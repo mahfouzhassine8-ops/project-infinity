@@ -19,42 +19,32 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
           path = Path('.github/workflows/build-kodi.yml')
           text = path.read_text()
-
-          old = '''      - name: Apply custom package ID
-        if: github.event.inputs.package_id != 'org.xbmc.kodi'
-        run: |
-          PKG="${{ github.event.inputs.package_id }}"
-          echo "📦 Setting package ID: $PKG"
-          find ~/kodi/tools/android/packaging -type f | \\
-            xargs sed -i "s|org\\.xbmc\\.kodi|$PKG|g" 2>/dev/null || true
-'''
-
-          new = '''      - name: Apply custom package ID
-        if: github.event.inputs.package_id != 'org.xbmc.kodi'
-        run: |
-          set -euo pipefail
-          PKG="${{ github.event.inputs.package_id }}"
-          echo "📦 Setting package ID: $PKG"
-
-          # Kodi reads APP_PACKAGE from version.txt during CMake configuration.
-          sed -i -E "s|^APP_PACKAGE[[:space:]]+org\\.xbmc\\.kodi$|APP_PACKAGE $PKG|" ~/kodi/version.txt
-
-          # Keep Android packaging references in sync with the package ID too.
-          find ~/kodi/tools/android/packaging -type f -print0 | \\
-            xargs -0 sed -i "s|org\\.xbmc\\.kodi|$PKG|g" 2>/dev/null || true
-
-          echo "Package value now:"
-          grep '^APP_PACKAGE ' ~/kodi/version.txt
-          grep -q "^APP_PACKAGE $PKG$" ~/kodi/version.txt
-'''
-
-          if old not in text:
-              raise SystemExit('Expected package-ID block was not found; refusing to make a blind edit.')
-
-          path.write_text(text.replace(old, new, 1))
+          start = text.index("      - name: Apply custom package ID\n")
+          end = text.index("      - name: Apply custom icon\n", start)
+          lines = [
+              "      - name: Apply custom package ID",
+              "        if: github.event.inputs.package_id != 'org.xbmc.kodi'",
+              "        run: |",
+              "          set -euo pipefail",
+              '          PKG="${{ github.event.inputs.package_id }}"',
+              '          echo "📦 Setting package ID: $PKG"',
+              "",
+              "          # Kodi reads APP_PACKAGE from version.txt during CMake configuration.",
+              '          sed -i -E "s|^APP_PACKAGE[[:space:]]+org\\.xbmc\\.kodi$|APP_PACKAGE $PKG|" ~/kodi/version.txt',
+              "",
+              "          # Keep Android packaging references in sync with the package ID too.",
+              "          find ~/kodi/tools/android/packaging -type f -print0 | \\",
+              '            xargs -0 sed -i "s|org\\.xbmc\\.kodi|$PKG|g" 2>/dev/null || true',
+              "",
+              '          echo "Package value now:"',
+              "          grep '^APP_PACKAGE ' ~/kodi/version.txt",
+              '          grep -q "^APP_PACKAGE $PKG$" ~/kodi/version.txt',
+              "",
+          ]
+          new_block = "\n".join(lines)
+          path.write_text(text[:start] + new_block + text[end:])
           PY
 
       - name: Remove one-time repair workflow
