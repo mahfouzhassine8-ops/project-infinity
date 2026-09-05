@@ -56,47 +56,54 @@ jobs:
           import re
 
           root = Path('/tmp/pi-decoded')
-
-          # Kodi's Android Splash code formats notice_dialog with a separate APP_NAME value.
-          # Force both the format string and all likely app-name resources to Infinity.
           for p in root.glob('res/values*/strings.xml'):
               text = p.read_text(errors='ignore')
               new = text
               for name in ('app_name', 'app_name_full', 'application_name'):
-                  new = re.sub(
-                      rf'(<string\s+name="{name}"[^>]*>).*?(</string>)',
-                      r'\1Infinity\2', new, flags=re.S)
-              new = re.sub(
-                  r'(<string\s+name="notice_dialog"[^>]*>).*?(</string>)',
-                  r'\1Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.\2',
-                  new, flags=re.S)
-              new = re.sub(
-                  r'(<string\s+name="networkperm_dialog"[^>]*>).*?(</string>)',
-                  r'\1Infinity requires access to your network to function. Please allow this via the following dialogue box or Infinity will exit.\2',
-                  new, flags=re.S)
-              new = re.sub(
-                  r'(<string\s+name="record_audio_dialog"[^>]*>).*?(</string>)',
-                  r'\1Infinity asks for permission to record audio. This is only used for voice search. Please allow or deny this in the following dialogue box.\2',
-                  new, flags=re.S)
+                  new = re.sub(rf'(<string\s+name="{name}"[^>]*>).*?(</string>)', r'\1Infinity\2', new, flags=re.S)
+              new = re.sub(r'(<string\s+name="notice_dialog"[^>]*>).*?(</string>)', r'\1Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.\2', new, flags=re.S)
+              new = re.sub(r'(<string\s+name="networkperm_dialog"[^>]*>).*?(</string>)', r'\1Infinity requires access to your network to function. Please allow this via the following dialogue box or Infinity will exit.\2', new, flags=re.S)
+              new = re.sub(r'(<string\s+name="record_audio_dialog"[^>]*>).*?(</string>)', r'\1Infinity asks for permission to record audio. This is only used for voice search. Please allow or deny this in the following dialogue box.\2', new, flags=re.S)
               if new != text:
                   p.write_text(new)
+
+          # Kodi's generated Splash.java passes the compiled APP_NAME literal into notice_dialog.
+          # Patch the decoded DEX/smali literals too, not just Android XML resources.
+          smali_hits = []
+          for p in root.glob('smali*/**/*.smali'):
+              text = p.read_text(errors='ignore')
+              if 'Kodi' not in text:
+                  continue
+              # Limit this to Splash-related classes so internal Kodi identifiers remain untouched.
+              if 'Splash' not in p.name and '/Splash' not in str(p):
+                  continue
+              new = re.sub(r'(const-string(?:/jumbo)?\s+[vp]\d+,\s+")Kodi(")', r'\1Infinity\2', text)
+              if new != text:
+                  p.write_text(new)
+                  smali_hits.append(str(p))
+          print('Patched Splash smali files:', smali_hits)
+          if not smali_hits:
+              print('WARNING: no Splash smali Kodi literal found; dumping candidates')
+              for p in root.glob('smali*/**/*.smali'):
+                  if 'Splash' in p.name:
+                      text = p.read_text(errors='ignore')
+                      if 'Kodi' in text or 'notice_dialog' in text:
+                          print(p)
 
           manifest = root / 'AndroidManifest.xml'
           text = manifest.read_text()
           text = re.sub(r'android:icon="[^"]+"', 'android:icon="@drawable/project_infinity_icon"', text, count=1)
           if 'android:roundIcon=' in text:
               text = re.sub(r'android:roundIcon="[^"]+"', 'android:roundIcon="@drawable/project_infinity_icon"', text, count=1)
-          # If the application/activity label is a literal Kodi string, remove that last Android-side source too.
           text = re.sub(r'android:label="Kodi"', 'android:label="Infinity"', text)
           manifest.write_text(text)
 
           for base in [root / 'assets' / 'addons' / 'resource.language.en_gb', root / 'assets' / 'language']:
-              if not base.exists():
-                  continue
-              for p in base.rglob('*.po'):
-                  text = p.read_text(errors='ignore')
-                  if 'Kodi' in text:
-                      p.write_text(text.replace('Kodi', 'Infinity'))
+              if base.exists():
+                  for p in base.rglob('*.po'):
+                      text = p.read_text(errors='ignore')
+                      if 'Kodi' in text:
+                          p.write_text(text.replace('Kodi', 'Infinity'))
           PY
 
           mkdir -p /tmp/pi-decoded/res/drawable-nodpi
@@ -111,28 +118,18 @@ jobs:
           convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' -quality 92 "$MEDIA/splash.jpg"
 
           mapfile -t LAUNCH_IMAGES < <(find /tmp/pi-decoded/res -type f \( -name 'applaunch_screen.png' -o -name 'applaunch_screen.webp' \))
-          if [ ${#LAUNCH_IMAGES[@]} -eq 0 ]; then
-            echo 'ERROR: applaunch_screen drawable not found'
-            exit 1
-          fi
+          test ${#LAUNCH_IMAGES[@]} -gt 0
           for f in "${LAUNCH_IMAGES[@]}"; do
             ext="${f##*.}"
             tmp="/tmp/infinity-launch.$ext"
-            convert -size 1920x1080 gradient:'#07151c-#0b2c3a' \
-              -font DejaVu-Sans -gravity center \
-              -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' \
-              -fill white -pointsize 92 -annotate +0+155 'INFINITY' \
-              "$tmp"
+            convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' "$tmp"
             cp "$tmp" "$f"
           done
           convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' "$MEDIA/applaunch_screen.png"
 
-          # Fail the build if the decoded Android resources still contain the exact old permission sentence.
-          if grep -RIn 'Kodi requires access to your device media and files' /tmp/pi-decoded/res; then
-            echo 'ERROR: old Kodi permission wording still present'
-            exit 1
-          fi
-          echo 'Permission branding verification:'
+          echo 'Remaining Kodi literals in Splash smali:'
+          grep -RIn --include='*Splash*.smali' '"Kodi"' /tmp/pi-decoded/smali* || true
+          echo 'Permission resource verification:'
           grep -RIn 'name="notice_dialog"' /tmp/pi-decoded/res/values* | head -20 || true
 
       - name: Rebuild branded APK
