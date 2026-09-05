@@ -1,0 +1,122 @@
+name: ♾️ Build Candidate 3 - Native Video Lock
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-candidate-3-video-lock.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin unzip curl fonts-dejavu-core
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download Infinity Stable 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9978114291/zip \
+            -o /tmp/stable2.zip
+          mkdir -p /tmp/stable2
+          unzip -q /tmp/stable2.zip -d /tmp/stable2
+          APK=$(find /tmp/stable2 -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/Infinity-Stable-2.apk
+
+      - name: Decode Stable 2
+        run: |
+          set -euo pipefail
+          java -jar /tmp/apktool.jar d -f /tmp/Infinity-Stable-2.apk -o /tmp/decoded
+
+      - name: Add native Infinity video lock
+        run: |
+          set -euo pipefail
+          SKIN=/tmp/decoded/assets/addons/skin.estuary
+          OSD="$SKIN/xml/VideoOSD.xml"
+          test -f "$OSD"
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          osd = Path('/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml')
+          text = osd.read_text()
+
+          marker = '<control type="radiobutton" id="804">'
+          if marker not in text:
+              raise SystemExit('ERROR: expected VideoOSD insertion point not found')
+
+          lock_button = '''<control type="radiobutton" id="7999">\n\t\t\t\t\t\t<include content="OSDButton">\n\t\t\t\t\t\t\t<param name="texture" value="osd/fullscreen/buttons/infinity-lock.png"/>\n\t\t\t\t\t\t</include>\n\t\t\t\t\t\t<label>Lock screen</label>\n\t\t\t\t\t\t<onclick>Dialog.Close(VideoOSD)</onclick>\n\t\t\t\t\t\t<onclick>ActivateWindow(1199)</onclick>\n\t\t\t\t\t\t<visible>Player.HasVideo</visible>\n\t\t\t\t\t</control>\n\t\t\t\t\t'''
+
+          if 'id="7999"' not in text:
+              text = text.replace(marker, lock_button + marker, 1)
+              osd.write_text(text)
+
+          overlay = Path('/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml')
+          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog">\n    <defaultcontrol always="true">9901</defaultcontrol>\n    <controls>\n        <!-- Full-screen invisible catcher: taps do nothing while playback continues. -->\n        <control type="button" id="9900">\n            <left>0</left><top>0</top><width>100%</width><height>100%</height>\n            <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n            <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n            <label></label>\n            <onclick>noop</onclick>\n        </control>\n\n        <!-- Small intentional unlock target. -->\n        <control type="button" id="9901">\n            <right>35</right><top>35</top><width>190</width><height>90</height>\n            <texturefocus colordiffuse="CC20252B">white.png</texturefocus>\n            <texturenofocus colordiffuse="9920252B">white.png</texturenofocus>\n            <label>🔓  Unlock</label>\n            <font>font13</font>\n            <align>center</align><aligny>center</aligny>\n            <onclick>Dialog.Close(1199)</onclick>\n        </control>\n\n        <control type="label">\n            <centerleft>50%</centerleft><top>35</top><width>500</width><height>65</height>\n            <align>center</align><aligny>center</aligny>\n            <label>🔒  Infinity screen locked</label>\n            <font>font13</font>\n            <textcolor>white</textcolor><shadowcolor>black</shadowcolor>\n        </control>\n    </controls>\n</window>\n''')
+          PY
+
+          # Add a simple lock icon used by the normal player OSD.
+          mkdir -p "$SKIN/media/osd/fullscreen/buttons"
+          cat > /tmp/infinity-lock.svg <<'SVG'
+          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74">
+            <rect x="14" y="31" width="46" height="35" rx="7" fill="white"/>
+            <path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="37" cy="47" r="4" fill="#111318"/>
+            <rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/>
+          </svg>
+          SVG
+          rsvg-convert -w 74 -h 74 /tmp/infinity-lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
+
+          echo '=== Candidate 3 verification ==='
+          grep -n 'id="7999"' "$OSD"
+          grep -n 'ActivateWindow(1199)' "$OSD"
+          test -f "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
+          test -f "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
+
+      - name: Rebuild Candidate 3
+        run: |
+          set -euo pipefail
+          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Candidate-3-unsigned.apk
+
+      - name: Sign Candidate 3
+        run: |
+          set -euo pipefail
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+          mkdir -p ~/.android
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Candidate 3, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BUILD_TOOLS/zipalign" -f -v 4 /tmp/Infinity-Candidate-3-unsigned.apk /tmp/Infinity-Candidate-3-aligned.apk
+          "$BUILD_TOOLS/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Candidate-3.apk /tmp/Infinity-Candidate-3-aligned.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose /tmp/Infinity-Candidate-3.apk
+
+      - name: Upload Candidate 3
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Candidate-3-Video-Lock
+          path: /tmp/Infinity-Candidate-3.apk
+          retention-days: 30
