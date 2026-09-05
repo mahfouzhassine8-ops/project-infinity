@@ -54,7 +54,7 @@ jobs:
           set -euo pipefail
           java -jar /tmp/apktool.jar d -f /tmp/Infinity-Stable-2.apk -o /tmp/decoded
 
-      - name: Add native Infinity video lock
+      - name: Add VLC-style native Infinity video lock
         run: |
           set -euo pipefail
           SKIN=/tmp/decoded/assets/addons/skin.estuary
@@ -78,10 +78,9 @@ jobs:
               osd.write_text(text)
 
           overlay = Path('/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml')
-          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog">\n    <defaultcontrol always="true">9901</defaultcontrol>\n    <controls>\n        <!-- Full-screen invisible catcher: taps do nothing while playback continues. -->\n        <control type="button" id="9900">\n            <left>0</left><top>0</top><width>100%</width><height>100%</height>\n            <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n            <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n            <label></label>\n            <onclick>noop</onclick>\n        </control>\n\n        <!-- Small intentional unlock target. -->\n        <control type="button" id="9901">\n            <right>35</right><top>35</top><width>190</width><height>90</height>\n            <texturefocus colordiffuse="CC20252B">white.png</texturefocus>\n            <texturenofocus colordiffuse="9920252B">white.png</texturenofocus>\n            <label>🔓  Unlock</label>\n            <font>font13</font>\n            <align>center</align><aligny>center</aligny>\n            <onclick>Dialog.Close(1199)</onclick>\n        </control>\n\n        <control type="label">\n            <centerleft>50%</centerleft><top>35</top><width>500</width><height>65</height>\n            <align>center</align><aligny>center</aligny>\n            <label>🔒  Infinity screen locked</label>\n            <font>font13</font>\n            <textcolor>white</textcolor><shadowcolor>black</shadowcolor>\n        </control>\n    </controls>\n</window>\n''')
+          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog">\n    <onload>ClearProperty(InfinityUnlockVisible)</onload>\n    <onunload>ClearProperty(InfinityUnlockVisible)</onunload>\n    <defaultcontrol always="true">9900</defaultcontrol>\n    <controls>\n        <!-- While locked, this full-screen transparent button absorbs touches.\n             First tap only reveals the unlock control; it does not affect playback. -->\n        <control type="button" id="9900">\n            <left>0</left><top>0</top><width>100%</width><height>100%</height>\n            <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n            <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n            <label></label>\n            <onclick>SetProperty(InfinityUnlockVisible,true)</onclick>\n            <onclick>AlarmClock(InfinityHideUnlock,ClearProperty(InfinityUnlockVisible),3,silent)</onclick>\n        </control>\n\n        <!-- VLC-style behavior: this is hidden until the user taps the locked screen.\n             It disappears again after ~3 seconds if not pressed. -->\n        <control type="button" id="9901">\n            <right>35</right><top>35</top><width>190</width><height>90</height>\n            <texturefocus colordiffuse="CC20252B">white.png</texturefocus>\n            <texturenofocus colordiffuse="9920252B">white.png</texturenofocus>\n            <label>🔓  Unlock</label>\n            <font>font13</font>\n            <align>center</align><aligny>center</aligny>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible))</visible>\n            <onclick>CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick>ClearProperty(InfinityUnlockVisible)</onclick>\n            <onclick>Dialog.Close(1199)</onclick>\n        </control>\n    </controls>\n</window>\n''')
           PY
 
-          # Add a simple lock icon used by the normal player OSD.
           mkdir -p "$SKIN/media/osd/fullscreen/buttons"
           cat > /tmp/infinity-lock.svg <<'SVG'
           <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74">
@@ -93,10 +92,11 @@ jobs:
           SVG
           rsvg-convert -w 74 -h 74 /tmp/infinity-lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
 
-          echo '=== Candidate 3 verification ==='
+          echo '=== Candidate 3 VLC-style verification ==='
           grep -n 'id="7999"' "$OSD"
           grep -n 'ActivateWindow(1199)' "$OSD"
-          test -f "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
+          grep -n 'InfinityUnlockVisible' "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
+          grep -n 'AlarmClock(InfinityHideUnlock' "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
           test -f "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
 
       - name: Rebuild Candidate 3
@@ -117,6 +117,6 @@ jobs:
       - name: Upload Candidate 3
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Candidate-3-Video-Lock
+          name: Infinity-Candidate-3-VLC-Style-Video-Lock
           path: /tmp/Infinity-Candidate-3.apk
           retention-days: 30
