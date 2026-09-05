@@ -31,7 +31,7 @@ jobs:
       - name: Install branding tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends imagemagick unzip curl
+          sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin unzip curl
           curl -fsSL -o /tmp/apktool.jar \
             https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
 
@@ -91,7 +91,7 @@ jobs:
             <text x="256" y="330" text-anchor="middle" font-size="300" font-family="DejaVu Sans" font-weight="bold" fill="#ffffff">∞</text>
           </svg>
           SVG
-          convert /tmp/project-infinity.svg /tmp/pi-decoded/res/drawable-nodpi/project_infinity_icon.png
+          rsvg-convert -w 512 -h 512 /tmp/project-infinity.svg -o /tmp/pi-decoded/res/drawable-nodpi/project_infinity_icon.png
 
           grep -n 'android:icon\|android:label' /tmp/pi-decoded/AndroidManifest.xml | head -10 || true
           grep -RIn 'name="app_name"' /tmp/pi-decoded/res/values* | head -10 || true
