@@ -336,13 +336,13 @@ jobs:
           find ~/kodi/tools/android/packaging -type f -name "*.xml" -o -name "*.gradle" | \
             xargs sed -i "s|>Kodi<|>$APP<|g; s|\"Kodi\"|\"$APP\"|g" 2>/dev/null || true
 
-      - name: Apply custom package ID
-        if: github.event.inputs.package_id != 'org.xbmc.kodi'
-        run: |
-          PKG="${{ github.event.inputs.package_id }}"
-          echo "📦 Setting package ID: $PKG"
-          find ~/kodi/tools/android/packaging -type f | \
-            xargs sed -i "s|org\.xbmc\.kodi|$PKG|g" 2>/dev/null || true
+       - name: Apply custom package ID
+  if: github.event.inputs.package_id != 'org.xbmc.kodi'
+  run: |
+    PKG="${{ github.event.inputs.package_id }}"
+    echo "📦 Setting package ID: $PKG"
+    sed -i "s|^APP_PACKAGE .*|APP_PACKAGE $PKG|" ~/kodi/version.txt
+    grep '^APP_PACKAGE ' ~/kodi/version.txt
 
       - name: Apply custom icon
         run: |
