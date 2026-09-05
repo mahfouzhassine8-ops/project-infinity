@@ -54,7 +54,7 @@ jobs:
           set -euo pipefail
           java -jar /tmp/apktool.jar d -f /tmp/Infinity-Stable-2.apk -o /tmp/decoded
 
-      - name: Add polished VLC-style Infinity video lock
+      - name: Add icon-only VLC-style Infinity video lock
         run: |
           set -euo pipefail
           SKIN=/tmp/decoded/assets/addons/skin.estuary
@@ -63,47 +63,31 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
-
           osd = Path('/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml')
           text = osd.read_text()
           marker = '<control type="radiobutton" id="804">'
           if marker not in text:
               raise SystemExit('ERROR: expected VideoOSD insertion point not found')
-
           lock_button = '''<control type="radiobutton" id="7999">\n\t\t\t\t\t\t<include content="OSDButton">\n\t\t\t\t\t\t\t<param name="texture" value="osd/fullscreen/buttons/infinity-lock.png"/>\n\t\t\t\t\t\t</include>\n\t\t\t\t\t\t<label>Lock screen</label>\n\t\t\t\t\t\t<onclick>Dialog.Close(VideoOSD)</onclick>\n\t\t\t\t\t\t<onclick>ActivateWindow(1199)</onclick>\n\t\t\t\t\t\t<visible>Player.HasVideo</visible>\n\t\t\t\t\t</control>\n\t\t\t\t\t'''
-
           if 'id="7999"' not in text:
               text = text.replace(marker, lock_button + marker, 1)
               osd.write_text(text)
 
           overlay = Path('/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml')
-          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog" id="1199">\n    <onload>SetProperty(InfinityVideoLocked,true)</onload>\n    <onload>SetProperty(InfinityLockHint,true)</onload>\n    <onload>ClearProperty(InfinityUnlockVisible)</onload>\n    <onload>ClearProperty(InfinityUnlocking)</onload>\n    <onload>AlarmClock(InfinityHideLockHint,ClearProperty(InfinityLockHint),2,silent)</onload>\n    <onunload>CancelAlarm(InfinityHideUnlock,silent)</onunload>\n    <onunload>CancelAlarm(InfinityHideLockHint,silent)</onunload>\n    <onunload>CancelAlarm(InfinityFinishUnlock,silent)</onunload>\n    <onunload>ClearProperty(InfinityUnlockVisible)</onunload>\n    <onunload>ClearProperty(InfinityLockHint)</onunload>\n    <onunload>ClearProperty(InfinityUnlocking)</onunload>\n    <onunload>ClearProperty(InfinityVideoLocked)</onunload>\n    <defaultcontrol always="true">9900</defaultcontrol>\n    <controls>\n        <!-- Full-screen transparent catcher: normal OSD cannot reopen while locked. -->\n        <control type="button" id="9900">\n            <left>0</left><top>0</top><width>100%</width><height>100%</height>\n            <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n            <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n            <label></label>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">SetProperty(InfinityUnlockVisible,true)</onclick>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">AlarmClock(InfinityHideUnlock,ClearProperty(InfinityUnlockVisible),3,silent)</onclick>\n        </control>\n\n        <!-- Initial LOCKED status: top-left, then disappears. -->\n        <control type="group">\n            <left>45</left><top>35</top>\n            <visible>!String.IsEmpty(Window.Property(InfinityLockHint))</visible>\n            <animation effect="fade" start="0" end="100" time="120">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="180">Hidden</animation>\n            <control type="image">\n                <left>0</left><top>0</top><width>62</width><height>62</height>\n                <texture>osd/fullscreen/buttons/infinity-lock.png</texture>\n            </control>\n            <control type="label">\n                <left>75</left><top>5</top><width>210</width><height>52</height>\n                <aligny>center</aligny><label>Locked</label>\n                <font>font13</font><textcolor>white</textcolor><shadowcolor>black</shadowcolor>\n            </control>\n        </control>\n\n        <!-- Tap while locked: only this top-left lock target appears. -->\n        <control type="button" id="9901">\n            <left>35</left><top>25</top><width>285</width><height>82</height>\n            <texturefocus colordiffuse="3320252B">white.png</texturefocus>\n            <texturenofocus colordiffuse="0020252B">white.png</texturenofocus>\n            <label>🔒   Locked</label>\n            <font>font13</font><align>left</align><aligny>center</aligny>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n            <animation effect="fade" start="0" end="100" time="100">Visible</animation>\n            <onclick>CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick>ClearProperty(InfinityUnlockVisible)</onclick>\n            <onclick>SetProperty(InfinityUnlocking,true)</onclick>\n            <onclick>AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),0.7,silent)</onclick>\n        </control>\n\n        <!-- Quick UNLOCKED animation in the SAME top-left position. -->\n        <control type="group">\n            <left>45</left><top>35</top>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n            <animation effect="fade" start="0" end="100" time="90">Visible</animation>\n            <animation effect="zoom" start="88" end="100" center="75,65" time="120">Visible</animation>\n            <control type="image">\n                <left>0</left><top>0</top><width>62</width><height>62</height>\n                <texture>osd/fullscreen/buttons/infinity-unlock.png</texture>\n            </control>\n            <control type="label">\n                <left>75</left><top>5</top><width>220</width><height>52</height>\n                <aligny>center</aligny><label>Unlocked</label>\n                <font>font13</font><textcolor>white</textcolor><shadowcolor>black</shadowcolor>\n            </control>\n        </control>\n    </controls>\n</window>\n''')
+          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog" id="1199">\n    <onload>SetProperty(InfinityVideoLocked,true)</onload>\n    <onload>SetProperty(InfinityLockHint,true)</onload>\n    <onload>ClearProperty(InfinityUnlockVisible)</onload>\n    <onload>ClearProperty(InfinityUnlocking)</onload>\n    <onload>AlarmClock(InfinityHideLockHint,ClearProperty(InfinityLockHint),1.4,silent)</onload>\n    <onunload>CancelAlarm(InfinityHideUnlock,silent)</onunload>\n    <onunload>CancelAlarm(InfinityHideLockHint,silent)</onunload>\n    <onunload>CancelAlarm(InfinityFinishUnlock,silent)</onunload>\n    <onunload>ClearProperty(InfinityUnlockVisible)</onunload>\n    <onunload>ClearProperty(InfinityLockHint)</onunload>\n    <onunload>ClearProperty(InfinityUnlocking)</onunload>\n    <onunload>ClearProperty(InfinityVideoLocked)</onunload>\n    <defaultcontrol always="true">9900</defaultcontrol>\n    <controls>\n        <control type="button" id="9900">\n            <left>0</left><top>0</top><width>100%</width><height>100%</height>\n            <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n            <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n            <label></label>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">SetProperty(InfinityUnlockVisible,true)</onclick>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">AlarmClock(InfinityHideUnlock,ClearProperty(InfinityUnlockVisible),2.5,silent)</onclick>\n        </control>\n\n        <!-- Icon only: briefly appears after lock, then fades away. -->\n        <control type="image">\n            <left>48</left><top>35</top><width>58</width><height>58</height>\n            <texture>osd/fullscreen/buttons/infinity-lock.png</texture>\n            <visible>!String.IsEmpty(Window.Property(InfinityLockHint))</visible>\n            <animation effect="fade" start="0" end="100" time="100">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="180">Hidden</animation>\n        </control>\n\n        <!-- Tap locked video: only the lock icon returns. Tapping it begins unlock. -->\n        <control type="button" id="9901">\n            <left>38</left><top>25</top><width>80</width><height>80</height>\n            <texturefocus>osd/fullscreen/buttons/infinity-lock.png</texturefocus>\n            <texturenofocus>osd/fullscreen/buttons/infinity-lock.png</texturenofocus>\n            <label></label>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n            <animation effect="fade" start="0" end="100" time="100">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="160">Hidden</animation>\n            <onclick>CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick>ClearProperty(InfinityUnlockVisible)</onclick>\n            <onclick>SetProperty(InfinityUnlocking,true)</onclick>\n            <onclick>AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),0.65,silent)</onclick>\n        </control>\n\n        <!-- Same position: quick closed-lock to open-lock transition, icon only. -->\n        <control type="image">\n            <left>48</left><top>35</top><width>58</width><height>58</height>\n            <texture>osd/fullscreen/buttons/infinity-unlock.png</texture>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n            <animation effect="fade" start="0" end="100" time="80">Visible</animation>\n            <animation effect="zoom" start="88" end="105" center="77,64" time="110" pulse="true">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="180" delay="360">Visible</animation>\n        </control>\n    </controls>\n</window>\n''')
           PY
 
           mkdir -p "$SKIN/media/osd/fullscreen/buttons"
           cat > /tmp/infinity-lock.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74">
-            <rect x="14" y="31" width="46" height="35" rx="7" fill="white"/>
-            <path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/>
-            <circle cx="37" cy="47" r="4" fill="#111318"/>
-            <rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/>
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#111318"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/></svg>
           SVG
           cat > /tmp/infinity-unlock.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74">
-            <rect x="14" y="31" width="46" height="35" rx="7" fill="white"/>
-            <path d="M24 31V22c0-8 5-14 13-14 6 0 11 3 13 8" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/>
-            <circle cx="37" cy="47" r="4" fill="#111318"/>
-            <rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/>
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14 6 0 11 3 13 8" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#111318"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/></svg>
           SVG
           rsvg-convert -w 74 -h 74 /tmp/infinity-lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
           rsvg-convert -w 74 -h 74 /tmp/infinity-unlock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-unlock.png"
-
-          echo '=== Candidate 3 polished lock verification ==='
           grep -n 'id="7999"' "$OSD"
           grep -n 'InfinityUnlocking' "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
-          grep -n 'InfinityFinishUnlock' "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
           test -f "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
           test -f "$SKIN/media/osd/fullscreen/buttons/infinity-unlock.png"
 
@@ -125,6 +109,6 @@ jobs:
       - name: Upload Candidate 3
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Candidate-3-Polished-VLC-Lock
+          name: Infinity-Candidate-3-Icon-Only-VLC-Lock
           path: /tmp/Infinity-Candidate-3.apk
           retention-days: 30
