@@ -54,12 +54,28 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
+
           root = Path('/tmp/pi-decoded')
+
+          # Android resource strings used by the actual first-run permission dialog.
           for p in root.glob('res/values*/strings.xml'):
               text = p.read_text(errors='ignore')
               new = re.sub(r'(<string\s+name="app_name"[^>]*>).*?(</string>)', r'\1Infinity\2', text, flags=re.S)
+              new = re.sub(
+                  r'(<string\s+name="notice_dialog"[^>]*>).*?(</string>)',
+                  r'\1Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.\2',
+                  new,
+                  flags=re.S,
+              )
+              new = re.sub(
+                  r'(<string\s+name="networkperm_dialog"[^>]*>).*?(</string>)',
+                  r'\1Infinity requires access to your network to function. Please allow this via the following dialogue box or Infinity will exit.\2',
+                  new,
+                  flags=re.S,
+              )
               if new != text:
                   p.write_text(new)
+
           manifest = root / 'AndroidManifest.xml'
           text = manifest.read_text()
           text = re.sub(r'android:icon="[^"]+"', 'android:icon="@drawable/project_infinity_icon"', text, count=1)
@@ -67,8 +83,7 @@ jobs:
               text = re.sub(r'android:roundIcon="[^"]+"', 'android:roundIcon="@drawable/project_infinity_icon"', text, count=1)
           manifest.write_text(text)
 
-          # Rebrand visible Kodi wording in packaged first-run/core language strings.
-          # This leaves package IDs, APIs, paths and functional identifiers untouched.
+          # Visible Kodi wording in packaged core language strings.
           for base in [root / 'assets' / 'addons' / 'resource.language.en_gb', root / 'assets' / 'language']:
               if not base.exists():
                   continue
@@ -88,15 +103,33 @@ jobs:
           mkdir -p "$MEDIA"
           convert -size 465x128 xc:none -font DejaVu-Sans -gravity west -fill '#19b5e6' -pointsize 92 -annotate +4+0 '∞' -fill white -pointsize 58 -annotate +126+0 'INFINITY' "$MEDIA/vendor_logo.png"
           convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' -quality 92 "$MEDIA/splash.jpg"
+
+          # This is the real Android splash/first-run background referenced by activity_splash.xml.
+          # Replace every decoded drawable variant named applaunch_screen.
+          mapfile -t LAUNCH_IMAGES < <(find /tmp/pi-decoded/res -type f \( -name 'applaunch_screen.png' -o -name 'applaunch_screen.webp' \))
+          if [ ${#LAUNCH_IMAGES[@]} -eq 0 ]; then
+            echo 'ERROR: applaunch_screen drawable not found'
+            exit 1
+          fi
+          for f in "${LAUNCH_IMAGES[@]}"; do
+            ext="${f##*.}"
+            tmp="/tmp/infinity-launch.$ext"
+            convert -size 1920x1080 gradient:'#07151c-#0b2c3a' \
+              -font DejaVu-Sans -gravity center \
+              -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' \
+              -fill white -pointsize 92 -annotate +0+155 'INFINITY' \
+              "$tmp"
+            cp "$tmp" "$f"
+            echo "Replaced Android launch image: $f"
+          done
+
+          # Keep a matching core media copy as well.
           convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' "$MEDIA/applaunch_screen.png"
 
-          # First-run screen in the screenshot uses the legacy Kodi logo asset.
-          # Replace common packaged legacy logo names while preserving dimensions/format.
-          for f in "$MEDIA/kodi-logo.png" "$MEDIA/kodi_logo.png" "$MEDIA/logo.png"; do
-            if [ -f "$f" ]; then
-              convert -size 900x520 xc:none -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 260 -annotate +0-70 '∞' -fill white -pointsize 92 -annotate +0+150 'INFINITY' "$f"
-            fi
-          done
+          echo 'First-run string check:'
+          grep -RIn 'name="notice_dialog"' /tmp/pi-decoded/res/values* | head -10 || true
+          echo 'Launch drawable check:'
+          find /tmp/pi-decoded/res -type f -name 'applaunch_screen*' -print
 
       - name: Rebuild branded APK
         run: |
