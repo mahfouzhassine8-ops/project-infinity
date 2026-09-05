@@ -31,7 +31,7 @@ jobs:
       - name: Install branding tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin unzip curl
+          sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin unzip curl fonts-dejavu-core
           curl -fsSL -o /tmp/apktool.jar \
             https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
 
@@ -50,7 +50,6 @@ jobs:
           APK=$(find /tmp/pi -name '*.apk' -type f | head -1)
           test -n "$APK"
           cp "$APK" /tmp/Project-Infinity-source.apk
-          echo "Source APK: $APK"
 
       - name: Decode and apply Infinity branding
         run: |
@@ -62,7 +61,6 @@ jobs:
           import re
 
           root = Path('/tmp/pi-decoded')
-          changed = 0
           for p in root.glob('res/values*/strings.xml'):
               text = p.read_text(errors='ignore')
               new = re.sub(
@@ -73,8 +71,6 @@ jobs:
               )
               if new != text:
                   p.write_text(new)
-                  changed += 1
-          print(f'Updated app_name in {changed} strings.xml file(s)')
 
           manifest = root / 'AndroidManifest.xml'
           text = manifest.read_text()
@@ -85,13 +81,39 @@ jobs:
           PY
 
           mkdir -p /tmp/pi-decoded/res/drawable-nodpi
-          cat > /tmp/project-infinity.svg <<'SVG'
+          cat > /tmp/infinity-icon.svg <<'SVG'
           <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
             <rect width="512" height="512" rx="112" fill="#111318"/>
             <text x="256" y="330" text-anchor="middle" font-size="300" font-family="DejaVu Sans" font-weight="bold" fill="#ffffff">∞</text>
           </svg>
           SVG
-          rsvg-convert -w 512 -h 512 /tmp/project-infinity.svg -o /tmp/pi-decoded/res/drawable-nodpi/project_infinity_icon.png
+          rsvg-convert -w 512 -h 512 /tmp/infinity-icon.svg -o /tmp/pi-decoded/res/drawable-nodpi/project_infinity_icon.png
+
+          MEDIA=/tmp/pi-decoded/assets/media
+          mkdir -p "$MEDIA"
+
+          # Estuary top-left branding: Home.xml already points to special://xbmc/media/vendor_logo.png
+          convert -size 465x128 xc:none \
+            -font DejaVu-Sans -gravity west \
+            -fill '#19b5e6' -pointsize 92 -annotate +4+0 '∞' \
+            -fill white -pointsize 58 -annotate +126+0 'INFINITY' \
+            "$MEDIA/vendor_logo.png"
+
+          # Kodi core splash screen replacement
+          convert -size 1920x1080 gradient:'#07151c-#0b2c3a' \
+            -font DejaVu-Sans -gravity center \
+            -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' \
+            -fill white -pointsize 92 -annotate +0+155 'INFINITY' \
+            -quality 92 "$MEDIA/splash.jpg"
+
+          # Android launch screen replacement
+          convert -size 1920x1080 gradient:'#07151c-#0b2c3a' \
+            -font DejaVu-Sans -gravity center \
+            -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' \
+            -fill white -pointsize 92 -annotate +0+155 'INFINITY' \
+            "$MEDIA/applaunch_screen.png"
+
+          identify "$MEDIA/vendor_logo.png" "$MEDIA/splash.jpg" "$MEDIA/applaunch_screen.png"
 
       - name: Rebuild branded APK
         run: |
