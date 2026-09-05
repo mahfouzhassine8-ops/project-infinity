@@ -57,22 +57,27 @@ jobs:
 
           root = Path('/tmp/pi-decoded')
 
-          # Android resource strings used by the actual first-run permission dialog.
+          # Kodi's Android Splash code formats notice_dialog with a separate APP_NAME value.
+          # Force both the format string and all likely app-name resources to Infinity.
           for p in root.glob('res/values*/strings.xml'):
               text = p.read_text(errors='ignore')
-              new = re.sub(r'(<string\s+name="app_name"[^>]*>).*?(</string>)', r'\1Infinity\2', text, flags=re.S)
+              new = text
+              for name in ('app_name', 'app_name_full', 'application_name'):
+                  new = re.sub(
+                      rf'(<string\s+name="{name}"[^>]*>).*?(</string>)',
+                      r'\1Infinity\2', new, flags=re.S)
               new = re.sub(
                   r'(<string\s+name="notice_dialog"[^>]*>).*?(</string>)',
                   r'\1Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.\2',
-                  new,
-                  flags=re.S,
-              )
+                  new, flags=re.S)
               new = re.sub(
                   r'(<string\s+name="networkperm_dialog"[^>]*>).*?(</string>)',
                   r'\1Infinity requires access to your network to function. Please allow this via the following dialogue box or Infinity will exit.\2',
-                  new,
-                  flags=re.S,
-              )
+                  new, flags=re.S)
+              new = re.sub(
+                  r'(<string\s+name="record_audio_dialog"[^>]*>).*?(</string>)',
+                  r'\1Infinity asks for permission to record audio. This is only used for voice search. Please allow or deny this in the following dialogue box.\2',
+                  new, flags=re.S)
               if new != text:
                   p.write_text(new)
 
@@ -81,9 +86,10 @@ jobs:
           text = re.sub(r'android:icon="[^"]+"', 'android:icon="@drawable/project_infinity_icon"', text, count=1)
           if 'android:roundIcon=' in text:
               text = re.sub(r'android:roundIcon="[^"]+"', 'android:roundIcon="@drawable/project_infinity_icon"', text, count=1)
+          # If the application/activity label is a literal Kodi string, remove that last Android-side source too.
+          text = re.sub(r'android:label="Kodi"', 'android:label="Infinity"', text)
           manifest.write_text(text)
 
-          # Visible Kodi wording in packaged core language strings.
           for base in [root / 'assets' / 'addons' / 'resource.language.en_gb', root / 'assets' / 'language']:
               if not base.exists():
                   continue
@@ -104,8 +110,6 @@ jobs:
           convert -size 465x128 xc:none -font DejaVu-Sans -gravity west -fill '#19b5e6' -pointsize 92 -annotate +4+0 '∞' -fill white -pointsize 58 -annotate +126+0 'INFINITY' "$MEDIA/vendor_logo.png"
           convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' -quality 92 "$MEDIA/splash.jpg"
 
-          # This is the real Android splash/first-run background referenced by activity_splash.xml.
-          # Replace every decoded drawable variant named applaunch_screen.
           mapfile -t LAUNCH_IMAGES < <(find /tmp/pi-decoded/res -type f \( -name 'applaunch_screen.png' -o -name 'applaunch_screen.webp' \))
           if [ ${#LAUNCH_IMAGES[@]} -eq 0 ]; then
             echo 'ERROR: applaunch_screen drawable not found'
@@ -120,16 +124,16 @@ jobs:
               -fill white -pointsize 92 -annotate +0+155 'INFINITY' \
               "$tmp"
             cp "$tmp" "$f"
-            echo "Replaced Android launch image: $f"
           done
-
-          # Keep a matching core media copy as well.
           convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' "$MEDIA/applaunch_screen.png"
 
-          echo 'First-run string check:'
-          grep -RIn 'name="notice_dialog"' /tmp/pi-decoded/res/values* | head -10 || true
-          echo 'Launch drawable check:'
-          find /tmp/pi-decoded/res -type f -name 'applaunch_screen*' -print
+          # Fail the build if the decoded Android resources still contain the exact old permission sentence.
+          if grep -RIn 'Kodi requires access to your device media and files' /tmp/pi-decoded/res; then
+            echo 'ERROR: old Kodi permission wording still present'
+            exit 1
+          fi
+          echo 'Permission branding verification:'
+          grep -RIn 'name="notice_dialog"' /tmp/pi-decoded/res/values* | head -20 || true
 
       - name: Rebuild branded APK
         run: |
