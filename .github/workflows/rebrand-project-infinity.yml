@@ -1,4 +1,4 @@
-name: ♾️ Rebrand Project Infinity APK
+name: ♾️ Rebrand Infinity APK
 
 on:
   workflow_dispatch:
@@ -52,7 +52,7 @@ jobs:
           cp "$APK" /tmp/Project-Infinity-source.apk
           echo "Source APK: $APK"
 
-      - name: Decode and apply Project Infinity branding
+      - name: Decode and apply Infinity branding
         run: |
           set -euo pipefail
           java -jar /tmp/apktool.jar d -f /tmp/Project-Infinity-source.apk -o /tmp/pi-decoded
@@ -67,7 +67,7 @@ jobs:
               text = p.read_text(errors='ignore')
               new = re.sub(
                   r'(<string\s+name="app_name"[^>]*>).*?(</string>)',
-                  r'\1Project Infinity\2',
+                  r'\1Infinity\2',
                   text,
                   flags=re.S,
               )
@@ -93,13 +93,10 @@ jobs:
           SVG
           rsvg-convert -w 512 -h 512 /tmp/project-infinity.svg -o /tmp/pi-decoded/res/drawable-nodpi/project_infinity_icon.png
 
-          grep -n 'android:icon\|android:label' /tmp/pi-decoded/AndroidManifest.xml | head -10 || true
-          grep -RIn 'name="app_name"' /tmp/pi-decoded/res/values* | head -10 || true
-
       - name: Rebuild branded APK
         run: |
           set -euo pipefail
-          java -jar /tmp/apktool.jar b /tmp/pi-decoded -o /tmp/Project-Infinity-unsigned.apk
+          java -jar /tmp/apktool.jar b /tmp/pi-decoded -o /tmp/Infinity-unsigned.apk
 
       - name: Sign branded APK
         run: |
@@ -111,26 +108,26 @@ jobs:
             -alias projectinfinity \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -storepass android -keypass android \
-            -dname "CN=Project Infinity, OU=Personal Build, O=Project Infinity, L=Detroit, ST=Michigan, C=US" \
+            -dname "CN=Infinity, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" \
             >/dev/null 2>&1
 
           "$BUILD_TOOLS/zipalign" -f -v 4 \
-            /tmp/Project-Infinity-unsigned.apk \
-            /tmp/Project-Infinity-aligned.apk
+            /tmp/Infinity-unsigned.apk \
+            /tmp/Infinity-aligned.apk
 
           "$BUILD_TOOLS/apksigner" sign \
             --ks ~/.android/project-infinity.keystore \
             --ks-key-alias projectinfinity \
             --ks-pass pass:android \
             --key-pass pass:android \
-            --out /tmp/Project-Infinity-Branded.apk \
-            /tmp/Project-Infinity-aligned.apk
+            --out /tmp/Infinity.apk \
+            /tmp/Infinity-aligned.apk
 
-          "$BUILD_TOOLS/apksigner" verify --verbose /tmp/Project-Infinity-Branded.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose /tmp/Infinity.apk
 
-      - name: Upload branded Project Infinity APK
+      - name: Upload Infinity APK
         uses: actions/upload-artifact@v7
         with:
-          name: Project-Infinity-Branded.apk
-          path: /tmp/Project-Infinity-Branded.apk
+          name: Infinity.apk
+          path: /tmp/Infinity.apk
           retention-days: 30
