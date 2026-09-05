@@ -1,0 +1,84 @@
+name: ♾️ Diagnose Internal Video Lock
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose-video-lock:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install diagnostic tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl binutils
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download Stable 2 APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Stable 2 = successful Run #10 artifact.
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9978114291/zip \
+            -o /tmp/stable2.zip
+          mkdir -p /tmp/stable2
+          unzip -q /tmp/stable2.zip -d /tmp/stable2
+          APK=$(find /tmp/stable2 -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/Infinity-Stable-2.apk
+
+      - name: Decode Stable 2 and trace video lock hooks
+        run: |
+          set -euo pipefail
+          java -jar /tmp/apktool.jar d -f /tmp/Infinity-Stable-2.apk -o /tmp/decoded
+          REPORT=/tmp/Infinity-Video-Lock-Diagnostic.txt
+          {
+            echo 'INFINITY INTERNAL VIDEO LOCK DIAGNOSTIC'
+            echo '======================================='
+            echo 'Base: Infinity Stable 2 / Run #10'
+            echo
+            echo '1) Fullscreen video / OSD XML candidates'
+            find /tmp/decoded -type f | grep -Ei '(VideoOSD|VideoFullScreen|FullScreenVideo|DialogSeekBar|PlayerControls|VideoPlayer|OSD).*\.xml$' || true
+            echo
+            echo '2) XML controls/actions mentioning lock, player, OSD, touch, fullscreen'
+            grep -RIna --include='*.xml' -E 'PlayerControl|Player\. |VideoPlayer|VideoOSD|FullScreen|fullscreen|lock|Lock|touch|Touch|gesture|Gesture' /tmp/decoded/assets /tmp/decoded/res 2>/dev/null | head -4000 || true
+            echo
+            echo '3) Kodi skin lock-related strings/actions'
+            grep -RIna --include='*.xml' -E 'PlayerControl\(|Action\(|SetProperty\(|ClearProperty\(|Window\(|ActivateWindow\(|lock|Lock' /tmp/decoded/assets/addons 2>/dev/null | head -4000 || true
+            echo
+            echo '4) Smali classes related to player/input/touch/key/fullscreen'
+            find /tmp/decoded -type f -name '*.smali' | grep -Ei '(player|video|touch|gesture|input|key|fullscreen|window)' | head -3000 || true
+            echo
+            echo '5) Smali text references for input interception / video playback'
+            grep -RIna --include='*.smali' -E 'onTouch|dispatchTouchEvent|onKey|dispatchKeyEvent|KeyEvent|MotionEvent|Video|Player|FullScreen|fullscreen|lock|Lock' /tmp/decoded/smali* 2>/dev/null | head -5000 || true
+            echo
+            echo '6) Existing visible lock labels/icons'
+            grep -RIna -E '>[^<]*(Lock|lock|Unlock|unlock)[^<]*<|lock\.png|unlock\.png|lock\.svg|unlock\.svg' /tmp/decoded/assets /tmp/decoded/res 2>/dev/null | head -3000 || true
+            echo
+            echo '7) Player action strings from packaged assets'
+            grep -RIna -E 'PlayerControl\([^)]*\)|Player\.Playing|Player\.Paused|VideoPlayer\.' /tmp/decoded/assets 2>/dev/null | head -5000 || true
+          } > "$REPORT"
+          echo '=== VIDEO LOCK DIAGNOSTIC PREVIEW ==='
+          sed -n '1,500p' "$REPORT"
+
+      - name: Upload video lock diagnostic
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Video-Lock-Diagnostic
+          path: /tmp/Infinity-Video-Lock-Diagnostic.txt
+          retention-days: 30
