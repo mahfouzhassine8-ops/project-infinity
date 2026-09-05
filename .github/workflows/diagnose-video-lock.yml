@@ -2,6 +2,9 @@ name: ♾️ Diagnose Internal Video Lock
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/diagnose-video-lock.yml'
 
 jobs:
   diagnose-video-lock:
@@ -32,7 +35,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          # Stable 2 = successful Run #10 artifact.
           curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9978114291/zip \
             -o /tmp/stable2.zip
