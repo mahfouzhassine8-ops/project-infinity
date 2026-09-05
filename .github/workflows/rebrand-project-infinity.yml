@@ -28,10 +28,10 @@ jobs:
         with:
           packages: 'build-tools;34.0.0 platform-tools'
 
-      - name: Install diagnostic tools
+      - name: Install branding tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends unzip curl binutils
+          sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin unzip curl fonts-dejavu-core
           curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
 
       - name: Download known working base APK
@@ -46,39 +46,112 @@ jobs:
           test -n "$APK"
           cp "$APK" /tmp/Infinity-base.apk
 
-      - name: Decode and trace every Kodi source
+      - name: Decode and apply Infinity branding
         run: |
           set -euo pipefail
           java -jar /tmp/apktool.jar d -f /tmp/Infinity-base.apk -o /tmp/decoded
-          REPORT=/tmp/Infinity-Kodi-Diagnostic.txt
-          {
-            echo 'INFINITY KODI DIAGNOSTIC REPORT'
-            echo '================================'
-            echo
-            echo 'Exact permission sentence / fragments in decoded files:'
-            grep -RIna --binary-files=text -E 'requires access to your device media and files|notice_dialog|networkperm_dialog|record_audio_dialog' /tmp/decoded 2>/dev/null || true
-            echo
-            echo 'Kodi literals in Splash-related decoded code:'
-            grep -RIna --binary-files=text -E 'Kodi|notice_dialog' /tmp/decoded/smali* 2>/dev/null | grep -Ei 'Splash|permission|notice_dialog|media and files' || true
-            echo
-            echo 'Android resource app-name/permission strings:'
-            grep -RIna --binary-files=text -E 'app_name|application_name|notice_dialog|Kodi requires access' /tmp/decoded/res 2>/dev/null || true
-            echo
-            echo 'Manifest Kodi/label references:'
-            grep -nEi 'Kodi|label=' /tmp/decoded/AndroidManifest.xml 2>/dev/null || true
-            echo
-            echo 'All textual Kodi occurrences (first 2000):'
-            grep -RIna --binary-files=text 'Kodi' /tmp/decoded 2>/dev/null | head -2000 || true
-            echo
-            echo 'Raw APK printable strings matching permission text / Kodi (first 1000):'
-            strings -a /tmp/Infinity-base.apk | grep -Ei 'Kodi|requires access to your device media and files|notice_dialog' | head -1000 || true
-          } > "$REPORT"
-          echo '=== DIAGNOSTIC PREVIEW ==='
-          sed -n '1,300p' "$REPORT"
 
-      - name: Upload diagnostic report
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('/tmp/decoded')
+
+          # Android visible app name.
+          for p in root.glob('res/values*/strings.xml'):
+              text = p.read_text(errors='ignore')
+              new = re.sub(r'(<string\s+name="app_name"[^>]*>).*?(</string>)', r'\1Infinity\2', text, flags=re.S)
+              if new != text:
+                  p.write_text(new)
+
+          # This is the exact runtime sentence found by the diagnostic report.
+          old = 'Kodi requires access to your device media and files to function. Please allow this via the following dialogue box or Kodi will exit.'
+          new = 'Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.'
+          hits = []
+          for p in root.glob('smali*/**/*.smali'):
+              text = p.read_text(errors='ignore')
+              if old in text:
+                  p.write_text(text.replace(old, new))
+                  hits.append(str(p))
+          print('Exact permission sentence patched in:', hits)
+          if not hits:
+              raise SystemExit('ERROR: exact compiled permission sentence not found')
+
+          # Patch other visible Splash strings without touching package/class identifiers.
+          splash_replacements = {
+              'Starting Kodi...': 'Starting Infinity...',
+          }
+          for p in root.glob('smali*/**/*Splash*.smali'):
+              text = p.read_text(errors='ignore')
+              new_text = text
+              for a, b in splash_replacements.items():
+                  new_text = new_text.replace(a, b)
+              if new_text != text:
+                  p.write_text(new_text)
+
+          manifest = root / 'AndroidManifest.xml'
+          text = manifest.read_text()
+          text = re.sub(r'android:icon="[^"]+"', 'android:icon="@drawable/project_infinity_icon"', text, count=1)
+          if 'android:roundIcon=' in text:
+              text = re.sub(r'android:roundIcon="[^"]+"', 'android:roundIcon="@drawable/project_infinity_icon"', text, count=1)
+          manifest.write_text(text)
+
+          # Core visible language branding used in the UI.
+          for base in [root / 'assets' / 'addons' / 'resource.language.en_gb', root / 'assets' / 'language']:
+              if not base.exists():
+                  continue
+              for p in base.rglob('*.po'):
+                  text = p.read_text(errors='ignore')
+                  if 'Kodi' in text:
+                      p.write_text(text.replace('Kodi', 'Infinity'))
+          PY
+
+          mkdir -p /tmp/decoded/res/drawable-nodpi
+          cat > /tmp/infinity-icon.svg <<'SVG'
+          <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#111318"/><text x="256" y="330" text-anchor="middle" font-size="300" font-family="DejaVu Sans" font-weight="bold" fill="#ffffff">∞</text></svg>
+          SVG
+          rsvg-convert -w 512 -h 512 /tmp/infinity-icon.svg -o /tmp/decoded/res/drawable-nodpi/project_infinity_icon.png
+
+          MEDIA=/tmp/decoded/assets/media
+          mkdir -p "$MEDIA"
+          convert -size 465x128 xc:none -font DejaVu-Sans -gravity west -fill '#19b5e6' -pointsize 92 -annotate +4+0 '∞' -fill white -pointsize 58 -annotate +126+0 'INFINITY' "$MEDIA/vendor_logo.png"
+          convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' -quality 92 "$MEDIA/splash.jpg"
+
+          mapfile -t LAUNCH_IMAGES < <(find /tmp/decoded/res -type f \( -name 'applaunch_screen.png' -o -name 'applaunch_screen.webp' \))
+          test ${#LAUNCH_IMAGES[@]} -gt 0
+          for f in "${LAUNCH_IMAGES[@]}"; do
+            ext="${f##*.}"
+            tmp="/tmp/infinity-launch.$ext"
+            convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' "$tmp"
+            cp "$tmp" "$f"
+          done
+          convert -size 1920x1080 gradient:'#07151c-#0b2c3a' -font DejaVu-Sans -gravity center -fill '#19b5e6' -pointsize 300 -annotate +0-90 '∞' -fill white -pointsize 92 -annotate +0+155 'INFINITY' "$MEDIA/applaunch_screen.png"
+
+          # Hard verification: the exact old runtime sentence must be gone.
+          if grep -RIna --binary-files=text 'Kodi requires access to your device media and files to function' /tmp/decoded/smali*; then
+            echo 'ERROR: old compiled permission sentence still present'
+            exit 1
+          fi
+          echo 'Verified exact compiled permission sentence is gone.'
+
+      - name: Rebuild branded APK
+        run: |
+          set -euo pipefail
+          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-unsigned.apk
+
+      - name: Sign branded APK
+        run: |
+          set -euo pipefail
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+          mkdir -p ~/.android
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BUILD_TOOLS/zipalign" -f -v 4 /tmp/Infinity-unsigned.apk /tmp/Infinity-aligned.apk
+          "$BUILD_TOOLS/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity.apk /tmp/Infinity-aligned.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose /tmp/Infinity.apk
+
+      - name: Upload Infinity APK
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Kodi-Diagnostic
-          path: /tmp/Infinity-Kodi-Diagnostic.txt
+          name: Infinity.apk
+          path: /tmp/Infinity.apk
           retention-days: 30
