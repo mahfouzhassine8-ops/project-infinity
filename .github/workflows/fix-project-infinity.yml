@@ -14,8 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Repair package-ID step
+      - name: Build corrected workflow blob
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -23,12 +25,13 @@ jobs:
           text = path.read_text()
           start = text.index("      - name: Apply custom package ID\n")
           end = text.index("      - name: Apply custom icon\n", start)
+          expr = "$" + "{{ github.event.inputs.package_id }}"
           lines = [
               "      - name: Apply custom package ID",
               "        if: github.event.inputs.package_id != 'org.xbmc.kodi'",
               "        run: |",
               "          set -euo pipefail",
-              '          PKG="${{ github.event.inputs.package_id }}"',
+              f'          PKG="{expr}"',
               '          echo "📦 Setting package ID: $PKG"',
               "",
               "          # Kodi reads APP_PACKAGE from version.txt during CMake configuration.",
@@ -47,13 +50,13 @@ jobs:
           path.write_text(text[:start] + new_block + text[end:])
           PY
 
-      - name: Remove one-time repair workflow
-        run: rm -f .github/workflows/fix-project-infinity.yml
-
-      - name: Commit repair
-        run: |
-          git config user.name "ChatGPT Project Infinity"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/build-kodi.yml .github/workflows/fix-project-infinity.yml
-          git commit -m "Fix Project Infinity package ID handling"
-          git push
+          CONTENT=$(base64 -w 0 .github/workflows/build-kodi.yml)
+          RESPONSE=$(curl -fsSL -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/git/blobs \
+            -d "{\"content\":\"$CONTENT\",\"encoding\":\"base64\"}")
+          SHA=$(echo "$RESPONSE" | jq -r '.sha')
+          echo "CORRECTED_BLOB_SHA=$SHA"
+          test -n "$SHA" && test "$SHA" != "null"
