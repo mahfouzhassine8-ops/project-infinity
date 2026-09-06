@@ -1,4 +1,4 @@
-name: Infinity Stable 2 Fluid v12
+name: Infinity Stable 2 Fluid v13
 
 on:
   push:
@@ -41,18 +41,22 @@ jobs:
           cp "$APK" /tmp/base.apk
       - name: Decode Stable 2
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
-      - name: Apply fluid volume polish
+      - name: Apply v13 volume activity patch
         run: python3 tools/patch_player_ui_v2.py
-      - name: Verify v12 timed return patch
+      - name: Verify v13 activity watcher
         run: |
           set -euo pipefail
           OSD=/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q 'Infinity volume fluid polish v12' "$OSD"
+          ADDON=/tmp/decoded/assets/addons/service.infinity.volume
+          grep -q 'Infinity volume fluid polish v13' "$OSD"
+          grep -q 'Infinity.VolumeActive' "$OSD"
           grep -q 'end="118,128"' "$OSD"
-          grep -q 'delay="220"' "$OSD"
-          grep -q 'start="118,128" end="100"' "$OSD"
+          grep -q 'xbmc.service' "$ADDON/addon.xml"
+          grep -q "Player.Volume" "$ADDON/service.py"
+          grep -q "active_until = now + 0.32" "$ADDON/service.py"
+          grep -q "clearProperty('Infinity.VolumeActive')" "$ADDON/service.py"
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-v12-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-v13-unsigned.apk
       - name: Sign
         env:
           PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
@@ -60,11 +64,11 @@ jobs:
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
           keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Stable 2, O=Infinity, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-FluidVolume-v12-unsigned.apk /tmp/Infinity-Stable2-FluidVolume-v12-aligned.apk
-          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-FluidVolume-v12.apk /tmp/Infinity-Stable2-FluidVolume-v12-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-FluidVolume-v12.apk
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-FluidVolume-v13-unsigned.apk /tmp/Infinity-Stable2-FluidVolume-v13-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-FluidVolume-v13.apk /tmp/Infinity-Stable2-FluidVolume-v13-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-FluidVolume-v13.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Stable2-FluidVolume-v12
-          path: /tmp/Infinity-Stable2-FluidVolume-v12.apk
+          name: Infinity-Stable2-FluidVolume-v13
+          path: /tmp/Infinity-Stable2-FluidVolume-v13.apk
           retention-days: 30
