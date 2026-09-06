@@ -1,4 +1,4 @@
-name: Infinity Player UI v7
+name: Infinity Stable 2 - Fluid Volume Polish
 
 on:
   push:
@@ -28,41 +28,39 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends unzip curl
           curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
-      - name: Download proven Native Resume base
+      - name: Download v7 Stable 2 baseline
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9981395367/zip -o /tmp/base.zip
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9985837121/zip -o /tmp/base.zip
           mkdir -p /tmp/base
           unzip -q /tmp/base.zip -d /tmp/base
           APK=$(find /tmp/base -name '*.apk' -type f | head -1)
           test -n "$APK"
           cp "$APK" /tmp/base.apk
-      - name: Decode
+      - name: Decode Stable 2
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
-      - name: Apply volume focus HUD v7
+      - name: Apply fluid volume polish
         run: python3 tools/patch_player_ui_v2.py
       - name: Verify patch
         run: |
           set -euo pipefail
-          grep -q 'Infinity volume focus HUD v7' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'Infinity volume fluid polish v9' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '<action>volume</action>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q '<onclick>Mute</onclick>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q '\$VAR\[VolumeIconVar\]' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Player-UI-v6-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-unsigned.apk
       - name: Sign
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
           mkdir -p ~/.android
-          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Player UI v6, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Player-UI-v6-unsigned.apk /tmp/Infinity-Player-UI-v6-aligned.apk
-          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Player-UI-v6.apk /tmp/Infinity-Player-UI-v6-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI-v6.apk
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Stable 2 Fluid Volume, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-FluidVolume-unsigned.apk /tmp/Infinity-Stable2-FluidVolume-aligned.apk
+          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Stable2-FluidVolume.apk /tmp/Infinity-Stable2-FluidVolume-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-FluidVolume.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Player-UI-v7-Candidate
-          path: /tmp/Infinity-Player-UI-v6.apk
+          name: Infinity-Stable2-FluidVolume
+          path: /tmp/Infinity-Stable2-FluidVolume.apk
           retention-days: 30
