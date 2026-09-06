@@ -46,7 +46,7 @@ jobs:
       - name: Verify patch
         run: |
           set -euo pipefail
-          grep -q 'Infinity volume fluid polish v9' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'Infinity Stable 2 fluid volume v10' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '<action>volume</action>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
       - name: Rebuild
         run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-unsigned.apk
