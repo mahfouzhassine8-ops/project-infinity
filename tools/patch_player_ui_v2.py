@@ -4,37 +4,59 @@ root = Path('/tmp/decoded/assets/addons/skin.estuary/xml')
 osd = root / 'VideoOSD.xml'
 s = osd.read_text(encoding='utf-8')
 
-# Remove the previous experimental floating volume cluster if present.
-start = s.find('<!-- Infinity player audio controls:')
-if start >= 0:
-    end = s.find('</control>', start)
-    # group contains nested controls, so remove through the known following controls marker conservatively
-    tail = s.find('</control>\n            </control>', start)
-    if tail >= 0:
-        s = s[:start] + s[tail + len('</control>\n            </control>'):]
+# Native resume stays completely untouched in this patch.
+# Add a true Kodi volume slider directly into the fullscreen player OSD.
+# Kodi's skin engine supports <action>volume</action>, so dragging this slider
+# changes volume without opening the separate top volume popup.
 
-# Add a single bottom-bar volume button. It opens Kodi's native volume control UI;
-# mute remains integrated via Kodi's speaker/mute state rather than separate +/- text buttons.
-needle = '<control type="button" id="' 
 insert_at = s.rfind('</controls>')
 if insert_at < 0:
     raise SystemExit('VideoOSD controls marker not found')
 
-if 'id="9895"' not in s:
-    block = '''\n    <!-- Infinity integrated audio control: bottom player bar -->\n    <control type="button" id="9895">\n      <right>420</right>\n      <bottom>18</bottom>\n      <width>64</width>\n      <height>64</height>\n      <label>🔊</label>\n      <font>font20</font>\n      <onclick>ActivateWindow(volumebar)</onclick>\n      <hinttext>Volume / Mute</hinttext>\n      <animation effect="fade" start="0" end="100" time="120">Visible</animation>\n      <animation effect="fade" start="100" end="0" time="160">Hidden</animation>\n    </control>\n'''
+if 'Infinity integrated volume v3' not in s:
+    block = r'''
+    <!-- Infinity integrated volume v3: bottom-bar volume + mute -->
+    <control type="group" id="9880">
+      <right>410</right>
+      <bottom>20</bottom>
+      <width>290</width>
+      <height>58</height>
+      <animation effect="fade" start="0" end="100" time="120">Visible</animation>
+      <animation effect="fade" start="100" end="0" time="150">Hidden</animation>
+
+      <!-- Speaker button: tap to mute/unmute. Icon follows Kodi's real mute/volume state. -->
+      <control type="button" id="9881">
+        <left>0</left>
+        <top>3</top>
+        <width>52</width>
+        <height>52</height>
+        <label></label>
+        <texturefocus colordiffuse="FFFFFFFF">$VAR[VolumeIconVar]</texturefocus>
+        <texturenofocus colordiffuse="D9FFFFFF">$VAR[VolumeIconVar]</texturenofocus>
+        <onclick>Mute</onclick>
+        <hinttext>Mute / Unmute</hinttext>
+        <pulseonselect>false</pulseonselect>
+      </control>
+
+      <!-- Native Kodi volume slider: direct touch/drag control, no popup window. -->
+      <control type="slider" id="9882">
+        <left>62</left>
+        <top>15</top>
+        <width>220</width>
+        <height>28</height>
+        <action>volume</action>
+        <orientation>horizontal</orientation>
+        <texturesliderbar colordiffuse="99FFFFFF">colors/white.png</texturesliderbar>
+        <texturesliderbardisabled colordiffuse="55FFFFFF">colors/white.png</texturesliderbardisabled>
+        <textureslidernib colordiffuse="FFFFFFFF">buttons/round.png</textureslidernib>
+        <textureslidernibfocus colordiffuse="FFFFFFFF">buttons/round.png</textureslidernibfocus>
+        <pulseonselect>false</pulseonselect>
+        <onleft>9881</onleft>
+        <onright>9882</onright>
+      </control>
+    </control>
+'''
     s = s[:insert_at] + block + s[insert_at:]
 
 osd.write_text(s, encoding='utf-8')
-
-# Presentation-only resume dialog polish. Native bookmark/resume logic is untouched.
-d = root / 'DialogSelect.xml'
-t = d.read_text(encoding='utf-8')
-if 'Infinity resume presentation' not in t:
-    marker = '<controls>'
-    anim = '''<!-- Infinity resume presentation: visual only; native resume logic untouched -->\n<animation effect="fade" start="0" end="100" time="130">WindowOpen</animation>\n<animation effect="slide" start="24,0" end="0,0" time="170" tween="cubic" easing="out">WindowOpen</animation>\n<animation effect="fade" start="100" end="0" time="110">WindowClose</animation>\n'''
-    if marker not in t:
-        raise SystemExit('DialogSelect controls marker not found')
-    t = t.replace(marker, anim + marker, 1)
-    d.write_text(t, encoding='utf-8')
-
-print('Player UI v2 patched; native resume logic untouched.')
+print('Infinity volume v3 patched. Native resume untouched.')
