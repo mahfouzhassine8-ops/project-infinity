@@ -50,7 +50,7 @@ jobs:
       - name: Decode known-good build
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
 
-      - name: Replace only locked overlay UI
+      - name: Install polished lock overlay
         run: |
           set -euo pipefail
           LOCKXML=/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml
@@ -61,71 +61,66 @@ jobs:
             <onload>SetProperty(InfinityVideoLocked,true)</onload>
             <onload>SetProperty(InfinityLockHint,true)</onload>
             <onload>ClearProperty(InfinityUnlockVisible)</onload>
-            <onload>ClearProperty(InfinityUnlocking)</onload>
-            <onload>AlarmClock(InfinityHideInitial,ClearProperty(InfinityLockHint),1.2,silent)</onload>
+            <onload>AlarmClock(InfinityHideInitial,ClearProperty(InfinityLockHint),1.0,silent)</onload>
+
             <onunload>CancelAlarm(InfinityHideInitial,silent)</onunload>
             <onunload>CancelAlarm(InfinityHideTap,silent)</onunload>
-            <onunload>CancelAlarm(InfinityFinishUnlock,silent)</onunload>
             <onunload>ClearProperty(InfinityVideoLocked)</onunload>
             <onunload>ClearProperty(InfinityLockHint)</onunload>
             <onunload>ClearProperty(InfinityUnlockVisible)</onunload>
-            <onunload>ClearProperty(InfinityUnlocking)</onunload>
+
             <defaultcontrol always="true">9900</defaultcontrol>
+
             <controls>
-              <!-- Invisible full-screen catcher. Keeps the known-good lock behavior. -->
+              <!-- Invisible full-screen touch catcher while locked. -->
               <control type="button" id="9900">
-                <left>0</left><top>0</top><width>100%</width><height>100%</height>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
                 <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>
                 <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>
                 <label></label>
-                <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">SetProperty(InfinityUnlockVisible,true)</onclick>
-                <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">CancelAlarm(InfinityHideTap,silent)</onclick>
-                <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">AlarmClock(InfinityHideTap,ClearProperty(InfinityUnlockVisible),2.5,silent)</onclick>
+                <onclick>SetProperty(InfinityUnlockVisible,true)</onclick>
+                <onclick>CancelAlarm(InfinityHideTap,silent)</onclick>
+                <onclick>AlarmClock(InfinityHideTap,ClearProperty(InfinityUnlockVisible),2.5,silent)</onclick>
               </control>
 
-              <!-- Initial lock flash only. Property removal makes it truly disappear. -->
+              <!-- Decorative initial lock. It is NOT a button and is removed after one second. -->
               <control type="image">
-                <left>48</left><top>35</top><width>58</width><height>58</height>
+                <left>48</left>
+                <top>35</top>
+                <width>58</width>
+                <height>58</height>
                 <texture>osd/fullscreen/buttons/infinity-lock.png</texture>
-                <visible>!String.IsEmpty(Window.Property(InfinityLockHint)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>
-                <animation effect="fade" start="0" end="100" time="90">Visible</animation>
-                <animation effect="fade" start="100" end="0" time="180" delay="850">Visible</animation>
+                <visible>!String.IsEmpty(Window.Property(InfinityLockHint))</visible>
               </control>
 
-              <!-- One-tap target shown after tapping locked video. onfocus performs unlock so Android touch does not require hold/second press. -->
+              <!-- Actual unlock button. Only appears after the user taps the locked video. -->
               <control type="button" id="9901">
-                <left>38</left><top>25</top><width>80</width><height>80</height>
+                <left>38</left>
+                <top>25</top>
+                <width>80</width>
+                <height>80</height>
                 <texturefocus>osd/fullscreen/buttons/infinity-lock.png</texturefocus>
                 <texturenofocus>osd/fullscreen/buttons/infinity-lock.png</texturenofocus>
                 <label></label>
-                <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>
+                <pulseonselect>false</pulseonselect>
+                <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible))</visible>
                 <onfocus>CancelAlarm(InfinityHideTap,silent)</onfocus>
-                <onfocus>ClearProperty(InfinityUnlockVisible)</onfocus>
-                <onfocus>SetProperty(InfinityUnlocking,true)</onfocus>
-                <onfocus>AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),0.9,silent)</onfocus>
+                <onfocus>Dialog.Close(1199)</onfocus>
                 <onclick>CancelAlarm(InfinityHideTap,silent)</onclick>
-                <onclick>ClearProperty(InfinityUnlockVisible)</onclick>
-                <onclick>SetProperty(InfinityUnlocking,true)</onclick>
-                <onclick>AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),0.9,silent)</onclick>
-              </control>
-
-              <!-- Quick open-lock animation before controls return. -->
-              <control type="image">
-                <left>48</left><top>35</top><width>58</width><height>58</height>
-                <texture>osd/fullscreen/buttons/infinity-unlock.png</texture>
-                <visible>!String.IsEmpty(Window.Property(InfinityUnlocking))</visible>
-                <animation effect="fade" start="0" end="100" time="70">Visible</animation>
-                <animation effect="zoom" start="90" end="108" center="77,64" time="130" pulse="true">Visible</animation>
-                <animation effect="fade" start="100" end="0" time="220" delay="520">Visible</animation>
+                <onclick>Dialog.Close(1199)</onclick>
               </control>
             </controls>
           </window>
           XML
-          grep -q '<onfocus>SetProperty(InfinityUnlocking,true)</onfocus>' "$LOCKXML"
-          grep -q 'InfinityHideInitial' "$LOCKXML"
+
+          grep -q 'InfinityHideInitial.*1.0' "$LOCKXML"
+          grep -q '<pulseonselect>false</pulseonselect>' "$LOCKXML"
 
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-One-Tap-Lock-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Polished-Lock-unsigned.apk
 
       - name: Sign
         run: |
@@ -133,13 +128,13 @@ jobs:
           BT="$ANDROID_HOME/build-tools/34.0.0"
           mkdir -p ~/.android
           keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Candidate 3, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-One-Tap-Lock-unsigned.apk /tmp/Infinity-One-Tap-Lock-aligned.apk
-          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-One-Tap-Lock.apk /tmp/Infinity-One-Tap-Lock-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-One-Tap-Lock.apk
+          "$BT/zipalign" -f 4 /tmp/Infinity-Polished-Lock-unsigned.apk /tmp/Infinity-Polished-Lock-aligned.apk
+          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Polished-Lock.apk /tmp/Infinity-Polished-Lock-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Polished-Lock.apk
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Candidate-3-One-Tap-Lock
-          path: /tmp/Infinity-One-Tap-Lock.apk
+          name: Infinity-Candidate-Polished-Lock
+          path: /tmp/Infinity-Polished-Lock.apk
           retention-days: 30
