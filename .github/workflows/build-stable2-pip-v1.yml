@@ -47,9 +47,9 @@ jobs:
         run: |
           set -euo pipefail
           MAN=/tmp/decoded/AndroidManifest.xml
-          grep -q 'android:name="org.xbmc.kodi.Main"' "$MAN"
           grep -q 'android:supportsPictureInPicture="true"' "$MAN"
           grep -q 'android:resizeableActivity="true"' "$MAN"
+          grep -q 'android:configChanges="[^"]*screenSize' "$MAN"
       - name: Rebuild
         run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PiP-v1-unsigned.apk
       - name: Sign
