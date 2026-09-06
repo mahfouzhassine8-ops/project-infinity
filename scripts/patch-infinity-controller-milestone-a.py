@@ -24,10 +24,6 @@ CTRL = f'{PKG_DESC}/InfinityController;'
 LISTENER = f'{PKG_DESC}/InfinityController$ListenerRunnable;'
 PIPRUN = f'{PKG_DESC}/InfinityController$PipRunnable;'
 
-# ---------------------------------------------------------------------------
-# The central brain.  Milestone A teaches it exactly one state: video playing.
-# It owns the Android-side PiP decision and keeps libkodi.so untouched.
-# ---------------------------------------------------------------------------
 controller = f'''.class public final {CTRL}
 .super Ljava/lang/Object;
 .source "InfinityController.java"
@@ -53,16 +49,12 @@ controller = f'''.class public final {CTRL}
 .method public static init(Landroid/app/Activity;)V
     .locals 2
     sput-object p0, {CTRL}->activity:Landroid/app/Activity;
-
-    # Safe default: Android 12+ auto-enter is OFF until real video is seen.
     const/4 v0, 0x0
     invoke-static {{p0, v0}}, {CTRL}->applyAutoPip(Landroid/app/Activity;Z)V
-
     sget-boolean v0, {CTRL}->started:Z
     if-nez v0, :done
     const/4 v0, 0x1
     sput-boolean v0, {CTRL}->started:Z
-
     new-instance v0, Ljava/lang/Thread;
     new-instance v1, {LISTENER}
     invoke-direct {{v1}}, {LISTENER}-><init>()V
@@ -70,7 +62,6 @@ controller = f'''.class public final {CTRL}
     const-string v1, "InfinityController"
     invoke-virtual {{v0, v1}}, Ljava/lang/Thread;->setName(Ljava/lang/String;)V
     invoke-virtual {{v0}}, Ljava/lang/Thread;->start()V
-
     :done
     return-void
 .end method
@@ -181,12 +172,11 @@ listener = f'''.class public final {LISTENER}
     move-result v4
     if-eqz v4, :check_stop
 
-    # Accept the review's type=video signal and Kodi's video player id=1.
-    const-string v4, "\"type\":\"video\""
+    const-string v4, "\\\"type\\\":\\\"video\\\""
     invoke-virtual {{v3, v4}}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
     move-result v4
     if-nez v4, :mark_playing
-    const-string v4, "\"playerid\":1"
+    const-string v4, "\\\"playerid\\\":1"
     invoke-virtual {{v3, v4}}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
     move-result v4
     if-eqz v4, :read_loop
@@ -257,7 +247,6 @@ piprun = f'''.class public final {PIPRUN}
 (PKG_DIR / 'InfinityController$ListenerRunnable.smali').write_text(listener)
 (PKG_DIR / 'InfinityController$PipRunnable.smali').write_text(piprun)
 
-# Hook 1: birth the brain during Main.onCreate().
 if f'{CTRL}->init(Landroid/app/Activity;)V' not in main_text:
     m = re.search(r'(?ms)^\.method[^\n]* onCreate\(Landroid/os/Bundle;\)V\n.*?^\.end method', main_text)
     if not m:
@@ -270,8 +259,6 @@ if f'{CTRL}->init(Landroid/app/Activity;)V' not in main_text:
     body = body[:super_call.end()] + add + body[super_call.end():]
     main_text = main_text[:m.start()] + body + main_text[m.end():]
 
-# Hook 2: gate Home/Recents PiP. If Stable 2 has no explicit hook, add the
-# smallest one. Android 12+ auto-enter is independently gated by brain state.
 method_match = re.search(r'(?ms)^\.method[^\n]* onUserLeaveHint\(\)V\n.*?^\.end method', main_text)
 if method_match:
     body = method_match.group(0)
@@ -308,7 +295,6 @@ else:
 
 MAIN.write_text(main_text)
 
-# Ensure Android permits native PiP; do not touch any native library.
 manifest = ROOT / 'AndroidManifest.xml'
 ms = manifest.read_text()
 activity_pat = r'<activity\b[^>]*android:name="(?:com\.projectinfinity\.kodi|org\.xbmc\.kodi)\.Main"[^>]*>'
