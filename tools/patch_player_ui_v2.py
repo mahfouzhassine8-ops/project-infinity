@@ -4,13 +4,8 @@ root = Path('/tmp/decoded/assets/addons/skin.estuary/xml')
 osd = root / 'VideoOSD.xml'
 s = osd.read_text(encoding='utf-8')
 
-# Native resume stays completely untouched.
-# v4 diagnosis:
-# - v3's slider worked but rendered as a blank gray rectangle because we forced
-#   ad-hoc slider textures and positioned it outside Estuary's real OSD grouplist.
-# - Put volume inside Estuary's existing right-side OSD button row and let Kodi
-#   render the slider with its native/default slider skin.
-
+# v5 is presentation-only: native resume and the proven v4 volume/mute mechanics stay untouched.
+# Put volume with playback controls on the LEFT, while Settings remains the final RIGHT-side button.
 
 def matching_control_end(text, start):
     pos = start
@@ -29,21 +24,20 @@ def matching_control_end(text, start):
                 return next_close
             pos = next_close + 10
 
-marker = '<control type="grouplist" id="202">'
+# Left playback row (previous / rewind / play / stop / forward / next).
+marker = '<control type="grouplist" id="201">'
 start = s.find(marker)
 if start < 0:
-    raise SystemExit('Right-side OSD grouplist 202 not found')
+    raise SystemExit('Playback OSD grouplist 201 not found')
 end = matching_control_end(s, start)
 
-if 'Infinity integrated volume v4' not in s:
+if 'Infinity integrated volume v5' not in s:
     block = r'''
 
-                    <!-- Infinity integrated volume v4: native-looking volume + mute -->
+                    <!-- Infinity integrated volume v5: volume belongs with playback controls -->
                     <control type="group" id="9880">
                         <width>300</width>
                         <height>76</height>
-
-                        <!-- Same focus ring style as the surrounding Estuary OSD buttons. -->
                         <control type="button" id="9881">
                             <left>0</left>
                             <top>0</top>
@@ -58,8 +52,6 @@ if 'Infinity integrated volume v4' not in s:
                             <pulseonselect>false</pulseonselect>
                             <onright>9882</onright>
                         </control>
-
-                        <!-- Kodi's own dynamic volume icon, including muted state. -->
                         <control type="image">
                             <left>17</left>
                             <top>17</top>
@@ -67,8 +59,6 @@ if 'Infinity integrated volume v4' not in s:
                             <height>40</height>
                             <texture colordiffuse="white">$VAR[VolumeIconVar]</texture>
                         </control>
-
-                        <!-- Native Kodi volume slider. No custom/fallback textures: use the skin's normal slider visuals. -->
                         <control type="slider" id="9882">
                             <left>88</left>
                             <top>23</top>
@@ -85,4 +75,4 @@ if 'Infinity integrated volume v4' not in s:
     s = s[:end] + block + s[end:]
 
 osd.write_text(s, encoding='utf-8')
-print('Infinity volume v4 patched into Estuary OSD row. Native resume untouched.')
+print('Infinity volume v5 placed with playback controls; Settings remains last on right. Native resume untouched.')
