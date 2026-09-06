@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/build-infinity-controller-milestone-a.yml'
       - 'scripts/patch-infinity-controller-milestone-a.py'
+      - 'scripts/harden-infinity-controller-runtime.py'
 
 jobs:
   build:
@@ -60,6 +61,9 @@ jobs:
       - name: Create Infinity Controller brain
         run: python3 scripts/patch-infinity-controller-milestone-a.py
 
+      - name: Harden brain runtime
+        run: python3 scripts/harden-infinity-controller-runtime.py
+
       - name: Verify brain wiring
         run: |
           set -euo pipefail
@@ -80,17 +84,17 @@ jobs:
           grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
 
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-5.3-Milestone-A-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-5.3.1-Milestone-A-unsigned.apk
 
       - name: Verify libkodi.so stayed byte-for-byte unchanged
         run: |
           set -euo pipefail
-          unzip -p /tmp/Infinity-5.3-Milestone-A-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-after.sha256
+          unzip -p /tmp/Infinity-5.3.1-Milestone-A-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-after.sha256
           echo "Before: $(cat /tmp/libkodi-before.sha256)"
           echo "After:  $(cat /tmp/libkodi-after.sha256)"
           cmp /tmp/libkodi-before.sha256 /tmp/libkodi-after.sha256
 
-      - name: Sign 5.3 test APK
+      - name: Sign 5.3.1 test APK
         env:
           PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
         run: |
@@ -101,22 +105,22 @@ jobs:
             -alias infinity \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -storepass "$PASS" -keypass "$PASS" \
-            -dname "CN=Infinity Controller Milestone A, O=Project Infinity, C=US" \
+            -dname "CN=Infinity Controller Milestone A Runtime Hardened, O=Project Infinity, C=US" \
             >/dev/null 2>&1
           "$BT/zipalign" -f 4 \
-            /tmp/Infinity-5.3-Milestone-A-unsigned.apk \
-            /tmp/Infinity-5.3-Milestone-A-aligned.apk
+            /tmp/Infinity-5.3.1-Milestone-A-unsigned.apk \
+            /tmp/Infinity-5.3.1-Milestone-A-aligned.apk
           "$BT/apksigner" sign \
             --ks /tmp/infinity.keystore \
             --ks-key-alias infinity \
             --ks-pass env:PASS \
             --key-pass env:PASS \
-            --out /tmp/Infinity-5.3-Milestone-A.apk \
-            /tmp/Infinity-5.3-Milestone-A-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-5.3-Milestone-A.apk
+            --out /tmp/Infinity-5.3.1-Milestone-A.apk \
+            /tmp/Infinity-5.3.1-Milestone-A-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-5.3.1-Milestone-A.apk
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-5.3-Milestone-A-Brain
-          path: /tmp/Infinity-5.3-Milestone-A.apk
+          name: Infinity-5.3.1-Milestone-A-Brain-Runtime-Hardened
+          path: /tmp/Infinity-5.3.1-Milestone-A.apk
           retention-days: 30
