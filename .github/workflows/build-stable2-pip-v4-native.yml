@@ -1,0 +1,246 @@
+name: Infinity Stable 2 PiP v4 Native
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-stable2-pip-v4-native.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download Stable 2 v12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip \
+            -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+
+      - name: Decode Stable 2
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+
+      - name: Patch Infinity Main activity with native Android PiP lifecycle
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('/tmp/decoded')
+          manifest = root / 'AndroidManifest.xml'
+          text = manifest.read_text()
+
+          # Enable real Android Picture-in-Picture on Infinity's NativeActivity.
+          pattern = r'<activity\b[^>]*android:name="com\.projectinfinity\.kodi\.Main"[^>]*>'
+          match = re.search(pattern, text)
+          if not match:
+              raise SystemExit('Infinity Main activity not found in manifest')
+
+          tag = match.group(0)
+          attrs = {
+              'android:supportsPictureInPicture': 'true',
+              'android:resizeableActivity': 'true',
+          }
+          for key, value in attrs.items():
+              if f'{key}=' in tag:
+                  tag = re.sub(rf'{re.escape(key)}="[^"]*"', f'{key}="{value}"', tag)
+              else:
+                  tag = tag[:-1] + f' {key}="{value}">'
+
+          # PiP transitions can resize/reconfigure the activity. Keep Kodi alive instead
+          # of letting Android recreate Main during the transition.
+          cm = re.search(r'android:configChanges="([^"]*)"', tag)
+          if cm:
+              changes = [x for x in cm.group(1).split('|') if x]
+              for needed in ('orientation', 'screenLayout', 'screenSize', 'smallestScreenSize'):
+                  if needed not in changes:
+                      changes.append(needed)
+              tag = tag[:cm.start(1)] + '|'.join(changes) + tag[cm.end(1):]
+
+          text = text[:match.start()] + tag + text[match.end():]
+          manifest.write_text(text)
+
+          # Find the real NativeActivity smali.
+          candidates = []
+          for d in sorted(root.glob('smali*')):
+              p = d / 'com/projectinfinity/kodi/Main.smali'
+              if p.exists():
+                  candidates.append(p)
+          if not candidates:
+              raise SystemExit('com/projectinfinity/kodi/Main.smali not found')
+          p = candidates[0]
+          smali = p.read_text()
+
+          # Remove the v3 fallback implementation if present so this workflow can be
+          # safely run against a PiP-patched base in the future.
+          smali = re.sub(
+              r'\n\.method protected onUserLeaveHint\(\)V.*?\n\.end method\n',
+              '\n', smali, flags=re.S
+          )
+
+          # Android 12+ supports auto-enter PiP. This is substantially more reliable
+          # with gesture navigation than relying only on onUserLeaveHint().
+          helper = r'''
+.method private infinityConfigurePip()V
+    .locals 4
+
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v1, 0x1f
+    if-lt v0, v1, :pip_config_done
+
+    new-instance v0, Landroid/app/PictureInPictureParams$Builder;
+    invoke-direct {v0}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
+
+    const/4 v1, 0x1
+    invoke-virtual {v0, v1}, Landroid/app/PictureInPictureParams$Builder;->setAutoEnterEnabled(Z)Landroid/app/PictureInPictureParams$Builder;
+    move-result-object v0
+
+    new-instance v1, Landroid/util/Rational;
+    const/16 v2, 0x10
+    const/16 v3, 0x9
+    invoke-direct {v1, v2, v3}, Landroid/util/Rational;-><init>(II)V
+    invoke-virtual {v0, v1}, Landroid/app/PictureInPictureParams$Builder;->setAspectRatio(Landroid/util/Rational;)Landroid/app/PictureInPictureParams$Builder;
+    move-result-object v0
+
+    invoke-virtual {v0}, Landroid/app/PictureInPictureParams$Builder;->build()Landroid/app/PictureInPictureParams;
+    move-result-object v0
+    invoke-virtual {p0, v0}, Lcom/projectinfinity/kodi/Main;->setPictureInPictureParams(Landroid/app/PictureInPictureParams;)V
+
+    :pip_config_done
+    return-void
+.end method
+'''
+
+          leave = r'''
+.method protected onUserLeaveHint()V
+    .locals 3
+
+    invoke-super {p0}, Landroid/app/NativeActivity;->onUserLeaveHint()V
+
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v1, 0x1a
+    if-lt v0, v1, :pip_leave_done
+
+    invoke-virtual {p0}, Lcom/projectinfinity/kodi/Main;->isInPictureInPictureMode()Z
+    move-result v2
+    if-nez v2, :pip_leave_done
+
+    const/16 v1, 0x1f
+    if-ge v0, v1, :pip_leave_done
+
+    new-instance v0, Landroid/app/PictureInPictureParams$Builder;
+    invoke-direct {v0}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
+
+    new-instance v1, Landroid/util/Rational;
+    const/16 v2, 0x10
+    const/16 v0, 0x9
+    invoke-direct {v1, v2, v0}, Landroid/util/Rational;-><init>(II)V
+
+    new-instance v0, Landroid/app/PictureInPictureParams$Builder;
+    invoke-direct {v0}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
+    invoke-virtual {v0, v1}, Landroid/app/PictureInPictureParams$Builder;->setAspectRatio(Landroid/util/Rational;)Landroid/app/PictureInPictureParams$Builder;
+    move-result-object v0
+    invoke-virtual {v0}, Landroid/app/PictureInPictureParams$Builder;->build()Landroid/app/PictureInPictureParams;
+    move-result-object v0
+    invoke-virtual {p0, v0}, Lcom/projectinfinity/kodi/Main;->enterPictureInPictureMode(Landroid/app/PictureInPictureParams;)Z
+
+    :pip_leave_done
+    return-void
+.end method
+'''
+
+          # Call the Android-12 auto-enter configuration every resume. onResume already
+          # exists in Kodi's Main class, so inject directly after invoke-super.
+          resume = re.search(r'(\.method protected onResume\(\)V.*?invoke-super \{p0\}, Landroid/app/NativeActivity;->onResume\(\)V)', smali, re.S)
+          if not resume:
+              resume = re.search(r'(\.method public onResume\(\)V.*?invoke-super \{p0\}, Landroid/app/NativeActivity;->onResume\(\)V)', smali, re.S)
+          if not resume:
+              raise SystemExit('Could not find Main.onResume() super call')
+
+          call = '\n\n    invoke-direct {p0}, Lcom/projectinfinity/kodi/Main;->infinityConfigurePip()V'
+          smali = smali[:resume.end()] + call + smali[resume.end():]
+          smali += '\n' + helper + '\n' + leave + '\n'
+          p.write_text(smali)
+          print('Patched native Android PiP into', p)
+          PY
+
+      - name: Verify native PiP patch
+        run: |
+          set -euo pipefail
+          MAN=/tmp/decoded/AndroidManifest.xml
+          MAIN=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          test -n "$MAIN"
+          grep -q 'android:supportsPictureInPicture="true"' "$MAN"
+          grep -q 'android:resizeableActivity="true"' "$MAN"
+          grep -q 'smallestScreenSize' "$MAN"
+          grep -q 'infinityConfigurePip()V' "$MAIN"
+          grep -q 'setAutoEnterEnabled(Z)' "$MAIN"
+          grep -q 'onUserLeaveHint()V' "$MAIN"
+          grep -q 'enterPictureInPictureMode(Landroid/app/PictureInPictureParams;)Z' "$MAIN"
+          echo 'Native PiP v4 patch verified.'
+
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PiP-v4-Native-unsigned.apk
+
+      - name: Sign
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair \
+            -keystore /tmp/infinity.keystore \
+            -alias infinity \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" \
+            -dname "CN=Infinity Stable 2 PiP v4 Native, O=Infinity, C=US" \
+            >/dev/null 2>&1
+          "$BT/zipalign" -f 4 \
+            /tmp/Infinity-Stable2-PiP-v4-Native-unsigned.apk \
+            /tmp/Infinity-Stable2-PiP-v4-Native-aligned.apk
+          "$BT/apksigner" sign \
+            --ks /tmp/infinity.keystore \
+            --ks-key-alias infinity \
+            --ks-pass env:PASS \
+            --key-pass env:PASS \
+            --out /tmp/Infinity-Stable2-PiP-v4-Native.apk \
+            /tmp/Infinity-Stable2-PiP-v4-Native-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-PiP-v4-Native.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Stable2-PiP-v4-Native
+          path: /tmp/Infinity-Stable2-PiP-v4-Native.apk
+          retention-days: 30
