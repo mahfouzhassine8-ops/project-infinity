@@ -26,7 +26,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends unzip curl openssl
+          sudo apt-get install -y --no-install-recommends unzip curl
           curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
       - name: Download Stable 2 baseline
         env:
@@ -55,16 +55,15 @@ jobs:
       - name: Rebuild
         run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-v10-unsigned.apk
       - name: Sign
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
-          PASS=$(openssl rand -hex 16)
           keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Stable 2, O=Infinity, C=US" >/dev/null 2>&1
           "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-FluidVolume-v10-unsigned.apk /tmp/Infinity-Stable2-FluidVolume-v10-aligned.apk
           "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-FluidVolume-v10.apk /tmp/Infinity-Stable2-FluidVolume-v10-aligned.apk
           "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-FluidVolume-v10.apk
-        env:
-          PASS: ${{ github.run_id }}${{ github.run_attempt }}
       - uses: actions/upload-artifact@v7
         with:
           name: Infinity-Stable2-FluidVolume-v10
