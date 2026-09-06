@@ -1,0 +1,100 @@
+name: Infinity Stable 2 v5.7 Android Only PiP Touch Fix
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-stable2-v5-7-pip-touch.yml'
+      - 'scripts/patch-pip-touch-v5-7.py'
+      - 'scripts/patch-fold-multitask-android-only-v5-6.py'
+      - 'scripts/patch-pip-android-only-v5-5.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Install APK patching tools
+        run: |
+          set -euo pipefail
+          sdkmanager 'build-tools;33.0.1' >/dev/null
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download Stable 2 v12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip" -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+
+      - name: Decode Stable 2 and record original native core
+        run: |
+          set -euo pipefail
+          java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+          test -f /tmp/decoded/lib/arm64-v8a/libkodi.so
+          sha256sum /tmp/decoded/lib/arm64-v8a/libkodi.so | tee /tmp/libkodi-before.sha
+
+      - name: Apply v5.7 Android-only PiP touch fix
+        run: python3 scripts/patch-pip-touch-v5-7.py
+
+      - name: Verify v5.7 boundaries
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          test -n "$MAIN"
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
+          grep -q 'android:resizeableActivity="true"' /tmp/decoded/AndroidManifest.xml
+          grep -q 'infinityRefreshSurfaceForWindow()V' "$MAIN"
+          grep -q 'setSizeFromLayout' "$MAIN"
+          grep -q 'getDecorView' "$MAIN"
+          grep -q 'setLayoutParams' "$MAIN"
+          grep -q 'enterPictureInPictureMode' "$MAIN"
+          ! grep -q 'InfinityPipAndroidOnly;->enterPipIfVideo' "$MAIN"
+          sha256sum /tmp/decoded/lib/arm64-v8a/libkodi.so | tee /tmp/libkodi-after.sha
+          cmp -s /tmp/libkodi-before.sha /tmp/libkodi-after.sha
+          echo 'Verified: Stable 2 original libkodi.so is byte-for-byte untouched.'
+
+      - name: Rebuild v5.7
+        run: |
+          set -euo pipefail
+          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix-unsigned.apk
+
+      - name: Align and sign v5.7
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/33.0.1"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Stable2 v5.7 Android Only, O=Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix-unsigned.apk \
+            /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS \
+            --out /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix.apk \
+            /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix
+          path: /tmp/Infinity-Stable2-v5-7-AndroidOnly-PiP-TouchFix.apk
+          retention-days: 30
