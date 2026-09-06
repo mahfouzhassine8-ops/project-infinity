@@ -1,0 +1,173 @@
+name: Infinity Stable 2 Phone Layer v2
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-stable2-phone-layer-v2.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download Stable 2 v12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+      - name: Decode Stable 2
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+      - name: Patch Phone Bridge v2
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root=Path('/tmp/decoded')
+          man=root/'AndroidManifest.xml'
+          s=man.read_text()
+          pat=r'<activity\b[^>]*android:name="com\.projectinfinity\.kodi\.Main"[^>]*>'
+          m=re.search(pat,s)
+          if not m: raise SystemExit('Main activity not found')
+          tag=m.group(0)
+          if 'android:supportsPictureInPicture=' not in tag:
+              tag=tag[:-1]+' android:supportsPictureInPicture="true">'
+          if 'android:resizeableActivity=' not in tag:
+              tag=tag[:-1]+' android:resizeableActivity="true">'
+          s=s[:m.start()]+tag+s[m.end():]
+          man.write_text(s)
+
+          bridge=root/'smali/com/projectinfinity/kodi/InfinityPhoneBridge.smali'
+          bridge.parent.mkdir(parents=True, exist_ok=True)
+          bridge.write_text(r'''.class public final Lcom/projectinfinity/kodi/InfinityPhoneBridge;
+.super Ljava/lang/Object;
+.source "InfinityPhoneBridge.java"
+
+.method private constructor <init>()V
+    .locals 0
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+    return-void
+.end method
+
+.method public static hasActiveVideoPlayer(Lcom/projectinfinity/kodi/XBMCJsonRPC;)Z
+    .locals 4
+
+    if-eqz p0, :no
+
+    const-string v0, "{\"jsonrpc\":\"2.0\",\"method\":\"Player.GetActivePlayers\",\"id\":1}"
+    invoke-virtual {p0, v0}, Lcom/projectinfinity/kodi/XBMCJsonRPC;->request_string(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    if-eqz v0, :no
+
+    const-string v1, "\"type\":\"video\""
+    invoke-virtual {v0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+    move-result v2
+    if-nez v2, :yes
+
+    const-string v1, "\"type\": \"video\""
+    invoke-virtual {v0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+    move-result v2
+    if-nez v2, :yes
+
+    const-string v1, "video"
+    invoke-virtual {v0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+    move-result v2
+    if-eqz v2, :no
+
+    :yes
+    const/4 v3, 0x1
+    return v3
+
+    :no
+    const/4 v3, 0x0
+    return v3
+.end method
+
+.method public static enterPipIfVideo(Landroid/app/Activity;Lcom/projectinfinity/kodi/XBMCJsonRPC;)Z
+    .locals 2
+
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v1, 0x1a
+    if-lt v0, v1, :skip
+
+    invoke-static {p1}, Lcom/projectinfinity/kodi/InfinityPhoneBridge;->hasActiveVideoPlayer(Lcom/projectinfinity/kodi/XBMCJsonRPC;)Z
+    move-result v0
+    if-eqz v0, :skip
+
+    invoke-virtual {p0}, Landroid/app/Activity;->enterPictureInPictureMode()Z
+    move-result v0
+    return v0
+
+    :skip
+    const/4 v0, 0x0
+    return v0
+.end method
+''')
+
+          p=root/'smali/com/projectinfinity/kodi/Main.smali'
+          t=p.read_text()
+          mm=re.search(r'(?ms)^\.method public onPause\(\)V\n(.*?)^\.end method',t)
+          if not mm: raise SystemExit('Main.onPause not found')
+          body=mm.group(0)
+          marker='    invoke-super {p0}, Landroid/app/NativeActivity;->onPause()V\n'
+          if marker not in body: raise SystemExit('onPause super marker not found')
+          hook=r'''
+    # Infinity Phone Layer v2: ask Kodi itself whether a video player is active.
+    iget-object v0, p0, Lcom/projectinfinity/kodi/Main;->mJsonRPC:Lcom/projectinfinity/kodi/XBMCJsonRPC;
+    invoke-static {p0, v0}, Lcom/projectinfinity/kodi/InfinityPhoneBridge;->enterPipIfVideo(Landroid/app/Activity;Lcom/projectinfinity/kodi/XBMCJsonRPC;)Z
+
+'''
+          newbody=body.replace(marker, marker+hook, 1)
+          t=t[:mm.start()]+newbody+t[mm.end():]
+          p.write_text(t)
+          PY
+      - name: Verify bridge wiring
+        run: |
+          set -euo pipefail
+          MAIN=/tmp/decoded/smali/com/projectinfinity/kodi/Main.smali
+          BRIDGE=/tmp/decoded/smali/com/projectinfinity/kodi/InfinityPhoneBridge.smali
+          grep -q 'Player.GetActivePlayers' "$BRIDGE"
+          grep -q 'enterPipIfVideo' "$MAIN"
+          grep -q 'mJsonRPC:Lcom/projectinfinity/kodi/XBMCJsonRPC;' "$MAIN"
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PhoneLayer-v2-unsigned.apk
+      - name: Sign
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Phone Layer v2, O=Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-PhoneLayer-v2-unsigned.apk /tmp/Infinity-Stable2-PhoneLayer-v2-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-PhoneLayer-v2.apk /tmp/Infinity-Stable2-PhoneLayer-v2-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-PhoneLayer-v2.apk
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Stable2-PhoneLayer-v2
+          path: /tmp/Infinity-Stable2-PhoneLayer-v2.apk
+          retention-days: 30
