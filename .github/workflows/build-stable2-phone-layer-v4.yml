@@ -1,0 +1,79 @@
+name: Infinity Stable 2 Phone Layer v4
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-stable2-phone-layer-v4.yml'
+      - 'scripts/patch-phone-layer-v4.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download Stable 2 v12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip" -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+      - name: Decode Stable 2
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+      - name: Patch Phone Layer v4
+        run: python3 scripts/patch-phone-layer-v4.py
+      - name: Verify PiP and surface resize wiring
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          VIEW=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/XBMCMainView.smali' | head -1)
+          BRIDGE=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/InfinityPhoneBridge.smali' | head -1)
+          test -n "$MAIN"
+          test -n "$VIEW"
+          test -n "$BRIDGE"
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
+          grep -q 'setAutoEnterEnabled(Z)' "$BRIDGE"
+          grep -q 'onUserLeaveHint()V' "$MAIN"
+          grep -q 'onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V' "$MAIN"
+          grep -q 'requestLayout()V' "$MAIN"
+          grep -q 'onSizeChanged(IIII)V' "$VIEW"
+          grep -q 'setFixedSize(II)V' "$VIEW"
+          grep -q 'infinityPipSurfaceResize' "$VIEW"
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PhoneLayer-v4-unsigned.apk
+      - name: Sign
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Phone Layer v4, O=Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-PhoneLayer-v4-unsigned.apk /tmp/Infinity-Stable2-PhoneLayer-v4-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-PhoneLayer-v4.apk /tmp/Infinity-Stable2-PhoneLayer-v4-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-PhoneLayer-v4.apk
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Stable2-PhoneLayer-v4-PiP-SurfaceFix
+          path: /tmp/Infinity-Stable2-PhoneLayer-v4.apk
+          retention-days: 30
