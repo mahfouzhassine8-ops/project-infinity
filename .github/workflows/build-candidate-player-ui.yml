@@ -1,0 +1,128 @@
+name: ♾️ Build Candidate - Player UI
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-candidate-player-ui.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download proven Native Resume candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9981395367/zip -o /tmp/base.zip
+          mkdir -p /tmp/base && unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+      - name: Decode
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+      - name: Add player volume and mute controls
+        run: |
+          set -euo pipefail
+          OSD=/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          test -f "$OSD"
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml')
+          s=p.read_text(encoding='utf-8')
+          marker='</controls>'
+          block='''
+            <!-- Infinity player audio controls: visual-only skin additions using Kodi native volume actions. -->
+            <control type="group" id="9890">
+              <left>70</left>
+              <top>70</top>
+              <animation effect="fade" start="0" end="100" time="140">Visible</animation>
+              <animation effect="fade" start="100" end="0" time="180">Hidden</animation>
+              <control type="button" id="9891">
+                <width>56</width><height>56</height>
+                <label>🔇</label>
+                <font>font20</font>
+                <onclick>Mute</onclick>
+                <hinttext>Mute / Unmute</hinttext>
+              </control>
+              <control type="button" id="9892">
+                <left>66</left><width>56</width><height>56</height>
+                <label>−</label>
+                <font>font30</font>
+                <onclick>SetVolume(-5)</onclick>
+                <hinttext>Volume Down</hinttext>
+              </control>
+              <control type="button" id="9893">
+                <left>132</left><width>56</width><height>56</height>
+                <label>+</label>
+                <font>font30</font>
+                <onclick>SetVolume(+5)</onclick>
+                <hinttext>Volume Up</hinttext>
+              </control>
+            </control>
+'''
+          if 'id="9890"' not in s:
+              pos=s.rfind(marker)
+              if pos < 0: raise SystemExit('VideoOSD controls marker not found')
+              s=s[:pos]+block+s[pos:]
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Soften resume dialog presentation
+        run: |
+          set -euo pipefail
+          # Keep Kodi's native resume decision and timestamp. Only soften the generic
+          # select dialog so it feels less like a full-screen interruption.
+          D=/tmp/decoded/assets/addons/skin.estuary/xml/DialogSelect.xml
+          test -f "$D"
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/decoded/assets/addons/skin.estuary/xml/DialogSelect.xml')
+          s=p.read_text(encoding='utf-8')
+          # Preserve logic; add quick window entrance/exit animations if absent.
+          if '<animation effect="fade" start="0" end="100" time="140">WindowOpen</animation>' not in s:
+              needle='<controls>'
+              anim='''<animation effect="fade" start="0" end="100" time="140">WindowOpen</animation>\n\t<animation effect="slide" start="0,18" end="0,0" time="160">WindowOpen</animation>\n\t<animation effect="fade" start="100" end="0" time="120">WindowClose</animation>\n\t'''
+              s=s.replace(needle,anim+needle,1)
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify player UI patch
+        run: |
+          set -euo pipefail
+          grep -q 'id="9890"' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q '<onclick>Mute</onclick>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'SetVolume' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'WindowOpen' /tmp/decoded/assets/addons/skin.estuary/xml/DialogSelect.xml
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Player-UI-unsigned.apk
+      - name: Sign
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          mkdir -p ~/.android
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Player UI, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Player-UI-unsigned.apk /tmp/Infinity-Player-UI-aligned.apk
+          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Player-UI.apk /tmp/Infinity-Player-UI-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI.apk
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Player-UI-Candidate
+          path: /tmp/Infinity-Player-UI.apk
+          retention-days: 30
