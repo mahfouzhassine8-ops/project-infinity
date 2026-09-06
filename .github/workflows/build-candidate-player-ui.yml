@@ -1,4 +1,4 @@
-name: Infinity Player UI v6
+name: Infinity Player UI v7
 
 on:
   push:
@@ -41,12 +41,12 @@ jobs:
           cp "$APK" /tmp/base.apk
       - name: Decode
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
-      - name: Apply integrated volume v6
+      - name: Apply volume focus HUD v7
         run: python3 tools/patch_player_ui_v2.py
       - name: Verify patch
         run: |
           set -euo pipefail
-          grep -q 'Infinity integrated volume v6' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'Infinity volume focus HUD v7' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '<action>volume</action>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '<onclick>Mute</onclick>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '\$VAR\[VolumeIconVar\]' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
@@ -63,6 +63,6 @@ jobs:
           "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI-v6.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Player-UI-v6-Candidate
+          name: Infinity-Player-UI-v7-Candidate
           path: /tmp/Infinity-Player-UI-v6.apk
           retention-days: 30
