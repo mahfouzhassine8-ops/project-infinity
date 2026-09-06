@@ -1,10 +1,10 @@
-name: Infinity Player UI Candidate
+name: Infinity Player UI v2
 
 on:
   push:
     paths:
       - '.github/workflows/build-candidate-player-ui.yml'
-      - 'scripts/player_ui_patch.py'
+      - 'tools/patch_player_ui_v2.py'
   workflow_dispatch:
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends unzip curl
           curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
-      - name: Download proven Native Resume candidate
+      - name: Download proven Native Resume base
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -41,28 +41,27 @@ jobs:
           cp "$APK" /tmp/base.apk
       - name: Decode
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
-      - name: Apply Player UI patch
-        run: python3 scripts/player_ui_patch.py
+      - name: Apply Player UI v2
+        run: python3 tools/patch_player_ui_v2.py
       - name: Verify patch
         run: |
           set -euo pipefail
-          grep -q 'id="9890"' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q '<onclick>Mute</onclick>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q 'SetVolume' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q 'WindowOpen' /tmp/decoded/assets/addons/skin.estuary/xml/DialogSelect.xml
+          grep -q 'id="9895"' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'ActivateWindow(volumebar)' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'native resume logic untouched' /tmp/decoded/assets/addons/skin.estuary/xml/DialogSelect.xml
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Player-UI-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Player-UI-v2-unsigned.apk
       - name: Sign
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
           mkdir -p ~/.android
-          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Player UI, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Player-UI-unsigned.apk /tmp/Infinity-Player-UI-aligned.apk
-          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Player-UI.apk /tmp/Infinity-Player-UI-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI.apk
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Player UI v2, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Player-UI-v2-unsigned.apk /tmp/Infinity-Player-UI-v2-aligned.apk
+          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Player-UI-v2.apk /tmp/Infinity-Player-UI-v2-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI-v2.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Player-UI-Candidate
-          path: /tmp/Infinity-Player-UI.apk
+          name: Infinity-Player-UI-v2-Candidate
+          path: /tmp/Infinity-Player-UI-v2.apk
           retention-days: 30
