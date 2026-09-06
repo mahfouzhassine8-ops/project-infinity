@@ -1,0 +1,186 @@
+name: Infinity Stable 2 PiP v5 Native Core
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-stable2-pip-v5-nativecore.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout Project Infinity
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android NDK and build tools
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;33.0.1' 'build-tools;34.0.0' 'ndk;21.4.7075529'
+
+      - name: Install build prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            autoconf bison build-essential curl flex gawk git gperf \
+            lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev \
+            unzip zip zlib1g-dev ccache
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Clone Kodi Omega 21.2 native PiP branch
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch infinity-pip-v5-omega-21.2 \
+            https://github.com/mahfouzhassine8-ops/xbmc.git /tmp/xbmc
+          cd /tmp/xbmc
+          git apply --check infinity-pip-v5.patch
+          git apply infinity-pip-v5.patch
+          grep -q 'Infinity PiP surface' xbmc/platform/android/activity/XBMCApp.cpp
+          sed -i 's/^APP_PACKAGE .*/APP_PACKAGE com.projectinfinity.kodi/' version.txt
+          grep '^VERSION_MAJOR 21' version.txt
+          grep '^VERSION_MINOR 2' version.txt
+          grep '^APP_PACKAGE com.projectinfinity.kodi' version.txt
+
+      - name: Cache Kodi depends
+        uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/kodi-tools/xbmc-depends
+            /tmp/kodi-tools/xbmc-tarballs
+          key: infinity-kodi-21.2-aarch64-r21e-${{ runner.os }}
+          restore-keys: |
+            infinity-kodi-21.2-aarch64-r21e-
+
+      - name: Configure Kodi depends
+        working-directory: /tmp/xbmc/tools/depends
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kodi-tools/xbmc-tarballs
+          ./bootstrap
+          ./configure \
+            --with-tarballs=/tmp/kodi-tools/xbmc-tarballs \
+            --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" \
+            --with-ndk-path="$ANDROID_HOME/ndk/21.4.7075529" \
+            --prefix=/tmp/kodi-tools/xbmc-depends \
+            --disable-ccache
+
+      - name: Build Kodi dependencies
+        working-directory: /tmp/xbmc/tools/depends
+        run: |
+          set -euo pipefail
+          make -j"$(nproc)"
+
+      - name: Configure Kodi native build
+        working-directory: /tmp/xbmc
+        run: |
+          set -euo pipefail
+          make -C tools/depends/target/cmakebuildsys BUILD_DIR=/tmp/xbmc-build
+
+      - name: Build patched libkodi.so
+        working-directory: /tmp/xbmc-build
+        run: |
+          set -euo pipefail
+          make -j"$(nproc)"
+          LIB=$(find /tmp/xbmc-build /tmp/xbmc -type f -name 'libkodi.so' | head -1)
+          test -n "$LIB"
+          cp "$LIB" /tmp/libkodi-pip-v5.so
+          ls -lh /tmp/libkodi-pip-v5.so
+
+      - name: Download Stable 2 v12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip \
+            -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+
+      - name: Decode Stable 2
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+
+      - name: Install patched native core
+        run: |
+          set -euo pipefail
+          TARGET=$(find /tmp/decoded/lib -path '*/arm64-v8a/libkodi.so' -type f | head -1)
+          if [ -z "$TARGET" ]; then
+            TARGET=/tmp/decoded/lib/arm64-v8a/libkodi.so
+            mkdir -p "$(dirname "$TARGET")"
+          fi
+          cp /tmp/libkodi-pip-v5.so "$TARGET"
+          echo "Replaced native core at $TARGET"
+          ls -lh "$TARGET"
+
+      - name: Apply working Android PiP layer
+        run: python3 scripts/patch-phone-layer-v4.py
+
+      - name: Verify native and Java PiP wiring
+        run: |
+          set -euo pipefail
+          MAN=/tmp/decoded/AndroidManifest.xml
+          MAIN=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          test -n "$MAIN"
+          grep -q 'android:supportsPictureInPicture="true"' "$MAN"
+          grep -q 'configureAutoPip' "$MAIN"
+          grep -q 'onPictureInPictureModeChanged' "$MAIN"
+          test -f /tmp/decoded/lib/arm64-v8a/libkodi.so
+          strings /tmp/decoded/lib/arm64-v8a/libkodi.so | grep -q 'Infinity PiP surface'
+          echo 'PiP v5 native-core wiring verified.'
+
+      - name: Rebuild Infinity
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PiP-v5-NativeCore-unsigned.apk
+
+      - name: Sign Infinity
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair \
+            -keystore /tmp/infinity.keystore \
+            -alias infinity \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" \
+            -dname "CN=Infinity Stable 2 PiP v5 Native Core, O=Infinity, C=US" \
+            >/dev/null 2>&1
+          "$BT/zipalign" -f 4 \
+            /tmp/Infinity-Stable2-PiP-v5-NativeCore-unsigned.apk \
+            /tmp/Infinity-Stable2-PiP-v5-NativeCore-aligned.apk
+          "$BT/apksigner" sign \
+            --ks /tmp/infinity.keystore \
+            --ks-key-alias infinity \
+            --ks-pass env:PASS \
+            --key-pass env:PASS \
+            --out /tmp/Infinity-Stable2-PiP-v5-NativeCore.apk \
+            /tmp/Infinity-Stable2-PiP-v5-NativeCore-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-PiP-v5-NativeCore.apk
+
+      - name: Upload Infinity PiP v5 APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Stable2-PiP-v5-NativeCore
+          path: /tmp/Infinity-Stable2-PiP-v5-NativeCore.apk
+          retention-days: 30
