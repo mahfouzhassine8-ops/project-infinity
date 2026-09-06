@@ -1,4 +1,4 @@
-name: Infinity Stable 2 Fluid v10
+name: Infinity Stable 2 Fluid v11
 
 on:
   push:
@@ -43,17 +43,18 @@ jobs:
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
       - name: Apply fluid volume polish
         run: python3 tools/patch_player_ui_v2.py
-      - name: Verify real volume patch
+      - name: Verify v11 interaction return patch
         run: |
           set -euo pipefail
           OSD=/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
-          grep -q 'Infinity volume fluid polish v10' "$OSD"
+          grep -q 'Infinity volume fluid polish v11' "$OSD"
           grep -q 'end="118,128"' "$OSD"
           grep -q 'time="190"' "$OSD"
           grep -q 'Control.HasFocus(8802)' "$OSD"
-          grep -q '>Hidden</animation>' "$OSD"
+          grep -q 'time="110"' "$OSD"
+          grep -q '>Unfocus</animation>' "$OSD"
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-v10-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-v11-unsigned.apk
       - name: Sign
         env:
           PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
@@ -61,11 +62,11 @@ jobs:
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
           keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Stable 2, O=Infinity, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-FluidVolume-v10-unsigned.apk /tmp/Infinity-Stable2-FluidVolume-v10-aligned.apk
-          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-FluidVolume-v10.apk /tmp/Infinity-Stable2-FluidVolume-v10-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-FluidVolume-v10.apk
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-FluidVolume-v11-unsigned.apk /tmp/Infinity-Stable2-FluidVolume-v11-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-FluidVolume-v11.apk /tmp/Infinity-Stable2-FluidVolume-v11-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-FluidVolume-v11.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Stable2-FluidVolume-v10
-          path: /tmp/Infinity-Stable2-FluidVolume-v10.apk
+          name: Infinity-Stable2-FluidVolume-v11
+          path: /tmp/Infinity-Stable2-FluidVolume-v11.apk
           retention-days: 30
