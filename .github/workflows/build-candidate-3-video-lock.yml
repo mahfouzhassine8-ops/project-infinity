@@ -61,7 +61,7 @@ jobs:
             <onload>SetProperty(InfinityVideoLocked,true)</onload>
             <onload>SetProperty(InfinityLockHint,true)</onload>
             <onload>ClearProperty(InfinityUnlockVisible)</onload>
-            <onload>AlarmClock(InfinityHideInitial,ClearProperty(InfinityLockHint),1.0,silent)</onload>
+            <onload>AlarmClock(InfinityHideInitial,ClearProperty(InfinityLockHint),00:00:01,silent)</onload>
 
             <onunload>CancelAlarm(InfinityHideInitial,silent)</onunload>
             <onunload>CancelAlarm(InfinityHideTap,silent)</onunload>
@@ -83,7 +83,7 @@ jobs:
                 <label></label>
                 <onclick>SetProperty(InfinityUnlockVisible,true)</onclick>
                 <onclick>CancelAlarm(InfinityHideTap,silent)</onclick>
-                <onclick>AlarmClock(InfinityHideTap,ClearProperty(InfinityUnlockVisible),2.5,silent)</onclick>
+                <onclick>AlarmClock(InfinityHideTap,ClearProperty(InfinityUnlockVisible),00:00:03,silent)</onclick>
               </control>
 
               <!-- Decorative initial lock. It is NOT a button and is removed after one second. -->
@@ -116,7 +116,8 @@ jobs:
           </window>
           XML
 
-          grep -q 'InfinityHideInitial.*1.0' "$LOCKXML"
+          grep -q 'InfinityHideInitial.*00:00:01' "$LOCKXML"
+          grep -q 'InfinityHideTap.*00:00:03' "$LOCKXML"
           grep -q '<pulseonselect>false</pulseonselect>' "$LOCKXML"
 
       - name: Rebuild
