@@ -35,80 +35,69 @@ jobs:
           sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin unzip curl fonts-dejavu-core
           curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
 
-      - name: Download Infinity Stable 2
+      # IMPORTANT: start from the known-good "Fresh Out the Oven" lock build.
+      # Artifact 9979055811 is the candidate where input blocking already works.
+      - name: Download known-good lock candidate
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9978114291/zip \
-            -o /tmp/stable2.zip
-          mkdir -p /tmp/stable2
-          unzip -q /tmp/stable2.zip -d /tmp/stable2
-          APK=$(find /tmp/stable2 -name '*.apk' -type f | head -1)
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9979055811/zip \
+            -o /tmp/known-good.zip
+          mkdir -p /tmp/known-good
+          unzip -q /tmp/known-good.zip -d /tmp/known-good
+          APK=$(find /tmp/known-good -name '*.apk' -type f | head -1)
           test -n "$APK"
-          cp "$APK" /tmp/Infinity-Stable-2.apk
+          cp "$APK" /tmp/Infinity-Known-Good-Lock.apk
 
-      - name: Decode Stable 2
+      - name: Decode known-good lock build
         run: |
           set -euo pipefail
-          java -jar /tmp/apktool.jar d -f /tmp/Infinity-Stable-2.apk -o /tmp/decoded
+          java -jar /tmp/apktool.jar d -f /tmp/Infinity-Known-Good-Lock.apk -o /tmp/decoded
 
-      - name: Add icon-only VLC-style Infinity video lock
+      - name: Polish visuals only - preserve working lock behavior
         run: |
           set -euo pipefail
-          SKIN=/tmp/decoded/assets/addons/skin.estuary
-          OSD="$SKIN/xml/VideoOSD.xml"
-          test -f "$OSD"
-
+          LOCKXML=/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml
+          test -f "$LOCKXML"
           python3 - <<'PY'
           from pathlib import Path
-          osd = Path('/tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml')
-          text = osd.read_text()
-          marker = '<control type="radiobutton" id="804">'
-          if marker not in text:
-              raise SystemExit('ERROR: expected VideoOSD insertion point not found')
-          lock_button = '''<control type="radiobutton" id="7999">\n\t\t\t\t\t\t<include content="OSDButton">\n\t\t\t\t\t\t\t<param name="texture" value="osd/fullscreen/buttons/infinity-lock.png"/>\n\t\t\t\t\t\t</include>\n\t\t\t\t\t\t<label>Lock screen</label>\n\t\t\t\t\t\t<onclick>Dialog.Close(VideoOSD)</onclick>\n\t\t\t\t\t\t<onclick>ActivateWindow(1199)</onclick>\n\t\t\t\t\t\t<visible>Player.HasVideo</visible>\n\t\t\t\t\t</control>\n\t\t\t\t\t'''
-          if 'id="7999"' not in text:
-              text = text.replace(marker, lock_button + marker, 1)
-              osd.write_text(text)
-
-          overlay = Path('/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml')
-          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog" id="1199">\n    <onload>SetProperty(InfinityVideoLocked,true)</onload>\n    <onload>SetProperty(InfinityLockHint,true)</onload>\n    <onload>ClearProperty(InfinityUnlockVisible)</onload>\n    <onload>ClearProperty(InfinityUnlocking)</onload>\n    <onload>AlarmClock(InfinityHideLockHint,ClearProperty(InfinityLockHint),1.4,silent)</onload>\n    <onunload>CancelAlarm(InfinityHideUnlock,silent)</onunload>\n    <onunload>CancelAlarm(InfinityHideLockHint,silent)</onunload>\n    <onunload>CancelAlarm(InfinityFinishUnlock,silent)</onunload>\n    <onunload>ClearProperty(InfinityUnlockVisible)</onunload>\n    <onunload>ClearProperty(InfinityLockHint)</onunload>\n    <onunload>ClearProperty(InfinityUnlocking)</onunload>\n    <onunload>ClearProperty(InfinityVideoLocked)</onunload>\n    <defaultcontrol always="true">9900</defaultcontrol>\n    <controls>\n        <control type="button" id="9900">\n            <left>0</left><top>0</top><width>100%</width><height>100%</height>\n            <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n            <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n            <label></label>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">SetProperty(InfinityUnlockVisible,true)</onclick>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">AlarmClock(InfinityHideUnlock,ClearProperty(InfinityUnlockVisible),2.5,silent)</onclick>\n        </control>\n\n        <!-- Icon only: briefly appears after lock, then fades away. -->\n        <control type="image">\n            <left>48</left><top>35</top><width>58</width><height>58</height>\n            <texture>osd/fullscreen/buttons/infinity-lock.png</texture>\n            <visible>!String.IsEmpty(Window.Property(InfinityLockHint))</visible>\n            <animation effect="fade" start="0" end="100" time="100">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="180">Hidden</animation>\n        </control>\n\n        <!-- Tap locked video: only the lock icon returns. Tapping it begins unlock. -->\n        <control type="button" id="9901">\n            <left>38</left><top>25</top><width>80</width><height>80</height>\n            <texturefocus>osd/fullscreen/buttons/infinity-lock.png</texturefocus>\n            <texturenofocus>osd/fullscreen/buttons/infinity-lock.png</texturenofocus>\n            <label></label>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n            <animation effect="fade" start="0" end="100" time="100">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="160">Hidden</animation>\n            <onclick>CancelAlarm(InfinityHideUnlock,silent)</onclick>\n            <onclick>ClearProperty(InfinityUnlockVisible)</onclick>\n            <onclick>SetProperty(InfinityUnlocking,true)</onclick>\n            <onclick>AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),0.65,silent)</onclick>\n        </control>\n\n        <!-- Same position: quick closed-lock to open-lock transition, icon only. -->\n        <control type="image">\n            <left>48</left><top>35</top><width>58</width><height>58</height>\n            <texture>osd/fullscreen/buttons/infinity-unlock.png</texture>\n            <visible>!String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n            <animation effect="fade" start="0" end="100" time="80">Visible</animation>\n            <animation effect="zoom" start="88" end="105" center="77,64" time="110" pulse="true">Visible</animation>\n            <animation effect="fade" start="100" end="0" time="180" delay="360">Visible</animation>\n        </control>\n    </controls>\n</window>\n''')
+          p=Path('/tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml')
+          s=p.read_text()
+          # Preserve the known-good touch interception and button actions. Only alter visual timing.
+          # Initial lock icon: remove the residual hidden-animation behavior and let visibility property
+          # be the hard off-switch after the existing 1.4s alarm clears InfinityLockHint.
+          s=s.replace('<animation effect="fade" start="100" end="0" time="180">Hidden</animation>',
+                      '<animation effect="fade" start="100" end="0" time="220" delay="1050">Visible</animation>',1)
+          # Unlock icon: make it unmistakable and keep the dialog alive long enough to render it.
+          s=s.replace('AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),0.65,silent)',
+                      'AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),1.00,silent)')
+          s=s.replace('<animation effect="fade" start="100" end="0" time="180" delay="360">Visible</animation>',
+                      '<animation effect="fade" start="100" end="0" time="240" delay="600">Visible</animation>')
+          p.write_text(s)
+          if '1.00,silent' not in s or 'delay="600"' not in s:
+              raise SystemExit('visual polish replacements did not apply')
           PY
 
-          mkdir -p "$SKIN/media/osd/fullscreen/buttons"
-          cat > /tmp/infinity-lock.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#111318"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/></svg>
-          SVG
-          cat > /tmp/infinity-unlock.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14 6 0 11 3 13 8" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#111318"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#111318"/></svg>
-          SVG
-          rsvg-convert -w 74 -h 74 /tmp/infinity-lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
-          rsvg-convert -w 74 -h 74 /tmp/infinity-unlock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-unlock.png"
-          grep -n 'id="7999"' "$OSD"
-          grep -n 'InfinityUnlocking' "$SKIN/xml/Custom_1199_InfinityVideoLock.xml"
-          test -f "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
-          test -f "$SKIN/media/osd/fullscreen/buttons/infinity-unlock.png"
-
-      - name: Rebuild Candidate 3
+      - name: Rebuild polished Candidate 3
         run: |
           set -euo pipefail
-          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Candidate-3-unsigned.apk
+          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Candidate-3-Polished-unsigned.apk
 
-      - name: Sign Candidate 3
+      - name: Sign polished Candidate 3
         run: |
           set -euo pipefail
           BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
           mkdir -p ~/.android
           keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Candidate 3, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
-          "$BUILD_TOOLS/zipalign" -f -v 4 /tmp/Infinity-Candidate-3-unsigned.apk /tmp/Infinity-Candidate-3-aligned.apk
-          "$BUILD_TOOLS/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Candidate-3.apk /tmp/Infinity-Candidate-3-aligned.apk
-          "$BUILD_TOOLS/apksigner" verify --verbose /tmp/Infinity-Candidate-3.apk
+          "$BUILD_TOOLS/zipalign" -f -v 4 /tmp/Infinity-Candidate-3-Polished-unsigned.apk /tmp/Infinity-Candidate-3-Polished-aligned.apk
+          "$BUILD_TOOLS/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Candidate-3-Polished.apk /tmp/Infinity-Candidate-3-Polished-aligned.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose /tmp/Infinity-Candidate-3-Polished.apk
 
-      - name: Upload Candidate 3
+      - name: Upload polished Candidate 3
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Candidate-3-Icon-Only-VLC-Lock
-          path: /tmp/Infinity-Candidate-3.apk
+          name: Infinity-Candidate-3-Fresh-Oven-Visual-Polish
+          path: /tmp/Infinity-Candidate-3-Polished.apk
           retention-days: 30
