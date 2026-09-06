@@ -1,4 +1,4 @@
-name: Infinity Player UI v3
+name: Infinity Player UI v4
 
 on:
   push:
@@ -41,27 +41,28 @@ jobs:
           cp "$APK" /tmp/base.apk
       - name: Decode
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
-      - name: Apply integrated volume v3
+      - name: Apply integrated volume v4
         run: python3 tools/patch_player_ui_v2.py
       - name: Verify patch
         run: |
           set -euo pipefail
-          grep -q 'Infinity integrated volume v3' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q 'Infinity integrated volume v4' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '<action>volume</action>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
           grep -q '<onclick>Mute</onclick>' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          grep -q '\$VAR\[VolumeIconVar\]' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Player-UI-v3-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Player-UI-v4-unsigned.apk
       - name: Sign
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
           mkdir -p ~/.android
-          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Player UI v3, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Player-UI-v3-unsigned.apk /tmp/Infinity-Player-UI-v3-aligned.apk
-          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Player-UI-v3.apk /tmp/Infinity-Player-UI-v3-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI-v3.apk
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Player UI v4, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Player-UI-v4-unsigned.apk /tmp/Infinity-Player-UI-v4-aligned.apk
+          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Player-UI-v4.apk /tmp/Infinity-Player-UI-v4-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Player-UI-v4.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Player-UI-v3-Candidate
-          path: /tmp/Infinity-Player-UI-v3.apk
+          name: Infinity-Player-UI-v4-Candidate
+          path: /tmp/Infinity-Player-UI-v4.apk
           retention-days: 30
