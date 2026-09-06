@@ -9,10 +9,14 @@ m = re.search(pat, s)
 if not m:
     raise SystemExit('Main activity not found')
 tag = m.group(0)
-if 'android:supportsPictureInPicture=' not in tag:
-    tag = tag[:-1] + ' android:supportsPictureInPicture="true">'
-if 'android:resizeableActivity=' not in tag:
-    tag = tag[:-1] + ' android:resizeableActivity="true">'
+for key, value in (
+    ('android:supportsPictureInPicture', 'true'),
+    ('android:resizeableActivity', 'true'),
+):
+    if key + '=' in tag:
+        tag = re.sub(re.escape(key) + r'="[^"]*"', key + '="' + value + '"', tag)
+    else:
+        tag = tag[:-1] + ' ' + key + '="' + value + '">'
 s = s[:m.start()] + tag + s[m.end():]
 man.write_text(s)
 
@@ -46,8 +50,36 @@ bridge.write_text(r'''.class public final Lcom/projectinfinity/kodi/InfinityPhon
     return v3
 .end method
 
+.method public static configureAutoPip(Landroid/app/Activity;)V
+    .locals 4
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v1, 0x1f
+    if-lt v0, v1, :done
+
+    new-instance v0, Landroid/app/PictureInPictureParams$Builder;
+    invoke-direct {v0}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
+
+    const/4 v1, 0x1
+    invoke-virtual {v0, v1}, Landroid/app/PictureInPictureParams$Builder;->setAutoEnterEnabled(Z)Landroid/app/PictureInPictureParams$Builder;
+    move-result-object v0
+
+    new-instance v1, Landroid/util/Rational;
+    const/16 v2, 0x10
+    const/16 v3, 0x9
+    invoke-direct {v1, v2, v3}, Landroid/util/Rational;-><init>(II)V
+    invoke-virtual {v0, v1}, Landroid/app/PictureInPictureParams$Builder;->setAspectRatio(Landroid/util/Rational;)Landroid/app/PictureInPictureParams$Builder;
+    move-result-object v0
+
+    invoke-virtual {v0}, Landroid/app/PictureInPictureParams$Builder;->build()Landroid/app/PictureInPictureParams;
+    move-result-object v0
+    invoke-virtual {p0, v0}, Landroid/app/Activity;->setPictureInPictureParams(Landroid/app/PictureInPictureParams;)V
+
+    :done
+    return-void
+.end method
+
 .method public static enterPipOnUserLeave(Landroid/app/Activity;Lcom/projectinfinity/kodi/XBMCJsonRPC;)Z
-    .locals 3
+    .locals 4
     sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
     const/16 v1, 0x1a
     if-lt v0, v1, :skip
@@ -62,6 +94,14 @@ bridge.write_text(r'''.class public final Lcom/projectinfinity/kodi/InfinityPhon
 
     new-instance v0, Landroid/app/PictureInPictureParams$Builder;
     invoke-direct {v0}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
+
+    new-instance v1, Landroid/util/Rational;
+    const/16 v2, 0x10
+    const/16 v3, 0x9
+    invoke-direct {v1, v2, v3}, Landroid/util/Rational;-><init>(II)V
+    invoke-virtual {v0, v1}, Landroid/app/PictureInPictureParams$Builder;->setAspectRatio(Landroid/util/Rational;)Landroid/app/PictureInPictureParams$Builder;
+    move-result-object v0
+
     invoke-virtual {v0}, Landroid/app/PictureInPictureParams$Builder;->build()Landroid/app/PictureInPictureParams;
     move-result-object v1
     invoke-virtual {p0, v1}, Landroid/app/Activity;->enterPictureInPictureMode(Landroid/app/PictureInPictureParams;)Z
@@ -82,7 +122,20 @@ if not p.exists():
     p = hits[0]
 t = p.read_text()
 
-# v3 follows VLC's Android pattern: trigger specifically when the user leaves for Home/Recents.
+# Android 12+ native auto-enter PiP. Configure it whenever Main resumes.
+if 'InfinityPhoneBridge;->configureAutoPip' not in t:
+    mm = re.search(r'(?ms)^\.method (?:public|protected) onResume\(\)V\n(.*?)^\.end method', t)
+    if not mm:
+        raise SystemExit('onResume not found')
+    body = mm.group(0)
+    marker = '    invoke-super {p0}, Landroid/app/NativeActivity;->onResume()V\n'
+    if marker not in body:
+        raise SystemExit('onResume super marker not found')
+    add = '\n    invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityPhoneBridge;->configureAutoPip(Landroid/app/Activity;)V\n'
+    newbody = body.replace(marker, marker + add, 1)
+    t = t[:mm.start()] + newbody + t[mm.end():]
+
+# Keep the existing explicit fallback for Home/Recents and pre-Android-12 devices.
 if '.method public onUserLeaveHint()V' not in t:
     hook = r'''
 .method public onUserLeaveHint()V
@@ -115,4 +168,4 @@ else:
         t = t[:mm.start()] + newbody + t[mm.end():]
 
 p.write_text(t)
-print('Phone Layer v3 patched successfully')
+print('Phone Layer v3 upgraded with Android 12+ auto-enter PiP')
