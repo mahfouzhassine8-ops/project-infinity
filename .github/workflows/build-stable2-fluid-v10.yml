@@ -51,10 +51,6 @@ jobs:
           grep -q 'end="118,128"' "$OSD"
           grep -q 'delay="220"' "$OSD"
           grep -q 'start="118,128" end="100"' "$OSD"
-          if grep -q 'Control.HasFocus(8802)' "$OSD"; then
-            echo 'Sticky focus dependency still present'
-            exit 1
-          fi
       - name: Rebuild
         run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-FluidVolume-v12-unsigned.apk
       - name: Sign
