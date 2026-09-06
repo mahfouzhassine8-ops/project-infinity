@@ -4,18 +4,41 @@ import re
 manifest = Path('/tmp/decoded/AndroidManifest.xml')
 s = manifest.read_text(encoding='utf-8')
 
-# Phone integration v1, built on Stable 2 (v12):
-# - enable Android picture-in-picture capability
-# - allow resizing/multi-window
-# - handle Fold/screen-size/orientation changes without forcing Android to recreate
-#   the activity for those configuration changes
-# Keep this manifest-only: no skin/player-control changes.
+# Stable 2 phone integration: locate the APK's real launcher activity instead
+# of assuming a hard-coded Kodi activity class. Manifest-only; no skin/player changes.
+activities = list(re.finditer(r'<activity\b[^>]*>', s))
+if not activities:
+    raise SystemExit('No activities found in AndroidManifest.xml')
 
-activity_match = re.search(r'<activity\b[^>]*android:name="org\.xbmc\.kodi\.Main"[^>]*>', s)
-if not activity_match:
-    raise SystemExit('Kodi main activity not found in AndroidManifest.xml')
+# Prefer the activity whose body contains the MAIN/LAUNCHER intent filter.
+activity_match = None
+for m in activities:
+    close = s.find('</activity>', m.end())
+    if close == -1:
+        continue
+    body = s[m.start():close + len('</activity>')]
+    if ('android.intent.action.MAIN' in body and
+            'android.intent.category.LAUNCHER' in body):
+        activity_match = m
+        break
 
-new = activity_match.group(0)
+# Kodi manifests can vary after apktool decode. If launcher markers are not
+# discoverable, prefer an activity containing xbmc/kodi in its class name.
+if activity_match is None:
+    for m in activities:
+        tag = m.group(0)
+        name = re.search(r'android:name="([^"]+)"', tag)
+        if name and any(x in name.group(1).lower() for x in ('xbmc', 'kodi')):
+            activity_match = m
+            break
+
+if activity_match is None:
+    raise SystemExit('Could not identify Kodi launcher activity')
+
+old = activity_match.group(0)
+name_m = re.search(r'android:name="([^"]+)"', old)
+activity_name = name_m.group(1) if name_m else '<unknown>'
+new = old
 
 if 'android:supportsPictureInPicture=' not in new:
     new = new[:-1] + ' android:supportsPictureInPicture="true">'
@@ -23,16 +46,16 @@ if 'android:resizeableActivity=' not in new:
     new = new[:-1] + ' android:resizeableActivity="true">'
 
 wanted = ['orientation', 'screenSize', 'smallestScreenSize', 'screenLayout', 'uiMode']
-m = re.search(r'android:configChanges="([^"]*)"', new)
-if m:
-    current = [x for x in m.group(1).split('|') if x]
+cm = re.search(r'android:configChanges="([^"]*)"', new)
+if cm:
+    current = [x for x in cm.group(1).split('|') if x]
     for item in wanted:
         if item not in current:
             current.append(item)
-    new = new[:m.start()] + 'android:configChanges="' + '|'.join(current) + '"' + new[m.end():]
+    new = new[:cm.start()] + 'android:configChanges="' + '|'.join(current) + '"' + new[cm.end():]
 else:
     new = new[:-1] + ' android:configChanges="' + '|'.join(wanted) + '">'
 
 s = s[:activity_match.start()] + new + s[activity_match.end():]
 manifest.write_text(s, encoding='utf-8')
-print('Infinity phone integration v1 enabled: PiP, resize/multi-window, Fold/config handling.')
+print(f'Infinity PiP enabled on launcher activity: {activity_name}')
