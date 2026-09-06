@@ -68,7 +68,6 @@ jobs:
           s=s[:m.start()]+tag+s[m.end():]
           man.write_text(s)
 
-          # Android integration layer: keep phone-specific logic out of Kodi Main as much as possible.
           bridge=root/'smali/com/projectinfinity/kodi/InfinityPhoneBridge.smali'
           bridge.parent.mkdir(parents=True,exist_ok=True)
           bridge.write_text(r'''.class public final Lcom/projectinfinity/kodi/InfinityPhoneBridge;
@@ -171,3 +170,5 @@ jobs:
           name: Infinity-Stable2-PhoneLayer-v1
           path: /tmp/Infinity-Stable2-PhoneLayer-v1.apk
           retention-days: 30
+
+# trigger: phone-layer-v1
