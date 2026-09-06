@@ -1,11 +1,11 @@
-name: Infinity Stable 2 Phone Layer v2
+name: Infinity Stable 2 Phone Layer v3
 
 on:
   workflow_dispatch:
   push:
     paths:
       - '.github/workflows/build-stable2-phone-layer-v2.yml'
-      - 'scripts/patch-phone-layer-v2.py'
+      - '.github/scripts/patch_phone_layer_v3.py'
 
 jobs:
   build:
@@ -41,32 +41,32 @@ jobs:
           cp "$APK" /tmp/base.apk
       - name: Decode Stable 2
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
-      - name: Patch Phone Bridge v2
-        run: python3 scripts/patch-phone-layer-v2.py
-      - name: Verify bridge wiring
+      - name: Patch Phone Bridge v3
+        run: python3 .github/scripts/patch_phone_layer_v3.py
+      - name: Verify VLC-style bridge wiring
         run: |
           set -euo pipefail
           MAIN=/tmp/decoded/smali/com/projectinfinity/kodi/Main.smali
           BRIDGE=/tmp/decoded/smali/com/projectinfinity/kodi/InfinityPhoneBridge.smali
           test -f "$BRIDGE"
           grep -q 'Player.GetActivePlayers' "$BRIDGE"
-          grep -q 'enterPipIfVideo' "$MAIN"
-          grep -q 'mJsonRPC:Lcom/projectinfinity/kodi/XBMCJsonRPC;' "$MAIN"
+          grep -q 'onUserLeaveHint()V' "$MAIN"
+          grep -q 'InfinityPhoneBridge;->enterPipIfVideo' "$MAIN"
           grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PhoneLayer-v2-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Stable2-PhoneLayer-v3-unsigned.apk
       - name: Sign
         env:
           PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
-          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Phone Layer v2, O=Infinity, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-PhoneLayer-v2-unsigned.apk /tmp/Infinity-Stable2-PhoneLayer-v2-aligned.apk
-          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-PhoneLayer-v2.apk /tmp/Infinity-Stable2-PhoneLayer-v2-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-PhoneLayer-v2.apk
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Phone Layer v3, O=Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Stable2-PhoneLayer-v3-unsigned.apk /tmp/Infinity-Stable2-PhoneLayer-v3-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Stable2-PhoneLayer-v3.apk /tmp/Infinity-Stable2-PhoneLayer-v3-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Stable2-PhoneLayer-v3.apk
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Stable2-PhoneLayer-v2
-          path: /tmp/Infinity-Stable2-PhoneLayer-v2.apk
+          name: Infinity-Stable2-PhoneLayer-v3
+          path: /tmp/Infinity-Stable2-PhoneLayer-v3.apk
           retention-days: 30
