@@ -65,13 +65,17 @@ jobs:
           cd kodi
           test "$(git rev-parse HEAD)" = "${KODI_SHA}"
 
-      - name: Apply Infinity Engine Phase 1 core changes
+      - name: Apply and preflight Infinity Engine Phase 1
         run: |
           set -euxo pipefail
           python3 engine/patches/apply_phase1.py
+          grep -q 'public static final class InfinityEngineState' kodi/tools/android/packaging/xbmc/src/Main.java.in
           grep -q 'InfinityEngineState.updateWindow' kodi/tools/android/packaging/xbmc/src/Main.java.in
-          grep -q 'InfinityEngineState.updatePlaybackState' kodi/tools/android/packaging/xbmc/src/XBMCMediaSession.java.in
-          test -f kodi/tools/android/packaging/xbmc/src/InfinityEngineState.java.in
+          grep -q 'Main.InfinityEngineState.updatePlaybackState' kodi/tools/android/packaging/xbmc/src/XBMCMediaSession.java.in
+          test ! -e kodi/tools/android/packaging/xbmc/src/InfinityEngineState.java.in
+          # The previous failure came from a new, unprocessed Java template.
+          # Phase 1 now uses only Kodi's existing templated Java sources.
+          test "$(find kodi/tools/android/packaging/xbmc/src -maxdepth 1 -name 'InfinityEngineState.java*' | wc -l)" -eq 0
 
       - name: Cache Kodi depends
         uses: actions/cache@v4
@@ -80,8 +84,10 @@ jobs:
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-donor-v1-kodi-21.3-arm64-${{ runner.os }}-${{ hashFiles('engine/**') }}
+          # Engine-only Java/C++ edits must not invalidate the expensive Kodi dependency cache.
+          key: infinity-donor-v1-kodi-21.3-arm64-${{ runner.os }}-ndk-${{ env.NDK_VER }}-v1
           restore-keys: |
+            infinity-donor-v1-kodi-21.3-arm64-${{ runner.os }}-
             infinity-kodi-21.3-arm64-${{ runner.os }}-
 
       - name: Configure Android dependencies
