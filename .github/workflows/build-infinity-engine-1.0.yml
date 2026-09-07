@@ -1,4 +1,4 @@
-name: Infinity Engine Unified V1
+name: Infinity Engine Standalone V1
 
 on:
   workflow_dispatch:
@@ -16,6 +16,7 @@ jobs:
     env:
       KODI_TAG: 21.3-Omega
       KODI_SHA: a3a448d26b8d560a65655dab2cd122994dc4e146
+      INFINITY_PACKAGE: com.infinity.engine
       NDK_VER: 21.4.7075529
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
       TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
@@ -66,6 +67,14 @@ jobs:
           cd kodi
           test "$(git rev-parse HEAD)" = "${KODI_SHA}"
 
+      - name: Give Infinity a standalone Android identity
+        run: |
+          set -euxo pipefail
+          grep -q '^APP_PACKAGE org.xbmc.kodi$' kodi/version.txt
+          sed -i "s/^APP_PACKAGE org\.xbmc\.kodi$/APP_PACKAGE ${INFINITY_PACKAGE}/" kodi/version.txt
+          grep -q "^APP_PACKAGE ${INFINITY_PACKAGE}$" kodi/version.txt
+          test "$(grep '^APP_PACKAGE ' kodi/version.txt | awk '{print $2}')" != "org.xbmc.kodi"
+
       - name: Apply and preflight unified Infinity modernization
         run: |
           set -euxo pipefail
@@ -91,8 +100,9 @@ jobs:
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-unified-v1-kodi-21.3-arm64-${{ runner.os }}-ndk-${{ env.NDK_VER }}-v1
+          key: infinity-standalone-v1-kodi-21.3-arm64-${{ runner.os }}-ndk-${{ env.NDK_VER }}-v1
           restore-keys: |
+            infinity-unified-v1-kodi-21.3-arm64-${{ runner.os }}-
             infinity-donor-v1-kodi-21.3-arm64-${{ runner.os }}-
             infinity-kodi-21.3-arm64-${{ runner.os }}-
 
@@ -121,6 +131,7 @@ jobs:
           mkdir -p "${BUILD_DIR}"
           make -C kodi/tools/depends/target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
           test -f "${BUILD_DIR}/CMakeCache.txt"
+          grep -q "APP_PACKAGE:STRING=${INFINITY_PACKAGE}" "${BUILD_DIR}/CMakeCache.txt" || grep -q "${INFINITY_PACKAGE}" "${BUILD_DIR}/CMakeCache.txt"
 
       - name: Build Infinity engine
         run: |
@@ -144,26 +155,35 @@ jobs:
           fi
           keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey >/dev/null
 
-      - name: Package APK
+      - name: Package standalone APK
         run: |
           set -euxo pipefail
           make -C "${BUILD_DIR}" apk
           APK=$(find kodi "${BUILD_DIR}" -type f -name '*.apk' | head -1)
           test -n "$APK"
-          cp "$APK" "${GITHUB_WORKSPACE}/Infinity-Engine-Unified-V1.apk"
+          cp "$APK" "${GITHUB_WORKSPACE}/Infinity-Engine-Standalone-V1.apk"
 
-      - name: Static smoke checks
+      - name: Verify standalone identity and APK
         run: |
           set -euxo pipefail
-          test -s Infinity-Engine-Unified-V1.apk
-          unzip -t Infinity-Engine-Unified-V1.apk >/dev/null
-          unzip -l Infinity-Engine-Unified-V1.apk | grep -q 'lib/arm64-v8a/'
-          sha256sum Infinity-Engine-Unified-V1.apk | tee Infinity-Engine-Unified-V1.sha256
+          test -s Infinity-Engine-Standalone-V1.apk
+          unzip -t Infinity-Engine-Standalone-V1.apk >/dev/null
+          unzip -l Infinity-Engine-Standalone-V1.apk | grep -q 'lib/arm64-v8a/'
+          AAPT="${ANDROID_HOME}/build-tools/33.0.1/aapt"
+          test -x "$AAPT"
+          "$AAPT" dump badging Infinity-Engine-Standalone-V1.apk | tee Infinity-Engine-Standalone-V1.badging.txt
+          grep -q "package: name='${INFINITY_PACKAGE}'" Infinity-Engine-Standalone-V1.badging.txt
+          if grep -q "package: name='org.xbmc.kodi'" Infinity-Engine-Standalone-V1.badging.txt; then
+            echo 'Refusing artifact: APK would overwrite Kodi'
+            exit 1
+          fi
+          sha256sum Infinity-Engine-Standalone-V1.apk | tee Infinity-Engine-Standalone-V1.sha256
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Engine-Unified-V1
+          name: Infinity-Engine-Standalone-V1
           path: |
-            Infinity-Engine-Unified-V1.apk
-            Infinity-Engine-Unified-V1.sha256
+            Infinity-Engine-Standalone-V1.apk
+            Infinity-Engine-Standalone-V1.sha256
+            Infinity-Engine-Standalone-V1.badging.txt
           retention-days: 30
