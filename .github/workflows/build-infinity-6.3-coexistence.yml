@@ -1,0 +1,114 @@
+name: Infinity 6.3 Stable2 PiP + Brain Coexistence
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-infinity-6.3-coexistence.yml'
+      - 'scripts/patch-infinity-6.3-coexistence.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Install apktool
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download exact working Stable2 PiP v3 body
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987818547/zip" -o /tmp/stable2.zip
+          mkdir -p /tmp/stable2-art
+          unzip -q /tmp/stable2.zip -d /tmp/stable2-art
+          APK=$(find /tmp/stable2-art -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/stable2.apk
+
+      - name: Download exact proven 5.3.6 brain donor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9999680657/zip" -o /tmp/donor.zip
+          mkdir -p /tmp/donor-art
+          unzip -q /tmp/donor.zip -d /tmp/donor-art
+          APK=$(find /tmp/donor-art -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/donor.apk
+
+      - name: Record protected Stable2 native library hash
+        run: unzip -p /tmp/stable2.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-before.sha256
+
+      - name: Decode Stable2 and donor
+        run: |
+          java -jar /tmp/apktool.jar d -f /tmp/stable2.apk -o /tmp/target
+          java -jar /tmp/apktool.jar d -f /tmp/donor.apk -o /tmp/donor
+
+      - name: Add brain without touching Stable2 PiP callback
+        run: python3 scripts/patch-infinity-6.3-coexistence.py
+
+      - name: Verify coexistence checkpoint
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/target -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          DIR=$(dirname "$MAIN")
+          CTRL="$DIR/InfinityController.smali"
+          LISTENER="$DIR/InfinityController\$KodiListenerRunnable.smali"
+          test -f "$CTRL"
+          test -f "$LISTENER"
+          grep -q 'InfinityController;->init(Landroid/app/Activity;)V' "$MAIN"
+          grep -q 'Player.OnAVStart' "$LISTENER"
+          grep -q 'Player.OnStop' "$LISTENER"
+          # Critical: PiP callback must contain native Stable2 PiP call and ZERO brain gate.
+          sed -n '/\.method protected onUserLeaveHint()V/,/\.end method/p' "$MAIN" > /tmp/pip.txt
+          grep -q 'enterPictureInPictureMode()Z' /tmp/pip.txt
+          ! grep -q 'InfinityController;->shouldAllowPiP()Z' /tmp/pip.txt
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/target/AndroidManifest.xml
+          grep -q 'android:resizeableActivity="true"' /tmp/target/AndroidManifest.xml
+
+      - name: Rebuild 6.3
+        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-6.3-Stable2-PiP-Brain-unsigned.apk
+
+      - name: Verify libkodi stayed byte-for-byte unchanged
+        run: |
+          unzip -p /tmp/Infinity-6.3-Stable2-PiP-Brain-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-after.sha256
+          cmp /tmp/lib-before.sha256 /tmp/lib-after.sha256
+
+      - name: Sign 6.3
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 6.3 Coexistence, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-6.3-Stable2-PiP-Brain-unsigned.apk /tmp/Infinity-6.3-Stable2-PiP-Brain-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS \
+            --out /tmp/Infinity-6.3-Stable2-PiP-Brain.apk /tmp/Infinity-6.3-Stable2-PiP-Brain-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-6.3-Stable2-PiP-Brain.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-6.3-Stable2-PiP-Brain
+          path: /tmp/Infinity-6.3-Stable2-PiP-Brain.apk
+          retention-days: 30
