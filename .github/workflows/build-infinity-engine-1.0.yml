@@ -1,10 +1,10 @@
-name: Infinity Engine 1.0 Foundation
+name: Infinity Engine Donor V1
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - infinity-engine-1.0-build
+      - infinity-engine-donor-v1
     paths:
       - '.github/workflows/build-infinity-engine-1.0.yml'
       - 'engine/**'
@@ -48,7 +48,6 @@ jobs:
           sdkmanager --version
           test -n "${ANDROID_HOME:-}"
           test -d "${ANDROID_HOME}"
-          echo "ANDROID_HOME=${ANDROID_HOME}"
 
       - name: Install exact Android requirements
         run: |
@@ -64,13 +63,15 @@ jobs:
           set -euxo pipefail
           git clone --depth 1 --branch "${KODI_TAG}" https://github.com/xbmc/xbmc.git kodi
           cd kodi
-          ACTUAL_SHA=$(git rev-parse HEAD)
-          test "${ACTUAL_SHA}" = "${KODI_SHA}"
-          test -f docs/README.Android.md
-          grep -q 'platforms;android-34' docs/README.Android.md
-          grep -q 'build-tools;33.0.1' docs/README.Android.md
-          grep -q "ndk;21.4.7075529" docs/README.Android.md
-          echo "Kodi 21.3 source and documented Android toolchain verified: ${ACTUAL_SHA}"
+          test "$(git rev-parse HEAD)" = "${KODI_SHA}"
+
+      - name: Apply Infinity Engine Phase 1 core changes
+        run: |
+          set -euxo pipefail
+          python3 engine/patches/apply_phase1.py
+          grep -q 'InfinityEngineState.updateWindow' kodi/tools/android/packaging/xbmc/src/Main.java.in
+          grep -q 'InfinityEngineState.updatePlaybackState' kodi/tools/android/packaging/xbmc/src/XBMCMediaSession.java.in
+          test -f kodi/tools/android/packaging/xbmc/src/InfinityEngineState.java.in
 
       - name: Cache Kodi depends
         uses: actions/cache@v4
@@ -79,7 +80,7 @@ jobs:
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-kodi-21.3-arm64-${{ runner.os }}-${{ hashFiles('engine/README.md') }}
+          key: infinity-donor-v1-kodi-21.3-arm64-${{ runner.os }}-${{ hashFiles('engine/**') }}
           restore-keys: |
             infinity-kodi-21.3-arm64-${{ runner.os }}-
 
@@ -102,14 +103,14 @@ jobs:
           set -euxo pipefail
           make -C kodi/tools/depends -j"$(nproc)"
 
-      - name: Configure Kodi
+      - name: Configure Infinity engine
         run: |
           set -euxo pipefail
           mkdir -p "${BUILD_DIR}"
           make -C kodi/tools/depends/target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
           test -f "${BUILD_DIR}/CMakeCache.txt"
 
-      - name: Build Kodi engine
+      - name: Build Infinity engine
         run: |
           set -euxo pipefail
           make -C "${BUILD_DIR}" -j"$(nproc)"
@@ -120,20 +121,20 @@ jobs:
           make -C "${BUILD_DIR}" apk
           APK=$(find kodi "${BUILD_DIR}" -type f -name '*.apk' | head -1)
           test -n "$APK"
-          cp "$APK" "${GITHUB_WORKSPACE}/Infinity-Engine-1.0-Foundation.apk"
+          cp "$APK" "${GITHUB_WORKSPACE}/Infinity-Engine-Donor-V1.apk"
 
       - name: Static smoke checks
         run: |
           set -euxo pipefail
-          test -s Infinity-Engine-1.0-Foundation.apk
-          unzip -t Infinity-Engine-1.0-Foundation.apk >/dev/null
-          unzip -l Infinity-Engine-1.0-Foundation.apk | grep -q 'lib/arm64-v8a/'
-          sha256sum Infinity-Engine-1.0-Foundation.apk | tee Infinity-Engine-1.0-Foundation.sha256
+          test -s Infinity-Engine-Donor-V1.apk
+          unzip -t Infinity-Engine-Donor-V1.apk >/dev/null
+          unzip -l Infinity-Engine-Donor-V1.apk | grep -q 'lib/arm64-v8a/'
+          sha256sum Infinity-Engine-Donor-V1.apk | tee Infinity-Engine-Donor-V1.sha256
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Engine-1.0-Foundation
+          name: Infinity-Engine-Donor-V1
           path: |
-            Infinity-Engine-1.0-Foundation.apk
-            Infinity-Engine-1.0-Foundation.sha256
+            Infinity-Engine-Donor-V1.apk
+            Infinity-Engine-Donor-V1.sha256
           retention-days: 30
