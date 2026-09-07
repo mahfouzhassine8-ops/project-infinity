@@ -1,0 +1,99 @@
+name: Infinity 6.1 Auto PiP
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-infinity-6.1-auto-pip.yml'
+      - 'scripts/patch-infinity-6.1-auto-pip.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Install apktool
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download exact tested Infinity 6.0 base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/10000967878/zip" -o /tmp/base.zip
+          mkdir -p /tmp/base-art
+          unzip -q /tmp/base.zip -d /tmp/base-art
+          APK=$(find /tmp/base-art -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+
+      - name: Record protected native hash
+        run: unzip -p /tmp/base.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-before.sha256
+
+      - name: Decode exact 6.0 base
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/target
+
+      - name: Apply only 6.1 Auto-PiP change
+        run: python3 scripts/patch-infinity-6.1-auto-pip.py
+
+      - name: Verify protected brain and new Auto-PiP wiring
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/target -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          DIR=$(dirname "$MAIN")
+          CTRL="$DIR/InfinityController.smali"
+          AUTO="$DIR/InfinityController\$AutoPiPRunnable.smali"
+          LISTENER="$DIR/InfinityController\$KodiListenerRunnable.smali"
+          test -f "$AUTO"
+          grep -q 'Player.OnAVStart' "$LISTENER"
+          grep -q 'Player.OnStop' "$LISTENER"
+          grep -q 'InfinityController;->updateAutoPiP(Z)V' "$CTRL"
+          grep -q 'setAutoEnterEnabled(Z)' "$AUTO"
+          grep -q 'setPictureInPictureParams' "$AUTO"
+          grep -q 'const/16 v1, 0x1f' "$MAIN"
+          grep -q 'Lcom/projectinfinity/kodi/Main;->enterPictureInPictureMode()Z' "$MAIN"
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/target/AndroidManifest.xml
+          grep -q 'android:resizeableActivity="true"' /tmp/target/AndroidManifest.xml
+
+      - name: Rebuild 6.1
+        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-6.1-Auto-PiP-unsigned.apk
+
+      - name: Verify libkodi stayed byte-for-byte unchanged
+        run: |
+          unzip -p /tmp/Infinity-6.1-Auto-PiP-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-after.sha256
+          cmp /tmp/libkodi-before.sha256 /tmp/libkodi-after.sha256
+
+      - name: Sign 6.1
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 6.1 Auto PiP, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-6.1-Auto-PiP-unsigned.apk /tmp/Infinity-6.1-Auto-PiP-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS \
+            --out /tmp/Infinity-6.1-Auto-PiP.apk /tmp/Infinity-6.1-Auto-PiP-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-6.1-Auto-PiP.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-6.1-Auto-PiP
+          path: /tmp/Infinity-6.1-Auto-PiP.apk
+          retention-days: 30
