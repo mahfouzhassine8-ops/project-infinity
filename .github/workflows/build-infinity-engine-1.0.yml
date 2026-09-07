@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 360
     env:
-      KODI_TAG: 21.2-Omega
-      KODI_SHA: d1a1d48c3cb3722d39264ffdd8132f755ffecd27
+      KODI_TAG: 21.3-Omega
+      KODI_SHA: a3a448d26b8d560a65655dab2cd122994dc4e146
       SDK_ROOT: ${{ github.workspace }}/android-sdk
       NDK_VER: 21.4.7075529
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
@@ -23,29 +23,24 @@ jobs:
       BUILD_DIR: ${{ github.workspace }}/kodi-build
     steps:
       - uses: actions/checkout@v5
-
       - name: Install host dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y autoconf bison build-essential curl default-jdk flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
-
       - name: Install Android platform, build tools and NDK
         run: |
           yes | sdkmanager --licenses >/dev/null
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;33.0.1" "ndk;${NDK_VER}"
           mkdir -p "${SDK_ROOT}"
           rsync -a "${ANDROID_HOME}/" "${SDK_ROOT}/"
-
-      - name: Clone exact Kodi 21.2 source
+      - name: Clone exact Kodi 21.3 source
         run: |
           git clone --depth 1 --branch "${KODI_TAG}" https://github.com/xbmc/xbmc.git kodi
           cd kodi
           test "$(git rev-parse HEAD)" = "${KODI_SHA}"
-          echo "Pinned Kodi source verified: $(git rev-parse HEAD)"
-
+          echo "Pinned Kodi 21.3 source verified: $(git rev-parse HEAD)"
       - name: Cache Kodi depends
         uses: actions/cache@v4
         with:
@@ -53,47 +48,33 @@ jobs:
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-kodi-21.2-arm64-${{ runner.os }}-${{ hashFiles('engine/README.md') }}
+          key: infinity-kodi-21.3-arm64-${{ runner.os }}-${{ hashFiles('engine/README.md') }}
           restore-keys: |
-            infinity-kodi-21.2-arm64-${{ runner.os }}-
-
+            infinity-kodi-21.3-arm64-${{ runner.os }}-
       - name: Build Android dependencies
         run: |
           mkdir -p "${TARBALLS}" "${DEPENDS}"
           cd kodi/tools/depends
           ./bootstrap
-          ./configure \
-            --with-tarballs="${TARBALLS}" \
-            --host=aarch64-linux-android \
-            --with-sdk-path="${SDK_ROOT}" \
-            --with-ndk-path="${SDK_ROOT}/ndk/${NDK_VER}" \
-            --prefix="${DEPENDS}" \
-            --enable-debug=yes
+          ./configure --with-tarballs="${TARBALLS}" --host=aarch64-linux-android --with-sdk-path="${SDK_ROOT}" --with-ndk-path="${SDK_ROOT}/ndk/${NDK_VER}" --prefix="${DEPENDS}" --enable-debug=yes
           make -j"$(nproc)"
-
       - name: Configure Kodi
         run: |
           mkdir -p "${BUILD_DIR}"
           make -C kodi/tools/depends/target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
-
       - name: Build Kodi engine
-        run: |
-          make -C "${BUILD_DIR}" -j"$(nproc)"
-
+        run: make -C "${BUILD_DIR}" -j"$(nproc)"
       - name: Package APK
         run: |
           make -C "${BUILD_DIR}" apk
-          find kodi -type f -name '*.apk' -print
           APK=$(find kodi -type f -name '*.apk' | head -1)
           test -n "$APK"
           cp "$APK" "${GITHUB_WORKSPACE}/Infinity-Engine-1.0-Foundation.apk"
-
       - name: Static smoke checks
         run: |
           test -s Infinity-Engine-1.0-Foundation.apk
           unzip -l Infinity-Engine-1.0-Foundation.apk | grep -q 'lib/arm64-v8a/'
           sha256sum Infinity-Engine-1.0-Foundation.apk | tee Infinity-Engine-1.0-Foundation.sha256
-
       - uses: actions/upload-artifact@v7
         with:
           name: Infinity-Engine-1.0-Foundation
