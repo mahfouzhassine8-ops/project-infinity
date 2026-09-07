@@ -1,0 +1,50 @@
+name: Inspect Infinity 6.0 PiP wiring
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/inspect-infinity-6.0-pip.yml'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install apktool
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download exact Infinity 6.0 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/10000967878/zip" -o /tmp/a.zip
+          unzip -q /tmp/a.zip -d /tmp/a
+          APK=$(find /tmp/a -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/infinity.apk
+      - name: Decode
+        run: java -jar /tmp/apktool.jar d -f /tmp/infinity.apk -o /tmp/decoded
+      - name: Inspect exact brain and PiP paths
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          DIR=$(dirname "$MAIN")
+          CTRL="$DIR/InfinityController.smali"
+          LISTENER="$DIR/InfinityController\$KodiListenerRunnable.smali"
+          echo '===== MAIN onUserLeaveHint ====='
+          sed -n '/\.method protected onUserLeaveHint()V/,/\.end method/p' "$MAIN"
+          echo '===== CONTROLLER method list ====='
+          grep '^\.method' "$CTRL"
+          echo '===== shouldAllowPiP ====='
+          sed -n '/\.method.*shouldAllowPiP/,/\.end method/p' "$CTRL"
+          echo '===== listener complete ====='
+          cat "$LISTENER"
