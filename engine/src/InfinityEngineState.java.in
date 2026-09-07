@@ -1,0 +1,80 @@
+package @APP_PACKAGE@;
+
+import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.media.session.PlaybackState;
+import android.util.Log;
+
+/**
+ * Central Android-facing state owned by Infinity Engine.
+ *
+ * This class intentionally lives below Kodi skins/OSDs.  Diggz or any other
+ * skin can replace visible controls without removing the engine state used by
+ * Fold, PiP, background playback and persistent Player Settings.
+ */
+public final class InfinityEngineState
+{
+  private static final String TAG = "InfinityEngine";
+
+  private static volatile boolean sPlaying = false;
+  private static volatile boolean sVideo = false;
+  private static volatile boolean sInPictureInPicture = false;
+  private static volatile int sWindowWidth = 0;
+  private static volatile int sWindowHeight = 0;
+  private static volatile int sOrientation = Configuration.ORIENTATION_UNDEFINED;
+
+  private InfinityEngineState() {}
+
+  public static void updatePlaybackState(PlaybackState state)
+  {
+    if (state == null)
+    {
+      sPlaying = false;
+      return;
+    }
+
+    final int value = state.getState();
+    sPlaying = value == PlaybackState.STATE_PLAYING ||
+               value == PlaybackState.STATE_BUFFERING ||
+               value == PlaybackState.STATE_FAST_FORWARDING ||
+               value == PlaybackState.STATE_REWINDING;
+    Log.d(TAG, "playback=" + sPlaying + " state=" + value);
+  }
+
+  // Native core will become authoritative for media type in Phase 2.
+  public static void setVideoPlaying(boolean video)
+  {
+    sVideo = video;
+    Log.d(TAG, "video=" + sVideo);
+  }
+
+  public static boolean isPlaying() { return sPlaying; }
+  public static boolean isVideoPlaying() { return sPlaying && sVideo; }
+
+  public static void setPictureInPicture(boolean inPip)
+  {
+    sInPictureInPicture = inPip;
+    Log.d(TAG, "pip=" + sInPictureInPicture);
+  }
+
+  public static boolean isInPictureInPicture() { return sInPictureInPicture; }
+
+  public static void updateWindow(Main activity, Configuration configuration)
+  {
+    if (activity == null)
+      return;
+
+    final Rect rect = activity.getDisplayRect();
+    sWindowWidth = Math.max(0, rect.width());
+    sWindowHeight = Math.max(0, rect.height());
+    if (configuration != null)
+      sOrientation = configuration.orientation;
+
+    Log.d(TAG, "window=" + sWindowWidth + "x" + sWindowHeight +
+               " orientation=" + sOrientation);
+  }
+
+  public static int getWindowWidth() { return sWindowWidth; }
+  public static int getWindowHeight() { return sWindowHeight; }
+  public static int getOrientation() { return sOrientation; }
+}
