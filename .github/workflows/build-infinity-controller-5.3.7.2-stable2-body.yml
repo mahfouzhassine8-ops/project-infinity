@@ -1,4 +1,4 @@
-name: Infinity Controller 5.3.7.2 Stable2 Body
+name: Infinity Controller 6.0 Stable2 Body
 
 on:
   workflow_dispatch:
@@ -92,17 +92,17 @@ jobs:
           grep -q 'InfinityController;->shouldAllowPiP()Z' "$MAIN"
           grep -q 'Lcom/projectinfinity/kodi/Main;->enterPictureInPictureMode()Z' "$MAIN"
           grep -q 'InfinityController;->init(Landroid/app/Activity;)V' "$MAIN"
-          grep -q 'Player.OnAVStart' "$TD/InfinityController$KodiListenerRunnable.smali"
-          grep -q 'Player.OnStop' "$TD/InfinityController$KodiListenerRunnable.smali"
+          grep -q 'Player.OnAVStart' "$TD/InfinityController\$KodiListenerRunnable.smali"
+          grep -q 'Player.OnStop' "$TD/InfinityController\$KodiListenerRunnable.smali"
           grep -q 'android:supportsPictureInPicture="true"' /tmp/target/AndroidManifest.xml
           grep -q 'android:resizeableActivity="true"' /tmp/target/AndroidManifest.xml
 
       - name: Rebuild
-        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-5.3.7.2-Stable2-Body-unsigned.apk
+        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-6.0-Stable2-Body-unsigned.apk
 
       - name: Verify target libkodi stayed byte-for-byte unchanged
         run: |
-          unzip -p /tmp/Infinity-5.3.7.2-Stable2-Body-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-after.sha256
+          unzip -p /tmp/Infinity-6.0-Stable2-Body-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-after.sha256
           cmp /tmp/libkodi-before.sha256 /tmp/libkodi-after.sha256
 
       - name: Sign APK
@@ -112,14 +112,14 @@ jobs:
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
           keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 5.3.7.2 Stable2 Body, O=Project Infinity, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-5.3.7.2-Stable2-Body-unsigned.apk /tmp/Infinity-5.3.7.2-Stable2-Body-aligned.apk
+            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 6.0 Stable2 Body, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-6.0-Stable2-Body-unsigned.apk /tmp/Infinity-6.0-Stable2-Body-aligned.apk
           "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS \
-            --out /tmp/Infinity-5.3.7.2-Stable2-Body.apk /tmp/Infinity-5.3.7.2-Stable2-Body-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-5.3.7.2-Stable2-Body.apk
+            --out /tmp/Infinity-6.0-Stable2-Body.apk /tmp/Infinity-6.0-Stable2-Body-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-6.0-Stable2-Body.apk
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-5.3.7.2-Stable2-Body
-          path: /tmp/Infinity-5.3.7.2-Stable2-Body.apk
+          name: Infinity-6.0-Stable2-Body
+          path: /tmp/Infinity-6.0-Stable2-Body.apk
           retention-days: 30
