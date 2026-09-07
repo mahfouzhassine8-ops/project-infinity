@@ -42,9 +42,13 @@ jobs:
           LISTENER="$DIR/InfinityController\$KodiListenerRunnable.smali"
           echo '===== MAIN onUserLeaveHint ====='
           sed -n '/\.method protected onUserLeaveHint()V/,/\.end method/p' "$MAIN"
-          echo '===== CONTROLLER method list ====='
-          grep '^\.method' "$CTRL"
+          echo '===== CONTROLLER fields ====='
+          grep '^\.field' "$CTRL"
+          echo '===== init ====='
+          sed -n '/\.method public static init(/,/\.end method/p' "$CTRL"
+          echo '===== setVideoPlaying ====='
+          sed -n '/\.method public static setVideoPlaying/,/\.end method/p' "$CTRL"
           echo '===== shouldAllowPiP ====='
-          sed -n '/\.method.*shouldAllowPiP/,/\.end method/p' "$CTRL"
-          echo '===== listener complete ====='
-          cat "$LISTENER"
+          sed -n '/\.method public static shouldAllowPiP/,/\.end method/p' "$CTRL"
+          echo '===== listener handleMessage ====='
+          sed -n '/\.method private static handleMessage/,/\.end method/p' "$LISTENER"
