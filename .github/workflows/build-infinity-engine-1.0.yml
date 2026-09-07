@@ -16,7 +16,6 @@ jobs:
     env:
       KODI_TAG: 21.3-Omega
       KODI_SHA: a3a448d26b8d560a65655dab2cd122994dc4e146
-      SDK_ROOT: ${{ github.workspace }}/android-sdk
       NDK_VER: 21.4.7075529
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
       TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
@@ -32,26 +31,46 @@ jobs:
 
       - name: Install host dependencies
         run: |
+          set -euxo pipefail
           sudo apt-get update
           sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
-          java -version
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 
-      - name: Install Android platform, build tools and NDK
+      - name: Toolchain preflight
         run: |
-          yes | sdkmanager --licenses >/dev/null
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;33.0.1" "ndk;${NDK_VER}"
-          mkdir -p "${SDK_ROOT}"
-          rsync -a "${ANDROID_HOME}/" "${SDK_ROOT}/"
+          set -euxo pipefail
+          java -version
+          JAVA_MAJOR=$(java -version 2>&1 | awk -F'[".]' '/version/ {print $2; exit}')
+          test "${JAVA_MAJOR}" -ge 17
+          command -v sdkmanager
+          sdkmanager --version
+          test -n "${ANDROID_HOME:-}"
+          test -d "${ANDROID_HOME}"
+          echo "ANDROID_HOME=${ANDROID_HOME}"
 
-      - name: Clone exact Kodi 21.3 source
+      - name: Install exact Android requirements
         run: |
+          set -euxo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;33.0.1" "ndk;${NDK_VER}"
+          test -d "${ANDROID_HOME}/platforms/android-34"
+          test -d "${ANDROID_HOME}/build-tools/33.0.1"
+          test -d "${ANDROID_HOME}/ndk/${NDK_VER}"
+
+      - name: Clone and verify exact Kodi 21.3 source
+        run: |
+          set -euxo pipefail
           git clone --depth 1 --branch "${KODI_TAG}" https://github.com/xbmc/xbmc.git kodi
           cd kodi
-          test "$(git rev-parse HEAD)" = "${KODI_SHA}"
-          echo "Pinned Kodi 21.3 source verified: $(git rev-parse HEAD)"
+          ACTUAL_SHA=$(git rev-parse HEAD)
+          test "${ACTUAL_SHA}" = "${KODI_SHA}"
+          test -f docs/README.Android.md
+          grep -q 'platforms;android-34' docs/README.Android.md
+          grep -q 'build-tools;33.0.1' docs/README.Android.md
+          grep -q "ndk;21.4.7075529" docs/README.Android.md
+          echo "Kodi 21.3 source and documented Android toolchain verified: ${ACTUAL_SHA}"
 
       - name: Cache Kodi depends
         uses: actions/cache@v4
@@ -64,38 +83,50 @@ jobs:
           restore-keys: |
             infinity-kodi-21.3-arm64-${{ runner.os }}-
 
-      - name: Build Android dependencies
+      - name: Configure Android dependencies
         run: |
+          set -euxo pipefail
           mkdir -p "${TARBALLS}" "${DEPENDS}"
           cd kodi/tools/depends
           ./bootstrap
           ./configure \
             --with-tarballs="${TARBALLS}" \
             --host=aarch64-linux-android \
-            --with-sdk-path="${SDK_ROOT}" \
-            --with-ndk-path="${SDK_ROOT}/ndk/${NDK_VER}" \
+            --with-sdk-path="${ANDROID_HOME}" \
+            --with-ndk-path="${ANDROID_HOME}/ndk/${NDK_VER}" \
             --prefix="${DEPENDS}" \
             --enable-debug=yes
-          make -j"$(nproc)"
+
+      - name: Build Android dependencies
+        run: |
+          set -euxo pipefail
+          make -C kodi/tools/depends -j"$(nproc)"
 
       - name: Configure Kodi
         run: |
+          set -euxo pipefail
           mkdir -p "${BUILD_DIR}"
           make -C kodi/tools/depends/target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
+          test -f "${BUILD_DIR}/CMakeCache.txt"
 
       - name: Build Kodi engine
-        run: make -C "${BUILD_DIR}" -j"$(nproc)"
+        run: |
+          set -euxo pipefail
+          make -C "${BUILD_DIR}" -j"$(nproc)"
 
       - name: Package APK
         run: |
+          set -euxo pipefail
           make -C "${BUILD_DIR}" apk
-          APK=$(find kodi -type f -name '*.apk' | head -1)
+          APK=$(find kodi "${BUILD_DIR}" -type f -name '*.apk' | head -1)
           test -n "$APK"
           cp "$APK" "${GITHUB_WORKSPACE}/Infinity-Engine-1.0-Foundation.apk"
 
       - name: Static smoke checks
         run: |
+          set -euxo pipefail
           test -s Infinity-Engine-1.0-Foundation.apk
+          unzip -t Infinity-Engine-1.0-Foundation.apk >/dev/null
           unzip -l Infinity-Engine-1.0-Foundation.apk | grep -q 'lib/arm64-v8a/'
           sha256sum Infinity-Engine-1.0-Foundation.apk | tee Infinity-Engine-1.0-Foundation.sha256
 
