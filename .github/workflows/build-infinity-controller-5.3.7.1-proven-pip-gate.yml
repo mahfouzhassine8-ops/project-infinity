@@ -1,0 +1,111 @@
+name: Infinity Controller 5.3.7.1 Proven PiP Gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-infinity-controller-5.3.7.1-proven-pip-gate.yml'
+      - 'scripts/patch-infinity-controller-5.3.7.1-proven-pip-gate.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Install apktool
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download tested 5.3.6 checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9999680657/zip" \
+            -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+
+      - name: Record protected native hash
+        run: unzip -p /tmp/base.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-before.sha256
+
+      - name: Decode 5.3.6
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+
+      - name: Record protected brain/listener hashes
+        run: |
+          set -euo pipefail
+          CTRL=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/InfinityController.smali' | head -1)
+          LISTENER=$(find /tmp/decoded -name 'InfinityController$KodiListenerRunnable.smali' | head -1)
+          sha256sum "$CTRL" | awk '{print $1}' > /tmp/controller-before.sha256
+          sha256sum "$LISTENER" | awk '{print $1}' > /tmp/listener-before.sha256
+
+      - name: Apply exact Stable2 PiP v3 trigger with brain gate
+        run: python3 scripts/patch-infinity-controller-5.3.7.1-proven-pip-gate.py
+
+      - name: Verify exact proven trigger shape and surgical scope
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          CTRL=$(find /tmp/decoded -path '*/com/projectinfinity/kodi/InfinityController.smali' | head -1)
+          LISTENER=$(find /tmp/decoded -name 'InfinityController$KodiListenerRunnable.smali' | head -1)
+          grep -q '.method protected onUserLeaveHint()V' "$MAIN"
+          grep -q 'invoke-super {p0}, Landroid/app/NativeActivity;->onUserLeaveHint()V' "$MAIN"
+          grep -q 'InfinityController;->shouldAllowPiP()Z' "$MAIN"
+          grep -q 'Lcom/projectinfinity/kodi/Main;->enterPictureInPictureMode()Z' "$MAIN"
+          grep -q 'android:name="com.projectinfinity.kodi.Main"' /tmp/decoded/AndroidManifest.xml
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
+          grep -q 'Player.OnAVStart' "$LISTENER"
+          grep -q 'Player.OnStop' "$LISTENER"
+          sha256sum "$CTRL" | awk '{print $1}' > /tmp/controller-after.sha256
+          sha256sum "$LISTENER" | awk '{print $1}' > /tmp/listener-after.sha256
+          cmp /tmp/controller-before.sha256 /tmp/controller-after.sha256
+          cmp /tmp/listener-before.sha256 /tmp/listener-after.sha256
+
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-5.3.7.1-Proven-PiP-Gate-unsigned.apk
+
+      - name: Verify libkodi.so stayed byte-for-byte unchanged
+        run: |
+          set -euo pipefail
+          unzip -p /tmp/Infinity-5.3.7.1-Proven-PiP-Gate-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/libkodi-after.sha256
+          cmp /tmp/libkodi-before.sha256 /tmp/libkodi-after.sha256
+
+      - name: Sign 5.3.7.1 APK
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 5.3.7.1 Proven PiP Gate, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-5.3.7.1-Proven-PiP-Gate-unsigned.apk /tmp/Infinity-5.3.7.1-Proven-PiP-Gate-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS \
+            --out /tmp/Infinity-5.3.7.1-Proven-PiP-Gate.apk /tmp/Infinity-5.3.7.1-Proven-PiP-Gate-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-5.3.7.1-Proven-PiP-Gate.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-5.3.7.1-Proven-PiP-Gate
+          path: /tmp/Infinity-5.3.7.1-Proven-PiP-Gate.apk
+          retention-days: 30
