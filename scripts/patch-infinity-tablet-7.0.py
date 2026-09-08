@@ -144,6 +144,7 @@ helper = '''
 if '.method private infinityRefreshWindow()V' not in mtxt:
     mtxt += '\n' + helper
 
+# Fold inner/cover transitions and rotations land here.
 if '.method public onConfigurationChanged(Landroid/content/res/Configuration;)V' not in mtxt:
     mtxt += '''
 .method public onConfigurationChanged(Landroid/content/res/Configuration;)V
@@ -154,6 +155,7 @@ if '.method public onConfigurationChanged(Landroid/content/res/Configuration;)V'
 .end method
 '''
 
+# PiP expand/collapse can change the app window without a full activity restart.
 if '.method public onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V' not in mtxt:
     mtxt += '''
 .method public onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V
@@ -163,9 +165,35 @@ if '.method public onPictureInPictureModeChanged(ZLandroid/content/res/Configura
     return-void
 .end method
 '''
+
+# Samsung multi-window / Flex-style resizing can also remap the surface.
+if '.method public onMultiWindowModeChanged(ZLandroid/content/res/Configuration;)V' not in mtxt:
+    mtxt += '''
+.method public onMultiWindowModeChanged(ZLandroid/content/res/Configuration;)V
+    .locals 0
+    invoke-super {p0, p1, p2}, Landroid/app/NativeActivity;->onMultiWindowModeChanged(ZLandroid/content/res/Configuration;)V
+    invoke-direct {p0}, Lcom/projectinfinity/kodi/Main;->infinityRefreshWindow()V
+    return-void
+.end method
+'''
+
+# A second safe refresh when focus returns catches the final settled Fold size.
+if '.method public onWindowFocusChanged(Z)V' not in mtxt:
+    mtxt += '''
+.method public onWindowFocusChanged(Z)V
+    .locals 0
+    invoke-super {p0, p1}, Landroid/app/NativeActivity;->onWindowFocusChanged(Z)V
+    if-eqz p1, :done_focus
+    invoke-direct {p0}, Lcom/projectinfinity/kodi/Main;->infinityRefreshWindow()V
+:done_focus
+    return-void
+.end method
+'''
+
 main.write_text(mtxt)
 
-print('Infinity Tablet 7.0 patch applied')
+print('Infinity Tablet/Fold 7.0 patch applied')
 print('OLED dark is true #000000')
 print('VLC-style player lock installed')
-print('Touch/window refresh added without changing libkodi')
+print('Fold inner/cover, PiP, multi-window and focus refresh paths installed')
+print('libkodi and the proven Stable2 PiP callback are not rewritten')
