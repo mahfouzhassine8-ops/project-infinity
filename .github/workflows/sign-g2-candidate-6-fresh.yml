@@ -1,0 +1,60 @@
+name: Sign G2 Candidate 6 Fresh Install
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/sign-g2-candidate-6-fresh.yml
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+      - name: Download verified Candidate 6 artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/10078340957/zip" -o /tmp/c6.zip
+          mkdir -p /tmp/c6
+          unzip -q /tmp/c6.zip -d /tmp/c6
+          APK=$(find /tmp/c6 -name 'G2-Candidate-6-unsigned.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/G2-Candidate-6-unsigned.apk
+          echo 'dbe2922171d77a15dfc2138e517956d92db4aa0f8d559d19b2620ed99ba461b4  /tmp/G2-Candidate-6-unsigned.apk' | sha256sum -c -
+      - name: Generate fresh signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          keytool -genkeypair -keystore /tmp/g2.keystore -alias infinity-g2 -keyalg RSA -keysize 3072 -validity 10000 -storepass infinity-g2-install -keypass infinity-g2-install -dname 'CN=Infinity G2, O=Project Infinity, C=US'
+      - name: Align sign and verify with Android tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          "$BT/zipalign" -f -p 4 /tmp/G2-Candidate-6-unsigned.apk /tmp/G2-Candidate-6-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/g2.keystore --ks-key-alias infinity-g2 --ks-pass pass:infinity-g2-install --key-pass pass:infinity-g2-install --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out /tmp/Infinity-G2-Candidate-6-Fresh-Install-v2.apk /tmp/G2-Candidate-6-aligned.apk
+          "$BT/apksigner" verify --verbose --print-certs /tmp/Infinity-G2-Candidate-6-Fresh-Install-v2.apk | tee /tmp/apksigner-verification.txt
+          "$BT/zipalign" -c -v 4 /tmp/Infinity-G2-Candidate-6-Fresh-Install-v2.apk >/tmp/zipalign-verification.txt
+          sha256sum /tmp/Infinity-G2-Candidate-6-Fresh-Install-v2.apk | tee /tmp/apk-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-G2-Candidate-6-Fresh-Install-v2
+          path: |
+            /tmp/Infinity-G2-Candidate-6-Fresh-Install-v2.apk
+            /tmp/apksigner-verification.txt
+            /tmp/zipalign-verification.txt
+            /tmp/apk-sha256.txt
+          retention-days: 30
