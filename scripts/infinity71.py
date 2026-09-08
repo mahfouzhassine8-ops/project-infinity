@@ -160,17 +160,37 @@ def check_apk_contract(apk: Path) -> None:
         '_doFrame':'(J)V', '_callNative':'(JJ)V', '_onVisibleBehindCanceled':'()V',
         **contract()['jni'],
     }
-    found=[]
+    # These are the other classes registered alongside Main and its SurfaceView.
+    # A correct Main alone does not establish a complete Java/native connection.
+    expected_classes = {
+        'Main': expected,
+        'XBMCSettingsContentObserver': {'_onVolumeChanged': '(I)V'},
+        'XBMCInputDeviceListener': {
+            '_onInputDeviceAdded': '(I)V', '_onInputDeviceChanged': '(I)V',
+            '_onInputDeviceRemoved': '(I)V',
+        },
+        'XBMCMainView': {
+            '_attach': '()V',
+            '_surfaceChanged': '(Landroid/view/SurfaceHolder;III)V',
+            '_surfaceCreated': '(Landroid/view/SurfaceHolder;)V',
+            '_surfaceDestroyed': '(Landroid/view/SurfaceHolder;)V',
+        },
+    }
+    found = {name: [] for name in expected_classes}
     from infinity71_axml import package_name
     with zipfile.ZipFile(apk) as z:
         if package_name(z.read('AndroidManifest.xml')) != PACKAGE:
             raise ValueError('APK would install under the wrong Android package')
         for n in z.namelist():
             if re.fullmatch(r'classes\d*\.dex',n):
-                methods=dex_native_methods(z.read(n),'Lcom/projectinfinity/kodi/Main;')
-                if methods is not None: found.append(methods)
-        if len(found)!=1 or found[0]!=expected:
-            raise ValueError('Final DEX native declarations do not equal the compiled JNI contract: '+repr(found))
+                data = z.read(n)
+                for name in expected_classes:
+                    methods = dex_native_methods(data, 'Lcom/projectinfinity/kodi/' + name + ';')
+                    if methods is not None:
+                        found[name].append(methods)
+        for name, required in expected_classes.items():
+            if len(found[name]) != 1 or found[name][0] != required:
+                raise ValueError('Final DEX native contract mismatch for ' + name + ': ' + repr(found[name]))
         if 'lib/arm64-v8a/libkodi.so' not in z.namelist():
             raise ValueError('Matched ARM64 Kodi engine missing')
 
@@ -191,12 +211,25 @@ def record_engine(apk: Path, output: Path, source_commit: str) -> None:
     print('Recorded independently reusable matched engine, DEX and complete APK inventory.')
 
 
+def validate_engine_metadata(engine: dict) -> None:
+    spec = contract()
+    if (engine.get('schema') != 1 or engine.get('package') != PACKAGE or
+            engine.get('bridge_version') != spec['bridge_version'] or
+            engine.get('kodi_sha') != spec['kodi_sha']):
+        raise ValueError('Wrong engine schema/identity/version')
+    if engine.get('source_patch_sha256') != sha((PATCHES/'source.patch').read_bytes()):
+        raise ValueError('Engine does not match this pinned source patch')
+    inventory = engine.get('files')
+    if not isinstance(inventory, dict) or not inventory:
+        raise ValueError('Engine file inventory is missing')
+    if any(not isinstance(n, str) or not isinstance(h, str) or
+           re.fullmatch(r'[0-9a-f]{64}', h) is None for n, h in inventory.items()):
+        raise ValueError('Invalid engine inventory digest')
+
+
 def check_engine(apk: Path, manifest: Path) -> dict:
     engine=json.loads(manifest.read_text())
-    if engine['package']!=PACKAGE or engine['bridge_version']!=contract()['bridge_version'] or engine['kodi_sha']!=contract()['kodi_sha']:
-        raise ValueError('Wrong engine identity/version')
-    if engine['source_patch_sha256']!=sha((PATCHES/'source.patch').read_bytes()):
-        raise ValueError('Engine does not match this pinned source patch')
+    validate_engine_metadata(engine)
     if sha(apk.read_bytes())!=engine['base_apk_sha256'] or apk_hashes(apk)!=engine['files']:
         raise ValueError('Base APK integrity mismatch')
     check_apk_contract(apk)
@@ -229,7 +262,10 @@ def overlay(apk: Path, manifest: Path, output: Path) -> None:
 
 
 def verify_overlay(apk: Path, manifest: Path) -> None:
-    engine=json.loads(manifest.read_text()); hashes=apk_hashes(apk)
+    asset_check()
+    engine=json.loads(manifest.read_text())
+    validate_engine_metadata(engine)
+    hashes=apk_hashes(apk)
     before=engine['files']
     changed={n for n in before.keys() | hashes.keys() if before.get(n)!=hashes.get(n)}
     if not changed.issubset(OVERLAY_ALLOWLIST):
@@ -237,6 +273,22 @@ def verify_overlay(apk: Path, manifest: Path) -> None:
     for name,target in LOCK_FILES.items():
         if hashes.get(target)!=sha((ASSETS/name).read_bytes()):
             raise ValueError('Lock not preserved: '+target)
+    # VideoOSD is allowlisted, but its required connection must still exist.
+    import xml.etree.ElementTree as ET
+    with zipfile.ZipFile(apk) as z:
+        try:
+            osd = ET.fromstring(z.read(SKIN + 'xml/VideoOSD.xml'))
+        except (ET.ParseError, KeyError) as error:
+            raise ValueError('Missing or malformed VideoOSD') from error
+    buttons = [e for e in osd.iter('control') if e.get('id') == '7999']
+    if len(buttons) != 1:
+        raise ValueError('Expected exactly one Infinity lock button')
+    # Compare the actual required subtree, ignoring only XML formatting whitespace.
+    def tree_shape(node):
+        return (node.tag, tuple(sorted(node.attrib.items())), (node.text or '').strip(),
+                tuple(tree_shape(child) for child in node))
+    if tree_shape(buttons[0]) != tree_shape(ET.fromstring(LOCK_BUTTON)):
+        raise ValueError('Infinity lock button does not match the approved connection')
     check_apk_contract(apk)
     print('Verified byte-identical native libraries, DEX, manifest, resources, resume code and all other protected members.')
 
