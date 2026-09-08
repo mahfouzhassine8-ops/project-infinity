@@ -100,8 +100,9 @@ jobs:
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-standalone-v1-kodi-21.3-arm64-${{ runner.os }}-ndk-${{ env.NDK_VER }}-v1
+          key: infinity-standalone-v1-kodi-21.3-arm64-${{ runner.os }}-ndk-${{ env.NDK_VER }}-v2
           restore-keys: |
+            infinity-standalone-v1-kodi-21.3-arm64-${{ runner.os }}-
             infinity-unified-v1-kodi-21.3-arm64-${{ runner.os }}-
             infinity-donor-v1-kodi-21.3-arm64-${{ runner.os }}-
             infinity-kodi-21.3-arm64-${{ runner.os }}-
@@ -131,7 +132,7 @@ jobs:
           mkdir -p "${BUILD_DIR}"
           make -C kodi/tools/depends/target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
           test -f "${BUILD_DIR}/CMakeCache.txt"
-          grep -q "APP_PACKAGE:STRING=${INFINITY_PACKAGE}" "${BUILD_DIR}/CMakeCache.txt" || grep -q "${INFINITY_PACKAGE}" "${BUILD_DIR}/CMakeCache.txt"
+          grep -q "^APP_PACKAGE ${INFINITY_PACKAGE}$" kodi/version.txt
 
       - name: Build Infinity engine
         run: |
