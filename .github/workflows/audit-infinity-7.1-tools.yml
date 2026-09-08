@@ -1,0 +1,29 @@
+name: Infinity 7.1 Local Validation Tools
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-7.1-core-unified]
+    paths: ['.github/workflows/audit-infinity-7.1-tools.yml']
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: android-actions/setup-android@v4
+      - name: Export Android compile and APK validation tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          mkdir -p /tmp/infinity-validation-tools
+          cp "$ANDROID_HOME/platforms/android-34/android.jar" /tmp/infinity-validation-tools/
+          cp -a "$ANDROID_HOME/build-tools/34.0.0" /tmp/infinity-validation-tools/build-tools
+          printf 'Android platform API 34 and Build Tools 34.0.0. No native build.\n' > /tmp/infinity-validation-tools/PROVENANCE.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-7.1-Local-Validation-Tools
+          path: /tmp/infinity-validation-tools/
+          retention-days: 7
+          if-no-files-found: error
