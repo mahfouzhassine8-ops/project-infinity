@@ -230,7 +230,7 @@ if rm:
     if supercall and f'{bridge_desc}->updateInfinityPictureInPictureParams' not in body:
         insert = supercall.group(0) + f'\n    invoke-static {{p0}}, {bridge_desc}->updateInfinityPictureInPictureParams({main_desc})V'
         body = body[:supercall.start()] + insert + body[supercall.end():]
-        t = t[:rm.start()] + body + t[supercall.end():]
+        t = t[:rm.start()] + body + t[rm.end():]
 
 # One callback map for PiP, Fold/configuration and multi-window.
 t += f'''
