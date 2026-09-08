@@ -1,0 +1,73 @@
+{
+  "kodi_sha": "a3a448d26b8d560a65655dab2cd122994dc4e146",
+  "bridge_version": 3,
+  "jni": {
+    "_infinityHasActiveVideo": "()Z",
+    "_infinitySyncDisplayState": "()V",
+    "_infinitySystemThemeMode": "()I",
+    "_infinityWindowWidth": "()I",
+    "_infinityWindowHeight": "()I",
+    "_infinityBridgeVersion": "()I",
+    "_infinityCanEnterPictureInPicture": "()Z",
+    "_infinityVideoAspectRatio": "()F",
+    "_infinityWindowMode": "()I"
+  },
+  "files": {
+    "cmake/scripts/android/Install.cmake": {
+      "before": "f2083d0a19eab56e54bf25043bae9c46fee9c87d96df52903cefc305ce09c767",
+      "after": "0d0fdd0619ab0988c6f7ab371bb1456e83e30f26ae18517b8c60a1b04d8b26c5"
+    },
+    "tools/android/packaging/xbmc/AndroidManifest.xml.in": {
+      "before": "cdf00c4ac0264faf6c6c7ea19a95ae180f5ce00f6b5a05295f453caf681a3c6d",
+      "after": "dea721bd6e3af367b2aa4b6ba35e23dea293a17e48c4c6a6aca53ae474bd75b2"
+    },
+    "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": {
+      "before": null,
+      "after": "f3634418554bf185e48824afbb8f95e2e25b5d94ff08f0b5da7efc2b5a34baa9"
+    },
+    "tools/android/packaging/xbmc/src/Main.java.in": {
+      "before": "2aad4ff503af63833d893e654fdbe8d060065eba0494c2255147e82744d2b455",
+      "after": "ef9c466a1c033e1386335479b72126eaadc9aa728b34c46ec651f94c8427406d"
+    },
+    "tools/android/packaging/xbmc/src/Splash.java.in": {
+      "before": "14ce3c51beef86d6b7f35b2708c1fa2334263ce3601035062bd69c238331512c",
+      "after": "d578b977aebfd40dada0ffa55d9f64a6ff14c7ac86ae89f19db0b9153d64ce04"
+    },
+    "tools/android/packaging/xbmc/strings.xml.in": {
+      "before": "9dac1d4e35a5d33099f3682fdd2a3fb62e45a182bc1eb43c2d221eb32fb857b3",
+      "after": "5e2ffafcdac72d3f7d5919a6ebbcd6fb3e7dfccf80e38b57cb5f76ffbcc13340"
+    },
+    "version.txt": {
+      "before": "3f63a81b906d48cc6826154695c6e195071cf912c008d143286f50c5a0762b72",
+      "after": "0a644fa6cc6c2504c9c4035df643bf775fb2b73a0ae3dac4bed832618445f055"
+    },
+    "xbmc/platform/android/activity/InfinityBridgeState.h": {
+      "before": null,
+      "after": "a1c099e537e540ec9c47a957de0904e0ff4450ec4e7e3e886846486120ff905c"
+    },
+    "xbmc/platform/android/activity/JNIMainActivity.cpp": {
+      "before": "af9a55e68df374c0ef349cc998c528e8afeb567f59e6c3efd2213bd975a0fcc4",
+      "after": "23b4a7bdcaade3f30f395973775073562e25583ce45e21ea56d20c107131099f"
+    },
+    "xbmc/platform/android/activity/JNIMainActivity.h": {
+      "before": "d48947bb8232a0dd119f85d57a28355d207a7b7e4d116f78658fbae20e8c09d6",
+      "after": "790791d2b6d7e23e528378cb9457d57e5a6603c260f54cb8bbec2e54dd162939"
+    },
+    "xbmc/platform/android/activity/XBMCApp.cpp": {
+      "before": "ed20f121da1d8554f650771612f42c3aeb5cfbd2f364aeb9511a83b8addca533",
+      "after": "74c904fc1f4e2e34f3f3131aba6d3e02908ca32d8395cc55426fb7969754e662"
+    },
+    "xbmc/platform/android/activity/XBMCApp.h": {
+      "before": "ab196df2d1c7d09699f8f6828d5f5aa094bedc2873cdea2d1a545a482ee6eeb7",
+      "after": "a29fb0aae5527dc25090dcbf26bf99f8f4838755c9998ba286f5fce6e15eaa52"
+    },
+    "xbmc/windowing/android/WinSystemAndroid.cpp": {
+      "before": "abf856fb0a9df19d789b0eeb80b1f0a71a9567c6b215fdde9e4fbec2cabe1c5e",
+      "after": "41b625ff6982bf2b29fa613817559e8b5b331ce74a1eb1047095eb7eebb07217"
+    },
+    "xbmc/windowing/android/WinSystemAndroid.h": {
+      "before": "bdd315c57b0cd755e2ad40b079f90ceb31a3affa8e4901afabc960daad069f42",
+      "after": "6a42f1c856bd930beefd2d4ed4b33ce4ca2f8c6dadf6490613cb943a04566131"
+    }
+  }
+}
