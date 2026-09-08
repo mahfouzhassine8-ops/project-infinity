@@ -37,6 +37,24 @@ jobs:
 
       - uses: android-actions/setup-android@v4
 
+      - name: Ensure Android debug keystore exists
+        run: |
+          set -euxo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair \
+              -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          test -f "$HOME/.android/debug.keystore"
+
       - name: Install build and packaging dependencies
         run: |
           set -euxo pipefail
