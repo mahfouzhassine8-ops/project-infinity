@@ -1,10 +1,11 @@
-name: Infinity Tablet 7.0 - OLED + Lock + Touch Refresh
+name: Infinity Fold Tablet 7.0 OLED Lock Touch Refresh
 
 on:
   workflow_dispatch:
   push:
     paths:
       - '.github/workflows/build-infinity-tablet-7.0-oled-lock-touchfix.yml'
+      - 'scripts/patch-infinity-tablet-7.0.py'
 
 jobs:
   build:
@@ -12,15 +13,12 @@ jobs:
     permissions:
       actions: read
       contents: read
-
     steps:
       - uses: actions/checkout@v5
-
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-
       - uses: android-actions/setup-android@v4
         with:
           packages: 'build-tools;34.0.0 platform-tools'
@@ -32,191 +30,74 @@ jobs:
           sudo apt-get install -y --no-install-recommends librsvg2-bin unzip curl
           curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
 
-      - name: Download exact proven Stable2 PiP body
+      - name: Download proven Stable2 PiP APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          curl -fsSL -L \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987818547/zip" \
-            -o /tmp/stable2.zip
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987818547/zip" -o /tmp/stable2.zip
           mkdir -p /tmp/stable2-art
           unzip -q /tmp/stable2.zip -d /tmp/stable2-art
           APK=$(find /tmp/stable2-art -name '*.apk' -type f | head -1)
           test -n "$APK"
           cp "$APK" /tmp/stable2.apk
 
-      - name: Preserve proven native core hash
-        run: |
-          unzip -p /tmp/stable2.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-before.sha256
+      - name: Preserve native core hash
+        run: unzip -p /tmp/stable2.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-before.sha256
 
-      - name: Decode Stable2
+      - name: Decode
         run: java -jar /tmp/apktool.jar d -f /tmp/stable2.apk -o /tmp/target
 
-      - name: Add OLED black palette, VLC-style lock, and resize touch refresh
+      - name: Apply OLED lock Fold patch
+        run: python3 scripts/patch-infinity-tablet-7.0.py
+
+      - name: Create lock icons
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          root = Path('/tmp/target')
-          skin = root / 'assets/addons/skin.estuary'
-          if not skin.exists():
-              raise SystemExit('Estuary skin missing')
-
-          # ------------------------------------------------------------
-          # 1) OLED DARK MODE
-          # Keep the dark palette truly black (#000000) wherever Estuary
-          # uses its principal dark backgrounds, while leaving text/accent
-          # colors alone for readability.
-          # ------------------------------------------------------------
-          colors_dir = skin / 'colors'
-          colors_dir.mkdir(parents=True, exist_ok=True)
-          defaults = colors_dir / 'defaults.xml'
-          if defaults.exists():
-              s = defaults.read_text()
-              # Replace common near-black Estuary backgrounds with true OLED black.
-              for old in ('FF101010','FF111111','FF121212','FF131313','FF171717','FF181818','FF1A1A1A','FF202020','FF242424','FF262626'):
-                  s = re.sub(old, 'FF000000', s, flags=re.I)
-              defaults.write_text(s)
-
-          oled = colors_dir / 'Infinity OLED.xml'
-          oled.write_text('''<?xml version="1.0" encoding="UTF-8"?>\n<colors>\n  <color name="black">FF000000</color>\n  <color name="background">FF000000</color>\n  <color name="background100">FF000000</color>\n  <color name="background90">E6000000</color>\n  <color name="background80">CC000000</color>\n  <color name="background70">B3000000</color>\n  <color name="background60">99000000</color>\n  <color name="background50">80000000</color>\n  <color name="background40">66000000</color>\n  <color name="background30">4D000000</color>\n  <color name="background20">33000000</color>\n  <color name="background10">1A000000</color>\n  <color name="white">FFFFFFFF</color>\n  <color name="grey">FFB8B8B8</color>\n  <color name="selected">FFFFFFFF</color>\n</colors>\n''')
-
-          # Light palette is included as the companion scheme. We do NOT
-          # force it as default; OLED remains the safe tablet-test default.
-          light = colors_dir / 'Infinity Light.xml'
-          light.write_text('''<?xml version="1.0" encoding="UTF-8"?>\n<colors>\n  <color name="black">FF111111</color>\n  <color name="background">FFF4F4F4</color>\n  <color name="background100">FFFFFFFF</color>\n  <color name="background90">E6FFFFFF</color>\n  <color name="background80">CCFFFFFF</color>\n  <color name="white">FF111111</color>\n  <color name="grey">FF555555</color>\n  <color name="selected">FF000000</color>\n</colors>\n''')
-
-          # ------------------------------------------------------------
-          # 2) VLC-STYLE VIDEO LOCK
-          # Locks the entire player surface. A screen tap reveals ONLY the
-          # unlock icon; tapping that icon unlocks after a short visual cue.
-          # ------------------------------------------------------------
-          osd = skin / 'xml/VideoOSD.xml'
-          text = osd.read_text()
-          marker = '<control type="radiobutton" id="804">'
-          lock = '''<control type="radiobutton" id="7999">\n\t\t\t\t\t\t<include content="OSDButton">\n\t\t\t\t\t\t\t<param name="texture" value="osd/fullscreen/buttons/infinity-lock.png"/>\n\t\t\t\t\t\t</include>\n\t\t\t\t\t\t<label>Lock screen</label>\n\t\t\t\t\t\t<onclick>Dialog.Close(VideoOSD)</onclick>\n\t\t\t\t\t\t<onclick>ActivateWindow(1199)</onclick>\n\t\t\t\t\t\t<visible>Player.HasVideo</visible>\n\t\t\t\t\t</control>\n\t\t\t\t\t'''
-          if 'id="7999"' not in text:
-              if marker not in text:
-                  raise SystemExit('VideoOSD insertion point missing')
-              osd.write_text(text.replace(marker, lock + marker, 1))
-
-          overlay = skin / 'xml/Custom_1199_InfinityVideoLock.xml'
-          overlay.write_text('''<?xml version="1.0" encoding="utf-8"?>\n<window type="dialog" id="1199">\n  <onload>SetProperty(InfinityLockHint,true)</onload>\n  <onload>ClearProperty(InfinityUnlockVisible)</onload>\n  <onload>ClearProperty(InfinityUnlocking)</onload>\n  <onload>AlarmClock(InfinityHideLockHint,ClearProperty(InfinityLockHint),00:00:01,silent)</onload>\n  <onunload>CancelAlarm(InfinityHideLockHint,silent)</onunload>\n  <onunload>CancelAlarm(InfinityHideUnlock,silent)</onunload>\n  <onunload>CancelAlarm(InfinityFinishUnlock,silent)</onunload>\n  <defaultcontrol always="true">9900</defaultcontrol>\n  <controls>\n    <control type="button" id="9900">\n      <left>0</left><top>0</top><width>100%</width><height>100%</height>\n      <texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>\n      <texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>\n      <label></label>\n      <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">SetProperty(InfinityUnlockVisible,true)</onclick>\n      <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">CancelAlarm(InfinityHideUnlock,silent)</onclick>\n      <onclick condition="String.IsEmpty(Window.Property(InfinityUnlocking))">AlarmClock(InfinityHideUnlock,ClearProperty(InfinityUnlockVisible),00:00:03,silent)</onclick>\n    </control>\n    <control type="image">\n      <left>48</left><top>35</top><width>58</width><height>58</height>\n      <texture>osd/fullscreen/buttons/infinity-lock.png</texture>\n      <visible>!String.IsEmpty(Window.Property(InfinityLockHint)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n      <animation effect="fade" start="0" end="100" time="100">Visible</animation>\n      <animation effect="fade" start="100" end="0" time="220">Hidden</animation>\n    </control>\n    <control type="button" id="9901">\n      <left>38</left><top>25</top><width>80</width><height>80</height>\n      <texturefocus>osd/fullscreen/buttons/infinity-lock.png</texturefocus>\n      <texturenofocus>osd/fullscreen/buttons/infinity-lock.png</texturenofocus>\n      <label></label>\n      <visible>!String.IsEmpty(Window.Property(InfinityUnlockVisible)) + String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n      <onclick>CancelAlarm(InfinityHideUnlock,silent)</onclick>\n      <onclick>ClearProperty(InfinityUnlockVisible)</onclick>\n      <onclick>SetProperty(InfinityUnlocking,true)</onclick>\n      <onclick>AlarmClock(InfinityFinishUnlock,Dialog.Close(1199),00:00:01,silent)</onclick>\n    </control>\n    <control type="image">\n      <left>48</left><top>35</top><width>58</width><height>58</height>\n      <texture>osd/fullscreen/buttons/infinity-unlock.png</texture>\n      <visible>!String.IsEmpty(Window.Property(InfinityUnlocking))</visible>\n      <animation effect="fade" start="0" end="100" time="90">Visible</animation>\n      <animation effect="zoom" start="88" end="104" center="77,64" time="140">Visible</animation>\n      <animation effect="fade" start="100" end="0" time="220" delay="500">Visible</animation>\n    </control>\n  </controls>\n</window>\n''')
-
-          # ------------------------------------------------------------
-          # 3) TABLET / PIP TOUCH-COORDINATE REFRESH
-          # Preserve Stable2's proven PiP callback. Add only a conservative
-          # Android view-layout refresh after configuration/window changes.
-          # This avoids rewriting libkodi or the working PiP path.
-          # ------------------------------------------------------------
-          main = None
-          for d in root.glob('smali*'):
-              p = d / 'com/projectinfinity/kodi/Main.smali'
-              if p.exists():
-                  main = p
-                  break
-          if not main:
-              raise SystemExit('Main.smali missing')
-          mtxt = main.read_text()
-
-          helper = r'''
-.method private infinityRefreshWindow()V
-    .locals 2
-    invoke-virtual {p0}, Lcom/projectinfinity/kodi/Main;->getWindow()Landroid/view/Window;
-    move-result-object v0
-    if-eqz v0, :done
-    invoke-virtual {v0}, Landroid/view/Window;->getDecorView()Landroid/view/View;
-    move-result-object v1
-    if-eqz v1, :done
-    invoke-virtual {v1}, Landroid/view/View;->requestLayout()V
-    invoke-virtual {v1}, Landroid/view/View;->invalidate()V
-:done
-    return-void
-.end method
-'''
-          if '.method private infinityRefreshWindow()V' not in mtxt:
-              mtxt += '\n' + helper
-
-          if '.method public onConfigurationChanged(Landroid/content/res/Configuration;)V' not in mtxt:
-              mtxt += r'''
-.method public onConfigurationChanged(Landroid/content/res/Configuration;)V
-    .locals 0
-    invoke-super {p0, p1}, Landroid/app/NativeActivity;->onConfigurationChanged(Landroid/content/res/Configuration;)V
-    invoke-direct {p0}, Lcom/projectinfinity/kodi/Main;->infinityRefreshWindow()V
-    return-void
-.end method
-'''
-
-          if '.method public onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V' not in mtxt:
-              mtxt += r'''
-.method public onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V
-    .locals 0
-    invoke-super {p0, p1, p2}, Landroid/app/NativeActivity;->onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V
-    invoke-direct {p0}, Lcom/projectinfinity/kodi/Main;->infinityRefreshWindow()V
-    return-void
-.end method
-'''
-          main.write_text(mtxt)
-
-          print('Tablet 7.0 patch applied')
-          print('OLED dark backgrounds: true #000000')
-          print('VLC-style lock overlay installed')
-          print('PiP callback untouched; layout refresh added only to config/PiP state changes')
-          PY
-
           SKIN=/tmp/target/assets/addons/skin.estuary
           mkdir -p "$SKIN/media/osd/fullscreen/buttons"
-          cat >/tmp/lock.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000000"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#000000"/></svg>
-          SVG
-          cat >/tmp/unlock.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14 6 0 11 3 13 8" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000000"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#000000"/></svg>
-          SVG
+          printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000000"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#000000"/></svg>' > /tmp/lock.svg
+          printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14 6 0 11 3 13 8" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000000"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#000000"/></svg>' > /tmp/unlock.svg
           rsvg-convert -w 74 -h 74 /tmp/lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
           rsvg-convert -w 74 -h 74 /tmp/unlock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-unlock.png"
 
-      - name: Verify tablet checkpoint
+      - name: Verify Fold checkpoint
         run: |
           set -euo pipefail
           MAIN=$(find /tmp/target -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
           test -n "$MAIN"
           grep -q 'infinityRefreshWindow()V' "$MAIN"
-          grep -q 'onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V' "$MAIN"
           grep -q 'onConfigurationChanged(Landroid/content/res/Configuration;)V' "$MAIN"
+          grep -q 'onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V' "$MAIN"
+          grep -q 'onMultiWindowModeChanged(ZLandroid/content/res/Configuration;)V' "$MAIN"
+          grep -q 'onWindowFocusChanged(Z)V' "$MAIN"
           grep -q 'id="7999"' /tmp/target/assets/addons/skin.estuary/xml/VideoOSD.xml
           test -f /tmp/target/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml
           grep -q 'FF000000' '/tmp/target/assets/addons/skin.estuary/colors/Infinity OLED.xml'
           grep -q 'android:supportsPictureInPicture="true"' /tmp/target/AndroidManifest.xml
           grep -q 'android:resizeableActivity="true"' /tmp/target/AndroidManifest.xml
 
-      - name: Rebuild Tablet 7.0
-        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-Tablet-7.0-unsigned.apk
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-Fold-Tablet-7.0-unsigned.apk
 
-      - name: Verify native Kodi core stayed byte-for-byte unchanged
+      - name: Verify native core unchanged
         run: |
-          unzip -p /tmp/Infinity-Tablet-7.0-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-after.sha256
+          unzip -p /tmp/Infinity-Fold-Tablet-7.0-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-after.sha256
           cmp /tmp/lib-before.sha256 /tmp/lib-after.sha256
 
-      - name: Sign Tablet 7.0
+      - name: Sign
         env:
           PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/34.0.0"
-          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Tablet 7.0, O=Project Infinity, C=US" >/dev/null 2>&1
-          "$BT/zipalign" -f 4 /tmp/Infinity-Tablet-7.0-unsigned.apk /tmp/Infinity-Tablet-7.0-aligned.apk
-          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS \
-            --out /tmp/Infinity-Tablet-7.0-OLED-Lock-TouchRefresh.apk /tmp/Infinity-Tablet-7.0-aligned.apk
-          "$BT/apksigner" verify --verbose /tmp/Infinity-Tablet-7.0-OLED-Lock-TouchRefresh.apk
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity Fold Tablet 7.0, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Fold-Tablet-7.0-unsigned.apk /tmp/Infinity-Fold-Tablet-7.0-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-Fold-Tablet-7.0-OLED-Lock-TouchRefresh.apk /tmp/Infinity-Fold-Tablet-7.0-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Fold-Tablet-7.0-OLED-Lock-TouchRefresh.apk
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Tablet-7.0-OLED-Lock-TouchRefresh
-          path: /tmp/Infinity-Tablet-7.0-OLED-Lock-TouchRefresh.apk
+          name: Infinity-Fold-Tablet-7.0-OLED-Lock-TouchRefresh
+          path: /tmp/Infinity-Fold-Tablet-7.0-OLED-Lock-TouchRefresh.apk
           retention-days: 30
