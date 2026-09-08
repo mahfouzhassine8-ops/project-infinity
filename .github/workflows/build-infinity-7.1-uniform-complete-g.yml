@@ -6,6 +6,7 @@ on:
     branches: [infinity-7.1-core-unified]
     paths:
       - '.github/workflows/build-infinity-7.1-uniform-complete-g.yml'
+      - 'scripts/patch-infinity-7.1-package-identity.py'
       - 'scripts/patch-infinity-7.1-native-fold.py'
       - 'scripts/patch-infinity-7.1-native-hook.py'
       - 'scripts/patch-infinity-7.1-native-contract-d.py'
@@ -51,14 +52,18 @@ jobs:
           git clone --depth 1 --branch "${KODI_TAG}" https://github.com/xbmc/xbmc.git kodi
           test "$(git -C kodi rev-parse HEAD)" = "${KODI_SHA}"
 
-      - name: Map complete Infinity native contract onto Kodi 21.3 source
+      - name: Map Infinity package identity and complete native contract onto Kodi 21.3 source
         run: |
           set -euxo pipefail
-          # Order matters: display sync exists first, hook exposes it second,
-          # extended theme/window contract builds on the hook third.
+          # Identity must be changed before compilation. Kodi's native JNI class root is
+          # generated from APP_PACKAGE, so post-build APK renaming is structurally unsafe.
+          python3 scripts/patch-infinity-7.1-package-identity.py
           python3 scripts/patch-infinity-7.1-native-fold.py
           python3 scripts/patch-infinity-7.1-native-hook.py
           python3 scripts/patch-infinity-7.1-native-contract-d.py
+          grep -q '^APP_PACKAGE com.projectinfinity.kodi$' kodi/version.txt
+          grep -q 'CCompileInfo::GetClass()' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+          grep -q 'pkgRoot + "/Main"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
           grep -q 'void CXBMCApp::InfinitySyncDisplayState()' kodi/xbmc/platform/android/activity/XBMCApp.cpp
           grep -q '"_infinityHasActiveVideo"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
           grep -q '"_infinitySystemThemeMode"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
@@ -73,8 +78,9 @@ jobs:
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-${{ hashFiles('scripts/patch-infinity-7.1-native-fold.py','scripts/patch-infinity-7.1-native-hook.py','scripts/patch-infinity-7.1-native-contract-d.py') }}
+          key: infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-${{ hashFiles('scripts/patch-infinity-7.1-package-identity.py','scripts/patch-infinity-7.1-native-fold.py','scripts/patch-infinity-7.1-native-hook.py','scripts/patch-infinity-7.1-native-contract-d.py') }}
           restore-keys: |
+            infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-
             infinity-7.1-hook-smoke-e-21.3-arm64-${{ runner.os }}-
             infinity-7.1-hooked-d-21.3-arm64-${{ runner.os }}-
             infinity-7.1-kodi-21.3-arm64-${{ runner.os }}-
@@ -96,7 +102,7 @@ jobs:
           make -C target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
           make -C "${BUILD_DIR}" -j"$(nproc)"
 
-      - name: Package exact matched 21.3 APK from same build tree
+      - name: Package exact matched 21.3 Infinity APK from same build tree
         run: |
           set -euxo pipefail
           make -C "${BUILD_DIR}" apk -j"$(nproc)"
@@ -104,6 +110,11 @@ jobs:
           test -n "$APK"
           cp "$APK" /tmp/uniform-base.apk
           unzip -l /tmp/uniform-base.apk | grep -q 'lib/arm64-v8a/libkodi.so'
+          java -jar /tmp/apktool.jar d -f /tmp/uniform-base.apk -o /tmp/base-identity-check
+          grep -q 'package="com.projectinfinity.kodi"' /tmp/base-identity-check/AndroidManifest.xml
+          test -f /tmp/base-identity-check/smali/com/projectinfinity/kodi/Main.smali || \
+            find /tmp/base-identity-check -path '*/com/projectinfinity/kodi/Main.smali' -type f | grep -q .
+          rm -rf /tmp/base-identity-check
 
       - name: Download proven 7.0 only as upper-layer donor
         env:
@@ -124,6 +135,7 @@ jobs:
           java -jar /tmp/apktool.jar d -f /tmp/uniform-base.apk -o /tmp/decoded
           java -jar /tmp/apktool.jar d -f /tmp/old.apk -o /tmp/old
           test -f /tmp/decoded/AndroidManifest.xml
+          grep -q 'package="com.projectinfinity.kodi"' /tmp/decoded/AndroidManifest.xml
           test -d /tmp/decoded/lib/arm64-v8a
           find /tmp/decoded/lib/arm64-v8a -maxdepth 1 -type f -name '*.so' -printf '%f\n' | sort > /tmp/native-before.txt
           sha256sum /tmp/decoded/lib/arm64-v8a/*.so | sort > /tmp/native-before.sha256
@@ -132,7 +144,6 @@ jobs:
         run: |
           set -euxo pipefail
           python3 scripts/patch-infinity-7.1-uniform-app.py
-
           SKIN=/tmp/decoded/assets/addons/skin.estuary
           mkdir -p "$SKIN/media/osd/fullscreen/buttons"
           printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000"/></svg>' > /tmp/lock.svg
@@ -141,8 +152,10 @@ jobs:
       - name: Uniform structure audit before rebuild
         run: |
           set -euxo pipefail
+          grep -q 'package="com.projectinfinity.kodi"' /tmp/decoded/AndroidManifest.xml
           MAIN=$(find /tmp/decoded -path '*/Main.smali' -type f | while read f; do grep -q 'Landroid/app/NativeActivity;' "$f" && { echo "$f"; break; }; done)
           test -n "$MAIN"
+          grep -q '^\.class.* Lcom/projectinfinity/kodi/Main;$' "$MAIN"
           BRIDGE="$(dirname "$MAIN")/InfinityCoreBridge.smali"
           test -f "$BRIDGE"
           grep -q '_infinityHasActiveVideo()Z' "$MAIN"
@@ -171,9 +184,15 @@ jobs:
           set -euxo pipefail
           java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-7.1-Uniform-G-unsigned.apk
 
-      - name: Verify every native library stayed matched after upper-layer mapping
+      - name: Verify final identity and every matched native library
         run: |
           set -euxo pipefail
+          rm -rf /tmp/final-check /tmp/rebuilt-check
+          java -jar /tmp/apktool.jar d -f /tmp/Infinity-7.1-Uniform-G-unsigned.apk -o /tmp/final-check
+          grep -q 'package="com.projectinfinity.kodi"' /tmp/final-check/AndroidManifest.xml
+          FINAL_MAIN=$(find /tmp/final-check -path '*/Main.smali' -type f | while read f; do grep -q 'Landroid/app/NativeActivity;' "$f" && { echo "$f"; break; }; done)
+          test -n "$FINAL_MAIN"
+          grep -q '^\.class.* Lcom/projectinfinity/kodi/Main;$' "$FINAL_MAIN"
           mkdir -p /tmp/rebuilt-check
           unzip -q /tmp/Infinity-7.1-Uniform-G-unsigned.apk 'lib/arm64-v8a/*.so' -d /tmp/rebuilt-check
           sha256sum /tmp/rebuilt-check/lib/arm64-v8a/*.so | sort > /tmp/native-rebuilt.sha256
@@ -190,7 +209,7 @@ jobs:
           if a != b:
               missing=sorted(set(a)-set(b)); extra=sorted(set(b)-set(a)); changed=sorted(k for k in set(a)&set(b) if a[k]!=b[k])
               raise SystemExit(f'native mismatch missing={missing} extra={extra} changed={changed}')
-          print('All native libraries remain byte-identical to the one matched 21.3 build.')
+          print('All native libraries remain byte-identical to the one matched 21.3 Infinity-identity build.')
           PY
 
       - name: Align sign and verify final 7.1 candidate
