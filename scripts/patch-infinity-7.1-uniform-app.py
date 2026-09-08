@@ -219,8 +219,10 @@ bridge.write_text(f'''.class public final {bridge_desc}
 ''')
 
 # Configure PiP on resume without auto-entering an idle app.
-if 'updateInfinityPictureInPictureParams' not in t:
-    raise SystemExit('bridge marker impossible')
+# Validate the generated bridge method itself; Main receives the call below.
+bridge_text = bridge.read_text()
+if 'updateInfinityPictureInPictureParams' not in bridge_text:
+    raise SystemExit('bridge PiP parameter method missing after generation')
 rm = re.search(r'(?ms)^\.method (?:public|protected) onResume\(\)V\n(.*?)^\.end method', t)
 if rm:
     body = rm.group(0)
@@ -228,7 +230,7 @@ if rm:
     if supercall and f'{bridge_desc}->updateInfinityPictureInPictureParams' not in body:
         insert = supercall.group(0) + f'\n    invoke-static {{p0}}, {bridge_desc}->updateInfinityPictureInPictureParams({main_desc})V'
         body = body[:supercall.start()] + insert + body[supercall.end():]
-        t = t[:rm.start()] + body + t[rm.end():]
+        t = t[:rm.start()] + body + t[supercall.end():]
 
 # One callback map for PiP, Fold/configuration and multi-window.
 t += f'''
