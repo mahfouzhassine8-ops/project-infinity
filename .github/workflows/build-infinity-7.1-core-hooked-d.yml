@@ -97,7 +97,7 @@ jobs:
           make -j"$(nproc)"
           make -C target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
           make -C "${BUILD_DIR}" -j"$(nproc)"
-          CORE=$(find "${BUILD_DIR}" kodi -type f -name 'libkodi.so' | head -1)
+          CORE=$(find "${BUILD_DIR}" -type f -name 'libkodi.so' -print -quit)
           test -n "$CORE"
           cp "$CORE" /tmp/libkodi-7.1-hooked-d.so
           sha256sum /tmp/libkodi-7.1-hooked-d.so > /tmp/core.sha256
