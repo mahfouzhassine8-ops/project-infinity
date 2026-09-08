@@ -1,0 +1,217 @@
+name: Infinity 7.1 Uniform Complete Candidate G
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-7.1-core-unified]
+    paths:
+      - '.github/workflows/build-infinity-7.1-uniform-complete-g.yml'
+      - 'scripts/patch-infinity-7.1-native-fold.py'
+      - 'scripts/patch-infinity-7.1-native-hook.py'
+      - 'scripts/patch-infinity-7.1-native-contract-d.py'
+      - 'scripts/patch-infinity-7.1-uniform-app.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+    env:
+      KODI_TAG: 21.3-Omega
+      KODI_SHA: a3a448d26b8d560a65655dab2cd122994dc4e146
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Install build and packaging dependencies
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm librsvg2-bin
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;${NDK_VER}"
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Clone exact Kodi 21.3
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch "${KODI_TAG}" https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = "${KODI_SHA}"
+
+      - name: Map complete Infinity native contract onto Kodi 21.3 source
+        run: |
+          set -euxo pipefail
+          # Order matters: display sync exists first, hook exposes it second,
+          # extended theme/window contract builds on the hook third.
+          python3 scripts/patch-infinity-7.1-native-fold.py
+          python3 scripts/patch-infinity-7.1-native-hook.py
+          python3 scripts/patch-infinity-7.1-native-contract-d.py
+          grep -q 'void CXBMCApp::InfinitySyncDisplayState()' kodi/xbmc/platform/android/activity/XBMCApp.cpp
+          grep -q '"_infinityHasActiveVideo"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+          grep -q '"_infinitySystemThemeMode"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+          grep -q '"_infinityWindowWidth"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+          grep -q '"_infinityBridgeVersion"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+          test -f kodi/xbmc/video/VideoDatabase.cpp
+
+      - name: Cache complete Kodi 21.3 dependency stack
+        uses: actions/cache@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-${{ hashFiles('scripts/patch-infinity-7.1-native-fold.py','scripts/patch-infinity-7.1-native-hook.py','scripts/patch-infinity-7.1-native-contract-d.py') }}
+          restore-keys: |
+            infinity-7.1-hook-smoke-e-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-hooked-d-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-kodi-21.3-arm64-${{ runner.os }}-
+
+      - name: Build one matched Kodi 21.3 Android stack
+        run: |
+          set -euxo pipefail
+          mkdir -p "${TARBALLS}" "${DEPENDS}" "${BUILD_DIR}"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure \
+            --with-tarballs="${TARBALLS}" \
+            --host=aarch64-linux-android \
+            --with-sdk-path="${ANDROID_HOME}" \
+            --with-ndk-path="${ANDROID_HOME}/ndk/${NDK_VER}" \
+            --prefix="${DEPENDS}" \
+            --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
+          make -C "${BUILD_DIR}" -j"$(nproc)"
+
+      - name: Package exact matched 21.3 APK from same build tree
+        run: |
+          set -euxo pipefail
+          make -C "${BUILD_DIR}" apk -j"$(nproc)"
+          APK=$(find kodi "${BUILD_DIR}" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          cp "$APK" /tmp/uniform-base.apk
+          unzip -l /tmp/uniform-base.apk | grep -q 'lib/arm64-v8a/libkodi.so'
+
+      - name: Download proven 7.0 only as upper-layer donor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987818547/zip" -o /tmp/old.zip
+          mkdir -p /tmp/old-art
+          unzip -q /tmp/old.zip -d /tmp/old-art
+          OLDAPK=$(find /tmp/old-art -type f -name '*.apk' -print -quit)
+          test -n "$OLDAPK"
+          cp "$OLDAPK" /tmp/old.apk
+
+      - name: Decode matched base and old upper-layer donor
+        run: |
+          set -euxo pipefail
+          java -jar /tmp/apktool.jar d -f /tmp/uniform-base.apk -o /tmp/decoded
+          java -jar /tmp/apktool.jar d -f /tmp/old.apk -o /tmp/old
+          test -f /tmp/decoded/AndroidManifest.xml
+          test -d /tmp/decoded/lib/arm64-v8a
+          find /tmp/decoded/lib/arm64-v8a -maxdepth 1 -type f -name '*.so' -printf '%f\n' | sort > /tmp/native-before.txt
+          sha256sum /tmp/decoded/lib/arm64-v8a/*.so | sort > /tmp/native-before.sha256
+
+      - name: Map all Infinity 7.1 upper-layer connections onto matched package
+        run: |
+          set -euxo pipefail
+          python3 scripts/patch-infinity-7.1-uniform-app.py
+
+          SKIN=/tmp/decoded/assets/addons/skin.estuary
+          mkdir -p "$SKIN/media/osd/fullscreen/buttons"
+          printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000"/></svg>' > /tmp/lock.svg
+          rsvg-convert -w 74 -h 74 /tmp/lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
+
+      - name: Uniform structure audit before rebuild
+        run: |
+          set -euxo pipefail
+          MAIN=$(find /tmp/decoded -path '*/Main.smali' -type f | while read f; do grep -q 'Landroid/app/NativeActivity;' "$f" && { echo "$f"; break; }; done)
+          test -n "$MAIN"
+          BRIDGE="$(dirname "$MAIN")/InfinityCoreBridge.smali"
+          test -f "$BRIDGE"
+          grep -q '_infinityHasActiveVideo()Z' "$MAIN"
+          grep -q '_infinitySyncDisplayState()V' "$MAIN"
+          grep -q '_infinitySystemThemeMode()I' "$MAIN"
+          grep -q '_infinityWindowWidth()I' "$MAIN"
+          grep -q '_infinityWindowHeight()I' "$MAIN"
+          grep -q '_infinityBridgeVersion()I' "$MAIN"
+          test "$(grep -c '^\.method public onConfigurationChanged(Landroid/content/res/Configuration;)V' "$MAIN")" -eq 1
+          test "$(grep -c '^\.method public onUserLeaveHint()V' "$MAIN")" -eq 1
+          grep -q 'hasActiveVideoPlayer' "$BRIDGE"
+          grep -q 'getSystemThemeMode' "$BRIDGE"
+          grep -q 'getNativeWindowWidth' "$BRIDGE"
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/decoded/AndroidManifest.xml
+          grep -q 'android:resizeableActivity="true"' /tmp/decoded/AndroidManifest.xml
+          test -f '/tmp/decoded/assets/addons/skin.estuary/colors/Infinity OLED.xml'
+          test -f '/tmp/decoded/assets/addons/skin.estuary/colors/Infinity Light.xml'
+          grep -q 'id="7999"' /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml
+          test -f /tmp/decoded/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml
+          grep -R -q -F 'Start Over' /tmp/decoded/assets/addons || echo 'Native Kodi resume remains enabled; no bundled phrase required replacement.'
+          sha256sum /tmp/decoded/lib/arm64-v8a/*.so | sort > /tmp/native-after-upper.sha256
+          cmp /tmp/native-before.sha256 /tmp/native-after-upper.sha256
+
+      - name: Rebuild complete Infinity package
+        run: |
+          set -euxo pipefail
+          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-7.1-Uniform-G-unsigned.apk
+
+      - name: Verify every native library stayed matched after upper-layer mapping
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/rebuilt-check
+          unzip -q /tmp/Infinity-7.1-Uniform-G-unsigned.apk 'lib/arm64-v8a/*.so' -d /tmp/rebuilt-check
+          sha256sum /tmp/rebuilt-check/lib/arm64-v8a/*.so | sort > /tmp/native-rebuilt.sha256
+          python3 - <<'PY'
+          from pathlib import Path
+          def m(path):
+              out={}
+              for line in Path(path).read_text().splitlines():
+                  h,p=line.split(maxsplit=1)
+                  out[p.split('/')[-1]]=h
+              return out
+          a=m('/tmp/native-before.sha256')
+          b=m('/tmp/native-rebuilt.sha256')
+          if a != b:
+              missing=sorted(set(a)-set(b)); extra=sorted(set(b)-set(a)); changed=sorted(k for k in set(a)&set(b) if a[k]!=b[k])
+              raise SystemExit(f'native mismatch missing={missing} extra={extra} changed={changed}')
+          print('All native libraries remain byte-identical to the one matched 21.3 build.')
+          PY
+
+      - name: Align sign and verify final 7.1 candidate
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euxo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 7.1 Uniform G, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-7.1-Uniform-G-unsigned.apk /tmp/Infinity-7.1-Uniform-G-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-7.1-Uniform-G.apk /tmp/Infinity-7.1-Uniform-G-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-7.1-Uniform-G.apk
+          sha256sum /tmp/Infinity-7.1-Uniform-G.apk > /tmp/Infinity-7.1-Uniform-G.sha256
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-7.1-Uniform-Complete-Candidate-G
+          path: |
+            /tmp/Infinity-7.1-Uniform-G.apk
+            /tmp/Infinity-7.1-Uniform-G.sha256
+            /tmp/native-before.txt
+            /tmp/native-before.sha256
+            /tmp/native-rebuilt.sha256
+          retention-days: 30
