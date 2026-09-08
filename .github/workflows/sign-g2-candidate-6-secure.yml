@@ -1,0 +1,138 @@
+name: G2 Candidate 6 Secure Fresh Sign
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/sign-g2-candidate-6-secure.yml
+  workflow_dispatch:
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Download exact Candidate 6
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/10078340957/zip" \
+            -o /tmp/c6.zip
+          mkdir -p /tmp/c6
+          unzip -q /tmp/c6.zip -d /tmp/c6
+          APK=$(find /tmp/c6 -name 'G2-Candidate-6-unsigned.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/G2-Candidate-6-unsigned.apk
+          echo "dbe2922171d77a15dfc2138e517956d92db4aa0f8d559d19b2620ed99ba461b4  /tmp/G2-Candidate-6-unsigned.apk" | sha256sum -c -
+
+      - name: Generate permanent Infinity G2 release key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          openssl rand -base64 36 | tr -d '\n' > /tmp/Infinity-G2-Release-key-password.txt
+          PASS=$(cat /tmp/Infinity-G2-Release-key-password.txt)
+          keytool -genkeypair \
+            -keystore /tmp/Infinity-G2-Release.keystore \
+            -alias infinity-g2-release \
+            -keyalg RSA -keysize 4096 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" \
+            -dname "CN=Project Infinity G2, O=Project Infinity, C=US" \
+            >/dev/null 2>&1
+
+      - name: Zipalign sign and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          PASS=$(cat /tmp/Infinity-G2-Release-key-password.txt)
+          "$BT/zipalign" -f 4 \
+            /tmp/G2-Candidate-6-unsigned.apk \
+            /tmp/G2-Candidate-6-aligned.apk
+          "$BT/apksigner" sign \
+            --ks /tmp/Infinity-G2-Release.keystore \
+            --ks-key-alias infinity-g2-release \
+            --ks-pass pass:"$PASS" \
+            --key-pass pass:"$PASS" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out /tmp/G2-Candidate-6.apk \
+            /tmp/G2-Candidate-6-aligned.apk
+          "$BT/apksigner" verify --verbose --print-certs \
+            /tmp/G2-Candidate-6.apk > /tmp/signature-info.txt
+          sha256sum /tmp/G2-Candidate-6.apk > /tmp/G2-Candidate-6.sha256
+          "$BT/zipalign" -c -v 4 /tmp/G2-Candidate-6.apk > /tmp/zipalign-check.txt
+
+      - name: Encrypt release key backup for private retrieval
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          cat > /tmp/wrap-public.pem <<'EOF'
+          -----BEGIN PUBLIC KEY-----
+          MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxGdNvz8WaIhDTV2ghe8S
+          iZK/HS81QZFfgDOeKNEBnZFmASYvzu1etC3TZ+N+8WqJBxjOiQAfuEa+8sTzVdWR
+          +qi/nE3t+sCdpYKNG9S1VMD2GmphPAPUzgd7Nh4Amar0yW/clGjnbQE/7iYFSpaR
+          c6a+cZ5DrBTHQcTU5u6IiFgeOmsPl8uViXxSoExZzhjcqap8W0U+cr3rVAboq2U1
+          +y49HETn8rlpWgFJqO9vL6bkGrZjRQrp1eYTSngplxq/rMWRAl/yIMuklvxHDts7
+          Qso40tDHw35a4aBImyqtn9GWRuDRsnLP29Fmy9eghP2z0rT78UbnGzH3RaDGz8l7
+          LV/B2La5/Zb2NrRxkL/mEA1ZomnF1rAuCaZmEgc/0VJ2ScCoWdCR3pe2pVVXFh0n
+          jjq4N00pqt6VIT7HhKp0SPBx0CJAtNJxm+2UEIYqmcEOydGMv6yAeIEXAr/fLsxJ
+          22wQi95s7dWz5HxnUjhh3/UokSk5gk5y3KUAK8rh6fZTAgMBAAE=
+          -----END PUBLIC KEY-----
+          EOF
+          mkdir -p /tmp/keybundle
+          cp /tmp/Infinity-G2-Release.keystore /tmp/keybundle/
+          cp /tmp/Infinity-G2-Release-key-password.txt /tmp/keybundle/
+          cat > /tmp/keybundle/README-KEEP-THIS-KEY.txt <<'EOF'
+          This is the signing key for the fresh-install G2 Candidate 6 line.
+          Keep the keystore and password private.
+          Future APKs must be signed with this same key to update #6 in place.
+          Alias: infinity-g2-release
+          EOF
+          tar -C /tmp/keybundle -czf /tmp/Infinity-G2-Release-Key-Backup.tar.gz .
+          openssl rand -hex 32 > /tmp/wrap-secret.txt
+          openssl enc -aes-256-cbc -salt -pbkdf2 \
+            -in /tmp/Infinity-G2-Release-Key-Backup.tar.gz \
+            -out /tmp/Infinity-G2-Release-Key-Backup.tar.gz.enc \
+            -pass file:/tmp/wrap-secret.txt
+          openssl pkeyutl -encrypt -pubin -inkey /tmp/wrap-public.pem \
+            -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 \
+            -in /tmp/wrap-secret.txt -out /tmp/wrap-secret.bin
+          rm -rf /tmp/keybundle /tmp/Infinity-G2-Release-Key-Backup.tar.gz /tmp/wrap-secret.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G2-Candidate-6-Fresh-Signed
+          path: |
+            /tmp/G2-Candidate-6.apk
+            /tmp/G2-Candidate-6.sha256
+            /tmp/signature-info.txt
+            /tmp/zipalign-check.txt
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-G2-Release-Key-Encrypted
+          path: |
+            /tmp/Infinity-G2-Release-Key-Backup.tar.gz.enc
+            /tmp/wrap-secret.bin
+          retention-days: 1
