@@ -9,42 +9,23 @@ on:
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
   collect:
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
-      - name: Collect exact source and existing donor for offline audit
+      - name: Export current source for independent audit without native compilation
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
           SOURCE_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p audit-inputs
           git archive --format=tar.gz HEAD > audit-inputs/infinity-source.tar.gz
-          curl --fail --location --retry 3 \
-            https://codeload.github.com/xbmc/xbmc/tar.gz/a3a448d26b8d560a65655dab2cd122994dc4e146 \
-            -o audit-inputs/kodi-21.3-source.tar.gz
-          curl --fail --location --retry 3 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H 'Accept: application/vnd.github+json' \
-            "https://api.github.com/repos/$REPO/actions/artifacts/9987818547" \
-            -o audit-inputs/donor-artifact.json
-          curl --fail --location --retry 3 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H 'Accept: application/vnd.github+json' \
-            "https://api.github.com/repos/$REPO/actions/artifacts/9987818547/zip" \
-            -o audit-inputs/donor.zip
-          curl --fail --location --retry 3 \
-            https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar \
-            -o audit-inputs/apktool.jar
-          printf 'Infinity source commit: %s\nKodi source commit: a3a448d26b8d560a65655dab2cd122994dc4e146\nDonor artifact: 9987818547\nNo native compilation performed.\n' "$SOURCE_SHA" > audit-inputs/PROVENANCE.txt
-          (cd audit-inputs && sha256sum *.tar.gz *.zip *.jar > SHA256SUMS)
+          printf 'Infinity source commit: %s\nKodi source commit: a3a448d26b8d560a65655dab2cd122994dc4e146\nSource-only snapshot. No engine compilation or signing credentials exported.\n' "$SOURCE_SHA" > audit-inputs/PROVENANCE.txt
+          (cd audit-inputs && sha256sum infinity-source.tar.gz > SHA256SUMS)
       - uses: actions/upload-artifact@v7
         with:
           name: Infinity-7.1-Architecture-Audit-Inputs
