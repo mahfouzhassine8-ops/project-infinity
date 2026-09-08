@@ -1,0 +1,113 @@
+name: Infinity 7.1 Uniform Candidate F
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-7.1-core-unified]
+    paths:
+      - '.github/workflows/build-infinity-7.1-uniform-f.yml'
+      - 'scripts/patch-infinity-7.1-native-hook.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    permissions:
+      contents: read
+    env:
+      KODI_TAG: 21.3-Omega
+      KODI_SHA: a3a448d26b8d560a65655dab2cd122994dc4e146
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Install build dependencies
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;${NDK_VER}"
+
+      - name: Clone exact Kodi 21.3
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch "${KODI_TAG}" https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = "${KODI_SHA}"
+
+      - name: Apply only stable Infinity native hook
+        run: |
+          set -euxo pipefail
+          # Candidate F intentionally DOES NOT apply the experimental native Fold rewrite.
+          python3 scripts/patch-infinity-7.1-native-hook.py
+          grep -q '"_infinityHasActiveVideo"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+          grep -q '"_infinitySyncDisplayState"' kodi/xbmc/platform/android/activity/JNIMainActivity.cpp
+
+      - name: Build complete matched Kodi 21.3 Android stack
+        run: |
+          set -euxo pipefail
+          mkdir -p "${TARBALLS}" "${DEPENDS}" "${BUILD_DIR}"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure \
+            --with-tarballs="${TARBALLS}" \
+            --host=aarch64-linux-android \
+            --with-sdk-path="${ANDROID_HOME}" \
+            --with-ndk-path="${ANDROID_HOME}/ndk/${NDK_VER}" \
+            --prefix="${DEPENDS}" \
+            --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="${BUILD_DIR}"
+          make -C "${BUILD_DIR}" -j"$(nproc)"
+
+      - name: Package from the same build tree
+        run: |
+          set -euxo pipefail
+          # Critical difference from D/E: package the Android APK from this exact
+          # Kodi 21.3 build so libkodi and its native/supporting pieces stay matched.
+          make -C "${BUILD_DIR}" apk -j"$(nproc)"
+          APK=$(find kodi "${BUILD_DIR}" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          cp "$APK" /tmp/Infinity-7.1-Uniform-F.apk
+          unzip -l /tmp/Infinity-7.1-Uniform-F.apk | grep -q 'lib/arm64-v8a/libkodi.so'
+
+      - name: Uniformity audit
+        run: |
+          set -euxo pipefail
+          unzip -q /tmp/Infinity-7.1-Uniform-F.apk -d /tmp/audit
+          test -f /tmp/audit/lib/arm64-v8a/libkodi.so
+          find /tmp/audit/lib/arm64-v8a -maxdepth 1 -type f -name '*.so' -printf '%f\n' | sort | tee /tmp/native-uniform-f.txt
+          sha256sum /tmp/audit/lib/arm64-v8a/*.so | sort > /tmp/native-uniform-f.sha256
+          # We require a complete package, not a lone transplanted libkodi.
+          test "$(wc -l < /tmp/native-uniform-f.txt)" -gt 1
+
+      - name: Sign and verify complete package
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euxo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair -keystore /tmp/infinity.keystore -alias infinity -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Infinity 7.1 Uniform F, O=Project Infinity, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-7.1-Uniform-F.apk /tmp/Infinity-7.1-Uniform-F-aligned.apk
+          "$BT/apksigner" sign --ks /tmp/infinity.keystore --ks-key-alias infinity --ks-pass env:PASS --key-pass env:PASS --out /tmp/Infinity-7.1-Uniform-F-signed.apk /tmp/Infinity-7.1-Uniform-F-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-7.1-Uniform-F-signed.apk
+          sha256sum /tmp/Infinity-7.1-Uniform-F-signed.apk > /tmp/Infinity-7.1-Uniform-F.sha256
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-7.1-Uniform-Candidate-F
+          path: |
+            /tmp/Infinity-7.1-Uniform-F-signed.apk
+            /tmp/Infinity-7.1-Uniform-F.sha256
+            /tmp/native-uniform-f.txt
+            /tmp/native-uniform-f.sha256
+          retention-days: 30
