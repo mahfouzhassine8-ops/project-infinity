@@ -125,7 +125,7 @@ def make_changes(apk: zipfile.ZipFile) -> dict[str,bytes]:
     changes[SKIN+'media/infinity/icon.png']=icon
     # This is only a padded rendering of the preserved approved icon, not new artwork.
     from PIL import Image
-    art=Image.open(io.BytesIO(icon)).convert('RGBA');art.thumbnail((660,660),Image.Resampling.LANCZOS)
+    art=Image.open(io.BytesIO(icon)).convert('RGBA');art.thumbnail((660,660),getattr(Image,'Resampling',Image).LANCZOS)
     splash=Image.new('RGB',(1920,1080),(0,0,0))
     splash.paste(art,((1920-art.width)//2,(1080-art.height)//2),art)
     out=io.BytesIO();splash.save(out,'JPEG',quality=95,subsampling=0)
