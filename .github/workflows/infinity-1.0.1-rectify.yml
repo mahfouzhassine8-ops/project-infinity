@@ -1,0 +1,82 @@
+name: Infinity 1.0.1 Rectify
+run-name: 'Infinity 1.0.1 | light theme + portrait readability | golden engine'
+
+on:
+  push:
+    branches: [infinity-android-first]
+    paths:
+      - 'scripts/infinity_1_0_1_rectify.py'
+      - '.github/workflows/infinity-1.0.1-rectify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  rectify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+
+      - name: Require permanent Infinity signing identity
+        shell: bash
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing secret: $name" >&2; exit 2; fi
+          done
+
+      - name: Download frozen RC3 #2 Golden Master unsigned candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-RC3-Unsigned-Candidate
+          path: golden
+          run-id: 34316336433
+          github-token: ${{ github.token }}
+
+      - name: Apply rectified presentation only
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 scripts/infinity_1_0_1_rectify.py \
+            golden/Infinity-Android-First-unsigned.apk \
+            out/Infinity-1.0.1-Rectified-unsigned.apk \
+            out/rectification.json
+
+      - name: Permanently sign and verify
+        shell: bash
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          bash scripts/sign-infinity71.sh out/Infinity-1.0.1-Rectified-unsigned.apk out/Infinity-1.0.1-Rectified.apk
+          grep -q 'Signing mode: stable-secret' out/Infinity-1.0.1-Rectified.signing.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.1-Rectified-Candidate
+          path: out/
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
