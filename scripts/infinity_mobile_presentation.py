@@ -15,7 +15,7 @@ COLOR_TAGS = ('textcolor','focusedcolor','disabledcolor','selectedcolor','shadow
               'colordiffuse','backgroundcolor','texturenofocuscolor','texturefocuscolor')
 EXCLUDED_XML = {'Custom_1199_InfinityVideoLock.xml', 'VideoOSD.xml', 'VideoFullScreen.xml',
                 'FullscreenVideo.xml', 'DialogSeekBar.xml'}
-RECIPE_VERSION = 1
+RECIPE_VERSION = 2
 RESUME = 'assets/addons/resource.language.en_gb/resources/strings.po'
 EXTRA = {SKIN+'xml/Custom_1198_InfinityAppearance.xml', SKIN+'media/infinity/icon.png',
          SKIN+'colors/Infinity Light.xml', SKIN+'colors/Infinity Dark.xml',
@@ -63,11 +63,26 @@ def color_sets(source: bytes) -> dict[str,dict[str,str]]:
     dark=dict(defaults,primary_background='FF14202B',secondary_background='FF1C2933')
     oled=dict(dark,primary_background='FF000000',secondary_background='FF000000',
               dialog_tint='FF080808',background='FF000000',black='FF000000',bg_overlay='00000000')
-    light=dict(defaults,primary_background='FFF4F5F7',secondary_background='FFE5E9EF',
-               dialog_tint='FFF4F5F7',background='FFF4F5F7',black='FFF4F5F7',white='FF101820',
-               grey='FF515B65',blue='FF075985',button_focus='FF9BD4EC',button_alt_focus='809BD4EC',
-               bg_image='FFEEEEEE',bg_overlay='10FFFFFF',text_shadow='00000000',
-               border_alpha='40333B45',disabled='80545B64',selected='FF795400')
+    # Infinity 1.0 light polish: softer cool-white surfaces with deliberately stronger
+    # text/control contrast. Keep the legacy black token surface-safe because Estuary
+    # also uses it as a texture tint; readable text is driven by white/grey/disabled.
+    light=dict(defaults,
+               primary_background='FFF0F4F8',
+               secondary_background='FFE3EAF1',
+               dialog_tint='FFF7F9FC',
+               background='FFF4F7FA',
+               black='FFF4F7FA',
+               white='FF0F172A',
+               grey='FF334155',
+               blue='FF2563EB',
+               button_focus='FFCFE8FF',
+               button_alt_focus='A0CFE8FF',
+               bg_image='FFF8FAFC',
+               bg_overlay='08FFFFFF',
+               text_shadow='18000000',
+               border_alpha='50334155',
+               disabled='B064748B',
+               selected='FF8A5A00')
     return {'light':light,'dark':dark,'oled':oled}
 
 
