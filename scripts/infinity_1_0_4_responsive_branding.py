@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Infinity 1.0.4 responsive-branding trigger revision 3
+# Infinity 1.0.4 responsive-branding trigger revision 4
 from __future__ import annotations
 import argparse, copy
 from pathlib import Path
@@ -95,7 +95,7 @@ def patch_home(data):
             theme = base.DARK if tex.endswith('dark.png') else base.LIGHT
             specs = [
                 (base.PORTRAIT, '0', '-8', '360', '200'),
-                (base.MOBILE_LANDSCAPE, '8', '-4', '330', '170'),
+                (base.MOBILE_LANDSCAPE, '8', '-4', '320', '170'),
                 (base.NON_MOBILE, '12', '-4', '330', '170'),
             ]
             for layout_cond, left, top, width, height in specs:
