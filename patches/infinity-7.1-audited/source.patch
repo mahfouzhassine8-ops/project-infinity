@@ -10,7 +10,7 @@
                    src/XBMCJsonRPC.java
 --- a/tools/android/packaging/xbmc/AndroidManifest.xml.in
 +++ b/tools/android/packaging/xbmc/AndroidManifest.xml.in
-@@ -44,13 +44,13 @@
+@@ -44,17 +44,17 @@
      <application
          android:banner="@drawable/banner"
          android:hasCode="true"
@@ -26,7 +26,12 @@
              android:finishOnTaskLaunch="true"
              android:launchMode="singleInstance"
              android:exported="true"
-@@ -95,7 +95,9 @@
+-            android:screenOrientation="sensorLandscape"
++            android:screenOrientation="unspecified"
+             android:theme="@style/AppTheme">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+@@ -95,11 +95,13 @@
          -->
          <activity
              android:name=".Main"
@@ -37,9 +42,57 @@
              android:finishOnTaskLaunch="true"
              android:launchMode="singleInstance"
              android:exported="true"
+-            android:screenOrientation="sensorLandscape"
++            android:screenOrientation="unspecified"
+             android:theme="@style/AppTheme">
+ 
+             <!-- Tell NativeActivity the name of or .so -->
+--- a/tools/android/packaging/xbmc/build.gradle.in
++++ b/tools/android/packaging/xbmc/build.gradle.in
+@@ -8,8 +8,8 @@
+         applicationId "@APP_PACKAGE@"
+         minSdk @TARGET_MINSDK@
+         targetSdk @TARGET_SDK@
+-        versionCode @APP_VERSION_CODE_ANDROID@
+-        versionName "@APP_VERSION@"
++        versionCode 2103100
++        versionName "21.3-Infinity-Android-First"
+     }
+     signingConfigs {
+         release {
+@@ -24,12 +24,15 @@
+     }
+     buildTypes {
+         debug {
++            debuggable false
+             signingConfig signingConfigs.release
+         }
+         relwithdebinfo {
++            debuggable false
+             signingConfig signingConfigs.release
+         }
+         release {
++            debuggable false
+             signingConfig signingConfigs.release
+         }
+     }
+--- a/tools/android/packaging/xbmc/res/layout/activity_splash.xml
++++ b/tools/android/packaging/xbmc/res/layout/activity_splash.xml
+@@ -10,8 +10,9 @@
+         android:layout_centerHorizontal="true"
+         android:adjustViewBounds="true"
+         android:layout_alignParentTop="true"
+-        android:scaleType="centerCrop"
+-        android:src="@drawable/applaunch_screen" />
++        android:scaleType="fitCenter"
++        android:padding="48dp"
++        android:src="@drawable/project_infinity_icon" />
+ 
+     <RelativeLayout
+         android:layout_width="wrap_content"
 --- /dev/null
 +++ b/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,161 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +package @APP_PACKAGE@;
 +
@@ -55,7 +108,7 @@
 +/** One event-driven adapter. Kodi owns player truth, geometry commits and resume. */
 +final class InfinityCoreBridge implements View.OnLayoutChangeListener
 +{
-+  static final int VERSION = 3;
++  static final int VERSION = 4;
 +  private final Main activity;
 +  private final View view;
 +  private boolean attached;
@@ -80,11 +133,11 @@
 +      return;
 +    }
 +    attached = true;
-+    Log.i("InfinityBridge", "Source-built JNI contract v3 attached");
++    Log.i("InfinityBridge", "Source-built Infinity Controller v4 attached");
 +    supported = Build.VERSION.SDK_INT >= 26 &&
 +        activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
 +    view.addOnLayoutChangeListener(this);
-+    publishWindow();
++    publishWindowSafely();
 +  }
 +
 +  void detach()
@@ -114,18 +167,27 @@
 +                      night == Configuration.UI_MODE_NIGHT_NO ? 1 : 0;
 +    final boolean pip = Build.VERSION.SDK_INT >= 26 && activity.isInPictureInPictureMode();
 +    final boolean multi = Build.VERSION.SDK_INT >= 24 && activity.isInMultiWindowMode();
-+    final int mode = (pip ? 1 : 0) | (multi ? 2 : 0);
++    final boolean television = activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK);
++    final int mode = (pip ? 1 : 0) | (multi ? 2 : 0) | (television ? 8 : 0);
 +    // Preserve Kodi's TV resolution/GUI-limit policy outside PiP and multi-window.
-+    final boolean managed = pip || multi ||
-+        !activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK);
++    final boolean managed = pip || multi || !television;
 +    activity.infinityPublishWindowSnapshot(view.getWidth(), view.getHeight(), theme, mode, managed);
 +    activity._infinitySyncDisplayState();
++    Log.d("InfinityController", "Published window/theme: " + java.util.Arrays.toString(activity._infinityGetState()));
++  }
++
++  private void publishWindowSafely()
++  {
++    try { publishWindow(); }
++    catch (LinkageError | IllegalStateException error) {
++      Log.e("InfinityController", "Window state publication failed", error);
++    }
 +  }
 +
 +  void onWindowChanged()
 +  {
 +    if (!attached) return;
-+    publishWindow();
++    publishWindowSafely();
 +    updatePictureInPictureParams();
 +    // Actual settled dimensions arrive through onLayoutChange; no timers or polling.
 +    view.requestLayout();
@@ -137,7 +199,7 @@
 +  {
 +    if (!attached || (right - left == oldRight - oldLeft && bottom - top == oldBottom - oldTop))
 +      return;
-+    publishWindow();
++    publishWindowSafely();
 +    updatePictureInPictureParams();
 +  }
 +
@@ -166,6 +228,8 @@
 +    if (!attached || !supported || activity.isFinishing() || activity.isDestroyed()) return;
 +    try {
 +      activity.setPictureInPictureParams(params(eligible()));
++    } catch (LinkageError error) {
++      Log.w("InfinityController", "PiP native contract unavailable", error);
 +    } catch (IllegalArgumentException | IllegalStateException | SecurityException error) {
 +      Log.w("InfinityBridge", "PiP parameters rejected by Android", error);
 +    }
@@ -173,12 +237,18 @@
 +
 +  void onUserLeaveHint()
 +  {
-+    if (!eligible() || activity.isInPictureInPictureMode()) return;
++    if (!attached || !supported) return;
++    try { if (!eligible() || activity.isInPictureInPictureMode()) return; }
++    catch (LinkageError | IllegalStateException error) {
++      Log.w("InfinityController", "PiP eligibility unavailable", error); return;
++    }
 +    // Android 12+ receives auto-enter state at playback events, before the Home gesture.
 +    // API 26-30 uses the original explicit lifecycle entry path, with a real player gate.
 +    if (Build.VERSION.SDK_INT >= 31) return;
 +    try {
 +      activity.enterPictureInPictureMode(params(false));
++    } catch (LinkageError error) {
++      Log.w("InfinityController", "PiP native contract unavailable", error);
 +    } catch (IllegalArgumentException | IllegalStateException | SecurityException error) {
 +      Log.w("InfinityBridge", "PiP entry rejected by Android", error);
 +    }
@@ -194,7 +264,7 @@
  import android.content.pm.ResolveInfo;
  import android.graphics.Color;
  import android.graphics.Rect;
-@@ -53,6 +54,23 @@
+@@ -53,6 +54,24 @@
    private ArrayList<DelayedIntent> mDelayedIntents = new ArrayList<DelayedIntent>();
    private boolean mPaused = true;
  
@@ -214,11 +284,12 @@
 +  public native boolean _infinityCanEnterPictureInPicture();
 +  public native float _infinityVideoAspectRatio();
 +  public native int _infinityWindowMode();
++  public native long[] _infinityGetState();
 +
  
    native void _onNewIntent(Intent intent);
  
-@@ -87,22 +105,9 @@
+@@ -87,22 +106,9 @@
  
    public Rect getDisplayRect()
    {
@@ -244,17 +315,17 @@
    }
  
    public void registerMediaButtonEventReceiver()
-@@ -170,6 +175,9 @@
+@@ -169,6 +175,9 @@
+     RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
      mMainView.setElevation(1);  // Always on Top
      mVideoLayout.addView(mMainView, layoutParams);
- 
++
 +    mInfinityBridge = new InfinityCoreBridge(this, mMainView);
 +    mInfinityBridge.attach();
-+
+ 
      if (Build.VERSION.SDK_INT < 30)
      {
-       mDecorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
-@@ -273,6 +281,7 @@
+@@ -273,6 +282,7 @@
      }
      mDelayedIntents.clear();
      mPaused = false;
@@ -262,7 +333,7 @@
    }
  
    @Override
-@@ -300,6 +309,9 @@
+@@ -300,6 +310,9 @@
    @Override
    public void onDestroy()
    {
@@ -272,10 +343,11 @@
      TvUtil.cancelAllScheduledJobs(this);
  
      // unregister the InputDeviceListener implementation
-@@ -324,6 +336,71 @@
+@@ -323,6 +336,71 @@
+     Choreographer.getInstance().postFrameCallback(this);
      _doFrame(frameTimeNanos);
    }
- 
++
 +  @Override
 +  protected void onUserLeaveHint()
 +  {
@@ -334,16 +406,15 @@
 +    mInfinityViewSize = size;
 +    mInfinityManagedSize = managed ? size : 0;
 +    mInfinitySystemTheme = theme;
-+    mInfinityWindowMode = mode;
++    mInfinityWindowMode = mode | (managed ? 4 : 0);
 +  }
 +
 +  public long infinityGetWindowSize() { return mInfinityDestroyed ? 0 : mInfinityManagedSize; }
 +  public int infinityGetSystemThemeMode() { return mInfinitySystemTheme; }
 +  public int infinityGetWindowMode() { return mInfinityWindowMode; }
-+
+ 
    private native void _callNative(long funcAddr, long variantAddr);
  
-   private void runNativeOnUiThread(final long funcAddr, final long variantAddr)
 --- a/tools/android/packaging/xbmc/src/Splash.java.in
 +++ b/tools/android/packaging/xbmc/src/Splash.java.in
 @@ -110,7 +110,7 @@
@@ -390,21 +461,32 @@
  PACKAGE_DESCRIPTION Kodi is an open source (GPL) software media center for playing videos, music, pictures, games, and more.
 --- /dev/null
 +++ b/xbmc/platform/android/activity/InfinityBridgeState.h
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,195 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#pragma once
 +
++#include <array>
 +#include <atomic>
 +#include <cmath>
 +#include <cstdint>
++#include <mutex>
 +
-+// The Android/UI thread publishes events; Kodi's main/render thread consumes them.
-+// This object owns no Android windows, JNIEnv pointers, Views or player objects.
++// No Views, JNIEnv, surface pointers or player objects cross this boundary.
++// UI/native callbacks publish bounded facts. Only the render owner applies work.
 +class CInfinityBridgeState final
 +{
 +public:
-+  static constexpr int VERSION = 3;
++  static constexpr int VERSION = 4;
 +  static constexpr int MAX_DIMENSION = 32768;
++  static constexpr int SNAPSHOT_LENGTH = 16;
++  struct Geometry
++  {
++    uint64_t size{0};
++    uint64_t generation{0};
++    uint64_t sequence{0};
++    int Width() const { return CInfinityBridgeState::Width(size); }
++    int Height() const { return CInfinityBridgeState::Height(size); }
++  };
 +
 +  static uint64_t PackSize(int width, int height)
 +  {
@@ -417,65 +499,163 @@
 +
 +  void SetPlayback(bool hasVideo, bool playing, bool external, float aspect)
 +  {
-+    // One atomic flags word prevents a stale, separately loaded eligibility flag.
 +    unsigned flags = hasVideo ? 1u : 0u;
-+    if (hasVideo && playing && !external)
-+      flags |= 2u;
++    if (hasVideo && playing && !external) flags |= 2u;
++    m_aspect.store(std::isfinite(aspect) && aspect > 0 ? aspect : 16.0f / 9.0f);
 +    m_playback.store(flags);
-+    m_aspect.store(std::isfinite(aspect) && aspect > 0.0f ? aspect : 16.0f / 9.0f);
 +  }
 +  bool HasActiveVideo() const { return (m_playback.load() & 1u) != 0; }
-+  bool CanEnterPictureInPicture() const { return (m_playback.load() & 2u) != 0; }
++  bool CanEnterPictureInPicture() const
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    return m_active && m_engineReady && m_surfaceReady && (m_playback.load() & 2u) != 0;
++  }
 +  float VideoAspectRatio() const { return m_aspect.load(); }
 +
-+  void QueueGeometry(int width, int height)
++  void SetEngineReady(bool ready)
 +  {
-+    const uint64_t size = PackSize(width, height);
-+    if (size == 0)
-+      return; // Never publish transient zero-sized layout or an invalid surface.
-+    m_requested.store(size);
-+    m_pending.store(true);
++    std::lock_guard<std::mutex> lock(m_mutex);
++    m_engineReady = m_active && ready;
 +  }
 +  void SetSurfaceReady(bool ready)
 +  {
-+    m_surfaceReady.store(ready);
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!m_active || ready == m_surfaceReady) return;
++    ++m_generation;
++    m_surfaceReady = ready;
++    m_committed = {};
 +    if (!ready)
-+      m_committed.store(0);
-+    else
-+      m_pending.store(true);
++    {
++      m_requested = {};
++      m_pending = false;
++    }
++    else if (m_requested.size)
++    {
++      // A size published before the first surface can be adopted by that surface.
++      // Destroy invalidates old requests, so this never replays a dead surface's work.
++      m_requested.generation = m_generation;
++      m_pending = true;
++    }
 +  }
-+  bool TakeGeometry(int& width, int& height)
++  void SetConfiguration(int theme, int mode)
 +  {
-+    if (!m_surfaceReady.load() || !m_pending.exchange(false))
-+      return false;
-+    const uint64_t size = m_requested.load();
-+    width = Width(size);
-+    height = Height(size);
-+    return size != 0;
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!m_active) return;
++    const int validTheme = (theme == 1 || theme == 2) ? theme : 0;
++    if (validTheme != m_theme || mode != m_mode)
++    {
++      m_theme = validTheme;
++      m_mode = mode;
++      ++m_themeRevision;
++      m_themePending = true;
++    }
++    const bool managed = (mode & 4) != 0;
++    if (managed != m_managed)
++    {
++      m_managed = managed;
++      ++m_generation;
++      m_requested = {};
++      m_committed = {};
++      m_pending = false;
++    }
 +  }
-+  void QueueDisplayModes() { m_displayModesPending.store(true); }
-+  bool TakeDisplayModes() { return m_displayModesPending.exchange(false); }
-+  void RetryGeometry() { m_pending.store(true); }
-+  void CommitGeometry(int width, int height) { m_committed.store(PackSize(width, height)); }
++  void QueueGeometry(int width, int height)
++  {
++    const uint64_t size = PackSize(width, height);
++    if (!size) return;
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!m_active || !m_managed) return;
++    if (m_requested.size == size && m_requested.generation == m_generation) return;
++    m_requested = {size, m_generation, ++m_sequence};
++    m_pending = true;
++  }
++  bool TakeGeometry(Geometry& request)
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!m_active || !m_engineReady || !m_surfaceReady || !m_managed || !m_pending || !m_requested.size)
++      return false;
++    m_pending = false;
++    request = m_requested;
++    return true;
++  }
++  bool IsCurrent(const Geometry& request) const
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    return Current(request);
++  }
++  bool CommitGeometry(const Geometry& request)
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!Current(request)) return false;
++    m_committed = request;
++    return true;
++  }
++  void RetryGeometry()
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (m_active && m_managed && m_requested.size) m_pending = true;
++  }
 +  int WindowWidth() const
 +  {
-+    const uint64_t size = m_surfaceReady.load() ? m_committed.load() : 0;
-+    return size != 0 ? Width(size) : -1;
++    const auto s = Snapshot();
++    return s[4] && s[9] ? static_cast<int>(s[10]) : -1;
 +  }
 +  int WindowHeight() const
 +  {
-+    const uint64_t size = m_surfaceReady.load() ? m_committed.load() : 0;
-+    return size != 0 ? Height(size) : -1;
++    const auto s = Snapshot();
++    return s[4] && s[9] ? static_cast<int>(s[11]) : -1;
++  }
++  bool TakeTheme(int& theme, int& mode, uint64_t& revision)
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!m_active || !m_engineReady || !m_themePending) return false;
++    theme = m_theme; mode = m_mode; revision = m_themeRevision;
++    m_themePending = false;
++    return true;
++  }
++  void RetryTheme()
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (m_active) m_themePending = true;
++  }
++  void QueueDisplayModes() { m_displayModesPending.store(true); }
++  bool TakeDisplayModes() { return m_displayModesPending.exchange(false); }
++  void Shutdown()
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    m_active = m_engineReady = m_surfaceReady = m_pending = m_themePending = false;
++    ++m_generation;
++    m_requested = {}; m_committed = {};
++    m_playback.store(0);
++    m_displayModesPending.store(false);
++  }
++  // ABI v4: version, capabilities, active, engineReady, surfaceReady, generation,
++  // requestedSeq/W/H, committedSeq/W/H, systemTheme, themeRevision, mode, managed.
++  std::array<int64_t, SNAPSHOT_LENGTH> Snapshot() const
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    return {{VERSION, 15, m_active, m_engineReady, m_surfaceReady,
++             static_cast<int64_t>(m_generation), static_cast<int64_t>(m_requested.sequence),
++             Width(m_requested.size), Height(m_requested.size),
++             static_cast<int64_t>(m_committed.sequence), Width(m_committed.size), Height(m_committed.size),
++             m_theme, static_cast<int64_t>(m_themeRevision), m_mode, m_managed}};
 +  }
 +
 +private:
++  bool Current(const Geometry& request) const
++  {
++    return m_active && m_engineReady && m_surfaceReady && m_managed && request.size &&
++           request.generation == m_generation && request.sequence == m_requested.sequence;
++  }
++  mutable std::mutex m_mutex;
 +  std::atomic<unsigned> m_playback{0};
 +  std::atomic<float> m_aspect{16.0f / 9.0f};
-+  std::atomic<uint64_t> m_requested{0};
-+  std::atomic<uint64_t> m_committed{0};
-+  std::atomic<bool> m_pending{false};
-+  std::atomic<bool> m_surfaceReady{false};
 +  std::atomic<bool> m_displayModesPending{false};
++  Geometry m_requested{}, m_committed{};
++  uint64_t m_generation{0}, m_sequence{0}, m_themeRevision{0};
++  bool m_active{true}, m_engineReady{false}, m_surfaceReady{false}, m_managed{false};
++  bool m_pending{false}, m_themePending{true};
++  int m_theme{0}, m_mode{0};
 +};
 --- a/xbmc/platform/android/activity/JNIMainActivity.cpp
 +++ b/xbmc/platform/android/activity/JNIMainActivity.cpp
@@ -490,7 +670,7 @@
  
  #include <androidjni/Activity.h>
  #include <androidjni/Intent.h>
-@@ -49,6 +53,24 @@
+@@ -49,6 +53,26 @@
          {"_callNative", "(JJ)V", reinterpret_cast<void*>(&CJNIMainActivity::_callNative)},
          {"_onVisibleBehindCanceled", "()V",
           reinterpret_cast<void*>(&CJNIMainActivity::_onVisibleBehindCanceled)},
@@ -512,10 +692,12 @@
 +         reinterpret_cast<void*>(&CJNIMainActivity::_infinityVideoAspectRatio)},
 +        {"_infinityWindowMode", "()I",
 +         reinterpret_cast<void*>(&CJNIMainActivity::_infinityWindowMode)},
++        {"_infinityGetState", "()[J",
++         reinterpret_cast<void*>(&CJNIMainActivity::_infinityGetState)},
      };
      env->RegisterNatives(cMain, methods, sizeof(methods) / sizeof(methods[0]));
    }
-@@ -99,6 +121,116 @@
+@@ -99,6 +123,141 @@
    ((void (*)(CVariant *))funcAddr)((CVariant *)variantAddr);
  }
  
@@ -609,6 +791,31 @@
 +  return InfinityReadIntSnapshot(env, context, "infinityGetWindowMode");
 +}
 +
++jlongArray CJNIMainActivity::_infinityGetState(JNIEnv* env, jobject context)
++{
++  (void)context;
++  if (!env) return nullptr;
++  const auto snapshot = m_appInstance ? m_appInstance->infinityGetState() : std::array<int64_t, 16>{};
++  jlong values[16];
++  for (size_t i = 0; i < 16; ++i) values[i] = static_cast<jlong>(snapshot[i]);
++  jlongArray result = env->NewLongArray(16);
++  if (!result) return nullptr; // Preserve JVM OOM for the caller; no further JNI calls.
++  env->SetLongArrayRegion(result, 0, 16, values);
++  return result;
++}
++
++int CJNIMainActivity::infinityGetSystemTheme() const
++{
++  const jint value = call_method<jint>(m_context, "infinityGetSystemThemeMode", "()I");
++  return InfinityClearException(xbmc_jnienv()) ? 0 : value;
++}
++
++int CJNIMainActivity::infinityGetModeSnapshot() const
++{
++  const jint value = call_method<jint>(m_context, "infinityGetWindowMode", "()I");
++  return InfinityClearException(xbmc_jnienv()) ? 0 : value;
++}
++
 +void CJNIMainActivity::infinityNotifyPlaybackChanged()
 +{
 +  call_method<void>(m_context, "infinityOnPlaybackStateChanged", "()V");
@@ -634,20 +841,21 @@
    (void)env;
 --- a/xbmc/platform/android/activity/JNIMainActivity.h
 +++ b/xbmc/platform/android/activity/JNIMainActivity.h
-@@ -8,6 +8,8 @@
+@@ -7,6 +7,9 @@
+  */
  
  #pragma once
- 
-+#include <cstdint>
 +
++#include <cstdint>
++#include <array>
+ 
  #include <androidjni/Activity.h>
  #include <androidjni/InputManager.h>
- #include <androidjni/Rect.h>
-@@ -34,6 +36,20 @@
+@@ -34,6 +37,23 @@
    static void _onInputDeviceRemoved(JNIEnv *env, jobject context, jint deviceId);
    static void _onVisibleBehindCanceled(JNIEnv *env, jobject context);
  
-+  // Infinity v3: source-built Java/JNI contract.
++  // Infinity v4: matched source-built Java/JNI contract.
 +  static jboolean _infinityHasActiveVideo(JNIEnv* env, jobject context);
 +  static void _infinitySyncDisplayState(JNIEnv* env, jobject context);
 +  static jint _infinitySystemThemeMode(JNIEnv* env, jobject context);
@@ -657,6 +865,9 @@
 +  static jboolean _infinityCanEnterPictureInPicture(JNIEnv* env, jobject context);
 +  static jfloat _infinityVideoAspectRatio(JNIEnv* env, jobject context);
 +  static jint _infinityWindowMode(JNIEnv* env, jobject context);
++  static jlongArray _infinityGetState(JNIEnv* env, jobject context);
++  int infinityGetSystemTheme() const;
++  int infinityGetModeSnapshot() const;
 +  void infinityNotifyPlaybackChanged();
 +  uint64_t infinityGetWindowSize() const;
 +  bool infinityIsPictureInPicture() const;
@@ -664,11 +875,12 @@
    static void _callNative(JNIEnv *env, jobject context, jlong funcAddr, jlong variantAddr);
    static void runNativeOnUiThread(void (*callback)(void*), void* variant);
    static void registerMediaButtonEventReceiver();
-@@ -54,6 +70,13 @@
+@@ -54,6 +74,14 @@
    virtual void onDisplayAdded(int displayId)=0;
    virtual void onDisplayChanged(int displayId)=0;
    virtual void onDisplayRemoved(int displayId)=0;
 +
++  virtual std::array<int64_t, 16> infinityGetState() const = 0;
 +  virtual bool infinityHasActiveVideo() const = 0;
 +  virtual void infinitySyncDisplayStateFromBridge() = 0;
 +  virtual int infinityWindowWidth() const = 0;
@@ -712,17 +924,16 @@
        {
          CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_ACTION, WINDOW_INVALID, -1,
                                                     static_cast<void*>(new CAction(ACTION_PAUSE)));
-@@ -404,6 +413,9 @@
+@@ -404,6 +413,8 @@
  {
    android_printf("%s", __PRETTY_FUNCTION__);
  
-+  m_infinity.SetPlayback(false, false, false, 16.0f / 9.0f);
-+  m_infinity.SetSurfaceReady(false);
++  m_infinity.Shutdown();
 +
    unregisterReceiver(*this);
  
    UnregisterDisplayListener();
-@@ -418,10 +430,43 @@
+@@ -418,10 +429,45 @@
    // no need to save anything as XBMC is running in its own thread
  }
  
@@ -730,6 +941,8 @@
 +{
 +  if (m_exiting)
 +    return;
++  // Theme and mode facts are independent from settled geometry.
++  m_infinity.SetConfiguration(infinityGetSystemTheme(), infinityGetModeSnapshot());
 +  // Read an immutable size snapshot, not Android Views or physical display modes.
 +  const uint64_t size = infinityGetWindowSize();
 +  m_infinity.QueueGeometry(CInfinityBridgeState::Width(size), CInfinityBridgeState::Height(size));
@@ -767,7 +980,7 @@
  }
  
  void CXBMCApp::onLowMemory()
-@@ -438,8 +483,8 @@
+@@ -438,8 +484,8 @@
  void CXBMCApp::onResizeWindow()
  {
    android_printf("%s: ", __PRETTY_FUNCTION__);
@@ -778,7 +991,7 @@
  }
  
  void CXBMCApp::onDestroyWindow()
-@@ -1838,10 +1883,8 @@
+@@ -1838,10 +1884,8 @@
      // Display mode has beed changed during app startup; we want to reset audio engine on next ACTION_HDMI_AUDIO_PLUG event
      m_aeReset = true;
  
@@ -791,7 +1004,7 @@
  
    m_displayChangeEvent.Set();
    m_inputHandler.setDPI(GetDPI());
-@@ -1855,7 +1898,9 @@
+@@ -1855,7 +1899,9 @@
  
  void CXBMCApp::surfaceChanged(CJNISurfaceHolder holder, int format, int width, int height)
  {
@@ -802,7 +1015,7 @@
  }
  
  void CXBMCApp::surfaceCreated(CJNISurfaceHolder holder)
-@@ -1869,6 +1914,8 @@
+@@ -1869,6 +1915,8 @@
      return;
    }
  
@@ -811,7 +1024,7 @@
    if (!m_firstrun)
      XBMC_SetupDisplay();
  
-@@ -1880,6 +1927,7 @@
+@@ -1880,6 +1928,7 @@
  void CXBMCApp::surfaceDestroyed(CJNISurfaceHolder holder)
  {
    android_printf("%s: ", __PRETTY_FUNCTION__);
@@ -829,10 +1042,11 @@
  #include "JNIMainActivity.h"
  #include "JNIXBMCAudioManagerOnAudioFocusChangeListener.h"
  #include "JNIXBMCDisplayManagerDisplayListener.h"
-@@ -156,6 +157,15 @@
+@@ -155,6 +156,16 @@
+   int GetBatteryLevel() const;
    void KeepScreenOn(bool on);
    bool HasFocus() const { return m_hasFocus; }
- 
++
 +  // Atomically published playback facts and render-thread geometry contract.
 +  bool infinityHasActiveVideo() const override { return m_infinity.HasActiveVideo(); }
 +  bool infinityCanEnterPictureInPicture() const override { return m_infinity.CanEnterPictureInPicture(); }
@@ -841,11 +1055,11 @@
 +  int infinityWindowHeight() const override { return m_infinity.WindowHeight(); }
 +  void infinitySyncDisplayStateFromBridge() override;
 +  CInfinityBridgeState& InfinityState() { return m_infinity; }
-+
++  std::array<int64_t, 16> infinityGetState() const override { return m_infinity.Snapshot(); }
+ 
    static bool StartActivity(const std::string& package,
                              const std::string& intent = std::string(),
-                             const std::string& dataType = std::string(),
-@@ -280,6 +290,10 @@
+@@ -280,6 +291,10 @@
  
    std::unique_ptr<CJNIActivityManager> m_activityManager;
  
@@ -858,17 +1072,20 @@
  
 --- a/xbmc/windowing/android/WinSystemAndroid.cpp
 +++ b/xbmc/windowing/android/WinSystemAndroid.cpp
-@@ -10,6 +10,9 @@
+@@ -10,6 +10,12 @@
  
  #include "OSScreenSaverAndroid.h"
  #include "ServiceBroker.h"
 +#include "application/Application.h"
 +#include "guilib/GUIComponent.h"
 +#include "guilib/GUIWindowManager.h"
++#include "guilib/GUIWindow.h"
++#include "guilib/WindowIDs.h"
++#include "utils/Variant.h"
  #include "WinEventsAndroid.h"
  #include "addons/interfaces/platform/android/System.h"
  #include "cores/RetroPlayer/process/android/RPProcessInfoAndroid.h"
-@@ -128,6 +131,7 @@
+@@ -128,6 +134,7 @@
    }
  
    m_android->SetNativeResolution(res);
@@ -876,7 +1093,15 @@
  
    m_bWindowCreated = true;
    return true;
-@@ -302,7 +306,73 @@
+@@ -136,6 +143,7 @@
+ bool CWinSystemAndroid::DestroyWindow()
+ {
+   CLog::Log(LOGINFO, "CWinSystemAndroid::{}", __FUNCTION__);
++  CXBMCApp::Get().InfinityState().SetEngineReady(false);
+   m_nativeWindow.reset();
+   m_bWindowCreated = false;
+   return true;
+@@ -302,7 +310,102 @@
  
  bool CWinSystemAndroid::MessagePump()
  {
@@ -889,6 +1114,26 @@
 +void CWinSystemAndroid::ApplyInfinityGeometry()
 +{
 +  auto& state = CXBMCApp::Get().InfinityState();
++  auto* gui = CServiceBroker::GetGUI();
++  state.SetEngineReady(g_application.IsInitialized() && gui && m_android && m_bWindowCreated && m_nativeWindow);
++  int theme = 0, mode = 0;
++  uint64_t themeRevision = 0;
++  if (state.TakeTheme(theme, mode, themeRevision))
++  {
++    auto* home = gui ? gui->GetWindowManager().GetWindow(WINDOW_HOME) : nullptr;
++    if (home)
++    {
++      // Dynamic skin variables consume this property. No skin reload, display-mode
++      // enumeration or playback reset is requested for a color-only change.
++      home->SetProperty("Infinity.SystemTheme", theme == 2 ? "dark" : theme == 1 ? "light" : "unknown");
++      home->SetProperty("Infinity.DeviceMode", (mode & 8) ? "tv" : "mobile");
++      home->SetProperty("Infinity.BridgeVersion", CInfinityBridgeState::VERSION);
++      home->SetProperty("Infinity.ThemeRevision", static_cast<int64_t>(themeRevision));
++      gui->GetWindowManager().MarkDirty();
++      CLog::Log(LOGINFO, "Infinity theme fact applied: mode={} revision={} (no geometry reset)", theme, themeRevision);
++    }
++    else state.RetryTheme();
++  }
 +  if (state.TakeDisplayModes())
 +  {
 +    if (g_application.IsInitialized() && m_android && m_bWindowCreated)
@@ -899,11 +1144,10 @@
 +    else
 +      state.QueueDisplayModes();
 +  }
-+  int width = 0;
-+  int height = 0;
-+  if (!state.TakeGeometry(width, height))
-+    return;
-+  auto* gui = CServiceBroker::GetGUI();
++  CInfinityBridgeState::Geometry request;
++  if (!state.TakeGeometry(request)) return;
++  const int width = request.Width();
++  const int height = request.Height();
 +  if (!g_application.IsInitialized() || !gui || !m_bWindowCreated || !m_nativeWindow)
 +  {
 +    state.RetryGeometry();
@@ -922,10 +1166,11 @@
 +      CDisplaySettings::GetInstance().GetResolutionInfo(active).iWidth == width &&
 +      CDisplaySettings::GetInstance().GetResolutionInfo(active).iHeight == height)
 +  {
-+    state.CommitGeometry(width, height);
++    state.CommitGeometry(request);
 +    return;
 +  }
 +
++  if (!state.IsCurrent(request)) return; // An intervening surface/mode/size event superseded it.
 +  // This runs in Kodi's main/render loop, not in Android's UI callbacks.
 +  // Preserve EGL/surface ownership and the physical display mode/refresh-rate identity.
 +  if (!m_nativeWindow->SetBuffersGeometry(width, height, 0) ||
@@ -946,8 +1191,17 @@
 +  // Keep the active resolution enum: do not turn Android fullscreen into RES_WINDOW.
 +  graphics.ApplyModeChange(active);
 +  gui->GetWindowManager().MarkDirty();
-+  state.CommitGeometry(width, height);
-+  CLog::Log(LOGINFO, "Infinity geometry committed: {}x{} (bridge v3)", width, height);
++  if (state.CommitGeometry(request))
++  {
++    if (auto* home = gui->GetWindowManager().GetWindow(WINDOW_HOME))
++    {
++      home->SetProperty("Infinity.CommittedWidth", width);
++      home->SetProperty("Infinity.CommittedHeight", height);
++      home->SetProperty("Infinity.GeometrySequence", static_cast<int64_t>(request.sequence));
++    }
++    CLog::Log(LOGINFO, "Infinity geometry committed: {}x{} generation={} sequence={} (bridge v4)",
++              width, height, request.generation, request.sequence);
++  }
  }
  
  bool CWinSystemAndroid::IsHDRDisplay()

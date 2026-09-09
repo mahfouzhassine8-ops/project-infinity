@@ -87,7 +87,7 @@ def prepare_source(source: Path) -> None:
     for name, h in spec['files'].items():
         if sha((source/name).read_bytes()) != h['after']:
             raise ValueError('Postimage mismatch: ' + name)
-    print('Applied the exact Kodi 21.3 / Infinity bridge v3 source set.')
+    print('Applied the exact Kodi 21.3 / Infinity Android-first v4 source set.')
 
 
 def uleb(data: bytes, pos: int) -> tuple[int, int]:

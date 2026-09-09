@@ -16,8 +16,8 @@ class SourceTests(unittest.TestCase):
         for name,h in self.spec['files'].items():self.assertEqual(m.sha((self.source/name).read_bytes()),h['after'],name)
     def test_java_and_jni_declarations_match(self):
         java=self.text('tools/android/packaging/xbmc/src/Main.java.in')
-        conv={'boolean':'Z','int':'I','float':'F','void':'V'}
-        actual={name:'()'+conv[typ] for typ,name in re.findall(r'public native (\w+) (_infinity\w+)\(\);',java)}
+        conv={'boolean':'Z','int':'I','float':'F','void':'V','long[]':'[J'}
+        actual={name:'()'+conv[typ] for typ,name in re.findall(r'public native (\w+(?:\[\])?) (_infinity\w+)\(\);',java)}
         self.assertEqual(actual,self.spec['jni'])
         cpp=self.text('xbmc/platform/android/activity/JNIMainActivity.cpp')
         registered=dict(re.findall(r'\{"(_infinity\w+)", "([^"\n]+)"',cpp))
@@ -41,7 +41,7 @@ class SourceTests(unittest.TestCase):
         self.assertIn('m_infinity.QueueDisplayModes()',display)
         win=self.text('xbmc/windowing/android/WinSystemAndroid.cpp')
         self.assertIn('graphics.ApplyModeChange(active);',win)
-        self.assertIn('state.CommitGeometry(width, height)',win)
+        self.assertIn('state.CommitGeometry(request)',win)
     def test_modern_pip_does_not_bypass_native_activity(self):
         cpp=self.text('xbmc/platform/android/activity/XBMCApp.cpp')
         self.assertIn('!m_hasReqVisible && !infinityIsPictureInPicture()',cpp)

@@ -1,0 +1,254 @@
+name: Infinity Android-first Foundation
+run-name: 'Infinity Android-first | matched hook + appearance | device acceptance pending'
+on:
+  workflow_dispatch:
+    inputs:
+      engine_run:
+        description: 'Optional successful run ID containing this exact engine; skip native rebuild'
+        required: false
+        type: string
+  push:
+    branches: [infinity-android-first]
+    paths:
+      - '.github/workflows/build-infinity-android-first.yml'
+      - 'patches/infinity-7.1-audited/**'
+      - 'scripts/infinity71*.py'
+      - 'scripts/infinity_mobile*.py'
+      - 'scripts/validate-infinity71-java.py'
+      - 'scripts/sign-infinity-mobile.sh'
+      - 'tests/infinity71/**'
+      - 'tests/infinity71_packaging/**'
+      - 'assets/infinity-7.1/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-android-first-foundation
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+      - name: Check matched source, real Java and DEX, state, packaging and signing regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-pil
+          mkdir -p checks/dex results
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out checks/java
+          "$ANDROID_HOME/build-tools/34.0.0/d8" --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 --output checks/dex checks/java/compile-check.jar
+          export INFINITY_KODI_SOURCE="$PWD/kodi"
+          export INFINITY_TEST_DEX="$PWD/checks/dex/classes.dex"
+          export INFINITY_ANDROID_JAR="$ANDROID_HOME/platforms/android-34/android.jar"
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp -o checks/bridge-state-tests
+          checks/bridge-state-tests | tee results/native-state.txt
+          python3 tests/infinity71/test_contract.py 2>&1 | tee results/contract.txt
+          python3 tests/infinity71_packaging/test_followup.py 2>&1 | tee results/packaging-regressions.txt
+          python3 tests/infinity71/test_mobile_presentation.py 2>&1 | tee results/mobile-presentation.txt
+          python3 tests/infinity71/test_mobile_signing.py 2>&1 | tee results/mobile-signing.txt
+          python3 tests/infinity71/test_mobile_package_check.py 2>&1 | tee results/package-metadata.txt
+          bash -n scripts/sign-infinity-mobile.sh
+          echo 'Preflight uses disposable non-installable signing fixtures only; no production credentials. Device acceptance remains pending.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Android-First-Preflight
+          path: results/
+          if-no-files-found: warn
+          retention-days: 30
+  engine:
+    needs: preflight
+    if: ${{ !inputs.engine_run }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Prepare pinned toolchain and internal base-package prerequisite
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Internal Build Only,O=Project Infinity,C=US'
+          fi
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-android-first-deps-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json') }}
+          restore-keys: |
+            infinity-android-first-deps-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-
+      - name: Configure exact native dependencies
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+      - name: Compile every changed native translation unit before the full engine
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+      - name: Build matched native stack and record reusable engine
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-Android-First-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine --apk engine/Infinity-Android-First-Engine-Base.apk --output engine/engine.json --source-commit "$GITHUB_SHA"
+          python3 scripts/infinity_mobile_package_check.py --apk engine/Infinity-Android-First-Engine-Base.apk --report engine/package-check.json
+          printf '%s\n' 'INTERNAL ENGINE INPUT, not a user release. Internal signing is not an update identity. 4 KB ARM64 baseline; 16 KB and TV acceptance not established. Device testing pending. Never install this artifact as a replacement.' > engine/README.txt
+      - name: Preserve engine before presentation or release signing
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Android-First-Engine
+          path: engine/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+  presentation:
+    needs: [preflight, engine]
+    if: ${{ always() && !cancelled() && needs.preflight.result == 'success' && (needs.engine.result == 'success' || needs.engine.result == 'skipped') }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Android-First-Engine
+          path: engine
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.engine_run || github.run_id }}
+      - name: Build Infinity appearance over the exact verified engine
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-pil
+          mkdir -p candidate
+          python3 scripts/infinity_mobile_presentation.py build --apk engine/Infinity-Android-First-Engine-Base.apk --manifest engine/engine.json --output candidate/Infinity-Android-First-unsigned.apk --receipt candidate/presentation.json
+          python3 scripts/infinity_mobile_package_check.py --apk candidate/Infinity-Android-First-unsigned.apk --report candidate/package-check.json
+          cp engine/engine.json candidate/engine.json
+          printf '%s\n' 'UNSIGNED: not installable. Dark/light/OLED, Fold, PiP and original lock require device acceptance. Profile-installed tools are not automatically reconstructed. Do not uninstall an existing app.' > candidate/README.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Android-First-Unsigned-Candidate
+          path: candidate/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Require a retained and pinned signing identity
+        id: signing
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_SIGNER_SHA256: ${{ secrets.INFINITY_SIGNER_SHA256 }}
+        run: |
+          set -euo pipefail
+          mkdir -p signing
+          python3 - <<'PYCODE'
+          import json, os
+          from pathlib import Path
+          names = ['INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS','INFINITY_SIGNER_SHA256']
+          complete = all(os.environ.get(n) for n in names)
+          partial = any(os.environ.get(n) for n in names) and not complete
+          status = 'credentials-present-verification-required' if complete else 'blocked-persistent-signing-not-configured'
+          Path('signing/status.json').write_text(json.dumps({'status':status,'signed':False,'device_accepted':False})+'\n')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write('configured='+str(complete).lower()+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+              f.write('## Infinity Android-first\nEngine and appearance integrity passed; device acceptance is pending.\n\nSigning: **'+status+'**. No disposable release key will be created.\n')
+          if partial: raise SystemExit('Incomplete signing configuration; refusing fallback identity.')
+          PYCODE
+          if [ -n "${INFINITY_KEYSTORE_B64:-}" ]; then
+            bash scripts/sign-infinity-mobile.sh candidate/Infinity-Android-First-unsigned.apk signing/Infinity-Android-First.apk
+            python3 scripts/infinity_mobile_presentation.py verify --apk signing/Infinity-Android-First.apk --manifest engine/engine.json --receipt candidate/presentation.json
+            python3 - <<'PYCODE'
+          import json
+          from pathlib import Path
+          Path('signing/status.json').write_text(json.dumps({'status':'signed-with-pinned-owner-key','signed':True,'device_accepted':False,'update_compatibility_with_installed_fixed6':'not_established'})+'\n')
+          PYCODE
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Android-First-Signing-Status
+          path: signing/status.json
+          retention-days: 30
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v7
+        if: success() && steps.signing.outputs.configured == 'true'
+        with:
+          name: Infinity-Android-First-Signed-Test-Candidate
+          path: |
+            signing/Infinity-Android-First.apk
+            signing/Infinity-Android-First.sha256
+            signing/Infinity-Android-First.signing.txt
+            signing/status.json
+            candidate/presentation.json
+            engine/engine.json
+          retention-days: 30
+          if-no-files-found: error

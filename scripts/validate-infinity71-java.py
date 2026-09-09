@@ -43,4 +43,4 @@ expected=json.loads((Path(__file__).resolve().parents[1]/'patches/infinity-7.1-a
 if actual != expected: raise SystemExit('Compiled Java descriptors differ: '+repr(actual))
 with zipfile.ZipFile(a.out/'compile-check.jar','w') as z:
  for f in classes.rglob('*.class'):z.write(f,f.relative_to(classes).as_posix())
-print('PASS: real Android API 34 compile; all nine compiled Main JNI descriptors match the native contract.')
+print('PASS: real Android API 34 compile; all compiled Main JNI descriptors match the native contract.')
