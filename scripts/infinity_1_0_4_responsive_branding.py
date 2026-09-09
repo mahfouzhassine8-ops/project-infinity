@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Infinity 1.0.4 responsive-branding trigger revision 2
+# Infinity 1.0.4 responsive-branding trigger revision 3
 from __future__ import annotations
 import argparse, copy
 from pathlib import Path
@@ -86,7 +86,8 @@ def patch_home(data):
                 brand_controls.append((c, tex))
         if not brand_controls:
             continue
-        insert_at = min(parent.index(c) for c, _ in brand_controls)
+        siblings = list(parent)
+        insert_at = min(siblings.index(c) for c, _ in brand_controls)
         for c, _ in brand_controls:
             parent.remove(c)
         new_controls = []
