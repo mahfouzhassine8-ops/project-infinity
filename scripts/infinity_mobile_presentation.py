@@ -15,11 +15,12 @@ COLOR_TAGS = ('textcolor','focusedcolor','disabledcolor','selectedcolor','shadow
               'colordiffuse','backgroundcolor','texturenofocuscolor','texturefocuscolor')
 EXCLUDED_XML = {'Custom_1199_InfinityVideoLock.xml', 'VideoOSD.xml', 'VideoFullScreen.xml',
                 'FullscreenVideo.xml', 'DialogSeekBar.xml'}
-RECIPE_VERSION = 2
+RECIPE_VERSION = 3
 RESUME = 'assets/addons/resource.language.en_gb/resources/strings.po'
 EXTRA = {SKIN+'xml/Custom_1198_InfinityAppearance.xml', SKIN+'media/infinity/icon.png',
          SKIN+'colors/Infinity Light.xml', SKIN+'colors/Infinity Dark.xml',
          SKIN+'colors/Infinity OLED.xml', 'assets/media/splash.jpg', RESUME}
+PORTRAIT_MOBILE = 'Integer.IsLess(System.ScreenWidth,System.ScreenHeight) + String.IsEqual(Window(Home).Property(Infinity.DeviceMode),mobile)'
 
 
 def allowed(name: str) -> bool:
@@ -63,9 +64,6 @@ def color_sets(source: bytes) -> dict[str,dict[str,str]]:
     dark=dict(defaults,primary_background='FF14202B',secondary_background='FF1C2933')
     oled=dict(dark,primary_background='FF000000',secondary_background='FF000000',
               dialog_tint='FF080808',background='FF000000',black='FF000000',bg_overlay='00000000')
-    # Infinity 1.0 light polish: softer cool-white surfaces with deliberately stronger
-    # text/control contrast. Keep the legacy black token surface-safe because Estuary
-    # also uses it as a texture tint; readable text is driven by white/grey/disabled.
     light=dict(defaults,
                primary_background='FFF0F4F8',
                secondary_background='FFE3EAF1',
@@ -100,6 +98,29 @@ def variables(palettes: dict[str,dict[str,str]]) -> str:
     return '\n'.join(nodes)
 
 
+def add_portrait_scaling(name: str, xml: str) -> str:
+    """Enlarge only the front/narrow portrait Home UI; inner/landscape stays unchanged."""
+    if name.endswith('/Home.xml'):
+        marker='<control type="fixedlist" id="9000">'
+        zoom=f'<animation effect="zoom" center="231,540" start="100" end="114" time="0" condition="{PORTRAIT_MOBILE}">Conditional</animation>'
+        if marker not in xml:
+            raise ValueError('Missing Home menu portrait scaling insertion point')
+        xml=xml.replace(marker, marker+zoom, 1)
+    elif name.endswith('/Includes_Home.xml'):
+        anchor='<include name="ImageWidget">'
+        if anchor not in xml:
+            raise ValueError('Missing ImageWidget portrait scaling include')
+        start=xml.index(anchor)
+        marker='<control type="group" id="$PARAM[button_id]889">'
+        pos=xml.find(marker,start)
+        if pos < 0:
+            raise ValueError('Missing ImageWidget group portrait scaling insertion point')
+        zoom=f'<animation effect="zoom" center="960,540" start="100" end="116" time="0" condition="{PORTRAIT_MOBILE}">Conditional</animation>'
+        pos += len(marker)
+        xml=xml[:pos]+zoom+xml[pos:]
+    return xml
+
+
 def make_changes(apk: zipfile.ZipFile) -> dict[str,bytes]:
     changes={}
     palettes=color_sets(apk.read(SKIN+'colors/defaults.xml'))
@@ -121,6 +142,7 @@ def make_changes(apk: zipfile.ZipFile) -> dict[str,bytes]:
             after=after.replace('</includes>',variables(palettes)+'\n</includes>')
         if name.endswith('/Home.xml'):
             after=after.replace('special://xbmc/media/vendor_logo.png','infinity/icon.png')
+        after=add_portrait_scaling(name,after)
         if name.endswith('/SkinSettings.xml'):
             marker='<control type="radiobutton" id="701">'
             if after.count(marker)!=1: raise ValueError('Missing exact skin settings insertion point')
@@ -138,7 +160,6 @@ def make_changes(apk: zipfile.ZipFile) -> dict[str,bytes]:
     changes[SKIN+'xml/Custom_1198_InfinityAppearance.xml']=appearance_dialog()
     icon=(engine.ASSETS/'project_infinity_icon.png').read_bytes()
     changes[SKIN+'media/infinity/icon.png']=icon
-    # This is only a padded rendering of the preserved approved icon, not new artwork.
     from PIL import Image
     art=Image.open(io.BytesIO(icon)).convert('RGBA');art.thumbnail((660,660),getattr(Image,'Resampling',Image).LANCZOS)
     splash=Image.new('RGB',(1920,1080),(0,0,0))
@@ -147,7 +168,6 @@ def make_changes(apk: zipfile.ZipFile) -> dict[str,bytes]:
     changes['assets/media/splash.jpg']=out.getvalue()
     if RESUME in apk.namelist():
         text=apk.read(RESUME).decode('utf-8')
-        # Exact localization IDs only; no native symbols, databases or add-on code.
         for number,value in [(12021,'Start Over'),(12022,'Continue from {0:s}')]:
             pattern=r'(msgctxt "#'+str(number)+r'"\n)msgid "[^"\n]*"'
             text,count=re.subn(pattern,lambda m:m[1]+'msgid "'+value+'"',text)
@@ -200,10 +220,14 @@ def verify(apk: Path, manifest: Path, receipt: Path) -> None:
         settings=z.read(SKIN+'xml/SkinSettings.xml').decode()
         if settings.count('id="7190"')!=1 or 'ActivateWindow(1198)' not in settings:
             raise ValueError('Missing appearance settings connection')
+        home=z.read(SKIN+'xml/Home.xml').decode()
+        ihome=z.read(SKIN+'xml/Includes_Home.xml').decode()
+        if PORTRAIT_MOBILE not in home or PORTRAIT_MOBILE not in ihome:
+            raise ValueError('Missing front-display portrait scaling rules')
         for name in (SKIN+'xml/Variables.xml',SKIN+'xml/Custom_1198_InfinityAppearance.xml'):
             if name not in actual:raise ValueError('Missing theme consumer')
     engine.check_apk_contract(apk)
-    print('PASS: Infinity branding/themes/lock with every native library, DEX and binary manifest protected. Device acceptance pending.')
+    print('PASS: Infinity 1.0 themes + front-display portrait scaling with native engine protected. Device acceptance pending.')
 
 
 def main() -> None:
