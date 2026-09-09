@@ -1,0 +1,152 @@
+name: Infinity Android-first RC3
+run-name: 'Infinity Android-first RC3 | real full CMake graph | no speculative target mapping'
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/build-infinity-android-first-rc3.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-android-first-rc3
+  cancel-in-progress: false
+jobs:
+  engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Prepare exact pinned source and toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm python3-pil
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Internal Build Only,O=Project Infinity,C=US'
+          fi
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out java-check
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-android-first-rc3-deps-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json') }}
+          restore-keys: |
+            infinity-android-first-deps-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-
+      - name: Configure dependencies through Kodi's supported graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+      - name: Build complete matched engine using the real target graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          # RC1/RC2 failed because a custom syntax gate bypassed prerequisites.
+          # The repaired canonical gate then made one wrong assumption: XBMCApp.cpp
+          # is owned by CMakeFiles/kodi.dir, not platform_android_activity. Do not
+          # invent another partial target map. The full Kodi target graph is the
+          # authoritative compiler/linker test and naturally builds its prerequisites.
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-Android-First-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine --apk engine/Infinity-Android-First-Engine-Base.apk --output engine/engine.json --source-commit "$GITHUB_SHA"
+          python3 scripts/infinity_mobile_package_check.py --apk engine/Infinity-Android-First-Engine-Base.apk --report engine/package-check.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC3-Engine
+          path: engine/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+  presentation:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-RC3-Engine
+          path: engine
+      - name: Build and verify Infinity presentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-pil
+          mkdir -p candidate signing
+          python3 scripts/infinity_mobile_presentation.py build --apk engine/Infinity-Android-First-Engine-Base.apk --manifest engine/engine.json --output candidate/Infinity-Android-First-unsigned.apk --receipt candidate/presentation.json
+          python3 scripts/infinity_mobile_package_check.py --apk candidate/Infinity-Android-First-unsigned.apk --report candidate/package-check.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC3-Unsigned-Candidate
+          path: candidate/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Sign only with retained Infinity identity
+        id: signing
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_SIGNER_SHA256: ${{ secrets.INFINITY_SIGNER_SHA256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          configured=false
+          if [ -n "${INFINITY_KEYSTORE_B64:-}" ] && [ -n "${INFINITY_STORE_PASSWORD:-}" ] && [ -n "${INFINITY_KEY_PASSWORD:-}" ] && [ -n "${INFINITY_KEY_ALIAS:-}" ] && [ -n "${INFINITY_SIGNER_SHA256:-}" ]; then
+            configured=true
+            bash scripts/sign-infinity-mobile.sh candidate/Infinity-Android-First-unsigned.apk signing/Infinity-Android-First.apk
+            python3 scripts/infinity_mobile_presentation.py verify --apk signing/Infinity-Android-First.apk --manifest engine/engine.json --receipt candidate/presentation.json
+          else
+            echo 'Persistent Infinity signing identity is not configured; unsigned candidate only.'
+          fi
+          echo "configured=$configured" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        if: success() && steps.signing.outputs.configured == 'true'
+        with:
+          name: Infinity-RC3-Signed-Test-Candidate
+          path: signing/
+          retention-days: 30
+          if-no-files-found: error
