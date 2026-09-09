@@ -1,0 +1,75 @@
+name: Infinity 1.0 Light Polish
+run-name: 'Infinity 1.0 | golden engine | light-mode polish'
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/infinity-1.0-light-polish.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  polish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - name: Download frozen Infinity 1.0 golden engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-RC3-Engine
+          path: engine
+          run-id: 34316336433
+          github-token: ${{ github.token }}
+      - name: Apply light-mode presentation polish only
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-pil
+          mkdir -p candidate signed
+          python3 scripts/infinity_mobile_presentation.py build \
+            --apk engine/Infinity-Android-First-Engine-Base.apk \
+            --manifest engine/engine.json \
+            --output candidate/Infinity-1.0-Light-Polish-unsigned.apk \
+            --receipt candidate/presentation.json
+          python3 scripts/infinity_mobile_package_check.py \
+            --apk candidate/Infinity-1.0-Light-Polish-unsigned.apk \
+            --report candidate/package-check.json
+      - name: Test-sign without rebuilding the engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0-Light-Polish-unsigned.apk \
+            signed/Infinity-1.0-Light-Polish.apk
+          python3 scripts/infinity_mobile_presentation.py verify \
+            --apk signed/Infinity-1.0-Light-Polish.apk \
+            --manifest engine/engine.json \
+            --receipt candidate/presentation.json
+          python3 scripts/infinity_mobile_package_check.py \
+            --apk signed/Infinity-1.0-Light-Polish.apk \
+            --report signed/package-check.json
+          cp candidate/presentation.json signed/presentation.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0-Light-Polish-Test-Candidate
+          path: signed/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+          overwrite: true
