@@ -1,0 +1,59 @@
+name: Infinity native-gate diagnosis
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/diagnose-infinity-rc-native-gate.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  evidence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Compare original failing and successful compiler logs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python3 - <<'PY'
+          import hashlib, json, os, re, urllib.request
+          from pathlib import Path
+          root=Path('evidence')
+          repo=os.environ['GITHUB_REPOSITORY']
+          records=[]
+          for label,job in [('rc1',102292707429),('rc2',102328197299),('audited-success',102210334751)]:
+              url=f'https://api.github.com/repos/{repo}/actions/jobs/{job}/logs'
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=90) as r: data=r.read()
+              text=data.decode('utf-8-sig',errors='replace')
+              lines=text.splitlines()
+              hits=[i for i,line in enumerate(lines) if 'Early native compiler gate:' in line or 'fatal error:' in line or '##[error]' in line]
+              selected=set()
+              for i in hits[-20:]: selected.update(range(max(0,i-8),min(len(lines),i+45)))
+              selected.update(range(max(0,len(lines)-55),len(lines)))
+              excerpt='\n'.join(f'{i+1}: {lines[i]}' for i in sorted(selected))+'\n'
+              (root/(label+'-native-gate.txt')).write_text(excerpt)
+              (root/(label+'-engine.log')).write_text(text)
+              records.append({'label':label,'job_id':job,'log_sha256':hashlib.sha256(data).hexdigest(),'line_count':len(lines)})
+          (root/'log-provenance.json').write_text(json.dumps(records,indent=2)+'\n')
+          PY
+          git archive HEAD | gzip > evidence/project-source.tar.gz
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git /tmp/kodi-reference
+          test "$(git -C /tmp/kodi-reference rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          git -C /tmp/kodi-reference archive HEAD cmake tools/depends tools/android/packaging xbmc/platform/android xbmc/windowing/android xbmc/application xbmc/messaging xbmc/settings xbmc/interfaces xbmc/guilib xbmc/input addons/skin.estuary version.txt | gzip > evidence/kodi-reference.tar.gz
+          printf '%s\n' "$GITHUB_SHA" > evidence/source-commit.txt
+          cd evidence
+          sha256sum *.tar.gz *-native-gate.txt > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Native-Gate-Diagnosis
+          path: evidence/
+          retention-days: 7
+          if-no-files-found: error
