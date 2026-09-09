@@ -1,5 +1,5 @@
 name: Infinity Android-first Foundation
-run-name: 'Infinity Android-first | matched hook + appearance | device acceptance pending'
+run-name: 'Infinity Android-first | surgical native-gate repair | device acceptance pending'
 on:
   workflow_dispatch:
     inputs:
@@ -63,6 +63,7 @@ jobs:
           python3 tests/infinity71/test_mobile_presentation.py 2>&1 | tee results/mobile-presentation.txt
           python3 tests/infinity71/test_mobile_signing.py 2>&1 | tee results/mobile-signing.txt
           python3 tests/infinity71/test_mobile_package_check.py 2>&1 | tee results/package-metadata.txt
+          python3 tests/infinity71/test_native_gate.py 2>&1 | tee results/native-gate-regressions.txt
           bash -n scripts/sign-infinity-mobile.sh
           echo 'Preflight uses disposable non-installable signing fixtures only; no production credentials. Device acceptance remains pending.' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
@@ -126,13 +127,28 @@ jobs:
           ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
           make -j"$(nproc)"
           make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
-      - name: Compile every changed native translation unit before the full engine
+      - name: Compile Android targets with their dependency graph before the full engine
+        id: native-gate
         run: |
           set -euo pipefail
+          mkdir -p results
           CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
           test -x "$CMAKE_BIN"
           "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+          # Native-check now builds Kodi's real Android targets, including their
+          # CMake-managed headers/libraries. Raw compiler replay skipped these.
+          CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)" python3 scripts/infinity71.py native-check \
+            --build-dir "$BUILD_DIR" 2>&1 | tee results/native-gate.log
+      - name: Preserve native-gate evidence even if compilation fails
+        uses: actions/upload-artifact@v7
+        if: always() && steps.native-gate.outcome != 'skipped'
+        with:
+          name: Infinity-Android-First-Native-Gate
+          path: |
+            results/native-gate.log
+            ${{ env.BUILD_DIR }}/infinity-native-gate/status.json
+          retention-days: 30
+          if-no-files-found: warn
       - name: Build matched native stack and record reusable engine
         run: |
           set -euo pipefail

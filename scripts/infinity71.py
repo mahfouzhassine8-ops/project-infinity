@@ -294,23 +294,71 @@ def verify_overlay(apk: Path, manifest: Path) -> None:
 
 
 def native_compile_check(build_dir: Path) -> None:
-    entries=json.loads((build_dir/'compile_commands.json').read_text())
-    targets=['xbmc/platform/android/activity/JNIMainActivity.cpp',
-             'xbmc/platform/android/activity/XBMCApp.cpp',
-             'xbmc/windowing/android/WinSystemAndroid.cpp']
+    """Build real Android targets with their prerequisites, never raw compiler replay.
+
+    compile_commands.json describes compiler invocations, not the target dependency
+    graph. Replaying it with -fsyntax-only on a cold prefix skipped libandroidjni,
+    fmt and other CMake-managed dependencies. Normal target builds materialize all
+    prerequisites and leave reusable object files for the subsequent full build.
+    """
     import shlex
+    build_dir = build_dir.resolve()
+    expected = {
+        'xbmc/platform/android/activity/JNIMainActivity.cpp': 'platform_android_activity',
+        'xbmc/platform/android/activity/XBMCApp.cpp': 'platform_android_activity',
+        'xbmc/windowing/android/WinSystemAndroid.cpp': 'windowing_android',
+    }
+    entries = json.loads((build_dir / 'compile_commands.json').read_text())
+    for source, target in expected.items():
+        matches = [e for e in entries if e['file'].replace('\\', '/').endswith('/' + source)]
+        if len(matches) != 1:
+            raise ValueError('Missing/ambiguous real compile command: ' + source)
+        entry = matches[0]
+        args = entry.get('arguments') or shlex.split(entry['command'])
+        output = entry.get('output')
+        if not output:
+            try:
+                output = args[args.index('-o') + 1]
+            except (ValueError, IndexError) as error:
+                raise ValueError('No object target recorded for ' + source) from error
+        if 'CMakeFiles/' + target + '.dir/' not in output.replace('\\', '/'):
+            raise ValueError('Unexpected native target for ' + source + ': ' + output)
+
+    cache = {}
+    for line in (build_dir / 'CMakeCache.txt').read_text().splitlines():
+        match = re.match(r'^([^#/:=][^:=]*):[^=]+=(.*)$', line)
+        if match:
+            cache[match[1]] = match[2]
+    cmake = cache.get('CMAKE_COMMAND', '')
+    if not cmake or not Path(cmake).is_file():
+        raise ValueError('Configured CMake executable is missing')
+    jobs = int(os.environ.get('CMAKE_BUILD_PARALLEL_LEVEL') or (os.cpu_count() or 1))
+    if jobs < 1:
+        raise ValueError('Native build parallelism must be positive')
+    targets = list(dict.fromkeys(expected.values()))
+    report_dir = build_dir / 'infinity-native-gate'
+    report_dir.mkdir(exist_ok=True)
+    report = {'schema': 1, 'method': 'cmake-target-dependency-graph',
+              'sources': expected, 'targets': targets, 'completed_targets': [],
+              'status': 'running', 'device_accepted': False}
+    report_path = report_dir / 'status.json'
+    report_path.write_text(json.dumps(report, indent=2) + '\n')
     for target in targets:
-        matches=[e for e in entries if e['file'].endswith('/'+target)]
-        if len(matches)!=1: raise ValueError('Missing/ambiguous real compile command: '+target)
-        e=matches[0]; args=e.get('arguments') or shlex.split(e['command'])
-        filtered=[];i=0
-        while i<len(args):
-            if args[i] in ('-o','-MF','-MT','-MQ'): i+=2;continue
-            if args[i] in ('-c','-MD','-MMD','-MP'): i+=1;continue
-            filtered.append(args[i]);i+=1
-        filtered.append('-fsyntax-only')
-        print('Early native compiler gate: '+target,flush=True)
-        subprocess.run(filtered,cwd=e['directory'],check=True)
+        command = [cmake, '--build', str(build_dir), '--target', target,
+                   '--parallel', str(jobs)]
+        print('Native compiler gate with dependencies: ' + target, flush=True)
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as error:
+            report.update(status='failed', failed_target=target, exit_code=error.returncode)
+            report_path.write_text(json.dumps(report, indent=2) + '\n')
+            raise
+        report['completed_targets'].append(target)
+        report_path.write_text(json.dumps(report, indent=2) + '\n')
+    report['status'] = 'passed'
+    report_path.write_text(json.dumps(report, indent=2) + '\n')
+    print('PASS: both Android targets and their prerequisites compiled; object files '
+          'are reusable by the full engine build. Device acceptance remains pending.', flush=True)
 
 
 def main() -> None:
