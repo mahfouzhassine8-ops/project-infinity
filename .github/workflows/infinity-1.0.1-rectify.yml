@@ -1,11 +1,11 @@
 name: Infinity 1.0.1 Rectify
-run-name: 'Infinity 1.0.1 | light theme + portrait readability | golden engine'
+run-name: 'Infinity 1.0.1 | OLED + light + portrait + player + branding | golden engine'
 
 on:
   push:
     branches: [infinity-android-first]
     paths:
-      - 'scripts/infinity_1_0_1_rectify.py'
+      - 'scripts/infinity_1_0_1_rectify_v2.py'
       - '.github/workflows/infinity-1.0.1-rectify.yml'
   workflow_dispatch:
 
@@ -52,11 +52,14 @@ jobs:
           run-id: 34316336433
           github-token: ${{ github.token }}
 
-      - name: Apply rectified presentation only
+      - name: Install visual tooling
+        run: python3 -m pip install --disable-pip-version-check pillow
+
+      - name: Apply Infinity 1.0.1 presentation package only
         run: |
           set -euo pipefail
           mkdir -p out
-          python3 scripts/infinity_1_0_1_rectify.py \
+          python3 scripts/infinity_1_0_1_rectify_v2.py \
             golden/Infinity-Android-First-unsigned.apk \
             out/Infinity-1.0.1-Rectified-unsigned.apk \
             out/rectification.json
