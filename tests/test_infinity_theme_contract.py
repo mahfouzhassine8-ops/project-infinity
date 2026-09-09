@@ -139,6 +139,10 @@ def contrast(a, b):
 class ThemeContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        if not APK.is_file():
+            raise unittest.SkipTest(
+                'Pinned 1.0.5 APK fixture is not present in this runner; '
+                'the APK-backed 270-case contract suite is run only when INFINITY_TEST_APK is supplied.')
         with zipfile.ZipFile(APK) as z:
             cls.source = {n: z.read(n) for n in patch.XML_FILES}
             cls.font_data = z.read(patch.SKIN + 'fonts/NotoSans-Regular.ttf')
@@ -216,7 +220,6 @@ class ThemeContractTests(unittest.TestCase):
             self.assertIsNone(c.find('left'))
             self.assertEqual(c.findtext('align'),'center')
             self.assertGreater(int(c.find('height').get('max')),300)
-            # Center equals the hero/button center on each existing skin canvas.
             for canvas in (1920,2040,2160,2338,2560):
                 parent_width = canvas - 462 - 80
                 child_width = float(c.findtext('width'))
