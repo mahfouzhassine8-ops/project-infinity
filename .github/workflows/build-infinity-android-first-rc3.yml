@@ -1,5 +1,5 @@
 name: Infinity Android-first RC3
-run-name: 'Infinity Android-first RC3 | real full CMake graph | no speculative target mapping'
+run-name: 'Infinity Android-first RC3 #${{ github.run_number }} | full graph | verified signed candidate'
 on:
   workflow_dispatch:
   push:
@@ -10,7 +10,7 @@ permissions:
   actions: read
 concurrency:
   group: infinity-android-first-rc3
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   engine:
     runs-on: ubuntu-22.04
@@ -20,6 +20,7 @@ jobs:
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
       TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
       BUILD_DIR: ${{ github.workspace }}/kodi-build
+      LOG_DIR: ${{ github.workspace }}/rc3-logs
     steps:
       - uses: actions/checkout@v5
         with:
@@ -28,15 +29,74 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Check retained signing identity early without blocking the engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_SIGNER_SHA256: ${{ secrets.INFINITY_SIGNER_SHA256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, hashlib, json, os, re, subprocess, tempfile
+          from pathlib import Path
+          names = ('INFINITY_KEYSTORE_B64', 'INFINITY_STORE_PASSWORD',
+                   'INFINITY_KEY_PASSWORD', 'INFINITY_KEY_ALIAS', 'INFINITY_SIGNER_SHA256')
+          missing = [name for name in names if not os.environ.get(name)]
+          status = 'blocked-missing-retained-signing-configuration'
+          if not missing:
+              status = 'blocked-invalid-retained-signing-configuration'
+              try:
+                  expected = os.environ['INFINITY_SIGNER_SHA256'].lower()
+                  if re.fullmatch(r'[0-9a-f]{64}', expected) is None:
+                      raise ValueError('Invalid certificate pin')
+                  with tempfile.TemporaryDirectory(prefix='rc3-private-signing-', dir=os.environ['RUNNER_TEMP']) as tmp:
+                      key = Path(tmp) / 'owner.keystore'
+                      cert = Path(tmp) / 'certificate.der'
+                      encoded = ''.join(os.environ['INFINITY_KEYSTORE_B64'].split())
+                      key.write_bytes(base64.b64decode(encoded, validate=True))
+                      key.chmod(0o600)
+                      result = subprocess.run([
+                          'keytool', '-exportcert', '-keystore', str(key),
+                          '-storepass:env', 'INFINITY_STORE_PASSWORD',
+                          '-alias', os.environ['INFINITY_KEY_ALIAS'], '-file', str(cert)
+                      ], capture_output=True, timeout=30)
+                      if result.returncode != 0:
+                          raise ValueError('Cannot read retained certificate')
+                      if hashlib.sha256(cert.read_bytes()).hexdigest() != expected:
+                          raise ValueError('Certificate pin mismatch')
+                  status = 'certificate-matched-final-apk-signing-still-required'
+              except (ValueError, OSError, subprocess.SubprocessError):
+                  pass
+          report = {'status': status, 'missing_fields': missing, 'new_key_created': False,
+                    'private_material_uploaded': False, 'device_accepted': False}
+          logs = Path(os.environ['LOG_DIR'])
+          logs.mkdir(parents=True, exist_ok=True)
+          (logs / 'signing-readiness.json').write_text(json.dumps(report, indent=2) + '\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## RC3 retained signing readiness\n' + status + '\n')
+              if missing:
+                  summary.write('Missing repository secrets: ' + ', '.join(missing) + '\n')
+              summary.write('Engine compilation continues independently. Final signing is mandatory; no fallback release key.\n')
+          if status.startswith('blocked-'):
+              print('::warning::Retained signing is blocked. See the signing-readiness report; engine build will continue.')
+          else:
+              print(status)
+          PY
       - uses: android-actions/setup-android@v4
       - name: Prepare exact pinned source and toolchain
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p "$LOG_DIR"
+          exec > >(tee "$LOG_DIR/prepare.log") 2>&1
           sudo apt-get update -qq
           sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm python3-pil
           sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
           mkdir -p "$HOME/.android"
+          # Internal packaging only. This key is never used for the final candidate.
           if [ ! -f "$HOME/.android/debug.keystore" ]; then
             keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Internal Build Only,O=Project Infinity,C=US'
           fi
@@ -45,6 +105,7 @@ jobs:
           python3 scripts/infinity71.py source --source kodi
           python3 scripts/validate-infinity71-java.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out java-check
       - uses: actions/cache/restore@v4
+        id: dependency_cache
         with:
           path: |
             android-tools/xbmc-depends
@@ -55,33 +116,45 @@ jobs:
             infinity-android-first-deps-21.3-arm64-${{ runner.os }}-
             infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
             infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-
-      - name: Configure dependencies through Kodi's supported graph
+      - name: Build dependencies through Kodi's supported graph
+        id: dependencies
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" "$LOG_DIR"
           cd kodi/tools/depends
-          ./bootstrap
-          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
-          make -j"$(nproc)"
-          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
-      - name: Build complete matched engine using the real target graph
+          ./bootstrap 2>&1 | tee "$LOG_DIR/depends-bootstrap.log"
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes 2>&1 | tee "$LOG_DIR/depends-configure.log"
+          make -j"$(nproc)" 2>&1 | tee "$LOG_DIR/depends-build.log"
+      - name: Configure the real engine CMake graph
         shell: bash
         run: |
           set -euo pipefail
-          # RC1/RC2 failed because a custom syntax gate bypassed prerequisites.
-          # The repaired canonical gate then made one wrong assumption: XBMCApp.cpp
-          # is owned by CMakeFiles/kodi.dir, not platform_android_activity. Do not
-          # invent another partial target map. The full Kodi target graph is the
-          # authoritative compiler/linker test and naturally builds its prerequisites.
-          make -C "$BUILD_DIR" -j"$(nproc)"
-          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          make -C kodi/tools/depends/target/cmakebuildsys BUILD_DIR="$BUILD_DIR" 2>&1 | tee "$LOG_DIR/engine-configure.log"
+      - name: Compile and link the complete matched engine
+        id: native
+        shell: bash
+        run: |
+          set -euo pipefail
+          # No standalone syntax gate and no hand-maintained target ownership map.
+          make -C "$BUILD_DIR" -j"$(nproc)" 2>&1 | tee "$LOG_DIR/engine-build.log"
+      - name: Package the matched engine APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" apk -j"$(nproc)" 2>&1 | tee "$LOG_DIR/apk-build.log"
           APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
           test -n "$APK"
           mkdir -p engine
           cp "$APK" engine/Infinity-Android-First-Engine-Base.apk
-          python3 scripts/infinity71.py record-engine --apk engine/Infinity-Android-First-Engine-Base.apk --output engine/engine.json --source-commit "$GITHUB_SHA"
-          python3 scripts/infinity_mobile_package_check.py --apk engine/Infinity-Android-First-Engine-Base.apk --report engine/package-check.json
+      - name: Record and verify the reusable engine
+        id: record
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity71.py record-engine --apk engine/Infinity-Android-First-Engine-Base.apk --output engine/engine.json --source-commit "$GITHUB_SHA" 2>&1 | tee "$LOG_DIR/engine-contract.log"
+          python3 scripts/infinity_mobile_package_check.py --apk engine/Infinity-Android-First-Engine-Base.apk --report engine/package-check.json 2>&1 | tee "$LOG_DIR/engine-package-check.log"
       - uses: actions/upload-artifact@v7
         with:
           name: Infinity-RC3-Engine
@@ -89,6 +162,26 @@ jobs:
           compression-level: 0
           retention-days: 30
           if-no-files-found: error
+          overwrite: true
+      - name: Save completed dependencies even if a later build stage failed
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && steps.dependency_cache.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.dependency_cache.outputs.cache-primary-key }}
+      - name: Preserve engine diagnostics on success or failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC3-Engine-Logs
+          path: rc3-logs/
+          retention-days: 14
+          if-no-files-found: warn
+          overwrite: true
   presentation:
     needs: engine
     runs-on: ubuntu-22.04
@@ -104,26 +197,29 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: 'build-tools;34.0.0'
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: Infinity-RC3-Engine
           path: engine
       - name: Build and verify Infinity presentation
+        id: presentation
         shell: bash
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends python3-pil
-          mkdir -p candidate signing
-          python3 scripts/infinity_mobile_presentation.py build --apk engine/Infinity-Android-First-Engine-Base.apk --manifest engine/engine.json --output candidate/Infinity-Android-First-unsigned.apk --receipt candidate/presentation.json
-          python3 scripts/infinity_mobile_package_check.py --apk candidate/Infinity-Android-First-unsigned.apk --report candidate/package-check.json
+          mkdir -p candidate signing presentation-logs
+          python3 scripts/infinity_mobile_presentation.py build --apk engine/Infinity-Android-First-Engine-Base.apk --manifest engine/engine.json --output candidate/Infinity-Android-First-unsigned.apk --receipt candidate/presentation.json 2>&1 | tee presentation-logs/build.log
+          python3 scripts/infinity_mobile_package_check.py --apk candidate/Infinity-Android-First-unsigned.apk --report candidate/package-check.json 2>&1 | tee presentation-logs/package-check.log
       - uses: actions/upload-artifact@v7
         with:
           name: Infinity-RC3-Unsigned-Candidate
           path: candidate/
+          compression-level: 0
           retention-days: 30
           if-no-files-found: error
-      - name: Sign only with retained Infinity identity
+          overwrite: true
+      - name: Require retained-key signing and verify the final APK
         id: signing
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -134,19 +230,46 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          configured=false
-          if [ -n "${INFINITY_KEYSTORE_B64:-}" ] && [ -n "${INFINITY_STORE_PASSWORD:-}" ] && [ -n "${INFINITY_KEY_PASSWORD:-}" ] && [ -n "${INFINITY_KEY_ALIAS:-}" ] && [ -n "${INFINITY_SIGNER_SHA256:-}" ]; then
-            configured=true
-            bash scripts/sign-infinity-mobile.sh candidate/Infinity-Android-First-unsigned.apk signing/Infinity-Android-First.apk
-            python3 scripts/infinity_mobile_presentation.py verify --apk signing/Infinity-Android-First.apk --manifest engine/engine.json --receipt candidate/presentation.json
-          else
-            echo 'Persistent Infinity signing identity is not configured; unsigned candidate only.'
-          fi
-          echo "configured=$configured" >> "$GITHUB_OUTPUT"
+          # Missing/invalid retained credentials fail here, never a green unsigned run.
+          # Do not tee secret-bearing commands into unmasked artifact logs.
+          bash scripts/sign-infinity-mobile.sh candidate/Infinity-Android-First-unsigned.apk signing/Infinity-Android-First.apk
+          python3 scripts/infinity_mobile_presentation.py verify --apk signing/Infinity-Android-First.apk --manifest engine/engine.json --receipt candidate/presentation.json
+          python3 scripts/infinity_mobile_package_check.py --apk signing/Infinity-Android-First.apk --report signing/package-check.json
+          test -s signing/Infinity-Android-First.apk
+          test -s signing/Infinity-Android-First.signing.txt
+          test -s signing/Infinity-Android-First.sha256
       - uses: actions/upload-artifact@v7
-        if: success() && steps.signing.outputs.configured == 'true'
+        id: signed_artifact
         with:
           name: Infinity-RC3-Signed-Test-Candidate
           path: signing/
+          compression-level: 0
           retention-days: 30
           if-no-files-found: error
+          overwrite: true
+      - name: Report the actual delivery result
+        if: always()
+        env:
+          SIGNING_RESULT: ${{ steps.signing.outcome }}
+          ARTIFACT_RESULT: ${{ steps.signed_artifact.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '## RC3 candidate delivery'
+            if [ "$SIGNING_RESULT" = success ] && [ "$ARTIFACT_RESULT" = success ]; then
+              echo 'Verified retained-key signed test candidate uploaded. Device acceptance is still pending.'
+            else
+              echo 'NOT READY: no verified signed candidate was delivered by this job attempt.'
+              echo 'Any saved engine or unsigned candidate is an intermediate, not the installable release.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve non-secret presentation diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC3-Presentation-Logs
+          path: presentation-logs/
+          retention-days: 14
+          if-no-files-found: warn
+          overwrite: true
