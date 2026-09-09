@@ -1,10 +1,12 @@
-name: Infinity 1.0 Light Polish
-run-name: 'Infinity 1.0 | golden engine | light-mode polish'
+name: Infinity 1.0 Final Polish
+run-name: 'Infinity 1.0 | golden engine | theme + front-display portrait polish'
 on:
   workflow_dispatch:
   push:
     branches: [infinity-android-first]
-    paths: ['.github/workflows/infinity-1.0-light-polish.yml']
+    paths:
+      - '.github/workflows/infinity-1.0-light-polish.yml'
+      - 'scripts/infinity_mobile_presentation.py'
 permissions:
   contents: read
   actions: read
@@ -30,7 +32,7 @@ jobs:
           path: engine
           run-id: 34316336433
           github-token: ${{ github.token }}
-      - name: Apply light-mode presentation polish only
+      - name: Apply Infinity 1.0 presentation polish only
         shell: bash
         run: |
           set -euo pipefail
@@ -40,10 +42,10 @@ jobs:
           python3 scripts/infinity_mobile_presentation.py build \
             --apk engine/Infinity-Android-First-Engine-Base.apk \
             --manifest engine/engine.json \
-            --output candidate/Infinity-1.0-Light-Polish-unsigned.apk \
+            --output candidate/Infinity-1.0-unsigned.apk \
             --receipt candidate/presentation.json
           python3 scripts/infinity_mobile_package_check.py \
-            --apk candidate/Infinity-1.0-Light-Polish-unsigned.apk \
+            --apk candidate/Infinity-1.0-unsigned.apk \
             --report candidate/package-check.json
       - name: Test-sign without rebuilding the engine
         env:
@@ -55,19 +57,19 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/sign-infinity71.sh \
-            candidate/Infinity-1.0-Light-Polish-unsigned.apk \
-            signed/Infinity-1.0-Light-Polish.apk
+            candidate/Infinity-1.0-unsigned.apk \
+            signed/Infinity-1.0.apk
           python3 scripts/infinity_mobile_presentation.py verify \
-            --apk signed/Infinity-1.0-Light-Polish.apk \
+            --apk signed/Infinity-1.0.apk \
             --manifest engine/engine.json \
             --receipt candidate/presentation.json
           python3 scripts/infinity_mobile_package_check.py \
-            --apk signed/Infinity-1.0-Light-Polish.apk \
+            --apk signed/Infinity-1.0.apk \
             --report signed/package-check.json
           cp candidate/presentation.json signed/presentation.json
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-1.0-Light-Polish-Test-Candidate
+          name: Infinity-1.0-Test-Candidate
           path: signed/
           compression-level: 0
           retention-days: 30
