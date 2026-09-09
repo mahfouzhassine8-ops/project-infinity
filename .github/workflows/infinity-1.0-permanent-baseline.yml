@@ -3,6 +3,9 @@ run-name: 'Infinity 1.0 | frozen golden master | permanent signing baseline'
 
 on:
   workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/infinity-1.0-permanent-baseline.yml']
 
 permissions:
   contents: read
