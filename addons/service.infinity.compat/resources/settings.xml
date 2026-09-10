@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <settings version="1">
   <section id="service.infinity.compat">
-    <category id="general" label="Infinity Compatibility">
+    <category id="general" label="Infinity Control Center">
       <group id="1">
         <setting id="compat_mode" type="string" label="Compatibility Mode">
           <level>0</level><default>auto</default>
@@ -12,6 +12,8 @@
             <option label="Safe Mode">safe</option>
           </options></constraints><control type="spinner" format="string"/>
         </setting>
+        <setting id="auto_safe_mode" type="boolean" label="Automatic Safe Mode After Repeated Unclean Starts"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="safe_mode_threshold" type="integer" label="Unclean Start Threshold"><level>1</level><default>3</default><constraints><minimum>2</minimum><maximum>5</maximum></constraints><control type="spinner" format="integer"/></setting>
         <setting id="protect_player_ui" type="boolean" label="Protect Infinity Player UI"><level>0</level><default>true</default><control type="toggle"/></setting>
         <setting id="follow_infinity_theme" type="boolean" label="Follow Infinity Light/Dark Theme"><level>0</level><default>true</default><control type="toggle"/></setting>
         <setting id="allow_system_font" type="boolean" label="Allow Infinity System Font"><level>0</level><default>true</default><control type="toggle"/></setting>
