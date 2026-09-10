@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.AudioAttributes;
 import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -48,10 +49,19 @@ final class InfinitySystemMediaHook extends InfinityPlatformHook
   @Override
   void onMediaSessionCreated(MediaSession session)
   {
+    // Advertise the session using the strongest public Android signals that truthfully
+    // describe Infinity: local media playback, USAGE_MEDIA, movie/video content.
+    session.setPlaybackToLocal(new AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+        .build());
+
     Bundle extras = new Bundle();
     extras.putInt("com.projectinfinity.platform_hook_api", InfinityPlatformHooks.API_VERSION);
     extras.putBoolean("com.projectinfinity.system_media", true);
     extras.putBoolean("com.projectinfinity.picture_in_picture", true);
+    extras.putBoolean("com.projectinfinity.video_app", true);
+    extras.putBoolean("com.projectinfinity.audio_eraser_compat_candidate", true);
     extras.putString("com.projectinfinity.media_controls",
         "play,pause,seek,previous,next,rewind,fast-forward,stop");
     session.setExtras(extras);
