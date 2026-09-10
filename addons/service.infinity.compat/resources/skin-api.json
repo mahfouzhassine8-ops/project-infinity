@@ -2,46 +2,64 @@
   "schema": 2,
   "skin_api": "1.0",
   "hook_api": "1.0",
-  "layout_api": "1.0",
-  "description": "Declarative contract for Infinity-compatible responsive skins.",
+  "theme_contract": "1.0",
+  "layout_api": "1.1",
+  "description": "Declarative contract for Infinity-compatible skins. Infinity owns theme/display policy; skins consume it.",
   "properties": [
     "Infinity.SkinAPI",
     "Infinity.HookAPI",
-    "Infinity.LayoutAPI",
-    "Infinity.Theme",
+    "Infinity.SystemTheme",
+    "Infinity.ThemeRevision",
+    "Infinity.DeviceMode",
+    "Infinity.Orientation",
+    "Infinity.WindowWidth",
+    "Infinity.WindowHeight",
+    "Infinity.AspectClass",
+    "Infinity.SafeInsetTop",
+    "Infinity.SafeInsetBottom",
+    "Infinity.SafeInsetLeft",
+    "Infinity.SafeInsetRight",
+    "Infinity.TouchClass",
+    "Infinity.MotionPolicy",
+    "Infinity.RefreshPolicy",
+    "Infinity.PowerPolicy",
     "Infinity.PerformanceMode",
-    "Infinity.RefreshMode",
     "Infinity.SafeMode",
     "Infinity.CompatMode",
-    "Infinity.ProtectedPlayerUI",
-    "Infinity.LayoutReady",
-    "Infinity.Layout",
-    "Infinity.Orientation",
-    "Infinity.DisplayClass",
-    "Infinity.LayoutWidth",
-    "Infinity.LayoutHeight",
-    "Infinity.LayoutShortEdge",
-    "Infinity.LayoutLongEdge",
-    "Infinity.LayoutAspect"
+    "Infinity.ProtectedPlayerUI"
   ],
-  "layout": {
-    "classes": ["compact", "medium", "expanded", "unknown"],
-    "orientations": ["portrait", "landscape", "square", "unknown"],
-    "display_classes": ["cover_or_phone", "large_phone_or_tablet", "large_or_unfolded", "unknown"],
-    "guidance": "Use layout class and orientation to select purpose-built responsive XML groups; do not uniformly scale a television layout."
-  },
+  "palette_tokens": [
+    "Infinity.Palette.Background",
+    "Infinity.Palette.Surface",
+    "Infinity.Palette.SurfaceElevated",
+    "Infinity.Palette.TextPrimary",
+    "Infinity.Palette.TextSecondary",
+    "Infinity.Palette.Border",
+    "Infinity.Palette.Focus",
+    "Infinity.Palette.Accent",
+    "Infinity.Palette.Danger",
+    "Infinity.Palette.Scrim"
+  ],
+  "theme_values": ["light", "dark", "OLED"],
+  "device_modes": ["cover/front", "inner/large", "phone", "tablet", "unknown"],
+  "orientations": ["portrait", "landscape", "square", "unknown"],
+  "aspect_classes": ["portrait", "square-ish", "standard-landscape", "ultrawide", "unknown"],
+  "touch_classes": ["compact", "normal", "large-display", "unknown"],
+  "motion_policies": ["normal", "reduced", "performance"],
+  "refresh_policies": ["normal", "high-refresh", "video-match"],
   "protected_zones": [
     "VideoOSD.xml",
     "DialogSeekBar.xml",
     "Custom_1199_InfinityVideoLock.xml"
   ],
-  "theme_tokens": [
-    "Infinity.Theme",
-    "Infinity.SystemTheme"
-  ],
+  "player_contract": {
+    "owner": "Infinity",
+    "replaceable_by_skin": false,
+    "direction": "subtitles/audio left; transport center; secondary controls right; adaptive portrait/large-display variants"
+  },
   "skin_registration": {
     "manifest_name": "infinity-skin.json",
     "required": ["skin_id", "name", "skin_api"],
-    "optional": ["capabilities", "protected_zone_policy", "theme_support", "layout_support", "notes"]
+    "optional": ["capabilities", "protected_zone_policy", "theme_support", "notes"]
   }
 }
