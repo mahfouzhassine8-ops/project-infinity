@@ -7,17 +7,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "patches/infinity-responsive-v5/contract.json"
 
+
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
+
 def load_contract() -> dict:
     return json.loads(CONTRACT.read_text(encoding="utf-8"))
+
 
 def replace_once(text: str, old: str, new: str, label: str) -> str:
     count = text.count(old)
     if count != 1:
         raise ValueError(f"{label}: expected 1 match, got {count}")
     return text.replace(old, new, 1)
+
+
+def transform_gradle(text: str) -> str:
+    text = replace_once(text, "versionCode 2103100", "versionCode 2103109", "version code")
+    return replace_once(text, 'versionName "21.3-Infinity-Android-First"',
+                        'versionName "1.0.8-Responsive-Bridge-v5"', "version name")
+
 
 def transform_bridge(text: str) -> str:
     text = replace_once(text, "static final int VERSION = 4;", "static final int VERSION = 5;", "bridge version")
@@ -26,7 +36,7 @@ def transform_bridge(text: str) -> str:
         "  private boolean supported;\n",
         '''  private boolean supported;
 
-  // Packed v5 window-mode extension. Bits 0..3 retain v4 PiP/multi/managed/TV.
+  // Packed v5 extension. Bits 0..3 retain v4 PiP/multi/managed/TV semantics.
   private static final int DEVICE_SHIFT = 4;      // 3 bits
   private static final int LAYOUT_SHIFT = 7;      // 2 bits
   private static final int WIDTH_DP_SHIFT = 9;    // 11 bits
@@ -63,19 +73,18 @@ def transform_bridge(text: str) -> str:
     final float density = Math.max(0.1f, view.getResources().getDisplayMetrics().density);
     final int widthDp = Math.min(2047, width > 0 ? Math.round(width / density) : 0);
     final int heightDp = Math.min(2047, height > 0 ? Math.round(height / density) : 0);
+    final int shortDp = Math.min(widthDp, heightDp);
     boolean foldHint = false;
     try {
       foldHint = activity.getPackageManager().hasSystemFeature("android.hardware.sensor.hinge_angle");
     } catch (RuntimeException ignored) {
     }
-    final float ratio = widthDp > 0 && heightDp > 0 ?
-        Math.max(widthDp, heightDp) / (float)Math.min(widthDp, heightDp) : 99f;
     final int layout = widthDp <= 0 ? LAYOUT_UNKNOWN :
         widthDp < 600 ? LAYOUT_COMPACT : widthDp < 840 ? LAYOUT_MEDIUM : LAYOUT_EXPANDED;
     final int device;
     if (television) device = DEVICE_TV;
-    else if ((foldHint || ratio <= 1.60f) && widthDp >= 600) device = DEVICE_INNER;
-    else if (foldHint && widthDp > 0) device = DEVICE_COVER;
+    else if (foldHint && shortDp > 0 && shortDp < 480) device = DEVICE_COVER;
+    else if (foldHint && widthDp >= 600) device = DEVICE_INNER;
     else if (widthDp >= 600) device = DEVICE_TABLET;
     else if (widthDp > 0) device = DEVICE_PHONE;
     else device = DEVICE_UNKNOWN;
@@ -96,10 +105,12 @@ def transform_bridge(text: str) -> str:
                         "Source-built Infinity Controller v5 attached", "bridge log")
     return text
 
+
 def transform_state(text: str) -> str:
     text = replace_once(text, "static constexpr int VERSION = 4;",
                         "static constexpr int VERSION = 5;", "native version")
     return text.replace("// ABI v4:", "// ABI v5:")
+
 
 def transform_window(text: str) -> str:
     old = '''      home->SetProperty("Infinity.SystemTheme", theme == 2 ? "dark" : theme == 1 ? "light" : "unknown");
@@ -151,23 +162,29 @@ def transform_window(text: str) -> str:
                         "native log")
     return text
 
+
 TRANSFORMS = {
+    "tools/android/packaging/xbmc/build.gradle.in": transform_gradle,
     "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": transform_bridge,
     "xbmc/platform/android/activity/InfinityBridgeState.h": transform_state,
     "xbmc/windowing/android/WinSystemAndroid.cpp": transform_window,
 }
 
+
 def verify(source: Path) -> None:
     checks = {
+        "tools/android/packaging/xbmc/build.gradle.in": [
+            "versionCode 2103109", 'versionName "1.0.8-Responsive-Bridge-v5"',
+        ],
         "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": [
-            "static final int VERSION = 5;", "WIDTH_DP_SHIFT = 9",
+            "static final int VERSION = 5;", "WIDTH_DP_SHIFT = 9", "shortDp < 480",
             "android.hardware.sensor.hinge_angle", "Published responsive v5",
         ],
         "xbmc/platform/android/activity/InfinityBridgeState.h": [
             "static constexpr int VERSION = 5;",
         ],
         "xbmc/windowing/android/WinSystemAndroid.cpp": [
-            "Infinity.NativeDeviceMode", "Infinity.NativeWidthDp",
+            "Infinity.NativeDeviceMode", "Infinity.NativeWidthDp", "Infinity.NativeHeightDp",
             "Infinity.NativeDisplayRevision", "Infinity.NativeSystemTheme",
         ],
     }
@@ -180,6 +197,7 @@ def verify(source: Path) -> None:
     if '(mode & 8) ? "tv" : "mobile"' in win:
         raise ValueError("legacy generic mobile classifier survived")
     print("PASS: Infinity Responsive Bridge v5 source contract verified.")
+
 
 def apply(source: Path) -> None:
     source = source.resolve()
@@ -199,12 +217,14 @@ def apply(source: Path) -> None:
     verify(source)
     print("Applied Infinity Responsive Bridge v5 cumulatively after audited v4.")
 
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("command", choices=["source", "verify"])
     p.add_argument("--source", type=Path, required=True)
     a = p.parse_args()
     (apply if a.command == "source" else verify)(a.source)
+
 
 if __name__ == "__main__":
     main()
