@@ -1,0 +1,1 @@
+Infinity's Audio Eraser compatibility probe keeps its real package identity and uses only public Android media/video classification signals. It does not spoof an allowlisted app. Samsung controls whether the Quick-panel Audio Eraser chip is surfaced for a package.
