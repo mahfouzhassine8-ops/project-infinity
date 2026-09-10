@@ -25,20 +25,21 @@ def apply(source: Path) -> dict:
     source = source.resolve()
     install = source / 'cmake/scripts/android/Install.cmake'
     gradle = source / 'tools/android/packaging/xbmc/build.gradle.in'
+    manifest = source / 'tools/android/packaging/xbmc/AndroidManifest.xml.in'
     session = source / 'tools/android/packaging/xbmc/src/XBMCMediaSession.java.in'
     targets = [
         source / 'tools/android/packaging/xbmc/src/InfinityPlatformHook.java.in',
         source / 'tools/android/packaging/xbmc/src/InfinityPlatformHooks.java.in',
         source / 'tools/android/packaging/xbmc/src/InfinitySystemMediaHook.java.in',
     ]
-    for path in (install, gradle, session):
+    for path in (install, gradle, manifest, session):
         if not path.is_file():
             raise FileNotFoundError(path)
     for path in targets:
         if path.exists():
             raise RuntimeError(f'Native media hook target already exists: {path}')
 
-    before = {str(p.relative_to(source)): sha(p) for p in (install, gradle, session)}
+    before = {str(p.relative_to(source)): sha(p) for p in (install, gradle, manifest, session)}
 
     text = install.read_text()
     text = replace_once(
@@ -50,6 +51,16 @@ def apply(source: Path) -> dict:
         '                  src/InfinitySystemMediaHook.java\n',
         'Install platform media hooks')
     install.write_text(text)
+
+    # Standard Android declaration that Infinity is primarily a video/movie app.
+    # This is a legitimate platform signal and does not impersonate any allowlisted package.
+    text = manifest.read_text()
+    text = replace_once(
+        text,
+        '    <application\n        android:banner="@drawable/banner"\n',
+        '    <application\n        android:appCategory="video"\n        android:banner="@drawable/banner"\n',
+        'Declare Android video app category')
+    manifest.write_text(text)
 
     text = session.read_text()
     text = replace_once(
@@ -114,12 +125,20 @@ def apply(source: Path) -> dict:
     if final_session.count('new MediaSession(') != 1:
         raise RuntimeError('Infinity must reuse Kodi single MediaSession, not create a second session')
 
+    if 'android:appCategory="video"' not in manifest.read_text():
+        raise RuntimeError('Infinity Android video app category missing')
+    system_hook = targets[2].read_text()
+    for needle in ('setPlaybackToLocal', 'AudioAttributes.USAGE_MEDIA',
+                   'AudioAttributes.CONTENT_TYPE_MOVIE'):
+        if needle not in system_hook:
+            raise RuntimeError('Missing standards-based media classification: ' + needle)
+
     files = {k: {'before': v, 'after': sha(source / k)} for k, v in before.items()}
     for target in targets:
         files[str(target.relative_to(source))] = {'after': sha(target)}
 
     return {
-        'schema': 1,
+        'schema': 2,
         'release': 'Infinity 1.0.8 Native Media Update',
         'versionCode': 2103109,
         'base': '1.0.8 Candidate 1 source stack',
@@ -128,6 +147,12 @@ def apply(source: Path) -> dict:
         'media_style_notification': True,
         'system_media_controls': ['play', 'pause', 'play_pause', 'seek', 'previous', 'next',
                                   'rewind', 'fast_forward', 'stop'],
+        'android_app_category': 'video',
+        'audio_usage': 'USAGE_MEDIA',
+        'audio_content_type': 'CONTENT_TYPE_MOVIE',
+        'samsung_audio_eraser_compat_candidate': True,
+        'samsung_audio_eraser_guaranteed': False,
+        'package_impersonation': False,
         'samsung_private_api': False,
         'single_media_session': True,
         'device_tested': False,
@@ -144,6 +169,8 @@ def main_cli():
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
     args.receipt.write_text(json.dumps(receipt, indent=2) + '\n')
     print('Infinity Platform Hook API 1 + native Android media integration applied.')
+    print('Audio Eraser compatibility posture: Android video category + local movie/media session.')
+    print('Samsung still owns package eligibility; no package spoofing or private Samsung API is used.')
 
 
 if __name__ == '__main__':
