@@ -31,6 +31,11 @@ jobs:
           gh run download "$BASE_RUN_ID" -n Infinity-1.0.8-Candidate-1 -D base
           test -f base/Infinity-1.0.8-Candidate-1.apk
 
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - uses: android-actions/setup-android@v4
 
       - name: Install Android signing tools
