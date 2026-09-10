@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/infinity-1.0.8-upper-layer-update.yml'
       - 'scripts/infinity_upper_layer_repack.py'
+      - 'scripts/validate_infinity_skin_contract.py'
       - 'addons/service.infinity.compat/**'
       - 'addons/service.infinity.refresh/**'
 
@@ -23,6 +24,11 @@ jobs:
       BASE_RUN_ID: '34452860358'
     steps:
       - uses: actions/checkout@v5
+
+      - name: Validate Infinity Skin Theme Contract
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_infinity_skin_contract.py
 
       - name: Download proven 1.0.8 Candidate 1 base artifact
         run: |
@@ -81,8 +87,14 @@ jobs:
           required=[
             'assets/addons/service.infinity.compat/addon.xml',
             'assets/addons/service.infinity.compat/service.py',
+            'assets/addons/service.infinity.compat/layout_service.py',
+            'assets/addons/service.infinity.compat/theme_contract.py',
             'assets/addons/service.infinity.compat/resources/settings.xml',
             'assets/addons/service.infinity.compat/resources/capabilities.json',
+            'assets/addons/service.infinity.compat/resources/skin-api.json',
+            'assets/addons/service.infinity.compat/resources/colors/InfinityLight.xml',
+            'assets/addons/service.infinity.compat/resources/colors/InfinityDark.xml',
+            'assets/addons/service.infinity.compat/resources/colors/InfinityOLED.xml',
             'assets/addons/service.infinity.refresh/addon.xml',
             'assets/addons/service.infinity.refresh/service.py',
             'assets/addons/service.infinity.refresh/resources/settings.xml',
