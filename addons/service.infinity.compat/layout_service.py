@@ -1,20 +1,18 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Infinity Adaptive Layout API 1.0.
+"""Infinity responsive display-state contract.
 
-Publishes Kodi-reported usable screen geometry as stable Window(Home) properties so
-Infinity-aware skins can implement responsive compact/medium/expanded layouts without
-device-specific Python glue.
+Infinity is the single source of truth for skin-visible geometry. This service publishes
+actual current Kodi GUI dimensions and responsive classes on startup and on Kodi events;
+it intentionally has no polling loop.
 """
 from __future__ import annotations
 
 import re
-import time
-
 import xbmc
 import xbmcgui
 
 TAG = '[InfinityLayout] '
-LAYOUT_API = '1.0'
+LAYOUT_API = '1.1'
 
 
 def _home():
@@ -37,8 +35,18 @@ def _number(label: str) -> int:
         return 0
 
 
-def _screen_size():
-    """Return Kodi-reported screen width/height, with ScreenMode as a fallback."""
+def _current_gui_size():
+    """Read the active Kodi GUI window first, with system labels only as fallbacks."""
+    try:
+        window_id = xbmcgui.getCurrentWindowId()
+        window = xbmcgui.Window(window_id)
+        width = int(window.getWidth())
+        height = int(window.getHeight())
+        if width > 0 and height > 0:
+            return width, height
+    except Exception:
+        pass
+
     width = _number('System.ScreenWidth')
     height = _number('System.ScreenHeight')
     if width > 0 and height > 0:
@@ -54,18 +62,29 @@ def _screen_size():
     return 0, 0
 
 
-def _classify(width: int, height: int):
+def _aspect_class(width: int, height: int) -> str:
     if width <= 0 or height <= 0:
-        return 'unknown', 'unknown', 'unknown', 0.0, 0
+        return 'unknown'
+    ratio = width / float(height)
+    if ratio < 0.82:
+        return 'portrait'
+    if ratio < 1.22:
+        return 'square-ish'
+    if ratio < 2.0:
+        return 'standard-landscape'
+    return 'ultrawide'
 
-    orientation = 'landscape' if width > height else ('portrait' if height > width else 'square')
+
+def _classes(width: int, height: int):
+    if width <= 0 or height <= 0:
+        return 'unknown', 'unknown', 'unknown', 'unknown'
+
+    orientation = 'landscape' if width > height else 'portrait' if height > width else 'square'
     short_edge = min(width, height)
     long_edge = max(width, height)
-    aspect = round(width / float(height), 4)
+    ratio = long_edge / float(short_edge)
 
-    # Geometry classes intentionally use reported pixels rather than device models.
-    # A cover/phone-style surface normally lands in compact; unfolded/tablet surfaces
-    # naturally graduate to medium or expanded as their usable short edge grows.
+    # Classes are geometry-based, not model-based, so foldables/tablets from any vendor work.
     if short_edge < 720:
         layout = 'compact'
     elif short_edge < 1200:
@@ -73,20 +92,34 @@ def _classify(width: int, height: int):
     else:
         layout = 'expanded'
 
-    if layout == 'compact':
-        display = 'cover_or_phone'
-    elif layout == 'medium':
-        display = 'large_phone_or_tablet'
+    if short_edge < 720 and ratio >= 1.75:
+        device = 'cover/front'
+    elif short_edge >= 1200:
+        device = 'inner/large'
+    elif short_edge >= 900:
+        device = 'tablet'
     else:
-        display = 'large_or_unfolded'
+        device = 'phone'
 
-    return layout, orientation, display, aspect, short_edge
+    touch = 'compact' if layout == 'compact' else 'large-display' if layout == 'expanded' else 'normal'
+    return layout, orientation, device, touch
+
+
+def _existing_inset(name: str) -> int:
+    """Preserve any inset supplied by the Android bridge; otherwise Kodi GUI is the safe area."""
+    try:
+        value = _home().getProperty(name).strip()
+        return max(0, int(value)) if value else 0
+    except Exception:
+        return 0
 
 
 def snapshot():
-    width, height = _screen_size()
-    layout, orientation, display, aspect, short_edge = _classify(width, height)
+    width, height = _current_gui_size()
+    layout, orientation, device, touch = _classes(width, height)
+    short_edge = min(width, height) if width > 0 and height > 0 else 0
     long_edge = max(width, height) if width > 0 and height > 0 else 0
+    aspect = round(width / float(height), 4) if width > 0 and height > 0 else 0.0
     return {
         'api': LAYOUT_API,
         'width': width,
@@ -94,43 +127,79 @@ def snapshot():
         'short_edge': short_edge,
         'long_edge': long_edge,
         'aspect': aspect,
+        'aspect_class': _aspect_class(width, height),
         'orientation': orientation,
         'layout': layout,
-        'display_class': display,
+        'device_mode': device,
+        'touch_class': touch,
+        'inset_top': _existing_inset('Infinity.SafeInsetTop'),
+        'inset_bottom': _existing_inset('Infinity.SafeInsetBottom'),
+        'inset_left': _existing_inset('Infinity.SafeInsetLeft'),
+        'inset_right': _existing_inset('Infinity.SafeInsetRight'),
     }
 
 
-def publish(state) -> None:
-    _set('Infinity.LayoutAPI', state['api'])
-    _set('Infinity.LayoutWidth', state['width'])
-    _set('Infinity.LayoutHeight', state['height'])
-    _set('Infinity.LayoutShortEdge', state['short_edge'])
-    _set('Infinity.LayoutLongEdge', state['long_edge'])
-    _set('Infinity.LayoutAspect', state['aspect'])
-    _set('Infinity.Orientation', state['orientation'])
-    _set('Infinity.Layout', state['layout'])
-    _set('Infinity.DisplayClass', state['display_class'])
-    _set('Infinity.LayoutReady', str(state['width'] > 0 and state['height'] > 0).lower())
+def publish(force=False) -> bool:
+    state = snapshot()
+    signature = '|'.join(str(state[k]) for k in (
+        'width', 'height', 'orientation', 'device_mode', 'layout', 'aspect_class',
+        'inset_top', 'inset_bottom', 'inset_left', 'inset_right'
+    ))
+    home = _home()
+    if not force and home.getProperty('Infinity.DisplaySignature') == signature:
+        return False
+
+    values = {
+        'Infinity.LayoutAPI': state['api'],
+        'Infinity.WindowWidth': state['width'],
+        'Infinity.WindowHeight': state['height'],
+        'Infinity.Orientation': state['orientation'],
+        'Infinity.DeviceMode': state['device_mode'],
+        'Infinity.AspectClass': state['aspect_class'],
+        'Infinity.TouchClass': state['touch_class'],
+        'Infinity.SafeInsetTop': state['inset_top'],
+        'Infinity.SafeInsetBottom': state['inset_bottom'],
+        'Infinity.SafeInsetLeft': state['inset_left'],
+        'Infinity.SafeInsetRight': state['inset_right'],
+        'Infinity.Layout': state['layout'],
+        'Infinity.LayoutWidth': state['width'],
+        'Infinity.LayoutHeight': state['height'],
+        'Infinity.LayoutShortEdge': state['short_edge'],
+        'Infinity.LayoutLongEdge': state['long_edge'],
+        'Infinity.LayoutAspect': state['aspect'],
+        'Infinity.LayoutReady': str(state['width'] > 0 and state['height'] > 0).lower(),
+        'Infinity.DisplaySignature': signature,
+    }
+    for key, value in values.items():
+        _set(key, value)
+
+    xbmc.log(
+        TAG + 'device=' + state['device_mode'] + ' layout=' + state['layout'] +
+        ' orientation=' + state['orientation'] + ' size=' +
+        str(state['width']) + 'x' + str(state['height']), xbmc.LOGINFO,
+    )
+    return True
+
+
+class DisplayMonitor(xbmc.Monitor):
+    def onNotification(self, sender, method, data):
+        # Kodi GUI/window/activity notifications are the event source for rotation,
+        # resize, multi-window, fold/unfold and cover<->inner transitions.
+        publish()
+
+    def onSettingsChanged(self):
+        publish(force=True)
+
+    def onScreensaverDeactivated(self):
+        publish(force=True)
+
+    def onDPMSDeactivated(self):
+        publish(force=True)
 
 
 if __name__ == '__main__':
-    monitor = xbmc.Monitor()
-    previous = None
-    xbmc.log(TAG + 'Adaptive Layout API ' + LAYOUT_API + ' started', xbmc.LOGINFO)
-    while not monitor.abortRequested():
-        current = snapshot()
-        signature = (
-            current['width'], current['height'], current['orientation'],
-            current['layout'], current['display_class']
-        )
-        if signature != previous:
-            publish(current)
-            previous = signature
-            xbmc.log(
-                TAG + 'layout=' + current['layout'] +
-                ' orientation=' + current['orientation'] +
-                ' size=' + str(current['width']) + 'x' + str(current['height']),
-                xbmc.LOGINFO,
-            )
-        if monitor.waitForAbort(1.0):
-            break
+    monitor = DisplayMonitor()
+    xbmc.log(TAG + 'Adaptive Layout API ' + LAYOUT_API + ' event service started', xbmc.LOGINFO)
+    publish(force=True)
+    # Single blocking wait: callbacks above drive updates; there is no geometry polling loop.
+    monitor.waitForAbort()
