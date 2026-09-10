@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings version="1">
+  <section id="script.infinity.commandcenter">
+    <category id="general" label="Infinity Experience">
+      <group id="1">
+        <setting id="guardian_enabled" type="boolean" label="Crash Quarantine Suggestions"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="playback_memory_enabled" type="boolean" label="Per-title Audio and Subtitle Memory"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="suspect_window_minutes" type="integer" label="Crash Correlation Window (minutes)"><level>1</level><default>30</default><constraints><minimum>5</minimum><maximum>180</maximum></constraints><control type="spinner" format="integer"/></setting>
+        <setting id="max_restore_points" type="integer" label="Restore Points to Keep"><level>1</level><default>5</default><constraints><minimum>2</minimum><maximum>10</maximum></constraints><control type="spinner" format="integer"/></setting>
+      </group>
+    </category>
+  </section>
+</settings>
