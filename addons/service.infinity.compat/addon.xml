@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="service.infinity.compat" name="Infinity Compatibility Guard" version="0.6.0" provider-name="Project Infinity">
+<addon id="service.infinity.compat" name="Infinity Compatibility Guard" version="0.7.0" provider-name="Project Infinity">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.service" library="service.py" start="startup" />
   <extension point="xbmc.service" library="layout_service.py" start="startup" />
   <extension point="xbmc.service" library="theme_contract.py" start="startup" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Infinity Hook API, Skin API, Adaptive Layout API and Skin Theme Contract.</summary>
-    <description lang="en_GB">Provides Infinity Hook API 1.0, Infinity Skin API 1.0, Adaptive Layout API 1.1 and Skin Theme Contract 1.0. Infinity is the source of truth for theme, palette, responsive geometry, orientation, device/touch class, motion, refresh and power policy while keeping the protected Infinity OSD and player navigation panel owned by Infinity.</description>
+    <description lang="en_GB">Provides Infinity Hook API 1.0, Infinity Skin API 1.0, native-responsive Adaptive Layout API 1.2 and Skin Theme Contract 1.1. Infinity is the source of truth for theme, palette, responsive geometry, orientation, device/touch class, pane mode, motion, refresh and power policy while keeping the protected Infinity OSD and player navigation panel owned by Infinity.</description>
     <platform>all</platform><license>GPL-2.0-or-later</license>
   </extension>
 </addon>
