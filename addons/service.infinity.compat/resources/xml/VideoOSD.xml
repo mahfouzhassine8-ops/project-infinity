@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window>
+  <defaultcontrol always="true">602</defaultcontrol>
+  <controls>
+    <control type="button" id="9000">
+      <left>0</left><top>0</top><width>100%</width><height>760</height>
+      <texturefocus colordiffuse="00FFFFFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus>
+      <texturenofocus colordiffuse="00FFFFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus>
+      <label></label><onclick>Dialog.Close(VideoOSD)</onclick>
+    </control>
+    <control type="image">
+      <left>0</left><bottom>0</bottom><width>100%</width><height>300</height>
+      <texture colordiffuse="E6000000">special://xbmc/addons/skin.estuary/media/white.png</texture>
+    </control>
+    <control type="label">
+      <left>55</left><bottom>225</bottom><width>1810</width><height>46</height>
+      <font>font13</font><textcolor>FFF5F7FA</textcolor><label>$INFO[VideoPlayer.Title]</label>
+      <scroll>true</scroll>
+    </control>
+    <control type="progress" id="87">
+      <left>55</left><right>55</right><bottom>185</bottom><height>8</height>
+      <texturebg colordiffuse="55FFFFFF">special://xbmc/addons/skin.estuary/media/white.png</texturebg>
+      <lefttexture></lefttexture><midtexture colordiffuse="FF19BFFF">special://xbmc/addons/skin.estuary/media/white.png</midtexture><righttexture></righttexture>
+      <info>Player.Progress</info>
+    </control>
+    <control type="label">
+      <left>55</left><bottom>150</bottom><width>300</width><height>30</height>
+      <font>font12</font><textcolor>FF8FA5B8</textcolor><label>$INFO[Player.Time]</label>
+    </control>
+    <control type="label">
+      <right>55</right><bottom>150</bottom><width>300</width><height>30</height>
+      <align>right</align><font>font12</font><textcolor>FF8FA5B8</textcolor><label>$INFO[Player.Duration]</label>
+    </control>
+    <control type="grouplist" id="201">
+      <left>55</left><right>55</right><bottom>45</bottom><height>88</height>
+      <orientation>horizontal</orientation><itemgap>12</itemgap><align>center</align>
+      <control type="button" id="600"><width>76</width><height>76</height><label>PREV</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>PlayerControl(Previous)</onclick></control>
+      <control type="button" id="601"><width>76</width><height>76</height><label>REW</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick condition="Player.Paused">PlayerControl(Play)</onclick><onclick condition="!Player.Paused">PlayerControl(Rewind)</onclick><visible>Player.SeekEnabled</visible></control>
+      <control type="button" id="602"><width>88</width><height>76</height><label>PLAY</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="3319BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>PlayerControl(Play)</onclick></control>
+      <control type="button" id="603"><width>76</width><height>76</height><label>STOP</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>PlayerControl(Stop)</onclick></control>
+      <control type="button" id="606"><width>76</width><height>76</height><label>FWD</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick condition="Player.Paused">PlayerControl(Play)</onclick><onclick condition="!Player.Paused">PlayerControl(Forward)</onclick><visible>Player.SeekEnabled</visible></control>
+      <control type="button" id="607"><width>76</width><height>76</height><label>NEXT</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>PlayerControl(Next)</onclick></control>
+      <control type="button" id="70043"><width>76</width><height>76</height><label>INFO</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>Info</onclick></control>
+      <control type="button" id="70046"><width>76</width><height>76</height><label>CC</label><font>font12</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>ActivateWindow(osdsubtitlesettings)</onclick></control>
+      <control type="button" id="70049"><width>76</width><height>76</height><label>AUDIO</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>ActivateWindow(osdaudiosettings)</onclick></control>
+      <control type="button" id="70050"><width>76</width><height>76</height><label>VIDEO</label><font>font13</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>ActivateWindow(osdvideosettings)</onclick></control>
+      <control type="button" id="7999"><width>86</width><height>76</height><label>LOCK</label><font>font12</font><textcolor>FFF5F7FA</textcolor><focusedcolor>FFFFFFFF</focusedcolor><texturefocus colordiffuse="FF0A8FFF">special://xbmc/addons/skin.estuary/media/white.png</texturefocus><texturenofocus colordiffuse="2219BFFF">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus><onclick>Dialog.Close(VideoOSD)</onclick><onclick>ActivateWindow(1199)</onclick></control>
+    </control>
+  </controls>
+</window>
