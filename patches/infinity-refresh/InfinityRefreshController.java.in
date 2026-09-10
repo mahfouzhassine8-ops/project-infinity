@@ -16,8 +16,8 @@ import java.util.Properties;
 /**
  * Infinity 1.0.8 adaptive refresh policy.
  *
- * Kodi keeps ownership of video refresh switching. This controller only requests a
- * high-refresh UI mode when appropriate and explicitly yields during Match Video.
+ * Auto is the safe default: use high refresh for the UI, yield to Kodi for video,
+ * respect Android low-power mode, and fall back to 60 Hz under severe thermal load.
  */
 final class InfinityRefreshController
 {
@@ -37,7 +37,9 @@ final class InfinityRefreshController
     try
     {
       final Policy p = Policy.load(policyFile);
-      if ("off".equals(p.mode))
+      final String mode = normalizeMode(p.mode);
+
+      if ("off".equals(mode) || "system".equals(mode))
       {
         clearRequest();
         return;
@@ -46,15 +48,10 @@ final class InfinityRefreshController
       final boolean playingVideo = activity._infinityHasActiveVideo();
       if (playingVideo && "match_video".equals(p.videoPolicy))
       {
-        // Do not fight Kodi's Adjust Display Refresh Rate / content timing.
         clearRequest();
         Log.d(TAG, "Yielding refresh control to Kodi video policy (" + reason + ")");
         return;
       }
-
-      float cap = p.maxHz;
-      if (p.respectBatterySaver && isBatterySaverOn()) cap = Math.min(cap, 60f);
-      if (p.thermalProtection && isThermallyLimited()) cap = Math.min(cap, 60f);
 
       if (playingVideo && "system".equals(p.videoPolicy))
       {
@@ -66,6 +63,15 @@ final class InfinityRefreshController
         clearRequest();
         return;
       }
+
+      float cap = p.maxHz;
+      if ("balanced".equals(mode)) cap = Math.min(cap, 90f);
+      if ("battery".equals(mode)) cap = Math.min(cap, 60f); // legacy 1.0.8 value
+
+      // Low-power and thermal safety win by default in every active mode.
+      // Advanced users can explicitly disable battery-saver respect in settings.
+      if (p.respectBatterySaver && isBatterySaverOn()) cap = Math.min(cap, 60f);
+      if (p.thermalProtection && isThermallyLimited()) cap = Math.min(cap, 60f);
 
       final Display display = currentDisplay();
       if (display == null)
@@ -88,14 +94,24 @@ final class InfinityRefreshController
         activity.getWindow().setAttributes(attrs);
       }
       Log.d(TAG, String.format(Locale.US,
-          "Requested mode id=%d %.2fHz (%s, video=%s)", chosen.getModeId(),
-          chosen.getRefreshRate(), reason, playingVideo));
+          "Mode=%s requested id=%d %.2fHz (%s, video=%s, saver=%s)", mode,
+          chosen.getModeId(), chosen.getRefreshRate(), reason, playingVideo,
+          isBatterySaverOn()));
     }
     catch (Throwable error)
     {
       Log.w(TAG, "Refresh policy rejected; returning control to Android/Kodi", error);
       clearRequest();
     }
+  }
+
+  private String normalizeMode(String mode)
+  {
+    if (mode == null) return "auto";
+    // Preserve upgrades from Candidate 1 settings without forcing a reset.
+    if ("adaptive".equals(mode)) return "auto";
+    if ("performance".equals(mode)) return "high_refresh";
+    return mode;
   }
 
   private Display currentDisplay()
@@ -110,7 +126,7 @@ final class InfinityRefreshController
     Display.Mode best = null;
     for (Display.Mode mode : display.getSupportedModes())
     {
-      // Preserve the current pixel dimensions; only change refresh mode.
+      // Preserve current pixel dimensions; only request another refresh mode.
       if (mode.getPhysicalWidth() != current.getPhysicalWidth() ||
           mode.getPhysicalHeight() != current.getPhysicalHeight()) continue;
       if (mode.getRefreshRate() > cap + 0.5f) continue;
@@ -148,7 +164,7 @@ final class InfinityRefreshController
 
   private static final class Policy
   {
-    String mode = "adaptive";
+    String mode = "auto";
     float maxHz = Float.MAX_VALUE;
     String uiPolicy = "high_refresh";
     String videoPolicy = "match_video";
