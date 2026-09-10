@@ -1,0 +1,67 @@
+name: Infinity 1.0.6 | existing engine log diagnostic
+
+on:
+  push:
+    branches: [infinity-theme-hook-audit]
+    paths:
+      - '.github/workflows/infinity-1.0.6-log-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Read existing failed engine log and print bounded error context
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAILED_JOB_ID: '102679645377'
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostics
+          curl --fail --silent --show-error --location --retry 2 --max-time 120 \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/jobs/$FAILED_JOB_ID/logs" \
+            -o "$RUNNER_TEMP/infinity-failed-engine.log"
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          log = Path(os.environ['RUNNER_TEMP']) / 'infinity-failed-engine.log'
+          lines = log.read_text(encoding='utf-8', errors='replace').splitlines()
+          pattern = re.compile(r'CMake Error|fatal error:|\berror:|Traceback|CalledProcessError|##\[error\]', re.I)
+          hits = [i for i, line in enumerate(lines) if pattern.search(line)]
+          # Avoid dumping dependency configure probes: final errors and log tail are enough.
+          selected = set(range(max(0, len(lines) - 90), len(lines)))
+          for hit in hits[-8:]:
+              selected.update(range(max(0, hit - 8), min(len(lines), hit + 20)))
+          output = [f'Source job: {os.environ["FAILED_JOB_ID"]}',
+                    f'Log lines: {len(lines)}; error-like matches: {len(hits)}']
+          previous = -2
+          for i in sorted(selected):
+              if i != previous + 1:
+                  output.append('---')
+              output.append(f'{i + 1}: {lines[i][:1000]}')
+              previous = i
+          text = '\n'.join(output)
+          if len(text) > 48000:
+              text = text[:48000] + '\n[diagnostic output capped at 48000 characters]'
+          Path('diagnostics/error-context.txt').write_text(text + '\n', encoding='utf-8')
+          print(text)
+          PY
+      - name: Save compact diagnostic
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.6-Existing-Engine-Error
+          path: diagnostics/error-context.txt
+          if-no-files-found: warn
+          retention-days: 7
