@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "skin_api": "1.0",
+  "hook_api": "1.0",
+  "description": "Declarative contract for Infinity-compatible skins.",
+  "properties": [
+    "Infinity.SkinAPI",
+    "Infinity.HookAPI",
+    "Infinity.Theme",
+    "Infinity.PerformanceMode",
+    "Infinity.RefreshMode",
+    "Infinity.SafeMode",
+    "Infinity.CompatMode",
+    "Infinity.ProtectedPlayerUI"
+  ],
+  "protected_zones": [
+    "VideoOSD.xml",
+    "DialogSeekBar.xml",
+    "Custom_1199_InfinityVideoLock.xml"
+  ],
+  "theme_tokens": [
+    "Infinity.Theme",
+    "Infinity.SystemTheme"
+  ],
+  "skin_registration": {
+    "manifest_name": "infinity-skin.json",
+    "required": ["skin_id", "name", "skin_api"],
+    "optional": ["capabilities", "protected_zone_policy", "theme_support", "notes"]
+  }
+}
