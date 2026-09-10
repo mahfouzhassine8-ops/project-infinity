@@ -13,6 +13,7 @@ import xbmcgui
 
 TAG = '[InfinityLayout] '
 LAYOUT_API = '1.1'
+VALID_DEVICE_MODES = {'cover/front', 'inner/large', 'phone', 'tablet'}
 
 
 def _home():
@@ -75,6 +76,19 @@ def _aspect_class(width: int, height: int) -> str:
     return 'ultrawide'
 
 
+def _bridge_device_mode() -> str:
+    """Prefer an Android/host bridge classification when available."""
+    home = _home()
+    for key in ('Infinity.NativeDeviceMode', 'Infinity.AndroidDeviceMode'):
+        try:
+            value = home.getProperty(key).strip().lower()
+            if value in VALID_DEVICE_MODES:
+                return value
+        except Exception:
+            pass
+    return ''
+
+
 def _classes(width: int, height: int):
     if width <= 0 or height <= 0:
         return 'unknown', 'unknown', 'unknown', 'unknown'
@@ -84,7 +98,6 @@ def _classes(width: int, height: int):
     long_edge = max(width, height)
     ratio = long_edge / float(short_edge)
 
-    # Classes are geometry-based, not model-based, so foldables/tablets from any vendor work.
     if short_edge < 720:
         layout = 'compact'
     elif short_edge < 1200:
@@ -92,11 +105,16 @@ def _classes(width: int, height: int):
     else:
         layout = 'expanded'
 
-    if short_edge < 720 and ratio >= 1.75:
+    native_mode = _bridge_device_mode()
+    if native_mode:
+        device = native_mode
+    elif short_edge < 720 and ratio >= 1.75:
         device = 'cover/front'
-    elif short_edge >= 1200:
+    elif ratio >= 1.8:
+        device = 'phone'
+    elif layout == 'expanded' and ratio <= 1.5:
         device = 'inner/large'
-    elif short_edge >= 900:
+    elif layout == 'expanded':
         device = 'tablet'
     else:
         device = 'phone'
@@ -183,8 +201,6 @@ def publish(force=False) -> bool:
 
 class DisplayMonitor(xbmc.Monitor):
     def onNotification(self, sender, method, data):
-        # Kodi GUI/window/activity notifications are the event source for rotation,
-        # resize, multi-window, fold/unfold and cover<->inner transitions.
         publish()
 
     def onSettingsChanged(self):
@@ -201,5 +217,4 @@ if __name__ == '__main__':
     monitor = DisplayMonitor()
     xbmc.log(TAG + 'Adaptive Layout API ' + LAYOUT_API + ' event service started', xbmc.LOGINFO)
     publish(force=True)
-    # Single blocking wait: callbacks above drive updates; there is no geometry polling loop.
     monitor.waitForAbort()
