@@ -1,0 +1,181 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.os.Build;
+import android.os.PowerManager;
+import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Locale;
+import java.util.Properties;
+
+/**
+ * Infinity 1.0.8 adaptive refresh policy.
+ *
+ * Kodi keeps ownership of video refresh switching. This controller only requests a
+ * high-refresh UI mode when appropriate and explicitly yields during Match Video.
+ */
+final class InfinityRefreshController
+{
+  private static final String TAG = "InfinityRefresh";
+  private final Main activity;
+  private final File policyFile;
+
+  InfinityRefreshController(Main activity)
+  {
+    this.activity = activity;
+    this.policyFile = new File(activity.getFilesDir(),
+        ".kodi/userdata/addon_data/service.infinity.refresh/policy.properties");
+  }
+
+  void apply(String reason)
+  {
+    try
+    {
+      final Policy p = Policy.load(policyFile);
+      if ("off".equals(p.mode))
+      {
+        clearRequest();
+        return;
+      }
+
+      final boolean playingVideo = activity._infinityHasActiveVideo();
+      if (playingVideo && "match_video".equals(p.videoPolicy))
+      {
+        // Do not fight Kodi's Adjust Display Refresh Rate / content timing.
+        clearRequest();
+        Log.d(TAG, "Yielding refresh control to Kodi video policy (" + reason + ")");
+        return;
+      }
+
+      float cap = p.maxHz;
+      if (p.respectBatterySaver && isBatterySaverOn()) cap = Math.min(cap, 60f);
+      if (p.thermalProtection && isThermallyLimited()) cap = Math.min(cap, 60f);
+
+      if (playingVideo && "system".equals(p.videoPolicy))
+      {
+        clearRequest();
+        return;
+      }
+      if (!playingVideo && "system".equals(p.uiPolicy))
+      {
+        clearRequest();
+        return;
+      }
+
+      final Display display = currentDisplay();
+      if (display == null)
+      {
+        clearRequest();
+        return;
+      }
+
+      final Display.Mode chosen = chooseMode(display, cap);
+      if (chosen == null)
+      {
+        clearRequest();
+        return;
+      }
+
+      WindowManager.LayoutParams attrs = activity.getWindow().getAttributes();
+      if (attrs.preferredDisplayModeId != chosen.getModeId())
+      {
+        attrs.preferredDisplayModeId = chosen.getModeId();
+        activity.getWindow().setAttributes(attrs);
+      }
+      Log.d(TAG, String.format(Locale.US,
+          "Requested mode id=%d %.2fHz (%s, video=%s)", chosen.getModeId(),
+          chosen.getRefreshRate(), reason, playingVideo));
+    }
+    catch (Throwable error)
+    {
+      Log.w(TAG, "Refresh policy rejected; returning control to Android/Kodi", error);
+      clearRequest();
+    }
+  }
+
+  private Display currentDisplay()
+  {
+    if (Build.VERSION.SDK_INT >= 30) return activity.getDisplay();
+    return activity.getWindowManager().getDefaultDisplay();
+  }
+
+  private Display.Mode chooseMode(Display display, float cap)
+  {
+    Display.Mode current = display.getMode();
+    Display.Mode best = null;
+    for (Display.Mode mode : display.getSupportedModes())
+    {
+      // Preserve the current pixel dimensions; only change refresh mode.
+      if (mode.getPhysicalWidth() != current.getPhysicalWidth() ||
+          mode.getPhysicalHeight() != current.getPhysicalHeight()) continue;
+      if (mode.getRefreshRate() > cap + 0.5f) continue;
+      if (best == null || mode.getRefreshRate() > best.getRefreshRate()) best = mode;
+    }
+    return best;
+  }
+
+  private boolean isBatterySaverOn()
+  {
+    PowerManager pm = (PowerManager)activity.getSystemService(Context.POWER_SERVICE);
+    return pm != null && pm.isPowerSaveMode();
+  }
+
+  private boolean isThermallyLimited()
+  {
+    if (Build.VERSION.SDK_INT < 29) return false;
+    PowerManager pm = (PowerManager)activity.getSystemService(Context.POWER_SERVICE);
+    return pm != null && pm.getCurrentThermalStatus() >= PowerManager.THERMAL_STATUS_SEVERE;
+  }
+
+  private void clearRequest()
+  {
+    try
+    {
+      WindowManager.LayoutParams attrs = activity.getWindow().getAttributes();
+      if (attrs.preferredDisplayModeId != 0)
+      {
+        attrs.preferredDisplayModeId = 0;
+        activity.getWindow().setAttributes(attrs);
+      }
+    }
+    catch (Throwable ignored) { }
+  }
+
+  private static final class Policy
+  {
+    String mode = "adaptive";
+    float maxHz = Float.MAX_VALUE;
+    String uiPolicy = "high_refresh";
+    String videoPolicy = "match_video";
+    boolean respectBatterySaver = true;
+    boolean thermalProtection = true;
+
+    static Policy load(File file)
+    {
+      Policy p = new Policy();
+      Properties props = new Properties();
+      if (file.isFile())
+      {
+        try (FileInputStream input = new FileInputStream(file)) { props.load(input); }
+        catch (Exception error) { Log.w(TAG, "Could not read refresh policy", error); }
+      }
+      p.mode = props.getProperty("mode", p.mode).trim().toLowerCase(Locale.US);
+      p.uiPolicy = props.getProperty("ui_policy", p.uiPolicy).trim().toLowerCase(Locale.US);
+      p.videoPolicy = props.getProperty("video_policy", p.videoPolicy).trim().toLowerCase(Locale.US);
+      p.respectBatterySaver = Boolean.parseBoolean(props.getProperty("respect_battery_saver", "true"));
+      p.thermalProtection = Boolean.parseBoolean(props.getProperty("thermal_protection", "true"));
+      String max = props.getProperty("max_hz", "auto").trim().toLowerCase(Locale.US);
+      if (!"auto".equals(max) && !"highest".equals(max))
+      {
+        try { p.maxHz = Math.max(30f, Float.parseFloat(max)); }
+        catch (NumberFormatException ignored) { p.maxHz = Float.MAX_VALUE; }
+      }
+      return p;
+    }
+  }
+}
