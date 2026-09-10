@@ -1,0 +1,77 @@
+name: Infinity Audio Policy | Cumulative Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.8-audio-policy-integration]
+    paths:
+      - '.github/workflows/infinity-audio-policy-validation.yml'
+      - 'scripts/infinity_audio_policy_source.py'
+      - 'scripts/validate_infinity_audio_policy.py'
+      - 'patches/infinity-audio-policy/**'
+      - 'tests/infinity_audio/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Prepare pinned cumulative source
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity_audio_policy_source.py kodi --receipts checks/receipts
+          git -C kodi diff --check
+      - name: Validate Java JNI policy configuration and lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_infinity_audio_policy.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out checks/validation
+          python3 tests/infinity_audio/test_config.py
+          python3 scripts/validate_infinity_skin_contract.py
+          mkdir -p checks/dex
+          "$ANDROID_HOME/build-tools/34.0.0/d8" --lib "$ANDROID_HOME/platforms/android-34/android.jar" \
+            --min-api 21 --output checks/dex checks/validation/java/compile-check.jar
+      - name: Export reviewed code and receipts without device data or signing material
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checks/source-review
+          git diff --stat > checks/repository-diff.txt
+          git -C kodi diff --stat > checks/kodi-diff-stat.txt
+          git -C kodi diff > checks/kodi-source.diff
+          python3 - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          out=Path('checks/source-review')
+          for folder in ('scripts','patches','tests','addons','.github'):
+              shutil.copytree(folder,out/'project'/folder)
+          receipt=Path('checks/receipts/cumulative-source.json')
+          if receipt.exists():
+              for rel in json.loads(receipt.read_text())['files']:
+                  dst=out/'kodi'/rel
+                  dst.parent.mkdir(parents=True,exist_ok=True)
+                  shutil.copyfile(Path('kodi')/rel,dst)
+          PY
+          printf '%s\n' "$GITHUB_SHA" > checks/source-commit.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Cumulative-Audio-Validation
+          path: checks/
+          if-no-files-found: error
+          retention-days: 7
