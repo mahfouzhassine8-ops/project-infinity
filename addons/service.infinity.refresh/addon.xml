@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="service.infinity.refresh" name="Infinity High Refresh Controller" version="1.0.0" provider-name="Infinity">
+<addon id="service.infinity.refresh" name="Infinity High Refresh Controller" version="1.0.1" provider-name="Infinity">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
   <extension point="xbmc.service" library="service.py" start="login"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Adaptive refresh policy for Infinity</summary>
-    <description lang="en_GB">Controls Infinity UI refresh requests while yielding video refresh timing to Kodi when Match Video is selected.</description>
+    <summary lang="en_GB">Adaptive refresh policy for Infinity Hook API 1.0</summary>
+    <description lang="en_GB">Controls Infinity UI refresh requests through the Hook API policy layer while yielding video refresh timing to Kodi when Match Video is selected.</description>
     <platform>all</platform>
     <license>GPL-2.0-or-later</license>
   </extension>
