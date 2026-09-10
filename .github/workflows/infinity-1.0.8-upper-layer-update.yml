@@ -83,6 +83,8 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import zipfile
+          import xml.etree.ElementTree as ET
+          from io import BytesIO
           apk='candidate/Infinity-1.0.8-Candidate-1-HookUpdate.apk'
           required=[
             'assets/addons/service.infinity.compat/addon.xml',
@@ -95,6 +97,9 @@ jobs:
             'assets/addons/service.infinity.compat/resources/colors/InfinityLight.xml',
             'assets/addons/service.infinity.compat/resources/colors/InfinityDark.xml',
             'assets/addons/service.infinity.compat/resources/colors/InfinityOLED.xml',
+            'assets/addons/service.infinity.compat/resources/xml/VideoOSD.xml',
+            'assets/addons/service.infinity.compat/resources/xml/DialogSeekBar.xml',
+            'assets/addons/service.infinity.compat/resources/xml/Custom_1199_InfinityVideoLock.xml',
             'assets/addons/service.infinity.refresh/addon.xml',
             'assets/addons/service.infinity.refresh/service.py',
             'assets/addons/service.infinity.refresh/resources/settings.xml',
@@ -103,7 +108,15 @@ jobs:
               names=set(z.namelist())
               missing=[x for x in required if x not in names]
               assert not missing, missing
-          print('Fast upper-layer payload verified; engine rebuild skipped.')
+              osd=z.read('assets/addons/service.infinity.compat/resources/xml/VideoOSD.xml')
+              ET.parse(BytesIO(osd))
+              text=osd.decode('utf-8')
+              for needle in ('Infinity.Palette.Scrim','Infinity.Palette.Focus','Infinity.Orientation',
+                             'ActivateWindow(osdsubtitlesettings)','ActivateWindow(osdaudiosettings)',
+                             'PlayerControl(Play)','ActivateWindow(1199)'):
+                  assert needle in text, needle
+              assert '<control type="videowindow"' not in text.lower()
+          print('Fast upper-layer payload + protected player contract verified; engine rebuild skipped.')
           PY
 
       - uses: actions/upload-artifact@v7
