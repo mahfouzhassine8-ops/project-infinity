@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "hook_api": "1.0",
+  "release": "Infinity 1.0.8 Candidate 1",
+  "capabilities": {
+    "protected_player_ui": true,
+    "theme_policy_bridge": true,
+    "system_font_bridge": true,
+    "refresh_policy_bridge": true,
+    "feature_flags": true,
+    "compatibility_mode": true,
+    "health_breadcrumbs": true,
+    "config_export_ready": true
+  },
+  "protected_ui": [
+    "VideoOSD.xml",
+    "DialogSeekBar.xml",
+    "Custom_1199_InfinityVideoLock.xml"
+  ]
+}
