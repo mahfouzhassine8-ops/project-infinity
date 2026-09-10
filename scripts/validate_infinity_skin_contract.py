@@ -18,7 +18,9 @@ THEME_SRC = (COMPAT / 'theme_contract.py').read_text(encoding='utf-8')
 LAYOUT_SRC = (COMPAT / 'layout_service.py').read_text(encoding='utf-8')
 COMPAT_SRC = (COMPAT / 'service.py').read_text(encoding='utf-8')
 OSD_PATH = COMPAT / 'resources/xml/VideoOSD.xml'
+PANEL_PATH = COMPAT / 'resources/xml/Custom_1197_InfinityPlayerPanel.xml'
 OSD_SRC = OSD_PATH.read_text(encoding='utf-8')
+PANEL_SRC = PANEL_PATH.read_text(encoding='utf-8')
 
 REQUIRED_PROPERTIES = {
     'Infinity.SystemTheme', 'Infinity.ThemeRevision', 'Infinity.DeviceMode',
@@ -70,8 +72,9 @@ def main():
     assert REQUIRED_PROPERTIES <= props, sorted(REQUIRED_PROPERTIES - props)
     assert REQUIRED_TOKENS <= tokens, sorted(REQUIRED_TOKENS - tokens)
     assert set(SKIN_API['theme_values']) == {'light', 'dark', 'OLED'}
-    for flag in ('protected_player_ui', 'palette_tokens', 'responsive_display_state',
-                 'event_driven_theme_updates', 'event_driven_layout_updates'):
+    for flag in ('protected_player_ui', 'protected_player_panel', 'palette_tokens',
+                 'responsive_display_state', 'event_driven_theme_updates',
+                 'event_driven_layout_updates'):
         assert CAPS['capabilities'][flag] is True, flag
 
     assert 'ReloadSkin()' not in COMPAT_SRC
@@ -102,23 +105,24 @@ def main():
     player = SKIN_API['player_contract']
     assert player['owner'] == 'Infinity'
     assert player['replaceable_by_skin'] is False
+    assert player['panel_window'] == 1197
 
-    # Protected OSD must be strict XML, palette-driven, responsive, and must not define
-    # any video-render control. It overlays Kodi playback; Kodi owns aspect-preserving video.
     ET.parse(OSD_PATH)
-    assert 'Infinity.Palette.Scrim' in OSD_SRC
-    assert 'Infinity.Palette.TextPrimary' in OSD_SRC
-    assert 'Infinity.Palette.TextSecondary' in OSD_SRC
-    assert 'Infinity.Palette.Focus' in OSD_SRC
-    assert 'Infinity.Palette.Accent' in OSD_SRC
-    assert 'Infinity.Orientation' in OSD_SRC
-    assert 'ActivateWindow(osdsubtitlesettings)' in OSD_SRC
-    assert 'ActivateWindow(osdaudiosettings)' in OSD_SRC
-    assert 'PlayerControl(Play)' in OSD_SRC
-    assert 'ActivateWindow(1199)' in OSD_SRC
+    ET.parse(PANEL_PATH)
+    for needle in ('Infinity.Palette.Scrim','Infinity.Palette.TextPrimary',
+                   'Infinity.Palette.TextSecondary','Infinity.Palette.Focus',
+                   'Infinity.Palette.Accent','Infinity.Orientation',
+                   'ActivateWindow(osdsubtitlesettings)','ActivateWindow(osdaudiosettings)',
+                   'PlayerControl(Play)','ActivateWindow(1199)','ActivateWindow(1197)'):
+        assert needle in OSD_SRC, needle
+    for needle in ('Chapters / Bookmarks','Subtitles','Audio','Video Settings',
+                   'Playback Speed +','Playback Speed -','Related / Cast &amp; Crew',
+                   'Close Player','Infinity.RefreshPolicy'):
+        assert needle in PANEL_SRC, needle
     assert '<control type="videowindow"' not in OSD_SRC.lower()
+    assert '<control type="videowindow"' not in PANEL_SRC.lower()
 
-    print('Infinity Skin Theme Contract + responsive protected player matrix PASS')
+    print('Infinity Skin Theme Contract + protected player panel matrix PASS')
     print('Real-device visual gate still required for fold/unfold, cutouts, player OSD and Kodi screens.')
 
 
