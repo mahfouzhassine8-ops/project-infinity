@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <settings version="1">
   <section id="service.infinity.refresh">
-    <category id="general" label="Infinity Adaptive Refresh">
+    <category id="general" label="Infinity Performance & Refresh">
       <group id="1">
-        <setting id="mode" type="string" label="Refresh Mode">
+        <setting id="mode" type="string" label="Performance Mode">
           <level>0</level><default>auto</default>
           <constraints><options>
             <option label="Auto (Recommended)">auto</option>
-            <option label="High Refresh">high_refresh</option>
+            <option label="Performance (Highest Safe Refresh)">performance</option>
             <option label="Balanced">balanced</option>
             <option label="System Default">system</option>
             <option label="Compatibility / Off">off</option>
@@ -39,6 +39,7 @@
           </options></constraints><control type="spinner" format="string"/>
         </setting>
         <setting id="respect_battery_saver" type="boolean" label="Respect Android Low Power / Battery Saver"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="performance_override_battery" type="boolean" label="Performance Mode May Override Battery Saver"><level>1</level><default>false</default><control type="toggle"/></setting>
         <setting id="thermal_protection" type="boolean" label="Thermal Protection"><level>0</level><default>true</default><control type="toggle"/></setting>
       </group>
     </category>
