@@ -106,11 +106,17 @@ def _native_v5_state():
     if width_dp <= 0 or height_dp <= 0:
         return None
 
+    # A Fold cover stays compact when rotated even if its horizontal width exceeds 840dp.
+    if device == 'cover/front':
+        layout = 'compact'
+
     orientation = (home.getProperty('Infinity.NativeOrientation') or '').strip().lower()
     if orientation not in ('portrait', 'landscape', 'square'):
         orientation = 'landscape' if width_dp > height_dp else 'portrait' if height_dp > width_dp else 'square'
     touch = (home.getProperty('Infinity.NativeTouchClass') or '').strip().lower()
-    if touch not in ('compact', 'normal', 'large-display'):
+    if device == 'cover/front':
+        touch = 'compact'
+    elif touch not in ('compact', 'normal', 'large-display'):
         touch = 'compact' if layout == 'compact' else 'large-display' if layout == 'expanded' else 'normal'
 
     px_w, px_h, px_source = _screen_size()
