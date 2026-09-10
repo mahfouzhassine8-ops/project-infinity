@@ -1,0 +1,49 @@
+name: Infinity compatibility | pinned source inspection
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-player-protection]
+    paths: ['.github/workflows/infinity-compat-source-inspection.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Prepare exact 1.0.6 source without building or signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --quiet --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity_1_0_6_source.py kodi
+          mkdir -p inspection
+          python3 - <<'PY'
+          from pathlib import Path
+          import os, zipfile
+          roots = ['scripts', 'patches', 'tests', '.github/workflows', 'assets',
+                   'kodi/xbmc', 'kodi/cmake', 'kodi/tools/android/packaging',
+                   'kodi/addons/skin.estuary/xml']
+          allowed = {'.py','.sh','.cpp','.h','.hpp','.c','.in','.cmake','.txt','.xml','.json','.yml','.patch','.md','.png','.po'}
+          with zipfile.ZipFile('inspection/pinned-source.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+              for root in roots:
+                  for path in Path(root).rglob('*'):
+                      if path.is_file() and path.suffix in allowed and '.git' not in path.parts:
+                          z.write(path, path.as_posix())
+              z.writestr('INSPECTION_COMMIT.txt', os.environ['GITHUB_SHA'] + '\n')
+              # An actual Android SDK API jar is useful for local javac validation.
+              sdk = Path(os.environ.get('ANDROID_HOME', '/usr/local/lib/android/sdk'))
+              jars = sorted(sdk.glob('platforms/android-*/android.jar'))
+              if jars:
+                  z.write(jars[-1], 'validation/android.jar')
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Pinned-Source-Inspection
+          path: inspection/pinned-source.zip
+          retention-days: 3
