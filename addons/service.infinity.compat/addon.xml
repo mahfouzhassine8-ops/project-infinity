@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="service.infinity.compat" name="Infinity Compatibility Guard" version="0.2.0" provider-name="Project Infinity">
+<addon id="service.infinity.compat" name="Infinity Compatibility Guard" version="0.3.0" provider-name="Project Infinity">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.service" library="service.py" start="startup" />
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Infinity Hook API capability, compatibility and protected-UI service.</summary>
-    <description lang="en_GB">Provides Infinity Hook API 1.0, protected player controls, Infinity light/dark theme bridging, compatibility/safe modes, feature flags and Health Center breadcrumbs while third-party skins keep ownership of Home, widgets and navigation.</description>
+    <summary lang="en_GB">Infinity Hook API and Skin API capability service.</summary>
+    <description lang="en_GB">Provides Infinity Hook API 1.0 and Infinity Skin API 1.0, including stable Window(Home) properties, declarative skin registration, protected player controls, light/dark theme bridging, performance and refresh state, compatibility/safe modes, feature flags and Health Center breadcrumbs while skins keep ownership of Home, widgets and navigation.</description>
     <platform>all</platform><license>GPL-2.0-or-later</license>
   </extension>
 </addon>
