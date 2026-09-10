@@ -1,4 +1,4 @@
-name: Infinity Audio Policy | Cumulative Validation
+name: Infinity 1.0.8 | Cumulative Audio Policy Update
 
 on:
   workflow_dispatch:
@@ -8,11 +8,21 @@ on:
       - '.github/workflows/infinity-audio-policy-validation.yml'
       - 'scripts/infinity_audio_policy_source.py'
       - 'scripts/validate_infinity_audio_policy.py'
+      - 'scripts/verify_infinity_audio_apk.py'
+      - 'scripts/verify_infinity_cumulative_media.py'
+      - 'scripts/infinity_upper_layer_repack.py'
       - 'patches/infinity-audio-policy/**'
+      - 'patches/infinity-media/**'
+      - 'addons/script.infinity.audiopolicy/**'
       - 'tests/infinity_audio/**'
 
 permissions:
   contents: read
+  actions: read
+
+concurrency:
+  group: infinity-cumulative-audio-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   validate:
@@ -25,10 +35,15 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Prepare pinned cumulative source
         shell: bash
         run: |
           set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y rapidjson-dev
           sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
           git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
           test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
@@ -40,33 +55,26 @@ jobs:
           set -euo pipefail
           python3 scripts/validate_infinity_audio_policy.py --source kodi \
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out checks/validation
-          python3 tests/infinity_audio/test_config.py
+          python3 tests/infinity_audio/test_config.py --source kodi --out checks/config-tests
           python3 scripts/validate_infinity_skin_contract.py
           mkdir -p checks/dex
           "$ANDROID_HOME/build-tools/34.0.0/d8" --lib "$ANDROID_HOME/platforms/android-34/android.jar" \
             --min-api 21 --output checks/dex checks/validation/java/compile-check.jar
-      - name: Export reviewed code and receipts without device data or signing material
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          saved=json.loads(Path('patches/infinity-audio-policy/preserved-v5-assets.json').read_text())
+          for name,expected in saved['files'].items():
+              path=Path(name.removeprefix('assets/'))
+              assert hashlib.sha256(path.read_bytes()).hexdigest()==expected,name
+          print('PASS: all 19 responsive-v5 add-on inputs preserved')
+          PY
+      - name: Export source receipts and diff
         if: always()
         shell: bash
         run: |
-          set -euo pipefail
-          mkdir -p checks/source-review
-          git diff --stat > checks/repository-diff.txt
-          git -C kodi diff --stat > checks/kodi-diff-stat.txt
-          git -C kodi diff > checks/kodi-source.diff
-          python3 - <<'PY'
-          import json, shutil
-          from pathlib import Path
-          out=Path('checks/source-review')
-          for folder in ('scripts','patches','tests','addons','.github'):
-              shutil.copytree(folder,out/'project'/folder)
-          receipt=Path('checks/receipts/cumulative-source.json')
-          if receipt.exists():
-              for rel in json.loads(receipt.read_text())['files']:
-                  dst=out/'kodi'/rel
-                  dst.parent.mkdir(parents=True,exist_ok=True)
-                  shutil.copyfile(Path('kodi')/rel,dst)
-          PY
+          mkdir -p checks
+          if [ -d kodi/.git ]; then git -C kodi diff > checks/kodi-source.diff; fi
           printf '%s\n' "$GITHUB_SHA" > checks/source-commit.txt
       - uses: actions/upload-artifact@v7
         if: always()
@@ -74,4 +82,208 @@ jobs:
           name: Infinity-Cumulative-Audio-Validation
           path: checks/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
+
+  engine:
+    needs: validate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Prepare matched Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+      - name: Apply the exact combined source stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity_audio_policy_source.py kodi --receipts engine/receipts
+          git -C kodi diff --check
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json') }}
+          restore-keys: |
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-
+      - name: Prepare matched dependencies
+        id: depends
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+      - name: Compile native Kodi targets and audio-policy owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+          make -C "$BUILD_DIR" -j"$(nproc)"
+      - name: Package and record reusable cumulative engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          cp "$APK" engine/Infinity-1.0.8-Cumulative-Audio-Engine-Base.apk
+          # Legacy inventory is only for the byte-preserving lock overlay.
+          # Actual capabilities and version are in cumulative-source.json.
+          python3 scripts/infinity71.py record-engine \
+            --apk engine/Infinity-1.0.8-Cumulative-Audio-Engine-Base.apk \
+            --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            engine/Infinity-1.0.8-Cumulative-Audio-Engine-Base.apk > engine/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103120'" engine/badging.txt
+          printf '%s\n' "$GITHUB_SHA" > engine/source-commit.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Cumulative-Audio-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: Infinity-Cumulative-Audio-Native-Failure
+          path: |
+            engine/receipts/
+            kodi-build/infinity-native-gate/
+            kodi-build/CMakeFiles/CMakeError.log
+          if-no-files-found: warn
+          retention-days: 14
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  package:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.8-Cumulative-Audio-Engine
+          path: engine
+      - name: Preserve v5 assets and inject the one-shot audio-policy utility
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat engine/source-commit.txt)" = "$GITHUB_SHA"
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay \
+            --apk engine/Infinity-1.0.8-Cumulative-Audio-Engine-Base.apk \
+            --manifest engine/overlay-inventory.json --output candidate/locked-unsigned.apk
+          python3 scripts/infinity_upper_layer_repack.py candidate/locked-unsigned.apk \
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update-unsigned.apk
+      - name: Sign with permanent Infinity identity only
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing configuration: $name" >&2; exit 2; fi
+          done
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update-unsigned.apk \
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update.apk > candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update.apk > candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103120'" candidate/badging.txt
+      - name: Reject split capabilities or changed responsive assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/verify_infinity_audio_apk.py \
+            --apk candidate/Infinity-1.0.8-Cumulative-Audio-Update.apk \
+            --engine engine/Infinity-1.0.8-Cumulative-Audio-Engine-Base.apk \
+            --source-receipt engine/receipts/cumulative-source.json \
+            --out candidate/cumulative-verification.json
+          cp engine/receipts/cumulative-source.json candidate/
+          cp engine/source-commit.txt candidate/
+          printf '%s\n' \
+            'Infinity 1.0.8 Cumulative Audio Policy 1 - versionCode 2103120' \
+            'Install the signed APK as an update. Do not uninstall existing Infinity.' \
+            'Includes responsive v5, native-media hooks and Audio Policy API 1.' \
+            'Auto is the default: video MOVIE; music MUSIC. No UI redesign.' \
+            'Audio Policy utility: stop playback completely before changing Auto/Legacy.' \
+            'CI checks are not device tests. Samsung Audio Eraser eligibility is unverified.' \
+            > candidate/README.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Cumulative-Audio-Update
+          path: |
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update.apk
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update.sha256
+            candidate/Infinity-1.0.8-Cumulative-Audio-Update.signing.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/cumulative-verification.json
+            candidate/cumulative-source.json
+            candidate/source-commit.txt
+            candidate/README.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
