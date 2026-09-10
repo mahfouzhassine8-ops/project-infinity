@@ -1,0 +1,103 @@
+name: Infinity 1.0.8 Candidate 1 | Fast Upper Layer Update
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.8-high-refresh]
+    paths:
+      - '.github/workflows/infinity-1.0.8-upper-layer-update.yml'
+      - 'scripts/infinity_upper_layer_repack.py'
+      - 'addons/service.infinity.compat/**'
+      - 'addons/service.infinity.refresh/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  repack:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BASE_RUN_ID: '34452860358'
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download proven 1.0.8 Candidate 1 base artifact
+        run: |
+          set -euo pipefail
+          mkdir -p base
+          gh run download "$BASE_RUN_ID" -n Infinity-1.0.8-Candidate-1 -D base
+          test -f base/Infinity-1.0.8-Candidate-1.apk
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Install Android signing tools
+        run: |
+          set -euo pipefail
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+
+      - name: Replace Infinity upper layer only
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity_upper_layer_repack.py \
+            base/Infinity-1.0.8-Candidate-1.apk \
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate-unsigned.apk
+
+      - name: Permanently sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing secret: $name" >&2; exit 2; fi
+          done
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate-unsigned.apk \
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103108'" candidate/badging.txt
+
+      - name: Verify upper-layer payload
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile
+          apk='candidate/Infinity-1.0.8-Candidate-1-HookUpdate.apk'
+          required=[
+            'assets/addons/service.infinity.compat/addon.xml',
+            'assets/addons/service.infinity.compat/service.py',
+            'assets/addons/service.infinity.compat/resources/settings.xml',
+            'assets/addons/service.infinity.compat/resources/capabilities.json',
+            'assets/addons/service.infinity.refresh/addon.xml',
+            'assets/addons/service.infinity.refresh/service.py',
+            'assets/addons/service.infinity.refresh/resources/settings.xml',
+          ]
+          with zipfile.ZipFile(apk) as z:
+              names=set(z.namelist())
+              missing=[x for x in required if x not in names]
+              assert not missing, missing
+          print('Fast upper-layer payload verified; engine rebuild skipped.')
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Candidate-1-HookUpdate
+          path: |
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate.apk
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate.sha256
+            candidate/Infinity-1.0.8-Candidate-1-HookUpdate.signing.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
