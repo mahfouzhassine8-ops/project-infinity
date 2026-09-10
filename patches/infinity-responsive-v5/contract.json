@@ -5,6 +5,7 @@
   "name": "Infinity Responsive Bridge",
   "preimage_files": {
     "tools/android/packaging/xbmc/build.gradle.in": "67c75dcca089ff0f01acdb3e2c4e72ff4d96e808a8f2ef070457c8a7591025cb",
+    "tools/android/packaging/xbmc/AndroidManifest.xml.in": "69281167b5d8516844ce98290c2a7b6270095ab05ec5816b5d142d8f66c147b5",
     "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": "ed760b046848c5c98314d250607228fa276a2b963cc4dca807b7d80c56f000d8",
     "xbmc/platform/android/activity/InfinityBridgeState.h": "795908602e27a06ddc029f4248db9c751dc88cc6128f803229c72959f26fd485",
     "xbmc/windowing/android/WinSystemAndroid.cpp": "52424a8d8c1ce7be9186989557e25df507da68207d71ab6c032258d3c0332cdd"
@@ -14,6 +15,12 @@
     "effective_layout_owner": "service.infinity.compat/layout_service.py",
     "raw_prefix": "Infinity.Native",
     "ready_marker": "Infinity.NativeReady"
+  },
+  "launcher_icon": {
+    "resource": "@drawable/project_infinity_icon",
+    "source": "tools/android/packaging/xbmc/res/drawable-nodpi/project_infinity_icon.png",
+    "sha256": "77215c0b5e512a9d81bfdb384ae041caefa5a45d879e04f719013ceecb14aff6",
+    "bindings": ["android:icon", "android:roundIcon", "startup splash"]
   },
   "schema": 1,
   "version_code": 2103109,
