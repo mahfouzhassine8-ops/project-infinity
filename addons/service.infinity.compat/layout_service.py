@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Infinity responsive display-state contract.
 
-Infinity is the single source of truth for skin-visible geometry. This service publishes
-actual current Kodi GUI dimensions and responsive classes on startup and on Kodi events;
-it intentionally has no polling loop.
+Bridge v5 is the preferred source of truth. It publishes Android window semantics in dp
+and device/layout classes through native Window(Home) properties. Kodi GUI labels are
+used only as diagnostics/fallbacks; authored skin-canvas dimensions never override v5.
 """
 from __future__ import annotations
 
@@ -12,8 +12,9 @@ import xbmc
 import xbmcgui
 
 TAG = '[InfinityLayout] '
-LAYOUT_API = '1.1'
-VALID_DEVICE_MODES = {'cover/front', 'inner/large', 'phone', 'tablet'}
+LAYOUT_API = '1.2'
+VALID_DEVICE_MODES = {'cover/front', 'inner/large', 'phone', 'tablet', 'tv', 'unknown'}
+VALID_LAYOUTS = {'compact', 'medium', 'expanded', 'unknown'}
 
 
 def _home():
@@ -36,31 +37,42 @@ def _number(label: str) -> int:
         return 0
 
 
-def _current_gui_size():
-    """Read the active Kodi GUI window first, with system labels only as fallbacks."""
+def _prop_int(home, name: str) -> int:
     try:
-        window_id = xbmcgui.getCurrentWindowId()
-        window = xbmcgui.Window(window_id)
-        width = int(window.getWidth())
-        height = int(window.getHeight())
-        if width > 0 and height > 0:
-            return width, height
+        raw = home.getProperty(name).strip()
+        return max(0, int(raw)) if raw else 0
     except Exception:
-        pass
+        return 0
 
+
+def _prop_bool(home, name: str) -> bool:
+    try:
+        return home.getProperty(name).strip().lower() == 'true'
+    except Exception:
+        return False
+
+
+def _screen_size():
+    """Diagnostic/fallback pixel size; never used to override native v5 classes."""
     width = _number('System.ScreenWidth')
     height = _number('System.ScreenHeight')
     if width > 0 and height > 0:
-        return width, height
-
+        return width, height, 'kodi-screen-labels'
     try:
         mode = xbmc.getInfoLabel('System.ScreenMode')
         match = re.search(r'(\d{2,5})\s*[xX]\s*(\d{2,5})', mode or '')
         if match:
-            return int(match.group(1)), int(match.group(2))
+            return int(match.group(1)), int(match.group(2)), 'kodi-screen-mode'
     except Exception:
         pass
-    return 0, 0
+    try:
+        window = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+        width, height = int(window.getWidth()), int(window.getHeight())
+        if width > 0 and height > 0:
+            return width, height, 'kodi-canvas-fallback'
+    except Exception:
+        pass
+    return 0, 0, 'unknown'
 
 
 def _aspect_class(width: int, height: int) -> str:
@@ -76,92 +88,104 @@ def _aspect_class(width: int, height: int) -> str:
     return 'ultrawide'
 
 
-def _bridge_device_mode() -> str:
-    """Prefer an Android/host bridge classification when available."""
+def _native_v5_state():
     home = _home()
-    for key in ('Infinity.NativeDeviceMode', 'Infinity.AndroidDeviceMode'):
-        try:
-            value = home.getProperty(key).strip().lower()
-            if value in VALID_DEVICE_MODES:
-                return value
-        except Exception:
-            pass
-    return ''
-
-
-def _classes(width: int, height: int):
-    if width <= 0 or height <= 0:
-        return 'unknown', 'unknown', 'unknown', 'unknown'
-
-    orientation = 'landscape' if width > height else 'portrait' if height > width else 'square'
-    short_edge = min(width, height)
-    long_edge = max(width, height)
-    ratio = long_edge / float(short_edge)
-
-    if short_edge < 720:
-        layout = 'compact'
-    elif short_edge < 1200:
-        layout = 'medium'
-    else:
-        layout = 'expanded'
-
-    native_mode = _bridge_device_mode()
-    if native_mode:
-        device = native_mode
-    elif short_edge < 720 and ratio >= 1.75:
-        device = 'cover/front'
-    elif ratio >= 1.8:
-        device = 'phone'
-    elif layout == 'expanded' and ratio <= 1.5:
-        device = 'inner/large'
-    elif layout == 'expanded':
-        device = 'tablet'
-    else:
-        device = 'phone'
-
-    touch = 'compact' if layout == 'compact' else 'large-display' if layout == 'expanded' else 'normal'
-    return layout, orientation, device, touch
-
-
-def _existing_inset(name: str) -> int:
-    """Preserve any inset supplied by the Android bridge; otherwise Kodi GUI is the safe area."""
     try:
-        value = _home().getProperty(name).strip()
-        return max(0, int(value)) if value else 0
+        bridge = int(home.getProperty('Infinity.BridgeVersion') or '0')
     except Exception:
-        return 0
+        bridge = 0
+    if bridge < 5 or not _prop_bool(home, 'Infinity.NativeReady'):
+        return None
 
+    device = (home.getProperty('Infinity.NativeDeviceMode') or 'unknown').strip().lower()
+    layout = (home.getProperty('Infinity.NativeLayout') or 'unknown').strip().lower()
+    if device not in VALID_DEVICE_MODES or layout not in VALID_LAYOUTS:
+        return None
+    width_dp = _prop_int(home, 'Infinity.NativeWidthDp')
+    height_dp = _prop_int(home, 'Infinity.NativeHeightDp')
+    if width_dp <= 0 or height_dp <= 0:
+        return None
 
-def snapshot():
-    width, height = _current_gui_size()
-    layout, orientation, device, touch = _classes(width, height)
-    short_edge = min(width, height) if width > 0 and height > 0 else 0
-    long_edge = max(width, height) if width > 0 and height > 0 else 0
-    aspect = round(width / float(height), 4) if width > 0 and height > 0 else 0.0
+    orientation = (home.getProperty('Infinity.NativeOrientation') or '').strip().lower()
+    if orientation not in ('portrait', 'landscape', 'square'):
+        orientation = 'landscape' if width_dp > height_dp else 'portrait' if height_dp > width_dp else 'square'
+    touch = (home.getProperty('Infinity.NativeTouchClass') or '').strip().lower()
+    if touch not in ('compact', 'normal', 'large-display'):
+        touch = 'compact' if layout == 'compact' else 'large-display' if layout == 'expanded' else 'normal'
+
+    px_w, px_h, px_source = _screen_size()
+    density_dpi = round(px_w * 160.0 / width_dp) if px_w > 0 and width_dp > 0 else 0
+    revision = _prop_int(home, 'Infinity.NativeDisplayRevision')
+    pip = _prop_bool(home, 'Infinity.NativePiP')
+    multi = _prop_bool(home, 'Infinity.NativeMultiWindow')
+    fold_hint = _prop_bool(home, 'Infinity.NativeFoldHint')
+    pane = (not pip and width_dp >= 600 and device in ('inner/large', 'tablet'))
     return {
         'api': LAYOUT_API,
-        'width': width,
-        'height': height,
-        'short_edge': short_edge,
-        'long_edge': long_edge,
-        'aspect': aspect,
-        'aspect_class': _aspect_class(width, height),
+        'width': px_w,
+        'height': px_h,
+        'width_dp': width_dp,
+        'height_dp': height_dp,
+        'density_dpi': density_dpi,
+        'aspect_class': _aspect_class(width_dp, height_dp),
         'orientation': orientation,
         'layout': layout,
         'device_mode': device,
         'touch_class': touch,
-        'inset_top': _existing_inset('Infinity.SafeInsetTop'),
-        'inset_bottom': _existing_inset('Infinity.SafeInsetBottom'),
-        'inset_left': _existing_inset('Infinity.SafeInsetLeft'),
-        'inset_right': _existing_inset('Infinity.SafeInsetRight'),
+        'pane_mode': 'pane' if pane else 'overlay',
+        'pip': pip,
+        'multiwindow': multi,
+        'fold_hint': fold_hint,
+        'revision': revision,
+        'source': 'native-v5',
+        'pixel_source': px_source,
+        'inset_top': 0,
+        'inset_bottom': 0,
+        'inset_left': 0,
+        'inset_right': 0,
+        'insets_source': 'kodi-safe-area',
     }
+
+
+def _fallback_state():
+    width, height, source = _screen_size()
+    if width <= 0 or height <= 0:
+        return {
+            'api': LAYOUT_API, 'width': 0, 'height': 0, 'width_dp': 0, 'height_dp': 0,
+            'density_dpi': 0, 'aspect_class': 'unknown', 'orientation': 'unknown',
+            'layout': 'unknown', 'device_mode': 'unknown', 'touch_class': 'unknown',
+            'pane_mode': 'overlay', 'pip': False, 'multiwindow': False, 'fold_hint': False,
+            'revision': 0, 'source': source, 'pixel_source': source,
+            'inset_top': 0, 'inset_bottom': 0, 'inset_left': 0, 'inset_right': 0,
+            'insets_source': 'unknown',
+        }
+    orientation = 'landscape' if width > height else 'portrait' if height > width else 'square'
+    short_edge = min(width, height)
+    layout = 'compact' if short_edge < 720 else 'medium' if short_edge < 1200 else 'expanded'
+    # Legacy fallback is deliberately conservative: it does not claim Fold cover/inner identity.
+    device = 'tablet' if layout == 'expanded' else 'phone'
+    touch = 'compact' if layout == 'compact' else 'large-display' if layout == 'expanded' else 'normal'
+    return {
+        'api': LAYOUT_API, 'width': width, 'height': height, 'width_dp': 0, 'height_dp': 0,
+        'density_dpi': 0, 'aspect_class': _aspect_class(width, height),
+        'orientation': orientation, 'layout': layout, 'device_mode': device,
+        'touch_class': touch, 'pane_mode': 'pane' if device == 'tablet' else 'overlay',
+        'pip': False, 'multiwindow': False, 'fold_hint': False, 'revision': 0,
+        'source': source, 'pixel_source': source,
+        'inset_top': 0, 'inset_bottom': 0, 'inset_left': 0, 'inset_right': 0,
+        'insets_source': 'unknown',
+    }
+
+
+def snapshot():
+    return _native_v5_state() or _fallback_state()
 
 
 def publish(force=False) -> bool:
     state = snapshot()
     signature = '|'.join(str(state[k]) for k in (
-        'width', 'height', 'orientation', 'device_mode', 'layout', 'aspect_class',
-        'inset_top', 'inset_bottom', 'inset_left', 'inset_right'
+        'source', 'revision', 'width_dp', 'height_dp', 'orientation', 'device_mode',
+        'layout', 'aspect_class', 'pane_mode', 'pip', 'multiwindow',
     ))
     home = _home()
     if not force and home.getProperty('Infinity.DisplaySignature') == signature:
@@ -171,30 +195,38 @@ def publish(force=False) -> bool:
         'Infinity.LayoutAPI': state['api'],
         'Infinity.WindowWidth': state['width'],
         'Infinity.WindowHeight': state['height'],
+        'Infinity.WindowWidthDp': state['width_dp'],
+        'Infinity.WindowHeightDp': state['height_dp'],
+        'Infinity.DensityDpi': state['density_dpi'],
         'Infinity.Orientation': state['orientation'],
         'Infinity.DeviceMode': state['device_mode'],
         'Infinity.AspectClass': state['aspect_class'],
         'Infinity.TouchClass': state['touch_class'],
+        'Infinity.Layout': state['layout'],
+        'Infinity.PaneMode': state['pane_mode'],
+        'Infinity.IsPiP': str(state['pip']).lower(),
+        'Infinity.IsMultiWindow': str(state['multiwindow']).lower(),
+        'Infinity.FoldHint': str(state['fold_hint']).lower(),
         'Infinity.SafeInsetTop': state['inset_top'],
         'Infinity.SafeInsetBottom': state['inset_bottom'],
         'Infinity.SafeInsetLeft': state['inset_left'],
         'Infinity.SafeInsetRight': state['inset_right'],
-        'Infinity.Layout': state['layout'],
-        'Infinity.LayoutWidth': state['width'],
-        'Infinity.LayoutHeight': state['height'],
-        'Infinity.LayoutShortEdge': state['short_edge'],
-        'Infinity.LayoutLongEdge': state['long_edge'],
-        'Infinity.LayoutAspect': state['aspect'],
-        'Infinity.LayoutReady': str(state['width'] > 0 and state['height'] > 0).lower(),
+        'Infinity.InsetsSource': state['insets_source'],
+        'Infinity.DisplaySource': state['source'],
+        'Infinity.PixelSource': state['pixel_source'],
+        'Infinity.DisplayRevision': state['revision'],
+        'Infinity.LayoutReady': str(state['device_mode'] != 'unknown').lower(),
         'Infinity.DisplaySignature': signature,
     }
     for key, value in values.items():
         _set(key, value)
 
     xbmc.log(
-        TAG + 'device=' + state['device_mode'] + ' layout=' + state['layout'] +
-        ' orientation=' + state['orientation'] + ' size=' +
-        str(state['width']) + 'x' + str(state['height']), xbmc.LOGINFO,
+        TAG + 'source=' + state['source'] + ' device=' + state['device_mode'] +
+        ' layout=' + state['layout'] + ' pane=' + state['pane_mode'] +
+        ' orientation=' + state['orientation'] + ' dp=' +
+        str(state['width_dp']) + 'x' + str(state['height_dp']) +
+        ' revision=' + str(state['revision']), xbmc.LOGINFO,
     )
     return True
 
