@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 SKIN_ID = 'skin.xenon2'
 PROTECTED = ('VideoOSD.xml', 'DialogSeekBar.xml', 'Custom_1199_InfinityVideoLock.xml')
-THEMES = ('InfinityDark.xml', 'InfinityLight.xml')
+THEMES = ('InfinityDark.xml', 'InfinityLight.xml', 'InfinityOLED.xml')
 
 
 def sha(data: bytes) -> str:
@@ -107,10 +107,14 @@ def resolve_theme(policy: str, system_theme: str) -> str:
     system_theme = (system_theme or '').lower()
     if policy == 'light':
         return 'InfinityLight.xml'
-    if policy in ('dark', 'oled'):
+    if policy == 'dark':
         return 'InfinityDark.xml'
+    if policy == 'oled':
+        return 'InfinityOLED.xml'
     if system_theme == 'light':
         return 'InfinityLight.xml'
+    if system_theme == 'oled':
+        return 'InfinityOLED.xml'
     if system_theme == 'dark':
         return 'InfinityDark.xml'
     return ''
