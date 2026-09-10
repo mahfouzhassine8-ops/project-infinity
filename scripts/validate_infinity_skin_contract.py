@@ -44,18 +44,20 @@ REQUIRED_TOKENS = {
 
 
 def classify(width_dp: int, height_dp: int, fold=False, tv=False):
-    ratio = max(width_dp, height_dp) / float(min(width_dp, height_dp))
-    layout = 'compact' if width_dp < 600 else 'medium' if width_dp < 840 else 'expanded'
+    short_dp = min(width_dp, height_dp)
+    native_layout = 'compact' if width_dp < 600 else 'medium' if width_dp < 840 else 'expanded'
     if tv:
         device = 'tv'
-    elif (fold or ratio <= 1.60) and width_dp >= 600:
-        device = 'inner/large'
-    elif fold:
+    elif fold and short_dp < 480:
         device = 'cover/front'
+    elif fold and width_dp >= 600:
+        device = 'inner/large'
     elif width_dp >= 600:
         device = 'tablet'
     else:
         device = 'phone'
+    # Effective layout keeps a rotated narrow Fold cover compact even if its width is >840dp.
+    layout = 'compact' if device == 'cover/front' else native_layout
     orientation = 'landscape' if width_dp > height_dp else 'portrait' if height_dp > width_dp else 'square'
     touch = 'compact' if layout == 'compact' else 'large-display' if layout == 'expanded' else 'normal'
     pane = 'pane' if width_dp >= 600 and device in ('inner/large', 'tablet') else 'overlay'
@@ -80,21 +82,21 @@ def main():
     assert 'while not monitor.abortRequested()' not in LAYOUT_SRC
     assert 'monitor.waitForAbort()' in LAYOUT_SRC
     assert 'monitor.waitForAbort()' in THEME_SRC
-    assert "bridge < 5" not in LAYOUT_SRC
     assert "bridge < 5 or not _prop_bool(home, 'Infinity.NativeReady')" in LAYOUT_SRC
     assert "'source': 'native-v5'" in LAYOUT_SRC
     assert "'Infinity.PaneMode'" in LAYOUT_SRC
     assert "performance_override_battery" in THEME_SRC
     assert "performance_ignore_battery_saver" not in THEME_SRC
     assert "Infinity.NativeSystemTheme" in THEME_SRC
-    assert THEME_SRC.index("Infinity.Palette.' + token") < THEME_SRC.index("Infinity.ThemeRevision")
+    assert THEME_SRC.index("_set('Infinity.Palette.' + token") < THEME_SRC.index("_set('Infinity.ThemeRevision'")
 
     matrix = [
         ('cover portrait', 412, 915, True, 'cover/front', 'compact', 'portrait', 'compact', 'overlay'),
-        ('cover landscape', 915, 412, True, 'inner/large', 'expanded', 'landscape', 'large-display', 'pane'),
+        ('cover landscape', 915, 412, True, 'cover/front', 'compact', 'landscape', 'compact', 'overlay'),
         ('inner portrait', 673, 790, True, 'inner/large', 'medium', 'portrait', 'normal', 'pane'),
         ('inner landscape', 790, 673, True, 'inner/large', 'medium', 'landscape', 'normal', 'pane'),
-        ('large tablet', 900, 600, False, 'inner/large', 'expanded', 'landscape', 'large-display', 'pane'),
+        ('tablet landscape', 900, 600, False, 'tablet', 'expanded', 'landscape', 'large-display', 'pane'),
+        ('inner fallback without hinge signal', 673, 790, False, 'tablet', 'medium', 'portrait', 'normal', 'pane'),
         ('phone portrait', 412, 915, False, 'phone', 'compact', 'portrait', 'compact', 'overlay'),
     ]
     for row in matrix:
