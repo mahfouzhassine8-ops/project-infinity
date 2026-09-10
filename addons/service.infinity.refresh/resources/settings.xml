@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <settings version="1">
   <section id="service.infinity.refresh">
-    <category id="general" label="Infinity High Refresh">
+    <category id="general" label="Infinity Adaptive Refresh">
       <group id="1">
         <setting id="mode" type="string" label="Refresh Mode">
-          <level>0</level><default>adaptive</default>
+          <level>0</level><default>auto</default>
           <constraints><options>
-            <option label="Adaptive">adaptive</option>
-            <option label="Performance">performance</option>
-            <option label="Battery Saver">battery</option>
-            <option label="Off">off</option>
+            <option label="Auto (Recommended)">auto</option>
+            <option label="High Refresh">high_refresh</option>
+            <option label="Balanced">balanced</option>
+            <option label="System Default">system</option>
+            <option label="Compatibility / Off">off</option>
           </options></constraints><control type="spinner" format="string"/>
         </setting>
         <setting id="max_hz" type="string" label="Maximum Refresh Rate">
-          <level>0</level><default>auto</default>
+          <level>1</level><default>auto</default>
           <constraints><options>
-            <option label="Automatic">auto</option><option label="60 Hz">60</option>
-            <option label="90 Hz">90</option><option label="120 Hz">120</option>
+            <option label="Automatic">auto</option>
+            <option label="60 Hz">60</option>
+            <option label="90 Hz">90</option>
+            <option label="120 Hz">120</option>
             <option label="Highest Available">highest</option>
           </options></constraints><control type="spinner" format="string"/>
         </setting>
         <setting id="ui_policy" type="string" label="Infinity Interface">
-          <level>0</level><default>high_refresh</default>
+          <level>1</level><default>high_refresh</default>
           <constraints><options>
             <option label="High Refresh">high_refresh</option>
             <option label="Match System">system</option>
@@ -30,12 +33,12 @@
         <setting id="video_policy" type="string" label="Video Playback">
           <level>0</level><default>match_video</default>
           <constraints><options>
-            <option label="Match Video">match_video</option>
+            <option label="Match Video (Recommended)">match_video</option>
             <option label="Match System">system</option>
             <option label="High Refresh">high_refresh</option>
           </options></constraints><control type="spinner" format="string"/>
         </setting>
-        <setting id="respect_battery_saver" type="boolean" label="Respect Android Battery Saver"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="respect_battery_saver" type="boolean" label="Respect Android Low Power / Battery Saver"><level>0</level><default>true</default><control type="toggle"/></setting>
         <setting id="thermal_protection" type="boolean" label="Thermal Protection"><level>0</level><default>true</default><control type="toggle"/></setting>
       </group>
     </category>
