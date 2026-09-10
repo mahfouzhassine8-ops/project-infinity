@@ -1,0 +1,214 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.KeyEvent;
+
+/**
+ * Standard Android system-media integration for Infinity.
+ *
+ * This intentionally uses public Android MediaSession/MediaStyle APIs only.
+ * Samsung One UI, lock screen, Bluetooth and other system controllers discover
+ * the same session instead of Infinity creating a vendor-private controller.
+ */
+final class InfinitySystemMediaHook extends InfinityPlatformHook
+{
+  private static final String CHANNEL_ID = "infinity_media_playback";
+  private static final int NOTIFICATION_ID = 10801;
+  private static final long SYSTEM_ACTIONS =
+      PlaybackState.ACTION_PLAY |
+      PlaybackState.ACTION_PAUSE |
+      PlaybackState.ACTION_PLAY_PAUSE |
+      PlaybackState.ACTION_SEEK_TO |
+      PlaybackState.ACTION_FAST_FORWARD |
+      PlaybackState.ACTION_REWIND |
+      PlaybackState.ACTION_SKIP_TO_NEXT |
+      PlaybackState.ACTION_SKIP_TO_PREVIOUS |
+      PlaybackState.ACTION_STOP;
+
+  private NotificationManager manager;
+  private PlaybackState playbackState;
+  private MediaMetadata metadata;
+  private PendingIntent sessionIntent;
+
+  @Override
+  String id() { return "system-media"; }
+
+  @Override
+  void onMediaSessionCreated(MediaSession session)
+  {
+    Bundle extras = new Bundle();
+    extras.putInt("com.projectinfinity.platform_hook_api", InfinityPlatformHooks.API_VERSION);
+    extras.putBoolean("com.projectinfinity.system_media", true);
+    extras.putBoolean("com.projectinfinity.picture_in_picture", true);
+    extras.putString("com.projectinfinity.media_controls",
+        "play,pause,seek,previous,next,rewind,fast-forward,stop");
+    session.setExtras(extras);
+
+    Context context = Main.MainActivity;
+    if (context != null)
+    {
+      manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+      ensureChannel();
+    }
+  }
+
+  @Override
+  void onMediaSessionActive(MediaSession session, boolean active)
+  {
+    if (!active)
+    {
+      cancel();
+      return;
+    }
+    publish(session);
+  }
+
+  @Override
+  PlaybackState onPlaybackState(MediaSession session, PlaybackState state)
+  {
+    if (state == null)
+      return null;
+
+    PlaybackState.Builder builder = new PlaybackState.Builder()
+        .setState(state.getState(), state.getPosition(), state.getPlaybackSpeed(),
+                  state.getLastPositionUpdateTime())
+        .setBufferedPosition(state.getBufferedPosition())
+        .setActions(SYSTEM_ACTIONS)
+        .setActiveQueueItemId(state.getActiveQueueItemId());
+
+    CharSequence error = state.getErrorMessage();
+    if (error != null)
+      builder.setErrorMessage(error);
+    for (PlaybackState.CustomAction action : state.getCustomActions())
+      builder.addCustomAction(action);
+    if (Build.VERSION.SDK_INT >= 22 && state.getExtras() != null)
+      builder.setExtras(new Bundle(state.getExtras()));
+
+    playbackState = builder.build();
+    publish(session);
+    return playbackState;
+  }
+
+  @Override
+  MediaMetadata onMetadata(MediaSession session, MediaMetadata data)
+  {
+    metadata = data;
+    publish(session);
+    return data;
+  }
+
+  @Override
+  void onSessionIntent(MediaSession session, Intent intent)
+  {
+    Context context = Main.MainActivity;
+    if (context != null && intent != null)
+    {
+      sessionIntent = PendingIntent.getActivity(context, 99, intent,
+          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+      publish(session);
+    }
+  }
+
+  private void ensureChannel()
+  {
+    if (manager == null || Build.VERSION.SDK_INT < 26)
+      return;
+    NotificationChannel channel = new NotificationChannel(
+        CHANNEL_ID, "Infinity playback", NotificationManager.IMPORTANCE_LOW);
+    channel.setDescription("Playback controls for Infinity");
+    channel.setShowBadge(false);
+    channel.enableVibration(false);
+    channel.setSound(null, null);
+    manager.createNotificationChannel(channel);
+  }
+
+  private void publish(MediaSession session)
+  {
+    Context context = Main.MainActivity;
+    if (context == null || manager == null || session == null || !session.isActive() ||
+        playbackState == null)
+      return;
+
+    final int state = playbackState.getState();
+    if (state == PlaybackState.STATE_NONE || state == PlaybackState.STATE_STOPPED)
+    {
+      cancel();
+      return;
+    }
+
+    String title = "Infinity";
+    String subtitle = "Playing media";
+    Bitmap art = null;
+    if (metadata != null)
+    {
+      String candidate = metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE);
+      if (candidate == null || candidate.length() == 0)
+        candidate = metadata.getString(MediaMetadata.METADATA_KEY_TITLE);
+      if (candidate != null && candidate.length() > 0)
+        title = candidate;
+      String secondary = metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE);
+      if (secondary == null || secondary.length() == 0)
+        secondary = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST);
+      if (secondary != null && secondary.length() > 0)
+        subtitle = secondary;
+      art = metadata.getBitmap(MediaMetadata.METADATA_KEY_ART);
+    }
+
+    Notification.Builder builder = Build.VERSION.SDK_INT >= 26
+        ? new Notification.Builder(context, CHANNEL_ID)
+        : new Notification.Builder(context);
+    Notification.MediaStyle style = new Notification.MediaStyle()
+        .setMediaSession(session.getSessionToken())
+        .setShowActionsInCompactView(0, 1, 2);
+
+    builder.setSmallIcon(R.drawable.notif_icon)
+        .setContentTitle(title)
+        .setContentText(subtitle)
+        .setCategory(Notification.CATEGORY_TRANSPORT)
+        .setVisibility(Notification.VISIBILITY_PUBLIC)
+        .setShowWhen(false)
+        .setOnlyAlertOnce(true)
+        .setOngoing(state == PlaybackState.STATE_PLAYING)
+        .setStyle(style)
+        .addAction(new Notification.Action.Builder(R.drawable.notif_icon, "Previous",
+            mediaButton(KeyEvent.KEYCODE_MEDIA_PREVIOUS, 10811)).build())
+        .addAction(new Notification.Action.Builder(R.drawable.notif_icon,
+            state == PlaybackState.STATE_PLAYING ? "Pause" : "Play",
+            mediaButton(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, 10812)).build())
+        .addAction(new Notification.Action.Builder(R.drawable.notif_icon, "Next",
+            mediaButton(KeyEvent.KEYCODE_MEDIA_NEXT, 10813)).build());
+    if (sessionIntent != null)
+      builder.setContentIntent(sessionIntent);
+    if (art != null)
+      builder.setLargeIcon(art);
+
+    manager.notify(NOTIFICATION_ID, builder.build());
+  }
+
+  private PendingIntent mediaButton(int keyCode, int requestCode)
+  {
+    Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+    intent.setClass(Main.MainActivity, XBMCBroadcastReceiver.class);
+    intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+    return PendingIntent.getBroadcast(Main.MainActivity, requestCode, intent,
+        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+  }
+
+  private void cancel()
+  {
+    if (manager != null)
+      manager.cancel(NOTIFICATION_ID);
+  }
+}
