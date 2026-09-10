@@ -1,7 +1,7 @@
 """Real host CMake fixtures reproduce a cold-prefix gate defect, not Android runtime.
 
-The fixture has the same two native target names and three source suffixes as the
-pinned Kodi target graph. Custom-command dependencies create otherwise absent
+The fixture mirrors Kodi 21.3: JNIMainActivity belongs to platform_android_activity,
+WinSystemAndroid to windowing_android, and CORE_MAIN_SOURCE XBMCApp to kodi. Custom-command dependencies create otherwise absent
 AndroidJNI/fmt/spdlog headers. No downloaded SDK or host package fills those gaps.
 """
 from pathlib import Path
@@ -61,10 +61,14 @@ add_custom_command(
 add_custom_target(native_fixture_prerequisites
   DEPENDS "${headers}/androidjni/Activity.h" "${headers}/fmt/format.h" "${headers}/spdlog/spdlog.h")
 add_library(platform_android_activity STATIC
-  xbmc/platform/android/activity/JNIMainActivity.cpp
-  xbmc/platform/android/activity/XBMCApp.cpp)
+  xbmc/platform/android/activity/JNIMainActivity.cpp)
 add_library(windowing_android STATIC xbmc/windowing/android/WinSystemAndroid.cpp)
-foreach(t platform_android_activity windowing_android)
+# Kodi Android ArchSetup.cmake assigns XBMCApp.cpp to CORE_MAIN_SOURCE;
+# the root CMakeLists.txt adds that source to the main shared kodi target.
+add_library(kodi SHARED xbmc/platform/android/activity/XBMCApp.cpp)
+target_link_libraries(kodi PRIVATE platform_android_activity windowing_android)
+foreach(t platform_android_activity windowing_android kodi)
+  set_target_properties(${t} PROPERTIES POSITION_INDEPENDENT_CODE ON)
   add_dependencies(${t} native_fixture_prerequisites)
   target_include_directories(${t} PRIVATE "${headers}")
 endforeach()
@@ -155,6 +159,38 @@ endforeach()
         path.write_text(json.dumps(entries[1:]))
         with self.assertRaisesRegex(ValueError, 'Missing/ambiguous'):
             infinity71.native_compile_check(self.build)
+
+    def test_kodi_21_3_main_source_is_built_by_its_real_owner(self):
+        entries = json.loads((self.build / 'compile_commands.json').read_text())
+        app = next(e for e in entries if e['file'].endswith('/XBMCApp.cpp'))
+        args = app.get('arguments') or shlex.split(app['command'])
+        output = app.get('output') or args[args.index('-o') + 1]
+        self.assertIn('CMakeFiles/kodi.dir/', output)
+        infinity71.native_compile_check(self.build)
+        receipt = self.status()
+        self.assertEqual(receipt['sources']['xbmc/platform/android/activity/XBMCApp.cpp'], 'kodi')
+        self.assertEqual(receipt['completed_targets'],
+                         ['platform_android_activity', 'windowing_android', 'kodi'])
+        self.assertFalse(receipt['device_accepted'])
+        self.assertTrue((self.build / 'libkodi.so').is_file())
+
+    def test_main_source_compile_error_is_not_hidden(self):
+        bad = self.source / 'xbmc/platform/android/activity/XBMCApp.cpp'
+        bad.write_text('#error DELIBERATE_MAIN_SOURCE_FIXTURE_FAILURE\n')
+        with self.assertRaises(subprocess.CalledProcessError):
+            infinity71.native_compile_check(self.build)
+        self.assertEqual(self.status()['status'], 'failed')
+        self.assertEqual(self.status()['failed_target'], 'kodi')
+        self.assertEqual(self.status()['completed_targets'],
+                         ['platform_android_activity', 'windowing_android'])
+
+    def test_incorrect_activity_owner_for_main_source_is_rejected(self):
+        path = self.build / 'compile_commands.json'
+        path.write_text(path.read_text().replace('CMakeFiles/kodi.dir/',
+                                                'CMakeFiles/platform_android_activity.dir/'))
+        with self.assertRaisesRegex(ValueError, 'Unexpected native target.*XBMCApp'):
+            infinity71.native_compile_check(self.build)
+        self.assertFalse((self.build / 'generated').exists())
 
     def test_invalid_parallelism_is_rejected(self):
         with patch.dict(os.environ, {'CMAKE_BUILD_PARALLEL_LEVEL': '0'}):

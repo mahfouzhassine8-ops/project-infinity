@@ -305,8 +305,11 @@ def native_compile_check(build_dir: Path) -> None:
     build_dir = build_dir.resolve()
     expected = {
         'xbmc/platform/android/activity/JNIMainActivity.cpp': 'platform_android_activity',
-        'xbmc/platform/android/activity/XBMCApp.cpp': 'platform_android_activity',
         'xbmc/windowing/android/WinSystemAndroid.cpp': 'windowing_android',
+        # Kodi 21.3 android/ArchSetup.cmake makes XBMCApp.cpp CORE_MAIN_SOURCE.
+        # It belongs to the root kodi target, not the activity object library.
+        # Build that owning target last, with its complete dependency graph.
+        'xbmc/platform/android/activity/XBMCApp.cpp': 'kodi',
     }
     entries = json.loads((build_dir / 'compile_commands.json').read_text())
     for source, target in expected.items():
@@ -357,7 +360,7 @@ def native_compile_check(build_dir: Path) -> None:
         report_path.write_text(json.dumps(report, indent=2) + '\n')
     report['status'] = 'passed'
     report_path.write_text(json.dumps(report, indent=2) + '\n')
-    print('PASS: both Android targets and their prerequisites compiled; object files '
+    print('PASS: all three Android targets and their prerequisites compiled; object files '
           'are reusable by the full engine build. Device acceptance remains pending.', flush=True)
 
 

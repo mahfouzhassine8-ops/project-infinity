@@ -6,6 +6,8 @@ on:
     branches: [infinity-theme-hook-audit]
     paths:
       - '.github/workflows/infinity-1.0.6-consolidated-source.yml'
+      - 'scripts/infinity71.py'
+      - 'tests/infinity71/test_native_gate.py'
       - 'scripts/infinity_1_0_6_source.py'
       - 'scripts/infinity_1_0_6_consolidated.py'
       - 'scripts/infinity_theme_contract.py'
@@ -21,6 +23,8 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
+      - name: Regression-test native target ownership before Android work
+        run: python3 tests/infinity71/test_native_gate.py
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -115,11 +119,15 @@ jobs:
       - name: Configure and compile source-sensitive targets first
         run: |
           set -euo pipefail
-          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
-          test -x "$CMAKE_BIN"
-          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
-          "$CMAKE_BIN" --build "$BUILD_DIR" --target guilib -j"$(nproc)" || true
+          mkdir -p engine/diagnostics
+          {
+            CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+            test -x "$CMAKE_BIN"
+            "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            # The gate builds the two small Android targets first, then the owning
+            # kodi target (including guilib). Nothing is ignored or syntax-replayed.
+            python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+          } 2>&1 | tee engine/diagnostics/native-gate.log
       - name: Build complete matched Kodi engine and APK
         run: |
           set -euo pipefail
@@ -138,6 +146,18 @@ jobs:
           path: engine/
           if-no-files-found: error
           compression-level: 0
+          retention-days: 30
+      - name: Save native diagnostics even when the gate fails
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.6-Native-Diagnostics
+          path: |
+            engine/diagnostics/
+            kodi-build/infinity-native-gate/
+            kodi-build/CMakeCache.txt
+            kodi-build/compile_commands.json
+          if-no-files-found: warn
           retention-days: 30
       - uses: actions/cache/save@v4
         if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
