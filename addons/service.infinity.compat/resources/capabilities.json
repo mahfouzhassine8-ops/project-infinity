@@ -1,10 +1,11 @@
 {
-  "schema": 3,
+  "schema": 4,
   "hook_api": "1.0",
   "skin_api": "1.0",
   "theme_contract": "1.0",
   "layout_api": "1.1",
-  "release": "Infinity 1.0.8 Candidate 1",
+  "experience_api": "0.1",
+  "release": "Infinity 1.0.9 Experience Wave 1",
   "capabilities": {
     "protected_player_ui": true,
     "theme_policy_bridge": true,
@@ -26,7 +27,12 @@
     "health_breadcrumbs": true,
     "config_export_ready": true,
     "event_driven_theme_updates": true,
-    "event_driven_layout_updates": true
+    "event_driven_layout_updates": true,
+    "command_center": true,
+    "restore_points": true,
+    "crash_quarantine": true,
+    "runtime_skin_inspector": true,
+    "per_title_audio_subtitle_memory": true
   },
   "protected_ui": [
     "VideoOSD.xml",
