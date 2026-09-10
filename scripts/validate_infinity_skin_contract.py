@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Static/matrix gate for Infinity Skin Theme Contract.
 
-Validates the upper-layer contract and representative responsive/theme states without
+Validates the upper-layer contract and representative responsive/theme/player states without
 pretending to replace real on-device fold/rotation/OSD testing.
 """
 from __future__ import annotations
 
 import json
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPAT = ROOT / 'addons/service.infinity.compat'
@@ -16,6 +17,8 @@ CAPS = json.loads((COMPAT / 'resources/capabilities.json').read_text(encoding='u
 THEME_SRC = (COMPAT / 'theme_contract.py').read_text(encoding='utf-8')
 LAYOUT_SRC = (COMPAT / 'layout_service.py').read_text(encoding='utf-8')
 COMPAT_SRC = (COMPAT / 'service.py').read_text(encoding='utf-8')
+OSD_PATH = COMPAT / 'resources/xml/VideoOSD.xml'
+OSD_SRC = OSD_PATH.read_text(encoding='utf-8')
 
 REQUIRED_PROPERTIES = {
     'Infinity.SystemTheme', 'Infinity.ThemeRevision', 'Infinity.DeviceMode',
@@ -100,7 +103,22 @@ def main():
     assert player['owner'] == 'Infinity'
     assert player['replaceable_by_skin'] is False
 
-    print('Infinity Skin Theme Contract static + representative state matrix PASS')
+    # Protected OSD must be strict XML, palette-driven, responsive, and must not define
+    # any video-render control. It overlays Kodi playback; Kodi owns aspect-preserving video.
+    ET.parse(OSD_PATH)
+    assert 'Infinity.Palette.Scrim' in OSD_SRC
+    assert 'Infinity.Palette.TextPrimary' in OSD_SRC
+    assert 'Infinity.Palette.TextSecondary' in OSD_SRC
+    assert 'Infinity.Palette.Focus' in OSD_SRC
+    assert 'Infinity.Palette.Accent' in OSD_SRC
+    assert 'Infinity.Orientation' in OSD_SRC
+    assert 'ActivateWindow(osdsubtitlesettings)' in OSD_SRC
+    assert 'ActivateWindow(osdaudiosettings)' in OSD_SRC
+    assert 'PlayerControl(Play)' in OSD_SRC
+    assert 'ActivateWindow(1199)' in OSD_SRC
+    assert '<control type="videowindow"' not in OSD_SRC.lower()
+
+    print('Infinity Skin Theme Contract + responsive protected player matrix PASS')
     print('Real-device visual gate still required for fold/unfold, cutouts, player OSD and Kodi screens.')
 
 
