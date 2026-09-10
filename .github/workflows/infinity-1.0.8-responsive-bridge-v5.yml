@@ -1,0 +1,311 @@
+name: Infinity 1.0.8 | Responsive Bridge v5
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.8-responsive-bridge-v5]
+    paths:
+      - '.github/workflows/infinity-1.0.8-responsive-bridge-v5.yml'
+      - 'patches/infinity-responsive-v5/**'
+      - 'scripts/infinity-responsive-v5.py'
+      - 'scripts/validate_infinity_skin_contract.py'
+      - 'addons/service.infinity.compat/**'
+      - 'addons/service.infinity.refresh/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Validate audited v4 baseline first
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/v4-java
+          mkdir -p preflight/v4-dex
+          "$ANDROID_HOME/build-tools/34.0.0/d8" \
+            --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 \
+            --output preflight/v4-dex preflight/v4-java/compile-check.jar
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread \
+            -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp \
+            -o preflight/v4-bridge-state
+          preflight/v4-bridge-state
+          INFINITY_KODI_SOURCE="$PWD/kodi" INFINITY_TEST_DEX="$PWD/preflight/v4-dex/classes.dex" \
+            python3 tests/infinity71/test_contract.py
+
+      - name: Apply and validate cumulative responsive v5
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity-responsive-v5.py source --source kodi
+          python3 scripts/infinity-responsive-v5.py verify --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/v5-java
+          grep -q 'versionCode 2103109' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.8-Responsive-Bridge-v5"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.NativeWidthDp' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          ! grep -q '(mode & 8) ? "tv" : "mobile"' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          python3 scripts/validate_infinity_skin_contract.py
+          python3 -m py_compile addons/service.infinity.compat/service.py \
+            addons/service.infinity.compat/layout_service.py \
+            addons/service.infinity.compat/theme_contract.py \
+            addons/service.infinity.refresh/service.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('patches/infinity-responsive-v5/contract.json').read_text())
+          assert c['base_bridge_version']==4 and c['bridge_version']==5
+          assert c['version_code']==2103109
+          print('PASS: cumulative v4 -> v5 source, Java API, skin/theme contract and update identity')
+          PY
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.8-Responsive-v5-Preflight
+          path: |
+            preflight/v4-java/Main.javap.txt
+            preflight/v5-java/Main.javap.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Prepare matched Android toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+
+      - name: Apply audited v4 then responsive v5 to exact Kodi 21.3
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity-responsive-v5.py source --source kodi
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-responsive-v5-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Prepare matched dependencies and native build configuration
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+
+      - name: Compile-check changed native owners
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+
+      - name: Build complete Kodi engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-1.0.8-Responsive-v5-Engine-Base.apk
+          # Legacy manifest is used only by the proven byte-preserving lock overlay verifier.
+          python3 scripts/infinity71.py record-engine \
+            --apk engine/Infinity-1.0.8-Responsive-v5-Engine-Base.apk \
+            --output engine/engine-v4-overlay-manifest.json --source-commit "$GITHUB_SHA"
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.8-Responsive-v5-Engine-Base.apk')
+          contract=json.loads(Path('patches/infinity-responsive-v5/contract.json').read_text())
+          with zipfile.ZipFile(apk) as z:
+              dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if n.startswith('classes') and n.endswith('.dex')}
+              native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+          out={
+              'schema':1,'bridge_version':5,'kodi_sha':contract['kodi_sha'],
+              'version_code':contract['version_code'],'version_name':contract['version_name'],
+              'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+              'libkodi_sha256':native,'dex':dex,'source_commit':'${GITHUB_SHA}'
+          }
+          Path('engine/responsive-v5.json').write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+          PY
+          printf '%s\n' 'Source-built responsive bridge v5 engine. Device verification is still pending.' > engine/README.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Responsive-v5-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  package:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.8-Responsive-v5-Engine
+          path: engine
+
+      - name: Add preserved Infinity lock, then current upper layer
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay \
+            --apk engine/Infinity-1.0.8-Responsive-v5-Engine-Base.apk \
+            --manifest engine/engine-v4-overlay-manifest.json \
+            --output candidate/with-lock-unsigned.apk
+          python3 scripts/infinity_upper_layer_repack.py \
+            candidate/with-lock-unsigned.apk \
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5-unsigned.apk
+
+      - name: Sign permanent update and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5-unsigned.apk \
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103109'" candidate/badging.txt
+
+      - name: Verify v5 engine preservation and bundled contracts
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_infinity_skin_contract.py
+          python3 - <<'PY'
+          import hashlib,zipfile
+          base='engine/Infinity-1.0.8-Responsive-v5-Engine-Base.apk'
+          final='candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk'
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
+              for name in a.namelist():
+                  if name == 'lib/arm64-v8a/libkodi.so' or (name.startswith('classes') and name.endswith('.dex')):
+                      assert a.read(name) == b.read(name), name
+              dex=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              native=b.read('lib/arm64-v8a/libkodi.so')
+              assert b'Published responsive v5' in dex
+              assert b'Infinity.NativeDeviceMode' in native
+              assert b'Infinity.NativeWidthDp' in native
+              required=[
+                'assets/addons/service.infinity.compat/addon.xml',
+                'assets/addons/service.infinity.compat/layout_service.py',
+                'assets/addons/service.infinity.compat/theme_contract.py',
+                'assets/addons/service.infinity.compat/resources/capabilities.json',
+                'assets/addons/service.infinity.compat/resources/skin-api.json',
+                'assets/addons/service.infinity.refresh/service.py',
+              ]
+              for name in required: assert name in b.namelist(), name
+              layout=b.read('assets/addons/service.infinity.compat/layout_service.py').decode()
+              theme=b.read('assets/addons/service.infinity.compat/theme_contract.py').decode()
+              assert "'source': 'native-v5'" in layout
+              assert 'Infinity.PaneMode' in layout
+              assert 'Infinity.NativeSystemTheme' in theme
+              assert 'performance_override_battery' in theme
+          print('PASS: signed v5 preserves compiled engine/DEX and contains native-responsive upper layer')
+          PY
+          cp engine/responsive-v5.json candidate/responsive-v5.json
+          sha256sum candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk | tee candidate/Infinity-1.0.8-Responsive-Bridge-v5.sha256
+          cat > candidate/DEVICE-TEST.txt <<'EOF'
+          DEVICE TEST REQUIRED — static/build success is not runtime proof.
+          Verify cover portrait, cover landscape, inner portrait, inner landscape, fold/unfold,
+          Auto drawer overlay/pane switching, Home reflow, protected player OSD, light/dark/OLED,
+          120 Hz Performance policy, PiP/multi-window, and Health Center DisplaySource/DeviceMode.
+          EOF
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Responsive-Bridge-v5
+          path: |
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5.sha256
+            candidate/Infinity-1.0.8-Responsive-Bridge-v5.signing.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/responsive-v5.json
+            candidate/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
