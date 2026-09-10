@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.commandcenter" name="Infinity Command Center" version="0.1.0" provider-name="Project Infinity">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="default.py"/>
+  <extension point="xbmc.service" library="service.py" start="startup"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Infinity Command Center, Restore Points, Crash Quarantine and playback memory.</summary>
+    <description lang="en_GB">Adds a system-wide Infinity control panel, safe configuration restore points, evidence-based crash quarantine suggestions, refresh/safe-mode controls and per-title audio/subtitle playback memory. Uses the existing Infinity Hook/Skin/Theme/Layout contracts and does not modify the native Kodi engine.</description>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+  </extension>
+</addon>
