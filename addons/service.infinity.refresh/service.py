@@ -19,7 +19,7 @@ def _value(setting_id: str, default: str) -> str:
 def write_policy() -> None:
     os.makedirs(POLICY_DIR, exist_ok=True)
     lines = [
-        'mode=' + _value('mode', 'adaptive'),
+        'mode=' + _value('mode', 'auto'),
         'max_hz=' + _value('max_hz', 'auto'),
         'ui_policy=' + _value('ui_policy', 'high_refresh'),
         'video_policy=' + _value('video_policy', 'match_video'),
@@ -46,8 +46,8 @@ class Monitor(xbmc.Monitor):
 if __name__ == '__main__':
     monitor = Monitor()
     write_policy()
-    # No high-frequency polling. Android re-evaluates policy on Infinity lifecycle,
-    # window and playback events; this service only persists user choices.
+    # Android re-evaluates policy on Infinity lifecycle, window and playback events.
+    # This service only persists user choices and intentionally avoids busy polling.
     while not monitor.abortRequested():
         if monitor.waitForAbort(60):
             break
