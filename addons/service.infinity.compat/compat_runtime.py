@@ -6,7 +6,7 @@ import shutil
 import xml.etree.ElementTree as ET
 
 SKIN_ID = 'skin.xenon2'
-PROTECTED = ('VideoOSD.xml', 'DialogSeekBar.xml', 'Custom_1199_InfinityVideoLock.xml')
+PROTECTED = ('VideoOSD.xml', 'DialogSeekBar.xml', 'Custom_1197_InfinityPlayerPanel.xml', 'Custom_1199_InfinityVideoLock.xml')
 THEMES = ('InfinityDark.xml', 'InfinityLight.xml', 'InfinityOLED.xml')
 
 
