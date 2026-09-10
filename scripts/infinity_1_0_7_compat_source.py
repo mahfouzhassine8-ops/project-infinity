@@ -14,7 +14,9 @@ import hashlib
 import json
 from pathlib import Path
 
-PINNED_PYTHON_INVOKER = '87bc2a46f9bda463d5b2f01002b81c7bbc047c97'
+# SHA-256 of PythonInvoker.cpp after the pinned Kodi 21.3 source stack and
+# Infinity 1.0.6 source correction have both been applied.
+PINNED_PYTHON_INVOKER = '67b8753f80a3608e2189b27398ec6a2c203bcd7b00cc4f727a0f0bef83e26610'
 
 
 def sha(path: Path) -> str:
