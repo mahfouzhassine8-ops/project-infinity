@@ -24,7 +24,7 @@ def collect(root, *, executable='/system/bin/logcat', runner=subprocess.run):
     command = [executable, '--uid=' + str(os.getuid()), '-b', 'crash', '-d',
                '-t', '200', '-v', 'threadtime']
     try:
-        with tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
+        with tempfile.TemporaryFile(dir=str(root)) as output, tempfile.TemporaryFile(dir=str(root)) as errors:
             completed = runner(command, stdout=output, stderr=errors, timeout=5, check=False)
             output.seek(0)
             data = output.read(MAX_LOGCAT_BYTES + 1)
@@ -40,6 +40,6 @@ def collect(root, *, executable='/system/bin/logcat', runner=subprocess.run):
                 result['status'] = 'no_visible_crash_records'
     except subprocess.TimeoutExpired:
         result['status'] = 'timed_out'
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, RuntimeError) as error:
         result.update(status='collection_error', error_type=type(error).__name__)
     return result

@@ -55,6 +55,13 @@ class LogcatTests(unittest.TestCase):
         result = logcat.collect(self.output, executable=str(self.exe), runner=fail)
         self.assertEqual(result['status'], 'timed_out')
 
+    def test_subprocess_unavailable_keeps_export_usable(self):
+        def fail(command, **kwargs):
+            raise NotImplementedError('subprocess disabled in this Android Python build')
+        result = logcat.collect(self.output, executable=str(self.exe), runner=fail)
+        self.assertEqual(result['status'], 'collection_error')
+        self.assertEqual(result['error_type'], 'NotImplementedError')
+
     def test_export_size_is_bounded(self):
         def fill(command, **kwargs):
             kwargs['stdout'].write(b'x' * (logcat.MAX_LOGCAT_BYTES + 10))
