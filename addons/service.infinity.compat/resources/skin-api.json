@@ -1,18 +1,35 @@
 {
-  "schema": 1,
+  "schema": 2,
   "skin_api": "1.0",
   "hook_api": "1.0",
-  "description": "Declarative contract for Infinity-compatible skins.",
+  "layout_api": "1.0",
+  "description": "Declarative contract for Infinity-compatible responsive skins.",
   "properties": [
     "Infinity.SkinAPI",
     "Infinity.HookAPI",
+    "Infinity.LayoutAPI",
     "Infinity.Theme",
     "Infinity.PerformanceMode",
     "Infinity.RefreshMode",
     "Infinity.SafeMode",
     "Infinity.CompatMode",
-    "Infinity.ProtectedPlayerUI"
+    "Infinity.ProtectedPlayerUI",
+    "Infinity.LayoutReady",
+    "Infinity.Layout",
+    "Infinity.Orientation",
+    "Infinity.DisplayClass",
+    "Infinity.LayoutWidth",
+    "Infinity.LayoutHeight",
+    "Infinity.LayoutShortEdge",
+    "Infinity.LayoutLongEdge",
+    "Infinity.LayoutAspect"
   ],
+  "layout": {
+    "classes": ["compact", "medium", "expanded", "unknown"],
+    "orientations": ["portrait", "landscape", "square", "unknown"],
+    "display_classes": ["cover_or_phone", "large_phone_or_tablet", "large_or_unfolded", "unknown"],
+    "guidance": "Use layout class and orientation to select purpose-built responsive XML groups; do not uniformly scale a television layout."
+  },
   "protected_zones": [
     "VideoOSD.xml",
     "DialogSeekBar.xml",
@@ -25,6 +42,6 @@
   "skin_registration": {
     "manifest_name": "infinity-skin.json",
     "required": ["skin_id", "name", "skin_api"],
-    "optional": ["capabilities", "protected_zone_policy", "theme_support", "notes"]
+    "optional": ["capabilities", "protected_zone_policy", "theme_support", "layout_support", "notes"]
   }
 }
