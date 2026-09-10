@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Infinity Skin Theme Contract 1.0.
+"""Infinity Skin Theme Contract.
 
-Publishes authoritative theme, palette, motion, refresh and power policy to Window(Home).
-Skins consume these properties; they do not independently decide Infinity state.
+Native bridge v5 publishes raw Android theme facts as Infinity.NativeSystemTheme.
+This service resolves user policy into the effective skin theme and publishes a complete
+palette/state snapshot before advancing ThemeRevision.
 """
 from __future__ import annotations
 
@@ -16,7 +17,7 @@ import xbmcgui
 import xbmcvfs
 
 TAG = '[InfinityThemeContract] '
-THEME_CONTRACT = '1.0'
+THEME_CONTRACT = '1.1'
 
 PALETTES = {
     'light': {
@@ -99,10 +100,19 @@ def _atomic_json(path: Path, data):
     tmp.replace(path)
 
 
+def _bridge_version(home) -> int:
+    try:
+        return int(home.getProperty('Infinity.BridgeVersion') or '0')
+    except Exception:
+        return 0
+
+
 def _native_system_theme(home) -> str:
-    # Existing 1.0.8 Android/theme bridge owns system-theme detection. Read its value;
-    # normalize to the contract vocabulary without creating a second detector.
-    value = (home.getProperty('Infinity.SystemTheme') or '').strip()
+    # Bridge v5 separates raw host truth from the effective skin output.
+    if _bridge_version(home) >= 5:
+        value = (home.getProperty('Infinity.NativeSystemTheme') or '').strip()
+    else:
+        value = (home.getProperty('Infinity.SystemTheme') or '').strip()
     if value.lower() == 'light':
         return 'light'
     if value.lower() == 'dark':
@@ -128,14 +138,14 @@ def _refresh_state():
     video_policy = 'match_video'
     respect_battery = True
     thermal = True
-    ignore_battery = False
+    override_battery = False
     try:
         refresh = xbmcaddon.Addon('service.infinity.refresh')
         mode = _addon_value(refresh, 'mode', 'auto').strip().lower()
         video_policy = _addon_value(refresh, 'video_policy', 'match_video').strip().lower()
         respect_battery = _addon_bool(refresh, 'respect_battery_saver', True)
         thermal = _addon_bool(refresh, 'thermal_protection', True)
-        ignore_battery = _addon_bool(refresh, 'performance_ignore_battery_saver', False)
+        override_battery = _addon_bool(refresh, 'performance_override_battery', False)
     except Exception:
         pass
 
@@ -146,11 +156,11 @@ def _refresh_state():
     else:
         refresh_policy = 'normal'
 
-    return mode, refresh_policy, respect_battery, thermal, ignore_battery
+    return mode, refresh_policy, respect_battery, thermal, override_battery
 
 
 def _policies(addon):
-    mode, refresh_policy, respect_battery, thermal, ignore_battery = _refresh_state()
+    mode, refresh_policy, respect_battery, thermal, override_battery = _refresh_state()
     safe = _addon_value(addon, 'compat_mode', 'auto').strip().lower() == 'safe'
 
     if safe:
@@ -160,11 +170,11 @@ def _policies(addon):
     else:
         motion = 'normal'
 
-    if thermal and respect_battery and not ignore_battery:
+    if thermal and respect_battery and not override_battery:
         power = 'battery+thermal-protected'
     elif thermal:
         power = 'thermal-protected'
-    elif respect_battery and not ignore_battery:
+    elif respect_battery and not override_battery:
         power = 'battery-aware'
     else:
         power = 'unrestricted'
@@ -191,7 +201,6 @@ def publish(addon, profile: Path, force=False):
     palette = PALETTES[theme]
     motion, refresh_policy, power = _policies(addon)
 
-    # ThemeRevision covers both palette and state relevant to skin rendering.
     display_sig = home.getProperty('Infinity.DisplaySignature')
     signature = '|'.join([
         theme, motion, refresh_policy, power, display_sig,
@@ -203,16 +212,20 @@ def publish(addon, profile: Path, force=False):
     if not force and home.getProperty('Infinity.ThemeContractSignature') == state_signature:
         return False
 
+    _set('Infinity.ThemeReady', 'false')
     _set('Infinity.ThemeContract', THEME_CONTRACT)
-    _set('Infinity.SystemTheme', theme)
     _set('Infinity.Theme', theme)
-    _set('Infinity.ThemeRevision', revision)
+    # Backward-compatible effective output. Raw Android truth remains NativeSystemTheme.
+    _set('Infinity.SystemTheme', theme)
     _set('Infinity.MotionPolicy', motion)
     _set('Infinity.RefreshPolicy', refresh_policy)
     _set('Infinity.PowerPolicy', power)
     for token, value in palette.items():
         _set('Infinity.Palette.' + token, value)
+
+    # Commit markers are deliberately last so a new revision is a complete snapshot.
     _set('Infinity.ThemeContractSignature', state_signature)
+    _set('Infinity.ThemeRevision', revision)
     _set('Infinity.ThemeReady', 'true')
 
     xbmc.log(
@@ -233,8 +246,6 @@ class ThemeMonitor(xbmc.Monitor):
         publish(self.addon, self.profile, force=True)
 
     def onNotification(self, sender, method, data):
-        # Theme/display/refresh/player/window transitions arrive through Kodi's event bus.
-        # Re-evaluate cheaply; ThemeRevision changes only when the rendering state changes.
         publish(self.addon, self.profile)
 
     def onScreensaverDeactivated(self):
