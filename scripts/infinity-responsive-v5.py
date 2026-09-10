@@ -6,6 +6,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "patches/infinity-responsive-v5/contract.json"
+APPROVED_ICON_SHA256 = "77215c0b5e512a9d81bfdb384ae041caefa5a45d879e04f719013ceecb14aff6"
+APPROVED_ICON = Path("tools/android/packaging/xbmc/res/drawable-nodpi/project_infinity_icon.png")
+MANIFEST = Path("tools/android/packaging/xbmc/AndroidManifest.xml.in")
+SPLASH = Path("tools/android/packaging/xbmc/res/layout/activity_splash.xml")
 
 
 def digest(path: Path) -> str:
@@ -27,6 +31,19 @@ def transform_gradle(text: str) -> str:
     text = replace_once(text, "versionCode 2103100", "versionCode 2103109", "version code")
     return replace_once(text, 'versionName "21.3-Infinity-Android-First"',
                         'versionName "1.0.8-Responsive-Bridge-v5"', "version name")
+
+
+def transform_manifest(text: str) -> str:
+    # v4 already owns the approved Infinity icon. Add the explicit round-icon
+    # binding so launchers that request the round variant cannot fall back to
+    # Kodi's legacy launcher resource.
+    return replace_once(
+        text,
+        '        android:icon="@drawable/project_infinity_icon"\n',
+        '        android:icon="@drawable/project_infinity_icon"\n'
+        '        android:roundIcon="@drawable/project_infinity_icon"\n',
+        "Infinity launcher round icon",
+    )
 
 
 def transform_bridge(text: str) -> str:
@@ -165,6 +182,7 @@ def transform_window(text: str) -> str:
 
 TRANSFORMS = {
     "tools/android/packaging/xbmc/build.gradle.in": transform_gradle,
+    "tools/android/packaging/xbmc/AndroidManifest.xml.in": transform_manifest,
     "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": transform_bridge,
     "xbmc/platform/android/activity/InfinityBridgeState.h": transform_state,
     "xbmc/windowing/android/WinSystemAndroid.cpp": transform_window,
@@ -175,6 +193,10 @@ def verify(source: Path) -> None:
     checks = {
         "tools/android/packaging/xbmc/build.gradle.in": [
             "versionCode 2103109", 'versionName "1.0.8-Responsive-Bridge-v5"',
+        ],
+        "tools/android/packaging/xbmc/AndroidManifest.xml.in": [
+            'android:icon="@drawable/project_infinity_icon"',
+            'android:roundIcon="@drawable/project_infinity_icon"',
         ],
         "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": [
             "static final int VERSION = 5;", "WIDTH_DP_SHIFT = 9", "shortDp < 480",
@@ -196,7 +218,13 @@ def verify(source: Path) -> None:
     win = (source / "xbmc/windowing/android/WinSystemAndroid.cpp").read_text(encoding="utf-8")
     if '(mode & 8) ? "tv" : "mobile"' in win:
         raise ValueError("legacy generic mobile classifier survived")
-    print("PASS: Infinity Responsive Bridge v5 source contract verified.")
+    icon = source / APPROVED_ICON
+    if not icon.is_file() or digest(icon) != APPROVED_ICON_SHA256:
+        raise ValueError("approved Infinity launcher icon missing or changed")
+    splash = (source / SPLASH).read_text(encoding="utf-8")
+    if 'android:src="@drawable/project_infinity_icon"' not in splash:
+        raise ValueError("Infinity startup layout no longer points at the approved icon")
+    print("PASS: Infinity Responsive Bridge v5 source + approved launcher icon contract verified.")
 
 
 def apply(source: Path) -> None:
