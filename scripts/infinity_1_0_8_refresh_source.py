@@ -20,6 +20,13 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
     return text.replace(old, new, 1)
 
 
+def replace_exact_count(text: str, old: str, new: str, expected: int, label: str) -> str:
+    count = text.count(old)
+    if count != expected:
+        raise RuntimeError(f'{label}: expected {expected} matches, found {count}')
+    return text.replace(old, new)
+
+
 def apply(source: Path) -> dict:
     source = source.resolve()
     main = source / 'tools/android/packaging/xbmc/src/Main.java.in'
@@ -58,10 +65,11 @@ def apply(source: Path) -> dict:
         '    mInfinityBridge = null;\n',
         '    mInfinityBridge = null;\n    mInfinityRefresh = null;\n',
         'Refresh destroy')
-    text = replace_once(text,
+    text = replace_exact_count(text,
         '    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n',
-        '    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n    if (mInfinityRefresh != null) mInfinityRefresh.apply("configuration");\n',
-        'Refresh configuration')
+        '    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n    if (mInfinityRefresh != null) mInfinityRefresh.apply("window");\n',
+        3,
+        'Refresh window callbacks')
     text = replace_once(text,
         '    if (hasFocus && mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n',
         '    if (hasFocus && mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n    if (hasFocus && mInfinityRefresh != null) mInfinityRefresh.apply("focus");\n',
@@ -85,6 +93,8 @@ def apply(source: Path) -> dict:
                    'mInfinityRefresh.apply("resume")', 'mInfinityRefresh.apply("playback")'):
         if needle not in final_main:
             raise RuntimeError('Missing 1.0.8 refresh wiring: ' + needle)
+    if final_main.count('mInfinityRefresh.apply("window")') != 3:
+        raise RuntimeError('Expected refresh re-evaluation on all three window callbacks')
 
     return {
         'schema': 1,
