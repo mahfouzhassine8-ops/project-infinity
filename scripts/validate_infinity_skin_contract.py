@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static/matrix gate for Infinity Skin Theme Contract.
 
-This validates the upper-layer contract and representative responsive/theme states without
+Validates the upper-layer contract and representative responsive/theme states without
 pretending to replace real on-device fold/rotation/OSD testing.
 """
 from __future__ import annotations
@@ -34,7 +34,7 @@ REQUIRED_TOKENS = {
 }
 
 
-def classify(width: int, height: int):
+def classify(width: int, height: int, bridge_mode=''):
     short_edge = min(width, height)
     long_edge = max(width, height)
     ratio = long_edge / float(short_edge)
@@ -45,11 +45,15 @@ def classify(width: int, height: int):
         layout = 'medium'
     else:
         layout = 'expanded'
-    if short_edge < 720 and ratio >= 1.75:
+    if bridge_mode:
+        device = bridge_mode
+    elif short_edge < 720 and ratio >= 1.75:
         device = 'cover/front'
-    elif short_edge >= 1200:
+    elif ratio >= 1.8:
+        device = 'phone'
+    elif layout == 'expanded' and ratio <= 1.5:
         device = 'inner/large'
-    elif short_edge >= 900:
+    elif layout == 'expanded':
         device = 'tablet'
     else:
         device = 'phone'
@@ -63,45 +67,39 @@ def main():
     assert REQUIRED_PROPERTIES <= props, sorted(REQUIRED_PROPERTIES - props)
     assert REQUIRED_TOKENS <= tokens, sorted(REQUIRED_TOKENS - tokens)
     assert set(SKIN_API['theme_values']) == {'light', 'dark', 'OLED'}
-    assert CAPS['capabilities']['protected_player_ui'] is True
-    assert CAPS['capabilities']['palette_tokens'] is True
-    assert CAPS['capabilities']['responsive_display_state'] is True
-    assert CAPS['capabilities']['event_driven_theme_updates'] is True
-    assert CAPS['capabilities']['event_driven_layout_updates'] is True
+    for flag in ('protected_player_ui', 'palette_tokens', 'responsive_display_state',
+                 'event_driven_theme_updates', 'event_driven_layout_updates'):
+        assert CAPS['capabilities'][flag] is True, flag
 
-    # No normal-theme/orientation forced ReloadSkin, and no geometry polling loop.
     assert 'ReloadSkin()' not in COMPAT_SRC
     assert 'while not monitor.abortRequested()' not in LAYOUT_SRC
     assert 'monitor.waitForAbort()' in LAYOUT_SRC
     assert 'monitor.waitForAbort()' in THEME_SRC
 
     for token in REQUIRED_TOKENS:
-        bare = token.split('.')[-1]
-        assert bare in THEME_SRC, bare
+        assert token.split('.')[-1] in THEME_SRC, token
 
     matrix = [
-        ('cover portrait', 540, 1280, 'cover/front', 'portrait', 'compact'),
-        ('cover landscape', 1280, 540, 'cover/front', 'landscape', 'compact'),
-        ('inner portrait', 1200, 1600, 'inner/large', 'portrait', 'large-display'),
-        ('inner landscape', 1600, 1200, 'inner/large', 'landscape', 'large-display'),
-        ('large-display landscape', 2560, 1600, 'inner/large', 'landscape', 'large-display'),
-        ('phone portrait', 1080, 2400, 'tablet', 'portrait', 'normal'),
+        ('cover portrait', 540, 1280, 'cover/front', 'cover/front', 'portrait', 'compact'),
+        ('cover landscape', 1280, 540, 'cover/front', 'cover/front', 'landscape', 'compact'),
+        ('inner portrait', 1200, 1600, 'inner/large', 'inner/large', 'portrait', 'large-display'),
+        ('inner landscape', 1600, 1200, 'inner/large', 'inner/large', 'landscape', 'large-display'),
+        ('large-display landscape', 2560, 1600, 'tablet', 'tablet', 'landscape', 'large-display'),
+        ('phone portrait', 1080, 2400, '', 'phone', 'portrait', 'normal'),
     ]
-    for name, width, height, expected_device, expected_orientation, expected_touch in matrix:
-        device, orientation, touch = classify(width, height)
+    for name, width, height, bridge, expected_device, expected_orientation, expected_touch in matrix:
+        device, orientation, touch = classify(width, height, bridge)
         assert device == expected_device, (name, device, expected_device)
         assert orientation == expected_orientation, (name, orientation, expected_orientation)
         assert touch == expected_touch, (name, touch, expected_touch)
 
     for theme in ('light', 'dark', 'OLED'):
-        assert repr(theme) in THEME_SRC or ("'" + theme + "'") in THEME_SRC
+        assert "'" + theme + "'" in THEME_SRC
 
     player = SKIN_API['player_contract']
     assert player['owner'] == 'Infinity'
     assert player['replaceable_by_skin'] is False
 
-    # Contract surfaces used across Home/widgets/menus/Add-ons/ZIP/settings/dialogs/power/weather/
-    # notifications/player are intentionally global Window(Home) properties, not screen-specific state.
     print('Infinity Skin Theme Contract static + representative state matrix PASS')
     print('Real-device visual gate still required for fold/unfold, cutouts, player OSD and Kodi screens.')
 
