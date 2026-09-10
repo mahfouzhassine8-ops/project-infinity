@@ -280,16 +280,19 @@ def apply_guard(addon_root: Path, profile: Path, backup_root: Path, addon):
         return
 
     if addon_bool(addon, 'follow_infinity_theme', True):
-        estuary_settings = Path(xbmcvfs.translatePath('special://profile/addon_data/skin.estuary/settings.xml'))
-        policy = parse_estuary_policy(estuary_settings)
+        policy = addon_value(addon, 'theme_mode', 'system').strip().lower()
+        if policy == 'system':
+            estuary_settings = Path(xbmcvfs.translatePath('special://profile/addon_data/skin.estuary/settings.xml'))
+            legacy_policy = parse_estuary_policy(estuary_settings)
+            if legacy_policy:
+                policy = legacy_policy
         system_theme = xbmc.getInfoLabel('Window(Home).Property(Infinity.SystemTheme)')
         wanted = resolve_theme(policy, system_theme)
         if wanted:
             current = get_setting('lookandfeel.skincolors')
             if current != wanted and set_setting('lookandfeel.skincolors', wanted):
                 changes.append('theme=' + wanted)
-                log('Applied Infinity theme policy to Xenon: ' + wanted)
-                xbmc.executebuiltin('ReloadSkin()')
+                log('Applied Infinity theme policy to Xenon without forcing ReloadSkin')
 
     write_state(profile, addon, mode, 'active', {'changes': changes})
 
