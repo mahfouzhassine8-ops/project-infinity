@@ -18,6 +18,7 @@ from compat_runtime import (SKIN_ID, ensure_player_files, ensure_system_fontset,
 
 TAG = '[InfinityCompat] '
 HOOK_API = '1.0'
+SKIN_API = '1.0'
 STABLE_SECONDS = 120
 WINDOW_SECONDS = 15 * 60
 
@@ -82,6 +83,77 @@ def _atomic_json(path: Path, data):
     tmp.replace(path)
 
 
+def _home():
+    return xbmcgui.Window(10000)
+
+
+def _set_prop(name: str, value) -> None:
+    try:
+        _home().setProperty(name, str(value))
+    except Exception:
+        pass
+
+
+def _active_skin_manifest():
+    skin_id = xbmc.getSkinDir()
+    try:
+        skin = xbmcaddon.Addon(skin_id)
+        skin_root = Path(xbmcvfs.translatePath(skin.getAddonInfo('path')))
+        manifest = skin_root / 'infinity-skin.json'
+        if not manifest.is_file():
+            return skin_id, None
+        data = _read_json(manifest, None)
+        if not isinstance(data, dict):
+            return skin_id, None
+        if str(data.get('skin_id', skin_id)) != skin_id:
+            return skin_id, None
+        return skin_id, data
+    except Exception:
+        return skin_id, None
+
+
+def publish_skin_api(addon):
+    """Expose stable state that any Infinity-aware skin can consume without custom scripts."""
+    skin_id, manifest = _active_skin_manifest()
+    compat_mode = addon_value(addon, 'compat_mode', 'auto').strip().lower()
+    safe_mode = compat_mode == 'safe'
+    theme = xbmc.getInfoLabel('Window(Home).Property(Infinity.SystemTheme)') or 'system'
+    refresh_mode = 'auto'
+    performance = 'false'
+    try:
+        refresh = xbmcaddon.Addon('service.infinity.refresh')
+        refresh_mode = addon_value(refresh, 'mode', 'auto').strip().lower()
+        performance = 'true' if refresh_mode in ('performance', 'high_refresh') else 'false'
+    except Exception:
+        pass
+
+    _set_prop('Infinity.HookAPI', HOOK_API)
+    _set_prop('Infinity.SkinAPI', SKIN_API)
+    _set_prop('Infinity.Theme', theme)
+    _set_prop('Infinity.CompatMode', compat_mode)
+    _set_prop('Infinity.SafeMode', str(safe_mode).lower())
+    _set_prop('Infinity.RefreshMode', refresh_mode)
+    _set_prop('Infinity.PerformanceMode', performance)
+    _set_prop('Infinity.ProtectedPlayerUI', str(addon_bool(addon, 'protect_player_ui', True)).lower())
+    _set_prop('Infinity.ActiveSkin', skin_id)
+    _set_prop('Infinity.SkinRegistered', str(bool(manifest)).lower())
+    _set_prop('Infinity.SkinName', manifest.get('name', '') if manifest else '')
+    _set_prop('Infinity.SkinDeclaredAPI', manifest.get('skin_api', '') if manifest else '')
+    _set_prop('Infinity.SkinProtectedPolicy', manifest.get('protected_zone_policy', '') if manifest else '')
+
+    compatible = False
+    if manifest:
+        declared = str(manifest.get('skin_api', ''))
+        compatible = declared.split('.')[0] == SKIN_API.split('.')[0]
+    _set_prop('Infinity.SkinCompatible', str(compatible).lower())
+    return {
+        'skin_id': skin_id,
+        'registered': bool(manifest),
+        'compatible': compatible,
+        'declared_api': manifest.get('skin_api', '') if manifest else '',
+    }
+
+
 def register_start(profile: Path, addon):
     """Track repeated unclean service starts without pretending they are proven native crashes."""
     marker = profile / 'startup-marker.json'
@@ -130,14 +202,19 @@ def write_state(profile: Path, addon, mode: str, status: str, extra=None):
     if not addon_bool(addon, 'health_breadcrumbs', True):
         return
     history = _read_json(profile / 'startup-history.json', {})
+    skin_state = publish_skin_api(addon)
     data = {
-        'schema': 2,
+        'schema': 3,
         'hook_api': HOOK_API,
+        'skin_api': SKIN_API,
         'infinity_release': '1.0.8 Candidate 1',
         'service': 'service.infinity.compat',
         'mode': mode,
         'status': status,
         'active_skin': xbmc.getSkinDir(),
+        'skin_registered': skin_state['registered'],
+        'skin_compatible': skin_state['compatible'],
+        'skin_declared_api': skin_state['declared_api'],
         'protect_player_ui': addon_bool(addon, 'protect_player_ui', True),
         'follow_infinity_theme': addon_bool(addon, 'follow_infinity_theme', True),
         'allow_system_font': addon_bool(addon, 'allow_system_font', True),
@@ -155,6 +232,8 @@ def apply_guard(addon_root: Path, profile: Path, backup_root: Path, addon):
     mode = addon_value(addon, 'compat_mode', 'auto').strip().lower()
     if mode not in ('auto', 'protected', 'system', 'safe'):
         mode = 'auto'
+
+    publish_skin_api(addon)
 
     if mode in ('system', 'safe'):
         write_state(profile, addon, mode, 'yielding_to_system')
@@ -223,7 +302,8 @@ def main():
     started = time.monotonic()
     stable_marked = False
     auto_safe, count, threshold = register_start(profile, addon)
-    log('Infinity Hook API ' + HOOK_API + ' compatibility service started')
+    log('Infinity Hook API ' + HOOK_API + ' / Skin API ' + SKIN_API + ' service started')
+    publish_skin_api(addon)
     write_state(profile, addon, addon_value(addon, 'compat_mode', 'auto'), 'started', {
         'auto_safe_triggered_this_start': auto_safe,
         'unclean_start_count': count,
@@ -242,7 +322,6 @@ def main():
         if monitor.waitForAbort(1.0):
             break
 
-    # A normal Kodi/service shutdown should not count as an unclean start next time.
     try:
         (profile / 'startup-marker.json').unlink()
     except FileNotFoundError:
