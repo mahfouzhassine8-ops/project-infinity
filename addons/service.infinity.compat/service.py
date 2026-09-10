@@ -10,6 +10,7 @@ import time
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 
 from compat_runtime import (SKIN_ID, ensure_player_files, ensure_system_fontset,
