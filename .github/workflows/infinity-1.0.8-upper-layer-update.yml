@@ -99,6 +99,7 @@ jobs:
             'assets/addons/service.infinity.compat/resources/colors/InfinityOLED.xml',
             'assets/addons/service.infinity.compat/resources/xml/VideoOSD.xml',
             'assets/addons/service.infinity.compat/resources/xml/DialogSeekBar.xml',
+            'assets/addons/service.infinity.compat/resources/xml/Custom_1197_InfinityPlayerPanel.xml',
             'assets/addons/service.infinity.compat/resources/xml/Custom_1199_InfinityVideoLock.xml',
             'assets/addons/service.infinity.refresh/addon.xml',
             'assets/addons/service.infinity.refresh/service.py',
@@ -109,14 +110,19 @@ jobs:
               missing=[x for x in required if x not in names]
               assert not missing, missing
               osd=z.read('assets/addons/service.infinity.compat/resources/xml/VideoOSD.xml')
-              ET.parse(BytesIO(osd))
-              text=osd.decode('utf-8')
+              panel=z.read('assets/addons/service.infinity.compat/resources/xml/Custom_1197_InfinityPlayerPanel.xml')
+              ET.parse(BytesIO(osd)); ET.parse(BytesIO(panel))
+              text=osd.decode('utf-8'); panel_text=panel.decode('utf-8')
               for needle in ('Infinity.Palette.Scrim','Infinity.Palette.Focus','Infinity.Orientation',
                              'ActivateWindow(osdsubtitlesettings)','ActivateWindow(osdaudiosettings)',
-                             'PlayerControl(Play)','ActivateWindow(1199)'):
+                             'PlayerControl(Play)','ActivateWindow(1199)','ActivateWindow(1197)'):
                   assert needle in text, needle
+              for needle in ('Chapters / Bookmarks','Audio','Subtitles','Video Settings',
+                             'Playback Speed +','Playback Speed -','Close Player'):
+                  assert needle in panel_text, needle
               assert '<control type="videowindow"' not in text.lower()
-          print('Fast upper-layer payload + protected player contract verified; engine rebuild skipped.')
+              assert '<control type="videowindow"' not in panel_text.lower()
+          print('Fast upper-layer payload + protected player panel verified; engine rebuild skipped.')
           PY
 
       - uses: actions/upload-artifact@v7
