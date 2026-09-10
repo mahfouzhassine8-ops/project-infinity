@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "hook_api": "1.0",
   "release": "Infinity 1.0.8 Candidate 1",
   "capabilities": {
@@ -7,8 +7,12 @@
     "theme_policy_bridge": true,
     "system_font_bridge": true,
     "refresh_policy_bridge": true,
+    "performance_mode": true,
+    "battery_saver_override": true,
+    "thermal_protection": true,
     "feature_flags": true,
     "compatibility_mode": true,
+    "automatic_safe_mode": true,
     "health_breadcrumbs": true,
     "config_export_ready": true
   },
