@@ -54,5 +54,19 @@ int main(int argc,char**argv){
 }
 ''')
 exe=a.out/'config-test'
-subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-pthread','-I'+str(src),'-I'+str(root/'patches/infinity-audio-policy'),'-I'+str(a.source/'xbmc'),str(root/'patches/infinity-audio-policy/InfinityAudioPolicy.cpp'),str(a.source/'xbmc/utils/Variant.cpp'),str(a.source/'xbmc/utils/JSONVariantParser.cpp'),str(test),'-o',str(exe)],check=True)
-subprocess.run([str(exe.resolve()),str((a.out/'config.json').resolve())],check=True)
+# Upstream Kodi callbacks deliberately name unused parameters. Keep those warnings
+# visible without promoting them to errors, only for the two unchanged upstream
+# translation units. Infinity policy and test code still compile with -Werror.
+common = ['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pthread',
+          '-I' + str(src), '-I' + str(root / 'patches/infinity-audio-policy'),
+          '-I' + str(a.source / 'xbmc')]
+objects = []
+for filename in ('Variant.cpp', 'JSONVariantParser.cpp'):
+    obj = a.out / (filename + '.o')
+    subprocess.run(common + ['-Wno-error=unused-parameter', '-c',
+                            str(a.source / 'xbmc/utils' / filename),
+                            '-o', str(obj)], check=True)
+    objects.append(str(obj))
+subprocess.run(common + [str(root / 'patches/infinity-audio-policy/InfinityAudioPolicy.cpp'),
+                         str(test), *objects, '-o', str(exe)], check=True)
+subprocess.run([str(exe.resolve()), str((a.out / 'config.json').resolve())], check=True)
