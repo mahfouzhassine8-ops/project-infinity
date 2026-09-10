@@ -50,12 +50,14 @@
   "protected_zones": [
     "VideoOSD.xml",
     "DialogSeekBar.xml",
+    "Custom_1197_InfinityPlayerPanel.xml",
     "Custom_1199_InfinityVideoLock.xml"
   ],
   "player_contract": {
     "owner": "Infinity",
     "replaceable_by_skin": false,
-    "direction": "subtitles/audio left; transport center; secondary controls right; adaptive portrait/large-display variants"
+    "panel_window": 1197,
+    "direction": "subtitles/audio left; transport center; secondary controls right; protected navigation panel; adaptive portrait/large-display variants; no skin-owned videowindow"
   },
   "skin_registration": {
     "manifest_name": "infinity-skin.json",
