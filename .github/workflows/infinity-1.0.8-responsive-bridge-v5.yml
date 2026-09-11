@@ -56,7 +56,8 @@ jobs:
           python3 scripts/infinity-responsive-v5.py verify --source kodi
           python3 scripts/validate-infinity71-java.py --source kodi \
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/v5-java
-          grep -q 'versionCode 2103109' kodi/tools/android/packaging/xbmc/build.gradle.in
+          sed -i 's/versionCode 2103109/versionCode 2103110/' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionCode 2103110' kodi/tools/android/packaging/xbmc/build.gradle.in
           grep -q 'versionName "1.0.8-Responsive-Bridge-v5"' kodi/tools/android/packaging/xbmc/build.gradle.in
           grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
           grep -q 'Infinity.NativeWidthDp' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
@@ -73,7 +74,7 @@ jobs:
           c=json.loads(Path('patches/infinity-responsive-v5/contract.json').read_text())
           assert c['base_bridge_version']==4 and c['bridge_version']==5
           assert c['version_code']==2103109
-          print('PASS: cumulative v4 -> v5 source, Java API, skin/theme contract and update identity')
+          print('PASS: cumulative v4 -> v5 source, Java API, skin/theme contract and update identity 2103110')
           PY
 
       - uses: actions/upload-artifact@v7
@@ -123,6 +124,8 @@ jobs:
           test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
           python3 scripts/infinity71.py source --source kodi
           python3 scripts/infinity-responsive-v5.py source --source kodi
+          sed -i 's/versionCode 2103109/versionCode 2103110/' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionCode 2103110' kodi/tools/android/packaging/xbmc/build.gradle.in
 
       - uses: actions/cache/restore@v4
         id: deps-cache
@@ -180,7 +183,7 @@ jobs:
               native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
           out={
               'schema':1,'bridge_version':5,'kodi_sha':contract['kodi_sha'],
-              'version_code':contract['version_code'],'version_name':contract['version_name'],
+              'version_code':2103110,'version_name':contract['version_name'],
               'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
               'libkodi_sha256':native,'dex':dex,'source_commit':'${GITHUB_SHA}'
           }
@@ -250,7 +253,7 @@ jobs:
           grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
             candidate/Infinity-1.0.8-Responsive-Bridge-v5.apk | tee candidate/badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103109'" candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103110'" candidate/badging.txt
 
       - name: Verify v5 engine preservation and bundled contracts
         run: |
