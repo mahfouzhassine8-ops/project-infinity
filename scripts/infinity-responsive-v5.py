@@ -200,10 +200,12 @@ def install_refresh_controller(source: Path) -> None:
 
     text = install.read_text(encoding="utf-8")
     if "src/InfinityRefreshController.java" not in text:
+        # Audited v4 adds InfinityCoreBridge.java to this exact Android Java source list.
+        # Anchor to that verified line so the refresh class is generated and compiled too.
         text = replace_once(
             text,
-            "                  src/InfinityExitDiagnostics.java\n",
-            "                  src/InfinityExitDiagnostics.java\n                  src/InfinityRefreshController.java\n",
+            "                  src/InfinityCoreBridge.java\n",
+            "                  src/InfinityCoreBridge.java\n                  src/InfinityRefreshController.java\n",
             "Install refresh controller",
         )
         install.write_text(text, encoding="utf-8")
