@@ -3,6 +3,7 @@ package @APP_PACKAGE@;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.FileObserver;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Display;
@@ -10,26 +11,69 @@ import android.view.WindowManager;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Locale;
 import java.util.Properties;
 
 /**
- * Infinity 1.0.8 adaptive refresh policy.
+ * Infinity adaptive refresh policy.
  *
- * Auto is the safe default: use high refresh for the UI, yield to Kodi for video,
- * respect Android low-power mode, and fall back to 60 Hz under severe thermal load.
+ * Performance/Professional Mode writes policy.properties through
+ * service.infinity.refresh. This controller watches that file, immediately
+ * reapplies the Android display request, and writes runtime.properties so the
+ * UI/diagnostics layer can prove what was requested and what Android granted.
  */
 final class InfinityRefreshController
 {
   private static final String TAG = "InfinityRefresh";
+  private static final long VERIFY_DELAY_MS = 700L;
+
   private final Main activity;
+  private final File policyDir;
   private final File policyFile;
+  private final File statusFile;
+  private FileObserver observer;
 
   InfinityRefreshController(Main activity)
   {
     this.activity = activity;
-    this.policyFile = new File(activity.getFilesDir(),
-        ".kodi/userdata/addon_data/service.infinity.refresh/policy.properties");
+    this.policyDir = new File(activity.getFilesDir(),
+        ".kodi/userdata/addon_data/service.infinity.refresh");
+    this.policyFile = new File(policyDir, "policy.properties");
+    this.statusFile = new File(policyDir, "runtime.properties");
+    if (!policyDir.isDirectory()) policyDir.mkdirs();
+    startWatching();
+  }
+
+  private void startWatching()
+  {
+    final int mask = FileObserver.CLOSE_WRITE | FileObserver.MOVED_TO | FileObserver.CREATE;
+    observer = new FileObserver(policyDir.getAbsolutePath(), mask)
+    {
+      @Override
+      public void onEvent(int event, String path)
+      {
+        if (path == null || !"policy.properties".equals(path)) return;
+        activity.runOnUiThread(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            apply("policy-change");
+          }
+        });
+      }
+    };
+    observer.startWatching();
+  }
+
+  void close()
+  {
+    if (observer != null)
+    {
+      observer.stopWatching();
+      observer = null;
+    }
   }
 
   void apply(String reason)
@@ -38,10 +82,12 @@ final class InfinityRefreshController
     {
       final Policy p = Policy.load(policyFile);
       final String mode = normalizeMode(p.mode);
+      final Display display = currentDisplay();
 
       if ("off".equals(mode) || "system".equals(mode))
       {
         clearRequest();
+        writePassiveStatus(mode, reason, display, "system-control");
         return;
       }
 
@@ -49,6 +95,7 @@ final class InfinityRefreshController
       if (playingVideo && "match_video".equals(p.videoPolicy))
       {
         clearRequest();
+        writePassiveStatus(mode, reason, display, "yield-to-kodi-video");
         Log.d(TAG, "Yielding refresh control to Kodi video policy (" + reason + ")");
         return;
       }
@@ -56,27 +103,30 @@ final class InfinityRefreshController
       if (playingVideo && "system".equals(p.videoPolicy))
       {
         clearRequest();
+        writePassiveStatus(mode, reason, display, "video-system-control");
         return;
       }
       if (!playingVideo && "system".equals(p.uiPolicy))
       {
         clearRequest();
+        writePassiveStatus(mode, reason, display, "ui-system-control");
         return;
       }
 
       float cap = p.maxHz;
       if ("balanced".equals(mode)) cap = Math.min(cap, 90f);
-      if ("battery".equals(mode)) cap = Math.min(cap, 60f); // legacy 1.0.8 value
+      if ("battery".equals(mode)) cap = Math.min(cap, 60f);
 
-      // Low-power and thermal safety win by default in every active mode.
-      // Advanced users can explicitly disable battery-saver respect in settings.
-      if (p.respectBatterySaver && isBatterySaverOn()) cap = Math.min(cap, 60f);
-      if (p.thermalProtection && isThermallyLimited()) cap = Math.min(cap, 60f);
+      final boolean saver = isBatterySaverOn();
+      final boolean thermal = isThermallyLimited();
+      if (p.respectBatterySaver && saver) cap = Math.min(cap, 60f);
+      if (p.thermalProtection && thermal) cap = Math.min(cap, 60f);
 
-      final Display display = currentDisplay();
       if (display == null)
       {
         clearRequest();
+        writeStatus(mode, reason, 0, 0f, 0, 0f, false,
+            "no-display", saver, thermal);
         return;
       }
 
@@ -84,31 +134,121 @@ final class InfinityRefreshController
       if (chosen == null)
       {
         clearRequest();
+        final Display.Mode active = display.getMode();
+        writeStatus(mode, reason, 0, 0f,
+            active != null ? active.getModeId() : 0,
+            active != null ? active.getRefreshRate() : 0f,
+            false, "no-compatible-mode", saver, thermal);
         return;
       }
 
+      final int requestedId = chosen.getModeId();
+      final float requestedHz = chosen.getRefreshRate();
       WindowManager.LayoutParams attrs = activity.getWindow().getAttributes();
-      if (attrs.preferredDisplayModeId != chosen.getModeId())
+      if (attrs.preferredDisplayModeId != requestedId)
       {
-        attrs.preferredDisplayModeId = chosen.getModeId();
+        attrs.preferredDisplayModeId = requestedId;
         activity.getWindow().setAttributes(attrs);
       }
+
+      final Display.Mode activeNow = display.getMode();
+      writeStatus(mode, reason, requestedId, requestedHz,
+          activeNow != null ? activeNow.getModeId() : 0,
+          activeNow != null ? activeNow.getRefreshRate() : 0f,
+          false, "request-pending", saver, thermal);
+
       Log.d(TAG, String.format(Locale.US,
-          "Mode=%s requested id=%d %.2fHz (%s, video=%s, saver=%s)", mode,
-          chosen.getModeId(), chosen.getRefreshRate(), reason, playingVideo,
-          isBatterySaverOn()));
+          "Mode=%s requested id=%d %.2fHz (%s, video=%s, saver=%s, thermal=%s)",
+          mode, requestedId, requestedHz, reason, playingVideo, saver, thermal));
+
+      activity.getWindow().getDecorView().postDelayed(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          verifyRequest(mode, reason, requestedId, requestedHz, saver, thermal);
+        }
+      }, VERIFY_DELAY_MS);
     }
     catch (Throwable error)
     {
       Log.w(TAG, "Refresh policy rejected; returning control to Android/Kodi", error);
       clearRequest();
+      writeStatus("error", reason, 0, 0f, 0, 0f, false,
+          "exception-" + error.getClass().getSimpleName(), isBatterySaverOn(), isThermallyLimited());
+    }
+  }
+
+  private void verifyRequest(String mode, String reason, int requestedId,
+                             float requestedHz, boolean saver, boolean thermal)
+  {
+    try
+    {
+      final Display display = currentDisplay();
+      final Display.Mode active = display != null ? display.getMode() : null;
+      final int activeId = active != null ? active.getModeId() : 0;
+      final float activeHz = active != null ? active.getRefreshRate() : 0f;
+      final int preferredId = activity.getWindow().getAttributes().preferredDisplayModeId;
+      final boolean requestApplied = preferredId == requestedId;
+      final boolean activeMatched = activeId == requestedId ||
+          Math.abs(activeHz - requestedHz) < 0.6f;
+      final boolean granted = requestApplied && activeMatched;
+      final String status = granted ? "active" : requestApplied ? "requested-not-active" : "request-rejected";
+      writeStatus(mode, reason, requestedId, requestedHz, activeId, activeHz,
+          granted, status, saver, thermal);
+      Log.d(TAG, String.format(Locale.US,
+          "VERIFY mode=%s requested=%d/%.2fHz preferred=%d active=%d/%.2fHz granted=%s",
+          mode, requestedId, requestedHz, preferredId, activeId, activeHz, granted));
+    }
+    catch (Throwable error)
+    {
+      Log.w(TAG, "Could not verify active refresh mode", error);
+    }
+  }
+
+  private void writePassiveStatus(String mode, String reason, Display display, String status)
+  {
+    final Display.Mode active = display != null ? display.getMode() : null;
+    writeStatus(mode, reason, 0, 0f,
+        active != null ? active.getModeId() : 0,
+        active != null ? active.getRefreshRate() : 0f,
+        true, status, isBatterySaverOn(), isThermallyLimited());
+  }
+
+  private void writeStatus(String mode, String reason, int requestedId, float requestedHz,
+                           int activeId, float activeHz, boolean granted, String status,
+                           boolean saver, boolean thermal)
+  {
+    try
+    {
+      if (!policyDir.isDirectory()) policyDir.mkdirs();
+      final Properties props = new Properties();
+      props.setProperty("hook_active", "true");
+      props.setProperty("mode", mode == null ? "unknown" : mode);
+      props.setProperty("reason", reason == null ? "unknown" : reason);
+      props.setProperty("requested_mode_id", Integer.toString(requestedId));
+      props.setProperty("requested_hz", String.format(Locale.US, "%.2f", requestedHz));
+      props.setProperty("active_mode_id", Integer.toString(activeId));
+      props.setProperty("active_hz", String.format(Locale.US, "%.2f", activeHz));
+      props.setProperty("granted", Boolean.toString(granted));
+      props.setProperty("status", status == null ? "unknown" : status);
+      props.setProperty("battery_saver", Boolean.toString(saver));
+      props.setProperty("thermal_limited", Boolean.toString(thermal));
+      props.setProperty("updated_ms", Long.toString(System.currentTimeMillis()));
+      try (FileOutputStream output = new FileOutputStream(statusFile, false))
+      {
+        props.store(output, "Infinity refresh runtime status");
+      }
+    }
+    catch (Throwable error)
+    {
+      Log.w(TAG, "Could not publish refresh runtime status", error);
     }
   }
 
   private String normalizeMode(String mode)
   {
     if (mode == null) return "auto";
-    // Preserve upgrades from Candidate 1 settings without forcing a reset.
     if ("adaptive".equals(mode)) return "auto";
     if ("performance".equals(mode)) return "high_refresh";
     return mode;
@@ -126,7 +266,6 @@ final class InfinityRefreshController
     Display.Mode best = null;
     for (Display.Mode mode : display.getSupportedModes())
     {
-      // Preserve current pixel dimensions; only request another refresh mode.
       if (mode.getPhysicalWidth() != current.getPhysicalWidth() ||
           mode.getPhysicalHeight() != current.getPhysicalHeight()) continue;
       if (mode.getRefreshRate() > cap + 0.5f) continue;
