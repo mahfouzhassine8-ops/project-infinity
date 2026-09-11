@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile real patched Main/bridge and four unchanged Kodi Android classes.
+"""Compile real patched Main/bridge and Android controller classes.
 
 Uses the real Android SDK API JAR. TV scheduling, JSON-RPC and generated R symbols
 are compile-only stubs; this is an API/descriptor check, not an Android runtime test.
@@ -13,7 +13,12 @@ p.add_argument('--out',type=Path,required=True)
 a=p.parse_args(); a.out.mkdir(parents=True,exist_ok=True)
 src=a.out/'src/com/projectinfinity/kodi';src.mkdir(parents=True,exist_ok=True)
 root=a.source/'tools/android/packaging/xbmc/src'
-for name in ['Main','InfinityCoreBridge','XBMCMainView','XBMCInputDeviceListener','XBMCSettingsContentObserver']:
+names=['Main','InfinityCoreBridge','XBMCMainView','XBMCInputDeviceListener','XBMCSettingsContentObserver']
+# Responsive-v5 Performance hotfix adds this source after the audited v4 baseline.
+# Keep the validator backward-compatible so v4 preflight still proves its original contract.
+if (root/'InfinityRefreshController.java.in').is_file():
+    names.append('InfinityRefreshController')
+for name in names:
     t=(root/(name+'.java.in')).read_text().replace('@APP_PACKAGE@','com.projectinfinity.kodi').replace('@APP_NAME_LC@','kodi').replace('@APP_NAME@','Kodi')
     (src/(name+'.java')).write_text(t)
 (src/'CompileOnlyStubs.java').write_text('''package com.projectinfinity.kodi;
@@ -43,4 +48,8 @@ expected=json.loads((Path(__file__).resolve().parents[1]/'patches/infinity-7.1-a
 if actual != expected: raise SystemExit('Compiled Java descriptors differ: '+repr(actual))
 with zipfile.ZipFile(a.out/'compile-check.jar','w') as z:
  for f in classes.rglob('*.class'):z.write(f,f.relative_to(classes).as_posix())
-print('PASS: real Android API 34 compile; all compiled Main JNI descriptors match the native contract.')
+if 'InfinityRefreshController' in names:
+    refresh_class=classes/'com/projectinfinity/kodi/InfinityRefreshController.class'
+    if not refresh_class.is_file(): raise SystemExit('Refresh controller did not compile')
+print('PASS: real Android API 34 compile; all compiled Main JNI descriptors match the native contract.' +
+      (' Refresh controller compiled.' if 'InfinityRefreshController' in names else ''))
