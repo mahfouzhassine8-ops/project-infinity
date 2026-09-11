@@ -27,6 +27,13 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
     return text.replace(old, new, 1)
 
 
+def replace_exact_count(text: str, old: str, new: str, expected: int, label: str) -> str:
+    count = text.count(old)
+    if count != expected:
+        raise ValueError(f"{label}: expected {expected} matches, got {count}")
+    return text.replace(old, new)
+
+
 def transform_gradle(text: str) -> str:
     text = replace_once(text, "versionCode 2103100", "versionCode 2103109", "version code")
     return replace_once(text, 'versionName "21.3-Infinity-Android-First"',
@@ -34,9 +41,6 @@ def transform_gradle(text: str) -> str:
 
 
 def transform_manifest(text: str) -> str:
-    # v4 already owns the approved Infinity icon. Add the explicit round-icon
-    # binding so launchers that request the round variant cannot fall back to
-    # Kodi's legacy launcher resource.
     return replace_once(
         text,
         '        android:icon="@drawable/project_infinity_icon"\n',
@@ -189,6 +193,101 @@ TRANSFORMS = {
 }
 
 
+def install_refresh_controller(source: Path) -> None:
+    main = source / "tools/android/packaging/xbmc/src/Main.java.in"
+    install = source / "cmake/scripts/android/Install.cmake"
+    controller = source / "tools/android/packaging/xbmc/src/InfinityRefreshController.java.in"
+
+    text = install.read_text(encoding="utf-8")
+    if "src/InfinityRefreshController.java" not in text:
+        text = replace_once(
+            text,
+            "                  src/InfinityExitDiagnostics.java\n",
+            "                  src/InfinityExitDiagnostics.java\n                  src/InfinityRefreshController.java\n",
+            "Install refresh controller",
+        )
+        install.write_text(text, encoding="utf-8")
+
+    text = main.read_text(encoding="utf-8")
+    if "InfinityRefreshController mInfinityRefresh" not in text:
+        text = replace_once(
+            text,
+            "  private InfinityCoreBridge mInfinityBridge;\n",
+            "  private InfinityCoreBridge mInfinityBridge;\n  private InfinityRefreshController mInfinityRefresh;\n",
+            "Refresh field",
+        )
+        text = replace_once(
+            text,
+            "    mInfinityBridge.attach();\n",
+            "    mInfinityBridge.attach();\n    mInfinityRefresh = new InfinityRefreshController(this);\n    mInfinityRefresh.apply(\"attach\");\n",
+            "Refresh attach",
+        )
+        text = replace_once(
+            text,
+            "    if (mInfinityBridge != null) mInfinityBridge.onResume();\n",
+            "    if (mInfinityBridge != null) mInfinityBridge.onResume();\n    if (mInfinityRefresh != null) mInfinityRefresh.apply(\"resume\");\n",
+            "Refresh resume",
+        )
+        text = replace_once(
+            text,
+            "    mInfinityBridge = null;\n",
+            "    if (mInfinityRefresh != null) mInfinityRefresh.close();\n    mInfinityRefresh = null;\n    mInfinityBridge = null;\n",
+            "Refresh destroy",
+        )
+        text = replace_exact_count(
+            text,
+            "    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n",
+            "    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n    if (mInfinityRefresh != null) mInfinityRefresh.apply(\"window\");\n",
+            3,
+            "Refresh window callbacks",
+        )
+        text = replace_once(
+            text,
+            "    if (hasFocus && mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n",
+            "    if (hasFocus && mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n    if (hasFocus && mInfinityRefresh != null) mInfinityRefresh.apply(\"focus\");\n",
+            "Refresh focus",
+        )
+        text = replace_once(
+            text,
+            "          mInfinityBridge.updatePictureInPictureParams();\n",
+            "          mInfinityBridge.updatePictureInPictureParams();\n        if (!mInfinityDestroyed && mInfinityRefresh != null)\n          mInfinityRefresh.apply(\"playback\");\n",
+            "Refresh playback",
+        )
+        main.write_text(text, encoding="utf-8")
+
+    controller.write_bytes((ROOT / "patches/infinity-refresh/InfinityRefreshController.java.in").read_bytes())
+
+
+def verify_refresh_controller(source: Path) -> None:
+    main = (source / "tools/android/packaging/xbmc/src/Main.java.in").read_text(encoding="utf-8")
+    install = (source / "cmake/scripts/android/Install.cmake").read_text(encoding="utf-8")
+    controller_path = source / "tools/android/packaging/xbmc/src/InfinityRefreshController.java.in"
+    if not controller_path.is_file():
+        raise ValueError("InfinityRefreshController.java.in was not installed")
+    controller = controller_path.read_text(encoding="utf-8")
+    for needle in (
+        "InfinityRefreshController mInfinityRefresh",
+        'mInfinityRefresh.apply("attach")',
+        'mInfinityRefresh.apply("resume")',
+        'mInfinityRefresh.apply("playback")',
+        "mInfinityRefresh.close()",
+    ):
+        if needle not in main:
+            raise ValueError(f"missing refresh wiring {needle!r} in Main.java.in")
+    if main.count('mInfinityRefresh.apply("window")') != 3:
+        raise ValueError("expected refresh controller on all three window callbacks")
+    if "src/InfinityRefreshController.java" not in install:
+        raise ValueError("refresh controller missing from Android Install.cmake")
+    for needle in (
+        "preferredDisplayModeId", "FileObserver", "policy-change",
+        "runtime.properties", "requested_hz", "active_hz", "granted",
+        "VERIFY mode=", "getSupportedModes()",
+    ):
+        if needle not in controller:
+            raise ValueError(f"missing verified refresh capability {needle!r}")
+    print("PASS: responsive v5 includes immediate, self-verifying Infinity refresh hook.")
+
+
 def verify(source: Path) -> None:
     checks = {
         "tools/android/packaging/xbmc/build.gradle.in": [
@@ -224,6 +323,7 @@ def verify(source: Path) -> None:
     splash = (source / SPLASH).read_text(encoding="utf-8")
     if 'android:src="@drawable/project_infinity_icon"' not in splash:
         raise ValueError("Infinity startup layout no longer points at the approved icon")
+    verify_refresh_controller(source)
     print("PASS: Infinity Responsive Bridge v5 source + approved launcher icon contract verified.")
 
 
@@ -239,11 +339,20 @@ def apply(source: Path) -> None:
             path = source / rel
             path.write_text(fn(path.read_text(encoding="utf-8")), encoding="utf-8")
     else:
-        verify(source)
-        print("Source already appears to contain v5; exact v4 preimage check skipped.")
-        return
+        # Validate the responsive transformation before layering the refresh hotfix.
+        checks_before_refresh = {
+            "tools/android/packaging/xbmc/build.gradle.in": "versionCode 2103109",
+            "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in": "static final int VERSION = 5;",
+            "xbmc/windowing/android/WinSystemAndroid.cpp": "Infinity.NativeDeviceMode",
+        }
+        for rel, needle in checks_before_refresh.items():
+            if needle not in (source / rel).read_text(encoding="utf-8"):
+                raise ValueError(f"source is neither exact v4 preimage nor valid responsive v5: {rel}")
+        print("Source already appears to contain responsive v5; applying refresh hotfix idempotently.")
+
+    install_refresh_controller(source)
     verify(source)
-    print("Applied Infinity Responsive Bridge v5 cumulatively after audited v4.")
+    print("Applied Infinity Responsive Bridge v5 with verified Performance refresh activation.")
 
 
 def main():
