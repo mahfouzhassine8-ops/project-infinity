@@ -37,11 +37,20 @@ final class InfinityRefreshController
   InfinityRefreshController(Main activity)
   {
     this.activity = activity;
-    this.policyDir = new File(activity.getFilesDir(),
+
+    // Kodi 21.3 sets HOME from getExternalFilesDir("") when available. Python's
+    // special://profile therefore lives below that external app-private root.
+    // Keep the Java/native refresh controller on the exact same profile tree so
+    // policy.properties written by service.infinity.refresh is observable here,
+    // and runtime.properties written here is observable from Kodi/Python.
+    File kodiHome = activity.getExternalFilesDir(null);
+    if (kodiHome == null) kodiHome = activity.getFilesDir();
+    this.policyDir = new File(kodiHome,
         ".kodi/userdata/addon_data/service.infinity.refresh");
     this.policyFile = new File(policyDir, "policy.properties");
     this.statusFile = new File(policyDir, "runtime.properties");
     if (!policyDir.isDirectory()) policyDir.mkdirs();
+    Log.i(TAG, "Refresh profile path=" + policyDir.getAbsolutePath());
     startWatching();
   }
 
