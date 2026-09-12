@@ -2,11 +2,11 @@
 """Cumulative audio-policy entry point for the current Responsive v5 contract.
 
 The validated audio recipe is preserved in infinity_audio_policy_source_base.py.
-Current Responsive v5 additionally owns the launcher round-icon binding in the
-Android manifest. Native-media intentionally adds appCategory=video before v5,
-so the old whole-file manifest hash is no longer a valid preimage. This adapter
-keeps exact hash gates for the native/Java capability owners and applies only
-that manifest binding through strict semantic anchors, preserving both layers.
+Current Responsive v5 additionally owns the launcher round-icon binding and the
+self-verifying refresh controller. Native-media intentionally changes the
+manifest before v5, while the validated audio stack already contains the older
+1.0.8 refresh lifecycle. This adapter performs strict ownership handoffs for
+those two intentional overlaps and leaves every other capability hash-gated.
 """
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ def prepare_current(source: Path, receipts: Path) -> None:
     manifest_rel = "tools/android/packaging/xbmc/AndroidManifest.xml.in"
 
     # Versioning belongs to the audio/deep release owners. Manifest presentation
-    # now has a semantic handoff because native-media legitimately changed it.
+    # has a semantic handoff because native-media legitimately adds appCategory.
     exact_paths = [
         rel for rel in v5.TRANSFORMS
         if not rel.endswith("build.gradle.in") and rel != manifest_rel
@@ -80,7 +80,27 @@ def prepare_current(source: Path, receipts: Path) -> None:
         raise ValueError("Responsive handoff changed native-media appCategory")
     manifest_path.write_text(manifest, encoding="utf-8")
 
-    print("PASS: current Responsive v5 capability + launcher bindings applied over complete native-media stack")
+    # The older cumulative audio baseline already wires InfinityRefreshController,
+    # so current v5's installer correctly avoids duplicating the field/callbacks.
+    # Upgrade only the missing close lifecycle, then install the current controller
+    # bytes and run the current self-verifying refresh contract.
+    main_path = source / "tools/android/packaging/xbmc/src/Main.java.in"
+    main = main_path.read_text(encoding="utf-8")
+    if "mInfinityRefresh.close()" not in main:
+        old = "    mInfinityBridge = null;\n    mInfinityRefresh = null;\n"
+        new = (
+            "    if (mInfinityRefresh != null) mInfinityRefresh.close();\n"
+            "    mInfinityRefresh = null;\n"
+            "    mInfinityBridge = null;\n"
+        )
+        if main.count(old) != 1:
+            raise ValueError("Legacy refresh destroy lifecycle owner changed")
+        main = main.replace(old, new, 1)
+        main_path.write_text(main, encoding="utf-8")
+
+    v5.install_refresh_controller(source)
+    v5.verify_refresh_controller(source)
+    print("PASS: current Responsive v5 capability, launcher and refresh owners applied over native-media stack")
 
 
 base.prepare = prepare_current
