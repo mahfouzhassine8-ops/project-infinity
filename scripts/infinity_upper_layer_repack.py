@@ -11,7 +11,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-ADDONS = ('service.infinity.compat', 'service.infinity.refresh')
+ADDONS = ('service.infinity.compat', 'service.infinity.refresh', 'script.infinity.audiopolicy')
 SIGNING = re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))', re.I)
 
 
@@ -22,7 +22,7 @@ def replacement_files() -> dict[str, bytes]:
         if not root.is_dir():
             raise FileNotFoundError(root)
         for path in sorted(root.rglob('*')):
-            if path.is_file():
+            if path.is_file() and '__pycache__' not in path.parts and path.suffix != '.pyc':
                 out[f'assets/addons/{addon_id}/' + path.relative_to(root).as_posix()] = path.read_bytes()
     return out
 

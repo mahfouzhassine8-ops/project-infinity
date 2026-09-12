@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "api": 1,
+  "config": "special://profile/infinity-audio-policy.json",
+  "keys": ["schema", "video", "music", "ui"],
+  "allowed_content": ["movie", "music", "speech", "sonification"],
+  "default": {"schema": 1, "video": "movie", "music": "music", "ui": "sonification"},
+  "apply_boundary": "new stream or new playback; stop completely before changing",
+  "engine_rebuild_for_mapping_changes": false,
+  "samsung_audio_eraser_eligibility": "unknown"
+}
