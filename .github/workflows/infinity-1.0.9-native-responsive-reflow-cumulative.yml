@@ -10,6 +10,8 @@ on:
       - 'scripts/infinity-native-responsive-reflow.py'
       - 'tests/infinity-native-reflow/**'
       - 'scripts/infinity_audio_policy_source.py'
+      - 'scripts/validate_infinity_audio_policy.py'
+      - 'tests/infinity_audio/**'
       - 'scripts/infinity_1_0_8_deep_audio_rebrand.py'
       - 'scripts/infinity_1_0_8_deep_rebrand_preimage.py'
       - 'scripts/infinity-responsive-v5.py'
@@ -55,7 +57,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends imagemagick fonts-dejavu-core rapidjson-dev
           python3 -m py_compile scripts/infinity-native-responsive-reflow.py
 
-      - name: Reconstruct accepted 2103123 cumulative source exactly
+      - name: Validate inherited audio and Responsive v5 layer at 2103120
         run: |
           set -euo pipefail
           git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
@@ -69,6 +71,22 @@ jobs:
           m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
           src=Path('kodi'); m.install_refresh_controller(src); m.verify_refresh_controller(src)
           PY
+          python3 scripts/validate_infinity_audio_policy.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
+          python3 tests/infinity_audio/test_config.py --source kodi --out preflight/audio-config
+          python3 scripts/validate_infinity_skin_contract.py
+          grep -q 'versionCode 2103120' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.8-Cumulative-Audio-Policy-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'InfinityRefreshController' kodi/tools/android/packaging/xbmc/src/Main.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.AudioPolicyApi' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'InfinityAudioPolicy.cpp' kodi/xbmc/platform/android/activity/CMakeLists.txt
+          grep -q 'InfinityAudioFocusHook.java' kodi/cmake/scripts/android/Install.cmake
+
+      - name: Reconstruct accepted 2103123 cumulative source exactly
+        run: |
+          set -euo pipefail
           python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
           python3 scripts/infinity_1_0_8_deep_audio_rebrand.py source --source kodi --receipt preflight/deep-audio-source.json
           python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-source --source kodi
@@ -92,7 +110,7 @@ jobs:
           grep -q 'Infinity.NativeReflowOwner' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
           test "$(grep -c '\"ReloadSkin\"' kodi/xbmc/windowing/android/WinSystemAndroid.cpp)" -eq 1
 
-      - name: Compile cumulative Java and native state contracts
+      - name: Compile final cumulative Java and v5 state contracts
         run: |
           set -euo pipefail
           python3 scripts/validate-infinity71-java.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/java
@@ -100,13 +118,13 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/d8" --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 --output preflight/dex preflight/java/compile-check.jar
           c++ -std=c++17 -Wall -Wextra -Werror -pthread -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp -o preflight/bridge-state
           preflight/bridge-state
-          python3 scripts/validate_infinity_audio_policy.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
           python3 scripts/validate_infinity_skin_contract.py
 
       - name: Write preflight audit
         run: |
           cat > preflight/AUDIT.txt <<'EOF'
           PASS: Source ancestry starts from accepted Deep-Rebrand-Audio cumulative commit 9833c4751e0e5c6961ca32566bb2625151ebf983.
+          PASS: Historical Audio Policy validator ran at its native 2103120 identity before release-identity transforms.
           PASS: Reconstructed baseline identity is 2103123 / 1.0.8-Deep-Rebrand-Audio-1 before native reflow.
           PASS: New identity is strictly monotonic: 2103124 / 1.0.9-Native-Responsive-Reflow-Cumulative.
           PASS: Responsive Bridge v5 preserved.
@@ -115,7 +133,7 @@ jobs:
           PASS: Audio Policy API 1 and audio focus hook preserved.
           PASS: Deep branding owner preserved.
           PASS: Native reflow is the only ReloadSkin owner in libkodi source and is skin/PiP/profile gated.
-          PASS: Java/JNI and bridge-state compile gates passed.
+          PASS: Final Java/JNI and v5 bridge-state compile gates passed.
           DEVICE ACCEPTANCE REMAINS REQUIRED.
           EOF
 
