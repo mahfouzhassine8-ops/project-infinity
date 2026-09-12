@@ -167,6 +167,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm imagemagick fonts-dejavu-core rapidjson-dev
           sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
 
       - name: Apply accepted cumulative stack then native reflow
         run: |
