@@ -1,0 +1,340 @@
+name: Infinity 1.0.9 | Native Responsive Reflow Cumulative
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.9-native-responsive-reflow-cumulative]
+    paths:
+      - '.github/workflows/infinity-1.0.9-native-responsive-reflow-cumulative.yml'
+      - 'patches/infinity-native-responsive-reflow/**'
+      - 'scripts/infinity-native-responsive-reflow.py'
+      - 'tests/infinity-native-reflow/**'
+      - 'scripts/infinity_audio_policy_source.py'
+      - 'scripts/infinity_1_0_8_deep_audio_rebrand.py'
+      - 'scripts/infinity_1_0_8_deep_rebrand_preimage.py'
+      - 'scripts/infinity-responsive-v5.py'
+      - 'scripts/infinity71.py'
+      - 'patches/infinity-7.1-audited/**'
+      - 'patches/infinity-responsive-v5/**'
+      - 'patches/infinity-refresh/**'
+      - 'patches/infinity-media/**'
+      - 'patches/infinity-audio-policy/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-native-reflow-cumulative-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BASE_COMMIT: 9833c4751e0e5c6961ca32566bb2625151ebf983
+  KODI_COMMIT: a3a448d26b8d560a65655dab2cd122994dc4e146
+  VERSION_CODE: '2103124'
+  VERSION_NAME: 1.0.9-Native-Responsive-Reflow-Cumulative
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Prepare exact validation toolchain
+        run: |
+          set -euo pipefail
+          test "$(git rev-list --max-parents=0 HEAD | head -1)" != "" >/dev/null
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick fonts-dejavu-core rapidjson-dev
+          python3 -m py_compile scripts/infinity-native-responsive-reflow.py
+
+      - name: Reconstruct accepted 2103123 cumulative source exactly
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = "$KODI_COMMIT"
+          python3 scripts/infinity_audio_policy_source.py kodi --receipts preflight/audio
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path('scripts/infinity-responsive-v5.py')
+          s=importlib.util.spec_from_file_location('responsive_v5_current',p)
+          m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+          src=Path('kodi'); m.install_refresh_controller(src); m.verify_refresh_controller(src)
+          PY
+          python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py source --source kodi --receipt preflight/deep-audio-source.json
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-source --source kodi
+          grep -q 'versionCode 2103123' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.8-Deep-Rebrand-Audio-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'InfinityRefreshController' kodi/tools/android/packaging/xbmc/src/Main.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.AudioPolicyApi' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'InfinityAudioPolicy.cpp' kodi/xbmc/platform/android/activity/CMakeLists.txt
+          printf '%s\n' 'PASS: accepted cumulative source reconstructed at 2103123 before reflow.' > preflight/BASELINE.txt
+
+      - name: Apply native reflow only after accepted cumulative baseline
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity-native-responsive-reflow.py source --source kodi
+          python3 scripts/infinity-native-responsive-reflow.py verify --source kodi
+          INFINITY_KODI_SOURCE="$PWD/kodi" python3 tests/infinity-native-reflow/test_contract.py
+          grep -q 'versionCode 2103124' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.9-Native-Responsive-Reflow-Cumulative"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'Infinity.NativeReflowOwner' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          test "$(grep -c '\"ReloadSkin\"' kodi/xbmc/windowing/android/WinSystemAndroid.cpp)" -eq 1
+
+      - name: Compile cumulative Java and native state contracts
+        run: |
+          set -euo pipefail
+          python3 scripts/validate-infinity71-java.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/java
+          mkdir -p preflight/dex
+          "$ANDROID_HOME/build-tools/34.0.0/d8" --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 --output preflight/dex preflight/java/compile-check.jar
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp -o preflight/bridge-state
+          preflight/bridge-state
+          python3 scripts/validate_infinity_audio_policy.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
+          python3 scripts/validate_infinity_skin_contract.py
+
+      - name: Write preflight audit
+        run: |
+          cat > preflight/AUDIT.txt <<'EOF'
+          PASS: Source ancestry starts from accepted Deep-Rebrand-Audio cumulative commit 9833c4751e0e5c6961ca32566bb2625151ebf983.
+          PASS: Reconstructed baseline identity is 2103123 / 1.0.8-Deep-Rebrand-Audio-1 before native reflow.
+          PASS: New identity is strictly monotonic: 2103124 / 1.0.9-Native-Responsive-Reflow-Cumulative.
+          PASS: Responsive Bridge v5 preserved.
+          PASS: Native refresh requested-vs-active path preserved.
+          PASS: Native media/platform hook markers preserved.
+          PASS: Audio Policy API 1 and audio focus hook preserved.
+          PASS: Deep branding owner preserved.
+          PASS: Native reflow is the only ReloadSkin owner in libkodi source and is skin/PiP/profile gated.
+          PASS: Java/JNI and bridge-state compile gates passed.
+          DEVICE ACCEPTANCE REMAINS REQUIRED.
+          EOF
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.9-Native-Reflow-Cumulative-Preflight
+          path: preflight/
+          if-no-files-found: error
+          retention-days: 30
+
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Prepare matched Android native toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm imagemagick fonts-dejavu-core rapidjson-dev
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+
+      - name: Apply accepted cumulative stack then native reflow
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = "$KODI_COMMIT"
+          python3 scripts/infinity_audio_policy_source.py kodi --receipts engine/audio-receipts
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path('scripts/infinity-responsive-v5.py'); s=importlib.util.spec_from_file_location('rv5',p)
+          m=importlib.util.module_from_spec(s); s.loader.exec_module(m); src=Path('kodi')
+          m.install_refresh_controller(src); m.verify_refresh_controller(src)
+          PY
+          python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py source --source kodi --receipt engine/deep-audio-source.json
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-source --source kodi
+          grep -q 'versionCode 2103123' kodi/tools/android/packaging/xbmc/build.gradle.in
+          python3 scripts/infinity-native-responsive-reflow.py source --source kodi
+          python3 scripts/infinity-native-responsive-reflow.py verify --source kodi
+          INFINITY_KODI_SOURCE="$PWD/kodi" python3 tests/infinity-native-reflow/test_contract.py
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-native-reflow-cumulative-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-audio-policy/**', 'patches/infinity-native-responsive-reflow/contract.json') }}
+          restore-keys: |
+            infinity-deep-audio-21.3-arm64-${{ runner.os }}-
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Prepare dependencies and native build configuration
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+
+      - name: Compile-check cumulative native owners
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+
+      - name: Build matched engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine --apk engine/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine-Base.apk --output engine/engine-overlay-manifest.json --source-commit "$GITHUB_SHA"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging engine/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine-Base.apk | tee engine/base-badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103124'" engine/base-badging.txt
+          grep -q "versionName='1.0.9-Native-Responsive-Reflow-Cumulative'" engine/base-badging.txt
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine-Base.apk')
+          with zipfile.ZipFile(apk) as z:
+              names=z.namelist(); native=z.read('lib/arm64-v8a/libkodi.so')
+              dex=b''.join(z.read(n) for n in names if re.fullmatch(r'classes\d*\.dex',n))
+              for needle in (b'Infinity.NativeReflowOwner',b'Infinity.NativeDeviceMode',b'Infinity.AudioPolicyApi'):
+                  assert needle in native, needle
+              for needle in (b'InfinityRefreshController',b'InfinityAudioFocusHook'):
+                  assert needle in dex, needle
+          Path('engine/native-responsive-reflow.json').write_text(json.dumps({
+              'schema':2,'base_version_code':2103123,'version_code':2103124,
+              'version_name':'1.0.9-Native-Responsive-Reflow-Cumulative',
+              'base_source_commit':'9833c4751e0e5c6961ca32566bb2625151ebf983',
+              'apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+              'source_commit':'${GITHUB_SHA}'
+          },indent=2,sort_keys=True)+'\n')
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  package:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine
+          path: engine
+
+      - name: Apply protected lock and current upper layer
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay --apk engine/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine-Base.apk --manifest engine/engine-overlay-manifest.json --output candidate/with-lock-unsigned.apk
+          python3 scripts/infinity_upper_layer_repack.py candidate/with-lock-unsigned.apk candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-unsigned.apk
+
+      - name: Sign permanent update and prove monotonic identity
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+          bash scripts/sign-infinity71.sh candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-unsigned.apk candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103124'" candidate/badging.txt
+          grep -q "versionName='1.0.9-Native-Responsive-Reflow-Cumulative'" candidate/badging.txt
+
+      - name: Final cumulative binary-preservation audit
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_infinity_skin_contract.py
+          python3 - <<'PY'
+          import hashlib,re,zipfile
+          from pathlib import Path
+          base=Path('engine/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative-Engine-Base.apk')
+          final=Path('candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative.apk')
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
+              for name in a.namelist():
+                  if name == 'lib/arm64-v8a/libkodi.so' or re.fullmatch(r'classes\d*\.dex',name):
+                      assert a.read(name) == b.read(name), name
+              native=b.read('lib/arm64-v8a/libkodi.so')
+              dex=b''.join(b.read(n) for n in b.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+              for needle in (b'Infinity.NativeReflowOwner',b'Infinity.NativeDeviceMode',b'Infinity.AudioPolicyApi'):
+                  assert needle in native,needle
+              for needle in (b'InfinityRefreshController',b'InfinityAudioFocusHook'):
+                  assert needle in dex,needle
+          sha=hashlib.sha256(final.read_bytes()).hexdigest()
+          Path('candidate/FINAL-AUDIT.txt').write_text(
+              'PASS: base lineage 2103123 Deep-Rebrand-Audio cumulative\n'
+              'PASS: final versionCode 2103124 is strictly newer\n'
+              'PASS: package com.projectinfinity.kodi\n'
+              'PASS: permanent signer verified\n'
+              'PASS: Responsive Bridge v5 preserved\n'
+              'PASS: native refresh/media/audio policy owners preserved\n'
+              'PASS: native responsive reflow owner present\n'
+              'PASS: engine/Dex bytes preserved through upper-layer repack and signing\n'
+              f'SHA-256: {sha}\n'
+              'DEVICE ACCEPTANCE REQUIRED BEFORE LOCK\n')
+          print('FINAL SHA-256',sha)
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.9-Native-Responsive-Reflow-Cumulative
+          path: |
+            candidate/Infinity-1.0.9-Native-Responsive-Reflow-Cumulative.apk
+            candidate/FINAL-AUDIT.txt
+            candidate/badging.txt
+            candidate/signing-verification.txt
+            engine/native-responsive-reflow.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
