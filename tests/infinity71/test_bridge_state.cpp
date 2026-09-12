@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 #include "InfinityBridgeState.h"
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <limits>
 #include <thread>
@@ -9,10 +10,11 @@ int main()
 {
   using State = CInfinityBridgeState;
   State s; State::Geometry r;
-  assert(s.Snapshot()[0] == 4 && !s.Snapshot()[3]);
+  const auto initial=s.Snapshot();
+  assert(initial[0] == 5 && !initial[3]);
   s.SetConfiguration(1, 4);
   s.SetPlayback(true, true, false, 2.35f);
-  assert(!s.CanEnterPictureInPicture()); // version is not readiness
+  assert(!s.CanEnterPictureInPicture()); // bridge version is not readiness
   s.QueueGeometry(2208,1840);
   assert(!s.TakeGeometry(r));
   s.SetSurfaceReady(true); s.SetEngineReady(true);
@@ -56,9 +58,10 @@ int main()
   writer.join();
   if(s.TakeGeometry(r)){assert(r.Width()==20000 && r.Height()==20001);assert(s.CommitGeometry(r));}
   const auto snapshot=s.Snapshot();
+  assert(snapshot[0]==5);
   assert(snapshot[7]==20000 && snapshot[8]==20001);
   s.Shutdown();s.SetSurfaceReady(true);s.SetEngineReady(true);s.QueueGeometry(500,600);
   assert(!s.TakeGeometry(r) && !s.CanEnterPictureInPicture() && s.WindowWidth()==-1);
   assert(s.Snapshot()[2]==0 && s.Snapshot()[3]==0 && s.Snapshot()[4]==0);
-  std::cout << "PASS: v4 readiness, paired snapshots, latest-wins coalescing, stale sequence rejection, surface generation rejection, no dead-request replay, theme/resize isolation, unmanaged handoff, playback policy, shutdown and 20,000 concurrent publications\n";
+  std::cout << "PASS: v5 readiness, paired snapshots, latest-wins coalescing, stale sequence rejection, surface generation rejection, no dead-request replay, theme/resize isolation, unmanaged handoff, playback policy, shutdown and 20,000 concurrent publications\n";
 }
