@@ -13,11 +13,13 @@ window = (SOURCE / "xbmc/windowing/android/WinSystemAndroid.cpp").read_text(enco
 bridge = (SOURCE / "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in").read_text(encoding="utf-8")
 gradle = (SOURCE / "tools/android/packaging/xbmc/build.gradle.in").read_text(encoding="utf-8")
 state = (SOURCE / "xbmc/platform/android/activity/InfinityBridgeState.h").read_text(encoding="utf-8")
+bridge_state_test = (ROOT / "tests/infinity71/test_bridge_state.cpp").read_text(encoding="utf-8")
 
 checks = {
     "monotonic_update": "versionCode 2103122" in gradle,
     "version_name": 'versionName "1.0.9-Native-Responsive-Reflow"' in gradle,
     "v5_bridge_preserved": "static final int VERSION = 5" in bridge,
+    "bridge_state_test_v5": "Snapshot()[0] == 5" in bridge_state_test,
     "view_layout_listener_preserved": "implements View.OnLayoutChangeListener" in bridge,
     "android_callbacks_publish_only": "ReloadSkin" not in bridge,
     "generation_contract_preserved": "generation == m_generation" in state and "sequence == m_requested.sequence" in state,
