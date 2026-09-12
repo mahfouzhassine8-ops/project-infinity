@@ -1,0 +1,37 @@
+{
+  "schema": 2,
+  "name": "Infinity Native Responsive Reflow Cumulative",
+  "base_bridge_version": 5,
+  "kodi_sha": "a3a448d26b8d560a65655dab2cd122994dc4e146",
+  "base_source_branch": "infinity-1.0.8-deep-rebrand-audio-cumulative",
+  "base_source_commit": "9833c4751e0e5c6961ca32566bb2625151ebf983",
+  "base_version_code": 2103123,
+  "version_code": 2103124,
+  "version_name": "1.0.9-Native-Responsive-Reflow-Cumulative",
+  "package_id": "com.projectinfinity.kodi",
+  "signer_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "skin_id": "skin.infinity.diggz",
+  "owner": "native-app",
+  "reflow": {
+    "settle_ms": 220,
+    "geometry_owner": "CWinSystemAndroid::ApplyInfinityGeometry",
+    "event_source": "InfinityCoreBridge View.OnLayoutChangeListener + Android configuration/window callbacks",
+    "profile_selector": "CSkinInfo::GetSkinPath(Home.xml)",
+    "reload_dispatch": "Kodi TMSG_EXECUTE_BUILT_IN ReloadSkin",
+    "pip_policy": "geometry facts continue; skin profile reload is bypassed in PiP",
+    "startup_policy": "first loaded profile is observed only; no startup reload"
+  },
+  "must_preserve": [
+    "Responsive Bridge v5 Java/JNI contract",
+    "InfinityBridgeState generation/sequence stale-event rejection",
+    "native refresh controller and requested-vs-active receipt",
+    "native media/platform hook stack",
+    "Audio Policy API 1 and audio focus hook",
+    "deep Infinity launcher/splash branding",
+    "diagnostics/compat cumulative owners",
+    "package com.projectinfinity.kodi",
+    "permanent update signer",
+    "Kodi 21.3 pinned source",
+    "skin and provider assets outside the normal upper-layer repack"
+  ]
+}
