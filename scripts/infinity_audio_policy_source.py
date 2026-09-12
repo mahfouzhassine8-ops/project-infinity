@@ -7,6 +7,8 @@ self-verifying refresh controller. Native-media intentionally changes the
 manifest before v5, while the validated audio stack already contains the older
 1.0.8 refresh lifecycle. This adapter performs strict ownership handoffs for
 those two intentional overlaps and leaves every other capability hash-gated.
+The generic Android descriptor validator now stages the same cumulative owner
+set, so the post-branding compile gate checks diagnostics/media/audio classes too.
 """
 from __future__ import annotations
 
