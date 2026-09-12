@@ -14,6 +14,7 @@ bridge = (SOURCE / "tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in"
 main = (SOURCE / "tools/android/packaging/xbmc/src/Main.java.in").read_text(encoding="utf-8")
 gradle = (SOURCE / "tools/android/packaging/xbmc/build.gradle.in").read_text(encoding="utf-8")
 manifest = (SOURCE / "tools/android/packaging/xbmc/AndroidManifest.xml.in").read_text(encoding="utf-8")
+splash_theme = (SOURCE / "tools/android/packaging/xbmc/res/values-v31/infinity_splash_theme.xml").read_text(encoding="utf-8")
 cmake = (SOURCE / "xbmc/platform/android/activity/CMakeLists.txt").read_text(encoding="utf-8")
 install = (SOURCE / "cmake/scripts/android/Install.cmake").read_text(encoding="utf-8")
 state = (SOURCE / "xbmc/platform/android/activity/InfinityBridgeState.h").read_text(encoding="utf-8")
@@ -21,7 +22,9 @@ state = (SOURCE / "xbmc/platform/android/activity/InfinityBridgeState.h").read_t
 checks = {
     "strictly_newer_than_accepted_2103123": "versionCode 2103124" in gradle,
     "version_name": 'versionName "1.0.9-Native-Responsive-Reflow-Cumulative"' in gradle,
-    "package_identity_source": "com.projectinfinity.kodi" in gradle,
+    # Package identity is asserted from the signed APK with aapt in the package job.
+    # At source/preflight level the authoritative contract must remain pinned.
+    "package_identity_contract": CONTRACT.get("package_id") == "com.projectinfinity.kodi",
     "v5_bridge_preserved": "static final int VERSION = 5" in bridge,
     "layout_listener_preserved": "implements View.OnLayoutChangeListener" in bridge,
     "java_callbacks_publish_only": "ReloadSkin" not in bridge,
@@ -30,7 +33,13 @@ checks = {
     "native_media_preserved": "Infinity.NativeDeviceMode" in window,
     "audio_policy_preserved": "Infinity.AudioPolicyApi" in window and "InfinityAudioPolicy.cpp" in cmake,
     "audio_focus_preserved": "InfinityAudioFocusHook.java" in install,
-    "deep_branding_preserved": '@mipmap/ic_launcher' in manifest and 'windowSplashScreenTheme' in manifest,
+    # Deep branding owns launcher icon bindings in the manifest and the Android 12+
+    # splash icon in the dedicated values-v31 theme resource, not in the manifest.
+    "deep_branding_preserved": (
+        'android:icon="@mipmap/ic_launcher"' in manifest
+        and 'android:roundIcon="@mipmap/ic_launcher_round"' in manifest
+        and "windowSplashScreenAnimatedIcon" in splash_theme
+    ),
     "native_owner_marker": "Infinity.NativeReflowOwner" in window,
     "profile_gate": 'INFINITY_SKIN_ID = "skin.infinity.diggz"' in window,
     "profile_selector": 'GetSkinPath("Home.xml", &res)' in window,
