@@ -13,6 +13,7 @@ on:
       - 'scripts/infinity-responsive-v5.py'
       - 'patches/infinity-7.1-audited/**'
       - 'scripts/infinity71.py'
+      - 'tests/infinity71/**'
       - 'addons/service.infinity.compat/**'
       - 'addons/service.infinity.refresh/**'
 
@@ -23,7 +24,7 @@ permissions:
 jobs:
   preflight:
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -32,11 +33,34 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v4
 
-      - name: Apply audited cumulative source layers
+      - name: Prepare Android compile gate
         shell: bash
         run: |
           set -euo pipefail
           sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+
+      - name: Audit pinned v4 layer in isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi-v4
+          test "$(git -C kodi-v4 rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi-v4
+          python3 scripts/validate-infinity71-java.py --source kodi-v4 \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/v4-java
+          mkdir -p preflight/v4-dex
+          "$ANDROID_HOME/build-tools/34.0.0/d8" \
+            --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 \
+            --output preflight/v4-dex preflight/v4-java/compile-check.jar
+          INFINITY_KODI_SOURCE="$PWD/kodi-v4" INFINITY_TEST_DEX="$PWD/preflight/v4-dex/classes.dex" \
+            python3 tests/infinity71/test_contract.py
+          printf '%s\n' 'PASS: exact audited v4 post-images and package regression suite verified before higher layers.' \
+            > preflight/V4-AUDIT.txt
+
+      - name: Apply and audit cumulative v4 + responsive v5 + native reflow
+        shell: bash
+        run: |
+          set -euo pipefail
           git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
           test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
           python3 scripts/infinity71.py source --source kodi
@@ -45,7 +69,7 @@ jobs:
           python3 scripts/infinity-native-responsive-reflow.py verify --source kodi
           INFINITY_KODI_SOURCE="$PWD/kodi" python3 tests/infinity-native-reflow/test_contract.py
 
-      - name: Compile Java/JNI contract and bridge-state tests
+      - name: Compile cumulative Java/JNI and v5 bridge-state contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -59,8 +83,7 @@ jobs:
             -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp \
             -o preflight/bridge-state
           preflight/bridge-state
-          INFINITY_KODI_SOURCE="$PWD/kodi" INFINITY_TEST_DEX="$PWD/preflight/dex/classes.dex" \
-            python3 tests/infinity71/test_contract.py
+          INFINITY_KODI_SOURCE="$PWD/kodi" python3 tests/infinity-native-reflow/test_contract.py
 
       - name: Audit ownership, update identity and source-only path
         shell: bash
@@ -88,7 +111,8 @@ jobs:
           print('PASS: source ownership, pinned provenance and monotonic update identity')
           PY
           cat > preflight/AUDIT.txt <<'EOF'
-          PASS: Responsive Bridge v5 event sources preserved.
+          PASS: old v4 exact post-image/package suite ran on its own v4-only source tree.
+          PASS: Responsive Bridge v5 event sources preserved in the cumulative source tree.
           PASS: Android UI/config callbacks only publish facts; they never reload the skin.
           PASS: Geometry still commits on Kodi's render/main loop with generation/sequence stale-event rejection.
           PASS: Profile reload is native-owned, Infinity-skin-gated, PiP-gated and 220ms settled.
@@ -104,7 +128,9 @@ jobs:
           name: Infinity-1.0.9-Native-Reflow-Preflight
           path: |
             preflight/AUDIT.txt
+            preflight/V4-AUDIT.txt
             preflight/java/Main.javap.txt
+            preflight/v4-java/Main.javap.txt
           if-no-files-found: warn
           retention-days: 30
 
@@ -203,9 +229,11 @@ jobs:
           contract=json.loads(Path('patches/infinity-native-responsive-reflow/contract.json').read_text())
           with zipfile.ZipFile(apk) as z:
               dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if n.startswith('classes') and n.endswith('.dex')}
-              native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
-              assert b'Infinity.NativeReflowOwner' in z.read('lib/arm64-v8a/libkodi.so')
-              assert b'Native responsive reflow' not in b''  # audit is driven by exact symbols below
+              native_bytes=z.read('lib/arm64-v8a/libkodi.so')
+              native=hashlib.sha256(native_bytes).hexdigest()
+              assert b'Infinity.NativeReflowOwner' in native_bytes
+              assert b'skin.infinity.diggz' in native_bytes
+              assert b'ReloadSkin' in native_bytes
           out={
               'schema':1,
               'bridge_version':5,
@@ -329,7 +357,8 @@ jobs:
           INFINITY 1.0.9 NATIVE RESPONSIVE REFLOW — BUILD AUDIT
           =====================================================
           PASS: exact Kodi 21.3 source SHA pinned.
-          PASS: audited v4 -> responsive v5 -> native reflow source layers applied in order.
+          PASS: audited v4 exact post-image/package tests ran in an isolated v4 source tree.
+          PASS: audited v4 -> responsive v5 -> native reflow source layers applied in order to production source.
           PASS: live Android layout/config events remain event-driven through InfinityCoreBridge.
           PASS: Android callbacks publish bounded facts only; no skin reload from Android UI callback.
           PASS: geometry is committed on Kodi's render/main loop with stale generation/sequence rejection preserved.
@@ -351,7 +380,7 @@ jobs:
           DEVICE ACCEPTANCE — DO NOT LOCK BEFORE PASS
           1. Install as an update over the currently signed Infinity build; do not uninstall.
           2. Fully exit/reopen once.
-          3. With temporary Command Center 0.3.5.3 still installed, install the observer/fallback cleanup package supplied with this candidate before transition testing to avoid double ReloadSkin ownership.
+          3. Install the native-aware Command Center observer/fallback update before transition testing so native app is the sole ReloadSkin owner.
           4. Front screen portrait -> landscape -> portrait.
           5. Front/cover -> inner and inner -> front/cover.
           6. Inner portrait -> inner landscape -> portrait.
