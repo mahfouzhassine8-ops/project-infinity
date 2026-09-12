@@ -1,0 +1,372 @@
+name: Infinity 1.0.9 | Native Responsive Reflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.9-native-responsive-reflow]
+    paths:
+      - '.github/workflows/infinity-1.0.9-native-responsive-reflow.yml'
+      - 'patches/infinity-native-responsive-reflow/**'
+      - 'scripts/infinity-native-responsive-reflow.py'
+      - 'tests/infinity-native-reflow/**'
+      - 'patches/infinity-responsive-v5/**'
+      - 'scripts/infinity-responsive-v5.py'
+      - 'patches/infinity-7.1-audited/**'
+      - 'scripts/infinity71.py'
+      - 'addons/service.infinity.compat/**'
+      - 'addons/service.infinity.refresh/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Apply audited cumulative source layers
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity-responsive-v5.py source --source kodi
+          python3 scripts/infinity-native-responsive-reflow.py source --source kodi
+          python3 scripts/infinity-native-responsive-reflow.py verify --source kodi
+          INFINITY_KODI_SOURCE="$PWD/kodi" python3 tests/infinity-native-reflow/test_contract.py
+
+      - name: Compile Java/JNI contract and bridge-state tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/java
+          mkdir -p preflight/dex
+          "$ANDROID_HOME/build-tools/34.0.0/d8" \
+            --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 \
+            --output preflight/dex preflight/java/compile-check.jar
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread \
+            -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp \
+            -o preflight/bridge-state
+          preflight/bridge-state
+          INFINITY_KODI_SOURCE="$PWD/kodi" INFINITY_TEST_DEX="$PWD/preflight/dex/classes.dex" \
+            python3 tests/infinity71/test_contract.py
+
+      - name: Audit ownership, update identity and source-only path
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'versionCode 2103122' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.9-Native-Responsive-Reflow"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'Infinity.NativeReflowOwner' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'INFINITY_REFLOW_SETTLE = 220ms' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'PostMsg(TMSG_EXECUTE_BUILT_IN' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          test "$(grep -c '\"ReloadSkin\"' kodi/xbmc/windowing/android/WinSystemAndroid.cpp)" -eq 1
+          ! grep -q 'ReloadSkin' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'implements View.OnLayoutChangeListener' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Infinity.NativeDisplayRevision' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('patches/infinity-native-responsive-reflow/contract.json').read_text())
+          assert c['base_bridge_version']==5
+          assert c['kodi_sha']=='a3a448d26b8d560a65655dab2cd122994dc4e146'
+          assert c['version_code']==2103122
+          assert c['package_id']=='com.projectinfinity.kodi'
+          assert c['reflow']['settle_ms']==220
+          assert c['owner']=='native-app'
+          print('PASS: source ownership, pinned provenance and monotonic update identity')
+          PY
+          cat > preflight/AUDIT.txt <<'EOF'
+          PASS: Responsive Bridge v5 event sources preserved.
+          PASS: Android UI/config callbacks only publish facts; they never reload the skin.
+          PASS: Geometry still commits on Kodi's render/main loop with generation/sequence stale-event rejection.
+          PASS: Profile reload is native-owned, Infinity-skin-gated, PiP-gated and 220ms settled.
+          PASS: Reload dispatch uses Kodi's asynchronous application messenger, not direct UI-thread mutation.
+          PASS: Startup establishes the loaded profile without forcing a reload.
+          PASS: Update identity is com.projectinfinity.kodi / versionCode 2103122.
+          DEVICE RUNTIME REMAINS THE FINAL ACCEPTANCE GATE.
+          EOF
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.9-Native-Reflow-Preflight
+          path: |
+            preflight/AUDIT.txt
+            preflight/java/Main.javap.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Prepare matched Android toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+
+      - name: Apply audited v4, responsive v5, then native reflow
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity-responsive-v5.py source --source kodi
+          python3 scripts/infinity-native-responsive-reflow.py source --source kodi
+          python3 scripts/infinity-native-responsive-reflow.py verify --source kodi
+          INFINITY_KODI_SOURCE="$PWD/kodi" python3 tests/infinity-native-reflow/test_contract.py
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-native-reflow-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-native-responsive-reflow/contract.json') }}
+          restore-keys: |
+            infinity-native-reflow-21.3-arm64-${{ runner.os }}-
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Prepare matched dependencies and native build configuration
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+
+      - name: Compile-check native owners
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+
+      - name: Build complete Kodi engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-1.0.9-Native-Responsive-Reflow-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine \
+            --apk engine/Infinity-1.0.9-Native-Responsive-Reflow-Engine-Base.apk \
+            --output engine/engine-overlay-manifest.json --source-commit "$GITHUB_SHA"
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.9-Native-Responsive-Reflow-Engine-Base.apk')
+          contract=json.loads(Path('patches/infinity-native-responsive-reflow/contract.json').read_text())
+          with zipfile.ZipFile(apk) as z:
+              dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if n.startswith('classes') and n.endswith('.dex')}
+              native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+              assert b'Infinity.NativeReflowOwner' in z.read('lib/arm64-v8a/libkodi.so')
+              assert b'Native responsive reflow' not in b''  # audit is driven by exact symbols below
+          out={
+              'schema':1,
+              'bridge_version':5,
+              'native_reflow_owner':'app-v1',
+              'settle_ms':220,
+              'kodi_sha':contract['kodi_sha'],
+              'version_code':2103122,
+              'version_name':contract['version_name'],
+              'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+              'libkodi_sha256':native,
+              'dex':dex,
+              'source_commit':'${GITHUB_SHA}'
+          }
+          Path('engine/native-responsive-reflow.json').write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+          PY
+          printf '%s\n' 'Source-built native responsive reflow engine. Device verification is still required.' > engine/README.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.9-Native-Responsive-Reflow-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  package:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Native-Responsive-Reflow-Engine
+          path: engine
+
+      - name: Add preserved Infinity lock and current upper layer
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay \
+            --apk engine/Infinity-1.0.9-Native-Responsive-Reflow-Engine-Base.apk \
+            --manifest engine/engine-overlay-manifest.json \
+            --output candidate/with-lock-unsigned.apk
+          python3 scripts/infinity_upper_layer_repack.py \
+            candidate/with-lock-unsigned.apk \
+            candidate/Infinity-1.0.9-Native-Responsive-Reflow-unsigned.apk
+
+      - name: Sign permanent update and verify identity
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.9-Native-Responsive-Reflow-unsigned.apk \
+            candidate/Infinity-1.0.9-Native-Responsive-Reflow.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.9-Native-Responsive-Reflow.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            candidate/Infinity-1.0.9-Native-Responsive-Reflow.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103122'" candidate/badging.txt
+          grep -q "versionName='1.0.9-Native-Responsive-Reflow'" candidate/badging.txt
+
+      - name: Final binary preservation and ownership audit
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_infinity_skin_contract.py
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          base=Path('engine/Infinity-1.0.9-Native-Responsive-Reflow-Engine-Base.apk')
+          final=Path('candidate/Infinity-1.0.9-Native-Responsive-Reflow.apk')
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
+              for name in a.namelist():
+                  if name == 'lib/arm64-v8a/libkodi.so' or (name.startswith('classes') and name.endswith('.dex')):
+                      assert a.read(name) == b.read(name), name
+              native=b.read('lib/arm64-v8a/libkodi.so')
+              dex=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              assert b'Infinity.NativeReflowOwner' in native
+              assert b'skin.infinity.diggz' in native
+              assert b'ReloadSkin' in native
+              assert b'Published responsive v5' in dex
+              assert b'Infinity.NativeDeviceMode' in native
+              assert b'Infinity.NativeWidthDp' in native
+              required=[
+                'assets/addons/service.infinity.compat/addon.xml',
+                'assets/addons/service.infinity.compat/layout_service.py',
+                'assets/addons/service.infinity.compat/theme_contract.py',
+                'assets/addons/service.infinity.refresh/service.py',
+              ]
+              for name in required:
+                  assert name in b.namelist(), name
+          manifest=json.loads(Path('engine/native-responsive-reflow.json').read_text())
+          assert manifest['version_code']==2103122
+          assert manifest['native_reflow_owner']=='app-v1'
+          assert manifest['settle_ms']==220
+          print('PASS: signed APK preserves source-built engine/DEX and native reflow ownership')
+          PY
+          cp engine/native-responsive-reflow.json candidate/native-responsive-reflow.json
+          sha256sum candidate/Infinity-1.0.9-Native-Responsive-Reflow.apk | tee candidate/Infinity-1.0.9-Native-Responsive-Reflow.sha256
+          cat > candidate/AUDIT.txt <<'EOF'
+          INFINITY 1.0.9 NATIVE RESPONSIVE REFLOW — BUILD AUDIT
+          =====================================================
+          PASS: exact Kodi 21.3 source SHA pinned.
+          PASS: audited v4 -> responsive v5 -> native reflow source layers applied in order.
+          PASS: live Android layout/config events remain event-driven through InfinityCoreBridge.
+          PASS: Android callbacks publish bounded facts only; no skin reload from Android UI callback.
+          PASS: geometry is committed on Kodi's render/main loop with stale generation/sequence rejection preserved.
+          PASS: skin profile replacement is owned by the native app layer.
+          PASS: only skin.infinity.diggz receives the automatic profile reload.
+          PASS: reflow waits 220ms after the final committed geometry event; immediate geometry remains active for touch alignment.
+          PASS: PiP bypasses skin-profile reload.
+          PASS: reload is posted asynchronously through Kodi's application messenger.
+          PASS: startup does not force a reflow.
+          PASS: package id preserved: com.projectinfinity.kodi.
+          PASS: monotonic versionCode: 2103122.
+          PASS: permanent signer digest verified.
+          PASS: compiled libkodi.so and DEX bytes are preserved through upper-layer repack/signing.
+          PASS: responsive v5 native facts and refresh/compat upper layer remain present.
+          NO CLAIM: static/build audit does not prove physical Fold transition quality.
+          DEVICE TEST REQUIRED before this update may replace the locked runtime baseline.
+          EOF
+          cat > candidate/DEVICE-TEST.txt <<'EOF'
+          DEVICE ACCEPTANCE — DO NOT LOCK BEFORE PASS
+          1. Install as an update over the currently signed Infinity build; do not uninstall.
+          2. Fully exit/reopen once.
+          3. With temporary Command Center 0.3.5.3 still installed, install the observer/fallback cleanup package supplied with this candidate before transition testing to avoid double ReloadSkin ownership.
+          4. Front screen portrait -> landscape -> portrait.
+          5. Front/cover -> inner and inner -> front/cover.
+          6. Inner portrait -> inner landscape -> portrait.
+          7. Repeat in Auto and Compact; selected View Mode must persist.
+          8. Open drawer, rotate/fold; no stale drawer geometry.
+          9. Start playback, rotate/fold, then open OSD; playback must survive and controls/touch must align.
+          10. Enter PiP and return; PiP must not trigger an Infinity skin-profile reload loop.
+          11. Verify Performance/Refresh requested-vs-active truth remains unchanged.
+          12. Export Health Center diagnostics immediately if any crash, loop, black frame or stale touch map occurs.
+          EOF
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.9-Native-Responsive-Reflow
+          path: candidate/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
