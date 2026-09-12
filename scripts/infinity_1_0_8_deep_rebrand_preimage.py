@@ -2,21 +2,24 @@
 """Fail-closed handoff from verified Responsive Bridge v5 presentation to deep branding.
 
 Responsive v5 deliberately replaces the raw Kodi launch image with the approved
-Infinity icon. The deep-rebrand layer then owns a complete day/night launch
-composition. This tiny adapter runs *after* responsive-v5.py has already
-verified its contract and converts only that known v5 splash presentation into
-the preimage consumed by the deep branding layer.
+Infinity icon. Audited v4 also already owns one user-facing startup line. The
+deep-rebrand layer then owns the complete day/night launch composition and the
+full startup wording set. This adapter runs *after* responsive-v5.py has already
+verified its contract and converts only those known Infinity v4/v5 presentation
+owners into the exact preimages consumed by the deep branding layer.
 """
 from __future__ import annotations
 import argparse
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-REL = Path("tools/android/packaging/xbmc/res/layout/activity_splash.xml")
+LAYOUT = Path("tools/android/packaging/xbmc/res/layout/activity_splash.xml")
+SPLASH_JAVA = Path("tools/android/packaging/xbmc/src/Splash.java.in")
 
 
 def normalize(source: Path) -> None:
-    path = source.resolve() / REL
+    source = source.resolve()
+    path = source / LAYOUT
     text = path.read_text(encoding="utf-8")
 
     required = (
@@ -48,7 +51,21 @@ def normalize(source: Path) -> None:
 
     ET.fromstring(text)
     path.write_text(text, encoding="utf-8")
-    print("PASS: verified Responsive v5 splash handed off to deep branding owner")
+
+    # Audited v4 already rebrands this one stock startup line. Normalize only
+    # that exact verified v4 postimage so the deeper branding pass can own and
+    # verify the entire startup wording set consistently. No internal state,
+    # class, JNI, package, or engine identifier is touched here.
+    java_path = source / SPLASH_JAVA
+    java = java_path.read_text(encoding="utf-8")
+    v4_line = 'mSplash.mTextView.setText("Starting Infinity...");'
+    stock_line = 'mSplash.mTextView.setText("Starting @APP_NAME@...");'
+    if java.count(v4_line) != 1 or stock_line in java:
+        raise RuntimeError("Unexpected audited-v4 startup wording owner/preimage")
+    java = java.replace(v4_line, stock_line, 1)
+    java_path.write_text(java, encoding="utf-8")
+
+    print("PASS: verified Responsive v5/v4 presentation handed off to deep branding owner")
 
 
 def main() -> None:
