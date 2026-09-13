@@ -6,8 +6,11 @@ cd kodi/tools/depends
 ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
   --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
   --prefix="$DEPENDS" --enable-debug=yes
+# Kodi 21.3 pins fontconfig 2.14.0 by SHA-512. The historical fontconfig.org
+# endpoint currently serves inconsistent bytes, so use the freedesktop/GStreamer
+# source mirror while leaving Kodi's version and checksum lock untouched.
 rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz" "$TARBALLS/fontconfig-2.14.0.tar.xz.sha512"
-make -C target/fontconfig FULL_URL=https://fontconfig.org/release/fontconfig-2.14.0.tar.xz download
+make -C target/fontconfig FULL_URL=https://gstreamer.freedesktop.org/data/src/mirror/fontconfig-2.14.0.tar.xz download
 make -j"$(nproc)"
 make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
 cd "$GITHUB_WORKSPACE"
