@@ -114,6 +114,17 @@ def patch_main(path: Path) -> None:
                         '        if (!mInfinityDestroyed) infinityApplyPlayerRotation("playback");\n',
                         "rotation playback callback")
 
+    # The cumulative source stack already owns these callbacks for the responsive
+    # bridge and refresh controller. Extend their bodies; never declare duplicates.
+    for callback, reason in (("onPictureInPictureModeChanged", "picture-in-picture"),
+                             ("onMultiWindowModeChanged", "multi-window")):
+        existing = (f"    super.{callback}(active, configuration);\n"
+                    "    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n"
+                    '    if (mInfinityRefresh != null) mInfinityRefresh.apply("window");\n')
+        text = replace_once(text, existing,
+                            existing + f'    infinityApplyPlayerRotation("{reason}");\n',
+                            "rotation joins " + callback)
+
     anchor = "  void infinityPublishWindowSnapshot(int width, int height, int theme, int mode, boolean managed)\n"
     helper = r'''  @Override
   @SuppressWarnings("deprecation")
@@ -128,22 +139,6 @@ def patch_main(path: Path) -> None:
   public void onMultiWindowModeChanged(boolean inMultiWindowMode)
   {
     super.onMultiWindowModeChanged(inMultiWindowMode);
-    infinityApplyPlayerRotation("multi-window");
-  }
-
-  @Override
-  public void onPictureInPictureModeChanged(boolean inPictureInPictureMode,
-                                           android.content.res.Configuration configuration)
-  {
-    super.onPictureInPictureModeChanged(inPictureInPictureMode, configuration);
-    infinityApplyPlayerRotation("picture-in-picture");
-  }
-
-  @Override
-  public void onMultiWindowModeChanged(boolean inMultiWindowMode,
-                                      android.content.res.Configuration configuration)
-  {
-    super.onMultiWindowModeChanged(inMultiWindowMode, configuration);
     infinityApplyPlayerRotation("multi-window");
   }
 

@@ -36,11 +36,18 @@ def run(source, out):
                  'infinityRequestPlayerOrientation', 'onPictureInPictureModeChanged',
                  'onMultiWindowModeChanged'):
         bodies += methods(main, name)
+    for name in ('onPictureInPictureModeChanged', 'onMultiWindowModeChanged'):
+        callbacks = methods(main, name)
+        assert len(callbacks) == 2, (name, 'exactly one API24 and one API26 declaration required')
+        modern = next(body for body in callbacks if 'Configuration' in body)
+        assert 'mInfinityBridge.onWindowChanged()' in modern
+        assert 'mInfinityRefresh.apply("window")' in modern
     out.mkdir(parents=True, exist_ok=True)
     config = out / 'android/content/res/Configuration.java'
     config.parent.mkdir(parents=True, exist_ok=True)
     config.write_text('package android.content.res; public class Configuration {}\n')
-    java = r'''class Parent {
+    java = r'''import android.content.res.Configuration;
+    class Parent {
       public void onPictureInPictureModeChanged(boolean b) {}
       public void onPictureInPictureModeChanged(boolean b, android.content.res.Configuration c) {}
       public void onMultiWindowModeChanged(boolean b) {}
@@ -57,6 +64,10 @@ def run(source, out):
       boolean mPaused=false,mInfinityDestroyed=false,pip=false,multi=false,tv=false,video=false;
       boolean reject=false,missingBridge=false,queryFailed=false;
       int requests=0,last=Integer.MIN_VALUE;
+      class Bridge { void onWindowChanged() {} }
+      class Refresh { void apply(String reason) {} }
+      Bridge mInfinityBridge=new Bridge();
+      Refresh mInfinityRefresh=new Refresh();
       class PM { boolean hasSystemFeature(String s) { return tv; } }
       PM getPackageManager() { return new PM(); }
       boolean isInPictureInPictureMode() { if(queryFailed) throw new IllegalStateException(); return pip; }
