@@ -205,6 +205,15 @@ jobs:
           ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
             --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
             --prefix="$DEPENDS" --enable-debug=yes
+          # The locked Fontconfig 2.14.0 source endpoint can return a non-archive
+          # response. Prefetch the same pinned archive through its canonical alias;
+          # Kodi's existing SHA-512 gate still verifies the exact locked bytes.
+          rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz" \
+            "$TARBALLS/fontconfig-2.14.0.tar.xz.sha512"
+          make -C target/fontconfig \
+            FULL_URL=https://fontconfig.org/release/fontconfig-2.14.0.tar.xz \
+            download
+
           make -j"$(nproc)"
           make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
 
