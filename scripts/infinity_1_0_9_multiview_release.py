@@ -76,12 +76,6 @@ def source_phase(source: Path, receipt: Path) -> None:
     text = main.read_text(encoding="utf-8")
     text = once(
         text,
-        "import android.content.pm.ResolveInfo;\n",
-        "import android.content.pm.ResolveInfo;\nimport android.content.res.Configuration;\n",
-        "Multi-View Configuration import",
-    )
-    text = once(
-        text,
         "  private RelativeLayout mVideoLayout = null;\n",
         "  private RelativeLayout mVideoLayout = null;\n  private InfinityMultiViewController mInfinityMultiView = null;\n",
         "Multi-View field",
@@ -98,11 +92,24 @@ def source_phase(source: Path, receipt: Path) -> None:
         "  protected void onNewIntent(Intent intent)\n  {\n    super.onNewIntent(intent);\n    if (mInfinityMultiView != null && mInfinityMultiView.handleIntent(intent))\n      return;\n",
         "Multi-View intent handoff",
     )
+    existing_configuration = (
+        "  @Override\n"
+        "  public void onConfigurationChanged(Configuration configuration)\n"
+        "  {\n"
+        "    super.onConfigurationChanged(configuration);\n"
+        "    if (mInfinityBridge != null) mInfinityBridge.onWindowChanged();\n"
+        "    if (mInfinityRefresh != null) mInfinityRefresh.apply(\"window\");\n"
+        "  }\n"
+    )
     text = once(
         text,
-        "  @Override\n  public void onPause()\n",
-        "  @Override\n  public void onConfigurationChanged(Configuration newConfig)\n  {\n    super.onConfigurationChanged(newConfig);\n    if (mInfinityMultiView != null) mInfinityMultiView.onConfigurationChanged(newConfig);\n  }\n\n  @Override\n  public void onPause()\n",
-        "Multi-View configuration callback",
+        existing_configuration,
+        existing_configuration.replace(
+            "    if (mInfinityRefresh != null) mInfinityRefresh.apply(\"window\");\n",
+            "    if (mInfinityRefresh != null) mInfinityRefresh.apply(\"window\");\n"
+            "    if (mInfinityMultiView != null) mInfinityMultiView.onConfigurationChanged(configuration);\n",
+        ),
+        "Multi-View joins responsive configuration callback",
     )
     text = once(
         text,
@@ -157,13 +164,15 @@ def verify_source(source: Path) -> None:
         "InfinityMultiViewController mInfinityMultiView",
         "new InfinityMultiViewController(this, mVideoLayout, mMainView)",
         "mInfinityMultiView.handleIntent(intent)",
-        "mInfinityMultiView.onConfigurationChanged(newConfig)",
+        "mInfinityMultiView.onConfigurationChanged(configuration)",
         "mInfinityMultiView.onHostPause()",
         "mInfinityMultiView.close()",
     )
     for needle in required_main:
         if needle not in main:
             raise RuntimeError("Missing Main Multi-View integration: " + needle)
+    if main.count("public void onConfigurationChanged(Configuration configuration)") != 1:
+        raise RuntimeError("Multi-View must share the single responsive configuration callback")
     if not controller.is_file():
         raise RuntimeError("InfinityMultiViewController.java.in missing")
     java = controller.read_text(encoding="utf-8")
