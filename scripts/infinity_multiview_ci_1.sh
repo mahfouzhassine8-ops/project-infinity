@@ -67,9 +67,11 @@ python3 scripts/infinity_1_0_9_multiview_release.py verify-source --source kodi
 python3 scripts/validate_infinity_multiview_java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/multiview-java
 
-# Preserve all established player/rotation lifecycle gates.
+# Preserve all established player/rotation lifecycle gates, and require the
+# cumulative Java validator itself to stage the optional Multi-View owner.
 python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/rotation-lifecycle
 python3 tests/infinity_rotation/test_history.py
+grep -Fq "'InfinityMultiViewController'" scripts/validate-infinity71-java.py
 python3 scripts/validate-infinity71-java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out engine/rotation-java
 
