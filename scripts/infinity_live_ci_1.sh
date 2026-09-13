@@ -19,8 +19,8 @@ python3 -m py_compile scripts/infinity_1_0_9_live_release.py scripts/verify_infi
   scripts/infinity_1_0_8_deep_rebrand_preimage.py scripts/infinity_audio_policy_source.py
 python3 scripts/verify_infinity_live.py
 python3 -m unittest discover -s tests/infinity_live -v
-if find addons/script.infinity.live \( -type d -name '__pycache__' -o -name '*.pyc' \) | grep -q .; then
-  echo 'Python cache files are forbidden in script.infinity.live' >&2; exit 1
+if git ls-files 'addons/script.infinity.live/**' | grep -E '(__pycache__/|\.pyc$)' -q; then
+  echo 'Tracked Python cache files are forbidden in script.infinity.live' >&2; exit 1
 fi
 
 git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
