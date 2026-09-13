@@ -2,8 +2,8 @@
 """Compile the real patched Infinity Android owner set against the Android SDK.
 
 The audited v4 contract has a small mandatory Java core. Later cumulative layers
-add diagnostics, refresh, native-media and audio-policy owners. Stage those
-owners when present so this generic JNI descriptor gate remains backward
+add diagnostics, refresh, native-media, audio-policy and Multi-View owners. Stage
+those owners when present so this generic JNI descriptor gate remains backward
 compatible with v4 while validating the complete source graph of newer builds.
 TV scheduling, JSON-RPC and generated resource integers are compile-only stubs;
 this is an API/descriptor check, not an Android runtime test.
@@ -35,6 +35,7 @@ optional = [
     'InfinityPlatformHooks',
     'InfinitySystemMediaHook',
     'InfinityAudioFocusHook',
+    'InfinityMultiViewController',
 ]
 
 names = list(mandatory)
