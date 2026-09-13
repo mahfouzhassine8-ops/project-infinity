@@ -112,8 +112,8 @@ def source_phase(source: Path, receipt: Path) -> None:
     )
     text = once(
         text,
-        "  public void onDestroy()\n  {\n    TvUtil.cancelAllScheduledJobs(this);\n",
-        "  public void onDestroy()\n  {\n    if (mInfinityMultiView != null)\n    {\n      mInfinityMultiView.close();\n      mInfinityMultiView = null;\n    }\n    TvUtil.cancelAllScheduledJobs(this);\n",
+        "    TvUtil.cancelAllScheduledJobs(this);\n",
+        "    if (mInfinityMultiView != null)\n    {\n      mInfinityMultiView.close();\n      mInfinityMultiView = null;\n    }\n    TvUtil.cancelAllScheduledJobs(this);\n",
         "Multi-View destroy cleanup",
     )
     main.write_text(text, encoding="utf-8")
