@@ -72,9 +72,28 @@ def addon_int(addon, key, default):
 
 def _read_json(path: Path, default):
     try:
-        return json.loads(path.read_text(encoding='utf-8'))
+        value = json.loads(path.read_text(encoding='utf-8'))
+        return value if isinstance(value, dict) else default
     except Exception:
         return default
+
+
+def _nonnegative_int(value, default=0):
+    try:
+        if isinstance(value, bool):
+            return default
+        number = int(value)
+        return number if number >= 0 else default
+    except (ValueError, TypeError, OverflowError):
+        return default
+
+
+def _startup_history(profile: Path):
+    data = _read_json(profile / 'startup-history.json', {})
+    starts = data.get('unclean_starts', [])
+    data['unclean_starts'] = starts if isinstance(starts, list) else []
+    data['auto_safe_activations'] = _nonnegative_int(data.get('auto_safe_activations', 0))
+    return data
 
 
 def _atomic_json(path: Path, data):
@@ -160,13 +179,14 @@ def register_start(profile: Path, addon):
     marker = profile / 'startup-marker.json'
     history = profile / 'startup-history.json'
     now = int(time.time())
-    data = _read_json(history, {'unclean_starts': [], 'auto_safe_activations': 0})
-    starts = [int(x) for x in data.get('unclean_starts', []) if now - int(x) <= WINDOW_SECONDS]
+    data = _startup_history(profile)
+    timestamps = (_nonnegative_int(x, -1) for x in data['unclean_starts'])
+    starts = [x for x in timestamps if x >= 0 and 0 <= now - x <= WINDOW_SECONDS]
 
     if marker.exists():
         prior = _read_json(marker, {})
-        prior_ts = int(prior.get('timestamp', now))
-        if now - prior_ts <= WINDOW_SECONDS:
+        prior_ts = _nonnegative_int(prior.get('timestamp'), -1)
+        if prior_ts >= 0 and 0 <= now - prior_ts <= WINDOW_SECONDS:
             starts.append(now)
 
     data['unclean_starts'] = starts[-10:]
@@ -189,7 +209,7 @@ def register_start(profile: Path, addon):
 def mark_stable(profile: Path):
     marker = profile / 'startup-marker.json'
     history = profile / 'startup-history.json'
-    data = _read_json(history, {'unclean_starts': []})
+    data = _startup_history(profile)
     data['unclean_starts'] = []
     data['last_stable'] = int(time.time())
     _atomic_json(history, data)
@@ -202,13 +222,13 @@ def mark_stable(profile: Path):
 def write_state(profile: Path, addon, mode: str, status: str, extra=None):
     if not addon_bool(addon, 'health_breadcrumbs', True):
         return
-    history = _read_json(profile / 'startup-history.json', {})
+    history = _startup_history(profile)
     skin_state = publish_skin_api(addon)
     data = {
         'schema': 3,
         'hook_api': HOOK_API,
         'skin_api': SKIN_API,
-        'infinity_release': '1.0.8 Candidate 1',
+        'infinity_release': '1.0.9 Deep Cleanup 1',
         'service': 'service.infinity.compat',
         'mode': mode,
         'status': status,

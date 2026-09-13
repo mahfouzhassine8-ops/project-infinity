@@ -17,8 +17,8 @@ import hashlib
 import json
 from pathlib import Path
 
-RELEASE = "1.0.9-Player-Rotation-1"
-VERSION_CODE = 2103125
+RELEASE = "1.0.9-Deep-Cleanup-1"
+VERSION_CODE = 2103126
 
 
 def sha(path: Path) -> str:
@@ -98,6 +98,10 @@ def patch_main(path: Path) -> None:
                         '    if (mInfinityRefresh != null) mInfinityRefresh.apply("resume");\n'
                         '    infinityApplyPlayerRotation("resume");\n',
                         "rotation resume")
+    text = replace_once(text, "    mPaused = true;\n  }\n",
+                        '    mPaused = true;\n'
+                        '    infinityApplyPlayerRotation("pause");\n  }\n',
+                        "rotation pause release")
     text = replace_once(text,
                         "  public void onStop()\n  {\n    if (mInfinityBridge != null) mInfinityBridge.onStop();\n    super.onStop();\n  }\n",
                         "  public void onStop()\n  {\n    infinityRequestPlayerOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED, \"stop\");\n"
@@ -111,7 +115,39 @@ def patch_main(path: Path) -> None:
                         "rotation playback callback")
 
     anchor = "  void infinityPublishWindowSnapshot(int width, int height, int theme, int mode, boolean managed)\n"
-    helper = r'''  private void infinityLoadPlayerRotationMode()
+    helper = r'''  @Override
+  @SuppressWarnings("deprecation")
+  public void onPictureInPictureModeChanged(boolean inPictureInPictureMode)
+  {
+    super.onPictureInPictureModeChanged(inPictureInPictureMode);
+    infinityApplyPlayerRotation("picture-in-picture");
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public void onMultiWindowModeChanged(boolean inMultiWindowMode)
+  {
+    super.onMultiWindowModeChanged(inMultiWindowMode);
+    infinityApplyPlayerRotation("multi-window");
+  }
+
+  @Override
+  public void onPictureInPictureModeChanged(boolean inPictureInPictureMode,
+                                           android.content.res.Configuration configuration)
+  {
+    super.onPictureInPictureModeChanged(inPictureInPictureMode, configuration);
+    infinityApplyPlayerRotation("picture-in-picture");
+  }
+
+  @Override
+  public void onMultiWindowModeChanged(boolean inMultiWindowMode,
+                                      android.content.res.Configuration configuration)
+  {
+    super.onMultiWindowModeChanged(inMultiWindowMode, configuration);
+    infinityApplyPlayerRotation("multi-window");
+  }
+
+  private void infinityLoadPlayerRotationMode()
   {
     SharedPreferences prefs = getSharedPreferences(INFINITY_ROTATION_PREFS, MODE_PRIVATE);
     int mode = prefs.getInt(INFINITY_ROTATION_PREF_MODE, INFINITY_ROTATION_FOLLOW_DEVICE);
@@ -219,7 +255,10 @@ def verify(source: Path) -> dict:
             raise RuntimeError("missing manifest rotation owner: " + needle)
     for needle in ("SCREEN_ORIENTATION_FULL_SENSOR", "SCREEN_ORIENTATION_UNSPECIFIED",
                    "infinityHandlePlayerRotationIntent", "infinityHasActiveVideoSafely",
-                   'infinityApplyPlayerRotation("playback")', "infinity_player_rotation", "InfinityRotation"):
+                   'infinityApplyPlayerRotation("playback")', 'infinityApplyPlayerRotation("pause")',
+                   'infinityApplyPlayerRotation("picture-in-picture")',
+                   'infinityApplyPlayerRotation("multi-window")',
+                   "infinity_player_rotation", "InfinityRotation"):
         if needle not in main_text:
             raise RuntimeError("missing Main rotation owner: " + needle)
     if "ACCELEROMETER_ROTATION" in main_text:
@@ -230,6 +269,7 @@ def verify(source: Path) -> dict:
         "unlocked_orientation": "ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR",
         "global_rotation_setting_mutated": False,
         "playback_gate": "_infinityHasActiveVideo", "pip_multiwindow_release": True,
+        "lifecycle_callbacks": ["pause", "resume", "stop", "picture-in-picture", "multi-window", "playback"],
         "background_release": True,
         "files": {str(p.relative_to(source)): sha(p) for p in (gradle, manifest, main)},
     }

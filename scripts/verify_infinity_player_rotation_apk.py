@@ -10,8 +10,8 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-RELEASE = "1.0.9-Player-Rotation-1"
-VERSION_CODE = 2103125
+RELEASE = "1.0.9-Deep-Cleanup-1"
+VERSION_CODE = 2103126
 
 
 def load_base():
@@ -31,7 +31,8 @@ def verify(apk: Path, engine: Path, source_receipt: Path) -> dict:
         dex = b"".join(archive.read(name) for name in dex_names)
         for needle in (b"PLAYER_ROTATION_FOLLOW_DEVICE", b"PLAYER_ROTATION_UNLOCKED",
                        b"infinity_player_rotation", b"InfinityRotation",
-                       b"follow-device", b"unlocked"):
+                       b"follow-device", b"unlocked", b"onPictureInPictureModeChanged",
+                       b"onMultiWindowModeChanged", b"picture-in-picture", b"multi-window"):
             if needle not in dex:
                 raise AssertionError(("missing compiled player-rotation owner", needle))
         if not archive.read("AndroidManifest.xml"):

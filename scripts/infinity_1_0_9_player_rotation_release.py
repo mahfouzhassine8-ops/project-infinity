@@ -6,8 +6,8 @@ import argparse
 from pathlib import Path
 import infinity_1_0_8_deep_rebrand as deep
 
-RELEASE = "1.0.9-Player-Rotation-1"
-VERSION_CODE = 2103125
+RELEASE = "1.0.9-Deep-Cleanup-1"
+VERSION_CODE = 2103126
 
 
 def configure() -> None:
