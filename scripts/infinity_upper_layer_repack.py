@@ -11,7 +11,12 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-ADDONS = ('service.infinity.compat', 'service.infinity.refresh', 'script.infinity.audiopolicy')
+ADDONS = (
+    'service.infinity.compat',
+    'service.infinity.refresh',
+    'script.infinity.audiopolicy',
+    'script.infinity.live',
+)
 SIGNING = re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))', re.I)
 
 

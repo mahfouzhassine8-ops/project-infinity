@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.live" name="Infinity Live" version="0.1.0" provider-name="Infinity">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+  </requires>
+  <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Infinity Live — first-party live television for Infinity.</summary>
+    <description lang="en_GB">Infinity-owned Live TV experience for user-authorized M3U/M3U8 playlists, XMLTV guide data and Xtream-style provider credentials. Sources and credentials stay in the local Infinity/Kodi profile and are never bundled with the application.</description>
+    <platform>all</platform>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>
