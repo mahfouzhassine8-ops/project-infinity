@@ -82,6 +82,14 @@ jobs:
           module.install_refresh_controller(source)
           module.verify_refresh_controller(source)
           PY
+
+          # Validate the accepted Audio Policy API 1 source contract at its own
+          # locked 2103120 ownership point before release branding/versioning.
+          python3 scripts/validate_infinity_audio_policy.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
+          python3 tests/infinity_audio/test_config.py --source kodi --out preflight/audio-config
+          python3 scripts/validate_infinity_skin_contract.py
+
           python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
           python3 scripts/infinity_1_0_8_deep_audio_rebrand.py source \
             --source kodi --receipt preflight/deep-audio-rebrand-source.json
@@ -98,10 +106,6 @@ jobs:
           grep -q '_infinityHasActiveVideo' kodi/tools/android/packaging/xbmc/src/Main.java.in
           ! grep -q 'ACCELEROMETER_ROTATION' kodi/tools/android/packaging/xbmc/src/Main.java.in
 
-          python3 scripts/validate_infinity_audio_policy.py --source kodi \
-            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
-          python3 tests/infinity_audio/test_config.py --source kodi --out preflight/audio-config
-          python3 scripts/validate_infinity_skin_contract.py
           python3 scripts/validate-infinity71-java.py --source kodi \
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/rotation-java
 
