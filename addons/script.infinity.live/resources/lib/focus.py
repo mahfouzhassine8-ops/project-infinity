@@ -2,7 +2,7 @@
 
 
 def _wire_live(window):
-    labels = ["GUIDE", "FAVORITE", "FULL SCREEN", "SOURCES", "REFRESH", "EXIT"]
+    labels = ["GUIDE", "FAVORITE", "FULL SCREEN", "MULTI-VIEW", "SOURCES", "REFRESH", "EXIT"]
     buttons = window.buttons
     window.groups.controlRight(window.channels)
     window.channels.controlLeft(window.groups)
