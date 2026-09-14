@@ -53,7 +53,6 @@ def main() -> None:
     for needle in (
         "class InfinityMultiViewController",
         "new ExoPlayer.Builder",
-        "set(TARGET_SDK 35)",
         "DefaultHttpDataSource.Factory",
         "DefaultMediaSourceFactory",
         "setVideoTextureView(texture)",
@@ -70,7 +69,7 @@ def main() -> None:
             raise SystemExit("forbidden third-party dependency/reference in Multi-View Java: " + forbidden)
 
     release = (ROOT / "scripts/infinity_1_0_9_multiview_release.py").read_text(encoding="utf-8")
-    for needle in ('VERSION_CODE = 2103130', 'RELEASE = "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"', '"kodi_application_player_changed": False'):
+    for needle in ('VERSION_CODE = 2103130', 'RELEASE = "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"', 'set(TARGET_SDK 35)', '"kodi_application_player_changed": False'):
         if needle not in release:
             raise SystemExit("missing Multi-View release contract: " + needle)
 
