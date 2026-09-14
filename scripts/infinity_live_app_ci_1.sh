@@ -14,6 +14,20 @@ if [ ! -f "$HOME/.android/debug.keystore" ]; then
     -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
 fi
 
+# Correct the embedded-class validation predicate before executing the source
+# owner. The Activity is deliberately declared `public final class`, so the
+# broader class-name check is the correct invariant.
+python3 - <<'PY'
+from pathlib import Path
+p = Path('scripts/infinity_1_0_9_live_app_shell.py')
+text = p.read_text(encoding='utf-8')
+old = 'if "public class InfinityLiveActivity" not in raw:'
+new = 'if "class InfinityLiveActivity" not in raw:'
+if text.count(old) != 1:
+    raise SystemExit('AppShell validation anchor missing or duplicated')
+p.write_text(text.replace(old, new, 1), encoding='utf-8')
+PY
+
 python3 -m py_compile \
   scripts/infinity_1_0_9_live_release.py \
   scripts/infinity_1_0_9_live_app_shell.py \
