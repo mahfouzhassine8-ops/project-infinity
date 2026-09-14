@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Two-profile Infinity/Cobra validation runs from the branch head.
 set -euo pipefail
 
 sudo apt-get update -qq
