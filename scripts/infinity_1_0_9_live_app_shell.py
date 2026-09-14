@@ -86,6 +86,10 @@ def source_phase(source: Path, receipt: Path) -> None:
     text = once(text, f'versionName "{OLD_RELEASE}"', f'versionName "{RELEASE}"', "AppShell versionName")
     gradle.write_text(text, encoding="utf-8")
 
+    text = android_config.read_text(encoding="utf-8")
+    text = once(text, "set(TARGET_SDK 34)", "set(TARGET_SDK 35)", "Live AppShell compile SDK")
+    android_config.write_text(text, encoding="utf-8")
+
     text = install.read_text(encoding="utf-8")
     text = once(
         text,
@@ -252,8 +256,8 @@ def verify_source(source: Path) -> None:
         raise RuntimeError("AppShell package identity missing")
     if f"versionCode {OLD_VERSION_CODE}" in gradle or f'versionName "{OLD_RELEASE}"' in gradle:
         raise RuntimeError("stale Live Candidate package identity remains")
-    if "set(TARGET_SDK 34)" not in android_config:
-        raise RuntimeError("AppShell must retain Android target SDK 34")
+    if "set(TARGET_SDK 35)" not in android_config or "set(TARGET_SDK 34)" in android_config:
+        raise RuntimeError("AppShell requires Android compile/target SDK 35 for Media3 1.7.1")
     for dependency in (
         "androidx.media3:media3-exoplayer:1.7.1",
         "androidx.media3:media3-exoplayer-hls:1.7.1",
