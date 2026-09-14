@@ -386,22 +386,23 @@ def source_phase(source: Path, receipt: Path) -> None:
   private void showInfinityExperienceChooser()
   {
     final String[] choices = {
-      "Infinity — Movies, Shows, Add-ons & Media",
-      "Cobra — Live TV, Guide & Multi-View"
+      "∞  INFINITY   |   Movies • Shows • Add-ons • Media",
+      "◈  COBRA      |   Live TV • Guide • Sports • Multi-View"
     };
     final int[] selected = {0};
     AlertDialog dialog = new AlertDialog.Builder(this)
-        .setTitle("Choose Your Experience")
+        .setTitle("CHOOSE YOUR EXPERIENCE")
+        .setMessage("ONE APK  •  TWO SEPARATE EXPERIENCES\\nChoose Infinity or Cobra. You can switch later from Settings.")
         .setSingleChoiceItems(choices, 0, (whichDialog, which) -> selected[0] = which)
-        .setPositiveButton("Launch & remember", (whichDialog, which) -> {
+        .setPositiveButton("LAUNCH & REMEMBER", (whichDialog, which) -> {
           String value = selected[0] == 1 ? "live" : "infinity";
           getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
               .putString(INFINITY_EXPERIENCE_DEFAULT, value).apply();
           launchInfinityExperience(value);
         })
-        .setNeutralButton("Just this time", (whichDialog, which) ->
+        .setNeutralButton("JUST THIS TIME", (whichDialog, which) ->
           launchInfinityExperience(selected[0] == 1 ? "live" : "infinity"))
-        .setNegativeButton("Exit", (whichDialog, which) -> finish())
+        .setNegativeButton("EXIT", (whichDialog, which) -> finish())
         .setCancelable(false)
         .create();
     dialog.show();
