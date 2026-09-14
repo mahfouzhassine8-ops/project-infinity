@@ -23,20 +23,21 @@ make -C "$BUILD_DIR" apk -j"$(nproc)"
 
 APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
 test -n "$APK"
-BASE=engine/Infinity-1.0.9-Live-AppShell-Candidate-1-Engine-Base.apk
+BASE=engine/Infinity-1.0.9-2in1-SingleApp-Candidate-2-Engine-Base.apk
 cp "$APK" "$BASE"
 
 python3 scripts/infinity71.py record-engine \
   --apk "$BASE" --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
 
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$BASE" | tee engine/base-badging.txt
-grep -q "package: name='com.projectinfinity.kodi' versionCode='2103131' versionName='1.0.9-Live-AppShell-Candidate-1'" engine/base-badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103132' versionName='1.0.9-2in1-SingleApp-Candidate-2'" engine/base-badging.txt
 grep -q "application-label:'Infinity'" engine/base-badging.txt
+test "$(grep -c '^launchable-activity:' engine/base-badging.txt)" -eq 1
 
 python3 - <<'PY'
 import hashlib, json, os, re, zipfile
 from pathlib import Path
-apk=Path('engine/Infinity-1.0.9-Live-AppShell-Candidate-1-Engine-Base.apk')
+apk=Path('engine/Infinity-1.0.9-2in1-SingleApp-Candidate-2-Engine-Base.apk')
 with zipfile.ZipFile(apk) as z:
     dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)}
     joined=b''.join(z.read(n) for n in dex)
@@ -62,13 +63,14 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'player_rotation_api':1,
   'infinity_live_api':1,
   'live_app_shell_api':1,
-  'version_code':2103131,
-  'version_name':'1.0.9-Live-AppShell-Candidate-1',
+  'version_code':2103132,
+  'version_name':'1.0.9-2in1-SingleApp-Candidate-2',
   'one_apk_two_environments':True,
+  'one_android_launcher':True,
   'host_environment':'Infinity/Kodi',
-  'live_environment':'InfinityLiveActivity',
+  'cobra_environment':'InfinityLiveActivity',
   'live_player':'androidx.media3.exoplayer 1.7.1',
-  'direct_live_launcher':True,
+  'direct_live_launcher':False,
   'startup_chooser':True,
   'max_simultaneous_live_feeds':2,
   'simultaneous_audio_owners':1,
@@ -82,4 +84,4 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
 },indent=2,sort_keys=True)+'\n')
 PY
 
-echo 'PASS: source-backed Kodi 21.3 AppShell engine built with dedicated Infinity Live Activity'
+echo 'PASS: source-backed Kodi 21.3 engine built as one Infinity app containing Infinity + Cobra'
