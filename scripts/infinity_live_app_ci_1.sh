@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Two-profile Infinity/Cobra validation runs from the branch head.
+# One-app Infinity/Cobra validation runs from the branch head.
 set -euo pipefail
 
 sudo apt-get update -qq
@@ -18,6 +18,7 @@ fi
 python3 -m py_compile \
   scripts/infinity_1_0_9_live_release.py \
   scripts/infinity_1_0_9_live_app_shell.py \
+  scripts/infinity_1_0_9_single_app.py \
   scripts/infinity_touch_startup_guard.py \
   scripts/infinity_upper_layer_repack.py \
   scripts/infinity_player_rotation.py \
@@ -59,29 +60,32 @@ python3 scripts/infinity_player_rotation.py verify --source kodi
 python3 scripts/infinity_1_0_9_live_release.py source --source kodi --receipt engine/live-release-source.json
 python3 scripts/infinity_1_0_9_live_release.py verify-source --source kodi
 
-# Preserve the proven native startup crash fix before adding the Live Activity.
+# Preserve the proven native startup crash fix before adding the Cobra experience.
 python3 scripts/infinity_touch_startup_guard.py apply --source kodi \
   --receipt engine/touch-startup-guard-source.json
 python3 scripts/infinity_touch_startup_guard.py verify --source kodi
 
-# Validate the locked native/rotation owners before the optional Media3 Activity.
+# Validate locked native/rotation owners before the optional Media3 Activity.
 python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/rotation-lifecycle
 python3 tests/infinity_rotation/test_history.py
 python3 scripts/validate-infinity71-java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-35/android.jar" --out engine/rotation-java
 
-# Add the app-within-app Live environment. No Kodi player/renderer owner changes.
-python3 scripts/infinity_1_0_9_live_app_shell.py source --source kodi \
+# Add Cobra as an internal second experience in the SAME Infinity package.
+# The finalizer removes the old direct Infinity Live launcher alias so Android
+# exposes exactly one Infinity app/icon.
+python3 scripts/infinity_1_0_9_single_app.py source --source kodi \
   --receipt engine/live-app-shell-source.json
-python3 scripts/infinity_1_0_9_live_app_shell.py verify-source --source kodi
+python3 scripts/infinity_1_0_9_single_app.py verify-source --source kodi
 
-grep -q 'versionCode 2103131' kodi/tools/android/packaging/xbmc/build.gradle.in
-grep -q 'versionName "1.0.9-Live-AppShell-Candidate-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q 'versionCode 2103132' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q 'versionName "1.0.9-2in1-SingleApp-Candidate-2"' kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q "androidx.media3:media3-exoplayer:1.7.1" kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'set(TARGET_SDK 35)' kodi/cmake/platform/android/android.cmake
 grep -q 'android:name=".InfinityLiveActivity"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
-grep -q 'android:name=".InfinityLiveLauncher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+! grep -q 'android:name=".InfinityLiveLauncher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'Choose Your Experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
+grep -q 'switch experiences later from Settings' kodi/tools/android/packaging/xbmc/src/Splash.java.in
 grep -q 'class InfinityLiveActivity' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'COBRA LIVE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'SWITCH PROFILE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
@@ -95,4 +99,13 @@ grep -Fq 'if (gui == nullptr)' kodi/xbmc/input/touch/generic/GenericTouchActionH
 ! grep -R -E 'CobraTV|cobratv|libmpv|android\.media\.MediaPlayer' \
   kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 
-echo 'PASS: App-within-App preflight preserves crash-fixed Infinity and adds isolated Infinity Live Activity'
+python3 - <<'PY'
+from pathlib import Path
+manifest = Path('kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in').read_text()
+launcher = '<category android:name="android.intent.category.LAUNCHER" />'
+assert manifest.count(launcher) == 1, manifest.count(launcher)
+assert 'InfinityLiveLauncher' not in manifest
+print('PASS: manifest exposes exactly one Android launcher entry')
+PY
+
+echo 'PASS: one Infinity APK contains both Infinity and Cobra with one launcher icon'
