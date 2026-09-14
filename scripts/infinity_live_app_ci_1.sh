@@ -83,7 +83,7 @@ grep -q 'android:name=".InfinityLiveActivity"' kodi/tools/android/packaging/xbmc
 grep -q 'android:name=".InfinityLiveLauncher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'Choose Your Experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
 grep -q 'class InfinityLiveActivity' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -q 'Cobra Live' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'COBRA LIVE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'SWITCH PROFILE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'new ExoPlayer.Builder' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'XTREAM' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
