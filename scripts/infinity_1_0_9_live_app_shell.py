@@ -383,35 +383,198 @@ def source_phase(source: Path, receipt: Path) -> None:
     showInfinityExperienceChooser();
   }
 
+  private int chooserDp(int value)
+  {
+    return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
+  }
+
+  private android.graphics.drawable.GradientDrawable chooserSurface(int fill, int stroke, int radius)
+  {
+    android.graphics.drawable.GradientDrawable shape =
+        new android.graphics.drawable.GradientDrawable();
+    shape.setColor(fill);
+    shape.setCornerRadius(chooserDp(radius));
+    shape.setStroke(chooserDp(2), stroke);
+    return shape;
+  }
+
+  private android.widget.TextView chooserText(String value, int color, float size)
+  {
+    android.widget.TextView view = new android.widget.TextView(this);
+    view.setText(value);
+    view.setTextColor(color);
+    view.setTextSize(size);
+    view.setGravity(android.view.Gravity.CENTER);
+    view.setPadding(chooserDp(12), chooserDp(8), chooserDp(12), chooserDp(8));
+    return view;
+  }
+
+  private android.widget.Button chooserCard(String value, int fill, int stroke)
+  {
+    android.widget.Button card = new android.widget.Button(this);
+    card.setText(value);
+    card.setTextColor(android.graphics.Color.rgb(242, 247, 255));
+    card.setTextSize(16);
+    card.setGravity(android.view.Gravity.CENTER);
+    card.setAllCaps(false);
+    card.setLetterSpacing(0.03f);
+    card.setPadding(chooserDp(16), chooserDp(18), chooserDp(16), chooserDp(18));
+    card.setMinHeight(chooserDp(190));
+    card.setFocusable(true);
+    card.setBackground(chooserSurface(fill, stroke, 24));
+    return card;
+  }
+
+  private void setChooserCardState(android.widget.Button card, boolean infinity, boolean active)
+  {
+    int fill;
+    int stroke;
+    if (infinity)
+    {
+      fill = active ? android.graphics.Color.rgb(18, 62, 84)
+                    : android.graphics.Color.rgb(14, 34, 52);
+      stroke = active ? android.graphics.Color.rgb(65, 211, 255)
+                      : android.graphics.Color.rgb(38, 119, 158);
+    }
+    else
+    {
+      fill = active ? android.graphics.Color.rgb(66, 19, 32)
+                    : android.graphics.Color.rgb(39, 17, 28);
+      stroke = active ? android.graphics.Color.rgb(255, 70, 102)
+                      : android.graphics.Color.rgb(140, 47, 67);
+    }
+    card.setBackground(chooserSurface(fill, stroke, 24));
+  }
+
   private void showInfinityExperienceChooser()
   {
-    final String[] choices = {
-      "∞  INFINITY   |   Movies • Shows • Add-ons • Media",
-      "◈  COBRA      |   Live TV • Guide • Sports • Multi-View"
-    };
+    final int cyan = android.graphics.Color.rgb(65, 211, 255);
+    final int cobraRed = android.graphics.Color.rgb(255, 70, 102);
+    final int white = android.graphics.Color.rgb(242, 247, 255);
+    final int muted = android.graphics.Color.rgb(157, 174, 194);
     final int[] selected = {0};
-    AlertDialog dialog = new AlertDialog.Builder(this)
-        .setTitle("CHOOSE YOUR EXPERIENCE")
-        .setMessage("ONE APK  •  TWO SEPARATE EXPERIENCES\\nChoose Infinity or Cobra. You can switch later from Settings.")
-        .setSingleChoiceItems(choices, 0, (whichDialog, which) -> selected[0] = which)
-        .setPositiveButton("LAUNCH & REMEMBER", (whichDialog, which) -> {
-          String value = selected[0] == 1 ? "live" : "infinity";
-          getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
-              .putString(INFINITY_EXPERIENCE_DEFAULT, value).apply();
-          launchInfinityExperience(value);
-        })
-        .setNeutralButton("JUST THIS TIME", (whichDialog, which) ->
-          launchInfinityExperience(selected[0] == 1 ? "live" : "infinity"))
-        .setNegativeButton("EXIT", (whichDialog, which) -> finish())
-        .setCancelable(false)
-        .create();
-    dialog.show();
-    dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        .setTextColor(Color.rgb(35, 190, 255));
-    dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-        .setTextColor(Color.rgb(255, 78, 105));
-    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        .setTextColor(Color.rgb(160, 174, 194));
+
+    android.widget.LinearLayout root = new android.widget.LinearLayout(this);
+    root.setOrientation(android.widget.LinearLayout.VERTICAL);
+    root.setGravity(android.view.Gravity.CENTER);
+    root.setPadding(chooserDp(36), chooserDp(28), chooserDp(36), chooserDp(22));
+    root.setBackgroundColor(android.graphics.Color.rgb(7, 11, 20));
+
+    android.widget.TextView brand = chooserText("INFINITY 2-IN-1", muted, 14);
+    brand.setLetterSpacing(0.22f);
+    root.addView(brand, new android.widget.LinearLayout.LayoutParams(
+        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(34)));
+
+    android.widget.TextView title = chooserText("Choose Your Experience", white, 32);
+    title.setTypeface(null, android.graphics.Typeface.BOLD);
+    root.addView(title, new android.widget.LinearLayout.LayoutParams(
+        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(58)));
+
+    android.widget.TextView subtitle = chooserText(
+        "Two separate environments  •  One seamless application", muted, 16);
+    root.addView(subtitle, new android.widget.LinearLayout.LayoutParams(
+        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(42)));
+
+    android.widget.LinearLayout cards = new android.widget.LinearLayout(this);
+    cards.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    cards.setGravity(android.view.Gravity.CENTER);
+    android.widget.LinearLayout.LayoutParams cardsParams =
+        new android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(230));
+    cardsParams.topMargin = chooserDp(18);
+    root.addView(cards, cardsParams);
+
+    android.widget.Button infinity = chooserCard(
+        "∞  INFINITY\\n\\nYour Home for Movies, Shows,\\nLive TV and More",
+        android.graphics.Color.rgb(14, 34, 52), android.graphics.Color.rgb(38, 119, 158));
+    android.widget.Button cobra = chooserCard(
+        "◈  COBRA\\n\\nLive TV Focused. Fast.\\nSimple. Powerful.",
+        android.graphics.Color.rgb(39, 17, 28), android.graphics.Color.rgb(140, 47, 67));
+
+    android.widget.LinearLayout.LayoutParams infinityParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
+    infinityParams.rightMargin = chooserDp(10);
+    cards.addView(infinity, infinityParams);
+    android.widget.LinearLayout.LayoutParams cobraParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
+    cobraParams.leftMargin = chooserDp(10);
+    cards.addView(cobra, cobraParams);
+
+    final Runnable refresh = () -> {
+      setChooserCardState(infinity, true, selected[0] == 0);
+      setChooserCardState(cobra, false, selected[0] == 1);
+    };
+    infinity.setOnClickListener(v -> { selected[0] = 0; refresh.run(); });
+    cobra.setOnClickListener(v -> { selected[0] = 1; refresh.run(); });
+    infinity.setOnFocusChangeListener((v, hasFocus) -> {
+      if (hasFocus) { selected[0] = 0; refresh.run(); }
+    });
+    cobra.setOnFocusChangeListener((v, hasFocus) -> {
+      if (hasFocus) { selected[0] = 1; refresh.run(); }
+    });
+    infinity.requestFocus();
+    refresh.run();
+
+    android.widget.TextView remember = chooserText(
+        "Remember my choice  •  Use LAUNCH & REMEMBER to save it", muted, 14);
+    android.widget.LinearLayout.LayoutParams rememberParams =
+        new android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(42));
+    rememberParams.topMargin = chooserDp(16);
+    root.addView(remember, rememberParams);
+
+    android.widget.LinearLayout actions = new android.widget.LinearLayout(this);
+    actions.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    actions.setGravity(android.view.Gravity.CENTER);
+    android.widget.LinearLayout.LayoutParams actionsParams =
+        new android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(58));
+    actionsParams.topMargin = chooserDp(12);
+    root.addView(actions, actionsParams);
+
+    android.widget.Button launchRemember = chooserCard(
+        "LAUNCH & REMEMBER", android.graphics.Color.rgb(18, 62, 84), cyan);
+    android.widget.Button justThisTime = chooserCard(
+        "JUST THIS TIME", android.graphics.Color.rgb(66, 19, 32), cobraRed);
+    android.widget.Button exit = chooserCard(
+        "EXIT", android.graphics.Color.rgb(22, 29, 40), android.graphics.Color.rgb(75, 91, 111));
+    launchRemember.setMinHeight(chooserDp(52));
+    justThisTime.setMinHeight(chooserDp(52));
+    exit.setMinHeight(chooserDp(52));
+
+    android.widget.LinearLayout.LayoutParams launchParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(52), 1.3f);
+    launchParams.rightMargin = chooserDp(6);
+    actions.addView(launchRemember, launchParams);
+    android.widget.LinearLayout.LayoutParams justParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(52), 1.1f);
+    justParams.leftMargin = chooserDp(6);
+    justParams.rightMargin = chooserDp(6);
+    actions.addView(justThisTime, justParams);
+    android.widget.LinearLayout.LayoutParams exitParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(52), .7f);
+    exitParams.leftMargin = chooserDp(6);
+    actions.addView(exit, exitParams);
+
+    launchRemember.setOnClickListener(v -> {
+      String value = selected[0] == 1 ? "live" : "infinity";
+      getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+          .putString(INFINITY_EXPERIENCE_DEFAULT, value).apply();
+      launchInfinityExperience(value);
+    });
+    justThisTime.setOnClickListener(v ->
+        launchInfinityExperience(selected[0] == 1 ? "live" : "infinity"));
+    exit.setOnClickListener(v -> finish());
+
+    android.widget.TextView note = chooserText(
+        "You can always switch apps later from Settings.", muted, 14);
+    android.widget.LinearLayout.LayoutParams noteParams =
+        new android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(34));
+    noteParams.topMargin = chooserDp(12);
+    root.addView(note, noteParams);
+
+    setContentView(root);
   }
 
   private void launchInfinityExperience(String experience)
