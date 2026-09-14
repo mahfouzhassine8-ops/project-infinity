@@ -91,7 +91,7 @@ python3 scripts/infinity_1_0_9_live_app_shell.py verify-source --source kodi
 grep -q 'versionCode 2103131' kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'versionName "1.0.9-Live-AppShell-Candidate-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q "androidx.media3:media3-exoplayer:1.7.1" kodi/tools/android/packaging/xbmc/build.gradle.in
-grep -q 'set(TARGET_SDK 34)' kodi/cmake/platform/android/android.cmake
+grep -q 'set(TARGET_SDK 35)' kodi/cmake/platform/android/android.cmake
 grep -q 'android:name=".InfinityLiveActivity"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'android:name=".InfinityLiveLauncher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'Choose your Infinity experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
