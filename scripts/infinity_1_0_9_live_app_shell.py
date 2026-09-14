@@ -84,12 +84,23 @@ def live_activity_source() -> str:
     return isCobraProfile() ? Color.rgb(255, 64, 89) : BASE_ACCENT;
   }
 
+  private int profilePanel()
+  {
+    return isCobraProfile() ? Color.rgb(36, 10, 18) : Color.rgb(8, 34, 48);
+  }
+
+  private int profileMuted()
+  {
+    return isCobraProfile() ? Color.rgb(255, 170, 180) : Color.rgb(150, 220, 232);
+  }
+
   private Button profileButton(String label, int fill, int stroke)
   {
     Button b = new Button(this);
     b.setText(label);
-    b.setTextColor(TEXT);
-    b.setTextSize(16);
+    b.setTextColor(isCobraProfile() ? Color.rgb(255, 235, 238) : TEXT);
+    b.setTextSize(isCobraProfile() ? 16 : 16);
+    b.setLetterSpacing(isCobraProfile() ? 0.06f : 0.03f);
     b.setAllCaps(false);
     b.setGravity(Gravity.CENTER);
     b.setPadding(dp(14), dp(10), dp(14), dp(10));
