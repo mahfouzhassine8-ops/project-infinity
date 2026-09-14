@@ -406,6 +406,12 @@ def source_phase(source: Path, receipt: Path) -> None:
         .setCancelable(false)
         .create();
     dialog.show();
+    dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        .setTextColor(Color.rgb(35, 190, 255));
+    dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+        .setTextColor(Color.rgb(255, 78, 105));
+    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        .setTextColor(Color.rgb(160, 174, 194));
   }
 
   private void launchInfinityExperience(String experience)
