@@ -1,4 +1,4 @@
-name: Infinity 1.0.9 | Live App-within-App Candidate 1
+name: Infinity 1.0.9 | 2-in-1 Single App Candidate 2
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
       - '.github/workflows/infinity-live-app-within-app.yml'
       - 'scripts/infinity_live_app_ci_*.sh'
       - 'scripts/infinity_1_0_9_live_app_shell.py'
+      - 'scripts/infinity_1_0_9_single_app.py'
       - 'scripts/infinity_touch_startup_guard.py'
       - 'scripts/infinity_upper_layer_repack.py'
       - 'addons/script.infinity.live/**'
@@ -54,14 +55,14 @@ jobs:
             infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
             infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
 
-      - name: Preflight crash-fixed Infinity + isolated Live Activity
+      - name: Preflight one-app Infinity + Cobra contract
         run: bash scripts/infinity_live_app_ci_1.sh
 
-      - name: Build source-backed Kodi 21.3 + Infinity Live Activity
+      - name: Build source-backed Kodi 21.3 + internal Cobra Activity
         id: compile
         run: bash scripts/infinity_live_app_ci_2.sh
 
-      - name: Package, sign and verify Infinity Live AppShell
+      - name: Package, sign and verify Infinity 2-in-1 single app
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -81,10 +82,10 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-1.0.9-Live-AppShell-Candidate-1
+          name: Infinity-1.0.9-2in1-SingleApp-Candidate-2
           path: |
-            candidate/Infinity-1.0.9-Live-AppShell-Candidate-1.apk
-            candidate/Infinity-1.0.9-Live-AppShell-Candidate-1.sha256
+            candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.apk
+            candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.sha256
             candidate/signing-verification.txt
             candidate/badging.txt
             candidate/manifest.txt
