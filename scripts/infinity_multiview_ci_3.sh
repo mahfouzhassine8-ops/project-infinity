@@ -41,7 +41,7 @@ bash scripts/sign-infinity71.sh "$UNSIGNED" "$FINAL"
 "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$FINAL" | tee candidate/signing-verification.txt
 grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$FINAL" | tee candidate/badging.txt
-grep -q "package: name='com.projectinfinity.kodi' versionCode='2103130' versionName='1.0.9-Live-MultiView-Candidate-1'" candidate/badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103130' versionName='1.0.9-Live-ExoPlayer-MultiView-Candidate-1'" candidate/badging.txt
 grep -q "application-label:'Infinity'" candidate/badging.txt
 python3 scripts/infinity_1_0_9_multiview_release.py verify-apk --apk "$FINAL"
 python3 scripts/verify_infinity_multiview_apk.py --apk "$FINAL" --engine "$BASE" \
