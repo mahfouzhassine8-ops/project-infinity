@@ -661,9 +661,9 @@ def verify_source(source: Path) -> None:
         if needle not in manifest:
             raise RuntimeError("Missing Live manifest owner: " + needle)
     for needle in (
-        "Choose Your Experience", "Launch & remember",
-        "Cobra — Live TV, Guide & Multi-View", "infinity_experience",
-        "InfinityLiveActivity.class",
+        "Choose Your Experience", "LAUNCH & REMEMBER",
+        "Live TV Focused. Fast.", "INFINITY 2-IN-1",
+        "infinity_experience", "InfinityLiveActivity.class",
     ):
         if needle not in splash:
             raise RuntimeError("Missing startup chooser owner: " + needle)
