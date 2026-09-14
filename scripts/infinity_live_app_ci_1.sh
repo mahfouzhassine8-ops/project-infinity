@@ -14,20 +14,6 @@ if [ ! -f "$HOME/.android/debug.keystore" ]; then
     -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
 fi
 
-# Correct the embedded-class validation predicate before executing the source
-# owner. The Activity is deliberately declared `public final class`, so the
-# broader class-name check is the correct invariant.
-python3 - <<'PY'
-from pathlib import Path
-p = Path('scripts/infinity_1_0_9_live_app_shell.py')
-text = p.read_text(encoding='utf-8')
-old = 'if "public class InfinityLiveActivity" not in raw:'
-new = 'if "class InfinityLiveActivity" not in raw:'
-if text.count(old) != 1:
-    raise SystemExit('AppShell validation anchor missing or duplicated')
-p.write_text(text.replace(old, new, 1), encoding='utf-8')
-PY
-
 python3 -m py_compile \
   scripts/infinity_1_0_9_live_release.py \
   scripts/infinity_1_0_9_live_app_shell.py \
@@ -94,8 +80,10 @@ grep -q "androidx.media3:media3-exoplayer:1.7.1" kodi/tools/android/packaging/xb
 grep -q 'set(TARGET_SDK 35)' kodi/cmake/platform/android/android.cmake
 grep -q 'android:name=".InfinityLiveActivity"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'android:name=".InfinityLiveLauncher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
-grep -q 'Choose your Infinity experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
+grep -q 'Choose Your Experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
 grep -q 'class InfinityLiveActivity' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'Cobra Live' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'SWITCH PROFILE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'new ExoPlayer.Builder' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'XTREAM' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'MULTI-VIEW' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
