@@ -46,8 +46,212 @@ def once(text: str, old: str, new: str, label: str) -> str:
 
 def live_activity_source() -> str:
     raw = gzip.decompress(base64.b64decode(LIVE_ACTIVITY_GZ_B64)).decode("utf-8")
-    if "public class InfinityLiveActivity" not in raw:
+    if "class InfinityLiveActivity" not in raw:
         raise RuntimeError("embedded Infinity Live Activity source is invalid")
+
+    raw = raw.replace(
+        '  private static final int ACCENT = Color.rgb(0, 184, 255);',
+        '  private static final int BASE_ACCENT = Color.rgb(0, 184, 255);',
+        1,
+    )
+    raw = raw.replace("ACCENT", "profileAccent()")
+
+    profile_fields = """  private static final String PROFILE_PREFS = "infinity_live_profiles";
+  private static final String PROFILE_KEY = "live_profile";
+  private static final String PROFILE_EXTRA = "infinity_live_profile";
+  private String mProfile = "infinity";
+  private boolean mProfileStarted = false;
+"""
+    raw = once(
+        raw,
+        "  private SharedPreferences mPrefs;\n",
+        "  private SharedPreferences mPrefs;\n" + profile_fields,
+        "Live profile fields",
+    )
+
+    profile_methods = """  private boolean isProfile(String value)
+  {
+    return "infinity".equals(value) || "cobra".equals(value);
+  }
+
+  private boolean isCobraProfile()
+  {
+    return "cobra".equals(mProfile);
+  }
+
+  private int profileAccent()
+  {
+    return isCobraProfile() ? Color.rgb(255, 64, 89) : BASE_ACCENT;
+  }
+
+  private Button profileButton(String label, int fill, int stroke)
+  {
+    Button b = new Button(this);
+    b.setText(label);
+    b.setTextColor(TEXT);
+    b.setTextSize(16);
+    b.setAllCaps(false);
+    b.setGravity(Gravity.CENTER);
+    b.setPadding(dp(14), dp(10), dp(14), dp(10));
+    b.setFocusable(true);
+    b.setBackground(panelDrawable(fill, 18, stroke, 2));
+    return b;
+  }
+
+  private void showProfileChooser()
+  {
+    LinearLayout box = new LinearLayout(this);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(18), dp(4), dp(18), dp(8));
+    TextView intro = text("Separate UI  •  Separate settings  •  Separate data",
+        MUTED, 14, Gravity.CENTER);
+    box.addView(intro, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(44)));
+    Button infinity = profileButton(
+        "∞  INFINITY\nElegant  •  Cyan  •  Immersive",
+        Color.rgb(12, 52, 70), Color.rgb(55, 229, 255));
+    Button cobra = profileButton(
+        "◈  COBRA\nFast  •  Simple  •  Powerful",
+        Color.rgb(52, 14, 23), Color.rgb(255, 64, 89));
+    box.addView(infinity, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(112)));
+    LinearLayout.LayoutParams cobraParams = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(112));
+    cobraParams.topMargin = dp(12);
+    box.addView(cobra, cobraParams);
+    final AlertDialog dialog = new AlertDialog.Builder(this)
+        .setTitle("Choose Your Experience")
+        .setView(box)
+        .setNegativeButton("Return to Infinity", (d, which) -> {
+          if (mProfileStarted) returnToInfinity(); else finish();
+        })
+        .setCancelable(false)
+        .create();
+    infinity.setOnClickListener(v -> { dialog.dismiss(); switchProfile("infinity"); });
+    cobra.setOnClickListener(v -> { dialog.dismiss(); switchProfile("cobra"); });
+    dialog.show();
+  }
+
+  private void switchProfile(String profile)
+  {
+    if (!isProfile(profile))
+      return;
+    getSharedPreferences(PROFILE_PREFS, MODE_PRIVATE).edit()
+        .putString(PROFILE_KEY, profile).apply();
+    startProfile(profile);
+  }
+
+  private void startProfile(String profile)
+  {
+    mProfile = profile;
+    mPrefs = getSharedPreferences(PREFS_BASE + profile, MODE_PRIVATE);
+    releasePlayers();
+    mSources.clear();
+    mChannels.clear();
+    mGuide.clear();
+    mFavorites.clear();
+    mRecents.clear();
+    mActiveSource = null;
+    mActiveCategory = "ALL";
+    mSearch = "";
+    loadPersistedState();
+    mProfileStarted = true;
+    buildShell();
+    showLiveHome();
+    if (mSources.isEmpty())
+      showFirstRunSourcePrompt();
+    else
+      loadActiveSource(false);
+  }
+"""
+    raw = once(
+        raw,
+        "  @Override\n  protected void onStop()",
+        profile_methods + "\n  @Override\n  protected void onStop()",
+        "Live profile methods",
+    )
+
+    old_create = """  @Override
+  protected void onCreate(Bundle savedInstanceState)
+  {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                         WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    mPrefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+    loadPersistedState();
+    buildShell();
+    showLiveHome();
+    if (mSources.isEmpty())
+      showFirstRunSourcePrompt();
+    else
+      loadActiveSource(false);
+  }
+
+"""
+    new_create = """  @Override
+  protected void onCreate(Bundle savedInstanceState)
+  {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                         WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    String profile = getIntent() == null ? "" :
+        getIntent().getStringExtra(PROFILE_EXTRA);
+    if (!isProfile(profile))
+      profile = getSharedPreferences(PROFILE_PREFS, MODE_PRIVATE)
+          .getString(PROFILE_KEY, "");
+    if (!isProfile(profile))
+    {
+      showProfileChooser();
+      return;
+    }
+    startProfile(profile);
+  }
+
+"""
+    raw = once(raw, old_create, new_create, "Live profile onCreate")
+
+    old_config = """  @Override
+  public void onConfigurationChanged(Configuration configuration)
+  {
+    super.onConfigurationChanged(configuration);
+    buildShell();
+    showLiveHome();
+  }
+
+"""
+    new_config = """  @Override
+  public void onConfigurationChanged(Configuration configuration)
+  {
+    super.onConfigurationChanged(configuration);
+    if (!mProfileStarted)
+      return;
+    buildShell();
+    showLiveHome();
+  }
+
+"""
+    raw = once(raw, old_config, new_config, "Live profile configuration")
+
+    raw = raw.replace(
+        '    addRailButton("INFINITY", v -> returnToInfinity());',
+        '    addRailButton("SWITCH PROFILE", v -> showProfileChooser());\n'
+        '    addRailButton("INFINITY", v -> returnToInfinity());',
+        1,
+    )
+    raw = raw.replace(
+        'mHeaderTitle = text("∞  INFINITY LIVE", TEXT, 19, Gravity.CENTER_VERTICAL);',
+        'mHeaderTitle = text(isCobraProfile() ? "◈  COBRA LIVE" : "∞  INFINITY LIVE", TEXT, 19, Gravity.CENTER_VERTICAL);',
+        1,
+    )
+    raw = raw.replace(
+        'mHeaderTitle.setText("∞  INFINITY LIVE  •  " + title);',
+        'mHeaderTitle.setText((isCobraProfile() ? "◈  COBRA LIVE  •  " : "∞  INFINITY LIVE  •  ") + title);',
+        1,
+    )
     return raw
 
 
@@ -172,11 +376,11 @@ def source_phase(source: Path, receipt: Path) -> None:
   {
     final String[] choices = {
       "Infinity — Movies, Shows, Add-ons & Media",
-      "Infinity Live — Live TV, Guide & Multi-View"
+      "Cobra — Live TV, Guide & Multi-View"
     };
     final int[] selected = {0};
     AlertDialog dialog = new AlertDialog.Builder(this)
-        .setTitle("Choose your Infinity experience")
+        .setTitle("Choose Your Experience")
         .setSingleChoiceItems(choices, 0, (whichDialog, which) -> selected[0] = which)
         .setPositiveButton("Launch & remember", (whichDialog, which) -> {
           String value = selected[0] == 1 ? "live" : "infinity";
@@ -199,7 +403,7 @@ def source_phase(source: Path, receipt: Path) -> None:
       intent = new Intent();
     intent.setClass(this, "live".equals(experience) ?
         @APP_PACKAGE@.InfinityLiveActivity.class : @APP_PACKAGE@.Main.class);
-    intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+    if ("live".equals(experience))\n      intent.putExtra("infinity_live_profile", "cobra");\n    intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
     startActivity(intent);
     finish();
   }
@@ -288,7 +492,7 @@ def verify_source(source: Path) -> None:
     for needle in (
         "class InfinityLiveActivity", "new ExoPlayer.Builder", "DefaultHttpDataSource.Factory",
         "DefaultMediaSourceFactory", "MULTI-VIEW", "XTREAM", "loadXmlTv",
-        "FAVORITES", "RECENTS", "SOURCES", "SETTINGS", "returnToInfinity",
+        "FAVORITES", "RECENTS", "SOURCES", "SETTINGS", "returnToInfinity",\n        "Cobra Live", "showProfileChooser", "switchProfile", "Separate UI",
     ):
         if needle not in java:
             raise RuntimeError("Missing Live Activity contract: " + needle)
