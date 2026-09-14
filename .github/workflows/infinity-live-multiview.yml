@@ -1,10 +1,10 @@
-name: Infinity 1.0.9 | Live Multi-View Candidate 1
+name: Infinity 1.0.9 | Live ExoPlayer Multi-View Candidate 1
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-live-multiview]
+    branches: [infinity-live-exoplayer-multiview]
     paths:
-      - '.github/workflows/infinity-live-multiview.yml'
+      - '.github/workflows/infinity-live-exoplayer-multiview.yml'
       - 'scripts/infinity_multiview_ci_*.sh'
       - 'scripts/infinity_1_0_9_multiview_release.py'
       - 'scripts/verify_infinity_multiview*.py'
@@ -17,7 +17,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-live-multiview-${{ github.ref }}
+  group: infinity-live-exoplayer-multiview-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -69,10 +69,10 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-1.0.9-Live-MultiView-Candidate-1
+          name: Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1
           path: |
-            candidate/Infinity-1.0.9-Live-MultiView-Candidate-1.apk
-            candidate/Infinity-1.0.9-Live-MultiView-Candidate-1.sha256
+            candidate/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1.apk
+            candidate/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1.sha256
             candidate/signing-verification.txt
             candidate/badging.txt
             candidate/infinity-multiview-verification.json

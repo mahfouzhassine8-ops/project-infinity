@@ -20,17 +20,17 @@ python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
 make -C "$BUILD_DIR" -j"$(nproc)"
 make -C "$BUILD_DIR" apk -j"$(nproc)"
 APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit); test -n "$APK"
-BASE=engine/Infinity-1.0.9-Live-MultiView-Candidate-1-Engine-Base.apk
+BASE=engine/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1-Engine-Base.apk
 cp "$APK" "$BASE"
 python3 scripts/infinity71.py record-engine \
   --apk "$BASE" --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$BASE" | tee engine/base-badging.txt
-grep -q "package: name='com.projectinfinity.kodi' versionCode='2103128' versionName='1.0.9-Live-MultiView-Candidate-1'" engine/base-badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103130' versionName='1.0.9-Live-ExoPlayer-MultiView-Candidate-1'" engine/base-badging.txt
 grep -q "application-label:'Infinity'" engine/base-badging.txt
 python3 - <<'PY'
 import hashlib,json,re,zipfile,os
 from pathlib import Path
-apk=Path('engine/Infinity-1.0.9-Live-MultiView-Candidate-1-Engine-Base.apk')
+apk=Path('engine/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1-Engine-Base.apk')
 with zipfile.ZipFile(apk) as z:
     dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)}
     joined=b''.join(z.read(n) for n in dex)
@@ -40,12 +40,12 @@ with zipfile.ZipFile(apk) as z:
         b'PLAYER_ROTATION_FOLLOW_DEVICE', b'PLAYER_ROTATION_UNLOCKED',
         b'infinity_player_rotation', b'InfinityRotation',
         b'InfinityMultiViewController', b'infinity-multiview',
-        b'android/media/MediaPlayer', b'android/view/TextureView',
+        b'androidx/media3', b'ExoPlayer', b'android/view/TextureView',
     ):
         assert needle in joined, needle
     for needle in (b'acquireAudioFocus',b'releaseAudioFocus',b'updateAudioPolicy'):
         assert needle in joined,needle
-    for forbidden in (b'ExoPlayer', b'libmpv', b'CobraTV', b'cobratv'):
+    for forbidden in (b'android/media/MediaPlayer', b'libmpv', b'CobraTV', b'cobratv'):
         assert forbidden not in joined, forbidden
     for needle in (
         b'Infinity.NativeDeviceMode', b'Infinity.AudioPolicyApi',
@@ -61,10 +61,11 @@ Path('engine/multiview-engine.json').write_text(json.dumps({
   'player_rotation_api':1,
   'infinity_live_api':1,
   'infinity_multiview_api':1,
+  'player_engine':'androidx.media3 ExoPlayer 1.9.2',
   'max_simultaneous_live_feeds':2,
   'simultaneous_audio_owners':1,
-  'version_code':2103128,
-  'version_name':'1.0.9-Live-MultiView-Candidate-1',
+  'version_code':2103130,
+  'version_name':'1.0.9-Live-ExoPlayer-MultiView-Candidate-1',
   'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
   'libkodi_sha256':native_sha,
   'dex':dex,
@@ -76,4 +77,4 @@ Path('engine/multiview-engine.json').write_text(json.dumps({
 },indent=2,sort_keys=True)+'\n')
 PY
 
-echo 'PASS: source-backed Kodi 21.3 Multi-View engine built with protected native/player owners intact'
+echo 'PASS: source-backed Kodi 21.3 ExoPlayer Multi-View engine built with protected native/player owners intact'

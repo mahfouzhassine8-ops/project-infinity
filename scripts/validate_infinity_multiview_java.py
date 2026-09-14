@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Compile-check the Infinity Multi-View Android controller against a real Android SDK jar."""
+"""Validate the Infinity Live TV Media3 owner contract.
+
+Media3 classes are supplied by the Kodi Gradle module. This preflight gate
+keeps the source owner deterministic; CI's Gradle compile performs the actual
+Android/Media3 type check.
+"""
 from __future__ import annotations
 
 import argparse
-import shutil
-import subprocess
-import tempfile
 from pathlib import Path
 
 
@@ -22,28 +24,33 @@ def main() -> None:
     if not args.android_jar.is_file():
         raise SystemExit("missing Android API jar")
 
-    text = template.read_text(encoding="utf-8")
-    text = text.replace("@APP_PACKAGE@", "com.projectinfinity.kodi")
+    text = template.read_text(encoding="utf-8").replace("@APP_PACKAGE@", "com.projectinfinity.kodi")
     if "@APP_" in text:
         raise SystemExit("unresolved Android packaging placeholder in Multi-View controller")
 
-    args.out.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as td:
-        src = Path(td) / "com/projectinfinity/kodi"
-        src.mkdir(parents=True)
-        java = src / "InfinityMultiViewController.java"
-        java.write_text(text, encoding="utf-8")
-        subprocess.run([
-            "javac", "-source", "8", "-target", "8",
-            "-cp", str(args.android_jar),
-            "-d", str(args.out),
-            str(java),
-        ], check=True)
+    required = (
+        "class InfinityMultiViewController",
+        "new ExoPlayer.Builder",
+        "DefaultHttpDataSource.Factory",
+        "DefaultMediaSourceFactory",
+        "setVideoTextureView(texture)",
+        "clearVideoTextureView(texture)",
+        "setAudioAttributes",
+        "setAudible(index == mAudioTile)",
+        'TAG_SCHEME = "infinity-multiview"',
+    )
+    for needle in required:
+        if needle not in text:
+            raise SystemExit("missing Media3 Live TV contract: " + needle)
 
-    expected = args.out / "com/projectinfinity/kodi/InfinityMultiViewController.class"
-    if not expected.is_file():
-        raise SystemExit("Multi-View javac output missing")
-    print("PASS: Infinity Multi-View controller compiles against Android API")
+    forbidden = ("android.media.MediaPlayer", "new MediaPlayer(", "CobraTV", "cobratv", "libmpv")
+    for needle in forbidden:
+        if needle in text:
+            raise SystemExit("forbidden legacy/reference player marker: " + needle)
+
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "InfinityMultiViewController.java").write_text(text, encoding="utf-8")
+    print("PASS: Infinity Live TV Media3 owner contract present; Gradle performs the real Android compile")
 
 
 if __name__ == "__main__":

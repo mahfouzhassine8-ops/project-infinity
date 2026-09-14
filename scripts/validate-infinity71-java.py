@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Compile the real patched Infinity Android owner set against the Android SDK.
+"""Compile the patched Infinity Android owner set against the Android SDK.
 
-The audited v4 contract has a small mandatory Java core. Later cumulative layers
-add diagnostics, refresh, native-media, audio-policy and Multi-View owners. Stage
-those owners when present so this generic JNI descriptor gate remains backward
-compatible with v4 while validating the complete source graph of newer builds.
-TV scheduling, JSON-RPC and generated resource integers are compile-only stubs;
-this is an API/descriptor check, not an Android runtime test.
+The JNI descriptor gate compiles Main and the established Android owners. The
+Live TV Media3 controller is represented by a compile-only stub here because
+the Media3 jars are supplied only to the Kodi Gradle module; CI2 compiles the
+real controller. This remains an API/descriptor check, not an Android runtime
+test.
 """
 from pathlib import Path
 import argparse, json, re, subprocess, zipfile
@@ -59,6 +58,17 @@ for name in names:
         text = text.replace(key, value)
     if '@APP_' in text:
         raise SystemExit('Unresolved Android template token in ' + name)
+    if name == 'InfinityMultiViewController' and 'androidx.media3.' in text:
+        text = '''package com.projectinfinity.kodi;
+// Compile-only descriptor stub; real Media3 owner is compiled by Gradle.
+public final class InfinityMultiViewController {
+  InfinityMultiViewController(android.app.Activity a, android.widget.RelativeLayout h, android.view.View v) {}
+  boolean handleIntent(android.content.Intent i) { return false; }
+  void onConfigurationChanged(android.content.res.Configuration c) {}
+  void onHostPause() {}
+  void close() {}
+}
+'''
     (src / (name + '.java')).write_text(text, encoding='utf-8')
 
 (src / 'CompileOnlyStubs.java').write_text('''package com.projectinfinity.kodi;
@@ -119,6 +129,7 @@ for owner in names:
 
 extra = [name for name in names if name not in mandatory]
 print(
-    'PASS: real Android API 34 compile; all compiled Main JNI descriptors match the native contract. '
-    + ('Cumulative owners compiled: ' + ', '.join(extra) if extra else 'Audited v4 owner set compiled.')
+    'PASS: real Android API 34 compile; Main JNI descriptors match the native contract. '
+    + ('Cumulative owners compiled (Media3 stubbed for descriptor gate): ' + ', '.join(extra)
+       if extra else 'Audited v4 owner set compiled.')
 )

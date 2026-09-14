@@ -75,17 +75,18 @@ grep -Fq "'InfinityMultiViewController'" scripts/validate-infinity71-java.py
 python3 scripts/validate-infinity71-java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out engine/rotation-java
 
-grep -q 'versionCode 2103128' kodi/tools/android/packaging/xbmc/build.gradle.in
-grep -q 'versionName "1.0.9-Live-MultiView-Candidate-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q 'versionCode 2103130' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q 'versionName "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q "androidx.media3:media3-exoplayer:1.9.2" kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'PLAYER_ROTATION_FOLLOW_DEVICE' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'PLAYER_ROTATION_UNLOCKED' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'SCREEN_ORIENTATION_FULL_SENSOR' kodi/tools/android/packaging/xbmc/src/Main.java.in
 grep -q '_infinityHasActiveVideo' kodi/tools/android/packaging/xbmc/src/Main.java.in
 grep -q 'InfinityMultiViewController mInfinityMultiView' kodi/tools/android/packaging/xbmc/src/Main.java.in
 grep -q 'mInfinityMultiView.handleIntent(intent)' kodi/tools/android/packaging/xbmc/src/Main.java.in
-grep -q 'new MediaPlayer()' kodi/tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in
+grep -q 'new ExoPlayer.Builder' kodi/tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in
 grep -q 'new TextureView(mActivity)' kodi/tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in
 ! grep -q 'ACCELEROMETER_ROTATION' kodi/tools/android/packaging/xbmc/src/Main.java.in
-! grep -R -E 'CobraTV|cobratv|libmpv|ExoPlayer' kodi/tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in
+! grep -R -E 'CobraTV|cobratv|libmpv|android.media.MediaPlayer' kodi/tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in
 
-echo 'PASS: Multi-View preflight recreated accepted Infinity stack and added only the isolated 2-up owner'
+echo 'PASS: ExoPlayer Multi-View preflight recreated accepted Infinity stack and added only the isolated 2-up owner'

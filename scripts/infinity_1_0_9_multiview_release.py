@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Source/release owner for Infinity Live 2-up Multi-View Candidate 1.
+"""Source/release owner for Infinity Live 2-up ExoPlayer Multi-View Candidate 1.
 
 Multi-View is additive: it keeps Kodi's accepted single CApplicationPlayer path
 unchanged and adds an Infinity-owned Android overlay controller for exactly two
@@ -19,8 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PATCH = ROOT / "patches/infinity-multiview/InfinityMultiViewController.java.in"
 OLD_RELEASE = "1.0.9-Live-Candidate-1"
 OLD_VERSION_CODE = 2103127
-RELEASE = "1.0.9-Live-MultiView-Candidate-1"
-VERSION_CODE = 2103128
+RELEASE = "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"
+VERSION_CODE = 2103130
 GRADLE = Path("tools/android/packaging/xbmc/build.gradle.in")
 INSTALL = Path("cmake/scripts/android/Install.cmake")
 MAIN = Path("tools/android/packaging/xbmc/src/Main.java.in")
@@ -60,6 +60,17 @@ def source_phase(source: Path, receipt: Path) -> None:
     before = {str(rel): sha(source / rel) for rel in (GRADLE, INSTALL, MAIN)}
 
     text = gradle.read_text(encoding="utf-8")
+    dependency_anchor = "    implementation 'com.google.code.gson:gson:2.10.1'\\n"
+    dependencies = (
+        "    implementation 'androidx.media3:media3-exoplayer:1.9.2'\\n"
+        "    implementation 'androidx.media3:media3-exoplayer-hls:1.9.2'\\n"
+        "    implementation 'androidx.media3:media3-exoplayer-rtsp:1.9.2'\\n"
+    )
+    if "androidx.media3:media3-exoplayer:1.9.2" in text:
+        raise RuntimeError("Media3 dependencies unexpectedly pre-existing")
+    if text.count(dependency_anchor) != 1:
+        raise RuntimeError("Media3 dependency anchor missing")
+    text = text.replace(dependency_anchor, dependency_anchor + dependencies, 1)
     text = once(text, f"versionCode {OLD_VERSION_CODE}", f"versionCode {VERSION_CODE}", "Multi-View versionCode")
     text = once(text, f'versionName "{OLD_RELEASE}"', f'versionName "{RELEASE}"', "Multi-View versionName")
     gradle.write_text(text, encoding="utf-8")
@@ -135,6 +146,7 @@ def source_phase(source: Path, receipt: Path) -> None:
         "previous_release": OLD_RELEASE,
         "previous_version_code": OLD_VERSION_CODE,
         "multiview_api": 1,
+        "player_engine": "androidx.media3.exoplayer 1.9.2",
         "max_simultaneous_feeds": 2,
         "audio_owners": 1,
         "kodi_application_player_changed": False,
@@ -146,11 +158,18 @@ def source_phase(source: Path, receipt: Path) -> None:
             str(CONTROLLER): {"after": sha(controller)},
         },
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print("PASS: Infinity Multi-View source added as isolated two-feed Android overlay")
+    print("PASS: Infinity ExoPlayer Multi-View source added as isolated two-feed Android overlay")
 
 
 def verify_source(source: Path) -> None:
     gradle = (source / GRADLE).read_text(encoding="utf-8")
+    for dependency in (
+        "androidx.media3:media3-exoplayer:1.9.2",
+        "androidx.media3:media3-exoplayer-hls:1.9.2",
+        "androidx.media3:media3-exoplayer-rtsp:1.9.2",
+    ):
+        if dependency not in gradle:
+            raise RuntimeError("Missing Media3 dependency: " + dependency)
     install = (source / INSTALL).read_text(encoding="utf-8")
     main = (source / MAIN).read_text(encoding="utf-8")
     controller = source / CONTROLLER
@@ -177,15 +196,18 @@ def verify_source(source: Path) -> None:
         raise RuntimeError("InfinityMultiViewController.java.in missing")
     java = controller.read_text(encoding="utf-8")
     for needle in (
-        "new MediaPlayer()",
-        "new TextureView(mActivity)",
-        "setVolume(value ? 1.0f : 0.0f",
-        "Multi-View Candidate 1 requires exactly two feeds",
-        "TAG_SCHEME = \"infinity-multiview\"",
+        "new ExoPlayer.Builder",
+        "DefaultHttpDataSource.Factory",
+        "DefaultMediaSourceFactory",
+        "setVideoTextureView(texture)",
+        "clearVideoTextureView(texture)",
+        "setAudible(index == mAudioTile)",
+        "requires exactly two feeds",
+        'TAG_SCHEME = \"infinity-multiview\"',
     ):
         if needle not in java:
             raise RuntimeError("Missing Multi-View controller contract: " + needle)
-    forbidden = ("ExoPlayer", "libmpv", "CobraTV", "cobratv")
+    forbidden = ("android.media.MediaPlayer", "new MediaPlayer(", "libmpv", "CobraTV", "cobratv")
     for needle in forbidden:
         if needle in java:
             raise RuntimeError("Unexpected third-party/native player dependency in Multi-View: " + needle)
@@ -211,7 +233,7 @@ def main() -> None:
         source_phase(args.source, args.receipt)
     elif args.cmd == "verify-source":
         verify_source(args.source)
-        print("PASS: Infinity Multi-View source verification")
+        print("PASS: Infinity ExoPlayer Multi-View source verification")
     elif args.cmd == "apk":
         configure_deep()
         deep.apk_phase(args.input, args.output, args.receipt)

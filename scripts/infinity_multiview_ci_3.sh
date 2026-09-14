@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 mkdir -p candidate
-BASE=engine/Infinity-1.0.9-Live-MultiView-Candidate-1-Engine-Base.apk
-UNSIGNED=candidate/Infinity-1.0.9-Live-MultiView-Candidate-1-unsigned.apk
-FINAL=candidate/Infinity-1.0.9-Live-MultiView-Candidate-1.apk
+BASE=engine/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1-Engine-Base.apk
+UNSIGNED=candidate/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1-unsigned.apk
+FINAL=candidate/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1.apk
 
 python3 scripts/infinity71.py overlay --apk "$BASE" \
   --manifest engine/overlay-inventory.json --output candidate/with-lock-unsigned.apk
@@ -41,7 +41,7 @@ bash scripts/sign-infinity71.sh "$UNSIGNED" "$FINAL"
 "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$FINAL" | tee candidate/signing-verification.txt
 grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$FINAL" | tee candidate/badging.txt
-grep -q "package: name='com.projectinfinity.kodi' versionCode='2103128' versionName='1.0.9-Live-MultiView-Candidate-1'" candidate/badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103130' versionName='1.0.9-Live-MultiView-Candidate-1'" candidate/badging.txt
 grep -q "application-label:'Infinity'" candidate/badging.txt
 python3 scripts/infinity_1_0_9_multiview_release.py verify-apk --apk "$FINAL"
 python3 scripts/verify_infinity_multiview_apk.py --apk "$FINAL" --engine "$BASE" \
@@ -50,8 +50,8 @@ python3 scripts/validate_infinity_skin_contract.py
 
 python3 - <<'PY'
 import re,zipfile
-base='engine/Infinity-1.0.9-Live-MultiView-Candidate-1-Engine-Base.apk'
-final='candidate/Infinity-1.0.9-Live-MultiView-Candidate-1.apk'
+base='engine/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1-Engine-Base.apk'
+final='candidate/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1.apk'
 with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
     for name in a.namelist():
         if name.startswith('lib/') or re.fullmatch(r'classes\d*\.dex',name):
@@ -81,13 +81,13 @@ cp engine/player-rotation-source.json candidate/player-rotation-source.json
 cp engine/live-release-source.json candidate/live-release-source.json
 cp engine/multiview-release-source.json candidate/multiview-release-source.json
 cp engine/multiview-engine.json candidate/multiview-engine.json
-sha256sum "$FINAL" | tee candidate/Infinity-1.0.9-Live-MultiView-Candidate-1.sha256
+sha256sum "$FINAL" | tee candidate/Infinity-1.0.9-Live-ExoPlayer-MultiView-Candidate-1.sha256
 
 cat > candidate/DEVICE-TEST.txt <<'EOF'
 INFINITY LIVE MULTI-VIEW CANDIDATE 1 — DEVICE ACCEPTANCE REQUIRED
 Build/static success is not runtime acceptance. Do not lock this candidate until these pass.
 
-1. Install/update Infinity 1.0.9 Live MultiView Candidate 1 (versionCode 2103128).
+1. Install/update Infinity 1.0.9 Live MultiView Candidate 1 (versionCode 2103130).
 2. Keep the existing Infinity Live skin 1.0.5.98. Candidate 1 injects MULTI-VIEW from the bundled Live module; no new skin ZIP is required.
 3. Infinity -> Live: select a primary channel, choose MULTI-VIEW, then select a different second channel.
 4. Unfolded/wide display: confirm two independently moving live feeds render side-by-side.
@@ -104,4 +104,4 @@ Build/static success is not runtime acceptance. Do not lock this candidate until
 15. Do not promote 4-up yet. First prove stable two-decoder hardware behavior on the target device.
 EOF
 
-echo 'PASS: Infinity Live Multi-View Candidate 1 packaged, permanently signed and statically verified'
+echo 'PASS: Infinity Live ExoPlayer Multi-View Candidate 1 packaged, permanently signed and statically verified'

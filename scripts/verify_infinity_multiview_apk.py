@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""APK integrity gate for Infinity Live Multi-View Candidate 1."""
+"""APK integrity gate for Infinity Live ExoPlayer Multi-View Candidate 1."""
 from __future__ import annotations
 
 import argparse
@@ -14,8 +14,8 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 ADDON_ID = "script.infinity.live"
 ADDON_PREFIX = f"assets/addons/{ADDON_ID}/"
-RELEASE = "1.0.9-Live-MultiView-Candidate-1"
-VERSION_CODE = 2103128
+RELEASE = "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"
+VERSION_CODE = 2103130
 REQUIRED = (
     "addon.xml",
     "default.py",
@@ -100,10 +100,16 @@ def verify(apk: Path, engine: Path, source_receipt: Path) -> dict:
                     dex_names.append(name)
 
         dex = b"\n".join(final.read(name) for name in dex_names)
-        for needle in (b"InfinityMultiViewController", b"infinity-multiview", b"android/media/MediaPlayer", b"android/view/TextureView"):
+        for needle in (
+            b"InfinityMultiViewController",
+            b"infinity-multiview",
+            b"androidx/media3",
+            b"ExoPlayer",
+            b"android/view/TextureView",
+        ):
             if needle not in dex:
                 raise AssertionError(("compiled Multi-View controller marker missing", needle.decode("utf-8", "ignore")))
-        for forbidden in (b"ExoPlayer", b"libmpv", b"CobraTV", b"cobratv"):
+        for forbidden in (b"android/media/MediaPlayer", b"libmpv", b"CobraTV", b"cobratv"):
             if forbidden in dex:
                 raise AssertionError(("forbidden player/reference leaked into DEX", forbidden.decode("utf-8", "ignore")))
 
@@ -118,7 +124,8 @@ def verify(apk: Path, engine: Path, source_receipt: Path) -> dict:
         "infinity_live_version": "0.1.0",
         "max_simultaneous_live_feeds": 2,
         "simultaneous_audio_owners": 1,
-        "multiview_surface": "android.media.MediaPlayer + TextureView",
+        "multiview_surface": "androidx.media3 ExoPlayer + TextureView",
+        "media3_version": "1.9.2",
         "kodi_application_player_changed": False,
         "kodi_renderer_changed": False,
         "bundled_provider_credentials": False,
@@ -139,7 +146,7 @@ def main() -> None:
     result = verify(args.apk, args.engine, args.source_receipt)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print("PASS: Infinity Live Multi-View bundled; engine preserved after packaging/signing")
+    print("PASS: Infinity Live ExoPlayer Multi-View bundled; engine preserved after packaging/signing")
     print("Device acceptance still required for two concurrent provider streams, decoder limits, audio handoff, Fold layout and Back round-trip.")
 
 

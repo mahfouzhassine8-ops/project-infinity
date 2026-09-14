@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static repository gate for Infinity Live 2-up Multi-View."""
+"""Static repository gate for Infinity Live 2-up ExoPlayer Multi-View."""
 from __future__ import annotations
 
 import ast
@@ -52,8 +52,11 @@ def main() -> None:
     java = (ROOT / "patches/infinity-multiview/InfinityMultiViewController.java.in").read_text(encoding="utf-8")
     for needle in (
         "class InfinityMultiViewController",
-        "new MediaPlayer()",
-        "new TextureView(mActivity)",
+        "new ExoPlayer.Builder",
+        "DefaultHttpDataSource.Factory",
+        "DefaultMediaSourceFactory",
+        "setVideoTextureView(texture)",
+        "clearVideoTextureView(texture)",
         'TAG_SCHEME = "infinity-multiview"',
         "setAudible(i == mAudioTile)",
         "mTileContainer.setOrientation",
@@ -61,16 +64,16 @@ def main() -> None:
     ):
         if needle not in java:
             raise SystemExit("missing Java Multi-View contract: " + needle)
-    for forbidden in ("ExoPlayer", "libmpv", "Flutter", "CobraTV", "cobratv"):
+    for forbidden in ("android.media.MediaPlayer", "new MediaPlayer(", "libmpv", "Flutter", "CobraTV", "cobratv"):
         if forbidden in java:
             raise SystemExit("forbidden third-party dependency/reference in Multi-View Java: " + forbidden)
 
     release = (ROOT / "scripts/infinity_1_0_9_multiview_release.py").read_text(encoding="utf-8")
-    for needle in ('VERSION_CODE = 2103128', 'RELEASE = "1.0.9-Live-MultiView-Candidate-1"', '"kodi_application_player_changed": False'):
+    for needle in ('VERSION_CODE = 2103130', 'RELEASE = "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"', '"kodi_application_player_changed": False'):
         if needle not in release:
             raise SystemExit("missing Multi-View release contract: " + needle)
 
-    print("Infinity Multi-View static verification: PASS")
+    print("Infinity ExoPlayer Multi-View static verification: PASS")
     print(f"Infinity Live Python files parsed: {parsed}")
     print("2-up overlay, single-audio owner, responsive split/stack and one-shot request contract present.")
 
