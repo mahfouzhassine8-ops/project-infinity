@@ -4,7 +4,7 @@ This branch adds a separate, Infinity-owned Live TV playback path. It is not a
 replacement for Kodi's main player, renderer, skin, or the locked Infinity
 shell.
 
-- Media3/ExoPlayer 1.9.2 is packaged in the Kodi Android module.
+- Media3/ExoPlayer 1.7.1 is packaged in the Kodi Android module.
 - Each two-up tile owns one ExoPlayer and one TextureView.
 - The controller owns one shared Android audio-focus lease; the focused tile is
   audible and D-pad/OK or tap switches audio.

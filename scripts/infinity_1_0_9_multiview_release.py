@@ -62,11 +62,11 @@ def source_phase(source: Path, receipt: Path) -> None:
     text = gradle.read_text(encoding="utf-8")
     dependency_anchor = "    implementation 'com.google.code.gson:gson:2.10.1'\n"
     dependencies = (
-        "    implementation 'androidx.media3:media3-exoplayer:1.9.2'\n"
-        "    implementation 'androidx.media3:media3-exoplayer-hls:1.9.2'\n"
-        "    implementation 'androidx.media3:media3-exoplayer-rtsp:1.9.2'\n"
+        "    implementation 'androidx.media3:media3-exoplayer:1.7.1'\n"
+        "    implementation 'androidx.media3:media3-exoplayer-hls:1.7.1'\n"
+        "    implementation 'androidx.media3:media3-exoplayer-rtsp:1.7.1'\n"
     )
-    if "androidx.media3:media3-exoplayer:1.9.2" in text:
+    if "androidx.media3:media3-exoplayer:1.7.1" in text:
         raise RuntimeError("Media3 dependencies unexpectedly pre-existing")
     if text.count(dependency_anchor) != 1:
         raise RuntimeError("Media3 dependency anchor missing")
@@ -146,7 +146,7 @@ def source_phase(source: Path, receipt: Path) -> None:
         "previous_release": OLD_RELEASE,
         "previous_version_code": OLD_VERSION_CODE,
         "multiview_api": 1,
-        "player_engine": "androidx.media3.exoplayer 1.9.2",
+        "player_engine": "androidx.media3.exoplayer 1.7.1",
         "max_simultaneous_feeds": 2,
         "audio_owners": 1,
         "kodi_application_player_changed": False,
@@ -164,9 +164,9 @@ def source_phase(source: Path, receipt: Path) -> None:
 def verify_source(source: Path) -> None:
     gradle = (source / GRADLE).read_text(encoding="utf-8")
     for dependency in (
-        "androidx.media3:media3-exoplayer:1.9.2",
-        "androidx.media3:media3-exoplayer-hls:1.9.2",
-        "androidx.media3:media3-exoplayer-rtsp:1.9.2",
+        "androidx.media3:media3-exoplayer:1.7.1",
+        "androidx.media3:media3-exoplayer-hls:1.7.1",
+        "androidx.media3:media3-exoplayer-rtsp:1.7.1",
     ):
         if dependency not in gradle:
             raise RuntimeError("Missing Media3 dependency: " + dependency)

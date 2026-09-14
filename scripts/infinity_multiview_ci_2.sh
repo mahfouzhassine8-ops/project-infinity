@@ -61,7 +61,7 @@ Path('engine/multiview-engine.json').write_text(json.dumps({
   'player_rotation_api':1,
   'infinity_live_api':1,
   'infinity_multiview_api':1,
-  'player_engine':'androidx.media3 ExoPlayer 1.9.2',
+  'player_engine':'androidx.media3 ExoPlayer 1.7.1',
   'max_simultaneous_live_feeds':2,
   'simultaneous_audio_owners':1,
   'version_code':2103130,

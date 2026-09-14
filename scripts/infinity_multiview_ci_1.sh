@@ -77,7 +77,7 @@ python3 scripts/validate-infinity71-java.py --source kodi \
 
 grep -q 'versionCode 2103130' kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'versionName "1.0.9-Live-ExoPlayer-MultiView-Candidate-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
-grep -q "androidx.media3:media3-exoplayer:1.9.2" kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q "androidx.media3:media3-exoplayer:1.7.1" kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'PLAYER_ROTATION_FOLLOW_DEVICE' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'PLAYER_ROTATION_UNLOCKED' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'SCREEN_ORIENTATION_FULL_SENSOR' kodi/tools/android/packaging/xbmc/src/Main.java.in

@@ -125,7 +125,7 @@ def verify(apk: Path, engine: Path, source_receipt: Path) -> dict:
         "max_simultaneous_live_feeds": 2,
         "simultaneous_audio_owners": 1,
         "multiview_surface": "androidx.media3 ExoPlayer + TextureView",
-        "media3_version": "1.9.2",
+        "media3_version": "1.7.1",
         "kodi_application_player_changed": False,
         "kodi_renderer_changed": False,
         "bundled_provider_credentials": False,
