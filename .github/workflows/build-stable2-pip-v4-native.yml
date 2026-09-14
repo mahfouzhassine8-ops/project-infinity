@@ -2,9 +2,6 @@ name: Infinity Stable 2 PiP v4 Native
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/build-stable2-pip-v4-native.yml
 
 jobs:
   build:
@@ -89,37 +86,37 @@ jobs:
           s = re.sub(r'\n\.method protected onUserLeaveHint\(\)V.*?\n\.end method\n', '\n', s, flags=re.S)
 
           method = '''
-.method protected onUserLeaveHint()V
-    .locals 4
+          .method protected onUserLeaveHint()V
+              .locals 4
 
-    invoke-super {p0}, Landroid/app/NativeActivity;->onUserLeaveHint()V
+              invoke-super {p0}, Landroid/app/NativeActivity;->onUserLeaveHint()V
 
-    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
-    const/16 v1, 0x1a
-    if-lt v0, v1, :done
+              sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+              const/16 v1, 0x1a
+              if-lt v0, v1, :done
 
-    invoke-virtual {p0}, Lcom/projectinfinity/kodi/Main;->isInPictureInPictureMode()Z
-    move-result v1
-    if-nez v1, :done
+              invoke-virtual {p0}, Lcom/projectinfinity/kodi/Main;->isInPictureInPictureMode()Z
+              move-result v1
+              if-nez v1, :done
 
-    new-instance v1, Landroid/app/PictureInPictureParams$Builder;
-    invoke-direct {v1}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
+              new-instance v1, Landroid/app/PictureInPictureParams$Builder;
+              invoke-direct {v1}, Landroid/app/PictureInPictureParams$Builder;-><init>()V
 
-    new-instance v2, Landroid/util/Rational;
-    const/16 v0, 0x10
-    const/16 v3, 0x9
-    invoke-direct {v2, v0, v3}, Landroid/util/Rational;-><init>(II)V
+              new-instance v2, Landroid/util/Rational;
+              const/16 v0, 0x10
+              const/16 v3, 0x9
+              invoke-direct {v2, v0, v3}, Landroid/util/Rational;-><init>(II)V
 
-    invoke-virtual {v1, v2}, Landroid/app/PictureInPictureParams$Builder;->setAspectRatio(Landroid/util/Rational;)Landroid/app/PictureInPictureParams$Builder;
-    move-result-object v1
-    invoke-virtual {v1}, Landroid/app/PictureInPictureParams$Builder;->build()Landroid/app/PictureInPictureParams;
-    move-result-object v1
-    invoke-virtual {p0, v1}, Lcom/projectinfinity/kodi/Main;->enterPictureInPictureMode(Landroid/app/PictureInPictureParams;)Z
+              invoke-virtual {v1, v2}, Landroid/app/PictureInPictureParams$Builder;->setAspectRatio(Landroid/util/Rational;)Landroid/app/PictureInPictureParams$Builder;
+              move-result-object v1
+              invoke-virtual {v1}, Landroid/app/PictureInPictureParams$Builder;->build()Landroid/app/PictureInPictureParams;
+              move-result-object v1
+              invoke-virtual {p0, v1}, Lcom/projectinfinity/kodi/Main;->enterPictureInPictureMode(Landroid/app/PictureInPictureParams;)Z
 
-    :done
-    return-void
-.end method
-'''
+              :done
+              return-void
+          .end method
+          '''
           main.write_text(s + '\n' + method)
           print('Patched', main)
           PY
@@ -156,3 +153,4 @@ jobs:
           name: Infinity-Stable2-PiP-v4-Native
           path: /tmp/Infinity-Stable2-PiP-v4-Native.apk
           retention-days: 30
+

@@ -1,0 +1,85 @@
+name: Infinity hook/theme audit - no APK release
+on:
+  push:
+    branches: [infinity-theme-hook-audit]
+    paths:
+      - 'scripts/infinity_theme_contract.py'
+      - 'tests/test_infinity_theme_contract.py'
+      - '.github/workflows/infinity-theme-contract-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-theme-contract-audit
+  cancel-in-progress: true
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Download exact shipped 1.0.5
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-1.0.5-BrandingFit-Candidate
+          path: inputs/v105
+          run-id: 34407851662
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download frozen RC3 for native and DEX comparison
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-RC3-Unsigned-Candidate
+          path: inputs/rc3
+          run-id: 34316336433
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install test-only image metrics dependency
+        run: python3 -m pip install --disable-pip-version-check 'Pillow==12.3.0'
+      - name: Verify exact input and unchanged hook binary provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit-out
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          current=Path('inputs/v105/Infinity-1.0.5-BrandingFit.apk')
+          frozen=Path('inputs/rc3/Infinity-Android-First-unsigned.apk')
+          expected={current:'611eb282b2b095acc0341af3ee46fdedd9a97b104b449a8f41df480bd9d8c683', frozen:'737511cc666a541939714b4a5e43b7fe3a013614936500dd74a5a5530f860d84'}
+          for path,digest in expected.items():
+              if hashlib.sha256(path.read_bytes()).hexdigest()!=digest:
+                  raise ValueError('Pinned input mismatch: '+str(path))
+          with zipfile.ZipFile(current) as a, zipfile.ZipFile(frozen) as b:
+              names=[n for n in a.namelist() if (n.startswith('lib/') and not a.getinfo(n).is_dir()) or n.endswith('.dex')]
+              reference=[n for n in b.namelist() if (n.startswith('lib/') and not b.getinfo(n).is_dir()) or n.endswith('.dex')]
+              if set(names)!=set(reference): raise ValueError('Engine/DEX inventory differs')
+              report={n:{'sha256':hashlib.sha256(a.read(n)).hexdigest(),'identical_to_rc3':a.read(n)==b.read(n)} for n in names}
+              if len(report)!=46 or not all(r['identical_to_rc3'] for r in report.values()):
+                  raise ValueError('Frozen hook binary comparison failed')
+          Path('audit-out/engine-dex-provenance.json').write_text(json.dumps(report,indent=2)+'\n')
+          print('45 native libraries and classes.dex are identical to frozen RC3.')
+          PY
+      - name: Run structural logic regressions - not device rendering tests
+        env:
+          INFINITY_TEST_APK: inputs/v105/Infinity-1.0.5-BrandingFit.apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tests/test_infinity_theme_contract.py 2>&1 | tee audit-out/structural-tests.txt
+      - name: Stage only the four XML files and explicit limitations
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_theme_contract.py inputs/v105/Infinity-1.0.5-BrandingFit.apk audit-out/xml-overlay-NOT-AN-APK.zip audit-out/staging-receipt.json
+          cp docs/INFINITY_THEME_HOOK_AUDIT.md audit-out/
+          echo '### Staged hook/theme correction only' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No APK built, signed, installed or released. No native splash correction claimed. Android/Fold rendering and startup rebuild remain release gates.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload audit evidence only - never APKs or fonts
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Hook-Theme-Audit-NOT-AN-APK
+          path: audit-out/
+          retention-days: 30
+          if-no-files-found: error

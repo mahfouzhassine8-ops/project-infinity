@@ -1,0 +1,48 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+/** Small Android-independent file writer, also exercised by JVM regression tests. */
+final class InfinityDiagnosticFiles {
+  static final class Result {
+    final long bytes;
+    final boolean truncated;
+    Result(long bytes, boolean truncated) { this.bytes = bytes; this.truncated = truncated; }
+  }
+
+  private InfinityDiagnosticFiles() {}
+
+  static Result copyBounded(InputStream input, File destination, int limit) throws IOException {
+    if (input == null || limit < 1) throw new IllegalArgumentException("input/limit");
+    File parent = destination.getCanonicalFile().getParentFile();
+    if (parent == null || (!parent.isDirectory() && !parent.mkdirs()))
+      throw new IOException("Diagnostic directory unavailable");
+    File temporary = File.createTempFile("infinity-write-", ".tmp", parent);
+    long count = 0;
+    boolean truncated;
+    try {
+      try (FileOutputStream output = new FileOutputStream(temporary)) {
+        byte[] buffer = new byte[8192];
+        while (count < limit) {
+          int size = input.read(buffer, 0, (int)Math.min(buffer.length, limit - count));
+          if (size < 0) break;
+          if (size == 0) throw new IOException("Diagnostic stream made no progress");
+          output.write(buffer, 0, size);
+          count += size;
+        }
+        truncated = count == limit && input.read() != -1;
+        output.getFD().sync();
+      }
+      // POSIX rename atomically replaces an existing report on Android. Never
+      // delete the previous report first: failed writes must preserve it.
+      if (!temporary.renameTo(destination)) throw new IOException("Diagnostic rename failed");
+      return new Result(count, truncated);
+    } finally {
+      if (temporary.exists()) temporary.delete();
+    }
+  }
+}
