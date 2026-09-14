@@ -1,0 +1,274 @@
+name: Infinity 1.0.7 Candidate 1 | Stop-crash hardening + Diggz boundary
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-player-protection]
+    paths:
+      - '.github/workflows/infinity-1.0.7-candidate1-compat.yml'
+      - 'scripts/infinity_1_0_7_compat_source.py'
+      - 'scripts/infinity_1_0_7_compat_package.py'
+      - 'scripts/infinity_diagnostics_source.py'
+      - 'scripts/infinity_compat_palette.py'
+      - 'addons/service.infinity.compat/**'
+      - 'tests/infinity_compat/test_candidate_107.py'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Test crash ownership fix and Diggz boundary without an Android build
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests.infinity_compat.test_candidate_107 -v
+          python3 -m py_compile scripts/infinity_1_0_7_compat_source.py scripts/infinity_1_0_7_compat_package.py addons/service.infinity.compat/*.py
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Apply exact source stack to pinned Kodi 21.3 and validate preimages
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          mkdir -p preflight
+          python3 scripts/infinity_1_0_6_source.py kodi --receipt preflight/source-1.0.6.json
+          python3 scripts/infinity_1_0_7_compat_source.py kodi --receipt preflight/source-1.0.7.json
+          python3 scripts/infinity_diagnostics_source.py kodi --receipt preflight/exit-diagnostics.json
+          git -C kodi diff --check
+          grep -F 'versionCode 2103107' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -F 'setModuleItem("__xbmcinvokerid__", PyObjectPtr(PyLong_FromLong(GetId())))' kodi/xbmc/interfaces/python/PythonInvoker.cpp
+          ! grep -F 'assert(Py_REFCNT(p) == 2)' kodi/xbmc/interfaces/python/PythonInvoker.cpp
+          grep -F 'InfinityExitDiagnostics.start(getApplicationContext())' kodi/tools/android/packaging/xbmc/src/Main.java.in
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.7-C1-Preflight
+          path: preflight/
+          if-no-files-found: warn
+          retention-days: 30
+
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Prepare Android/Kodi toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+      - name: Clone exact Kodi and apply 1.0.7 Candidate 1 source stack
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          mkdir -p engine
+          python3 scripts/infinity_1_0_6_source.py kodi --receipt engine/source-1.0.6.json
+          python3 scripts/infinity_1_0_7_compat_source.py kodi --receipt engine/source-1.0.7.json
+          python3 scripts/infinity_diagnostics_source.py kodi --receipt engine/exit-diagnostics.json
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json') }}
+          restore-keys: |
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-uniform-g-21.3-arm64-${{ runner.os }}-
+            infinity-7.1-hooked-d-21.3-arm64-${{ runner.os }}-
+      - name: Prepare matched dependencies
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+      - name: Configure and compile source-sensitive targets first
+        run: |
+          set -euo pipefail
+          mkdir -p engine/diagnostics
+          {
+            CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+            test -x "$CMAKE_BIN"
+            "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+          } 2>&1 | tee engine/diagnostics/native-gate.log
+      - name: Build complete matched engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          cp "$APK" engine/Infinity-1.0.7-C1-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine --apk engine/Infinity-1.0.7-C1-Engine-Base.apk \
+            --output engine/engine.json --source-commit "$GITHUB_SHA"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging engine/Infinity-1.0.7-C1-Engine-Base.apk | tee engine/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103107'" engine/badging.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.7-C1-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Save native diagnostics even if a gate fails
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.7-C1-Native-Diagnostics
+          path: |
+            engine/diagnostics/
+            kodi-build/infinity-native-gate/
+            kodi-build/CMakeCache.txt
+            kodi-build/compile_commands.json
+          if-no-files-found: warn
+          retention-days: 30
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  presentation:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-1.0.7-C1-Engine
+          path: engine
+      - name: Install presentation tooling
+        run: python3 -m pip install --disable-pip-version-check pillow
+      - name: Build 1.0.6 presentation, fill palette, and add compatibility guard
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay --apk engine/Infinity-1.0.7-C1-Engine-Base.apk \
+            --manifest engine/engine.json --output candidate/locked-unsigned.apk
+          python3 scripts/infinity_1_0_6_presentation_fix.py \
+            candidate/locked-unsigned.apk candidate/presentation-unsigned.apk candidate/presentation-1.0.6.json
+          python3 scripts/infinity_compat_palette.py candidate/presentation-unsigned.apk candidate/palette-unsigned.apk \
+            --receipt candidate/palette.json
+          python3 scripts/infinity_1_0_7_compat_package.py candidate/palette-unsigned.apk \
+            candidate/Infinity-1.0.7-Candidate-1-unsigned.apk --receipt candidate/compat-package.json
+      - name: Permanently sign and verify update
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing secret: $name" >&2; exit 2; fi
+          done
+          bash scripts/sign-infinity71.sh candidate/Infinity-1.0.7-Candidate-1-unsigned.apk \
+            candidate/Infinity-1.0.7-Candidate-1.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.7-Candidate-1.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging candidate/Infinity-1.0.7-Candidate-1.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103107'" candidate/badging.txt
+      - name: Final structural candidate gates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, zipfile, xml.etree.ElementTree as ET
+          apk='candidate/Infinity-1.0.7-Candidate-1.apk'
+          estuary='assets/addons/skin.estuary/'
+          guard='assets/addons/service.infinity.compat/'
+          with zipfile.ZipFile(apk) as z:
+              names=set(z.namelist())
+              for required in [
+                  guard+'addon.xml', guard+'service.py', guard+'compat_runtime.py',
+                  guard+'resources/xml/VideoOSD.xml', guard+'resources/xml/DialogSeekBar.xml',
+                  guard+'resources/xml/Custom_1199_InfinityVideoLock.xml',
+                  guard+'resources/colors/InfinityDark.xml', guard+'resources/colors/InfinityLight.xml']:
+                  assert required in names, required
+                  if required.endswith('.xml'): ET.fromstring(z.read(required))
+              assert guard+'16x9/Home.xml' not in names
+              assert not any(n.startswith(guard+'shortcuts/') for n in names)
+              variables=z.read(estuary+'xml/Variables.xml').decode()
+              assert 'InfinityColor_blue' in variables and 'InfinityColor_white' in variables
+              osd=z.read(guard+'resources/xml/VideoOSD.xml').decode()
+              assert 'id="7999"' in osd and 'PlayerControl(Stop)' in osd
+              assert '$VAR[' not in osd and '<include' not in osd
+              assert 'ActivateWindow(osdaudiosettings)' in osd and 'ActivateWindow(osdsubtitlesettings)' in osd
+          source=json.load(open('engine/source-1.0.7.json'))
+          assert source['versionCode']==2103107 and source['device_tested'] is False
+          package=json.load(open('candidate/compat-package.json'))
+          assert package['diggz_home_preserved'] is True and package['home_xml_modified_by_guard'] is False
+          print('Candidate structural gates passed; Stop/theme/player behavior still requires device testing.')
+          PY
+          cp engine/source-1.0.6.json candidate/
+          cp engine/source-1.0.7.json candidate/
+          cp engine/exit-diagnostics.json candidate/
+          cp engine/engine.json candidate/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.7-Candidate-1
+          path: |
+            candidate/Infinity-1.0.7-Candidate-1.apk
+            candidate/Infinity-1.0.7-Candidate-1.sha256
+            candidate/Infinity-1.0.7-Candidate-1.signing.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/source-1.0.6.json
+            candidate/source-1.0.7.json
+            candidate/exit-diagnostics.json
+            candidate/presentation-1.0.6.json
+            candidate/palette.json
+            candidate/compat-package.json
+            candidate/engine.json
+          if-no-files-found: error
+          retention-days: 90

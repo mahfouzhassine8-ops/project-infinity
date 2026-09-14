@@ -1,0 +1,587 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.SurfaceTexture;
+import android.graphics.drawable.GradientDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.Surface;
+import android.view.TextureView;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * Infinity-owned two-feed Live Multi-View overlay.
+ *
+ * This deliberately does not create a second Kodi CApplicationPlayer and does
+ * not alter Kodi's accepted player/renderer path. During Multi-View, two local
+ * Android MediaPlayer instances own two TextureView surfaces above Kodi's main
+ * view. Only one feed is audible at a time.
+ */
+public final class InfinityMultiViewController
+{
+  private static final String TAG_SCHEME = "infinity-multiview";
+  private static final int ACCENT = Color.rgb(0, 184, 255);
+  private static final int BG = Color.rgb(0, 0, 0);
+  private static final int PANEL = Color.rgb(12, 20, 27);
+  private static final int MUTED = Color.rgb(171, 192, 207);
+
+  private final Activity mActivity;
+  private final RelativeLayout mHost;
+  private final View mKodiView;
+  private final AudioManager mAudioManager;
+  private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
+
+  private MultiViewRoot mRoot;
+  private LinearLayout mTileContainer;
+  private TileView[] mTiles;
+  private int mAudioTile = 0;
+  private boolean mActive = false;
+
+  InfinityMultiViewController(Activity activity, RelativeLayout host, View kodiView)
+  {
+    mActivity = activity;
+    mHost = host;
+    mKodiView = kodiView;
+    mAudioManager = (AudioManager) activity.getSystemService(Activity.AUDIO_SERVICE);
+    mAudioFocusListener = focusChange -> {
+      if (focusChange <= AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
+      {
+        for (TileView tile : mTiles == null ? new TileView[0] : mTiles)
+          if (tile != null)
+            tile.setAudible(false);
+      }
+      else if (focusChange == AudioManager.AUDIOFOCUS_GAIN)
+      {
+        applyAudioOwner();
+      }
+    };
+  }
+
+  boolean handleIntent(Intent intent)
+  {
+    if (intent == null || intent.getData() == null)
+      return false;
+    final Uri data = intent.getData();
+    if (!TAG_SCHEME.equals(data.getScheme()))
+      return false;
+
+    final String requestPath = data.getQueryParameter("path");
+    if (requestPath == null || requestPath.isEmpty())
+    {
+      showMessage("Multi-View request is missing");
+      return true;
+    }
+
+    try
+    {
+      final Request request = readRequest(requestPath);
+      open(request);
+    }
+    catch (Exception exc)
+    {
+      close();
+      showMessage("Could not open Multi-View");
+    }
+    return true;
+  }
+
+  void onConfigurationChanged(Configuration configuration)
+  {
+    if (mActive)
+      updateOrientation();
+  }
+
+  void onHostPause()
+  {
+    // Never leave two IPTV decoders running in the background.
+    if (mActive)
+      close();
+  }
+
+  void close()
+  {
+    mActive = false;
+    if (mTiles != null)
+    {
+      for (TileView tile : mTiles)
+        if (tile != null)
+          tile.release();
+    }
+    mTiles = null;
+
+    if (mRoot != null)
+    {
+      try
+      {
+        mHost.removeView(mRoot);
+      }
+      catch (Exception ignored)
+      {
+      }
+    }
+    mRoot = null;
+    mTileContainer = null;
+
+    try
+    {
+      mAudioManager.abandonAudioFocus(mAudioFocusListener);
+    }
+    catch (Exception ignored)
+    {
+    }
+
+    if (mKodiView != null)
+    {
+      mKodiView.setFocusable(true);
+      mKodiView.requestFocus();
+    }
+  }
+
+  private void open(Request request)
+  {
+    close();
+    mAudioTile = request.audioTile == 1 ? 1 : 0;
+    mActive = true;
+
+    try
+    {
+      mAudioManager.requestAudioFocus(mAudioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+    }
+    catch (Exception ignored)
+    {
+    }
+
+    mRoot = new MultiViewRoot();
+    mRoot.setOrientation(LinearLayout.VERTICAL);
+    mRoot.setBackgroundColor(BG);
+    mRoot.setFocusable(true);
+    mRoot.setFocusableInTouchMode(true);
+    mRoot.setKeepScreenOn(true);
+    if (Build.VERSION.SDK_INT >= 21)
+      mRoot.setElevation(50.0f);
+
+    final TextView header = text("INFINITY  •  MULTI-VIEW", Color.WHITE, 18, Gravity.CENTER_VERTICAL);
+    header.setPadding(dp(20), 0, dp(20), 0);
+    mRoot.addView(header, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(56)));
+
+    mTileContainer = new LinearLayout(mActivity);
+    mTileContainer.setBackgroundColor(BG);
+    mRoot.addView(mTileContainer, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f));
+
+    final TextView footer = text("D-pad: choose feed    •    OK/tap: hear focused feed    •    Back: return to Infinity Live", MUTED, 13, Gravity.CENTER);
+    footer.setPadding(dp(12), 0, dp(12), 0);
+    mRoot.addView(footer, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(48)));
+
+    mTiles = new TileView[] {new TileView(0, request.channels[0]), new TileView(1, request.channels[1])};
+    mTileContainer.addView(mTiles[0]);
+    mTileContainer.addView(mTiles[1]);
+    updateOrientation();
+
+    final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+    mHost.addView(mRoot, params);
+    if (mKodiView != null)
+      mKodiView.setFocusable(false);
+    mTiles[mAudioTile].requestFocus();
+    applyAudioOwner();
+  }
+
+  private void updateOrientation()
+  {
+    if (mTileContainer == null || mTiles == null)
+      return;
+    final int width = Math.max(mHost.getWidth(), mActivity.getResources().getDisplayMetrics().widthPixels);
+    final int height = Math.max(mHost.getHeight(), mActivity.getResources().getDisplayMetrics().heightPixels);
+    final boolean sideBySide = width >= height;
+    mTileContainer.setOrientation(sideBySide ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+    for (TileView tile : mTiles)
+    {
+      final LinearLayout.LayoutParams params = sideBySide
+          ? new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f)
+          : new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
+      params.setMargins(dp(4), dp(4), dp(4), dp(4));
+      tile.setLayoutParams(params);
+    }
+  }
+
+  private void setAudioTile(int index)
+  {
+    if (index < 0 || index > 1 || mTiles == null)
+      return;
+    mAudioTile = index;
+    applyAudioOwner();
+  }
+
+  private void applyAudioOwner()
+  {
+    if (mTiles == null)
+      return;
+    for (int i = 0; i < mTiles.length; ++i)
+    {
+      if (mTiles[i] != null)
+      {
+        mTiles[i].setAudible(i == mAudioTile);
+        mTiles[i].updateChrome();
+      }
+    }
+  }
+
+  private TextView text(String value, int color, int sp, int gravity)
+  {
+    final TextView view = new TextView(mActivity);
+    view.setText(value);
+    view.setTextColor(color);
+    view.setTextSize(sp);
+    view.setGravity(gravity);
+    return view;
+  }
+
+  private int dp(int value)
+  {
+    return Math.max(1, Math.round(value * mActivity.getResources().getDisplayMetrics().density));
+  }
+
+  private void showMessage(String message)
+  {
+    android.widget.Toast.makeText(mActivity, message, android.widget.Toast.LENGTH_LONG).show();
+  }
+
+  private Request readRequest(String path) throws Exception
+  {
+    final File file = new File(path);
+    if (!file.isFile() || file.length() <= 0 || file.length() > 256 * 1024)
+      throw new IllegalArgumentException("Invalid Multi-View request file");
+
+    final byte[] bytes;
+    try (FileInputStream input = new FileInputStream(file); ByteArrayOutputStream out = new ByteArrayOutputStream())
+    {
+      final byte[] buffer = new byte[4096];
+      int read;
+      while ((read = input.read(buffer)) != -1)
+      {
+        if (out.size() + read > 256 * 1024)
+          throw new IllegalArgumentException("Multi-View request too large");
+        out.write(buffer, 0, read);
+      }
+      bytes = out.toByteArray();
+    }
+    finally
+    {
+      // URLs may contain user credentials. The request is intentionally one-shot.
+      try
+      {
+        file.delete();
+      }
+      catch (Exception ignored)
+      {
+      }
+    }
+
+    final JSONObject root = new JSONObject(new String(bytes, StandardCharsets.UTF_8));
+    if (root.optInt("schema", 0) != 1 || !"split2".equals(root.optString("mode", "")))
+      throw new IllegalArgumentException("Unsupported Multi-View request schema");
+    final JSONArray channels = root.getJSONArray("channels");
+    if (channels.length() != 2)
+      throw new IllegalArgumentException("Multi-View Candidate 1 requires exactly two feeds");
+
+    final ChannelSpec[] specs = new ChannelSpec[] {parseChannel(channels.getJSONObject(0)), parseChannel(channels.getJSONObject(1))};
+    return new Request(specs, root.optInt("audio_tile", 0));
+  }
+
+  private ChannelSpec parseChannel(JSONObject json) throws Exception
+  {
+    final String name = json.optString("name", "Live channel");
+    final String url = json.getString("url");
+    if (!(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("rtsp://") || url.startsWith("file://")))
+      throw new IllegalArgumentException("Unsupported Multi-View stream scheme");
+
+    final HashMap<String, String> headers = new HashMap<>();
+    final JSONObject object = json.optJSONObject("headers");
+    if (object != null)
+    {
+      final Iterator<String> keys = object.keys();
+      while (keys.hasNext())
+      {
+        final String key = keys.next();
+        final String value = object.optString(key, "");
+        if (!key.isEmpty() && !value.isEmpty() && key.length() <= 128 && value.length() <= 4096)
+          headers.put(key, value);
+      }
+    }
+    return new ChannelSpec(name, url, headers);
+  }
+
+  private final class MultiViewRoot extends LinearLayout
+  {
+    MultiViewRoot()
+    {
+      super(mActivity);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+      if (event.getAction() != KeyEvent.ACTION_DOWN)
+        return super.dispatchKeyEvent(event);
+      final int code = event.getKeyCode();
+      if (code == KeyEvent.KEYCODE_BACK || code == KeyEvent.KEYCODE_ESCAPE)
+      {
+        close();
+        return true;
+      }
+      if (mTiles == null)
+        return super.dispatchKeyEvent(event);
+      if (code == KeyEvent.KEYCODE_DPAD_LEFT || code == KeyEvent.KEYCODE_DPAD_UP)
+      {
+        mTiles[0].requestFocus();
+        return true;
+      }
+      if (code == KeyEvent.KEYCODE_DPAD_RIGHT || code == KeyEvent.KEYCODE_DPAD_DOWN)
+      {
+        mTiles[1].requestFocus();
+        return true;
+      }
+      if (code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER || code == KeyEvent.KEYCODE_NUMPAD_ENTER)
+      {
+        if (mTiles[1].hasFocus())
+          setAudioTile(1);
+        else
+          setAudioTile(0);
+        return true;
+      }
+      return super.dispatchKeyEvent(event);
+    }
+  }
+
+  private final class TileView extends FrameLayout implements TextureView.SurfaceTextureListener, View.OnFocusChangeListener, View.OnClickListener
+  {
+    final int index;
+    final ChannelSpec spec;
+    final TextureView texture;
+    final View border;
+    final TextView title;
+    final TextView state;
+    MediaPlayer player;
+    Surface surface;
+    boolean prepared = false;
+    boolean audible = false;
+
+    TileView(int index, ChannelSpec spec)
+    {
+      super(mActivity);
+      this.index = index;
+      this.spec = spec;
+      setFocusable(true);
+      setFocusableInTouchMode(true);
+      setOnFocusChangeListener(this);
+      setOnClickListener(this);
+      setBackgroundColor(PANEL);
+
+      texture = new TextureView(mActivity);
+      texture.setSurfaceTextureListener(this);
+      addView(texture, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+      title = text(spec.name, Color.WHITE, 15, Gravity.CENTER_VERTICAL);
+      title.setPadding(dp(14), 0, dp(120), 0);
+      title.setBackgroundColor(Color.argb(180, 0, 0, 0));
+      final FrameLayout.LayoutParams titleParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, dp(44), Gravity.BOTTOM);
+      addView(title, titleParams);
+
+      state = text("LOADING", MUTED, 12, Gravity.CENTER);
+      state.setBackgroundColor(Color.argb(185, 0, 0, 0));
+      final FrameLayout.LayoutParams stateParams = new FrameLayout.LayoutParams(dp(108), dp(36), Gravity.TOP | Gravity.RIGHT);
+      stateParams.setMargins(0, dp(12), dp(12), 0);
+      addView(state, stateParams);
+
+      border = new View(mActivity);
+      addView(border, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+      border.setClickable(false);
+      updateChrome();
+    }
+
+    void updateChrome()
+    {
+      final GradientDrawable drawable = new GradientDrawable();
+      drawable.setColor(Color.TRANSPARENT);
+      final int color = hasFocus() ? Color.WHITE : (audible ? ACCENT : Color.argb(120, 80, 100, 110));
+      drawable.setStroke(dp(audible || hasFocus() ? 3 : 1), color);
+      drawable.setCornerRadius(dp(12));
+      border.setBackground(drawable);
+      state.setText(prepared ? (audible ? "AUDIO  •  LIVE" : "LIVE") : state.getText());
+      state.setTextColor(audible ? ACCENT : MUTED);
+    }
+
+    void setAudible(boolean value)
+    {
+      audible = value;
+      if (player != null)
+      {
+        try
+        {
+          player.setVolume(value ? 1.0f : 0.0f, value ? 1.0f : 0.0f);
+        }
+        catch (Exception ignored)
+        {
+        }
+      }
+    }
+
+    void startPlayer(SurfaceTexture surfaceTexture)
+    {
+      release();
+      state.setText("LOADING");
+      try
+      {
+        surface = new Surface(surfaceTexture);
+        player = new MediaPlayer();
+        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        player.setSurface(surface);
+        player.setScreenOnWhilePlaying(true);
+        player.setOnPreparedListener(mp -> {
+          prepared = true;
+          setAudible(index == mAudioTile);
+          updateChrome();
+          try
+          {
+            mp.start();
+          }
+          catch (Exception ignored)
+          {
+          }
+        });
+        player.setOnErrorListener((mp, what, extra) -> {
+          prepared = false;
+          state.setText("UNAVAILABLE");
+          state.setTextColor(Color.rgb(255, 98, 90));
+          return true;
+        });
+        player.setDataSource(mActivity, Uri.parse(spec.url), spec.headers);
+        player.prepareAsync();
+      }
+      catch (Exception exc)
+      {
+        prepared = false;
+        state.setText("UNAVAILABLE");
+        state.setTextColor(Color.rgb(255, 98, 90));
+      }
+    }
+
+    void release()
+    {
+      prepared = false;
+      if (player != null)
+      {
+        try
+        {
+          player.stop();
+        }
+        catch (Exception ignored)
+        {
+        }
+        try
+        {
+          player.reset();
+          player.release();
+        }
+        catch (Exception ignored)
+        {
+        }
+      }
+      player = null;
+      if (surface != null)
+      {
+        try
+        {
+          surface.release();
+        }
+        catch (Exception ignored)
+        {
+        }
+      }
+      surface = null;
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height)
+    {
+      startPlayer(surfaceTexture);
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height)
+    {
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture)
+    {
+      release();
+      return true;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture)
+    {
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean hasFocus)
+    {
+      updateChrome();
+    }
+
+    @Override
+    public void onClick(View view)
+    {
+      requestFocus();
+      setAudioTile(index);
+    }
+  }
+
+  private static final class ChannelSpec
+  {
+    final String name;
+    final String url;
+    final Map<String, String> headers;
+
+    ChannelSpec(String name, String url, Map<String, String> headers)
+    {
+      this.name = name;
+      this.url = url;
+      this.headers = headers;
+    }
+  }
+
+  private static final class Request
+  {
+    final ChannelSpec[] channels;
+    final int audioTile;
+
+    Request(ChannelSpec[] channels, int audioTile)
+    {
+      this.channels = channels;
+      this.audioTile = audioTile;
+    }
+  }
+}

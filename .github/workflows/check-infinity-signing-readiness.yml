@@ -1,0 +1,56 @@
+name: Infinity Signing Readiness
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/check-infinity-signing-readiness.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Inspect configuration without creating a new signing identity
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_SIGNER_SHA256: ${{ secrets.INFINITY_SIGNER_SHA256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p results
+          python3 - <<'PY'
+          import base64,hashlib,json,os,re,subprocess,tempfile
+          from pathlib import Path
+          names=['INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS','INFINITY_SIGNER_SHA256']
+          count=sum(bool(os.environ.get(n)) for n in names)
+          status='blocked-missing-retained-key-configuration'
+          if count == len(names):
+              expected=os.environ['INFINITY_SIGNER_SHA256'].lower()
+              if re.fullmatch('[0-9a-f]{64}',expected) is None: raise SystemExit('Invalid certificate pin')
+              with tempfile.TemporaryDirectory(prefix='private-signing-check-') as t:
+                  key=Path(t)/'key';cert=Path(t)/'public.der'
+                  key.write_bytes(base64.b64decode(os.environ['INFINITY_KEYSTORE_B64'],validate=True))
+                  r=subprocess.run(['keytool','-exportcert','-keystore',str(key),'-storepass:env','INFINITY_STORE_PASSWORD','-alias',os.environ['INFINITY_KEY_ALIAS'],'-file',str(cert)],capture_output=True)
+                  if r.returncode: raise SystemExit('Keystore certificate check failed; no private material published')
+                  if hashlib.sha256(cert.read_bytes()).hexdigest()!=expected: raise SystemExit('Certificate pin mismatch')
+              status='configured-certificate-matches-signing-still-needs-verification'
+          report={'status':status,'configured_field_count':count,'required_field_count':len(names),'new_key_created':False,'private_material_uploaded':False,'installed_fixed6_update_compatibility':'not_established'}
+          Path('results/signing-readiness.json').write_text(json.dumps(report,indent=2)+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('## Retained signing readiness\n**'+status+'**\nNo key was created or uploaded. No app was installed/uninstalled.\n')
+          print(status)
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Signing-Readiness
+          path: results/signing-readiness.json
+          retention-days: 7
+          if-no-files-found: error
