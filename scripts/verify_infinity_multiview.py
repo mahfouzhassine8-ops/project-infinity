@@ -53,6 +53,7 @@ def main() -> None:
     for needle in (
         "class InfinityMultiViewController",
         "new ExoPlayer.Builder",
+        "set(TARGET_SDK 35)",
         "DefaultHttpDataSource.Factory",
         "DefaultMediaSourceFactory",
         "setVideoTextureView(texture)",

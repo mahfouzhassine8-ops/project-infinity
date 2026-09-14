@@ -25,6 +25,7 @@ GRADLE = Path("tools/android/packaging/xbmc/build.gradle.in")
 INSTALL = Path("cmake/scripts/android/Install.cmake")
 MAIN = Path("tools/android/packaging/xbmc/src/Main.java.in")
 CONTROLLER = Path("tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in")
+ANDROID_CONFIG = Path("cmake/platform/android/android.cmake")
 
 
 def sha(path: Path) -> str:
@@ -49,7 +50,8 @@ def source_phase(source: Path, receipt: Path) -> None:
     install = source / INSTALL
     main = source / MAIN
     controller = source / CONTROLLER
-    for path in (gradle, install, main):
+    android_config = source / ANDROID_CONFIG
+    for path in (gradle, install, main, android_config):
         if not path.is_file():
             raise FileNotFoundError(path)
     if controller.exists():
@@ -57,7 +59,7 @@ def source_phase(source: Path, receipt: Path) -> None:
     if not PATCH.is_file():
         raise FileNotFoundError(PATCH)
 
-    before = {str(rel): sha(source / rel) for rel in (GRADLE, INSTALL, MAIN)}
+    before = {str(rel): sha(source / rel) for rel in (GRADLE, INSTALL, MAIN, ANDROID_CONFIG)}
 
     text = gradle.read_text(encoding="utf-8")
     dependency_anchor = "    implementation 'com.google.code.gson:gson:2.10.1'\n"
@@ -74,6 +76,10 @@ def source_phase(source: Path, receipt: Path) -> None:
     text = once(text, f"versionCode {OLD_VERSION_CODE}", f"versionCode {VERSION_CODE}", "Multi-View versionCode")
     text = once(text, f'versionName "{OLD_RELEASE}"', f'versionName "{RELEASE}"', "Multi-View versionName")
     gradle.write_text(text, encoding="utf-8")
+
+    android_text = android_config.read_text(encoding="utf-8")
+    android_text = once(android_text, "set(TARGET_SDK 34)", "set(TARGET_SDK 35)", "Live TV compile SDK")
+    android_config.write_text(android_text, encoding="utf-8")
 
     text = install.read_text(encoding="utf-8")
     text = once(
@@ -163,6 +169,9 @@ def source_phase(source: Path, receipt: Path) -> None:
 
 def verify_source(source: Path) -> None:
     gradle = (source / GRADLE).read_text(encoding="utf-8")
+    android_config = (source / ANDROID_CONFIG).read_text(encoding="utf-8")
+    if "set(TARGET_SDK 35)" not in android_config or "set(TARGET_SDK 34)" in android_config:
+        raise RuntimeError("Live TV compile SDK 35 owner missing")
     for dependency in (
         "androidx.media3:media3-exoplayer:1.7.1",
         "androidx.media3:media3-exoplayer-hls:1.7.1",
