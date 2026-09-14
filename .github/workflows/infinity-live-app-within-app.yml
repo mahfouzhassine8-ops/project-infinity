@@ -39,6 +39,8 @@ jobs:
           java-version: '17'
 
       - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
 
       - uses: actions/cache/restore@v4
         id: deps-cache
