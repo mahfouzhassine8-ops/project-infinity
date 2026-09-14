@@ -60,11 +60,11 @@ def source_phase(source: Path, receipt: Path) -> None:
     before = {str(rel): sha(source / rel) for rel in (GRADLE, INSTALL, MAIN)}
 
     text = gradle.read_text(encoding="utf-8")
-    dependency_anchor = "    implementation 'com.google.code.gson:gson:2.10.1'\\n"
+    dependency_anchor = "    implementation 'com.google.code.gson:gson:2.10.1'\n"
     dependencies = (
-        "    implementation 'androidx.media3:media3-exoplayer:1.9.2'\\n"
-        "    implementation 'androidx.media3:media3-exoplayer-hls:1.9.2'\\n"
-        "    implementation 'androidx.media3:media3-exoplayer-rtsp:1.9.2'\\n"
+        "    implementation 'androidx.media3:media3-exoplayer:1.9.2'\n"
+        "    implementation 'androidx.media3:media3-exoplayer-hls:1.9.2'\n"
+        "    implementation 'androidx.media3:media3-exoplayer-rtsp:1.9.2'\n"
     )
     if "androidx.media3:media3-exoplayer:1.9.2" in text:
         raise RuntimeError("Media3 dependencies unexpectedly pre-existing")
