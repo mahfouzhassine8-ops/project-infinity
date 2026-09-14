@@ -5,7 +5,7 @@ sudo apt-get update -qq
 sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf \
   lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev \
   ccache python3 nasm yasm imagemagick fonts-dejavu-core rapidjson-dev
-sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
 
 mkdir -p "$HOME/.android" preflight engine
 if [ ! -f "$HOME/.android/debug.keystore" ]; then
@@ -60,7 +60,7 @@ module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
 source=Path('kodi'); module.install_refresh_controller(source); module.verify_refresh_controller(source)
 PY
 python3 scripts/validate_infinity_audio_policy.py --source kodi \
-  --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
+  --android-jar "$ANDROID_HOME/platforms/android-35/android.jar" --out preflight/audio-validation
 python3 tests/infinity_audio/test_config.py --source kodi --out preflight/audio-config
 python3 scripts/validate_infinity_skin_contract.py
 python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
@@ -81,7 +81,7 @@ python3 scripts/infinity_touch_startup_guard.py verify --source kodi
 python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/rotation-lifecycle
 python3 tests/infinity_rotation/test_history.py
 python3 scripts/validate-infinity71-java.py --source kodi \
-  --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out engine/rotation-java
+  --android-jar "$ANDROID_HOME/platforms/android-35/android.jar" --out engine/rotation-java
 
 # Add the app-within-app Live environment. No Kodi player/renderer owner changes.
 python3 scripts/infinity_1_0_9_live_app_shell.py source --source kodi \
