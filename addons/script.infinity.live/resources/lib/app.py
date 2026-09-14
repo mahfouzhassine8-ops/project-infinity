@@ -1,4 +1,8 @@
+import json
+import os
+import time
 import urllib.parse
+import uuid
 
 import xbmc
 import xbmcaddon
@@ -8,6 +12,7 @@ from .catalog import load_catalog
 from .sources import add_source_dialog, manage_sources_dialog
 from .storage import SourceStore
 from .ui import InfinityLiveWindow
+from .multiview import channel_payload, launch_command, write_request
 
 
 class InfinityPlayer(xbmc.Player):
@@ -29,6 +34,31 @@ def _stream_url(channel):
 
 
 def _play_channel(player, channel, state):
+    """Android Live TV is owned by Media3/ExoPlayer; Kodi player remains fallback off Android."""
+    if xbmc.getCondVisibility("System.Platform.Android"):
+        try:
+            payload = channel_payload(channel)
+            if not payload.get("url"):
+                raise ValueError("Channel has no playable URL")
+            request = {
+                "schema": 1,
+                "mode": "single",
+                "audio_tile": 0,
+                "created_epoch": int(time.time()),
+                "channels": [payload],
+            }
+            request_path = write_request(SourceStore().profile_dir, request)
+            if player.isPlaying():
+                player.stop()
+            xbmc.executebuiltin(launch_command(request_path))
+            state["owned_playback"] = False
+            state["channel_key"] = channel.stable_key()
+            state["exo_live"] = True
+            return
+        except Exception as exc:
+            xbmcgui.Dialog().notification("Infinity Live", "ExoPlayer launch failed: {}".format(exc), xbmcgui.NOTIFICATION_ERROR, 3500)
+            return
+
     item = xbmcgui.ListItem(label=channel.name, path=channel.url)
     item.setInfo("video", {"title": channel.name, "genre": channel.group or "Live TV"})
     if channel.logo:
@@ -92,7 +122,7 @@ def run():
             return
 
     player = InfinityPlayer()
-    state = {"owned_playback": False, "channel_key": ""}
+    state = {"owned_playback": False, "channel_key": "", "exo_live": False}
     force = False
     catalog = None
 
