@@ -493,7 +493,7 @@ def verify_source(source: Path) -> None:
         "class InfinityLiveActivity", "new ExoPlayer.Builder", "DefaultHttpDataSource.Factory",
         "DefaultMediaSourceFactory", "MULTI-VIEW", "XTREAM", "loadXmlTv",
         "FAVORITES", "RECENTS", "SOURCES", "SETTINGS", "returnToInfinity",
-        "Cobra Live", "showProfileChooser", "switchProfile", "Separate UI",
+        "COBRA LIVE", "showProfileChooser", "switchProfile", "Separate UI",
     ):
         if needle not in java:
             raise RuntimeError("Missing Live Activity contract: " + needle)
