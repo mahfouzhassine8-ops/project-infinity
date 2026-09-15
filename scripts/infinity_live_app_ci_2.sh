@@ -23,21 +23,21 @@ make -C "$BUILD_DIR" apk -j"$(nproc)"
 
 APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
 test -n "$APK"
-BASE=engine/Infinity-1.0.9-2in1-SingleApp-Candidate-2-Engine-Base.apk
+BASE=engine/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1-Engine-Base.apk
 cp "$APK" "$BASE"
 
 python3 scripts/infinity71.py record-engine \
   --apk "$BASE" --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
 
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$BASE" | tee engine/base-badging.txt
-grep -q "package: name='com.projectinfinity.kodi' versionCode='2103132' versionName='1.0.9-2in1-SingleApp-Candidate-2'" engine/base-badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103133' versionName='1.0.9-Cobra-Legitimate-Live-Candidate-1'" engine/base-badging.txt
 grep -q "application-label:'Infinity'" engine/base-badging.txt
 test "$(grep -c '^launchable-activity:' engine/base-badging.txt)" -eq 1
 
 python3 - <<'PY'
 import hashlib, json, os, re, zipfile
 from pathlib import Path
-apk=Path('engine/Infinity-1.0.9-2in1-SingleApp-Candidate-2-Engine-Base.apk')
+apk=Path('engine/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1-Engine-Base.apk')
 with zipfile.ZipFile(apk) as z:
     dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)}
     joined=b''.join(z.read(n) for n in dex)
@@ -45,13 +45,16 @@ with zipfile.ZipFile(apk) as z:
     for needle in (
         b'InfinityLiveActivity',
         b'infinity_experience',
-        b'Choose your Infinity experience',
+        b'Choose Your Experience',
+        b'player_api.php?username=',
+        b'get_live_streams',
+        b'get_live_categories',
         b'androidx/media3/exoplayer/ExoPlayer',
         b'MULTI-VIEW',
-        b'XTREAM',
+        b'Stream could not play',
     ):
         assert needle in joined, needle
-    for forbidden in (b'CobraTV', b'cobratv', b'libmpv', b'android/media/MediaPlayer'):
+    for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
         assert forbidden not in joined, forbidden
     native_sha=hashlib.sha256(native).hexdigest()
 
@@ -61,19 +64,24 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'platform_hook_api':2,
   'audio_policy_api':1,
   'player_rotation_api':1,
-  'infinity_live_api':1,
-  'live_app_shell_api':1,
-  'version_code':2103132,
-  'version_name':'1.0.9-2in1-SingleApp-Candidate-2',
+  'infinity_live_api':2,
+  'cobra_runtime_api':1,
+  'version_code':2103133,
+  'version_name':'1.0.9-Cobra-Legitimate-Live-Candidate-1',
   'one_apk_two_environments':True,
   'one_android_launcher':True,
   'host_environment':'Infinity/Kodi',
   'cobra_environment':'InfinityLiveActivity',
-  'live_player':'androidx.media3.exoplayer 1.7.1',
+  'cobra_player':'androidx.media3.exoplayer 1.7.1',
   'direct_live_launcher':False,
   'startup_chooser':True,
+  'xtream_provider_flow':True,
+  'm3u_provider_flow':True,
+  'xmltv_epg':True,
+  'cleartext_provider_opt_in':True,
   'max_simultaneous_live_feeds':2,
   'simultaneous_audio_owners':1,
+  'external_theme_addon':'script.infinity.cobra.theme',
   'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
   'libkodi_sha256':native_sha,
   'dex':dex,
@@ -84,4 +92,4 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
 },indent=2,sort_keys=True)+'\n')
 PY
 
-echo 'PASS: source-backed Kodi 21.3 engine built as one Infinity app containing Infinity + Cobra'
+echo 'PASS: source-backed Kodi 21.3 engine built with real Cobra provider + Media3 runtime'
