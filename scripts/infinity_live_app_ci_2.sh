@@ -62,8 +62,8 @@ grep -q "application-label:'Infinity'" engine/base-badging.txt
 test "$(grep -c '^launchable-activity:' engine/base-badging.txt)" -eq 1
 
 # Native compile/package output is authoritative for generated Java behavior.
-# Keep fragile source-spelling probes diagnostic-only, while preserving hard
-# safety/architecture checks and v3 renderer verification.
+# The compiled DEX contract remains a hard gate; only source spelling assumptions
+# were removed. Renderer and forbidden-owner checks remain fatal.
 python3 - <<'PY'
 import hashlib, json, re, zipfile
 from pathlib import Path
@@ -83,17 +83,13 @@ with zipfile.ZipFile(apk) as z:
       b'.kodi/userdata/addon_data/service.infinity.refresh', b'preferredDisplayModeId',
       b'fold-cover', b'fold-inner', b'multiview-start', b'multiview-stop', b'player-close'
     )
-    missing=[needle for needle in required if needle not in joined]
-    if missing:
-        print('Candidate 2 post-build diagnostic: compiled DEX tokens not found:')
-        for needle in missing:
-            print('  -', needle.decode('utf-8', 'replace'))
+    for needle in required:
+        assert needle in joined, needle
     for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
         assert forbidden not in joined, forbidden
     native_sha=hashlib.sha256(native).hexdigest()
 
 receipt=json.loads(Path('engine/gui-render-hardening-source.json').read_text())
-# v3 schema is authoritative here.
 assert receipt['schema'] == 3
 assert receipt['gui_font_cache_hardened'] is True
 assert receipt['renderer_changed'] is True
@@ -133,7 +129,7 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'android_resize_hardened':receipt['android_resize_hardened'],
   'protected_geometry_bridge_owner':receipt['protected_geometry_bridge_owner'],
   'protected_geometry_bridge_rewritten':receipt['protected_geometry_bridge_rewritten'],
-  'post_build_dex_token_probe':'diagnostic-only'
+  'post_build_dex_contract':'authoritative'
 },indent=2,sort_keys=True)+'\n')
 PY
 
