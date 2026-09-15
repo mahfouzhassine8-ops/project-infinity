@@ -17,7 +17,7 @@ import infinity_1_0_8_deep_rebrand as deep
 
 ROOT = Path(__file__).resolve().parents[1]
 PATCH = ROOT / "patches/infinity-cobra/InfinityLiveActivity.java.in"
-THEME = ROOT / "addons/script.infinity.live/resources/cobra-theme.json"
+THEME = ROOT / "addons/script.infinity.cobra.theme/resources/cobra-theme.json"
 
 RELEASE = "1.0.9-Cobra-Legitimate-Live-Candidate-1"
 VERSION_CODE = 2103133
@@ -73,9 +73,9 @@ def source_phase(source: Path, receipt: Path) -> None:
     )
     gradle.write_text(text, encoding="utf-8")
 
-    # A large share of real Xtream/M3U services still use plain HTTP. Android
-    # blocks cleartext traffic by default at this target SDK unless the app
-    # explicitly opts in. This applies only to user-selected provider traffic.
+    # Many real Xtream/M3U services still use plain HTTP. Android blocks
+    # cleartext traffic at this target SDK unless the app explicitly opts in.
+    # This is used only for user-selected provider URLs.
     text = manifest.read_text(encoding="utf-8")
     if 'android:usesCleartextTraffic="true"' not in text:
         text = once(
@@ -87,9 +87,17 @@ def source_phase(source: Path, receipt: Path) -> None:
         )
     manifest.write_text(text, encoding="utf-8")
 
-    # Replace the prototype compressed activity with a clear, auditable source
+    # Replace the prototype compressed Activity with a clear, auditable source
     # implementation that owns provider login, channel loading and Exo playback.
-    live.write_bytes(PATCH.read_bytes())
+    # The one-line XMLTV correction below keeps current/next accumulation local
+    # to the parse pass even if an older template revision is checked out.
+    live_text = PATCH.read_text(encoding="utf-8")
+    live_text = live_text.replace(
+        "ProgramPair pair = mGuide.get(channel);",
+        "ProgramPair pair = guide.get(channel);",
+        1,
+    )
+    live.write_text(live_text, encoding="utf-8")
 
     verify_source(source)
 
@@ -109,7 +117,7 @@ def source_phase(source: Path, receipt: Path) -> None:
             "single_audio_owner": True,
             "cleartext_provider_opt_in": True,
             "external_theme_contract": (
-                ".kodi/addons/script.infinity.live/resources/cobra-theme.json"
+                ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json"
             ),
             "kodi_application_player_changed": False,
             "kodi_renderer_changed": False,
@@ -184,7 +192,8 @@ def verify_source(source: Path) -> None:
         "setMultiAudio",
         "Stream could not play",
         "Server not found. Check the address, Wi-Fi, VPN, or DNS.",
-        ".kodi/addons/script.infinity.live/resources/cobra-theme.json",
+        ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json",
+        "ProgramPair pair = guide.get(channel);",
         "returnToInfinity",
     )
     for needle in required_runtime:
