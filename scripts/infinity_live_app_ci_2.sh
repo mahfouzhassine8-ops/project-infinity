@@ -5,21 +5,21 @@ mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
 
 # Combined Candidate 2 gate: source hardening + Java import assertion must pass before the long cook.
 cd "$GITHUB_WORKSPACE"
-python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py
+python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py scripts/infinity_gui_render_hardening_v3.py
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
   echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2
   exit 1
 }
-python3 scripts/infinity_gui_render_hardening_v2.py apply --source kodi \
+python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi \
   --receipt engine/gui-render-hardening-source.json
-python3 scripts/infinity_gui_render_hardening_v2.py verify --source kodi
+python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
 # Fail pre-build if the exact crash protections and the accepted geometry safety contract are absent.
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
 grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
 grep -Fq 'ConsumeRenderCacheFlushRequest()' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-grep -Fq 'm_requested.size == size' kodi/xbmc/platform/android/activity/XBMCApp.h
-grep -Fq 'CommitGeometry' kodi/xbmc/platform/android/activity/XBMCApp.h
+grep -Fq 'm_requested.size == size' kodi/xbmc/platform/android/activity/InfinityBridgeState.h
+grep -Fq 'CommitGeometry' kodi/xbmc/platform/android/activity/InfinityBridgeState.h
 grep -Fq 'state.IsCurrent(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 grep -Fq 'state.CommitGeometry(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
