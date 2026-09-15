@@ -93,10 +93,7 @@ def candidate2_device_once(text: str, old: str, new: str, label: str) -> str:
 
 
 def polish_device_ui(java: str) -> str:
-    # Remove every standalone Multi-View rail destination that can survive the
-    # layered Candidate 1/Candidate 2 transforms. Multi-View belongs in player
-    # chrome; this deliberately tolerates the same semantic rail insertion being
-    # produced by more than one earlier transform while still verifying none ship.
+    # Multi-View belongs in player chrome, never the permanent Cobra rail.
     rail = '    addRail("MULTI-VIEW", v -> beginMultiView());\n'
     rail_count = java.count(rail)
     if rail_count < 1:
@@ -118,9 +115,24 @@ def polish_device_ui(java: str) -> str:
         )
     java = java.replace(old_channel_pane, new_channel_pane, 1)
 
-    # Locked Cobra Live direction: Live-only navigation. Movies/Shows/Add-ons
-    # remain Infinity responsibilities and are never introduced into this rail.
-    for forbidden in ('addRail("MOVIES"', 'addRail("SHOWS"', 'addRail("ADD-ONS"'):
+    # Locked Cobra Live direction: keep the rail Live-focused. Candidate 2 still
+    # owns the VOD implementations for compatibility/testing, but Movies/Series
+    # are not permanent Cobra destinations; Infinity remains the presentation
+    # owner for movie/show browsing. Strip the known generated rail lines rather
+    # than treating their expected pre-polish presence as a transform failure.
+    non_live_rail_lines = (
+        '    addRail("MOVIES", v -> showMovies());\n',
+        '    addRail("SERIES", v -> showSeries());\n',
+    )
+    for line in non_live_rail_lines:
+        java = java.replace(line, "")
+
+    for forbidden in (
+        'addRail("MOVIES"',
+        'addRail("SERIES"',
+        'addRail("SHOWS"',
+        'addRail("ADD-ONS"',
+    ):
         if forbidden in java:
             raise RuntimeError("Candidate 2 UI polish: non-Live destination leaked into Cobra Live: " + forbidden)
     return java
@@ -136,7 +148,12 @@ def verify_device_ui(java: str) -> None:
     rail_block = java[rail_start:rail_end]
     if 'addRail("MULTI-VIEW"' in rail_block:
         raise RuntimeError("Candidate 2 UI polish: Multi-View survived as a rail destination")
-    for forbidden in ('addRail("MOVIES"', 'addRail("SHOWS"', 'addRail("ADD-ONS"'):
+    for forbidden in (
+        'addRail("MOVIES"',
+        'addRail("SERIES"',
+        'addRail("SHOWS"',
+        'addRail("ADD-ONS"',
+    ):
         if forbidden in rail_block:
             raise RuntimeError("Candidate 2 UI polish: Cobra Live rail contains Infinity content destination")
     if 'Button multi = action(' not in java or 'multi.setOnClickListener(v -> beginMultiView());' not in java:
