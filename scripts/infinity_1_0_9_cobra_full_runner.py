@@ -33,6 +33,7 @@ _ORIGINAL_INSERT_AFTER = full.insert_after
 _ORIGINAL_VERIFY_SOURCE = full.verify_source
 _ORIGINAL_FIXUP_REPLACE_ONCE = fixups.replace_once
 _ORIGINAL_FIXUP_REPLACE_BETWEEN = fixups.replace_between
+_ORIGINAL_DEVICE_ONCE = device.once
 
 
 def candidate2_insert_after(text: str, anchor: str, addition: str, label: str) -> str:
@@ -93,6 +94,24 @@ def candidate2_fixup_replace_between(
     if replacement.endswith(end):
         replacement = replacement[:-len(end)]
     return text[:a] + replacement + text[b:]
+
+
+def candidate2_device_once(text: str, old: str, new: str, label: str) -> str:
+    """Narrow one ambiguous device-parity cleanup to onDestroy only."""
+    if label != "Cobra device bridge destroy":
+        return _ORIGINAL_DEVICE_ONCE(text, old, new, label)
+    start_marker = "  @Override\n  protected void onDestroy() {\n"
+    start = text.find(start_marker)
+    if start < 0:
+        raise RuntimeError(f"{label}: onDestroy start missing")
+    end = text.find("\n  }\n\n  @Override", start + len(start_marker))
+    if end < 0:
+        raise RuntimeError(f"{label}: onDestroy end missing")
+    block = text[start:end]
+    count = block.count(old)
+    if count != 1:
+        raise RuntimeError(f"{label}: onDestroy anchor expected exactly once, found {count}")
+    return text[:start] + block.replace(old, new, 1) + text[end:]
 
 
 def polish_device_ui(java: str) -> str:
@@ -164,24 +183,27 @@ def candidate2_verify_source(source: Path) -> None:
         live.write_text(java, encoding="utf-8")
 
 
-def _install_safe_guards() -> tuple[object, object, object, object]:
+def _install_safe_guards() -> tuple[object, object, object, object, object]:
     previous_insert = full.insert_after
     previous_verify = full.verify_source
     previous_replace = fixups.replace_once
     previous_between = fixups.replace_between
+    previous_device_once = device.once
     full.insert_after = candidate2_insert_after
     full.verify_source = candidate2_verify_source
     fixups.replace_once = candidate2_fixup_replace_once
     fixups.replace_between = candidate2_fixup_replace_between
-    return previous_insert, previous_verify, previous_replace, previous_between
+    device.once = candidate2_device_once
+    return previous_insert, previous_verify, previous_replace, previous_between, previous_device_once
 
 
-def _restore_safe_guards(previous: tuple[object, object, object, object]) -> None:
+def _restore_safe_guards(previous: tuple[object, object, object, object, object]) -> None:
     (
         full.insert_after,
         full.verify_source,
         fixups.replace_once,
         fixups.replace_between,
+        device.once,
     ) = previous
 
 
