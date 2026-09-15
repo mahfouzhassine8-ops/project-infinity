@@ -6,6 +6,65 @@ BASE=engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk
 UNSIGNED=candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-unsigned.apk
 FINAL=candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk
 
+# Fail immediately and descriptively if build-stage ownership/handoff is incomplete.
+# This prevents late packaging/signing failures caused by a missing receipt, inventory,
+# or mismatched engine filename.
+for required in \
+  "$BASE" \
+  engine/overlay-inventory.json \
+  engine/gui-render-hardening-source.json \
+  engine/audio-receipts/cumulative-source.json \
+  engine/deep-audio-rebrand-source.json \
+  engine/player-rotation-source.json \
+  engine/live-release-source.json \
+  engine/touch-startup-guard-source.json \
+  engine/cobra-full-source.json \
+  engine/live-app-shell-engine.json \
+  candidate/Infinity-Cobra-Theme-1.1.0.zip; do
+  if [[ ! -s "$required" ]]; then
+    echo "Missing Candidate 2 build/package handoff: $required" >&2
+    exit 1
+  fi
+done
+
+python3 - <<'PY'
+import json
+from pathlib import Path
+m=json.loads(Path('engine/live-app-shell-engine.json').read_text())
+expected={
+  'schema':2,
+  'version_code':2103134,
+  'version_name':'1.0.9-Cobra-Full-Feature-Candidate-2',
+  'package':'com.projectinfinity.kodi',
+  'application_label':'Infinity',
+  'one_apk_two_environments':True,
+  'one_android_launcher':True,
+  'cobra_live_only':True,
+  'live_only_multiview':True,
+  'single_audio_owner':True,
+  'dvr':True,
+  'guide':True,
+  'catchup':True,
+  'fold_parity':True,
+  'real_picture_in_picture':True,
+  'rotation_shared_with_infinity':True,
+  'refresh_policy_shared_with_infinity':True,
+  'copied_cobratv_code':False,
+  'renderer_hardening_schema':3,
+  'renderer_changed':True,
+  'android_resize_hardened':True,
+  'protected_geometry_bridge_owner':'xbmc/platform/android/activity/InfinityBridgeState.h',
+  'protected_geometry_bridge_rewritten':False,
+}
+for key,value in expected.items():
+    assert m.get(key)==value, (key,m.get(key),value)
+assert m.get('provider_contract')==['xtream','m3u'], m.get('provider_contract')
+assert m.get('multiview_outputs')==[2,3,4], m.get('multiview_outputs')
+assert m.get('player')=='androidx.media3.exoplayer 1.7.1', m.get('player')
+assert m.get('source_commit'), 'missing source_commit'
+print('PASS: Candidate 2 engine handoff manifest is complete')
+PY
+
 python3 scripts/infinity71.py overlay --apk "$BASE" \
   --manifest engine/overlay-inventory.json --output candidate/with-lock-unsigned.apk
 python3 scripts/infinity_upper_layer_repack.py \
