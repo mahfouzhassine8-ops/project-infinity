@@ -16,9 +16,9 @@ class SupportExportTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
-        self.skin = self.root / 'skin.xenon2'
+        self.skin = self.root / 'skin.infinity.diggz'
         (self.skin / '16x9').mkdir(parents=True)
-        (self.skin / 'addon.xml').write_text('<addon id="skin.xenon2" version="fixture"/>')
+        (self.skin / 'addon.xml').write_text('<addon id="skin.infinity.diggz" version="fixture"/>')
         (self.skin / '16x9/Home.xml').write_text('<window><controls/></window>')
         self.output = self.root / 'report.zip'
 
@@ -26,8 +26,8 @@ class SupportExportTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_real_nonempty_zip_and_correct_skin_id(self):
-        result = support.make_report(self.output, self.skin, 'skin.xenon2')
-        self.assertEqual(result['active_skin_id'], 'skin.xenon2')
+        result = support.make_report(self.output, self.skin, 'skin.infinity.diggz')
+        self.assertEqual(result['active_skin_id'], 'skin.infinity.diggz')
         with zipfile.ZipFile(self.output) as z:
             self.assertIsNone(z.testzip())
             self.assertIn('active-skin/16x9/Home.xml', z.namelist())
@@ -39,7 +39,7 @@ class SupportExportTests(unittest.TestCase):
         (self.skin / 'userdata/guisettings.xml').write_text('PRIVATE_PASSWORD')
         for name in ('Noto.ttf', 'Textures.xbt', 'cache.db', 'background.png', 'account.json'):
             (self.skin / name).write_text('EXCLUDED')
-        support.make_report(self.output, self.skin, 'skin.xenon2')
+        support.make_report(self.output, self.skin, 'skin.infinity.diggz')
         with zipfile.ZipFile(self.output) as z:
             raw = b''.join(z.read(n) for n in z.namelist())
             self.assertNotIn(b'PRIVATE_PASSWORD', raw)
@@ -47,7 +47,7 @@ class SupportExportTests(unittest.TestCase):
 
     def test_source_bytes_remain_unchanged(self):
         before = {p: p.read_bytes() for p in self.skin.rglob('*') if p.is_file()}
-        support.make_report(self.output, self.skin, 'skin.xenon2')
+        support.make_report(self.output, self.skin, 'skin.infinity.diggz')
         self.assertEqual(before, {p: p.read_bytes() for p in before})
 
     def test_symlink_file_and_folder_are_not_followed(self):
@@ -55,7 +55,7 @@ class SupportExportTests(unittest.TestCase):
         secret.write_text('PRIVATE')
         (self.skin / 'outside.xml').symlink_to(secret)
         (self.skin / 'outside-dir').symlink_to(self.root, target_is_directory=True)
-        support.make_report(self.output, self.skin, 'skin.xenon2')
+        support.make_report(self.output, self.skin, 'skin.infinity.diggz')
         with zipfile.ZipFile(self.output) as z:
             self.assertNotIn('active-skin/outside.xml', z.namelist())
             self.assertFalse(any('outside-dir' in n for n in z.namelist()))
@@ -65,31 +65,31 @@ class SupportExportTests(unittest.TestCase):
         native.mkdir()
         (native / 'android-exit-info.json').write_text('{"schema":1}')
         (native / 'exit-123-45-5.trace').write_bytes(b'PRIVATE_NATIVE_TRACE')
-        support.make_report(self.output, self.skin, 'skin.xenon2', native_roots=[native])
+        support.make_report(self.output, self.skin, 'skin.infinity.diggz', native_roots=[native])
         with zipfile.ZipFile(self.output) as z:
             self.assertIn('native/android-exit-info.json', z.namelist())
             self.assertFalse(any(n.endswith('.trace') for n in z.namelist()))
         second = self.root / 'traces.zip'
-        support.make_report(second, self.skin, 'skin.xenon2', native_roots=[native], include_native_traces=True)
+        support.make_report(second, self.skin, 'skin.infinity.diggz', native_roots=[native], include_native_traces=True)
         with zipfile.ZipFile(second) as z:
             self.assertIn('native/exit-123-45-5.trace', z.namelist())
 
     def test_size_limit_is_reported_not_silently_hidden(self):
         (self.skin / '16x9/TooLarge.xml').write_bytes(b'x' * 200)
         with patch.object(support, 'MAX_FILE', 100):
-            result = support.make_report(self.output, self.skin, 'skin.xenon2')
+            result = support.make_report(self.output, self.skin, 'skin.infinity.diggz')
         self.assertFalse(result['complete_within_limits'])
         self.assertEqual(result['omitted'][0]['file'], 'active-skin/16x9/TooLarge.xml')
 
     def test_refuses_overwrite(self):
         self.output.write_text('KEEP')
         with self.assertRaises(ValueError):
-            support.make_report(self.output, self.skin, 'skin.xenon2')
+            support.make_report(self.output, self.skin, 'skin.infinity.diggz')
         self.assertEqual(self.output.read_text(), 'KEEP')
 
     def test_report_cannot_be_written_into_skin(self):
         with self.assertRaises(ValueError):
-            support.make_report(self.skin / 'report.zip', self.skin, 'skin.xenon2')
+            support.make_report(self.skin / 'report.zip', self.skin, 'skin.infinity.diggz')
 
     def test_health_center_source_excludes_user_addon_data(self):
         health = self.root / 'health'
@@ -98,13 +98,13 @@ class SupportExportTests(unittest.TestCase):
         (health / 'resources/settings.xml').write_text('<settings/>')
         (health / 'addon_data').mkdir()
         (health / 'addon_data/settings.xml').write_text('PRIVATE')
-        support.make_report(self.output, self.skin, 'skin.xenon2', health_root=health)
+        support.make_report(self.output, self.skin, 'skin.infinity.diggz', health_root=health)
         with zipfile.ZipFile(self.output) as z:
             self.assertIn('health-center-source/default.py', z.namelist())
             self.assertNotIn('health-center-source/addon_data/settings.xml', z.namelist())
 
     def test_no_native_files_is_explicit_not_claimed_success(self):
-        result = support.make_report(self.output, self.skin, 'skin.xenon2')
+        result = support.make_report(self.output, self.skin, 'skin.infinity.diggz')
         self.assertFalse(result['native_evidence_present'])
         self.assertFalse(result['crash_cause_confirmed'])
 
