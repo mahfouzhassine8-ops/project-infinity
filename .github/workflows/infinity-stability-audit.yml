@@ -1,0 +1,51 @@
+name: Infinity | Whole-Stack Stability Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      certify:
+        description: 'Fail the run while certification blockers remain'
+        type: boolean
+        default: false
+  push:
+    branches: [infinity-stability-rc]
+    paths:
+      - 'addons/**'
+      - 'tests/**'
+      - 'kodi-config/addons.txt'
+      - 'scripts/infinity_stability_audit.py'
+      - 'stability/**'
+      - '.github/workflows/infinity-stability-audit.yml'
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run fast whole-stack inventory audit
+        run: python3 scripts/infinity_stability_audit.py --report stability-report.json
+
+      - name: Enforce certification gate when requested
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.certify }}
+        run: python3 scripts/infinity_stability_audit.py --strict --report stability-report.json
+
+      - name: Upload stability report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: infinity-stability-report
+          path: stability-report.json
+          if-no-files-found: error
+          retention-days: 90
