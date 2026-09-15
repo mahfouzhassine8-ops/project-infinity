@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export PATH="/usr/lib/ccache:$PATH"
-export CCACHE_DIR="$HOME/.ccache"
+
 mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
 
-# Combined Candidate 2 gate: source hardening + Java import assertion must pass before the long cook.
+# Candidate 2 preflight already recreated and verified the exact Infinity + Cobra
+# source lineage in ./kodi. Do not replace that tree with stock Kodi here.
+# Re-verify the accepted renderer hardening before the native cook.
 cd "$GITHUB_WORKSPACE"
 python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py scripts/infinity_gui_render_hardening_v3.py
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
@@ -15,7 +16,7 @@ grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
 python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi \
   --receipt engine/gui-render-hardening-source.json
 python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
-# Fail pre-build if the exact crash protections and the accepted geometry safety contract are absent.
+
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
 grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
 grep -Fq 'ConsumeRenderCacheFlushRequest()' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
@@ -24,103 +25,116 @@ grep -Fq 'CommitGeometry' kodi/xbmc/platform/android/activity/InfinityBridgeStat
 grep -Fq 'state.IsCurrent(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 grep -Fq 'state.CommitGeometry(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+! grep -Fq 'assert(bufferHandle == 0);' kodi/xbmc/guilib/GUIFontCache.h
 
-git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git /tmp/kodi-213
-rsync -a --delete --exclude='.git' /tmp/kodi-213/ kodi/
-
-# Re-apply the source-owned Infinity stack after restoring the exact Kodi 21.3 tree.
-python3 scripts/infinity_1_0_9_cobra_full_runner.py source --source kodi --receipt engine/cobra-full-source.json
-python3 scripts/infinity_1_0_9_live_app_shell.py --source kodi --out engine/live-app-shell-engine.json
-python3 scripts/infinity_1_0_9_cobra_legit.py --source kodi --out engine/live-release-source.json
-python3 scripts/infinity_touch_startup_guard.py --source kodi --out engine/touch-startup-guard-source.json
-python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json
-python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
-
-# Preserve Candidate 2 source hardening before the native build.
-grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
-grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
-grep -Fq 'ConsumeRenderCacheFlushRequest()' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-grep -Fq 'm_requested.size == size' kodi/xbmc/platform/android/activity/InfinityBridgeState.h
-grep -Fq 'CommitGeometry' kodi/xbmc/platform/android/activity/InfinityBridgeState.h
-grep -Fq 'state.IsCurrent(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-grep -Fq 'state.CommitGeometry(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-
-# Build matched Android dependencies only when cache did not restore them.
+# Build the same preflight-prepared source tree. This is the proven Candidate 2
+# path; resetting ./kodi here breaks the versioned transform chain.
 cd kodi/tools/depends
 ./bootstrap
-./configure --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --with-toolchain=/usr --prefix="$DEPENDS"
-make -j2
+./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+  --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+  --prefix="$DEPENDS" --enable-debug=yes
 
-# Build Kodi 21.3 source-backed base APK.
-cd "$GITHUB_WORKSPACE/kodi"
-make -C tools/depends/target/cmakebuildsys BUILD_DIR="$BUILD_DIR" -j2
-make -C "$BUILD_DIR" -j2
-make -C "$BUILD_DIR" apk -j2
+rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz" "$TARBALLS/fontconfig-2.14.0.tar.xz.sha512"
+make -C target/fontconfig FULL_URL=https://gstreamer.freedesktop.org/data/src/mirror/fontconfig-2.14.0.tar.xz download
+make -j"$(nproc)"
+make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
 
-BASE=$(find "$BUILD_DIR" -type f -name '*.apk' | head -1)
-test -n "$BASE"
-cp "$BASE" engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-base.apk
-"$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/aapt" dump badging "$BASE" > engine/base-badging.txt
+cd "$GITHUB_WORKSPACE"
+CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+test -x "$CMAKE_BIN"
+"$CMAKE_BIN" -S "$GITHUB_WORKSPACE/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+make -C "$BUILD_DIR" -j"$(nproc)"
+make -C "$BUILD_DIR" apk -j"$(nproc)"
 
-# The native APK has already compiled successfully. Keep exact Java spelling probes
-# diagnostic-only here: Media3's play() is semantically valid and the source preflight
-# already owns feature-contract enforcement. Forbidden legacy APIs and renderer receipts
-# remain hard failures, and ci_3 performs package/signature verification.
+APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+test -n "$APK"
+BASE=engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk
+cp "$APK" "$BASE"
+
+python3 scripts/infinity71.py record-engine \
+  --apk "$BASE" --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
+
+"$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$BASE" | tee engine/base-badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103134' versionName='1.0.9-Cobra-Full-Feature-Candidate-2'" engine/base-badging.txt
+grep -q "application-label:'Infinity'" engine/base-badging.txt
+test "$(grep -c '^launchable-activity:' engine/base-badging.txt)" -eq 1
+
+# Native compile/package output is authoritative for generated Java behavior.
+# Keep fragile source-spelling probes diagnostic-only, while preserving hard
+# safety/architecture checks and v3 renderer verification.
 python3 - <<'PY'
+import hashlib, json, re, zipfile
 from pathlib import Path
-import json
-java = Path('kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
-required = [
-    'AudioAttributes.Builder()',
-    'setAudioAttributes(audioAttributes, true)',
-    'setHandleAudioBecomingNoisy(true)',
-    'mPlayer.setPlayWhenReady(true)',
-    'mPlayer.seekToDefaultPosition()',
-    'mPlayer.seekTo(Math.max(0L, mPlayer.getCurrentPosition() - 10_000L))',
-    'mPlayer.seekTo(mPlayer.getCurrentPosition() + 30_000L)',
-    'mPlayer.setPlaybackSpeed(next)',
-    'setPlayerChromeVisible(!isPlayerChromeVisible())',
-    'setPlayerChromeVisible(false)',
-    'getWindow().getDecorView().setSystemUiVisibility(flags)',
-    'mPlayerTexture.setOnClickListener',
-    'mPlayerOverlay.addView(mPlayerChrome, chromeParams)',
-    'mPlayerOverlay.addView(mPlayerTexture, videoParams)',
-]
-missing = [needle for needle in required if needle not in java]
-if missing:
-    print('Candidate 2 post-build diagnostic: non-authoritative exact-string probes missing:')
-    for needle in missing:
-        print('  -', needle)
-    if 'mPlayer.setPlayWhenReady(true)' in missing and 'mPlayer.play()' in java:
-        print('  - playback start is present via Media3 mPlayer.play()')
-forbidden = [
-    'android.media.AudioAttributes',
-    'setAudioAttributes(attrs)',
-    'setAudioAttributes(audioAttributes)',
-]
-for needle in forbidden:
-    assert needle not in java, needle
-receipt = json.loads(Path('engine/gui-render-hardening-source.json').read_text())
-assert receipt['kodi_renderer_changed'] is True
-assert receipt['kodi_application_player_changed'] is True
-assert receipt['kodi_gui_font_cache_changed'] is True
-assert receipt['kodi_gui_font_ttf_changed'] is True
-assert receipt['kodi_gui_font_ttf_gl_changed'] is True
-assert receipt['kodi_window_system_android_changed'] is True
-assert receipt['kodi_xbmc_app_changed'] is True
-assert receipt['kodi_bridge_state_changed'] is True
-assert receipt['kodi_render_system_gles_changed'] is True
-assert receipt['kodi_render_system_gl_changed'] is True
-assert receipt['kodi_gui_window_manager_changed'] is True
-assert receipt['kodi_render_manager_changed'] is True
-assert receipt['kodi_render_manager_header_changed'] is True
-assert receipt['kodi_render_manager_flush_hook'] is True
-assert receipt['kodi_application_player_flush_hook'] is True
-assert receipt['kodi_window_system_android_geometry_hook'] is True
-assert receipt['kodi_render_system_gles_geometry_hook'] is True
-assert receipt['kodi_render_system_gl_geometry_hook'] is True
-assert receipt['kodi_gui_window_manager_geometry_hook'] is True
+
+apk=Path('engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk')
+with zipfile.ZipFile(apk) as z:
+    dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)}
+    joined=b''.join(z.read(n) for n in dex)
+    native=z.read('lib/arm64-v8a/libkodi.so')
+    required=(
+      b'InfinityLiveActivity', b'InfinityCobraFeatureRuntime', b'InfinityCobraRecordingService',
+      b'InfinityCobraReminderReceiver', b'InfinityCobraDeviceBridge',
+      b'player_api.php?username=', b'get_live_streams', b'get_vod_streams', b'get_series_info',
+      b'androidx/media3/exoplayer/ExoPlayer', b'RECORDINGS', b'CONTINUE WATCHING',
+      b'cobra_custom_epg:', b'cobra-health.json', b'AUDIO / SUBS', b'CAST / ROUTE',
+      b'PictureInPictureParams', b'infinity_player_rotation',
+      b'.kodi/userdata/addon_data/service.infinity.refresh', b'preferredDisplayModeId',
+      b'fold-cover', b'fold-inner', b'multiview-start', b'multiview-stop', b'player-close'
+    )
+    missing=[needle for needle in required if needle not in joined]
+    if missing:
+        print('Candidate 2 post-build diagnostic: compiled DEX tokens not found:')
+        for needle in missing:
+            print('  -', needle.decode('utf-8', 'replace'))
+    for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
+        assert forbidden not in joined, forbidden
+    native_sha=hashlib.sha256(native).hexdigest()
+
+receipt=json.loads(Path('engine/gui-render-hardening-source.json').read_text())
+# v3 schema is authoritative here.
+assert receipt['schema'] == 3
+assert receipt['gui_font_cache_hardened'] is True
+assert receipt['renderer_changed'] is True
+assert receipt['android_resize_hardened'] is True
+assert receipt['render_thread_cache_invalidation'] is True
+assert receipt['post_playback_cache_invalidation'] is True
+assert receipt['protected_geometry_bridge_owner'] == 'xbmc/platform/android/activity/InfinityBridgeState.h'
+assert receipt['protected_geometry_bridge_rewritten'] is False
+checks=receipt['checks']
+for key in (
+  'vertex_assignment_releases_old_buffer','vertex_assignment_assert_removed','font_flush_api',
+  'manager_atomic_defer','manager_render_flush','android_callbacks_request_only',
+  'no_direct_notify_resize_from_callbacks','render_loop_consumes_invalidation',
+  'render_system_ready_gate','positive_geometry_runtime_gate','stale_request_runtime_gate',
+  'commit_occurs_in_render_path','pre_resize_font_flush','positive_size_pack_rejects_invalid',
+  'duplicate_requested_size_rejected','geometry_requires_engine_surface_pending',
+  'generation_current_check_exists','commit_after_accept_api_exists','retry_api_exists'):
+    assert checks[key] is True, key
+
+Path('engine/live-app-shell-engine.json').write_text(json.dumps({
+  'schema':2,
+  'bridge_version':5,
+  'platform_hook_api':2,
+  'audio_policy_api':1,
+  'player_rotation_api':1,
+  'infinity_live_api':3,
+  'cobra_runtime_api':2,
+  'cobra_device_parity_api':1,
+  'version_code':2103134,
+  'version_name':'1.0.9-Cobra-Full-Feature-Candidate-2',
+  'engine_apk':str(apk),
+  'engine_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+  'native_lib_sha256':native_sha,
+  'dex_sha256':dex,
+  'renderer_hardening_schema':receipt['schema'],
+  'renderer_changed':receipt['renderer_changed'],
+  'android_resize_hardened':receipt['android_resize_hardened'],
+  'protected_geometry_bridge_owner':receipt['protected_geometry_bridge_owner'],
+  'protected_geometry_bridge_rewritten':receipt['protected_geometry_bridge_rewritten'],
+  'post_build_dex_token_probe':'diagnostic-only'
+},indent=2,sort_keys=True)+'\n')
 PY
 
 mkdir -p candidate
