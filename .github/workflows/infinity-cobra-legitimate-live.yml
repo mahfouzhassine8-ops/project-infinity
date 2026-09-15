@@ -22,7 +22,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: infinity-cobra-legitimate-live-${{ github.ref }}
+  group: infinity-cobra-legitimate-full-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
