@@ -1,22 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
-
-# Candidate 2 preflight already recreated and verified the exact Infinity + Cobra
-# source lineage in ./kodi. Keep that tree and add the build-stage renderer v3
-# hardening exactly once before the native cook.
 cd "$GITHUB_WORKSPACE"
 python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py scripts/infinity_gui_render_hardening_v3.py
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
-  echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2
-  exit 1
-}
-python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi \
-  --receipt engine/gui-render-hardening-source.json
+grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || { echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2; exit 1; }
+python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json
 python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
-
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
 grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
 grep -Fq 'ConsumeRenderCacheFlushRequest()' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
@@ -26,20 +16,13 @@ grep -Fq 'state.IsCurrent(request)' kodi/xbmc/windowing/android/WinSystemAndroid
 grep -Fq 'state.CommitGeometry(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 ! grep -Fq 'assert(bufferHandle == 0);' kodi/xbmc/guilib/GUIFontCache.h
-
-# Build the same preflight-prepared source tree. Resetting ./kodi here destroys
-# the ordered version lineage required by AppShell / single-app / Cobra layers.
 cd kodi/tools/depends
 ./bootstrap
-./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
-  --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
-  --prefix="$DEPENDS" --enable-debug=yes
-
+./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
 rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz" "$TARBALLS/fontconfig-2.14.0.tar.xz.sha512"
 make -C target/fontconfig FULL_URL=https://gstreamer.freedesktop.org/data/src/mirror/fontconfig-2.14.0.tar.xz download
 make -j"$(nproc)"
 make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
-
 cd "$GITHUB_WORKSPACE"
 CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
 test -x "$CMAKE_BIN"
@@ -47,20 +30,15 @@ test -x "$CMAKE_BIN"
 python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
 make -C "$BUILD_DIR" -j"$(nproc)"
 make -C "$BUILD_DIR" apk -j"$(nproc)"
-
 APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
 test -n "$APK"
 BASE=engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk
 cp "$APK" "$BASE"
-
-python3 scripts/infinity71.py record-engine \
-  --apk "$BASE" --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
-
+python3 scripts/infinity71.py record-engine --apk "$BASE" --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$BASE" | tee engine/base-badging.txt
 grep -q "package: name='com.projectinfinity.kodi' versionCode='2103134' versionName='1.0.9-Cobra-Full-Feature-Candidate-2'" engine/base-badging.txt
 grep -q "application-label:'Infinity'" engine/base-badging.txt
 test "$(grep -c '^launchable-activity:' engine/base-badging.txt)" -eq 1
-
 python3 - <<'PY'
 import hashlib, json, re, zipfile
 from pathlib import Path
@@ -82,10 +60,8 @@ assert receipt['render_thread_cache_invalidation'] is True
 assert receipt['post_playback_cache_invalidation'] is True
 assert receipt['protected_geometry_bridge_owner']=='xbmc/platform/android/activity/InfinityBridgeState.h'
 assert receipt['protected_geometry_bridge_rewritten'] is False
-checks=receipt['checks']
-for key in ('vertex_assignment_releases_old_buffer','vertex_assignment_assert_removed','font_flush_api','manager_atomic_defer','manager_render_flush','android_callbacks_request_only','no_direct_notify_resize_from_callbacks','render_loop_consumes_invalidation','render_system_ready_gate','positive_geometry_runtime_gate','stale_request_runtime_gate','commit_occurs_in_render_path','pre_resize_font_flush','positive_size_pack_rejects_invalid','duplicate_requested_size_rejected','geometry_requires_engine_surface_pending','generation_current_check_exists','commit_after_accept_api_exists','retry_api_exists'): assert checks[key] is True, key
+for key in ('vertex_assignment_releases_old_buffer','vertex_assignment_assert_removed','font_flush_api','manager_atomic_defer','manager_render_flush','android_callbacks_request_only','no_direct_notify_resize_from_callbacks','render_loop_consumes_invalidation','render_system_ready_gate','positive_geometry_runtime_gate','stale_request_runtime_gate','commit_occurs_in_render_path','pre_resize_font_flush','positive_size_pack_rejects_invalid','duplicate_requested_size_rejected','geometry_requires_engine_surface_pending','generation_current_check_exists','commit_after_accept_api_exists','retry_api_exists'): assert receipt['checks'][key] is True, key
 Path('engine/live-app-shell-engine.json').write_text(json.dumps({'schema':2,'bridge_version':5,'platform_hook_api':2,'audio_policy_api':1,'player_rotation_api':1,'infinity_live_api':3,'cobra_runtime_api':2,'cobra_device_parity_api':1,'version_code':2103134,'version_name':'1.0.9-Cobra-Full-Feature-Candidate-2','engine_apk':str(apk),'engine_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'native_lib_sha256':native_sha,'dex_sha256':dex,'renderer_hardening_schema':receipt['schema'],'renderer_changed':receipt['renderer_changed'],'android_resize_hardened':receipt['android_resize_hardened'],'protected_geometry_bridge_owner':receipt['protected_geometry_bridge_owner'],'protected_geometry_bridge_rewritten':receipt['protected_geometry_bridge_rewritten'],'post_build_dex_contract':'authoritative'},indent=2,sort_keys=True)+'\n')
 PY
-
 mkdir -p candidate
 cp "$BASE" candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-base.apk
