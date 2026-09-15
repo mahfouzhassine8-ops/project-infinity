@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Candidate 2 GUI/render hardening driver for the audited Infinity Android source lineage.
 
-This wraps infinity_gui_render_hardening.py and supplies the WinSystemAndroid transform that matches
-Infinity's already-audited SetEngineReady(false) DestroyWindow contract. All other hardening and
-verification is delegated to the base transform.
+This wraps infinity_gui_render_hardening.py and supplies the Android bridge/window transforms that
+match Infinity's already-audited geometry and SetEngineReady(false) contracts. All other hardening
+and verification is delegated to the base transform.
 """
 from __future__ import annotations
 
@@ -17,6 +17,19 @@ if spec is None or spec.loader is None:
     raise RuntimeError(f"cannot load {BASE}")
 base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
+
+
+def patch_xbmc_app_h(path: Path) -> None:
+    """Add committed-size dedupe without assuming the surrounding audited formatting."""
+    text = path.read_text(encoding="utf-8")
+    if "m_committed.size == size && m_committed.generation == m_generation" in text:
+        raise RuntimeError("Infinity committed-size dedupe already present unexpectedly")
+    anchor = '''    m_requested = {size, m_generation, ++m_sequence};\n'''
+    insert = '''    // Reject duplicate geometry that is already committed for the current surface generation.\n    if (m_committed.size == size && m_committed.generation == m_generation)\n    {\n      m_pending = false;\n      return;\n    }\n'''
+    path.write_text(
+        base.replace_once(text, anchor, insert + anchor, "Infinity committed-size dedupe anchor"),
+        encoding="utf-8",
+    )
 
 
 def patch_win_system(path: Path) -> None:
@@ -48,8 +61,9 @@ def patch_win_system(path: Path) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-# The base apply() resolves patch_win_system through its module globals, so override only that
-# audited-lineage-specific transform and retain every other hardening step/receipt check unchanged.
+# base.apply() resolves transforms through its module globals. Override only the two transforms whose
+# surrounding text is intentionally different in Infinity's accepted Android bridge lineage.
+base.patch_xbmc_app_h = patch_xbmc_app_h
 base.patch_win_system = patch_win_system
 
 
