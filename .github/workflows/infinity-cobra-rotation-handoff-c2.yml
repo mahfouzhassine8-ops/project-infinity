@@ -1,0 +1,135 @@
+name: Infinity 1.0.9 | Cobra Surface Rotation Handoff Candidate 2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.9-cobra-rotation-handoff-c2]
+    paths:
+      - '.github/workflows/infinity-cobra-rotation-handoff-c2.yml'
+      - 'scripts/infinity_surface_rotation_handoff.py'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-cobra-surface-rotation-handoff-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Recreate accepted Cobra Live source stack
+        run: bash scripts/infinity_live_app_ci_1.sh
+
+      - name: Apply and verify native surface rotation handoff
+        run: |
+          python3 -m py_compile scripts/infinity_surface_rotation_handoff.py
+          python3 scripts/infinity_surface_rotation_handoff.py apply \
+            --source kodi --receipt engine/rotation-handoff-source.json
+          python3 scripts/infinity_surface_rotation_handoff.py verify \
+            --source kodi --receipt preflight/rotation-handoff-verification.json
+
+      - name: Build source-backed Kodi 21.3 engine with rotation handoff
+        id: compile
+        run: bash scripts/infinity_live_app_ci_2.sh
+
+      - name: Package, sign and verify cumulative Infinity/Cobra candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: bash scripts/infinity_live_app_ci_3.sh
+
+      - name: Publish rotation-handoff test alias and focused device test
+        run: |
+          set -euo pipefail
+          SRC=candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.apk
+          OUT=candidate/Infinity-1.0.9-Cobra-Surface-Rotation-Handoff-Test-Candidate-2.apk
+          cp "$SRC" "$OUT"
+          sha256sum "$OUT" | tee candidate/Infinity-1.0.9-Cobra-Surface-Rotation-Handoff-Test-Candidate-2.sha256
+          cp engine/rotation-handoff-source.json candidate/rotation-handoff-source.json
+          cat > candidate/ROTATION-HANDOFF-DEVICE-TEST.txt <<'EOF'
+INFINITY 1.0.9 — COBRA SURFACE ROTATION HANDOFF TEST CANDIDATE 2
+
+This test intentionally preserves the installed package identity/versionCode 2103133
+so the accepted Cobra Live/Infinity application stack is otherwise unchanged.
+
+BEFORE TESTING
+1. Restore/install the exact locked Infinity skin 1.0.5.109. Do NOT test with the rejected 1.0.5.110/1.0.5.111 transition-mask experiments.
+2. Update-install this APK over the current permanently signed Infinity build.
+
+ROTATION ACCEPTANCE
+3. On Infinity Home, rotate portrait -> landscape and landscape -> portrait repeatedly.
+4. There must be no stretched old-orientation UI and no deliberate black/gradient holding screen.
+5. The correct skin profile should take ownership after two stable render-loop passes, not the old Python 0.55s debounce path.
+6. Repeat with the drawer open/closed and on cover/front and inner display geometries.
+7. Confirm focus, selected section, view mode and content position remain usable after rotation.
+
+REGRESSION
+8. Cobra Live must still launch inside the same APK and play through Media3/ExoPlayer.
+9. Infinity Movies/Shows player, Cinema, audio, PiP, AddonBrowser, FileBrowser and Install from ZIP must remain intact.
+10. Do not lock/promote until on-device rotation is accepted.
+EOF
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.compile.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.9-Cobra-Surface-Rotation-Handoff-Test-Candidate-2
+          path: |
+            candidate/Infinity-1.0.9-Cobra-Surface-Rotation-Handoff-Test-Candidate-2.apk
+            candidate/Infinity-1.0.9-Cobra-Surface-Rotation-Handoff-Test-Candidate-2.sha256
+            candidate/ROTATION-HANDOFF-DEVICE-TEST.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/manifest.txt
+            candidate/rotation-handoff-source.json
+            candidate/cobra-theme.json
+            candidate/live-app-shell-engine.json
+            candidate/player-rotation-source.json
+            candidate/cumulative-audio-source.json
+            preflight/rotation-handoff-verification.json
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90
