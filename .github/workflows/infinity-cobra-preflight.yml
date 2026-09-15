@@ -9,7 +9,7 @@ on:
       - 'scripts/infinity_1_0_9_cobra_legit.py'
       - 'scripts/cobra_provider_contract.py'
       - 'patches/infinity-cobra/**'
-      - 'addons/script.infinity.live/resources/cobra-theme.json'
+      - 'addons/script.infinity.cobra.theme/**'
       - 'tests/cobra_live/**'
 
 permissions:
@@ -65,17 +65,18 @@ jobs:
           from pathlib import Path
           java = Path('patches/infinity-cobra/InfinityLiveActivity.java.in').read_text()
           patcher = Path('scripts/infinity_1_0_9_cobra_legit.py').read_text()
-          theme = json.loads(Path('addons/script.infinity.live/resources/cobra-theme.json').read_text())
+          theme = json.loads(Path('addons/script.infinity.cobra.theme/resources/cobra-theme.json').read_text())
           required = [
             'player_api.php?username=', 'get_live_categories', 'get_live_streams',
             '/xmltv.php?username=', 'new ExoPlayer.Builder', 'openMultiView',
             'COBRA • LIVE TV', 'Stream could not play',
-            '.kodi/addons/script.infinity.live/resources/cobra-theme.json'
+            '.kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json'
           ]
           for token in required:
             assert token in java, token
           assert 'android:usesCleartextTraffic="true"' in patcher
           assert 'one_android_launcher' in patcher
+          assert 'ProgramPair pair = guide.get(channel);' in patcher
           assert theme['schema'] == 1
-          print('PASS: legitimate provider + playback + Cobra UI + fast-theme contracts present')
+          print('PASS: provider + playback + Cobra UI + fast-theme contracts present')
           PY
