@@ -28,7 +28,8 @@ def contained_files(root, extensions):
 
 
 def make_report(destination, skin_root, skin_id, settings=None, health_root=None,
-                native_roots=(), include_native_traces=False, logcat_root=None, logcat_status=None):
+                native_roots=(), include_native_traces=False, logcat_root=None, logcat_status=None,
+                runtime_snapshot=None, refresh_files=()):
     destination = Path(destination)
     skin_root = Path(skin_root)
     if destination.exists():
@@ -79,6 +80,19 @@ def make_report(destination, skin_root, skin_id, settings=None, health_root=None
             # media files, databases or user addon settings.
             for path in contained_files(skin_root, {'.xml'}):
                 add(path, 'active-skin/' + path.relative_to(skin_root).as_posix())
+            for contract in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
+                path = skin_root / contract
+                if path.is_file() and not path.is_symlink():
+                    add(path, 'active-skin/' + contract)
+            if runtime_snapshot is not None:
+                data = json.dumps(runtime_snapshot, indent=2, sort_keys=True).encode('utf-8')
+                archive.writestr('runtime/infinity-runtime.json', data)
+                seen.add('runtime/infinity-runtime.json'); total += len(data)
+                receipt['included'].append({'file':'runtime/infinity-runtime.json','bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+            for path, name in refresh_files:
+                path = Path(path)
+                if path.is_file() and not path.is_symlink():
+                    add(path, 'runtime/' + name)
             if health_root is not None:
                 health_root = Path(health_root)
                 for path in contained_files(health_root, {'.py', '.xml'}):
