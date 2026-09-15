@@ -18,6 +18,7 @@ RELEASE = full.RELEASE
 VERSION_CODE = full.VERSION_CODE
 _ORIGINAL_INSERT_AFTER = full.insert_after
 _ORIGINAL_FIXUP_REPLACE_ONCE = fixups.replace_once
+_ORIGINAL_FIXUP_REPLACE_BETWEEN = fixups.replace_between
 
 
 def candidate2_insert_after(text: str, anchor: str, addition: str, label: str) -> str:
@@ -61,19 +62,47 @@ def candidate2_fixup_replace_once(text: str, old: str, new: str, label: str) -> 
     return text.replace(target, replacement, 1)
 
 
-def _install_safe_guards() -> tuple[object, object]:
+def candidate2_fixup_replace_between(
+    text: str, start: str, end: str, replacement: str, label: str
+) -> str:
+    if label != "continue watching catalogue":
+        return _ORIGINAL_FIXUP_REPLACE_BETWEEN(text, start, end, replacement, label)
+    a = text.find(start)
+    if a < 0:
+        raise RuntimeError(f"{label}: start marker missing")
+    b = text.find(end, a + len(start))
+    if b < 0:
+        raise RuntimeError(f"{label}: end marker missing")
+    # The original fixup supplied the end marker in replacement and the generic
+    # helper also preserves it from text[b:], which would duplicate the method
+    # declaration. Keep exactly one declaration.
+    if replacement.endswith(end):
+        replacement = replacement[:-len(end)]
+    return text[:a] + replacement + text[b:]
+
+
+def _install_safe_guards() -> tuple[object, object, object]:
     previous_insert = full.insert_after
     previous_replace = fixups.replace_once
+    previous_between = fixups.replace_between
     full.insert_after = candidate2_insert_after
     fixups.replace_once = candidate2_fixup_replace_once
-    return previous_insert, previous_replace
+    fixups.replace_between = candidate2_fixup_replace_between
+    return previous_insert, previous_replace, previous_between
 
 
-def _restore_safe_guards(previous: tuple[object, object]) -> None:
-    full.insert_after, fixups.replace_once = previous
+def _restore_safe_guards(previous: tuple[object, object, object]) -> None:
+    full.insert_after, fixups.replace_once, fixups.replace_between = previous
 
 
 def transform_for_fast_test(java: str) -> str:
+    # Candidate 1's source phase corrects this XMLTV accumulator before the
+    # Candidate 2 transform runs. Mirror that accepted baseline in the fast test.
+    java = java.replace(
+        "ProgramPair pair = mGuide.get(channel);",
+        "ProgramPair pair = guide.get(channel);",
+        1,
+    )
     previous = _install_safe_guards()
     try:
         return fixups.harden_activity(full.patch_activity(java))
