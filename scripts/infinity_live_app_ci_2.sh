@@ -5,7 +5,8 @@ mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
 
 # Candidate 2 preflight already recreated and verified the exact Infinity + Cobra
 # source lineage in ./kodi. Do not replace that tree with stock Kodi here.
-# Re-verify the accepted renderer hardening before the native cook.
+# Renderer v3 was already applied in preflight; verify it here without reapplying
+# to avoid exact-once transform failures.
 cd "$GITHUB_WORKSPACE"
 python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py scripts/infinity_gui_render_hardening_v3.py
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
@@ -13,8 +14,6 @@ grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
   echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2
   exit 1
 }
-python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi \
-  --receipt engine/gui-render-hardening-source.json
 python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
 
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
