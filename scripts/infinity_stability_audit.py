@@ -167,12 +167,12 @@ def scan_legacy_contracts(root: Path, issues):
     legacy_test = root / "tests" / "infinity_compat" / "test_candidate_107.py"
     if legacy_test.exists():
         text = legacy_test.read_text(encoding="utf-8", errors="ignore")
-        if "ensure_player_files(" in text:
+        if "compat_runtime.ensure_player_files(" in text or "compat_runtime.ensure_theme_files(" in text:
             issue(
                 issues,
                 "blocker",
                 "LEGACY_TEST_EXPECTATION",
-                "tests/infinity_compat/test_candidate_107.py still asserts player-file mutation behavior that conflicts with the 0.8.0 clean-core target",
+                "tests/infinity_compat/test_candidate_107.py still invokes legacy file-mutation behavior that conflicts with the clean-core Compat contract",
             )
 
     support_test = root / "tests" / "infinity_compat" / "test_support.py"
@@ -181,7 +181,7 @@ def scan_legacy_contracts(root: Path, issues):
             issues,
             "warning",
             "SUPPORT_TEST_LEGACY_FIXTURE",
-            "Support Exporter tests still use skin.xenon2 fixtures; canonical 0.3.0/current-skin coverage is required",
+            "Support Exporter tests still use skin.xenon2 fixtures; current-skin 0.3.1 coverage is required",
         )
 
 
