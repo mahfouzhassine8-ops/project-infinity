@@ -174,7 +174,11 @@ class CobraSourceTemplateTests(unittest.TestCase):
             'addons/script.infinity.cobra.theme/resources/cobra-theme.json',
             self.patcher,
         )
-        self.assertEqual(self.theme["schema"], 1)
+        # Candidate 1 established schema 1; Candidate 2 intentionally extends
+        # the same fast-theme contract to schema 2. The baseline live suite
+        # verifies backwards-compatible core tokens while the Candidate 2 suite
+        # separately requires schema 2 and its new touch/motion fields.
+        self.assertIn(self.theme["schema"], (1, 2))
         self.assertRegex(self.theme["accent"], r"^#[0-9A-Fa-f]{6}$")
         self.assertGreaterEqual(self.theme["row_height"], 48)
 
