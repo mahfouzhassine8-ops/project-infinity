@@ -12,11 +12,11 @@ owned by its own Java source and reached through InfinityCobraFeatureRuntime.
 The runner preserves the strict manifest/install/helper verification and uses a
 temporary, non-shipping linkage marker only while the original verifier runs.
 
-Device testing also exposed two UI contract issues in the Candidate 1 lineage:
-portrait used a horizontal-layout channel pane width of zero, making the channel
-list invisible even though category buttons visibly pressed; and Multi-View was
-shown as a top-level rail destination even though it is a playback action. The
-runner corrects both after the feature transforms and verifies those contracts.
+Device testing exposed a portrait channel-pane width bug and showed Multi-View
+belongs inside playback rather than the main rail. The final post-transform pass
+also joins Cobra to Infinity's accepted Android fold/PiP, player-rotation and
+adaptive-refresh contracts. Those device-level checks intentionally run only
+after the strict Candidate 2 source transform is complete.
 """
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ from pathlib import Path
 
 import infinity_1_0_9_cobra_full as full
 import infinity_1_0_9_cobra_full_fixups as fixups
+import infinity_1_0_9_cobra_device_parity as device
 
 RELEASE = full.RELEASE
 VERSION_CODE = full.VERSION_CODE
@@ -140,20 +141,17 @@ def verify_device_ui(java: str) -> None:
 
 
 def candidate2_verify_source(source: Path) -> None:
-    """Run the original strict verifier without weakening service ownership.
+    """Run only the original strict verifier during nested source transforms.
 
-    The original verifier correctly proves the recording service exists in the
-    manifest, Install.cmake and its own Java template before it reaches the live
-    Activity token list. The Activity itself intentionally talks to
-    InfinityCobraFeatureRuntime rather than naming the service class directly.
-    Add that one linkage token only for the duration of verification, then put
-    the source bytes back exactly as they were. This lets every later original
-    verification check (theme boundary, forbidden owners, health redaction)
-    continue to run unchanged.
+    Post-transform UI/fold/PiP checks must not run here: full.source_phase calls
+    this verifier before the runner has had a chance to apply those final layers.
+    The original verifier already proves the recording service exists in the
+    manifest, Install.cmake and its own Java template. A temporary non-shipping
+    linkage marker satisfies its historical Activity token check, then the exact
+    source bytes are restored.
     """
     live = source.resolve() / full.LIVE_ACTIVITY
     java = live.read_text(encoding="utf-8")
-    verify_device_ui(java)
     if "InfinityCobraRecordingService" in java:
         _ORIGINAL_VERIFY_SOURCE(source)
         return
@@ -199,7 +197,9 @@ def transform_for_fast_test(java: str) -> str:
     try:
         java = fixups.harden_activity(full.patch_activity(java))
         java = polish_device_ui(java)
+        java = device.patch_activity(java)
         verify_device_ui(java)
+        device.verify_activity(java)
         return java
     finally:
         _restore_safe_guards(previous)
@@ -208,12 +208,23 @@ def transform_for_fast_test(java: str) -> str:
 def source_phase(source: Path, receipt: Path) -> None:
     previous = _install_safe_guards()
     try:
+        # First complete every strict Candidate 2 feature/source verifier.
         fixups.source_phase(source, receipt)
+
+        # Only then apply device/UI corrections that depend on the final Java.
         live = source.resolve() / full.LIVE_ACTIVITY
         java = polish_device_ui(live.read_text(encoding="utf-8"))
-        verify_device_ui(java)
         live.write_text(java, encoding="utf-8")
+        device.apply_source(source, receipt)
+
+        final_java = live.read_text(encoding="utf-8")
+        verify_device_ui(final_java)
+        device.verify_activity(final_java)
+
+        # Re-run all original Candidate 2 contracts over the final source plus
+        # the new device-parity contract before native compilation starts.
         fixups.verify_source(source)
+        device.verify_source(source)
     finally:
         _restore_safe_guards(previous)
 
@@ -222,6 +233,9 @@ def verify_source(source: Path) -> None:
     previous = _install_safe_guards()
     try:
         fixups.verify_source(source)
+        java = (source.resolve() / full.LIVE_ACTIVITY).read_text(encoding="utf-8")
+        verify_device_ui(java)
+        device.verify_source(source)
     finally:
         _restore_safe_guards(previous)
 
@@ -245,7 +259,7 @@ def main() -> None:
         source_phase(args.source, args.receipt)
     elif args.cmd == "verify-source":
         verify_source(args.source)
-        print("PASS: Cobra Candidate 2 safe source + device UI verification")
+        print("PASS: Cobra Candidate 2 safe source + fold/PiP device parity verification")
     elif args.cmd == "apk":
         fixups.configure_deep()
         import infinity_1_0_8_deep_rebrand as deep
