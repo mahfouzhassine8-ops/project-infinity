@@ -15,6 +15,7 @@ on:
       - 'scripts/cobra_provider_contract.py'
       - 'scripts/package_cobra_theme.py'
       - 'scripts/infinity_touch_startup_guard.py'
+      - 'scripts/infinity_gui_render_hardening.py'
       - 'scripts/infinity_upper_layer_repack.py'
       - 'patches/infinity-cobra/**'
       - 'patches/infinity-cobra-v2/**'
@@ -113,6 +114,7 @@ jobs:
             candidate/deep-audio-rebrand-source.json
             candidate/FEATURE-CONTRACT.md
             candidate/DEVICE-TEST.txt
+            engine/gui-render-hardening-source.json
             engine/base-badging.txt
             preflight/
           if-no-files-found: warn
