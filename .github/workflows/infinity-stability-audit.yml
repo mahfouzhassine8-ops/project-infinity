@@ -29,10 +29,26 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Verify accepted Live source lineage is reachable
+        shell: bash
+        run: |
+          set -euo pipefail
+          LIVE_COMMIT='cb9769bd77d6ca040b07435f569e9c5887d033d9'
+          git cat-file -e "${LIVE_COMMIT}^{commit}"
+          git show "${LIVE_COMMIT}:addons/script.infinity.live/addon.xml" | grep -F 'version="0.1.12"'
+
+      - name: Run Compat Guard clean-core regression tests
+        run: python3 -m unittest discover -s tests/infinity_compat -p 'test_candidate_107.py' -v
+
+      - name: Run Support Exporter safety regression tests
+        run: python3 -m unittest discover -s tests/infinity_compat -p 'test_support.py' -v
 
       - name: Run fast whole-stack inventory audit
         run: python3 scripts/infinity_stability_audit.py --report stability-report.json
