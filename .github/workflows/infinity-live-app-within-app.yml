@@ -1,24 +1,28 @@
-name: Infinity 1.0.9 | 2-in-1 Single App Candidate 2
+name: Infinity 1.0.9 | Cobra Legitimate Live Candidate 1
 
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-live-app-within-app]
+    branches: [infinity-cobra-legitimate-live]
     paths:
       - '.github/workflows/infinity-live-app-within-app.yml'
       - 'scripts/infinity_live_app_ci_*.sh'
-      - 'scripts/infinity_1_0_9_live_app_shell.py'
+      - 'scripts/infinity_1_0_9_cobra_legit.py'
       - 'scripts/infinity_1_0_9_single_app.py'
+      - 'scripts/infinity_1_0_9_live_app_shell.py'
+      - 'scripts/cobra_provider_contract.py'
       - 'scripts/infinity_touch_startup_guard.py'
       - 'scripts/infinity_upper_layer_repack.py'
-      - 'addons/script.infinity.live/**'
+      - 'patches/infinity-cobra/**'
+      - 'addons/script.infinity.cobra.theme/**'
+      - 'tests/cobra_live/**'
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: infinity-live-app-within-app-${{ github.ref }}
+  group: infinity-cobra-legitimate-live-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -55,14 +59,14 @@ jobs:
             infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
             infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
 
-      - name: Preflight one-app Infinity + Cobra contract
+      - name: Preflight one-app Cobra provider, playback and UI contracts
         run: bash scripts/infinity_live_app_ci_1.sh
 
-      - name: Build source-backed Kodi 21.3 + internal Cobra Activity
+      - name: Build source-backed Kodi 21.3 + legitimate Cobra Live runtime
         id: compile
         run: bash scripts/infinity_live_app_ci_2.sh
 
-      - name: Package, sign and verify Infinity 2-in-1 single app
+      - name: Package, sign and verify legitimate Infinity Cobra candidate
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -82,13 +86,14 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-1.0.9-2in1-SingleApp-Candidate-2
+          name: Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1
           path: |
-            candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.apk
-            candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.sha256
+            candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.apk
+            candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.sha256
             candidate/signing-verification.txt
             candidate/badging.txt
             candidate/manifest.txt
+            candidate/cobra-theme.json
             candidate/live-app-shell-branding-apk.json
             candidate/live-app-shell-source.json
             candidate/live-app-shell-engine.json
