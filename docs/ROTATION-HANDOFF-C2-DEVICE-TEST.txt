@@ -1,0 +1,19 @@
+INFINITY 1.0.9 — COBRA SURFACE ROTATION HANDOFF TEST CANDIDATE 2
+
+This test intentionally preserves the installed package identity/versionCode 2103133 so the accepted Cobra Live/Infinity application stack is otherwise unchanged.
+
+BEFORE TESTING
+1. Restore/install the exact locked Infinity skin 1.0.5.109. Do NOT test with the rejected 1.0.5.110/1.0.5.111 transition-mask experiments.
+2. Update-install this APK over the current permanently signed Infinity build.
+
+ROTATION ACCEPTANCE
+3. On Infinity Home, rotate portrait -> landscape and landscape -> portrait repeatedly.
+4. There must be no stretched old-orientation UI and no deliberate black/gradient holding screen.
+5. The correct skin profile should take ownership after two stable render-loop passes, not the old Python 0.55s debounce path.
+6. Repeat with the drawer open/closed and on cover/front and inner display geometries.
+7. Confirm focus, selected section, view mode and content position remain usable after rotation.
+
+REGRESSION
+8. Cobra Live must still launch inside the same APK and play through Media3/ExoPlayer.
+9. Infinity Movies/Shows player, Cinema, audio, PiP, AddonBrowser, FileBrowser and Install from ZIP must remain intact.
+10. Do not lock/promote until on-device rotation is accepted.
