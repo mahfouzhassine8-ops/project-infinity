@@ -1,4 +1,4 @@
-"""Manual support export. Never runs in the background or edits an add-on."""
+"""Manual Infinity support/export utility. Never runs in the background or edits an add-on."""
 from datetime import datetime
 from pathlib import Path
 import json
@@ -18,26 +18,66 @@ TITLE = 'Infinity Support Exporter'
 def selected_appearance():
     result = {}
     for key in ('lookandfeel.skin', 'lookandfeel.font', 'lookandfeel.skincolors', 'lookandfeel.skintheme'):
-        reply = json.loads(xbmc.executeJSONRPC(json.dumps({
-            'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.GetSettingValue',
-            'params': {'setting': key}})))
-        if 'result' in reply:
-            result[key] = reply['result'].get('value')
+        try:
+            reply = json.loads(xbmc.executeJSONRPC(json.dumps({
+                'jsonrpc': '2.0', 'id': 1, 'method': 'Settings.GetSettingValue',
+                'params': {'setting': key}})))
+            if 'result' in reply:
+                result[key] = reply['result'].get('value')
+        except Exception:
+            pass
     return result
 
 
-def export(dialog):
-    destination = dialog.browseSingle(0, 'Choose a folder to save the report', 'files')
+def choose_destination(dialog, prompt):
+    return dialog.browseSingle(0, prompt, 'files')
+
+
+def copy_out(dialog, local, destination, name, success_message):
+    target = destination.rstrip('/\\') + '/' + name
+    if not xbmcvfs.copy(str(local), target) or not xbmcvfs.exists(target):
+        dialog.ok(TITLE, 'Archive created, but the chosen folder was not writable. Local copy:\n' + str(local))
+        return
+    try:
+        if xbmcvfs.Stat(target).st_size() != local.stat().st_size:
+            raise RuntimeError('Destination archive is incomplete; original kept in exporter profile')
+    except Exception:
+        raise
+    if str(local) != target:
+        local.unlink()
+    dialog.ok(TITLE, success_message + '\n' + target)
+
+
+def infinity_runtime_snapshot():
+    home = xbmcgui.Window(10000)
+    keys = (
+        'Infinity.CommandCenter.Version','Infinity.BridgeVersion','Infinity.NativeDeviceMode','Infinity.NativeLayout','Infinity.NativeOrientation',
+        'Infinity.NativeWidthDp','Infinity.NativeHeightDp','Infinity.NativeFoldHint','Infinity.EffectiveDeviceMode','Infinity.EffectiveLayout',
+        'Infinity.EffectiveOrientation','Infinity.EffectiveViewMode','Infinity.EffectivePaneMode','Infinity.SafeAreaClass','Infinity.RefreshUserMode',
+        'Infinity.RefreshMaxHz','Infinity.RefreshHookActive','Infinity.RefreshRequestedHz','Infinity.RefreshActiveHz','Infinity.RefreshGranted',
+        'Infinity.RefreshStatus','Infinity.RefreshBatterySaver','Infinity.RefreshThermalLimited','Infinity.RefreshSummary','Infinity.MotionModeUser',
+        'Infinity.MotionModeEffective','Infinity.UIFrameBudgetMs','Infinity.BaselineIntegrityStatus','Infinity.BaselineMismatchCount','Infinity.UIHealth.Status'
+    )
+    result = {'schema':1,'home_properties':{}}
+    for key in keys:
+        try:
+            result['home_properties'][key] = home.getProperty(key)[:200]
+        except Exception:
+            pass
+    result['skin_string_home_view'] = xbmc.getInfoLabel('Skin.String(Infinity.HomeView)')[:80]
+    return result
+
+
+def export_support_report(dialog):
+    destination = choose_destination(dialog, 'Choose a folder to save the support report')
     if not destination:
         return
-    # getSkinDir is the add-on ID. System.SkinTheme is NOT the active skin ID.
     skin_id = xbmc.getSkinDir()
     skin = xbmcaddon.Addon(skin_id)
     skin_root = Path(xbmcvfs.translatePath(skin.getAddonInfo('path')))
     health_root = None
     try:
-        health_root = Path(xbmcvfs.translatePath(
-            xbmcaddon.Addon('script.kodihealthcenter').getAddonInfo('path')))
+        health_root = Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.kodihealthcenter').getAddonInfo('path')))
     except RuntimeError:
         pass
     native_roots = [Path(xbmcvfs.translatePath('special://temp/infinity-native-diagnostics'))]
@@ -49,6 +89,7 @@ def export(dialog):
     include_traces = (has_traces or android_logcat) and dialog.yesno(TITLE,
         'Also try to collect Android crash evidence visible to this app? '
         'It may be unavailable and may contain private data. Nothing is uploaded automatically.')
+
     profile = Path(xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile')))
     reports = profile / 'reports'
     reports.mkdir(parents=True, exist_ok=True)
@@ -56,36 +97,33 @@ def export(dialog):
     local = reports / name
     with tempfile.TemporaryDirectory(prefix='capture-', dir=str(reports)) as capture:
         logcat_status = collect_logcat(capture) if include_traces else {'status': 'not_requested'}
+        refresh_root = Path(xbmcvfs.translatePath('special://profile/addon_data/service.infinity.refresh'))
+        refresh_files = [(refresh_root / 'policy.properties', 'refresh-policy.properties'),
+                         (refresh_root / 'runtime.properties', 'refresh-runtime.properties')]
         receipt = make_report(local, skin_root, skin_id, selected_appearance(), health_root,
-                              native_roots, include_traces, capture, logcat_status)
-    target = destination.rstrip('/\\') + '/' + name
-    if not xbmcvfs.copy(str(local), target) or not xbmcvfs.exists(target):
-        dialog.ok(TITLE, 'Report created, but the chosen folder was not writable. Local copy:\n' + str(local))
-        return
-    if xbmcvfs.Stat(target).st_size() != local.stat().st_size:
-        raise RuntimeError('Destination report is incomplete; original kept in exporter profile')
-    # A successfully exported copy means a second local copy is unnecessary.
-    if str(local) != target:
-        local.unlink()
-    message = 'Saved ' + skin_id + ' report:\n' + target
+                              native_roots, include_traces, capture, logcat_status,
+                              infinity_runtime_snapshot(), refresh_files)
+    message = 'Saved ' + skin_id + ' support report.'
     if receipt['omitted']:
         message += '\nSome files were omitted; report.json lists them.'
     if not receipt['native_evidence_present']:
         message += '\nNo Android crash evidence was available. Skin report is still useful.'
-    dialog.ok(TITLE, message)
+    copy_out(dialog, local, destination, name, message)
 
 
 def main():
     dialog = xbmcgui.Dialog()
-    if not dialog.yesno(TITLE,
-            'Create a small report of the active skin XML, appearance choices, and Health Center code? '
-            'Account settings folders, media, and full Kodi logs are excluded. '
-            'Skin/source files may contain embedded URLs. Review before sharing. Nothing is uploaded.'):
-        return
+    choice = dialog.select(TITLE, [
+        'Create Infinity support report',
+        'Cancel'])
     try:
-        export(dialog)
+        if choice == 0:
+            if dialog.yesno(TITLE,
+                    'Create a small report of the active skin XML, appearance choices, and Health Center code? '
+                    'Account settings folders, media, and full Kodi logs are excluded. Nothing is uploaded.'):
+                export_support_report(dialog)
     except Exception as error:
-        xbmc.log('[InfinitySupport] Export failed: ' + type(error).__name__, xbmc.LOGERROR)
+        xbmc.log('[InfinitySupport] Export failed: ' + type(error).__name__ + ': ' + str(error), xbmc.LOGERROR)
         dialog.ok(TITLE, 'Export did not finish: ' + type(error).__name__ + '. Your setup was not changed.')
 
 
