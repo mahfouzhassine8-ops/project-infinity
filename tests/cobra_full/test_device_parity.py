@@ -25,7 +25,24 @@ class CobraDeviceParityTests(unittest.TestCase):
             "onUserLeaveHint",
             "onPictureInPictureModeChanged",
             "setAutoEnterEnabled",
+            "setSeamlessResizeEnabled",
             "pauseCobraForBackground",
+            "resumeCobraAfterBackground",
+        ):
+            self.assertIn(token, self.java)
+
+    def test_pip_failure_never_leaves_ghost_audio(self):
+        self.assertIn("boolean entered = params != null && enterPictureInPictureMode(params);", self.java)
+        self.assertIn("if (!entered) pauseCobraForBackground();", self.java)
+        self.assertIn("if (!isCobraInPictureInPicture() && hasCobraVideo()) pauseCobraForBackground();", self.java)
+        self.assertIn("mPausedForBackground", self.java)
+
+    def test_multiview_pip_collapses_to_audio_owner(self):
+        for token in (
+            "int owner = Math.max(0, Math.min(mAudioTile, mMultiChannels.length - 1));",
+            "Channel selected = mMultiChannels[owner];",
+            "releaseMulti();",
+            "if (selected != null) playChannel(selected);",
         ):
             self.assertIn(token, self.java)
 
@@ -35,12 +52,21 @@ class CobraDeviceParityTests(unittest.TestCase):
             "onMultiWindowModeChanged",
             "mRebuildShellAfterPlayer",
             "mReflowingMulti",
+            "mPlayerOverlay.requestLayout()",
             "widthDp < 600",
             "widthDp >= 600 && widthDp < 840",
         ):
             self.assertIn(token, self.java)
         for token in ("android.hardware.sensor.hinge_angle", "fold-cover", "fold-inner"):
             self.assertIn(token, self.bridge)
+
+    def test_fold_reflow_preserves_multiview_audio_owner(self):
+        for token in (
+            "int owner = mAudioTile;",
+            "openMultiView(snapshot);",
+            "setMultiAudio(Math.min(owner, snapshot.size() - 1));",
+        ):
+            self.assertIn(token, self.java)
 
     def test_infinity_rotation_and_refresh_policy_are_shared(self):
         for token in (
@@ -49,6 +75,9 @@ class CobraDeviceParityTests(unittest.TestCase):
             ".kodi/userdata/addon_data/service.infinity.refresh",
             "preferredDisplayModeId",
             "yield-to-video",
+            "respectBatterySaver",
+            "thermalProtection",
+            "constrainedWindow()",
             'props.setProperty("owner", "cobra")',
         ):
             self.assertIn(token, self.bridge)
@@ -56,6 +85,7 @@ class CobraDeviceParityTests(unittest.TestCase):
     def test_multiview_controls_are_transient_not_permanent_top_bar(self):
         self.assertIn("mMultiChrome", self.java)
         self.assertIn("showMultiChromeTemporarily", self.java)
+        self.assertIn("mMain.postDelayed(mHideMultiChrome, 3200L);", self.java)
         self.assertIn("Gravity.BOTTOM", self.java)
         self.assertNotIn(
             "mMultiOverlay.addView(bar, new FrameLayout.LayoutParams(-1, dp(60), Gravity.TOP))",
@@ -68,8 +98,8 @@ class CobraDeviceParityTests(unittest.TestCase):
         self.assertIn('android:supportsPictureInPicture="true"', patched)
         self.assertIn('android:resizeableActivity="true"', patched)
         self.assertIn('android.supports_size_changes', patched)
-        self.assertIn("density", patched)
-        self.assertIn("uiMode", patched)
+        for token in ("density", "fontScale", "layoutDirection", "locale", "uiMode"):
+            self.assertIn(token, patched)
 
 
 if __name__ == "__main__":
