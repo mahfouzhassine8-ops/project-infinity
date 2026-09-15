@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/infinity-cobra-full-feature-preflight.yml'
       - 'scripts/infinity_1_0_9_cobra_full*.py'
+      - 'scripts/infinity_1_0_9_cobra_device_parity.py'
       - 'scripts/package_cobra_theme.py'
       - 'patches/infinity-cobra-v2/**'
       - 'patches/infinity-cobra/InfinityLiveActivity.java.in'
@@ -37,6 +38,7 @@ jobs:
             scripts/infinity_1_0_9_cobra_full.py \
             scripts/infinity_1_0_9_cobra_full_fixups.py \
             scripts/infinity_1_0_9_cobra_full_runner.py \
+            scripts/infinity_1_0_9_cobra_device_parity.py \
             scripts/infinity_1_0_9_cobra_legit.py \
             scripts/package_cobra_theme.py
 
@@ -56,7 +58,7 @@ jobs:
           src=Path('patches/infinity-cobra/InfinityLiveActivity.java.in').read_text()
           out=runner.transform_for_fast_test(src).replace('@APP_PACKAGE@','com.projectinfinity.kodi')
           Path('/tmp/InfinityLiveActivity.java').write_text(out)
-          for name in ('InfinityCobraFeatureRuntime','InfinityCobraRecordingService','InfinityCobraReminderReceiver','InfinityCobraBootReceiver'):
+          for name in ('InfinityCobraFeatureRuntime','InfinityCobraRecordingService','InfinityCobraReminderReceiver','InfinityCobraBootReceiver','InfinityCobraDeviceBridge'):
               raw=Path(f'patches/infinity-cobra-v2/{name}.java.in').read_text().replace('@APP_PACKAGE@','com.projectinfinity.kodi')
               Path(f'/tmp/{name}.java').write_text(raw)
           PY
