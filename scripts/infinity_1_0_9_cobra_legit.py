@@ -97,6 +97,33 @@ def source_phase(source: Path, receipt: Path) -> None:
         "ProgramPair pair = guide.get(channel);",
         1,
     )
+    # Normalize provider/network/parser checked failures into LiveException at
+    # the loadSource boundary. loadActiveSource intentionally handles the
+    # user-facing LiveException path, so allowing raw Exception to escape here
+    # makes the background lambda fail Java compilation.
+    live_text = once(
+        live_text,
+        '  private LoadResult loadSource(LiveSource source, boolean validating)\n'
+        '      throws Exception {\n'
+        '    if ("xtream".equals(source.type)) return loadXtream(source);\n'
+        '    if ("m3u".equals(source.type)) return loadM3u(source);\n'
+        '    throw new LiveException("This source type is not supported.");\n'
+        '  }\n',
+        '  private LoadResult loadSource(LiveSource source, boolean validating)\n'
+        '      throws LiveException {\n'
+        '    try {\n'
+        '      if ("xtream".equals(source.type)) return loadXtream(source);\n'
+        '      if ("m3u".equals(source.type)) return loadM3u(source);\n'
+        '      throw new LiveException("This source type is not supported.");\n'
+        '    } catch (LiveException e) {\n'
+        '      throw e;\n'
+        '    } catch (Exception e) {\n'
+        '      throw new LiveException(\n'
+        '          "Unexpected response. Check the server address and try again.");\n'
+        '    }\n'
+        '  }\n',
+        "Cobra loadSource checked exception normalization",
+    )
     live.write_text(live_text, encoding="utf-8")
 
     verify_source(source)
@@ -194,6 +221,9 @@ def verify_source(source: Path) -> None:
         "Server not found. Check the address, Wi-Fi, VPN, or DNS.",
         ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json",
         "ProgramPair pair = guide.get(channel);",
+        "private LoadResult loadSource(LiveSource source, boolean validating)",
+        "throws LiveException",
+        "Unexpected response. Check the server address and try again.",
         "returnToInfinity",
     )
     for needle in required_runtime:
