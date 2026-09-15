@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "audit_generation": 2,
+  "audit_generation": 3,
   "as_of": "2026-09-15",
   "purpose": "Infinity whole-stack stability certification baseline",
   "git_base": {
@@ -45,8 +45,18 @@
       "status": "stability_candidate",
       "parent_version": "2.5.2",
       "parent_sha256": "211c98194e3bb40751544c009af6b8881ee2f14b8ba0b02ea3dac9fb9c5776b9",
-      "candidate_sha256": "cccf729a11f00a8e1ca8741392ed0edff2a16621f5ed3753c65741ddd0c1e1b7",
-      "delta": "Read-only Infinity skin exporter accepts the active skin.infinity.diggz or skin.infinity identity; diagnostics and repair behavior otherwise preserved.",
+      "candidate_sha256": "b1243bca0682460170b2efec388a31266a4efb50d3196c311ae5fd616305266c",
+      "delta": "Read-only Infinity skin exporter accepts the active skin.infinity.diggz or skin.infinity identity; new diagnostics/Doctor metadata stamps 2.5.3; no existing historic records are rewritten.",
+      "static_validation": {
+        "python_compile": "passed",
+        "addon_xml": "parsed",
+        "zip_crc": "passed",
+        "source_receipt_hashes": "matched",
+        "legacy_xenon_references": 0,
+        "player_or_theme_mutation_tokens": 0,
+        "startup_services": 1,
+        "android_device_or_emulator_tested": false
+      },
       "repo_source_required": false
     },
     {
