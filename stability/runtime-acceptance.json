@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "as_of": "2026-09-15",
+  "policy": "Only observed on-device results may be changed from pending to pass/fail. Static or CI checks never imply device acceptance.",
+  "release_pipeline": {
+    "candidate2_preflight": "pass",
+    "candidate2_native_build": "pass",
+    "candidate2_packaging": "fail",
+    "candidate2_signing": "fail",
+    "exact_signing_failure_reconciled": false,
+    "final_apk_signature_verified": false,
+    "final_apk_update_identity_verified": false
+  },
+  "first_party": [
+    {"addon_id":"script.infinity.live","version":"0.1.12","artifact_status":"locked_user_accepted","cold_launch":"pending","repeat_launch":"pending","playback_start_stop":"pending","seek_pause_resume":"pending","background_foreground":"pending","pythoninvoker_teardown":"pending","fold_rotation":"pending","crash_recovery":"pending"},
+    {"addon_id":"script.infinity.commandcenter","version":"0.3.5.13","artifact_status":"locked_user_accepted","open_close":"pending","handoff_return":"pending","repeat_actions":"pending","background_foreground":"pending","fold_rotation":"pending"},
+    {"addon_id":"script.kodihealthcenter","version":"2.5.3","artifact_status":"stability_candidate","open_close":"pending","diagnostics":"pending","doctor":"pending","crash_collection":"pending","support_export":"pending","repeat_runs":"pending","post_crash_operation":"pending"},
+    {"addon_id":"service.infinity.compat","version":"0.8.1","artifact_status":"stability_candidate","startup":"pending","single_service_runtime":"pending","skin_diggz_detection":"pending","no_player_mutation":"pending","no_skin_mutation":"pending","background_foreground":"pending"},
+    {"addon_id":"script.infinity.support","version":"0.3.1","artifact_status":"stability_candidate","open_close":"pending","bounded_report":"pending","privacy_exclusions":"pending","native_evidence_opt_in":"pending","repeat_exports":"pending"},
+    {"addon_id":"script.infinity.audiopolicy","version":"1.0.0","artifact_status":"repo_baseline","startup":"pending","settings_change":"pending","playback_interaction":"pending","repeat_session":"pending"},
+    {"addon_id":"service.infinity.refresh","version":"1.0.1","artifact_status":"repo_baseline","startup":"pending","mode_publish":"pending","sleep_wake":"pending","fold_rotation":"pending","battery_thermal_boundary":"pending"},
+    {"addon_id":"script.infinity.cobra.theme","version":"1.1.0","artifact_status":"repo_baseline","open_apply":"pending","light_dark_oled":"pending","skin_reload":"pending","repeat_apply":"pending"}
+  ],
+  "providers": [
+    "plugin.video.umbrella","plugin.video.fenlight","plugin.video.pov","plugin.video.thecrew","plugin.video.seren","plugin.video.ghost","plugin.video.essential","plugin.video.bnwmovie19","plugin.video.halcyon","plugin.video.absolution","plugin.video.themoviedb.helper","plugin.video.playlistbrowser"
+  ],
+  "provider_checks": {
+    "plugin.video.umbrella":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.fenlight":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.pov":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.thecrew":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.seren":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.ghost":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.essential":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.bnwmovie19":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.halcyon":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.absolution":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.themoviedb.helper":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"},
+    "plugin.video.playlistbrowser":{"open_browse":"pending","resolve_start":"pending","seek":"pending","pause_resume":"pending","stop_return":"pending","second_playback":"pending","failure_path":"pending","pythoninvoker_teardown":"pending","black_video_boundary":"pending"}
+  },
+  "separate_fault_classes": {
+    "pythoninvoker_assertion_or_sigabrt": "pending reproduction/acceptance evidence",
+    "audio_with_black_video_mediacodec_or_provider": "pending reproduction/acceptance evidence",
+    "rule": "Do not merge these two fault classes unless evidence proves a common cause."
+  }
+}
