@@ -23,6 +23,7 @@ python3 -m py_compile \
   scripts/infinity_1_0_9_cobra_legit.py \
   scripts/infinity_1_0_9_cobra_full.py \
   scripts/infinity_1_0_9_cobra_full_fixups.py \
+  scripts/infinity_1_0_9_cobra_full_runner.py \
   scripts/package_cobra_theme.py \
   scripts/infinity_touch_startup_guard.py \
   scripts/infinity_upper_layer_repack.py \
@@ -33,6 +34,7 @@ python3 -m py_compile \
   scripts/infinity_audio_policy_source.py
 
 python3 -m unittest discover -s tests/cobra_live -v
+python3 -m unittest discover -s tests/cobra_full -v
 python3 scripts/verify_infinity_live.py
 python3 -m unittest discover -s tests/infinity_live -v
 python3 scripts/package_cobra_theme.py --output candidate/Infinity-Cobra-Theme-1.1.0.zip
@@ -75,9 +77,10 @@ python3 scripts/validate-infinity71-java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-35/android.jar" --out engine/rotation-java
 
 # Candidate 2 is layered on the exact successful Candidate 1 source transform.
-python3 scripts/infinity_1_0_9_cobra_full_fixups.py source --source kodi \
+# Use the guarded runner that has already passed the fast transform/syntax suite.
+python3 scripts/infinity_1_0_9_cobra_full_runner.py source --source kodi \
   --receipt engine/cobra-full-source.json
-python3 scripts/infinity_1_0_9_cobra_full_fixups.py verify-source --source kodi
+python3 scripts/infinity_1_0_9_cobra_full_runner.py verify-source --source kodi
 
 grep -q 'versionCode 2103134' kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'versionName "1.0.9-Cobra-Full-Feature-Candidate-2"' kodi/tools/android/packaging/xbmc/build.gradle.in
