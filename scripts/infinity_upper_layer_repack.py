@@ -16,6 +16,7 @@ ADDONS = (
     'service.infinity.refresh',
     'script.infinity.audiopolicy',
     'script.infinity.live',
+    'script.infinity.cobra.theme',
 )
 SIGNING = re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))', re.I)
 
