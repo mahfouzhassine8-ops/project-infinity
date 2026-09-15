@@ -5,15 +5,15 @@ mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
 
 # Combined Candidate 2 gate: source hardening + Java import assertion must pass before the long cook.
 cd "$GITHUB_WORKSPACE"
-python3 -m py_compile scripts/infinity_gui_render_hardening.py
+python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
   echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2
   exit 1
 }
-python3 scripts/infinity_gui_render_hardening.py apply --source kodi \
+python3 scripts/infinity_gui_render_hardening_v2.py apply --source kodi \
   --receipt engine/gui-render-hardening-source.json
-python3 scripts/infinity_gui_render_hardening.py verify --source kodi
+python3 scripts/infinity_gui_render_hardening_v2.py verify --source kodi
 # Fail pre-build if the exact crash/resize protections were not installed.
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
 grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
