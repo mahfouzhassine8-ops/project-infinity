@@ -29,7 +29,7 @@ git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git /tmp/ko
 rsync -a --delete --exclude='.git' /tmp/kodi-213/ kodi/
 
 # Re-apply the source-owned Infinity stack after restoring the exact Kodi 21.3 tree.
-python3 scripts/infinity_1_0_9_cobra_full_runner.py --source kodi --repo "$GITHUB_WORKSPACE" --out engine/cobra-full-source.json
+python3 scripts/infinity_1_0_9_cobra_full_runner.py source --source kodi --receipt engine/cobra-full-source.json
 python3 scripts/infinity_1_0_9_live_app_shell.py --source kodi --out engine/live-app-shell-engine.json
 python3 scripts/infinity_1_0_9_cobra_legit.py --source kodi --out engine/live-release-source.json
 python3 scripts/infinity_touch_startup_guard.py --source kodi --out engine/touch-startup-guard-source.json
