@@ -1,0 +1,147 @@
+package @APP_PACKAGE@;
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
+import android.os.IBinder;
+
+/**
+ * User-controlled process-priority helper for Infinity/Cobra.
+ *
+ * The service is deliberately visible and opt-in. It does not hold a wake lock,
+ * does not keep the display awake, and does not claim that Android can never
+ * reclaim the process. START_STICKY plus a low-importance foreground service
+ * gives Infinity a better chance of surviving normal background pressure while
+ * preserving Android's ability to stop it under stronger resource pressure.
+ */
+public final class InfinityExtendedBackgroundService extends Service {
+  private static final String PREFS = "infinity_runtime";
+  private static final String KEY_ENABLED = "extended_background";
+  private static final String CHANNEL_ID = "infinity_extended_background";
+  private static final int NOTIFICATION_ID = 10932;
+  private static final int REQUEST_OPEN = 10933;
+  private static final int REQUEST_DISABLE = 10934;
+  private static final String ACTION_DISABLE =
+      "com.projectinfinity.kodi.action.DISABLE_EXTENDED_BACKGROUND";
+
+  public static boolean isEnabled(Context context) {
+    return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .getBoolean(KEY_ENABLED, false);
+  }
+
+  public static void setEnabled(Context context, boolean enabled) {
+    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .edit().putBoolean(KEY_ENABLED, enabled).apply();
+    if (enabled) start(context); else stop(context);
+  }
+
+  public static void sync(Context context) {
+    if (isEnabled(context)) start(context);
+  }
+
+  private static void start(Context context) {
+    Intent intent = new Intent(context, InfinityExtendedBackgroundService.class);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(intent);
+    } else {
+      context.startService(intent);
+    }
+  }
+
+  private static void stop(Context context) {
+    context.stopService(new Intent(context, InfinityExtendedBackgroundService.class));
+  }
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    ensureChannel();
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    if (intent != null && ACTION_DISABLE.equals(intent.getAction())) {
+      getSharedPreferences(PREFS, MODE_PRIVATE)
+          .edit().putBoolean(KEY_ENABLED, false).apply();
+      stopForeground(true);
+      stopSelf();
+      return START_NOT_STICKY;
+    }
+    if (!isEnabled(this)) {
+      stopForeground(true);
+      stopSelf();
+      return START_NOT_STICKY;
+    }
+
+    Notification notification = buildNotification();
+    if (Build.VERSION.SDK_INT >= 34) {
+      startForeground(
+          NOTIFICATION_ID,
+          notification,
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+    } else {
+      startForeground(NOTIFICATION_ID, notification);
+    }
+    return START_STICKY;
+  }
+
+  private void ensureChannel() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+    NotificationManager manager = getSystemService(NotificationManager.class);
+    if (manager == null || manager.getNotificationChannel(CHANNEL_ID) != null) return;
+    NotificationChannel channel = new NotificationChannel(
+        CHANNEL_ID,
+        "Infinity extended background",
+        NotificationManager.IMPORTANCE_LOW);
+    channel.setDescription(
+        "Visible status while user-enabled Extended Background Mode is active.");
+    channel.setShowBadge(false);
+    manager.createNotificationChannel(channel);
+  }
+
+  private Notification buildNotification() {
+    Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
+    if (launch == null) launch = new Intent();
+    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    int pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      pendingFlags |= PendingIntent.FLAG_IMMUTABLE;
+    }
+    PendingIntent open = PendingIntent.getActivity(
+        this, REQUEST_OPEN, launch, pendingFlags);
+
+    Intent disableIntent = new Intent(this, InfinityExtendedBackgroundService.class)
+        .setAction(ACTION_DISABLE);
+    PendingIntent disable = PendingIntent.getService(
+        this, REQUEST_DISABLE, disableIntent, pendingFlags);
+
+    Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        ? new Notification.Builder(this, CHANNEL_ID)
+        : new Notification.Builder(this);
+    builder.setSmallIcon(android.R.drawable.stat_notify_sync_noanim)
+        .setContentTitle("Infinity • Extended Background Mode")
+        .setContentText("Infinity is being kept easier to resume in the background.")
+        .setContentIntent(open)
+        .setCategory(Notification.CATEGORY_SERVICE)
+        .setOngoing(true)
+        .setOnlyAlertOnce(true)
+        .setShowWhen(false)
+        .addAction(new Notification.Action.Builder(
+            android.R.drawable.ic_menu_close_clear_cancel,
+            "Turn off",
+            disable).build());
+    return builder.build();
+  }
+
+  @Override
+  public IBinder onBind(Intent intent) {
+    return null;
+  }
+}
