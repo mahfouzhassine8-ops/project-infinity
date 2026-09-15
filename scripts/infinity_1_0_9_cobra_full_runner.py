@@ -11,6 +11,12 @@ class name inside InfinityLiveActivity even though that service is deliberately
 owned by its own Java source and reached through InfinityCobraFeatureRuntime.
 The runner preserves the strict manifest/install/helper verification and uses a
 temporary, non-shipping linkage marker only while the original verifier runs.
+
+Device testing also exposed two UI contract issues in the Candidate 1 lineage:
+portrait used a horizontal-layout channel pane width of zero, making the channel
+list invisible even though category buttons visibly pressed; and Multi-View was
+shown as a top-level rail destination even though it is a playback action. The
+runner corrects both after the feature transforms and verifies those contracts.
 """
 from __future__ import annotations
 
@@ -88,6 +94,51 @@ def candidate2_fixup_replace_between(
     return text[:a] + replacement + text[b:]
 
 
+def polish_device_ui(java: str) -> str:
+    rail = '    addRail("MULTI-VIEW", v -> beginMultiView());\n'
+    if java.count(rail) != 1:
+        raise RuntimeError(
+            "Candidate 2 UI polish: expected one standalone Multi-View rail item, "
+            f"found {java.count(rail)}"
+        )
+    java = java.replace(rail, "", 1)
+
+    old_channel_pane = (
+        "    content.addView(channelScroll, new LinearLayout.LayoutParams(0, -1, 1));\n"
+    )
+    new_channel_pane = (
+        "    content.addView(channelScroll, isPortrait()\n"
+        "        ? new LinearLayout.LayoutParams(\n"
+        "            LinearLayout.LayoutParams.MATCH_PARENT, 0, 1)\n"
+        "        : new LinearLayout.LayoutParams(\n"
+        "            0, LinearLayout.LayoutParams.MATCH_PARENT, 1));\n"
+    )
+    if java.count(old_channel_pane) != 1:
+        raise RuntimeError(
+            "Candidate 2 UI polish: portrait channel-pane anchor expected once, "
+            f"found {java.count(old_channel_pane)}"
+        )
+    return java.replace(old_channel_pane, new_channel_pane, 1)
+
+
+def verify_device_ui(java: str) -> None:
+    rail_start = java.find('TextView brand = text("◈  COBRA"')
+    rail_end = java.find("View spacer = new View(this);", rail_start)
+    if rail_start < 0 or rail_end < 0:
+        raise RuntimeError("Candidate 2 UI polish: navigation rail bounds missing")
+    if 'addRail("MULTI-VIEW"' in java[rail_start:rail_end]:
+        raise RuntimeError("Candidate 2 UI polish: Multi-View survived as a rail destination")
+    if 'Button multi = action(' not in java or 'multi.setOnClickListener(v -> beginMultiView());' not in java:
+        raise RuntimeError("Candidate 2 UI polish: player Multi-View action missing")
+    portrait_contract = (
+        "content.addView(channelScroll, isPortrait()\n"
+        "        ? new LinearLayout.LayoutParams(\n"
+        "            LinearLayout.LayoutParams.MATCH_PARENT, 0, 1)"
+    )
+    if portrait_contract not in java:
+        raise RuntimeError("Candidate 2 UI polish: portrait channel browser remains collapsed")
+
+
 def candidate2_verify_source(source: Path) -> None:
     """Run the original strict verifier without weakening service ownership.
 
@@ -102,6 +153,7 @@ def candidate2_verify_source(source: Path) -> None:
     """
     live = source.resolve() / full.LIVE_ACTIVITY
     java = live.read_text(encoding="utf-8")
+    verify_device_ui(java)
     if "InfinityCobraRecordingService" in java:
         _ORIGINAL_VERIFY_SOURCE(source)
         return
@@ -145,7 +197,10 @@ def transform_for_fast_test(java: str) -> str:
     )
     previous = _install_safe_guards()
     try:
-        return fixups.harden_activity(full.patch_activity(java))
+        java = fixups.harden_activity(full.patch_activity(java))
+        java = polish_device_ui(java)
+        verify_device_ui(java)
+        return java
     finally:
         _restore_safe_guards(previous)
 
@@ -154,6 +209,11 @@ def source_phase(source: Path, receipt: Path) -> None:
     previous = _install_safe_guards()
     try:
         fixups.source_phase(source, receipt)
+        live = source.resolve() / full.LIVE_ACTIVITY
+        java = polish_device_ui(live.read_text(encoding="utf-8"))
+        verify_device_ui(java)
+        live.write_text(java, encoding="utf-8")
+        fixups.verify_source(source)
     finally:
         _restore_safe_guards(previous)
 
@@ -185,7 +245,7 @@ def main() -> None:
         source_phase(args.source, args.receipt)
     elif args.cmd == "verify-source":
         verify_source(args.source)
-        print("PASS: Cobra Candidate 2 safe source verification")
+        print("PASS: Cobra Candidate 2 safe source + device UI verification")
     elif args.cmd == "apk":
         fixups.configure_deep()
         import infinity_1_0_8_deep_rebrand as deep
