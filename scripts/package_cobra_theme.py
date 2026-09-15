@@ -35,7 +35,7 @@ def validate() -> str:
     version = addon_version()
     theme = SOURCE / "resources" / "cobra-theme.json"
     data = json.loads(theme.read_text(encoding="utf-8"))
-    if data.get("schema") != 1:
+    if data.get("schema") not in (1, 2):
         raise RuntimeError("unsupported Cobra theme schema")
     for key in (
         "background", "rail", "panel", "panel2", "focus", "accent",
@@ -44,6 +44,10 @@ def validate() -> str:
     ):
         if key not in data:
             raise RuntimeError("missing Cobra theme token: " + key)
+    if data.get("schema") >= 2:
+        for key in ("touch_target", "rail_item_height", "motion_ms"):
+            if key not in data:
+                raise RuntimeError("missing Cobra responsive token: " + key)
     return version
 
 
