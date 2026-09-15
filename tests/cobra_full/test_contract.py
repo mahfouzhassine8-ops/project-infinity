@@ -9,15 +9,14 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import infinity_1_0_9_cobra_full as full
-import infinity_1_0_9_cobra_full_fixups as fixups
+import infinity_1_0_9_cobra_full_runner as runner
 
 
 class CobraFullTransformTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         base = (ROOT / "patches/infinity-cobra/InfinityLiveActivity.java.in").read_text(encoding="utf-8")
-        transformed = full.patch_activity(base)
-        cls.java = fixups.harden_activity(transformed)
+        cls.java = runner.transform_for_fast_test(base)
         cls.feature = (ROOT / "patches/infinity-cobra-v2/InfinityCobraFeatureRuntime.java.in").read_text(encoding="utf-8")
         cls.recording = (ROOT / "patches/infinity-cobra-v2/InfinityCobraRecordingService.java.in").read_text(encoding="utf-8")
         cls.theme = json.loads((ROOT / "addons/script.infinity.cobra.theme/resources/cobra-theme.json").read_text(encoding="utf-8"))
@@ -40,7 +39,6 @@ class CobraFullTransformTests(unittest.TestCase):
     def test_vod_resume_and_auto_next(self):
         for token in ("get_vod_streams", "get_series_info", "continue_items", "playSavedVod", "playNextEpisode()"):
             self.assertIn(token, self.java)
-        # Critical ordering bug: close previous player before assigning new VOD identity.
         method = self.java.split("private void playVodUrl", 1)[1].split("private void saveVodProgress", 1)[0]
         self.assertLess(method.index("closePlayer();"), method.index("mPlayingVodKey ="))
 
