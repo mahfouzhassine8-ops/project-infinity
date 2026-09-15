@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       certify:
-        description: 'Fail the run while certification blockers remain'
+        description: 'Attempt strict whole-release certification'
         type: boolean
         default: false
   push:
@@ -14,6 +14,8 @@ on:
       - 'tests/**'
       - 'kodi-config/addons.txt'
       - 'scripts/infinity_stability_audit.py'
+      - 'scripts/infinity_release_certification_gate.py'
+      - 'scripts/infinity_1_0_7_compat_package.py'
       - 'stability/**'
       - '.github/workflows/infinity-stability-audit.yml'
 
@@ -65,18 +67,27 @@ jobs:
       - name: Run Support Exporter safety regression tests
         run: python3 -m unittest discover -s tests/infinity_compat -p 'test_support.py' -v
 
-      - name: Run fast whole-stack inventory audit
+      - name: Run fast static whole-stack audit
         run: python3 scripts/infinity_stability_audit.py --report stability-report.json
 
-      - name: Enforce certification gate when requested
+      - name: Produce full release-readiness report
+        run: python3 scripts/infinity_release_certification_gate.py --report release-certification-report.json
+
+      - name: Enforce static gate when certification is requested
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.certify }}
         run: python3 scripts/infinity_stability_audit.py --strict --report stability-report.json
 
-      - name: Upload stability report
+      - name: Enforce runtime and release gate when certification is requested
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.certify }}
+        run: python3 scripts/infinity_release_certification_gate.py --strict --report release-certification-report.json
+
+      - name: Upload stability reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: infinity-stability-report
-          path: stability-report.json
+          name: infinity-stability-reports
+          path: |
+            stability-report.json
+            release-certification-report.json
           if-no-files-found: error
           retention-days: 90
