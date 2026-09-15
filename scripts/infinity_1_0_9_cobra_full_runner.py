@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Safe entry point for Cobra Full Feature Candidate 2.
 
-The large Candidate 2 transform intentionally uses exact-match guards. One
-Candidate 1 loop anchor occurs twice (category collection and channel filtering),
-so this runner narrows only that parental-filter insertion before invoking the
-reviewed transform. All other exact guards remain strict.
+The Candidate 2 transforms use strict exact-match guards. Candidate 1 contains
+a few intentionally repeated structural snippets, so this runner narrows only
+the known ambiguous insertions to their semantic methods while leaving every
+other source guard strict.
 """
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ import infinity_1_0_9_cobra_full_fixups as fixups
 RELEASE = full.RELEASE
 VERSION_CODE = full.VERSION_CODE
 _ORIGINAL_INSERT_AFTER = full.insert_after
+_ORIGINAL_FIXUP_REPLACE_ONCE = fixups.replace_once
 
 
 def candidate2_insert_after(text: str, anchor: str, addition: str, label: str) -> str:
@@ -34,22 +35,58 @@ def candidate2_insert_after(text: str, anchor: str, addition: str, label: str) -
     return text.replace(target, replacement, 1)
 
 
-def transform_for_fast_test(java: str) -> str:
-    previous = full.insert_after
+def candidate2_fixup_replace_once(text: str, old: str, new: str, label: str) -> str:
+    if label != "Candidate 2 auto refresh start":
+        return _ORIGINAL_FIXUP_REPLACE_ONCE(text, old, new, label)
+    target = (
+        "    mTheme = Theme.load(this);\n"
+        "    loadPersistedState();\n"
+        "    buildShell();\n"
+        "    if (mSources.isEmpty()) {\n"
+        "      showWelcome();\n"
+    )
+    replacement = (
+        "    mTheme = Theme.load(this);\n"
+        "    loadPersistedState();\n"
+        "    buildShell();\n"
+        "    mMain.removeCallbacks(mAutoRefresh);\n"
+        "    mMain.postDelayed(mAutoRefresh, 30L * 60L * 1000L);\n"
+        "    if (mSources.isEmpty()) {\n"
+        "      showWelcome();\n"
+    )
+    if text.count(target) != 1:
+        raise RuntimeError(
+            f"{label}: onCreate anchor expected exactly once, found {text.count(target)}"
+        )
+    return text.replace(target, replacement, 1)
+
+
+def _install_safe_guards() -> tuple[object, object]:
+    previous_insert = full.insert_after
+    previous_replace = fixups.replace_once
     full.insert_after = candidate2_insert_after
+    fixups.replace_once = candidate2_fixup_replace_once
+    return previous_insert, previous_replace
+
+
+def _restore_safe_guards(previous: tuple[object, object]) -> None:
+    full.insert_after, fixups.replace_once = previous
+
+
+def transform_for_fast_test(java: str) -> str:
+    previous = _install_safe_guards()
     try:
         return fixups.harden_activity(full.patch_activity(java))
     finally:
-        full.insert_after = previous
+        _restore_safe_guards(previous)
 
 
 def source_phase(source: Path, receipt: Path) -> None:
-    previous = full.insert_after
-    full.insert_after = candidate2_insert_after
+    previous = _install_safe_guards()
     try:
         fixups.source_phase(source, receipt)
     finally:
-        full.insert_after = previous
+        _restore_safe_guards(previous)
 
 
 def main() -> None:
