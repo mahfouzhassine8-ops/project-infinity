@@ -44,10 +44,13 @@ with zipfile.ZipFile(apk) as z:
     native=z.read('lib/arm64-v8a/libkodi.so')
     required=(
       b'InfinityLiveActivity', b'InfinityCobraFeatureRuntime', b'InfinityCobraRecordingService',
-      b'InfinityCobraReminderReceiver', b'player_api.php?username=', b'get_live_streams',
-      b'get_vod_streams', b'get_series_info', b'androidx/media3/exoplayer/ExoPlayer',
-      b'RECORDINGS', b'MULTI-VIEW', b'CONTINUE WATCHING', b'cobra_custom_epg:',
-      b'cobra-health.json', b'AUDIO / SUBS', b'CAST / ROUTE'
+      b'InfinityCobraReminderReceiver', b'InfinityCobraDeviceBridge',
+      b'player_api.php?username=', b'get_live_streams', b'get_vod_streams', b'get_series_info',
+      b'androidx/media3/exoplayer/ExoPlayer', b'RECORDINGS', b'MULTI-VIEW', b'CONTINUE WATCHING',
+      b'cobra_custom_epg:', b'cobra-health.json', b'AUDIO / SUBS', b'CAST / ROUTE',
+      b'PictureInPictureParams', b'infinity_player_rotation',
+      b'.kodi/userdata/addon_data/service.infinity.refresh', b'preferredDisplayModeId',
+      b'fold-cover', b'fold-inner', b'multiview-start', b'multiview-stop', b'player-close'
     )
     for needle in required: assert needle in joined, needle
     for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
@@ -61,6 +64,7 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'player_rotation_api':1,
   'infinity_live_api':3,
   'cobra_runtime_api':2,
+  'cobra_device_parity_api':1,
   'version_code':2103134,
   'version_name':'1.0.9-Cobra-Full-Feature-Candidate-2',
   'one_apk_two_environments':True,
@@ -85,6 +89,19 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'profiles_parental':True,
   'max_simultaneous_live_feeds':4,
   'simultaneous_audio_owners':1,
+  'cobra_fold_window_classes_dp':[600,840],
+  'cobra_fold_hinge_awareness':True,
+  'cobra_fold_multiview_reflow':True,
+  'cobra_fold_multiview_preserves_audio_owner':True,
+  'cobra_picture_in_picture':True,
+  'cobra_pip_multiview_collapses_to_audio_owner':True,
+  'cobra_background_ghost_audio_guard':True,
+  'cobra_player_rotation_shared_policy':True,
+  'cobra_adaptive_refresh_shared_policy':True,
+  'cobra_refresh_battery_saver_guard':True,
+  'cobra_refresh_thermal_guard':True,
+  'cobra_multiwindow_policy_yield':True,
+  'cobra_multiview_transient_chrome':True,
   'health_center_redacted_bridge':True,
   'external_theme_addon':'script.infinity.cobra.theme 1.1.0',
   'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
@@ -97,4 +114,4 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
 },indent=2,sort_keys=True)+'\n')
 PY
 
-echo 'PASS: source-backed Kodi 21.3 engine built with Cobra Full Feature Candidate 2'
+echo 'PASS: source-backed Kodi 21.3 engine built with Cobra Full Feature Candidate 2 + Infinity Fold device parity'
