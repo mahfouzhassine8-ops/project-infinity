@@ -999,7 +999,7 @@ public final class InfinityLiveActivity extends Activity {
         if ("title".equals(tag)) {
           inTitle = false;
         } else if ("programme".equals(tag) && channel != null) {
-          ProgramPair pair = guide.get(channel);
+          ProgramPair pair = mGuide.get(channel);
           if (pair == null) pair = new ProgramPair();
           if (start <= now && stop > now) {
             pair.now = title.trim();
@@ -1326,7 +1326,7 @@ public final class InfinityLiveActivity extends Activity {
 
     TextView themeInfo = text(
         "Fast visual updates are read from:\n" +
-        ".kodi/addons/script.infinity.live/resources/cobra-theme.json\n\n" +
+        ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json\n\n" +
         "That file can be changed by a small add-on ZIP without rebuilding the APK.",
         mTheme.muted, 14, Gravity.LEFT | Gravity.CENTER_VERTICAL);
 
@@ -1918,7 +1918,7 @@ public final class InfinityLiveActivity extends Activity {
       if (external == null) return theme;
       File file = new File(
           external,
-          ".kodi/addons/script.infinity.live/resources/cobra-theme.json");
+          ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json");
       if (!file.isFile() || file.length() <= 0 || file.length() > 65536) return theme;
       try {
         byte[] data;
