@@ -14,11 +14,14 @@ grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
 python3 scripts/infinity_gui_render_hardening_v2.py apply --source kodi \
   --receipt engine/gui-render-hardening-source.json
 python3 scripts/infinity_gui_render_hardening_v2.py verify --source kodi
-# Fail pre-build if the exact crash/resize protections were not installed.
+# Fail pre-build if the exact crash protections and the accepted geometry safety contract are absent.
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
 grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
 grep -Fq 'ConsumeRenderCacheFlushRequest()' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-grep -Fq 'm_committed.size == size' kodi/xbmc/platform/android/activity/XBMCApp.h
+grep -Fq 'm_requested.size == size' kodi/xbmc/platform/android/activity/XBMCApp.h
+grep -Fq 'CommitGeometry' kodi/xbmc/platform/android/activity/XBMCApp.h
+grep -Fq 'state.IsCurrent(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+grep -Fq 'state.CommitGeometry(request)' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 ! grep -Fq 'assert(bufferHandle == 0);' kodi/xbmc/guilib/GUIFontCache.h
 
@@ -81,6 +84,7 @@ receipt=json.loads(Path('engine/gui-render-hardening-source.json').read_text())
 assert receipt['gui_font_cache_hardened'] is True
 assert receipt['renderer_changed'] is True
 assert receipt['android_resize_hardened'] is True
+assert receipt['protected_geometry_bridge_rewritten'] is False
 Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'schema':2,
   'bridge_version':5,
