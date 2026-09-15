@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.infinity.cobra.theme"
        name="Infinity Cobra Theme"
-       version="1.0.0"
+       version="1.1.0"
        provider-name="Infinity">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
@@ -9,7 +9,7 @@
   <extension point="xbmc.python.module" library="lib"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Fast visual contract for the Cobra experience inside Infinity.</summary>
-    <description lang="en_GB">Provides theme tokens read directly by the native Cobra Live Activity so visual tuning can ship as a small Kodi add-on ZIP instead of rebuilding the APK.</description>
+    <description lang="en_GB">Provides responsive theme, focus, touch-target and motion tokens read by the native Cobra Live Activity so visual tuning can ship as a small Kodi add-on ZIP instead of rebuilding the APK.</description>
     <platform>all</platform>
     <license>GPL-2.0-or-later</license>
   </extension>
