@@ -28,7 +28,7 @@ class CobraFullTransformTests(unittest.TestCase):
     def test_multiview_is_two_to_four_with_one_audio_owner(self):
         for token in ("2 screens", "3 screens", "4 screens", "openMultiView(List<Channel>", "setMultiAudio"):
             self.assertIn(token, self.java)
-        self.assertIn("player.setVolume(i == index ? 1f : 0f)", self.java)
+        self.assertIn("mMultiPlayers[i].setVolume(i == index ? 1f : 0f)", self.java)
 
     def test_dvr_and_guide_contract(self):
         for token in ("showRecordings()", "scheduleRecording", "addReminder", "playCatchup", "showGuideOverlay()", "cobra_custom_epg:"):
