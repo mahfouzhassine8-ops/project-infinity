@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-app Infinity/Cobra validation runs from the branch head.
+# Legitimate one-app Infinity/Cobra validation from the branch head.
 set -euo pipefail
 
 sudo apt-get update -qq
@@ -16,9 +16,11 @@ if [ ! -f "$HOME/.android/debug.keystore" ]; then
 fi
 
 python3 -m py_compile \
+  scripts/cobra_provider_contract.py \
   scripts/infinity_1_0_9_live_release.py \
   scripts/infinity_1_0_9_live_app_shell.py \
   scripts/infinity_1_0_9_single_app.py \
+  scripts/infinity_1_0_9_cobra_legit.py \
   scripts/infinity_touch_startup_guard.py \
   scripts/infinity_upper_layer_repack.py \
   scripts/infinity_player_rotation.py \
@@ -27,10 +29,12 @@ python3 -m py_compile \
   scripts/infinity_1_0_8_deep_rebrand_preimage.py \
   scripts/infinity_audio_policy_source.py
 
+# Cheap provider/UI/playback contract checks must pass before the long native build.
+python3 -m unittest discover -s tests/cobra_live -v
 python3 scripts/verify_infinity_live.py
 python3 -m unittest discover -s tests/infinity_live -v
-if git ls-files 'addons/script.infinity.live/**' | grep -E '(__pycache__/|\.pyc$)' -q; then
-  echo 'Tracked Python cache files are forbidden in script.infinity.live' >&2
+if git ls-files 'addons/**' | grep -E '(__pycache__/|\.pyc$)' -q; then
+  echo 'Tracked Python cache files are forbidden in Infinity addons' >&2
   exit 1
 fi
 
@@ -60,52 +64,54 @@ python3 scripts/infinity_player_rotation.py verify --source kodi
 python3 scripts/infinity_1_0_9_live_release.py source --source kodi --receipt engine/live-release-source.json
 python3 scripts/infinity_1_0_9_live_release.py verify-source --source kodi
 
-# Preserve the proven native startup crash fix before adding the Cobra experience.
+# Preserve the proven startup crash guard.
 python3 scripts/infinity_touch_startup_guard.py apply --source kodi \
   --receipt engine/touch-startup-guard-source.json
 python3 scripts/infinity_touch_startup_guard.py verify --source kodi
-
-# Validate locked native/rotation owners before the optional Media3 Activity.
 python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/rotation-lifecycle
 python3 tests/infinity_rotation/test_history.py
 python3 scripts/validate-infinity71-java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-35/android.jar" --out engine/rotation-java
 
-# Add Cobra as an internal second experience in the SAME Infinity package.
-# The finalizer removes the old direct Infinity Live launcher alias so Android
-# exposes exactly one Infinity app/icon.
-python3 scripts/infinity_1_0_9_single_app.py source --source kodi \
+# Build the one-launcher foundation, then replace its prototype Live shell with
+# the legitimate Cobra provider + Media3 runtime.
+python3 scripts/infinity_1_0_9_cobra_legit.py source --source kodi \
   --receipt engine/live-app-shell-source.json
-python3 scripts/infinity_1_0_9_single_app.py verify-source --source kodi
+python3 scripts/infinity_1_0_9_cobra_legit.py verify-source --source kodi
 
-grep -q 'versionCode 2103132' kodi/tools/android/packaging/xbmc/build.gradle.in
-grep -q 'versionName "1.0.9-2in1-SingleApp-Candidate-2"' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q 'versionCode 2103133' kodi/tools/android/packaging/xbmc/build.gradle.in
+grep -q 'versionName "1.0.9-Cobra-Legitimate-Live-Candidate-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q "androidx.media3:media3-exoplayer:1.7.1" kodi/tools/android/packaging/xbmc/build.gradle.in
 grep -q 'set(TARGET_SDK 35)' kodi/cmake/platform/android/android.cmake
 grep -q 'android:name=".InfinityLiveActivity"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 ! grep -q 'android:name=".InfinityLiveLauncher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+grep -q 'android:usesCleartextTraffic="true"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 grep -q 'Choose Your Experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
-grep -q 'switch experiences later from Settings' kodi/tools/android/packaging/xbmc/src/Splash.java.in
 grep -q 'class InfinityLiveActivity' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -q 'COBRA LIVE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -q 'SWITCH PROFILE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'player_api.php?username=' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'get_live_streams' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'get_live_categories' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'parseM3u' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -q 'new ExoPlayer.Builder' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -q 'XTREAM' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -q 'MULTI-VIEW' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-grep -q 'loadXmlTv' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'setEnableDecoderFallback(true)' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'openMultiView' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'COBRA • LIVE TV' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'Stream could not play' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -q 'ProgramPair pair = guide.get(channel);' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 grep -Fq 'CGUIComponent* gui = CServiceBroker::GetGUI();' kodi/xbmc/input/touch/generic/GenericTouchActionHandler.cpp
 grep -Fq 'if (gui == nullptr)' kodi/xbmc/input/touch/generic/GenericTouchActionHandler.cpp
-! test -e kodi/tools/android/packaging/xbmc/src/InfinityMultiViewController.java.in
-! grep -R -E 'CobraTV|cobratv|libmpv|android\.media\.MediaPlayer' \
+! grep -R -E 'com\.cobratv|CobraTV_|libmpv|android\.media\.MediaPlayer' \
   kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 
+test -f addons/script.infinity.cobra.theme/addon.xml
+test -f addons/script.infinity.cobra.theme/resources/cobra-theme.json
 python3 - <<'PY'
 from pathlib import Path
 manifest = Path('kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in').read_text()
 launcher = '<category android:name="android.intent.category.LAUNCHER" />'
 assert manifest.count(launcher) == 1, manifest.count(launcher)
 assert 'InfinityLiveLauncher' not in manifest
-print('PASS: manifest exposes exactly one Android launcher entry')
+print('PASS: exactly one Android launcher; Cobra remains internal')
 PY
 
-echo 'PASS: one Infinity APK contains both Infinity and Cobra with one launcher icon'
+echo 'PASS: legitimate Cobra provider, playback, guide, Multi-View and one-app contracts are source-backed'
