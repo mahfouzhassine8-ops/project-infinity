@@ -109,9 +109,13 @@ class CobraSourceTemplateTests(unittest.TestCase):
         cls.java = (
             ROOT / "patches/infinity-cobra/InfinityLiveActivity.java.in"
         ).read_text(encoding="utf-8")
+        cls.patcher = (
+            ROOT / "scripts/infinity_1_0_9_cobra_legit.py"
+        ).read_text(encoding="utf-8")
         cls.theme = json.loads(
             (
-                ROOT / "addons/script.infinity.live/resources/cobra-theme.json"
+                ROOT
+                / "addons/script.infinity.cobra.theme/resources/cobra-theme.json"
             ).read_text(encoding="utf-8")
         )
 
@@ -163,12 +167,26 @@ class CobraSourceTemplateTests(unittest.TestCase):
             "MULTI-VIEW",
             "SOURCES",
             "SETTINGS",
-            ".kodi/addons/script.infinity.live/resources/cobra-theme.json",
+            ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json",
         ):
             self.assertIn(needle, self.java)
+        self.assertIn(
+            'addons/script.infinity.cobra.theme/resources/cobra-theme.json',
+            self.patcher,
+        )
         self.assertEqual(self.theme["schema"], 1)
         self.assertRegex(self.theme["accent"], r"^#[0-9A-Fa-f]{6}$")
         self.assertGreaterEqual(self.theme["row_height"], 48)
+
+    def test_build_corrects_xmltv_current_next_accumulator(self):
+        self.assertIn(
+            '"ProgramPair pair = mGuide.get(channel);",',
+            self.patcher,
+        )
+        self.assertIn(
+            '"ProgramPair pair = guide.get(channel);",',
+            self.patcher,
+        )
 
 
 if __name__ == "__main__":
