@@ -24,6 +24,7 @@ python3 -m py_compile \
   scripts/infinity_1_0_9_cobra_full.py \
   scripts/infinity_1_0_9_cobra_full_fixups.py \
   scripts/infinity_1_0_9_cobra_full_runner.py \
+  scripts/infinity_1_0_9_cobra_device_parity.py \
   scripts/package_cobra_theme.py \
   scripts/infinity_touch_startup_guard.py \
   scripts/infinity_upper_layer_repack.py \
@@ -77,7 +78,8 @@ python3 scripts/validate-infinity71-java.py --source kodi \
   --android-jar "$ANDROID_HOME/platforms/android-35/android.jar" --out engine/rotation-java
 
 # Candidate 2 is layered on the exact successful Candidate 1 source transform.
-# Use the guarded runner that has already passed the fast transform/syntax suite.
+# The guarded runner now adds Cobra's Activity-level Infinity device parity only
+# after all strict Candidate 2 source contracts have completed.
 python3 scripts/infinity_1_0_9_cobra_full_runner.py source --source kodi \
   --receipt engine/cobra-full-source.json
 python3 scripts/infinity_1_0_9_cobra_full_runner.py verify-source --source kodi
@@ -88,12 +90,16 @@ grep -q "androidx.media3:media3-exoplayer:1.7.1" kodi/tools/android/packaging/xb
 grep -q 'set(TARGET_SDK 35)' kodi/cmake/platform/android/android.cmake
 MANIFEST=kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+DEVICE=kodi/tools/android/packaging/xbmc/src/InfinityCobraDeviceBridge.java.in
 grep -q 'android:name=".InfinityLiveActivity"' "$MANIFEST"
 grep -q 'android:name=".InfinityCobraRecordingService"' "$MANIFEST"
 grep -q 'android.permission.FOREGROUND_SERVICE_DATA_SYNC' "$MANIFEST"
 grep -q 'android.permission.RECEIVE_BOOT_COMPLETED' "$MANIFEST"
 ! grep -q 'android:name=".InfinityLiveLauncher"' "$MANIFEST"
 grep -q 'android:usesCleartextTraffic="true"' "$MANIFEST"
+grep -q 'android:supportsPictureInPicture="true"' "$MANIFEST"
+grep -q 'android:resizeableActivity="true"' "$MANIFEST"
+grep -q 'android.supports_size_changes' "$MANIFEST"
 grep -q 'Choose Your Experience' kodi/tools/android/packaging/xbmc/src/Splash.java.in
 
 for token in \
@@ -103,15 +109,25 @@ for token in \
   'scheduleRecording' 'addReminder' 'timeshift.php' 'TrackSelectionOverride' \
   'Settings.ACTION_CAST_SETTINGS' 'ACTION_OPEN_DOCUMENT' 'showGuideOverlay()' \
   'cobra_custom_epg:' 'continue_items' 'playNextEpisode()' 'mStallWatchdog' \
-  'mAutoRefresh' 'mFeatures.writeHealth'; do
+  'mAutoRefresh' 'mFeatures.writeHealth' 'enterPictureInPictureMode' \
+  'onPictureInPictureModeChanged' 'onMultiWindowModeChanged' 'mMultiChrome' \
+  'showMultiChromeTemporarily'; do
   grep -Fq "$token" "$JAVA" || { echo "Missing Candidate 2 runtime token: $token" >&2; exit 1; }
 done
 
-for helper in InfinityCobraFeatureRuntime InfinityCobraRecordingService InfinityCobraReminderReceiver InfinityCobraBootReceiver; do
+for helper in InfinityCobraFeatureRuntime InfinityCobraRecordingService InfinityCobraReminderReceiver InfinityCobraBootReceiver InfinityCobraDeviceBridge; do
   test -f "kodi/tools/android/packaging/xbmc/src/${helper}.java.in"
   grep -Fq "src/${helper}.java" kodi/cmake/scripts/android/Install.cmake
 done
 
+for token in \
+  'infinity_player_rotation' 'SCREEN_ORIENTATION_FULL_SENSOR' \
+  '.kodi/userdata/addon_data/service.infinity.refresh' 'preferredDisplayModeId' \
+  'android.hardware.sensor.hinge_angle' 'fold-cover' 'fold-inner'; do
+  grep -Fq "$token" "$DEVICE" || { echo "Missing Cobra device parity token: $token" >&2; exit 1; }
+done
+
+! grep -Fq 'mMultiOverlay.addView(bar, new FrameLayout.LayoutParams(-1, dp(60), Gravity.TOP))' "$JAVA"
 grep -Fq 'CGUIComponent* gui = CServiceBroker::GetGUI();' kodi/xbmc/input/touch/generic/GenericTouchActionHandler.cpp
 grep -Fq 'if (gui == nullptr)' kodi/xbmc/input/touch/generic/GenericTouchActionHandler.cpp
 ! grep -R -E 'com\.cobratv|CobraTV_|libmpv|android\.media\.MediaPlayer' \
@@ -125,6 +141,8 @@ manifest = Path('kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in').read
 launcher = '<category android:name="android.intent.category.LAUNCHER" />'
 assert manifest.count(launcher) == 1, manifest.count(launcher)
 assert 'InfinityLiveLauncher' not in manifest
+assert 'android:supportsPictureInPicture="true"' in manifest
+assert 'android.supports_size_changes' in manifest
 theme=json.loads(Path('addons/script.infinity.cobra.theme/resources/cobra-theme.json').read_text())
 assert theme['schema'] == 2
 for key in ('touch_target','rail_item_height','motion_ms'):
@@ -132,7 +150,10 @@ for key in ('touch_target','rail_item_height','motion_ms'):
 health=Path('kodi/tools/android/packaging/xbmc/src/InfinityCobraFeatureRuntime.java.in').read_text()
 for token in ('redact(', 'username|user|password|pass', '/live/***/***/', 'cobra-health.json'):
     assert token in health, token
-print('PASS: one launcher + Cobra full feature + redacted diagnostics + fast theme contracts')
+receipt=json.loads(Path('engine/cobra-full-source.json').read_text())
+for key in ('cobra_pip','cobra_fold_reflow','cobra_multi_window','cobra_rotation_shared_with_infinity','cobra_refresh_policy_shared_with_infinity'):
+    assert receipt.get(key) is True, (key, receipt.get(key))
+print('PASS: one launcher + full Cobra features + Infinity fold/PiP device parity + redacted diagnostics')
 PY
 
 echo 'PASS: Cobra Full Feature Candidate 2 preflight is source-backed and ready for native compile'
