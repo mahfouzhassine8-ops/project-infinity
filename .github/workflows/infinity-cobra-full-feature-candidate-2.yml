@@ -9,20 +9,42 @@ on:
       - '.github/workflows/infinity-cobra-full-feature-candidate-2.yml'
       - 'scripts/infinity_live_app_ci_*.sh'
       - 'scripts/infinity_1_0_9_cobra_full*.py'
+      - 'scripts/infinity_1_0_9_cobra_device_parity.py'
       - 'scripts/infinity_1_0_9_cobra_legit.py'
       - 'scripts/infinity_1_0_9_single_app.py'
       - 'scripts/infinity_1_0_9_live_app_shell.py'
+      - 'scripts/infinity_1_0_9_live_release.py'
       - 'scripts/cobra_provider_contract.py'
       - 'scripts/package_cobra_theme.py'
       - 'scripts/infinity_touch_startup_guard.py'
       - 'scripts/infinity_gui_render_hardening.py'
       - 'scripts/infinity_gui_render_hardening_v2.py'
+      - 'scripts/infinity_gui_render_hardening_v3.py'
+      - 'scripts/infinity_player_rotation.py'
+      - 'scripts/infinity_1_0_8_deep_rebrand.py'
+      - 'scripts/infinity_1_0_8_deep_rebrand_preimage.py'
+      - 'scripts/infinity_1_0_8_deep_audio_rebrand.py'
+      - 'scripts/infinity_audio_policy_source.py'
+      - 'scripts/infinity-responsive-v5.py'
+      - 'scripts/validate_infinity_audio_policy.py'
+      - 'scripts/validate_infinity_skin_contract.py'
+      - 'scripts/validate-infinity71-java.py'
+      - 'scripts/infinity71.py'
       - 'scripts/infinity_upper_layer_repack.py'
+      - 'scripts/sign-infinity71.sh'
       - 'patches/infinity-cobra/**'
       - 'patches/infinity-cobra-v2/**'
+      - 'patches/infinity-7.1-audited/**'
+      - 'patches/infinity-responsive-v5/**'
+      - 'patches/infinity-refresh/**'
+      - 'patches/infinity-media/**'
+      - 'patches/infinity-audio-policy/**'
       - 'addons/script.infinity.cobra.theme/**'
       - 'tests/cobra_live/**'
       - 'tests/cobra_full/**'
+      - 'tests/infinity_live/**'
+      - 'tests/infinity_audio/**'
+      - 'tests/infinity_rotation/**'
       - 'docs/cobra-candidate-2-feature-contract.md'
 
 permissions:
@@ -116,6 +138,8 @@ jobs:
             candidate/FEATURE-CONTRACT.md
             candidate/DEVICE-TEST.txt
             engine/gui-render-hardening-source.json
+            engine/live-app-shell-engine.json
+            engine/overlay-inventory.json
             engine/base-badging.txt
             preflight/
           if-no-files-found: warn
