@@ -36,6 +36,7 @@ jobs:
           python -m py_compile \
             scripts/infinity_1_0_9_cobra_full.py \
             scripts/infinity_1_0_9_cobra_full_fixups.py \
+            scripts/infinity_1_0_9_cobra_full_runner.py \
             scripts/infinity_1_0_9_cobra_legit.py \
             scripts/package_cobra_theme.py
 
@@ -51,10 +52,9 @@ jobs:
           import sys
           from pathlib import Path
           sys.path.insert(0, 'scripts')
-          import infinity_1_0_9_cobra_full as full
-          import infinity_1_0_9_cobra_full_fixups as fixups
+          import infinity_1_0_9_cobra_full_runner as runner
           src=Path('patches/infinity-cobra/InfinityLiveActivity.java.in').read_text()
-          out=fixups.harden_activity(full.patch_activity(src)).replace('@APP_PACKAGE@','com.projectinfinity.kodi')
+          out=runner.transform_for_fast_test(src).replace('@APP_PACKAGE@','com.projectinfinity.kodi')
           Path('/tmp/InfinityLiveActivity.java').write_text(out)
           for name in ('InfinityCobraFeatureRuntime','InfinityCobraRecordingService','InfinityCobraReminderReceiver','InfinityCobraBootReceiver'):
               raw=Path(f'patches/infinity-cobra-v2/{name}.java.in').read_text().replace('@APP_PACKAGE@','com.projectinfinity.kodi')
