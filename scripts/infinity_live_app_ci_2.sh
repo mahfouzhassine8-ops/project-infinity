@@ -2,6 +2,26 @@
 set -euo pipefail
 
 mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
+
+# Combined Candidate 2 gate: source hardening + Java import assertion must pass before the long cook.
+cd "$GITHUB_WORKSPACE"
+python3 -m py_compile scripts/infinity_gui_render_hardening.py
+JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
+  echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2
+  exit 1
+}
+python3 scripts/infinity_gui_render_hardening.py apply --source kodi \
+  --receipt engine/gui-render-hardening-source.json
+python3 scripts/infinity_gui_render_hardening.py verify --source kodi
+# Fail pre-build if the exact crash/resize protections were not installed.
+grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
+grep -Fq 'void FlushRenderCaches();' kodi/xbmc/guilib/GUIFontTTF.h
+grep -Fq 'ConsumeRenderCacheFlushRequest()' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+grep -Fq 'm_committed.size == size' kodi/xbmc/platform/android/activity/XBMCApp.h
+grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+! grep -Fq 'assert(bufferHandle == 0);' kodi/xbmc/guilib/GUIFontCache.h
+
 cd kodi/tools/depends
 ./bootstrap
 ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
@@ -18,6 +38,7 @@ CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
 test -x "$CMAKE_BIN"
 "$CMAKE_BIN" -S "$GITHUB_WORKSPACE/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+# Native renderer compile happens as part of the one real Candidate 2 cook; no Java-only build is run.
 make -C "$BUILD_DIR" -j"$(nproc)"
 make -C "$BUILD_DIR" apk -j"$(nproc)"
 
@@ -56,6 +77,10 @@ with zipfile.ZipFile(apk) as z:
     for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
         assert forbidden not in joined, forbidden
     native_sha=hashlib.sha256(native).hexdigest()
+receipt=json.loads(Path('engine/gui-render-hardening-source.json').read_text())
+assert receipt['gui_font_cache_hardened'] is True
+assert receipt['renderer_changed'] is True
+assert receipt['android_resize_hardened'] is True
 Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'schema':2,
   'bridge_version':5,
@@ -109,9 +134,11 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'dex':dex,
   'source_commit':os.environ['GITHUB_SHA'],
   'kodi_application_player_changed':False,
-  'kodi_renderer_changed':False,
+  'kodi_renderer_changed':True,
+  'kodi_gui_font_cache_hardened':True,
+  'kodi_android_resize_hardened':True,
   'runtime_tested':False,
 },indent=2,sort_keys=True)+'\n')
 PY
 
-echo 'PASS: source-backed Kodi 21.3 engine built with Cobra Full Feature Candidate 2 + Infinity Fold device parity'
+echo 'PASS: source-backed Kodi 21.3 engine built with Cobra Full Feature Candidate 2 + GUI/render hardening + Infinity Fold device parity'
