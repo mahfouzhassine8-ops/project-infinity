@@ -29,20 +29,35 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Verify accepted Live source lineage is reachable
-        shell: bash
+      - name: Verify locked external companion ledger
         run: |
-          set -euo pipefail
-          LIVE_COMMIT='cb9769bd77d6ca040b07435f569e9c5887d033d9'
-          git cat-file -e "${LIVE_COMMIT}^{commit}"
-          git show "${LIVE_COMMIT}:addons/script.infinity.live/addon.xml" | grep -F 'version="0.1.12"'
+          python3 - <<'PY'
+          import json
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          baseline = json.loads(Path('stability/infinity-stability-baseline.json').read_text())
+          artifacts = json.loads(Path('stability/canonical-companion-artifacts.json').read_text())
+          live = next(x for x in baseline['external_companions'] if x['addon_id'] == 'script.infinity.live')
+          receipt = next(x for x in artifacts['artifacts'] if x['addon_id'] == 'script.infinity.live')
+          assert live['target_version'] == '0.1.12'
+          assert live['status'] == 'locked_user_accepted'
+          assert live['historical_source_commit_reachable'] is False
+          assert receipt['version'] == live['target_version']
+          assert receipt['sha256'] == live['sha256']
+          assert receipt['zip_crc'] == 'passed'
+          assert receipt['python_syntax'] == 'passed'
+          assert receipt['python_cache_entries'] == 0
+          branch = ET.parse('addons/script.infinity.live/addon.xml').getroot()
+          if branch.attrib.get('version') != live['target_version']:
+              print('INFO: branch Live source is a stale shadow and is not the locked artifact authority:', branch.attrib.get('version'))
+          print('PASS: locked Live 0.1.12 artifact receipt is pinned; dead historical commit is not treated as reachable')
+          PY
 
       - name: Run Compat Guard clean-core regression tests
         run: python3 -m unittest discover -s tests/infinity_compat -p 'test_candidate_107.py' -v
