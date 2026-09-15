@@ -2,20 +2,20 @@
 set -euo pipefail
 
 mkdir -p candidate
-BASE=engine/Infinity-1.0.9-2in1-SingleApp-Candidate-2-Engine-Base.apk
-UNSIGNED=candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2-unsigned.apk
-FINAL=candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.apk
+BASE=engine/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1-Engine-Base.apk
+UNSIGNED=candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1-unsigned.apk
+FINAL=candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.apk
 
 python3 scripts/infinity71.py overlay --apk "$BASE" \
   --manifest engine/overlay-inventory.json --output candidate/with-lock-unsigned.apk
 python3 scripts/infinity_upper_layer_repack.py \
   candidate/with-lock-unsigned.apk candidate/upper-layer-unsigned.apk
 
-python3 scripts/infinity_1_0_9_single_app.py apk \
+python3 scripts/infinity_1_0_9_cobra_legit.py apk \
   --input candidate/upper-layer-unsigned.apk \
   --output "$UNSIGNED" \
   --receipt candidate/live-app-shell-branding-apk.json
-python3 scripts/infinity_1_0_9_single_app.py verify-apk --apk "$UNSIGNED"
+python3 scripts/infinity_1_0_9_cobra_legit.py verify-apk --apk "$UNSIGNED"
 
 for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
   if [[ -z "${!name:-}" ]]; then
@@ -31,7 +31,7 @@ grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' \
   candidate/signing-verification.txt
 
 "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$FINAL" | tee candidate/badging.txt
-grep -q "package: name='com.projectinfinity.kodi' versionCode='2103132' versionName='1.0.9-2in1-SingleApp-Candidate-2'" candidate/badging.txt
+grep -q "package: name='com.projectinfinity.kodi' versionCode='2103133' versionName='1.0.9-Cobra-Legitimate-Live-Candidate-1'" candidate/badging.txt
 grep -q "application-label:'Infinity'" candidate/badging.txt
 test "$(grep -c '^launchable-activity:' candidate/badging.txt)" -eq 1
 
@@ -40,14 +40,15 @@ test "$(grep -c '^launchable-activity:' candidate/badging.txt)" -eq 1
 grep -q 'InfinityLiveActivity' candidate/manifest.txt
 ! grep -q 'InfinityLiveLauncher' candidate/manifest.txt
 grep -q 'action.OPEN_LIVE' candidate/manifest.txt
+grep -q 'usesCleartextTraffic' candidate/manifest.txt
 
-python3 scripts/infinity_1_0_9_single_app.py verify-apk --apk "$FINAL"
+python3 scripts/infinity_1_0_9_cobra_legit.py verify-apk --apk "$FINAL"
 python3 scripts/validate_infinity_skin_contract.py
 
 python3 - <<'PY'
 import re,zipfile
-base='engine/Infinity-1.0.9-2in1-SingleApp-Candidate-2-Engine-Base.apk'
-final='candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.apk'
+base='engine/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1-Engine-Base.apk'
+final='candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.apk'
 with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
     for name in a.namelist():
         if name.startswith('lib/') or re.fullmatch(r'classes\d*\.dex', name):
@@ -56,12 +57,20 @@ with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
     joined=b''.join(b.read(n) for n in b.namelist() if re.fullmatch(r'classes\d*\.dex',n))
     for needle in (
         b'InfinityLiveActivity', b'infinity_experience',
-        b'androidx/media3/exoplayer/ExoPlayer', b'MULTI-VIEW', b'XTREAM'
+        b'player_api.php?username=', b'get_live_streams', b'get_live_categories',
+        b'androidx/media3/exoplayer/ExoPlayer', b'MULTI-VIEW',
+        b'Stream could not play'
     ):
         assert needle in joined, needle
-    for forbidden in (b'CobraTV', b'cobratv', b'libmpv', b'android/media/MediaPlayer'):
+    for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
         assert forbidden not in joined, forbidden
-print('PASS: signed single-app APK preserves source-built DEX/native engine byte-for-byte')
+    names=set(b.namelist())
+    required_theme={
+      'assets/addons/script.infinity.cobra.theme/addon.xml',
+      'assets/addons/script.infinity.cobra.theme/resources/cobra-theme.json',
+    }
+    assert required_theme <= names, required_theme - names
+print('PASS: signed APK preserves source-built engine and bundles independent Cobra theme addon')
 PY
 
 cp engine/audio-receipts/cumulative-source.json candidate/cumulative-audio-source.json
@@ -71,37 +80,50 @@ cp engine/live-release-source.json candidate/live-release-source.json
 cp engine/touch-startup-guard-source.json candidate/touch-startup-guard-source.json
 cp engine/live-app-shell-source.json candidate/live-app-shell-source.json
 cp engine/live-app-shell-engine.json candidate/live-app-shell-engine.json
-sha256sum "$FINAL" | tee candidate/Infinity-1.0.9-2in1-SingleApp-Candidate-2.sha256
+cp addons/script.infinity.cobra.theme/resources/cobra-theme.json candidate/cobra-theme.json
+sha256sum "$FINAL" | tee candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.sha256
 
 cat > candidate/DEVICE-TEST.txt <<'EOF'
-INFINITY 2-IN-1 SINGLE-APP CANDIDATE 2 — DEVICE ACCEPTANCE REQUIRED
+INFINITY 1.0.9 — COBRA LEGITIMATE LIVE CANDIDATE 1
+DEVICE ACCEPTANCE REQUIRED — DO NOT LOCK BEFORE THESE PASS
 
-This is ONE installed Infinity APK/package with two internal experiences:
-- Infinity/Kodi
-- Cobra (dedicated Live Activity + Media3/ExoPlayer)
+ONE APP CONTRACT
+1. Update-install over the current permanently signed Infinity build. Confirm versionCode 2103133.
+2. Android launcher/app list must show exactly ONE Infinity entry. No separate Cobra or Infinity Live icon.
+3. Launch Infinity -> Choose Your Experience -> Infinity or Cobra. Both must stay in the same Android package.
+4. Remember Infinity, relaunch; remember Cobra, relaunch; Ask on Next Launch must restore the chooser.
 
-There must be ONE Android launcher icon: Infinity. Cobra is entered inside Infinity.
+PROVIDER LOGIN — NON-NEGOTIABLE
+5. Add the real Xtream-compatible service using server + username + password. TEST & SAVE must authenticate and populate Live channels.
+6. If the provider uses plain http://, it must still connect. If available, test an https:// provider too.
+7. Wrong password must produce a specific provider/authentication error, not a generic "cannot load" message.
+8. Bad hostname must report server/DNS failure; unreachable server must report timeout; HTTP failures must show the HTTP code.
+9. Add a real M3U/M3U8 source. Verify channel names, groups, relative stream URLs and provider User-Agent/Referer headers when supplied.
 
-1. Update-install over the current signed Infinity build. Confirm versionCode 2103132.
-2. Android launcher/app list: confirm there is exactly ONE Infinity entry and no separate Infinity Live/Cobra entry.
-3. First normal launch: chooser offers Infinity and Cobra inside the same app.
-4. Choose Infinity + "Launch & remember"; relaunch and confirm normal Infinity starts.
-5. Switch to Cobra from the in-app experience path; confirm Cobra opens without launching a second Android app/package.
-6. Cobra Settings -> set default to Cobra; relaunch Infinity and confirm Cobra starts directly inside the same package.
-7. Set "Ask me each launch"; relaunch and confirm chooser returns.
-8. Add an M3U source. Confirm channels load, groups/categories work, Search filters, Favorites and Recents persist.
-9. Add an Xtream-compatible source using server/username/password. Confirm playlist and XMLTV URLs resolve without bundling credentials in the APK.
-10. Guide: confirm current/next programme data appears when XMLTV is available.
-11. Single-stream playback: confirm video+audio, channel switching, Favorite, Guide and PiP (when device supports PiP).
-12. Multi-View: select two different channels. Confirm both video tiles move simultaneously.
-13. Multi-View audio: tap or D-pad focus either tile and press OK. Confirm exactly one tile is audible.
-14. Fold/cover layouts: wide display uses side-by-side Multi-View; portrait/cover stacks feeds vertically.
-15. Back from playback -> Cobra channel browser. Back from Cobra root -> normal Infinity.
-16. Background/home/app switch: all Live decoders release. No hidden IPTV playback.
-17. Regression: normal Infinity player, Cinema, responsive Fold/cover UI, audio policy, rotation, AddonBrowser, FileBrowser and Install from ZIP.
-18. Crash regression: aggressively tap during cold launch and during transitions. The native touch-startup GUI null guard must remain effective.
-19. Privacy: confirm no provider URL, username, password, M3U or EPG data is bundled in the APK artifact.
-20. Do not lock this branch until device acceptance passes.
+LIVE TV + GUIDE
+10. Categories/groups must populate and filter correctly. Search, Favorites and Recents must persist.
+11. XMLTV must populate current/next programme text when the provider exposes guide data. EPG failure must not break playable channels.
+12. Selecting a channel must create a visible Media3/ExoPlayer surface with VIDEO AND AUDIO.
+13. Test both MPEG-TS and HLS channels when available. Xtream TS/HLS fallback must retry once when the provider's preferred container fails.
+14. PREV/NEXT, Favorite, Guide, Back and player chrome must work with touch and D-pad/remote navigation.
+
+MULTI-VIEW
+15. Choose Multi-View and select a second channel. Both tiles must render moving video simultaneously.
+16. Switching focus/tapping AUDIO 1 or AUDIO 2 must leave exactly one audible tile without recreating Infinity.
+17. Wide/Fold inner display: feeds side by side. Portrait/cover: feeds stack vertically.
+
+INFINITY REGRESSION
+18. Return to Infinity must restore the normal Infinity/Kodi experience and release Cobra players.
+19. Confirm normal Infinity Movies/Shows player, Cinema, rotation, responsive Fold/cover UI, audio policy, AddonBrowser, FileBrowser and Install from ZIP remain intact.
+20. Aggressively tap during cold launch/transitions; the native touch-startup crash guard must remain effective.
+
+FAST VISUAL UPDATE CONTRACT
+21. Cobra Settings -> RELOAD COBRA UI THEME must reread script.infinity.cobra.theme/resources/cobra-theme.json.
+22. Future color/spacing/row-height visual tuning ships as a small Cobra Theme ZIP; it must not require another native APK build.
+
+PRIVACY / SOURCE BOUNDARY
+23. No provider URL, username, password, M3U or EPG credentials may be baked into the APK artifact.
+24. No proprietary CobraTV code/assets are bundled. Cobra is an independently authored Infinity experience.
 EOF
 
-echo 'PASS: Infinity 2-in-1 Single-App Candidate 2 packaged, permanently signed and statically verified'
+echo 'PASS: legitimate Cobra Live candidate packaged, permanently signed and statically verified'
