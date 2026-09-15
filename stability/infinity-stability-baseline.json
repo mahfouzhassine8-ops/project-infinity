@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "as_of": "2026-09-15",
+  "purpose": "Infinity whole-stack stability certification baseline",
+  "git_base": {
+    "repository": "mahfouzhassine8-ops/project-infinity",
+    "source_branch": "infinity-cobra-full-feature-candidate-2",
+    "commit": "080545faf884741c260d0a4a2c4810a7a788127b",
+    "stability_branch": "infinity-stability-rc"
+  },
+  "locked_skin": {
+    "addon_id": "skin.infinity.diggz",
+    "version": "1.0.5.133",
+    "filename": "Infinity-Skin-1.0.5.133-Drawer-Top-Left-Bleed-Root-Fix-Official-Lock.zip",
+    "sha256": "4bd4cda3335b233f19b3712e9fd65c56c67a91bd45708cdc2f147b2a0b6a4abe",
+    "xml_count": 388,
+    "profiles": ["16x9", "20x9", "6x5", "5x6", "portrait"],
+    "external_artifact": true
+  },
+  "companions": [
+    {
+      "addon_id": "script.infinity.live",
+      "name": "Infinity Live",
+      "target_version": "0.1.12",
+      "sha256": "e2460306c1e8c1171a997a8969a8c85a5198f80389a8174a3941d5e6ba3c1f41",
+      "source_commit": "cb9769bd77d6ca040b07435f569e9c5887d033d9",
+      "status": "locked_user_accepted",
+      "repo_source_required": true
+    },
+    {
+      "addon_id": "script.infinity.commandcenter",
+      "name": "Infinity Command Center",
+      "target_version": "0.3.6",
+      "sha256": "99c66221cf4b979018ab4e39290b8ea8d060bc7cc3641b85a7b5e9237f68b1db",
+      "status": "reference_baseline",
+      "repo_source_required": false,
+      "identity_reconciliation_required": true
+    },
+    {
+      "addon_id": "script.kodihealthcenter",
+      "name": "Kodi Health Center",
+      "target_version": "2.5.2",
+      "sha256": "211c98194e3bb40751544c009af6b8881ee2f14b8ba0b02ea3dac9fb9c5776b9",
+      "status": "reference_baseline",
+      "repo_source_required": false,
+      "identity_reconciliation_required": true
+    },
+    {
+      "addon_id": "service.infinity.compat",
+      "name": "Infinity Compatibility Guard",
+      "target_version": "0.8.0",
+      "sha256": "3aeaf93de170b547081e9492d1a2e8de4449dea8941b6d960b2e1693a87471ba",
+      "status": "reference_baseline",
+      "repo_source_required": true,
+      "contract": {
+        "single_startup_service": true,
+        "forbid_player_mutation": true,
+        "forbid_skin_file_mutation": true,
+        "forbid_foreign_skin_reassertion": true
+      },
+      "identity_reconciliation_required": true
+    },
+    {
+      "addon_id": "script.infinity.support",
+      "name": "Infinity Support Exporter",
+      "target_version": "0.3.0",
+      "sha256": "b903da8fad63f79218efe41d5e6992029a4dec6b376ce49cc7bd2a084d637d7b",
+      "status": "reference_baseline",
+      "repo_source_required": true
+    },
+    {
+      "addon_id": "script.infinity.audiopolicy",
+      "name": "Infinity Audio Policy",
+      "target_version": "1.0.0",
+      "status": "repo_baseline",
+      "repo_source_required": true
+    },
+    {
+      "addon_id": "service.infinity.refresh",
+      "name": "Infinity High Refresh Controller",
+      "target_version": "1.0.1",
+      "status": "repo_baseline",
+      "repo_source_required": true
+    },
+    {
+      "addon_id": "script.infinity.cobra.theme",
+      "name": "Infinity Cobra Theme",
+      "target_version": "1.1.0",
+      "status": "repo_baseline",
+      "repo_source_required": true
+    }
+  ],
+  "providers": [
+    "plugin.video.umbrella",
+    "plugin.video.fenlight",
+    "plugin.video.pov",
+    "plugin.video.thecrew",
+    "plugin.video.seren",
+    "plugin.video.ghost",
+    "plugin.video.essential",
+    "plugin.video.bnwmovie19",
+    "plugin.video.halcyon",
+    "plugin.video.absolution",
+    "plugin.video.themoviedb.helper",
+    "plugin.video.playlistbrowser"
+  ],
+  "known_boundaries": [
+    "Candidate 2 native compile is known-good; packaging/signing is a separate downstream gate.",
+    "Infinity Live 0.1.12 does not claim to repair audio-with-black-video MediaCodec/provider playback.",
+    "The locked skin artifact is external to this repository and must be hash-verified when supplied to the audit.",
+    "Clean-core companion package identity must be reconciled against the current skin.infinity.diggz lock before certification."
+  ]
+}
