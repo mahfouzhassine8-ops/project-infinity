@@ -4,9 +4,8 @@ set -euo pipefail
 mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" engine
 
 # Candidate 2 preflight already recreated and verified the exact Infinity + Cobra
-# source lineage in ./kodi. Do not replace that tree with stock Kodi here.
-# Renderer v3 was already applied in preflight; verify it here without reapplying
-# to avoid exact-once transform failures.
+# source lineage in ./kodi. Keep that tree and add the build-stage renderer v3
+# hardening exactly once before the native cook.
 cd "$GITHUB_WORKSPACE"
 python3 -m py_compile scripts/infinity_gui_render_hardening.py scripts/infinity_gui_render_hardening_v2.py scripts/infinity_gui_render_hardening_v3.py
 JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
@@ -14,6 +13,8 @@ grep -Fq 'import androidx.media3.common.AudioAttributes;' "$JAVA" || {
   echo 'Candidate 2 generated InfinityLiveActivity.java.in is missing Media3 AudioAttributes import' >&2
   exit 1
 }
+python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi \
+  --receipt engine/gui-render-hardening-source.json
 python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
 
 grep -Fq 'clear();' kodi/xbmc/guilib/GUIFontCache.h
@@ -26,8 +27,8 @@ grep -Fq 'state.CommitGeometry(request)' kodi/xbmc/windowing/android/WinSystemAn
 grep -Fq 'if (width <= 0 || height <= 0) return;' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
 ! grep -Fq 'assert(bufferHandle == 0);' kodi/xbmc/guilib/GUIFontCache.h
 
-# Build the same preflight-prepared source tree. This is the proven Candidate 2
-# path; resetting ./kodi here breaks the versioned transform chain.
+# Build the same preflight-prepared source tree. Resetting ./kodi here destroys
+# the ordered version lineage required by AppShell / single-app / Cobra layers.
 cd kodi/tools/depends
 ./bootstrap
 ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
@@ -61,8 +62,8 @@ grep -q "application-label:'Infinity'" engine/base-badging.txt
 test "$(grep -c '^launchable-activity:' engine/base-badging.txt)" -eq 1
 
 # Native compile/package output is authoritative for generated Java behavior.
-# The compiled DEX contract remains a hard gate; only source spelling assumptions
-# were removed. Renderer and forbidden-owner checks remain fatal.
+# Compiled feature and forbidden-owner checks remain hard gates. Renderer checks
+# use the schema v3 receipt actually produced by the hardening owner.
 python3 - <<'PY'
 import hashlib, json, re, zipfile
 from pathlib import Path
