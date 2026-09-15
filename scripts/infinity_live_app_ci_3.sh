@@ -43,6 +43,11 @@ grep -q 'InfinityCobraReminderReceiver' candidate/manifest.txt
 ! grep -q 'InfinityLiveLauncher' candidate/manifest.txt
 grep -q 'action.OPEN_LIVE' candidate/manifest.txt
 grep -q 'usesCleartextTraffic' candidate/manifest.txt
+grep -q 'supportsPictureInPicture' candidate/manifest.txt
+grep -q 'resizeableActivity' candidate/manifest.txt
+grep -q 'android.supports_size_changes' candidate/manifest.txt
+grep -q 'density' candidate/manifest.txt
+grep -q 'uiMode' candidate/manifest.txt
 
 python3 scripts/infinity_1_0_9_cobra_full_fixups.py verify-apk --apk "$FINAL"
 python3 scripts/validate_infinity_skin_contract.py
@@ -59,9 +64,12 @@ with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
     joined=b''.join(b.read(n) for n in b.namelist() if re.fullmatch(r'classes\d*\.dex',n))
     required=(
       b'InfinityLiveActivity', b'InfinityCobraFeatureRuntime', b'InfinityCobraRecordingService',
-      b'player_api.php?username=', b'get_vod_streams', b'get_series_info', b'RECORDINGS',
-      b'4 screens', b'CONTINUE WATCHING', b'cobra-health.json', b'AUDIO / SUBS',
-      b'CUSTOM EPG FOR ACTIVE SOURCE', b'Cobra Guide', b'CAST / ROUTE'
+      b'InfinityCobraDeviceBridge', b'player_api.php?username=', b'get_vod_streams',
+      b'get_series_info', b'RECORDINGS', b'4 screens', b'CONTINUE WATCHING',
+      b'cobra-health.json', b'AUDIO / SUBS', b'CUSTOM EPG FOR ACTIVE SOURCE', b'Cobra Guide',
+      b'CAST / ROUTE', b'PictureInPictureParams', b'infinity_player_rotation',
+      b'.kodi/userdata/addon_data/service.infinity.refresh', b'preferredDisplayModeId',
+      b'fold-cover', b'fold-inner', b'multiview-start', b'multiview-stop', b'player-close'
     )
     for needle in required: assert needle in joined, needle
     for forbidden in (b'CobraTV_', b'com/cobratv', b'libmpv', b'android/media/MediaPlayer'):
@@ -75,7 +83,7 @@ with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
     theme=json.loads(b.read('assets/addons/script.infinity.cobra.theme/resources/cobra-theme.json'))
     assert theme['schema']==2
     assert theme['touch_target']>=48
-print('PASS: signed Candidate 2 preserves source-built engine and bundles Cobra Theme 1.1 contract')
+print('PASS: signed Candidate 2 preserves engine, Cobra Theme 1.1 and Infinity Fold/PiP/rotation/refresh parity')
 PY
 
 cp engine/audio-receipts/cumulative-source.json candidate/cumulative-audio-source.json
@@ -121,42 +129,58 @@ MULTI-VIEW
 16. Test 2, 3 and 4 feeds. Device/provider connection limits may legitimately reject extra streams, but per-tile errors must not collapse other tiles.
 17. Exactly one tile may own audio at a time. Switch audio by focus/tap and AUDIO buttons.
 18. Wide/Fold: 2 feeds side-by-side and 3/4 in an adaptive grid. Portrait/cover: vertically stacked feeds.
-19. Watch temperature/decoder stability for 4 feeds; 4-feed acceptance is device-dependent until proven on this device.
+19. Multi-View controls must appear at the bottom, auto-hide after about 3.2 seconds, and reappear on tap. The old permanent top bar must not return.
+20. Watch temperature/decoder stability for 4 feeds; 4-feed acceptance is device-dependent until proven on this device.
 
 DVR
-20. Record current Live TV. Verify persistent foreground notification and a playable file in Cobra Recordings.
-21. Test both a direct MPEG-TS stream and an HLS stream if the provider permits recording.
-22. Record from Guide. Test 30m/1h/2h/4h/manual-stop paths and storage guard.
-23. Schedule a future recording; test after leaving Cobra. Reboot/package replacement should re-arm future schedules.
-24. While provider connection limits allow: watch one while recording another; record from source A while watching source B; play an existing recording while another records.
-25. Recordings screen: play, rename and delete. Long-press a scheduled item to cancel.
+21. Record current Live TV. Verify persistent foreground notification and a playable file in Cobra Recordings.
+22. Test both a direct MPEG-TS stream and an HLS stream if the provider permits recording.
+23. Record from Guide. Test 30m/1h/2h/4h/manual-stop paths and storage guard.
+24. Schedule a future recording; test after leaving Cobra. Reboot/package replacement should re-arm future schedules.
+25. While provider connection limits allow: watch one while recording another; record from source A while watching source B; play an existing recording while another records.
+26. Recordings screen: play, rename and delete. Long-press a scheduled item to cancel.
 
 REMINDERS / CATCH-UP
-26. Schedule a reminder and confirm notification opens Cobra for the relevant channel.
-27. On a provider/channel marked archive-capable, play a past programme using catch-up. Non-archive channels must not falsely expose catch-up.
+27. Schedule a reminder and confirm notification opens Cobra for the relevant channel.
+28. On a provider/channel marked archive-capable, play a past programme using catch-up. Non-archive channels must not falsely expose catch-up.
 
 MOVIES / SERIES
-28. Movies aggregates enabled Xtream providers and labels the provider for every title.
-29. Series loads seasons/episodes. Play an episode and allow it to end; next episode should auto-start when another episode exists.
-30. Stop a movie/episode after >5 seconds. Continue Watching must show the title and resume it. Near-complete titles should clear resume state.
-31. Long-press Movies/Series to add/remove My List. Search must work within loaded provider libraries.
-32. Verify decoder fallback and error reporting on a title the provider encodes differently from Live TV.
+29. Movies aggregates enabled Xtream providers and labels the provider for every title.
+30. Series loads seasons/episodes. Play an episode and allow it to end; next episode should auto-start when another episode exists.
+31. Stop a movie/episode after >5 seconds. Continue Watching must show the title and resume it. Near-complete titles should clear resume state.
+32. Long-press Movies/Series to add/remove My List. Search must work within loaded provider libraries.
+33. Verify decoder fallback and error reporting on a title the provider encodes differently from Live TV.
 
 PROFILES / PARENTAL / LOCAL FILES
-33. Create a second profile, optional PIN, and adult-category lock. Favorites/Recents/My List/Continue Watching must remain profile-scoped.
-34. Test correct/incorrect PIN behavior. Adult-named categories must be filtered when locked.
-35. Discover -> My Files must use Android's document picker and play a user-selected local video/audio file without broad-storage permission.
+34. Create a second profile, optional PIN, and adult-category lock. Favorites/Recents/My List/Continue Watching must remain profile-scoped.
+35. Test correct/incorrect PIN behavior. Adult-named categories must be filtered when locked.
+36. Discover -> My Files must use Android's document picker and play a user-selected local video/audio file without broad-storage permission.
 
 DISCOVER / UX
-36. Open Discover modules and verify navigation remains touch/D-pad safe. Remote public web modules are a legal-content shell, not bundled TV content.
-37. Verify larger touch targets, faster rail focus and responsive Fold/phone layouts.
-38. Install Infinity-Cobra-Theme-1.1.0 as a small ZIP and use Reload Cobra UI Theme. Visual token changes must not require another native APK build.
+37. Open Discover modules and verify navigation remains touch/D-pad safe. Remote public web modules are a legal-content shell, not bundled TV content.
+38. Verify larger touch targets, faster rail focus and responsive Fold/phone layouts.
+39. Install Infinity-Cobra-Theme-1.1.0 as a small ZIP and use Reload Cobra UI Theme. Visual token changes must not require another native APK build.
+
+FOLD / PIP / ROTATION / REFRESH — DEVICE PARITY
+40. On the cover display in portrait, Live TV categories AND channel rows must remain visible. The channel pane must not collapse to zero width.
+41. Open Cobra on the cover display, unfold to the inner display while browsing, and confirm the shell reflows without a crash, duplicate rail, frozen layout, or forced provider re-login.
+42. Fold back to the cover display while browsing. Confirm compact layout returns cleanly and touch/D-pad navigation remains usable.
+43. Start one Live channel, then fold/unfold during playback. Video/audio should survive; the player surface and controls should resize instead of tearing down the provider session.
+44. Start 2-4 feed Multi-View, choose AUDIO 2/3/4, then fold/unfold. The grid must reflow and the same selected audio owner must remain selected.
+45. With a single channel playing, press Home/leave Infinity. Cobra should enter real Android Picture-in-Picture when Android allows it. Player chrome must disappear in PiP.
+46. If Android rejects PiP or PiP is unavailable, playback must pause rather than leaving hidden/ghost audio running in the background.
+47. Enter PiP from Multi-View. Cobra must collapse Multi-View to the current audio-owner tile before PiP so only one feed continues in the PiP window.
+48. Return from PiP to Cobra. Confirm the player is interactive, controls return, and closing playback rebuilds the correct cover/inner shell.
+49. Enable Infinity's player rotation UNLOCKED mode, play Cobra video, and rotate the Fold. Cobra should use FULL_SENSOR only during active video; leaving playback/PiP/multi-window must return orientation control to Android.
+50. Switch Infinity refresh policy between Auto/High Refresh/Balanced/Battery where available. Cobra must read the same policy, request the matching display mode for UI, yield for match-video playback, and yield in PiP/multi-window.
+51. With battery saver enabled, verify Cobra caps the high-refresh request. If the device reports severe thermal status, Cobra must also cap/yield rather than forcing high refresh.
+52. Check Cobra Health/device diagnostics after cover/inner/PiP tests: device class should report fold-cover/fold-inner where the hinge feature is exposed and window class should move compact/medium/expanded at the 600/840dp thresholds.
 
 HEALTH / PRIVACY
-39. Trigger at least one provider error and one player error, then Cobra Settings -> Cobra Health Snapshot. Verify useful state is present.
-40. Snapshot must contain NO raw username/password or credential-bearing live/movie/series/timeshift URL.
-41. No provider credentials, M3U URLs or EPG credentials may be baked into the APK artifact.
-42. No proprietary CobraTV code/assets are bundled. This is an independently authored Infinity implementation using behavior/UX as reference only.
+53. Trigger at least one provider error and one player error, then Cobra Settings -> Cobra Health Snapshot. Verify useful state is present.
+54. Snapshot must contain NO raw username/password or credential-bearing live/movie/series/timeshift URL.
+55. No provider credentials, M3U URLs or EPG credentials may be baked into the APK artifact.
+56. No proprietary CobraTV code/assets are bundled. This is an independently authored Infinity implementation using behavior/UX as reference only.
 EOF
 
-echo 'PASS: Cobra Full Feature Candidate 2 packaged, permanently signed and statically verified'
+echo 'PASS: Cobra Full Feature Candidate 2 packaged, permanently signed and statically verified with Fold/PiP acceptance contract'
