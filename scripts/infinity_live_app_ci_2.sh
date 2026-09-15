@@ -109,7 +109,7 @@ for key in (
   'generation_current_check_exists','commit_after_accept_api_exists','retry_api_exists'):
     assert checks[key] is True, key
 
-Path('engine/live-app-shell-engine.json').write_text(json.dumps({
+engine_receipt={
   'schema':2,
   'bridge_version':5,
   'platform_hook_api':2,
@@ -130,7 +130,8 @@ Path('engine/live-app-shell-engine.json').write_text(json.dumps({
   'protected_geometry_bridge_owner':receipt['protected_geometry_bridge_owner'],
   'protected_geometry_bridge_rewritten':receipt['protected_geometry_bridge_rewritten'],
   'post_build_dex_contract':'authoritative'
-},indent=2,sort_keys=True)+'\n')
+}
+Path('engine/live-app-shell-engine.json').write_text(json.dumps(engine_receipt,indent=2,sort_keys=True)+'\n')
 PY
 
 mkdir -p candidate
