@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "audit_generation": 3,
+  "audit_generation": 4,
   "as_of": "2026-09-15",
   "purpose": "Infinity whole-stack stability certification baseline",
   "git_base": {
@@ -18,35 +18,38 @@
     "profiles": ["16x9", "20x9", "6x5", "5x6", "portrait"],
     "external_artifact": true
   },
-  "companions": [
+  "external_companions": [
     {
       "addon_id": "script.infinity.live",
       "name": "Infinity Live",
       "target_version": "0.1.12",
+      "filename": "script.infinity.live-0.1.12-Official-Lock.zip",
       "sha256": "e2460306c1e8c1171a997a8969a8c85a5198f80389a8174a3941d5e6ba3c1f41",
-      "source_commit": "cb9769bd77d6ca040b07435f569e9c5887d033d9",
       "status": "locked_user_accepted",
-      "repo_source_required": true
+      "historical_source_commit": "cb9769bd77d6ca040b07435f569e9c5887d033d9",
+      "historical_source_commit_reachable": false,
+      "note": "Exact accepted ZIP bytes remain the authority; the historical source commit is no longer resolvable from this repository. The stale branch shadow source must not silently replace the locked artifact."
     },
     {
       "addon_id": "script.infinity.commandcenter",
       "name": "Infinity Command Center",
       "target_version": "0.3.5.13",
+      "filename": "script.infinity.commandcenter-0.3.5.13-Local-Continue-Watching-Official-Lock.zip",
       "sha256": "72e1a3f10fd14a870a9350aee9450476316c23fe0c81b8c8ebb57475ef07aad1",
       "status": "locked_user_accepted",
       "paired_skin_at_lock": "1.0.5.118",
-      "current_skin_minimum": "0.3.5.13",
-      "repo_source_required": false
+      "current_skin_minimum": "0.3.5.13"
     },
     {
       "addon_id": "script.kodihealthcenter",
       "name": "Kodi Health Center",
       "target_version": "2.5.3",
+      "filename": "script.kodihealthcenter-2.5.3-Stability-Candidate.zip",
       "status": "stability_candidate",
       "parent_version": "2.5.2",
       "parent_sha256": "211c98194e3bb40751544c009af6b8881ee2f14b8ba0b02ea3dac9fb9c5776b9",
       "candidate_sha256": "b1243bca0682460170b2efec388a31266a4efb50d3196c311ae5fd616305266c",
-      "delta": "Read-only Infinity skin exporter accepts the active skin.infinity.diggz or skin.infinity identity; new diagnostics/Doctor metadata stamps 2.5.3; no existing historic records are rewritten.",
+      "delta": "Read-only Infinity skin exporter accepts active skin.infinity.diggz or skin.infinity; new diagnostics/Doctor metadata stamps 2.5.3; no existing historic records are rewritten.",
       "static_validation": {
         "python_compile": "passed",
         "addon_xml": "parsed",
@@ -56,9 +59,10 @@
         "player_or_theme_mutation_tokens": 0,
         "startup_services": 1,
         "android_device_or_emulator_tested": false
-      },
-      "repo_source_required": false
-    },
+      }
+    }
+  ],
+  "companions": [
     {
       "addon_id": "service.infinity.compat",
       "name": "Infinity Compatibility Guard",
@@ -126,8 +130,8 @@
   "known_boundaries": [
     "Candidate 2 native compile is known-good; packaging/signing is a separate downstream gate.",
     "Infinity Live 0.1.12 does not claim to repair audio-with-black-video MediaCodec/provider playback.",
-    "The locked skin artifact is external to this repository and must be hash-verified when supplied to the audit.",
-    "Command Center 0.3.5.13 and Live 0.1.12 are protected accepted artifacts; stability candidates must not silently replace them.",
+    "Locked skin, Live and Command Center are external exact-byte artifacts and must be hash-verified for final certification.",
+    "The stale branch copy of script.infinity.live is not the accepted 0.1.12 authority and must not be packaged as a substitute.",
     "Health Center, Compatibility Guard and Support Exporter stability candidates require device acceptance before lock/promotion."
   ]
 }
