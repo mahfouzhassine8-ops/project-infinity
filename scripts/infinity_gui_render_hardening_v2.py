@@ -21,6 +21,55 @@ base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
 
 
+def insert_after_function_open(text: str, signature: str, body: str, label: str) -> str:
+    marker = signature + "\n{\n"
+    count = text.count(marker)
+    if count != 1:
+        raise RuntimeError(f"{label}: expected one function signature, found {count}")
+    return text.replace(marker, marker + body, 1)
+
+
+def patch_xbmc_app_cpp(path: Path) -> None:
+    """Publish invalidation requests from Android/player callbacks without touching GL there."""
+    text = path.read_text(encoding="utf-8")
+    text = base.replace_once(
+        text,
+        '#include "guilib/GUIComponent.h"\n',
+        '#include "guilib/GUIComponent.h"\n#include "guilib/GUIFontManager.h"\n',
+        "XBMCApp GUIFontManager include",
+    )
+    text = insert_after_function_open(
+        text,
+        "void CXBMCApp::onResizeWindow()",
+        "  // Android callback thread: publish invalidation only; Kodi's render loop owns GL/cache mutation.\n"
+        "  g_fontManager.RequestRenderCacheFlush();\n",
+        "Android resize callback deferral",
+    )
+    text = insert_after_function_open(
+        text,
+        "void CXBMCApp::surfaceChanged(CJNISurfaceHolder holder, int format, int width, int height)",
+        "  // Surface callbacks may arrive before GUI/render readiness. Never mutate GL/font state here.\n"
+        "  if (width > 0 && height > 0)\n"
+        "    g_fontManager.RequestRenderCacheFlush();\n",
+        "surfaceChanged render deferral",
+    )
+    text = insert_after_function_open(
+        text,
+        "void CXBMCApp::OnPlayBackStopped()",
+        "  // Post-playback media/widget refresh can race cached text geometry. Defer disposal to render loop.\n"
+        "  g_fontManager.RequestRenderCacheFlush();\n",
+        "post-playback render-cache request",
+    )
+    text = insert_after_function_open(
+        text,
+        "void CXBMCApp::surfaceDestroyed(CJNISurfaceHolder holder)",
+        "  // Mark cached text geometry before any later surface/context reuse; render thread performs disposal.\n"
+        "  g_fontManager.RequestRenderCacheFlush();\n",
+        "surfaceDestroyed render-cache request",
+    )
+    path.write_text(text, encoding="utf-8")
+
+
 def patch_win_system(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     text = base.replace_once(
@@ -74,7 +123,6 @@ def verify_v2(source: Path) -> dict:
     app = files["xbmc/platform/android/activity/XBMCApp.cpp"].read_text(encoding="utf-8")
     win = files["xbmc/windowing/android/WinSystemAndroid.cpp"].read_text(encoding="utf-8")
 
-    # These bridge checks validate the accepted source contract instead of rewriting protected state.
     bridge_checks = {
         "positive_size_pack_rejects_invalid": "if (!size) return;" in apph,
         "duplicate_requested_size_rejected": "m_requested.size == size" in apph,
@@ -144,7 +192,7 @@ def apply_v2(source: Path, receipt: Path) -> None:
     base.patch_font_manager_h(paths["font_manager_h"])
     base.patch_font_manager_cpp(paths["font_manager_cpp"])
     # Preserve XBMCApp.h exactly: its accepted bridge already rejects invalid/duplicate/stale work.
-    base.patch_xbmc_app_cpp(paths["xbmc_app_cpp"])
+    patch_xbmc_app_cpp(paths["xbmc_app_cpp"])
     patch_win_system(paths["win_system"])
 
     result = verify_v2(source)
