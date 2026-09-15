@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "audit_generation": 1,
+  "audit_generation": 2,
   "as_of": "2026-09-15",
   "purpose": "Infinity whole-stack stability certification baseline",
   "git_base": {
@@ -31,42 +31,50 @@
     {
       "addon_id": "script.infinity.commandcenter",
       "name": "Infinity Command Center",
-      "target_version": "0.3.6",
-      "sha256": "99c66221cf4b979018ab4e39290b8ea8d060bc7cc3641b85a7b5e9237f68b1db",
-      "status": "reference_baseline",
-      "repo_source_required": false,
-      "identity_reconciliation_required": true
+      "target_version": "0.3.5.13",
+      "sha256": "72e1a3f10fd14a870a9350aee9450476316c23fe0c81b8c8ebb57475ef07aad1",
+      "status": "locked_user_accepted",
+      "paired_skin_at_lock": "1.0.5.118",
+      "current_skin_minimum": "0.3.5.13",
+      "repo_source_required": false
     },
     {
       "addon_id": "script.kodihealthcenter",
       "name": "Kodi Health Center",
-      "target_version": "2.5.2",
-      "sha256": "211c98194e3bb40751544c009af6b8881ee2f14b8ba0b02ea3dac9fb9c5776b9",
-      "status": "reference_baseline",
-      "repo_source_required": false,
-      "identity_reconciliation_required": true
+      "target_version": "2.5.3",
+      "status": "stability_candidate",
+      "parent_version": "2.5.2",
+      "parent_sha256": "211c98194e3bb40751544c009af6b8881ee2f14b8ba0b02ea3dac9fb9c5776b9",
+      "candidate_sha256": "cccf729a11f00a8e1ca8741392ed0edff2a16621f5ed3753c65741ddd0c1e1b7",
+      "delta": "Read-only Infinity skin exporter accepts the active skin.infinity.diggz or skin.infinity identity; diagnostics and repair behavior otherwise preserved.",
+      "repo_source_required": false
     },
     {
       "addon_id": "service.infinity.compat",
       "name": "Infinity Compatibility Guard",
-      "target_version": "0.8.0",
-      "sha256": "3aeaf93de170b547081e9492d1a2e8de4449dea8941b6d960b2e1693a87471ba",
-      "status": "reference_baseline",
+      "target_version": "0.8.1",
+      "status": "stability_candidate",
+      "parent_version": "0.8.0",
+      "parent_sha256": "3aeaf93de170b547081e9492d1a2e8de4449dea8941b6d960b2e1693a87471ba",
+      "candidate_sha256": "8d74390208c200aacecaf101cbf00b2fabba5677867290eb7025dd85dc4f6e4c",
       "repo_source_required": true,
       "contract": {
+        "supported_skin_ids": ["skin.infinity.diggz", "skin.infinity"],
         "single_startup_service": true,
         "forbid_player_mutation": true,
         "forbid_skin_file_mutation": true,
         "forbid_foreign_skin_reassertion": true
-      },
-      "identity_reconciliation_required": true
+      }
     },
     {
       "addon_id": "script.infinity.support",
       "name": "Infinity Support Exporter",
-      "target_version": "0.3.0",
-      "sha256": "b903da8fad63f79218efe41d5e6992029a4dec6b376ce49cc7bd2a084d637d7b",
-      "status": "reference_baseline",
+      "target_version": "0.3.1",
+      "status": "stability_candidate",
+      "parent_version": "0.3.0",
+      "parent_sha256": "b903da8fad63f79218efe41d5e6992029a4dec6b376ce49cc7bd2a084d637d7b",
+      "candidate_sha256": "638d169cd797659015f977c44934564f980995217f28d4e823e53343ab775b6b",
+      "delta": "Preserves bounded runtime-aware support reporting and removes the obsolete Xenon-only source export path.",
       "repo_source_required": true
     },
     {
@@ -109,6 +117,7 @@
     "Candidate 2 native compile is known-good; packaging/signing is a separate downstream gate.",
     "Infinity Live 0.1.12 does not claim to repair audio-with-black-video MediaCodec/provider playback.",
     "The locked skin artifact is external to this repository and must be hash-verified when supplied to the audit.",
-    "Clean-core companion package identity must be reconciled against the current skin.infinity.diggz lock before certification."
+    "Command Center 0.3.5.13 and Live 0.1.12 are protected accepted artifacts; stability candidates must not silently replace them.",
+    "Health Center, Compatibility Guard and Support Exporter stability candidates require device acceptance before lock/promotion."
   ]
 }
