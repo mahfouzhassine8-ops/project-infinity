@@ -1,10 +1,11 @@
-name: Infinity | Cobra Structural UI Bridge
+name: Infinity | Cobra Structural UI Bridge R2
 on:
   workflow_dispatch:
   push:
     branches: [infinity-cobra-mobile-tv-guide-views]
     paths:
       - 'scripts/infinity_cobra_mobile_tv_guide_views.py'
+      - 'addons/script.infinity.cobra.theme/**'
       - '.github/workflows/infinity-cobra-mobile-tv-guide-views.yml'
 permissions:
   contents: read
@@ -77,36 +78,41 @@ jobs:
           python3 scripts/infinity_cobra_player_presentation_fix_v2.py --source kodi
           git -C kodi diff --binary -- xbmc > engine/native-after-2103141-source.patch
           cmp engine/native-before.patch engine/native-after-2103141-source.patch
-      - name: Apply structural ZIP UI bridge
+      - name: Apply corrected structural ZIP UI bridge
         run: |
           python3 scripts/infinity_cobra_mobile_tv_guide_views.py --source kodi
           JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
           for token in \
+            'addRail("MOBILE VIEW"' \
+            'addRail("TV GUIDE"' \
+            'mCobraPreviewPlayer' \
+            'LIVE PREVIEW' \
+            'TAP VIDEO FOR FULLSCREEN' \
+            'setTag("cobra_channel_actions")' \
+            'showCobraChannelActions(item)' \
+            'guideTitleAt(item, when)' \
+            'guideFirstActivationPreview' \
+            'guideSecondActivationFullscreen' \
+            'closeFullscreenToCobraView()' \
             'COBRA_UI_RUNTIME = 3' \
-            'INSTALL COBRA UI PACKAGE' \
-            'MOBILE VIEW' \
-            'TV GUIDE  ▦' \
-            'showCobraChannelActions(channel)' \
-            'selectGuidePreview(channel)' \
-            'select again for fullscreen' \
-            'COBRA VIEW  •  ' \
             'closePlayerSettingsDrawer()' \
             'Crop / Fill' \
             'isCobraAsyncAlive()'; do
-            grep -Fq "$token" "$JAVA" || { echo "Missing structural UI bridge token: $token" >&2; exit 1; }
+            grep -Fq "$token" "$JAVA" || { echo "Missing corrected structural UI token: $token" >&2; exit 1; }
           done
+          ! grep -Fq 'COBRA VIEW  •  ' "$JAVA"
           git -C kodi diff --binary -- xbmc > engine/native-after-structural-ui.patch
           cmp engine/native-before.patch engine/native-after-structural-ui.patch
-      - name: Promote presentation runtime to 2103142
+      - name: Promote presentation runtime to 2103143
         run: |
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
-          RELEASE='1.0.9-Cobra-Structural-UI-Bridge'
-          VERSION=2103142
+          RELEASE='1.0.9-Cobra-Structural-UI-Bridge-R2'
+          VERSION=2103143
           gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
           text=gradle.read_text()
-          assert text.count('versionCode 2103138') == 1, text.count('versionCode 2103138')
+          assert text.count('versionCode 2103138') == 1
           assert text.count('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"') == 1
           text=text.replace('versionCode 2103138',f'versionCode {VERSION}',1)
           text=text.replace('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"',f'versionName "{RELEASE}"',1)
@@ -121,7 +127,9 @@ jobs:
                      player_settings_dismiss_fix=True,deterministic_crop_fill=True,
                      structural_ui_bridge=True,mobile_view_contract=True,
                      tv_guide_view_contract=True,long_press_channel_actions=True,
-                     guide_preview_then_fullscreen=True)
+                     inline_live_preview=True,main_menu_view_destinations=True,
+                     guide_preview_then_fullscreen=True,fullscreen_back_restores_preview=True,
+                     cobra_ui_json_structural_parser=True)
           receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
 
           constants=Path('scripts/infinity_background_resume.py')
@@ -147,17 +155,17 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir structural-ui-build --out background-candidate
-          APK=background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge.apk
+          APK=background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge-R2.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee background-candidate/badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103142' versionName='1.0.9-Cobra-Structural-UI-Bridge'" background-candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103143' versionName='1.0.9-Cobra-Structural-UI-Bridge-R2'" background-candidate/badging.txt
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee background-candidate/signing.txt
           grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
           python3 - <<'PY'
           import hashlib,zipfile
           from pathlib import Path
           base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
-          out=Path('background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge.apk')
+          out=Path('background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge-R2.apk')
           with zipfile.ZipFile(base) as a, zipfile.ZipFile(out) as b:
               libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
               assert libs
@@ -165,28 +173,41 @@ jobs:
                   assert n in b.namelist(), n
                   assert hashlib.sha256(a.read(n)).digest()==hashlib.sha256(b.read(n)).digest(), n
               joined=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
-              for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'Crop / Fill',b'select again for fullscreen'):
+              for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'LIVE PREVIEW',b'TAP VIDEO FOR FULLSCREEN',b'Channel Information',b'Crop / Fill'):
                   assert token in joined, token
-          print('PASS: structural UI bridge signed; exact native libraries preserved')
+          print('PASS: corrected structural UI bridge signed; exact native libraries preserved')
           PY
-          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge.sha256
-      - name: Package matching Mobile + TV Guide UI 1.3.0
+          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge-R2.sha256
+      - name: Package matching Mobile + TV Guide UI 1.3.1
         run: |
+          python3 - <<'PY'
+          import json, pathlib, xml.etree.ElementTree as ET
+          root=pathlib.Path('addons/script.infinity.cobra.theme')
+          ui=json.loads((root/'resources/cobra-ui.json').read_text())
+          addon=ET.parse(root/'addon.xml').getroot()
+          assert addon.attrib['version']=='1.3.1'
+          assert ui['version']=='1.3.1'
+          assert ui['views']['mobile']['preview_first'] is True
+          assert ui['views']['mobile']['channel_long_press_action']=='context_sheet'
+          assert ui['views']['tv_guide']['preview_player'] is True
+          assert ui['views']['tv_guide']['first_activation']=='preview'
+          assert ui['views']['tv_guide']['second_activation']=='fullscreen'
+          PY
           mkdir -p ui-package/script.infinity.cobra.theme/resources
           cp addons/script.infinity.cobra.theme/addon.xml ui-package/script.infinity.cobra.theme/
           cp addons/script.infinity.cobra.theme/resources/cobra-theme.json ui-package/script.infinity.cobra.theme/resources/
           cp addons/script.infinity.cobra.theme/resources/cobra-ui.json ui-package/script.infinity.cobra.theme/resources/
           cd ui-package
-          zip -9 -r Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip script.infinity.cobra.theme
-          sha256sum Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip > Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.sha256
+          zip -9 -r Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip script.infinity.cobra.theme
+          sha256sum Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip > Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.sha256
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Cobra-Structural-UI-Bridge-2103142
+          name: Infinity-Cobra-Structural-UI-Bridge-2103143
           path: |
             background-candidate/
-            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip
-            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.sha256
+            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip
+            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.sha256
             engine/background-resume-source.json
             preflight/lifecycle-races/
           if-no-files-found: error
