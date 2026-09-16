@@ -130,10 +130,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$CANDIDATE_DIR"
-          python3 pinned-infinity-recipe/scripts/validate-infinity71-java.py \
+          python3 upstream/validate_candidate_java.py \
             --source "$SOURCE_DIR" \
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
-            --out "$CANDIDATE_DIR/java-check"
+            --out "$CANDIDATE_DIR/java-check" \
+            --contract "$GITHUB_WORKSPACE/pinned-infinity-recipe/patches/infinity-7.1-audited/contract.json"
 
       - name: Build matched Kodi dependencies from the replayed target tree
         id: dependencies
