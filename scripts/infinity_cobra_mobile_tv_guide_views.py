@@ -76,27 +76,25 @@ def patch(java: str) -> str:
   }
 
   private String mobileGuideSummary(Channel channel) {
-    ProgramPair pair=guideFor(channel); if(pair==null) return providerBadge(channel)+"  •  "+channel.group;
-    String now=pair.now==null?"No guide information":pair.now;
-    return "Now  •  "+now;
+    String group=channel.group==null || channel.group.isEmpty()?"Live TV":channel.group;
+    return providerBadge(channel)+"  •  "+group;
   }
 
   private void showCobraChannelActions(Channel channel) {
-    boolean favorite=isFavorite(channel);
     ArrayList<String> items=new ArrayList<>();
-    items.add(favorite?"Remove from Favorites":"Add to Favorites");
+    items.add("Favorite / Unfavorite");
     items.add("View Channel Guide"); items.add("Channel Information"); items.add("Source Information"); items.add("Hide Channel");
     new AlertDialog.Builder(this).setTitle(channel.name).setItems(items.toArray(new String[0]),(d,w)->{
       if(w==0){toggleFavorite(channel);showCobraMobileView();}
       else if(w==1)showProgramGuide(channel);
-      else if(w==2)toast(channel.name+" • "+channel.group);
+      else if(w==2)toast(channel.name+" • "+(channel.group==null?"Live TV":channel.group));
       else if(w==3)toast("Source • "+providerBadge(channel));
       else if(w==4)toast("Hide Channel will be added only through Cobra's protected channel-state contract");
     }).setNegativeButton("Close",null).show();
   }
 
   private void selectGuidePreview(Channel channel) {
-    String key=channelKey(channel);
+    String key=(channel.name==null?"":channel.name)+"\u0000"+(channel.group==null?"":channel.group);
     if(key.equals(mGuidePreviewKey) && mGuidePreviewChannel!=null){
       playChannel(channel); return;
     }
@@ -129,8 +127,10 @@ def patch(java: str) -> str:
 
 
 def verify(java):
-    for token in ('MOBILE VIEW','TV GUIDE  ▦','showCobraChannelActions(channel)','selectGuidePreview(channel)','select again for fullscreen','COBRA VIEW  •  ','COBRA_PRIMARY_VIEW'):
+    for token in ('MOBILE VIEW','TV GUIDE  ▦','showCobraChannelActions(channel)','selectGuidePreview(channel)','select again for fullscreen','COBRA VIEW  •  ','COBRA_PRIMARY_VIEW','Favorite / Unfavorite'):
       if token not in java: raise RuntimeError('Missing Mobile/Guide contract: '+token)
+    for forbidden in ('guideFor(channel)','isFavorite(channel)','channelKey(channel)'):
+      if forbidden in java: raise RuntimeError('Unsupported helper leaked into Mobile/Guide bridge: '+forbidden)
 
 
 def main():
