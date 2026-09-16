@@ -63,6 +63,8 @@ jobs:
           java-version: '17'
 
       - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
 
       - name: Re-run candidate-builder safety contracts
         run: python3 -m unittest discover -s upstream/tests -v
