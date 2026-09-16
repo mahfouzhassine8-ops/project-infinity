@@ -37,6 +37,7 @@ jobs:
     timeout-minutes: 360
     env:
       NDK_VER: 21.4.7075529
+      RUNTIME_NAMESPACE: com.projectinfinity.kodi
       CANDIDATE_PACKAGE: com.projectinfinity.kodi.candidate
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
       TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
@@ -100,6 +101,46 @@ jobs:
           print('Source replay gate passed. The committed candidate build adapter may now compile this disposable tree.')
           PY
 
+      - name: Isolate Android application ID without renaming Infinity runtime classes
+        run: |
+          set -euo pipefail
+          mkdir -p "$CANDIDATE_DIR"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          source = Path(os.environ['SOURCE_DIR'])
+          candidate = os.environ['CANDIDATE_PACKAGE']
+          runtime = os.environ['RUNTIME_NAMESPACE']
+
+          gradle = source / 'tools/android/packaging/xbmc/build.gradle.in'
+          text = gradle.read_text()
+          namespace_line = "namespace '@APP_PACKAGE@'"
+          app_id_line = 'applicationId "@APP_PACKAGE@"'
+          assert text.count(namespace_line) == 1, 'Unexpected Kodi namespace template contract'
+          assert text.count(app_id_line) == 1, 'Unexpected Kodi applicationId template contract'
+          # Keep @APP_PACKAGE@ for namespace/class generation and native Java contracts.
+          # Change only the installed Android application ID so test userdata is isolated.
+          text = text.replace(app_id_line, f'applicationId "{candidate}"', 1)
+          gradle.write_text(text)
+
+          manifest = source / 'tools/android/packaging/xbmc/AndroidManifest.xml.in'
+          m = manifest.read_text()
+          for suffix in ('media', 'file', 'ytdl'):
+              old = f'android:authorities="@APP_PACKAGE@.{suffix}"'
+              new = f'android:authorities="{candidate}.{suffix}"'
+              assert m.count(old) == 1, f'Unexpected provider authority contract for {suffix}'
+              m = m.replace(old, new, 1)
+          manifest.write_text(m)
+
+          receipt = Path(os.environ['CANDIDATE_DIR']) / 'SIDEBYSIDE-ISOLATION.txt'
+          receipt.write_text(
+              f'Android application ID: {candidate}\n'
+              f'Infinity runtime namespace preserved: {runtime}\n'
+              'Provider authorities isolated to candidate application ID.\n'
+              'No production signer, release, install or promotion.\n')
+          PY
+
       - name: Install pinned Android/native toolchain only after source gate passes
         run: |
           set -euo pipefail
@@ -109,8 +150,6 @@ jobs:
             ccache python3 nasm yasm python3-pil
           sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
           mkdir -p "$HOME/.android"
-          # Kodi packaging requires an Android signing identity. This is an ephemeral
-          # debug key for CI packaging only; retained Infinity production keys are never loaded.
           rm -f "$HOME/.android/debug.keystore"
           keytool -genkeypair -noprompt \
             -keystore "$HOME/.android/debug.keystore" \
@@ -130,7 +169,6 @@ jobs:
       - name: Validate generated Android source before native build
         run: |
           set -euo pipefail
-          mkdir -p "$CANDIDATE_DIR"
           python3 upstream/validate_candidate_java.py \
             --source "$SOURCE_DIR" \
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
@@ -157,17 +195,12 @@ jobs:
         id: compile
         run: |
           set -euo pipefail
-          # Internal candidates deliberately use a different Android application ID.
-          # Kodi's CMake contract supports APP_PACKAGE overrides, so generated Java,
-          # manifest authorities and Android userdata are isolated from production.
-          make -C "$SOURCE_DIR/tools/depends/target/cmakebuildsys" \
-            BUILD_DIR="$BUILD_DIR" \
-            CMAKE_EXTRA_ARGUMENTS="-DAPP_PACKAGE=$CANDIDATE_PACKAGE"
+          # Compile with Infinity's original runtime namespace. Only Gradle's
+          # applicationId and provider authorities were isolated above.
+          make -C "$SOURCE_DIR/tools/depends/target/cmakebuildsys" BUILD_DIR="$BUILD_DIR"
           CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
           test -x "$CMAKE_BIN"
-          "$CMAKE_BIN" -S "$SOURCE_DIR" -B "$BUILD_DIR" \
-            -DAPP_PACKAGE="$CANDIDATE_PACKAGE" \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          "$CMAKE_BIN" -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           python3 pinned-infinity-recipe/scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
           make -C "$BUILD_DIR" -j"$(nproc)"
           make -C "$BUILD_DIR" apk -j"$(nproc)"
@@ -185,6 +218,7 @@ jobs:
           cp "$APK" "$OUT"
           sha256sum "$OUT" | tee "$OUT.sha256"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$OUT" | tee "$CANDIDATE_DIR/badging.txt"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump xmltree "$OUT" AndroidManifest.xml | tee "$CANDIDATE_DIR/manifest-tree.txt"
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$OUT" | tee "$CANDIDATE_DIR/signing.txt"
           unzip -l "$OUT" | grep -F 'lib/arm64-v8a/libkodi.so'
           grep -q "package: name='$CANDIDATE_PACKAGE'" "$CANDIDATE_DIR/badging.txt"
@@ -193,17 +227,29 @@ jobs:
             exit 1
           fi
           grep -q "application-label:'Infinity'" "$CANDIDATE_DIR/badging.txt"
+          grep -q 'com.projectinfinity.kodi.candidate.media' "$CANDIDATE_DIR/manifest-tree.txt"
+          grep -q 'com.projectinfinity.kodi.candidate.file' "$CANDIDATE_DIR/manifest-tree.txt"
+          grep -q 'com.projectinfinity.kodi.candidate.ytdl' "$CANDIDATE_DIR/manifest-tree.txt"
           python3 - <<'PY'
-          import json, os
+          import json, os, zipfile
           from pathlib import Path
           baseline=json.loads(Path('upstream/baseline.json').read_text())
           production=baseline['runtime']['signer_sha256'].lower()
-          text=Path(os.environ['CANDIDATE_DIR'],'signing.txt').read_text().lower().replace(':','')
+          cdir=Path(os.environ['CANDIDATE_DIR'])
+          text=(cdir/'signing.txt').read_text().lower().replace(':','')
           assert production not in text, 'Production Infinity signer must never be used by automatic candidate builds'
-          Path(os.environ['CANDIDATE_DIR'],'CANDIDATE-STATUS.txt').write_text(
+          apk=next(cdir.glob('*-INTERNAL-SIDEBYSIDE-CANDIDATE.apk'))
+          with zipfile.ZipFile(apk) as z:
+              dex=z.read('classes.dex')
+          runtime=b'Lcom/projectinfinity/kodi/Main;'
+          renamed=b'Lcom/projectinfinity/kodi/candidate/Main;'
+          assert runtime in dex, 'Infinity runtime namespace must stay unchanged in side-by-side test build'
+          assert renamed not in dex, 'Side-by-side application ID must not rename Infinity runtime classes'
+          (cdir/'CANDIDATE-STATUS.txt').write_text(
               'INTERNAL SIDE-BY-SIDE DEBUG CANDIDATE ONLY\n'
               'Native compile/package gates passed.\n'
               'Android package: com.projectinfinity.kodi.candidate\n'
+              'Infinity runtime namespace preserved: com.projectinfinity.kodi\n'
               'Uses separate Android app data/userdata from production Infinity.\n'
               'NOT production-signed. NOT released. NOT installed. NOT promoted.\n'
               'Human review and device acceptance are required before retained-key signing.\n')
@@ -213,7 +259,8 @@ jobs:
             echo '## Infinity Kodi internal side-by-side candidate'
             echo "Target: $TARGET_TAG"
             echo "Android package: $CANDIDATE_PACKAGE"
-            echo 'Compile/package gates passed with isolated Android userdata.'
+            echo "Runtime namespace: $RUNTIME_NAMESPACE"
+            echo 'Compile/package gates passed with isolated Android userdata and preserved Infinity runtime classes.'
             echo '**STOP GATE:** internal debug candidate only; no retained-key signing, release, install or promotion occurred.'
           } >> "$GITHUB_STEP_SUMMARY"
 
