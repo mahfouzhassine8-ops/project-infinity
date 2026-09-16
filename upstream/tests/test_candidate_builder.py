@@ -31,12 +31,26 @@ class CandidateBuilderContracts(unittest.TestCase):
 
     def test_builder_candidate_is_side_by_side_and_userdata_isolated(self):
         text = BUILDER.read_text()
+        self.assertIn('RUNTIME_NAMESPACE: com.projectinfinity.kodi', text)
         self.assertIn('CANDIDATE_PACKAGE: com.projectinfinity.kodi.candidate', text)
-        self.assertIn('-DAPP_PACKAGE="$CANDIDATE_PACKAGE"', text)
+        self.assertIn('applicationId "{candidate}"', text)
+        self.assertIn('Infinity runtime namespace preserved', text)
         self.assertIn("package: name='$CANDIDATE_PACKAGE'", text)
         self.assertIn("package: name='com.projectinfinity.kodi'", text)
         self.assertIn('Refusing internal candidate that could collide with production package ID', text)
         self.assertIn('Uses separate Android app data/userdata from production Infinity.', text)
+        self.assertNotIn('-DAPP_PACKAGE="$CANDIDATE_PACKAGE"', text)
+        self.assertIn("runtime=b'Lcom/projectinfinity/kodi/Main;'", text)
+        self.assertIn("renamed=b'Lcom/projectinfinity/kodi/candidate/Main;'", text)
+        self.assertIn('Side-by-side application ID must not rename Infinity runtime classes', text)
+
+    def test_builder_isolates_provider_authorities_without_runtime_namespace_mutation(self):
+        text = BUILDER.read_text()
+        for suffix in ('media', 'file', 'ytdl'):
+            self.assertIn(f"com.projectinfinity.kodi.candidate.{suffix}", text)
+        self.assertIn('Unexpected Kodi namespace template contract', text)
+        self.assertIn('Unexpected Kodi applicationId template contract', text)
+        self.assertIn('Provider authorities isolated to candidate application ID.', text)
 
     def test_builder_cannot_silently_become_production_promotion(self):
         text = BUILDER.read_text()
