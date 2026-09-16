@@ -1,0 +1,228 @@
+name: Infinity | Kodi Internal Candidate Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_tag:
+        description: 'Official stable Kodi source tag to build as an isolated internal candidate'
+        type: string
+        default: '21.3-Omega'
+        required: true
+      target_sha:
+        description: 'Optional expected 40-character tag commit; rejects moved tags'
+        type: string
+        default: ''
+        required: false
+  workflow_call:
+    inputs:
+      target_tag:
+        type: string
+        required: true
+      target_sha:
+        type: string
+        default: ''
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infinity-kodi-internal-candidate-${{ inputs.target_tag }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  build-internal-candidate:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-candidate-build
+      PORT_WORKSPACE: ${{ runner.temp }}/infinity-kodi-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+      EVIDENCE_DIR: ${{ github.workspace }}/candidate-evidence
+      SOURCE_DIR: ${{ runner.temp }}/infinity-kodi-candidate-${{ github.run_id }}-${{ github.run_attempt }}/candidate
+      CANDIDATE_DIR: ${{ github.workspace }}/internal-candidate
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check out exact delivered RC3 transformation recipe
+        uses: actions/checkout@v7.0.1
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          ref: 5f7d9b311568cca053d9c0e082463baca1bd99e0
+          path: pinned-infinity-recipe
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Re-run candidate-builder safety contracts
+        run: python3 -m unittest discover -s upstream/tests -v
+
+      - name: Install source-replay utilities
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends patch imagemagick fonts-dejavu-core
+
+      - name: Reconstruct target source and require a clean deterministic replay
+        env:
+          TARGET_TAG: ${{ inputs.target_tag }}
+          TARGET_SHA: ${{ inputs.target_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 upstream/port.py \
+            --recipe-root "$GITHUB_WORKSPACE/pinned-infinity-recipe" \
+            --workspace "$PORT_WORKSPACE" \
+            --output "$EVIDENCE_DIR" \
+            --target-tag "$TARGET_TAG" \
+            --target-sha "$TARGET_SHA"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          report=json.loads((Path(os.environ['EVIDENCE_DIR'])/'port-report.json').read_text())
+          assert report['status']=='source_prepared_review_required', report['status']
+          assert report['replay_clean'] is True
+          assert report['production_modified'] is False
+          assert Path(os.environ['SOURCE_DIR']).is_dir()
+          print('Source replay gate passed. The committed candidate build adapter may now compile this disposable tree.')
+          PY
+
+      - name: Install pinned Android/native toolchain only after source gate passes
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y --no-install-recommends \
+            autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 \
+            lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev \
+            ccache python3 nasm yasm python3-pil
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          # Kodi packaging requires an Android signing identity. This is an ephemeral
+          # debug key for CI packaging only; retained Infinity production keys are never loaded.
+          rm -f "$HOME/.android/debug.keystore"
+          keytool -genkeypair -noprompt \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -keypass android -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 2 \
+            -dname 'CN=Disposable Kodi Candidate,O=Project Infinity Internal CI,C=US'
+
+      - uses: actions/cache/restore@v4
+        id: dependency-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-kodi-candidate-${{ inputs.target_tag }}-${{ inputs.target_sha }}-${{ runner.os }}-ndk-${{ env.NDK_VER }}
+
+      - name: Validate generated Android source before native build
+        run: |
+          set -euo pipefail
+          python3 pinned-infinity-recipe/scripts/validate-infinity71-java.py \
+            --source "$SOURCE_DIR" \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
+            --out "$CANDIDATE_DIR/java-check"
+
+      - name: Build matched Kodi dependencies from the replayed target tree
+        id: dependencies
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR" "$CANDIDATE_DIR"
+          cd "$SOURCE_DIR/tools/depends"
+          ./bootstrap
+          ./configure \
+            --with-tarballs="$TARBALLS" \
+            --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" \
+            --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" \
+            --enable-debug=yes
+          make -j"$(nproc)"
+
+      - name: Configure, compile and package the complete matched target engine
+        id: compile
+        run: |
+          set -euo pipefail
+          make -C "$SOURCE_DIR/tools/depends/target/cmakebuildsys" BUILD_DIR="$BUILD_DIR"
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 pinned-infinity-recipe/scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+
+      - name: Quarantine and verify the internal candidate package
+        id: package
+        env:
+          TARGET_TAG: ${{ inputs.target_tag }}
+        run: |
+          set -euo pipefail
+          APK=$(find "$SOURCE_DIR" "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          SAFE_TAG=$(printf '%s' "$TARGET_TAG" | tr -c 'A-Za-z0-9._-' '_')
+          OUT="$CANDIDATE_DIR/Infinity-${SAFE_TAG}-INTERNAL-DEBUG-CANDIDATE.apk"
+          cp "$APK" "$OUT"
+          sha256sum "$OUT" | tee "$OUT.sha256"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$OUT" | tee "$CANDIDATE_DIR/badging.txt"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$OUT" | tee "$CANDIDATE_DIR/signing.txt"
+          unzip -l "$OUT" | grep -F 'lib/arm64-v8a/libkodi.so'
+          grep -q "package: name='com.projectinfinity.kodi'" "$CANDIDATE_DIR/badging.txt"
+          grep -q "application-label:'Infinity'" "$CANDIDATE_DIR/badging.txt"
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          baseline=json.loads(Path('upstream/baseline.json').read_text())
+          production=baseline['runtime']['signer_sha256'].lower()
+          text=Path(os.environ['CANDIDATE_DIR'],'signing.txt').read_text().lower().replace(':','')
+          assert production not in text, 'Production Infinity signer must never be used by automatic candidate builds'
+          Path(os.environ['CANDIDATE_DIR'],'CANDIDATE-STATUS.txt').write_text(
+              'INTERNAL DEBUG CANDIDATE ONLY\n'
+              'Native compile/package gates passed.\n'
+              'NOT production-signed. NOT released. NOT installed. NOT promoted.\n'
+              'Human review and device acceptance are required before retained-key signing.\n')
+          PY
+          echo 'candidate_ready=true' >> "$GITHUB_OUTPUT"
+          {
+            echo '## Infinity Kodi internal candidate'
+            echo "Target: $TARGET_TAG"
+            echo 'Compile/package gates passed.'
+            echo '**STOP GATE:** internal debug candidate only; no retained-key signing, release, install or promotion occurred.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/cache/save@v4
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' && steps.dependency-cache.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.dependency-cache.outputs.cache-primary-key }}
+
+      - name: Upload internal candidate for human approval
+        if: ${{ steps.package.outputs.candidate_ready == 'true' }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: Infinity-Kodi-${{ inputs.target_tag }}-INTERNAL-CANDIDATE
+          path: internal-candidate/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Preserve source-port evidence even when compilation fails
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: Infinity-Kodi-${{ inputs.target_tag }}-candidate-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: candidate-evidence/
+          retention-days: 90
+          if-no-files-found: warn

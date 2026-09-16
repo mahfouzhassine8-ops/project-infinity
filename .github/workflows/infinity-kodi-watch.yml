@@ -66,3 +66,12 @@ jobs:
       target_sha: ${{ needs.alert.outputs.target_sha }}
     permissions:
       contents: read
+  candidate-build:
+    needs: [alert, source-analysis]
+    if: ${{ needs.alert.outputs.new_alert == 'true' && needs.source-analysis.result == 'success' }}
+    uses: ./.github/workflows/kodi-candidate-builder.yml
+    with:
+      target_tag: ${{ needs.alert.outputs.tag }}
+      target_sha: ${{ needs.alert.outputs.target_sha }}
+    permissions:
+      contents: read
