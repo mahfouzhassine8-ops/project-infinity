@@ -35,6 +35,7 @@ jobs:
       PORT_WORKSPACE: ${{ runner.temp }}/infinity-port-${{ github.run_id }}-${{ github.run_attempt }}
       PORT_EVIDENCE: ${{ github.workspace }}/port-evidence
       FAST_JAVA_OUT: ${{ github.workspace }}/fast-java-check
+      EXPORT_DIR: ${{ github.workspace }}/analysis-export
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -126,6 +127,18 @@ jobs:
           cat "$PORT_EVIDENCE/SMART-ANALYSIS.md" >> "$GITHUB_STEP_SUMMARY"
           test -s "$PORT_EVIDENCE/system-tray-status.json"
 
+      - name: Create portable analysis ZIP for Save As / sharing
+        env:
+          TARGET_TAG: ${{ inputs.target_tag }}
+        run: |
+          set -euo pipefail
+          SAFE_TAG=$(printf '%s' "$TARGET_TAG" | tr -c 'A-Za-z0-9._-' '_')
+          mkdir -p "$EXPORT_DIR"
+          python3 upstream/export_analysis.py \
+            --evidence "$PORT_EVIDENCE" \
+            --output "$EXPORT_DIR/Infinity-Kodi-${SAFE_TAG}-Analysis-Report.zip"
+          test -s "$EXPORT_DIR/Infinity-Kodi-${SAFE_TAG}-Analysis-Report.zip"
+
       - name: Mark this exact Kodi tag and commit as analyzed
         run: |
           mkdir -p analysis-cache-marker
@@ -135,6 +148,14 @@ jobs:
         with:
           path: analysis-cache-marker
           key: infinity-kodi-smart-analysis-${{ inputs.target_tag }}-${{ steps.target.outputs.sha }}
+
+      - name: Upload portable analysis ZIP
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: infinity-kodi-portable-analysis-${{ inputs.target_tag }}
+          path: analysis-export/*.zip
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Preserve smart report, source diff, replay evidence and downloaded candidate source
         if: always()
