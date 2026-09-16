@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "runtime": {
     "minimum_runtime": 3,
     "scope": "cobra-live-only"
@@ -17,7 +17,7 @@
   "appearance": {
     "default": "dark",
     "modes": ["system", "light", "dark", "oled"],
-    "player_overlay": "dark"
+    "player_overlay": "dark_high_contrast"
   },
   "views": {
     "default": "mobile",
@@ -29,8 +29,9 @@
       "channel_row_height_dp": 70,
       "category_control": "favorites_and_categories_hub",
       "bottom_navigation": false,
-      "drawer_mode": "popup_overlay",
-      "drawer_destinations": ["search", "tv", "movies", "shows", "recordings", "my_list"],
+      "drawer_mode": "push_content",
+      "drawer_collapse_control": true,
+      "drawer_destinations": ["search", "tv", "movies", "shows", "recordings", "my_list", "view_mode", "settings", "power"],
       "channel_primary_action": "preview_then_fullscreen",
       "channel_long_press_action": "context_sheet",
       "context_actions": ["favorite", "schedule_recording", "add_to_group", "share", "channel_epg", "hide_channel"]
@@ -41,21 +42,43 @@
       "channel_column": true,
       "favorites_and_groups": true,
       "category_hub_first": true,
-      "category_selection_opens_filtered_grid": true,
+      "category_selection_opens_selected_view": true,
       "preview_player": true,
       "preview_controls": true,
       "first_activation": "preview",
       "second_activation": "fullscreen",
       "back_from_fullscreen": "restore_guide_preview_state",
       "expanded_grid": true,
+      "view_modes": {
+        "grid": "timeline_grid",
+        "compact": "dense_list",
+        "cards": "touch_cards",
+        "focus": "large_preview_channel_strip"
+      },
       "input": ["touch", "dpad"]
     }
+  },
+  "player": {
+    "status_badge": "auto_hide_with_chrome",
+    "pip_chrome": "video_only",
+    "aspect_modes": ["best_fit", "crop_fill", "16:9", "4:3", "zoom_1_25", "zoom_1_50", "zoom_2_00"]
+  },
+  "settings": {
+    "subscription_account_status": true,
+    "subscription_expiry_from_provider_when_available": true,
+    "guide_view_selector_location": "drawer"
+  },
+  "navigation": {
+    "internal_back_returns_to_cobra_root": true,
+    "root_back_backgrounds_task": true,
+    "intentional_exit_via_power_menu": true
   },
   "presentation": {
     "density": "comfortable",
     "surface_style": "cobra_glass",
     "rounded_surfaces": true,
     "focus_ring": true,
+    "drawer_motion_ms": 190,
     "portrait_category_height_dp": 58,
     "guide_channel_width_dp": 152,
     "guide_program_width_dp": 220,
