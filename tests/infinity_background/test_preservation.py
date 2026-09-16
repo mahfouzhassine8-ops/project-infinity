@@ -3,7 +3,6 @@
 import argparse
 import importlib.util
 from pathlib import Path
-import re
 import xml.etree.ElementTree as ET
 
 p=argparse.ArgumentParser(description=__doc__)
@@ -20,6 +19,7 @@ allowed={
  'tools/android/packaging/xbmc/src/Main.java.in',
  'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in',
  'tools/android/packaging/xbmc/src/InfinityExtendedBackgroundService.java.in',
+ 'tools/android/packaging/xbmc/src/InfinityBackgroundControlActivity.java.in',
  'tools/android/packaging/xbmc/AndroidManifest.xml.in',
  'tools/android/packaging/xbmc/build.gradle.in',
  'cmake/scripts/android/Install.cmake',
@@ -41,6 +41,14 @@ service=app.find("service[@%sname='.InfinityExtendedBackgroundService']"%ns)
 assert service is not None
 assert service.get(ns+'exported')=='false' and service.get(ns+'foregroundServiceType')=='specialUse'
 app.remove(service)
+control=app.find("activity[@%sname='.InfinityBackgroundControlActivity']"%ns)
+assert control is not None and control.get(ns+'exported')=='true'
+actions={a.get(ns+'name') for a in control.findall('./intent-filter/action')}
+assert actions=={
+ 'com.projectinfinity.kodi.action.BACKGROUND_MODE_NORMAL',
+ 'com.projectinfinity.kodi.action.BACKGROUND_MODE_EXTENDED',
+}
+app.remove(control)
 def semantic(node):
     return node.tag,sorted(node.attrib.items()),(node.text or '').strip(),[semantic(c) for c in node]
 assert semantic(new)==semantic(old),'Existing manifest activity/provider/permission contract changed'
@@ -48,10 +56,10 @@ assert semantic(new)==semantic(old),'Existing manifest activity/provider/permiss
 spec=importlib.util.spec_from_file_location('tests',Path(__file__).with_name('test_background.py'))
 mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
 path='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
-old,new=before[path].decode(),after[path].decode()
+old_live,new_live=before[path].decode(),after[path].decode()
 for name in ('returnToInfinity','onUserLeaveHint','onPictureInPictureModeChanged','onConfigurationChanged','onMultiWindowModeChanged','enterCobraPictureInPicture','configureCobraPip'):
-    # Match the exact method names present, do not silently skip missing protections.
-    assert mod.method(old,name)==mod.method(new,name),name
-assert 'mPlayer.prepare();\n      startCobraPlayer(mPlayer);' in new
-assert 'player.prepare(); startCobraPlayer(player);' in new
-print('PASS: exact six-file allow-list; Main unchanged except two service calls; manifest and Cobra PiP/Fold/handoff methods preserved')
+    assert mod.method(old_live,name)==mod.method(new_live,name),name
+assert 'mPlayer.prepare();\n      startCobraPlayer(mPlayer);' in new_live
+assert 'player.prepare(); startCobraPlayer(player);' in new_live
+assert 'EXTENDED BACKGROUND MODE' not in new_live, 'Infinity control leaked back into Cobra Settings'
+print('PASS: exact seven-file allow-list; native-facing Main contract preserved; Infinity control bridge only; Cobra PiP/Fold/handoff methods preserved')
