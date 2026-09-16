@@ -231,11 +231,12 @@ class Contracts(unittest.TestCase):
             for forbidden in ['contents: write','secrets: inherit','INFINITY_KEYSTORE','pull_request_target','adb install']:
                 self.assertNotIn(forbidden,txt)
             self.assertIn('persist-credentials: false',txt)
-    def test_notification_scope_is_isolated(self):
+    def test_scheduled_watcher_is_read_only_and_never_auto_builds(self):
         watcher=(ROOT.parent/'.github/workflows/infinity-kodi-watch.yml').read_text()
-        self.assertEqual(watcher.count('issues: write'),1)
+        self.assertNotIn('issues: write',watcher)
         self.assertIn("cron: '17 13 * * *'",watcher)
-        self.assertIn("github.ref == 'refs/heads/main'",watcher)
+        self.assertIn('lookup-only: true',watcher)
+        self.assertNotIn('kodi-candidate-builder.yml',watcher)
     def test_recipe_checkout_is_pinned_to_delivered_rc3(self):
         self.assertRegex(BASELINE['runtime']['source_commit'], r'^[0-9a-f]{40}$')
         self.assertEqual(BASELINE['runtime']['source_commit'],
