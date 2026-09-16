@@ -1,0 +1,91 @@
+name: Infinity | Cobra Mobile + TV Guide Views
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-mobile-tv-guide-views]
+    paths:
+      - 'scripts/infinity_cobra_mobile_tv_guide_views.py'
+      - '.github/workflows/infinity-cobra-mobile-tv-guide-views.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-cobra-mobile-tv-guide-views-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-update:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Verify exact native baseline
+        run: |
+          mkdir -p background-rollback background-candidate preflight
+          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
+          echo '8ef45e9c54a79e2295e295ce1fcdd3430322a0049c7ff5227804c15aed6b4c57  background-rollback/Infinity-Run40-Exact-Base.apk' | sha256sum -c -
+      - name: Reconstruct preserved RC3 Runtime v3 presentation source
+        run: |
+          bash scripts/infinity_live_app_ci_1.sh
+          git -C kodi diff --binary -- xbmc > engine-native-before.patch
+          python3 scripts/infinity_background_resume.py --source kodi --receipt background-resume-source.json
+          python3 scripts/infinity_background_control_bridge.py --source kodi --receipt background-resume-source.json --packager scripts/package_background_resume.py
+          python3 scripts/infinity_cobra_async_lifecycle.py --source kodi --receipt background-resume-source.json --packager scripts/package_background_resume.py
+          python3 scripts/apply_cobra_approved_ui.py --source kodi
+          python3 scripts/infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix.py --source kodi
+          python3 scripts/infinity_cobra_ui_frontend_matcher_fix.py --source kodi
+          python3 scripts/infinity_cobra_player_presentation_fix.py --source kodi
+      - name: Apply locked Mobile and TV Guide views
+        run: |
+          python3 -m py_compile scripts/infinity_cobra_mobile_tv_guide_views.py
+          python3 scripts/infinity_cobra_mobile_tv_guide_views.py --source kodi
+          JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          for token in 'MOBILE VIEW' 'TV GUIDE  ▦' 'showCobraChannelActions(channel)' 'selectGuidePreview(channel)' 'select again for fullscreen' 'COBRA VIEW  •  '; do grep -Fq "$token" "$JAVA" || exit 1; done
+          git -C kodi diff --binary -- xbmc > engine-native-after.patch
+          cmp engine-native-before.patch engine-native-after.patch
+      - name: Promote shell identity to 2103142
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('kodi/tools/android/packaging/xbmc/build.gradle.in');s=p.read_text()
+          for old in ('versionCode 2103141','versionCode 2103138'):
+            if old in s: s=s.replace(old,'versionCode 2103142',1);break
+          else: raise SystemExit('versionCode anchor missing')
+          import re
+          s=re.sub(r'versionName "[^"]+"','versionName "1.0.9-Cobra-Mobile-TV-Guide-RC1"',s,count=1)
+          p.write_text(s)
+          q=Path('scripts/infinity_background_resume.py');t=q.read_text();t=re.sub(r'VERSION_CODE = \d+','VERSION_CODE = 2103142',t,count=1);t=re.sub(r"RELEASE = '[^']+'","RELEASE = '1.0.9-Cobra-Mobile-TV-Guide-RC1'",t,count=1);q.write_text(t)
+          pack=Path('scripts/package_background_resume.py');u=pack.read_text();u=re.sub(r'Infinity-1\.0\.9-[A-Za-z0-9-]+','Infinity-1.0.9-Cobra-Mobile-TV-Guide-RC1',u);pack.write_text(u)
+          PY
+      - name: Compile Android shell only, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir mobile-guide-build --out background-candidate
+          APK=$(find background-candidate -name '*.apk' -type f | head -1); test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee background-candidate/badging.txt
+          grep -q "versionCode='2103142'" background-candidate/badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee background-candidate/signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
+          sha256sum "$APK" | tee background-candidate/mobile-tv-guide.sha256
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Cobra-Mobile-TV-Guide-RC1
+          path: background-candidate/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
