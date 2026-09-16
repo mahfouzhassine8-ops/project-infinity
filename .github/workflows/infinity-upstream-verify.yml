@@ -1,0 +1,40 @@
+name: Infinity | Upstream infrastructure checks
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, infinity-upstream-infrastructure]
+    paths: ['tooling/infinity_upstream/**', '.github/workflows/infinity-upstream-*.yml']
+permissions:
+  contents: read
+concurrency:
+  group: infinity-upstream-verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-roundtrip:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Test stable filtering, conflict handling and production isolation
+        run: python3 -m unittest discover -s tooling/infinity_upstream -v
+      - name: Install source-generation and host-test tools only
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y git patch imagemagick fonts-dejavu-core openjdk-17-jdk-headless
+      - name: Reconstruct exact RC3 source and replay on same Kodi base (NO APK BUILD)
+        run: python3 tooling/infinity_upstream/port.py --selftest --workspace "$RUNNER_TEMP/infinity-upstream-selftest" --out upstream-proof
+      - name: Write verification summary
+        if: always()
+        run: |
+          if test -f upstream-proof/SUMMARY.md; then cat upstream-proof/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: Infinity-Upstream-Infrastructure-Proof
+          path: upstream-proof/
+          if-no-files-found: warn
+          retention-days: 30
