@@ -3,12 +3,12 @@ on:
   workflow_dispatch:
     inputs:
       target_tag:
-        description: 'Official stable Kodi source tag; 21.3-Omega tests exact baseline replay'
+        description: 'Official stable Kodi source tag to analyze against the locked Infinity baseline'
         type: string
         default: '21.3-Omega'
         required: true
       target_sha:
-        description: 'Optional expected 40-character commit; rejects a tag that moved'
+        description: 'Optional expected 40-character commit; rejects a moved tag'
         type: string
         default: ''
         required: false
@@ -24,17 +24,22 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: infinity-kodi-analysis-${{ github.run_id }}
+  group: infinity-kodi-analysis-${{ inputs.target_tag }}-${{ inputs.target_sha }}
   cancel-in-progress: false
 jobs:
   source-only:
     if: github.repository == 'mahfouzhassine8-ops/project-infinity'
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 30
+    env:
+      PORT_WORKSPACE: ${{ runner.temp }}/infinity-port-${{ github.run_id }}-${{ github.run_attempt }}
+      PORT_EVIDENCE: ${{ github.workspace }}/port-evidence
+      FAST_JAVA_OUT: ${{ github.workspace }}/fast-java-check
     steps:
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
+
       - name: Check out exact delivered RC3 recipe, NOT old main or RC2
         uses: actions/checkout@v7.0.1
         with:
@@ -42,13 +47,16 @@ jobs:
           ref: 5f7d9b311568cca053d9c0e082463baca1bd99e0
           path: pinned-infinity-recipe
           persist-credentials: false
+
       - name: Run infrastructure regression tests
         run: python3 -m unittest discover -s upstream/tests -v
-      - name: Install source-transformation utilities only (NO Android SDK or native compiler build)
+
+      - name: Install source-analysis utilities only
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends patch imagemagick fonts-dejavu-core
-      - name: Reconstruct, inventory, compare and replay in disposable source trees
+
+      - name: Download, inventory, diff and replay against the new Kodi source
         env:
           TARGET_TAG: ${{ inputs.target_tag }}
           TARGET_SHA: ${{ inputs.target_sha }}
@@ -56,14 +64,72 @@ jobs:
         run: |
           python3 upstream/port.py \
             --recipe-root "$GITHUB_WORKSPACE/pinned-infinity-recipe" \
-            --workspace "$RUNNER_TEMP/infinity-port-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
-            --output "$GITHUB_WORKSPACE/port-evidence" \
-            --target-tag "$TARGET_TAG" --target-sha "$TARGET_SHA"
-      - name: Preserve reports and patch evidence even if source reconstruction fails
+            --workspace "$PORT_WORKSPACE" \
+            --output "$PORT_EVIDENCE" \
+            --target-tag "$TARGET_TAG" \
+            --target-sha "$TARGET_SHA"
+
+      - name: Resolve exact analyzed target commit
+        id: target
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          report=json.loads(Path(os.environ['PORT_EVIDENCE'],'port-report.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
+              out.write('sha='+report['target']['commit']+'\n')
+          PY
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install Android API only for the fast Infinity Java contract compile
+        run: sdkmanager 'platforms;android-34' 'build-tools;34.0.0'
+
+      - name: Fast compile Infinity Android runtime contracts against the replayed source
+        run: |
+          set -euo pipefail
+          python3 upstream/validate_candidate_java.py \
+            --source "$PORT_WORKSPACE/candidate" \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
+            --out "$FAST_JAVA_OUT" \
+            --contract "$GITHUB_WORKSPACE/pinned-infinity-recipe/patches/infinity-7.1-audited/contract.json"
+          printf '{"status":"passed","scope":"Infinity Android/Java runtime contract only"}\n' \
+            > "$PORT_EVIDENCE/fast-java-status.json"
+
+      - name: Produce readable smart compatibility report and System Tray status payload
+        run: |
+          python3 upstream/smart_analyze.py \
+            --port-report "$PORT_EVIDENCE/port-report.json" \
+            --ownership "$PORT_EVIDENCE/ownership-manifest.json" \
+            --java-status "$PORT_EVIDENCE/fast-java-status.json" \
+            --output "$PORT_EVIDENCE"
+          cat "$PORT_EVIDENCE/SMART-ANALYSIS.md" >> "$GITHUB_STEP_SUMMARY"
+          test -s "$PORT_EVIDENCE/system-tray-status.json"
+
+      - name: Mark this exact Kodi tag and commit as analyzed
+        run: |
+          mkdir -p analysis-cache-marker
+          printf '%s %s\n' '${{ inputs.target_tag }}' '${{ steps.target.outputs.sha }}' > analysis-cache-marker/analyzed.txt
+
+      - uses: actions/cache/save@v4
+        with:
+          path: analysis-cache-marker
+          key: infinity-kodi-smart-analysis-${{ inputs.target_tag }}-${{ steps.target.outputs.sha }}
+
+      - name: Preserve smart report, source diff, replay evidence and downloaded candidate source
         if: always()
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: infinity-kodi-port-evidence-${{ github.run_id }}-${{ github.run_attempt }}
-          path: port-evidence/
+          name: infinity-kodi-smart-analysis-${{ inputs.target_tag }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            port-evidence/
+            fast-java-check/
           if-no-files-found: warn
           retention-days: 90
