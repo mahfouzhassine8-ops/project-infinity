@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Package the native Cobra visual contract as a Kodi-installable ZIP.
+"""Package Cobra's ZIP-driven presentation contract as a Kodi-installable ZIP.
 
-This intentionally contains no APK/native code. InfinityLiveActivity reads the
-installed JSON tokens at runtime, so visual tuning can be tested without a full
-Kodi/Android rebuild.
+The package contains no APK/native code. A compatible Cobra UI runtime reads
+both the visual tokens and structural UI definition at runtime. Native-only
+contracts (renderer, lifecycle, rotation, background/resume and playback) are
+explicitly outside this package.
 """
 from __future__ import annotations
 
@@ -48,6 +49,34 @@ def validate() -> str:
         for key in ("touch_target", "rail_item_height", "motion_ms"):
             if key not in data:
                 raise RuntimeError("missing Cobra responsive token: " + key)
+
+    ui_file = SOURCE / "resources" / "cobra-ui.json"
+    ui = json.loads(ui_file.read_text(encoding="utf-8"))
+    if ui.get("schema") != 1:
+        raise RuntimeError("unsupported Cobra UI schema")
+    runtime = ui.get("runtime", {})
+    if runtime.get("scope") != "cobra-live-only":
+        raise RuntimeError("Cobra UI package must remain Cobra Live-only")
+    if int(runtime.get("minimum_runtime", 0)) < 3:
+        raise RuntimeError("Cobra UI package requires runtime 3+")
+    protected = ui.get("protected_contracts", {})
+    for key in (
+        "rotation", "fold", "background_resume", "renderer",
+        "provider_playback", "infinity_handoff",
+    ):
+        if protected.get(key) != "native":
+            raise RuntimeError("Cobra UI ZIP cannot own native contract: " + key)
+    nav = ui.get("navigation", {})
+    if nav.get("mode") not in ("drawer", "rail", "compact_rail"):
+        raise RuntimeError("invalid Cobra navigation mode")
+    touch = ui.get("touch", {})
+    if not isinstance(touch.get("single_tap_activate"), bool):
+        raise RuntimeError("Cobra touch contract missing single_tap_activate")
+    multiview = ui.get("multiview", {})
+    if int(multiview.get("minimum_tiles", 0)) < 1:
+        raise RuntimeError("Cobra MultiView minimum must be at least one tile")
+    if int(multiview.get("maximum_tiles", 0)) > 4:
+        raise RuntimeError("Cobra MultiView maximum cannot exceed runtime capacity")
     return version
 
 
@@ -67,6 +96,7 @@ def build(output: Path) -> None:
         for required in (
             f"{ADDON_ID}/addon.xml",
             f"{ADDON_ID}/resources/cobra-theme.json",
+            f"{ADDON_ID}/resources/cobra-ui.json",
         ):
             if required not in names:
                 raise RuntimeError("missing ZIP member: " + required)
@@ -74,7 +104,7 @@ def build(output: Path) -> None:
     output.with_suffix(output.suffix + ".sha256").write_text(
         f"{digest}  {output.name}\n", encoding="utf-8"
     )
-    print(f"PASS: Cobra Theme {version} ZIP -> {output}")
+    print(f"PASS: Cobra Theme/UI {version} ZIP -> {output}")
 
 
 def main() -> None:
