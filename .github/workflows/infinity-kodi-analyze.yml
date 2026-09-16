@@ -93,6 +93,8 @@ jobs:
         run: sdkmanager 'platforms;android-34' 'build-tools;34.0.0'
 
       - name: Fast compile Infinity Android runtime contracts against the replayed source
+        id: java-check
+        continue-on-error: true
         run: |
           set -euo pipefail
           python3 upstream/validate_candidate_java.py \
@@ -100,8 +102,19 @@ jobs:
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
             --out "$FAST_JAVA_OUT" \
             --contract "$GITHUB_WORKSPACE/pinned-infinity-recipe/patches/infinity-7.1-audited/contract.json"
-          printf '{"status":"passed","scope":"Infinity Android/Java runtime contract only"}\n' \
-            > "$PORT_EVIDENCE/fast-java-status.json"
+
+      - name: Record targeted Java compatibility result
+        if: always()
+        env:
+          JAVA_OUTCOME: ${{ steps.java-check.outcome }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          status='passed' if os.environ.get('JAVA_OUTCOME') == 'success' else 'failed'
+          Path(os.environ['PORT_EVIDENCE'],'fast-java-status.json').write_text(
+              json.dumps({'status':status,'scope':'Infinity Android/Java runtime contract only'},indent=2)+'\n')
+          PY
 
       - name: Produce readable smart compatibility report and System Tray status payload
         run: |
