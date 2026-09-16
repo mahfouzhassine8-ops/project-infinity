@@ -1,4 +1,4 @@
-name: Infinity | Cobra Mobile Modernization
+name: Infinity | Cobra Appearance Modes
 on:
   workflow_dispatch:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/infinity_cobra_mobile_tv_guide_views.py'
       - 'scripts/infinity_cobra_mobile_modernization.py'
+      - 'scripts/infinity_cobra_appearance_modes.py'
       - 'scripts/infinity_cobra_task_exit.py'
       - 'scripts/infinity_experience_chooser_simplify.py'
       - 'addons/script.infinity.cobra.theme/**'
@@ -14,7 +15,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-experience-card-settings-${{ github.ref }}
+  group: infinity-cobra-appearance-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   android-update:
@@ -77,6 +78,7 @@ jobs:
             scripts/infinity_cobra_player_presentation_fix_v2.py \
             scripts/infinity_cobra_mobile_tv_guide_views.py \
             scripts/infinity_cobra_mobile_modernization.py \
+            scripts/infinity_cobra_appearance_modes.py \
             scripts/infinity_cobra_task_exit.py \
             scripts/infinity_experience_chooser_simplify.py
           python3 scripts/apply_cobra_approved_ui.py --source kodi
@@ -146,6 +148,26 @@ jobs:
           ! grep -Fq '"■  Stop Recording"' "$JAVA"
           git -C kodi diff --binary -- xbmc > engine/native-after-mobile-modernization.patch
           cmp engine/native-before.patch engine/native-after-mobile-modernization.patch
+      - name: Apply Cobra appearance modes
+        run: |
+          python3 scripts/infinity_cobra_appearance_modes.py --source kodi
+          JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          for token in \
+            'COBRA_APPEARANCE_MODE = "cobra_appearance_mode"' \
+            'APPEARANCE  •  ' \
+            'showCobraAppearancePicker()' \
+            'Follow System' \
+            'True OLED Black' \
+            'cobraEffectiveAppearanceMode()' \
+            'optJSONObject("palettes")' \
+            'cobraThemeColor("background", mTheme.background)' \
+            'cobraThemeColor("text", mTheme.text)'; do
+            grep -Fq "$token" "$JAVA" || { echo "Missing Cobra appearance token: $token" >&2; exit 1; }
+          done
+          grep -Fq 'host.setBackground(surface(Color.BLACK' "$JAVA"
+          grep -Fq 'controls.setBackgroundColor(Color.argb(158, 0, 0, 0))' "$JAVA"
+          git -C kodi diff --binary -- xbmc > engine/native-after-appearance.patch
+          cmp engine/native-before.patch engine/native-after-appearance.patch
       - name: Apply two-card chooser with per-card settings
         run: |
           python3 scripts/infinity_experience_chooser_simplify.py --source kodi
@@ -165,13 +187,13 @@ jobs:
           ! grep -Fq 'Remember my choice' "$SPLASH"
           git -C kodi diff --binary -- xbmc > engine/native-after-chooser.patch
           cmp engine/native-before.patch engine/native-after-chooser.patch
-      - name: Promote presentation runtime to 2103147
+      - name: Promote presentation runtime to 2103148
         run: |
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
-          RELEASE='1.0.9-Cobra-Mobile-Modernization'
-          VERSION=2103147
+          RELEASE='1.0.9-Cobra-Appearance-Modes'
+          VERSION=2103148
           gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
           text=gradle.read_text()
           assert text.count('versionCode 2103138') == 1
@@ -208,7 +230,14 @@ jobs:
                      schedule_recording_context_action=True,
                      add_to_group_context_action=True,
                      share_channel_context_action=True,
-                     hide_channel_context_action=True)
+                     hide_channel_context_action=True,
+                     cobra_appearance_modes=True,
+                     cobra_follow_system_appearance=True,
+                     cobra_light_mode=True,
+                     cobra_dark_mode=True,
+                     cobra_oled_black_mode=True,
+                     cobra_palette_zip_contract=True,
+                     dark_video_overlay_in_light_mode=True)
           receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
 
           constants=Path('scripts/infinity_background_resume.py')
@@ -234,17 +263,17 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir structural-ui-build --out background-candidate
-          APK=background-candidate/Infinity-1.0.9-Cobra-Mobile-Modernization.apk
+          APK=background-candidate/Infinity-1.0.9-Cobra-Appearance-Modes.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee background-candidate/badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103147' versionName='1.0.9-Cobra-Mobile-Modernization'" background-candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103148' versionName='1.0.9-Cobra-Appearance-Modes'" background-candidate/badging.txt
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee background-candidate/signing.txt
           grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
           python3 - <<'PY'
           import hashlib,zipfile
           from pathlib import Path
           base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
-          out=Path('background-candidate/Infinity-1.0.9-Cobra-Mobile-Modernization.apk')
+          out=Path('background-candidate/Infinity-1.0.9-Cobra-Appearance-Modes.apk')
           with zipfile.ZipFile(base) as a, zipfile.ZipFile(out) as b:
               libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
               assert libs
@@ -252,24 +281,34 @@ jobs:
                   assert n in b.namelist(), n
                   assert hashlib.sha256(a.read(n)).digest()==hashlib.sha256(b.read(n)).digest(), n
               joined=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
-              for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'Choose Your Experience',b'Infinity settings',b'Cobra settings',b'Remember & launch',b'Ask every time',b'FAVORITES & CATEGORIES',b'Schedule Recording',b'Add to Group',b'Share to a Friend',b'View Channel EPG',b'Hide Channel'):
+              for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'Choose Your Experience',b'Infinity settings',b'Cobra settings',b'Remember & launch',b'Ask every time',b'FAVORITES & CATEGORIES',b'Schedule Recording',b'Add to Group',b'Share to a Friend',b'View Channel EPG',b'Hide Channel',b'APPEARANCE',b'Follow System',b'True OLED Black'):
                   assert token in joined, token
               for forbidden in (b'LAUNCH & REMEMBER',b'JUST THIS TIME',b'Remember my choice',b'Record Channel'):
                   assert forbidden not in joined, forbidden
-          print('PASS: modern Cobra mobile shell signed; exact native libraries preserved')
+          print('PASS: Cobra appearance modes signed; exact native libraries preserved')
           PY
-          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Mobile-Modernization.sha256
-      - name: Package matching Mobile + TV Guide UI 1.3.2
+          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Appearance-Modes.sha256
+      - name: Package matching Mobile + TV Guide UI 1.3.3
         run: |
           python3 - <<'PY'
           import json, pathlib, xml.etree.ElementTree as ET
           root=pathlib.Path('addons/script.infinity.cobra.theme')
           ui=json.loads((root/'resources/cobra-ui.json').read_text())
+          theme=json.loads((root/'resources/cobra-theme.json').read_text())
           addon=ET.parse(root/'addon.xml').getroot()
-          assert addon.attrib['version']=='1.3.2'
-          assert ui['version']=='1.3.2'
+          assert addon.attrib['version']=='1.3.3'
+          assert ui['version']=='1.3.3'
           mobile=ui['views']['mobile']
           guide=ui['views']['tv_guide']
+          appearance=ui['appearance']
+          assert appearance['default']=='dark'
+          assert appearance['modes']==['system','light','dark','oled']
+          assert appearance['player_overlay']=='dark'
+          assert set(theme['palettes'])=={'dark','light','oled'}
+          for mode in ('dark','light','oled'):
+              for key in ('background','rail','panel','panel2','focus','accent','accent_soft','text','muted','line'):
+                  assert key in theme['palettes'][mode], (mode,key)
+          assert theme['palettes']['oled']['background']=='#000000'
           assert mobile['preview_first'] is True
           assert mobile['drawer_mode']=='popup_overlay'
           assert mobile['drawer_destinations']==['search','tv','movies','shows','recordings','my_list']
@@ -285,16 +324,16 @@ jobs:
           cp addons/script.infinity.cobra.theme/resources/cobra-theme.json ui-package/script.infinity.cobra.theme/resources/
           cp addons/script.infinity.cobra.theme/resources/cobra-ui.json ui-package/script.infinity.cobra.theme/resources/
           cd ui-package
-          zip -9 -r Infinity-Cobra-Mobile-TV-Guide-UI-1.3.2.zip script.infinity.cobra.theme
-          sha256sum Infinity-Cobra-Mobile-TV-Guide-UI-1.3.2.zip > Infinity-Cobra-Mobile-TV-Guide-UI-1.3.2.sha256
+          zip -9 -r Infinity-Cobra-Mobile-TV-Guide-UI-1.3.3.zip script.infinity.cobra.theme
+          sha256sum Infinity-Cobra-Mobile-TV-Guide-UI-1.3.3.zip > Infinity-Cobra-Mobile-TV-Guide-UI-1.3.3.sha256
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Cobra-Mobile-Modernization-2103147
+          name: Infinity-Cobra-Appearance-Modes-2103148
           path: |
             background-candidate/
-            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.2.zip
-            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.2.sha256
+            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.3.zip
+            ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.3.sha256
             engine/background-resume-source.json
             preflight/lifecycle-races/
           if-no-files-found: error
