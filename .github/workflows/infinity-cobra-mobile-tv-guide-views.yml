@@ -1,17 +1,18 @@
-name: Infinity | Cobra Structural UI Bridge R2
+name: Infinity | Cobra Task Exit Fix
 on:
   workflow_dispatch:
   push:
     branches: [infinity-cobra-mobile-tv-guide-views]
     paths:
       - 'scripts/infinity_cobra_mobile_tv_guide_views.py'
+      - 'scripts/infinity_cobra_task_exit.py'
       - 'addons/script.infinity.cobra.theme/**'
       - '.github/workflows/infinity-cobra-mobile-tv-guide-views.yml'
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-cobra-structural-ui-bridge-${{ github.ref }}
+  group: infinity-cobra-task-exit-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   android-update:
@@ -72,7 +73,8 @@ jobs:
             scripts/infinity_cobra_ui_frontend_matcher_fix.py \
             scripts/infinity_cobra_player_presentation_fix.py \
             scripts/infinity_cobra_player_presentation_fix_v2.py \
-            scripts/infinity_cobra_mobile_tv_guide_views.py
+            scripts/infinity_cobra_mobile_tv_guide_views.py \
+            scripts/infinity_cobra_task_exit.py
           python3 scripts/apply_cobra_approved_ui.py --source kodi
           python3 scripts/infinity_cobra_ui_frontend_matcher_fix.py --source kodi
           python3 scripts/infinity_cobra_player_presentation_fix_v2.py --source kodi
@@ -103,13 +105,23 @@ jobs:
           ! grep -Fq 'COBRA VIEW  •  ' "$JAVA"
           git -C kodi diff --binary -- xbmc > engine/native-after-structural-ui.patch
           cmp engine/native-before.patch engine/native-after-structural-ui.patch
-      - name: Promote presentation runtime to 2103143
+      - name: Apply Cobra task-exit isolation
+        run: |
+          python3 scripts/infinity_cobra_task_exit.py --source kodi
+          JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'moveTaskToBack(true);' "$JAVA"
+          grep -Fq 'returnToInfinity' "$JAVA"
+          grep -Fq 'closeFullscreenToCobraView()' "$JAVA"
+          grep -Fq 'closeCobraChannelActions()' "$JAVA"
+          git -C kodi diff --binary -- xbmc > engine/native-after-task-exit.patch
+          cmp engine/native-before.patch engine/native-after-task-exit.patch
+      - name: Promote presentation runtime to 2103144
         run: |
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
-          RELEASE='1.0.9-Cobra-Structural-UI-Bridge-R2'
-          VERSION=2103143
+          RELEASE='1.0.9-Cobra-Task-Exit-Fix'
+          VERSION=2103144
           gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
           text=gradle.read_text()
           assert text.count('versionCode 2103138') == 1
@@ -129,7 +141,9 @@ jobs:
                      tv_guide_view_contract=True,long_press_channel_actions=True,
                      inline_live_preview=True,main_menu_view_destinations=True,
                      guide_preview_then_fullscreen=True,fullscreen_back_restores_preview=True,
-                     cobra_ui_json_structural_parser=True)
+                     cobra_ui_json_structural_parser=True,
+                     cobra_terminal_back_backgrounds_task=True,
+                     infinity_handoff_explicit_toggle_only=True)
           receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
 
           constants=Path('scripts/infinity_background_resume.py')
@@ -155,17 +169,17 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir structural-ui-build --out background-candidate
-          APK=background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge-R2.apk
+          APK=background-candidate/Infinity-1.0.9-Cobra-Task-Exit-Fix.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee background-candidate/badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103143' versionName='1.0.9-Cobra-Structural-UI-Bridge-R2'" background-candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103144' versionName='1.0.9-Cobra-Task-Exit-Fix'" background-candidate/badging.txt
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee background-candidate/signing.txt
           grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
           python3 - <<'PY'
           import hashlib,zipfile
           from pathlib import Path
           base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
-          out=Path('background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge-R2.apk')
+          out=Path('background-candidate/Infinity-1.0.9-Cobra-Task-Exit-Fix.apk')
           with zipfile.ZipFile(base) as a, zipfile.ZipFile(out) as b:
               libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
               assert libs
@@ -175,9 +189,9 @@ jobs:
               joined=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
               for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'LIVE PREVIEW',b'TAP VIDEO FOR FULLSCREEN',b'Channel Information',b'Crop / Fill'):
                   assert token in joined, token
-          print('PASS: corrected structural UI bridge signed; exact native libraries preserved')
+          print('PASS: Cobra task-exit fix signed; exact native libraries preserved')
           PY
-          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Structural-UI-Bridge-R2.sha256
+          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Task-Exit-Fix.sha256
       - name: Package matching Mobile + TV Guide UI 1.3.1
         run: |
           python3 - <<'PY'
@@ -203,7 +217,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Cobra-Structural-UI-Bridge-2103143
+          name: Infinity-Cobra-Task-Exit-Fix-2103144
           path: |
             background-candidate/
             ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip
