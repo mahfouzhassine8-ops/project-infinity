@@ -1,60 +1,76 @@
-name: Infinity | Background Resume RC1
+name: Infinity | Cobra UI Runtime RC1
+
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-cobra-background-resume-rc1]
+    branches: [infinity-cobra-ui-runtime-rc1]
     paths:
       - '.github/workflows/infinity-background-resume.yml'
       - 'patches/infinity-background/**'
       - 'scripts/infinity_background_resume.py'
       - 'scripts/package_background_resume.py'
+      - 'scripts/infinity_1_0_9_cobra_ui_runtime.py'
+      - 'scripts/apply_cobra_ui_runtime.py'
       - 'tests/infinity_background/**'
+      - 'tests/infinity_rotation/**'
       - 'stability/background-resume-preimage.json'
       - 'docs/background-resume-rc1.md'
+
 permissions:
   contents: read
   actions: read
+
 concurrency:
-  group: infinity-background-resume-${{ github.ref }}
+  group: infinity-cobra-ui-runtime-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   android-update:
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 75
     env:
       NDK_VER: 21.4.7075529
+      COBRA_UI_SOURCE_COMMIT: eae946710c5aba44d5e36152f46018085911e581
+
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
+
       - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
+
       - name: Preserve exact source snapshots
         run: |
-          mkdir -p background-rollback background-candidate
+          mkdir -p background-rollback background-candidate preflight/ui-runtime
           git archive --format=zip --output=background-rollback/base-source.zip 2674c05e605afbf19a2fe54bdab1a552e76ec394
-          git archive --format=zip --output=background-rollback/postponed-source.zip 7abb31b47756f2faf4e8688e515f8cb52a40565f
-          git archive --format=zip --output=background-candidate/candidate-source.zip "$GITHUB_SHA"
+          git archive --format=zip --output=background-rollback/background-rc1-source.zip f8d8fa1261e98476fd4a4e120a1197257f0c961f
+          git archive --format=zip --output=background-candidate/ui-runtime-source.zip "$GITHUB_SHA"
           sha256sum background-rollback/*zip > background-rollback/source-sha256.txt
+
       - uses: actions/download-artifact@v5
         with:
           name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
           run-id: 35044752997
           github-token: ${{ github.token }}
           path: run40
+
       - name: Verify and preserve exact signed engine baseline
         run: |
           cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
           echo '8ef45e9c54a79e2295e295ce1fcdd3430322a0049c7ff5227804c15aed6b4c57  background-rollback/Infinity-Run40-Exact-Base.apk' | sha256sum -c -
           cp run40/candidate/live-app-shell-engine.json background-rollback/
-      - name: Reconstruct and validate accepted source — no native rebuild
+
+      - name: Reconstruct accepted run-40 source — no native rebuild
         run: bash scripts/infinity_live_app_ci_1.sh
-      - name: Apply isolated background source and verify preservation
+
+      - name: Apply isolated background/resume source first
         run: |
           mkdir -p engine/background-preimage/tools/android/packaging engine/background-preimage/cmake/scripts/android
           cp -a kodi/tools/android/packaging/xbmc engine/background-preimage/tools/android/packaging/
@@ -64,10 +80,125 @@ jobs:
           python3 tests/infinity_background/test_preservation.py --before engine/background-preimage --after kodi
           git -C kodi diff --binary -- xbmc > engine/native-after.patch
           cmp engine/native-before.patch engine/native-after.patch
-      - name: Background service and player behavior tests
+
+      - name: Background and rotation contract tests before Cobra UI runtime
         run: |
           python3 tests/infinity_background/test_background.py --source kodi --out preflight/background --android-jar "$ANDROID_HOME/platforms/android-35/android.jar"
-          python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/background-rotation
+          python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/background-rotation-before-ui
+
+      - name: Snapshot protected lifecycle blocks before UI runtime
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          text = Path('kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          names = [
+              'onResume', 'onPause', 'onStop', 'onConfigurationChanged',
+              'onPictureInPictureModeChanged', 'onMultiWindowModeChanged',
+              'pauseCobraForBackground', 'resumeCobraAfterBackground',
+              'enterCobraPictureInPicture', 'returnToInfinity', 'hasCobraVideo',
+          ]
+          def method_block(name):
+              needle = name + '('
+              pos = text.find(needle)
+              if pos < 0: raise SystemExit('missing protected method: ' + name)
+              start = text.rfind('\n', 0, pos) + 1
+              brace = text.find('{', pos)
+              if brace < 0: raise SystemExit('missing method brace: ' + name)
+              depth = 0
+              for i in range(brace, len(text)):
+                  if text[i] == '{': depth += 1
+                  elif text[i] == '}':
+                      depth -= 1
+                      if depth == 0: return text[start:i+1]
+              raise SystemExit('unterminated protected method: ' + name)
+          rows = {name: hashlib.sha256(method_block(name).encode()).hexdigest() for name in names}
+          Path('preflight/ui-runtime/protected-before.json').write_text(json.dumps(rows, indent=2, sort_keys=True) + '\n')
+          PY
+
+      - name: Stage pinned approved Cobra UI package source
+        run: |
+          git fetch --no-tags origin "$COBRA_UI_SOURCE_COMMIT"
+          git show "$COBRA_UI_SOURCE_COMMIT:scripts/infinity_1_0_9_cobra_approved_ui.py" > scripts/infinity_1_0_9_cobra_approved_ui.py
+          git show "$COBRA_UI_SOURCE_COMMIT:scripts/apply_cobra_approved_ui.py" > scripts/apply_cobra_approved_ui.py
+          git show "$COBRA_UI_SOURCE_COMMIT:scripts/package_cobra_theme.py" > scripts/package_cobra_theme.py
+          rm -rf addons/script.infinity.cobra.theme
+          git archive "$COBRA_UI_SOURCE_COMMIT" addons/script.infinity.cobra.theme | tar -x
+          python3 -m py_compile \
+            scripts/infinity_1_0_9_cobra_approved_ui.py \
+            scripts/apply_cobra_approved_ui.py \
+            scripts/infinity_1_0_9_cobra_ui_runtime.py \
+            scripts/apply_cobra_ui_runtime.py \
+            scripts/package_cobra_theme.py
+
+      - name: Apply approved Cobra UI and ZIP runtime v3
+        run: |
+          python3 scripts/apply_cobra_approved_ui.py --source kodi
+          python3 scripts/apply_cobra_ui_runtime.py --source kodi
+          grep -Fq 'private static final class CobraUi' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'RUNTIME_VERSION = 3' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'last_good_ui' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'RELOAD COBRA UI PACKAGE' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'multiAllowRemoveTile' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+
+      - name: Verify UI runtime did not mutate protected lifecycle contracts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          before = json.loads(Path('preflight/ui-runtime/protected-before.json').read_text())
+          text = Path('kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          def method_block(name):
+              pos = text.find(name + '(')
+              if pos < 0: raise SystemExit('missing protected method after UI runtime: ' + name)
+              start = text.rfind('\n', 0, pos) + 1
+              brace = text.find('{', pos)
+              depth = 0
+              for i in range(brace, len(text)):
+                  if text[i] == '{': depth += 1
+                  elif text[i] == '}':
+                      depth -= 1
+                      if depth == 0: return text[start:i+1]
+              raise SystemExit('unterminated protected method after UI runtime: ' + name)
+          after = {name: hashlib.sha256(method_block(name).encode()).hexdigest() for name in before}
+          Path('preflight/ui-runtime/protected-after.json').write_text(json.dumps(after, indent=2, sort_keys=True) + '\n')
+          if before != after:
+              changed = sorted(name for name in before if before[name] != after.get(name))
+              raise SystemExit('Cobra UI runtime touched protected lifecycle contracts: ' + ', '.join(changed))
+          print('PASS: rotation/Fold/background/PiP/handoff method bodies are byte-identical across UI runtime layer')
+          PY
+          python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/background-rotation-after-ui
+
+      - name: Extend audited source receipt with presentation-only layer
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          receipt_path = Path('engine/background-resume-source.json')
+          receipt = json.loads(receipt_path.read_text())
+          live = Path('kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          key = 'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
+          row = receipt['files'][key]
+          row['background_only_after'] = row['after']
+          row['after'] = hashlib.sha256(live.read_bytes()).hexdigest()
+          receipt['cobra_ui_runtime'] = {
+              'runtime_version': 3,
+              'presentation_only': True,
+              'zip_package_version': '1.2.0',
+              'protected_lifecycle_byte_identical': True,
+              'native_engine_modified': False,
+              'skin_modified': False,
+          }
+          receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          PY
+
+      - name: Package Cobra UI ZIP
+        run: |
+          python3 scripts/package_cobra_theme.py --output background-candidate/Infinity-Cobra-UI-1.2.0.zip
+          unzip -l background-candidate/Infinity-Cobra-UI-1.2.0.zip | tee preflight/ui-runtime/ui-zip-members.txt
+          grep -Fq 'script.infinity.cobra.theme/resources/cobra-ui.json' preflight/ui-runtime/ui-zip-members.txt
+          grep -Fq 'script.infinity.cobra.theme/resources/cobra-theme.json' preflight/ui-runtime/ui-zip-members.txt
+
       - name: Compile Android shell, retain exact engine, permanently sign and verify
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -75,22 +206,35 @@ jobs:
           INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
-          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir background-android-build --out background-candidate
+          python3 scripts/package_background_resume.py \
+            --source kodi \
+            --base-apk background-rollback/Infinity-Run40-Exact-Base.apk \
+            --build-dir background-android-build \
+            --out background-candidate
+          cp background-candidate/Infinity-1.0.9-Cobra-Background-Resume-RC1.apk \
+             background-candidate/Infinity-1.0.9-Cobra-UI-Runtime-RC1.apk
+          sha256sum background-candidate/Infinity-1.0.9-Cobra-UI-Runtime-RC1.apk \
+            > background-candidate/Infinity-1.0.9-Cobra-UI-Runtime-RC1.apk.sha256
+
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Background-Resume-RC1
+          name: Infinity-Cobra-UI-Runtime-RC1
           path: |
             background-candidate/
             engine/background-resume-source.json
             preflight/background/
-            preflight/background-rotation/
+            preflight/background-rotation-before-ui/
+            preflight/background-rotation-after-ui/
+            preflight/ui-runtime/
           if-no-files-found: error
+          compression-level: 0
           retention-days: 90
+
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Background-Resume-Exact-Rollback
+          name: Infinity-Cobra-UI-Runtime-Exact-Rollback
           path: background-rollback/
           if-no-files-found: error
           compression-level: 0
