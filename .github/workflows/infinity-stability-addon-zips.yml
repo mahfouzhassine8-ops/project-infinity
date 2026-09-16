@@ -1,0 +1,51 @@
+name: Infinity Stability | Companion Addon ZIPs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-stability-rc]
+    paths:
+      - '.github/workflows/infinity-stability-addon-zips.yml'
+      - 'scripts/package_stability_addons.py'
+      - 'addons/service.infinity.compat/**'
+      - 'addons/script.infinity.support/**'
+      - 'addons/script.infinity.audiopolicy/**'
+      - 'addons/service.infinity.refresh/**'
+      - 'addons/script.infinity.cobra.theme/**'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Compile Python source
+        run: |
+          python -m compileall -q \
+            addons/service.infinity.compat \
+            addons/script.infinity.support \
+            addons/script.infinity.audiopolicy \
+            addons/service.infinity.refresh
+          find addons -type d -name __pycache__ -prune -exec rm -rf {} +
+
+      - name: Build and verify installable addon ZIPs
+        run: python scripts/package_stability_addons.py
+
+      - name: Run stability audit in report mode
+        run: python scripts/infinity_stability_audit.py --output candidate/stability-addons/STABILITY-AUDIT.json
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Stability-Companion-Addon-ZIPs
+          path: candidate/stability-addons/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
