@@ -1,4 +1,4 @@
-# Cobra Live modern UI lock: rebuild Candidate 2
+# Cobra Live approved UI: collapsible drawer, portrait-first channels, player settings drawer
 name: Infinity 1.0.9 | Cobra Full Feature Candidate 2
 
 on:
@@ -9,6 +9,8 @@ on:
       - '.github/workflows/infinity-cobra-full-feature-candidate-2.yml'
       - 'scripts/infinity_live_app_ci_*.sh'
       - 'scripts/infinity_1_0_9_cobra_full*.py'
+      - 'scripts/infinity_1_0_9_cobra_approved_ui.py'
+      - 'scripts/apply_cobra_approved_ui.py'
       - 'scripts/infinity_1_0_9_cobra_device_parity.py'
       - 'scripts/infinity_1_0_9_cobra_legit.py'
       - 'scripts/infinity_1_0_9_single_app.py'
@@ -92,6 +94,15 @@ jobs:
 
       - name: Preflight full Cobra Candidate 2 contracts
         run: bash scripts/infinity_live_app_ci_1.sh
+
+      - name: Apply approved Cobra UI contract
+        run: |
+          python3 scripts/apply_cobra_approved_ui.py --source kodi
+          grep -Fq 'mRail.setVisibility(View.GONE)' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'showPlayerSettingsDrawer()' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'removeSelectedMultiTile()' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'multiToSingle()' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'button.setFocusableInTouchMode(false)' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 
       - name: Build source-backed Kodi 21.3 + Cobra Full Feature Candidate 2
         id: compile
