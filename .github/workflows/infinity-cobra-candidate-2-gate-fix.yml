@@ -1,0 +1,82 @@
+name: Infinity 1.0.9 | Candidate 2 Manifest Gate Repair
+
+on:
+  push:
+    branches: [infinity-cobra-full-feature-candidate-2]
+    paths:
+      - '.github/workflows/infinity-cobra-candidate-2-gate-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Patch only the false compiled-manifest gate
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/infinity_live_app_ci_3.sh')
+          text = path.read_text()
+          old = """grep -q 'density' candidate/manifest.txt
+grep -q 'uiMode' candidate/manifest.txt"""
+          new = """python3 - <<'PY_MANIFEST'
+from pathlib import Path
+import re
+
+manifest = Path('candidate/manifest.txt').read_text()
+
+def config_mask(fqcn: str) -> int:
+    lines = manifest.splitlines()
+    marker = f'=\"{fqcn}\"'
+    for i, line in enumerate(lines):
+        if 'android:name' not in line or marker not in line:
+            continue
+        name_indent = len(line) - len(line.lstrip())
+        element_indent = max(0, name_indent - 2)
+        for candidate in lines[i + 1:]:
+            stripped = candidate.lstrip()
+            indent = len(candidate) - len(stripped)
+            if stripped.startswith('E: ') and indent <= element_indent:
+                break
+            if 'android:configChanges' in candidate:
+                values = re.findall(r'0x([0-9a-fA-F]+)', candidate)
+                assert values, (fqcn, candidate)
+                return int(values[-1], 16)
+        raise AssertionError(f'configChanges missing for {fqcn}')
+    raise AssertionError(f'activity missing: {fqcn}')
+
+required = 0x0200 | 0x1000  # uiMode | density
+for activity in (
+    'com.projectinfinity.kodi.Main',
+    'com.projectinfinity.kodi.InfinityLiveActivity',
+):
+    mask = config_mask(activity)
+    assert mask & required == required, (activity, hex(mask), hex(required))
+    print(f'PASS: {activity} configChanges={hex(mask)} includes uiMode+density')
+PY_MANIFEST"""
+          if text.count(old) != 1:
+              raise SystemExit('Refusing patch: expected Candidate 2 density/uiMode gate not found exactly once')
+          path.write_text(text.replace(old, new))
+          PY
+
+          git diff --check
+          git diff -- scripts/infinity_live_app_ci_3.sh
+          test "$(git diff --name-only | wc -l)" -eq 1
+          test "$(git diff --name-only)" = 'scripts/infinity_live_app_ci_3.sh'
+
+      - name: Commit guarded Stage-3 fix
+        run: |
+          set -euo pipefail
+          git config user.name 'Infinity CI Repair'
+          git config user.email 'actions@users.noreply.github.com'
+          git add scripts/infinity_live_app_ci_3.sh
+          test "$(git diff --cached --name-only)" = 'scripts/infinity_live_app_ci_3.sh'
+          git commit -m 'Fix Candidate 2 compiled manifest validation [skip ci]'
+          git push origin HEAD:infinity-cobra-full-feature-candidate-2
