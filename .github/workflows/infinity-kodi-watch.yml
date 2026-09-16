@@ -1,0 +1,68 @@
+name: Infinity | Kodi Update Watcher
+on:
+  schedule:
+    - cron: '17 13 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: infinity-kodi-upstream-watcher
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      has_update: ${{ steps.check.outputs.has_update }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test watcher and safety contracts
+        run: python3 -m unittest discover -s upstream/tests -v
+      - name: Check official Kodi source tags
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 upstream/watch.py check
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: kodi-update-check
+          path: watch-output/
+          if-no-files-found: error
+          retention-days: 30
+  alert:
+    needs: check
+    if: needs.check.outputs.has_update == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      new_alert: ${{ steps.alert.outputs.new_alert }}
+      tag: ${{ steps.alert.outputs.tag }}
+      target_sha: ${{ steps.alert.outputs.target_sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: kodi-update-check
+          path: watch-output/
+      - name: Create one deduplicated GitHub alert per source tag and commit
+        id: alert
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 upstream/watch.py notify
+  source-analysis:
+    needs: alert
+    if: needs.alert.outputs.new_alert == 'true'
+    uses: ./.github/workflows/infinity-kodi-analyze.yml
+    with:
+      target_tag: ${{ needs.alert.outputs.tag }}
+      target_sha: ${{ needs.alert.outputs.target_sha }}
+    permissions:
+      contents: read
