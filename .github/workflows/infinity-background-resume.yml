@@ -1,4 +1,4 @@
-name: Infinity | Background Resume RC1
+name: Infinity | Background Control RC2
 on:
   workflow_dispatch:
   push:
@@ -7,10 +7,12 @@ on:
       - '.github/workflows/infinity-background-resume.yml'
       - 'patches/infinity-background/**'
       - 'scripts/infinity_background_resume.py'
+      - 'scripts/infinity_background_control_bridge.py'
       - 'scripts/package_background_resume.py'
       - 'tests/infinity_background/**'
       - 'stability/background-resume-preimage.json'
       - 'docs/background-resume-rc1.md'
+      - 'docs/infinity-background-control-rc2.md'
 permissions:
   contents: read
   actions: read
@@ -54,19 +56,21 @@ jobs:
           cp run40/candidate/live-app-shell-engine.json background-rollback/
       - name: Reconstruct and validate accepted source — no native rebuild
         run: bash scripts/infinity_live_app_ci_1.sh
-      - name: Apply isolated background source and verify preservation
+      - name: Apply background runtime and Infinity control bridge
         run: |
           mkdir -p engine/background-preimage/tools/android/packaging engine/background-preimage/cmake/scripts/android
           cp -a kodi/tools/android/packaging/xbmc engine/background-preimage/tools/android/packaging/
           cp kodi/cmake/scripts/android/Install.cmake engine/background-preimage/cmake/scripts/android/
           git -C kodi diff --binary -- xbmc > engine/native-before.patch
           python3 scripts/infinity_background_resume.py --source kodi --receipt engine/background-resume-source.json
+          python3 scripts/infinity_background_control_bridge.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
           python3 tests/infinity_background/test_preservation.py --before engine/background-preimage --after kodi
           git -C kodi diff --binary -- xbmc > engine/native-after.patch
           cmp engine/native-before.patch engine/native-after.patch
-      - name: Background service and player behavior tests
+      - name: Background service, Infinity bridge and player behavior tests
         run: |
           python3 tests/infinity_background/test_background.py --source kodi --out preflight/background --android-jar "$ANDROID_HOME/platforms/android-35/android.jar"
+          python3 tests/infinity_background/test_infinity_control.py --source kodi --out preflight/background-control
           python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/background-rotation
       - name: Compile Android shell, retain exact engine, permanently sign and verify
         env:
@@ -79,11 +83,12 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Background-Resume-RC1
+          name: Infinity-Background-Control-RC2
           path: |
             background-candidate/
             engine/background-resume-source.json
             preflight/background/
+            preflight/background-control/
             preflight/background-rotation/
           if-no-files-found: error
           retention-days: 90
