@@ -19,7 +19,7 @@ class CandidateBuilderContracts(unittest.TestCase):
         self.assertIn('5f7d9b311568cca053d9c0e082463baca1bd99e0', text)
         self.assertIn('python3 upstream/port.py', text)
         self.assertIn("report['status']=='source_prepared_review_required'", text)
-        self.assertIn('INTERNAL-DEBUG-CANDIDATE', text)
+        self.assertIn('INTERNAL-SIDEBYSIDE-CANDIDATE', text)
         self.assertIn('Disposable Kodi Candidate', text)
         self.assertIn('NOT production-signed. NOT released. NOT installed. NOT promoted.', text)
         for forbidden in (
@@ -28,6 +28,15 @@ class CandidateBuilderContracts(unittest.TestCase):
             'INFINITY_KEY_ALIAS', 'gh release', 'adb install', 'apksigner sign',
             'pull_request_target', 'secrets: inherit'):
             self.assertNotIn(forbidden, text)
+
+    def test_builder_candidate_is_side_by_side_and_userdata_isolated(self):
+        text = BUILDER.read_text()
+        self.assertIn('CANDIDATE_PACKAGE: com.projectinfinity.kodi.candidate', text)
+        self.assertIn('-DAPP_PACKAGE="$CANDIDATE_PACKAGE"', text)
+        self.assertIn("package: name='$CANDIDATE_PACKAGE'", text)
+        self.assertIn("package: name='com.projectinfinity.kodi'", text)
+        self.assertIn('Refusing internal candidate that could collide with production package ID', text)
+        self.assertIn('Uses separate Android app data/userdata from production Infinity.', text)
 
     def test_builder_cannot_silently_become_production_promotion(self):
         text = BUILDER.read_text()
