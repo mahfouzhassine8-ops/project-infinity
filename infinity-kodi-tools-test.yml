@@ -1,0 +1,22 @@
+name: Infinity | Upstream Infrastructure Tests
+on:
+  pull_request:
+    paths:
+      - 'upstream/**'
+      - '.github/workflows/infinity-kodi-*.yml'
+  push:
+    paths:
+      - 'upstream/**'
+      - '.github/workflows/infinity-kodi-*.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s upstream/tests -v
