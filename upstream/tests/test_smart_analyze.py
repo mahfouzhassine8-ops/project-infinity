@@ -18,13 +18,17 @@ class SmartAnalysisContracts(unittest.TestCase):
         self.assertIn("'production_modified': False", text)
         self.assertIn("'stop_gate': True", text)
         self.assertIn("'title': 'Kodi Update'", text)
+        self.assertIn("'export_action_label': 'Export Analysis ZIP'", text)
+        self.assertIn("'save_destination': 'user_selected'", text)
 
     def test_analyzer_uses_fast_java_compile_but_no_native_build(self):
         text = ANALYZE.read_text()
         self.assertIn('python3 upstream/port.py', text)
         self.assertIn('python3 upstream/validate_candidate_java.py', text)
         self.assertIn('python3 upstream/smart_analyze.py', text)
+        self.assertIn('python3 upstream/export_analysis.py', text)
         self.assertIn('system-tray-status.json', text)
+        self.assertIn('analysis-export/*.zip', text)
         for forbidden in ('make -C', ' cmake ', 'ndk;', 'apk -j', 'apksigner sign', 'adb install'):
             self.assertNotIn(forbidden, text)
 
@@ -55,6 +59,27 @@ class SmartAnalysisContracts(unittest.TestCase):
         self.assertEqual(report['state'], 'review_required')
         self.assertEqual(report['targeted_checks']['full_apk_build'], 'not_started')
         self.assertEqual(report['system_tray']['title'], 'Kodi Update')
+        self.assertTrue(report['export']['available'])
+        self.assertEqual(report['system_tray']['save_destination'], 'user_selected')
+
+    def test_export_zip_is_compact_and_contains_no_apk_or_keys(self):
+        import sys
+        import zipfile
+        sys.path.insert(0, str(UPSTREAM))
+        import export_analysis
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            (evidence / 'SMART-ANALYSIS.md').write_text('summary')
+            (evidence / 'smart-analysis.json').write_text('{}')
+            (evidence / 'system-tray-status.json').write_text('{}')
+            (evidence / 'candidate-source-NOT-AN-APK.tar.gz').write_bytes(b'not included')
+            included, skipped = export_analysis.collect(evidence)
+            self.assertEqual(skipped, [])
+            names = [p.name for p in included]
+            self.assertIn('SMART-ANALYSIS.md', names)
+            self.assertNotIn('candidate-source-NOT-AN-APK.tar.gz', names)
 
 
 if __name__ == '__main__':
