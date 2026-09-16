@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "name": "Infinity Cobra Mobile + TV Guide",
+  "version": "1.3.0",
+  "runtime": {
+    "minimum_runtime": 3,
+    "scope": "cobra-live-only"
+  },
+  "protected_contracts": {
+    "rotation": "native",
+    "fold": "native",
+    "background_resume": "native",
+    "renderer": "native",
+    "provider_playback": "native",
+    "infinity_handoff": "native"
+  },
+  "views": {
+    "default": "mobile",
+    "available": ["mobile", "tv_guide"],
+    "mobile": {
+      "preview_first": true,
+      "preview_aspect": "16:9",
+      "channel_row_height_dp": 78,
+      "category_control": "chips_and_picker",
+      "bottom_navigation": true,
+      "channel_primary_action": "play",
+      "channel_long_press_action": "context_sheet",
+      "context_actions": ["favorite", "record_when_supported", "channel_guide", "channel_info", "source_info", "hide_when_supported"]
+    },
+    "tv_guide": {
+      "timeline": true,
+      "now_marker": true,
+      "channel_column": true,
+      "favorites_and_groups": true,
+      "preview_player": true,
+      "first_activation": "preview",
+      "second_activation": "fullscreen",
+      "back_from_fullscreen": "restore_guide_preview_state",
+      "expanded_grid": true,
+      "input": ["touch", "dpad"]
+    }
+  },
+  "presentation": {
+    "density": "comfortable",
+    "surface_style": "cobra_glass",
+    "rounded_surfaces": true,
+    "focus_ring": true,
+    "portrait_category_height_dp": 58,
+    "guide_channel_width_dp": 128,
+    "guide_program_width_dp": 210,
+    "guide_row_height_dp": 68,
+    "guide_header_height_dp": 54,
+    "mobile_preview_height_dp": 220,
+    "mobile_navigation_height_dp": 64
+  }
+}
