@@ -1,0 +1,308 @@
+package @APP_PACKAGE@;
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.IBinder;
+
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/** Foreground DVR service for Infinity Cobra. */
+public final class InfinityCobraRecordingService extends Service {
+  private static final String CHANNEL = "infinity_cobra_recording";
+  private static final int NOTIFICATION_ID = 7312;
+  private final ExecutorService pool = Executors.newCachedThreadPool();
+  private final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
+  private InfinityCobraFeatureRuntime features;
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    features = new InfinityCobraFeatureRuntime(this);
+    ensureChannel();
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    if (intent == null || intent.getAction() == null) return START_NOT_STICKY;
+    if (InfinityCobraFeatureRuntime.ACTION_STOP_RECORD.equals(intent.getAction())) {
+      stopSession(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_SESSION));
+      return START_NOT_STICKY;
+    }
+    if (!InfinityCobraFeatureRuntime.ACTION_RECORD.equals(intent.getAction())) return START_NOT_STICKY;
+
+    String sessionId = safe(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_SESSION));
+    String url = safe(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_URL));
+    String name = safe(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_NAME));
+    String headersJson = safe(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_HEADERS));
+    long endAt = intent.getLongExtra(InfinityCobraFeatureRuntime.EXTRA_END_AT, 0L);
+    String sourceId = safe(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_SOURCE_ID));
+    String channelId = safe(intent.getStringExtra(InfinityCobraFeatureRuntime.EXTRA_CHANNEL_ID));
+    if (sessionId.isEmpty()) sessionId = "rec-" + Long.toHexString(System.currentTimeMillis());
+    if (url.isEmpty()) {
+      stopSelfResult(startId);
+      return START_NOT_STICKY;
+    }
+    if (name.isEmpty()) name = "Recording";
+    if (!features.hasRecordingSpace()) {
+      notifyError("Not enough storage space to start recording");
+      features.writeHealth("recording", sourceId, channelId, "idle", "recording storage guard", 0, 0, -1, "no-space", "");
+      stopSelfResult(startId);
+      return START_NOT_STICKY;
+    }
+
+    startForeground(NOTIFICATION_ID, notification("Recording • " + name, true));
+    final String finalSession = sessionId;
+    final String finalName = name;
+    final Map<String, String> headers = parseHeaders(headersJson);
+    Session session = new Session(finalSession);
+    Session prior = sessions.putIfAbsent(finalSession, session);
+    if (prior == null) {
+      session.future = pool.submit(() -> record(session, url, finalName, headers, endAt, sourceId, channelId));
+    }
+    return START_REDELIVER_INTENT;
+  }
+
+  @Override
+  public void onDestroy() {
+    for (Session session : sessions.values()) session.cancel.set(true);
+    pool.shutdownNow();
+    super.onDestroy();
+  }
+
+  @Override
+  public IBinder onBind(Intent intent) { return null; }
+
+  private void record(Session session, String url, String name, Map<String, String> headers,
+                      long endAt, String sourceId, String channelId) {
+    File output = null;
+    try {
+      output = new File(features.recordingsDir(), fileName(name));
+      features.writeHealth("recording", sourceId, channelId, "recording", "", 0,
+          0, -1, "recording", "");
+      if (looksHls(url)) recordHls(session, url, headers, output, endAt);
+      else recordDirect(session, url, headers, output, endAt);
+      if (output.length() == 0) output.delete();
+      features.writeHealth("recording", sourceId, channelId, "idle", "", 0,
+          0, -1, session.cancel.get() ? "stopped" : "completed", "");
+    } catch (Exception e) {
+      if (output != null && output.isFile() && output.length() == 0) output.delete();
+      features.writeHealth("recording", sourceId, channelId, "idle",
+          e.getClass().getSimpleName() + ": " + e.getMessage(), 0, 0, -1, "error", "");
+      notifyError("Recording failed • " + name);
+    } finally {
+      sessions.remove(session.id);
+      if (sessions.isEmpty()) {
+        stopForeground(true);
+        stopSelf();
+      }
+    }
+  }
+
+  private void recordDirect(Session session, String url, Map<String, String> headers,
+                            File output, long endAt) throws Exception {
+    HttpURLConnection connection = open(url, headers, 30000);
+    int code = connection.getResponseCode();
+    if (code < 200 || code >= 300) {
+      connection.disconnect();
+      throw new IllegalStateException("HTTP " + code);
+    }
+    try (InputStream raw = new BufferedInputStream(connection.getInputStream());
+         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
+      byte[] buffer = new byte[64 * 1024];
+      int read;
+      while (!session.cancel.get() && !expired(endAt) && (read = raw.read(buffer)) != -1) {
+        out.write(buffer, 0, read);
+        if (!features.hasRecordingSpace()) throw new IllegalStateException("recording storage exhausted");
+      }
+      out.flush();
+    } finally {
+      connection.disconnect();
+    }
+  }
+
+  private void recordHls(Session session, String playlistUrl, Map<String, String> headers,
+                         File output, long endAt) throws Exception {
+    Set<String> seen = new HashSet<>();
+    int idleCycles = 0;
+    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
+      while (!session.cancel.get() && !expired(endAt)) {
+        String playlist = textGet(playlistUrl, headers);
+        ArrayList<String> segments = new ArrayList<>();
+        double targetSeconds = 4.0;
+        for (String raw : playlist.replace("\r", "").split("\n")) {
+          String line = raw.trim();
+          if (line.startsWith("#EXT-X-TARGETDURATION:")) {
+            try { targetSeconds = Double.parseDouble(line.substring(line.indexOf(':') + 1)); }
+            catch (Exception ignored) {}
+          } else if (!line.isEmpty() && !line.startsWith("#")) {
+            segments.add(new URL(new URL(playlistUrl), line).toString());
+          }
+        }
+        int wrote = 0;
+        for (String segment : segments) {
+          if (session.cancel.get() || expired(endAt)) break;
+          if (!seen.add(segment)) continue;
+          HttpURLConnection c = open(segment, headers, 20000);
+          int code = c.getResponseCode();
+          if (code >= 200 && code < 300) {
+            try (InputStream in = new BufferedInputStream(c.getInputStream())) {
+              byte[] buffer = new byte[64 * 1024];
+              int read;
+              while ((read = in.read(buffer)) != -1) out.write(buffer, 0, read);
+            }
+            wrote++;
+          }
+          c.disconnect();
+          if (!features.hasRecordingSpace()) throw new IllegalStateException("recording storage exhausted");
+        }
+        out.flush();
+        if (playlist.contains("#EXT-X-ENDLIST")) break;
+        idleCycles = wrote == 0 ? idleCycles + 1 : 0;
+        if (idleCycles > 12) throw new IllegalStateException("HLS playlist stalled");
+        long sleep = Math.max(1200L, Math.min(6000L, (long) (targetSeconds * 500.0)));
+        Thread.sleep(sleep);
+      }
+    }
+  }
+
+  private HttpURLConnection open(String url, Map<String, String> headers, int readTimeout)
+      throws Exception {
+    HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+    connection.setInstanceFollowRedirects(true);
+    connection.setConnectTimeout(15000);
+    connection.setReadTimeout(readTimeout);
+    connection.setRequestProperty("User-Agent", "Infinity Cobra DVR/2.0");
+    for (Map.Entry<String, String> entry : headers.entrySet()) {
+      connection.setRequestProperty(entry.getKey(), entry.getValue());
+    }
+    return connection;
+  }
+
+  private String textGet(String url, Map<String, String> headers) throws Exception {
+    HttpURLConnection c = open(url, headers, 20000);
+    int code = c.getResponseCode();
+    if (code < 200 || code >= 300) {
+      c.disconnect();
+      throw new IllegalStateException("HLS HTTP " + code);
+    }
+    try (InputStream in = new BufferedInputStream(c.getInputStream());
+         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      byte[] buffer = new byte[8192];
+      int read;
+      while ((read = in.read(buffer)) != -1) {
+        if (out.size() > 2 * 1024 * 1024) throw new IllegalStateException("HLS playlist too large");
+        out.write(buffer, 0, read);
+      }
+      return new String(out.toByteArray(), StandardCharsets.UTF_8);
+    } finally {
+      c.disconnect();
+    }
+  }
+
+  private void stopSession(String id) {
+    if (id == null || id.isEmpty()) {
+      for (Session session : sessions.values()) session.cancel.set(true);
+      return;
+    }
+    Session session = sessions.get(id);
+    if (session != null) session.cancel.set(true);
+  }
+
+  private boolean expired(long endAt) {
+    return endAt > 0 && System.currentTimeMillis() >= endAt;
+  }
+
+  private boolean looksHls(String url) {
+    String lower = url.toLowerCase(Locale.US);
+    return lower.contains(".m3u8") || lower.contains("output=m3u8") || lower.contains("type=m3u_plus");
+  }
+
+  private String fileName(String name) {
+    String safe = name.replaceAll("[^A-Za-z0-9._ -]+", "_").trim();
+    if (safe.isEmpty()) safe = "Recording";
+    String stamp = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US)
+        .format(new java.util.Date());
+    return safe + "_" + stamp + ".ts";
+  }
+
+  private Map<String, String> parseHeaders(String json) {
+    Map<String, String> out = new HashMap<>();
+    try {
+      JSONObject object = new JSONObject(json == null ? "{}" : json);
+      java.util.Iterator<String> keys = object.keys();
+      while (keys.hasNext()) {
+        String key = keys.next();
+        String value = object.optString(key, "");
+        if (!key.isEmpty() && !value.isEmpty()) out.put(key, value);
+      }
+    } catch (Exception ignored) {}
+    return out;
+  }
+
+  private void ensureChannel() {
+    if (Build.VERSION.SDK_INT < 26) return;
+    NotificationChannel channel = new NotificationChannel(CHANNEL,
+        "Cobra recordings", NotificationManager.IMPORTANCE_LOW);
+    channel.setDescription("Infinity Cobra DVR recording status");
+    ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+  }
+
+  private Notification notification(String text, boolean ongoing) {
+    Intent open = new Intent(this, InfinityLiveActivity.class)
+        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= 23) flags |= PendingIntent.FLAG_IMMUTABLE;
+    PendingIntent content = PendingIntent.getActivity(this, 0, open, flags);
+    Notification.Builder builder = Build.VERSION.SDK_INT >= 26
+        ? new Notification.Builder(this, CHANNEL)
+        : new Notification.Builder(this);
+    return builder.setContentTitle("Infinity Cobra DVR")
+        .setContentText(text)
+        .setSmallIcon(android.R.drawable.presence_video_online)
+        .setContentIntent(content)
+        .setOngoing(ongoing)
+        .setOnlyAlertOnce(true)
+        .build();
+  }
+
+  private void notifyError(String text) {
+    ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
+        .notify(NOTIFICATION_ID + 1, notification(text, false));
+  }
+
+  private static String safe(String value) { return value == null ? "" : value; }
+
+  private static final class Session {
+    final String id;
+    final AtomicBoolean cancel = new AtomicBoolean(false);
+    volatile Future<?> future;
+    Session(String id) { this.id = id; }
+  }
+}

@@ -1,0 +1,82 @@
+name: Infinity Cobra | Fast Preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-legitimate-live]
+    paths:
+      - '.github/workflows/infinity-cobra-preflight.yml'
+      - 'scripts/infinity_1_0_9_cobra_legit.py'
+      - 'scripts/cobra_provider_contract.py'
+      - 'patches/infinity-cobra/**'
+      - 'addons/script.infinity.cobra.theme/**'
+      - 'tests/cobra_live/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infinity-cobra-fast-preflight-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Compile Cobra build scripts
+        run: |
+          python -m py_compile \
+            scripts/cobra_provider_contract.py \
+            scripts/infinity_1_0_9_cobra_legit.py \
+            scripts/infinity_1_0_9_single_app.py \
+            scripts/infinity_1_0_9_live_app_shell.py
+
+      - name: Provider, playback and visual contract tests
+        run: python -m unittest discover -s tests/cobra_live -v
+
+      - name: Java template syntax gate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path('patches/infinity-cobra/InfinityLiveActivity.java.in').read_text()
+          src = src.replace('@APP_PACKAGE@', 'com.projectinfinity.kodi')
+          Path('/tmp/InfinityLiveActivity.java').write_text(src)
+          PY
+          set +e
+          javac -Xmaxerrs 1000 -proc:none /tmp/InfinityLiveActivity.java 2>/tmp/cobra-javac.txt
+          set -e
+          if grep -E -i '; expected|illegal start|unclosed|not a statement|expected$|reached end of file while parsing|illegal escape character' /tmp/cobra-javac.txt; then
+            cat /tmp/cobra-javac.txt
+            exit 1
+          fi
+          echo 'PASS: Java parser found no syntax/escape failures (Android/Media3 symbols are resolved by the APK build)'
+
+      - name: One-app and runtime contract audit
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          java = Path('patches/infinity-cobra/InfinityLiveActivity.java.in').read_text()
+          patcher = Path('scripts/infinity_1_0_9_cobra_legit.py').read_text()
+          theme = json.loads(Path('addons/script.infinity.cobra.theme/resources/cobra-theme.json').read_text())
+          required = [
+            'player_api.php?username=', 'get_live_categories', 'get_live_streams',
+            '/xmltv.php?username=', 'new ExoPlayer.Builder', 'openMultiView',
+            'COBRA • LIVE TV', 'Stream could not play',
+            '.kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json'
+          ]
+          for token in required:
+            assert token in java, token
+          assert 'android:usesCleartextTraffic="true"' in patcher
+          assert 'one_android_launcher' in patcher
+          assert 'ProgramPair pair = guide.get(channel);' in patcher
+          assert theme['schema'] == 1
+          print('PASS: provider + playback + Cobra UI + fast-theme contracts present')
+          PY

@@ -1,0 +1,171 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.ActivityManager;
+import android.app.ApplicationExitInfo;
+import android.content.Context;
+import android.os.Build;
+import android.os.Process;
+import android.util.Log;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Local, bounded post-mortem collection. No network, root, JNI or player access.
+ * This is diagnostic instrumentation, NOT a claim that a crash is repaired.
+ */
+final class InfinityExitDiagnostics {
+  private static final AtomicBoolean STARTED = new AtomicBoolean();
+  private static final int MAX_RECORDS = 8;
+  private static final int MAX_TRACES = 4;
+  private static final int MAX_TRACE_BYTES = 2 * 1024 * 1024;
+  private static final String TAG = "InfinityDiagnostics";
+
+  private InfinityExitDiagnostics() {}
+
+  static void start(Context context) {
+    if (context == null || !STARTED.compareAndSet(false, true)) return;
+    try {
+      final Context app = context.getApplicationContext();
+      if (app == null) return;
+      Thread worker = new Thread(() -> {
+        try {
+          Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+          collect(app);
+        } catch (Exception | LinkageError failure) {
+          Log.w(TAG, "Local exit report unavailable: " + failure.getClass().getSimpleName());
+        }
+      }, "InfinityExitReport");
+      worker.setDaemon(true);
+      worker.start();
+    } catch (RuntimeException | LinkageError failure) {
+      // Instrumentation must not turn a recoverable collection failure into a
+      // startup crash. Do not replace the real uncaught-exception/signal handler.
+      Log.w(TAG, "Exit collector could not start: " + failure.getClass().getSimpleName());
+    }
+  }
+
+  private static File reportDirectory(Context app) throws Exception {
+    // Same app-specific external files root used by Kodi's .kodi directory.
+    // A companion export script can include these files with explicit consent.
+    File external = app.getExternalFilesDir(null);
+    if (external != null) {
+      File folder = new File(external, ".kodi/temp/infinity-native-diagnostics");
+      if ((folder.isDirectory() || folder.mkdirs()) && folder.canWrite()) return folder;
+    }
+    File folder = new File(app.getFilesDir(), "infinity-native-diagnostics");
+    if ((!folder.isDirectory() && !folder.mkdirs()) || !folder.canWrite())
+      throw new java.io.IOException("No local diagnostic directory");
+    return folder;
+  }
+
+  private static void collect(Context app) throws Exception {
+    File folder = reportDirectory(app);
+    JSONObject report = new JSONObject();
+    report.put("schema", 1);
+    report.put("collector_version", "1");
+    report.put("collected_at_ms", System.currentTimeMillis());
+    report.put("api_level", Build.VERSION.SDK_INT);
+    report.put("package", app.getPackageName());
+    report.put("current_pid", Process.myPid());
+    report.put("network_upload", false);
+    report.put("crash_cause_confirmed", false);
+    if (Build.VERSION.SDK_INT >= 30) {
+      try { Api30.collect(app, folder, report); }
+      catch (Exception failure) {
+        report.put("status", "collection_unavailable");
+        report.put("collection_error", failure.getClass().getSimpleName());
+        report.put("records", new JSONArray());
+      }
+    } else {
+      report.put("status", "unsupported_android_api");
+      report.put("records", new JSONArray());
+    }
+    byte[] data = report.toString(2).getBytes(StandardCharsets.UTF_8);
+    if (data.length > 256 * 1024) throw new java.io.IOException("Oversized exit metadata");
+    try (InputStream input = new ByteArrayInputStream(data)) {
+      InfinityDiagnosticFiles.Result saved = InfinityDiagnosticFiles.copyBounded(
+          input, new File(folder, "android-exit-info.json"), 256 * 1024);
+      if (saved.truncated) throw new java.io.IOException("Unexpected oversized exit metadata");
+    }
+    Log.i(TAG, "Local Android exit report saved; trace availability is not guaranteed");
+  }
+
+  /** Keep API-30 types out of code executed on API 21-29. */
+  private static final class Api30 {
+    static void collect(Context app, File folder, JSONObject report) throws Exception {
+      ActivityManager manager = (ActivityManager) app.getSystemService(Context.ACTIVITY_SERVICE);
+      if (manager == null) {
+        report.put("status", "activity_manager_unavailable");
+        report.put("records", new JSONArray());
+        return;
+      }
+      // Explicitly restrict query to our own package/UID, not other apps.
+      List<ApplicationExitInfo> exits = manager.getHistoricalProcessExitReasons(
+          app.getPackageName(), 0, MAX_RECORDS);
+      JSONArray records = new JSONArray();
+      int traces = 0;
+      for (ApplicationExitInfo exit : exits) {
+        if (records.length() >= MAX_RECORDS) break;
+        JSONObject record = new JSONObject();
+        int reason = exit.getReason();
+        record.put("timestamp_ms", exit.getTimestamp());
+        record.put("pid", exit.getPid());
+        record.put("reason", reason);
+        record.put("status_or_signal", exit.getStatus());
+        record.put("importance", exit.getImportance());
+        record.put("pss_kb_last_sample", exit.getPss());
+        record.put("rss_kb_last_sample", exit.getRss());
+        record.put("trace_available", false);
+        // Descriptions, process-state summaries and media URLs are deliberately
+        // omitted. Native traces themselves may still contain private data.
+        boolean eligible = reason == ApplicationExitInfo.REASON_ANR ||
+            (Build.VERSION.SDK_INT >= 31 && reason == ApplicationExitInfo.REASON_CRASH_NATIVE);
+        if (eligible && traces < MAX_TRACES) {
+          try (InputStream input = exit.getTraceInputStream()) {
+            if (input != null) {
+              String name = "exit-" + exit.getTimestamp() + "-" + exit.getPid() + "-" + reason + ".trace";
+              InfinityDiagnosticFiles.Result saved = InfinityDiagnosticFiles.copyBounded(
+                  input, new File(folder, name), MAX_TRACE_BYTES);
+              record.put("trace_available", true);
+              record.put("trace_file", name);
+              record.put("trace_bytes", saved.bytes);
+              record.put("trace_truncated", saved.truncated);
+              record.put("trace_format", reason == ApplicationExitInfo.REASON_CRASH_NATIVE
+                  ? "android_tombstone_protobuf" : "system_trace");
+              traces++;
+            }
+          } catch (Exception failure) {
+            record.put("trace_error", failure.getClass().getSimpleName());
+          }
+        }
+        records.put(record);
+      }
+      // Retain a bounded local cache even if Android has already evicted an
+      // older exit record. Do not erase the only trace just because the OS no
+      // longer returned it on this launch.
+      File[] old = folder.listFiles((dir, name) -> name.matches("exit-[0-9]+-[0-9]+-[0-9]+\\.trace"));
+      JSONArray cached = new JSONArray();
+      if (old != null) {
+        java.util.Arrays.sort(old, (a, b) -> b.getName().compareTo(a.getName()));
+        int kept = 0;
+        for (File file : old) {
+          if (!file.isFile()) continue;
+          if (++kept <= MAX_TRACES && file.length() <= MAX_TRACE_BYTES) cached.put(file.getName());
+          else file.delete();
+        }
+      }
+      report.put("cached_trace_files", cached);
+      report.put("status", records.length() == 0 ? "no_retained_exit_records" : "collected");
+      report.put("records", records);
+      report.put("trace_limit_bytes", MAX_TRACE_BYTES);
+      report.put("trace_limit_count", MAX_TRACES);
+      report.put("note", "OS exit history is limited; a missing trace does not exclude a native crash.");
+    }
+  }
+}

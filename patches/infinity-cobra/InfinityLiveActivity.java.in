@@ -1,0 +1,1965 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
+import android.util.Xml;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.TextureView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.media3.common.AudioAttributes;
+import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.datasource.DefaultDataSource;
+import androidx.media3.datasource.DefaultHttpDataSource;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
+/**
+ * Infinity-owned Cobra Live experience.
+ *
+ * CobraTV is a UX/behavior reference only. No CobraTV code or assets are used.
+ * This Activity is an independent implementation inside the single Infinity APK.
+ */
+public final class InfinityLiveActivity extends Activity {
+  private static final String PREFS = "infinity_cobra_live";
+  private static final String SOURCES = "sources_json";
+  private static final String ACTIVE_SOURCE = "active_source";
+  private static final String FAVORITES = "favorites";
+  private static final String RECENTS = "recents";
+  private static final String EXPERIENCE_PREFS = "infinity_experience";
+  private static final String EXPERIENCE_DEFAULT = "default";
+  private static final int MAX_CHANNELS = 12000;
+  private static final int MAX_TEXT_BYTES = 48 * 1024 * 1024;
+  private static final Pattern M3U_ATTR =
+      Pattern.compile("([A-Za-z0-9_-]+)=\\\"([^\\\"]*)\\\"");
+
+  private final ExecutorService mIo = Executors.newFixedThreadPool(3);
+  private final Handler mMain = new Handler(Looper.getMainLooper());
+
+  private SharedPreferences mPrefs;
+  private Theme mTheme;
+  private LinearLayout mRoot;
+  private LinearLayout mRail;
+  private LinearLayout mStage;
+  private TextView mHeader;
+  private TextView mStatus;
+
+  private final ArrayList<LiveSource> mSources = new ArrayList<>();
+  private final ArrayList<Channel> mChannels = new ArrayList<>();
+  private final Map<String, ProgramPair> mGuide = new HashMap<>();
+  private final Set<String> mFavorites = new HashSet<>();
+  private final ArrayList<String> mRecents = new ArrayList<>();
+
+  private LiveSource mActiveSource;
+  private String mCategory = "ALL";
+  private String mSearch = "";
+
+  private FrameLayout mPlayerOverlay;
+  private ExoPlayer mPlayer;
+  private TextureView mPlayerTexture;
+  private Channel mPlaying;
+  private int mPlayingIndex = -1;
+  private boolean mTriedFallback;
+  private LinearLayout mPlayerChrome;
+
+  private FrameLayout mMultiOverlay;
+  private ExoPlayer[] mMultiPlayers;
+  private TextureView[] mMultiTextures;
+  private Channel[] mMultiChannels;
+  private int mAudioTile = 0;
+
+  @Override
+  protected void onCreate(Bundle state) {
+    super.onCreate(state);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    getWindow().setFlags(
+        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    mPrefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+    mTheme = Theme.load(this);
+    loadPersistedState();
+    buildShell();
+    if (mSources.isEmpty()) {
+      showWelcome();
+    } else {
+      String active = mPrefs.getString(ACTIVE_SOURCE, "");
+      for (LiveSource source : mSources) {
+        if (source.id.equals(active)) {
+          mActiveSource = source;
+          break;
+        }
+      }
+      if (mActiveSource == null) mActiveSource = mSources.get(0);
+      loadActiveSource(true);
+    }
+  }
+
+  @Override
+  protected void onDestroy() {
+    releaseSinglePlayer();
+    releaseMulti();
+    mIo.shutdownNow();
+    super.onDestroy();
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration configuration) {
+    super.onConfigurationChanged(configuration);
+    Channel playing = mPlaying;
+    releaseSinglePlayer();
+    releaseMulti();
+    mTheme = Theme.load(this);
+    buildShell();
+    if (mChannels.isEmpty()) {
+      if (mSources.isEmpty()) showWelcome(); else loadActiveSource(false);
+    } else {
+      showLiveHome();
+      if (playing != null) playChannel(playing);
+    }
+  }
+
+  @Override
+  public void onBackPressed() {
+    if (mMultiOverlay != null) {
+      releaseMulti();
+      return;
+    }
+    if (mPlayerOverlay != null) {
+      closePlayer();
+      return;
+    }
+    returnToInfinity();
+  }
+
+  private int dp(int value) {
+    return Math.max(1, Math.round(
+        value * getResources().getDisplayMetrics().density));
+  }
+
+  private GradientDrawable surface(int fill, int radius, int stroke, int strokeWidth) {
+    GradientDrawable drawable = new GradientDrawable();
+    drawable.setColor(fill);
+    drawable.setCornerRadius(dp(radius));
+    if (strokeWidth > 0) drawable.setStroke(dp(strokeWidth), stroke);
+    return drawable;
+  }
+
+  private StateListDrawable focusSurface(int normal, int focused, int radius) {
+    StateListDrawable state = new StateListDrawable();
+    state.addState(
+        new int[]{android.R.attr.state_focused},
+        surface(focused, radius, mTheme.accentSoft, 1));
+    state.addState(
+        new int[]{android.R.attr.state_pressed},
+        surface(focused, radius, mTheme.accentSoft, 1));
+    state.addState(
+        new int[]{},
+        surface(normal, radius, Color.TRANSPARENT, 0));
+    return state;
+  }
+
+  private TextView text(String value, int color, int sp, int gravity) {
+    TextView view = new TextView(this);
+    view.setText(value);
+    view.setTextColor(color);
+    view.setTextSize(sp);
+    view.setGravity(gravity);
+    view.setPadding(dp(12), dp(8), dp(12), dp(8));
+    return view;
+  }
+
+  private Button action(String value) {
+    Button button = new Button(this);
+    button.setText(value);
+    button.setTextColor(mTheme.text);
+    button.setTextSize(13);
+    button.setAllCaps(false);
+    button.setGravity(Gravity.CENTER);
+    button.setFocusable(true);
+    button.setPadding(dp(10), dp(6), dp(10), dp(6));
+    button.setBackground(focusSurface(mTheme.panel, mTheme.focus, 14));
+    return button;
+  }
+
+  private void buildShell() {
+    FrameLayout frame = new FrameLayout(this);
+    frame.setBackgroundColor(mTheme.background);
+
+    mRoot = new LinearLayout(this);
+    mRoot.setOrientation(LinearLayout.HORIZONTAL);
+    mRoot.setBackgroundColor(mTheme.background);
+    frame.addView(mRoot, new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT));
+
+    mRail = new LinearLayout(this);
+    mRail.setOrientation(LinearLayout.VERTICAL);
+    mRail.setPadding(dp(10), dp(18), dp(10), dp(12));
+    mRail.setBackgroundColor(mTheme.rail);
+    int railWidth = isCompact() ? dp(108) : dp(156);
+    mRoot.addView(mRail, new LinearLayout.LayoutParams(
+        railWidth, LinearLayout.LayoutParams.MATCH_PARENT));
+
+    TextView brand = text("◈  COBRA", mTheme.accent, isCompact() ? 15 : 18,
+        Gravity.CENTER);
+    brand.setTypeface(null, Typeface.BOLD);
+    mRail.addView(brand, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(62)));
+
+    addRail("LIVE TV", v -> showLiveHome());
+    addRail("GUIDE", v -> showGuide());
+    addRail("FAVORITES", v -> showFavorites());
+    addRail("RECENTS", v -> showRecents());
+    addRail("SEARCH", v -> showSearch());
+    addRail("MULTI-VIEW", v -> beginMultiView());
+    addRail("SOURCES", v -> showSources());
+    addRail("SETTINGS", v -> showSettings());
+
+    View spacer = new View(this);
+    mRail.addView(spacer, new LinearLayout.LayoutParams(
+        1, 0, 1));
+
+    Button infinity = action("∞  INFINITY");
+    infinity.setOnClickListener(v -> returnToInfinity());
+    mRail.addView(infinity, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(52)));
+
+    mStage = new LinearLayout(this);
+    mStage.setOrientation(LinearLayout.VERTICAL);
+    mStage.setPadding(dp(18), dp(12), dp(18), dp(12));
+    mRoot.addView(mStage, new LinearLayout.LayoutParams(
+        0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+
+    mHeader = text("COBRA • LIVE TV", mTheme.text, isCompact() ? 18 : 23,
+        Gravity.CENTER_VERTICAL);
+    mHeader.setTypeface(null, Typeface.BOLD);
+    mStage.addView(mHeader, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(52)));
+
+    mStatus = text("Ready", mTheme.muted, 13, Gravity.CENTER_VERTICAL);
+    mStage.addView(mStatus, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(36)));
+
+    setContentView(frame);
+  }
+
+  private boolean isCompact() {
+    int widthDp = Math.round(
+        getResources().getDisplayMetrics().widthPixels /
+        getResources().getDisplayMetrics().density);
+    return widthDp < 700;
+  }
+
+  private boolean isPortrait() {
+    return getResources().getConfiguration().orientation ==
+        Configuration.ORIENTATION_PORTRAIT;
+  }
+
+  private void addRail(String label, View.OnClickListener listener) {
+    Button button = action(label);
+    button.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+    button.setOnClickListener(listener);
+    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(isCompact() ? 48 : 52));
+    params.bottomMargin = dp(4);
+    mRail.addView(button, params);
+  }
+
+  private void clearStage(String title) {
+    while (mStage.getChildCount() > 2) {
+      mStage.removeViewAt(2);
+    }
+    mHeader.setText(title);
+  }
+
+  private void status(String value) {
+    mStatus.setText(value == null ? "" : value);
+  }
+
+  private void showWelcome() {
+    clearStage("COBRA • WELCOME");
+    status("Add a TV source to begin.");
+    LinearLayout box = new LinearLayout(this);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setGravity(Gravity.CENTER);
+    TextView title = text("LIVE TV. FAST. FOCUSED.", mTheme.text, 24, Gravity.CENTER);
+    title.setTypeface(null, Typeface.BOLD);
+    TextView body = text(
+        "Connect an Xtream-compatible service or an M3U playlist. " +
+        "Cobra will validate it before saving it.",
+        mTheme.muted, 15, Gravity.CENTER);
+    Button add = action("+  ADD TV SOURCE");
+    add.setOnClickListener(v -> chooseSourceType());
+    box.addView(title, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(70)));
+    box.addView(body, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(84)));
+    LinearLayout.LayoutParams button = new LinearLayout.LayoutParams(
+        isCompact() ? LinearLayout.LayoutParams.MATCH_PARENT : dp(300), dp(58));
+    button.topMargin = dp(14);
+    box.addView(add, button);
+    mStage.addView(box, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+  }
+
+  private void chooseSourceType() {
+    new AlertDialog.Builder(this)
+        .setTitle("Add TV source")
+        .setItems(new String[]{
+            "Xtream-compatible login",
+            "M3U / M3U8 playlist"
+        }, (dialog, which) -> {
+          if (which == 0) showXtreamEditor(null);
+          else showM3uEditor(null);
+        })
+        .setNegativeButton("Cancel", null)
+        .show();
+  }
+
+  private EditText field(String hint, int inputType) {
+    EditText input = new EditText(this);
+    input.setHint(hint);
+    input.setTextColor(mTheme.text);
+    input.setHintTextColor(mTheme.muted);
+    input.setSingleLine(true);
+    input.setInputType(inputType);
+    input.setPadding(dp(12), dp(8), dp(12), dp(8));
+    input.setBackground(surface(mTheme.panel2, 12, mTheme.line, 1));
+    return input;
+  }
+
+  private void showXtreamEditor(LiveSource editing) {
+    LinearLayout form = new LinearLayout(this);
+    form.setOrientation(LinearLayout.VERTICAL);
+    form.setPadding(dp(18), dp(8), dp(18), dp(4));
+
+    EditText name = field("Name (optional)", InputType.TYPE_CLASS_TEXT);
+    EditText server = field("Server URL, e.g. http://host:port",
+        InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+    EditText username = field("Username", InputType.TYPE_CLASS_TEXT);
+    EditText password = field("Password",
+        InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+    if (editing != null) {
+      name.setText(editing.name);
+      server.setText(editing.server);
+      username.setText(editing.username);
+      password.setText(editing.password);
+    }
+
+    addField(form, name);
+    addField(form, server);
+    addField(form, username);
+    addField(form, password);
+
+    AlertDialog dialog = new AlertDialog.Builder(this)
+        .setTitle("Xtream-compatible source")
+        .setView(form)
+        .setPositiveButton("TEST & SAVE", null)
+        .setNegativeButton("Cancel", null)
+        .create();
+
+    dialog.setOnShowListener(ignore -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        .setOnClickListener(v -> {
+          String base;
+          try {
+            base = normalizeServer(server.getText().toString());
+          } catch (Exception e) {
+            server.setError("Enter a valid server URL");
+            return;
+          }
+          String user = username.getText().toString().trim();
+          String pass = password.getText().toString();
+          if (user.isEmpty()) {
+            username.setError("Username is required");
+            return;
+          }
+          if (pass.isEmpty()) {
+            password.setError("Password is required");
+            return;
+          }
+          String label = name.getText().toString().trim();
+          if (label.isEmpty()) label = hostLabel(base);
+          LiveSource candidate = LiveSource.xtream(
+              editing == null ? newId() : editing.id,
+              label, base, user, pass);
+          status("Checking " + label + "…");
+          dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+          validateAndSave(candidate, editing, dialog);
+        }));
+    dialog.show();
+  }
+
+  private void showM3uEditor(LiveSource editing) {
+    LinearLayout form = new LinearLayout(this);
+    form.setOrientation(LinearLayout.VERTICAL);
+    form.setPadding(dp(18), dp(8), dp(18), dp(4));
+
+    EditText name = field("Name (optional)", InputType.TYPE_CLASS_TEXT);
+    EditText playlist = field("M3U / M3U8 URL",
+        InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+    EditText epg = field("XMLTV URL (optional)",
+        InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+
+    if (editing != null) {
+      name.setText(editing.name);
+      playlist.setText(editing.playlistUrl);
+      epg.setText(editing.epgUrl);
+    }
+
+    addField(form, name);
+    addField(form, playlist);
+    addField(form, epg);
+
+    AlertDialog dialog = new AlertDialog.Builder(this)
+        .setTitle("M3U source")
+        .setView(form)
+        .setPositiveButton("TEST & SAVE", null)
+        .setNegativeButton("Cancel", null)
+        .create();
+
+    dialog.setOnShowListener(ignore -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        .setOnClickListener(v -> {
+          String url = playlist.getText().toString().trim();
+          if (!isHttpUrl(url)) {
+            playlist.setError("Enter an http:// or https:// playlist URL");
+            return;
+          }
+          String epgUrl = epg.getText().toString().trim();
+          if (!epgUrl.isEmpty() && !isHttpUrl(epgUrl)) {
+            epg.setError("Enter an http:// or https:// XMLTV URL");
+            return;
+          }
+          String label = name.getText().toString().trim();
+          if (label.isEmpty()) label = hostLabel(url);
+          LiveSource candidate = LiveSource.m3u(
+              editing == null ? newId() : editing.id,
+              label, url, epgUrl);
+          status("Checking " + label + "…");
+          dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+          validateAndSave(candidate, editing, dialog);
+        }));
+    dialog.show();
+  }
+
+  private void addField(LinearLayout form, EditText field) {
+    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(54));
+    params.bottomMargin = dp(10);
+    form.addView(field, params);
+  }
+
+  private void validateAndSave(
+      LiveSource candidate, LiveSource editing, AlertDialog dialog) {
+    mIo.execute(() -> {
+      try {
+        LoadResult result = loadSource(candidate, true);
+        runOnUiThread(() -> {
+          if (editing != null) mSources.remove(editing);
+          mSources.add(candidate);
+          mActiveSource = candidate;
+          persistSources();
+          mPrefs.edit().putString(ACTIVE_SOURCE, candidate.id).apply();
+          applyLoadResult(result);
+          dialog.dismiss();
+          showLiveHome();
+          loadGuideAsync(candidate);
+          toast("Source connected • " + mChannels.size() + " channels");
+        });
+      } catch (LiveException e) {
+        runOnUiThread(() -> {
+          dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+          status("Connection failed");
+          showError("Could not connect", e.userMessage);
+        });
+      } catch (Exception e) {
+        runOnUiThread(() -> {
+          dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+          status("Connection failed");
+          showError("Could not connect",
+              "Unexpected response. Check the server address and try again.");
+        });
+      }
+    });
+  }
+
+  private void loadActiveSource(boolean showBusy) {
+    if (mActiveSource == null) {
+      showWelcome();
+      return;
+    }
+    if (showBusy) {
+      clearStage("COBRA • LIVE TV");
+      status("Loading " + mActiveSource.name + "…");
+      TextView loading = text("CONNECTING TO TV SERVICE…",
+          mTheme.muted, 16, Gravity.CENTER);
+      mStage.addView(loading, new LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+    }
+    LiveSource source = mActiveSource;
+    mIo.execute(() -> {
+      try {
+        LoadResult result = loadSource(source, false);
+        runOnUiThread(() -> {
+          if (source != mActiveSource) return;
+          applyLoadResult(result);
+          showLiveHome();
+          loadGuideAsync(source);
+        });
+      } catch (LiveException e) {
+        runOnUiThread(() -> {
+          if (source != mActiveSource) return;
+          clearStage("COBRA • SOURCE ERROR");
+          status("Could not load " + source.name);
+          Button retry = action("RETRY");
+          retry.setOnClickListener(v -> loadActiveSource(true));
+          Button edit = action("EDIT SOURCE");
+          edit.setOnClickListener(v -> {
+            if ("xtream".equals(source.type)) showXtreamEditor(source);
+            else showM3uEditor(source);
+          });
+          TextView message = text(e.userMessage, mTheme.text, 15, Gravity.CENTER);
+          mStage.addView(message, new LinearLayout.LayoutParams(
+              LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+          LinearLayout actions = new LinearLayout(this);
+          actions.setGravity(Gravity.CENTER);
+          actions.addView(retry, new LinearLayout.LayoutParams(dp(150), dp(54)));
+          LinearLayout.LayoutParams editParams =
+              new LinearLayout.LayoutParams(dp(180), dp(54));
+          editParams.leftMargin = dp(10);
+          actions.addView(edit, editParams);
+          mStage.addView(actions, new LinearLayout.LayoutParams(
+              LinearLayout.LayoutParams.MATCH_PARENT, dp(72)));
+        });
+      }
+    });
+  }
+
+  private LoadResult loadSource(LiveSource source, boolean validating)
+      throws Exception {
+    if ("xtream".equals(source.type)) return loadXtream(source);
+    if ("m3u".equals(source.type)) return loadM3u(source);
+    throw new LiveException("This source type is not supported.");
+  }
+
+  private LoadResult loadXtream(LiveSource source) throws Exception {
+    String authUrl = xtreamUrl(source, "");
+    JSONObject auth = new JSONObject(httpGet(authUrl));
+    JSONObject userInfo = auth.optJSONObject("user_info");
+    if (userInfo == null) {
+      throw new LiveException(
+          "The provider did not return Xtream account information. " +
+          "Check the server URL; do not paste a playlist URL here.");
+    }
+    String authValue = String.valueOf(userInfo.opt("auth"));
+    if (!"1".equals(authValue) && !"true".equalsIgnoreCase(authValue)) {
+      String message = userInfo.optString("message", "");
+      if (message.isEmpty()) message = userInfo.optString("status", "");
+      if (message.isEmpty()) message = "The provider rejected the username or password.";
+      throw new LiveException(message);
+    }
+    String statusValue = userInfo.optString("status", "");
+    if (!statusValue.isEmpty()
+        && !"active".equalsIgnoreCase(statusValue)
+        && !"trial".equalsIgnoreCase(statusValue)) {
+      throw new LiveException("Account status: " + statusValue);
+    }
+
+    Map<String, String> categories = new HashMap<>();
+    JSONArray categoryJson = new JSONArray(
+        httpGet(xtreamUrl(source, "get_live_categories")));
+    for (int i = 0; i < categoryJson.length(); i++) {
+      JSONObject object = categoryJson.optJSONObject(i);
+      if (object == null) continue;
+      categories.put(
+          object.optString("category_id", ""),
+          object.optString("category_name", "Other"));
+    }
+
+    JSONArray streams = new JSONArray(
+        httpGet(xtreamUrl(source, "get_live_streams")));
+    ArrayList<Channel> channels = new ArrayList<>();
+    for (int i = 0; i < streams.length() && channels.size() < MAX_CHANNELS; i++) {
+      JSONObject object = streams.optJSONObject(i);
+      if (object == null) continue;
+      String id = object.optString("stream_id", "");
+      if (id.isEmpty()) continue;
+      String name = object.optString("name", "Live channel").trim();
+      String categoryId = object.optString("category_id", "");
+      String group = categories.get(categoryId);
+      if (group == null || group.trim().isEmpty()) group = "Other";
+      String extension = sanitizeExtension(
+          object.optString("container_extension", "ts"));
+      String built = xtreamStreamUrl(source, id, extension);
+      String fallback = xtreamStreamUrl(
+          source, id, "m3u8".equals(extension) ? "ts" : "m3u8");
+      String direct = object.optString("direct_source", "").trim();
+      String primary = isPlayableUrl(direct) ? direct : built;
+      if (isPlayableUrl(direct)) fallback = built;
+      channels.add(new Channel(
+          source.id + ":" + id,
+          name,
+          group,
+          object.optString("epg_channel_id", ""),
+          object.optString("stream_icon", ""),
+          primary,
+          fallback,
+          Collections.emptyMap()));
+    }
+    if (channels.isEmpty()) {
+      throw new LiveException(
+          "Login worked, but the provider returned no Live TV channels.");
+    }
+    return new LoadResult(channels);
+  }
+
+  private LoadResult loadM3u(LiveSource source) throws Exception {
+    String playlist = httpGet(source.playlistUrl);
+    ArrayList<Channel> channels = parseM3u(source, playlist);
+    if (channels.isEmpty()) {
+      throw new LiveException(
+          "The playlist loaded, but it did not contain playable channels.");
+    }
+    return new LoadResult(channels);
+  }
+
+  private String xtreamUrl(LiveSource source, String action) throws Exception {
+    String url = source.server + "/player_api.php?username=" +
+        enc(source.username) + "&password=" + enc(source.password);
+    if (action != null && !action.isEmpty()) {
+      url += "&action=" + enc(action);
+    }
+    return url;
+  }
+
+  private String xtreamStreamUrl(
+      LiveSource source, String streamId, String extension) throws Exception {
+    return source.server + "/live/" + encPath(source.username) + "/" +
+        encPath(source.password) + "/" + encPath(streamId) + "." + extension;
+  }
+
+  private String xtreamEpgUrl(LiveSource source) throws Exception {
+    return source.server + "/xmltv.php?username=" +
+        enc(source.username) + "&password=" + enc(source.password);
+  }
+
+  private static String enc(String value) throws Exception {
+    return URLEncoder.encode(value == null ? "" : value, "UTF-8");
+  }
+
+  private static String encPath(String value) {
+    return Uri.encode(value == null ? "" : value);
+  }
+
+  private String normalizeServer(String raw) throws Exception {
+    String value = raw == null ? "" : raw.trim();
+    if (value.isEmpty()) throw new IllegalArgumentException();
+    if (!value.matches("^[A-Za-z][A-Za-z0-9+.-]*://.*")) {
+      value = "http://" + value;
+    }
+    URL url = new URL(value);
+    if (!"http".equalsIgnoreCase(url.getProtocol())
+        && !"https".equalsIgnoreCase(url.getProtocol())) {
+      throw new IllegalArgumentException();
+    }
+    String path = url.getPath();
+    if (path == null) path = "";
+    while (path.endsWith("/")) path = path.substring(0, path.length() - 1);
+    if (path.endsWith("/player_api.php")) {
+      path = path.substring(0, path.length() - "/player_api.php".length());
+    }
+    int port = url.getPort();
+    String authority = url.getHost() +
+        (port > 0 ? ":" + port : "");
+    return url.getProtocol().toLowerCase(Locale.US) + "://" +
+        authority + path;
+  }
+
+  private String hostLabel(String url) {
+    try {
+      return new URL(url).getHost();
+    } catch (Exception e) {
+      return "TV Source";
+    }
+  }
+
+  private boolean isHttpUrl(String value) {
+    if (value == null) return false;
+    String lower = value.trim().toLowerCase(Locale.US);
+    return lower.startsWith("http://") || lower.startsWith("https://");
+  }
+
+  private String sanitizeExtension(String value) {
+    if (value == null) return "ts";
+    String lower = value.trim().toLowerCase(Locale.US);
+    if (lower.matches("[a-z0-9]{1,8}")) return lower;
+    return "ts";
+  }
+
+  private ArrayList<Channel> parseM3u(
+      LiveSource source, String data) throws Exception {
+    ArrayList<Channel> channels = new ArrayList<>();
+    String[] lines = data.replace("\r", "").split("\n");
+    String pendingInfo = null;
+    Map<String, String> pendingHeaders = new HashMap<>();
+
+    for (String raw : lines) {
+      String line = raw.trim();
+      if (line.isEmpty()) continue;
+      if (line.startsWith("#EXTINF")) {
+        pendingInfo = line;
+        pendingHeaders = new HashMap<>();
+        continue;
+      }
+      if (line.startsWith("#EXTVLCOPT:")) {
+        String option = line.substring("#EXTVLCOPT:".length());
+        int eq = option.indexOf('=');
+        if (eq > 0) {
+          String key = option.substring(0, eq).trim().toLowerCase(Locale.US);
+          String value = option.substring(eq + 1).trim();
+          if ("http-user-agent".equals(key)) pendingHeaders.put("User-Agent", value);
+          if ("http-referrer".equals(key) || "http-referer".equals(key)) {
+            pendingHeaders.put("Referer", value);
+          }
+        }
+        continue;
+      }
+      if (line.startsWith("#EXTHTTP:")) {
+        try {
+          JSONObject headers = new JSONObject(line.substring("#EXTHTTP:".length()).trim());
+          java.util.Iterator<String> keys = headers.keys();
+          while (keys.hasNext()) {
+            String key = keys.next();
+            String value = headers.optString(key, "");
+            if (!key.isEmpty() && !value.isEmpty()) pendingHeaders.put(key, value);
+          }
+        } catch (Exception ignored) {}
+        continue;
+      }
+      if (line.startsWith("#")) continue;
+      if (pendingInfo == null) continue;
+
+      Map<String, String> attributes = new HashMap<>();
+      Matcher matcher = M3U_ATTR.matcher(pendingInfo);
+      while (matcher.find()) {
+        attributes.put(matcher.group(1).toLowerCase(Locale.US), matcher.group(2));
+      }
+      int comma = pendingInfo.lastIndexOf(',');
+      String name = comma >= 0 ? pendingInfo.substring(comma + 1).trim() : "";
+      if (name.isEmpty()) name = attributes.get("tvg-name");
+      if (name == null || name.trim().isEmpty()) name = "Live channel";
+      String group = attributes.get("group-title");
+      if (group == null || group.trim().isEmpty()) group = "Other";
+      String epgId = attributes.get("tvg-id");
+      if (epgId == null) epgId = "";
+      String icon = attributes.get("tvg-logo");
+      if (icon == null) icon = "";
+
+      String streamLine = line;
+      int pipe = streamLine.indexOf('|');
+      if (pipe > 0) {
+        String options = streamLine.substring(pipe + 1);
+        streamLine = streamLine.substring(0, pipe);
+        for (String pair : options.split("&")) {
+          int eq = pair.indexOf('=');
+          if (eq <= 0) continue;
+          String key = Uri.decode(pair.substring(0, eq)).trim();
+          String value = Uri.decode(pair.substring(eq + 1)).trim();
+          if ("User-Agent".equalsIgnoreCase(key)) pendingHeaders.put("User-Agent", value);
+          else if ("Referer".equalsIgnoreCase(key) || "Referrer".equalsIgnoreCase(key)) {
+            pendingHeaders.put("Referer", value);
+          } else if ("Cookie".equalsIgnoreCase(key)) {
+            pendingHeaders.put("Cookie", value);
+          }
+        }
+      }
+      String resolved;
+      try {
+        resolved = new URL(new URL(source.playlistUrl), streamLine).toString();
+      } catch (Exception e) {
+        resolved = streamLine;
+      }
+      if (isPlayableUrl(resolved)) {
+        String stable = source.id + ":" + channels.size() + ":" +
+            Integer.toHexString(resolved.hashCode());
+        channels.add(new Channel(
+            stable, name, group, epgId, icon,
+            resolved, "", pendingHeaders));
+        if (channels.size() >= MAX_CHANNELS) break;
+      }
+      pendingInfo = null;
+      pendingHeaders = new HashMap<>();
+    }
+    return channels;
+  }
+
+  private boolean isPlayableUrl(String value) {
+    if (value == null) return false;
+    String lower = value.trim().toLowerCase(Locale.US);
+    return lower.startsWith("http://") ||
+        lower.startsWith("https://") ||
+        lower.startsWith("rtsp://");
+  }
+
+  private String httpGet(String url) throws LiveException {
+    HttpURLConnection connection = null;
+    try {
+      connection = (HttpURLConnection) new URL(url).openConnection();
+      connection.setConnectTimeout(15000);
+      connection.setReadTimeout(28000);
+      connection.setInstanceFollowRedirects(true);
+      connection.setRequestProperty(
+          "User-Agent", "Mozilla/5.0 (Android) Infinity-Cobra/1.0");
+      connection.setRequestProperty("Accept", "*/*");
+      connection.setRequestProperty("Accept-Encoding", "gzip");
+      int code = connection.getResponseCode();
+      InputStream raw = code >= 200 && code < 300
+          ? connection.getInputStream() : connection.getErrorStream();
+      String encoding = connection.getContentEncoding();
+      if (raw == null) {
+        throw new LiveException("The TV server returned HTTP " + code + ".");
+      }
+      InputStream in = new BufferedInputStream(
+          encoding != null && "gzip".equalsIgnoreCase(encoding)
+              ? new GZIPInputStream(raw) : raw);
+      String body = readText(in);
+      if (code < 200 || code >= 300) {
+        throw new LiveException(
+            "The TV server returned HTTP " + code + ". " +
+            safeServerMessage(body));
+      }
+      if (body.trim().isEmpty()) {
+        throw new LiveException("The TV server returned an empty response.");
+      }
+      return body;
+    } catch (LiveException e) {
+      throw e;
+    } catch (java.net.UnknownHostException e) {
+      throw new LiveException(
+          "Server not found. Check the address, Wi-Fi, VPN, or DNS.");
+    } catch (java.net.SocketTimeoutException e) {
+      throw new LiveException(
+          "The TV server timed out. Check the server address or try again.");
+    } catch (javax.net.ssl.SSLException e) {
+      throw new LiveException(
+          "Secure connection failed. Check the provider's HTTPS address or certificate.");
+    } catch (Exception e) {
+      throw new LiveException(
+          "Network request failed: " + e.getClass().getSimpleName() + ".");
+    } finally {
+      if (connection != null) connection.disconnect();
+    }
+  }
+
+  private String readText(InputStream in) throws Exception {
+    try (InputStream input = in;
+         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      byte[] buffer = new byte[8192];
+      int total = 0;
+      int count;
+      while ((count = input.read(buffer)) != -1) {
+        total += count;
+        if (total > MAX_TEXT_BYTES) {
+          throw new LiveException("The provider response is too large to process safely.");
+        }
+        out.write(buffer, 0, count);
+      }
+      return new String(out.toByteArray(), StandardCharsets.UTF_8);
+    }
+  }
+
+  private String safeServerMessage(String body) {
+    if (body == null) return "";
+    String flat = body.replaceAll("\\s+", " ").trim();
+    if (flat.length() > 120) flat = flat.substring(0, 120);
+    if (flat.contains("username=") || flat.contains("password=")) return "";
+    return flat;
+  }
+
+  private void applyLoadResult(LoadResult result) {
+    mChannels.clear();
+    mChannels.addAll(result.channels);
+    mCategory = "ALL";
+    mSearch = "";
+    status(mChannels.size() + " channels • " +
+        (mActiveSource == null ? "" : mActiveSource.name));
+  }
+
+  private void loadGuideAsync(LiveSource source) {
+    String epgUrl = "";
+    try {
+      if ("xtream".equals(source.type)) epgUrl = xtreamEpgUrl(source);
+      else epgUrl = source.epgUrl;
+    } catch (Exception ignored) {}
+    if (epgUrl == null || epgUrl.trim().isEmpty()) return;
+    final String target = epgUrl;
+    mIo.execute(() -> {
+      try {
+        String xml = httpGet(target);
+        Map<String, ProgramPair> parsed = parseXmlTv(xml);
+        runOnUiThread(() -> {
+          if (source != mActiveSource) return;
+          mGuide.clear();
+          mGuide.putAll(parsed);
+          if (mPlayerOverlay == null && mMultiOverlay == null) showLiveHome();
+        });
+      } catch (Exception ignored) {
+        // EPG failure does not invalidate a playable TV source.
+      }
+    });
+  }
+
+  private Map<String, ProgramPair> parseXmlTv(String xml) throws Exception {
+    Map<String, ProgramPair> guide = new HashMap<>();
+    XmlPullParser parser = Xml.newPullParser();
+    parser.setInput(new java.io.StringReader(xml));
+    long now = System.currentTimeMillis();
+    int event = parser.getEventType();
+    String channel = null;
+    long start = 0;
+    long stop = 0;
+    String title = "";
+    boolean inTitle = false;
+
+    while (event != XmlPullParser.END_DOCUMENT) {
+      if (event == XmlPullParser.START_TAG) {
+        String tag = parser.getName();
+        if ("programme".equals(tag)) {
+          channel = parser.getAttributeValue(null, "channel");
+          start = parseXmlTvTime(parser.getAttributeValue(null, "start"));
+          stop = parseXmlTvTime(parser.getAttributeValue(null, "stop"));
+          title = "";
+        } else if ("title".equals(tag) && channel != null) {
+          inTitle = true;
+        }
+      } else if (event == XmlPullParser.TEXT && inTitle) {
+        title += parser.getText();
+      } else if (event == XmlPullParser.END_TAG) {
+        String tag = parser.getName();
+        if ("title".equals(tag)) {
+          inTitle = false;
+        } else if ("programme".equals(tag) && channel != null) {
+          ProgramPair pair = mGuide.get(channel);
+          if (pair == null) pair = new ProgramPair();
+          if (start <= now && stop > now) {
+            pair.now = title.trim();
+          } else if (start > now && (pair.nextStart == 0 || start < pair.nextStart)) {
+            pair.next = title.trim();
+            pair.nextStart = start;
+          }
+          if (!pair.now.isEmpty() || !pair.next.isEmpty()) {
+            guide.put(channel, pair);
+          }
+          channel = null;
+          inTitle = false;
+        }
+      }
+      event = parser.next();
+    }
+    return guide;
+  }
+
+  private long parseXmlTvTime(String value) {
+    if (value == null || value.length() < 14) return 0;
+    String[] patterns = {
+        "yyyyMMddHHmmss Z",
+        "yyyyMMddHHmmssZ",
+        "yyyyMMddHHmmss"
+    };
+    for (String pattern : patterns) {
+      try {
+        SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.US);
+        if (!pattern.contains("Z")) format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = format.parse(value.trim());
+        if (date != null) return date.getTime();
+      } catch (Exception ignored) {}
+    }
+    return 0;
+  }
+
+  private void showLiveHome() {
+    showChannelBrowser("COBRA • LIVE TV", false, false, false);
+  }
+
+  private void showGuide() {
+    showChannelBrowser("COBRA • GUIDE", true, false, false);
+  }
+
+  private void showFavorites() {
+    showChannelBrowser("COBRA • FAVORITES", true, true, false);
+  }
+
+  private void showRecents() {
+    showChannelBrowser("COBRA • RECENTS", true, false, true);
+  }
+
+  private void showChannelBrowser(
+      String title, boolean guideMode, boolean favoritesOnly, boolean recentsOnly) {
+    if (mChannels.isEmpty()) {
+      if (mSources.isEmpty()) showWelcome(); else loadActiveSource(true);
+      return;
+    }
+    clearStage(title);
+    status(mChannels.size() + " channels • " +
+        (mActiveSource == null ? "" : mActiveSource.name));
+
+    LinearLayout content = new LinearLayout(this);
+    content.setOrientation(isPortrait()
+        ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+    mStage.addView(content, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+
+    if (!recentsOnly) {
+      ScrollView groupsScroll = new ScrollView(this);
+      LinearLayout groups = new LinearLayout(this);
+      groups.setOrientation(LinearLayout.VERTICAL);
+      groups.setPadding(0, dp(4), dp(8), dp(4));
+      groupsScroll.addView(groups);
+      ArrayList<String> categories = categoriesForCurrentChannels();
+      for (String category : categories) {
+        Button button = action(category);
+        if (category.equals(mCategory)) {
+          button.setText("●  " + category);
+        }
+        button.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+        button.setOnClickListener(v -> {
+          mCategory = category;
+          showChannelBrowser(title, guideMode, favoritesOnly, false);
+        });
+        groups.addView(button, new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(48)));
+      }
+      LinearLayout.LayoutParams groupParams = isPortrait()
+          ? new LinearLayout.LayoutParams(
+              LinearLayout.LayoutParams.MATCH_PARENT, dp(116))
+          : new LinearLayout.LayoutParams(dp(isCompact() ? 150 : 200), -1);
+      content.addView(groupsScroll, groupParams);
+    }
+
+    ScrollView channelScroll = new ScrollView(this);
+    LinearLayout rows = new LinearLayout(this);
+    rows.setOrientation(LinearLayout.VERTICAL);
+    rows.setPadding(dp(4), dp(4), dp(4), dp(12));
+    channelScroll.addView(rows);
+
+    List<Channel> visible = filteredChannels(favoritesOnly, recentsOnly);
+    if (visible.isEmpty()) {
+      rows.addView(text(
+          favoritesOnly ? "No favorite channels yet."
+              : recentsOnly ? "No recently watched channels yet."
+              : "No channels match this view.",
+          mTheme.muted, 15, Gravity.CENTER),
+          new LinearLayout.LayoutParams(
+              LinearLayout.LayoutParams.MATCH_PARENT, dp(120)));
+    }
+
+    int number = 1;
+    for (Channel channel : visible) {
+      Button row = channelButton(channel, number++, guideMode);
+      rows.addView(row, new LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          dp(guideMode ? mTheme.guideRowHeight : mTheme.rowHeight)));
+    }
+    content.addView(channelScroll, new LinearLayout.LayoutParams(0, -1, 1));
+  }
+
+  private Button channelButton(Channel channel, int number, boolean guideMode) {
+    Button row = action("");
+    row.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+    row.setTextSize(isCompact() ? 13 : 14);
+    ProgramPair pair = programFor(channel);
+    StringBuilder label = new StringBuilder();
+    label.append(String.format(Locale.US, "%03d", number))
+        .append("   ")
+        .append(mFavorites.contains(channel.id) ? "★ " : "")
+        .append(channel.name);
+    if (guideMode || pair != null) {
+      if (pair != null && !pair.now.isEmpty()) {
+        label.append("\n     NOW  •  ").append(pair.now);
+      }
+      if (pair != null && !pair.next.isEmpty()) {
+        label.append("\n     NEXT •  ").append(pair.next);
+      }
+    } else {
+      label.append("\n     ").append(channel.group);
+    }
+    row.setText(label.toString());
+    row.setOnClickListener(v -> playChannel(channel));
+    row.setOnLongClickListener(v -> {
+      toggleFavorite(channel);
+      return true;
+    });
+    return row;
+  }
+
+  private ProgramPair programFor(Channel channel) {
+    if (channel.epgId == null || channel.epgId.isEmpty()) return null;
+    return mGuide.get(channel.epgId);
+  }
+
+  private ArrayList<String> categoriesForCurrentChannels() {
+    Set<String> set = new HashSet<>();
+    for (Channel channel : mChannels) {
+      if (channel.group != null && !channel.group.isEmpty()) set.add(channel.group);
+    }
+    ArrayList<String> out = new ArrayList<>(set);
+    Collections.sort(out, String.CASE_INSENSITIVE_ORDER);
+    out.add(0, "ALL");
+    return out;
+  }
+
+  private List<Channel> filteredChannels(boolean favoritesOnly, boolean recentsOnly) {
+    ArrayList<Channel> out = new ArrayList<>();
+    if (recentsOnly) {
+      for (String id : mRecents) {
+        Channel channel = findChannel(id);
+        if (channel != null) out.add(channel);
+      }
+      return out;
+    }
+    String needle = mSearch.trim().toLowerCase(Locale.US);
+    for (Channel channel : mChannels) {
+      if (favoritesOnly && !mFavorites.contains(channel.id)) continue;
+      if (!"ALL".equals(mCategory) && !mCategory.equals(channel.group)) continue;
+      if (!needle.isEmpty()
+          && !channel.name.toLowerCase(Locale.US).contains(needle)
+          && !channel.group.toLowerCase(Locale.US).contains(needle)) continue;
+      out.add(channel);
+    }
+    return out;
+  }
+
+  private Channel findChannel(String id) {
+    for (Channel channel : mChannels) if (channel.id.equals(id)) return channel;
+    return null;
+  }
+
+  private void showSearch() {
+    final EditText input = field("Search channels or groups", InputType.TYPE_CLASS_TEXT);
+    input.setText(mSearch);
+    new AlertDialog.Builder(this)
+        .setTitle("Search Live TV")
+        .setView(input)
+        .setPositiveButton("SEARCH", (dialog, which) -> {
+          mSearch = input.getText().toString();
+          mCategory = "ALL";
+          showLiveHome();
+        })
+        .setNeutralButton("CLEAR", (dialog, which) -> {
+          mSearch = "";
+          mCategory = "ALL";
+          showLiveHome();
+        })
+        .setNegativeButton("Cancel", null)
+        .show();
+  }
+
+  private void showSources() {
+    clearStage("COBRA • SOURCES");
+    status(mSources.size() + " configured source" + (mSources.size() == 1 ? "" : "s"));
+
+    ScrollView scroll = new ScrollView(this);
+    LinearLayout list = new LinearLayout(this);
+    list.setOrientation(LinearLayout.VERTICAL);
+    list.setPadding(0, dp(4), 0, dp(12));
+    scroll.addView(list);
+
+    Button add = action("+  ADD TV SOURCE");
+    add.setOnClickListener(v -> chooseSourceType());
+    list.addView(add, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(58)));
+
+    for (LiveSource source : new ArrayList<>(mSources)) {
+      Button row = action(
+          (source == mActiveSource ? "●  " : "○  ") +
+          source.name + "\n     " +
+          ("xtream".equals(source.type) ? "Xtream-compatible" : "M3U"));
+      row.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+      row.setOnClickListener(v -> {
+        mActiveSource = source;
+        mPrefs.edit().putString(ACTIVE_SOURCE, source.id).apply();
+        loadActiveSource(true);
+      });
+      row.setOnLongClickListener(v -> {
+        showSourceActions(source);
+        return true;
+      });
+      list.addView(row, new LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT, dp(72)));
+    }
+
+    mStage.addView(scroll, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+  }
+
+  private void showSourceActions(LiveSource source) {
+    new AlertDialog.Builder(this)
+        .setTitle(source.name)
+        .setItems(new String[]{"Edit", "Test connection", "Remove"},
+            (dialog, which) -> {
+              if (which == 0) {
+                if ("xtream".equals(source.type)) showXtreamEditor(source);
+                else showM3uEditor(source);
+              } else if (which == 1) {
+                LiveSource previous = mActiveSource;
+                mActiveSource = source;
+                loadActiveSource(true);
+                if (previous != source) {
+                  mPrefs.edit().putString(ACTIVE_SOURCE, source.id).apply();
+                }
+              } else {
+                confirmRemoveSource(source);
+              }
+            })
+        .setNegativeButton("Cancel", null)
+        .show();
+  }
+
+  private void confirmRemoveSource(LiveSource source) {
+    new AlertDialog.Builder(this)
+        .setTitle("Remove source?")
+        .setMessage(source.name)
+        .setPositiveButton("REMOVE", (dialog, which) -> {
+          mSources.remove(source);
+          if (source == mActiveSource) {
+            mActiveSource = mSources.isEmpty() ? null : mSources.get(0);
+          }
+          persistSources();
+          mPrefs.edit().putString(
+              ACTIVE_SOURCE, mActiveSource == null ? "" : mActiveSource.id).apply();
+          if (mActiveSource == null) {
+            mChannels.clear();
+            showWelcome();
+          } else {
+            loadActiveSource(true);
+          }
+        })
+        .setNegativeButton("Cancel", null)
+        .show();
+  }
+
+  private void showSettings() {
+    clearStage("COBRA • SETTINGS");
+    status("One Infinity app • Cobra Live runtime");
+
+    LinearLayout list = new LinearLayout(this);
+    list.setOrientation(LinearLayout.VERTICAL);
+    list.setPadding(0, dp(4), 0, dp(12));
+
+    Button chooser = action("ASK WHICH EXPERIENCE ON NEXT LAUNCH");
+    chooser.setOnClickListener(v -> {
+      getSharedPreferences(EXPERIENCE_PREFS, MODE_PRIVATE)
+          .edit().remove(EXPERIENCE_DEFAULT).apply();
+      toast("Experience chooser will appear next launch");
+    });
+
+    Button reloadTheme = action("RELOAD COBRA UI THEME");
+    reloadTheme.setOnClickListener(v -> {
+      mTheme = Theme.load(this);
+      buildShell();
+      showLiveHome();
+      toast("Cobra theme reloaded");
+    });
+
+    Button refresh = action("REFRESH CURRENT SOURCE");
+    refresh.setOnClickListener(v -> loadActiveSource(true));
+
+    TextView themeInfo = text(
+        "Fast visual updates are read from:\n" +
+        ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json\n\n" +
+        "That file can be changed by a small add-on ZIP without rebuilding the APK.",
+        mTheme.muted, 14, Gravity.LEFT | Gravity.CENTER_VERTICAL);
+
+    list.addView(chooser, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(56)));
+    list.addView(reloadTheme, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(56)));
+    list.addView(refresh, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(56)));
+    list.addView(themeInfo, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(160)));
+
+    mStage.addView(list, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+  }
+
+  private void playChannel(Channel channel) {
+    releaseMulti();
+    closePlayer();
+    mPlaying = channel;
+    mPlayingIndex = mChannels.indexOf(channel);
+    mTriedFallback = false;
+    addRecent(channel);
+    openPlayerOverlay(channel);
+    startSinglePlayer(channel.primaryUrl);
+  }
+
+  private void openPlayerOverlay(Channel channel) {
+    FrameLayout decor = (FrameLayout) getWindow().getDecorView();
+    mPlayerOverlay = new FrameLayout(this);
+    mPlayerOverlay.setBackgroundColor(Color.BLACK);
+    mPlayerOverlay.setFocusable(true);
+    mPlayerOverlay.setFocusableInTouchMode(true);
+
+    mPlayerTexture = new TextureView(this);
+    mPlayerOverlay.addView(mPlayerTexture, new FrameLayout.LayoutParams(-1, -1));
+
+    TextView state = text("CONNECTING", Color.WHITE, 13,
+        Gravity.TOP | Gravity.RIGHT);
+    state.setTag("player_state");
+    FrameLayout.LayoutParams stateParams =
+        new FrameLayout.LayoutParams(dp(190), dp(48), Gravity.TOP | Gravity.RIGHT);
+    stateParams.setMargins(0, dp(20), dp(20), 0);
+    mPlayerOverlay.addView(state, stateParams);
+
+    mPlayerChrome = new LinearLayout(this);
+    mPlayerChrome.setOrientation(LinearLayout.VERTICAL);
+    mPlayerChrome.setBackgroundColor(Color.argb(205, 4, 6, 10));
+
+    TextView info = text(
+        "◈  " + channel.name + "\n" + channel.group,
+        Color.WHITE, isCompact() ? 15 : 18, Gravity.CENTER_VERTICAL);
+    info.setTypeface(null, Typeface.BOLD);
+    mPlayerChrome.addView(info, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+
+    LinearLayout controls = new LinearLayout(this);
+    controls.setGravity(Gravity.CENTER);
+    Button prev = action("◀ PREV");
+    Button favorite = action("★ FAVORITE");
+    Button guide = action("☰ GUIDE");
+    Button multi = action("▦ MULTI-VIEW");
+    Button next = action("NEXT ▶");
+    Button close = action("✕");
+
+    prev.setOnClickListener(v -> stepChannel(-1));
+    favorite.setOnClickListener(v -> toggleFavorite(channel));
+    guide.setOnClickListener(v -> closePlayer());
+    multi.setOnClickListener(v -> beginMultiView());
+    next.setOnClickListener(v -> stepChannel(1));
+    close.setOnClickListener(v -> closePlayer());
+
+    for (Button button : new Button[]{prev, favorite, guide, multi, next}) {
+      controls.addView(button, new LinearLayout.LayoutParams(0, dp(50), 1));
+    }
+    controls.addView(close, new LinearLayout.LayoutParams(dp(64), dp(50)));
+    mPlayerChrome.addView(controls, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, dp(58)));
+
+    FrameLayout.LayoutParams chromeParams =
+        new FrameLayout.LayoutParams(-1, dp(isCompact() ? 136 : 150), Gravity.BOTTOM);
+    mPlayerOverlay.addView(mPlayerChrome, chromeParams);
+    mPlayerOverlay.setOnClickListener(v -> togglePlayerChrome());
+    mPlayerOverlay.setOnKeyListener((v, keyCode, event) -> {
+      if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+      if (keyCode == KeyEvent.KEYCODE_DPAD_UP
+          || keyCode == KeyEvent.KEYCODE_DPAD_DOWN
+          || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+        showPlayerChromeTemporarily();
+      }
+      return false;
+    });
+    decor.addView(mPlayerOverlay, new FrameLayout.LayoutParams(-1, -1));
+    controls.requestFocus();
+    scheduleChromeHide();
+  }
+
+  private void startSinglePlayer(String url) {
+    if (mPlayerTexture == null || mPlaying == null) return;
+    releaseSinglePlayer();
+    TextView state = (TextView) mPlayerOverlay.findViewWithTag("player_state");
+    if (state != null) state.setText("CONNECTING");
+    try {
+      mPlayer = buildPlayer(mPlayerTexture, mPlaying, true);
+      final String attempted = url;
+      mPlayer.addListener(new Player.Listener() {
+        @Override
+        public void onPlaybackStateChanged(int playbackState) {
+          if (state == null) return;
+          if (playbackState == Player.STATE_BUFFERING) state.setText("BUFFERING");
+          else if (playbackState == Player.STATE_READY) state.setText("LIVE");
+          else if (playbackState == Player.STATE_ENDED) state.setText("ENDED");
+        }
+
+        @Override
+        public void onPlayerError(PlaybackException error) {
+          if (mPlaying == null) return;
+          if (!mTriedFallback
+              && mPlaying.fallbackUrl != null
+              && !mPlaying.fallbackUrl.isEmpty()
+              && !mPlaying.fallbackUrl.equals(attempted)) {
+            mTriedFallback = true;
+            if (state != null) state.setText("RETRYING STREAM");
+            mMain.postDelayed(
+                () -> startSinglePlayer(mPlaying.fallbackUrl), 250);
+            return;
+          }
+          if (state != null) {
+            state.setText("STREAM ERROR");
+          }
+          showPlayerError(error);
+        }
+      });
+      MediaItem item = mediaItem(url);
+      mPlayer.setMediaItem(item);
+      mPlayer.prepare();
+      mPlayer.play();
+    } catch (Exception e) {
+      if (state != null) state.setText("STREAM ERROR");
+      showError("Playback failed",
+          "Could not start this stream. " + e.getClass().getSimpleName());
+    }
+  }
+
+  private ExoPlayer buildPlayer(
+      TextureView texture, Channel channel, boolean audible) {
+    DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
+        .setAllowCrossProtocolRedirects(true)
+        .setConnectTimeoutMs(15000)
+        .setReadTimeoutMs(30000)
+        .setUserAgent("Infinity Cobra/1.0");
+    if (channel.headers != null && !channel.headers.isEmpty()) {
+      http.setDefaultRequestProperties(channel.headers);
+    }
+    DefaultDataSource.Factory data = new DefaultDataSource.Factory(this, http);
+    DefaultRenderersFactory renderers = new DefaultRenderersFactory(this)
+        .setEnableDecoderFallback(true);
+    ExoPlayer player = new ExoPlayer.Builder(this, renderers)
+        .setMediaSourceFactory(new DefaultMediaSourceFactory(data))
+        .build();
+    player.setAudioAttributes(
+        new AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+            .build(),
+        false);
+    player.setVideoTextureView(texture);
+    player.setVolume(audible ? 1f : 0f);
+    return player;
+  }
+
+  private MediaItem mediaItem(String url) {
+    MediaItem.Builder item = new MediaItem.Builder().setUri(Uri.parse(url));
+    String lower = url.toLowerCase(Locale.US);
+    if (lower.contains(".m3u8")) item.setMimeType("application/x-mpegURL");
+    else if (lower.matches(".*\\.ts(?:\\?|$).*")) item.setMimeType("video/mp2t");
+    return item.build();
+  }
+
+  private void showPlayerError(PlaybackException error) {
+    String code = error == null ? "UNKNOWN" : error.getErrorCodeName();
+    showError(
+        "Stream could not play",
+        code + "\n\nTry another channel. If every channel fails, open Sources " +
+        "and re-test the provider. Cobra never hides provider/network errors " +
+        "behind a generic “cannot load” message.");
+  }
+
+  private void releaseSinglePlayer() {
+    if (mPlayer != null) {
+      try {
+        if (mPlayerTexture != null) mPlayer.clearVideoTextureView(mPlayerTexture);
+      } catch (Exception ignored) {}
+      try { mPlayer.stop(); } catch (Exception ignored) {}
+      try { mPlayer.release(); } catch (Exception ignored) {}
+    }
+    mPlayer = null;
+  }
+
+  private void closePlayer() {
+    releaseSinglePlayer();
+    if (mPlayerOverlay != null) {
+      try {
+        ((FrameLayout) getWindow().getDecorView()).removeView(mPlayerOverlay);
+      } catch (Exception ignored) {}
+    }
+    mPlayerOverlay = null;
+    mPlayerTexture = null;
+    mPlayerChrome = null;
+    mPlaying = null;
+    mPlayingIndex = -1;
+  }
+
+  private void stepChannel(int delta) {
+    if (mChannels.isEmpty()) return;
+    int current = mPlayingIndex;
+    if (current < 0) current = 0;
+    int next = (current + delta + mChannels.size()) % mChannels.size();
+    playChannel(mChannels.get(next));
+  }
+
+  private void togglePlayerChrome() {
+    if (mPlayerChrome == null) return;
+    mPlayerChrome.setVisibility(
+        mPlayerChrome.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+    if (mPlayerChrome.getVisibility() == View.VISIBLE) scheduleChromeHide();
+  }
+
+  private void showPlayerChromeTemporarily() {
+    if (mPlayerChrome == null) return;
+    mPlayerChrome.setVisibility(View.VISIBLE);
+    scheduleChromeHide();
+  }
+
+  private final Runnable mHideChrome = () -> {
+    if (mPlayerChrome != null) mPlayerChrome.setVisibility(View.GONE);
+  };
+
+  private void scheduleChromeHide() {
+    mMain.removeCallbacks(mHideChrome);
+    mMain.postDelayed(mHideChrome, 5500);
+  }
+
+  private void beginMultiView() {
+    if (mChannels.size() < 2) {
+      toast("Multi-View needs at least two channels");
+      return;
+    }
+    final Channel first = mPlaying != null ? mPlaying : mChannels.get(0);
+    ArrayList<Channel> options = new ArrayList<>();
+    for (Channel channel : filteredChannels(false, false)) {
+      if (!channel.id.equals(first.id)) options.add(channel);
+      if (options.size() >= 500) break;
+    }
+    if (options.isEmpty()) {
+      toast("Choose a second channel");
+      return;
+    }
+    String[] names = new String[options.size()];
+    for (int i = 0; i < options.size(); i++) names[i] = options.get(i).name;
+    new AlertDialog.Builder(this)
+        .setTitle("Multi-View • second channel")
+        .setItems(names, (dialog, which) -> openMultiView(first, options.get(which)))
+        .setNegativeButton("Cancel", null)
+        .show();
+  }
+
+  private void openMultiView(Channel first, Channel second) {
+    closePlayer();
+    releaseMulti();
+    mMultiChannels = new Channel[]{first, second};
+    mAudioTile = 0;
+    FrameLayout decor = (FrameLayout) getWindow().getDecorView();
+    mMultiOverlay = new FrameLayout(this);
+    mMultiOverlay.setBackgroundColor(Color.BLACK);
+
+    LinearLayout tiles = new LinearLayout(this);
+    tiles.setOrientation(isPortrait()
+        ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+    mMultiOverlay.addView(tiles, new FrameLayout.LayoutParams(-1, -1));
+
+    mMultiPlayers = new ExoPlayer[2];
+    mMultiTextures = new TextureView[2];
+
+    for (int i = 0; i < 2; i++) {
+      final int index = i;
+      FrameLayout tile = new FrameLayout(this);
+      tile.setFocusable(true);
+      tile.setFocusableInTouchMode(true);
+      tile.setBackground(focusSurface(Color.BLACK, mTheme.focus, 0));
+
+      TextureView texture = new TextureView(this);
+      mMultiTextures[i] = texture;
+      tile.addView(texture, new FrameLayout.LayoutParams(-1, -1));
+
+      TextView label = text(
+          mMultiChannels[i].name + (i == 0 ? "  •  AUDIO" : ""),
+          Color.WHITE, 14, Gravity.CENTER_VERTICAL);
+      label.setTag("multi_label_" + i);
+      label.setBackgroundColor(Color.argb(185, 4, 6, 10));
+      tile.addView(label, new FrameLayout.LayoutParams(
+          -1, dp(48), Gravity.BOTTOM));
+
+      tile.setOnClickListener(v -> setMultiAudio(index));
+      tile.setOnFocusChangeListener((v, focused) -> {
+        if (focused) setMultiAudio(index);
+      });
+      tiles.addView(tile, isPortrait()
+          ? new LinearLayout.LayoutParams(-1, 0, 1)
+          : new LinearLayout.LayoutParams(0, -1, 1));
+
+      try {
+        ExoPlayer player = buildPlayer(texture, mMultiChannels[i], i == 0);
+        mMultiPlayers[i] = player;
+        player.setMediaItem(mediaItem(mMultiChannels[i].primaryUrl));
+        player.prepare();
+        player.play();
+      } catch (Exception e) {
+        label.setText(mMultiChannels[i].name + "  •  ERROR");
+      }
+    }
+
+    LinearLayout bar = new LinearLayout(this);
+    bar.setGravity(Gravity.CENTER);
+    bar.setPadding(dp(10), dp(6), dp(10), dp(6));
+    bar.setBackgroundColor(Color.argb(220, 4, 6, 10));
+    Button one = action("AUDIO 1");
+    Button two = action("AUDIO 2");
+    Button exit = action("✕ EXIT MULTI-VIEW");
+    one.setOnClickListener(v -> setMultiAudio(0));
+    two.setOnClickListener(v -> setMultiAudio(1));
+    exit.setOnClickListener(v -> releaseMulti());
+    bar.addView(one, new LinearLayout.LayoutParams(0, dp(50), 1));
+    bar.addView(two, new LinearLayout.LayoutParams(0, dp(50), 1));
+    bar.addView(exit, new LinearLayout.LayoutParams(0, dp(50), 1));
+    mMultiOverlay.addView(bar, new FrameLayout.LayoutParams(
+        -1, dp(64), Gravity.TOP));
+
+    decor.addView(mMultiOverlay, new FrameLayout.LayoutParams(-1, -1));
+    setMultiAudio(0);
+  }
+
+  private void setMultiAudio(int index) {
+    if (mMultiPlayers == null || index < 0 || index >= mMultiPlayers.length) return;
+    mAudioTile = index;
+    for (int i = 0; i < mMultiPlayers.length; i++) {
+      if (mMultiPlayers[i] != null) mMultiPlayers[i].setVolume(i == index ? 1f : 0f);
+      if (mMultiOverlay != null) {
+        View view = mMultiOverlay.findViewWithTag("multi_label_" + i);
+        if (view instanceof TextView && mMultiChannels != null) {
+          ((TextView) view).setText(
+              mMultiChannels[i].name + (i == index ? "  •  AUDIO" : ""));
+        }
+      }
+    }
+  }
+
+  private void releaseMulti() {
+    if (mMultiPlayers != null) {
+      for (int i = 0; i < mMultiPlayers.length; i++) {
+        ExoPlayer player = mMultiPlayers[i];
+        if (player == null) continue;
+        try {
+          if (mMultiTextures != null && mMultiTextures[i] != null) {
+            player.clearVideoTextureView(mMultiTextures[i]);
+          }
+        } catch (Exception ignored) {}
+        try { player.stop(); } catch (Exception ignored) {}
+        try { player.release(); } catch (Exception ignored) {}
+      }
+    }
+    mMultiPlayers = null;
+    mMultiTextures = null;
+    mMultiChannels = null;
+    if (mMultiOverlay != null) {
+      try {
+        ((FrameLayout) getWindow().getDecorView()).removeView(mMultiOverlay);
+      } catch (Exception ignored) {}
+    }
+    mMultiOverlay = null;
+  }
+
+  private void toggleFavorite(Channel channel) {
+    if (mFavorites.contains(channel.id)) {
+      mFavorites.remove(channel.id);
+      toast("Removed from Favorites");
+    } else {
+      mFavorites.add(channel.id);
+      toast("Added to Favorites");
+    }
+    mPrefs.edit().putStringSet(FAVORITES, new HashSet<>(mFavorites)).apply();
+  }
+
+  private void addRecent(Channel channel) {
+    mRecents.remove(channel.id);
+    mRecents.add(0, channel.id);
+    while (mRecents.size() > 40) mRecents.remove(mRecents.size() - 1);
+    JSONArray array = new JSONArray();
+    for (String id : mRecents) array.put(id);
+    mPrefs.edit().putString(RECENTS, array.toString()).apply();
+  }
+
+  private void loadPersistedState() {
+    mSources.clear();
+    String stored = mPrefs.getString(SOURCES, "[]");
+    try {
+      JSONArray array = new JSONArray(stored);
+      for (int i = 0; i < array.length(); i++) {
+        JSONObject object = array.optJSONObject(i);
+        if (object == null) continue;
+        LiveSource source = LiveSource.fromJson(object);
+        if (source != null) mSources.add(source);
+      }
+    } catch (Exception ignored) {}
+
+    Set<String> favorites = mPrefs.getStringSet(FAVORITES, Collections.emptySet());
+    if (favorites != null) mFavorites.addAll(favorites);
+
+    try {
+      JSONArray recent = new JSONArray(mPrefs.getString(RECENTS, "[]"));
+      for (int i = 0; i < recent.length(); i++) {
+        String id = recent.optString(i, "");
+        if (!id.isEmpty()) mRecents.add(id);
+      }
+    } catch (Exception ignored) {}
+  }
+
+  private void persistSources() {
+    JSONArray array = new JSONArray();
+    for (LiveSource source : mSources) array.put(source.toJson());
+    mPrefs.edit().putString(SOURCES, array.toString()).apply();
+  }
+
+  private void returnToInfinity() {
+    releaseSinglePlayer();
+    releaseMulti();
+    Intent intent = new Intent(this, @APP_PACKAGE@.Main.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    startActivity(intent);
+    finish();
+  }
+
+  private void showError(String title, String message) {
+    if (isFinishing()) return;
+    new AlertDialog.Builder(this)
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton("OK", null)
+        .show();
+  }
+
+  private void toast(String value) {
+    Toast.makeText(this, value, Toast.LENGTH_SHORT).show();
+  }
+
+  private String newId() {
+    return Long.toHexString(System.currentTimeMillis()) +
+        Integer.toHexString((int) (Math.random() * 0xFFFF));
+  }
+
+  private static final class LiveException extends Exception {
+    final String userMessage;
+    LiveException(String message) {
+      super(message);
+      userMessage = message;
+    }
+  }
+
+  private static final class LoadResult {
+    final ArrayList<Channel> channels;
+    LoadResult(ArrayList<Channel> channels) {
+      this.channels = channels;
+    }
+  }
+
+  private static final class ProgramPair {
+    String now = "";
+    String next = "";
+    long nextStart = 0;
+  }
+
+  private static final class Channel {
+    final String id;
+    final String name;
+    final String group;
+    final String epgId;
+    final String icon;
+    final String primaryUrl;
+    final String fallbackUrl;
+    final Map<String, String> headers;
+
+    Channel(
+        String id, String name, String group, String epgId, String icon,
+        String primaryUrl, String fallbackUrl, Map<String, String> headers) {
+      this.id = id;
+      this.name = name;
+      this.group = group == null || group.isEmpty() ? "Other" : group;
+      this.epgId = epgId == null ? "" : epgId;
+      this.icon = icon == null ? "" : icon;
+      this.primaryUrl = primaryUrl;
+      this.fallbackUrl = fallbackUrl == null ? "" : fallbackUrl;
+      this.headers = headers == null ? Collections.emptyMap() : headers;
+    }
+  }
+
+  private static final class LiveSource {
+    final String id;
+    final String type;
+    final String name;
+    final String server;
+    final String username;
+    final String password;
+    final String playlistUrl;
+    final String epgUrl;
+
+    LiveSource(
+        String id, String type, String name, String server,
+        String username, String password, String playlistUrl, String epgUrl) {
+      this.id = id;
+      this.type = type;
+      this.name = name;
+      this.server = server;
+      this.username = username;
+      this.password = password;
+      this.playlistUrl = playlistUrl;
+      this.epgUrl = epgUrl;
+    }
+
+    static LiveSource xtream(
+        String id, String name, String server, String username, String password) {
+      return new LiveSource(
+          id, "xtream", name, server, username, password, "", "");
+    }
+
+    static LiveSource m3u(
+        String id, String name, String playlist, String epg) {
+      return new LiveSource(
+          id, "m3u", name, "", "", "", playlist, epg == null ? "" : epg);
+    }
+
+    JSONObject toJson() {
+      JSONObject object = new JSONObject();
+      try {
+        object.put("id", id);
+        object.put("type", type);
+        object.put("name", name);
+        object.put("server", server);
+        object.put("username", username);
+        object.put("password", password);
+        object.put("playlist_url", playlistUrl);
+        object.put("epg_url", epgUrl);
+      } catch (Exception ignored) {}
+      return object;
+    }
+
+    static LiveSource fromJson(JSONObject object) {
+      String id = object.optString("id", "");
+      String type = object.optString("type", "");
+      if (id.isEmpty() || (!"xtream".equals(type) && !"m3u".equals(type))) return null;
+      return new LiveSource(
+          id,
+          type,
+          object.optString("name", "TV Source"),
+          object.optString("server", ""),
+          object.optString("username", ""),
+          object.optString("password", ""),
+          object.optString("playlist_url", ""),
+          object.optString("epg_url", ""));
+    }
+  }
+
+  private static final class Theme {
+    int background = Color.rgb(5, 7, 11);
+    int rail = Color.rgb(8, 10, 15);
+    int panel = Color.rgb(18, 22, 30);
+    int panel2 = Color.rgb(24, 29, 39);
+    int focus = Color.rgb(72, 18, 29);
+    int accent = Color.rgb(255, 64, 89);
+    int accentSoft = Color.rgb(255, 104, 124);
+    int text = Color.rgb(244, 247, 251);
+    int muted = Color.rgb(151, 160, 174);
+    int line = Color.rgb(55, 62, 74);
+    int rowHeight = 66;
+    int guideRowHeight = 94;
+
+    static Theme load(Context context) {
+      Theme theme = new Theme();
+      File external = context.getExternalFilesDir(null);
+      if (external == null) return theme;
+      File file = new File(
+          external,
+          ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json");
+      if (!file.isFile() || file.length() <= 0 || file.length() > 65536) return theme;
+      try {
+        byte[] data;
+        try (InputStream in = new java.io.FileInputStream(file);
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+          byte[] buffer = new byte[4096];
+          int count;
+          while ((count = in.read(buffer)) != -1) out.write(buffer, 0, count);
+          data = out.toByteArray();
+        }
+        JSONObject root = new JSONObject(
+            new String(data, StandardCharsets.UTF_8));
+        theme.background = color(root, "background", theme.background);
+        theme.rail = color(root, "rail", theme.rail);
+        theme.panel = color(root, "panel", theme.panel);
+        theme.panel2 = color(root, "panel2", theme.panel2);
+        theme.focus = color(root, "focus", theme.focus);
+        theme.accent = color(root, "accent", theme.accent);
+        theme.accentSoft = color(root, "accent_soft", theme.accentSoft);
+        theme.text = color(root, "text", theme.text);
+        theme.muted = color(root, "muted", theme.muted);
+        theme.line = color(root, "line", theme.line);
+        theme.rowHeight = clamp(root.optInt("row_height", theme.rowHeight), 48, 96);
+        theme.guideRowHeight = clamp(
+            root.optInt("guide_row_height", theme.guideRowHeight), 70, 132);
+      } catch (Exception ignored) {}
+      return theme;
+    }
+
+    private static int color(JSONObject root, String key, int fallback) {
+      String value = root.optString(key, "");
+      if (value.isEmpty()) return fallback;
+      try {
+        return Color.parseColor(value);
+      } catch (Exception e) {
+        return fallback;
+      }
+    }
+
+    private static int clamp(int value, int min, int max) {
+      return Math.max(min, Math.min(max, value));
+    }
+  }
+}

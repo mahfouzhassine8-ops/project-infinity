@@ -1,0 +1,406 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
+import android.os.FileObserver;
+import android.os.PowerManager;
+import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Locale;
+import java.util.Properties;
+
+/**
+ * Cobra-side Android device policy bridge.
+ *
+ * Infinity and Cobra are two Activities in one package. Android Activity-level
+ * features do not automatically carry from Main into InfinityLiveActivity, so
+ * this bridge deliberately mirrors Infinity's accepted fold/multi-window,
+ * player-rotation and adaptive-refresh contracts without changing Kodi's native
+ * renderer or using Samsung-private APIs.
+ */
+public final class InfinityCobraDeviceBridge {
+  public interface PlaybackOwner {
+    boolean hasActiveVideo();
+  }
+
+  private static final String TAG = "InfinityCobraDevice";
+  private static final String ROTATION_PREFS = "infinity_player_rotation";
+  private static final String ROTATION_MODE = "mode";
+  private static final int ROTATION_FOLLOW_DEVICE = 0;
+  private static final int ROTATION_UNLOCKED = 1;
+  private static final String HINGE_FEATURE = "android.hardware.sensor.hinge_angle";
+  private static final long VERIFY_DELAY_MS = 700L;
+
+  private final Activity activity;
+  private final PlaybackOwner playback;
+  private final File policyDir;
+  private final File policyFile;
+  private final File runtimeFile;
+  private final File deviceFile;
+  private FileObserver observer;
+  private boolean paused;
+  private int lastOrientation = Integer.MIN_VALUE;
+
+  public InfinityCobraDeviceBridge(Activity activity, PlaybackOwner playback) {
+    this.activity = activity;
+    this.playback = playback;
+    File kodiHome = activity.getExternalFilesDir(null);
+    if (kodiHome == null) kodiHome = activity.getFilesDir();
+    policyDir = new File(kodiHome, ".kodi/userdata/addon_data/service.infinity.refresh");
+    policyFile = new File(policyDir, "policy.properties");
+    runtimeFile = new File(policyDir, "runtime.properties");
+    File health = new File(activity.getFilesDir(), "health");
+    if (!health.isDirectory()) health.mkdirs();
+    deviceFile = new File(health, "cobra-device.properties");
+    if (!policyDir.isDirectory()) policyDir.mkdirs();
+    startWatching();
+    applyAll("attach");
+  }
+
+  public void onResume() {
+    paused = false;
+    applyAll("resume");
+  }
+
+  public void onPause() {
+    paused = true;
+    applyRotation("pause");
+    applyRefresh("pause");
+    publishWindow("pause");
+  }
+
+  public void onWindowChanged(String reason) {
+    applyAll(reason == null ? "window" : reason);
+  }
+
+  public void onPlaybackChanged(String reason) {
+    applyAll(reason == null ? "playback" : reason);
+  }
+
+  public void close() {
+    if (observer != null) {
+      observer.stopWatching();
+      observer = null;
+    }
+    clearRefreshRequest();
+    requestOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED, "close");
+  }
+
+  public int widthClass() {
+    int widthDp = activity.getResources().getConfiguration().screenWidthDp;
+    if (widthDp <= 0) {
+      float density = activity.getResources().getDisplayMetrics().density;
+      widthDp = Math.round(activity.getResources().getDisplayMetrics().widthPixels / density);
+    }
+    if (widthDp < 600) return 0;
+    if (widthDp < 840) return 1;
+    return 2;
+  }
+
+  public String windowClass() {
+    int value = widthClass();
+    return value == 0 ? "compact" : value == 1 ? "medium" : "expanded";
+  }
+
+  public boolean hasHingeFeature() {
+    return activity.getPackageManager().hasSystemFeature(HINGE_FEATURE);
+  }
+
+  public String deviceClass() {
+    if (hasHingeFeature()) return widthClass() == 0 ? "fold-cover" : "fold-inner";
+    return widthClass() == 2 ? "tablet" : "phone";
+  }
+
+  private void startWatching() {
+    final int mask = FileObserver.CLOSE_WRITE | FileObserver.MOVED_TO | FileObserver.CREATE;
+    observer = new FileObserver(policyDir.getAbsolutePath(), mask) {
+      @Override
+      public void onEvent(int event, String path) {
+        if (path == null || !"policy.properties".equals(path)) return;
+        activity.runOnUiThread(() -> applyAll("policy-change"));
+      }
+    };
+    observer.startWatching();
+  }
+
+  private void applyAll(String reason) {
+    applyRotation(reason);
+    applyRefresh(reason);
+    publishWindow(reason);
+  }
+
+  private boolean hasVideo() {
+    try {
+      return playback != null && playback.hasActiveVideo();
+    } catch (Throwable error) {
+      Log.w(TAG, "Playback state unavailable", error);
+      return false;
+    }
+  }
+
+  private boolean constrainedWindow() {
+    try {
+      return (Build.VERSION.SDK_INT >= 26 && activity.isInPictureInPictureMode()) ||
+          (Build.VERSION.SDK_INT >= 24 && activity.isInMultiWindowMode());
+    } catch (IllegalStateException ignored) {
+      return true;
+    }
+  }
+
+  private void applyRotation(String reason) {
+    int mode = activity.getSharedPreferences(ROTATION_PREFS, Context.MODE_PRIVATE)
+        .getInt(ROTATION_MODE, ROTATION_FOLLOW_DEVICE);
+    boolean television = activity.getPackageManager().hasSystemFeature("android.software.leanback");
+    boolean unlock = !paused && !television && !constrainedWindow() &&
+        mode == ROTATION_UNLOCKED && hasVideo();
+    requestOrientation(unlock ? ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+        : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED, reason);
+  }
+
+  private void requestOrientation(int requested, String reason) {
+    if (lastOrientation == requested) return;
+    try {
+      activity.setRequestedOrientation(requested);
+      lastOrientation = requested;
+      Log.i(TAG, "rotation=" +
+          (requested == ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR ? "unlocked" : "follow-device") +
+          " reason=" + reason);
+    } catch (IllegalStateException | SecurityException error) {
+      Log.w(TAG, "Android rejected Cobra orientation request", error);
+    }
+  }
+
+  private void applyRefresh(String reason) {
+    if (Build.VERSION.SDK_INT < 23) {
+      publishRefreshStatus("system", reason, 0, 0f, 0, 0f, true, "api-below-23");
+      return;
+    }
+    try {
+      Policy p = Policy.load(policyFile);
+      String mode = normalizeMode(p.mode);
+      Display display = currentDisplay();
+      if ("off".equals(mode) || "system".equals(mode)) {
+        clearRefreshRequest();
+        publishPassive(mode, reason, display, "system-control");
+        return;
+      }
+      boolean video = hasVideo();
+      if (video && "match_video".equals(p.videoPolicy)) {
+        clearRefreshRequest();
+        publishPassive(mode, reason, display, "yield-to-video");
+        return;
+      }
+      if ((video && "system".equals(p.videoPolicy)) ||
+          (!video && "system".equals(p.uiPolicy)) || constrainedWindow()) {
+        clearRefreshRequest();
+        publishPassive(mode, reason, display, constrainedWindow() ? "window-system-control" : "system-control");
+        return;
+      }
+
+      float cap = p.maxHz;
+      if ("balanced".equals(mode)) cap = Math.min(cap, 90f);
+      if ("battery".equals(mode)) cap = Math.min(cap, 60f);
+      if (p.respectBatterySaver && isBatterySaverOn()) cap = Math.min(cap, 60f);
+      if (p.thermalProtection && isThermallyLimited()) cap = Math.min(cap, 60f);
+      if (display == null) {
+        clearRefreshRequest();
+        publishRefreshStatus(mode, reason, 0, 0f, 0, 0f, false, "no-display");
+        return;
+      }
+      Display.Mode chosen = chooseMode(display, cap);
+      if (chosen == null) {
+        clearRefreshRequest();
+        Display.Mode active = display.getMode();
+        publishRefreshStatus(mode, reason, 0, 0f,
+            active == null ? 0 : active.getModeId(), active == null ? 0f : active.getRefreshRate(),
+            false, "no-compatible-mode");
+        return;
+      }
+      WindowManager.LayoutParams attrs = activity.getWindow().getAttributes();
+      if (attrs.preferredDisplayModeId != chosen.getModeId()) {
+        attrs.preferredDisplayModeId = chosen.getModeId();
+        activity.getWindow().setAttributes(attrs);
+      }
+      Display.Mode active = display.getMode();
+      publishRefreshStatus(mode, reason, chosen.getModeId(), chosen.getRefreshRate(),
+          active == null ? 0 : active.getModeId(), active == null ? 0f : active.getRefreshRate(),
+          false, "request-pending");
+      final int requestedId = chosen.getModeId();
+      final float requestedHz = chosen.getRefreshRate();
+      activity.getWindow().getDecorView().postDelayed(
+          () -> verifyRefresh(mode, reason, requestedId, requestedHz), VERIFY_DELAY_MS);
+    } catch (Throwable error) {
+      Log.w(TAG, "Cobra refresh policy rejected; yielding to Android", error);
+      clearRefreshRequest();
+      publishRefreshStatus("error", reason, 0, 0f, 0, 0f, false,
+          "exception-" + error.getClass().getSimpleName());
+    }
+  }
+
+  private void verifyRefresh(String mode, String reason, int requestedId, float requestedHz) {
+    try {
+      Display display = currentDisplay();
+      Display.Mode active = display == null ? null : display.getMode();
+      int activeId = active == null ? 0 : active.getModeId();
+      float activeHz = active == null ? 0f : active.getRefreshRate();
+      int preferred = activity.getWindow().getAttributes().preferredDisplayModeId;
+      boolean requestApplied = preferred == requestedId;
+      boolean activeMatched = activeId == requestedId || Math.abs(activeHz - requestedHz) < 0.6f;
+      boolean granted = requestApplied && activeMatched;
+      publishRefreshStatus(mode, reason, requestedId, requestedHz, activeId, activeHz,
+          granted, granted ? "active" : requestApplied ? "requested-not-active" : "request-rejected");
+    } catch (Throwable error) {
+      Log.w(TAG, "Could not verify Cobra refresh request", error);
+    }
+  }
+
+  private Display currentDisplay() {
+    if (Build.VERSION.SDK_INT >= 30) return activity.getDisplay();
+    return activity.getWindowManager().getDefaultDisplay();
+  }
+
+  private Display.Mode chooseMode(Display display, float cap) {
+    Display.Mode current = display.getMode();
+    Display.Mode best = null;
+    for (Display.Mode mode : display.getSupportedModes()) {
+      if (mode.getPhysicalWidth() != current.getPhysicalWidth() ||
+          mode.getPhysicalHeight() != current.getPhysicalHeight()) continue;
+      if (mode.getRefreshRate() > cap + 0.5f) continue;
+      if (best == null || mode.getRefreshRate() > best.getRefreshRate()) best = mode;
+    }
+    return best;
+  }
+
+  private void clearRefreshRequest() {
+    if (Build.VERSION.SDK_INT < 23) return;
+    try {
+      WindowManager.LayoutParams attrs = activity.getWindow().getAttributes();
+      if (attrs.preferredDisplayModeId != 0) {
+        attrs.preferredDisplayModeId = 0;
+        activity.getWindow().setAttributes(attrs);
+      }
+    } catch (Throwable ignored) {}
+  }
+
+  private boolean isBatterySaverOn() {
+    PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+    return pm != null && pm.isPowerSaveMode();
+  }
+
+  private boolean isThermallyLimited() {
+    if (Build.VERSION.SDK_INT < 29) return false;
+    PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+    return pm != null && pm.getCurrentThermalStatus() >= PowerManager.THERMAL_STATUS_SEVERE;
+  }
+
+  private void publishPassive(String mode, String reason, Display display, String status) {
+    Display.Mode active = display == null ? null : display.getMode();
+    publishRefreshStatus(mode, reason, 0, 0f,
+        active == null ? 0 : active.getModeId(), active == null ? 0f : active.getRefreshRate(),
+        true, status);
+  }
+
+  private void publishRefreshStatus(String mode, String reason, int requestedId, float requestedHz,
+                                    int activeId, float activeHz, boolean granted, String status) {
+    try {
+      if (!policyDir.isDirectory()) policyDir.mkdirs();
+      Properties props = new Properties();
+      props.setProperty("hook_active", "true");
+      props.setProperty("owner", "cobra");
+      props.setProperty("mode", mode == null ? "unknown" : mode);
+      props.setProperty("reason", reason == null ? "unknown" : reason);
+      props.setProperty("requested_mode_id", Integer.toString(requestedId));
+      props.setProperty("requested_hz", String.format(Locale.US, "%.2f", requestedHz));
+      props.setProperty("active_mode_id", Integer.toString(activeId));
+      props.setProperty("active_hz", String.format(Locale.US, "%.2f", activeHz));
+      props.setProperty("granted", Boolean.toString(granted));
+      props.setProperty("status", status == null ? "unknown" : status);
+      props.setProperty("battery_saver", Boolean.toString(isBatterySaverOn()));
+      props.setProperty("thermal_limited", Boolean.toString(isThermallyLimited()));
+      props.setProperty("updated_ms", Long.toString(System.currentTimeMillis()));
+      try (FileOutputStream output = new FileOutputStream(runtimeFile, false)) {
+        props.store(output, "Infinity/Cobra refresh runtime status");
+      }
+    } catch (Throwable error) {
+      Log.w(TAG, "Could not publish Cobra refresh runtime status", error);
+    }
+  }
+
+  private void publishWindow(String reason) {
+    try {
+      Properties props = new Properties();
+      int widthDp = activity.getResources().getConfiguration().screenWidthDp;
+      int heightDp = activity.getResources().getConfiguration().screenHeightDp;
+      props.setProperty("owner", "cobra");
+      props.setProperty("reason", reason == null ? "unknown" : reason);
+      props.setProperty("device_class", deviceClass());
+      props.setProperty("window_class", windowClass());
+      props.setProperty("width_dp", Integer.toString(widthDp));
+      props.setProperty("height_dp", Integer.toString(heightDp));
+      props.setProperty("hinge_feature", Boolean.toString(hasHingeFeature()));
+      props.setProperty("picture_in_picture", Boolean.toString(
+          Build.VERSION.SDK_INT >= 26 && activity.isInPictureInPictureMode()));
+      props.setProperty("multi_window", Boolean.toString(
+          Build.VERSION.SDK_INT >= 24 && activity.isInMultiWindowMode()));
+      props.setProperty("active_video", Boolean.toString(hasVideo()));
+      props.setProperty("updated_ms", Long.toString(System.currentTimeMillis()));
+      try (FileOutputStream output = new FileOutputStream(deviceFile, false)) {
+        props.store(output, "Infinity Cobra device/window status");
+      }
+    } catch (Throwable error) {
+      Log.w(TAG, "Could not publish Cobra device status", error);
+    }
+  }
+
+  private static String normalizeMode(String mode) {
+    if (mode == null) return "auto";
+    if ("adaptive".equals(mode)) return "auto";
+    if ("performance".equals(mode)) return "high_refresh";
+    return mode;
+  }
+
+  private static final class Policy {
+    String mode = "auto";
+    float maxHz = Float.MAX_VALUE;
+    String uiPolicy = "high_refresh";
+    String videoPolicy = "match_video";
+    boolean respectBatterySaver = true;
+    boolean thermalProtection = true;
+
+    static Policy load(File file) {
+      Policy p = new Policy();
+      Properties props = new Properties();
+      if (file.isFile()) {
+        try (FileInputStream input = new FileInputStream(file)) {
+          props.load(input);
+        } catch (Exception error) {
+          Log.w(TAG, "Could not read Infinity refresh policy", error);
+        }
+      }
+      p.mode = props.getProperty("mode", p.mode).trim().toLowerCase(Locale.US);
+      p.uiPolicy = props.getProperty("ui_policy", p.uiPolicy).trim().toLowerCase(Locale.US);
+      p.videoPolicy = props.getProperty("video_policy", p.videoPolicy).trim().toLowerCase(Locale.US);
+      p.respectBatterySaver = Boolean.parseBoolean(
+          props.getProperty("respect_battery_saver", "true"));
+      p.thermalProtection = Boolean.parseBoolean(
+          props.getProperty("thermal_protection", "true"));
+      String max = props.getProperty("max_hz", "auto").trim().toLowerCase(Locale.US);
+      if (!"auto".equals(max) && !"highest".equals(max)) {
+        try {
+          p.maxHz = Math.max(30f, Float.parseFloat(max));
+        } catch (NumberFormatException ignored) {
+          p.maxHz = Float.MAX_VALUE;
+        }
+      }
+      return p;
+    }
+  }
+}

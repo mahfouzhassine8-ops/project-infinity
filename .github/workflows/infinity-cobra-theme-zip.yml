@@ -1,0 +1,37 @@
+name: Infinity Cobra | Theme ZIP
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-full-feature-candidate-2]
+    paths:
+      - '.github/workflows/infinity-cobra-theme-zip.yml'
+      - 'scripts/package_cobra_theme.py'
+      - 'addons/script.infinity.cobra.theme/**'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Package Cobra visual update
+        run: python scripts/package_cobra_theme.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-Theme-1.1.0
+          path: |
+            candidate/Infinity-Cobra-Theme-1.1.0.zip
+            candidate/Infinity-Cobra-Theme-1.1.0.zip.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

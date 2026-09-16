@@ -1,0 +1,27 @@
+name: Infinity Audio Policy | Media Inputs
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.8-audio-policy-integration]
+    paths: ['.github/workflows/infinity-audio-policy-media-inputs.yml']
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Export exact media source and baseline assets
+        run: |
+          set -euo pipefail
+          mkdir -p export/media export/assets
+          git fetch --depth=1 origin 179b66503666b2b2bdd0b35ffc1d22cd0e5654d1
+          git archive 179b66503666b2b2bdd0b35ffc1d22cd0e5654d1 patches scripts addons .github/workflows | tar -x -C export/media
+          git archive HEAD assets | tar -x -C export/assets
+          find export -type f \( -iname '*.ttf' -o -iname '*.otf' -o -iname '*.woff*' \) -delete
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Audio-Policy-Media-Inputs
+          path: export/
+          retention-days: 7

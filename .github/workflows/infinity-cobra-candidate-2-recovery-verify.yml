@@ -1,0 +1,232 @@
+name: Infinity 1.0.9 | Candidate 2 Recovery Verify
+
+on:
+  push:
+    branches: [infinity-cobra-full-feature-candidate-2]
+    paths:
+      - '.github/workflows/infinity-cobra-candidate-2-recovery-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install Android build tools 34.0.0
+        run: sdkmanager 'build-tools;34.0.0' >/dev/null
+
+      - name: Download proven Candidate 2 run 39 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          path: recovered
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 34972144687
+
+      - name: Re-verify Candidate 2 without rebuilding the engine
+        run: |
+          set -euo pipefail
+          FINAL=recovered/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk
+          ENGINE=recovered/engine/live-app-shell-engine.json
+          EXPECTED_SHA=recovered/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.sha256
+          OUT=recovery-verification
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+
+          test -s "$FINAL"
+          test -s "$ENGINE"
+          test -s "$EXPECTED_SHA"
+          mkdir -p "$OUT"
+
+          EXPECTED=$(awk '{print $1}' "$EXPECTED_SHA")
+          ACTUAL=$(sha256sum "$FINAL" | awk '{print $1}')
+          test "$ACTUAL" = "$EXPECTED"
+          printf 'APK SHA-256: %s\n' "$ACTUAL" | tee "$OUT/apk-sha256.txt"
+
+          "$BT/apksigner" verify --verbose --print-certs "$FINAL" \
+            | tee "$OUT/signing-verification.txt"
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' \
+            "$OUT/signing-verification.txt"
+
+          "$BT/aapt" dump badging "$FINAL" | tee "$OUT/badging.txt"
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103134' versionName='1.0.9-Cobra-Full-Feature-Candidate-2'" \
+            "$OUT/badging.txt"
+          grep -q "application-label:'Infinity'" "$OUT/badging.txt"
+          test "$(grep -c '^launchable-activity:' "$OUT/badging.txt")" -eq 1
+
+          "$BT/aapt" dump xmltree "$FINAL" AndroidManifest.xml | tee "$OUT/manifest.txt"
+          grep -q 'InfinityLiveActivity' "$OUT/manifest.txt"
+          grep -q 'InfinityCobraRecordingService' "$OUT/manifest.txt"
+          grep -q 'InfinityCobraReminderReceiver' "$OUT/manifest.txt"
+          ! grep -q 'InfinityLiveLauncher' "$OUT/manifest.txt"
+          grep -q 'action.OPEN_LIVE' "$OUT/manifest.txt"
+          grep -q 'usesCleartextTraffic' "$OUT/manifest.txt"
+          grep -q 'supportsPictureInPicture' "$OUT/manifest.txt"
+          grep -q 'resizeableActivity' "$OUT/manifest.txt"
+          grep -q 'android.supports_size_changes' "$OUT/manifest.txt"
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import re
+          import zipfile
+          from pathlib import Path
+
+          final = Path('recovered/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk')
+          engine = json.loads(Path('recovered/engine/live-app-shell-engine.json').read_text())
+          manifest_path = Path('recovery-verification/manifest.txt')
+          manifest = manifest_path.read_text()
+
+          expected_identity = {
+              'schema': 2,
+              'version_code': 2103134,
+              'version_name': '1.0.9-Cobra-Full-Feature-Candidate-2',
+              'package': 'com.projectinfinity.kodi',
+              'application_label': 'Infinity',
+              'source_commit': '080545faf884741c260d0a4a2c4810a7a788127b',
+              'renderer_hardening_schema': 3,
+              'renderer_changed': True,
+              'android_resize_hardened': True,
+              'protected_geometry_bridge_rewritten': False,
+          }
+          for key, value in expected_identity.items():
+              assert engine.get(key) == value, (key, engine.get(key), value)
+
+          def config_mask(fqcn: str) -> int:
+              lines = manifest.splitlines()
+              marker = f'="{fqcn}"'
+              for i, line in enumerate(lines):
+                  if 'android:name' not in line or marker not in line:
+                      continue
+                  name_indent = len(line) - len(line.lstrip())
+                  element_indent = max(0, name_indent - 2)
+                  for candidate in lines[i + 1:]:
+                      stripped = candidate.lstrip()
+                      indent = len(candidate) - len(stripped)
+                      if stripped.startswith('E: ') and indent <= element_indent:
+                          break
+                      if 'android:configChanges' in candidate:
+                          values = re.findall(r'0x([0-9a-fA-F]+)', candidate)
+                          assert values, (fqcn, candidate)
+                          return int(values[-1], 16)
+                  raise AssertionError(f'configChanges missing for {fqcn}')
+              raise AssertionError(f'activity missing: {fqcn}')
+
+          required_config = 0x0200 | 0x1000  # uiMode | density
+          for activity in (
+              'com.projectinfinity.kodi.Main',
+              'com.projectinfinity.kodi.InfinityLiveActivity',
+          ):
+              mask = config_mask(activity)
+              assert mask & required_config == required_config, (
+                  activity, hex(mask), hex(required_config)
+              )
+
+          with zipfile.ZipFile(final) as apk:
+              dex = {
+                  name: hashlib.sha256(apk.read(name)).hexdigest()
+                  for name in apk.namelist()
+                  if re.fullmatch(r'classes\d*\.dex', name)
+              }
+              assert dex == engine['dex_sha256'], (dex, engine['dex_sha256'])
+
+              native = hashlib.sha256(
+                  apk.read('lib/arm64-v8a/libkodi.so')
+              ).hexdigest()
+              assert native == engine['native_lib_sha256'], (
+                  native, engine['native_lib_sha256']
+              )
+
+              joined = b''.join(apk.read(name) for name in dex)
+              required = (
+                  b'InfinityLiveActivity',
+                  b'InfinityCobraFeatureRuntime',
+                  b'InfinityCobraRecordingService',
+                  b'InfinityCobraDeviceBridge',
+                  b'player_api.php?username=',
+                  b'get_vod_streams',
+                  b'get_series_info',
+                  b'RECORDINGS',
+                  b'4 screens',
+                  b'CONTINUE WATCHING',
+                  b'cobra-health.json',
+                  b'AUDIO / SUBS',
+                  b'CUSTOM EPG FOR ACTIVE SOURCE',
+                  b'Cobra Guide',
+                  b'CAST / ROUTE',
+                  b'PictureInPictureParams',
+                  b'infinity_player_rotation',
+                  b'.kodi/userdata/addon_data/service.infinity.refresh',
+                  b'preferredDisplayModeId',
+                  b'fold-cover',
+                  b'fold-inner',
+                  b'multiview-start',
+                  b'multiview-stop',
+                  b'player-close',
+              )
+              for needle in required:
+                  assert needle in joined, needle
+
+              for forbidden in (
+                  b'CobraTV_',
+                  b'com/cobratv',
+                  b'libmpv',
+                  b'android/media/MediaPlayer',
+              ):
+                  assert forbidden not in joined, forbidden
+
+              names = set(apk.namelist())
+              theme_files = {
+                  'assets/addons/script.infinity.cobra.theme/addon.xml',
+                  'assets/addons/script.infinity.cobra.theme/resources/cobra-theme.json',
+              }
+              assert theme_files <= names, theme_files - names
+              theme = json.loads(
+                  apk.read(
+                      'assets/addons/script.infinity.cobra.theme/resources/cobra-theme.json'
+                  )
+              )
+              assert theme['schema'] == 2
+              assert theme['touch_target'] >= 48
+
+          Path('recovery-verification/RESULT.txt').write_text(
+              'PASS: Candidate 2 run 39 is permanently signed, identity-correct, '
+              'engine/Dex-preserving, and manifest configChanges includes '
+              'uiMode+density for Main and InfinityLiveActivity. No native rebuild '
+              'was performed.\n'
+          )
+          print(Path('recovery-verification/RESULT.txt').read_text(), end='')
+          PY
+
+      - name: Upload verified Candidate 2 recovery
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Verified
+          path: |
+            recovered/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk
+            recovered/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.sha256
+            recovered/candidate/Infinity-Cobra-Theme-1.1.0.zip
+            recovered/candidate/cobra-full-branding-apk.json
+            recovered/engine/live-app-shell-engine.json
+            recovered/engine/gui-render-hardening-source.json
+            recovered/engine/overlay-inventory.json
+            recovery-verification/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

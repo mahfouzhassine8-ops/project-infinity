@@ -1,0 +1,110 @@
+name: Infinity 1.0.9 | Cobra Legitimate Live Candidate 1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-legitimate-live]
+    paths:
+      - '.github/workflows/infinity-cobra-legitimate-live.yml'
+      - 'scripts/infinity_live_app_ci_*.sh'
+      - 'scripts/infinity_1_0_9_cobra_legit.py'
+      - 'scripts/infinity_1_0_9_single_app.py'
+      - 'scripts/infinity_1_0_9_live_app_shell.py'
+      - 'scripts/cobra_provider_contract.py'
+      - 'scripts/infinity_touch_startup_guard.py'
+      - 'scripts/infinity_upper_layer_repack.py'
+      - 'patches/infinity-cobra/**'
+      - 'addons/script.infinity.cobra.theme/**'
+      - 'tests/cobra_live/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-cobra-legitimate-full-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Preflight one-app Cobra provider, playback and UI contracts
+        run: bash scripts/infinity_live_app_ci_1.sh
+
+      - name: Build source-backed Kodi 21.3 + legitimate Cobra Live runtime
+        id: compile
+        run: bash scripts/infinity_live_app_ci_2.sh
+
+      - name: Package, sign and verify legitimate Infinity Cobra candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: bash scripts/infinity_live_app_ci_3.sh
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.compile.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1
+          path: |
+            candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.apk
+            candidate/Infinity-1.0.9-Cobra-Legitimate-Live-Candidate-1.sha256
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/manifest.txt
+            candidate/cobra-theme.json
+            candidate/live-app-shell-branding-apk.json
+            candidate/live-app-shell-source.json
+            candidate/live-app-shell-engine.json
+            candidate/live-release-source.json
+            candidate/touch-startup-guard-source.json
+            candidate/player-rotation-source.json
+            candidate/cumulative-audio-source.json
+            candidate/deep-audio-rebrand-source.json
+            candidate/DEVICE-TEST.txt
+            engine/base-badging.txt
+            preflight/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90
