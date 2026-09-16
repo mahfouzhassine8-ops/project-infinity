@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+import infinity_1_0_9_cobra_approved_ui as approved
+import infinity_1_0_9_cobra_full_runner as runner
 import infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix as matcher_fix
 
 
@@ -34,9 +36,6 @@ class CobraZipUiRuntimeMatcherTests(unittest.TestCase):
         )
 
     def test_full_candidate_template_navigation_width_matcher(self) -> None:
-        # The full APK pipeline can expose the pre-parity Candidate 2 expression
-        # at the late UI injection boundary. Runtime v3 must not depend on one
-        # historical width formula.
         source = (
             "before\n"
             "    int railWidth = isCompact() ? dp(108) : dp(156);\n"
@@ -53,6 +52,65 @@ class CobraZipUiRuntimeMatcherTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(RuntimeError, "found 2"):
             matcher_fix._replace_navigation_width(source, self._replacement())
+
+    def test_legacy_channel_row_height_matcher(self) -> None:
+        source = (
+            "      rows.addView(row, new LinearLayout.LayoutParams(\n"
+            "          LinearLayout.LayoutParams.MATCH_PARENT,\n"
+            "          dp(guideMode ? mTheme.guideRowHeight : mTheme.rowHeight)));\n"
+        )
+        result = matcher_fix._replace_channel_row_height(source)
+        self.assertIn(
+            "mUi.channelRowHeight(isPortrait(), mTheme.rowHeight)",
+            result,
+        )
+        self.assertIn("rows.addView(row", result)
+
+    def test_final_candidate2_channel_row_height_matcher(self) -> None:
+        source = (
+            "      LinearLayout.LayoutParams channelRowParams = new LinearLayout.LayoutParams(\n"
+            "          LinearLayout.LayoutParams.MATCH_PARENT,\n"
+            "          dp(guideMode ? mTheme.guideRowHeight : mTheme.rowHeight));\n"
+            "      channelRowParams.bottomMargin = dp(6);\n"
+            "      rows.addView(row, channelRowParams);\n"
+        )
+        result = matcher_fix._replace_channel_row_height(source)
+        self.assertIn(
+            "mUi.channelRowHeight(isPortrait(), mTheme.rowHeight)",
+            result,
+        )
+        self.assertIn("channelRowParams.bottomMargin = dp(6)", result)
+        self.assertIn("rows.addView(row, channelRowParams)", result)
+
+    def test_channel_row_height_matcher_rejects_ambiguous_source(self) -> None:
+        source = (
+            "dp(guideMode ? mTheme.guideRowHeight : mTheme.rowHeight)\n"
+            "dp(guideMode ? mTheme.guideRowHeight : mTheme.rowHeight)\n"
+        )
+        with self.assertRaisesRegex(RuntimeError, "found 2"):
+            matcher_fix._replace_channel_row_height(source)
+
+    def test_full_candidate2_approved_ui_runtime_v3_sequence(self) -> None:
+        source = (ROOT / "patches/infinity-cobra/InfinityLiveActivity.java.in").read_text(
+            encoding="utf-8"
+        )
+        java = runner.transform_for_fast_test(source)
+        java = approved.patch(java)
+        approved.verify(java)
+        java = matcher_fix.patch(java)
+        matcher_fix.verify(java)
+
+        for token in (
+            "COBRA_UI_RUNTIME = 3",
+            "mUi.destinationEnabled(label)",
+            "mUi.channelRowHeight(isPortrait(), mTheme.rowHeight)",
+            "mUi.orderPlayerActions(",
+            "mUi.orderSettingsActions(",
+            "showPlayerSettingsDrawer()",
+            "removeSelectedMultiTile()",
+            "multiToSingle()",
+        ):
+            self.assertIn(token, java)
 
     def test_default_ui_package_preserves_candidate2_destinations_and_player(self) -> None:
         ui = json.loads(

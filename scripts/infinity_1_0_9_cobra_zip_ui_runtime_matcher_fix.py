@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 '''Compatibility repair for the Cobra ZIP-driven UI runtime v3 source transform.
 
-The Runtime v3 contract itself remains version 3. This module only repairs the
-build-time navigation-width anchor used after Candidate 2's source transforms.
-The anchor deliberately targets the single local ``railWidth`` declaration
-rather than one historical expression, so approved presentation transforms can
-change the responsive formula without breaking the Runtime v3 injection.
+The Runtime v3 contract itself remains version 3. This module hardens the late
+presentation anchors that are intentionally rewritten by Candidate 2's final
+UI polish. Matchers target structural declarations/expressions rather than
+historical formatting while still requiring an unambiguous single match.
 '''
 from __future__ import annotations
 
@@ -22,6 +21,11 @@ _RAIL_WIDTH_DECL = re.compile(
     re.MULTILINE,
 )
 
+_CHANNEL_ROW_HEIGHT_EXPR = re.compile(
+    r"dp\(\s*guideMode\s*\?\s*mTheme\.guideRowHeight\s*:\s*mTheme\.rowHeight\s*\)",
+    re.MULTILINE,
+)
+
 
 def _replace_navigation_width(text: str, replacement: str) -> str:
     matches = list(_RAIL_WIDTH_DECL.finditer(text))
@@ -34,19 +38,42 @@ def _replace_navigation_width(text: str, replacement: str) -> str:
     return text[:match.start()] + replacement + text[match.end():]
 
 
+def _replace_channel_row_height(text: str) -> str:
+    matches = list(_CHANNEL_ROW_HEIGHT_EXPR.finditer(text))
+    if len(matches) != 1:
+        raise RuntimeError(
+            "Cobra ZIP UI runtime channel row height: expected exactly one final "
+            f"guide/channel row-height expression, found {len(matches)}"
+        )
+    replacement = (
+        "dp(guideMode ? mTheme.guideRowHeight\n"
+        "              : mUi.channelRowHeight(isPortrait(), mTheme.rowHeight))"
+    )
+    match = matches[0]
+    return text[:match.start()] + replacement + text[match.end():]
+
+
 def patch(java: str) -> str:
     original_regex_once = base.regex_once
+    original_once = base.once
 
-    def matcher(text: str, pattern: str, replacement: str, label: str) -> str:
+    def regex_matcher(text: str, pattern: str, replacement: str, label: str) -> str:
         if label == "navigation width":
             return _replace_navigation_width(text, replacement)
         return original_regex_once(text, pattern, replacement, label)
 
-    base.regex_once = matcher
+    def exact_matcher(text: str, old: str, new: str, label: str) -> str:
+        if label == "channel row height":
+            return _replace_channel_row_height(text)
+        return original_once(text, old, new, label)
+
+    base.regex_once = regex_matcher
+    base.once = exact_matcher
     try:
         java = base.patch(java)
     finally:
         base.regex_once = original_regex_once
+        base.once = original_once
 
     # If cobra-ui.json is absent, malformed, or rejected, Runtime v3 must fall
     # back to the approved Candidate 2 presentation rather than re-introducing
@@ -75,6 +102,7 @@ def verify(java: str) -> None:
     required = (
         "mUi.drawerPortraitWidthDp",
         "mUi.drawerLandscapeWidthDp",
+        "mUi.channelRowHeight(isPortrait(), mTheme.rowHeight)",
         '"previous", "favorite", "record", "multiview", "next"',
         '"source", "guide", "multiview", "close"',
     )
