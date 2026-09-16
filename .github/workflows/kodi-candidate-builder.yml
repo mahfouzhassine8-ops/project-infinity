@@ -37,6 +37,7 @@ jobs:
     timeout-minutes: 360
     env:
       NDK_VER: 21.4.7075529
+      CANDIDATE_PACKAGE: com.projectinfinity.kodi.candidate
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
       TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
       BUILD_DIR: ${{ github.workspace }}/kodi-candidate-build
@@ -156,10 +157,17 @@ jobs:
         id: compile
         run: |
           set -euo pipefail
-          make -C "$SOURCE_DIR/tools/depends/target/cmakebuildsys" BUILD_DIR="$BUILD_DIR"
+          # Internal candidates deliberately use a different Android application ID.
+          # Kodi's CMake contract supports APP_PACKAGE overrides, so generated Java,
+          # manifest authorities and Android userdata are isolated from production.
+          make -C "$SOURCE_DIR/tools/depends/target/cmakebuildsys" \
+            BUILD_DIR="$BUILD_DIR" \
+            CMAKE_EXTRA_ARGUMENTS="-DAPP_PACKAGE=$CANDIDATE_PACKAGE"
           CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
           test -x "$CMAKE_BIN"
-          "$CMAKE_BIN" -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          "$CMAKE_BIN" -S "$SOURCE_DIR" -B "$BUILD_DIR" \
+            -DAPP_PACKAGE="$CANDIDATE_PACKAGE" \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           python3 pinned-infinity-recipe/scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
           make -C "$BUILD_DIR" -j"$(nproc)"
           make -C "$BUILD_DIR" apk -j"$(nproc)"
@@ -173,13 +181,17 @@ jobs:
           APK=$(find "$SOURCE_DIR" "$BUILD_DIR" -type f -name '*.apk' -print -quit)
           test -n "$APK"
           SAFE_TAG=$(printf '%s' "$TARGET_TAG" | tr -c 'A-Za-z0-9._-' '_')
-          OUT="$CANDIDATE_DIR/Infinity-${SAFE_TAG}-INTERNAL-DEBUG-CANDIDATE.apk"
+          OUT="$CANDIDATE_DIR/Infinity-${SAFE_TAG}-INTERNAL-SIDEBYSIDE-CANDIDATE.apk"
           cp "$APK" "$OUT"
           sha256sum "$OUT" | tee "$OUT.sha256"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$OUT" | tee "$CANDIDATE_DIR/badging.txt"
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$OUT" | tee "$CANDIDATE_DIR/signing.txt"
           unzip -l "$OUT" | grep -F 'lib/arm64-v8a/libkodi.so'
-          grep -q "package: name='com.projectinfinity.kodi'" "$CANDIDATE_DIR/badging.txt"
+          grep -q "package: name='$CANDIDATE_PACKAGE'" "$CANDIDATE_DIR/badging.txt"
+          if grep -q "package: name='com.projectinfinity.kodi'" "$CANDIDATE_DIR/badging.txt"; then
+            echo 'Refusing internal candidate that could collide with production package ID' >&2
+            exit 1
+          fi
           grep -q "application-label:'Infinity'" "$CANDIDATE_DIR/badging.txt"
           python3 - <<'PY'
           import json, os
@@ -189,16 +201,19 @@ jobs:
           text=Path(os.environ['CANDIDATE_DIR'],'signing.txt').read_text().lower().replace(':','')
           assert production not in text, 'Production Infinity signer must never be used by automatic candidate builds'
           Path(os.environ['CANDIDATE_DIR'],'CANDIDATE-STATUS.txt').write_text(
-              'INTERNAL DEBUG CANDIDATE ONLY\n'
+              'INTERNAL SIDE-BY-SIDE DEBUG CANDIDATE ONLY\n'
               'Native compile/package gates passed.\n'
+              'Android package: com.projectinfinity.kodi.candidate\n'
+              'Uses separate Android app data/userdata from production Infinity.\n'
               'NOT production-signed. NOT released. NOT installed. NOT promoted.\n'
               'Human review and device acceptance are required before retained-key signing.\n')
           PY
           echo 'candidate_ready=true' >> "$GITHUB_OUTPUT"
           {
-            echo '## Infinity Kodi internal candidate'
+            echo '## Infinity Kodi internal side-by-side candidate'
             echo "Target: $TARGET_TAG"
-            echo 'Compile/package gates passed.'
+            echo "Android package: $CANDIDATE_PACKAGE"
+            echo 'Compile/package gates passed with isolated Android userdata.'
             echo '**STOP GATE:** internal debug candidate only; no retained-key signing, release, install or promotion occurred.'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -216,7 +231,7 @@ jobs:
         if: ${{ steps.package.outputs.candidate_ready == 'true' }}
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: Infinity-Kodi-${{ inputs.target_tag }}-INTERNAL-CANDIDATE
+          name: Infinity-Kodi-${{ inputs.target_tag }}-INTERNAL-SIDEBYSIDE-CANDIDATE
           path: internal-candidate/
           compression-level: 0
           retention-days: 30
