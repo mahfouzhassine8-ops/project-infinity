@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "source_commit": "5f7d9b311568cca053d9c0e082463baca1bd99e0",
+  "phases": [
+    {
+      "name": "01-cumulative-foundation",
+      "reason": "Existing Infinity 7.1 through responsive/audio-policy cumulative owners.",
+      "android_only": false,
+      "argv": [
+        "{python}",
+        "scripts/infinity_audio_policy_source.py",
+        "{source}",
+        "--receipts",
+        "{evidence}/receipts/audio"
+      ]
+    },
+    {
+      "name": "02-refresh-controller",
+      "reason": "Exact current refresh controller after cumulative ownership handoff.",
+      "android_only": true,
+      "argv": [
+        "{python}",
+        "-c",
+        "import importlib.util;from pathlib import Path;p=Path('scripts/infinity-responsive-v5.py');s=importlib.util.spec_from_file_location('port_v5',p);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);m.install_refresh_controller(Path('{source}'));m.verify_refresh_controller(Path('{source}'))"
+      ]
+    },
+    {
+      "name": "03-branding-handoff",
+      "reason": "Strict responsive branding preimage handoff.",
+      "android_only": true,
+      "argv": [
+        "{python}",
+        "scripts/infinity_1_0_8_deep_rebrand_preimage.py",
+        "--source",
+        "{source}"
+      ]
+    },
+    {
+      "name": "04-deep-branding-audio",
+      "reason": "Preserve audited deep branding and semantic audio changes.",
+      "android_only": false,
+      "argv": [
+        "{python}",
+        "scripts/infinity_1_0_8_deep_audio_rebrand.py",
+        "source",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/deep-audio.json"
+      ]
+    },
+    {
+      "name": "05-player-rotation",
+      "reason": "Preserve accepted player-only rotation policy.",
+      "android_only": false,
+      "argv": [
+        "{python}",
+        "scripts/infinity_player_rotation.py",
+        "apply",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/rotation.json"
+      ]
+    },
+    {
+      "name": "06-live-release",
+      "reason": "Preserve pre-Cobra Infinity source release stack.",
+      "android_only": false,
+      "argv": [
+        "{python}",
+        "scripts/infinity_1_0_9_live_release.py",
+        "source",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/live-release.json"
+      ]
+    },
+    {
+      "name": "07-touch-startup",
+      "reason": "Preserve native startup null-GUI guard.",
+      "android_only": false,
+      "argv": [
+        "{python}",
+        "scripts/infinity_touch_startup_guard.py",
+        "apply",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/touch.json"
+      ]
+    },
+    {
+      "name": "08-cobra-full",
+      "reason": "Source-built Cobra features, device parity and original strict fixups.",
+      "android_only": false,
+      "argv": [
+        "{python}",
+        "scripts/infinity_1_0_9_cobra_full_runner.py",
+        "source",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/cobra.json"
+      ]
+    },
+    {
+      "name": "09-background-session",
+      "reason": "Preserve foreground service and per-player resume behavior.",
+      "android_only": true,
+      "argv": [
+        "{python}",
+        "scripts/infinity_background_resume.py",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/background.json"
+      ]
+    },
+    {
+      "name": "10-infinity-background-control",
+      "reason": "Preserve real Normal/Extended Infinity control bridge.",
+      "android_only": true,
+      "argv": [
+        "{python}",
+        "scripts/infinity_background_control_bridge.py",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/background.json",
+        "--packager",
+        "{recipe}/scripts/package_background_resume.py"
+      ]
+    },
+    {
+      "name": "11-rc3-lifecycle",
+      "reason": "Preserve delivered callback-after-destroy and terminated-executor repair.",
+      "android_only": true,
+      "argv": [
+        "{python}",
+        "scripts/infinity_async_lifecycle_repair.py",
+        "--source",
+        "{source}",
+        "--receipt",
+        "{evidence}/receipts/background.json"
+      ]
+    }
+  ]
+}

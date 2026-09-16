@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "notification_recipient": "mahfouzhassine8-ops",
+  "scope": "Explicitly locked stack in this conversation; other candidate branches are not silently promoted.",
+  "upstream": {
+    "repository": "xbmc/xbmc",
+    "tag": "21.3-Omega",
+    "commit": "a3a448d26b8d560a65655dab2cd122994dc4e146"
+  },
+  "runtime": {
+    "name": "Infinity 1.0.9 Infinity Lifecycle Repair RC3",
+    "version_code": 2103138,
+    "source_branch": "infinity-lifecycle-repair-rc3",
+    "source_commit": "5f7d9b311568cca053d9c0e082463baca1bd99e0",
+    "build_run": 35071438615,
+    "apk_sha256": "202246685314324514ccd919a1521f187fdf6285c77d0622a2d481deb3aa7829",
+    "native_engine_sha256": "9783527356ec108fb3bdd61213dc6c7af9b227da3b81051163aa893a9fa358d0",
+    "signer_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+  },
+  "skin": {
+    "id": "skin.infinity.diggz",
+    "version": "1.0.5.141",
+    "sha256": "c300da2f1ba47e19d5fe0e0c9f4928a3ac046afe6d12afdce3d4200dd2e99ff9"
+  },
+  "health_center": {
+    "id": "script.kodihealthcenter",
+    "version": "2.5.6",
+    "sha256": "7988cc82ebe5bfd9346862bb13dc74ebb7107cbad8973efaa84a946a910b4101"
+  },
+  "other_companions": {
+    "status": "not reconstructed or changed by this tool",
+    "promotion_gate": "Record installed Command Center, compatibility, refresh, audio-policy, support and Cobra theme versions from an on-device export before any engine migration."
+  },
+  "policy": {
+    "stable_source_tags_only": true,
+    "auto_build": false,
+    "auto_sign": false,
+    "auto_merge": false,
+    "auto_install": false,
+    "auto_change_baseline": false,
+    "separate_candidate_userdata_required": true
+  },
+  "provenance": {
+    "runtime_verified_from": "Published RC3 workflow artifact + local APK SHA256",
+    "skin_health_verified_from": "Exact locked ZIP bytes",
+    "full_device_matrix": "not attested by this manifest"
+  }
+}

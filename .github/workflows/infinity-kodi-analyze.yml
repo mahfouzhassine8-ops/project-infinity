@@ -1,0 +1,69 @@
+name: Infinity | Kodi Port Analysis
+on:
+  workflow_dispatch:
+    inputs:
+      target_tag:
+        description: 'Official stable Kodi source tag; 21.3-Omega tests exact baseline replay'
+        type: string
+        default: '21.3-Omega'
+        required: true
+      target_sha:
+        description: 'Optional expected 40-character commit; rejects a tag that moved'
+        type: string
+        default: ''
+        required: false
+  workflow_call:
+    inputs:
+      target_tag:
+        type: string
+        required: true
+      target_sha:
+        type: string
+        default: ''
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: infinity-kodi-analysis-${{ github.run_id }}
+  cancel-in-progress: false
+jobs:
+  source-only:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check out exact delivered RC3 recipe, NOT old main or RC2
+        uses: actions/checkout@v7.0.1
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          ref: 5f7d9b311568cca053d9c0e082463baca1bd99e0
+          path: pinned-infinity-recipe
+          persist-credentials: false
+      - name: Run infrastructure regression tests
+        run: python3 -m unittest discover -s upstream/tests -v
+      - name: Install source-transformation utilities only (NO Android SDK or native compiler build)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends patch imagemagick fonts-dejavu-core
+      - name: Reconstruct, inventory, compare and replay in disposable source trees
+        env:
+          TARGET_TAG: ${{ inputs.target_tag }}
+          TARGET_SHA: ${{ inputs.target_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 upstream/port.py \
+            --recipe-root "$GITHUB_WORKSPACE/pinned-infinity-recipe" \
+            --workspace "$RUNNER_TEMP/infinity-port-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --output "$GITHUB_WORKSPACE/port-evidence" \
+            --target-tag "$TARGET_TAG" --target-sha "$TARGET_SHA"
+      - name: Preserve reports and patch evidence even if source reconstruction fails
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: infinity-kodi-port-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: port-evidence/
+          if-no-files-found: warn
+          retention-days: 90
