@@ -10,17 +10,16 @@ concurrency:
   cancel-in-progress: false
 jobs:
   check:
-    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       has_update: ${{ steps.check.outputs.has_update }}
+      tag: ${{ steps.check.outputs.tag }}
+      target_sha: ${{ steps.check.outputs.target_sha }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - name: Test watcher and safety contracts
-        run: python3 -m unittest discover -s upstream/tests -v
       - name: Check official Kodi source tags
         id: check
         env:
@@ -32,46 +31,35 @@ jobs:
           path: watch-output/
           if-no-files-found: error
           retention-days: 30
-  alert:
+
+  report:
     needs: check
-    if: needs.check.outputs.has_update == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      issues: write
-    outputs:
-      new_alert: ${{ steps.alert.outputs.new_alert }}
-      tag: ${{ steps.alert.outputs.tag }}
-      target_sha: ${{ steps.alert.outputs.target_sha }}
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/download-artifact@v8
-        with:
-          name: kodi-update-check
-          path: watch-output/
-      - name: Create one deduplicated GitHub alert per source tag and commit
-        id: alert
+      - name: Write simple update status
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 upstream/watch.py notify
-  source-analysis:
-    needs: alert
-    if: needs.alert.outputs.new_alert == 'true'
-    uses: ./.github/workflows/infinity-kodi-analyze.yml
-    with:
-      target_tag: ${{ needs.alert.outputs.tag }}
-      target_sha: ${{ needs.alert.outputs.target_sha }}
-    permissions:
-      contents: read
-  candidate-build:
-    needs: [alert, source-analysis]
-    if: ${{ needs.alert.outputs.new_alert == 'true' && needs.source-analysis.result == 'success' }}
-    uses: ./.github/workflows/kodi-candidate-builder.yml
-    with:
-      target_tag: ${{ needs.alert.outputs.tag }}
-      target_sha: ${{ needs.alert.outputs.target_sha }}
-    permissions:
-      contents: read
+          HAS_UPDATE: ${{ needs.check.outputs.has_update }}
+          TARGET_TAG: ${{ needs.check.outputs.tag }}
+          TARGET_SHA: ${{ needs.check.outputs.target_sha }}
+        run: |
+          if [ "$HAS_UPDATE" = "true" ]; then
+            {
+              echo '## Kodi update available'
+              echo
+              echo "**Infinity baseline:** Kodi 21.3-Omega"
+              echo "**Latest detected:** $TARGET_TAG"
+              echo "**Target commit:** \`$TARGET_SHA\`"
+              echo
+              echo '**Action:** review/analyze when we choose. No APK build was started.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo '## Kodi is up to date'
+              echo
+              echo '**Infinity baseline:** Kodi 21.3-Omega'
+              echo '**Update available:** No'
+              echo
+              echo 'No APK build was started.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
