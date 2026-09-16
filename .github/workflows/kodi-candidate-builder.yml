@@ -34,15 +34,15 @@ jobs:
   build-internal-candidate:
     if: github.repository == 'mahfouzhassine8-ops/project-infinity'
     runs-on: ubuntu-22.04
-    timeout-minutes: 420
+    timeout-minutes: 360
     env:
       NDK_VER: 21.4.7075529
       DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
       TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
       BUILD_DIR: ${{ github.workspace }}/kodi-candidate-build
-      PORT_WORKSPACE: ${{ runner.temp }}/infinity-kodi-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+      PORT_WORKSPACE: ${{ github.workspace }}/candidate-workspace-${{ github.run_id }}-${{ github.run_attempt }}
       EVIDENCE_DIR: ${{ github.workspace }}/candidate-evidence
-      SOURCE_DIR: ${{ runner.temp }}/infinity-kodi-candidate-${{ github.run_id }}-${{ github.run_attempt }}/candidate
+      SOURCE_DIR: ${{ github.workspace }}/candidate-workspace-${{ github.run_id }}-${{ github.run_attempt }}/candidate
       CANDIDATE_DIR: ${{ github.workspace }}/internal-candidate
     steps:
       - uses: actions/checkout@v7.0.1
@@ -127,6 +127,7 @@ jobs:
       - name: Validate generated Android source before native build
         run: |
           set -euo pipefail
+          mkdir -p "$CANDIDATE_DIR"
           python3 pinned-infinity-recipe/scripts/validate-infinity71-java.py \
             --source "$SOURCE_DIR" \
             --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
@@ -178,7 +179,7 @@ jobs:
           grep -q "package: name='com.projectinfinity.kodi'" "$CANDIDATE_DIR/badging.txt"
           grep -q "application-label:'Infinity'" "$CANDIDATE_DIR/badging.txt"
           python3 - <<'PY'
-          import json, os, re
+          import json, os
           from pathlib import Path
           baseline=json.loads(Path('upstream/baseline.json').read_text())
           production=baseline['runtime']['signer_sha256'].lower()
