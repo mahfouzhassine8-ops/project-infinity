@@ -90,7 +90,7 @@ def verify(java: str) -> None:
         "submitCobraIo(() ->",
         "publishCobraUi(() ->",
         "script.infinity.cobra.theme/resources/cobra-ui.json",
-        "Cobra UI package attempted to own protected contract",
+        "UI package attempted to own protected contract",
     )
     for token in required:
         if token not in java:
