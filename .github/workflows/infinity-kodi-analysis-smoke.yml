@@ -1,0 +1,17 @@
+name: Infinity | Kodi Port Analysis Smoke
+on:
+  push:
+    branches:
+      - infinity-kodi-analysis-smoke
+    paths:
+      - '.github/workflows/infinity-kodi-analysis-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  analyze:
+    uses: ./.github/workflows/infinity-kodi-analyze.yml
+    with:
+      target_tag: '21.3-Omega'
+      target_sha: 'a3a448d26b8d560a65655dab2cd122994dc4e146'
+    permissions:
+      contents: read
