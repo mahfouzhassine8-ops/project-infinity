@@ -1,0 +1,84 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Intent;
+import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+import android.util.Log;
+
+/** Fault-isolated registry for native Android platform integrations. */
+final class InfinityPlatformHooks
+{
+  static final int API_VERSION = 1;
+  private static final String TAG = "InfinityPlatformHooks";
+
+  // Add future platform integrations here. Hooks share Kodi's single MediaSession.
+  private static final InfinityPlatformHook[] HOOKS = new InfinityPlatformHook[] {
+      new InfinitySystemMediaHook()
+  };
+
+  private InfinityPlatformHooks() { }
+
+  static void onMediaSessionCreated(MediaSession session)
+  {
+    for (InfinityPlatformHook hook : HOOKS)
+    {
+      try { hook.onMediaSessionCreated(session); }
+      catch (Throwable error) { failed(hook, "session-created", error); }
+    }
+  }
+
+  static void onMediaSessionActive(MediaSession session, boolean active)
+  {
+    for (InfinityPlatformHook hook : HOOKS)
+    {
+      try { hook.onMediaSessionActive(session, active); }
+      catch (Throwable error) { failed(hook, "session-active", error); }
+    }
+  }
+
+  static PlaybackState onPlaybackState(MediaSession session, PlaybackState state)
+  {
+    PlaybackState decorated = state;
+    for (InfinityPlatformHook hook : HOOKS)
+    {
+      try
+      {
+        PlaybackState next = hook.onPlaybackState(session, decorated);
+        if (next != null) decorated = next;
+      }
+      catch (Throwable error) { failed(hook, "playback-state", error); }
+    }
+    return decorated;
+  }
+
+  static MediaMetadata onMetadata(MediaSession session, MediaMetadata metadata)
+  {
+    MediaMetadata decorated = metadata;
+    for (InfinityPlatformHook hook : HOOKS)
+    {
+      try
+      {
+        MediaMetadata next = hook.onMetadata(session, decorated);
+        if (next != null) decorated = next;
+      }
+      catch (Throwable error) { failed(hook, "metadata", error); }
+    }
+    return decorated;
+  }
+
+  static void onSessionIntent(MediaSession session, Intent intent)
+  {
+    for (InfinityPlatformHook hook : HOOKS)
+    {
+      try { hook.onSessionIntent(session, intent); }
+      catch (Throwable error) { failed(hook, "session-intent", error); }
+    }
+  }
+
+  private static void failed(InfinityPlatformHook hook, String event, Throwable error)
+  {
+    Log.w(TAG, "Ignoring platform hook failure: " + hook.id() + " @ " + event, error);
+  }
+}

@@ -1,0 +1,26 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Intent;
+import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+
+/**
+ * Stable Android-side extension point for Infinity platform integrations.
+ *
+ * Hooks observe/decorate the one Kodi MediaSession. They must never create a
+ * competing MediaSession or own Kodi playback. Future Android/Samsung/system
+ * integrations can extend this class and register in InfinityPlatformHooks.
+ */
+abstract class InfinityPlatformHook
+{
+  String id() { return getClass().getSimpleName(); }
+  int apiVersion() { return InfinityPlatformHooks.API_VERSION; }
+
+  void onMediaSessionCreated(MediaSession session) { }
+  void onMediaSessionActive(MediaSession session, boolean active) { }
+  PlaybackState onPlaybackState(MediaSession session, PlaybackState state) { return state; }
+  MediaMetadata onMetadata(MediaSession session, MediaMetadata metadata) { return metadata; }
+  void onSessionIntent(MediaSession session, Intent intent) { }
+}

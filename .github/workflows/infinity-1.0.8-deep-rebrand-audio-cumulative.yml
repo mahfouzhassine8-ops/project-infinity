@@ -1,0 +1,458 @@
+name: Infinity 1.0.8 | Deep Rebrand + Audio Cumulative
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.8-deep-rebrand-audio-cumulative]
+    paths:
+      - '.github/workflows/infinity-1.0.8-deep-rebrand-audio-cumulative.yml'
+      - 'scripts/infinity_1_0_8_deep_rebrand.py'
+      - 'scripts/infinity_1_0_8_deep_audio_rebrand.py'
+      - 'scripts/infinity_1_0_8_deep_rebrand_preimage.py'
+      - 'scripts/infinity_audio_policy_source.py'
+      - 'scripts/infinity_1_0_8_media_source.py'
+      - 'scripts/infinity-responsive-v5.py'
+      - 'scripts/infinity_upper_layer_repack.py'
+      - 'scripts/validate_infinity_audio_policy.py'
+      - 'scripts/verify_infinity_deep_audio_apk.py'
+      - 'scripts/verify_infinity_cumulative_media.py'
+      - 'scripts/infinity71.py'
+      - 'patches/infinity-7.1-audited/**'
+      - 'patches/infinity-responsive-v5/**'
+      - 'patches/infinity-refresh/**'
+      - 'patches/infinity-media/**'
+      - 'patches/infinity-audio-policy/**'
+      - 'addons/service.infinity.compat/**'
+      - 'addons/service.infinity.refresh/**'
+      - 'addons/script.infinity.audiopolicy/**'
+      - 'tests/infinity_audio/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-deep-rebrand-audio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Install exact validation and branding tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick fonts-dejavu-core rapidjson-dev
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          python3 -m py_compile \
+            scripts/infinity_1_0_8_deep_rebrand.py \
+            scripts/infinity_1_0_8_deep_audio_rebrand.py \
+            scripts/infinity_1_0_8_deep_rebrand_preimage.py \
+            scripts/infinity_audio_policy_source.py \
+            scripts/verify_infinity_deep_audio_apk.py
+
+      - name: Prepare cumulative responsive v5 media and Audio Policy API 1 source
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity_audio_policy_source.py kodi --receipts preflight/audio
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          path=Path('scripts/infinity-responsive-v5.py')
+          spec=importlib.util.spec_from_file_location('responsive_v5_current',path)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          source=Path('kodi')
+          module.install_refresh_controller(source)
+          module.verify_refresh_controller(source)
+          PY
+          python3 scripts/validate_infinity_audio_policy.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/audio-validation
+          python3 tests/infinity_audio/test_config.py --source kodi --out preflight/audio-config
+          python3 scripts/validate_infinity_skin_contract.py
+          grep -q 'versionCode 2103120' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'InfinityRefreshController' kodi/tools/android/packaging/xbmc/src/Main.java.in
+          grep -q 'Infinity.AudioPolicyApi' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'InfinityAudioPolicy.cpp' kodi/xbmc/platform/android/activity/CMakeLists.txt
+          grep -q 'InfinityAudioFocusHook.java' kodi/cmake/scripts/android/Install.cmake
+
+      - name: Transfer presentation ownership and apply locked deep Infinity branding
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py source \
+            --source kodi --receipt preflight/deep-audio-rebrand-source.json
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-source --source kodi
+          grep -q 'versionCode 2103123' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.8-Deep-Rebrand-Audio-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Published responsive v5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.AudioPolicyApi' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'InfinityAudioPolicy.cpp' kodi/xbmc/platform/android/activity/CMakeLists.txt
+          grep -q 'InfinityRefreshController' kodi/tools/android/packaging/xbmc/src/Main.java.in
+          grep -q 'android:icon="@mipmap/ic_launcher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+          grep -q 'android:roundIcon="@mipmap/ic_launcher_round"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+          grep -q 'windowSplashScreenAnimatedIcon' kodi/tools/android/packaging/xbmc/res/values-v31/infinity_splash_theme.xml
+          grep -q '<monochrome ' kodi/tools/android/packaging/xbmc/res/mipmap-anydpi-v33/ic_launcher.xml
+          test -s kodi/media/applaunch_screen.png
+          test -s kodi/media/infinity_launch_dark.png
+          test -s kodi/media/splash.jpg
+          test -s kodi/media/vendor_logo.png
+          test -s kodi/media/vendor_icon.png
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/rebrand-java
+          python3 -m py_compile \
+            addons/service.infinity.compat/service.py \
+            addons/service.infinity.compat/layout_service.py \
+            addons/service.infinity.compat/theme_contract.py \
+            addons/service.infinity.refresh/service.py \
+            addons/script.infinity.audiopolicy/default.py
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-Audio-Preflight
+          path: |
+            preflight/audio/
+            preflight/audio-validation/
+            preflight/audio-config/
+            preflight/deep-audio-rebrand-source.json
+            preflight/rebrand-java/Main.javap.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Prepare matched Android native and branding toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf \
+            lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev \
+            ccache python3 nasm yasm imagemagick fonts-dejavu-core rapidjson-dev
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+
+      - name: Apply exact cumulative source stack and locked branding
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity_audio_policy_source.py kodi --receipts engine/audio-receipts
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          path=Path('scripts/infinity-responsive-v5.py')
+          spec=importlib.util.spec_from_file_location('responsive_v5_current',path)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          source=Path('kodi')
+          module.install_refresh_controller(source)
+          module.verify_refresh_controller(source)
+          PY
+          python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py source \
+            --source kodi --receipt engine/deep-audio-rebrand-source.json
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-source --source kodi
+          grep -q 'versionCode 2103123' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.AudioPolicyApi' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'InfinityAudioPolicy.cpp' kodi/xbmc/platform/android/activity/CMakeLists.txt
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Prepare matched dependencies and native build configuration
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+
+      - name: Compile-check all changed native owners
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+
+      - name: Build complete cumulative source-branded Kodi 21.3 engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine \
+            --apk engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk \
+            --output engine/overlay-inventory.json --source-commit "$GITHUB_SHA"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk | tee engine/base-badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103123'" engine/base-badging.txt
+          grep -q "application-label:'Infinity'" engine/base-badging.txt
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk')
+          with zipfile.ZipFile(apk) as z:
+              dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)}
+              joined=b''.join(z.read(n) for n in dex)
+              native=z.read('lib/arm64-v8a/libkodi.so')
+              assert b'Published responsive v5' in joined
+              assert b'InfinityAudioFocusHook' in joined
+              for needle in (b'acquireAudioFocus',b'releaseAudioFocus',b'updateAudioPolicy'):
+                  assert needle in joined,needle
+              for needle in (b'Infinity.NativeDeviceMode',b'Infinity.AudioPolicyApi',b'Infinity AudioPolicy API 1 AudioTrack:',b'infinity-audio-policy.json'):
+                  assert needle in native,needle
+              native_sha=hashlib.sha256(native).hexdigest()
+          Path('engine/deep-audio-engine.json').write_text(json.dumps({
+              'schema':1,'bridge_version':5,'platform_hook_api':2,'audio_policy_api':1,
+              'version_code':2103123,'version_name':'1.0.8-Deep-Rebrand-Audio-1',
+              'base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+              'libkodi_sha256':native_sha,'dex':dex,'source_commit':'${GITHUB_SHA}'
+          },indent=2,sort_keys=True)+'\n')
+          PY
+          printf '%s\n' \
+            'Source-built Responsive Bridge v5 + native media + Audio Policy API 1 + locked Infinity deep branding.' \
+            'Build/static checks are not device acceptance.' > engine/README.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-Audio-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  package:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Install final packaging and branding tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick fonts-dejavu-core unzip zip
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-Audio-Engine
+          path: engine
+
+      - name: Apply preserved Infinity player lock and complete current upper layer
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay \
+            --apk engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk \
+            --manifest engine/overlay-inventory.json \
+            --output candidate/with-lock-unsigned.apk
+          python3 scripts/infinity_upper_layer_repack.py \
+            candidate/with-lock-unsigned.apk candidate/upper-layer-unsigned.apk
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('candidate/upper-layer-unsigned.apk') as z:
+              for name in (
+                  'assets/addons/service.infinity.compat/service.py',
+                  'assets/addons/service.infinity.refresh/service.py',
+                  'assets/addons/script.infinity.audiopolicy/addon.xml',
+                  'assets/addons/script.infinity.audiopolicy/default.py',
+                  'assets/addons/script.infinity.audiopolicy/contract.json',
+              ):
+                  assert name in z.namelist(),name
+          PY
+
+      - name: Re-assert final user-facing Infinity branding
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py apk \
+            --input candidate/upper-layer-unsigned.apk \
+            --output candidate/Infinity-1.0.8-Deep-Rebrand-Audio-unsigned.apk \
+            --receipt candidate/deep-audio-rebrand-apk.json
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-apk \
+            --apk candidate/Infinity-1.0.8-Deep-Rebrand-Audio-unsigned.apk
+
+      - name: Sign with permanent Infinity identity and verify updateability
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing configuration: $name" >&2; exit 2; fi
+          done
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio-unsigned.apk \
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103123'" candidate/badging.txt
+          grep -q "application-label:'Infinity'" candidate/badging.txt
+
+      - name: Final cumulative engine audio branding and upper-layer regression gates
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_1_0_8_deep_audio_rebrand.py verify-apk \
+            --apk candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk
+          python3 scripts/verify_infinity_deep_audio_apk.py \
+            --apk candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk \
+            --engine engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk \
+            --source-receipt engine/audio-receipts/cumulative-source.json \
+            --out candidate/cumulative-verification.json
+          python3 scripts/validate_infinity_skin_contract.py
+          python3 - <<'PY'
+          import re,zipfile
+          base='engine/Infinity-1.0.8-Deep-Rebrand-Audio-Engine-Base.apk'
+          final='candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk'
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
+              for name in a.namelist():
+                  if name.startswith('lib/') or re.fullmatch(r'classes\d*\.dex',name):
+                      assert a.read(name)==b.read(name),name
+              required=[
+                  'assets/addons/service.infinity.compat/addon.xml',
+                  'assets/addons/service.infinity.compat/layout_service.py',
+                  'assets/addons/service.infinity.compat/theme_contract.py',
+                  'assets/addons/service.infinity.refresh/service.py',
+                  'assets/addons/script.infinity.audiopolicy/addon.xml',
+                  'assets/addons/script.infinity.audiopolicy/default.py',
+                  'assets/addons/script.infinity.audiopolicy/contract.json',
+                  'assets/media/splash.jpg',
+                  'assets/media/vendor_logo.png',
+                  'assets/media/vendor_icon.png',
+              ]
+              for name in required: assert name in b.namelist(),name
+              po=b.read('assets/addons/resource.language.en_gb/resources/strings.po').decode('utf-8')
+              assert 'msgid "About Infinity"' in po
+              assert 'Kodi Foundation' in po
+          print('PASS: final signed APK keeps cumulative native/DEX engine, audio utility, current upper layer and legal branding boundary')
+          PY
+          cp engine/audio-receipts/cumulative-source.json candidate/cumulative-audio-source.json
+          cp engine/deep-audio-rebrand-source.json candidate/deep-audio-rebrand-source.json
+          cp engine/deep-audio-engine.json candidate/deep-audio-engine.json
+          sha256sum candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk | tee candidate/Infinity-1.0.8-Deep-Rebrand-Audio.sha256
+          cat > candidate/DEVICE-TEST.txt <<'EOF'
+          DEVICE TEST REQUIRED — build/static success is not runtime proof.
+
+          BRANDING
+          - Samsung launcher: trimmed Infinity icon under circle/squircle masks.
+          - Android themed/monochrome icon remains legible.
+          - Light launch: light Infinity splash; no stock Kodi launch art.
+          - Dark/OLED launch: black/deep Infinity splash; no stock Kodi launch art.
+          - First-run/storage/permission startup text says Infinity.
+          - Native startup/handoff remains Infinity branded.
+          - Normal English Settings/About/user-facing labels say Infinity.
+          - Kodi legal/open-source attribution remains accessible only where appropriate.
+
+          RESPONSIVE / PERFORMANCE
+          - Cover, inner, portrait, landscape, fold/unfold, multi-window and PiP.
+          - Auto/Smooth/Max/Performance refresh behavior and video match policy.
+          - Battery saver and thermal protection remain respected by policy.
+
+          AUDIO POLICY
+          - Auto: video content routes as MOVIE; music routes as MUSIC.
+          - Same-format video/music and TV/radio transitions reconfigure correctly.
+          - Audio focus acquire/release behaves normally across play/stop/background/resume.
+          - Stop playback completely before changing a manual Auto/Legacy policy, then start playback again.
+          - This build makes NO Samsung Audio Eraser eligibility claim.
+
+          SKIN REGRESSION
+          - Locked C30.4.1 remains the skin baseline.
+          - Player transport/scrubber/volume, player submenus, glass dialogs and Install from ZIP remain regression checks.
+
+          Do not promote this APK to a locked baseline until on-device acceptance passes.
+          EOF
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-Audio-Cumulative
+          path: |
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio.apk
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio.sha256
+            candidate/Infinity-1.0.8-Deep-Rebrand-Audio.signing.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/cumulative-verification.json
+            candidate/cumulative-audio-source.json
+            candidate/deep-audio-rebrand-source.json
+            candidate/deep-audio-rebrand-apk.json
+            candidate/deep-audio-engine.json
+            candidate/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
