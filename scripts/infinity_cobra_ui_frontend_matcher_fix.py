@@ -7,6 +7,7 @@ Settings matcher with a structural match scoped to showSettings().
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 import infinity_cobra_ui_frontend as base
@@ -14,7 +15,7 @@ import infinity_cobra_ui_frontend as base
 LIVE = base.LIVE
 
 
-def _scroll_settings(text: str) -> str:
+def _settings_bounds(text: str) -> tuple[int, int]:
     start_marker = "  private void showSettings() {\n"
     start = text.find(start_marker)
     if start < 0:
@@ -22,25 +23,40 @@ def _scroll_settings(text: str) -> str:
     end = text.find("\n  private ", start + len(start_marker))
     if end < 0:
         raise RuntimeError("Cobra UI frontend Settings method end missing")
+    return start, end
 
+
+def _scroll_settings(text: str) -> str:
+    start, end = _settings_bounds(text)
     block = text[start:end]
-    old = (
-        "    mStage.addView(list, new LinearLayout.LayoutParams(\n"
-        "        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));\n"
+
+    # Some final Candidate/RC3 source shapes already wrap Settings in a ScrollView.
+    # Preserve that rather than nesting a second scroller.
+    if "new ScrollView(this)" in block and re.search(r"\b\w+\.addView\(list\);", block):
+        return text
+
+    # Otherwise replace the one direct Settings-list attachment regardless of
+    # whitespace or the exact LayoutParams spelling used by the final transform.
+    pattern = re.compile(
+        r"(?ms)^(?P<indent>[ \t]*)mStage\.addView\(\s*list\s*,\s*"
+        r"new LinearLayout\.LayoutParams\((?P<args>.*?)\)\s*\);[ \t]*$"
     )
-    new = (
-        "    ScrollView settingsScroll = new ScrollView(this);\n"
-        "    settingsScroll.addView(list);\n"
-        "    mStage.addView(settingsScroll, new LinearLayout.LayoutParams(\n"
-        "        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));\n"
-    )
-    count = block.count(old)
-    if count != 1:
+    matches = list(pattern.finditer(block))
+    if len(matches) != 1:
+        hints = [line.strip() for line in block.splitlines() if "addView" in line and "list" in line]
         raise RuntimeError(
-            "Cobra UI frontend scrollable settings: expected exactly one Settings "
-            f"stage attachment, found {count}"
+            "Cobra UI frontend scrollable settings: expected one direct Settings "
+            f"list attachment or an existing ScrollView, found {len(matches)}; hints={hints[:6]}"
         )
-    block = block.replace(old, new, 1)
+    match = matches[0]
+    indent = match.group("indent")
+    replacement = (
+        f"{indent}ScrollView settingsScroll = new ScrollView(this);\n"
+        f"{indent}settingsScroll.addView(list);\n"
+        f"{indent}mStage.addView(settingsScroll, new LinearLayout.LayoutParams(\n"
+        f"{indent}    LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));"
+    )
+    block = block[:match.start()] + replacement + block[match.end():]
     return text[:start] + block + text[end:]
 
 
@@ -60,15 +76,41 @@ def patch(java: str) -> str:
 
 
 def verify(java: str) -> None:
-    base.verify(java)
     required = (
-        "ScrollView settingsScroll = new ScrollView(this)",
-        "settingsScroll.addView(list)",
-        "mStage.addView(settingsScroll",
+        "REQUEST_COBRA_UI_PACKAGE = 4173",
+        "INSTALL COBRA UI PACKAGE",
+        "activeCobraUiLabel()",
+        "showCobraGuideViewPicker(false)",
+        "showGuideGrid()",
+        "showGuideCompact()",
+        "showGuideFocus()",
+        '"TV Grid"',
+        "CATEGORY  •  ",
+        "installCobraUiPackage(data.getData())",
+        "submitCobraIo(() ->",
+        "publishCobraUi(() ->",
+        "script.infinity.cobra.theme/resources/cobra-ui.json",
+        "Cobra UI package attempted to own protected contract",
     )
     for token in required:
         if token not in java:
-            raise RuntimeError("Cobra UI frontend matcher repair missing: " + token)
+            raise RuntimeError("Cobra UI frontend contract missing: " + token)
+
+    start, end = _settings_bounds(java)
+    block = java[start:end]
+    scrollable = (
+        "settingsScroll.addView(list)" in block
+        or ("new ScrollView(this)" in block and re.search(r"\b\w+\.addView\(list\);", block))
+    )
+    if not scrollable:
+        raise RuntimeError("Cobra Settings is not scrollable after frontend patch")
+
+    installer_start = java.find("private void installCobraUiPackage")
+    installer_end = java.find("private void playChannel", installer_start)
+    if installer_start < 0 or installer_end < 0:
+        raise RuntimeError("Cobra UI installer bounds missing")
+    if "mIo.execute(() ->" in java[installer_start:installer_end]:
+        raise RuntimeError("Cobra UI installer bypassed RC3 guarded async executor")
 
 
 def main() -> None:
@@ -80,7 +122,7 @@ def main() -> None:
     java = patch(java)
     verify(java)
     live.write_text(java, encoding="utf-8")
-    print("PASS: Cobra UI frontend + method-scoped Settings matcher applied")
+    print("PASS: Cobra UI frontend + format-independent Settings matcher applied")
 
 
 if __name__ == "__main__":
