@@ -1,4 +1,4 @@
-"""Safety contracts for the automatic INTERNAL Kodi candidate builder."""
+"""Safety contracts for the on-demand INTERNAL Kodi candidate builder."""
 import json
 from pathlib import Path
 import unittest
@@ -63,14 +63,12 @@ class CandidateBuilderContracts(unittest.TestCase):
         self.assertFalse(policy['auto_install'])
         self.assertFalse(policy['auto_change_baseline'])
 
-    def test_watcher_requires_successful_source_analysis_before_candidate_build(self):
+    def test_watcher_never_invokes_candidate_builder_automatically(self):
         text = WATCHER.read_text()
-        self.assertIn('candidate-build:', text)
-        self.assertIn('needs: [alert, source-analysis]', text)
-        self.assertIn("needs.source-analysis.result == 'success'", text)
-        self.assertIn('uses: ./.github/workflows/kodi-candidate-builder.yml', text)
-        self.assertIn('target_tag: ${{ needs.alert.outputs.tag }}', text)
-        self.assertIn('target_sha: ${{ needs.alert.outputs.target_sha }}', text)
+        self.assertNotIn('candidate-build:', text)
+        self.assertNotIn('kodi-candidate-builder.yml', text)
+        self.assertIn('uses: ./.github/workflows/infinity-kodi-analyze.yml', text)
+        self.assertIn('lookup-only: true', text)
 
     def test_source_analyzer_itself_still_does_not_authorize_a_build(self):
         import sys
