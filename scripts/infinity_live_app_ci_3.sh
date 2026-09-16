@@ -105,8 +105,7 @@ grep -q 'usesCleartextTraffic' candidate/manifest.txt
 grep -q 'supportsPictureInPicture' candidate/manifest.txt
 grep -q 'resizeableActivity' candidate/manifest.txt
 grep -q 'android.supports_size_changes' candidate/manifest.txt
-grep -q 'density' candidate/manifest.txt
-grep -q 'uiMode' candidate/manifest.txt
+python3 scripts/validate_candidate2_compiled_manifest.py candidate/manifest.txt
 
 python3 scripts/infinity_1_0_9_cobra_full_fixups.py verify-apk --apk "$FINAL"
 python3 scripts/validate_infinity_skin_contract.py
