@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   patch:
@@ -15,6 +16,20 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
+
+      - name: Download proven run 39 manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          path: recovered
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 34972144687
+
+      - name: Prove numeric configChanges validator against run 39
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_candidate2_compiled_manifest.py recovered/candidate/manifest.txt
 
       - name: Patch only the false compiled-manifest gate
         run: |
@@ -24,45 +39,13 @@ jobs:
 
           path = Path('scripts/infinity_live_app_ci_3.sh')
           text = path.read_text()
-          old = """grep -q 'density' candidate/manifest.txt
-grep -q 'uiMode' candidate/manifest.txt"""
-          new = """python3 - <<'PY_MANIFEST'
-from pathlib import Path
-import re
-
-manifest = Path('candidate/manifest.txt').read_text()
-
-def config_mask(fqcn: str) -> int:
-    lines = manifest.splitlines()
-    marker = f'=\"{fqcn}\"'
-    for i, line in enumerate(lines):
-        if 'android:name' not in line or marker not in line:
-            continue
-        name_indent = len(line) - len(line.lstrip())
-        element_indent = max(0, name_indent - 2)
-        for candidate in lines[i + 1:]:
-            stripped = candidate.lstrip()
-            indent = len(candidate) - len(stripped)
-            if stripped.startswith('E: ') and indent <= element_indent:
-                break
-            if 'android:configChanges' in candidate:
-                values = re.findall(r'0x([0-9a-fA-F]+)', candidate)
-                assert values, (fqcn, candidate)
-                return int(values[-1], 16)
-        raise AssertionError(f'configChanges missing for {fqcn}')
-    raise AssertionError(f'activity missing: {fqcn}')
-
-required = 0x0200 | 0x1000  # uiMode | density
-for activity in (
-    'com.projectinfinity.kodi.Main',
-    'com.projectinfinity.kodi.InfinityLiveActivity',
-):
-    mask = config_mask(activity)
-    assert mask & required == required, (activity, hex(mask), hex(required))
-    print(f'PASS: {activity} configChanges={hex(mask)} includes uiMode+density')
-PY_MANIFEST"""
+          old = "grep -q 'density' candidate/manifest.txt\ngrep -q 'uiMode' candidate/manifest.txt"
+          new = "python3 scripts/validate_candidate2_compiled_manifest.py candidate/manifest.txt"
           if text.count(old) != 1:
-              raise SystemExit('Refusing patch: expected Candidate 2 density/uiMode gate not found exactly once')
+              raise SystemExit(
+                  'Refusing patch: expected Candidate 2 density/uiMode gate '
+                  'not found exactly once'
+              )
           path.write_text(text.replace(old, new))
           PY
 
