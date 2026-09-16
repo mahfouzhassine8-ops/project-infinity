@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Make the startup experience chooser two-card, direct-launch, and remembered.
+"""Keep the startup chooser to two cards with per-card settings menus.
 
-Android presentation-shell only. This patch changes Splash.java.in after the
-existing one-app chooser has been reconstructed. It does not touch Kodi native,
-Cobra playback/provider ownership, rotation, Fold, background/resume, or the
-explicit Infinity/Cobra handoff controls inside the experiences.
+Android presentation-shell only. The two large experience cards launch immediately
+without changing the remembered default. A small gear on each card exposes the
+optional remember/default controls. Kodi native, Cobra playback/provider ownership,
+rotation, Fold, background/resume, and explicit in-app handoff controls stay intact.
 """
 from __future__ import annotations
 
@@ -12,6 +12,13 @@ import argparse
 from pathlib import Path
 
 SPLASH = Path("tools/android/packaging/xbmc/src/Splash.java.in")
+
+
+def once(text: str, old: str, new: str, label: str) -> str:
+    count = text.count(old)
+    if count != 1:
+        raise RuntimeError(f"Chooser {label}: expected one exact match, found {count}")
+    return text.replace(old, new, 1)
 
 
 def replace_between(text: str, start: str, end: str, replacement: str, label: str) -> str:
@@ -25,19 +32,120 @@ def replace_between(text: str, start: str, end: str, replacement: str, label: st
 
 
 def patch(java: str) -> str:
-    # Preserve the existing cards, title and subtitle. Replace the old two-step
-    # selection + bottom action row with direct card actions. A card tap writes
-    # the same preference already consumed by startXBMC(), then launches it.
-    direct_actions = r'''    infinity.setOnClickListener(v -> {
-      getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
-          .putString(INFINITY_EXPERIENCE_DEFAULT, "infinity").apply();
-      launchInfinityExperience("infinity");
-    });
-    cobra.setOnClickListener(v -> {
-      getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
-          .putString(INFINITY_EXPERIENCE_DEFAULT, "live").apply();
-      launchInfinityExperience("live");
-    });
+    settings_helper = r'''  private void showExperienceCardSettings(String experience)
+  {
+    final boolean cobra = "live".equals(experience);
+    final String title = cobra ? "Cobra options" : "Infinity options";
+    final String label = cobra ? "Cobra" : "Infinity";
+    final String[] options = new String[]{
+        "Remember & launch " + label,
+        "Launch " + label + " just this time",
+        "Ask every time"
+    };
+    new android.app.AlertDialog.Builder(this)
+        .setTitle(title)
+        .setItems(options, (dialog, which) -> {
+          if (which == 0)
+          {
+            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+                .putString(INFINITY_EXPERIENCE_DEFAULT, experience).apply();
+            launchInfinityExperience(experience);
+          }
+          else if (which == 1)
+          {
+            launchInfinityExperience(experience);
+          }
+          else
+          {
+            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+                .remove(INFINITY_EXPERIENCE_DEFAULT).apply();
+            android.widget.Toast.makeText(this,
+                "Infinity will ask which experience to open next time.",
+                android.widget.Toast.LENGTH_SHORT).show();
+          }
+        })
+        .setNegativeButton("Cancel", null)
+        .show();
+  }
+
+'''
+    java = once(
+        java,
+        "  private void showInfinityExperienceChooser()\n",
+        settings_helper + "  private void showInfinityExperienceChooser()\n",
+        "card settings helper",
+    )
+
+    old_cards = r'''    android.widget.LinearLayout.LayoutParams infinityParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
+    infinityParams.rightMargin = chooserDp(10);
+    cards.addView(infinity, infinityParams);
+    android.widget.LinearLayout.LayoutParams cobraParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
+    cobraParams.leftMargin = chooserDp(10);
+    cards.addView(cobra, cobraParams);
+
+'''
+    new_cards = r'''    android.widget.FrameLayout infinityCard = new android.widget.FrameLayout(this);
+    infinityCard.addView(infinity, new android.widget.FrameLayout.LayoutParams(
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+    android.widget.Button infinitySettings = new android.widget.Button(this);
+    infinitySettings.setText("⚙");
+    infinitySettings.setTextColor(white);
+    infinitySettings.setTextSize(18);
+    infinitySettings.setAllCaps(false);
+    infinitySettings.setPadding(0, 0, 0, 0);
+    infinitySettings.setMinHeight(0);
+    infinitySettings.setMinWidth(0);
+    infinitySettings.setContentDescription("Infinity settings");
+    infinitySettings.setBackground(chooserSurface(
+        android.graphics.Color.rgb(18, 62, 84), cyan, 18));
+    android.widget.FrameLayout.LayoutParams infinityGearParams =
+        new android.widget.FrameLayout.LayoutParams(
+            chooserDp(48), chooserDp(48), android.view.Gravity.TOP | android.view.Gravity.END);
+    infinityGearParams.setMargins(0, chooserDp(10), chooserDp(10), 0);
+    infinityCard.addView(infinitySettings, infinityGearParams);
+
+    android.widget.FrameLayout cobraCard = new android.widget.FrameLayout(this);
+    cobraCard.addView(cobra, new android.widget.FrameLayout.LayoutParams(
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+    android.widget.Button cobraSettings = new android.widget.Button(this);
+    cobraSettings.setText("⚙");
+    cobraSettings.setTextColor(white);
+    cobraSettings.setTextSize(18);
+    cobraSettings.setAllCaps(false);
+    cobraSettings.setPadding(0, 0, 0, 0);
+    cobraSettings.setMinHeight(0);
+    cobraSettings.setMinWidth(0);
+    cobraSettings.setContentDescription("Cobra settings");
+    cobraSettings.setBackground(chooserSurface(
+        android.graphics.Color.rgb(66, 19, 32), cobraRed, 18));
+    android.widget.FrameLayout.LayoutParams cobraGearParams =
+        new android.widget.FrameLayout.LayoutParams(
+            chooserDp(48), chooserDp(48), android.view.Gravity.TOP | android.view.Gravity.END);
+    cobraGearParams.setMargins(0, chooserDp(10), chooserDp(10), 0);
+    cobraCard.addView(cobraSettings, cobraGearParams);
+
+    android.widget.LinearLayout.LayoutParams infinityParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
+    infinityParams.rightMargin = chooserDp(10);
+    cards.addView(infinityCard, infinityParams);
+    android.widget.LinearLayout.LayoutParams cobraParams =
+        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
+    cobraParams.leftMargin = chooserDp(10);
+    cards.addView(cobraCard, cobraParams);
+
+'''
+    java = once(java, old_cards, new_cards, "card gear overlays")
+
+    # The main card is always a one-tap launch. Remembering is intentionally
+    # optional and lives behind the small gear so the chooser itself stays clean.
+    actions = r'''    infinity.setOnClickListener(v -> launchInfinityExperience("infinity"));
+    cobra.setOnClickListener(v -> launchInfinityExperience("live"));
+    infinitySettings.setOnClickListener(v -> showExperienceCardSettings("infinity"));
+    cobraSettings.setOnClickListener(v -> showExperienceCardSettings("live"));
 
     // D-pad/remote focus remains visual only; activation still happens on click.
     infinity.setOnFocusChangeListener((v, hasFocus) -> {
@@ -61,20 +169,25 @@ def patch(java: str) -> str:
         java,
         "    final Runnable refresh = () -> {\n",
         "    setContentView(root);\n",
-        direct_actions + "    setContentView(root);\n",
-        "direct-card action block",
+        actions + "    setContentView(root);\n",
+        "two-card action block",
     )
     return java
 
 
 def verify(java: str) -> None:
     required = (
-        'putString(INFINITY_EXPERIENCE_DEFAULT, "infinity")',
-        'putString(INFINITY_EXPERIENCE_DEFAULT, "live")',
         'launchInfinityExperience("infinity")',
         'launchInfinityExperience("live")',
-        'setChooserCardState(infinity, true, true)',
-        'setChooserCardState(cobra, false, true)',
+        'showExperienceCardSettings("infinity")',
+        'showExperienceCardSettings("live")',
+        'setContentDescription("Infinity settings")',
+        'setContentDescription("Cobra settings")',
+        '"Remember & launch " + label',
+        '"Launch " + label + " just this time"',
+        '"Ask every time"',
+        '.remove(INFINITY_EXPERIENCE_DEFAULT)',
+        'putString(INFINITY_EXPERIENCE_DEFAULT, experience)',
         'Choose Your Experience',
         '∞  INFINITY',
         '◈  COBRA',
@@ -103,7 +216,7 @@ def main() -> None:
     java = patch(java)
     verify(java)
     splash.write_text(java, encoding="utf-8")
-    print("PASS: two-card remembered experience chooser applied")
+    print("PASS: two-card chooser with per-card remember/settings menus applied")
 
 
 if __name__ == "__main__":
