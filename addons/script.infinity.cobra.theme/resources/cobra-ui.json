@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "runtime": {
     "minimum_runtime": 3,
     "scope": "cobra-live-only"
@@ -20,19 +20,25 @@
     "mobile": {
       "preview_first": true,
       "preview_aspect": "16:9",
-      "channel_row_height_dp": 72,
-      "category_control": "chips_and_picker",
-      "bottom_navigation": true,
+      "preview_controls": ["fullscreen", "favorite", "schedule_recording", "captions", "volume", "more"],
+      "channel_row_height_dp": 70,
+      "category_control": "favorites_and_categories_hub",
+      "bottom_navigation": false,
+      "drawer_mode": "popup_overlay",
+      "drawer_destinations": ["search", "tv", "movies", "shows", "recordings", "my_list"],
       "channel_primary_action": "preview_then_fullscreen",
       "channel_long_press_action": "context_sheet",
-      "context_actions": ["favorite", "record", "channel_guide", "channel_info", "source_info"]
+      "context_actions": ["favorite", "schedule_recording", "add_to_group", "share", "channel_epg", "hide_channel"]
     },
     "tv_guide": {
       "timeline": true,
       "now_marker": true,
       "channel_column": true,
       "favorites_and_groups": true,
+      "category_hub_first": true,
+      "category_selection_opens_filtered_grid": true,
       "preview_player": true,
+      "preview_controls": true,
       "first_activation": "preview",
       "second_activation": "fullscreen",
       "back_from_fullscreen": "restore_guide_preview_state",
@@ -50,8 +56,8 @@
     "guide_program_width_dp": 220,
     "guide_row_height_dp": 66,
     "guide_header_height_dp": 52,
-    "guide_preview_height_dp": 190,
-    "mobile_preview_height_dp": 230,
-    "mobile_navigation_height_dp": 64
+    "guide_preview_height_dp": 210,
+    "mobile_preview_height_dp": 240,
+    "mobile_navigation_height_dp": 0
   }
 }
