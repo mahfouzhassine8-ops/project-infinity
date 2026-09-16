@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-      - name: Validate Runtime v3 UI package contract
+      - name: Validate Runtime v3 structural UI package contract
         run: |
           python3 - <<'PY'
           import json, pathlib, xml.etree.ElementTree as ET
@@ -23,17 +23,20 @@ jobs:
           theme=json.loads((root/'resources/cobra-theme.json').read_text())
           addon=ET.parse(root/'addon.xml').getroot()
           assert addon.attrib['id']=='script.infinity.cobra.theme'
-          assert addon.attrib['version']=='1.3.0'
+          assert addon.attrib['version']=='1.3.1'
+          assert ui['version']=='1.3.1'
           assert ui['schema']==1 and ui['runtime']['minimum_runtime']<=3
           assert ui['runtime']['scope']=='cobra-live-only'
           assert ui['views']['available']==['mobile','tv_guide']
+          assert ui['views']['mobile']['preview_first'] is True
+          assert ui['views']['mobile']['channel_long_press_action']=='context_sheet'
+          assert ui['views']['tv_guide']['preview_player'] is True
           assert ui['views']['tv_guide']['first_activation']=='preview'
           assert ui['views']['tv_guide']['second_activation']=='fullscreen'
-          assert ui['views']['mobile']['channel_long_press_action']=='context_sheet'
           for k in ('rotation','fold','background_resume','renderer','provider_playback','infinity_handoff'):
               assert ui['protected_contracts'][k]=='native'
           assert theme['schema'] in (1,2)
-          print('PASS: Cobra UI 1.3.0 Runtime v3 contract valid')
+          print('PASS: Cobra UI 1.3.1 Runtime v3 structural contract valid')
           PY
       - name: Build tiny installable Cobra UI ZIP
         run: |
@@ -42,15 +45,15 @@ jobs:
           cp addons/script.infinity.cobra.theme/resources/cobra-theme.json out/script.infinity.cobra.theme/resources/
           cp addons/script.infinity.cobra.theme/resources/cobra-ui.json out/script.infinity.cobra.theme/resources/
           cd out
-          zip -9 -r Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip script.infinity.cobra.theme
-          sha256sum Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip > Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.sha256
-          unzip -l Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip
+          zip -9 -r Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip script.infinity.cobra.theme
+          sha256sum Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip > Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.sha256
+          unzip -l Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0
+          name: Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1
           path: |
-            out/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.zip
-            out/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.0.sha256
+            out/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip
+            out/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.sha256
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
