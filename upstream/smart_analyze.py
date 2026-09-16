@@ -41,6 +41,10 @@ def suffix(path: str) -> str:
     return Path(path).suffix.lower() or '(none)'
 
 
+def safe_tag(tag: str) -> str:
+    return ''.join(ch if ch.isalnum() or ch in '._-' else '_' for ch in tag)
+
+
 def build_report(port_report: dict, ownership: dict, java_status: dict) -> dict:
     changed = port_report['impact']['changed_upstream_files']
     intersections = port_report['impact']['owned_file_intersections']
@@ -77,6 +81,7 @@ def build_report(port_report: dict, ownership: dict, java_status: dict) -> dict:
     baseline_tag = port_report['baseline']['upstream']['tag']
     target_tag = port_report['target']['tag']
     target_commit = port_report['target']['commit']
+    export_name = f"Infinity-Kodi-{safe_tag(target_tag)}-Analysis-Report.zip"
 
     return {
         'schema': 1,
@@ -102,6 +107,12 @@ def build_report(port_report: dict, ownership: dict, java_status: dict) -> dict:
         'production_modified': False,
         'stop_gate': True,
         'next_action': next_action,
+        'export': {
+            'available': True,
+            'format': 'zip',
+            'default_filename': export_name,
+            'purpose': 'Portable analysis bundle that can be saved anywhere and sent back for review.',
+        },
         'system_tray': {
             'title': 'Kodi Update',
             'state': state,
@@ -110,6 +121,10 @@ def build_report(port_report: dict, ownership: dict, java_status: dict) -> dict:
             'changed_files': len(changed),
             'direct_intersections': len(intersections),
             'action_label': 'View analysis',
+            'export_available': True,
+            'export_action_label': 'Export Analysis ZIP',
+            'export_default_filename': export_name,
+            'save_destination': 'user_selected',
             'summary': next_action,
         },
     }
@@ -142,6 +157,11 @@ def markdown(report: dict) -> str:
         '- Full native compile: deferred',
         '- Full APK build: not started',
         '- Device test: not run',
+        '',
+        '## Export',
+        f"- Portable ZIP: `{report['export']['default_filename']}`",
+        '- Save destination: chosen by the user when exported from the Infinity drawer.',
+        '- Designed to be sent back for review without rebuilding Infinity.',
         '',
         f"**Next:** {report['next_action']}",
         '',
