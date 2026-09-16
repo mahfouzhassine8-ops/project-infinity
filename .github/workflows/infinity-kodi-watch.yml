@@ -32,34 +32,96 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-  report:
+  dedupe-analysis:
     needs: check
+    if: needs.check.outputs.has_update == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    outputs:
+      cache_hit: ${{ steps.seen.outputs.cache-hit }}
     steps:
-      - name: Write simple update status
-        env:
-          HAS_UPDATE: ${{ needs.check.outputs.has_update }}
-          TARGET_TAG: ${{ needs.check.outputs.tag }}
-          TARGET_SHA: ${{ needs.check.outputs.target_sha }}
+      - name: Check whether this exact Kodi tag and commit was already analyzed
+        id: seen
+        uses: actions/cache/restore@v4
+        with:
+          path: .kodi-analysis-marker
+          key: infinity-kodi-smart-analysis-${{ needs.check.outputs.tag }}-${{ needs.check.outputs.target_sha }}
+          lookup-only: true
+
+  source-analysis:
+    needs: [check, dedupe-analysis]
+    if: needs.check.outputs.has_update == 'true' && needs.dedupe-analysis.outputs.cache_hit != 'true'
+    uses: ./.github/workflows/infinity-kodi-analyze.yml
+    with:
+      target_tag: ${{ needs.check.outputs.tag }}
+      target_sha: ${{ needs.check.outputs.target_sha }}
+    permissions:
+      contents: read
+
+  report:
+    needs: [check, dedupe-analysis, source-analysis]
+    if: always() && needs.check.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      HAS_UPDATE: ${{ needs.check.outputs.has_update }}
+      TARGET_TAG: ${{ needs.check.outputs.tag }}
+      TARGET_SHA: ${{ needs.check.outputs.target_sha }}
+      CACHE_HIT: ${{ needs.dedupe-analysis.outputs.cache_hit }}
+      ANALYSIS_RESULT: ${{ needs.source-analysis.result }}
+    steps:
+      - name: Write simple System Tray status payload and workflow summary
         run: |
-          if [ "$HAS_UPDATE" = "true" ]; then
-            {
-              echo '## Kodi update available'
-              echo
-              echo "**Infinity baseline:** Kodi 21.3-Omega"
-              echo "**Latest detected:** $TARGET_TAG"
-              echo "**Target commit:** \`$TARGET_SHA\`"
-              echo
-              echo '**Action:** review/analyze when we choose. No APK build was started.'
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            {
-              echo '## Kodi is up to date'
-              echo
-              echo '**Infinity baseline:** Kodi 21.3-Omega'
-              echo '**Update available:** No'
-              echo
-              echo 'No APK build was started.'
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
+          mkdir -p kodi-status
+          python3 - <<'PY'
+          import json, os
+          has_update=os.environ.get('HAS_UPDATE') == 'true'
+          cache_hit=os.environ.get('CACHE_HIT') == 'true'
+          analysis=os.environ.get('ANALYSIS_RESULT','')
+          target=os.environ.get('TARGET_TAG','')
+          sha=os.environ.get('TARGET_SHA','')
+
+          if not has_update:
+              state='up_to_date'
+              summary='Kodi 21.3-Omega is still the latest stable source tracked by Infinity.'
+              action='No action needed'
+          elif cache_hit:
+              state='already_analyzed'
+              summary=f'{target} was already downloaded, compared and analyzed.'
+              action='View latest analysis'
+          elif analysis == 'success':
+              state='analysis_ready'
+              summary=f'{target} was downloaded, compared and fast-validated. No Infinity APK was built.'
+              action='View analysis'
+          else:
+              state='analysis_blocked'
+              summary=f'{target} was detected, but fast source analysis needs review.'
+              action='Review analysis'
+
+          payload={
+              'schema':1,
+              'title':'Kodi Update',
+              'state':state,
+              'current_version':'21.3-Omega',
+              'available_version':target or '21.3-Omega',
+              'target_commit':sha,
+              'summary':summary,
+              'action_label':action,
+              'automatic_full_build':False,
+              'production_modified':False,
+          }
+          with open('kodi-status/system-tray-status.json','w',encoding='utf-8') as f:
+              json.dump(payload,f,indent=2)
+              f.write('\n')
+
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as s:
+              s.write('## Kodi Update\n\n')
+              s.write(f"**Status:** {state}\n\n{summary}\n\n")
+              s.write('**Full Infinity APK build:** not started.\n')
+          PY
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: kodi-system-tray-status
+          path: kodi-status/system-tray-status.json
+          if-no-files-found: error
+          retention-days: 30
