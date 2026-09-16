@@ -1,111 +1,98 @@
 # Infinity Kodi upstream maintenance v1
 
-**A lookout and a source-port laboratory, NOT an unattended application updater.**
+**A daily lookout and a source-port laboratory, not an unattended app updater.**
 
-The known working app is not on `main`: it is the specific RC3 APK paired with the
-independent locked skin and Health Center. Never select the newest-looking branch
-or any other APK called RC3. `baseline.json` pins the actual shipped artifact,
-source commit and seven independently recorded final Android source hashes.
+## Daily operation
 
-## What is installed
+The **Kodi stable update watcher** runs at 11:37 UTC daily, on manual dispatch,
+and on infrastructure updates on `main`. It reads official `xbmc/xbmc` releases,
+checks numeric versions, resolves the release tag to a full commit SHA and
+rejects drafts, alpha/beta/RC releases and nightlies. A changed pinned tag is an
+error requiring investigation, not an update silently accepted.
 
-* **Kodi stable update watcher** runs daily at 11:37 UTC, on manual dispatch and on
-  infrastructure changes on `main`. It checks official `xbmc/xbmc` releases,
-  verifies tags resolve to full commit hashes, excludes drafts/prereleases/nightlies,
-  compares versions numerically, and checks the pinned base tag for movement.
-* New stable releases get disposable source analysis, a collision map, replay
-  results, and one GitHub issue mentioning/assigning the repository owner.
-  Closed issues are remembered: there is no daily repeated alert for the same tag.
-  Normal GitHub notification preferences determine email/mobile delivery.
-* **Source port lab** accepts a specific official release tag. Prerelease source
-  analysis is possible only with explicit opt-in. There is no automatic beta adoption.
-* **Infrastructure checks** test filtering, conflict handling and isolation, then
-  reconstruct shipped RC3 on Kodi 21.3 and verify a same-base patch round-trip.
+A new stable release gets a disposable source comparison and patch replay.
+The result produces one notification mentioning `@mahfouzhassine8-ops` in the
+conversation of **maintenance PR #6**, including a link to the analysis run.
+This repository has Issues disabled. PR conversation comments work without
+changing that administrative setting. Alerts continue after PR #6 is merged.
+Keep that discussion unlocked and retain its Actions-owned comment markers.
+Only Actions-owned comments suppress duplicates; unrelated comments cannot.
 
-No workflow here runs Gradle, CMake builds, signing, installation, branch pushes,
-merges, app updates, or lock promotion. The only automatic write is a notification
-issue. A green workflow is NOT an APK compatibility certificate.
+The first successful watcher run posts a clearly labelled **setup confirmation**
+once. That is not a new Kodi update. Normal GitHub account notification preferences
+determine email/mobile delivery; there is no new in-app update popup.
+Network/API/pagination failures fail visibly rather than reporting no updates.
+Ambiguous POST failures are not retried blindly; the next run checks history first.
 
-## Exact current baseline
+## Exact protected app
 
-* Kodi `21.3-Omega`, commit `a3a448d26b8d560a65655dab2cd122994dc4e146`.
-* RC3 source `5f7d9b311568cca053d9c0e082463baca1bd99e0`, run `35071438615`,
-  APK versionCode `2103138`. Use the full hash in `baseline.json` (including its
-  final digit), not the historically truncated hash in a chat message.
-* External skin **1.0.5.141**, Health Center **2.5.6**: fingerprinted and unchanged.
-* Other companion versions are not fully inventoried in this lock. Capture the
-  device's complete companion inventory before an actual migration; don't guess.
-* Other concurrent RC3/UI-runtime branches are deliberately not merged or selected.
+`baseline.json` pins Kodi `21.3-Omega` at
+`a3a448d26b8d560a65655dab2cd122994dc4e146`, the shipped RC3 source at
+`5f7d9b311568cca053d9c0e082463baca1bd99e0` (run `35071438615`), external
+skin **1.0.5.141**, and Health Center **2.5.6**, including full artifact hashes.
+The current app source is NOT the older `main` branch. Other branches also called
+RC3 are not substitutes. The real RC3 APK hash ends in `829`; an earlier chat
+message accidentally omitted its final digit. Use the full manifest hash.
+Other companion versions are not fully inventoried here. Capture the target
+device's complete companion inventory before an actual migration; do not guess.
 
-## How source migration works
+## Source-port process
 
-1. Check out the exact pinned Infinity recipe in a fresh temporary directory.
-2. Check out untouched pinned Kodi 21.3. Run the audited SOURCE transforms in the
-   same order as RC3, but omit the native/Android build and APK packaging steps.
-3. Capture eight independently identifiable patch stages, file owners, provenance
-   and checksums. Verify seven golden source hashes from the shipped RC3 artifact,
-   and rerun its existing late-callback lifecycle host regression tests.
-4. Resolve the candidate Kodi tag through the official release record (not its
-   mutable `target_commitish`). Recheck it immediately before source replay.
-5. Compare complete local Git trees; there is no 300-file REST compare truncation.
-   Renames show both old and new paths. Flag direct overlaps and broader API,
-   renderer, player, toolchain, dependency, database and input risk domains.
-6. Replay binary/full-index patches in order using three-way application. Stop at
-   the first conflict; never force `ours`, `theirs`, fuzzy replacement or deletion
-   of an upstream fix. Upload failure logs and identify remaining unapplied stages.
-7. Clean textual replay produces **source only**, never an installable update.
-   JSON and Markdown explicitly mark compatibility/build approval as pending.
+1. Check out clean pinned Kodi 21.3 and the exact pinned RC3 recipe into NEW
+   temporary directories. Existing workspaces are rejected, never deleted.
+2. Run only that recipe's source transforms in the original order. Capture eight
+   full-index/binary patch stages with checksums and file ownership. Check the
+   seven final Android source hashes against the shipped RC3 artifact and run its
+   existing late-callback lifecycle host tests. No native/APK build is invoked.
+3. Compare complete local upstream Git trees, not a potentially truncated REST
+   file list. Renames retain both old and new paths. Report direct overlaps and
+   broader renderer/player/JNI/API/toolchain/database/input compatibility domains.
+4. Replay patches into a disposable candidate worktree. Stop at the FIRST conflict.
+   Never automatically choose ours/theirs or erase an upstream fix to pass a gate.
+5. Clean replay yields SOURCE ONLY. A clean patch is not a compatibility certificate.
+   Same-base infrastructure verification requires exact source-tree round-trip.
 
-The replayed source still contains old package/version metadata by design. It
-must NOT be built/released unchanged and called a new Kodi-based Infinity.
+Outputs include `impact.json`, `ownership.json`, `patch-series.json`, patches,
+receipts, logs and `SUMMARY.md`. A successful replay also produces a source ZIP.
+That ZIP still contains OLD package/version metadata and must not be released
+unchanged as a new Kodi-based Infinity.
 
-## What still requires release-specific engineering
+The **manual source port lab** accepts an exact official release tag, never a branch.
+Prerelease analysis needs explicit opt-in and remains source-only.
 
-There is intentionally **no generic new-Kodi APK builder enabled in v1**. The
-existing RC3 packager reuses a 21.3 engine and resources; using it for Kodi 22 would
-be false versioning and potentially ABI-incompatible. A real engine upgrade needs
-an actual build of that new engine with matched dependencies, resources and JNI.
+## Actual upgrade gates -- deliberately not automatic
 
-For each target, review the impact report and create a release-specific build
-adapter on a separate candidate branch. It must bind to the exact upstream SHA,
-patch-series hashes and final candidate tree. It must:
+There is **no generic new-Kodi APK builder enabled in v1**. The RC3 Android-only
+packager reuses the old Kodi engine; it MUST NOT be used to claim an engine upgrade.
+For each new target, a reviewed release-specific build adapter must bind the exact
+upstream SHA, patch hashes and final source tree. It must select/pin the appropriate
+JDK/SDK/NDK/CMake/dependencies, resolve conflicts, compile the NEW native engine,
+verify matched JNI/resources/manifest/signer, assign a deliberate new versionCode,
+and run the existing test suites. For a new engine its hash SHOULD change.
 
-* choose and pin compatible JDK/SDK/NDK/CMake/FFmpeg/Python/add-on dependencies;
-* resolve each conflict without overwriting upstream fixes;
-* verify native/Java JNI declarations, resources, manifest, package identity and
-  signer; assign a deliberate, monotonic versionCode, not RC3's unchanged value;
-* preserve or port all Infinity capabilities and run the existing test suites;
-* test phone/Fold AND a TV using D-pad only; test Cobra handoff/PiP/Multi-View,
-  lifetime races, pause/resume, Normal/Extended mode, all skin routes and companions;
-* inventory binary/Python add-ons and check Kodi skin/window APIs;
-* use an isolated candidate application/profile or a dedicated test device until
-  acceptance. Do NOT update the user's sole working installation for a smoke test;
-* make a complete user-profile/database backup before any in-place major upgrade.
+Device acceptance includes phone/Fold AND TV remote-only use, playback/audio/subtitles,
+Cobra handoff/PiP/Multi-View/lifetime races, rotation/resume, Normal/Extended background,
+skin navigation/System Hub/Power, Health Center and Python/binary add-ons.
+Use an isolated candidate app/profile or dedicated test device, not the user's sole
+working installation. Back up the complete user profile/databases before any major
+in-place upgrade. An old APK alone does not roll back migrated databases.
 
-A previous APK alone is NOT a guaranteed data rollback after database migration.
-For a NEW engine, its native hash should change. Compare to the approved new build,
-not the old `libkodi.so` hash. Keep the old artifact independently available.
+No workflow here builds/signs/installs APKs, pushes source branches, merges app
+changes, or promotes the locked baseline. The only automatic write is a notification
+comment in PR #6. Baseline promotion requires explicit approval after acceptance.
 
-Only explicit approval after build and device gates allows promotion. Changing
-`baseline.json` is a reviewed release operation, never something the watcher does.
+## Scheduling and recovery
 
-## Operation and limitations
+Schedules run only from the default branch, so merge this infrastructure into `main`
+after its own checks pass. Opening a PR alone does not activate the watcher.
+GitHub may delay scheduled runs or disable public-repository schedules after 60 days
+without repository activity. Check Actions if the daily heartbeat stops; no dummy
+commits or keepalive tricks are used. Workflow artifacts expire after 30 days;
+archive approved migration evidence separately. Reconstruction uses pinned Git
+source commits rather than expiring Actions artifacts.
 
-GitHub schedules run only from the default branch. These files must be installed
-on `main` to activate the daily check; merely opening a PR isn't enough.
-Scheduled jobs can be delayed. Public-repository schedules may be disabled after
-60 days without repository activity. Check Actions if the daily heartbeat stops;
-no dummy commits/secret keepalive is used. API failures and exhausted pagination
-fail explicitly; they are never shown as 'no updates'.
-
-Run manually: Actions -> **Infinity | Kodi stable update watcher** -> Run workflow.
-Read the last run's summary / `watch.json` for the last successful check time.
-New-release GitHub issues link to the source impact report and artifacts.
-Artifacts expire after 30 days; archive approved reports/patch series separately
-for long-term retention. Source reconstruction uses pinned Git commits, not
-expired Actions artifacts. The device-side app contains no new update menu.
-
-## Local tests
+Manual check: Actions -> **Infinity | Kodi stable update watcher** -> Run workflow.
+The summary and `watch.json` give the last successful check time and stable version.
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tooling/infinity_upstream -v
@@ -113,12 +100,8 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tooling/infinity_upstr
 python3 tooling/infinity_upstream/port.py --selftest --workspace /tmp/infinity-new-sandbox --out /tmp/infinity-proof
 ```
 
-Reusing an existing workspace is rejected rather than deleting it. Temporary
-source changes never get copied into the actual project or the locked ZIPs.
-
-## Primary references
-
-* Kodi source/build guide: https://github.com/xbmc/xbmc/blob/master/docs/README.Android.md
-* Kodi dependency system: https://github.com/xbmc/xbmc/blob/master/tools/depends/README.md
-* GitHub scheduling: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
-* Releases API: https://docs.github.com/en/rest/releases/releases
+Primary references:
+- https://github.com/xbmc/xbmc/blob/master/docs/README.Android.md
+- https://github.com/xbmc/xbmc/blob/master/tools/depends/README.md
+- https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+- https://docs.github.com/en/rest/releases/releases

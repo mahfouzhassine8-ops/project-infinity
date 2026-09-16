@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 90
     permissions:
       contents: read
-      issues: write
+      pull-requests: write
     env:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
@@ -56,8 +56,8 @@ jobs:
               if result.returncode: failures.append(tag)
           if failures: raise SystemExit('Analysis failed (NOT compatible): '+', '.join(failures))
           PY
-      - name: Notify once per stable release, including analysis failures
-        if: always() && steps.discover.outputs.has_updates == 'true'
+      - name: Notify once per stable release and confirm initial setup
+        if: always() && steps.discover.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 tooling/infinity_upstream/watch.py notify --out upstream-watch
