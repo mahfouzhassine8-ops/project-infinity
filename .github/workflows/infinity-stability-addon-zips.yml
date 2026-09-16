@@ -40,7 +40,7 @@ jobs:
         run: python scripts/package_stability_addons.py
 
       - name: Run stability audit in report mode
-        run: python scripts/infinity_stability_audit.py --output candidate/stability-addons/STABILITY-AUDIT.json
+        run: python scripts/infinity_stability_audit.py --report candidate/stability-addons/STABILITY-AUDIT.json
 
       - uses: actions/upload-artifact@v7
         with:
