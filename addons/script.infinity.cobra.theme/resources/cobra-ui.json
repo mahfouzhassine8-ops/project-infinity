@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "runtime": {
     "minimum_runtime": 3,
     "scope": "cobra-live-only"
@@ -20,12 +20,12 @@
     "mobile": {
       "preview_first": true,
       "preview_aspect": "16:9",
-      "channel_row_height_dp": 78,
+      "channel_row_height_dp": 72,
       "category_control": "chips_and_picker",
       "bottom_navigation": true,
-      "channel_primary_action": "play",
+      "channel_primary_action": "preview_then_fullscreen",
       "channel_long_press_action": "context_sheet",
-      "context_actions": ["favorite", "record_when_supported", "channel_guide", "channel_info", "source_info", "hide_when_supported"]
+      "context_actions": ["favorite", "record", "channel_guide", "channel_info", "source_info"]
     },
     "tv_guide": {
       "timeline": true,
@@ -46,11 +46,12 @@
     "rounded_surfaces": true,
     "focus_ring": true,
     "portrait_category_height_dp": 58,
-    "guide_channel_width_dp": 128,
-    "guide_program_width_dp": 210,
-    "guide_row_height_dp": 68,
-    "guide_header_height_dp": 54,
-    "mobile_preview_height_dp": 220,
+    "guide_channel_width_dp": 152,
+    "guide_program_width_dp": 220,
+    "guide_row_height_dp": 66,
+    "guide_header_height_dp": 52,
+    "guide_preview_height_dp": 190,
+    "mobile_preview_height_dp": 230,
     "mobile_navigation_height_dp": 64
   }
 }
