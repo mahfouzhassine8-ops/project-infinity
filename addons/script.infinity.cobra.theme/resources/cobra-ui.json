@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "runtime": {
     "minimum_runtime": 3,
     "scope": "cobra-live-only"
@@ -13,6 +13,11 @@
     "renderer": "native",
     "provider_playback": "native",
     "infinity_handoff": "native"
+  },
+  "appearance": {
+    "default": "dark",
+    "modes": ["system", "light", "dark", "oled"],
+    "player_overlay": "dark"
   },
   "views": {
     "default": "mobile",
