@@ -14,5 +14,43 @@
   "guide_row_height": 98,
   "touch_target": 60,
   "rail_item_height": 54,
-  "motion_ms": 190
+  "motion_ms": 190,
+  "palettes": {
+    "dark": {
+      "background": "#01050B",
+      "rail": "#06111E",
+      "panel": "#091726",
+      "panel2": "#0C2034",
+      "focus": "#095FD8",
+      "accent": "#24B7FF",
+      "accent_soft": "#7BD6FF",
+      "text": "#F5FAFF",
+      "muted": "#8FA7BD",
+      "line": "#1B3852"
+    },
+    "light": {
+      "background": "#F5F7FB",
+      "rail": "#FFFFFF",
+      "panel": "#FFFFFF",
+      "panel2": "#EAF0F6",
+      "focus": "#0B63CE",
+      "accent": "#0B7FDB",
+      "accent_soft": "#2A8BD8",
+      "text": "#101722",
+      "muted": "#5F6F80",
+      "line": "#CBD6E2"
+    },
+    "oled": {
+      "background": "#000000",
+      "rail": "#000000",
+      "panel": "#050505",
+      "panel2": "#0A0A0A",
+      "focus": "#095FD8",
+      "accent": "#24B7FF",
+      "accent_soft": "#7BD6FF",
+      "text": "#FFFFFF",
+      "muted": "#A8B7C6",
+      "line": "#1D2730"
+    }
+  }
 }
