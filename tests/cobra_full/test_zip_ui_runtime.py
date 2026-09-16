@@ -13,23 +13,46 @@ import infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix as matcher_fix
 
 
 class CobraZipUiRuntimeMatcherTests(unittest.TestCase):
+    def _replacement(self) -> str:
+        return (
+            '    int railWidth = "drawer".equals(mUi.navigationMode)\n'
+            "        ? dp(isPortrait() ? mUi.drawerPortraitWidthDp : mUi.drawerLandscapeWidthDp)\n"
+            "        : (isCompact() ? dp(104) : isMedium() ? dp(132) : dp(156));"
+        )
+
     def test_post_parity_navigation_width_matcher(self) -> None:
         source = (
             "before\n"
             "    int railWidth = isCompact() ? dp(104) : isMedium() ? dp(132) : dp(156);\n"
             "after\n"
         )
-        replacement = (
-            '    int railWidth = "drawer".equals(mUi.navigationMode)\n'
-            "        ? dp(isPortrait() ? mUi.drawerPortraitWidthDp : mUi.drawerLandscapeWidthDp)\n"
-            "        : (isCompact() ? dp(104) : isMedium() ? dp(132) : dp(156));"
-        )
-        result = matcher_fix._replace_navigation_width(source, replacement)
+        result = matcher_fix._replace_navigation_width(source, self._replacement())
         self.assertIn("mUi.drawerPortraitWidthDp", result)
         self.assertNotIn(
             "int railWidth = isCompact() ? dp(104) : isMedium() ? dp(132) : dp(156);",
             result,
         )
+
+    def test_full_candidate_template_navigation_width_matcher(self) -> None:
+        # The full APK pipeline can expose the pre-parity Candidate 2 expression
+        # at the late UI injection boundary. Runtime v3 must not depend on one
+        # historical width formula.
+        source = (
+            "before\n"
+            "    int railWidth = isCompact() ? dp(108) : dp(156);\n"
+            "after\n"
+        )
+        result = matcher_fix._replace_navigation_width(source, self._replacement())
+        self.assertIn("mUi.drawerLandscapeWidthDp", result)
+        self.assertNotIn("isCompact() ? dp(108) : dp(156)", result)
+
+    def test_navigation_width_matcher_rejects_ambiguous_source(self) -> None:
+        source = (
+            "    int railWidth = dp(108);\n"
+            "    int railWidth = dp(156);\n"
+        )
+        with self.assertRaisesRegex(RuntimeError, "found 2"):
+            matcher_fix._replace_navigation_width(source, self._replacement())
 
     def test_default_ui_package_preserves_candidate2_destinations_and_player(self) -> None:
         ui = json.loads(

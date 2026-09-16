@@ -2,11 +2,14 @@
 '''Compatibility repair for the Cobra ZIP-driven UI runtime v3 source transform.
 
 The Runtime v3 contract itself remains version 3. This module only repairs the
-build-time matcher used after Candidate 2 device-parity has rewritten Cobra's
-responsive rail width. It also keeps the runtime's no-package fallback aligned
-with the already-approved Cobra player layout.
+build-time navigation-width anchor used after Candidate 2's source transforms.
+The anchor deliberately targets the single local ``railWidth`` declaration
+rather than one historical expression, so approved presentation transforms can
+change the responsive formula without breaking the Runtime v3 injection.
 '''
 from __future__ import annotations
+
+import re
 
 import infinity_1_0_9_cobra_zip_ui_runtime as base
 
@@ -14,19 +17,21 @@ import infinity_1_0_9_cobra_zip_ui_runtime as base
 RUNTIME = base.RUNTIME
 UI_PATH = base.UI_PATH
 
-_POST_PARITY_RAIL_WIDTH = (
-    "    int railWidth = isCompact() ? dp(104) : isMedium() ? dp(132) : dp(156);\n"
+_RAIL_WIDTH_DECL = re.compile(
+    r"^[ \t]*int railWidth[ \t]*=[^;]+;[ \t]*$",
+    re.MULTILINE,
 )
 
 
 def _replace_navigation_width(text: str, replacement: str) -> str:
-    count = text.count(_POST_PARITY_RAIL_WIDTH)
-    if count != 1:
+    matches = list(_RAIL_WIDTH_DECL.finditer(text))
+    if len(matches) != 1:
         raise RuntimeError(
-            "Cobra ZIP UI runtime navigation width: expected exactly one post-parity "
-            f"match, found {count}"
+            "Cobra ZIP UI runtime navigation width: expected exactly one final "
+            f"railWidth declaration, found {len(matches)}"
         )
-    return text.replace(_POST_PARITY_RAIL_WIDTH, replacement + "\n", 1)
+    match = matches[0]
+    return text[:match.start()] + replacement + text[match.end():]
 
 
 def patch(java: str) -> str:
