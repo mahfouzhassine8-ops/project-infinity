@@ -1,0 +1,177 @@
+name: Infinity | RC3 Cobra UI Frontend v2
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-rc3-cobra-runtime-v3-install-fix]
+    paths:
+      - '.github/workflows/infinity-rc3-cobra-ui-frontend-v2.yml'
+      - 'scripts/infinity_cobra_ui_frontend_matcher_fix.py'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-rc3-cobra-ui-frontend-v2-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-update:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Verify exact signed native baseline
+        run: |
+          mkdir -p background-rollback background-candidate preflight
+          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
+          echo '8ef45e9c54a79e2295e295ce1fcdd3430322a0049c7ff5227804c15aed6b4c57  background-rollback/Infinity-Run40-Exact-Base.apk' | sha256sum -c -
+      - name: Reconstruct RC3 Android source without native rebuild
+        run: |
+          bash scripts/infinity_live_app_ci_1.sh
+          mkdir -p engine/background-preimage/tools/android/packaging engine/background-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/background-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/background-preimage/cmake/scripts/android/
+          git -C kodi diff --binary -- xbmc > engine/native-before.patch
+          python3 scripts/infinity_background_resume.py --source kodi --receipt engine/background-resume-source.json
+          python3 scripts/infinity_background_control_bridge.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
+          mkdir -p engine/lifecycle-preimage/tools/android/packaging engine/lifecycle-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/lifecycle-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/lifecycle-preimage/cmake/scripts/android/
+          python3 scripts/infinity_cobra_async_lifecycle.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
+          python3 tests/infinity_background/test_async_lifecycle.py --before engine/lifecycle-preimage/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --after kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out preflight/lifecycle-races
+          git -C kodi diff --binary -- xbmc > engine/native-after-rc3.patch
+          cmp engine/native-before.patch engine/native-after-rc3.patch
+      - name: Import Runtime v3 and apply hardened UI frontend
+        run: |
+          base="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${RUNTIME_COMMIT}"
+          for f in infinity_1_0_9_cobra_approved_ui.py infinity_1_0_9_cobra_zip_ui_runtime.py infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix.py apply_cobra_approved_ui.py; do
+            curl -fsSL "$base/scripts/$f" -o "scripts/$f"
+          done
+          python3 -m py_compile \
+            scripts/infinity_1_0_9_cobra_approved_ui.py \
+            scripts/infinity_1_0_9_cobra_zip_ui_runtime.py \
+            scripts/infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix.py \
+            scripts/apply_cobra_approved_ui.py \
+            scripts/infinity_cobra_ui_frontend.py \
+            scripts/infinity_cobra_ui_frontend_matcher_fix.py
+          python3 scripts/apply_cobra_approved_ui.py --source kodi
+          python3 scripts/infinity_cobra_ui_frontend_matcher_fix.py --source kodi
+          JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          for token in \
+            'COBRA_UI_RUNTIME = 3' \
+            'INSTALL COBRA UI PACKAGE' \
+            'REQUEST_COBRA_UI_PACKAGE = 4173' \
+            'showGuideGrid()' \
+            'showGuideCompact()' \
+            'showGuideFocus()' \
+            'CATEGORY  •  ' \
+            'ScrollView settingsScroll' \
+            'submitCobraIo(() ->' \
+            'publishCobraUi(() ->' \
+            'isCobraAsyncAlive()'; do
+            grep -Fq "$token" "$JAVA" || { echo "Missing Cobra UI frontend token: $token" >&2; exit 1; }
+          done
+          git -C kodi diff --binary -- xbmc > engine/native-after-ui-frontend.patch
+          cmp engine/native-before.patch engine/native-after-ui-frontend.patch
+      - name: Promote install identity above Runtime v3 RC3
+        run: |
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          RELEASE='1.0.9-Cobra-UI-Frontend-RC3'
+          VERSION=2103140
+          gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
+          text=gradle.read_text()
+          assert text.count('versionCode 2103138') == 1
+          assert text.count('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"') == 1
+          text=text.replace('versionCode 2103138',f'versionCode {VERSION}',1)
+          text=text.replace('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"',f'versionName "{RELEASE}"',1)
+          gradle.write_text(text)
+          receipt=Path('engine/background-resume-source.json')
+          row=json.loads(receipt.read_text())
+          for rel in ('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in','tools/android/packaging/xbmc/build.gradle.in'):
+              row['files'][rel]['after']=hashlib.sha256((Path('kodi')/rel).read_bytes()).hexdigest()
+          row.update(version_code=VERSION,version_name=RELEASE,cobra_ui_runtime=3,
+                     rc3_lifecycle_preserved=True,cobra_ui_package_installer=True,
+                     cobra_guide_view_modes=['grid','compact','cards','focus'],
+                     portrait_category_picker=True)
+          receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
+          constants=Path('scripts/infinity_background_resume.py')
+          c=constants.read_text()
+          assert c.count('VERSION_CODE = 2103138') == 1
+          assert c.count("RELEASE = '1.0.9-Infinity-Lifecycle-Repair-RC3'") == 1
+          c=c.replace('VERSION_CODE = 2103138',f'VERSION_CODE = {VERSION}',1)
+          c=c.replace("RELEASE = '1.0.9-Infinity-Lifecycle-Repair-RC3'",f"RELEASE = '{RELEASE}'",1)
+          constants.write_text(c)
+          pack=Path('scripts/package_background_resume.py')
+          p=pack.read_text()
+          old='Infinity-1.0.9-Infinity-Lifecycle-Repair-RC3'
+          assert p.count(old) >= 1
+          p=p.replace(old,'Infinity-'+RELEASE)
+          pack.write_text(p)
+          PY
+      - name: Compile Android shell only, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir cobra-ui-frontend-build --out background-candidate
+          APK=background-candidate/Infinity-1.0.9-Cobra-UI-Frontend-RC3.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee background-candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103140' versionName='1.0.9-Cobra-UI-Frontend-RC3'" background-candidate/badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee background-candidate/signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
+          out=Path('background-candidate/Infinity-1.0.9-Cobra-UI-Frontend-RC3.apk')
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(out) as b:
+              libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
+              assert libs
+              for n in libs:
+                  assert n in b.namelist(), n
+                  assert hashlib.sha256(a.read(n)).digest()==hashlib.sha256(b.read(n)).digest(), n
+              joined=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              for token in (b'INSTALL COBRA UI PACKAGE',b'cobra-ui.json',b'Cobra Guide view',b'Choose category'):
+                  assert token in joined, token
+          print('PASS: UI frontend shell signed; exact native libraries preserved')
+          PY
+          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-UI-Frontend-RC3.sha256
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Theme-1.2.0-Fast-Preview
+          run-id: 35071453361
+          github-token: ${{ github.token }}
+          path: ui-package
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-RC3-Cobra-UI-Frontend-v2
+          path: |
+            background-candidate/
+            ui-package/
+            engine/background-resume-source.json
+            preflight/lifecycle-races/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
