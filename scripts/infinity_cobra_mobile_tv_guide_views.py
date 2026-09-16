@@ -437,7 +437,7 @@ def patch(java: str) -> str:
 
 '''
     java = replace_between(java, "  private void showGuideGrid() {\n", "  private void showGuideCompact() {\n",
-                           guide_grid + "  private void showGuideCompact() {\n", "TV Guide grid")
+                           guide_grid, "TV Guide grid")
 
     # Long-press must be useful everywhere a legacy browser can still be reached.
     legacy_long = '''    row.setOnLongClickListener(v -> {
@@ -499,6 +499,8 @@ def verify(java: str) -> None:
     for token in required:
         if token not in java:
             raise RuntimeError("Missing Mobile/Guide contract: " + token)
+    if java.count("  private void showGuideCompact() {") != 1:
+        raise RuntimeError("TV Guide replacement duplicated showGuideCompact boundary")
     if 'COBRA VIEW  •  ' in java:
         raise RuntimeError("Primary Mobile/TV Guide selector is still buried in Settings")
 
