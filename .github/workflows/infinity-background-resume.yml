@@ -5,6 +5,12 @@ on:
     branches: [infinity-cobra-background-resume-rc1]
     paths:
       - '.github/workflows/infinity-background-resume.yml'
+      - 'patches/infinity-background/**'
+      - 'scripts/infinity_background_resume.py'
+      - 'scripts/package_background_resume.py'
+      - 'tests/infinity_background/**'
+      - 'stability/background-resume-preimage.json'
+      - 'docs/background-resume-rc1.md'
 permissions:
   contents: read
   actions: read
@@ -12,9 +18,9 @@ concurrency:
   group: infinity-background-resume-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  audit:
+  android-update:
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       NDK_VER: 21.4.7075529
     steps:
@@ -30,21 +36,62 @@ jobs:
           packages: platform-tools
       - name: Preserve exact source snapshots
         run: |
-          mkdir -p background-audit
-          git archive --format=zip --output=background-audit/baseline-source.zip 2674c05e605afbf19a2fe54bdab1a552e76ec394
-          git archive --format=zip --output=background-audit/postponed-background-source.zip 7abb31b47756f2faf4e8688e515f8cb52a40565f
-          sha256sum background-audit/*-source.zip > background-audit/source-sha256.txt
-      - name: Reconstruct and test successful APK source without native rebuild
-        run: bash scripts/infinity_live_app_ci_1.sh
-      - name: Export Android source for isolated background audit
-        if: success()
+          mkdir -p background-rollback background-candidate
+          git archive --format=zip --output=background-rollback/base-source.zip 2674c05e605afbf19a2fe54bdab1a552e76ec394
+          git archive --format=zip --output=background-rollback/postponed-source.zip 7abb31b47756f2faf4e8688e515f8cb52a40565f
+          git archive --format=zip --output=background-candidate/candidate-source.zip "$GITHUB_SHA"
+          sha256sum background-rollback/*zip > background-rollback/source-sha256.txt
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Verify and preserve exact signed engine baseline
         run: |
-          zip -q -r background-audit/android-source.zip kodi/tools/android/packaging/xbmc kodi/cmake/scripts/android/Install.cmake engine preflight
-          cp "$ANDROID_HOME/platforms/android-35/android.jar" background-audit/android-35.jar
+          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
+          echo '8ef45e9c54a79e2295e295ce1fcdd3430322a0049c7ff5227804c15aed6b4c57  background-rollback/Infinity-Run40-Exact-Base.apk' | sha256sum -c -
+          cp run40/candidate/live-app-shell-engine.json background-rollback/
+      - name: Reconstruct and validate accepted source — no native rebuild
+        run: bash scripts/infinity_live_app_ci_1.sh
+      - name: Apply isolated background source and verify preservation
+        run: |
+          mkdir -p engine/background-preimage/tools/android/packaging engine/background-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/background-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/background-preimage/cmake/scripts/android/
+          git -C kodi diff --binary -- xbmc > engine/native-before.patch
+          python3 scripts/infinity_background_resume.py --source kodi --receipt engine/background-resume-source.json
+          python3 tests/infinity_background/test_preservation.py --before engine/background-preimage --after kodi
+          git -C kodi diff --binary -- xbmc > engine/native-after.patch
+          cmp engine/native-before.patch engine/native-after.patch
+      - name: Background service and player behavior tests
+        run: |
+          python3 tests/infinity_background/test_background.py --source kodi --out preflight/background --android-jar "$ANDROID_HOME/platforms/android-35/android.jar"
+          python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/background-rotation
+      - name: Compile Android shell, retain exact engine, permanently sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir background-android-build --out background-candidate
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Background-Resume-Source-Audit
-          path: background-audit/
+          name: Infinity-Background-Resume-RC1
+          path: |
+            background-candidate/
+            engine/background-resume-source.json
+            preflight/background/
+            preflight/background-rotation/
           if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Background-Resume-Exact-Rollback
+          path: background-rollback/
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 90
