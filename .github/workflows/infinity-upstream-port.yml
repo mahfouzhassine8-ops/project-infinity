@@ -1,0 +1,56 @@
+name: Infinity | Kodi source port lab (no APK)
+on:
+  workflow_dispatch:
+    inputs:
+      target_tag:
+        description: 'Exact official Kodi release tag, for example 21.3-Omega. Never a branch.'
+        required: true
+        type: string
+      allow_prerelease:
+        description: 'Explicitly allow an alpha/beta/RC for SOURCE ANALYSIS ONLY'
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: infinity-upstream-manual-port
+  cancel-in-progress: false
+jobs:
+  source-analysis:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Validate exact official release and resolve immutable commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_TAG: ${{ inputs.target_tag }}
+          ALLOW_PRERELEASE: ${{ inputs.allow_prerelease }}
+        run: |
+          args=()
+          if [ "$ALLOW_PRERELEASE" = true ]; then args+=(--allow-prerelease); fi
+          python3 tooling/infinity_upstream/watch.py resolve --tag "$TARGET_TAG" "${args[@]}" --out upstream-port
+      - name: Source-only tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y git patch imagemagick fonts-dejavu-core openjdk-17-jdk-headless
+      - name: Replay Infinity patches and report every direct overlap (NO COOK)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tooling/infinity_upstream/port.py --target-file upstream-port/target.json --workspace "$RUNNER_TEMP/infinity-port-manual" --out upstream-port
+      - name: Report pending review gates
+        if: always()
+        run: |
+          if test -f upstream-port/SUMMARY.md; then cat upstream-port/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: Infinity-Kodi-Source-Port-Report
+          path: upstream-port/
+          if-no-files-found: warn
+          retention-days: 30

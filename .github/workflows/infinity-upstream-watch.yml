@@ -1,0 +1,77 @@
+name: Infinity | Kodi stable update watcher
+on:
+  schedule:
+    - cron: '37 11 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['tooling/infinity_upstream/**', '.github/workflows/infinity-upstream-watch.yml']
+permissions:
+  contents: read
+concurrency:
+  group: infinity-kodi-stable-release-watch
+  cancel-in-progress: false
+jobs:
+  watch:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Watcher safety tests
+        run: python3 -m unittest discover -s tooling/infinity_upstream -v
+      - name: Check official stable releases (never nightlies/betas)
+        id: discover
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tooling/infinity_upstream/watch.py discover --out upstream-watch
+      - name: Install analysis tools only when a new stable release exists
+        if: steps.discover.outputs.has_updates == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y git patch imagemagick fonts-dejavu-core openjdk-17-jdk-headless
+      - name: Analyze new releases in disposable source sandboxes (NO BUILD)
+        if: steps.discover.outputs.has_updates == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess, sys
+          root=pathlib.Path('upstream-watch')
+          updates=json.loads((root/'watch.json').read_text())['new_stable_updates']
+          failures=[]
+          for target in updates:
+              tag=target['tag']
+              result=subprocess.run([sys.executable,'tooling/infinity_upstream/port.py',
+                  '--target-file',str(root/(tag+'.target.json')),
+                  '--workspace',str(pathlib.Path(os.environ['RUNNER_TEMP'])/('infinity-port-'+tag)),
+                  '--out',str(root/tag)],check=False)
+              if result.returncode: failures.append(tag)
+          if failures: raise SystemExit('Analysis failed (NOT compatible): '+', '.join(failures))
+          PY
+      - name: Notify once per stable release and confirm initial setup
+        if: always() && steps.discover.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tooling/infinity_upstream/watch.py notify --out upstream-watch
+      - name: Daily heartbeat and result
+        if: always()
+        run: |
+          if test -f upstream-watch/SUMMARY.md; then cat upstream-watch/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"; fi
+          for report in upstream-watch/*/SUMMARY.md; do
+            if test -f "$report"; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: Infinity-Kodi-Update-Watch
+          path: upstream-watch/
+          if-no-files-found: warn
+          retention-days: 30

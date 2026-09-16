@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "id": "infinity-21.3-rc3-skin141-hc256",
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "upstream": {
+    "repository": "xbmc/xbmc",
+    "tag": "21.3-Omega",
+    "commit": "a3a448d26b8d560a65655dab2cd122994dc4e146",
+    "version": [
+      21,
+      3,
+      0
+    ]
+  },
+  "runtime": {
+    "repository": "mahfouzhassine8-ops/project-infinity",
+    "source_branch_for_reference_only": "infinity-lifecycle-repair-rc3",
+    "source_commit": "5f7d9b311568cca053d9c0e082463baca1bd99e0",
+    "source_run_id": 35071438615,
+    "source_artifact_id": 10436890714,
+    "version_code": 2103138,
+    "package_name": "com.projectinfinity.kodi",
+    "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "native_engine_sha256": "9783527356ec108fb3bdd61213dc6c7af9b227da3b81051163aa893a9fa358d0",
+    "source_receipt_sha256": {
+      "cmake/scripts/android/Install.cmake": "c4ef0ab5cc6ea5e577b7857b94e1594ed81f83fab83d7ebc75e0006910e53fb0",
+      "tools/android/packaging/xbmc/AndroidManifest.xml.in": "eeef97b36f64711c9c5e545f0b969e4a5041378a0c1875b0be161bc3ec17c138",
+      "tools/android/packaging/xbmc/build.gradle.in": "518a7655bf491b6eb6261e1286fe457f5ab7ec44a3cdf48f6f043a83c95b63dc",
+      "tools/android/packaging/xbmc/src/InfinityBackgroundControlActivity.java.in": "f01dcfdb05dc3a71155c2ba1c64382620c4788551c68a5bd15fa9d0f34b777d4",
+      "tools/android/packaging/xbmc/src/InfinityExtendedBackgroundService.java.in": "bb603dd85dcdf07d4b355d8cee06148ad22a4dd1e0984f4ce4afe7e3ecb14bcc",
+      "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in": "89160ac6e5f532faf5963fb34012afa3db55297d2673e755f0c248f4eee9e5d2",
+      "tools/android/packaging/xbmc/src/Main.java.in": "ddf18d30c4040369b30e861ded588a53846ff3de319a89a219344771f8db9318"
+    },
+    "other_rc3_branches_are_not_substitutes": true
+  },
+  "protected_artifacts": {
+    "skin": {
+      "filename": "Infinity-Skin-1.0.5.141-Final-Visual-Convergence-Official-Lock.zip",
+      "sha256": "c300da2f1ba47e19d5fe0e0c9f4928a3ac046afe6d12afdce3d4200dd2e99ff9",
+      "bytes": 52207532
+    },
+    "health_center": {
+      "filename": "KodiHealthCenter_2.5.6-Dashboard-Double-Popup-Fix-Official-Lock.zip",
+      "sha256": "7988cc82ebe5bfd9346862bb13dc74ebb7107cbad8973efaa84a946a910b4101",
+      "bytes": 99170
+    },
+    "apk": {
+      "filename": "Infinity-1.0.9-Infinity-Lifecycle-Repair-RC3.apk",
+      "sha256": "202246685314324514ccd919a1521f187fdf6285c77d0622a2d481deb3aa7829",
+      "bytes": 92020886
+    }
+  },
+  "companions": {
+    "skin": "1.0.5.141",
+    "health_center": "2.5.6",
+    "others": "Preserve installed companion versions; not all versions have an exact manifest in this lock. Inventory the target device before migration."
+  },
+  "policy": {
+    "stable_only": true,
+    "automatic_native_build": false,
+    "automatic_install": false,
+    "automatic_merge": false,
+    "automatic_baseline_promotion": false,
+    "replay_is_not_compatibility_proof": true,
+    "source_only_sandbox": true
+  },
+  "candidate_build": {
+    "enabled": false,
+    "reason": "Each new Kodi release requires a reviewed toolchain/build adapter, JNI/resource/manifest checks, unique candidate identity, device acceptance and profile backup before install. RC3 Android-only repackaging MUST NOT be used to claim a Kodi engine upgrade."
+  },
+  "device_acceptance": [
+    "phone-fold",
+    "android-tv-dpad",
+    "playback-seek-audio-subtitles",
+    "cobra-handoff-pip-multiview",
+    "cobra-late-callback-lifecycle",
+    "normal-extended-background",
+    "rotation-resume",
+    "skin141-umbrella-navigation-power",
+    "healthcenter256-fresh-baseline",
+    "addons-python-binary-api",
+    "profile-database-upgrade-backup"
+  ]
+}
