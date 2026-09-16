@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.infinity.cobra.theme"
-       name="Infinity Cobra Theme"
-       version="1.1.0"
+       name="Infinity Cobra Mobile + TV Guide"
+       version="1.3.0"
        provider-name="Infinity">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
   <extension point="xbmc.python.module" library="lib"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Fast visual contract for the Cobra experience inside Infinity.</summary>
-    <description lang="en_GB">Provides responsive theme, focus, touch-target and motion tokens read by the native Cobra Live Activity so visual tuning can ship as a small Kodi add-on ZIP instead of rebuilding the APK.</description>
+    <summary lang="en_GB">Runtime v3 Mobile and TV Guide presentation contract for Cobra.</summary>
+    <description lang="en_GB">Provides the locked Cobra Mobile View and TV Guide View presentation contract while preserving native playback, renderer, rotation, Fold, background/resume and Infinity handoff ownership.</description>
     <platform>all</platform>
     <license>GPL-2.0-or-later</license>
   </extension>
