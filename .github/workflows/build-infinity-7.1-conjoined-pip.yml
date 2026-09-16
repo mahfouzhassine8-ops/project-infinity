@@ -1,0 +1,144 @@
+name: Infinity 7.1 Conjoined PiP Candidate A
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - infinity-7.1-core-unified
+    paths:
+      - '.github/workflows/build-infinity-7.1-conjoined-pip.yml'
+      - 'scripts/patch-infinity-tablet-7.0.py'
+      - 'scripts/patch-infinity-7.1-conjoined-pip.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends librsvg2-bin unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download proven Infinity body
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987818547/zip" \
+            -o /tmp/base.zip
+          mkdir -p /tmp/base-art
+          unzip -q /tmp/base.zip -d /tmp/base-art
+          APK=$(find /tmp/base-art -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+          unzip -p /tmp/base.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-before.sha256
+
+      - name: Decode
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/target
+
+      - name: Recreate proven 7.0 lock checkpoint
+        run: python3 scripts/patch-infinity-tablet-7.0.py
+
+      - name: Create 7.0 lock icons
+        run: |
+          set -euo pipefail
+          SKIN=/tmp/target/assets/addons/skin.estuary
+          mkdir -p "$SKIN/media/osd/fullscreen/buttons"
+          printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14s13 6 13 14v9" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000000"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#000000"/></svg>' > /tmp/lock.svg
+          printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="0 0 74 74"><rect x="14" y="31" width="46" height="35" rx="7" fill="white"/><path d="M24 31V22c0-8 5-14 13-14 6 0 11 3 13 8" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><circle cx="37" cy="47" r="4" fill="#000000"/><rect x="35" y="47" width="4" height="10" rx="2" fill="#000000"/></svg>' > /tmp/unlock.svg
+          rsvg-convert -w 74 -h 74 /tmp/lock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-lock.png"
+          rsvg-convert -w 74 -h 74 /tmp/unlock.svg -o "$SKIN/media/osd/fullscreen/buttons/infinity-unlock.png"
+
+      - name: Apply Standalone-style PiP donor bridge
+        run: python3 scripts/patch-infinity-7.1-conjoined-pip.py
+
+      - name: Verify conjoined boundaries
+        run: |
+          set -euo pipefail
+          MAIN=$(find /tmp/target -path '*/com/projectinfinity/kodi/Main.smali' | head -1)
+          BRIDGE=$(find /tmp/target -path '*/com/projectinfinity/kodi/InfinityCoreBridge.smali' | head -1)
+          test -n "$MAIN"
+          test -n "$BRIDGE"
+
+          # 7.0 lock must survive unchanged.
+          grep -q 'id="7999"' /tmp/target/assets/addons/skin.estuary/xml/VideoOSD.xml
+          test -f /tmp/target/assets/addons/skin.estuary/xml/Custom_1199_InfinityVideoLock.xml
+          test -f /tmp/target/assets/addons/skin.estuary/media/osd/fullscreen/buttons/infinity-lock.png
+          test -f /tmp/target/assets/addons/skin.estuary/media/osd/fullscreen/buttons/infinity-unlock.png
+
+          # Standalone-style PiP lifecycle must be present.
+          grep -q 'setAutoEnterEnabled' "$BRIDGE"
+          grep -q 'setPictureInPictureParams' "$BRIDGE"
+          grep -q 'enterInfinityPictureInPicture' "$BRIDGE"
+          grep -q 'updateInfinityPictureInPictureParams' "$BRIDGE"
+          grep -q 'onUserLeaveHint()V' "$MAIN"
+          grep -q 'android:supportsPictureInPicture="true"' /tmp/target/AndroidManifest.xml
+          grep -q 'android:resizeableActivity="true"' /tmp/target/AndroidManifest.xml
+
+          # Candidate A deliberately removes the 7.0 forced geometry refresh methods.
+          ! grep -q 'infinityRefreshWindow()V' "$MAIN"
+          ! grep -q 'Infinity OLED.xml' <(find /tmp/target/assets/addons/skin.estuary/colors -maxdepth 1 -type f -printf '%f\n')
+          ! grep -q 'Infinity Light.xml' <(find /tmp/target/assets/addons/skin.estuary/colors -maxdepth 1 -type f -printf '%f\n')
+
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/target -o /tmp/Infinity-7.1-Candidate-A-unsigned.apk
+
+      - name: Verify native core unchanged
+        run: |
+          set -euo pipefail
+          unzip -p /tmp/Infinity-7.1-Candidate-A-unsigned.apk lib/arm64-v8a/libkodi.so | sha256sum | awk '{print $1}' > /tmp/lib-after.sha256
+          cmp /tmp/lib-before.sha256 /tmp/lib-after.sha256
+
+      - name: Align and sign
+        env:
+          PASS: infinity${{ github.run_id }}${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          keytool -genkeypair \
+            -keystore /tmp/infinity.keystore \
+            -alias infinity \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PASS" -keypass "$PASS" \
+            -dname "CN=Infinity 7.1 Candidate A, O=Project Infinity, C=US" \
+            >/dev/null 2>&1
+          "$BT/zipalign" -f 4 \
+            /tmp/Infinity-7.1-Candidate-A-unsigned.apk \
+            /tmp/Infinity-7.1-Candidate-A-aligned.apk
+          "$BT/apksigner" sign \
+            --ks /tmp/infinity.keystore \
+            --ks-key-alias infinity \
+            --ks-pass env:PASS \
+            --key-pass env:PASS \
+            --out /tmp/Infinity-7.1-Candidate-A.apk \
+            /tmp/Infinity-7.1-Candidate-A-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-7.1-Candidate-A.apk
+          sha256sum /tmp/Infinity-7.1-Candidate-A.apk > /tmp/Infinity-7.1-Candidate-A.sha256
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-7.1-Candidate-A-Conjoined-PiP-Lock
+          path: |
+            /tmp/Infinity-7.1-Candidate-A.apk
+            /tmp/Infinity-7.1-Candidate-A.sha256
+          retention-days: 30

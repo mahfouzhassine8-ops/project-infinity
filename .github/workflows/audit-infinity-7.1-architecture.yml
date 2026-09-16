@@ -1,0 +1,35 @@
+name: Infinity 7.1 Architecture Audit Inputs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-7.1-core-unified]
+    paths:
+      - '.github/workflows/audit-infinity-7.1-architecture.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Export current source for independent audit without native compilation
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit-inputs
+          git archive --format=tar.gz HEAD > audit-inputs/infinity-source.tar.gz
+          printf 'Infinity source commit: %s\nKodi source commit: a3a448d26b8d560a65655dab2cd122994dc4e146\nSource-only snapshot. No engine compilation or signing credentials exported.\n' "$SOURCE_SHA" > audit-inputs/PROVENANCE.txt
+          (cd audit-inputs && sha256sum infinity-source.tar.gz > SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-7.1-Architecture-Audit-Inputs
+          path: audit-inputs/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7

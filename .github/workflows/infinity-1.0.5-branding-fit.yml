@@ -1,0 +1,68 @@
+name: Infinity 1.0.5 | portrait-safe splash + corrected sidebar branding
+on:
+  push:
+    branches: [infinity-android-first]
+    paths:
+      - 'scripts/infinity_1_0_5_branding_fit.py'
+      - '.github/workflows/infinity-1.0.5-branding-fit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  branding-fit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - name: Require permanent Infinity signing identity
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing secret: $name" >&2; exit 2; fi
+          done
+      - name: Download frozen RC3
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-RC3-Unsigned-Candidate
+          path: golden
+          run-id: 34316336433
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install visual tooling
+        run: python3 -m pip install --disable-pip-version-check pillow
+      - name: Apply branding fit only
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 scripts/infinity_1_0_5_branding_fit.py golden/Infinity-Android-First-unsigned.apk out/Infinity-1.0.5-BrandingFit-unsigned.apk out/branding-fit.json
+      - name: Permanently sign and verify update
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          echo "$INFINITY_KEYSTORE_B64" | base64 -d > infinity-release.jks
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -f -p 4 out/Infinity-1.0.5-BrandingFit-unsigned.apk out/Infinity-1.0.5-BrandingFit-aligned.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" sign --ks infinity-release.jks --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass "pass:$INFINITY_STORE_PASSWORD" --key-pass "pass:$INFINITY_KEY_PASSWORD" --out out/Infinity-1.0.5-BrandingFit.apk out/Infinity-1.0.5-BrandingFit-aligned.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs out/Infinity-1.0.5-BrandingFit.apk
+          rm -f infinity-release.jks
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.5-BrandingFit-Candidate
+          path: |
+            out/Infinity-1.0.5-BrandingFit.apk
+            out/branding-fit.json
+          retention-days: 90

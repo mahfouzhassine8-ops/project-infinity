@@ -1,0 +1,61 @@
+name: Infinity RC3 Sign-Only Candidate
+run-name: 'Infinity RC3 sign-only | reuse verified run 34316336433'
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/sign-rc3-candidate.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  sign:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - name: Download the already-verified RC3 unsigned candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-RC3-Unsigned-Candidate
+          path: candidate
+          run-id: 34316336433
+          github-token: ${{ github.token }}
+      - name: Sign without rebuilding the engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p signed
+          # Stable retained secrets are used when present. With all four absent,
+          # the audited signer creates an explicitly test-only certificate so we
+          # can exercise the APK without another Kodi engine build.
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-Android-First-unsigned.apk \
+            signed/Infinity-RC3-Test-Signed.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            signed/Infinity-RC3-Test-Signed.apk > signed/apksigner-verification.txt
+          python3 scripts/infinity_mobile_package_check.py \
+            --apk signed/Infinity-RC3-Test-Signed.apk \
+            --report signed/package-check.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC3-Test-Signed-Candidate
+          path: signed/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+          overwrite: true

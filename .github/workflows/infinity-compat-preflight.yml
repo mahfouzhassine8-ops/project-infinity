@@ -1,0 +1,78 @@
+name: Infinity compatibility | diagnostics and resource preflight (not APK)
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-player-protection]
+    paths:
+      - '.github/workflows/infinity-compat-preflight.yml'
+      - 'patches/infinity-compat/**'
+      - 'scripts/infinity_compat_palette.py'
+      - 'scripts/infinity_diagnostics_source.py'
+      - 'scripts/infinity_player_resource_audit.py'
+      - 'addons/script.infinity.support/**'
+      - 'tests/infinity_compat/**'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platforms;android-34'
+      - name: Download actual signed 1.0.6 fixture without rebuilding
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34429870805
+          name: Infinity-1.0.6-Consolidated-Candidate
+          path: baseline
+      - name: Prepare pinned source and verify baseline integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'db85653a1453748dd96f0d6c3e4c0e92693cf1938cb5f42a225067ff6c43af85  baseline/Infinity-1.0.6-Consolidated.apk' | sha256sum -c -
+          python3 -m pip install --disable-pip-version-check pillow
+          git clone --quiet --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity_1_0_6_source.py kodi
+          mkdir -p reports
+      - name: Test diagnostics, bounded exporter and real-APK palette regression
+        shell: bash
+        env:
+          INFINITY_BASELINE_APK: ${{ github.workspace }}/baseline/Infinity-1.0.6-Consolidated.apk
+          INFINITY_PINNED_SOURCE: ${{ github.workspace }}/kodi
+        run: |
+          set -euo pipefail
+          export INFINITY_ANDROID_JAR="$ANDROID_HOME/platforms/android-34/android.jar"
+          test -f "$INFINITY_ANDROID_JAR"
+          python3 -m unittest discover -s tests/infinity_compat -v 2>&1 | tee reports/tests.txt
+          python3 scripts/infinity_player_resource_audit.py "$INFINITY_BASELINE_APK" --output reports/player-boundary-before.json
+          python3 scripts/infinity_compat_palette.py "$INFINITY_BASELINE_APK" "$RUNNER_TEMP/palette-validation-unsigned.apk" --receipt reports/palette.json
+          python3 scripts/infinity_player_resource_audit.py "$RUNNER_TEMP/palette-validation-unsigned.apk" --output reports/player-boundary-after.json
+          python3 scripts/infinity_diagnostics_source.py kodi --receipt reports/diagnostic-source.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('reports/player-boundary-after.json').read_text())
+          assert report['unresolved_definitions'] == []
+          assert report['runtime_protection_implemented'] is False
+          print('Preflight only. Crash cause, full native player isolation and device validation remain pending.')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Compatibility-Preflight-Reports
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30
