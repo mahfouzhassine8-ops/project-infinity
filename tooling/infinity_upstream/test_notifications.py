@@ -8,9 +8,18 @@ import unittest
 from unittest.mock import patch
 from urllib.error import HTTPError, URLError
 import watch
+import port
 
 
 class TransportTests(unittest.TestCase):
+    def test_disposable_git_never_spawns_background_maintenance(self):
+        # Git 2.55 auto maintenance can race TemporaryDirectory cleanup.
+        # Prevent the writer rather than hiding cleanup errors or skipping tests.
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self.assertEqual(port.git(root, 'config', '--get', 'maintenance.auto').strip(), b'false')
+            self.assertEqual(port.git(root, 'config', '--get', 'gc.auto').strip(), b'0')
+
     def test_write_outside_notification_thread_rejected(self):
         for path in ('/repos/xbmc/xbmc/issues', '/repos/'+watch.REPOSITORY+'/issues',
                      '/repos/'+watch.REPOSITORY+'/issues/4/comments', '/repos/'+watch.REPOSITORY+'/git/refs'):

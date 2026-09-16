@@ -46,6 +46,7 @@ def command(argv, cwd=None, check=True, env=None):
 
 def git(root: Path, *args, check=True) -> bytes:
     return command(['git', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false',
+                    '-c', 'maintenance.auto=false', '-c', 'gc.auto=0',
                     *args], cwd=root, check=check).stdout
 
 
