@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Apply the audited Cobra UI Runtime v3 to the reconstructed Android shell."""
 from __future__ import annotations
 
 import argparse
