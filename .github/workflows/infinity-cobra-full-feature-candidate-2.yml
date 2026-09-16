@@ -1,4 +1,4 @@
-# Cobra Live approved UI: collapsible drawer, portrait-first channels, player settings drawer
+# Cobra Live approved UI + ZIP-driven presentation runtime v3
 name: Infinity 1.0.9 | Cobra Full Feature Candidate 2
 
 on:
@@ -10,6 +10,7 @@ on:
       - 'scripts/infinity_live_app_ci_*.sh'
       - 'scripts/infinity_1_0_9_cobra_full*.py'
       - 'scripts/infinity_1_0_9_cobra_approved_ui.py'
+      - 'scripts/infinity_1_0_9_cobra_zip_ui_runtime.py'
       - 'scripts/apply_cobra_approved_ui.py'
       - 'scripts/infinity_1_0_9_cobra_device_parity.py'
       - 'scripts/infinity_1_0_9_cobra_legit.py'
@@ -95,14 +96,19 @@ jobs:
       - name: Preflight full Cobra Candidate 2 contracts
         run: bash scripts/infinity_live_app_ci_1.sh
 
-      - name: Apply approved Cobra UI contract
+      - name: Apply approved Cobra UI + ZIP runtime v3
         run: |
+          python3 -m py_compile scripts/infinity_1_0_9_cobra_zip_ui_runtime.py
           python3 scripts/apply_cobra_approved_ui.py --source kodi
-          grep -Fq 'mRail.setVisibility(View.GONE)' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'COBRA_UI_RUNTIME = 3' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq '.kodi/addons/script.infinity.cobra.theme/resources/cobra-ui.json' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'mUi.destinationEnabled(label)' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'mUi.orderPlayerActions(' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'mUi.orderSettingsActions(' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
           grep -Fq 'showPlayerSettingsDrawer()' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
           grep -Fq 'removeSelectedMultiTile()' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
           grep -Fq 'multiToSingle()' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-          grep -Fq 'button.setFocusableInTouchMode(false)' kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          python3 scripts/package_cobra_theme.py --output candidate/Infinity-Cobra-Theme-1.2.0.zip
 
       - name: Build source-backed Kodi 21.3 + Cobra Full Feature Candidate 2
         id: compile
@@ -132,9 +138,8 @@ jobs:
           path: |
             candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk
             candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.sha256
-            candidate/Infinity-Cobra-Theme-1.1.0.zip
-            candidate/Infinity-Cobra-Theme-1.1.0.zip.sha256
-            candidate/Infinity-Cobra-Theme-1.1.0-fast-update.zip
+            candidate/Infinity-Cobra-Theme-1.2.0.zip
+            candidate/Infinity-Cobra-Theme-1.2.0.zip.sha256
             candidate/signing-verification.txt
             candidate/badging.txt
             candidate/manifest.txt

@@ -5,6 +5,7 @@ import argparse
 from pathlib import Path
 
 import infinity_1_0_9_cobra_approved_ui as approved
+import infinity_1_0_9_cobra_zip_ui_runtime as zip_ui
 
 
 def main() -> None:
@@ -15,8 +16,10 @@ def main() -> None:
     java = live.read_text(encoding="utf-8")
     java = approved.patch(java)
     approved.verify(java)
+    java = zip_ui.patch(java)
+    zip_ui.verify(java)
     live.write_text(java, encoding="utf-8")
-    print("PASS: approved Cobra collapsible-drawer/player/Multi-View UI applied")
+    print("PASS: approved Cobra UI + ZIP-driven runtime v3 applied")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-name: Infinity Cobra | Theme ZIP
+name: Infinity Cobra | UI ZIP
 
 on:
   workflow_dispatch:
@@ -23,15 +23,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Package Cobra visual update
+      - name: Package Cobra UI update
         run: python scripts/package_cobra_theme.py
 
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Cobra-Theme-1.1.0
+          name: Infinity-Cobra-Theme-1.2.0
           path: |
-            candidate/Infinity-Cobra-Theme-1.1.0.zip
-            candidate/Infinity-Cobra-Theme-1.1.0.zip.sha256
+            candidate/Infinity-Cobra-Theme-1.2.0.zip
+            candidate/Infinity-Cobra-Theme-1.2.0.zip.sha256
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
