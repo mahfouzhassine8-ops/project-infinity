@@ -1,4 +1,4 @@
-name: Infinity | Experience Chooser Simplify
+name: Infinity | Experience Card Settings
 on:
   workflow_dispatch:
   push:
@@ -13,7 +13,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-experience-chooser-${{ github.ref }}
+  group: infinity-experience-card-settings-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   android-update:
@@ -117,27 +117,32 @@ jobs:
           grep -Fq 'closeCobraChannelActions()' "$JAVA"
           git -C kodi diff --binary -- xbmc > engine/native-after-task-exit.patch
           cmp engine/native-before.patch engine/native-after-task-exit.patch
-      - name: Apply simplified remembered experience chooser
+      - name: Apply two-card chooser with per-card settings
         run: |
           python3 scripts/infinity_experience_chooser_simplify.py --source kodi
           SPLASH=kodi/tools/android/packaging/xbmc/src/Splash.java.in
-          grep -Fq 'putString(INFINITY_EXPERIENCE_DEFAULT, "infinity")' "$SPLASH"
-          grep -Fq 'putString(INFINITY_EXPERIENCE_DEFAULT, "live")' "$SPLASH"
           grep -Fq 'launchInfinityExperience("infinity")' "$SPLASH"
           grep -Fq 'launchInfinityExperience("live")' "$SPLASH"
+          grep -Fq 'showExperienceCardSettings("infinity")' "$SPLASH"
+          grep -Fq 'showExperienceCardSettings("live")' "$SPLASH"
+          grep -Fq 'setContentDescription("Infinity settings")' "$SPLASH"
+          grep -Fq 'setContentDescription("Cobra settings")' "$SPLASH"
+          grep -Fq 'Remember & launch' "$SPLASH"
+          grep -Fq 'just this time' "$SPLASH"
+          grep -Fq 'Ask every time' "$SPLASH"
+          grep -Fq '.remove(INFINITY_EXPERIENCE_DEFAULT)' "$SPLASH"
           ! grep -Fq 'LAUNCH & REMEMBER' "$SPLASH"
           ! grep -Fq 'JUST THIS TIME' "$SPLASH"
           ! grep -Fq 'Remember my choice' "$SPLASH"
-          ! grep -Fq 'switch experiences later from Settings.' "$SPLASH"
           git -C kodi diff --binary -- xbmc > engine/native-after-chooser.patch
           cmp engine/native-before.patch engine/native-after-chooser.patch
-      - name: Promote presentation runtime to 2103145
+      - name: Promote presentation runtime to 2103146
         run: |
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
-          RELEASE='1.0.9-Experience-Chooser-Simplify'
-          VERSION=2103145
+          RELEASE='1.0.9-Experience-Card-Settings'
+          VERSION=2103146
           gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
           text=gradle.read_text()
           assert text.count('versionCode 2103138') == 1
@@ -162,8 +167,10 @@ jobs:
                      cobra_terminal_back_backgrounds_task=True,
                      infinity_handoff_explicit_toggle_only=True,
                      two_card_experience_chooser=True,
-                     chooser_direct_launch=True,
-                     chooser_auto_remembers_last_selection=True)
+                     chooser_direct_launch_just_this_time=True,
+                     chooser_card_gear_settings=True,
+                     chooser_remember_via_card_settings=True,
+                     chooser_ask_every_time=True)
           receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
 
           constants=Path('scripts/infinity_background_resume.py')
@@ -189,17 +196,17 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir structural-ui-build --out background-candidate
-          APK=background-candidate/Infinity-1.0.9-Experience-Chooser-Simplify.apk
+          APK=background-candidate/Infinity-1.0.9-Experience-Card-Settings.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee background-candidate/badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103145' versionName='1.0.9-Experience-Chooser-Simplify'" background-candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103146' versionName='1.0.9-Experience-Card-Settings'" background-candidate/badging.txt
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee background-candidate/signing.txt
           grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
           python3 - <<'PY'
           import hashlib,zipfile
           from pathlib import Path
           base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
-          out=Path('background-candidate/Infinity-1.0.9-Experience-Chooser-Simplify.apk')
+          out=Path('background-candidate/Infinity-1.0.9-Experience-Card-Settings.apk')
           with zipfile.ZipFile(base) as a, zipfile.ZipFile(out) as b:
               libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
               assert libs
@@ -207,13 +214,13 @@ jobs:
                   assert n in b.namelist(), n
                   assert hashlib.sha256(a.read(n)).digest()==hashlib.sha256(b.read(n)).digest(), n
               joined=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
-              for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'LIVE PREVIEW',b'TAP VIDEO FOR FULLSCREEN',b'Choose Your Experience'):
+              for token in (b'INSTALL COBRA UI PACKAGE',b'MOBILE VIEW',b'TV GUIDE',b'LIVE PREVIEW',b'TAP VIDEO FOR FULLSCREEN',b'Choose Your Experience',b'Infinity settings',b'Cobra settings',b'Remember & launch',b'Ask every time'):
                   assert token in joined, token
               for forbidden in (b'LAUNCH & REMEMBER',b'JUST THIS TIME',b'Remember my choice'):
                   assert forbidden not in joined, forbidden
-          print('PASS: two-card remembered chooser signed; exact native libraries preserved')
+          print('PASS: two-card chooser settings signed; exact native libraries preserved')
           PY
-          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Experience-Chooser-Simplify.sha256
+          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Experience-Card-Settings.sha256
       - name: Package matching Mobile + TV Guide UI 1.3.1
         run: |
           python3 - <<'PY'
@@ -239,7 +246,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Experience-Chooser-Simplify-2103145
+          name: Infinity-Experience-Card-Settings-2103146
           path: |
             background-candidate/
             ui-package/Infinity-Cobra-Mobile-TV-Guide-UI-1.3.1.zip
