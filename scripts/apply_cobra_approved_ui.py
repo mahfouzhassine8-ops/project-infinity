@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 
 import infinity_1_0_9_cobra_approved_ui as approved
-import infinity_1_0_9_cobra_zip_ui_runtime as zip_ui
+import infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix as zip_ui
 
 
 def main() -> None:
@@ -19,7 +19,7 @@ def main() -> None:
     java = zip_ui.patch(java)
     zip_ui.verify(java)
     live.write_text(java, encoding="utf-8")
-    print("PASS: approved Cobra UI + ZIP-driven runtime v3 applied")
+    print("PASS: approved Cobra UI + ZIP-driven runtime v3 matcher repair applied")
 
 
 if __name__ == "__main__":

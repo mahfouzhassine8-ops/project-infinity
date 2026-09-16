@@ -15,7 +15,7 @@
     "scrim": true,
     "portrait_width_dp": 286,
     "landscape_width_dp": 320,
-    "destinations": ["live", "guide", "recordings", "favorites", "search", "discover", "sources", "settings", "infinity"]
+    "destinations": ["live", "guide", "movies", "series", "recordings", "favorites", "search", "multiview", "discover", "sources", "settings", "infinity"]
   },
   "live_browser": {
     "portrait": {
@@ -45,8 +45,8 @@
     "settings_mode": "drawer",
     "settings_edge": "right",
     "settings_width_percent": 86,
-    "primary_actions": ["previous", "favorite", "guide", "record", "multiview", "next"],
-    "settings_actions": ["tracks", "subtitles", "aspect", "cast", "source", "close"]
+    "primary_actions": ["previous", "favorite", "record", "multiview", "next"],
+    "settings_actions": ["tracks", "subtitles", "aspect", "cast", "source", "guide", "multiview", "close"]
   },
   "multiview": {
     "chrome": "floating_bottom_bar",
