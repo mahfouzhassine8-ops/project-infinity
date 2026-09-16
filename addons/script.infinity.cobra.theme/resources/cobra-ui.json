@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "runtime": {
+    "minimum_runtime": 3,
+    "hot_reload": true,
+    "atomic_apply": true,
+    "rollback_on_error": true,
+    "scope": "cobra-live-only"
+  },
+  "navigation": {
+    "mode": "drawer",
+    "collapsed_by_default": true,
+    "auto_collapse_after_action": true,
+    "edge_swipe": true,
+    "scrim": true,
+    "portrait_width_dp": 286,
+    "landscape_width_dp": 320,
+    "destinations": ["live", "guide", "recordings", "favorites", "search", "discover", "sources", "settings", "infinity"]
+  },
+  "live_browser": {
+    "portrait": {
+      "category_mode": "horizontal_chips",
+      "category_height_dp": 58,
+      "channel_width_percent": 100,
+      "channel_row_height_dp": 78,
+      "show_now_next": true
+    },
+    "landscape": {
+      "category_mode": "side_panel",
+      "category_width_dp": 224,
+      "channel_row_height_dp": 72,
+      "show_now_next": true
+    }
+  },
+  "touch": {
+    "single_tap_activate": true,
+    "touch_focus_first": false,
+    "dpad_focus_enabled": true,
+    "minimum_target_dp": 56,
+    "pressed_feedback_ms": 90
+  },
+  "player": {
+    "chrome": "compact_bottom_bar",
+    "auto_hide_ms": 3200,
+    "settings_mode": "drawer",
+    "settings_edge": "right",
+    "settings_width_percent": 86,
+    "primary_actions": ["previous", "favorite", "guide", "record", "multiview", "next"],
+    "settings_actions": ["tracks", "subtitles", "aspect", "cast", "source", "close"]
+  },
+  "multiview": {
+    "chrome": "floating_bottom_bar",
+    "allow_remove_tile": true,
+    "allow_return_to_single": true,
+    "single_view_keeps_selected_tile": true,
+    "reflow_after_remove": true,
+    "minimum_tiles": 1,
+    "maximum_tiles": 4
+  },
+  "responsive": {
+    "compact_max_dp": 599,
+    "medium_max_dp": 839,
+    "portrait_full_width_channels": true,
+    "fold_reflow": true
+  },
+  "protected_contracts": {
+    "rotation": "native",
+    "fold": "native",
+    "background_resume": "native",
+    "renderer": "native",
+    "provider_playback": "native",
+    "infinity_handoff": "native"
+  }
+}
