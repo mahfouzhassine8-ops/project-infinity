@@ -74,7 +74,7 @@ jobs:
         run: |
           mkdir -p kodi-status
           python3 - <<'PY'
-          import json, os
+          import json, os, re
           has_update=os.environ.get('HAS_UPDATE') == 'true'
           cache_hit=os.environ.get('CACHE_HIT') == 'true'
           analysis=os.environ.get('ANALYSIS_RESULT','')
@@ -85,19 +85,25 @@ jobs:
               state='up_to_date'
               summary='Kodi 21.3-Omega is still the latest stable source tracked by Infinity.'
               action='No action needed'
+              export_available=False
           elif cache_hit:
               state='already_analyzed'
               summary=f'{target} was already downloaded, compared and analyzed.'
               action='View latest analysis'
+              export_available=True
           elif analysis == 'success':
               state='analysis_ready'
               summary=f'{target} was downloaded, compared and fast-validated. No Infinity APK was built.'
               action='View analysis'
+              export_available=True
           else:
               state='analysis_blocked'
               summary=f'{target} was detected, but fast source analysis needs review.'
               action='Review analysis'
+              export_available=bool(target)
 
+          safe_tag=re.sub(r'[^A-Za-z0-9._-]','_',target) if target else ''
+          export_name=f'Infinity-Kodi-{safe_tag}-Analysis-Report.zip' if safe_tag else ''
           payload={
               'schema':1,
               'title':'Kodi Update',
@@ -107,6 +113,10 @@ jobs:
               'target_commit':sha,
               'summary':summary,
               'action_label':action,
+              'export_available':export_available,
+              'export_action_label':'Export Analysis ZIP' if export_available else '',
+              'export_default_filename':export_name,
+              'save_destination':'user_selected' if export_available else 'not_applicable',
               'automatic_full_build':False,
               'production_modified':False,
           }
@@ -117,6 +127,8 @@ jobs:
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as s:
               s.write('## Kodi Update\n\n')
               s.write(f"**Status:** {state}\n\n{summary}\n\n")
+              if export_available:
+                  s.write(f"**Portable report:** `{export_name}`\n\n")
               s.write('**Full Infinity APK build:** not started.\n')
           PY
       - uses: actions/upload-artifact@v7.0.1
