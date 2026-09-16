@@ -1,0 +1,22 @@
+--- a/tests/infinity_background/test_background.py
++++ b/tests/infinity_background/test_background.py
+@@ -123,6 +123,8 @@
+                                'com/projectinfinity/kodi/ServiceTest.java': SERVICE_TEST}, 'com.projectinfinity.kodi.ServiceTest')
+     live = (java_root / 'InfinityLiveActivity.java.in').read_text()
+     bodies = '\n'.join(method(live, n) for n in ('startCobraPlayer','rememberAndPauseCobraPlayer','isCurrentCobraPlayer','pauseCobraForBackground','resumeCobraAfterBackground','onStop'))
++    if 'private boolean postCobraDelayed(' in live:
++        bodies += '\n' + method(live, 'isCobraAsyncAlive') + '\n' + method(live, 'postCobraDelayed')
+     a = live.index('  private final Runnable mStallWatchdog =')
+     b = live.index('  private final Runnable mAutoRefresh =',a)
+     watchdog = live[a:b]
+@@ -135,8 +137,9 @@
+  ExoPlayer mPlayer;ExoPlayer[] mMultiPlayers;boolean mBackgroundStopped,pip,finishing;
+  java.util.IdentityHashMap<ExoPlayer,Boolean> mBackgroundResumePlayers=new java.util.IdentityHashMap<>();
+  long mBufferingSince;int mPlaybackRetryCount;
+- class Handler {int posts;void removeCallbacks(Runnable r){}void postDelayed(Runnable r,long n){posts++;}} Handler mMain=new Handler();
++ class Handler {int posts;void removeCallbacks(Runnable r){}boolean postDelayed(Runnable r,long n){posts++;return true;}} Handler mMain=new Handler();
+  boolean isCobraInPictureInPicture(){return pip;}boolean isFinishing(){return finishing;}
++ boolean mAsyncDestroyed=false;final Object mAsyncLock=new Object();boolean isDestroyed(){return false;}
+ ''' + watchdog + bodies + PLAYER_TEST
+     compile_run(out / 'player', {'BackgroundPlayerTest.java':harness}, 'BackgroundPlayerTest')
+     if android_jar:
