@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.infinity.cobra.theme"
        name="Infinity Cobra Mobile + TV Guide"
-       version="1.3.3"
+       version="1.3.4"
        provider-name="Infinity">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
   <extension point="xbmc.python.module" library="lib"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Runtime v3 modern Mobile, TV Guide and appearance contract for Cobra.</summary>
-    <description lang="en_GB">Adds Follow System, Light, Dark and True OLED Black palettes to the popup-drawer Mobile and TV Guide experience, while preserving the mini-player, Favorites/category grids, scheduling/group/share/EPG/hide actions and native playback, renderer, rotation, Fold, background/resume and Infinity handoff ownership.</description>
+    <summary lang="en_GB">Runtime v3 polished Cobra navigation, guide and player presentation contract.</summary>
+    <description lang="en_GB">Adds a push-content drawer with View Mode and Power controls, four visually distinct guide modes, internal Back navigation, high-contrast player surfaces, video-only PiP chrome, expanded aspect modes and provider subscription-expiry status while preserving native playback, renderer, rotation, Fold, background/resume and Infinity handoff ownership.</description>
     <platform>all</platform>
     <license>GPL-2.0-or-later</license>
   </extension>
