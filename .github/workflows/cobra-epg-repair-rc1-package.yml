@@ -15,16 +15,17 @@ jobs:
     env:
       NDK_VER: 21.4.7075529
     steps:
-      - name: Check out repair branch
-        uses: actions/checkout@v5
-        with:
-          persist-credentials: false
       - name: Check out immutable reconstruction stack
         uses: actions/checkout@v5
         with:
           ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
-          path: base
           fetch-depth: 0
+          persist-credentials: false
+      - name: Check out exact adaptive and EPG repair delta separately
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: refinement-delta
           persist-credentials: false
       - uses: actions/setup-java@v5
         with:
@@ -33,60 +34,86 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
-      - name: Download exact run40 base APK
+      - name: Download exact run40 native donor APK
         uses: actions/download-artifact@v5
         with:
           name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
           run-id: 35044752997
           github-token: ${{ github.token }}
           path: run40
-      - name: Download exact 2103154 generated source evidence
+      - name: Download exact protected 2103152 APK
         uses: actions/download-artifact@v5
         with:
-          name: Cobra-2103154-Layout-Evidence
-          run-id: 35180825737
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
           github-token: ${{ github.token }}
-          path: inherited154
-      - name: Download exact 2103153 rollback
+          path: rollback2103152
+      - name: Download exact audited 2103153 candidate
         uses: actions/download-artifact@v5
         with:
-          name: Cobra-2103153-Complete-Rollback
-          run-id: 35180825737
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
           github-token: ${{ github.token }}
-          path: rollback153
-      - name: Reconstruct matched shell and apply verified EPG repair
+          path: rollback2103153
+      - name: Reconstruct exact audited 2103154 source and presentation
         run: |
           set -euo pipefail
-          cd base
-          bash scripts/infinity_live_app_ci_1.sh
-          mkdir -p ../work ../candidate ../ui-package ../engine
-          test -d kodi/tools/android/packaging/xbmc/src
-          cp ../inherited154/preflight/2103154-final.java.in kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-          python3 ../repairs/cobra-epg-rc1/apply_epg_repair.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --output ../work/InfinityLiveActivity.java.in --receipt ../work/repair-receipt.json
-          cp ../work/InfinityLiveActivity.java.in kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-          python3 ../repairs/cobra-epg-rc1/tests/run_guards.py --source ../inherited154/preflight/2103154-final.java.in --out ../work/guards
-          git -C kodi diff --binary -- xbmc > ../engine/native-after.patch
-      - name: Promote shell version without rebuilding native engine
-        run: |
-          set -euo pipefail
-          cd base
+          python3 -m pip install pyyaml
+          python3 refinement-delta/scripts/cobra_2103154_ci.py reconstruct
+          python3 refinement-delta/scripts/cobra_2103154_ci.py apply
+          python3 refinement-delta/scripts/cobra_2103154_ci.py promote
+          echo '923a43943ecdf0ff096eb3206cd7ab70dcb22063d2f23f5856546b62469ff326  kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in' | sha256sum -c -
           python3 - <<'PY'
+          import json
           from pathlib import Path
-          g=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
-          s=g.read_text()
-          assert s.count('versionCode 2103138') == 1
-          assert s.count('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"') == 1
-          s=s.replace('versionCode 2103138','versionCode 2103155',1)
-          s=s.replace('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"','versionName "1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1"',1)
-          g.write_text(s)
-          p=Path('scripts/infinity_background_resume.py')
-          if p.exists():
-              t=p.read_text().replace('VERSION_CODE = 2103138','VERSION_CODE = 2103155',1).replace("RELEASE = '1.0.9-Infinity-Lifecycle-Repair-RC3'","RELEASE = '1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'",1)
-              p.write_text(t)
-          q=Path('scripts/package_background_resume.py')
-          if q.exists(): q.write_text(q.read_text().replace('Infinity-1.0.9-Infinity-Lifecycle-Repair-RC3','Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'))
+          row=json.loads(Path('engine/background-resume-source.json').read_text())
+          assert row['version_code']==2103154,row['version_code']
+          assert row['version_name']=='1.0.9-Cobra-Adaptive-View-Identities',row['version_name']
+          assert row['native_engine_unchanged'] is True
+          print('PASS: exact 2103154 shell reconstructed before EPG repair')
           PY
-      - name: Package and sign installable update
+      - name: Apply audited EPG repair and promote only Android shell to 2103155
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          SRC=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          python3 refinement-delta/repairs/cobra-epg-rc1/apply_epg_repair.py --source "$SRC" --output work/InfinityLiveActivity.java.in --receipt work/repair-receipt.json
+          cp work/InfinityLiveActivity.java.in "$SRC"
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_tests.py --source "$SRC" --out work/epg-host
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_short.py --source "$SRC" --host work/epg-host --out work/epg-short
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_guards.py --source preflight/2103154-final.java.in --out work/guards
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          VERSION=2103155
+          OLD='1.0.9-Cobra-Adaptive-View-Identities'
+          NEW='1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'
+          def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
+          text=gradle.read_text()
+          assert text.count('versionCode 2103154')==1
+          assert text.count(f'versionName "{OLD}"')==1
+          gradle.write_text(text.replace('versionCode 2103154',f'versionCode {VERSION}',1).replace(f'versionName "{OLD}"',f'versionName "{NEW}"',1))
+          constants=Path('scripts/infinity_background_resume.py')
+          text=constants.read_text()
+          assert text.count('VERSION_CODE = 2103154')==1
+          assert text.count(f"RELEASE = '{OLD}'")==1
+          constants.write_text(text.replace('VERSION_CODE = 2103154',f'VERSION_CODE = {VERSION}',1).replace(f"RELEASE = '{OLD}'",f"RELEASE = '{NEW}'",1))
+          pack=Path('scripts/package_background_resume.py')
+          text=pack.read_text(); old_name='Infinity-'+OLD; new_name='Infinity-'+NEW
+          assert old_name in text
+          pack.write_text(text.replace(old_name,new_name))
+          receipt=Path('engine/background-resume-source.json');row=json.loads(receipt.read_text())
+          for rel in ('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in','tools/android/packaging/xbmc/build.gradle.in'):
+              assert rel in row['files'],rel
+              row['files'][rel]['after']=sha(Path('kodi')/rel)
+          row.update(version_code=VERSION,version_name=NEW,locked_parent=2103154,epg_repair='cobra-epg-data-rc1',native_engine_unchanged=True,native_source_modified=False,device_playback_verified=False)
+          receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
+          print('PASS: version promotion anchored to exact reconstructed 2103154 source')
+          PY
+          git -C kodi diff --binary -- xbmc > engine/native-after-2103155.patch
+          cmp engine/native-before.patch engine/native-after-2103155.patch
+      - name: Package sign and verify installable 2103155 update
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -94,38 +121,53 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
-          mkdir -p background-rollback
-          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
-          python3 base/scripts/package_background_resume.py --source base/kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out candidate
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out candidate
           APK=candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk
           test -s "$APK"
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > candidate/badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103155' versionName='1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'" candidate/badging.txt
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > candidate/signing.txt
-          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > candidate/final-badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103155' versionName='1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'" candidate/final-badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > candidate/final-signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/final-signing.txt
           python3 - <<'PY'
           import zipfile
           from pathlib import Path
           apk=Path('candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk')
-          base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
-          with zipfile.ZipFile(apk) as new, zipfile.ZipFile(base) as old:
-              libs={n for n in old.namelist() if n.startswith('lib/') and not n.endswith('/')}
-              assert libs=={n for n in new.namelist() if n.startswith('lib/') and not n.endswith('/')}
-              for n in libs: assert old.read(n)==new.read(n),n
+          baselines=[Path('background-rollback/Infinity-Run40-Exact-Base.apk'),Path('rollback2103153/background-candidate/Infinity-1.0.9-Cobra-Guide-Player-Refinement.apk')]
+          with zipfile.ZipFile(apk) as new:
+              final_libs={n for n in new.namelist() if n.startswith('lib/') and not n.endswith('/')};assert final_libs
+              for path in baselines:
+                  with zipfile.ZipFile(path) as old:
+                      libs={n for n in old.namelist() if n.startswith('lib/') and not n.endswith('/')}
+                      assert libs==final_libs,(path,libs^final_libs)
+                      for name in libs: assert old.read(name)==new.read(name),(path,name)
               dex=b''.join(new.read(n) for n in new.namelist() if n.startswith('classes') and n.endswith('.dex'))
-              for token in (b'CobraModeLayout',b'CobraBroadcastRow',b'cobra_tv_time_ruler',b'Guide ready',b'No matching programme ID'): assert token in dex,token
-          print('PASS: signed update retains exact native libraries and adaptive-view/guide contracts')
+              for token in (b'CobraModeLayout',b'CobraBroadcastRow',b'cobra_tv_time_ruler',b'cobraEpgSnapshotFile',b'Schedule has unknown end times'):
+                  assert token in dex,token
+          print('PASS: permanent signer, exact protected native bytes, adaptive views and EPG repair all present')
           PY
           sha256sum "$APK" > candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.sha256
-          cp repairs/cobra-epg-rc1/README.md candidate/EPG-REPAIR-README.md
-      - name: Upload installable signed update
+          cp refinement-delta/repairs/cobra-epg-rc1/README.md candidate/EPG-REPAIR-README.md
+          cat > candidate/READ-ME.txt <<'TXT'
+          Infinity Cobra 2103155 — Adaptive Views + EPG Repair RC1. Candidate, NOT locked.
+          Install the APK as an Android app update; do not uninstall or clear app data.
+          Native Kodi libraries are reused and must remain byte-identical to the protected baseline.
+          EPG host fixtures and generated layout tests do not prove real-provider playback or final visual acceptance.
+          Physical-device acceptance is still required before any lock or release promotion.
+          TXT
+      - name: Upload installable signed update and evidence
         uses: actions/upload-artifact@v7
         with:
           name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
           path: |
             candidate/
             work/repair-receipt.json
+            work/epg-host/results.json
+            work/epg-short/results.json
             work/guards/
+            preflight/2103154-refinement.json
+            preflight/mode-regressions/results.json
+            preflight/inherited-regressions/results.json
+            engine/native-after-2103155.patch
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
