@@ -99,7 +99,10 @@ jobs:
           Timeline: tap a live channel for preview; tap the playing channel again for fullscreen.
           Swipe a timeline row to browse time. Hold a programme for its schedule actions.
           The player/channel drawer, Multi-View, EPG data, and player lock remain from 2103153.
-          Native-rendered test screenshots use generated guide fixtures, NOT provider playback.
+          Native Android layout evidence uses generated guide fixtures, NOT provider playback.
+          TextureView bitmap capture is deliberately excluded from host CI because Robolectric can
+          deadlock while snapshotting live TextureView; dimensions, row renderers, adapter counts,
+          virtualization bounds, timeline presence and exact TextureView identity are recorded.
           Test on your phone: mode switches, portrait/landscape/Fold, touch/D-pad, light/dark,
           category/back without reconnect, preview/fullscreen, player lock and 2-4 Multi-View.
           The build does not claim that provider EPG coverage or multi-decoder playback is verified.
