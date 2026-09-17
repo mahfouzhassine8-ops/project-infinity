@@ -72,9 +72,16 @@ def patch_activity(before):
   a,b=method(before,name);protected[name]=before[a:b]
 
  a,b=method(before,'cobraDrawerView');view_before=before[a:b]
- health_block='    LinearLayout health=cobraDetailRow("health","Health Center","Playback, guide and recovery","cobra-drawer-health",false,()->{closeCobraExperienceDrawer();showCobraHealthCenter();});\n    health.setContentDescription("Health Center");items.addView(health,new LinearLayout.LayoutParams(-1,-2));\n'
- if health_block not in view_before:raise ValueError('Locked drawer Health Center anchor missing')
- view_after=once(view_before,health_block,'','drawer Health Center')
+ # Run 35269563869 proved the exact 2103158 baseline and chooser bridge are good,
+ # but the cleanup test was brittle because it required the two Health Center
+ # statements to be one byte-contiguous block. Keep the exact BASE_ACTIVITY gate,
+ # then identify each locked statement independently and require exactly one of each.
+ health_row='    LinearLayout health=cobraDetailRow("health","Health Center","Playback, guide and recovery","cobra-drawer-health",false,()->{closeCobraExperienceDrawer();showCobraHealthCenter();});'
+ health_attach='    health.setContentDescription("Health Center");items.addView(health,new LinearLayout.LayoutParams(-1,-2));'
+ if view_before.count(health_row)!=1:raise ValueError('Expected exactly one locked drawer Health Center row')
+ if view_before.count(health_attach)!=1:raise ValueError('Expected exactly one locked drawer Health Center attachment')
+ view_after=view_before.replace(health_row+'\n','',1).replace(health_attach+'\n','',1)
+ if health_row in view_after or health_attach in view_after:raise ValueError('Drawer Health Center removal incomplete')
  if 'cobraDetailRow("multi","View"' not in view_after:raise ValueError('View destination lost')
  text=before[:a]+view_after+before[b:]
 
