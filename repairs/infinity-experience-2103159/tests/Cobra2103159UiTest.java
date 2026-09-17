@@ -47,7 +47,14 @@ public class Cobra2103159UiTest {
       assertNull("Health Center must not remain a main-drawer destination",contains(drawer,"Health Center"));
       assertNull("Direct Infinity drawer handoff must be removed",exact(drawer,"∞ Infinity"));shot(a,"cobra-2103159-drawer-clean");
       View settings=clickableAncestor(exact(drawer,"Settings"),drawer);assertNotNull(settings);assertTrue(settings.performClick());ui.measure(a,412,915);
-      assertNotNull("Health Center must be available from Cobra Settings",contains(a.getWindow().getDecorView(),"Health Center"));shot(a,"cobra-2103159-settings-health");
+      View health=contains(a.getWindow().getDecorView(),"Health Center");
+      assertNotNull("Health Center must be available from Cobra Settings",health);
+      View healthButton=clickableAncestor(health,a.getWindow().getDecorView());assertNotNull("Health Center must have a real click action",healthButton);
+      healthButton.requestRectangleOnScreen(new Rect(0,0,healthButton.getWidth(),healthButton.getHeight()),true);ui.measure(a,412,915);
+      Rect visible=new Rect();assertTrue("Health Center must be scroll-reachable",healthButton.getGlobalVisibleRect(visible));assertTrue(visible.height()>0);shot(a,"cobra-2103159-settings-health");
+      assertTrue(healthButton.performClick());ui.measure(a,412,915);
+      View healthSheet=(View)CobraNavigationUiTest.get(a,"mCobraActionSheet");assertNotNull("Settings button must open Health Center",healthSheet);
+      assertEquals("health-center",CobraNavigationUiTest.get(a,"mCobraSheetKind"));assertNotNull(healthSheet.findViewWithTag("cobra-health-summary"));shot(a,"cobra-2103159-health-from-settings");
     }finally{ui.clean(a);}
   }
   @Test(timeout=90000) public void powerIsTheSingleHandoffAndExitLabelIsPlain()throws Exception{
