@@ -1,154 +1,77 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.7",
-  "runtime": {
-    "minimum_runtime": 3,
-    "scope": "cobra-live-only"
-  },
-  "protected_contracts": {
-    "rotation": "native",
-    "fold": "native",
-    "background_resume": "native",
-    "renderer": "native",
-    "provider_playback": "native",
-    "infinity_handoff": "native"
-  },
-  "appearance": {
-    "default": "dark",
-    "modes": ["system", "light", "dark", "oled"],
-    "player_overlay": "video_first_high_contrast_gradient"
-  },
+  "version": "1.3.8",
+  "runtime": {"minimum_runtime": 3, "scope": "cobra-live-only", "matched_apk_version_code": 2103153},
+  "protected_contracts": {"rotation": "native", "fold": "native", "background_resume": "native", "renderer": "native", "provider_playback": "native", "infinity_handoff": "native"},
+  "appearance": {"default": "dark", "modes": ["system", "light", "dark", "oled"], "player_overlay": "video_first_high_contrast_gradient"},
   "performance": {
-    "channel_library": "virtualized_recycled_views",
-    "warm_start": "last_good_private_cache",
-    "refresh": "background_non_blocking",
-    "large_library_target": 12000,
+    "channel_library": "virtualized_recycled_views", "warm_start": "last_good_private_cache",
+    "refresh": "background_non_blocking", "large_library_target": 12000,
     "selection_updates_preview_in_place": true,
-    "preview_navigation": "same_exoplayer_session_reattached_without_prepare"
+    "preview_navigation": "same_player_and_texture_in_persistent_shell"
   },
   "views": {
-    "default": "mobile",
-    "available": ["mobile", "tv_guide"],
+    "default": "mobile", "available": ["mobile", "tv_guide"],
     "mobile": {
-      "preview_first": true,
-      "preview_aspect": "16:9",
-      "preview_controls": ["fullscreen", "play_pause", "favorite", "captions", "volume", "more"],
-      "channel_row_height_dp": 70,
-      "category_control": "favorites_recent_and_categories_hub",
-      "top_tabs": ["favorites", "recently_played"],
-      "recently_played_policy": "successful_ready_state_only",
-      "startup_preview": "last_successfully_played_channel",
-      "bottom_navigation": false,
-      "drawer_mode": "push_content",
-      "drawer_collapse_control": true,
+      "preview_first": true, "preview_aspect": "source_proportions_fit",
+      "preview_controls": ["play_pause", "favorite", "captions", "volume", "more", "fullscreen"],
+      "channel_row_height_dp": 84, "category_control": "favorites_recent_playlist_category_hierarchy",
+      "top_tabs": ["favorites", "recently_played"], "recently_played_policy": "first_rendered_frame_only",
+      "startup_preview": "last_successfully_played_channel", "bottom_navigation": false,
+      "drawer_mode": "push_content", "drawer_collapse_control": true,
       "drawer_destinations": ["mobile", "search", "tv", "movies", "shows", "recordings", "my_list", "view_mode", "settings", "power"],
-      "channel_primary_action": "preview_then_fullscreen",
-      "channel_long_press_action": "context_sheet",
+      "channel_primary_action": "preview_then_fullscreen", "channel_long_press_action": "context_sheet",
       "context_actions": ["favorite", "schedule_recording", "add_to_group", "share", "channel_epg", "hide_channel"],
-      "orientation": {
-        "portrait": "preview_tools_virtual_list",
-        "landscape": "preview_tools_virtual_list",
-        "fold_cover": "single_column_touch_first"
-      }
+      "orientation": {"portrait": "preview_tools_virtual_list", "landscape": "preview_group_rail_virtual_list", "fold_cover": "single_column_touch_first"}
     },
     "tv_guide": {
-      "timeline": true,
-      "now_marker": true,
-      "channel_column": true,
-      "favorites_and_groups": true,
-      "category_hub_first": true,
-      "category_selection_opens_selected_view": true,
-      "preview_player": true,
-      "preview_controls": true,
-      "preview_navigation_continuity": true,
-      "first_activation": "preview",
-      "second_activation": "fullscreen",
-      "back_from_fullscreen": "reuse_live_session_in_preview",
-      "expanded_grid": true,
-      "view_modes": {
-        "grid": "orientation_adaptive_timeline",
-        "compact": "virtual_dense_list",
-        "cards": "responsive_touch_grid",
-        "focus": "adaptive_hero_with_virtual_browser"
-      },
-      "orientation": {
-        "portrait_grid": "channel_now_next_list",
-        "landscape_grid": "three_slot_timeline",
-        "portrait_focus": "hero_plus_vertical_grid",
-        "landscape_focus": "hero_left_channel_rail_right"
-      },
+      "timeline": true, "now_marker": true, "channel_column": true, "favorites_and_groups": true,
+      "category_hub_first": true, "category_selection_opens_selected_view": true,
+      "preview_player": true, "preview_controls": true, "preview_navigation_continuity": true,
+      "first_activation": "preview", "second_activation": "fullscreen",
+      "back_from_fullscreen": "reuse_live_session_in_preview", "expanded_grid": true,
+      "view_modes": {"grid": "duration_scaled_programme_timeline", "compact": "virtual_dense_list", "cards": "responsive_touch_grid", "focus": "adaptive_hero_with_virtual_browser"},
+      "orientation": {"portrait_grid": "channel_now_next_list", "landscape_grid": "time_aligned_two_hour_window", "portrait_focus": "hero_plus_vertical_grid", "landscape_focus": "hero_left_channel_rail_right"},
       "input": ["touch", "dpad"]
     }
   },
+  "guide_data": {
+    "xmltv": "bounded_streaming_parser", "gzip_detection": "payload_magic",
+    "matching": "source_scoped_exact_id_then_unambiguous_alias", "cache": "private_atomic_gzip_v3",
+    "refresh_hours": 4, "custom_source_independent_of_provider_failure": true,
+    "fallback": "bounded_xtream_short_epg_when_supported", "failure_states": "visible_without_fabricated_programmes",
+    "now_next_updates": "clock_driven_without_screen_rebuild"
+  },
   "player": {
-    "status_badge": "auto_hide_with_chrome",
-    "pip_chrome": "video_only",
-    "mini_to_fullscreen": "reuse_exoplayer_session",
-    "fullscreen_to_mini": "reuse_exoplayer_session",
-    "chrome": "video_first_gradient_info_plus_compact_icons",
-    "program_hierarchy": ["channel", "now", "next", "live_state"],
+    "status_badge": "auto_hide_with_chrome", "pip_chrome": "video_only",
+    "mini_to_fullscreen": "reuse_exoplayer_session", "fullscreen_to_mini": "reuse_exoplayer_session",
+    "chrome": "top_identity_center_transport_bottom_programme_tools",
+    "program_hierarchy": ["channel", "now", "schedule", "next", "live_state"],
     "play_pause": "direct_in_mini_and_fullscreen",
-    "lock": {
-      "enabled": true,
-      "mode": "input_blocking_overlay",
-      "back_behavior": "reveal_unlock_only",
-      "unlock_affordance_timeout_ms": 3000,
-      "pip_hidden": true
-    },
+    "channel_drawer": {"tabs": ["favorites", "recently_played", "all", "categories"], "portrait": "video_above_drawer_below", "landscape": "video_left_drawer_right", "preserve_video_surface": true},
+    "settings_actions": ["record", "audio_subtitles", "aspect_display", "cast_route", "sources", "close_player"],
+    "lock": {"enabled": true, "mode": "input_blocking_overlay", "back_behavior": "reveal_unlock_only", "unlock_affordance_timeout_ms": 3000, "pip_hidden": true},
     "aspect_control": "always_reachable",
-    "aspect_modes": [
-      "best_fit",
-      "crop_fill",
-      "16:9",
-      "4:3",
-      "wide_1_10",
-      "wide_1_25",
-      "wide_1_40",
-      "short_wide",
-      "zoom_1_25",
-      "zoom_1_50",
-      "zoom_2_00",
-      "custom_width_height"
-    ]
+    "aspect_modes": ["best_fit", "crop_fill", "16:9", "4:3", "wide_1_10", "wide_1_25", "wide_1_40", "short_wide", "zoom_1_25", "zoom_1_50", "zoom_2_00", "custom_width_height"]
   },
   "multiview": {
-    "entry": "keep_current_video_alive",
-    "picker": "docked_category_browser",
+    "entry": "keep_current_video_alive", "picker": "docked_category_browser",
     "picker_tabs": ["favorites", "recently_played", "all", "categories"],
-    "initial_current_session_reuse": true,
-    "add_screen_session_reuse": true,
-    "reflow": "reattach_existing_players_without_prepare",
-    "maximum_screens": 4,
-    "chrome": "video_only_normal_state",
-    "single_tap": "select_audio_owner",
-    "long_press": ["use_audio_here", "change_channel", "add_screen", "fullscreen_this", "remove_screen", "close_multiview"],
-    "portrait_picker": "video_above_browser_below",
-    "landscape_picker": "video_left_browser_right"
+    "initial_current_session_reuse": true, "add_screen_session_reuse": true,
+    "reflow": "retain_existing_tile_player_and_texture_instances", "maximum_screens": 4,
+    "chrome": "video_only_normal_state", "single_tap": "select_audio_owner",
+    "long_press": ["use_audio_here", "change_channel", "add_screen", "fullscreen_this", "retry_this_screen", "playback_details", "remove_screen", "close_multiview"],
+    "portrait_picker": "video_above_browser_below", "landscape_picker": "video_left_browser_right",
+    "diagnostics": "per_tile_state_suppression_rendered_frames_surface_error", "retry": "only_selected_tile"
   },
-  "settings": {
-    "subscription_account_status": true,
-    "subscription_expiry_from_provider_when_available": true,
-    "guide_view_selector_location": "drawer"
-  },
-  "navigation": {
-    "internal_back_returns_to_cobra_root": true,
-    "root_back_backgrounds_task": true,
-    "intentional_exit_via_power_menu": true
-  },
+  "settings": {"subscription_account_status": true, "subscription_expiry_from_provider_when_available": true, "guide_view_selector_location": "drawer"},
+  "navigation": {"internal_back_returns_to_cobra_root": true, "root_back_backgrounds_task": true, "intentional_exit_via_power_menu": true},
   "presentation": {
-    "density": "comfortable",
-    "surface_style": "cobra_glass",
-    "rounded_surfaces": true,
-    "focus_ring": true,
-    "drawer_motion_ms": 190,
-    "portrait_category_height_dp": 58,
-    "guide_channel_width_dp": 152,
-    "guide_program_width_dp": 220,
-    "guide_row_height_dp": 66,
-    "guide_header_height_dp": 52,
-    "guide_preview_height_dp": 210,
-    "mobile_preview_height_dp": 240,
-    "mobile_navigation_height_dp": 0
+    "density": "comfortable", "surface_style": "cobra_glass", "rounded_surfaces": true,
+    "focus_ring": true, "drawer_motion_ms": 190, "portrait_category_height_dp": 52,
+    "guide_channel_width_dp": 152, "guide_program_width_dp": 220, "guide_row_height_dp": 74,
+    "guide_header_height_dp": 52, "guide_preview_height_dp": 210, "mobile_preview_height_dp": 240,
+    "mobile_navigation_height_dp": 0, "player_icons": "original_vector_canvas", "player_sheets": "bounded_themed_bottom_or_side_sheet"
   }
 }
