@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.infinity.cobra.theme"
        name="Infinity Cobra Mobile + TV Guide"
-       version="1.3.6"
+       version="1.3.7"
        provider-name="Infinity">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
   <extension point="xbmc.python.module" library="lib"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Runtime v3 player, recent-channel and Multi-View polish contract.</summary>
-    <description lang="en_GB">Adds successful Recently Played startup selection, mini-player and fullscreen play/pause, wider and custom display transforms, slimmer player chrome, and a category-driven Multi-View picker that preserves the current live session while keeping native playback, renderer, rotation, Fold, background/resume and Infinity handoff ownership protected.</description>
+    <summary lang="en_GB">Runtime v3 Cobra player reboot, lock and Multi-View continuity contract.</summary>
+    <description lang="en_GB">Reboots fullscreen Cobra playback around a video-first gradient layout, adds an Infinity-style input-blocking player lock with timed unlock affordance, preserves the mini-player session while navigating guide/category screens, and keeps existing Multi-View streams alive when adding or reflowing tiles. Native playback, renderer, rotation, Fold, background/resume and Infinity handoff ownership remain protected.</description>
     <platform>all</platform>
     <license>GPL-2.0-or-later</license>
   </extension>
