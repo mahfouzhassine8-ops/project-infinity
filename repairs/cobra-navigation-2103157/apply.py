@@ -48,6 +48,19 @@ def patch(before):
   s=once(s,'mStage.setPadding(dp(8),0,dp(8),0);','mStage.setPadding("grid".equals(mCobraGuideStyle)?0:dp(8),0,"grid".equals(mCobraGuideStyle)?0:dp(8),0);\n    if(!mCobraDrawerShifted){mStage.animate().cancel();mStage.setTranslationX(0f);}')
   s=once(s,'    if(mCobraGuideShell==null){','    if(mCobraGuideShell==null){\n      mCobraLastGuideWidth=-1;mCobraLastGuideHeight=-1;mCobraModeLayout=null;')
   s=once(s,'if(r-l!=mCobraLastGuideWidth||b-t!=mCobraLastGuideHeight)', 'if(v==mCobraGuideShell&&(mCobraModeLayout==null||r-l!=mCobraLastGuideWidth||b-t!=mCobraLastGuideHeight))')
+  # New shells can be attached before their weighted parent receives final bounds. The immediate
+  # layout call then sees 0x0 and the first frame can otherwise retain the 1x1 placeholders.
+  # Queue one fail-closed pass against the same shell; it is a no-op when normal layout already ran.
+  s=once(s,'    cobraRestyleGuide();cobraLayoutGuide();cobraRenderGuideBrowser();', '''    cobraRestyleGuide();cobraLayoutGuide();cobraRenderGuideBrowser();
+    final FrameLayout laidOutGuide=mCobraGuideShell;
+    laidOutGuide.post(()->{
+      if(laidOutGuide==mCobraGuideShell&&laidOutGuide.isAttachedToWindow()){
+        int width=laidOutGuide.getWidth(),height=laidOutGuide.getHeight();
+        if(width>0&&height>0&&(mCobraModeLayout==null||width!=mCobraLastGuideWidth||height!=mCobraLastGuideHeight)){
+          cobraLayoutGuide();cobraRenderGuideBrowser();
+        }
+      }
+    });''')
   return s
  transform('cobraShowGuideShell',shell)
  transform('buildShell',lambda s:once(s,'    FrameLayout frame = new FrameLayout(this);','    mCobraNavigation.advance();\n    FrameLayout frame = new FrameLayout(this);'))
