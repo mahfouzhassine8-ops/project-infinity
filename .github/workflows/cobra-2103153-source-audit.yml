@@ -1,0 +1,68 @@
+name: Cobra 2103153 | Locked source audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103153-guide-session-refinement]
+    paths: ['.github/workflows/cobra-2103153-source-audit.yml']
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools platforms;android-35
+      - name: Reconstruct exact locked source without native build or signing
+        run: |
+          python3 -m pip install pyyaml
+          mkdir -p engine preflight
+          python3 - <<'PY'
+          import subprocess, yaml
+          from pathlib import Path
+          locked = 'cce2de3042cca22b531fa8ed9e13659c19dab8a4'
+          path = '.github/workflows/infinity-cobra-2103152-player-reboot-lock.yml'
+          raw = subprocess.check_output(['git','show',locked+':'+path], text=True)
+          workflow = yaml.safe_load(raw)
+          names = {
+              'Reconstruct protected RC3 Runtime v3 and 2103141 player source',
+              'Rebuild locked 2103151 presentation baseline',
+              'Apply 2103152 player reboot lock and continuity polish',
+              'Apply protected two-card chooser',
+          }
+          matched = set()
+          for step in workflow['jobs']['android-update']['steps']:
+              name = step.get('name','')
+              if name in names:
+                  print('::group::'+name, flush=True)
+                  subprocess.run(['bash','-e','-o','pipefail','-c',step['run']], check=True)
+                  matched.add(name)
+                  print('::endgroup::', flush=True)
+          assert matched == names
+          PY
+      - name: Save source audit and exact rollback source archive
+        run: |
+          mkdir -p source-audit/repo source-audit/generated source-audit/sdk
+          cp -a scripts patches tests addons .github source-audit/repo/
+          cp -a kodi/tools/android/packaging/xbmc source-audit/generated/
+          cp -a engine/background-resume-source.json preflight/lifecycle-races source-audit/
+          cp "$ANDROID_HOME/platforms/android-35/android.jar" source-audit/sdk/
+          git archive --format=zip cce2de3042cca22b531fa8ed9e13659c19dab8a4 > source-audit/locked-2103152-repository.zip
+          sha256sum source-audit/generated/xbmc/src/InfinityLiveActivity.java.in source-audit/locked-2103152-repository.zip > source-audit/SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103152-Exact-Source-Audit
+          path: source-audit/
+          if-no-files-found: error
+          retention-days: 90
