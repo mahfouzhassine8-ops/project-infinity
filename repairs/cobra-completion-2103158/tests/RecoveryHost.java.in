@@ -1,0 +1,52 @@
+import java.util.*;import java.nio.charset.StandardCharsets;
+// Executes exact production policies and inspector against disclosed player/view doubles.
+public class RecoveryHost {
+@@CHOICE@@
+@@BUDGET@@
+@@RECOVERY@@
+@@INSPECT@@
+@@SUSPEND@@
+  static final class Looper {static final Object MAIN=new Object();static boolean main=true;static Object myLooper(){return main?MAIN:null;}static Object getMainLooper(){return MAIN;}}
+  static final class Player {static final int STATE_READY=3,STATE_BUFFERING=2,PLAYBACK_SUPPRESSION_REASON_NONE=0;}
+  static final class C {static final int TRACK_TYPE_VIDEO=2;}
+  static final class Surface {long stamp;boolean fail;long getTimestamp(){if(fail)throw new IllegalStateException("unavailable");return stamp;}}
+  static final class TextureView {boolean attached=true,shown=true,available=true;int width=400,height=225;final Surface surface=new Surface();boolean isAttachedToWindow(){return attached;}boolean isShown(){return shown;}boolean isAvailable(){return available;}int getWidth(){return width;}int getHeight(){return height;}Surface getSurfaceTexture(){return surface;}}
+  static final class Tracks {boolean video=true;boolean isTypeSelected(int type){return video;}}
+  static final class FakePlayer {int state=3,suppression=0,clears,binds;boolean requested=true,fail;long position;float volume=.0f;final Tracks tracks=new Tracks();TextureView last;int getPlaybackState(){return state;}boolean getPlayWhenReady(){return requested;}int getPlaybackSuppressionReason(){return suppression;}Tracks getCurrentTracks(){return tracks;}long getCurrentPosition(){return position;}void clearVideoTextureView(TextureView t){clears++;last=t;if(fail)throw new IllegalStateException("rebind failed");}void setVideoTextureView(TextureView t){require(last==t,"Same texture rebound");binds++;}}
+  static final class CobraPlayerBinding {FakePlayer player=new FakePlayer();TextureView texture=new TextureView();CobraPlaybackChoice choice=new CobraPlaybackChoice(0,1f,1f);CobraSurfaceRecovery recovery=new CobraSurfaceRecovery();String error="";boolean alive=true;boolean current(){return alive;}}
+  static final class Prefs {boolean enabled=true;boolean getBoolean(String k,boolean d){return enabled;}}
+  static final class InfinityCobraDiagnostics {static int records,errors;static void record(Object a,String b,String c,String d){records++;}static void failure(Object a,String b,RuntimeException e){errors++;}}
+  static final String COBRA_RECOVERY_ENABLED="enabled";
+  boolean mCobraHealthForeground=true,mBackgroundStopped=false,mInPictureInPicture=false;
+  Prefs mPrefs=new Prefs();final Map<FakePlayer,CobraPlayerBinding> mCobraPlayerBindings=new IdentityHashMap<>();
+  final CobraRecoveryBudget mCobraRecoveryBudget=new CobraRecoveryBudget();int fits;
+  void cobraFitBinding(CobraPlayerBinding b){fits++;}
+  CobraPlayerBinding add(){CobraPlayerBinding b=new CobraPlayerBinding();mCobraPlayerBindings.put(b.player,b);return b;}
+  void time(long now,boolean frames){android.os.SystemClock.now=now;for(CobraPlayerBinding b:mCobraPlayerBindings.values()){b.player.position=now;if(frames)b.texture.surface.stamp=now+1;}cobraInspectSurfaceRecovery();}
+  static int count;static void require(boolean ok,String why){count++;if(!ok)throw new AssertionError(why);}
+  static void checks(){
+    for(int i=-50;i<50;i++)require(CobraPlaybackChoice.mode(i)==(i>=0&&i<=11?i:0),"Aspect whitelist");
+    require(CobraPlaybackChoice.factor(Float.NaN)==1f&&CobraPlaybackChoice.factor(Float.POSITIVE_INFINITY)==1f,"Non-finite sizes rejected");
+    require(CobraPlaybackChoice.factor(-9)==.55f&&CobraPlaybackChoice.factor(9)==1.8f,"Size bounds");
+    require(CobraPlaybackChoice.language("en_US").equals("en-us"),"Language normalized");
+    for(String s:new String[]{"https://private/secret","", "user:pass", "en\nsecret", "123"})require(CobraPlaybackChoice.language(s).isEmpty(),"Non-language not persisted");
+    String key=CobraPlaybackChoice.key("p","s","c");require(key.length()==67&&!key.contains("p:s:c"),"Hashed scoped key");
+    require(!key.equals(CobraPlaybackChoice.key("p2","s","c")),"Profile isolation");require(!key.equals(CobraPlaybackChoice.key("p","s2","c")),"Source isolation");require(!key.equals(CobraPlaybackChoice.key("p","s","c2")),"Channel isolation");
+    require(!CobraPlaybackChoice.key("a|b","c","d").equals(CobraPlaybackChoice.key("a","b|c","d")),"Delimiter collision rejected");
+    RecoveryHost live=new RecoveryHost();CobraPlayerBinding steady=live.add();for(long t=0;t<=300000;t+=1000)live.time(t,true);require(steady.player.clears==0,"Healthy frames never rebound");
+    RecoveryHost stalled=new RecoveryHost();CobraPlayerBinding b=stalled.add();for(long t=0;t<=150000;t+=1000)stalled.time(t,false);require(b.player.binds==2&&b.player.clears==2&&b.recovery.attempts==2,"Exactly two bounded attempts");require(b.player.volume==0f&&stalled.fits==2,"No audio ownership changes");
+    stalled.cobraSuspendRecovery();for(long t=151000;t<300000;t+=1000)stalled.time(t,false);require(b.player.binds==2,"Suspend/resume cannot replenish budget");
+    for(int guard=0;guard<17;guard++){
+      RecoveryHost h=new RecoveryHost();CobraPlayerBinding x=h.add();
+      switch(guard){case 0:h.mCobraHealthForeground=false;break;case 1:h.mBackgroundStopped=true;break;case 2:h.mInPictureInPicture=true;break;case 3:h.mPrefs.enabled=false;break;case 4:x.choice.recovery=false;break;case 5:x.texture.attached=false;break;case 6:x.texture.shown=false;break;case 7:x.texture.available=false;break;case 8:x.texture.width=1;break;case 9:x.texture.height=0;break;case 10:x.error="ERROR";break;case 11:x.player.state=2;break;case 12:x.player.requested=false;break;case 13:x.player.suppression=1;break;case 14:x.player.tracks.video=false;break;case 15:x.alive=false;break;case 16:Looper.main=false;break;}
+      for(long t=0;t<=90000;t+=1000)h.time(t,false);require(x.player.clears==0&&x.recovery.attempts==0,"Eligibility guard "+guard);Looper.main=true;
+    }
+    RecoveryHost multi=new RecoveryHost();for(int i=0;i<8;i++)multi.add();for(long t=0;t<=90000;t+=1000)multi.time(t,false);int total=0;for(CobraPlayerBinding x:multi.mCobraPlayerBindings.values())total+=x.player.clears;require(total==4,"Global 4-in-five-minute budget includes peers");
+    RecoveryHost failure=new RecoveryHost();CobraPlayerBinding broken=failure.add();broken.player.fail=true;for(long t=0;t<=90000;t+=1000)failure.time(t,false);require(broken.player.clears==2&&broken.player.binds==0,"Exceptions consume retry budget");
+    RecoveryHost frozen=new RecoveryHost();CobraPlayerBinding p=frozen.add();for(long t=0;t<=90000;t+=1000){android.os.SystemClock.now=t;frozen.cobraInspectSurfaceRecovery();}require(p.player.clears==0,"Nonadvancing playback never rebound");
+    RecoveryHost probe=new RecoveryHost();CobraPlayerBinding q=probe.add();q.texture.surface.fail=true;int oldErrors=InfinityCobraDiagnostics.errors;for(long t=0;t<=90000;t+=1000)probe.time(t,false);require(q.player.clears==0&&InfinityCobraDiagnostics.errors-oldErrors==1,"Unavailable timestamp is not a rebind or log loop");
+    CobraSurfaceRecovery clock=new CobraSurfaceRecovery();require(!clock.inspect(100,2,3000,true),"New observation grace");require(!clock.inspect(12100,2,0,true),"Seek-back resets observation");
+    CobraRecoveryBudget budget=new CobraRecoveryBudget();for(int i=0;i<4;i++)require(budget.take(i),"Global slot");require(!budget.take(299999),"Global window limited");require(budget.take(300000),"Old global slot expires");
+  }
+  public static void main(String[] args){checks();System.out.println("PASS: "+count+" exact-policy/inspector assertions; host doubles, NOT hardware playback.");}
+}

@@ -1,0 +1,147 @@
+name: Cobra | 2103158 Health Preferences Recovery Candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103158-health-preferences-recovery-rc1]
+    paths:
+      - '.github/workflows/cobra-completion-2103158.yml'
+      - 'repairs/cobra-completion-2103158/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103158-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32
+          path: refinement-delta
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          ref: b3bcb619b08205dcfc1451424b2d41e05fd37633
+          path: audit-delta
+          persist-credentials: false
+      - name: Read exact locked 2103157 recipe without editing it
+        uses: actions/checkout@v5
+        with:
+          ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98
+          path: view-delta
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: candidate-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
+          github-token: ${{ github.token }}
+          path: rollback2103153
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
+          run-id: 35188339917
+          github-token: ${{ github.token }}
+          path: baseline155
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156
+          run-id: 35192605567
+          github-token: ${{ github.token }}
+          path: baseline156
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157
+          run-id: 35200244871
+          github-token: ${{ github.token }}
+          path: baseline157
+      - name: Reconstruct exact locked stack and preserve complete rollback
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 candidate-delta/repairs/cobra-completion-2103158/ci.py reconstruct
+      - name: Integrate all Cobra features and run executable safety and inherited tests
+        run: |
+          set -euo pipefail
+          python3 candidate-delta/repairs/cobra-completion-2103158/ci.py apply
+      - name: Compile Android only, sign permanently and compare protected payloads
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test ! -e signed158
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir completion-build --out signed158
+          python3 candidate-delta/repairs/cobra-completion-2103158/ci.py verify
+      - name: Execute all 12 Android view, preference and Media3 parameter tests
+        run: |
+          set -euo pipefail
+          python3 candidate-delta/repairs/cobra-completion-2103158/tests/android.py --build completion-build --out audit158/android
+          python3 candidate-delta/repairs/cobra-completion-2103158/ci.py deliver
+      - name: Upload signed TEST CANDIDATE only after all automated gates pass
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103158-Health-Preferences-Recovery-TEST-CANDIDATE
+          path: signed158/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve audit evidence even on failure, never an unaccepted APK
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103158-Source-Android-Audit-Evidence
+          path: |
+            audit158/
+            audit157/
+            engine/background-resume-source.json
+            signed158/*.txt
+            signed158/*.json
+            candidate-delta/repairs/cobra-completion-2103158/
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Preserve locked baseline and older complete rollbacks even on failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103157-Complete-Rollback-Before-2103158
+          path: rollback158/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90
