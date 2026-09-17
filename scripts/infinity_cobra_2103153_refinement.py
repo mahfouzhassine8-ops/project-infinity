@@ -72,6 +72,37 @@ def patch(text: str) -> tuple[str, list[str]]:
                   '    mPlayerChrome = null;\n    mCobraPlayerProgram=null;mCobraPlayerSchedule=null;mCobraPlayerUpcoming=null;mCobraPlayerProgramProgress=null;')
     text = inject(text,'resumeCobraAfterBackground','    mBackgroundStopped = false;',
                   '    mBackgroundStopped = false;\n    cobraStartPresentationTicker();')
+    # Integration checks found two presentation details that must not regress:
+    # retain direct preview captions, and undock the canvas after selecting an added tile.
+    text = inject(text,'cobraPreviewPanel',
+                  '    for(Button b:new Button[]{pause,fav,mute,more,full})',
+                  '    CobraIconButton captions=cobraIcon("cc","Preview captions",true,v->toggleCobraPreviewCaptions());\n'
+                  '    for(Button b:new Button[]{pause,fav,captions,mute,more,full})')
+    text = inject(text,'rebuildCobraMultiPreservingSessions',
+                  '    setMultiAudio(audio);cobraLayoutMultiTiles();cobraStartPresentationTicker();',
+                  '    setMultiAudio(audio);cobraLayoutPlayerPanels();cobraLayoutMultiTiles();cobraStartPresentationTicker();')
+    text = inject(text,'startCobraPreview',
+                  '}catch(Exception failure){setCobraPreviewLabel("Preview unavailable");}',
+                  '}catch(Exception failure){stopCobraPreviewPlayerOnly();setCobraPreviewLabel("Preview unavailable");}')
+    text = inject(text,'startSinglePlayer',
+                  '}catch(Exception error){showError("Playback failed",',
+                  '}catch(Exception error){releaseSinglePlayer();showError("Playback failed",')
+    # A healthy complete XMLTV schedule takes precedence over a short fallback.
+    text = inject(text,'cobraResolveEpg',
+                  '    if(data.programs.containsKey("@stream:"+channel.id))key="@stream:"+channel.id;\n'
+                  '    else if(!epg.isEmpty()&&data.programs.containsKey(epg))key=epg;',
+                  '    if(!epg.isEmpty()&&data.programs.containsKey(epg))key=epg;')
+    text = inject(text,'cobraResolveEpg',
+                  '    mCobraResolvedEpg.put(channel.id,key);return key;',
+                  '    if(key.isEmpty()&&data.programs.containsKey("@stream:"+channel.id))key="@stream:"+channel.id;\n'
+                  '    mCobraResolvedEpg.put(channel.id,key);return key;')
+    # Long viewing sessions refresh the guide too, not only navigation/launch.
+    marker = '        mCobraLastTickerMinute = minute;\n'
+    assert text.count(marker) == 1
+    text = text.replace(marker, marker +
+        '        for(LiveSource source:mSources)if(mFeatures.sourceEnabled(source.id))loadGuideAsync(source);\n'
+        '        if(mGuidePreviewChannel!=null)cobraRequestShortEpg(mGuidePreviewChannel);\n'
+        '        if(mPlaying!=null)cobraRequestShortEpg(mPlaying);\n', 1)
     changed += ['loadM3u','closePlayer','resumeCobraAfterBackground']
     verify(text)
     return text,changed
