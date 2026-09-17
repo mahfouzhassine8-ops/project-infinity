@@ -1,0 +1,175 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
+import org.json.JSONObject;
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/** Visual resolver only. Theme values cannot call actions or mutate playback ownership. */
+public final class CobraVisualRenderer {
+  static volatile CobraVisualTheme active=CobraVisualTheme.builtin();
+  static volatile String loadStatus="Built-in appearance";
+  static final AtomicBoolean loading=new AtomicBoolean(false);
+  static final ExecutorService IO=Executors.newSingleThreadExecutor();
+  static final Handler MAIN=new Handler(Looper.getMainLooper());
+  static final List<WeakReference<CobraVisualRenderer>> clients=new ArrayList<>();
+  final WeakReference<Context> context;
+  final WeakHashMap<View,Binding> bindings=new WeakHashMap<>();
+  CobraVisualTheme cached;
+  final HashMap<String,Object> cache=new HashMap<>();
+  String cacheVariant="";
+  private Runnable readyAction;
+  public void whenReady(Runnable action){readyAction=action;}
+  public boolean installed(){Context c=context.get();return !active.id.equals("builtin")||(c!=null&&!CobraVisualTheme.readPointer(c).optString("active","").isEmpty());}
+  public CobraVisualRenderer(Context owner){
+    context=new WeakReference<>(owner);
+    synchronized(clients){clients.add(new WeakReference<>(this));}
+    if(loading.compareAndSet(false,true)){Context app=owner.getApplicationContext();IO.execute(()->{
+      synchronized(CobraVisualTheme.STORE_LOCK){try{publish(CobraVisualTheme.load(app),"Loaded visual theme");}catch(Exception error){publish(CobraVisualTheme.builtin(),"Theme unavailable; built-in appearance used");}}
+    });}
+  }
+  static void publish(CobraVisualTheme value,String status){MAIN.post(()->{
+    active=value;loadStatus=status;
+    synchronized(clients){Iterator<WeakReference<CobraVisualRenderer>> it=clients.iterator();while(it.hasNext()){CobraVisualRenderer client=it.next().get();if(client==null)it.remove();else client.refresh();}}
+  });}
+  public String palette(){Context c=context.get();if(c==null)return "dark";
+    // The Activity passes its actual resolved palette via mode(), avoiding a second preference owner.
+    if(explicitPalette!=null)return explicitPalette;
+    return (c.getResources().getConfiguration().uiMode&Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES?"dark":"light";
+  }
+  private String explicitPalette;
+  public CobraVisualRenderer mode(String palette){explicitPalette=palette;return this;}
+  public String layout(){Context c=context.get();if(c==null)return "portrait";Configuration q=c.getResources().getConfiguration();int width=q.screenWidthDp;
+    if((q.uiMode&Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION)return "tv";
+    if(width>0&&width<360)return "cover";if(q.smallestScreenWidthDp>=600)return "tablet";return q.orientation==Configuration.ORIENTATION_LANDSCAPE?"landscape":"portrait";
+  }
+  Object get(String group,String key){CobraVisualTheme now=active;String variant=layout()+"/"+palette();if(cached!=now||!variant.equals(cacheVariant)){cache.clear();cached=now;cacheVariant=variant;}
+    String k=group+":"+key;Object v=cache.get(k);if(v==null&&!cache.containsKey(k)){v=now.value(group,key,palette(),layout());cache.put(k,v==null?JSONObject.NULL:v);}return v==JSONObject.NULL?null:v;
+  }
+  public int color(String key,int fallback){Object v=get("colors",key);if(v==null)v=get("colors",String.format(Locale.ROOT,"argb.%08x",fallback));try{return v instanceof String?Color.parseColor((String)v):fallback;}catch(Exception ignored){return fallback;}}
+  public int dimension(String key,int fallback){Object v=get("dimensions",key);return v instanceof Number?Math.max(fallback>=44&&fallback<=72?44:0,Math.min(Math.min(2048,Math.max(64,fallback*3)),((Number)v).intValue())):fallback;}
+  public float number(String key,float fallback,float low,float high){Object v=get("numbers",key);return v instanceof Number?Math.max(low,Math.min(high,((Number)v).floatValue())):fallback;}
+  public String copy(String key,String fallback){Object v=get("copy",key);return v instanceof String?(String)v:fallback;}
+  public Typeface font(String key,Typeface fallback){Object value=get("styles",key);if(value==null)value=get("styles","font.all");if(!(value instanceof JSONObject))return fallback;JSONObject s=(JSONObject)value;
+    Typeface asset=active.fonts.get(s.optString("font_asset",""));if(asset!=null)return Typeface.create(asset,s.optInt("font_style",0));
+    return s.has("font_family")?Typeface.create(s.optString("font_family"),s.optInt("font_style",0)):fallback;
+  }
+  public long motion(String key,long fallback){Context c=context.get();if(Build.VERSION.SDK_INT>=26&&!android.animation.ValueAnimator.areAnimatorsEnabled())return 0;return Math.round(number(key,fallback,0,600));}
+  int px(float dp){Context c=context.get();return Math.round(dp*(c==null?1:c.getResources().getDisplayMetrics().density));}
+  Bitmap bitmap(String slot){Object id=get("images",slot);return id instanceof String?active.bitmaps.get(id):null;}
+  public boolean hasImage(String slot){return bitmap(slot)!=null;}
+  public boolean draw(Canvas canvas,String slot,float left,float top,float right,float bottom,String fit){Bitmap image=bitmap(slot);if(image==null||right<=left||bottom<=top)return false;drawBitmap(canvas,image,new RectF(left,top,right,bottom),fit,255);return true;}
+  static void drawBitmap(Canvas canvas,Bitmap image,RectF bounds,String fit,int alpha){
+    if(image==null||image.isRecycled())return;Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);p.setAlpha(alpha);RectF dst=new RectF(bounds);int save=canvas.save();canvas.clipRect(bounds);
+    if(!"stretch".equals(fit)){float sx=bounds.width()/image.getWidth(),sy=bounds.height()/image.getHeight();float scale="cover".equals(fit)?Math.max(sx,sy):Math.min(sx,sy);float w=image.getWidth()*scale,h=image.getHeight()*scale;dst.set(bounds.centerX()-w/2,bounds.centerY()-h/2,bounds.centerX()+w/2,bounds.centerY()+h/2);}
+    canvas.drawBitmap(image,null,dst,p);canvas.restoreToCount(save);
+  }
+  JSONObject stylesFor(Binding binding,View view){
+    JSONObject merged=new JSONObject();String type=view instanceof EditText?"input":view instanceof Button?"button":view instanceof TextView?"text":"panel";
+    ArrayList<String> names=new ArrayList<>();names.add("all."+type);
+    // Factory defaults first; component families next; exact roles last. A later tree
+    // walk must not overwrite a named drawer row with its global panel defaults.
+    for(String alias:binding.aliases)if(alias.startsWith("widget.")){names.add(alias.split("/")[0]+"."+type);names.add(alias);}
+    for(String alias:binding.aliases)if(!alias.startsWith("widget."))names.add(alias.split("/")[0]+"."+type);
+    for(String alias:binding.aliases)if(!alias.startsWith("widget."))names.add(alias);
+    if(view.getTag() instanceof String)names.add("tag."+view.getTag());
+    for(String key:names){Object value=get("styles",key);if(value instanceof JSONObject){JSONObject part=(JSONObject)value;Iterator<String> keys=part.keys();while(keys.hasNext()){String k=keys.next();try{merged.put(k,part.get(k));}catch(Exception ignored){}}}}
+    if(binding.inlineStyle!=null){Iterator<String> keys=binding.inlineStyle.keys();while(keys.hasNext()){String key=keys.next();try{merged.put(key,binding.inlineStyle.get(key));}catch(Exception ignored){}}}
+    return merged;
+  }
+  static final class Binding {
+    CobraVisualGeometry.Original geometry;boolean waitingForAttach;JSONObject inlineStyle;final String slot;final LinkedHashSet<String> aliases=new LinkedHashSet<>();final Drawable background;final int l,t,r,b,minHeight;final float elevation,textSize,spacing;final Typeface typeface;final android.content.res.ColorStateList textColors;
+    Binding(View v,String key){slot=key;aliases.add(key);background=v.getBackground();l=v.getPaddingLeft();t=v.getPaddingTop();r=v.getPaddingRight();b=v.getPaddingBottom();minHeight=v.getMinimumHeight();elevation=v.getElevation();
+      if(v instanceof TextView){TextView tv=(TextView)v;textSize=tv.getTextSize();spacing=tv.getLetterSpacing();typeface=tv.getTypeface();textColors=tv.getTextColors();}else{textSize=spacing=0;typeface=null;textColors=null;}}
+  }
+  public void inline(View view,String slot,JSONObject style){paint(view,slot);Binding b=bindings.get(view);if(b!=null){b.inlineStyle=style;apply(view,b);}}
+  public JSONObject guideLayout(String name){Object value=get("guide_layouts",name);return value instanceof JSONObject?(JSONObject)value:null;}
+  public JSONObject scene(String name){Object value=get("scenes",name);return value instanceof JSONObject?(JSONObject)value:null;}
+  public <T extends View>T paint(T view,String slot){
+    if(view==null||"cobra-visual-theme-controls".equals(view.getTag())||view instanceof TextureView||view instanceof SurfaceView||view instanceof android.webkit.WebView)return view;
+    Binding binding=bindings.get(view);if(binding==null){binding=new Binding(view,slot);bindings.put(view,binding);}else if(binding.aliases.size()<12)binding.aliases.add(slot);apply(view,binding);return view;
+  }
+  public void tree(View root,String slot){tree(root,slot,0,new int[]{0});}
+  void tree(View view,String slot,int depth,int[] count){
+    if(view==null||depth>24||++count[0]>512||view instanceof TextureView||view instanceof SurfaceView||view instanceof android.webkit.WebView)return;
+    paint(view,slot);if(view instanceof android.widget.AbsListView)return; // Virtual rows are themed in their own factory, not traversed per frame.
+    if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)tree(group.getChildAt(i),slot+"/"+i,depth+1,count);}
+  }
+  void apply(View view,Binding base){JSONObject s=stylesFor(base,view);if(s.length()==0)return;
+    if(s.has("fill")||s.has("fill_end")||s.has("image")||s.has("stroke")||s.has("radius_dp")){
+      int fill=parseColor(s,"fill",Color.TRANSPARENT),end=parseColor(s,"fill_end",fill);float radius=px((float)s.optDouble("radius_dp",12));int stroke=parseColor(s,"stroke",Color.TRANSPARENT),width=px((float)s.optDouble("stroke_width_dp",1));
+      Drawable normal=background(s,fill,end,stroke,width,radius);
+      if(view.isClickable()||view.isFocusable()){
+        StateListDrawable states=new StateListDrawable();states.addState(new int[]{android.R.attr.state_pressed},background(s,parseColor(s,"pressed",end),end,parseColor(s,"focus",0xff4cbcff),Math.max(px(2),width),radius));
+        states.addState(new int[]{android.R.attr.state_focused},background(s,fill,end,parseColor(s,"focus",0xff4cbcff),Math.max(px(2),width),radius));
+        states.addState(new int[]{android.R.attr.state_selected},background(s,parseColor(s,"selected",fill),end,stroke,width,radius));states.addState(new int[]{},normal);view.setBackground(states);
+      }else view.setBackground(normal);
+    }
+    if(s.has("padding_dp")){int padding=px((float)s.optDouble("padding_dp",0));view.setPadding(padding,padding,padding,padding);}
+    if(s.has("min_height_dp"))view.setMinimumHeight(Math.max(base.minHeight,px((float)s.optDouble("min_height_dp",48))));
+    if(s.has("elevation_dp"))view.setElevation(px((float)s.optDouble("elevation_dp",0)));
+    if(base.geometry==null&&(!CobraVisualGeometry.changesParams(s)||view.getLayoutParams()!=null))base.geometry=new CobraVisualGeometry.Original(view);
+    CobraVisualGeometry.apply(view,s,this);
+    if(CobraVisualGeometry.changesParams(s)&&view.getLayoutParams()==null&&!base.waitingForAttach){base.waitingForAttach=true;view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(){public void onViewAttachedToWindow(View v){v.removeOnAttachStateChangeListener(this);base.waitingForAttach=false;apply(v,base);}public void onViewDetachedFromWindow(View v){}});}
+    if(view instanceof TextView){TextView tv=(TextView)view;if(s.has("text"))tv.setTextColor(parseColor(s,"text",tv.getCurrentTextColor()));
+      if(s.has("text_size_sp"))tv.setTextSize((float)s.optDouble("text_size_sp",14));if(s.has("letter_spacing"))tv.setLetterSpacing((float)s.optDouble("letter_spacing",0));
+      if(s.has("font_asset")&&active.fonts.containsKey(s.optString("font_asset")))tv.setTypeface(active.fonts.get(s.optString("font_asset")),s.optInt("font_style",0));
+      else if(s.has("font_family")||s.has("font_style"))tv.setTypeface(Typeface.create(s.optString("font_family","sans-serif"),s.optInt("font_style",0)));
+    }
+  }
+  static int parseColor(JSONObject s,String key,int fallback){try{return s.has(key)?Color.parseColor(s.getString(key)):fallback;}catch(Exception ignored){return fallback;}}
+  Drawable background(JSONObject s,int top,int bottom,int stroke,int width,float radius){
+    GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{top,bottom});shape.setCornerRadius(radius);shape.setStroke(width,stroke);
+    Bitmap image=active.bitmaps.get(s.optString("image",""));if(image==null)return shape;
+    return new ArtworkDrawable(shape,image,s.optString("image_fit","cover"),radius,stroke,width);
+  }
+  static final class ArtworkDrawable extends Drawable {
+    final Drawable under;final Bitmap bitmap;final String fit;final float radius;final int stroke,width;int alpha=255;
+    ArtworkDrawable(Drawable bg,Bitmap b,String sizing,float r,int ink,int sw){under=bg;bitmap=b;fit=sizing;radius=r;stroke=ink;width=sw;}
+    public void draw(Canvas c){Rect b=getBounds();under.setBounds(b);under.draw(c);RectF bounds=new RectF(b);Path clip=new Path();clip.addRoundRect(bounds,radius,radius,Path.Direction.CW);int save=c.save();c.clipPath(clip);drawBitmap(c,bitmap,bounds,fit,alpha);c.restoreToCount(save);if(width>0){Paint p=new Paint(3);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setColor(stroke);RectF edge=new RectF(bounds);edge.inset(width/2f,width/2f);c.drawRoundRect(edge,radius,radius,p);}}
+    public void setAlpha(int a){alpha=a;under.setAlpha(a);invalidateSelf();}public void setColorFilter(ColorFilter filter){under.setColorFilter(filter);}public int getOpacity(){return PixelFormat.TRANSLUCENT;}
+  }
+  public View art(Context owner,String slot,int defaultHeight){
+    View v=new View(owner){protected void onDraw(Canvas c){CobraVisualRenderer.this.draw(c,slot,0,0,getWidth(),getHeight(),"contain");}};
+    v.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);v.setFocusable(false);v.setClickable(false);v.setTag("visual-art:"+slot);
+    v.setMinimumHeight(px(dimension("art."+slot+".height",defaultHeight)));paint(v,"art."+slot);return v;
+  }
+  void restore(View view,Binding b){if(b.geometry!=null){b.geometry.restore(view);b.geometry=null;}view.setBackground(b.background);view.setPadding(b.l,b.t,b.r,b.b);view.setMinimumHeight(b.minHeight);view.setElevation(b.elevation);if(view instanceof TextView){TextView tv=(TextView)view;tv.setTextColor(b.textColors);tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,b.textSize);tv.setLetterSpacing(b.spacing);tv.setTypeface(b.typeface);}}
+  void refresh(){cache.clear();for(Map.Entry<View,Binding> e:new ArrayList<>(bindings.entrySet())){View v=e.getKey();if(v!=null){restore(v,e.getValue());apply(v,e.getValue());v.invalidate();}}if(readyAction!=null){Context c=context.get();if(c instanceof Activity&&!((Activity)c).isFinishing()&&!((Activity)c).isDestroyed())readyAction.run();}}
+  public String description(){return active.id+" · visual runtime "+CobraVisualTheme.RUNTIME+" · "+loadStatus;}
+  public void manager(Activity activity){
+    // Deliberately not themed: this escape hatch cannot be hidden by a theme.
+    new AlertDialog.Builder(activity).setTitle("Cobra theme controls").setMessage(description()+"\n\nReset and rollback change presentation only. Reopen menus to refresh source-driven layout and copy. No playlists or playback preferences are deleted.")
+      .setPositiveButton("Built-in appearance",(d,w)->IO.execute(()->{try{synchronized(CobraVisualTheme.STORE_LOCK){CobraVisualTheme.reset(activity.getApplicationContext());publish(CobraVisualTheme.builtin(),"Built-in appearance restored");}}catch(Exception e){MAIN.post(()->Toast.makeText(activity,"Theme reset failed",Toast.LENGTH_LONG).show());}}))
+      .setNeutralButton("Previous theme",(d,w)->IO.execute(()->{try{synchronized(CobraVisualTheme.STORE_LOCK){publish(CobraVisualTheme.rollback(activity.getApplicationContext()),"Previous theme restored");}}catch(Exception e){MAIN.post(()->Toast.makeText(activity,"Previous theme unavailable; current theme unchanged",Toast.LENGTH_LONG).show());}}))
+      .setNegativeButton("Close",null).show();
+  }
+  public static class DialogBuilder extends AlertDialog.Builder {
+    final CobraVisualRenderer renderer;final String slot;
+    public DialogBuilder(Context c,CobraVisualRenderer r,String name){super(c);renderer=r;slot=name;}
+    @Override public AlertDialog create(){
+      final AlertDialog dialog=super.create();
+      if(dialog.getWindow()!=null){
+        final View decor=dialog.getWindow().getDecorView();
+        // A view listener, not Dialog.setOnShowListener: preserve login/profile/guide callbacks.
+        decor.addOnLayoutChangeListener(new View.OnLayoutChangeListener(){
+          public void onLayoutChange(View view,int l,int t,int r,int b,int ol,int ot,int or,int ob){
+            if(dialog.isShowing()&&r>l&&b>t){view.removeOnLayoutChangeListener(this);renderer.tree(view,slot);}
+          }
+        });
+      }
+      return dialog;
+    }
+    @Override public AlertDialog show(){AlertDialog dialog=super.show();if(dialog.getWindow()!=null)renderer.tree(dialog.getWindow().getDecorView(),slot);return dialog;}
+  }
+}

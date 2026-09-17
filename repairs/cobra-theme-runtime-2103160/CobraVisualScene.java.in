@@ -1,0 +1,99 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.IOException;
+import java.util.*;
+
+/** Declarative presentation of existing actions, never an action interpreter. */
+public final class CobraVisualScene {
+  static final Set<String> CHOOSER_SLOTS = new HashSet<>(Arrays.asList(
+      "enter.infinity", "enter.cobra", "settings.infinity", "settings.cobra"));
+
+  static void validate(JSONObject scene, Map<String,String> assets) throws Exception {
+    CobraVisualTheme.keys(scene,"width","height","background","nodes");
+    CobraVisualTheme.validateNumber(scene.get("width"),240,4096);
+    CobraVisualTheme.validateNumber(scene.get("height"),240,8192);
+    if(scene.has("background"))CobraVisualTheme.validateColor(scene.get("background"));
+    JSONArray nodes=scene.getJSONArray("nodes");
+    if(nodes.length()>64)throw new IOException("Too many scene nodes");
+    Set<String> ids=new HashSet<>(),slots=new HashSet<>();
+    ArrayList<double[]> targets=new ArrayList<>();
+    for(int i=0;i<nodes.length();i++){
+      JSONObject n=nodes.getJSONObject(i);
+      CobraVisualTheme.keys(n,"id","type","slot","rect","asset","fit","label","style","align");
+      String id=n.getString("id"),type=n.getString("type");
+      if(!id.matches("[a-z0-9._-]{1,80}")||!ids.add(id))throw new IOException("Invalid or repeated scene id");
+      if(!Arrays.asList("image","text","slot").contains(type))throw new IOException("Unknown scene node type");
+      JSONArray rect=n.getJSONArray("rect");if(rect.length()!=4)throw new IOException("Scene rect requires four numbers");
+      for(int j=0;j<4;j++)CobraVisualTheme.validateNumber(rect.get(j),0,j%2==0?scene.getDouble("width"):scene.getDouble("height"));
+      double x=rect.getDouble(0),y=rect.getDouble(1),w=rect.getDouble(2),h=rect.getDouble(3);
+      if(w<=0||h<=0||x+w>scene.getDouble("width")+.001||y+h>scene.getDouble("height")+.001)throw new IOException("Scene node outside bounds");
+      if(n.has("fit")&&!Arrays.asList("contain","cover","stretch").contains(n.getString("fit")))throw new IOException("Unknown scene image fit");
+      if(n.has("align")&&!Arrays.asList("left","center","right").contains(n.getString("align")))throw new IOException("Unknown scene text alignment");
+      if(n.has("asset")&&!"image".equals(assets.get(n.getString("asset"))))throw new IOException("Unknown scene image");
+      if(type.equals("image")&&!n.has("asset"))throw new IOException("Image node has no asset");
+      if(n.has("style"))CobraVisualTheme.validateStyle(n.getJSONObject("style"),assets);
+      if(n.has("label")&&(!(n.get("label") instanceof String)||n.getString("label").length()>240||n.getString("label").indexOf('\0')>=0))throw new IOException("Invalid scene label");
+      if(type.equals("text")&&!n.has("label"))throw new IOException("Text node has no label");
+      if(type.equals("slot")){
+        String slot=n.getString("slot");if(!CHOOSER_SLOTS.contains(slot)||!slots.add(slot))throw new IOException("Unknown or duplicate native action slot");
+        for(double[] old:targets)if(x<old[0]+old[2]&&x+w>old[0]&&y<old[1]+old[3]&&y+h>old[1])throw new IOException("Action targets overlap");
+        targets.add(new double[]{x,y,w,h});
+      }else if(n.has("slot"))throw new IOException("Decoration cannot specify actions");
+    }
+    if(!slots.equals(CHOOSER_SLOTS))throw new IOException("Scene must retain both native launch and both settings controls");
+  }
+
+  /** Returns null before touching native slots when a scene cannot fit safely. */
+  static View build(Context context,CobraVisualRenderer renderer,JSONObject scene,Map<String,View> slots,int widthDp) throws Exception {
+    if(scene==null||!slots.keySet().equals(CHOOSER_SLOTS))return null;
+    float width=scene.getInt("width"),scale=widthDp/width;
+    JSONArray nodes=scene.getJSONArray("nodes");
+    for(int i=0;i<nodes.length();i++){
+      JSONObject n=nodes.getJSONObject(i);if(!"slot".equals(n.getString("type")))continue;
+      JSONArray r=n.getJSONArray("rect");
+      if(r.getDouble(2)*scale<44||r.getDouble(3)*scale<44)return null;
+    }
+    float density=context.getResources().getDisplayMetrics().density;
+    ScrollView scroll=new ScrollView(context);scroll.setFillViewport(true);scroll.setTag("visual-scene:chooser");
+    FrameLayout canvas=new FrameLayout(context);canvas.setTag("visual-scene-canvas");
+    canvas.setBackgroundColor(android.graphics.Color.parseColor(scene.optString("background","#000000")));
+    int canvasHeight=Math.round(scene.getInt("height")*scale*density);
+    scroll.addView(canvas,new ScrollView.LayoutParams(-1,canvasHeight));
+    // Decorative nodes are always behind real controls, regardless of manifest order.
+    for(String pass:new String[]{"decoration","slot"})for(int i=0;i<nodes.length();i++){
+      JSONObject n=nodes.getJSONObject(i);String type=n.getString("type");if(type.equals("slot")!=pass.equals("slot"))continue;
+      View v;
+      if(type.equals("slot")){
+        v=slots.get(n.getString("slot"));if(v.getParent()!=null)throw new IOException("Native action slot already attached");
+        // Only its presentation is replaced. Existing click, focus and accessibility ownership remains native.
+        if(n.has("label")&&v instanceof TextView){((TextView)v).setText(n.getString("label"));v.setContentDescription(n.getString("label"));}
+      }else if(type.equals("text")){
+        TextView text=new TextView(context);text.setText(n.getString("label"));text.setTextColor(android.graphics.Color.WHITE);text.setTextSize(14);
+        String align=n.optString("align","center");text.setGravity(Gravity.CENTER_VERTICAL|(align.equals("left")?Gravity.LEFT:align.equals("right")?Gravity.RIGHT:Gravity.CENTER_HORIZONTAL));
+        text.setIncludeFontPadding(false);v=text;
+      }else{
+        final String asset=n.getString("asset"),fit=n.optString("fit","contain");
+        v=new View(context){@Override protected void onDraw(Canvas c){CobraVisualRenderer.drawBitmap(c,CobraVisualRenderer.active.bitmaps.get(asset),new android.graphics.RectF(0,0,getWidth(),getHeight()),fit,255);}};
+        v.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);v.setClickable(false);v.setFocusable(false);
+      }
+      if(!type.equals("slot"))v.setTag("visual-node:"+n.getString("id"));
+      if(n.has("asset")&&!type.equals("image")){
+        JSONObject style=n.has("style")?new JSONObject(n.getJSONObject("style").toString()):new JSONObject();style.put("image",n.getString("asset"));style.put("image_fit",n.optString("fit","contain"));
+        renderer.inline(v,"chooser.node."+n.getString("id"),style);
+      }else if(n.has("style"))renderer.inline(v,"chooser.node."+n.getString("id"),n.getJSONObject("style"));
+      else renderer.paint(v,"chooser.node."+n.getString("id"));
+      JSONArray r=n.getJSONArray("rect");FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(Math.round((float)r.getDouble(2)*scale*density),Math.round((float)r.getDouble(3)*scale*density));
+      p.leftMargin=Math.round((float)r.getDouble(0)*scale*density);p.topMargin=Math.round((float)r.getDouble(1)*scale*density);canvas.addView(v,p);
+    }
+    return scroll;
+  }
+}
