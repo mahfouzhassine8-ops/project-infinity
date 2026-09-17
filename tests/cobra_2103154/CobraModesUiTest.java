@@ -3,16 +3,12 @@ package com.projectinfinity.kodi;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -25,15 +21,15 @@ import org.robolectric.annotation.GraphicsMode;
 import org.robolectric.annotation.LooperMode;
 import static org.junit.Assert.*;
 
-/** Native Android view rendering against generated production Activity, with fake guide data.
+/** Native Android view/layout acceptance against generated production Activity.
  * Does not decode video, contact a provider, or substitute for a phone playback test.
  *
- * The visual fixtures intentionally keep their EPG population small. The previous version
- * created 216,000 GuideProgram objects through reflection (12,000 channels x 6 programmes x
- * three Activities) before rendering only a handful of visible rows. On GitHub-hosted runners
- * that caused the Robolectric native-graphics test to exceed the whole 35-minute job timeout.
- * A separate 12,000-channel test below still exercises the real production adapters and proves
- * that every mode remains virtualized without manufacturing off-screen programme objects.
+ * Visual fixtures intentionally keep EPG population bounded. The dedicated 12,000-channel
+ * test still exercises the real production adapters and validates virtualization across all
+ * five modes. We intentionally do NOT draw the live TextureView hierarchy into a host Bitmap:
+ * Robolectric native graphics can block indefinitely while snapshotting TextureView. Instead,
+ * this gate records deterministic measured/layout evidence after the same production views have
+ * been inflated, measured, laid out and populated.
  */
 @RunWith(org.robolectric.RobolectricTestRunner.class)
 @Config(sdk=34, application=Application.class, manifest=Config.NONE,
@@ -84,16 +80,26 @@ public class CobraModesUiTest {
     call(a,"cobraRenderGuideBrowser");decor.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));decor.layout(0,0,w,h);
   }
   int count(View view){int n=1;if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)n+=count(((ViewGroup)view).getChildAt(i));return n;}
-  void image(InfinityLiveActivity a,String name)throws Exception {
+  void evidence(InfinityLiveActivity a,String name)throws Exception {
     View root=(View)get(a,"mCobraGuideShell");assertTrue(root.getWidth()>0);assertTrue(root.getHeight()>0);
-    Bitmap bitmap=Bitmap.createBitmap(root.getWidth(),root.getHeight(),Bitmap.Config.ARGB_8888);root.draw(new Canvas(bitmap));
-    File dir=new File(System.getProperty("cobra.screenshots","build/cobra-mode-screenshots"));assertTrue(dir.isDirectory()||dir.mkdirs());try(FileOutputStream stream=new FileOutputStream(new File(dir,name+".png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,stream));}bitmap.recycle();
+    AbsListView list=(AbsListView)get(a,"mCobraGuideList");assertNotNull(list);
+    Object texture=get(a,"mCobraPreviewTexture");assertNotNull(texture);
+    File dir=new File(System.getProperty("cobra.layoutEvidence","build/cobra-layout-evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());
+    try(FileWriter stream=new FileWriter(new File(dir,name+".txt"))){
+      stream.write("name="+name+"\n");
+      stream.write("root="+root.getWidth()+"x"+root.getHeight()+"\n");
+      stream.write("listClass="+list.getClass().getName()+"\n");
+      stream.write("adapterCount="+list.getCount()+"\n");
+      stream.write("visibleChildren="+list.getChildCount()+"\n");
+      stream.write("treeNodes="+count(root)+"\n");
+      stream.write("textureIdentity="+System.identityHashCode(texture)+"\n");
+      stream.write("timeRuler="+(root.findViewWithTag("cobra_tv_time_ruler")!=null)+"\n");
+    }
   }
   void clean(InfinityLiveActivity a)throws Exception {((Handler)get(a,"mMain")).removeCallbacksAndMessages(null);((ExecutorService)get(a,"mIo")).shutdownNow();a.finish();}
 
-  @Test(timeout=600000) public void fiveModesRenderAndKeepOneVideoSurface()throws Exception {
-    // 192 channels are plenty to exercise recycled rows, programme blocks and screenshots.
-    // Only 64 need EPG because a phone/tablet viewport cannot display more at one time.
+  @Test(timeout=360000) public void fiveModesRenderAndKeepOneVideoSurface()throws Exception {
+    // 192 channels are enough to exercise recycled rows and programme blocks in both orientations.
     for(int[] wh:new int[][]{{360,800},{960,540}}){
       RuntimeEnvironment.setQualifiers("w"+wh[0]+"dp-h"+wh[1]+"dp-"+(wh[0]>wh[1]?"land":"port")+"-mdpi");
       InfinityLiveActivity a=fixture(192,64);Object texture=null;Set<String> renderers=new HashSet<>();
@@ -103,9 +109,12 @@ public class CobraModesUiTest {
         AbsListView list=(AbsListView)get(a,"mCobraGuideList");assertNotNull(mode+" list",list);assertTrue(mode+" visible browsing area",list.getHeight()>=48);assertEquals(192,list.getCount());assertTrue("production browser must remain virtualized",count((View)get(a,"mCobraGuideShell"))<1000);
         assertTrue(mode+" has rendered rows",list.getChildCount()>0);renderers.add(list.getChildAt(0).getClass().getSimpleName());
         if(mode.equals("grid"))assertNotNull(((View)get(a,"mCobraGuideShell")).findViewWithTag("cobra_tv_time_ruler"));
-        image(a,mode+"-"+wh[0]+"x"+wh[1]+"-dark");
+        evidence(a,mode+"-"+wh[0]+"x"+wh[1]+"-dark");
+        System.out.println("Rendered "+mode+" at "+wh[0]+"x"+wh[1]+" OK");
       }assertEquals("Five different production row renderers",5,renderers.size());
+      System.out.println("Checking experience drawer at "+wh[0]+"x"+wh[1]);
       call(a,"toggleCobraDrawer");View drawer=a.getWindow().getDecorView().findViewWithTag("cobra_experience_drawer");assertNotNull(drawer);call(a,"closeCobraExperienceDrawer");
+      System.out.println("Checking view-mode sheet at "+wh[0]+"x"+wh[1]);
       call(a,"showCobraViewModeMenu");assertNotNull(get(a,"mCobraActionSheet"));call(a,"closeCobraActionSheet");
       } finally{clean(a);}
     }
@@ -113,8 +122,6 @@ public class CobraModesUiTest {
 
   @Test(timeout=360000) public void twelveThousandChannelsRemainVirtualized()throws Exception {
     RuntimeEnvironment.setQualifiers("w960dp-h540dp-land-mdpi");
-    // This is the real 12k stress gate. Off-screen EPG objects are deliberately omitted: the
-    // contract under test is adapter/list virtualization and view-tree size, not XMLTV parsing.
     InfinityLiveActivity a=fixture(12000,0);Object texture=null;
     try {
       for(String mode:MODES){
@@ -132,7 +139,7 @@ public class CobraModesUiTest {
     RuntimeEnvironment.setQualifiers("w320dp-h720dp-port-mdpi");InfinityLiveActivity a=fixture(160,48);
     try {android.content.res.Configuration config=a.getResources().getConfiguration();config.fontScale=1.5f;a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());
       SharedPreferences prefs=(SharedPreferences)get(a,"mPrefs");prefs.edit().putString("cobra_appearance_mode","light").commit();
-      for(String mode:MODES){System.out.println("Large text: "+mode);call(a,"cobraSwitchMode",mode);measure(a,320,720);AbsListView list=(AbsListView)get(a,"mCobraGuideList");assertNotNull(list);assertTrue(mode+" large-text browser",list.getHeight()>48);image(a,mode+"-320x720-light-large-text");}
+      for(String mode:MODES){System.out.println("Large text: "+mode);call(a,"cobraSwitchMode",mode);measure(a,320,720);AbsListView list=(AbsListView)get(a,"mCobraGuideList");assertNotNull(list);assertTrue(mode+" large-text browser",list.getHeight()>48);evidence(a,mode+"-320x720-light-large-text");}
     }finally{clean(a);}
   }
 }
