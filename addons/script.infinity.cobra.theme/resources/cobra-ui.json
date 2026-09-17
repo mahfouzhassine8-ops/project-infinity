@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "runtime": {
     "minimum_runtime": 3,
     "scope": "cobra-live-only"
@@ -32,9 +32,12 @@
     "mobile": {
       "preview_first": true,
       "preview_aspect": "16:9",
-      "preview_controls": ["fullscreen", "favorite", "schedule_recording", "captions", "volume", "more"],
+      "preview_controls": ["fullscreen", "play_pause", "favorite", "captions", "volume", "more"],
       "channel_row_height_dp": 70,
-      "category_control": "favorites_and_categories_hub",
+      "category_control": "favorites_recent_and_categories_hub",
+      "top_tabs": ["favorites", "recently_played"],
+      "recently_played_policy": "successful_ready_state_only",
+      "startup_preview": "last_successfully_played_channel",
       "bottom_navigation": false,
       "drawer_mode": "push_content",
       "drawer_collapse_control": true,
@@ -81,9 +84,35 @@
     "pip_chrome": "video_only",
     "mini_to_fullscreen": "reuse_exoplayer_session",
     "fullscreen_to_mini": "reuse_exoplayer_session",
-    "chrome": "compact_dark_two_band",
+    "chrome": "slim_dark_single_control_row",
+    "play_pause": "direct_in_mini_and_fullscreen",
     "aspect_control": "always_reachable",
-    "aspect_modes": ["best_fit", "crop_fill", "16:9", "4:3", "zoom_1_25", "zoom_1_50", "zoom_2_00"]
+    "aspect_modes": [
+      "best_fit",
+      "crop_fill",
+      "16:9",
+      "4:3",
+      "wide_1_10",
+      "wide_1_25",
+      "wide_1_40",
+      "short_wide",
+      "zoom_1_25",
+      "zoom_1_50",
+      "zoom_2_00",
+      "custom_width_height"
+    ]
+  },
+  "multiview": {
+    "entry": "keep_current_video_alive",
+    "picker": "docked_category_browser",
+    "picker_tabs": ["favorites", "recently_played", "all", "categories"],
+    "initial_current_session_reuse": true,
+    "maximum_screens": 4,
+    "add_screen_control": true,
+    "single_view_control": true,
+    "remove_screen_control": true,
+    "portrait_picker": "video_above_browser_below",
+    "landscape_picker": "video_left_browser_right"
   },
   "settings": {
     "subscription_account_status": true,
