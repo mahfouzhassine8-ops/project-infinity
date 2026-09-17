@@ -125,7 +125,7 @@ jobs:
           cmp kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in rollback159/2103158-activity.java.in
           python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_tests.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit159/epg-host
           python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_short.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --host audit159/epg-host --out audit159/epg-short
-          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_inherited.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --repository refinement-delta --mode-harness audit157/host/modes/CobraModesHarness.java --out audit159/inherited
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_inherited.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --repository refinement-delta --mode-harness audit159/parent-health-host/modes/CobraModesHarness.java --out audit159/inherited
           python3 experience-delta/repairs/infinity-experience-2103159/ci.py promote
       - name: Compile sign and verify bridge APK with locked native payload
         env:
