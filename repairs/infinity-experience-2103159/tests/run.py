@@ -9,12 +9,12 @@ apply=load('experience_apply',ROOT/'apply.py');builder=load('experience_zip',ROO
 def h(b):return hashlib.sha256(b).hexdigest()
 def main():
  p=argparse.ArgumentParser();p.add_argument('--splash',type=Path,required=True);p.add_argument('--ui',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
- before=a.splash.read_text();after,receipt=apply.patch(before);(a.out/'Splash.java.in').write_text(after)
+ before=a.splash.read_text();after=apply.patch_splash(before);receipt={'before_sha256':apply.sha(before),'after_sha256':apply.sha(after),'protected_methods':['startXBMC','showExperienceCardSettings','launchInfinityExperience','onCreate'],'legacy_fallback_preserved':True};(a.out/'Splash.java.in').write_text(after)
  checks=[]
  def check(value,label):
   if not value:raise AssertionError(label)
   checks.append(label)
- check(receipt['before_sha256']==apply.BASE,'Exact locked Splash accepted')
+ check(receipt['before_sha256']==apply.BASE_SPLASH,'Exact locked Splash accepted')
  check(receipt['legacy_fallback_preserved'],'Legacy fallback preserved')
  for name in receipt['protected_methods']:
   x,y=apply.method(before,name);u,v=apply.method(after,name);check(before[x:y]==after[u:v],'Protected '+name+' byte-identical')
@@ -30,7 +30,7 @@ def main():
  check(after.count('private void launchInfinityExperience(String experience)')==1,'Single launch owner')
  check('experience-initials' in after and 'experience-themed-root' in after,'HM/theme view tags present')
  check('YOUR HOME FOR MOVIES, SHOWS AND MORE' in after and 'FOCUSED. FAST. POWERFUL.' in after,'Approved card copy present')
- try:apply.patch(before+'\n')
+ try:apply.patch_splash(before+'\n')
  except ValueError:check(True,'Modified Splash preimage rejected')
  else:raise AssertionError('Modified Splash accepted')
  with tempfile.TemporaryDirectory() as t:
