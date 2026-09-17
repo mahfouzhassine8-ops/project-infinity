@@ -1,0 +1,128 @@
+name: Infinity | Cobra EPG Repair RC1 Signed APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-epg-repair-rc1]
+    paths:
+      - '.github/workflows/cobra-epg-repair-rc1-package.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      NDK_VER: 21.4.7075529
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Check out immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          path: base
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Download exact run40 base APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Download exact 2103154 generated source evidence
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103154-Layout-Evidence
+          run-id: 35180825737
+          github-token: ${{ github.token }}
+          path: inherited154
+      - name: Download exact 2103153 rollback
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103153-Complete-Rollback
+          run-id: 35180825737
+          github-token: ${{ github.token }}
+          path: rollback153
+      - name: Reconstruct matched shell and apply verified EPG repair
+        run: |
+          set -euo pipefail
+          cd base
+          bash scripts/infinity_live_app_ci_1.sh
+          mkdir -p ../work ../candidate ../ui-package ../engine
+          cp ../inherited154/preflight/2103154-final.java.in tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          python3 ../repairs/cobra-epg-rc1/apply_epg_repair.py --source tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --output ../work/InfinityLiveActivity.java.in --receipt ../work/repair-receipt.json
+          cp ../work/InfinityLiveActivity.java.in tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          python3 ../repairs/cobra-epg-rc1/tests/run_guards.py --source ../inherited154/preflight/2103154-final.java.in --out ../work/guards
+          git diff --binary -- xbmc > ../engine/native-after.patch
+      - name: Promote shell version without rebuilding native engine
+        run: |
+          set -euo pipefail
+          cd base
+          python3 - <<'PY'
+          from pathlib import Path
+          g=Path('tools/android/packaging/xbmc/build.gradle.in')
+          s=g.read_text()
+          s=s.replace('versionCode 2103138','versionCode 2103155',1)
+          s=s.replace('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"','versionName "1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1"',1)
+          g.write_text(s)
+          p=Path('scripts/infinity_background_resume.py')
+          if p.exists():
+              t=p.read_text().replace('VERSION_CODE = 2103138','VERSION_CODE = 2103155',1).replace("RELEASE = '1.0.9-Infinity-Lifecycle-Repair-RC3'","RELEASE = '1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'",1)
+              p.write_text(t)
+          q=Path('scripts/package_background_resume.py')
+          if q.exists(): q.write_text(q.read_text().replace('Infinity-1.0.9-Infinity-Lifecycle-Repair-RC3','Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'))
+          PY
+      - name: Package and sign installable update
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p background-rollback
+          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
+          python3 base/scripts/package_background_resume.py --source base --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out candidate
+          APK=candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103155' versionName='1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'" candidate/badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > candidate/signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing.txt
+          python3 - <<'PY'
+          import zipfile,hashlib
+          from pathlib import Path
+          apk=Path('candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk')
+          base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
+          with zipfile.ZipFile(apk) as new, zipfile.ZipFile(base) as old:
+              libs={n for n in old.namelist() if n.startswith('lib/') and not n.endswith('/')}
+              assert libs=={n for n in new.namelist() if n.startswith('lib/') and not n.endswith('/')}
+              for n in libs: assert old.read(n)==new.read(n),n
+              dex=b''.join(new.read(n) for n in new.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              for token in (b'CobraModeLayout',b'CobraBroadcastRow',b'cobra_tv_time_ruler',b'Guide ready',b'No matching programme ID'): assert token in dex,token
+          print('PASS: signed update retains exact native libraries and adaptive-view/guide contracts')
+          PY
+          sha256sum "$APK" > candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.sha256
+          cp repairs/cobra-epg-rc1/README.md candidate/EPG-REPAIR-README.md
+      - name: Upload installable signed update
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
+          path: |
+            candidate/
+            work/repair-receipt.json
+            work/guards/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
