@@ -148,6 +148,11 @@ jobs:
           python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir experience-build --out signed159
           python3 experience-delta/repairs/infinity-experience-2103159/ci.py verify
       - name: Render inherited Cobra, cleaned navigation and new experience chooser Android UI
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
           python3 experience-delta/repairs/infinity-experience-2103159/tests/android.py --build experience-build --out audit159/android
