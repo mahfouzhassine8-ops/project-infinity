@@ -3,10 +3,28 @@
 from pathlib import Path
 import argparse,os,shutil,signal,subprocess,threading,time
 
+# Read-only geometry evidence. No production method is invoked and no assertion,
+# measure/layout sequence, clock, or fixture field is changed by this probe.
+GEOMETRY_PROBE = r'''
+    System.out.println("GEOMETRY density="+a.getResources().getDisplayMetrics().density+" font="+a.getResources().getConfiguration().fontScale+" stamp="+get(a,"mCobraLastGuideWidth")+"x"+get(a,"mCobraLastGuideHeight"));
+    for(String key:new String[]{"mRoot","mStage","mCobraGuideShell","mCobraGuideVideo","mCobraPreviewTexture","mCobraGuideBrowser"}){
+      View item=(View)get(a,key);
+      if(item==null){System.out.println("GEOMETRY "+key+" null");continue;}
+      ViewGroup.LayoutParams lp=item.getLayoutParams();int[] loc=new int[2];item.getLocationInWindow(loc);
+      System.out.println("GEOMETRY "+key+" actual="+item.getWidth()+"x"+item.getHeight()+" measured="+item.getMeasuredWidth()+"x"+item.getMeasuredHeight()+" params="+(lp==null?"null":lp.width+"x"+lp.height)+" attached="+item.isAttachedToWindow()+" shown="+item.isShown()+" requested="+item.isLayoutRequested()+" location="+Arrays.toString(loc));
+    }
+    Object plan=get(a,"mCobraModeLayout");
+    System.out.println("GEOMETRY plan="+(plan==null?"null":get(plan,"width")+"x"+get(plan,"height")+" video="+Arrays.toString((int[])get(plan,"video"))+" browser="+Arrays.toString((int[])get(plan,"browser"))));
+'''
+
 def main():
  p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();build=a.build.resolve();out=a.out.resolve();out.mkdir(parents=True,exist_ok=True)
  app=build/'xbmc';test=app/'src/test/java/com/projectinfinity/kodi';test.mkdir(parents=True,exist_ok=True)
- shutil.copy2(Path(__file__).with_name('CobraNavigationUiTest.java'),test)
+ test_source=Path(__file__).with_name('CobraNavigationUiTest.java').read_text()
+ anchor='  void guide(InfinityLiveActivity a)throws Exception{'
+ if test_source.count(anchor)!=1:raise ValueError('Geometry evidence anchor drift')
+ (test/'CobraNavigationUiTest.java').write_text(test_source.replace(anchor,anchor+GEOMETRY_PROBE,1))
+ shutil.copy2(test/'CobraNavigationUiTest.java',out/'executed-CobraNavigationUiTest.java')
  with (app/'build.gradle').open('a') as f:f.write('''
 // Host test dependencies only. The already verified release APK contains none of these.
 android.testOptions.unitTests.includeAndroidResources = true
