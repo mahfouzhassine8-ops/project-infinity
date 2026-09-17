@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "Infinity Cobra Mobile + TV Guide",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "runtime": {
     "minimum_runtime": 3,
     "scope": "cobra-live-only"
@@ -17,14 +17,15 @@
   "appearance": {
     "default": "dark",
     "modes": ["system", "light", "dark", "oled"],
-    "player_overlay": "dark_high_contrast"
+    "player_overlay": "video_first_high_contrast_gradient"
   },
   "performance": {
     "channel_library": "virtualized_recycled_views",
     "warm_start": "last_good_private_cache",
     "refresh": "background_non_blocking",
     "large_library_target": 12000,
-    "selection_updates_preview_in_place": true
+    "selection_updates_preview_in_place": true,
+    "preview_navigation": "same_exoplayer_session_reattached_without_prepare"
   },
   "views": {
     "default": "mobile",
@@ -60,6 +61,7 @@
       "category_selection_opens_selected_view": true,
       "preview_player": true,
       "preview_controls": true,
+      "preview_navigation_continuity": true,
       "first_activation": "preview",
       "second_activation": "fullscreen",
       "back_from_fullscreen": "reuse_live_session_in_preview",
@@ -84,8 +86,16 @@
     "pip_chrome": "video_only",
     "mini_to_fullscreen": "reuse_exoplayer_session",
     "fullscreen_to_mini": "reuse_exoplayer_session",
-    "chrome": "slim_dark_single_control_row",
+    "chrome": "video_first_gradient_info_plus_compact_icons",
+    "program_hierarchy": ["channel", "now", "next", "live_state"],
     "play_pause": "direct_in_mini_and_fullscreen",
+    "lock": {
+      "enabled": true,
+      "mode": "input_blocking_overlay",
+      "back_behavior": "reveal_unlock_only",
+      "unlock_affordance_timeout_ms": 3000,
+      "pip_hidden": true
+    },
     "aspect_control": "always_reachable",
     "aspect_modes": [
       "best_fit",
@@ -107,10 +117,12 @@
     "picker": "docked_category_browser",
     "picker_tabs": ["favorites", "recently_played", "all", "categories"],
     "initial_current_session_reuse": true,
+    "add_screen_session_reuse": true,
+    "reflow": "reattach_existing_players_without_prepare",
     "maximum_screens": 4,
-    "add_screen_control": true,
-    "single_view_control": true,
-    "remove_screen_control": true,
+    "chrome": "video_only_normal_state",
+    "single_tap": "select_audio_owner",
+    "long_press": ["use_audio_here", "change_channel", "add_screen", "fullscreen_this", "remove_screen", "close_multiview"],
     "portrait_picker": "video_above_browser_below",
     "landscape_picker": "video_left_browser_right"
   },
