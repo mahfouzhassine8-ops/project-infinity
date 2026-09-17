@@ -14,10 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.shadows.ShadowAlertDialog;
 import static org.junit.Assert.*;
 
@@ -31,7 +34,29 @@ import static org.junit.Assert.*;
 public class ExperienceChooserUiTest {
   static Method chooser;
   @BeforeClass public static void reflect()throws Exception{chooser=Splash.class.getDeclaredMethod("showInfinityExperienceChooser");chooser.setAccessible(true);}
-  Splash activity()throws Exception{return Robolectric.buildActivity(Splash.class).get();}
+  final Map<Splash,ActivityController<Splash>> controllers=new IdentityHashMap<>();
+  Splash activity()throws Exception{
+    ActivityController<Splash> controller=Robolectric.buildActivity(Splash.class);
+    Splash a=controller.get();controllers.put(a,controller);return a;
+  }
+  void layout(Splash a,int width,int height){
+    View decor=a.getWindow().getDecorView();
+    // Run 35275938034 drew an unattached DecorView: Android 34 needs a ViewRootImpl.
+    // Match the locked Cobra fixture: build the real UI, then attach its window.
+    // Do NOT call setup()/onCreate(): native startup is outside this rendering test.
+    ActivityController<Splash> controller=controllers.get(a);
+    assertNotNull("Splash must belong to this test fixture",controller);
+    if(!decor.isAttachedToWindow())controller.visible();
+    assertTrue("Chooser window must be attached before layout",decor.isAttachedToWindow());
+    decor.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));
+    decor.layout(0,0,width,height);
+  }
+  @After public void closeWindows(){
+    AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+    if(dialog!=null&&dialog.isShowing())dialog.dismiss();
+    for(ActivityController<Splash> controller:controllers.values())controller.destroy();
+    controllers.clear();
+  }
   File themeFile(Splash a){return new File(a.getExternalFilesDir(null),".kodi/addons/script.infinity.cobra.theme/resources/experience-chooser.json");}
   void installTheme(Splash a)throws Exception{
     File file=themeFile(a);assertTrue(file.getParentFile().isDirectory()||file.getParentFile().mkdirs());byte[] data=Files.readAllBytes(Paths.get(System.getProperty("experience.theme.source")));
@@ -39,7 +64,7 @@ public class ExperienceChooserUiTest {
   }
   void show(Splash a,boolean themed,int width,int height)throws Exception{
     File f=themeFile(a);if(f.exists())assertTrue(f.delete());if(themed)installTheme(a);chooser.invoke(a);
-    View decor=a.getWindow().getDecorView();decor.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));decor.layout(0,0,width,height);
+    layout(a,width,height);
   }
   View tag(Splash a,String value){return a.getWindow().getDecorView().findViewWithTag(value);}
   List<String> texts(View root){ArrayList<String> out=new ArrayList<>();if(root instanceof TextView)out.add(((TextView)root).getText().toString());if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++)out.addAll(texts(((ViewGroup)root).getChildAt(i)));return out;}
@@ -59,7 +84,7 @@ public class ExperienceChooserUiTest {
     Splash cobra=activity();show(cobra,true,412,915);assertTrue(tag(cobra,"experience-card-cobra").performClick());Intent live=Shadows.shadowOf(cobra).getNextStartedActivity();assertNotNull(live);assertEquals("com.projectinfinity.kodi.InfinityLiveActivity",live.getComponent().getClassName());assertEquals("cobra",live.getStringExtra("infinity_live_profile"));
   }
   @Test public void corruptThemeFallsBackWithoutChangingLegacyChooser()throws Exception{
-    Splash a=activity();File file=themeFile(a);assertTrue(file.getParentFile().isDirectory()||file.getParentFile().mkdirs());try(FileOutputStream out=new FileOutputStream(file)){out.write("{not json".getBytes("UTF-8"));}chooser.invoke(a);View decor=a.getWindow().getDecorView();decor.measure(View.MeasureSpec.makeMeasureSpec(412,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(915,View.MeasureSpec.EXACTLY));decor.layout(0,0,412,915);List<String> copy=texts(decor);assertNull(tag(a,"experience-themed-root"));assertTrue(contains(copy,"INFINITY 2-IN-1"));assertTrue(contains(copy,"Two separate environments"));
+    Splash a=activity();File file=themeFile(a);assertTrue(file.getParentFile().isDirectory()||file.getParentFile().mkdirs());try(FileOutputStream out=new FileOutputStream(file)){out.write("{not json".getBytes("UTF-8"));}chooser.invoke(a);layout(a,412,915);List<String> copy=texts(a.getWindow().getDecorView());assertNull(tag(a,"experience-themed-root"));assertTrue(contains(copy,"INFINITY 2-IN-1"));assertTrue(contains(copy,"Two separate environments"));
   }
   @Test @Config(sdk=34,application=android.app.Application.class,manifest=Config.NONE,qualifiers="w320dp-h720dp-port-mdpi") public void narrowDisplayStacksCardsAndKeepsControlsReachable()throws Exception{
     Splash a=activity();show(a,true,320,720);View infinity=tag(a,"experience-card-infinity"),cobra=tag(a,"experience-card-cobra");assertNotNull(infinity);assertNotNull(cobra);assertTrue("stacked",cobra.getTop()>=infinity.getBottom());assertTrue(infinity.getHeight()>=180);assertTrue(cobra.getHeight()>=180);assertNotNull(tag(a,"experience-settings-infinity"));assertNotNull(tag(a,"experience-settings-cobra"));shot(a,"experience-cover-320x720");
