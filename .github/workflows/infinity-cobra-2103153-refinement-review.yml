@@ -1,0 +1,22 @@
+name: Infinity | Cobra 2103153 Refinement Review
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103153-guide-player-refinement]
+    paths: ['.github/workflows/infinity-cobra-2103153-refinement-review.yml']
+permissions:
+  contents: read
+jobs:
+  review-snapshot:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103153-Refinement-Sources
+          path: patches/infinity-cobra-refinement/
+          if-no-files-found: error
+          retention-days: 30
