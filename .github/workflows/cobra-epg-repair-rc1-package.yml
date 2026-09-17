@@ -5,15 +5,21 @@ on:
     branches: [infinity-cobra-epg-repair-rc1]
     paths:
       - '.github/workflows/cobra-epg-repair-rc1-package.yml'
+      - 'repairs/cobra-epg-rc1/package_guard.py'
+      - 'repairs/cobra-epg-rc1/tests/test_package_guard.py'
 permissions:
   contents: read
   actions: read
+concurrency:
+  group: cobra-epg-repair-package-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   package:
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     env:
       NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
     steps:
       - name: Check out immutable reconstruction stack
         uses: actions/checkout@v5
@@ -27,6 +33,15 @@ jobs:
           ref: ${{ github.sha }}
           path: refinement-delta
           persist-credentials: false
+      - name: Validate reconstruction inputs and preserve pre-change source
+        run: |
+          set -euo pipefail
+          : "${RUNTIME_COMMIT:?Pinned runtime commit is required}"
+          : "${NDK_VER:?Pinned NDK version is required}"
+          : "${GITHUB_REPOSITORY:?Repository identity is required}"
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/test_package_guard.py
+          python3 -m pip install pyyaml
+          python3 refinement-delta/repairs/cobra-epg-rc1/package_guard.py inputs
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -55,10 +70,11 @@ jobs:
           run-id: 35176733529
           github-token: ${{ github.token }}
           path: rollback2103153
+      - name: Verify all exact APK and matching UI inputs before reconstruction
+        run: python3 refinement-delta/repairs/cobra-epg-rc1/package_guard.py artifacts
       - name: Reconstruct exact audited 2103154 source and presentation
         run: |
           set -euo pipefail
-          python3 -m pip install pyyaml
           python3 refinement-delta/scripts/cobra_2103154_ci.py reconstruct
           python3 refinement-delta/scripts/cobra_2103154_ci.py apply
           python3 refinement-delta/scripts/cobra_2103154_ci.py promote
@@ -107,12 +123,16 @@ jobs:
           for rel in ('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in','tools/android/packaging/xbmc/build.gradle.in'):
               assert rel in row['files'],rel
               row['files'][rel]['after']=sha(Path('kodi')/rel)
-          row.update(version_code=VERSION,version_name=NEW,locked_parent=2103154,epg_repair='cobra-epg-data-rc1',native_engine_unchanged=True,native_source_modified=False,device_playback_verified=False)
+          row.update(version_code=VERSION,version_name=NEW,source_parent=2103154,source_parent_locked=False,
+                     candidate_locked=False,epg_repair='cobra-epg-data-rc1',native_engine_unchanged=True,
+                     native_source_modified=False,device_playback_verified=False)
           receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
           print('PASS: version promotion anchored to exact reconstructed 2103154 source')
           PY
           git -C kodi diff --binary -- xbmc > engine/native-after-2103155.patch
           cmp engine/native-before.patch engine/native-after-2103155.patch
+      - name: Package and verify exact matching UI 1.3.9
+        run: python3 refinement-delta/repairs/cobra-epg-rc1/package_guard.py ui
       - name: Package sign and verify installable 2103155 update
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -121,17 +141,19 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
-          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out candidate
-          APK=candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk
+          # A separate destination excludes the historical candidate/1.3.7 theme ZIP.
+          test ! -e signed-candidate
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out signed-candidate
+          APK=signed-candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk
           test -s "$APK"
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > candidate/final-badging.txt
-          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103155' versionName='1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'" candidate/final-badging.txt
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > candidate/final-signing.txt
-          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/final-signing.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > signed-candidate/final-badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103155' versionName='1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1'" signed-candidate/final-badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > signed-candidate/final-signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' signed-candidate/final-signing.txt
           python3 - <<'PY'
-          import zipfile
+          import hashlib,json,zipfile
           from pathlib import Path
-          apk=Path('candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk')
+          apk=Path('signed-candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk')
           baselines=[Path('background-rollback/Infinity-Run40-Exact-Base.apk'),Path('rollback2103153/background-candidate/Infinity-1.0.9-Cobra-Guide-Player-Refinement.apk')]
           with zipfile.ZipFile(apk) as new:
               final_libs={n for n in new.namelist() if n.startswith('lib/') and not n.endswith('/')};assert final_libs
@@ -141,26 +163,47 @@ jobs:
                       assert libs==final_libs,(path,libs^final_libs)
                       for name in libs: assert old.read(name)==new.read(name),(path,name)
               dex=b''.join(new.read(n) for n in new.namelist() if n.startswith('classes') and n.endswith('.dex'))
-              for token in (b'CobraModeLayout',b'CobraBroadcastRow',b'cobra_tv_time_ruler',b'cobraEpgSnapshotFile',b'Schedule has unknown end times'):
+              for token in (b'CobraModeLayout',b'CobraBroadcastRow',b'CobraMobileChannelRow',b'CobraCompactChannelRow',
+                            b'CobraPosterChannelCard',b'CobraFocusQueueRow',b'cobra_tv_time_ruler',b'cobraEpgSnapshotFile',
+                            b'Schedule has unknown end times'):
                   assert token in dex,token
-          print('PASS: permanent signer, exact protected native bytes, adaptive views and EPG repair all present')
+              assert b'CobraModesUiTest' not in dex
+          ui=Path('ui-package/Infinity-Cobra-UI-1.3.9.zip')
+          ui_report=json.loads(Path('work/matching-ui.json').read_text())
+          assert hashlib.sha256(ui.read_bytes()).hexdigest()==ui_report['sha256']
+          acceptance={'build':2103155,'candidate_locked':False,'native_recompiled':False,
+                      'native_libraries_byte_identical_to_both_baselines':len(final_libs),
+                      'matching_ui_version':'1.3.9','matching_ui_sha256':ui_report['sha256'],
+                      'android_layout_rendering':'not_run_in_this_packaging_workflow',
+                      'prior_android_layout_run':35180825737,'prior_android_layout_conclusion':'cancelled',
+                      'real_provider_playback_verified':False,'device_visual_acceptance':False}
+          Path('signed-candidate/ACCEPTANCE-STATUS.json').write_text(json.dumps(acceptance,indent=2)+'\n')
+          print('PASS: permanent signer, exact protected native bytes, five adaptive views and EPG repair present')
           PY
-          sha256sum "$APK" > candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.sha256
-          cp refinement-delta/repairs/cobra-epg-rc1/README.md candidate/EPG-REPAIR-README.md
-          cat > candidate/READ-ME.txt <<'TXT'
-          Infinity Cobra 2103155 — Adaptive Views + EPG Repair RC1. Candidate, NOT locked.
+          sha256sum "$APK" > signed-candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.sha256
+          cp refinement-delta/repairs/cobra-epg-rc1/README.md signed-candidate/EPG-REPAIR-README.md
+          cat > signed-candidate/READ-ME.txt <<'TXT'
+          Infinity Cobra 2103155 - Adaptive Views + EPG Repair RC1. TEST CANDIDATE, NOT locked.
           Install the APK as an Android app update; do not uninstall or clear app data.
-          Native Kodi libraries are reused and must remain byte-identical to the protected baseline.
-          EPG host fixtures and generated layout tests do not prove real-provider playback or final visual acceptance.
-          Physical-device acceptance is still required before any lock or release promotion.
+          Matching presentation contract: Infinity-Cobra-UI-1.3.9.zip in ui-package/.
+          That ZIP is a Cobra UI addon, not an APK or replacement for the APK.
+          Native Kodi libraries are reused byte-for-byte; no native engine rebuild.
+          EPG host fixtures are not real-provider or real-device playback validation.
+          IMPORTANT: Android view-rendering run 35180825737 was cancelled, not passed.
+          This packaging-only workflow does not rerun or resolve that rendering test.
+          Physical-device playback and final visual acceptance remain unverified.
+          No release, baseline lock, installation or data migration is performed by CI.
           TXT
-      - name: Upload installable signed update and evidence
+      - name: Upload installable test candidate and matching UI
         uses: actions/upload-artifact@v7
         with:
           name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
           path: |
-            candidate/
+            signed-candidate/
+            ui-package/Infinity-Cobra-UI-1.3.9.zip
+            ui-package/Infinity-Cobra-UI-1.3.9.zip.sha256
             work/repair-receipt.json
+            work/matching-ui.json
             work/epg-host/results.json
             work/epg-short/results.json
             work/guards/
@@ -171,3 +214,40 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
+      - name: Preserve packaging diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103155-Packaging-Evidence
+          path: |
+            work/
+            preflight/
+            engine/background-resume-source.json
+            engine/native-before.patch
+            engine/native-after-2103154.patch
+            engine/native-after-2103155.patch
+            signed-candidate/*.json
+            signed-candidate/*.txt
+            refinement-delta/.github/workflows/cobra-epg-repair-rc1-package.yml
+            refinement-delta/repairs/cobra-epg-rc1/package_guard.py
+            refinement-delta/repairs/cobra-epg-rc1/tests/test_package_guard.py
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Preserve exact protected app and pre-change pipeline rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103153-and-EPG-Pipeline-Rollback-For-2103155
+          path: |
+            rollback-package/
+            pipeline-rollback/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90
+      - name: Report packaging-only validation boundary
+        if: always()
+        run: |
+          echo '### Cobra 2103155 packaging candidate' >> "$GITHUB_STEP_SUMMARY"
+          echo 'APK availability depends on the installable artifact upload above.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The cancelled 2103154 Android rendering test is NOT a passed test and is not rerun here.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Real-provider playback and final device visual acceptance remain pending. Candidate is not locked.' >> "$GITHUB_STEP_SUMMARY"
