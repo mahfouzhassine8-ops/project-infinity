@@ -47,20 +47,26 @@ def patch(before):
   s=once(s,'    mCobraInternalScreen="root";','    mCobraNavigation.advance();mCobraStageTitle="";\n    mCobraInternalScreen="root";\n    if("grid".equals(mCobraGuideStyle)&&!"sources".equals(mCobraGuideRoute))mCobraGuideRoute="channels";')
   s=once(s,'mStage.setPadding(dp(8),0,dp(8),0);','mStage.setPadding("grid".equals(mCobraGuideStyle)?0:dp(8),0,"grid".equals(mCobraGuideStyle)?0:dp(8),0);\n    if(!mCobraDrawerShifted){mStage.animate().cancel();mStage.setTranslationX(0f);}')
   s=once(s,'    if(mCobraGuideShell==null){','    if(mCobraGuideShell==null){\n      mCobraLastGuideWidth=-1;mCobraLastGuideHeight=-1;mCobraModeLayout=null;')
-  s=once(s,'if(r-l!=mCobraLastGuideWidth||b-t!=mCobraLastGuideHeight)', 'if(v==mCobraGuideShell&&(mCobraModeLayout==null||r-l!=mCobraLastGuideWidth||b-t!=mCobraLastGuideHeight))')
-  # New shells can be attached before their weighted parent receives final bounds. The immediate
-  # layout call then sees 0x0 and the first frame can otherwise retain the 1x1 placeholders.
-  # Queue one fail-closed pass against the same shell; it is a no-op when normal layout already ran.
-  s=once(s,'    cobraRestyleGuide();cobraLayoutGuide();cobraRenderGuideBrowser();', '''    cobraRestyleGuide();cobraLayoutGuide();cobraRenderGuideBrowser();
-    final FrameLayout laidOutGuide=mCobraGuideShell;
-    laidOutGuide.post(()->{
-      if(laidOutGuide==mCobraGuideShell&&laidOutGuide.isAttachedToWindow()){
-        int width=laidOutGuide.getWidth(),height=laidOutGuide.getHeight();
-        if(width>0&&height>0&&(mCobraModeLayout==null||width!=mCobraLastGuideWidth||height!=mCobraLastGuideHeight)){
-          cobraLayoutGuide();cobraRenderGuideBrowser();
+  # Own the direct children's measurement BEFORE FrameLayout positions them.
+  # An after-layout listener changes LayoutParams too late for that traversal;
+  # caching only the shell's size can then hide unmeasured 1x1 children.
+  s=once(s,'mCobraGuideShell=new FrameLayout(this);','''mCobraGuideShell=new FrameLayout(this){
+        @Override protected void onLayout(boolean changed,int left,int top,int right,int bottom){
+          if(this==mCobraGuideShell&&right>left&&bottom>top){
+            if(mCobraModeLayout==null||right-left!=mCobraLastGuideWidth||bottom-top!=mCobraLastGuideHeight){
+              cobraLayoutGuide();cobraRenderGuideBrowser();
+            }
+            int widthSpec=View.MeasureSpec.makeMeasureSpec(right-left,View.MeasureSpec.EXACTLY);
+            int heightSpec=View.MeasureSpec.makeMeasureSpec(bottom-top,View.MeasureSpec.EXACTLY);
+            for(int i=0;i<getChildCount();i++){
+              View child=getChildAt(i);
+              if(child.getVisibility()!=View.GONE)measureChildWithMargins(child,widthSpec,0,heightSpec,0);
+            }
+          }
+          super.onLayout(changed,left,top,right,bottom);
         }
-      }
-    });''')
+      };''')
+  s=once(s,'      mCobraGuideShell.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=mCobraLastGuideWidth||b-t!=mCobraLastGuideHeight){cobraLayoutGuide();cobraRenderGuideBrowser();}});','')
   return s
  transform('cobraShowGuideShell',shell)
  transform('buildShell',lambda s:once(s,'    FrameLayout frame = new FrameLayout(this);','    mCobraNavigation.advance();\n    FrameLayout frame = new FrameLayout(this);'))

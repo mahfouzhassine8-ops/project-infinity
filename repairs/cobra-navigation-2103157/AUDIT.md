@@ -134,3 +134,31 @@ plus the retained locked 2103155 rollback. Android may refuse a lower versionCod
 Do not uninstall/clear app data to force downgrade without a separate device-data
 backup and reviewed rollback/update path. This workflow does not merge, release,
 install or lock the candidate.
+
+
+## Measurement-ownership repair after the failed Android gate
+
+Runs 35196712386 and 35198082026 passed Android compilation/signing but failed all
+four Android view cases. Read-only geometry instrumentation in run 35199155394
+reproduced the unchanged failure: the shell was 412x915 and its solved preview box
+and LayoutParams were 412x231, while the preview AND TextureView were still
+measured/laid out at 1x1. The browser similarly had 412x550 LayoutParams but 1x1
+actual bounds. Landscape and smaller portrait cases showed the same mismatch.
+The shell's layout request was clear while its children still needed layout.
+
+The earlier deferred callback checked only the shell-size stamp and therefore
+could skip work even though its children had never consumed their new parameters.
+The replacement makes the guide FrameLayout own this phase: solve changed shell
+geometry, rebuild the guide if necessary, measure its visible direct children
+against their assigned parameters, and only then let FrameLayout position them.
+The late layout listener and deferred timing workaround are removed. Stale-shell
+callbacks cannot mutate the current shell. No player/decoder/surface ownership,
+EPG algorithms, other mode geometry, native bytes or signing gates are changed.
+
+All four original Android cases and their assertions remain. Additional guards
+require a correctly sized preview in the FIRST traversal, before clock advances,
+and equality between assigned, measured, laid-out and TextureView bounds. This is
+stricter than waiting six frames for the original size check. Upload remains
+blocked until the full Android suite and existing packaging/rollback gates pass.
+Read-only view-tree evidence remains in the test reports. Device playback and
+final visual acceptance remain separate and unverified; 2103157 is not locked.

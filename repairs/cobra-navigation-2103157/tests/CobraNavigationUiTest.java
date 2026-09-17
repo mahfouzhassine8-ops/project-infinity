@@ -61,7 +61,18 @@ public class CobraNavigationUiTest {
     ((Map<String,Object>)get(a,"mCobraEpg")).put("",data);put(a,"mGuidePreviewChannel",all.get(0));((Set<String>)get(a,"mFavorites")).add("fixture:0");
     call(a,"buildShell");controller.visible();return a;
   }
-  void measure(InfinityLiveActivity a,int w,int h){View decor=a.getWindow().getDecorView();for(int i=0;i<6;i++){decor.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));decor.layout(0,0,w,h);frames(1);}}
+  void measure(InfinityLiveActivity a,int w,int h)throws Exception{
+    View decor=a.getWindow().getDecorView();
+    for(int i=0;i<6;i++){
+      decor.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));decor.layout(0,0,w,h);
+      View shell=(View)get(a,"mCobraGuideShell"),video=(View)get(a,"mCobraGuideVideo");
+      if(i==0&&shell!=null&&shell.isAttachedToWindow()){
+        assertNotNull(video);
+        assertTrue("Preview must have real bounds in the FIRST traversal, before advancing the clock",video.getWidth()>32&&video.getHeight()>24);
+      }
+      frames(1);
+    }
+  }
   void clean(InfinityLiveActivity a)throws Exception{((Handler)get(a,"mMain")).removeCallbacksAndMessages(null);((ExecutorService)get(a,"mIo")).shutdownNow();a.finish();}
   View description(View root,String exact){CharSequence c=root.getContentDescription();if(c!=null&&c.toString().equals(exact))return root;if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){View found=description(((ViewGroup)root).getChildAt(i),exact);if(found!=null)return found;}return null;}
   void drawer(InfinityLiveActivity a,String destination)throws Exception{call(a,"toggleCobraDrawer");View drawer=a.getWindow().getDecorView().findViewWithTag("cobra_experience_drawer");assertNotNull(drawer);View row=description(drawer,destination);assertNotNull(destination,row);assertTrue(row.performClick());}
@@ -70,6 +81,12 @@ public class CobraNavigationUiTest {
     View shell=(View)get(a,"mCobraGuideShell"),video=(View)get(a,"mCobraGuideVideo"),texture=(View)get(a,"mCobraPreviewTexture");
     assertNotNull(shell);assertTrue("Guide must be attached",shell.isAttachedToWindow());assertTrue("Preview must not remain 1x1",video.getWidth()>32&&video.getHeight()>24);
     assertTrue("Texture must have actual visible bounds",texture.getWidth()>32&&texture.getHeight()>24);assertTrue(texture.isAttachedToWindow());
+    assertEquals("Preview measured width must match assigned width",video.getLayoutParams().width,video.getMeasuredWidth());
+    assertEquals("Preview measured height must match assigned height",video.getLayoutParams().height,video.getMeasuredHeight());
+    assertEquals("Preview laid-out width must match its measurement",video.getMeasuredWidth(),video.getWidth());
+    assertEquals("Preview laid-out height must match its measurement",video.getMeasuredHeight(),video.getHeight());
+    assertEquals("Texture fills the preview width",video.getWidth(),texture.getWidth());
+    assertEquals("Texture fills the preview height",video.getHeight(),texture.getHeight());
     AbsListView list=(AbsListView)get(a,"mCobraGuideList");assertNotNull("TV Grid must not be only groups",list);assertTrue(list.getHeight()>=48);assertTrue(list.getChildCount()>0);
     assertNotNull(shell.findViewWithTag("cobra_tv_time_ruler"));
     View browser=(View)get(a,"mCobraGuideBrowser");assertTrue("Guide reaches full usable right edge",Math.abs(browser.getRight()-shell.getWidth())<=2);
