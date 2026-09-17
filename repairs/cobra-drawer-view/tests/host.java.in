@@ -1,0 +1,109 @@
+import java.util.*;
+// Host doubles: exercise production row/chooser callbacks, not Android rendering or hardware.
+public class DrawerViewHost {
+  static class View {
+    static final int IMPORTANT_FOR_ACCESSIBILITY_NO=2;
+    interface Click { void click(View v); }
+    final List<View> children=new ArrayList<>();
+    Click click; Object tag; String description=""; boolean selected,focusable,clickable;
+    void addView(View v,Object params){children.add(v);} void addView(View v){children.add(v);}
+    void setTag(Object v){tag=v;} void setGravity(int v){} void setPadding(int a,int b,int c,int d){}
+    void setBackground(Object v){} void setSelected(boolean v){selected=v;}
+    void setFocusable(boolean v){focusable=v;} void setFocusableInTouchMode(boolean v){}
+    void setClickable(boolean v){clickable=v;} void setEnabled(boolean v){}
+    void setImportantForAccessibility(int v){} void setMinimumHeight(int v){}
+    void setContentDescription(String v){description=v;} void setOnClickListener(Click v){click=v;}
+    void performClick(){if(click==null)throw new AssertionError("Missing callback");click.click(this);}
+  }
+  static class LinearLayout extends View {
+    static final int VERTICAL=1; LinearLayout(Object context){} void setOrientation(int v){}
+    static class LayoutParams {int leftMargin;LayoutParams(int w,int h){}LayoutParams(int w,int h,int weight){}}
+  }
+  static class TextView extends View {
+    final String text;TextView(String s){text=s;}
+    void setTypeface(Object v){} void setSingleLine(boolean v){} void setMaxLines(int v){}
+  }
+  static class CobraIconButton extends View {int ink;CobraIconButton(String icon,String label,boolean dark){}}
+  static class CobraModeThumbnail extends View {CobraModeThumbnail(String mode,boolean dark){}}
+  static class Gravity {static final int CENTER=1,CENTER_VERTICAL=2;}
+  static class Color {static final int WHITE=-1;}
+  static class Typeface {static final int NORMAL=0;static Object create(String s,int w){return new Object();}}
+  static class Theme {int text=1,muted=2;}
+  static class CobraModeLayout {
+    static final String[] MODES={"mobile","grid","compact","cards","focus"};
+    static boolean valid(String s){return Arrays.asList(MODES).contains(s);}
+  }
+  final Theme mTheme=new Theme();
+  String mCobraGuideStyle="mobile",mCobraGuideRoute="channels",kind="";
+  Object mCobraInspectedChannel,mCobraInspectedProgram;
+  boolean night,drawerOpen=true;int remembered,rendered,drawerCloses;
+  LinearLayout rows;
+  int dp(int v){return v;} int cobraModeColor(String name){return 1;}
+  int cobraThemeColor(String name,int fallback){return fallback;}
+  Object cobraModeSurface(int radius,boolean selected){return new Object();}
+  Object cobraPressSurface(boolean dark){return new Object();}
+  TextView cobraText(String s,int c,int size){return new TextView(s);}
+  boolean cobraSheetIsDark(){return night;}
+  boolean closeCobraActionSheet(){rows=null;kind="";return true;}
+  boolean closeCobraExperienceDrawer(){boolean was=drawerOpen;drawerOpen=false;drawerCloses++;return was;}
+  LinearLayout cobraOpenSheet(String title,String detail,String type){
+    require(!drawerOpen,"Drawer must close before chooser opens");
+    kind=type;rows=new LinearLayout(this);return rows;
+  }
+  void cobraRememberModeScroll(){remembered++;}
+  void cobraShowGuideShell(){rendered++;}
+  LinearLayout buildDrawerView(){
+    LinearLayout items=new LinearLayout(this);boolean dark=night;
+@@DRAWER@@
+    return items;
+  }
+@@ROW@@
+@@CHOOSER@@
+@@SWITCH@@
+@@NAME@@
+  static int assertions;
+  static void require(boolean ok,String message){assertions++;if(!ok)throw new AssertionError(message);}
+  static boolean hasText(View v,String text){
+    if(v instanceof TextView&&((TextView)v).text.equals(text))return true;
+    for(View c:v.children)if(hasText(c,text))return true;return false;
+  }
+  static void scenario(String current,String chosen,boolean dark){
+    DrawerViewHost h=new DrawerViewHost();h.mCobraGuideStyle=current;h.night=dark;
+    LinearLayout drawer=h.buildDrawerView();
+    require(drawer.children.size()==1,"One collapsed View destination");
+    View entry=drawer.children.get(0);
+    require("cobra_drawer_view".equals(entry.tag),"Stable drawer tag");
+    require(hasText(entry,"View"),"View title");
+    require(hasText(entry,"Current: "+h.cobraModeName(current)),"Current mode subtitle");
+    require(entry.focusable&&entry.clickable,"Focusable clickable row");
+    require(h.rows==null&&h.rendered==0&&h.remembered==0,"Opening drawer does not switch modes");
+    require(h.mCobraGuideStyle.equals(current),"Current mode preserved until selection");
+    entry.performClick();
+    require(!h.drawerOpen&&h.drawerCloses==1,"Drawer dismissed once before chooser");
+    require("view-mode".equals(h.kind)&&h.rows.children.size()==5,"All five modes in chooser");
+    require(h.rendered==0&&h.remembered==0,"Opening chooser does not switch");
+    int selected=0;View target=null;
+    for(int i=0;i<5;i++){
+      View row=h.rows.children.get(i);String mode=CobraModeLayout.MODES[i];
+      if(row.selected)selected++;
+      require(row.selected==mode.equals(current),"Correct selected mode");
+      require(row.focusable&&row.clickable,"Each mode is selectable");
+      require(row.description.startsWith(h.cobraModeName(mode)+","),"Accessible mode label");
+      if(mode.equals(chosen))target=row;
+    }
+    require(selected==1,"Exactly one selected choice");
+    target.performClick();
+    require(h.mCobraGuideStyle.equals(chosen),"Existing switch selects requested mode");
+    require(h.rows==null&&!h.drawerOpen,"Selection closes chooser and drawer");
+    require(h.rendered==1&&h.remembered==1,"Existing switch path invoked exactly once");
+  }
+  public static void main(String[] args){
+    for(boolean dark:new boolean[]{false,true})for(String current:CobraModeLayout.MODES){
+      for(String chosen:CobraModeLayout.MODES)scenario(current,chosen,dark);
+      DrawerViewHost h=new DrawerViewHost();h.night=dark;h.mCobraGuideStyle=current;
+      h.buildDrawerView().children.get(0).performClick();h.closeCobraActionSheet();
+      require(h.mCobraGuideStyle.equals(current)&&h.rendered==0&&h.remembered==0,"Cancel leaves mode unchanged");
+    }
+    System.out.println("PASS: "+assertions+" host callback assertions; 50 mode transitions plus 10 cancels. Android rendering and device playback NOT tested.");
+  }
+}
