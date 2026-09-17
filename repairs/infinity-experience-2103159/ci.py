@@ -48,7 +48,14 @@ def reconstruct():
  ledger(rollback);print('PASS: exact locked 2103158 reconstructed; full pre-change rollback preserved')
 def promote():
  patch=json.loads(Path('audit159/patch.json').read_text());require(sha(Path('kodi')/SPLASH)==patch['after_sha256'],'Splash differs from tested bridge')
- pairs={'kodi/tools/android/packaging/xbmc/build.gradle.in':[('versionCode 2103158','versionCode 2103159'),('versionName "'+OLD+'"','versionName "'+NEW+'"')],'scripts/infinity_background_resume.py':[('VERSION_CODE = 2103158','VERSION_CODE = 2103159'),("RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"')]}
+ pairs={
+  'kodi/tools/android/packaging/xbmc/build.gradle.in':[
+   ('versionCode 2103158','versionCode 2103159'),
+   ('versionName "'+OLD+'"','versionName "'+NEW+'"')],
+  'scripts/infinity_background_resume.py':[
+   ('VERSION_CODE = 2103158','VERSION_CODE = 2103159'),
+   ("RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"'")]
+ }
  for name,edits in pairs.items():
   p=Path(name);text=p.read_text()
   for old,new in edits:require(text.count(old)==1,'Wrong promotion preimage: '+name);text=text.replace(old,new,1)
