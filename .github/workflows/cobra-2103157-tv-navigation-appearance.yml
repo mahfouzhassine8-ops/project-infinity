@@ -1,0 +1,150 @@
+name: Infinity | Cobra 2103157 TV Navigation Appearance
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103157-tv-navigation-appearance-rc1]
+    paths:
+      - '.github/workflows/cobra-2103157-tv-navigation-appearance.yml'
+      - 'repairs/cobra-navigation-2103157/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103157-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Check out immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out locked 2103155 recipe
+        uses: actions/checkout@v5
+        with:
+          ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32
+          path: refinement-delta
+          persist-credentials: false
+      - name: Check out passing 2103156 diagnostics recipe
+        uses: actions/checkout@v5
+        with:
+          ref: b3bcb619b08205dcfc1451424b2d41e05fd37633
+          path: audit-delta
+          persist-credentials: false
+      - name: Check out isolated TV navigation appearance delta
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: view-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
+          github-token: ${{ github.token }}
+          path: rollback2103153
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
+          run-id: 35188339917
+          github-token: ${{ github.token }}
+          path: baseline155
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156
+          run-id: 35192605567
+          github-token: ${{ github.token }}
+          path: baseline156
+      - name: Reconstruct verified 2103156 and preserve both rollback baselines
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 view-delta/repairs/cobra-navigation-2103157/ci.py reconstruct
+      - name: Reproduce navigation defects and test final layout and dark policy
+        run: |
+          set -euo pipefail
+          python3 view-delta/repairs/cobra-navigation-2103157/tests/run.py --baseline rollback157/2103156-activity.java.in --out audit157/host
+      - name: Apply scoped repair and rerun final guide and inherited algorithms
+        run: |
+          set -euo pipefail
+          python3 view-delta/repairs/cobra-navigation-2103157/apply.py --source kodi --receipt audit157/patch.json
+          SRC=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          cmp "$SRC" audit157/host/InfinityLiveActivity.java.in
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_tests.py --source "$SRC" --out audit157/epg-host
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_short.py --source "$SRC" --host audit157/epg-host --out audit157/epg-short
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_inherited.py --source "$SRC" --repository refinement-delta --mode-harness audit157/host/modes/CobraModesHarness.java --out audit157/inherited
+          python3 view-delta/repairs/cobra-navigation-2103157/ci.py promote
+      - name: Compile sign and verify Android shell using protected native engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test ! -e signed157
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir navigation-build --out signed157
+          python3 view-delta/repairs/cobra-navigation-2103157/ci.py verify
+      - name: Render real Android TV layouts and exercise drawer return and appearance controls
+        run: |
+          set -euo pipefail
+          python3 view-delta/repairs/cobra-navigation-2103157/tests/android.py --build navigation-build --out audit157/android
+          python3 view-delta/repairs/cobra-navigation-2103157/ci.py deliver
+      - name: Upload verified signed candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157
+          path: signed157/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve audit and Android screenshot evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103157-Navigation-Layout-Evidence
+          path: |
+            audit157/
+            engine/background-resume-source.json
+            engine/native-before.patch
+            engine/native-after-2103157.patch
+            signed157/*.txt
+            signed157/*.json
+            view-delta/repairs/cobra-navigation-2103157/
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Preserve complete 2103155 and 2103156 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103155-2103156-Complete-Rollback-For-2103157
+          path: rollback157/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90
