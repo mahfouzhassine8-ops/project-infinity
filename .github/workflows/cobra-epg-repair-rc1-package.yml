@@ -60,19 +60,22 @@ jobs:
           cd base
           bash scripts/infinity_live_app_ci_1.sh
           mkdir -p ../work ../candidate ../ui-package ../engine
-          cp ../inherited154/preflight/2103154-final.java.in tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-          python3 ../repairs/cobra-epg-rc1/apply_epg_repair.py --source tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --output ../work/InfinityLiveActivity.java.in --receipt ../work/repair-receipt.json
-          cp ../work/InfinityLiveActivity.java.in tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          test -d kodi/tools/android/packaging/xbmc/src
+          cp ../inherited154/preflight/2103154-final.java.in kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          python3 ../repairs/cobra-epg-rc1/apply_epg_repair.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --output ../work/InfinityLiveActivity.java.in --receipt ../work/repair-receipt.json
+          cp ../work/InfinityLiveActivity.java.in kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
           python3 ../repairs/cobra-epg-rc1/tests/run_guards.py --source ../inherited154/preflight/2103154-final.java.in --out ../work/guards
-          git diff --binary -- xbmc > ../engine/native-after.patch
+          git -C kodi diff --binary -- xbmc > ../engine/native-after.patch
       - name: Promote shell version without rebuilding native engine
         run: |
           set -euo pipefail
           cd base
           python3 - <<'PY'
           from pathlib import Path
-          g=Path('tools/android/packaging/xbmc/build.gradle.in')
+          g=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
           s=g.read_text()
+          assert s.count('versionCode 2103138') == 1
+          assert s.count('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"') == 1
           s=s.replace('versionCode 2103138','versionCode 2103155',1)
           s=s.replace('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"','versionName "1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1"',1)
           g.write_text(s)
@@ -93,7 +96,7 @@ jobs:
           set -euo pipefail
           mkdir -p background-rollback
           cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
-          python3 base/scripts/package_background_resume.py --source base --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out candidate
+          python3 base/scripts/package_background_resume.py --source base/kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir repaired-build --out candidate
           APK=candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > candidate/badging.txt
@@ -101,7 +104,7 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > candidate/signing.txt
           grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing.txt
           python3 - <<'PY'
-          import zipfile,hashlib
+          import zipfile
           from pathlib import Path
           apk=Path('candidate/Infinity-1.0.9-Cobra-Adaptive-Views-EPG-Repair-RC1.apk')
           base=Path('background-rollback/Infinity-Run40-Exact-Base.apk')
