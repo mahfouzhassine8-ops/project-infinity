@@ -10,7 +10,13 @@ with (app/'build.gradle').open('a') as stream:
 android.testOptions.unitTests.includeAndroidResources = true
 android.testOptions.unitTests.all {
   maxHeapSize = "3g"
+  maxParallelForks = 1
   systemProperty "cobra.screenshots", System.getenv("COBRA_SCREENSHOTS")
+  testLogging {
+    events "passed", "failed", "skipped"
+    showStandardStreams = true
+    exceptionFormat = "full"
+  }
 }
 dependencies {
   testImplementation 'junit:junit:4.13.2'
@@ -18,7 +24,13 @@ dependencies {
 }
 ''')
 env=dict(os.environ);env.update(COBRA_SCREENSHOTS=str(out/'screenshots'),KODI_ANDROID_KEY_ALIAS='androiddebugkey',KODI_ANDROID_KEY_PASSWORD='android',KODI_ANDROID_STORE_PASSWORD='android',KODI_ANDROID_STORE_FILE=str(Path.home()/'.android/debug.keystore'))
-try:subprocess.run(['./gradlew','--no-daemon',':xbmc:testReleaseUnitTest','--tests','com.projectinfinity.kodi.CobraModesUiTest','--stacktrace'],cwd=build,env=env,check=True)
+command=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest','--tests','com.projectinfinity.kodi.CobraModesUiTest','--stacktrace']
+try:
+    # JUnit has per-test timeouts too. This outer bound prevents a wedged Gradle/Robolectric
+    # worker from consuming the entire Actions job and hiding which acceptance gate stalled.
+    subprocess.run(command,cwd=build,env=env,check=True,timeout=1200)
+except subprocess.TimeoutExpired as error:
+    raise SystemExit('Cobra Android layout acceptance exceeded 20 minutes; worker terminated deterministically') from error
 finally:
     for rel in ('build/test-results/testReleaseUnitTest','build/reports/tests/testReleaseUnitTest'):
         source=app/rel
