@@ -2,6 +2,9 @@
       boolean medium, int gravity)
   {
     android.widget.TextView text = chooserText(value, color, sp);
+    // The new layout owns spacing; do not inherit legacy button padding.
+    // Retain chooserText itself unchanged for the protected legacy fallback.
+    text.setPadding(0, 0, 0, 0);
     text.setGravity(gravity);
     text.setTypeface(android.graphics.Typeface.create("sans-serif", medium ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL));
     text.setIncludeFontPadding(false);

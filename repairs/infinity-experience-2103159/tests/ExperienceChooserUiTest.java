@@ -65,6 +65,44 @@ public class ExperienceChooserUiTest {
   void show(Splash a,boolean themed,int width,int height)throws Exception{
     File f=themeFile(a);if(f.exists())assertTrue(f.delete());if(themed)installTheme(a);chooser.invoke(a);
     layout(a,width,height);
+    if(themed)typographyFits(a);
+  }
+  TextView exactText(View root,String value){
+    if(root instanceof TextView&&value.contentEquals(((TextView)root).getText()))return (TextView)root;
+    if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){
+      TextView found=exactText(((ViewGroup)root).getChildAt(i),value);if(found!=null)return found;
+    }
+    return null;
+  }
+  void textFits(View root){
+    if(root instanceof TextView){
+      TextView text=(TextView)root;String value=text.getText().toString();
+      if(!value.isEmpty()){
+        android.text.Layout lines=text.getLayout();assertNotNull("Text has a real layout: "+value,lines);
+        int count=lines.getLineCount();assertTrue("Text is not zero-height: "+value,count>0&&text.getHeight()>0);
+        assertTrue("No hidden lines beyond maxLines: "+value,count<=text.getMaxLines());
+        assertEquals("Full copy reaches the final line: "+value,value.length(),lines.getLineEnd(count-1));
+        int width=text.getWidth()-text.getCompoundPaddingLeft()-text.getCompoundPaddingRight();
+        int height=text.getHeight()-text.getCompoundPaddingTop()-text.getCompoundPaddingBottom();
+        assertTrue("Text is not vertically clipped: "+value,lines.getHeight()<=height+1);
+        for(int i=0;i<count;i++){
+          assertEquals("No ellipsized copy: "+value,0,lines.getEllipsisCount(i));
+          assertTrue("Text fits its row width: "+value,lines.getLineMax(i)<=width+1);
+        }
+        if(text.getParent() instanceof ViewGroup){
+          ViewGroup parent=(ViewGroup)text.getParent();
+          assertTrue("Label is inside its parent: "+value,text.getTop()>=0&&text.getLeft()>=0&&text.getBottom()<=parent.getHeight()+1&&text.getRight()<=parent.getWidth()+1);
+        }
+      }
+    }
+    if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++)textFits(((ViewGroup)root).getChildAt(i));
+  }
+  void typographyFits(Splash a){
+    View root=tag(a,"experience-themed-root");assertNotNull(root);textFits(root);
+    for(String experience:new String[]{"infinity","cobra"}){
+      TextView title=exactText(tag(a,"experience-card-"+experience),experience.toUpperCase(java.util.Locale.US));
+      assertNotNull("Card title is present",title);assertEquals("Card branding stays on one line",1,title.getLineCount());
+    }
   }
   View tag(Splash a,String value){return a.getWindow().getDecorView().findViewWithTag(value);}
   List<String> texts(View root){ArrayList<String> out=new ArrayList<>();if(root instanceof TextView)out.add(((TextView)root).getText().toString());if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++)out.addAll(texts(((ViewGroup)root).getChildAt(i)));return out;}
