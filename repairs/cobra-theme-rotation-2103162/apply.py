@@ -262,12 +262,14 @@ def patch_live(s):
 
     # Place Rotation beside Lock, matching the established Infinity player placement policy.
     def chrome(block):
-        anchor='''    header.addView(cobraIcon("lock","Lock controls",true,v->lockCobraPlayer()),new LinearLayout.LayoutParams(dp(48),dp(48)));chrome.addView(header,new LinearLayout.LayoutParams(-1,-2));'''
-        replacement='''    CobraIconButton rotation=cobraIcon("rotate",cobraPlayerRotationDescription(),true,v->cobraTogglePlayerRotation());
+        anchor='header.addView(cobraIcon("lock","Lock controls",true,v->lockCobraPlayer()),'
+        if block.count(anchor)!=1: raise RuntimeError("player rotation button: stable lock-action hook count="+str(block.count(anchor)))
+        at=block.index(anchor)
+        insert='''CobraIconButton rotation=cobraIcon("rotate",cobraPlayerRotationDescription(),true,v->cobraTogglePlayerRotation());
     rotation.setTag("cobra_player_rotation");mCobraPlayerRotationButton=rotation;cobraUpdatePlayerRotationButton();
     header.addView(rotation,new LinearLayout.LayoutParams(dp(48),dp(48)));
-    header.addView(cobraIcon("lock","Lock controls",true,v->lockCobraPlayer()),new LinearLayout.LayoutParams(dp(48),dp(48)));chrome.addView(header,new LinearLayout.LayoutParams(-1,-2));'''
-        block=once(block,anchor,replacement,"player rotation button")
+    '''
+        block=block[:at]+insert+block[at:]
         end='''    vtheme().tree(chrome,"player.chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();'''
         if end in block:
             block=block.replace(end,'    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();',1)
