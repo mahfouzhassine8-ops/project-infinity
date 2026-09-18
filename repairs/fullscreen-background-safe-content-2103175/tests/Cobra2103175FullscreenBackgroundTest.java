@@ -58,8 +58,12 @@ public class Cobra2103175FullscreenBackgroundTest {
     throw new NoSuchMethodException(name);
   }
   void idle(){Shadows.shadowOf(Looper.getMainLooper()).idle();}
-  View browseRoot()throws Exception{return (View)get(a,"mRoot");}
-  View browseBackground()throws Exception{return (View)get(a,"mCobraBrowseBackground");}
+  void ensureBrowse()throws Exception{
+    if(a!=null)return;
+    ui=new CobraNavigationUiTest();ui.clock();a=ui.fixture(24);idle();
+  }
+  View browseRoot()throws Exception{ensureBrowse();return (View)get(a,"mRoot");}
+  View browseBackground()throws Exception{ensureBrowse();return (View)get(a,"mCobraBrowseBackground");}
   int colorOf(View v){
     Drawable d=v.getBackground();assertTrue(d instanceof ColorDrawable);
     return ((ColorDrawable)d).getColor();
@@ -120,12 +124,11 @@ public class Cobra2103175FullscreenBackgroundTest {
     context=RuntimeEnvironment.getApplication();
     CobraVisualRenderer.loading.set(true);CobraVisualTheme.deleteTree(CobraVisualTheme.store(context));
     CobraVisualRenderer.active=CobraVisualTheme.builtin();CobraVisualRenderer.clients.clear();
-    ui=new CobraNavigationUiTest();ui.clock();a=ui.fixture(24);idle();
     chooser=new ExperienceChooserUiTest();ExperienceChooserUiTest.reflect();
     visual=new CobraVisualRuntimeTest();visual.context=context;
   }
   @After public void after(){
-    try{if(a!=null)ui.clean(a);}catch(Exception ignored){}
+    try{if(a!=null&&ui!=null)ui.clean(a);}catch(Exception ignored){}
     try{chooser.closeWindows();}catch(Exception ignored){}
     try{visual.cleanup();}catch(Exception ignored){}
     CobraVisualRenderer.active=CobraVisualTheme.builtin();CobraVisualRenderer.clients.clear();
@@ -133,6 +136,7 @@ public class Cobra2103175FullscreenBackgroundTest {
   }
 
   @Test public void browseBackdropAndSafeContentAreSeparateFullSizeLayers()throws Exception{
+    ensureBrowse();
     ui.measure(a,717,917);View bg=browseBackground(),root=browseRoot();
     assertNotNull(bg);assertNotNull(root);assertNotSame(bg,root);
     assertEquals("cobra-browse-background",bg.getTag());assertEquals("cobra-browse-safe-content",root.getTag());
@@ -141,6 +145,7 @@ public class Cobra2103175FullscreenBackgroundTest {
   }
 
   @Test public void browseInsetsMoveOnlyForegroundNotWallpaper()throws Exception{
+    ensureBrowse();
     View bg=browseBackground(),root=browseRoot();
     root.dispatchApplyWindowInsets(insets(46,24));idle();ui.measure(a,717,917);
     assertEquals(46,root.getPaddingTop());assertEquals(24,root.getPaddingBottom());
@@ -149,6 +154,7 @@ public class Cobra2103175FullscreenBackgroundTest {
   }
 
   @Test public void browseThemeStillControlsStatusBarContrastWithoutPaintingRoot()throws Exception{
+    ensureBrowse();
     CobraVisualTheme theme=screenTheme("light-fullscreen","#EEF3F8");CobraVisualRenderer.active=theme;
     call(a,"buildShell");idle();call(a,"cobraApplySystemBarsForSurface");idle();
     assertEquals(Color.parseColor("#EEF3F8"),(int)call(a,"cobraBrowseSystemBarSurfaceColor"));
@@ -159,6 +165,7 @@ public class Cobra2103175FullscreenBackgroundTest {
   }
 
   @Test public void shellRebuildPreservesBackgroundContentSplit()throws Exception{
+    ensureBrowse();
     View oldBg=browseBackground(),oldRoot=browseRoot();call(a,"buildShell");idle();ui.measure(a,717,917);
     assertNotSame(oldBg,browseBackground());assertNotSame(oldRoot,browseRoot());
     browseRoot().dispatchApplyWindowInsets(insets(40,20));idle();
@@ -167,6 +174,7 @@ public class Cobra2103175FullscreenBackgroundTest {
   }
 
   @Test public void fullscreenPlayerOwnershipIsUnchanged()throws Exception{
+    ensureBrowse();
     FrameLayout overlay=new FrameLayout(a);set(a,"mPlayerOverlay",overlay);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
     call(a,"cobraApplySystemBarsForSurface");
     assertTrue((a.getWindow().getAttributes().flags&WindowManager.LayoutParams.FLAG_FULLSCREEN)!=0);
