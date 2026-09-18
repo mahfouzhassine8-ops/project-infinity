@@ -47,8 +47,9 @@ def main():
     bars=method_span(text,'cobraApplySystemBarsForSurface')
     confirm=method_span(text,'cobraConfirmBrowseSystemBars')
     safe=method_span(text,'cobraInstallBrowseSafeArea')
+    focus=method_span(text,'onWindowFocusChanged')
 
-    checks['scope_one_changed_method']=proof.get('changed_methods')==['cobraApplySystemBarsForSurface']
+    checks['scope_two_changed_methods']=proof.get('changed_methods')==['cobraApplySystemBarsForSurface','onWindowFocusChanged']
     checks['scope_one_new_helper']=proof.get('new_helpers')==['cobraConfirmBrowseSystemBars']
     checks['layout_declared_unchanged']=proof.get('layout_changed') is False
     checks['force_not_fullscreen_browse']='addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)' in bars
@@ -62,6 +63,8 @@ def main():
     checks['modern_navigation_show']='controller.show(android.view.WindowInsets.Type.navigationBars())' in bars
     checks['default_system_bar_behavior']='BEHAVIOR_DEFAULT' in bars
     checks['next_frame_confirmation']='postOnAnimation(this::cobraConfirmBrowseSystemBars)' in bars
+    checks['focus_sync_recovery']='if(hasFocus)' in focus and 'cobraApplySystemBarsForSurface();' in focus
+    checks['focus_post_recovery']='mMain.post(this::cobraApplySystemBarsForSurface);' in focus
     checks['confirmation_force_not_fullscreen']='FLAG_FORCE_NOT_FULLSCREEN' in confirm
     checks['confirmation_shows_bars']='statusBars()' in confirm and 'navigationBars()' in confirm
     checks['safe_area_owner_still_present']='WindowInsets.Type.systemBars()' in safe and 'WindowInsets.Type.displayCutout()' in safe
