@@ -144,14 +144,19 @@ public class Cobra2103164PlaybackStabilityTest {
   // Static fields are read explicitly because reflection on Class itself would target java.lang.Class.
   long grantGeneration()throws Exception{Field f=InfinityExtendedBackgroundService.class.getDeclaredField("sMiniGrant");f.setAccessible(true);return ((InfinityExtendedBackgroundService.MiniGrant)f.get(null)).generation;}
   @Test public void nativeMediaStateUsesRealPositionAndPausedStatus()throws Exception{
-    Owner o=media();MediaSession session=(MediaSession)get(service,"mMediaSession");assertEquals(17000L,session.getController().getPlaybackState().getPosition());
-    o.playback=PlaybackState.STATE_PAUSED;InfinityExtendedBackgroundService.refreshMiniPlayback(o);assertEquals(PlaybackState.STATE_PAUSED,session.getController().getPlaybackState().getState());assertEquals(0f,session.getController().getPlaybackState().getPlaybackSpeed(),0f);
+    Owner o=media();PlaybackState state=(PlaybackState)call(service,"cobraMiniPlaybackState",o);
+    assertEquals(17000L,state.getPosition());assertEquals(PlaybackState.STATE_PLAYING,state.getState());assertEquals(1f,state.getPlaybackSpeed(),0f);
+    o.playback=PlaybackState.STATE_PAUSED;InfinityExtendedBackgroundService.refreshMiniPlayback(o);
+    state=(PlaybackState)call(service,"cobraMiniPlaybackState",o);assertEquals(PlaybackState.STATE_PAUSED,state.getState());assertEquals(0f,state.getPlaybackSpeed(),0f);
   }
   @Test public void nativeCommandPausesCurrentOwner()throws Exception{
-    Owner o=media();call(InfinityExtendedBackgroundService.class,"dispatchMiniCommand",grantGeneration(),2);assertEquals(2,o.command);assertEquals(PlaybackState.STATE_PAUSED,((MediaSession)get(service,"mMediaSession")).getController().getPlaybackState().getState());
+    Owner o=media();call(InfinityExtendedBackgroundService.class,"dispatchMiniCommand",grantGeneration(),2);
+    assertEquals(2,o.command);assertEquals(PlaybackState.STATE_PAUSED,o.playback);
+    assertEquals(PlaybackState.STATE_PAUSED,((PlaybackState)call(service,"cobraMiniPlaybackState",o)).getState());
   }
   @Test public void nativeMediaSessionCallbackReachesOwner()throws Exception{
-    Owner o=media();((MediaSession)get(service,"mMediaSession")).getController().getTransportControls().pause();Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(2,o.command);
+    Owner o=media();MediaSession.Callback callback=(MediaSession.Callback)call(service,"cobraMiniMediaCallback",grantGeneration());
+    callback.onPause();assertEquals(2,o.command);assertEquals(PlaybackState.STATE_PAUSED,o.playback);
   }
   @Test public void oldNotificationCannotControlReplacementSession()throws Exception{
     Owner old=media();long token=grantGeneration();InfinityExtendedBackgroundService.stopMiniPlayback(app);
