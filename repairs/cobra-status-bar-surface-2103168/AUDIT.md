@@ -43,3 +43,5 @@ One helper is added:
 CI must reconstruct through locked 2103167 and rerun every prior Android suite plus four new surface-color tests. Expected total: **111 Android tests**, plus the new source-scope audit and all signer/native/resource gates.
 
 Physical Fold acceptance is the final confirmation that the former black band now visually blends with the active Cobra screen while the Android status icons remain visible.
+
+CI trigger: execute the complete locked-chain reconstruction and 2103168 surface-match gates before accepting the candidate.
