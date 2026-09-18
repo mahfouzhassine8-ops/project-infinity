@@ -38,6 +38,7 @@ def method(text,name):
 def main():
     p=argparse.ArgumentParser();p.add_argument("--source",type=Path,required=True);p.add_argument("--patch",type=Path,required=True);p.add_argument("--out",type=Path,required=True);a=p.parse_args()
     text=(a.source/REL).read_text();patch=json.loads(a.patch.read_text())
+    oncreate=method(text,"onCreate")
     bars=method(text,"cobraApplySystemBarsForSurface")
     confirm=method(text,"cobraConfirmBrowseSystemBars")
     safe=method(text,"cobraInstallBrowseSafeArea")
@@ -46,11 +47,12 @@ def main():
     pip=method(text,"onPictureInPictureModeChanged")
 
     checks={}
-    checks["exact_patch_scope"]=patch.get("changed_methods")==["cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"]
-    checks["edge_to_edge_explicit"]="WindowCompat.setDecorFitsSystemWindows(window,false)" in bars and "WindowCompat.setDecorFitsSystemWindows(window,false)" in confirm
-    checks["contrast_scrim_disabled"]="setStatusBarContrastEnforced(false)" in bars and "setStatusBarContrastEnforced(false)" in confirm
-    checks["draws_system_bar_backgrounds"]="FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS" in bars and "FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS" in confirm
-    checks["translucent_status_cleared"]="FLAG_TRANSLUCENT_STATUS" in bars and "FLAG_TRANSLUCENT_STATUS" in confirm
+    checks["exact_patch_scope"]=patch.get("changed_methods")==["onCreate","cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"]
+    checks["edge_to_edge_explicit"]="WindowCompat.setDecorFitsSystemWindows(getWindow(),false)" in oncreate
+    checks["edge_to_edge_configured_once"]=oncreate.count("setDecorFitsSystemWindows")==1 and "setDecorFitsSystemWindows" not in bars+confirm
+    checks["contrast_scrim_disabled"]="setStatusBarContrastEnforced(false)" in oncreate and "setStatusBarContrastEnforced(false)" in bars and "setStatusBarContrastEnforced(false)" in confirm
+    checks["draws_system_bar_backgrounds"]="FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS" in oncreate
+    checks["translucent_status_cleared"]="FLAG_TRANSLUCENT_STATUS" in oncreate
     checks["browse_does_not_force_not_fullscreen"]="addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)" not in bars+confirm
     checks["stale_force_not_fullscreen_cleared"]="clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN" in bars and "FLAG_FORCE_NOT_FULLSCREEN" in bars and "FLAG_FORCE_NOT_FULLSCREEN" in confirm
     checks["browse_draws_behind_status"]="SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN" in bars and "SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN" in confirm
