@@ -81,7 +81,7 @@ public class Cobra2103161SettingsTest {
   @Test public void chooserConsumesSystemBarInsetsBeforeLayingOutThemeScene()throws Exception{
     CobraVisualRuntimeTest theme=new CobraVisualRuntimeTest();theme.context=app;theme.activate(theme.install(sceneTheme("safe-area")));
     ExperienceChooserUiTest.reflect();ExperienceChooserUiTest old=new ExperienceChooserUiTest();Splash a=old.activity();try{
-      old.show(a,false,412,915);View root=tag(a,"experience-themed-root");assertNotNull(root);
+      ExperienceChooserUiTest.chooser.invoke(a);View root=tag(a,"experience-themed-root");assertNotNull(root);
       WindowInsets insets=new WindowInsets.Builder().setSystemWindowInsets(android.graphics.Insets.of(0,32,0,20)).build();root.dispatchApplyWindowInsets(insets);
       assertEquals(32,root.getPaddingTop());assertEquals(20,root.getPaddingBottom());assertEquals(0,root.getPaddingLeft());assertEquals(0,root.getPaddingRight());
       assertNotNull(tag(a,"experience-card-infinity"));assertNotNull(tag(a,"experience-card-cobra"));
