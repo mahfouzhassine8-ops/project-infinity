@@ -56,9 +56,11 @@ def verify():
   require(protected==current,'Protected APK inventory changed')
   for name in protected:require(old.read(name)==new.read(name),'Protected APK payload changed: '+name)
   dex=b''.join(new.read(n) for n in new.namelist() if n.startswith('classes') and n.endswith('.dex'))
+  # Java inlines ActivityInfo orientation constants as integers, so their symbol
+  # names are not expected in DEX. Runtime Android acceptance below proves
+  # FULL_SENSOR -> UNSPECIFIED behavior directly on the Activity.
   for token in (b'cobra_player_rotation',b'infinity_player_rotation',b'Installed visual theme',
-                b'Built-in appearance',b'SCREEN_ORIENTATION_FULL_SENSOR',b'SCREEN_ORIENTATION_UNSPECIFIED',
-                b'Player rotation'):
+                b'Built-in appearance',b'Player rotation'):
    require(token in dex,'Missing compiled 2103162 contract: '+repr(token))
   for forbidden in (b'Cobra2103162ThemeRotationTest',b'ACCELEROMETER_ROTATION'):
    require(forbidden not in dex,'Forbidden/test token packaged: '+repr(forbidden))
