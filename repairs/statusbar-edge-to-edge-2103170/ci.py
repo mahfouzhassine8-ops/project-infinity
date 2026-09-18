@@ -164,7 +164,7 @@ def deliver():
     p164=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest.xml",26)
     p165=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest.xml",6)
     p166=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest.xml",8)
-    p167=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103167StatusBarRestoreTest.xml",5)
+    p167=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarRestoreSupersessionTest.xml",5)
     surface=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103168StatusBarSurfaceTest.xml",4)
     edge=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest.xml",6)
     total=inherited+c14+p164+p165+p166+p167+surface+edge
