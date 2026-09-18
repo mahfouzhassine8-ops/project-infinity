@@ -17,3 +17,9 @@ Physical acceptance is simple: on a normal Cobra screen the black top strip must
 The first 2103169 gate proved the new edge-to-edge path itself and all six new tests passed, but two inherited 2103166 safe-area tests caught a lifecycle regression: repeatedly calling `setDecorFitsSystemWindows(false)` could trigger a zero-inset redispatch after a valid inset had already been delivered. That would erase the safe-area padding during fullscreen return or Fold reflow.
 
 The window-fit switch is now **idempotent**: it is configured once per Activity window. Status-bar visibility/color can still be reconciled repeatedly, but the structural window-fit mode is not toggled or reasserted after valid insets arrive. This preserves both requirements at once: Cobra draws behind the system bar, and its content keeps the locked safe inset.
+
+## Second gate correction
+
+Run 35379876318 showed that making only `setDecorFitsSystemWindows(false)` idempotent was not enough: reissuing the associated window flag mutations during the posted confirmation could still trigger a zero-inset redispatch in the inherited 2103166 tests.
+
+2103169 now treats the **entire modern edge-to-edge window setup** as one-time structural state: `FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS`, clearing `FLAG_TRANSLUCENT_STATUS`, and `setDecorFitsSystemWindows(false)` all execute only once per Activity window. Repeated status-bar reconciliation changes visibility/appearance only and does not touch window-fit structure after safe insets have been delivered.

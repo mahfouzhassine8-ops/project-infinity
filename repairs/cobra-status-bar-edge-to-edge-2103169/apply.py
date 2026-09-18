@@ -130,17 +130,19 @@ def apply(source,receipt_path,out):
   private boolean mCobraEdgeToEdgeConfigured=false;
 
   private void cobraConfigureEdgeToEdgeSystemBars(android.view.Window window,View decor){
-    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     if(Build.VERSION.SDK_INT>=30){
-      // Window-fit ownership is structural. Reapplying setDecorFitsSystemWindows(false) on every
-      // focus/PiP/status-bar reconciliation causes an OEM/Robolectric zero-inset redispatch that
-      // can erase the already-delivered safe inset. Configure it once for this Activity window.
+      // All window-fit mutations are structural. Reapplying even an already-set Window flag can
+      // cause an OEM/Robolectric insets redispatch after a valid inset was delivered. Perform the
+      // complete structural setup exactly once for this Activity window.
       if(!mCobraEdgeToEdgeConfigured){
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setDecorFitsSystemWindows(false);
         mCobraEdgeToEdgeConfigured=true;
       }
     }else{
+      window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+      window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
       int layout=decor.getSystemUiVisibility();
       layout|=View.SYSTEM_UI_FLAG_LAYOUT_STABLE
           |View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
