@@ -166,9 +166,9 @@ def deliver():
     p166=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest.xml",8)
     p167=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarRestoreSupersessionTest.xml",5)
     surface=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103168StatusBarSurfaceTest.xml",4)
-    edge=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest.xml",6)
+    edge=suite("audit170/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest.xml",7)
     total=inherited+c14+p164+p165+p166+p167+surface+edge
-    require(total==117,f"Expected 117 Android tests, got {total}")
+    require(total==118,f"Expected 118 Android tests, got {total}")
 
     s=json.loads(Path("audit170/surface-source-audit.json").read_text())
     e=json.loads(Path("audit170/edge-source-audit/source-audit.json").read_text())
