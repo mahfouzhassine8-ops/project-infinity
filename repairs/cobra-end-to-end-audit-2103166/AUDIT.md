@@ -77,3 +77,5 @@ Delivery requires:
 Expected total: **102 Android tests**, plus static/source/native/signer gates.
 
 Physical Samsung Fold acceptance remains a separate final check. Automated tests do not claim OEM SystemUI, hardware decoder, real provider network or installed-device behavior.
+
+CI trigger note: this branch must pass the complete 2103166 reconstruction, protected-payload, inherited, locked-baseline and new end-to-end gates before any APK is accepted.
