@@ -44,7 +44,7 @@ public class CobraVisualRuntimeTest {
   try{View mark=(View)CobraNavigationUiTest.construct("CobraBrandMark",a);mark.measure(View.MeasureSpec.makeMeasureSpec(80,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(80,View.MeasureSpec.EXACTLY));mark.layout(0,0,80,80);Bitmap b=Bitmap.createBitmap(80,80,Bitmap.Config.ARGB_8888);mark.draw(new Canvas(b));assertEquals(Color.MAGENTA,b.getPixel(40,40));save(b,"actual-cobra-custom-badge.png");b.recycle();}finally{helper.clean(a);}}
  @Test public void paletteOverridesAndBoundedDimensionsResolve()throws Exception{JSONObject data=root("palette");data.getJSONObject("base").put("colors",new JSONObject().put("palette.accent","#123456"));data.put("variants",new JSONObject().put("oled",new JSONObject().put("colors",new JSONObject().put("palette.accent","#ABCDEF"))));activate(install(data));CobraVisualRenderer r=new CobraVisualRenderer(context);assertEquals(Color.parseColor("#123456"),r.mode("light").color("palette.accent",0));assertEquals(Color.parseColor("#ABCDEF"),r.mode("oled").color("palette.accent",0));assertEquals(48,r.dimension("missing",48));}
  @Test public void viewStylesDoNotReplaceClicksTagsOrAccessibility()throws Exception{JSONObject data=root("style");data.getJSONObject("base").put("styles",new JSONObject().put("drawer.item.tv",new JSONObject().put("fill","#012345").put("text","#FFFFFF").put("font_family","serif").put("radius_dp",20)));activate(install(data));Button b=new Button(context);b.setTag("action-tv");b.setContentDescription("Live TV");int[] clicks={0};b.setOnClickListener(v->clicks[0]++);new CobraVisualRenderer(context).paint(b,"drawer.item.tv");assertTrue(b.performClick());assertEquals(1,clicks[0]);assertEquals("action-tv",b.getTag());assertEquals("Live TV",b.getContentDescription());assertNotNull(b.getBackground());}
- @Test public void textureViewsAreNeverStyledRecreatedOrReparented()throws Exception{JSONObject data=root("safe");data.getJSONObject("base").put("styles",new JSONObject().put("all.panel",new JSONObject().put("fill","#FF0000").put("padding_dp",50)));activate(install(data));FrameLayout parent=new FrameLayout(context);TextureView texture=new TextureView(context);parent.addView(texture,new FrameLayout.LayoutParams(100,80));Object params=texture.getLayoutParams();new CobraVisualRenderer(context).tree(parent,"player.chrome");assertSame(parent,texture.getParent());assertSame(params,texture.getLayoutParams());assertEquals(0,texture.getPaddingLeft());assertNull(texture.getBackground());}
+ @Test public void textureViewsAreNeverStyledRecreatedOrReparented()throws Exception{JSONObject data=root("safe");data.getJSONObject("base").put("styles",new JSONObject().put("all.panel",new JSONObject().put("fill","#FF0000").put("padding_dp",50)));activate(install(data));FrameLayout parent=new FrameLayout(helperContext());TextureView texture=new TextureView(context);parent.addView(texture,new FrameLayout.LayoutParams(100,80));Object params=texture.getLayoutParams();new CobraVisualRenderer(context).tree(parent,"player.chrome");assertSame(parent,texture.getParent());assertSame(params,texture.getLayoutParams());assertEquals(0,texture.getPaddingLeft());assertNull(texture.getBackground());}
  @Test public void nativeThemeEscapeHatchCannotBeRestyled()throws Exception{JSONObject data=root("safe");data.getJSONObject("base").put("styles",new JSONObject().put("all.button",new JSONObject().put("padding_dp",40).put("text","#000000")));activate(install(data));Button button=new Button(context);button.setTag("cobra-visual-theme-controls");int padding=button.getPaddingLeft();new CobraVisualRenderer(context).paint(button,"settings");assertEquals(padding,button.getPaddingLeft());}
  @Test public void themeInstallDoesNotReplaceGuideOrItsVideoTexture()throws Exception{CobraNavigationUiTest helper=new CobraNavigationUiTest();helper.clock();InfinityLiveActivity a=helper.fixture(96);try{CobraNavigationUiTest.call(a,"cobraOpenLiveTv");helper.measure(a,412,915);Object shell=CobraNavigationUiTest.get(a,"mCobraGuideShell"),texture=CobraNavigationUiTest.get(a,"mCobraPreviewTexture");JSONObject data=root("new-look");data.getJSONObject("base").put("styles",new JSONObject().put("drawer.panel",new JSONObject().put("fill","#F0F6FC")));activate(install(data));assertSame(shell,CobraNavigationUiTest.get(a,"mCobraGuideShell"));assertSame(texture,CobraNavigationUiTest.get(a,"mCobraPreviewTexture"));helper.guide(a);CobraNavigationUiTest.call(a,"toggleCobraDrawer");helper.measure(a,412,915);View drawer=a.getWindow().getDecorView().findViewWithTag("cobra_experience_drawer");assertNotNull(drawer);Bitmap image=Bitmap.createBitmap(412,915,Bitmap.Config.ARGB_8888);drawer.draw(new Canvas(image));save(image,"actual-themed-drawer.png");image.recycle();}finally{helper.clean(a);}}
  @Test public void corruptedStoredManifestFailsClosed()throws Exception{CobraVisualTheme good=install(root("good"));try(FileOutputStream out=new FileOutputStream(new File(good.directory,CobraVisualTheme.MANIFEST))){out.write("{}".getBytes(StandardCharsets.UTF_8));}rejects(()->CobraVisualTheme.load(context));CobraVisualTheme.reset(context);assertEquals("builtin",CobraVisualTheme.load(context).id);}
@@ -58,9 +58,9 @@ public class CobraVisualRuntimeTest {
   CobraNavigationUiTest helper=new CobraNavigationUiTest();helper.clock();
   InfinityLiveActivity a=helper.fixture(24);
   try{
-   // Android queues Dialog.OnShowListener and AlertDialog button messages. Under
-   // PAUSED mode, measuring a window does not dispatch those messages. Exercise
-   // an unmodified framework control alongside the themed builder as a control.
+   // The inherited fixture pauses both Looper and Choreographer. ViewRootImpl
+   // traversal barriers hold synchronous dialog messages until a scheduled frame.
+   // Exercise the unmodified framework dialog as a control, not only our builder.
    for(boolean themed:new boolean[]{false,true}){
     int[] events={0,0};
     android.app.AlertDialog.Builder builder=themed
@@ -75,21 +75,23 @@ public class CobraVisualRuntimeTest {
      decor.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(240,View.MeasureSpec.EXACTLY));
      decor.layout(0,0,360,240);
      assertEquals("OnShow is queued, not missing; themed="+themed,0,events[0]);
-     // Drain only messages due now: no sleeps, clock advances or direct callback invocation.
-     Shadows.shadowOf(Looper.getMainLooper()).idle();
+     // A plain idle() cannot pass the pending ViewRoot traversal barrier. Advance
+     // the configured 16ms frame through the SAME frame helper as the locked tests.
+     // Do not invoke callbacks, remove barriers, or force a production layout.
+     helper.frames(1);
      assertEquals("Original OnShow delivered once; themed="+themed,1,events[0]);
      Button positive=dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE);
      assertNotNull(positive);
      if(themed)assertEquals("Theme actually styled the live dialog",Color.parseColor("#123456"),positive.getCurrentTextColor());
      assertTrue(positive.performClick());
      assertEquals("Button listener is queued; themed="+themed,0,events[1]);
-     Shadows.shadowOf(Looper.getMainLooper()).idle();
+     helper.frames(1);
      assertEquals("Original button delivered once; themed="+themed,1,events[1]);
      assertFalse("Native button dismissal retained; themed="+themed,dialog.isShowing());
-     Shadows.shadowOf(Looper.getMainLooper()).idle();
+     helper.frames(1);
      assertEquals("No duplicate OnShow; themed="+themed,1,events[0]);
      assertEquals("No duplicate button; themed="+themed,1,events[1]);
-    }finally{dialog.dismiss();Shadows.shadowOf(Looper.getMainLooper()).idle();}
+    }finally{dialog.dismiss();helper.frames(1);}
    }
   }finally{helper.clean(a);}
  }
