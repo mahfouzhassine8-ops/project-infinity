@@ -1,0 +1,192 @@
+name: Cobra | 2103163 Candidate 14 Five Fixes
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103163-candidate14-five-fixes-rc1]
+    paths:
+      - '.github/workflows/cobra-2103163-candidate14-five-fixes.yml'
+      - 'repairs/cobra-candidate14-five-fixes-2103163/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103163-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  audit-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Locked 2103155 recipe
+        uses: actions/checkout@v5
+        with: {ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32, path: refinement-delta, persist-credentials: false}
+      - name: 2103156 diagnostics recipe
+        uses: actions/checkout@v5
+        with: {ref: b3bcb619b08205dcfc1451424b2d41e05fd37633, path: audit-delta, persist-credentials: false}
+      - name: Locked 2103157 recipe
+        uses: actions/checkout@v5
+        with: {ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98, path: view-delta, persist-credentials: false}
+      - name: Locked 2103158 health recipe
+        uses: actions/checkout@v5
+        with: {ref: fd2af59bab2edcaea6be9e5046720715e25e64e0, path: health-delta, persist-credentials: false}
+      - name: Locked 2103159 experience recipe
+        uses: actions/checkout@v5
+        with: {ref: 257a49d742890acf0c7d3e0220bded5a8aa80c57, path: experience-delta, persist-credentials: false}
+      - name: Locked 2103160 visual runtime recipe
+        uses: actions/checkout@v5
+        with: {ref: 42b1afc95a07b3ce0f534232e0f774c5159ddec1, path: theme-delta, persist-credentials: false}
+      - name: Locked/passed 2103161 delta
+        uses: actions/checkout@v5
+        with: {ref: 0ff8b5463ae6adf26ef0f20d64bc1b10f6c5a593, path: settings-delta, persist-credentials: false}
+      - name: Exact locked Candidate 14 recipe
+        uses: actions/checkout@v5
+        with: {ref: 1465eabb045badad56142642c48292df94caaa12, path: candidate14-delta, persist-credentials: false}
+      - name: Isolated 2103163 delta
+        uses: actions/checkout@v5
+        with: {ref: '${{ github.sha }}', path: next-delta, persist-credentials: false}
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2, run-id: 35044752997, github-token: '${{ github.token }}', path: run40}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Player-Reboot-Lock-2103152, run-id: 35169846333, github-token: '${{ github.token }}', path: rollback2103152}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited, run-id: 35176733529, github-token: '${{ github.token }}', path: rollback2103153}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155, run-id: 35188339917, github-token: '${{ github.token }}', path: baseline155}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156, run-id: 35192605567, github-token: '${{ github.token }}', path: baseline156}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157, run-id: 35200244871, github-token: '${{ github.token }}', path: baseline157}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Health-Playback-RC1-2103158, run-id: 35206405387, github-token: '${{ github.token }}', path: baseline158}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103158-Health-Playback-Evidence, run-id: 35206405387, github-token: '${{ github.token }}', path: evidence158}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Experience-Zip-Bridge-RC1-2103159, run-id: 35278026159, github-token: '${{ github.token }}', path: baseline159}
+      - uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103160-Visual-Theme-Runtime-v2-TEST-CANDIDATE
+          run-id: 35290503341
+          github-token: ${{ github.token }}
+          path: baseline160
+      - name: Exact locked 2103161 signed APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103161-Theme-Management-Background-Mode-Safe-Area-TEST-CANDIDATE
+          run-id: 35314694255
+          github-token: ${{ github.token }}
+          path: baseline161
+      - name: Exact locked Candidate 14 signed APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103163-Candidate14-Five-Fixes-TEST-CANDIDATE
+          run-id: 35324889607
+          github-token: ${{ github.token }}
+          path: baseline162
+
+      - name: Reconstruct exact locked 2103161 source without moving either lock
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py reconstruct
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py apply
+          python3 settings-delta/repairs/cobra-settings-background-2103161/ci.py upgrade
+
+      - name: Recreate exact locked Candidate 14 source
+        run: |
+          set -euo pipefail
+          python3 candidate14-delta/repairs/cobra-theme-rotation-2103162/ci.py upgrade
+
+      - name: Audit and apply only the 2103163 five-fix delta
+        run: |
+          set -euo pipefail
+          python3 next-delta/repairs/cobra-candidate14-five-fixes-2103163/ci.py upgrade
+
+      - name: Compile Android shell only, permanently sign, and compare Candidate 14 protected payloads
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source kodi \
+            --base-apk background-rollback/Infinity-Run40-Exact-Base.apk \
+            --build-dir rotation-build \
+            --out signed163
+          python3 next-delta/repairs/cobra-candidate14-five-fixes-2103163/ci.py verify
+
+      - name: Repeat all 46 inherited Android tests unchanged
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
+            --build rotation-build \
+            --out audit163/android
+
+      - name: Execute Theme switch Rotation Background and Safe-area acceptance
+        run: |
+          set -euo pipefail
+          cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path('experience-delta/repairs/infinity-experience-2103159/tests/android.py')
+          s=importlib.util.spec_from_file_location('runner159',p)
+          r=importlib.util.module_from_spec(s);s.loader.exec_module(r)
+          out=Path('audit163/theme-rotation');env=r.test_environment(out)
+          r.run_ui_gate([
+            './gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest','--stacktrace'
+          ],Path('rotation-build'),env,out)
+          PY
+          python3 next-delta/repairs/cobra-candidate14-five-fixes-2103163/ci.py deliver
+
+      - name: Upload signed TEST CANDIDATE only after every gate
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE
+          path: signed163/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve audit evidence even if a gate fails
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103163-Candidate14-Five-Fixes-Evidence
+          path: |
+            audit163/
+            audit162/
+            audit161/
+            audit160/
+            audit159/
+            engine/background-resume-source.json
+            candidate14-delta/repairs/cobra-theme-rotation-2103162/
+            next-delta/repairs/cobra-candidate14-five-fixes-2103163/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact locked Candidate 14 rollback artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103162-Exact-Rollback-Before-2103163
+          path: baseline162/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
