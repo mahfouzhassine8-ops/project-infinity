@@ -87,7 +87,7 @@ def verify():
   for n in protected:require(old.read(n)==new.read(n),"Protected resource changed: "+n)
   dex=b"".join(new.read(n) for n in new.namelist() if re.fullmatch(r"classes\d*\.dex",n))
   for token in (b"cobraPrepareExperienceSystemBars",b"cobraChooserDarkStatusIcons",
-                b"APPEARANCE_LIGHT_STATUS_BARS",b"experience-themed-root",
+                b"setSystemBarsAppearance",b"experience-themed-root",
                 b"cobraApplySystemBarsForSurface",b"setStatusBarContrastEnforced"):
    require(token in dex,"Combined contract missing: "+repr(token))
   require(b"Cobra2103171ChooserStatusBarTest" not in dex,"Test code packaged in release APK")
