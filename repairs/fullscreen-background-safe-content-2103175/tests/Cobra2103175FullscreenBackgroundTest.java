@@ -200,6 +200,17 @@ public class Cobra2103175FullscreenBackgroundTest {
     assertEquals(0,root.getPaddingTop());assertEquals(43,safe.getPaddingTop());assertEquals(23,safe.getPaddingBottom());
   }
 
+  @Test public void chooserSafeContentSupersedesLegacyRootInsetContract()throws Exception{
+    installVisual("chooser-supersede","#F5F3FA","#102033");
+    Splash s=chooser.activity();chooser.show(s,false,412,915);
+    View root=tag(s,"experience-themed-root"),safe=tag(s,"experience-safe-content");
+    assertNotNull(root);assertNotNull(safe);
+    safe.dispatchApplyWindowInsets(insets(32,18));idle();
+    assertEquals("Wallpaper root must remain physically full-screen",0,root.getPaddingTop());
+    assertEquals("Foreground chooser content must remain below status icons",32,safe.getPaddingTop());
+    assertEquals(18,safe.getPaddingBottom());
+  }
+
   @Test public void styledFallbackUsesSameFullBackgroundSafeForegroundContract()throws Exception{
     Splash s=chooser.activity();installExperienceJson(s,"#F0F2F7","#122033");
     ExperienceChooserUiTest.chooser.invoke(s);chooser.layout(s,412,915);
