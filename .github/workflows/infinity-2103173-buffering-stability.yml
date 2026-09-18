@@ -126,7 +126,7 @@ jobs:
       - name: Exact locked 2103171 rollback
         uses: actions/download-artifact@v5
         with:
-          name: Infinity-2103173-Buffering-Stability-TEST-CANDIDATE
+          name: Infinity-2103171-Chooser-Status-Bar-Surface-TEST-CANDIDATE
           run-id: 35391501653
           github-token: ${{ github.token }}
           path: baseline171
@@ -228,7 +228,7 @@ jobs:
       - name: Publish audited 2103173 TEST CANDIDATE
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103171-Chooser-Status-Bar-Surface-TEST-CANDIDATE
+          name: Infinity-2103173-Buffering-Stability-TEST-CANDIDATE
           path: signed173/
           if-no-files-found: error
           compression-level: 0
