@@ -136,7 +136,7 @@ def deliver():
     source=json.loads(Path('audit167/source-audit/source-audit.json').read_text())
     require(source.get('passed') and source.get('protected_methods',0)>=35,'2103167 source audit failed')
     patch=json.loads(Path('audit167/patch/patch.json').read_text())
-    require(patch.get('changed_methods')==['cobraApplySystemBarsForSurface'],'Scope drift in 2103167')
+    require(patch.get('changed_methods')==['cobraApplySystemBarsForSurface','onWindowFocusChanged'],'Scope drift in 2103167')
     require(patch.get('new_helpers')==['cobraConfirmBrowseSystemBars'],'Helper contract drift in 2103167')
     require(patch.get('layout_changed') is False,'Layout changed in status-bar micro-fix')
     require(patch.get('navigation_bar')=='always visible','Navigation-bar policy drift')
