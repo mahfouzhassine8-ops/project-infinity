@@ -62,8 +62,8 @@ def deliver():
  inherited=0
  for name,count,folder in [('CobraNavigationUiTest',4,'cobra-regression'),('CobraHealthUiTest',7,'cobra-regression'),('Cobra2103159UiTest',2,'experience'),('ExperienceChooserUiTest',6,'experience')]:
   inherited+=suite(Path('audit159/android')/folder/'test-results'/('TEST-com.projectinfinity.kodi.'+name+'.xml'),count)
- inherited+=suite('audit160/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualRuntimeTest.xml',17)
- inherited+=suite('audit160/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualLayoutTest.xml',10)
+ inherited+=suite('audit163/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualRuntimeTest.xml',17)
+ inherited+=suite('audit163/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualLayoutTest.xml',10)
  targeted=suite('audit163/theme-rotation/test-results/TEST-com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.xml',16)
  require(json.loads(Path('audit163/source-post/source-tests.json').read_text())['passed'],'2103163 source acceptance failed')
  require(sha('signed163/Infinity-'+NEW+'.apk')==json.loads(Path('audit163/apk-verification.json').read_text())['apk_sha256'],'APK changed after verification')
