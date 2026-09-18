@@ -251,17 +251,17 @@ def patch_splash(before):
     text=before
 
     scene=method(text,"showVisualExperienceScene")
-    old_scene='''      View view=CobraVisualScene.build(this,vtheme(),scene,slots,width);if(view==null)return false;
-      android.widget.FrameLayout root=new android.widget.FrameLayout(this);root.setTag("experience-themed-root");root.addView(new ExperienceBackdrop(theme),new android.widget.FrameLayout.LayoutParams(-1,-1));root.addView(view,new android.widget.FrameLayout.LayoutParams(-1,-1));
-      root.setOnLongClickListener(v->{vtheme().manager(this);return true;});setContentView(root);cobraPrepareExperienceSystemBars(theme,root);slots.get("enter.infinity").requestFocus();vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});return true;'''
-    new_scene='''      View view=CobraVisualScene.build(this,vtheme(),scene,slots,width);if(view==null)return false;
-      android.widget.FrameLayout root=new android.widget.FrameLayout(this);root.setTag("experience-themed-root");
+    old_layers='''      android.widget.FrameLayout root=new android.widget.FrameLayout(this);root.setTag("experience-themed-root");root.addView(new ExperienceBackdrop(theme),new android.widget.FrameLayout.LayoutParams(-1,-1));root.addView(view,new android.widget.FrameLayout.LayoutParams(-1,-1));'''
+    new_layers='''      android.widget.FrameLayout root=new android.widget.FrameLayout(this);root.setTag("experience-themed-root");
       root.addView(new ExperienceBackdrop(theme),new android.widget.FrameLayout.LayoutParams(-1,-1));
       android.widget.FrameLayout safeContent=new android.widget.FrameLayout(this);safeContent.setTag("experience-safe-content");
       safeContent.addView(view,new android.widget.FrameLayout.LayoutParams(-1,-1));
-      root.addView(safeContent,new android.widget.FrameLayout.LayoutParams(-1,-1));
-      root.setOnLongClickListener(v->{vtheme().manager(this);return true;});setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);slots.get("enter.infinity").requestFocus();vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});return true;'''
-    scene=once(scene,old_scene,new_scene,"visual chooser layer split")
+      root.addView(safeContent,new android.widget.FrameLayout.LayoutParams(-1,-1));'''
+    scene=once(scene,old_layers,new_layers,"visual chooser layer split")
+    scene=once(scene,
+      "      setContentView(root);cobraPrepareExperienceSystemBars(theme,root);slots.get(\"enter.infinity\").requestFocus();",
+      "      setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);slots.get(\"enter.infinity\").requestFocus();",
+      "visual chooser safe-content owner")
     text=replace_method(text,"showVisualExperienceScene",scene)
 
     styled=method(text,"showStyledInfinityExperienceChooser")
