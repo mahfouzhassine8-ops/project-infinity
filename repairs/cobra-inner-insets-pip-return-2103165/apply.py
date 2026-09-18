@@ -182,20 +182,25 @@ def apply(source, receipt_path, out):
         "    cobraApplySystemBarsForSurface();"
     )
     # onConfigurationChanged has intentional early returns for player, Multi-View,
-    # attached guide and Settings. Every exit must leave system-bar ownership settled,
-    # then post once more after any reflow work queued by those branches.
+    # attached guide and Settings. A finally block preserves those exact branches while
+    # guaranteeing the bar policy runs after every exit. The posted pass runs after any
+    # reflow callbacks queued inside the original method.
     ca, cb = method_span(text, "onConfigurationChanged")
     config = text[ca:cb]
-    config = config.replace(
-        "return;",
-        "cobraApplySystemBarsForSurface();mMain.post(this::cobraApplySystemBarsForSurface);return;"
+    opening = config.index("{")
+    closing = config.rfind("}")
+    body = config[opening + 1:closing]
+    config = (
+        config[:opening + 1]
+        + "\n    try {"
+        + body
+        + "\n    } finally {\n"
+        + "      cobraApplySystemBarsForSurface();\n"
+        + "      mMain.post(this::cobraApplySystemBarsForSurface);\n"
+        + "    }\n  "
+        + config[closing:]
     )
     text = text[:ca] + config + text[cb:]
-    text = append_method_body(
-        text, "onConfigurationChanged",
-        "    cobraApplySystemBarsForSurface();\n"
-        "    mMain.post(this::cobraApplySystemBarsForSurface);"
-    )
 
     # Fullscreen video/multiview hide only the status bar; browse/preview restore it.
     text = prepend_method(text, "openPlayerOverlay", "    cobraApplySystemBarsForSurface();")
