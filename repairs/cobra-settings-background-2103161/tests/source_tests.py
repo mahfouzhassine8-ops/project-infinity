@@ -34,6 +34,9 @@ def main():
  assert 'startsWith("cobra-visual-theme-controls")' in renderer;checks+=1
  for token in ['setMediaItem','ExoPlayer','TextureView.set','release()','prepare()']:
   assert token not in method(renderer,'restoreBuiltIn')+method(renderer,'restorePrevious'),token;checks+=1
+ assert 'VISUAL THEME RUNTIME 2\\n' in after[p.ACT];checks+=1
+ assert 'description()+\"\\n\\nReset and rollback change presentation only.' in after[p.RENDER];checks+=1
+ assert 'description()+\"\n\nReset and rollback change presentation only.' not in after[p.RENDER];checks+=1
  assert 'BUILD=2103161' in after[p.THEME];checks+=1
  result={'checks':checks,'protected_activity_methods':found,'after_sha256':{k:p.sha(v) for k,v in after.items()},'background_contract':'existing InfinityExtendedBackgroundService Normal/Extended; no new preference','safe_area':'system window insets applied to themed chooser root','official':False}
  (args.out/'source-tests.json').write_text(json.dumps(result,indent=2)+'\n')
