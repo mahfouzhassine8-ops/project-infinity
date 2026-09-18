@@ -19,6 +19,7 @@ def replace(path,old,new,count=1):
 def upgrade():
  run('python3',ROOT/'tests/source_tests.py','--source','kodi','--out','audit162/source')
  run('python3',ROOT/'apply.py','--source','kodi','--receipt','audit162/patch.json')
+ run('python3',ROOT/'harden.py','--source','kodi','--receipt','audit162/patch.json','--out','audit162/hardening')
 
  replace('kodi/tools/android/packaging/xbmc/build.gradle.in','versionCode 2103161',f'versionCode {VERSION}')
  replace('kodi/tools/android/packaging/xbmc/build.gradle.in','versionName "'+OLD+'"','versionName "'+NEW+'"')
@@ -34,7 +35,7 @@ def upgrade():
  data.update(version_code=VERSION,version_name=NEW,locked_commit=BASE161,locked_parent=2103161,source_parent=2103161,source_parent_locked=True,
              candidate_locked=False,theme_setting_consolidated=True,cobra_player_rotation=True,
              infinity_rotation_contract_reused=True,global_rotation_setting_mutated=False,native_engine_unchanged=True,
-             physical_device_verified=False)
+             physical_device_verified=False,single_cobra_rotation_owner=True)
  receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
  with Path('audit162/native-after.patch').open('wb') as f:subprocess.run(['git','-C','kodi','diff','--binary','--','xbmc'],stdout=f,check=True)
  require(Path('audit162/native-after.patch').read_bytes()==Path('engine/native-before.patch').read_bytes(),'Native source changed')
@@ -56,11 +57,10 @@ def verify():
   require(protected==current,'Protected APK inventory changed')
   for name in protected:require(old.read(name)==new.read(name),'Protected APK payload changed: '+name)
   dex=b''.join(new.read(n) for n in new.namelist() if n.startswith('classes') and n.endswith('.dex'))
-  # Java inlines ActivityInfo orientation constants as integers, so their symbol
-  # names are not expected in DEX. Runtime Android acceptance below proves
-  # FULL_SENSOR -> UNSPECIFIED behavior directly on the Activity.
+  # Java inlines ActivityInfo orientation constants as integers. Actual Android
+  # acceptance below proves FULL_SENSOR -> UNSPECIFIED behavior directly.
   for token in (b'cobra_player_rotation',b'infinity_player_rotation',b'Installed visual theme',
-                b'Built-in appearance',b'Player rotation'):
+                b'Built-in appearance',b'Player rotation',b'setPlayerRotationEligible'):
    require(token in dex,'Missing compiled 2103162 contract: '+repr(token))
   for forbidden in (b'Cobra2103162ThemeRotationTest',b'ACCELEROMETER_ROTATION'):
    require(forbidden not in dex,'Forbidden/test token packaged: '+repr(forbidden))
@@ -86,19 +86,20 @@ def deliver():
  inherited+=suite('audit162/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualRuntimeTest.xml',17)
  inherited+=suite('audit162/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualLayoutTest.xml',10)
  require(inherited==46,'Inherited Android count drift')
- new=suite('audit162/theme-rotation/test-results/TEST-com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.xml',6)
+ new=suite('audit162/theme-rotation/test-results/TEST-com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.xml',16)
 
  result={'build':VERSION,'base_build':2103161,'base_commit':BASE161,
          'inherited_android_tests':inherited,'new_or_updated_android_tests':new,
          'total_android_tests':inherited+new,
          'theme_management':'one Theme row: built-in / same installed theme / install-replace ZIP',
-         'rotation':'Cobra player button reuses Infinity Follow Device / Unlocked semantics',
-         'background_mode_preserved':True,'chooser_safe_area_preserved':True,
+         'rotation':'Cobra player button delegates to the existing InfinityCobraDeviceBridge',
+         'single_cobra_rotation_owner':True,'background_mode_preserved':True,'chooser_safe_area_preserved':True,
          'native_recompiled':False,'physical_device_verified':False,'official':False,
          'status':'SIGNED TEST CANDIDATE - device acceptance pending'}
  Path('signed162/ACCEPTANCE.json').write_text(json.dumps(result,indent=2)+'\n')
  shutil.copy2('audit162/apk-verification.json','signed162/2103162-verification.json')
  shutil.copy2('audit162/source/source-tests.json','signed162/2103162-source-tests.json')
+ shutil.copy2('audit162/hardening/source-audit.json','signed162/2103162-hardening-audit.json')
  rollback=Path('rollback162');rollback.mkdir(exist_ok=True)
  shutil.copytree('baseline161',rollback/'locked-2103161-artifact',dirs_exist_ok=True)
  (rollback/'README.txt').write_text('Exact locked 2103161 signed artifact preserved before 2103162. HM Theme 2.0.3 remains separately locked. Do not uninstall or clear data to force downgrade.\n')
