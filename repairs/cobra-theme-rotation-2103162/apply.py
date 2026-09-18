@@ -305,8 +305,69 @@ def patch_live(s):
 
     # Exact established release behavior at lifecycle and player transitions.
     def append_before_close(block,line):
-        i=block.rfind("}")
-        if i<0:raise RuntimeError("method close missing")
+        matches=list(re.finditer(r'(?m)^[ \\t]*}[ \\t]*
+    s=edit_method(s,"onResume",lambda b:append_before_close(b,'    cobraApplyPlayerRotation("resume");'))
+    s=edit_method(s,"onPause",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"pause\");","rotation pause release"))
+    s=edit_method(s,"onStop",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"stop\");","rotation stop release"))
+    s=edit_method(s,"closePlayer",lambda b:after_method_open(
+        b,'    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"close-player");mCobraPlayerRotationButton=null;',"rotation close release"))
+    s=edit_method(s,"openMultiView",lambda b:after_method_open(
+        b,'    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-view");mCobraPlayerRotationButton=null;',"rotation multiview release"))
+
+    s=edit_method(s,"onPictureInPictureModeChanged",lambda b:after_method_open(
+        b,'    if(inPictureInPictureMode)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pip-enter");else cobraApplyPlayerRotation("pip-exit");',"rotation PiP lifecycle"))
+    s=edit_method(s,"onMultiWindowModeChanged",lambda b:after_method_open(
+        b,'    if(inMultiWindowMode)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-window-enter");else cobraApplyPlayerRotation("multi-window-exit");',"rotation multi-window lifecycle"))
+
+    # Append helpers without changing any playback/provider/native implementation.
+    pos=s.rfind("\n}")
+    if pos<0:raise RuntimeError("Activity terminator missing")
+    s=s[:pos]+"\n"+HELPERS.rstrip()+"\n"+s[pos:]
+    verify_live(s)
+    return s
+
+def verify_live(s):
+    required=[
+      'THEME  •  ','cobra_theme_management','showCobraVisualThemePicker()',
+      'Built-in appearance','Installed visual theme','Install / replace theme ZIP',
+      'COBRA_ROTATION_PREFS="infinity_player_rotation"','COBRA_ROTATION_MODE="mode"',
+      'SCREEN_ORIENTATION_FULL_SENSOR','SCREEN_ORIENTATION_UNSPECIFIED',
+      'cobra_player_rotation','cobraTogglePlayerRotation()','"rotate".equals(glyph)',
+      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("is-playing")','cobraApplyPlayerRotation("video-size")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pip-enter")','cobraApplyPlayerRotation("pip-exit")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-window-enter")','cobraApplyPlayerRotation("multi-window-exit")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"player-error")',
+      'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause")'
+    ]
+    for token in required:
+        if token not in s: raise RuntimeError("missing 2103162 contract: "+token)
+    settings=s[s.index("  private void showSettings()"):span(s,"showSettings")[1]]
+    for forbidden in ["PREVIOUS VISUAL THEME","REMOVE VISUAL THEME","RELOAD COBRA UI THEME","INSTALL COBRA UI / VISUAL THEME ZIP","cobra_visual_theme_state"]:
+        if forbidden in settings: raise RuntimeError("old theme clutter remains: "+forbidden)
+    if "Settings.System" in s or "ACCELEROMETER_ROTATION" in s:
+        raise RuntimeError("rotation must not mutate Android global auto-rotate")
+    if s.count('private void showCobraVisualThemePicker()')!=1: raise RuntimeError("theme picker duplicate")
+    if s.count('private void cobraTogglePlayerRotation()')!=1: raise RuntimeError("rotation controller duplicate")
+
+def patch_theme(s):
+    if sha_text(s)!=THEME_PRE: raise RuntimeError("Not exact locked 2103161 visual runtime: "+sha_text(s))
+    s=once(s,"public static final int RUNTIME=2, BUILD=2103161;","public static final int RUNTIME=2, BUILD=2103162;","visual runtime build")
+    return s
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument("--source",type=Path,required=True);p.add_argument("--receipt",type=Path,required=True);a=p.parse_args()
+    live=a.source/LIVE;theme=a.source/THEME
+    before_live=live.read_text();before_theme=theme.read_text()
+    after_live=patch_live(before_live);after_theme=patch_theme(before_theme)
+    live.write_text(after_live);theme.write_text(after_theme)
+    row={"base_build":2103161,"target_build":2103162,"files":{
+      str(LIVE):{"before":sha_text(before_live),"after":sha_text(after_live)},
+      str(THEME):{"before":sha_text(before_theme),"after":sha_text(after_theme)}
+    },"rotation_contract":{"shared_with_infinity":True,"follow_device":0,"unlocked":1,"global_setting_mutated":False},
+       "theme_settings":"single settings row -> built-in / installed theme / install ZIP"}
+    a.receipt.parent.mkdir(parents=True,exist_ok=True);a.receipt.write_text(json.dumps(row,indent=2)+"\n")
+    print("PASS: exact 2103161 -> 2103162 theme switch + Cobra player rotation delta applied")
+if __name__=="__main__":main()
+,block))
+        if not matches:raise RuntimeError("method close missing")
+        i=matches[-1].start()
         return block[:i]+line+"\n"+block[i:]
     s=edit_method(s,"onResume",lambda b:append_before_close(b,'    cobraApplyPlayerRotation("resume");'))
     s=edit_method(s,"onPause",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"pause\");","rotation pause release"))
