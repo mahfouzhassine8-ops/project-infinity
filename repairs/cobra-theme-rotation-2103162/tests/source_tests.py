@@ -62,7 +62,9 @@ def main():
    ('@Override public void onIsPlayingChanged(boolean playing){if(current())cobraUpdatePlaybackLabels();}',
     '@Override public void onIsPlayingChanged(boolean playing){if(current()){if(player==mPlayer)cobraApplyPlayerRotation("is-playing");cobraUpdatePlaybackLabels();}}'),
    ('@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;',
-    '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;\n      if(player==mPlayer)cobraApplyPlayerRotation("playback-state");')]:
+    '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;\n      if(player==mPlayer)cobraApplyPlayerRotation("playback-state");'),
+   ('@Override public void onPlayerError(PlaybackException failure) {\n      if(!current())return;',
+    '@Override public void onPlayerError(PlaybackException failure) {\n      if(!current())return;\n      if(player==mPlayer)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"player-error");')]:
   assert before_token in live and after_token in after,(before_token,after_token);checks+=1
 
  # Theme setting is one row in Settings, not three recovery rows + reload.
@@ -80,7 +82,7 @@ def main():
  # Exact Infinity rotation semantics are reused; no system-setting or playback ownership.
  for token in ['"infinity_player_rotation"','"mode"',"COBRA_ROTATION_FOLLOW_DEVICE=0",
                "COBRA_ROTATION_UNLOCKED=1","SCREEN_ORIENTATION_FULL_SENSOR",
-               "SCREEN_ORIENTATION_UNSPECIFIED",'mPlayer!=null&&mPlayer.getVideoFormat()!=null',
+               "SCREEN_ORIENTATION_UNSPECIFIED",'state!=Player.STATE_IDLE&&state!=Player.STATE_ENDED','mPlayer.getVideoFormat()!=null',
                '"android.software.leanback"']:
   assert token in after,token;checks+=1
  for forbidden in ["ACCELEROMETER_ROTATION","Settings.System","setMediaItem(","prepare()","release()","stop()"]:
