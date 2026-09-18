@@ -195,8 +195,9 @@ HELPERS=r'''
 
   private boolean cobraHasActiveVideo(){
     try{
-      return mPlayer!=null&&mPlayer.getVideoFormat()!=null
-          &&(mPlayer.isPlaying()||mPlayer.getPlayWhenReady());
+      int state=mPlayer==null?Player.STATE_IDLE:mPlayer.getPlaybackState();
+      return mPlayer!=null&&state!=Player.STATE_IDLE&&state!=Player.STATE_ENDED
+          &&mPlayer.getVideoFormat()!=null&&(mPlayer.isPlaying()||mPlayer.getPlayWhenReady());
     }catch(Exception ignored){return false;}
   }
 
@@ -292,6 +293,10 @@ def patch_live(s):
       '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;',
       '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;\n      if(player==mPlayer)cobraApplyPlayerRotation("playback-state");',
       "rotation state observer")
+    s=once(s,
+      '@Override public void onPlayerError(PlaybackException failure) {\n      if(!current())return;',
+      '@Override public void onPlayerError(PlaybackException failure) {\n      if(!current())return;\n      if(player==mPlayer)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"player-error");',
+      "rotation error release")
 
     # Exact established release behavior at lifecycle and player transitions.
     def append_before_close(block,line):
@@ -328,7 +333,7 @@ def verify_live(s):
       'COBRA_ROTATION_PREFS="infinity_player_rotation"','COBRA_ROTATION_MODE="mode"',
       'SCREEN_ORIENTATION_FULL_SENSOR','SCREEN_ORIENTATION_UNSPECIFIED',
       'cobra_player_rotation','cobraTogglePlayerRotation()','"rotate".equals(glyph)',
-      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("is-playing")','cobraApplyPlayerRotation("video-size")','cobraApplyPlayerRotation("pip")','cobraApplyPlayerRotation("multi-window")',
+      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("is-playing")','cobraApplyPlayerRotation("video-size")','cobraApplyPlayerRotation("pip")','cobraApplyPlayerRotation("multi-window")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"player-error")',
       'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause")'
     ]
     for token in required:
