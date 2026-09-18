@@ -19,6 +19,8 @@ def baseline():
 
 def upgrade():
  baseline();Path('audit164').mkdir(exist_ok=True)
+ # The inherited runner sets COBRA_EVIDENCE but does not create its screenshots child.
+ Path('audit164/acceptance/screenshots').mkdir(parents=True,exist_ok=True)
  receipt=Path('engine/background-resume-source.json');data=json.loads(receipt.read_text())
  require(data.get('version_code')==2103163,'Expected exact reconstructed 2103163')
  for rel,hashes in data['files'].items():
