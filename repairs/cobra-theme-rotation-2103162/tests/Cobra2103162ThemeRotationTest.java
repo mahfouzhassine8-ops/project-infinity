@@ -108,6 +108,34 @@ public class Cobra2103162ThemeRotationTest {
     }finally{ui.clean(a);}
   }
 
+
+  @Test public void backgroundModeStillUsesTheExistingNormalExtendedContract()throws Exception{
+    InfinityLiveActivity a=ui.fixture(24);try{
+      a.getSharedPreferences("infinity_runtime",Context.MODE_PRIVATE).edit().putBoolean("extended_background",true).commit();
+      call(a,"showSettings");ui.measure(a,412,915);
+      TextView background=(TextView)tag(a,"cobra_background_mode");assertNotNull(background);assertTrue(background.getText().toString().contains("EXTENDED"));
+      assertTrue(background.performClick());ui.measure(a,412,915);
+      View normal=tag(a,"cobra-background-mode:normal");View extended=tag(a,"cobra-background-mode:extended");
+      assertNotNull(normal);assertNotNull(extended);assertTrue(normal.performClick());
+      assertFalse(InfinityExtendedBackgroundService.isEnabled(a));
+      call(a,"showSettings");ui.measure(a,412,915);
+      assertTrue(((TextView)tag(a,"cobra_background_mode")).getText().toString().contains("NORMAL"));
+    }finally{InfinityExtendedBackgroundService.setEnabled(a,false);ui.clean(a);}
+  }
+
+  @Test public void chooserStillConsumesSystemBarInsets()throws Exception{
+    CobraVisualRuntimeTest harness=new CobraVisualRuntimeTest();harness.context=app;harness.activate(harness.install(theme("safe-area")));
+    ExperienceChooserUiTest.reflect();ExperienceChooserUiTest old=new ExperienceChooserUiTest();Splash a=old.activity();try{
+      ExperienceChooserUiTest.chooser.invoke(a);View root=tag(a,"experience-themed-root");assertNotNull(root);
+      android.view.WindowInsets insets=new android.view.WindowInsets.Builder()
+          .setSystemWindowInsets(android.graphics.Insets.of(0,32,0,20)).build();
+      root.dispatchApplyWindowInsets(insets);
+      assertEquals(32,root.getPaddingTop());assertEquals(20,root.getPaddingBottom());
+      assertEquals(0,root.getPaddingLeft());assertEquals(0,root.getPaddingRight());
+      assertNotNull(tag(a,"experience-card-infinity"));assertNotNull(tag(a,"experience-card-cobra"));
+    }finally{old.closeWindows();}
+  }
+
   @Test public void playerChromeHasRotationBesideLockAndUsesSharedInfinityPreference()throws Exception{
     InfinityLiveActivity a=ui.fixture(24);try{
       FrameLayout overlay=new FrameLayout(a);a.setContentView(overlay);set(a,"mPlayerOverlay",overlay);
