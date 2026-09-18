@@ -19,7 +19,7 @@ def upgrade():
  replace('kodi/tools/android/packaging/xbmc/build.gradle.in','versionName "'+OLD+'"','versionName "'+NEW+'"')
  replace('scripts/infinity_background_resume.py','VERSION_CODE = 2103160','VERSION_CODE = 2103161')
  replace('scripts/infinity_background_resume.py',"RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"'")
- replace('scripts/package_background_resume.py','Infinity-'+OLD,'Infinity-'+NEW)
+ p=Path('scripts/package_background_resume.py');s=p.read_text();require(s.count('Infinity-'+OLD)==2,'packager identity anchors changed');p.write_text(s.replace('Infinity-'+OLD,'Infinity-'+NEW))
  receipt=Path('engine/background-resume-source.json');data=json.loads(receipt.read_text());patch=json.loads(Path('audit161/patch.json').read_text())
  require(data.get('version_code')==2103160,'Expected exact 2103160 source receipt')
  for rel,row in patch['files'].items():data['files'][rel]={'before':row['before'],'after':row['after']}
