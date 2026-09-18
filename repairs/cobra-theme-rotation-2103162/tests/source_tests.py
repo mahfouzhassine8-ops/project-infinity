@@ -71,7 +71,7 @@ def main():
  # Exact Infinity rotation semantics are reused; no system-setting or playback ownership.
  for token in ['"infinity_player_rotation"','"mode"',"COBRA_ROTATION_FOLLOW_DEVICE=0",
                "COBRA_ROTATION_UNLOCKED=1","SCREEN_ORIENTATION_FULL_SENSOR",
-               "SCREEN_ORIENTATION_UNSPECIFIED",'mPlayer.getVideoFormat()!=null',
+               "SCREEN_ORIENTATION_UNSPECIFIED",'mPlayer!=null&&mPlayer.getVideoFormat()!=null',
                '"android.software.leanback"']:
   assert token in after,token;checks+=1
  for forbidden in ["ACCELEROMETER_ROTATION","Settings.System","setMediaItem(","prepare()","release()","stop()"]:
