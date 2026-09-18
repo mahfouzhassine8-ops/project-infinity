@@ -47,7 +47,7 @@ def main():
     pip=method(text,"onPictureInPictureModeChanged")
 
     checks={}
-    checks["exact_patch_scope"]=patch.get("changed_methods")==["onCreate","cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"]
+    checks["exact_patch_scope"]=patch.get("changed_methods")==["onCreate","cobraInstallBrowseSafeArea","cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"]
     checks["edge_to_edge_explicit"]="WindowCompat.setDecorFitsSystemWindows(getWindow(),false)" in oncreate
     checks["edge_to_edge_configured_once"]=oncreate.count("setDecorFitsSystemWindows")==1 and "setDecorFitsSystemWindows" not in bars+confirm
     checks["contrast_scrim_disabled"]="setStatusBarContrastEnforced(false)" in oncreate and "setStatusBarContrastEnforced(false)" in bars and "setStatusBarContrastEnforced(false)" in confirm
@@ -60,12 +60,14 @@ def main():
     checks["status_transparent"]="setStatusBarColor(fullscreen?Color.BLACK:Color.TRANSPARENT)" in bars and "setStatusBarColor(Color.TRANSPARENT)" in confirm
     checks["system_status_visible"]="controller.show(android.view.WindowInsets.Type.statusBars())" in bars and "statusBars()" in confirm
     checks["safe_area_root_owns_insets"]="WindowInsets.Type.systemBars()" in safe and "WindowInsets.Type.displayCutout()" in safe and "v.setPadding(left,top,right,bottom)" in safe
+    checks["safe_area_transient_zero_stabilized"]="stableVerticalInsets" in safe and "if(top>0)stableVerticalInsets[0]=top" in safe and "if(bottom>0)stableVerticalInsets[1]=bottom" in safe
     checks["matched_underlay"]="mRoot.setBackgroundColor(barColor)" in bars and "mRoot.setBackgroundColor(barColor)" in confirm
     checks["persisted_theme_resolver"]="CobraVisualTheme.readPointer(this)" in resolver and "CobraVisualTheme.hash(raw)" in resolver
     checks["theme_screen_cascade"]='new String[]{"all.panel","screen.panel","screen"}' in resolver
     checks["fullscreen_video_contract"]="mPlayerOverlay" in fullscreen and "Color.BLACK" in bars and "controller.hide(android.view.WindowInsets.Type.statusBars())" in bars
     checks["pip_callback_untouched"]="cobraConsumeLauncherPipReturn" in pip and "cobraApplySystemBarsForSurface" in pip
-    checks["no_layout_or_safe_area_rewrite"]=patch.get("safe_area_changed") is False and patch.get("player_changed") is False and patch.get("pip_changed") is False
+    checks["safe_area_geometry_preserved"]=patch.get("safe_area_geometry_changed") is False and patch.get("safe_area_stabilization_changed") is True
+    checks["no_player_or_pip_rewrite"]=patch.get("player_changed") is False and patch.get("pip_changed") is False
     checks["native_unchanged"]=patch.get("native_changed") is False
 
     failed=[k for k,v in checks.items() if not v]
