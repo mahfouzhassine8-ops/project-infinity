@@ -63,7 +63,7 @@ def apply(source,receipt_path,out):
         raise RuntimeError("2103168 status-surface Activity preimage mismatch")
 
     protected=[
-        "buildShell","cobraInstallBrowseSafeArea","cobraDarkIconsFor",
+        "buildShell","cobraDarkIconsFor",
         "cobraBrowseSystemBarSurfaceColor",
         "onStart","onResume","onPause","onStop","onUserLeaveHint",
         "onPictureInPictureModeChanged","onNewIntent","onConfigurationChanged",
@@ -80,6 +80,7 @@ def apply(source,receipt_path,out):
     protected_before={n:sha_bytes(method(before,n)) for n in protected}
 
     oncreate=method(before,"onCreate")
+    safe=method(before,"cobraInstallBrowseSafeArea")
     bars=method(before,"cobraApplySystemBarsForSurface")
     confirm=method(before,"cobraConfirmBrowseSystemBars")
 
@@ -97,6 +98,42 @@ def apply(source,receipt_path,out):
     ):
         if token not in confirm:raise RuntimeError("Expected confirmation preimage token missing: "+token)
 
+    if "root.setOnApplyWindowInsetsListener((v,insets)->{" not in safe or "v.setPadding(left,top,right,bottom)" not in safe:
+        raise RuntimeError("2103166 safe-area preimage drift")
+
+    new_safe='''  private void cobraInstallBrowseSafeArea(View root){
+    if(root==null)return;
+    final int[] stableVerticalInsets=new int[]{0,0};
+    root.setOnApplyWindowInsetsListener((v,insets)->{
+      int left=0,top=0,right=0,bottom=0;
+      if(Build.VERSION.SDK_INT>=30){
+        android.graphics.Insets bars=insets.getInsets(android.view.WindowInsets.Type.systemBars());
+        android.graphics.Insets cut=insets.getInsets(android.view.WindowInsets.Type.displayCutout());
+        left=Math.max(bars.left,cut.left);top=Math.max(bars.top,cut.top);
+        right=Math.max(bars.right,cut.right);bottom=Math.max(bars.bottom,cut.bottom);
+      }else{
+        left=insets.getSystemWindowInsetLeft();top=insets.getSystemWindowInsetTop();
+        right=insets.getSystemWindowInsetRight();bottom=insets.getSystemWindowInsetBottom();
+        if(Build.VERSION.SDK_INT>=28&&insets.getDisplayCutout()!=null){
+          android.view.DisplayCutout cut=insets.getDisplayCutout();
+          left=Math.max(left,cut.getSafeInsetLeft());top=Math.max(top,cut.getSafeInsetTop());
+          right=Math.max(right,cut.getSafeInsetRight());bottom=Math.max(bottom,cut.getSafeInsetBottom());
+        }
+      }
+      boolean browse=!isCobraInPictureInPicture()&&mPlayerOverlay==null&&mMultiOverlay==null;
+      if(browse){
+        // Samsung/SystemUI can transiently report zero bar insets while restoring from
+        // fullscreen/PiP. Do not collapse a known-good browse safe area during that handoff.
+        if(top>0)stableVerticalInsets[0]=top;else if(stableVerticalInsets[0]>0)top=stableVerticalInsets[0];
+        if(bottom>0)stableVerticalInsets[1]=bottom;else if(stableVerticalInsets[1]>0)bottom=stableVerticalInsets[1];
+      }
+      if(v.getPaddingLeft()!=left||v.getPaddingTop()!=top||v.getPaddingRight()!=right||v.getPaddingBottom()!=bottom)
+        v.setPadding(left,top,right,bottom);
+      return insets;
+    });
+  }'''
+    text=replace_method(before,"cobraInstallBrowseSafeArea",new_safe)
+
     new_oncreate=oncreate.replace(
         "    requestWindowFeature(Window.FEATURE_NO_TITLE);",
         """    requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -104,7 +141,7 @@ def apply(source,receipt_path,out):
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     if(Build.VERSION.SDK_INT>=29)getWindow().setStatusBarContrastEnforced(false);""",1)
-    text=replace_method(before,"onCreate",new_oncreate)
+    text=replace_method(text,"onCreate",new_oncreate)
 
     new_bars=bars
     new_bars=new_bars.replace(
@@ -164,8 +201,16 @@ def apply(source,receipt_path,out):
         if sha_bytes(method(text,n))!=h:raise RuntimeError("Protected method changed: "+n)
 
     after_oncreate=method(text,"onCreate")
+    after_safe=method(text,"cobraInstallBrowseSafeArea")
     after_bars=method(text,"cobraApplySystemBarsForSurface")
     after_confirm=method(text,"cobraConfirmBrowseSystemBars")
+    for token in (
+        "stableVerticalInsets",
+        "boolean browse=!isCobraInPictureInPicture()&&mPlayerOverlay==null&&mMultiOverlay==null",
+        "if(top>0)stableVerticalInsets[0]=top",
+        "if(bottom>0)stableVerticalInsets[1]=bottom",
+    ):
+        if token not in after_safe:raise RuntimeError("2103170 safe-area stabilization missing: "+token)
     for token in (
         "WindowCompat.setDecorFitsSystemWindows(getWindow(),false)",
         "FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS",
@@ -203,7 +248,7 @@ def apply(source,receipt_path,out):
         "base_locked_commit":BASE_LOCK,
         "base_version_code":2103168,
         "files":{str(REL):{"before":sha_bytes(before_bytes),"after":sha_bytes(after_bytes)}},
-        "changed_methods":["onCreate","cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"],
+        "changed_methods":["onCreate","cobraInstallBrowseSafeArea","cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"],
         "new_helpers":[],
         "protected_methods":protected_before,
         "root_cause":[
@@ -213,7 +258,8 @@ def apply(source,receipt_path,out):
         ],
         "browse_window":"edge-to-edge transparent status bar; root paints underlay and owns insets",
         "status_bar_contrast_enforced":False,
-        "safe_area_changed":False,
+        "safe_area_geometry_changed":False,
+        "safe_area_stabilization_changed":True,
         "player_changed":False,
         "pip_changed":False,
         "native_changed":False,
