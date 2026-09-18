@@ -39,7 +39,8 @@ def main():
    ("onPause",'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause")'),
    ("onStop",'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"stop")'),
    ("onResume",'cobraApplyPlayerRotation("resume")'),
-   ("onPictureInPictureModeChanged",'cobraApplyPlayerRotation("pip")')]:
+   ("onPictureInPictureModeChanged",'cobraApplyPlayerRotation("pip")'),
+   ("onMultiWindowModeChanged",'cobraApplyPlayerRotation("multi-window")')]:
   b=method(live,name);c=method(after,name);assert needle in c
   assert strip_lines(c,[needle])==strip_lines(b,[]),name;checks+=2
 
@@ -51,10 +52,18 @@ def main():
   for n in needles:assert n in c;checks+=1
   assert strip_lines(c,needles)==strip_lines(b,[]),name;checks+=1
 
- # Single player keeps its existing Media3 ownership and only gains one policy callback.
+ # Single-player start/ownership remains byte-identical. Rotation observes the existing
+ # CobraPlayerBinding callbacks instead of adding another listener.
  b=method(live,"startSinglePlayer");c=method(after,"startSinglePlayer")
- assert c.count('cobraApplyPlayerRotation("playback-state")')==1;checks+=1
- assert strip_lines(c,['cobraApplyPlayerRotation("playback-state")'])==strip_lines(b,[]);checks+=1
+ assert b==c;checks+=1
+ for before_token,after_token in [
+   ('@Override public void onVideoSizeChanged(VideoSize size){if(current())cobraFitBinding(this);}',
+    '@Override public void onVideoSizeChanged(VideoSize size){if(current()){cobraFitBinding(this);if(player==mPlayer)cobraApplyPlayerRotation("video-size");}}'),
+   ('@Override public void onIsPlayingChanged(boolean playing){if(current())cobraUpdatePlaybackLabels();}',
+    '@Override public void onIsPlayingChanged(boolean playing){if(current()){if(player==mPlayer)cobraApplyPlayerRotation("is-playing");cobraUpdatePlaybackLabels();}}'),
+   ('@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;',
+    '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;\n      if(player==mPlayer)cobraApplyPlayerRotation("playback-state");')]:
+  assert before_token in live and after_token in after,(before_token,after_token);checks+=1
 
  # Theme setting is one row in Settings, not three recovery rows + reload.
  settings=method(after,"showSettings")
