@@ -1,0 +1,140 @@
+name: HM Theme 2.0.3 | Exact 2103160 audit harness
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-hm-theme-203-audit-harness]
+    paths: ['.github/workflows/hm-theme-203-audit-harness.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: hm-theme-203-audit-harness
+  cancel-in-progress: false
+jobs:
+  exact-runtime-test-environment:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with: {ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32, path: refinement-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: b3bcb619b08205dcfc1451424b2d41e05fd37633, path: audit-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98, path: view-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: fd2af59bab2edcaea6be9e5046720715e25e64e0, path: health-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 257a49d742890acf0c7d3e0220bded5a8aa80c57, path: experience-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 42b1afc95a07b3ce0f534232e0f774c5159ddec1, path: theme-delta, persist-credentials: false}
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2, run-id: 35044752997, github-token: '${{ github.token }}', path: run40}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Player-Reboot-Lock-2103152, run-id: 35169846333, github-token: '${{ github.token }}', path: rollback2103152}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited, run-id: 35176733529, github-token: '${{ github.token }}', path: rollback2103153}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155, run-id: 35188339917, github-token: '${{ github.token }}', path: baseline155}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156, run-id: 35192605567, github-token: '${{ github.token }}', path: baseline156}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157, run-id: 35200244871, github-token: '${{ github.token }}', path: baseline157}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Health-Playback-RC1-2103158, run-id: 35206405387, github-token: '${{ github.token }}', path: baseline158}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103158-Health-Playback-Evidence, run-id: 35206405387, github-token: '${{ github.token }}', path: evidence158}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Experience-Zip-Bridge-RC1-2103159, run-id: 35278026159, github-token: '${{ github.token }}', path: baseline159}
+      - name: Reconstruct immutable 2103160 source with all original checks
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py reconstruct
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py apply
+      - name: Rebuild unchanged Android shell for tests, never rebuild native engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir visual-build --out signed160
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py verify
+      - name: Repeat all 46 unchanged Android tests
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py --build visual-build --out audit160/android
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py deliver
+      - name: Export only compiled test inputs and public dependencies, never credentials
+        run: |
+          set -euo pipefail
+          cat >> visual-build/xbmc/build.gradle <<'GRADLE'
+          tasks.register('exportThemeAuditClasspath') {
+            doLast {
+              def files = tasks.named('testReleaseUnitTest').get().classpath.files + android.bootClasspath
+              new File(rootProject.projectDir, 'theme-audit-classpath.txt').text = files.collect { it.absolutePath }.join('\n')
+            }
+          }
+          GRADLE
+          python3 - <<'PY'
+          import importlib.util,subprocess
+          from pathlib import Path
+          p=Path('experience-delta/repairs/infinity-experience-2103159/tests/android.py')
+          s=importlib.util.spec_from_file_location('runner',p);r=importlib.util.module_from_spec(s);s.loader.exec_module(r)
+          subprocess.run(['./gradlew','--no-daemon',':xbmc:exportThemeAuditClasspath'],cwd='visual-build',env=r.test_environment(Path('audit160/export')),check=True)
+          PY
+          python3 - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          out=Path('offline-theme-harness');out.mkdir()
+          files=[Path(s) for s in Path('visual-build/theme-audit-classpath.txt').read_text().splitlines() if s.strip()]
+          mapping=[]
+          for i,src in enumerate(files):
+            if not src.exists():continue
+            if src.suffix in ('.keystore','.jks','.apk'):raise RuntimeError('Unexpected artifact in test classpath')
+            dst=out/'classpath'/('%03d-'%i+src.name);dst.parent.mkdir(exist_ok=True)
+            if src.is_dir():shutil.copytree(src,dst)
+            else:shutil.copy2(src,dst)
+            mapping.append({'source':str(src),'local':str(dst.relative_to(out))})
+          sdk=out/'sdk';sdk.mkdir()
+          for base in [Path.home()/'.m2',Path.home()/'.gradle']:
+            for p in base.rglob('android-all*-instrumented-*.jar'):
+              if p.is_file():shutil.copy2(p,sdk/p.name)
+          # Include test fixture/source inputs, never full workspaces, environments, caches or keys.
+          shutil.copytree('visual-build/xbmc/src/test',out/'test-source')
+          shutil.copytree('kodi/tools/android/packaging/xbmc/src',out/'production-source',ignore=shutil.ignore_patterns('*.keystore','*.jks'))
+          shutil.copy2('audit160/patch.json',out/'locked-source-receipt.json')
+          shutil.copy2('signed160/ACCEPTANCE.json',out/'inherited-acceptance.json')
+          (out/'classpath.json').write_text(json.dumps(mapping,indent=2)+'\n')
+          (out/'SHA256SUMS').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+str(p.relative_to(out))+'\n' for p in sorted(out.rglob('*')) if p.is_file()))
+          print('HARNESS',len(mapping),'classpath entries;',len(list(sdk.glob('*.jar'))),'SDK jars; no APK published')
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: HM-203-Exact-2103160-Offline-Android-Harness
+          path: offline-theme-harness/
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: HM-203-Harness-Preparation-Evidence
+          path: |
+            audit160/
+            audit159/
+          if-no-files-found: warn
+          retention-days: 30
