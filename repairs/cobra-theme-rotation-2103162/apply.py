@@ -278,14 +278,20 @@ def patch_live(s):
         return block
     s=edit_method(s,"cobraBuildPlayerChrome",chrome)
 
-    # Re-evaluate when Media3 playback state changes; no play/prepare/release ownership changes.
-    def start_player(block):
-        pat=re.compile(r'(@Override public void onPlaybackStateChanged\(int playbackState\) \{\s*)(if \(!isCobraAsyncAlive\(\)\) return;\s*)?')
-        m=pat.search(block)
-        if not m: raise RuntimeError("single-player playback callback hook missing")
-        prefix=m.group(1)+(m.group(2) or "")+'          cobraApplyPlayerRotation("playback-state");\n'
-        return block[:m.start()]+prefix+block[m.end():]
-    s=edit_method(s,"startSinglePlayer",start_player)
+    # Media3 ownership lives in CobraPlayerBinding on this locked source. Observe it there;
+    # never add a second listener and never mutate play/prepare/release ownership.
+    s=once(s,
+      '@Override public void onVideoSizeChanged(VideoSize size){if(current())cobraFitBinding(this);}',
+      '@Override public void onVideoSizeChanged(VideoSize size){if(current()){cobraFitBinding(this);if(player==mPlayer)cobraApplyPlayerRotation("video-size");}}',
+      "rotation video-size observer")
+    s=once(s,
+      '@Override public void onIsPlayingChanged(boolean playing){if(current())cobraUpdatePlaybackLabels();}',
+      '@Override public void onIsPlayingChanged(boolean playing){if(current()){if(player==mPlayer)cobraApplyPlayerRotation("is-playing");cobraUpdatePlaybackLabels();}}',
+      "rotation playing observer")
+    s=once(s,
+      '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;',
+      '@Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;\n      if(player==mPlayer)cobraApplyPlayerRotation("playback-state");',
+      "rotation state observer")
 
     # Exact established release behavior at lifecycle and player transitions.
     def append_before_close(block,line):
@@ -302,6 +308,11 @@ def patch_live(s):
         anchor="    mInPictureInPicture = inPictureInPictureMode;\n"
         return once(block,anchor,anchor+'    cobraApplyPlayerRotation("pip");\n',"rotation PiP release")
     s=edit_method(s,"onPictureInPictureModeChanged",pip)
+    s=edit_method(s,"onMultiWindowModeChanged",lambda b:once(
+        b,
+        '    super.onMultiWindowModeChanged(inMultiWindowMode, configuration);',
+        '    super.onMultiWindowModeChanged(inMultiWindowMode, configuration);\n    cobraApplyPlayerRotation("multi-window");',
+        "rotation multi-window release"))
 
     # Append helpers without changing any playback/provider/native implementation.
     pos=s.rfind("\n}")
@@ -317,7 +328,7 @@ def verify_live(s):
       'COBRA_ROTATION_PREFS="infinity_player_rotation"','COBRA_ROTATION_MODE="mode"',
       'SCREEN_ORIENTATION_FULL_SENSOR','SCREEN_ORIENTATION_UNSPECIFIED',
       'cobra_player_rotation','cobraTogglePlayerRotation()','"rotate".equals(glyph)',
-      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("pip")',
+      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("is-playing")','cobraApplyPlayerRotation("video-size")','cobraApplyPlayerRotation("pip")','cobraApplyPlayerRotation("multi-window")',
       'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause")'
     ]
     for token in required:
