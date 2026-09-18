@@ -26,7 +26,8 @@ The fix therefore does **not** add padding, move headers, resize the guide, chan
 1. **Browse surfaces add `FLAG_FORCE_NOT_FULLSCREEN`** while clearing `FLAG_FULLSCREEN`.
 2. **Legacy hide/immersive flags are explicitly scrubbed** before the modern WindowInsetsController call.
 3. **WindowInsetsController behavior returns to `BEHAVIOR_DEFAULT`** and explicitly shows both status and navigation bars on browse surfaces.
-4. **A one-frame confirmation pass** reasserts the browse policy after window traversal, which protects against OEM state being re-applied after the first request.
+4. **Window-focus recovery is synchronous first, then posted once more**, so an OEM focus handoff cannot leave a stale fullscreen frame behind.
+5. **A one-frame confirmation pass** reasserts the browse policy after window traversal, which protects against OEM state being re-applied after the first request.
 
 Fullscreen video and Multi-View clear `FLAG_FORCE_NOT_FULLSCREEN`, keep `FLAG_FULLSCREEN`, and continue hiding **only** the status bar. The navigation/gesture bar remains visible by contract.
 
@@ -37,6 +38,7 @@ The micro-fix is forbidden from changing the 2103166 layout/safe-area implementa
 The patch hashes those owners before editing and requires them to remain byte-identical. Only:
 
 - `cobraApplySystemBarsForSurface()`
+- `onWindowFocusChanged()` (only to make the existing status-bar reapply synchronous before its posted retry)
 
 may change, with one new helper:
 
