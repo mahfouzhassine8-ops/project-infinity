@@ -91,7 +91,8 @@ public class Cobra2103166EndToEndUiAuditTest {
 
   @Test public void settingsHeaderLivesInsideSharedTopSafeArea()throws Exception{
     call(a,"showSettings");dispatch(insets(0,40,0,22));ui.measure(a,717,917);
-    assertEquals("COBRA • SETTINGS",header().getText().toString());
+    assertTrue("Settings title must remain present even when the approved menu affordance prefixes it",
+        header().getText().toString().endsWith("COBRA • SETTINGS"));
     assertEquals(40,root().getPaddingTop());
     assertEquals(View.VISIBLE,header().getVisibility());
     assertTrue("Header must retain measurable height",header().getHeight()>0);
@@ -149,7 +150,8 @@ public class Cobra2103166EndToEndUiAuditTest {
     call(a,"cobraApplySystemBarsForSurface");set(a,"mPlayerOverlay",null);
     call(a,"cobraApplySystemBarsForSurface");call(a,"showSettings");
     dispatch(insets(0,44,0,24));ui.measure(a,717,917);
-    assertEquals("COBRA • SETTINGS",header().getText().toString());
+    assertTrue("Settings title must remain present even when the approved menu affordance prefixes it",
+        header().getText().toString().endsWith("COBRA • SETTINGS"));
     assertEquals(44,root().getPaddingTop());
     assertEquals(0,a.getWindow().getAttributes().flags&WindowManager.LayoutParams.FLAG_FULLSCREEN);
   }
