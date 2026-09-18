@@ -1,0 +1,320 @@
+name: Infinity | 2103164 PythonInvoker Thread-State Repair
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103164-pythoninvoker-threadstate-repair-rc1]
+    paths:
+      - '.github/workflows/infinity-2103164-pythoninvoker-threadstate-repair.yml'
+      - 'scripts/infinity_python_invoker_hardening.py'
+      - 'repairs/pythoninvoker-2103164/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103164-pythoninvoker-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Reconstruct exact accepted Kodi 21.3 + Infinity/Cobra native source
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_1.sh
+
+      - name: Backport upstream Python thread-state ownership fix and device abort guard
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_python_invoker_hardening.py apply \
+            --source kodi --receipt engine/pythoninvoker-threadstate-source.json
+          python3 scripts/infinity_python_invoker_hardening.py verify --source kodi
+          grep -Fq 'thread state cleaned while waiting for child threads' kodi/xbmc/interfaces/python/PythonInvoker.cpp
+          ! grep -Fq 'assert(m_threadState != nullptr)' kodi/xbmc/interfaces/python/PythonInvoker.cpp
+
+      - name: Full native rebuild with existing renderer hardening
+        id: native_compile
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_2.sh
+          python3 scripts/infinity_python_invoker_hardening.py verify --source kodi
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk')
+          assert apk.is_file()
+          with zipfile.ZipFile(apk) as z:
+              native=z.read('lib/arm64-v8a/libkodi.so')
+          assert b'thread state cleaned while waiting for child threads' in native
+          assert b'm_threadState != nullptr' not in native
+          print('PASS: rebuilt libkodi.so contains guard and no line-412 assertion')
+          PY
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.native_compile.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - name: Upload rebuilt native engine and source proof
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103164-PythonInvoker-Native-Engine
+          path: |
+            engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk
+            engine/live-app-shell-engine.json
+            engine/gui-render-hardening-source.json
+            engine/pythoninvoker-threadstate-source.json
+            engine/base-badging.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+  package-and-audit:
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    steps:
+      - name: Immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Locked 2103155 recipe
+        uses: actions/checkout@v5
+        with: {ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32, path: refinement-delta, persist-credentials: false}
+      - name: 2103156 diagnostics recipe
+        uses: actions/checkout@v5
+        with: {ref: b3bcb619b08205dcfc1451424b2d41e05fd37633, path: audit-delta, persist-credentials: false}
+      - name: Locked 2103157 recipe
+        uses: actions/checkout@v5
+        with: {ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98, path: view-delta, persist-credentials: false}
+      - name: Locked 2103158 recipe
+        uses: actions/checkout@v5
+        with: {ref: fd2af59bab2edcaea6be9e5046720715e25e64e0, path: health-delta, persist-credentials: false}
+      - name: Locked 2103159 recipe
+        uses: actions/checkout@v5
+        with: {ref: 257a49d742890acf0c7d3e0220bded5a8aa80c57, path: experience-delta, persist-credentials: false}
+      - name: Locked 2103160 recipe
+        uses: actions/checkout@v5
+        with: {ref: 42b1afc95a07b3ce0f534232e0f774c5159ddec1, path: theme-delta, persist-credentials: false}
+      - name: Locked 2103161 recipe
+        uses: actions/checkout@v5
+        with: {ref: 0ff8b5463ae6adf26ef0f20d64bc1b10f6c5a593, path: settings-delta, persist-credentials: false}
+      - name: Exact Candidate 14 recipe
+        uses: actions/checkout@v5
+        with: {ref: 1465eabb045badad56142642c48292df94caaa12, path: candidate14-delta, persist-credentials: false}
+      - name: Exact successful 2103163 recipe
+        uses: actions/checkout@v5
+        with: {ref: c3f4a92ff9a46006afc91995ec3e696d806b768c, path: candidate163-delta, persist-credentials: false}
+      - name: Isolated 2103164 repair recipe
+        uses: actions/checkout@v5
+        with: {ref: '${{ github.sha }}', path: repair164, persist-credentials: false}
+
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2, run-id: 35044752997, github-token: '${{ github.token }}', path: run40}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Player-Reboot-Lock-2103152, run-id: 35169846333, github-token: '${{ github.token }}', path: rollback2103152}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited, run-id: 35176733529, github-token: '${{ github.token }}', path: rollback2103153}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155, run-id: 35188339917, github-token: '${{ github.token }}', path: baseline155}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156, run-id: 35192605567, github-token: '${{ github.token }}', path: baseline156}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157, run-id: 35200244871, github-token: '${{ github.token }}', path: baseline157}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Health-Playback-RC1-2103158, run-id: 35206405387, github-token: '${{ github.token }}', path: baseline158}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103158-Health-Playback-Evidence, run-id: 35206405387, github-token: '${{ github.token }}', path: evidence158}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Experience-Zip-Bridge-RC1-2103159, run-id: 35278026159, github-token: '${{ github.token }}', path: baseline159}
+      - uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103160-Visual-Theme-Runtime-v2-TEST-CANDIDATE
+          run-id: 35290503341
+          github-token: ${{ github.token }}
+          path: baseline160
+      - uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103161-Theme-Management-Background-Mode-Safe-Area-TEST-CANDIDATE
+          run-id: 35314694255
+          github-token: ${{ github.token }}
+          path: baseline161
+      - uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE
+          run-id: 35324889607
+          github-token: ${{ github.token }}
+          path: baseline162
+      - name: Exact successful 2103163 APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103163-Candidate14-Five-Fixes-TEST-CANDIDATE
+          run-id: 35335781380
+          github-token: ${{ github.token }}
+          path: baseline163
+      - name: Rebuilt PythonInvoker native engine
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103164-PythonInvoker-Native-Engine
+          path: native164
+
+      - name: Reconstruct exact successful 2103163 shell source
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py reconstruct
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py apply
+          python3 settings-delta/repairs/cobra-settings-background-2103161/ci.py upgrade
+          python3 candidate14-delta/repairs/cobra-theme-rotation-2103162/ci.py upgrade
+          python3 candidate163-delta/repairs/cobra-candidate14-five-fixes-2103163/ci.py upgrade
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+          expected=json.loads(Path('baseline163/background-resume-source.json').read_text())
+          current=json.loads(Path('engine/background-resume-source.json').read_text())
+          assert expected['version_code']==current['version_code']==2103163
+          assert expected['files'].keys()==current['files'].keys()
+          for rel,row in expected['files'].items():
+              assert sha(Path('kodi')/rel)==row['after']==current['files'][rel]['after'], rel
+          assert sha('baseline163/Infinity-1.0.9-Cobra-Candidate14-Five-Fixes-RC1.apk') == '5991bdd239c0c26c67a6535d9d08671ef865a48e88a3691a5d7f8993d4b67be9'
+          print('PASS: exact run-6 2103163 source and APK reconstructed')
+          PY
+          mv kodi shell-kodi
+
+      - name: Promote exact run-6 shell to 2103164 over rebuilt native engine
+        run: |
+          set -euo pipefail
+          mkdir -p audit164
+          cp native164/pythoninvoker-threadstate-source.json engine/pythoninvoker-threadstate-source.json
+          python3 repair164/repairs/pythoninvoker-2103164/ci.py promote \
+            --shell shell-kodi \
+            --run6 baseline163/Infinity-1.0.9-Cobra-Candidate14-Five-Fixes-RC1.apk \
+            --native-apk native164/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --out audit164/native-base
+
+      - name: Build shell, permanently sign, and verify repaired APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit164/native-base/Infinity-2103163-PythonInvoker-Patched-Base.apk \
+            --build-dir rotation-build \
+            --out signed164
+          python3 repair164/repairs/pythoninvoker-2103164/ci.py verify \
+            --final signed164/Infinity-1.0.9-Cobra-PythonInvoker-Stability-RC1.apk \
+            --run6 baseline163/Infinity-1.0.9-Cobra-Candidate14-Five-Fixes-RC1.apk \
+            --native-apk native164/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --audit signed164/background-resume-apk-audit.json
+
+      - name: Repeat inherited and 2103163 behavioral Android tests
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
+            --build rotation-build --out audit164/android
+          cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp candidate163-delta/repairs/cobra-candidate14-five-fixes-2103163/tests/Cobra2103163AuditTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path('experience-delta/repairs/infinity-experience-2103159/tests/android.py')
+          s=importlib.util.spec_from_file_location('runner164',p)
+          r=importlib.util.module_from_spec(s);s.loader.exec_module(r)
+          for name,outname in [
+            ('com.projectinfinity.kodi.Cobra2103162ThemeRotationTest','theme-rotation'),
+            ('com.projectinfinity.kodi.Cobra2103163AuditTest','behavior')]:
+              out=Path('audit164')/outname;env=r.test_environment(out)
+              r.run_ui_gate(['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest','--tests',name,'--stacktrace'],
+                            Path('rotation-build'),env,out)
+          PY
+          python3 repair164/repairs/pythoninvoker-2103164/ci.py deliver
+
+      - name: Upload 2103164 native repair TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103164-PythonInvoker-Stability-TEST-CANDIDATE
+          path: signed164/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103164 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103164-PythonInvoker-Stability-Evidence
+          path: |
+            audit164/
+            engine/pythoninvoker-threadstate-source.json
+            repair164/scripts/infinity_python_invoker_hardening.py
+            repair164/repairs/pythoninvoker-2103164/
+            signed164/*.json
+            signed164/*.txt
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact run-6 2103163 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103163-Exact-Rollback-Before-PythonInvoker-Repair
+          path: baseline163/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
