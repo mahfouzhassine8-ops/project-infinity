@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,importlib.util,json,re,hashlib
 ROOT=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('patch164',ROOT/'apply.py');p=importlib.util.module_from_spec(spec);spec.loader.exec_module(p)
-ALLOWED={'cobraBeginMiniBackgroundPlayback','cobraEndMiniBackgroundPlayback','cobraOpenSheet','configureCobraPip','enterCobraPictureInPicture','onBackPressed','onConfigurationChanged','onCreate','onDestroy','onPictureInPictureModeChanged','onResume','onStop','onUserLeaveHint','pauseCobraForBackground','playChannel','playVodUrl','promoteCobraPreviewToFullscreen','selectGuidePreview','startCobraPlayer','toggleCobraPreviewPlayPause'}
+ALLOWED={'cobraSheetIsDark','cobraSheetRow','cobraBeginMiniBackgroundPlayback','cobraEndMiniBackgroundPlayback','cobraOpenSheet','configureCobraPip','enterCobraPictureInPicture','onBackPressed','onConfigurationChanged','onCreate','onDestroy','onPictureInPictureModeChanged','onResume','onStop','onUserLeaveHint','pauseCobraForBackground','playChannel','playVodUrl','promoteCobraPreviewToFullscreen','selectGuidePreview','startCobraPlayer','toggleCobraPreviewPlayPause'}
 def audit(source,out):
  before=(source/p.SRC/'InfinityLiveActivity.java.in').read_text();after=p.activity(before)
  assert p.sha(before)==p.PRE['InfinityLiveActivity.java.in'],'Wrong exact accepted Activity'

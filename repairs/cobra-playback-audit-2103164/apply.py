@@ -97,6 +97,17 @@ def activity(s):
  for name in ('cobraBeginMiniBackgroundPlayback','cobraEndMiniBackgroundPlayback'):
   replacement=method(mini,name);s=edit(s,name,lambda _,r=replacement:r)
  s=insert(s,(ROOT/'activity-164.java.inc').read_text())
+ # Match text/icons and surfaces to the SAME active palette. A fullscreen owner
+ # must not force white text when a light visual theme paints pale sheet surfaces.
+ s=edit(s,'cobraSheetIsDark',lambda b:once(b,
+  'return mPlayerOverlay!=null||mMultiOverlay!=null||!"light".equals(cobraEffectiveAppearanceMode());',
+  'return !"light".equals(cobraEffectiveAppearanceMode());'))
+ s=edit(s,'cobraOpenSheet',lambda b:once(b,
+  'boolean dark=mPlayerOverlay!=null||mMultiOverlay!=null||!"light".equals(cobraEffectiveAppearanceMode());',
+  'boolean dark=cobraSheetIsDark();'))
+ s=edit(s,'cobraSheetRow',lambda b:once(b,
+  '    LinearLayout row=new LinearLayout(this);',
+  '    if(mPlayerOverlay!=null||mMultiOverlay!=null)dark=cobraSheetIsDark();\n    LinearLayout row=new LinearLayout(this);'))
  return s
 
 def splash(s):

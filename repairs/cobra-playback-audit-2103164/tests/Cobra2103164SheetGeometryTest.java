@@ -77,7 +77,12 @@ public class Cobra2103164SheetGeometryTest {
    CobraVisualRuntimeTest theme=new CobraVisualRuntimeTest();theme.context=RuntimeEnvironment.getApplication();
    JSONObject root=theme.root("sheet-"+mode);root.getJSONObject("base").put("styles",new JSONObject().put("sheet.channel-aspect",new JSONObject().put("fill",mode.equals("light")?"#F0F5FA":mode.equals("oled")?"#000000":"#0A1522").put("radius_dp",20).put("stroke_width_dp",1).put("stroke","#60B7ED")));
    theme.activate(theme.install(root));InfinityLiveActivity a=f.activity();try{
-    f.fullscreen(a,915,412);call(a,"showCobraAspectPicker");f.ui.measure(a,915,412);bounds(a,915,412,0,0);f.ui.frames(15);f.shot(a,"video-display-"+mode);
+    ((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",mode).commit();call(a,"cobraApplyAppearanceSettings");
+    f.fullscreen(a,915,412);call(a,"showCobraAspectPicker");f.ui.measure(a,915,412);bounds(a,915,412,0,0);f.ui.frames(15);
+    FrameLayout scrim=(FrameLayout)get(a,"mCobraActionSheet");TextView text=(TextView)f.text(scrim,"Best Fit");assertNotNull(text);
+    int ink=text.getCurrentTextColor();boolean bright=Color.red(ink)+Color.green(ink)+Color.blue(ink)>384;
+    assertEquals("Palette text contrast must match the actual sheet surface",!"light".equals(mode),bright);
+    f.shot(a,"video-display-"+mode);
    }finally{f.clean(a);theme.cleanup();}
   }
  }
