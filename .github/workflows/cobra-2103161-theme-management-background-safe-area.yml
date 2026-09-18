@@ -10,7 +10,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: cobra-2103161-\${{ github.ref }}
+  group: cobra-2103161-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   audit-and-package:
@@ -46,34 +46,34 @@ jobs:
         with: {ref: 42b1afc95a07b3ce0f534232e0f774c5159ddec1, path: theme-delta, persist-credentials: false}
       - name: Isolated 2103161 delta
         uses: actions/checkout@v5
-        with: {ref: '\${{ github.sha }}', path: next-delta, persist-credentials: false}
+        with: {ref: '${{ github.sha }}', path: next-delta, persist-credentials: false}
       - uses: actions/setup-java@v5
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
         with: {packages: platform-tools}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2, run-id: 35044752997, github-token: '\${{ github.token }}', path: run40}
+        with: {name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2, run-id: 35044752997, github-token: '${{ github.token }}', path: run40}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Cobra-Player-Reboot-Lock-2103152, run-id: 35169846333, github-token: '\${{ github.token }}', path: rollback2103152}
+        with: {name: Infinity-Cobra-Player-Reboot-Lock-2103152, run-id: 35169846333, github-token: '${{ github.token }}', path: rollback2103152}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited, run-id: 35176733529, github-token: '\${{ github.token }}', path: rollback2103153}
+        with: {name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited, run-id: 35176733529, github-token: '${{ github.token }}', path: rollback2103153}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155, run-id: 35188339917, github-token: '\${{ github.token }}', path: baseline155}
+        with: {name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155, run-id: 35188339917, github-token: '${{ github.token }}', path: baseline155}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156, run-id: 35192605567, github-token: '\${{ github.token }}', path: baseline156}
+        with: {name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156, run-id: 35192605567, github-token: '${{ github.token }}', path: baseline156}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157, run-id: 35200244871, github-token: '\${{ github.token }}', path: baseline157}
+        with: {name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157, run-id: 35200244871, github-token: '${{ github.token }}', path: baseline157}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Cobra-Health-Playback-RC1-2103158, run-id: 35206405387, github-token: '\${{ github.token }}', path: baseline158}
+        with: {name: Infinity-Cobra-Health-Playback-RC1-2103158, run-id: 35206405387, github-token: '${{ github.token }}', path: baseline158}
       - uses: actions/download-artifact@v5
-        with: {name: Cobra-2103158-Health-Playback-Evidence, run-id: 35206405387, github-token: '\${{ github.token }}', path: evidence158}
+        with: {name: Cobra-2103158-Health-Playback-Evidence, run-id: 35206405387, github-token: '${{ github.token }}', path: evidence158}
       - uses: actions/download-artifact@v5
-        with: {name: Infinity-Experience-Zip-Bridge-RC1-2103159, run-id: 35278026159, github-token: '\${{ github.token }}', path: baseline159}
+        with: {name: Infinity-Experience-Zip-Bridge-RC1-2103159, run-id: 35278026159, github-token: '${{ github.token }}', path: baseline159}
       - uses: actions/download-artifact@v5
         with:
           name: Cobra-2103160-Visual-Theme-Runtime-v2-TEST-CANDIDATE
           run-id: 35290503341
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: baseline160
       - name: Reconstruct exact locked 2103160 without moving any lock
         run: |
@@ -87,10 +87,10 @@ jobs:
           python3 next-delta/repairs/cobra-settings-background-2103161/ci.py upgrade
       - name: Compile Android only, permanently sign, and compare locked payloads
         env:
-          INFINITY_KEYSTORE_B64: \${{ secrets.INFINITY_KEYSTORE_B64 }}
-          INFINITY_STORE_PASSWORD: \${{ secrets.INFINITY_STORE_PASSWORD }}
-          INFINITY_KEY_PASSWORD: \${{ secrets.INFINITY_KEY_PASSWORD }}
-          INFINITY_KEY_ALIAS: \${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
           python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir settings-build --out signed161
