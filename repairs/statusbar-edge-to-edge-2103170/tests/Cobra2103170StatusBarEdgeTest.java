@@ -113,6 +113,23 @@ public class Cobra2103170StatusBarEdgeTest {
     assertTrue((flags()&View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)!=0);
   }
 
+
+  @Test public void transientZeroInsetsCannotCollapseKnownBrowseSafeArea()throws Exception{
+    set(a,"mPlayerOverlay",null);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
+    call(a,"cobraApplySystemBarsForSurface");
+    WindowInsets stable=new WindowInsets.Builder()
+        .setInsets(WindowInsets.Type.systemBars(),Insets.of(0,42,0,22))
+        .build();
+    root().dispatchApplyWindowInsets(stable);idle();
+    assertEquals(42,root().getPaddingTop());assertEquals(22,root().getPaddingBottom());
+    WindowInsets transientZero=new WindowInsets.Builder()
+        .setInsets(WindowInsets.Type.systemBars(),Insets.NONE)
+        .build();
+    root().dispatchApplyWindowInsets(transientZero);idle();
+    assertEquals("Transient SystemUI zero must not collapse the visible browse status safe area",42,root().getPaddingTop());
+    assertEquals(22,root().getPaddingBottom());
+  }
+
   @Test public void pipNeverCreatesOpaqueBrowseBand()throws Exception{
     FrameLayout overlay=new FrameLayout(a);
     set(a,"mPlayerOverlay",overlay);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",true);
