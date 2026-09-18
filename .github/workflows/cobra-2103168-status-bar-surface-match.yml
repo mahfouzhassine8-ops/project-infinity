@@ -192,7 +192,7 @@ jobs:
       - name: Exact locked 2103167 signed APK
         uses: actions/download-artifact@v5
         with:
-          name: Cobra-2103168-Status-Bar-Surface-Match-TEST-CANDIDATE
+          name: Cobra-2103167-Status-Bar-Restore-TEST-CANDIDATE
           run-id: 35371132749
           github-token: ${{ github.token }}
           path: baseline167
