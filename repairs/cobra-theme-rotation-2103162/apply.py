@@ -195,7 +195,7 @@ HELPERS=r'''
 
   private boolean cobraHasActiveVideo(){
     try{
-      return mPlayer!=null&&mPlaying!=null&&mPlayer.getVideoFormat()!=null
+      return mPlayer!=null&&mPlayer.getVideoFormat()!=null
           &&(mPlayer.isPlaying()||mPlayer.getPlayWhenReady());
     }catch(Exception ignored){return false;}
   }
