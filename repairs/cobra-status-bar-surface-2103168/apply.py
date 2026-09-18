@@ -123,20 +123,81 @@ def apply(source,receipt_path,out):
   private int cobraBrowseSystemBarSurfaceColor(){
     int fallback=cobraThemeColor("background",mTheme.background);
     try{
-      // Visual Theme Runtime resolves variant-aware styles for the exact same "screen" slot
-      // used by mStage. The first gradient stop is the correct color for the top system-bar band.
-      Object raw=vtheme().get("styles","screen");
-      if(raw instanceof JSONObject){
-        JSONObject style=(JSONObject)raw;
-        String encoded=style.optString("fill","");
-        if(encoded!=null&&!encoded.isEmpty()){
-          int resolved=android.graphics.Color.parseColor(encoded);
-          if(android.graphics.Color.alpha(resolved)>0)return resolved;
+      CobraVisualRenderer renderer=vtheme();
+      String palette=cobraEffectiveAppearanceMode();
+      String layout=renderer.layout();
+      JSONObject manifest=null;
+
+      // The installed Visual Theme pointer is the persistent source of truth. Read only its
+      // small JSON manifest here; never decode images/fonts on the UI thread. This also avoids
+      // an async renderer-publication race during Activity/window restoration.
+      JSONObject pointer=CobraVisualTheme.readPointer(this);
+      String generation=pointer.optString("active","");
+      if(generation!=null&&!generation.isEmpty()){
+        File directory=CobraVisualTheme.inside(CobraVisualTheme.store(this),generation);
+        File manifestFile=CobraVisualTheme.inside(directory,CobraVisualTheme.MANIFEST);
+        byte[] raw=CobraVisualTheme.readFile(manifestFile,CobraVisualTheme.MAX_JSON);
+        if(generation.equals(CobraVisualTheme.hash(raw)))
+          manifest=new JSONObject(new String(raw,StandardCharsets.UTF_8));
+      }
+
+      // If no installed pointer exists, a currently published runtime theme may still be active.
+      if(manifest==null&&CobraVisualRenderer.active!=null
+          &&CobraVisualRenderer.active.data!=null
+          &&CobraVisualRenderer.active.data.length()>0)
+        manifest=CobraVisualRenderer.active.data;
+
+      if(manifest!=null){
+        int resolved=fallback;boolean found=false;
+        JSONObject variants=manifest.optJSONObject("variants");
+        JSONObject[] layers=new JSONObject[]{
+            manifest.optJSONObject("base"),
+            variants==null?null:variants.optJSONObject(layout),
+            variants==null?null:variants.optJSONObject(palette)};
+        for(JSONObject layer:layers){
+          if(layer==null)continue;
+
+          // Palette token first; the actual screen panel styles override it in the same order
+          // CobraVisualRenderer.stylesFor() uses for mStage: all.panel -> screen.panel -> screen.
+          JSONObject colors=layer.optJSONObject("colors");
+          if(colors!=null){
+            String encoded=colors.optString("palette.background","");
+            if(encoded!=null&&!encoded.isEmpty()){
+              int color=android.graphics.Color.parseColor(encoded);
+              if(android.graphics.Color.alpha(color)>0){resolved=color;found=true;}
+            }
+          }
+          JSONObject styles=layer.optJSONObject("styles");
+          if(styles!=null){
+            for(String key:new String[]{"all.panel","screen.panel","screen"}){
+              JSONObject style=styles.optJSONObject(key);
+              if(style==null)continue;
+              String encoded=style.optString("fill","");
+              if(encoded!=null&&!encoded.isEmpty()){
+                int color=android.graphics.Color.parseColor(encoded);
+                if(android.graphics.Color.alpha(color)>0){resolved=color;found=true;}
+              }
+            }
+          }
+        }
+        if(found)return resolved;
+      }
+
+      // Runtime-only fallback for a theme that has been published but is not persisted.
+      int resolved=fallback;boolean found=false;
+      for(String key:new String[]{"all.panel","screen.panel","screen"}){
+        Object raw=renderer.get("styles",key);
+        if(raw instanceof JSONObject){
+          String encoded=((JSONObject)raw).optString("fill","");
+          if(encoded!=null&&!encoded.isEmpty()){
+            int color=android.graphics.Color.parseColor(encoded);
+            if(android.graphics.Color.alpha(color)>0){resolved=color;found=true;}
+          }
         }
       }
-      // A theme may choose a palette token instead of a screen style.
-      int palette=vtheme().color("palette.background",fallback);
-      if(android.graphics.Color.alpha(palette)>0)return palette;
+      if(found)return resolved;
+      int paletteColor=renderer.color("palette.background",fallback);
+      if(android.graphics.Color.alpha(paletteColor)>0)return paletteColor;
     }catch(Exception ignored){}
     return fallback;
   }
@@ -164,9 +225,11 @@ def apply(source,receipt_path,out):
     ):
         if token not in after_confirm:raise RuntimeError("2103168 confirmation contract missing "+token)
     for token in (
-        'vtheme().get("styles","screen")',
-        'style.optString("fill","")',
-        'vtheme().color("palette.background",fallback)',
+        'CobraVisualTheme.readPointer(this)',
+        'CobraVisualTheme.readFile(manifestFile,CobraVisualTheme.MAX_JSON)',
+        'new String[]{"all.panel","screen.panel","screen"}',
+        'manifest.optJSONObject("base")',
+        'renderer.get("styles",key)',
     ):
         if token not in surface:raise RuntimeError("2103168 surface resolver missing "+token)
 

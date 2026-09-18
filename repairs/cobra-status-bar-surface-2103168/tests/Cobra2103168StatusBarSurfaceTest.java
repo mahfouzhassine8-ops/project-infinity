@@ -75,9 +75,12 @@ public class Cobra2103168StatusBarSurfaceTest {
             new JSONObject().put("screen",new JSONObject().put("fill",fill))));
     return CobraVisualTheme.install(context,new ByteArrayInputStream(zip(root)));
   }
-  void activate(CobraVisualTheme theme){
-    CobraVisualRenderer.publish(theme,"2103168 test");
+  void persistBeforeRendererPublication(CobraVisualTheme theme){
+    assertNotNull(theme);
+    CobraVisualRenderer.active=CobraVisualTheme.builtin();
     Shadows.shadowOf(Looper.getMainLooper()).idle();
+    assertEquals("Test must exercise persistent-manifest fallback before renderer publication",
+        "builtin",CobraVisualRenderer.active.id);
   }
   int rootColor()throws Exception{
     Drawable d=((View)get(a,"mRoot")).getBackground();
@@ -103,7 +106,7 @@ public class Cobra2103168StatusBarSurfaceTest {
 
   @Test public void customScreenFillOwnsTransparentBrowseStatusBarBand()throws Exception{
     int expected=Color.parseColor("#DCE5EF");
-    activate(screenTheme("bar-light","#DCE5EF"));
+    persistBeforeRendererPublication(screenTheme("bar-light","#DCE5EF"));
     set(a,"mPlayerOverlay",null);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
     call(a,"cobraApplySystemBarsForSurface");
     assertEquals(expected,(int)call(a,"cobraBrowseSystemBarSurfaceColor"));
@@ -113,7 +116,7 @@ public class Cobra2103168StatusBarSurfaceTest {
   }
 
   @Test public void customLightScreenFillRequestsDarkStatusIcons()throws Exception{
-    activate(screenTheme("bar-icons-light","#F1F4F8"));
+    persistBeforeRendererPublication(screenTheme("bar-icons-light","#F1F4F8"));
     set(a,"mPlayerOverlay",null);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
     call(a,"cobraApplySystemBarsForSurface");
     int flags=a.getWindow().getDecorView().getSystemUiVisibility();
@@ -121,7 +124,7 @@ public class Cobra2103168StatusBarSurfaceTest {
   }
 
   @Test public void customDarkScreenFillKeepsLightStatusIcons()throws Exception{
-    activate(screenTheme("bar-icons-dark","#101720"));
+    persistBeforeRendererPublication(screenTheme("bar-icons-dark","#101720"));
     set(a,"mPlayerOverlay",null);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
     call(a,"cobraApplySystemBarsForSurface");
     int flags=a.getWindow().getDecorView().getSystemUiVisibility();
@@ -130,7 +133,7 @@ public class Cobra2103168StatusBarSurfaceTest {
   }
 
   @Test public void fullscreenVideoStillOwnsBlackHiddenStatusBar()throws Exception{
-    activate(screenTheme("bar-player","#DCE5EF"));
+    persistBeforeRendererPublication(screenTheme("bar-player","#DCE5EF"));
     FrameLayout overlay=new FrameLayout(a);
     set(a,"mPlayerOverlay",overlay);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
     call(a,"cobraApplySystemBarsForSurface");

@@ -45,8 +45,11 @@ def main():
     checks['transparent_browse_bar']='setStatusBarColor(fullscreen?Color.BLACK:Color.TRANSPARENT)' in bars
     checks['transparent_confirmation']='setStatusBarColor(Color.TRANSPARENT)' in confirm
     checks['root_band_matches_bar']='mRoot.setBackgroundColor(barColor)' in bars and 'mRoot.setBackgroundColor(barColor)' in confirm
-    checks['visual_screen_style']='vtheme().get("styles","screen")' in helper and 'style.optString("fill","")' in helper
-    checks['visual_palette_fallback']='vtheme().color("palette.background",fallback)' in helper
+    checks['persistent_theme_pointer']='CobraVisualTheme.readPointer(this)' in helper and 'CobraVisualTheme.readFile(manifestFile,CobraVisualTheme.MAX_JSON)' in helper
+    checks['persistent_theme_integrity']='generation.equals(CobraVisualTheme.hash(raw))' in helper
+    checks['screen_style_cascade']='new String[]{"all.panel","screen.panel","screen"}' in helper
+    checks['variant_precedence']='manifest.optJSONObject("base")' in helper and 'variants.optJSONObject(layout)' in helper and 'variants.optJSONObject(palette)' in helper
+    checks['runtime_theme_fallback']='renderer.get("styles",key)' in helper and 'renderer.color("palette.background",fallback)' in helper
     checks['base_palette_fallback']='cobraThemeColor("background",mTheme.background)' in helper
     checks['fullscreen_black_preserved']='fullscreen?Color.BLACK:cobraBrowseSystemBarSurfaceColor()' in bars
     checks['inset_owner_preserved']='WindowInsets.Type.systemBars()' in safe and 'WindowInsets.Type.displayCutout()' in safe
