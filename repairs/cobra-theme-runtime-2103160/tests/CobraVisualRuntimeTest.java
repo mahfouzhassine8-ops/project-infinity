@@ -51,6 +51,47 @@ public class CobraVisualRuntimeTest {
  @Test public void invalidFontHeaderIsRejectedBeforeActivation()throws Exception{JSONObject data=root("font");byte[] bad=new byte[]{1,2,3,4};String path="resources/assets/custom.ttf";data.getJSONObject("assets").put("font",new JSONObject().put("kind","font").put("path",path).put("sha256",CobraVisualTheme.hash(bad)));Map<String,byte[]> files=manifest(data);files.put(path,bad);rejects(()->CobraVisualTheme.install(context,new ByteArrayInputStream(zip(files))));assertEquals("builtin",CobraVisualTheme.load(context).id);}
  @Test public void imageCannotBeUsedAsFontAsset()throws Exception{JSONObject data=root("mixed-kind");data.getJSONObject("base").put("styles",new JSONObject().put("font.all",new JSONObject().put("font_asset","badge")));Map<String,byte[]> files=withImage(data,Color.BLUE);rejects(()->CobraVisualTheme.install(context,new ByteArrayInputStream(zip(files))));assertEquals("builtin",CobraVisualTheme.load(context).id);}
  @Test public void previousSnapshotSurvivesFailedInstallation()throws Exception{install(root("one"));install(root("two"));JSONObject bad=root("bad");bad.put("unknown-field",true);rejects(()->install(bad));assertEquals("two",CobraVisualTheme.load(context).id);assertEquals("one",CobraVisualTheme.rollback(context).id);}
- @Test public void createdDialogsKeepExistingOnShowAndButtonActions()throws Exception{JSONObject data=root("dialog");data.getJSONObject("base").put("styles",new JSONObject().put("dialog.button",new JSONObject().put("text","#123456")));activate(install(data));CobraNavigationUiTest helper=new CobraNavigationUiTest();helper.clock();InfinityLiveActivity a=helper.fixture(24);android.app.AlertDialog dialog=null;try{int[] events={0,0};dialog=new CobraVisualRenderer.DialogBuilder(a,new CobraVisualRenderer(a),"dialog").setTitle("Preserved actions").setPositiveButton("OK",(d,w)->events[1]++).create();dialog.setOnShowListener(d->events[0]++);dialog.show();View decor=dialog.getWindow().getDecorView();decor.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(240,View.MeasureSpec.EXACTLY));decor.layout(0,0,360,240);assertEquals(1,events[0]);assertTrue(dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick());assertEquals(1,events[1]);}finally{if(dialog!=null)dialog.dismiss();helper.clean(a);}}
+ @Test public void createdDialogsKeepExistingOnShowAndButtonActions()throws Exception{
+  JSONObject data=root("dialog");
+  data.getJSONObject("base").put("styles",new JSONObject().put("dialog.button",new JSONObject().put("text","#123456")));
+  activate(install(data));
+  CobraNavigationUiTest helper=new CobraNavigationUiTest();helper.clock();
+  InfinityLiveActivity a=helper.fixture(24);
+  try{
+   // Android queues Dialog.OnShowListener and AlertDialog button messages. Under
+   // PAUSED mode, measuring a window does not dispatch those messages. Exercise
+   // an unmodified framework control alongside the themed builder as a control.
+   for(boolean themed:new boolean[]{false,true}){
+    int[] events={0,0};
+    android.app.AlertDialog.Builder builder=themed
+        ?new CobraVisualRenderer.DialogBuilder(a,new CobraVisualRenderer(a),"dialog")
+        :new android.app.AlertDialog.Builder(a);
+    android.app.AlertDialog dialog=builder.setTitle("Preserved actions")
+        .setPositiveButton("OK",(d,w)->events[1]++).create();
+    dialog.setOnShowListener(d->events[0]++);
+    try{
+     dialog.show();
+     View decor=dialog.getWindow().getDecorView();
+     decor.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(240,View.MeasureSpec.EXACTLY));
+     decor.layout(0,0,360,240);
+     assertEquals("OnShow is queued, not missing; themed="+themed,0,events[0]);
+     // Drain only messages due now: no sleeps, clock advances or direct callback invocation.
+     Shadows.shadowOf(Looper.getMainLooper()).idle();
+     assertEquals("Original OnShow delivered once; themed="+themed,1,events[0]);
+     Button positive=dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE);
+     assertNotNull(positive);
+     if(themed)assertEquals("Theme actually styled the live dialog",Color.parseColor("#123456"),positive.getCurrentTextColor());
+     assertTrue(positive.performClick());
+     assertEquals("Button listener is queued; themed="+themed,0,events[1]);
+     Shadows.shadowOf(Looper.getMainLooper()).idle();
+     assertEquals("Original button delivered once; themed="+themed,1,events[1]);
+     assertFalse("Native button dismissal retained; themed="+themed,dialog.isShowing());
+     Shadows.shadowOf(Looper.getMainLooper()).idle();
+     assertEquals("No duplicate OnShow; themed="+themed,1,events[0]);
+     assertEquals("No duplicate button; themed="+themed,1,events[1]);
+    }finally{dialog.dismiss();Shadows.shadowOf(Looper.getMainLooper()).idle();}
+   }
+  }finally{helper.clean(a);}
+ }
  void save(Bitmap b,String name)throws Exception{File dir=new File(System.getProperty("cobra.evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());try(FileOutputStream out=new FileOutputStream(new File(dir,name))){assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,out));}}
 }
