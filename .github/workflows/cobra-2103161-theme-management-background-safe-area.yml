@@ -10,7 +10,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: cobra-2103161-${{ github.ref }}
+  group: cobra-2103161-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   audit-and-package:
