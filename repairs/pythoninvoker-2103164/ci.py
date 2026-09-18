@@ -57,7 +57,40 @@ def promote(shell:Path,run6:Path,native_apk:Path,outdir:Path):
  s=s.replace(old_engine_match.group(0),"BASE_ENGINE_SHA256 = '"+new_engine+"'",1)
  runtime.write_text(s)
  pack=Path("scripts/package_background_resume.py");s=pack.read_text();needle="Infinity-"+OLD
- require(s.count(needle)>=2,"Packager 2103163 identity drift");pack.write_text(s.replace(needle,"Infinity-"+NEW))
+ require(s.count(needle)>=2,"Packager 2103163 identity drift");s=s.replace(needle,"Infinity-"+NEW)
+ # 2103163 is now the protected base APK. Its manifest already contains the approved
+ # foreground service/control bridge/permissions. The old packager verifier was designed
+ # for run-40 as the base and therefore stripped those nodes only from the newly compiled
+ # manifest, which creates a false mismatch when both old and new legitimately contain them.
+ start=s.index("def verify_manifest_pair(original: str, compiled: str):")
+ end=s.index("\n\ndef merge(",start)
+ verifier='''def verify_manifest_pair(original: str, compiled: str):
+    old,new=manifest_tree(original),manifest_tree(compiled)
+    for tree in (old,new):
+        for key in ('android:versionCode','android:versionName'): tree['attrs'].pop(key,None)
+    def validate(tree):
+        names=[n['attrs'].get('android:name','') for n in tree['children'] if n['tag']=='uses-permission']
+        for permission in (
+            'android.permission.FOREGROUND_SERVICE_SPECIAL_USE',
+            'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
+            'android.permission.WAKE_LOCK'):
+            require(sum(permission in name for name in names)==1,'Expected one manifest permission: '+permission)
+        app=next(n for n in tree['children'] if n['tag']=='application')
+        services=[n for n in app['children'] if n['tag']=='service' and
+                  'InfinityExtendedBackgroundService' in n['attrs'].get('android:name','')]
+        require(len(services)==1,'Exactly one background service component required')
+        svc=services[0]
+        require(svc['attrs'].get('android:exported','').endswith('0x0'),'Background service must not be exported')
+        require(svc['attrs'].get('android:foregroundServiceType','').endswith('0x40000002'),
+                'Expected specialUse|mediaPlayback foreground service type')
+        controls=[n for n in app['children'] if n['tag']=='activity' and
+                  'InfinityBackgroundControlActivity' in n['attrs'].get('android:name','')]
+        require(len(controls)==1,'Exactly one Infinity background control Activity required')
+    validate(old);validate(new)
+    require(old==new,'Compiled manifest drift from protected 2103163 base outside version identity')
+'''
+ s=s[:start]+verifier+s[end:]
+ pack.write_text(s)
  receipt=Path("engine/background-resume-source.json");data=json.loads(receipt.read_text());require(data["version_code"]==2103163,"Wrong shell source receipt")
  rel="tools/android/packaging/xbmc/build.gradle.in";require(rel in data["files"],"Gradle missing from source receipt")
  data["files"][rel]["after"]=sha(gradle)
