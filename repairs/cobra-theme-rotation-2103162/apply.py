@@ -316,15 +316,10 @@ def patch_live(s):
     s=edit_method(s,"openMultiView",lambda b:after_method_open(
         b,'    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-view");mCobraPlayerRotationButton=null;',"rotation multiview release"))
 
-    def pip(block):
-        anchor="    mInPictureInPicture = inPictureInPictureMode;\n"
-        return once(block,anchor,anchor+'    cobraApplyPlayerRotation("pip");\n',"rotation PiP release")
-    s=edit_method(s,"onPictureInPictureModeChanged",pip)
-    s=edit_method(s,"onMultiWindowModeChanged",lambda b:once(
-        b,
-        '    super.onMultiWindowModeChanged(inMultiWindowMode, configuration);',
-        '    super.onMultiWindowModeChanged(inMultiWindowMode, configuration);\n    cobraApplyPlayerRotation("multi-window");',
-        "rotation multi-window release"))
+    s=edit_method(s,"onPictureInPictureModeChanged",lambda b:after_method_open(
+        b,'    if(inPictureInPictureMode)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pip-enter");else cobraApplyPlayerRotation("pip-exit");',"rotation PiP lifecycle"))
+    s=edit_method(s,"onMultiWindowModeChanged",lambda b:after_method_open(
+        b,'    if(inMultiWindowMode)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-window-enter");else cobraApplyPlayerRotation("multi-window-exit");',"rotation multi-window lifecycle"))
 
     # Append helpers without changing any playback/provider/native implementation.
     pos=s.rfind("\n}")
@@ -340,7 +335,7 @@ def verify_live(s):
       'COBRA_ROTATION_PREFS="infinity_player_rotation"','COBRA_ROTATION_MODE="mode"',
       'SCREEN_ORIENTATION_FULL_SENSOR','SCREEN_ORIENTATION_UNSPECIFIED',
       'cobra_player_rotation','cobraTogglePlayerRotation()','"rotate".equals(glyph)',
-      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("is-playing")','cobraApplyPlayerRotation("video-size")','cobraApplyPlayerRotation("pip")','cobraApplyPlayerRotation("multi-window")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"player-error")',
+      'cobraApplyPlayerRotation("playback-state")','cobraApplyPlayerRotation("is-playing")','cobraApplyPlayerRotation("video-size")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pip-enter")','cobraApplyPlayerRotation("pip-exit")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-window-enter")','cobraApplyPlayerRotation("multi-window-exit")','cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"player-error")',
       'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause")'
     ]
     for token in required:
