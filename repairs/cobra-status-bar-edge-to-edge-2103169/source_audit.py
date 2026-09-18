@@ -52,6 +52,7 @@ def main():
     checks['clears_translucent_status']='FLAG_TRANSLUCENT_STATUS' in edge
     checks['legacy_layout_through_status']='SYSTEM_UI_FLAG_LAYOUT_STABLE' in edge and 'SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN' in edge
     checks['transparent_confirmation']='setStatusBarColor(Color.TRANSPARENT)' in confirm
+    checks['confirmation_preserves_delivered_insets']='requestApplyInsets()' not in confirm and 'requestLayout()' in confirm
     checks['root_band_matches_bar']='mRoot.setBackgroundColor(barColor)' in bars and 'mRoot.setBackgroundColor(barColor)' in confirm
     checks['persistent_theme_pointer']='CobraVisualTheme.readPointer(this)' in helper and 'CobraVisualTheme.readFile(manifestFile,CobraVisualTheme.MAX_JSON)' in helper
     checks['persistent_theme_integrity']='generation.equals(CobraVisualTheme.hash(raw))' in helper

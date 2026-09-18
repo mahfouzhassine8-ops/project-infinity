@@ -23,3 +23,11 @@ The window-fit switch is now **idempotent**: it is configured once per Activity 
 Run 35379876318 showed that making only `setDecorFitsSystemWindows(false)` idempotent was not enough: reissuing the associated window flag mutations during the posted confirmation could still trigger a zero-inset redispatch in the inherited 2103166 tests.
 
 2103169 now treats the **entire modern edge-to-edge window setup** as one-time structural state: `FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS`, clearing `FLAG_TRANSLUCENT_STATUS`, and `setDecorFitsSystemWindows(false)` all execute only once per Activity window. Repeated status-bar reconciliation changes visibility/appearance only and does not touch window-fit structure after safe insets have been delivered.
+
+## Third gate correction — preserve the last delivered inset
+
+Runs 35378865504, 35379876318, and 35380715339 consistently showed the same two inherited failures while every new edge-to-edge test passed. That isolated the remaining test/lifecycle problem to the **posted confirmation pass**, not the edge-to-edge setup itself.
+
+`cobraConfirmBrowseSystemBars()` was still calling `requestApplyInsets()` after a valid system-bar inset had already been delivered. Under the controlled Android test environment, that causes a later zero-inset redispatch and overwrites the correct 44/28dp top padding. It is also unnecessary in production: the primary system-bar policy and normal Android window lifecycle already request/deliver insets.
+
+The posted confirmation now only reasserts status-bar visibility, icon appearance, colors, and layout. It **never requests a second inset dispatch**. A new regression test delivers a 44dp top / 24dp bottom inset, runs the confirmation and two frames, and requires those exact safe-area values to survive.

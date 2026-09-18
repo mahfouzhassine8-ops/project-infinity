@@ -121,8 +121,11 @@ def apply(source,receipt_path,out):
         'window.setStatusBarColor(barColor);window.setNavigationBarColor(barColor);',
         'window.setStatusBarColor(Color.TRANSPARENT);window.setNavigationBarColor(barColor);'
     ).replace(
+        'decor.requestApplyInsets();decor.requestLayout();',
+        'decor.requestLayout();'
+    ).replace(
         'if(mRoot!=null){mRoot.requestApplyInsets();mRoot.requestLayout();}',
-        'if(mRoot!=null){mRoot.setBackgroundColor(barColor);mRoot.requestApplyInsets();mRoot.requestLayout();}'
+        'if(mRoot!=null){mRoot.setBackgroundColor(barColor);mRoot.requestLayout();}'
     )
     text=replace_method(text,"cobraConfirmBrowseSystemBars",confirm)
 
@@ -254,8 +257,11 @@ def apply(source,receipt_path,out):
     for token in (
         "setStatusBarColor(Color.TRANSPARENT)",
         "mRoot.setBackgroundColor(barColor)",
+        "decor.requestLayout()",
     ):
         if token not in after_confirm:raise RuntimeError("2103169 confirmation contract missing "+token)
+    if "requestApplyInsets()" in after_confirm:
+        raise RuntimeError("2103169 confirmation must not force a second inset dispatch")
     for token in (
         'window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)',
         'window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)',
@@ -294,6 +300,7 @@ def apply(source,receipt_path,out):
         "window_fit_changed":True,
         "decor_fits_system_windows":False,
         "edge_to_edge_configured_once":True,
+        "confirmation_requests_new_insets":False,
         "safe_area_changed":False,
         "player_changed":False,
         "native_changed":False,

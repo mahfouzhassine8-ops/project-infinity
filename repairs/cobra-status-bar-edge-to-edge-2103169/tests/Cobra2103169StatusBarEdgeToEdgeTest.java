@@ -132,6 +132,20 @@ public class Cobra2103169StatusBarEdgeToEdgeTest {
     assertEquals(Color.parseColor("#101720"),rootColor());
   }
 
+  @Test public void confirmationCannotEraseAlreadyDeliveredSafeInset()throws Exception{
+    set(a,"mPlayerOverlay",null);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);
+    View root=(View)get(a,"mRoot");
+    WindowInsets delivered=new WindowInsets.Builder()
+        .setInsets(WindowInsets.Type.systemBars(),android.graphics.Insets.of(0,44,0,24))
+        .build();
+    root.dispatchApplyWindowInsets(delivered);
+    assertEquals(44,root.getPaddingTop());
+    call(a,"cobraConfirmBrowseSystemBars");
+    ui.frames(2);
+    assertEquals("Posted status-bar confirmation must preserve the last delivered top inset",44,root.getPaddingTop());
+    assertEquals(24,root.getPaddingBottom());
+  }
+
   @Test public void browseUsesDrawableTransparentSystemBarWindow()throws Exception{
     persistBeforeRendererPublication(screenTheme("bar-window","#DCE5EF"));
     set(a,"mPlayerOverlay",null);set(a,"mMultiOverlay",null);set(a,"mInPictureInPicture",false);

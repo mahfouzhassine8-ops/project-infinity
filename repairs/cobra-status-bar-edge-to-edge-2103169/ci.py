@@ -135,7 +135,7 @@ def deliver():
     locked165=suite('audit169/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest.xml',6)
     locked166=suite('audit169/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest.xml',8)
     locked167=suite('audit169/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103167StatusBarRestoreTest.xml',5)
-    new=suite('audit169/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103169StatusBarEdgeToEdgeTest.xml',6)
+    new=suite('audit169/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103169StatusBarEdgeToEdgeTest.xml',7)
 
     source=json.loads(Path('audit169/source-audit/source-audit.json').read_text())
     require(source.get('passed') and source.get('protected_methods',0)>=35,'2103169 source audit failed')
@@ -151,7 +151,7 @@ def deliver():
     require(apkproof['apk_sha256']==sha('signed169/Infinity-'+NEW+'.apk'),'APK changed after verification')
 
     total=inherited+candidate14+locked164+locked165+locked166+locked167+new
-    require(total==113,'Expected 113 Android tests, got '+str(total))
+    require(total==114,'Expected 114 Android tests, got '+str(total))
     report={
         'build':VERSION,'locked_base_commit':LOCKED_BASE,'protected_candidate14':CANDIDATE14,
         'candidate_locked':False,'inherited_android_tests':inherited,'candidate14_tests':candidate14,
