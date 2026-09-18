@@ -23,11 +23,11 @@ def main():
   checks={
    'player settings bottom anchored':'playerSettings?Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL' in act,
    'group normalization':'cobraNormalizeProviderGroup' in act and 'MAX_CHANNELS = 50000' in act,
-   'mini-only background toggle':'PLAY IN BACKGROUND  •  ' in act and 'cobraMiniPreviewPlaying' in act,
+   'mini-only background toggle':'PLAY IN BACKGROUND  •  ' in act and 'cobraMiniPreviewPlaying' in act and 'else mCobraMiniBackgroundActive=cobraBeginMiniBackgroundPlayback();' in act,
    'fullscreen PiP preserved':'if (hasCobraVideo()) enterCobraPictureInPicture();' in act,
    'native media session':'Notification.MediaStyle' in svc and 'FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK' in svc,
    'mini service actions':'MINI_BACKGROUND_START' in svc and 'MINI_BACKGROUND_STOP' in svc,
-   'compact chooser':'compactHeight=heightDp<700' in spl and 'adaptiveCardHeight' in spl,
+   'compact chooser':'compactHeight=heightDp<700' in spl and 'adaptiveCardHeight' in spl and 'availableHeightDp<700' in spl,
    'file picker modes':'ACTION_GET_CONTENT' in act and 'MiXplorer' in act and 'ACTION_OPEN_DOCUMENT' in act,
    'media playback manifest':'FOREGROUND_SERVICE_MEDIA_PLAYBACK' in man and 'specialUse|mediaPlayback' in man,
    'no native global rotation mutation':'ACCELEROMETER_ROTATION' not in act and 'Settings.System' not in act,
