@@ -17,7 +17,7 @@ def sha(v):return hashlib.sha256(v if isinstance(v,bytes) else v.encode()).hexdi
 
 def matches(text,name):
     return list(re.finditer(
-        r'^  (?:(?:@Override(?:[ \t]*\n  |[ \t]+))?)(?:public|private|protected) [^\n;=(){}]*\b'
+        r'^[ \\t]{2,}(?:(?:@Override(?:[ \t]*\n  |[ \t]+))?)(?:public|private|protected) [^\n;=(){}]*\b'
         +re.escape(name)+r'\s*\(',text,re.M))
 
 def span(text,name):
