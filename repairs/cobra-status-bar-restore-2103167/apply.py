@@ -75,7 +75,7 @@ def apply(source,receipt_path,out):
         "onCreate","buildShell","cobraInstallBrowseSafeArea","cobraDarkIconsFor",
         "onStart","onResume","onPause","onStop","onUserLeaveHint",
         "onPictureInPictureModeChanged","onNewIntent","onConfigurationChanged",
-        "cobraConsumeLauncherPipReturn","onWindowFocusChanged",
+        "cobraConsumeLauncherPipReturn",
         "cobraBuildPlayerChrome","openPlayerOverlay","showCobraPlayerDrawer",
         "showPlayerSettingsDrawer","showTrackChooser","lockCobraPlayer",
         "toggleCobraPlayerPlayPause","cobraPreviewPanel",
@@ -88,6 +88,9 @@ def apply(source,receipt_path,out):
     protected_before={name:sha_bytes(method_text(before,name)) for name in protected}
 
     old=method_text(before,"cobraApplySystemBarsForSurface")
+    focus_before=method_text(before,"onWindowFocusChanged")
+    if "if(hasFocus)mMain.post(this::cobraApplySystemBarsForSurface);" not in focus_before:
+        raise RuntimeError("Locked 2103166 focus-recovery preimage drift")
     for token in (
         "controller.show(android.view.WindowInsets.Type.statusBars())",
         "window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)",
@@ -152,6 +155,17 @@ def apply(source,receipt_path,out):
   }'''
 
     text=replace_method(before,"cobraApplySystemBarsForSurface",bars)
+
+    focus='''  @Override public void onWindowFocusChanged(boolean hasFocus){
+    super.onWindowFocusChanged(hasFocus);
+    if(hasFocus){
+      // Apply synchronously so an OEM focus handoff cannot leave one frame in stale fullscreen,
+      // then apply once more after queued window work settles.
+      cobraApplySystemBarsForSurface();
+      mMain.post(this::cobraApplySystemBarsForSurface);
+    }
+  }'''
+    text=replace_method(text,"onWindowFocusChanged",focus)
 
     confirm=r'''
   private void cobraConfirmBrowseSystemBars(){
@@ -229,7 +243,7 @@ def apply(source,receipt_path,out):
         "base_locked_commit":BASE_LOCK,
         "base_version_code":2103166,
         "files":{str(REL):{"before":sha_bytes(before_bytes),"after":sha_bytes(after_bytes)}},
-        "changed_methods":["cobraApplySystemBarsForSurface"],
+        "changed_methods":["cobraApplySystemBarsForSurface","onWindowFocusChanged"],
         "new_helpers":["cobraConfirmBrowseSystemBars"],
         "protected_methods":protected_before,
         "browse_status_bar":"forced visible + legacy immersive scrub + next-frame confirmation",
