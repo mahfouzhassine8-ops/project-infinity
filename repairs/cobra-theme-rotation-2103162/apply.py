@@ -68,6 +68,11 @@ def once(text,old,new,label):
     if text.count(old)!=1: raise RuntimeError(f"{label}: expected one exact match, got {text.count(old)}")
     return text.replace(old,new,1)
 
+def after_method_open(block,line,label):
+    at=block.find("{")
+    if at<0: raise RuntimeError(label+": method opening brace missing")
+    return block[:at+1]+"\n"+line+block[at+1:]
+
 SETTINGS=r'''  private void showSettings() {
     mCobraInternalScreen = "internal";
     clearStage("COBRA • SETTINGS");
@@ -306,8 +311,10 @@ def patch_live(s):
     s=edit_method(s,"onResume",lambda b:append_before_close(b,'    cobraApplyPlayerRotation("resume");'))
     s=edit_method(s,"onPause",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"pause\");","rotation pause release"))
     s=edit_method(s,"onStop",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"stop\");","rotation stop release"))
-    s=edit_method(s,"closePlayer",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"close-player\");mCobraPlayerRotationButton=null;","rotation close release"))
-    s=edit_method(s,"openMultiView",lambda b:once(b,"{","{\n    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,\"multi-view\");mCobraPlayerRotationButton=null;","rotation multiview release"))
+    s=edit_method(s,"closePlayer",lambda b:after_method_open(
+        b,'    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"close-player");mCobraPlayerRotationButton=null;',"rotation close release"))
+    s=edit_method(s,"openMultiView",lambda b:after_method_open(
+        b,'    cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-view");mCobraPlayerRotationButton=null;',"rotation multiview release"))
 
     def pip(block):
         anchor="    mInPictureInPicture = inPictureInPictureMode;\n"
