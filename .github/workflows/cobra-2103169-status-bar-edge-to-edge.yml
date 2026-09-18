@@ -1,0 +1,330 @@
+name: Cobra | 2103169 Status Bar Edge-to-Edge
+'on':
+  workflow_dispatch: null
+  push:
+    branches:
+      - infinity-cobra-2103169-status-bar-edge-to-edge-rc1
+    paths:
+      - .github/workflows/cobra-2103169-status-bar-edge-to-edge.yml
+      - repairs/cobra-status-bar-edge-to-edge-2103169/**
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103169-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Exact source recipe - refinement delta
+        uses: actions/checkout@v5
+        with: {ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32, path: refinement-delta, persist-credentials: false}
+      - name: Exact source recipe - diagnostics delta
+        uses: actions/checkout@v5
+        with: {ref: b3bcb619b08205dcfc1451424b2d41e05fd37633, path: audit-delta, persist-credentials: false}
+      - name: Exact source recipe - navigation delta
+        uses: actions/checkout@v5
+        with: {ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98, path: view-delta, persist-credentials: false}
+      - name: Exact source recipe - health delta
+        uses: actions/checkout@v5
+        with: {ref: fd2af59bab2edcaea6be9e5046720715e25e64e0, path: health-delta, persist-credentials: false}
+      - name: Exact source recipe - experience delta
+        uses: actions/checkout@v5
+        with: {ref: 257a49d742890acf0c7d3e0220bded5a8aa80c57, path: experience-delta, persist-credentials: false}
+      - name: Exact source recipe - theme delta
+        uses: actions/checkout@v5
+        with: {ref: 42b1afc95a07b3ce0f534232e0f774c5159ddec1, path: theme-delta, persist-credentials: false}
+      - name: Exact source recipe - settings delta
+        uses: actions/checkout@v5
+        with: {ref: 0ff8b5463ae6adf26ef0f20d64bc1b10f6c5a593, path: settings-delta, persist-credentials: false}
+      - name: Exact source recipe - Candidate 14
+        uses: actions/checkout@v5
+        with: {ref: 1465eabb045badad56142642c48292df94caaa12, path: candidate14-delta, persist-credentials: false}
+      - name: Exact passed 2103163 recipe
+        uses: actions/checkout@v5
+        with: {ref: 8f2c9c7b0fdd7bfcaa0d903f8df997a139c23261, path: next-delta, persist-credentials: false}
+      - name: Exact locked 2103164 playback stability recipe
+        uses: actions/checkout@v5
+        with: {ref: d9819b9823ff281f874daaa2bf91fdac1613aeb1, path: stability-delta, persist-credentials: false}
+      - name: Exact locked 2103165 inset PiP player recipe
+        uses: actions/checkout@v5
+        with: {ref: 6148e34be3024c5939c736a7b4316572d7bd50c0, path: insets-delta, persist-credentials: false}
+      - name: Exact locked 2103166 end-to-end recipe
+        uses: actions/checkout@v5
+        with: {ref: 644160d0ca3baeebb6759638d3f40e2853eeed0b, path: audit166-delta, persist-credentials: false}
+      - name: Exact locked 2103167 status-bar restore recipe
+        uses: actions/checkout@v5
+        with: {ref: 2d72c733998d3c535a16d354058344007c5f7921, path: status167-delta, persist-credentials: false}
+      - name: Isolated 2103169 status-bar surface delta
+        uses: actions/checkout@v5
+        with: {ref: '${{ github.sha }}', path: final-delta, persist-credentials: false}
+
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Verified baseline artifact - run40
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Verified baseline artifact - rollback2103152
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - name: Verified baseline artifact - rollback2103153
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
+          github-token: ${{ github.token }}
+          path: rollback2103153
+      - name: Verified baseline artifact - baseline155
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
+          run-id: 35188339917
+          github-token: ${{ github.token }}
+          path: baseline155
+      - name: Verified baseline artifact - baseline156
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156
+          run-id: 35192605567
+          github-token: ${{ github.token }}
+          path: baseline156
+      - name: Verified baseline artifact - baseline157
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157
+          run-id: 35200244871
+          github-token: ${{ github.token }}
+          path: baseline157
+      - name: Verified baseline artifact - baseline158
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Health-Playback-RC1-2103158
+          run-id: 35206405387
+          github-token: ${{ github.token }}
+          path: baseline158
+      - name: Verified baseline artifact - evidence158
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103158-Health-Playback-Evidence
+          run-id: 35206405387
+          github-token: ${{ github.token }}
+          path: evidence158
+      - name: Verified baseline artifact - baseline159
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Experience-Zip-Bridge-RC1-2103159
+          run-id: 35278026159
+          github-token: ${{ github.token }}
+          path: baseline159
+      - name: Verified baseline artifact - baseline160
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103160-Visual-Theme-Runtime-v2-TEST-CANDIDATE
+          run-id: 35290503341
+          github-token: ${{ github.token }}
+          path: baseline160
+      - name: Verified baseline artifact - baseline161
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103161-Theme-Management-Background-Mode-Safe-Area-TEST-CANDIDATE
+          run-id: 35314694255
+          github-token: ${{ github.token }}
+          path: baseline161
+      - name: Verified baseline artifact - baseline162
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE
+          run-id: 35324889607
+          github-token: ${{ github.token }}
+          path: baseline162
+      - name: Verified baseline artifact - baseline163
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE
+          run-id: 35331099172
+          github-token: ${{ github.token }}
+          path: baseline163
+      - name: Exact locked 2103164 signed APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103164-Playback-Stability-TEST-CANDIDATE
+          run-id: 35338917341
+          github-token: ${{ github.token }}
+          path: baseline164
+      - name: Exact locked 2103165 signed APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103165-Insets-PiP-Return-Player-Consistency-TEST-CANDIDATE
+          run-id: 35343195748
+          github-token: ${{ github.token }}
+          path: baseline165
+      - name: Exact locked 2103166 signed APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103166-End-to-End-UI-Lifecycle-Audit-TEST-CANDIDATE
+          run-id: 35347847781
+          github-token: ${{ github.token }}
+          path: baseline166
+      - name: Exact locked 2103167 signed APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103167-Status-Bar-Restore-TEST-CANDIDATE
+          run-id: 35371132749
+          github-token: ${{ github.token }}
+          path: baseline167
+
+      - name: Reconstruct exact passed 2103163
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py reconstruct
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py apply
+          python3 settings-delta/repairs/cobra-settings-background-2103161/ci.py upgrade
+          python3 candidate14-delta/repairs/cobra-theme-rotation-2103162/ci.py upgrade
+          python3 next-delta/repairs/cobra-candidate14-five-fixes-2103163/ci.py upgrade
+
+      - name: Reapply exact locked 2103164
+        run: |
+          set -euo pipefail
+          python3 stability-delta/repairs/cobra-playback-stability-2103164/ci.py upgrade
+
+      - name: Reapply exact locked 2103165
+        run: |
+          set -euo pipefail
+          python3 insets-delta/repairs/cobra-inner-insets-pip-return-2103165/ci.py upgrade
+
+      - name: Reapply exact locked 2103166
+        run: |
+          set -euo pipefail
+          python3 audit166-delta/repairs/cobra-end-to-end-audit-2103166/ci.py upgrade
+
+      - name: Reapply exact locked 2103167 status-bar restore
+        run: |
+          set -euo pipefail
+          python3 status167-delta/repairs/cobra-status-bar-restore-2103167/ci.py upgrade
+
+      - name: Apply only 2103169 status-bar surface match
+        run: |
+          set -euo pipefail
+          python3 final-delta/repairs/cobra-status-bar-edge-to-edge-2103169/ci.py upgrade
+
+      - name: Compile Android shell only and verify protected payloads
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source kodi \
+            --base-apk background-rollback/Infinity-Run40-Exact-Base.apk \
+            --build-dir rotation-build \
+            --out signed169
+          python3 final-delta/repairs/cobra-status-bar-edge-to-edge-2103169/ci.py verify
+
+      - name: Repeat inherited UI Health theme tests unchanged
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
+            --build rotation-build \
+            --out audit169/android
+
+      - name: Run locked baselines and new 2103169 status-bar surface gates
+        run: |
+          set -euo pipefail
+          cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp stability-delta/repairs/cobra-playback-stability-2103164/tests/Cobra2103164PlaybackStabilityTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp insets-delta/repairs/cobra-inner-insets-pip-return-2103165/tests/Cobra2103165InsetsPipPlayerTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp audit166-delta/repairs/cobra-end-to-end-audit-2103166/tests/Cobra2103166EndToEndUiAuditTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp status167-delta/repairs/cobra-status-bar-restore-2103167/tests/Cobra2103167StatusBarRestoreTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp final-delta/repairs/cobra-status-bar-edge-to-edge-2103169/tests/Cobra2103169StatusBarEdgeToEdgeTest.java \
+            rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          python3 - <<'PYTEST'
+          import importlib.util
+          from pathlib import Path
+          p=Path('experience-delta/repairs/infinity-experience-2103159/tests/android.py')
+          s=importlib.util.spec_from_file_location('runner159',p)
+          r=importlib.util.module_from_spec(s);s.loader.exec_module(r)
+          out=Path('audit169/targeted');env=r.test_environment(out)
+          r.run_ui_gate([
+            './gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103167StatusBarRestoreTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103169StatusBarEdgeToEdgeTest',
+            '--stacktrace'
+          ],Path('rotation-build'),env,out)
+          PYTEST
+          python3 final-delta/repairs/cobra-status-bar-edge-to-edge-2103169/ci.py deliver
+
+      - name: Publish signed 2103169 TEST CANDIDATE only after every gate
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103169-Status-Bar-Edge-to-Edge-TEST-CANDIDATE
+          path: signed169/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103169 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103169-Status-Bar-Edge-to-Edge-Evidence
+          path: |
+            audit169/
+            audit167/
+            audit166/
+            audit165/
+            audit164/
+            audit163/
+            audit162/
+            audit161/
+            audit160/
+            audit159/
+            engine/background-resume-source.json
+            final-delta/repairs/cobra-status-bar-edge-to-edge-2103169/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact locked 2103167 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103167-Exact-Rollback-Before-2103169
+          path: baseline167/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
