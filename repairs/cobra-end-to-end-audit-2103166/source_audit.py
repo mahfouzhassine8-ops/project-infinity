@@ -47,7 +47,7 @@ def main():
     checks['system_and_cutout_insets']='WindowInsets.Type.systemBars()' in text and 'WindowInsets.Type.displayCutout()' in text
     on_create=span(text,'onCreate')
     checks['no_global_fullscreen']=(
-        not re.search(r'\\b(?:setFlags|addFlags)\\s*\\([^;]*FLAG_FULLSCREEN',on_create,re.S)
+        not re.search(r'\b(?:setFlags|addFlags)\s*\([^;]*FLAG_FULLSCREEN',on_create,re.S)
         and 'clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)' in on_create
     )
     checks['fullscreen_surface_scope']='mPlayerOverlay!=null||mMultiOverlay!=null' in bars
