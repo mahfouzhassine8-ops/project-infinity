@@ -24,7 +24,21 @@ def upgrade():
  replace('scripts/infinity_background_resume.py','VERSION_CODE = 2103162',f'VERSION_CODE = {VERSION}')
  replace('scripts/infinity_background_resume.py',"RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"'")
  p=Path('scripts/package_background_resume.py');s=p.read_text();old='Infinity-'+OLD
- require(s.count(old)==2,'packager release-name anchors changed');p.write_text(s.replace(old,'Infinity-'+NEW))
+ require(s.count(old)==2,'packager release-name anchors changed');s=s.replace(old,'Infinity-'+NEW)
+ guard_old="""    permissions=[n for n in new['children'] if n['tag']=='uses-permission' and
+                 'android.permission.FOREGROUND_SERVICE_SPECIAL_USE' in n['attrs'].get('android:name','')]
+    require(len(permissions)==1,'Exactly one background service permission required')
+    new['children'].remove(permissions[0])"""
+ guard_new="""    special=[n for n in new['children'] if n['tag']=='uses-permission' and
+             'android.permission.FOREGROUND_SERVICE_SPECIAL_USE' in n['attrs'].get('android:name','')]
+    media=[n for n in new['children'] if n['tag']=='uses-permission' and
+           'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK' in n['attrs'].get('android:name','')]
+    require(len(special)==1 and len(media)==1,'Exactly one special-use and one media-playback foreground permission required')
+    new['children'].remove(special[0]);new['children'].remove(media[0])"""
+ require(s.count(guard_old)==1,'packager permission guard drift');s=s.replace(guard_old,guard_new,1)
+ type_old="""    require(svc['attrs'].get('android:foregroundServiceType','').endswith('0x40000000'),'Wrong compiled foreground service type')"""
+ type_new="""    require(svc['attrs'].get('android:foregroundServiceType','').endswith('0x40000002'),'Wrong compiled foreground service type; expected specialUse|mediaPlayback')"""
+ require(s.count(type_old)==1,'packager foreground-type guard drift');s=s.replace(type_old,type_new,1);p.write_text(s)
  receipt=Path('engine/background-resume-source.json');data=json.loads(receipt.read_text());patch=json.loads(Path('audit163/patch.json').read_text())
  require(data.get('version_code')==2103162,'Expected exact Candidate 14 source receipt')
  for rel,row in patch['files'].items():
