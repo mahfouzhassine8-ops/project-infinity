@@ -50,7 +50,7 @@ def upgrade():
    chooser_status_bar_contrast_enforced=False,
    chooser_status_icon_contrast_from_theme=True,
    chooser_safe_area_transient_zero_stabilized=True,
-   cobra_runtime_activity_unchanged=True,
+   cobra_runtime_activity_unchanged=False,\n   chooser_wallpaper_full_window=True,\n   cobra_menu_wallpaper_full_window=True,\n   foreground_safe_area_only=True,\n   approved_component_sizing_preserved=True,
    native_engine_recompiled=False,
    physical_device_verified=False)
  receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+"\n")
@@ -69,7 +69,7 @@ def verify():
  base=Path("baseline171/Infinity-"+OLD+".apk")
  final=Path("signed175/Infinity-"+NEW+".apk")
  require(base.is_file() and final.is_file(),"Baseline/final APK missing")
- base_verify=Path("baseline171/2103175-verification.json")
+ base_verify=Path("baseline171/2103171-verification.json")
  require(base_verify.is_file(),"2103171 verification receipt missing")
  bv=json.loads(base_verify.read_text());require(bv["apk_sha256"]==sha(base),"Wrong exact locked 2103171 APK")
  audit=json.loads(Path("signed175/background-resume-apk-audit.json").read_text())
@@ -120,7 +120,7 @@ def deliver():
  p164=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest.xml",26)
  p165=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest.xml",6)
  p166=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest.xml",8)
- p167=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103171StatusBarRestoreSupersessionTest.xml",5)
+ p167=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarRestoreSupersessionTest.xml",5)
  edge=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest.xml",7)
  screen=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103175FullscreenBackgroundTest.xml",11)
  total=inherited+c14+p164+p165+p166+p167+edge+screen
