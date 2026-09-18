@@ -71,3 +71,17 @@
     int flags=PendingIntent.FLAG_UPDATE_CURRENT;if(Build.VERSION.SDK_INT>=23)flags|=PendingIntent.FLAG_IMMUTABLE;
     return PendingIntent.getService(this,10936+command,intent,flags);
   }
+
+  private android.media.session.MediaSession.Callback cobraMiniMediaCallback(final long generation){
+    return new android.media.session.MediaSession.Callback(){
+      @Override public void onPlay(){dispatchMiniCommand(generation,COMMAND_PLAY);}
+      @Override public void onPause(){dispatchMiniCommand(generation,COMMAND_PAUSE);}
+      @Override public void onStop(){dispatchMiniCommand(generation,COMMAND_STOP);}
+    };
+  }
+  private android.media.session.PlaybackState cobraMiniPlaybackState(MiniPlaybackOwner owner){
+    int state=owner.state();
+    return new android.media.session.PlaybackState.Builder()
+        .setActions(android.media.session.PlaybackState.ACTION_PLAY|android.media.session.PlaybackState.ACTION_PAUSE|android.media.session.PlaybackState.ACTION_PLAY_PAUSE|android.media.session.PlaybackState.ACTION_STOP)
+        .setState(state,owner.position(),state==android.media.session.PlaybackState.STATE_PLAYING?1f:0f,android.os.SystemClock.elapsedRealtime()).build();
+  }
