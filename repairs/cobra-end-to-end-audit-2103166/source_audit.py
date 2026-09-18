@@ -45,7 +45,11 @@ def main():
     checks['single_activity_content_root']=text.count('setContentView(')==1 and 'setContentView(frame);' in build
     checks['browse_root_inset_listener']='cobraInstallBrowseSafeArea(mRoot);' in build and 'mRoot.requestApplyInsets();' in build
     checks['system_and_cutout_insets']='WindowInsets.Type.systemBars()' in text and 'WindowInsets.Type.displayCutout()' in text
-    checks['no_global_fullscreen']='FLAG_FULLSCREEN' not in span(text,'onCreate')
+    on_create=span(text,'onCreate')
+    checks['no_global_fullscreen']=(
+        not re.search(r'\\b(?:setFlags|addFlags)\\s*\\([^;]*FLAG_FULLSCREEN',on_create,re.S)
+        and 'clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)' in on_create
+    )
     checks['fullscreen_surface_scope']='mPlayerOverlay!=null||mMultiOverlay!=null' in bars
     checks['status_bar_show_hide']='controller.hide(android.view.WindowInsets.Type.statusBars())' in bars and 'controller.show(android.view.WindowInsets.Type.statusBars())' in bars
     checks['navigation_bar_never_hidden']='navigationBars()' not in bars and 'hide(android.view.WindowInsets.Type.navigationBars())' not in text
