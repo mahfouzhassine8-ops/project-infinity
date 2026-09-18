@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.media3.common.Format;
+import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
 import java.lang.reflect.*;
 import java.util.concurrent.TimeUnit;
@@ -66,11 +67,13 @@ public class Cobra2103162ThemeRotationTest {
     return new JSONObject().put("schema",2).put("scope","cobra-presentation").put("minimum_runtime",2).put("minimum_build",2103162)
       .put("id",id).put("name","Theme "+id).put("assets",new JSONObject()).put("base",new JSONObject().put("scenes",new JSONObject().put("chooser",scene)));
   }
-  ExoPlayer fakeVideoPlayer(){
+  ExoPlayer fakeVideoPlayer(int[] state,boolean[] playWhenReady){
     return (ExoPlayer)Proxy.newProxyInstance(getClass().getClassLoader(),new Class[]{ExoPlayer.class},(proxy,method,args)->{
       String n=method.getName();
       if(n.equals("getVideoFormat"))return new Format.Builder().setSampleMimeType("video/avc").build();
-      if(n.equals("isPlaying")||n.equals("getPlayWhenReady"))return true;
+      if(n.equals("getPlaybackState"))return state[0];
+      if(n.equals("isPlaying"))return state[0]==Player.STATE_READY&&playWhenReady[0];
+      if(n.equals("getPlayWhenReady"))return playWhenReady[0];
       Class<?> t=method.getReturnType();
       if(t==boolean.class)return false;if(t==int.class)return 0;if(t==long.class)return 0L;if(t==float.class)return 0f;if(t==double.class)return 0d;
       return null;
@@ -154,11 +157,14 @@ public class Cobra2103162ThemeRotationTest {
 
   @Test public void unlockedRotationRequestsFullSensorOnlyForEligibleActiveVideo()throws Exception{
     InfinityLiveActivity a=ui.fixture(24);try{
-      FrameLayout overlay=new FrameLayout(a);a.setContentView(overlay);set(a,"mPlayerOverlay",overlay);set(a,"mPlayer",fakeVideoPlayer());
+      int[] state={Player.STATE_READY};boolean[] playWhenReady={true};
+      FrameLayout overlay=new FrameLayout(a);a.setContentView(overlay);set(a,"mPlayerOverlay",overlay);set(a,"mPlayer",fakeVideoPlayer(state,playWhenReady));
       a.getSharedPreferences("infinity_player_rotation",Context.MODE_PRIVATE).edit().putInt("mode",1).commit();
       call(a,"cobraApplyPlayerRotation","test-active");
       assertEquals(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR,a.getRequestedOrientation());
-      set(a,"mBackgroundStopped",true);call(a,"cobraApplyPlayerRotation","test-background");
+      state[0]=Player.STATE_ENDED;call(a,"cobraApplyPlayerRotation","test-ended");
+      assertEquals(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,a.getRequestedOrientation());
+      state[0]=Player.STATE_READY;set(a,"mBackgroundStopped",true);call(a,"cobraApplyPlayerRotation","test-background");
       assertEquals(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,a.getRequestedOrientation());
     }finally{ui.clean(a);}
   }
