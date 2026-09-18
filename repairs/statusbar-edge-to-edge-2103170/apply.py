@@ -63,7 +63,7 @@ def apply(source,receipt_path,out):
         raise RuntimeError("2103168 status-surface Activity preimage mismatch")
 
     protected=[
-        "onCreate","buildShell","cobraInstallBrowseSafeArea","cobraDarkIconsFor",
+        "buildShell","cobraInstallBrowseSafeArea","cobraDarkIconsFor",
         "cobraBrowseSystemBarSurfaceColor",
         "onStart","onResume","onPause","onStop","onUserLeaveHint",
         "onPictureInPictureModeChanged","onNewIntent","onConfigurationChanged",
@@ -79,6 +79,7 @@ def apply(source,receipt_path,out):
     ]
     protected_before={n:sha_bytes(method(before,n)) for n in protected}
 
+    oncreate=method(before,"onCreate")
     bars=method(before,"cobraApplySystemBarsForSurface")
     confirm=method(before,"cobraConfirmBrowseSystemBars")
 
@@ -96,13 +97,19 @@ def apply(source,receipt_path,out):
     ):
         if token not in confirm:raise RuntimeError("Expected confirmation preimage token missing: "+token)
 
+    new_oncreate=oncreate.replace(
+        "    requestWindowFeature(Window.FEATURE_NO_TITLE);",
+        """    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(),false);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    if(Build.VERSION.SDK_INT>=29)getWindow().setStatusBarContrastEnforced(false);""",1)
+    text=replace_method(before,"onCreate",new_oncreate)
+
     new_bars=bars
     new_bars=new_bars.replace(
         "android.view.Window window=getWindow();View decor=window.getDecorView();",
         """android.view.Window window=getWindow();View decor=window.getDecorView();
-    androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window,false);
-    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     if(Build.VERSION.SDK_INT>=29)window.setStatusBarContrastEnforced(false);""",
         1)
     new_bars=new_bars.replace(
@@ -123,15 +130,12 @@ def apply(source,receipt_path,out):
       flags|=View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
       flags&=~View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
     }""",1)
-    text=replace_method(before,"cobraApplySystemBarsForSurface",new_bars)
+    text=replace_method(text,"cobraApplySystemBarsForSurface",new_bars)
 
     new_confirm=confirm
     new_confirm=new_confirm.replace(
         "android.view.Window window=getWindow();View decor=window.getDecorView();",
         """android.view.Window window=getWindow();View decor=window.getDecorView();
-    androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window,false);
-    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     if(Build.VERSION.SDK_INT>=29)window.setStatusBarContrastEnforced(false);""",
         1)
     new_confirm=new_confirm.replace(
@@ -159,13 +163,18 @@ def apply(source,receipt_path,out):
     for n,h in protected_before.items():
         if sha_bytes(method(text,n))!=h:raise RuntimeError("Protected method changed: "+n)
 
+    after_oncreate=method(text,"onCreate")
     after_bars=method(text,"cobraApplySystemBarsForSurface")
     after_confirm=method(text,"cobraConfirmBrowseSystemBars")
-    required=[
-        "WindowCompat.setDecorFitsSystemWindows(window,false)",
-        "setStatusBarContrastEnforced(false)",
+    for token in (
+        "WindowCompat.setDecorFitsSystemWindows(getWindow(),false)",
         "FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS",
         "FLAG_TRANSLUCENT_STATUS",
+        "setStatusBarContrastEnforced(false)",
+    ):
+        if token not in after_oncreate:raise RuntimeError("2103170 one-time window setup missing: "+token)
+    required=[
+        "setStatusBarContrastEnforced(false)",
         "FLAG_FORCE_NOT_FULLSCREEN",
         "SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN",
         "setStatusBarColor(fullscreen?Color.BLACK:Color.TRANSPARENT)",
@@ -174,7 +183,6 @@ def apply(source,receipt_path,out):
     for token in required:
         if token not in after_bars:raise RuntimeError("2103170 browse edge-to-edge contract missing: "+token)
     for token in (
-        "WindowCompat.setDecorFitsSystemWindows(window,false)",
         "setStatusBarContrastEnforced(false)",
         "SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN",
         "setStatusBarColor(Color.TRANSPARENT)",
@@ -195,7 +203,7 @@ def apply(source,receipt_path,out):
         "base_locked_commit":BASE_LOCK,
         "base_version_code":2103168,
         "files":{str(REL):{"before":sha_bytes(before_bytes),"after":sha_bytes(after_bytes)}},
-        "changed_methods":["cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"],
+        "changed_methods":["onCreate","cobraApplySystemBarsForSurface","cobraConfirmBrowseSystemBars"],
         "new_helpers":[],
         "protected_methods":protected_before,
         "root_cause":[
