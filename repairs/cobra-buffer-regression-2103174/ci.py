@@ -90,7 +90,7 @@ def verify():
                 b"promoteCobraPreviewToFullscreen",b"cobraPrepareExperienceSystemBars",
                 b"cobraApplySystemBarsForSurface"):
    require(token in dex,"Combined 2103174 contract missing: "+repr(token))
-  require(b"Cobra2103174BufferingStabilityTest" not in dex,"Test code packaged in release APK")
+  require(b"Cobra2103174BufferRegressionTest" not in dex,"Test code packaged in release APK")
 
  badging=Path("signed174/badging.txt").read_text()
  require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103174'" in badging,
@@ -126,7 +126,7 @@ def deliver():
   ("Cobra2103165InsetsPipPlayerTest",6),("Cobra2103166EndToEndUiAuditTest",8),
   ("Cobra2103170StatusBarRestoreSupersessionTest",5),("Cobra2103168StatusBarSurfaceTest",4),
   ("Cobra2103170StatusBarEdgeTest",7),("Cobra2103171ChooserStatusBarTest",7),
-  ("Cobra2103174BufferingStabilityTest",4)]:
+  ("Cobra2103174BufferRegressionTest",3)]:
   targeted+=suite(Path("audit174/targeted/test-results")/("TEST-com.projectinfinity.kodi."+name+".xml"),count)
  total=inherited+targeted
  require(total==128,f"Expected 128 Android tests, got {total}")
