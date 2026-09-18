@@ -94,7 +94,10 @@ def append_method_body(text, name, code):
     a, b = method_span(text, name)
     block = text[a:b]
     pos = block.rfind("}")
-    block = block[:pos] + "\n" + code.rstrip() + "\n" + block[pos:]
+    line_start = block.rfind("\n", 0, pos)
+    if line_start < 0 or block[line_start + 1:pos].strip():
+        raise RuntimeError("Unexpected closing-brace layout in " + name)
+    block = block[:line_start + 1] + code.rstrip() + "\n" + block[line_start + 1:]
     return text[:a] + block + text[b:]
 
 def append_class(text, block):
