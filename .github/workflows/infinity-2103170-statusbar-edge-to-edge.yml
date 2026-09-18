@@ -193,7 +193,7 @@ jobs:
           cp stability-delta/repairs/cobra-playback-stability-2103164/tests/Cobra2103164PlaybackStabilityTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp insets-delta/repairs/cobra-inner-insets-pip-return-2103165/tests/Cobra2103165InsetsPipPlayerTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp audit166-delta/repairs/cobra-end-to-end-audit-2103166/tests/Cobra2103166EndToEndUiAuditTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
-          cp status167-delta/repairs/cobra-status-bar-restore-2103167/tests/Cobra2103167StatusBarRestoreTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp edge170/repairs/statusbar-edge-to-edge-2103170/tests/Cobra2103170StatusBarRestoreSupersessionTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp surface-delta/repairs/cobra-status-bar-surface-2103168/tests/Cobra2103168StatusBarSurfaceTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp edge170/repairs/statusbar-edge-to-edge-2103170/tests/Cobra2103170StatusBarEdgeTest.java rotation-build/xbmc/src/test/java/com/projectinfinity/kodi/
           python3 - <<'PY'
@@ -209,7 +209,7 @@ jobs:
             '--tests','com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest',
             '--tests','com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest',
             '--tests','com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest',
-            '--tests','com.projectinfinity.kodi.Cobra2103167StatusBarRestoreTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103170StatusBarRestoreSupersessionTest',
             '--tests','com.projectinfinity.kodi.Cobra2103168StatusBarSurfaceTest',
             '--tests','com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest',
             '--stacktrace'],Path('rotation-build'),env,out)
