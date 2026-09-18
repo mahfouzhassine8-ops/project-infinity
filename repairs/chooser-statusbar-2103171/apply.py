@@ -63,10 +63,10 @@ HELPER=r'''  private void cobraPrepareExperienceSystemBars(ExperienceTheme theme
     // Scope edge-to-edge to the chooser Activity only. The launched Infinity/Cobra Activity
     // owns its own status-bar policy after this Activity leaves the foreground.
     androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window,false);
-    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-        |WindowManager.LayoutParams.FLAG_FULLSCREEN
-        |WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+        |android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
+        |android.view.WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
     window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
     if(Build.VERSION.SDK_INT>=29)window.setStatusBarContrastEnforced(false);
 
