@@ -122,13 +122,13 @@ def deliver():
   inherited+=suite(Path("audit159/android")/folder/"test-results"/("TEST-com.projectinfinity.kodi."+name+".xml"),count)
  inherited+=suite("audit175/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualRuntimeTest.xml",17)
  inherited+=suite("audit175/android/runtime/test-results/TEST-com.projectinfinity.kodi.CobraVisualLayoutTest.xml",10)
- c14=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.xml",16)
+ c14=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.xml",15)
  p164=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest.xml",26)
  p165=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest.xml",6)
  p166=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest.xml",8)
  p167=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarRestoreSupersessionTest.xml",5)
  edge=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest.xml",7)
- screen=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103175FullscreenBackgroundTest.xml",11)
+ screen=suite("audit175/targeted/test-results/TEST-com.projectinfinity.kodi.Cobra2103175FullscreenBackgroundTest.xml",12)
  total=inherited+c14+p164+p165+p166+p167+edge+screen
  require(total==125,f"Expected 125 Android tests, got {total}")
 
