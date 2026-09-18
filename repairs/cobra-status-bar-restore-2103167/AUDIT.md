@@ -61,3 +61,5 @@ Required gates:
 - compiled DEX contains the 2103167 status-bar confirmation contract.
 
 Physical Fold acceptance remains the final confirmation that the clock/battery/signal status bar is visibly restored on normal Cobra screens while fullscreen video still hides it.
+
+CI trigger note: run the complete 2103167 reconstruction and protected-baseline gates before accepting any APK.
