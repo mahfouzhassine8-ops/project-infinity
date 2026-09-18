@@ -11,3 +11,9 @@ Fullscreen player and Multi-View keep their existing hidden black status-bar own
 Acceptance requires all inherited locked tests plus six new system-bar tests. Expected total: **113 Android tests**, along with source-scope, signer, native and protected-resource gates.
 
 Physical acceptance is simple: on a normal Cobra screen the black top strip must be gone, Android status icons must remain visible, and Cobra content must remain safely below them.
+
+## Gate hardening after run 35378865504
+
+The first 2103169 gate proved the new edge-to-edge path itself and all six new tests passed, but two inherited 2103166 safe-area tests caught a lifecycle regression: repeatedly calling `setDecorFitsSystemWindows(false)` could trigger a zero-inset redispatch after a valid inset had already been delivered. That would erase the safe-area padding during fullscreen return or Fold reflow.
+
+The window-fit switch is now **idempotent**: it is configured once per Activity window. Status-bar visibility/color can still be reconciled repeatedly, but the structural window-fit mode is not toggled or reasserted after valid insets arrive. This preserves both requirements at once: Cobra draws behind the system bar, and its content keeps the locked safe inset.

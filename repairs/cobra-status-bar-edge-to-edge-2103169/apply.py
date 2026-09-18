@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""2103169 status-bar surface-match repair over exact locked 2103167.
+"""2103169 status-bar edge-to-edge repair over exact locked 2103167.
 
-2103167 successfully restored Android's real status bar. Physical Fold testing then proved the
 2103168 matched the intended surface color but physical Fold testing still showed a black strip.
 The missing piece is window-fit ownership: 2103167 forced a visible non-fullscreen window but did
 not guarantee that Cobra's drawable content extended behind the status-bar region. A transparent
@@ -128,11 +127,19 @@ def apply(source,receipt_path,out):
     text=replace_method(text,"cobraConfirmBrowseSystemBars",confirm)
 
     helper=r'''
+  private boolean mCobraEdgeToEdgeConfigured=false;
+
   private void cobraConfigureEdgeToEdgeSystemBars(android.view.Window window,View decor){
     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     if(Build.VERSION.SDK_INT>=30){
-      window.setDecorFitsSystemWindows(false);
+      // Window-fit ownership is structural. Reapplying setDecorFitsSystemWindows(false) on every
+      // focus/PiP/status-bar reconciliation causes an OEM/Robolectric zero-inset redispatch that
+      // can erase the already-delivered safe inset. Configure it once for this Activity window.
+      if(!mCobraEdgeToEdgeConfigured){
+        window.setDecorFitsSystemWindows(false);
+        mCobraEdgeToEdgeConfigured=true;
+      }
     }else{
       int layout=decor.getSystemUiVisibility();
       layout|=View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -250,7 +257,9 @@ def apply(source,receipt_path,out):
     for token in (
         'window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)',
         'window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)',
+        'if(!mCobraEdgeToEdgeConfigured)',
         'window.setDecorFitsSystemWindows(false)',
+        'mCobraEdgeToEdgeConfigured=true',
         'View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN',
         'View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION',
     ):
@@ -282,6 +291,7 @@ def apply(source,receipt_path,out):
         "layout_changed":False,
         "window_fit_changed":True,
         "decor_fits_system_windows":False,
+        "edge_to_edge_configured_once":True,
         "safe_area_changed":False,
         "player_changed":False,
         "native_changed":False,

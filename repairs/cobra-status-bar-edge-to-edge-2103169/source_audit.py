@@ -47,6 +47,7 @@ def main():
     checks['edge_helper_called_browse']='cobraConfigureEdgeToEdgeSystemBars(window,decor)' in bars
     checks['edge_helper_called_confirmation']='cobraConfigureEdgeToEdgeSystemBars(window,decor)' in confirm
     checks['modern_edge_to_edge']='window.setDecorFitsSystemWindows(false)' in edge
+    checks['modern_edge_to_edge_idempotent']='if(!mCobraEdgeToEdgeConfigured)' in edge and 'mCobraEdgeToEdgeConfigured=true' in edge
     checks['draws_system_bar_backgrounds']='FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS' in edge
     checks['clears_translucent_status']='FLAG_TRANSLUCENT_STATUS' in edge
     checks['legacy_layout_through_status']='SYSTEM_UI_FLAG_LAYOUT_STABLE' in edge and 'SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN' in edge
