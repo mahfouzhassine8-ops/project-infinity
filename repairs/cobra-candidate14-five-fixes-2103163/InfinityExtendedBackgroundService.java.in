@@ -1,0 +1,285 @@
+package @APP_PACKAGE@;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
+import android.os.IBinder;
+import android.util.Log;
+
+/**
+ * User-owned background continuity plus Cobra mini-player native media presence.
+ * Mini playback never starts a stream: it only keeps an already-playing preview alive.
+ */
+public final class InfinityExtendedBackgroundService extends Service {
+  private static final String TAG = "InfinityBackground";
+  private static final String PREFS = "infinity_runtime";
+  private static final String KEY_ENABLED = "extended_background";
+  private static final String CHANNEL_ID = "infinity_extended_background";
+  private static final int NOTIFICATION_ID = 10932;
+  private static final int REQUEST_OPEN = 10933;
+  private static final int REQUEST_DISABLE = 10934;
+  private static final String ACTION_DISABLE =
+      "com.projectinfinity.kodi.action.DISABLE_EXTENDED_BACKGROUND";
+  private static final String ACTION_MINI_START =
+      "com.projectinfinity.kodi.action.MINI_BACKGROUND_START";
+  private static final String ACTION_MINI_STOP =
+      "com.projectinfinity.kodi.action.MINI_BACKGROUND_STOP";
+  private static final String EXTRA_MINI_TITLE = "mini_title";
+  private static volatile boolean sRunning;
+  private static volatile boolean sMiniPlayback;
+
+  private android.media.session.MediaSession mMediaSession;
+  private String mMiniTitle = "Cobra Live";
+
+  private static SharedPreferences preferences(Context context) {
+    return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+  }
+
+  public static boolean isEnabled(Context context) {
+    return preferences(context).getBoolean(KEY_ENABLED, false);
+  }
+
+  public static boolean isRunning() { return sRunning; }
+  public static boolean isMiniPlaybackRunning() { return sMiniPlayback; }
+
+  public static boolean notificationsAllowed(Context context) {
+    try { return notificationsAllowedChecked(context); }
+    catch (RuntimeException error) {
+      Log.w(TAG, "Notification state unavailable: " + error.getClass().getSimpleName());
+      return false;
+    }
+  }
+
+  private static boolean notificationsAllowedChecked(Context context) {
+    if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(
+        Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return false;
+    NotificationManager manager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    if (manager == null) return false;
+    if (Build.VERSION.SDK_INT >= 24 && !manager.areNotificationsEnabled()) return false;
+    if (Build.VERSION.SDK_INT >= 26) {
+      NotificationChannel channel = manager.getNotificationChannel(CHANNEL_ID);
+      if (channel != null && channel.getImportance() == NotificationManager.IMPORTANCE_NONE) return false;
+    }
+    return true;
+  }
+
+  public static void openNotificationSettings(Activity activity) {
+    try {
+      Intent intent;
+      if (Build.VERSION.SDK_INT >= 26) {
+        intent = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.getPackageName());
+      } else {
+        intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            android.net.Uri.parse("package:" + activity.getPackageName()));
+      }
+      activity.startActivity(intent);
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Notification settings unavailable: " + error.getClass().getSimpleName());
+    }
+  }
+
+  public static boolean setEnabled(Activity activity, boolean enabled) {
+    if (!enabled) {
+      preferences(activity).edit().putBoolean(KEY_ENABLED, false).apply();
+      if (!sMiniPlayback) stopForExit(activity);
+      else request(activity, new Intent(activity, InfinityExtendedBackgroundService.class));
+      return true;
+    }
+    if (activity.isFinishing() || activity.isDestroyed() || !notificationsAllowed(activity)) return false;
+    preferences(activity).edit().putBoolean(KEY_ENABLED, true).apply();
+    if (start(activity)) return true;
+    preferences(activity).edit().putBoolean(KEY_ENABLED, false).apply();
+    return false;
+  }
+
+  public static void sync(Activity activity) {
+    if (activity.isFinishing() || activity.isDestroyed()) return;
+    if (sMiniPlayback) return;
+    if (!isEnabled(activity)) return;
+    if (!notificationsAllowed(activity)) { stopForExit(activity); return; }
+    if (!sRunning) start(activity);
+  }
+
+  public static boolean startMiniPlayback(Context context, String title) {
+    if (!notificationsAllowed(context)) return false;
+    Intent intent = new Intent(context, InfinityExtendedBackgroundService.class)
+        .setAction(ACTION_MINI_START)
+        .putExtra(EXTRA_MINI_TITLE, title == null || title.trim().isEmpty() ? "Cobra Live" : title.trim());
+    return request(context, intent);
+  }
+
+  public static void stopMiniPlayback(Context context) {
+    if (!sRunning && !sMiniPlayback) return;
+    request(context, new Intent(context, InfinityExtendedBackgroundService.class).setAction(ACTION_MINI_STOP));
+  }
+
+  private static boolean start(Context context) {
+    return request(context, new Intent(context, InfinityExtendedBackgroundService.class));
+  }
+
+  private static boolean request(Context context, Intent intent) {
+    try {
+      if (Build.VERSION.SDK_INT >= 26) return context.startForegroundService(intent) != null;
+      return context.startService(intent) != null;
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Background start refused: " + error.getClass().getSimpleName());
+      return false;
+    }
+  }
+
+  public static void stopForExit(Context context) {
+    sMiniPlayback = false;
+    try { context.stopService(new Intent(context, InfinityExtendedBackgroundService.class)); }
+    catch (RuntimeException error) {
+      Log.w(TAG, "Background stop refused: " + error.getClass().getSimpleName());
+    }
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    String action = intent == null ? "" : intent.getAction();
+    if (ACTION_DISABLE.equals(action)) {
+      preferences(this).edit().putBoolean(KEY_ENABLED, false).apply();
+      if (!sMiniPlayback) { endSession(); return START_NOT_STICKY; }
+    }
+    if (ACTION_MINI_STOP.equals(action)) {
+      sMiniPlayback = false;
+      releaseMediaSession();
+      if (!isEnabled(this)) { endSession(); return START_NOT_STICKY; }
+    } else if (ACTION_MINI_START.equals(action)) {
+      if (!notificationsAllowed(this)) { endSession(); return START_NOT_STICKY; }
+      sMiniPlayback = true;
+      mMiniTitle = intent.getStringExtra(EXTRA_MINI_TITLE);
+      if (mMiniTitle == null || mMiniTitle.trim().isEmpty()) mMiniTitle = "Cobra Live";
+    }
+
+    if (!sMiniPlayback && (!isEnabled(this) || !notificationsAllowed(this))) {
+      endSession(); return START_NOT_STICKY;
+    }
+    try {
+      ensureChannel();
+      Notification notification = sMiniPlayback ? buildMiniPlaybackNotification() : buildNotification();
+      if (Build.VERSION.SDK_INT >= 34) {
+        int type = sMiniPlayback ? ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            : ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
+        if (sMiniPlayback && isEnabled(this)) type |= ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
+        startForeground(NOTIFICATION_ID, notification, type);
+      } else {
+        startForeground(NOTIFICATION_ID, notification);
+      }
+      sRunning = true;
+      return sMiniPlayback ? START_NOT_STICKY : START_STICKY;
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Foreground promotion refused: " + error.getClass().getSimpleName());
+      endSession(); return START_NOT_STICKY;
+    }
+  }
+
+  private void ensureChannel() {
+    if (Build.VERSION.SDK_INT < 26) return;
+    NotificationManager manager =
+        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    if (manager == null) throw new IllegalStateException("Notification manager unavailable");
+    if (manager.getNotificationChannel(CHANNEL_ID) != null) return;
+    NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+        "Infinity background playback", NotificationManager.IMPORTANCE_LOW);
+    channel.setDescription("Background session continuity and user-enabled Cobra mini-player audio.");
+    channel.setShowBadge(false);
+    manager.createNotificationChannel(channel);
+  }
+
+  private PendingIntent openPendingIntent() {
+    Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
+    if (launch == null) launch = new Intent(this, Splash.class)
+        .setAction(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    int pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= 23) pendingFlags |= PendingIntent.FLAG_IMMUTABLE;
+    return PendingIntent.getActivity(this, REQUEST_OPEN, launch, pendingFlags);
+  }
+
+  private Notification.Builder builder() {
+    return Build.VERSION.SDK_INT >= 26
+        ? new Notification.Builder(this, CHANNEL_ID) : new Notification.Builder(this);
+  }
+
+  private Notification buildMiniPlaybackNotification() {
+    ensureMediaSession();
+    Notification.Builder builder = builder();
+    builder.setSmallIcon(android.R.drawable.stat_notify_sync_noanim)
+        .setContentTitle(mMiniTitle)
+        .setContentText("Infinity • Cobra mini-player playing in background")
+        .setContentIntent(openPendingIntent())
+        .setCategory(Notification.CATEGORY_TRANSPORT)
+        .setOngoing(true).setOnlyAlertOnce(true).setShowWhen(false)
+        .setStyle(new Notification.MediaStyle().setMediaSession(mMediaSession.getSessionToken()));
+    if (Build.VERSION.SDK_INT >= 31) builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+    return builder.build();
+  }
+
+  private void ensureMediaSession() {
+    if (mMediaSession == null) mMediaSession = new android.media.session.MediaSession(this, "InfinityCobraMini");
+    android.media.MediaMetadata metadata = new android.media.MediaMetadata.Builder()
+        .putString(android.media.MediaMetadata.METADATA_KEY_TITLE, mMiniTitle)
+        .putString(android.media.MediaMetadata.METADATA_KEY_ARTIST, "Infinity • Cobra")
+        .build();
+    android.media.session.PlaybackState state = new android.media.session.PlaybackState.Builder()
+        .setState(android.media.session.PlaybackState.STATE_PLAYING, 0L, 1f)
+        .build();
+    mMediaSession.setMetadata(metadata);mMediaSession.setPlaybackState(state);mMediaSession.setActive(true);
+  }
+
+  private void releaseMediaSession() {
+    if (mMediaSession == null) return;
+    try { mMediaSession.setActive(false);mMediaSession.release(); }
+    catch (RuntimeException error) { Log.w(TAG, "Media session cleanup refused", error); }
+    mMediaSession = null;
+  }
+
+  private Notification buildNotification() {
+    int pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= 23) pendingFlags |= PendingIntent.FLAG_IMMUTABLE;
+    PendingIntent disable = PendingIntent.getService(this, REQUEST_DISABLE,
+        new Intent(this, InfinityExtendedBackgroundService.class).setAction(ACTION_DISABLE), pendingFlags);
+    Notification.Builder builder = builder();
+    builder.setSmallIcon(android.R.drawable.stat_notify_sync_noanim)
+        .setContentTitle("Infinity • Extended Background Mode")
+        .setContentText("Session continuity enabled. Android may still stop Infinity.")
+        .setContentIntent(openPendingIntent())
+        .setCategory(Notification.CATEGORY_SERVICE)
+        .setOngoing(true).setOnlyAlertOnce(true).setShowWhen(false)
+        .addAction(new Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,
+            "Turn off", disable).build());
+    if (Build.VERSION.SDK_INT >= 31) builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+    return builder.build();
+  }
+
+  private void endSession() {
+    sRunning = false;sMiniPlayback = false;releaseMediaSession();
+    try { stopForeground(true); }
+    catch (RuntimeException error) { Log.w(TAG, "Foreground cleanup refused: " + error.getClass().getSimpleName()); }
+    stopSelf();
+  }
+
+  @Override public void onTaskRemoved(Intent rootIntent) {
+    endSession();super.onTaskRemoved(rootIntent);
+  }
+
+  @Override public void onDestroy() {
+    sRunning=false;sMiniPlayback=false;releaseMediaSession();super.onDestroy();
+  }
+
+  @Override public IBinder onBind(Intent intent) { return null; }
+}
