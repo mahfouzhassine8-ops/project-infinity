@@ -177,18 +177,11 @@ def service(s):
       releaseMediaSession();mMediaGeneration=generation;
       mMediaSession=new android.media.session.MediaSession(this,"InfinityCobraMini");
       mMediaSession.setFlags(android.media.session.MediaSession.FLAG_HANDLES_MEDIA_BUTTONS|android.media.session.MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
-      mMediaSession.setCallback(new android.media.session.MediaSession.Callback(){
-        @Override public void onPlay(){dispatchMiniCommand(generation,COMMAND_PLAY);}
-        @Override public void onPause(){dispatchMiniCommand(generation,COMMAND_PAUSE);}
-        @Override public void onStop(){dispatchMiniCommand(generation,COMMAND_STOP);}
-      },new android.os.Handler(android.os.Looper.getMainLooper()));
+      mMediaSession.setCallback(cobraMiniMediaCallback(generation),new android.os.Handler(android.os.Looper.getMainLooper()));
       mMediaSession.setSessionActivity(miniOpenPendingIntent());
     }
     mMediaSession.setMetadata(new android.media.MediaMetadata.Builder().putString(android.media.MediaMetadata.METADATA_KEY_TITLE,mMiniTitle).putString(android.media.MediaMetadata.METADATA_KEY_ARTIST,"Infinity • Cobra").build());
-    int state=owner.state();
-    mMediaSession.setPlaybackState(new android.media.session.PlaybackState.Builder()
-        .setActions(android.media.session.PlaybackState.ACTION_PLAY|android.media.session.PlaybackState.ACTION_PAUSE|android.media.session.PlaybackState.ACTION_PLAY_PAUSE|android.media.session.PlaybackState.ACTION_STOP)
-        .setState(state,owner.position(),state==android.media.session.PlaybackState.STATE_PLAYING?1f:0f,android.os.SystemClock.elapsedRealtime()).build());
+    mMediaSession.setPlaybackState(cobraMiniPlaybackState(owner));
     mMediaSession.setActive(true);
   }''')
  s=method(s,'buildMiniPlaybackNotification','''  private Notification buildMiniPlaybackNotification(){
