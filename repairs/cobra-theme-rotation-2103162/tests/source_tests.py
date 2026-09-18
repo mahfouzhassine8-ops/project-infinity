@@ -39,8 +39,8 @@ def main():
    ("onPause",'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause")'),
    ("onStop",'cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"stop")'),
    ("onResume",'cobraApplyPlayerRotation("resume")'),
-   ("onPictureInPictureModeChanged",'cobraApplyPlayerRotation("pip")'),
-   ("onMultiWindowModeChanged",'cobraApplyPlayerRotation("multi-window")')]:
+   ("onPictureInPictureModeChanged",'if(inPictureInPictureMode)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pip-enter");else cobraApplyPlayerRotation("pip-exit");'),
+   ("onMultiWindowModeChanged",'if(inMultiWindowMode)cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"multi-window-enter");else cobraApplyPlayerRotation("multi-window-exit");')]:
   b=method(live,name);c=method(after,name);assert needle in c
   assert strip_lines(c,[needle])==strip_lines(b,[]),name;checks+=2
 
