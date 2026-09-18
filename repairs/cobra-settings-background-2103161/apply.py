@@ -105,7 +105,7 @@ def patch_activity(s):
     subscriptionStatus.setTag("cobra_subscription_status");
 
     TextView themeInfo = text(
-        "VISUAL THEME RUNTIME 2\n" +
+        "VISUAL THEME RUNTIME 2\\n" +
         "Theme ZIPs can change Cobra presentation without replacing playback, providers or the native engine.",
         cobraThemeColor("muted", mTheme.muted), 14, Gravity.LEFT | Gravity.CENTER_VERTICAL);
 
@@ -185,7 +185,7 @@ def patch_renderer(s):
     IO.execute(()->{try{synchronized(CobraVisualTheme.STORE_LOCK){publish(CobraVisualTheme.rollback(activity.getApplicationContext()),"Previous theme restored");}if(after!=null)MAIN.post(after);}catch(Exception e){MAIN.post(()->Toast.makeText(activity,"Previous theme unavailable; current theme unchanged",Toast.LENGTH_LONG).show());}});
   }
   public void manager(Activity activity){
-    new AlertDialog.Builder(activity).setTitle("Cobra theme controls").setMessage(description()+"\n\nReset and rollback change presentation only. Reopen menus to refresh source-driven layout and copy. No playlists or playback preferences are deleted.")
+    new AlertDialog.Builder(activity).setTitle("Cobra theme controls").setMessage(description()+"\\n\\nReset and rollback change presentation only. Reopen menus to refresh source-driven layout and copy. No playlists or playback preferences are deleted.")
       .setPositiveButton("Built-in appearance",(d,w)->restoreBuiltIn(activity,null))
       .setNeutralButton("Previous theme",(d,w)->restorePrevious(activity,null))
       .setNegativeButton("Close",null).show();
