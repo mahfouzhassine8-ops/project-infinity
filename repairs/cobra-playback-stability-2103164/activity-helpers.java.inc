@@ -150,8 +150,8 @@
     int limit=Math.max(1,rect[4]-panel.getPaddingTop()-panel.getPaddingBottom());
     boolean resized=mCobraSheetHeightLimit!=limit;mCobraSheetHeightLimit=limit;
     FrameLayout.LayoutParams lp=(FrameLayout.LayoutParams)panel.getLayoutParams();
-    if(lp.width!=rect[2]||lp.leftMargin!=rect[0]||lp.topMargin!=rect[1]||lp.gravity!=(Gravity.TOP|Gravity.LEFT)){
-      lp.width=rect[2];lp.height=-2;lp.gravity=Gravity.TOP|Gravity.LEFT;
+    if(lp.width!=rect[2]||lp.height!=rect[3]||lp.leftMargin!=rect[0]||lp.topMargin!=rect[1]||lp.gravity!=(Gravity.TOP|Gravity.LEFT)){
+      lp.width=rect[2];lp.height=rect[3];lp.gravity=Gravity.TOP|Gravity.LEFT;
       lp.setMargins(rect[0],rect[1],0,0);panel.setLayoutParams(lp);
     }else if(resized)panel.requestLayout();
     if(panel.getLeft()==rect[0]&&panel.getTop()==rect[1]&&panel.getWidth()==rect[2]&&!panel.isLayoutRequested())panel.setAlpha(1f);
