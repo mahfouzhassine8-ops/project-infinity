@@ -105,8 +105,11 @@ def apply(source,receipt_path,out):
     # Source-level topology audit before editing.
     if before.count("setContentView(")!=1 or "setContentView(frame);" not in method_text(before,"buildShell"):
         raise RuntimeError("Browse content topology drift: expected one Activity content root")
-    if "FLAG_FULLSCREEN" in method_text(before,"onCreate"):
+    on_create=method_text(before,"onCreate")
+    if re.search(r'\\b(?:setFlags|addFlags)\\s*\\([^;]*FLAG_FULLSCREEN',on_create,re.S):
         raise RuntimeError("Locked 2103165 unexpectedly regained global fullscreen ownership")
+    if "clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)" not in on_create:
+        raise RuntimeError("Locked 2103165 browse-mode fullscreen clear is missing")
 
     text=before
 
