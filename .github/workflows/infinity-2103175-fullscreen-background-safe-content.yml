@@ -191,7 +191,7 @@ jobs:
           python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
             --build screen175-build --out audit175/android
 
-      - name: Run 114 unchanged gates plus 11 screen-real-estate supersession gates
+      - name: Run 113 unchanged gates plus 12 screen-real-estate supersession gates
         run: |
           set -euo pipefail
           cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java screen175-build/xbmc/src/test/java/com/projectinfinity/kodi/
@@ -210,7 +210,21 @@ jobs:
           out=Path('audit175/targeted');env=r.test_environment(out)
           r.run_ui_gate([
             './gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest',
-            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.settingsUseOneThemeEntryAndNoLegacyThemeButtonStack',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.oneThemeSheetSwitchesToBuiltInThenBackToSameInstalledTheme',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.backgroundModeStillUsesTheExistingNormalExtendedContract',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.playerChromeHasRotationBesideLockAndUsesSharedInfinityPreference',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.unlockedRotationRequestsFullSensorOnlyForEligibleActiveVideo',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.latePlaybackCallbackCannotReacquireRotationAfterPause',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.fullscreenToPreviewReleasesRotationWithoutReplacingThePlayer',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.splitWindowCallbackBlocksLateRotationUntilExit',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.pipAndTelevisionNeverAcquireRotation',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.controlsLockPreventsRotationPreferenceChanges',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.invalidMultiviewRequestLeavesFullscreenOrientationAlone',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.repeatedBuiltInResetKeepsTheSameThemeRestorable',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.corruptSavedThemeCannotReplaceBuiltInSnapshot',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.pausedIdleEndedOrMissingVideoCannotOwnOrientation',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.themePickerBindsNewRowRolesAndDefaultButtonsMatch',
             '--tests','com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest',
             '--tests','com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest',
             '--tests','com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest',
