@@ -116,7 +116,8 @@ def patch_activity(s):
     list.addView(filePicker, new LinearLayout.LayoutParams(-1, dp(56)));
     list.addView(uiState, new LinearLayout.LayoutParams(-1, dp(44)));''','settings rows')
  s=edit(s,'showSettings',settings)
- s=edit(s,'onStop',lambda b:once(b,'    if (!isCobraInPictureInPicture()) pauseCobraForBackground();','    if (!isCobraInPictureInPicture()) {mCobraMiniBackgroundActive=cobraBeginMiniBackgroundPlayback();pauseCobraForBackground();}','mini onStop'))
+ s=edit(s,'onUserLeaveHint',lambda b:once(b,'    if (hasCobraVideo()) enterCobraPictureInPicture();','    if (hasCobraVideo()) enterCobraPictureInPicture();\n    else mCobraMiniBackgroundActive=cobraBeginMiniBackgroundPlayback();','mini foreground handoff'))
+ s=edit(s,'onStop',lambda b:once(b,'    if (!isCobraInPictureInPicture()) pauseCobraForBackground();','    if (!isCobraInPictureInPicture()) {if(!mCobraMiniBackgroundActive)mCobraMiniBackgroundActive=cobraBeginMiniBackgroundPlayback();pauseCobraForBackground();}','mini onStop fallback'))
  s=edit(s,'onResume',lambda b:once(b,
 '''    mCobraHealthForeground=true;cobraStartHealthTicker();
     InfinityExtendedBackgroundService.sync(this);''',
@@ -144,13 +145,13 @@ def patch_activity(s):
  for token in ('playerSettings?Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL','MAX_CHANNELS = 50000','cobraNormalizeProviderGroup','PLAY IN BACKGROUND  •  ','InfinityExtendedBackgroundService.startMiniPlayback','MiXplorer','ACTION_GET_CONTENT'):
   if token not in s:raise ValueError('missing activity contract '+token)
  a,b=span(s,'onUserLeaveHint');leave=s[a:b]
- if 'if (hasCobraVideo()) enterCobraPictureInPicture();' not in leave or 'mCobraPreviewPlayer' in leave:raise ValueError('PiP ownership changed')
+ if 'if (hasCobraVideo()) enterCobraPictureInPicture();' not in leave or 'else mCobraMiniBackgroundActive=cobraBeginMiniBackgroundPlayback();' not in leave:raise ValueError('PiP/mini-player ownership changed')
  return s
 
 def patch_splash(s):
  s=edit(s,'showVisualExperienceScene',lambda b:once(b,
 '    org.json.JSONObject scene=vtheme().scene("chooser");if(scene==null)return false;',
-'    org.json.JSONObject scene=vtheme().scene("chooser");if(scene==null)return false;\n    int availableHeightDp=Math.round(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);\n    if(availableHeightDp<640)return false;','scene height guard'))
+'    org.json.JSONObject scene=vtheme().scene("chooser");if(scene==null)return false;\n    int availableHeightDp=Math.round(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);\n    if(availableHeightDp<700)return false;','scene height guard'))
  def compact(b):
   b=once(b,
 '''    android.widget.LinearLayout content = new android.widget.LinearLayout(this);
@@ -169,7 +170,7 @@ def patch_splash(s):
   b=once(b,'    android.widget.LinearLayout.LayoutParams footerParams = new android.widget.LinearLayout.LayoutParams(-1, -2); footerParams.topMargin = chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.11",34)); content.addView(footer, footerParams);','    android.widget.LinearLayout.LayoutParams footerParams = new android.widget.LinearLayout.LayoutParams(-1, -2); footerParams.topMargin = chooserDp(compactHeight?10:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.11",34)); content.addView(footer, footerParams);','compact footer')
   return once(b,'    if(vtheme().hasImage("chooser.footer"))content.addView(vtheme().art(this,"chooser.footer",60),new android.widget.LinearLayout.LayoutParams(-1,chooserDp(vtheme().dimension("chooser.footer.height",60))));','    if(!compactHeight&&vtheme().hasImage("chooser.footer"))content.addView(vtheme().art(this,"chooser.footer",60),new android.widget.LinearLayout.LayoutParams(-1,chooserDp(vtheme().dimension("chooser.footer.height",60))));','compact footer art')
  s=edit(s,'showStyledInfinityExperienceChooser',compact)
- for token in ('compactHeight=heightDp<700','adaptiveCardHeight','availableHeightDp<640'):
+ for token in ('compactHeight=heightDp<700','adaptiveCardHeight','availableHeightDp<700'):
   if token not in s:raise ValueError('missing chooser contract '+token)
  return s
 
