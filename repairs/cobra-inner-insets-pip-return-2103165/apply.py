@@ -179,6 +179,21 @@ def apply(source, receipt_path, out):
     text = edit_method(
         text, "onConfigurationChanged", "    super.onConfigurationChanged(configuration);",
         "    super.onConfigurationChanged(configuration);\n"
+        "    cobraApplySystemBarsForSurface();"
+    )
+    # onConfigurationChanged has intentional early returns for player, Multi-View,
+    # attached guide and Settings. Every exit must leave system-bar ownership settled,
+    # then post once more after any reflow work queued by those branches.
+    ca, cb = method_span(text, "onConfigurationChanged")
+    config = text[ca:cb]
+    config = config.replace(
+        "return;",
+        "cobraApplySystemBarsForSurface();mMain.post(this::cobraApplySystemBarsForSurface);return;"
+    )
+    text = text[:ca] + config + text[cb:]
+    text = append_method_body(
+        text, "onConfigurationChanged",
+        "    cobraApplySystemBarsForSurface();\n"
         "    mMain.post(this::cobraApplySystemBarsForSurface);"
     )
 
