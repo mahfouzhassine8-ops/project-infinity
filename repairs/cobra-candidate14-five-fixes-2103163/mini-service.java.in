@@ -1,0 +1,226 @@
+package @APP_PACKAGE@;
+
+import android.Manifest;
+import android.app.*;
+import android.content.*;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
+import android.media.AudioManager;
+import android.media.AudioFocusRequest;
+import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+import android.os.*;
+import android.util.Log;
+import androidx.media3.common.C;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
+
+/** An explicit, process-local lease of the existing preview, never a second player. */
+public final class InfinityExtendedBackgroundService extends Service {
+  private static final String TAG="InfinityBackground",PREFS="infinity_runtime",KEY_ENABLED="extended_background";
+  private static final String CHANNEL_ID="infinity_extended_background";
+  private static final int NOTIFICATION_ID=10932,REQUEST_OPEN=10933,REQUEST_DISABLE=10934;
+  private static final String ACTION_DISABLE="com.projectinfinity.kodi.action.DISABLE_EXTENDED_BACKGROUND";
+  private static final String ACTION_MINI_START="com.projectinfinity.kodi.action.MINI_BACKGROUND_START";
+  private static final String ACTION_MINI_STOP="com.projectinfinity.kodi.action.MINI_BACKGROUND_STOP";
+  private static final String ACTION_MINI_PLAY="com.projectinfinity.kodi.action.MINI_BACKGROUND_PLAY",ACTION_MINI_PAUSE="com.projectinfinity.kodi.action.MINI_BACKGROUND_PAUSE";
+  private static volatile boolean sRunning;
+  private static long sequence;
+  private static MiniLease lease;
+  private static InfinityExtendedBackgroundService instance;
+  private final Handler main=new Handler(Looper.getMainLooper());
+  private MediaSession mediaSession;
+  private MediaSession.Callback mediaCallback;
+  private AudioManager audio;
+  private AudioFocusRequest focusRequest;
+  private boolean hasFocus;
+  private MiniLease listening;
+  private final Runnable pausedTimeout=()->terminateMini(true);
+  private final Player.Listener listener=new Player.Listener(){
+    @Override public void onEvents(Player player,Player.Events events){
+      if(listening==null||lease!=listening)return;
+      if(player.getPlayerError()!=null||player.getPlaybackState()==Player.STATE_IDLE||player.getPlaybackState()==Player.STATE_ENDED){terminateMini(true);return;}
+      refreshNotification();
+    }
+  };
+  private AudioManager.OnAudioFocusChangeListener focusChange;
+  private AudioManager.OnAudioFocusChangeListener focusListener(final MiniLease owner){return change->{
+    if(lease==null||lease!=owner||instance!=this)return;
+    if(change==AudioManager.AUDIOFOCUS_LOSS){terminateMini(true);return;}
+    if(change==AudioManager.AUDIOFOCUS_LOSS_TRANSIENT||change==AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){lease.player.pause();refreshNotification();}
+    // Focus gain never restarts audio the user or another app paused.
+  };}
+  private static final class MiniLease {
+    final long id;final ExoPlayer player;final String title;final Runnable ended;
+    boolean promoted;
+    MiniLease(ExoPlayer p,String title,Runnable ended){id=++sequence;player=p;this.title=title;this.ended=ended;}
+  }
+  private static SharedPreferences preferences(Context c){return c.getSharedPreferences(PREFS,MODE_PRIVATE);}
+  public static boolean isEnabled(Context c){return preferences(c).getBoolean(KEY_ENABLED,false);}
+  public static boolean isRunning(){return sRunning;}
+  public static boolean isMiniPlaybackRunning(){return lease!=null&&lease.promoted;}
+  public static boolean keepsMiniPlayback(ExoPlayer player){return player!=null&&lease!=null&&lease.player==player;}
+  static int nativeState(Player player){
+    if(player.getPlayerError()!=null)return PlaybackState.STATE_ERROR;
+    if(player.getPlaybackState()==Player.STATE_IDLE||player.getPlaybackState()==Player.STATE_ENDED)return PlaybackState.STATE_STOPPED;
+    if(!player.getPlayWhenReady())return PlaybackState.STATE_PAUSED;
+    if(player.getPlaybackState()==Player.STATE_BUFFERING)return PlaybackState.STATE_BUFFERING;
+    return player.isPlaying()?PlaybackState.STATE_PLAYING:PlaybackState.STATE_PAUSED;
+  }
+  public static boolean notificationsAllowed(Context c){
+    try{
+      if(Build.VERSION.SDK_INT>=33&&c.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)return false;
+      NotificationManager manager=(NotificationManager)c.getSystemService(NOTIFICATION_SERVICE);
+      if(manager==null||Build.VERSION.SDK_INT>=24&&!manager.areNotificationsEnabled())return false;
+      NotificationChannel channel=Build.VERSION.SDK_INT>=26?manager.getNotificationChannel(CHANNEL_ID):null;
+      return channel==null||channel.getImportance()!=NotificationManager.IMPORTANCE_NONE;
+    }catch(RuntimeException e){return false;}
+  }
+  public static void openNotificationSettings(Activity a){
+    try{a.startActivity(Build.VERSION.SDK_INT>=26?new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(android.provider.Settings.EXTRA_APP_PACKAGE,a.getPackageName()):new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,android.net.Uri.parse("package:"+a.getPackageName())));}
+    catch(RuntimeException e){Log.w(TAG,"Notification settings unavailable",e);}
+  }
+  public static boolean setEnabled(Activity a,boolean enabled){
+    if(!enabled){preferences(a).edit().putBoolean(KEY_ENABLED,false).apply();if(lease==null)stopForExit(a);else if(instance!=null)instance.refreshNotification();return true;}
+    if(a.isFinishing()||a.isDestroyed()||!notificationsAllowed(a))return false;
+    preferences(a).edit().putBoolean(KEY_ENABLED,true).apply();if(request(a,new Intent(a,InfinityExtendedBackgroundService.class)))return true;
+    preferences(a).edit().putBoolean(KEY_ENABLED,false).apply();return false;
+  }
+  public static void sync(Activity a){
+    if(a.isFinishing()||a.isDestroyed()||lease!=null||!isEnabled(a))return;
+    if(!notificationsAllowed(a)){stopForExit(a);return;}
+    if(!sRunning)request(a,new Intent(a,InfinityExtendedBackgroundService.class));
+  }
+  /** Only called from the visible Activity's user-leave hook. True means pending, not promoted. */
+  public static boolean startMiniPlayback(Activity a,ExoPlayer player,String title,Runnable ended){
+    if(Looper.myLooper()!=Looper.getMainLooper()||player==null||player.getApplicationLooper()!=Looper.getMainLooper()||a.isFinishing()||a.isDestroyed()||!notificationsAllowed(a))return false;
+    if(!player.isPlaying()&&!(player.getPlaybackState()==Player.STATE_BUFFERING&&player.getPlayWhenReady()))return false;
+    if(keepsMiniPlayback(player))return true;
+    stopMiniPlayback(a);
+    MiniLease pending=new MiniLease(player,title==null||title.trim().isEmpty()?"Cobra Live":title,ended);lease=pending;
+    if(request(a,new Intent(a,InfinityExtendedBackgroundService.class).setAction(ACTION_MINI_START).putExtra("lease",pending.id)))return true;
+    if(lease==pending)lease=null;return false;
+  }
+  /** Return/stop invalidate pending requests too. Stopping never starts a foreground service. */
+  public static void stopMiniPlayback(Context c){
+    MiniLease old=lease;lease=null;++sequence;
+    if(instance!=null){instance.detach(old,false);instance.refreshNotification();}
+    else if(old!=null&&!isEnabled(c))try{c.stopService(new Intent(c,InfinityExtendedBackgroundService.class));}catch(RuntimeException ignored){}
+  }
+  public static void stopForExit(Context c){
+    MiniLease old=lease;lease=null;++sequence;
+    if(instance!=null)instance.detach(old,true);
+    else if(old!=null){try{old.player.pause();}catch(RuntimeException ignored){}old.ended.run();}
+    try{c.stopService(new Intent(c,InfinityExtendedBackgroundService.class));}catch(RuntimeException e){Log.w(TAG,"Background stop refused",e);}
+  }
+  private static boolean request(Context c,Intent intent){
+    try{return Build.VERSION.SDK_INT>=26?c.startForegroundService(intent)!=null:c.startService(intent)!=null;}
+    catch(RuntimeException e){Log.w(TAG,"Foreground request refused: "+e.getClass().getSimpleName());return false;}
+  }
+  @Override public void onCreate(){super.onCreate();instance=this;}
+  @Override public int onStartCommand(Intent intent,int flags,int startId){
+    String action=intent==null?null:intent.getAction();
+    if(ACTION_DISABLE.equals(action))preferences(this).edit().putBoolean(KEY_ENABLED,false).apply();
+    if(ACTION_MINI_STOP.equals(action)||ACTION_MINI_PLAY.equals(action)||ACTION_MINI_PAUSE.equals(action)){
+      if(lease!=null&&lease==listening&&intent.getLongExtra("lease",-1)==lease.id){
+        if(ACTION_MINI_STOP.equals(action))terminateMini(true);
+        else if(ACTION_MINI_PAUSE.equals(action)){lease.player.pause();refreshNotification();}
+        else if(requestFocus()){lease.player.play();refreshNotification();}
+      }else refreshNotification();
+      return START_NOT_STICKY;
+    }
+    if(ACTION_MINI_START.equals(action)){
+      MiniLease current=lease;
+      if(current==null||intent.getLongExtra("lease",-1)!=current.id){refreshNotification();return START_NOT_STICKY;}
+      if(current.promoted&&listening==current){refreshNotification();return START_NOT_STICKY;}
+      try{
+        if(!notificationsAllowed(this))throw new SecurityException("Notification unavailable");
+        listening=current;current.player.addListener(listener);
+        ensureMediaSession();promote(buildNotification());
+        if(!requestFocus())throw new IllegalStateException("Audio focus refused");
+        current.player.setWakeMode(C.WAKE_MODE_LOCAL);
+        current.promoted=true;refreshNotification();
+      }catch(RuntimeException failure){Log.w(TAG,"Mini-player promotion failed: "+failure.getClass().getSimpleName());terminateMini(true);}
+      return START_NOT_STICKY;
+    }
+    refreshNotification();return lease==null&&sRunning?START_STICKY:START_NOT_STICKY;
+  }
+  private boolean requestFocus(){
+    if(hasFocus)return true;
+    audio=(AudioManager)getSystemService(AUDIO_SERVICE);if(audio==null)return false;
+    int result;focusChange=focusListener(lease);
+    if(Build.VERSION.SDK_INT>=26){focusRequest=new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(new android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE).build()).setOnAudioFocusChangeListener(focusChange,main).build();result=audio.requestAudioFocus(focusRequest);}
+    else result=audio.requestAudioFocus(focusChange,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+    hasFocus=result==AudioManager.AUDIOFOCUS_REQUEST_GRANTED;return hasFocus;
+  }
+  private void ensureMediaSession(){
+    if(mediaSession!=null)return;
+    mediaSession=new MediaSession(this,"InfinityCobraMini");
+    mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS|MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+    final MiniLease sessionLease=lease;
+    mediaCallback=new MediaSession.Callback(){
+      @Override public void onPlay(){if(lease!=null&&lease==sessionLease&&requestFocus()){lease.player.play();refreshNotification();}}
+      @Override public void onPause(){if(lease!=null&&lease==sessionLease){lease.player.pause();refreshNotification();}}
+      @Override public void onStop(){if(lease==sessionLease)terminateMini(true);}
+    };mediaSession.setCallback(mediaCallback,main);
+    mediaSession.setSessionActivity(openPendingIntent(true));mediaSession.setActive(true);
+  }
+  private PendingIntent openPendingIntent(boolean mini){
+    Intent launch=mini?new Intent(this,InfinityLiveActivity.class).putExtra("infinity_live_profile","cobra"):getPackageManager().getLaunchIntentForPackage(getPackageName());
+    if(launch==null)launch=new Intent(this,Splash.class);
+    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    return PendingIntent.getActivity(this,mini?10938:REQUEST_OPEN,launch,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+  }
+  private Notification buildNotification(){
+    NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+    if(Build.VERSION.SDK_INT>=26&&manager.getNotificationChannel(CHANNEL_ID)==null){NotificationChannel channel=new NotificationChannel(CHANNEL_ID,"Infinity background playback",NotificationManager.IMPORTANCE_LOW);channel.setShowBadge(false);manager.createNotificationChannel(channel);}
+    Notification.Builder b=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL_ID):new Notification.Builder(this);
+    b.setSmallIcon(android.R.drawable.ic_media_play).setOnlyAlertOnce(true).setShowWhen(false);
+    if(lease!=null&&lease==listening){
+      ensureMediaSession();int state=nativeState(lease.player);
+      mediaSession.setMetadata(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,lease.title).putString(MediaMetadata.METADATA_KEY_ARTIST,"Infinity • Cobra").build());
+      mediaSession.setPlaybackState(new PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY|PlaybackState.ACTION_PAUSE|PlaybackState.ACTION_PLAY_PAUSE|PlaybackState.ACTION_STOP).setState(state,Math.max(0L,lease.player.getCurrentPosition()),state==PlaybackState.STATE_PLAYING?1f:0f).build());
+      b.setContentTitle(lease.title).setContentText(state==PlaybackState.STATE_PLAYING?"Cobra • Playing in background":state==PlaybackState.STATE_BUFFERING?"Cobra • Buffering":"Cobra • Paused").setContentIntent(openPendingIntent(true)).setCategory(Notification.CATEGORY_TRANSPORT).setOngoing(state!=PlaybackState.STATE_PAUSED).setStyle(new Notification.MediaStyle().setMediaSession(mediaSession.getSessionToken()));
+      boolean paused=state==PlaybackState.STATE_PAUSED;
+      PendingIntent toggle=PendingIntent.getService(this,10939,new Intent(this,InfinityExtendedBackgroundService.class).setAction(paused?ACTION_MINI_PLAY:ACTION_MINI_PAUSE).putExtra("lease",lease.id),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+      PendingIntent stop=PendingIntent.getService(this,10940,new Intent(this,InfinityExtendedBackgroundService.class).setAction(ACTION_MINI_STOP).putExtra("lease",lease.id),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+      b.addAction(new Notification.Action.Builder(paused?android.R.drawable.ic_media_play:android.R.drawable.ic_media_pause,paused?"Play":"Pause",toggle).build());
+      b.addAction(new Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,"Stop",stop).build());
+      b.setStyle(new Notification.MediaStyle().setMediaSession(mediaSession.getSessionToken()).setShowActionsInCompactView(0,1));
+    }else{
+      PendingIntent disable=PendingIntent.getService(this,REQUEST_DISABLE,new Intent(this,InfinityExtendedBackgroundService.class).setAction(ACTION_DISABLE),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+      b.setContentTitle("Infinity • Extended Background Mode").setContentText("Session continuity enabled. Android may still stop Infinity.").setContentIntent(openPendingIntent(false)).setCategory(Notification.CATEGORY_SERVICE).setOngoing(true).addAction(new Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,"Turn off",disable).build());
+    }
+    if(Build.VERSION.SDK_INT>=31)b.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+    return b.build();
+  }
+  private void promote(Notification n){
+    int type=lease!=null?ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK:ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
+    if(lease!=null&&isEnabled(this))type|=ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
+    if(Build.VERSION.SDK_INT>=29)startForeground(NOTIFICATION_ID,n,type);else startForeground(NOTIFICATION_ID,n);
+    sRunning=true;
+  }
+  private void refreshNotification(){
+    main.removeCallbacks(pausedTimeout);
+    if(lease!=null&&listening!=lease)return; // Pending Activity request is not yet a media session.
+    if(lease==null&&!isEnabled(this)){endSession();return;}
+    try{
+      if(!notificationsAllowed(this))throw new SecurityException("Notification permission revoked");
+      promote(buildNotification());
+      if(lease!=null&&nativeState(lease.player)==PlaybackState.STATE_PAUSED)main.postDelayed(pausedTimeout,60000L);
+    }catch(RuntimeException e){if(lease!=null)terminateMini(true);else endSession();}
+  }
+  private void detach(MiniLease old,boolean pause){
+    main.removeCallbacks(pausedTimeout);
+    if(listening!=null){try{listening.player.removeListener(listener);listening.player.setWakeMode(C.WAKE_MODE_NONE);}catch(RuntimeException ignored){}listening=null;}
+    if(mediaSession!=null){mediaSession.setActive(false);mediaSession.release();mediaSession=null;mediaCallback=null;}
+    if(audio!=null&&hasFocus){if(Build.VERSION.SDK_INT>=26&&focusRequest!=null)audio.abandonAudioFocusRequest(focusRequest);else audio.abandonAudioFocus(focusChange);}hasFocus=false;focusRequest=null;
+    if(old!=null){old.promoted=false;if(pause){try{old.player.pause();}catch(RuntimeException ignored){}old.ended.run();}}
+  }
+  private void terminateMini(boolean pause){MiniLease old=lease;lease=null;++sequence;detach(old,pause);refreshNotification();}
+  private void endSession(){sRunning=false;try{stopForeground(true);}catch(RuntimeException ignored){}stopSelf();}
+  @Override public void onTaskRemoved(Intent root){MiniLease old=lease;lease=null;++sequence;detach(old,true);endSession();super.onTaskRemoved(root);}
+  @Override public void onDestroy(){boolean owner=instance==this;MiniLease old=owner?lease:listening;if(owner){lease=null;++sequence;sRunning=false;instance=null;}detach(old,true);super.onDestroy();}
+  @Override public IBinder onBind(Intent intent){return null;}
+}

@@ -158,7 +158,7 @@ jobs:
       - name: Upload signed TEST CANDIDATE only after every gate
         uses: actions/upload-artifact@v7
         with:
-          name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE
+          name: Cobra-2103163-Candidate14-Five-Fixes-TEST-CANDIDATE
           path: signed163/
           if-no-files-found: error
           compression-level: 0

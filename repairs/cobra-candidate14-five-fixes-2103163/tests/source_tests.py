@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import argparse,hashlib,json
+import argparse,hashlib,json,importlib.util
 ACT=Path('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
 SPLASH=Path('tools/android/packaging/xbmc/src/Splash.java.in')
 SERVICE=Path('tools/android/packaging/xbmc/src/InfinityExtendedBackgroundService.java.in')
@@ -20,6 +20,8 @@ def main():
    actual=sha(a.source/rel);ok=actual==expected;rows.append({'check':'preimage '+rel,'ok':ok,'actual':actual});passed&=ok
  else:
   act=(a.source/ACT).read_text();spl=(a.source/SPLASH).read_text();svc=(a.source/SERVICE).read_text();man=(a.source/MANIFEST).read_text()
+  scene=(a.source/'tools/android/packaging/xbmc/src/CobraVisualScene.java.in').read_text()
+  spec=importlib.util.spec_from_file_location('refine163',Path(__file__).resolve().parents[1]/'refine.py');refine=importlib.util.module_from_spec(spec);spec.loader.exec_module(refine)
   checks={
    'player settings bottom anchored':'playerSettings?Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL' in act,
    'group normalization':'cobraNormalizeProviderGroup' in act and 'MAX_CHANNELS = 50000' in act,
@@ -27,11 +29,13 @@ def main():
    'fullscreen PiP preserved':'if (hasCobraVideo()) enterCobraPictureInPicture();' in act,
    'native media session':'Notification.MediaStyle' in svc and 'FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK' in svc,
    'mini service actions':'MINI_BACKGROUND_START' in svc and 'MINI_BACKGROUND_STOP' in svc,
-   'compact chooser':'compactHeight=heightDp<700' in spl and 'adaptiveCardHeight' in spl and 'availableHeightDp<700' in spl,
+   'compact chooser':'adaptiveCardHeight' in spl and 'minimumScale' in scene and 'if(availableHeightDp<700)' not in spl,
    'file picker modes':'ACTION_GET_CONTENT' in act and 'MiXplorer' in act and 'ACTION_OPEN_DOCUMENT' in act,
    'media playback manifest':'FOREGROUND_SERVICE_MEDIA_PLAYBACK' in man and 'specialUse|mediaPlayback' in man,
    'no native global rotation mutation':'ACCELEROMETER_ROTATION' not in act and 'Settings.System' not in act,
   }
+  checks.update({'exact audited postimage '+name:sha(a.source/'tools/android/packaging/xbmc/src'/name)==digest for name,digest in refine.POST.items()})
+  checks['wake permission']='android.permission.WAKE_LOCK' in man
   for k,v in checks.items():rows.append({'check':k,'ok':bool(v)});passed&=bool(v)
  (a.out/'source-tests.json').write_text(json.dumps({'phase':a.phase,'passed':passed,'checks':rows},indent=2)+'\n')
  if not passed:raise SystemExit('FAIL: source acceptance')
