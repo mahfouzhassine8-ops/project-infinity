@@ -9,7 +9,8 @@ OLD="1.0.9-Cobra-Chooser-Status-Bar-Surface-RC1"
 NEW="1.0.9-Cobra-Fullscreen-Background-Safe-Content-RC1"
 VERSION=2103175
 CERT="d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
-ACT="tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in"\nSPLASH="tools/android/packaging/xbmc/src/Splash.java.in"
+ACT="tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in"
+SPLASH="tools/android/packaging/xbmc/src/Splash.java.in"
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def require(v,msg):
@@ -27,7 +28,8 @@ def upgrade():
 
  run("python3",ROOT/"apply.py","--source","kodi","--receipt",receipt,"--out","audit175/patch")
  patch=json.loads(Path("audit175/patch/patch.json").read_text())
- data["files"][ACT]["after"]=patch["files"][ACT]["after"]\n data["files"][SPLASH]["after"]=patch["files"][SPLASH]["after"]
+ data["files"][ACT]["after"]=patch["files"][ACT]["after"]
+ data["files"][SPLASH]["after"]=patch["files"][SPLASH]["after"]
 
  gradle=Path("kodi/tools/android/packaging/xbmc/build.gradle.in")
  replace(gradle,"versionCode 2103171",f"versionCode {VERSION}")
@@ -50,7 +52,11 @@ def upgrade():
    chooser_status_bar_contrast_enforced=False,
    chooser_status_icon_contrast_from_theme=True,
    chooser_safe_area_transient_zero_stabilized=True,
-   cobra_runtime_activity_unchanged=False,\n   chooser_wallpaper_full_window=True,\n   cobra_menu_wallpaper_full_window=True,\n   foreground_safe_area_only=True,\n   approved_component_sizing_preserved=True,
+   cobra_runtime_activity_unchanged=False,
+   chooser_wallpaper_full_window=True,
+   cobra_menu_wallpaper_full_window=True,
+   foreground_safe_area_only=True,
+   approved_component_sizing_preserved=True,
    native_engine_recompiled=False,
    physical_device_verified=False)
  receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+"\n")
