@@ -42,27 +42,26 @@ def patch_packager_for_protected_base(pack:Path):
     verifier='''def verify_manifest_pair(original: str, compiled: str):
     old,new=manifest_tree(original),manifest_tree(compiled)
     for tree in (old,new):
-        for key in ('android:versionCode','android:versionName'): tree['attrs'].pop(key,None)
-    def validate(tree):
-        names=[n['attrs'].get('android:name','') for n in tree['children'] if n['tag']=='uses-permission']
-        for permission in (
-            'android.permission.FOREGROUND_SERVICE_SPECIAL_USE',
-            'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
-            'android.permission.WAKE_LOCK'):
-            require(sum(permission in name for name in names)==1,'Expected one manifest permission: '+permission)
-        app=next(n for n in tree['children'] if n['tag']=='application')
-        services=[n for n in app['children'] if n['tag']=='service' and
-                  'InfinityExtendedBackgroundService' in n['attrs'].get('android:name','')]
-        require(len(services)==1,'Exactly one background service component required')
-        svc=services[0]
-        require(svc['attrs'].get('android:exported','').endswith('0x0'),'Background service must not be exported')
-        require(svc['attrs'].get('android:foregroundServiceType','').endswith('0x40000002'),
-                'Expected specialUse|mediaPlayback foreground service type')
-        controls=[n for n in app['children'] if n['tag']=='activity' and
-                  'InfinityBackgroundControlActivity' in n['attrs'].get('android:name','')]
-        require(len(controls)==1,'Exactly one Infinity background control Activity required')
-    validate(old);validate(new)
+        for key in ('android:versionCode','android:versionName'):
+            tree['attrs'].pop(key,None)
+
+    # 2103168 is a native-only forward repair over the exact successful 2103167 APK.
+    # Therefore the compiled manifest must be byte-semantically identical to 2103167
+    # after version identity is removed. Do not invent permissions that the protected
+    # baseline does not have (run 1 falsely required WAKE_LOCK and rejected a valid build).
     require(old==new,'Compiled manifest drift from protected 2103167 base outside version identity')
+
+    app=next(n for n in new['children'] if n['tag']=='application')
+    services=[n for n in app['children'] if n['tag']=='service' and
+              'InfinityExtendedBackgroundService' in n['attrs'].get('android:name','')]
+    require(len(services)==1,'Protected 2103167 background service contract missing/duplicated')
+    svc=services[0]
+    require(svc['attrs'].get('android:exported','').endswith('0x0'),
+            'Protected background service must remain non-exported')
+
+    controls=[n for n in app['children'] if n['tag']=='activity' and
+              'InfinityBackgroundControlActivity' in n['attrs'].get('android:name','')]
+    require(len(controls)==1,'Protected Infinity background control Activity missing/duplicated')
 '''
     pack.write_text(s[:start]+verifier+s[end:])
 
