@@ -110,36 +110,49 @@ RESILIENCE_HELPERS=r'''
       return false;
     }
   }
-  private int mCobraTimeshiftRecoveryGeneration=0,mCobraTransientMultiWindowStops=0,mCobraTimeshiftStallGeneration=0,mCobraTimeshiftStallRecoveries=0,mCobraAutoLiveEdgeRecoveries=0,mCobraRebufferBurstRecoveries=0;
-  private long mCobraRebufferBurstWindowStart=0L;
-  private int mCobraRebufferBurstCount=0;
+  static final class CobraTimeshiftStallPolicy {
+    static final long STALL_TRIGGER_MS=6000L;
+    static final long RECOVERY_COOLDOWN_MS=60000L;
+    static final int MAX_AUTO_LIVE_EDGE_ATTEMPTS=2;
+    static final int BURST_COUNT=3;
+    static final long BURST_WINDOW_MS=12000L;
+    static boolean canAutoRecover(int attempts,long lastAttempt,long now){
+      return attempts<MAX_AUTO_LIVE_EDGE_ATTEMPTS&&(lastAttempt==0L||now-lastAttempt>=RECOVERY_COOLDOWN_MS);
+    }
+  }
+
+  private int mCobraTimeshiftRecoveryGeneration=0,mCobraTransientMultiWindowStops=0,mCobraTimeshiftStallGeneration=0,mCobraTimeshiftStallRecoveries=0,mCobraAutoLiveEdgeRecoveries=0,mCobraRebufferBurstObservations=0;
+  private long mCobraRebufferBurstWindowStart=0L,mCobraLastAutoLiveEdgeElapsed=0L;
+  private int mCobraRebufferBurstCount=0,mCobraAutoLiveEdgeAttempts=0;
+  private ExoPlayer mCobraAutoLiveEdgeBudgetPlayer=null;
 
   private void cobraCancelTimeshiftStallCheck(){mCobraTimeshiftStallGeneration++;}
+
+  private boolean cobraCurrentLocalTimeshiftPlayer(ExoPlayer player){
+    return player!=null&&player==mCobraTimeshiftPlayer&&mCobraTimeshiftSession!=null&&(player==mPlayer||player==mCobraPreviewPlayer);
+  }
 
   private void cobraObserveTimeshiftRebufferBurst(ExoPlayer player,Channel channel){
     if(channel==null||!cobraCurrentLocalTimeshiftPlayer(player))return;
     long now=android.os.SystemClock.elapsedRealtime();
-    if(mCobraRebufferBurstWindowStart==0L||now-mCobraRebufferBurstWindowStart>12000L){mCobraRebufferBurstWindowStart=now;mCobraRebufferBurstCount=1;}
-    else mCobraRebufferBurstCount++;
-    if(mCobraRebufferBurstCount<3)return;
-    mCobraRebufferBurstWindowStart=0L;mCobraRebufferBurstCount=0;mCobraRebufferBurstRecoveries++;
-    final CobraLocalTimeshiftSession session=mCobraTimeshiftSession;
-    InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst","count="+mCobraRebufferBurstRecoveries+"; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; "+(session==null?"no-session":session.diagnostic()));
-    try{
-      if(session!=null){
-        mCobraAutoLiveEdgeRecoveries++;
-        player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_live_edge="+mCobraAutoLiveEdgeRecoveries));
-        cobraPrepareObserved(player,"timeshift-live-edge-recovery");startCobraPlayer(player);
-        cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
-        InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst-live-edge","fresh-playlist; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
-        return;
-      }
-    }catch(RuntimeException liveEdgeFailure){InfinityCobraDiagnostics.failure(this,"timeshift-rebuffer-burst-live-edge",liveEdgeFailure);}
-    if(session!=null)cobraRecoverTimeshiftStallDeep(player,channel,session,session.latestSequence(),mCobraTimeshiftStallGeneration,player==mPlayer?"fullscreen":"preview");
+    if(mCobraRebufferBurstWindowStart==0L||now-mCobraRebufferBurstWindowStart>CobraTimeshiftStallPolicy.BURST_WINDOW_MS){
+      mCobraRebufferBurstWindowStart=now;mCobraRebufferBurstCount=1;
+    }else mCobraRebufferBurstCount++;
+    if(mCobraRebufferBurstCount<CobraTimeshiftStallPolicy.BURST_COUNT)return;
+    mCobraRebufferBurstWindowStart=0L;mCobraRebufferBurstCount=0;mCobraRebufferBurstObservations++;
+    CobraLocalTimeshiftSession session=mCobraTimeshiftSession;
+    InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst-observed",
+        "count="+mCobraRebufferBurstObservations+"; no_restart=true; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; "+(session==null?"no-session":session.diagnostic()));
   }
 
-  private boolean cobraCurrentLocalTimeshiftPlayer(ExoPlayer player){
-    return player!=null&&player==mCobraTimeshiftPlayer&&mCobraTimeshiftSession!=null&&(player==mPlayer||player==mCobraPreviewPlayer);
+  private boolean cobraPermitAutoLiveEdge(ExoPlayer player){
+    long now=android.os.SystemClock.elapsedRealtime();
+    if(player!=mCobraAutoLiveEdgeBudgetPlayer){
+      mCobraAutoLiveEdgeBudgetPlayer=player;mCobraAutoLiveEdgeAttempts=0;mCobraLastAutoLiveEdgeElapsed=0L;
+    }
+    if(!CobraTimeshiftStallPolicy.canAutoRecover(mCobraAutoLiveEdgeAttempts,mCobraLastAutoLiveEdgeElapsed,now))return false;
+    // Consume the attempt before the external seek, matching the earlier bounded recovery audit.
+    mCobraAutoLiveEdgeAttempts++;mCobraLastAutoLiveEdgeElapsed=now;return true;
   }
 
   private void cobraScheduleTimeshiftStallCheck(ExoPlayer player,Channel channel){
@@ -149,54 +162,42 @@ RESILIENCE_HELPERS=r'''
       if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
       if(!player.getPlayWhenReady()||player.getPlaybackState()!=Player.STATE_BUFFERING)return;
       cobraRecoverTimeshiftStall(player,channel,session,startSeq,generation);
-    },6000L);
+    },CobraTimeshiftStallPolicy.STALL_TRIGGER_MS);
   }
 
   private void cobraRecoverTimeshiftStall(ExoPlayer player,Channel channel,CobraLocalTimeshiftSession session,long startSeq,int generation){
     if(player==null||channel==null||session==null)return;
     final String surface=player==mPlayer?"fullscreen":"preview";
-    InfinityCobraDiagnostics.record(this,"timeshift","stall-detected",surface+"; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; tail="+startSeq+"; "+session.diagnostic());
+    InfinityCobraDiagnostics.record(this,"timeshift","stall-detected",
+        surface+"; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; tail="+startSeq+"; "+session.diagnostic());
 
-    // Device evidence: a manual LIVE press immediately recovers this exact state while
-    // the local 120s cache remains healthy. Do that first, on the same player/cache.
+    // Cross-check against the passed playback audits: do not re-prepare, replace the media item,
+    // or restart loading merely because Media3 reports BUFFERING. The only automatic action here
+    // is the exact same-player live-edge seek that the user's manual LIVE press proved effective.
+    if(!cobraPermitAutoLiveEdge(player)){
+      InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge-suppressed",
+          surface+"; attempts="+mCobraAutoLiveEdgeAttempts+"; cooldown_ms="+CobraTimeshiftStallPolicy.RECOVERY_COOLDOWN_MS);
+      return;
+    }
     try{
+      if(!player.isCurrentMediaItemSeekable()){
+        InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge-unavailable",surface+"; seekable=false");
+        return;
+      }
       mCobraAutoLiveEdgeRecoveries++;
-      player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_live_edge="+mCobraAutoLiveEdgeRecoveries));
-      cobraPrepareObserved(player,"timeshift-live-edge-recovery");startCobraPlayer(player);
-      cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
-      InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge",surface+"; fresh-playlist; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
+      player.seekToDefaultPosition();
+      InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge-seek",
+          surface+"; same_player=true; no_restart=true; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
       mMain.postDelayed(()->{
         if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
-        if(player.getPlayWhenReady()&&player.getPlaybackState()==Player.STATE_BUFFERING)cobraRecoverTimeshiftStallDeep(player,channel,session,startSeq,generation,surface);
+        if(player.getPlayWhenReady()&&player.getPlaybackState()==Player.STATE_BUFFERING){
+          InfinityCobraDiagnostics.record(this,"timeshift","stall-persists-after-live-edge",
+              surface+"; error_path_owns_restart=true; "+session.diagnostic());
+        }
       },2500L);
-      return;
     }catch(RuntimeException liveEdgeFailure){
       InfinityCobraDiagnostics.failure(this,"timeshift-auto-live-edge",liveEdgeFailure);
     }
-    cobraRecoverTimeshiftStallDeep(player,channel,session,startSeq,generation,surface);
-  }
-
-  private void cobraRecoverTimeshiftStallDeep(ExoPlayer player,Channel channel,CobraLocalTimeshiftSession session,long startSeq,int generation,String surface){
-    if(!submitCobraIo(()->{
-      boolean advanced=session.latestSequence()>startSeq||session.awaitSequenceAfter(startSeq,6000L);
-      publishCobraUi(()->{
-        if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
-        if(player.getPlaybackState()!=Player.STATE_BUFFERING||!player.getPlayWhenReady())return;
-        if(advanced){
-          try{
-            mCobraTimeshiftStallRecoveries++;
-            player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_stall="+mCobraTimeshiftStallRecoveries));
-            cobraPrepareObserved(player,surface+"-timeshift-stall-recovery");startCobraPlayer(player);
-            cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
-            InfinityCobraDiagnostics.record(this,"timeshift","stall-recovered",surface+"; "+session.diagnostic());
-            return;
-          }catch(RuntimeException retryFailure){
-            InfinityCobraDiagnostics.failure(this,"timeshift-stall-recovery",retryFailure);
-          }
-        }
-        cobraFallbackFromLocalTimeshift(player,channel,advanced?"stall-prepare-failed":"stall-no-advance");
-      });
-    }))cobraFallbackFromLocalTimeshift(player,channel,"stall-worker-rejected");
   }
 
   private void cobraFallbackFromLocalTimeshift(ExoPlayer failed,Channel failedChannel,String reason){
@@ -396,7 +397,7 @@ def apply(source,receipt_path,out):
     fresh=member(text,'cobraFreshHealthSnapshot')
     fresh=once(fresh,
 '      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("preview_start_count",mCobraPreviewStartCount);',
-'      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("multi_window",Build.VERSION.SDK_INT>=24&&isInMultiWindowMode());root.put("transient_multiwindow_stops",mCobraTransientMultiWindowStops);root.put("timeshift_stall_recoveries",mCobraTimeshiftStallRecoveries);root.put("auto_live_edge_recoveries",mCobraAutoLiveEdgeRecoveries);root.put("rebuffer_burst_recoveries",mCobraRebufferBurstRecoveries);root.put("preview_start_count",mCobraPreviewStartCount);',
+'      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("multi_window",Build.VERSION.SDK_INT>=24&&isInMultiWindowMode());root.put("transient_multiwindow_stops",mCobraTransientMultiWindowStops);root.put("timeshift_stall_recoveries",mCobraTimeshiftStallRecoveries);root.put("auto_live_edge_recoveries",mCobraAutoLiveEdgeRecoveries);root.put("auto_live_edge_attempts",mCobraAutoLiveEdgeAttempts);root.put("rebuffer_burst_observations",mCobraRebufferBurstObservations);root.put("preview_start_count",mCobraPreviewStartCount);',
 'multi-window diagnostic evidence')
     text=replace_member(text,'cobraFreshHealthSnapshot',fresh)
 
@@ -416,9 +417,9 @@ def apply(source,receipt_path,out):
       'finishSegment(true)','bufferingTransitions','rebufferDurationMs','bufferedFor>=750L',
       'CobraWindowLifecyclePolicy','preservePlaybackOnStop','multitask-window-stop',
       'CobraTimeshiftRecoveryPolicy','awaitSequenceAfter','timeshift-source-recovery','source-recovered',
-      'stall-detected','auto-live-edge','stall-recovered','timeshift-stall-recovery','mCobraAutoLiveEdgeRecoveries',
-      'rebuffer-burst','rebuffer-burst-live-edge','mCobraRebufferBurstRecoveries','mCobraRebufferBurstCount<3','12000L',
-      'timeshift-live-edge-recovery','?cobra_live_edge=','fresh-playlist',
+      'CobraTimeshiftStallPolicy','STALL_TRIGGER_MS=6000L','RECOVERY_COOLDOWN_MS=60000L','MAX_AUTO_LIVE_EDGE_ATTEMPTS=2',
+      'rebuffer-burst-observed','no_restart=true','auto-live-edge-seek','same_player=true',
+      'stall-persists-after-live-edge','error_path_owns_restart=true','mCobraAutoLiveEdgeRecoveries',
       'ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer',
       'timeshift-transport-fallback','preview-timeshift-fullscreen','cobra_live_timeshift_seek',
       'preferredDisplayModeId','cobra_last_channel','buffer_observed_no_restart'
@@ -439,9 +440,10 @@ def apply(source,receipt_path,out):
       'partial_segment_preservation':True,'visible_rebuffer_threshold_ms':750,
       'multitask_resize_playback_preserved':True,'timeshift_source_recovery':True,
       'timeshift_recovery_wait_ms':12000,'timeshift_stall_recovery':True,'timeshift_stall_detect_ms':6000,
-      'rebuffer_burst_recovery':True,'rebuffer_burst_count':3,'rebuffer_burst_window_ms':12000,
-      'auto_live_edge_first':True,'auto_live_edge_verify_ms':2500,'monotonic_live_edge_reload':True,
-      'stale_default_seek_removed':True,'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
+      'rebuffer_burst_observation_only':True,'rebuffer_burst_count':3,'rebuffer_burst_window_ms':12000,
+      'auto_live_edge_first':True,'auto_live_edge_verify_ms':2500,'auto_live_edge_max_attempts':2,
+      'auto_live_edge_cooldown_ms':60000,'buffering_media_restart_forbidden':True,
+      'manual_live_seek_equivalent':True,'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
       'physical_device_verified':False
     }
     (out/'patch.json').write_text(json.dumps(report,indent=2)+'\n')
