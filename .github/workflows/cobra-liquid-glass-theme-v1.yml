@@ -1,0 +1,58 @@
+name: Cobra Liquid Glass HM v1
+
+on:
+  push:
+    branches:
+      - cobra-liquid-glass-theme-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-audit-theme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact theme branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove presentation-only delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=0560b18c497e9861864126d96f9b784e488ebe32
+          git cat-file -e "$BASE^{commit}"
+          test "$(git merge-base "$BASE" HEAD)" = "$BASE"
+          bad="$(git diff --name-only "$BASE"..HEAD | grep -vE '^(themes/cobra-liquid-glass-v1/|\.github/workflows/cobra-liquid-glass-theme-v1\.yml$)' || true)"
+          if [ -n "$bad" ]; then
+            echo "Protected/non-theme files changed:"
+            echo "$bad"
+            exit 1
+          fi
+          echo "PASS: no player/native/runtime/provider source changed"
+
+      - name: Build and statically validate visual package
+        run: python3 themes/cobra-liquid-glass-v1/build.py --out dist
+
+      - name: Inspect data-only ZIP contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -l dist/Cobra-Liquid-Glass-HM-v1.0.0.zip
+          count="$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip | wc -l)"
+          test "$count" -eq 1
+          test "$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip)" = "script.infinity.cobra.theme/resources/visual-theme.json"
+          sha256sum -c dist/SHA256SUMS
+
+      - name: Upload installable Cobra theme
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cobra-Liquid-Glass-HM-v1.0.0
+          path: |
+            dist/Cobra-Liquid-Glass-HM-v1.0.0.zip
+            dist/build-report.json
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
