@@ -98,3 +98,5 @@ def main():
  (a.out/"patch.json").write_text(json.dumps(report,indent=2)+"\n")
  print("PASS: chooser-independent emergency theme recovery applied")
 if __name__=="__main__":main()
+
+# reconstruction-pipeline-trigger
