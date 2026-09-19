@@ -1,0 +1,69 @@
+    header.addView(cobraIcon(mPlaying!=null&&mFavorites.contains(mPlaying.id)?"favorite_on":"favorite","Favorite",true,v->{if(mPlaying!=null){toggleFavorite(mPlaying);((CobraIconButton)v).icon(mFavorites.contains(mPlaying.id)?"favorite_on":"favorite");}}),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.10",48)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.11",48))));''','last channel chrome')
+    chrome=once(chrome,
+'''    mCobraPlayerProgramProgress=cobraProgress(true);LinearLayout.LayoutParams progress=new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.31",3)));progress.topMargin=dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.32",8));progress.bottomMargin=dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.33",8));footer.addView(mCobraPlayerProgramProgress,progress);''',
+'''    mCobraPlayerProgramProgress=cobraProgress(true);LinearLayout.LayoutParams progress=new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.31",3)));progress.topMargin=dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.32",8));progress.bottomMargin=dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.33",8));footer.addView(mCobraPlayerProgramProgress,progress);
+    mCobraTimeshiftSeek=new android.widget.SeekBar(this);mCobraTimeshiftSeek.setTag("cobra_live_timeshift_seek");mCobraTimeshiftSeek.setMax(1000);mCobraTimeshiftSeek.setVisibility(View.GONE);mCobraTimeshiftSeek.setContentDescription("Live TV timeshift position");mCobraTimeshiftSeek.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onStartTrackingTouch(android.widget.SeekBar b){mCobraTimeshiftDragging=true;mMain.removeCallbacks(mHideChrome);}public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){if(!user||mPlayer==null)return;long duration=mPlayer.getDuration();if(duration>0&&duration!=C.TIME_UNSET&&mPlayer.isCurrentMediaItemSeekable())mPlayer.seekTo((duration*value)/1000L);}public void onStopTrackingTouch(android.widget.SeekBar b){mCobraTimeshiftDragging=false;showPlayerChromeTemporarily();}});footer.addView(mCobraTimeshiftSeek,new LinearLayout.LayoutParams(-1,dp(28)));''','timeshift scrubber')
+    chrome=once(chrome,'    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();cobraUpdateLiveRewindControls();','    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();cobraUpdateLiveRewindControls();cobraUpdateLastChannelButton();cobraUpdateTimeshiftSeek();')
+    text=replace_member(text,'cobraBuildPlayerChrome',chrome)
+
+    # Final presentation polish: player chrome fades rather than popping in/out.
+    old_hide='''  private final Runnable mHideChrome = () -> {
+    if (mPlayerChrome != null) mPlayerChrome.setVisibility(View.GONE);
+  };'''
+    new_hide='''  private final Runnable mHideChrome = () -> {
+    if(mPlayerChrome!=null&&mPlayerChrome.getVisibility()==View.VISIBLE&&!mCobraTimeshiftDragging){final LinearLayout target=mPlayerChrome;target.animate().cancel();target.animate().alpha(0f).setDuration(150).withEndAction(()->{if(target==mPlayerChrome&&!mCobraTimeshiftDragging)target.setVisibility(View.GONE);}).start();}
+  };'''
+    text=once(text,old_hide,new_hide,'player chrome fade-out')
+    showchrome=member(text,'showPlayerChromeTemporarily')
+    showchrome=once(showchrome,'    mPlayerChrome.setVisibility(View.VISIBLE);mPlayerChrome.setAlpha(1f);scheduleChromeHide();','    mPlayerChrome.animate().cancel();if(mPlayerChrome.getVisibility()!=View.VISIBLE){mPlayerChrome.setAlpha(0f);mPlayerChrome.setVisibility(View.VISIBLE);mPlayerChrome.animate().alpha(1f).setDuration(120).start();}else mPlayerChrome.setAlpha(1f);scheduleChromeHide();','player chrome fade-in')
+    text=replace_member(text,'showPlayerChromeTemporarily',showchrome)
+
+    # Update labels keeps proof overlay and scrub state live.
+    labels=member(text,'cobraUpdatePlaybackLabels')
+    labels=once(labels,'    cobraRefreshProgrammeLabels();','    cobraRefreshProgrammeLabels();cobraUpdateLiveRewindControls();cobraUpdateTimeshiftSeek();cobraUpdatePerformanceOverlay();')
+    text=replace_member(text,'cobraUpdatePlaybackLabels',labels)
+
+    # Record transition count in the binding without changing media ownership.
+    binding=member(text,'CobraPlayerBinding',kind='class')
+    binding=once(binding,'    @Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;','    @Override public void onPlaybackStateChanged(int state) {\n      if(!current())return;\n      if(state==Player.STATE_BUFFERING&&vitals.everReady)vitals.rebufferEvents++;\n      if(state==Player.STATE_READY)vitals.everReady=true;')
+    binding=once(binding,'      if(!current())return;\n      if(player==mPlayer)cobraRequestPlayerOrientation','      if(!current())return;\n      if(player==mCobraTimeshiftPlayer)cobraStopLocalTimeshift("player-error");\n      if(player==mPlayer)cobraRequestPlayerOrientation', 'timeshift player error cleanup')
+    text=replace_member(text,'CobraPlayerBinding',binding,kind='class')
+
+    vitals=member(text,'CobraSessionVitals',kind='class')
+    vitals=once(vitals,'    int loadErrors,bufferRetries;String lastError="",lastRecovery="not_requested",decoder="Not reported";','    int loadErrors,bufferRetries,rebufferEvents,longStalls;boolean everReady=false;String lastError="",lastRecovery="not_requested",decoder="Not reported";')
+    text=replace_member(text,'CobraSessionVitals',vitals,kind='class')
+
+    # Health Center now exposes the evidence needed for buffering/network diagnosis.
+    health=member(text,'cobraRefreshHealthSummary')
+    health=once(health,'    text.append("\\nProvider-wide connection use is not known.");','    text.append("\\nNetwork: ").append(cobraNetworkTransport()).append(" • Display ").append(String.format(Locale.US,"%.2f Hz",mCobraActiveHz)).append(" • ").append(mCobraRefreshStatus);\n    text.append("\\nProvider-wide connection use is not known.");\n    if(mCobraTimeshiftSession!=null)text.append("\\nLocal timeshift: ").append(mCobraTimeshiftSession.diagnostic());')
+    health=once(health,'      text.append("\\nBuffered: ").append(Math.max(0,p.getTotalBufferedDuration())).append(" ms");\n      text.append("\\nLast media load: ").append(s.lastLoadMs<0?"Not observed":s.lastLoadMs+" ms / "+s.lastLoadBytes+" bytes");','      text.append("\\nBuffered ahead: ").append(Math.max(0,p.getTotalBufferedDuration())).append(" ms • rebuffers: ").append(s.rebufferEvents).append(" • long stalls: ").append(s.longStalls);\n      long kbps=CobraFinalFeaturePolicy.throughputKbps(s.lastLoadBytes,s.lastLoadMs);text.append("\\nLast media load: ").append(s.lastLoadMs<0?"Not observed":s.lastLoadMs+" ms / "+s.lastLoadBytes+" bytes").append(kbps<0?"":" • ~"+kbps+" kbps");\n      try{long offset=p.getCurrentLiveOffset();if(offset!=C.TIME_UNSET&&offset>=0)text.append("\\nLive-edge latency: ").append(offset).append(" ms");}catch(RuntimeException ignored){}')
+    health=once(health,'    text.append("\\n\\nFrame counters and surface timestamps do not prove the picture is visually correct. Media-load duration is not a network-speed test.");','    text.append("\\n\\nThroughput is derived from the most recent Media3 load, not a speed test. VPN/network transport is Android-reported active routing. Buffer reserve can hide short stalls but cannot fix a sustained provider outage.");')
+    text=replace_member(text,'cobraRefreshHealthSummary',health)
+
+    session_health=member(text,'cobraAddSessionHealth')
+    session_health=once(session_health,'      row.put("last_media_load_ms",s.lastLoadMs);row.put("last_media_load_bytes",s.lastLoadBytes);row.put("media_load_errors",s.loadErrors);','      row.put("last_media_load_ms",s.lastLoadMs);row.put("last_media_load_bytes",s.lastLoadBytes);row.put("last_media_load_kbps",CobraFinalFeaturePolicy.throughputKbps(s.lastLoadBytes,s.lastLoadMs));row.put("media_load_errors",s.loadErrors);row.put("rebuffer_events",s.rebufferEvents);row.put("long_stalls",s.longStalls);')
+    session_health=once(session_health,'    root.put("session_health",sessions);root.put("surface_recovery_limit",2);','    root.put("session_health",sessions);root.put("network_transport",cobraNetworkTransport());root.put("display_requested_hz",mCobraRequestedHz);root.put("display_active_hz",mCobraActiveHz);root.put("display_max_hz",mCobraMaxHz);root.put("display_status",mCobraRefreshStatus);if(mCobraTimeshiftSession!=null){root.put("timeshift_state",mCobraTimeshiftSession.shortState());root.put("timeshift_window_ms",mCobraTimeshiftSession.windowDurationMs());root.put("timeshift_disk_bytes",mCobraTimeshiftSession.diskBytes());root.put("timeshift_provider_kbps",mCobraTimeshiftSession.ingestKbps());root.put("timeshift_reconnects",mCobraTimeshiftSession.reconnects());root.put("timeshift_network_stall_ms",mCobraTimeshiftSession.stallMs());}root.put("surface_recovery_limit",2);')
+    text=replace_member(text,'cobraAddSessionHealth',session_health)
+
+    # Lifecycle owns display proof and local cache cleanup.
+    resume=member(text,'onResume')
+    resume=once(resume,'    mCobraRotationResumed=true;cobraApplyPlayerRotation("resume");','    mCobraRotationResumed=true;cobraApplyPlayerRotation("resume");cobraApplyDisplayPerformance("resume");cobraSyncPerformanceOverlay();')
+    text=replace_member(text,'onResume',resume)
+    destroy=member(text,'onDestroy')
+    destroy=once(destroy,'    stopCobraPreview();releaseSinglePlayer();releaseMulti();releaseCobraTransferPlayer();','    stopCobraPreview();releaseSinglePlayer();releaseMulti();releaseCobraTransferPlayer();cobraStopLocalTimeshift("destroy");cobraStopPerformanceOverlay();cobraClearRefreshRequest();')
+    text=replace_member(text,'onDestroy',destroy)
+    config=member(text,'onConfigurationChanged')
+    config=once(config,'      mMain.post(this::cobraApplySystemBarsForSurface);','      mMain.post(this::cobraApplySystemBarsForSurface);cobraApplyDisplayPerformance("configuration");cobraSyncPerformanceOverlay();')
+    text=replace_member(text,'onConfigurationChanged',config)
+    focus=member(text,'onWindowFocusChanged')
+    focus=once(focus,'      mMain.post(this::cobraApplySystemBarsForSurface);','      mMain.post(this::cobraApplySystemBarsForSurface);cobraApplyDisplayPerformance("focus");')
+    text=replace_member(text,'onWindowFocusChanged',focus)
+    pip=member(text,'onPictureInPictureModeChanged')
+    # Append before closing brace safely.
+    i=pip.rfind('}'); pip=pip[:i]+'  cobraApplyDisplayPerformance("pip");cobraSyncPerformanceOverlay();\n'+pip[i:]
+    text=replace_member(text,'onPictureInPictureModeChanged',pip)
+
+    # Visible D-pad/remote shortcut for Last Channel where Android exposes the key.
+    dispatch=member(text,'dispatchKeyEvent')
+    dispatch=once(dispatch,'  @Override public boolean dispatchKeyEvent(KeyEvent event) {','  @Override public boolean dispatchKeyEvent(KeyEvent event) {\n    if(event.getAction()==KeyEvent.ACTION_DOWN&&event.getKeyCode()==KeyEvent.KEYCODE_LAST_CHANNEL&&mPlayerOverlay!=null&&!mCobraPlayerLocked){cobraTuneLastChannel();return true;}')
+    text=replace_member(text,'dispatchKeyEvent',dispatch)
