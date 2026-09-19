@@ -333,21 +333,21 @@ jobs:
           # Every other inherited 2103178/2103179 gate stays intact.
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('repair182-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103178TimeshiftMiniPlayerTest.java')
+          p=Path('repair183-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103178TimeshiftMiniPlayerTest.java')
           t=p.read_text()
           old='#EXT-X-START:TIME-OFFSET=-6.0,PRECISE=NO\\n'
           new='#EXT-X-START:TIME-OFFSET=-15.0,PRECISE=NO\\n'
           if t.count(old)!=1: raise SystemExit(f'2103178 live-reserve test anchor drift: {t.count(old)}')
           p.write_text(t.replace(old,new,1))
 
-          p=Path('repair182-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103179BufferResilienceTest.java')
+          p=Path('repair183-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103179BufferResilienceTest.java')
           t=p.read_text()
           old='#EXT-X-START:TIME-OFFSET=-9.0,PRECISE=NO\\n'
           new='#EXT-X-START:TIME-OFFSET=-15.0,PRECISE=NO\\n'
           if t.count(old)!=1: raise SystemExit('2103179 live-reserve anchor drift')
           p.write_text(t.replace(old,new,1))
 
-          p=Path('repair182-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103180PlaybackFinalizationTest.java')
+          p=Path('repair183-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103180PlaybackFinalizationTest.java')
           t=p.read_text()
           old='assertEquals(15000,InfinityLiveActivity.CobraTimeshiftTransportPolicy.READ_TIMEOUT_MS);'
           new='assertEquals(5000,InfinityLiveActivity.CobraTimeshiftTransportPolicy.READ_TIMEOUT_MS);'
