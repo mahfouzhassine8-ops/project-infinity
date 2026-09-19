@@ -27,9 +27,10 @@ def upgrade():
  pack=Path('scripts/package_background_resume.py');s=pack.read_text();needle='Infinity-'+OLD;require(s.count(needle)>=2,'2103183 packager identity drift');pack.write_text(s.replace(needle,'Infinity-'+NEW))
  data['files'][GRADLE]['after']=sha(gradle)
  data.update(version_code=VERSION,version_name=NEW,source_parent=2103183,source_parent_locked=True,locked_parent_commit=BASE_COMMIT,candidate_locked=False,
-   stream_fingerprint_schema=1,seamless_live_proxy=True,single_provider_ingest_for_live_and_rewind=True,rewind_hls_on_demand=True,
+   stream_fingerprint_schema=2,seamless_live_proxy=True,single_provider_ingest_for_live_and_rewind=True,live_proxy_nonblocking_fanout=True,
+   rewind_hls_on_demand=True,rewind_off_seamless_retune=True,transport_timestamp_fingerprint=['PCR','PTS'],
    happy_eyeballs_style_auto=True,happy_delay_ms=250,route_memory_ms=300000,direct_player_family_control=True,timeshift_family_control=True,
-   media3_okhttp_version='1.7.1',manual_ipv4_ipv6_preserved=True,provider_network_modes=['AUTO','IPV4_ONLY','IPV6_ONLY'],
+   external_literal_family_enforced=True,media3_okhttp_version='1.7.1',manual_ipv4_ipv6_preserved=True,provider_network_modes=['AUTO','IPV4_ONLY','IPV6_ONLY'],
    does_not_change_device_apn=True,does_not_change_wifi_or_other_apps=True,does_not_create_vpn_or_proxy=True,
    unified_blue_timeline_preserved=True,phone_call_video_continuity_preserved=True,pro_buffer_safeguards_preserved=True,
    native_engine_recompiled=False,theme_zip_changed=False,physical_device_verified=False)
@@ -50,13 +51,14 @@ def verify():
   protected={n for n in old.namelist() if n.startswith(('assets/','res/')) or n=='resources.arsc'};require(protected=={n for n in new.namelist() if n.startswith(('assets/','res/')) or n=='resources.arsc'},'Protected resource inventory changed')
   for n in protected:require(old.read(n)==new.read(n),'Protected resource changed: '+n)
   dex=b''.join(new.read(n) for n in new.namelist() if re.fullmatch(r'classes\d*\.dex',n))
-  for token in (b'Automatic (IPv4 + IPv6)',b'IPv4 only',b'IPv6 only',b'CobraHappyEyeballs',b'live.ts',b'timeshift-enter-on-demand',b'stream_fingerprint_schema',b'timeshift_ts_continuity_errors',b'network_connected_family',b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart'):require(token in dex,'Combined 2103184 contract missing: '+repr(token))
+  for token in (b'Automatic (IPv4 + IPv6)',b'IPv4 only',b'IPv6 only',b'CobraHappyEyeballs',b'live.ts',b'timeshift-enter-on-demand',b'stream_fingerprint_schema',b'timeshift_ts_continuity_errors',b'timeshift_pcr_backwards',b'timeshift_pts_backwards',b'liveProxyQueueDrops',b'network_connected_family',b'network_scope',b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart'):require(token in dex,'Combined 2103184 contract missing: '+repr(token))
   require(b'Cobra2103184StreamNetworkOptimizationTest' not in dex,'2103184 test code packaged in release APK')
  badging=Path('signed184/badging.txt').read_text();require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103184'" in badging,'Final APK not forward-installable')
  result={'build':VERSION,'base_build':2103183,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
-   'native_entries':len(old_native),'protected_resource_entries':len(protected),'stream_fingerprint_schema':1,'seamless_live_proxy':True,
-   'single_provider_ingest_for_live_and_rewind':True,'rewind_hls_on_demand':True,'happy_eyeballs_style_auto':True,'happy_delay_ms':250,
-   'route_memory_ms':300000,'direct_player_family_control':True,'timeshift_family_control':True,'media3_okhttp_version':'1.7.1',
+   'native_entries':len(old_native),'protected_resource_entries':len(protected),'stream_fingerprint_schema':2,'seamless_live_proxy':True,
+   'single_provider_ingest_for_live_and_rewind':True,'live_proxy_nonblocking_fanout':True,'rewind_hls_on_demand':True,'rewind_off_seamless_retune':True,
+   'transport_timestamp_fingerprint':['PCR','PTS'],'happy_eyeballs_style_auto':True,'happy_delay_ms':250,
+   'route_memory_ms':300000,'direct_player_family_control':True,'timeshift_family_control':True,'external_literal_family_enforced':True,'media3_okhttp_version':'1.7.1',
    'manual_ipv4_ipv6_preserved':True,'unified_blue_timeline_preserved':True,'phone_call_video_continuity_preserved':True,
    'pro_buffer_safeguards_preserved':True,'native_engine_recompiled':False,'theme_zip_changed':False,'physical_device_verified':False}
  Path('audit184/final-verification.json').write_text(json.dumps(result,indent=2)+'\n');print('PASS: signed 2103184 preserves exact 2103183 native/resources/signer')
@@ -71,8 +73,9 @@ def deliver():
  total=inherited+targeted;require(total==192,f'Expected 192 Android tests, got {total}')
  source=json.loads(Path('audit184/source-audit/source-audit.json').read_text());final=json.loads(Path('audit184/final-verification.json').read_text());require(source.get('passed') and not source.get('failed'),'2103184 source audit failed')
  result={'build':VERSION,'locked_parent':2103183,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_stream_network_tests':7,
-   'stream_fingerprint_schema':1,'seamless_live_proxy':True,'single_provider_ingest_for_live_and_rewind':True,'rewind_hls_on_demand':True,
-   'happy_eyeballs_style_auto':True,'manual_ipv4_ipv6_preserved':True,'direct_player_family_control':True,'timeshift_family_control':True,
+   'stream_fingerprint_schema':2,'seamless_live_proxy':True,'single_provider_ingest_for_live_and_rewind':True,'live_proxy_nonblocking_fanout':True,
+   'rewind_hls_on_demand':True,'rewind_off_seamless_retune':True,'transport_timestamp_fingerprint':['PCR','PTS'],
+   'happy_eyeballs_style_auto':True,'manual_ipv4_ipv6_preserved':True,'direct_player_family_control':True,'timeshift_family_control':True,'external_literal_family_enforced':True,
    'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],'physical_device_verified':False,'candidate_locked':False,
    'status':'TEST CANDIDATE - compare good/problem Nicktoons startup, direct playback, rewind, IPv4/IPv6/Automatic, then export diagnostics'}
  Path('signed184/ACCEPTANCE.json').write_text(json.dumps(result,indent=2)+'\n');shutil.copy2('audit184/final-verification.json','signed184/2103184-verification.json');shutil.copy2('audit184/source-audit/source-audit.json','signed184/2103184-source-audit.json');print('PASS:',total,'Android tests + 2103184 stream/network gates')
