@@ -1,0 +1,583 @@
+{
+  "schema": 2,
+  "scope": "cobra-presentation",
+  "minimum_runtime": 2,
+  "minimum_build": 2103160,
+  "id": "cobra.liquid-glass.hm.v1",
+  "name": "Cobra Liquid Glass · HM",
+  "assets": {},
+  "base": {
+    "colors": {
+      "palette.background": "#FF080D16",
+      "palette.rail": "#CC111A28",
+      "palette.panel": "#B31A2638",
+      "palette.panel2": "#991F2E43",
+      "palette.text": "#FFF7FAFF",
+      "palette.muted": "#FF9EACBF",
+      "palette.accent": "#FF4CBFFF",
+      "palette.accent_soft": "#334CBFFF",
+      "palette.line": "#52FFFFFF",
+      "palette.focus": "#FF78CCFF",
+      "chooser.palette.background": "#FF080D16",
+      "chooser.palette.background_glow": "#FF102A46",
+      "chooser.palette.text": "#FFF7FAFF",
+      "chooser.palette.muted": "#FF9EACBF",
+      "chooser.palette.infinity_top": "#E6111B2A",
+      "chooser.palette.infinity_bottom": "#C9142032",
+      "chooser.palette.infinity_border": "#70FFFFFF",
+      "chooser.palette.infinity_glow": "#554CBFFF",
+      "chooser.palette.cobra_top": "#E60B2741",
+      "chooser.palette.cobra_bottom": "#C90B1D31",
+      "chooser.palette.cobra_border": "#996ED0FF",
+      "chooser.palette.cobra_glow": "#664CBFFF",
+      "chooser.palette.badge_fill": "#B31B2A3F",
+      "chooser.palette.badge_border": "#70FFFFFF",
+      "chooser.palette.horizon": "#334CBFFF"
+    },
+    "numbers": {
+      "chooser.layout.motion_ms": 220
+    },
+    "copy": {
+      "chooser.label.brand": "INFINITY",
+      "chooser.label.brand_tagline": "LIQUID GLASS",
+      "chooser.label.title": "CHOOSE YOUR EXPERIENCE",
+      "chooser.label.personalization": "Personalized for HM",
+      "chooser.label.infinity_title": "INFINITY",
+      "chooser.label.infinity_subtitle": "Your media, refined",
+      "chooser.label.cobra_title": "COBRA",
+      "chooser.label.cobra_subtitle": "Fluid playback. Focused control.",
+      "chooser.label.footer_brand": "INFINITY × COBRA",
+      "chooser.label.footer_tagline": "HM",
+      "chooser.label.initials": "HM"
+    },
+    "styles": {
+      "font.all": {
+        "font_family": "sans-serif",
+        "font_style": 0
+      },
+      "all.panel": {
+        "fill": "#B31A2638",
+        "fill_end": "#8F101A29",
+        "stroke": "#52FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 26,
+        "elevation_dp": 6
+      },
+      "all.text": {
+        "text": "#FFF7FAFF",
+        "font_family": "sans-serif",
+        "letter_spacing": 0.01
+      },
+      "all.button": {
+        "fill": "#8F22324A",
+        "fill_end": "#66203046",
+        "stroke": "#52FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22,
+        "text": "#FFF7FAFF",
+        "focus": "#FF78CCFF",
+        "pressed": "#B34CBFFF",
+        "selected": "#994CBFFF",
+        "elevation_dp": 4,
+        "min_height_dp": 48
+      },
+      "all.input": {
+        "fill": "#80141F2F",
+        "fill_end": "#66101A29",
+        "stroke": "#52FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "text": "#FFF7FAFF",
+        "focus": "#FF78CCFF",
+        "min_height_dp": 48
+      },
+      "screen": {
+        "fill": "#FF080D16",
+        "fill_end": "#FF0B1320"
+      },
+      "screen.header": {
+        "fill": "#B3182536",
+        "fill_end": "#8F111B2A",
+        "stroke": "#3DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 24,
+        "elevation_dp": 5
+      },
+      "screen.status": {
+        "fill": "#8F111B2A",
+        "fill_end": "#66111B2A",
+        "stroke": "#33FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 18
+      },
+      "rail": {
+        "fill": "#CC111A28",
+        "fill_end": "#A60B121D",
+        "stroke": "#3DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28,
+        "elevation_dp": 7
+      },
+      "drawer.panel": {
+        "fill": "#E6172233",
+        "fill_end": "#C9101927",
+        "stroke": "#66FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 30,
+        "elevation_dp": 10
+      },
+      "drawer.header": {
+        "fill": "#661E3048",
+        "fill_end": "#40152234",
+        "stroke": "#33FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 24
+      },
+      "drawer.items": {
+        "fill": "#33172638",
+        "fill_end": "#1A172638",
+        "radius_dp": 24
+      },
+      "drawer.power": {
+        "fill": "#6619273B",
+        "fill_end": "#40111B2A",
+        "stroke": "#3DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "drawer.item.search": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.tv": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.movies": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.shows": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.recordings": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.my_list": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.settings": {
+        "fill": "#401B2A40",
+        "fill_end": "#26152235",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#664CBFFF"
+      },
+      "drawer.item.view": {
+        "fill": "#4D183451",
+        "fill_end": "#33172A40",
+        "stroke": "#4D78CCFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF"
+      },
+      "settings": {
+        "fill": "#CC152132",
+        "fill_end": "#A60D1623",
+        "stroke": "#52FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28,
+        "elevation_dp": 8
+      },
+      "sheet.row": {
+        "fill": "#661C2B40",
+        "fill_end": "#40152234",
+        "stroke": "#33FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF"
+      },
+      "sheet.detail": {
+        "fill": "#4D17263A",
+        "fill_end": "#26152234",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "dialog.panel": {
+        "fill": "#F2182334",
+        "fill_end": "#E60E1723",
+        "stroke": "#70FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28,
+        "elevation_dp": 10
+      },
+      "dialog.button": {
+        "fill": "#661F324C",
+        "fill_end": "#40192940",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 18,
+        "text": "#FFF7FAFF",
+        "focus": "#FF78CCFF",
+        "pressed": "#994CBFFF"
+      },
+      "guide.shell": {
+        "fill": "#99131F30",
+        "fill_end": "#80101A29",
+        "stroke": "#3DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28
+      },
+      "guide.directory": {
+        "fill": "#A61A283C",
+        "fill_end": "#80121D2C",
+        "stroke": "#3DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "guide.details": {
+        "fill": "#8F17263A",
+        "fill_end": "#66111B2A",
+        "stroke": "#33FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "guide.browser": {
+        "fill": "#80111B2A",
+        "fill_end": "#66101A28",
+        "stroke": "#26FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 24
+      },
+      "player.chrome": {
+        "fill": "#A60D1623",
+        "fill_end": "#80111E30",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 26,
+        "elevation_dp": 8
+      },
+      "player.channels": {
+        "fill": "#CC111B2A",
+        "fill_end": "#A60D1623",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 26,
+        "elevation_dp": 8
+      },
+      "chooser": {
+        "fill": "#330E1827",
+        "fill_end": "#1A10243B"
+      },
+      "chooser.card.infinity": {
+        "fill": "#B31A2638",
+        "fill_end": "#8F132033",
+        "stroke": "#70FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 30,
+        "focus": "#FF78CCFF",
+        "pressed": "#995AAEFF",
+        "elevation_dp": 8
+      },
+      "chooser.card.cobra": {
+        "fill": "#B30D2A45",
+        "fill_end": "#8F0B1F35",
+        "stroke": "#9978CCFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 30,
+        "focus": "#FF9ADFFF",
+        "pressed": "#9957C7FF",
+        "elevation_dp": 9
+      }
+    }
+  },
+  "variants": {
+    "light": {
+      "colors": {
+        "palette.background": "#FFF2F6FB",
+        "palette.rail": "#D9FFFFFF",
+        "palette.panel": "#CCFFFFFF",
+        "palette.panel2": "#B3F7FBFF",
+        "palette.text": "#FF122033",
+        "palette.muted": "#FF5C6C80",
+        "palette.accent": "#FF1677C8",
+        "palette.accent_soft": "#331677C8",
+        "palette.line": "#4D2B3E55",
+        "palette.focus": "#FF168DE2"
+      },
+      "styles": {
+        "all.panel": {
+          "fill": "#D9FFFFFF",
+          "fill_end": "#B3F1F7FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 5
+        },
+        "all.text": {
+          "text": "#FF122033",
+          "font_family": "sans-serif",
+          "letter_spacing": 0.01
+        },
+        "all.button": {
+          "fill": "#B3FFFFFF",
+          "fill_end": "#99EDF5FC",
+          "stroke": "#59374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 22,
+          "text": "#FF122033",
+          "focus": "#FF168DE2",
+          "pressed": "#B342A9F5",
+          "selected": "#8042A9F5",
+          "elevation_dp": 4,
+          "min_height_dp": 48
+        },
+        "screen": {
+          "fill": "#FFF2F6FB",
+          "fill_end": "#FFE8F0F8"
+        },
+        "rail": {
+          "fill": "#E6FFFFFF",
+          "fill_end": "#CCECF3F9",
+          "stroke": "#4D374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 6
+        },
+        "drawer.panel": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#D9EDF4FA",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "elevation_dp": 8
+        },
+        "settings": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#D9EDF4FA",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 7
+        },
+        "player.chrome": {
+          "fill": "#D9FFFFFF",
+          "fill_end": "#B3E9F2FA",
+          "stroke": "#59374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 7
+        },
+        "chooser.card.infinity": {
+          "fill": "#E6FFFFFF",
+          "fill_end": "#B3EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF168DE2",
+          "pressed": "#B342A9F5",
+          "elevation_dp": 7
+        },
+        "chooser.card.cobra": {
+          "fill": "#D9EAF7FF",
+          "fill_end": "#B3DDEEFF",
+          "stroke": "#80168DE2",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF168DE2",
+          "pressed": "#B342A9F5",
+          "elevation_dp": 8
+        }
+      }
+    },
+    "dark": {
+      "styles": {
+        "all.panel": {
+          "fill": "#B31A2638",
+          "fill_end": "#8F101A29",
+          "stroke": "#52FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 6
+        }
+      }
+    },
+    "oled": {
+      "colors": {
+        "palette.background": "#FF000000",
+        "palette.rail": "#CC080A0E",
+        "palette.panel": "#B30A0D12",
+        "palette.panel2": "#990D1118",
+        "palette.text": "#FFFFFFFF",
+        "palette.muted": "#FFA2ADBA",
+        "palette.accent": "#FF46C3FF",
+        "palette.accent_soft": "#3346C3FF",
+        "palette.line": "#52FFFFFF",
+        "palette.focus": "#FF78D7FF"
+      },
+      "styles": {
+        "screen": {
+          "fill": "#FF000000",
+          "fill_end": "#FF000000"
+        },
+        "all.panel": {
+          "fill": "#B30A0D12",
+          "fill_end": "#8F05070A",
+          "stroke": "#52FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 4
+        },
+        "rail": {
+          "fill": "#D9080A0E",
+          "fill_end": "#BF030405",
+          "stroke": "#3DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 4
+        },
+        "drawer.panel": {
+          "fill": "#F20A0D12",
+          "fill_end": "#E605070A",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "elevation_dp": 6
+        },
+        "settings": {
+          "fill": "#F20A0D12",
+          "fill_end": "#E605070A",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 6
+        },
+        "player.chrome": {
+          "fill": "#D90A0D12",
+          "fill_end": "#B305070A",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 5
+        },
+        "chooser.card.infinity": {
+          "fill": "#D90A0D12",
+          "fill_end": "#B305070A",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF78D7FF",
+          "pressed": "#9946C3FF",
+          "elevation_dp": 5
+        },
+        "chooser.card.cobra": {
+          "fill": "#D9071621",
+          "fill_end": "#B3040D14",
+          "stroke": "#9946C3FF",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF9AE4FF",
+          "pressed": "#9946C3FF",
+          "elevation_dp": 6
+        }
+      }
+    },
+    "cover": {
+      "styles": {
+        "all.panel": {
+          "radius_dp": 20
+        },
+        "all.button": {
+          "radius_dp": 18,
+          "min_height_dp": 48
+        },
+        "drawer.panel": {
+          "radius_dp": 22
+        },
+        "player.chrome": {
+          "radius_dp": 20
+        },
+        "chooser.card.infinity": {
+          "radius_dp": 22
+        },
+        "chooser.card.cobra": {
+          "radius_dp": 22
+        }
+      }
+    },
+    "tablet": {
+      "styles": {
+        "all.panel": {
+          "radius_dp": 30
+        },
+        "drawer.panel": {
+          "radius_dp": 34
+        },
+        "settings": {
+          "radius_dp": 32
+        },
+        "player.chrome": {
+          "radius_dp": 30
+        },
+        "chooser.card.infinity": {
+          "radius_dp": 34
+        },
+        "chooser.card.cobra": {
+          "radius_dp": 34
+        }
+      }
+    },
+    "tv": {
+      "styles": {
+        "all.button": {
+          "min_height_dp": 56,
+          "radius_dp": 20,
+          "focus": "#FF9ADFFF"
+        },
+        "drawer.item.tv": {
+          "focus": "#FF9ADFFF",
+          "stroke_width_dp": 2
+        },
+        "player.channels": {
+          "stroke_width_dp": 2
+        }
+      }
+    }
+  }
+}
