@@ -48,6 +48,7 @@ def upgrade():
    live_reserve_seconds=9,provider_connect_timeout_ms=7000,provider_read_timeout_ms=5000,
    reconnect_backoff_initial_ms=250,reconnect_backoff_max_ms=1500,
    partial_segment_preservation=True,visible_rebuffer_threshold_ms=750,
+   multitask_resize_playback_preserved=True,timeshift_source_recovery=True,timeshift_recovery_wait_ms=12000,
    rewind_contract_preserved=True,timeshift_transport_repaired=True,
    mini_preview_same_player_handoff=True,display_performance_preserved=True,
    provider_catchup_preserved=True,last_channel_preserved=True,
@@ -87,6 +88,7 @@ def verify():
   dex=b"".join(new.read(n) for n in new.namelist() if re.fullmatch(r"classes\d*\.dex",n))
   for token in (
     b"CobraTimeshiftTransportPolicy",b"TIME-OFFSET=-9.0",b"buffering_transitions",b"rebuffer_duration_ms",
+    b"multitask-window-stop",b"timeshift-source-recovery",b"source-recovered",
     b"mini_preview_direct",b"timeshift_http_failures",b"preview-timeshift-fullscreen",
     b"timeshift-transport-fallback",b"Capture diagnostics",b"preview_timeshift_starts",
     b"surface_attach_calls",b"last_prepare_reason",b"cobra_display_performance",
@@ -109,7 +111,8 @@ def verify():
   "rewind_contract_preserved":True,"live_reserve_seconds":9,
   "partial_segment_preservation":True,"provider_connect_timeout_ms":7000,
   "provider_read_timeout_ms":5000,"reconnect_backoff_max_ms":1500,
-  "visible_rebuffer_threshold_ms":750,"physical_device_verified":False}
+  "visible_rebuffer_threshold_ms":750,"multitask_resize_playback_preserved":True,
+  "timeshift_source_recovery":True,"timeshift_recovery_wait_ms":12000,"physical_device_verified":False}
  Path("audit179/final-verification.json").write_text(json.dumps(result,indent=2)+"\n")
  print("PASS: signed 2103179 preserves exact 2103178 native/resources/signer and rewind contract")
 
@@ -135,18 +138,19 @@ def deliver():
   ("Cobra2103170StatusBarRestoreSupersessionTest",5),("Cobra2103170StatusBarEdgeTest",7),
   ("Cobra2103175FullscreenBackgroundTest",12),("Cobra2103176LiveRewindTest",5),
   ("Cobra2103177FinalFeatureFreezeTest",10),("Cobra2103178TimeshiftMiniPlayerTest",10),
-  ("Cobra2103179BufferResilienceTest",7)]:
+  ("Cobra2103179BufferResilienceTest",10)]:
   targeted+=suite(Path("audit179/targeted/test-results")/("TEST-com.projectinfinity.kodi."+name+".xml"),count)
  total=inherited+targeted
- require(total==157,f"Expected 157 Android tests, got {total}")
+ require(total==160,f"Expected 160 Android tests, got {total}")
  source=json.loads(Path("audit179/source-audit/source-audit.json").read_text())
  final=json.loads(Path("audit179/final-verification.json").read_text())
  require(source.get("passed") and not source.get("failed"),"2103179 source audit failed")
  result={
   "build":VERSION,"locked_parent":2103178,"locked_parent_commit":BASE_COMMIT,
-  "android_tests":total,"new_buffer_resilience_tests":7,
+  "android_tests":total,"new_buffer_resilience_tests":10,
   "rewind_contract_preserved":True,"live_reserve_seconds":9,
-  "partial_segment_preservation":True,"provider_connect_timeout_ms":7000,
+  "partial_segment_preservation":True,"multitask_resize_playback_preserved":True,
+  "timeshift_source_recovery":True,"timeshift_recovery_wait_ms":12000,"provider_connect_timeout_ms":7000,
   "provider_read_timeout_ms":5000,"reconnect_backoff_initial_ms":250,
   "reconnect_backoff_max_ms":1500,"visible_rebuffer_threshold_ms":750,
   "timeshift_direct_fallback":True,"mini_preview_same_player_handoff":True,
