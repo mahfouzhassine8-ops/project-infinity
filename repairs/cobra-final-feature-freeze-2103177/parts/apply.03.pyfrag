@@ -1,0 +1,70 @@
+# Replacement versions for a few methods.
+NEW_START_SINGLE=r'''  private void startSinglePlayer(String url) {
+    if(!isCobraAsyncAlive()||mPlayerTexture==null||mPlaying==null)return;
+    cobraResetLiveRewindState();
+    Channel target=mPlaying;cobraRememberChannelTransition(target);
+    releaseSinglePlayer();cobraStopLocalTimeshift("retune");
+    if(cobraShouldUseLocalTimeshift(target,url)){cobraStartLocalTimeshift(target,url);cobraUpdatePlaybackLabels();return;}
+    cobraStartDirectSinglePlayer(target,url,"normal");
+  }'''
+
+NEW_BUILD_PLAYER=r'''  private ExoPlayer buildPlayer(TextureView texture, Channel channel, boolean audible) {
+    DefaultHttpDataSource.Factory http=new DefaultHttpDataSource.Factory()
+        .setAllowCrossProtocolRedirects(true).setConnectTimeoutMs(15000).setReadTimeoutMs(30000)
+        .setUserAgent("Infinity Cobra/3.0");
+    if(channel.headers!=null&&!channel.headers.isEmpty())http.setDefaultRequestProperties(channel.headers);
+    DefaultDataSource.Factory data=new DefaultDataSource.Factory(this,http);
+    DefaultRenderersFactory renderers=new DefaultRenderersFactory(this).setEnableDecoderFallback(true);
+    boolean multi=mCobraCreatingMulti;
+    // Normal single-view playback returns to Media3's proven default load-control policy.
+    // Multi-View stays explicitly bounded so several simultaneous decoders cannot hoard memory.
+    DefaultLoadControl control=multi?new DefaultLoadControl.Builder()
+        .setBufferDurationsMs(6000,30000,1500,3000)
+        .setTargetBufferBytes(12*1024*1024).setPrioritizeTimeOverSizeThresholds(false).build()
+        :new DefaultLoadControl();
+    ExoPlayer player=new ExoPlayer.Builder(this,renderers).setMediaSourceFactory(new DefaultMediaSourceFactory(data))
+        .setLoadControl(control).build();
+    player.setAudioAttributes(new AudioAttributes.Builder().setUsage(C.USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(),audible);
+    player.setHandleAudioBecomingNoisy(true);player.setVolume(audible?1f:0f);
+    CobraPlayerBinding binding=new CobraPlayerBinding(player,channel);
+    mCobraPlayerBindings.put(player,binding);player.addListener(binding);
+    player.addAnalyticsListener(binding.vitals);cobraApplyChannelTracks(binding);
+    cobraAttachVideo(player,texture);cobraStartHealthTicker();
+    return player;
+  }'''
+
+NEW_SETTINGS=None
+
+def apply(source,receipt_path,out):
+    source=Path(source);receipt=json.loads(Path(receipt_path).read_text());out=Path(out)
+    if receipt.get('version_code')!=BASE_BUILD: raise RuntimeError('Expected exact passed 2103176 source receipt')
+    path=source/REL;before_b=path.read_bytes();before=before_b.decode()
+    expected=receipt.get('files',{}).get(str(REL),{}).get('after')
+    if sha(before_b)!=EXPECTED_ACTIVITY or expected!=EXPECTED_ACTIVITY: raise RuntimeError('2103176 Activity preimage mismatch')
+    text=before
+
+    # Protect the sensitive contracts that this feature pass must not touch.
+    protected=['cobraApplySystemBarsForSurface','cobraInstallBrowseSafeArea','cobraConfirmBrowseSystemBars','cobraReattachObservedSurface','loadXtream','loadM3u','parseM3u','cobraOpenFilePicker','cobraLaunchFilePicker','cobraStartOwnedMiniPlayback','cobraEndMiniBackgroundPlayback']
+    guards={n:sha(member(before,n)) for n in protected}
+
+    # Settings: group the existing rows and add one display/performance entry without removing anything.
+    settings=member(text,'showSettings')
+    settings=once(settings,
+'''    Button appearance = action(vtheme().copy("cobra.showSettings.copy.4","APPEARANCE  •  ") + cobraAppearanceLabel());
+    appearance.setOnClickListener(v -> showCobraAppearancePicker());''',
+'''    Button appearance = action(vtheme().copy("cobra.showSettings.copy.4","APPEARANCE  •  ") + cobraAppearanceLabel());
+    appearance.setOnClickListener(v -> showCobraAppearancePicker());
+
+    Button displayPerformance = action("DISPLAY & PERFORMANCE  •  " + cobraRefreshModeLabel());
+    displayPerformance.setTag("cobra_display_performance");
+    displayPerformance.setOnClickListener(v -> showCobraDisplayPerformancePicker());''','display performance setting')
+    settings=once(settings,
+'''    list.addView(chooser, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(theme, new LinearLayout.LayoutParams(-1, dp(58)));
+    list.addView(appearance, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(backgroundMode, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(miniBackground, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(filePicker, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(liveRewind, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(uiState, new LinearLayout.LayoutParams(-1, dp(44)));
