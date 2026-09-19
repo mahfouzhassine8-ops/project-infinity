@@ -49,7 +49,7 @@ jobs:
           unzip -l dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip
           count="$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip | wc -l)"
           test "$count" -eq 1
-          test "$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip)" = "script.infinity.cobra.theme/resources/visual-theme.json"
+          test "$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip)" = "script.infinity.cobra.theme/resources/visual-theme.json"
           (cd dist && sha256sum -c SHA256SUMS)
 
       - name: Upload installable Cobra theme
