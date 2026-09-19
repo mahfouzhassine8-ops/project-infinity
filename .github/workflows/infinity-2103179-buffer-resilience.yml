@@ -251,7 +251,7 @@ jobs:
           python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
             --build repair179-build --out audit179/android
 
-      - name: Run 150 passed gates plus 10 buffer-resilience gates
+      - name: Run 150 passed gates plus 11 buffer-resilience gates
         run: |
           set -euo pipefail
           cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/
