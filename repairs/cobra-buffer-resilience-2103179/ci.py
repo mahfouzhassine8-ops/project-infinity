@@ -148,7 +148,7 @@ def deliver():
   ("Cobra2103170StatusBarRestoreSupersessionTest",5),("Cobra2103170StatusBarEdgeTest",7),
   ("Cobra2103175FullscreenBackgroundTest",12),("Cobra2103176LiveRewindTest",5),
   ("Cobra2103177FinalFeatureFreezeTest",10),("Cobra2103178TimeshiftMiniPlayerTest",10),
-  ("Cobra2103179BufferResilienceTest",10)]:
+  ("Cobra2103179BufferResilienceTest",11)]:
   targeted+=suite(Path("audit179/targeted/test-results")/("TEST-com.projectinfinity.kodi."+name+".xml"),count)
  total=inherited+targeted
  require(total==160,f"Expected 160 Android tests, got {total}")
