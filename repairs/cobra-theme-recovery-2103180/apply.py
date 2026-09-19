@@ -16,8 +16,13 @@ def insert_once(text,anchor,addition,label):
  return text.replace(anchor,addition+anchor,1)
 
 def main():
- p=argparse.ArgumentParser();p.add_argument("--source",type=Path,required=True);p.add_argument("--out",type=Path,required=True);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument("--source",type=Path,required=True);p.add_argument("--out",type=Path,required=True);p.add_argument("--receipt",type=Path,default=Path("engine/background-resume-source.json"));a=p.parse_args()
  splash=a.source/ROOT/"Splash.java.in"; before=splash.read_text()
+ receipt=json.loads(a.receipt.read_text())
+ rel=str(ROOT/"Splash.java.in")
+ require(receipt.get("version_code")==2103179,"Expected reconstructed 2103179 source receipt")
+ require(rel in receipt.get("files",{}),"Splash missing from source receipt")
+ require(receipt["files"][rel]["after"]==sha(before.encode()),"Splash preimage does not match audited 2103179 receipt")
  require("restoreBuiltInVisualThemeFromChooser" not in before,"Recovery already present")
  load_anchor="  private ExperienceTheme loadExperienceTheme()\n  {"
  recovery='''  private void restoreBuiltInVisualThemeFromChooser()
@@ -93,10 +98,22 @@ def main():
  for token in ("Restore Built-in Theme","Cobra recovery","active.recovery-backup.json","visual-theme.disabled-by-recovery.json"):
   require(token in after,"missing recovery token "+token)
  splash.write_text(after)
+ after_sha=sha(after.encode())
  a.out.mkdir(parents=True,exist_ok=True)
- report={"before":sha(before.encode()),"after":sha(after.encode()),"changed_file":str(ROOT/"Splash.java.in"),"native_changed":False,"playback_changed":False,"timeshift_changed":False}
+ (a.out/"source-receipt-before.json").write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
+ receipt["files"][rel]["after"]=after_sha
+ receipt.update(
+   source_parent=2103179,
+   source_parent_locked=True,
+   emergency_theme_recovery=True,
+   emergency_theme_recovery_surface="experience-chooser-cobra-settings",
+   emergency_theme_recovery_preserves_userdata=True,
+   emergency_theme_recovery_preserves_playback=True,
+   native_engine_recompiled=False)
+ a.receipt.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
+ require(sha(splash.read_bytes())==receipt["files"][rel]["after"],"Updated Splash receipt does not match source")
+ report={"before":sha(before.encode()),"after":after_sha,"changed_file":rel,"receipt_updated":True,"native_changed":False,"playback_changed":False,"timeshift_changed":False}
  (a.out/"patch.json").write_text(json.dumps(report,indent=2)+"\n")
+ (a.out/"source-receipt-after.json").write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
  print("PASS: chooser-independent emergency theme recovery applied")
 if __name__=="__main__":main()
-
-# reconstruction-pipeline-trigger
