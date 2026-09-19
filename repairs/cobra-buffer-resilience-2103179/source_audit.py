@@ -63,6 +63,7 @@ def main():
     vitals=class_block(text,'CobraSessionVitals')
     stop=method(text,'onStop')
     recover=method(text,'cobraRecoverLocalTimeshiftSource')
+    burst=method(text,'cobraObserveTimeshiftRebufferBurst')
     stall=method(text,'cobraRecoverTimeshiftStall')
     stall_deep=method(text,'cobraRecoverTimeshiftStallDeep')
     overlay=method(text,'cobraUpdatePerformanceOverlay')
@@ -78,6 +79,8 @@ def main():
       'multitask_resize_does_not_background_pause':'CobraWindowLifecyclePolicy.preservePlaybackOnStop(isInMultiWindowMode(),isFinishing())' in stop and 'multitask-window-stop' in stop,
       'timeshift_waits_for_new_local_segment':'awaitSequenceAfter' in ts and 'latestSequence' in ts,
       'timeshift_source_error_recovers_before_fallback':'CobraTimeshiftRecoveryPolicy.recoverable' in recover and 'timeshift-source-recovery' in recover and 'source-recovered' in recover,
+      'rebuffer_burst_preempts_permanent_stall':'mCobraRebufferBurstCount<3' in burst and '12000L' in burst and 'rebuffer-burst' in burst and 'seekToDefaultPosition' in burst,
+      'rebuffer_burst_preserves_cache':'cobraStopLocalTimeshift' not in burst and 'releaseSinglePlayer' not in burst,
       'timeshift_stall_detects_both_surfaces':'player==mPlayer?"fullscreen":"preview"' in stall and 'stall-detected' in stall,
       'manual_live_behavior_is_automatic_first_recovery':'seekToDefaultPosition' in stall and 'auto-live-edge' in stall and 'startCobraPlayer(player)' in stall,
       'automatic_live_edge_preserves_cache':'cobraStopLocalTimeshift' not in stall and 'session.playlistUrl()' not in stall,
@@ -100,6 +103,7 @@ def main():
       'multitask_patch_declared':patch.get('multitask_resize_playback_preserved') is True,
       'timeshift_recovery_declared':patch.get('timeshift_source_recovery') is True,
       'timeshift_stall_recovery_declared':patch.get('timeshift_stall_recovery') is True and patch.get('timeshift_stall_detect_ms')==6000,
+      'rebuffer_burst_declared':patch.get('rebuffer_burst_recovery') is True and patch.get('rebuffer_burst_count')==3 and patch.get('rebuffer_burst_window_ms')==12000,
       'auto_live_edge_declared':patch.get('auto_live_edge_first') is True and patch.get('auto_live_edge_verify_ms')==2500,
       'overlay_source_aware_declared':patch.get('performance_overlay_source_aware') is True,
       'physical_unverified':patch.get('physical_device_verified') is False,
