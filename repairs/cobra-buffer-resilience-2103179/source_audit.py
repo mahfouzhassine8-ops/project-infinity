@@ -82,7 +82,7 @@ def main():
       'buffer_transition_evidence':'bufferingTransitions' in binding and 'bufferingTransitions' in vitals and 'rebufferDurationMs' in vitals,
       'rewind_seek_preserved':'cobra_live_timeshift_seek' in text and 'cobraUpdateTimeshiftSeek' in text,
       'same_player_handoff_preserved':'preview-timeshift-fullscreen' in text and 'session==mCobraTimeshiftPlayer' in method(text,'promoteCobraPreviewToFullscreen'),
-      'direct_fallback_preserved':'timeshift-transport-fallback' in binding,
+      'direct_fallback_preserved':'timeshift-transport-fallback' in text,
       'provider_catchup_preserved':'tv_archive' in text and 'cobraStartProviderCatchup' in text,
       'last_channel_preserved':'cobra_last_channel' in text and 'cobraTuneLastChannel' in text,
       'refresh_120_preserved':'preferredDisplayModeId' in text and 'mCobraActiveHz' in text,
