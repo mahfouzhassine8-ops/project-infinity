@@ -65,7 +65,6 @@ def main():
     recover=method(text,'cobraRecoverLocalTimeshiftSource')
     burst=method(text,'cobraObserveTimeshiftRebufferBurst')
     stall=method(text,'cobraRecoverTimeshiftStall')
-    stall_deep=method(text,'cobraRecoverTimeshiftStallDeep')
     overlay=method(text,'cobraUpdatePerformanceOverlay')
     watchdog=text[text.index('private final Runnable mStallWatchdog'):text.index('private final Runnable mAutoRefresh')]
     checks={
@@ -79,14 +78,14 @@ def main():
       'multitask_resize_does_not_background_pause':'CobraWindowLifecyclePolicy.preservePlaybackOnStop(isInMultiWindowMode(),isFinishing())' in stop and 'multitask-window-stop' in stop,
       'timeshift_waits_for_new_local_segment':'awaitSequenceAfter' in ts and 'latestSequence' in ts,
       'timeshift_source_error_recovers_before_fallback':'CobraTimeshiftRecoveryPolicy.recoverable' in recover and 'timeshift-source-recovery' in recover and 'source-recovered' in recover,
-      'rebuffer_burst_preempts_permanent_stall':'mCobraRebufferBurstCount<3' in burst and '12000L' in burst and 'rebuffer-burst' in burst and 'timeshift-live-edge-recovery' in burst,
+      'rebuffer_burst_is_observation_only':'rebuffer-burst-observed' in burst and 'no_restart=true' in burst and all(x not in burst for x in ('setMediaItem(','.prepare(','seekToDefaultPosition','startCobraPlayer','cobraFallbackFromLocalTimeshift')),
       'rebuffer_burst_preserves_cache':'cobraStopLocalTimeshift' not in burst and 'releaseSinglePlayer' not in burst,
-      'rebuffer_burst_reloads_fresh_local_edge':'session.playlistUrl()+"?cobra_live_edge="' in burst and 'seekToDefaultPosition' not in burst,
       'timeshift_stall_detects_both_surfaces':'player==mPlayer?"fullscreen":"preview"' in stall and 'stall-detected' in stall,
-      'automatic_live_behavior_reloads_fresh_playlist':'session.playlistUrl()+"?cobra_live_edge="' in stall and 'timeshift-live-edge-recovery' in stall and 'startCobraPlayer(player)' in stall,
+      'automatic_live_matches_manual_live_seek':'seekToDefaultPosition' in stall and 'auto-live-edge-seek' in stall and 'same_player=true' in stall,
+      'automatic_live_does_not_restart_media':all(x not in stall for x in ('setMediaItem(','.prepare(','startCobraPlayer','cobraFallbackFromLocalTimeshift')),
       'automatic_live_edge_preserves_cache':'cobraStopLocalTimeshift' not in stall and 'releaseSinglePlayer' not in stall,
-      'stale_default_seek_removed_from_auto_recovery':'seekToDefaultPosition' not in burst and 'seekToDefaultPosition' not in stall,
-      'deep_recovery_reuses_same_timeshift_session':'session.playlistUrl()' in stall_deep and 'stall-recovered' in stall_deep and 'cobraFallbackFromLocalTimeshift' in stall_deep,
+      'stall_persistence_defers_to_error_path':'stall-persists-after-live-edge' in stall and 'error_path_owns_restart=true' in stall,
+      'pro_recovery_budget':'MAX_AUTO_LIVE_EDGE_ATTEMPTS=2' in text and 'RECOVERY_COOLDOWN_MS=60000L' in text and 'cobraPermitAutoLiveEdge' in text,
       'performance_overlay_reads_visible_player':'ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer' in overlay,
       'timeshift_error_no_immediate_session_kill':'if(localTimeshift)cobraStopLocalTimeshift("player-error")' not in binding,
       'http_framing_fix_preserved':'hasRealHttpFraming' in transport and '"\\r\\n\\r\\n"' in transport,
@@ -99,15 +98,17 @@ def main():
       'provider_catchup_preserved':'tv_archive' in text and 'cobraStartProviderCatchup' in text,
       'last_channel_preserved':'cobra_last_channel' in text and 'cobraTuneLastChannel' in text,
       'refresh_120_preserved':'preferredDisplayModeId' in text and 'mCobraActiveHz' in text,
+      'single_view_media3_default':'new DefaultLoadControl();' in method(text,'buildPlayer'),
       'watchdog_observation_only':'buffer_observed_no_restart' in watchdog and 'mPlayer.prepare()' not in watchdog and 'mPlayer.play()' not in watchdog,
       'native_unchanged':patch.get('native_changed') is False,
       'theme_zip_unchanged':patch.get('theme_zip_changed') is False,
       'multitask_patch_declared':patch.get('multitask_resize_playback_preserved') is True,
       'timeshift_recovery_declared':patch.get('timeshift_source_recovery') is True,
       'timeshift_stall_recovery_declared':patch.get('timeshift_stall_recovery') is True and patch.get('timeshift_stall_detect_ms')==6000,
-      'rebuffer_burst_declared':patch.get('rebuffer_burst_recovery') is True and patch.get('rebuffer_burst_count')==3 and patch.get('rebuffer_burst_window_ms')==12000,
+      'rebuffer_burst_declared':patch.get('rebuffer_burst_observation_only') is True and patch.get('rebuffer_burst_count')==3 and patch.get('rebuffer_burst_window_ms')==12000,
       'auto_live_edge_declared':patch.get('auto_live_edge_first') is True and patch.get('auto_live_edge_verify_ms')==2500,
-      'monotonic_live_edge_declared':patch.get('monotonic_live_edge_reload') is True and patch.get('stale_default_seek_removed') is True,
+      'pro_budget_declared':patch.get('auto_live_edge_max_attempts')==2 and patch.get('auto_live_edge_cooldown_ms')==60000,
+      'buffering_restart_forbidden_declared':patch.get('buffering_media_restart_forbidden') is True and patch.get('manual_live_seek_equivalent') is True,
       'overlay_source_aware_declared':patch.get('performance_overlay_source_aware') is True,
       'physical_unverified':patch.get('physical_device_verified') is False,
     }
