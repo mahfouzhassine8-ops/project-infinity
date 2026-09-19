@@ -357,18 +357,18 @@ def apply(source,receipt_path,out):
 
  chrome=method(text,"cobraBuildPlayerChrome")
  chrome=once(chrome,
-'''    CobraIconButton prev=cobraIcon("prev","Previous channel",true,v->stepChannel(-1)),pause=cobraIcon("pause","Pause",true,v->toggleCobraPlayerPlayPause()),next=cobraIcon("next","Next channel",true,v->stepChannel(1));pause.setTag("cobra_player_play_pause");pause.setBackground(surface(0x87000000,40,0x55ffffff,1));
-    transport.addView(prev,new LinearLayout.LayoutParams(dp(56),dp(56)));LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(shortScreen?56:72),dp(shortScreen?56:72));pp.leftMargin=dp(24);pp.rightMargin=dp(24);transport.addView(pause,pp);transport.addView(next,new LinearLayout.LayoutParams(dp(56),dp(56)));chrome.addView(transport,new LinearLayout.LayoutParams(-1,dp(shortScreen?60:76)));''',
+'''    CobraIconButton prev=cobraIcon("prev","Previous channel",true,v->stepChannel(-1)),pause=cobraIcon("pause","Pause",true,v->toggleCobraPlayerPlayPause()),next=cobraIcon("next","Next channel",true,v->stepChannel(1));pause.setTag("cobra_player_play_pause");pause.setBackground(surface(vtheme().color("cobra.cobraBuildPlayerChrome.colors.5",0x87000000),40,vtheme().color("cobra.cobraBuildPlayerChrome.colors.6",0x55ffffff),1));
+    transport.addView(prev,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.16",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.17",56))));LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(shortScreen?56:72),dp(shortScreen?56:72));pp.leftMargin=dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.18",24));pp.rightMargin=dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.19",24));transport.addView(pause,pp);transport.addView(next,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.20",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.21",56))));chrome.addView(transport,new LinearLayout.LayoutParams(-1,dp(shortScreen?60:76)));''',
 '''    CobraIconButton prev=cobraIcon("prev","Previous channel",true,v->stepChannel(-1));
     CobraIconButton rewind=cobraIcon("prev","Rewind Live TV 30 seconds",true,v->cobraRewindLive(30000L));rewind.caption("-30s");rewind.setTag("cobra_live_rewind_30");mCobraLiveRewindButton=rewind;
-    CobraIconButton pause=cobraIcon("pause","Pause",true,v->toggleCobraPlayerPlayPause());pause.setTag("cobra_player_play_pause");pause.setBackground(surface(0x87000000,40,0x55ffffff,1));
+    CobraIconButton pause=cobraIcon("pause","Pause",true,v->toggleCobraPlayerPlayPause());pause.setTag("cobra_player_play_pause");pause.setBackground(surface(vtheme().color("cobra.cobraBuildPlayerChrome.colors.5",0x87000000),40,vtheme().color("cobra.cobraBuildPlayerChrome.colors.6",0x55ffffff),1));
     CobraIconButton live=cobraIcon("play","Go Live",true,v->cobraGoLive());live.caption("LIVE");live.setTag("cobra_live_edge");mCobraGoLiveButton=live;
     CobraIconButton next=cobraIcon("next","Next channel",true,v->stepChannel(1));
-    transport.addView(prev,new LinearLayout.LayoutParams(dp(52),dp(52)));
+    transport.addView(prev,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.16",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.17",56))));
     transport.addView(rewind,new LinearLayout.LayoutParams(dp(52),dp(52)));
     LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(shortScreen?56:68),dp(shortScreen?56:68));pp.leftMargin=dp(14);pp.rightMargin=dp(14);transport.addView(pause,pp);
     transport.addView(live,new LinearLayout.LayoutParams(dp(52),dp(52)));
-    transport.addView(next,new LinearLayout.LayoutParams(dp(52),dp(52)));
+    transport.addView(next,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.20",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.21",56))));
     chrome.addView(transport,new LinearLayout.LayoutParams(-1,dp(shortScreen?60:76)));''',"player rewind transport")
  chrome=once(chrome,
 '    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();',
