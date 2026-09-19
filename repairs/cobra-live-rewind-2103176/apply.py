@@ -395,7 +395,7 @@ def apply(source,receipt_path,out):
  text=replace_method(text,"promoteCobraPreviewToFullscreen",promote)
 
  close=method(text,"closePlayer")
- close=once(close,"  private void closePlayer() {","  private void closePlayer() {\\n    cobraResetLiveRewindState();mCobraLiveRewindButton=null;mCobraGoLiveButton=null;","close rewind reset")
+ close=once(close,"  private void closePlayer() {","  private void closePlayer() {\n    cobraResetLiveRewindState();mCobraLiveRewindButton=null;mCobraGoLiveButton=null;","close rewind reset")
  text=replace_method(text,"closePlayer",close)
 
  back=method(text,"closeFullscreenToCobraView")
