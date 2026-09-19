@@ -63,6 +63,8 @@ def main():
     vitals=class_block(text,'CobraSessionVitals')
     stop=method(text,'onStop')
     recover=method(text,'cobraRecoverLocalTimeshiftSource')
+    preview_stall=method(text,'cobraRecoverPreviewTimeshiftStall')
+    overlay=method(text,'cobraUpdatePerformanceOverlay')
     watchdog=text[text.index('private final Runnable mStallWatchdog'):text.index('private final Runnable mAutoRefresh')]
     checks={
       'exact_2103178_parent':patch.get('base_build')==2103178 and patch.get('base_commit')=='56792d4e44b381cff2c900e7b86ed99265b55d04',
@@ -75,6 +77,9 @@ def main():
       'multitask_resize_does_not_background_pause':'CobraWindowLifecyclePolicy.preservePlaybackOnStop(isInMultiWindowMode(),isFinishing())' in stop and 'multitask-window-stop' in stop,
       'timeshift_waits_for_new_local_segment':'awaitSequenceAfter' in ts and 'latestSequence' in ts,
       'timeshift_source_error_recovers_before_fallback':'CobraTimeshiftRecoveryPolicy.recoverable' in recover and 'timeshift-source-recovery' in recover and 'source-recovered' in recover,
+      'preview_stall_has_targeted_recovery':'preview-stall-detected' in preview_stall and 'preview-stall-recovered' in preview_stall and 'preview-timeshift-stall-recovery' in preview_stall,
+      'preview_stall_reuses_timeshift_session':'session.playlistUrl()' in preview_stall and 'cobraFallbackFromLocalTimeshift' in preview_stall,
+      'performance_overlay_reads_visible_player':'ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer' in overlay,
       'timeshift_error_no_immediate_session_kill':'if(localTimeshift)cobraStopLocalTimeshift("player-error")' not in binding,
       'http_framing_fix_preserved':'hasRealHttpFraming' in transport and '"\\r\\n\\r\\n"' in transport,
       'playlist_line_fix_preserved':'hasRealPlaylistLines' in transport and '#EXTM3U\\n' in transport,
@@ -91,6 +96,8 @@ def main():
       'theme_zip_unchanged':patch.get('theme_zip_changed') is False,
       'multitask_patch_declared':patch.get('multitask_resize_playback_preserved') is True,
       'timeshift_recovery_declared':patch.get('timeshift_source_recovery') is True,
+      'preview_stall_recovery_declared':patch.get('preview_stall_recovery') is True and patch.get('preview_stall_detect_ms')==6000,
+      'overlay_source_aware_declared':patch.get('performance_overlay_source_aware') is True,
       'physical_unverified':patch.get('physical_device_verified') is False,
     }
     failed=[k for k,v in checks.items() if not v]
