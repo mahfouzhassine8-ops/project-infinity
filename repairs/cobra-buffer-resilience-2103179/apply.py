@@ -110,9 +110,30 @@ RESILIENCE_HELPERS=r'''
       return false;
     }
   }
-  private int mCobraTimeshiftRecoveryGeneration=0,mCobraTransientMultiWindowStops=0,mCobraTimeshiftStallGeneration=0,mCobraTimeshiftStallRecoveries=0,mCobraAutoLiveEdgeRecoveries=0;
+  private int mCobraTimeshiftRecoveryGeneration=0,mCobraTransientMultiWindowStops=0,mCobraTimeshiftStallGeneration=0,mCobraTimeshiftStallRecoveries=0,mCobraAutoLiveEdgeRecoveries=0,mCobraRebufferBurstRecoveries=0;
+  private long mCobraRebufferBurstWindowStart=0L;
+  private int mCobraRebufferBurstCount=0;
 
   private void cobraCancelTimeshiftStallCheck(){mCobraTimeshiftStallGeneration++;}
+
+  private void cobraObserveTimeshiftRebufferBurst(ExoPlayer player,Channel channel){
+    if(channel==null||!cobraCurrentLocalTimeshiftPlayer(player))return;
+    long now=android.os.SystemClock.elapsedRealtime();
+    if(mCobraRebufferBurstWindowStart==0L||now-mCobraRebufferBurstWindowStart>12000L){mCobraRebufferBurstWindowStart=now;mCobraRebufferBurstCount=1;}
+    else mCobraRebufferBurstCount++;
+    if(mCobraRebufferBurstCount<3)return;
+    mCobraRebufferBurstWindowStart=0L;mCobraRebufferBurstCount=0;mCobraRebufferBurstRecoveries++;
+    final CobraLocalTimeshiftSession session=mCobraTimeshiftSession;
+    InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst","count="+mCobraRebufferBurstRecoveries+"; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; "+(session==null?"no-session":session.diagnostic()));
+    try{
+      if(player.isCurrentMediaItemSeekable()){
+        mCobraAutoLiveEdgeRecoveries++;player.seekToDefaultPosition();startCobraPlayer(player);
+        InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst-live-edge","count="+mCobraAutoLiveEdgeRecoveries);
+        return;
+      }
+    }catch(RuntimeException liveEdgeFailure){InfinityCobraDiagnostics.failure(this,"timeshift-rebuffer-burst-live-edge",liveEdgeFailure);}
+    if(session!=null)cobraRecoverTimeshiftStallDeep(player,channel,session,session.latestSequence(),mCobraTimeshiftStallGeneration,player==mPlayer?"fullscreen":"preview");
+  }
 
   private boolean cobraCurrentLocalTimeshiftPlayer(ExoPlayer player){
     return player!=null&&player==mCobraTimeshiftPlayer&&mCobraTimeshiftSession!=null&&(player==mPlayer||player==mCobraPreviewPlayer);
@@ -293,7 +314,7 @@ def apply(source,receipt_path,out):
 '''      if(state==Player.STATE_BUFFERING&&vitals.everReady){
         vitals.bufferingTransitions++;
         if(vitals.bufferingStartedElapsed==0L)vitals.bufferingStartedElapsed=android.os.SystemClock.elapsedRealtime();
-        if(player==mCobraTimeshiftPlayer)cobraScheduleTimeshiftStallCheck(player,channel);
+        if(player==mCobraTimeshiftPlayer){cobraObserveTimeshiftRebufferBurst(player,channel);cobraScheduleTimeshiftStallCheck(player,channel);}
       }
       if(state==Player.STATE_READY){
         if(player==mCobraTimeshiftPlayer)cobraCancelTimeshiftStallCheck();
@@ -374,7 +395,7 @@ def apply(source,receipt_path,out):
     fresh=member(text,'cobraFreshHealthSnapshot')
     fresh=once(fresh,
 '      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("preview_start_count",mCobraPreviewStartCount);',
-'      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("multi_window",Build.VERSION.SDK_INT>=24&&isInMultiWindowMode());root.put("transient_multiwindow_stops",mCobraTransientMultiWindowStops);root.put("timeshift_stall_recoveries",mCobraTimeshiftStallRecoveries);root.put("auto_live_edge_recoveries",mCobraAutoLiveEdgeRecoveries);root.put("preview_start_count",mCobraPreviewStartCount);',
+'      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("multi_window",Build.VERSION.SDK_INT>=24&&isInMultiWindowMode());root.put("transient_multiwindow_stops",mCobraTransientMultiWindowStops);root.put("timeshift_stall_recoveries",mCobraTimeshiftStallRecoveries);root.put("auto_live_edge_recoveries",mCobraAutoLiveEdgeRecoveries);root.put("rebuffer_burst_recoveries",mCobraRebufferBurstRecoveries);root.put("preview_start_count",mCobraPreviewStartCount);',
 'multi-window diagnostic evidence')
     text=replace_member(text,'cobraFreshHealthSnapshot',fresh)
 
@@ -395,6 +416,7 @@ def apply(source,receipt_path,out):
       'CobraWindowLifecyclePolicy','preservePlaybackOnStop','multitask-window-stop',
       'CobraTimeshiftRecoveryPolicy','awaitSequenceAfter','timeshift-source-recovery','source-recovered',
       'stall-detected','auto-live-edge','stall-recovered','timeshift-stall-recovery','mCobraAutoLiveEdgeRecoveries',
+      'rebuffer-burst','rebuffer-burst-live-edge','mCobraRebufferBurstRecoveries','mCobraRebufferBurstCount<3','12000L',
       'seekToDefaultPosition','ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer',
       'timeshift-transport-fallback','preview-timeshift-fullscreen','cobra_live_timeshift_seek',
       'preferredDisplayModeId','cobra_last_channel','buffer_observed_no_restart'
@@ -415,6 +437,7 @@ def apply(source,receipt_path,out):
       'partial_segment_preservation':True,'visible_rebuffer_threshold_ms':750,
       'multitask_resize_playback_preserved':True,'timeshift_source_recovery':True,
       'timeshift_recovery_wait_ms':12000,'timeshift_stall_recovery':True,'timeshift_stall_detect_ms':6000,
+      'rebuffer_burst_recovery':True,'rebuffer_burst_count':3,'rebuffer_burst_window_ms':12000,
       'auto_live_edge_first':True,'auto_live_edge_verify_ms':2500,'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
       'physical_device_verified':False
     }
