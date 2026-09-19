@@ -11,7 +11,7 @@
     if (mPlayerChrome != null) mPlayerChrome.setVisibility(View.GONE);
   };'''
     new_hide='''  private final Runnable mHideChrome = () -> {
-    if(mPlayerChrome!=null&&mPlayerChrome.getVisibility()==View.VISIBLE&&!mCobraTimeshiftDragging){final LinearLayout target=mPlayerChrome;target.animate().cancel();target.animate().alpha(0f).setDuration(150).withEndAction(()->{if(target==mPlayerChrome&&!mCobraTimeshiftDragging)target.setVisibility(View.GONE);}).start();}
+    if(mPlayerChrome!=null&&mPlayerChrome.getVisibility()==View.VISIBLE&&!this.mCobraTimeshiftDragging){final LinearLayout target=mPlayerChrome;target.animate().cancel();target.animate().alpha(0f).setDuration(150).withEndAction(()->{if(target==mPlayerChrome&&!this.mCobraTimeshiftDragging)target.setVisibility(View.GONE);}).start();}
   };'''
     text=once(text,old_hide,new_hide,'player chrome fade-out')
     showchrome=member(text,'showPlayerChromeTemporarily')
