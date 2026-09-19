@@ -28,13 +28,24 @@ jobs:
           BASE=0560b18c497e9861864126d96f9b784e488ebe32
           git cat-file -e "$BASE^{commit}"
           test "$(git merge-base "$BASE" HEAD)" = "$BASE"
-          bad="$(git diff --name-only "$BASE"..HEAD | grep -vE '^(themes/cobra-liquid-glass-v1/|\.github/workflows/cobra-liquid-glass-theme-v1\.yml$)' || true)"
+          bad="$(git diff --name-only "$BASE"..HEAD | grep -vE '^(themes/cobra-liquid-glass-v1/|repairs/infinity-experience-2103159/bridge-1\.java\.inc$|repairs/infinity-experience-2103159/bridge-3\.java\.inc$|repairs/infinity-experience-2103159/tests/ExperienceChooserUiTest\.java$|\.github/workflows/cobra-liquid-glass-theme-v1\.yml$)' || true)"
           if [ -n "$bad" ]; then
             echo "Protected/non-theme files changed:"
             echo "$bad"
             exit 1
           fi
-          echo "PASS: no player/native/runtime/provider source changed"
+          echo "PASS: delta limited to theme + chooser recovery; no player/native/provider source changed"
+
+      - name: Prove chooser recovery is independent of Cobra themed settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'Restore Built-in Theme' repairs/infinity-experience-2103159/bridge-3.java.inc
+          grep -q 'restoreBuiltInVisualThemeFromChooser' repairs/infinity-experience-2103159/bridge-1.java.inc
+          grep -q 'visual-theme.disabled-by-recovery.json' repairs/infinity-experience-2103159/bridge-1.java.inc
+          grep -q 'Cobra recovery' repairs/infinity-experience-2103159/tests/ExperienceChooserUiTest.java
+          ! grep -q 'InfinityLiveActivity' repairs/infinity-experience-2103159/bridge-1.java.inc
+          echo "PASS: chooser can reset theme without entering Cobra"
 
       - name: Build and statically validate visual package
         run: python3 themes/cobra-liquid-glass-v1/build.py --out dist
