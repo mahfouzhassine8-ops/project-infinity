@@ -136,7 +136,7 @@ jobs:
       - name: Exact passed 2103175 baseline
         uses: actions/download-artifact@v5
         with:
-          name: Infinity-2103176-Live-TV-Rewind-Catchup-TEST-CANDIDATE
+          name: Infinity-2103175-Fullscreen-Background-Safe-Content-TEST-CANDIDATE
           run-id: 35405052743
           github-token: ${{ github.token }}
           path: baseline175
