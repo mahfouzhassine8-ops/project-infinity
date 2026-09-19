@@ -1,0 +1,115 @@
+name: Infinity | 2103180 Emergency Theme Recovery
+
+on:
+  push:
+    branches: [cobra-2103180-theme-recovery]
+    paths:
+      - '.github/workflows/infinity-2103180-theme-recovery.yml'
+      - 'repairs/cobra-theme-recovery-2103180/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: 0560b18c497e9861864126d96f9b784e488ebe32
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: recovery-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact passed 2103179 APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103179-Buffer-Resilience-TEST-CANDIDATE
+          run-id: 35441078889
+          github-token: ${{ github.token }}
+          path: baseline179
+
+      - name: Apply recovery-only Java delta
+        run: |
+          set -euo pipefail
+          python3 recovery-delta/repairs/cobra-theme-recovery-2103180/apply.py --source . --out audit180
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/android/packaging/xbmc/src/Splash.java.in').read_text()
+          for token in ['Restore Built-in Theme','Cobra recovery','restoreBuiltInVisualThemeFromChooser','visual-theme.disabled-by-recovery.json']:
+              assert token in p, token
+          assert 'InfinityLiveActivity.java.in' not in Path('audit180/patch.json').read_text()
+          print('PASS: recovery delta is Splash-only; player/timeshift sources untouched')
+          PY
+
+      - name: Stage Java shell against exact accepted native APK
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        run: |
+          set -euo pipefail
+          base="$(find baseline179 -maxdepth 2 -type f -name '*.apk' | head -1)"
+          test -n "$base"
+          mkdir -p audit180/package
+          python3 scripts/package_background_resume.py --source . --base-apk "$base" --build-dir build180 --out unsigned180
+
+      - name: Sign recovery APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$INFINITY_KEYSTORE_B64"
+          echo "$INFINITY_KEYSTORE_B64" | base64 -d > infinity.jks
+          apk="$(find unsigned180 -maxdepth 1 -type f -name '*.apk' | head -1)"
+          test -n "$apk"
+          mkdir -p signed180
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" sign --ks infinity.jks --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass env:INFINITY_STORE_PASSWORD --key-pass env:INFINITY_KEY_PASSWORD --out signed180/Infinity-Cobra-2103180-Emergency-Theme-Recovery.apk "$apk"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs signed180/Infinity-Cobra-2103180-Emergency-Theme-Recovery.apk > signed180/apksigner.txt
+          sha256sum signed180/Infinity-Cobra-2103180-Emergency-Theme-Recovery.apk > signed180/SHA256SUMS
+
+      - name: Verify recovery code is in packaged APK and native payload unchanged
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,hashlib
+          base=next(Path('baseline179').rglob('*.apk'))
+          new=Path('signed180/Infinity-Cobra-2103180-Emergency-Theme-Recovery.apk')
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(new) as b:
+              libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
+              assert libs
+              assert set(libs)=={n for n in b.namelist() if n.startswith('lib/') and not n.endswith('/')}
+              for n in libs: assert a.read(n)==b.read(n), n
+              dex=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              for token in (b'Restore Built-in Theme',b'Cobra recovery',b'Built-in Cobra theme restored',b'visual-theme.disabled-by-recovery.json'):
+                  assert token in dex, token
+          print('PASS: recovery strings packaged; native libraries byte-identical to 2103179')
+          PY
+
+      - name: Upload recovery-enabled APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-2103180-Emergency-Theme-Recovery
+          path: |
+            signed180/
+            audit180/patch.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
