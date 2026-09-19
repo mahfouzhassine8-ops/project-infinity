@@ -49,7 +49,7 @@ def upgrade():
    reconnect_backoff_initial_ms=250,reconnect_backoff_max_ms=1500,
    partial_segment_preservation=True,visible_rebuffer_threshold_ms=750,
    multitask_resize_playback_preserved=True,timeshift_source_recovery=True,timeshift_recovery_wait_ms=12000,
-   timeshift_stall_recovery=True,timeshift_stall_detect_ms=6000,rebuffer_burst_recovery=True,rebuffer_burst_count=3,rebuffer_burst_window_ms=12000,auto_live_edge_first=True,auto_live_edge_verify_ms=2500,performance_overlay_source_aware=True,
+   timeshift_stall_recovery=True,timeshift_stall_detect_ms=6000,rebuffer_burst_recovery=True,rebuffer_burst_count=3,rebuffer_burst_window_ms=12000,auto_live_edge_first=True,auto_live_edge_verify_ms=2500,monotonic_live_edge_reload=True,stale_default_seek_removed=True,performance_overlay_source_aware=True,
    rewind_contract_preserved=True,timeshift_transport_repaired=True,
    mini_preview_same_player_handoff=True,display_performance_preserved=True,
    provider_catchup_preserved=True,last_channel_preserved=True,
@@ -92,6 +92,7 @@ def verify():
     b"multitask-window-stop",b"timeshift-source-recovery",b"source-recovered",
     b"stall-detected",b"auto-live-edge",b"stall-recovered",b"timeshift-stall-recovery",
     b"rebuffer-burst",b"rebuffer-burst-live-edge",b"rebuffer_burst_recoveries",
+    b"timeshift-live-edge-recovery",b"cobra_live_edge",b"fresh-playlist",
     b"auto_live_edge_recoveries",
     b"mini_preview_direct",b"timeshift_http_failures",b"preview-timeshift-fullscreen",
     b"timeshift-transport-fallback",b"Capture diagnostics",b"preview_timeshift_starts",
@@ -120,6 +121,7 @@ def verify():
   "timeshift_stall_recovery":True,"timeshift_stall_detect_ms":6000,
   "rebuffer_burst_recovery":True,"rebuffer_burst_count":3,"rebuffer_burst_window_ms":12000,
   "auto_live_edge_first":True,"auto_live_edge_verify_ms":2500,
+  "monotonic_live_edge_reload":True,"stale_default_seek_removed":True,
   "performance_overlay_source_aware":True,"physical_device_verified":False}
  Path("audit179/final-verification.json").write_text(json.dumps(result,indent=2)+"\n")
  print("PASS: signed 2103179 preserves exact 2103178 native/resources/signer and rewind contract")
@@ -162,6 +164,7 @@ def deliver():
   "timeshift_stall_recovery":True,"timeshift_stall_detect_ms":6000,
   "rebuffer_burst_recovery":True,"rebuffer_burst_count":3,"rebuffer_burst_window_ms":12000,
   "auto_live_edge_first":True,"auto_live_edge_verify_ms":2500,
+  "monotonic_live_edge_reload":True,"stale_default_seek_removed":True,
   "performance_overlay_source_aware":True,"provider_connect_timeout_ms":7000,
   "provider_read_timeout_ms":5000,"reconnect_backoff_initial_ms":250,
   "reconnect_backoff_max_ms":1500,"visible_rebuffer_threshold_ms":750,
