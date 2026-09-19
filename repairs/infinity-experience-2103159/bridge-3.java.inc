@@ -36,7 +36,27 @@
     android.widget.TextView gear = chooserStyledText("⚙", theme.text, 17, false, android.view.Gravity.CENTER);
     gear.setFocusable(true); gear.setClickable(true); gear.setTag(infinity ? "experience-settings-infinity" : "experience-settings-cobra"); gear.setContentDescription(title + " settings");
     gear.setBackground(chooserSurface((top & 0x00ffffff) | 0xdd000000, border, 16));
-    gear.setOnClickListener(v -> settings.run());
+    gear.setOnClickListener(v -> {
+      if (!infinity)
+      {
+        final String[] choices = new String[]{"Cobra settings", "Restore Built-in Theme", "Cancel"};
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Cobra recovery")
+            .setItems(choices, (dialog, which) -> {
+              if (which == 0) settings.run();
+              else if (which == 1)
+              {
+                new android.app.AlertDialog.Builder(this)
+                    .setTitle("Restore Built-in Theme?")
+                    .setMessage("Disables the installed Cobra visual theme and returns Cobra to its built-in appearance. Playback, timeshift and app data are not cleared.")
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Restore", (confirm, button) -> restoreBuiltInVisualThemeFromChooser())
+                    .show();
+              }
+            }).show();
+      }
+      else settings.run();
+    });
     android.widget.FrameLayout.LayoutParams gearParams = new android.widget.FrameLayout.LayoutParams(chooserDp(44), chooserDp(44), android.view.Gravity.TOP | android.view.Gravity.END);
     card.addView(gear, gearParams);
 
