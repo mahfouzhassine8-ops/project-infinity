@@ -151,13 +151,13 @@ def deliver():
   ("Cobra2103179BufferResilienceTest",11)]:
   targeted+=suite(Path("audit179/targeted/test-results")/("TEST-com.projectinfinity.kodi."+name+".xml"),count)
  total=inherited+targeted
- require(total==160,f"Expected 160 Android tests, got {total}")
+ require(total==161,f"Expected 161 Android tests, got {total}")
  source=json.loads(Path("audit179/source-audit/source-audit.json").read_text())
  final=json.loads(Path("audit179/final-verification.json").read_text())
  require(source.get("passed") and not source.get("failed"),"2103179 source audit failed")
  result={
   "build":VERSION,"locked_parent":2103178,"locked_parent_commit":BASE_COMMIT,
-  "android_tests":total,"new_buffer_resilience_tests":10,
+  "android_tests":total,"new_buffer_resilience_tests":11,
   "rewind_contract_preserved":True,"live_reserve_seconds":9,
   "partial_segment_preservation":True,"multitask_resize_playback_preserved":True,
   "timeshift_source_recovery":True,"timeshift_recovery_wait_ms":12000,
