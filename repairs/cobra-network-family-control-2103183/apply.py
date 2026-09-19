@@ -88,7 +88,7 @@ NETWORK_HELPERS=r'''  static final class CobraProviderConnection {
       if(ipv4Literal(host)||ipv6Literal(host)){
         java.net.InetAddress literal=java.net.InetAddress.getByName(host);
         if(!matches(literal,mode))throw new java.net.UnknownHostException("Provider URL is not "+shortLabel(mode));
-        return routed(original,literal,mode,1,0);
+        return routed(original,literal,mode,literal instanceof java.net.Inet4Address?1:0,literal instanceof java.net.Inet6Address?1:0);
       }
       java.net.InetAddress[] all=java.net.InetAddress.getAllByName(host);
       java.util.ArrayList<java.net.InetAddress> selected=new java.util.ArrayList<>();int v4=0,v6=0;
