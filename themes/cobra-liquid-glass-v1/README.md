@@ -31,3 +31,5 @@ The ZIP contains exactly:
 `script.infinity.cobra.theme/resources/visual-theme.json`
 
 No binary assets are bundled in v1. The “glass” effect is implemented with supported native translucent gradients/strokes/elevation; this does **not** claim real-time blur where the runtime does not provide it.
+
+Validation is intentionally performed on a draft PR before any merge into the protected playback branch.
