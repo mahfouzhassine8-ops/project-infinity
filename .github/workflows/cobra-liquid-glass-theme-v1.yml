@@ -1,4 +1,4 @@
-name: Cobra Liquid Glass HM v1
+name: Cobra Liquid Glass HM SAFE v1.1
 
 on:
   push:
@@ -46,8 +46,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          unzip -l dist/Cobra-Liquid-Glass-HM-v1.0.0.zip
-          count="$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip | wc -l)"
+          unzip -l dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip
+          count="$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip | wc -l)"
           test "$count" -eq 1
           test "$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip)" = "script.infinity.cobra.theme/resources/visual-theme.json"
           (cd dist && sha256sum -c SHA256SUMS)
@@ -60,6 +60,6 @@ jobs:
             dist/Cobra-Liquid-Glass-HM-v1.0.0.zip
             dist/build-report.json
             dist/SHA256SUMS
-            dist/adversarial-audit.json
+            dist/safe-audit.json
           if-no-files-found: error
           retention-days: 30
