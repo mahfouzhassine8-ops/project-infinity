@@ -279,6 +279,7 @@ jobs:
           cp rewind176/repairs/cobra-live-rewind-2103176/tests/Cobra2103176LiveRewindTest.java repair180-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp freeze177/repairs/cobra-final-feature-freeze-2103177/tests/Cobra2103177FinalFeatureFreezeTest.java repair180-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp repair178/repairs/cobra-timeshift-miniplayer-2103178/tests/Cobra2103178TimeshiftMiniPlayerTest.java repair180-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair179/repairs/cobra-buffer-resilience-2103179/tests/Cobra2103179BufferResilienceTest.java repair180-build/xbmc/src/test/java/com/projectinfinity/kodi/
           # 2103180 intentionally supersedes the inherited local live reserve/read-timeout expectations.
           # Every other inherited 2103178/2103179 gate stays intact.
           python3 - <<'PY'
@@ -301,7 +302,6 @@ jobs:
           t=t.replace('assertEquals(5000,InfinityLiveActivity.CobraTimeshiftTransportPolicy.READ_TIMEOUT_MS);','assertEquals(15000,InfinityLiveActivity.CobraTimeshiftTransportPolicy.READ_TIMEOUT_MS);',1)
           p.write_text(t)
           PY
-          cp repair179/repairs/cobra-buffer-resilience-2103179/tests/Cobra2103179BufferResilienceTest.java repair180-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp repair180/repairs/cobra-playback-finalization-2103180/tests/Cobra2103180PlaybackFinalizationTest.java repair180-build/xbmc/src/test/java/com/projectinfinity/kodi/
           python3 - <<'PY'
           import importlib.util
