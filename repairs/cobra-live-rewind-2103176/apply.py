@@ -291,6 +291,7 @@ def apply(source,receipt_path,out):
  protected=[
   "buildPlayer","cobraStartOwnedMiniPlayback","cobraEndMiniBackgroundPlayback",
   "onUserLeaveHint","onStop","onPictureInPictureModeChanged",
+  "buildShell","onConfigurationChanged","cobraConfirmBrowseSystemBars",
   "cobraApplySystemBarsForSurface","cobraInstallBrowseSafeArea",
   "cobraReattachObservedSurface","loadM3u","parseM3u"
  ]
