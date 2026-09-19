@@ -61,6 +61,8 @@ def main():
     ts=class_block(text,'CobraLocalTimeshiftSession')
     binding=class_block(text,'CobraPlayerBinding')
     vitals=class_block(text,'CobraSessionVitals')
+    stop=method(text,'onStop')
+    recover=method(text,'cobraRecoverLocalTimeshiftSource')
     watchdog=text[text.index('private final Runnable mStallWatchdog'):text.index('private final Runnable mAutoRefresh')]
     checks={
       'exact_2103178_parent':patch.get('base_build')==2103178 and patch.get('base_commit')=='56792d4e44b381cff2c900e7b86ed99265b55d04',
@@ -70,6 +72,10 @@ def main():
       'fast_bounded_reconnect':all(x in transport for x in ('INITIAL_BACKOFF_MS=250L','MAX_BACKOFF_MS=1500L','nextBackoffMs')),
       'partial_ts_survives_provider_drop':'finishSegment(true)' in ts and 'pendingDiscontinuity=true' in ts,
       'stall_accounting_not_double_counted':'outageStart' in ts and 'elapsed>10000' not in ts,
+      'multitask_resize_does_not_background_pause':'CobraWindowLifecyclePolicy.preservePlaybackOnStop(isInMultiWindowMode(),isFinishing())' in stop and 'multitask-window-stop' in stop,
+      'timeshift_waits_for_new_local_segment':'awaitSequenceAfter' in ts and 'latestSequence' in ts,
+      'timeshift_source_error_recovers_before_fallback':'CobraTimeshiftRecoveryPolicy.recoverable' in recover and 'timeshift-source-recovery' in recover and 'source-recovered' in recover,
+      'timeshift_error_no_immediate_session_kill':'if(localTimeshift)cobraStopLocalTimeshift("player-error")' not in binding,
       'http_framing_fix_preserved':'hasRealHttpFraming' in transport and '"\\r\\n\\r\\n"' in transport,
       'playlist_line_fix_preserved':'hasRealPlaylistLines' in transport and '#EXTM3U\\n' in transport,
       'visible_rebuffer_threshold':'bufferedFor>=750L' in binding and 'vitals.rebufferEvents++' in binding,
@@ -83,6 +89,8 @@ def main():
       'watchdog_observation_only':'buffer_observed_no_restart' in watchdog and 'mPlayer.prepare()' not in watchdog and 'mPlayer.play()' not in watchdog,
       'native_unchanged':patch.get('native_changed') is False,
       'theme_zip_unchanged':patch.get('theme_zip_changed') is False,
+      'multitask_patch_declared':patch.get('multitask_resize_playback_preserved') is True,
+      'timeshift_recovery_declared':patch.get('timeshift_source_recovery') is True,
       'physical_unverified':patch.get('physical_device_verified') is False,
     }
     failed=[k for k,v in checks.items() if not v]
