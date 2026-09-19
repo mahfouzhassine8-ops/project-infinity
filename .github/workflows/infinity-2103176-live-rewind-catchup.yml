@@ -255,7 +255,7 @@ jobs:
       - name: Publish audited 2103176 TEST CANDIDATE
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103175-Fullscreen-Background-Safe-Content-TEST-CANDIDATE
+          name: Infinity-2103176-Live-TV-Rewind-Catchup-TEST-CANDIDATE
           path: signed176/
           if-no-files-found: error
           compression-level: 0
