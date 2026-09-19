@@ -83,6 +83,12 @@ public class ExperienceChooserUiTest {
     Splash infinity=activity();show(infinity,true,412,915);assertTrue(tag(infinity,"experience-card-infinity").performClick());Intent next=Shadows.shadowOf(infinity).getNextStartedActivity();assertNotNull(next);assertEquals("com.projectinfinity.kodi.Main",next.getComponent().getClassName());
     Splash cobra=activity();show(cobra,true,412,915);assertTrue(tag(cobra,"experience-card-cobra").performClick());Intent live=Shadows.shadowOf(cobra).getNextStartedActivity();assertNotNull(live);assertEquals("com.projectinfinity.kodi.InfinityLiveActivity",live.getComponent().getClassName());assertEquals("cobra",live.getStringExtra("infinity_live_profile"));
   }
+  @Test public void cobraGearExposesThemeRecoveryWithoutEnteringCobra()throws Exception{
+    Splash a=activity();show(a,true,412,915);View gear=tag(a,"experience-settings-cobra");assertNotNull(gear);assertTrue(gear.performClick());
+    AlertDialog recovery=ShadowAlertDialog.getLatestAlertDialog();assertNotNull(recovery);assertEquals("Cobra recovery",Shadows.shadowOf(recovery).getTitle().toString());
+    assertTrue(texts(recovery.getListView()).contains("Restore Built-in Theme"));
+  }
+
   @Test public void corruptThemeFallsBackWithoutChangingLegacyChooser()throws Exception{
     Splash a=activity();File file=themeFile(a);assertTrue(file.getParentFile().isDirectory()||file.getParentFile().mkdirs());try(FileOutputStream out=new FileOutputStream(file)){out.write("{not json".getBytes("UTF-8"));}chooser.invoke(a);layout(a,412,915);List<String> copy=texts(a.getWindow().getDecorView());assertNull(tag(a,"experience-themed-root"));assertTrue(contains(copy,"INFINITY 2-IN-1"));assertTrue(contains(copy,"Two separate environments"));
   }
