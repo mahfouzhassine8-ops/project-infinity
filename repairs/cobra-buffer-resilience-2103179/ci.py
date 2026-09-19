@@ -49,7 +49,7 @@ def upgrade():
    reconnect_backoff_initial_ms=250,reconnect_backoff_max_ms=1500,
    partial_segment_preservation=True,visible_rebuffer_threshold_ms=750,
    multitask_resize_playback_preserved=True,timeshift_source_recovery=True,timeshift_recovery_wait_ms=12000,
-   preview_stall_recovery=True,preview_stall_detect_ms=6000,performance_overlay_source_aware=True,
+   timeshift_stall_recovery=True,timeshift_stall_detect_ms=6000,auto_live_edge_first=True,auto_live_edge_verify_ms=2500,performance_overlay_source_aware=True,
    rewind_contract_preserved=True,timeshift_transport_repaired=True,
    mini_preview_same_player_handoff=True,display_performance_preserved=True,
    provider_catchup_preserved=True,last_channel_preserved=True,
@@ -90,8 +90,8 @@ def verify():
   for token in (
     b"CobraTimeshiftTransportPolicy",b"TIME-OFFSET=-9.0",b"buffering_transitions",b"rebuffer_duration_ms",
     b"multitask-window-stop",b"timeshift-source-recovery",b"source-recovered",
-    b"preview-stall-detected",b"preview-stall-recovered",b"preview-timeshift-stall-recovery",
-    b"preview_stall_recoveries",
+    b"stall-detected",b"auto-live-edge",b"stall-recovered",b"timeshift-stall-recovery",
+    b"auto_live_edge_recoveries",
     b"mini_preview_direct",b"timeshift_http_failures",b"preview-timeshift-fullscreen",
     b"timeshift-transport-fallback",b"Capture diagnostics",b"preview_timeshift_starts",
     b"surface_attach_calls",b"last_prepare_reason",b"cobra_display_performance",
@@ -116,7 +116,8 @@ def verify():
   "provider_read_timeout_ms":5000,"reconnect_backoff_max_ms":1500,
   "visible_rebuffer_threshold_ms":750,"multitask_resize_playback_preserved":True,
   "timeshift_source_recovery":True,"timeshift_recovery_wait_ms":12000,
-  "preview_stall_recovery":True,"preview_stall_detect_ms":6000,
+  "timeshift_stall_recovery":True,"timeshift_stall_detect_ms":6000,
+  "auto_live_edge_first":True,"auto_live_edge_verify_ms":2500,
   "performance_overlay_source_aware":True,"physical_device_verified":False}
  Path("audit179/final-verification.json").write_text(json.dumps(result,indent=2)+"\n")
  print("PASS: signed 2103179 preserves exact 2103178 native/resources/signer and rewind contract")
@@ -156,7 +157,8 @@ def deliver():
   "rewind_contract_preserved":True,"live_reserve_seconds":9,
   "partial_segment_preservation":True,"multitask_resize_playback_preserved":True,
   "timeshift_source_recovery":True,"timeshift_recovery_wait_ms":12000,
-  "preview_stall_recovery":True,"preview_stall_detect_ms":6000,
+  "timeshift_stall_recovery":True,"timeshift_stall_detect_ms":6000,
+  "auto_live_edge_first":True,"auto_live_edge_verify_ms":2500,
   "performance_overlay_source_aware":True,"provider_connect_timeout_ms":7000,
   "provider_read_timeout_ms":5000,"reconnect_backoff_initial_ms":250,
   "reconnect_backoff_max_ms":1500,"visible_rebuffer_threshold_ms":750,
