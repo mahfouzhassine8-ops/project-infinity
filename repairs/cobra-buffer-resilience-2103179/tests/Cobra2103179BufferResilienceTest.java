@@ -66,4 +66,16 @@ public class Cobra2103179BufferResilienceTest {
   @Test public void localTimeshiftRecoveryWaitIsBounded(){
     assertEquals(12000L,InfinityLiveActivity.CobraTimeshiftRecoveryPolicy.ADVANCE_WAIT_MS);
   }
+
+  @Test public void automaticLiveEdgeRecoveryIsBudgetedLikePassedPlaybackAudit(){
+    assertEquals(6000L,InfinityLiveActivity.CobraTimeshiftStallPolicy.STALL_TRIGGER_MS);
+    assertEquals(60000L,InfinityLiveActivity.CobraTimeshiftStallPolicy.RECOVERY_COOLDOWN_MS);
+    assertEquals(2,InfinityLiveActivity.CobraTimeshiftStallPolicy.MAX_AUTO_LIVE_EDGE_ATTEMPTS);
+    assertEquals(3,InfinityLiveActivity.CobraTimeshiftStallPolicy.BURST_COUNT);
+    assertEquals(12000L,InfinityLiveActivity.CobraTimeshiftStallPolicy.BURST_WINDOW_MS);
+    assertTrue(InfinityLiveActivity.CobraTimeshiftStallPolicy.canAutoRecover(0,0L,1000L));
+    assertFalse(InfinityLiveActivity.CobraTimeshiftStallPolicy.canAutoRecover(2,0L,100000L));
+    assertFalse(InfinityLiveActivity.CobraTimeshiftStallPolicy.canAutoRecover(1,1000L,60999L));
+    assertTrue(InfinityLiveActivity.CobraTimeshiftStallPolicy.canAutoRecover(1,1000L,61000L));
+  }
 }
