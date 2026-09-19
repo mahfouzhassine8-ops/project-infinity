@@ -38,13 +38,13 @@ jobs:
       - uses: android-actions/setup-android@v4
         with: {packages: platform-tools}
 
-      - name: Download exact passed 2103179 APK
+      - name: Download exact passed 2103178 APK
         uses: actions/download-artifact@v5
         with:
-          name: Infinity-2103179-Buffer-Resilience-TEST-CANDIDATE
-          run-id: 35441078889
+          name: Infinity-2103178-Timeshift-Mini-Player-Repair-TEST-CANDIDATE
+          run-id: 35426978986
           github-token: ${{ github.token }}
-          path: baseline179
+          path: baseline178
 
       - name: Apply recovery-only Java delta
         run: |
@@ -64,7 +64,7 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
         run: |
           set -euo pipefail
-          base="$(find baseline179 -maxdepth 2 -type f -name '*.apk' | head -1)"
+          base="$(find baseline178 -maxdepth 2 -type f -name '*.apk' | head -1)"
           test -n "$base"
           mkdir -p audit180/package
           python3 scripts/package_background_resume.py --source . --base-apk "$base" --build-dir build180 --out unsigned180
@@ -92,7 +92,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import zipfile,hashlib
-          base=next(Path('baseline179').rglob('*.apk'))
+          base=next(Path('baseline178').rglob('*.apk'))
           new=Path('signed180/Infinity-Cobra-2103180-Emergency-Theme-Recovery.apk')
           with zipfile.ZipFile(base) as a, zipfile.ZipFile(new) as b:
               libs=[n for n in a.namelist() if n.startswith('lib/') and not n.endswith('/')]
@@ -102,7 +102,7 @@ jobs:
               dex=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
               for token in (b'Restore Built-in Theme',b'Cobra recovery',b'Built-in Cobra theme restored',b'visual-theme.disabled-by-recovery.json'):
                   assert token in dex, token
-          print('PASS: recovery strings packaged; native libraries byte-identical to 2103179')
+          print('PASS: recovery strings packaged; native libraries byte-identical to the exact passed 2103178 engine APK')
           PY
 
       - name: Upload recovery-enabled APK
