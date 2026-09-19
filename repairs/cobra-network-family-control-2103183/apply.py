@@ -230,12 +230,10 @@ def apply(source,receipt_path,out):
 '''+access,
 'network diagnostics accessors')
 
-    diag=member(ts,'diagnostic')
-    diag=once(diag,
+    ts=once(ts,
 '+"; bytes="+diskBytes()',
 '+"; network_pref="+providerNetworkPreference()+"; provider_family="+lastProviderFamily+"; resolved_v4="+resolvedIpv4+"; resolved_v6="+resolvedIpv6+"; bytes="+diskBytes()',
 'network diagnostic summary')
-    ts=replace_member(ts,'diagnostic',diag)
 
     ingest=member(ts,'ingestLoop')
     ingest=once(ingest,
