@@ -56,7 +56,7 @@ def verify():
  badging=Path('signed184/badging.txt').read_text();require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103184'" in badging,'Final APK not forward-installable')
  result={'build':VERSION,'base_build':2103183,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
    'native_entries':len(old_native),'protected_resource_entries':len(protected),'stream_fingerprint_schema':2,'seamless_live_proxy':True,
-   'single_provider_ingest_for_live_and_rewind':True,'live_proxy_nonblocking_fanout':True,'rewind_hls_on_demand':True,'rewind_off_seamless_retune':True,
+   'single_provider_ingest_for_live_and_rewind':True,'live_proxy_nonblocking_fanout':True,'rewind_hls_on_demand':True,'rewind_off_seamless_retune':True,'provider_startup_failure_fallback_ms':12000,
    'transport_timestamp_fingerprint':['PCR','PTS'],'happy_eyeballs_style_auto':True,'happy_delay_ms':250,
    'route_memory_ms':300000,'direct_player_family_control':True,'timeshift_family_control':True,'external_literal_family_enforced':True,'media3_okhttp_version':'1.7.1',
    'manual_ipv4_ipv6_preserved':True,'unified_blue_timeline_preserved':True,'phone_call_video_continuity_preserved':True,
@@ -74,7 +74,7 @@ def deliver():
  source=json.loads(Path('audit184/source-audit/source-audit.json').read_text());final=json.loads(Path('audit184/final-verification.json').read_text());require(source.get('passed') and not source.get('failed'),'2103184 source audit failed')
  result={'build':VERSION,'locked_parent':2103183,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_stream_network_tests':7,
    'stream_fingerprint_schema':2,'seamless_live_proxy':True,'single_provider_ingest_for_live_and_rewind':True,'live_proxy_nonblocking_fanout':True,
-   'rewind_hls_on_demand':True,'rewind_off_seamless_retune':True,'transport_timestamp_fingerprint':['PCR','PTS'],
+   'rewind_hls_on_demand':True,'rewind_off_seamless_retune':True,'provider_startup_failure_fallback_ms':12000,'transport_timestamp_fingerprint':['PCR','PTS'],
    'happy_eyeballs_style_auto':True,'manual_ipv4_ipv6_preserved':True,'direct_player_family_control':True,'timeshift_family_control':True,'external_literal_family_enforced':True,
    'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],'physical_device_verified':False,'candidate_locked':False,
    'status':'TEST CANDIDATE - compare good/problem Nicktoons startup, direct playback, rewind, IPv4/IPv6/Automatic, then export diagnostics'}
