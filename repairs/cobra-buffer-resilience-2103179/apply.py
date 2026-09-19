@@ -116,11 +116,11 @@ RESILIENCE_HELPERS=r'''
     if(failed==null||failedChannel==null)return;
     if(failed==mPlayer&&mPlaying!=null&&failedChannel.id.equals(mPlaying.id)){
       cobraStopLocalTimeshift(reason);releaseSinglePlayer();
-      cobraStartDirectSinglePlayer(failedChannel,failedChannel.primaryUrl,"timeshift-source-fallback");
+      cobraStartDirectSinglePlayer(failedChannel,failedChannel.primaryUrl,"timeshift-transport-fallback");
       cobraSetTimeshiftUiState("FAILED","direct fallback active");
     }else if(failed==mCobraPreviewPlayer&&mGuidePreviewChannel!=null&&failedChannel.id.equals(mGuidePreviewChannel.id)){
       mCobraPreviewPlayer=null;mCobraPreviewSessionKey="";cobraDisposePlayer(failed);cobraStopLocalTimeshift(reason);
-      cobraStartDirectPreview(failedChannel,"timeshift-source-fallback");
+      cobraStartDirectPreview(failedChannel,"timeshift-transport-fallback");
       cobraSetTimeshiftUiState("FAILED","preview direct fallback");
     }
   }
