@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - cobra-liquid-glass-theme-v1
+  pull_request:
+    branches:
+      - infinity-cobra-2103179-buffer-resilience-rc1
   workflow_dispatch:
 
 permissions:
