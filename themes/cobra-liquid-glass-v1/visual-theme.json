@@ -1,0 +1,825 @@
+{
+  "schema": 2,
+  "scope": "cobra-presentation",
+  "minimum_runtime": 2,
+  "minimum_build": 2103160,
+  "id": "cobra.liquid-glass.hm.safe.v1",
+  "name": "Cobra Liquid Glass · HM Safe v1",
+  "assets": {},
+  "base": {
+    "colors": {
+      "palette.background": "#FF080D16",
+      "palette.rail": "#CC111A28",
+      "palette.panel": "#B31A2638",
+      "palette.panel2": "#991F2E43",
+      "palette.text": "#FFF7FAFF",
+      "palette.muted": "#FF9EACBF",
+      "palette.accent": "#FF4CBFFF",
+      "palette.accent_soft": "#334CBFFF",
+      "palette.line": "#52FFFFFF",
+      "palette.focus": "#FF78CCFF",
+      "chooser.palette.background": "#FF080D16",
+      "chooser.palette.background_glow": "#FF102A46",
+      "chooser.palette.text": "#FFF7FAFF",
+      "chooser.palette.muted": "#FF9EACBF",
+      "chooser.palette.infinity_top": "#E6111B2A",
+      "chooser.palette.infinity_bottom": "#C9142032",
+      "chooser.palette.infinity_border": "#70FFFFFF",
+      "chooser.palette.infinity_glow": "#554CBFFF",
+      "chooser.palette.cobra_top": "#E60B2741",
+      "chooser.palette.cobra_bottom": "#C90B1D31",
+      "chooser.palette.cobra_border": "#996ED0FF",
+      "chooser.palette.cobra_glow": "#664CBFFF",
+      "chooser.palette.badge_fill": "#B31B2A3F",
+      "chooser.palette.badge_border": "#70FFFFFF",
+      "chooser.palette.horizon": "#334CBFFF"
+    },
+    "numbers": {
+      "chooser.layout.motion_ms": 220
+    },
+    "copy": {
+      "chooser.label.brand": "INFINITY",
+      "chooser.label.brand_tagline": "LIQUID GLASS",
+      "chooser.label.title": "CHOOSE YOUR EXPERIENCE",
+      "chooser.label.personalization": "Personalized for HM",
+      "chooser.label.infinity_title": "INFINITY",
+      "chooser.label.infinity_subtitle": "Your media, refined",
+      "chooser.label.cobra_title": "COBRA",
+      "chooser.label.cobra_subtitle": "Fluid playback. Focused control.",
+      "chooser.label.footer_brand": "INFINITY × COBRA",
+      "chooser.label.footer_tagline": "HM",
+      "chooser.label.initials": "HM"
+    },
+    "styles": {
+      "screen": {
+        "fill": "#FF080D16",
+        "fill_end": "#FF0B1320"
+      },
+      "screen.header": {
+        "fill": "#F21A2638",
+        "fill_end": "#E6111B2A",
+        "stroke": "#66FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 24,
+        "elevation_dp": 4
+      },
+      "screen.status": {
+        "fill": "#E6111B2A",
+        "fill_end": "#D9111B2A",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 18
+      },
+      "rail": {
+        "fill": "#F2111A28",
+        "fill_end": "#E60B121D",
+        "stroke": "#59FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28,
+        "elevation_dp": 5
+      },
+      "drawer.panel": {
+        "fill": "#FA172233",
+        "fill_end": "#F0101927",
+        "stroke": "#80FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 30,
+        "elevation_dp": 6
+      },
+      "drawer.header": {
+        "fill": "#E61E3048",
+        "fill_end": "#D9152234",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 24
+      },
+      "drawer.items": {
+        "fill": "#CC172638",
+        "fill_end": "#B3172638",
+        "radius_dp": 24
+      },
+      "drawer.power": {
+        "fill": "#E619273B",
+        "fill_end": "#D9111B2A",
+        "stroke": "#59FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "drawer.item.search": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.tv": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.movies": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.shows": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.recordings": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.my_list": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.settings": {
+        "fill": "#D91B2A40",
+        "fill_end": "#CC152235",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF",
+        "selected": "#FF244E70"
+      },
+      "drawer.item.view": {
+        "fill": "#E6183451",
+        "fill_end": "#D9172A40",
+        "stroke": "#8078CCFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF"
+      },
+      "settings": {
+        "fill": "#FA152132",
+        "fill_end": "#F00D1623",
+        "stroke": "#80FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28,
+        "elevation_dp": 6
+      },
+      "sheet.row": {
+        "fill": "#E61C2B40",
+        "fill_end": "#D9152234",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 20,
+        "focus": "#FF78CCFF"
+      },
+      "sheet.detail": {
+        "fill": "#D917263A",
+        "fill_end": "#CC152234",
+        "stroke": "#40FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "dialog.panel": {
+        "fill": "#FF182334",
+        "fill_end": "#FA0E1723",
+        "stroke": "#8CFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28,
+        "elevation_dp": 6
+      },
+      "dialog.button": {
+        "fill": "#E61F324C",
+        "fill_end": "#D9192940",
+        "stroke": "#66FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 18,
+        "text": "#FFF7FAFF",
+        "focus": "#FF78CCFF",
+        "pressed": "#FF315F87"
+      },
+      "guide.shell": {
+        "fill": "#E6131F30",
+        "fill_end": "#D9101A29",
+        "stroke": "#59FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 28
+      },
+      "guide.directory": {
+        "fill": "#F21A283C",
+        "fill_end": "#E6121D2C",
+        "stroke": "#59FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "guide.details": {
+        "fill": "#E617263A",
+        "fill_end": "#D9111B2A",
+        "stroke": "#4DFFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 22
+      },
+      "guide.browser": {
+        "fill": "#D9111B2A",
+        "fill_end": "#CC101A28",
+        "stroke": "#40FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 24
+      },
+      "player.chrome": {
+        "fill": "#ED0D1623",
+        "fill_end": "#E0111E30",
+        "stroke": "#66FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 26,
+        "elevation_dp": 5
+      },
+      "player.channels": {
+        "fill": "#FA111B2A",
+        "fill_end": "#ED0D1623",
+        "stroke": "#66FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 26,
+        "elevation_dp": 5
+      },
+      "chooser": {
+        "fill": "#FF080D16",
+        "fill_end": "#FF10243B"
+      },
+      "chooser.card.infinity": {
+        "fill": "#F21A2638",
+        "fill_end": "#E6132033",
+        "stroke": "#80FFFFFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 30,
+        "focus": "#FF78CCFF",
+        "pressed": "#FF294F73",
+        "elevation_dp": 5
+      },
+      "chooser.card.cobra": {
+        "fill": "#F20D2A45",
+        "fill_end": "#E60B1F35",
+        "stroke": "#B378CCFF",
+        "stroke_width_dp": 1,
+        "radius_dp": 30,
+        "focus": "#FF9ADFFF",
+        "pressed": "#FF1E567D",
+        "elevation_dp": 5
+      }
+    }
+  },
+  "variants": {
+    "light": {
+      "colors": {
+        "palette.background": "#FFF2F6FB",
+        "palette.rail": "#D9FFFFFF",
+        "palette.panel": "#CCFFFFFF",
+        "palette.panel2": "#B3F7FBFF",
+        "palette.text": "#FF122033",
+        "palette.muted": "#FF5C6C80",
+        "palette.accent": "#FF1677C8",
+        "palette.accent_soft": "#331677C8",
+        "palette.line": "#4D2B3E55",
+        "palette.focus": "#FF168DE2",
+        "chooser.palette.background": "#FFF2F6FB",
+        "chooser.palette.background_glow": "#FFDCEEFF",
+        "chooser.palette.text": "#FF122033",
+        "chooser.palette.muted": "#FF5C6C80",
+        "chooser.palette.infinity_top": "#E6FFFFFF",
+        "chooser.palette.infinity_bottom": "#B3EDF5FC",
+        "chooser.palette.infinity_border": "#66374C63",
+        "chooser.palette.infinity_glow": "#4D42A9F5",
+        "chooser.palette.cobra_top": "#D9EAF7FF",
+        "chooser.palette.cobra_bottom": "#B3DDEEFF",
+        "chooser.palette.cobra_border": "#80168DE2",
+        "chooser.palette.cobra_glow": "#5942A9F5",
+        "chooser.palette.badge_fill": "#CCFFFFFF",
+        "chooser.palette.badge_border": "#66374C63",
+        "chooser.palette.horizon": "#33168DE2"
+      },
+      "styles": {
+        "screen": {
+          "fill": "#FFF2F6FB",
+          "fill_end": "#FFE8F0F8"
+        },
+        "screen.header": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2EDF4FA",
+          "stroke": "#80374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 24,
+          "elevation_dp": 4
+        },
+        "screen.status": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF4FA",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 18
+        },
+        "rail": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2ECF3F9",
+          "stroke": "#73374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 5
+        },
+        "drawer.panel": {
+          "fill": "#FFFFFFFF",
+          "fill_end": "#FAEDF4FA",
+          "stroke": "#8C374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "elevation_dp": 6
+        },
+        "drawer.header": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2E9F2FA",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 24
+        },
+        "drawer.items": {
+          "fill": "#E6FFFFFF",
+          "fill_end": "#D9EDF5FC",
+          "radius_dp": 24
+        },
+        "drawer.power": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2EAF3FA",
+          "stroke": "#73374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "settings": {
+          "fill": "#FFFFFFFF",
+          "fill_end": "#FAEDF4FA",
+          "stroke": "#8C374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 6
+        },
+        "sheet.row": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2"
+        },
+        "sheet.detail": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#59374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "dialog.panel": {
+          "fill": "#FFFFFFFF",
+          "fill_end": "#FAEDF4FA",
+          "stroke": "#99374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 6
+        },
+        "dialog.button": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2E9F3FB",
+          "stroke": "#80374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 18,
+          "text": "#FF122033",
+          "focus": "#FF168DE2",
+          "pressed": "#FFD2E8F8"
+        },
+        "guide.shell": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF4FA",
+          "stroke": "#73374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 28
+        },
+        "guide.directory": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2EAF3FA",
+          "stroke": "#73374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "guide.details": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF4FA",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "guide.browser": {
+          "fill": "#EFFFFFFF",
+          "fill_end": "#E0EDF4FA",
+          "stroke": "#59374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 24
+        },
+        "player.chrome": {
+          "fill": "#FAFFFFFF",
+          "fill_end": "#F2E9F2FA",
+          "stroke": "#80374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 5
+        },
+        "player.channels": {
+          "fill": "#FFFFFFFF",
+          "fill_end": "#FAEAF3FA",
+          "stroke": "#80374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 5
+        },
+        "chooser": {
+          "fill": "#FFF2F6FB",
+          "fill_end": "#FFE5F1FA"
+        },
+        "chooser.card.infinity": {
+          "fill": "#FFFFFFFF",
+          "fill_end": "#FAEDF5FC",
+          "stroke": "#80374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF168DE2",
+          "pressed": "#FFD4EAF9",
+          "elevation_dp": 5
+        },
+        "chooser.card.cobra": {
+          "fill": "#FFEAF7FF",
+          "fill_end": "#FADDEEFF",
+          "stroke": "#99168DE2",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF168DE2",
+          "pressed": "#FFCBE6FA",
+          "elevation_dp": 5
+        },
+        "drawer.item.search": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.tv": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.movies": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.shows": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.recordings": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.my_list": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.settings": {
+          "fill": "#F2FFFFFF",
+          "fill_end": "#E6EDF5FC",
+          "stroke": "#66374C63",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2",
+          "selected": "#FFD6ECFA"
+        },
+        "drawer.item.view": {
+          "fill": "#F2E7F5FF",
+          "fill_end": "#E6DCEEFF",
+          "stroke": "#80168DE2",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF168DE2"
+        }
+      }
+    },
+    "dark": {
+      "styles": {}
+    },
+    "oled": {
+      "colors": {
+        "palette.background": "#FF000000",
+        "palette.rail": "#CC080A0E",
+        "palette.panel": "#B30A0D12",
+        "palette.panel2": "#990D1118",
+        "palette.text": "#FFFFFFFF",
+        "palette.muted": "#FFA2ADBA",
+        "palette.accent": "#FF46C3FF",
+        "palette.accent_soft": "#3346C3FF",
+        "palette.line": "#52FFFFFF",
+        "palette.focus": "#FF78D7FF",
+        "chooser.palette.background": "#FF000000",
+        "chooser.palette.background_glow": "#FF050A0F",
+        "chooser.palette.text": "#FFFFFFFF",
+        "chooser.palette.muted": "#FFA2ADBA",
+        "chooser.palette.infinity_top": "#D9080A0E",
+        "chooser.palette.infinity_bottom": "#B3030405",
+        "chooser.palette.infinity_border": "#66FFFFFF",
+        "chooser.palette.infinity_glow": "#3346C3FF",
+        "chooser.palette.cobra_top": "#D9071621",
+        "chooser.palette.cobra_bottom": "#B3040D14",
+        "chooser.palette.cobra_border": "#9946C3FF",
+        "chooser.palette.cobra_glow": "#4D46C3FF",
+        "chooser.palette.badge_fill": "#D9080A0E",
+        "chooser.palette.badge_border": "#66FFFFFF",
+        "chooser.palette.horizon": "#3346C3FF"
+      },
+      "styles": {
+        "screen": {
+          "fill": "#FF000000",
+          "fill_end": "#FF000000"
+        },
+        "screen.header": {
+          "fill": "#FA080A0E",
+          "fill_end": "#F205070A",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 24,
+          "elevation_dp": 3
+        },
+        "screen.status": {
+          "fill": "#F2080A0E",
+          "fill_end": "#E605070A",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 18
+        },
+        "rail": {
+          "fill": "#FA080A0E",
+          "fill_end": "#F2030405",
+          "stroke": "#59FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 4
+        },
+        "drawer.panel": {
+          "fill": "#FF0A0D12",
+          "fill_end": "#FA05070A",
+          "stroke": "#80FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "elevation_dp": 5
+        },
+        "drawer.header": {
+          "fill": "#F20B1017",
+          "fill_end": "#E6070A0F",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 24
+        },
+        "drawer.items": {
+          "fill": "#D9080A0E",
+          "fill_end": "#CC05070A",
+          "radius_dp": 24
+        },
+        "drawer.power": {
+          "fill": "#F20A0D12",
+          "fill_end": "#E605070A",
+          "stroke": "#59FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "settings": {
+          "fill": "#FF0A0D12",
+          "fill_end": "#FA05070A",
+          "stroke": "#80FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 5
+        },
+        "sheet.row": {
+          "fill": "#F20D1118",
+          "fill_end": "#E6080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF"
+        },
+        "sheet.detail": {
+          "fill": "#E60A0D12",
+          "fill_end": "#D905070A",
+          "stroke": "#40FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "dialog.panel": {
+          "fill": "#FF0A0D12",
+          "fill_end": "#FA05070A",
+          "stroke": "#8CFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 28,
+          "elevation_dp": 5
+        },
+        "dialog.button": {
+          "fill": "#F20D1118",
+          "fill_end": "#E6080B10",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 18,
+          "text": "#FFFFFFFF",
+          "focus": "#FF78D7FF",
+          "pressed": "#FF173A4D"
+        },
+        "guide.shell": {
+          "fill": "#E60A0D12",
+          "fill_end": "#D905070A",
+          "stroke": "#59FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 28
+        },
+        "guide.directory": {
+          "fill": "#F20D1118",
+          "fill_end": "#E6080B10",
+          "stroke": "#59FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "guide.details": {
+          "fill": "#E60A0D12",
+          "fill_end": "#D905070A",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 22
+        },
+        "guide.browser": {
+          "fill": "#D9080A0E",
+          "fill_end": "#CC05070A",
+          "stroke": "#40FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 24
+        },
+        "player.chrome": {
+          "fill": "#F20A0D12",
+          "fill_end": "#E605070A",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 4
+        },
+        "player.channels": {
+          "fill": "#FA0A0D12",
+          "fill_end": "#F205070A",
+          "stroke": "#66FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 26,
+          "elevation_dp": 4
+        },
+        "chooser": {
+          "fill": "#FF000000",
+          "fill_end": "#FF030609"
+        },
+        "chooser.card.infinity": {
+          "fill": "#F20A0D12",
+          "fill_end": "#E605070A",
+          "stroke": "#80FFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF78D7FF",
+          "pressed": "#FF153646",
+          "elevation_dp": 4
+        },
+        "chooser.card.cobra": {
+          "fill": "#F2071621",
+          "fill_end": "#E6040D14",
+          "stroke": "#B346C3FF",
+          "stroke_width_dp": 1,
+          "radius_dp": 30,
+          "focus": "#FF9AE4FF",
+          "pressed": "#FF0F3850",
+          "elevation_dp": 4
+        },
+        "drawer.item.search": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.tv": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.movies": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.shows": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.recordings": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.my_list": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.settings": {
+          "fill": "#E60D1118",
+          "fill_end": "#D9080B10",
+          "stroke": "#4DFFFFFF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF",
+          "selected": "#FF12384D"
+        },
+        "drawer.item.view": {
+          "fill": "#E6091A26",
+          "fill_end": "#D9051018",
+          "stroke": "#8046C3FF",
+          "stroke_width_dp": 1,
+          "radius_dp": 20,
+          "focus": "#FF78D7FF"
+        }
+      }
+    }
+  }
+}

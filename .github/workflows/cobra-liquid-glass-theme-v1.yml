@@ -1,0 +1,76 @@
+name: Cobra Liquid Glass HM SAFE v1.1
+
+on:
+  push:
+    branches:
+      - cobra-liquid-glass-theme-v1
+  pull_request:
+    branches:
+      - infinity-cobra-2103179-buffer-resilience-rc1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-audit-theme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact theme branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove presentation-only delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=0560b18c497e9861864126d96f9b784e488ebe32
+          git cat-file -e "$BASE^{commit}"
+          test "$(git merge-base "$BASE" HEAD)" = "$BASE"
+          bad="$(git diff --name-only "$BASE"..HEAD | grep -vE '^(themes/cobra-liquid-glass-v1/|repairs/infinity-experience-2103159/bridge-1\.java\.inc$|repairs/infinity-experience-2103159/bridge-3\.java\.inc$|repairs/infinity-experience-2103159/tests/ExperienceChooserUiTest\.java$|\.github/workflows/cobra-liquid-glass-theme-v1\.yml$)' || true)"
+          if [ -n "$bad" ]; then
+            echo "Protected/non-theme files changed:"
+            echo "$bad"
+            exit 1
+          fi
+          echo "PASS: delta limited to theme + chooser recovery; no player/native/provider source changed"
+
+      - name: Prove chooser recovery is independent of Cobra themed settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'Restore Built-in Theme' repairs/infinity-experience-2103159/bridge-3.java.inc
+          grep -q 'restoreBuiltInVisualThemeFromChooser' repairs/infinity-experience-2103159/bridge-1.java.inc
+          grep -q 'visual-theme.disabled-by-recovery.json' repairs/infinity-experience-2103159/bridge-1.java.inc
+          grep -q 'Cobra recovery' repairs/infinity-experience-2103159/tests/ExperienceChooserUiTest.java
+          ! grep -q 'InfinityLiveActivity' repairs/infinity-experience-2103159/bridge-1.java.inc
+          echo "PASS: chooser can reset theme without entering Cobra"
+
+      - name: Build and statically validate visual package
+        run: python3 themes/cobra-liquid-glass-v1/build.py --out dist
+
+      - name: Run final adversarial certification
+        run: python3 themes/cobra-liquid-glass-v1/adversarial_audit.py
+
+      - name: Inspect data-only ZIP contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -l dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip
+          count="$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip | wc -l)"
+          test "$count" -eq 1
+          test "$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip)" = "script.infinity.cobra.theme/resources/visual-theme.json"
+          (cd dist && sha256sum -c SHA256SUMS)
+
+      - name: Upload installable Cobra theme
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cobra-Liquid-Glass-HM-SAFE-v1.1.0
+          path: |
+            dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip
+            dist/build-report.json
+            dist/SHA256SUMS
+            dist/safe-audit.json
+          if-no-files-found: error
+          retention-days: 30
