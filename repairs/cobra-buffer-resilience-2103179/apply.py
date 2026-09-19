@@ -110,43 +110,71 @@ RESILIENCE_HELPERS=r'''
       return false;
     }
   }
-  private int mCobraTimeshiftRecoveryGeneration=0,mCobraTransientMultiWindowStops=0,mCobraPreviewStallGeneration=0,mCobraPreviewStallRecoveries=0;
+  private int mCobraTimeshiftRecoveryGeneration=0,mCobraTransientMultiWindowStops=0,mCobraTimeshiftStallGeneration=0,mCobraTimeshiftStallRecoveries=0,mCobraAutoLiveEdgeRecoveries=0;
 
-  private void cobraCancelPreviewTimeshiftStallCheck(){mCobraPreviewStallGeneration++;}
+  private void cobraCancelTimeshiftStallCheck(){mCobraTimeshiftStallGeneration++;}
 
-  private void cobraSchedulePreviewTimeshiftStallCheck(ExoPlayer player,Channel channel){
-    if(player==null||channel==null||player!=mCobraPreviewPlayer||player!=mCobraTimeshiftPlayer||mCobraTimeshiftSession==null)return;
-    final CobraLocalTimeshiftSession session=mCobraTimeshiftSession;final long startSeq=session.latestSequence();final int generation=++mCobraPreviewStallGeneration;
+  private boolean cobraCurrentLocalTimeshiftPlayer(ExoPlayer player){
+    return player!=null&&player==mCobraTimeshiftPlayer&&mCobraTimeshiftSession!=null&&(player==mPlayer||player==mCobraPreviewPlayer);
+  }
+
+  private void cobraScheduleTimeshiftStallCheck(ExoPlayer player,Channel channel){
+    if(channel==null||!cobraCurrentLocalTimeshiftPlayer(player))return;
+    final CobraLocalTimeshiftSession session=mCobraTimeshiftSession;final long startSeq=session.latestSequence();final int generation=++mCobraTimeshiftStallGeneration;
     mMain.postDelayed(()->{
-      if(generation!=mCobraPreviewStallGeneration||player!=mCobraPreviewPlayer||player!=mCobraTimeshiftPlayer||session!=mCobraTimeshiftSession)return;
+      if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
       if(!player.getPlayWhenReady()||player.getPlaybackState()!=Player.STATE_BUFFERING)return;
-      cobraRecoverPreviewTimeshiftStall(player,channel,session,startSeq,generation);
+      cobraRecoverTimeshiftStall(player,channel,session,startSeq,generation);
     },6000L);
   }
 
-  private void cobraRecoverPreviewTimeshiftStall(ExoPlayer player,Channel channel,CobraLocalTimeshiftSession session,long startSeq,int generation){
+  private void cobraRecoverTimeshiftStall(ExoPlayer player,Channel channel,CobraLocalTimeshiftSession session,long startSeq,int generation){
     if(player==null||channel==null||session==null)return;
-    InfinityCobraDiagnostics.record(this,"timeshift","preview-stall-detected","tail="+startSeq+"; "+session.diagnostic());
+    final String surface=player==mPlayer?"fullscreen":"preview";
+    InfinityCobraDiagnostics.record(this,"timeshift","stall-detected",surface+"; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; tail="+startSeq+"; "+session.diagnostic());
+
+    // Device evidence: a manual LIVE press immediately recovers this exact state while
+    // the local 120s cache remains healthy. Do that first, on the same player/cache.
+    try{
+      if(player.isCurrentMediaItemSeekable()){
+        mCobraAutoLiveEdgeRecoveries++;
+        player.seekToDefaultPosition();
+        startCobraPlayer(player);
+        cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
+        InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge",surface+"; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
+        mMain.postDelayed(()->{
+          if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
+          if(player.getPlayWhenReady()&&player.getPlaybackState()==Player.STATE_BUFFERING)cobraRecoverTimeshiftStallDeep(player,channel,session,startSeq,generation,surface);
+        },2500L);
+        return;
+      }
+    }catch(RuntimeException liveEdgeFailure){
+      InfinityCobraDiagnostics.failure(this,"timeshift-auto-live-edge",liveEdgeFailure);
+    }
+    cobraRecoverTimeshiftStallDeep(player,channel,session,startSeq,generation,surface);
+  }
+
+  private void cobraRecoverTimeshiftStallDeep(ExoPlayer player,Channel channel,CobraLocalTimeshiftSession session,long startSeq,int generation,String surface){
     if(!submitCobraIo(()->{
       boolean advanced=session.latestSequence()>startSeq||session.awaitSequenceAfter(startSeq,6000L);
       publishCobraUi(()->{
-        if(generation!=mCobraPreviewStallGeneration||player!=mCobraPreviewPlayer||player!=mCobraTimeshiftPlayer||session!=mCobraTimeshiftSession)return;
+        if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
         if(player.getPlaybackState()!=Player.STATE_BUFFERING||!player.getPlayWhenReady())return;
         if(advanced){
           try{
-            mCobraPreviewStallRecoveries++;
-            player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_preview_stall="+mCobraPreviewStallRecoveries));
-            cobraPrepareObserved(player,"preview-timeshift-stall-recovery");startCobraPlayer(player);
+            mCobraTimeshiftStallRecoveries++;
+            player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_stall="+mCobraTimeshiftStallRecoveries));
+            cobraPrepareObserved(player,surface+"-timeshift-stall-recovery");startCobraPlayer(player);
             cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
-            InfinityCobraDiagnostics.record(this,"timeshift","preview-stall-recovered",session.diagnostic());
+            InfinityCobraDiagnostics.record(this,"timeshift","stall-recovered",surface+"; "+session.diagnostic());
             return;
           }catch(RuntimeException retryFailure){
-            InfinityCobraDiagnostics.failure(this,"preview-timeshift-stall-recovery",retryFailure);
+            InfinityCobraDiagnostics.failure(this,"timeshift-stall-recovery",retryFailure);
           }
         }
-        cobraFallbackFromLocalTimeshift(player,channel,advanced?"preview-stall-prepare-failed":"preview-stall-no-advance");
+        cobraFallbackFromLocalTimeshift(player,channel,advanced?"stall-prepare-failed":"stall-no-advance");
       });
-    }))cobraFallbackFromLocalTimeshift(player,channel,"preview-stall-worker-rejected");
+    }))cobraFallbackFromLocalTimeshift(player,channel,"stall-worker-rejected");
   }
 
   private void cobraFallbackFromLocalTimeshift(ExoPlayer failed,Channel failedChannel,String reason){
@@ -265,16 +293,16 @@ def apply(source,receipt_path,out):
 '''      if(state==Player.STATE_BUFFERING&&vitals.everReady){
         vitals.bufferingTransitions++;
         if(vitals.bufferingStartedElapsed==0L)vitals.bufferingStartedElapsed=android.os.SystemClock.elapsedRealtime();
-        if(player==mCobraPreviewPlayer&&player==mCobraTimeshiftPlayer)cobraSchedulePreviewTimeshiftStallCheck(player,channel);
+        if(player==mCobraTimeshiftPlayer)cobraScheduleTimeshiftStallCheck(player,channel);
       }
       if(state==Player.STATE_READY){
-        if(player==mCobraPreviewPlayer&&player==mCobraTimeshiftPlayer)cobraCancelPreviewTimeshiftStallCheck();
+        if(player==mCobraTimeshiftPlayer)cobraCancelTimeshiftStallCheck();
         if(vitals.everReady&&vitals.bufferingStartedElapsed>0L){
           long bufferedFor=Math.max(0L,android.os.SystemClock.elapsedRealtime()-vitals.bufferingStartedElapsed);
           if(bufferedFor>=750L){vitals.rebufferEvents++;vitals.rebufferDurationMs+=bufferedFor;}
         }
         vitals.bufferingStartedElapsed=0L;vitals.everReady=true;
-      }else if(state==Player.STATE_IDLE||state==Player.STATE_ENDED){vitals.bufferingStartedElapsed=0L;if(player==mCobraPreviewPlayer&&player==mCobraTimeshiftPlayer)cobraCancelPreviewTimeshiftStallCheck();}''','visible rebuffer accounting')
+      }else if(state==Player.STATE_IDLE||state==Player.STATE_ENDED){vitals.bufferingStartedElapsed=0L;if(player==mCobraTimeshiftPlayer)cobraCancelTimeshiftStallCheck();}''','visible rebuffer accounting')
     binding=once(binding,
 '''      final boolean localTimeshift=player==mCobraTimeshiftPlayer;
       if(localTimeshift)cobraStopLocalTimeshift("player-error");''',
@@ -346,7 +374,7 @@ def apply(source,receipt_path,out):
     fresh=member(text,'cobraFreshHealthSnapshot')
     fresh=once(fresh,
 '      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("preview_start_count",mCobraPreviewStartCount);',
-'      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("multi_window",Build.VERSION.SDK_INT>=24&&isInMultiWindowMode());root.put("transient_multiwindow_stops",mCobraTransientMultiWindowStops);root.put("preview_stall_recoveries",mCobraPreviewStallRecoveries);root.put("preview_start_count",mCobraPreviewStartCount);',
+'      root.put("preview_height",mCobraPreviewTexture==null?0:mCobraPreviewTexture.getHeight());root.put("multi_window",Build.VERSION.SDK_INT>=24&&isInMultiWindowMode());root.put("transient_multiwindow_stops",mCobraTransientMultiWindowStops);root.put("timeshift_stall_recoveries",mCobraTimeshiftStallRecoveries);root.put("auto_live_edge_recoveries",mCobraAutoLiveEdgeRecoveries);root.put("preview_start_count",mCobraPreviewStartCount);',
 'multi-window diagnostic evidence')
     text=replace_member(text,'cobraFreshHealthSnapshot',fresh)
 
@@ -366,8 +394,8 @@ def apply(source,receipt_path,out):
       'finishSegment(true)','bufferingTransitions','rebufferDurationMs','bufferedFor>=750L',
       'CobraWindowLifecyclePolicy','preservePlaybackOnStop','multitask-window-stop',
       'CobraTimeshiftRecoveryPolicy','awaitSequenceAfter','timeshift-source-recovery','source-recovered',
-      'preview-stall-detected','preview-stall-recovered','preview-timeshift-stall-recovery','mCobraPreviewStallRecoveries',
-      'ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer',
+      'stall-detected','auto-live-edge','stall-recovered','timeshift-stall-recovery','mCobraAutoLiveEdgeRecoveries',
+      'seekToDefaultPosition','ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer',
       'timeshift-transport-fallback','preview-timeshift-fullscreen','cobra_live_timeshift_seek',
       'preferredDisplayModeId','cobra_last_channel','buffer_observed_no_restart'
     ]
@@ -386,8 +414,8 @@ def apply(source,receipt_path,out):
       'reconnect_backoff_initial_ms':250,'reconnect_backoff_max_ms':1500,
       'partial_segment_preservation':True,'visible_rebuffer_threshold_ms':750,
       'multitask_resize_playback_preserved':True,'timeshift_source_recovery':True,
-      'timeshift_recovery_wait_ms':12000,'preview_stall_recovery':True,'preview_stall_detect_ms':6000,
-      'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
+      'timeshift_recovery_wait_ms':12000,'timeshift_stall_recovery':True,'timeshift_stall_detect_ms':6000,
+      'auto_live_edge_first':True,'auto_live_edge_verify_ms':2500,'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
       'physical_device_verified':False
     }
     (out/'patch.json').write_text(json.dumps(report,indent=2)+'\n')
