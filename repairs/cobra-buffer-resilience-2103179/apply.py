@@ -126,9 +126,12 @@ RESILIENCE_HELPERS=r'''
     final CobraLocalTimeshiftSession session=mCobraTimeshiftSession;
     InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst","count="+mCobraRebufferBurstRecoveries+"; buffer_ms="+Math.max(0,player.getTotalBufferedDuration())+"; "+(session==null?"no-session":session.diagnostic()));
     try{
-      if(player.isCurrentMediaItemSeekable()){
-        mCobraAutoLiveEdgeRecoveries++;player.seekToDefaultPosition();startCobraPlayer(player);
-        InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst-live-edge","count="+mCobraAutoLiveEdgeRecoveries);
+      if(session!=null){
+        mCobraAutoLiveEdgeRecoveries++;
+        player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_live_edge="+mCobraAutoLiveEdgeRecoveries));
+        cobraPrepareObserved(player,"timeshift-live-edge-recovery");startCobraPlayer(player);
+        cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
+        InfinityCobraDiagnostics.record(this,"timeshift","rebuffer-burst-live-edge","fresh-playlist; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
         return;
       }
     }catch(RuntimeException liveEdgeFailure){InfinityCobraDiagnostics.failure(this,"timeshift-rebuffer-burst-live-edge",liveEdgeFailure);}
@@ -157,18 +160,16 @@ RESILIENCE_HELPERS=r'''
     // Device evidence: a manual LIVE press immediately recovers this exact state while
     // the local 120s cache remains healthy. Do that first, on the same player/cache.
     try{
-      if(player.isCurrentMediaItemSeekable()){
-        mCobraAutoLiveEdgeRecoveries++;
-        player.seekToDefaultPosition();
-        startCobraPlayer(player);
-        cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
-        InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge",surface+"; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
-        mMain.postDelayed(()->{
-          if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
-          if(player.getPlayWhenReady()&&player.getPlaybackState()==Player.STATE_BUFFERING)cobraRecoverTimeshiftStallDeep(player,channel,session,startSeq,generation,surface);
-        },2500L);
-        return;
-      }
+      mCobraAutoLiveEdgeRecoveries++;
+      player.setMediaItem(mediaItem(session.playlistUrl()+"?cobra_live_edge="+mCobraAutoLiveEdgeRecoveries));
+      cobraPrepareObserved(player,"timeshift-live-edge-recovery");startCobraPlayer(player);
+      cobraSetTimeshiftUiState("READY",Math.round(session.windowDurationMs()/1000f)+"s");
+      InfinityCobraDiagnostics.record(this,"timeshift","auto-live-edge",surface+"; fresh-playlist; count="+mCobraAutoLiveEdgeRecoveries+"; "+session.diagnostic());
+      mMain.postDelayed(()->{
+        if(generation!=mCobraTimeshiftStallGeneration||!cobraCurrentLocalTimeshiftPlayer(player)||session!=mCobraTimeshiftSession)return;
+        if(player.getPlayWhenReady()&&player.getPlaybackState()==Player.STATE_BUFFERING)cobraRecoverTimeshiftStallDeep(player,channel,session,startSeq,generation,surface);
+      },2500L);
+      return;
     }catch(RuntimeException liveEdgeFailure){
       InfinityCobraDiagnostics.failure(this,"timeshift-auto-live-edge",liveEdgeFailure);
     }
@@ -417,7 +418,8 @@ def apply(source,receipt_path,out):
       'CobraTimeshiftRecoveryPolicy','awaitSequenceAfter','timeshift-source-recovery','source-recovered',
       'stall-detected','auto-live-edge','stall-recovered','timeshift-stall-recovery','mCobraAutoLiveEdgeRecoveries',
       'rebuffer-burst','rebuffer-burst-live-edge','mCobraRebufferBurstRecoveries','mCobraRebufferBurstCount<3','12000L',
-      'seekToDefaultPosition','ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer',
+      'timeshift-live-edge-recovery','?cobra_live_edge=','fresh-playlist',
+      'ExoPlayer proofPlayer=mPlayer!=null?mPlayer:mCobraPreviewPlayer',
       'timeshift-transport-fallback','preview-timeshift-fullscreen','cobra_live_timeshift_seek',
       'preferredDisplayModeId','cobra_last_channel','buffer_observed_no_restart'
     ]
@@ -438,7 +440,8 @@ def apply(source,receipt_path,out):
       'multitask_resize_playback_preserved':True,'timeshift_source_recovery':True,
       'timeshift_recovery_wait_ms':12000,'timeshift_stall_recovery':True,'timeshift_stall_detect_ms':6000,
       'rebuffer_burst_recovery':True,'rebuffer_burst_count':3,'rebuffer_burst_window_ms':12000,
-      'auto_live_edge_first':True,'auto_live_edge_verify_ms':2500,'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
+      'auto_live_edge_first':True,'auto_live_edge_verify_ms':2500,'monotonic_live_edge_reload':True,
+      'stale_default_seek_removed':True,'performance_overlay_source_aware':True,'rewind_contract_preserved':True,'native_changed':False,'theme_zip_changed':False,
       'physical_device_verified':False
     }
     (out/'patch.json').write_text(json.dumps(report,indent=2)+'\n')
