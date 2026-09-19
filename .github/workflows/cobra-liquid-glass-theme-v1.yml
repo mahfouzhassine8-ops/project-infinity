@@ -55,9 +55,9 @@ jobs:
       - name: Upload installable Cobra theme
         uses: actions/upload-artifact@v4
         with:
-          name: Cobra-Liquid-Glass-HM-v1.0.0
+          name: Cobra-Liquid-Glass-HM-SAFE-v1.1.0
           path: |
-            dist/Cobra-Liquid-Glass-HM-v1.0.0.zip
+            dist/Cobra-Liquid-Glass-HM-SAFE-v1.1.0.zip
             dist/build-report.json
             dist/SHA256SUMS
             dist/safe-audit.json
