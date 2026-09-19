@@ -33,7 +33,7 @@
           try { mPlayer.prepare(); mPlayer.play(); } catch (Exception ignored) {}
           mBufferingSince = System.currentTimeMillis();'''
  new='''          CobraPlayerBinding binding=mCobraPlayerBindings.get(mPlayer);
-          if(binding!=null&&binding.current()){binding.vitals.lastRecovery="buffering_observed_12s";binding.vitals.bufferRetries++;InfinityCobraDiagnostics.record(this,"buffering","prolonged","Observed 12 s buffering; player was not re-prepared");}
+          if(binding!=null&&binding.current()){binding.vitals.lastRecovery="buffering_observed_12s";binding.vitals.bufferRetries++;InfinityCobraDiagnostics.record(InfinityLiveActivity.this,"buffering","prolonged","Observed 12 s buffering; player was not re-prepared");}
           mBufferingSince = System.currentTimeMillis();'''
  text=once(text,old,new,'remove stall reprepare')
 
