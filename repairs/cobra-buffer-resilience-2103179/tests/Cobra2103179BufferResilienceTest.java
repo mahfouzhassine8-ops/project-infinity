@@ -51,4 +51,19 @@ public class Cobra2103179BufferResilienceTest {
     assertEquals(120f,InfinityLiveActivity.CobraRefreshPolicy.choose("120",new float[]{60f,90f,120f},false,false),.01f);
     assertTrue(InfinityLiveActivity.CobraRefreshPolicy.requestedExactly("120",120f));
   }
+
+  @Test public void multitaskResizeStopPreservesPlayback(){
+    assertTrue(InfinityLiveActivity.CobraWindowLifecyclePolicy.preservePlaybackOnStop(true,false));
+    assertFalse(InfinityLiveActivity.CobraWindowLifecyclePolicy.preservePlaybackOnStop(true,true));
+    assertFalse(InfinityLiveActivity.CobraWindowLifecyclePolicy.preservePlaybackOnStop(false,false));
+  }
+
+  @Test public void localTimeshiftSourceIoErrorsAreRecoverable(){
+    assertTrue(InfinityLiveActivity.CobraTimeshiftRecoveryPolicy.recoverable(new java.io.IOException("provider hiccup")));
+    assertFalse(InfinityLiveActivity.CobraTimeshiftRecoveryPolicy.recoverable(new IllegalArgumentException("not source io")));
+  }
+
+  @Test public void localTimeshiftRecoveryWaitIsBounded(){
+    assertEquals(12000L,InfinityLiveActivity.CobraTimeshiftRecoveryPolicy.ADVANCE_WAIT_MS);
+  }
 }
