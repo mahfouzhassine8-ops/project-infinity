@@ -39,6 +39,9 @@ jobs:
       - name: Build and statically validate visual package
         run: python3 themes/cobra-liquid-glass-v1/build.py --out dist
 
+      - name: Run final adversarial certification
+        run: python3 themes/cobra-liquid-glass-v1/adversarial_audit.py
+
       - name: Inspect data-only ZIP contract
         shell: bash
         run: |
@@ -47,7 +50,7 @@ jobs:
           count="$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip | wc -l)"
           test "$count" -eq 1
           test "$(unzip -Z1 dist/Cobra-Liquid-Glass-HM-v1.0.0.zip)" = "script.infinity.cobra.theme/resources/visual-theme.json"
-          sha256sum -c dist/SHA256SUMS
+          (cd dist && sha256sum -c SHA256SUMS)
 
       - name: Upload installable Cobra theme
         uses: actions/upload-artifact@v4
@@ -57,5 +60,6 @@ jobs:
             dist/Cobra-Liquid-Glass-HM-v1.0.0.zip
             dist/build-report.json
             dist/SHA256SUMS
+            dist/adversarial-audit.json
           if-no-files-found: error
           retention-days: 30
