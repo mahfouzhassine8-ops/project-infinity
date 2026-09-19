@@ -20,6 +20,9 @@ public class Cobra2103184StreamNetworkOptimizationTest {
     assertEquals(1,InfinityLiveActivity.CobraNetworkFamilyPolicy.filter(all,InfinityLiveActivity.CobraNetworkFamilyPolicy.IPV4).size());
     assertTrue(InfinityLiveActivity.CobraNetworkFamilyPolicy.filter(all,InfinityLiveActivity.CobraNetworkFamilyPolicy.IPV4).get(0) instanceof Inet4Address);
     assertTrue(InfinityLiveActivity.CobraNetworkFamilyPolicy.filter(all,InfinityLiveActivity.CobraNetworkFamilyPolicy.IPV6).get(0) instanceof Inet6Address);
+    assertEquals(InfinityLiveActivity.CobraNetworkFamilyPolicy.IPV4,InfinityLiveActivity.CobraNetworkFamilyPolicy.literalFamily("192.0.2.44"));
+    assertEquals(InfinityLiveActivity.CobraNetworkFamilyPolicy.IPV6,InfinityLiveActivity.CobraNetworkFamilyPolicy.literalFamily("2001:db8::44"));
+    assertEquals(InfinityLiveActivity.CobraNetworkFamilyPolicy.AUTO,InfinityLiveActivity.CobraNetworkFamilyPolicy.literalFamily("provider.example"));
   }
 
   @Test public void happyEyeballsUsesStandardSmallStaggerAndMemory(){
