@@ -251,7 +251,7 @@ jobs:
           python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
             --build repair179-build --out audit179/android
 
-      - name: Run 150 passed gates plus 7 buffer-resilience gates
+      - name: Run 150 passed gates plus 10 buffer-resilience gates
         run: |
           set -euo pipefail
           cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/
@@ -264,6 +264,18 @@ jobs:
           cp rewind176/repairs/cobra-live-rewind-2103176/tests/Cobra2103176LiveRewindTest.java repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp freeze177/repairs/cobra-final-feature-freeze-2103177/tests/Cobra2103177FinalFeatureFreezeTest.java repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp repair178/repairs/cobra-timeshift-miniplayer-2103178/tests/Cobra2103178TimeshiftMiniPlayerTest.java repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          # 2103179 intentionally supersedes only the 2103178 six-second live-reserve assertion.
+          # Keep every other inherited 2103178 gate intact while testing the new nine-second policy.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103178TimeshiftMiniPlayerTest.java')
+          s=p.read_text()
+          old='#EXT-X-START:TIME-OFFSET=-6.0,PRECISE=NO\\n'
+          new='#EXT-X-START:TIME-OFFSET=-9.0,PRECISE=NO\\n'
+          if s.count(old)!=1:
+              raise SystemExit(f'2103178 live-reserve test anchor drift: {s.count(old)}')
+          p.write_text(s.replace(old,new,1))
+          PY
           cp repair179/repairs/cobra-buffer-resilience-2103179/tests/Cobra2103179BufferResilienceTest.java repair179-build/xbmc/src/test/java/com/projectinfinity/kodi/
           python3 - <<'PY'
           import importlib.util
