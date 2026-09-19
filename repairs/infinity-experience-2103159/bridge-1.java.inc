@@ -93,6 +93,57 @@
     return Math.max(low, Math.min(high, value));
   }
 
+  private void restoreBuiltInVisualThemeFromChooser()
+  {
+    File root = getExternalFilesDir(null);
+    if (root == null)
+    {
+      android.widget.Toast.makeText(this, "Theme recovery unavailable", android.widget.Toast.LENGTH_LONG).show();
+      return;
+    }
+    File visualRoot = new File(root, ".kodi/addons/script.infinity.cobra.theme/resources/visual");
+    File pointer = new File(visualRoot, "active.json");
+    boolean reset = false;
+    try
+    {
+      if (pointer.isFile())
+      {
+        File backup = new File(visualRoot, "active.recovery-backup.json");
+        try
+        {
+          java.nio.file.Files.copy(pointer.toPath(), backup.toPath(),
+              java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch (Exception ignored) {}
+        if (!pointer.delete())
+        {
+          try (java.io.FileOutputStream out = new java.io.FileOutputStream(pointer, false))
+          {
+            out.write("{\"active\":\"\",\"previous\":\"\"}\n".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+          }
+        }
+        reset = true;
+      }
+      File legacy = new File(root, ".kodi/addons/script.infinity.cobra.theme/resources/visual-theme.json");
+      if (legacy.isFile())
+      {
+        File disabled = new File(legacy.getParentFile(), "visual-theme.disabled-by-recovery.json");
+        if (disabled.exists()) disabled.delete();
+        if (!legacy.renameTo(disabled) && !legacy.delete())
+          throw new java.io.IOException("Could not disable legacy visual theme");
+        reset = true;
+      }
+      android.widget.Toast.makeText(this,
+          reset ? "Built-in Cobra theme restored" : "Cobra is already using the built-in theme",
+          android.widget.Toast.LENGTH_LONG).show();
+    }
+    catch (Exception failure)
+    {
+      android.util.Log.e(TAG, "Emergency theme recovery failed", failure);
+      android.widget.Toast.makeText(this, "Theme recovery failed", android.widget.Toast.LENGTH_LONG).show();
+    }
+  }
+
   private ExperienceTheme loadExperienceTheme()
   {
     File root = getExternalFilesDir(null);
