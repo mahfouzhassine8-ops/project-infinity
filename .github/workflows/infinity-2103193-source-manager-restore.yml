@@ -1,0 +1,652 @@
+name: Infinity | 2103193 Source Manager Restore
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103193-source-manager-restore-rc1]
+    paths:
+      - '.github/workflows/infinity-2103193-source-manager-restore.yml'
+      - 'repairs/cobra-source-manager-restore-2103193/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103193-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  audit-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with: {ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32, path: refinement-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: b3bcb619b08205dcfc1451424b2d41e05fd37633, path: audit-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98, path: view-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: fd2af59bab2edcaea6be9e5046720715e25e64e0, path: health-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 257a49d742890acf0c7d3e0220bded5a8aa80c57, path: experience-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 42b1afc95a07b3ce0f534232e0f774c5159ddec1, path: theme-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 0ff8b5463ae6adf26ef0f20d64bc1b10f6c5a593, path: settings-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 1465eabb045badad56142642c48292df94caaa12, path: candidate14-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 8f2c9c7b0fdd7bfcaa0d903f8df997a139c23261, path: next-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: d9819b9823ff281f874daaa2bf91fdac1613aeb1, path: stability-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 6148e34be3024c5939c736a7b4316572d7bd50c0, path: insets-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 644160d0ca3baeebb6759638d3f40e2853eeed0b, path: audit166-delta, persist-credentials: false}
+      - uses: actions/checkout@v5
+        with: {ref: 2d72c733998d3c535a16d354058344007c5f7921, path: status167-delta, persist-credentials: false}
+      - name: Proven status-bar surface resolver
+        uses: actions/checkout@v5
+        with: {ref: 3b97cd74e2f0e42b091a21fcab4019dfa319eb48, path: surface-delta, persist-credentials: false}
+      - name: Exact passed 2103170 edge-to-edge recipe
+        uses: actions/checkout@v5
+        with: {ref: 6046c0ac64c7ef83a65550d53ffd4211c6cb5bef, path: edge170, persist-credentials: false}
+      - name: Exact locked 2103171 chooser delta
+        uses: actions/checkout@v5
+        with: {ref: 59cf1958e5d911ede8df9b04c200025f4b39026e, path: chooser171, persist-credentials: false}
+      - name: Exact passed 2103175 screen-real-estate delta
+        uses: actions/checkout@v5
+        with: {ref: 8f29df5a3a51e9462336412222e0d674af1d5969, path: screen175, persist-credentials: false}
+      - name: Exact passed 2103176 Live TV rewind delta
+        uses: actions/checkout@v5
+        with: {ref: 9c26e7aaa92c6c2bbe83a284c3377c6ca61d2224, path: rewind176, persist-credentials: false}
+      - name: Exact passed 2103177 final feature-freeze delta
+        uses: actions/checkout@v5
+        with: {ref: 3c51f790018eda816beeac6328d050e1fe242d6e, path: freeze177, persist-credentials: false}
+      - name: Exact passed 2103178 timeshift / mini-player repair
+        uses: actions/checkout@v5
+        with: {ref: 56792d4e44b381cff2c900e7b86ed99265b55d04, path: repair178, persist-credentials: false}
+      - name: Exact passed 2103179 buffer resilience
+        uses: actions/checkout@v5
+        with: {ref: 0560b18c497e9861864126d96f9b784e488ebe32, path: repair179, persist-credentials: false}
+      - name: Exact passed 2103180 playback finalization
+        uses: actions/checkout@v5
+        with: {ref: c7a52ef5553152d75f54b713e8975c8e2794e09b, path: repair180, persist-credentials: false}
+      - name: Exact passed 2103181 transport integrity
+        uses: actions/checkout@v5
+        with: {ref: bfc69d84552dd64ef39946bdd2b368e7ff1def52, path: repair181, persist-credentials: false}
+      - name: Exact passed 2103182 startup reserve
+        uses: actions/checkout@v5
+        with: {ref: 3785ed0bf6fe2cd65eae534f1c394d7001285537, path: repair182, persist-credentials: false}
+      - name: Exact passed 2103183 network family control
+        uses: actions/checkout@v5
+        with: {ref: 1b0fd6365715895f4325e10082df6d8470b26632, path: repair183, persist-credentials: false}
+      - name: Exact passed 2103184 stream/network optimization
+        uses: actions/checkout@v5
+        with: {ref: fa77159f3a24cbb86d6ab34e24f7d3326139b0e0, path: repair184, persist-credentials: false}
+      - name: Exact passed 2103185 live diagnostics freeze
+        uses: actions/checkout@v5
+        with: {ref: 41912bf61440b263898c3e67ad6ba48279473f78, path: repair185, persist-credentials: false}
+      - name: Exact passed 2103186 stream cadence fingerprint
+        uses: actions/checkout@v5
+        with: {ref: 431d8d00e814a47d9ec4df972667c1c1f700413b, path: repair186, persist-credentials: false}
+      - name: Exact passed 2103187 TS access-unit compatibility
+        uses: actions/checkout@v5
+        with: {ref: 898ead49f3b8d7fe5f6169a6eb92354b699cb55b, path: repair187, persist-credentials: false}
+      - name: Exact passed 2103188 TS keyframe compatibility
+        uses: actions/checkout@v5
+        with: {ref: 81390fd1e7f53c9cd55d33aaa25fbca26dd7a509, path: repair188, persist-credentials: false}
+      - name: Exact passed 2103189 TS timeline fingerprint
+        uses: actions/checkout@v5
+        with: {ref: af44c82189b37312abf5f75d9237eef1e3d89dc8, path: repair189, persist-credentials: false}
+      - name: Exact passed 2103190 TS clock normalization
+        uses: actions/checkout@v5
+        with: {ref: f31d1208be0357856a80b59b7118be093212c8a6, path: repair190, persist-credentials: false}
+      - name: Exact passed 2103191 provider route fingerprint
+        uses: actions/checkout@v5
+        with: {ref: 23fab77d21e97e6f74f04f397d3fa0a63a24bc2e, path: repair191, persist-credentials: false}
+      - name: Exact passed 2103192 provider pace guard
+        uses: actions/checkout@v5
+        with: {ref: 6277ab3bf7bc9e65010af84d0e62534c3e75ce18, path: repair192, persist-credentials: false}
+      - name: Isolated 2103193 source manager restore
+        uses: actions/checkout@v5
+        with: {ref: '${{ github.sha }}', path: repair193, persist-credentials: false}
+
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2, run-id: 35044752997, github-token: '${{ github.token }}', path: run40}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Player-Reboot-Lock-2103152, run-id: 35169846333, github-token: '${{ github.token }}', path: rollback2103152}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited, run-id: 35176733529, github-token: '${{ github.token }}', path: rollback2103153}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155, run-id: 35188339917, github-token: '${{ github.token }}', path: baseline155}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156, run-id: 35192605567, github-token: '${{ github.token }}', path: baseline156}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157, run-id: 35200244871, github-token: '${{ github.token }}', path: baseline157}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Cobra-Health-Playback-RC1-2103158, run-id: 35206405387, github-token: '${{ github.token }}', path: baseline158}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103158-Health-Playback-Evidence, run-id: 35206405387, github-token: '${{ github.token }}', path: evidence158}
+      - uses: actions/download-artifact@v5
+        with: {name: Infinity-Experience-Zip-Bridge-RC1-2103159, run-id: 35278026159, github-token: '${{ github.token }}', path: baseline159}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103160-Visual-Theme-Runtime-v2-TEST-CANDIDATE, run-id: 35290503341, github-token: '${{ github.token }}', path: baseline160}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103161-Theme-Management-Background-Mode-Safe-Area-TEST-CANDIDATE, run-id: 35314694255, github-token: '${{ github.token }}', path: baseline161}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE, run-id: 35324889607, github-token: '${{ github.token }}', path: baseline162}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103162-Theme-Switch-Player-Rotation-TEST-CANDIDATE, run-id: 35331099172, github-token: '${{ github.token }}', path: baseline163}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103164-Playback-Stability-TEST-CANDIDATE, run-id: 35338917341, github-token: '${{ github.token }}', path: baseline164}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103165-Insets-PiP-Return-Player-Consistency-TEST-CANDIDATE, run-id: 35343195748, github-token: '${{ github.token }}', path: baseline165}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103166-End-to-End-UI-Lifecycle-Audit-TEST-CANDIDATE, run-id: 35347847781, github-token: '${{ github.token }}', path: baseline166}
+      - uses: actions/download-artifact@v5
+        with: {name: Cobra-2103167-Status-Bar-Restore-TEST-CANDIDATE, run-id: 35371132749, github-token: '${{ github.token }}', path: baseline167}
+      - name: Exact locked 2103168 native crash fix
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103168-Status-Bar-PythonInvoker-Stability-TEST-CANDIDATE
+          run-id: 35374581122
+          github-token: ${{ github.token }}
+          path: baseline168native
+      - name: Exact passed 2103170 rollback
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103170-Status-Bar-Edge-to-Edge-TEST-CANDIDATE
+          run-id: 35386404644
+          github-token: ${{ github.token }}
+          path: baseline170
+      - name: Exact locked 2103171 rollback
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103171-Chooser-Status-Bar-Surface-TEST-CANDIDATE
+          run-id: 35391501653
+          github-token: ${{ github.token }}
+          path: baseline171
+      - name: Exact passed 2103175 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103175-Fullscreen-Background-Safe-Content-TEST-CANDIDATE
+          run-id: 35405052743
+          github-token: ${{ github.token }}
+          path: baseline175
+      - name: Exact passed 2103176 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103176-Live-TV-Rewind-Catchup-TEST-CANDIDATE
+          run-id: 35416469460
+          github-token: ${{ github.token }}
+          path: baseline176
+      - name: Exact passed 2103177 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103177-Final-Feature-Freeze-TEST-CANDIDATE
+          run-id: 35424620170
+          github-token: ${{ github.token }}
+          path: baseline177
+      - name: Exact passed 2103178 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103178-Timeshift-Mini-Player-Repair-TEST-CANDIDATE
+          run-id: 35426978986
+          github-token: ${{ github.token }}
+          path: baseline178
+      - name: Exact passed 2103179 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103179-Buffer-Resilience-TEST-CANDIDATE
+          run-id: 35440352816
+          github-token: ${{ github.token }}
+          path: baseline179
+      - name: Exact passed 2103180 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103180-Playback-Finalization-TEST-CANDIDATE
+          run-id: 35443380440
+          github-token: ${{ github.token }}
+          path: baseline180
+      - name: Exact passed 2103181 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103181-Timeshift-Transport-Integrity-TEST-CANDIDATE
+          run-id: 35458598188
+          github-token: ${{ github.token }}
+          path: baseline181
+      - name: Exact passed 2103182 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103182-Timeshift-Startup-Reserve-TEST-CANDIDATE
+          run-id: 35460175920
+          github-token: ${{ github.token }}
+          path: baseline182
+      - name: Exact passed 2103183 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103183-Network-Family-Control-TEST-CANDIDATE
+          run-id: 35471240160
+          github-token: ${{ github.token }}
+          path: baseline183
+      - name: Exact passed 2103184 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103184-Stream-Network-Optimization-TEST-CANDIDATE
+          run-id: 35476077436
+          github-token: ${{ github.token }}
+          path: baseline184
+      - name: Exact passed 2103185 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103185-Live-Diagnostics-Freeze-TEST-CANDIDATE
+          run-id: 35477494034
+          github-token: ${{ github.token }}
+          path: baseline185
+      - name: Exact passed 2103186 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103186-Stream-Cadence-Fingerprint-TEST-CANDIDATE
+          run-id: 35479297828
+          github-token: ${{ github.token }}
+          path: baseline186
+      - name: Exact passed 2103187 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103187-TS-Access-Unit-Compatibility-TEST-CANDIDATE
+          run-id: 35480884225
+          github-token: ${{ github.token }}
+          path: baseline187
+      - name: Exact passed 2103188 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103188-TS-Keyframe-Compatibility-TEST-CANDIDATE
+          run-id: 35482764606
+          github-token: ${{ github.token }}
+          path: baseline188
+      - name: Exact passed 2103189 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103189-TS-Timeline-Fingerprint-TEST-CANDIDATE
+          run-id: 35483968031
+          github-token: ${{ github.token }}
+          path: baseline189
+      - name: Exact passed 2103190 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103190-TS-Clock-Normalization-TEST-CANDIDATE
+          run-id: 35485026484
+          github-token: ${{ github.token }}
+          path: baseline190
+      - name: Exact passed 2103191 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103191-Provider-Route-Fingerprint-TEST-CANDIDATE
+          run-id: 35487095075
+          github-token: ${{ github.token }}
+          path: baseline191
+      - name: Exact passed 2103192 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103192-Provider-Pace-Guard-TEST-CANDIDATE
+          run-id: 35489308579
+          github-token: ${{ github.token }}
+          path: baseline192
+
+      - name: Reconstruct exact 2103167 shell
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py reconstruct
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py apply
+          python3 settings-delta/repairs/cobra-settings-background-2103161/ci.py upgrade
+          python3 candidate14-delta/repairs/cobra-theme-rotation-2103162/ci.py upgrade
+          python3 next-delta/repairs/cobra-candidate14-five-fixes-2103163/ci.py upgrade
+          python3 stability-delta/repairs/cobra-playback-stability-2103164/ci.py upgrade
+          python3 insets-delta/repairs/cobra-inner-insets-pip-return-2103165/ci.py upgrade
+          python3 audit166-delta/repairs/cobra-end-to-end-audit-2103166/ci.py upgrade
+          python3 status167-delta/repairs/cobra-status-bar-restore-2103167/ci.py upgrade
+
+      - name: Recreate exact passed 2103170 source
+        run: |
+          set -euo pipefail
+          python3 surface-delta/repairs/cobra-status-bar-surface-2103168/ci.py upgrade
+          mkdir -p audit170
+          cp audit168/source-audit/source-audit.json audit170/surface-source-audit.json
+          python3 edge170/repairs/statusbar-edge-to-edge-2103170/apply.py \
+            --source kodi --receipt engine/background-resume-source.json --out audit170/edge-patch
+          python3 edge170/repairs/statusbar-edge-to-edge-2103170/source_audit.py \
+            --source kodi --patch audit170/edge-patch/patch.json --out audit170/edge-source-audit
+          python3 edge170/repairs/statusbar-edge-to-edge-2103170/ci.py promote \
+            --source kodi \
+            --base168 baseline168native/Infinity-1.0.9-Cobra-Status-Bar-PythonInvoker-Stability-RC1.apk \
+            --out audit170
+
+      - name: Apply exact chooser-only 2103171 repair
+        run: |
+          set -euo pipefail
+          python3 chooser171/repairs/chooser-statusbar-2103171/ci.py upgrade
+
+      - name: Apply exact 2103175 full-window background / safe-content repair
+        run: |
+          set -euo pipefail
+          python3 screen175/repairs/fullscreen-background-safe-content-2103175/ci.py upgrade
+
+      - name: Apply exact passed 2103176 Live TV rewind / catch-up
+        run: |
+          set -euo pipefail
+          python3 rewind176/repairs/cobra-live-rewind-2103176/ci.py upgrade
+
+      - name: Apply exact passed 2103177 final feature-freeze delta
+        run: |
+          set -euo pipefail
+          python3 freeze177/repairs/cobra-final-feature-freeze-2103177/ci.py upgrade
+
+      - name: Apply exact passed 2103178 timeshift transport + mini-player repair
+        run: |
+          set -euo pipefail
+          python3 repair178/repairs/cobra-timeshift-miniplayer-2103178/ci.py upgrade
+
+      - name: Apply exact passed 2103179 Pro-aligned buffer resilience
+        run: |
+          set -euo pipefail
+          python3 repair179/repairs/cobra-buffer-resilience-2103179/ci.py upgrade
+
+      - name: Apply exact passed 2103180 playback finalization
+        run: |
+          set -euo pipefail
+          python3 repair180/repairs/cobra-playback-finalization-2103180/ci.py upgrade
+
+      - name: Apply exact passed 2103181 timeshift transport integrity
+        run: |
+          set -euo pipefail
+          python3 repair181/repairs/cobra-timeshift-transport-integrity-2103181/ci.py upgrade
+
+      - name: Apply exact passed 2103182 startup reserve
+        run: |
+          set -euo pipefail
+          python3 repair182/repairs/cobra-timeshift-startup-reserve-2103182/ci.py upgrade
+
+      - name: Apply exact passed 2103183 Cobra network family control
+        run: |
+          set -euo pipefail
+          python3 repair183/repairs/cobra-network-family-control-2103183/ci.py upgrade
+
+      - name: Apply exact passed 2103184 fingerprint / seamless rewind / smart dual-stack
+        run: |
+          set -euo pipefail
+          python3 repair184/repairs/cobra-stream-network-optimization-2103184/ci.py upgrade
+
+      - name: Apply exact passed 2103185 live diagnostics freeze
+        run: |
+          set -euo pipefail
+          python3 repair185/repairs/cobra-live-diagnostics-freeze-2103185/ci.py upgrade
+
+      - name: Apply exact passed 2103186 stream cadence fingerprint
+        run: |
+          set -euo pipefail
+          python3 repair186/repairs/cobra-stream-cadence-fingerprint-2103186/ci.py upgrade
+
+      - name: Apply exact passed 2103187 TS access-unit compatibility
+        run: |
+          set -euo pipefail
+          python3 repair187/repairs/cobra-ts-access-unit-compatibility-2103187/ci.py upgrade
+
+      - name: Apply exact passed 2103188 TS keyframe compatibility
+        run: |
+          set -euo pipefail
+          python3 repair188/repairs/cobra-ts-keyframe-compatibility-2103188/ci.py upgrade
+
+      - name: Apply exact passed 2103189 TS timeline fingerprint
+        run: |
+          set -euo pipefail
+          python3 repair189/repairs/cobra-ts-timeline-fingerprint-2103189/ci.py upgrade
+
+      - name: Apply exact passed 2103190 conditional TS clock normalization
+        run: |
+          set -euo pipefail
+          python3 repair190/repairs/cobra-ts-clock-normalization-2103190/ci.py upgrade
+
+      - name: Apply exact passed 2103191 provider route fingerprint
+        run: |
+          set -euo pipefail
+          python3 repair191/repairs/cobra-provider-route-fingerprint-2103191/ci.py upgrade
+
+      - name: Apply exact passed 2103192 provider pace guard
+        run: |
+          set -euo pipefail
+          python3 repair192/repairs/cobra-provider-pace-reserve-2103192/ci.py upgrade
+
+      - name: Apply 2103193 source manager restore
+        run: |
+          set -euo pipefail
+          python3 repair193/repairs/cobra-source-manager-restore-2103193/ci.py upgrade
+
+      - name: Build/sign 2103193 without rebuilding native engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source kodi \
+            --base-apk baseline168native/Infinity-1.0.9-Cobra-Status-Bar-PythonInvoker-Stability-RC1.apk \
+            --build-dir repair193-build \
+            --out signed193
+          python3 repair193/repairs/cobra-source-manager-restore-2103193/ci.py verify
+
+      - name: Repeat all inherited UI/runtime suites
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
+            --build repair193-build --out audit193/android
+
+      - name: Run 232 inherited gates plus 5 source-manager restore gates
+        run: |
+          set -euo pipefail
+          cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp stability-delta/repairs/cobra-playback-stability-2103164/tests/Cobra2103164PlaybackStabilityTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp insets-delta/repairs/cobra-inner-insets-pip-return-2103165/tests/Cobra2103165InsetsPipPlayerTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp audit166-delta/repairs/cobra-end-to-end-audit-2103166/tests/Cobra2103166EndToEndUiAuditTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp edge170/repairs/statusbar-edge-to-edge-2103170/tests/Cobra2103170StatusBarRestoreSupersessionTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp edge170/repairs/statusbar-edge-to-edge-2103170/tests/Cobra2103170StatusBarEdgeTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp screen175/repairs/fullscreen-background-safe-content-2103175/tests/Cobra2103175FullscreenBackgroundTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp rewind176/repairs/cobra-live-rewind-2103176/tests/Cobra2103176LiveRewindTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp freeze177/repairs/cobra-final-feature-freeze-2103177/tests/Cobra2103177FinalFeatureFreezeTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair178/repairs/cobra-timeshift-miniplayer-2103178/tests/Cobra2103178TimeshiftMiniPlayerTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair179/repairs/cobra-buffer-resilience-2103179/tests/Cobra2103179BufferResilienceTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair180/repairs/cobra-playback-finalization-2103180/tests/Cobra2103180PlaybackFinalizationTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair181/repairs/cobra-timeshift-transport-integrity-2103181/tests/Cobra2103181TimeshiftTransportIntegrityTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          # 2103182 preserves all 2103181 transport-integrity behavior and only delays
+          # local HLS playback until the configured 15-second live reserve actually exists.
+          # and hardens local HLS duration/discontinuity/retention semantics.
+          # Every other inherited 2103178/2103179 gate stays intact.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103178TimeshiftMiniPlayerTest.java')
+          t=p.read_text()
+          old='#EXT-X-START:TIME-OFFSET=-6.0,PRECISE=NO\\n'
+          new='#EXT-X-START:TIME-OFFSET=-15.0,PRECISE=NO\\n'
+          if t.count(old)!=1: raise SystemExit(f'2103178 live-reserve test anchor drift: {t.count(old)}')
+          p.write_text(t.replace(old,new,1))
+
+          p=Path('repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103179BufferResilienceTest.java')
+          t=p.read_text()
+          old='#EXT-X-START:TIME-OFFSET=-9.0,PRECISE=NO\\n'
+          new='#EXT-X-START:TIME-OFFSET=-15.0,PRECISE=NO\\n'
+          if t.count(old)!=1: raise SystemExit('2103179 live-reserve anchor drift')
+          p.write_text(t.replace(old,new,1))
+
+          p=Path('repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103180PlaybackFinalizationTest.java')
+          t=p.read_text()
+          old='assertEquals(15000,InfinityLiveActivity.CobraTimeshiftTransportPolicy.READ_TIMEOUT_MS);'
+          new='assertEquals(5000,InfinityLiveActivity.CobraTimeshiftTransportPolicy.READ_TIMEOUT_MS);'
+          if t.count(old)!=1: raise SystemExit('2103180 read-timeout anchor drift')
+          p.write_text(t.replace(old,new,1))
+          PY
+          cp repair182/repairs/cobra-timeshift-startup-reserve-2103182/tests/Cobra2103182TimeshiftStartupReserveTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair183/repairs/cobra-network-family-control-2103183/tests/Cobra2103183NetworkFamilyControlTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair184/repairs/cobra-stream-network-optimization-2103184/tests/Cobra2103184StreamNetworkOptimizationTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair185/repairs/cobra-live-diagnostics-freeze-2103185/tests/Cobra2103185LiveDiagnosticsFreezeTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair186/repairs/cobra-stream-cadence-fingerprint-2103186/tests/Cobra2103186StreamCadenceFingerprintTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair187/repairs/cobra-ts-access-unit-compatibility-2103187/tests/Cobra2103187TsAccessUnitCompatibilityTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair188/repairs/cobra-ts-keyframe-compatibility-2103188/tests/Cobra2103188TsKeyframeCompatibilityTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair189/repairs/cobra-ts-timeline-fingerprint-2103189/tests/Cobra2103189TsTimelineFingerprintTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair190/repairs/cobra-ts-clock-normalization-2103190/tests/Cobra2103190TsClockNormalizationTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair191/repairs/cobra-provider-route-fingerprint-2103191/tests/Cobra2103191ProviderRouteFingerprintTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair192/repairs/cobra-provider-pace-reserve-2103192/tests/Cobra2103192ProviderPaceReserveTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repair193/repairs/cobra-source-manager-restore-2103193/tests/Cobra2103193SourceManagerRestoreTest.java repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/
+          # 2103188 intentionally supersedes only the two 2103187 assertions
+          # that required non-IDR compatibility to remain disabled.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('repair193-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103187TsAccessUnitCompatibilityTest.java')
+          t=p.read_text()
+          old="  @Test public void keepsNonIdrKeyframesDisabled(){\n    assertFalse(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes());\n  }\n\n  @Test public void exactFlagIsNarrow(){\n    assertEquals(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS,\n        InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);\n  }"
+          new="  @Test public void supersededNonIdrExpectationNowEnabled(){\n    assertTrue(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes());\n  }\n\n  @Test public void supersededExactFlagNowIncludesKeyframeCompatibility(){\n    int expected=androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS\n      |androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES;\n    assertEquals(expected,InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);\n  }"
+          if t.count(old)!=1: raise SystemExit(f'2103187 supersession anchor drift: {t.count(old)}')
+          p.write_text(t.replace(old,new,1))
+          PY
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path('experience-delta/repairs/infinity-experience-2103159/tests/android.py')
+          s=importlib.util.spec_from_file_location('runner179',p)
+          r=importlib.util.module_from_spec(s);s.loader.exec_module(r)
+          out=Path('audit193/targeted');env=r.test_environment(out)
+          r.run_ui_gate([
+            './gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.settingsUseOneThemeEntryAndNoLegacyThemeButtonStack',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.oneThemeSheetSwitchesToBuiltInThenBackToSameInstalledTheme',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.backgroundModeStillUsesTheExistingNormalExtendedContract',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.playerChromeHasRotationBesideLockAndUsesSharedInfinityPreference',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.unlockedRotationRequestsFullSensorOnlyForEligibleActiveVideo',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.latePlaybackCallbackCannotReacquireRotationAfterPause',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.fullscreenToPreviewReleasesRotationWithoutReplacingThePlayer',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.splitWindowCallbackBlocksLateRotationUntilExit',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.pipAndTelevisionNeverAcquireRotation',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.controlsLockPreventsRotationPreferenceChanges',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.invalidMultiviewRequestLeavesFullscreenOrientationAlone',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.repeatedBuiltInResetKeepsTheSameThemeRestorable',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.corruptSavedThemeCannotReplaceBuiltInSnapshot',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.pausedIdleEndedOrMissingVideoCannotOwnOrientation',
+            '--tests','com.projectinfinity.kodi.Cobra2103162ThemeRotationTest.themePickerBindsNewRowRolesAndDefaultButtonsMatch',
+            '--tests','com.projectinfinity.kodi.Cobra2103164PlaybackStabilityTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103165InsetsPipPlayerTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103166EndToEndUiAuditTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103170StatusBarRestoreSupersessionTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103170StatusBarEdgeTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103175FullscreenBackgroundTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103176LiveRewindTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103177FinalFeatureFreezeTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103178TimeshiftMiniPlayerTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103179BufferResilienceTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103180PlaybackFinalizationTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103181TimeshiftTransportIntegrityTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103182TimeshiftStartupReserveTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103183NetworkFamilyControlTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103184StreamNetworkOptimizationTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103185LiveDiagnosticsFreezeTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103186StreamCadenceFingerprintTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103187TsAccessUnitCompatibilityTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103188TsKeyframeCompatibilityTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103189TsTimelineFingerprintTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103190TsClockNormalizationTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103191ProviderRouteFingerprintTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103192ProviderPaceReserveTest',
+            '--tests','com.projectinfinity.kodi.Cobra2103193SourceManagerRestoreTest',
+            '--stacktrace'],Path('repair193-build'),env,out)
+          PY
+          python3 repair193/repairs/cobra-source-manager-restore-2103193/ci.py deliver
+
+      - name: Publish audited 2103193 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103193-Source-Manager-Restore-TEST-CANDIDATE
+          path: signed193/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103193 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103193-Source-Manager-Restore-Evidence
+          path: |
+            audit193/
+            audit192/
+            audit191/
+            audit190/
+            audit189/
+            audit188/
+            audit187/
+            audit186/
+            audit185/
+            audit184/
+            audit183/
+            audit182/
+            audit181/
+            audit180/
+            audit179/
+            audit178/
+            audit177/
+            audit176/
+            audit175/
+            audit171/
+            audit170/
+            engine/background-resume-source.json
+            repair193/repairs/cobra-source-manager-restore-2103193/
+            repair192/repairs/cobra-provider-pace-reserve-2103192/
+            repair191/repairs/cobra-provider-route-fingerprint-2103191/
+            repair190/repairs/cobra-ts-clock-normalization-2103190/
+            repair189/repairs/cobra-ts-timeline-fingerprint-2103189/
+            repair188/repairs/cobra-ts-keyframe-compatibility-2103188/
+            repair187/repairs/cobra-ts-access-unit-compatibility-2103187/
+            repair186/repairs/cobra-stream-cadence-fingerprint-2103186/
+            repair185/repairs/cobra-live-diagnostics-freeze-2103185/
+            repair184/repairs/cobra-stream-network-optimization-2103184/
+            repair183/repairs/cobra-network-family-control-2103183/
+            repair182/repairs/cobra-timeshift-startup-reserve-2103182/
+            repair181/repairs/cobra-timeshift-transport-integrity-2103181/
+            repair180/repairs/cobra-playback-finalization-2103180/
+            repair179/repairs/cobra-buffer-resilience-2103179/
+            repair178/repairs/cobra-timeshift-miniplayer-2103178/
+            freeze177/repairs/cobra-final-feature-freeze-2103177/
+            rewind176/repairs/cobra-live-rewind-2103176/
+            screen175/repairs/fullscreen-background-safe-content-2103175/
+            chooser171/repairs/chooser-statusbar-2103171/
+            signed193/*.json
+            signed193/*.txt
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact passed 2103192 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103192-Exact-Rollback-Before-2103193
+          path: baseline192/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
