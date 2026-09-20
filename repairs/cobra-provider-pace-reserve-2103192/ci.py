@@ -35,7 +35,7 @@ def upgrade():
     replace(runtime,'VERSION_CODE = 2103191',f'VERSION_CODE = {VERSION}')
     replace(runtime,"RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"'")
     pack=Path('scripts/package_background_resume.py');s=pack.read_text();needle='Infinity-'+OLD
-    require(s.count(needle)>=2,'2103190 packager identity drift');pack.write_text(s.replace(needle,'Infinity-'+NEW))
+    require(s.count(needle)>=2,'2103191 packager identity drift');pack.write_text(s.replace(needle,'Infinity-'+NEW))
 
     data['files'][GRADLE]['after']=sha(gradle)
     data.update(
@@ -81,9 +81,9 @@ def verify():
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
           b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart'):
             require(token in dex,'2103192 contract missing: '+repr(token))
-        require(b'Cobra2103192ProviderPaceReserveTest' not in dex,'2103191 test code packaged in release APK')
+        require(b'Cobra2103192ProviderPaceReserveTest' not in dex,'2103192 test code packaged in release APK')
 
-    badging=Path('signed191/badging.txt').read_text()
+    badging=Path('signed192/badging.txt').read_text()
     require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103191'" in badging,'Final APK not forward-installable')
     result={'build':VERSION,'base_build':2103191,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
       'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_reserve':True,'pace_reserve_uses_existing_hls':True,
@@ -120,7 +120,7 @@ def deliver():
     source=json.loads(Path('audit192/source-audit/source-audit.json').read_text())
     final=json.loads(Path('audit192/final-verification.json').read_text())
     require(source.get('passed') and not source.get('failed'),'2103192 source audit failed')
-    result={'build':VERSION,'locked_parent':2103191,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_provider_route_tests':5,
+    result={'build':VERSION,'locked_parent':2103191,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_provider_pace_tests':5,
       'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_reserve':True,'raw_provider_url_logged':False,'raw_remote_ip_logged':False,
       'playback_behavior_changed':True,'network_selection_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,
       'timeline_normalizer_recovery_release':True,'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],
