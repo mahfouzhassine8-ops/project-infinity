@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Package/gate 2103192 provider pace reserve over exact passed 2103191."""
+"""Package/gate 2103192 provider pace guard over exact passed 2103191."""
 from pathlib import Path
 import argparse,hashlib,json,re,shutil,subprocess,zipfile,xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parent
 BASE_COMMIT='23fab77d21e97e6f74f04f397d3fa0a63a24bc2e'
 OLD='1.0.9-Cobra-Provider-Route-Fingerprint-RC1'
-NEW='1.0.9-Cobra-Provider-Pace-Reserve-RC1'
+NEW='1.0.9-Cobra-Provider-Pace-Guard-RC1'
 VERSION=2103192
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 ACT='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
@@ -40,9 +40,9 @@ def upgrade():
     data['files'][GRADLE]['after']=sha(gradle)
     data.update(
       version_code=VERSION,version_name=NEW,source_parent=2103191,source_parent_locked=True,locked_parent_commit=BASE_COMMIT,candidate_locked=False,
-      stream_fingerprint_schema=7,provider_route_fingerprint=True,provider_pace_reserve=True,pace_reserve_uses_existing_hls=True,
-      pace_reserve_auto_activation=True,timeline_normalizer_recovery_release=True,raw_provider_url_logged=False,raw_remote_ip_logged=False,
-      playback_behavior_changed=True,network_selection_changed=False,timeshift_ownership_changed=False,buffer_policy_changed=False,
+      stream_fingerprint_schema=7,provider_route_fingerprint=True,provider_pace_limit_classifier=True,timeline_normalizer_rewrite_enabled=False,
+      clock_rewrite_suppressed_by_evidence=True,raw_provider_url_logged=False,raw_remote_ip_logged=False,
+      playback_behavior_changed=False,network_selection_changed=False,timeshift_ownership_changed=False,buffer_policy_changed=False,
       parser_flags_changed=False,native_engine_recompiled=False,theme_zip_changed=False,physical_device_verified=False)
     receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
 
@@ -52,7 +52,7 @@ def upgrade():
     with Path('audit192/native-after.patch').open('wb') as out:
         subprocess.run(['git','-C','kodi','diff','--binary','--','xbmc'],stdout=out,check=True)
     require(Path('audit192/native-after.patch').read_bytes()==Path('engine/native-before.patch').read_bytes(),'Native source changed')
-    print('PASS: exact 2103191 -> 2103192 provider pace reserve; protected stack preserved')
+    print('PASS: exact 2103191 -> 2103192 provider pace guard; protected stack preserved')
 
 def verify():
     base=Path('baseline191/Infinity-'+OLD+'.apk')
@@ -77,7 +77,7 @@ def verify():
         for token in (
           b'timeshift_provider_remote_hash',b'timeshift_provider_dns_hashes',b'timeshift_provider_protocol',
           b'timeshift_provider_proxy',b'timeshift_provider_final_host_hash',b'timeshift_provider_response_header_hash',
-          b'routeFingerprint',b'timeshift_timeline_normalizer_active',b'timeshift_timeline_normalizer_scale_ppm',b'timeshift_pace_reserve_activations',b'timeshift_timeline_normalizer_releases',b'pace-reserve-auto',
+          b'routeFingerprint',b'timeshift_timeline_normalizer_active',b'timeshift_timeline_normalizer_scale_ppm',b'timeshift_provider_pace_limited',b'timeshift_timeline_normalizer_rewrite_enabled',
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
           b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart'):
             require(token in dex,'2103192 contract missing: '+repr(token))
@@ -86,12 +86,12 @@ def verify():
     badging=Path('signed192/badging.txt').read_text()
     require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103191'" in badging,'Final APK not forward-installable')
     result={'build':VERSION,'base_build':2103191,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
-      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_reserve':True,'pace_reserve_uses_existing_hls':True,
-      'pace_reserve_auto_activation':True,'timeline_normalizer_recovery_release':True,'raw_provider_url_logged':False,'raw_remote_ip_logged':False,
-      'playback_behavior_changed':True,'network_selection_changed':False,'timeshift_ownership_changed':False,'buffer_policy_changed':False,
+      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'timeline_normalizer_rewrite_enabled':False,
+      'clock_rewrite_suppressed_by_evidence':True,'raw_provider_url_logged':False,'raw_remote_ip_logged':False,
+      'playback_behavior_changed':False,'network_selection_changed':False,'timeshift_ownership_changed':False,'buffer_policy_changed':False,
       'parser_flags_changed':False,'native_engine_recompiled':False,'theme_zip_changed':False,'physical_device_verified':False}
     Path('audit192/final-verification.json').write_text(json.dumps(result,indent=2)+'\n')
-    print('PASS: signed 2103192 preserves exact 2103191 native/resources/signer and adds pace mitigation only')
+    print('PASS: signed 2103192 preserves exact 2103191 native/resources/signer and adds evidence-driven pace guard only')
 
 def suite(path,count):
     p=Path(path);require(p.is_file(),'Missing test evidence '+str(p));root=ET.parse(p).getroot();cases=root.findall('testcase')
@@ -121,15 +121,15 @@ def deliver():
     final=json.loads(Path('audit192/final-verification.json').read_text())
     require(source.get('passed') and not source.get('failed'),'2103192 source audit failed')
     result={'build':VERSION,'locked_parent':2103191,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_provider_pace_tests':5,
-      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_reserve':True,'raw_provider_url_logged':False,'raw_remote_ip_logged':False,
-      'playback_behavior_changed':True,'network_selection_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,
-      'timeline_normalizer_recovery_release':True,'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],
+      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'raw_provider_url_logged':False,'raw_remote_ip_logged':False,
+      'playback_behavior_changed':False,'network_selection_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,
+      'timeline_normalizer_rewrite_enabled':False,'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],
       'physical_device_verified':False,'candidate_locked':False,
-      'status':'TEST CANDIDATE - Problem Nicktoons VPN OFF acceptance: sustained clean under-rate should auto-enter protected HLS reserve; normal-rate channels must remain on live proxy; VPN/raw-clock recovery must release normalization'}
+      'status':'TEST CANDIDATE - evidence guard only: Problem Nicktoons direct path should classify as provider pace limited; no timestamp rewrite, no buffer/network/parser change'}
     Path('signed192/ACCEPTANCE.json').write_text(json.dumps(result,indent=2)+'\n')
     shutil.copy2('audit192/final-verification.json','signed192/2103192-verification.json')
     shutil.copy2('audit192/source-audit/source-audit.json','signed192/2103192-source-audit.json')
-    print('PASS:',total,'Android tests + 2103192 provider pace reserve gates')
+    print('PASS:',total,'Android tests + 2103192 provider pace guard gates')
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('phase',choices=['upgrade','verify','deliver']);a=p.parse_args();globals()[a.phase]()
