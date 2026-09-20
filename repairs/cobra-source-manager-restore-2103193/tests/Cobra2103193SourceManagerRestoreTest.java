@@ -39,7 +39,7 @@ public class Cobra2103193SourceManagerRestoreTest {
     InfinityLiveActivity a=fixture();try{call(a,"showSettings");ui.measure(a,412,915);assertNotNull(findText(a.getWindow().getDecorView(),"REFRESH CURRENT SOURCE"));assertNotNull(findText(a.getWindow().getDecorView(),"REFRESH ALL ENABLED SOURCES"));}finally{ui.clean(a);}
   }
   @Test public void sourceManagerStillExposesAddSourceContract()throws Exception{
-    InfinityLiveActivity a=fixture();try{call(a,"showSources");ui.measure(a,412,915);TextView add=findText(a.getWindow().getDecorView(),"+  ADD TV SOURCE");assertNotNull(add);assertNotNull(clickableAncestor(add));assertTrue(clickableAncestor(add).isClickable());}finally{ui.clean(a);}
+    InfinityLiveActivity a=fixture();try{call(a,"showSources");ui.measure(a,412,915);TextView add=findText(a.getWindow().getDecorView(),"+  ADD TV SOURCE");assertNotNull(add);assertTrue(add.isClickable());}finally{ui.clean(a);}
   }
   @Test public void playbackGuardRemainsUntouched(){
     assertFalse(InfinityLiveActivity.CobraTimelineNormalizerPolicy.REWRITE_ENABLED);
