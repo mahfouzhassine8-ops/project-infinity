@@ -79,7 +79,9 @@ public class Cobra2103195PresentationPolishTest {
     InfinityLiveActivity a=fixture();try{
       FrameLayout o=overlay(a,412,300);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"cobraBuildPlayerChrome");
       assertNotNull(findDescription(o,"Channels"));assertNotNull(findDescription(o,"Display"));assertNotNull(findDescription(o,"Multi-View"));assertNotNull(findDescription(o,"Options"));
-      assertNull(findDescription(o,"Favorite"));assertNull(findDescription(o,"Audio"));
+      // Favorite intentionally remains in the separate player header on compact layouts.
+      // Only the expanded quick-tools extras collapse out of the bottom toolbar.
+      assertNotNull(findDescription(o,"Favorite"));assertNull(findDescription(o,"Audio"));
     }finally{ui.clean(a);}
   }
 
