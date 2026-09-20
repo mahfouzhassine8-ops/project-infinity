@@ -248,7 +248,7 @@ def apply(source,receipt_path,out):
 
     settings_drawer=member(text,'showPlayerSettingsDrawer')
     original_settings_drawer=settings_drawer
-    open_rows=list(re.finditer(r'(?m)^([ \\t]*)LinearLayout rows=cobraOpenSheet\\([^;\\n]+\\);',settings_drawer))
+    open_rows=list(re.finditer(r'(?m)^([ \t]*)LinearLayout rows=cobraOpenSheet\([^;\n]+\);',settings_drawer))
     if len(open_rows)!=1: raise RuntimeError('Original player settings sheet anchor drift: '+str(len(open_rows)))
     m=open_rows[0];indent=m.group(1);old_open=m.group(0)
     new_open=indent+'LinearLayout rows=cobraOpenSheet("Player options",mPlaying==null?"Quick playback controls":mPlaying.name+" • quick playback controls","player-settings");\n'+indent+'cobraAddRecentPlayerStrip(rows);'
