@@ -78,7 +78,7 @@ def apply(source,receipt_path,out):
       'showCobraDiagnosticExport','cobraCapturePreviewDiagnostics','cobraDiagnosticSnapshotForExport','onStop','onPictureInPictureModeChanged',
       'cobraHandleAudioFocus','cobraClaimAudioFocus','cobraApplyDisplayPerformance','cobraTuneLastChannel',
       'showSources','showSourceActions','chooseSourceType','loadActiveSource','loadAllEnabledSources','editCustomEpg','showProfiles',
-      'showPlayerSettingsDrawer','cobraBuildPlayerChrome'
+      'cobraBuildPlayerChrome'
     ]
     method_guards={n:sha(member(before,n)) for n in protected_methods}
     class_guards={n:sha(member(before,n,'class')) for n in [
@@ -149,6 +149,27 @@ def apply(source,receipt_path,out):
       'Fold Adaptive global default persistence')
     text=replace_member(text,'cobraShowPlaybackDefaults',defaults)
 
+    # Keep the exact original option set/actions, but make every top-level row use
+    # the same original sheet-row component so spacing/typography/focus are uniform.
+    original_menu=member(text,'showPlayerSettingsDrawer')
+    for label in ('Player settings','Viewing preferences and recording','Channel playback','Health Center','Restart current program','Record now','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player'):
+        if label not in original_menu: raise RuntimeError('Original player menu contract missing before normalization: '+label)
+    uniform_menu=r'''  private void showPlayerSettingsDrawer() {
+    if(mPlayerOverlay==null||mCobraPlayerLocked)return;
+    closeCobraPlayerDrawer();if("player-settings".equals(mCobraSheetKind)){closeCobraActionSheet();return;}
+    LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings");
+    if(cobraLiveChannel(mPlaying)){final Channel selected=mPlaying;rows.addView(cobraSheetRow("settings","Channel playback","Display, languages and recovery",false,true,()->cobraShowChannelPreferences(selected)));}
+    rows.addView(cobraSheetRow("health","Health Center","Observe playback without stopping it",false,true,()->showCobraHealthCenter()));
+    if(cobraCanRestartCurrentProgram())rows.addView(cobraSheetRow("recent","Restart current program","Provider catch-up",false,true,()->cobraRestartCurrentProgram()));
+    rows.addView(cobraSheetRow("record",mRecordingSession.isEmpty()?"Record now":"Stop recording",null,false,true,()->{if(mPlaying!=null)toggleRecording(mPlaying);}));
+    rows.addView(cobraSheetRow("cc","Audio & subtitles",null,false,true,()->showTrackChooser()));
+    rows.addView(cobraSheetRow("aspect","Aspect / Display",cobraAspectLabel(mAspectMode),false,true,()->showCobraAspectPicker()));
+    rows.addView(cobraSheetRow("cast","Cast / Route",null,false,true,()->openCastSettings()));
+    rows.addView(cobraSheetRow("source","Manage sources","Leaves this player",false,true,()->{closePlayer();stopCobraPreview();mCobraInternalScreen="internal";showSources();}));
+    rows.addView(cobraSheetRow("close","Close player","Stop playback and return to browsing",true,true,()->{mCobraPreviewAutoplayAllowed=false;closePlayer();showCobraPrimaryView();cobraUpdatePlaybackLabels();}));
+  }'''
+    text=replace_member(text,'showPlayerSettingsDrawer',uniform_menu)
+
     # Ensure the full-screen texture reacts to cover/inner/split-window geometry changes
     # without player replacement. The binding listener already does this for attached peers.
     build=member(text,'cobraBuildPlayerChrome')
@@ -166,7 +187,7 @@ def apply(source,receipt_path,out):
       'cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false','DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',
       'cobra_unified_live_timeline','CobraCallAudioPolicy','buffer_observed_no_restart',
       'value<=CobraFoldAspectPolicy.MODE','mode<=CobraFoldAspectPolicy.MODE','final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10}',
-      'LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings")','Aspect / Display','Manage sources','Close player'
+      'LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings")','Channel playback','Health Center','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player'
     ]
     for token in required:
         if token not in text: raise RuntimeError('2103197 contract missing: '+token)
@@ -177,7 +198,7 @@ def apply(source,receipt_path,out):
     report={
       'base_build':BASE_BUILD,'base_commit':BASE_COMMIT,'files':{str(ACT):{'before':sha(before_b),'after':sha(after)}},
       'fold_adaptive_aspect':True,'fold_adaptive_mode':12,'fold_adaptive_first_choice':True,'fold_adaptive_max_crop':1.06,
-      'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'original_player_menu_preserved':True,
+      'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'original_player_menu_preserved':True,'player_menu_uniform_rows':True,'player_menu_duplicate_top_level_options':False,
       'fold_adaptive_reacts_to_viewport':True,'player_recreated_on_resize':False,'pip_authority_preserved':True,
       'source_manager_route_preserved':True,'playback_behavior_changed':False,'network_selection_changed':False,
       'timeshift_ownership_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,'clock_rewrite_changed':False,
