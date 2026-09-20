@@ -41,7 +41,7 @@ def upgrade():
     data.update(
       version_code=VERSION,version_name=NEW,source_parent=2103194,source_parent_locked=True,locked_parent_commit=BASE_COMMIT,candidate_locked=False,
       stream_fingerprint_schema=7,provider_route_fingerprint=True,provider_pace_limit_classifier=True,timeline_normalizer_rewrite_enabled=False,
-      clock_rewrite_suppressed_by_evidence=True,source_manager_route_restored=True,source_manager_label='TV SOURCES',fold_adaptive_aspect=True,fold_adaptive_mode=12,fold_adaptive_preference_persistence_fixed=True,fold_adaptive_global_default_first=True,tivimate_inspired_player_hub=True,motion_polish=True,
+      clock_rewrite_suppressed_by_evidence=True,source_manager_route_restored=True,source_manager_label='TV SOURCES',fold_adaptive_aspect=True,fold_adaptive_mode=12,fold_adaptive_preference_persistence_fixed=True,fold_adaptive_global_default_first=True,tivimate_inspired_player_hub=True,recent_channel_strip=True,original_player_settings_restored=True,player_settings_body_preserved=True,motion_polish=True,
       playback_behavior_changed=False,network_selection_changed=False,timeshift_ownership_changed=False,buffer_policy_changed=False,
       parser_flags_changed=False,native_engine_recompiled=False,theme_zip_changed=False,physical_device_verified=False)
     receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
