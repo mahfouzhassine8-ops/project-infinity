@@ -251,7 +251,7 @@ def apply(source,receipt_path,out):
     open_rows=list(re.finditer(r'(?m)^([ \\t]*)LinearLayout rows=cobraOpenSheet\\([^;\\n]+\\);',settings_drawer))
     if len(open_rows)!=1: raise RuntimeError('Original player settings sheet anchor drift: '+str(len(open_rows)))
     m=open_rows[0];indent=m.group(1);old_open=m.group(0)
-    new_open=indent+'LinearLayout rows=cobraOpenSheet("Player options",mPlaying==null?"Quick playback controls":mPlaying.name+" • quick playback controls","player-settings");\\n'+indent+'cobraAddRecentPlayerStrip(rows);'
+    new_open=indent+'LinearLayout rows=cobraOpenSheet("Player options",mPlaying==null?"Quick playback controls":mPlaying.name+" • quick playback controls","player-settings");\n'+indent+'cobraAddRecentPlayerStrip(rows);'
     settings_drawer=settings_drawer[:m.start()]+new_open+settings_drawer[m.end():]
     restored=settings_drawer.replace(new_open,old_open,1)
     if restored!=original_settings_drawer: raise RuntimeError('Original player settings body changed outside Player options header / Recent Channels insertion')
