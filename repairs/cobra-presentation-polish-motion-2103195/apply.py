@@ -5,7 +5,7 @@ import argparse,hashlib,json,re
 ACT=Path('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
 BASE_BUILD=2103194
 BASE_NAME='1.0.9-Cobra-Fold-Adaptive-Aspect-RC1'
-BASE_COMMIT='b5181e627fa6bd81bc080004cbeedb207f6e0ea2'
+BASE_COMMIT='e37d8a166fa8afd3aa2013b8fc5d235e1905983a'
 
 def sha(v): return hashlib.sha256(v if isinstance(v,bytes) else v.encode()).hexdigest()
 def once(s,a,b,label):
