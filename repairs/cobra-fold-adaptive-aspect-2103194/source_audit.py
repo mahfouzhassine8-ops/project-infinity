@@ -28,11 +28,12 @@ def block(t,n,k='method'):
     raise RuntimeError('unclosed '+n)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--patch',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
- t=(a.source/ACT).read_text();x=json.loads(a.patch.read_text());picker=block(t,'showCobraAspectPicker');fit=block(t,'cobraFitVideo');policy=block(t,'CobraFoldAspectPolicy','class')
+ t=(a.source/ACT).read_text();x=json.loads(a.patch.read_text());picker=block(t,'showCobraAspectPicker');channel=block(t,'cobraShowChannelAspect');label=block(t,'cobraAspectLabel');fit=block(t,'cobraFitVideo');policy=block(t,'CobraFoldAspectPolicy','class')
  checks={
  'exact_2103193_parent':x.get('base_build')==2103193 and x.get('base_commit')=='65cee6f8fdc60757a1e9bdaaac113be1ea344a2c',
  'fold_first':'final int[] modes={CobraFoldAspectPolicy.MODE,0,1' in picker,
- 'fold_named':'"Fold Adaptive"' in picker,
+ 'fold_first_live':'final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1' in channel,
+ 'fold_named':'"Fold Adaptive"' in picker and 'case 12: return "Fold Adaptive"' in label,
  'mode_12':'static final int MODE=12' in policy,
  'viewport_driven':'viewportWidth' in policy and 'viewportHeight' in policy,
  'conservative_crop':'MAX_CROP=1.06f' in policy and 'mismatch<=1.18f' in policy,
