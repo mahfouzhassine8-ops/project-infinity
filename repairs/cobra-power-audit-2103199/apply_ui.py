@@ -13,6 +13,7 @@ def replace_once(text: str, before: str, after: str) -> str:
 
 
 def transform(text: str) -> str:
+    text = repair_guide_ruler(text)
     # A paired remote/keyboard can drive the existing buttons on a Fold or
     # phone too. Retain the existing contract flag and touch-mode exclusion.
     text = replace_once(text,
@@ -149,3 +150,24 @@ def transform(text: str) -> str:
     }
     if("COBRA • SETTINGS".equals(mCobraStageTitle)){buildShell();showSettings();return;}''')
     return text
+
+
+def repair_guide_ruler(text: str) -> str:
+    # The existing full date/time label exceeds a 30-minute cell at large font
+    # scales. Preserve it where it fits; the date is already shown above the
+    # ruler, so fall back to the clock before ellipsizing an extremely tight cell.
+    text = replace_once(text,
+        '''  private final class CobraGuideRuler extends View{
+    final android.graphics.Paint paint=new android.graphics.Paint(3);''',
+        '''  private final class CobraGuideRuler extends View{
+    final android.text.TextPaint paint=new android.text.TextPaint(3);
+    String labelFor(long time,float available){
+      if(available<=0)return "";
+      String label=formatTime(time);if(paint.measureText(label)<=available)return label;
+      label=new SimpleDateFormat("h:mm a",Locale.US).format(new Date(time));
+      return paint.measureText(label)<=available?label:android.text.TextUtils.ellipsize(label,paint,available,android.text.TextUtils.TruncateAt.END).toString();
+    }''')
+    before = 'canvas.drawText(formatTime(t),x+dp(vtheme().dimension("cobra.CobraGuideRuler.dimensions.3",5)),getHeight()-dp(vtheme().dimension("cobra.CobraGuideRuler.dimensions.4",10)),paint);'
+    after = '''float inset=dp(vtheme().dimension("cobra.CobraGuideRuler.dimensions.3",5)),right=Math.min(w,x+(w-cw)*1800000f/span),left=x+inset;float available=Math.max(0,right-left-inset);
+        int textClip=canvas.save();canvas.clipRect(left,0,Math.max(left,right-inset),getHeight());canvas.drawText(labelFor(t,available),left,getHeight()-dp(vtheme().dimension("cobra.CobraGuideRuler.dimensions.4",10)),paint);canvas.restoreToCount(textClip);'''
+    return replace_once(text,before,after)

@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -67,6 +68,18 @@ public class Cobra2103199UiRepairTest {
     drawable.setState(state);drawable.jumpToCurrentState();drawable.setBounds(0,0,160,100);
     Bitmap image=Bitmap.createBitmap(160,100,Bitmap.Config.ARGB_8888);image.eraseColor(Color.MAGENTA);
     drawable.draw(new Canvas(image));int color=image.getPixel(80,50);image.recycle();return color;
+  }
+
+  static final class RulerCanvas extends Canvas {
+    final java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+    final java.util.ArrayList<float[]> positions=new java.util.ArrayList<>();
+    RulerCanvas(Bitmap bitmap){super(bitmap);}
+    @Override public void drawText(String text,float x,float y,Paint paint){
+      if(!"CHANNEL".equals(text)&&!text.isEmpty()){
+        labels.add(text);positions.add(new float[]{x,y,paint.measureText(text),paint.getTextSize()});
+      }
+      super.drawText(text,x,y,paint);
+    }
   }
 
   @Before public void before()throws Exception{
@@ -191,5 +204,41 @@ public class Cobra2103199UiRepairTest {
     assertTrue(sources.performClick());assertNotNull(findText((View)get(a,"mStage"),"+  ADD TV SOURCE"));
     put(contract,"dpadFocusEnabled",false);Button disabled=(Button)call(a,"action","Contract-disabled action");
     assertFalse(disabled.isFocusable());assertFalse(disabled.isFocusableInTouchMode());
+  }
+
+  @Test public void guideRulerKeepsReadableTimesWithinTheirActualLargeFontSlots()throws Exception{
+    java.util.Calendar clock=java.util.Calendar.getInstance();clock.clear();clock.set(2026,java.util.Calendar.SEPTEMBER,20,10,0);
+    long start=clock.getTimeInMillis();
+    for(int[] fixture:new int[][]{{320,720,150},{960,540,100}}){
+      int width=fixture[0],height=fixture[1];float fontScale=fixture[2]/100f;
+      RuntimeEnvironment.setQualifiers("w"+width+"dp-h"+height+"dp-"+(width>height?"land":"port")+"-mdpi");
+      Configuration config=new Configuration(a.getResources().getConfiguration());config.fontScale=fontScale;
+      a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());a.onConfigurationChanged(config);
+      prefs().edit().putString("cobra_appearance_mode","oled").commit();call(a,"cobraOpenLiveTv");
+      ui.measure(a,width,height);ui.frames(32);ui.measure(a,width,height);put(a,"mCobraGuideWindow",start);
+      View ruler=(View)get(a,"mCobraGuideRuler");Object layout=get(a,"mCobraModeLayout");
+      float channelWidth=((Number)get(layout,"channelWidth")).floatValue()*a.getResources().getDisplayMetrics().density;
+      long span=((Number)get(layout,"timeSpan")).longValue();float slot=(ruler.getWidth()-channelWidth)*1800000f/span;
+      assertTrue("Production ruler is measured",ruler.getWidth()>200&&ruler.getHeight()>0);
+      Bitmap bitmap=Bitmap.createBitmap(ruler.getWidth(),ruler.getHeight(),Bitmap.Config.ARGB_8888);
+      RulerCanvas canvas=new RulerCanvas(bitmap);ruler.draw(canvas);
+      assertTrue("Actual onDraw must paint timeline labels",canvas.labels.size()>=2);
+      for(int i=0;i<canvas.labels.size();i++){
+        float[] position=canvas.positions.get(i);
+        assertEquals("Actual paint follows accessibility font size",10f*fontScale,position[3],.05f);
+        assertTrue("Rendered label must fit before next tick: "+canvas.labels.get(i),position[2]<=slot-10f+.1f);
+        assertTrue("Rendered label must fit visible ruler: "+canvas.labels.get(i),position[0]+position[2]<=ruler.getWidth()-5f+.1f);
+      }
+      String full=(String)call(a,"formatTime",start);
+      if(width==320){
+        assertEquals(new java.text.SimpleDateFormat("h:mm a",java.util.Locale.US).format(new java.util.Date(start)),canvas.labels.get(0));
+        assertFalse("Narrow labels retain the actual clock rather than clipping a date prefix",canvas.labels.get(0).equals(full));
+      }else assertEquals("Normal wide ruler preserves the existing full date/time label",full,canvas.labels.get(0));
+      // An extreme custom cell must still respect measured text bounds. This is
+      // secondary to the actual production onDraw assertions above.
+      Paint paint=(Paint)get(ruler,"paint");String tiny=(String)call(ruler,"labelFor",start,8f);
+      assertTrue(paint.measureText(tiny)<=8.1f);assertEquals("",call(ruler,"labelFor",start,0f));
+      ui.image(a,"tv-grid-ruler-repaired-"+width+"x"+height+"-font"+fixture[2]);bitmap.recycle();
+    }
   }
 }

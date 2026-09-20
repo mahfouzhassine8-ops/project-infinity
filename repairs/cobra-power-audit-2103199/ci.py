@@ -117,7 +117,7 @@ def deliver():
     require(sum(v['tests'] for v in inherited)==265,'Inherited 265-test inventory changed')
     expected_new={'com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest':7,
                   'com.projectinfinity.kodi.Cobra2103199DisplayRegressionTest':13,
-                  'com.projectinfinity.kodi.Cobra2103199UiRepairTest':7}
+                  'com.projectinfinity.kodi.Cobra2103199UiRepairTest':8}
     require({v['suite']:v['tests'] for v in new}==expected_new,'New behavioral regression suite inventory changed')
     final=json.loads(Path('audit199/final-verification.json').read_text())
     require(final['apk_sha256']==sha(Path('signed199/Infinity-'+NEW+'.apk')),'Candidate changed after verification')
