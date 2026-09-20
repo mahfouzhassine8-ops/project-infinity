@@ -142,7 +142,7 @@ def apply(source,receipt_path,out):
       '''    long lastLoadCompletedElapsed=-1,lastLoadIntervalMs=-1,loadIntervalTotalMs=0,minLoadIntervalMs=Long.MAX_VALUE,maxLoadIntervalMs=0;int loadIntervalSamples=0;
     long rebufferAheadLastMs=-1,rebufferAheadTotalMs=0,rebufferAheadMinMs=Long.MAX_VALUE,rebufferAheadMaxMs=0;
     long providerAgeAtRebufferLastMs=-1,providerAgeAtRebufferTotalMs=0,providerAgeAtRebufferMaxMs=0;
-    long proxyAgeAtRebufferLastMs=-1,proxyAgeAtRebufferTotalMs=0,proxyAgeAtRebufferMaxMs=0;int cadenceRebufferSamples=0;''',
+    long proxyAgeAtRebufferLastMs=-1,proxyAgeAtRebufferTotalMs=0,proxyAgeAtRebufferMaxMs=0;int cadenceRebufferSamples=0,providerAgeRebufferSamples=0,proxyAgeRebufferSamples=0;''',
       'rebuffer cadence fields')
     text=replace_member(text,'CobraSessionVitals',vit,kind='class')
 
@@ -150,7 +150,7 @@ def apply(source,receipt_path,out):
     binding=once(binding,
       '        vitals.bufferingTransitions++;',
       '''        long ahead=Math.max(0L,player.getTotalBufferedDuration());vitals.rebufferAheadLastMs=ahead;vitals.rebufferAheadTotalMs+=ahead;vitals.rebufferAheadMinMs=Math.min(vitals.rebufferAheadMinMs,ahead);vitals.rebufferAheadMaxMs=Math.max(vitals.rebufferAheadMaxMs,ahead);
-        if(player==mCobraTimeshiftProxyPlayer&&mCobraTimeshiftSession!=null){long providerAge=mCobraTimeshiftSession.providerReadAgeMs(),proxyAge=mCobraTimeshiftSession.proxyWriteAgeMs();vitals.providerAgeAtRebufferLastMs=providerAge;vitals.proxyAgeAtRebufferLastMs=proxyAge;if(providerAge>=0L){vitals.providerAgeAtRebufferTotalMs+=providerAge;vitals.providerAgeAtRebufferMaxMs=Math.max(vitals.providerAgeAtRebufferMaxMs,providerAge);}if(proxyAge>=0L){vitals.proxyAgeAtRebufferTotalMs+=proxyAge;vitals.proxyAgeAtRebufferMaxMs=Math.max(vitals.proxyAgeAtRebufferMaxMs,proxyAge);}vitals.cadenceRebufferSamples++;}
+        if(player==mCobraTimeshiftProxyPlayer&&mCobraTimeshiftSession!=null){long providerAge=mCobraTimeshiftSession.providerReadAgeMs(),proxyAge=mCobraTimeshiftSession.proxyWriteAgeMs();vitals.providerAgeAtRebufferLastMs=providerAge;vitals.proxyAgeAtRebufferLastMs=proxyAge;if(providerAge>=0L){vitals.providerAgeAtRebufferTotalMs+=providerAge;vitals.providerAgeAtRebufferMaxMs=Math.max(vitals.providerAgeAtRebufferMaxMs,providerAge);vitals.providerAgeRebufferSamples++;}if(proxyAge>=0L){vitals.proxyAgeAtRebufferTotalMs+=proxyAge;vitals.proxyAgeAtRebufferMaxMs=Math.max(vitals.proxyAgeAtRebufferMaxMs,proxyAge);vitals.proxyAgeRebufferSamples++;}vitals.cadenceRebufferSamples++;}
         vitals.bufferingTransitions++;''',
       'rebuffer instant fingerprint')
     text=replace_member(text,'CobraPlayerBinding',binding,kind='class')
@@ -158,7 +158,7 @@ def apply(source,receipt_path,out):
     health=member(text,'cobraAddSessionHealth')
     health=once(health,
       'row.put("load_interval_avg_ms",s.loadIntervalSamples<=0?-1:s.loadIntervalTotalMs/s.loadIntervalSamples);',
-      '''row.put("load_interval_avg_ms",s.loadIntervalSamples<=0?-1:s.loadIntervalTotalMs/s.loadIntervalSamples);row.put("rebuffer_buffer_ahead_last_ms",s.rebufferAheadLastMs);row.put("rebuffer_buffer_ahead_avg_ms",s.bufferingTransitions<=0?-1:s.rebufferAheadTotalMs/Math.max(1,s.bufferingTransitions));row.put("rebuffer_buffer_ahead_min_ms",s.rebufferAheadMinMs==Long.MAX_VALUE?-1:s.rebufferAheadMinMs);row.put("rebuffer_buffer_ahead_max_ms",s.rebufferAheadMaxMs);row.put("cadence_rebuffer_samples",s.cadenceRebufferSamples);row.put("provider_age_at_rebuffer_last_ms",s.providerAgeAtRebufferLastMs);row.put("provider_age_at_rebuffer_avg_ms",s.cadenceRebufferSamples<=0?-1:s.providerAgeAtRebufferTotalMs/s.cadenceRebufferSamples);row.put("provider_age_at_rebuffer_max_ms",s.providerAgeAtRebufferMaxMs);row.put("proxy_age_at_rebuffer_last_ms",s.proxyAgeAtRebufferLastMs);row.put("proxy_age_at_rebuffer_avg_ms",s.cadenceRebufferSamples<=0?-1:s.proxyAgeAtRebufferTotalMs/s.cadenceRebufferSamples);row.put("proxy_age_at_rebuffer_max_ms",s.proxyAgeAtRebufferMaxMs);''',
+      '''row.put("load_interval_avg_ms",s.loadIntervalSamples<=0?-1:s.loadIntervalTotalMs/s.loadIntervalSamples);row.put("rebuffer_buffer_ahead_last_ms",s.rebufferAheadLastMs);row.put("rebuffer_buffer_ahead_avg_ms",s.bufferingTransitions<=0?-1:s.rebufferAheadTotalMs/Math.max(1,s.bufferingTransitions));row.put("rebuffer_buffer_ahead_min_ms",s.rebufferAheadMinMs==Long.MAX_VALUE?-1:s.rebufferAheadMinMs);row.put("rebuffer_buffer_ahead_max_ms",s.rebufferAheadMaxMs);row.put("cadence_rebuffer_samples",s.cadenceRebufferSamples);row.put("provider_age_at_rebuffer_last_ms",s.providerAgeAtRebufferLastMs);row.put("provider_age_at_rebuffer_avg_ms",s.providerAgeRebufferSamples<=0?-1:s.providerAgeAtRebufferTotalMs/s.providerAgeRebufferSamples);row.put("provider_age_at_rebuffer_max_ms",s.providerAgeAtRebufferMaxMs);row.put("proxy_age_at_rebuffer_last_ms",s.proxyAgeAtRebufferLastMs);row.put("proxy_age_at_rebuffer_avg_ms",s.proxyAgeRebufferSamples<=0?-1:s.proxyAgeAtRebufferTotalMs/s.proxyAgeRebufferSamples);row.put("proxy_age_at_rebuffer_max_ms",s.proxyAgeAtRebufferMaxMs);''',
       'session cadence health')
 
     health=once(health,
