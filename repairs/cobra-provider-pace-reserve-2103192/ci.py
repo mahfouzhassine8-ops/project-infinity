@@ -84,7 +84,7 @@ def verify():
         require(b'Cobra2103192ProviderPaceReserveTest' not in dex,'2103192 test code packaged in release APK')
 
     badging=Path('signed192/badging.txt').read_text()
-    require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103191'" in badging,'Final APK not forward-installable')
+    require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103192'" in badging,'Final APK not forward-installable')
     result={'build':VERSION,'base_build':2103191,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
       'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'timeline_normalizer_rewrite_enabled':False,
       'clock_rewrite_suppressed_by_evidence':True,'raw_provider_url_logged':False,'raw_remote_ip_logged':False,
