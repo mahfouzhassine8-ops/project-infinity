@@ -137,7 +137,7 @@ def apply(source,receipt_path,out):
 
     required=[
       'CobraFoldAspectPolicy','static final int MODE=12','case 12: return "Fold Adaptive"','Fold Adaptive','final int[] modes={CobraFoldAspectPolicy.MODE,0,1','final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1',
-      'mode==CobraFoldAspectPolicy.MODE','mPlayerTexture.addOnLayoutChangeListener','applyCobraAspectTransform()',
+      'mode==CobraFoldAspectPolicy.MODE','texture.addOnLayoutChangeListener(binding.layoutListener)','applyCobraAspectTransform()',
       'cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false','DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',
       'cobra_unified_live_timeline','CobraCallAudioPolicy','buffer_observed_no_restart'
     ]
