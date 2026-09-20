@@ -3,9 +3,9 @@ from pathlib import Path
 import argparse,hashlib,json,re
 
 ACT=Path('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
-BASE_BUILD=2103193
-BASE_NAME='1.0.9-Cobra-Source-Manager-Restore-RC1'
-BASE_COMMIT='65cee6f8fdc60757a1e9bdaaac113be1ea344a2c'
+BASE_BUILD=2103194
+BASE_NAME='1.0.9-Cobra-Fold-Adaptive-Aspect-RC1'
+BASE_COMMIT='2c2a759bd7f1ef380f21609105675ff2012d4d56'
 
 def sha(v): return hashlib.sha256(v if isinstance(v,bytes) else v.encode()).hexdigest()
 def once(s,a,b,label):
@@ -43,33 +43,53 @@ def member(text,name,kind='method'):
     a,b=span(text,name,kind);return text[a:b]
 def replace_member(text,name,new,kind='method'):
     a,b=span(text,name,kind);return text[:a]+new.rstrip()+'\n'+text[b:]
+def insert_before_final(text,addition):
+    i=text.rfind('}')
+    if i<0: raise RuntimeError('missing class close')
+    return text[:i]+addition.rstrip()+'\n'+text[i:]
 
-FOLD_POLICY=r'''  static final class CobraFoldAspectPolicy {
-    static final int MODE=12;
-    static final float MAX_CROP=1.06f;
-    static float[] scale(int videoWidth,int videoHeight,float pixelRatio,int viewportWidth,int viewportHeight){
-      if(videoWidth<=0||videoHeight<=0||viewportWidth<=0||viewportHeight<=0)return new float[]{1f,1f};
-      float source=videoWidth*(pixelRatio>0?pixelRatio:1f)/videoHeight;
-      float view=(float)viewportWidth/viewportHeight;
-      float sx=source<view?source/view:1f,sy=source>view?view/source:1f;
-      // Fold Adaptive is conservative: preserve the entire frame on extreme/narrow
-      // windows, and use only a tiny center crop on near-matching large viewports.
-      float mismatch=Math.max(source/view,view/source);
-      boolean roomy=Math.min(viewportWidth,viewportHeight)>=600;
-      if(roomy&&mismatch<=1.18f){
-        float z=Math.min(MAX_CROP,Math.max(1f/sx,1f/sy));sx*=z;sy*=z;
-      }
-      return new float[]{sx,sy};
+HELPERS=r'''
+  private static final class CobraMotionSpec {
+    static final long MICRO=120L, PANEL=190L, STAGGER=22L;
+  }
+
+  private void cobraPolishFocusable(View view){
+    if(view==null)return;
+    view.setOnFocusChangeListener((v,focused)->{
+      v.animate().cancel();
+      v.animate().scaleX(focused?1.018f:1f).scaleY(focused?1.018f:1f)
+          .alpha(focused?1f:.97f).setDuration(focused?CobraMotionSpec.MICRO:100L)
+          .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+    });
+  }
+
+  private void cobraAnimateChildrenIn(LinearLayout group){
+    if(group==null)return;
+    int count=Math.min(group.getChildCount(),14);
+    for(int i=0;i<count;i++){
+      View child=group.getChildAt(i);if(child==null)continue;
+      child.animate().cancel();child.setAlpha(0f);child.setTranslationY(dp(8));child.setScaleX(.992f);child.setScaleY(.992f);
+      child.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f)
+          .setStartDelay(i*CobraMotionSpec.STAGGER).setDuration(CobraMotionSpec.PANEL)
+          .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
     }
-  }'''
+  }
+
+  private void cobraAnimatePanelIn(View view,boolean horizontal){
+    if(view==null)return;view.animate().cancel();view.setAlpha(0f);view.setScaleX(.985f);view.setScaleY(.985f);
+    if(horizontal)view.setTranslationX(dp(18));else view.setTranslationY(dp(14));
+    view.animate().alpha(1f).translationX(0f).translationY(0f).scaleX(1f).scaleY(1f)
+        .setDuration(CobraMotionSpec.PANEL).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+  }
+'''
 
 def apply(source,receipt_path,out):
     source=Path(source);out=Path(out);receipt=json.loads(Path(receipt_path).read_text())
     if receipt.get('version_code')!=BASE_BUILD or receipt.get('version_name')!=BASE_NAME:
-        raise RuntimeError('Expected exact passed 2103193 source receipt')
+        raise RuntimeError('Expected exact passed 2103194 source receipt')
     path=source/ACT;before_b=path.read_bytes();before=before_b.decode()
     expected=receipt.get('files',{}).get(str(ACT),{}).get('after')
-    if not expected or sha(before_b)!=expected: raise RuntimeError('2103193 Activity preimage mismatch')
+    if not expected or sha(before_b)!=expected: raise RuntimeError('2103194 Activity preimage mismatch')
     text=before
 
     protected_methods=[
@@ -77,56 +97,20 @@ def apply(source,receipt_path,out):
       'cobraRewindLive','cobraGoLive','cobraStopLocalTimeshift','cobraDisposePlayer','cobraUpdateTimeshiftSeek','cobraStartProviderCatchup',
       'showCobraDiagnosticExport','cobraCapturePreviewDiagnostics','cobraDiagnosticSnapshotForExport','onStop','onPictureInPictureModeChanged',
       'cobraHandleAudioFocus','cobraClaimAudioFocus','cobraApplyDisplayPerformance','cobraTuneLastChannel',
-      'showSources','showSourceActions','chooseSourceType','loadActiveSource','loadAllEnabledSources','editCustomEpg','showProfiles',
-      'cobraBuildPlayerChrome'
+      'showSourceActions','chooseSourceType','loadActiveSource','loadAllEnabledSources','editCustomEpg','showProfiles',
+      'cobraFitVideo','showCobraAspectPicker','cobraShowChannelAspect','cobraAspectLabel','showPlayerSettingsDrawer'
     ]
     method_guards={n:sha(member(before,n)) for n in protected_methods}
     class_guards={n:sha(member(before,n,'class')) for n in [
       'CobraNetworkFamilyPolicy','CobraDiagnosticFreezePolicy','CobraStreamCadencePolicy','CobraTsParserPolicy',
-      'CobraTsTimelinePolicy','CobraTimelineNormalizerPolicy','CobraProviderPacePolicy'
+      'CobraTsTimelinePolicy','CobraTimelineNormalizerPolicy','CobraProviderPacePolicy','CobraFoldAspectPolicy'
     ]}
 
-    # New presentation-only policy beside the existing layout math.
-    a,b=span(text,'CobraLayoutMath','class')
-    text=text[:b]+'\n\n'+FOLD_POLICY+text[b:]
+    text=insert_before_final(text,HELPERS)
 
-    label=member(text,'cobraAspectLabel')
-    label=once(label,'    switch (mode) {','    switch (mode) {\n      case 12: return "Fold Adaptive";','Fold Adaptive label')
-    text=replace_member(text,'cobraAspectLabel',label)
-
-    channel_aspect=member(text,'cobraShowChannelAspect')
-    channel_aspect=once(channel_aspect,
-      '    for(int i=-1;i<=11;i++){final int value=i;cobraAddDetail(rows,"aspect",i<0?"Inherit default":cobraAspectLabel(i),null,"cobra-channel-aspect:"+i,prefs.aspect==i,()->{\n      CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=value;if(cobraSavePreferences(channel,key,p,false)){if(value==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}\n    });}',
-      '''    final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1,2,3,4,5,6,7,8,9,10,11};
-    for(int value:modes){final int selected=value;cobraAddDetail(rows,"aspect",selected<0?"Inherit default":cobraAspectLabel(selected),null,"cobra-channel-aspect:"+selected,prefs.aspect==selected,()->{
-      CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=selected;if(cobraSavePreferences(channel,key,p,false)){if(selected==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}
-    });}''',
-      'channel aspect ordering')
-    text=replace_member(text,'cobraShowChannelAspect',channel_aspect)
-
-    picker=member(text,'showCobraAspectPicker')
-    picker=once(picker,
-      '    LinearLayout rows=cobraOpenSheet("Aspect / Display","Best Fit preserves the source proportions","aspect");\n    for(int i=0;i<12;i++){final int mode=i;rows.addView(cobraSheetRow("aspect",cobraAspectLabel(i),mAspectMode==i?"Selected":null,false,true,()->{\n      mAspectMode=mode;mPrefs.edit().putInt(COBRA_ASPECT_MODE,mode).apply();applyCobraAspectTransform();if(mode==11)showCobraCustomAspectEditor();}));}',
-      '''    LinearLayout rows=cobraOpenSheet("Aspect / Display","Fold Adaptive automatically follows the usable screen size without restarting playback","aspect");
-    final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10,11};
-    for(int mode:modes){final int selected=mode;String label=selected==CobraFoldAspectPolicy.MODE?"Fold Adaptive":cobraAspectLabel(selected);
-      rows.addView(cobraSheetRow("aspect",label,mAspectMode==selected?"Selected":null,false,true,()->{
-        mAspectMode=selected;mPrefs.edit().putInt(COBRA_ASPECT_MODE,selected).apply();applyCobraAspectTransform();if(selected==11)showCobraCustomAspectEditor();}));}''',
-      'aspect picker ordering')
-    text=replace_member(text,'showCobraAspectPicker',picker)
-
-    fit=member(text,'cobraFitVideo')
-    fit=once(fit,
-      '    float[] scale=CobraLayoutMath.fit(size.width,size.height,size.pixelWidthHeightRatio,\n        texture.getWidth(),texture.getHeight(),mode,customX,customY);',
-      '''    float[] scale=mode==CobraFoldAspectPolicy.MODE
-        ?CobraFoldAspectPolicy.scale(size.width,size.height,size.pixelWidthHeightRatio,texture.getWidth(),texture.getHeight())
-        :CobraLayoutMath.fit(size.width,size.height,size.pixelWidthHeightRatio,
-            texture.getWidth(),texture.getHeight(),mode,customX,customY);''',
-      'fold adaptive fit')
-    text=replace_member(text,'cobraFitVideo',fit)
-
-    # Keep the original player menu exactly as-is; only repair Fold Adaptive
-    # persistence so mode 12 does not sanitize back to Best Fit/default.
+    # 2103194 exposed mode 12 in the UI, but the inherited preference validators
+    # still capped aspect modes at 11. That caused Fold Adaptive to be serialized
+    # back to inherit/default and immediately snap to the previous mode.
     preference=member(text,'CobraPreferencePolicy','class')
     preference=once(preference,
       '    static int aspect(int value){return value>=-1&&value<=11?value:-1;}',
@@ -134,47 +118,117 @@ def apply(source,receipt_path,out):
       'Fold Adaptive channel preference persistence')
     text=replace_member(text,'CobraPreferencePolicy',preference,'class')
 
-    global_aspect=member(text,'cobraChannelAspect')
-    global_aspect=once(global_aspect,
+    channel_mode=member(text,'cobraChannelAspect')
+    channel_mode=once(channel_mode,
       '    int mode=mPrefs.getInt(COBRA_ASPECT_MODE,0);return mode>=0&&mode<=11?mode:0;',
       '    int mode=mPrefs.getInt(COBRA_ASPECT_MODE,0);return mode>=0&&mode<=CobraFoldAspectPolicy.MODE?mode:0;',
       'Fold Adaptive global preference persistence')
-    text=replace_member(text,'cobraChannelAspect',global_aspect)
+    text=replace_member(text,'cobraChannelAspect',channel_mode)
 
     defaults=member(text,'cobraShowPlaybackDefaults')
     defaults=once(defaults,
       '      for(int i=0;i<11;i++){final int value=i;cobraAddDetail(choices,"aspect",cobraAspectLabel(i),null,"cobra-default-aspect:"+i,mPrefs.getInt(COBRA_ASPECT_MODE,0)==i,()->{mPrefs.edit().putInt(COBRA_ASPECT_MODE,value).apply();for(CobraPlayerBinding b:mCobraPlayerBindings.values())cobraFitBinding(b);if(mPlaying!=null){mAspectMode=cobraChannelAspect(mPlaying);applyCobraAspectTransform();}cobraShowPlaybackDefaults();});}',
       '''      final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10};
-      for(int selected:modes){final int value=selected;cobraAddDetail(choices,"aspect",cobraAspectLabel(value),null,"cobra-default-aspect:"+value,mPrefs.getInt(COBRA_ASPECT_MODE,0)==value,()->{mPrefs.edit().putInt(COBRA_ASPECT_MODE,value).apply();for(CobraPlayerBinding b:mCobraPlayerBindings.values())cobraFitBinding(b);if(mPlaying!=null){mAspectMode=cobraChannelAspect(mPlaying);applyCobraAspectTransform();}cobraShowPlaybackDefaults();});}''',
-      'Fold Adaptive global default persistence')
+      for(int value:modes){final int selected=value;cobraAddDetail(choices,"aspect",cobraAspectLabel(selected),null,"cobra-default-aspect:"+selected,mPrefs.getInt(COBRA_ASPECT_MODE,0)==selected,()->{mPrefs.edit().putInt(COBRA_ASPECT_MODE,selected).apply();for(CobraPlayerBinding b:mCobraPlayerBindings.values())cobraFitBinding(b);if(mPlaying!=null){mAspectMode=cobraChannelAspect(mPlaying);applyCobraAspectTransform();}cobraShowPlaybackDefaults();});}''',
+      'Fold Adaptive first in global defaults')
     text=replace_member(text,'cobraShowPlaybackDefaults',defaults)
 
-    # Keep the exact original option set/actions, but make every top-level row use
-    # the same original sheet-row component so spacing/typography/focus are uniform.
-    original_menu=member(text,'showPlayerSettingsDrawer')
-    for label in ('Player settings','Viewing preferences and recording','Channel playback','Health Center','Restart current program','Record now','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player'):
-        if label not in original_menu: raise RuntimeError('Original player menu contract missing before normalization: '+label)
-    uniform_menu=r'''  private void showPlayerSettingsDrawer() {
-    if(mPlayerOverlay==null||mCobraPlayerLocked)return;
-    closeCobraPlayerDrawer();if("player-settings".equals(mCobraSheetKind)){closeCobraActionSheet();return;}
-    LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings");
-    if(cobraLiveChannel(mPlaying)){final Channel selected=mPlaying;rows.addView(cobraSheetRow("settings","Channel playback","Display, languages and recovery",false,true,()->cobraShowChannelPreferences(selected)));}
-    rows.addView(cobraSheetRow("health","Health Center","Observe playback without stopping it",false,true,()->showCobraHealthCenter()));
-    if(cobraCanRestartCurrentProgram())rows.addView(cobraSheetRow("recent","Restart current program","Provider catch-up",false,true,()->cobraRestartCurrentProgram()));
-    rows.addView(cobraSheetRow("record",mRecordingSession.isEmpty()?"Record now":"Stop recording",null,false,true,()->{if(mPlaying!=null)toggleRecording(mPlaying);}));
-    rows.addView(cobraSheetRow("cc","Audio & subtitles",null,false,true,()->showTrackChooser()));
-    rows.addView(cobraSheetRow("aspect","Aspect / Display",cobraAspectLabel(mAspectMode),false,true,()->showCobraAspectPicker()));
-    rows.addView(cobraSheetRow("cast","Cast / Route",null,false,true,()->openCastSettings()));
-    rows.addView(cobraSheetRow("source","Manage sources","Leaves this player",false,true,()->{closePlayer();stopCobraPreview();mCobraInternalScreen="internal";showSources();}));
-    rows.addView(cobraSheetRow("close","Close player","Stop playback and return to browsing",true,true,()->{mCobraPreviewAutoplayAllowed=false;closePlayer();showCobraPrimaryView();cobraUpdatePlaybackLabels();}));
-  }'''
-    text=replace_member(text,'showPlayerSettingsDrawer',uniform_menu)
+    sheet=member(text,'cobraOpenSheet')
+    sheet=once(sheet,
+      '    panel.setAlpha(0f);panel.setTranslationY(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.18",10)));panel.animate().alpha(1f).translationY(0f).setDuration(vtheme().motion("cobra.cobraOpenSheet.numbers.1",160)).start();',
+      '''    panel.setAlpha(0f);panel.setTranslationY(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.18",12)));panel.setScaleX(.985f);panel.setScaleY(.985f);
+    panel.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f).setDuration(vtheme().motion("cobra.cobraOpenSheet.numbers.1",190)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();''',
+      'sheet motion')
+    text=replace_member(text,'cobraOpenSheet',sheet)
 
-    # Ensure the full-screen texture reacts to cover/inner/split-window geometry changes
-    # without player replacement. The binding listener already does this for attached peers.
-    build=member(text,'cobraBuildPlayerChrome')
-    # Existing player texture listener is installed during player UI construction; add no player operation here.
-    # We intentionally rely on the already-proven TextureView/layout listener and applyCobraAspectTransform path.
+    anchored=member(text,'cobraPositionAnchoredSheet')
+    anchored=once(anchored,
+      '    if(panel.getLeft()==rect[0]&&panel.getTop()==rect[1]&&panel.getWidth()==rect[2]&&!panel.isLayoutRequested())panel.setAlpha(1f);',
+      '''    if(panel.getLeft()==rect[0]&&panel.getTop()==rect[1]&&panel.getWidth()==rect[2]&&!panel.isLayoutRequested()&&panel.getAlpha()==0f){
+      panel.setScaleX(.985f);panel.setScaleY(.985f);panel.setTranslationX(dp(8));
+      panel.animate().alpha(1f).translationX(0f).scaleX(1f).scaleY(1f).setDuration(CobraMotionSpec.PANEL).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+    }''',
+      'anchored sheet motion')
+    text=replace_member(text,'cobraPositionAnchoredSheet',anchored)
+
+    row=member(text,'cobraSheetRow')
+    row=once(row,'    row.setMinimumHeight(dp(subtitle==null||subtitle.isEmpty()?52:64));vtheme().tree(row,"sheet.row");return row;',
+             '    row.setMinimumHeight(dp(subtitle==null||subtitle.isEmpty()?52:64));cobraPolishFocusable(row);vtheme().tree(row,"sheet.row");return row;','sheet row focus motion')
+    text=replace_member(text,'cobraSheetRow',row)
+
+    detail=member(text,'cobraDetailRow')
+    detail=once(detail,'    row.setOnClickListener(v->{closeCobraActionSheet();action.run();});vtheme().tree(row,"sheet.detail");return row;',
+                '    row.setOnClickListener(v->{closeCobraActionSheet();action.run();});cobraPolishFocusable(row);vtheme().tree(row,"sheet.detail");return row;','detail row focus motion')
+    text=replace_member(text,'cobraDetailRow',detail)
+
+    action=member(text,'action')
+    action=once(action,'    vtheme().paint(button,"widget.action");return button;',
+                '    cobraPolishFocusable(button);vtheme().paint(button,"widget.action");return button;','action focus motion')
+    text=replace_member(text,'action',action)
+
+    text_button=member(text,'cobraTextButton')
+    text_button=once(text_button,'b.setOnClickListener(v->action.run());vtheme().paint(b,"widget.cobraTextButton");return b;',
+                     'b.setOnClickListener(v->action.run());cobraPolishFocusable(b);vtheme().paint(b,"widget.cobraTextButton");return b;','text button focus motion')
+    text=replace_member(text,'cobraTextButton',text_button)
+
+    settings=member(text,'showSettings')
+    settings=once(settings,'    mStage.addView(settingsScroll, new LinearLayout.LayoutParams(-1,0,1));\n    refreshCobraSubscriptionStatus();',
+                  '    mStage.addView(settingsScroll, new LinearLayout.LayoutParams(-1,0,1));\n    list.post(()->cobraAnimateChildrenIn(list));\n    refreshCobraSubscriptionStatus();','settings stagger')
+    text=replace_member(text,'showSettings',settings)
+
+    sources=member(text,'showSources')
+    sources=once(sources,'    mStage.addView(scroll, new LinearLayout.LayoutParams(\n        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));',
+                 '    mStage.addView(scroll, new LinearLayout.LayoutParams(\n        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));\n    list.post(()->cobraAnimateChildrenIn(list));','sources stagger')
+    text=replace_member(text,'showSources',sources)
+
+    drawer=member(text,'showCobraPlayerDrawer')
+    drawer=once(drawer,'    mPlayerOverlay.addView(panel,new FrameLayout.LayoutParams(1,1));mPlayerChrome.setVisibility(View.GONE);cobraRenderPlayerDrawer(mCobraDrawerFilter);cobraLayoutPlayerPanels();vtheme().tree(content,"player.channels");',
+                '    mPlayerOverlay.addView(panel,new FrameLayout.LayoutParams(1,1));mPlayerChrome.setVisibility(View.GONE);cobraRenderPlayerDrawer(mCobraDrawerFilter);cobraLayoutPlayerPanels();panel.post(()->cobraAnimatePanelIn(panel,!isPortrait()));vtheme().tree(content,"player.channels");','player drawer motion')
+    text=replace_member(text,'showCobraPlayerDrawer',drawer)
+
+    render_drawer=member(text,'cobraRenderPlayerDrawer')
+    render_drawer=once(render_drawer,
+      '        return row;}});',
+      '        return row;}});\n    mCobraPlayerDrawerList.setAlpha(.72f);mCobraPlayerDrawerList.setTranslationY(dp(5));mCobraPlayerDrawerList.animate().alpha(1f).translationY(0f).setDuration(150L).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();',
+      'player drawer filter motion')
+    text=replace_member(text,'cobraRenderPlayerDrawer',render_drawer)
+
+    chrome=member(text,'cobraBuildPlayerChrome')
+    chrome=once(chrome,
+      '    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();cobraUpdateLiveRewindControls();cobraUpdateLastChannelButton();cobraUpdateTimeshiftSeek();',
+      '    if(visible){chrome.setAlpha(0f);chrome.setTranslationY(dp(8));chrome.animate().alpha(1f).translationY(0f).setDuration(150L).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();}\n    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();cobraUpdateLiveRewindControls();cobraUpdateLastChannelButton();cobraUpdateTimeshiftSeek();',
+      'player chrome motion')
+    text=replace_member(text,'cobraBuildPlayerChrome',chrome)
+
+    exp=member(text,'toggleCobraDrawer')
+    exp=once(exp,
+      '    panel.setTranslationX(-width);panel.animate().translationX(0).setDuration(vtheme().motion("cobra.toggleCobraDrawer.numbers.1",180)).start();animateCobraDrawerShift(Math.min(width,screen*.28f));',
+      '    panel.setTranslationX(-width);panel.setAlpha(.90f);panel.setScaleX(.99f);panel.setScaleY(.99f);panel.animate().translationX(0).alpha(1f).scaleX(1f).scaleY(1f).setDuration(vtheme().motion("cobra.toggleCobraDrawer.numbers.1",210)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();animateCobraDrawerShift(Math.min(width,screen*.28f));',
+      'experience drawer motion')
+    text=replace_member(text,'toggleCobraDrawer',exp)
+
+    shift=member(text,'animateCobraDrawerShift')
+    shift=once(shift,
+      '    if(mStage!=null)mStage.animate().translationX(translation).setDuration(vtheme().motion("cobra.animateCobraDrawerShift.numbers.1",180)).start();',
+      '    if(mStage!=null)mStage.animate().translationX(translation).setDuration(vtheme().motion("cobra.animateCobraDrawerShift.numbers.1",210)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();',
+      'drawer stage easing')
+    text=replace_member(text,'animateCobraDrawerShift',shift)
+
+    empty=member(text,'cobraModeEmpty')
+    empty=r'''  private void cobraModeEmpty(LinearLayout parent,String value){
+    TextView empty=cobraText(value,cobraModeColor("muted"),14);empty.setGravity(Gravity.CENTER);empty.setMaxLines(4);
+    empty.setPadding(dp(24),dp(20),dp(24),dp(20));empty.setBackground(cobraModeSurface(18,true));
+    LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,0,1);p.setMargins(dp(10),dp(12),dp(10),dp(12));parent.addView(empty,p);
+    empty.setAlpha(0f);empty.setScaleX(.98f);empty.setScaleY(.98f);empty.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(180L).start();
+  }'''
+    text=replace_member(text,'cobraModeEmpty',empty)
+
+    browser=member(text,'cobraRenderGuideBrowser')
+    browser=once(browser,
+      '      mCobraGuideBrowser.setAlpha(.65f);mCobraGuideBrowser.animate().alpha(1f).setDuration(vtheme().motion("cobra.cobraRenderGuideBrowser.numbers.1",160)).start();mCobraRenderedMode=mCobraGuideStyle;',
+      '      mCobraGuideBrowser.setAlpha(.62f);mCobraGuideBrowser.setTranslationY(dp(7));mCobraGuideBrowser.animate().alpha(1f).translationY(0f).setDuration(vtheme().motion("cobra.cobraRenderGuideBrowser.numbers.1",190)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();mCobraRenderedMode=mCobraGuideStyle;',
+      'guide mode transition')
+    text=replace_member(text,'cobraRenderGuideBrowser',browser)
 
     for n,h in method_guards.items():
         if sha(member(text,n))!=h: raise RuntimeError('Protected playback/source owner changed: '+n)
@@ -182,30 +236,31 @@ def apply(source,receipt_path,out):
         if sha(member(text,n,'class'))!=h: raise RuntimeError('Protected class changed: '+n)
 
     required=[
-      'CobraFoldAspectPolicy','static final int MODE=12','case 12: return "Fold Adaptive"','Fold Adaptive','final int[] modes={CobraFoldAspectPolicy.MODE,0,1','final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1',
-      'mode==CobraFoldAspectPolicy.MODE','texture.addOnLayoutChangeListener(binding.layoutListener)','applyCobraAspectTransform()',
-      'cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false','DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',
-      'cobra_unified_live_timeline','CobraCallAudioPolicy','buffer_observed_no_restart',
+      'CobraMotionSpec','cobraAnimateChildrenIn','cobraPolishFocusable','cobraAnimatePanelIn',
       'value<=CobraFoldAspectPolicy.MODE','mode<=CobraFoldAspectPolicy.MODE','final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10}',
-      'LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings")','Channel playback','Health Center','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player'
+      'Fold Adaptive','cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false',
+      'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES','cobra_unified_live_timeline','CobraCallAudioPolicy','buffer_observed_no_restart',
+      'LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings")',
+      'String[] glyphs={"guide","aspect","multi","more"},labels={"Channels","Display","Multi-View","More"}'
     ]
     for token in required:
         if token not in text: raise RuntimeError('2103197 contract missing: '+token)
-    for banned in ('showCobraPlayerOptionsHub','RECENT CHANNELS','cobra-player-hub-','expandedTools'):
-        if banned in text: raise RuntimeError('2103197 original-menu violation: '+banned)
+    for banned in ('showCobraPlayerOptionsHub','cobraAddRecentPlayerStrip','RECENT CHANNELS','cobra-player-hub-','showCobraVideoOptions','expandedTools'):
+        if banned in text: raise RuntimeError('2103197 surgical menu revert violation: '+banned)
 
     after=text.encode();path.write_bytes(after);out.mkdir(parents=True,exist_ok=True);(out/'source-before').mkdir(exist_ok=True);(out/'source-before'/path.name).write_bytes(before_b)
     report={
       'base_build':BASE_BUILD,'base_commit':BASE_COMMIT,'files':{str(ACT):{'before':sha(before_b),'after':sha(after)}},
-      'fold_adaptive_aspect':True,'fold_adaptive_mode':12,'fold_adaptive_first_choice':True,'fold_adaptive_max_crop':1.06,
-      'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'original_player_menu_preserved':True,'player_menu_uniform_rows':True,'player_menu_duplicate_top_level_options':False,
-      'fold_adaptive_reacts_to_viewport':True,'player_recreated_on_resize':False,'pip_authority_preserved':True,
-      'source_manager_route_preserved':True,'playback_behavior_changed':False,'network_selection_changed':False,
-      'timeshift_ownership_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,'clock_rewrite_changed':False,
-      'native_changed':False,'theme_zip_changed':False,'physical_device_verified':False
+      'tivimate_inspired_player_hub':False,'recent_channel_strip':False,'video_display_submenu':False,'original_player_settings_restored':True,'player_settings_body_preserved':True,'original_four_button_toolbar_restored':True,
+      'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,
+      'expanded_player_toolbar':True,'motion_polish':True,'settings_stagger':True,'sources_stagger':True,'guide_transition_polish':True,
+      'fold_adaptive_preserved':True,'source_manager_route_preserved':True,
+      'playback_behavior_changed':False,'network_selection_changed':False,'timeshift_ownership_changed':False,
+      'buffer_policy_changed':False,'parser_flags_changed':False,'clock_rewrite_changed':False,'native_changed':False,
+      'theme_zip_changed':False,'physical_device_verified':False
     }
     (out/'patch.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('PASS: 2103197 original player menu preserved exactly; only Fold Adaptive mode/persistence added over exact passed 2103193')
+    print('PASS: 2103197 keeps Player options + Recent Channels while restoring the exact pre-2103195 player settings body over 2103194; protected playback/source stack preserved')
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--receipt',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();apply(a.source,a.receipt,a.out)
