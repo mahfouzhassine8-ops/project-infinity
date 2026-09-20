@@ -42,23 +42,18 @@ def upgrade():
     s=pack.read_text()
     require(s.count('Infinity-'+OLD)>=2,'2103197 packager identity drift')
     s=s.replace('Infinity-'+OLD,'Infinity-'+NEW)
-    anchor="""    for tree in (old,new):
-        for key in ('android:versionCode','android:versionName'): tree['attrs'].pop(key,None)
-    permissions=[n for n in new['children'] if n['tag']=='uses-permission' and
-"""
-    replacement="""    for tree in (old,new):
-        for key in ('android:versionCode','android:versionName'): tree['attrs'].pop(key,None)
-    old_boot=[n for n in old['children'] if n['tag']=='uses-permission' and
+    marker="    require(old==new,"
+    require(s.count(marker)==1,'Final manifest comparison anchor drift')
+    at=s.index(marker)
+    normalization="""    old_boot=[n for n in old['children'] if n['tag']=='uses-permission' and
               'android.permission.RECEIVE_BOOT_COMPLETED' in n['attrs'].get('android:name','')]
     new_boot=[n for n in new['children'] if n['tag']=='uses-permission' and
               'android.permission.RECEIVE_BOOT_COMPLETED' in n['attrs'].get('android:name','')]
     require(len(old_boot)==2,'Inherited base must contain exactly two boot permissions')
     require(len(new_boot)==1,'Audited manifest must contain exactly one boot permission')
     old['children'].remove(old_boot[0])
-    permissions=[n for n in new['children'] if n['tag']=='uses-permission' and
 """
-    require(s.count(anchor)==1,'Manifest comparator anchor drift')
-    pack.write_text(s.replace(anchor,replacement,1))
+    pack.write_text(s[:at]+normalization+s[at:])
 
     data['files'][GRADLE]['after']=sha(gradle)
     data.update(
