@@ -89,6 +89,20 @@ def apply(source,receipt_path,out):
     a,b=span(text,'CobraLayoutMath','class')
     text=text[:b]+'\n\n'+FOLD_POLICY+text[b:]
 
+    label=member(text,'cobraAspectLabel')
+    label=once(label,'    switch (mode) {','    switch (mode) {\\n      case 12: return "Fold Adaptive";','Fold Adaptive label')
+    text=replace_member(text,'cobraAspectLabel',label)
+
+    channel_aspect=member(text,'cobraShowChannelAspect')
+    channel_aspect=once(channel_aspect,
+      '    for(int i=-1;i<=11;i++){final int value=i;cobraAddDetail(rows,"aspect",i<0?"Inherit default":cobraAspectLabel(i),null,"cobra-channel-aspect:"+i,prefs.aspect==i,()->{\\n      CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=value;if(cobraSavePreferences(channel,key,p,false)){if(value==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}\\n    });}',
+      '''    final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1,2,3,4,5,6,7,8,9,10,11};
+    for(int value:modes){final int selected=value;cobraAddDetail(rows,"aspect",selected<0?"Inherit default":cobraAspectLabel(selected),null,"cobra-channel-aspect:"+selected,prefs.aspect==selected,()->{
+      CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=selected;if(cobraSavePreferences(channel,key,p,false)){if(selected==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}
+    });}''',
+      'channel aspect ordering')
+    text=replace_member(text,'cobraShowChannelAspect',channel_aspect)
+
     picker=member(text,'showCobraAspectPicker')
     picker=once(picker,
       '    LinearLayout rows=cobraOpenSheet("Aspect / Display","Best Fit preserves the source proportions","aspect");\n    for(int i=0;i<12;i++){final int mode=i;rows.addView(cobraSheetRow("aspect",cobraAspectLabel(i),mAspectMode==i?"Selected":null,false,true,()->{\n      mAspectMode=mode;mPrefs.edit().putInt(COBRA_ASPECT_MODE,mode).apply();applyCobraAspectTransform();if(mode==11)showCobraCustomAspectEditor();}));}',
@@ -102,11 +116,11 @@ def apply(source,receipt_path,out):
 
     fit=member(text,'cobraFitVideo')
     fit=once(fit,
-      '    float[] scale=CobraLayoutMath.fit(size.width,size.height,size.pixelWidthHeightRatio,\n        texture.getWidth(),texture.getHeight(),mode,mPrefs.getFloat(COBRA_CUSTOM_ASPECT_X,1.15f),mPrefs.getFloat(COBRA_CUSTOM_ASPECT_Y,.92f));',
+      '    float[] scale=CobraLayoutMath.fit(size.width,size.height,size.pixelWidthHeightRatio,\n        texture.getWidth(),texture.getHeight(),mode,customX,customY);',
       '''    float[] scale=mode==CobraFoldAspectPolicy.MODE
         ?CobraFoldAspectPolicy.scale(size.width,size.height,size.pixelWidthHeightRatio,texture.getWidth(),texture.getHeight())
         :CobraLayoutMath.fit(size.width,size.height,size.pixelWidthHeightRatio,
-            texture.getWidth(),texture.getHeight(),mode,mPrefs.getFloat(COBRA_CUSTOM_ASPECT_X,1.15f),mPrefs.getFloat(COBRA_CUSTOM_ASPECT_Y,.92f));''',
+            texture.getWidth(),texture.getHeight(),mode,customX,customY);''',
       'fold adaptive fit')
     text=replace_member(text,'cobraFitVideo',fit)
 
@@ -122,7 +136,7 @@ def apply(source,receipt_path,out):
         if sha(member(text,n,'class'))!=h: raise RuntimeError('Protected class changed: '+n)
 
     required=[
-      'CobraFoldAspectPolicy','static final int MODE=12','Fold Adaptive','final int[] modes={CobraFoldAspectPolicy.MODE,0,1',
+      'CobraFoldAspectPolicy','static final int MODE=12','case 12: return "Fold Adaptive"','Fold Adaptive','final int[] modes={CobraFoldAspectPolicy.MODE,0,1','final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1',
       'mode==CobraFoldAspectPolicy.MODE','mPlayerTexture.addOnLayoutChangeListener','applyCobraAspectTransform()',
       'cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false','DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',
       'cobra_unified_live_timeline','CobraCallAudioPolicy','buffer_observed_no_restart'
