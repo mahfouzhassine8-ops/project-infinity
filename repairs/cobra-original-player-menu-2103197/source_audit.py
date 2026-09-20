@@ -28,7 +28,7 @@ def block(t,n,k='method'):
     raise RuntimeError('unclosed '+n)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--patch',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
- t=(a.source/ACT).read_text();x=json.loads(a.patch.read_text());picker=block(t,'showCobraAspectPicker');channel=block(t,'cobraShowChannelAspect');label=block(t,'cobraAspectLabel');fit=block(t,'cobraFitVideo');policy=block(t,'CobraFoldAspectPolicy','class');pref=block(t,'CobraPreferencePolicy','class');global_aspect=block(t,'cobraChannelAspect');defaults=block(t,'cobraShowPlaybackDefaults');menu=block(t,'showPlayerSettingsDrawer');chrome=block(t,'cobraBuildPlayerChrome')
+ t=(a.source/ACT).read_text();x=json.loads(a.patch.read_text());picker=block(t,'showCobraAspectPicker');channel=block(t,'cobraShowChannelAspect');label=block(t,'cobraAspectLabel');fit=block(t,'cobraFitVideo');policy=block(t,'CobraFoldAspectPolicy','class');pref=block(t,'CobraPreferencePolicy','class');global_aspect=block(t,'cobraChannelAspect');defaults=block(t,'cobraShowPlaybackDefaults');menu=block(t,'showPlayerSettingsDrawer');chrome=block(t,'cobraBuildPlayerChrome');health=block(t,'showCobraHealthCenter')
  checks={
  'exact_2103193_parent':x.get('base_build')==2103193 and x.get('base_commit')=='65cee6f8fdc60757a1e9bdaaac113be1ea344a2c',
  'fold_first':'final int[] modes={CobraFoldAspectPolicy.MODE,0,1' in picker,
@@ -43,9 +43,13 @@ def main():
  'fold_global_persistence':'mode<=CobraFoldAspectPolicy.MODE' in global_aspect,
  'fold_global_first':'final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10}' in defaults,
  'original_menu_title':'Player settings' in menu and 'Viewing preferences and recording' in menu,
- 'original_menu_rows':all(v in menu for v in ['Channel playback','Health Center','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player']),
+ 'original_menu_rows':all(menu.count(v)==1 for v in ['Channel playback','Health Center','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player']),
+ 'uniform_top_level_rows':menu.count('cobraSheetRow(')>=8 and 'cobraAddDetail(rows' not in menu,
+ 'menu_action_map':all(v in menu for v in ['cobraShowChannelPreferences(selected)','showCobraHealthCenter()','cobraRestartCurrentProgram()','toggleRecording(mPlaying)','showTrackChooser()','showCobraAspectPicker()','openCastSettings()','showSources()','showCobraPrimaryView()']),
+ 'no_top_level_duplication':all(menu.count(v)==1 for v in ['Channel playback','Health Center','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player']),
+ 'health_defaults_preserved':'Playback defaults' in health and 'cobraShowPlaybackDefaults()' in health,
  'original_menu_only':all(v not in t for v in ['showCobraPlayerOptionsHub','RECENT CHANNELS','cobra-player-hub-','expandedTools']),
- 'original_toolbar':all(v in chrome for v in ['new String[]{"guide","aspect","multi","more"}','new String[]{"Channels","Display","Multi-View","More"}']),
+ 'original_toolbar':all(v in chrome for v in ['new String[]{"guide","aspect","multi","more"}','new String[]{"Channels","Display","Multi-View","More"}']) and 'Options' not in chrome,
  'layout_reactivity':'texture.addOnLayoutChangeListener(binding.layoutListener)' in t and 'cobraFitBinding(binding)' in t,
  'pip_preserved':'mInPictureInPicture?0:mAspectMode' in t,
  'source_manager_preserved':'cobra_tv_sources' in t and 'TV SOURCES' in t,
@@ -56,7 +60,7 @@ def main():
  'timeshift_unchanged':x.get('timeshift_ownership_changed') is False,
  'native_unchanged':x.get('native_changed') is False,
  'physical_unverified':x.get('physical_device_verified') is False}
- failed=[k for k,v in checks.items() if not v];result={'passed':not failed,'checks':checks,'failed':failed,'build':2103197,'original_player_menu_preserved':True,'physical_device_verified':False}
+ failed=[k for k,v in checks.items() if not v];result={'passed':not failed,'checks':checks,'failed':failed,'build':2103197,'original_player_menu_preserved':True,'player_menu_uniform_rows':True,'player_menu_duplicate_top_level_options':False,'physical_device_verified':False}
  a.out.mkdir(parents=True,exist_ok=True);(a.out/'source-audit.json').write_text(json.dumps(result,indent=2)+'\n')
  if failed:raise RuntimeError('2103197 source audit failed: '+', '.join(failed))
  print('PASS:',len(checks),'2103197 source checks')
