@@ -143,12 +143,10 @@ def apply(source,receipt_path,out):
     private final byte[] normalizedLiveBatch=new byte[PACKET*32];private int normalizedLiveBatchLen=0;''',
       'normalizer fields')
 
-    ctor=member(ts,'CobraLocalTimeshiftSession')
-    ctor=once(ctor,
+    ts=once(ts,
       'java.util.Arrays.fill(lastPts90k,-1L);directory=new File(cache,"cobra-timeshift-"+Long.toHexString(System.nanoTime()));',
       'java.util.Arrays.fill(lastPts90k,-1L);java.util.Arrays.fill(normalizerPtsAnchor90k,-1L);java.util.Arrays.fill(normalizerDtsAnchor90k,-1L);java.util.Arrays.fill(normalizerPcrAnchor90k,-1L);directory=new File(cache,"cobra-timeshift-"+Long.toHexString(System.nanoTime()));',
       'normalizer ctor')
-    ts=replace_member(ts,'CobraLocalTimeshiftSession',ctor)
 
     anchor='    private void serveLive(java.net.Socket s,boolean head)throws Exception{'
     if ts.count(anchor)!=1:raise RuntimeError('normalizer helper anchor drift')
