@@ -79,9 +79,9 @@ def verify():
           b'timeshift_provider_proxy',b'timeshift_provider_final_host_hash',b'timeshift_provider_response_header_hash',
           b'routeFingerprint',b'timeshift_timeline_normalizer_active',b'timeshift_timeline_normalizer_scale_ppm',b'timeshift_provider_pace_limited',b'timeshift_timeline_normalizer_rewrite_enabled',
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
-          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart'):
+          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources'):
             require(token in dex,'2103193 contract missing: '+repr(token))
-        require(b'Cobra2103193SourceManagerRestoreTest' not in dex,'2103192 test code packaged in release APK')
+        require(b'Cobra2103193SourceManagerRestoreTest' not in dex,'2103193 test code packaged in release APK')
 
     badging=Path('signed193/badging.txt').read_text()
     require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103193'" in badging,'Final APK not forward-installable')
