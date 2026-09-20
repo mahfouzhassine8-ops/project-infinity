@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Package/gate 2103197 original player-menu audit over exact passed 2103193 with Fold Adaptive persistence repair."""
+"""Package/gate 2103197 surgical original-player-menu revert over exact passed 2103194 while preserving non-menu polish and Fold persistence."""
 from pathlib import Path
 import argparse,hashlib,json,re,shutil,subprocess,zipfile,xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parent
-BASE_COMMIT='65cee6f8fdc60757a1e9bdaaac113be1ea344a2c'
-OLD='1.0.9-Cobra-Source-Manager-Restore-RC1'
+BASE_COMMIT='2c2a759bd7f1ef380f21609105675ff2012d4d56'
+OLD='1.0.9-Cobra-Fold-Adaptive-Aspect-RC1'
 NEW='1.0.9-Cobra-Original-Player-Menu-RC1'
 VERSION=2103197
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
@@ -21,27 +21,27 @@ def replace(path,old,new):
 
 def upgrade():
     receipt=Path('engine/background-resume-source.json');data=json.loads(receipt.read_text())
-    require(data.get('version_code')==2103193 and data.get('version_name')==OLD,'Expected exact passed 2103193 source receipt')
+    require(data.get('version_code')==2103194 and data.get('version_name')==OLD,'Expected exact passed 2103194 source receipt')
     for rel,row in data.get('files',{}).items():
-        require(sha(Path('kodi')/rel)==row['after'],'2103193 source receipt drift: '+rel)
+        require(sha(Path('kodi')/rel)==row['after'],'2103194 source receipt drift: '+rel)
 
     run('python3',ROOT/'apply.py','--source','kodi','--receipt',receipt,'--out','audit197/patch')
     patch=json.loads(Path('audit197/patch/patch.json').read_text());data['files'][ACT]['after']=patch['files'][ACT]['after']
 
     gradle=Path('kodi')/GRADLE
-    replace(gradle,'versionCode 2103193',f'versionCode {VERSION}')
+    replace(gradle,'versionCode 2103194',f'versionCode {VERSION}')
     replace(gradle,'versionName "'+OLD+'"','versionName "'+NEW+'"')
     runtime=Path('scripts/infinity_background_resume.py')
-    replace(runtime,'VERSION_CODE = 2103193',f'VERSION_CODE = {VERSION}')
+    replace(runtime,'VERSION_CODE = 2103194',f'VERSION_CODE = {VERSION}')
     replace(runtime,"RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"'")
     pack=Path('scripts/package_background_resume.py');s=pack.read_text();needle='Infinity-'+OLD
-    require(s.count(needle)>=2,'2103193 packager identity drift');pack.write_text(s.replace(needle,'Infinity-'+NEW))
+    require(s.count(needle)>=2,'2103194 packager identity drift');pack.write_text(s.replace(needle,'Infinity-'+NEW))
 
     data['files'][GRADLE]['after']=sha(gradle)
     data.update(
-      version_code=VERSION,version_name=NEW,source_parent=2103193,source_parent_locked=True,locked_parent_commit=BASE_COMMIT,candidate_locked=False,
+      version_code=VERSION,version_name=NEW,source_parent=2103194,source_parent_locked=True,locked_parent_commit=BASE_COMMIT,candidate_locked=False,
       stream_fingerprint_schema=7,provider_route_fingerprint=True,provider_pace_limit_classifier=True,timeline_normalizer_rewrite_enabled=False,
-      clock_rewrite_suppressed_by_evidence=True,source_manager_route_restored=True,source_manager_label='TV SOURCES',fold_adaptive_aspect=True,fold_adaptive_mode=12,fold_adaptive_preference_persistence_fixed=True,fold_adaptive_global_default_first=True,original_player_menu_preserved=True,player_menu_uniform_rows=True,player_menu_duplicate_top_level_options=False,
+      clock_rewrite_suppressed_by_evidence=True,source_manager_route_restored=True,source_manager_label='TV SOURCES',fold_adaptive_aspect=True,fold_adaptive_mode=12,fold_adaptive_preference_persistence_fixed=True,fold_adaptive_global_default_first=True,tivimate_inspired_player_hub=False,recent_channel_strip=False,original_player_settings_restored=True,player_settings_body_preserved=True,original_four_button_toolbar_restored=True,non_menu_polish_preserved=True,motion_polish=True,
       playback_behavior_changed=False,network_selection_changed=False,timeshift_ownership_changed=False,buffer_policy_changed=False,
       parser_flags_changed=False,native_engine_recompiled=False,theme_zip_changed=False,physical_device_verified=False)
     receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
@@ -52,14 +52,14 @@ def upgrade():
     with Path('audit197/native-after.patch').open('wb') as out:
         subprocess.run(['git','-C','kodi','diff','--binary','--','xbmc'],stdout=out,check=True)
     require(Path('audit197/native-after.patch').read_bytes()==Path('engine/native-before.patch').read_bytes(),'Native source changed')
-    print('PASS: exact 2103193 -> 2103197 original player menu + Fold Adaptive persistence repair; protected stack preserved')
+    print('PASS: exact 2103194 -> 2103197 surgical original player-menu revert; protected stack preserved')
 
 def verify():
-    base=Path('baseline193/Infinity-'+OLD+'.apk')
+    base=Path('baseline194/Infinity-'+OLD+'.apk')
     final=Path('signed197/Infinity-'+NEW+'.apk')
     require(base.is_file() and final.is_file(),'Baseline/final APK missing')
-    bv=json.loads(Path('baseline193/2103193-verification.json').read_text())
-    require(bv['apk_sha256']==sha(base),'Wrong exact passed 2103193 APK')
+    bv=json.loads(Path('baseline194/2103194-verification.json').read_text())
+    require(bv['apk_sha256']==sha(base),'Wrong exact passed 2103194 APK')
     audit=json.loads(Path('signed197/background-resume-apk-audit.json').read_text())
     require(audit['version_code']==VERSION and audit['version_name']==NEW,'Final 2103197 identity mismatch')
     require(audit['signer_certificate_sha256']==CERT and audit['apk_sha256']==sha(final),'Signer/hash mismatch')
@@ -79,19 +79,19 @@ def verify():
           b'timeshift_provider_proxy',b'timeshift_provider_final_host_hash',b'timeshift_provider_response_header_hash',
           b'routeFingerprint',b'timeshift_timeline_normalizer_active',b'timeshift_timeline_normalizer_scale_ppm',b'timeshift_provider_pace_limited',b'timeshift_timeline_normalizer_rewrite_enabled',
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
-          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player settings',b'Channel playback',b'Health Center',b'Audio & subtitles',b'Aspect / Display',b'Cast / Route',b'Manage sources',b'Close player',b'cobra-default-aspect:'):
+          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player settings',b'Channel playback',b'Health Center',b'Audio & subtitles',b'Aspect / Display',b'Cast / Route',b'Manage sources',b'Close player',b'CobraMotionSpec',b'cobra-default-aspect:'):
             require(token in dex,'2103197 contract missing: '+repr(token))
         require(b'Cobra2103197OriginalPlayerMenuTest' not in dex,'2103197 test code packaged in release APK')
 
     badging=Path('signed197/badging.txt').read_text()
     require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103197'" in badging,'Final APK not forward-installable')
-    result={'build':VERSION,'base_build':2103193,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
+    result={'build':VERSION,'base_build':2103194,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
       'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'timeline_normalizer_rewrite_enabled':False,
-      'clock_rewrite_suppressed_by_evidence':True,'source_manager_route_restored':True,'source_manager_label':'TV SOURCES','fold_adaptive_aspect':True,'fold_adaptive_mode':12,'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'original_player_menu_preserved':True,'player_menu_uniform_rows':True,'player_menu_duplicate_top_level_options':False,
+      'clock_rewrite_suppressed_by_evidence':True,'source_manager_route_restored':True,'source_manager_label':'TV SOURCES','fold_adaptive_aspect':True,'fold_adaptive_mode':12,'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'tivimate_inspired_player_hub':False,'recent_channel_strip':False,'original_player_settings_restored':True,'player_settings_body_preserved':True,'original_four_button_toolbar_restored':True,'non_menu_polish_preserved':True,'motion_polish':True,
       'playback_behavior_changed':False,'network_selection_changed':False,'timeshift_ownership_changed':False,'buffer_policy_changed':False,
       'parser_flags_changed':False,'native_engine_recompiled':False,'theme_zip_changed':False,'physical_device_verified':False}
     Path('audit197/final-verification.json').write_text(json.dumps(result,indent=2)+'\n')
-    print('PASS: signed 2103197 preserves exact 2103193 native/resources/signer and restores one uniform original player menu with Fold Adaptive persistence')
+    print('PASS: signed 2103197 preserves exact 2103194 native/resources/signer and preserves non-menu polish and Fold persistence while restoring only the original player menu and four-button toolbar')
 
 def suite(path,count):
     p=Path(path);require(p.is_file(),'Missing test evidence '+str(p));root=ET.parse(p).getroot();cases=root.findall('testcase')
@@ -120,16 +120,16 @@ def deliver():
     source=json.loads(Path('audit197/source-audit/source-audit.json').read_text())
     final=json.loads(Path('audit197/final-verification.json').read_text())
     require(source.get('passed') and not source.get('failed'),'2103197 source audit failed')
-    result={'build':VERSION,'locked_parent':2103193,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_fold_adaptive_tests':6,'new_original_player_menu_tests':10,
-      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'source_manager_route_restored':True,'fold_adaptive_aspect':True,'fold_adaptive_first_choice':True,'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'original_player_menu_preserved':True,'player_menu_uniform_rows':True,'player_menu_duplicate_top_level_options':False,
+    result={'build':VERSION,'locked_parent':2103194,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_original_player_menu_tests':10,
+      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'source_manager_route_restored':True,'fold_adaptive_aspect':True,'fold_adaptive_first_choice':True,'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'tivimate_inspired_player_hub':True,'recent_channel_strip':True,'original_player_settings_restored':True,'player_settings_body_preserved':True,'motion_polish':True,
       'playback_behavior_changed':False,'network_selection_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,
       'timeline_normalizer_rewrite_enabled':False,'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],
       'physical_device_verified':False,'candidate_locked':False,
-      'status':'TEST CANDIDATE - exact original player option set restored as one uniform non-duplicated menu; Fold Adaptive remains inside Aspect / Display with persistence fixed; 2103193 playback/network/timeshift/native contracts remain protected'}
+      'status':'TEST CANDIDATE - only the player/options menu and four-button toolbar are reverted to the original contract; non-menu polish, Fold persistence, playback/network/timeshift/native contracts remain protected'}
     Path('signed197/ACCEPTANCE.json').write_text(json.dumps(result,indent=2)+'\n')
     shutil.copy2('audit197/final-verification.json','signed197/2103197-verification.json')
     shutil.copy2('audit197/source-audit/source-audit.json','signed197/2103197-source-audit.json')
-    print('PASS:',total,'Android tests + 2103197 original-player-menu audit gates')
+    print('PASS:',total,'Android tests + 2103197 surgical original-player-menu revert gates')
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('phase',choices=['upgrade','verify','deliver']);a=p.parse_args();globals()[a.phase]()
