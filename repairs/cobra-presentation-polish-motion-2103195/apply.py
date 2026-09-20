@@ -337,7 +337,7 @@ def apply(source,receipt_path,out):
     required=[
       'showCobraPlayerOptionsHub','showCobraVideoOptions','RECENT CHANNELS','TV Guide','Video & display','Picture in Picture',
       'value<=CobraFoldAspectPolicy.MODE','mode<=CobraFoldAspectPolicy.MODE','final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10}',
-      'cobra-player-hub-channels','cobra-player-hub-video','cobra-video-options-aspect','cobra-player-options-anchor',
+      'cobra-player-hub-channels','cobra-player-hub-video','cobra-video-options-aspect','cobra_player_options_anchor',
       'CobraMotionSpec','cobraAnimateChildrenIn','cobraPolishFocusable','cobraAnimatePanelIn',
       'Fold Adaptive','cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false',
       'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES','cobra_unified_live_timeline','CobraCallAudioPolicy','buffer_observed_no_restart'
