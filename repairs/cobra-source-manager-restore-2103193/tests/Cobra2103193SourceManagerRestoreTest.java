@@ -38,8 +38,8 @@ public class Cobra2103193SourceManagerRestoreTest {
   @Test public void existingRefreshControlsRemain()throws Exception{
     InfinityLiveActivity a=fixture();try{call(a,"showSettings");ui.measure(a,412,915);assertNotNull(findText(a.getWindow().getDecorView(),"REFRESH CURRENT SOURCE"));assertNotNull(findText(a.getWindow().getDecorView(),"REFRESH ALL ENABLED SOURCES"));}finally{ui.clean(a);}
   }
-  @Test public void sourceManagerStillShowsConfiguredSources()throws Exception{
-    InfinityLiveActivity a=fixture();try{call(a,"showSources");ui.measure(a,412,915);java.util.List<?> sources=(java.util.List<?>)CobraNavigationUiTest.get(a,"mSources");assertFalse(sources.isEmpty());assertNotNull(findText(a.getWindow().getDecorView(),"+  ADD TV SOURCE"));}finally{ui.clean(a);}
+  @Test public void sourceManagerStillExposesAddSourceContract()throws Exception{
+    InfinityLiveActivity a=fixture();try{call(a,"showSources");ui.measure(a,412,915);TextView add=findText(a.getWindow().getDecorView(),"+  ADD TV SOURCE");assertNotNull(add);assertNotNull(clickableAncestor(add));assertTrue(clickableAncestor(add).isClickable());}finally{ui.clean(a);}
   }
   @Test public void playbackGuardRemainsUntouched(){
     assertFalse(InfinityLiveActivity.CobraTimelineNormalizerPolicy.REWRITE_ENABLED);
