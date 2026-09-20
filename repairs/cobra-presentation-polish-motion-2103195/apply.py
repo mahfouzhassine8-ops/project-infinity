@@ -104,7 +104,7 @@ HELPERS=r'''
     label.setLetterSpacing(.10f);label.setPadding(dp(12),dp(10),dp(12),dp(6));parent.addView(label,new LinearLayout.LayoutParams(-1,-2));
     android.widget.HorizontalScrollView scroll=new android.widget.HorizontalScrollView(this);scroll.setHorizontalScrollBarEnabled(false);scroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
     LinearLayout rail=new LinearLayout(this);rail.setOrientation(LinearLayout.HORIZONTAL);rail.setPadding(dp(4),0,dp(4),dp(6));scroll.addView(rail,new android.widget.HorizontalScrollView.LayoutParams(-2,-2));
-    int shown=0;for(String id:ids){Channel c=findChannel(id);if(!cobraChannelAllowed(c))continue;final Channel selected=c;
+    int shown=0;for(String id:ids){Channel c=findChannel(id);if(c==null||!cobraChannelAllowed(c))continue;final Channel selected=c;
       Button chip=cobraTextButton(c.name,true,()->cobraTuneFromPlayerMenu(selected));chip.setSingleLine(true);chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
       chip.setTag("cobra-player-recent:"+c.id);chip.setSelected(mPlaying!=null&&mPlaying.id.equals(c.id));cobraPolishFocusable(chip);
       LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(150),dp(48));lp.rightMargin=dp(8);rail.addView(chip,lp);if(++shown>=8)break;
