@@ -493,8 +493,12 @@ jobs:
           set -euo pipefail
           python3 audit199/repairs/cobra-power-audit-2103199/ci.py upgrade
           python3 audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit199/host-timeshift
+          python3 audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift_stop.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit199/host-timeshift-stop
           python3 audit199/repairs/cobra-power-audit-2103199/tests/display_geometry_host.py --activity kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit199/host-display
           python3 audit199/repairs/cobra-power-audit-2103199/tests/diagnostics_host.py --source kodi --out audit199/host-diagnostics
+          python3 audit199/repairs/cobra-power-audit-2103199/tests/host_packaging.py --manifest kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in --out audit199/host-packaging
+          python3 audit199/repairs/cobra-power-audit-2103199/tests/host_recording.py --source kodi/tools/android/packaging/xbmc/src/InfinityCobraRecordingService.java.in --out audit199/host-recording
+          python3 audit199/repairs/cobra-power-audit-2103199/tests/ytdl_host.py --provider kodi/tools/android/packaging/xbmc/src/content/XBMCYTDLContentProvider.java.in --out audit199/host-ytdl
 
       - name: Build/sign 2103199 without rebuilding native engine
         env:
@@ -510,6 +514,7 @@ jobs:
             --build-dir repair199-build \
             --out signed199
           python3 audit199/repairs/cobra-power-audit-2103199/ci.py verify
+          python3 audit199/repairs/cobra-power-audit-2103199/tests/host_packaging.py --manifest kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in --packager scripts/package_background_resume.py --old-manifest signed199/base-manifest.txt --new-manifest signed199/manifest.txt --out audit199/host-compiled-manifest
 
       - name: Repeat all inherited UI/runtime suites
         run: |

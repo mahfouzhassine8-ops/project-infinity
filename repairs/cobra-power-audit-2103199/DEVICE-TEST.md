@@ -51,6 +51,8 @@ For each mode verify saved global default, per-channel override and Reset this c
 - Enter/exit multi-window and PiP; return by tapping PiP and by reopening the app. Check the intended destination, no stale overlays, no unexplained top black region, status/navigation-bar colors and correct safe areas/cutouts.
 - Test rotation lock/unlock, screen lock/unlock, Home→resume, and a phone call. Preserve established audio-focus/video behavior; no second audio owner or surprise autoplay.
 - Test Normal and Extended background behavior separately, including existing notification pause/stop controls. Verify Stop actually ends playback and an old callback cannot restart it.
+- Test those same Normal/Extended actions from the existing Kodi skin bridge as well as Cobra Settings. Confirm a separate untrusted application cannot start the background-control activity; this Android permission enforcement has not been physically tested.
+- Stop or change channel while a provider read is stalled. Confirm the old request/session ends, its cache is eventually removed, and repeated Stop does not create repeated cleanup work.
 
 ## 5. UI, themes, input and captions
 
@@ -67,6 +69,13 @@ For each mode verify saved global default, per-channel override and Reset this c
 - Classify startup connection failure, sustained slow media arrival, upstream delivery pauses, and decoder/frame-drop behavior separately. Do not declare a buffer-size fix from a faster network session.
 - Run at least one 60-minute session plus 30 channel changes and 20 mini/full/PiP/background transitions. Check memory trend, heat, dropped video/audio, responsiveness and eventual resource release.
 - Export before and after any failure. Confirm display_geometry, playback/session, network-family, buffer/rewind and attachment-age fields match the observed state. A TextureView matrix is computed geometry, not proof of rendered pixels. Diagnostic history is bounded; old attached logs are not current-session proof.
+
+## 7. Recordings and inherited media integrations
+
+- Record and replay an ordinary direct TS channel, an HLS media playlist, and an HLS master playlist with muxed TS audio/video. Confirm real A/V content, relative/redirected segment loading, duration, Stop, schedules and retained files using existing controls.
+- Stop an HLS recording during download and during playlist polling. Stop should be observed between reads; an already blocked request may still wait for the existing timeout (20 seconds HLS, 30 seconds direct). Cancellation should not produce a false provider-error notification.
+- Encrypted HLS, initialization maps, byte ranges and separate-audio variants are not supported by the existing TS concatenator. Confirm they report through the existing recording error path instead of appearing successfully recorded as playlist text.
+- Exercise existing external media/search/recommendation artwork and YTDL playback integrations. Confirm ordinary redirects and streaming still work and stalled/cyclic endpoints fail cleanly. The separate exported file-provider authorization finding requires benign caller/consumer testing before release acceptance.
 
 ## Release gate
 

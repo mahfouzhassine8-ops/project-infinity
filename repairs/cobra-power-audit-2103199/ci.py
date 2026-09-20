@@ -27,20 +27,27 @@ def upgrade():
     require(data['version_code']==2103198 and data['version_name']==OLD,'Wrong reconstructed parent')
     run('python3',ROOT/'apply.py','--source','kodi','--receipt',receipt,'--out','audit199/patch')
     patch=json.loads(Path('audit199/patch/patch.json').read_text())
-    for path,row in patch['files'].items(): data['files'][path]['after']=row['after']
+    for path,row in patch['files'].items():
+        data['files'].setdefault(path,{'before':row['before']})['after']=row['after']
     replace(Path('kodi')/GRADLE,'versionCode 2103198','versionCode 2103199')
     replace(Path('kodi')/GRADLE,'versionName "'+OLD+'"','versionName "'+NEW+'"')
     replace('scripts/infinity_background_resume.py','VERSION_CODE = 2103198','VERSION_CODE = 2103199')
     replace('scripts/infinity_background_resume.py',"RELEASE = '"+OLD+"'","RELEASE = '"+NEW+"'")
     pack=Path('scripts/package_background_resume.py');s=pack.read_text()
     require(s.count('Infinity-'+OLD)>=2,'Parent packager filename drift')
-    pack.write_text(s.replace('Infinity-'+OLD,'Infinity-'+NEW))
+    spec=importlib.util.spec_from_file_location('packaging_repair',ROOT/'apply_packaging.py')
+    packaging=importlib.util.module_from_spec(spec);spec.loader.exec_module(packaging)
+    pack.write_text(packaging.patch_packager(s.replace('Infinity-'+OLD,'Infinity-'+NEW)))
     data['files'][GRADLE]['after']=sha(Path('kodi')/GRADLE)
-    data.update(version_code=VERSION,version_name=NEW,source_parent=2103198,source_parent_commit=PARENT,
+    data.update(version_code=VERSION,version_name=NEW,source_parent=2103198,source_parent_commit=PARENT,source_parent_locked=False,
         protected_baseline=2103197,protected_baseline_commit=BASE,
         candidate_locked=False,physical_device_verified=False,runtime_device_tested=False,
         playback_behavior_changed=True,display_geometry_repaired=True,timeshift_controls_repaired=True,
         ui_defects_repaired=True,diagnostic_redaction_repaired=True,
+        timeshift_shutdown_repaired=True,recording_master_playlist_repaired=True,
+        timeshift_ownership_changed=True,recording_behavior_changed=True,
+        background_control_external_access_removed=True,
+        legacy_ytdl_http_resource_release_repaired=True,
         new_controls=False,network_selection_changed=False,buffer_policy_changed=False,
         parser_flags_changed=False,timeshift_architecture_changed=False,native_engine_recompiled=False,
         theme_zip_changed=False,complete_product_acceptance=False)

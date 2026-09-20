@@ -141,12 +141,17 @@ public class Cobra2103199DisplayRegressionTest {
     assertEquals("texture_matrix_not_rendered_frame",d.getString("observation"));assertFalse(d.getBoolean("physical_device_verified"));assertEquals(9,d.getJSONArray("texture_matrix").length());
   }
   @Test public void captionsTrackTheVideoPaneWhenDrawerResizesFullscreen()throws Exception{
-    Controlled c=new Controlled();TextureView t=texture(1600,900);Object b=bind(c,channel(0),t,true);
-    View captions=(View)get(b,"captions");captions.setVisibility(View.VISIBLE);FrameLayout root=(FrameLayout)t.getParent();
-    FrameLayout drawer=new FrameLayout(a);root.addView(drawer,new FrameLayout.LayoutParams(1,1));put(a,"mCobraPlayerDrawer",drawer);c.writes.clear();
-    call(a,"cobraLayoutPlayerPanels");for(int i=0;i<3;i++)resize(root,1600,900);
+    // Use the production decor overlay, its own layout listener, and the actual
+    // drawer action. A synthetic content root resized in isolation is not the
+    // fullscreen traversal used by Cobra and left the drawer policy unobserved.
+    Controlled c=new Controlled();Object ch=channel(0);put(a,"mPlaying",ch);
+    call(a,"openPlayerOverlay",ch);TextureView t=(TextureView)get(a,"mPlayerTexture");Object b=bind(c,ch,t,true);
+    View captions=(View)get(b,"captions");captions.setVisibility(View.VISIBLE);ui.measure(a,1600,900);
+    assertEquals("Fullscreen must be measured before opening its drawer",1600,t.getWidth());c.writes.clear();
+    call(a,"showCobraPlayerDrawer");ui.measure(a,1600,900);
+    View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer);assertTrue(drawer.isAttachedToWindow());assertEquals(430,drawer.getWidth());
     assertEquals(1170,t.getWidth());assertEquals(t.getLeft(),captions.getLeft());assertEquals(t.getTop(),captions.getTop());assertEquals(t.getWidth(),captions.getWidth());assertEquals(t.getHeight(),captions.getHeight());
-    put(a,"mCobraPlayerDrawer",null);root.removeView(drawer);call(a,"cobraLayoutPlayerPanels");for(int i=0;i<3;i++)resize(root,1600,900);
+    assertEquals(true,call(a,"closeCobraPlayerDrawer"));ui.measure(a,1600,900);assertNull(get(a,"mCobraPlayerDrawer"));
     assertEquals(1600,t.getWidth());assertEquals(t.getWidth(),captions.getWidth());assertSame(c.player,get(a,"mPlayer"));assertTrue(c.writes.isEmpty());
   }
   @Test public void captionBoundsAccountForParentPaddingAndNeverMoveAnotherContainer()throws Exception{

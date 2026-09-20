@@ -7,9 +7,12 @@ The exact signed APK, complete 206-file Android source/package snapshot, origina
 ## Surgical repair scope
 
 - Refresh the existing timeshift scrubber and rewind enablement as playback advances; preserve user dragging and paused intent through activation/recovery/direct fallback.
+- Cancel a stopped timeshift provider request and keep segment closure on its ingest thread; wait for that owner only on the cleanup worker. Actual-method tests reproduce blocked reads and a stop/write race in the baseline.
 - Resolve aspect selection from the current channel/player binding through resize/video callbacks, match untouched Custom defaults to the displayed 100% values, and expose actual transform/viewport observations in existing diagnostics.
 - Repair existing sheet contrast, interrupted focus/entry animations, profile scrolling, active-session subtitle visibility, and human-visible escaped-newline strings. Additional scoped navigation/async-input repairs are recorded in the committed module and regression tests.
 - Redact scheme-less provider socket endpoints in exported failures, and disclose bounded history/attachment age without claiming old logs are current.
+- Follow HLS master playlists and redirected relative references before recording TS media, preserve the provider entry URL between polls, and honor cooperative cancellation. Unsupported encrypted/map/range/separate-audio formats use the existing error path instead of producing misleading recordings.
+- Restrict the existing background-mode activity to Cobra's own UID, preserving its action contract. Bound and close the legacy YTDL provider's redirect probes and streaming resources above the native engine.
 
 No new controls, settings, player options, menus or features. No mode redesign, buffer-policy change, network-family change, timestamp rewriting, timeshift-architecture replacement, theme ZIP change or Kodi engine rebuild. The same permanent signer and package identity are required; native libraries/assets/resources must match the protected APK byte-for-byte.
 
@@ -27,7 +30,8 @@ Sixteen supplied diagnostic archives show multiple failure classes. In one probl
 
 - Real-device acceptance in DEVICE-TEST.md remains mandatory; candidate_locked and physical_device_verified stay false.
 - Source Change colour persists metadata but has no identified visible consumer. Its existing control is preserved; no new decoration is invented.
-- Existing `.file`/`.media`/`.ytdl` provider exposure requires compatibility-aware review. `.file` serves search/recommendation imagery; blindly disabling exports would break integrations. Source suggests an inherited authorization gap; cross-app behavior has not been physically tested. No export change is included here.
+- Existing `.file`/`.media`/`.ytdl` provider exposure requires compatibility-aware review. `.file` serves search/recommendation imagery; blindly disabling provider exports would break integrations. Source establishes an inherited authorization gap; cross-app reachable data has not been physically tested. Provider exports are preserved; the same-UID background-control activity is made private.
+- Recording cancellation is cooperative between reads; an already-blocked read can still wait for the existing HLS/direct timeout. This is distinct from the timeshift Call-cancellation repair.
 - Preserved native libraries use 4 KiB ELF alignment. 16 KiB native-device compatibility is not established; the engine is not rebuilt for a hypothetical target change.
 - Local HLS and progressive TS extractor configuration differ; no supplied raw-media replay proves that this difference causes the user's rewind problem. This is recorded rather than applying an unproven parser change.
 - Source inventories identify further performance/coverage risks, including large eager VOD lists, theme-driven geometry, bounded diagnostics history and external provider/SAF/recording integrations. No crash-free or exhaustive physical-product claim is made from compile/test success.

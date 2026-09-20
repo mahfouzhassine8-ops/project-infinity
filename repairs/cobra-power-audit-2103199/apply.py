@@ -7,6 +7,9 @@ ROOT = Path(__file__).resolve().parent
 ACT = 'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 ARCHIVE = 'tools/android/packaging/xbmc/src/CobraDiagnosticArchive.java.in'
 DIAGNOSTICS = 'tools/android/packaging/xbmc/src/InfinityCobraDiagnostics.java.in'
+RECORDING = 'tools/android/packaging/xbmc/src/InfinityCobraRecordingService.java.in'
+MANIFEST = 'tools/android/packaging/xbmc/AndroidManifest.xml.in'
+YTDL = 'tools/android/packaging/xbmc/src/content/XBMCYTDLContentProvider.java.in'
 
 def sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -39,8 +42,12 @@ def apply(source, receipt, out):
         (ACT, 'apply_timeshift', 'transform'),
         (ACT, 'apply_display', 'transform'),
         (ACT, 'apply_ui', 'transform'),
+        (ACT, 'apply_timeshift_stop', 'transform'),
         (ARCHIVE, 'apply_diagnostics', 'transform_archive'),
         (DIAGNOSTICS, 'apply_diagnostics', 'transform_diagnostics'),
+        (RECORDING, 'apply_recording', 'transform'),
+        (MANIFEST, 'apply_packaging', 'transform'),
+        (YTDL, 'apply_ytdl', 'transform'),
     ]
     files = {}
     for path, name, function in transforms:
