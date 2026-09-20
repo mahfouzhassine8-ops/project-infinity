@@ -113,10 +113,6 @@ def apply(source,receipt_path,out):
       '    private void resetTimelineNormalizerAnchors(){',
       RELEASE_HELPER+'    private void resetTimelineNormalizerAnchors(){',
       'normalizer release helper')
-    ts=once(ts,
-      '    boolean timelineNormalizerActive(){return timelineNormalizerActive;}boolean timelineNormalizerPending(){return timelineNormalizerPending();}',
-      '    boolean timelineNormalizerActive(){return timelineNormalizerActive;}boolean timelineNormalizerPending(){return timelineNormalizerPending();}',
-      'noop anchor')
     # Accessors are a single dense line in the inherited source.
     ts=once(ts,
       'boolean timelineNormalizerActive(){return timelineNormalizerActive;}boolean timelineNormalizerPending(){return timelineNormalizerPending;}long timelineNormalizerRawRatePermille(){return timelineNormalizerRawRatePermille;}long timelineNormalizerScalePpm(){return timelineNormalizerScalePpm;}long timelineNormalizerActivatedAfterMs(){return timelineNormalizerActivatedElapsed<0L?-1L:Math.max(0L,timelineNormalizerActivatedElapsed-startedElapsed);}long timelineNormalizerRewrittenPcr(){return timelineNormalizerRewrittenPcr;}long timelineNormalizerRewrittenPts(){return timelineNormalizerRewrittenPts;}long timelineNormalizerRewrittenDts(){return timelineNormalizerRewrittenDts;}',
