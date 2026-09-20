@@ -34,7 +34,7 @@ def main():
     hub=block(text,'showCobraPlayerOptionsHub');video=block(text,'showCobraVideoOptions');chrome=block(text,'cobraBuildPlayerChrome')
     settings=block(text,'showSettings');sources=block(text,'showSources');sheet=block(text,'cobraOpenSheet');guide=block(text,'cobraRenderGuideBrowser')
     checks={
-      'exact_2103194_parent':patch.get('base_build')==2103194 and patch.get('base_commit')=='8c4a993afac76aafc295d482fe32e240e407ae14',
+      'exact_2103194_parent':patch.get('base_build')==2103194 and patch.get('base_commit')=='b5181e627fa6bd81bc080004cbeedb207f6e0ea2',
       'player_hub':all(x in hub for x in ['Player options','RECENT CHANNELS','Channels','TV Guide','Audio & subtitles','Video & display','Multi-View','Picture in Picture','Health Center','Player settings']),
       'recent_strip':'cobraAddRecentPlayerStrip(rows)' in hub and 'cobra-player-recent:' in text,
       'video_submenu':all(x in video for x in ['Display mode','Video details','Rotation','Display & performance','Picture in Picture']),
