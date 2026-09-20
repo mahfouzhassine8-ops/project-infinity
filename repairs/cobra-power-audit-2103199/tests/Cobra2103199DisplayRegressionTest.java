@@ -140,7 +140,8 @@ public class Cobra2103199DisplayRegressionTest {
     assertEquals(1200,d.getJSONArray("transformed_bounds").getDouble(2)-d.getJSONArray("transformed_bounds").getDouble(0),.02);
     assertEquals("texture_matrix_not_rendered_frame",d.getString("observation"));assertFalse(d.getBoolean("physical_device_verified"));assertEquals(9,d.getJSONArray("texture_matrix").length());
   }
-  @Test public void captionsTrackTheVideoPaneWhenDrawerResizesFullscreen()throws Exception{
+  @Test @Config(qualifiers="w1600dp-h900dp-land-mdpi")
+  public void captionsTrackTheVideoPaneWhenDrawerResizesFullscreen()throws Exception{
     // Use the production decor overlay, its own layout listener, and the actual
     // drawer action. A synthetic content root resized in isolation is not the
     // fullscreen traversal used by Cobra and left the drawer policy unobserved.
