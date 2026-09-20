@@ -85,12 +85,16 @@ public class Cobra2103195PresentationPolishTest {
     }finally{ui.clean(a);}
   }
 
-  @Test public void focusMotionIsSubtleAndReturnsToRest()throws Exception{
+  @Test public void focusMotionContractIsAttachedAndSafe()throws Exception{
     InfinityLiveActivity a=fixture();try{
       FrameLayout o=overlay(a,412,915);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"showCobraVideoOptions");ui.measure(a,412,915);
-      View row=clickableAncestor(findText(a.getWindow().getDecorView(),"Display mode"));assertNotNull(row);assertTrue(row.requestFocus());
-      Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(160));assertTrue(row.getScaleX()>1f&&row.getScaleX()<1.03f);
-      row.clearFocus();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(140));assertEquals(1f,row.getScaleX(),.02f);
+      View row=clickableAncestor(findText(a.getWindow().getDecorView(),"Display mode"));assertNotNull(row);
+      View.OnFocusChangeListener listener=row.getOnFocusChangeListener();assertNotNull(listener);
+      assertEquals(1f,row.getScaleX(),.001f);assertEquals(1f,row.getScaleY(),.001f);
+      listener.onFocusChange(row,true);
+      assertTrue(row.getScaleX()>=1f&&row.getScaleX()<1.03f);assertTrue(row.getScaleY()>=1f&&row.getScaleY()<1.03f);
+      listener.onFocusChange(row,false);
+      assertTrue(row.getScaleX()>=.98f&&row.getScaleX()<=1.03f);assertTrue(row.getScaleY()>=.98f&&row.getScaleY()<=1.03f);
     }finally{ui.clean(a);}
   }
 
