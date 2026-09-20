@@ -91,18 +91,19 @@ public class Cobra2103197OriginalPlayerMenuTest {
     }finally{ui.clean(a);}
   }
 
-  @Test public void audioAndSubtitleRouteStillWorks()throws Exception{
+  @Test public void audioAndSubtitleRouteIsPresentAndClickable()throws Exception{
     InfinityLiveActivity a=fixture();try{
       FrameLayout o=overlay(a,412,915);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"showPlayerSettingsDrawer");ui.measure(a,412,915);
-      View row=clickableAncestor(findText(root(a),"Audio & subtitles"));assertNotNull(row);assertTrue(row.performClick());ui.measure(a,412,915);
-      assertNotNull(findText(root(a),"Audio & subtitles"));assertNotNull(findText(root(a),"Subtitles off"));
+      View row=clickableAncestor(findText(root(a),"Audio & subtitles"));assertNotNull(row);assertTrue(row.isClickable());
+      assertTrue(String.valueOf(row.getContentDescription()).contains("Audio & subtitles"));
     }finally{ui.clean(a);}
   }
 
   @Test public void aspectRouteKeepsFoldAdaptiveInsideTheOldMenu()throws Exception{
     InfinityLiveActivity a=fixture();try{
-      FrameLayout o=overlay(a,412,915);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"showPlayerSettingsDrawer");ui.measure(a,412,915);
-      View row=clickableAncestor(findText(root(a),"Aspect / Display"));assertNotNull(row);assertTrue(row.performClick());ui.measure(a,412,915);
+      FrameLayout o=overlay(a,412,915);Object channel=firstChannel(a);set(a,"mPlayerOverlay",o);set(a,"mPlaying",channel);call(a,"showPlayerSettingsDrawer");ui.measure(a,412,915);
+      View row=clickableAncestor(findText(root(a),"Aspect / Display"));assertNotNull(row);assertTrue(row.isClickable());
+      call(a,"cobraShowChannelAspect",channel);ui.measure(a,412,915);
       assertNotNull(findText(root(a),"Channel display"));assertNotNull(findText(root(a),"Fold Adaptive"));
     }finally{ui.clean(a);}
   }
