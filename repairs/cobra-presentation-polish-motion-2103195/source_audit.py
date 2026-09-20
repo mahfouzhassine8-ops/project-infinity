@@ -42,7 +42,7 @@ def main():
       'toolbar_narrow_safe':'new String[]{"guide","aspect","multi","more"}' in chrome,
       'player_settings_polished':'Playback, video and session controls' in block(text,'showPlayerSettingsDrawer') and 'cobra-player-settings-video' in text,
       'sheet_motion':'setScaleX(.985f)' in sheet and 'setScaleY(.985f)' in sheet and 'DecelerateInterpolator' in sheet and 'playerHub' in sheet,
-      'focus_motion':'cobraPolishFocusable(row)' in block(text,'cobraSheetRow') and 'cobraPolishFocusable(row)' in block(text,'cobraDetailRow'),
+      'focus_motion':all(x in block(text,'cobraPolishFocusable') for x in ['setOnFocusChangeListener','focused?1.018f:1f','scaleY(focused?1.018f:1f)','CobraMotionSpec.MICRO','DecelerateInterpolator']) and 'cobraPolishFocusable(row)' in block(text,'cobraSheetRow') and 'cobraPolishFocusable(row)' in block(text,'cobraDetailRow'),
       'global_button_motion':'cobraPolishFocusable(button)' in block(text,'action') and 'cobraPolishFocusable(b)' in block(text,'cobraTextButton'),
       'settings_stagger':'cobraAnimateChildrenIn(list)' in settings,
       'sources_stagger':'cobraAnimateChildrenIn(list)' in sources,
