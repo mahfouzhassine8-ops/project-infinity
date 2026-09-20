@@ -1,4 +1,4 @@
-name: Infinity | 2103197 Original Player Menu Audit
+name: Infinity | 2103197 Surgical Original Player Menu Audit
 
 on:
   workflow_dispatch:
@@ -123,10 +123,10 @@ jobs:
       - name: Exact passed 2103193 source manager restore
         uses: actions/checkout@v5
         with: {ref: 65cee6f8fdc60757a1e9bdaaac113be1ea344a2c, path: repair193, persist-credentials: false}
-      - name: Exact passed 2103194 Fold Adaptive aspect tests
+      - name: Exact passed 2103194 Fold Adaptive aspect
         uses: actions/checkout@v5
         with: {ref: 2c2a759bd7f1ef380f21609105675ff2012d4d56, path: repair194, persist-credentials: false}
-      - name: Isolated 2103197 original player menu audit
+      - name: Isolated 2103197 surgical original player menu audit
         uses: actions/checkout@v5
         with: {ref: '${{ github.sha }}', path: repair197, persist-credentials: false}
 
@@ -323,6 +323,13 @@ jobs:
           run-id: 35493051610
           github-token: ${{ github.token }}
           path: baseline193
+      - name: Exact passed 2103194 baseline
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-2103194-Fold-Adaptive-Aspect-TEST-CANDIDATE
+          run-id: 35496708544
+          github-token: ${{ github.token }}
+          path: baseline194
 
       - name: Reconstruct exact 2103167 shell
         run: |
@@ -453,7 +460,12 @@ jobs:
           set -euo pipefail
           python3 repair193/repairs/cobra-source-manager-restore-2103193/ci.py upgrade
 
-      - name: Apply 2103197 original player menu + Fold persistence audit
+      - name: Apply exact passed 2103194 Fold Adaptive aspect
+        run: |
+          set -euo pipefail
+          python3 repair194/repairs/cobra-fold-adaptive-aspect-2103194/ci.py upgrade
+
+      - name: Apply 2103197 surgical original player menu audit
         run: |
           set -euo pipefail
           python3 repair197/repairs/cobra-original-player-menu-2103197/ci.py upgrade
@@ -479,7 +491,7 @@ jobs:
           python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
             --build repair197-build --out audit197/android
 
-      - name: Run 237 inherited + 6 Fold Adaptive + 10 original-menu gates
+      - name: Run 243 inherited gates plus 10 menu-only revert / persistence gates
         run: |
           set -euo pipefail
           cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java repair197-build/xbmc/src/test/java/com/projectinfinity/kodi/
@@ -617,6 +629,7 @@ jobs:
           name: Infinity-2103197-Original-Player-Menu-Evidence
           path: |
             audit197/
+            audit194/
             audit193/
             audit192/
             audit191/
@@ -666,12 +679,12 @@ jobs:
           if-no-files-found: warn
           retention-days: 90
 
-      - name: Preserve exact passed 2103193 rollback
+      - name: Preserve exact passed 2103194 rollback
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103193-Exact-Rollback-Before-2103197
-          path: baseline193/
+          name: Infinity-2103194-Exact-Rollback-Before-2103197
+          path: baseline194/
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
