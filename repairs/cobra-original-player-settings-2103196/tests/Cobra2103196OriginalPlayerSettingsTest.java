@@ -1,0 +1,146 @@
+package com.projectinfinity.kodi;
+
+import android.app.Application;
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import java.lang.reflect.*;
+import java.time.Duration;
+import java.util.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk=34,application=Application.class,manifest=Config.NONE,qualifiers="w412dp-h915dp-port-mdpi")
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@LooperMode(LooperMode.Mode.PAUSED)
+public class Cobra2103196OriginalPlayerSettingsTest {
+  CobraNavigationUiTest ui;
+  @Before public void before(){ui=new CobraNavigationUiTest();ui.clock();}
+  InfinityLiveActivity fixture()throws Exception{return ui.fixture(24);}
+  Object call(Object owner,String name,Object...args)throws Exception{
+    Method found=null;for(Method m:owner.getClass().getDeclaredMethods())if(m.getName().equals(name)&&m.getParameterCount()==args.length){found=m;break;}
+    if(found==null)throw new NoSuchMethodException(name);found.setAccessible(true);return found.invoke(owner,args);
+  }
+  void set(Object owner,String name,Object value)throws Exception{Field f=owner.getClass().getDeclaredField(name);f.setAccessible(true);f.set(owner,value);}
+  TextView findText(View v,String text){
+    if(v instanceof TextView&&text.contentEquals(((TextView)v).getText()))return (TextView)v;
+    if(v instanceof ViewGroup){ViewGroup g=(ViewGroup)v;for(int i=0;i<g.getChildCount();i++){TextView r=findText(g.getChildAt(i),text);if(r!=null)return r;}}
+    return null;
+  }
+  View findDescription(View v,String text){
+    CharSequence d=v.getContentDescription();if(d!=null&&text.contentEquals(d))return v;
+    if(v instanceof ViewGroup){ViewGroup g=(ViewGroup)v;for(int i=0;i<g.getChildCount();i++){View r=findDescription(g.getChildAt(i),text);if(r!=null)return r;}}
+    return null;
+  }
+  View clickableAncestor(View v){
+    View p=v;while(p!=null&&!p.isClickable()){android.view.ViewParent parent=p.getParent();p=parent instanceof View?(View)parent:null;}return p;
+  }
+  FrameLayout overlay(InfinityLiveActivity a,int w,int h){
+    FrameLayout o=new FrameLayout(a);a.setContentView(o);o.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));o.layout(0,0,w,h);return o;
+  }
+  Object firstChannel(InfinityLiveActivity a)throws Exception{
+    java.util.List<?> channels=(java.util.List<?>)CobraNavigationUiTest.get(a,"mChannels");assertFalse(channels.isEmpty());return channels.get(0);
+  }
+  String channelId(Object c)throws Exception{Field f=c.getClass().getDeclaredField("id");f.setAccessible(true);return (String)f.get(c);}
+
+  @Test public void playerOptionsKeepsRecentChannelsButRestoresOriginalSettings()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      FrameLayout o=overlay(a,412,915);set(a,"mPlayerOverlay",o);Object channel=firstChannel(a);set(a,"mPlaying",channel);
+      @SuppressWarnings("unchecked") Collection<String> recents=(Collection<String>)CobraNavigationUiTest.get(a,"mRecents");recents.add(channelId(channel));
+      call(a,"showCobraPlayerOptionsHub");ui.measure(a,412,915);
+      assertNotNull(findText(a.getWindow().getDecorView(),"Player options"));
+      assertNotNull(findText(a.getWindow().getDecorView(),"RECENT CHANNELS"));
+      for(String label:new String[]{"Channel playback","Health Center","Record now","Audio & subtitles","Aspect / Display","Cast / Route","Manage sources","Close player"})
+        assertNotNull(label,findText(a.getWindow().getDecorView(),label));
+      assertNull(findText(a.getWindow().getDecorView(),"Video & display"));
+      assertNull(findText(a.getWindow().getDecorView(),"Player settings"));
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void videoMenuCollectsFoldDisplayRotationAndPip()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      FrameLayout o=overlay(a,412,915);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));
+      call(a,"showCobraVideoOptions");ui.measure(a,412,915);
+      for(String label:new String[]{"Video & display","Display mode","Video details","Rotation","Display & performance","Picture in Picture","Channel playback"})
+        assertNotNull(label,findText(a.getWindow().getDecorView(),label));
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void widePlayerChromeExposesExpandedQuickActions()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      FrameLayout o=overlay(a,900,700);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"cobraBuildPlayerChrome");
+      for(String label:new String[]{"Channels","Favorite","Audio","Display","Multi-View","Options"})assertNotNull(label,findDescription(o,label));
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void shortPlayerChromeStaysCompact()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      FrameLayout o=overlay(a,412,300);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"cobraBuildPlayerChrome");
+      assertNotNull(findDescription(o,"Channels"));assertNotNull(findDescription(o,"Display"));assertNotNull(findDescription(o,"Multi-View"));assertNotNull(findDescription(o,"Options"));
+      // Favorite intentionally remains in the separate player header on compact layouts.
+      // Only the expanded quick-tools extras collapse out of the bottom toolbar.
+      assertNotNull(findDescription(o,"Favorite"));assertNull(findDescription(o,"Audio"));
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void focusMotionContractIsAttachedAndSafe()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      FrameLayout o=overlay(a,412,915);set(a,"mPlayerOverlay",o);set(a,"mPlaying",firstChannel(a));call(a,"showCobraVideoOptions");ui.measure(a,412,915);
+      View row=clickableAncestor(findText(a.getWindow().getDecorView(),"Display mode"));assertNotNull(row);
+      View.OnFocusChangeListener listener=row.getOnFocusChangeListener();assertNotNull(listener);
+      // The row may still be inside its entrance animation here. Validate safe motion bounds,
+      // not an exact animation frame; source_audit.py verifies the exact 1.018 -> 1.0 recipe.
+      assertTrue(row.getScaleX()>=.98f&&row.getScaleX()<=1.03f);assertTrue(row.getScaleY()>=.98f&&row.getScaleY()<=1.03f);
+      listener.onFocusChange(row,true);
+      assertTrue(row.getScaleX()>=.98f&&row.getScaleX()<=1.03f);assertTrue(row.getScaleY()>=.98f&&row.getScaleY()<=1.03f);
+      listener.onFocusChange(row,false);
+      assertTrue(row.getScaleX()>=.98f&&row.getScaleX()<=1.03f);assertTrue(row.getScaleY()>=.98f&&row.getScaleY()<=1.03f);
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void lockedSourceAndFoldContractsRemainVisible()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      call(a,"showSettings");ui.measure(a,412,915);assertNotNull(findText(a.getWindow().getDecorView(),"TV SOURCES"));
+      assertEquals(12,InfinityLiveActivity.CobraFoldAspectPolicy.MODE);
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void foldAdaptivePersistsForLiveChannelInsteadOfSnappingBack()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      Object channel=firstChannel(a);call(a,"cobraShowChannelAspect",channel);ui.measure(a,412,915);
+      TextView fold=findText(a.getWindow().getDecorView(),"Fold Adaptive");assertNotNull(fold);View row=clickableAncestor(fold);assertNotNull(row);assertTrue(row.performClick());
+      String key=(String)call(a,"cobraPreferenceKey",channel);
+      android.content.SharedPreferences prefs=(android.content.SharedPreferences)CobraNavigationUiTest.get(a,"mPrefs");
+      assertTrue(prefs.getString(key,"").contains("\"aspect\":12"));
+      assertEquals(12,((Integer)call(a,"cobraChannelAspect",channel)).intValue());
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void foldAdaptiveCanBeTheGlobalFullscreenDefault()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      Object channel=firstChannel(a);String key=(String)call(a,"cobraPreferenceKey",channel);
+      android.content.SharedPreferences prefs=(android.content.SharedPreferences)CobraNavigationUiTest.get(a,"mPrefs");
+      prefs.edit().remove(key).putInt("cobra_player_aspect_mode",12).apply();
+      assertEquals(12,((Integer)call(a,"cobraChannelAspect",channel)).intValue());
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void playbackDefaultsExposeFoldAdaptive()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      call(a,"cobraShowPlaybackDefaults");ui.measure(a,412,915);
+      View row=clickableAncestor(findText(a.getWindow().getDecorView(),"Default fullscreen aspect"));assertNotNull(row);assertTrue(row.performClick());ui.measure(a,412,915);
+      assertNotNull(findText(a.getWindow().getDecorView(),"Fold Adaptive"));
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void lockedPlaybackGuardRemainsUntouched(){
+    assertFalse(InfinityLiveActivity.CobraTimelineNormalizerPolicy.REWRITE_ENABLED);
+    assertTrue(InfinityLiveActivity.CobraProviderPacePolicy.limited(30000L,900L,180L,560L,560L,560L,10L,500L,0L,0L,0L));
+  }
+}
