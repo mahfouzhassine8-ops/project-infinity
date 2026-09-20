@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse,hashlib,json,re,shutil,subprocess,zipfile,xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parent
-BASE_COMMIT='e37d8a166fa8afd3aa2013b8fc5d235e1905983a'
+BASE_COMMIT='2c2a759bd7f1ef380f21609105675ff2012d4d56'
 OLD='1.0.9-Cobra-Fold-Adaptive-Aspect-RC1'
 NEW='1.0.9-Cobra-Presentation-Polish-Motion-RC1'
 VERSION=2103195
