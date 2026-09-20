@@ -37,7 +37,7 @@ def main():
     checks={
       'exact_2103186_parent':patch.get('base_build')==2103186 and patch.get('base_commit')=='431d8d00e814a47d9ec4df972667c1c1f700413b',
       'detect_access_units_enabled':'FLAG_DETECT_ACCESS_UNITS' in policy and 'detectsAccessUnits' in policy,
-      'non_idr_not_enabled':'TS_FLAGS=androidx.media3.extractor.ts.TsExtractor.FLAG_DETECT_ACCESS_UNITS' in policy and 'FLAG_ALLOW_NON_IDR_KEYFRAMES' not in build,
+      'non_idr_not_enabled':'TS_FLAGS=androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS' in policy and 'FLAG_ALLOW_NON_IDR_KEYFRAMES' not in build,
       'custom_extractors_factory':'DefaultExtractorsFactory' in build,
       'extractors_wired_to_media_source':'new DefaultMediaSourceFactory(data,extractors)' in build,
       'diagnostic_marker':all(x in health for x in ('ts_access_unit_detection','ts_allow_non_idr_keyframes','ts_extractor_profile')),

@@ -46,9 +46,9 @@ def replace_member(text,name,new,kind='method'):
 
 PARSER_POLICY=r'''
   static final class CobraTsParserPolicy {
-    static final int TS_FLAGS=androidx.media3.extractor.ts.TsExtractor.FLAG_DETECT_ACCESS_UNITS;
-    static boolean detectsAccessUnits(){return (TS_FLAGS&androidx.media3.extractor.ts.TsExtractor.FLAG_DETECT_ACCESS_UNITS)!=0;}
-    static boolean allowsNonIdrKeyframes(){return (TS_FLAGS&androidx.media3.extractor.ts.TsExtractor.FLAG_ALLOW_NON_IDR_KEYFRAMES)!=0;}
+    static final int TS_FLAGS=androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS;
+    static boolean detectsAccessUnits(){return (TS_FLAGS&androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS)!=0;}
+    static boolean allowsNonIdrKeyframes(){return (TS_FLAGS&androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES)!=0;}
   }
 '''
 

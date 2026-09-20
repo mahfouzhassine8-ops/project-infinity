@@ -19,7 +19,7 @@ public class Cobra2103187TsAccessUnitCompatibilityTest {
   }
 
   @Test public void exactFlagIsNarrow(){
-    assertEquals(androidx.media3.extractor.ts.TsExtractor.FLAG_DETECT_ACCESS_UNITS,
+    assertEquals(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS,
         InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);
   }
 
