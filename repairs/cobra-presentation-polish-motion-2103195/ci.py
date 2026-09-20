@@ -41,7 +41,7 @@ def upgrade():
     data.update(
       version_code=VERSION,version_name=NEW,source_parent=2103194,source_parent_locked=True,locked_parent_commit=BASE_COMMIT,candidate_locked=False,
       stream_fingerprint_schema=7,provider_route_fingerprint=True,provider_pace_limit_classifier=True,timeline_normalizer_rewrite_enabled=False,
-      clock_rewrite_suppressed_by_evidence=True,source_manager_route_restored=True,source_manager_label='TV SOURCES',fold_adaptive_aspect=True,fold_adaptive_mode=12,tivimate_inspired_player_hub=True,motion_polish=True,
+      clock_rewrite_suppressed_by_evidence=True,source_manager_route_restored=True,source_manager_label='TV SOURCES',fold_adaptive_aspect=True,fold_adaptive_mode=12,fold_adaptive_preference_persistence_fixed=True,fold_adaptive_global_default_first=True,tivimate_inspired_player_hub=True,motion_polish=True,
       playback_behavior_changed=False,network_selection_changed=False,timeshift_ownership_changed=False,buffer_policy_changed=False,
       parser_flags_changed=False,native_engine_recompiled=False,theme_zip_changed=False,physical_device_verified=False)
     receipt.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
@@ -79,7 +79,7 @@ def verify():
           b'timeshift_provider_proxy',b'timeshift_provider_final_host_hash',b'timeshift_provider_response_header_hash',
           b'routeFingerprint',b'timeshift_timeline_normalizer_active',b'timeshift_timeline_normalizer_scale_ppm',b'timeshift_provider_pace_limited',b'timeshift_timeline_normalizer_rewrite_enabled',
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
-          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player options',b'RECENT CHANNELS',b'Video & display',b'cobra-player-hub-video',b'CobraMotionSpec'):
+          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player options',b'RECENT CHANNELS',b'Video & display',b'cobra-player-hub-video',b'CobraMotionSpec',b'cobra-default-aspect:12'):
             require(token in dex,'2103195 contract missing: '+repr(token))
         require(b'Cobra2103195PresentationPolishTest' not in dex,'2103195 test code packaged in release APK')
 
@@ -87,7 +87,7 @@ def verify():
     require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103195'" in badging,'Final APK not forward-installable')
     result={'build':VERSION,'base_build':2103194,'base_commit':BASE_COMMIT,'base_apk_sha256':sha(base),'apk_sha256':sha(final),'signer':CERT,
       'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'timeline_normalizer_rewrite_enabled':False,
-      'clock_rewrite_suppressed_by_evidence':True,'source_manager_route_restored':True,'source_manager_label':'TV SOURCES','fold_adaptive_aspect':True,'fold_adaptive_mode':12,'tivimate_inspired_player_hub':True,'motion_polish':True,
+      'clock_rewrite_suppressed_by_evidence':True,'source_manager_route_restored':True,'source_manager_label':'TV SOURCES','fold_adaptive_aspect':True,'fold_adaptive_mode':12,'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'tivimate_inspired_player_hub':True,'motion_polish':True,
       'playback_behavior_changed':False,'network_selection_changed':False,'timeshift_ownership_changed':False,'buffer_policy_changed':False,
       'parser_flags_changed':False,'native_engine_recompiled':False,'theme_zip_changed':False,'physical_device_verified':False}
     Path('audit195/final-verification.json').write_text(json.dumps(result,indent=2)+'\n')
@@ -114,14 +114,14 @@ def deliver():
       ('Cobra2103181TimeshiftTransportIntegrityTest',6),('Cobra2103182TimeshiftStartupReserveTest',6),('Cobra2103183NetworkFamilyControlTest',6),
       ('Cobra2103184StreamNetworkOptimizationTest',7),('Cobra2103185LiveDiagnosticsFreezeTest',5),('Cobra2103186StreamCadenceFingerprintTest',5),
       ('Cobra2103187TsAccessUnitCompatibilityTest',5),('Cobra2103188TsKeyframeCompatibilityTest',5),('Cobra2103189TsTimelineFingerprintTest',5),
-      ('Cobra2103190TsClockNormalizationTest',5),('Cobra2103191ProviderRouteFingerprintTest',5),('Cobra2103192ProviderPaceReserveTest',5),('Cobra2103193SourceManagerRestoreTest',5),('Cobra2103194FoldAdaptiveAspectTest',6),('Cobra2103195PresentationPolishTest',7)]:
+      ('Cobra2103190TsClockNormalizationTest',5),('Cobra2103191ProviderRouteFingerprintTest',5),('Cobra2103192ProviderPaceReserveTest',5),('Cobra2103193SourceManagerRestoreTest',5),('Cobra2103194FoldAdaptiveAspectTest',6),('Cobra2103195PresentationPolishTest',10)]:
         total+=suite(Path('audit195/targeted/test-results')/('TEST-com.projectinfinity.kodi.'+name+'.xml'),count)
-    require(total==250,f'Expected 250 Android tests, got {total}')
+    require(total==253,f'Expected 253 Android tests, got {total}')
     source=json.loads(Path('audit195/source-audit/source-audit.json').read_text())
     final=json.loads(Path('audit195/final-verification.json').read_text())
     require(source.get('passed') and not source.get('failed'),'2103195 source audit failed')
-    result={'build':VERSION,'locked_parent':2103194,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_presentation_polish_tests':7,
-      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'source_manager_route_restored':True,'fold_adaptive_aspect':True,'fold_adaptive_first_choice':True,'tivimate_inspired_player_hub':True,'recent_channel_strip':True,'motion_polish':True,
+    result={'build':VERSION,'locked_parent':2103194,'locked_parent_commit':BASE_COMMIT,'android_tests':total,'new_presentation_polish_tests':10,
+      'stream_fingerprint_schema':7,'provider_route_fingerprint':True,'provider_pace_limit_classifier':True,'source_manager_route_restored':True,'fold_adaptive_aspect':True,'fold_adaptive_first_choice':True,'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,'tivimate_inspired_player_hub':True,'recent_channel_strip':True,'motion_polish':True,
       'playback_behavior_changed':False,'network_selection_changed':False,'buffer_policy_changed':False,'parser_flags_changed':False,
       'timeline_normalizer_rewrite_enabled':False,'native_engine_recompiled':False,'theme_zip_changed':False,'apk_sha256':final['apk_sha256'],
       'physical_device_verified':False,'candidate_locked':False,
