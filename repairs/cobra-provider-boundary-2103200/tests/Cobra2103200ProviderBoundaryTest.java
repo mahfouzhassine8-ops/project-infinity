@@ -147,8 +147,8 @@ public class Cobra2103200ProviderBoundaryTest {
       Context app=RuntimeEnvironment.getApplication();Notification own=new Notification(),foreign=new Notification();own.extras=new android.os.Bundle();foreign.extras=new android.os.Bundle();
       own.extras.putString("android.backgroundImageUri",XBMCFileContentProvider.buildUri("/own/art.jpg").toString());foreign.extras.putString("android.backgroundImageUri",XBMCFileContentProvider.buildUri("/foreign/secret").toString());
       return new android.service.notification.StatusBarNotification[]{
-        new android.service.notification.StatusBarNotification("other.package","other.package",1,null,Process.myUid()+8,0,foreign,android.os.Process.myUserHandle(),null,1),
-        new android.service.notification.StatusBarNotification(app.getPackageName(),app.getPackageName(),2,null,Process.myUid(),0,own,android.os.Process.myUserHandle(),null,1)};
+        new android.service.notification.StatusBarNotification("other.package","other.package",1,null,Process.myUid()+8,0,0,foreign,android.os.Process.myUserHandle(),1L),
+        new android.service.notification.StatusBarNotification(app.getPackageName(),app.getPackageName(),2,null,Process.myUid(),0,0,own,android.os.Process.myUserHandle(),1L)};
     }
   }
   @Test @Config(shadows=ForeignNotifications.class)
