@@ -10,26 +10,25 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=34,application=Application.class,manifest=Config.NONE)
 public class Cobra2103192ProviderPaceReserveTest {
-  @Test public void steadyCleanUnderrateUsesReserve(){
-    assertTrue(InfinityLiveActivity.CobraProviderPacePolicy.shouldUseReserve(
+  @Test public void steadyCleanUnderrateIsClassifiedAsPaceLimit(){
+    assertTrue(InfinityLiveActivity.CobraProviderPacePolicy.limited(
       30000L,900L,180L,560L,560L,560L,10L,500L,0L,0L,0L));
   }
 
-  @Test public void normalRateDoesNotUseReserve(){
-    assertFalse(InfinityLiveActivity.CobraProviderPacePolicy.shouldUseReserve(
+  @Test public void normalRateIsNotClassifiedAsPaceLimit(){
+    assertFalse(InfinityLiveActivity.CobraProviderPacePolicy.limited(
       30000L,900L,180L,1000L,1000L,1000L,10L,500L,0L,0L,0L));
   }
 
-  @Test public void trueNetworkGapsDoNotMasqueradeAsPaceLimit(){
-    assertFalse(InfinityLiveActivity.CobraProviderPacePolicy.shouldUseReserve(
+  @Test public void trueNetworkGapsAreNotMisclassified(){
+    assertFalse(InfinityLiveActivity.CobraProviderPacePolicy.limited(
       30000L,900L,180L,560L,560L,560L,20L,17000L,40L,0L,0L));
   }
 
-  @Test public void normalizerReleasesWhenRawClockRecovers(){
-    assertTrue(InfinityLiveActivity.CobraTimelineNormalizerPolicy.recovered(
-      30000L,900L,180L,1018L,1018L,1018L));
-    assertFalse(InfinityLiveActivity.CobraTimelineNormalizerPolicy.recovered(
-      30000L,900L,180L,560L,560L,560L));
+  @Test public void disprovenTimelineRewriteIsDisabled(){
+    assertFalse(InfinityLiveActivity.CobraTimelineNormalizerPolicy.REWRITE_ENABLED);
+    assertTrue(InfinityLiveActivity.CobraTimelineNormalizerPolicy.eligible(
+      228824L,7681L,1197L,559L,559L,559L));
   }
 
   @Test public void inheritedPlaybackSafetyRemains(){
