@@ -99,6 +99,34 @@ public class Cobra2103195PresentationPolishTest {
     }finally{ui.clean(a);}
   }
 
+  @Test public void foldAdaptivePersistsForLiveChannelInsteadOfSnappingBack()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      Object channel=firstChannel(a);call(a,"cobraShowChannelAspect",channel);ui.measure(a,412,915);
+      TextView fold=findText(a.getWindow().getDecorView(),"Fold Adaptive");assertNotNull(fold);View row=clickableAncestor(fold);assertNotNull(row);assertTrue(row.performClick());
+      String key=(String)call(a,"cobraPreferenceKey",channel);
+      android.content.SharedPreferences prefs=(android.content.SharedPreferences)CobraNavigationUiTest.get(a,"mPrefs");
+      assertTrue(prefs.getString(key,"").contains("\"aspect\":12"));
+      assertEquals(12,((Integer)call(a,"cobraChannelAspect",channel)).intValue());
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void foldAdaptiveCanBeTheGlobalFullscreenDefault()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      Object channel=firstChannel(a);String key=(String)call(a,"cobraPreferenceKey",channel);
+      android.content.SharedPreferences prefs=(android.content.SharedPreferences)CobraNavigationUiTest.get(a,"mPrefs");
+      prefs.edit().remove(key).putInt("cobra_player_aspect_mode",12).apply();
+      assertEquals(12,((Integer)call(a,"cobraChannelAspect",channel)).intValue());
+    }finally{ui.clean(a);}
+  }
+
+  @Test public void playbackDefaultsExposeFoldAdaptive()throws Exception{
+    InfinityLiveActivity a=fixture();try{
+      call(a,"cobraShowPlaybackDefaults");ui.measure(a,412,915);
+      View row=clickableAncestor(findText(a.getWindow().getDecorView(),"Default fullscreen aspect"));assertNotNull(row);assertTrue(row.performClick());ui.measure(a,412,915);
+      assertNotNull(findText(a.getWindow().getDecorView(),"Fold Adaptive"));
+    }finally{ui.clean(a);}
+  }
+
   @Test public void lockedPlaybackGuardRemainsUntouched(){
     assertFalse(InfinityLiveActivity.CobraTimelineNormalizerPolicy.REWRITE_ENABLED);
     assertTrue(InfinityLiveActivity.CobraProviderPacePolicy.limited(30000L,900L,180L,560L,560L,560L,10L,500L,0L,0L,0L));
