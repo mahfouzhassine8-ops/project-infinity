@@ -32,7 +32,7 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--patch',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
     text=(a.source/ACT).read_text();patch=json.loads(a.patch.read_text())
     hub=block(text,'showCobraPlayerOptionsHub');video=block(text,'showCobraVideoOptions');chrome=block(text,'cobraBuildPlayerChrome')
-    settings=block(text,'showSettings');sources=block(text,'showSources');sheet=block(text,'cobraOpenSheet');guide=block(text,'cobraRenderGuideBrowser')
+    settings=block(text,'showSettings');sources=block(text,'showSources');sheet=block(text,'cobraOpenSheet');guide=block(text,'cobraRenderGuideBrowser');pref=block(text,'CobraPreferencePolicy','class');channel_mode=block(text,'cobraChannelAspect');defaults=block(text,'cobraShowPlaybackDefaults')
     checks={
       'exact_2103194_parent':patch.get('base_build')==2103194 and patch.get('base_commit')=='2c2a759bd7f1ef380f21609105675ff2012d4d56',
       'player_hub':all(x in hub for x in ['Player options','RECENT CHANNELS','Channels','TV Guide','Audio & subtitles','Video & display','Multi-View','Picture in Picture','Health Center','Player settings']),
@@ -50,6 +50,9 @@ def main():
       'guide_motion':'translationY(dp(7))' in guide and 'DecelerateInterpolator' in guide,
       'empty_state_polish':'cobraModeSurface(18,true)' in block(text,'cobraModeEmpty'),
       'fold_adaptive_preserved':'CobraFoldAspectPolicy' in text and 'case 12: return "Fold Adaptive"' in block(text,'cobraAspectLabel'),
+      'fold_channel_persistence':'value<=CobraFoldAspectPolicy.MODE' in pref,
+      'fold_global_persistence':'mode<=CobraFoldAspectPolicy.MODE' in channel_mode,
+      'fold_global_first':'final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10}' in defaults,
       'fold_first_live':'final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1' in block(text,'cobraShowChannelAspect'),
       'tv_sources_preserved':'cobra_tv_sources' in text and 'TV SOURCES' in text,
       'pace_guard_preserved':'timeshift_provider_pace_limited' in text and 'REWRITE_ENABLED=false' in text,
