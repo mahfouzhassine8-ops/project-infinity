@@ -90,12 +90,12 @@ def apply(source,receipt_path,out):
     text=text[:b]+'\n\n'+FOLD_POLICY+text[b:]
 
     label=member(text,'cobraAspectLabel')
-    label=once(label,'    switch (mode) {','    switch (mode) {\\n      case 12: return "Fold Adaptive";','Fold Adaptive label')
+    label=once(label,'    switch (mode) {','    switch (mode) {\n      case 12: return "Fold Adaptive";','Fold Adaptive label')
     text=replace_member(text,'cobraAspectLabel',label)
 
     channel_aspect=member(text,'cobraShowChannelAspect')
     channel_aspect=once(channel_aspect,
-      '    for(int i=-1;i<=11;i++){final int value=i;cobraAddDetail(rows,"aspect",i<0?"Inherit default":cobraAspectLabel(i),null,"cobra-channel-aspect:"+i,prefs.aspect==i,()->{\\n      CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=value;if(cobraSavePreferences(channel,key,p,false)){if(value==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}\\n    });}',
+      '    for(int i=-1;i<=11;i++){final int value=i;cobraAddDetail(rows,"aspect",i<0?"Inherit default":cobraAspectLabel(i),null,"cobra-channel-aspect:"+i,prefs.aspect==i,()->{\n      CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=value;if(cobraSavePreferences(channel,key,p,false)){if(value==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}\n    });}',
       '''    final int[] modes={CobraFoldAspectPolicy.MODE,-1,0,1,2,3,4,5,6,7,8,9,10,11};
     for(int value:modes){final int selected=value;cobraAddDetail(rows,"aspect",selected<0?"Inherit default":cobraAspectLabel(selected),null,"cobra-channel-aspect:"+selected,prefs.aspect==selected,()->{
       CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=selected;if(cobraSavePreferences(channel,key,p,false)){if(selected==11)cobraShowChannelCustomAspect(channel);else cobraShowChannelPreferences(channel);}
