@@ -92,8 +92,9 @@ def verify():
 
     manifest=Path('signed198/manifest.txt').read_text()
     base_manifest=Path('signed198/base-manifest.txt').read_text()
-    require(manifest.count('android.permission.RECEIVE_BOOT_COMPLETED')==1,'Final manifest still duplicates RECEIVE_BOOT_COMPLETED')
-    require(base_manifest.count('android.permission.RECEIVE_BOOT_COMPLETED')==2,'Historical base duplicate proof changed unexpectedly')
+    boot_raw='(Raw: "android.permission.RECEIVE_BOOT_COMPLETED")'
+    require(manifest.count(boot_raw)==1,'Final manifest still duplicates RECEIVE_BOOT_COMPLETED')
+    require(base_manifest.count(boot_raw)==2,'Historical base duplicate proof changed unexpectedly')
 
     with zipfile.ZipFile(base) as old,zipfile.ZipFile(final) as new:
         old_native={n for n in old.namelist() if n.startswith('lib/') and not n.endswith('/')}
