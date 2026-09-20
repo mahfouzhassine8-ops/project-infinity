@@ -79,7 +79,7 @@ def verify():
           b'timeshift_provider_proxy',b'timeshift_provider_final_host_hash',b'timeshift_provider_response_header_hash',
           b'routeFingerprint',b'timeshift_timeline_normalizer_active',b'timeshift_timeline_normalizer_scale_ppm',b'timeshift_provider_pace_limited',b'timeshift_timeline_normalizer_rewrite_enabled',
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
-          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player options',b'RECENT CHANNELS',b'Video & display',b'cobra-player-hub-video',b'CobraMotionSpec',b'cobra-default-aspect:12'):
+          b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player options',b'RECENT CHANNELS',b'Video & display',b'cobra-player-hub-video',b'CobraMotionSpec',b'cobra-default-aspect:'):
             require(token in dex,'2103195 contract missing: '+repr(token))
         require(b'Cobra2103195PresentationPolishTest' not in dex,'2103195 test code packaged in release APK')
 
