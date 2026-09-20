@@ -81,7 +81,7 @@ def verify():
           b'DETECT_ACCESS_UNITS+ALLOW_NON_IDR_KEYFRAMES',b'last_live_before_navigation',
           b'cobra_unified_live_timeline',b'CobraCallAudioPolicy',b'buffer_observed_no_restart',b'TV SOURCES',b'cobra_tv_sources',b'Fold Adaptive',b'Player options',b'RECENT CHANNELS',b'Video & display',b'cobra-player-hub-video',b'CobraMotionSpec'):
             require(token in dex,'2103195 contract missing: '+repr(token))
-        require(b'Cobra2103195PresentationPolishTest' not in dex,'2103194 test code packaged in release APK')
+        require(b'Cobra2103195PresentationPolishTest' not in dex,'2103195 test code packaged in release APK')
 
     badging=Path('signed195/badging.txt').read_text()
     require("package: name='com.projectinfinity.kodi'" in badging and "versionCode='2103195'" in badging,'Final APK not forward-installable')
