@@ -33,10 +33,28 @@ HELPERS = r'''
     android.view.ViewGroup.LayoutParams current=captions.getLayoutParams();
     FrameLayout.LayoutParams old=current instanceof FrameLayout.LayoutParams?(FrameLayout.LayoutParams)current:null;
     int gravity=Gravity.TOP|Gravity.LEFT;
-    if(old!=null&&old.width==texture.getWidth()&&old.height==texture.getHeight()
-        &&old.leftMargin==left&&old.topMargin==top&&old.gravity==gravity)return;
-    FrameLayout.LayoutParams next=new FrameLayout.LayoutParams(texture.getWidth(),texture.getHeight(),gravity);
-    next.leftMargin=left;next.topMargin=top;captions.setLayoutParams(next);
+    if(old==null||old.width!=texture.getWidth()||old.height!=texture.getHeight()
+        ||old.leftMargin!=left||old.topMargin!=top||old.gravity!=gravity){
+      FrameLayout.LayoutParams next=new FrameLayout.LayoutParams(texture.getWidth(),texture.getHeight(),gravity);
+      next.leftMargin=left;next.topMargin=top;captions.setLayoutParams(next);
+    }
+    // A TextureView layout callback precedes its caption sibling's layout. The
+    // parent can still lay that sibling with its old measured size and clear the
+    // request raised by setLayoutParams. Recheck after this traversal, when a
+    // fresh request cannot be consumed by that old sibling layout.
+    if(captions.getVisibility()!=View.GONE&&(captions.getMeasuredWidth()!=texture.getWidth()
+        ||captions.getMeasuredHeight()!=texture.getHeight()||captions.getWidth()!=texture.getWidth()
+        ||captions.getHeight()!=texture.getHeight()||captions.getLeft()!=texture.getLeft()
+        ||captions.getTop()!=texture.getTop())){
+      captions.post(()->{
+        if(!binding.current()||binding.texture!=texture||binding.captions!=captions
+            ||texture.getParent()!=parent||captions.getParent()!=parent)return;
+        if(captions.getVisibility()!=View.GONE&&(captions.getMeasuredWidth()!=texture.getWidth()
+            ||captions.getMeasuredHeight()!=texture.getHeight()||captions.getWidth()!=texture.getWidth()
+            ||captions.getHeight()!=texture.getHeight()||captions.getLeft()!=texture.getLeft()
+            ||captions.getTop()!=texture.getTop()))captions.requestLayout();
+      });
+    }
   }
 
   private JSONObject cobraDisplayGeometry(CobraPlayerBinding binding)throws Exception{

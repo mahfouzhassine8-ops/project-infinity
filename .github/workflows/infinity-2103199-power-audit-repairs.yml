@@ -651,7 +651,7 @@ jobs:
       - name: Publish verified 2103199 TEST CANDIDATE
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103199-Power-Audit-TEST-CANDIDATE
+          name: Infinity-2103199-Power-Audit-TEST-CANDIDATE-Attempt-${{ github.run_attempt }}
           path: signed199/
           if-no-files-found: error
           compression-level: 0
@@ -661,7 +661,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103199-Power-Audit-Evidence
+          name: Infinity-2103199-Power-Audit-Evidence-Attempt-${{ github.run_attempt }}
           path: |
             audit198/
             audit159/android/
@@ -722,7 +722,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103197-Exact-Rollback-Before-2103199
+          name: Infinity-2103197-Exact-Rollback-Before-2103199-Attempt-${{ github.run_attempt }}
           path: baseline197/
           if-no-files-found: error
           compression-level: 0

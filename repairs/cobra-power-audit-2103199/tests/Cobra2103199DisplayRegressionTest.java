@@ -63,6 +63,7 @@ public class Cobra2103199DisplayRegressionTest {
   }
   void resize(View root,int w,int h){root.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));root.layout(0,0,w,h);}
   RectF rendered(TextureView t){RectF r=new RectF(0,0,t.getWidth(),t.getHeight());t.getTransform(new Matrix()).mapRect(r);return r;}
+  String geometry(View v){android.view.ViewGroup.LayoutParams p=v.getLayoutParams();return "bounds="+v.getLeft()+","+v.getTop()+" "+v.getWidth()+"x"+v.getHeight()+" measured="+v.getMeasuredWidth()+"x"+v.getMeasuredHeight()+" params="+(p==null?"none":p.width+"x"+p.height)+" requested="+v.isLayoutRequested()+" inLayout="+v.isInLayout();}
   void checkRect(TextureView t,double expectedW,double expectedH){RectF r=rendered(t);assertEquals(expectedW,r.width(),.02);assertEquals(expectedH,r.height(),.02);assertEquals(t.getWidth()/2f,r.centerX(),.02);assertEquals(t.getHeight()/2f,r.centerY(),.02);}
   void mode(Object channel,int mode)throws Exception{String key=(String)call(a,"cobraPreferenceKey",channel);prefs.edit().putString(key,new JSONObject().put("schema",1).put("aspect",mode).put("x",1.33).put("y",.77).toString()).commit();}
   double[] expected(int mode,int sw,int sh,float par,int w,int h){
@@ -150,17 +151,32 @@ public class Cobra2103199DisplayRegressionTest {
     View captions=(View)get(b,"captions");captions.setVisibility(View.VISIBLE);ui.measure(a,1600,900);
     assertEquals("Fullscreen must be measured before opening its drawer",1600,t.getWidth());c.writes.clear();
     call(a,"showCobraPlayerDrawer");ui.measure(a,1600,900);
-    View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer);assertTrue(drawer.isAttachedToWindow());assertEquals(430,drawer.getWidth());
-    assertEquals(1170,t.getWidth());assertEquals(t.getLeft(),captions.getLeft());assertEquals(t.getTop(),captions.getTop());assertEquals(t.getWidth(),captions.getWidth());assertEquals(t.getHeight(),captions.getHeight());
+    View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer);assertTrue(drawer.isAttachedToWindow());
+    String observed="texture["+geometry(t)+"] caption["+geometry(captions)+"] drawer["+geometry(drawer)+"]";
+    System.out.println("Caption drawer after traversal: "+observed);
+    assertEquals("Drawer width: "+observed,430,drawer.getWidth());
+    assertEquals("Video pane width: "+observed,1170,t.getWidth());
+    assertEquals("Caption left: "+observed,t.getLeft(),captions.getLeft());
+    assertEquals("Caption top: "+observed,t.getTop(),captions.getTop());
+    assertEquals("Caption measured width: "+observed,t.getWidth(),captions.getMeasuredWidth());
+    assertEquals("Caption actual width: "+observed,t.getWidth(),captions.getWidth());
+    assertEquals("Caption actual height: "+observed,t.getHeight(),captions.getHeight());
     assertEquals(true,call(a,"closeCobraPlayerDrawer"));ui.measure(a,1600,900);assertNull(get(a,"mCobraPlayerDrawer"));
-    assertEquals(1600,t.getWidth());assertEquals(t.getWidth(),captions.getWidth());assertSame(c.player,get(a,"mPlayer"));assertTrue(c.writes.isEmpty());
+    assertEquals("Video restores fullscreen",1600,t.getWidth());
+    assertEquals("Caption restores fullscreen: "+geometry(captions),t.getWidth(),captions.getWidth());
+    assertSame(c.player,get(a,"mPlayer"));assertTrue(c.writes.isEmpty());
   }
   @Test public void captionBoundsAccountForParentPaddingAndNeverMoveAnotherContainer()throws Exception{
     Controlled c=new Controlled();TextureView t=texture(1600,900);Object b=bind(c,channel(0),t,true);
     View captions=(View)get(b,"captions");captions.setVisibility(View.VISIBLE);FrameLayout root=(FrameLayout)t.getParent();root.setPadding(20,30,40,50);
     for(int i=0;i<3;i++)resize(root,1600,900);call(a,"cobraFitBinding",b);resize(root,1600,900);
     assertEquals(t.getLeft(),captions.getLeft());assertEquals(t.getTop(),captions.getTop());assertEquals(t.getWidth(),captions.getWidth());assertEquals(t.getHeight(),captions.getHeight());
+    // Queue a deferred caption measurement, then move the overlay before that
+    // callback runs. A callback for the previous parent must become a no-op.
+    FrameLayout.LayoutParams narrow=(FrameLayout.LayoutParams)t.getLayoutParams();narrow.width=t.getWidth()-10;t.setLayoutParams(narrow);resize(root,1600,900);
     root.removeView(captions);FrameLayout elsewhere=new FrameLayout(a);elsewhere.addView(captions,new FrameLayout.LayoutParams(123,45));
+    resize(elsewhere,123,45);assertFalse(captions.isLayoutRequested());ui.frames(2);
     call(a,"cobraFitBinding",b);assertSame(elsewhere,captions.getParent());assertEquals(123,captions.getLayoutParams().width);assertEquals(45,captions.getLayoutParams().height);
+    assertFalse("A deferred callback cannot request layout in the replacement container",captions.isLayoutRequested());
   }
 }
