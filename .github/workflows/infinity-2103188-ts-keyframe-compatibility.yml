@@ -436,30 +436,14 @@ jobs:
           cp repair186/repairs/cobra-stream-cadence-fingerprint-2103186/tests/Cobra2103186StreamCadenceFingerprintTest.java repair188-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp repair187/repairs/cobra-ts-access-unit-compatibility-2103187/tests/Cobra2103187TsAccessUnitCompatibilityTest.java repair188-build/xbmc/src/test/java/com/projectinfinity/kodi/
           cp repair188/repairs/cobra-ts-keyframe-compatibility-2103188/tests/Cobra2103188TsKeyframeCompatibilityTest.java repair188-build/xbmc/src/test/java/com/projectinfinity/kodi/
-          # 2103188 intentionally supersedes the two 2103187 assertions that required
-          # non-IDR keyframe compatibility to remain disabled. Preserve the other three
-          # 2103187 regression assertions unchanged and rewrite only the superseded pair.
+          # 2103188 intentionally supersedes only the two 2103187 assertions
+          # that required non-IDR compatibility to remain disabled.
           python3 - <<'PY'
           from pathlib import Path
           p=Path('repair188-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103187TsAccessUnitCompatibilityTest.java')
           t=p.read_text()
-          old='''  @Test public void keepsNonIdrKeyframesDisabled(){
-    assertFalse(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes());
-  }
-
-  @Test public void exactFlagIsNarrow(){
-    assertEquals(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS,
-        InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);
-  }'''
-          new='''  @Test public void supersededNonIdrExpectationNowEnabled(){
-    assertTrue(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes());
-  }
-
-  @Test public void supersededExactFlagNowIncludesKeyframeCompatibility(){
-    int expected=androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
-      |androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES;
-    assertEquals(expected,InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);
-  }'''
+          old="  @Test public void keepsNonIdrKeyframesDisabled(){\n    assertFalse(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes());\n  }\n\n  @Test public void exactFlagIsNarrow(){\n    assertEquals(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS,\n        InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);\n  }"
+          new="  @Test public void supersededNonIdrExpectationNowEnabled(){\n    assertTrue(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes());\n  }\n\n  @Test public void supersededExactFlagNowIncludesKeyframeCompatibility(){\n    int expected=androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS\n      |androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES;\n    assertEquals(expected,InfinityLiveActivity.CobraTsParserPolicy.TS_FLAGS);\n  }"
           if t.count(old)!=1: raise SystemExit(f'2103187 supersession anchor drift: {t.count(old)}')
           p.write_text(t.replace(old,new,1))
           PY
