@@ -168,6 +168,31 @@ def apply(source,receipt_path,out):
 
     text=insert_before_final(text,HELPERS)
 
+    # 2103194 exposed mode 12 in the UI, but the inherited preference validators
+    # still capped aspect modes at 11. That caused Fold Adaptive to be serialized
+    # back to inherit/default and immediately snap to the previous mode.
+    preference=member(text,'CobraPreferencePolicy','class')
+    preference=once(preference,
+      '    static int aspect(int value){return value>=-1&&value<=11?value:-1;}',
+      '    static int aspect(int value){return value>=-1&&value<=CobraFoldAspectPolicy.MODE?value:-1;}',
+      'Fold Adaptive channel preference persistence')
+    text=replace_member(text,'CobraPreferencePolicy',preference,'class')
+
+    channel_mode=member(text,'cobraChannelAspect')
+    channel_mode=once(channel_mode,
+      '    int mode=mPrefs.getInt(COBRA_ASPECT_MODE,0);return mode>=0&&mode<=11?mode:0;',
+      '    int mode=mPrefs.getInt(COBRA_ASPECT_MODE,0);return mode>=0&&mode<=CobraFoldAspectPolicy.MODE?mode:0;',
+      'Fold Adaptive global preference persistence')
+    text=replace_member(text,'cobraChannelAspect',channel_mode)
+
+    defaults=member(text,'cobraShowPlaybackDefaults')
+    defaults=once(defaults,
+      '      for(int i=0;i<11;i++){final int value=i;cobraAddDetail(choices,"aspect",cobraAspectLabel(i),null,"cobra-default-aspect:"+i,mPrefs.getInt(COBRA_ASPECT_MODE,0)==i,()->{mPrefs.edit().putInt(COBRA_ASPECT_MODE,value).apply();for(CobraPlayerBinding b:mCobraPlayerBindings.values())cobraFitBinding(b);if(mPlaying!=null){mAspectMode=cobraChannelAspect(mPlaying);applyCobraAspectTransform();}cobraShowPlaybackDefaults();});}',
+      '''      final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10};
+      for(int value:modes){final int selected=value;cobraAddDetail(choices,"aspect",cobraAspectLabel(selected),null,"cobra-default-aspect:"+selected,mPrefs.getInt(COBRA_ASPECT_MODE,0)==selected,()->{mPrefs.edit().putInt(COBRA_ASPECT_MODE,selected).apply();for(CobraPlayerBinding b:mCobraPlayerBindings.values())cobraFitBinding(b);if(mPlaying!=null){mAspectMode=cobraChannelAspect(mPlaying);applyCobraAspectTransform();}cobraShowPlaybackDefaults();});}''',
+      'Fold Adaptive first in global defaults')
+    text=replace_member(text,'cobraShowPlaybackDefaults',defaults)
+
     sheet=member(text,'cobraOpenSheet')
     sheet=once(sheet,
       '    final boolean playerSettings="player-settings".equals(kind);\n    FrameLayout.LayoutParams pos=new FrameLayout.LayoutParams(Math.min(width-dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.12",24)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.13",440))),-2,\n        playerSettings?Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL:(isPortrait()?Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL:Gravity.RIGHT|Gravity.CENTER_VERTICAL));',
@@ -311,6 +336,7 @@ def apply(source,receipt_path,out):
 
     required=[
       'showCobraPlayerOptionsHub','showCobraVideoOptions','RECENT CHANNELS','TV Guide','Video & display','Picture in Picture',
+      'value<=CobraFoldAspectPolicy.MODE','mode<=CobraFoldAspectPolicy.MODE','final int[] modes={CobraFoldAspectPolicy.MODE,0,1,2,3,4,5,6,7,8,9,10}',
       'cobra-player-hub-channels','cobra-player-hub-video','cobra-video-options-aspect','cobra-player-options-anchor',
       'CobraMotionSpec','cobraAnimateChildrenIn','cobraPolishFocusable','cobraAnimatePanelIn',
       'Fold Adaptive','cobra_tv_sources','timeshift_provider_pace_limited','REWRITE_ENABLED=false',
@@ -323,6 +349,7 @@ def apply(source,receipt_path,out):
     report={
       'base_build':BASE_BUILD,'base_commit':BASE_COMMIT,'files':{str(ACT):{'before':sha(before_b),'after':sha(after)}},
       'tivimate_inspired_player_hub':True,'recent_channel_strip':True,'video_display_submenu':True,
+      'fold_adaptive_preference_persistence_fixed':True,'fold_adaptive_global_default_first':True,
       'expanded_player_toolbar':True,'motion_polish':True,'settings_stagger':True,'sources_stagger':True,'guide_transition_polish':True,
       'fold_adaptive_preserved':True,'source_manager_route_preserved':True,
       'playback_behavior_changed':False,'network_selection_changed':False,'timeshift_ownership_changed':False,
