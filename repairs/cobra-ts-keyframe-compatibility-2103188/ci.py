@@ -22,7 +22,7 @@ def upgrade():
     receipt=Path('engine/background-resume-source.json'); data=json.loads(receipt.read_text())
     require(data.get('version_code')==2103187 and data.get('version_name')==OLD,'Expected exact passed 2103187 source receipt')
     for rel,row in data.get('files',{}).items():
-        require(sha(Path('kodi')/rel)==row['after'],'2103186 source drift: '+rel)
+        require(sha(Path('kodi')/rel)==row['after'],'2103187 source drift: '+rel)
     run('python3',ROOT/'apply.py','--source','kodi','--receipt',receipt,'--out','audit188/patch')
     patch=json.loads(Path('audit188/patch/patch.json').read_text()); data['files'][ACT]['after']=patch['files'][ACT]['after']
 
@@ -54,7 +54,7 @@ def upgrade():
 def verify():
     base=Path('baseline187/Infinity-'+OLD+'.apk'); final=Path('signed188/Infinity-'+NEW+'.apk')
     require(base.is_file() and final.is_file(),'APK missing')
-    bv=json.loads(Path('baseline187/2103188-verification.json').read_text())
+    bv=json.loads(Path('baseline187/2103187-verification.json').read_text())
     require(bv['apk_sha256']==sha(base),'Wrong exact passed 2103187 APK')
     audit=json.loads(Path('signed188/background-resume-apk-audit.json').read_text())
     require(audit['version_code']==VERSION and audit['version_name']==NEW,'2103188 identity mismatch')
@@ -74,7 +74,7 @@ def verify():
           b'timeshift_provider_max_gap_ms',b'timeshift_proxy_max_gap_ms',b'rebuffer_buffer_ahead_last_ms',
           b'last_live_before_navigation',b'CobraHappyEyeballs',b'IPv4 only',b'IPv6 only',
           b'cobra_unified_live_timeline',b'CobraCallAudioPolicy'):
-            require(token in dex,'2103187 contract missing: '+repr(token))
+            require(token in dex,'2103188 contract missing: '+repr(token))
         require(b'Cobra2103187TsAccessUnitCompatibilityTest' not in dex and b'Cobra2103188TsKeyframeCompatibilityTest' not in dex,'Test code packaged')
 
     badging=Path('signed188/badging.txt').read_text()
