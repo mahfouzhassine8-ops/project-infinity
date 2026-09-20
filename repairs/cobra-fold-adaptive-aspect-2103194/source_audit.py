@@ -39,7 +39,7 @@ def main():
  'conservative_crop':'MAX_CROP=1.06f' in policy and 'mismatch<=1.18f' in policy,
  'extreme_windows_fit':'boolean roomy=Math.min(viewportWidth,viewportHeight)>=600' in policy,
  'fit_dispatch':'mode==CobraFoldAspectPolicy.MODE' in fit and 'CobraLayoutMath.fit' in fit,
- 'layout_reactivity':'mPlayerTexture.addOnLayoutChangeListener' in t and 'cobraFitBinding(binding)' in t,
+ 'layout_reactivity':'texture.addOnLayoutChangeListener(binding.layoutListener)' in t and 'cobraFitBinding(binding)' in t,
  'pip_preserved':'mInPictureInPicture?0:mAspectMode' in t,
  'source_manager_preserved':'cobra_tv_sources' in t and 'TV SOURCES' in t,
  'pace_guard_preserved':'timeshift_provider_pace_limited' in t and 'REWRITE_ENABLED=false' in t,
