@@ -82,6 +82,12 @@ public class Cobra2103199UiRepairTest {
     }
   }
 
+  // Robolectric's default TextUtils shadow treats available pixels as a character
+  // count. This method-local replacement calls through to Android's real text
+  // measurement/ellipsis implementation without changing the production helper.
+  @Implements(android.text.TextUtils.class)
+  public static class ActualTextUtils {}
+
   @Before public void before()throws Exception{
     CobraVisualRenderer.loading.set(true);CobraVisualRenderer.active=CobraVisualTheme.builtin();CobraVisualRenderer.clients.clear();
     ui=new CobraNavigationUiTest();ui.clock();a=ui.fixture(24);
@@ -206,7 +212,8 @@ public class Cobra2103199UiRepairTest {
     assertFalse(disabled.isFocusable());assertFalse(disabled.isFocusableInTouchMode());
   }
 
-  @Test public void guideRulerKeepsReadableTimesWithinTheirActualLargeFontSlots()throws Exception{
+  @Test @Config(shadows=ActualTextUtils.class)
+  public void guideRulerKeepsReadableTimesWithinTheirActualLargeFontSlots()throws Exception{
     java.util.Calendar clock=java.util.Calendar.getInstance();clock.clear();clock.set(2026,java.util.Calendar.SEPTEMBER,20,10,0);
     long start=clock.getTimeInMillis();
     for(int[] fixture:new int[][]{{320,720,150},{960,540,100}}){
