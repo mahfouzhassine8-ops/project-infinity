@@ -49,7 +49,7 @@ def main():
  'no_top_level_duplication':all(menu.count(v)==1 for v in ['Channel playback','Health Center','Audio & subtitles','Aspect / Display','Cast / Route','Manage sources','Close player']),
  'health_defaults_preserved':'Playback defaults' in health and 'cobraShowPlaybackDefaults()' in health,
  'original_menu_only':all(v not in t for v in ['showCobraPlayerOptionsHub','RECENT CHANNELS','cobra-player-hub-','expandedTools']),
- 'original_toolbar':'String[] glyphs={"guide","aspect","multi","more"},labels={"Channels","Display","Multi-View","More"};' in chrome and 'expandedTools' not in chrome and '"Options"' not in chrome,
+ 'original_toolbar':'LinearLayout tools=new LinearLayout(this);String[] glyphs={"guide","aspect","multi","more"},labels={"Channels","Display","Multi-View","More"};' in chrome and 'expandedTools' not in chrome and '"Options"' not in chrome,
  'layout_reactivity':'texture.addOnLayoutChangeListener(binding.layoutListener)' in t and 'cobraFitBinding(binding)' in t,
  'pip_preserved':'mInPictureInPicture?0:mAspectMode' in t,
  'source_manager_preserved':'cobra_tv_sources' in t and 'TV SOURCES' in t,
