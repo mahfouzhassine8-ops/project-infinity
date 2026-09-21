@@ -16,7 +16,7 @@ GRADLE = 'tools/android/packaging/xbmc/build.gradle.in'
 ACTIVITY = SOURCE_ROOT + 'InfinityLiveActivity.java.in'
 ALLOWED_JAVA = {SOURCE_ROOT + name + '.java.in' for name in (
     'InfinityLiveActivity', 'CobraPresentationEffects', 'CobraQuickPeekSession',
-    'CobraEmblem', 'InfinityExtendedBackgroundService')}
+    'CobraEmblem', 'InfinityExtendedBackgroundService', 'Splash')}
 
 # The existing resource table is immutable. These named PNG payloads alone may
 # change for the explicitly approved unified icon. Slots are verified against

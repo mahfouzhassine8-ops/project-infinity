@@ -628,3 +628,37 @@
    }
    private void cobraEditGreeting(){
      EditText input=new EditText(this);input.setText(mPrefs.getString(CobraPresentationEffects.GREETING,""));
+--- a/tools/android/packaging/xbmc/src/Splash.java.in
++++ b/tools/android/packaging/xbmc/src/Splash.java.in
+@@ -1178,10 +1178,13 @@
+     private final boolean cobra;
+     private final int color;
+     private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+-    ExperienceMark(boolean isCobra, int ink) { super(Splash.this); cobra = isCobra; color = ink; setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO); }
++    private final android.graphics.RectF cobraBounds = new android.graphics.RectF();
++    ExperienceMark(boolean isCobra, int ink) { super(Splash.this); cobra = isCobra; color = ink; if(cobra)CobraEmblem.prepare(getContext()); setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO); }
+     @Override protected void onDraw(android.graphics.Canvas canvas)
+     {
+-      if(vtheme().draw(canvas,cobra?"chooser.mark.cobra":"chooser.mark.infinity",0,0,getWidth(),getHeight(),"contain"))return;
++      // Cobra identity is the approved shared artwork; Infinity's theme slot is unchanged.
++      if(cobra){cobraBounds.set(0,0,getWidth(),getHeight());CobraEmblem.draw(canvas,cobraBounds,android.graphics.Color.WHITE,255);return;}
++      if(vtheme().draw(canvas,"chooser.mark.infinity",0,0,getWidth(),getHeight(),"contain"))return;
+       int w = getWidth(), h = getHeight(); float cx = w / 2f, cy = h / 2f;
+       paint.setStyle(android.graphics.Paint.Style.STROKE); paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+       paint.setStrokeJoin(android.graphics.Paint.Join.ROUND); paint.setStrokeWidth(Math.max(2, Math.min(w, h) * .065f)); paint.setColor(color);
+@@ -1194,15 +1197,6 @@
+         path.cubicTo(cx - rx, cy + ry, cx - rx * .45f, cy + ry, cx, cy);
+         path.cubicTo(cx + rx * .45f, cy - ry, cx + rx, cy - ry, cx + rx, cy);
+         path.cubicTo(cx + rx, cy + ry, cx + rx * .45f, cy + ry, cx, cy);
+-      }
+-      else
+-      {
+-        path.moveTo(cx + w * .16f, cy - h * .30f);
+-        path.cubicTo(cx - w * .03f, cy - h * .38f, cx - w * .20f, cy - h * .18f, cx - w * .12f, cy - h * .02f);
+-        path.cubicTo(cx - w * .03f, cy + h * .15f, cx + w * .20f, cy + h * .04f, cx + w * .09f, cy - h * .06f);
+-        path.cubicTo(cx - w * .04f, cy - h * .15f, cx - w * .27f, cy + h * .06f, cx - w * .14f, cy + h * .24f);
+-        path.cubicTo(cx - w * .02f, cy + h * .40f, cx + w * .18f, cy + h * .30f, cx + w * .20f, cy + h * .16f);
+-        canvas.drawCircle(cx + w * .11f, cy - h * .21f, Math.max(1, w * .012f), paint);
+       }
+       canvas.drawPath(path, paint);
+     }

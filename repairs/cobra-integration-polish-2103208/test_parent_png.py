@@ -66,6 +66,19 @@ class ParentPngTimestampTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'inventory'):
             canonical.prove_timestamp_only(PATH, candidate, png())
 
+    def test_unknown_ancillary_chunk_insert_rejected(self):
+        value = png()
+        candidate = value[:-12] + chunk(b'zzZz', b'new ancillary payload') + value[-12:]
+        with self.assertRaisesRegex(RuntimeError, 'inventory'):
+            canonical.prove_timestamp_only(PATH, candidate, value)
+
+    def test_unknown_ancillary_chunk_change_rejected(self):
+        value = png()
+        old = value[:-12] + chunk(b'zzZz', b'old') + value[-12:]
+        new = value[:-12] + chunk(b'zzZz', b'new') + value[-12:]
+        with self.assertRaisesRegex(RuntimeError, 'non-timestamp'):
+            canonical.prove_timestamp_only(PATH, new, old)
+
     def setup_tree(self, folder, other=b'approved Java'):
         source = folder / 'source'
         (source / 'media').mkdir(parents=True)

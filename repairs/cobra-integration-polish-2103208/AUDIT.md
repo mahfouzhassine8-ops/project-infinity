@@ -8,7 +8,7 @@ This is a successor test candidate, not a replacement lock or a claim of physica
 
 The approved unified red-eyed Cobra–Infinity artwork, restrained drawer/settings branding, existing visual-choice dropdown, truthful file-picker Ask behavior, compact anchored Quick Peek, and state/status wording corrections. Existing player, provider, native, timeshift, PiP/background, theme runtime, phone-audio and welcome contracts remain protected. The source inventory and `features.patch` identify the exact implementation; this document does not claim a feature is finished merely because it has UI.
 
-The one explicitly superseded theme slot is `drawer.badge`: the user requested the exact approved shared brand rather than inconsistent theme-specific marks. Installed themes remain active and retain their other image, palette, scene and geometry slots. The inherited custom-badge case now checks that cyan/red branding renders while that custom theme remains selected; the original custom-badge assertion still ran first on 207.
+The two explicitly superseded theme slots are `drawer.badge` and `chooser.mark.cobra`: the user requested the exact approved shared brand rather than inconsistent theme-specific marks. Installed themes remain active and retain their other image, palette, scene and geometry slots, including `chooser.mark.infinity`. The inherited custom-badge case now checks that cyan/red branding renders while that custom theme remains selected; the original custom-badge assertion still ran first on 207. The experience chooser's Infinity curve and all launch/recovery behavior are unchanged.
 
 ## Preservation gates
 
@@ -17,6 +17,7 @@ The one explicitly superseded theme slot is `drawer.badge`: the user requested t
 - Original package, launcher count, manifest capabilities, JNI declarations and permanent certificate checks remain enforced.
 - The generated recipe hashes guard source patches, icon payloads, tests and workflow. No locked recipe or original source branch is overwritten.
 - Every inherited case identity is rerun. Explicit generated-fixture supersessions name the user-requested healthy-mark/brand-color expectation changes; original parent assertions ran first. No skipped or failing cases may publish a candidate.
+- Replayed legacy PNGs may contain build-time metadata. For only 35 explicit legacy source paths, the recipe validates PNG signatures/CRCs and proves every non-timestamp chunk is byte-identical before restoring the exact member bytes from the SHA-pinned locked source archive. Every source and receipt entry is validated before any restoration; the full 226-file parent and 49-member checks then run unchanged. Pixel, encoded image, unknown metadata, non-allowlisted path, and source changes fail closed.
 
 Local syntax, patch application and negative guard tests are not Android or device results. Controlled Robolectric/native rendering is not a phone screenshot, live provider playback, actual call audibility, or hardware dual decoding.
 

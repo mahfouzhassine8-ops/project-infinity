@@ -334,15 +334,19 @@
     "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in": {
       "before": "73b8d475cf754f83d4c4b047199b1d7cb1357c902455879683cd0cc1de71f51a",
       "after": "d0fe1e070fc2c9c1a7ff587c15c39f903a89b0ee2d2dc642db85d4408f380459"
+    },
+    "tools/android/packaging/xbmc/src/Splash.java.in": {
+      "before": "6e87d5a64caa40abe48b81fd7463e1af23c81ddfc87150c047492204629691bd",
+      "after": "89d10b3eab529cb3faa3a810acf66cb2f30d3e6b1a03757deb40473b1131b121"
     }
   },
   "recipe_hashes": {
     "test_guards.py": "4d039ee442b3a1cf09e1ff48311c40c0bb8a557f6fb902a12db6fc442207e0ad",
     "ci.py": "2b4b2a6adc3cae46774e07d141883f6a64a1784755b1a70f68400df91cc6e756",
-    "contract.py": "782c8ff72dfcdcd4c00e4f7049a294c4e38504739e64dcbeaced111fc40cc59f",
-    "AUDIT.md": "a524d467459f2cf10599cdb8103d3597c673852b672f457a0eac203876603c9e",
-    "test_parent_png.py": "a323978befdf1e4c6f780a0f8dfbf31a2d78e9686a189142f1c2bc3591b4c124",
-    "features.patch": "8560fa0fbbb5e55de9af69ce545626ad705007ab28b39cd01cd1d57f97d745b4",
+    "contract.py": "b0dfd976efb2d40c49dc36a7ff69a38015c63a45cabac080de422bc0782ff029",
+    "AUDIT.md": "c394267c27ed062064c4dfc1512afcc1f6bc6c10e88454e7219bda4f73c0c519",
+    "test_parent_png.py": "ba752026717288944c2700d97a3f68f84b944b3c291548a1c16ea00e4b8284d9",
+    "features.patch": "9933bfa47a357d6cc7f36f97b6985b718cf9975df4a89072f5918afc9a1843ee",
     "DEVICE-TEST.md": "b26c28569db979e1e1031082317dd8bad057c04c5e996de40df316af5d0d31f5",
     "asset-payloads.json": "3ec474582ae71c25be7a13e479faa53ea081e9cbe9db4381d11c37268af44170",
     "approved-resources.json": "63c5d7e1259374aafc241b9ee55865e087ef00106d38c7e2c7afeadf69aa5cf7",
@@ -353,7 +357,7 @@
     "adapt_tests.py": "112da584e94ac18f584b3a0d3170e30be0d5e9080f08fc10b80a852a5cc621e0",
     "local_checks.py": "d97748de4e12ec013205a0b6eaf6f2b6f87cf527f0ba102fbf3d75480f723fd6",
     "protected-members.json": "3d41dbcbea4315c004b7dbbbbc166d1386919e599dd806a9e177f38b0089caaa",
-    "new-cases.json": "a8c2e56f898a18aac69f1514f74c7b4e2209092cb68d26af916f8d9eaf134d44",
+    "new-cases.json": "c7b3a3a7cc22f9d65e0198c3455c2de0f5d6583dddd65478df6e73b2d718b927",
     "parts/presentation-ui-real-effects-followup.patch": "17cc0021c29ea70f9021fc3271f05eb3cdef972906f87f15a0b169f8c4666d87",
     "parts/presentation-ui-artwork-fixture.patch": "04268c9aec7f142df7af0bb0262170cf1d17302b3e83a7e5c31ba5e2e2a3db69",
     "tests/Cobra2103208PresentationUiTest.java": "937aad668b07c472744aa74923cbd05d051528f5b4135294a08dbdedef51111b",
@@ -361,6 +365,7 @@
     "tests/Cobra2103208PlaybackPresentationTest.java": "d9ac980908dcbdecaa65cac42e03fb6f3853fec6ebb71ed25d68dc6abe6b7f37",
     "tests/Cobra2103208StateOwnershipReviewTest.java": "b2b5bc95bad0a84a32af3d2bb2128270818c1b93277b85582e8e5b0c668355d7",
     "tests/Cobra2103208PickerTest.java": "44c8dac997a760a49d254bafee9f8f24c542bb4a93414d6d12fd1a0de565ba00",
+    "tests/Cobra2103208ChooserBrandingTest.java": "601f504d7ad37a5abd2cdca95753ef4c73cee84d063d17e364266f093dfebd5e",
     "tests/Cobra2103208RewindWarmupPresentationTest.java": "38b365e402dc74c81e5856c2b51683f73efa46dc4270a7af3d6f296a36b395fc",
     "tests/Cobra2103208QuickPeekLayoutTest.java": "93c7ef17293b03c38bbdf48ad98747f2abe19206c4c34dffadb8ec5721bc2769"
   }
