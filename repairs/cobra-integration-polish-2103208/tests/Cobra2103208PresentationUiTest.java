@@ -55,12 +55,12 @@ public class Cobra2103208PresentationUiTest {
   void measure(int w,int h)throws Exception{f.ui.measure(a,w,h);f.ui.frames(20);}
   void capture(String name,int w,int h)throws Exception{Cobra2103201MenuPolishTest.capture(a,f.ui,name,w,h);}
   void captureViewport(String name,int w,int h)throws Exception{
-    // RuntimeEnvironment qualifier changes do not recreate this already-running Robolectric Activity.
-    // The behavioral assertions above use the requested safe window; evidence should capture that
-    // same viewport rather than advancing the stale 412dp test window and mistaking it for product drift.
-    f.ui.measure(a,w,h);View view=root();assertTrue(view.getWidth()>=w&&view.getHeight()>=h);
+    // Qualifier changes do not recreate this existing Robolectric Activity. Capture the exact
+    // behavioral viewport by laying out the decor directly, without advancing another stale frame.
+    View view=root();for(int i=0;i<2;i++){view.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));view.layout(0,0,w,h);}
+    assertEquals(w,view.getWidth());assertEquals(h,view.getHeight());
     java.io.File dir=new java.io.File(System.getProperty("cobra.evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());
-    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);android.graphics.Canvas canvas=new android.graphics.Canvas(image);canvas.clipRect(0,0,w,h);view.draw(canvas);
+    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);android.graphics.Canvas canvas=new android.graphics.Canvas(image);view.draw(canvas);
     try(java.io.FileOutputStream out=new java.io.FileOutputStream(new java.io.File(dir,name+".png"))){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,out));}image.recycle();
   }
   TextView text(View root,String value){
@@ -101,7 +101,7 @@ public class Cobra2103208PresentationUiTest {
   @SuppressWarnings("unchecked") TransportSpy preview()throws Exception{
     TransportSpy spy=new TransportSpy();Object ch=f.channel(0);Object binding=CobraNavigationUiTest.construct("CobraPlayerBinding",a,spy.player,ch);
     ((Map<ExoPlayer,Object>)get("mCobraPlayerBindings")).put(spy.player,binding);put("mCobraPreviewPlayer",spy.player);
-    call("cobraAttachVideo",spy.player,(TextureView)get("mCobraPreviewTexture"));spy.writes.clear();return spy;
+    call("cobraAttachVideo",spy.player,(TextureView)get("mCobraPreviewTexture"));f.ui.frames(2);spy.writes.clear();return spy;
   }
 
   @Test public void visualMenuReplacesOnlyToolbarTransportAndLeavesPreviewPauseReachable()throws Exception{
