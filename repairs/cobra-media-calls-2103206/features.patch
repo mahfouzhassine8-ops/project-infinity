@@ -167,7 +167,7 @@
 +  private String mCobraManualCallAttempt="none";
 +
 +  private boolean cobraCallResumeAvailable(ExoPlayer player){
-+    return player!=null&&player==mCobraAudioFocusPlayer&&cobraPlayerAudioSelected(player)&&mCobraAudioFocusMuted&&cobraManualCallResumeEnabled()&&CobraCallAudioPolicy.activeCallMode(cobraAudioMode());
++    return player!=null&&player==mCobraAudioFocusPlayer&&cobraPlayerAudioSelected(player)&&mCobraAudioFocusMuted&&!mCobraManualCallResume&&cobraManualCallResumeEnabled()&&CobraCallAudioPolicy.activeCallMode(cobraAudioMode());
 +  }
 +  private void cobraRefreshCallControls(){
 +    updateCobraPlayerPlayPause();updateCobraPreviewPlayPause();cobraRefreshModeDetails();cobraUpdatePipMediaSession();cobraPublishMiniState();

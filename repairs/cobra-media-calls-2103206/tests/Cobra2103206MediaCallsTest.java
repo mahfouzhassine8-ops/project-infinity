@@ -78,7 +78,7 @@ public class Cobra2103206MediaCallsTest {
     assertEquals(0f,s.volume,0f);assertEquals("delayed",get(a,"mCobraManualCallAttempt"));listener().onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN);assertEquals(1f,s.volume,0f);unchanged(s);
   }
   @Test public void pauseBeforeDelayedGrantDoesNotResumePlayer()throws Exception{
-    manual();Cobra2103202LifecycleTest.State s=playing();interrupt();audio.setNextFocusRequestResponse(AudioManager.AUDIOFOCUS_REQUEST_DELAYED);call("cobraUserPlay",s.player);s.player.pause();
+    manual();Cobra2103202LifecycleTest.State s=playing();interrupt();audio.setNextFocusRequestResponse(AudioManager.AUDIOFOCUS_REQUEST_DELAYED);call("cobraUserPlay",s.player);Object r=request();call("toggleCobraPlayerPlayPause");assertFalse(s.requested);assertSame(r,request());
     listener().onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN);mode(AudioManager.MODE_NORMAL);assertFalse(s.requested);unchanged(s);
   }
   @Test public void automaticRecoveryAndHandoffCannotRenewFocusDuringCall()throws Exception{
@@ -154,6 +154,21 @@ public class Cobra2103206MediaCallsTest {
   }
   @Test public void repeatedCallCyclesKeepOnePlayerAndRevokeManualIntentEveryTime()throws Exception{
     manual();Cobra2103202LifecycleTest.State s=playing();for(int i=0;i<8;i++){interrupt();assertEquals(0f,s.volume,0f);call("cobraUserPlay",s.player);assertEquals(1f,s.volume,0f);mode(AudioManager.MODE_NORMAL);unchanged(s);}
+  }
+  @Test public void rewoundPositionCannotBeResetByCallPlayPauseOrCallEnd()throws Exception{
+    manual();final long[] position={42000L};final int[] transportMutations={0};
+    Cobra2103202LifecycleTest.State s=f.new State(){
+      @Override public Object invoke(Object p,java.lang.reflect.Method m,Object[] values){
+        String n=m.getName();if(n.equals("getCurrentPosition")||n.equals("getContentPosition"))return position[0];
+        if(n.startsWith("seek")||n.equals("setMediaItem")||n.equals("setMediaSource")||n.equals("stop")){transportMutations[0]++;position[0]=0;}
+        return super.invoke(p,m,values);
+      }
+    };
+    f.states.add(s);put(a,"mPlayer",s.player);put(a,"mPlaying",f.channels.get(0));call("openPlayerOverlay",f.channels.get(0));
+    f.bind(s,f.channels.get(0),(android.view.TextureView)get(a,"mPlayerTexture"));put(a,"mCobraTimeshiftPlayer",s.player);call("cobraUserPlay",s.player);
+    interrupt();call("toggleCobraPlayerPlayPause");call("toggleCobraPlayerPlayPause");assertFalse(s.requested);
+    mode(AudioManager.MODE_NORMAL);listener().onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN);
+    assertEquals(42000L,s.player.getCurrentPosition());assertEquals(0,transportMutations[0]);assertFalse(s.requested);assertSame(s.player,get(a,"mCobraTimeshiftPlayer"));unchanged(s);
   }
   @Test @Config(sdk=25) @GraphicsMode(GraphicsMode.Mode.LEGACY)
   public void legacyFocusPathStillHonorsOptInWithoutApi31Listener()throws Exception{
