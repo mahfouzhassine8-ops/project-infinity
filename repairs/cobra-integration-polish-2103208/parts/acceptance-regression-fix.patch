@@ -1,5 +1,14 @@
 --- a/tools/android/packaging/xbmc/src/CobraEmblem.java.in
 +++ b/tools/android/packaging/xbmc/src/CobraEmblem.java.in
+@@ -25,7 +25,7 @@
+   }
+ 
+   private static final class Drawing {
+-    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
++    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+     final RectF destination = new RectF();
+   }
+ 
 @@ -74,9 +74,11 @@
          || bounds.height() <= 0 || alpha <= 0) return;
      Drawing drawing = DRAWING.get();
@@ -35,13 +44,14 @@
      panel.setBackground(cobraPanelSurface(dark?("oled".equals(cobraEffectiveAppearanceMode())?vtheme().color("cobra.cobraOpenSheet.colors.2",0xfc000000):vtheme().color("cobra.cobraOpenSheet.colors.3",0xf7080b11)):cobraAlpha(cobraThemeColor("panel",mTheme.panel),250),22,
          dark?vtheme().color("cobra.cobraOpenSheet.colors.4",0xff344359):cobraThemeColor("line",mTheme.line)));panel.setElevation(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.5",14)));
      LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);
-@@ -10750,16 +10752,22 @@
+@@ -10750,16 +10752,23 @@
          "cobra-ambient:"+key,i==selected,()->{mPrefs.edit().putString(CobraPresentationEffects.AMBIENT,key).apply();mCobraAmbientContext="@refresh";
            cobraRefreshAmbient();cobraApplyAppearanceSettings();});}
    }
 +  private void cobraRestoreVisualTextureTransform(TextureView texture,android.graphics.Matrix transform,int width,int height){
 +    if(texture==null||transform==null)return;
-+    texture.post(()->{if(texture.isAttachedToWindow()&&texture.getWidth()==width&&texture.getHeight()==height)texture.setTransform(transform);});
++    texture.setTransform(new android.graphics.Matrix(transform));
++    texture.post(()->texture.setTransform(new android.graphics.Matrix(transform)));
 +  }
    private void cobraShowVisualMenu(View anchor){
      LinearLayout rows;mCobraNextSheetAnchor=anchor;

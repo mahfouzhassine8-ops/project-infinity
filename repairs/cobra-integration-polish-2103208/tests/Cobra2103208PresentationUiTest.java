@@ -54,6 +54,15 @@ public class Cobra2103208PresentationUiTest {
   View tag(String n){return root().findViewWithTag(n);}
   void measure(int w,int h)throws Exception{f.ui.measure(a,w,h);f.ui.frames(20);}
   void capture(String name,int w,int h)throws Exception{Cobra2103201MenuPolishTest.capture(a,f.ui,name,w,h);}
+  void captureViewport(String name,int w,int h)throws Exception{
+    // RuntimeEnvironment qualifier changes do not recreate this already-running Robolectric Activity.
+    // The behavioral assertions above use the requested safe window; evidence should capture that
+    // same viewport rather than advancing the stale 412dp test window and mistaking it for product drift.
+    f.ui.measure(a,w,h);View view=root();assertTrue(view.getWidth()>=w&&view.getHeight()>=h);
+    java.io.File dir=new java.io.File(System.getProperty("cobra.evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());
+    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);android.graphics.Canvas canvas=new android.graphics.Canvas(image);canvas.clipRect(0,0,w,h);view.draw(canvas);
+    try(java.io.FileOutputStream out=new java.io.FileOutputStream(new java.io.File(dir,name+".png"))){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,out));}image.recycle();
+  }
   TextView text(View root,String value){
     if(root instanceof TextView&&value.contentEquals(((TextView)root).getText()))return (TextView)root;
     if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){TextView found=text(((ViewGroup)root).getChildAt(i),value);if(found!=null)return found;}
@@ -226,7 +235,7 @@ public class Cobra2103208PresentationUiTest {
       call("closeCobraExperienceDrawer");RuntimeEnvironment.setQualifiers("w"+size[0]+"dp-h"+size[1]+"dp-"+(size[0]>size[1]?"land":"port")+"-mdpi");measure(size[0],size[1]);
       call("toggleCobraDrawer");measure(size[0],size[1]);
       for(String name:new String[]{"cobra_drawer_brand","cobra_drawer_power"}){View v=tag(name);assertNotNull(name,v);Rect visible=new Rect();assertTrue(name,v.getGlobalVisibleRect(visible));assertTrue(name,visible.left>=0&&visible.top>=0&&visible.right<=size[0]&&visible.bottom<=size[1]);assertTrue(name,visible.height()>=v.getHeight()-1);}
-      capture("cobra208-drawer-fit-"+size[0]+"x"+size[1],size[0],size[1]);
+      captureViewport("cobra208-drawer-fit-"+size[0]+"x"+size[1],size[0],size[1]);
     }
   }
 }
