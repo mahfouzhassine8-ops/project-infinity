@@ -31,9 +31,10 @@ public class Cobra2103202ViewportTimelineTest {
     for(String mode:new String[]{"light","dark","oled","system"}){f.prefs.edit().putString("cobra_appearance_mode",mode).commit();call("cobraBuildPlayerChrome");f.settle();f.state.position=30000;call("cobraUpdateTimeshiftSeek");ProgressBar bar=line();bar.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(8,View.MeasureSpec.EXACTLY));bar.layout(0,0,400,8);Bitmap b=Bitmap.createBitmap(400,8,Bitmap.Config.ARGB_8888);bar.draw(new Canvas(b));assertNotEquals(mode,b.getPixel(50,4),b.getPixel(300,4));b.recycle();}
   }
   @Test public void openSheetRecomputesHeightAfterWindowResize()throws Exception{
-    f.ui.measure(a,1500,436);call("cobraShowChannelPreferences",get(a,"mPlaying"));f.ui.measure(a,1500,436);View panel=a.getWindow().getDecorView().findViewWithTag("cobra_sheet_panel");int shortHeight=panel.getHeight();assertTrue(shortHeight<=436);
+    RuntimeEnvironment.setQualifiers("w1500dp-h436dp-land-mdpi");
+    f.ui.measure(a,1500,436);call("cobraShowChannelPreferences",get(a,"mPlaying"));f.ui.measure(a,1500,436);View panel=a.getWindow().getDecorView().findViewWithTag("cobra_sheet_panel");int shortHeight=panel.getHeight();assertTrue(shortHeight<=436);assertTrue(panel.getTop()>=0);assertTrue(panel.getBottom()<=436);
     Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-split-1500x436",1500,436);
-    f.ui.measure(a,412,915);f.ui.frames(20);f.ui.measure(a,412,915);assertTrue("Open sheet must gain space after leaving short split-screen",panel.getHeight()>shortHeight);assertTrue(panel.getHeight()<=915);
+    RuntimeEnvironment.setQualifiers("w412dp-h915dp-port-mdpi");f.ui.measure(a,412,915);f.ui.frames(20);f.ui.measure(a,412,915);assertTrue("Open sheet must gain space after leaving short split-screen",panel.getHeight()>shortHeight);assertTrue(panel.getHeight()<=915);assertTrue(panel.getTop()>=0);assertTrue(panel.getBottom()<=915);
     Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-resized-412x915",412,915);
   }
   @Test public void foldAdaptiveUsesActualSplitWindowWithoutCroppingOrRetuning()throws Exception{

@@ -70,6 +70,10 @@ public class Cobra2103202ControlsTest {
   @Test public void filePickerPolicyIconsPersistAllThreeChoices()throws Exception{
     for(String value:new String[]{"system","apps","ask"}){call("showCobraFilePickerPicker");layout();View row=tag("cobra-file-picker:"+value);assertNotNull(row);touchIcon(row,false);assertEquals(value,prefs.getString("cobra_file_picker_mode",""));}
   }
+  @Test public void pipGlyphRendersAWindowInsteadOfTheUnknownIconFallback()throws Exception{
+    View pip=(View)CobraNavigationUiTest.construct("CobraIconButton",a,"pip","Picture-in-picture",true),fallback=(View)CobraNavigationUiTest.construct("CobraIconButton",a,"unknown-test-icon","Unknown",true);
+    Bitmap first=Bitmap.createBitmap(48,48,Bitmap.Config.ARGB_8888),second=Bitmap.createBitmap(48,48,Bitmap.Config.ARGB_8888);pip.layout(0,0,48,48);fallback.layout(0,0,48,48);pip.draw(new Canvas(first));fallback.draw(new Canvas(second));assertFalse("PiP must not draw the generic channel-list fallback",first.sameAs(second));first.recycle();second.recycle();
+  }
   @Test public void systemPickerUsesDocumentContractAndReadPermission()throws Exception{
     prefs.edit().putString("cobra_file_picker_mode","system").commit();call("cobraOpenFilePicker",412,"*/*",new String[]{"video/*","audio/*"},true);
     Intent intent=Shadows.shadowOf(a).getNextStartedActivityForResult().intent;assertEquals(Intent.ACTION_OPEN_DOCUMENT,intent.getAction());assertTrue(intent.hasCategory(Intent.CATEGORY_OPENABLE));assertTrue((intent.getFlags()&Intent.FLAG_GRANT_READ_URI_PERMISSION)!=0);assertTrue((intent.getFlags()&Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)!=0);
