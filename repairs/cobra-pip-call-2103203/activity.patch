@@ -1,0 +1,278 @@
+--- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+@@ -362,6 +362,7 @@
+   }
+ 
+   @Override protected void onDestroy() {
++    cobraReleasePipMediaSession();
+     mCobraRotationResumed=false;cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"destroy");mCobraPlayerRotationButton=null;
+     if(!isChangingConfigurations())cobraEndMiniBackgroundPlayback();
+     // Terminal state must be visible before callbacks, views or decoder sessions are released.
+@@ -485,6 +486,7 @@
+     if(!inPictureInPictureMode)showPlayerChromeTemporarily();cobraLayoutPlayerPanels();
+     if(mDeviceBridge!=null)mDeviceBridge.onWindowChanged("picture-in-picture");
+     if(inPictureInPictureMode)mCobraPipReturnArmed=true;
++    cobraUpdatePipMediaSession();
+     mMain.post(()->{cobraRestoreMultiAfterPip();cobraConsumeLauncherPipReturn();cobraApplySystemBarsForSurface();});
+     cobraApplyDisplayPerformance("pip");cobraSyncPerformanceOverlay();
+ }
+@@ -2094,7 +2096,7 @@
+ 
+   private void toggleCobraPreviewPlayPause() {
+     if(mCobraPreviewPlayer==null){mCobraPreviewAutoplayAllowed=true;if(mGuidePreviewChannel!=null)startCobraPreview(mGuidePreviewChannel);return;}
+-    if(mCobraPreviewPlayer.getPlayWhenReady())mCobraPreviewPlayer.pause();else startCobraPlayer(mCobraPreviewPlayer);updateCobraPreviewPlayPause();
++    if(mCobraPreviewPlayer.getPlayWhenReady())mCobraPreviewPlayer.pause();else cobraUserPlay(mCobraPreviewPlayer);updateCobraPreviewPlayPause();
+   }
+ 
+ 
+@@ -3455,7 +3457,7 @@
+   private void toggleCobraPlayerPlayPause() {
+     if (mPlayer == null || mCobraPlayerLocked) return;
+     if (mPlayer.isPlaying() || mPlayer.getPlayWhenReady()) mPlayer.pause();
+-    else mPlayer.play();
++    else cobraUserPlay(mPlayer);
+     updateCobraPlayerPlayPause();
+     showPlayerChromeTemporarily();
+   }
+@@ -4417,7 +4419,7 @@
+ 
+   private void showTrackChooser() {
+     final ExoPlayer player=mPlayer;if(!cobraCurrentTrackPlayer(player)||mCobraPlayerLocked)return;
+-    LinearLayout rows=cobraOpenSheet("Audio & subtitles","Available tracks • this playback session","tracks");
++    LinearLayout rows=cobraOpenSheet("Audio & subtitles","Detected tracks • this playback session","tracks");
+     mCobraTrackSheetPlayer=player;mCobraTrackSheetRows=rows;cobraRefreshTrackChooser(player);
+   }
+ 
+@@ -4437,7 +4439,7 @@
+     View focused=rows.findFocus();Object focusedTag=focused==null?null:focused.getTag();
+     rows.removeAllViews();
+     boolean disabled=player.getTrackSelectionParameters().disabledTrackTypes.contains(C.TRACK_TYPE_TEXT);
+-    cobraTrackDetail(player,rows,"cc","Subtitles off",disabled?"Selected":"Turn off subtitles for this playback", "cobra-track-off",disabled,()->cobraSetCaptionsEnabled(player,false));
++    cobraTrackDetail(player,rows,"cc","Subtitles off",disabled?"Off is selected for this playback":"Turn off subtitles for this playback", "cobra-track-off",disabled,()->cobraSetCaptionsEnabled(player,false));
+     int audioCount=0,textCount=0,unsupportedText=0,groupIndex=0;
+     for(Tracks.Group group:player.getCurrentTracks().getGroups()) {
+       final int groupNumber=groupIndex++;
+@@ -4464,13 +4466,13 @@
+         if(audio)audioCount++;else textCount++;
+       }
+     }
+-    if(textCount==0)cobraInfoText(rows,unsupportedText>0?"Subtitle tracks are present but unsupported on this player.":"No subtitle tracks available in this stream.");
++    if(textCount==0)cobraInfoText(rows,unsupportedText>0?"Subtitle tracks are present but unsupported on this player.":"No subtitle tracks detected in this playback session.");
+     if(audioCount==0)cobraInfoText(rows,"No audio tracks available in this stream.");
+     CobraPlayerBinding binding=mCobraPlayerBindings.get(player);
+     if(binding!=null&&cobraLiveChannel(binding.channel)){
+       final Channel channel=binding.channel;CobraChannelPreferences prefs=binding.vitals.preferences;
+       cobraTrackDetail(player,rows,"audio","Preferred audio language",prefs.audio.isEmpty()?"Automatic / default":cobraLanguageLabel(prefs.audio)+" • when available","cobra-channel-audio",false,()->cobraShowChannelLanguage(channel,false));
+-      cobraTrackDetail(player,rows,"cc","Preferred subtitles",cobraSubtitlePreferenceLabel(prefs.subtitles),"cobra-channel-subtitles",false,()->cobraShowChannelLanguage(channel,true));
++      cobraTrackDetail(player,rows,"cc","Preferred subtitles","Saved preference: "+cobraSubtitlePreferenceLabel(prefs.subtitles),"cobra-channel-subtitles",false,()->cobraShowChannelLanguage(channel,true));
+     }
+     cobraTrackDetail(player,rows,"cc","Subtitle size",cobraSubtitleSizeLabel(),"cobra-subtitle-size",false,this::cobraShowSubtitleSize);
+     cobraTrackDetail(player,rows,"aspect","Subtitle screen adaptation",cobraSubtitleAdaptive()?"On • keep captions within the available screen":"Off • use stream placement","cobra-subtitle-adaptation",false,this::cobraShowSubtitleAdaptation);
+@@ -4692,6 +4694,7 @@
+ 
+ 
+   private void configureCobraPip(boolean autoEnter) {
++    cobraUpdatePipMediaSession();
+     if (Build.VERSION.SDK_INT < 26 || isFinishing()) return;
+     try {
+       PictureInPictureParams params = cobraPipParams(autoEnter && mMultiOverlay == null && cobraWantsFullscreenPip());
+@@ -4715,6 +4718,72 @@
+     catch(IllegalStateException|IllegalArgumentException|SecurityException error){pauseCobraForBackground();cobraRestoreAfterPipFailure();}
+   }
+ 
++  // Android renders the standard PiP transport from this session. It owns no
++  // decoder and never overlaps the existing background-audio MediaSession.
++  private android.media.session.MediaSession mCobraPipMediaSession;
++  private ExoPlayer mCobraPipMediaPlayer;
++  private long mCobraPipMediaGeneration=0L;
++  private String mCobraPipMediaProfile="",mCobraPipMediaError="";
++
++  private boolean cobraPipMediaAvailable(ExoPlayer player,CobraPlayerBinding binding,String profile){
++    if(Build.VERSION.SDK_INT<26||!isCobraAsyncAlive()||!isCobraInPictureInPicture()
++        ||mBackgroundStopped||mCobraPlaybackPolicy.dismissed||mCobraMiniBackgroundActive
++        ||mPlayerOverlay==null||mMultiOverlay!=null||player==null||player!=mPlayer
++        ||binding==null||!binding.current()||mCobraPlayerBindings.get(player)!=binding
++        ||mFeatures==null||!profile.equals(mFeatures.activeProfileId()))return false;
++    int state=player.getPlaybackState();return state!=Player.STATE_IDLE&&state!=Player.STATE_ENDED;
++  }
++
++  private void cobraReleasePipMediaSession(){
++    android.media.session.MediaSession old=mCobraPipMediaSession;
++    if(old==null&&mCobraPipMediaPlayer==null)return;
++    // Invalidate queued callbacks before releasing the platform session.
++    mCobraPipMediaGeneration++;mCobraPipMediaSession=null;mCobraPipMediaPlayer=null;mCobraPipMediaProfile="";
++    if(old!=null)try{old.setCallback(null);old.setActive(false);old.release();}catch(RuntimeException ignored){}
++  }
++
++  private android.media.session.MediaSession.Callback cobraPipMediaCallback(final ExoPlayer player,final CobraPlayerBinding binding,final long generation,final String profile){
++    return new android.media.session.MediaSession.Callback(){
++      @Override public void onPlay(){cobraDispatchPipCommand(player,binding,generation,profile,true);}
++      @Override public void onPause(){cobraDispatchPipCommand(player,binding,generation,profile,false);}
++    };
++  }
++
++  private void cobraDispatchPipCommand(ExoPlayer player,CobraPlayerBinding binding,long generation,String profile,boolean play){
++    if(generation!=mCobraPipMediaGeneration||mCobraPipMediaSession==null||player!=mCobraPipMediaPlayer
++        ||!cobraPipMediaAvailable(player,binding,profile))return;
++    if(play)cobraUserPlay(player);
++    else {mCobraPlaybackPolicy.epoch++;mBackgroundResumePlayers.remove(player);player.pause();}
++    if(mCobraPipMultiChannels!=null&&binding.channel!=null&&mCobraPipMultiAudio.equals(binding.channel.id))
++      mCobraPipMultiRequested.put(binding.channel.id,player.getPlayWhenReady());
++    cobraUpdatePlaybackLabels();cobraUpdatePipMediaSession();
++  }
++
++  private android.media.session.PlaybackState cobraPipPlaybackState(ExoPlayer player){
++    int state=player.isPlaying()?android.media.session.PlaybackState.STATE_PLAYING:
++        player.getPlayWhenReady()&&player.getPlaybackState()==Player.STATE_BUFFERING
++            ?android.media.session.PlaybackState.STATE_BUFFERING:android.media.session.PlaybackState.STATE_PAUSED;
++    return new android.media.session.PlaybackState.Builder()
++        .setActions(android.media.session.PlaybackState.ACTION_PLAY|android.media.session.PlaybackState.ACTION_PAUSE|android.media.session.PlaybackState.ACTION_PLAY_PAUSE)
++        .setState(state,Math.max(0L,player.getCurrentPosition()),state==android.media.session.PlaybackState.STATE_PLAYING?player.getPlaybackParameters().speed:0f,android.os.SystemClock.elapsedRealtime()).build();
++  }
++
++  private void cobraUpdatePipMediaSession(){
++    ExoPlayer player=mPlayer;CobraPlayerBinding binding=mCobraPlayerBindings.get(player);
++    String profile=mFeatures==null?"":mFeatures.activeProfileId();
++    if(!cobraPipMediaAvailable(player,binding,profile)){cobraReleasePipMediaSession();return;}
++    try{
++      if(mCobraPipMediaSession==null||mCobraPipMediaPlayer!=player||!mCobraPipMediaProfile.equals(profile)){
++        cobraReleasePipMediaSession();mCobraPipMediaPlayer=player;mCobraPipMediaProfile=profile;
++        mCobraPipMediaSession=new android.media.session.MediaSession(this,"InfinityCobraPip");
++        mCobraPipMediaSession.setFlags(android.media.session.MediaSession.FLAG_HANDLES_MEDIA_BUTTONS|android.media.session.MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
++        mCobraPipMediaSession.setCallback(cobraPipMediaCallback(player,binding,mCobraPipMediaGeneration,profile),mMain);
++        mCobraPipMediaSession.setMetadata(new android.media.MediaMetadata.Builder().putString(android.media.MediaMetadata.METADATA_KEY_TITLE,binding.channel==null?"Cobra":binding.channel.name).build());
++      }
++      mCobraPipMediaSession.setPlaybackState(cobraPipPlaybackState(player));mCobraPipMediaSession.setActive(true);mCobraPipMediaError="";
++    }catch(RuntimeException error){mCobraPipMediaError=error.getClass().getSimpleName();cobraReleasePipMediaSession();}
++  }
++
+ 
+   private void startCobraPlayer(ExoPlayer player){
+     if(player==null||!isCobraAsyncAlive())return;
+@@ -4722,6 +4791,14 @@
+       if(!mCobraPlaybackPolicy.dismissed)mBackgroundResumePlayers.put(player,Boolean.TRUE);
+       player.pause();
+     }else {if(player.getVolume()>0f)cobraClaimAudioFocus(player);player.play();}
++  }
++
++  // A deliberate Play may retry focus after a call or another app silenced us.
++  // Automatic retries keep their existing path and cannot use this to steal focus.
++  private void cobraUserPlay(ExoPlayer player){
++    if(!cobraPlaybackMayRun(player))return;
++    if(cobraPlayerAudioSelected(player))cobraClaimAudioFocus(player);
++    player.play();
+   }
+ 
+ 
+@@ -6306,7 +6383,7 @@
+       if(!requested&&(!mBackgroundStopped||reason!=Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST)){mCobraPlaybackPolicy.epoch++;mBackgroundResumePlayers.remove(player);}
+       if(player==mPlayer)configureCobraPip(requested);cobraPublishMiniState();
+     }}
+-    @Override public void onPlaybackSuppressionReasonChanged(int reason){if(current())cobraPublishMiniState();}
++    @Override public void onPlaybackSuppressionReasonChanged(int reason){if(current()){cobraPublishMiniState();if(player==mPlayer)cobraUpdatePipMediaSession();}}
+     @Override public void onPlaybackStateChanged(int state) {
+       if(!current())return;
+       if(state==Player.STATE_BUFFERING&&vitals.everReady){
+@@ -6422,6 +6499,7 @@
+   private void cobraDisposePlayer(ExoPlayer player) {
+     cobraRememberLiveDiagnostics("player-dispose");
+     if(player==null)return;
++    if(player==mCobraPipMediaPlayer)cobraReleasePipMediaSession();
+     CobraPlayerBinding binding=mCobraPlayerBindings.remove(player);
+     if(binding!=null){binding.closed=true;player.removeListener(binding);player.removeAnalyticsListener(binding.vitals);if(binding.captions!=null&&binding.captions.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)binding.captions.getParent()).removeView(binding.captions);if(binding.texture!=null&&binding.layoutListener!=null)binding.texture.removeOnLayoutChangeListener(binding.layoutListener);}
+     mBackgroundResumePlayers.remove(player);cobraReleaseAudioFocus(player);
+@@ -7206,6 +7284,12 @@
+       root.put("view_mode",mCobraGuideStyle);root.put("lifecycle",InfinityCobraDiagnostics.state());
+       root.put("background_stopped",mBackgroundStopped);root.put("picture_in_picture",mInPictureInPicture);root.put("pip_session_owned",mCobraPlaybackPolicy.pipOwned);root.put("activity_started",mCobraPlaybackPolicy.started);root.put("mini_audio_owned",cobraOwnsMiniSession(mCobraMiniBackgroundPlayer));root.put("mini_media_service",InfinityExtendedBackgroundService.isMiniPlaybackRunning());root.put("playback_epoch",mCobraPlaybackPolicy.epoch);root.put("background_mode",cobraBackgroundModeLabel());root.put("extended_background_requested",InfinityExtendedBackgroundService.isEnabled(this));root.put("extended_background_running",InfinityExtendedBackgroundService.isRunning());
+       root.put("source_count",mSources.size());root.put("channel_count",mChannels.size());
++      root.put("pip_media_session_active",mCobraPipMediaSession!=null&&mCobraPipMediaSession.isActive());
++      root.put("pip_media_generation",mCobraPipMediaGeneration);root.put("pip_media_error",mCobraPipMediaError);
++      root.put("audio_focus_request_result",mCobraAudioFocusResult);root.put("audio_focus_app_muted",mCobraAudioFocusMuted);
++      root.put("audio_focus_generation",mCobraAudioFocusGeneration);
++      // These are app observations, not proof that the OS routes audible call-time media.
++      root.put("call_time_audibility","not_observed_by_app");
+       root.put("guide_requests_in_flight",mCobraEpgRequest.size());root.put("short_guide_requests_in_flight",mCobraShortEpgBusy.size());
+       root.put("cached_guide_source_count",mCobraEpg.size());root.put("multiview_tiles",mCobraTiles.keys().size());
+       root.put("audio_owner",mMultiOverlay==null?-1:mAudioTile);root.put("recording_state",mRecordingSession.isEmpty()?"idle":"recording");
+@@ -8193,7 +8277,7 @@
+       public long position(){return Math.max(0L,session.getCurrentPosition());}
+       public void command(int command){
+         if(!available())return;
+-        if(command==InfinityExtendedBackgroundService.COMMAND_PLAY)startCobraPlayer(session);
++        if(command==InfinityExtendedBackgroundService.COMMAND_PLAY)cobraUserPlay(session);
+         else {
+           mCobraPlaybackPolicy.epoch++;mBackgroundResumePlayers.remove(session);session.pause();
+           if(command==InfinityExtendedBackgroundService.COMMAND_STOP){mCobraPreviewAutoplayAllowed=false;cobraEndMiniBackgroundPlayback();}
+@@ -9124,7 +9208,26 @@
+   private AudioManager mCobraAudioManager;
+   private ExoPlayer mCobraAudioFocusPlayer;
+   private boolean mCobraAudioFocusMuted=false;
+-  private final AudioManager.OnAudioFocusChangeListener mCobraAudioFocusListener=this::cobraHandleAudioFocus;
++  private AudioManager.OnAudioFocusChangeListener mCobraAudioFocusListener;
++  private Object mCobraAudioFocusRequest;
++  private boolean mCobraAudioFocusAccepted=false;
++  private long mCobraAudioFocusGeneration=0L;
++  private int mCobraAudioFocusResult=AudioManager.AUDIOFOCUS_REQUEST_FAILED;
++
++  // Keep API-26 request types isolated so legacy supported Android releases retain
++  // their original STREAM_MUSIC path. Describe video honestly as MEDIA/MOVIE.
++  private static final class CobraAudioFocusApi26 {
++    static Object create(AudioManager.OnAudioFocusChangeListener listener,android.os.Handler handler){
++      return new android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
++          .setAudioAttributes(new android.media.AudioAttributes.Builder()
++              .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
++              .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE).build())
++          .setAcceptsDelayedFocusGain(true)
++          .setOnAudioFocusChangeListener(listener,handler).build();
++    }
++    static int acquire(AudioManager manager,Object request){return manager.requestAudioFocus((android.media.AudioFocusRequest)request);}
++    static void abandon(AudioManager manager,Object request){manager.abandonAudioFocusRequest((android.media.AudioFocusRequest)request);}
++  }
+ 
+   private boolean cobraPlayerAudioSelected(ExoPlayer player){
+     if(player==null)return false;if(player==mPlayer)return true;if(player==mCobraPreviewPlayer)return !mCobraPreviewMuted;
+@@ -9132,8 +9235,8 @@
+     return player==mCobraTransferPlayer||player==mCobraCarryPlayer;
+   }
+ 
+-  private void cobraHandleAudioFocus(int change){
+-    ExoPlayer player=mCobraAudioFocusPlayer;if(player==null)return;
++  private void cobraHandleAudioFocus(ExoPlayer player,long generation,int change){
++    if(player==null||player!=mCobraAudioFocusPlayer||generation!=mCobraAudioFocusGeneration||!mCobraAudioFocusAccepted||!isCobraAsyncAlive())return;
+     if(change==AudioManager.AUDIOFOCUS_GAIN){mCobraAudioFocusMuted=false;if(isCurrentCobraPlayer(player)&&cobraPlayerAudioSelected(player))player.setVolume(1f);InfinityCobraDiagnostics.record(this,"audio-focus","gain","video_preserved=true");return;}
+     if(CobraCallAudioPolicy.muteForFocus(change)){mCobraAudioFocusMuted=true;if(isCurrentCobraPlayer(player))player.setVolume(0f);InfinityCobraDiagnostics.record(this,"audio-focus","yield","video_preserved=true; focus="+change);}
+   }
+@@ -9141,18 +9244,28 @@
+   private void cobraClaimAudioFocus(ExoPlayer player){
+     if(player==null)return;
+     if(mCobraAudioManager==null)mCobraAudioManager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+-    if(mCobraAudioManager==null){player.setVolume(1f);return;}
+-    if(mCobraAudioFocusPlayer!=null&&mCobraAudioFocusPlayer!=player)cobraReleaseAudioFocus(mCobraAudioFocusPlayer);
++    if(mCobraAudioManager==null){mCobraAudioFocusMuted=true;player.setVolume(0f);return;}
++    if(mCobraAudioFocusPlayer!=null)cobraReleaseAudioFocus(mCobraAudioFocusPlayer);
+     mCobraAudioFocusPlayer=player;
+-    int result=mCobraAudioManager.requestAudioFocus(mCobraAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
++    final long generation=++mCobraAudioFocusGeneration;
++    mCobraAudioFocusListener=change->cobraHandleAudioFocus(player,generation,change);
++    int result=AudioManager.AUDIOFOCUS_REQUEST_FAILED;
++    try{
++      if(Build.VERSION.SDK_INT>=26){mCobraAudioFocusRequest=CobraAudioFocusApi26.create(mCobraAudioFocusListener,mMain);result=CobraAudioFocusApi26.acquire(mCobraAudioManager,mCobraAudioFocusRequest);}
++      else result=mCobraAudioManager.requestAudioFocus(mCobraAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
++    }catch(RuntimeException failure){InfinityCobraDiagnostics.failure(this,"audio-focus-request",failure);}
++    mCobraAudioFocusResult=result;
++    mCobraAudioFocusAccepted=result==AudioManager.AUDIOFOCUS_REQUEST_GRANTED||(Build.VERSION.SDK_INT>=26&&result==AudioManager.AUDIOFOCUS_REQUEST_DELAYED);
+     mCobraAudioFocusMuted=result!=AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+     player.setVolume(mCobraAudioFocusMuted?0f:1f);
++    InfinityCobraDiagnostics.record(this,"audio-focus","request","result="+result+"; app_muted="+mCobraAudioFocusMuted+"; video_preserved=true");
+   }
+ 
+   private void cobraReleaseAudioFocus(ExoPlayer player){
+     if(player==null||player!=mCobraAudioFocusPlayer)return;
+-    if(mCobraAudioManager!=null)try{mCobraAudioManager.abandonAudioFocus(mCobraAudioFocusListener);}catch(RuntimeException ignored){}
+-    mCobraAudioFocusPlayer=null;mCobraAudioFocusMuted=false;
++    Object request=mCobraAudioFocusRequest;AudioManager.OnAudioFocusChangeListener listener=mCobraAudioFocusListener;
++    ++mCobraAudioFocusGeneration;mCobraAudioFocusPlayer=null;mCobraAudioFocusListener=null;mCobraAudioFocusRequest=null;mCobraAudioFocusAccepted=false;mCobraAudioFocusMuted=false;mCobraAudioFocusResult=AudioManager.AUDIOFOCUS_REQUEST_FAILED;
++    if(mCobraAudioManager!=null)try{if(Build.VERSION.SDK_INT>=26&&request!=null)CobraAudioFocusApi26.abandon(mCobraAudioManager,request);else if(listener!=null)mCobraAudioManager.abandonAudioFocus(listener);}catch(RuntimeException failure){InfinityCobraDiagnostics.failure(this,"audio-focus-release",failure);}
+   }
+ 
+   static final class CobraWindowLifecyclePolicy {
