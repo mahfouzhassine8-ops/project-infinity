@@ -101,9 +101,8 @@ public class Cobra2103201FoldMotionTest {
     Button focusAnchor=new Button(a);focusAnchor.setText("Anchor");chrome.addView(focusAnchor,new LinearLayout.LayoutParams(80,46));
     chrome.addView(button,new LinearLayout.LayoutParams(46,46));d.resize((View)chrome.getParent(),1600,900);
     assertEquals("Measured Last-channel width",46,button.getWidth());assertEquals("Measured Last-channel height",46,button.getHeight());
-    org.robolectric.shadows.ShadowInstrumentation.getInstrumentation().setInTouchMode(false);
-    assertFalse("D-pad fixture must leave touch mode",button.isInTouchMode());
-    assertTrue("Establish a different real focus owner",focusAnchor.requestFocus());ui.frames(12);
+    assertTrue("Establish a different real focus owner and leave touch mode",focusAnchor.requestFocusFromTouch());
+    assertFalse("D-pad fixture must leave touch mode",button.isInTouchMode());ui.frames(12);
     assertFalse("Icon must not already own focus",button.hasFocus());assertEquals("Prior focus motion settled",1f,button.getScaleX(),.001f);
     boolean requested=button.requestFocus();
     System.out.println("Disabled-icon focus fixture: requested="+requested+" focused="+button.hasFocus()+" bounds="+button.getWidth()+"x"+button.getHeight()+" alpha="+button.getAlpha()+" scale="+button.getScaleX());
