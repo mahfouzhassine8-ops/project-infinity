@@ -8,6 +8,12 @@ def replace(text,old,new,count=1):
     if text.count(old)!=count:raise RuntimeError('Expected '+str(count)+' occurrences: '+old)
     return text.replace(old,new)
 def adapt(name,text):
+    if name=='CobraHealthUiTest.java':
+        # This fixture edits a loaded but non-playing channel. Enter the same
+        # editor directly; the new controls suite tests actual combined-menu taps.
+        text=replace(text,'click(a,"cobra-channel-aspect");click(a,"cobra-channel-aspect:2");','call(a,"cobraShowChannelAspect",c);ui.measure(a,412,915);click(a,"cobra-channel-aspect:2");')
+        text=replace(text,'click(a,"cobra-channel-audio");click(a,"cobra-channel-language:ar");','call(a,"cobraShowChannelLanguage",c,false);ui.measure(a,412,915);click(a,"cobra-channel-language:ar");')
+        return replace(text,'      click(a,"cobra-channel-recovery");','      call(a,"cobraShowChannelPreferences",c);ui.measure(a,412,915);click(a,"cobra-channel-recovery");')
     if name in ['Cobra2103197OriginalPlayerMenuTest.java','Cobra2103198CompleteProductAuditTest.java']:
         return replace(text,'"Aspect / display","Preferred audio language","Preferred subtitles"','"Recents","Restart live playback","Picture-in-picture","Play in background","Live TV Rewind"')
     if name=='Cobra2103201MenuPolishTest.java':
@@ -26,13 +32,14 @@ def adapt(name,text):
     raise RuntimeError(name)
 def main(root,phase,out):
     if phase=='host':paths=[root/'audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py']
+    elif phase=='health':paths=[root/'health-delta/repairs/cobra-health-2103158/tests/CobraHealthUiTest.java']
     else:paths=[root/'repair202-build/xbmc/src/test/java/com/projectinfinity/kodi'/n for n in ['Cobra2103197OriginalPlayerMenuTest.java','Cobra2103198CompleteProductAuditTest.java','Cobra2103201MenuPolishTest.java','Cobra2103201SubtitleTest.java']]
     results={}
     for path in paths:
         old=path.read_text();new=adapt(path.name,old)
-        names=lambda s:re.findall(r'@Test(?:\s*@[^\n]+)?\s+public void (\w+)\s*\(',s)
+        names=lambda s:re.findall(r'@Test(?:\([^\n]*?\))?(?:\s*@[^\n]+)?\s+public void (\w+)\s*\(',s)
         if names(old)!=names(new):raise RuntimeError('Inherited testcase identity changed: '+str(path))
         path.write_text(new);results[str(path)]={'before':digest(old),'after':digest(new),'case_names_unchanged':True}
     out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps({'explicit_user_requested_menu_moves':True,'host_scope':'new preference/UI collaborators only; no transport assertions removed','changes':results},indent=2)+'\n')
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--phase',choices=['host','android'],required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();main(a.root,a.phase,a.out)
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--phase',choices=['host','health','android'],required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();main(a.root,a.phase,a.out)

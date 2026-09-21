@@ -217,6 +217,15 @@
      if(mCobraPlayerLockOverlay!=null)mCobraPlayerLockOverlay.setVisibility(mCobraPlayerLocked?View.VISIBLE:View.GONE);
      showPlayerChromeTemporarily();
    }
+@@ -7134,7 +7203,7 @@
+       root.put("system_dark_palette",cobraSystemDarkVariant());
+       root.put("effective_appearance",cobraEffectiveAppearanceMode());
+       root.put("view_mode",mCobraGuideStyle);root.put("lifecycle",InfinityCobraDiagnostics.state());
+-      root.put("background_stopped",mBackgroundStopped);root.put("picture_in_picture",mInPictureInPicture);root.put("pip_session_owned",mCobraPlaybackPolicy.pipOwned);root.put("activity_started",mCobraPlaybackPolicy.started);root.put("mini_audio_owned",cobraOwnsMiniSession(mCobraPreviewPlayer));root.put("mini_media_service",InfinityExtendedBackgroundService.isMiniPlaybackRunning());root.put("playback_epoch",mCobraPlaybackPolicy.epoch);root.put("background_mode",cobraBackgroundModeLabel());root.put("extended_background_requested",InfinityExtendedBackgroundService.isEnabled(this));root.put("extended_background_running",InfinityExtendedBackgroundService.isRunning());
++      root.put("background_stopped",mBackgroundStopped);root.put("picture_in_picture",mInPictureInPicture);root.put("pip_session_owned",mCobraPlaybackPolicy.pipOwned);root.put("activity_started",mCobraPlaybackPolicy.started);root.put("mini_audio_owned",cobraOwnsMiniSession(mCobraMiniBackgroundPlayer));root.put("mini_media_service",InfinityExtendedBackgroundService.isMiniPlaybackRunning());root.put("playback_epoch",mCobraPlaybackPolicy.epoch);root.put("background_mode",cobraBackgroundModeLabel());root.put("extended_background_requested",InfinityExtendedBackgroundService.isEnabled(this));root.put("extended_background_running",InfinityExtendedBackgroundService.isRunning());
+       root.put("source_count",mSources.size());root.put("channel_count",mChannels.size());
+       root.put("guide_requests_in_flight",mCobraEpgRequest.size());root.put("short_guide_requests_in_flight",mCobraShortEpgBusy.size());
+       root.put("cached_guide_source_count",mCobraEpg.size());root.put("multiview_tiles",mCobraTiles.keys().size());
 @@ -7344,6 +7413,7 @@
  
    private static final class CobraChannelPreferences {

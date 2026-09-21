@@ -22,7 +22,7 @@ public class Cobra2103202ViewportTimelineTest {
   @Before public void before()throws Exception{f=new Cobra2103201ScrubberTest();f.before();a=f.a;}
   @After public void after()throws Exception{if(f!=null)f.after();}
   ProgressBar line()throws Exception{return (ProgressBar)get(a,"mCobraPlayerProgramProgress");}
-  @Test public void rewoundProgressAndLiveEdgeUseDistinctPartsOfTheSameTimeline()throws Exception{f.state.position=30000;f.state.duration=120000;call("cobraUpdateTimeshiftSeek");assertEquals(250,line().getProgress());assertEquals(1000,line().getSecondaryProgress());assertEquals(250,f.seek().getProgress());assertTrue(f.seek().getContentDescription().toString().contains("live edge"));assertNotEquals(line().getProgressTintList().getDefaultColor(),line().getSecondaryProgressTintList().getDefaultColor());}
+  @Test public void rewoundProgressAndLiveEdgeUseDistinctPartsOfTheSameTimeline()throws Exception{f.state.position=30000;f.state.duration=120000;call("cobraUpdateTimeshiftSeek");assertEquals(250,line().getProgress());assertEquals(1000,line().getSecondaryProgress());assertEquals(250,f.seek().getProgress());assertTrue(f.seek().getContentDescription().toString().contains("live edge"));assertNotEquals(line().getProgressTintList().getDefaultColor(),line().getSecondaryProgressTintList().getDefaultColor());Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-rewound-timeline-412x915",412,915);}
   @Test public void returningToLiveSynchronizesThumbWithoutRemovingLiveEnd()throws Exception{f.state.position=120000;call("cobraUpdateTimeshiftSeek");assertEquals(1000,line().getProgress());assertEquals(1000,line().getSecondaryProgress());assertEquals(1000,f.seek().getProgress());}
   @Test public void providerCatchupEndpointIsNeverPresentedAsCurrentLiveEdge()throws Exception{put(a,"mCobraProviderCatchupActive",true);call("cobraUpdateTimeshiftSeek");assertEquals(0,line().getSecondaryProgress());assertFalse(f.seek().getContentDescription().toString().contains("live edge"));}
   @Test public void unavailableTimelineClearsOldLiveShading()throws Exception{call("cobraUpdateTimeshiftSeek");f.state.seekable=false;call("cobraUpdateTimeshiftSeek");assertEquals(0,line().getSecondaryProgress());assertEquals(View.GONE,f.seek().getVisibility());}
@@ -32,7 +32,9 @@ public class Cobra2103202ViewportTimelineTest {
   }
   @Test public void openSheetRecomputesHeightAfterWindowResize()throws Exception{
     f.ui.measure(a,1500,436);call("cobraShowChannelPreferences",get(a,"mPlaying"));f.ui.measure(a,1500,436);View panel=a.getWindow().getDecorView().findViewWithTag("cobra_sheet_panel");int shortHeight=panel.getHeight();assertTrue(shortHeight<=436);
+    Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-split-1500x436",1500,436);
     f.ui.measure(a,412,915);f.ui.frames(20);f.ui.measure(a,412,915);assertTrue("Open sheet must gain space after leaving short split-screen",panel.getHeight()>shortHeight);assertTrue(panel.getHeight()<=915);
+    Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-resized-412x915",412,915);
   }
   @Test public void foldAdaptiveUsesActualSplitWindowWithoutCroppingOrRetuning()throws Exception{
     Cobra2103199DisplayRegressionTest g=new Cobra2103199DisplayRegressionTest();g.before();try{Cobra2103199DisplayRegressionTest.Controlled c=g.new Controlled();TextureView t=g.texture(1500,436);g.bind(c,g.channel(0),t,true);g.mode(g.channel(0),12);

@@ -40,8 +40,10 @@ public class Cobra2103202ControlsTest {
     call("cobraShowChannelPreferences",f.channel);layout();
     for(String value:new String[]{"cobra-channel-aspect","cobra-channel-audio","cobra-channel-subtitles"})assertNull(tag(value));
     for(String value:new String[]{"cobra-channel-recents","cobra-channel-restart-live","cobra-channel-pip","cobra-channel-background","cobra-channel-rewind","cobra-channel-reset","cobra-channel-fallback","cobra-channel-recovery"})assertNotNull(value,tag(value));
+    Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-412x915",412,915);
     open();assertNotNull(tag("cobra-channel-audio"));assertNotNull(tag("cobra-channel-subtitles"));
     assertNotNull(tag("cobra-subtitle-size"));assertNotNull(tag("cobra-subtitle-adaptation"));
+    Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-audio-subtitles-412x915",412,915);
   }
   @Test public void preferredAudioPersistsAndReturnsToCombinedMenu()throws Exception{
     call("cobraShowChannelLanguage",f.channel,false);layout();tag("cobra-channel-language:en").performClick();layout();
@@ -84,7 +86,7 @@ public class Cobra2103202ControlsTest {
   }
   @Test public void subtitleSizePersistsAndActuallyChangesPaintSize()throws Exception{
     f.cue();View captions=f.captions();captions.layout(0,0,412,300);Bitmap image=Bitmap.createBitmap(412,300,Bitmap.Config.ARGB_8888);captions.draw(new Canvas(image));float before=((android.text.TextPaint)get(captions,"text")).getTextSize();
-    call("cobraShowSubtitleSize");layout();tag("cobra-subtitle-size:150").performClick();assertEquals(150,call("cobraSubtitleSize"));captions.layout(0,0,412,300);captions.draw(new Canvas(image));assertEquals(before*1.5f,((android.text.TextPaint)get(captions,"text")).getTextSize(),.01f);image.recycle();
+    call("cobraShowSubtitleSize");layout();Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-subtitle-size-412x915",412,915);tag("cobra-subtitle-size:150").performClick();assertEquals(150,call("cobraSubtitleSize"));captions.layout(0,0,412,300);captions.draw(new Canvas(image));assertEquals(before*1.5f,((android.text.TextPaint)get(captions,"text")).getTextSize(),.01f);image.recycle();
     call("closeCobraActionSheet");open();assertNotNull(f.text(f.root(),"Extra large • 150%"));
   }
   @Test public void adaptiveBitmapCaptionFitsCompleteImageInsideShortViewport()throws Exception{

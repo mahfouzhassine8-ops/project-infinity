@@ -567,6 +567,7 @@ jobs:
           python3 audit200/repairs/cobra-provider-boundary-2103200/tests/transfer_host.py --provider kodi/tools/android/packaging/xbmc/src/content/XBMCFileContentProvider.java.in --out audit202/host-provider-transfer
 
       - name: Build/sign 2103202 without rebuilding native engine
+        id: build202
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -585,10 +586,12 @@ jobs:
       - name: Repeat all inherited UI/runtime suites
         run: |
           set -euo pipefail
+          python3 audit202/repairs/cobra-player-refinement-2103202/adapt_inherited_tests.py --root . --phase health --out audit202/health-test-adaptations.json
           python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py \
             --build repair202-build --out audit198/android
 
       - name: Run all 358 inherited Android gates plus requested refinement regressions
+        if: ${{ !cancelled() && steps.build202.outcome == 'success' }}
         run: |
           set -euo pipefail
           cp candidate14-delta/repairs/cobra-theme-rotation-2103162/tests/Cobra2103162ThemeRotationTest.java repair202-build/xbmc/src/test/java/com/projectinfinity/kodi/
