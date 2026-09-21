@@ -1,0 +1,2502 @@
+--- a/cmake/scripts/android/Install.cmake
++++ b/cmake/scripts/android/Install.cmake
+@@ -204,3 +204,21 @@
+ 
+ configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraVisualCatalog.java.in
+                ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraVisualCatalog.java @ONLY)
++
++configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraEmblem.java.in
++               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraEmblem.java @ONLY)
++
++configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraPresentationEffects.java.in
++               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraPresentationEffects.java @ONLY)
++
++configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraPresentationSafety.java.in
++               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraPresentationSafety.java @ONLY)
++
++configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraSmartReturn.java.in
++               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraSmartReturn.java @ONLY)
++
++configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraQuickPeekSession.java.in
++               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraQuickPeekSession.java @ONLY)
++
++configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraNetworkIntelligence.java.in
++               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraNetworkIntelligence.java @ONLY)
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/CobraEmblem.java.in
+@@ -0,0 +1,86 @@
++package @APP_PACKAGE@;
++
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.Paint;
++import android.graphics.Path;
++import android.graphics.RectF;
++
++/** Scalable presentation trace of the approved Cobra Pulse hood/head/tail mark.
++ * No letter fallback, new brand, bitmap readback, native-engine or video effect.
++ * Reference: Cobra Pulse Neon Media Player Mockup.png, approved status direction.
++ */
++final class CobraEmblem {
++  private CobraEmblem() {}
++  private static Path hood() {
++    Path p=new Path();p.moveTo(42,14);p.cubicTo(33,8,19,10,13,20);p.cubicTo(6,30,10,40,20,49);
++    p.cubicTo(31,59,39,68,39,82);p.lineTo(38,91);p.cubicTo(44,83,44,72,39,62);
++    p.cubicTo(34,52,24,46,18,39);p.cubicTo(12,32,14,23,21,20);p.cubicTo(27,16,34,18,39,22);
++    p.moveTo(58,14);p.cubicTo(67,8,81,10,87,20);p.cubicTo(94,30,90,40,80,49);
++    p.cubicTo(69,59,61,67,60,79);p.cubicTo(59,89,52,97,43,98);p.cubicTo(54,87,53,77,54,65);
++    p.cubicTo(55,53,62,47,72,40);p.cubicTo(81,34,87,27,80,21);p.cubicTo(73,16,66,18,61,22);return p;
++  }
++  private static Path head() {
++    Path p=new Path();p.moveTo(38,13);p.cubicTo(38,9,43,8,48,11);p.lineTo(52,11);p.cubicTo(57,8,62,9,62,13);
++    p.lineTo(65,19);p.lineTo(60,26);p.lineTo(57,28);p.lineTo(55,39);p.lineTo(51,33);p.lineTo(49,33);
++    p.lineTo(45,39);p.lineTo(43,28);p.lineTo(40,26);p.lineTo(35,19);p.close();return p;
++  }
++  private static Path face() {
++    Path p=new Path();p.moveTo(40,18);p.lineTo(46,21);p.lineTo(43,23);p.close();
++    p.moveTo(60,18);p.lineTo(54,21);p.lineTo(57,23);p.close();
++    p.moveTo(47,27);p.lineTo(50,25);p.lineTo(53,27);p.lineTo(50,30);p.close();return p;
++  }
++  private static Path scales() {
++    Path p=new Path();p.moveTo(48,39);p.lineTo(54,41);p.moveTo(48,46);p.lineTo(55,48);
++    p.moveTo(48,54);p.lineTo(54,56);p.moveTo(47,62);p.lineTo(53,64);p.moveTo(46,70);p.lineTo(52,72);
++    p.moveTo(45,78);p.lineTo(50,80);p.moveTo(43,86);p.lineTo(47,87);return p;
++  }
++  private static Path inner() {
++    Path p=new Path();p.moveTo(23,26);p.cubicTo(29,24,33,27,37,31);p.moveTo(20,33);p.lineTo(33,36);
++    p.moveTo(25,42);p.lineTo(38,43);p.moveTo(31,51);p.lineTo(42,50);p.moveTo(76,26);p.cubicTo(70,24,66,27,62,31);
++    p.moveTo(79,33);p.lineTo(66,36);p.moveTo(74,42);p.lineTo(61,43);p.moveTo(68,51);p.lineTo(57,50);return p;
++  }
++  private static final Path HOOD=hood(),HEAD=head(),FACE=face(),SCALES=scales(),INNER=inner();
++  private static final ThreadLocal<Paint> PAINT = new ThreadLocal<Paint>() {
++    @Override protected Paint initialValue() { return new Paint(Paint.ANTI_ALIAS_FLAG); }
++  };
++
++  static void draw(Canvas canvas, RectF bounds, int color, int alpha) {
++    if (canvas == null || bounds == null || bounds.width() <= 0 || bounds.height() <= 0 || alpha <= 0) return;
++    Paint paint = PAINT.get();
++    int saved = canvas.save();
++    float scale = Math.min(bounds.width(), bounds.height()) / 104f;
++    canvas.translate(bounds.centerX() - 50f * scale, bounds.centerY() - 52f * scale);
++    canvas.scale(scale, scale);
++    int opacity = Math.min(255, alpha) * Color.alpha(color) / 255;
++    paint.setColor(color);
++    paint.setStyle(Paint.Style.STROKE);
++    paint.setStrokeCap(Paint.Cap.ROUND);
++    paint.setStrokeJoin(Paint.Join.ROUND);
++    paint.setStrokeWidth(7f);
++    paint.setAlpha(opacity / 12);
++    canvas.drawPath(HOOD, paint);
++    canvas.drawPath(HEAD, paint);
++    paint.setStrokeWidth(3.2f);
++    paint.setAlpha(opacity);
++    canvas.drawPath(HOOD, paint);
++    paint.setStyle(Paint.Style.FILL);
++    paint.setAlpha(opacity * 3 / 4);
++    canvas.drawPath(HEAD, paint);
++    paint.setStyle(Paint.Style.STROKE);
++    paint.setStrokeWidth(1.8f);
++    paint.setAlpha(opacity);
++    canvas.drawPath(HEAD, paint);
++    paint.setStrokeWidth(1.3f);
++    paint.setAlpha(opacity / 2);
++    canvas.drawPath(INNER, paint);
++    paint.setAlpha(opacity * 3 / 4);
++    canvas.drawPath(SCALES, paint);
++    paint.setStyle(Paint.Style.FILL);
++    paint.setColor(Color.BLACK);
++    paint.setAlpha(opacity * 4 / 5);
++    canvas.drawPath(FACE, paint);
++    paint.setAlpha(255);
++    canvas.restoreToCount(saved);
++  }
++}
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/CobraNetworkIntelligence.java.in
+@@ -0,0 +1,225 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++package @APP_PACKAGE@;
++
++import android.content.Context;
++import android.net.ConnectivityManager;
++import android.net.Network;
++import android.net.NetworkCapabilities;
++import android.net.NetworkInfo;
++import android.net.NetworkRequest;
++import android.os.Build;
++import android.os.Handler;
++import android.os.Looper;
++import android.os.SystemClock;
++import org.json.JSONException;
++import org.json.JSONObject;
++
++/** Passive, bounded Android routing observations. Never owns a player, socket, or preference. */
++final class CobraNetworkIntelligence implements AutoCloseable {
++  static final int WIFI=1,CELLULAR=2,ETHERNET=4,VPN=8,OTHER=16;
++  private final ConnectivityManager manager;
++  private final Handler main=new Handler(Looper.getMainLooper());
++  private final State state=new State();
++  private ConnectivityManager.NetworkCallback callback;
++  private volatile boolean closed;
++  private boolean started,registered;
++  private String observation="Not started";
++  private final Runnable legacySample=()->sampleCurrent();
++
++  CobraNetworkIntelligence(Context context){
++    ConnectivityManager service=null;
++    try{Context app=context==null?null:context.getApplicationContext();if(app!=null)service=(ConnectivityManager)app.getSystemService(Context.CONNECTIVITY_SERVICE);}catch(RuntimeException ignored){}
++    manager=service;
++  }
++
++  synchronized void start(){
++    if(started||closed)return;started=true;
++    if(manager==null){observation="Unavailable";return;}
++    sampleCurrent();
++    callback=new ConnectivityManager.NetworkCallback(){
++      @Override public void onAvailable(Network network){
++        if(closed)return;
++        if(Build.VERSION.SDK_INT>=24)state.available(network,SystemClock.elapsedRealtime());else scheduleLegacySample();
++      }
++      @Override public void onCapabilitiesChanged(Network network,NetworkCapabilities capabilities){
++        if(closed)return;
++        // Callback-supplied capabilities avoid a synchronous query racing a new default route.
++        if(Build.VERSION.SDK_INT>=24)state.capabilities(network,transports(capabilities),
++            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET),true,
++            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED),true,
++            !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED),
++            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL),SystemClock.elapsedRealtime());
++        else scheduleLegacySample();
++      }
++      @Override public void onLost(Network network){
++        if(closed)return;
++        if(Build.VERSION.SDK_INT>=24)state.lost(network,SystemClock.elapsedRealtime());else scheduleLegacySample();
++      }
++    };
++    try{
++      if(Build.VERSION.SDK_INT>=24)manager.registerDefaultNetworkCallback(callback);
++      else manager.registerNetworkCallback(new NetworkRequest.Builder()
++          .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
++          .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN).build(),callback);
++      registered=true;observation=Build.VERSION.SDK_INT>=24?"Default network callback":"Legacy active-route observation";
++    }catch(RuntimeException unavailable){callback=null;observation="Snapshot only; network callback unavailable";}
++  }
++
++  private void scheduleLegacySample(){
++    synchronized(this){if(closed)return;main.removeCallbacks(legacySample);main.post(legacySample);}
++  }
++
++  @SuppressWarnings("deprecation") private synchronized void sampleCurrent(){
++    if(closed||manager==null)return;
++    try{
++      long now=SystemClock.elapsedRealtime();
++      if(Build.VERSION.SDK_INT>=23){
++        Network current=manager.getActiveNetwork();
++        if(current==null){state.disconnected(now);return;}
++        NetworkCapabilities capabilities=manager.getNetworkCapabilities(current);
++        state.available(current,now);
++        if(capabilities!=null)state.capabilities(current,transports(capabilities),
++            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET),true,
++            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED),true,
++            !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED),
++            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL),now);
++      }else{
++        NetworkInfo info=manager.getActiveNetworkInfo();
++        if(info==null||!info.isConnected()){state.disconnected(now);return;}
++        int type=info.getType(),bits=type==ConnectivityManager.TYPE_WIFI?WIFI:
++            type==ConnectivityManager.TYPE_MOBILE?CELLULAR:type==ConnectivityManager.TYPE_ETHERNET?ETHERNET:
++            type==ConnectivityManager.TYPE_VPN?VPN:OTHER;
++        Object route=Integer.valueOf(type);state.available(route,now);
++        state.capabilities(route,bits,true,false,false,true,manager.isActiveNetworkMetered(),false,now);
++      }
++    }catch(RuntimeException unavailable){state.unavailable(SystemClock.elapsedRealtime());}
++  }
++
++  synchronized Snapshot snapshot(){
++    // Old Android and callback-registration failures use snapshots, not periodic polling.
++    if(started&&!closed&&(!registered||Build.VERSION.SDK_INT<24))sampleCurrent();
++    return state.snapshot(SystemClock.elapsedRealtime(),closed?"Closed":observation);
++  }
++
++  synchronized Snapshot cachedSnapshot(){
++    return state.snapshot(SystemClock.elapsedRealtime(),closed?"Closed":observation);
++  }
++
++  @Override public synchronized void close(){
++    if(closed)return;closed=true;main.removeCallbacks(legacySample);state.close();
++    if(registered&&callback!=null&&manager!=null)try{manager.unregisterNetworkCallback(callback);}catch(RuntimeException ignored){}
++    registered=false;callback=null;
++  }
++
++  static int transports(NetworkCapabilities capabilities){
++    int bits=0;if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))bits|=WIFI;
++    if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))bits|=CELLULAR;
++    if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))bits|=ETHERNET;
++    if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN))bits|=VPN;
++    return bits==0?OTHER:bits;
++  }
++
++  static String transportLabel(int bits){
++    StringBuilder value=new StringBuilder();int[] masks={VPN,WIFI,CELLULAR,ETHERNET,OTHER};
++    String[] names={"VPN","Wi-Fi","Cellular","Ethernet","Other"};
++    for(int i=0;i<masks.length;i++)if((bits&masks[i])!=0){if(value.length()>0)value.append(" + ");value.append(names[i]);}
++    return value.length()==0?"Not reported":value.toString();
++  }
++
++  static final class Snapshot {
++    final boolean known,connected,capabilitiesKnown,validatedKnown,validated,meteredKnown,metered,captivePortal;
++    final int transportBits,recentChanges;
++    final long transitions,disconnects,reconnections,changedAgeMs,recoveryAgeMs;
++    final String observation,status;
++    Snapshot(State state,long now,String owner){
++      known=state.known;connected=state.connected;capabilitiesKnown=state.capabilitiesKnown;
++      validatedKnown=state.validatedKnown;validated=state.validated;meteredKnown=state.meteredKnown;
++      metered=state.metered;captivePortal=state.captivePortal;transportBits=state.transportBits;
++      transitions=state.transitions;disconnects=state.disconnects;reconnections=state.reconnections;
++      recentChanges=state.recent(now);changedAgeMs=age(now,state.changedAt);recoveryAgeMs=age(now,state.recoveredAt);
++      observation=owner==null?"Not reported":owner;
++      status=!known?"Not reported":!connected?"No default network":!capabilitiesKnown?"Connecting":
++          captivePortal?"Sign-in may be required":validatedKnown&&!validated?"Internet not validated":
++          recoveryAgeMs>=0&&recoveryAgeMs<State.RECOVERY_WINDOW_MS?"Reconnected":
++          recentChanges>=State.UNSTABLE_TRANSITIONS?"Frequent route changes":"Connected";
++    }
++    private static long age(long now,long then){return then<0||now<then?-1L:now-then;}
++    String summary(){
++      StringBuilder value=new StringBuilder(transportLabel(transportBits)).append(" • ").append(status);
++      if(meteredKnown&&connected)value.append(metered?" • Metered":" • Unmetered");
++      if(connected&&recentChanges>=State.UNSTABLE_TRANSITIONS&&!"Frequent route changes".equals(status))value.append(" • Frequent route changes");
++      return value.toString();
++    }
++    JSONObject json()throws JSONException{
++      return new JSONObject().put("observation",observation).put("state",status)
++          .put("transport",transportLabel(transportBits)).put("known",known)
++          .put("connected",known?Boolean.valueOf(connected):JSONObject.NULL)
++          .put("internet_validated",validatedKnown?Boolean.valueOf(validated):JSONObject.NULL)
++          .put("metered",meteredKnown?Boolean.valueOf(metered):JSONObject.NULL)
++          .put("captive_portal",capabilitiesKnown?Boolean.valueOf(captivePortal):JSONObject.NULL)
++          .put("recent_changes_30s",recentChanges).put("route_changes",transitions)
++          .put("default_route_losses",disconnects).put("reconnections",reconnections)
++          .put("last_change_age_ms",changedAgeMs).put("reconnected_age_ms",recoveryAgeMs)
++          .put("policy","observation_only; user playback preferences unchanged")
++          .put("limitation","Android routing observations do not prove provider reachability or throughput");
++    }
++  }
++
++  /** Deterministic, fixed-memory state; opaque network keys never leave this object. */
++  static final class State {
++    static final long CHANGE_WINDOW_MS=30000L,RECOVERY_WINDOW_MS=10000L;
++    static final int UNSTABLE_TRANSITIONS=3;
++    private final long[] changes=new long[8];private int changeCount,changeNext;
++    private Object route;
++    private boolean closed,known,connected,capabilitiesKnown,validatedKnown,validated,meteredKnown,metered,captivePortal;
++    private boolean waitingForRecovery;
++    private int transportBits;
++    private long transitions,disconnects,reconnections,changedAt=-1,recoveredAt=-1,lastAt=-1;
++
++    synchronized void available(Object next,long now){
++      if(closed||next==null)return;clock(now);
++      boolean same=known&&connected&&next.equals(route);
++      if(same)return;
++      if(known)changed(now);
++      known=true;connected=true;route=next;capabilitiesKnown=false;validatedKnown=false;validated=false;
++      meteredKnown=false;metered=false;captivePortal=false;transportBits=0;recoveredAt=-1;
++    }
++    synchronized void capabilities(Object current,int bits,boolean internet,boolean validationKnown,
++        boolean validation,boolean costKnown,boolean cost,boolean captive,long now){
++      if(closed||!connected||route==null||!route.equals(current))return;clock(now);
++      if(capabilitiesKnown&&(transportBits!=bits||(validatedKnown&&validationKnown&&validated!=validation))){
++        changed(now);if(validatedKnown&&validated&&validationKnown&&!validation)waitingForRecovery=true;
++      }
++      capabilitiesKnown=true;transportBits=bits;validatedKnown=validationKnown;validated=validation;
++      meteredKnown=costKnown;metered=cost;captivePortal=captive;
++      if(waitingForRecovery&&internet&&!captive&&(!validationKnown||validation)){
++        reconnections++;recoveredAt=now;waitingForRecovery=false;
++      }
++    }
++    synchronized void lost(Object previous,long now){
++      if(closed||!connected||route==null||!route.equals(previous))return;
++      disconnected(now);
++    }
++    synchronized void disconnected(long now){
++      if(closed)return;clock(now);
++      if(known&&connected){changed(now);disconnects++;waitingForRecovery=true;}
++      known=true;connected=false;route=null;capabilitiesKnown=false;transportBits=0;
++      validatedKnown=false;validated=false;meteredKnown=false;metered=false;captivePortal=false;recoveredAt=-1;
++    }
++    synchronized void unavailable(long now){
++      if(closed)return;clock(now);known=false;connected=false;route=null;capabilitiesKnown=false;
++      transportBits=0;validatedKnown=false;validated=false;meteredKnown=false;metered=false;captivePortal=false;
++    }
++    synchronized void close(){closed=true;route=null;}
++    synchronized Snapshot snapshot(long now,String observation){return new Snapshot(this,now,observation);}
++    private void clock(long now){
++      if(lastAt>=0&&now<lastAt){changeCount=0;changeNext=0;changedAt=-1;recoveredAt=-1;waitingForRecovery=false;}
++      lastAt=now;
++    }
++    private void changed(long now){
++      transitions++;changedAt=now;changes[changeNext]=now;changeNext=(changeNext+1)%changes.length;
++      if(changeCount<changes.length)changeCount++;
++    }
++    private int recent(long now){int count=0;for(int i=0;i<changeCount;i++)if(now>=changes[i]&&now-changes[i]<CHANGE_WINDOW_MS)count++;return count;}
++  }
++}
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/CobraPresentationEffects.java.in
+@@ -0,0 +1,341 @@
++package @APP_PACKAGE@;
++
++import android.animation.ValueAnimator;
++import android.app.Activity;
++import android.content.Intent;
++import android.content.SharedPreferences;
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.RectF;
++import android.graphics.drawable.Drawable;
++import android.graphics.drawable.ColorDrawable;
++import android.graphics.drawable.GradientDrawable;
++import android.graphics.drawable.LayerDrawable;
++import android.os.Build;
++import android.os.Bundle;
++import android.os.Handler;
++import android.os.Looper;
++import android.view.Gravity;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.FrameLayout;
++import android.widget.LinearLayout;
++import android.widget.TextView;
++import java.lang.ref.WeakReference;
++import java.util.ArrayList;
++import java.util.Map;
++import java.util.WeakHashMap;
++
++/** Presentation only. No player, decoder, network, surface or transport dependency. */
++final class CobraPresentationEffects implements AutoCloseable {
++  static final String AMBIENT = "cobra_ambient_mode";
++  static final String NIGHT = "cobra_night_cinema";
++  static final String GREETING = "cobra_custom_greeting";
++  static final String EXTRA_ENTRY_TOKEN = "cobra_explicit_entry_token";
++  static final String SAVED_ENTRY_TOKEN = "cobra_welcome_consumed_token";
++  static final int OFF = 0, SUBTLE = 1, IMMERSIVE = 2;
++  static final long WELCOME_MS = 2200L;
++
++  enum PulseState {
++    NONE(0, ""), NORMAL(0xff62aaff, "Normal playback"),
++    BUFFERING(0xff62aaff, "Buffering"), TIMESHIFT(0xff54df8e, "Timeshift"),
++    RECORDING(0xff54df8e, "Recording"), LIVE(0xfff5fbff, "Live edge"),
++    BACKGROUND(0xffffc65e, "Background playback"),
++    NETWORK(0xffff6767, "Network trouble"), RECOVERING(0xffbb8aff, "Recovering");
++    final int color; final String label;
++    PulseState(int color, String label) { this.color = color; this.label = label; }
++    boolean animated() { return this == BUFFERING || this == RECOVERING; }
++  }
++
++  static int ambientMode(SharedPreferences prefs) {
++    String value = prefs == null ? "off" : prefs.getString(AMBIENT, "off");
++    return "subtle".equals(value) ? SUBTLE : "immersive".equals(value) ? IMMERSIVE : OFF;
++  }
++  static String ambientLabel(int mode) {
++    return mode == SUBTLE ? "Subtle" : mode == IMMERSIVE ? "Immersive" : "Off";
++  }
++  static String boundedGreeting(String raw) {
++    String value = raw == null ? "" : raw.trim();
++    // Count Unicode code points, not UTF-16 units: never cut an emoji in half.
++    if (value.codePointCount(0, value.length()) > 120)
++      value = value.substring(0, value.offsetByCodePoints(0, 120));
++    return value.isEmpty() ? "Welcome back" : value;
++  }
++  static String greeting(SharedPreferences prefs) {
++    return boundedGreeting(prefs == null ? "" : prefs.getString(GREETING, ""));
++  }
++  static long chromeDelay(boolean night) { return night ? 2100L : 3500L; }
++  static boolean motionAllowed() {
++    return Build.VERSION.SDK_INT < 26 || ValueAnimator.areAnimatorsEnabled();
++  }
++  static int blend(int base, int tint, float fraction) {
++    float amount = Math.max(0f, Math.min(1f, fraction));
++    return Color.argb(Color.alpha(base),
++        Math.round(Color.red(base) * (1f - amount) + Color.red(tint) * amount),
++        Math.round(Color.green(base) * (1f - amount) + Color.green(tint) * amount),
++        Math.round(Color.blue(base) * (1f - amount) + Color.blue(tint) * amount));
++  }
++  static int contextTint(String sourceColor) {
++    try { return Color.parseColor(sourceColor); }
++    catch (RuntimeException invalid) { return 0xff62aaff; }
++  }
++  static int ambientColor(String role, int base, int mode, int tint) {
++    if (mode != SUBTLE && mode != IMMERSIVE) return base;
++    float amount;
++    if ("accent".equals(role) || "accent_soft".equals(role)) amount = .12f;
++    else if ("focus".equals(role)) amount = .10f;
++    else if ("line".equals(role)) amount = .06f;
++    else if ("panel".equals(role) || "panel2".equals(role) || "rail".equals(role)) amount = .035f;
++    else return base; // Text, error colours, video and the opaque OLED canvas remain unchanged.
++    return blend(base, tint, mode == IMMERSIVE ? amount * 2f : amount);
++  }
++  static PulseState pulseState(boolean session, boolean networkTrouble, boolean recovering,
++      boolean buffering, boolean recording, boolean background, boolean timeshift, boolean live) {
++    if (!session) return PulseState.NONE;
++    if (networkTrouble) return PulseState.NETWORK;
++    if (recovering) return PulseState.RECOVERING;
++    if (buffering) return PulseState.BUFFERING;
++    if (recording) return PulseState.RECORDING;
++    if (background) return PulseState.BACKGROUND;
++    if (timeshift) return PulseState.TIMESHIFT;
++    if (live) return PulseState.LIVE;
++    return PulseState.NORMAL;
++  }
++
++  private final Activity activity;
++  private final Handler main = new Handler(Looper.getMainLooper());
++  private final WeakHashMap<View, Backdrop> backdrops = new WeakHashMap<>();
++  private final ArrayList<WeakReference<StatusSlot>> slots = new ArrayList<>();
++  private LinearLayout welcome;
++  private String consumedToken = "";
++  private boolean foreground = true, closed;
++  private final Runnable removeWelcome = this::dismissWelcome;
++
++  CobraPresentationEffects(Activity activity) { this.activity = activity; }
++  void restore(Bundle state) {
++    if (state != null) consumedToken = state.getString(SAVED_ENTRY_TOKEN, "");
++  }
++  void save(Bundle state) { state.putString(SAVED_ENTRY_TOKEN, consumedToken); }
++  boolean consumeEntry(Intent intent) {
++    if (intent == null) return false;
++    String token = intent.getStringExtra(EXTRA_ENTRY_TOKEN);
++    intent.removeExtra(EXTRA_ENTRY_TOKEN);
++    if (token == null || token.isEmpty() || token.length() > 128 || token.equals(consumedToken)) return false;
++    consumedToken = token;
++    return true;
++  }
++  void setForeground(boolean active) {
++    foreground = active;
++    if (!active) {
++      dismissWelcome();
++      for (Backdrop value : backdrops.values()) value.cancel();
++    }
++    for (int i = slots.size() - 1; i >= 0; i--) {
++      StatusSlot slot = slots.get(i).get();
++      if (slot == null) slots.remove(i); else slot.pulse.allowMotion(active);
++    }
++  }
++
++  private static final class Backdrop {
++    Drawable original;
++    GradientDrawable gradient;
++    LayerDrawable composite;
++    ValueAnimator animator;
++    int mode = -1, base, tint;
++    void cancel() { if (animator != null) { animator.cancel(); animator = null; } if (gradient != null) gradient.setAlpha(255); }
++  }
++  void backdrop(View view, int base, int tint, int mode) {
++    if (closed || view == null) return;
++    // These are named background owners only. Never call this on a video container.
++    String tag = String.valueOf(view.getTag());
++    if (!"cobra-browse-background".equals(tag) && !"cobra_persistent_guide_shell".equals(tag)) return;
++    Backdrop old = backdrops.get(view);
++    if (mode == OFF) {
++      if (old != null) {
++        old.cancel();
++        if (view.getBackground() == old.composite) view.setBackground(old.original);
++        backdrops.remove(view);
++      }
++      return;
++    }
++    if (old != null && old.mode == mode && old.base == base && old.tint == tint
++        && view.getBackground() == old.composite) return;
++    if (old == null) { old = new Backdrop(); backdrops.put(view, old); }
++    if (view.getBackground() != old.composite) old.original = view.getBackground();
++    old.cancel(); old.mode = mode; old.base = base; old.tint = tint;
++    // Retain theme artwork/states as the actual first layer, not a flattened colour.
++    // The overlay is bounded to this background owner and never touches video pixels.
++    final int top = Color.argb(mode == IMMERSIVE ? 28 : 12, Color.red(tint), Color.green(tint), Color.blue(tint));
++    final int bottom = Color.argb(0, Color.red(tint), Color.green(tint), Color.blue(tint));
++    final GradientDrawable gradient = new GradientDrawable(
++        GradientDrawable.Orientation.TL_BR, new int[]{top, bottom, bottom});
++    gradient.setGradientType(GradientDrawable.LINEAR_GRADIENT);
++    old.gradient = gradient;
++    old.composite = new LayerDrawable(new Drawable[]{old.original != null ? old.original : new ColorDrawable(base), gradient});
++    if (Build.VERSION.SDK_INT >= 23) old.composite.setPaddingMode(LayerDrawable.PADDING_MODE_STACK);
++    view.setBackground(old.composite);
++    if (foreground && motionAllowed() && view.isAttachedToWindow()) {
++      gradient.setAlpha(0);
++      ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
++      animation.setDuration(220L);
++      animation.addUpdateListener(a -> gradient.setAlpha(Math.round(255f * (Float) a.getAnimatedValue())));
++      old.animator = animation; animation.start();
++    }
++  }
++
++  View status(TextView legacy) {
++    StatusSlot slot = new StatusSlot(legacy);
++    slots.add(new WeakReference<>(slot));
++    slot.pulse.allowMotion(foreground);
++    return slot;
++  }
++  void updateStatus(View root, PulseState state, boolean visible) {
++    for (int i = slots.size() - 1; i >= 0; i--) {
++      StatusSlot slot = slots.get(i).get();
++      if (slot == null) { slots.remove(i); continue; }
++      if (root != null && isWithin(slot, root)) slot.show(state, visible && foreground);
++    }
++  }
++  private static boolean isWithin(View child, View root) {
++    View cursor = child;
++    while (cursor != null) {
++      if (cursor == root) return true;
++      cursor = cursor.getParent() instanceof View ? (View) cursor.getParent() : null;
++    }
++    return false;
++  }
++  private final class StatusSlot extends FrameLayout {
++    final TextView legacy;
++    final PulseView pulse;
++    StatusSlot(TextView text) {
++      super(activity); legacy = text; setTag("cobra_pulse_slot");
++      setFocusable(false); setClickable(false); setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
++      addView(legacy, new FrameLayout.LayoutParams(-1, -1));
++      pulse = new PulseView(activity);
++      addView(pulse, new FrameLayout.LayoutParams(dp(26), dp(26), Gravity.CENTER_VERTICAL | Gravity.END));
++      pulse.setVisibility(GONE);
++    }
++    void show(PulseState state, boolean visible) {
++      boolean useful = state != PulseState.NONE && visible;
++      // Keep the old tagged status TextView for existing updates, ownership and empty states.
++      legacy.setVisibility(useful ? INVISIBLE : VISIBLE);
++      pulse.setVisibility(useful ? VISIBLE : GONE);
++      pulse.state(state);
++      setContentDescription(useful ? state.label : legacy.getText());
++    }
++  }
++
++  static final class PulseView extends View {
++    private final RectF bounds = new RectF();
++    private final android.graphics.Paint plate = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
++    private PulseState state = PulseState.NORMAL;
++    private boolean allowed = true, prominent;
++    private float intensity = .45f;
++    private ValueAnimator animator;
++    PulseView(android.content.Context context) {
++      super(context); setTag("cobra_pulse_emblem"); setFocusable(false); setClickable(false);
++      setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
++    }
++    void state(PulseState value) {
++      if (state == value) return;
++      state = value; restart(); invalidate();
++    }
++    PulseState state() { return state; }
++    void prominent() { prominent = true; restart(); invalidate(); }
++    boolean animating() { return animator != null && animator.isStarted(); }
++    void allowMotion(boolean active) { if (allowed == active) return; allowed = active; restart(); }
++    void stop() {
++      if (animator != null) { animator.cancel(); animator = null; }
++      intensity = prominent ? .92f : state == PulseState.NORMAL ? .38f : state == PulseState.LIVE ? .5f : .8f;
++    }
++    private void restart() {
++      stop();
++      if (!allowed || !isAttachedToWindow() || getWindowVisibility() != VISIBLE
++          || !isShown() || !state.animated() || !motionAllowed()) return;
++      animator = ValueAnimator.ofFloat(.48f, .95f);
++      animator.setDuration(1400L); animator.setRepeatCount(ValueAnimator.INFINITE);
++      animator.setRepeatMode(ValueAnimator.REVERSE);
++      animator.addUpdateListener(a -> { intensity = (Float) a.getAnimatedValue(); invalidate(); });
++      animator.start();
++    }
++    @Override protected void onAttachedToWindow() { super.onAttachedToWindow(); restart(); }
++    @Override protected void onDetachedFromWindow() { stop(); super.onDetachedFromWindow(); }
++    @Override protected void onVisibilityChanged(View changed, int visibility) {
++      super.onVisibilityChanged(changed, visibility); restart();
++    }
++    @Override protected void onWindowVisibilityChanged(int visibility) {
++      super.onWindowVisibilityChanged(visibility); restart();
++    }
++    @Override protected void onDraw(Canvas canvas) {
++      super.onDraw(canvas);
++      if (state == null || state == PulseState.NONE) return;
++      bounds.set(1, 1, Math.max(1, getWidth() - 1), Math.max(1, getHeight() - 1));
++      if (!prominent) {
++        plate.setColor(0xb3000000);
++        canvas.drawOval(bounds, plate); // Local contrast backing, never a filter on video pixels.
++      }
++      CobraEmblem.draw(canvas, bounds, state.color, Math.round(255f * intensity));
++    }
++  }
++
++  void showWelcome(FrameLayout parent, String greeting, boolean dark, boolean rightToLeft) {
++    if (closed || !foreground || parent == null) return;
++    dismissWelcome();
++    LinearLayout row = new LinearLayout(activity);
++    row.setTag("cobra_personalized_welcome"); row.setOrientation(LinearLayout.HORIZONTAL);
++    row.setGravity(Gravity.CENTER_VERTICAL); row.setFocusable(false); row.setClickable(false);
++    // Arrange this small row explicitly: the protected app manifest need not opt
++    // the rest of Cobra into RTL layout just to place the greeting beside its mark.
++    row.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
++    row.setPadding(dp(16), dp(12), dp(16), dp(12));
++    GradientDrawable panel = new GradientDrawable(); panel.setColor(dark ? 0xf5080b11 : 0xfaf5f8fd);
++    panel.setCornerRadius(dp(20)); panel.setStroke(dp(1), dark ? 0xff293244 : 0xffcbd7e8);
++    row.setBackground(panel);
++    PulseView emblem = new PulseView(activity); emblem.allowMotion(false); emblem.prominent();
++    TextView text = new TextView(activity); text.setTag("cobra_welcome_text");
++    text.setText(boundedGreeting(greeting)); text.setTextColor(dark ? 0xfff7faff : 0xff101b2c);
++    text.setTextSize(20); text.setTypeface(android.graphics.Typeface.create("sans-serif-medium", 0));
++    text.setMaxLines(2); text.setEllipsize(android.text.TextUtils.TruncateAt.END);
++    text.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG); text.setGravity((rightToLeft ? Gravity.RIGHT : Gravity.LEFT) | Gravity.CENTER_VERTICAL);
++    text.setFocusable(false); text.setClickable(false);
++    LinearLayout.LayoutParams copy = new LinearLayout.LayoutParams(0, -2, 1f);
++    if (rightToLeft) {
++      copy.rightMargin=dp(12);row.addView(text,copy);
++      row.addView(emblem,new LinearLayout.LayoutParams(dp(38),dp(42)));
++    } else {
++      row.addView(emblem,new LinearLayout.LayoutParams(dp(38),dp(42)));
++      copy.leftMargin=dp(12);row.addView(text,copy);
++    }
++    int width = parent.getWidth() > 0 ? parent.getWidth() : activity.getResources().getDisplayMetrics().widthPixels;
++    FrameLayout.LayoutParams position = new FrameLayout.LayoutParams(Math.max(1, Math.min(dp(440), width - dp(32))), -2,
++        Gravity.TOP | Gravity.CENTER_HORIZONTAL);
++    int inset = 0;
++    if (Build.VERSION.SDK_INT >= 23 && parent.getRootWindowInsets() != null)
++      inset = parent.getRootWindowInsets().getSystemWindowInsetTop();
++    position.topMargin = inset + dp(16); parent.addView(row, position); welcome = row;
++    if (motionAllowed()) {
++      // Reveal only alpha. The greeting never owns input or translates the existing UI.
++      text.setAlpha(0f); text.animate().alpha(1f).setDuration(260L).start();
++    }
++    main.postDelayed(removeWelcome, WELCOME_MS);
++  }
++  void dismissWelcome() {
++    main.removeCallbacks(removeWelcome);
++    if (welcome != null) {
++      for (int i = 0; i < welcome.getChildCount(); i++) welcome.getChildAt(i).animate().cancel();
++      if (welcome.getParent() instanceof ViewGroup) ((ViewGroup) welcome.getParent()).removeView(welcome);
++      welcome = null;
++    }
++  }
++  boolean welcomeVisible() { return welcome != null; }
++  private int dp(int value) { return Math.max(1, Math.round(value * activity.getResources().getDisplayMetrics().density)); }
++  @Override public void close() {
++    if (closed) return;
++    closed = true; dismissWelcome(); setForeground(false);
++    for (Map.Entry<View, Backdrop> entry : backdrops.entrySet()) {
++      View view = entry.getKey(); Backdrop backdrop = entry.getValue(); backdrop.cancel();
++      if (view != null && view.getBackground() == backdrop.composite) view.setBackground(backdrop.original);
++    }
++    backdrops.clear(); slots.clear(); main.removeCallbacksAndMessages(null);
++  }
++}
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/CobraPresentationSafety.java.in
+@@ -0,0 +1,228 @@
++package @APP_PACKAGE@;
++
++import android.app.Activity;
++import android.app.AlertDialog;
++import android.content.Context;
++import android.content.ContextWrapper;
++import android.content.Intent;
++import android.graphics.Color;
++import android.os.SystemClock;
++import android.util.AtomicFile;
++import android.view.View;
++import org.json.JSONObject;
++import java.io.*;
++import java.lang.ref.WeakReference;
++import java.nio.charset.StandardCharsets;
++import java.util.*;
++
++/** Presentation-only safety. No player, provider, native-engine or user-data ownership. */
++public final class CobraPresentationSafety {
++  public static final String EXTRA_SAFE="cobra_safe_start";
++  public static final String EXTRA_ENTRY_TOKEN="cobra_explicit_entry_token";
++  static final long PREVIEW_MS=20000L;
++  private static final CobraVisualTheme BUILTIN=CobraVisualTheme.builtin();
++  private static final Map<String,JSONObject> stateCache=new HashMap<>();
++  private static volatile Lease preview;
++  private static final Set<String> initialized=new HashSet<>();
++  private static final WeakHashMap<Activity,Boolean> refreshOnReturn=new WeakHashMap<>();
++  private static final WeakHashMap<Activity,Boolean> stoppedOwners=new WeakHashMap<>();
++  static final class Lease {
++    final String token=UUID.randomUUID().toString();
++    final Context app;final WeakReference<Activity> owner;
++    final CobraVisualTheme visual;final File legacy;
++    final long deadline=SystemClock.elapsedRealtime()+PREVIEW_MS;
++    AlertDialog dialog;Runnable timeout;
++    Lease(Activity a,CobraVisualTheme theme,File folder){app=a.getApplicationContext();owner=new WeakReference<>(a);visual=theme;legacy=folder;}
++  }
++
++  public static boolean isSafe(Context context){
++    for(int i=0;context!=null&&i<12;i++){
++      if(context instanceof Activity){Intent intent=((Activity)context).getIntent();return intent!=null&&intent.getBooleanExtra(EXTRA_SAFE,false);}
++      if(!(context instanceof ContextWrapper))break;
++      Context next=((ContextWrapper)context).getBaseContext();if(next==context)break;context=next;
++    }return false;
++  }
++  static File root(Context c){return new File(c.getFilesDir(),"cobra-presentation-safety-v1");}
++  static String key(Context c){return c.getFilesDir().getAbsolutePath();}
++  static JSONObject state(Context c){synchronized(CobraVisualTheme.STORE_LOCK){
++    String key=key(c);JSONObject cached=stateCache.get(key);if(cached!=null)return cached;
++    JSONObject value;try{value=new JSONObject(new String(new AtomicFile(new File(root(c),"state.json")).readFully(),StandardCharsets.UTF_8));}
++    catch(Exception absent){value=new JSONObject();}stateCache.put(key,value);return value;
++  }}
++  static void writeState(Context c,JSONObject value)throws Exception{
++    File directory=root(c);if(!directory.isDirectory()&&!directory.mkdirs())throw new IOException("Presentation storage unavailable");
++    AtomicFile file=new AtomicFile(new File(directory,"state.json"));FileOutputStream out=null;
++    try{out=file.startWrite();out.write(value.toString().getBytes(StandardCharsets.UTF_8));file.finishWrite(out);stateCache.put(key(c),value);}
++    catch(Exception failure){if(out!=null)file.failWrite(out);throw failure;}
++  }
++  static JSONObject copy(JSONObject value)throws Exception{return new JSONObject(value.toString());}
++  public static void initialize(Context c){synchronized(CobraVisualTheme.STORE_LOCK){
++    if(!initialized.add(key(c)))return;
++    CobraVisualTheme.discardAbandonedPreviews(c);
++    File[] files=root(c).listFiles();if(files==null)return;String kept=state(c).optString("legacy_active","");
++    for(File marker:files)if(marker.getName().matches("preview-legacy-[0-9a-f]{64}\\.pending")){
++      String generation=marker.getName().substring(15,79);if(!generation.equals(kept))CobraVisualTheme.deleteTree(new File(root(c),"legacy-"+generation));marker.delete();
++    }
++  }}
++  static boolean sameApp(Context c,Lease lease){return c!=null&&key(c).equals(key(lease.app));}
++  static Lease active(Context c){Lease lease=preview;return lease!=null&&sameApp(c,lease)?lease:null;}
++  public static boolean isPreviewing(Context c){return active(c)!=null;}
++  public static boolean usesBuiltIn(Context c){return isSafe(c)||state(c).optBoolean("legacy_builtin",false);}
++  static boolean hasLegacyOverride(Context c){Lease lease=active(c);return !isSafe(c)&&((lease!=null&&lease.legacy!=null)||(!state(c).optBoolean("legacy_builtin",false)&&state(c).optString("legacy_active","").matches("[0-9a-f]{64}")));}
++  public static boolean hasPrevious(Context c){return !CobraVisualTheme.readPointer(c).optString("previous","").isEmpty()||state(c).optString("legacy_active","").matches("[0-9a-f]{64}");}
++
++  /** Null means built-in legacy layout/palette; original addon files are never deleted. */
++  public static File legacyDirectory(Context c){
++    if(isSafe(c))return null;
++    Lease lease=active(c);if(lease!=null&&lease.legacy!=null)return lease.legacy;
++    JSONObject saved=state(c);if(saved.optBoolean("legacy_builtin",false))return null;
++    String generation=saved.optString("legacy_active","");
++    if(generation.matches("[0-9a-f]{64}")){
++      File directory=new File(root(c),"legacy-"+generation);if(directory.isDirectory())return directory;
++      return null; // Missing saved data must never reactivate an unrelated external theme.
++    }
++    File external=c.getExternalFilesDir(null);return external==null?null:new File(external,".kodi/addons/script.infinity.cobra.theme");
++  }
++  static CobraVisualTheme effective(Context c,CobraVisualTheme normal){
++    if(c==null)return normal;if(isSafe(c))return BUILTIN;
++    Lease lease=active(c);if(lease!=null)return lease.visual==null?BUILTIN:lease.visual;
++    return state(c).optBoolean("visual_builtin",false)?BUILTIN:normal;
++  }
++  static JSONObject effectiveManifest(Context c){return effective(c,CobraVisualRenderer.active).data;}
++
++  /** Stages a legacy data-only UI package; no external directory is renamed or overwritten. */
++  static File stageLegacy(Context c,Map<String,byte[]> files)throws Exception{synchronized(CobraVisualTheme.STORE_LOCK){
++    initialize(c);
++    if(files==null||files.isEmpty()||files.size()>256)throw new IOException("Invalid legacy package inventory");
++    String prefix=CobraVisualTheme.PREFIX;TreeMap<String,byte[]> ordered=new TreeMap<>();long total=0;
++    for(Map.Entry<String,byte[]> item:files.entrySet()){
++      if(!item.getKey().startsWith(prefix))throw new IOException("Unexpected package path");
++      String relative=item.getKey().substring(prefix.length());
++      if(!CobraVisualTheme.safeName(relative)||relative.endsWith(".so")||relative.endsWith(".dex")||relative.endsWith(".class"))throw new IOException("Unsafe presentation package");
++      byte[] bytes=item.getValue();if(bytes==null||(total+=bytes.length)>16L*1024*1024)throw new IOException("Presentation package too large");ordered.put(relative,bytes);
++    }
++    if(!ordered.containsKey("addon.xml")||!ordered.containsKey("resources/cobra-theme.json")||!ordered.containsKey("resources/cobra-ui.json"))throw new IOException("Incomplete Cobra UI package");
++    JSONObject ui=new JSONObject(new String(ordered.get("resources/cobra-ui.json"),StandardCharsets.UTF_8));
++    JSONObject runtime=ui.optJSONObject("runtime"),contracts=ui.optJSONObject("protected_contracts");
++    if(ui.optInt("schema")!=1||runtime==null||runtime.optInt("minimum_runtime",Integer.MAX_VALUE)>3||!"cobra-live-only".equals(runtime.optString("scope"))||contracts==null)throw new IOException("Unsupported Cobra UI contract");
++    for(String contract:new String[]{"rotation","fold","background_resume","renderer","provider_playback","infinity_handoff"})if(!"native".equals(contracts.optString(contract)))throw new IOException("Protected contract changed");
++    JSONObject palette=new JSONObject(new String(ordered.get("resources/cobra-theme.json"),StandardCharsets.UTF_8));if(palette.optInt("schema")<1||palette.optInt("schema")>2)throw new IOException("Unsupported palette");
++    java.security.MessageDigest digest=java.security.MessageDigest.getInstance("SHA-256");
++    for(Map.Entry<String,byte[]> item:ordered.entrySet()){digest.update(item.getKey().getBytes(StandardCharsets.UTF_8));digest.update((byte)0);digest.update(CobraVisualTheme.hash(item.getValue()).getBytes(StandardCharsets.UTF_8));}
++    StringBuilder id=new StringBuilder();for(byte b:digest.digest())id.append(String.format(Locale.ROOT,"%02x",b&255));
++    File directory=root(c);if(!directory.isDirectory()&&!directory.mkdirs())throw new IOException("Presentation storage unavailable");
++    File target=new File(directory,"legacy-"+id),stage=new File(directory,"stage-"+UUID.randomUUID());
++    if(target.exists()){
++      for(Map.Entry<String,byte[]> item:ordered.entrySet())if(!Arrays.equals(item.getValue(),CobraVisualTheme.readFile(CobraVisualTheme.inside(target,item.getKey()),16L*1024*1024)))throw new IOException("Stored preview changed");
++      return target;
++    }
++    try{
++      if(!stage.mkdir())throw new IOException("Cannot stage presentation");
++      for(Map.Entry<String,byte[]> item:ordered.entrySet()){
++        File file=CobraVisualTheme.inside(stage,item.getKey());if(!file.getParentFile().isDirectory()&&!file.getParentFile().mkdirs())throw new IOException("Cannot stage presentation directory");
++        try(FileOutputStream out=new FileOutputStream(file)){out.write(item.getValue());out.getFD().sync();}
++      }
++      try(FileOutputStream marker=new FileOutputStream(new File(directory,"preview-legacy-"+id+".pending"))){marker.write(1);marker.getFD().sync();}
++      if(!stage.renameTo(target))throw new IOException("Cannot retain presentation preview");return target;
++    }finally{CobraVisualTheme.deleteTree(stage);}
++  }}
++
++  public static void offerVisual(Activity a,CobraVisualTheme ready){offer(a,ready,null);}
++  public static void offerLegacy(Activity a,File ready){offer(a,null,ready);}
++  public static void previewPrevious(Activity a){
++    Context app=a.getApplicationContext();WeakReference<Activity> owner=new WeakReference<>(a);
++    CobraVisualRenderer.IO.execute(()->{
++      try{CobraVisualTheme saved;File legacy;
++        synchronized(CobraVisualTheme.STORE_LOCK){String generation=CobraVisualTheme.readPointer(app).optString("previous","");String oldLegacy=state(app).optString("legacy_active","");
++          if(generation.isEmpty()&&oldLegacy.matches("[0-9a-f]{64}")){legacy=new File(root(app),"legacy-"+oldLegacy);if(!legacy.isDirectory())throw new IOException("Previous theme missing");saved=null;}
++          else{if(generation.isEmpty())throw new IOException("No previous theme");saved=CobraVisualTheme.loadGeneration(app,generation);legacy=null;}
++        }
++        CobraVisualRenderer.MAIN.post(()->{Activity current=owner.get();if(current!=null){if(legacy!=null)offerLegacy(current,legacy);else offerVisual(current,saved);}});
++      }catch(Exception error){CobraVisualRenderer.MAIN.post(()->{Activity current=owner.get();if(current!=null&&!current.isFinishing()&&!current.isDestroyed())android.widget.Toast.makeText(current,"Previous theme unavailable; appearance unchanged",android.widget.Toast.LENGTH_LONG).show();});}
++    });
++  }
++  static void offer(Activity a,CobraVisualTheme visual,File legacy){
++    if(a==null)return;
++    if(a.isFinishing()||a.isDestroyed()||stoppedOwners.containsKey(a)||isSafe(a)){
++      Lease abandoned=new Lease(a,visual,legacy);CobraVisualRenderer.IO.execute(()->discard(abandoned));
++      if(isSafe(a)&&!a.isFinishing()&&!a.isDestroyed())android.widget.Toast.makeText(a,"Leave Safe Mode before previewing a theme",android.widget.Toast.LENGTH_LONG).show();return;
++    }
++    Lease lease; synchronized(CobraVisualTheme.STORE_LOCK){cancel(a,false);lease=new Lease(a,visual,legacy);preview=lease;}
++    refresh(a);showPrompt(lease);
++    lease.timeout=()->revert(lease.token,true);CobraVisualRenderer.MAIN.postDelayed(lease.timeout,PREVIEW_MS);
++  }
++  static void showPrompt(Lease lease){
++    Activity a=lease.owner.get();if(a==null||a.isFinishing()||a.isDestroyed()){revert(lease.token,false);return;}
++    AlertDialog dialog=safeDialog(a).setTitle("Keep this theme?")
++        .setMessage("Preview only. Cobra restores your previous appearance after 20 seconds unless you choose Keep Theme.")
++        .setPositiveButton("Keep Theme",(d,w)->keep(lease.token))
++        .setNegativeButton("Revert",(d,w)->revert(lease.token,true)).create();
++    dialog.setOnCancelListener(d->revert(lease.token,true));lease.dialog=dialog;dialog.show();
++    if(dialog.getWindow()!=null)dialog.getWindow().getDecorView().setTag("cobra-visual-theme-controls-preview");
++  }
++  static AlertDialog.Builder safeDialog(Activity a){return new AlertDialog.Builder(a,android.R.style.Theme_Material_Dialog_Alert);}
++  static void dismiss(Lease lease){
++    if(lease.timeout!=null)CobraVisualRenderer.MAIN.removeCallbacks(lease.timeout);
++    if(lease.dialog!=null){lease.dialog.setOnCancelListener(null);lease.dialog.dismiss();lease.dialog=null;}
++  }
++  static void keep(String token){
++    Lease lease=preview;if(lease==null||!lease.token.equals(token))return;
++    if(SystemClock.elapsedRealtime()>=lease.deadline){revert(token,true);return;}
++    // Disk work is serialized with theme loads/restore. Only a confirmed exact
++    // lease is committed, and the old pointer is restored if the second write fails.
++    CobraVisualRenderer.IO.execute(()->{
++      boolean kept=false;String error=null;
++      synchronized(CobraVisualTheme.STORE_LOCK){
++        if(preview!=lease||SystemClock.elapsedRealtime()>=lease.deadline)return;
++        JSONObject old=CobraVisualTheme.readPointer(lease.app);
++        try{
++          JSONObject next=copy(state(lease.app));
++          if(lease.visual!=null){CobraVisualTheme.keepPreview(lease.app,lease.visual);next.put("visual_builtin",false);}
++          else{next.put("legacy_active",lease.legacy.getName().substring("legacy-".length()));next.put("legacy_builtin",false);next.put("visual_builtin",true);}
++          writeState(lease.app,next);
++          if(lease.visual!=null)new File(CobraVisualTheme.store(lease.app),"preview-"+lease.visual.directory.getName()+".pending").delete();
++          if(lease.legacy!=null)new File(root(lease.app),"preview-"+lease.legacy.getName()+".pending").delete();preview=null;kept=true;
++        }catch(Exception failure){try{CobraVisualTheme.writePointer(lease.app,old);}catch(Exception ignored){}error="Theme was not kept; previous appearance restored";}
++      }
++      final boolean success=kept;final String failure=error;
++      CobraVisualRenderer.MAIN.post(()->{
++        if(success){dismiss(lease);if(lease.visual!=null)CobraVisualRenderer.publish(lease.visual,"Visual theme kept");Activity a=lease.owner.get();if(a!=null)refresh(a);}
++        else{revert(token,true);Activity a=lease.owner.get();if(a!=null&&failure!=null)android.widget.Toast.makeText(a,failure,android.widget.Toast.LENGTH_LONG).show();}
++      });
++    });
++  }
++  static void revert(String token,boolean refresh){
++    Lease lease;
++    synchronized(CobraVisualTheme.STORE_LOCK){lease=preview;if(lease==null||!lease.token.equals(token))return;preview=null;}
++    dismiss(lease);Activity a=lease.owner.get();if(refresh&&a!=null)refresh(a);
++    CobraVisualRenderer.IO.execute(()->discard(lease));
++  }
++  static void discard(Lease lease){synchronized(CobraVisualTheme.STORE_LOCK){
++    Lease current=preview;if(current!=null&&((lease.visual!=null&&current.visual!=null&&lease.visual.directory.equals(current.visual.directory))||(lease.legacy!=null&&lease.legacy.equals(current.legacy))))return;
++    if(lease.visual!=null)CobraVisualTheme.discardPreview(lease.app,lease.visual);
++    if(lease.legacy!=null){String id=lease.legacy.getName().substring("legacy-".length());File marker=new File(root(lease.app),"preview-legacy-"+id+".pending");
++      if(marker.isFile()){if(!id.equals(state(lease.app).optString("legacy_active")))CobraVisualTheme.deleteTree(lease.legacy);marker.delete();}}
++  }}
++  public static void cancel(Context c,boolean refresh){Lease lease=active(c);if(lease!=null)revert(lease.token,refresh);}
++  public static void onStop(Activity a){stoppedOwners.put(a,Boolean.TRUE);Lease lease=active(a);if(lease!=null&&lease.owner.get()==a){refreshOnReturn.put(a,Boolean.TRUE);revert(lease.token,false);}}
++  public static void onResume(Activity a){stoppedOwners.remove(a);if(refreshOnReturn.remove(a)!=null)refresh(a);}
++  static void refresh(Activity a){
++    if(a==null||a.isFinishing()||a.isDestroyed())return;
++    CobraVisualRenderer.refreshClients();
++    if(a instanceof InfinityLiveActivity)((InfinityLiveActivity)a).cobraRefreshSafetyPresentation();
++    else if(a instanceof Splash)((Splash)a).cobraRefreshSafetyChooser();
++  }
++  public static void restoreBuiltIn(Activity a,Runnable after){
++    cancel(a,false);Context app=a.getApplicationContext();WeakReference<Activity> owner=new WeakReference<>(a);
++    CobraVisualRenderer.IO.execute(()->{
++      try{synchronized(CobraVisualTheme.STORE_LOCK){
++        JSONObject next=copy(state(app));next.put("legacy_builtin",true);next.put("visual_builtin",true);writeState(app,next);
++        CobraVisualTheme.reset(app);
++      }
++        CobraVisualRenderer.publish(CobraVisualTheme.builtin(),"Built-in appearance restored");
++        CobraVisualRenderer.MAIN.post(()->{Activity current=owner.get();if(current!=null&&!current.isFinishing()&&!current.isDestroyed()){refresh(current);if(after!=null)after.run();}});
++      }catch(Exception failure){CobraVisualRenderer.MAIN.post(()->{Activity current=owner.get();if(current!=null)android.widget.Toast.makeText(current,"Theme restore could not finish; no theme files were deleted",android.widget.Toast.LENGTH_LONG).show();});}
++    });
++  }
++  static void allowVisual(Context c)throws Exception{synchronized(CobraVisualTheme.STORE_LOCK){JSONObject next=copy(state(c));next.put("visual_builtin",false);writeState(c,next);}}
++}
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/CobraQuickPeekSession.java.in
+@@ -0,0 +1,90 @@
++package @APP_PACKAGE@;
++
++import android.content.Context;
++import android.graphics.Matrix;
++import android.os.Handler;
++import android.os.Looper;
++import android.view.TextureView;
++import android.view.View;
++import androidx.media3.common.C;
++import androidx.media3.common.MediaItem;
++import androidx.media3.common.PlaybackException;
++import androidx.media3.common.Player;
++import androidx.media3.common.VideoSize;
++import androidx.media3.exoplayer.DefaultLoadControl;
++import androidx.media3.exoplayer.DefaultRenderersFactory;
++import androidx.media3.exoplayer.ExoPlayer;
++import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
++import org.json.JSONObject;
++
++/** A disposable, silent direct preview. Deliberately not registered as a Cobra playback owner. */
++final class CobraQuickPeekSession implements AutoCloseable {
++  interface Listener {void changed(String state,int width,int height,String codec);}
++  static final long CAPACITY_MAX_AGE_MS=120000L;
++  static final class Capacity {
++    final int maximum,active;final long observed;
++    Capacity(int maximum,int active,long observed){this.maximum=maximum;this.active=active;this.observed=observed;}
++    static Capacity from(JSONObject user,long now){
++      if(user==null)return null;
++      int maximum=integer(user.optString("max_connections","")),active=integer(user.optString("active_cons",""));
++      return maximum>0?new Capacity(maximum,active,now):null;
++    }
++    private static int integer(String value){try{int n=Integer.parseInt(value);return n>=0&&n<=10000?n:-1;}catch(RuntimeException invalid){return -1;}}
++  }
++  static boolean capacityAllows(Capacity capacity,int ownSourceSessions,long now){
++    if(ownSourceSessions<0)return false;
++    if(capacity==null||now<capacity.observed||now-capacity.observed>CAPACITY_MAX_AGE_MS)return ownSourceSessions==0;
++    if(capacity.active<0)return ownSourceSessions==0;
++    return Math.max(ownSourceSessions,capacity.active)<capacity.maximum;
++  }
++
++  private ExoPlayer player;
++  private TextureView texture;
++  private Listener listener;
++  private Runnable transportCleanup;
++  private final Handler handler=new Handler(Looper.getMainLooper());
++  private boolean closed,firstFrame;
++  private final Runnable startupTimeout=()->{if(!closed&&!firstFrame)fail("Preview unavailable");};
++  private final View.OnLayoutChangeListener layout=(v,l,t,r,b,ol,ot,or,ob)->fit();
++  private final Player.Listener events=new Player.Listener(){
++    @Override public void onRenderedFirstFrame(){if(!closed){firstFrame=true;handler.removeCallbacks(startupTimeout);publish("Live preview · muted");}}
++    @Override public void onVideoSizeChanged(VideoSize size){fit();}
++    @Override public void onPlaybackStateChanged(int state){
++      if(closed)return;if(state==Player.STATE_BUFFERING)publish(firstFrame?"Preview buffering…":"Connecting preview…");
++      else if(state==Player.STATE_READY)publish(firstFrame?"Live preview · muted":"Connecting preview…");else if(state==Player.STATE_ENDED)fail("Preview ended");
++    }
++    @Override public void onPlayerError(PlaybackException failure){fail("Preview unavailable");}
++  };
++  CobraQuickPeekSession(Context context,TextureView target,DefaultMediaSourceFactory factory,MediaItem media,Listener updates,Runnable cleanup){
++    texture=target;listener=updates;transportCleanup=cleanup;
++    try{
++      DefaultLoadControl buffer=new DefaultLoadControl.Builder().setBufferDurationsMs(1200,8000,750,1000).setTargetBufferBytes(4*1024*1024).setPrioritizeTimeOverSizeThresholds(false).build();
++      player=new ExoPlayer.Builder(context,new DefaultRenderersFactory(context).setEnableDecoderFallback(true)).setMediaSourceFactory(factory).setLoadControl(buffer).build();
++      // No audio renderer/focus request, captions, playback service, shared timeline or retries.
++      player.setVolume(0f);player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setTrackTypeDisabled(C.TRACK_TYPE_AUDIO,true).setTrackTypeDisabled(C.TRACK_TYPE_TEXT,true).build());
++      player.addListener(events);texture.addOnLayoutChangeListener(layout);player.setVideoTextureView(texture);
++      player.setMediaItem(media);player.prepare();player.play();handler.postDelayed(startupTimeout,12000L);publish("Connecting preview…");
++    }catch(RuntimeException unavailable){fail("Preview unavailable");}
++  }
++  private void publish(String state){
++    Listener target=listener;if(closed||target==null)return;
++    VideoSize size=player==null?VideoSize.UNKNOWN:player.getVideoSize();String codec="";
++    if(player!=null&&player.getVideoFormat()!=null){androidx.media3.common.Format f=player.getVideoFormat();codec=f.codecs==null?f.sampleMimeType==null?"":f.sampleMimeType:f.codecs;}
++    target.changed(state,size.width,size.height,codec);
++  }
++  private void fit(){
++    if(closed||player==null||texture==null)return;VideoSize size=player.getVideoSize();int w=texture.getWidth(),h=texture.getHeight();
++    if(w<=0||h<=0||size.width<=0||size.height<=0)return;
++    float aspect=size.width*Math.max(.01f,size.pixelWidthHeightRatio)/size.height;float viewport=(float)w/h;
++    Matrix matrix=new Matrix();matrix.setScale(aspect<viewport?aspect/viewport:1f,aspect>viewport?viewport/aspect:1f,w/2f,h/2f);texture.setTransform(matrix);
++  }
++  private void fail(String state){Listener target=listener;close();if(target!=null)target.changed(state,0,0,"");}
++  boolean closed(){return closed;}
++  @Override public void close(){
++    if(closed)return;closed=true;handler.removeCallbacksAndMessages(null);listener=null;
++    Runnable cleanup=transportCleanup;transportCleanup=null;if(cleanup!=null)try{cleanup.run();}catch(RuntimeException ignoredFailure){}
++    if(texture!=null)texture.removeOnLayoutChangeListener(layout);
++    ExoPlayer previous=player;player=null;texture=null;
++    if(previous!=null){previous.removeListener(events);try{previous.clearVideoSurface();}catch(RuntimeException ignoredFailure){}try{previous.release();}catch(RuntimeException ignoredFailure){}}
++  }
++}
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/CobraSmartReturn.java.in
+@@ -0,0 +1,94 @@
++package @APP_PACKAGE@;
++
++import android.content.SharedPreferences;
++import java.util.LinkedHashMap;
++import java.util.Map;
++import org.json.JSONArray;
++import org.json.JSONObject;
++
++/** UI context only. Never stores a transport, URL, credential, or live seek offset. */
++final class CobraSmartReturn {
++  static final String ENABLED = "cobra_smart_return";
++  static final String SNAPSHOT = "cobra_smart_return_snapshot_v1";
++  static final int MAX_BYTES = 32768;
++  static final long MAX_AGE_MS = 7L * 24L * 60L * 60L * 1000L;
++
++  static final class Snapshot {
++    String profile="", source="", channel="", selected="", mode="mobile", route="channels";
++    String category="ALL", search="", destination="guide", playback="none";
++    long savedAt, guideWindow;
++    boolean requested, groups=true;
++    int screenScroll;
++    final LinkedHashMap<String,int[]> scroll = new LinkedHashMap<>();
++    final LinkedHashMap<String,String> focus = new LinkedHashMap<>();
++  }
++
++  /** User input or a changed navigation epoch permanently cancels this cold-entry offer. */
++  static final class Gate {
++    private Snapshot pending;
++    private long epoch;
++    Gate(Snapshot value,long navigationEpoch){pending=value;epoch=navigationEpoch;}
++    void loading(long navigationEpoch){if(pending!=null)epoch=navigationEpoch;}
++    void cancel(){pending=null;}
++    boolean pending(){return pending!=null;}
++    Snapshot take(String profile,long navigationEpoch){
++      Snapshot value=pending;pending=null;
++      return value!=null&&value.profile.equals(profile)&&epoch==navigationEpoch?value:null;
++    }
++  }
++
++  static boolean enabled(SharedPreferences preferences){
++    try{return preferences!=null&&preferences.getBoolean(ENABLED,false);}catch(ClassCastException invalid){return false;}
++  }
++  static String bounded(String value,int max){return value==null?"":value.length()<=max?value:value.substring(0,max);}
++  static boolean mode(String value){return "mobile".equals(value)||"grid".equals(value)||"compact".equals(value)||"cards".equals(value)||"focus".equals(value);}
++  static String destination(String value){
++    for(String allowed:new String[]{"guide","settings","sources","movies","shows","recordings","watchlist","continue","profiles","discover","health"})if(allowed.equals(value))return value;
++    return "guide";
++  }
++  static String encode(Snapshot s){
++    if(s==null)return "";
++    try{
++      JSONObject j=new JSONObject();j.put("schema",1);j.put("profile",bounded(s.profile,128));j.put("source",bounded(s.source,512));
++      j.put("channel",bounded(s.channel,512));j.put("selected",bounded(s.selected,512));j.put("saved",s.savedAt);
++      j.put("mode",mode(s.mode)?s.mode:"mobile");j.put("route","sources".equals(s.route)?"sources":"categories".equals(s.route)?"categories":"channels");
++      j.put("category",bounded(s.category,256));j.put("search",bounded(s.search,256));j.put("destination",destination(s.destination));
++      j.put("playback","fullscreen".equals(s.playback)?"fullscreen":"preview".equals(s.playback)?"preview":"none");
++      j.put("requested",s.requested);j.put("groups",s.groups);j.put("guide_window",Math.max(0,s.guideWindow));j.put("screen_scroll",Math.max(0,Math.min(100000,s.screenScroll)));
++      JSONArray rows=new JSONArray();
++      for(Map.Entry<String,int[]> e:s.scroll.entrySet()){
++        if(rows.length()>=32)break;int[] p=e.getValue();if(p==null||p.length<2||e.getKey()==null||e.getKey().length()>512)continue;
++        JSONObject r=new JSONObject();r.put("key",e.getKey());r.put("index",Math.max(0,Math.min(50000,p[0])));r.put("top",Math.max(-10000,Math.min(10000,p[1])));
++        r.put("focus",bounded(s.focus.get(e.getKey()),512));rows.put(r);
++      }
++      j.put("positions",rows);String value=j.toString();return value.length()<=MAX_BYTES?value:"";
++    }catch(Exception invalid){return "";}
++  }
++  static Snapshot decode(String value,String profile,long now){
++    if(value==null||value.isEmpty()||value.length()>MAX_BYTES)return null;
++    try{
++      JSONObject j=new JSONObject(value);long saved=j.optLong("saved",0L);
++      if(j.optInt("schema")!=1||!profile.equals(j.optString("profile"))||saved<=0L||saved>now+60000L||now-saved>MAX_AGE_MS)return null;
++      Snapshot s=new Snapshot();s.profile=profile;s.savedAt=saved;s.source=bounded(j.optString("source"),512);s.channel=bounded(j.optString("channel"),512);s.selected=bounded(j.optString("selected"),512);
++      s.mode=j.optString("mode","mobile");if(!mode(s.mode))return null;
++      s.route=j.optString("route","channels");if(!"sources".equals(s.route)&&!"categories".equals(s.route))s.route="channels";
++      s.category=bounded(j.optString("category","ALL"),256);s.search=bounded(j.optString("search"),256);s.destination=destination(j.optString("destination"));
++      s.playback=j.optString("playback","none");if(!"fullscreen".equals(s.playback)&&!"preview".equals(s.playback))s.playback="none";
++      s.requested=j.optBoolean("requested",false);s.groups=j.optBoolean("groups",true);s.screenScroll=Math.max(0,Math.min(100000,j.optInt("screen_scroll",0)));
++      long window=j.optLong("guide_window",0L);s.guideWindow=window>now-24L*3600000L&&window<now+7L*24L*3600000L?window:0L;
++      JSONArray rows=j.optJSONArray("positions");if(rows!=null)for(int i=0;i<Math.min(rows.length(),32);i++){
++        JSONObject r=rows.optJSONObject(i);if(r==null)continue;String key=r.optString("key");if(key.isEmpty()||key.length()>512)continue;
++        s.scroll.put(key,new int[]{Math.max(0,Math.min(50000,r.optInt("index",0))),Math.max(-10000,Math.min(10000,r.optInt("top",0)))});
++        s.focus.put(key,bounded(r.optString("focus"),512));
++      }
++      return s;
++    }catch(Exception invalid){return null;}
++  }
++  static Snapshot read(SharedPreferences preferences,String key,String profile,long now){
++    if(!enabled(preferences))return null;
++    try{return decode(preferences.getString(key,""),profile,now);}catch(ClassCastException invalid){return null;}
++  }
++  static void save(SharedPreferences preferences,String key,Snapshot snapshot){
++    if(!enabled(preferences))return;String value=encode(snapshot);if(!value.isEmpty())preferences.edit().putString(key,value).apply();
++  }
++}
+--- a/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in
++++ b/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in
+@@ -30,18 +30,22 @@
+   String cacheVariant="";
+   private Runnable readyAction;
+   public void whenReady(Runnable action){readyAction=action;}
+-  public boolean installed(){Context c=context.get();return !active.id.equals("builtin")||(c!=null&&!CobraVisualTheme.readPointer(c).optString("active","").isEmpty());}
++  CobraVisualTheme effective(){return CobraPresentationSafety.effective(context.get(),active);}
++  public boolean visualInstalled(){Context c=context.get();return !effective().id.equals("builtin")||(c!=null&&!CobraPresentationSafety.isSafe(c)&&!CobraPresentationSafety.state(c).optBoolean("visual_builtin",false)&&!CobraVisualTheme.readPointer(c).optString("active","").isEmpty());}
++  public boolean installed(){Context c=context.get();return visualInstalled()||(c!=null&&CobraPresentationSafety.hasLegacyOverride(c));}
+   public CobraVisualRenderer(Context owner){
+     context=new WeakReference<>(owner);
+     synchronized(clients){clients.add(new WeakReference<>(this));}
+     if(loading.compareAndSet(false,true)){Context app=owner.getApplicationContext();IO.execute(()->{
++      CobraPresentationSafety.initialize(app);
+       synchronized(CobraVisualTheme.STORE_LOCK){try{publish(CobraVisualTheme.load(app),"Loaded visual theme");}catch(Exception error){publish(CobraVisualTheme.builtin(),"Theme unavailable; built-in appearance used");}}
+     });}
+   }
+   static void publish(CobraVisualTheme value,String status){MAIN.post(()->{
+     active=value;loadStatus=status;
+-    synchronized(clients){Iterator<WeakReference<CobraVisualRenderer>> it=clients.iterator();while(it.hasNext()){CobraVisualRenderer client=it.next().get();if(client==null)it.remove();else client.refresh();}}
++    refreshClients();
+   });}
++  static void refreshClients(){synchronized(clients){Iterator<WeakReference<CobraVisualRenderer>> it=clients.iterator();while(it.hasNext()){CobraVisualRenderer client=it.next().get();if(client==null)it.remove();else client.refresh();}}}
+   public String palette(){Context c=context.get();if(c==null)return "dark";
+     // The Activity passes its actual resolved palette via mode(), avoiding a second preference owner.
+     if(explicitPalette!=null)return explicitPalette;
+@@ -53,7 +57,7 @@
+     if((q.uiMode&Configuration.UI_MODE_TYPE_MASK)==Configuration.UI_MODE_TYPE_TELEVISION)return "tv";
+     if(width>0&&width<360)return "cover";if(q.smallestScreenWidthDp>=600)return "tablet";return q.orientation==Configuration.ORIENTATION_LANDSCAPE?"landscape":"portrait";
+   }
+-  Object get(String group,String key){CobraVisualTheme now=active;String variant=layout()+"/"+palette();if(cached!=now||!variant.equals(cacheVariant)){cache.clear();cached=now;cacheVariant=variant;}
++  Object get(String group,String key){CobraVisualTheme now=effective();String variant=layout()+"/"+palette();if(cached!=now||!variant.equals(cacheVariant)){cache.clear();cached=now;cacheVariant=variant;}
+     String k=group+":"+key;Object v=cache.get(k);if(v==null&&!cache.containsKey(k)){v=now.value(group,key,palette(),layout());cache.put(k,v==null?JSONObject.NULL:v);}return v==JSONObject.NULL?null:v;
+   }
+   public int color(String key,int fallback){Object v=get("colors",key);if(v==null)v=get("colors",String.format(Locale.ROOT,"argb.%08x",fallback));try{return v instanceof String?Color.parseColor((String)v):fallback;}catch(Exception ignored){return fallback;}}
+@@ -61,12 +65,13 @@
+   public float number(String key,float fallback,float low,float high){Object v=get("numbers",key);return v instanceof Number?Math.max(low,Math.min(high,((Number)v).floatValue())):fallback;}
+   public String copy(String key,String fallback){Object v=get("copy",key);return v instanceof String?(String)v:fallback;}
+   public Typeface font(String key,Typeface fallback){Object value=get("styles",key);if(value==null)value=get("styles","font.all");if(!(value instanceof JSONObject))return fallback;JSONObject s=(JSONObject)value;
+-    Typeface asset=active.fonts.get(s.optString("font_asset",""));if(asset!=null)return Typeface.create(asset,s.optInt("font_style",0));
++    Typeface asset=effective().fonts.get(s.optString("font_asset",""));if(asset!=null)return Typeface.create(asset,s.optInt("font_style",0));
+     return s.has("font_family")?Typeface.create(s.optString("font_family"),s.optInt("font_style",0)):fallback;
+   }
+   public long motion(String key,long fallback){Context c=context.get();if(Build.VERSION.SDK_INT>=26&&!android.animation.ValueAnimator.areAnimatorsEnabled())return 0;return Math.round(number(key,fallback,0,600));}
+   int px(float dp){Context c=context.get();return Math.round(dp*(c==null?1:c.getResources().getDisplayMetrics().density));}
+-  Bitmap bitmap(String slot){Object id=get("images",slot);return id instanceof String?active.bitmaps.get(id):null;}
++  Bitmap bitmap(String slot){Object id=get("images",slot);return id instanceof String?effective().bitmaps.get(id):null;}
++  Bitmap assetBitmap(String id){return effective().bitmaps.get(id);}
+   public boolean hasImage(String slot){return bitmap(slot)!=null;}
+   public boolean draw(Canvas canvas,String slot,float left,float top,float right,float bottom,String fit){Bitmap image=bitmap(slot);if(image==null||right<=left||bottom<=top)return false;drawBitmap(canvas,image,new RectF(left,top,right,bottom),fit,255);return true;}
+   static void drawBitmap(Canvas canvas,Bitmap image,RectF bounds,String fit,int alpha){
+@@ -123,14 +128,14 @@
+     if(CobraVisualGeometry.changesParams(s)&&view.getLayoutParams()==null&&!base.waitingForAttach){base.waitingForAttach=true;view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(){public void onViewAttachedToWindow(View v){v.removeOnAttachStateChangeListener(this);base.waitingForAttach=false;apply(v,base);}public void onViewDetachedFromWindow(View v){}});}
+     if(view instanceof TextView){TextView tv=(TextView)view;if(s.has("text"))tv.setTextColor(parseColor(s,"text",tv.getCurrentTextColor()));
+       if(s.has("text_size_sp"))tv.setTextSize((float)s.optDouble("text_size_sp",14));if(s.has("letter_spacing"))tv.setLetterSpacing((float)s.optDouble("letter_spacing",0));
+-      if(s.has("font_asset")&&active.fonts.containsKey(s.optString("font_asset")))tv.setTypeface(active.fonts.get(s.optString("font_asset")),s.optInt("font_style",0));
++      if(s.has("font_asset")&&effective().fonts.containsKey(s.optString("font_asset")))tv.setTypeface(effective().fonts.get(s.optString("font_asset")),s.optInt("font_style",0));
+       else if(s.has("font_family")||s.has("font_style"))tv.setTypeface(Typeface.create(s.optString("font_family","sans-serif"),s.optInt("font_style",0)));
+     }
+   }
+   static int parseColor(JSONObject s,String key,int fallback){try{return s.has(key)?Color.parseColor(s.getString(key)):fallback;}catch(Exception ignored){return fallback;}}
+   Drawable background(JSONObject s,int top,int bottom,int stroke,int width,float radius){
+     GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{top,bottom});shape.setCornerRadius(radius);shape.setStroke(width,stroke);
+-    Bitmap image=active.bitmaps.get(s.optString("image",""));if(image==null)return shape;
++    Bitmap image=effective().bitmaps.get(s.optString("image",""));if(image==null)return shape;
+     return new ArtworkDrawable(shape,image,s.optString("image_fit","cover"),radius,stroke,width);
+   }
+   static final class ArtworkDrawable extends Drawable {
+@@ -146,13 +151,14 @@
+   }
+   void restore(View view,Binding b){if(b.geometry!=null){b.geometry.restore(view);b.geometry=null;}view.setBackground(b.background);view.setPadding(b.l,b.t,b.r,b.b);view.setMinimumHeight(b.minHeight);view.setElevation(b.elevation);if(view instanceof TextView){TextView tv=(TextView)view;tv.setTextColor(b.textColors);tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,b.textSize);tv.setLetterSpacing(b.spacing);tv.setTypeface(b.typeface);}}
+   void refresh(){cache.clear();for(Map.Entry<View,Binding> e:new ArrayList<>(bindings.entrySet())){View v=e.getKey();if(v!=null){restore(v,e.getValue());apply(v,e.getValue());v.invalidate();}}if(readyAction!=null){Context c=context.get();if(c instanceof Activity&&!((Activity)c).isFinishing()&&!((Activity)c).isDestroyed())readyAction.run();}}
+-  public String description(){return active.id+" · visual runtime "+CobraVisualTheme.RUNTIME+" · "+loadStatus;}
+-  public String displayName(){String name=active.data.optString("name","").trim();return name.isEmpty()?active.id:name;}
++  public String description(){return effective().id+" · visual runtime "+CobraVisualTheme.RUNTIME+" · "+loadStatus;}
++  public String displayName(){CobraVisualTheme value=effective();Context c=context.get();if("builtin".equals(value.id)&&c!=null&&CobraPresentationSafety.hasLegacyOverride(c))return "Installed Cobra UI package";String name=value.data.optString("name","").trim();return name.isEmpty()?value.id:name;}
+   public void restoreBuiltIn(Activity activity,Runnable after){
+-    IO.execute(()->{try{synchronized(CobraVisualTheme.STORE_LOCK){CobraVisualTheme.reset(activity.getApplicationContext());publish(CobraVisualTheme.builtin(),"Built-in appearance restored");}if(after!=null)MAIN.post(after);}catch(Exception e){MAIN.post(()->Toast.makeText(activity,"Theme reset failed; current theme unchanged",Toast.LENGTH_LONG).show());}});
++    CobraPresentationSafety.restoreBuiltIn(activity,after);
+   }
+   public void restorePrevious(Activity activity,Runnable after){
+-    IO.execute(()->{try{synchronized(CobraVisualTheme.STORE_LOCK){publish(CobraVisualTheme.rollback(activity.getApplicationContext()),"Previous theme restored");}if(after!=null)MAIN.post(after);}catch(Exception e){MAIN.post(()->Toast.makeText(activity,"Previous theme unavailable; current theme unchanged",Toast.LENGTH_LONG).show());}});
++    CobraPresentationSafety.cancel(activity,false);
++    IO.execute(()->{try{synchronized(CobraVisualTheme.STORE_LOCK){CobraVisualTheme restored=CobraVisualTheme.rollback(activity.getApplicationContext());CobraPresentationSafety.allowVisual(activity.getApplicationContext());publish(restored,"Previous theme restored");}if(after!=null)MAIN.post(after);}catch(Exception e){MAIN.post(()->Toast.makeText(activity,"Previous theme unavailable; current theme unchanged",Toast.LENGTH_LONG).show());}});
+   }
+   public void manager(Activity activity){
+     new AlertDialog.Builder(activity).setTitle("Cobra theme controls").setMessage(description()+"\n\nReset and rollback change presentation only. Reopen menus to refresh source-driven layout and copy. No playlists or playback preferences are deleted.")
+--- a/tools/android/packaging/xbmc/src/CobraVisualScene.java.in
++++ b/tools/android/packaging/xbmc/src/CobraVisualScene.java.in
+@@ -82,7 +82,7 @@
+         text.setIncludeFontPadding(false);v=text;
+       }else{
+         final String asset=n.getString("asset"),fit=n.optString("fit","contain");
+-        v=new View(context){@Override protected void onDraw(Canvas c){CobraVisualRenderer.drawBitmap(c,CobraVisualRenderer.active.bitmaps.get(asset),new android.graphics.RectF(0,0,getWidth(),getHeight()),fit,255);}};
++        v=new View(context){@Override protected void onDraw(Canvas c){CobraVisualRenderer.drawBitmap(c,renderer.assetBitmap(asset),new android.graphics.RectF(0,0,getWidth(),getHeight()),fit,255);}};
+         v.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);v.setClickable(false);v.setFocusable(false);
+       }
+       if(!type.equals("slot"))v.setTag("visual-node:"+n.getString("id"));
+--- a/tools/android/packaging/xbmc/src/CobraVisualTheme.java.in
++++ b/tools/android/packaging/xbmc/src/CobraVisualTheme.java.in
+@@ -176,25 +176,63 @@
+     try{return loadChecked(c);}catch(OutOfMemoryError pressure){throw new IOException("Insufficient memory to load visual theme",pressure);}
+   }
+   static CobraVisualTheme loadChecked(Context c)throws Exception{synchronized(STORE_LOCK){
+-    JSONObject p=readPointer(c);String generation=p.optString("active","");if(generation.isEmpty())return builtin();if(!generation.matches("[0-9a-f]{64}"))throw new IOException("Invalid active theme pointer");
++    return loadGeneration(c,readPointer(c).optString("active",""));
++  }}
++  static CobraVisualTheme loadGeneration(Context c,String generation)throws Exception{synchronized(STORE_LOCK){
++    if(generation.isEmpty())return builtin();if(!generation.matches("[0-9a-f]{64}"))throw new IOException("Invalid active theme pointer");
+     File dir=inside(store(c),generation);Map<String,byte[]> files=filesAt(dir);if(!hash(files.get(MANIFEST)).equals(generation))throw new IOException("Theme manifest integrity mismatch");JSONObject root=validate(files);Map<String,Bitmap> decoded=decode(root,files);long size=0;for(Bitmap b:decoded.values())size+=b.getAllocationByteCount();try{return new CobraVisualTheme(root,dir,decoded,size);}catch(Exception|OutOfMemoryError e){for(Bitmap b:decoded.values())b.recycle();throw new IOException("Theme could not be loaded",e);}
+   }}
+   static CobraVisualTheme install(Context c,InputStream input)throws Exception{
+     try{return installChecked(c,input);}catch(OutOfMemoryError pressure){throw new IOException("Insufficient memory for visual theme; prior snapshot retained",pressure);}
+   }
+   static CobraVisualTheme installChecked(Context c,InputStream input)throws Exception{synchronized(STORE_LOCK){
++    return storePrepared(c,input,true);
++  }}
++  // Preview validates and stages immutable data, but never changes the committed
++  // active/previous pointer and never prunes a user's rollback generation.
++  static CobraVisualTheme stagePreview(Context c,InputStream input)throws Exception{synchronized(STORE_LOCK){
++    CobraPresentationSafety.initialize(c);
++    try{return storePrepared(c,input,false);}catch(OutOfMemoryError pressure){throw new IOException("Insufficient memory to preview visual theme",pressure);}
++  }}
++  static CobraVisualTheme storePrepared(Context c,InputStream input,boolean activate)throws Exception{
+     Map<String,byte[]> files=unpack(input);JSONObject root=validate(files);Map<String,Bitmap> images=decode(root,files);String generation=hash(files.get(MANIFEST));File home=store(c);
+     if(!home.isDirectory()&&!home.mkdirs())throw new IOException("Theme storage unavailable");File target=inside(home,generation);boolean existed=target.exists();boolean committed=false;File stage=new File(home,"stage-"+UUID.randomUUID());long bytes=0;
+     try{
+       if(!stage.mkdir())throw new IOException("Cannot stage theme");for(Map.Entry<String,byte[]> entry:files.entrySet()){File file=inside(stage,entry.getKey());if(!file.getParentFile().isDirectory()&&!file.getParentFile().mkdirs())throw new IOException("Cannot stage assets");try(FileOutputStream out=new FileOutputStream(file)){out.write(entry.getValue());out.getFD().sync();}}
+       // Reusing a generation is allowed only if its already stored bytes still validate.
+       if(target.exists()){JSONObject stored=validate(filesAt(target));if(!hash(readFile(inside(target,MANIFEST),MAX_JSON)).equals(generation))throw new IOException("Stored generation corrupt");}
+-      else if(!stage.renameTo(target))throw new IOException("Cannot commit theme generation");
++      else {
++        if(!activate)try(FileOutputStream marker=new FileOutputStream(new File(home,"preview-"+generation+".pending"))){marker.write(1);marker.getFD().sync();}
++        if(!stage.renameTo(target))throw new IOException("Cannot commit theme generation");
++      }
+       for(Bitmap b:images.values())bytes+=b.getAllocationByteCount();CobraVisualTheme ready=new CobraVisualTheme(root,target,images,bytes);
+-      JSONObject old=readPointer(c),next=new JSONObject();String active=old.optString("active","");next.put("active",generation);next.put("previous",generation.equals(active)?old.optString("previous",""):active);writePointer(c,next);committed=true;
+-      File[] children=home.listFiles();if(children!=null)for(File child:children)if(child.getName().matches("[0-9a-f]{64}")&&!child.getName().equals(generation)&&!child.getName().equals(next.optString("previous","")))deleteTree(child);
++      JSONObject old=readPointer(c),next=new JSONObject();String active=old.optString("active","");next.put("active",generation);next.put("previous",generation.equals(active)?old.optString("previous",""):active);
++      if(activate)writePointer(c,next);committed=true;
++      if(activate)new File(home,"preview-"+generation+".pending").delete();
++      if(activate){File[] children=home.listFiles();if(children!=null)for(File child:children)if(child.getName().matches("[0-9a-f]{64}")&&!child.getName().equals(generation)&&!child.getName().equals(next.optString("previous","")))deleteTree(child);}
+       return ready;
+     }catch(Exception|OutOfMemoryError e){for(Bitmap b:images.values())b.recycle();if(!existed&&!committed)deleteTree(target);throw new IOException("Theme could not be installed",e);}finally{deleteTree(stage);}
++  }
++  static void keepPreview(Context c,CobraVisualTheme ready)throws Exception{synchronized(STORE_LOCK){
++    if(ready==null||ready.directory==null)throw new IOException("Missing staged theme");
++    String generation=ready.directory.getName();File expected=inside(store(c),generation);
++    if(!expected.getCanonicalFile().equals(ready.directory.getCanonicalFile())||!generation.matches("[0-9a-f]{64}"))throw new IOException("Invalid staged theme");
++    validate(filesAt(expected));if(!generation.equals(hash(readFile(inside(expected,MANIFEST),MAX_JSON))))throw new IOException("Staged theme changed");
++    JSONObject old=readPointer(c),next=new JSONObject();String prior=old.optString("active","");
++    next.put("active",generation);next.put("previous",generation.equals(prior)?old.optString("previous",""):prior);writePointer(c,next);
++  }}
++  static void discardPreview(Context c,CobraVisualTheme ready){synchronized(STORE_LOCK){
++    if(ready==null||ready.directory==null)return;String generation=ready.directory.getName();if(!generation.matches("[0-9a-f]{64}"))return;
++    File marker=new File(store(c),"preview-"+generation+".pending");if(!marker.isFile())return;
++    JSONObject saved=readPointer(c);if(!generation.equals(saved.optString("active"))&&!generation.equals(saved.optString("previous")))deleteTree(new File(store(c),generation));
++    marker.delete();
++  }}
++  static void discardAbandonedPreviews(Context c){synchronized(STORE_LOCK){
++    File[] files=store(c).listFiles();if(files==null)return;JSONObject saved=readPointer(c);
++    for(File marker:files)if(marker.getName().matches("preview-[0-9a-f]{64}\\.pending")){
++      String generation=marker.getName().substring(8,72);
++      if(!generation.equals(saved.optString("active"))&&!generation.equals(saved.optString("previous")))deleteTree(new File(store(c),generation));marker.delete();
++    }
+   }}
+   static void reset(Context c)throws Exception{synchronized(STORE_LOCK){JSONObject old=readPointer(c),p=new JSONObject();if(old.optString("active","").isEmpty())return;p.put("active","");p.put("previous",old.optString("active",""));if(!store(c).isDirectory())store(c).mkdirs();writePointer(c,p);}}
+   static CobraVisualTheme rollback(Context c)throws Exception{synchronized(STORE_LOCK){JSONObject old=readPointer(c),next=new JSONObject();String previous=old.optString("previous","");
+--- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+@@ -172,6 +172,7 @@
+       cobraUpdateLiveRewindControls();
+       cobraUpdateTimeshiftSeek();
+       cobraInspectMultiHealth();
++      cobraRefreshVisualEffects();
+       int minute = (int)(System.currentTimeMillis() / 60000L);
+       if (minute != mCobraLastTickerMinute) {
+         mCobraLastTickerMinute = minute;
+@@ -334,7 +335,9 @@
+     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+     mPrefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+     mFeatures = new InfinityCobraFeatureRuntime(this);
++    cobraInitPresentationEffects(state);
+     InfinityCobraDiagnostics.start(this);
++    mCobraNetworkIntelligence=new CobraNetworkIntelligence(this);mCobraNetworkIntelligence.start();
+     if(state!=null){mCobraDiagnosticsPicker=state.getBoolean("cobra_diagnostics_picker",false);mCobraDiagnosticsSnapshot=state.getString("cobra_diagnostics_snapshot");}
+     mTheme = Theme.load(this);
+     mUi = UiContract.load(this);
+@@ -343,6 +346,8 @@
+     loadPersistedState();
+     cobraDiagnosticSecrets();
+     buildShell();
++    cobraPrepareSmartReturn();
++    mMain.post(this::cobraMaybeShowWelcome);
+     mMain.post(this::cobraApplySystemBarsForSurface);
+     mMain.removeCallbacks(mAutoRefresh);
+     mMain.postDelayed(mAutoRefresh, 30L * 60L * 1000L);
+@@ -362,6 +367,10 @@
+   }
+ 
+   @Override protected void onDestroy() {
++    if(mCobraEffects!=null)mCobraEffects.close();
++    if(mCobraNetworkIntelligence!=null){mCobraNetworkIntelligence.close();mCobraNetworkIntelligence=null;}
++    cobraCloseQuickPeekSession();
++    CobraPresentationSafety.onStop(this);
+     cobraReleasePipMediaSession();
+     mCobraRotationResumed=false;cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"destroy");mCobraPlayerRotationButton=null;
+     if(!isChangingConfigurations())cobraEndMiniBackgroundPlayback();
+@@ -380,6 +389,7 @@
+   @Override public void onConfigurationChanged(Configuration configuration) {
+     try {
+     super.onConfigurationChanged(configuration);
++    if(mCobraEffects!=null)mCobraEffects.dismissWelcome();
+     cobraApplySystemBarsForSurface();mTheme=Theme.load(this);mUi=UiContract.load(this);
+     if(mDeviceBridge!=null)mDeviceBridge.onWindowChanged("configuration");
+     // Reflow child bounds in place. No player, video texture or tile is replaced.
+@@ -422,6 +432,8 @@
+   @Override
+   protected void onResume() {
+     super.onResume();
++    if(mCobraEffects!=null)mCobraEffects.setForeground(true);
++    CobraPresentationSafety.onResume(this);
+     mMain.post(()->{cobraConsumeLauncherPipReturn();cobraApplySystemBarsForSurface();});
+     mCobraPlaybackPolicy.resume(isCobraInPictureInPicture());
+     mCobraHealthForeground=true;cobraStartHealthTicker();
+@@ -438,6 +450,8 @@
+ 
+   @Override
+   protected void onPause() {
++    mCobraWelcomePending=false;if(mCobraEffects!=null)mCobraEffects.setForeground(false);
++    cobraSaveSmartReturn();if("quick-peek".equals(mCobraSheetKind))closeCobraActionSheet();else cobraCloseQuickPeekSession();
+     mCobraRotationResumed=false;cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause");
+     if (mDeviceBridge != null) mDeviceBridge.onPause();
+     cobraSuspendHealth();
+@@ -447,6 +461,7 @@
+ 
+   @Override
+   protected void onStop() {
++    CobraPresentationSafety.onStop(this);
+     mCobraRotationResumed=false;cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"stop");
+     boolean preserveMultiWindow=Build.VERSION.SDK_INT>=24&&CobraWindowLifecyclePolicy.preservePlaybackOnStop(isInMultiWindowMode(),isFinishing());
+     if(preserveMultiWindow){
+@@ -790,6 +805,7 @@
+     // Do not restyle/rescale mStage; its previously approved internal geometry stays intact.
+     vtheme().paint(mCobraBrowseBackground,"screen");
+     mRoot.requestApplyInsets();vtheme().tree(mRail,"rail");vtheme().paint(mHeader,"screen.header");vtheme().paint(mStatus,"screen.status");
++    cobraRefreshAmbient();
+   }
+ 
+ 
+@@ -822,6 +838,7 @@
+   }
+ 
+   private String cobraEffectiveAppearanceMode() {
++    if(CobraPresentationSafety.isSafe(this))return "dark";
+     boolean night=(getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES;
+     return CobraAppearancePolicy.effective(cobraStoredAppearanceMode(),cobraSystemDarkVariant(),night);
+   }
+@@ -845,10 +862,9 @@
+ 
+   private JSONObject cobraAppearancePalette(String mode) {
+     try {
+-      File external = getExternalFilesDir(null);
+-      if (external == null) return null;
+-      File file = new File(external,
+-          ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json");
++      File addon = CobraPresentationSafety.legacyDirectory(this);
++      if (addon == null) return null;
++      File file = new File(addon,"resources/cobra-theme.json");
+       if (!file.isFile() || file.length() <= 0 || file.length() > 131072) return null;
+       long stamp = file.lastModified() ^ file.length();
+       if (stamp != mCobraPaletteSourceStamp) {
+@@ -903,7 +919,7 @@
+         catch (IllegalArgumentException ignored) {}
+       }
+     }
+-    return cobraBuiltInAppearanceColor(mode, key, fallback);
++    return CobraPresentationEffects.ambientColor(key,cobraBuiltInAppearanceColor(mode,key,fallback),cobraAmbientMode(),mCobraAmbientTint);
+   }
+ 
+   private boolean closeCobraExperienceDrawer() {
+@@ -1092,6 +1108,7 @@
+   }
+ 
+   private void clearStage(String title) {
++    mCobraSmartWatchlist=false;
+     mCobraNavigation.advance();mCobraStageTitle=title;
+     cobraRememberModeScroll();
+     mHeader.setVisibility(View.VISIBLE);mStatus.setVisibility(View.VISIBLE);
+@@ -1100,6 +1117,7 @@
+       mStage.removeViewAt(2);
+     }
+     mHeader.setText("drawer".equals(mUi.navigationMode) ? "☰  " + title : title);
++    cobraRestoreSmartScreenPosition();
+   }
+ 
+   private void status(String value) {
+@@ -1375,7 +1393,7 @@
+       for (LiveSource source : enabled) if (source.id.equals(active)) { mActiveSource = source; break; }
+       if (mActiveSource == null && !enabled.isEmpty()) mActiveSource = enabled.get(0);
+       status(restored.size() + " channels • saved library • refreshing quietly");
+-      showCobraPrimaryView();
++      if(!cobraTrySmartReturn())showCobraPrimaryView();
+       return true;
+     } catch (Exception ignored) {
+       return false;
+@@ -1445,6 +1463,7 @@
+       status(mChannels.size() + " channels • refreshing in background");
+     }
+ 
++    cobraSmartLoading();
+     final boolean hadWarmLibrary = warm;
+     final ArrayList<Channel> previous = new ArrayList<>(mChannels);
+     if (!submitCobraIo(() -> {
+@@ -1483,8 +1502,10 @@
+         String suffix = failures.isEmpty() ? "ready" : (failures.size() + " source refresh unavailable");
+         status(resolved.size() + " channels • " + enabled.size() + " enabled source"
+             + (enabled.size() == 1 ? "" : "s") + " • " + suffix);
+-        if ((!hadWarmLibrary || changed) && mPlayerOverlay == null && mMultiOverlay == null)
+-          showCobraPrimaryView();
++        if ((!hadWarmLibrary || changed) && mPlayerOverlay == null && mMultiOverlay == null
++            &&(!mCobraSmartRestoreSucceeded||(mCobraGuideShell!=null&&mCobraGuideShell.isAttachedToWindow()))) {
++          if(!cobraTrySmartReturn())showCobraPrimaryView();
++        }
+         final ArrayList<Channel> persist = new ArrayList<>(resolved);
+         submitCobraIo(() -> saveCobraLibraryCache(enabled, persist));
+         for (LiveSource source : enabled) loadGuideAsync(source);
+@@ -1587,6 +1608,7 @@
+         && !"trial".equalsIgnoreCase(statusValue)) {
+       throw new LiveException("Account status: " + statusValue);
+     }
++    cobraRememberPeekCapacity(source,userInfo);
+     JSONObject serverInfo=auth.optJSONObject("server_info");
+     String catchupTimezone=serverInfo==null?"UTC":serverInfo.optString("timezone","UTC");
+ 
+@@ -2131,7 +2153,7 @@
+     host.addView(mCobraPreviewTexture,new FrameLayout.LayoutParams(-1,-1));
+     TextView state=cobraText(vtheme().copy("cobra.cobraPreviewPanel.copy.1","Select a channel"),vtheme().color("cobra.cobraPreviewPanel.colors.2",Color.WHITE),11);state.setTag("cobra_preview_label");
+     state.setPadding(dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.1",10)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.2",4)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.3",10)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.4",4)));state.setBackgroundColor(vtheme().color("cobra.cobraPreviewPanel.colors.3",0xa0000000));
+-    FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-2,dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.5",28)),Gravity.TOP|Gravity.RIGHT);sp.setMargins(dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.6",8)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.7",8)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.8",8)),0);host.addView(state,sp);
++    FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-2,dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.5",28)),Gravity.TOP|Gravity.RIGHT);sp.setMargins(dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.6",8)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.7",8)),dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.8",8)),0);host.addView(cobraPulseStatus(state),sp);
+     LinearLayout bar=new LinearLayout(this);bar.setTag("cobra_preview_controls");bar.setGravity(Gravity.CENTER_VERTICAL);bar.setPadding(dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.9",6)),0,dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.10",6)),0);
+     bar.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{vtheme().color("cobra.cobraPreviewPanel.colors.4",0x00000000),vtheme().color("cobra.cobraPreviewPanel.colors.5",0xc9000000)}));
+     CobraIconButton pause=cobraIcon("pause","Pause preview",true,v->toggleCobraPreviewPlayPause());pause.setTag("cobra_preview_play_pause");
+@@ -2479,7 +2501,7 @@
+         row.setBackground(focusSurface(cobraThemeColor("panel", mTheme.panel),
+             cobraThemeColor("focus", mTheme.focus), "cards".equals(style) ? 18 : 13));
+         row.setOnClickListener(v -> selectGuidePreview(channel));
+-        row.setOnLongClickListener(v -> { showCobraChannelActions(channel); return true; });
++        row.setOnLongClickListener(v -> { cobraShowQuickPeek(channel,v); return true; });
+         row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1, dp(height)));
+         return row;
+       }
+@@ -2530,7 +2552,7 @@
+           if (i == 0) cell.setText(String.format(Locale.US, "%03d  %s", position + 1, channel.name));
+           else cell.setText(guideTitleAt(channel, slot + (i - 1) * 1800000L));
+           cell.setOnClickListener(v -> selectGuidePreview(channel));
+-          cell.setOnLongClickListener(v -> { showCobraChannelActions(channel); return true; });
++          cell.setOnLongClickListener(v -> { cobraShowQuickPeek(channel,v); return true; });
+           cell.setLayoutParams(new LinearLayout.LayoutParams(dp(i == 0 ? channelWidthDp : programWidthDp),
+               dp(mUi.guideRowHeightDp)));
+         }
+@@ -2750,7 +2772,7 @@
+     row.setText(label.toString());
+     row.setOnClickListener(v -> playChannel(channel));
+     row.setOnLongClickListener(v -> {
+-      showCobraChannelActions(channel);
++      cobraShowQuickPeek(channel,v);
+       return true;
+     });
+     return row;
+@@ -3027,6 +3049,7 @@
+     list.addView(chooser, new LinearLayout.LayoutParams(-1, dp(56)));
+     list.addView(theme, new LinearLayout.LayoutParams(-1, dp(58)));
+     list.addView(appearance, new LinearLayout.LayoutParams(-1, dp(56)));
++    cobraAddPresentationSettings(list);
+     list.addView(displayPerformance, new LinearLayout.LayoutParams(-1, dp(58)));
+     list.addView(cobraSettingsSection("PLAYBACK"), new LinearLayout.LayoutParams(-1, dp(38)));
+     list.addView(backgroundMode, new LinearLayout.LayoutParams(-1, dp(56)));
+@@ -3058,6 +3081,7 @@
+       }
+     }
+ 
++    Button smartReturn=action("SMART RETURN  •  "+(CobraSmartReturn.enabled(mPrefs)?"ON":"OFF"));smartReturn.setTag("cobra_smart_return_setting");smartReturn.setOnClickListener(v->cobraShowSmartReturnSetting());list.addView(smartReturn,new LinearLayout.LayoutParams(-1,dp(56)));
+     vtheme().tree(list,"settings");
+     ScrollView settingsScroll = new ScrollView(this);
+     settingsScroll.setFillViewport(true);settingsScroll.addView(list);
+@@ -3128,6 +3152,7 @@
+         String url = source.server + "/player_api.php?username=" + enc(source.username) + "&password=" + enc(source.password);
+         JSONObject root = new JSONObject(httpGet(url));
+         JSONObject user = root.optJSONObject("user_info");
++        cobraRememberPeekCapacity(source,user);
+         final String label = user == null ? "SUBSCRIPTION • Provider did not return account status" : cobraSubscriptionLabel(user);
+         mPrefs.edit().putString(cobraSubscriptionCacheKey(source), label).apply();
+         publishCobraUi(() -> {
+@@ -3153,7 +3178,8 @@
+ 
+ 
+   private void installCobraUiPackage(Uri uri) {
+-    status("Installing Cobra UI package…");
++    if(CobraPresentationSafety.isSafe(this)){toast("Leave Safe Mode before previewing a theme");return;}
++    status("Preparing Cobra theme preview…");
+     if (!submitCobraIo(() -> {
+       try {
+         boolean visual=false;
+@@ -3165,15 +3191,8 @@
+           }
+         }
+         if(visual){
+-          synchronized(CobraVisualTheme.STORE_LOCK){
+-            CobraVisualTheme installed=CobraVisualTheme.install(getApplicationContext(),getContentResolver().openInputStream(uri));
+-            CobraVisualRenderer.publish(installed,"Visual ZIP installed");
+-          }
+-          publishCobraUi(()->{
+-            status("Visual theme installed");toast("Visual theme installed. Playback is not restarted.");
+-            if(mPlayerOverlay==null&&mMultiOverlay==null&&mStage!=null&&mStage.findViewWithTag("cobra_theme_management")!=null){showSettings();}
+-            else if(mCobraGuideShell!=null&&mCobraGuideShell.isAttachedToWindow()&&mPlayerOverlay==null&&mMultiOverlay==null){cobraRestyleGuide();cobraRenderGuideBrowser();}
+-          });
++          CobraVisualTheme staged=CobraVisualTheme.stagePreview(getApplicationContext(),getContentResolver().openInputStream(uri));
++          publishCobraUi(()->CobraPresentationSafety.offerVisual(this,staged));
+           return;
+         }
+ 
+@@ -3226,44 +3245,8 @@
+         if (theme.optInt("schema", 0) < 1 || theme.optInt("schema", 0) > 2)
+           throw new IllegalArgumentException("Unsupported Cobra theme schema");
+ 
+-        File external = getExternalFilesDir(null);
+-        if (external == null) throw new IllegalStateException("External app storage unavailable");
+-        File addons = new File(external, ".kodi/addons");
+-        if (!addons.isDirectory() && !addons.mkdirs())
+-          throw new IllegalStateException("Could not create Cobra add-on directory");
+-        File target = new File(addons, "script.infinity.cobra.theme");
+-        File stage = new File(addons, ".cobra-ui-stage");
+-        File backup = new File(addons, ".cobra-ui-backup");
+-        deleteCobraUiTree(stage);
+-        deleteCobraUiTree(backup);
+-        if (!stage.mkdirs()) throw new IllegalStateException("Could not stage Cobra UI package");
+-        String prefix = "script.infinity.cobra.theme/";
+-        for (Map.Entry<String, byte[]> item : files.entrySet()) {
+-          String relative = item.getKey().substring(prefix.length());
+-          File staged = new File(stage, relative);
+-          File parent = staged.getParentFile();
+-          if (parent != null && !parent.isDirectory() && !parent.mkdirs())
+-            throw new IllegalStateException("Could not stage Cobra UI package directory");
+-          writeCobraUiBytes(staged, item.getValue());
+-        }
+-
+-        boolean hadTarget = target.exists();
+-        if (hadTarget && !target.renameTo(backup))
+-          throw new IllegalStateException("Could not preserve previous Cobra UI package");
+-        if (!stage.renameTo(target)) {
+-          if (hadTarget) backup.renameTo(target);
+-          throw new IllegalStateException("Could not activate Cobra UI package");
+-        }
+-        deleteCobraUiTree(backup);
+-
+-        publishCobraUi(() -> {
+-          mUi = UiContract.load(this);
+-          mTheme = Theme.load(this);
+-          stopCobraPreview();
+-          buildShell();
+-          showCobraPrimaryView();
+-          toast("Cobra UI package installed");
+-        });
++        File staged=CobraPresentationSafety.stageLegacy(getApplicationContext(),files);
++        publishCobraUi(()->CobraPresentationSafety.offerLegacy(this,staged));
+       } catch (Exception error) {
+         publishCobraUi(() -> showError("Cobra UI package",
+             "Install failed: " + (error.getMessage() == null
+@@ -3292,9 +3275,9 @@
+ 
+   private String activeCobraUiLabel() {
+     try {
+-      File external=getExternalFilesDir(null);
+-      if(external==null)return "ACTIVE UI  •  APK DEFAULT  •  RUNTIME 3";
+-      File addon=new File(external,".kodi/addons/script.infinity.cobra.theme/addon.xml");
++      File directory=CobraPresentationSafety.legacyDirectory(this);
++      if(directory==null)return "ACTIVE UI  •  APK DEFAULT  •  RUNTIME 3";
++      File addon=new File(directory,"addon.xml");
+       if(!addon.isFile())return "ACTIVE UI  •  APK DEFAULT  •  RUNTIME 3";
+       if(addon.length()>65536)return "ACTIVE UI  •  METADATA UNAVAILABLE  •  RUNTIME 3";
+       try(InputStream input=new java.io.FileInputStream(addon)){
+@@ -3516,6 +3499,7 @@
+     LinearLayout rows=cobraOpenSheet("Player settings","Viewing preferences and recording","player-settings");
+     if(cobraLiveChannel(mPlaying)){final Channel selected=mPlaying;cobraAddDetail(rows,"settings","Channel playback","Recents, live recovery and playback preferences","cobra-player-channel-preferences",false,()->cobraShowChannelPreferences(selected));}
+     cobraAddDetail(rows,"health","Health Center","Observe playback without stopping it","cobra-player-health",false,()->showCobraHealthCenter());
++    cobraAddNightCinemaSetting(rows);
+     if(cobraCanRestartCurrentProgram())rows.addView(cobraSheetRow("recent","Restart current program","Provider catch-up",false,true,()->cobraRestartCurrentProgram()));
+     rows.addView(cobraSheetRow("record",mRecordingSession.isEmpty()?"Record now":"Stop recording",null,false,true,()->{if(mPlaying!=null)toggleRecording(mPlaying);}));
+     rows.addView(cobraSheetRow("cc","Audio & subtitles",null,false,true,()->showTrackChooser()));
+@@ -3652,7 +3636,7 @@
+ 
+   private void scheduleChromeHide() {
+     mMain.removeCallbacks(mHideChrome);
+-    if(mPlayerChrome!=null&&!mCobraPlayerLocked&&!mInPictureInPicture&&mCobraActionSheet==null&&mCobraPlayerDrawer==null&&mCobraMultiPicker==null)mMain.postDelayed(mHideChrome,3500L);
++    if(mPlayerChrome!=null&&!mCobraPlayerLocked&&!mInPictureInPicture&&mCobraActionSheet==null&&mCobraPlayerDrawer==null&&mCobraMultiPicker==null)mMain.postDelayed(mHideChrome,CobraPresentationEffects.chromeDelay(cobraNightCinemaActive()));
+   }
+ 
+ 
+@@ -4309,7 +4293,7 @@
+     mCobraInternalScreen = "internal";
+ 
+     ArrayList<VodItem> items = new ArrayList<>(); try { JSONArray list = new JSONArray(mPrefs.getString(mFeatures.profileKey("watchlist"), "[]")); for (int i = 0; i < list.length(); i++) { JSONObject o = list.optJSONObject(i); if (o != null) items.add(new VodItem(o.optString("source"), o.optString("id"), o.optString("title"), o.optString("category"), "", o.optString("extension", "mp4"), o.optBoolean("series", false))); } } catch (Exception ignored) {}
+-    renderVodItems(items, false, new ArrayList<>()); mHeader.setText("COBRA • MY LIST");
++    renderVodItems(items, false, new ArrayList<>()); mHeader.setText("COBRA • MY LIST");mCobraSmartWatchlist=true;cobraRestoreSmartScreenPosition();
+   }
+ 
+   private void showContinueWatching() {
+@@ -4599,6 +4583,7 @@
+   }
+ 
+   private void reloadProfileCollections() {
++    cobraCancelSmartReturn();if("quick-peek".equals(mCobraSheetKind))closeCobraActionSheet();else cobraCloseQuickPeekSession();
+     mFavorites.clear(); Set<String> favorites = mPrefs.getStringSet(mFeatures.profileKey(FAVORITES), Collections.emptySet()); if (favorites != null) mFavorites.addAll(favorites); mRecents.clear(); try { JSONArray recent = new JSONArray(mPrefs.getString(mFeatures.profileKey(RECENTS), "[]")); for (int i = 0; i < recent.length(); i++) { String id = recent.optString(i, ""); if (!id.isEmpty()) mRecents.add(id); } } catch (Exception ignored) {}
+   }
+ 
+@@ -4888,6 +4873,7 @@
+   }
+ 
+   private void returnToInfinity() {
++    cobraSaveSmartReturn();cobraCloseQuickPeekSession();
+     closeCobraAsyncWork();stopCobraPreview();releaseSinglePlayer();releaseMulti();releaseCobraTransferPlayer();
+     Intent intent=new Intent(this,@APP_PACKAGE@.Main.class);intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);startActivity(intent);finish();
+   }
+@@ -5130,10 +5116,9 @@
+     static UiContract load(Context context) {
+       UiContract defaults = new UiContract();
+       defaults.sourceStamp = sourceStamp(context);
+-      File external = context.getExternalFilesDir(null);
+-      if (external == null) return defaults;
+-      File file = new File(external,
+-          ".kodi/addons/script.infinity.cobra.theme/resources/cobra-ui.json");
++      File addon = CobraPresentationSafety.legacyDirectory(context);
++      if (addon == null) return defaults;
++      File file = new File(addon,"resources/cobra-ui.json");
+       if (!file.isFile() || file.length() <= 0 || file.length() > 131072) return defaults;
+ 
+       try {
+@@ -5355,13 +5340,13 @@
+     }
+ 
+     static long sourceStamp(Context context) {
+-      File external = context.getExternalFilesDir(null);
+-      if (external == null) return 0L;
+-      File ui = new File(external, ".kodi/addons/script.infinity.cobra.theme/resources/cobra-ui.json");
+-      File theme = new File(external, ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json");
++      File addon = CobraPresentationSafety.legacyDirectory(context);
++      if (addon == null) return 0L;
++      File ui = new File(addon,"resources/cobra-ui.json");
++      File theme = new File(addon,"resources/cobra-theme.json");
+       long a = ui.isFile() ? ui.lastModified() ^ ui.length() : 0L;
+       long b = theme.isFile() ? theme.lastModified() ^ theme.length() : 0L;
+-      return a ^ Long.rotateLeft(b, 17);
++      return a ^ Long.rotateLeft(b, 17) ^ addon.getAbsolutePath().hashCode();
+     }
+ 
+     private static int clamp(int value, int low, int high) {
+@@ -5388,11 +5373,9 @@
+ 
+     static Theme load(Context context) {
+       Theme theme = new Theme();
+-      File external = context.getExternalFilesDir(null);
+-      if (external == null) return theme;
+-      File file = new File(
+-          external,
+-          ".kodi/addons/script.infinity.cobra.theme/resources/cobra-theme.json");
++      File addon = CobraPresentationSafety.legacyDirectory(context);
++      if (addon == null) return theme;
++      File file = new File(addon,"resources/cobra-theme.json");
+       if (!file.isFile() || file.length() <= 0 || file.length() > 65536) return theme;
+       try {
+         byte[] data;
+@@ -5691,6 +5674,7 @@
+ 
+   private boolean closeCobraActionSheet() {
+     if(mCobraActionSheet==null)return false;
++    if("quick-peek".equals(mCobraSheetKind))cobraCloseQuickPeekSession();
+     if(mCobraSheetLayoutListener!=null&&mCobraActionSheet.getViewTreeObserver().isAlive())mCobraActionSheet.getViewTreeObserver().removeOnGlobalLayoutListener(mCobraSheetLayoutListener);
+     cobraResetMotion(mCobraSheetPanel);mCobraSheetLayoutListener=null;mCobraSheetAnchor=null;mCobraSheetPane=null;mCobraSheetPanel=null;mCobraSheetHeightLimit=Integer.MAX_VALUE;mCobraSheetWindowWidth=0;mCobraSheetWindowHeight=0;
+     android.view.ViewParent parent=mCobraActionSheet.getParent();
+@@ -6353,7 +6337,7 @@
+     Channel channel;long window;int labelWidth;final android.graphics.Paint line=new android.graphics.Paint(3);final ArrayList<float[]> bounds=new ArrayList<>();
+     CobraTimelineRow(){super(InfinityLiveActivity.this);setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.1",74))));}
+     void bind(Channel c,long time){channel=c;window=time;removeAllViews();bounds.clear();boolean dark=!"light".equals(cobraEffectiveAppearanceMode());
+-      Button title=cobraTextButton(c.name,dark,()->selectGuidePreview(c));title.setTextSize(vtheme().number("cobra.CobraTimelineRow.numbers.1",12,8f,96f));title.setMaxLines(2);title.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);title.setSelected(mGuidePreviewChannel!=null&&c.id.equals(mGuidePreviewChannel.id));title.setOnLongClickListener(v->{showCobraChannelActions(c);return true;});addView(title);bounds.add(null);
++      Button title=cobraTextButton(c.name,dark,()->selectGuidePreview(c));title.setTextSize(vtheme().number("cobra.CobraTimelineRow.numbers.1",12,8f,96f));title.setMaxLines(2);title.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);title.setSelected(mGuidePreviewChannel!=null&&c.id.equals(mGuidePreviewChannel.id));title.setOnLongClickListener(v->{cobraShowQuickPeek(c,v);return true;});addView(title);bounds.add(null);
+       ArrayList<GuideProgram> programs=cobraPrograms(c);int count=0;
+       if(programs!=null)for(GuideProgram p:programs){float[] interval=CobraGuideMath.interval(p.start,p.stop,time,7200000L);if(interval==null)continue;Button cell=cobraTextButton(p.title,dark,()->{long n=System.currentTimeMillis();if(p.start<=n&&p.stop>n)selectGuidePreview(c);else showProgramActions(c,p);});cell.setMaxLines(2);cell.setTextSize(vtheme().number("cobra.CobraTimelineRow.numbers.2",11,8f,96f));cell.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);cell.setContentDescription(formatTime(p.start)+" to "+formatTime(p.stop)+", "+p.title);cell.setSelected(p.start<=System.currentTimeMillis()&&p.stop>System.currentTimeMillis());cell.setOnLongClickListener(v->{showProgramActions(c,p);return true;});addView(cell);bounds.add(interval);count++;}
+       if(count==0){Button empty=cobraTextButton(cobraGuideStatus(c),dark,()->showProgramGuide(c));empty.setTextSize(vtheme().number("cobra.CobraTimelineRow.numbers.3",11,8f,96f));addView(empty);bounds.add(new float[]{0f,1f});}
+@@ -6366,6 +6350,7 @@
+ 
+   private void cobraRefreshProgrammeLabels() {
+     if(!isCobraAsyncAlive())return;
++    cobraRefreshQuickPeek();
+     Channel channel=mGuidePreviewChannel;GuideProgram now=cobraCurrentProgram(channel),next=cobraNextProgram(channel);
+     if(mCobraGuideNowLabel!=null)mCobraGuideNowLabel.setText(channel==null?"Select a channel":channel.name+(now==null?"":"  ·  "+now.title));
+     if(mCobraGuideNextLabel!=null)mCobraGuideNextLabel.setText(now==null?cobraGuideStatus(channel):(formatTime(now.start)+" – "+formatTime(now.stop)+"  ·  "+Math.max(0,(now.stop-System.currentTimeMillis()+59999)/60000)+" min left\n"+(next==null?"Upcoming schedule unavailable":"Next  "+next.title)));
+@@ -6570,7 +6555,7 @@
+     if(mPlayerOverlay!=null){View badge=mPlayerOverlay.findViewWithTag("player_state");
+       if(badge instanceof TextView)((TextView)badge).setText(mPlayingVodKey.isEmpty()?cobraPlayerState(mPlayer):
+           mPlayer!=null&&mPlayer.getPlayWhenReady()?"PLAYING":"PAUSED");}
+-    cobraRefreshProgrammeLabels();cobraUpdateLiveRewindControls();cobraUpdateTimeshiftSeek();cobraUpdatePerformanceOverlay();
++    cobraRefreshProgrammeLabels();cobraUpdateLiveRewindControls();cobraUpdateTimeshiftSeek();cobraUpdatePerformanceOverlay();cobraRefreshVisualEffects();
+   }
+ 
+ 
+@@ -6681,7 +6666,7 @@
+     LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(left,top,right,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.4",6)));header.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{vtheme().color("cobra.cobraBuildPlayerChrome.colors.1",0xcf000000),vtheme().color("cobra.cobraBuildPlayerChrome.colors.2",0x65000000),vtheme().color("cobra.cobraBuildPlayerChrome.colors.3",Color.TRANSPARENT)}));
+     header.addView(cobraIcon("back","Return to preview",true,v->closeFullscreenToCobraView()),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.5",48)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.6",48))));
+     TextView title=cobraText(mPlaying==null?"Cobra Live":mPlaying.name,vtheme().color("cobra.cobraBuildPlayerChrome.colors.4",Color.WHITE),15);title.setTag("cobra_player_channel_title");title.setTypeface(vtheme().font("cobra.cobraBuildPlayerChrome.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));title.setSingleLine(true);title.setPadding(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.7",8)),0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.8",8)),0);header.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.9",48)),1));
+-    mCobraLastChannelButton=cobraIcon("recent","Last channel",true,v->cobraTuneLastChannel());mCobraLastChannelButton.setTag("cobra_last_channel");cobraUpdateLastChannelButton();header.addView(mCobraLastChannelButton,new LinearLayout.LayoutParams(dp(46),dp(46)));
++    mCobraLastChannelButton=cobraIcon("recent","Last channel",true,v->cobraTuneLastChannel());mCobraLastChannelButton.setTag("cobra_last_channel");mCobraLastChannelButton.setOnLongClickListener(v->{mCobraNextSheetAnchor=v;try{cobraShowPlaybackRecents();}finally{mCobraNextSheetAnchor=null;}return true;});cobraUpdateLastChannelButton();header.addView(mCobraLastChannelButton,new LinearLayout.LayoutParams(dp(46),dp(46)));
+     header.addView(cobraIcon(mPlaying!=null&&mFavorites.contains(mPlaying.id)?"favorite_on":"favorite","Favorite",true,v->{if(mPlaying!=null){toggleFavorite(mPlaying);((CobraIconButton)v).icon(mFavorites.contains(mPlaying.id)?"favorite_on":"favorite");}}),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.10",48)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.11",48))));
+     CobraIconButton rotation=cobraIcon("rotate",cobraPlayerRotationDescription(),true,v->cobraTogglePlayerRotation());
+     rotation.setTag("cobra_player_rotation");mCobraPlayerRotationButton=rotation;cobraUpdatePlayerRotationButton();
+@@ -6703,7 +6688,7 @@
+     chrome.addView(new View(this),new LinearLayout.LayoutParams(1,0,1));
+     LinearLayout footer=new LinearLayout(this);footer.setOrientation(LinearLayout.VERTICAL);footer.setPadding(left+dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.22",4)),dp(shortScreen?8:24),right+dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.23",4)),bottom);footer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{vtheme().color("cobra.cobraBuildPlayerChrome.colors.7",Color.TRANSPARENT),vtheme().color("cobra.cobraBuildPlayerChrome.colors.8",0xba000000),vtheme().color("cobra.cobraBuildPlayerChrome.colors.9",0xe6000000)}));
+     LinearLayout programLine=new LinearLayout(this);programLine.setGravity(Gravity.CENTER_VERTICAL);mCobraPlayerProgram=cobraText("",vtheme().color("cobra.cobraBuildPlayerChrome.colors.10",Color.WHITE),height>width?19:21);mCobraPlayerProgram.setTypeface(vtheme().font("cobra.cobraBuildPlayerChrome.styles.2",Typeface.create("sans-serif-medium",Typeface.NORMAL)));mCobraPlayerProgram.setSingleLine(true);programLine.addView(mCobraPlayerProgram,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.24",30)),1));
+-    TextView state=cobraText(vtheme().copy("cobra.cobraBuildPlayerChrome.copy.1","CONNECTING"),vtheme().color("cobra.cobraBuildPlayerChrome.colors.11",0xff7ce2ff),10);state.setTag("player_state");state.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);programLine.addView(state,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.25",82)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.26",30))));footer.addView(programLine,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.27",30))));
++    TextView state=cobraText(vtheme().copy("cobra.cobraBuildPlayerChrome.copy.1","CONNECTING"),vtheme().color("cobra.cobraBuildPlayerChrome.colors.11",0xff7ce2ff),10);state.setTag("player_state");state.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);programLine.addView(cobraPulseStatus(state),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.25",82)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.26",30))));footer.addView(programLine,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.27",30))));
+     mCobraPlayerSchedule=cobraText("",vtheme().color("cobra.cobraBuildPlayerChrome.colors.12",0xffd6e0e9),12);mCobraPlayerSchedule.setSingleLine(true);footer.addView(mCobraPlayerSchedule,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.28",22))));
+     mCobraPlayerUpcoming=cobraText("",vtheme().color("cobra.cobraBuildPlayerChrome.colors.13",0xffaabccc),11);mCobraPlayerUpcoming.setSingleLine(true);if(shortScreen)mCobraPlayerUpcoming.setVisibility(View.GONE);if(height<dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.29",280)))mCobraPlayerSchedule.setVisibility(View.GONE);footer.addView(mCobraPlayerUpcoming,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.30",20))));
+     FrameLayout timeline=new FrameLayout(this);timeline.setTag("cobra_unified_live_timeline");
+@@ -6718,7 +6703,7 @@
+     chrome.setVisibility(visible&&!mCobraPlayerLocked&&!mInPictureInPicture&&mCobraPlayerDrawer==null&&mCobraMultiPicker==null?View.VISIBLE:View.GONE);
+     if(mCobraPlayerDrawer!=null)mCobraPlayerDrawer.bringToFront();if(mCobraMultiPicker!=null)mCobraMultiPicker.bringToFront();if(mCobraActionSheet!=null)mCobraActionSheet.bringToFront();if(mCobraPlayerLockOverlay!=null)mCobraPlayerLockOverlay.bringToFront();
+     if(chrome.getVisibility()==View.VISIBLE)cobraAnimatePlayerChromeIn(chrome);
+-    vtheme().tree(chrome,"player.chrome");cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();cobraUpdateLiveRewindControls();cobraUpdateLastChannelButton();cobraUpdateTimeshiftSeek();
++    vtheme().tree(chrome,"player.chrome");cobraApplyNightCinema(header,footer,pause);cobraUpdatePlayerRotationButton();cobraApplyPlayerRotation("chrome");cobraRefreshProgrammeLabels();cobraUpdatePlaybackLabels();cobraUpdateLiveRewindControls();cobraUpdateLastChannelButton();cobraUpdateTimeshiftSeek();
+   }
+ 
+ 
+@@ -6733,7 +6718,7 @@
+     LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);TextView title=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.1","Live TV"),vtheme().color("cobra.showCobraPlayerDrawer.colors.2",Color.WHITE),18);title.setTypeface(vtheme().font("cobra.showCobraPlayerDrawer.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));head.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.6",48)),1));head.addView(cobraIcon("close","Close channel drawer",true,v->closeCobraPlayerDrawer()),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.7",48)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.8",48))));content.addView(head,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.9",50))));
+     LinearLayout tabs=new LinearLayout(this);String[] labels={"Favorites","Recent","All","Groups"},filters={"FAVORITES","RECENT","ALL","CATEGORIES"};for(int i=0;i<labels.length;i++){final String filter=filters[i];tabs.addView(cobraTextButton(labels[i],true,()->cobraRenderPlayerDrawer(filter)),new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.10",48)),1));}content.addView(tabs,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.11",48))));
+     mCobraPlayerDrawerList=new android.widget.ListView(this);mCobraPlayerDrawerList.setDividerHeight(0);mCobraPlayerDrawerList.setSelector(android.R.color.transparent);mCobraPlayerDrawerList.setFastScrollEnabled(true);content.addView(mCobraPlayerDrawerList,new LinearLayout.LayoutParams(-1,0,1));
+-    TextView hint=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.2","Tap to tune • tap playing channel to expand • hold for schedule"),vtheme().color("cobra.showCobraPlayerDrawer.colors.3",0xff91a8be),11);hint.setGravity(Gravity.CENTER);hint.setMaxLines(2);content.addView(hint,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.12",34))));
++    TextView hint=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.2","Tap to tune • tap playing channel to expand • hold for Quick Peek"),vtheme().color("cobra.showCobraPlayerDrawer.colors.3",0xff91a8be),11);hint.setGravity(Gravity.CENTER);hint.setMaxLines(2);content.addView(hint,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.12",34))));
+     mPlayerOverlay.addView(panel,new FrameLayout.LayoutParams(1,1));mPlayerChrome.setVisibility(View.GONE);cobraRenderPlayerDrawer(mCobraDrawerFilter);cobraLayoutPlayerPanels();panel.post(()->{if(panel==mCobraPlayerDrawer&&panel.isAttachedToWindow())cobraAnimatePanelIn(panel,!isPortrait());});vtheme().tree(content,"player.channels");
+   }
+ 
+@@ -6753,7 +6738,7 @@
+     mCobraPlayerDrawerList.setAdapter(new android.widget.BaseAdapter(){public int getCount(){return groups?names.size():channels.size();}public Object getItem(int p){return groups?names.get(p):channels.get(p);}public long getItemId(int p){return p;}
+       public View getView(int p,View recycled,android.view.ViewGroup parent){Button row=recycled instanceof Button?(Button)recycled:cobraTextButton("",true,()->{});row.setTextSize(vtheme().number("cobra.cobraRenderPlayerDrawer.numbers.1",13,8f,96f));row.setPadding(dp(vtheme().dimension("cobra.cobraRenderPlayerDrawer.dimensions.1",14)),0,dp(vtheme().dimension("cobra.cobraRenderPlayerDrawer.dimensions.2",12)),0);row.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);row.setMaxLines(3);row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,dp(groups?52:82)));
+         if(groups){String group=names.get(p);row.setText(group);row.setSelected(false);row.setOnClickListener(v->cobraRenderPlayerDrawer("GROUP:"+group));row.setOnLongClickListener(null);}
+-        else {Channel c=channels.get(p);GuideProgram now=cobraCurrentProgram(c),next=cobraNextProgram(c);row.setText(c.name+"\n"+(now==null?cobraGuideStatus(c):"Now  "+now.title)+(next==null?"":"\nNext  "+next.title));row.setSelected(mPlaying!=null&&mPlaying.id.equals(c.id));row.setOnClickListener(v->{if(mPlaying!=null&&mPlaying.id.equals(c.id)){closeCobraPlayerDrawer();return;}mPlaying=c;mPlayingIndex=mChannels.indexOf(c);mPlayingVodKey="";mPendingResumeMs=0;startSinglePlayer(c.primaryUrl);cobraBuildPlayerChrome();if(mCobraPlayerDrawerList!=null&&mCobraPlayerDrawerList.getAdapter() instanceof android.widget.BaseAdapter)((android.widget.BaseAdapter)mCobraPlayerDrawerList.getAdapter()).notifyDataSetChanged();});row.setOnLongClickListener(v->{showProgramGuide(c);return true;});}
++        else {Channel c=channels.get(p);GuideProgram now=cobraCurrentProgram(c),next=cobraNextProgram(c);row.setText(c.name+"\n"+(now==null?cobraGuideStatus(c):"Now  "+now.title)+(next==null?"":"\nNext  "+next.title));row.setSelected(mPlaying!=null&&mPlaying.id.equals(c.id));row.setOnClickListener(v->{if(mPlaying!=null&&mPlaying.id.equals(c.id)){closeCobraPlayerDrawer();return;}mPlaying=c;mPlayingIndex=mChannels.indexOf(c);mPlayingVodKey="";mPendingResumeMs=0;startSinglePlayer(c.primaryUrl);cobraBuildPlayerChrome();if(mCobraPlayerDrawerList!=null&&mCobraPlayerDrawerList.getAdapter() instanceof android.widget.BaseAdapter)((android.widget.BaseAdapter)mCobraPlayerDrawerList.getAdapter()).notifyDataSetChanged();});row.setOnLongClickListener(v->{cobraShowQuickPeek(c,v);return true;});}
+         return row;}});
+     mCobraPlayerDrawerList.setAlpha(.72f);mCobraPlayerDrawerList.setTranslationY(dp(5));mCobraPlayerDrawerList.animate().alpha(1f).translationY(0f).setDuration(150L).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+   }
+@@ -6776,7 +6761,7 @@
+     mCobraGuideDirectory.setBackground(surface(cobraModeColor("rail"),"grid".equals(mCobraGuideStyle)?3:16,vtheme().color("cobra.cobraRestyleGuide.colors.1",Color.TRANSPARENT),0));
+     mCobraGuideDetails.setBackground(surface("mobile".equals(mCobraGuideStyle)?cobraModeColor("panel"):vtheme().color("cobra.cobraRestyleGuide.colors.2",Color.TRANSPARENT),"mobile".equals(mCobraGuideStyle)?16:0,vtheme().color("cobra.cobraRestyleGuide.colors.3",Color.TRANSPARENT),0));
+     mCobraGuideNowLabel.setTextColor(cobraModeColor("text"));mCobraGuideNextLabel.setTextColor(cobraModeColor("muted"));mCobraModeDescription.setTextColor(cobraModeColor("muted"));mCobraModeEyebrow.setTextColor(cobraModeColor("accent"));
+-    cobraBuildModeChrome();vtheme().paint(mCobraGuideShell,"guide.shell");vtheme().tree(mCobraGuideDirectory,"guide.directory");vtheme().tree(mCobraGuideDetails,"guide.details");
++    cobraBuildModeChrome();vtheme().paint(mCobraGuideShell,"guide.shell");vtheme().tree(mCobraGuideDirectory,"guide.directory");vtheme().tree(mCobraGuideDetails,"guide.details");cobraRefreshAmbient();
+   }
+ 
+ 
+@@ -7041,8 +7026,8 @@
+   private boolean cobraModeSelected(Channel c){return mGuidePreviewChannel!=null&&c.id.equals(mGuidePreviewChannel.id);}
+   private void cobraBindRow(View row,Channel c){
+     row.setSelected(cobraModeSelected(c));row.setFocusable(true);row.setFocusableInTouchMode(false);row.setClickable(true);row.setTag("cobra-channel:"+c.id);
+-    row.setOnClickListener(v->{mCobraInspectedChannel=null;mCobraInspectedProgram=null;selectGuidePreview(c);});row.setOnLongClickListener(v->{showCobraChannelActions(c);return true;});
+-    GuideProgram now=cobraCurrentProgram(c);row.setContentDescription(c.name+", "+(now==null?cobraGuideStatus(c):now.title)+(cobraModeSelected(c)?", selected":"")+", tap to preview, hold for actions");
++    row.setOnClickListener(v->{mCobraInspectedChannel=null;mCobraInspectedProgram=null;selectGuidePreview(c);});row.setOnLongClickListener(v->{cobraShowQuickPeek(c,v);return true;});
++    GuideProgram now=cobraCurrentProgram(c);row.setContentDescription(c.name+", "+(now==null?cobraGuideStatus(c):now.title)+(cobraModeSelected(c)?", selected":"")+", tap to preview, hold for Quick Peek");
+   }
+   /** Deterministic channel identity, never invented programme artwork or a network request on scroll. */
+   private final class CobraChannelMark extends View{
+@@ -7105,7 +7090,7 @@
+     final android.graphics.Paint paint=new android.graphics.Paint(3);
+     CobraBroadcastRow(){super(InfinityLiveActivity.this);title=cobraTextButton("",cobraModeDark(),()->{});title.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);title.setPadding(dp(vtheme().dimension("cobra.CobraBroadcastRow.dimensions.1",8)),dp(vtheme().dimension("cobra.CobraBroadcastRow.dimensions.2",2)),dp(vtheme().dimension("cobra.CobraBroadcastRow.dimensions.3",6)),dp(vtheme().dimension("cobra.CobraBroadcastRow.dimensions.4",2)));title.setMaxLines(2);title.setTextSize(vtheme().number("cobra.CobraBroadcastRow.numbers.1",12,8f,96f));addView(title);setDescendantFocusability(android.view.ViewGroup.FOCUS_AFTER_DESCENDANTS);}
+     void bind(Channel c,int position){
+-      channel=c;setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,cobraModeRowHeight("grid")));title.setText(String.format(Locale.US,"%03d  ",position+1)+c.name);title.setTag("cobra-channel:"+c.id);title.setTextColor(cobraModeColor("text"));title.setBackground(cobraModeSurface(3,true));title.setSelected(cobraModeSelected(c));title.setOnClickListener(v->selectGuidePreview(c));title.setOnLongClickListener(v->{showCobraChannelActions(c);return true;});title.setOnFocusChangeListener((v,focus)->{if(focus)cobraInspectProgramme(c,null);});
++      channel=c;setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,cobraModeRowHeight("grid")));title.setText(String.format(Locale.US,"%03d  ",position+1)+c.name);title.setTag("cobra-channel:"+c.id);title.setTextColor(cobraModeColor("text"));title.setBackground(cobraModeSurface(3,true));title.setSelected(cobraModeSelected(c));title.setOnClickListener(v->selectGuidePreview(c));title.setOnLongClickListener(v->{cobraShowQuickPeek(c,v);return true;});title.setOnFocusChangeListener((v,focus)->{if(focus)cobraInspectProgramme(c,null);});
+       title.setOnKeyListener((v,key,event)->{if(event.getAction()!=KeyEvent.ACTION_DOWN)return false;if(key==KeyEvent.KEYCODE_DPAD_LEFT){cobraOpenTvDirectory(false);return true;}return false;});
+       used=0;ranges.clear();ArrayList<GuideProgram> programmes=cobraPrograms(c);long span=mCobraModeLayout.timeSpan;
+       if(programmes!=null)for(GuideProgram p:programmes){float[] r=CobraGuideMath.interval(p.start,p.stop,mCobraGuideWindow,span);if(r==null)continue;if(used>=64)break;Button cell=obtainCell(used);final int index=used;cell.setText(p.title);cell.setContentDescription(c.name+", "+p.title+", "+formatTime(p.start)+" to "+formatTime(p.stop));cell.setTag("cobra-program:"+c.id+":"+p.start);cell.setSelected(cobraModeSelected(c)&&p.start<=System.currentTimeMillis()&&p.stop>System.currentTimeMillis());cell.setOnClickListener(v->{if(p.start<=System.currentTimeMillis()&&p.stop>System.currentTimeMillis()){mCobraInspectedChannel=null;mCobraInspectedProgram=null;selectGuidePreview(c);}else showProgramActions(c,p);});cell.setOnLongClickListener(v->{showProgramActions(c,p);return true;});cell.setOnFocusChangeListener((v,focus)->{if(focus)cobraInspectProgramme(c,p);});cell.setOnKeyListener((v,key,event)->{if(event.getAction()!=KeyEvent.ACTION_DOWN)return false;if(key==KeyEvent.KEYCODE_DPAD_LEFT&&index==0){title.requestFocus();return true;}if(key==KeyEvent.KEYCODE_DPAD_RIGHT&&index==used-1){cobraMoveGuideTime(1);return true;}return false;});ranges.add(r);used++;}
+@@ -7296,6 +7281,8 @@
+   private String mCobraDiagnosticsSnapshot;
+ 
+   @Override protected void onSaveInstanceState(Bundle state) {
++    if(mCobraEffects!=null)mCobraEffects.save(state);
++    cobraSaveSmartReturn();
+     state.putBoolean("cobra_diagnostics_picker",mCobraDiagnosticsPicker);
+     if(mCobraDiagnosticsSnapshot!=null && mCobraDiagnosticsSnapshot.length()<=128*1024)
+       state.putString("cobra_diagnostics_snapshot",mCobraDiagnosticsSnapshot);
+@@ -7356,6 +7343,8 @@
+       root.put("source_states",sources);root.put("source_states_truncated",mSources.size()>64);
+       root.put("crash_history","collected separately in the exported ZIP; this snapshot is not a crash detector");
+       cobraAddSessionHealth(root);
++      root.put("network_intelligence",cobraNetworkObservation().json());
++      root.put("playback_session_card",cobraPlaybackSessionCardSnapshot());
+       return root.toString(2);
+     }catch(Exception failure){InfinityCobraDiagnostics.failure(this,"snapshot",failure);return "Snapshot unavailable: "+failure.getClass().getSimpleName();}
+   }
+@@ -7513,6 +7502,79 @@
+     }
+   }
+ 
++
++
++  // Cobra 2103205: passive network observation and Health Center presentation only.
++  private CobraNetworkIntelligence mCobraNetworkIntelligence;
++  private CobraNetworkIntelligence.Snapshot cobraNetworkObservation(){
++    return mCobraNetworkIntelligence==null
++        ?new CobraNetworkIntelligence.State().snapshot(android.os.SystemClock.elapsedRealtime(),"Not started")
++        :mCobraNetworkIntelligence.snapshot();
++  }
++  private float cobraObservedDisplayHz(){
++    try{android.view.Display display=cobraCurrentDisplay();float hz=display==null?0f:display.getRefreshRate();
++      return Float.isNaN(hz)||Float.isInfinite(hz)||hz<=0f?0f:hz;
++    }catch(RuntimeException unavailable){return 0f;}
++  }
++  private String cobraSessionVideoDescription(Format format){
++    String size=format!=null&&format.width>0&&format.height>0?format.width+" × "+format.height:"Not reported";
++    String codec=format==null||format.sampleMimeType==null||format.sampleMimeType.isEmpty()?"Not reported":format.sampleMimeType;
++    if(format!=null&&format.codecs!=null&&!format.codecs.isEmpty())codec+=" / "+format.codecs;
++    float fps=format==null?-1f:format.frameRate;
++    String rate=fps>0&&!Float.isNaN(fps)&&!Float.isInfinite(fps)?String.format(Locale.US,"%.2f",fps):"Not reported";
++    return "Video "+size+" · "+codec+"\nSource FPS: "+rate+" (stream metadata; not measured output FPS)";
++  }
++  private String cobraSessionBufferedAhead(ExoPlayer player){
++    try{long value=player.getTotalBufferedDuration();return value<0||value==C.TIME_UNSET?"Not reported":value+" ms";}
++    catch(RuntimeException unavailable){return "Not reported";}
++  }
++  private String cobraSessionRole(ExoPlayer player){
++    return player==mPlayer?"Fullscreen":player==mCobraPreviewPlayer?"Mini-player":"Multi-View / transfer";
++  }
++  private JSONObject cobraPlaybackSessionCardSnapshot()throws Exception{
++    JSONObject card=new JSONObject();long now=android.os.SystemClock.elapsedRealtime();
++    float hz=cobraObservedDisplayHz();
++    card.put("schema",1).put("display_refresh_hz",hz>0?Float.valueOf(hz):JSONObject.NULL)
++        .put("pip",isCobraInPictureInPicture()).put("background_stopped",mBackgroundStopped)
++        .put("background_audio_owned",cobraOwnsMiniSession(mCobraMiniBackgroundPlayer))
++        .put("background_media_service",InfinityExtendedBackgroundService.isMiniPlaybackRunning())
++        .put("audio_focus_app_muted",mCobraAudioFocusMuted)
++        .put("call_time_audibility","not_observable_by_app")
++        .put("network",cobraNetworkObservation().json())
++        .put("observation","App-owned current sessions; no speed test or physical rendering/audibility proof");
++    JSONArray sessions=new JSONArray();int active=0;
++    for(CobraPlayerBinding b:mCobraPlayerBindings.values()){
++      if(!b.current())continue;active++;if(sessions.length()>=6)continue;
++      JSONObject row=new JSONObject().put("channel_hash",InfinityCobraFeatureRuntime.hashId(b.channel.id))
++          .put("role",cobraSessionRole(b.player));
++      try{
++        ExoPlayer player=b.player;CobraSessionVitals s=b.vitals;Format format=player.getVideoFormat();
++        float fps=format==null?-1f:format.frameRate;long buffered=player.getTotalBufferedDuration();
++        row.put("state",player.getPlaybackState()).put("play_when_ready",player.getPlayWhenReady()).put("is_playing",player.isPlaying())
++            .put("video_width",format!=null&&format.width>0?Integer.valueOf(format.width):JSONObject.NULL)
++            .put("video_height",format!=null&&format.height>0?Integer.valueOf(format.height):JSONObject.NULL)
++            .put("video_mime",format==null||format.sampleMimeType==null?JSONObject.NULL:format.sampleMimeType)
++            .put("video_codec",format==null||format.codecs==null?JSONObject.NULL:format.codecs)
++            .put("source_fps",fps>0&&!Float.isNaN(fps)&&!Float.isInfinite(fps)?Float.valueOf(fps):JSONObject.NULL)
++            .put("source_fps_basis","stream_metadata_not_rendered_fps")
++            .put("decoder",s.decoder).put("buffered_ahead_ms",buffered>=0&&buffered!=C.TIME_UNSET?Long.valueOf(buffered):JSONObject.NULL)
++            .put("observed_frames",s.frameCount>=0?Long.valueOf(s.frameCount):JSONObject.NULL)
++            .put("dropped_frames",s.droppedFrames>=0?Long.valueOf(s.droppedFrames):JSONObject.NULL)
++            .put("counter_age_ms",s.observedAt<0?JSONObject.NULL:Long.valueOf(Math.max(0L,now-s.observedAt)))
++            .put("rebuffer_events",s.rebufferEvents).put("rebuffer_duration_ms",s.rebufferDurationMs)
++            .put("surface_recovery",cobraRecoveryEnabled(b)?s.recovery.state:"Disabled")
++            .put("background_audio_owner",cobraOwnsMiniSession(player));
++        long live=player.getCurrentLiveOffset();row.put("live_edge_ms",live>=0&&live!=C.TIME_UNSET?Long.valueOf(live):JSONObject.NULL);
++        boolean local=mCobraTimeshiftSession!=null&&(player==mCobraTimeshiftPlayer||player==mCobraTimeshiftProxyPlayer);
++        row.put("local_timeshift",local);
++        if(local)row.put("timeshift_state",mCobraTimeshiftSession.shortState())
++            .put("timeshift_depth_ms",Math.max(0L,mCobraTimeshiftSession.windowDurationMs()))
++            .put("timeshift_reconnections",mCobraTimeshiftSession.reconnects());
++      }catch(RuntimeException unavailable){row.put("observation_error","Current player sample unavailable");}
++      sessions.put(row);
++    }
++    return card.put("sessions",sessions).put("session_count",active).put("sessions_truncated",active>sessions.length());
++  }
+ 
+   private static final String COBRA_AUTO_RECOVERY="cobra_auto_surface_recovery";
+   private boolean mCobraHealthForeground;
+@@ -7878,7 +7940,12 @@
+   private void showCobraHealthCenter(){
+     cobraRememberLiveDiagnostics("health-center-open");
+     LinearLayout rows=cobraOpenSheet("Cobra Health Center","Observed playback and guide state • private, on-device diagnostics","health-center");
+-    mCobraHealthSummary=cobraInfoText(rows,"");mCobraHealthSummary.setTag("cobra-health-summary");cobraRefreshHealthSummary();
++    LinearLayout sessionCard=new LinearLayout(this);sessionCard.setOrientation(LinearLayout.VERTICAL);sessionCard.setTag("cobra-health-session-card");
++    sessionCard.setBackground(cobraSheetDetailSurface(18));
++    TextView sessionTitle=cobraText("Playback Session Card",cobraSheetIsDark()?0xfff7faff:cobraModeColor("text"),18);
++    sessionTitle.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));sessionTitle.setPadding(dp(12),dp(14),dp(12),0);sessionCard.addView(sessionTitle,new LinearLayout.LayoutParams(-1,-2));
++    rows.addView(sessionCard,new LinearLayout.LayoutParams(-1,-2));
++    mCobraHealthSummary=cobraInfoText(sessionCard,"");mCobraHealthSummary.setTag("cobra-health-summary");cobraRefreshHealthSummary();
+     cobraAddDetail(rows,"recent","Refresh observations","Read current state; no provider scan or stream restart","cobra-health-refresh",false,()->showCobraHealthCenter());
+     cobraAddDetail(rows,"source","Export diagnostics ZIP","Choose where to save the redacted report","cobra-health-export",false,()->showCobraDiagnosticExport());
+     cobraAddDetail(rows,"health","Health Snapshot","Inspect timestamped state and captured failures","cobra-health-snapshot",false,()->showCobraHealthSnapshot());
+@@ -7896,27 +7963,38 @@
+     if(!"health-center".equals(mCobraSheetKind)||mCobraHealthSummary==null)return;
+     StringBuilder text=new StringBuilder("OBSERVED  ").append(new SimpleDateFormat("HH:mm:ss",Locale.getDefault()).format(new Date()));
+     text.append("\n").append(mCobraPlayerBindings.size()).append(" app-local player sessions • ").append(mSources.size()).append(" sources");
+-    text.append("\nNetwork: ").append(cobraNetworkTransport()).append(" • Display ").append(String.format(Locale.US,"%.2f Hz",mCobraActiveHz)).append(" • ").append(mCobraRefreshStatus);
++    CobraNetworkIntelligence.Snapshot network=cobraNetworkObservation();
++    text.append("\nNetwork: ").append(network.summary());
++    text.append("\nRouting observations: ").append(network.observation);
++    float displayHz=cobraObservedDisplayHz();text.append("\nDisplay: ").append(displayHz>0?String.format(Locale.US,"%.2f Hz",displayHz):"Not reported");
++    text.append("\nPiP: ").append(isCobraInPictureInPicture()?"Active":"Inactive")
++        .append(" • Background audio: ").append(cobraOwnsMiniSession(mCobraMiniBackgroundPlayer)?"Session owned":"Inactive");
++    text.append("\nMedia controls service: ").append(InfinityExtendedBackgroundService.isMiniPlaybackRunning()?"Running":"Not running")
++        .append(" • App audio mute: ").append(mCobraAudioFocusMuted?"Muted":"Not muted");
++    text.append("\nCall-time audibility: not observable by Cobra.");
+     text.append("\nProvider-wide connection use is not known.");
+     if(mCobraTimeshiftSession!=null)text.append("\nLocal timeshift: ").append(mCobraTimeshiftSession.diagnostic());
+     long now=android.os.SystemClock.elapsedRealtime();int count=0;
+     for(CobraPlayerBinding b:mCobraPlayerBindings.values()){
+-      if(++count>6)break;CobraSessionVitals s=b.vitals;ExoPlayer p=b.player;
++      if(!b.current())continue;if(++count>6)break;CobraSessionVitals s=b.vitals;ExoPlayer p=b.player;
++      try{
+       text.append("\n\n").append(InfinityCobraDiagnostics.redact(b.channel.name)).append("  ·  ").append(cobraPlayerState(p));
+-      Format format=p.getVideoFormat();if(format!=null)text.append("\nVideo ").append(format.width).append(" × ").append(format.height).append(" · ").append(format.sampleMimeType==null?"Codec not reported":format.sampleMimeType);
++      text.append("\n").append(cobraSessionRole(p)).append(" • Decoder: ").append(s.decoder);
++      text.append("\n").append(cobraSessionVideoDescription(p.getVideoFormat()));
+       text.append("\nCounter sample: ").append(s.observedAt<0?"Not observed":Math.max(0,now-s.observedAt)+" ms ago");
+       text.append("\nVideo output frames: ").append(s.frameCount<0?"Not observed":s.frameCount).append(" • dropped: ").append(s.droppedFrames<0?"Not observed":s.droppedFrames);
+       text.append("\nFirst frame: ").append(s.firstFrameAt<0?"Not observed":Math.max(0,s.firstFrameAt-s.createdAt)+" ms");
+-      text.append("\nBuffered ahead: ").append(Math.max(0,p.getTotalBufferedDuration())).append(" ms • visible rebuffers: ").append(s.rebufferEvents).append(" / ").append(s.rebufferDurationMs).append(" ms • buffer transitions: ").append(s.bufferingTransitions).append(" • long stalls: ").append(s.longStalls);
++      text.append("\nBuffered ahead: ").append(cobraSessionBufferedAhead(p)).append(" • visible rebuffers: ").append(s.rebufferEvents).append(" / ").append(s.rebufferDurationMs).append(" ms • buffer transitions: ").append(s.bufferingTransitions).append(" • long stalls: ").append(s.longStalls);
+       long kbps=CobraFinalFeaturePolicy.throughputKbps(s.lastLoadBytes,s.lastLoadMs);text.append("\nLast media load: ").append(s.lastLoadMs<0?"Not observed":s.lastLoadMs+" ms / "+s.lastLoadBytes+" bytes").append(kbps<0?"":" • ~"+kbps+" kbps");
+       try{long offset=p.getCurrentLiveOffset();if(offset!=C.TIME_UNSET&&offset>=0)text.append("\nLive-edge latency: ").append(offset).append(" ms");}catch(RuntimeException ignored){}
+       text.append("\nVideo host: ").append(b.texture==null?"Not attached":b.texture.getWidth()+" × "+b.texture.getHeight()+" / "+(b.texture.isAvailable()?"surface available":"surface not available"));
+       text.append("\nRecovery: ").append(cobraRecoveryEnabled(b)?s.recovery.state:"Disabled").append(" • ").append(s.recovery.attempts).append("/2 attempts");
+       text.append("\nLast captured error: ").append(s.lastError.isEmpty()?"None captured (not a crash guarantee)":s.lastError);
++      }catch(RuntimeException unavailable){text.append("\nCurrent player sample unavailable.");}
+     }
+     if(count==0)text.append("\n\nNo active playback to evaluate. Start a channel to collect frame and load observations.");
+     text.append("\n\nThroughput is derived from the most recent Media3 load, not a speed test. VPN/network transport is Android-reported active routing. Buffer reserve can hide short stalls but cannot fix a sustained provider outage.");
+-    String value=text.toString();if(!value.contentEquals(mCobraHealthSummary.getText()))mCobraHealthSummary.setText(value);
++    String value=InfinityCobraDiagnostics.redact(text.toString());if(!value.contentEquals(mCobraHealthSummary.getText()))mCobraHealthSummary.setText(value);
+   }
+ 
+ 
+@@ -7990,10 +8068,11 @@
+   }
+ 
+   private void cobraShowPlaybackRecents(){
+-    LinearLayout rows=cobraOpenSheet("Recents","Recently watched channels","channel-recents");int count=0;
++    LinearLayout rows=cobraOpenSheet("Recents","Your last eight watched channels","channel-recents");int count=0;HashSet<String> shown=new HashSet<>();final String profile=mFeatures.activeProfileId();
+     for(String id:new ArrayList<>(mRecents)){
+-      final Channel channel=findChannel(id);if(channel==null||!cobraChannelAllowed(channel))continue;
+-      cobraAddDetail(rows,"recent",channel.name,null,"cobra-playback-recent:"+id,mPlaying!=null&&id.equals(mPlaying.id),()->playChannel(channel));count++;
++      final Channel channel=findChannel(id);if(channel==null||!cobraChannelAllowed(channel)||!shown.add(id))continue;
++      GuideProgram now=cobraCurrentProgram(channel);String detail=now==null?channel.group:"Now  "+now.title;
++      cobraAddDetail(rows,"recent",channel.name,detail,"cobra-playback-recent:"+id,mPlaying!=null&&id.equals(mPlaying.id),()->{if(profile.equals(mFeatures.activeProfileId()))cobraRecallTune(channel);});if(++count==8)break;
+     }
+     if(count==0)cobraInfoText(rows,"No recently watched channels yet.");
+   }
+@@ -8032,6 +8111,27 @@
+     toast("This channel is not currently playing");
+   }
+ 
++
++  // Source-driven presentation is refreshed in place. This method never creates,
++  // releases, reparents or seeks a player/texture/timeshift session.
++  void cobraRefreshSafetyPresentation(){
++    if(isFinishing()||isDestroyed()||mPrefs==null)return;
++    mCobraPaletteSourceStamp=Long.MIN_VALUE;mCobraPaletteCache=null;
++    mTheme=Theme.load(this);mUi=UiContract.load(this);
++    closeCobraActionSheet();
++    if(mCobraBrowseBackground!=null){mCobraBrowseBackground.setBackgroundColor(cobraThemeColor("background",mTheme.background));vtheme().paint(mCobraBrowseBackground,"screen");}
++    if(mRail!=null){mRail.setBackgroundColor(cobraThemeColor("rail",mTheme.rail));vtheme().paint(mRail,"rail");}
++    if(mHeader!=null){mHeader.setTextColor(cobraThemeColor("text",mTheme.text));vtheme().paint(mHeader,"screen.header");}
++    if(mStatus!=null){mStatus.setTextColor(cobraThemeColor("muted",mTheme.muted));vtheme().paint(mStatus,"screen.status");}
++    if(mPlayerOverlay!=null)cobraBuildPlayerChrome();
++    else if(mMultiOverlay==null){
++      if(mCobraGuideShell!=null&&mCobraGuideShell.isAttachedToWindow()){cobraRestyleGuide();cobraLayoutGuide();cobraRenderGuideBrowser();}
++      else if("COBRA • SETTINGS".equals(mCobraStageTitle))showSettings();
++      else if("COBRA • WELCOME".equals(mCobraStageTitle))showWelcome();
++    }
++    if(mRoot!=null)mRoot.requestLayout();cobraApplySystemBarsForSurface();
++  }
++
+   private CobraVisualRenderer mVisualTheme;
+   private CobraVisualRenderer vtheme(){if(mVisualTheme==null)mVisualTheme=new CobraVisualRenderer(this);return mVisualTheme.mode(cobraEffectiveAppearanceMode());}
+   private View headerForVisuals(LinearLayout panel){return panel.getChildCount()>0?panel.getChildAt(0):panel;}
+@@ -8063,7 +8163,7 @@
+   private void showCobraVisualThemePicker(){
+     final boolean installed=vtheme().installed();
+     final String previous=CobraVisualTheme.readPointer(this).optString("previous","");
+-    final boolean canRestore=!previous.isEmpty();
++    final boolean canRestore=CobraPresentationSafety.hasPrevious(this);
+     LinearLayout rows=cobraOpenSheet("Theme",
+         installed ? "Current • "+vtheme().displayName() : "Current • Cobra built-in appearance",
+         "theme-management");
+@@ -8083,12 +8183,10 @@
+             : (canRestore ? "Return to the same visual theme you were using" : "Install a visual theme ZIP first"),
+         false,dark,()->{
+           if(vtheme().installed()){toast("Installed visual theme is already active");showSettings();return;}
+-          if(CobraVisualTheme.readPointer(this).optString("previous","").isEmpty()){
++          if(!CobraPresentationSafety.hasPrevious(this)){
+             toast("No installed visual theme is available");showCobraVisualThemePicker();return;
+           }
+-          vtheme().restorePrevious(this,()->{
+-            if(!isFinishing()&&!isDestroyed()){toast("Installed visual theme restored");showSettings();}
+-          });
++          CobraPresentationSafety.previewPrevious(this);
+         });installedRow.setTag("cobra_theme_installed");rows.addView(installedRow);
+ 
+     LinearLayout installRow=cobraSheetRow("add","Install / replace theme ZIP",
+@@ -8440,6 +8538,7 @@
+ 
+   @Override protected void onNewIntent(Intent intent){
+     super.onNewIntent(intent);setIntent(intent);
++    if(mCobraEffects!=null){mCobraWelcomePending=mCobraEffects.consumeEntry(intent)&&cobraVisualEffectsAllowed();mMain.post(this::cobraMaybeShowWelcome);}
+     if(cobraIsLauncherReturn(intent)&&(mCobraPipReturnArmed||mCobraPlaybackPolicy.pipOwned
+         ||isCobraInPictureInPicture()||mPlayerOverlay!=null||mMultiOverlay!=null)){
+       mCobraLauncherPipReentry=true;
+@@ -8637,7 +8736,10 @@
+       // The installed Visual Theme pointer is the persistent source of truth. Read only its
+       // small JSON manifest here; never decode images/fonts on the UI thread. This also avoids
+       // an async renderer-publication race during Activity/window restoration.
+-      JSONObject pointer=CobraVisualTheme.readPointer(this);
++      boolean transientPresentation=CobraPresentationSafety.isSafe(this)||CobraPresentationSafety.isPreviewing(this)
++          ||CobraPresentationSafety.state(this).optBoolean("visual_builtin",false);
++      if(transientPresentation)manifest=CobraPresentationSafety.effectiveManifest(this);
++      JSONObject pointer=transientPresentation?new JSONObject():CobraVisualTheme.readPointer(this);
+       String generation=pointer.optString("active","");
+       if(generation!=null&&!generation.isEmpty()){
+         File directory=CobraVisualTheme.inside(CobraVisualTheme.store(this),generation);
+@@ -9138,7 +9240,7 @@
+   private void cobraRememberChannelTransition(Channel next){if(next==null||mPrefs==null)return;String current=mPrefs.getString(COBRA_LAST_CURRENT,"");if(!current.isEmpty()&&!current.equals(next.id))mPrefs.edit().putString(COBRA_LAST_PREVIOUS,current).putString(COBRA_LAST_CURRENT,next.id).apply();else if(current.isEmpty())mPrefs.edit().putString(COBRA_LAST_CURRENT,next.id).apply();cobraUpdateLastChannelButton();}
+   private Channel cobraLastChannel(){String id=mPrefs==null?"":mPrefs.getString(COBRA_LAST_PREVIOUS,"");return id.isEmpty()?null:findChannel(id);}
+   private void cobraTuneLastChannel(){Channel last=cobraLastChannel();if(last==null){toast("No previous channel yet");return;}playChannel(last);}
+-  private void cobraUpdateLastChannelButton(){if(mCobraLastChannelButton==null)return;boolean enabled=cobraLastChannel()!=null;mCobraLastChannelButton.setEnabled(enabled);mCobraLastChannelButton.setAlpha(enabled?1f:.35f);mCobraLastChannelButton.setContentDescription(enabled?"Last channel":"No previous channel yet");}
++  private void cobraUpdateLastChannelButton(){if(mCobraLastChannelButton==null)return;boolean enabled=cobraLastChannel()!=null;mCobraLastChannelButton.setEnabled(enabled);mCobraLastChannelButton.setAlpha(enabled?1f:.35f);mCobraLastChannelButton.setContentDescription(enabled?"Last channel. Hold for recent channels":"No previous channel yet");}
+ 
+   private String cobraNetworkTransport(){
+     try{android.net.ConnectivityManager cm=(android.net.ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);android.net.Network n=cm==null?null:cm.getActiveNetwork();android.net.NetworkCapabilities c=n==null?null:cm.getNetworkCapabilities(n);if(c==null)return "Unknown";ArrayList<String> p=new ArrayList<>();if(c.hasTransport(android.net.NetworkCapabilities.TRANSPORT_VPN))p.add("VPN");if(c.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI))p.add("Wi-Fi");if(c.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR))p.add("Cellular");if(c.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET))p.add("Ethernet");return p.isEmpty()?"Other":android.text.TextUtils.join(" + ",p);}catch(Exception e){return "Unavailable";}
+@@ -10108,4 +10210,291 @@
+     return geometry;
+   }
+ 
++  // 2103205: bounded UI return + isolated channel inspection; main transport stays untouched.
++  private CobraSmartReturn.Gate mCobraSmartReturnGate;
++  private CobraSmartReturn.Snapshot mCobraSmartScreenPosition;
++  private boolean mCobraSmartRestoreSucceeded,mCobraSmartRestoring,mCobraSmartWatchlist;
++  private CobraQuickPeekSession mCobraQuickPeek;
++  private Channel mCobraQuickPeekChannel;
++  private long mCobraQuickPeekGeneration;
++  private TextView mCobraQuickPeekNow,mCobraQuickPeekNext;
++  private final java.util.concurrent.ConcurrentHashMap<String,CobraQuickPeekSession.Capacity> mCobraPeekCapacity=new java.util.concurrent.ConcurrentHashMap<>();
++
++  private void cobraPrepareSmartReturn(){
++    if(CobraPresentationSafety.isSafe(this)){mCobraSmartReturnGate=null;return;}
++    String profile=mFeatures.activeProfileId();
++    mCobraSmartReturnGate=new CobraSmartReturn.Gate(CobraSmartReturn.read(mPrefs,mFeatures.profileKey(CobraSmartReturn.SNAPSHOT),profile,System.currentTimeMillis()),mCobraNavigation.current());
++  }
++  private void cobraSmartLoading(){if(mCobraSmartReturnGate!=null)mCobraSmartReturnGate.loading(mCobraNavigation.current());}
++  private void cobraCancelSmartReturn(){
++    if(mCobraSmartReturnGate!=null)mCobraSmartReturnGate.cancel();mCobraSmartScreenPosition=null;
++  }
++  private boolean cobraSessionChannelAllowed(Channel channel){return cobraChannelAllowed(channel)&&sourceForChannel(channel)!=null;}
++  @Override public void onUserInteraction(){super.onUserInteraction();cobraCancelSmartReturn();if(cobraNightCinemaActive())scheduleChromeHide();}
++  private String cobraSmartDestination(){
++    if("health-center".equals(mCobraSheetKind))return "health";
++    if(mCobraGuideShell!=null&&mCobraGuideShell.isAttachedToWindow())return "guide";
++    if(mCobraSmartWatchlist)return "watchlist";
++    if("COBRA • SETTINGS".equals(mCobraStageTitle))return "settings";
++    if("COBRA • SOURCES".equals(mCobraStageTitle))return "sources";
++    if("COBRA • MOVIES".equals(mCobraStageTitle))return "movies";
++    if("COBRA • SERIES".equals(mCobraStageTitle))return "shows";
++    if("COBRA • RECORDINGS".equals(mCobraStageTitle))return "recordings";
++    if("COBRA • CONTINUE WATCHING".equals(mCobraStageTitle))return "continue";
++    if("COBRA • PROFILES".equals(mCobraStageTitle))return "profiles";
++    if("COBRA • DISCOVER".equals(mCobraStageTitle))return "discover";
++    return "guide";
++  }
++  private ScrollView cobraSmartScroll(View view){
++    if(view instanceof ScrollView)return (ScrollView)view;
++    if(view instanceof android.view.ViewGroup){android.view.ViewGroup group=(android.view.ViewGroup)view;for(int i=0;i<group.getChildCount();i++){ScrollView found=cobraSmartScroll(group.getChildAt(i));if(found!=null)return found;}}
++    return null;
++  }
++  private void cobraSaveSmartReturn(){
++    if(mPrefs==null||mFeatures==null||mCobraSmartRestoring||CobraPresentationSafety.isSafe(this)||!CobraSmartReturn.enabled(mPrefs)||mChannels.isEmpty())return;
++    if(mCobraSmartReturnGate!=null&&mCobraSmartReturnGate.pending())return;
++    CobraSmartReturn.Snapshot saved=new CobraSmartReturn.Snapshot();saved.profile=mFeatures.activeProfileId();saved.savedAt=System.currentTimeMillis();
++    saved.mode=mCobraGuideStyle;saved.route=mCobraGuideRoute;saved.category=mCategory;saved.search=mSearch;saved.source=mCobraGuideSource;
++    saved.destination=cobraSmartDestination();saved.guideWindow=mCobraGuideWindow;saved.groups=mCobraModeGroupsExpanded;
++    saved.selected=mCobraInspectedChannel!=null?mCobraInspectedChannel.id:mGuidePreviewChannel!=null?mGuidePreviewChannel.id:"";
++    Channel channel=mPlayer!=null&&cobraLiveChannel(mPlaying)?mPlaying:mCobraPreviewPlayer!=null?mGuidePreviewChannel:null;
++    if(channel!=null&&cobraSessionChannelAllowed(channel)){
++      saved.channel=channel.id;saved.playback=mPlayer!=null?"fullscreen":"preview";
++      ExoPlayer player=mPlayer!=null?mPlayer:mCobraPreviewPlayer;
++      CobraPlayerBinding binding=mCobraPlayerBindings.get(player);
++      saved.requested=binding!=null&&binding.vitals.preferenceKey.equals(cobraPreferenceKey(channel))&&!mCobraPlaybackPolicy.dismissed&&(player.getPlayWhenReady()||Boolean.TRUE.equals(mBackgroundResumePlayers.get(player)));
++    }
++    cobraRememberModeScroll();for(Map.Entry<String,int[]> item:mCobraModeScroll.entrySet())saved.scroll.put(item.getKey(),item.getValue().clone());saved.focus.putAll(mCobraModeFocused);
++    ScrollView scroll=cobraSmartScroll(mStage);saved.screenScroll=scroll==null?0:scroll.getScrollY();
++    CobraSmartReturn.save(mPrefs,mFeatures.profileKey(CobraSmartReturn.SNAPSHOT),saved);
++  }
++  private boolean cobraTrySmartReturn(){
++    if(mCobraSmartReturnGate==null)return false;
++    if(!CobraSmartReturn.enabled(mPrefs)||CobraPresentationSafety.isSafe(this)){cobraCancelSmartReturn();return false;}
++    CobraSmartReturn.Snapshot saved=mCobraSmartReturnGate.take(mFeatures.activeProfileId(),mCobraNavigation.current());
++    if(saved==null||!isCobraAsyncAlive())return false;
++    Channel channel=findChannel(saved.channel),selected=findChannel(saved.selected);
++    if(channel!=null&&!cobraSessionChannelAllowed(channel))channel=null;if(selected!=null&&!cobraSessionChannelAllowed(selected))selected=null;
++    boolean sourceAllowed=saved.source.isEmpty();for(LiveSource source:mSources)if(saved.source.equals(source.id)&&mFeatures.sourceEnabled(source.id))sourceAllowed=true;
++    if(!sourceAllowed)return false;
++    mCobraSmartRestoring=true;
++    try{
++      mCobraGuideStyle=saved.mode;mCobraGuideRoute=saved.route;mCategory=saved.category;mSearch=saved.search;mCobraGuideSource=saved.source;mCobraGuideWindow=saved.guideWindow;mCobraModeGroupsExpanded=saved.groups;
++      mCobraModeScroll.clear();mCobraModeScroll.putAll(saved.scroll);mCobraModeFocused.clear();mCobraModeFocused.putAll(saved.focus);
++      mCobraInspectedChannel=selected;mGuidePreviewChannel=channel!=null?channel:selected;mGuidePreviewKey=mGuidePreviewChannel==null?"":cobraChannelKey(mGuidePreviewChannel);
++      // A cold paused/stopped session restores context only: no connection or audio focus.
++      // Ordinary resume/PiP continues to use the existing live player and lifecycle owner.
++      mCobraPreviewAutoplayAllowed=false;mCobraSmartRestoreSucceeded=true;mCobraSmartScreenPosition=saved;
++      if("settings".equals(saved.destination))showSettings();else if("sources".equals(saved.destination))showSources();
++      else if("movies".equals(saved.destination))showMovies();else if("shows".equals(saved.destination))showSeries();
++      else if("recordings".equals(saved.destination))showRecordings();else if("watchlist".equals(saved.destination))showWatchlist();else if("continue".equals(saved.destination))showContinueWatching();
++      else if("profiles".equals(saved.destination))showProfiles();else if("discover".equals(saved.destination))showDiscover();
++      else {cobraShowGuideShell();if("health".equals(saved.destination))showCobraHealthCenter();}
++      if(channel!=null&&saved.requested){
++        if("fullscreen".equals(saved.playback))playChannel(channel);
++        else if("preview".equals(saved.playback)&&"guide".equals(saved.destination)){mCobraPreviewAutoplayAllowed=true;startCobraPreview(channel);}
++      }
++      cobraRestoreSmartScreenPosition();return true;
++    }finally{mCobraSmartRestoring=false;}
++  }
++  private void cobraRestoreSmartScreenPosition(){
++    final CobraSmartReturn.Snapshot saved=mCobraSmartScreenPosition;if(saved==null||mStage==null)return;
++    final long ticket=mCobraNavigation.current();mStage.post(()->{
++      if(saved!=mCobraSmartScreenPosition||!mCobraNavigation.accepts(ticket)||!saved.profile.equals(mFeatures.activeProfileId())||!saved.destination.equals(cobraSmartDestination()))return;
++      ScrollView scroll=cobraSmartScroll(mStage);if(scroll!=null)scroll.scrollTo(0,saved.screenScroll);
++    });
++  }
++  private void cobraShowSmartReturnSetting(){
++    LinearLayout rows=cobraOpenSheet("Smart Return","Remember your channel, view and browsing position when returning to Cobra.","smart-return");boolean current=CobraSmartReturn.enabled(mPrefs);
++    for(boolean enabled:new boolean[]{false,true}){final boolean selected=enabled;
++      cobraAddDetail(rows,"recent",enabled?"On":"Off",enabled?"Restore useful session context; paused cold sessions stay paused":"Use Cobra's normal entry behavior","cobra-smart-return:"+enabled,current==enabled,()->{
++        mPrefs.edit().putBoolean(CobraSmartReturn.ENABLED,selected).apply();cobraCancelSmartReturn();showSettings();
++      });
++    }
++  }
++  private void cobraRememberPeekCapacity(LiveSource source,JSONObject user){
++    if(source==null)return;CobraQuickPeekSession.Capacity capacity=CobraQuickPeekSession.Capacity.from(user,System.currentTimeMillis());
++    if(capacity==null)mCobraPeekCapacity.remove(source.id);else mCobraPeekCapacity.put(source.id,capacity);
++  }
++  private int cobraPeekSourceSessions(Channel channel){
++    String source=sourceIdForChannel(channel);int sessions=0;
++    for(CobraPlayerBinding binding:mCobraPlayerBindings.values())if(binding.current()&&binding.channel!=null&&source.equals(sourceIdForChannel(binding.channel)))sessions++;
++    return sessions;
++  }
++  private boolean cobraPeekRecordingActive(){
++    if(!mRecordingSession.isEmpty())return true;
++    try{
++      android.app.ActivityManager manager=(android.app.ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
++      if(manager==null)return true;
++      for(android.app.ActivityManager.RunningServiceInfo service:manager.getRunningServices(64))
++        if(service.service!=null&&InfinityCobraRecordingService.class.getName().equals(service.service.getClassName()))return true;
++      return false;
++    }catch(RuntimeException unavailable){return true;}
++  }
++  private void cobraCloseQuickPeekSession(){
++    mCobraQuickPeekGeneration++;CobraQuickPeekSession previous=mCobraQuickPeek;mCobraQuickPeek=null;mCobraQuickPeekChannel=null;mCobraQuickPeekNow=null;mCobraQuickPeekNext=null;if(previous!=null)previous.close();
++  }
++  private void cobraRefreshQuickPeek(){
++    Channel channel=mCobraQuickPeekChannel;if(channel==null)return;
++    GuideProgram now=cobraCurrentProgram(channel),next=cobraNextProgram(channel);
++    if(mCobraQuickPeekNow!=null)mCobraQuickPeekNow.setText(now==null?cobraGuideStatus(channel):"Now  "+now.title);
++    if(mCobraQuickPeekNext!=null)mCobraQuickPeekNext.setText(next==null?"Next programme unavailable":"Next  "+next.title);
++  }
++  private void cobraReleasePeekClient(okhttp3.OkHttpClient client){
++    if(client==null)return;client.dispatcher().cancelAll();client.connectionPool().evictAll();client.dispatcher().executorService().shutdown();
++  }
++  private void cobraShowQuickPeek(Channel channel,View anchor){
++    if(!cobraSessionChannelAllowed(channel)||mCobraPlayerLocked||isCobraInPictureInPicture()||mBackgroundStopped)return;
++    mCobraNextSheetAnchor=anchor;LinearLayout rows;
++    try{rows=cobraOpenSheet(channel.name,"Channel Quick Peek · current playback stays in place","quick-peek");}finally{mCobraNextSheetAnchor=null;}
++    final long generation=++mCobraQuickPeekGeneration;final String profile=mFeatures.activeProfileId();mCobraQuickPeekChannel=channel;
++    FrameLayout preview=new FrameLayout(this);preview.setBackgroundColor(Color.BLACK);preview.setTag("cobra_quick_peek_video");
++    TextureView texture=new TextureView(this);preview.addView(texture,new FrameLayout.LayoutParams(-1,-1));rows.addView(preview,new LinearLayout.LayoutParams(-1,dp(160)));
++    TextView state=cobraInfoText(rows,"Checking preview availability…");state.setTag("cobra_quick_peek_state");
++    mCobraQuickPeekNow=cobraInfoText(rows,"");mCobraQuickPeekNow.setTag("cobra_quick_peek_now");mCobraQuickPeekNext=cobraInfoText(rows,"");mCobraQuickPeekNext.setTag("cobra_quick_peek_next");
++    cobraRefreshQuickPeek();cobraRequestShortEpg(channel);
++    cobraAddDetail(rows,"play","Play",channel.name,"cobra-quick-peek-play",false,()->{if(profile.equals(mFeatures.activeProfileId())&&cobraSessionChannelAllowed(channel))cobraRecallTune(channel);});
++    cobraAddDetail(rows,"favorite",mFavorites.contains(channel.id)?"Remove from favorites":"Add to favorites",null,"cobra-quick-peek-favorite",mFavorites.contains(channel.id),()->{if(profile.equals(mFeatures.activeProfileId())&&cobraSessionChannelAllowed(channel)){toggleFavorite(channel);cobraRefreshProgrammeLabels();if(mCobraGuideAdapter!=null)mCobraGuideAdapter.notifyDataSetChanged();}});
++    cobraAddDetail(rows,"more","Channel actions","Schedule, playback preferences and existing actions","cobra-quick-peek-actions",false,()->{if(profile.equals(mFeatures.activeProfileId())&&cobraSessionChannelAllowed(channel))showCobraChannelActions(channel);});
++    cobraInfoText(rows,channel.group==null||channel.group.isEmpty()?"Live channel":channel.group);
++    boolean sameCurrent=mPlaying!=null&&channel.id.equals(mPlaying.id)||mGuidePreviewChannel!=null&&mCobraPreviewPlayer!=null&&channel.id.equals(mGuidePreviewChannel.id);
++    if(sameCurrent){state.setText("Already playing in the current player");preview.setVisibility(View.GONE);return;}
++    int own=cobraPeekSourceSessions(channel);
++    if(cobraPeekRecordingActive()||mCobraPlayerBindings.size()>=4||!CobraQuickPeekSession.capacityAllows(mCobraPeekCapacity.get(sourceIdForChannel(channel)),own,System.currentTimeMillis())){
++      state.setText("Live preview unavailable without risking the current stream. Play switches channels.");preview.setVisibility(View.GONE);return;
++    }
++    okhttp3.OkHttpClient pendingClient=null;
++    try{
++      int mode=cobraNetworkFamilyMode();CobraNetworkFamilyPolicy.NetworkTelemetry telemetry=new CobraNetworkFamilyPolicy.NetworkTelemetry(channel.primaryUrl);
++      CobraNetworkFamilyPolicy.FamilyDns dns=CobraNetworkFamilyPolicy.dns(channel.primaryUrl,mode,telemetry);
++      final okhttp3.OkHttpClient client=CobraNetworkFamilyPolicy.client(dns,telemetry,5000,8000);pendingClient=client;
++      androidx.media3.datasource.okhttp.OkHttpDataSource.Factory http=new androidx.media3.datasource.okhttp.OkHttpDataSource.Factory(client).setUserAgent("Infinity Cobra/3.0");if(channel.headers!=null&&!channel.headers.isEmpty())http.setDefaultRequestProperties(channel.headers);
++      DefaultMediaSourceFactory factory=new DefaultMediaSourceFactory(new DefaultDataSource.Factory(this,http),new androidx.media3.extractor.DefaultExtractorsFactory().setTsExtractorFlags(CobraTsParserPolicy.TS_FLAGS));
++      mCobraQuickPeek=new CobraQuickPeekSession(this,texture,factory,mediaItem(channel.primaryUrl),(message,width,height,codec)->{
++        if(generation!=mCobraQuickPeekGeneration||!profile.equals(mFeatures.activeProfileId())||!"quick-peek".equals(mCobraSheetKind)||!isCobraAsyncAlive())return;
++        state.setText(message+(width>0&&height>0?" · "+width+" × "+height:"")+(codec.isEmpty()?"":" · "+codec));
++      },()->cobraReleasePeekClient(client));
++    }catch(RuntimeException unavailable){cobraReleasePeekClient(pendingClient);state.setText("Live preview unavailable. Current playback is unchanged.");}
++  }
++  private void cobraRecallTune(Channel channel){
++    if(!cobraSessionChannelAllowed(channel))return;
++    if(mPlayer!=null&&mPlaying!=null&&mPlaying.id.equals(channel.id)){closeCobraActionSheet();return;}
++    playChannel(channel);
++  }
++
++
++  // ---- 2103205 presentation extensions; no transport ownership ----
++  private CobraPresentationEffects mCobraEffects;
++  private int mCobraAmbientTint=0xff62aaff;
++  private String mCobraAmbientContext="";
++  private boolean mCobraWelcomePending;
++
++  private boolean cobraVisualEffectsAllowed(){return !CobraPresentationSafety.isSafe(this);}
++  private int cobraAmbientMode(){
++    int selected=CobraPresentationEffects.ambientMode(mPrefs);
++    if(selected==CobraPresentationEffects.OFF||!cobraVisualEffectsAllowed()||cobraNightCinemaActive())return CobraPresentationEffects.OFF;
++    return selected;
++  }
++  private boolean cobraNightCinemaActive(){
++    return cobraVisualEffectsAllowed()&&mPrefs!=null&&mPrefs.getBoolean(CobraPresentationEffects.NIGHT,false)
++        &&mPlayerOverlay!=null&&mMultiOverlay==null&&!mInPictureInPicture;
++  }
++  private void cobraInitPresentationEffects(Bundle saved){
++    mCobraEffects=new CobraPresentationEffects(this);mCobraEffects.restore(saved);
++    mCobraWelcomePending=mCobraEffects.consumeEntry(getIntent())&&cobraVisualEffectsAllowed();
++  }
++  private void cobraMaybeShowWelcome(){
++    if(!mCobraWelcomePending||mCobraEffects==null)return;
++    mCobraWelcomePending=false;
++    if(!cobraVisualEffectsAllowed()||mInPictureInPicture||mPlayerOverlay!=null||mMultiOverlay!=null)return;
++    View content=findViewById(android.R.id.content);
++    if(content instanceof FrameLayout)mCobraEffects.showWelcome((FrameLayout)content,
++        CobraPresentationEffects.greeting(mPrefs),cobraModeDark(),getResources().getConfiguration().getLayoutDirection()==View.LAYOUT_DIRECTION_RTL);
++  }
++  private void cobraRefreshAmbient(){
++    if(mCobraEffects==null)return;
++    int mode=cobraAmbientMode();Channel context=mCobraInspectedChannel!=null?mCobraInspectedChannel:mPlaying!=null?mPlaying:mGuidePreviewChannel;
++    String key=context==null?"":context.id;
++    if(!key.equals(mCobraAmbientContext)){mCobraAmbientContext=key;
++      mCobraAmbientTint=context==null?0xff62aaff:CobraPresentationEffects.contextTint(mFeatures.sourceColor(sourceIdForChannel(context)));}
++    mCobraEffects.backdrop(mCobraBrowseBackground,cobraThemeColor("background",mTheme.background),mCobraAmbientTint,mode);
++    mCobraEffects.backdrop(mCobraGuideShell,cobraModeColor("background"),mCobraAmbientTint,mode);
++  }
++  private View cobraPulseStatus(TextView legacy){
++    return mCobraEffects!=null&&cobraVisualEffectsAllowed()?mCobraEffects.status(legacy):legacy;
++  }
++  private CobraPresentationEffects.PulseState cobraVisualPulseState(ExoPlayer player){
++    if(player==null)return CobraPresentationEffects.PulseState.NONE;
++    CobraPlayerBinding binding=mCobraPlayerBindings.get(player);if(binding==null||!binding.current())return CobraPresentationEffects.PulseState.NONE;
++    boolean buffering=player.getPlaybackState()==Player.STATE_BUFFERING;
++    boolean active=player.getPlaybackState()!=Player.STATE_IDLE&&player.getPlaybackState()!=Player.STATE_ENDED;
++    boolean error=!binding.error.isEmpty();
++    CobraNetworkIntelligence.Snapshot networkState=mCobraNetworkIntelligence==null?null:mCobraNetworkIntelligence.cachedSnapshot();
++    boolean network=error&&(binding.error.contains("NETWORK")||binding.error.contains("CONNECTION")||binding.error.contains("TIMEOUT"));
++    if(networkState!=null)network|=networkState.known&&(!networkState.connected||(networkState.validatedKnown&&!networkState.validated)||networkState.captivePortal);
++    // Do not replace a decoder/terminal error or a paused/suppressed status with a healthy-looking emblem.
++    if((error&&!network)||!player.getPlayWhenReady()||player.getPlaybackSuppressionReason()!=Player.PLAYBACK_SUPPRESSION_REASON_NONE)
++      return CobraPresentationEffects.PulseState.NONE;
++    boolean recovering=buffering&&"reattach_requested".equals(binding.vitals.lastRecovery);
++    if(networkState!=null)recovering|=networkState.connected&&networkState.recoveryAgeMs>=0L&&networkState.recoveryAgeMs<10000L;
++    boolean behind=false,live=false;
++    if(binding.vitals.live&&active){try{
++      if(player==mCobraTimeshiftProxyPlayer){live=true;}
++      else if(player.isCurrentMediaItemLive()&&!player.getCurrentTimeline().isEmpty()){
++        androidx.media3.common.Timeline.Window window=new androidx.media3.common.Timeline.Window();
++        player.getCurrentTimeline().getWindow(player.getCurrentMediaItemIndex(),window);
++        long edge=window.getDefaultPositionMs();if(edge!=C.TIME_UNSET){long distance=edge-player.getCurrentPosition();behind=distance>3000L;live=!behind;}
++      }
++      if(player==mPlayer&&mCobraProviderCatchupActive){behind=true;live=false;}
++    }catch(RuntimeException unavailable){}}
++    return CobraPresentationEffects.pulseState(active||network,network,recovering,buffering,
++        !mRecordingSession.isEmpty(),mCobraMiniBackgroundActive,behind,live);
++  }
++  private void cobraRefreshVisualEffects(){
++    cobraRefreshAmbient();if(mCobraEffects==null)return;
++    boolean visible=cobraVisualEffectsAllowed()&&!mInPictureInPicture&&!mBackgroundStopped;
++    mCobraEffects.updateStatus(mPlayerChrome,cobraVisualPulseState(mPlayer),visible&&!mCobraPlayerLocked&&mCobraActionSheet==null&&mCobraPlayerDrawer==null&&mCobraMultiPicker==null);
++    mCobraEffects.updateStatus(mCobraPreviewHost,cobraVisualPulseState(mCobraPreviewPlayer),visible&&mPlayerOverlay==null&&mMultiOverlay==null);
++  }
++  private void cobraApplyNightCinema(View header,View footer,View pause){
++    if(!cobraNightCinemaActive())return;
++    header.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xff000000,0x99000000,Color.TRANSPARENT}));
++    footer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{Color.TRANSPARENT,0xdd000000,Color.BLACK}));
++    if(pause!=null)pause.setBackground(cobraPressSurface(true));
++    if(mCobraPlayerSchedule!=null)mCobraPlayerSchedule.setVisibility(View.GONE);
++    if(mCobraPlayerUpcoming!=null)mCobraPlayerUpcoming.setVisibility(View.GONE);
++    // Existing controls, handlers, timeline, caption and video ownership are unchanged.
++  }
++  private void cobraAddPresentationSettings(LinearLayout list){
++    Button ambient=action("AMBIENT MODE  •  "+CobraPresentationEffects.ambientLabel(CobraPresentationEffects.ambientMode(mPrefs)).toUpperCase(Locale.US));
++    ambient.setTag("cobra_ambient_mode");ambient.setOnClickListener(v->cobraShowAmbientMode());
++    list.addView(ambient,new LinearLayout.LayoutParams(-1,dp(56)));
++    Button greeting=action("CUSTOM GREETING");greeting.setTag("cobra_custom_greeting");greeting.setOnClickListener(v->cobraEditGreeting());
++    list.addView(greeting,new LinearLayout.LayoutParams(-1,dp(56)));
++  }
++  private void cobraShowAmbientMode(){
++    LinearLayout rows=cobraOpenSheet("Cobra Ambient Mode","A visual layer only. Video is never recolored. Installed theme overrides remain authoritative.","ambient-mode");
++    String[] keys={"off","subtle","immersive"};int selected=CobraPresentationEffects.ambientMode(mPrefs);
++    for(int i=0;i<keys.length;i++){final int index=i;final String key=keys[i];cobraAddDetail(rows,"aspect",CobraPresentationEffects.ambientLabel(i),
++        i==0?"Use the current Cobra appearance":i==1?"Restrained contextual tint and lighting":"Richer contextual tint and lighting",
++        "cobra-ambient:"+key,i==selected,()->{mPrefs.edit().putString(CobraPresentationEffects.AMBIENT,key).apply();mCobraAmbientContext="@refresh";
++          cobraRefreshAmbient();cobraApplyAppearanceSettings();});}
++  }
++  private void cobraEditGreeting(){
++    EditText input=new EditText(this);input.setText(mPrefs.getString(CobraPresentationEffects.GREETING,""));
++    input.setHint("Welcome back");input.setMaxLines(3);input.setSelectAllOnFocus(true);
++    input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(240)});
++    new CobraVisualRenderer.DialogBuilder(this,vtheme(),"dialog").setTitle("Custom Greeting")
++        .setMessage("Shown only when you choose the Cobra experience. Up to 120 characters; leave blank for Welcome back.")
++        .setView(input).setNegativeButton("Cancel",null).setPositiveButton("Save",(dialog,which)->{
++          String raw=input.getText().toString().trim();mPrefs.edit().putString(CobraPresentationEffects.GREETING,raw.isEmpty()?"":CobraPresentationEffects.boundedGreeting(raw)).apply();
++        }).show();
++  }
++  private void cobraAddNightCinemaSetting(LinearLayout rows){
++    boolean night=mPrefs.getBoolean(CobraPresentationEffects.NIGHT,false);
++    cobraAddDetail(rows,"aspect","Night Cinema",night?"On • quiet fullscreen chrome":"Off • current fullscreen appearance",
++        "cobra_night_cinema",night,()->{mPrefs.edit().putBoolean(CobraPresentationEffects.NIGHT,!night).apply();
++          cobraBuildPlayerChrome();cobraRefreshVisualEffects();scheduleChromeHide();});
++  }
++
+ }
+--- a/tools/android/packaging/xbmc/src/Splash.java.in
++++ b/tools/android/packaging/xbmc/src/Splash.java.in
+@@ -626,7 +626,7 @@
+     if (incoming != null && incoming.getAction() != null &&
+         !Intent.ACTION_MAIN.equals(incoming.getAction()))
+     {
+-      launchInfinityExperience("infinity");
++      launchInfinityExperience("infinity",false,false);
+       return;
+     }
+ 
+@@ -634,7 +634,7 @@
+         .getString(INFINITY_EXPERIENCE_DEFAULT, "");
+     if ("live".equals(preferred) || "infinity".equals(preferred))
+     {
+-      launchInfinityExperience(preferred);
++      launchInfinityExperience(preferred,false,false);
+       return;
+     }
+     showInfinityExperienceChooser();
+@@ -778,12 +778,18 @@
+     final boolean cobra = "live".equals(experience);
+     final String title = cobra ? "Cobra options" : "Infinity options";
+     final String label = cobra ? "Cobra" : "Infinity";
+-    final String[] options = new String[]{
++    final String[] options = cobra ? new String[]{
++        "Remember & launch " + label,
++        "Launch " + label + " just this time",
++        "Ask every time",
++        "Cobra Recovery"
++    } : new String[]{
+         "Remember & launch " + label,
+         "Launch " + label + " just this time",
+         "Ask every time"
+     };
+-    new CobraVisualRenderer.DialogBuilder(this, vtheme(), "chooser.settings")
++    (cobra ? new android.app.AlertDialog.Builder(this,"light".equals(chooserAppearanceMode())?android.R.style.Theme_Material_Light_Dialog_Alert:android.R.style.Theme_Material_Dialog_Alert)
++        : new CobraVisualRenderer.DialogBuilder(this,vtheme(),"chooser.settings"))
+         .setTitle(title)
+         .setItems(options, (dialog, which) -> {
+           if (which == 0)
+@@ -796,6 +802,10 @@
+           {
+             launchInfinityExperience(experience);
+           }
++          else if(which==3&&cobra)
++          {
++            showCobraRecovery();
++          }
+           else
+           {
+             getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+@@ -822,6 +832,43 @@
+     }
+     showStyledInfinityExperienceChooser(resolveVisualExperienceTheme(theme));
+   }
++
++  void cobraRefreshSafetyChooser(){if(!isFinishing()&&!isDestroyed())showInfinityExperienceChooser();}
++
++  private void showCobraRecovery(){
++    new android.app.AlertDialog.Builder(this,android.R.style.Theme_Material_Dialog_Alert)
++        .setTitle("Cobra Recovery")
++        .setItems(new String[]{"Start Cobra in Safe Mode","Restore Built-in Theme"},(dialog,which)->{
++          if(which==0)launchInfinityExperience("live",true,true);
++          else new android.app.AlertDialog.Builder(this,android.R.style.Theme_Material_Dialog_Alert)
++              .setTitle("Restore Built-in Theme?")
++              .setMessage("Restore Cobra's built-in presentation. Your themes, sources, settings and playback data are kept.")
++              .setPositiveButton("Restore",(d,w)->CobraPresentationSafety.restoreBuiltIn(this,null))
++              .setNegativeButton("Cancel",null).show();
++        }).setNegativeButton("Close",null).show();
++  }
++
++  // Custom chooser scenes may hide or move their own gear slot. This native
++  // instance of the same Cobra gear remains outside imported scene ownership.
++  private void cobraAttachRecoveryGear(android.widget.FrameLayout root){
++    // The approved built-in/legacy chooser keeps its original card gear exactly.
++    // Only imported visual scenes can arbitrarily hide the escape route.
++    if(root==null||!vtheme().visualInstalled())return;
++    View hostView=findViewById(android.R.id.content);if(!(hostView instanceof android.widget.FrameLayout))return;
++    android.widget.FrameLayout host=(android.widget.FrameLayout)hostView;
++    if(mCobraRecoveryGear!=null&&mCobraRecoveryGear.getParent()==host)return;
++    View prior=root.findViewWithTag("experience-settings-cobra");
++    if(prior!=null&&prior.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)prior.getParent()).removeView(prior);
++    android.widget.Button gear=new android.widget.Button(this);gear.setText("Cobra ⚙");gear.setAllCaps(false);
++    gear.setTextColor(0xfff7faff);gear.setTextSize(13);gear.setTypeface(android.graphics.Typeface.create("sans-serif-medium",0));
++    gear.setContentDescription("Cobra settings and recovery");gear.setTag("experience-settings-cobra");mCobraRecoveryGear=gear;
++    android.graphics.drawable.GradientDrawable bg=new android.graphics.drawable.GradientDrawable();bg.setColor(0xff0b0f16);bg.setCornerRadius(chooserDp(14));bg.setStroke(Math.max(1,chooserDp(1)),0xff62aaff);gear.setBackground(bg);
++    gear.setPadding(chooserDp(12),0,chooserDp(12),0);gear.setMinHeight(chooserDp(48));gear.setOnClickListener(v->showExperienceCardSettings("live"));
++    android.widget.FrameLayout.LayoutParams p=new android.widget.FrameLayout.LayoutParams(-2,chooserDp(48),android.view.Gravity.END|android.view.Gravity.TOP);p.setMargins(chooserDp(12),chooserDp(12),chooserDp(12),0);host.addView(gear,p);
++    gear.setElevation(chooserDp(20));
++    gear.setOnApplyWindowInsetsListener((view,insets)->{android.widget.FrameLayout.LayoutParams lp=(android.widget.FrameLayout.LayoutParams)gear.getLayoutParams();lp.topMargin=chooserDp(12)+insets.getSystemWindowInsetTop();lp.rightMargin=chooserDp(12)+insets.getSystemWindowInsetRight();gear.setLayoutParams(lp);return insets;});gear.requestApplyInsets();
++  }
++  private View mCobraRecoveryGear;
+ 
+   private void showLegacyInfinityExperienceChooser()
+   {
+@@ -1049,15 +1096,15 @@
+ 
+   private ExperienceTheme loadExperienceTheme()
+   {
+-    File root = getExternalFilesDir(null);
++    File root = CobraPresentationSafety.legacyDirectory(this);
+     if (root == null)
+       return null;
+-    File file = new File(root, INFINITY_EXPERIENCE_THEME_FILE);
++    File file = new File(root, "resources/experience-chooser.json");
+     try
+     {
+       if (!file.isFile() || file.length() <= 0 || file.length() > 65536)
+         return null;
+-      File addon = new File(root, ".kodi/addons/script.infinity.cobra.theme/resources");
++      File addon = new File(root, "resources");
+       String parent = addon.getCanonicalPath() + File.separator;
+       if (!file.getCanonicalPath().startsWith(parent))
+         return null;
+@@ -1199,6 +1246,14 @@
+     android.widget.TextView gear = chooserStyledText(vtheme().copy("chooser.chooserExperienceCard.copy.1","⚙"), theme.text, 17, false, android.view.Gravity.CENTER);
+     gear.setFocusable(true); gear.setClickable(true); gear.setTag(infinity ? "experience-settings-infinity" : "experience-settings-cobra"); gear.setContentDescription(title + " settings");
+     gear.setBackground(chooserControlSurface((top & 0x00ffffff) | 0xdd000000, border, 16, glow));
++    if(!infinity&&!vtheme().visualInstalled()){
++      // Legacy chooser palette files can contain equal foreground/background
++      // colors. Keep the existing Cobra gear and bounds, with independent ink.
++      boolean light="light".equals(chooserAppearanceMode());gear.setText("⚙");
++      gear.setTextColor(light?0xff101b2c:0xfff7faff);
++      gear.setTypeface(android.graphics.Typeface.create("sans-serif",0));
++      gear.setBackground(chooserControlSurface(light?0xfff5f8fd:0xff0b0f16,light?0xff145fdf:0xff62aaff,16,light?0xff145fdf:0xff62aaff));
++    }
+     gear.setOnClickListener(v -> settings.run());
+     android.widget.FrameLayout.LayoutParams gearParams = new android.widget.FrameLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.8",44)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.9",44)), android.view.Gravity.TOP | android.view.Gravity.END);
+     card.addView(gear, gearParams);
+@@ -1279,7 +1334,7 @@
+     android.widget.TextView footerTag = chooserStyledText(theme.footerTagline, theme.muted, 8, false, android.view.Gravity.CENTER); footerTag.setLetterSpacing(vtheme().number("chooser.showStyledInfinityExperienceChooser.numbers.5",.18f,-0.02f,0.25f)); content.addView(footerTag);
+ 
+     if(!compactHeight&&vtheme().hasImage("chooser.footer"))content.addView(vtheme().art(this,"chooser.footer",60),new android.widget.LinearLayout.LayoutParams(-1,chooserDp(vtheme().dimension("chooser.footer.height",60))));
+-    setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);
++    setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);cobraAttachRecoveryGear(root);
+     infinity.requestFocus();
+     infinity.setBackground(chooserGradient(theme.infinityTop, theme.infinityBottom, theme.infinityGlow, theme.cardRadius, true));
+     infinity.setElevation(chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.12",9)));vtheme().tree(root,"chooser");vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});
+@@ -1289,9 +1344,18 @@
+ 
+   private void launchInfinityExperience(String experience)
+   {
+-    Intent intent = getIntent();
+-    if (intent == null)
+-      intent = new Intent();
++    launchInfinityExperience(experience,true,false);
++  }
++
++  private void launchInfinityExperience(String experience,boolean explicit,boolean safe)
++  {
++    Intent intent = getIntent()==null?new Intent():new Intent(getIntent());
++    intent.removeExtra(CobraPresentationSafety.EXTRA_SAFE);
++    intent.removeExtra(CobraPresentationSafety.EXTRA_ENTRY_TOKEN);
++    if("live".equals(experience)){
++      if(safe)intent.putExtra(CobraPresentationSafety.EXTRA_SAFE,true);
++      if(explicit)intent.putExtra(CobraPresentationSafety.EXTRA_ENTRY_TOKEN,java.util.UUID.randomUUID().toString());
++    }
+     intent.setClass(this, "live".equals(experience) ?
+         @APP_PACKAGE@.InfinityLiveActivity.class : @APP_PACKAGE@.Main.class);
+     if ("live".equals(experience))
+@@ -1418,7 +1482,7 @@
+       safeContent.addView(view,new android.widget.FrameLayout.LayoutParams(-1,-1));
+       root.addView(safeContent,new android.widget.FrameLayout.LayoutParams(-1,-1));
+       root.setOnLongClickListener(v->{vtheme().manager(this);return true;});
+-      setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);slots.get("enter.infinity").requestFocus();vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});return true;
++      setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);cobraAttachRecoveryGear(root);slots.get("enter.infinity").requestFocus();vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});return true;
+     }catch(Exception failed){android.util.Log.w("CobraTheme","Custom chooser could not be laid out; using safe chooser",failed);return false;}
+   }
+ 

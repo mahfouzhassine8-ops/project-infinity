@@ -1,0 +1,140 @@
+{
+  "status": "frozen",
+  "parent_build": 2103204,
+  "parent_commit": "166cf9dad40a8a0333563830a3c0965ce4e81da6",
+  "files": {
+    "cmake/scripts/android/Install.cmake": {
+      "before": "0868ac020a24118e86c22d8e08d007c594d5517c3a3dfbc1f670833342694cf2",
+      "after": "ab4f8e9abe7e6acc31823bdeffd38ab956eed11944e35c05602c18f1034cc490"
+    },
+    "tools/android/packaging/xbmc/src/CobraEmblem.java.in": {
+      "before": null,
+      "after": "53df5a7d131ad1f46e6f5ce40c1b2d5756813a21705bb22006889ba2d5538cf8"
+    },
+    "tools/android/packaging/xbmc/src/CobraNetworkIntelligence.java.in": {
+      "before": null,
+      "after": "763c74a60f92710e16d15ebe218638cecf7615e4d44d7fc38b443f20091f4f46"
+    },
+    "tools/android/packaging/xbmc/src/CobraPresentationEffects.java.in": {
+      "before": null,
+      "after": "fe99be240934aecdca08a7ae3a78d0b90e97080eac87b525d55bc32d24d21c68"
+    },
+    "tools/android/packaging/xbmc/src/CobraPresentationSafety.java.in": {
+      "before": null,
+      "after": "2af33134b82ff4c77d26efd0d4531933a2db7da746b24312abf6a49338ccfac8"
+    },
+    "tools/android/packaging/xbmc/src/CobraQuickPeekSession.java.in": {
+      "before": null,
+      "after": "e64faa8a5eb065ac267af90e8ef406d26303b5dad71cb80ed61160a8de24a756"
+    },
+    "tools/android/packaging/xbmc/src/CobraSmartReturn.java.in": {
+      "before": null,
+      "after": "25b13313185559fe82be0b8942441074c589dbb9696238f0bf4e5a7e1410c2ae"
+    },
+    "tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in": {
+      "before": "3d61ce175acbdcd9c0c611dd5fb20ea4fbffc28ade47429ee572f524fb49531d",
+      "after": "220e49a060b2b899476927f6046b723085e2cbb22fcd8eb10b58d3a666d29f28"
+    },
+    "tools/android/packaging/xbmc/src/CobraVisualScene.java.in": {
+      "before": "87b92d6b1796c9da7a409465a845cf7216c646f3d90fe6b8ce98d6963cb34dd8",
+      "after": "9f315de2034de2eb262310e11054e62e42b37b3b0ebc9ae2c5edce97fd09b444"
+    },
+    "tools/android/packaging/xbmc/src/CobraVisualTheme.java.in": {
+      "before": "5716dae9799401c9ebe893e4008b1c6e6d3fd6d9abc6cade2826c280ef36d4bc",
+      "after": "dc5c8c05bbc559500689cd5a68c3128edf575b836e977fdd503959b7a27959fe"
+    },
+    "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in": {
+      "before": "e916b7a8a6cf47e361b9e2f1b66f5488f6c3390dbfe6fe10acf7d4020c80b8e1",
+      "after": "6714daa5b600898df976ca4af929c541b9a734ce97dcdcd6d9e94f50c2729947"
+    },
+    "tools/android/packaging/xbmc/src/Splash.java.in": {
+      "before": "dc2592cd05f48ac0ddc9b6db58b002435a52ad4d5050f3af79d2a8014b564b14",
+      "after": "6e87d5a64caa40abe48b81fd7463e1af23c81ddfc87150c047492204629691bd"
+    }
+  },
+  "patch_sha256": "7152fe83f7bb890c640edd25017b2dcb24538e98a2a13ba445e0519473690e94",
+  "parent_png_pixels_sha256": "3dbacd57e2f9c148d11401d3dc9dfbd8b8de53aa092ebb850e94204c69979389",
+  "parent_source_files": 220,
+  "new_source_files": 6,
+  "protected_runtime_members": {
+    "CobraLayoutMath": "2d16cef09fe3151af6b2600fdab40037de4eb49df6f3f32a5674eaff7c0cacce",
+    "CobraModeLayout": "f5b788f4cb255e010f87e05e642d0b5b1fd7a70707280b7084af9045244c2572",
+    "CobraLocalTimeshiftSession": "2bff3e0e7b424e7bd07cf5bcb26a5030e498c0d7b11d2bafbdecc7ed16388882",
+    "CobraTimeshiftTransportPolicy": "f4ed2bd3be9d78d5e055b78c1cc69118c0f3565b23b34901da4f69d4422a8e09",
+    "CobraTsParserPolicy": "b3366fe2a958f151220b3ec915663953e42d98fb18c35be78f5561cffdb71b49",
+    "CobraTimelineNormalizerPolicy": "e9f0d929266422fa18072d6f921d381eeacbdeb4059281bcd6d0047b9620e3eb",
+    "CobraProviderPacePolicy": "08c3c2e49db5498315eabc4ad8dfa8c444b3351a73736f5b0d86e08b91ce7e90",
+    "CobraNetworkFamilyPolicy": "b5751ecfe7931a21fea758ef39e40a0c911a2ac58cd432c47082108fc69cda29",
+    "CobraCallAudioPolicy": "24bb445e83fc6c70a03ad28abae463d2652c26cb85c3e7beff0b5fde0218b383",
+    "CobraWindowLifecyclePolicy": "5796a1ba82101d080003b808dfb1fdbd32270efaa826c87f0d6681f44e9c6265",
+    "CobraTimeshiftRecoveryPolicy": "4f37da549478e1b3c849253989c9783fde7de28505c5e816f52e8439e4f14865",
+    "CobraTimeshiftStallPolicy": "ca9c65866ed4b028099d4db3853d5f929575e7e0cb8cf45d284d32c6dc447ada",
+    "CobraPreferencePolicy": "6fe46bef7ced59da008ec3be44984232b30fb424a08b65b3b24fde05668edad5",
+    "CobraPlaybackPolicy": "f15492ba98bcaa18acd7341eff6846159b8cc05de0e18cf7df795526d963f074",
+    "CobraProviderConnection": "9bb3f6240c7e896d0d8fff9edfea8652b3a724a037edbb0d202eb2ebf9f233fe",
+    "CobraSniSocketFactory": "3b8b355a883f1cbd2ff74f76addc862a47e24b3149e10d938322785ec3493c6f",
+    "CobraTsTimelinePolicy": "6e0c04abc41a035dc22e7416cda6f640c755f5cc488a68256c4acf701ea6820a",
+    "CobraStreamCadencePolicy": "872e773785d8d9f61f3d65cd96cb182fe7294b0c3af4c5cc31bd498638d94733",
+    "CobraLiveRewindPolicy": "a0da5546fd9404a7579c4ef9d1e6afc61f75ae70a6aa74d7a6160d19932ff839",
+    "CobraFoldAspectPolicy": "9db7f98c7733181c6749e24dd5b4ceacb7243d8101740e374133153df46e6a80",
+    "CobraRefreshPolicy": "d4e9161481584274dce9da1997eb7495b76fb7aee1c1140d15ac92dd2785a614",
+    "buildPlayer": "737a50fd799730718c21083b470e039daab98b636d2e7a55e4a2e3d3c5240093",
+    "cobraActivateLocalTimeshift": "7dfb1af0f6bcdbcf418d3abe40a662997ca386e09bb4b92b938baaaec38aa089",
+    "cobraRecoverLocalTimeshiftSource": "761313b9031fb6db10b614680780e550ed9befa0723e3fac6273252708fb641c",
+    "cobraFallbackFromLocalTimeshift": "88277efe5422173bfac1fb36d8c0363008c3687c309793725545a0fc8a15fbf2",
+    "cobraAttachVideo": "13c2586fc57d2c0569c51835c6a64aa00050228c0e3681711779276e2094c093",
+    "cobraFitCaptions": "afd89f79079b5d64d47db252fcc9e5e4162a844b1dbae9a755e616f2e7864347",
+    "cobraFitVideo": "c3224e5f7088057a4a717e4fbae09f13550922eb4a0913ebb651aff2283994c3",
+    "cobraPrepareMultiForPip": "4b0489bc9fe4e0ec3db95c51f2cfd3079bd1b7985e3f6cf8de55bb7a672acea0",
+    "cobraRestoreMultiAfterPip": "10ccd98faeecd97d840e599f647ee4e006e612823bd495fa9d758bf477d652eb",
+    "cobraPipParams": "08688ecb86641a1528687f1ace5136259a6b30cc7f97443bb8ad57b415cb53a6",
+    "cobraPipMediaAvailable": "0e4e59cb6685c58bf51a2d3d0e6b283d9e6f7a74d15e11cad3e9e21c5ae22c83",
+    "cobraReleasePipMediaSession": "bf571e7a1b455f5525c36caaa4d56e8fada0ca6984845ad5e8cad4af9ef74c32",
+    "cobraPipMediaCallback": "c482f5a67ebbbdbe23abd571d86142b8093eca4e98acdaedd973361274ce96a0",
+    "cobraDispatchPipCommand": "899a5e020af7086573cf9b7dde0a1cddea5cdc4391a8322431b258d26c6c4532",
+    "cobraPipPlaybackState": "f5946b02ff67975d433ca5459f6e9c9fe23e76b17000fa412aecf86aaf9ea320",
+    "cobraUpdatePipMediaSession": "c4abf5c295e67bc52aabba98aeae8112f65f0f7c25bf74c77c435653d42292b1",
+    "cobraUserPlay": "4637d646bbfcbdbddd973ab040f3a1d6ed6dc587738fc6251e1636572ecdd4b3",
+    "cobraHandleAudioFocus": "4a9b2dbd3ac0b0bf00812650d4e74fc7b94d8775bbd3ea385ec1eaa2fe240fc4",
+    "cobraClaimAudioFocus": "a768d566f975470d2067a75f47aba11b51e85e625f8feec9aa65e657f303cbff",
+    "cobraReleaseAudioFocus": "cdfc7679fd5d5c64c854c062a1ffb5f7a942c418e9c00e290d6b0b71ebaffb6d",
+    "mediaItem": "6b9dcacb2e42de3dfdc672414ba4cb8d4400e040c8a8010eba51653ba3a2294c",
+    "cobraStopLocalTimeshift": "f7f4342fce4e85757721d0359d92d414c4d3694e2dffbf2c6f13fd2b7d094356",
+    "cobraStartLocalTimeshift": "4128bcf0dcd94c272c9a990343ef22c7e0e46447b5c3bd7ddaf7f37070955981",
+    "cobraStartDirectSinglePlayer": "3d14edae14bee9e7494819322e2685204149a710927a8c08af7319feb17354ab",
+    "cobraStartDirectPreview": "8a29bf2c14a1e62ad26bbada3f7100988a1e4bb1a8a5465b1702a1141bd7f1ae",
+    "cobraStartLocalTimeshiftPreview": "27577e332496f2cc280b4873b3a8ab64f76234bf6f605446b820772e65cf20de",
+    "cobraWatchTimeshiftReady": "75beed7c0bd6af39a7b145040ba41887be815a3db7b29e16225f17d2a38fbdd7",
+    "cobraPrepareObserved": "a013c753c1ed022a9b5748761aa3c367a23b89a2257ab4277fb47693b4fc09b1",
+    "cobraApplyPendingTimelineSeek": "2021664926e526dff0ca94525278f65274d8188cf84485a04d6c5cd95ed738c9",
+    "cobraCommitTimelineSeek": "5735ae375de634dd391258e5f38b64b0549e4fc226ed53e4f28c31c5d4dfab2e",
+    "cobraUpdateTimeshiftSeek": "691bc0219925db3d175ccf7749ed0e15d582e929ab40a80c24a11c85e81d8a15",
+    "cobraRecoverTimeshiftStall": "bbd27ae0caea47c4e866e558a75ee5a44117ed7f7a2b5c60e95b412dc7638396",
+    "cobraScheduleTimeshiftStallCheck": "5d7120b9c9a7f2c6d791649f20ea935437707fe131502243bb22ba47c65f9b93",
+    "cobraObserveTimeshiftRebufferBurst": "8dd65813df8f90e490f268065106c2ff74671414cfa276a4be4582b4c808a38a",
+    "cobraPermitAutoLiveEdge": "ba3dc6028668b36bff4dc55e282a63ae8f3a16f09d650bf2fc4c82b8380bd93a"
+  },
+  "inherited_android_cases": 500,
+  "new_android_cases": 133,
+  "test_source_hashes": {
+    "tests/Cobra2103205NetworkAndroidTest.java": "ad0f998da5671eade0590bdbfd19f99c6ac2cabdace29ff27af93f81488434ef",
+    "tests/Cobra2103205NetworkPolicyTest.java": "8174ee3091b137ed3692962f41b7f968cb77ea8a3e4f214dbdae5f51ddf8b3b7",
+    "tests/Cobra2103205PresentationEffectsTest.java": "d14be3708398789b69357300223c3707f6ee85084c394869deb771043c1b05ae",
+    "tests/Cobra2103205PresentationUiTest.java": "b167dcb86475ab809a447d6e743ebdb417ddaf78cab8e0172859a10ef0dd91cb",
+    "tests/Cobra2103205QuickPeekSessionTest.java": "c48cb45a6f866639d915c67c87e6d4d13a87808da6cc6fd195a95fa98a02c70b",
+    "tests/Cobra2103205SafetyEntryTest.java": "90e76337b279b4e0872b2b82d1d0ec9ef214adfb29d816b5431c4ba80a51ab9b",
+    "tests/Cobra2103205SafetyIntegrationTest.java": "5b8b55bd8bad2f1b475f490760394404ca2a526a6d933b4a9d4abe8bf38f1a37",
+    "tests/Cobra2103205SafetyTest.java": "3347d3fd5056476c665f82b3fd112621a26dc1b11a8c59fb0b236dc5fed40aa5",
+    "tests/Cobra2103205SessionCardTest.java": "45465fbd9f539bb8d92b1bedc7f14ac34934b2b6d08713d1563d9e453877f352",
+    "tests/Cobra2103205SessionPolicyTest.java": "0ecd3cf6507094abbb6487108225d48665f0bc7fd65cb4e43204d6a3b69e86c8",
+    "tests/Cobra2103205SessionUiTest.java": "53e2c8af1acd11047a680a44668486b34a3ce63411feba78de478b6c4b0785dc"
+  },
+  "native_engine_recompiled": false,
+  "physical_device_verified": false,
+  "user_requested_controls": true,
+  "new_features": true,
+  "excluded_features": [
+    "4 Command Palette",
+    "11 dedicated Fold Continuity"
+  ]
+}
