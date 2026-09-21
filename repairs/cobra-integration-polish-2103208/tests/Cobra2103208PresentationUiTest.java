@@ -1,10 +1,15 @@
 package com.projectinfinity.kodi;
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Bundle;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,9 +39,14 @@ public class Cobra2103208PresentationUiTest {
     Cobra2103208BrandingTest.installApprovedArtwork();
     f=new Cobra2103199DisplayRegressionTest();f.before();a=f.a;prefs=f.prefs;
     prefs.edit().putString(CobraPresentationEffects.AMBIENT,"off").putBoolean(CobraPresentationEffects.NIGHT,false).commit();
+    a.setIntent(new Intent());if(get("mCobraEffects")==null)call("cobraInitPresentationEffects",(Bundle)null);
+    assertNotNull("Exercise the production presentation effects owner",get("mCobraEffects"));
     call("cobraOpenLiveTv");measure(412,915);
   }
-  @After public void after()throws Exception{if(f!=null)f.after();}
+  @After public void after()throws Exception{
+    if(a!=null){CobraPresentationEffects effects=(CobraPresentationEffects)get("mCobraEffects");if(effects!=null)effects.close();call("cobraReleasePipMediaSession");}
+    if(f!=null)f.after();
+  }
   Object call(String n,Object...v)throws Exception{return CobraNavigationUiTest.call(a,n,v);}
   Object get(String n)throws Exception{return CobraNavigationUiTest.get(a,n);}
   void put(String n,Object v)throws Exception{CobraNavigationUiTest.put(a,n,v);}
@@ -107,14 +117,30 @@ public class Cobra2103208PresentationUiTest {
     Object mode=get("mCobraGuideStyle"),channel=get("mGuidePreviewChannel"),timeshift=get("mCobraTimeshiftSession");
     String profile=((InfinityCobraFeatureRuntime)get("mFeatures")).activeProfileId();Map<String,Object> unchanged=nonVisualPreferences();
     CobraVisualTheme visualTheme=CobraVisualRenderer.active;String themePointer=CobraVisualTheme.readPointer(a).toString();
-    for(String value:new String[]{"subtle","immersive","off"}){
+    CobraPresentationEffects effects=(CobraPresentationEffects)get("mCobraEffects");assertNotNull(effects);
+    Drawable originalBackground=shell.getBackground(),videoBackground=texture.getBackground();
+    Matrix videoTransform=((TextureView)texture).getTransform(new Matrix());
+    Bitmap originalPixels=Cobra2103204PresentationTest.background(shell,Color.MAGENTA);
+    try{for(String value:new String[]{"subtle","immersive","off"}){
       call("closeCobraActionSheet");menu();spy.writes.clear();assertTrue(tag("cobra-visual-ambient:"+value).performClick());measure(412,915);
       assertEquals(value,prefs.getString(CobraPresentationEffects.AMBIENT,""));assertTrue("Appearance cannot prepare, seek, pause or replace video: "+spy.writes,spy.writes.isEmpty());
       assertSame(spy.player,get("mCobraPreviewPlayer"));assertSame(channel,get("mGuidePreviewChannel"));assertSame(timeshift,get("mCobraTimeshiftSession"));
       assertSame(shell,get("mCobraGuideShell"));assertSame(texture,get("mCobraPreviewTexture"));assertEquals(geometry,bounds(texture));assertEquals(mode,get("mCobraGuideStyle"));
       assertEquals(profile,((InfinityCobraFeatureRuntime)get("mFeatures")).activeProfileId());assertEquals(unchanged,nonVisualPreferences());
       assertSame("Ambient selection must not replace theme runtime",visualTheme,CobraVisualRenderer.active);assertEquals(themePointer,CobraVisualTheme.readPointer(a).toString());
-    }
+      assertSame("Use the existing real effects owner",effects,get("mCobraEffects"));
+      assertSame("Ambient never paints over the video texture",videoBackground,texture.getBackground());
+      assertEquals("Ambient preserves the video transform",videoTransform,((TextureView)texture).getTransform(new Matrix()));
+      Bitmap pixels=Cobra2103204PresentationTest.background(shell,Color.MAGENTA);
+      try{
+        if("off".equals(value)){assertSame("Off restores the original theme background",originalBackground,shell.getBackground());assertTrue("Off restores original guide pixels",originalPixels.sameAs(pixels));}
+        else{
+          assertTrue("Ambient installs its real composite on the guide",shell.getBackground() instanceof LayerDrawable);
+          assertSame("Ambient retains theme artwork underneath",originalBackground,((LayerDrawable)shell.getBackground()).getDrawable(0));
+          assertFalse(value+" changes actual guide-background pixels",originalPixels.sameAs(pixels));
+        }
+      }finally{pixels.recycle();}
+    }}finally{originalPixels.recycle();}
   }
 
   @Test public void nightSelectionsPreservePreviewTransportAndUserAudioState()throws Exception{
@@ -144,7 +170,13 @@ public class Cobra2103208PresentationUiTest {
 
   @Test public void drawerKeepsExactlyOriginalDestinationsWithoutStateChips()throws Exception{
     call("toggleCobraDrawer");measure(412,915);View drawer=tag("cobra_experience_drawer");assertNotNull(drawer);
-    Set<String> actual=new HashSet<>();for(View row:tagged(drawer,"cobra-destination:")){actual.add((String)row.getTag());assertEquals("No appended chip in drawer navigation",2,((ViewGroup)row).getChildCount());}
+    Set<String> actual=new HashSet<>();for(View row:tagged(drawer,"cobra-destination:")){
+      actual.add((String)row.getTag());ViewGroup navigation=(ViewGroup)row;
+      assertEquals("Only icon, label and decorative chevron; no state chip",3,navigation.getChildCount());
+      View chevron=navigation.getChildAt(2);assertTrue(chevron instanceof TextView);assertEquals("›",((TextView)chevron).getText().toString());
+      assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_NO,chevron.getImportantForAccessibility());
+      assertFalse("Decorative chevron is not a separate action",chevron.isClickable());assertFalse(chevron.isFocusable());
+    }
     Set<String> expected=new HashSet<>(Arrays.asList("cobra-destination:SEARCH","cobra-destination:TV","cobra-destination:MOVIES","cobra-destination:SHOWS","cobra-destination:RECORDINGS","cobra-destination:MY LIST","cobra-destination:SETTINGS"));
     assertEquals(expected,actual);assertNotNull(drawer.findViewWithTag("cobra-drawer-view"));assertNotNull(drawer.findViewWithTag("cobra_drawer_brand"));
     assertNotNull(drawer.findViewWithTag("cobra_drawer_navigation_group"));assertNotNull(drawer.findViewWithTag("cobra_drawer_footer"));

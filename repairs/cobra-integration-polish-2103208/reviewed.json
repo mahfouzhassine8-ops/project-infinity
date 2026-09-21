@@ -333,31 +333,35 @@
     },
     "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in": {
       "before": "73b8d475cf754f83d4c4b047199b1d7cb1357c902455879683cd0cc1de71f51a",
-      "after": "eeb23fa6d40f89cc901ab2a5c66515c13c253e6b7f2f98add78da13113347ea0"
+      "after": "d0fe1e070fc2c9c1a7ff587c15c39f903a89b0ee2d2dc642db85d4408f380459"
     }
   },
   "recipe_hashes": {
     "test_guards.py": "4d039ee442b3a1cf09e1ff48311c40c0bb8a557f6fb902a12db6fc442207e0ad",
-    "ci.py": "aedeb538039e4e213e12277556eb8f5bbc7eb90d775885ebef1250b8fb8f2c3b",
+    "ci.py": "2b4b2a6adc3cae46774e07d141883f6a64a1784755b1a70f68400df91cc6e756",
     "contract.py": "782c8ff72dfcdcd4c00e4f7049a294c4e38504739e64dcbeaced111fc40cc59f",
     "AUDIT.md": "a524d467459f2cf10599cdb8103d3597c673852b672f457a0eac203876603c9e",
-    "features.patch": "0fe38c9c5dcfbb0f21c628adf2a7234d9721d88bd9775d27450ca571c912ba11",
+    "test_parent_png.py": "a323978befdf1e4c6f780a0f8dfbf31a2d78e9686a189142f1c2bc3591b4c124",
+    "features.patch": "8560fa0fbbb5e55de9af69ce545626ad705007ab28b39cd01cd1d57f97d745b4",
     "DEVICE-TEST.md": "b26c28569db979e1e1031082317dd8bad057c04c5e996de40df316af5d0d31f5",
     "asset-payloads.json": "3ec474582ae71c25be7a13e479faa53ea081e9cbe9db4381d11c37268af44170",
     "approved-resources.json": "63c5d7e1259374aafc241b9ee55865e087ef00106d38c7e2c7afeadf69aa5cf7",
-    "freeze_local.py": "7bd738e9b696edcb822b377922478fe60c0201642d0962ec69eb3126249145a0",
-    "infinity-2103208-integration-polish.yml": "291aa678b99107914fac438042ea51090be3a87e4972b75b2d241b3b8e665d30",
+    "freeze_local.py": "cbca98dc6a4d545007d0847baafa1c6a418a93fb5f3dc5e777dd3ca86a426c74",
+    "infinity-2103208-integration-polish.yml": "d3f87c19dd4a35108eb1b2d2513ceb5627ba0c8ead3bef4ee9ba863c9e09efe2",
     "branding_package.py": "63ed4966cfee9fa02ff234f41ae2e66ee1e3945539586dcd972dfb182c7ff6d7",
+    "canonicalize_parent_png.py": "27779cc92fe374a1f6ca70438e8183c85253866537d97adfe0a36ac55adae1f0",
     "adapt_tests.py": "112da584e94ac18f584b3a0d3170e30be0d5e9080f08fc10b80a852a5cc621e0",
-    "local_checks.py": "9e97ddf0503aaba3b1d26f99db29990de54225a37e544d3644594d49d8ec4a75",
+    "local_checks.py": "d97748de4e12ec013205a0b6eaf6f2b6f87cf527f0ba102fbf3d75480f723fd6",
     "protected-members.json": "3d41dbcbea4315c004b7dbbbbc166d1386919e599dd806a9e177f38b0089caaa",
-    "new-cases.json": "d36eb7f3d0f5068196597cf2597ec385bac496e649b53aed32c0e9380840085e",
+    "new-cases.json": "a8c2e56f898a18aac69f1514f74c7b4e2209092cb68d26af916f8d9eaf134d44",
+    "parts/presentation-ui-real-effects-followup.patch": "17cc0021c29ea70f9021fc3271f05eb3cdef972906f87f15a0b169f8c4666d87",
     "parts/presentation-ui-artwork-fixture.patch": "04268c9aec7f142df7af0bb0262170cf1d17302b3e83a7e5c31ba5e2e2a3db69",
-    "tests/Cobra2103208PresentationUiTest.java": "7415f6f28eb20d99be2fe7b2174958d9c17f2de1858da422f43b3f6b0c40fb18",
+    "tests/Cobra2103208PresentationUiTest.java": "937aad668b07c472744aa74923cbd05d051528f5b4135294a08dbdedef51111b",
     "tests/Cobra2103208BrandingTest.java": "6e28eeef913b301d90a412640ff1e022ac23502fa7f245179034767425ab3fdd",
     "tests/Cobra2103208PlaybackPresentationTest.java": "d9ac980908dcbdecaa65cac42e03fb6f3853fec6ebb71ed25d68dc6abe6b7f37",
     "tests/Cobra2103208StateOwnershipReviewTest.java": "b2b5bc95bad0a84a32af3d2bb2128270818c1b93277b85582e8e5b0c668355d7",
     "tests/Cobra2103208PickerTest.java": "44c8dac997a760a49d254bafee9f8f24c542bb4a93414d6d12fd1a0de565ba00",
+    "tests/Cobra2103208RewindWarmupPresentationTest.java": "38b365e402dc74c81e5856c2b51683f73efa46dc4270a7af3d6f296a36b395fc",
     "tests/Cobra2103208QuickPeekLayoutTest.java": "93c7ef17293b03c38bbdf48ad98747f2abe19206c4c34dffadb8ec5721bc2769"
   }
 }

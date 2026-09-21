@@ -59,6 +59,10 @@ def upgrade():
     receipt = Path('engine/background-resume-source.json')
     data = json.loads(receipt.read_text())
     require(data['version_code'] == 2103207, 'Not a built 207 source')
+    from canonicalize_parent_png import canonicalize
+    canonicalize(source, export, reviewed['parent_inventory'], receipt,
+                 Path('audit208/parent-png-timestamp-restoration.json'))
+    data = json.loads(receipt.read_text())
     for name, digest in reviewed['parent_inventory'].items():
         require(sha(source / name) == digest, 'Locked 207 source drift: ' + name)
     parser_path = Path('audit206/repairs/cobra-original-player-menu-2103197/apply.py')
@@ -183,7 +187,7 @@ def tests():
     Path('signed208/ACCEPTANCE.json').write_text(json.dumps(acceptance, indent=2) + '\n')
     for name in ('AUDIT.md', 'DEVICE-TEST.md', 'approved-resources.json'):
         shutil.copy2(ROOT / name, Path('signed208') / name)
-    for name in ('source-preservation.json', 'final-verification.json', 'test-expectation-supersessions.json', 'expected-cases.json'):
+    for name in ('source-preservation.json', 'final-verification.json', 'test-expectation-supersessions.json', 'expected-cases.json', 'parent-png-timestamp-restoration.json'):
         shutil.copy2(Path('audit208') / name, Path('signed208') / name)
     with zipfile.ZipFile('signed208/Cobra-2103208-Generated-Android-Source.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
         for name in reviewed['parent_inventory']:

@@ -846,6 +846,7 @@ jobs:
       - name: Guard successor recipe and apply only after all 691 original 207 cases pass
         run: |
           python3 audit208/repairs/cobra-integration-polish-2103208/test_guards.py
+          python3 audit208/repairs/cobra-integration-polish-2103208/test_parent_png.py
           python3 audit208/repairs/cobra-integration-polish-2103208/ci.py upgrade
           python3 audit205/repairs/cobra-final-features-2103205/host_timeshift_adapter.py --fixture audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit208/host_timeshift
           python3 audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift_stop.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit208/host_timeshift_stop

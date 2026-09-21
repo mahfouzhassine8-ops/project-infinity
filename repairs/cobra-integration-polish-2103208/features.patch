@@ -580,10 +580,40 @@
        },()->cobraReleasePeekClient(client));
      }catch(RuntimeException unavailable){cobraReleasePeekClient(pendingClient);state.setText("Live preview unavailable. Current playback is unchanged.");}
    }
-@@ -10687,6 +10742,18 @@
+@@ -10644,9 +10699,17 @@
+       return CobraPresentationEffects.PulseState.NONE;
+     boolean recovering=buffering&&"reattach_requested".equals(binding.vitals.lastRecovery);
+     if(networkState!=null)recovering|=networkState.connected&&networkState.recoveryAgeMs>=0L&&networkState.recoveryAgeMs<10000L;
+-    boolean behind=false,live=false;
++    boolean behind=false,live=false,warming=false;
+     if(binding.vitals.live&&active){try{
+-      if(player==mCobraTimeshiftProxyPlayer){live=true;}
++      if(player==mCobraTimeshiftProxyPlayer){
++        live=true;
++        CobraLocalTimeshiftSession session=mCobraTimeshiftSession;
++        // Observe the current owner only. The existing readiness watcher owns
++        // session/generation transitions; this presentation never changes them.
++        warming=(player==mPlayer||player==mCobraPreviewPlayer)&&session!=null
++            &&!session.stopped&&!session.ready()
++            &&("STARTING".equals(mCobraTimeshiftUiState)||"RECORDING".equals(mCobraTimeshiftUiState));
++      }
+       else if(player.isCurrentMediaItemLive()&&!player.getCurrentTimeline().isEmpty()){
+         androidx.media3.common.Timeline.Window window=new androidx.media3.common.Timeline.Window();
+         player.getCurrentTimeline().getWindow(player.getCurrentMediaItemIndex(),window);
+@@ -10655,7 +10718,7 @@
+       if(player==mPlayer&&mCobraProviderCatchupActive){behind=true;live=false;}
+     }catch(RuntimeException unavailable){}}
+     return CobraPresentationEffects.pulseState(active||network,network,recovering,buffering,
+-        !mRecordingSession.isEmpty(),mCobraMiniBackgroundActive,behind,live);
++        !mRecordingSession.isEmpty(),mCobraMiniBackgroundActive,behind||warming,live);
+   }
+   private void cobraRefreshVisualEffects(){
+     cobraRefreshAmbient();if(mCobraEffects==null)return;
+@@ -10686,6 +10749,18 @@
+         i==0?"Use the current Cobra appearance":i==1?"Restrained contextual tint and lighting":"Richer contextual tint and lighting",
          "cobra-ambient:"+key,i==selected,()->{mPrefs.edit().putString(CobraPresentationEffects.AMBIENT,key).apply();mCobraAmbientContext="@refresh";
            cobraRefreshAmbient();cobraApplyAppearanceSettings();});}
-   }
++  }
 +  private void cobraShowVisualMenu(View anchor){
 +    LinearLayout rows;mCobraNextSheetAnchor=anchor;
 +    try{rows=cobraOpenSheet("Visual settings","","visual-settings");}finally{mCobraNextSheetAnchor=null;}
@@ -595,7 +625,6 @@
 +    for(int i=0;i<2;i++){final boolean enabled=i==1;cobraAddDetail(rows,"visuals",enabled?"On":"Off",null,"cobra-visual-night:"+(enabled?"on":"off"),night==enabled,()->{
 +      mPrefs.edit().putBoolean(CobraPresentationEffects.NIGHT,enabled).apply();if(mPlayerOverlay!=null)cobraBuildPlayerChrome();cobraRefreshVisualEffects();cobraRefreshModeDetails();
 +    });}
-+  }
+   }
    private void cobraEditGreeting(){
      EditText input=new EditText(this);input.setText(mPrefs.getString(CobraPresentationEffects.GREETING,""));
-     input.setHint("Welcome back");input.setMaxLines(3);input.setSelectAllOnFocus(true);

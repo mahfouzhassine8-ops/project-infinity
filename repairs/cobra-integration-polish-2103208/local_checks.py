@@ -20,6 +20,7 @@ def main():
     subprocess.run(['java', str(parser), str(candidate / SOURCE_ROOT)], check=True)
     subprocess.run(['java', str(parser), str(ROOT / 'tests')], check=True)
     subprocess.run(['python3', str(ROOT / 'test_guards.py')], check=True)
+    subprocess.run(['python3', str(ROOT / 'test_parent_png.py')], check=True)
     ci.protect(candidate, ROOT.parent / 'cobra-ci-inputs/audit206/repairs/cobra-original-player-menu-2103197/apply.py')
     # Adapter is exercised against already-adapted 207 fixtures, not raw 206.
     parent_fixtures = ROOT.parent / 'cobra-207-delivery/evidence-1/audit207'
