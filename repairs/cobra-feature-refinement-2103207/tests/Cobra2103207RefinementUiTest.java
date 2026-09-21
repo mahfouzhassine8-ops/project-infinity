@@ -32,7 +32,7 @@ public class Cobra2103207RefinementUiTest {
   @Test public void supportedButUnselectedTrackIsNeutral()throws Exception{preview();call("cobraSetCaptionsEnabled",f.fake.player,true);f.tracks(Cobra2103201SubtitleTest.group("en","text/vtt","en",true,false));assertFalse(cc().isSelected());}
   @Test public void selectedSupportedTrackIsActiveThenOffClearsIt()throws Exception{preview();call("cobraSetCaptionsEnabled",f.fake.player,true);f.tracks(Cobra2103201SubtitleTest.group("en","text/vtt","en",true,true));assertTrue(cc().isSelected());call("cobraSetCaptionsEnabled",f.fake.player,false);assertFalse(cc().isSelected());}
   @Test public void unsupportedSelectedTrackCannotClaimEnabled()throws Exception{preview();f.tracks(Cobra2103201SubtitleTest.group("en","text/vtt","en",false,true));assertFalse(cc().isSelected());}
-  Bitmap paint(Drawable d,int[] state){d.setState(state);d.setBounds(0,0,64,48);Bitmap b=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);d.draw(new Canvas(b));return b;}
+  Bitmap paint(Drawable d,int[] state){d.setState(state);d.jumpToCurrentState();d.setBounds(0,0,64,48);Bitmap b=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);d.draw(new Canvas(b));return b;}
   void evidence(Bitmap b,String name)throws Exception{new Cobra2103205PresentationEffectsTest().evidence(b,name);}
   @Test public void focusedOffHasTransparentCenterButActiveHasBlueFill()throws Exception{
     Drawable d=(Drawable)call("cobraCaptionControlSurface",true);

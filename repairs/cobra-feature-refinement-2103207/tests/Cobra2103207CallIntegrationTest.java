@@ -42,4 +42,10 @@ public class Cobra2103207CallIntegrationTest {
   @Test public void explicitMuteDuringCallSurvivesFocusGainAndCallEnd()throws Exception{
     f.interrupt();f.call("cobraUserUnmute",s.player);f.call("cobraToggleMediaMute",s.player);f.listener().onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN);f.mode(AudioManager.MODE_NORMAL);assertEquals(0f,s.volume,0f);assertEquals(0,transport);
   }
+  @Test public void existingMultiAudioActionUnmutesOnlySelectedPaneDuringCall()throws Exception{
+    f.call("releaseSinglePlayer");f.f.states.clear();f.f.multi(3);f.interrupt();
+    String key=(String)f.get(f.f.channels.get(1),"id");f.call("cobraUseMultiAudioHere",key);
+    assertEquals(0f,f.f.states.get(0).volume,0f);assertEquals(1f,f.f.states.get(1).volume,0f);assertEquals(0f,f.f.states.get(2).volume,0f);
+    for(Cobra2103202LifecycleTest.State tile:f.f.states){assertEquals(0,tile.prepares);assertEquals(0,tile.releases);assertTrue(tile.requested);}
+  }
 }
