@@ -163,6 +163,14 @@ TRACKS = r'''  private ExoPlayer mCobraTrackSheetPlayer;
     }
     if(textCount==0)cobraInfoText(rows,unsupportedText>0?"Subtitle tracks are present but unsupported on this player.":"No subtitle tracks available in this stream.");
     if(audioCount==0)cobraInfoText(rows,"No audio tracks available in this stream.");
+    // Anchoring fixes the first measured height. New tracks must be measured as
+    // content again before that same owner reapplies its viewport/anchor limits.
+    LinearLayout panel=mCobraSheetPanel;
+    if(panel!=null&&panel.getParent()==mCobraActionSheet){
+      android.view.ViewGroup.LayoutParams geometry=panel.getLayoutParams();
+      if(geometry.height!=android.view.ViewGroup.LayoutParams.WRAP_CONTENT){geometry.height=android.view.ViewGroup.LayoutParams.WRAP_CONTENT;panel.setLayoutParams(geometry);}
+      else panel.requestLayout();
+    }
     if(focusedTag!=null){View replacement=rows.findViewWithTag(focusedTag);if(replacement!=null)replacement.requestFocus();}
   }
 '''

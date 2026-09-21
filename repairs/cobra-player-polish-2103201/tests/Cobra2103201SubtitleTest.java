@@ -3,9 +3,11 @@ package com.projectinfinity.kodi;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.media3.common.*;
 import androidx.media3.common.text.Cue;
@@ -57,6 +59,18 @@ public class Cobra2103201SubtitleTest {
     if(v instanceof TextView&&value.contentEquals(((TextView)v).getText()))return (TextView)v;
     if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){TextView found=text(((ViewGroup)v).getChildAt(i),value);if(found!=null)return found;}
     return null;
+  }
+  ScrollView scroll(View v){
+    if(v instanceof ScrollView)return (ScrollView)v;
+    if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){ScrollView found=scroll(((ViewGroup)v).getChildAt(i));if(found!=null)return found;}
+    return null;
+  }
+  void fullyVisible(View row){
+    Rect visible=new Rect();assertTrue("Track row must intersect the visible viewport",row.getGlobalVisibleRect(visible));
+    assertTrue("Track row must have nonzero laid-out height",row.getHeight()>0);
+    // Focus may slightly enlarge the rendered row; at least its complete control
+    // height must remain visible. A clipped discovery row is shorter than this.
+    assertTrue("Entire track row must be visible: height="+row.getHeight()+", visible="+visible.height(),visible.height()>=row.getHeight());
   }
   void open()throws Exception{call(a,"showTrackChooser");ui.measure(a,412,915);assertEquals("tracks",get(a,"mCobraSheetKind"));}
   void cue()throws Exception{call(binding,"onCues",new CueGroup(Collections.singletonList(new Cue.Builder().setText("Visible supplied caption").build()),0L));}
@@ -110,6 +124,7 @@ public class Cobra2103201SubtitleTest {
 
   @Test public void delayedTrackDiscoveryRefreshesExistingSheetAndKeepsFocus()throws Exception{
     tracks(group("audio","audio/mp4a-latm","und",true,true));open();View sheet=tag("cobra_themed_sheet");View off=tag("cobra-track-off");
+    View panel=tag("cobra_sheet_panel");int originalHeight=panel.getHeight();ScrollView originalScroll=scroll(panel);
     // Exercise focus navigation, not a touch-mode row that intentionally cannot take focus.
     // This public Android operation exits touch mode without changing the control's flags.
     System.out.println("Subtitle focus setup: touch="+off.isInTouchMode()+", focusable="+off.isFocusable()+", focusableInTouch="+off.isFocusableInTouchMode());
@@ -123,6 +138,13 @@ public class Cobra2103201SubtitleTest {
     assertTrue("Selected English state must match the current track",tag("cobra-track:1:0").isSelected());
     assertTrue("The same Off action must retain focus after row replacement",tag("cobra-track-off").hasFocus());
     Cobra2103201MenuPolishTest.capture(a,ui,"cobra201-english-track-412x915",412,915);
+    assertSame("Discovery must keep the same bounded scroll container",originalScroll,scroll(panel));
+    assertTrue("Panel must grow for discovered content when the viewport has room",panel.getHeight()>originalHeight);
+    fullyVisible(tag("cobra-track:1:0"));
+    // Removing the discovered language must release the old larger panel height.
+    tracks(group("audio","audio/mp4a-latm","und",true,true));call(binding,"onTracksChanged",fake.tracks);ui.measure(a,412,915);ui.frames(20);ui.measure(a,412,915);
+    assertEquals("Removed tracks must shrink the same sheet back to its content",originalHeight,panel.getHeight());
+    assertTrue(tag("cobra-track-off").hasFocus());fullyVisible(tag("cobra-track:0:0"));
   }
 
   @Test public void unsupportedSubtitlesAreExplainedButNeverSelectable()throws Exception{
@@ -204,5 +226,21 @@ public class Cobra2103201SubtitleTest {
     int writes=fake.parameterWrites;call(binding,"onTracksChanged",fake.tracks);assertEquals("No repeated selection loop",writes,fake.parameterWrites);
     call(a,"toggleCobraPreviewCaptions");assertTrue(fake.params.disabledTrackTypes.contains(C.TRACK_TYPE_TEXT));assertTrue(fake.params.overrides.isEmpty());
     writes=fake.parameterWrites;call(binding,"onTracksChanged",fake.tracks);assertEquals("Off cannot be undone by later discovery",writes,fake.parameterWrites);
+  }
+
+  @Test public void manyDiscoveredTracksStayBoundedScrollableAndPreserveFocusedVisiblePosition()throws Exception{
+    tracks(group("audio","audio/mp4a-latm","und",true,true));open();View sheet=tag("cobra_themed_sheet");View panel=tag("cobra_sheet_panel");ScrollView list=scroll(panel);
+    Tracks.Group[] many=new Tracks.Group[18];for(int i=0;i<many.length;i++)many[i]=group("subtitle-"+i,"text/vtt","en",true,false);
+    tracks(many);call(binding,"onTracksChanged",fake.tracks);ui.measure(a,412,915);ui.frames(20);ui.measure(a,412,915);
+    assertSame(sheet,tag("cobra_themed_sheet"));assertSame(list,scroll(panel));
+    assertTrue("Long track list must retain the existing 480px scroll cap",list.getHeight()<=480);
+    assertTrue("Long list must exceed its viewport",list.getChildAt(0).getHeight()>list.getHeight());
+    View target=tag("cobra-track:12:0");assertTrue(target.requestFocusFromTouch());ui.measure(a,412,915);ui.frames(20);ui.measure(a,412,915);
+    fullyVisible(target);assertTrue("Focus navigation must scroll later tracks into view",list.getScrollY()>0);int before=list.getScrollY();
+    Tracks.Group[] expanded=Arrays.copyOf(many,19);expanded[18]=group("subtitle-18","text/vtt","en",true,false);
+    tracks(expanded);call(binding,"onTracksChanged",fake.tracks);ui.measure(a,412,915);ui.frames(20);ui.measure(a,412,915);
+    assertSame("Refresh must preserve the scroll view",list,scroll(panel));assertTrue(tag("cobra-track:12:0").hasFocus());
+    assertEquals("Appending a track must not jump the existing focused visible row",before,list.getScrollY());fullyVisible(tag("cobra-track:12:0"));
+    View last=tag("cobra-track:18:0");assertTrue(last.requestFocusFromTouch());ui.measure(a,412,915);ui.frames(20);ui.measure(a,412,915);fullyVisible(last);
   }
 }

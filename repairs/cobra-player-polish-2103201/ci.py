@@ -12,7 +12,7 @@ PARENT_APK='0a5632068ed242245d17fc60753d22e5aee7e6d80680b81e82510de67343c243'
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 GRADLE='tools/android/packaging/xbmc/build.gradle.in'
 ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
-REVIEWED_ACTIVITY='018f2875b5f922932db9a45a4e40aff73baa247b63d954a6082ac93d53e4f014'
+REVIEWED_ACTIVITY='5a9c28de6714824e5792030be1d6d7b58e25bf12cc4aa7954eee4e344b21fb0d'
 
 def require(value,message):
     if not value: raise RuntimeError(message)
