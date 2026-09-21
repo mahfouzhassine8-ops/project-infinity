@@ -1,0 +1,68 @@
+{
+  "status": "frozen",
+  "parent_build": 2103203,
+  "parent_commit": "45eac1987c7cd583572d6715eee2ba191130ad71",
+  "files": {
+    "tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in": {
+      "before": "175e87499c20de7ee0466b831945f4187b39c9d753367d421e3c16e7f98822db",
+      "after": "3d61ce175acbdcd9c0c611dd5fb20ea4fbffc28ade47429ee572f524fb49531d"
+    },
+    "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in": {
+      "before": "a992dc6d541ff72c2b38518aec8628da0e2dfd93c9653c129243332d50af804d",
+      "after": "1dedded145460e10291c9c0459c815363ab76dc48e730434b43751478f6e36f7"
+    },
+    "tools/android/packaging/xbmc/src/Splash.java.in": {
+      "before": "22b152d8df482310419aa2d851fd3de619dc6ce9fcb32f46cc31553868388e04",
+      "after": "dc2592cd05f48ac0ddc9b6db58b002435a52ad4d5050f3af79d2a8014b564b14"
+    }
+  },
+  "patch_sha256": "262bb046a644daca51eb63ea668f99eec22a9784063e60be59f308622166ffbc",
+  "protected_runtime_members": {
+    "CobraLayoutMath": "2d16cef09fe3151af6b2600fdab40037de4eb49df6f3f32a5674eaff7c0cacce",
+    "CobraModeLayout": "f5b788f4cb255e010f87e05e642d0b5b1fd7a70707280b7084af9045244c2572",
+    "CobraLocalTimeshiftSession": "2bff3e0e7b424e7bd07cf5bcb26a5030e498c0d7b11d2bafbdecc7ed16388882",
+    "CobraTimeshiftTransportPolicy": "f4ed2bd3be9d78d5e055b78c1cc69118c0f3565b23b34901da4f69d4422a8e09",
+    "CobraTsParserPolicy": "b3366fe2a958f151220b3ec915663953e42d98fb18c35be78f5561cffdb71b49",
+    "CobraTimelineNormalizerPolicy": "e9f0d929266422fa18072d6f921d381eeacbdeb4059281bcd6d0047b9620e3eb",
+    "CobraProviderPacePolicy": "08c3c2e49db5498315eabc4ad8dfa8c444b3351a73736f5b0d86e08b91ce7e90",
+    "CobraNetworkFamilyPolicy": "b5751ecfe7931a21fea758ef39e40a0c911a2ac58cd432c47082108fc69cda29",
+    "CobraCallAudioPolicy": "24bb445e83fc6c70a03ad28abae463d2652c26cb85c3e7beff0b5fde0218b383",
+    "CobraWindowLifecyclePolicy": "5796a1ba82101d080003b808dfb1fdbd32270efaa826c87f0d6681f44e9c6265",
+    "CobraTimeshiftRecoveryPolicy": "4f37da549478e1b3c849253989c9783fde7de28505c5e816f52e8439e4f14865",
+    "CobraTimeshiftStallPolicy": "ca9c65866ed4b028099d4db3853d5f929575e7e0cb8cf45d284d32c6dc447ada",
+    "CobraPreferencePolicy": "6fe46bef7ced59da008ec3be44984232b30fb424a08b65b3b24fde05668edad5",
+    "CobraPlaybackPolicy": "f15492ba98bcaa18acd7341eff6846159b8cc05de0e18cf7df795526d963f074",
+    "buildPlayer": "737a50fd799730718c21083b470e039daab98b636d2e7a55e4a2e3d3c5240093",
+    "cobraActivateLocalTimeshift": "7dfb1af0f6bcdbcf418d3abe40a662997ca386e09bb4b92b938baaaec38aa089",
+    "cobraRecoverLocalTimeshiftSource": "761313b9031fb6db10b614680780e550ed9befa0723e3fac6273252708fb641c",
+    "cobraFallbackFromLocalTimeshift": "88277efe5422173bfac1fb36d8c0363008c3687c309793725545a0fc8a15fbf2",
+    "cobraAttachVideo": "13c2586fc57d2c0569c51835c6a64aa00050228c0e3681711779276e2094c093",
+    "cobraFitCaptions": "afd89f79079b5d64d47db252fcc9e5e4162a844b1dbae9a755e616f2e7864347",
+    "cobraFitVideo": "c3224e5f7088057a4a717e4fbae09f13550922eb4a0913ebb651aff2283994c3",
+    "cobraPrepareMultiForPip": "4b0489bc9fe4e0ec3db95c51f2cfd3079bd1b7985e3f6cf8de55bb7a672acea0",
+    "cobraRestoreMultiAfterPip": "10ccd98faeecd97d840e599f647ee4e006e612823bd495fa9d758bf477d652eb",
+    "cobraPipParams": "08688ecb86641a1528687f1ace5136259a6b30cc7f97443bb8ad57b415cb53a6",
+    "cobraPipMediaAvailable": "0e4e59cb6685c58bf51a2d3d0e6b283d9e6f7a74d15e11cad3e9e21c5ae22c83",
+    "cobraReleasePipMediaSession": "bf571e7a1b455f5525c36caaa4d56e8fada0ca6984845ad5e8cad4af9ef74c32",
+    "cobraPipMediaCallback": "c482f5a67ebbbdbe23abd571d86142b8093eca4e98acdaedd973361274ce96a0",
+    "cobraDispatchPipCommand": "899a5e020af7086573cf9b7dde0a1cddea5cdc4391a8322431b258d26c6c4532",
+    "cobraPipPlaybackState": "f5946b02ff67975d433ca5459f6e9c9fe23e76b17000fa412aecf86aaf9ea320",
+    "cobraUpdatePipMediaSession": "c4abf5c295e67bc52aabba98aeae8112f65f0f7c25bf74c77c435653d42292b1",
+    "cobraUserPlay": "4637d646bbfcbdbddd973ab040f3a1d6ed6dc587738fc6251e1636572ecdd4b3",
+    "cobraHandleAudioFocus": "4a9b2dbd3ac0b0bf00812650d4e74fc7b94d8775bbd3ea385ec1eaa2fe240fc4",
+    "cobraClaimAudioFocus": "a768d566f975470d2067a75f47aba11b51e85e625f8feec9aa65e657f303cbff",
+    "cobraReleaseAudioFocus": "cdfc7679fd5d5c64c854c062a1ffb5f7a942c418e9c00e290d6b0b71ebaffb6d"
+  },
+  "inherited_android_cases": 445,
+  "new_android_cases": 54,
+  "test_source_hashes": {
+    "tests/Cobra2103204DialogTest.java": "c45026ee339ed39b4e284edd7759fb35f357a21a7c3d1ed454a4d0ed8f526b24",
+    "tests/Cobra2103204EntryThemeTest.java": "fd69521f37b20aad28a27f6dfbcacd01dd6342983feab2628cc7f0ecd0183c93",
+    "tests/Cobra2103204PaletteTest.java": "b5ba8b6fb5e1453e03d3e03af7293a712111364896b87c80e1d9e4e44d180cf8",
+    "tests/Cobra2103204PresentationTest.java": "27ae45308a9846bb776c1effb523dc189af8bc839f44dfab4e07c618180a8f7c"
+  },
+  "native_engine_recompiled": false,
+  "physical_device_verified": false,
+  "new_controls": false,
+  "new_features": false
+}

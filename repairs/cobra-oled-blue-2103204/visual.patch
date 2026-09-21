@@ -1,0 +1,759 @@
+--- a/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in
++++ b/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in
+@@ -162,7 +162,89 @@
+   }
+   public static class DialogBuilder extends AlertDialog.Builder {
+     final CobraVisualRenderer renderer;final String slot;
+-    public DialogBuilder(Context c,CobraVisualRenderer r,String name){super(c);renderer=r;slot=name;}
++    private final WeakHashMap<View,Boolean> presented=new WeakHashMap<>();
++    public DialogBuilder(Context c,CobraVisualRenderer r,String name){
++      super(c,"light".equals(r.palette())?android.R.style.Theme_Material_Light_Dialog_Alert:android.R.style.Theme_Material_Dialog_Alert);
++      renderer=r;slot=name;
++    }
++    private void finishPresentation(AlertDialog dialog){
++      if(dialog.getWindow()==null)return;
++      View decor=dialog.getWindow().getDecorView();
++      // Apply the native fallback once, before imported bindings capture it.
++      // Repeated show/layout calls must not overwrite an installed theme.
++      if(!presented.containsKey(decor)){
++        boolean light="light".equals(renderer.palette());
++        int fill=light?0xfffbfcff:0xff0b0f16,line=light?0xffcbd7e8:0xff344359;
++        GradientDrawable background=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
++            new int[]{light?Color.WHITE:0xff111722,fill});
++        float density=decor.getResources().getDisplayMetrics().density;
++        background.setCornerRadius(22*density);background.setStroke(Math.max(1,Math.round(density)),line);
++        dialog.getWindow().setBackgroundDrawable(background);
++        nativeDialogText(decor,light);
++        nativeDialogChoices(dialog.getListView(),light);
++        presented.put(decor,Boolean.TRUE);
++      }
++      renderer.tree(decor,slot);
++    }
++    private void nativeDialogText(View view,boolean light){
++      // App-owned forms already carry their exact widget/theme bindings. Only
++      // framework chrome receives a fallback; never flatten custom field fonts,
++      // validation colors, disabled states, or imported input backgrounds.
++      if(view.getId()==android.R.id.custom)return;
++      if(view instanceof TextView){
++        TextView text=(TextView)view;
++        int ink=light?0xff101b2c:0xfff7faff,accent=light?0xff145fdf:0xff62aaff;
++        if(view instanceof Button)text.setTextColor(new android.content.res.ColorStateList(
++            new int[][]{new int[]{-android.R.attr.state_enabled},new int[]{}},
++            new int[]{light?0xff64748b:0xff8d9fb8,accent}));
++        else text.setTextColor(ink);
++        text.setTypeface(Typeface.create(view instanceof Button?"sans-serif-medium":"sans-serif",Typeface.NORMAL));
++        if(view instanceof EditText){
++          text.setHintTextColor(light?0xff526176:0xffb1bfd2);
++          view.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accent));
++        }
++      }
++      if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)nativeDialogText(group.getChildAt(i),light);}
++    }
++    private void nativeDialogChoices(final ListView list,boolean light){
++      if(list==null)return;
++      final int accent=renderer.color("palette.accent",light?0xff145fdf:0xff62aaff);
++      final android.content.res.ColorStateList marks=new android.content.res.ColorStateList(
++          new int[][]{new int[]{-android.R.attr.state_enabled},new int[]{android.R.attr.state_checked},new int[]{}},
++          new int[]{light?0xffa1acbc:0xff566278,accent,light?0xff627187:0xffa9b8cf});
++      float density=list.getResources().getDisplayMetrics().density;
++      GradientDrawable focused=new GradientDrawable();focused.setColor((accent&0x00ffffff)|0x18000000);
++      focused.setCornerRadius(8*density);focused.setStroke(Math.max(1,Math.round(density)),accent);
++      StateListDrawable selector=new StateListDrawable();
++      selector.addState(new int[]{android.R.attr.state_pressed},focused);
++      selector.addState(new int[]{android.R.attr.state_focused},focused);
++      selector.addState(new int[]{},new ColorDrawable(Color.TRANSPARENT));list.setSelector(selector);
++      // Native choice rows are materialized/recycled after AlertDialog.show().
++      // Observe only this dialog's visible children; never replace its adapter,
++      // scroll listener, checked-state owner, or existing item callbacks.
++      class ChoiceTint implements ViewTreeObserver.OnPreDrawListener,View.OnAttachStateChangeListener {
++        ViewTreeObserver observer;
++        final WeakHashMap<View,Boolean> styled=new WeakHashMap<>();
++        void attach(){observer=list.getViewTreeObserver();observer.addOnPreDrawListener(this);}
++        public boolean onPreDraw(){
++          for(int i=0;i<list.getChildCount();i++){
++            View child=list.getChildAt(i);
++            if(child.getClass()==CheckedTextView.class&&!styled.containsKey(child)){CheckedTextView row=(CheckedTextView)child;
++              // Material's choice indicator is often a compound start drawable,
++              // not checkMark. Theme the actual owner without replacing artwork.
++              if(row.getCheckMarkDrawable()!=null)row.setCheckMarkTintList(marks);
++              if(Build.VERSION.SDK_INT>=23)row.setCompoundDrawableTintList(marks);
++              else for(Drawable icon:row.getCompoundDrawablesRelative())if(icon!=null)icon.mutate().setTintList(marks);
++              styled.put(child,Boolean.TRUE);
++            }
++          }
++          return true;
++        }
++        public void onViewAttachedToWindow(View view){attach();}
++        public void onViewDetachedFromWindow(View view){if(observer!=null&&observer.isAlive())observer.removeOnPreDrawListener(this);observer=null;}
++      }
++      ChoiceTint tint=new ChoiceTint();list.addOnAttachStateChangeListener(tint);if(list.isAttachedToWindow())tint.attach();
++    }
+     @Override public AlertDialog create(){
+       final AlertDialog dialog=super.create();
+       if(dialog.getWindow()!=null){
+@@ -170,12 +252,12 @@
+         // A view listener, not Dialog.setOnShowListener: preserve login/profile/guide callbacks.
+         decor.addOnLayoutChangeListener(new View.OnLayoutChangeListener(){
+           public void onLayoutChange(View view,int l,int t,int r,int b,int ol,int ot,int or,int ob){
+-            if(dialog.isShowing()&&r>l&&b>t){view.removeOnLayoutChangeListener(this);renderer.tree(view,slot);}
++            if(dialog.isShowing()&&r>l&&b>t){view.removeOnLayoutChangeListener(this);finishPresentation(dialog);}
+           }
+         });
+       }
+       return dialog;
+     }
+-    @Override public AlertDialog show(){AlertDialog dialog=super.show();if(dialog.getWindow()!=null)renderer.tree(dialog.getWindow().getDecorView(),slot);return dialog;}
++    @Override public AlertDialog show(){AlertDialog dialog=super.show();finishPresentation(dialog);return dialog;}
+   }
+ }
+--- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+@@ -613,6 +613,15 @@
+     return drawable;
+   }
+ 
++  private GradientDrawable cobraPanelSurface(int fill,int radius,int stroke) {
++    // A small tonal lift supplies depth without blur, bitmap allocation, or a
++    // render effect on the video surface. Opacity belongs to the caller.
++    int top=Color.argb(Color.alpha(fill),Math.min(255,Color.red(fill)+5),
++        Math.min(255,Color.green(fill)+5),Math.min(255,Color.blue(fill)+5));
++    GradientDrawable drawable=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{top,fill});
++    drawable.setCornerRadius(dp(radius));drawable.setStroke(dp(1),stroke);return drawable;
++  }
++
+   private int cobraAlpha(int color, int alpha) {
+     return Color.argb(Math.max(0, Math.min(255, alpha)),
+         Color.red(color), Color.green(color), Color.blue(color));
+@@ -628,7 +637,7 @@
+         surface(focused, radius, cobraThemeColor("accent_soft", mTheme.accentSoft), 2));
+     state.addState(
+         new int[]{},
+-        surface(normal, radius, cobraAlpha(cobraThemeColor("line", mTheme.line), 210), 1));
++        cobraPanelSurface(normal, radius, cobraAlpha(cobraThemeColor("line", mTheme.line), 210)));
+     return state;
+   }
+ 
+@@ -637,6 +646,7 @@
+     view.setText(value);
+     view.setTextColor(color);
+     view.setTextSize(sp);
++    view.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+     view.setGravity(gravity);
+     view.setPadding(dp(vtheme().dimension("cobra.text.dimensions.1",12)), dp(vtheme().dimension("cobra.text.dimensions.2",8)), dp(vtheme().dimension("cobra.text.dimensions.3",12)), dp(vtheme().dimension("cobra.text.dimensions.4",8)));
+     vtheme().paint(view,"widget.text");return view;
+@@ -647,6 +657,8 @@
+     button.setText(value);
+     button.setTextColor(cobraThemeColor("text", mTheme.text));
+     button.setTextSize(vtheme().number("cobra.action.numbers.1",13,8f,96f));
++    button.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
++    button.setLetterSpacing(.015f);
+     button.setAllCaps(false);
+     button.setGravity(Gravity.CENTER);
+     button.setFocusable(mUi == null || mUi.dpadFocusEnabled);
+@@ -854,30 +866,30 @@
+ 
+   private int cobraBuiltInAppearanceColor(String mode, String key, int fallback) {
+     if ("light".equals(mode)) {
+-      if ("background".equals(key)) return android.graphics.Color.rgb(245, 247, 251);
+-      if ("rail".equals(key)) return android.graphics.Color.rgb(255, 255, 255);
+-      if ("panel".equals(key)) return android.graphics.Color.rgb(255, 255, 255);
+-      if ("panel2".equals(key)) return android.graphics.Color.rgb(234, 240, 246);
+-      if ("focus".equals(key)) return android.graphics.Color.rgb(11, 99, 206);
+-      if ("accent".equals(key)) return android.graphics.Color.rgb(11, 127, 219);
+-      if ("accent_soft".equals(key)) return android.graphics.Color.rgb(42, 139, 216);
+-      if ("text".equals(key)) return android.graphics.Color.rgb(16, 23, 34);
+-      if ("muted".equals(key)) return android.graphics.Color.rgb(95, 111, 128);
+-      if ("line".equals(key)) return android.graphics.Color.rgb(203, 214, 226);
++      if ("background".equals(key)) return android.graphics.Color.WHITE;
++      if ("rail".equals(key)) return 0xfff5f8fd;
++      if ("panel".equals(key)) return 0xfff5f8fd;
++      if ("panel2".equals(key)) return 0xffedf3fc;
++      if ("focus".equals(key)) return 0xffe5efff;
++      if ("accent".equals(key)) return 0xff145fdf;
++      if ("accent_soft".equals(key)) return 0xff165bc5;
++      if ("text".equals(key)) return 0xff101b2c;
++      if ("muted".equals(key)) return 0xff526176;
++      if ("line".equals(key)) return 0xffcbd7e8;
+     } else if ("oled".equals(mode)) {
+       if ("background".equals(key)) return android.graphics.Color.BLACK;
+       if ("rail".equals(key)) return android.graphics.Color.BLACK;
+-      if ("panel".equals(key)) return android.graphics.Color.rgb(5, 5, 5);
+-      if ("panel2".equals(key)) return android.graphics.Color.rgb(10, 10, 10);
+-      if ("focus".equals(key)) return android.graphics.Color.rgb(9, 95, 216);
+-      if ("accent".equals(key)) return android.graphics.Color.rgb(36, 183, 255);
+-      if ("accent_soft".equals(key)) return android.graphics.Color.rgb(123, 214, 255);
+-      if ("text".equals(key)) return android.graphics.Color.WHITE;
+-      if ("muted".equals(key)) return android.graphics.Color.rgb(168, 183, 198);
+-      if ("line".equals(key)) return android.graphics.Color.rgb(29, 39, 48);
+-    }
+-    // Dark intentionally falls back to Theme.load(), preserving the current
+-    // Cobra palette when no ZIP palette override is installed.
++      if ("panel".equals(key)) return 0xff070a10;
++      if ("panel2".equals(key)) return 0xff0b0f16;
++      if ("focus".equals(key)) return 0xff162d49;
++      if ("accent".equals(key)) return 0xff62aaff;
++      if ("accent_soft".equals(key)) return 0xff8ac0ff;
++      if ("text".equals(key)) return 0xfff7faff;
++      if ("muted".equals(key)) return 0xffb1bfd2;
++      if ("line".equals(key)) return 0xff293244;
++    }
++    // Dark uses the same black/blue defaults through Theme.load(), so existing
++    // legacy theme colors and explicit palette overrides retain their ownership.
+     return fallback;
+   }
+ 
+@@ -1142,6 +1154,7 @@
+     input.setTextSize(vtheme().number("cobra.field.numbers.1",15,8f,96f));
+     input.setSingleLine(true);
+     input.setInputType(inputType);
++    input.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+     input.setPadding(dp(vtheme().dimension("cobra.field.dimensions.1",16)), dp(vtheme().dimension("cobra.field.dimensions.2",10)), dp(vtheme().dimension("cobra.field.dimensions.3",16)), dp(vtheme().dimension("cobra.field.dimensions.4",10)));
+     input.setBackground(surface(
+         cobraAlpha(cobraThemeColor("panel2", mTheme.panel2), 232), 16, cobraAlpha(cobraThemeColor("line", mTheme.line), 230), 1));
+@@ -3033,6 +3046,18 @@
+     list.addView(customEpg, new LinearLayout.LayoutParams(-1, dp(56)));
+     list.addView(subscriptionStatus, new LinearLayout.LayoutParams(-1, dp(86)));
+ 
++    // Keep the established sections, order and controls; give each row a little
++    // breathing room and a shared left edge instead of touching centered tiles.
++    for(int i=0;i<list.getChildCount();i++){
++      View child=list.getChildAt(i);
++      if(child instanceof Button){
++        Button row=(Button)child;row.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);
++        row.setPadding(dp(18),row.getPaddingTop(),dp(18),row.getPaddingBottom());
++        LinearLayout.LayoutParams p=(LinearLayout.LayoutParams)row.getLayoutParams();
++        p.topMargin=dp(3);p.bottomMargin=dp(3);row.setLayoutParams(p);
++      }
++    }
++
+     vtheme().tree(list,"settings");
+     ScrollView settingsScroll = new ScrollView(this);
+     settingsScroll.setFillViewport(true);settingsScroll.addView(list);
+@@ -3712,7 +3737,7 @@
+   private void showCobraMultiPicker(boolean adding) {
+     if(mCobraPlayerLocked)return;closeCobraPlayerDrawer();closeCobraActionSheet();closeCobraMultiPicker(false);
+     FrameLayout parent=adding?mMultiOverlay:mPlayerOverlay;if(parent==null)return;mCobraMultiPickerAdding=adding;
+-    FrameLayout panel=new FrameLayout(this);mCobraMultiPicker=panel;panel.setBackgroundColor(vtheme().color("cobra.showCobraMultiPicker.colors.1",0xff101924));panel.setElevation(dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.1",12)));
++    FrameLayout panel=new FrameLayout(this);mCobraMultiPicker=panel;panel.setBackground(cobraPanelSurface(vtheme().color("cobra.showCobraMultiPicker.colors.1",0xfc080b11),0,0xff293244));panel.setElevation(dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.1",12)));
+     LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.2",10)),dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.3",8)),dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.4",10)),dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.5",14)));panel.addView(content,new FrameLayout.LayoutParams(-1,-1));
+     LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);TextView title=cobraText(mCobraMultiReplaceIndex>=0?"Change channel":adding?"Add screen":"Pick a second screen",vtheme().color("cobra.showCobraMultiPicker.colors.2",Color.WHITE),17);title.setTypeface(vtheme().font("cobra.showCobraMultiPicker.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));header.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.6",48)),1));header.addView(cobraIcon("close","Close channel picker",true,v->closeCobraMultiPicker(false)),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.7",48)),dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.8",48))));content.addView(header,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraMultiPicker.dimensions.9",50))));
+     LinearLayout filters=new LinearLayout(this);String[] labels={"Favorites","Recent","All","Groups"},keys={"FAVORITES","RECENT","ALL","CATEGORIES"};
+@@ -5345,16 +5370,16 @@
+   }
+ 
+   private static final class Theme {
+-    int background = Color.rgb(5, 7, 11);
+-    int rail = Color.rgb(8, 10, 15);
+-    int panel = Color.rgb(18, 22, 30);
+-    int panel2 = Color.rgb(24, 29, 39);
+-    int focus = Color.rgb(72, 18, 29);
+-    int accent = Color.rgb(255, 64, 89);
+-    int accentSoft = Color.rgb(255, 104, 124);
+-    int text = Color.rgb(244, 247, 251);
+-    int muted = Color.rgb(151, 160, 174);
+-    int line = Color.rgb(55, 62, 74);
++    int background = Color.BLACK;
++    int rail = Color.BLACK;
++    int panel = 0xff0b0f16;
++    int panel2 = 0xff111722;
++    int focus = 0xff162d49;
++    int accent = 0xff62aaff;
++    int accentSoft = 0xff8ac0ff;
++    int text = 0xfff7faff;
++    int muted = 0xffb1bfd2;
++    int line = 0xff293244;
+     int rowHeight = 66;
+     int guideRowHeight = 94;
+     int touchTarget = 52;
+@@ -5380,16 +5405,23 @@
+         }
+         JSONObject root = new JSONObject(
+             new String(data, StandardCharsets.UTF_8));
+-        theme.background = color(root, "background", theme.background);
+-        theme.rail = color(root, "rail", theme.rail);
+-        theme.panel = color(root, "panel", theme.panel);
+-        theme.panel2 = color(root, "panel2", theme.panel2);
+-        theme.focus = color(root, "focus", theme.focus);
+-        theme.accent = color(root, "accent", theme.accent);
+-        theme.accentSoft = color(root, "accent_soft", theme.accentSoft);
+-        theme.text = color(root, "text", theme.text);
+-        theme.muted = color(root, "muted", theme.muted);
+-        theme.line = color(root, "line", theme.line);
++        // Only the exact factory palette shipped through locked 2103203 receives
++        // the new native appearance. Never rewrite the installed file: any edited
++        // or custom manifest keeps its own colors, and factory geometry stays put.
++        boolean factoryPalette = "3afe4362451ad394f4a0f95bc790955b10de27ffdbf4d36247ebe85d60adbb3b"
++            .equals(CobraVisualTheme.hash(data));
++        if (!factoryPalette) {
++          theme.background = color(root, "background", theme.background);
++          theme.rail = color(root, "rail", theme.rail);
++          theme.panel = color(root, "panel", theme.panel);
++          theme.panel2 = color(root, "panel2", theme.panel2);
++          theme.focus = color(root, "focus", theme.focus);
++          theme.accent = color(root, "accent", theme.accent);
++          theme.accentSoft = color(root, "accent_soft", theme.accentSoft);
++          theme.text = color(root, "text", theme.text);
++          theme.muted = color(root, "muted", theme.muted);
++          theme.line = color(root, "line", theme.line);
++        }
+         theme.rowHeight = clamp(root.optInt("row_height", theme.rowHeight), 48, 96);
+         theme.guideRowHeight = clamp(
+             root.optInt("guide_row_height", theme.guideRowHeight), 70, 132);
+@@ -5498,11 +5530,11 @@
+   private android.graphics.drawable.Drawable cobraPressSurface(boolean dark) {
+     int accent=cobraThemeColor("accent",mTheme.accent);
+     android.graphics.drawable.StateListDrawable states=new android.graphics.drawable.StateListDrawable();
+-    states.addState(new int[]{android.R.attr.state_focused},surface(Color.argb(75,40,150,220),12,accent,2));
+-    states.addState(new int[]{android.R.attr.state_selected},surface(Color.argb(45,40,150,220),12,vtheme().color("cobra.cobraPressSurface.colors.1",Color.TRANSPARENT),0));
++    states.addState(new int[]{android.R.attr.state_focused},surface(dark?0xff162c47:0xffdceaff,12,accent,2));
++    states.addState(new int[]{android.R.attr.state_selected},surface(dark?0xeb10223a:0xe8e8f1ff,12,vtheme().color("cobra.cobraPressSurface.colors.1",cobraAlpha(accent,110)),1));
+     states.addState(new int[]{},surface(vtheme().color("cobra.cobraPressSurface.colors.2",Color.TRANSPARENT),12,vtheme().color("cobra.cobraPressSurface.colors.3",Color.TRANSPARENT),0));
+     return new android.graphics.drawable.RippleDrawable(
+-        android.content.res.ColorStateList.valueOf(dark?vtheme().color("cobra.cobraPressSurface.colors.4",0x35ffffff):vtheme().color("cobra.cobraPressSurface.colors.5",0x22002244)),states,
++        android.content.res.ColorStateList.valueOf(dark?vtheme().color("cobra.cobraPressSurface.colors.4",0x3062aaff):vtheme().color("cobra.cobraPressSurface.colors.5",0x24145fdf)),states,
+         surface(vtheme().color("cobra.cobraPressSurface.colors.6",Color.WHITE),12,vtheme().color("cobra.cobraPressSurface.colors.7",Color.TRANSPARENT),0));
+   }
+ 
+@@ -5590,11 +5622,12 @@
+     row.setPadding(dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.1",10)),dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.2",3)),dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.3",12)),dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.4",3)));row.setBackground(cobraPressSurface(dark));
+     row.setFocusable(true);row.setFocusableInTouchMode(false);row.setClickable(true);
+     CobraIconButton image=new CobraIconButton(icon,label,dark);image.setEnabled(false);image.setFocusable(false);image.setClickable(false);image.setLongClickable(false);image.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+-    if(destructive)image.ink=vtheme().color("cobra.cobraSheetRow.colors.1",0xffff7486);
++    if(destructive)image.ink=vtheme().color("cobra.cobraSheetRow.colors.1",dark?0xffff8d9d:0xffb4233c);
+     row.addView(image,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.5",42)),dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.6",42))));
+     LinearLayout copy=new LinearLayout(this);copy.setOrientation(LinearLayout.VERTICAL);
+-    TextView title=cobraText(label,destructive?vtheme().color("cobra.cobraSheetRow.colors.2",0xffff7486):dark?vtheme().color("cobra.cobraSheetRow.colors.3",Color.WHITE):cobraThemeColor("text",mTheme.text),15);
+-    title.setMaxLines(1);copy.addView(title,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.7",24))));
++    TextView title=cobraText(label,destructive?vtheme().color("cobra.cobraSheetRow.colors.2",dark?0xffff8d9d:0xffb4233c):dark?vtheme().color("cobra.cobraSheetRow.colors.3",Color.WHITE):cobraThemeColor("text",mTheme.text),15);
++    title.setTypeface(vtheme().font("cobra.cobraText.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));
++    title.setMaxLines(1);title.setMinimumHeight(dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.7",24)));copy.addView(title,new LinearLayout.LayoutParams(-1,-2));
+     if(subtitle!=null&&!subtitle.isEmpty()) {TextView sub=cobraText(subtitle,dark?vtheme().color("cobra.cobraSheetRow.colors.4",0xffaebdcc):cobraThemeColor("muted",mTheme.muted),11);sub.setMaxLines(2);copy.addView(sub,new LinearLayout.LayoutParams(-1,-2));}
+     LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(0,-2,1);cp.leftMargin=dp(vtheme().dimension("cobra.cobraSheetRow.dimensions.8",10));row.addView(copy,cp);
+     row.setContentDescription(label+(subtitle==null?"":", "+subtitle));
+@@ -5613,11 +5646,11 @@
+     scrim.setBackgroundColor(vtheme().color("cobra.cobraOpenSheet.colors.1",0x55000000));scrim.setClickable(true);scrim.setOnClickListener(v->closeCobraActionSheet());
+     LinearLayout panel=new LinearLayout(this);panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);
+     panel.setPadding(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.1",12)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.2",8)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.3",12)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.4",12)));
+-    panel.setBackground(surface(dark?("oled".equals(cobraEffectiveAppearanceMode())?vtheme().color("cobra.cobraOpenSheet.colors.2",0xff000000):vtheme().color("cobra.cobraOpenSheet.colors.3",0xf5141c27)):cobraThemeColor("panel",mTheme.panel),22,
+-        dark?vtheme().color("cobra.cobraOpenSheet.colors.4",0xff334457):cobraThemeColor("line",mTheme.line),1));panel.setElevation(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.5",14)));
++    panel.setBackground(cobraPanelSurface(dark?("oled".equals(cobraEffectiveAppearanceMode())?vtheme().color("cobra.cobraOpenSheet.colors.2",0xfc000000):vtheme().color("cobra.cobraOpenSheet.colors.3",0xf7080b11)):cobraAlpha(cobraThemeColor("panel",mTheme.panel),250),22,
++        dark?vtheme().color("cobra.cobraOpenSheet.colors.4",0xff344359):cobraThemeColor("line",mTheme.line)));panel.setElevation(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.5",14)));
+     LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);
+     LinearLayout copy=new LinearLayout(this);copy.setOrientation(LinearLayout.VERTICAL);copy.setPadding(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.6",12)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.7",4)),0,dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.8",4)));
+-    TextView heading=cobraText(title,dark?vtheme().color("cobra.cobraOpenSheet.colors.5",Color.WHITE):cobraThemeColor("text",mTheme.text),18);heading.setTypeface(vtheme().font("cobra.cobraOpenSheet.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));heading.setMaxLines(2);
++    TextView heading=cobraText(title,dark?vtheme().color("cobra.cobraOpenSheet.colors.5",Color.WHITE):cobraThemeColor("text",mTheme.text),18);heading.setTypeface(vtheme().font("cobra.cobraOpenSheet.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));heading.setMaxLines(2);heading.setLetterSpacing(.005f);
+     copy.addView(heading,new LinearLayout.LayoutParams(-1,-2));
+     if(detail!=null&&!detail.isEmpty()){TextView sub=cobraText(detail,dark?vtheme().color("cobra.cobraOpenSheet.colors.6",0xff9fb2c6):cobraThemeColor("muted",mTheme.muted),12);sub.setMaxLines(3);copy.addView(sub,new LinearLayout.LayoutParams(-1,-2));}
+     header.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
+@@ -6322,7 +6355,7 @@
+     }
+     @Override protected void onMeasure(int width,int height){int w=View.MeasureSpec.getSize(width),h=dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.2",74));labelWidth=Math.max(dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.3",110)),Math.min(dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.4",180)),w/4));setMeasuredDimension(w,h);for(int i=0;i<getChildCount();i++){float[] r=bounds.get(i);int cw=r==null?labelWidth:Math.max(1,Math.round((w-labelWidth)*(r[1]-r[0]))-dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.5",2)));getChildAt(i).measure(View.MeasureSpec.makeMeasureSpec(cw,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h-dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.6",3)),View.MeasureSpec.EXACTLY));}}
+     @Override protected void onLayout(boolean change,int l,int t,int r,int b){int w=r-l;for(int i=0;i<getChildCount();i++){View v=getChildAt(i);float[] range=bounds.get(i);int x=range==null?0:labelWidth+Math.round((w-labelWidth)*range[0]);v.layout(x,0,x+v.getMeasuredWidth(),v.getMeasuredHeight());}}
+-    @Override protected void dispatchDraw(android.graphics.Canvas c){super.dispatchDraw(c);long now=System.currentTimeMillis();if(now>=window&&now<=window+7200000L){float x=labelWidth+(getWidth()-labelWidth)*(now-window)/7200000f;line.setColor(vtheme().color("cobra.CobraTimelineRow.colors.1",0xffff526b));line.setStrokeWidth(dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.7",2)));c.drawLine(x,0,x,getHeight(),line);}}
++    @Override protected void dispatchDraw(android.graphics.Canvas c){super.dispatchDraw(c);long now=System.currentTimeMillis();if(now>=window&&now<=window+7200000L){float x=labelWidth+(getWidth()-labelWidth)*(now-window)/7200000f;line.setColor(vtheme().color("cobra.CobraTimelineRow.colors.1",cobraModeColor("accent")));line.setStrokeWidth(dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.7",2)));c.drawLine(x,0,x,getHeight(),line);}}
+   }
+ 
+   private void cobraRefreshProgrammeLabels() {
+@@ -6652,7 +6685,7 @@
+     LinearLayout transport=new LinearLayout(this);transport.setGravity(Gravity.CENTER);transport.setPadding(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.14",16)),0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.15",16)),0);
+     CobraIconButton prev=cobraIcon("prev","Previous channel",true,v->stepChannel(-1));
+     CobraIconButton rewind=cobraIcon("prev","Rewind Live TV 30 seconds",true,v->cobraRewindLive(30000L));rewind.caption("-30s");rewind.setTag("cobra_live_rewind_30");mCobraLiveRewindButton=rewind;
+-    CobraIconButton pause=cobraIcon("pause","Pause",true,v->toggleCobraPlayerPlayPause());pause.setTag("cobra_player_play_pause");pause.setBackground(surface(vtheme().color("cobra.cobraBuildPlayerChrome.colors.5",0x87000000),40,vtheme().color("cobra.cobraBuildPlayerChrome.colors.6",0x55ffffff),1));
++    CobraIconButton pause=cobraIcon("pause","Pause",true,v->toggleCobraPlayerPlayPause());pause.setTag("cobra_player_play_pause");pause.setBackground(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(0x4062aaff),cobraPanelSurface(vtheme().color("cobra.cobraBuildPlayerChrome.colors.5",0xc909101c),40,vtheme().color("cobra.cobraBuildPlayerChrome.colors.6",0x906b9ccc)),surface(Color.WHITE,40,Color.TRANSPARENT,0)));
+     CobraIconButton live=cobraIcon("play","Go Live",true,v->cobraGoLive());live.caption("LIVE");live.setTag("cobra_live_edge");mCobraGoLiveButton=live;
+     CobraIconButton next=cobraIcon("next","Next channel",true,v->stepChannel(1));
+     transport.addView(prev,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.16",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.17",56))));
+@@ -6689,7 +6722,7 @@
+   private void showCobraPlayerDrawer() {
+     if(mPlayerOverlay==null||mCobraPlayerLocked||mInPictureInPicture)return;
+     if(closeCobraPlayerDrawer())return;closeCobraActionSheet();closeCobraMultiPicker(false);
+-    FrameLayout panel=new FrameLayout(this);mCobraPlayerDrawer=panel;panel.setTag("cobra_player_channel_drawer");panel.setBackgroundColor(vtheme().color("cobra.showCobraPlayerDrawer.colors.1",0xff101924));panel.setElevation(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.1",12)));
++    FrameLayout panel=new FrameLayout(this);mCobraPlayerDrawer=panel;panel.setTag("cobra_player_channel_drawer");panel.setBackground(cobraPanelSurface(vtheme().color("cobra.showCobraPlayerDrawer.colors.1",0xfc080b11),0,0xff293244));panel.setElevation(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.1",12)));
+     LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.2",10)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.3",8)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.4",10)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.5",14)));panel.addView(content,new FrameLayout.LayoutParams(-1,-1));
+     LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);TextView title=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.1","Live TV"),vtheme().color("cobra.showCobraPlayerDrawer.colors.2",Color.WHITE),18);title.setTypeface(vtheme().font("cobra.showCobraPlayerDrawer.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));head.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.6",48)),1));head.addView(cobraIcon("close","Close channel drawer",true,v->closeCobraPlayerDrawer()),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.7",48)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.8",48))));content.addView(head,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.9",50))));
+     LinearLayout tabs=new LinearLayout(this);String[] labels={"Favorites","Recent","All","Groups"},filters={"FAVORITES","RECENT","ALL","CATEGORIES"};for(int i=0;i<labels.length;i++){final String filter=filters[i];tabs.addView(cobraTextButton(labels[i],true,()->cobraRenderPlayerDrawer(filter)),new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.10",48)),1));}content.addView(tabs,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.11",48))));
+@@ -6832,12 +6865,14 @@
+   private int cobraModeColorBuiltin(String name){
+     boolean dark=cobraModeDark(),oled="oled".equals(cobraEffectiveAppearanceMode()),tv="grid".equals(mCobraGuideStyle);
+     if("accent".equals(name))return cobraThemeColor("accent",mTheme.accent);
+-    if("text".equals(name))return dark?vtheme().color("cobra.cobraModeColorBuiltin.colors.1",0xffeef3f8):vtheme().color("cobra.cobraModeColorBuiltin.colors.2",0xff152536);
+-    if("muted".equals(name))return dark?vtheme().color("cobra.cobraModeColorBuiltin.colors.3",0xffa6b5c6):vtheme().color("cobra.cobraModeColorBuiltin.colors.4",0xff526476);
+-    if("line".equals(name))return dark?vtheme().color("cobra.cobraModeColorBuiltin.colors.5",0xff2a3542):vtheme().color("cobra.cobraModeColorBuiltin.colors.6",0xffd4dde7);
+-    if("rail".equals(name))return oled?vtheme().color("cobra.cobraModeColorBuiltin.colors.7",0xff080b10):dark?vtheme().color("cobra.cobraModeColorBuiltin.colors.8",0xff151c25):vtheme().color("cobra.cobraModeColorBuiltin.colors.9",0xffe4eaf1);
+-    if("panel".equals(name))return oled?vtheme().color("cobra.cobraModeColorBuiltin.colors.10",0xff0c1118):dark?vtheme().color("cobra.cobraModeColorBuiltin.colors.11",0xff1a2430):vtheme().color("cobra.cobraModeColorBuiltin.colors.12",Color.WHITE);
+-    return oled?vtheme().color("cobra.cobraModeColorBuiltin.colors.13",Color.BLACK):dark?(tv?vtheme().color("cobra.cobraModeColorBuiltin.colors.14",0xff0e141d):vtheme().color("cobra.cobraModeColorBuiltin.colors.15",0xff0a121c)):(tv?vtheme().color("cobra.cobraModeColorBuiltin.colors.16",0xffedf1f6):vtheme().color("cobra.cobraModeColorBuiltin.colors.17",0xfff4f7fb));
++    // Guide and legacy screens share native palette owners. Keep every published
++    // per-component visual slot above those defaults for installed theme packages.
++    if("text".equals(name))return vtheme().color(dark?"cobra.cobraModeColorBuiltin.colors.1":"cobra.cobraModeColorBuiltin.colors.2",cobraThemeColor("text",mTheme.text));
++    if("muted".equals(name))return vtheme().color(dark?"cobra.cobraModeColorBuiltin.colors.3":"cobra.cobraModeColorBuiltin.colors.4",cobraThemeColor("muted",mTheme.muted));
++    if("line".equals(name))return vtheme().color(dark?"cobra.cobraModeColorBuiltin.colors.5":"cobra.cobraModeColorBuiltin.colors.6",cobraThemeColor("line",mTheme.line));
++    if("rail".equals(name))return vtheme().color(oled?"cobra.cobraModeColorBuiltin.colors.7":dark?"cobra.cobraModeColorBuiltin.colors.8":"cobra.cobraModeColorBuiltin.colors.9",cobraThemeColor("rail",mTheme.rail));
++    if("panel".equals(name))return vtheme().color(oled?"cobra.cobraModeColorBuiltin.colors.10":dark?"cobra.cobraModeColorBuiltin.colors.11":"cobra.cobraModeColorBuiltin.colors.12",cobraThemeColor("panel",mTheme.panel));
++    return vtheme().color(oled?"cobra.cobraModeColorBuiltin.colors.13":dark?(tv?"cobra.cobraModeColorBuiltin.colors.14":"cobra.cobraModeColorBuiltin.colors.15"):(tv?"cobra.cobraModeColorBuiltin.colors.16":"cobra.cobraModeColorBuiltin.colors.17"),cobraThemeColor("background",mTheme.background));
+   }
+   private String cobraModeName(String key){return "grid".equals(key)?"TV Grid":"compact".equals(key)?"Compact":"cards".equals(key)?"Cards":"focus".equals(key)?"Focus":"Mobile";}
+   private String cobraModeSourceName(){for(LiveSource s:mSources)if(s.id.equals(mCobraGuideSource))return s.name;return "All playlists";}
+@@ -6991,10 +7026,10 @@
+ 
+   private android.graphics.drawable.Drawable cobraModeSurface(int radius,boolean raised){
+     int accent=cobraModeColor("accent");android.graphics.drawable.StateListDrawable states=new android.graphics.drawable.StateListDrawable();
+-    states.addState(new int[]{android.R.attr.state_focused},surface(cobraModeDark()?vtheme().color("cobra.cobraModeSurface.colors.1",0xff263d51):vtheme().color("cobra.cobraModeSurface.colors.2",0xffd6e9f6),radius,accent,2));
+-    states.addState(new int[]{android.R.attr.state_selected},surface(cobraModeDark()?vtheme().color("cobra.cobraModeSurface.colors.3",0xff1d3549):vtheme().color("cobra.cobraModeSurface.colors.4",0xffe0edf7),radius,cobraAlpha(accent,135),1));
+-    states.addState(new int[]{},surface(raised?cobraModeColor("panel"):vtheme().color("cobra.cobraModeSurface.colors.5",Color.TRANSPARENT),radius,vtheme().color("cobra.cobraModeSurface.colors.6",Color.TRANSPARENT),0));
+-    return new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(cobraModeDark()?vtheme().color("cobra.cobraModeSurface.colors.7",0x24ffffff):vtheme().color("cobra.cobraModeSurface.colors.8",0x22002850)),states,surface(vtheme().color("cobra.cobraModeSurface.colors.9",Color.WHITE),radius,vtheme().color("cobra.cobraModeSurface.colors.10",Color.TRANSPARENT),0));
++    states.addState(new int[]{android.R.attr.state_focused},surface(cobraModeDark()?vtheme().color("cobra.cobraModeSurface.colors.1",0xff162d49):vtheme().color("cobra.cobraModeSurface.colors.2",0xffe5efff),radius,accent,2));
++    states.addState(new int[]{android.R.attr.state_selected},surface(cobraModeDark()?vtheme().color("cobra.cobraModeSurface.colors.3",0xff111f32):vtheme().color("cobra.cobraModeSurface.colors.4",0xffedf3fc),radius,cobraAlpha(accent,155),1));
++    states.addState(new int[]{},surface(raised?cobraModeColor("panel"):vtheme().color("cobra.cobraModeSurface.colors.5",Color.TRANSPARENT),radius,vtheme().color("cobra.cobraModeSurface.colors.6",raised?cobraModeColor("line"):Color.TRANSPARENT),raised?1:0));
++    return new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(cobraModeDark()?vtheme().color("cobra.cobraModeSurface.colors.7",0x2462aaff):vtheme().color("cobra.cobraModeSurface.colors.8",0x1c145fdf)),states,surface(vtheme().color("cobra.cobraModeSurface.colors.9",Color.WHITE),radius,vtheme().color("cobra.cobraModeSurface.colors.10",Color.TRANSPARENT),0));
+   }
+   private TextView cobraModeLabel(float size,boolean strong){TextView t=cobraText("",cobraModeColor(strong?"text":"muted"),size);if(strong)t.setTypeface(vtheme().font("cobra.cobraModeLabel.styles.1",Typeface.create("sans-serif-medium",0)));t.setSingleLine(true);return t;}
+   private boolean cobraModeSelected(Channel c){return mGuidePreviewChannel!=null&&c.id.equals(mGuidePreviewChannel.id);}
+@@ -7768,10 +7803,10 @@
+     if(!cobraSheetIsDark()||cobraModeDark())return cobraModeSurface(radius,true);
+     int accent=cobraModeColor("accent");
+     android.graphics.drawable.StateListDrawable states=new android.graphics.drawable.StateListDrawable();
+-    states.addState(new int[]{android.R.attr.state_focused},surface(vtheme().color("cobra.cobraModeSurface.colors.1",0xff263d51),radius,accent,2));
+-    states.addState(new int[]{android.R.attr.state_selected},surface(vtheme().color("cobra.cobraModeSurface.colors.3",0xff1d3549),radius,cobraAlpha(accent,135),1));
+-    states.addState(new int[]{},surface(vtheme().color("cobra.cobraModeColorBuiltin.colors.11",0xff1a2430),radius,vtheme().color("cobra.cobraModeSurface.colors.6",Color.TRANSPARENT),0));
+-    return new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(vtheme().color("cobra.cobraModeSurface.colors.7",0x24ffffff)),states,surface(vtheme().color("cobra.cobraModeSurface.colors.9",Color.WHITE),radius,vtheme().color("cobra.cobraModeSurface.colors.10",Color.TRANSPARENT),0));
++    states.addState(new int[]{android.R.attr.state_focused},surface(vtheme().color("cobra.cobraModeSurface.colors.1",0xff162d49),radius,accent,2));
++    states.addState(new int[]{android.R.attr.state_selected},surface(vtheme().color("cobra.cobraModeSurface.colors.3",0xff111f32),radius,cobraAlpha(accent,155),1));
++    states.addState(new int[]{},surface(vtheme().color("cobra.cobraModeColorBuiltin.colors.11",0xff0b0f16),radius,vtheme().color("cobra.cobraModeSurface.colors.6",0xff293244),1));
++    return new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(vtheme().color("cobra.cobraModeSurface.colors.7",0x2462aaff)),states,surface(vtheme().color("cobra.cobraModeSurface.colors.9",Color.WHITE),radius,vtheme().color("cobra.cobraModeSurface.colors.10",Color.TRANSPARENT),0));
+   }
+ 
+   private LinearLayout cobraDetailRow(String icon,String title,String detail,String tag,boolean selected,Runnable action){
+@@ -9956,9 +9991,11 @@
+     int count=Math.min(group.getChildCount(),14);
+     for(int i=0;i<count;i++){
+       View child=group.getChildAt(i);if(child==null||child.hasFocus())continue;
+-      cobraResetMotion(child);child.setAlpha(0f);child.setTranslationY(dp(8));child.setScaleX(.992f);child.setScaleY(.992f);
++      // Keep every hit rectangle fixed while the surface fades in. A long
++      // settings list must not leave later controls waiting half a second.
++      cobraResetMotion(child);child.setAlpha(0f);
+       child.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f)
+-          .setStartDelay(i*CobraMotionSpec.STAGGER).setDuration(CobraMotionSpec.PANEL)
++          .setStartDelay(Math.min(i*CobraMotionSpec.STAGGER,66L)).setDuration(160L)
+           .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+     }
+   }
+--- a/tools/android/packaging/xbmc/src/Splash.java.in
++++ b/tools/android/packaging/xbmc/src/Splash.java.in
+@@ -645,13 +645,91 @@
+     return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
+   }
+ 
++  private String chooserAppearanceMode()
++  {
++    // Read Cobra's existing appearance preference; the chooser has no separate setting.
++    android.content.SharedPreferences prefs = getSharedPreferences("infinity_cobra_live", MODE_PRIVATE);
++    String mode = prefs.getString("cobra_appearance_mode", "dark");
++    if ("system".equals(mode))
++    {
++      boolean night = (getResources().getConfiguration().uiMode &
++          android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
++          android.content.res.Configuration.UI_MODE_NIGHT_YES;
++      return night ? ("oled".equals(prefs.getString("cobra_system_dark_variant", "dark"))
++          ? "oled" : "dark") : "light";
++    }
++    return "light".equals(mode) ? "light" : "oled".equals(mode) ? "oled" : "dark";
++  }
++
++  private int chooserBuiltinColor(String role, int light, int dark)
++  {
++    return vtheme().color("chooser.builtin." + role,
++        "light".equals(chooserAppearanceMode()) ? light : dark);
++  }
++
++  private void chooserPrepareBuiltinSystemBars()
++  {
++    int background = chooserBuiltinColor("background", android.graphics.Color.WHITE, android.graphics.Color.BLACK);
++    boolean darkIcons = cobraChooserDarkStatusIcons(background);
++    android.view.Window window = getWindow();
++    View decor = window.getDecorView();
++    // Keep the fallback's existing fitted layout. Only the bar colors and icon contrast change.
++    // The matching window underlay also covers OS-enforced transparent bars on newer Android.
++    decor.setBackgroundColor(background);
++    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
++    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
++        | android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
++    window.setStatusBarColor(Build.VERSION.SDK_INT >= 23 ? background : android.graphics.Color.BLACK);
++    window.setNavigationBarColor(Build.VERSION.SDK_INT >= 26 ? background : android.graphics.Color.BLACK);
++    if (Build.VERSION.SDK_INT >= 29)
++    {
++      window.setStatusBarContrastEnforced(false);
++      window.setNavigationBarContrastEnforced(false);
++    }
++    if (Build.VERSION.SDK_INT >= 30)
++    {
++      android.view.WindowInsetsController controller = window.getInsetsController();
++      if (controller != null)
++      {
++        int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
++            | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
++        controller.setSystemBarsAppearance(darkIcons ? mask : 0, mask);
++      }
++    }
++    else
++    {
++      int flags = decor.getSystemUiVisibility();
++      if (Build.VERSION.SDK_INT >= 23)
++        flags = darkIcons ? flags | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR : flags & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
++      if (Build.VERSION.SDK_INT >= 26)
++        flags = darkIcons ? flags | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR : flags & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
++      decor.setSystemUiVisibility(flags);
++    }
++  }
++
++  private android.graphics.drawable.Drawable chooserControlSurface(int fill, int stroke, int radius)
++  {
++    return chooserControlSurface(fill, stroke, radius,
++        chooserBuiltinColor("accent", 0xff145fdf, 0xff62aaff));
++  }
++
++  private android.graphics.drawable.Drawable chooserControlSurface(int fill, int stroke, int radius, int focus)
++  {
++    android.graphics.drawable.StateListDrawable states = new android.graphics.drawable.StateListDrawable();
++    states.addState(new int[]{android.R.attr.state_focused}, chooserSurface(fill, focus, radius));
++    states.addState(new int[]{}, chooserSurface(fill, stroke, radius));
++    return new android.graphics.drawable.RippleDrawable(
++        android.content.res.ColorStateList.valueOf((focus & 0x00ffffff) | 0x24000000),
++        states, chooserSurface(android.graphics.Color.WHITE, android.graphics.Color.WHITE, radius));
++  }
++
+   private android.graphics.drawable.GradientDrawable chooserSurface(int fill, int stroke, int radius)
+   {
+     android.graphics.drawable.GradientDrawable shape =
+         new android.graphics.drawable.GradientDrawable();
+     shape.setColor(fill);
+     shape.setCornerRadius(chooserDp(radius));
+-    shape.setStroke(chooserDp(vtheme().dimension("chooser.chooserSurface.dimensions.1",2)), stroke);
++    shape.setStroke(Math.max(1, chooserDp(vtheme().dimension("chooser.chooserSurface.dimensions.1",1))), stroke);
+     return shape;
+   }
+ 
+@@ -661,6 +739,7 @@
+     view.setText(value);
+     view.setTextColor(color);
+     view.setTextSize(size);
++    view.setTypeface(vtheme().font("chooser.chooserText.styles.1", android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)));
+     view.setGravity(android.view.Gravity.CENTER);
+     view.setPadding(chooserDp(vtheme().dimension("chooser.chooserText.dimensions.1",12)), chooserDp(vtheme().dimension("chooser.chooserText.dimensions.2",8)), chooserDp(vtheme().dimension("chooser.chooserText.dimensions.3",12)), chooserDp(vtheme().dimension("chooser.chooserText.dimensions.4",8)));
+     return view;
+@@ -669,38 +748,29 @@
+   private android.widget.Button chooserCard(String value, int fill, int stroke)
+   {
+     android.widget.Button card = new android.widget.Button(this);
++    boolean narrow = getResources().getConfiguration().screenWidthDp < 360;
+     card.setText(value);
+-    card.setTextColor(android.graphics.Color.rgb(242, 247, 255));
++    card.setTextColor(chooserBuiltinColor("text", 0xff101b2c, 0xfff7faff));
+     card.setTextSize(vtheme().number("chooser.chooserCard.numbers.2",16,8f,96f));
+     card.setGravity(android.view.Gravity.CENTER);
+     card.setAllCaps(false);
++    card.setTypeface(vtheme().font("chooser.chooserCard.styles.1", android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)));
+     card.setLetterSpacing(vtheme().number("chooser.chooserCard.numbers.1",0.03f,-0.02f,0.25f));
+-    card.setPadding(chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.1",16)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.2",18)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.3",16)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.4",18)));
+-    card.setMinHeight(chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.5",190)));
++    // Keep the existing corner settings control clear of both the title and copy.
++    card.setPadding(chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.1",narrow ? 12 : 16)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.2",66)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.3",narrow ? 12 : 16)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.4",18)));
++    card.setMinHeight(chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.5",210)));
+     card.setFocusable(true);
+-    card.setBackground(chooserSurface(fill, stroke, 24));
++    card.setBackground(chooserControlSurface(fill, stroke, 24));
+     return card;
+   }
+ 
+   private void setChooserCardState(android.widget.Button card, boolean infinity, boolean active)
+   {
+-    int fill;
+-    int stroke;
+-    if (infinity)
+-    {
+-      fill = active ? android.graphics.Color.rgb(18, 62, 84)
+-                    : android.graphics.Color.rgb(14, 34, 52);
+-      stroke = active ? android.graphics.Color.rgb(65, 211, 255)
+-                      : android.graphics.Color.rgb(38, 119, 158);
+-    }
+-    else
+-    {
+-      fill = active ? android.graphics.Color.rgb(66, 19, 32)
+-                    : android.graphics.Color.rgb(39, 17, 28);
+-      stroke = active ? android.graphics.Color.rgb(255, 70, 102)
+-                      : android.graphics.Color.rgb(140, 47, 67);
+-    }
+-    card.setBackground(chooserSurface(fill, stroke, 24));
++    int fill = active ? chooserBuiltinColor("selected", 0xffedf3fc, 0xff111f32)
++        : chooserBuiltinColor("panel", 0xfff5f8fd, "oled".equals(chooserAppearanceMode()) ? 0xff070a10 : 0xff0b0f16);
++    int stroke = active ? chooserBuiltinColor("accent", 0xff145fdf, 0xff62aaff)
++        : chooserBuiltinColor("rim", 0xffcbd7e8, 0xff293244);
++    card.setBackground(chooserControlSurface(fill, stroke, 24));
+   }
+ 
+   private void showExperienceCardSettings(String experience)
+@@ -713,7 +783,7 @@
+         "Launch " + label + " just this time",
+         "Ask every time"
+     };
+-    new android.app.AlertDialog.Builder(this)
++    new CobraVisualRenderer.DialogBuilder(this, vtheme(), "chooser.settings")
+         .setTitle(title)
+         .setItems(options, (dialog, which) -> {
+           if (which == 0)
+@@ -755,48 +825,57 @@
+ 
+   private void showLegacyInfinityExperienceChooser()
+   {
+-    final int cyan = android.graphics.Color.rgb(65, 211, 255);
+-    final int cobraRed = android.graphics.Color.rgb(255, 70, 102);
+-    final int white = android.graphics.Color.rgb(242, 247, 255);
+-    final int muted = android.graphics.Color.rgb(157, 174, 194);
++    final int white = chooserBuiltinColor("text", 0xff101b2c, 0xfff7faff);
++    final int muted = chooserBuiltinColor("muted", 0xff526176, 0xffb1bfd2);
++    final int panel = chooserBuiltinColor("panel", 0xfff5f8fd, "oled".equals(chooserAppearanceMode()) ? 0xff070a10 : 0xff0b0f16);
++    final int rim = chooserBuiltinColor("rim", 0xffcbd7e8, 0xff293244);
+     final int[] selected = {0};
+ 
+     android.widget.LinearLayout root = new android.widget.LinearLayout(this);
+     root.setOrientation(android.widget.LinearLayout.VERTICAL);
+     root.setGravity(android.view.Gravity.CENTER);
+-    root.setPadding(chooserDp(36), chooserDp(28), chooserDp(36), chooserDp(22));
+-    root.setBackgroundColor(android.graphics.Color.rgb(7, 11, 20));
++    int outer = getResources().getConfiguration().screenWidthDp < 360 ? 20 : 36;
++    root.setPadding(chooserDp(outer), chooserDp(28), chooserDp(outer), chooserDp(22));
++    root.setBackgroundColor(chooserBuiltinColor("background", android.graphics.Color.WHITE, android.graphics.Color.BLACK));
++    android.widget.ScrollView scroll = new android.widget.ScrollView(this);
++    scroll.setFillViewport(true); scroll.setClipToPadding(false);
++    scroll.setBackgroundColor(chooserBuiltinColor("background", android.graphics.Color.WHITE, android.graphics.Color.BLACK));
++    scroll.addView(root, new android.widget.ScrollView.LayoutParams(-1, -2));
+ 
+     android.widget.TextView brand = chooserText("INFINITY 2-IN-1", muted, 14);
+-    brand.setLetterSpacing(0.22f);
++    brand.setLetterSpacing(0.14f);
++    brand.setMinHeight(chooserDp(34));
+     root.addView(brand, new android.widget.LinearLayout.LayoutParams(
+-        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(34)));
++        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+ 
+     android.widget.TextView title = chooserText("Choose Your Experience", white, 32);
+-    title.setTypeface(null, android.graphics.Typeface.BOLD);
++    title.setTypeface(vtheme().font("chooser.title", android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)));
++    title.setMinHeight(chooserDp(58));
+     root.addView(title, new android.widget.LinearLayout.LayoutParams(
+-        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(58)));
++        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+ 
+     android.widget.TextView subtitle = chooserText(
+         "Two separate environments  •  One seamless application", muted, 16);
++    subtitle.setMinHeight(chooserDp(42));
+     root.addView(subtitle, new android.widget.LinearLayout.LayoutParams(
+-        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(42)));
++        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+ 
+     android.widget.LinearLayout cards = new android.widget.LinearLayout(this);
+     cards.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+     cards.setGravity(android.view.Gravity.CENTER);
++    cards.setMinimumHeight(chooserDp(230));
+     android.widget.LinearLayout.LayoutParams cardsParams =
+         new android.widget.LinearLayout.LayoutParams(
+-            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, chooserDp(230));
++            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+     cardsParams.topMargin = chooserDp(18);
+     root.addView(cards, cardsParams);
+ 
+     android.widget.Button infinity = chooserCard(
+         "∞  INFINITY\n\nYour Home for Movies, Shows,\nLive TV and More",
+-        android.graphics.Color.rgb(14, 34, 52), android.graphics.Color.rgb(38, 119, 158));
++        panel, rim);
+     android.widget.Button cobra = chooserCard(
+         "◈  COBRA\n\nLive TV Focused. Fast.\nSimple. Powerful.",
+-        android.graphics.Color.rgb(39, 17, 28), android.graphics.Color.rgb(140, 47, 67));
++        panel, rim);
+ 
+     android.widget.FrameLayout infinityCard = new android.widget.FrameLayout(this);
+     infinityCard.addView(infinity, new android.widget.FrameLayout.LayoutParams(
+@@ -811,8 +890,7 @@
+     infinitySettings.setMinHeight(0);
+     infinitySettings.setMinWidth(0);
+     infinitySettings.setContentDescription("Infinity settings");
+-    infinitySettings.setBackground(chooserSurface(
+-        android.graphics.Color.rgb(18, 62, 84), cyan, 18));
++    infinitySettings.setBackground(chooserControlSurface(panel, rim, 18));
+     android.widget.FrameLayout.LayoutParams infinityGearParams =
+         new android.widget.FrameLayout.LayoutParams(
+             chooserDp(48), chooserDp(48), android.view.Gravity.TOP | android.view.Gravity.END);
+@@ -832,8 +910,7 @@
+     cobraSettings.setMinHeight(0);
+     cobraSettings.setMinWidth(0);
+     cobraSettings.setContentDescription("Cobra settings");
+-    cobraSettings.setBackground(chooserSurface(
+-        android.graphics.Color.rgb(66, 19, 32), cobraRed, 18));
++    cobraSettings.setBackground(chooserControlSurface(panel, rim, 18));
+     android.widget.FrameLayout.LayoutParams cobraGearParams =
+         new android.widget.FrameLayout.LayoutParams(
+             chooserDp(48), chooserDp(48), android.view.Gravity.TOP | android.view.Gravity.END);
+@@ -841,11 +918,11 @@
+     cobraCard.addView(cobraSettings, cobraGearParams);
+ 
+     android.widget.LinearLayout.LayoutParams infinityParams =
+-        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
++        new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
+     infinityParams.rightMargin = chooserDp(10);
+     cards.addView(infinityCard, infinityParams);
+     android.widget.LinearLayout.LayoutParams cobraParams =
+-        new android.widget.LinearLayout.LayoutParams(0, chooserDp(210), 1);
++        new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
+     cobraParams.leftMargin = chooserDp(10);
+     cards.addView(cobraCard, cobraParams);
+ 
+@@ -871,8 +948,8 @@
+     setChooserCardState(infinity, true, true);
+     setChooserCardState(cobra, false, false);
+ 
+-    setContentView(root);
+-    setContentView(root);
++    setContentView(scroll);
++    chooserPrepareBuiltinSystemBars();
+   }
+ 
+   private static final int INFINITY_EXPERIENCE_THEME_BRIDGE = 1;
+@@ -1089,7 +1166,7 @@
+     android.widget.TextView text = chooserText(value, color, sp);
+     text.setPadding(0, 0, 0, 0);
+     text.setGravity(gravity);
+-    text.setTypeface(vtheme().font("chooser.chooserStyledText.styles.1",android.graphics.Typeface.create("sans-serif", medium ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL)));
++    text.setTypeface(vtheme().font("chooser.chooserStyledText.styles.1",android.graphics.Typeface.create(medium ? "sans-serif-medium" : "sans-serif", android.graphics.Typeface.NORMAL)));
+     text.setIncludeFontPadding(false);
+     return text;
+   }
+@@ -1121,7 +1198,7 @@
+ 
+     android.widget.TextView gear = chooserStyledText(vtheme().copy("chooser.chooserExperienceCard.copy.1","⚙"), theme.text, 17, false, android.view.Gravity.CENTER);
+     gear.setFocusable(true); gear.setClickable(true); gear.setTag(infinity ? "experience-settings-infinity" : "experience-settings-cobra"); gear.setContentDescription(title + " settings");
+-    gear.setBackground(chooserSurface((top & 0x00ffffff) | 0xdd000000, border, 16));
++    gear.setBackground(chooserControlSurface((top & 0x00ffffff) | 0xdd000000, border, 16, glow));
+     gear.setOnClickListener(v -> settings.run());
+     android.widget.FrameLayout.LayoutParams gearParams = new android.widget.FrameLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.8",44)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.9",44)), android.view.Gravity.TOP | android.view.Gravity.END);
+     card.addView(gear, gearParams);
+@@ -1129,7 +1206,11 @@
+     card.setOnClickListener(v -> launch.run());
+     card.setOnFocusChangeListener((v, focused) -> {
+       card.setBackground(chooserGradient(top, bottom, focused ? glow : border, theme.cardRadius, focused));
+-      card.animate().scaleX(focused ? 1.015f : 1f).scaleY(focused ? 1.015f : 1f).setDuration(theme.motionMs).start();
++      card.animate().cancel();
++      long duration = vtheme().motion("chooser.layout.motion_ms", theme.motionMs);
++      if (duration == 0) { card.setScaleX(focused ? 1.015f : 1f); card.setScaleY(focused ? 1.015f : 1f); }
++      else card.animate().scaleX(focused ? 1.015f : 1f).scaleY(focused ? 1.015f : 1f)
++          .setDuration(duration).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+       card.setElevation(chooserDp(focused ? 9 : 3));vtheme().paint(card,infinity?"chooser.card.infinity":"chooser.card.cobra");
+     });
+     vtheme().tree(card,infinity?"chooser.card.infinity":"chooser.card.cobra");return card;
+@@ -1314,7 +1395,7 @@
+   }
+ 
+   private CobraVisualRenderer mVisualTheme;
+-  private CobraVisualRenderer vtheme(){if(mVisualTheme==null)mVisualTheme=new CobraVisualRenderer(this);return mVisualTheme;}
++  private CobraVisualRenderer vtheme(){if(mVisualTheme==null)mVisualTheme=new CobraVisualRenderer(this);return mVisualTheme.mode(chooserAppearanceMode());}
+   private boolean showVisualExperienceScene(ExperienceTheme theme){
+     org.json.JSONObject scene=vtheme().scene("chooser");if(scene==null)return false;
+     int availableHeightDp=Math.round(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
