@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 import org.robolectric.shadows.ShadowDisplay;
+import org.robolectric.util.ReflectionHelpers;
+import org.robolectric.util.ReflectionHelpers.ClassParameter;
 import static org.junit.Assert.*;
 
 /** Production Health Center, synthetic guide/player/format counters. No device, decoder or network proof. */
@@ -89,9 +91,14 @@ public class Cobra2103205SessionCardTest {
   }
   @Config(shadows=ReportedRefreshDisplay.class) @Test public void currentDisplayIsObservedWithoutChangingRefreshPolicyOrEnablingOverlay()throws Exception{
     InfinityLiveActivity a=ui.fixture(16);try{
+      // This controlled fixture bypasses normal Activity creation. Preserve the
+      // honest unknown result before associating its framework context with a display.
+      assertNull(call(a,"cobraCurrentDisplay"));assertTrue(card(a).isNull("display_refresh_hz"));
+      ReflectionHelpers.callInstanceMethod(a,"updateDisplay",ClassParameter.from(int.class,Display.DEFAULT_DISPLAY));
       Display display=(Display)call(a,"cobraCurrentDisplay");assertNotNull(display);ReportedRefreshDisplay.reported=90f;put(a,"mCobraActiveHz",17f);
       int requested=a.getWindow().getAttributes().preferredDisplayModeId;assertEquals(90,card(a).getDouble("display_refresh_hz"),0.01);
       ReportedRefreshDisplay.reported=120f;assertEquals(120,card(a).getDouble("display_refresh_hz"),0.01);
+      ReportedRefreshDisplay.reported=Float.NaN;assertTrue(card(a).isNull("display_refresh_hz"));
       assertEquals(17f,(Float)get(a,"mCobraActiveHz"),0f);assertEquals(requested,a.getWindow().getAttributes().preferredDisplayModeId);assertNull(get(a,"mCobraPerformanceOverlayView"));
     }finally{ui.clean(a);}
   }

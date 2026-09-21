@@ -37,6 +37,13 @@ def main():
     adapter_run = 'python3 audit205/repairs/cobra-final-features-2103205/host_timeshift_adapter.py --fixture audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py'
     assert text.count(adapter_gate) == text.count(adapter_run) == 1
     assert text.index(adapter_gate) < text.index(upgrade) < text.index(adapter_run) < text.index('id: build205')
+    prior_adapter = 'python3 audit204/repairs/cobra-oled-blue-2103204/adapt_inherited_tests.py --root . --out audit204/android-test-adaptations.json'
+    theme_guard = 'python3 audit205/repairs/cobra-final-features-2103205/test_theme_fixture_adapter.py --fixture repair202-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103162ThemeRotationTest.java --out audit205/theme-fixture-adapter-guards.json'
+    theme_adapter = 'python3 audit205/repairs/cobra-final-features-2103205/theme-fixture-adapter.py --root . --out audit205/theme-fixture-adaptation.json'
+    theme_evidence = 'cp repair202-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103162ThemeRotationTest.java audit205/theme-fixture/Cobra2103162ThemeRotationTest.java'
+    assert text.count(theme_guard) == text.count(theme_adapter) == text.count(theme_evidence) == 1
+    assert text.index(prior_adapter) < text.index(theme_guard) < text.index(theme_adapter) < text.index(theme_evidence)
+    assert text.index(theme_evidence) < text.index("out=Path('audit198/targeted')")
     for phase in ['verify', 'deliver']:
         assert text.count('python3 audit205/repairs/cobra-final-features-2103205/ci.py ' + phase) == 1
     assert 'steps.build205.outcome' in text and 'steps.build204.outcome' not in text

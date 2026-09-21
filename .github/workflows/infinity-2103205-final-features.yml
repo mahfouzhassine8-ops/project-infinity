@@ -714,6 +714,10 @@ jobs:
           python3 audit202/repairs/cobra-player-refinement-2103202/adapt_inherited_tests.py --root . --phase android --out audit202/android-test-adaptations.json
           python3 audit203/repairs/cobra-pip-call-2103203/adapt_inherited_tests.py --root . --out audit203/android-test-adaptations.json
           python3 audit204/repairs/cobra-oled-blue-2103204/adapt_inherited_tests.py --root . --out audit204/android-test-adaptations.json
+          python3 audit205/repairs/cobra-final-features-2103205/test_theme_fixture_adapter.py --fixture repair202-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103162ThemeRotationTest.java --out audit205/theme-fixture-adapter-guards.json
+          python3 audit205/repairs/cobra-final-features-2103205/theme-fixture-adapter.py --root . --out audit205/theme-fixture-adaptation.json
+          mkdir -p audit205/theme-fixture
+          cp repair202-build/xbmc/src/test/java/com/projectinfinity/kodi/Cobra2103162ThemeRotationTest.java audit205/theme-fixture/Cobra2103162ThemeRotationTest.java
           # 2103188 intentionally supersedes only the two 2103187 assertions
           # that required non-IDR compatibility to remain disabled.
           python3 - <<'PY'

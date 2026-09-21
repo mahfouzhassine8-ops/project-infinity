@@ -108,6 +108,25 @@ def verify():
 
 
 def deliver():
+    theme_guards = json.loads(Path('audit205/theme-fixture-adapter-guards.json').read_text())
+    theme_fixture = json.loads(Path('audit205/theme-fixture-adaptation.json').read_text())
+    require(theme_guards.get('suite') == '205 explicit theme-preview fixture adapter guards' and
+            theme_guards.get('tests') == 7 and theme_guards.get('failures') == 0 and
+            theme_guards.get('errors') == 0 and theme_guards.get('passed') is True and
+            theme_guards.get('physical_device_verified') is False, 'Theme fixture adapter guards missing/nonpassing')
+    require(theme_fixture.get('status') == 'adapted' and
+            theme_fixture.get('frozen_source_sha256') == theme_fixture.get('input_sha256') ==
+            '0a17437b2064e81df1e721ab0ef439a2d2a0aa76c26ae01dfbd4e9b708651ddb' and
+            theme_fixture.get('output_sha256') ==
+            sha('audit205/theme-fixture/Cobra2103162ThemeRotationTest.java') ==
+            'ebf89cdcda0c0ec2d96d53493e0f141a9b842d36cce41e0246636f9abf738962',
+            'Unreviewed generated theme fixture adaptation')
+    require(theme_fixture.get('historical_repository_tests_modified') is False and
+            theme_fixture.get('case_names_unchanged') is True and
+            theme_fixture.get('original_assertions_byte_identical') is True and
+            theme_fixture.get('changes_outside_reviewed_insertion') is False and
+            theme_fixture.get('physical_device_verified') is False,
+            'Inherited theme assertion preservation contract missing')
     inherited = json.loads((ROOT / 'inherited-android-cases.json').read_text())
     new = json.loads((ROOT / 'new-android-cases.json').read_text())
     parent = ROOT.parent / 'cobra-oled-blue-2103204'

@@ -1,9 +1,15 @@
 package com.projectinfinity.kodi;
 
+import android.app.Application;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import static org.junit.Assert.*;
 
 /** Exact production state machine with synthetic Android routing events; not device/network proof. */
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk=34,application=Application.class,manifest=Config.NONE)
 public class Cobra2103205NetworkPolicyTest {
   private final CobraNetworkIntelligence.State state=new CobraNetworkIntelligence.State();
   private final Object wifi=new Object(),cell=new Object();

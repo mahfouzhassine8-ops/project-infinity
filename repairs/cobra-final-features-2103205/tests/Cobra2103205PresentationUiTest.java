@@ -96,6 +96,8 @@ public class Cobra2103205PresentationUiTest {
   @Test public void nightMenuPersistsAppliesBlackChromeAndRetainsAllControlsAndTransport()throws Exception{
     single();Matrix matrix=texture.getTransform(new Matrix());controls();assertFalse(prefs.getBoolean(CobraPresentationEffects.NIGHT,false));
     toggleNight();assertTrue(prefs.getBoolean(CobraPresentationEffects.NIGHT,false));assertEquals(true,call("cobraNightCinemaActive"));controls();
+    assertFalse("Night Cinema must preserve disabled rewind",prefs.getBoolean("cobra_live_rewind_enabled",false));
+    assertEquals(View.GONE,tag("cobra_live_timeshift_seek").getVisibility());
     assertEquals(View.GONE,((View)get(a,"mCobraPlayerSchedule")).getVisibility());assertEquals(View.GONE,((View)get(a,"mCobraPlayerUpcoming")).getVisibility());
     call("cobraRefreshProgrammeLabels");assertEquals(View.GONE,((View)get(a,"mCobraPlayerSchedule")).getVisibility());
     LinearLayout chrome=(LinearLayout)get(a,"mPlayerChrome");View footer=chrome.getChildAt(chrome.getChildCount()-1);
@@ -106,7 +108,9 @@ public class Cobra2103205PresentationUiTest {
     toggleNight();assertFalse(prefs.getBoolean(CobraPresentationEffects.NIGHT,false));assertEquals(View.VISIBLE,((View)get(a,"mCobraPlayerSchedule")).getVisibility());controls();unchangedVideo(matrix);
   }
   @Test public void nightTimelineStillSeeksThroughExistingUserListenerOnly()throws Exception{
-    single();toggleNight();player.writes.clear();SeekBar seek=(SeekBar)tag("cobra_live_timeshift_seek");assertEquals(View.VISIBLE,seek.getVisibility());
+    // The protected rewind preference is Off by default. Night Cinema must not enable it.
+    prefs.edit().putBoolean("cobra_live_rewind_enabled",true).commit();
+    single();assertEquals(true,call("cobraTimeshiftTimelineAvailable"));toggleNight();player.writes.clear();SeekBar seek=(SeekBar)tag("cobra_live_timeshift_seek");assertEquals(View.VISIBLE,seek.getVisibility());
     seek.setProgress(250,true); // Programmatic/animated progress must not seek.
     assertTrue(player.writes.isEmpty());
     assertTrue(seek.onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT,new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_LEFT)));
@@ -119,7 +123,13 @@ public class Cobra2103205PresentationUiTest {
     Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(600));assertEquals(View.VISIBLE,chrome.getVisibility());
     put(a,"mCobraTimeshiftDragging",true);Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2000));assertEquals(View.VISIBLE,chrome.getVisibility());
     put(a,"mCobraTimeshiftDragging",false);call("showPlayerSettingsDrawer");Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2400));assertNotNull(get(a,"mCobraActionSheet"));
-    call("closeCobraActionSheet");call("showPlayerChromeTemporarily");Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2300));assertEquals(View.GONE,chrome.getVisibility());
+    call("closeCobraActionSheet");call("showPlayerChromeTemporarily");
+    assertEquals(true,call("cobraNightCinemaActive"));assertEquals(true,call("cobraChromeCanHide",chrome));
+    // This fixture pauses Choreographer: a bulk idle advances time without delivering
+    // the 150ms fade frames. Drive real frame steps and check both sides of the deadline.
+    ui.frames(129);assertEquals("Before the 2100ms deadline",View.VISIBLE,chrome.getVisibility());assertEquals(1f,chrome.getAlpha(),.001f);
+    ui.frames(6);assertEquals("During the existing fade",View.VISIBLE,chrome.getVisibility());assertTrue("Hide starts after 2100ms",chrome.getAlpha()<1f);
+    ui.frames(10);assertEquals("Fade completes without another interaction",View.GONE,chrome.getVisibility());
   }
   @Test public void nightIsFullscreenOnlyAndSafeModeKeepsStoredPreferenceRecoverable()throws Exception{
     single();toggleNight();assertEquals(true,call("cobraNightCinemaActive"));
@@ -152,7 +162,7 @@ public class Cobra2103205PresentationUiTest {
   @Test public void installedArtworkThemeRetainsArtAndExplicitColorsWhileAmbientRemainsActive()throws Exception{
     Bitmap art=Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888);
     for(int x=0;x<32;x++)for(int y=0;y<32;y++)art.setPixel(x,y,(x/8+y/8)%2==0?0xffab7021:0xff284625);
-    JSONObject json=new JSONObject("{\"id\":\"installed-art-fixture\",\"colors\":{\"fixture_accent\":\"#DD9955\"},\"styles\":{\"screen\":{\"image\":\"art\",\"image_fit\":\"stretch\",\"radius_dp\":0}}}");
+    JSONObject json=new JSONObject("{\"id\":\"installed-art-fixture\",\"base\":{\"colors\":{\"fixture_accent\":\"#DD9955\"},\"styles\":{\"screen\":{\"image\":\"art\",\"image_fit\":\"stretch\",\"radius_dp\":0}}}}");
     Constructor<CobraVisualTheme> constructor=CobraVisualTheme.class.getDeclaredConstructor(JSONObject.class,File.class,Map.class,long.class);constructor.setAccessible(true);
     Map<String,Bitmap> images=new HashMap<>();images.put("art",art);CobraVisualRenderer.active=constructor.newInstance(json,null,images,4096L);
     CobraVisualRenderer renderer=(CobraVisualRenderer)call("vtheme");assertTrue(renderer.installed());

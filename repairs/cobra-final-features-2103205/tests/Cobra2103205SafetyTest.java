@@ -200,4 +200,16 @@ public class Cobra2103205SafetyTest {
     CobraPresentationSafety.previewPrevious(activity);drain();assertEquals("second",new CobraVisualRenderer(activity).displayName());assertEquals(prior,CobraVisualTheme.readPointer(app).toString());
     CobraPresentationSafety.cancel(activity,true);assertEquals(prior,CobraVisualTheme.readPointer(app).toString());assertEquals("builtin",new CobraVisualRenderer(activity).displayName());
   }
+  @Test public void previousInstalledThemeIsExactButUncommittedUntilNativeKeep()throws Exception{
+    CobraVisualTheme original=installed("hm-test","#123456");String generation=original.directory.getName();
+    CobraPresentationSafety.restoreBuiltIn(activity,null);drain();
+    assertEquals("builtin",CobraVisualRenderer.active.id);assertEquals("",CobraVisualTheme.readPointer(app).optString("active"));assertEquals(generation,CobraVisualTheme.readPointer(app).optString("previous"));
+    CobraPresentationSafety.previewPrevious(activity);drain();CobraVisualRenderer renderer=new CobraVisualRenderer(activity);
+    assertTrue(CobraPresentationSafety.isPreviewing(activity));assertEquals("hm-test",renderer.displayName());assertEquals(Color.parseColor("#123456"),renderer.color("palette.accent",Color.BLUE));
+    assertEquals("builtin",CobraVisualRenderer.active.id);assertEquals("",CobraVisualTheme.readPointer(app).optString("active"));assertEquals("builtin",CobraVisualTheme.load(app).id);
+    AlertDialog prompt=ShadowAlertDialog.getLatestAlertDialog();assertTrue(prompt.isShowing());assertEquals("Keep Theme",prompt.getButton(AlertDialog.BUTTON_POSITIVE).getText().toString());assertTrue(prompt.getButton(AlertDialog.BUTTON_POSITIVE).performClick());drain();
+    assertFalse(CobraPresentationSafety.isPreviewing(activity));assertEquals("hm-test",CobraVisualRenderer.active.id);assertEquals(generation,CobraVisualTheme.readPointer(app).optString("active"));
+    CobraVisualTheme cold=CobraVisualTheme.load(app);assertEquals("hm-test",cold.id);assertEquals(generation,cold.directory.getName());assertEquals(original.data.toString(),cold.data.toString());
+    assertEquals(Color.parseColor("#123456"),renderer.color("palette.accent",Color.BLUE));
+  }
 }
