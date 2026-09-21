@@ -115,6 +115,18 @@ def verify_exact_payload_delta(base, final, rows):
             'other_payload_entries_preserved': len(kept) - len(changes),
         }
 
+# Preserve the current parent contract after its background-control bridge
+# upgrade, not the obsolete pre-bridge display-copy sentinel.
+RUNTIME_TOKENS = (
+    b'InfinityExtendedBackgroundService', b'InfinityBackgroundControlActivity',
+    b'BACKGROUND_MODE_NORMAL', b'BACKGROUND_MODE_EXTENDED', b'InfinityCoreBridge',
+    b'InfinityCobraDeviceBridge', b'getPlayWhenReady', b'Turn off',
+)
+
+def verify_runtime_tokens(joined):
+    for token in RUNTIME_TOKENS:
+        require(token in joined, 'Missing source-built runtime: ' + repr(token))
+
 def main():
     # Resolve the same existing shell packager from the CI reconstruction. Its
     # manifest/JNI/resource ID/signature checks remain executed by its main().
@@ -134,9 +146,7 @@ def main():
             require(digest(candidate.read('lib/arm64-v8a/libkodi.so')) == package.BASE_ENGINE_SHA256, 'Native engine changed')
             require(package.dex_contract(original)[0] == package.dex_contract(candidate)[0], 'Final JNI contract changed')
             joined = b''.join(candidate.read(name) for name in candidate.namelist() if DEX.fullmatch(name))
-            for token in (b'InfinityExtendedBackgroundService', b'EXTENDED BACKGROUND MODE', b'InfinityCoreBridge',
-                          b'InfinityCobraDeviceBridge', b'getPlayWhenReady', b'Turn off'):
-                require(token in joined, 'Missing source-built runtime: ' + repr(token))
+            verify_runtime_tokens(joined)
         return result
     package.merge = merge
     package.verify_bytes = verify_bytes
