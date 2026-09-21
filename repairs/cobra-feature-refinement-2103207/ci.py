@@ -40,7 +40,7 @@ def upgrade():
     data['files'][GRADLE]['after']=sha(src/GRADLE)
     data.update(version_code=2103207,version_name=NEW,source_parent=2103206,source_parent_commit=PARENT,
         candidate_locked=False,physical_device_verified=False,runtime_device_tested=False,native_engine_recompiled=False,
-        new_features=False,new_controls=False,complete_product_acceptance=False)
+        new_features=False,new_controls=True,user_requested_controls=True,complete_product_acceptance=False)
     receipt.write_text(json.dumps(data,indent=2)+'\n')
     for name,row in data['files'].items():require(sha(src/name)==row['after'],'Final source drift '+name)
     with Path('audit207/native-after.patch').open('wb') as out:subprocess.run(['git','-C','kodi','diff','--binary','--','xbmc'],stdout=out,check=True)

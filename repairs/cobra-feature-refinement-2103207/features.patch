@@ -416,7 +416,7 @@
 +    CobraMediaAudioState state=cobraMediaAudioState(player);state.observe(CobraCallAudioPolicy.callMode(cobraAudioMode()));
 +    state.volume=player.getVolume();state.mute();mCobraManualCallResume=false;
 +    if(player==mCobraPreviewPlayer)mCobraPreviewMuted=true;
-+    player.setVolume(0f);cobraRefreshCallControls();
++    player.setVolume(0f);if(player==mCobraAudioFocusPlayer)cobraApplyAudioFocusVolume();cobraRefreshCallControls();
 +  }
 +  private void cobraUserUnmute(ExoPlayer player){
 +    if(player==null||!isCurrentCobraPlayer(player)||mCobraPlayerLocked)return;
@@ -516,7 +516,7 @@
    }
    private void cobraRefreshQuickPeek(){
      Channel channel=mCobraQuickPeekChannel;if(channel==null)return;
-@@ -10447,12 +10526,36 @@
+@@ -10447,12 +10526,37 @@
      cobraAddDetail(rows,"favorite",mFavorites.contains(channel.id)?"Remove from favorites":"Add to favorites",null,"cobra-quick-peek-favorite",mFavorites.contains(channel.id),()->{if(profile.equals(mFeatures.activeProfileId())&&cobraSessionChannelAllowed(channel)){toggleFavorite(channel);cobraRefreshProgrammeLabels();if(mCobraGuideAdapter!=null)mCobraGuideAdapter.notifyDataSetChanged();}});
      cobraAddDetail(rows,"more","Channel actions","Schedule, playback preferences and existing actions","cobra-quick-peek-actions",false,()->{if(profile.equals(mFeatures.activeProfileId())&&cobraSessionChannelAllowed(channel))showCobraChannelActions(channel);});
      cobraInfoText(rows,channel.group==null||channel.group.isEmpty()?"Live channel":channel.group);
@@ -526,17 +526,18 @@
 +    boolean sameCurrent=mPlayer!=null&&mPlaying!=null&&channel.id.equals(mPlaying.id)||mGuidePreviewChannel!=null&&mCobraPreviewPlayer!=null&&channel.id.equals(mGuidePreviewChannel.id);
      if(sameCurrent){state.setText("Already playing in the current player");preview.setVisibility(View.GONE);return;}
 +    mCobraQuickPeekCapacityReady=()->cobraStartQuickPeek(channel,profile,generation,preview,texture,state);
++    if(cobraPeekRecordingActive()||mCobraPlayerBindings.size()>=4){mCobraQuickPeekCapacityReady.run();return;}
 +    LiveSource source=sourceForChannel(channel);
 +    if(source!=null&&"xtream".equals(source.type)&&!CobraQuickPeekSession.capacityFresh(mCobraPeekCapacity.get(source.id),System.currentTimeMillis())){
 +      preview.setVisibility(View.GONE);state.setText("Checking available provider connections…");
-+      if(mCobraPeekCapacityRequests.add(source.id))submitCobraIo(()->{
++      if(mCobraPeekCapacityRequests.add(source.id)&&!submitCobraIo(()->{
 +        try{JSONObject response=new JSONObject(httpGet(xtreamUrl(source,"")));cobraRememberPeekCapacity(source,response.optJSONObject("user_info"));}
 +        catch(Exception unavailable){mCobraPeekCapacity.remove(source.id);}
 +        finally{publishCobraUi(()->{
 +          mCobraPeekCapacityRequests.remove(source.id);
 +          if(mCobraQuickPeekChannel!=null&&source.id.equals(sourceIdForChannel(mCobraQuickPeekChannel))&&mCobraQuickPeekCapacityReady!=null)mCobraQuickPeekCapacityReady.run();
 +        });}
-+      });
++      })){mCobraPeekCapacityRequests.remove(source.id);mCobraQuickPeekCapacityReady.run();}
 +    }else mCobraQuickPeekCapacityReady.run();
 +  }
 +  private void cobraStartQuickPeek(Channel channel,String profile,long generation,FrameLayout preview,TextureView texture,TextView state){
@@ -557,7 +558,7 @@
      okhttp3.OkHttpClient pendingClient=null;
      try{
        int mode=cobraNetworkFamilyMode();CobraNetworkFamilyPolicy.NetworkTelemetry telemetry=new CobraNetworkFamilyPolicy.NetworkTelemetry(channel.primaryUrl);
-@@ -10498,8 +10601,13 @@
+@@ -10498,8 +10602,13 @@
      mCobraWelcomePending=false;
      if(!cobraVisualEffectsAllowed()||mInPictureInPicture||mPlayerOverlay!=null||mMultiOverlay!=null)return;
      View content=findViewById(android.R.id.content);
