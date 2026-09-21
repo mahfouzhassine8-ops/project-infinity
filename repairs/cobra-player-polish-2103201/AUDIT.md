@@ -42,6 +42,8 @@ Six inherited test/harness files receive guarded, recorded adaptations in tempor
 
 Local evidence already reproduces the gesture and Fold/motion failures against the untouched parent. The delivered report records final combined CI counts and APK identity only after verification. Host tests do not decode video; Robolectric does not establish OEM display, Binder or physical playback behavior.
 
+The first combined run executed all 357 cases in both replicas and stopped on two new focus assertions. The subtitle fixture requested focus while still in touch mode and never checked whether initial focus existed. An API34 Android probe reproduced that precondition failure and confirmed replacement-row focus survives layout after entering focus navigation. The corrected test explicitly establishes and verifies that precondition. The icon fixture now matches the real 46×46 control slot, distinguishes focus acceptance from animation progress, and waits a bounded number of frames for actual unfinished motion before disabling the button. Its original compound assertion cannot identify focus versus frame timing as the exact failing subcondition; zero width alone did not reproduce failure. All original behavior assertions and testcase identities remain, with stronger precondition/unfinished-motion checks. Production source is unchanged by these fixture corrections. Final combined CI must still pass before delivery.
+
 ## Rollback and release limits
 
 `Cobra-2103200-Complete-Product-Rollback-20260921.zip` was preserved and saved before changes. SHA-256:

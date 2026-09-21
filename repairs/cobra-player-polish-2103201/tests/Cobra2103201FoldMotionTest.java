@@ -96,8 +96,22 @@ public class Cobra2103201FoldMotionTest {
     ((Runnable)get(a,"mHideChrome")).run();ui.frames(20);assertEquals(View.VISIBLE,chrome.getVisibility());settled(chrome);put(a,"mCobraTimeshiftDragging",false);
   }
   @Test public void runtimeDisabledIconCancelsFocusMotionAndKeepsItsDimmedState()throws Exception{
-    View button=(View)call(a,"cobraIcon","recent","Last channel",true,(View.OnClickListener)v->{});LinearLayout chrome=chrome();chrome.addView(button);
-    button.setFocusableInTouchMode(true);assertTrue(button.requestFocus());ui.frames(2);assertTrue(button.getScaleX()>1f);
+    View button=(View)call(a,"cobraIcon","recent","Last channel",true,(View.OnClickListener)v->{});LinearLayout chrome=chrome();
+    // Match the real Last-channel slot; empty icon text has no intrinsic width.
+    Button focusAnchor=new Button(a);focusAnchor.setText("Anchor");chrome.addView(focusAnchor,new LinearLayout.LayoutParams(80,46));
+    chrome.addView(button,new LinearLayout.LayoutParams(46,46));d.resize((View)chrome.getParent(),1600,900);
+    assertEquals("Measured Last-channel width",46,button.getWidth());assertEquals("Measured Last-channel height",46,button.getHeight());
+    org.robolectric.shadows.ShadowInstrumentation.getInstrumentation().setInTouchMode(false);
+    assertFalse("D-pad fixture must leave touch mode",button.isInTouchMode());
+    assertTrue("Establish a different real focus owner",focusAnchor.requestFocus());ui.frames(12);
+    assertFalse("Icon must not already own focus",button.hasFocus());assertEquals("Prior focus motion settled",1f,button.getScaleX(),.001f);
+    boolean requested=button.requestFocus();
+    System.out.println("Disabled-icon focus fixture: requested="+requested+" focused="+button.hasFocus()+" bounds="+button.getWidth()+"x"+button.getHeight()+" alpha="+button.getAlpha()+" scale="+button.getScaleX());
+    assertTrue("Measured icon must accept real focus",requested);assertTrue("Measured icon owns real focus",button.hasFocus());
+    ui.frames(2);
+    System.out.println("Disabled-icon before runtime disable: focused="+button.hasFocus()+" scale="+button.getScaleX());
+    assertTrue("Focus animation must have started",button.getScaleX()>1f);
+    assertTrue("Disable must interrupt unfinished focus motion",button.getScaleX()<1.018f);
     // Real availability owner: no previous channel means disable, then alpha .35.
     put(a,"mCobraLastChannelButton",button);call(a,"cobraUpdateLastChannelButton");assertFalse(button.isEnabled());assertEquals(.35f,button.getAlpha(),.001f);
     ui.frames(12);assertEquals(.35f,button.getAlpha(),.001f);assertEquals(1f,button.getScaleX(),.001f);

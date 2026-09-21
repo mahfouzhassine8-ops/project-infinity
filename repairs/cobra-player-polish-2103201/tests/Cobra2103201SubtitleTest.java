@@ -109,11 +109,19 @@ public class Cobra2103201SubtitleTest {
   }
 
   @Test public void delayedTrackDiscoveryRefreshesExistingSheetAndKeepsFocus()throws Exception{
-    tracks(group("audio","audio/mp4a-latm","und",true,true));open();View sheet=tag("cobra_themed_sheet");tag("cobra-track-off").requestFocus();
+    tracks(group("audio","audio/mp4a-latm","und",true,true));open();View sheet=tag("cobra_themed_sheet");View off=tag("cobra-track-off");
+    // Exercise focus navigation, not a touch-mode row that intentionally cannot take focus.
+    // This public Android operation exits touch mode without changing the control's flags.
+    System.out.println("Subtitle focus setup: touch="+off.isInTouchMode()+", focusable="+off.isFocusable()+", focusableInTouch="+off.isFocusableInTouchMode());
+    assertTrue("Off row must accept focus navigation before track discovery",off.requestFocusFromTouch());
+    assertFalse("Focus restoration is tested outside touch mode",off.isInTouchMode());
+    assertTrue("Initial focus must be established before rows change",off.hasFocus());
     tracks(group("audio","audio/mp4a-latm","und",true,true),group("english","text/vtt","en",true,true));
     call(binding,"onTracksChanged",fake.tracks);ui.measure(a,412,915);
     assertSame(sheet,tag("cobra_themed_sheet"));assertNull(text(root(),"No subtitle tracks available in this stream."));
-    assertNotNull(text(root(),"English"));assertTrue(tag("cobra-track:1:0").isSelected());assertTrue(tag("cobra-track-off").hasFocus());
+    assertNotNull("Discovered English track must be visible",text(root(),"English"));
+    assertTrue("Selected English state must match the current track",tag("cobra-track:1:0").isSelected());
+    assertTrue("The same Off action must retain focus after row replacement",tag("cobra-track-off").hasFocus());
     Cobra2103201MenuPolishTest.capture(a,ui,"cobra201-english-track-412x915",412,915);
   }
 
