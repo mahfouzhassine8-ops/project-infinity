@@ -92,7 +92,11 @@ public class Cobra2103204PresentationTest {
     assertTrue(view.getWidth()>0&&view.getHeight()>0);
     int[] location=new int[2];view.getLocationOnScreen(location);
     Rect bounds=new Rect(location[0],location[1],location[0]+view.getWidth(),location[1]+view.getHeight());
-    assertTrue("Full laid-out control must fit, not only its clipped visible portion: "+bounds+" / "+window,window.contains(bounds));
+    // getGlobalVisibleRect is root-relative, while getLocationOnScreen includes
+    // the window origin. Full (unclipped) bounds must use the same coordinates.
+    View decor=a.getWindow().getDecorView();int[] origin=new int[2];decor.getLocationOnScreen(origin);
+    Rect screenWindow=new Rect(origin[0],origin[1],origin[0]+decor.getWidth(),origin[1]+decor.getHeight());
+    assertTrue("Full laid-out control must fit, not only its clipped visible portion: "+bounds+" / screenWindow="+screenWindow+" / visibleRoot="+window,screenWindow.contains(bounds));
   }
   static void tapIcon(View row,boolean cancel){
     assertTrue(row instanceof ViewGroup);View icon=((ViewGroup)row).getChildAt(0);
@@ -107,6 +111,12 @@ public class Cobra2103204PresentationTest {
         call(a,"cobraOpenLiveTv");ui.measure(a,size[0],size[1]);TextureView texture=(TextureView)get(a,"mCobraPreviewTexture");
         for(String mode:new String[]{"mobile","grid","compact","cards","focus"}){
           call(a,"cobraSwitchMode",mode);ui.measure(a,size[0],size[1]);
+          // Retain the first-traversal checks above, then let the established
+          // 190 ms browser transition finish naturally before settled geometry.
+          ui.frames(20);ui.measure(a,size[0],size[1]);
+          View browser=(View)get(a,"mCobraGuideBrowser");
+          assertEquals("Browser transition must finish without a stale offset",0f,browser.getTranslationY(),.001f);
+          assertEquals("Browser transition must finish fully visible",1f,browser.getAlpha(),.001f);
           assertSame("Visual guide modes retain the existing preview surface",texture,get(a,"mCobraPreviewTexture"));
           assertTrue(texture.isAttachedToWindow());assertTrue(texture.getWidth()>24&&texture.getHeight()>24);
           View shell=(View)get(a,"mCobraGuideShell");AbsListView list=(AbsListView)get(a,"mCobraGuideList");
@@ -250,6 +260,9 @@ public class Cobra2103204PresentationTest {
   }
 
   @Test public void playerChromeAndPlaybackSheetsStayReadableWithoutTransportWrites()throws Exception{
+    // This nested fixture is invoked as Java, so its own @Config is not applied.
+    // Set the actual window configuration before constructing its activity.
+    qualifiers(960,540);
     Cobra2103199DisplayRegressionTest f=new Cobra2103199DisplayRegressionTest();f.before();
     try{
       InfinityLiveActivity a=f.a;Cobra2103199DisplayRegressionTest.Controlled player=f.new Controlled();

@@ -689,6 +689,7 @@ jobs:
           cp audit204/repairs/cobra-oled-blue-2103204/tests/Cobra2103204*.java repair202-build/xbmc/src/test/java/com/projectinfinity/kodi/
           python3 audit202/repairs/cobra-player-refinement-2103202/adapt_inherited_tests.py --root . --phase android --out audit202/android-test-adaptations.json
           python3 audit203/repairs/cobra-pip-call-2103203/adapt_inherited_tests.py --root . --out audit203/android-test-adaptations.json
+          python3 audit204/repairs/cobra-oled-blue-2103204/adapt_inherited_tests.py --root . --out audit204/android-test-adaptations.json
           # 2103188 intentionally supersedes only the two 2103187 assertions
           # that required non-IDR compatibility to remain disabled.
           python3 - <<'PY'
