@@ -117,6 +117,19 @@ public class Cobra2103204PresentationTest {
           View browser=(View)get(a,"mCobraGuideBrowser");
           assertEquals("Browser transition must finish without a stale offset",0f,browser.getTranslationY(),.001f);
           assertEquals("Browser transition must finish fully visible",1f,browser.getAlpha(),.001f);
+          // Exercise the actual solver-to-Android placement bridge, including
+          // zero coordinates. A size helper that clamps zero to one must fail.
+          Object layout=get(a,"mCobraModeLayout");float density=a.getResources().getDisplayMetrics().density;
+          String[] owners={"mCobraModeToolbar","mCobraModeRail","mCobraGuideDirectory","mCobraGuideVideo","mCobraGuideDetails","mCobraGuideBrowser","mCobraModeFooter"};
+          String[] boxes={"toolbar","rail","directory","video","details","browser","footer"};
+          for(int i=0;i<owners.length;i++){
+            View pane=(View)get(a,owners[i]);int[] box=(int[])get(layout,boxes[i]);
+            if(pane.getVisibility()!=View.VISIBLE)continue;
+            assertEquals(mode+" "+owners[i]+" X follows solver, including zero",Math.round(box[0]*density),pane.getLeft());
+            assertEquals(mode+" "+owners[i]+" Y follows solver, including zero",Math.round(box[1]*density),pane.getTop());
+            assertEquals(mode+" "+owners[i]+" width preserved",Math.max(1,Math.round(box[2]*density)),pane.getWidth());
+            assertEquals(mode+" "+owners[i]+" height preserved",Math.max(1,Math.round(box[3]*density)),pane.getHeight());
+          }
           assertSame("Visual guide modes retain the existing preview surface",texture,get(a,"mCobraPreviewTexture"));
           assertTrue(texture.isAttachedToWindow());assertTrue(texture.getWidth()>24&&texture.getHeight()>24);
           View shell=(View)get(a,"mCobraGuideShell");AbsListView list=(AbsListView)get(a,"mCobraGuideList");

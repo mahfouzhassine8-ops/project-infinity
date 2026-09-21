@@ -22,6 +22,12 @@ video geometry, PiP controls, call-audio policy and Multi-View ownership.
   ordinary drawables, not expensive live blur or video-surface effects.
 - Repair reproduced Light contrast and narrow chooser clipping; keep labels,
   actions and controls. Short list fades keep hit rectangles stationary.
+- Reserve an interior sheet gutter for the existing focus scale so its outline
+  is not clipped. Keep outer and scrolling bounds intact; cover narrow layouts
+  and enlarged text with transformed-bound and rendered-rim regressions.
+- Fix the proven guide-placement bridge defect where the size helper converted
+  zero coordinates to one pixel. Preserve the solver and positive size minima;
+  verify each visible pane's actual coordinates and dimensions against its box.
 
 Only the exact reviewed Java owner allowlist and Gradle version identity may
 change. Imported-theme storage and validation, APK resources/assets, native

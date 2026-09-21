@@ -345,7 +345,31 @@
      copy.addView(heading,new LinearLayout.LayoutParams(-1,-2));
      if(detail!=null&&!detail.isEmpty()){TextView sub=cobraText(detail,dark?vtheme().color("cobra.cobraOpenSheet.colors.6",0xff9fb2c6):cobraThemeColor("muted",mTheme.muted),12);sub.setMaxLines(3);copy.addView(sub,new LinearLayout.LayoutParams(-1,-2));}
      header.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
-@@ -6322,7 +6355,7 @@
+@@ -5631,7 +5664,11 @@
+       }
+     };
+     scroll.setFillViewport(false);scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
+-    LinearLayout items=new LinearLayout(this);items.setOrientation(LinearLayout.VERTICAL);body.addView(items,new LinearLayout.LayoutParams(-1,-2));scroll.addView(body,new ScrollView.LayoutParams(-1,-2));
++    LinearLayout items=new LinearLayout(this);items.setOrientation(LinearLayout.VERTICAL);
++    // Reserve room for the existing 1.018 focus feedback inside the sheet.
++    // Only this padding may be overdrawn; outer/scroll clipping stays intact.
++    items.setPadding(dp(4),dp(3),dp(4),dp(3));items.setClipToPadding(false);
++    body.addView(items,new LinearLayout.LayoutParams(-1,-2));scroll.addView(body,new ScrollView.LayoutParams(-1,-2));
+     // Bounded scrolling, including a narrow cover display; the panel never fills the whole screen unnecessarily.
+     panel.addView(scroll,new LinearLayout.LayoutParams(-1,-2));
+     int width=parent.getWidth()>0?parent.getWidth():getResources().getDisplayMetrics().widthPixels;
+@@ -6228,7 +6265,9 @@
+     int[][] boxes={mCobraModeLayout.toolbar,mCobraModeLayout.rail,mCobraModeLayout.directory,mCobraModeLayout.video,mCobraModeLayout.details,mCobraModeLayout.browser,mCobraModeLayout.footer};
+     org.json.JSONObject custom=vtheme().guideLayout(mCobraGuideStyle);
+     if(CobraVisualGeometry.guide(custom,boxes,mCobraModeLayout.width,mCobraModeLayout.height,getResources().getConfiguration().fontScale)){mCobraModeLayout.columns=custom.optInt("columns",mCobraModeLayout.columns);mCobraModeLayout.channelWidth=custom.optInt("channel_width_dp",mCobraModeLayout.channelWidth);}
+-    for(int i=0;i<views.length;i++){int[] r=boxes[i];views[i].setVisibility(r[2]>0&&r[3]>0?View.VISIBLE:View.GONE);cobraPosition(views[i],left+dp(r[0]),top+dp(r[1]),dp(r[2]),dp(r[3]));}
++    // dp() deliberately gives sizes a one-pixel minimum. Coordinates must keep
++    // zero, or an edge-to-edge guide is shifted beyond its usable viewport.
++    for(int i=0;i<views.length;i++){int[] r=boxes[i];views[i].setVisibility(r[2]>0&&r[3]>0?View.VISIBLE:View.GONE);cobraPosition(views[i],left+Math.round(r[0]*density),top+Math.round(r[1]*density),dp(r[2]),dp(r[3]));}
+     View controls=mCobraGuideVideo.findViewWithTag("cobra_preview_controls");
+     if(controls!=null)controls.setVisibility(mCobraModeLayout.video[2]>=300&&mCobraModeLayout.video[3]>=145?View.VISIBLE:View.GONE);
+     mCobraGuideNowLabel.setTextSize("focus".equals(mCobraGuideStyle)?22:"mobile".equals(mCobraGuideStyle)?18:15);
+@@ -6322,7 +6361,7 @@
      }
      @Override protected void onMeasure(int width,int height){int w=View.MeasureSpec.getSize(width),h=dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.2",74));labelWidth=Math.max(dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.3",110)),Math.min(dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.4",180)),w/4));setMeasuredDimension(w,h);for(int i=0;i<getChildCount();i++){float[] r=bounds.get(i);int cw=r==null?labelWidth:Math.max(1,Math.round((w-labelWidth)*(r[1]-r[0]))-dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.5",2)));getChildAt(i).measure(View.MeasureSpec.makeMeasureSpec(cw,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h-dp(vtheme().dimension("cobra.CobraTimelineRow.dimensions.6",3)),View.MeasureSpec.EXACTLY));}}
      @Override protected void onLayout(boolean change,int l,int t,int r,int b){int w=r-l;for(int i=0;i<getChildCount();i++){View v=getChildAt(i);float[] range=bounds.get(i);int x=range==null?0:labelWidth+Math.round((w-labelWidth)*range[0]);v.layout(x,0,x+v.getMeasuredWidth(),v.getMeasuredHeight());}}
@@ -354,7 +378,7 @@
    }
  
    private void cobraRefreshProgrammeLabels() {
-@@ -6652,7 +6685,7 @@
+@@ -6652,7 +6691,7 @@
      LinearLayout transport=new LinearLayout(this);transport.setGravity(Gravity.CENTER);transport.setPadding(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.14",16)),0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.15",16)),0);
      CobraIconButton prev=cobraIcon("prev","Previous channel",true,v->stepChannel(-1));
      CobraIconButton rewind=cobraIcon("prev","Rewind Live TV 30 seconds",true,v->cobraRewindLive(30000L));rewind.caption("-30s");rewind.setTag("cobra_live_rewind_30");mCobraLiveRewindButton=rewind;
@@ -363,7 +387,7 @@
      CobraIconButton live=cobraIcon("play","Go Live",true,v->cobraGoLive());live.caption("LIVE");live.setTag("cobra_live_edge");mCobraGoLiveButton=live;
      CobraIconButton next=cobraIcon("next","Next channel",true,v->stepChannel(1));
      transport.addView(prev,new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.16",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.17",56))));
-@@ -6689,7 +6722,7 @@
+@@ -6689,7 +6728,7 @@
    private void showCobraPlayerDrawer() {
      if(mPlayerOverlay==null||mCobraPlayerLocked||mInPictureInPicture)return;
      if(closeCobraPlayerDrawer())return;closeCobraActionSheet();closeCobraMultiPicker(false);
@@ -372,7 +396,7 @@
      LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.2",10)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.3",8)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.4",10)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.5",14)));panel.addView(content,new FrameLayout.LayoutParams(-1,-1));
      LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);TextView title=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.1","Live TV"),vtheme().color("cobra.showCobraPlayerDrawer.colors.2",Color.WHITE),18);title.setTypeface(vtheme().font("cobra.showCobraPlayerDrawer.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));head.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.6",48)),1));head.addView(cobraIcon("close","Close channel drawer",true,v->closeCobraPlayerDrawer()),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.7",48)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.8",48))));content.addView(head,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.9",50))));
      LinearLayout tabs=new LinearLayout(this);String[] labels={"Favorites","Recent","All","Groups"},filters={"FAVORITES","RECENT","ALL","CATEGORIES"};for(int i=0;i<labels.length;i++){final String filter=filters[i];tabs.addView(cobraTextButton(labels[i],true,()->cobraRenderPlayerDrawer(filter)),new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.10",48)),1));}content.addView(tabs,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.11",48))));
-@@ -6832,12 +6865,14 @@
+@@ -6832,12 +6871,14 @@
    private int cobraModeColorBuiltin(String name){
      boolean dark=cobraModeDark(),oled="oled".equals(cobraEffectiveAppearanceMode()),tv="grid".equals(mCobraGuideStyle);
      if("accent".equals(name))return cobraThemeColor("accent",mTheme.accent);
@@ -393,7 +417,7 @@
    }
    private String cobraModeName(String key){return "grid".equals(key)?"TV Grid":"compact".equals(key)?"Compact":"cards".equals(key)?"Cards":"focus".equals(key)?"Focus":"Mobile";}
    private String cobraModeSourceName(){for(LiveSource s:mSources)if(s.id.equals(mCobraGuideSource))return s.name;return "All playlists";}
-@@ -6991,10 +7026,10 @@
+@@ -6991,10 +7032,10 @@
  
    private android.graphics.drawable.Drawable cobraModeSurface(int radius,boolean raised){
      int accent=cobraModeColor("accent");android.graphics.drawable.StateListDrawable states=new android.graphics.drawable.StateListDrawable();
@@ -408,7 +432,7 @@
    }
    private TextView cobraModeLabel(float size,boolean strong){TextView t=cobraText("",cobraModeColor(strong?"text":"muted"),size);if(strong)t.setTypeface(vtheme().font("cobra.cobraModeLabel.styles.1",Typeface.create("sans-serif-medium",0)));t.setSingleLine(true);return t;}
    private boolean cobraModeSelected(Channel c){return mGuidePreviewChannel!=null&&c.id.equals(mGuidePreviewChannel.id);}
-@@ -7768,10 +7803,10 @@
+@@ -7768,10 +7809,10 @@
      if(!cobraSheetIsDark()||cobraModeDark())return cobraModeSurface(radius,true);
      int accent=cobraModeColor("accent");
      android.graphics.drawable.StateListDrawable states=new android.graphics.drawable.StateListDrawable();
@@ -423,7 +447,7 @@
    }
  
    private LinearLayout cobraDetailRow(String icon,String title,String detail,String tag,boolean selected,Runnable action){
-@@ -9956,9 +9991,11 @@
+@@ -9956,9 +9997,11 @@
      int count=Math.min(group.getChildCount(),14);
      for(int i=0;i<count;i++){
        View child=group.getChildAt(i);if(child==null||child.hasFocus())continue;

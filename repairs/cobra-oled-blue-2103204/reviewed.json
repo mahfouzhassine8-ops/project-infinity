@@ -9,14 +9,14 @@
     },
     "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in": {
       "before": "a992dc6d541ff72c2b38518aec8628da0e2dfd93c9653c129243332d50af804d",
-      "after": "1dedded145460e10291c9c0459c815363ab76dc48e730434b43751478f6e36f7"
+      "after": "e916b7a8a6cf47e361b9e2f1b66f5488f6c3390dbfe6fe10acf7d4020c80b8e1"
     },
     "tools/android/packaging/xbmc/src/Splash.java.in": {
       "before": "22b152d8df482310419aa2d851fd3de619dc6ce9fcb32f46cc31553868388e04",
       "after": "dc2592cd05f48ac0ddc9b6db58b002435a52ad4d5050f3af79d2a8014b564b14"
     }
   },
-  "patch_sha256": "262bb046a644daca51eb63ea668f99eec22a9784063e60be59f308622166ffbc",
+  "patch_sha256": "9ca122b52bb67baf6b24ec165c8a73450b58f6ed7085d0a27ca262b44a95d9fb",
   "protected_runtime_members": {
     "CobraLayoutMath": "2d16cef09fe3151af6b2600fdab40037de4eb49df6f3f32a5674eaff7c0cacce",
     "CobraModeLayout": "f5b788f4cb255e010f87e05e642d0b5b1fd7a70707280b7084af9045244c2572",
@@ -54,12 +54,13 @@
     "cobraReleaseAudioFocus": "cdfc7679fd5d5c64c854c062a1ffb5f7a942c418e9c00e290d6b0b71ebaffb6d"
   },
   "inherited_android_cases": 445,
-  "new_android_cases": 54,
+  "new_android_cases": 55,
   "test_source_hashes": {
     "tests/Cobra2103204DialogTest.java": "c45026ee339ed39b4e284edd7759fb35f357a21a7c3d1ed454a4d0ed8f526b24",
     "tests/Cobra2103204EntryThemeTest.java": "fd69521f37b20aad28a27f6dfbcacd01dd6342983feab2628cc7f0ecd0183c93",
+    "tests/Cobra2103204FocusTrimTest.java": "1b3da5066d2fe4a172681310b5d5a807a516d814dc33420a38a17ec1159975d4",
     "tests/Cobra2103204PaletteTest.java": "b5ba8b6fb5e1453e03d3e03af7293a712111364896b87c80e1d9e4e44d180cf8",
-    "tests/Cobra2103204PresentationTest.java": "da2f8851057e81f290c993c3e5f98130f2012b593f080b7cb1a662b42de56617"
+    "tests/Cobra2103204PresentationTest.java": "97c369278bcd2e8223153f1f7fdf56da229e86e9b2e9940b063d42038c1a02a5"
   },
   "native_engine_recompiled": false,
   "physical_device_verified": false,
