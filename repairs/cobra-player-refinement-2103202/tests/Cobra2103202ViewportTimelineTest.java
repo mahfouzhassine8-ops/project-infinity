@@ -22,6 +22,18 @@ public class Cobra2103202ViewportTimelineTest {
   @Before public void before()throws Exception{f=new Cobra2103201ScrubberTest();f.before();a=f.a;}
   @After public void after()throws Exception{if(f!=null)f.after();}
   ProgressBar line()throws Exception{return (ProgressBar)get(a,"mCobraPlayerProgramProgress");}
+  void resizeWindow(int width,int height)throws Exception{
+    // This fixture does not use ActivityController.configurationChange(). Send
+    // the attached window its new bounds as well as updating resource qualifiers;
+    // manual decor.measure() alone can be undone by a scheduled WM traversal.
+    RuntimeEnvironment.setQualifiers("w"+width+"dp-h"+height+"dp-"+(width>height?"land":"port")+"-mdpi");
+    a.getWindow().setLayout(width,height);
+    Object root=org.robolectric.util.ReflectionHelpers.callInstanceMethod(a.getWindow().getDecorView(),"getViewRootImpl");
+    org.robolectric.shadows.ShadowViewRootImpl shadow=org.robolectric.shadow.api.Shadow.extract(root);shadow.callDispatchResized();
+    f.ui.frames(20);f.ui.measure(a,width,height);
+    assertEquals("Actual attached-window width",width,a.getWindow().getDecorView().getWidth());
+    assertEquals("Actual attached-window height",height,a.getWindow().getDecorView().getHeight());
+  }
   @Test public void rewoundProgressAndLiveEdgeUseDistinctPartsOfTheSameTimeline()throws Exception{f.state.position=30000;f.state.duration=120000;call("cobraUpdateTimeshiftSeek");assertEquals(250,line().getProgress());assertEquals(1000,line().getSecondaryProgress());assertEquals(250,f.seek().getProgress());assertTrue(f.seek().getContentDescription().toString().contains("live edge"));assertNotEquals(line().getProgressTintList().getDefaultColor(),line().getSecondaryProgressTintList().getDefaultColor());Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-rewound-timeline-412x915",412,915);}
   @Test public void returningToLiveSynchronizesThumbWithoutRemovingLiveEnd()throws Exception{f.state.position=120000;call("cobraUpdateTimeshiftSeek");assertEquals(1000,line().getProgress());assertEquals(1000,line().getSecondaryProgress());assertEquals(1000,f.seek().getProgress());}
   @Test public void providerCatchupEndpointIsNeverPresentedAsCurrentLiveEdge()throws Exception{put(a,"mCobraProviderCatchupActive",true);call("cobraUpdateTimeshiftSeek");assertEquals(0,line().getSecondaryProgress());assertFalse(f.seek().getContentDescription().toString().contains("live edge"));}
@@ -31,10 +43,10 @@ public class Cobra2103202ViewportTimelineTest {
     for(String mode:new String[]{"light","dark","oled","system"}){f.prefs.edit().putString("cobra_appearance_mode",mode).commit();call("cobraBuildPlayerChrome");f.settle();f.state.position=30000;call("cobraUpdateTimeshiftSeek");ProgressBar bar=line();bar.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(8,View.MeasureSpec.EXACTLY));bar.layout(0,0,400,8);Bitmap b=Bitmap.createBitmap(400,8,Bitmap.Config.ARGB_8888);bar.draw(new Canvas(b));assertNotEquals(mode,b.getPixel(50,4),b.getPixel(300,4));b.recycle();}
   }
   @Test public void openSheetRecomputesHeightAfterWindowResize()throws Exception{
-    RuntimeEnvironment.setQualifiers("w1500dp-h436dp-land-mdpi");
-    f.ui.measure(a,1500,436);call("cobraShowChannelPreferences",get(a,"mPlaying"));f.ui.measure(a,1500,436);View panel=a.getWindow().getDecorView().findViewWithTag("cobra_sheet_panel");int shortHeight=panel.getHeight();assertTrue(shortHeight<=436);assertTrue(panel.getTop()>=0);assertTrue(panel.getBottom()<=436);
+    resizeWindow(1500,436);
+    call("cobraShowChannelPreferences",get(a,"mPlaying"));f.ui.measure(a,1500,436);View panel=a.getWindow().getDecorView().findViewWithTag("cobra_sheet_panel");int shortHeight=panel.getHeight();assertTrue(shortHeight<=436);assertTrue(panel.getTop()>=0);assertTrue(panel.getBottom()<=436);
     Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-split-1500x436",1500,436);
-    RuntimeEnvironment.setQualifiers("w412dp-h915dp-port-mdpi");f.ui.measure(a,412,915);f.ui.frames(20);f.ui.measure(a,412,915);assertTrue("Open sheet must gain space after leaving short split-screen",panel.getHeight()>shortHeight);assertTrue(panel.getHeight()<=915);assertTrue(panel.getTop()>=0);assertTrue(panel.getBottom()<=915);
+    resizeWindow(412,915);assertSame("Resize retains the open sheet",panel,a.getWindow().getDecorView().findViewWithTag("cobra_sheet_panel"));assertTrue("Open sheet must gain space after leaving short split-screen",panel.getHeight()>shortHeight);assertTrue(panel.getHeight()<=915);assertTrue(panel.getTop()>=0);assertTrue(panel.getBottom()<=915);
     Cobra2103201MenuPolishTest.capture(a,f.ui,"cobra202-channel-playback-resized-412x915",412,915);
   }
   @Test public void foldAdaptiveUsesActualSplitWindowWithoutCroppingOrRetuning()throws Exception{
