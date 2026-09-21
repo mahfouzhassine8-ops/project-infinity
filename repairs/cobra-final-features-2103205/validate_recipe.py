@@ -33,6 +33,10 @@ def main():
     upgrade = 'python3 audit205/repairs/cobra-final-features-2103205/ci.py upgrade'
     assert text.count(parent_upgrade) == text.count(upgrade) == 1
     assert text.index(parent_upgrade) < text.index(upgrade) < text.index('id: build205')
+    adapter_gate = 'python3 audit205/repairs/cobra-final-features-2103205/test_host_fixture_adapter.py --fixture audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py --out audit205/host-fixture-adapter-guards.json'
+    adapter_run = 'python3 audit205/repairs/cobra-final-features-2103205/host_timeshift_adapter.py --fixture audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py'
+    assert text.count(adapter_gate) == text.count(adapter_run) == 1
+    assert text.index(adapter_gate) < text.index(upgrade) < text.index(adapter_run) < text.index('id: build205')
     for phase in ['verify', 'deliver']:
         assert text.count('python3 audit205/repairs/cobra-final-features-2103205/ci.py ' + phase) == 1
     assert 'steps.build205.outcome' in text and 'steps.build204.outcome' not in text

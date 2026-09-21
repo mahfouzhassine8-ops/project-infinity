@@ -608,8 +608,9 @@ jobs:
           python3 -m pip install 'Pillow==12.3.0'
           python3 audit205/repairs/cobra-final-features-2103205/validate_recipe.py --require-frozen
           python3 audit205/repairs/cobra-final-features-2103205/test_recipe_guards.py
+          python3 audit205/repairs/cobra-final-features-2103205/test_host_fixture_adapter.py --fixture audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py --out audit205/host-fixture-adapter-guards.json
           python3 audit205/repairs/cobra-final-features-2103205/ci.py upgrade
-          python3 audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit205/host_timeshift
+          python3 audit205/repairs/cobra-final-features-2103205/host_timeshift_adapter.py --fixture audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit205/host_timeshift
           python3 audit199/repairs/cobra-power-audit-2103199/tests/host_timeshift_stop.py --source kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit205/host_timeshift_stop
           python3 audit199/repairs/cobra-power-audit-2103199/tests/display_geometry_host.py --activity kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out audit205/display_geometry_host
           python3 audit199/repairs/cobra-power-audit-2103199/tests/diagnostics_host.py --source kodi --out audit205/diagnostics_host

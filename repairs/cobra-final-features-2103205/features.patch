@@ -685,7 +685,7 @@
 +}
 --- /dev/null
 +++ b/tools/android/packaging/xbmc/src/CobraPresentationSafety.java.in
-@@ -0,0 +1,228 @@
+@@ -0,0 +1,233 @@
 +package @APP_PACKAGE@;
 +
 +import android.app.Activity;
@@ -709,7 +709,7 @@
 +  public static final String EXTRA_ENTRY_TOKEN="cobra_explicit_entry_token";
 +  static final long PREVIEW_MS=20000L;
 +  private static final CobraVisualTheme BUILTIN=CobraVisualTheme.builtin();
-+  private static final Map<String,JSONObject> stateCache=new HashMap<>();
++  private static final java.util.concurrent.ConcurrentHashMap<String,JSONObject> stateCache=new java.util.concurrent.ConcurrentHashMap<>();
 +  private static volatile Lease preview;
 +  private static final Set<String> initialized=new HashSet<>();
 +  private static final WeakHashMap<Activity,Boolean> refreshOnReturn=new WeakHashMap<>();
@@ -732,11 +732,16 @@
 +  }
 +  static File root(Context c){return new File(c.getFilesDir(),"cobra-presentation-safety-v1");}
 +  static String key(Context c){return c.getFilesDir().getAbsolutePath();}
-+  static JSONObject state(Context c){synchronized(CobraVisualTheme.STORE_LOCK){
++  static JSONObject state(Context c){
 +    String key=key(c);JSONObject cached=stateCache.get(key);if(cached!=null)return cached;
-+    JSONObject value;try{value=new JSONObject(new String(new AtomicFile(new File(root(c),"state.json")).readFully(),StandardCharsets.UTF_8));}
-+    catch(Exception absent){value=new JSONObject();}stateCache.put(key,value);return value;
-+  }}
++    // Warm lookups run during drawing/input and must not wait for ZIP decode or
++    // fsync. Writers publish a new snapshot only after the atomic write succeeds.
++    synchronized(CobraVisualTheme.STORE_LOCK){
++      cached=stateCache.get(key);if(cached!=null)return cached;
++      JSONObject value;try{value=new JSONObject(new String(new AtomicFile(new File(root(c),"state.json")).readFully(),StandardCharsets.UTF_8));}
++      catch(Exception absent){value=new JSONObject();}stateCache.put(key,value);return value;
++    }
++  }
 +  static void writeState(Context c,JSONObject value)throws Exception{
 +    File directory=root(c);if(!directory.isDirectory()&&!directory.mkdirs())throw new IOException("Presentation storage unavailable");
 +    AtomicFile file=new AtomicFile(new File(directory,"state.json"));FileOutputStream out=null;

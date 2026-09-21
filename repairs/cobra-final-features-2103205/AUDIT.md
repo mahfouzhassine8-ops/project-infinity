@@ -35,6 +35,10 @@ Source FPS is stream metadata, not measured visible frame rate. Network transpor
 
 ## Verification requirements
 
+Warm presentation-state reads use a concurrent snapshot cache so rendering/input does not wait behind background theme staging. Cold loads and atomic write publication retain the original storage lock. Three regressions cover warm state/actual renderer reads while the lock is held, and immutable snapshots through preview, cancel, Keep and restore.
+
+The inherited extracted timeshift host harness receives one explicitly declared no-op visual-refresh collaborator. Its historical source and extraction helper are hash-pinned; all 14 inherited case names and the full assertions remain byte-identical. This fixture adaptation neither rewrites the production timeline method nor claims to test Android presentation. A separate adversarial host suite rejects fixture/assertion drift.
+
 The build workflow validates the frozen source and exact tests, all 500 inherited Android test identities, new feature tests, 56 byte-identical protected playback/transport/display members, permanent signer, package/version and unchanged native/assets/resources. Two independent replicas must produce identical signed APK bytes before delivery. The machine-readable ACCEPTANCE.json records the actual result; this document alone is not a passing test claim.
 
 Local helper/policy tests and native-graphics render fixtures are not full-device tests. Full Android/Robolectric tests are distinct from physical decoder, provider, Fold, cellular, PiP, SystemUI and phone-call behavior. DEVICE-TEST.md is the required real-device acceptance checklist. No physical acceptance is claimed by this candidate.

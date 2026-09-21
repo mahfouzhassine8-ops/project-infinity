@@ -16,7 +16,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.*;
 import static org.junit.Assert.*;
 
@@ -50,6 +52,45 @@ public class Cobra2103205SafetyTest {
   }
   void reject(Checked operation)throws Exception{try{operation.run();fail("Unsafe operation accepted");}catch(IOException expected){}}
   interface Checked{void run()throws Exception;}
+  void assertReadCompletesWhileStoreLocked(Checked read)throws Exception{
+    CountDownLatch started=new CountDownLatch(1),completed=new CountDownLatch(1);
+    AtomicReference<Throwable> failure=new AtomicReference<>();
+    Thread reader=new Thread(()->{
+      started.countDown();try{read.run();}catch(Throwable error){failure.set(error);}finally{completed.countDown();}
+    },"CobraWarmPresentationRead");
+    try{
+      synchronized(CobraVisualTheme.STORE_LOCK){
+        reader.start();assertTrue("Reader must start",started.await(5,TimeUnit.SECONDS));
+        // No elapsed-time benchmark: the lookup must finish before the store
+        // owner releases its lock. Bounds only prevent a broken test hanging CI.
+        assertTrue("Warm presentation read waited for background theme storage",completed.await(5,TimeUnit.SECONDS));
+      }
+    }finally{reader.join(5000);}
+    assertFalse("Reader must terminate",reader.isAlive());if(failure.get()!=null)throw new AssertionError("Presentation read failed",failure.get());
+  }
+  @Test public void warmCachedStateDoesNotAcquireThemeStoreLock()throws Exception{
+    JSONObject cached=CobraPresentationSafety.state(app);
+    assertReadCompletesWhileStoreLocked(()->assertSame(cached,CobraPresentationSafety.state(app)));
+  }
+  @Test public void warmRendererColorLookupDoesNotAcquireThemeStoreLock()throws Exception{
+    installed("warm-renderer","#123456");CobraVisualRenderer renderer=new CobraVisualRenderer(activity).mode("dark");
+    assertEquals(Color.parseColor("#123456"),renderer.color("palette.accent",Color.BLUE));
+    assertReadCompletesWhileStoreLocked(()->assertEquals(Color.parseColor("#123456"),renderer.color("palette.accent",Color.BLUE)));
+  }
+  @Test public void previewCancelKeepAndRestoreNeverMutatePublishedStateSnapshots()throws Exception{
+    JSONObject initial=CobraPresentationSafety.state(app);String initialJson=initial.toString();
+    CobraPresentationSafety.offerLegacy(activity,CobraPresentationSafety.stageLegacy(app,legacy("#123456")));
+    assertSame(initial,CobraPresentationSafety.state(app));CobraPresentationSafety.cancel(activity,true);drain();assertSame(initial,CobraPresentationSafety.state(app));
+    CobraPresentationSafety.offerLegacy(activity,CobraPresentationSafety.stageLegacy(app,legacy("#123456")));
+    ShadowAlertDialog.getLatestAlertDialog().getButton(AlertDialog.BUTTON_POSITIVE).performClick();drain();
+    JSONObject kept=CobraPresentationSafety.state(app);String keptJson=kept.toString();
+    assertNotSame(initial,kept);assertEquals(initialJson,initial.toString());assertTrue(kept.optBoolean("visual_builtin"));assertFalse(kept.optBoolean("legacy_builtin"));
+    CobraPresentationSafety.restoreBuiltIn(activity,null);drain();JSONObject restored=CobraPresentationSafety.state(app);String restoredJson=restored.toString();
+    assertNotSame(kept,restored);assertEquals(keptJson,kept.toString());assertTrue(restored.optBoolean("legacy_builtin"));assertTrue(restored.optBoolean("visual_builtin"));
+    CobraPresentationSafety.allowVisual(app);JSONObject allowed=CobraPresentationSafety.state(app);
+    assertNotSame(restored,allowed);assertEquals(restoredJson,restored.toString());assertEquals(initialJson,initial.toString());assertFalse(allowed.optBoolean("visual_builtin"));
+    assertReadCompletesWhileStoreLocked(()->assertSame(allowed,CobraPresentationSafety.state(app)));
+  }
   @Test public void safeIntentIsActivityScopedAndDoesNotOverwritePreferences()throws Exception{
     installed("saved","#123456");String pointer=CobraVisualTheme.readPointer(app).toString();app.getSharedPreferences("infinity_cobra_live",0).edit().putString("source","kept").commit();
     activity.setIntent(new Intent().putExtra(CobraPresentationSafety.EXTRA_SAFE,true));CobraVisualRenderer renderer=new CobraVisualRenderer(activity);

@@ -332,6 +332,10 @@
     ],
     [
       "com.projectinfinity.kodi.Cobra2103205SafetyTest",
+      "previewCancelKeepAndRestoreNeverMutatePublishedStateSnapshots"
+    ],
+    [
+      "com.projectinfinity.kodi.Cobra2103205SafetyTest",
       "previewNeverReparentsOrStylesVideoTexture"
     ],
     [
@@ -369,6 +373,14 @@
     [
       "com.projectinfinity.kodi.Cobra2103205SafetyTest",
       "timeoutRestoresExactPointerHistoryAndUi"
+    ],
+    [
+      "com.projectinfinity.kodi.Cobra2103205SafetyTest",
+      "warmCachedStateDoesNotAcquireThemeStoreLock"
+    ],
+    [
+      "com.projectinfinity.kodi.Cobra2103205SafetyTest",
+      "warmRendererColorLookupDoesNotAcquireThemeStoreLock"
     ]
   ],
   "com.projectinfinity.kodi.Cobra2103205SessionCardTest": [
