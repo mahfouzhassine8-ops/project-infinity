@@ -69,6 +69,8 @@ def upgrade():
     protect(source, parser_path)
     subprocess.run(['git', 'apply', '--check', str(ROOT / 'features.patch')], cwd=source, check=True)
     subprocess.run(['git', 'apply', str(ROOT / 'features.patch')], cwd=source, check=True)
+    subprocess.run(['git', 'apply', '--check', str(ROOT / 'parts/acceptance-regression-fix.patch')], cwd=source, check=True)
+    subprocess.run(['git', 'apply', str(ROOT / 'parts/acceptance-regression-fix.patch')], cwd=source, check=True)
     assets = json.loads((ROOT / 'asset-payloads.json').read_text())
     require(set(assets) == set(reviewed['files']) & set(ICON_SLOTS), 'Binary source scope mismatch')
     for name, encoded in assets.items():

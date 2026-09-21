@@ -1,0 +1,62 @@
+--- a/tools/android/packaging/xbmc/src/CobraEmblem.java.in
++++ b/tools/android/packaging/xbmc/src/CobraEmblem.java.in
+@@ -74,9 +74,11 @@
+         || bounds.height() <= 0 || alpha <= 0) return;
+     Drawing drawing = DRAWING.get();
+     float scale = Math.min(bounds.width() / source.content.width(), bounds.height() / source.content.height());
+-    float width = source.content.width() * scale, height = source.content.height() * scale;
+-    drawing.destination.set(bounds.centerX() - width / 2f, bounds.centerY() - height / 2f,
+-        bounds.centerX() + width / 2f, bounds.centerY() + height / 2f);
++    float width = Math.max(1f, Math.round(source.content.width() * scale));
++    float height = Math.max(1f, Math.round(source.content.height() * scale));
++    float left = Math.round(bounds.centerX() - width / 2f);
++    float top = Math.round(bounds.centerY() - height / 2f);
++    drawing.destination.set(left, top, left + width, top + height);
+     // Status intensity may vary, but never tint away the approved cyan and red eyes.
+     drawing.paint.setAlpha(Math.min(255, alpha) * Color.alpha(color) / 255);
+     drawing.paint.setColorFilter(null);
+--- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+@@ -1057,6 +1057,8 @@
+     FrameLayout shield=new FrameLayout(this);shield.setTag("cobra_experience_drawer");shield.setClickable(true);shield.setBackgroundColor(vtheme().color("cobra.toggleCobraDrawer.colors.1",0x4d000000));shield.setOnClickListener(v->closeCobraExperienceDrawer());
+     LinearLayout panel=new LinearLayout(this);panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);panel.setBackgroundColor(cobraModeColor("rail"));panel.setPadding(dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.4",12)),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.5",12)),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.6",12)),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.7",12)));
+     if(Build.VERSION.SDK_INT>=23&&decor.getRootWindowInsets()!=null){android.view.WindowInsets in=decor.getRootWindowInsets();panel.setPadding(dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.8",12))+in.getSystemWindowInsetLeft(),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.9",12))+in.getSystemWindowInsetTop(),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.10",12)),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.11",12))+in.getSystemWindowInsetBottom());}
++    android.graphics.Rect drawerWindow=new android.graphics.Rect();decor.getWindowVisibleDisplayFrame(drawerWindow);
++    if(!drawerWindow.isEmpty()){int[] drawerLocation=new int[2];decor.getLocationOnScreen(drawerLocation);int frameBottom=Math.max(0,decor.getHeight()-(drawerWindow.bottom-drawerLocation[1]));if(frameBottom>0)panel.setPadding(panel.getPaddingLeft(),panel.getPaddingTop(),panel.getPaddingRight(),Math.max(panel.getPaddingBottom(),dp(vtheme().dimension("cobra.toggleCobraDrawer.dimensions.11",12))+frameBottom));}
+     panel.addView(cobraBrandHeader());
+     ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=new LinearLayout(this);items.setOrientation(LinearLayout.VERTICAL);scroll.addView(items);panel.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+     cobraDrawerDestination(items,"search","Search","SEARCH",()->{if(mChannels.isEmpty()){mCobraInternalScreen="internal";showSearch();}else{if(mCobraGuideShell==null||!mCobraGuideShell.isAttachedToWindow())cobraShowGuideShell();cobraShowChannelSearch();}});
+@@ -5677,7 +5679,7 @@
+     scrim.setBackgroundColor(compactPopup?Color.TRANSPARENT:vtheme().color("cobra.cobraOpenSheet.colors.1",0x55000000));scrim.setClickable(true);scrim.setOnClickListener(v->closeCobraActionSheet());
+     LinearLayout panel=new LinearLayout(this);panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);
+     panel.setPadding(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.1",12)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.2",8)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.3",12)),dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.4",12)));
+-    if(quickPeek)panel.setPadding(dp(8),dp(4),dp(8),dp(6));
++    if(quickPeek){panel.setPadding(dp(8),dp(4),dp(8),dp(6));panel.setMinimumHeight(dp(232));}
+     panel.setBackground(cobraPanelSurface(dark?("oled".equals(cobraEffectiveAppearanceMode())?vtheme().color("cobra.cobraOpenSheet.colors.2",0xfc000000):vtheme().color("cobra.cobraOpenSheet.colors.3",0xf7080b11)):cobraAlpha(cobraThemeColor("panel",mTheme.panel),250),22,
+         dark?vtheme().color("cobra.cobraOpenSheet.colors.4",0xff344359):cobraThemeColor("line",mTheme.line)));panel.setElevation(dp(vtheme().dimension("cobra.cobraOpenSheet.dimensions.5",14)));
+     LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);
+@@ -10750,16 +10752,22 @@
+         "cobra-ambient:"+key,i==selected,()->{mPrefs.edit().putString(CobraPresentationEffects.AMBIENT,key).apply();mCobraAmbientContext="@refresh";
+           cobraRefreshAmbient();cobraApplyAppearanceSettings();});}
+   }
++  private void cobraRestoreVisualTextureTransform(TextureView texture,android.graphics.Matrix transform,int width,int height){
++    if(texture==null||transform==null)return;
++    texture.post(()->{if(texture.isAttachedToWindow()&&texture.getWidth()==width&&texture.getHeight()==height)texture.setTransform(transform);});
++  }
+   private void cobraShowVisualMenu(View anchor){
+     LinearLayout rows;mCobraNextSheetAnchor=anchor;
+     try{rows=cobraOpenSheet("Visual settings","","visual-settings");}finally{mCobraNextSheetAnchor=null;}
+     cobraInfoText(rows,"Ambient Mode");String[] keys={"off","subtle","immersive"};int selected=CobraPresentationEffects.ambientMode(mPrefs);
+     for(int i=0;i<keys.length;i++){final String value=keys[i];cobraAddDetail(rows,"visuals",CobraPresentationEffects.ambientLabel(i),null,"cobra-visual-ambient:"+value,i==selected,()->{
+-      mPrefs.edit().putString(CobraPresentationEffects.AMBIENT,value).apply();mCobraAmbientContext="@refresh";cobraRefreshVisualEffects();cobraRefreshModeDetails();
++      TextureView texture=mPlayerOverlay!=null?mPlayerTexture:mCobraPreviewTexture;android.graphics.Matrix transform=texture==null?null:texture.getTransform(new android.graphics.Matrix());int width=texture==null?0:texture.getWidth(),height=texture==null?0:texture.getHeight();
++      mPrefs.edit().putString(CobraPresentationEffects.AMBIENT,value).apply();mCobraAmbientContext="@refresh";cobraRefreshVisualEffects();cobraRefreshModeDetails();cobraRestoreVisualTextureTransform(texture,transform,width,height);
+     });}
+     cobraInfoText(rows,"Night Cinema");boolean night=mPrefs.getBoolean(CobraPresentationEffects.NIGHT,false);
+     for(int i=0;i<2;i++){final boolean enabled=i==1;cobraAddDetail(rows,"visuals",enabled?"On":"Off",null,"cobra-visual-night:"+(enabled?"on":"off"),night==enabled,()->{
+-      mPrefs.edit().putBoolean(CobraPresentationEffects.NIGHT,enabled).apply();if(mPlayerOverlay!=null)cobraBuildPlayerChrome();cobraRefreshVisualEffects();cobraRefreshModeDetails();
++      TextureView texture=mPlayerOverlay!=null?mPlayerTexture:mCobraPreviewTexture;android.graphics.Matrix transform=texture==null?null:texture.getTransform(new android.graphics.Matrix());int width=texture==null?0:texture.getWidth(),height=texture==null?0:texture.getHeight();
++      mPrefs.edit().putBoolean(CobraPresentationEffects.NIGHT,enabled).apply();if(mPlayerOverlay!=null)cobraBuildPlayerChrome();cobraRefreshVisualEffects();cobraRefreshModeDetails();cobraRestoreVisualTextureTransform(texture,transform,width,height);
+     });}
+   }
+   private void cobraEditGreeting(){
