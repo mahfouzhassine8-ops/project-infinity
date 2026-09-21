@@ -32,7 +32,7 @@
      private PulseState state = PulseState.NORMAL;
      private boolean allowed = true, prominent;
      private float intensity = .45f;
-@@ -270,15 +273,19 @@
+@@ -270,15 +273,15 @@
        super.onDraw(canvas);
        if (state == null || state == PulseState.NONE) return;
        bounds.set(1, 1, Math.max(1, getWidth() - 1), Math.max(1, getHeight() - 1));
@@ -40,11 +40,7 @@
 -        plate.setColor(0xb3000000);
 -        canvas.drawOval(bounds, plate); // Local contrast backing, never a filter on video pixels.
 -      }
-+      // Glyph-only contrast keeps the pale live mark readable on bright video.
-+      // The surrounding content stays transparent: no disc or rectangular plate.
-+      bounds.offset(.5f,.5f);
-+      CobraEmblem.draw(canvas,bounds,0xff0b1422,Math.round(100f*intensity));
-+      bounds.offset(-.5f,-.5f);
++      // Use only the existing Cobra strokes; the surrounding video stays clear.
        CobraEmblem.draw(canvas, bounds, state.color, Math.round(255f * intensity));
      }
    }
@@ -56,7 +52,7 @@
      if (closed || !foreground || parent == null) return;
      dismissWelcome();
      LinearLayout row = new LinearLayout(activity);
-@@ -287,45 +294,77 @@
+@@ -287,45 +290,77 @@
      // Arrange this small row explicitly: the protected app manifest need not opt
      // the rest of Cobra into RTL layout just to place the greeting beside its mark.
      row.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
