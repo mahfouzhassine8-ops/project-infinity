@@ -1,0 +1,80 @@
+name: onn TV remote source audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103218-onn4kpro-tv-armv7-rc1]
+    paths:
+      - '.github/workflows/onn-tv-remote-source-audit.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 mobile engine for source reconstruction only
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103218 TV Android source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit218
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit218/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+
+      - name: Print remote/focus/animation source contexts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+          lines=s.splitlines()
+          pats=re.compile(r'KEYCODE_|dispatchKeyEvent|onKeyDown|onKeyUp|focusSearch|requestFocus|setFocusable|setOnFocusChangeListener|nextFocus|cobraPolishDrawerRow|cobraAnimatePanelIn|LayoutTransition|\.animate\(|setDuration\(|ViewPropertyAnimator|setSmoothScrollingEnabled|setItemAnimator',re.I)
+          hits=[i for i,x in enumerate(lines) if pats.search(x)]
+          merged=[]
+          for i in hits:
+            a=max(0,i-5); b=min(len(lines),i+9)
+            if merged and a<=merged[-1][1]+1:
+              merged[-1]=(merged[-1][0],max(merged[-1][1],b))
+            else:
+              merged.append((a,b))
+          for a,b in merged:
+            print(f'--- lines {a+1}-{b} ---')
+            for n in range(a,b):
+              print(f'{n+1:05d}: {lines[n]}')
+          PY
