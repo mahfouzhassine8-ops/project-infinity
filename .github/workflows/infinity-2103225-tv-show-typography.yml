@@ -1,0 +1,140 @@
+name: Infinity | 2103225 TV Show Typography
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103225-tv-show-typography-rc1]
+    paths:
+      - '.github/workflows/infinity-2103225-tv-show-typography.yml'
+      - 'repairs/tv-show-typography-2103225/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103225-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact 2103208 source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103224 APK for preservation gate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103224-Cobra-Movie-TV-Details-Trailers-TEST-CANDIDATE
+          run-id: 35793959046
+          github-token: ${{ github.token }}
+          path: parent224
+
+      - name: Reconstruct exact locked 2103224 source
+        run: |
+          set -euo pipefail
+          mkdir -p audit225 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+
+          python3 repairs/python311-gil-2103209/ci.py prepare             --base-dir baseline208             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --shell shell-kodi             --out audit225/base
+
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/drawer-owner-ui-restore-2103221/apply.py --shell shell-kodi
+          python3 repairs/experience-options-ui-2103222/apply.py --shell shell-kodi
+          python3 repairs/movie-details-trailers-2103223/apply.py --shell shell-kodi
+          python3 repairs/tv-show-details-trailers-2103224/apply.py --shell shell-kodi
+
+          grep -F '"version_code": 2103224' engine/background-resume-source.json
+          grep -F '"version_name": "1.0.9-Cobra-Movie-TV-Details-Trailers-RC1"' engine/background-resume-source.json
+          grep -F '"tv_show_details_full_page": true' engine/background-resume-source.json
+          grep -F '"movie_details_unchanged_from_2103223": true' engine/background-resume-source.json
+
+      - name: Apply ONLY TV Shows typography correction
+        run: |
+          set -euo pipefail
+          python3 repairs/tv-show-typography-2103225/apply.py --shell shell-kodi
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'tv_show_title_typography' "$JAVA"
+          grep -F 'tv_show_metadata_typography' "$JAVA"
+          grep -F 'tv_show_hero_metadata_typography' "$JAVA"
+          grep -F 'item.series?54:42' "$JAVA"
+          grep -F 'item.series?30:22' "$JAVA"
+          grep -F 'series?(isCompact()?278:312):(isCompact()?258:292)' "$JAVA"
+          grep -F 'state.series?(isCompact()?278:312):(isCompact()?258:292)' "$JAVA"
+
+          grep -F '"tv_show_typography_only": true' engine/background-resume-source.json
+          grep -F '"tv_show_font_family_unchanged": true' engine/background-resume-source.json
+          grep -F '"tv_show_shelf_order_unchanged": true' engine/background-resume-source.json
+          grep -F '"movie_card_metrics_unchanged": true' engine/background-resume-source.json
+          grep -F '"playback_unchanged": true' engine/background-resume-source.json
+          grep -F '"providers_unchanged": true' engine/background-resume-source.json
+
+      - name: Build sign and verify 2103225
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android -alias androiddebugkey -keypass android             -dname "CN=Android Debug,O=Android,C=US"             -keyalg RSA -keysize 2048 -validity 10000
+
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk audit225/base/Infinity-2103208-Python311-GIL-Patched-Base.apk             --build-dir build225             --out signed225
+
+          python3 repairs/tv-show-typography-2103225/verify.py             --apk signed225/Infinity-1.0.9-Cobra-TV-Show-Typography-RC1.apk             --parent224 parent224/Infinity-1.0.9-Cobra-Movie-TV-Details-Trailers-RC1.apk             --audit signed225/background-resume-apk-audit.json             --scope audit225/scope.json
+
+      - name: Publish 2103225 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-Cobra-TV-Show-Typography-TEST-CANDIDATE
+          path: signed225/
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103225 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-Cobra-TV-Show-Typography-Evidence
+          path: |
+            audit225/
+            engine/background-resume-source.json
+            repairs/tv-show-typography-2103225/
+            signed225/*.json
+            signed225/*.txt
+          if-no-files-found: warn
+          retention-days: 90
