@@ -3,7 +3,7 @@ name: onn TV remote source audit
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-cobra-2103219-onn4kpro-tv-remote-rc2]
+    branches: [infinity-cobra-2103220-onn4kpro-tv-grid-only-rc3]
     paths:
       - '.github/workflows/onn-tv-remote-source-audit.yml'
 
@@ -34,7 +34,7 @@ jobs:
           github-token: ${{ github.token }}
           path: native209
 
-      - name: Reconstruct exact 2103219 TV Android source
+      - name: Reconstruct exact 2103219 TV Android source for 2103220 audit
         run: |
           set -euo pipefail
           mkdir -p engine audit219
@@ -102,6 +102,12 @@ jobs:
               if 'setOnFocusChangeListener' in line or 'KEYCODE_DPAD' in line:
                   print(f'{n:05d}: {line}')
 
+          print('\n===== TV SETTINGS / PHONE-ONLY REFERENCES =====')
+          phone_pat=re.compile(r'PictureInPicture|PIP|Background Mode|Play in Background|DISPLAY|Performance|120|refresh|rotation|orientation|Media During Calls|phone call|file picker|Ask every time|gesture|swipe|touch',re.I)
+          for n,line in enumerate(lines,1):
+              if phone_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
           print('\n===== TV MODE / VIEW REFERENCES =====')
           mode_pat=re.compile(r'TV Grid|Normal|Cinema|Focus|Compact|GuideStyle|mCobraGuideStyle|view mode|mode label|cobraMode',re.I)
           for n,line in enumerate(lines,1):
@@ -121,6 +127,26 @@ jobs:
               'private void showCobraViewModeMenu(',
               'private void cobraSetGuideMode(',
               'private void cobraApplyMode(',
+              'private void toggleCobraDrawer(',
+              'private void closeCobraExperienceDrawer(',
+              'private void cobraDrawerDestination(',
+              'private LinearLayout cobraDrawerViewRow(',
+              'private LinearLayout cobraBrandHeader(',
+              'private void cobraPremiumViewMenu(',
+              'private void cobraSwitchMode(',
+              'private void showSettings(',
+              'private void cobraAddDisplayPerformance',
+              'private void cobraAddBackground',
+              'private void cobraAddPlayInBackground',
+              'private void cobraShowBackgroundMode',
+              'private void cobraAddRotation',
+              'private void cobraAddMediaDuringCalls',
+              'private void cobraShowMediaDuringCalls',
+              'private void enterCobraPip',
+              'private void cobraEnterPictureInPicture',
+              'private void cobraApplyPlayerRotation',
+              'private void cobraUpdatePlayerRotationButton',
+              'private void cobraShowVisualMenu(',
           ):
               method(name)
           PY
