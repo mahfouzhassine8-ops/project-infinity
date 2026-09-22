@@ -3,7 +3,7 @@ name: onn TV remote source audit
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-cobra-2103218-onn4kpro-tv-armv7-rc1]
+    branches: [infinity-cobra-2103219-onn4kpro-tv-remote-rc2]
     paths:
       - '.github/workflows/onn-tv-remote-source-audit.yml'
 
@@ -34,17 +34,17 @@ jobs:
           github-token: ${{ github.token }}
           path: native209
 
-      - name: Reconstruct exact 2103218 TV Android source
+      - name: Reconstruct exact 2103219 TV Android source
         run: |
           set -euo pipefail
-          mkdir -p engine audit218
+          mkdir -p engine audit219
           cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
           cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
           python3 repairs/python311-gil-2103209/ci.py prepare \
             --base-dir baseline208 \
             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
             --shell shell-kodi \
-            --out audit218/mobile-source-base
+            --out audit219/mobile-source-base
           python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
           python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
           python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
@@ -54,6 +54,7 @@ jobs:
           python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
           python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
 
       - name: Print remote/focus/animation source contexts
         run: |
@@ -100,4 +101,21 @@ jobs:
           for n,line in enumerate(lines,1):
               if 'setOnFocusChangeListener' in line or 'KEYCODE_DPAD' in line:
                   print(f'{n:05d}: {line}')
+
+          print('\n===== TV MODE / VIEW REFERENCES =====')
+          mode_pat=re.compile(r'TV Grid|Normal|Cinema|Focus|Compact|GuideStyle|mCobraGuideStyle|view mode|mode label|cobraMode',re.I)
+          for n,line in enumerate(lines,1):
+              if mode_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          for name in (
+              'private void showCobraMode',
+              'private void cobraShowMode',
+              'private void cobraSetMode',
+              'private void cobraSetGuideStyle',
+              'private void showCobraVisual',
+              'private void cobraShowVisual',
+              'private void cobraRenderGuideBrowser',
+          ):
+              method(name)
           PY
