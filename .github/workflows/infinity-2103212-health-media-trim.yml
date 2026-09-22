@@ -1,0 +1,142 @@
+name: Infinity | 2103212 Health + Ambient Media Trim
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103212-health-media-trim-rc1]
+    paths:
+      - '.github/workflows/infinity-2103212-health-media-trim.yml'
+      - 'repairs/health-media-trim-2103212/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103212-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  package-and-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout scoped 2103212 successor
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact successful 2103208 presentation parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 Python 3.11 GIL native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103209 shell without native rebuild
+        run: |
+          set -euo pipefail
+          mkdir -p audit212 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit212/native-base
+
+      - name: Recreate exact successful 2103210 and locked 2103211 source
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "b4c4607fb76acd6735baf8d2858e99f3b43572870071b7f6825b89dd1dc8924a"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in | cut -d' ' -f1)" = "3be7a6789d756f1349d76b645f49dd9b7112e5d1c15ce6153898332078f16d0f"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Main.java.in | cut -d' ' -f1)" = "ddf18d30c4040369b30e861ded588a53846ff3de319a89a219344771f8db9318"
+
+      - name: Apply Infinity Health polish and ambient-aware media trim
+        run: |
+          set -euo pipefail
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          grep -F 'DIAGNOSTICS  •  RECOVERY' shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          grep -F 'cobraVodAmbientTrimColor()' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'cobraRefreshVodAmbientTrim()' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F '"media_structure_unchanged": true' audit212/scope.json
+          grep -F '"health_behavior_unchanged": true' audit212/scope.json
+          grep -F '"video_recolored": false' audit212/scope.json
+
+      - name: Create intermediate Android build keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          test -s "$HOME/.android/debug.keystore"
+
+      - name: Build Android shell sign and verify 2103212
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit212/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build212 \
+            --out signed212
+          python3 repairs/health-media-trim-2103212/verify.py \
+            --final signed212/Infinity-1.0.9-Cobra-Health-Media-Trim-RC1.apk \
+            --audit signed212/background-resume-apk-audit.json \
+            --base audit212/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk
+
+      - name: Publish 2103212 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103212-Health-Ambient-Media-Trim-TEST-CANDIDATE
+          path: signed212/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103212 evidence and protected boundaries
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103212-Health-Ambient-Media-Trim-Evidence
+          path: |
+            audit212/
+            engine/background-resume-source.json
+            repairs/health-media-trim-2103212/
+            signed212/*.json
+            signed212/*.txt
+          if-no-files-found: warn
+          retention-days: 90
