@@ -34,7 +34,7 @@ jobs:
           github-token: ${{ github.token }}
           path: native209
 
-      - name: Reconstruct exact 2103219 TV Android source for 2103220 audit
+      - name: Reconstruct and apply exact 2103220 TV Grid source
         run: |
           set -euo pipefail
           mkdir -p engine audit219
@@ -55,6 +55,7 @@ jobs:
           python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
 
       - name: Print remote/focus/animation source contexts
         run: |
