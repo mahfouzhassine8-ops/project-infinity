@@ -1,0 +1,171 @@
+name: Infinity | 2103226 Audited Fold Fit Fill
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103226-fold-fit-fill-audited-rc1]
+    paths:
+      - '.github/workflows/infinity-2103226-fold-fit-fill.yml'
+      - 'repairs/fold-fit-fill-2103226/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103226-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact 2103208 source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103225 APK for rollback and preservation gate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103225-Cobra-TV-Show-Typography-TEST-CANDIDATE
+          run-id: 35795353201
+          github-token: ${{ github.token }}
+          path: parent225
+
+      - name: Reconstruct exact locked 2103225
+        run: |
+          set -euo pipefail
+          mkdir -p audit226 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+
+          python3 repairs/python311-gil-2103209/ci.py prepare             --base-dir baseline208             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --shell shell-kodi             --out audit226/base
+
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/drawer-owner-ui-restore-2103221/apply.py --shell shell-kodi
+          python3 repairs/experience-options-ui-2103222/apply.py --shell shell-kodi
+          python3 repairs/movie-details-trailers-2103223/apply.py --shell shell-kodi
+          python3 repairs/tv-show-details-trailers-2103224/apply.py --shell shell-kodi
+          python3 repairs/tv-show-typography-2103225/apply.py --shell shell-kodi
+
+          grep -F '"version_code": 2103225' engine/background-resume-source.json
+          grep -F '"version_name": "1.0.9-Cobra-TV-Show-Typography-RC1"' engine/background-resume-source.json
+
+          ACT=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          test "$(sha256sum "$ACT" | cut -d' ' -f1)" = "2fee5673e153ac152ecfec495d3c6c076eac1bb55a6221a1c03535742698de9a"
+          cp "$ACT" audit226/InfinityLiveActivity-2103225-before.java.in
+
+          grep -F 'static final int MODE=12;' "$ACT"
+          grep -F 'case 12: return "Fold Adaptive";' "$ACT"
+          ! grep -F 'Fold Fill' "$ACT"
+
+      - name: Apply Fold Fit Fill while auditing protected ownership
+        run: |
+          set -euo pipefail
+          python3 repairs/fold-fit-fill-2103226/apply.py --shell shell-kodi
+          ACT=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          cp "$ACT" audit226/InfinityLiveActivity-2103226-after.java.in
+
+          python3 repairs/fold-fit-fill-2103226/source_audit.py             --source shell-kodi             --scope audit226/scope.json             --out audit226
+
+          grep -F 'case 12: return "Fold Fit";' "$ACT"
+          grep -F 'case 13: return "Fold Fill";' "$ACT"
+          grep -F 'static final int FILL_MODE=13;' "$ACT"
+          grep -F 'texture.addOnLayoutChangeListener(binding.layoutListener);' "$ACT"
+          grep -F 'mInPictureInPicture?0:mode' "$ACT"
+          grep -F '"player_recreated": false' audit226/scope.json
+          grep -F '"retune": false' audit226/scope.json
+          grep -F '"seek": false' audit226/scope.json
+
+      - name: Build and sign exact 2103226 candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android -alias androiddebugkey -keypass android             -dname "CN=Android Debug,O=Android,C=US"             -keyalg RSA -keysize 2048 -validity 10000
+
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk audit226/base/Infinity-2103208-Python311-GIL-Patched-Base.apk             --build-dir build226             --out signed226
+
+      - name: Run legacy Fold Fit and new Fold Fill Android tests
+        run: |
+          set -euo pipefail
+          TESTDIR=build226/xbmc/src/test/java/com/projectinfinity/kodi
+          mkdir -p "$TESTDIR"
+          cp repairs/cobra-fold-adaptive-aspect-2103194/tests/Cobra2103194FoldAdaptiveAspectTest.java "$TESTDIR/"
+          cp repairs/fold-fit-fill-2103226/tests/Cobra2103226FoldFitFillTest.java "$TESTDIR/"
+          (
+            cd build226
+            ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest               --tests com.projectinfinity.kodi.Cobra2103194FoldAdaptiveAspectTest               --tests com.projectinfinity.kodi.Cobra2103226FoldFitFillTest
+          )
+
+      - name: Verify APK against locked 2103225 and final audit
+        run: |
+          set -euo pipefail
+          python3 repairs/fold-fit-fill-2103226/verify.py             --apk signed226/Infinity-1.0.9-Cobra-Fold-Fit-Fill-Audited-RC1.apk             --parent225 parent225/Infinity-1.0.9-Cobra-TV-Show-Typography-RC1.apk             --audit signed226/background-resume-apk-audit.json             --scope audit226/scope.json             --source-audit audit226/source-audit.json
+
+      - name: Publish 2103226 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103226-Cobra-Fold-Fit-Fill-Audited-TEST-CANDIDATE
+          path: signed226/
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve complete 2103226 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103226-Cobra-Fold-Fit-Fill-Audit-Evidence
+          path: |
+            audit226/
+            engine/background-resume-source.json
+            repairs/fold-fit-fill-2103226/
+            signed226/*.json
+            signed226/*.txt
+            build226/xbmc/build/reports/tests/testReleaseUnitTest/
+            build226/xbmc/build/test-results/testReleaseUnitTest/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact locked 2103225 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-Exact-Rollback-Before-2103226
+          path: parent225/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
