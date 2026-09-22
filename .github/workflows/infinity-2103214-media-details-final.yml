@@ -1,0 +1,146 @@
+name: Infinity | 2103214 Media Details Final
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103214-media-details-final-rc1]
+    paths:
+      - '.github/workflows/infinity-2103214-media-details-final.yml'
+      - 'repairs/media-details-final-2103214/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103214-\${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  package-and-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout scoped 2103214 successor
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact successful 2103208 presentation parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: \${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 Python 3.11 GIL native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: \${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103209 shell without native rebuild
+        run: |
+          set -euo pipefail
+          mkdir -p audit214 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit214/native-base
+
+      - name: Recreate exact successful 2103210 through locked 2103213 source
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "d749c82e64a787f8d20078279ee5110c90045767ea84bb7d61098cd8dbb563e1"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in | cut -d' ' -f1)" = "7c9e8930a41da2e7c5a75fd9d18195413e1f09701d6e3dcaa196a2f848baca9c"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Main.java.in | cut -d' ' -f1)" = "ddf18d30c4040369b30e861ded588a53846ff3de319a89a219344771f8db9318"
+
+      - name: Apply final Movies and TV Shows refinement
+        run: |
+          set -euo pipefail
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          grep -F 'Play Next Episode' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'Resume Episode' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'Recently Added' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'Cast & Crew' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'No titles match these filters.' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F '"live_tv_blue_ambient_unchanged": true' engine/background-resume-source.json
+          grep -F '"settings_return_unchanged": true' engine/background-resume-source.json
+          grep -F '"health_center_unchanged": true' engine/background-resume-source.json
+
+      - name: Create intermediate Android build keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          test -s "$HOME/.android/debug.keystore"
+
+      - name: Build Android shell sign and verify 2103214
+        env:
+          INFINITY_KEYSTORE_B64: \${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: \${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: \${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: \${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit214/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build214 \
+            --out signed214
+          python3 repairs/media-details-final-2103214/verify.py \
+            --final signed214/Infinity-1.0.9-Cobra-Media-Details-Final-RC1.apk \
+            --audit signed214/background-resume-apk-audit.json \
+            --base audit214/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk
+
+      - name: Publish 2103214 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103214-Cobra-Media-Details-Final-TEST-CANDIDATE
+          path: signed214/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103214 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103214-Cobra-Media-Details-Final-Evidence
+          path: |
+            audit214/
+            engine/background-resume-source.json
+            repairs/media-details-final-2103214/
+            signed214/*.json
+            signed214/*.txt
+          if-no-files-found: warn
+          retention-days: 90
