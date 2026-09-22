@@ -120,6 +120,11 @@ jobs:
           python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk audit226/base/Infinity-2103208-Python311-GIL-Patched-Base.apk             --build-dir build226             --out signed226
 
       - name: Run legacy Fold Fit and new Fold Fill Android tests
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
         run: |
           set -euo pipefail
           TESTDIR=build226/xbmc/src/test/java/com/projectinfinity/kodi
