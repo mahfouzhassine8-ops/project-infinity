@@ -2,6 +2,13 @@ name: Infinity | 2103209 Python 3.11 GIL Stability
 
 on:
   workflow_dispatch:
+    inputs:
+      reuse_native:
+        description: 'Reuse the proven native engine from failed run 35693288744; skip native rebuild'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
   push:
     branches: [infinity-cobra-2103209-python311-gil-stability-rc1]
     paths:
@@ -24,6 +31,7 @@ env:
 
 jobs:
   native-engine:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.reuse_native != 'true' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 420
     env:
@@ -118,6 +126,7 @@ jobs:
 
   package-and-audit:
     needs: native-engine
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.reuse_native != 'true' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 90
     steps:
@@ -160,6 +169,19 @@ jobs:
             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
             --shell shell-kodi \
             --out audit209/native-base
+
+      - name: Create intermediate Android build keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          test -s "$HOME/.android/debug.keystore"
 
       - name: Build Android shell, permanently sign, and verify candidate
         env:
