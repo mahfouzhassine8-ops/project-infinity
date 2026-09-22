@@ -1,14 +1,5 @@
 --- a/tools/android/packaging/xbmc/src/CobraEmblem.java.in
 +++ b/tools/android/packaging/xbmc/src/CobraEmblem.java.in
-@@ -25,7 +25,7 @@
-   }
- 
-   private static final class Drawing {
--    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-+    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-     final RectF destination = new RectF();
-   }
- 
 @@ -74,9 +74,11 @@
          || bounds.height() <= 0 || alpha <= 0) return;
      Drawing drawing = DRAWING.get();
