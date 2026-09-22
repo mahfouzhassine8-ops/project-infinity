@@ -63,7 +63,6 @@ PROTECTED_METHODS=[
     'private void cobraApplyNightCinema(View header,View footer,View pause)',
     'private void cobraReturnFromSettings()',
     'private void showSettings()',
-    'private void showExperienceCardSettings(String experience)',
 ]
 def method_hashes(s,names):
     return {n:hb(method(s,n).encode()) for n in names}
