@@ -31,7 +31,6 @@ env:
 
 jobs:
   native-engine:
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.reuse_native != 'true' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 420
     env:
@@ -126,7 +125,6 @@ jobs:
 
   package-and-audit:
     needs: native-engine
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.reuse_native != 'true' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 90
     steps:
