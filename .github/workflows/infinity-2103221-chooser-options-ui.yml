@@ -1,0 +1,123 @@
+name: Infinity | 2103221 Chooser Options UI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103221-chooser-options-ui-rc1]
+    paths:
+      - '.github/workflows/infinity-2103221-chooser-options-ui.yml'
+      - 'repairs/chooser-options-ui-2103221/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103221-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103220 source
+        run: |
+          set -euo pipefail
+          mkdir -p audit221 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare             --base-dir baseline208             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --shell shell-kodi             --out audit221/base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/active-section-owner-2103219/apply.py --shell shell-kodi
+          python3 repairs/active-section-lifecycle-2103220/apply.py --shell shell-kodi
+          grep -F '"version_code": 2103220' engine/background-resume-source.json
+
+      - name: Restore both chooser options UIs
+        run: |
+          set -euo pipefail
+          python3 repairs/chooser-options-ui-2103221/apply.py --shell shell-kodi
+          SPLASH=shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in')
+          s=p.read_text()
+          i=s.index('private void showExperienceCardSettings(String experience)')
+          b=s.index('{',i);d=0
+          for j in range(b,len(s)):
+              if s[j]=='{': d+=1
+              elif s[j]=='}':
+                  d-=1
+                  if d==0:
+                      m=s[i:j+1];break
+          assert 'new android.app.AlertDialog.Builder(this' not in m
+          assert m.count('new CobraVisualRenderer.DialogBuilder(this,vtheme(),"chooser.settings")')==1
+          for token in ('Cobra options','Infinity options','Remember & launch ','Launch ','Ask every time',
+                        'Infinity Health Center','Cobra Recovery','showInfinityHealthCenter()','showCobraRecovery()'):
+              assert token in m,token
+          assert 'Smart Return' not in m and 'cobra_smart_return' not in m
+          print('PASS: both gear menus share approved chooser.settings renderer; callbacks preserved')
+          PY
+          grep -F '"stock_cobra_options_dialog_removed": true' engine/background-resume-source.json
+          grep -F '"smart_return_untouched": true' engine/background-resume-source.json
+
+      - name: Build sign and verify 2103221
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android -alias androiddebugkey -keypass android             -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk audit221/base/Infinity-2103208-Python311-GIL-Patched-Base.apk             --build-dir build221             --out signed221
+          python3 repairs/chooser-options-ui-2103221/verify.py             --apk signed221/Infinity-1.0.9-Cobra-Chooser-Options-UI-RC1.apk             --audit signed221/background-resume-apk-audit.json
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103221-Chooser-Options-UI-TEST-CANDIDATE
+          path: signed221/
+          compression-level: 0
+          retention-days: 90
+
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103221-Chooser-Options-UI-Evidence
+          path: |
+            audit221/
+            engine/background-resume-source.json
+            repairs/chooser-options-ui-2103221/
+            signed221/*.json
+            signed221/*.txt
+          if-no-files-found: warn
+          retention-days: 90
