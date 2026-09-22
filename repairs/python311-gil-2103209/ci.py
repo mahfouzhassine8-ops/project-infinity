@@ -127,6 +127,18 @@ def patch_runtime_and_packager(controlled_sha: str, engine_sha: str) -> None:
     require(old==new,'Compiled manifest drift from exact 2103208 base outside version identity')
 '''
     ptext = ptext[:start] + verifier + ptext[end:]
+    # The legacy packager also checks Background-Resume-era DEX labels that are not
+    # part of the exact 2103208 source contract. Replace that stale token gate with
+    # current 2103208 runtime contracts; final verify() independently enforces them too.
+    old_tokens = """        for token in (b'InfinityExtendedBackgroundService',b'EXTENDED BACKGROUND MODE',b'InfinityCoreBridge',b'InfinityCobraDeviceBridge',b'getPlayWhenReady',b'Turn off'):
+            require(token in joined,'Missing source-built runtime: '+repr(token))
+"""
+    new_tokens = """        for token in (b'CobraQuickPeekSession', b'InfinityCobraFeatureRuntime', b'InfinitySystemMediaHook',
+                      b'PLAY IN BACKGROUND', b'Ask every time'):
+            require(token in joined,'Missing protected 2103208 runtime: '+repr(token))
+"""
+    require(ptext.count(old_tokens) == 1, "Legacy DEX token gate anchor drift")
+    ptext = ptext.replace(old_tokens, new_tokens, 1)
     packager.write_text(ptext)
 
 
