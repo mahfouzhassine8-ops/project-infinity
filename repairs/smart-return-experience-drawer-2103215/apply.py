@@ -110,47 +110,76 @@ def patch_smart_return(path):
 
 def patch_splash(path):
  s=path.read_text();before=mh(s,SPLASH_PROTECT)
- old='''    final String[] options = cobra ? new String[]{
-        "Remember & launch " + label,
-        "Launch " + label + " just this time",
-        "Ask every time",
-        "Cobra Recovery"
-    } : new String[]{'''
- new='''    final boolean smartReturn = getSharedPreferences("infinity_cobra_live", MODE_PRIVATE)
+ a,b=method_range(s,'private void showExperienceCardSettings(String experience)')
+ replacement='''  private void showExperienceCardSettings(String experience)
+  {
+    final boolean cobra = "live".equals(experience);
+    final String title = cobra ? "Cobra options" : "Infinity options";
+    final String label = cobra ? "Cobra" : "Infinity";
+    final boolean smartReturn = getSharedPreferences("infinity_cobra_live", MODE_PRIVATE)
         .getBoolean("cobra_smart_return", true);
     final String[] options = cobra ? new String[]{
         "Remember & launch " + label,
         "Launch " + label + " just this time",
         "Ask every time",
         "Smart Return  •  " + (smartReturn ? "ON" : "OFF"),
+        "Infinity Health Center",
         "Cobra Recovery"
-    } : new String[]{'''
- s=once(s,old,new,'Cobra Experience Smart Return row')
-
- old_handler='''          else if(which==3&&cobra)
+    } : new String[]{
+        "Remember & launch " + label,
+        "Launch " + label + " just this time",
+        "Ask every time",
+        "Infinity Health Center"
+    };
+    (cobra ? new android.app.AlertDialog.Builder(this,
+        "light".equals(chooserAppearanceMode())?android.R.style.Theme_Material_Light_Dialog_Alert:
+        android.R.style.Theme_Material_Dialog_Alert)
+        : new CobraVisualRenderer.DialogBuilder(this,vtheme(),"chooser.settings"))
+        .setTitle(title)
+        .setItems(options, (dialog, which) -> {
+          if (which == 0)
           {
-            showCobraRecovery();
+            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+                .putString(INFINITY_EXPERIENCE_DEFAULT, experience).apply();
+            launchInfinityExperience(experience);
           }
-          else
+          else if (which == 1)
           {
-            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()'''
- new_handler='''          else if(which==3&&cobra)
+            launchInfinityExperience(experience);
+          }
+          else if (which == 2)
+          {
+            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+                .remove(INFINITY_EXPERIENCE_DEFAULT).apply();
+            android.widget.Toast.makeText(this,
+                "Infinity will ask which experience to open next time.",
+                android.widget.Toast.LENGTH_SHORT).show();
+          }
+          else if (which == 3 && cobra)
           {
             getSharedPreferences("infinity_cobra_live", MODE_PRIVATE).edit()
                 .putBoolean("cobra_smart_return", !smartReturn).apply();
             showExperienceCardSettings(experience);
           }
-          else if(which==4&&cobra)
+          else if ((which == 4 && cobra) || (which == 3 && !cobra))
+          {
+            showInfinityHealthCenter();
+          }
+          else if (which == 5 && cobra)
           {
             showCobraRecovery();
           }
-          else
-          {
-            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()'''
- s=once(s,old_handler,new_handler,'Cobra Experience Smart Return action')
+        })
+        .setNegativeButton("Cancel", null)
+        .show();
+  }'''
+ s=s[:a]+replacement+s[b:]
  exp=method(s,'private void showExperienceCardSettings(String experience)')
- for token in ('Smart Return  •  ','infinity_cobra_live','cobra_smart_return','which==4&&cobra'):
+ for token in ('Smart Return  •  ','infinity_cobra_live','cobra_smart_return',
+               'Infinity Health Center','showInfinityHealthCenter()','which == 5 && cobra'):
   require(token in exp,'Experience Smart Return contract missing: '+token)
+ require('launchKodiHealthCenter' not in exp and 'infinity_launch_kodi_health_center' not in exp,
+         'Obsolete Kodi Health bridge returned in experience options')
  path.write_text(s)
  require(mh(s,SPLASH_PROTECT)==before,'Infinity Health Center behavior changed')
 
