@@ -147,6 +147,20 @@ jobs:
               'private void cobraApplyPlayerRotation',
               'private void cobraUpdatePlayerRotationButton',
               'private void cobraShowVisualMenu(',
+              'private PictureInPictureParams cobraPipParams(',
+              'private void configureCobraPip(',
+              'private void enterCobraPictureInPicture(',
+              'private boolean cobraWantsFullscreenPip(',
+              'private void onCobraUserLeaveHint',
+              'private void cobraAddPresentationSettings(',
+              'private String cobraPlayerRotationMode(',
+              'private int cobraPlayerRotationMode(',
+              'private void cobraShowChannelPreferences(',
           ):
               method(name)
           PY
+
+      - name: Print TV manifest compatibility flags
+        run: |
+          set -euo pipefail
+          grep -n -E 'supportsPictureInPicture|resizeableActivity|screenOrientation|LEANBACK|touchscreen|television|autoEnterEnabled' shell-kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in || true
