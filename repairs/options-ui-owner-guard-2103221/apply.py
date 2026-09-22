@@ -244,7 +244,7 @@ def patch_splash(path):
         'experience-options-cobra','experience-options-infinity',
         'experience-option-remember','experience-option-once','experience-option-ask',
         'experience-option-health','experience-option-recovery',
-        'Remember & launch ','Launch ","Ask every time',
+        'Remember & launch ','Launch ','Ask every time',
         'showInfinityHealthCenter','showCobraRecovery'
     ):
         req(token in s,'Options UI contract missing: '+token)
