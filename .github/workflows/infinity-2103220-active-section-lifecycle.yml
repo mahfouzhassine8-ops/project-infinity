@@ -1,0 +1,106 @@
+name: Infinity | 2103220 Cobra Active Section Lifecycle
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103220-active-section-lifecycle-rc1]
+    paths:
+      - '.github/workflows/infinity-2103220-active-section-lifecycle.yml'
+      - 'repairs/active-section-lifecycle-2103220/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103220-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103219 source
+        run: |
+          set -euo pipefail
+          mkdir -p audit220 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare             --base-dir baseline208             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --shell shell-kodi             --out audit220/base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/active-section-owner-2103219/apply.py --shell shell-kodi
+          grep -F '"version_code": 2103219' engine/background-resume-source.json
+          grep -F '"smart_return_untouched": true' engine/background-resume-source.json
+
+      - name: Apply Android native-back and lifecycle ownership
+        run: |
+          set -euo pipefail
+          python3 repairs/active-section-lifecycle-2103220/apply.py --shell shell-kodi
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'cobraRegisterNativeBack()' "$JAVA"
+          grep -F 'cobraEnforceActiveSectionLifecycle' "$JAVA"
+          grep -F 'cobraRestoreActiveSectionOnEntry' "$JAVA"
+          grep -F 'OnBackInvokedCallback' "$JAVA"
+          grep -F '"smart_return_untouched": true' engine/background-resume-source.json
+
+      - name: Build sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v             -keystore "$HOME/.android/debug.keystore"             -storepass android -alias androiddebugkey -keypass android             -dname "CN=Android Debug,O=Android,C=US"             -keyalg RSA -keysize 2048 -validity 10000
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk audit220/base/Infinity-2103208-Python311-GIL-Patched-Base.apk             --build-dir build220             --out signed220
+          python3 repairs/active-section-lifecycle-2103220/verify.py             --apk signed220/Infinity-1.0.9-Cobra-Active-Section-Lifecycle-RC1.apk             --audit signed220/background-resume-apk-audit.json             --base audit220/base/Infinity-2103208-Python311-GIL-Patched-Base.apk
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103220-Cobra-Active-Section-Lifecycle-TEST-CANDIDATE
+          path: signed220/
+          compression-level: 0
+          retention-days: 90
+
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103220-Cobra-Active-Section-Lifecycle-Evidence
+          path: |
+            audit220/
+            engine/background-resume-source.json
+            repairs/active-section-lifecycle-2103220/
+            signed220/*.json
+            signed220/*.txt
+          if-no-files-found: warn
+          retention-days: 90
