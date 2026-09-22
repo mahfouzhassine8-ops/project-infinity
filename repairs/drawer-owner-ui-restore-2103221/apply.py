@@ -60,7 +60,7 @@ ACTIVITY_PROTECTED=[
 SPLASH_PROTECTED=[
  'private void showInfinityExperienceChooser()',
  'private void showStyledInfinityExperienceChooser(ExperienceTheme theme)',
- 'private boolean showVisualExperienceScene(ExperienceTheme fallback)',
+ 'private boolean showVisualExperienceScene(ExperienceTheme theme)',
  'private void launchInfinityExperience(String experience)',
 ]
 def hashes(s,names): return {n:hb(method(s,n).encode()) for n in names}
