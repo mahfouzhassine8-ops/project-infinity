@@ -279,8 +279,8 @@ def apply(shell:Path):
     ):
         s=remove_exact(s,line,label)
     s=once(s,'cobraSettingsSection("EXPERIENCE & DISPLAY")','cobraSettingsSection("EXPERIENCE")','TV settings heading')
-    s=once(s,'    list.post(()->cobraAnimateChildrenIn(list));',
-           '    list.post(()->{cobraAnimateChildrenIn(list);cobraTvFocusFirst(list);});','settings initial focus')
+    s=once(s,'    mStage.addView(settingsScroll, new LinearLayout.LayoutParams(-1,0,1));\n    list.post(()->cobraAnimateChildrenIn(list));\n    refreshCobraSubscriptionStatus();',
+           '    mStage.addView(settingsScroll, new LinearLayout.LayoutParams(-1,0,1));\n    list.post(()->{cobraAnimateChildrenIn(list);cobraTvFocusFirst(list);});\n    refreshCobraSubscriptionStatus();','settings initial focus')
 
     # TV is 60 Hz focused; ignore stale 90/120/max preferences and disable stale FPS overlay work.
     s=replace_body(s,'cobraRefreshMode','return "60";')
