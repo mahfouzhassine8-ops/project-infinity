@@ -1,0 +1,143 @@
+name: Infinity | 2103211 Library + Native Health Refinement
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103211-library-health-refinement-rc1]
+    paths:
+      - '.github/workflows/infinity-2103211-library-health-refinement.yml'
+      - 'repairs/cobra-library-health-2103211/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103211-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  package-and-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout scoped 2103211 successor
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact successful 2103208 presentation parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 Python 3.11 GIL native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103209 shell without native rebuild
+        run: |
+          set -euo pipefail
+          mkdir -p audit211 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit211/native-base
+
+      - name: Recreate exact successful 2103210 source
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "0d5172b619c8901994eb332050ae2330b0b6b607dae5e58e84a5b332581a8f5b"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in | cut -d' ' -f1)" = "e440ed7cfff5021c4e620ef825669c3e63126ce18e0fbeaa58a39cba3e216e93"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Main.java.in | cut -d' ' -f1)" = "240d08c21cbdbdfbff8f06f4af3f7a633516d499e49a24481c304990a705173f"
+
+      - name: Apply locked 2103211 media and Infinity-native Health corrections
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          grep -F '"Recent Releases"' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F '"Popular Now"' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'cobraAddVodGenres(page, items, series)' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'getHistoricalProcessExitReasons' shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          grep -F 'ACTION_CREATE_DOCUMENT' shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          ! grep -Fq 'launchKodiHealthCenter' shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          ! grep -Fq 'infinity_launch_kodi_health_center' shell-kodi/tools/android/packaging/xbmc/src/Main.java.in
+          grep -F '"live_tv_source_untouched": true' audit211/scope.json
+
+      - name: Create intermediate Android build keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          test -s "$HOME/.android/debug.keystore"
+
+      - name: Build Android shell sign and verify 2103211
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit211/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build211 \
+            --out signed211
+          python3 repairs/cobra-library-health-2103211/verify.py \
+            --final signed211/Infinity-1.0.9-Cobra-Library-Health-Refinement-RC1.apk \
+            --audit signed211/background-resume-apk-audit.json \
+            --base audit211/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk
+
+      - name: Publish 2103211 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103211-Cobra-Library-Native-Health-TEST-CANDIDATE
+          path: signed211/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103211 evidence and protected boundaries
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103211-Cobra-Library-Native-Health-Evidence
+          path: |
+            audit211/
+            engine/background-resume-source.json
+            repairs/cobra-library-health-2103211/
+            signed211/*.json
+            signed211/*.txt
+          if-no-files-found: warn
+          retention-days: 90
