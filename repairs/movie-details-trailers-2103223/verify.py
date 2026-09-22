@@ -56,8 +56,6 @@ def main():
             b'trailer_url',
             b'official trailer',
             b'android.intent.action.VIEW',
-            b'cobraVodDetailReturnCaptured',
-            b'cobraRestoreVodDetailReturn',
             b'Browse Episodes',
             b'cobra_drawer_active_section',
             b'experience_options_ui_dialog',
