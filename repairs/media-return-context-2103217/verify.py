@@ -24,7 +24,7 @@ def main():
    if name.startswith(('assets/','res/')) or name=='resources.arsc':require(apk.read(name)==base.read(name),'Protected asset/resource changed: '+name)
   dex=b''.join(apk.read(n) for n in apk.namelist() if re.fullmatch(r'classes\d*\.dex',n))
   for token in (b'cobraRestoreVodLandingReturn',b'cobraCaptureVodLandingReturn',
-                b'cobra_smart_return_experience_display',b'COBRA â¢ TV SHOWS',
+                b'cobra_smart_return_experience_display',b'COBRA '+bytes.fromhex('e280a2')+b' TV SHOWS',
                 b'LIVE TV AMBIENT BLUE',b'Infinity Health Center',b'Play Next Episode'):
    require(token in dex,'2103217 DEX contract missing: '+repr(token))
   require(b'cobra_settings_return' not in dex,'Obsolete inline Settings back returned')
