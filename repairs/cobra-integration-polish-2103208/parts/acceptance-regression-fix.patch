@@ -5,7 +5,7 @@
  
    private static final class Drawing {
 -    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-+    final Paint paint = new Paint();
++    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
      final RectF destination = new RectF();
    }
  
