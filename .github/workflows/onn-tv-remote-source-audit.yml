@@ -64,17 +64,40 @@ jobs:
           p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
           s=p.read_text()
           lines=s.splitlines()
-          pats=re.compile(r'KEYCODE_|dispatchKeyEvent|onKeyDown|onKeyUp|focusSearch|requestFocus|setFocusable|setOnFocusChangeListener|nextFocus|cobraPolishDrawerRow|cobraAnimatePanelIn|LayoutTransition|\.animate\(|setDuration\(|ViewPropertyAnimator|setSmoothScrollingEnabled|setItemAnimator',re.I)
-          hits=[i for i,x in enumerate(lines) if pats.search(x)]
-          merged=[]
-          for i in hits:
-            a=max(0,i-5); b=min(len(lines),i+9)
-            if merged and a<=merged[-1][1]+1:
-              merged[-1]=(merged[-1][0],max(merged[-1][1],b))
-            else:
-              merged.append((a,b))
-          for a,b in merged:
-            print(f'--- lines {a+1}-{b} ---')
-            for n in range(a,b):
-              print(f'{n+1:05d}: {lines[n]}')
+
+          def method(name):
+              start=s.find(name)
+              if start < 0:
+                  print('NOT FOUND:',name); return
+              brace=s.find('{',start)
+              if brace < 0:
+                  print('NO BRACE:',name); return
+              depth=0; end=None
+              for i in range(brace,len(s)):
+                  ch=s[i]
+                  if ch=='{': depth+=1
+                  elif ch=='}':
+                      depth-=1
+                      if depth==0:
+                          end=i+1; break
+              print('\n===== '+name+' =====')
+              print(s[start:end])
+
+          for name in (
+              'private boolean cobraMotionEnabled(',
+              'private void cobraPolishFocusable(',
+              'private void cobraAnimateChildrenIn(',
+              'private void cobraAnimatePanelIn(',
+              'private void cobraInspectProgramme(',
+              '@Override public boolean dispatchKeyEvent(',
+              'private Button cobraTextButton(',
+              'private CobraIconButton cobraIcon(',
+              'private void cobraPolishDrawerRow(',
+          ):
+              method(name)
+
+          print('\n===== FOCUS LISTENERS =====')
+          for n,line in enumerate(lines,1):
+              if 'setOnFocusChangeListener' in line or 'KEYCODE_DPAD' in line:
+                  print(f'{n:05d}: {line}')
           PY
