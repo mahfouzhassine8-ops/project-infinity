@@ -147,10 +147,20 @@ jobs:
           make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
 
           cd "$GITHUB_WORKSPACE"
+          # Artifact/source reconstruction can drop the executable bit from Gradle's wrapper.
+          # Restore it explicitly before CMake copies/configures Android packaging, then verify
+          # the generated build-tree wrapper immediately before the APK target.
+          test -f "$GITHUB_WORKSPACE/kodi/tools/android/packaging/gradlew"
+          chmod +x "$GITHUB_WORKSPACE/kodi/tools/android/packaging/gradlew"
+
           CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
           test -x "$CMAKE_BIN"
           "$CMAKE_BIN" -S "$GITHUB_WORKSPACE/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           make -C "$BUILD_DIR" -j"$(nproc)"
+
+          test -f "$BUILD_DIR/tools/android/packaging/gradlew"
+          chmod +x "$BUILD_DIR/tools/android/packaging/gradlew"
+          test -x "$BUILD_DIR/tools/android/packaging/gradlew"
           make -C "$BUILD_DIR" apk -j"$(nproc)"
 
           APK=$(find "$BUILD_DIR" kodi -type f -name '*.apk' -printf '%s %p\n' | sort -nr | head -1 | cut -d' ' -f2-)
