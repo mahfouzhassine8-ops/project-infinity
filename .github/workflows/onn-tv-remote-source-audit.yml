@@ -114,8 +114,36 @@ jobs:
               if mode_pat.search(line):
                   print(f'{n:05d}: {line}')
 
+          def token_method(token):
+              start=s.find(token)
+              if start < 0:
+                  print('TOKEN NOT FOUND:',token); return
+              line_start=s.rfind('\n',0,start)+1
+              brace=s.find('{',start)
+              if brace < 0:
+                  print('NO BRACE:',token); return
+              depth=0; end=None
+              for i in range(brace,len(s)):
+                  ch=s[i]
+                  if ch=='{': depth+=1
+                  elif ch=='}':
+                      depth-=1
+                      if depth==0:
+                          end=i+1; break
+              print('\n===== TOKEN '+token+' =====')
+              print(s[line_start:end])
+
+          for token in (
+              'cobraBuildModeChrome()',
+              'cobraTouchFirstDevice()',
+              'closeCobraExperienceDrawer()',
+              'static CobraModeLayout solve(',
+              'cobraDrawerView(',
+          ):
+              token_method(token)
+
           for name in (
-              'private void showCobraMode',
+              'private void showCobraMode'
               'private void cobraShowMode',
               'private void cobraSetMode',
               'private void cobraSetGuideStyle',
