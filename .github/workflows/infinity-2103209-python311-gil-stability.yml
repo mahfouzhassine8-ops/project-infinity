@@ -6,6 +6,7 @@ on:
     branches: [infinity-cobra-2103209-python311-gil-stability-rc1]
     paths:
       - '.github/workflows/infinity-2103209-python311-gil-stability.yml'
+      - 'scripts/infinity_python_invoker_hardening.py'
       - 'scripts/infinity_python_invoker_hardening_v2.py'
       - 'repairs/python311-gil-2103209/**'
 
