@@ -13,7 +13,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: infinity-2103214-\${{ github.sha }}
+  group: infinity-2103214-${{ github.sha }}
   cancel-in-progress: false
 
 env:
@@ -44,7 +44,7 @@ jobs:
         with:
           name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
           run-id: 35676573761
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: baseline208
 
       - name: Download preserved 2103209 Python 3.11 GIL native engine
@@ -52,7 +52,7 @@ jobs:
         with:
           name: Infinity-2103209-Python311-GIL-Native-Engine
           run-id: 35693288744
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: native209
 
       - name: Reconstruct exact 2103209 shell without native rebuild
@@ -106,10 +106,10 @@ jobs:
 
       - name: Build Android shell sign and verify 2103214
         env:
-          INFINITY_KEYSTORE_B64: \${{ secrets.INFINITY_KEYSTORE_B64 }}
-          INFINITY_STORE_PASSWORD: \${{ secrets.INFINITY_STORE_PASSWORD }}
-          INFINITY_KEY_PASSWORD: \${{ secrets.INFINITY_KEY_PASSWORD }}
-          INFINITY_KEY_ALIAS: \${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
           python3 scripts/package_background_resume.py \
