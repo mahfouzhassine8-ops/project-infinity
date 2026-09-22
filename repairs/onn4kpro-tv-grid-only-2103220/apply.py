@@ -221,8 +221,8 @@ def apply(shell:Path):
     s=once(s,'    if(closeCobraExperienceDrawer())return;\n',
            '    if(closeCobraExperienceDrawer()){mCobraTvDrawerPanel=null;mCobraTvDrawerPreviousFocus=null;return;}\n    mCobraTvDrawerPreviousFocus=getCurrentFocus();\n',
            'drawer previous focus')
-    s=once(s,'    LinearLayout panel=new LinearLayout(this);panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);',
-           '    LinearLayout panel=new LinearLayout(this);mCobraTvDrawerPanel=panel;panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);panel.setFocusable(true);panel.setFocusableInTouchMode(false);panel.setDescendantFocusability(android.view.ViewGroup.FOCUS_AFTER_DESCENDANTS);',
+    s=once(s,'    FrameLayout shield=new FrameLayout(this);shield.setTag("cobra_experience_drawer");shield.setClickable(true);shield.setBackgroundColor(vtheme().color("cobra.toggleCobraDrawer.colors.1",0x4d000000));shield.setOnClickListener(v->closeCobraExperienceDrawer());\n    LinearLayout panel=new LinearLayout(this);panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);',
+           '    FrameLayout shield=new FrameLayout(this);shield.setTag("cobra_experience_drawer");shield.setClickable(true);shield.setBackgroundColor(vtheme().color("cobra.toggleCobraDrawer.colors.1",0x4d000000));shield.setOnClickListener(v->closeCobraExperienceDrawer());\n    LinearLayout panel=new LinearLayout(this);mCobraTvDrawerPanel=panel;panel.setOrientation(LinearLayout.VERTICAL);panel.setClickable(true);panel.setFocusable(true);panel.setFocusableInTouchMode(false);panel.setDescendantFocusability(android.view.ViewGroup.FOCUS_AFTER_DESCENDANTS);',
            'drawer focus owner')
     s=once(s,'    shield.addView(panel,new FrameLayout.LayoutParams(width,-1,Gravity.LEFT));decor.addView(shield,new FrameLayout.LayoutParams(-1,-1));\n',
            '    shield.addView(panel,new FrameLayout.LayoutParams(width,-1,Gravity.LEFT));decor.addView(shield,new FrameLayout.LayoutParams(-1,-1));panel.post(()->cobraTvFocusDrawer(panel));\n',
