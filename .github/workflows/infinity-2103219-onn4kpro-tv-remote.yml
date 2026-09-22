@@ -1,0 +1,299 @@
+name: Infinity | 2103219 onn 4K Pro TV Remote RC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103219-onn4kpro-tv-remote-rc2]
+    paths:
+      - '.github/workflows/infinity-2103219-onn4kpro-tv-remote.yml'
+      - 'repairs/onn4kpro-tv-remote-2103219/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103219-onn4kpro-remote-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends-armv7
+  TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+  BUILD_DIR: ${{ github.workspace }}/kodi-build-armv7
+
+jobs:
+  build-tv:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - name: Checkout isolated onn TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Restore ARMv7 Kodi dependency cache
+        id: deps-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends-armv7
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-onn4kpro-21.3-armv7-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**', 'scripts/infinity_python_invoker_hardening_v2.py') }}
+          restore-keys: |
+            infinity-onn4kpro-21.3-armv7-${{ runner.os }}-
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 mobile engine for source reconstruction only
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct accepted Kodi 21.3 Infinity/Cobra native source
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_1.sh
+
+      - name: Apply Python 3.11 GIL and renderer hardening to ARMv7 native source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit219 candidate219
+          python3 scripts/infinity_python_invoker_hardening_v2.py apply             --source kodi             --receipt engine/armv7-pythoninvoker-threadstate-v2-source.json
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+          cp engine/armv7-pythoninvoker-threadstate-v2-source.json audit219/
+          grep -Fq 'PyEval_RestoreThread(m_mainThreadState);' kodi/xbmc/interfaces/python/PythonInvoker.cpp
+          python3 scripts/infinity_gui_render_hardening_v3.py apply             --source kodi             --receipt engine/armv7-gui-render-hardening-source.json
+          python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
+          cp engine/armv7-gui-render-hardening-source.json audit219/
+
+      - name: Reconstruct exact locked 2103217 Android layer and apply TV identity
+        run: |
+          set -euo pipefail
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare             --base-dir baseline208             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --shell shell-kodi             --out audit219/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          test "$(python3 - <<'PY'
+          import json
+          print(json.load(open('engine/background-resume-source.json'))['version_code'])
+          PY
+          )" = "2103219"
+
+          # Overlay only the generated Android/media/cmake source onto the full Kodi tree.
+          # Native Python/GIL and renderer source stays owned by the full kodi tree above.
+          rsync -a shell-kodi/ kodi/
+
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          receipt=json.loads(Path('engine/background-resume-source.json').read_text())
+          for name,row in receipt['files'].items():
+              path=Path('kodi')/name
+              assert path.is_file(), name
+              digest=hashlib.sha256(path.read_bytes()).hexdigest()
+              assert digest==row['after'], (name,digest,row['after'])
+          print('PASS: exact locked 2103217 Android layer plus 2103218 TV identity overlaid')
+          PY
+
+          MANIFEST=kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+          JAVA=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'android.intent.category.LEANBACK_LAUNCHER' "$MANIFEST"
+          grep -Fq 'android:banner="@drawable/banner"' "$MANIFEST"
+          grep -Fq 'cobra_smart_return_experience_display' "$JAVA"
+          grep -Fq 'cobraRestoreVodLandingReturn()' "$JAVA"
+          grep -Fq 'LIVE TV AMBIENT BLUE' "$JAVA"
+          grep -Fq 'versionCode 2103219' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Remote-RC2"' kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Build Kodi 21.3 ARMv7 dependencies and native engine
+        id: native_compile
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure             --with-tarballs="$TARBALLS"             --host=arm-linux-androideabi             --with-sdk-path="$ANDROID_HOME"             --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER"             --prefix="$DEPENDS"             --enable-debug=yes
+          rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz" "$TARBALLS/fontconfig-2.14.0.tar.xz.sha512"
+          make -C target/fontconfig FULL_URL=https://gstreamer.freedesktop.org/data/src/mirror/fontconfig-2.14.0.tar.xz download
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+
+          cd "$GITHUB_WORKSPACE"
+          # Artifact/source reconstruction can drop the executable bit from Gradle's wrapper.
+          # Restore it explicitly before CMake copies/configures Android packaging, then verify
+          # the generated build-tree wrapper immediately before the APK target.
+          test -f "$GITHUB_WORKSPACE/kodi/tools/android/packaging/gradlew"
+          chmod +x "$GITHUB_WORKSPACE/kodi/tools/android/packaging/gradlew"
+
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$GITHUB_WORKSPACE/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          make -C "$BUILD_DIR" -j"$(nproc)"
+
+          test -f "$BUILD_DIR/tools/android/packaging/gradlew"
+          chmod +x "$BUILD_DIR/tools/android/packaging/gradlew"
+          test -x "$BUILD_DIR/tools/android/packaging/gradlew"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+
+          APK=$(find "$BUILD_DIR" kodi -type f -name '*.apk' -printf '%s %p\n' | sort -nr | head -1 | cut -d' ' -f2-)
+          test -n "$APK"
+          cp "$APK" candidate219/Infinity-2103219-Onn4KPro-TV-Remote-built.apk
+
+          python3 - <<'PY'
+          import zipfile,hashlib,struct,json
+          from pathlib import Path
+          apk=Path('candidate219/Infinity-2103219-Onn4KPro-TV-Remote-built.apk')
+          with zipfile.ZipFile(apk) as z:
+              natives=[n for n in z.namelist() if n.startswith('lib/') and not n.endswith('/')]
+              assert natives
+              assert 'lib/armeabi-v7a/libkodi.so' in natives, natives[:10]
+              assert all(n.startswith('lib/armeabi-v7a/') for n in natives), [n for n in natives if not n.startswith('lib/armeabi-v7a/')]
+              elf=z.read('lib/armeabi-v7a/libkodi.so')
+              assert elf[:4]==b'\x7fELF' and elf[4]==1 and elf[5]==1
+              assert struct.unpack_from('<H',elf,18)[0]==40
+              proof={
+                'apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+                'libkodi_sha256':hashlib.sha256(elf).hexdigest(),
+                'native_files':natives,
+                'elf_class':'ELF32','elf_machine':'ARM','abi':'armeabi-v7a'
+              }
+          Path('audit219/armv7-engine.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print('PASS: native engine is armeabi-v7a / ELF32 ARM')
+          PY
+
+      - name: Permanently sign and verify onn TV candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          INPUT=candidate219/Infinity-2103219-Onn4KPro-TV-Remote-built.apk
+          FINAL=candidate219/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-RC2.apk
+          bash scripts/sign-infinity71.sh "$INPUT" "$FINAL"
+
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          "$BT/apksigner" verify --verbose --print-certs "$FINAL" | tee candidate219/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate219/signing-verification.txt
+
+          "$BT/aapt" dump badging "$FINAL" | tee candidate219/badging.txt
+          "$BT/aapt" dump xmltree "$FINAL" AndroidManifest.xml | tee candidate219/manifest.txt
+          grep -Fq "package: name='com.projectinfinity.kodi' versionCode='2103219' versionName='1.0.9-Cobra-Onn4KPro-TV-Remote-RC2'" candidate219/badging.txt
+          grep -Fq "application-label:'Infinity'" candidate219/badging.txt
+          grep -Fq "native-code: 'armeabi-v7a'" candidate219/badging.txt
+          grep -Fq 'android.intent.category.LEANBACK_LAUNCHER' candidate219/manifest.txt
+
+          python3 repairs/onn4kpro-tv-remote-2103219/verify.py             --apk "$FINAL"             --badging candidate219/badging.txt             --manifest candidate219/manifest.txt             --signing candidate219/signing-verification.txt             --python-proof audit219/armv7-pythoninvoker-threadstate-v2-source.json             --remote-proof audit219/tv-remote-source.json             --out candidate219/ONN-TV-VERIFICATION.json
+
+          sha256sum "$FINAL" | tee candidate219/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-RC2.sha256
+          cat > candidate219/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103219 — ONN. 4K PRO / GOOGLE TV ARMV7 REMOTE RC2
+          DEVICE ACCEPTANCE REQUIRED
+
+          INSTALL
+          1. Enable Developer options and USB/Wireless debugging on the onn. 4K Pro.
+          2. Install this APK as com.projectinfinity.kodi. Keep any existing Infinity data unless a clean TV-only test is explicitly desired.
+          3. Confirm Infinity appears in the Google TV Apps surface with its TV banner.
+
+          REMOTE / NAVIGATION
+          4. Use only the onn. remote: D-pad, Select, Back, Home. Rapidly move through Cobra drawer, Settings, Movies, TV Shows and Live TV; focus must move immediately with no sticky/laggy focus animation.
+          5. Cobra Settings -> Experience & Display -> Smart Return must be present.
+          6. Movies -> See all -> Back must return to the Movies landing page, not Live TV. Repeat for TV Shows and Genres.
+
+          LIVE TV / PLAYER
+          7. Open Live TV and move rapidly through at least 20 guide cells with the D-pad. Focus must keep pace with key presses; programme details may settle a fraction later but must not block navigation. Then confirm blue Ambient treatment, Quick Peek and player controls.
+          8. Test HLS and MPEG-TS legal/user-owned streams. Confirm MediaCodec video/audio, seek/timeshift where available, subtitles and audio tracks.
+          9. Test 1080p and 4K playback. Watch for decoder fallback, dropped frames, black video or audio-only playback.
+          10. Test refresh-rate modes and match-video behavior supported by the TV/HDMI display.
+          11. Test Night Cinema and player drawer with the remote.
+
+          MOVIES / TV SHOWS
+          12. Verify Featured, Recent Releases, Continue Watching, Trending, Popular and Genres.
+          13. TV Shows: season selector, episode thumbnails, Resume Episode and Play Next Episode.
+          14. Verify Sort/Filter and Details/My List/More Like This.
+
+          ANDROID TV LIFECYCLE
+          15. Press Home during playback and verify expected PiP/background behavior.
+          16. Return to Infinity and verify Smart Return restores Movies/Shows/Live TV according to the last useful destination.
+          17. Reboot the onn. device and verify the app still launches normally and scheduled reminders/recordings remain valid where configured.
+
+          ACCEPTANCE
+          - APK must report native-code armeabi-v7a.
+          - No arm64-v8a library may be present.
+          - Package and permanent Infinity signer must remain unchanged.
+          - Do not promote/lock this TV candidate until the physical onn. 4K Pro remote responsiveness tests above pass.
+          EOF
+
+      - name: Save ARMv7 dependency cache
+        if: always() && steps.native_compile.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            android-tools/xbmc-depends-armv7
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - name: Publish onn 4K Pro TV TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103219-Onn4KPro-TV-Remote-TEST-CANDIDATE
+          path: |
+            candidate219/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-RC2.apk
+            candidate219/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-RC2.sha256
+            candidate219/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-RC2.signing.txt
+            candidate219/signing-verification.txt
+            candidate219/badging.txt
+            candidate219/manifest.txt
+            candidate219/ONN-TV-VERIFICATION.json
+            candidate219/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve onn TV evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103219-Onn4KPro-TV-Remote-Evidence
+          path: |
+            audit219/
+            engine/armv7-pythoninvoker-threadstate-v2-source.json
+            engine/armv7-gui-render-hardening-source.json
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-2103218/
+            repairs/onn4kpro-tv-remote-2103219/
+            candidate219/*.json
+            candidate219/*.txt
+          if-no-files-found: warn
+          retention-days: 90
