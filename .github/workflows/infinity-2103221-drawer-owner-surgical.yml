@@ -1,0 +1,138 @@
+name: Infinity | 2103221 Cobra Drawer Owner Surgical
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103221-drawer-owner-surgical-rc1]
+    paths:
+      - '.github/workflows/infinity-2103221-drawer-owner-surgical.yml'
+      - 'repairs/drawer-owner-surgical-2103221/**'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103221-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+      - name: Download exact locked 2103217 APK for no-regression comparison
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103217-Media-Return-Context-TEST-CANDIDATE
+          run-id: 35719901011
+          github-token: ${{ github.token }}
+          path: parent217
+      - name: Reconstruct exact locked 2103217 source
+        run: |
+          set -euo pipefail
+          mkdir -p audit221 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi --out audit221/base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          grep -F '"version_code": 2103217' engine/background-resume-source.json
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          r=json.loads(Path('engine/background-resume-source.json').read_text())
+          expected={
+            'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in':'f94415e13b3c83fa23f739335a109d14d357d977236d10cf5b54c5b91b114203',
+            'tools/android/packaging/xbmc/src/Splash.java.in':'773e58b93abc782410b9d4cc4d3a69fb854b29e63d888ee9bc660834fddb7723',
+            'tools/android/packaging/xbmc/src/CobraSmartReturn.java.in':'7bf7dc411149bee5482f5390d986a9e375b3b6b28f02a1e35bf1d6e92855b8fb',
+            'tools/android/packaging/xbmc/src/Main.java.in':'ddf18d30c4040369b30e861ded588a53846ff3de319a89a219344771f8db9318',
+          }
+          for p,h in expected.items():
+            d=hashlib.sha256((Path('shell-kodi')/p).read_bytes()).hexdigest()
+            assert d==h,(p,d,h)
+          print('PASS: exact locked 2103217 UI/source parent')
+          PY
+      - name: Apply only drawer owner correction
+        run: |
+          set -euo pipefail
+          python3 repairs/drawer-owner-surgical-2103221/apply.py --shell shell-kodi
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'cobraSelectActiveSectionFromDrawer(destination)' "$JAVA"
+          grep -F 'if(cobraIsActiveSectionLanding()){moveTaskToBack(true);return;}' "$JAVA"
+          grep -F 'if(!"root".equals(mCobraInternalScreen)){cobraReturnToActiveSection();return;}' "$JAVA"
+          ! grep -Fq 'OnBackInvokedCallback' "$JAVA"
+      - name: Build, sign and prove UI/native parity
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android \
+            -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit221/base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build221 --out signed221
+          python3 repairs/drawer-owner-surgical-2103221/verify.py \
+            --final signed221/Infinity-1.0.9-Cobra-Drawer-Owner-Surgical-RC1.apk \
+            --parent parent217/Infinity-1.0.9-Cobra-Media-Return-Context-RC1.apk \
+            --audit signed221/background-resume-apk-audit.json
+          cat > signed221/DEVICE-TEST.txt <<'EOF'
+          2103221 DEVICE ACCEPTANCE — DRAWER OWNER ONLY
+
+          1. Do NOT uninstall or clear Infinity data. Update-install this APK.
+          2. Drawer -> Movies. Confirm Movies landing.
+          3. Android side Back/edge gesture from the Movies landing: Infinity/Cobra should leave/background, NOT switch to Live TV.
+          4. Return to Infinity/Cobra: it must return to Movies.
+          5. Movies -> See All / Genre -> Back: remain inside Movies.
+          6. Drawer -> TV Shows. Repeat side Back/background/return: it must return to TV Shows.
+          7. Drawer -> Live TV. Live TV may now become the owner because YOU selected it.
+          8. Confirm both Choose Your Experience gear/settings surfaces are unchanged from the locked parent.
+          9. Confirm Cobra Settings, Experience & Display, Smart Return, player, Ambient, Health Center and providers are unchanged.
+
+          Do not lock until these physical-device checks pass.
+          EOF
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103221-Cobra-Drawer-Owner-Surgical-TEST-CANDIDATE
+          path: signed221/
+          compression-level: 0
+          retention-days: 90
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103221-Cobra-Drawer-Owner-Surgical-Evidence
+          path: |
+            audit221/
+            engine/background-resume-source.json
+            repairs/drawer-owner-surgical-2103221/
+            signed221/*.json
+            signed221/*.txt
+          if-no-files-found: warn
+          retention-days: 90
