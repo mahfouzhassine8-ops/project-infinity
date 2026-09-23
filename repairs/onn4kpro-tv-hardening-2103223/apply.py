@@ -148,8 +148,8 @@ HARDENING_HELPERS=r'''  private static final String COBRA_TV_HARDENING_BUILD="co
       int[] there=new int[2];v.getLocationOnScreen(there);int x=there[0]+v.getWidth()/2,y=there[1]+v.getHeight()/2,primary,secondary;
       if(key==KeyEvent.KEYCODE_DPAD_DOWN){if(y<=cy+2)continue;primary=y-cy;secondary=Math.abs(x-cx);}
       else if(key==KeyEvent.KEYCODE_DPAD_UP){if(y>=cy-2)continue;primary=cy-y;secondary=Math.abs(x-cx);}
-      else if(key==KeyEvent.KEYCODE_DPAD_RIGHT){if(x<=cx+2)continue;primary=x-cx;secondary=Math.abs(y-cy);}
-      else if(key==KeyEvent.KEYCODE_DPAD_LEFT){if(x>=cx-2)continue;primary=cx-x;secondary=Math.abs(y-cy);}
+      else if(key==KeyEvent.KEYCODE_DPAD_RIGHT){if(x<=cx+2)continue;secondary=Math.abs(y-cy);if(secondary>Math.max(current.getHeight(),v.getHeight())*2)continue;primary=x-cx;}
+      else if(key==KeyEvent.KEYCODE_DPAD_LEFT){if(x>=cx-2)continue;secondary=Math.abs(y-cy);if(secondary>Math.max(current.getHeight(),v.getHeight())*2)continue;primary=cx-x;}
       else return false;
       long s=(long)primary*10000L+secondary;if(s<score){score=s;best=v;}
     }
