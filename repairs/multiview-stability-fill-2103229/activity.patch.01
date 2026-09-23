@@ -1,0 +1,78 @@
+_MS);
++    }
++    static String reason(boolean live,boolean requested,int suppression,int state,boolean hasError,
++        long stateAgeMs,long errorAgeMs,boolean fallbackInFlight){
++      if(!live||!requested||suppression!=Player.PLAYBACK_SUPPRESSION_REASON_NONE)return "";
++      if(hasError&&errorAgeMs>=(fallbackInFlight?FALLBACK_GRACE_MS:ERROR_GRACE_MS))return "error";
++      if(state==Player.STATE_IDLE&&stateAgeMs>=IDLE_GRACE_MS)return "idle";
++      if(state==Player.STATE_BUFFERING&&stateAgeMs>=BUFFER_STALL_MS)return "buffering";
++      // READY video-output stalls stay owned by the existing surface-observer/reattach path.
++      // ENDED stays owned by CobraLiveEndedPolicy. Never stack two recovery systems.
++      return "";
++    }
++  }
++
++  private boolean cobraMultiFillScreen(){
++    return mPrefs!=null&&mPrefs.getBoolean(COBRA_MULTI_LAYOUT_FILL,false);
++  }
++
++  private int[] cobraMultiSafeInsets(){
++    if(mCobraMultiCanvas==null)return new int[]{0,0,0,0};
++    android.view.WindowInsets insets=Build.VERSION.SDK_INT>=23?mCobraMultiCanvas.getRootWindowInsets():null;
++    if(insets==null)return new int[]{0,0,0,0};
++    int left=0,top=0,right=0,bottom=0;
++    if(Build.VERSION.SDK_INT>=30){
++      android.graphics.Insets safe=insets.getInsets(android.view.WindowInsets.Type.systemBars()|android.view.WindowInsets.Type.displayCutout());
++      left=safe.left;top=safe.top;right=safe.right;bottom=safe.bottom;
++    }else{
++      left=insets.getSystemWindowInsetLeft();top=insets.getSystemWindowInsetTop();right=insets.getSystemWindowInsetRight();bottom=insets.getSystemWindowInsetBottom();
++      if(Build.VERSION.SDK_INT>=28&&insets.getDisplayCutout()!=null){android.view.DisplayCutout cut=insets.getDisplayCutout();left=Math.max(left,cut.getSafeInsetLeft());top=Math.max(top,cut.getSafeInsetTop());right=Math.max(right,cut.getSafeInsetRight());bottom=Math.max(bottom,cut.getSafeInsetBottom());}
++    }
++    return new int[]{Math.max(0,left),Math.max(0,top),Math.max(0,right),Math.max(0,bottom)};
++  }
++
++  private void cobraSetMultiFillScreen(boolean fill){
++    if(mPrefs==null)return;
++    mPrefs.edit().putBoolean(COBRA_MULTI_LAYOUT_FILL,fill).apply();
++    closeCobraActionSheet();cobraLayoutMultiTiles();
++    for(CobraVideoTile tile:mCobraTiles.values()){
++      CobraPlayerBinding binding=mCobraPlayerBindings.get(tile.player);
++      if(binding!=null)tile.texture.post(()->{if(binding.current()&&binding.texture==tile.texture)cobraFitBinding(binding);});
++    }
++    toast(fill?"Multi-View • Fill Screen":"Multi-View • Fit");
++  }
++
++  private void cobraShowMultiLayoutChooser(){
++    boolean fill=cobraMultiFillScreen();
++    LinearLayout rows=cobraOpenSheet("Multi-View layout",
++        "Fit keeps current framing. Fill Screen uses every safe tile region with proportional minimum center crop.","multi-layout");
++    rows.addView(cobraSheetRow("aspect",fill?"Fit":"Fit",fill?"Preserve the current framing":"Selected • preserve the current framing",false,true,()->cobraSetMultiFillScreen(false)));
++    rows.addView(cobraSheetRow("fullscreen","Fill Screen",fill?"Selected • edge-to-edge Multi-View":"Use the available display • minimum center crop",false,true,()->cobraSetMultiFillScreen(true)));
++  }
++
++  private boolean cobraRecoverMultiTileSession(CobraVideoTile tile,CobraPlayerBinding binding,String reason,long now){
++    if(tile==null||binding==null||tile.player==null||tile.player!=binding.player||!binding.current())return false;
++    ExoPlayer player=tile.player;
++    if(mCobraMultiFullscreenActive||mBackgroundStopped||mInPictureInPicture||!player.getPlayWhenReady()
++        ||player.getPlaybackSuppressionReason()!=Player.PLAYBACK_SUPPRESSION_REASON_NONE
++        ||player==mCobraTimeshiftPlayer||player==mCobraTimeshiftProxyPlayer
++        ||!CobraMultiRecoveryPolicy.canAttempt(tile.autoRecoveries,tile.lastRecoveryAt,now))return false;
++    tile.autoRecoveries++;tile.lastRecoveryAt=now;tile.recovering=true;tile.stableSince=0L;tile.changed=now;
++    binding.vitals.recovery.suspend();binding.vitals.lastRecovery="multiview-"+reason+"-same-player";
++    try{
++      player.seekToDefaultPosition();player.prepare();startCobraPlayer(player);
++      InfinityCobraDiagnostics.record(this,"multiview","auto-recovery",
++          "channel_hash="+InfinityCobraFeatureRuntime.hashId(tile.channel.id)+"; reason="+reason+"; attempt="+tile.autoRecoveries+"; same_player=true; peers_untouched=true");
++      return true;
++    }catch(RuntimeException failure){
++      tile.recovering=false;binding.vitals.lastRecovery="multiview-recovery-failed";
++      InfinityCobraDiagnostics.failure(this,"multiview-auto-recovery",failure);return false;
+     }
+   }
+ 
+@@ -8360,7 +8486,11 @@
+   private void cobraFitBinding(CobraPlayerBinding binding) {
+     int mode=cobraBindingAspect(binding);
+     if(binding.player==mPlayer)mAspectMode=mode;
+-    cobraFitVideo(binding.texture,binding.player,mInPictureInPicture?0:mode);
++    if(!mInPictureInPi
