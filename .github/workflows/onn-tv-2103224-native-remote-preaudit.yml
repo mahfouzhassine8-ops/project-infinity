@@ -1,0 +1,365 @@
+name: onn TV 2103224 native remote architecture preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103224-onn4kpro-tv-native-remote-architecture-rc7]
+    paths:
+      - '.github/workflows/onn-tv-2103224-native-remote-preaudit.yml'
+      - 'repairs/onn4kpro-tv-grid-only-2103220/**'
+      - 'repairs/onn4kpro-tv-remote-ui-2103221/**'
+      - 'repairs/onn4kpro-tv-player-multiview-2103222/**'
+      - 'repairs/onn4kpro-tv-hardening-2103223/**'
+      - 'repairs/onn4kpro-tv-native-remote-2103224/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 mobile engine for source reconstruction only
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct through 2103222 and apply 2103223 TV hardening
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit219
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit219/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+
+      - name: Audit 2103221 TV fit focus handoff and Multi-View source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+          lines=s.splitlines()
+
+          def method(name):
+              start=s.find(name)
+              if start < 0:
+                  print('NOT FOUND:',name); return
+              brace=s.find('{',start)
+              if brace < 0:
+                  print('NO BRACE:',name); return
+              depth=0; end=None
+              for i in range(brace,len(s)):
+                  ch=s[i]
+                  if ch=='{': depth+=1
+                  elif ch=='}':
+                      depth-=1
+                      if depth==0:
+                          end=i+1; break
+              print('\n===== '+name+' =====')
+              print(s[start:end])
+
+          for name in (
+              'private boolean cobraMotionEnabled(',
+              'private void cobraPolishFocusable(',
+              'private void cobraAnimateChildrenIn(',
+              'private void cobraAnimatePanelIn(',
+              'private void cobraInspectProgramme(',
+              '@Override public boolean dispatchKeyEvent(',
+              'private Button cobraTextButton(',
+              'private CobraIconButton cobraIcon(',
+              'private void cobraPolishDrawerRow(',
+          ):
+              method(name)
+
+          print('\n===== FOCUS LISTENERS =====')
+          for n,line in enumerate(lines,1):
+              if 'setOnFocusChangeListener' in line or 'KEYCODE_DPAD' in line:
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== TV SETTINGS / PHONE-ONLY REFERENCES =====')
+          phone_pat=re.compile(r'PictureInPicture|PIP|Background Mode|Play in Background|DISPLAY|Performance|120|refresh|rotation|orientation|Media During Calls|phone call|file picker|Ask every time|gesture|swipe|touch',re.I)
+          for n,line in enumerate(lines,1):
+              if phone_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== 2103224 MULTIVIEW / FAVORITES / HEADER FOCUS REFERENCES =====')
+          tvnative_pat=re.compile(r'favorites|cobra_tv_grid_group|cobra_multi_|multi picker|setOnItemClick|setSelection|performClick|player_header|header_favorite|header_lock|cobra_last_channel|filter|CATEGORIES|RECENT|FAVORITES|GROUP:',re.I)
+          for n,line in enumerate(lines,1):
+              if tvnative_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== HARDENING / MAIN THREAD / REBUILD / DELAY REFERENCES =====')
+          hard_pat=re.compile(r'runOnUiThread|mMain\.post|postDelayed|notifyDataSetChanged|removeAllViews|removeView|addView|requestLayout|requestApplyInsets|setSystemUiVisibility|showCobraPrimaryView|buildShell\(|clearStage\(|loadGuideAsync|cobraRenderGuideBrowser|cobraRefreshModeDetails|cobraRefreshProgrammeLabels|Thread\.sleep|sleep\(|execute\(|submit\(|new Thread|Executors|synchronized',re.I)
+          for n,line in enumerate(lines,1):
+              if hard_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== HARDENING / FOCUSABLE SURFACE INVENTORY =====')
+          focus_pat=re.compile(r'setFocusable\(|setFocusableInTouchMode|requestFocus\(|focusSearch|nextFocus|setOnKeyListener|KEYCODE_DPAD|ListView|ScrollView|Recycler',re.I)
+          for n,line in enumerate(lines,1):
+              if focus_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== TV SAFE AREA / PLAYER FOCUS / HANDOFF / MULTIVIEW REFERENCES =====')
+          fit_pat=re.compile(r'nextFocus|focusSearch|requestFocus|setFocusable|player chrome|transport|footer|header|preview|fullscreen|removeView|addView|visibility|layoutGuide|inset|system bar|multi.?view|multi tile|enlarge|return multi|screen fit',re.I)
+          for n,line in enumerate(lines,1):
+              if fit_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== TV GROUP / PLAYER / PREVIEW REFERENCES =====')
+          tvui_pat=re.compile(r'group|category|preview|player chrome|player drawer|timeshift|seek|subtitle|audio track|more|quick peek|focusable|requestFocus|dpad',re.I)
+          for n,line in enumerate(lines,1):
+              if tvui_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== TV MODE / VIEW REFERENCES =====')
+          mode_pat=re.compile(r'TV Grid|Normal|Cinema|Focus|Compact|GuideStyle|mCobraGuideStyle|view mode|mode label|cobraMode',re.I)
+          for n,line in enumerate(lines,1):
+              if mode_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          def token_method(token):
+              start=s.find(token)
+              if start < 0:
+                  print('TOKEN NOT FOUND:',token); return
+              line_start=s.rfind('\n',0,start)+1
+              brace=s.find('{',start)
+              if brace < 0:
+                  print('NO BRACE:',token); return
+              depth=0; end=None
+              for i in range(brace,len(s)):
+                  ch=s[i]
+                  if ch=='{': depth+=1
+                  elif ch=='}':
+                      depth-=1
+                      if depth==0:
+                          end=i+1; break
+              print('\n===== TOKEN '+token+' =====')
+              print(s[line_start:end])
+
+          for token in (
+              'cobraBuildModeChrome()',
+              'cobraTouchFirstDevice()',
+              'closeCobraExperienceDrawer()',
+              'static CobraModeLayout solve(',
+              'cobraDrawerView(',
+              'cobraBackgroundPlaybackRequested(',
+              'cobraChannelBackgroundEnabled(',
+              'cobraMiniBackground',
+              'pauseCobraForBackground(',
+              'cobraBackgroundModeLabel(',
+              'cobraMiniBackgroundLabel(',
+              'cobraInstallModeList(',
+              'scheduleChromeHide(',
+              'showPlayerSettingsDrawer(',
+              'closeCobraPlayerDrawer(',
+              'openPlayerOverlay(',
+              'showTrackChooser(',
+              'cobraOpenSheet(',
+              'cobraAttachVideo(',
+              'onBackPressed(',
+              'cobraFitVideo(',
+              'buildShell(',
+              'cobraPosition(',
+              'CobraVideoTile(',
+              'rebuildCobraMultiPreservingSessions(',
+              'mCobraPresentationTick',
+              'mCobraTvApplyProgrammeFocus',
+              'mCobraVisibleGuideFetch',
+              'mRebuildShellAfterPlayer',
+          ):
+              token_method(token)
+
+          for name in (
+              'private void showCobraMode'
+              'private void cobraShowMode',
+              'private void cobraSetMode',
+              'private void cobraSetGuideStyle',
+              'private void showCobraVisual',
+              'private void cobraShowVisual',
+              'private void cobraRenderGuideBrowser',
+              'private String cobraGuideViewMode(',
+              'private String cobraGuideViewModeLabel(',
+              'private void showCobraViewModeMenu(',
+              'private void cobraSetGuideMode(',
+              'private void cobraApplyMode(',
+              'private void toggleCobraDrawer(',
+              'private void closeCobraExperienceDrawer(',
+              'private void cobraDrawerDestination(',
+              'private LinearLayout cobraDrawerViewRow(',
+              'private LinearLayout cobraBrandHeader(',
+              'private void cobraPremiumViewMenu(',
+              'private void cobraSwitchMode(',
+              'private void showSettings(',
+              'private void cobraAddDisplayPerformance',
+              'private void cobraAddBackground',
+              'private void cobraAddPlayInBackground',
+              'private void cobraShowBackgroundMode',
+              'private void cobraAddRotation',
+              'private void cobraAddMediaDuringCalls',
+              'private void cobraShowMediaDuringCalls',
+              'private void enterCobraPip',
+              'private void cobraEnterPictureInPicture',
+              'private void cobraApplyPlayerRotation',
+              'private void cobraUpdatePlayerRotationButton',
+              'private void cobraShowVisualMenu(',
+              'private PictureInPictureParams cobraPipParams(',
+              'private void configureCobraPip(',
+              'private void enterCobraPictureInPicture(',
+              'private boolean cobraWantsFullscreenPip(',
+              'private void onCobraUserLeaveHint',
+              'private void cobraAddPresentationSettings(',
+              'private String cobraPlayerRotationMode(',
+              'private int cobraPlayerRotationMode(',
+              'private void cobraShowChannelPreferences(',
+              'private void cobraToggleModeGroups(',
+              'private void cobraDirectory(',
+              'private void cobraOpenTvDirectory(',
+              'private void cobraRenderGridMode(',
+              'private void cobraBuildPlayerChrome(',
+              'private void showCobraPlayerDrawer(',
+              'private void cobraRenderPlayerDrawer(',
+              'private void closeCobraPlayerDrawer(',
+              'private void showPlayerChromeTemporarily(',
+              'private void hidePlayerChrome(',
+              'private void cobraRefreshModeDetails(',
+              'private void updateCobraPreviewDetails(',
+              'private void startCobraPreview(',
+              'private FrameLayout cobraPreviewPanel(',
+              'private void cobraShowQuickPeek(',
+              'private void cobraRefreshQuickPeek(',
+              'private void showCobraAudioSubtitleMenu(',
+              'private void showCobraMoreMenu(',
+              'private void showCobraPlayerMoreMenu(',
+              'private void showCobraTracks(',
+              'private void cobraLayoutGuide(',
+              'private void cobraShowGuideShell(',
+              'private void showCobraTvHub(',
+              'private void selectGuidePreview(',
+              'private void promoteCobraPreviewToFullscreen(',
+              'private void closeFullscreenToCobraView(',
+              'private void openPlayerOverlay(',
+              'private void closePlayer(',
+              'private void cobraLayoutPlayerPanels(',
+              'private void cobraApplySystemBarsForSurface(',
+              'private void beginMultiView(',
+              'private void openMultiView(',
+              'private void showCobraMultiPicker(',
+              'private void renderCobraMultiPicker(',
+              'private void showCobraMultiTileActions(',
+              'private void cobraLayoutMultiTiles(',
+              'private void showMultiChromeTemporarily(',
+              'private void multiToSingle(',
+              'private void releaseMulti(',
+              'private void onBackPressed(',
+              'protected void onCreate(',
+              'protected void onStart(',
+              'protected void onResume(',
+              'protected void onPause(',
+              'protected void onStop(',
+              'private void buildShell(',
+              'private void showCobraPrimaryView(',
+              'private void clearStage(',
+              'private void cobraShowGuideShell(',
+              'private void cobraRenderGuideBrowser(',
+              'private ArrayList<Channel> cobraGuideChannels(',
+              'private void cobraInspectProgramme(',
+              'private void cobraRefreshModeDetails(',
+              'private void cobraRefreshProgrammeLabels(',
+              'private void loadGuideAsync(',
+              'private void cobraQueueVisibleGuides(',
+              'private void showCobraMultiPicker(',
+              'private void renderCobraMultiPicker(',
+              'private void showCobraMultiTileActions(',
+              'private LinearLayout cobraOpenSheet(',
+              'private boolean closeCobraActionSheet(',
+              'private void showCobraAspectPicker(',
+              'private void showPlayerSettingsDrawer(',
+              'private void showTrackChooser(',
+              'private void cobraShowChannelSearch(',
+              'private void cobraOpenTvDirectory(',
+              'private void toggleCobraDrawer(',
+              'private void cobraAnimateChildrenIn(',
+              'private void cobraAnimatePanelIn(',
+              'private void cobraRefreshVisualEffects(',
+              'private void cobraStartPresentationTicker(',
+              'private void cobraStopPresentationTicker(',
+              'private void rebuildCobraShellIfNeeded(',
+              'private void cobraApplySystemBarsForSurface(',
+              'private void loadAllEnabledSources(',
+              'private void loadActiveSource(',
+              'private void loadPersistedState(',
+              'private boolean cobraTrySmartReturn(',
+              'private void cobraRefreshChannelMetadata(',
+              'private void cobraInstallEpg(',
+              'private void cobraRefreshQuickPeek(',
+              'private void cobraUpdatePerformanceOverlay(',
+              'private void cobraApplyDisplayPerformance(',
+              'private boolean cobraGuidePresentationActive(',
+              'private void cobraPublishMiniState(',
+              'private boolean restoreCobraLibraryCache(',
+              'private void saveCobraLibraryCache(',
+              'private File cobraLibraryCacheFile(',
+              'private void cobraRenderGridMode(',
+              'private void cobraModeBrowserHeader(',
+              'private void cobraBuildModeChrome(',
+              'private LinearLayout cobraModeToolbar(',
+              'private void showCobraMultiPicker(',
+              'private void renderCobraMultiPicker(',
+              'private void renderCobraMultiPickerSearch(',
+              'private void selectCobraMultiChannel(',
+              'private void beginMultiView(',
+              'private void openMultiView(',
+              'private void showCobraMultiTileActions(',
+              'private boolean cobraTvHandleTransientKey(',
+              'private boolean cobraTvMoveTransientFocus(',
+              'private boolean cobraTvHandlePlayerKey(',
+              'private boolean cobraTvPlayerFocusGraph(',
+              'private void cobraBuildPlayerChrome(',
+              'private void cobraTvFocusPlayerPrimary(',
+              'private void cobraTvFocusFirst(',
+              'private void cobraDirectory(',
+              'private void cobraOpenTvDirectory(',
+          ):
+              method(name)
+          PY
+
+      - name: Print TV manifest compatibility flags
+        run: |
+          set -euo pipefail
+          grep -n -E 'supportsPictureInPicture|resizeableActivity|screenOrientation|LEANBACK|touchscreen|television|autoEnterEnabled' shell-kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in || true
