@@ -1,0 +1,208 @@
+name: Infinity | 2103227 Device Live Fold Multi-View
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103227-device-live-fold-multiview-audit-rc1]
+    paths:
+      - '.github/workflows/infinity-2103227-device-live-fold-multiview.yml'
+      - 'repairs/device-live-fold-multiview-2103227/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103227-\${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact 2103208 source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: \${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: \${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103225 APK for rollback and payload gate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103225-Cobra-TV-Show-Typography-TEST-CANDIDATE
+          run-id: 35795353201
+          github-token: \${{ github.token }}
+          path: parent225
+
+      - name: Reconstruct exact locked 2103225
+        run: |
+          set -euo pipefail
+          mkdir -p audit227 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit227/base
+
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/drawer-owner-ui-restore-2103221/apply.py --shell shell-kodi
+          python3 repairs/experience-options-ui-2103222/apply.py --shell shell-kodi
+          python3 repairs/movie-details-trailers-2103223/apply.py --shell shell-kodi
+          python3 repairs/tv-show-details-trailers-2103224/apply.py --shell shell-kodi
+          python3 repairs/tv-show-typography-2103225/apply.py --shell shell-kodi
+
+          grep -F '"version_code": 2103225' engine/background-resume-source.json
+          grep -F '"version_name": "1.0.9-Cobra-TV-Show-Typography-RC1"' engine/background-resume-source.json
+
+      - name: Replay audited 2103226 Fold Fit Fill
+        run: |
+          set -euo pipefail
+          python3 repairs/fold-fit-fill-2103226/apply.py --shell shell-kodi
+          grep -F '"version_code": 2103226' engine/background-resume-source.json
+          grep -F '"fold_fit_fill_audited": true' engine/background-resume-source.json
+          ACT=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          test "$(sha256sum "$ACT" | cut -d' ' -f1)" = "f02e1aa2550e56e0222fafaa3e8b74bf5ee8585353535891e60da709e1d3cdd0"
+
+      - name: Apply and audit 2103227 device corrections
+        run: |
+          set -euo pipefail
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit227/InfinityLiveActivity-2103226-before.java.in
+          python3 repairs/device-live-fold-multiview-2103227/apply.py --shell shell-kodi
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit227/InfinityLiveActivity-2103227-after.java.in
+
+          python3 repairs/device-live-fold-multiview-2103227/source_audit.py \
+            --source shell-kodi \
+            --scope audit227/scope.json \
+            --out audit227
+
+          grep -F '"version_code": 2103227' engine/background-resume-source.json
+          grep -F '"live_ended_auto_recovery": true' engine/background-resume-source.json
+          grep -F '"multiview_fullscreen_reversible": true' engine/background-resume-source.json
+          grep -F '"fold_fit_device_balanced": true' engine/background-resume-source.json
+
+      - name: Build and sign exact 2103227 candidate
+        env:
+          INFINITY_KEYSTORE_B64: \${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: \${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: \${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: \${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -alias androiddebugkey -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit227/base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build227 \
+            --out signed227
+
+      - name: Run device-fix Android tests
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          TESTDIR=build227/xbmc/src/test/java/com/projectinfinity/kodi
+          mkdir -p "$TESTDIR"
+          cp repairs/device-live-fold-multiview-2103227/tests/Cobra2103227DeviceLiveFoldMultiViewTest.java "$TESTDIR/"
+
+          cat >> build227/xbmc/build.gradle <<'GRADLE'
+          android.testOptions.unitTests.includeAndroidResources = true
+          android.testOptions.unitTests.all {
+            maxHeapSize = "3g"
+            maxParallelForks = 1
+            testLogging { events "started", "passed", "failed", "skipped"; exceptionFormat = "full" }
+          }
+          dependencies {
+            testImplementation 'junit:junit:4.13.2'
+            testImplementation 'org.robolectric:robolectric:4.14.1'
+          }
+          GRADLE
+
+          (
+            cd build227
+            ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+              --tests com.projectinfinity.kodi.Cobra2103227DeviceLiveFoldMultiViewTest \
+              --stacktrace
+          )
+
+      - name: Verify final APK against locked 2103225
+        run: |
+          set -euo pipefail
+          python3 repairs/device-live-fold-multiview-2103227/verify.py \
+            --apk signed227/Infinity-1.0.9-Cobra-Device-Live-Fold-MultiView-RC1.apk \
+            --parent225 parent225/Infinity-1.0.9-Cobra-TV-Show-Typography-RC1.apk \
+            --audit signed227/background-resume-apk-audit.json \
+            --scope audit227/scope.json \
+            --source-audit audit227/source-audit.json
+
+      - name: Publish 2103227 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103227-Cobra-Device-Live-Fold-MultiView-TEST-CANDIDATE
+          path: signed227/
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve complete 2103227 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103227-Cobra-Device-Live-Fold-MultiView-Evidence
+          path: |
+            audit227/
+            engine/background-resume-source.json
+            repairs/device-live-fold-multiview-2103227/
+            signed227/*.json
+            signed227/*.txt
+            build227/xbmc/build/reports/tests/testReleaseUnitTest/
+            build227/xbmc/build/test-results/testReleaseUnitTest/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact locked 2103225 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-Exact-Rollback-Before-2103227
+          path: parent225/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
