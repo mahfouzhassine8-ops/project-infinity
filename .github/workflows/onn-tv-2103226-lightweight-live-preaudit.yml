@@ -109,7 +109,7 @@ jobs:
             'openPlayerOverlay','closePlayer','cobraBuildPlayerChrome','cobraLayoutPlayerPanels','showCobraPlayerDrawer','closeCobraPlayerDrawer',
             'cobraRenderPlayerDrawer','cobraTvFocusPlayerDrawerTarget','cobraTvHandleGuideKey','cobraTvHandlePlayerKey',
             'cobraRefreshEpg','cobraRefreshModeDetails','cobraLayoutGuide',
-            'startSinglePlayer','cobraStartDirectSinglePlayer','releaseSinglePlayer','cobraAttachVideo','rebuildCobraShellIfNeeded','showPlayerChromeTemporarily'
+            'startSinglePlayer','cobraStartDirectSinglePlayer','releaseSinglePlayer','cobraAttachVideo','rebuildCobraShellIfNeeded','applyLoadResult','cobraTvInstallWarmLibrary','loadAllEnabledSources','toggleFavorite','configureCobraPip','cobraRequestPlayerOrientation','cobraUpdatePlayerRotationButton','showPlayerChromeTemporarily'
           ]
           out=[]
           for n in names:out += ['\n===== '+n+' =====\n',span(n)]
