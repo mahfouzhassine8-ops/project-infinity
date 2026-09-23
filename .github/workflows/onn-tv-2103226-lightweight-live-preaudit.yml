@@ -65,6 +65,26 @@ jobs:
           python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
 
+      - name: Dry-run 2103226 lightweight persistent Live TV source
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-lightweight-live-2103226/apply.py
+          python3 repairs/onn4kpro-tv-lightweight-live-2103226/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103226
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Lightweight-Live-RC9'
+          assert r['tv_lightweight_live_architecture'] is True
+          assert r['tv_persistent_player_surface'] is True
+          assert r['tv_guide_preview_decoder_disabled'] is True
+          assert r['tv_channel_library_index_cached'] is True
+          assert r['tv_channel_group_counts_cached'] is True
+          assert r['tv_player_surface_not_resized_by_overlays'] is True
+          assert r['native_engine_rebuilt'] is False
+          print('PASS: RC9 source receipt')
+          PY
+
       - name: Audit TV navigation and hot paths
         run: |
           python3 - <<'PY'
