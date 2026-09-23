@@ -3,10 +3,11 @@ name: onn TV remote source audit
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-cobra-2103220-onn4kpro-tv-grid-only-rc3]
+    branches: [infinity-cobra-2103221-onn4kpro-tv-remote-ui-rc4]
     paths:
       - '.github/workflows/onn-tv-remote-source-audit.yml'
       - 'repairs/onn4kpro-tv-grid-only-2103220/**'
+      - 'repairs/onn4kpro-tv-remote-ui-2103221/**'
 
 permissions:
   contents: read
@@ -58,7 +59,7 @@ jobs:
           python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
 
-      - name: Print remote/focus/animation source contexts
+      - name: Print TV groups player preview remote source contexts
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -108,6 +109,12 @@ jobs:
           phone_pat=re.compile(r'PictureInPicture|PIP|Background Mode|Play in Background|DISPLAY|Performance|120|refresh|rotation|orientation|Media During Calls|phone call|file picker|Ask every time|gesture|swipe|touch',re.I)
           for n,line in enumerate(lines,1):
               if phone_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
+          print('\n===== TV GROUP / PLAYER / PREVIEW REFERENCES =====')
+          tvui_pat=re.compile(r'group|category|preview|player chrome|player drawer|timeshift|seek|subtitle|audio track|more|quick peek|focusable|requestFocus|dpad',re.I)
+          for n,line in enumerate(lines,1):
+              if tvui_pat.search(line):
                   print(f'{n:05d}: {line}')
 
           print('\n===== TV MODE / VIEW REFERENCES =====')
@@ -192,6 +199,26 @@ jobs:
               'private String cobraPlayerRotationMode(',
               'private int cobraPlayerRotationMode(',
               'private void cobraShowChannelPreferences(',
+              'private void cobraToggleModeGroups(',
+              'private void cobraDirectory(',
+              'private void cobraOpenTvDirectory(',
+              'private void cobraRenderGridMode(',
+              'private void cobraBuildPlayerChrome(',
+              'private void showCobraPlayerDrawer(',
+              'private void cobraRenderPlayerDrawer(',
+              'private void closeCobraPlayerDrawer(',
+              'private void showPlayerChromeTemporarily(',
+              'private void hidePlayerChrome(',
+              'private void cobraRefreshModeDetails(',
+              'private void updateCobraPreviewDetails(',
+              'private void startCobraPreview(',
+              'private FrameLayout cobraPreviewPanel(',
+              'private void cobraShowQuickPeek(',
+              'private void cobraRefreshQuickPeek(',
+              'private void showCobraAudioSubtitleMenu(',
+              'private void showCobraMoreMenu(',
+              'private void showCobraPlayerMoreMenu(',
+              'private void showCobraTracks(',
           ):
               method(name)
           PY
