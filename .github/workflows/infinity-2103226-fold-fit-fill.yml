@@ -131,6 +131,23 @@ jobs:
           mkdir -p "$TESTDIR"
           cp repairs/cobra-fold-adaptive-aspect-2103194/tests/Cobra2103194FoldAdaptiveAspectTest.java "$TESTDIR/"
           cp repairs/fold-fit-fill-2103226/tests/Cobra2103226FoldFitFillTest.java "$TESTDIR/"
+
+          # package_background_resume intentionally stages a release-only Gradle project.
+          # Add test-only dependencies after the signed APK has already been built; they
+          # cannot enter or mutate the delivery artifact.
+          cat >> build226/xbmc/build.gradle <<'GRADLE'
+          android.testOptions.unitTests.includeAndroidResources = true
+          android.testOptions.unitTests.all {
+            maxHeapSize = "3g"
+            maxParallelForks = 1
+            testLogging { events "started", "passed", "failed", "skipped"; exceptionFormat = "full" }
+          }
+          dependencies {
+            testImplementation 'junit:junit:4.13.2'
+            testImplementation 'org.robolectric:robolectric:4.14.1'
+          }
+          GRADLE
+
           (
             cd build226
             ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest               --tests com.projectinfinity.kodi.Cobra2103194FoldAdaptiveAspectTest               --tests com.projectinfinity.kodi.Cobra2103226FoldFitFillTest
