@@ -1,0 +1,241 @@
+name: Infinity | 2103225 onn TV Handoff Focus RC8 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103225-onn4kpro-tv-handoff-focus-rc8]
+    paths:
+      - '.github/workflows/infinity-2103225-onn4kpro-tv-handoff-focus.yml'
+      - 'repairs/onn4kpro-tv-handoff-focus-2103225/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103225-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC8 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103224 RC7 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103224-Onn4KPro-TV-Native-Remote-TEST-CANDIDATE
+          run-id: 35892830850
+          github-token: ${{ github.token }}
+          path: base224
+
+      - name: Reconstruct exact locked RC7 source and apply RC8 corrections
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 candidate225
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit225/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103225
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['mobile_parent_untouched'] is True
+          assert r['tv_hardening'] is True
+          assert r['tv_native_remote_architecture'] is True
+          assert r['tv_handoff_first_render'] is True
+          assert r['tv_black_surface_exposure_fixed'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['tv_player_footer_unclipped'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['multiview_survivor_player_recreated'] is False
+          assert r['multiview_fullscreen_reversible'] is True
+          print('PASS: exact 2103225 RC8 TV handoff/focus source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_grid_only_2103220' "$JAVA"
+          grep -Fq 'cobra_tv_remote_ui_2103221' "$JAVA"
+          grep -Fq 'cobra_tv_player_multiview_2103222' "$JAVA"
+          grep -Fq 'cobra_tv_hardening_2103223' "$JAVA"
+          grep -Fq 'cobra_tv_native_remote_2103224' "$JAVA"
+          grep -Fq 'cobra_tv_handoff_focus_2103225' "$JAVA"
+          grep -Fq 'onRenderedFirstFrame' "$JAVA"
+          grep -Fq 'cobraTvMultiRowSurface' "$JAVA"
+          grep -Fq 'cobraTvPaintMultiRowSelection' "$JAVA"
+          grep -Fq 'new LinearLayout.LayoutParams(-1,dp(64))' "$JAVA"
+          grep -Fq 'mCobraTvOpeningSurfaceHandoff=session!=null&&!restart' "$JAVA"
+          grep -Fq 'versionCode 2103225' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC7 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base224 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Native-Remote-RC7.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '65ba5d48a9070eaadcaa564d3e80d5850aac96c2c6a02f57b149f5f5a424a994' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate225/Infinity-2103224-RC7-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC8 Android TV layer, preserve exact ARMv7 engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate225/Infinity-2103224-RC7-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-225 \
+            --out candidate225
+          FINAL=candidate225/Infinity-1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate225/Infinity-1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate225/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103225 — ONN. 4K PRO TV HANDOFF + FOCUS RC8
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          LOCKED PARENT
+          - Exact RC7 / 2103224 is the protected parent and rollback.
+          - No native-engine rebuild. ARMv7 libkodi.so and protected payload remain byte-identical.
+
+          MULTI-VIEW PICKER FOCUS
+          1. Fullscreen -> Multi-View -> Favorites / Recent / All / Groups.
+          2. Press Down into rows and traverse at least 30 channels.
+          3. The current row must ALWAYS show a visible cyan/blue focus surface.
+          4. Select must tune/create/replace the intended screen.
+
+          PLAYER FOOTER FIT
+          5. Open fullscreen Live TV at 1080p and 4K output.
+          6. Channels, Display, Multi-View and More icons + captions must be completely visible.
+          7. Nothing may be clipped by the bottom edge.
+
+          MULTI-VIEW 2 -> 1 SURVIVOR
+          8. Run two channels simultaneously and confirm both render.
+          9. Remove either screen.
+          10. The surviving ExoPlayer must continue into single/fullscreen without recreation.
+          11. No black/loading regression, audio loss or provider reconnect unless the stream itself fails.
+
+          VIDEO SURFACE HANDOFFS
+          12. Guide/preview -> fullscreen: keep the previous rendered frame/UI visible until fullscreen renders its first frame.
+          13. Fullscreen -> guide/main TV view: keep fullscreen visible until the preview/menu destination renders.
+          14. Repeat at least 20 times across several channels.
+          15. Normal UI transitions must not expose a multi-second black screen.
+          16. Genuine provider buffering may still show its normal buffering state.
+
+          REGRESSION
+          17. Verify remote header, transport, timeline, Channels, Display, Multi-View and More.
+          18. Verify Favorites/Recent/All/Groups and third/fourth Multi-View screens.
+          19. Verify rewind/timeshift, 1080p/4K, audio/subtitles, recordings/reminders.
+          20. Phone/Fold, PiP/background/rotation/120-Hz surfaces remain untouched.
+
+          Do not lock/promote 2103225 until physical tests pass.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103225 HANDOFF FOCUS TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-Onn4KPro-TV-Handoff-Focus-TEST-CANDIDATE
+          path: |
+            candidate225/Infinity-1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8.apk
+            candidate225/Infinity-1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8.sha256
+            candidate225/signing-verification.txt
+            candidate225/badging.txt
+            candidate225/manifest.txt
+            candidate225/ONN-TV-2103225-VERIFICATION.json
+            candidate225/tv-handoff-focus-source.json
+            candidate225/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103225 RC8 source/packaging evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-Onn4KPro-TV-Handoff-Focus-Evidence
+          path: |
+            audit225/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-player-multiview-2103222/
+            repairs/onn4kpro-tv-hardening-2103223/
+            repairs/onn4kpro-tv-native-remote-2103224/
+            repairs/onn4kpro-tv-handoff-focus-2103225/
+            candidate225/*.json
+            candidate225/*.txt
+          if-no-files-found: warn
+          retention-days: 90
