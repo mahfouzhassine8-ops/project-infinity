@@ -188,7 +188,7 @@ jobs:
           python3 - <<'PY'
           import zipfile,hashlib,struct,json
           from pathlib import Path
-          apk=Path('candidate221/Infinity-2103220-Onn4KPro-TV-Grid-built.apk')
+          apk=Path('candidate221/Infinity-2103221-Onn4KPro-TV-Remote-UI-built.apk')
           with zipfile.ZipFile(apk) as z:
               natives=[n for n in z.namelist() if n.startswith('lib/') and not n.endswith('/')]
               assert natives
@@ -215,7 +215,7 @@ jobs:
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
-          INPUT=candidate221/Infinity-2103220-Onn4KPro-TV-Grid-built.apk
+          INPUT=candidate221/Infinity-2103221-Onn4KPro-TV-Remote-UI-built.apk
           FINAL=candidate221/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-UI-RC4.apk
           bash scripts/sign-infinity71.sh "$INPUT" "$FINAL"
 
@@ -295,8 +295,8 @@ jobs:
         with:
           name: Infinity-2103221-Onn4KPro-TV-Remote-UI-TEST-CANDIDATE
           path: |
-            candidate221/Infinity-1.0.9-Cobra-Onn4KPro-TV-Grid-RC3.apk
-            candidate221/Infinity-1.0.9-Cobra-Onn4KPro-TV-Grid-RC3.sha256
+            candidate221/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-UI-RC4.apk
+            candidate221/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-UI-RC4.sha256
             candidate221/Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-UI-RC4.signing.txt
             candidate221/signing-verification.txt
             candidate221/badging.txt
