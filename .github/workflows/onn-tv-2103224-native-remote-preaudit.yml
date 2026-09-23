@@ -64,6 +64,7 @@ jobs:
           python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
 
       - name: Audit 2103221 TV fit focus handoff and Multi-View source
         run: |
