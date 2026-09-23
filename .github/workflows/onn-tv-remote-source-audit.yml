@@ -112,6 +112,12 @@ jobs:
               if phone_pat.search(line):
                   print(f'{n:05d}: {line}')
 
+          print('\n===== TV SAFE AREA / HANDOFF / FOCUS REFERENCES =====')
+          fit_pat=re.compile(r'inset|padding|margin|width|height|safe|system bar|layoutGuide|fullscreen|preview|removeView|addView|visibility|focusSearch|nextFocus|requestFocus',re.I)
+          for n,line in enumerate(lines,1):
+              if fit_pat.search(line):
+                  print(f'{n:05d}: {line}')
+
           print('\n===== TV GROUP / PLAYER / PREVIEW REFERENCES =====')
           tvui_pat=re.compile(r'group|category|preview|player chrome|player drawer|timeshift|seek|subtitle|audio track|more|quick peek|focusable|requestFocus|dpad',re.I)
           for n,line in enumerate(lines,1):
@@ -162,6 +168,15 @@ jobs:
               'openPlayerOverlay(',
               'showTrackChooser(',
               'cobraOpenSheet(',
+              'cobraLayoutGuide(',
+              'cobraShowGuideShell(',
+              'cobraRenderGuideBrowser(',
+              'cobraModeBrowserHeader(',
+              'closeFullscreenToCobraView(',
+              'promoteCobraPreviewToFullscreen(',
+              'openPlayerOverlay(',
+              'closePlayer(',
+              'cobraBuildPlayerChrome(',
           ):
               token_method(token)
 
