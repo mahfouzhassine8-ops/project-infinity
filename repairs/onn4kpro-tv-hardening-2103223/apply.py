@@ -244,7 +244,7 @@ def patch_activity(path:Path):
     # consequently rebuilt the entire 20k-channel browser on every layout pass.
     shell=member(s,'cobraShowGuideShell')
     req(shell.count('cobraLayoutGuide();cobraRenderGuideBrowser();')==2,'guide shell render anchor drift')
-    shell=shell.replace('cobraLayoutGuide();cobraRenderGuideBrowser();','cobraLayoutGuide();',1)
+    shell=shell.replace('cobraLayoutGuide();cobraRenderGuideBrowser();','cobraLayoutGuide();if(mCobraGuideBrowser!=null&&mCobraGuideBrowser.getChildCount()==0)cobraRenderGuideBrowser();',1)
     s=replace_member(s,'cobraShowGuideShell',shell)
 
     s=replace_member(s,'cobraLayoutGuide',r'''  private void cobraLayoutGuide(){
@@ -263,6 +263,11 @@ def patch_activity(path:Path):
       }
     }finally{mCobraTvGuideLayoutBusy=false;}
   }''')
+
+    # A newly built root needs its own one-time inset listener; player returns no longer rebuild it.
+    build=member(s,'buildShell')
+    build=once(build,'  private void buildShell() {\n','  private void buildShell() {\n    mCobraTvInsetsInstalled=false;\n','TV root inset reset')
+    s=replace_member(s,'buildShell',build)
 
     # TV system bars are static. Reassert immersive flags but never trigger a fresh layout tree.
     s=replace_member(s,'cobraApplySystemBarsForSurface',r'''  private void cobraApplySystemBarsForSurface(){
