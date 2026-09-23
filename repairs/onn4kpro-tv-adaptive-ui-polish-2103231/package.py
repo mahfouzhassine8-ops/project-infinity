@@ -178,7 +178,7 @@ def verify_bytes(base:Path,final:Path):
         require(not b.testzip(),'Final APK CRC failure');require(dex_contract(b)[0]==dex_contract(a)[0],'Final JNI contract changed')
         joined=b''.join(b.read(n) for n in bn if DEX.fullmatch(n))
         for token in (b'cobra_tv_grid_only_2103220',b'cobra_tv_remote_ui_2103221',b'cobra_tv_player_multiview_2103222',b'cobra_tv_hardening_2103223',
-                      b'Return to Multi-View',b'Search and add',b'Enlarge screen',b'cobra_tv_player_tool_channels',b'Opening saved TV library',b'TV SYSTEM',b'cobra_tv_native_remote_2103224',b'cobra_tv_handoff_focus_2103225',b'cobra_tv_navigation_motion_2103230',b'cobra_tv_adaptive_ui_2103231',b'Back to guide',b'cobra_tv_grid_settings',b'cobra_multi_filter:',b'Channel group ',b'Select to change group.',b'onRenderedFirstFrame'):
+                      b'Return to Multi-View',b'Search and add',b'Enlarge screen',b'cobra_tv_player_tool_channels',b'Opening saved TV library',b'TV SYSTEM',b'cobra_tv_native_remote_2103224',b'cobra_tv_handoff_focus_2103225',b'cobra_tv_navigation_motion_2103230',b'cobra_tv_adaptive_ui_2103231',b'Back to guide',b'cobra_tv_grid_settings',b'cobraTvShowGroupChooser',b'cobraTvSelectGroup',b'cobra_multi_filter:',b'onRenderedFirstFrame'):
             require(token in joined,'Missing 2103231 runtime marker: '+repr(token))
         return {'native_files_byte_identical':sum(n.startswith('lib/') and not n.endswith('/') for n in kept),
                 'asset_files_byte_identical':sum(n.startswith('assets/') and not n.endswith('/') for n in kept),
