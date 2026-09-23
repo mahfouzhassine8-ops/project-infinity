@@ -38,7 +38,7 @@ jobs:
           github-token: ${{ github.token }}
           path: native209
 
-      - name: Reconstruct through 2103222 TV candidate for deep hardening audit
+      - name: Reconstruct through 2103222 and apply 2103223 TV hardening
         run: |
           set -euo pipefail
           mkdir -p engine audit219
@@ -62,6 +62,7 @@ jobs:
           python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
 
       - name: Audit 2103221 TV fit focus handoff and Multi-View source
         run: |
