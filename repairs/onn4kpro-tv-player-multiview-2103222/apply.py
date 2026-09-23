@@ -62,6 +62,7 @@ def replace_member(text,name,replacement,kind='method'):
 TV_HANDOFF_HELPERS=r'''  private static final String COBRA_TV_PLAYER_MULTIVIEW_BUILD="cobra_tv_player_multiview_2103222";
   private View mCobraTvFullscreenReturnFocus;
   private int mCobraTvSurfaceHandoffGeneration=0;
+  private boolean mCobraTvOpeningSurfaceHandoff=false;
   private LinearLayout mCobraTvPlayerHeader;
   private LinearLayout mCobraTvPlayerTransport;
   private LinearLayout mCobraTvPlayerTools;
@@ -109,7 +110,7 @@ TV_HANDOFF_HELPERS=r'''  private static final String COBRA_TV_PLAYER_MULTIVIEW_B
     Object raw=focus.getTag();String tag=raw instanceof String?(String)raw:"";
     boolean header=tag.startsWith("cobra_tv_player_header")||"cobra_last_channel".equals(tag);
     boolean transport=tag.startsWith("cobra_tv_player_transport")||"cobra_live_rewind_30".equals(tag)||"cobra_player_play_pause".equals(tag)||"cobra_live_edge".equals(tag);
-    boolean tools=tag.startsWith("cobra_tv_player_tool");
+    boolean tools=tag.startsWith("cobra_tv_player_tool")||"cobra_player_aspect_anchor".equals(tag)||"cobra_player_options_anchor".equals(tag);
     boolean timeline="cobra_live_timeshift_seek".equals(tag);
     if(code==KeyEvent.KEYCODE_DPAD_UP){
       if(tools){if(mCobraTimeshiftSeek!=null&&mCobraTimeshiftSeek.getVisibility()==View.VISIBLE)return mCobraTimeshiftSeek.requestFocus();return cobraTvFocusPlayerTag("cobra_player_play_pause");}
@@ -215,7 +216,7 @@ TV_HANDOFF_HELPERS=r'''  private static final String COBRA_TV_PLAYER_MULTIVIEW_B
     if(index<0||tile==null||tile.player==null||mMultiOverlay==null)return;
     closeCobraActionSheet();closeCobraMultiPicker(true);setMultiAudio(index);
     mCobraMultiFullscreenActive=true;mCobraMultiFullscreenKey=key;mPlaying=tile.channel;mPlayingIndex=mChannels.indexOf(tile.channel);mPlayingVodKey="";mPendingResumeMs=0L;
-    openPlayerOverlay(tile.channel);mPlayer=tile.player;final FrameLayout multi=mMultiOverlay;
+    mCobraTvOpeningSurfaceHandoff=true;openPlayerOverlay(tile.channel);mPlayer=tile.player;final FrameLayout multi=mMultiOverlay;
     cobraTvAttachSurfaceWhenReady(mPlayer,mPlayerTexture,()->{
       if(mPlayerOverlay!=null)mPlayerOverlay.setBackgroundColor(Color.BLACK);
       if(mPlayerTexture!=null)mPlayerTexture.setOpaque(true);
@@ -285,7 +286,6 @@ def patch_activity(path:Path):
       if(views[i]==null)continue;if(rw<=0||rh<=0){views[i].setVisibility(View.GONE);continue;}
       views[i].setVisibility(View.VISIBLE);cobraPosition(views[i],x,y,rw,rh);
     }
-    if(mCobraModeLayout!=null)mCobraModeLayout.width=Math.max(1,Math.round(w/density));
   }''')
 
     # Preserve the working group overlay but fit it to the TV canvas instead of phone safe areas.
@@ -304,11 +304,11 @@ def patch_activity(path:Path):
     player=member(s,'openPlayerOverlay')
     player=once(player,
       'mPlayerOverlay=new FrameLayout(this);mPlayerOverlay.setBackgroundColor(vtheme().color("cobra.openPlayerOverlay.colors.1",Color.BLACK));mPlayerOverlay.setFocusable(true);mPlayerOverlay.setFocusableInTouchMode(false);',
-      'mPlayerOverlay=new FrameLayout(this);mPlayerOverlay.setBackgroundColor(Color.TRANSPARENT);mPlayerOverlay.setFocusable(true);mPlayerOverlay.setFocusableInTouchMode(false);',
+      'mPlayerOverlay=new FrameLayout(this);mPlayerOverlay.setBackgroundColor(mCobraTvOpeningSurfaceHandoff?Color.TRANSPARENT:Color.BLACK);mPlayerOverlay.setFocusable(true);mPlayerOverlay.setFocusableInTouchMode(false);',
       'transparent player handoff overlay')
     player=once(player,
       'mPlayerTexture=new TextureView(this);mAspectMode=cobraChannelAspect(channel);mPlayerOverlay.addView(mPlayerTexture,new FrameLayout.LayoutParams(-1,-1));',
-      'mPlayerTexture=new TextureView(this);mPlayerTexture.setOpaque(false);mPlayerTexture.setAlpha(0f);mAspectMode=cobraChannelAspect(channel);mPlayerOverlay.addView(mPlayerTexture,new FrameLayout.LayoutParams(-1,-1));',
+      'mPlayerTexture=new TextureView(this);if(mCobraTvOpeningSurfaceHandoff){mPlayerTexture.setOpaque(false);mPlayerTexture.setAlpha(0f);}mAspectMode=cobraChannelAspect(channel);mPlayerOverlay.addView(mPlayerTexture,new FrameLayout.LayoutParams(-1,-1));mCobraTvOpeningSurfaceHandoff=false;',
       'transparent destination texture')
     s=replace_member(s,'openPlayerOverlay',player)
 
@@ -318,7 +318,7 @@ def patch_activity(path:Path):
     boolean local=session==mCobraTimeshiftPlayer&&mCobraTimeshiftSession!=null,proxy=session==mCobraTimeshiftProxyPlayer&&mCobraTimeshiftSession!=null;
     mCobraTvFullscreenReturnFocus=getCurrentFocus();cobraEndMiniBackgroundPlayback();
     mCobraPreviewPlayer=null;mCobraPreviewSessionKey="";mCobraPreviewHandoffs++;
-    mPlaying=channel;mPlayingIndex=mChannels.indexOf(channel);mTriedFallback=false;openPlayerOverlay(channel);mPlayer=session;
+    mPlaying=channel;mPlayingIndex=mChannels.indexOf(channel);mTriedFallback=false;mCobraTvOpeningSurfaceHandoff=session!=null;openPlayerOverlay(channel);mPlayer=session;
     if(local)mCobraTimeshiftPlayer=session;if(proxy)mCobraTimeshiftProxyPlayer=session;
     if(session!=null){
       cobraTvAttachSurfaceWhenReady(session,mPlayerTexture,()->{
@@ -448,7 +448,7 @@ def patch_activity(path:Path):
     oldtools='''    LinearLayout tools=new LinearLayout(this);String[] glyphs={"guide","aspect","multi","more"},labels={"Channels","Display","Multi-View","More"};
     for(int i=0;i<4;i++){final int action=i;CobraIconButton b=cobraIcon(glyphs[i],labels[i],true,v->{if(action==0)showCobraPlayerDrawer();else if(action==1)showCobraAspectPicker();else if(action==2)beginMultiView();else showPlayerSettingsDrawer();});b.caption(labels[i]);if(action==1)b.setTag("cobra_player_aspect_anchor");if(action==3)b.setTag("cobra_player_options_anchor");tools.addView(b,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.34",52)),1));}'''
     newtools='''    LinearLayout tools=new LinearLayout(this);mCobraTvPlayerTools=tools;String[] glyphs={"guide","aspect","multi","more"},labels={"Channels","Display",mCobraMultiFullscreenActive?"Return Multi":"Multi-View","More"};
-    for(int i=0;i<4;i++){final int action=i;CobraIconButton b=cobraIcon(glyphs[i],labels[i],true,v->{if(action==0){if(mCobraMultiFullscreenActive)toast("Return to Multi-View to change screens");else showCobraPlayerDrawer();}else if(action==1)showCobraAspectPicker();else if(action==2){if(mCobraMultiFullscreenActive)cobraReturnToMultiFromFullscreen();else beginMultiView();}else showPlayerSettingsDrawer();});b.caption(labels[i]);b.setTag(action==0?"cobra_tv_player_tool_channels":action==1?"cobra_tv_player_tool_display":action==2?"cobra_tv_player_tool_multi":"cobra_tv_player_tool_more");tools.addView(b,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.34",58)),1));}'''
+    for(int i=0;i<4;i++){final int action=i;CobraIconButton b=cobraIcon(glyphs[i],labels[i],true,v->{if(action==0){if(mCobraMultiFullscreenActive)toast("Return to Multi-View to change screens");else showCobraPlayerDrawer();}else if(action==1)showCobraAspectPicker();else if(action==2){if(mCobraMultiFullscreenActive)cobraReturnToMultiFromFullscreen();else beginMultiView();}else showPlayerSettingsDrawer();});b.caption(labels[i]);b.setTag(action==0?"cobra_tv_player_tool_channels":action==1?"cobra_player_aspect_anchor":action==2?"cobra_tv_player_tool_multi":"cobra_player_options_anchor");tools.addView(b,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.34",58)),1));}'''
     chrome=once(chrome,oldtools,newtools,'TV player tools graph')
     s=replace_member(s,'cobraBuildPlayerChrome',chrome)
 
