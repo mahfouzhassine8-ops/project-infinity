@@ -1,0 +1,234 @@
+name: Infinity | 2103222 onn TV Player Multi-View RC5 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103222-onn4kpro-tv-player-multiview-fit-rc5]
+    paths:
+      - '.github/workflows/infinity-2103222-onn4kpro-tv-player-multiview.yml'
+      - 'repairs/onn4kpro-tv-player-multiview-2103222/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103222-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103221 ARMv7 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103221-Onn4KPro-TV-Remote-UI-TEST-CANDIDATE
+          run-id: 35806145217
+          github-token: ${{ github.token }}
+          path: base221
+
+      - name: Reconstruct exact locked 2103221 source and apply 2103222
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit222 candidate222
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit222/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103222
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['mobile_parent_untouched'] is True
+          assert r['tv_player_focus_graph'] is True
+          assert r['tv_full_canvas'] is True
+          assert r['tv_preview_fullscreen_seamless'] is True
+          assert r['multiview_fullscreen_reversible'] is True
+          print('PASS: exact 2103222 TV source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_player_multiview_2103222' "$JAVA"
+          grep -Fq 'cobraTvPlayerFocusGraph' "$JAVA"
+          grep -Fq 'cobraTvAttachSurfaceWhenReady' "$JAVA"
+          grep -Fq 'cobra_tv_player_header_back' "$JAVA"
+          grep -Fq 'cobra_tv_player_tool_channels' "$JAVA"
+          grep -Fq '"Search and add"' "$JAVA"
+          grep -Fq '"Enlarge screen"' "$JAVA"
+          grep -Fq '"Return to Multi-View"' "$JAVA"
+          ! grep -A20 -F 'private void showCobraMultiTileActions' "$JAVA" | grep -Fq 'multiToSingle();'
+          grep -Fq 'versionCode 2103222' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base221 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-UI-RC4.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '6d3b19ae4c7256cd15283d828e95eda25d5baa11c7d618068d14652ccb3e4e8c' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate222/Infinity-2103221-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile Android TV layer, preserve exact ARMv7 native engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate222/Infinity-2103221-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-222 \
+            --out candidate222
+          FINAL=candidate222/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate222/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate222/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103222 — ONN. 4K PRO TV PLAYER / MULTI-VIEW RC5
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          PLAYER REMOTE FOCUS
+          1. Start Live TV fullscreen. Play/Pause should own initial focus.
+          2. Press Up: the top header row must become reachable. Test Back/Return, Last Channel, Favorite and Lock.
+          3. Return to transport. Press Down: the timeline (when available) and then Channels / Display / Multi-View / More must be reachable.
+          4. Left/Right moves within each row; Up/Down moves between header, transport and footer. Select activates the focused control.
+          5. More and Audio/Subtitles must own focus while open; Back closes only that layer and returns to player controls.
+
+          PREVIEW / FULLSCREEN HANDOFF
+          6. From TV Grid start preview, then promote fullscreen. The guide/preview should remain visible until fullscreen video is ready; no long black screen.
+          7. Back from fullscreen returns to the already-mounted guide/preview without rebuilding or a long black screen.
+          8. Repeat preview -> fullscreen -> guide at least 10 times. Playback must not retune solely because presentation changed.
+          9. Guide focus returns to the channel/program you left.
+
+          TV FIT
+          10. Live TV uses the full TV canvas without phone status/navigation-bar reservation.
+          11. TV Grid, preview/details, EPG and Channel Groups must stay inside all four screen edges with balanced margins.
+          12. Channel Groups must still focus the current group immediately and Select it with one press.
+
+          MULTI-VIEW
+          13. Open Multi-View with 2–4 legal/user-owned channels.
+          14. Existing actions remain: Use audio here, Change channel, Add screen, Retry, Playback details, Remove screen, Close Multi-View.
+          15. Search and add opens TV keyboard/search and can add an available channel.
+          16. Pause/Resume affects only the selected tile.
+          17. Enlarge screen makes the selected tile primary while every other screen remains running; Restore grid returns equal layout.
+          18. Full screen promotes one existing Multi-View tile. Other tiles/players must remain alive.
+          19. Player Multi-View button becomes Return Multi; Android Back also returns to the same Multi-View session.
+          20. Return restores the same screens, selected/audio tile and positions without retune/rebuild.
+
+          CORE REGRESSION
+          21. Verify Live TV playback, 1080p/4K, audio/subtitles, provider fallback, rewind/timeshift and recordings.
+          22. Verify Movies, Shows, My List, Smart Return, Health Center and diagnostics.
+          23. PiP/background/rotation/120-Hz phone surfaces remain absent from this TV build.
+          24. Reboot the onn. and repeat the remote path.
+
+          ACCEPTANCE
+          - APK must be armeabi-v7a / ELF32 ARM only.
+          - Package and permanent Infinity signer must remain unchanged.
+          - Native libkodi.so must be byte-identical to locked 2103221.
+          - 2103221 remains the rollback baseline.
+          - ARM64 phone/Fold source is untouched.
+          - Do not lock/promote 2103222 until physical onn. tests pass.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103222 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103222-Onn4KPro-TV-Player-MultiView-TEST-CANDIDATE
+          path: |
+            candidate222/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.apk
+            candidate222/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.sha256
+            candidate222/signing-verification.txt
+            candidate222/badging.txt
+            candidate222/manifest.txt
+            candidate222/ONN-TV-2103222-VERIFICATION.json
+            candidate222/tv-player-multiview-source.json
+            candidate222/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103222 source/packaging evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103222-Onn4KPro-TV-Player-MultiView-Evidence
+          path: |
+            audit222/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-player-multiview-2103222/
+            candidate222/*.json
+            candidate222/*.txt
+          if-no-files-found: warn
+          retention-days: 90
