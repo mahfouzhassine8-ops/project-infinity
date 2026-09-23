@@ -1,0 +1,249 @@
+name: Infinity | 2103232 onn TV Integrated Drawer RC12 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-rc12]
+    paths:
+      - '.github/workflows/infinity-2103232-onn4kpro-tv-integrated-drawer.yml'
+      - 'repairs/onn4kpro-tv-integrated-drawer-2103232/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103232-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC12 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103231 RC11 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103231-Onn4KPro-TV-Adaptive-UI-Polish-TEST-CANDIDATE
+          run-id: 35933994416
+          github-token: ${{ github.token }}
+          path: base231
+
+      - name: Reconstruct exact locked RC11 source and apply RC12 integrated drawer
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 candidate232
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit232/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103232
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Integrated-Drawer-RC12'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['tv_drawer_compact_integrated'] is True
+          assert r['tv_drawer_stage_shift'] is False
+          assert r['tv_drawer_modal_scrim_heavy'] is False
+          assert r['tv_drawer_destination_auto_close'] is True
+          assert r['tv_drawer_row_compact'] is True
+          assert r['tv_live_flow']=='drawer-live-tv-groups-grid'
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_back_reverses_hierarchy'] is True
+          assert r['tv_hamburger_removed'] is True
+          assert r['tv_grid_settings_next_to_search'] is True
+          assert r['tv_mini_player_adaptive_large'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC12 integrated drawer source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_adaptive_ui_2103231' "$JAVA"
+          grep -Fq 'cobra_tv_integrated_drawer_2103232' "$JAVA"
+          grep -Fq 'screen*.245f' "$JAVA"
+          grep -Fq 'Gravity.LEFT|Gravity.CENTER_VERTICAL' "$JAVA"
+          grep -Fq 'mCobraModeGroupsExpanded=true' "$JAVA"
+          grep -Fq 'cobra_tv_grid_settings' "$JAVA"
+          grep -Fq 'startCobraPreview(mGuidePreviewChannel)' "$JAVA"
+          ! grep -A120 -F 'private void toggleCobraDrawer' "$JAVA" | grep -Fq 'animateCobraDrawerShift'
+          grep -Fq 'versionCode 2103232' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Integrated-Drawer-RC12"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC11 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base231 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Adaptive-UI-Polish-RC11.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '8deb8aac6aa8a090781f0037e2b8e717a7c650b324044c8b8645f27c490f886c' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate232/Infinity-2103231-RC11-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC12 Android TV layer, preserve exact ARMv7 engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate232/Infinity-2103231-RC11-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-232 \
+            --out candidate232
+          FINAL=candidate232/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Drawer-RC12.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate232/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Drawer-RC12.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate232/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103232 — ONN. 4K PRO TV INTEGRATED DRAWER RC12
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          BASELINE
+          - Exact locked RC11 / 2103231 is parent and rollback.
+          - RC11 adaptive mini-player/grid cleanup remains protected.
+          - No native-engine rebuild.
+
+          DRAWER
+          1. Open drawer from Back hierarchy or remote Menu.
+          2. Drawer is visibly narrower, shorter, and visually integrated into the left side of the current UI.
+          3. Main TV UI remains stationary; opening drawer must not shift/scale the whole screen.
+          4. Scrim is restrained, not a heavy modal blackout.
+          5. Search / Live TV / Movies / Shows / Recordings / My List / Settings / Power remain D-pad reachable.
+          6. Focus ring is obvious but compact; no clipping at 1080p or 4K.
+
+          DESTINATION BEHAVIOR
+          7. Select any destination: drawer disappears immediately before destination content takes focus.
+          8. Drawer -> Live TV: Channels/Groups level appears first.
+          9. Choose Favorites / Recent / All / provider group: Channels level collapses and full EPG grid owns the screen.
+          10. Back: Full Grid -> Channels/Groups -> Drawer.
+          11. Movies / Shows / Recordings / My List / Settings each open without leaving drawer remnants behind.
+          12. Power closes drawer before opening Power menu.
+
+          RC11 PRESERVATION
+          13. No TV Grid hamburger.
+          14. Settings remains immediately beside Search.
+          15. Large group dropdown under mini-player remains removed.
+          16. Larger adaptive mini-player still works.
+          17. Player Back/header -> Grid; Channels remains separate.
+          18. Multi-View 2/3/4 screens, filters/groups, focus and survivor behavior remain intact.
+          19. Rewind/timeshift/audio/subtitles/recordings/reminders remain intact.
+
+          STABILITY
+          20. Open/close drawer 30 times and switch destinations repeatedly.
+          21. No progressive slowdown, stale focus, detached drawer, shifted Stage or layout drift.
+          22. Phone/Fold source remains untouched.
+          23. Permanent package/signer and armeabi-v7a engine remain preserved.
+
+          Do not lock/promote RC12 until physical acceptance passes.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103232 INTEGRATED DRAWER TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103232-Onn4KPro-TV-Integrated-Drawer-TEST-CANDIDATE
+          path: |
+            candidate232/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Drawer-RC12.apk
+            candidate232/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Drawer-RC12.sha256
+            candidate232/signing-verification.txt
+            candidate232/badging.txt
+            candidate232/manifest.txt
+            candidate232/ONN-TV-2103232-VERIFICATION.json
+            candidate232/tv-integrated-drawer-source.json
+            candidate232/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103232 RC12 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103232-Onn4KPro-TV-Integrated-Drawer-Evidence
+          path: |
+            audit232/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-navigation-motion-2103230/
+            repairs/onn4kpro-tv-adaptive-ui-polish-2103231/
+            repairs/onn4kpro-tv-integrated-drawer-2103232/
+            candidate232/*.json
+            candidate232/*.txt
+          if-no-files-found: warn
+          retention-days: 90
