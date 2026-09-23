@@ -132,7 +132,7 @@ def patch_activity(path:Path):
     }
     if("cobra_mode_visuals".equals(tag)&&key==KeyEvent.KEYCODE_DPAD_DOWN){
       if(cobraTvFocusTagged(mCobraGuideBrowser,"cobra_tv_grid_search"))return true;
-      return cobraTvFocusGuideBody();
+      cobraTvFocusGuideBody();return true;
     }
     return false;
   }''')
