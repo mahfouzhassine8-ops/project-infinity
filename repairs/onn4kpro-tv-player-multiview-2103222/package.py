@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""Fast-pack the audited 2103222 Android TV layer over exact signed 2103221 ARMv7 APK.
+
+No Kodi native rebuild, no apktool and no smali. Java/manifest/resources are
+compiled from source, resource IDs are pinned to the protected 2103221 APK, and
+only compiled DEX + manifest replace their counterparts. All native libraries,
+assets and compiled Android resources remain byte-identical to 2103221.
+"""
+from __future__ import annotations
+import argparse,hashlib,json,os,re,shutil,struct,subprocess,zipfile
+from pathlib import Path
+
+ROOT=Path(__file__).resolve().parents[2]
+PACKAGE='com.projectinfinity.kodi'
+VERSION=2103222
+RELEASE='1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5'
+BASE_APK_SHA256='6d3b19ae4c7256cd15283d828e95eda25d5baa11c7d618068d14652ccb3e4e8c'
+BASE_ENGINE_SHA256='670eb63be5c42a82224229215a7cb38b9e0d9ab393e394247f199d2bacc8c105'
+CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+LIB='lib/armeabi-v7a/libkodi.so'
+DEX=re.compile(r'classes\d*\.dex$')
+SIGNATURE=re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))$',re.I)
+
+def sha(data:bytes)->str:return hashlib.sha256(data).hexdigest()
+def require(v,m):
+    if not v:raise RuntimeError(m)
+def run(*args,cwd=None,env=None,output=None):
+    result=subprocess.run([str(x) for x in args],cwd=cwd,env=env,check=True,
+                          stdout=subprocess.PIPE if output is not None else None,text=True)
+    if output is not None:
+        Path(output).write_text(result.stdout);return result.stdout
+def configured(path:Path,values:dict[str,str])->str:
+    text=path.read_text()
+    for key,value in values.items():text=text.replace('@'+key+'@',value)
+    require(not re.search(r'@[A-Z][A-Z_0-9]*@',text),'Unresolved CMake placeholder: '+str(path))
+    return text
+def resource_ids(aapt2:Path,apk:Path,output:Path)->dict[str,str]:
+    text=run(aapt2,'dump','resources',apk,output=output);ids={}
+    for rid,name in re.findall(r'^\s*resource\s+(0x7f[0-9a-fA-F]{6})\s+([^\s]+/[^\s]+)',text,re.M):
+        name=name.split(':',1)[-1];require(name not in ids or ids[name]==rid,'Ambiguous resource '+name);ids[name]=rid.lower()
+    require(len(ids)>20,'Resource map empty');return ids
+
+def dex_contract(archive:zipfile.ZipFile):
+    native,classes=set(),set()
+    for name in archive.namelist():
+        if not DEX.fullmatch(name):continue
+        data=archive.read(name);require(data[:4]==b'dex\n','Not standard DEX '+name)
+        def u32(o):return struct.unpack_from('<I',data,o)[0]
+        def leb(o):
+            val=shift=0
+            while True:
+                b=data[o];o+=1;val|=(b&127)<<shift
+                if b<128:return val,o
+                shift+=7;require(shift<=28,'Invalid LEB128')
+        count,off=u32(56),u32(60);strings=[]
+        for i in range(count):
+            _,p=leb(u32(off+4*i));strings.append(data[p:data.index(b'\0',p)].decode('utf-8',errors='replace'))
+        count,off=u32(64),u32(68);types=[strings[u32(off+4*i)] for i in range(count)]
+        count,off=u32(72),u32(76);protos=[]
+        for i in range(count):
+            ret,poff=u32(off+12*i+4),u32(off+12*i+8);params=[] if not poff else [types[struct.unpack_from('<H',data,poff+4+2*j)[0]] for j in range(u32(poff))]
+            protos.append('('+''.join(params)+')'+types[ret])
+        count,off=u32(88),u32(92);methods=[]
+        for i in range(count):
+            owner,proto,text=struct.unpack_from('<HHI',data,off+8*i);methods.append((types[owner],strings[text],protos[proto]))
+        count,off=u32(96),u32(100)
+        for i in range(count):
+            owner=types[u32(off+32*i)];classes.add(owner);pos=u32(off+32*i+24)
+            if not pos:continue
+            sf,pos=leb(pos);inf,pos=leb(pos);direct,pos=leb(pos);virtual,pos=leb(pos)
+            for _ in range(sf+inf):_,pos=leb(pos);_,pos=leb(pos)
+            for size in (direct,virtual):
+                index=0
+                for _ in range(size):
+                    delta,pos=leb(pos);flags,pos=leb(pos);_,pos=leb(pos);index+=delta
+                    if flags&0x100:native.add(methods[index])
+    require(native,'No JNI declarations found');return native,classes
+
+def source_preservation(source:Path):
+    receipt=json.loads((ROOT/'engine/background-resume-source.json').read_text())
+    require(receipt.get('version_code')==VERSION and receipt.get('version_name')==RELEASE,'Wrong audited 2103222 source receipt')
+    require(receipt.get('tv_target_abi')=='armeabi-v7a' and receipt.get('mobile_parent_untouched') is True,'TV source scope receipt mismatch')
+    require(receipt.get('tv_player_focus_graph') is True and receipt.get('multiview_fullscreen_reversible') is True,'2103222 source gates missing')
+    for name,row in receipt['files'].items():
+        require(sha((source/name).read_bytes())==row['after'],'Source changed after audit: '+name)
+
+def prepare(source:Path,base:Path,build:Path,out:Path):
+    require(sha(base.read_bytes())==BASE_APK_SHA256,'Not exact locked 2103221 signed TV APK')
+    source_preservation(source);sdk=Path(os.environ['ANDROID_HOME']);bt=sdk/'build-tools/34.0.0'
+    original_ids=resource_ids(bt/'aapt2',base,out/'base-resources.txt');packaging=source/'tools/android/packaging'
+    build.mkdir(parents=True,exist_ok=False)
+    for name in ('build.gradle','settings.gradle','gradle.properties','gradlew'):shutil.copy2(packaging/name,build/name)
+    shutil.copytree(packaging/'gradle',build/'gradle');(build/'gradlew').chmod(0o755);app=build/'xbmc';app.mkdir()
+    values={'APP_PACKAGE':PACKAGE,'APP_NAME':'Kodi','APP_NAME_LC':'kodi','APP_VERSION':RELEASE,
+            'APP_VERSION_CODE_ANDROID':str(VERSION),'TARGET_MINSDK':'21','TARGET_SDK':'35',
+            'NDKROOT':str(sdk/'ndk'/os.environ.get('NDK_VER','21.4.7075529'))}
+    for name in ('AndroidManifest.xml','build.gradle'):(app/name).write_text(configured(packaging/'xbmc'/(name+'.in'),values))
+    (build/'stable-ids.txt').write_text(''.join(f'{PACKAGE}:{name} = {rid}\n' for name,rid in sorted(original_ids.items())))
+    with (app/'build.gradle').open('a') as f:f.write('\nandroid.aaptOptions.additionalParameters "--stable-ids", rootProject.file("stable-ids.txt").absolutePath\n')
+    registered=set(re.findall(r'\bsrc/([\w/]+\.java)\b',(source/'cmake/scripts/android/Install.cmake').read_text()))
+    actual={str(p.relative_to(packaging/'xbmc/src'))[:-3] for p in (packaging/'xbmc/src').rglob('*.java.in')}
+    require(registered==actual,'CMake/Java registration mismatch: '+repr(registered^actual))
+    for name in sorted(registered):
+        p=app/'java'/PACKAGE.replace('.','/')/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(configured(packaging/'xbmc/src'/(name+'.in'),values))
+    shutil.copytree(packaging/'xbmc/res',app/'res')
+    for name,dest in (('strings.xml','values'),('colors.xml','values'),('searchable.xml','xml')):
+        p=app/'res'/dest/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(configured(packaging/'xbmc'/(name+'.in'),values))
+    copies={'drawable/applaunch_screen.png':source/'media/applaunch_screen.png',
+            'drawable-xxxhdpi/applaunch_screen.png':source/'media/applaunch_screen.png',
+            'drawable/ic_recommendation_80dp.png':source/'media/icon80x80.png',
+            'drawable-xhdpi/banner.png':packaging/'media/drawable-xhdpi/banner.png'}
+    for density in ('ldpi','mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi'):
+        name='drawable-'+density+'/ic_launcher.png';copies[name]=packaging/'media'/name
+    for name,origin in copies.items():
+        p=app/'res'/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(origin,p)
+    (build/'local.properties').write_text('sdk.dir='+str(sdk)+'\n')
+    print(f'PASS: staged {len(registered)} Java sources and pinned {len(original_ids)} resource IDs; no native source/build')
+    return original_ids
+
+def manifest_tree(text:str):
+    root=None;stack=[]
+    for line in text.splitlines():
+        stripped=line.lstrip();indent=len(line)-len(stripped)
+        if stripped.startswith('E: '):
+            node={'tag':stripped.split()[1],'attrs':{},'children':[]}
+            while stack and stack[-1][0]>=indent:stack.pop()
+            if stack:stack[-1][1]['children'].append(node)
+            else:require(root is None,'Multiple manifest roots');root=node
+            stack.append((indent,node))
+        elif stripped.startswith('A: '):
+            key,value=stripped[3:].split('=',1);require(stack,'Manifest attr outside element');stack[-1][1]['attrs'][key.split('(')[0]]=value
+    require(root is not None,'Empty manifest');return root
+
+def verify_manifest_pair(old_text:str,new_text:str):
+    old,new=manifest_tree(old_text),manifest_tree(new_text)
+    for tree in (old,new):
+        tree['attrs'].pop('android:versionCode',None);tree['attrs'].pop('android:versionName',None)
+    require(old==new,'Compiled manifest drift outside version identity')
+
+def merge(base:Path,donor:Path,output:Path):
+    with zipfile.ZipFile(base) as a,zipfile.ZipFile(donor) as b,zipfile.ZipFile(output,'w') as z:
+        an,bn=set(a.namelist()),set(b.namelist());require(len(an)==len(a.namelist()) and len(bn)==len(b.namelist()),'Duplicate APK member')
+        require(not a.testzip() and not b.testzip(),'APK CRC failure')
+        require(not any(n.startswith(('lib/','assets/')) and not n.endswith('/') for n in bn),'Unexpected native/assets in Android-only donor')
+        original_native,original_classes=dex_contract(a);compiled_native,compiled_classes=dex_contract(b)
+        require(original_native==compiled_native,'JNI native descriptor inventory changed')
+        core={n for n in original_classes if n.startswith('Lcom/projectinfinity/kodi/') and '$' not in n}
+        require(core<=compiled_classes,'Native-facing Java class lost: '+repr(core-compiled_classes))
+        for info in a.infolist():
+            n=info.filename
+            if n=='AndroidManifest.xml' or DEX.fullmatch(n) or SIGNATURE.fullmatch(n):continue
+            z.writestr(info,a.read(n))
+        for info in b.infolist():
+            n=info.filename
+            if n=='AndroidManifest.xml' or DEX.fullmatch(n):z.writestr(info,b.read(n))
+    return len(original_native),len(core)
+
+def verify_bytes(base:Path,final:Path):
+    with zipfile.ZipFile(base) as a,zipfile.ZipFile(final) as b:
+        an,bn=set(a.namelist()),set(b.namelist())
+        kept={n for n in an if n!='AndroidManifest.xml' and not DEX.fullmatch(n) and not SIGNATURE.fullmatch(n)}
+        expected=kept|{'AndroidManifest.xml'}|{n for n in bn if DEX.fullmatch(n) or SIGNATURE.fullmatch(n)}
+        require(bn==expected,'Unexpected final APK member inventory')
+        for name in sorted(kept):require(a.read(name)==b.read(name),'Protected APK payload changed: '+name)
+        require(LIB in bn,'ARMv7 libkodi.so missing');require(sha(b.read(LIB))==BASE_ENGINE_SHA256,'ARMv7 native engine changed')
+        require(not any(n.startswith('lib/arm64-v8a/') for n in bn),'arm64 payload leaked into TV candidate')
+        require(not b.testzip(),'Final APK CRC failure');require(dex_contract(b)[0]==dex_contract(a)[0],'Final JNI contract changed')
+        joined=b''.join(b.read(n) for n in bn if DEX.fullmatch(n))
+        for token in (b'cobra_tv_grid_only_2103220',b'cobra_tv_remote_ui_2103221',b'cobra_tv_player_multiview_2103222',
+                      b'Return to Multi-View',b'Search and add',b'Enlarge screen',b'cobra_tv_player_tool_channels'):
+            require(token in joined,'Missing 2103222 runtime marker: '+repr(token))
+        return {'native_files_byte_identical':sum(n.startswith('lib/') and not n.endswith('/') for n in kept),
+                'asset_files_byte_identical':sum(n.startswith('assets/') and not n.endswith('/') for n in kept),
+                'android_resources_byte_identical':True,'other_payload_entries_preserved':len(kept)}
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--source',type=Path,required=True);p.add_argument('--base-apk',type=Path,required=True)
+    p.add_argument('--build-dir',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
+    a=p.parse_args();source,base,build,out=[x.resolve() for x in (a.source,a.base_apk,a.build_dir,a.out)]
+    out.mkdir(parents=True,exist_ok=True);ids=prepare(source,base,build,out)
+    env=dict(os.environ,KODI_ANDROID_KEY_ALIAS='androiddebugkey',KODI_ANDROID_KEY_PASSWORD='android',
+             KODI_ANDROID_STORE_PASSWORD='android',KODI_ANDROID_STORE_FILE=str(Path.home()/'.android/debug.keystore'))
+    run('./gradlew','--no-daemon','--console=plain',':xbmc:assembleRelease',cwd=build,env=env)
+    run('./gradlew','--no-daemon','--console=plain',':xbmc:dependencies','--configuration','releaseRuntimeClasspath',cwd=build,env=env,output=out/'android-dependencies.txt')
+    donor=build/'xbmc/build/outputs/apk/release/xbmc-release.apk';require(donor.is_file(),'Donor APK missing')
+    bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0';donor_ids=resource_ids(bt/'aapt2',donor,out/'compiled-resources.txt')
+    require(ids==donor_ids,'Compiled resource IDs do not match locked 2103221 table')
+    unsigned=out/'Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5-unsigned.apk'
+    natives,core=merge(base,donor,unsigned)
+    manifest=run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=out/'manifest.txt')
+    old_manifest=run(bt/'aapt','dump','xmltree',base,'AndroidManifest.xml',output=out/'base-manifest.txt');verify_manifest_pair(old_manifest,manifest)
+    require('android.intent.category.LEANBACK_LAUNCHER' in manifest,'Leanback launcher missing')
+    pip=[line for line in manifest.splitlines() if 'supportsPictureInPicture' in line]
+    require(pip and all('0xffffffff' not in line.lower() for line in pip),'TV PiP unexpectedly enabled')
+    for name in ('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS'):require(bool(os.environ.get(name)),'Missing permanent signing '+name)
+    final=out/'Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.apk';run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
+    cert=run(bt/'apksigner','verify','--verbose','--print-certs',final,output=out/'signing-verification.txt');require(CERT in cert.lower(),'Signer changed')
+    badging=run(bt/'aapt','dump','badging',final,output=out/'badging.txt')
+    require(f"package: name='{PACKAGE}' versionCode='{VERSION}' versionName='{RELEASE}'" in badging,'Wrong APK identity')
+    require("application-label:'Infinity'" in badging and "native-code: 'armeabi-v7a'" in badging,'TV label/ABI changed')
+    require('application-debuggable' not in badging,'Candidate is debuggable')
+    preserved=verify_bytes(base,final)
+    report={'schema':1,'build':VERSION,'version_name':RELEASE,'package':PACKAGE,'target_abi':'armeabi-v7a',
+            'base_build':2103221,'base_apk_sha256':BASE_APK_SHA256,'base_native_engine_sha256':BASE_ENGINE_SHA256,
+            'apk':final.name,'apk_sha256':sha(final.read_bytes()),'signer_certificate_sha256':CERT,
+            'compiled_jni_declarations_preserved':natives,'native_facing_java_classes_preserved':core,
+            'resource_id_map_verified':len(ids),'source_built_android_layer':True,'native_recompiled':False,
+            'fast_tv_packaging_lane':True,'smali_used':False,'runtime_device_tested':False,**preserved}
+    (out/'ONN-TV-2103222-VERIFICATION.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+    shutil.copy2(ROOT/'engine/background-resume-source.json',out/'background-resume-source.json')
+    shutil.copy2(ROOT/'audit222/tv-player-multiview-source.json',out/'tv-player-multiview-source.json')
+    unsigned.unlink()
+    print('PASS: 2103222 source-built TV Android layer + exact locked 2103221 ARMv7 native/resources; permanent signer verified')
+
+if __name__=='__main__':main()
