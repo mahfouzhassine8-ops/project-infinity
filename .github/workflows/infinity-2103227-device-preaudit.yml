@@ -1,0 +1,155 @@
+name: Infinity | 2103227 Device Fix Pre-Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103227-device-live-fold-multiview-audit-rc1]
+    paths:
+      - '.github/workflows/infinity-2103227-device-preaudit.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103227-preaudit-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - name: Download exact 2103208 source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact locked 2103225 + audited 2103226
+        run: |
+          set -euo pipefail
+          mkdir -p audit227-pre engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+
+          python3 repairs/python311-gil-2103209/ci.py prepare             --base-dir baseline208             --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --shell shell-kodi             --out audit227-pre/base
+
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/drawer-owner-ui-restore-2103221/apply.py --shell shell-kodi
+          python3 repairs/experience-options-ui-2103222/apply.py --shell shell-kodi
+          python3 repairs/movie-details-trailers-2103223/apply.py --shell shell-kodi
+          python3 repairs/tv-show-details-trailers-2103224/apply.py --shell shell-kodi
+          python3 repairs/tv-show-typography-2103225/apply.py --shell shell-kodi
+          python3 repairs/fold-fit-fill-2103226/apply.py --shell shell-kodi
+
+          grep -F '"version_code": 2103226' engine/background-resume-source.json
+          grep -F '"fold_fit_fill_audited": true' engine/background-resume-source.json
+
+      - name: Audit Live Ended, Fold geometry and Multi-View ownership
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,re
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+
+          def span(name,kind='method'):
+              if kind=='method':
+                  pat=re.compile(r'^[ \t]{2,}(?:(?:@Override(?:[ \t]*\n[ \t]+|[ \t]+))?)(?:public|private|protected) [^\n;=(){}]*\b'+re.escape(name)+r'\s*\(',re.M)
+              else:
+                  pat=re.compile(r'^[ \t]{2,}(?:(?:private|public|protected|static|final)\s+)*class\s+'+re.escape(name)+r'\b',re.M)
+              ms=list(pat.finditer(s))
+              if len(ms)!=1: raise SystemExit(f'{kind} cardinality {name}={len(ms)}')
+              start=ms[0].start();i=s.index('{',ms[0].end());d=0;q=None;esc=line=block=False
+              while i<len(s):
+                  c=s[i];n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\n': line=False
+                  elif block:
+                      if c=='*' and n=='/': block=False;i+=1
+                  elif q:
+                      if esc: esc=False
+                      elif c=='\\': esc=True
+                      elif c==q:q=None
+                  elif c=='/' and n=='/': line=True;i+=1
+                  elif c=='/' and n=='*': block=True;i+=1
+                  elif c in ('"',"'"):q=c
+                  elif c=='{':d+=1
+                  elif c=='}':
+                      d-=1
+                      if d==0:return s[start:i+1]
+                  i+=1
+              raise SystemExit('unclosed '+name)
+
+          methods=[
+            'startSinglePlayer','cobraUpdatePlaybackLabels','cobraStartPresentationTicker',
+            'cobraRecoverLocalTimeshiftSource','cobraFallbackFromLocalTimeshift',
+            'cobraRestartLiveChannel','cobraHandlePlaybackFailure',
+            'openMultiView','releaseMulti','multiToSingle','showCobraMultiTileActions',
+            'cobraLayoutMultiTiles','setMultiAudio','showCobraMultiPicker',
+            'selectCobraMultiChannel','removeCobraMultiTileClean','onBackPressed',
+            'cobraPrepareMultiForPip','cobraRestoreMultiAfterPip',
+            'cobraFitVideo','cobraFitBinding','cobraBindingAspect','cobraChannelAspect',
+            'applyCobraAspectTransform','onConfigurationChanged'
+          ]
+          classes=['CobraFoldAspectPolicy','CobraLayoutMath']
+          out={'activity_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'methods':{},'classes':{}}
+          chunks=[]
+          for name in methods:
+              try:
+                  body=span(name)
+              except SystemExit:
+                  continue
+              out['methods'][name]=hashlib.sha256(body.encode()).hexdigest()
+              chunks.append('\n===== METHOD '+name+' =====\n'+body+'\n')
+          for name in classes:
+              body=span(name,'class');out['classes'][name]=hashlib.sha256(body.encode()).hexdigest()
+              chunks.append('\n===== CLASS '+name+' =====\n'+body+'\n')
+
+          # Find every containing method for Ended/STATE_ENDED references.
+          refs=[]
+          for m in re.finditer(r'STATE_ENDED|["\']Ended["\']|["\']ENDED["\']|Stream ended',s):
+              start=s.rfind('\n  ',0,m.start())
+              refs.append({'offset':m.start(),'context':s[max(0,m.start()-700):min(len(s),m.start()+1000)]})
+          out['ended_refs']=refs
+          Path('audit227-pre/ownership.json').write_text(json.dumps(out,indent=2)+'\n')
+          Path('audit227-pre/members.txt').write_text(''.join(chunks))
+          Path('audit227-pre/ended-contexts.txt').write_text('\n\n---\n\n'.join(x['context'] for x in refs))
+          print(Path('audit227-pre/ended-contexts.txt').read_text())
+          print(Path('audit227-pre/members.txt').read_text())
+          PY
+
+      - name: Preserve pre-change audit
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103227-Device-Fix-PreAudit
+          path: |
+            audit227-pre/
+            engine/background-resume-source.json
+          compression-level: 0
+          retention-days: 90
