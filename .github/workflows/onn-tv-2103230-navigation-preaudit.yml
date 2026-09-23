@@ -102,10 +102,10 @@ jobs:
             'toggleCobraDrawer','closeCobraExperienceDrawer','cobraDrawerDestination','cobraOpenLiveTv',
             'showCobraPrimaryView','cobraShowGuideShell','cobraLayoutGuide','cobraRenderGuideBrowser',
             'cobraToggleModeGroups','cobraOpenTvDirectory','closeCobraActionSheet','selectCobraCategory',
-            'cobraDirectory','cobraTvHandleGuideKey','cobraTvRestoreGuideFocus','cobraTvFocusGuideBody',
+            'cobraDirectory','cobraTvHandleDirectoryKey','cobraTvHandleGuideKey','cobraTvRestoreGuideFocus','cobraTvFocusGuideBody',
             'playChannel','promoteCobraPreviewToFullscreen','closeFullscreenToCobraView',
             'cobraTvHandlePlayerKey','cobraBuildPlayerChrome','showCobraPlayerDrawer','closeCobraPlayerDrawer',
-            'onBackPressed','onKeyDown','dispatchKeyEvent'
+            'applyLoadResult','cobraTvInstallWarmLibrary','loadAllEnabledSources','toggleFavorite','cobraGuideChannels','onBackPressed','onKeyDown','dispatchKeyEvent'
           ]
           out=[]
           for n in names:out += ['\n===== '+n+' =====\n',span(n)]
