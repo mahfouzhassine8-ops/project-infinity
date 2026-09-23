@@ -102,14 +102,14 @@ jobs:
               return 'UNCLOSED '+name
 
           names=[
-            'toggleCobraDrawer','closeCobraExperienceDrawer','showCobraPrimaryView',
-            'cobraShowGuideShell','cobraBuildModeChrome','cobraRenderGuideBrowser',
-            'cobraOpenTvDirectory','selectCobraCategory','cobraPreviewChannel',
+            'toggleCobraDrawer','closeCobraExperienceDrawer','showCobraPrimaryView','cobraOpenLiveTv','showGuide',
+            'cobraShowGuideShell','cobraBuildModeChrome','cobraRenderGuideBrowser','cobraRenderGridMode',
+            'cobraOpenTvDirectory','cobraDirectory','categoriesForCurrentChannels','filteredChannels','cobraGuideChannels','selectCobraCategory','cobraPreviewChannel','playChannel',
             'promoteCobraPreviewToFullscreen','closeFullscreenToCobraView',
-            'openPlayerOverlay','closePlayer','showCobraPlayerDrawer',
-            'cobraRenderPlayerDrawer','cobraTvHandleGuideKey','cobraTvHandlePlayerKey',
+            'openPlayerOverlay','closePlayer','showCobraPlayerDrawer','closeCobraPlayerDrawer',
+            'cobraRenderPlayerDrawer','cobraTvFocusPlayerDrawerTarget','cobraTvHandleGuideKey','cobraTvHandlePlayerKey',
             'cobraRefreshEpg','cobraRefreshModeDetails','cobraLayoutGuide',
-            'startSinglePlayer','showPlayerChromeTemporarily'
+            'startSinglePlayer','cobraStartDirectSinglePlayer','releaseSinglePlayer','cobraAttachVideo','rebuildCobraShellIfNeeded','showPlayerChromeTemporarily'
           ]
           out=[]
           for n in names:out += ['\n===== '+n+' =====\n',span(n)]
