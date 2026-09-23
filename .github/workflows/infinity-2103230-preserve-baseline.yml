@@ -1,0 +1,72 @@
+name: Infinity | 2103230 Preserve locked 2103229
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103230-final-preservation-audit-rc1]
+    paths: ['.github/workflows/infinity-2103230-preserve-baseline.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103230-preserve-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  preserve:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103228-Exact-PreAudit-Inputs
+          run-id: 35814815870
+          github-token: ${{ github.token }}
+          path: inputs228
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103229-Cobra-MultiView-Stability-Fill-TEST-CANDIDATE
+          run-id: 35818972256
+          github-token: ${{ github.token }}
+          path: rollback/accepted-apk
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103229-Cobra-MultiView-Stability-Fill-Evidence
+          run-id: 35818972256
+          github-token: ${{ github.token }}
+          path: evidence229
+      - name: Verify and freeze exact 2103229 source APK and packaging inputs
+        run: |
+          set -euo pipefail
+          echo '3a80480e300bafc6071aed7f494cc6b3a96a79f7e1e4dcb9ae87fe36c9a707f5  rollback/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk' | sha256sum -c -
+          (cd inputs228 && sha256sum -c SHA256SUMS)
+          git archive --format=tar.gz -o rollback/locked-2103229-repository.tar.gz 7fbfc5ade1e96b272b8e7ba584332cb6c81d01bc
+          tar -xzf inputs228/locked-2103227-reconstructed-shell.tar.gz
+          python3 repairs/multiview-stability-fill-2103229/apply.py --shell shell-kodi
+          cmp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in evidence229/audit229/InfinityLiveActivity-2103229-after.java.in
+          python3 repairs/multiview-stability-fill-2103229/source_audit.py --source shell-kodi --scope audit229/scope.json --out audit229
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path('shell-kodi')
+          receipt=json.loads(Path('engine/background-resume-source.json').read_text())
+          assert receipt['version_code']==2103229
+          for name,row in receipt['files'].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==row['after'],name
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          Path('rollback/reconstructed-source-sha256.json').write_text(json.dumps(hashes,indent=2)+'\n')
+          print('Verified reconstructed files:',len(hashes))
+          PY
+          tar -czf rollback/locked-2103229-reconstructed-shell.tar.gz shell-kodi engine scripts/infinity_background_resume.py scripts/package_background_resume.py
+          cp evidence229/audit229/base/Infinity-2103208-Python311-GIL-Patched-Base.apk rollback/packaging-base.apk
+          cp engine/background-resume-source.json rollback/
+          printf '%s\n' 'Protected baseline: locked-infinity-cobra-2103229-multiview-stability-fill-passed' 'Exact commit: 7fbfc5ade1e96b272b8e7ba584332cb6c81d01bc' 'Verify SHA256SUMS before use. Extract repository archive into a NEW empty directory, then reconstructed-shell archive into that directory to restore generated source and packaging scripts.' 'The exact accepted APK is in accepted-apk/. Device app data is NOT included. Back up providers/settings/Kodi userdata before testing.' 'Do not uninstall or clear app data to force a downgrade. Android may reject lower versionCode; use a supported backup/restore or downgrade procedure.' 'No native rebuild. packaging-base.apk is the preserved verified engine/payload packaging input.' > rollback/RESTORE.txt
+          (cd rollback && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
+      - name: Publish complete immutable rollback before corrective changes
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103229-Exact-Rollback-Before-2103230
+          path: rollback/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
