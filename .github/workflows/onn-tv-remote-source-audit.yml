@@ -36,7 +36,7 @@ jobs:
           github-token: ${{ github.token }}
           path: native209
 
-      - name: Reconstruct and apply exact 2103220 TV Grid source
+      - name: Reconstruct 2103220 and apply 2103221 TV Remote UI source
         run: |
           set -euo pipefail
           mkdir -p engine audit219
@@ -58,6 +58,7 @@ jobs:
           python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
 
       - name: Print TV groups player preview remote source contexts
         run: |
