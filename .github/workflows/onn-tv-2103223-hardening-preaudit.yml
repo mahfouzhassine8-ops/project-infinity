@@ -190,6 +190,10 @@ jobs:
               'cobraPosition(',
               'CobraVideoTile(',
               'rebuildCobraMultiPreservingSessions(',
+              'mCobraPresentationTick',
+              'mCobraTvApplyProgrammeFocus',
+              'mCobraVisibleGuideFetch',
+              'mRebuildShellAfterPlayer',
           ):
               token_method(token)
 
@@ -309,6 +313,17 @@ jobs:
               'private void cobraStopPresentationTicker(',
               'private void rebuildCobraShellIfNeeded(',
               'private void cobraApplySystemBarsForSurface(',
+              'private void loadAllEnabledSources(',
+              'private void loadActiveSource(',
+              'private void loadPersistedState(',
+              'private boolean cobraTrySmartReturn(',
+              'private void cobraRefreshChannelMetadata(',
+              'private void cobraInstallEpg(',
+              'private void cobraRefreshQuickPeek(',
+              'private void cobraUpdatePerformanceOverlay(',
+              'private void cobraApplyDisplayPerformance(',
+              'private boolean cobraGuidePresentationActive(',
+              'private void cobraPublishMiniState(',
           ):
               method(name)
           PY
