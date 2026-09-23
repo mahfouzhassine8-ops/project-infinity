@@ -1,0 +1,144 @@
+name: onn TV 2103226 lightweight live preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103226-onn4kpro-tv-lightweight-live-rc9]
+    paths:
+      - '.github/workflows/onn-tv-2103226-lightweight-live-preaudit.yml'
+      - 'repairs/onn4kpro-tv-lightweight-live-2103226/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preaudit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact locked RC8 source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit226
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit226/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+
+      - name: Audit TV navigation and hot paths
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+
+          def span(name, ctor=False):
+              if ctor:
+                  pat=re.compile(r'(?m)^\s*'+re.escape(name)+r'\s*\([^;\n]*\)\s*\{')
+              else:
+                  pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+'+re.escape(name)+r'\s*\([^\n{;]*\)\s*\{')
+              ms=list(pat.finditer(s))
+              if len(ms)!=1:return f'CARDINALITY {name}={len(ms)}'
+              start=ms[0].start();brace=s.find('{',start);depth=0;quote=None;esc=line=block=False;i=brace
+              while i<len(s):
+                  c=s[i];n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\n':line=False
+                  elif block:
+                      if c=='*' and n=='/':block=False;i+=1
+                  elif quote:
+                      if esc:esc=False
+                      elif c=='\\':esc=True
+                      elif c==quote:quote=None
+                  elif c=='/' and n=='/':line=True;i+=1
+                  elif c=='/' and n=='*':block=True;i+=1
+                  elif c in ('"',"'"):quote=c
+                  elif c=='{':depth+=1
+                  elif c=='}':
+                      depth-=1
+                      if depth==0:return s[start:i+1]
+                  i+=1
+              return 'UNCLOSED '+name
+
+          names=[
+            'toggleCobraDrawer','closeCobraExperienceDrawer','showCobraPrimaryView',
+            'cobraShowGuideShell','cobraBuildModeChrome','cobraRenderGuideBrowser',
+            'cobraOpenTvDirectory','selectCobraCategory','cobraPreviewChannel',
+            'promoteCobraPreviewToFullscreen','closeFullscreenToCobraView',
+            'openPlayerOverlay','closePlayer','showCobraPlayerDrawer',
+            'cobraRenderPlayerDrawer','cobraTvHandleGuideKey','cobraTvHandlePlayerKey',
+            'cobraRefreshEpg','cobraRefreshModeDetails','cobraLayoutGuide',
+            'startSinglePlayer','showPlayerChromeTemporarily'
+          ]
+          out=[]
+          for n in names:out += ['\n===== '+n+' =====\n',span(n)]
+          Path('audit226/rc8-tv-hotpaths.txt').write_text('\n'.join(out))
+
+          # Inventory methods that scan the entire channel list; this is the most likely
+          # source of 32-bit UI stalls with ~20K channels.
+          scan=[]
+          meth_pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+(\w+)\s*\([^\n{;]*\)\s*\{')
+          for m in meth_pat.finditer(s):
+              name=m.group(1);body=span(name)
+              if body.startswith('CARDINALITY') or body.startswith('UNCLOSED'):continue
+              refs=body.count('mChannels')
+              loops=len(re.findall(r'for\s*\([^\)]*mChannels',body))+len(re.findall(r'for\s*\([^\)]*:\s*mChannels\)',body))
+              if refs or loops:
+                  scan.append({'method':name,'mChannels_refs':refs,'explicit_full_scans':loops,'chars':len(body)})
+          scan.sort(key=lambda x:(x['explicit_full_scans'],x['mChannels_refs'],x['chars']),reverse=True)
+          Path('audit226/channel-scan-inventory.json').write_text(json.dumps(scan,indent=2))
+
+          # Flag mobile-oriented TV runtime hooks so RC9 can remove only paths not useful on TV.
+          tokens=['PictureInPicture','SCREEN_ORIENTATION','preferredDisplayModeId','rotation','120','background','windowInsets','Gesture','Touch','onTouch','swipe']
+          inventory={t:s.lower().count(t.lower()) for t in tokens}
+          Path('audit226/mobile-runtime-token-inventory.json').write_text(json.dumps(inventory,indent=2,sort_keys=True))
+          print(Path('audit226/channel-scan-inventory.json').read_text())
+          PY
+
+      - name: Preserve preaudit
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103226-Lightweight-Live-Preaudit
+          path: audit226/
+          retention-days: 30
