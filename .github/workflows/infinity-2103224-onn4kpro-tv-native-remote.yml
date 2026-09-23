@@ -57,7 +57,7 @@ jobs:
       - name: Download exact locked 2103223 TV APK
         uses: actions/download-artifact@v8
         with:
-          name: Infinity-2103224-Onn4KPro-TV-Native-Remote-TEST-CANDIDATE
+          name: Infinity-2103223-Onn4KPro-TV-Hardening-TEST-CANDIDATE
           run-id: 35831108419
           github-token: ${{ github.token }}
           path: base223
@@ -86,8 +86,7 @@ jobs:
           python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
-          python3 repairs/onn4kpro-tv-hardening-2103223/
-            repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
 
           python3 - <<'PY'
@@ -223,7 +222,7 @@ jobs:
       - name: Publish onn 4K Pro TV 2103224 NATIVE REMOTE TEST CANDIDATE
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103223-Onn4KPro-TV-Hardening-TEST-CANDIDATE
+          name: Infinity-2103224-Onn4KPro-TV-Native-Remote-TEST-CANDIDATE
           path: |
             candidate224/Infinity-1.0.9-Cobra-Onn4KPro-TV-Native-Remote-RC7.apk
             candidate224/Infinity-1.0.9-Cobra-Onn4KPro-TV-Native-Remote-RC7.sha256
