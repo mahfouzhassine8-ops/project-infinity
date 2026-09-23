@@ -1,0 +1,47 @@
+cture&&cobraMultiViewPlayer(binding.player)&&cobraMultiFillScreen()){
++      TextureView texture=binding.texture;VideoSize size=binding.player.getVideoSize();
++      float[] scale=CobraFoldAspectPolicy.fill(size.width,size.height,size.pixelWidthHeightRatio,texture==null?0:texture.getWidth(),texture==null?0:texture.getHeight());
++      if(texture!=null){android.graphics.Matrix matrix=new android.graphics.Matrix();matrix.setScale(scale[0],scale[1],texture.getWidth()/2f,texture.getHeight()/2f);texture.setTransform(matrix);}
++    }else cobraFitVideo(binding.texture,binding.player,mInPictureInPicture?0:mode);
+     cobraFitCaptions(binding);
+   }
+ 
+@@ -8425,7 +8555,7 @@
+ 
+   private final class CobraVideoTile {
+     final Channel channel;final FrameLayout view;final TextureView texture;final View audioRing;final TextView warning;
+-    ExoPlayer player;int frames=-1;long changed=android.os.SystemClock.elapsedRealtime(),lastReport=0;String lastState="";
++    ExoPlayer player;int frames=-1,lastPlaybackState=-1,autoRecoveries=0;long changed=android.os.SystemClock.elapsedRealtime(),stateChanged=changed,lastReport=0,lastRecoveryAt=0L,stableSince=0L;boolean recovering=false;String lastState="";
+     CobraVideoTile(Channel c){channel=c;view=new FrameLayout(InfinityLiveActivity.this);view.setBackgroundColor(vtheme().color("cobra.CobraVideoTile.colors.1",Color.BLACK));texture=new TextureView(InfinityLiveActivity.this);view.addView(texture,new FrameLayout.LayoutParams(-1,-1));
+       warning=cobraText("",vtheme().color("cobra.CobraVideoTile.colors.2",Color.WHITE),11);warning.setGravity(Gravity.CENTER);warning.setBackgroundColor(vtheme().color("cobra.CobraVideoTile.colors.3",0xbb07111c));warning.setPadding(dp(vtheme().dimension("cobra.CobraVideoTile.dimensions.1",8)),dp(vtheme().dimension("cobra.CobraVideoTile.dimensions.2",4)),dp(vtheme().dimension("cobra.CobraVideoTile.dimensions.3",8)),dp(vtheme().dimension("cobra.CobraVideoTile.dimensions.4",4)));warning.setVisibility(View.GONE);view.addView(warning,new FrameLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.CobraVideoTile.dimensions.5",32)),Gravity.BOTTOM));
+       audioRing=new View(InfinityLiveActivity.this);audioRing.setBackgroundColor(vtheme().color("cobra.CobraVideoTile.colors.4",0xff41c8ef));audioRing.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);view.addView(audioRing,new FrameLayout.LayoutParams(dp(vtheme().dimension("cobra.CobraVideoTile.dimensions.6",2)),-1,Gravity.LEFT));
+@@ -8457,7 +8587,13 @@
+   private void cobraLayoutMultiTiles() {
+     if(mCobraMultiCanvas==null)return;int w=mCobraMultiCanvas.getWidth(),h=mCobraMultiCanvas.getHeight();if(w<=0||h<=0)return;ArrayList<CobraVideoTile> tiles=mCobraTiles.values();
+     int enlarged=mCobraMultiEnlargedKey.isEmpty()?-1:cobraMultiIndex(mCobraMultiEnlargedKey);if(enlarged<0)mCobraMultiEnlargedKey="";
+-    for(int i=0;i<tiles.size();i++){int[] rect=CobraMultiLayoutPolicy.rect(i,tiles.size(),w,h,enlarged);cobraPosition(tiles.get(i).view,rect[0],rect[1],rect[2],rect[3]);}
++    boolean fill=cobraMultiFillScreen();int left=0,top=0,safeW=w,safeH=h;
++    if(fill){int[] in=cobraMultiSafeInsets();left=in[0];top=in[1];safeW=Math.max(1,w-in[0]-in[2]);safeH=Math.max(1,h-in[1]-in[3]);}
++    for(int i=0;i<tiles.size();i++){
++      CobraVideoTile tile=tiles.get(i);int[] rect=CobraMultiLayoutPolicy.rect(i,tiles.size(),safeW,safeH,enlarged,fill);
++      cobraPosition(tile.view,left+rect[0],top+rect[1],rect[2],rect[3]);
++      CobraPlayerBinding binding=mCobraPlayerBindings.get(tile.player);if(binding!=null)tile.texture.post(()->{if(binding.current()&&binding.texture==tile.texture)cobraFitBinding(binding);});
++    }
+   }
+ 
+   private int cobraMultiIndex(String key) {if(mMultiChannels!=null)for(int i=0;i<mMultiChannels.length;i++)if(mMultiChannels[i].id.equals(key))return i;return -1;}
+@@ -8472,7 +8608,7 @@
+ 
+   private void cobraRetryMultiTile(String key) {
+     CobraVideoTile tile=mCobraTiles.get(key);if(tile==null||!isCobraAsyncAlive())return;
+-    int owner=mAudioTile;cobraDisposePlayer(tile.player);tile.player=null;tile.frames=-1;tile.changed=android.os.SystemClock.elapsedRealtime();
++    int owner=mAudioTile;cobraDisposePlayer(tile.player);tile.player=null;tile.frames=-1;tile.lastPlaybackState=-1;tile.autoRecoveries=0;tile.recovering=false;tile.lastRecoveryAt=0L;tile.stableSince=0L;tile.changed=tile.stateChanged=android.os.SystemClock.elapsedRealtime();
+     mCobraCreatingMulti=true;
+     try{tile.player=buildPlayer(tile.texture,tile.channel,false);tile.player.setMediaItem(mediaItem(tile.channel.primaryUrl));tile.player.prepare();startCobraPlayer(tile.player);}
+     catch(Exception error){tile.warning.setText("Cannot restart this screen");tile.warning.setVisibility(View.VISIBLE);}
+@@ -8481,20 +8617,47 @@
+   }
+ 
+   private void cobraInspectMultiHealth() {
+-    if(mBackgroundStopped||mInPictureInPicture||mCobraTiles.isEmpty())return;
+-    long now=android.os.SystemClock.elapsedRealti
