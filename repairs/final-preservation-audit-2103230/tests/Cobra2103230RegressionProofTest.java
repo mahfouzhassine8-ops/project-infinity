@@ -92,7 +92,7 @@ public class Cobra2103230RegressionProofTest {
     grid();((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_multiview_layout_fill_screen",true).putInt("cobra_player_aspect_mode",0).commit();
     put(a,"mCobraMultiFullscreenActive",true);put(a,"mPlayer",players[0].player);put(a,"mPlaying",channels[0]);
     TextureView full=new TextureView(a);full.layout(0,0,1000,1000);put(bindings[0],"texture",full);call(a,"cobraFitBinding",bindings[0]);
-    float[] actual=new float[9];full.getTransform(new Matrix()).getValues(actual);float[] expected=InfinityLiveActivity.CobraLayoutMath.fit(1920,1080,1f,1000,1000,0,1f,1f);
+    float[] actual=new float[9];full.getTransform(new Matrix()).getValues(actual);Method fit=Class.forName(InfinityLiveActivity.class.getName()+"$CobraLayoutMath").getDeclaredMethod("fit",int.class,int.class,float.class,int.class,int.class,int.class,float.class,float.class);fit.setAccessible(true);float[] expected=(float[])fit.invoke(null,1920,1080,1f,1000,1000,0,1f,1f);
     assertEquals(expected[0],actual[Matrix.MSCALE_X],.001f);assertEquals(expected[1],actual[Matrix.MSCALE_Y],.001f);assertEquals(0,players[0].prepares);assertEquals(0,players[1].releases);
   }
   @Test public void previewUnexpectedEndIsNotSilentlyExcluded()throws Exception{
