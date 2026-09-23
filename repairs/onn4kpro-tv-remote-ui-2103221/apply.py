@@ -172,6 +172,11 @@ def apply(shell:Path):
     cobraUpdatePreviewSubtitleState();return host;
   }''')
 
+    # The preview details panel is display-only on TV too; the guide keeps D-pad ownership.
+    s=once(s,'    epg.setTag("cobra_preview_epg");',
+      '    epg.setTag("cobra_preview_epg");epg.setFocusable(false);epg.setFocusableInTouchMode(false);epg.setClickable(false);epg.setVisibility(View.GONE);',
+      'preview EPG focus removal')
+
     # Slightly larger TV preview than RC3 while still leaving the EPG dominant.
     s=once(s,
       'int hero=Math.min(Math.round(108+10*(f-1)),Math.max(76,avail*20/100));\n        int vw=Math.min(Math.round(192+16*(f-1)),Math.min(Math.max(120,body/4),hero*16/9));',
@@ -316,6 +321,7 @@ def apply(shell:Path):
       'Select to tune • Back to close',
       'Select the current channel again to watch',
       'preview.setFocusable(false)',
+      'epg.setFocusable(false)',
       'list.setFastScrollEnabled(false)',
       'versionCode 2103221',
     ):
