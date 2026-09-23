@@ -66,7 +66,26 @@ jobs:
           python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
 
-      - name: Audit locked RC10 layout, focus and rendering
+      - name: Dry-run RC11 adaptive UI patch
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103231
+          assert r['tv_hamburger_removed'] is True
+          assert r['tv_grid_group_dropdown_removed'] is True
+          assert r['tv_grid_settings_next_to_search'] is True
+          assert r['tv_mini_player_adaptive_large'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['native_engine_rebuilt'] is False
+          print('PASS: RC11 adaptive UI source receipt')
+          PY
+
+      - name: Audit locked RC11 layout, focus and rendering
         run: |
           python3 - <<'PY'
           from pathlib import Path
