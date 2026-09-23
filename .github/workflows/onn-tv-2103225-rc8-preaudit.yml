@@ -95,7 +95,7 @@ jobs:
                       if depth==0: return s[start:i+1]
                   i+=1
               return 'UNCLOSED '+name
-          names=['cobraTvAttachSurfaceWhenReady','openPlayerOverlay','promoteCobraPreviewToFullscreen','closeFullscreenToCobraView','cobraBuildPlayerChrome','showCobraMultiPicker','renderCobraMultiPicker','renderCobraMultiPickerSearch','cobraTvFocusMultiRow','showCobraMultiTileActions','releaseMulti']
+          names=['cobraTvAttachSurfaceWhenReady','openPlayerOverlay','promoteCobraPreviewToFullscreen','closeFullscreenToCobraView','cobraBuildPlayerChrome','showCobraMultiPicker','renderCobraMultiPicker','renderCobraMultiPickerSearch','cobraTvFocusMultiRow','showCobraMultiTileActions','removeCobraMultiTileClean','cobraRetryMultiTile','setMultiAudio','releaseMulti']
           out=[]
           for n in names:
               out += ['\n===== '+n+' =====\n',span(n)]
