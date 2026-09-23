@@ -18,6 +18,12 @@ RED={
  'promotedFullscreenHonorsItsOwnNormalAspectWithFillSaved',
  'previewUnexpectedEndIsNotSilentlyExcluded',
 }
+EXTRA_PROOF='Cobra2103230OwnershipProofTest'
+EXTRA_RED={
+ 'promotedManualRestartKeepsTileRegistryAndReturnCoherent',
+ 'promotedRecallOfPeerReusesBothSessionsAndKeepsMultiView',
+ 'promotedNewChannelReplacesOnlyTheSelectedTile',
+}
 def req(value,message):
  if not value:raise RuntimeError(message)
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -90,7 +96,7 @@ def tests(build,phase):
    if failure is None:failure=error
    if failure is not None:failures[key]={'type':failure.get('type',''),'message':failure.get('message',''),'trace':failure.text or ''}
    if case.find('skipped') is not None:skipped.append(key)
- expected_fail={(PROOF,name) for name in RED} if phase=='baseline' else set()
+ expected_fail=({(PROOF,name) for name in RED}|{(EXTRA_PROOF,name) for name in EXTRA_RED}) if phase=='baseline' else set()
  result=dict(phase=phase,gradle_exit_code=code,expected_count=len(expected),executed_count=len(actual),missing=sorted(expected-actual),unexpected=sorted(actual-expected),failures=[dict(suite=k[0],test=k[1],**v) for k,v in failures.items()],skipped=skipped,expected_failures=sorted(expected_fail),source_hashes=hashes,physical_device_verified=False)
  write(REPO/'audit230'/phase/'RESULT.json',result)
  req(actual==expected,'Missing/unexpected compiled test cases: '+str(result['missing'])+' / '+str(result['unexpected']))
@@ -106,6 +112,9 @@ def tests(build,phase):
    'activeLoaderIsNotAbortedByEighteenSecondMultiWatchdog':'expected:<0> but was:<1>',
    'promotedFullscreenHonorsItsOwnNormalAspectWithFillSaved':'expected:<1.0> but was:<1.7777778>',
    'previewUnexpectedEndIsNotSilentlyExcluded':'expected:<1> but was:<0>',
+   'promotedManualRestartKeepsTileRegistryAndReturnCoherent':'Restart must update the promoted tile registry',
+   'promotedRecallOfPeerReusesBothSessionsAndKeepsMultiView':'Explicit recall must retain Multi-View',
+   'promotedNewChannelReplacesOnlyTheSelectedTile':'Healthy peer must survive explicit channel replacement',
   }
   for (_,name),failure in failures.items():
    req(expected_messages[name] in failure['message'] and 'Caused by:' not in failure['trace'],'Not the measured regression assertion: '+name)

@@ -50,6 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 repairs/final-preservation-audit-2103230/apply.py --shell shell-kodi
+          python3 repairs/final-preservation-audit-2103230/ownership.py --shell shell-kodi
           java repairs/cobra-feature-refinement-2103207/ParseJava.java shell-kodi/tools/android/packaging/xbmc/src
           cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit230/InfinityLiveActivity-2103230-after.java.in
           tar -czf audit230/generated-2103230-source.tar.gz shell-kodi engine scripts/infinity_background_resume.py scripts/package_background_resume.py
@@ -70,6 +71,8 @@ jobs:
           python3 repairs/final-preservation-audit-2103230/ci.py verify
           cp repairs/final-preservation-audit-2103230/DEVICE-TEST.md signed230/DEVICE-TEST.md
           cp repairs/final-preservation-audit-2103230/AUDIT.md signed230/AUDIT.md
+          cp repairs/final-preservation-audit-2103230/OWNERSHIP-SUPPLEMENT.md signed230/OWNERSHIP-SUPPLEMENT.md
+          cp repairs/final-preservation-audit-2103230/FIXTURE-ADAPTATION.md signed230/FIXTURE-ADAPTATION.md
       - name: Publish 2103230 TEST CANDIDATE only after all gates
         uses: actions/upload-artifact@v7
         with:
