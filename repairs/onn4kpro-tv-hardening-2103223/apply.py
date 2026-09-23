@@ -243,7 +243,8 @@ def patch_activity(path:Path):
     # 2103222 accidentally stopped maintaining these dimensions. Its guide-shell onLayout
     # consequently rebuilt the entire 20k-channel browser on every layout pass.
     shell=member(s,'cobraShowGuideShell')
-    shell=once(shell,'cobraLayoutGuide();cobraRenderGuideBrowser();','cobraLayoutGuide();','guide onLayout rebuild loop')
+    req(shell.count('cobraLayoutGuide();cobraRenderGuideBrowser();')==2,'guide shell render anchor drift')
+    shell=shell.replace('cobraLayoutGuide();cobraRenderGuideBrowser();','cobraLayoutGuide();',1)
     s=replace_member(s,'cobraShowGuideShell',shell)
 
     s=replace_member(s,'cobraLayoutGuide',r'''  private void cobraLayoutGuide(){
@@ -472,7 +473,7 @@ def patch_activity(path:Path):
       'cobra_tv_toolbar_menu',
     ):req(token in s,'2103223 source gate missing: '+token)
     req('if (!warm) warm = restoreCobraLibraryCache(enabled);' not in s,'Synchronous startup cache restore remains')
-    req('cobraLayoutGuide();cobraRenderGuideBrowser();' not in member(s,'cobraShowGuideShell'),'Guide onLayout redraw loop remains')
+    req(member(s,'cobraShowGuideShell').count('cobraLayoutGuide();cobraRenderGuideBrowser();')==1,'Guide onLayout redraw loop remains')
     req('decor.requestLayout()' not in member(s,'cobraApplySystemBarsForSurface'),'System-bar layout churn remains')
     req('preferredDisplayModeId' not in member(s,'cobraApplyDisplayPerformance'),'TV display-mode handshake remains')
     path.write_text(s)
