@@ -13,7 +13,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: infinity-2103227-\${{ github.sha }}
+  group: infinity-2103227-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
         with:
           name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
           run-id: 35676573761
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: baseline208
 
       - name: Download preserved 2103209 native engine
@@ -43,7 +43,7 @@ jobs:
         with:
           name: Infinity-2103209-Python311-GIL-Native-Engine
           run-id: 35693288744
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: native209
 
       - name: Download exact locked 2103225 APK for rollback and payload gate
@@ -51,7 +51,7 @@ jobs:
         with:
           name: Infinity-2103225-Cobra-TV-Show-Typography-TEST-CANDIDATE
           run-id: 35795353201
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: parent225
 
       - name: Reconstruct exact locked 2103225
@@ -112,10 +112,10 @@ jobs:
 
       - name: Build and sign exact 2103227 candidate
         env:
-          INFINITY_KEYSTORE_B64: \${{ secrets.INFINITY_KEYSTORE_B64 }}
-          INFINITY_STORE_PASSWORD: \${{ secrets.INFINITY_STORE_PASSWORD }}
-          INFINITY_KEY_PASSWORD: \${{ secrets.INFINITY_KEY_PASSWORD }}
-          INFINITY_KEY_ALIAS: \${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
           set -euo pipefail
           mkdir -p "$HOME/.android"
