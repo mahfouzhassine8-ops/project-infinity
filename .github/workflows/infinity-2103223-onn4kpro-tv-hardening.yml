@@ -1,0 +1,245 @@
+name: Infinity | 2103223 onn TV Hardening RC6 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103223-onn4kpro-tv-hardening-rc6]
+    paths:
+      - '.github/workflows/infinity-2103223-onn4kpro-tv-hardening.yml'
+      - 'repairs/onn4kpro-tv-hardening-2103223/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103223-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103221 ARMv7 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103221-Onn4KPro-TV-Remote-UI-TEST-CANDIDATE
+          run-id: 35806145217
+          github-token: ${{ github.token }}
+          path: base221
+
+      - name: Reconstruct through 2103222 and apply 2103223 hardening
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit223 candidate223
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit223/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103223
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Hardening-RC6'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['mobile_parent_untouched'] is True
+          assert r['tv_hardening'] is True
+          assert r['tv_guide_layout_rebuild_loop_fixed'] is True
+          assert r['tv_cache_restore_off_main'] is True
+          assert r['tv_display_mode_switching_disabled'] is True
+          assert r['tv_system_bar_layout_churn_fixed'] is True
+          assert r['tv_transient_focus_owned'] is True
+          assert r['tv_grid_focus_graph'] is True
+          assert r['multiview_fullscreen_reversible'] is True
+          print('PASS: exact 2103223 TV hardening source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_player_multiview_2103222' "$JAVA"
+          grep -Fq 'cobra_tv_hardening_2103223' "$JAVA"
+          grep -Fq 'cobraTvReadLibraryCache' "$JAVA"
+          grep -Fq 'cobraTvHandleTransientKey' "$JAVA"
+          grep -Fq 'cobraTvHandleGuideKey' "$JAVA"
+          grep -Fq 'mCobraLastGuideWidth=w;mCobraLastGuideHeight=h' "$JAVA"
+          grep -Fq 'mCobraRefreshStatus="TV SYSTEM"' "$JAVA"
+          grep -Fq '"Search and add"' "$JAVA"
+          grep -Fq '"Return to Multi-View"' "$JAVA"
+          ! grep -Fq 'if (!warm) warm = restoreCobraLibraryCache(enabled);' "$JAVA"
+          ! grep -A16 -F 'private void cobraApplyDisplayPerformance' "$JAVA" | grep -Fq 'preferredDisplayModeId'
+          ! grep -A28 -F 'private void cobraApplySystemBarsForSurface' "$JAVA" | grep -Fq 'decor.requestLayout()'
+          grep -Fq 'versionCode 2103223' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Hardening-RC6"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base221 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Remote-UI-RC4.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '6d3b19ae4c7256cd15283d828e95eda25d5baa11c7d618068d14652ccb3e4e8c' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate223/Infinity-2103221-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile Android TV layer, preserve exact ARMv7 native engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate223/Infinity-2103221-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-hardening-2103223/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-223 \
+            --out candidate223
+          FINAL=candidate223/Infinity-1.0.9-Cobra-Onn4KPro-TV-Hardening-RC6.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate223/Infinity-1.0.9-Cobra-Onn4KPro-TV-Hardening-RC6.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate223/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103223 — ONN. 4K PRO TV HARDENING RC6
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          STARTUP / BLACK-SCREEN
+          1. Cold launch Infinity. A visible Cobra loading surface must appear promptly; do not accept a long blank/black screen while the 20k-channel cache is decoded.
+          2. Repeat cold launch after reboot and warm launch from Google TV Home.
+          3. Enter preview -> fullscreen -> guide 10 times. No HDMI-style black mode switch and no long blank presentation.
+          4. Exit fullscreen/player to the main TV Grid repeatedly. The mounted guide should return without reconstructing the whole Cobra shell.
+
+          REMOTE / MAIN TV GRID
+          5. Operate only with D-pad, Select, Back and Menu.
+          6. Toolbar -> Group/Playlist/Search -> EPG must all be reachable. Focus must not become trapped in the grid.
+          7. Channel Groups still opens with current group focused; one Select chooses it; Back returns to the exact guide position.
+          8. Rapidly move through 30+ guide cells. Every press should visibly move once without lagging behind or rebuilding the page.
+
+          PLAYER CHILD SURFACES
+          9. Preserve the working 2103222 player layout.
+          10. Open Channels, Display, Multi-View and More from the bottom row. Each opened surface must own focus immediately.
+          11. Up/Down/Left/Right must stay inside the open surface; focus must never leak into video/guide behind it.
+          12. Back closes exactly one layer and restores the player control that opened it.
+          13. Audio & subtitles, Channel playback, Health Center and nested sheets must be usable with the remote and scroll focused rows into view.
+          14. Channels drawer: tabs and current-channel list are reachable; Select tunes once and closes cleanly.
+
+          MULTI-VIEW
+          15. Open 2–4 legal/user-owned channels. Tile focus must remain responsive while all streams play.
+          16. Search/Add, Pause/Resume, Enlarge/Restore, Full Screen and Return Multi must all be remote usable.
+          17. Full Screen/Return Multi must preserve other tile players, audio owner and session positions.
+
+          PERFORMANCE / STABILITY
+          18. Leave TV Grid open for 10 minutes and navigate repeatedly. No progressive slowdown or focus loss.
+          19. Cycle Guide -> Player -> Display/More/Channels -> Guide -> Multi-View -> Guide at least 20 times.
+          20. Watch for retained overlays, duplicate controls, repeated loading, black frames, freezes, crashes or audio continuing after intended close.
+          21. Provider/EPG background refresh must not interrupt D-pad responsiveness.
+
+          CORE REGRESSION
+          22. Verify Live TV playback, audio/subtitles, 1080p/4K, fallback/recovery and rewind/timeshift.
+          23. Verify recordings/reminders, Movies, Shows, My List, Smart Return, Health Center and diagnostics.
+          24. PiP/background/rotation/120-Hz phone surfaces remain absent.
+
+          ACCEPTANCE
+          - armeabi-v7a / ELF32 ARM only.
+          - Permanent Infinity package/signer unchanged.
+          - Native libkodi.so byte-identical to locked 2103221.
+          - 2103221 remains protected rollback.
+          - ARM64 phone/Fold source untouched.
+          - Do not lock/promote 2103223 until these physical tests pass.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103223 HARDENING TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103223-Onn4KPro-TV-Hardening-TEST-CANDIDATE
+          path: |
+            candidate223/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.apk
+            candidate223/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-MultiView-RC5.sha256
+            candidate223/signing-verification.txt
+            candidate223/badging.txt
+            candidate223/manifest.txt
+            candidate223/ONN-TV-2103223-VERIFICATION.json
+            candidate223/tv-hardening-source.json
+            candidate223/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103223 hardening source/packaging evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103223-Onn4KPro-TV-Hardening-Evidence
+          path: |
+            audit223/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-player-multiview-2103222/
+            repairs/onn4kpro-tv-hardening-2103223/
+            candidate223/*.json
+            candidate223/*.txt
+          if-no-files-found: warn
+          retention-days: 90
