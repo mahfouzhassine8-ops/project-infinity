@@ -1,0 +1,248 @@
+name: Infinity | 2103230 onn TV Navigation Motion RC10 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103230-onn4kpro-tv-navigation-motion-rc10]
+    paths:
+      - '.github/workflows/infinity-2103230-onn4kpro-tv-navigation-motion.yml'
+      - 'repairs/onn4kpro-tv-navigation-motion-2103230/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103230-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC10 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103225 RC8 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103225-Onn4KPro-TV-Handoff-Focus-TEST-CANDIDATE
+          run-id: 35895797009
+          github-token: ${{ github.token }}
+          path: base225
+
+      - name: Reconstruct exact locked RC8 source and apply RC10 navigation motion
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 candidate230
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit230/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103230
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Navigation-Motion-RC10'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_back_reverses_hierarchy'] is True
+          assert r['tv_group_chooser_persistent'] is True
+          assert r['tv_group_selection_expands_grid'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_player_channels_control_preserved'] is True
+          assert r['tv_group_counts_cached'] is True
+          assert r['tv_motion_translation_alpha_only'] is True
+          assert r['tv_motion_layout_animator'] is False
+          assert r['tv_handoff_first_render'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['native_engine_rebuilt'] is False
+          print('PASS: exact RC10 navigation/motion source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_handoff_focus_2103225' "$JAVA"
+          grep -Fq 'cobra_tv_navigation_motion_2103230' "$JAVA"
+          grep -Fq 'Back to guide' "$JAVA"
+          grep -Fq 'cobraTvShowGroupChooser' "$JAVA"
+          grep -Fq 'cobraTvSelectGroup' "$JAVA"
+          grep -Fq 'startCobraPreview(mGuidePreviewChannel)' "$JAVA"
+          grep -Fq 'mCobraPreviewPlayer=session' "$JAVA"
+          grep -Fq 'showCobraPlayerDrawer()' "$JAVA"
+          grep -Fq 'versionCode 2103230' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Navigation-Motion-RC10"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC8 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base225 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Handoff-Focus-RC8.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' 'b4e97e83a40eeb6db02fe491be842427ac6c0a8c6254ec0648300b4e23e6e8e6' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate230/Infinity-2103225-RC8-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC10 Android TV layer, preserve exact ARMv7 engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate230/Infinity-2103225-RC8-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-230 \
+            --out candidate230
+          FINAL=candidate230/Infinity-1.0.9-Cobra-Onn4KPro-TV-Navigation-Motion-RC10.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate230/Infinity-1.0.9-Cobra-Onn4KPro-TV-Navigation-Motion-RC10.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate230/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103230 — ONN. 4K PRO TV NAVIGATION MOTION RC10
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          LOCKED PARENT
+          - Exact RC8 / 2103225 is the protected parent and rollback.
+          - RC9 / 2103226 is NOT a parent and is discarded.
+          - No native rebuild. ARMv7 engine remains byte-identical.
+
+          REQUIRED NAVIGATION
+          1. Open the main Cobra drawer and select TV.
+          2. Drawer collapses; CHANNELS / group choices appear on the left with focus.
+          3. RC8 mini-player/preview and programme information remain visible and working.
+          4. Select Favorites, All Channels or a provider group.
+          5. Group chooser slides away; the existing EPG grid expands to the full available guide canvas.
+          6. Focus moves into the filtered EPG/grid.
+          7. Press Back from the full grid: group chooser returns with the selected group focused.
+          8. Press Back again: main Cobra drawer opens with TV selected.
+          9. Repeat the sequence at least 20 times. Each Back reverses exactly one level.
+
+          PLAYER HIERARCHY
+          10. Select a channel/program and enter fullscreen.
+          11. Physical Back returns directly to the full EPG grid/mini-player level.
+          12. Top-left Back arrow does the same.
+          13. Channels button remains separate and still opens the player channel drawer.
+          14. Back must never be remapped to Channels.
+
+          MOTION / PERFORMANCE
+          15. Groups slide/collapse is short and restrained; no heavy scaling/reflow loop.
+          16. Grid/mini-player use translation/alpha polish only.
+          17. Reopen the group level repeatedly with ~20K channels; group counts should be cached between library/source/profile changes.
+          18. No progressive slowdown after repeated Groups <-> Grid transitions.
+          19. Fullscreen -> guide uses the RC8 first-render handoff plus a short old-frame fade.
+          20. Note any remaining black-screen duration separately from provider buffering.
+
+          REGRESSION
+          21. Verify mini-player continuously.
+          22. Verify player header, timeline, Channels, Display, Multi-View and More.
+          23. Verify Multi-View Favorites/Recent/All/Groups, two-screen survivor, third/fourth screens and audio switching.
+          24. Verify rewind/timeshift, audio/subtitles, recordings/reminders.
+          25. Phone/Fold source remains untouched.
+
+          Do not lock/promote RC10 until physical tests pass.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103230 NAVIGATION MOTION TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103230-Onn4KPro-TV-Navigation-Motion-TEST-CANDIDATE
+          path: |
+            candidate230/Infinity-1.0.9-Cobra-Onn4KPro-TV-Navigation-Motion-RC10.apk
+            candidate230/Infinity-1.0.9-Cobra-Onn4KPro-TV-Navigation-Motion-RC10.sha256
+            candidate230/signing-verification.txt
+            candidate230/badging.txt
+            candidate230/manifest.txt
+            candidate230/ONN-TV-2103230-VERIFICATION.json
+            candidate230/tv-navigation-motion-source.json
+            candidate230/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103230 RC10 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103230-Onn4KPro-TV-Navigation-Motion-Evidence
+          path: |
+            audit230/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-player-multiview-2103222/
+            repairs/onn4kpro-tv-hardening-2103223/
+            repairs/onn4kpro-tv-native-remote-2103224/
+            repairs/onn4kpro-tv-handoff-focus-2103225/
+            repairs/onn4kpro-tv-navigation-motion-2103230/
+            candidate230/*.json
+            candidate230/*.txt
+          if-no-files-found: warn
+          retention-days: 90
