@@ -65,7 +65,26 @@ jobs:
           python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
 
-      - name: Dump exact RC8 navigation state machine
+      - name: Dry-run RC10 navigation patch
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-navigation-motion-2103230/apply.py
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103230
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_back_reverses_hierarchy'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_player_channels_control_preserved'] is True
+          assert r['tv_group_counts_cached'] is True
+          assert r['native_engine_rebuilt'] is False
+          print('PASS: RC10 navigation source receipt')
+          PY
+
+      - name: Dump exact RC10 navigation state machine
         run: |
           python3 - <<'PY'
           from pathlib import Path
