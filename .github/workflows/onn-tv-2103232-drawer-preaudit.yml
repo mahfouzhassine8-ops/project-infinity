@@ -67,7 +67,26 @@ jobs:
           python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
 
-      - name: Dump exact RC11 drawer/navigation methods
+      - name: Dry-run RC12 integrated drawer patch
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103232
+          assert r['tv_drawer_compact_integrated'] is True
+          assert r['tv_drawer_stage_shift'] is False
+          assert r['tv_drawer_destination_auto_close'] is True
+          assert r['tv_live_flow']=='drawer-live-tv-groups-grid'
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_mini_player_preserved'] is True
+          assert r['native_engine_rebuilt'] is False
+          print('PASS: RC12 integrated drawer source receipt')
+          PY
+
+      - name: Dump exact RC12 drawer/navigation methods
         run: |
           python3 - <<'PY'
           from pathlib import Path
