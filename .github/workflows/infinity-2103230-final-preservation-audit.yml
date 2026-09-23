@@ -1,0 +1,96 @@
+name: Infinity | 2103230 Final Preservation Audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103230-final-preservation-audit-rc1]
+    paths:
+      - '.github/workflows/infinity-2103230-final-preservation-audit.yml'
+      - 'repairs/final-preservation-audit-2103230/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103230-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    env:
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103229-Exact-Rollback-Before-2103230
+          run-id: 35820419796
+          github-token: ${{ github.token }}
+          path: rollback229
+      - name: Verify exact rollback and stage unchanged 2103229
+        run: |
+          set -euo pipefail
+          (cd rollback229 && sha256sum -c SHA256SUMS)
+          tar -xzf rollback229/locked-2103229-reconstructed-shell.tar.gz
+          mkdir -p audit230 "$HOME/.android"
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit230/InfinityLiveActivity-2103229-before.java.in
+          cp engine/background-resume-source.json audit230/parent-source-receipt.json
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+          keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Debug,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+      - name: Reproduce exact parent defects and run inherited baseline suites
+        run: python3 repairs/final-preservation-audit-2103230/ci.py baseline
+      - name: Apply minimum corrective delta and verify source boundaries
+        run: |
+          set -euo pipefail
+          python3 repairs/final-preservation-audit-2103230/apply.py --shell shell-kodi
+          java repairs/cobra-feature-refinement-2103207/ParseJava.java shell-kodi/tools/android/packaging/xbmc/src
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit230/InfinityLiveActivity-2103230-after.java.in
+          tar -czf audit230/generated-2103230-source.tar.gz shell-kodi engine scripts/infinity_background_resume.py scripts/package_background_resume.py
+      - name: Compile package and permanently sign candidate without native rebuild
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk rollback229/packaging-base.apk --build-dir build230 --out signed230
+      - name: Run unchanged regression proofs and candidate inherited suites
+        run: python3 repairs/final-preservation-audit-2103230/ci.py candidate
+      - name: Verify exact native payload signer assets resources and regression inventory
+        run: |
+          set -euo pipefail
+          python3 repairs/final-preservation-audit-2103230/ci.py verify
+          cp repairs/final-preservation-audit-2103230/DEVICE-TEST.md signed230/DEVICE-TEST.md
+          cp repairs/final-preservation-audit-2103230/AUDIT.md signed230/AUDIT.md
+      - name: Publish 2103230 TEST CANDIDATE only after all gates
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103230-Cobra-Final-Preservation-Audit-TEST-CANDIDATE
+          path: signed230/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+      - name: Preserve source audit and complete red green test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103230-Cobra-Final-Preservation-Audit-Evidence
+          path: |
+            audit230/
+            repairs/final-preservation-audit-2103230/
+            engine/background-resume-source.json
+            signed230/*.json
+            build230-baseline/xbmc/build/test-results/testReleaseUnitTest/
+            build230-baseline/xbmc/build/reports/tests/testReleaseUnitTest/
+            build230/xbmc/build/test-results/testReleaseUnitTest/
+            build230/xbmc/build/reports/tests/testReleaseUnitTest/
+          if-no-files-found: error
+          retention-days: 90
