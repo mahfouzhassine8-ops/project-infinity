@@ -31,10 +31,21 @@ def stage(build,phase):
  if phase=='baseline':selected.remove('Cobra2103230PolicyTest')
  directory=build/'xbmc/src/test/java/com/projectinfinity/kodi';directory.mkdir(parents=True,exist_ok=True)
  req(not list(directory.glob('*.java')),'Test directory must be empty; no stale/hidden test fixtures')
- hashes={};expected=set()
+ hashes={};original_hashes={};adaptations=[];expected=set()
  for name,path in manifest['sources'].items():
   if phase=='baseline' and name=='Cobra2103230PolicyTest':continue
-  source=REPO/path;target=directory/(name+'.java');shutil.copy2(source,target);hashes[name]=sha(target)
+  source=REPO/path;target=directory/(name+'.java');shutil.copy2(source,target);original_hashes[name]=sha(source)
+  if name=='Cobra2103179BufferResilienceTest':
+   # 2103180 explicitly superseded the old nine-second playlist reserve. The
+   # exact locked 229 has fifteen seconds; apply the SAME fixture to both builds.
+   old='TIME-OFFSET=-9.0,PRECISE=NO';new='TIME-OFFSET=-15.0,PRECISE=NO'
+   text=target.read_text();req(text.count(old)==1,'Legacy reserve fixture anchor drift')
+   proof=(REPO/'repairs/cobra-playback-finalization-2103180/apply.py').read_text()
+   req(old in proof and new in proof,'Missing historical reserve supersession evidence')
+   req(new in (REPO/'shell-kodi'/ACT).read_text(),'Current source does not contain locked 15-second reserve')
+   target.write_text(text.replace(old,new,1))
+   adaptations.append(dict(test=name,reason='2103180 changed playlist reserve 9s to 15s; preserve accepted 2103229 behavior',before=original_hashes[name],after=sha(target),historical_test_identity_retained=True))
+  hashes[name]=sha(target)
   if name in selected:
    methods=re.findall(r'@Test\b(?:(?!@Test).)*?public\s+void\s+(\w+)\s*\(',source.read_text(),re.S)
    req(methods,'No tests discovered in '+name)
@@ -55,7 +66,7 @@ dependencies {
 }
 '''%evidence.as_posix()
  with (build/'xbmc/build.gradle').open('a') as out:out.write(config)
- write(REPO/'audit230'/phase/'fixture.json',dict(selected=selected,source_hashes=hashes,expected_cases=sorted(expected),approved_art_sha256=sha(resource)))
+ write(REPO/'audit230'/phase/'fixture.json',dict(selected=selected,source_hashes=hashes,original_source_hashes=original_hashes,adaptations=adaptations,expected_cases=sorted(expected),approved_art_sha256=sha(resource)))
  return selected,expected,hashes
 
 def tests(build,phase):
@@ -88,6 +99,16 @@ def tests(build,phase):
  if phase=='baseline':
   req(code!=0,'Expected baseline regression tests did not reproduce')
   req(all('Assertion' in v['type'] or 'ComparisonFailure' in v['type'] for v in failures.values()),'Baseline failed on infrastructure/runtime exception, not regression assertion')
+  expected_messages={
+   'peerPauseDoesNotCancelAnotherPlayersFallback':'expected:<1> but was:<0>',
+   'endedBufferingEndedUsesSecondAttemptWithoutRequiringReady':'expected:<2> but was:<1>',
+   'multiEndedErrorCannotBypassLiveEndedRecoveryBudget':'expected:<[]> but was:<[error]>',
+   'activeLoaderIsNotAbortedByEighteenSecondMultiWatchdog':'expected:<0> but was:<1>',
+   'promotedFullscreenHonorsItsOwnNormalAspectWithFillSaved':'expected:<1.0> but was:<1.7777778>',
+   'previewUnexpectedEndIsNotSilentlyExcluded':'expected:<1> but was:<0>',
+  }
+  for (_,name),failure in failures.items():
+   req(expected_messages[name] in failure['message'] and 'Caused by:' not in failure['trace'],'Not the measured regression assertion: '+name)
  else:
   req(code==0,'Gradle failed despite XML; do not claim test pass')
   previous=json.loads((REPO/'audit230/baseline/RESULT.json').read_text())
