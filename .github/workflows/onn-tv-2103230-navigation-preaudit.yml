@@ -1,0 +1,128 @@
+name: onn TV 2103230 navigation preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103230-onn4kpro-tv-navigation-motion-rc10]
+    paths:
+      - '.github/workflows/onn-tv-2103230-navigation-preaudit.yml'
+      - 'repairs/onn4kpro-tv-navigation-motion-2103230/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preaudit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact locked RC8 source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit230
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit230/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+
+      - name: Dump exact RC8 navigation state machine
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+
+          def span(name):
+              pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+'+re.escape(name)+r'\s*\([^\n{;]*\)\s*\{')
+              ms=list(pat.finditer(s))
+              if len(ms)!=1:return f'CARDINALITY {name}={len(ms)}'
+              start=ms[0].start();brace=s.find('{',start);depth=0;quote=None;esc=line=block=False;i=brace
+              while i<len(s):
+                  c=s[i];n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\n':line=False
+                  elif block:
+                      if c=='*' and n=='/':block=False;i+=1
+                  elif quote:
+                      if esc:esc=False
+                      elif c=='\\':esc=True
+                      elif c==quote:quote=None
+                  elif c=='/' and n=='/':line=True;i+=1
+                  elif c=='/' and n=='*':block=True;i+=1
+                  elif c in ('"',"'"):quote=c
+                  elif c=='{':depth+=1
+                  elif c=='}':
+                      depth-=1
+                      if depth==0:return s[start:i+1]
+                  i+=1
+              return 'UNCLOSED '+name
+
+          names=[
+            'toggleCobraDrawer','closeCobraExperienceDrawer','cobraDrawerDestination','cobraOpenLiveTv',
+            'showCobraPrimaryView','cobraShowGuideShell','cobraLayoutGuide','cobraRenderGuideBrowser',
+            'cobraToggleModeGroups','cobraOpenTvDirectory','closeCobraActionSheet','selectCobraCategory',
+            'cobraDirectory','cobraTvHandleGuideKey','cobraTvRestoreGuideFocus','cobraTvFocusGuideBody',
+            'playChannel','promoteCobraPreviewToFullscreen','closeFullscreenToCobraView',
+            'cobraTvHandlePlayerKey','cobraBuildPlayerChrome','showCobraPlayerDrawer','closeCobraPlayerDrawer',
+            'onBackPressed','onKeyDown','dispatchKeyEvent'
+          ]
+          out=[]
+          for n in names:out += ['\n===== '+n+' =====\n',span(n)]
+          Path('audit230/rc8-navigation-methods.txt').write_text('\n'.join(out))
+
+          # Search all back/key routing + guide state fields.
+          lines=[]
+          for i,line in enumerate(s.splitlines(),1):
+              if re.search(r'KEYCODE_BACK|closeFullscreenToCobraView|cobraOpenTvDirectory|mCobraGuideRoute|mCobraModeGroupsExpanded|mCategory|toggleCobraDrawer|showCobraPrimaryView',line):
+                  lines.append(f'{i}: {line}')
+          Path('audit230/rc8-navigation-references.txt').write_text('\n'.join(lines))
+          print('PASS navigation dump',len(lines))
+          PY
+
+      - name: Preserve preaudit
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103230-Navigation-Preaudit
+          path: audit230/
+          retention-days: 30
