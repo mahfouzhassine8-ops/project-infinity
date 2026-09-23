@@ -1,0 +1,111 @@
+name: onn TV 2103225 RC8 source preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103225-onn4kpro-tv-handoff-focus-rc8]
+    paths:
+      - '.github/workflows/onn-tv-2103225-rc8-preaudit.yml'
+      - 'repairs/onn4kpro-tv-handoff-focus-2103225/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preaudit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+      - name: Reconstruct exact RC7 source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit225
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit225/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+      - name: Inspect exact RC7 methods involved in reported defects
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+          def span(name, ctor=False):
+              if ctor:
+                  pat=re.compile(r'(?m)^\s*'+re.escape(name)+r'\s*\([^;\n]*\)\s*\{')
+              else:
+                  pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+'+re.escape(name)+r'\s*\([^\n{;]*\)\s*\{')
+              ms=list(pat.finditer(s))
+              if len(ms)!=1:
+                  return f'CARDINALITY {name}={len(ms)}'
+              start=ms[0].start(); brace=s.find('{',ms[0].start()); depth=0; quote=None; esc=line=block=False; i=brace
+              while i<len(s):
+                  c=s[i]; n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\n': line=False
+                  elif block:
+                      if c=='*' and n=='/': block=False; i+=1
+                  elif quote:
+                      if esc: esc=False
+                      elif c=='\\': esc=True
+                      elif c==quote: quote=None
+                  elif c=='/' and n=='/': line=True; i+=1
+                  elif c=='/' and n=='*': block=True; i+=1
+                  elif c in ('"',"'"): quote=c
+                  elif c=='{': depth+=1
+                  elif c=='}':
+                      depth-=1
+                      if depth==0: return s[start:i+1]
+                  i+=1
+              return 'UNCLOSED '+name
+          names=['cobraTvAttachSurfaceWhenReady','openPlayerOverlay','promoteCobraPreviewToFullscreen','closeFullscreenToCobraView','cobraBuildPlayerChrome','showCobraMultiPicker','renderCobraMultiPicker','renderCobraMultiPickerSearch','cobraTvFocusMultiRow','showCobraMultiTileActions','releaseMulti']
+          out=[]
+          for n in names:
+              out += ['\n===== '+n+' =====\n',span(n)]
+          out += ['\n===== CobraVideoTile constructor =====\n',span('CobraVideoTile',True)]
+          Path('audit225/rc7-source-excerpts.txt').write_text('\n'.join(out))
+          print(Path('audit225/rc7-source-excerpts.txt').read_text())
+          PY
+      - name: Preserve preaudit excerpts
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103225-RC8-Source-Preaudit
+          path: audit225/rc7-source-excerpts.txt
+          retention-days: 30
