@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Real Robolectric Android-view tests, not physical TV/decoder certification."""
 from pathlib import Path
-import argparse, importlib.util, json, os, shutil, subprocess, xml.etree.ElementTree as ET
-
+import argparse,hashlib,importlib.util,json,os,shutil,subprocess,xml.etree.ElementTree as ET
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
 BASE_APK_SHA='2e0480ae719a319125ad9482840439e3e8406fe47c8181424469a719b44b9754'
@@ -29,15 +28,37 @@ def main():
  pack.BASE_APK_SHA256=BASE_APK_SHA
  if not a.baseline:
   receipt=json.loads((ROOT/'engine/background-resume-source.json').read_text());pack.VERSION=receipt['version_code'];pack.RELEASE=receipt['version_name']
-  # Candidate audit owns changed contracts; do not pass a doctored receipt to an older validator.
   def preservation(folder):
    assert receipt['version_code']==2103243
    for name,row in receipt['files'].items():assert pack.sha((folder/name).read_bytes())==row['after'],name
   pack.source_preservation=preservation
  pack.prepare(source,base,build,out)
  test=build/'xbmc/src/test/java/com/projectinfinity/kodi';test.mkdir(parents=True,exist_ok=True)
- shutil.copy2(ROOT/'repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java',test)
+ fixture=(ROOT/'repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java').read_text()
+ anchor='call(a,"buildShell");controller.visible();return a;'
+ assert fixture.count(anchor)==1,'Fixture setup anchor drift'
+ # The old fixture only made the window visible. Explicitly grant window focus, leave touch
+ # mode, and prove Activity focus is usable before any application focus assertion can run.
+ # This adaptation affects only test setup, not production Java or the test assertions.
+ replacement='''call(a,"buildShell");controller.visible().windowFocusChanged(true);
+    ViewGroup decor=(ViewGroup)a.getWindow().getDecorView();
+    android.widget.Button probe=new android.widget.Button(a);probe.setText("Remote focus precondition");probe.setFocusable(true);
+    decor.addView(probe,new ViewGroup.LayoutParams(64,64));
+    int width=a.getResources().getDisplayMetrics().widthPixels,height=a.getResources().getDisplayMetrics().heightPixels;
+    decor.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));decor.layout(0,0,width,height);
+    assertTrue("FIXTURE_REMOTE_FOCUS_UNAVAILABLE",probe.requestFocusFromTouch());
+    assertSame("FIXTURE_ACTIVITY_FOCUS_UNAVAILABLE",probe,a.getCurrentFocus());
+    assertFalse("FIXTURE_STILL_IN_TOUCH_MODE",probe.isInTouchMode());decor.removeView(probe);return a;'''
+ fixture=fixture.replace(anchor,replacement,1)
+ (test/'CobraNavigationUiTest.java').write_text(fixture)
  shutil.copy2(HERE/'tests/Cobra2103243TvAuditTest.java',test)
+ harness={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(test.glob('*.java'))}
+ harness_sha=hashlib.sha256(json.dumps(harness,sort_keys=True).encode()).hexdigest()
+ (out/'harness-hashes.json').write_text(json.dumps({'files':harness,'harness_sha256':harness_sha,'remote_window_precondition':True},indent=2)+'\n')
+ shutil.copytree(test,out/'executed-test-sources',dirs_exist_ok=True)
+ if not a.baseline:
+  prior=json.loads((ROOT/'audit243/baseline-android/android-test-summary.json').read_text())
+  assert prior.get('harness_sha256')==harness_sha,'Re-run the baseline with this exact validated test harness before candidate testing'
  with (build/'xbmc/build.gradle').open('a') as f:f.write('''
 android.testOptions.unitTests.includeAndroidResources = true
 android.testOptions.unitTests.all {
@@ -60,18 +81,18 @@ dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.
  for case in suite.findall('testcase'):
   failures=case.findall('failure')+case.findall('error');message='\n'.join((f.get('message','')+'\n'+(f.text or '')) for f in failures)
   name=case.get('name');status='failed' if failures else 'skipped' if case.find('skipped') is not None else 'passed'
-  known=bool(failures) and name in MARKERS and MARKERS[name] in message
+  known=bool(failures) and name in MARKERS and MARKERS[name] in message and 'FIXTURE_' not in message
   row={'name':name,'status':status,'source_defect_reproduced':known,'seconds':case.get('time'),'failure':message[:5000]};cases.append(row)
   print('RC23 TEST',name,status,'expected-baseline-defect' if known else '')
   if failures and (not a.baseline or not known):unexpected.append(name)
- report={'mode':'locked-rc22-negative-control' if a.baseline else 'rc23-candidate','tests':len(cases),'passed':sum(x['status']=='passed' for x in cases),'reproduced_defects':sum(x['source_defect_reproduced'] for x in cases),'unexpected_failures':unexpected,'cases':cases,'physical_device_tested':False,'real_provider_or_decoder_tested':False}
+ report={'mode':'locked-rc22-negative-control' if a.baseline else 'rc23-candidate','tests':len(cases),'passed':sum(x['status']=='passed' for x in cases),'reproduced_defects':sum(x['source_defect_reproduced'] for x in cases),'unexpected_failures':unexpected,'cases':cases,'harness_sha256':harness_sha,'remote_window_precondition':True,'physical_device_tested':False,'real_provider_or_decoder_tested':False}
  (out/'android-test-summary.json').write_text(json.dumps(report,indent=2)+'\n')
  assert len(cases)==20,'Missing executed cases'
  assert not any(x['status']=='skipped' for x in cases),'Skipped cases are not a pass'
  if unexpected:raise RuntimeError('Unexpected Android test failures: '+repr(unexpected))
  if a.baseline:
   assert report['reproduced_defects']>0,'Negative control failed to reproduce any defect'
-  print('BASELINE CONTROL COMPLETE:',report['reproduced_defects'],'source defects reproduced; baseline APK unchanged')
+  print('BASELINE CONTROL COMPLETE:',report['reproduced_defects'],'assertion-specific defects; validated focus setup; baseline APK unchanged')
  else:
   assert result.returncode==0 and report['passed']==20
   print('PASS: 20 actual Android-view regression cases; physical TV/decoder acceptance pending')
