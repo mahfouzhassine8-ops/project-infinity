@@ -131,8 +131,7 @@ def patch_splash(path:Path):
     mCobraRecoveryGear=null;
   }''')
 
-    launch=member(s,'launchInfinityExperience')
-    # The first overload found by method parser is the one-argument wrapper. Patch the 3-arg body directly by anchor.
+    # Patch the explicit 3-argument launch body directly; Splash intentionally has two overloads.
     s=once(s,
 '''    if ("live".equals(experience))
       intent.putExtra("infinity_live_profile", "cobra");''',
