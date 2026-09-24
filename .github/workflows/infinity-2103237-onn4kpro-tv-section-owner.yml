@@ -1,0 +1,331 @@
+name: Infinity | 2103237 onn TV Section Owner RC17 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103237-onn4kpro-tv-section-owner-player-cleanup-rc17]
+    paths:
+      - '.github/workflows/infinity-2103237-onn4kpro-tv-section-owner.yml'
+      - 'repairs/onn4kpro-tv-section-owner-2103237/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103237-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC17 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103236 RC16 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103236-Onn4KPro-TV-Pulsing-Dot-TEST-CANDIDATE
+          run-id: 35951447409
+          github-token: ${{ github.token }}
+          path: base236
+
+      - name: Reconstruct exact locked RC16 source and apply RC17 section ownership
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 audit233 audit234 audit235 audit236 audit237 candidate237
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit237/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-section-owner-2103237/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103237
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17'
+          assert r['tv_target_abi']=='armeabi-v7a'
+
+          # Choose Experience.
+          assert r['chooser_card_settings_removed'] is True
+          assert r['chooser_infinity_settings_removed'] is True
+          assert r['chooser_cobra_settings_removed'] is True
+          assert r['chooser_visual_scene_settings_removed'] is True
+          assert r['chooser_cobra_recovery_gear_removed'] is True
+
+          # Explicit Cobra startup.
+          assert r['cobra_explicit_start_destination']=='live_tv'
+          assert r['tv_cobra_startup_integrated_shell'] is True
+          assert r['tv_cobra_startup_drawer_open'] is True
+          assert r['tv_cobra_startup_groups_visible'] is True
+          assert r['tv_cobra_startup_grid'] is True
+
+          # Live-TV-only input rules.
+          assert r['tv_drawer_right_select'] is True
+          assert r['tv_drawer_left_back'] is True
+          assert r['tv_directory_right_select'] is True
+          assert r['tv_directory_left_back'] is True
+          assert r['tv_right_select_scope']=='live-tv-only'
+          assert r['tv_left_back_scope']=='live-tv-drawer-directory-only'
+
+          # Persistent primary-section ownership.
+          assert r['tv_section_owner_persistent'] is True
+          assert r['tv_section_owner_values']==['LIVE_TV','MOVIES','SHOWS']
+          assert r['tv_movies_persistent_until_drawer_change'] is True
+          assert r['tv_shows_persistent_until_drawer_change'] is True
+          assert r['tv_live_persistent_until_drawer_change'] is True
+          assert r['tv_smart_return_cannot_override_vod_owner'] is True
+
+          # VOD player is not Live TV.
+          assert r['tv_vod_player_origin_explicit'] is True
+          assert r['tv_vod_channels_control_removed'] is True
+          assert r['tv_vod_multiview_control_removed'] is True
+          assert r['tv_vod_channel_stepping_removed'] is True
+          assert r['tv_vod_last_channel_removed'] is True
+          assert r['tv_vod_channel_favorite_removed'] is True
+          assert r['tv_vod_live_rewind_removed'] is True
+          assert r['tv_vod_go_live_removed'] is True
+          assert r['tv_vod_live_timeline_removed'] is True
+          assert r['tv_vod_live_record_removed'] is True
+          assert r['tv_vod_epg_labels_removed'] is True
+          assert r['tv_vod_display_preserved'] is True
+          assert r['tv_vod_more_preserved'] is True
+          assert r['tv_vod_audio_subtitles_preserved'] is True
+          assert r['tv_vod_remote_seek_ms']==30000
+
+          # Locked RC16/TV preservation.
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_playing_dot_actual_session'] is True
+          assert r['tv_playing_dot_frame_ms']==33
+          assert r['tv_ambient_mode_retired'] is True
+          assert r['tv_movies_dedicated_search'] is True
+          assert r['tv_shows_dedicated_search'] is True
+          assert r['tv_mini_player_playing_badge_removed'] is True
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_back_reverses_hierarchy'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC17 section-owner source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          SPLASH=shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          grep -Fq 'class CobraTvPlayingDot extends View' "$JAVA"
+          grep -Fq 'NORMAL_PULSE_MS=1320L' "$JAVA"
+          grep -Fq 'COBRA_SECTION_OWNER' "$JAVA"
+          grep -Fq 'cobraOpenLiveTvStartup' "$JAVA"
+          grep -Fq 'cobraOnDemandPlayer' "$JAVA"
+          grep -Fq 'cobraSeekOnDemandBy' "$JAVA"
+          grep -Fq 'KEYCODE_DPAD_LEFT' "$JAVA"
+          grep -Fq 'KEYCODE_DPAD_RIGHT' "$JAVA"
+          grep -Fq 'cobra_movies_search' "$JAVA"
+          grep -Fq 'cobra_shows_search' "$JAVA"
+          ! grep -Fq 'AMBIENT MODE  •' "$JAVA"
+          ! grep -Fq 'experience-settings-infinity' "$SPLASH"
+          ! grep -Fq 'experience-settings-cobra' "$SPLASH"
+          grep -Fq 'cobra_start_destination' "$SPLASH"
+          grep -Fq 'versionCode 2103237' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC16 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base236 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '4a2b70d2f4c97e2dde5743036f411b13a9857bdde54d5de4e171e28e0142b661' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate237/Infinity-2103236-RC16-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC17 Android TV layer, preserve exact ARMv7 engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate237/Infinity-2103236-RC16-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-section-owner-2103237/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-237 \
+            --out candidate237
+          FINAL=candidate237/Infinity-1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate237/Infinity-1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate237/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103237 — ONN. 4K PRO TV SECTION OWNER RC17
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          LOCKED PARENT
+          - Exact locked RC16 / 2103236 is parent and rollback.
+          - RC16 pulsing dot is preserved but remains physically unverified because RC16 was intentionally skipped.
+          - No native-engine rebuild.
+
+          CHOOSE YOUR EXPERIENCE
+          1. Infinity choice has NO upper-right Settings/gear control.
+          2. Cobra choice has NO upper-right Settings/gear/recovery control.
+          3. Both main experience cards remain focusable/selectable.
+          4. Selecting Infinity still launches Infinity normally.
+          5. Selecting Cobra launches Cobra directly into the integrated Live TV shell.
+
+          COBRA STARTUP
+          6. Immediately after choosing Cobra, screen composition is:
+             Drawer | Channels/Groups | Preview/Details + TV Grid.
+          7. No intermediate Cobra home/mobile view flashes before that target.
+          8. Drawer is open and focused; Groups are visible beside it.
+          9. RC16 pulsing dot appears only on the actual playing Live TV channel once playback exists.
+
+          LIVE TV REMOTE FLOW
+          10. In the Drawer, RIGHT = Select/Enter on the focused destination.
+          11. In the Drawer, LEFT = Back/close to the previous Live TV level.
+          12. In Channels/Groups/playlist selection, RIGHT = Select/Enter.
+          13. In Channels/Groups/playlist selection, LEFT = Back to Drawer/previous level.
+          14. EPG/program-cell LEFT/RIGHT remains normal time/program navigation.
+          15. Movies and TV Shows LEFT/RIGHT behavior is unchanged.
+
+          PERSISTENT PRIMARY SECTION
+          16. Choose Movies from Drawer; browse, open details, play, Back out, and remain in Movies.
+          17. Repeat normal Android/remote Back flows in Movies. It must NEVER magically land in Live TV.
+          18. Choose Shows from Drawer; browse, episodes, play, Back out, and remain in Shows.
+          19. Shows must NEVER magically land in Live TV.
+          20. Only explicit selection of Live TV/Movies/Shows in Drawer changes that primary section.
+          21. Re-enter/restore Cobra and confirm saved Movies/Shows owner is respected unless Cobra was explicitly freshly chosen from Choose Experience; a fresh Cobra choice starts Live TV as specified.
+
+          MOVIE / TV SHOW PLAYER
+          22. Movie playback does NOT show Channels.
+          23. Movie playback does NOT show Multi-View.
+          24. Show/episode playback does NOT show Channels or Multi-View.
+          25. VOD player has no Previous/Next Channel, Last Channel or channel Favorite.
+          26. VOD player has no Live rewind, Go Live, live timeshift scrubber or Live EPG programme chrome.
+          27. VOD More menu has no live Record-now action.
+          28. VOD keeps Play/Pause, Display, More, Audio & Subtitles and applicable Night Cinema controls.
+          29. Media Rewind/Fast-forward seeks VOD about -/+30 seconds instead of invoking Live-TV behavior.
+          30. Player Back returns to the originating Movie/Show context rather than Live TV.
+
+          LIVE TV PRESERVATION
+          31. Live TV player STILL has Channels, Display, Multi-View and More.
+          32. Live TV Previous/Next Channel, Last Channel, Favorite, rewind/timeshift and Go Live remain intact.
+          33. Multi-View 2/3/4, group/filter focus and 2->1 survivor remain intact.
+          34. RC16 pulsing dot stays actual-session-owned and focus-independent.
+          35. Ambient Mode remains retired; no real-time blur returns.
+
+          STABILITY / COMPATIBILITY
+          36. Stress Drawer -> Movies -> player -> Back -> Drawer -> Shows -> player -> Back -> Live TV for 20 cycles.
+          37. No stale focus, black permanent overlay, section jump or progressive slowdown.
+          38. Verify 1080p and 4K clipping/overscan.
+          39. Permanent signer/package and armeabi-v7a native engine remain preserved.
+          40. Phone/Fold behavior is not part of this TV candidate and must remain untouched.
+
+          Do not lock/promote RC17 until physical acceptance passes unless the user explicitly elects to lock without device testing.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103237 SECTION OWNER TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103237-Onn4KPro-TV-Section-Owner-TEST-CANDIDATE
+          path: |
+            candidate237/Infinity-1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17.apk
+            candidate237/Infinity-1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17.sha256
+            candidate237/signing-verification.txt
+            candidate237/badging.txt
+            candidate237/manifest.txt
+            candidate237/ONN-TV-2103237-VERIFICATION.json
+            candidate237/tv-section-owner-source.json
+            candidate237/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103237 RC17 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103237-Onn4KPro-TV-Section-Owner-Evidence
+          path: |
+            audit237/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-pulsing-dot-2103236/
+            repairs/onn4kpro-tv-section-owner-2103237/
+            candidate237/*.json
+            candidate237/*.txt
+          if-no-files-found: warn
+          retention-days: 90
