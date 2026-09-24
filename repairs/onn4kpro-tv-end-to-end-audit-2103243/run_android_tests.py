@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real Robolectric Android-view tests, not physical TV/decoder certification."""
+"""Production Android-view tests with a validated focus bridge; not physical TV certification."""
 from pathlib import Path
 import argparse,hashlib,importlib.util,json,os,shutil,subprocess,xml.etree.ElementTree as ET
 HERE=Path(__file__).resolve().parent
@@ -20,7 +20,19 @@ MARKERS={
  'staleMultiFocusCannotSelectFromReplacedAdapter':'STALE_MULTI_SELECTION',
  'playingControlsResetInactivityDeadline':'ACTIVE_INPUT_DID_NOT_RESET_TIMEOUT'
 }
-
+FOCUS_BRIDGE='''package com.projectinfinity.kodi;
+/** Robolectric 4.14 ShadowActivity.getCurrentFocus returns a manually stored stub.
+ * Delegate to the actual Android View hierarchy instead. No expected target is injected. */
+@org.robolectric.annotation.Implements(android.app.Activity.class)
+public class TvFocusActivityShadow extends org.robolectric.shadows.ShadowActivity {
+ @org.robolectric.annotation.RealObject private android.app.Activity activity;
+ @org.robolectric.annotation.Implementation
+ @Override protected android.view.View getCurrentFocus(){
+  android.view.Window window=activity.getWindow();
+  return window==null?null:window.getDecorView().findFocus();
+ }
+}
+'''
 def main():
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--base-apk',type=Path,required=True);p.add_argument('--build',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--baseline',action='store_true');a=p.parse_args()
  source,base,build,out=[x.resolve() for x in (a.source,a.base_apk,a.build,a.out)];out.mkdir(parents=True,exist_ok=True)
@@ -37,9 +49,6 @@ def main():
  fixture=(ROOT/'repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java').read_text()
  anchor='call(a,"buildShell");controller.visible();return a;'
  assert fixture.count(anchor)==1,'Fixture setup anchor drift'
- # The old fixture only made the window visible. Explicitly grant window focus, leave touch
- # mode, and prove Activity focus is usable before any application focus assertion can run.
- # This adaptation affects only test setup, not production Java or the test assertions.
  replacement='''call(a,"buildShell");controller.visible().windowFocusChanged(true);
     ViewGroup decor=(ViewGroup)a.getWindow().getDecorView();
     android.widget.Button probe=new android.widget.Button(a);probe.setText("Remote focus precondition");probe.setFocusable(true);
@@ -51,10 +60,14 @@ def main():
     assertFalse("FIXTURE_STILL_IN_TOUCH_MODE",probe.isInTouchMode());decor.removeView(probe);return a;'''
  fixture=fixture.replace(anchor,replacement,1)
  (test/'CobraNavigationUiTest.java').write_text(fixture)
- shutil.copy2(HERE/'tests/Cobra2103243TvAuditTest.java',test)
+ suite_source=(HERE/'tests/Cobra2103243TvAuditTest.java').read_text()
+ assert suite_source.count('@Config(sdk=34,')==1
+ suite_source=suite_source.replace('@Config(sdk=34,','@Config(shadows=TvFocusActivityShadow.class,sdk=34,',1)
+ (test/'Cobra2103243TvAuditTest.java').write_text(suite_source)
+ (test/'TvFocusActivityShadow.java').write_text(FOCUS_BRIDGE)
  harness={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(test.glob('*.java'))}
  harness_sha=hashlib.sha256(json.dumps(harness,sort_keys=True).encode()).hexdigest()
- (out/'harness-hashes.json').write_text(json.dumps({'files':harness,'harness_sha256':harness_sha,'remote_window_precondition':True},indent=2)+'\n')
+ (out/'harness-hashes.json').write_text(json.dumps({'files':harness,'harness_sha256':harness_sha,'remote_window_precondition':True,'activity_focus':'actual decor View.findFocus'},indent=2)+'\n')
  shutil.copytree(test,out/'executed-test-sources',dirs_exist_ok=True)
  if not a.baseline:
   prior=json.loads((ROOT/'audit243/baseline-android/android-test-summary.json').read_text())
@@ -85,14 +98,14 @@ dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.
   row={'name':name,'status':status,'source_defect_reproduced':known,'seconds':case.get('time'),'failure':message[:5000]};cases.append(row)
   print('RC23 TEST',name,status,'expected-baseline-defect' if known else '')
   if failures and (not a.baseline or not known):unexpected.append(name)
- report={'mode':'locked-rc22-negative-control' if a.baseline else 'rc23-candidate','tests':len(cases),'passed':sum(x['status']=='passed' for x in cases),'reproduced_defects':sum(x['source_defect_reproduced'] for x in cases),'unexpected_failures':unexpected,'cases':cases,'harness_sha256':harness_sha,'remote_window_precondition':True,'physical_device_tested':False,'real_provider_or_decoder_tested':False}
+ report={'mode':'locked-rc22-negative-control' if a.baseline else 'rc23-candidate','tests':len(cases),'passed':sum(x['status']=='passed' for x in cases),'reproduced_defects':sum(x['source_defect_reproduced'] for x in cases),'unexpected_failures':unexpected,'cases':cases,'harness_sha256':harness_sha,'remote_window_precondition':True,'activity_focus':'actual decor View.findFocus','physical_device_tested':False,'real_provider_or_decoder_tested':False}
  (out/'android-test-summary.json').write_text(json.dumps(report,indent=2)+'\n')
  assert len(cases)==20,'Missing executed cases'
  assert not any(x['status']=='skipped' for x in cases),'Skipped cases are not a pass'
  if unexpected:raise RuntimeError('Unexpected Android test failures: '+repr(unexpected))
  if a.baseline:
   assert report['reproduced_defects']>0,'Negative control failed to reproduce any defect'
-  print('BASELINE CONTROL COMPLETE:',report['reproduced_defects'],'assertion-specific defects; validated focus setup; baseline APK unchanged')
+  print('BASELINE CONTROL COMPLETE:',report['reproduced_defects'],'assertion-specific defects; validated real focus; baseline APK unchanged')
  else:
   assert result.returncode==0 and report['passed']==20
   print('PASS: 20 actual Android-view regression cases; physical TV/decoder acceptance pending')
