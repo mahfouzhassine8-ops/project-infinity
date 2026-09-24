@@ -68,6 +68,34 @@ jobs:
           python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
 
+      - name: Dry-run RC13 glass system
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-glass-system-2103233/apply.py
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103233
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Glass-System-RC13'
+          assert r['tv_glass_system'] is True
+          assert r['tv_glass_real_time_blur'] is False
+          assert r['tv_ambient_mode_retired'] is True
+          assert r['tv_ambient_setting_exposed'] is False
+          assert r['tv_glass_drawer'] is True
+          assert r['tv_glass_playlist'] is True
+          assert r['tv_glass_guide'] is True
+          assert r['tv_glass_preview'] is True
+          assert r['tv_glass_sheets'] is True
+          assert r['tv_glass_player_surfaces'] is True
+          assert r['tv_glass_multiview'] is True
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_mini_player_preserved'] is True
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: RC13 glass source receipt')
+          PY
+
       - name: Audit glass targets, Ambient, focus and heavy paths
         run: |
           python3 - <<'PY'
@@ -145,7 +173,7 @@ jobs:
             'ambient_mode_present':('Ambient' in s or 'ambient' in s),
           }
           Path('audit233/locked-contracts.json').write_text(json.dumps(gates,indent=2,sort_keys=True))
-          Path('audit233/InfinityLiveActivity-RC12.java.in').write_text(s)
+          Path('audit233/InfinityLiveActivity-RC13.java.in').write_text(s)
           print(json.dumps(gates,sort_keys=True))
           PY
 
