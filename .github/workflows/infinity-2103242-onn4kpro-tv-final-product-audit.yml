@@ -57,7 +57,7 @@ jobs:
       - name: Download exact locked 2103241 RC21 TV APK
         uses: actions/download-artifact@v8
         with:
-          name: Infinity-2103242-Onn4KPro-TV-Final-Product-Audit-TEST-CANDIDATE
+          name: Infinity-2103241-Onn4KPro-TV-Player-Chrome-Focus-Stability-TEST-CANDIDATE
           run-id: 36018898200
           github-token: ${{ github.token }}
           path: base241
