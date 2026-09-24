@@ -1,0 +1,78 @@
+name: Infinity TV RC23 | Locked RC22 audit source snapshot
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23]
+    paths: ['.github/workflows/infinity-2103243-audit-source-snapshot.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-tv-rc23-source-snapshot
+  cancel-in-progress: false
+jobs:
+  snapshot:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify isolated branch and locked baseline
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23
+          test "$(git rev-parse origin/locked-infinity-cobra-2103242-onn4kpro-tv-final-product-audit-passed)" = f95e84676932470ec6093bf6408a920d40239702
+          git merge-base --is-ancestor f95e84676932470ec6093bf6408a920d40239702 HEAD
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+      - name: Reconstruct locked RC22 using its exact committed recipe
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, subprocess, textwrap
+          path='.github/workflows/infinity-2103242-onn4kpro-tv-final-product-audit.yml'
+          text=subprocess.check_output(['git','show','f95e84676932470ec6093bf6408a920d40239702:'+path],text=True)
+          start=text.index('      - name: Reconstruct exact locked RC21 source and apply RC22 final product audit corrections')
+          block=text[start:text.index('\n      - name:',start+1)]
+          script=textwrap.dedent(block.split('        run: |\n',1)[1])
+          pathlib.Path('locked-rc22-reconstruct.sh').write_text(script)
+          subprocess.run(['bash','locked-rc22-reconstruct.sh'],check=True)
+          PY
+      - name: Snapshot actual reconstructed Android source and audit inputs
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('shell-kodi')
+          receipt=json.loads(pathlib.Path('engine/background-resume-source.json').read_text())
+          assert receipt['version_code']==2103242
+          for name,row in receipt['files'].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==row['after'],name
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file() and '.git' not in p.parts}
+          pathlib.Path('snapshot/locked-rc22-all-source-hashes.json').write_text(json.dumps(hashes,indent=2,sort_keys=True)+'\n')
+          pathlib.Path('snapshot/provenance.json').write_text(json.dumps({'baseline_commit':'f95e84676932470ec6093bf6408a920d40239702','version_code':2103242,'source_files':len(hashes),'runtime_device_tested':False},indent=2)+'\n')
+          print('Verified',len(receipt['files']),'receipt files; inventoried',len(hashes),'source files')
+          PY
+          tar -czf snapshot/locked-rc22-android-source.tgz shell-kodi/tools/android/packaging shell-kodi/cmake/scripts/android/Install.cmake shell-kodi/media engine/background-resume-source.json
+          git archive --format=tar.gz --output=snapshot/locked-rc22-repository.tgz f95e84676932470ec6093bf6408a920d40239702
+          cp locked-rc22-reconstruct.sh snapshot/
+          sha256sum snapshot/*.tgz > snapshot/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-TV-RC23-Locked-RC22-Audit-Source
+          path: snapshot/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
