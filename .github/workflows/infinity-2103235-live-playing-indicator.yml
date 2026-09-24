@@ -1,0 +1,156 @@
+name: Infinity | 2103235 Live Playing Indicator
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103235-live-playing-indicator-rc1]
+    paths:
+      - '.github/workflows/infinity-2103235-live-playing-indicator.yml'
+      - 'repairs/live-playing-indicator-2103235/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103235-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    env:
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact passed 2103230 source evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103230-Cobra-Final-Preservation-Audit-Evidence
+          run-id: 35823061866
+          github-token: ${{ github.token }}
+          path: parent230e
+
+      - name: Download exact passed 2103230 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103230-Cobra-Final-Preservation-Audit-TEST-CANDIDATE
+          run-id: 35823061866
+          github-token: ${{ github.token }}
+          path: parent230
+
+      - name: Download preserved native packaging base
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103229-Exact-Rollback-Before-2103230
+          run-id: 35820419796
+          github-token: ${{ github.token }}
+          path: rollback229
+
+      - name: Restore exact 2103230 generated source and test baseline
+        run: |
+          set -euo pipefail
+          test "$(sha256sum parent230/Infinity-1.0.9-Cobra-Final-Preservation-Audit-RC1.apk | cut -d' ' -f1)" = "11337e17a65ec06da978f4d9bf3fa4649d78159d8abf296370d518ab97652376"
+          (cd rollback229 && sha256sum -c SHA256SUMS)
+          tar -xzf parent230e/audit230/generated-2103230-source.tar.gz
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "1324e98736c24e203941261cc34c468596892a7897e0679b51f5915e26bd34b6"
+          grep -F '"version_code": 2103230' engine/background-resume-source.json
+          grep -F '"version_name": "1.0.9-Cobra-Final-Preservation-Audit-RC1"' engine/background-resume-source.json
+          mkdir -p audit235 audit230/baseline "$HOME/.android"
+          cp parent230e/audit230/baseline/RESULT.json audit230/baseline/RESULT.json
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit235/InfinityLiveActivity-2103230-before.java.in
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+          keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Debug,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+
+      - name: Apply true-playing indicator and verify source boundaries
+        run: |
+          set -euo pipefail
+          python3 repairs/live-playing-indicator-2103235/apply.py --shell shell-kodi
+          python3 repairs/live-playing-indicator-2103235/source_audit.py --source shell-kodi --scope audit235/scope.json --out audit235
+          java repairs/cobra-feature-refinement-2103207/ParseJava.java shell-kodi/tools/android/packaging/xbmc/src
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit235/InfinityLiveActivity-2103235-after.java.in
+          grep -F '"version_code": 2103235' engine/background-resume-source.json
+          grep -F '"true_live_playing_indicator": true' engine/background-resume-source.json
+
+      - name: Compile and permanently sign without native rebuild
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk rollback229/packaging-base.apk             --build-dir build230             --out signed235
+
+      - name: Run complete inherited 2103230 candidate suite
+        run: |
+          set -euo pipefail
+          python3 repairs/final-preservation-audit-2103230/ci.py candidate
+          cp audit230/candidate/RESULT.json audit235/inherited-2103230-result.json
+
+      - name: Run focused true-playing indicator tests
+        run: |
+          set -euo pipefail
+          TESTDIR=build230/xbmc/src/test/java/com/projectinfinity/kodi
+          cp repairs/live-playing-indicator-2103235/tests/Cobra2103235PlayingIndicatorTest.java "$TESTDIR/"
+          (
+            cd build230
+            ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest               --tests com.projectinfinity.kodi.Cobra2103235PlayingIndicatorTest               --stacktrace
+          )
+          mkdir -p audit235/indicator-test-results
+          cp build230/xbmc/build/test-results/testReleaseUnitTest/TEST-*.xml audit235/indicator-test-results/
+
+      - name: Verify final APK against exact passed 2103230
+        run: |
+          set -euo pipefail
+          python3 repairs/live-playing-indicator-2103235/verify.py             --apk signed235/Infinity-1.0.9-Cobra-Live-Playing-Indicator-RC1.apk             --parent230 parent230/Infinity-1.0.9-Cobra-Final-Preservation-Audit-RC1.apk             --audit signed235/background-resume-apk-audit.json             --scope audit235/scope.json             --source-audit audit235/source-audit.json             --inherited-result audit235/inherited-2103230-result.json             --indicator-results audit235/indicator-test-results
+          cp repairs/live-playing-indicator-2103235/DEVICE-TEST.md signed235/DEVICE-TEST.md
+
+      - name: Publish 2103235 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103235-Cobra-Live-Playing-Indicator-TEST-CANDIDATE
+          path: signed235/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+      - name: Preserve 2103235 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103235-Cobra-Live-Playing-Indicator-Evidence
+          path: |
+            audit235/
+            audit230/candidate/RESULT.json
+            engine/background-resume-source.json
+            repairs/live-playing-indicator-2103235/
+            signed235/*.json
+            build230/xbmc/build/test-results/testReleaseUnitTest/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact 2103230 rollback before 2103235
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103230-Exact-Rollback-Before-2103235
+          path: |
+            parent230/
+            parent230e/audit230/generated-2103230-source.tar.gz
+            parent230e/audit230/ACCEPTANCE.json
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
