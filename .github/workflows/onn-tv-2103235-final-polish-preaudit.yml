@@ -1,0 +1,195 @@
+name: onn TV 2103235 final polish preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103235-onn4kpro-tv-final-polish-rc15]
+    paths:
+      - '.github/workflows/onn-tv-2103235-final-polish-preaudit.yml'
+      - 'repairs/onn4kpro-tv-final-polish-2103235/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preaudit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact locked RC14 source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit235
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit235/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+
+      - name: Dry-run RC15 final polish
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-final-polish-2103235/apply.py
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103235
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Final-Polish-RC15'
+          assert r['tv_drawer_brand_compact'] is True
+          assert r['tv_drawer_brand_single_line'] is True
+          assert r['tv_drawer_power_unclipped'] is True
+          assert r['tv_live_right_select_drawer'] is True
+          assert r['tv_live_right_select_directory'] is True
+          assert r['tv_right_select_scope']=='live-tv-only'
+          assert r['tv_vod_right_navigation_untouched'] is True
+          assert r['tv_movies_dedicated_search'] is True
+          assert r['tv_shows_dedicated_search'] is True
+          assert r['tv_mini_player_playing_badge_removed'] is True
+          assert r['tv_playing_channel_indicator'] is True
+          assert r['tv_group_layout_pass_reduced'] is True
+          assert r['tv_performance_polish'] is True
+          assert r['tv_stability_polish'] is True
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: RC15 final-polish receipt')
+          PY
+
+      - name: Audit input scope and interaction contracts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+
+          def span(name):
+              pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+'+re.escape(name)+r'\s*\([^\n{;]*\)\s*\{')
+              ms=list(pat.finditer(s)); assert len(ms)==1,(name,len(ms))
+              st=ms[0].start();b=s.find('{',st);d=0;q=None;esc=line=block=False
+              for i in range(b,len(s)):
+                  c=s[i];n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\n':line=False
+                  elif block:
+                      if c=='*' and n=='/':block=False
+                  elif q:
+                      if esc:esc=False
+                      elif c=='\\':esc=True
+                      elif c==q:q=None
+                  elif c=='/' and n=='/':line=True
+                  elif c=='/' and n=='*':block=True
+                  elif c in ('"',"'"):q=c
+                  elif c=='{':d+=1
+                  elif c=='}':
+                      d-=1
+                      if d==0:return s[st:i+1]
+              raise AssertionError('unclosed '+name)
+
+          drawer=span('cobraDrawerDestination')
+          directory=span('cobraDirectory')
+          card=span('cobraVodCard')
+          browse=span('renderVodBrowse')
+          epg=span('cobraTvHandleGuideKey')
+          labels=span('cobraUpdatePlaybackLabels')
+          chooser=span('cobraTvShowGroupChooser')
+          commit=span('cobraTvCommitGroupSelection')
+          brand=span('cobraBrandHeader')
+
+          checks={
+            'rc15_marker':'cobra_tv_final_polish_2103235' in s,
+            'brand_single_line':'setSingleLine(true)' in brand,
+            'drawer_right_select_live_only':'KEYCODE_DPAD_RIGHT&&mCobraTvDrawerInline' in drawer,
+            'directory_right_select':'KEYCODE_DPAD_RIGHT' in directory,
+            'movies_cards_right_untouched':'KEYCODE_DPAD_RIGHT' not in card,
+            'movies_landing_right_untouched':'KEYCODE_DPAD_RIGHT' not in browse,
+            'epg_right_still_navigation':'KEYCODE_DPAD_RIGHT' in epg,
+            'movies_search':'cobra_movies_search' in s,
+            'shows_search':'cobra_shows_search' in s,
+            'mini_player_no_playing_badge':'▶ PLAYING' not in labels,
+            'channel_playing_remains':'▶ PLAYING' in s and 'cobraTvChannelPlaying' in s,
+            'old_preview_instruction_absent':'Select the current channel again to watch' not in s,
+            'ambient_retired':'AMBIENT MODE  •' not in s,
+            'inline_drawer_preserved':'mCobraGuideShell.addView(panel' in s,
+            'chooser_single_layout':chooser.count('cobraLayoutGuide()')<=1,
+            'commit_single_layout':commit.count('cobraLayoutGuide()')<=1,
+            'vod_cache':'COBRA_TV_VOD_CACHE_MS' in s,
+          }
+          assert all(checks.values()),checks
+          Path('audit235/rc15-source-checks.json').write_text(json.dumps(checks,indent=2,sort_keys=True))
+          Path('audit235/InfinityLiveActivity-RC15.java.in').write_text(s)
+          print(json.dumps(checks,sort_keys=True))
+          PY
+
+      - name: Static stability and performance inventory
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re
+          s=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          inv={
+            'animate_calls':s.count('.animate()'),
+            'request_layout_calls':s.count('requestLayout()'),
+            'notify_data_set_changed':s.count('notifyDataSetChanged()'),
+            'remove_all_views':s.count('removeAllViews()'),
+            'render_effect_refs':s.count('RenderEffect'),
+            'blur_refs':len(re.findall(r'\bblur\b',s,re.I)),
+            'group_cache_refs':s.count('cobraTvEnsureGroupCache'),
+            'vod_cache_refs':s.count('COBRA_TV_VOD_CACHE_MS'),
+            'right_key_refs':s.count('KEYCODE_DPAD_RIGHT'),
+          }
+          Path('audit235/rc15-performance-inventory.json').write_text(json.dumps(inv,indent=2,sort_keys=True))
+          print(json.dumps(inv,sort_keys=True))
+          PY
+
+      - name: Preserve preaudit
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103235-Final-Polish-Preaudit
+          path: audit235/
+          retention-days: 30
