@@ -38,7 +38,7 @@ def span(text,name,kind='method'):
     else:
         p=re.compile(r'(?m)^\s*(?:(?:private|public|protected|static|final)\s+)*class\s+'+re.escape(name)+r'\b')
     ms=list(p.finditer(text));req(len(ms)==1,f'{kind} cardinality {name}={len(ms)}')
-    st=ms[0].start();b=text.rfind('{',st,ms[0].end());req(b>=st,'opening brace missing: '+name)
+    st=ms[0].start();b=(text.rfind('{',st,ms[0].end()) if kind=='method' else text.find('{',ms[0].end()));req(b>=st,'opening brace missing: '+name)
     d=0;q=None;esc=line=block=False
     for i in range(b,len(text)):
         c=text[i];n=text[i+1] if i+1<len(text) else ''
