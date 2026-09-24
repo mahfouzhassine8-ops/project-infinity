@@ -1,0 +1,281 @@
+name: Infinity | 2103234 onn TV Integrated Shell RC14 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-rc14]
+    paths:
+      - '.github/workflows/infinity-2103234-onn4kpro-tv-integrated-shell-playing.yml'
+      - 'repairs/onn4kpro-tv-integrated-shell-playing-2103234/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103234-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC14 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103233 RC13 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103234-Onn4KPro-TV-Integrated-Shell-TEST-CANDIDATE
+          run-id: 35942347012
+          github-token: ${{ github.token }}
+          path: base233
+
+      - name: Reconstruct exact locked RC13 source and apply RC14 integrated shell
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 audit233 audit234 candidate234
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit234/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/
+            repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103234
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Integrated-Shell-Playing-RC14'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['tv_glass_system'] is True
+          assert r['tv_drawer_inline_column'] is True
+          assert r['tv_drawer_guide_overlay'] is False
+          assert r['tv_drawer_back_restores_underlay'] is True
+          assert r['tv_drawer_groups_visible_while_open'] is True
+          assert r['tv_playing_channel_indicator'] is True
+          assert r['tv_playing_indicator_actual_session'] is True
+          assert r['tv_preview_instruction_removed'] is True
+          assert r['tv_border_density_reduced'] is True
+          assert r['tv_glass_reference_locked'] is True
+          assert r['tv_glass_static_gradient'] is True
+          assert r['tv_glass_real_time_blur'] is False
+          assert r['tv_glass_drawer'] is True
+          assert r['tv_glass_playlist'] is True
+          assert r['tv_glass_guide'] is True
+          assert r['tv_glass_preview'] is True
+          assert r['tv_glass_sheets'] is True
+          assert r['tv_glass_player_surfaces'] is True
+          assert r['tv_glass_multiview'] is True
+          assert r['tv_ambient_mode_retired'] is True
+          assert r['tv_ambient_dynamic_layering'] is False
+          assert r['tv_ambient_setting_exposed'] is False
+          assert r['tv_group_cache_reused_player'] is True
+          assert r['tv_group_cache_reused_multiview'] is True
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['tv_back_reverses_hierarchy'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC14 integrated shell source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_integrated_drawer_2103232' "$JAVA"
+          grep -Fq 'cobra_tv_glass_system_2103233' "$JAVA"
+          grep -Fq 'cobra_tv_integrated_shell_playing_2103234' "$JAVA"
+          grep -Fq 'mCobraGuideShell.addView(panel' "$JAVA"
+          grep -Fq 'cobraTvChannelPlaybackState' "$JAVA"
+          grep -Fq '▶ PLAYING' "$JAVA"
+          ! grep -Fq 'Select the current channel again to watch' "$JAVA"
+          grep -Fq 'Lightweight Glass UI is always active.' "$JAVA"
+          grep -Fq 'cobra_tv_grid_settings' "$JAVA"
+          grep -Fq 'startCobraPreview(mGuidePreviewChannel)' "$JAVA"
+          grep -Fq 'mCobraPreviewPlayer=session' "$JAVA"
+          grep -Fq 'cobraTvGlassPanelSurface' "$JAVA"
+          grep -Fq 'cobraTvGlassRowSurface' "$JAVA"
+          ! grep -Fq 'AMBIENT MODE  •' "$JAVA"
+          ! grep -Fq 'Visual settings: Ambient Mode and Night Cinema' "$JAVA"
+          grep -Fq 'versionCode 2103234' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Integrated-Shell-Playing-RC14"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC13 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base233 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Glass-System-RC13.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '7dd995e834227db31e66469450b65079100efcfe5ae4283b95984ac44b16959a' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate234/Infinity-2103233-RC13-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC14 Android TV layer, preserve exact ARMv7 engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate234/Infinity-2103233-RC13-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-234 \
+            --out candidate234
+          FINAL=candidate234/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Shell-Playing-RC14.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate234/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Shell-Playing-RC14.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate234/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103234 — ONN. 4K PRO TV INTEGRATED SHELL RC14
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          LOCKED PARENT
+          - Exact locked RC13 / 2103233 is parent and rollback.
+          - RC13 glass system, Ambient retirement, playback, timeshift and Multi-View stay protected.
+          - No native-engine rebuild.
+
+          DRAWER STRUCTURE
+          1. Back hierarchy reaches the drawer from Groups.
+          2. Drawer is a true left column inside the guide shell — it must NOT float over or cover the Groups list.
+          3. Drawer-open composition reads: Navigation | Groups | Preview/Details + EPG.
+          4. No dark full-screen shield/scrim behind the drawer while Live TV guide is active.
+          5. Drawer width is compact and does not starve the guide.
+          6. Search / Live TV / Movies / Shows / Recordings / My List / Settings / Power remain D-pad reachable.
+
+          BACK / DESTINATIONS
+          7. Grid -> Back -> Groups -> Back -> integrated Drawer.
+          8. Back while Drawer is open closes it and restores the exact TV state underneath; no unexpected bare/main guide reset.
+          9. Selecting Live TV closes Drawer and lands on Groups.
+          10. Selecting another Drawer destination closes Drawer before the destination takes focus.
+          11. Menu-key drawer opened from full Grid may temporarily show Groups beside it; closing restores the prior full-Grid state.
+
+          PLAYING INDICATOR
+          12. The permanent "Select the current channel again to watch" banner is gone.
+          13. The actual active preview channel shows ▶ PLAYING in its channel row plus cyan active treatment.
+          14. Browsing/focusing another channel must NOT move the PLAYING marker.
+          15. Tuning a new channel moves PLAYING to the new real player session.
+          16. Pausing changes the state to PAUSED; resuming returns PLAYING.
+
+          GLASS CLEANUP
+          17. Drawer, Groups, Preview/Details and EPG still share the locked RC13 glass language.
+          18. Nested border density is visibly reduced; cyan focus outline remains obvious.
+          19. No Ambient Mode or real-time blur returns.
+
+          PRESERVATION / STABILITY
+          20. Larger mini-player works and fullscreen handoff remains first-frame safe.
+          21. Player Back -> Grid, Channels remains separate.
+          22. Multi-View 2/3/4, groups/filter focus and 2->1 survivor remain intact.
+          23. Rewind/timeshift, audio/subtitles, recordings/reminders remain intact.
+          24. Stress Drawer/Groups/Grid 30 cycles with no stale focus, progressive slowdown or layout drift.
+          25. Verify 1080p and 4K clipping/overscan.
+          26. Phone/Fold source remains untouched.
+          27. Permanent package/signer and armeabi-v7a engine remain preserved.
+
+          Do not lock/promote RC14 until physical acceptance passes.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103234 INTEGRATED SHELL TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103233-Onn4KPro-TV-Glass-System-TEST-CANDIDATE
+          path: |
+            candidate234/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Shell-Playing-RC14.apk
+            candidate234/Infinity-1.0.9-Cobra-Onn4KPro-TV-Integrated-Shell-Playing-RC14.sha256
+            candidate234/signing-verification.txt
+            candidate234/badging.txt
+            candidate234/manifest.txt
+            candidate234/ONN-TV-2103234-VERIFICATION.json
+            candidate234/tv-integrated-shell-playing-source.json
+            candidate234/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103234 RC14 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103234-Onn4KPro-TV-Integrated-Shell-Evidence
+          path: |
+            audit234/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-navigation-motion-2103230/
+            repairs/onn4kpro-tv-adaptive-ui-polish-2103231/
+            repairs/onn4kpro-tv-integrated-drawer-2103232/
+            repairs/onn4kpro-tv-glass-system-2103233/
+            candidate234/*.json
+            candidate234/*.txt
+          if-no-files-found: warn
+          retention-days: 90
