@@ -72,8 +72,7 @@ def patch_activity(path:Path):
       'cobraTvPlayingDotColor','cobraTvHandleDrawerKey','cobraDirectory','cobraTvHandleGuideKey',
       'cobraLayoutGuide','cobraRenderGuideBrowser','cobraBuildPlayerChrome','cobraTvHandlePlayerKey',
       'onBackPressed','showMovies','showSeries','cobraSetSectionOwner','cobraShowLoadedPrimary',
-      'cobraOpenLiveTv','renderVodBrowse','cobraAddVodGenres','cobraVodSectionSearchMenu',
-      'cobraShowVodCollection'
+      'cobraOpenLiveTv'
     ]
     protected={n:hb(member(s,n)) for n in protected_methods}
     dot_hash=hb(member(s,'CobraTvPlayingDot','class'))
