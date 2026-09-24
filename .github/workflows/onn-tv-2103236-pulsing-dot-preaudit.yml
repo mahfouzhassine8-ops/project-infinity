@@ -1,0 +1,143 @@
+name: onn TV 2103236 pulsing dot preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-rc16]
+    paths:
+      - '.github/workflows/onn-tv-2103236-pulsing-dot-preaudit.yml'
+      - 'repairs/onn4kpro-tv-pulsing-dot-2103236/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preaudit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact locked RC15 source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit236
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit236/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+
+      - name: Dry-run RC16 pulsing dot
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103236
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16'
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_playing_dot_actual_session'] is True
+          assert r['tv_playing_dot_focus_independent'] is True
+          assert r['tv_playing_dot_normal_pulse_ms']==1320
+          assert r['tv_playing_dot_night_cinema_pulse_ms']==1900
+          assert r['tv_playing_dot_handoff_ms']==180
+          assert r['tv_playing_dot_color_morph_ms']==240
+          assert r['tv_playing_dot_oled_core_floor_alpha']==218
+          assert r['tv_playing_dot_oled_glow_floor']==.58
+          assert r['tv_playing_dot_night_cinema_amber']=='0xffffc247'
+          assert r['tv_playing_dot_ambient_independent'] is True
+          assert r['tv_playing_dot_frame_ms']==33
+          assert r['tv_playing_dot_no_blur'] is True
+          assert r['tv_playing_dot_playback_mutation'] is False
+          assert r['tv_ambient_mode_retired'] is True
+          assert r['tv_right_select_scope']=='live-tv-only'
+          assert r['tv_movies_dedicated_search'] is True
+          assert r['tv_shows_dedicated_search'] is True
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: RC16 pulsing-dot source receipt')
+          PY
+
+      - name: Audit visual and preservation contracts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re
+          s=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          checks={
+            'rc16_dot_class':'class CobraTvPlayingDot extends View' in s,
+            'rc16_policy':'class CobraTvPlayingDotPolicy' in s,
+            'normal_pulse_1320':'NORMAL_PULSE_MS=1320L' in s,
+            'cinema_pulse_1900':'CINEMA_PULSE_MS=1900L' in s,
+            'handoff_180':'HANDOFF_MS=180L' in s,
+            'morph_240':'COLOR_MORPH_MS=240L' in s,
+            'oled_floor':'OLED_CORE_FLOOR_ALPHA=218' in s and 'OLED_GLOW_FLOOR=.58f' in s,
+            'cinema_amber':'CINEMA_AMBER=0xffffc247' in s,
+            'tv_frame_33':'FRAME_MS=33L' in s,
+            'dot_in_grid':'final CobraTvPlayingDot playingDot=new CobraTvPlayingDot()' in s,
+            'actual_session':'cobraTvChannelPlaying(channel)' in s,
+            'no_ambient_renderer_dependency':'CobraPresentationEffects.ambientMode(mPrefs)' not in s[s.index('private final class CobraTvPlayingDot'):s.index('private final class CobraBroadcastRow')],
+            'ambient_still_retired':'AMBIENT MODE  •' not in s,
+            'rc15_right_scope':'KEYCODE_DPAD_RIGHT&&mCobraTvDrawerInline' in s,
+            'rc15_movies_search':'cobra_movies_search' in s,
+            'rc15_shows_search':'cobra_shows_search' in s,
+            'preview_handoff':'mCobraPreviewPlayer=session' in s,
+          }
+          assert all(checks.values()),checks
+          Path('audit236/rc16-source-checks.json').write_text(json.dumps(checks,indent=2,sort_keys=True))
+          Path('audit236/InfinityLiveActivity-RC16.java.in').write_text(s)
+          print(json.dumps(checks,sort_keys=True))
+          PY
+
+      - name: Preserve preaudit
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103236-TV-Pulsing-Dot-Preaudit
+          path: audit236/
+          retention-days: 30
