@@ -49,8 +49,13 @@ def main():
  fixture=(ROOT/'repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java').read_text()
  anchor='call(a,"buildShell");controller.visible();return a;'
  assert fixture.count(anchor)==1,'Fixture setup anchor drift'
- replacement='''call(a,"buildShell");controller.visible().windowFocusChanged(true);
+ replacement='''call(a,"buildShell");controller.visible();
+    // visible() queues attachment on the next frame. With a PAUSED Choreographer,
+    // idle() at the current timestamp cannot dispatch that traversal.
+    Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(32));
     ViewGroup decor=(ViewGroup)a.getWindow().getDecorView();
+    assertTrue("FIXTURE_WINDOW_NOT_ATTACHED parent="+decor.getParent(),decor.isAttachedToWindow());
+    controller.windowFocusChanged(true);
     android.widget.Button probe=new android.widget.Button(a);probe.setText("Remote focus precondition");probe.setFocusable(true);
     decor.addView(probe,new ViewGroup.LayoutParams(64,64));
     int width=a.getResources().getDisplayMetrics().widthPixels,height=a.getResources().getDisplayMetrics().heightPixels;
