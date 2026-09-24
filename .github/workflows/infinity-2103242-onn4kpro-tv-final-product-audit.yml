@@ -1,0 +1,319 @@
+name: Infinity | 2103242 onn TV Final Product Audit RC22 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103242-onn4kpro-tv-final-product-audit-rc22]
+    paths:
+      - '.github/workflows/infinity-2103242-onn4kpro-tv-final-product-audit.yml'
+      - 'repairs/onn4kpro-tv-final-product-audit-2103242/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103242-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC22 final-audit branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103241 RC21 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103242-Onn4KPro-TV-Final-Product-Audit-TEST-CANDIDATE
+          run-id: 36018898200
+          github-token: ${{ github.token }}
+          path: base241
+
+      - name: Reconstruct exact locked RC21 source and apply RC22 final product audit corrections
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 audit233 audit234 audit235 audit236 audit237 audit238 audit239 audit240 audit241 audit242 candidate242
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit242/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-section-owner-2103237/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-movies-shows-2103238/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-search-ui-polish-2103239/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-search-remote-hardening-2103240/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-chrome-focus-stability-2103241/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-product-audit-2103242/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103242
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22'
+          assert r['tv_target_abi']=='armeabi-v7a'
+
+          # RC22 confirmed fixes.
+          assert r['tv_final_product_audit'] is True
+          assert r['tv_shipping_preservation_audit'] is True
+          assert r['tv_power_menu_remote_focus'] is True
+          assert r['tv_power_menu_initial_focus'] is True
+          assert r['tv_power_menu_linear_focus'] is True
+          assert r['tv_power_menu_transient_owner'] is True
+          assert r['tv_power_menu_back_cancel'] is True
+          assert r['tv_power_menu_safe_focus_restore'] is True
+          assert r['tv_grid_legacy_playing_text_removed'] is True
+          assert r['tv_grid_legacy_paused_text_removed'] is True
+          assert r['tv_playing_dot_authoritative'] is True
+
+          # Locked RC21/RC20 behavior stays protected.
+          assert r['tv_player_chrome_auto_hide_restored'] is True
+          assert r['tv_player_back_first_hides_chrome'] is True
+          assert r['tv_player_back_second_exits'] is True
+          assert r['tv_channel_playback_linear_focus'] is True
+          assert r['tv_buffering_policy_observation_only'] is True
+          assert r['tv_buffering_media_restart_forbidden'] is True
+          assert r['tv_timeshift_engine_unchanged'] is True
+          assert r['tv_vod_landing_search_inline'] is True
+          assert r['tv_remote_crash_hardening'] is True
+          assert r['tv_live_structure_unchanged'] is True
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['tv_motion_lightweight'] is True
+          assert r['tv_real_time_blur'] is False
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC22 final preservation-first product audit receipt')
+          PY
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          SPLASH=shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          # RC22 Power menu focus owner.
+          grep -Fq 'cobra_power_switch_infinity' "$JAVA"
+          grep -Fq 'cobra_power_exit' "$JAVA"
+          grep -Fq 'cobra_power_cancel' "$JAVA"
+          grep -Fq 'cobraTvPowerRoot' "$JAVA"
+          grep -Fq 'cobraTvClosePowerMenuRestoreFocus' "$JAVA"
+          # OLED playing dot is authoritative; old multiline row label must be gone.
+          ! grep -Fq '▶ PLAYING\n' "$JAVA"
+          grep -Fq 'class CobraTvPlayingDot extends View' "$JAVA"
+          grep -Fq 'NORMAL_PULSE_MS=1320L' "$JAVA"
+          # RC21 player behavior.
+          grep -Fq 'mMain.postDelayed(mHideChrome,CobraPresentationEffects.chromeDelay(cobraNightCinemaActive()))' "$JAVA"
+          grep -Fq 'COBRA_TV_TRANSPORT_TOGGLE_GUARD_MS=220L' "$JAVA"
+          grep -Fq 'cobraTvWireLinearFocus' "$JAVA"
+          grep -Fq 'buffer_observed_no_restart' "$JAVA"
+          # RC20 TV search/remote behavior.
+          grep -Fq 'cobra_tv_movies_landing_search_2103240' "$JAVA"
+          grep -Fq 'cobra_tv_shows_landing_search_2103240' "$JAVA"
+          grep -Fq 'COBRA_TV_REMOTE_EDGE_GUARD_MS=120L' "$JAVA"
+          grep -Fq 'Type a title or narrow by genre' "$JAVA"
+          ! grep -Fq 'On-screen keyboard' "$JAVA"
+          # Protected TV/player identity.
+          grep -Fq 'cobra_tv_player_tool_channels' "$JAVA"
+          grep -Fq 'cobra_live_timeshift_seek' "$JAVA"
+          grep -Fq 'cobraOnDemandPlayer' "$JAVA"
+          ! grep -Fq 'AMBIENT MODE  •' "$JAVA"
+          ! grep -Fq 'experience-settings-infinity' "$SPLASH"
+          ! grep -Fq 'experience-settings-cobra' "$SPLASH"
+          grep -Fq 'versionCode 2103242' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC21 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base241 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' 'e1ebde8a5f6477c77431139b351140b54417f662735caeec77d78d14313b6261' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate242/Infinity-2103241-RC21-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC22 audited TV layer, preserve exact locked RC21 ARMv7 engine/resources, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate242/Infinity-2103241-RC21-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-final-product-audit-2103242/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-242 \
+            --out candidate242
+          FINAL=candidate242/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate242/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.sha256
+          rm -f "$BASE"
+
+      - name: Write RC22 final physical TV acceptance checklist
+        run: |
+          cat > candidate242/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103242 — ONN. 4K PRO FINAL PRODUCT AUDIT RC22
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          POWER MENU — CONFIRMED RC21 DEFECT
+          1. Open Drawer -> Power. Focus immediately lands on Switch to Infinity.
+          2. One Down moves to Exit; one Down moves to Cancel. Up reverses exactly one row.
+          3. Select activates the focused option exactly once.
+          4. Back dismisses Power and returns usable focus to the underlying TV screen.
+          5. Cancel dismisses Power and restores usable focus.
+          6. Reopen/close Power at least 25 times; no frozen focus, focus leak behind the overlay, ANR or crash.
+
+          LIVE TV / CURRENT PLAYING INDICATOR
+          7. Currently playing row no longer shows the old multiline ▶ PLAYING label.
+          8. The pulsing cyan/OLED dot remains the sole playing-state indicator in the grid row.
+          9. Channel number/name stays aligned and row height/EPG geometry is unchanged.
+          10. Focus highlight and playback dot remain independent.
+          11. Favorites, Recent, All Channels, Groups and playlist/source switching remain functional.
+
+          REMOTE / D-PAD STRESS
+          12. Stress Drawer -> Groups -> Channel List -> Grid -> Player -> Back -> Drawer for 50 cycles.
+          13. Rapid Left/Right does not double-select, double-close, freeze or crash.
+          14. Up/Down moves exactly one intended item with visible focus.
+          15. No delayed callback steals focus after a panel/list has changed.
+
+          PLAYER / PLAYBACK
+          16. Fullscreen chrome auto-hides after inactivity and remote interaction restores it.
+          17. Back: submenu closes -> visible chrome hides -> next Back exits fullscreen.
+          18. Channel Playback: Recents -> Restart live playback -> Live TV Rewind -> fallback -> recovery -> reset is one Down per row.
+          19. User Pause stays paused until user Resume.
+          20. BUFFERING remains observation-first; no blind restart/re-prepare was introduced.
+          21. Timeshift/Rewind, Go Live, Last Channel, Favorites, Display and More remain intact.
+          22. Preview/fullscreen surface handoff remains smooth and playback ownership does not duplicate.
+
+          MULTI-VIEW
+          23. Test 2, 3 and 4 streams, visible selection focus, audio ownership and channel selection.
+          24. Fullscreen promotion and Return to Multi-View preserve healthy sessions.
+          25. 2 -> 1 survivor behavior remains correct.
+
+          MOVIES / TV SHOWS / SEARCH
+          26. Movies and Shows keep approved cinematic hero / Popular Now / Recent Releases / Genres UI.
+          27. Details/playback/Back preserve section ownership until Drawer changes destination.
+          28. One inline field reads "Type a title or narrow by genre".
+          29. Field opens native Android TV keyboard; no custom A-Z keyboard or duplicate Search button exists.
+          30. Exact/prefix/contains/genre-year-provider narrowing behaves correctly; clearing restores cinematic landing.
+          31. Rapid typing/deleting and repeated Search entry do not freeze, leak focus or progressively slow down.
+
+          UI / PERFORMANCE / LIFECYCLE
+          32. Check 1080p/4K clipping, overscan, typography, focus outlines/scaling, spacing, panel proportions and text truncation.
+          33. Animations remain subtle/lightweight; no real-time blur/Ambient renderer returns.
+          34. Stress foreground/background, repeated fullscreen entry/exit, rapid Back and repeated drawer opening.
+          35. Cold start, Cobra entry, Live TV entry, category changes, Grid and Movies/Shows should not regress RC21 latency.
+          36. No visible control/badge/setting is a placeholder or reports false state.
+
+          PRESERVATION
+          37. Permanent package/signer and armeabi-v7a native engine/resources are preserved.
+          38. Providers and timeshift/rewind engine are preserved.
+          39. Locked RC20 search/remote hardening and locked RC21 player fixes are preserved.
+          40. Phone/Fold behavior is outside this TV branch and must remain untouched.
+
+          CI pass = build candidate passed. Do not lock/promote RC22 until physical onn 4K Pro acceptance passes.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103242 FINAL PRODUCT AUDIT TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103242-Onn4KPro-TV-Final-Product-Audit-TEST-CANDIDATE
+          path: |
+            candidate242/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk
+            candidate242/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.sha256
+            candidate242/signing-verification.txt
+            candidate242/badging.txt
+            candidate242/manifest.txt
+            candidate242/ONN-TV-2103242-VERIFICATION.json
+            candidate242/final-product-audit-source.json
+            candidate242/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103242 RC22 final audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103242-Onn4KPro-TV-Final-Product-Audit-Evidence
+          path: |
+            audit242/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-section-owner-2103237/
+            repairs/onn4kpro-tv-movies-shows-2103238/
+            repairs/onn4kpro-tv-native-search-ui-polish-2103239/
+            repairs/onn4kpro-tv-search-remote-hardening-2103240/
+            repairs/onn4kpro-tv-player-chrome-focus-stability-2103241/
+            repairs/onn4kpro-tv-final-product-audit-2103242/
+            candidate242/*.json
+            candidate242/*.txt
+          if-no-files-found: warn
+          retention-days: 90
