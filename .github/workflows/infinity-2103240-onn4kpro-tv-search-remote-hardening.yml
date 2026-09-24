@@ -57,7 +57,7 @@ jobs:
       - name: Download exact passed 2103239 RC19 TV APK
         uses: actions/download-artifact@v8
         with:
-          name: Infinity-2103240-Onn4KPro-TV-Search-Remote-Hardening-TEST-CANDIDATE
+          name: Infinity-2103239-Onn4KPro-TV-Native-Search-UI-Polish-TEST-CANDIDATE
           run-id: 35993657859
           github-token: ${{ github.token }}
           path: base239
