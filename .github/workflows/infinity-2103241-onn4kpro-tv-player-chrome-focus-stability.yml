@@ -1,0 +1,290 @@
+name: Infinity | 2103241 onn TV Player Chrome Focus Stability RC21 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-rc21]
+    paths:
+      - '.github/workflows/infinity-2103241-onn4kpro-tv-player-chrome-focus-stability.yml'
+      - 'repairs/onn4kpro-tv-player-chrome-focus-stability-2103241/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103241-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC21 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103240 RC20 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103241-Onn4KPro-TV-Player-Chrome-Focus-Stability-TEST-CANDIDATE
+          run-id: 36016018255
+          github-token: ${{ github.token }}
+          path: base240
+
+      - name: Reconstruct exact locked RC20 source and apply RC21 player stability fixes
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 audit233 audit234 audit235 audit236 audit237 audit238 audit239 audit240 audit241 candidate241
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit241/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-section-owner-2103237/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-movies-shows-2103238/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-search-ui-polish-2103239/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-search-remote-hardening-2103240/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-chrome-focus-stability-2103241/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103241
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21'
+          assert r['tv_target_abi']=='armeabi-v7a'
+
+          # Player chrome inactivity / Back hierarchy.
+          assert r['tv_player_chrome_auto_hide_restored'] is True
+          assert r['tv_player_chrome_uses_existing_delay_policy'] is True
+          assert r['tv_player_menu_holds_chrome'] is True
+          assert r['tv_player_back_first_hides_chrome'] is True
+          assert r['tv_player_back_second_exits'] is True
+
+          # Channel Playback focus.
+          assert r['tv_channel_playback_linear_focus'] is True
+          assert r['tv_channel_playback_single_initial_focus_post'] is True
+          assert r['tv_sheet_stale_focus_cancelled'] is True
+          assert r['tv_sheet_focus_restore_attachment_guard'] is True
+
+          # Pause/buffer safety.
+          assert r['tv_transport_toggle_guard_ms']==220
+          assert r['tv_transport_duplicate_toggle_suppressed'] is True
+          assert r['tv_unexpected_non_user_pause_recovery'] is True
+          assert r['tv_unexpected_pause_recovery_delay_ms']==280
+          assert r['tv_unexpected_pause_no_restart'] is True
+          assert r['tv_buffering_policy_observation_only'] is True
+          assert r['tv_buffering_media_restart_forbidden'] is True
+          assert r['tv_timeshift_engine_unchanged'] is True
+          assert r['tv_player_engine_unchanged'] is True
+
+          # Locked RC20 / TV preservation.
+          assert r['tv_vod_landing_search_inline'] is True
+          assert r['tv_remote_crash_hardening'] is True
+          assert r['tv_live_structure_unchanged'] is True
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['tv_motion_lightweight'] is True
+          assert r['tv_real_time_blur'] is False
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC21 player chrome/focus/back stability receipt')
+          PY
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          SPLASH=shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          grep -Fq 'mMain.postDelayed(mHideChrome,CobraPresentationEffects.chromeDelay(cobraNightCinemaActive()))' "$JAVA"
+          grep -Fq 'COBRA_TV_TRANSPORT_TOGGLE_GUARD_MS=220L' "$JAVA"
+          grep -Fq 'cobraTvWireLinearFocus' "$JAVA"
+          grep -Fq 'cobra-channel-restart-live' "$JAVA"
+          grep -Fq 'unexpected-pause-recovery' "$JAVA"
+          grep -Fq 'no_restart=true' "$JAVA"
+          grep -Fq 'buffer_observed_no_restart' "$JAVA"
+          grep -Fq 'cobraTvHidePlayerChrome();return true;' "$JAVA"
+          grep -Fq 'cobra_tv_movies_landing_search_2103240' "$JAVA"
+          grep -Fq 'COBRA_TV_REMOTE_EDGE_GUARD_MS=120L' "$JAVA"
+          grep -Fq 'class CobraTvPlayingDot extends View' "$JAVA"
+          grep -Fq 'NORMAL_PULSE_MS=1320L' "$JAVA"
+          grep -Fq 'cobra_tv_player_tool_channels' "$JAVA"
+          grep -Fq 'cobra_live_timeshift_seek' "$JAVA"
+          grep -Fq 'cobraOnDemandPlayer' "$JAVA"
+          ! grep -Fq 'AMBIENT MODE  •' "$JAVA"
+          ! grep -Fq 'experience-settings-infinity' "$SPLASH"
+          ! grep -Fq 'experience-settings-cobra' "$SPLASH"
+          grep -Fq 'versionCode 2103241' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC20 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base240 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '20012334dbb5983f582a5671af95e870cfd6a8cae7159db9b573c38af0b4283e' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate241/Infinity-2103240-RC20-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC21 Android TV layer, preserve exact locked RC20 ARMv7 engine/resources, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate241/Infinity-2103240-RC20-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-player-chrome-focus-stability-2103241/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-241 \
+            --out candidate241
+          FINAL=candidate241/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate241/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21.sha256
+          rm -f "$BASE"
+
+      - name: Write RC21 physical TV acceptance checklist
+        run: |
+          cat > candidate241/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103241 — ONN. 4K PRO TV PLAYER CHROME / FOCUS / BACK STABILITY RC21
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          PLAYER UI AUTO-HIDE
+          1. Enter fullscreen Live TV and do nothing: normal player chrome fades away after the existing inactivity delay.
+          2. Any D-pad/Select interaction can bring the chrome back; it times out again after inactivity.
+          3. An intentionally open menu (More, Channel Playback, Display, Audio/Subtitles, Multi-View picker) stays visible until dismissed.
+          4. Closing a menu returns to the player chrome, and the chrome timer restarts normally.
+          5. Timeshift dragging never hides the chrome mid-scrub.
+
+          BACK HIERARCHY
+          6. With only normal player chrome visible: first Back hides the chrome and leaves the video playing fullscreen.
+          7. With chrome already hidden: next Back exits fullscreen to the previous Live TV context.
+          8. With Channel Playback/More open: Back closes that submenu first and returns to chrome; subsequent Back follows steps 6-7.
+          9. Multi-View fullscreen return and locked-player behavior remain unchanged.
+
+          CHANNEL PLAYBACK FOCUS
+          10. More -> Channel playback starts on Recents.
+          11. One Down moves Recents -> Restart live playback.
+          12. One Down moves Restart live playback -> Live TV Rewind. NO swallowed first press.
+          13. Continue one-row-per-press through Configured stream fallback -> Automatic video-surface recovery -> Reset this channel.
+          14. Up reverses the same sequence exactly; no jump-back to Recents from a delayed focus callback.
+          15. Rapid Up/Down in this panel does not freeze, lose focus or crash.
+
+          PAUSE / BUFFER SAFETY
+          16. A single Play/Pause press toggles exactly once; remote bounce/repeat does not double-toggle.
+          17. Normal user Pause remains paused until the user resumes.
+          18. A confirmed non-user playWhenReady drop while active fullscreen playback is recovered without replacing/re-preparing the media item.
+          19. BUFFERING remains observation-only: no automatic media restart, re-prepare or forced live-edge seek was added.
+          20. If Nicktoons/direct-provider buffering still occurs, capture diagnostics; RC21 must not make buffering frequency worse than RC20.
+          21. Live TV Rewind/timeshift behavior, existing bounded stall policy and provider fallback remain unchanged.
+
+          PRESERVATION
+          22. Locked RC20 inline Movies/Shows search and remote hardening remain intact.
+          23. Drawer/Groups/Grid flow and EPG directional navigation remain intact.
+          24. Mini-player, preview, PLAYING dot, full player, Favorites and Multi-View remain intact.
+          25. Permanent package/signer, armeabi-v7a native engine/resources and phone/Fold behavior remain preserved.
+
+          Do not lock/promote RC21 until physical acceptance passes.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103241 PLAYER CHROME FOCUS STABILITY TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103241-Onn4KPro-TV-Player-Chrome-Focus-Stability-TEST-CANDIDATE
+          path: |
+            candidate241/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21.apk
+            candidate241/Infinity-1.0.9-Cobra-Onn4KPro-TV-Player-Chrome-Focus-Stability-RC21.sha256
+            candidate241/signing-verification.txt
+            candidate241/badging.txt
+            candidate241/manifest.txt
+            candidate241/ONN-TV-2103241-VERIFICATION.json
+            candidate241/tv-player-chrome-focus-stability-source.json
+            candidate241/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103241 RC21 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103241-Onn4KPro-TV-Player-Chrome-Focus-Stability-Evidence
+          path: |
+            audit241/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-section-owner-2103237/
+            repairs/onn4kpro-tv-movies-shows-2103238/
+            repairs/onn4kpro-tv-native-search-ui-polish-2103239/
+            repairs/onn4kpro-tv-search-remote-hardening-2103240/
+            repairs/onn4kpro-tv-player-chrome-focus-stability-2103241/
+            candidate241/*.json
+            candidate241/*.txt
+          if-no-files-found: warn
+          retention-days: 90
