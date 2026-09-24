@@ -65,7 +65,7 @@ def repl(text,name,new,kind='method'):
 
 def patch_activity(path:Path):
     before=path.read_bytes();s=before.decode()
-    req('COBRA_SECTION_OWNER' in s and 'cobra_start_destination' not in s,'Expected RC17 section-owner Activity')
+    req('COBRA_SECTION_OWNER' in s and 'cobra_start_destination' in s,'Expected RC17 section-owner Activity')
     req('class CobraTvPlayingDot extends View' in s,'RC16 pulsing dot missing from RC17 parent')
     req('cobra_movies_search' in s and 'cobra_shows_search' in s,'RC17 dedicated VOD search controls missing')
 
