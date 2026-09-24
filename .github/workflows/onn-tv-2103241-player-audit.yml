@@ -111,6 +111,7 @@ jobs:
               'showPlayerChromeTemporarily','cobraTvHidePlayerChrome','cobraTvHandlePlayerKey',
               'onBackPressed','showPlayerSettingsDrawer','cobraSheetRow','showCobraPlayerDrawer',
               'closeFullscreenToCobraView','toggleCobraPlayerPlayPause','dispatchKeyEvent',
-              'cobraUpdatePlaybackLabels'
+              'cobraUpdatePlaybackLabels','scheduleChromeHide','cobraShowChannelPreferences','cobraOpenSheet',
+              'closeCobraActionSheet','cobraAddDetail','cobraPolishFocusable','cobraPlayerState'
           ]: member(name)
           PY
