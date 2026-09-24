@@ -124,6 +124,25 @@ jobs:
               print(tok, s.count(tok))
           PY
 
+      - name: Print raw VOD helper neighborhoods
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          for tok in ['cobraAddVodShelf(','cobraAddVodGenres(','cobraVodHeroCarousel(','cobraVodPopularSubset(','cobraRenderVodCollection(','cobraRenderVodDetails(','cobraShowSeriesBrowser(','cobraCaptureVodLandingReturn(','cobraDiscardVodLandingReturn(']:
+              print('\n===== RAW',tok,'=====')
+              start=0
+              found=0
+              while True:
+                  i=s.find(tok,start)
+                  if i<0:break
+                  found+=1
+                  print('\n--- occurrence',found,'at',i,'---\n')
+                  print(s[max(0,i-1500):min(len(s),i+9000)])
+                  start=i+len(tok)
+                  if found>=3:break
+          PY
+
       - name: Save RC17 generated source
         run: |
           cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit238/InfinityLiveActivity-RC17.java.in
