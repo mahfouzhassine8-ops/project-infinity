@@ -1,0 +1,182 @@
+name: Infinity | 2103237 Playing Dot OLED Micro Polish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103237-playing-dot-oled-micro-polish-rc1]
+    paths:
+      - '.github/workflows/infinity-2103237-playing-dot-oled-micro-polish.yml'
+      - 'repairs/playing-dot-oled-micro-polish-2103237/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103237-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    env:
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact passed 2103230 generated source evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103230-Cobra-Final-Preservation-Audit-Evidence
+          run-id: 35823061866
+          github-token: ${{ github.token }}
+          path: parent230e
+
+      - name: Download exact locked 2103236 parent APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103236-Cobra-Playing-Indicator-All-Views-TEST-CANDIDATE
+          run-id: 35948554275
+          github-token: ${{ github.token }}
+          path: parent236
+
+      - name: Download preserved native packaging base
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103229-Exact-Rollback-Before-2103230
+          run-id: 35820419796
+          github-token: ${{ github.token }}
+          path: rollback229
+
+      - name: Restore exact 2103230 source and audit baseline
+        run: |
+          set -euo pipefail
+          test "$(sha256sum parent236/Infinity-1.0.9-Cobra-All-Views-Playing-Indicator-RC1.apk | cut -d' ' -f1)" = "e2131134c74516f9b85973856770c663a421bf5681dc3bd79e13648027a7d5d5"
+          (cd rollback229 && sha256sum -c SHA256SUMS)
+          tar -xzf parent230e/audit230/generated-2103230-source.tar.gz
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "1324e98736c24e203941261cc34c468596892a7897e0679b51f5915e26bd34b6"
+          mkdir -p audit230/baseline audit235 audit236 audit237 "$HOME/.android"
+          cp parent230e/audit230/baseline/RESULT.json audit230/baseline/RESULT.json
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+          keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Debug,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+
+      - name: Reconstruct exact 2103235 true-playing indicator
+        run: |
+          set -euo pipefail
+          python3 repairs/live-playing-indicator-2103235/apply.py --shell shell-kodi
+          python3 repairs/live-playing-indicator-2103235/source_audit.py             --source shell-kodi             --scope audit235/scope.json             --out audit235
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "edaf4a757ceded3099fc0e2adbbcfb5dbf98d394c713b321d41efe62ae6a7d54"
+
+      - name: Reconstruct exact locked 2103236 all-view indicator
+        run: |
+          set -euo pipefail
+          python3 repairs/playing-indicator-all-views-2103236/apply.py --shell shell-kodi
+          python3 repairs/playing-indicator-all-views-2103236/source_audit.py             --source shell-kodi             --scope audit236/scope.json             --out audit236
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "0b1e50528f790dd6fdbc71a880eeffbd0c6c6bb13f9606ffacb8e7971f149dbf"
+          grep -F '"version_code": 2103236' engine/background-resume-source.json
+          grep -F '"playing_indicator_all_live_views": true' engine/background-resume-source.json
+          grep -F '"playing_indicator_night_cinema_amber": "0xffffc247"' engine/background-resume-source.json
+
+      - name: Apply shared OLED playing-dot micro-polish
+        run: |
+          set -euo pipefail
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit237/InfinityLiveActivity-2103236-before.java.in
+          python3 repairs/playing-dot-oled-micro-polish-2103237/apply.py --shell shell-kodi
+          python3 repairs/playing-dot-oled-micro-polish-2103237/source_audit.py             --source shell-kodi             --scope audit237/scope.json             --out audit237
+          java repairs/cobra-feature-refinement-2103207/ParseJava.java shell-kodi/tools/android/packaging/xbmc/src
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit237/InfinityLiveActivity-2103237-after.java.in
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "afa638f0f881c2d437fb5cad56c22453972a5900dcee18eac962537dba0bc255"
+          grep -F '"version_code": 2103237' engine/background-resume-source.json
+          grep -F '"playing_indicator_handoff_ms": 180' engine/background-resume-source.json
+          grep -F '"playing_indicator_oled_native_rendering": true' engine/background-resume-source.json
+          grep -F '"buffering_animation_untouched": true' engine/background-resume-source.json
+
+      - name: Compile and permanently sign without native rebuild
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk rollback229/packaging-base.apk             --build-dir build230             --out signed237
+
+      - name: Run complete inherited 2103230 preservation suite
+        run: |
+          set -euo pipefail
+          python3 repairs/final-preservation-audit-2103230/ci.py candidate
+          cp audit230/candidate/RESULT.json audit237/inherited-2103230-result.json
+
+      - name: Run all playing-indicator truth and polish tests
+        run: |
+          set -euo pipefail
+          TESTDIR=build230/xbmc/src/test/java/com/projectinfinity/kodi
+          cp repairs/live-playing-indicator-2103235/tests/Cobra2103235PlayingIndicatorTest.java "$TESTDIR/"
+          cp repairs/playing-indicator-all-views-2103236/tests/Cobra2103236AllViewsPlayingIndicatorTest.java "$TESTDIR/"
+          cp repairs/playing-dot-oled-micro-polish-2103237/tests/Cobra2103237PlayingDotPolishTest.java "$TESTDIR/"
+          (
+            cd build230
+            ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest               --tests com.projectinfinity.kodi.Cobra2103235PlayingIndicatorTest               --tests com.projectinfinity.kodi.Cobra2103236AllViewsPlayingIndicatorTest               --tests com.projectinfinity.kodi.Cobra2103237PlayingDotPolishTest               --stacktrace
+          )
+          mkdir -p audit237/focused-results
+          cp build230/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103235PlayingIndicatorTest.xml audit237/focused-results/
+          cp build230/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103236AllViewsPlayingIndicatorTest.xml audit237/focused-results/
+          cp build230/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103237PlayingDotPolishTest.xml audit237/focused-results/
+
+      - name: Verify final candidate against exact locked 2103236
+        run: |
+          set -euo pipefail
+          python3 repairs/playing-dot-oled-micro-polish-2103237/verify.py             --apk signed237/Infinity-1.0.9-Cobra-Playing-Dot-OLED-Micro-Polish-RC1.apk             --parent236 parent236/Infinity-1.0.9-Cobra-All-Views-Playing-Indicator-RC1.apk             --audit signed237/background-resume-apk-audit.json             --scope audit237/scope.json             --source-audit audit237/source-audit.json             --inherited-result audit237/inherited-2103230-result.json             --focused-results audit237/focused-results
+          cp repairs/playing-dot-oled-micro-polish-2103237/DEVICE-TEST.md signed237/DEVICE-TEST.md
+
+      - name: Publish 2103237 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103237-Cobra-Playing-Dot-OLED-Micro-Polish-TEST-CANDIDATE
+          path: signed237/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+      - name: Preserve 2103237 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103237-Cobra-Playing-Dot-OLED-Micro-Polish-Evidence
+          path: |
+            audit235/
+            audit236/
+            audit237/
+            audit230/candidate/RESULT.json
+            engine/background-resume-source.json
+            repairs/playing-dot-oled-micro-polish-2103237/
+            signed237/*.json
+            build230/xbmc/build/test-results/testReleaseUnitTest/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact locked 2103236 rollback before 2103237
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103236-Exact-Rollback-Before-2103237
+          path: |
+            parent236/
+            audit237/InfinityLiveActivity-2103236-before.java.in
+            audit236/scope.json
+            audit236/source-audit.json
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
