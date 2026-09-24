@@ -1,4 +1,4 @@
-name: Infinity TV RC23 | End-to-end audit regression-gated candidate
+name: Infinity TV RC23 | Paired end-to-end audit regression-gated candidate
 on:
   workflow_dispatch:
   push:
@@ -33,7 +33,7 @@ jobs:
           paths=subprocess.check_output(['git','diff','--name-only','f95e84676932470ec6093bf6408a920d40239702','HEAD'],text=True).splitlines()
           for path in paths:
               assert path.startswith('repairs/onn4kpro-tv-end-to-end-audit-2103243/') or path.startswith('.github/workflows/infinity-2103243-'),path
-          print('PASS: no locked, phone/Fold, engine or unrelated repository files changed')
+          print('PASS: locked, phone/Fold, native engine and unrelated repository files untouched')
           PY
       - uses: actions/setup-java@v6
         with:
@@ -55,27 +55,18 @@ jobs:
           run-id: 36022909060
           github-token: ${{ github.token }}
           path: baseline-apk
-      - uses: actions/download-artifact@v8
-        with:
-          name: Infinity-TV-RC23-RC22-Negative-Control-Evidence
-          run-id: 36027475388
-          github-token: ${{ github.token }}
-          path: audit243/baseline-android
-      - name: Verify source, baseline evidence and actual APK rollback
+      - name: Verify source and actual APK rollback before any modification
         run: |
           set -euo pipefail
           (cd baseline-source && sed 's#  snapshot/#  #' SHA256SUMS.txt | sha256sum -c -)
           tar -xzf baseline-source/locked-rc22-android-source.tgz
-          mkdir -p rollback243
+          mkdir -p rollback243 "$HOME/.android"
           cp baseline-apk/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk rollback243/
           cp repairs/onn4kpro-tv-end-to-end-audit-2103243/ROLLBACK.md rollback243/
           printf '%s  %s\n' '2e0480ae719a319125ad9482840439e3e8406fe47c8181424469a719b44b9754' 'rollback243/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk' | sha256sum -c -
-          python3 - <<'PY'
-          import json
-          r=json.load(open('audit243/baseline-android/android-test-summary.json'))
-          assert r['mode']=='locked-rc22-negative-control' and r['tests']==20 and r['reproduced_defects']==11 and not r['unexpected_failures']
-          print('PASS: 11 assertion-specific defects reproduced in original RC22; baseline itself unmodified')
-          PY
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Test,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+          fi
       - uses: actions/upload-artifact@v7
         with:
           name: Infinity-TV-RC23-Exact-RC22-Rollback
@@ -83,16 +74,18 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
+      - name: Run untouched RC22 negative control using this exact test harness
+        run: |
+          python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/run_android_tests.py --baseline \
+            --source shell-kodi \
+            --base-apk baseline-apk/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk \
+            --build rc23-baseline-test-build --out audit243/baseline-android
       - name: Apply reviewed fixes and prove all-declaration/source-file preservation
         run: |
           set -euo pipefail
           python3 -m py_compile repairs/onn4kpro-tv-end-to-end-audit-2103243/*.py
           python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/apply.py --shell shell-kodi --out audit243/source
-          mkdir -p "$HOME/.android"
-          if [ ! -f "$HOME/.android/debug.keystore" ]; then
-            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Test,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
-          fi
-      - name: Run actual Android-view candidate regressions — no skips or expected failures
+      - name: Run candidate regressions with the same harness — no skips or expected failures
         run: |
           python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/run_android_tests.py \
             --source shell-kodi \

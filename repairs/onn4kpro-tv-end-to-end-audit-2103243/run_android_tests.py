@@ -59,6 +59,10 @@ def main():
     assertSame("FIXTURE_ACTIVITY_FOCUS_UNAVAILABLE",probe,a.getCurrentFocus());
     assertFalse("FIXTURE_STILL_IN_TOUCH_MODE",probe.isInTouchMode());decor.removeView(probe);return a;'''
  fixture=fixture.replace(anchor,replacement,1)
+ lifecycle_anchor='ActivityController<InfinityLiveActivity> controller=Robolectric.buildActivity(InfinityLiveActivity.class);'
+ assert fixture.count(lifecycle_anchor)==1,'Fixture lifecycle anchor drift'
+ fixture=fixture.replace(lifecycle_anchor,lifecycle_anchor.replace(';','.create().start().resume();'),1)
+ fixture=fixture.replace('InfinityLiveActivity a=controller.get();','InfinityLiveActivity a=controller.get();((Handler)get(a,"mMain")).removeCallbacksAndMessages(null);',1)
  (test/'CobraNavigationUiTest.java').write_text(fixture)
  suite_source=(HERE/'tests/Cobra2103243TvAuditTest.java').read_text()
  assert suite_source.count('@Config(sdk=34,')==1
