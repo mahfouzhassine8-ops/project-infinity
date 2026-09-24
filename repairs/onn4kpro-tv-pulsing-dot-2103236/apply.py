@@ -66,9 +66,10 @@ def patch_activity(path:Path):
     protected_methods=[
       'playChannel','startCobraPreview','promoteCobraPreviewToFullscreen','closeFullscreenToCobraView',
       'cobraReturnToMultiFromFullscreen','setMultiAudio','cobraLayoutPlayerPanels',
-      'cobraTvChannelPlaybackState','cobraTvChannelPlaying','cobraTvPlayingIndicatorKey'
+      'cobraTvChannelPlaybackState','cobraTvChannelPlaying'
     ]
     protected={n:sha_bytes(member(s,n)) for n in protected_methods}
+    playing_key_before=member(s,'cobraTvPlayingIndicatorKey')
 
     marker='  private final class CobraBroadcastRow extends FrameLayout{'
     helpers=r'''  static final class CobraTvPlayingDotPolicy{
@@ -206,6 +207,7 @@ def patch_activity(path:Path):
 
     # Preservation gates.
     for n,d in protected.items():req(sha_bytes(member(s,n))==d,'Protected playback/session method changed: '+n)
+    req(playing_key_before in s,'Protected playback indicator key method changed')
     req('CobraTvPlayingDotPolicy.NORMAL_PULSE_MS=1320L' in s,'Normal pulse cadence missing')
     req('CobraTvPlayingDotPolicy.CINEMA_PULSE_MS=1900L' in s,'Night Cinema pulse cadence missing')
     req('CINEMA_AMBER=0xffffc247' in s,'Night Cinema amber missing')
