@@ -1,0 +1,141 @@
+name: Infinity TV RC23 | End-to-end audit regression-gated candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23]
+    paths:
+      - '.github/workflows/infinity-2103243-end-to-end-audit-candidate.yml'
+      - 'repairs/onn4kpro-tv-end-to-end-audit-2103243/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-tv-rc23-audited-candidate
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  audited-android-tv:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify locked RC22 reference and isolated change scope
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23
+          test "$(git rev-parse origin/locked-infinity-cobra-2103242-onn4kpro-tv-final-product-audit-passed)" = f95e84676932470ec6093bf6408a920d40239702
+          git merge-base --is-ancestor f95e84676932470ec6093bf6408a920d40239702 HEAD
+          python3 - <<'PY'
+          import subprocess
+          paths=subprocess.check_output(['git','diff','--name-only','f95e84676932470ec6093bf6408a920d40239702','HEAD'],text=True).splitlines()
+          for path in paths:
+              assert path.startswith('repairs/onn4kpro-tv-end-to-end-audit-2103243/') or path.startswith('.github/workflows/infinity-2103243-'),path
+          print('PASS: no locked, phone/Fold, engine or unrelated repository files changed')
+          PY
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-TV-RC23-Locked-RC22-Audit-Source
+          run-id: 36024863257
+          github-token: ${{ github.token }}
+          path: baseline-source
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103242-Onn4KPro-TV-Final-Product-Audit-TEST-CANDIDATE
+          run-id: 36022909060
+          github-token: ${{ github.token }}
+          path: baseline-apk
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-TV-RC23-RC22-Negative-Control-Evidence
+          run-id: 36027475388
+          github-token: ${{ github.token }}
+          path: audit243/baseline-android
+      - name: Verify source, baseline evidence and actual APK rollback
+        run: |
+          set -euo pipefail
+          (cd baseline-source && sed 's#  snapshot/#  #' SHA256SUMS.txt | sha256sum -c -)
+          tar -xzf baseline-source/locked-rc22-android-source.tgz
+          mkdir -p rollback243
+          cp baseline-apk/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk rollback243/
+          cp repairs/onn4kpro-tv-end-to-end-audit-2103243/ROLLBACK.md rollback243/
+          printf '%s  %s\n' '2e0480ae719a319125ad9482840439e3e8406fe47c8181424469a719b44b9754' 'rollback243/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          r=json.load(open('audit243/baseline-android/android-test-summary.json'))
+          assert r['mode']=='locked-rc22-negative-control' and r['tests']==20 and r['reproduced_defects']==11 and not r['unexpected_failures']
+          print('PASS: 11 assertion-specific defects reproduced in original RC22; baseline itself unmodified')
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-TV-RC23-Exact-RC22-Rollback
+          path: rollback243/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Apply reviewed fixes and prove all-declaration/source-file preservation
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-end-to-end-audit-2103243/*.py
+          python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/apply.py --shell shell-kodi --out audit243/source
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Test,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+          fi
+      - name: Run actual Android-view candidate regressions — no skips or expected failures
+        run: |
+          python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/run_android_tests.py \
+            --source shell-kodi \
+            --base-apk baseline-apk/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk \
+            --build rc23-candidate-test-build --out audit243/candidate-android
+      - name: Compile Android layer, preserve exact native/resources, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/package.py \
+            --source shell-kodi \
+            --base-apk baseline-apk/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk \
+            --build-dir rc23-android-release --out candidate243
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103243-Onn4KPro-TV-End-To-End-Audit-TEST-CANDIDATE
+          path: |
+            candidate243/Infinity-1.0.9-Cobra-Onn4KPro-TV-End-To-End-Audit-RC23.apk
+            candidate243/Infinity-TV-RC23.sha256
+            candidate243/RC23-VERIFICATION.json
+            candidate243/source-preservation.json
+            candidate243/android-test-summary.json
+            candidate243/signing-verification.txt
+            candidate243/zipalign-verification.txt
+            candidate243/AUDIT.md
+            candidate243/DEVICE-TEST.md
+            candidate243/ROLLBACK.md
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve audit evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103243-Onn4KPro-TV-End-To-End-Audit-Evidence
+          path: |
+            audit243/
+            candidate243/*.json
+            candidate243/*.txt
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-end-to-end-audit-2103243/
+          if-no-files-found: warn
+          retention-days: 90
