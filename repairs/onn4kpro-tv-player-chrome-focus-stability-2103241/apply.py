@@ -78,7 +78,7 @@ def patch_activity(path:Path):
       'cobraStartProviderCatchup','cobraGoLive','cobraTimeshiftSeconds','cobraUpdateTimeshiftSeek',
       'cobraAttachVideo','cobraStartDirectSinglePlayer','cobraStartDirectPreview','mediaItem','buildPlayer'
     ]
-    protected={n:hb(member(s,n)) for n in protected_methods}
+    protected={n:hb(member(s,n).strip()) for n in protected_methods}
     dot_hash=hb(member(s,'CobraTvPlayingDot','class'))
     watchdog=s[s.index('private final Runnable mStallWatchdog'):s.index('private final Runnable mAutoRefresh')]
     watchdog_hash=hb(watchdog)
@@ -231,7 +231,7 @@ def patch_activity(path:Path):
     s=repl(s,'onBackPressed',back)
 
     # Scope/preservation gates.
-    for n,h in protected.items():req(hb(member(s,n))==h,'Protected playback/timeshift/TV method changed: '+n)
+    for n,h in protected.items():req(hb(member(s,n).strip())==h,'Protected playback/timeshift/TV method changed: '+n)
     req(hb(member(s,'CobraTvPlayingDot','class'))==dot_hash,'RC16 pulsing dot changed')
     watchdog_after=s[s.index('private final Runnable mStallWatchdog'):s.index('private final Runnable mAutoRefresh')]
     req(hb(watchdog_after)==watchdog_hash,'Observation-only stall watchdog changed')
