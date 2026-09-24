@@ -90,9 +90,62 @@ jobs:
           cp shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in audit237/Splash-RC16.java.in
           cp engine/background-resume-source.json audit237/RC16-source-receipt.json
 
-      - name: Preserve exact RC16 source snapshot
+      - name: Dry-run RC17 section owner and player cleanup
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/onn4kpro-tv-section-owner-2103237/apply.py
+          python3 repairs/onn4kpro-tv-section-owner-2103237/apply.py --shell shell-kodi
+          python3 - <<'PY'
+          import json,pathlib
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103237
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Section-Owner-RC17'
+          assert r['chooser_card_settings_removed'] is True
+          assert r['chooser_infinity_settings_removed'] is True
+          assert r['chooser_cobra_settings_removed'] is True
+          assert r['cobra_explicit_start_destination']=='live_tv'
+          assert r['tv_cobra_startup_integrated_shell'] is True
+          assert r['tv_cobra_startup_drawer_open'] is True
+          assert r['tv_cobra_startup_groups_visible'] is True
+          assert r['tv_drawer_right_select'] is True and r['tv_drawer_left_back'] is True
+          assert r['tv_directory_right_select'] is True and r['tv_directory_left_back'] is True
+          assert r['tv_right_select_scope']=='live-tv-only'
+          assert r['tv_left_back_scope']=='live-tv-drawer-directory-only'
+          assert r['tv_section_owner_persistent'] is True
+          assert r['tv_movies_persistent_until_drawer_change'] is True
+          assert r['tv_shows_persistent_until_drawer_change'] is True
+          assert r['tv_smart_return_cannot_override_vod_owner'] is True
+          assert r['tv_vod_channels_control_removed'] is True
+          assert r['tv_vod_multiview_control_removed'] is True
+          assert r['tv_vod_live_rewind_removed'] is True
+          assert r['tv_vod_go_live_removed'] is True
+          assert r['tv_vod_live_timeline_removed'] is True
+          assert r['tv_vod_live_record_removed'] is True
+          assert r['tv_vod_display_preserved'] is True
+          assert r['tv_vod_more_preserved'] is True
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_ambient_mode_retired'] is True
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          a=pathlib.Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          s=pathlib.Path('shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in').read_text()
+          assert 'experience-settings-infinity' not in s
+          assert 'experience-settings-cobra' not in s
+          assert 'cobra_start_destination' in s
+          assert 'COBRA_SECTION_OWNER' in a
+          assert 'cobraOpenLiveTvStartup' in a
+          assert 'cobraOnDemandPlayer' in a
+          assert 'class CobraTvPlayingDot extends View' in a
+          assert 'cobra_movies_search' in a and 'cobra_shows_search' in a
+          print('PASS: RC17 startup/section-owner/VOD-player source gates')
+          PY
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit237/InfinityLiveActivity-RC17.java.in
+          cp shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in audit237/Splash-RC17.java.in
+          cp engine/background-resume-source.json audit237/RC17-source-receipt.json
+
+      - name: Preserve RC17 source audit
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103237-Section-Owner-Source-Snapshot
+          name: Infinity-2103237-Section-Owner-Preaudit
           path: audit237/
           retention-days: 30
