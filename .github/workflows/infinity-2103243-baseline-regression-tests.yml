@@ -41,7 +41,7 @@ jobs:
       - name: Verify untouched snapshot and prepare test keystore
         run: |
           set -euo pipefail
-          (cd baseline-source && sha256sum -c SHA256SUMS.txt)
+          (cd baseline-source && sed 's#  snapshot/#  #' SHA256SUMS.txt | sha256sum -c -)
           tar -xzf baseline-source/locked-rc22-android-source.tgz
           mkdir -p "$HOME/.android"
           if [ ! -f "$HOME/.android/debug.keystore" ]; then
