@@ -10,23 +10,28 @@ The baseline snapshot was reconstructed from the exact committed RC22 recipe and
 
 **Evidence levels are distinct:** source review, source preservation, executable Android-view regression tests, and physical-device/live-provider validation. None substitutes for the others. CI success is not shipping certification. The final Android XML/JSON reports, not this prose, determine which tests passed.
 
+## Validated paired execution
+
+Run `36032851085` executed the same 20 cases against untouched RC22 and the corrected RC23 source in one workflow. RC22 passed 10 cases and failed 10 with the specific defect assertions below. RC23 passed all 20, with no skipped cases, errors or unexpected failures. Both controls used harness SHA-256 `3f67056cfd34064d6bc50e652474ccfff895907c1aa08b28bc96ea9b61158543`.
+
+This validated result supersedes the earlier provisional 9-pass/11-failure report from run `36027475388`. Intermediate harness failures were not application-defect evidence: Robolectric's Activity focus stub did not track the real view tree, and the paused Choreographer had not dispatched the initial window-attachment traversal before window-focus setup. The final fixture initializes the Activity lifecycle, advances that traversal, verifies window attachment and non-touch remote focus, and obtains current focus from the actual decor View hierarchy. It does not inject the expected focused view. These identical fixture adaptations apply to both baseline and candidate, never to the shipped Activity.
+
+Later release runs rerun both controls before packaging. Read `audit243/baseline-android/android-test-summary.json`, `audit243/candidate-android/android-test-summary.json` and their JUnit XML for the result associated with the delivered APK. The candidate runner rejects mismatched baseline/candidate harness hashes.
+
 ## Reproduced baseline defects
 
-Run `36027475388`, attempt 2, executed 20 regression cases against untouched reconstructed RC22. Nine cases passed; eleven failed with their specific defect assertions. No setup errors were accepted as bug reproductions. The first attempt had a GitHub artifact-service failure; that was infrastructure, not an application defect.
-
 1. A delayed directory focus callback could take focus behind Power.
-2. Closing Power could schedule focus restoration that steals focus from a newly opened modal.
-3. The transient-menu router ignored explicit next-focus links, including the Channel Playback links added in RC21.
-4. The blanket 120ms Left/Right cooldown discarded separate legitimate fast presses.
-5. A held Play/Pause key could toggle twice despite the 220ms debounce.
-6. RC21's generic non-user-pause recovery automatically resumed a system/audio-focus pause.
-7. The dot treated playWhenReady as actual playback and could indicate playing while buffering.
-8. IME Search could hand focus off before new results existed; delayed filtering then removed the focused result.
-9. Fixed search-card height was smaller than the poster, title, metadata and padding combined.
-10. Repeated search refreshes retained discarded view trees through the strong trim registry.
-11. Delayed metadata/details completion could open a details panel after navigation to another section.
+2. The transient-menu router ignored explicit next-focus links, including the Channel Playback links added in RC21.
+3. The blanket 120ms Left/Right cooldown discarded separate legitimate fast presses.
+4. A held Play/Pause key could toggle twice despite the 220ms debounce.
+5. RC21's generic non-user-pause recovery automatically resumed a system/audio-focus pause.
+6. The dot treated playWhenReady as actual playback and could indicate playing while buffering.
+7. IME Search could hand focus off before new results existed; delayed filtering then removed the focused result.
+8. Fixed search-card height was smaller than the poster, title, metadata and padding combined.
+9. Repeated search refreshes retained discarded view trees through the strong trim registry.
+10. Delayed metadata/details completion could open a details panel after navigation to another section.
 
-Additional code-reviewed hazards guarded in the same diff: Multi-View picker callbacks acting on replaced adapters, stale person/collection metadata completion, background library iteration over a mutable source list, oversized artwork decoding/cache retention, and collection card clipping. Two test cases (stale Multi-View focus and inactivity refresh) already passed the controlled baseline scenario; they are preservation checks, not claimed baseline reproductions.
+Additional code-reviewed hazards guarded in the same diff: Power focus restoration without navigation/modal ownership checks, Multi-View picker callbacks acting on replaced adapters, stale person/collection metadata completion, background library iteration over a mutable source list, oversized artwork decoding/cache retention, and collection card clipping. The controlled Power-restore, stale Multi-View-focus and inactivity-refresh cases already passed the validated baseline scenario; they are preservation checks and code-reviewed hardening, not claimed baseline reproductions.
 
 The user's last apparent random-pause incident was withdrawn as an intentional pause. This audit does not reinterpret it as a confirmed network/provider stall.
 
@@ -68,11 +73,11 @@ Picker selection callbacks check adapter identity, item position/id and attachme
 
 | Area | Review / executable evidence | Remaining physical acceptance |
 |---|---|---|
-| Launch / Choose Experience / Cobra handoff | Existing launcher/manifest/entry behavior and sources preserved; no new destinations | Cold/warm launch, handoff to Infinity, actual native startup |
+| Launch / Choose Experience / Cobra handoff | Existing launcher/manifest/entry behavior and sources preserved; fixture executes Activity lifecycle; no new destinations | Cold/warm launch, handoff to Infinity, actual native startup |
 | Drawer, groups, channel directory, grid | Routing, callback ownership and repeat handling reviewed; rapid separate edge events and 12,000-channel virtualized UI tested | Actual remote repetition, 50 navigation cycles, crash/ANR observation |
-| Power and other menus | Actual Android view tests for modal ownership, stale restore and Cancel; actions retained | Switch to Infinity, Exit, reopening in all sections |
+| Power and other menus | Android-view tests for modal ownership, stale restore and Cancel; existing actions retained | Switch to Infinity, Exit, reopening in all sections |
 | Channel Playback | Explicit-link routing test plus unchanged row/action construction | Each displayed row in both directions, no two-press hiccup |
-| Player chrome and Back | Actual Activity/View tests for hide-before-exit, pause and timeout interaction | Auto-fade timing and submenu hierarchy on real remote |
+| Player chrome and Back | Activity/View tests for hide-before-exit, pause and timeout interaction | Auto-fade timing and submenu hierarchy on real remote |
 | Playback / timeshift / audio | Playback inner classes and media/session methods protected; controlled buffering watchdog and pause-state tests | Real streams, rewind/live edge, network loss, audio-focus/lifecycle |
 | Current-playing indicator | Controlled READY/buffering/suppression/end state tests; renderer byte-identical | Pulse appearance, channel handoff and theme colors |
 | Multi-View | Adapter callback review and controlled selection test; engine classes preserved | 2/3/4 live streams, audio ownership, cancel/failure, fullscreen return |
@@ -87,6 +92,8 @@ Picker selection callbacks check adapter identity, item position/id and attachme
 ## Preservation proof and acceptance
 
 `source-preservation.json` inventories every original Activity declaration using the Java parser. The allowed diff is 29 original declarations plus 13 additions, with no original declaration removed. Every other original declaration, including all original nested playback/timeshift classes and the dot renderer, must retain its source hash. The complete reconstructed source-file inventory permits changes only to the Activity and version identity in build.gradle.
+
+The verified inventory contains 1,336 original Activity declarations: 1,307 unchanged, 29 changed and none removed. Of 226 source files, 224 remain byte-identical; only the Activity and version identity are changed. These are source-preservation measurements, not a claim that every possible runtime path was exercised.
 
 Packaging uses the exact signed RC22 APK as the payload base. Only compiled Android DEX and the versioned manifest are substituted. Native libraries, assets and compiled Android resources must compare byte-for-byte; JNI native declarations and resource IDs must match. The permanent signer/package and ARMv7-only payload are mandatory.
 
