@@ -69,7 +69,7 @@ def patch_activity(path:Path):
     ]
     protected_classes=[
       'CobraPlayerBinding','CobraVideoTile','CobraMultiRecoveryPolicy','CobraLiveEndedPolicy',
-      'CobraAuditPolicy','CobraFoldAspectPolicy','CobraPlayingDot'
+      'CobraAuditPolicy','CobraFoldAspectPolicy','CobraPlayingDot','CobraBroadcastRow'
     ]
     mh={n:hb(member(s,n)) for n in protected_methods};ch={n:hb(member(s,n,'class')) for n in protected_classes}
 
