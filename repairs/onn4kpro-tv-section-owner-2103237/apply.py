@@ -479,7 +479,7 @@ def patch_activity(path:Path):
     # Preservation and scope gates.
     for n,h in protected.items():req(hb(member(s,n))==h,'Protected playback/session method changed: '+n)
     req('class CobraTvPlayingDot extends View' in s and 'NORMAL_PULSE_MS=1320L' in s and 'CINEMA_PULSE_MS=1900L' in s,'RC16 dot regressed')
-    req('cobra_start_destination' not in s,'Splash-only startup token leaked into Activity source')
+    req('getStringExtra("cobra_start_destination")' in s,'Cobra startup destination receiver missing from Activity')
     req('COBRA_SECTION_OWNER' in s and 'cobraShowLoadedPrimary' in s,'Section owner missing')
     req('cobraOpenLiveTvStartup' in s and 'toggleCobraDrawer()' in member(s,'cobraOpenLiveTvStartup'),'Startup integrated drawer missing')
     req('KEYCODE_DPAD_RIGHT' in member(s,'cobraTvHandleDrawerKey') and 'performClick()' in member(s,'cobraTvHandleDrawerKey'),'Drawer Right=Select missing')
