@@ -58,7 +58,7 @@ def span(text,name,kind='method'):
 def member(text,name,kind='method'):
     a,b=span(text,name,kind);return text[a:b]
 def repl(text,name,new,kind='method'):
-    a,b=span(text,name,kind);return text[:a]+new.rstrip()+text[b:]
+    a,b=span(text,name,kind);return text[:a]+new.rstrip()+"\n"+text[b:]
 
 def patch_splash(path:Path):
     before=path.read_bytes();s=before.decode()
