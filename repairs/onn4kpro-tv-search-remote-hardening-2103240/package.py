@@ -124,7 +124,7 @@ def source_preservation(source:Path):
     require(receipt.get('tv_vod_search_live_narrowing') is True and receipt.get('tv_vod_search_on_screen_keyboard') is False,'2103239 custom-keyboard removal missing')
     require(receipt.get('tv_search_native_android_tv_ime') is True and receipt.get('tv_search_top_field_is_input') is True,'2103239 native TV search field missing')
     require(receipt.get('tv_vod_search_exact_title_priority') is True and receipt.get('tv_search_genre_text_matching') is True,'2103239 title/genre matching contract missing')
-    require(receipt.get('tv_vod_search_debounce_ms')==160 and receipt.get('tv_vod_search_visible_result_cap')==30,'2103239 search work budget missing')
+    require(receipt.get('tv_vod_search_debounce_ms')==150 and receipt.get('tv_vod_search_visible_result_cap')==35,'2103240 inline-search work budget missing')
     require(receipt.get('tv_search_results_full_width') is True and receipt.get('tv_focus_clip_protection') is True and receipt.get('tv_search_stale_refresh_guard') is True,'2103239 UI/stability polish missing')
     require(receipt.get('tv_vod_landing_search_inline') is True and receipt.get('tv_vod_search_separate_landing_button_removed') is True,'2103240 inline landing search missing')
     require(receipt.get('tv_vod_search_native_android_tv_ime') is True and receipt.get('tv_vod_search_empty_restores_cinematic_landing') is True,'2103240 landing search/IME contract missing')
@@ -266,7 +266,7 @@ def main():
             'search_top_field_is_input':True,'search_custom_keyboard_removed':True,'search_left_panel_removed':True,
             'search_genre_chips_removed':True,'search_genre_text_matching':True,'search_results_full_width':True,
             'search_results_below_input':True,'vod_search_exact_title_priority':True,'vod_search_genre_filters':False,
-            'vod_search_debounce_ms':160,'vod_search_visible_result_cap':30,'vod_search_focus_restore':True,
+            'vod_search_focus_restore':True,
             'vod_search_section_scoped':True,'search_stale_refresh_guard':True,'search_ime_submit_to_results':True,
             'focus_clip_protection':True,'result_smooth_scroll':True,'ui_refinement_polish':True,
             'vod_landing_search_inline':True,'vod_search_separate_landing_button_removed':True,
