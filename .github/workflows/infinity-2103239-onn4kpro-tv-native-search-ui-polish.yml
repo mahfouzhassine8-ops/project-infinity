@@ -5,7 +5,7 @@ on:
   push:
     branches: [infinity-cobra-2103239-onn4kpro-tv-native-search-ui-polish-rc19]
     paths:
-      - '.github/workflows/infinity-2103238-onn4kpro-tv-movies-shows-refinement.yml'
+      - '.github/workflows/infinity-2103239-onn4kpro-tv-native-search-ui-polish.yml'
       - 'repairs/onn4kpro-tv-native-search-ui-polish-2103239/**'
 
 permissions:
@@ -57,7 +57,7 @@ jobs:
       - name: Download exact passed 2103238 RC18 TV APK
         uses: actions/download-artifact@v8
         with:
-          name: Infinity-2103239-Onn4KPro-TV-Native-Search-UI-Polish-TEST-CANDIDATE
+          name: Infinity-2103238-Onn4KPro-TV-Movies-Shows-Refinement-TEST-CANDIDATE
           run-id: 35961671020
           github-token: ${{ github.token }}
           path: base238
@@ -97,7 +97,7 @@ jobs:
           python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-section-owner-2103237/apply.py --shell shell-kodi
-          python3 repairs/onn4kpro-tv-native-search-ui-polish-2103239/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-movies-shows-2103238/apply.py --shell shell-kodi
           python3 repairs/onn4kpro-tv-native-search-ui-polish-2103239/apply.py --shell shell-kodi
 
           python3 - <<'PY'
@@ -283,6 +283,7 @@ jobs:
             audit239/
             engine/background-resume-source.json
             repairs/onn4kpro-tv-section-owner-2103237/
+            repairs/onn4kpro-tv-movies-shows-2103238/
             repairs/onn4kpro-tv-native-search-ui-polish-2103239/
             candidate239/*.json
             candidate239/*.txt
