@@ -57,7 +57,7 @@ jobs:
       - name: Download exact locked 2103233 RC13 TV APK
         uses: actions/download-artifact@v8
         with:
-          name: Infinity-2103234-Onn4KPro-TV-Integrated-Shell-TEST-CANDIDATE
+          name: Infinity-2103233-Onn4KPro-TV-Glass-System-TEST-CANDIDATE
           run-id: 35942347012
           github-token: ${{ github.token }}
           path: base233
@@ -275,6 +275,7 @@ jobs:
             repairs/onn4kpro-tv-adaptive-ui-polish-2103231/
             repairs/onn4kpro-tv-integrated-drawer-2103232/
             repairs/onn4kpro-tv-glass-system-2103233/
+            repairs/onn4kpro-tv-integrated-shell-playing-2103234/
             candidate234/*.json
             candidate234/*.txt
           if-no-files-found: warn
