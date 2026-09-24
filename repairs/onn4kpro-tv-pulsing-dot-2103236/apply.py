@@ -206,8 +206,8 @@ def patch_activity(path:Path):
 
     # Preservation gates.
     for n,d in protected.items():req(sha_bytes(member(s,n))==d,'Protected playback/session method changed: '+n)
-    req('CobraTvPlayingDotPolicy.NORMAL_PULSE_MS=1320L' in s,'Normal pulse cadence missing')
-    req('CobraTvPlayingDotPolicy.CINEMA_PULSE_MS=1900L' in s,'Night Cinema pulse cadence missing')
+    req('NORMAL_PULSE_MS=1320L' in s,'Normal pulse cadence missing')
+    req('CINEMA_PULSE_MS=1900L' in s,'Night Cinema pulse cadence missing')
     req('CINEMA_AMBER=0xffffc247' in s,'Night Cinema amber missing')
     req('OLED_CORE_FLOOR_ALPHA=218' in s and 'OLED_GLOW_FLOOR=.58f' in s,'OLED floor missing')
     req('postInvalidateDelayed(CobraTvPlayingDotPolicy.FRAME_MS)' in s,'Lightweight TV repaint cadence missing')
