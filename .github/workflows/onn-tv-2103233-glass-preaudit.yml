@@ -1,0 +1,156 @@
+name: onn TV 2103233 glass system preaudit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103233-onn4kpro-tv-glass-system-rc13]
+    paths:
+      - '.github/workflows/onn-tv-2103233-glass-preaudit.yml'
+      - 'repairs/onn4kpro-tv-glass-system-2103233/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preaudit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact locked RC12 source
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit233
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit233/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+
+      - name: Audit glass targets, Ambient, focus and heavy paths
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json
+          p=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+          s=p.read_text()
+
+          def span(name):
+              pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+'+re.escape(name)+r'\s*\([^\n{;]*\)\s*\{')
+              ms=list(pat.finditer(s))
+              if len(ms)!=1:return f'CARDINALITY {name}={len(ms)}'
+              start=ms[0].start();brace=s.find('{',start);depth=0;quote=None;esc=line=block=False;i=brace
+              while i<len(s):
+                  c=s[i];n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\n':line=False
+                  elif block:
+                      if c=='*' and n=='/':block=False;i+=1
+                  elif quote:
+                      if esc:esc=False
+                      elif c=='\\':esc=True
+                      elif c==quote:quote=None
+                  elif c=='/' and n=='/':line=True;i+=1
+                  elif c=='/' and n=='*':block=True;i+=1
+                  elif c in ('"',"'"):quote=c
+                  elif c=='{':depth+=1
+                  elif c=='}':
+                      depth-=1
+                      if depth==0:return s[start:i+1]
+                  i+=1
+              return 'UNCLOSED '+name
+
+          names=[
+            'toggleCobraDrawer','cobraPolishDrawerRow','cobraDrawerDestination',
+            'cobraDirectory','cobraOpenTvDirectory','cobraRenderGuideBrowser','cobraRenderGridMode',
+            'cobraModeBrowserHeader','cobraLayoutGuide','cobraPreviewPanel','cobraRefreshModeDetails',
+            'cobraBuildModeChrome','cobraRestyleGuide','cobraOpenSheet','cobraSheetRow',
+            'showCobraPlayerDrawer','cobraRenderPlayerDrawer','showPlayerSettingsDrawer',
+            'showCobraMultiPicker','renderCobraMultiPicker','renderCobraMultiPickerSearch',
+            'cobraBuildPlayerChrome','cobraLayoutPlayerPanels','showSettings',
+            'cobraRefreshAmbient','cobraRefreshLiveAmbientSurfaces','cobraAmbientSurface',
+            'cobraPresentationMode','cobraShowVisualModeMenu','cobraShowAmbientSetting'
+          ]
+          out=[]
+          for n in names:out += ['\n===== '+n+' =====\n',span(n)]
+          Path('audit233/rc12-glass-target-methods.txt').write_text('\n'.join(out))
+
+          # Every method that references Ambient, focus visuals, surface creation or expensive redraws.
+          lines=[]
+          for i,line in enumerate(s.splitlines(),1):
+              if re.search(r'ambient|night|surface\(|GradientDrawable|LayerDrawable|setBackground|setAlpha|setScale|animate\(|requestLayout|invalidate\(|notifyDataSetChanged|removeAllViews|blur|RenderEffect',line,re.I):
+                  lines.append(f'{i}: {line}')
+          Path('audit233/visual-performance-references.txt').write_text('\n'.join(lines))
+
+          # Method inventory for Ambient and visual-related methods.
+          meth=[]
+          pat=re.compile(r'(?m)^\s*(?:@Override\s+)?(?:(?:public|private|protected|static|final|synchronized)\s+)*[\w.<>,\[\]?]+\s+(\w+)\s*\([^\n{;]*\)\s*\{')
+          for m in pat.finditer(s):
+              n=m.group(1)
+              if re.search(r'ambient|visual|theme|surface|drawer|guide|player|multi|sheet|settings',n,re.I):
+                  b=span(n)
+                  if not b.startswith(('CARDINALITY','UNCLOSED')):
+                      meth.append({'method':n,'chars':len(b),'animate':b.count('.animate()'),'surface':b.count('surface('),'invalidate':b.count('invalidate'),'notify':b.count('notifyDataSetChanged')})
+          meth.sort(key=lambda x:(x['animate']+x['surface']+x['invalidate']+x['notify'],x['chars']),reverse=True)
+          Path('audit233/visual-method-inventory.json').write_text(json.dumps(meth,indent=2))
+
+          # Confirm locked RC12 contracts before new work.
+          gates={
+            'rc12_marker':'cobra_tv_integrated_drawer_2103232' in s,
+            'rc11_marker':'cobra_tv_adaptive_ui_2103231' in s,
+            'mini_preview':'startCobraPreview(mGuidePreviewChannel)' in s,
+            'settings_grid':'cobra_tv_grid_settings' in s,
+            'multiview':'cobra_tv_player_multiview_2103222' in s,
+            'ambient_mode_present':('Ambient' in s or 'ambient' in s),
+          }
+          Path('audit233/locked-contracts.json').write_text(json.dumps(gates,indent=2,sort_keys=True))
+          print(json.dumps(gates,sort_keys=True))
+          PY
+
+      - name: Preserve preaudit
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103233-Glass-System-Preaudit
+          path: audit233/
+          retention-days: 30
