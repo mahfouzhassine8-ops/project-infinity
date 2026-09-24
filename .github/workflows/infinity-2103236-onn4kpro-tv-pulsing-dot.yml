@@ -1,0 +1,265 @@
+name: Infinity | 2103236 onn TV Pulsing Dot RC16 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-rc16]
+    paths:
+      - '.github/workflows/infinity-2103236-onn4kpro-tv-pulsing-dot.yml'
+      - 'repairs/onn4kpro-tv-pulsing-dot-2103236/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103236-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC16 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact locked 2103235 RC15 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103235-Onn4KPro-TV-Final-Polish-TEST-CANDIDATE
+          run-id: 35947129924
+          github-token: ${{ github.token }}
+          path: base235
+
+      - name: Reconstruct exact locked RC15 source and apply RC16 pulsing dot
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 audit233 audit234 audit235 audit236 candidate236
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit236/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103236
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16'
+          assert r['tv_target_abi']=='armeabi-v7a'
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_playing_dot_actual_session'] is True
+          assert r['tv_playing_dot_focus_independent'] is True
+          assert r['tv_playing_dot_normal_pulse_ms']==1320
+          assert r['tv_playing_dot_night_cinema_pulse_ms']==1900
+          assert r['tv_playing_dot_handoff_ms']==180
+          assert r['tv_playing_dot_color_morph_ms']==240
+          assert r['tv_playing_dot_oled_core_floor_alpha']==218
+          assert r['tv_playing_dot_oled_glow_floor']==.58
+          assert r['tv_playing_dot_night_cinema_amber']=='0xffffc247'
+          assert r['tv_playing_dot_glass_accent'] is True
+          assert r['tv_playing_dot_ambient_independent'] is True
+          assert r['tv_playing_dot_frame_ms']==33
+          assert r['tv_playing_dot_no_blur'] is True
+          assert r['tv_playing_dot_playback_mutation'] is False
+          assert r['tv_ambient_mode_retired'] is True
+          assert r['tv_right_select_scope']=='live-tv-only'
+          assert r['tv_vod_right_navigation_untouched'] is True
+          assert r['tv_movies_dedicated_search'] is True
+          assert r['tv_shows_dedicated_search'] is True
+          assert r['tv_mini_player_playing_badge_removed'] is True
+          assert r['tv_navigation_hierarchy']=='drawer-groups-grid-player'
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC16 pulsing-dot source receipt')
+          PY
+
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -Fq 'cobra_tv_final_polish_2103235' "$JAVA"
+          grep -Fq 'class CobraTvPlayingDot extends View' "$JAVA"
+          grep -Fq 'NORMAL_PULSE_MS=1320L' "$JAVA"
+          grep -Fq 'CINEMA_PULSE_MS=1900L' "$JAVA"
+          grep -Fq 'HANDOFF_MS=180L' "$JAVA"
+          grep -Fq 'COLOR_MORPH_MS=240L' "$JAVA"
+          grep -Fq 'OLED_CORE_FLOOR_ALPHA=218' "$JAVA"
+          grep -Fq 'OLED_GLOW_FLOOR=.58f' "$JAVA"
+          grep -Fq 'CINEMA_AMBER=0xffffc247' "$JAVA"
+          grep -Fq 'FRAME_MS=33L' "$JAVA"
+          grep -Fq 'postInvalidateDelayed(CobraTvPlayingDotPolicy.FRAME_MS)' "$JAVA"
+          grep -Fq 'KEYCODE_DPAD_RIGHT&&mCobraTvDrawerInline' "$JAVA"
+          grep -Fq 'cobra_movies_search' "$JAVA"
+          grep -Fq 'cobra_shows_search' "$JAVA"
+          ! grep -Fq 'AMBIENT MODE  •' "$JAVA"
+          grep -Fq 'versionCode 2103236' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact locked RC15 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base235 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Polish-RC15.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' 'bd864a19078c18fa63aeda4b90ac81eaa4a59c478e799e9de5791aa8eb09498e' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate236/Infinity-2103235-RC15-LOCKED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC16 Android TV layer, preserve exact ARMv7 engine, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate236/Infinity-2103235-RC15-LOCKED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-236 \
+            --out candidate236
+          FINAL=candidate236/Infinity-1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate236/Infinity-1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16.sha256
+          rm -f "$BASE"
+
+      - name: Write physical onn acceptance checklist
+        run: |
+          cat > candidate236/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103236 — ONN. 4K PRO TV PULSING DOT RC16
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          BASELINE
+          - Exact locked RC15 / 2103235 is parent and rollback.
+          - This is a presentation-only TV Grid indicator pass.
+          - No native/playback/timeshift/Multi-View changes.
+
+          PLAYING DOT
+          1. The actual playing Live TV channel keeps RC15's channel-row PLAYING state.
+          2. A small emissive pulsing dot is now visible in the same channel identity column.
+          3. Moving focus to another channel must NOT move the dot.
+          4. Tuning a different channel moves the dot only when the real playback session changes.
+          5. The old channel softly fades and the new dot blooms over ~180 ms.
+          6. Normal pulse period is ~1320 ms and remains restrained.
+          7. Dot has a crisp OLED-like center and small transparent bloom; it never fully blinks off.
+          8. No large halo, plate, badge or mini-player PLAYING label is added.
+
+          NIGHT CINEMA / VISUALS
+          9. With Night Cinema OFF, dot follows the current Glass UI accent.
+          10. Toggle Night Cinema ON: dot morphs smoothly over ~240 ms to warm amber/yellow #FFC247.
+          11. Night Cinema uses the slower/quieter ~1900 ms pulse.
+          12. Toggle Night Cinema OFF: dot morphs smoothly back to the Glass accent.
+          13. Ambient Mode remains absent/retired on TV. The dot must not re-enable Ambient rendering.
+          14. No real-time blur or heavy effect is introduced.
+
+          PERFORMANCE / REGRESSION
+          15. Dot animation must not make D-pad navigation visibly slower than locked RC15.
+          16. Stress-scroll the EPG while the dot is pulsing and verify smooth focus movement.
+          17. Drawer/Groups/Grid/Player Back hierarchy remains exact.
+          18. Live TV Right=Select remains limited to Drawer + Groups/playlist directory.
+          19. Movies/Shows Right navigation remains untouched and their dedicated searches remain present.
+          20. Mini-player stays free of normal PLAYING/PAUSED badges.
+          21. Verify fullscreen handoff, Multi-View, rewind/timeshift and player Channels.
+          22. Verify 1080p and 4K clipping/overscan.
+          23. Phone/Fold source remains untouched.
+          24. Permanent signer and armeabi-v7a engine remain preserved.
+
+          Do not lock/promote RC16 until physical acceptance passes.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103236 PULSING DOT TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103236-Onn4KPro-TV-Pulsing-Dot-TEST-CANDIDATE
+          path: |
+            candidate236/Infinity-1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16.apk
+            candidate236/Infinity-1.0.9-Cobra-Onn4KPro-TV-Pulsing-Dot-RC16.sha256
+            candidate236/signing-verification.txt
+            candidate236/badging.txt
+            candidate236/manifest.txt
+            candidate236/ONN-TV-2103236-VERIFICATION.json
+            candidate236/tv-pulsing-dot-source.json
+            candidate236/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103236 RC16 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103236-Onn4KPro-TV-Pulsing-Dot-Evidence
+          path: |
+            audit236/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-final-polish-2103235/
+            repairs/onn4kpro-tv-pulsing-dot-2103236/
+            candidate236/*.json
+            candidate236/*.txt
+          if-no-files-found: warn
+          retention-days: 90
