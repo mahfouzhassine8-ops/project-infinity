@@ -106,8 +106,34 @@ jobs:
           for name in [
             'showCobraPowerMenu','closeCobraPowerMenu','cobraTvHandleTransientKey',
             'cobraPowerMenu','toggleCobraDrawer','cobraTvFocusFirst','cobraPolishFocusable',
-            'CobraModeAdapter','cobraRenderGridMode','cobraTvPlayingDotColor','cobraTvChannelPlaybackState'
+            'cobraRenderGridMode','cobraTvPlayingDotColor','cobraTvChannelPlaybackState',
+            'cobraTvTransientRoot','cobraTvMoveTransientFocus','cobraTvCloseTransient','dispatchKeyEvent'
           ]: member(name)
+          def class_member(name):
+              pat=re.compile(r'(?m)^\\s*(?:(?:private|public|protected|static|final)\\s+)*class\\s+'+re.escape(name)+r'\\b')
+              m=pat.search(s)
+              if not m:
+                  print('MISSING CLASS',name);return
+              st=m.start();b=s.find('{',m.end());d=0;q=None;esc=line=block=False
+              for i in range(b,len(s)):
+                  c=s[i];n=s[i+1] if i+1<len(s) else ''
+                  if line:
+                      if c=='\\n':line=False
+                  elif block:
+                      if c=='*' and n=='/':block=False
+                  elif q:
+                      if esc:esc=False
+                      elif c=='\\\\':esc=True
+                      elif c==q:q=None
+                  elif c=='/' and n=='/':line=True
+                  elif c=='/' and n=='*':block=True
+                  elif c in ('\"',\"'\"):q=c
+                  elif c=='{':d+=1
+                  elif c=='}':
+                      d-=1
+                      if d==0:
+                          print('\\n===== CLASS '+name+' =====\\n'+s[st:i+1]+'\\n===== END CLASS '+name+' =====');return
+          class_member('CobraBroadcastRow')
           print("\n===== POWER TOKENS =====")
           for i,line in enumerate(s.splitlines(),1):
               if re.search(r'Power|Switch to Infinity|Exit|Cancel|mCobraPower|PLAYING',line):
