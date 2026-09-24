@@ -145,6 +145,7 @@ jobs:
             'ambient_mode_present':('Ambient' in s or 'ambient' in s),
           }
           Path('audit233/locked-contracts.json').write_text(json.dumps(gates,indent=2,sort_keys=True))
+          Path('audit233/InfinityLiveActivity-RC12.java.in').write_text(s)
           print(json.dumps(gates,sort_keys=True))
           PY
 
