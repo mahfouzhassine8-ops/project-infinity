@@ -1,0 +1,298 @@
+name: Infinity | 2103240 onn TV Search Remote Hardening RC20 FAST
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-rc20]
+    paths:
+      - '.github/workflows/infinity-2103240-onn4kpro-tv-search-remote-hardening.yml'
+      - 'repairs/onn4kpro-tv-search-remote-hardening-2103240/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103240-onn-tv-fast-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  fast-tv-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout isolated RC20 TV branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact 2103208 Android source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 source reconstruction engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Download exact passed 2103239 RC19 TV APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103240-Onn4KPro-TV-Search-Remote-Hardening-TEST-CANDIDATE
+          run-id: 35993657859
+          github-token: ${{ github.token }}
+          path: base239
+
+      - name: Reconstruct exact passed RC19 source and apply RC20 search/remote hardening
+        run: |
+          set -euo pipefail
+          mkdir -p engine audit220 audit221 audit224 audit225 audit230 audit231 audit232 audit233 audit234 audit235 audit236 audit237 audit238 audit239 audit240 candidate240
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit240/mobile-source-base
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          python3 repairs/smart-return-experience-display-2103216/apply.py --shell shell-kodi
+          python3 repairs/media-return-context-2103217/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-2103218/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-2103219/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-grid-only-2103220/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-remote-ui-2103221/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-player-multiview-2103222/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-hardening-2103223/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-remote-2103224/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-handoff-focus-2103225/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-navigation-motion-2103230/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-adaptive-ui-polish-2103231/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-drawer-2103232/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-glass-system-2103233/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-integrated-shell-playing-2103234/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-final-polish-2103235/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-pulsing-dot-2103236/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-section-owner-2103237/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-movies-shows-2103238/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-native-search-ui-polish-2103239/apply.py --shell shell-kodi
+          python3 repairs/onn4kpro-tv-search-remote-hardening-2103240/apply.py --shell shell-kodi
+
+          python3 - <<'PY'
+          import json
+          r=json.load(open('engine/background-resume-source.json'))
+          assert r['version_code']==2103240
+          assert r['version_name']=='1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20'
+          assert r['tv_target_abi']=='armeabi-v7a'
+
+          # RC20 inline Movies/Shows landing search.
+          assert r['tv_vod_landing_search_inline'] is True
+          assert r['tv_vod_search_separate_landing_button_removed'] is True
+          assert r['tv_vod_search_top_field_inline'] is True
+          assert r['tv_vod_search_native_android_tv_ime'] is True
+          assert r['tv_vod_search_inline_live_narrowing'] is True
+          assert r['tv_vod_search_empty_restores_cinematic_landing'] is True
+          assert r['tv_vod_search_exact_title_priority'] is True
+          assert r['tv_vod_search_genre_text_matching'] is True
+          assert r['tv_vod_search_debounce_ms']==150
+          assert r['tv_vod_search_visible_result_cap']==35
+
+          # RC20 remote/focus crash hardening.
+          assert r['tv_remote_edge_guard_ms']==120
+          assert r['tv_remote_repeat_suppressed'] is True
+          assert r['tv_remote_safe_click'] is True
+          assert r['tv_directory_focus_epoch_guard'] is True
+          assert r['tv_drawer_focus_epoch_guard'] is True
+          assert r['tv_remote_crash_hardening'] is True
+          assert r['tv_remote_left_back_preserved'] is True
+          assert r['tv_remote_right_select_preserved'] is True
+          assert r['tv_focus_target_attachment_guard'] is True
+
+          # Preserve RC19/RC18 visual language and protected TV engine/session behavior.
+          assert r['tv_movies_tv_first_refinement'] is True
+          assert r['tv_shows_tv_first_refinement'] is True
+          assert r['tv_vod_hero_cinematic'] is True
+          assert r['tv_vod_popular_first'] is True
+          assert r['tv_vod_recent_second'] is True
+          assert r['tv_vod_genres_third'] is True
+          assert r['tv_section_owner_persistent'] is True
+          assert r['tv_movies_persistent_until_drawer_change'] is True
+          assert r['tv_shows_persistent_until_drawer_change'] is True
+          assert r['tv_live_structure_unchanged'] is True
+          assert r['tv_grid_pulsing_playing_dot'] is True
+          assert r['tv_mini_player_preserved'] is True
+          assert r['tv_preview_engine_preserved'] is True
+          assert r['tv_multiview_row_focus_visible'] is True
+          assert r['multiview_two_to_one_session_preserved'] is True
+          assert r['tv_motion_lightweight'] is True
+          assert r['tv_real_time_blur'] is False
+          assert r['native_engine_rebuilt'] is False
+          assert r['playback_engine_unchanged'] is True
+          print('PASS: exact RC20 inline landing search + remote/focus hardening receipt')
+          PY
+          JAVA=shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          SPLASH=shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          grep -Fq 'Type a title or narrow by genre' "$JAVA"
+          grep -Fq 'cobra_tv_movies_landing_search_2103240' "$JAVA"
+          grep -Fq 'cobra_tv_shows_landing_search_2103240' "$JAVA"
+          grep -Fq 'cobraPopulateVodLandingSearchResults' "$JAVA"
+          grep -Fq 'cobraTvSafeRemoteClick' "$JAVA"
+          grep -Fq 'COBRA_TV_REMOTE_EDGE_GUARD_MS=120L' "$JAVA"
+          grep -Fq 'event.getRepeatCount()>0' "$JAVA"
+          grep -Fq 'cobraTvPostDirectoryFocus(list,index)' "$JAVA"
+          ! grep -Fq 'page.addView(cobraVodSectionSearchMenu(series)' "$JAVA"
+          ! grep -Fq 'On-screen keyboard' "$JAVA"
+          grep -Fq 'FEATURED' "$JAVA"
+          grep -Fq 'Popular Now' "$JAVA"
+          grep -Fq 'Recent Releases' "$JAVA"
+          grep -Fq 'class CobraTvPlayingDot extends View' "$JAVA"
+          grep -Fq 'NORMAL_PULSE_MS=1320L' "$JAVA"
+          grep -Fq 'cobra_tv_player_tool_channels' "$JAVA"
+          grep -Fq 'cobra_live_timeshift_seek' "$JAVA"
+          grep -Fq 'cobraOnDemandPlayer' "$JAVA"
+          grep -Fq 'Back to Movies' "$JAVA"
+          grep -Fq 'Back to Shows' "$JAVA"
+          ! grep -Fq 'AMBIENT MODE  •' "$JAVA"
+          ! grep -Fq 'experience-settings-infinity' "$SPLASH"
+          ! grep -Fq 'experience-settings-cobra' "$SPLASH"
+          grep -Fq 'versionCode 2103240' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -Fq 'versionName "1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20"' shell-kodi/tools/android/packaging/xbmc/build.gradle.in
+
+      - name: Verify exact passed RC19 TV base
+        run: |
+          set -euo pipefail
+          BASE="$(find base239 -type f -name 'Infinity-1.0.9-Cobra-Onn4KPro-TV-Native-Search-UI-Polish-RC19.apk' -print -quit)"
+          test -n "$BASE"
+          printf '%s  %s\n' '243a82db8c2dbc773b17a6feacf1f22379d9fbcd0525ec7073ab6237a085489d' "$BASE" | sha256sum -c -
+          cp "$BASE" candidate240/Infinity-2103239-RC19-PASSED-ROLLBACK.apk
+
+      - name: Ensure donor debug keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Fast compile RC20 Android TV layer, preserve exact RC19 ARMv7 engine/resources, sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          BASE=candidate240/Infinity-2103239-RC19-PASSED-ROLLBACK.apk
+          python3 repairs/onn4kpro-tv-search-remote-hardening-2103240/package.py \
+            --source shell-kodi \
+            --base-apk "$BASE" \
+            --build-dir tv-android-build-240 \
+            --out candidate240
+          FINAL=candidate240/Infinity-1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20.apk
+          test -f "$FINAL"
+          sha256sum "$FINAL" | tee candidate240/Infinity-1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20.sha256
+          rm -f "$BASE"
+
+      - name: Write RC20 physical TV acceptance checklist
+        run: |
+          cat > candidate240/DEVICE-TEST.txt <<'EOF'
+          INFINITY / COBRA 2103240 — ONN. 4K PRO TV INLINE SEARCH + REMOTE HARDENING RC20
+          PHYSICAL DEVICE ACCEPTANCE REQUIRED
+
+          MOVIES / TV SHOWS LANDING SEARCH
+          1. Directly below the provider/status row is ONE full-width field: "Type a title or narrow by genre".
+          2. The old clipped Movies/Shows strip and separate Search Movies/Search TV Shows button are gone.
+          3. Selecting the field opens the native Android TV keyboard; there is no custom A-Z keyboard.
+          4. Typing stays on the Movies/Shows landing page and replaces everything UNDER the field with closest results.
+          5. Exact-title matches rank first, then title-prefix, title-contains, then genre/year/provider matches.
+          6. Typing a genre name (for example Comedy or Action) narrows the same result list.
+          7. Clearing the field restores the approved cinematic hero, Popular Now, Recent Releases and Genres layout.
+          8. IME Search/Done closes the Android TV keyboard and moves focus into the first result when one exists.
+          9. D-pad Down from the search field enters content/results; Up from first search-result row returns to the field.
+          10. Search never changes Movies to Shows/Live TV or Shows to Movies/Live TV.
+
+          REMOTE / FOCUS / CRASH HARDENING
+          11. Drawer Right still means Select and Left/Back still means Back.
+          12. Group/channel-directory Right still means Select and Left still returns toward the drawer.
+          13. Holding Left or Right does NOT fire repeated select/back actions.
+          14. Rapid alternating Left/Right presses do not double-open/double-close panels or double-select rows.
+          15. Rapid Up/Down browsing remains responsive and does not get stuck on invisible/stale focus.
+          16. Focus is never restored to a detached, hidden or disabled row after a panel/list rebuild.
+          17. Stress Drawer -> Groups/Channel List -> Grid -> Back -> Drawer for at least 50 rapid cycles.
+          18. Stress rapid Left/Right/Up/Down input for at least 2 minutes; no freeze, ANR, black screen or application crash.
+          19. Repeatedly switch Favorites / Recently played / All channels / groups; no progressive slowdown or crash.
+          20. Playlist/source picker Left/Right behavior remains correct and does not re-enter a closing sheet.
+
+          PRESERVATION / UI
+          21. EPG/grid directional navigation is unchanged.
+          22. Mini-player, preview, true PLAYING dot, fullscreen player and player focus graph remain intact.
+          23. Timeshift/rewind, Go Live, Last Channel, Favorites and Multi-View 2/3/4 + 2->1 survivor remain intact.
+          24. Movies/Shows section ownership and on-demand player cleanup remain intact.
+          25. Focus outlines/scaling remain unclipped at 1080p and 4K; motion remains restrained/lightweight.
+          26. No Ambient renderer or real-time blur returns.
+          27. Fullscreen enter/exit latency must not regress against passed RC19.
+          28. Permanent package/signer, armeabi-v7a native engine, resources and phone/Fold behavior remain preserved.
+
+          Do not lock/promote RC20 until physical acceptance passes unless the user explicitly elects to lock without installing it.
+          EOF
+
+      - name: Publish onn 4K Pro TV 2103240 SEARCH REMOTE HARDENING TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103240-Onn4KPro-TV-Search-Remote-Hardening-TEST-CANDIDATE
+          path: |
+            candidate240/Infinity-1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20.apk
+            candidate240/Infinity-1.0.9-Cobra-Onn4KPro-TV-Search-Remote-Hardening-RC20.sha256
+            candidate240/signing-verification.txt
+            candidate240/badging.txt
+            candidate240/manifest.txt
+            candidate240/ONN-TV-2103240-VERIFICATION.json
+            candidate240/tv-search-remote-hardening-source.json
+            candidate240/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103240 RC20 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103240-Onn4KPro-TV-Search-Remote-Hardening-Evidence
+          path: |
+            audit240/
+            engine/background-resume-source.json
+            repairs/onn4kpro-tv-section-owner-2103237/
+            repairs/onn4kpro-tv-movies-shows-2103238/
+            repairs/onn4kpro-tv-native-search-ui-polish-2103239/
+            repairs/onn4kpro-tv-search-remote-hardening-2103240/
+            candidate240/*.json
+            candidate240/*.txt
+          if-no-files-found: warn
+          retention-days: 90
