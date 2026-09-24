@@ -1,0 +1,62 @@
+name: Infinity TV RC23 | RC22 negative-control Android tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23]
+    paths:
+      - '.github/workflows/infinity-2103243-baseline-regression-tests.yml'
+      - 'repairs/onn4kpro-tv-end-to-end-audit-2103243/tests/**'
+      - 'repairs/onn4kpro-tv-end-to-end-audit-2103243/run_android_tests.py'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-tv-rc23-baseline-tests
+  cancel-in-progress: false
+jobs:
+  android-negative-control:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-TV-RC23-Locked-RC22-Audit-Source
+          run-id: 36024863257
+          github-token: ${{ github.token }}
+          path: baseline-source
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103242-Onn4KPro-TV-Final-Product-Audit-TEST-CANDIDATE
+          run-id: 36022909060
+          github-token: ${{ github.token }}
+          path: baseline-apk
+      - name: Verify untouched snapshot and prepare test keystore
+        run: |
+          set -euo pipefail
+          (cd baseline-source && sha256sum -c SHA256SUMS.txt)
+          tar -xzf baseline-source/locked-rc22-android-source.tgz
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname 'CN=Android Test,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+          fi
+      - name: Run the same proposed regression cases against original RC22
+        run: |
+          python3 repairs/onn4kpro-tv-end-to-end-audit-2103243/run_android_tests.py --baseline \
+            --source shell-kodi \
+            --base-apk baseline-apk/Infinity-1.0.9-Cobra-Onn4KPro-TV-Final-Product-Audit-RC22.apk \
+            --build rc23-baseline-test-build --out audit243/baseline-android
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-TV-RC23-RC22-Negative-Control-Evidence
+          path: audit243/baseline-android/
+          if-no-files-found: warn
+          retention-days: 90
