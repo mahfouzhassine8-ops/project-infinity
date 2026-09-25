@@ -45,28 +45,28 @@ def patch_main(path: Path) -> None:
     super.onCreate(savedInstanceState);
 '''
     new = '''    // Preserve previous-process evidence before native initialization can truncate
-    // its new-process crash slot. Load Kodi FIRST, then install the diagnostic
-    // fatal-signal recorder so Kodi/native initialization cannot overwrite our
-    // SIGSEGV/SIGABRT/SIGBUS/SIGILL/SIGFPE handlers.
+    // its new-process crash slot. Let Kodi and NativeActivity finish onCreate
+    // first, then install the diagnostic fatal-signal recorder LAST so startup
+    // cannot overwrite our SIGSEGV/SIGABRT/SIGBUS/SIGILL/SIGFPE handlers.
     InfinityExitDiagnostics.start(getApplicationContext());
     InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.onCreate.beforeNative");
     System.loadLibrary("@APP_NAME_LC@");
     InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.kodiNative.loaded");
+
+    super.onCreate(savedInstanceState);
+    InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.onCreate.afterSuper");
     try
     {
       System.loadLibrary("infinitycrash");
-      InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "nativeCrashRecorder.loaded.afterKodi");
+      InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "nativeCrashRecorder.loaded.afterKodiOnCreateOnCreate");
     }
     catch (LinkageError recorderUnavailable)
     {
       android.util.Log.w("InfinityDiagnostics", "Native crash recorder unavailable: " +
           recorderUnavailable.getClass().getSimpleName());
-      InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "nativeCrashRecorder.unavailable.afterKodi");
+      InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "nativeCrashRecorder.unavailable.afterKodiOnCreate");
     }
     InfinityExitDiagnostics.snapshotNativeMaps(getApplicationContext());
-
-    super.onCreate(savedInstanceState);
-    InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.onCreate.afterSuper");
 '''
     text = once(text, old, new, "onCreate native diagnostics")
 
@@ -183,7 +183,7 @@ def patch_identity(root: Path, shell: Path) -> None:
         "verify recorder",
     )
     old_runtime = "        for token in (b'InfinityExtendedBackgroundService',b'InfinityBackgroundControlActivity',b'BACKGROUND_MODE_NORMAL',b'BACKGROUND_MODE_EXTENDED',b'InfinityCoreBridge',b'InfinityCobraDeviceBridge',b'getPlayWhenReady',b'Turn off'):\n            require(token in joined,'Missing source-built runtime: '+repr(token))\n        return {'native_files_byte_identical':sum(n.startswith('lib/') and not n.endswith('/') for n in kept),\n"
-    new_runtime = "        for token in (b'InfinityExtendedBackgroundService',b'InfinityBackgroundControlActivity',b'BACKGROUND_MODE_NORMAL',b'BACKGROUND_MODE_EXTENDED',b'InfinityCoreBridge',b'InfinityCobraDeviceBridge',b'getPlayWhenReady',b'Turn off',b'nativeCrashRecorder.loaded.afterKodi',b'trace_request_attempted',b'process_state_summary'):\n            require(token in joined,'Missing source-built runtime: '+repr(token))\n        return {'native_files_byte_identical':sum(n.startswith('lib/') and not n.endswith('/') for n in kept),\n                'diagnostic_native_library_added':CRASH_RECORDER_APK_PATH,\n"
+    new_runtime = "        for token in (b'InfinityExtendedBackgroundService',b'InfinityBackgroundControlActivity',b'BACKGROUND_MODE_NORMAL',b'BACKGROUND_MODE_EXTENDED',b'InfinityCoreBridge',b'InfinityCobraDeviceBridge',b'getPlayWhenReady',b'Turn off',b'nativeCrashRecorder.loaded.afterKodiOnCreate',b'trace_request_attempted',b'process_state_summary'):\n            require(token in joined,'Missing source-built runtime: '+repr(token))\n        return {'native_files_byte_identical':sum(n.startswith('lib/') and not n.endswith('/') for n in kept),\n                'diagnostic_native_library_added':CRASH_RECORDER_APK_PATH,\n"
     p = once(p, old_runtime, new_runtime, "runtime proof")
     p = p.replace(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1-unsigned.apk",
