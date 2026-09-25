@@ -1,9 +1,9 @@
-name: Infinity | 2103251 Native Crash Forensics RC2
+name: Infinity | 2103252 Native Crash Forensics RC3
 
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-cobra-2103251-native-crash-forensics-rc2]
+    branches: [infinity-cobra-2103252-native-crash-forensics-rc2]
     paths:
       - '.github/workflows/infinity-2103250-native-crash-forensics.yml'
       - 'repairs/native-crash-forensics-2103250/**'
@@ -13,7 +13,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: infinity-2103251-native-crash-forensics-${{ github.sha }}
+  group: infinity-2103252-native-crash-forensics-${{ github.sha }}
   cancel-in-progress: false
 
 env:
@@ -88,8 +88,8 @@ jobs:
             --collector /tmp/InfinityExitDiagnostics.java.in
           python3 -m py_compile scripts/infinity_background_resume.py scripts/package_background_resume.py \
             repairs/native-crash-forensics-2103250/apply.py repairs/native-crash-forensics-2103250/verify.py
-          cp shell-kodi/tools/android/packaging/xbmc/src/Main.java.in audit250/Main-2103251-after.java.in
-          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in audit250/ExitDiagnostics-2103251-after.java.in
+          cp shell-kodi/tools/android/packaging/xbmc/src/Main.java.in audit250/Main-2103252-after.java.in
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in audit250/ExitDiagnostics-2103252-after.java.in
 
       - name: Build isolated native crash-recorder companion
         run: |
@@ -130,16 +130,18 @@ jobs:
           for bad in ('malloc(','calloc(','realloc(','free(','snprintf(','printf(','fprintf(',
                       '_Unwind_Backtrace','backtrace(','JNIEnv','dladdr('):
               assert bad not in body,bad
-          for good in ('write(g_crash_fd','restore_and_reraise','__NR_gettid','fault_address=',
+          for good in ('ftruncate(g_crash_fd, 0)','lseek(g_crash_fd, 0, SEEK_SET)','write(g_crash_fd','restore_and_reraise','__NR_gettid','fault_address=',
                        'pc=','sp=','fp=','lr=','native_engine_sha256='):
               assert good in body,good
           assert 'SA_SIGINFO | SA_ONSTACK' in c
           assert 'sigaction(g_signals[i], &action, &g_previous[i])' in c
           assert '__NR_tgkill' in c
-          print('PASS: bounded recorder chains back to Android and avoids unsafe unwinding/heap/JNI')
+          assert 'g_crash_fd = open(crash_path, O_WRONLY | O_CREAT | O_CLOEXEC, 0600);' in c
+          assert 'g_crash_fd = open(crash_path, O_WRONLY | O_CREAT | O_TRUNC' not in c
+          print('PASS: bounded recorder preserves prior crash evidence across restart and chains back to Android')
           PY
 
-      - name: Build and permanently sign 2103251 instrumentation APK
+      - name: Build and permanently sign 2103252 instrumentation APK
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -166,7 +168,7 @@ jobs:
           set -euo pipefail
           python3 repairs/native-crash-forensics-2103250/verify.py \
             --parent baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk \
-            --candidate signed250/Infinity-1.0.9-Native-Crash-Forensics-RC2.apk \
+            --candidate signed250/Infinity-1.0.9-Native-Crash-Forensics-RC3.apk \
             --audit signed250/background-resume-apk-audit.json \
             --source shell-kodi \
             --recorder engine/libinfinitycrash.so \
@@ -178,12 +180,14 @@ jobs:
       - name: Create device test instructions
         run: |
           cat > signed250/DEVICE-TEST-NATIVE-FORENSICS.txt <<'EOF'
-          INFINITY 2103251 NATIVE CRASH FORENSICS RC2 — DEVICE TEST
+          INFINITY 2103252 NATIVE CRASH FORENSICS RC3 — DEVICE TEST
 
           PURPOSE
-          This APK does NOT claim to fix the current SIGSEGV. RC2 corrects the recorder install
-          order discovered from the 2026-09-25 device diagnostic: Kodi native loads first, then
-          the crash recorder installs its fatal-signal handlers. It captures PID/TID/signal/fault address/program counter,
+          This APK does NOT claim to fix the current SIGSEGV. RC3 preserves the corrected
+          post-Kodi handler install order and fixes the evidence-loss defect proven by the RC2
+          device test: reopening Infinity no longer truncates native-crash-last.txt. A new fatal
+          signal replaces the prior slot only after the handler is already running. It captures
+          PID/TID/signal/fault address/program counter,
           resolve the PC to a loaded native module offset, correlate Android exit history and
           preserve Android tombstone/trace data when the platform exposes it.
 
@@ -212,14 +216,14 @@ jobs:
           the exact 2103209 libkodi.so engine and adds one isolated diagnostic companion .so only.
           Do not lock this candidate until basic device startup and one diagnostic export pass.
           EOF
-          cp audit250/verification.json signed250/2103251-verification.json
-          cp audit250/scope.json signed250/2103251-scope.json
+          cp audit250/verification.json signed250/2103252-verification.json
+          cp audit250/scope.json signed250/2103252-scope.json
           cp repairs/native-crash-forensics-2103250/AUDIT.md signed250/AUDIT.md
 
       - name: Publish TEST CANDIDATE
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103251-Native-Crash-Forensics-RC2-TEST-CANDIDATE
+          name: Infinity-2103252-Native-Crash-Forensics-RC3-TEST-CANDIDATE
           path: signed250/
           if-no-files-found: error
           compression-level: 0
@@ -229,7 +233,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103251-Native-Crash-Forensics-RC2-Evidence
+          name: Infinity-2103252-Native-Crash-Forensics-RC3-Evidence
           path: |
             audit250/
             engine/background-resume-source.json
