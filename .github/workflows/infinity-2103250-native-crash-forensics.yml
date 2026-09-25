@@ -1,0 +1,231 @@
+name: Infinity | 2103250 Native Crash Forensics
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103250-native-crash-forensics-rc1]
+    paths:
+      - '.github/workflows/infinity-2103250-native-crash-forensics.yml'
+      - 'repairs/native-crash-forensics-2103250/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103250-native-crash-forensics-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  BASELINE_RUN: 35820419796
+  BASELINE_ARTIFACT: Infinity-2103229-Exact-Rollback-Before-2103230
+  PARENT_APK_SHA: 3a80480e300bafc6071aed7f494cc6b3a96a79f7e1e4dcb9ae87fe36c9a707f5
+  PACKAGING_BASE_SHA: 9bda7a49c38dcfd7c67b548ed38c661ddb44ca7434fbb2c69ce48dd7554dab7f
+  SOURCE_TAR_SHA: 8ba08a7d0d185145c224b9858839db82446061aabf4843a0b081f2cb5070948a
+  NATIVE_ENGINE_SHA: db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375
+
+jobs:
+  build-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout isolated forensic branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install matched Android toolchain
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+
+      - name: Download exact locked 2103229 rollback inputs
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.BASELINE_ARTIFACT }}
+          run-id: ${{ env.BASELINE_RUN }}
+          github-token: ${{ github.token }}
+          path: baseline229
+
+      - name: Verify exact protected baseline before any change
+        run: |
+          set -euo pipefail
+          test "$(sha256sum baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk | cut -d' ' -f1)" = "$PARENT_APK_SHA"
+          test "$(sha256sum baseline229/packaging-base.apk | cut -d' ' -f1)" = "$PACKAGING_BASE_SHA"
+          test "$(sha256sum baseline229/locked-2103229-reconstructed-shell.tar.gz | cut -d' ' -f1)" = "$SOURCE_TAR_SHA"
+          mkdir -p audit250
+          cp baseline229/SHA256SUMS audit250/baseline-SHA256SUMS.txt
+          sha256sum baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk \
+            baseline229/packaging-base.apk \
+            baseline229/locked-2103229-reconstructed-shell.tar.gz > audit250/baseline-identity.txt
+
+      - name: Restore exact locked 2103229 reconstructed source
+        run: |
+          set -euo pipefail
+          tar -xzf baseline229/locked-2103229-reconstructed-shell.tar.gz
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Main.java.in | cut -d' ' -f1)" = "ddf18d30c4040369b30e861ded588a53846ff3de319a89a219344771f8db9318"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in | cut -d' ' -f1)" = "9ad267b3f5e1a9c1c9adbdc120146cc1d93848f4e50e7d0a9953c20f26d1ff94"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/build.gradle.in | cut -d' ' -f1)" = "3d4d5c84a810104d8b532caa2a09598b4019ed526e22d0ba7b5c85af9678895b"
+          cp shell-kodi/tools/android/packaging/xbmc/src/Main.java.in audit250/Main-2103229-before.java.in
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in audit250/ExitDiagnostics-2103229-before.java.in
+
+      - name: Apply crash-forensics-only Android delta
+        run: |
+          set -euo pipefail
+          base64 -d repairs/native-crash-forensics-2103250/InfinityExitDiagnostics.java.in.gz.b64 | gunzip > /tmp/InfinityExitDiagnostics.java.in
+          python3 repairs/native-crash-forensics-2103250/apply.py \
+            --root . --shell shell-kodi \
+            --collector /tmp/InfinityExitDiagnostics.java.in
+          python3 -m py_compile scripts/infinity_background_resume.py scripts/package_background_resume.py \
+            repairs/native-crash-forensics-2103250/apply.py repairs/native-crash-forensics-2103250/verify.py
+          cp shell-kodi/tools/android/packaging/xbmc/src/Main.java.in audit250/Main-2103250-after.java.in
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in audit250/ExitDiagnostics-2103250-after.java.in
+
+      - name: Build isolated native crash-recorder companion
+        run: |
+          set -euo pipefail
+          TOOLCHAIN="$ANDROID_HOME/ndk/$NDK_VER/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          CC="$TOOLCHAIN/aarch64-linux-android21-clang"
+          test -x "$CC"
+          "$CC" -shared -fPIC -O2 -fvisibility=hidden -fno-omit-frame-pointer \
+            -Wl,--build-id=sha1 \
+            repairs/native-crash-forensics-2103250/infinity_crash_recorder.c \
+            -o engine/libinfinitycrash.so
+          test -s engine/libinfinitycrash.so
+          file engine/libinfinitycrash.so | tee audit250/crash-recorder-file.txt
+          readelf -h engine/libinfinitycrash.so > audit250/crash-recorder-elf-header.txt
+          readelf -n engine/libinfinitycrash.so > audit250/crash-recorder-elf-notes.txt
+          readelf -Ws engine/libinfinitycrash.so > audit250/crash-recorder-symbols.txt
+          sha256sum engine/libinfinitycrash.so > audit250/crash-recorder-sha256.txt
+          grep -Fq 'Build ID:' audit250/crash-recorder-elf-notes.txt
+          grep -Fq 'infinity_crash_recorder_install' audit250/crash-recorder-symbols.txt
+
+      - name: Static safety audit of fatal-signal recorder
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          c=Path('repairs/native-crash-forensics-2103250/infinity_crash_recorder.c').read_text()
+          m=re.search(r'static void crash_handler\([^)]*\)\s*\{',c); assert m
+          i=m.end()-1; d=0
+          while i<len(c):
+              if c[i]=='{': d+=1
+              elif c[i]=='}':
+                  d-=1
+                  if d==0: break
+              i+=1
+          body=c[m.start():i+1]
+          for bad in ('malloc(','calloc(','realloc(','free(','snprintf(','printf(','fprintf(',
+                      '_Unwind_Backtrace','backtrace(','JNIEnv','dladdr('):
+              assert bad not in body,bad
+          for good in ('write(g_crash_fd','restore_and_reraise','__NR_gettid','fault_address=',
+                       'pc=','sp=','fp=','lr=','native_engine_sha256='):
+              assert good in body,good
+          assert 'SA_SIGINFO | SA_ONSTACK' in c
+          assert 'sigaction(g_signals[i], &action, &g_previous[i])' in c
+          assert '__NR_tgkill' in c
+          print('PASS: bounded recorder chains back to Android and avoids unsafe unwinding/heap/JNI')
+          PY
+
+      - name: Build and permanently sign 2103250 instrumentation APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk baseline229/packaging-base.apk \
+            --build-dir build250 \
+            --out signed250
+
+      - name: Verify candidate against exact locked 2103229
+        run: |
+          set -euo pipefail
+          python3 repairs/native-crash-forensics-2103250/verify.py \
+            --parent baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk \
+            --candidate signed250/Infinity-1.0.9-Native-Crash-Forensics-RC1.apk \
+            --audit signed250/background-resume-apk-audit.json \
+            --source shell-kodi \
+            --recorder engine/libinfinitycrash.so \
+            --recorder-source repairs/native-crash-forensics-2103250/infinity_crash_recorder.c \
+            --signing signed250/signing-verification.txt \
+            --badging signed250/badging.txt \
+            --out audit250
+
+      - name: Create device test instructions
+        run: |
+          cat > signed250/DEVICE-TEST-NATIVE-FORENSICS.txt <<'EOF'
+          INFINITY 2103250 NATIVE CRASH FORENSICS — DEVICE TEST
+
+          PURPOSE
+          This APK does NOT claim to fix the current SIGSEGV. It captures enough exact evidence
+          on the next fatal native crash to identify PID/TID/signal/fault address/program counter,
+          resolve the PC to a loaded native module offset, correlate Android exit history and
+          preserve Android tombstone/trace data when the platform exposes it.
+
+          PAIRING
+          Install Kodi Health Center 2.5.8 Native Incident Correlation candidate after updating APK.
+
+          PROCEDURE
+          1. Update-install the APK. Do not uninstall or clear app data.
+          2. Confirm normal Infinity startup/playback before crash reproduction.
+          3. In Health Center press Start Fresh once.
+          4. Reproduce the native crash using the same steps that previously triggered it.
+          5. Reopen Infinity. Do NOT press Start Fresh again.
+          6. Immediately export Health Center diagnostics.
+          7. Send the exported ZIP for symbol correlation/root-cause analysis.
+
+          EXPECTED NEW EVIDENCE
+          - native-incident-correlation.json
+          - android-exit-info.json with trace_request_attempted
+          - app-owned native_crash_record with PID/TID/signal/fault/PC/SP/FP/LR
+          - native_pc_resolution with module + module_offset when maps are retained
+          - lifecycle-breadcrumbs.jsonl and controlled process_state_summary
+          - Android tombstone protobuf when the OS exposes it
+
+          SAFETY / ACCEPTANCE
+          The locked 2103229 source/runtime remains the rollback reference. This candidate preserves
+          the exact 2103209 libkodi.so engine and adds one isolated diagnostic companion .so only.
+          Do not lock this candidate until basic device startup and one diagnostic export pass.
+          EOF
+          cp audit250/verification.json signed250/2103250-verification.json
+          cp audit250/scope.json signed250/2103250-scope.json
+          cp repairs/native-crash-forensics-2103250/AUDIT.md signed250/AUDIT.md
+
+      - name: Publish TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103250-Native-Crash-Forensics-TEST-CANDIDATE
+          path: signed250/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve complete forensic build evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103250-Native-Crash-Forensics-Evidence
+          path: |
+            audit250/
+            engine/background-resume-source.json
+            engine/libinfinitycrash.so
+            repairs/native-crash-forensics-2103250/
+            signed250/*.json
+            signed250/*.txt
+          if-no-files-found: warn
+          retention-days: 90
