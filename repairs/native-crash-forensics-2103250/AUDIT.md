@@ -1,23 +1,20 @@
-# Infinity 2103250 — Native Crash Forensics instrumentation
+# Infinity 2103252 — Native Crash Forensics RC3
 
 ## Scope
-This is diagnostic instrumentation only, branched from the exact locked mobile/Cobra runtime 2103229. It does **not** claim the user's SIGSEGV is fixed.
+Diagnostic instrumentation only, still anchored to exact locked mobile/Cobra runtime 2103229. It does **not** claim the user's SIGSEGV is fixed.
 
-## Why
-A fresh Health Center incident after Start Fresh captured Android `REASON_SIGNALED` / signal 11 (`SIGSEGV`) for the new process, but Android did not expose a matching tombstone. The existing collector only requested traces for ANR / `REASON_CRASH_NATIVE`, leaving the fatal-signal case without an exact native frame.
+## Evidence from RC2 device test
+Health Center 2.5.8 confirmed a new post-baseline SIGSEGV for PID 23598 on versionCode 2103251. Lifecycle breadcrumbs prove RC2 loaded the crash recorder after Kodi/NativeActivity onCreate, but the exported native-crash-last.txt was zero bytes.
 
-## Delta
-- Exact `libkodi.so` stays byte-identical to the locked Python 3.11 GIL-stability engine.
-- Add one isolated `libinfinitycrash.so` diagnostic companion loaded before libkodi.
-- On SIGSEGV/SIGABRT/SIGBUS/SIGILL/SIGFPE, write a bounded async-signal-safe register record and then restore/re-raise to Android so platform crash handling remains owner.
-- Preserve PID/TID, signal, `si_code`, fault address, PC, SP, FP, LR, PSTATE, timestamp and exact native-engine SHA.
-- Preserve `/proc/self/maps` for module-offset resolution.
-- Record privacy-safe Activity lifecycle breadcrumbs and `ApplicationExitInfo` process-state summary.
-- Attempt `getTraceInputStream()` for fatal `REASON_SIGNALED` exits as well as documented native crashes, while explicitly recording null platform results.
-- Correlate app-owned native crash record to Android exit history by PID/timestamp.
+Binary/source audit found the persistence defect: the recorder constructor opened native-crash-last.txt with O_TRUNC on every normal app start. Reopening Infinity after the crash therefore erased the previous-process record before the asynchronous Java collector could preserve it.
 
-## Explicitly unchanged
-Playback/native engine, providers, timeshift, Multi-View behavior, skin, Command Center, user data and provider data.
+## RC3 correction
+- Keep the corrected RC2 signal-handler install order (after Kodi/NativeActivity onCreate).
+- Open native-crash-last.txt without O_TRUNC so a normal restart cannot destroy crash evidence.
+- Only after a *new fatal signal has entered the signal handler*, atomically clear the old slot with async-signal-safe ftruncate/lseek and write the new bounded register record.
+- Continue to restore/re-raise the fatal signal to Android after recording.
+- Keep exact locked libkodi.so byte-identical.
+- No playback, provider, timeshift, Multi-View, skin, Command Center, or Health Center behavior changes.
 
 ## Acceptance
-Automated checks can prove preservation and instrumentation integrity. A physical crash reproduction + Health Center 2.5.8 export is required before the actual native root cause can be identified.
+CI must prove the startup open path cannot truncate the crash slot and that ftruncate/lseek/write/fsync occur only in the fatal handler. Physical device verification is still required before promoting anything.
