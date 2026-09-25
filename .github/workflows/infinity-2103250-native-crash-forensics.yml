@@ -94,12 +94,12 @@ jobs:
       - name: Build isolated native crash-recorder companion
         run: |
           set -euo pipefail
-          TOOLCHAIN="$ANDROID_HOME/ndk/$NDK_VER/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          base64 -d /tmp/infinity_crash_recorder.c.gz.b64 | gunzip > /tmp/infinity_crash_recorder.c\n          TOOLCHAIN="$ANDROID_HOME/ndk/$NDK_VER/toolchains/llvm/prebuilt/linux-x86_64/bin"
           CC="$TOOLCHAIN/aarch64-linux-android21-clang"
           test -x "$CC"
           "$CC" -shared -fPIC -O2 -fvisibility=hidden -fno-omit-frame-pointer \
             -Wl,--build-id=sha1 \
-            repairs/native-crash-forensics-2103250/infinity_crash_recorder.c \
+            /tmp/infinity_crash_recorder.c \
             -o engine/libinfinitycrash.so
           test -s engine/libinfinitycrash.so
           file engine/libinfinitycrash.so | tee audit250/crash-recorder-file.txt
@@ -116,7 +116,7 @@ jobs:
           python3 - <<'PY'
           import re
           from pathlib import Path
-          c=Path('repairs/native-crash-forensics-2103250/infinity_crash_recorder.c').read_text()
+          c=Path('/tmp/infinity_crash_recorder.c').read_text()
           m=re.search(r'static void crash_handler\([^)]*\)\s*\{',c); assert m
           i=m.end()-1; d=0
           while i<len(c):
@@ -161,7 +161,7 @@ jobs:
             --audit signed250/background-resume-apk-audit.json \
             --source shell-kodi \
             --recorder engine/libinfinitycrash.so \
-            --recorder-source repairs/native-crash-forensics-2103250/infinity_crash_recorder.c \
+            --recorder-source /tmp/infinity_crash_recorder.c \
             --signing signed250/signing-verification.txt \
             --badging signed250/badging.txt \
             --out audit250
