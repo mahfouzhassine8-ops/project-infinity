@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Verify the 2103251 crash-forensics RC2 APK against exact locked 2103229."""
+"""Verify the 2103252 crash-forensics RC3 APK against exact locked 2103229."""
 from __future__ import annotations
 import argparse, hashlib, json, re, subprocess, zipfile
 from pathlib import Path
 
-VERSION=2103251
-NAME='1.0.9-Native-Crash-Forensics-RC2'
+VERSION=2103252
+NAME='1.0.9-Native-Crash-Forensics-RC3'
 PARENT_SHA='3a80480e300bafc6071aed7f494cc6b3a96a79f7e1e4dcb9ae87fe36c9a707f5'
 NATIVE_SHA='db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375'
 SIGNER='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
@@ -111,12 +111,16 @@ def main():
     for forbidden in ('malloc(','calloc(','realloc(','free(','snprintf(','printf(','fprintf(',
                       '_Unwind_Backtrace','backtrace(','JNIEnv','dladdr('):
         req(forbidden not in body,'unsafe crash-handler call/token: '+forbidden)
-    for required in ('write(g_crash_fd','restore_and_reraise','__NR_gettid','fault_address=',
+    for required in ('ftruncate(g_crash_fd, 0)','lseek(g_crash_fd, 0, SEEK_SET)','write(g_crash_fd','restore_and_reraise','__NR_gettid','fault_address=',
                      'pc=','sp=','fp=','lr=','native_engine_sha256='):
         req(required in body,'crash-handler evidence token missing: '+required)
     req('SA_SIGINFO | SA_ONSTACK' in c,'altstack signal handler contract missing')
     req('sigaction(g_signals[i], &action, &g_previous[i])' in c,'previous signal handler not preserved')
     req('__NR_tgkill' in c,'fatal signal not re-raised to Android')
+    req('g_crash_fd = open(crash_path, O_WRONLY | O_CREAT | O_CLOEXEC, 0600);' in c,
+        'crash record must survive normal process restart')
+    req('g_crash_fd = open(crash_path, O_WRONLY | O_CREAT | O_TRUNC' not in c,
+        'startup must not truncate previous native crash evidence')
 
     note=subprocess.run(['readelf','-n',str(a.recorder)],capture_output=True,text=True,check=True).stdout
     syms=subprocess.run(['readelf','-Ws',str(a.recorder)],capture_output=True,text=True,check=True).stdout
