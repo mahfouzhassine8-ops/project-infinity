@@ -3,7 +3,7 @@ name: Infinity | 2103252 Native Crash Forensics RC3
 on:
   workflow_dispatch:
   push:
-    branches: [infinity-cobra-2103252-native-crash-forensics-rc2]
+    branches: [infinity-cobra-2103252-native-crash-forensics-rc3]
     paths:
       - '.github/workflows/infinity-2103250-native-crash-forensics.yml'
       - 'repairs/native-crash-forensics-2103250/**'
