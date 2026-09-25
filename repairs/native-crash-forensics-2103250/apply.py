@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""2103250: crash-forensics-only delta over exact locked 2103229 source."""
+"""2103252: crash-forensics RC3 delta over exact locked 2103229 source."""
 from __future__ import annotations
 import argparse, hashlib, json
 from pathlib import Path
 
-VERSION = 2103251
+VERSION = 2103252
 OLD_VERSION = 2103229
 OLD_NAME = "1.0.9-Cobra-MultiView-Stability-Fill-RC1"
-NEW_NAME = "1.0.9-Native-Crash-Forensics-RC2"
+NEW_NAME = "1.0.9-Native-Crash-Forensics-RC3"
 NATIVE_ENGINE_SHA = "db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375"
 PARENT_APK_SHA = "3a80480e300bafc6071aed7f494cc6b3a96a79f7e1e4dcb9ae87fe36c9a707f5"
 PACKAGING_BASE_SHA = "9bda7a49c38dcfd7c67b548ed38c661ddb44ca7434fbb2c69ce48dd7554dab7f"
@@ -187,11 +187,11 @@ def patch_identity(root: Path, shell: Path) -> None:
     p = once(p, old_runtime, new_runtime, "runtime proof")
     p = p.replace(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1-unsigned.apk",
-        "Infinity-1.0.9-Native-Crash-Forensics-RC2-unsigned.apk",
+        "Infinity-1.0.9-Native-Crash-Forensics-RC3-unsigned.apk",
     )
     p = p.replace(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk",
-        "Infinity-1.0.9-Native-Crash-Forensics-RC2.apk",
+        "Infinity-1.0.9-Native-Crash-Forensics-RC3.apk",
     )
     req(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1" not in p,
