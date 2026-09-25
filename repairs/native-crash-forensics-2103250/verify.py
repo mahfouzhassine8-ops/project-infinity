@@ -81,7 +81,7 @@ def main():
                     req(old.read(n)==new.read(n),'asset/resource changed: '+n)
         req(old.read('resources.arsc')==new.read('resources.arsc'),'resources.arsc changed')
         joined=b''.join(new.read(n) for n in nn if DEX.fullmatch(n))
-        for token in (b'nativeCrashRecorder.loaded.afterKodi',b'nativeCrashRecorder.unavailable.afterKodi',
+        for token in (b'nativeCrashRecorder.loaded.afterKodiOnCreate',b'nativeCrashRecorder.unavailable.afterKodi',
                       b'trace_request_attempted',b'process_state_summary',
                       b'native_crash_record',b'native_pc_resolution',b'main.onResume'):
             req(token in joined,'compiled diagnostics token missing: '+repr(token))
@@ -95,11 +95,13 @@ def main():
     main=(a.source/'tools/android/packaging/xbmc/src/Main.java.in').read_text()
     exit_src=(a.source/'tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in').read_text()
     for token in ('System.loadLibrary("infinitycrash")','InfinityExitDiagnostics.snapshotNativeMaps',
-                  'main.onCreate.beforeNative','nativeCrashRecorder.loaded.afterKodi',
+                  'main.onCreate.beforeNative','nativeCrashRecorder.loaded.afterKodiOnCreate',
                   'main.onResume','main.onPause','main.onStop'):
         req(token in main,'Main diagnostic hook missing: '+token)
     req(main.index('System.loadLibrary("@APP_NAME_LC@")') < main.index('System.loadLibrary("infinitycrash")'),
-        'crash recorder must install AFTER Kodi native load so its fatal-signal handlers remain last')
+        'crash recorder must install AFTER Kodi native load')
+    req(main.index('super.onCreate(savedInstanceState);') < main.index('System.loadLibrary("infinitycrash")'),
+        'crash recorder must install AFTER Kodi/NativeActivity onCreate so its fatal-signal handlers remain last')
     for token in ('collector_version", "2"','getProcessStateSummary','trace_request_attempted',
                   'native_crash_record','native_pc_resolution','native-maps-pending-'):
         req(token in exit_src,'collector v2 contract missing: '+token)
