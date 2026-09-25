@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Verify the 2103250 crash-forensics APK against exact locked 2103229."""
+"""Verify the 2103251 crash-forensics RC2 APK against exact locked 2103229."""
 from __future__ import annotations
 import argparse, hashlib, json, re, subprocess, zipfile
 from pathlib import Path
 
-VERSION=2103250
-NAME='1.0.9-Native-Crash-Forensics-RC1'
+VERSION=2103251
+NAME='1.0.9-Native-Crash-Forensics-RC2'
 PARENT_SHA='3a80480e300bafc6071aed7f494cc6b3a96a79f7e1e4dcb9ae87fe36c9a707f5'
 NATIVE_SHA='db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375'
 SIGNER='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
@@ -81,7 +81,7 @@ def main():
                     req(old.read(n)==new.read(n),'asset/resource changed: '+n)
         req(old.read('resources.arsc')==new.read('resources.arsc'),'resources.arsc changed')
         joined=b''.join(new.read(n) for n in nn if DEX.fullmatch(n))
-        for token in (b'nativeCrashRecorder.loaded',b'nativeCrashRecorder.unavailable',
+        for token in (b'nativeCrashRecorder.loaded.afterKodi',b'nativeCrashRecorder.unavailable.afterKodi',
                       b'trace_request_attempted',b'process_state_summary',
                       b'native_crash_record',b'native_pc_resolution',b'main.onResume'):
             req(token in joined,'compiled diagnostics token missing: '+repr(token))
@@ -95,8 +95,11 @@ def main():
     main=(a.source/'tools/android/packaging/xbmc/src/Main.java.in').read_text()
     exit_src=(a.source/'tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in').read_text()
     for token in ('System.loadLibrary("infinitycrash")','InfinityExitDiagnostics.snapshotNativeMaps',
-                  'main.onCreate.beforeNative','main.onResume','main.onPause','main.onStop'):
+                  'main.onCreate.beforeNative','nativeCrashRecorder.loaded.afterKodi',
+                  'main.onResume','main.onPause','main.onStop'):
         req(token in main,'Main diagnostic hook missing: '+token)
+    req(main.index('System.loadLibrary("@APP_NAME_LC@")') < main.index('System.loadLibrary("infinitycrash")'),
+        'crash recorder must install AFTER Kodi native load so its fatal-signal handlers remain last')
     for token in ('collector_version", "2"','getProcessStateSummary','trace_request_attempted',
                   'native_crash_record','native_pc_resolution','native-maps-pending-'):
         req(token in exit_src,'collector v2 contract missing: '+token)
