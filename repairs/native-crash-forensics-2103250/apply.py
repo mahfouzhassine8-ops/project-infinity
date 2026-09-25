@@ -187,11 +187,11 @@ def patch_identity(root: Path, shell: Path) -> None:
     p = once(p, old_runtime, new_runtime, "runtime proof")
     p = p.replace(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1-unsigned.apk",
-        "Infinity-1.0.9-Native-Crash-Forensics-RC1-unsigned.apk",
+        "Infinity-1.0.9-Native-Crash-Forensics-RC2-unsigned.apk",
     )
     p = p.replace(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk",
-        "Infinity-1.0.9-Native-Crash-Forensics-RC1.apk",
+        "Infinity-1.0.9-Native-Crash-Forensics-RC2.apk",
     )
     req(
         "Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1" not in p,
