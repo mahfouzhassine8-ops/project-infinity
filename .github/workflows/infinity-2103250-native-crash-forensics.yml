@@ -82,7 +82,7 @@ jobs:
       - name: Apply crash-forensics-only Android delta
         run: |
           set -euo pipefail
-          base64 -d repairs/native-crash-forensics-2103250/InfinityExitDiagnostics.java.in.gz.b64 | gunzip > /tmp/InfinityExitDiagnostics.java.in
+          cat repairs/native-crash-forensics-2103250/collector_parts/part* | base64 -d | gunzip > /tmp/InfinityExitDiagnostics.java.in
           python3 repairs/native-crash-forensics-2103250/apply.py \
             --root . --shell shell-kodi \
             --collector /tmp/InfinityExitDiagnostics.java.in
