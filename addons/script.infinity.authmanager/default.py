@@ -17,7 +17,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-ADDON = xbmcaddon.Addon()
+ADDON = xbmcaddon.Addon()\nVERSION = "0.1.1"
 PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo("profile"))
 STATE = os.path.join(PROFILE, "authorization-state.json")
 ACCT = "script.module.acctmgr"
@@ -84,9 +84,14 @@ def tail_log(limit=800000):
 
 
 def log_state(service_key, log_text):
-    failures = [p for p in ERROR_PATTERNS.get(service_key, ()) if p in log_text]
-    successes = [p for p in SUCCESS_PATTERNS.get(service_key, ()) if p in log_text]
-    return bool(failures), bool(successes)
+    """Classify by the newest matching marker, not mere presence anywhere in kodi.log."""
+    failure_hits = [(log_text.rfind(p), p) for p in ERROR_PATTERNS.get(service_key, ()) if p in log_text]
+    success_hits = [(log_text.rfind(p), p) for p in SUCCESS_PATTERNS.get(service_key, ()) if p in log_text]
+    newest_failure = max((x[0] for x in failure_hits), default=-1)
+    newest_success = max((x[0] for x in success_hits), default=-1)
+    failed = newest_failure >= 0 and newest_failure > newest_success
+    succeeded = newest_success >= 0 and newest_success > newest_failure
+    return failed, succeeded
 
 
 def snapshot():
@@ -104,6 +109,11 @@ def snapshot():
             status = "Reauthorization required"
         elif all_present and failed:
             status = "Credentials present - refresh failed"
+        elif key == "trakt" and all_present and acct_installed:
+            # AM Lite 1.1.6's own master credential pair exists. We intentionally
+            # do not claim downstream add-ons are healthy until their owner sync/refresh
+            # has been observed; AM Lite remains the credential owner in RC1.
+            status = "Connected (owner)"
         elif all_present:
             status = "Connected"
         elif any_present:
