@@ -65,8 +65,8 @@ jobs:
           assert "action == 'traktAuthAll'" in nd
           assert "action == 'traktReSyncAll'" in nd
 
-          # Regression: tolerate tabs as well as the audited source's spaces.
-          tab_sel=sel.replace('    def create_list(self):','\tdef create_list(self):',1)
+          # Regression: tolerate a valid tab-indented class as well as the audited source's spaces.
+          tab_sel="class tk_list():\n\tdef create_list(self):\n\t\treturn True\n"
           tab_patched,changed=patch_select(tab_sel)
           assert changed
           compile(tab_patched,'trakt_select-tabs.py','exec')
