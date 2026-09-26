@@ -1,0 +1,277 @@
+name: Infinity | 2103254 Python Runtime Native Repair RC1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103254-python-runtime-native-repair-rc1]
+    paths:
+      - '.github/workflows/infinity-2103254-python-runtime-native-repair.yml'
+      - 'scripts/infinity_python_invoker_hardening_v3.py'
+      - 'repairs/python-runtime-2103254/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103254-python-runtime-native-repair-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  BASELINE_RUN: 35820419796
+  BASELINE_ARTIFACT: Infinity-2103229-Exact-Rollback-Before-2103230
+  PARENT_APK_SHA: 3a80480e300bafc6071aed7f494cc6b3a96a79f7e1e4dcb9ae87fe36c9a707f5
+  PACKAGING_BASE_SHA: 9bda7a49c38dcfd7c67b548ed38c661ddb44ca7434fbb2c69ce48dd7554dab7f
+  SOURCE_TAR_SHA: 8ba08a7d0d185145c224b9858839db82446061aabf4843a0b081f2cb5070948a
+  PARENT_ENGINE_SHA: db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375
+
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - name: Checkout isolated native-repair branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Restore matched Kodi 21.3 native dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Reconstruct accepted Kodi 21.3 + Infinity/Cobra native source
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_1.sh
+
+      - name: Reapply protected 2103209 Python 3.11 repair
+        run: |
+          set -euo pipefail
+          mkdir -p engine
+          python3 scripts/infinity_python_invoker_hardening_v2.py apply             --source kodi --receipt engine/pythoninvoker-threadstate-v2-source.json
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+
+      - name: Apply captured 2103254 Python failure and teardown repair
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_python_invoker_hardening_v3.py apply             --source kodi --receipt engine/pythoninvoker-runtime-v3-source.json
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          grep -Fq 'failure callback reached without invoker GIL ownership'             kodi/xbmc/interfaces/python/PythonInvoker.cpp
+          grep -Fq 'PyDict_Clear(modules);' kodi/xbmc/interfaces/python/PythonInvoker.cpp
+          grep -Fq 'bool m_invokerOwnsGil{false};' kodi/xbmc/interfaces/python/PythonInvoker.h
+
+      - name: Full native rebuild
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_2.sh
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk')
+          assert apk.is_file()
+          with zipfile.ZipFile(apk) as z:
+              native=z.read('lib/arm64-v8a/libkodi.so')
+          digest=hashlib.sha256(native).hexdigest()
+          assert digest != 'db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375'
+          proof=json.loads(Path('engine/pythoninvoker-runtime-v3-source.json').read_text())
+          assert proof['schema']==3 and all(proof['checks'].values())
+          proof['rebuilt_native_engine_sha256']=digest
+          Path('engine/pythoninvoker-runtime-v3-source.json').write_text(
+              json.dumps(proof,indent=2,sort_keys=True)+'\n')
+          Path('engine/2103254-native-engine-sha256.txt').write_text(digest+'\n')
+          print('PASS: rebuilt 2103254 native engine',digest)
+          PY
+
+      - name: Preserve rebuilt native engine
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103254-Python-Runtime-Native-Engine
+          path: |
+            engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk
+            engine/pythoninvoker-threadstate-v2-source.json
+            engine/pythoninvoker-threadstate-v2-source.stage1.json
+            engine/pythoninvoker-runtime-v3-source.json
+            engine/2103254-native-engine-sha256.txt
+            engine/gui-render-hardening-source.json
+            engine/live-app-shell-engine.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+  package-audit:
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout isolated native-repair branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install matched Android toolchain
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+
+      - name: Download exact locked 2103229 rollback inputs
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.BASELINE_ARTIFACT }}
+          run-id: ${{ env.BASELINE_RUN }}
+          github-token: ${{ github.token }}
+          path: baseline229
+
+      - name: Download rebuilt 2103254 native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103254-Python-Runtime-Native-Engine
+          path: native254
+
+      - name: Verify exact protected parent
+        run: |
+          set -euo pipefail
+          test "$(sha256sum baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk | cut -d' ' -f1)" = "$PARENT_APK_SHA"
+          test "$(sha256sum baseline229/packaging-base.apk | cut -d' ' -f1)" = "$PACKAGING_BASE_SHA"
+          test "$(sha256sum baseline229/locked-2103229-reconstructed-shell.tar.gz | cut -d' ' -f1)" = "$SOURCE_TAR_SHA"
+          mkdir -p audit254
+          sha256sum baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk             baseline229/packaging-base.apk             baseline229/locked-2103229-reconstructed-shell.tar.gz > audit254/protected-parent.txt
+
+      - name: Restore exact locked 2103229 reconstructed source
+        run: |
+          set -euo pipefail
+          tar -xzf baseline229/locked-2103229-reconstructed-shell.tar.gz
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/Main.java.in | cut -d' ' -f1)" = "ddf18d30c4040369b30e861ded588a53846ff3de319a89a219344771f8db9318"
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityExitDiagnostics.java.in | cut -d' ' -f1)" = "9ad267b3f5e1a9c1c9adbdc120146cc1d93848f4e50e7d0a9953c20f26d1ff94"
+
+      - name: Apply 2103254 Android identity and keep RC4 native recorder
+        run: |
+          set -euo pipefail
+          cat repairs/native-crash-forensics-2103250/collector_parts/part* | base64 -d | gunzip > /tmp/InfinityExitDiagnostics.java.in
+          python3 repairs/python-runtime-2103254/apply_android.py             --root . --shell shell-kodi --collector /tmp/InfinityExitDiagnostics.java.in
+          python3 -m py_compile             repairs/python-runtime-2103254/apply_android.py             repairs/python-runtime-2103254/prepare_native_base.py             repairs/python-runtime-2103254/verify.py
+
+      - name: Build proven RC4 crash-recorder companion
+        run: |
+          set -euo pipefail
+          base64 -d repairs/native-crash-forensics-2103250/infinity_crash_recorder.c.gz.b64 | gunzip > /tmp/infinity_crash_recorder.c
+          TOOLCHAIN="$ANDROID_HOME/ndk/$NDK_VER/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          CC="$TOOLCHAIN/aarch64-linux-android21-clang"
+          "$CC" -shared -fPIC -O2 -fvisibility=hidden -fno-omit-frame-pointer -pthread             -Wl,--build-id=sha1 /tmp/infinity_crash_recorder.c             -o engine/libinfinitycrash.so
+          test -s engine/libinfinitycrash.so
+          readelf -n engine/libinfinitycrash.so > audit254/crash-recorder-notes.txt
+          grep -Fq 'Build ID:' audit254/crash-recorder-notes.txt
+
+      - name: Prepare packaging base with rebuilt libkodi only
+        run: |
+          set -euo pipefail
+          python3 repairs/python-runtime-2103254/prepare_native_base.py             --base baseline229/packaging-base.apk             --engine-apk native254/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk             --out baseline254/packaging-base-native254.apk             --root . --receipt audit254/native-base-proof.json
+          cp native254/pythoninvoker-runtime-v3-source.json audit254/pythoninvoker-runtime-v3-source.json
+
+      - name: Build and permanently sign 2103254 repair APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt               -keystore "$HOME/.android/debug.keystore"               -storepass android -keypass android -alias androiddebugkey               -keyalg RSA -keysize 2048 -validity 10000               -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk baseline254/packaging-base-native254.apk             --build-dir build254             --out signed254
+
+      - name: Verify 2103254 preservation and native repair
+        run: |
+          set -euo pipefail
+          python3 repairs/python-runtime-2103254/verify.py             --parent baseline229/accepted-apk/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk             --candidate signed254/Infinity-1.0.9-Python-Runtime-Native-Repair-RC1.apk             --audit signed254/background-resume-apk-audit.json             --native-proof native254/pythoninvoker-runtime-v3-source.json             --base-proof audit254/native-base-proof.json             --recorder engine/libinfinitycrash.so             --signing signed254/signing-verification.txt             --badging signed254/badging.txt             --out audit254
+          cp audit254/verification.json signed254/2103254-verification.json
+          cp audit254/native-base-proof.json signed254/2103254-native-base-proof.json
+          cp native254/pythoninvoker-runtime-v3-source.json signed254/2103254-python-runtime-source-proof.json
+
+      - name: Create device acceptance instructions
+        run: |
+          cat > signed254/DEVICE-TEST-2103254.txt <<'EOF'
+          INFINITY 2103254 — PYTHON RUNTIME NATIVE REPAIR RC1
+
+          PURPOSE
+          This is the first build in this incident series that changes the actual native engine
+          to repair the captured Python runtime crash path. It keeps the proven RC4 crash recorder
+          temporarily so any remaining SIGSEGV still yields exact PC/fault/module evidence.
+
+          CHANGES
+          - preserve the complete accepted 2103209 Python 3.11 GIL/thread-state repair
+          - prevent failure callback from releasing a GIL the invoker thread does not own
+          - avoid double-acquiring the GIL on caught-exception terminal paths
+          - backport upstream Kodi sub-interpreter teardown ordering (92315ab):
+            error clear -> GC -> module dict clear -> GC -> error clear -> Py_EndInterpreter
+          - no UI/player/provider/timeshift/PiP/Multi-View/skin feature change
+
+          DEVICE TEST
+          1. Update-install; do not uninstall and do not clear data.
+          2. Keep Health Center 2.5.8.
+          3. Do not press Start Fresh.
+          4. Reproduce the same View Options / view-selection / return-to-directory path once.
+          5. If it survives, repeat the open/select/back cycle several times, then normal playback smoke test.
+          6. If it crashes, reopen Infinity and export Health Center immediately; do not Start Fresh.
+
+          This is a TEST CANDIDATE. Do not lock until device acceptance.
+          EOF
+
+      - name: Publish TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103254-Python-Runtime-Native-Repair-RC1-TEST-CANDIDATE
+          path: signed254/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve complete repair evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103254-Python-Runtime-Native-Repair-RC1-Evidence
+          path: |
+            audit254/
+            repairs/python-runtime-2103254/
+            scripts/infinity_python_invoker_hardening_v3.py
+            engine/background-resume-source.json
+            engine/libinfinitycrash.so
+            signed254/*.json
+            signed254/*.txt
+          if-no-files-found: warn
+          retention-days: 90
