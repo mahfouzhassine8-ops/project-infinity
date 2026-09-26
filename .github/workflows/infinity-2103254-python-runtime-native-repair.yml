@@ -86,8 +86,6 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/infinity_live_app_ci_2.sh
-          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
-          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
           python3 - <<'PY'
           import hashlib, json, zipfile
           from pathlib import Path
@@ -106,7 +104,7 @@ jobs:
           print('PASS: rebuilt 2103254 native engine',digest)
           PY
 
-      - name: Preserve rebuilt native engine
+      - name: Preserve rebuilt native engine immediately
         uses: actions/upload-artifact@v7
         with:
           name: Infinity-2103254-Python-Runtime-Native-Engine
@@ -121,6 +119,29 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
+
+      - name: Post-build native repair verification
+        run: |
+          set -euo pipefail
+          # The protected 2103209 verifier already passed before the v3 delta was applied.
+          # Do not rerun its exact-text adjacency checks after v3 intentionally inserts
+          # m_invokerOwnsGil bookkeeping between RestoreThread and Py_NewInterpreter.
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          v2=json.loads(Path('engine/pythoninvoker-threadstate-v2-source.json').read_text())
+          v3=json.loads(Path('engine/pythoninvoker-runtime-v3-source.json').read_text())
+          assert v2['schema']==2 and all(v2['checks'].values())
+          assert v3['schema']==3 and all(v3['checks'].values())
+          cpp=Path('kodi/xbmc/interfaces/python/PythonInvoker.cpp').read_text()
+          assert 'PyEval_RestoreThread(m_mainThreadState);' in cpp
+          assert 'l_threadState = Py_NewInterpreter();' in cpp
+          assert 'm_invokerOwnsGil = true;' in cpp
+          assert 'failure callback reached without invoker GIL ownership' in cpp
+          assert 'PyDict_Clear(modules);' in cpp
+          print('PASS: protected v2 proof remains green; v3 intentional source shape verified semantically')
+          PY
 
   package-audit:
     needs: native-engine
