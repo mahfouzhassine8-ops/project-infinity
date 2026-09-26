@@ -6,7 +6,7 @@ import xbmc, xbmcgui
 
 OWNER="script.module.acctmgr"
 SERVICES=[
- ("⚡ Trakt Everywhere","traktAuth","traktReSync"),
+ ("⚡ Trakt Everywhere","traktAuthAll","traktReSync"),
  ("Real-Debrid Everywhere","realdebridAuth","realdebridReSync"),
  ("Premiumize","premiumizeAuth","premiumizeReSync"),
  ("All-Debrid","alldebridAuth","alldebridReSync"),
