@@ -1,0 +1,75 @@
+name: Infinity | 2103254 Shipping Audit RC1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103254-shipping-audit-rc1]
+    paths:
+      - '.github/workflows/infinity-2103254-shipping-audit.yml'
+      - 'audits/infinity-2103254-shipping/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-shipping-audit-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  source-preservation-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download exact 2103254 candidate without rebuilding the engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103254-Python-Runtime-Native-Repair-RC1-TEST-CANDIDATE
+          run-id: 36210108726
+          github-token: ${{ github.token }}
+          path: audit-input/candidate
+      - name: Preserve and verify exact 2103254 source and APK
+        run: |
+          set -euo pipefail
+          mkdir -p audit-output
+          git merge-base --is-ancestor 84f293d753b863a06c9366d9575b459a9e2992d9 HEAD
+          git archive --format=tar 84f293d753b863a06c9366d9575b459a9e2992d9 | gzip -n > audit-output/2103254-exact-repository.tar.gz
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          path = Path('audit-input/candidate/Infinity-1.0.9-Python-Runtime-Native-Repair-RC1.apk')
+          assert path.is_file(), 'Exact candidate APK is missing'
+          sha = hashlib.sha256(path.read_bytes()).hexdigest()
+          assert sha == 'c526f740f258c48e3a208ccac6659f22995d077ff6a5097fc3d4d6617a51625e', 'Candidate APK identity differs'
+          with zipfile.ZipFile(path) as z:
+              assert z.testzip() is None
+              engine = hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+          assert engine == 'c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+          result = {'schema': 1, 'source_commit': '84f293d753b863a06c9366d9575b459a9e2992d9',
+                    'candidate_apk_sha256': sha, 'native_engine_sha256': engine,
+                    'runtime_changed': False, 'cobra_changed': False,
+                    'device_verified': False, 'shipping_audit_complete': False,
+                    'stage': 'source-preservation-audit',
+                    'note': 'Input preservation and source tests only. Not an APK build or release approval.'}
+          Path('audit-output/input-verification.json').write_text(json.dumps(result, indent=2) + '\n')
+          print(json.dumps(result, indent=2))
+          PY
+      - name: Run isolated audit regression tests when supplied
+        run: |
+          set -euo pipefail
+          if [ -f audits/infinity-2103254-shipping/run_tests.py ]; then
+            python3 audits/infinity-2103254-shipping/run_tests.py
+          else
+            echo 'Regression payload not supplied yet; only input preservation is complete.'
+          fi
+      - name: Publish source preservation evidence, not a new APK
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103254-Shipping-Audit-Source-Evidence
+          path: audit-output/
+          if-no-files-found: error
+          retention-days: 90
