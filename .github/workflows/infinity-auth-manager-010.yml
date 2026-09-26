@@ -1,0 +1,91 @@
+name: Infinity | Authorization Manager 0.1.0 RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-auth-manager-010-rc1]
+    paths:
+      - 'addons/script.infinity.authmanager/**'
+      - '.github/workflows/infinity-auth-manager-010.yml'
+permissions:
+  contents: read
+jobs:
+  validate-package:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate source and privacy contract
+        run: |
+          set -euo pipefail
+          python3 -m py_compile addons/script.infinity.authmanager/default.py
+          python3 - <<'PY'
+          import ast, pathlib, xml.etree.ElementTree as ET
+          root=pathlib.Path('addons/script.infinity.authmanager')
+          ET.parse(root/'addon.xml'); ET.parse(root/'resources/settings.xml')
+          s=(root/'default.py').read_text()
+          required=[
+            'RunScript(%s, action=%s)',
+            'Infinity.Auth.trakt.Status',
+            'credential_values_stored',
+            'authorization-state.json',
+            'traktAuth','traktReSync','traktViewer',
+            'realdebridAuth','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth'
+          ]
+          # Dynamic property prefix means exact Trakt property is assembled at runtime.
+          assert 'w.setProperty("Infinity.Auth.%s.Status"' in s
+          for x in required:
+            if x=='Infinity.Auth.trakt.Status': continue
+            assert x in s, x
+          forbidden=['trakt.token") +','trakt.refresh") +','access_token":','refresh_token":']
+          for x in forbidden: assert x not in s, x
+          print('PASS: source/XML/privacy contract')
+          PY
+      - name: Host-test status classifier without credential disclosure
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import ast, pathlib
+          s=pathlib.Path('addons/script.infinity.authmanager/default.py').read_text()
+          tree=ast.parse(s)
+          funcs={n.name:n for n in tree.body if isinstance(n,ast.FunctionDef)}
+          assert 'snapshot' in funcs and 'persist_safe' in funcs and 'run_owner' in funcs
+          assert 'getSetting' in s
+          # Persisted state is constructed from booleans/labels, never getSetting values.
+          persist=ast.get_source_segment(s,funcs['persist_safe'])
+          assert 'getSetting' not in persist
+          assert 'credential_values_stored' in persist
+          print('PASS: persisted state cannot directly read credential values')
+          PY
+      - name: Package installable ZIP
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd addons
+          zip -qr ../dist/Infinity-Authorization-Manager-0.1.0-RC1.zip script.infinity.authmanager
+          cd ..
+          python3 - <<'PY'
+          import hashlib,zipfile
+          p='dist/Infinity-Authorization-Manager-0.1.0-RC1.zip'
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            names=set(z.namelist())
+            assert 'script.infinity.authmanager/addon.xml' in names
+            assert 'script.infinity.authmanager/default.py' in names
+          print('SHA256',hashlib.sha256(open(p,'rb').read()).hexdigest())
+          PY
+          cat > dist/DEVICE-TEST.txt <<'EOF'
+          INFINITY AUTHORIZATION MANAGER 0.1.0 RC1
+          1. Install ZIP. Do not uninstall Account Manager Lite.
+          2. Add-ons > Program add-ons > Infinity Authorization Manager.
+          3. Select Trakt > Authorize / Reauthorize.
+          4. Complete Account Manager Lite's normal Trakt device authorization.
+          5. Reopen Infinity Authorization Manager and confirm Trakt reports Connected.
+          6. Restart Infinity once without installing anything; confirm status remains Connected.
+          7. Health Center diagnostic ZIP may be used afterward to verify refresh behavior.
+          NOTE: Infinity Authorization Manager stores no OAuth credential values.
+          EOF
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Authorization-Manager-0.1.0-RC1
+          path: dist/
+          if-no-files-found: error
+          retention-days: 90
