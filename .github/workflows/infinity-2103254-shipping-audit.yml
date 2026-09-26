@@ -57,7 +57,7 @@ jobs:
           Path('audit-output/input-verification.json').write_text(json.dumps(result, indent=2) + '\n')
           print(json.dumps(result, indent=2))
           PY
-      - name: Run isolated audit regression tests
+      - name: Run isolated first-batch regression tests
         run: |
           set -euo pipefail
           python3 audits/infinity-2103254-shipping/run_tests.py
@@ -99,6 +99,10 @@ jobs:
           (root/'SOURCE-RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
           print('Pinned public upstream source acquired for review; no credentials, devices or provider APIs accessed.')
           PY
+      - name: Run current 113 offline Health and real-source Trakt regressions
+        run: |
+          set -euo pipefail
+          python3 audits/infinity-2103254-shipping/followup/run_tests.py
       - name: Publish source preservation evidence, not a new APK
         if: always()
         uses: actions/upload-artifact@v7
