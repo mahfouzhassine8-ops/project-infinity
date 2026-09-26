@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.infinity.authmanager" version="0.1.0" name="Infinity Authorization Manager" provider-name="Infinity">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.python.script" library="default.py"><provides>executable</provides></extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Infinity authorization status and service launcher</summary>
+    <description lang="en">Privacy-safe authorization dashboard. Delegates authentication to installed service owners and never stores service credentials.</description>
+    <platform>all</platform>
+    <license>MIT</license>
+  </extension>
+</addon>
