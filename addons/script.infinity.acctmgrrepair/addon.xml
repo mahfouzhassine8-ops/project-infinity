@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.infinity.acctmgrrepair" version="0.1.0" name="Infinity Account Manager Repair" provider-name="Infinity">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.python.script" library="default.py"><provides>executable</provides></extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Targeted Account Manager Lite 1.1.6 Trakt sync repair</summary>
+    <description lang="en">Repairs Trakt refresh-token propagation and adds one-tap all-installed Trakt authorization for Account Manager Lite 1.1.6. Creates a rollback backup before modifying the installed add-on.</description>
+    <platform>all</platform><license>MIT</license>
+  </extension>
+</addon>
