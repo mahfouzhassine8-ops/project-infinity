@@ -17,7 +17,9 @@ jobs:
           import xml.etree.ElementTree as ET
           ET.parse('addons/script.infinity.authsurface/addon.xml')
           s=open('addons/script.infinity.authsurface/default.py').read()
-          assert 'authorize_trakt_everywhere' in s\n          assert 'trakt_sync.Auth().trakt_auth(mode="auth")' in s\n          for x in ['traktAuth','realdebridAuth','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
+          assert 'authorize_trakt_everywhere' in s
+          assert 'trakt_sync.Auth().trakt_auth(mode="auth")' in s
+          for x in ['traktAuth','realdebridAuth','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
               assert x in s,x
           print('PASS')
           PY
