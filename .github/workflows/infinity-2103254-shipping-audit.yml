@@ -57,14 +57,48 @@ jobs:
           Path('audit-output/input-verification.json').write_text(json.dumps(result, indent=2) + '\n')
           print(json.dumps(result, indent=2))
           PY
-      - name: Run isolated audit regression tests when supplied
+      - name: Run isolated audit regression tests
         run: |
           set -euo pipefail
-          if [ -f audits/infinity-2103254-shipping/run_tests.py ]; then
-            python3 audits/infinity-2103254-shipping/run_tests.py
-          else
-            echo 'Regression payload not supplied yet; only input preservation is complete.'
-          fi
+          python3 audits/infinity-2103254-shipping/run_tests.py
+      - name: Acquire hash-pinned AM Lite source for integration review only
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, io, json, urllib.request, zipfile
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          url='https://raw.githubusercontent.com/Zaxxon709/accountmanager/main/script.module.acctmgr-1.1.6.zip'
+          with urllib.request.urlopen(url,timeout=25) as response:
+              data=response.read(6*1024*1024)
+          assert len(data)==5150123, 'Unexpected upstream archive length'
+          blob=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert blob=='b9de2983bd5785c14c9bdf9aabbe12fe9783cbda', 'Upstream archive changed; review must not float'
+          root=Path('audit-output/upstream-review')
+          root.mkdir(parents=True,exist_ok=False)
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+              assert z.testzip() is None
+              manifest=ET.fromstring(z.read('script.module.acctmgr/addon.xml'))
+              assert manifest.get('id')=='script.module.acctmgr' and manifest.get('version')=='1.1.6'
+              paths=['addon.xml','lib/default.py','lib/acctmgr/modules/sync/trakt_sync.py',
+                     'lib/acctmgr/modules/sync/trakt_select.py','lib/acctmgr/modules/auth/trakt.py',
+                     'lib/acctmgr/modules/control.py','lib/acctmgr/modules/var.py']
+              receipt={'source_url':url,'git_blob_sha1':blob,'archive_sha256':hashlib.sha256(data).hexdigest(),
+                       'installed':False,'executed':False,'files':{},'missing':[]}
+              for name in paths:
+                  key='script.module.acctmgr/'+name
+                  if key not in z.namelist():
+                      receipt['missing'].append(name)
+                      continue
+                  raw=z.read(key)
+                  assert len(raw)<=2*1024*1024
+                  destination=root/name
+                  destination.parent.mkdir(parents=True,exist_ok=True)
+                  destination.write_bytes(raw)
+                  receipt['files'][name]=hashlib.sha256(raw).hexdigest()
+          (root/'SOURCE-RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          print('Pinned public upstream source acquired for review; no credentials, devices or provider APIs accessed.')
+          PY
       - name: Publish source preservation evidence, not a new APK
         if: always()
         uses: actions/upload-artifact@v7
