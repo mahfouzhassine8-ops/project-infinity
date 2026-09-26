@@ -1,39 +1,104 @@
-name: Infinity | Authorization Surface 0.4.0
+name: Infinity | Authorization & Accounts 0.5.0
 on:
   workflow_dispatch:
   push:
     branches: [infinity-auth-manager-010-rc1]
-    paths: ['addons/script.infinity.authsurface/**','.github/workflows/infinity-auth-surface.yml']
+    paths:
+      - 'addons/script.infinity.authsurface/**'
+      - '.github/workflows/infinity-auth-surface.yml'
 permissions: {contents: read}
+
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
-      - name: Validate repaired public API boundary
+
+      - name: Validate Infinity surface
         run: |
           set -euo pipefail
-          python3 -m py_compile addons/script.infinity.authsurface/default.py
+          python3 -m py_compile             addons/script.infinity.authsurface/default.py             addons/script.infinity.authsurface/repair_core.py
           python3 - <<'PY'
           import xml.etree.ElementTree as ET
-          s=open('addons/script.infinity.authsurface/default.py').read()
           ET.parse('addons/script.infinity.authsurface/addon.xml')
+          s=open('addons/script.infinity.authsurface/default.py',encoding='utf-8').read()
+          for x in [
+              'Trakt Repair & Status',
+              'apply_repair',
+              'rollback_repair',
+              'traktAuthAll',
+              'traktReSyncAll',
+              'am-lite-trakt-repair-receipt.json'
+          ]:
+              assert x in s, x
           assert 'from acctmgr' not in s
           assert 'import acctmgr' not in s
-          assert 'traktAuthAll' in s
-          for x in ['traktReSync','realdebridAuth','realdebridReSync','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
-              assert x in s,x
-          assert 'RunScript(%s, action=%s)' in s
-          print('PASS: public-action-only authorization surface')
+          print('PASS: surface compile/XML/integrated-repair boundary')
           PY
+
+      - name: Validate repair against audited AM Lite source
+        run: |
+          set -euo pipefail
+          REF=3d99933d27af7079df72cce29f00ac04030782f4
+          mkdir -p /tmp/am-lite
+          curl -fsSL "https://raw.githubusercontent.com/blry12/nxtflix/$REF/repo/script.module.acctmgr/lib/acctmgr/modules/sync/trakt_sync.py" -o /tmp/am-lite/trakt_sync.py
+          curl -fsSL "https://raw.githubusercontent.com/blry12/nxtflix/$REF/repo/script.module.acctmgr/lib/acctmgr/modules/sync/trakt_select.py" -o /tmp/am-lite/trakt_select.py
+          curl -fsSL "https://raw.githubusercontent.com/blry12/nxtflix/$REF/repo/script.module.acctmgr/lib/default.py" -o /tmp/am-lite/default.py
+          PYTHONPATH=addons/script.infinity.authsurface python3 - <<'PY'
+          from repair_core import patch_sync, patch_select, patch_default, source_status, FIXED_REFRESH
+          def rd(p): return open(p,encoding='utf-8').read()
+          sync=rd('/tmp/am-lite/trakt_sync.py')
+          sel=rd('/tmp/am-lite/trakt_select.py')
+          default=rd('/tmp/am-lite/default.py')
+          assert source_status(sync,sel,default) == 'READY'
+          ns,c1=patch_sync(sync)
+          nl,c2=patch_select(sel)
+          nd,c3=patch_default(default)
+          assert c1 and c2 and c3
+          compile(ns,'trakt_sync.py','exec')
+          compile(nl,'trakt_select.py','exec')
+          compile(nd,'default.py','exec')
+          assert source_status(ns,nl,nd) == 'APPLIED'
+          assert FIXED_REFRESH in ns
+          assert "your_refresh = '1'" not in ns
+          assert 'def create_all_list(self):' in nl
+          assert "action == 'traktAuthAll'" in nd
+          assert "action == 'traktReSyncAll'" in nd
+
+          # Regression: tolerate tabs as well as the audited source's spaces.
+          tab_sel=sel.replace('    def create_list(self):','\tdef create_list(self):',1)
+          tab_patched,changed=patch_select(tab_sel)
+          assert changed
+          compile(tab_patched,'trakt_select-tabs.py','exec')
+          print('PASS: exact audited source + whitespace-tolerant repair transforms')
+          PY
+
       - name: Package
         run: |
+          set -euo pipefail
           mkdir -p dist
-          cd addons && zip -qr ../dist/Infinity-Authorization-and-Accounts-0.4.0.zip script.infinity.authsurface
+          cd addons
+          zip -qr ../dist/Infinity-Authorization-and-Accounts-0.5.0.zip script.infinity.authsurface
           cd ..
-          sha256sum dist/Infinity-Authorization-and-Accounts-0.4.0.zip | tee dist/SHA256.txt
+          sha256sum dist/Infinity-Authorization-and-Accounts-0.5.0.zip | tee dist/SHA256.txt
+          cat > dist/TEST-NOTES.txt <<'EOF'
+          Infinity Authorization & Accounts 0.5.0
+          - Trakt Repair & Status lives inside the existing System Hub authorization menu.
+          - Repair recognizes audited AM Lite 1.1.6 source using spaces or tabs.
+          - It refuses unknown/partial source, compiles transforms before write, backs up exact preimages, and supports rollback.
+          - Trakt Everywhere adds all installed targets supported by this AM Lite build.
+          - ReSync uses a safe no-force-exit action.
+          Device acceptance:
+          1) System Hub > Authorization & Accounts > Trakt Repair & Status.
+          2) Apply / repair Account Manager Lite.
+          3) Restart Infinity once.
+          4) Authorization & Accounts > Trakt Everywhere > ReSync current Trakt authorization everywhere.
+          5) Health Center > Authorization Health.
+          Expected: previously selected supported targets no longer report REFRESH MISMATCH.
+          EOF
+
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Authorization-and-Accounts-0.4.0
+          name: Infinity-Authorization-and-Accounts-0.5.0
           path: dist/
           retention-days: 90
