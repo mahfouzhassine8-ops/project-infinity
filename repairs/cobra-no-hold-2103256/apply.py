@@ -76,6 +76,11 @@ def apply(root: Path, evidence: Path) -> dict:
         config = once(config, a, b)
     changes['scripts/infinity_background_resume.py'] = config
     pack = changes['scripts/package_background_resume.py']
+    # writestr mutates ZipInfo.header_offset. Do not corrupt the input archive's
+    # cached offsets: it is reread below to validate the retained recorder.
+    pack = once(pack, 'import argparse\n', 'import argparse\nimport copy\n')
+    pack = once(pack, 'z.writestr(info,a.read(n))', 'z.writestr(copy.copy(info),a.read(n))')
+    pack = once(pack, 'z.writestr(info,b.read(n))', 'z.writestr(copy.copy(info),b.read(n))')
     # The parent already contains the recorder. Verify/reuse it rather than append a duplicate ZIP entry.
     pack = once(pack,
         '        z.write(recorder, CRASH_RECORDER_APK_PATH, compress_type=zipfile.ZIP_STORED)',

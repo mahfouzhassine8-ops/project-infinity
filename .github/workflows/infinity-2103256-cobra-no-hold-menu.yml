@@ -61,6 +61,10 @@ jobs:
           set -euo pipefail
           python3 repairs/cobra-no-hold-2103256/apply.py --root . --evidence audit256
           python3 repairs/cobra-no-hold-2103256/test_gesture.py --source shell-kodi --evidence audit256
+      - name: Test exact parent APK merge and retained recorder before compilation
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-no-hold-2103256/test_packaging.py --root . --parent parent255/Infinity-1.0.9-Infinity-Shipping-Audit-Lifecycle-RC2.apk --evidence audit256
       - name: Prepare matched Android toolchain
         run: |
           sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
@@ -98,9 +102,11 @@ jobs:
           assert source['android_source_delta']==['tools/android/packaging/xbmc/build.gradle.in','tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in']
           tests=json.loads(Path('audit256/gesture-tests.json').read_text())
           assert tests['java_callback_assertions']==18 and tests['source_diff_exact']
+          packaging=json.loads(Path('audit256/packaging-tests.json').read_text())
+          assert packaging['packaging_regressions']==8 and packaging['uses_real_dex_parser']
           result=json.loads(Path('signed256/background-resume-apk-audit.json').read_text())
           assert result['version_code']==2103256
-          result.update(protected_apk_members_byte_identical=len(old), java_callback_assertions=18,
+          result.update(protected_apk_members_byte_identical=len(old), java_callback_assertions=18, packaging_regressions=8,
               functional_delta='Cobra fullscreen video hold no longer opens any menu',
               channels_button_preserved=True, channel_quickpeek_preserved=True,
               infinity_skin_and_companions_changed=False, native_recompiled=False,
