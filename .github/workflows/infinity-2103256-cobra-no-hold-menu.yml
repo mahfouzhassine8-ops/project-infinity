@@ -1,0 +1,130 @@
+name: Infinity | 2103256 Cobra No Hold Menu RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103256-no-video-hold-menu-rc1]
+    paths:
+      - '.github/workflows/infinity-2103256-cobra-no-hold-menu.yml'
+      - 'repairs/cobra-no-hold-2103256/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-cobra-no-hold-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  android-package-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Download exact locked 2103255 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103255-Shipping-Lifecycle-RC2-TEST-CANDIDATE
+          run-id: 36230424118
+          github-token: ${{ github.token }}
+          path: parent255
+      - name: Download exact reconstructed 2103255 source
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103255-Shipping-Lifecycle-RC2-Evidence
+          run-id: 36230424118
+          github-token: ${{ github.token }}
+          path: source255
+      - name: Verify exact parent and reuse unchanged engine and recorder
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source255/reconstructed-2103255-shell.tar.gz | cut -d' ' -f1)" = 'a5d3681d789c52342abc9fb8ab8460b6d6455db5c8deeb8dda1928fa996a12a4'
+          test "$(sha256sum parent255/Infinity-1.0.9-Infinity-Shipping-Audit-Lifecycle-RC2.apk | cut -d' ' -f1)" = '273c7d0a88196cd9f00121b51fe5ac54a4328558c34d5c3c79a74e85a29176be'
+          tar -xzf source255/reconstructed-2103255-shell.tar.gz
+          python3 - <<'PY'
+          import hashlib, zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent255/Infinity-1.0.9-Infinity-Shipping-Audit-Lifecycle-RC2.apk') as z:
+              assert z.testzip() is None
+              assert len(z.namelist()) == len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest() == 'c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Remove video hold action only and test actual callback statements
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-no-hold-2103256/apply.py --root . --evidence audit256
+          python3 repairs/cobra-no-hold-2103256/test_gesture.py --source shell-kodi --evidence audit256
+      - name: Prepare matched Android toolchain
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+      - name: Compile Android shell and permanently sign 2103256 candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent255/Infinity-1.0.9-Infinity-Shipping-Audit-Lifecycle-RC2.apk --build-dir build256 --out signed256
+      - name: Verify final APK inventory, native bytes and exact source scope
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, sys, zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import dex_contract, DEX, SIGNATURE
+          parent=Path('parent255/Infinity-1.0.9-Infinity-Shipping-Audit-Lifecycle-RC2.apk')
+          candidate=Path('signed256/Infinity-2103256-Cobra-No-Hold-Menu-RC1.apk')
+          with zipfile.ZipFile(parent) as a, zipfile.ZipFile(candidate) as b:
+              assert b.testzip() is None and len(b.namelist())==len(set(b.namelist()))
+              keep=lambda n:n!='AndroidManifest.xml' and not DEX.fullmatch(n) and not SIGNATURE.fullmatch(n)
+              old={n for n in a.namelist() if keep(n)}; new={n for n in b.namelist() if keep(n)}
+              assert old==new
+              for n in old: assert a.read(n)==b.read(n), n
+              assert dex_contract(a)[0]==dex_contract(b)[0]
+          source=json.loads(Path('audit256/source-verification.json').read_text())
+          assert source['android_source_delta']==['tools/android/packaging/xbmc/build.gradle.in','tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in']
+          tests=json.loads(Path('audit256/gesture-tests.json').read_text())
+          assert tests['java_callback_assertions']==18 and tests['source_diff_exact']
+          result=json.loads(Path('signed256/background-resume-apk-audit.json').read_text())
+          assert result['version_code']==2103256
+          result.update(protected_apk_members_byte_identical=len(old), java_callback_assertions=18,
+              functional_delta='Cobra fullscreen video hold no longer opens any menu',
+              channels_button_preserved=True, channel_quickpeek_preserved=True,
+              infinity_skin_and_companions_changed=False, native_recompiled=False,
+              device_verified=False, historical_fdset_fixed=False, stable_lock=False,
+              final_stage='android-package-audit')
+          Path('signed256/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed256/SHA256SUMS.txt').write_text(hashlib.sha256(candidate.read_bytes()).hexdigest()+'  '+candidate.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+          tar -czf audit256/reconstructed-2103256-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          cp -r repairs/cobra-no-hold-2103256 audit256/repair-source
+      - name: Publish signed TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103256-Cobra-No-Hold-Menu-RC1-TEST-CANDIDATE
+          path: signed256/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Preserve source, exact diff and callback test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103256-Cobra-No-Hold-Menu-RC1-Evidence
+          path: audit256/
+          if-no-files-found: error
+          retention-days: 90
