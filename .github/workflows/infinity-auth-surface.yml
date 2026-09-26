@@ -1,4 +1,4 @@
-name: Infinity | Authorization Surface 0.3.0
+name: Infinity | Authorization Surface 0.4.0
 on:
   workflow_dispatch:
   push:
@@ -10,30 +10,30 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
-      - name: Validate public API boundary
+      - name: Validate repaired public API boundary
         run: |
           set -euo pipefail
           python3 -m py_compile addons/script.infinity.authsurface/default.py
           python3 - <<'PY'
           import xml.etree.ElementTree as ET
-          p='addons/script.infinity.authsurface/default.py'
-          s=open(p).read()
+          s=open('addons/script.infinity.authsurface/default.py').read()
           ET.parse('addons/script.infinity.authsurface/addon.xml')
           assert 'from acctmgr' not in s
           assert 'import acctmgr' not in s
-          for x in ['traktAuth','traktReSync','realdebridAuth','realdebridReSync','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
+          assert 'traktAuthAll' in s
+          for x in ['traktReSync','realdebridAuth','realdebridReSync','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
               assert x in s,x
           assert 'RunScript(%s, action=%s)' in s
-          print('PASS: compile/XML/public AM Lite action boundary')
+          print('PASS: public-action-only authorization surface')
           PY
       - name: Package
         run: |
           mkdir -p dist
-          cd addons && zip -qr ../dist/Infinity-Authorization-and-Accounts-0.3.0.zip script.infinity.authsurface
+          cd addons && zip -qr ../dist/Infinity-Authorization-and-Accounts-0.4.0.zip script.infinity.authsurface
           cd ..
-          sha256sum dist/Infinity-Authorization-and-Accounts-0.3.0.zip | tee dist/SHA256.txt
+          sha256sum dist/Infinity-Authorization-and-Accounts-0.4.0.zip | tee dist/SHA256.txt
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Authorization-and-Accounts-0.3.0
+          name: Infinity-Authorization-and-Accounts-0.4.0
           path: dist/
-          retention-days: 90 # rc3
+          retention-days: 90
