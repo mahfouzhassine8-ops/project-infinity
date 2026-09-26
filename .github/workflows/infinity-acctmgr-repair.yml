@@ -22,7 +22,7 @@ jobs:
           ET.parse('addons/script.infinity.acctmgrrepair/resources/settings.xml')
           for x in [
               "your_refresh = '1'",
-              'your_refresh = acctmgr.getSetting("trakt.refresh")',
+              'new="your_refresh = acctmgr.getSetting(\\\"trakt.refresh\\\")"',
               "def create_all_list(self):",
               "action == 'traktAuthAll'",
               "trakt_sync.Auth().trakt_auth(mode=\"auth\")",
