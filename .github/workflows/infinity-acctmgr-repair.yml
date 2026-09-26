@@ -1,0 +1,71 @@
+name: Infinity | AM Lite Trakt Repair 0.1.0
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-auth-manager-010-rc1]
+    paths: ['addons/script.infinity.acctmgrrepair/**','.github/workflows/infinity-acctmgr-repair.yml']
+permissions: {contents: read}
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate repair add-on
+        run: |
+          set -euo pipefail
+          python3 -m py_compile addons/script.infinity.acctmgrrepair/default.py
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          p='addons/script.infinity.acctmgrrepair/default.py'
+          s=open(p).read()
+          ET.parse('addons/script.infinity.acctmgrrepair/addon.xml')
+          ET.parse('addons/script.infinity.acctmgrrepair/resources/settings.xml')
+          for x in [
+              "your_refresh = '1'",
+              'your_refresh = acctmgr.getSetting("trakt.refresh")',
+              "def create_all_list(self):",
+              "action == 'traktAuthAll'",
+              "trakt_sync.Auth().trakt_auth(mode=\"auth\")",
+              "repair-receipt.json",
+              "rollback"
+          ]:
+              assert x in s,x
+          assert 'No tokens are read, logged, exported or copied by this repair add-on.' in s
+          print('PASS: repair source/XML/rollback contract')
+          PY
+      - name: Host-test exact transformation anchors
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import ast,re
+          s=open('addons/script.infinity.acctmgrrepair/default.py').read()
+          # Ensure the repair itself compiles and its transformation anchors are bounded.
+          ast.parse(s)
+          assert s.count("old=\"your_refresh = '1'\"")==1
+          assert s.count('anchor="class tk_list():\\n\\tdef create_list(self):"')==1
+          assert s.count('anchor="elif action == \'traktAuth\':"')==1
+          print('PASS: bounded exact preimage anchors')
+          PY
+      - name: Package
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd addons && zip -qr ../dist/Infinity-Account-Manager-Lite-1.1.6-Trakt-Repair-0.1.0.zip script.infinity.acctmgrrepair
+          cd ..
+          sha256sum dist/Infinity-Account-Manager-Lite-1.1.6-Trakt-Repair-0.1.0.zip | tee dist/SHA256.txt
+          cat > dist/DEVICE-TEST.txt <<'EOF'
+          1. Keep Account Manager Lite 1.1.6 installed.
+          2. Install this repair ZIP and run Infinity Account Manager Repair > Apply Trakt Sync Repair.
+          3. Restart Infinity once.
+          4. Install/update Infinity Authorization & Accounts 0.4.0.
+          5. System Hub > Authorization & Accounts > Trakt Everywhere > Authorize / Reauthorize.
+          6. Complete Trakt authorization once.
+          7. Restart Infinity once.
+          8. Health Center > Authorization Health, then Send Logs for Help.
+          Acceptance: selected installed targets no longer show REFRESH MISMATCH.
+          EOF
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-AM-Lite-Trakt-Repair-0.1.0
+          path: dist/
+          retention-days: 90
