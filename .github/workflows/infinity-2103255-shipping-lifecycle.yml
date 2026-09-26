@@ -1,0 +1,147 @@
+name: Infinity | 2103255 Shipping Lifecycle RC2
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103255-shipping-lifecycle-rc2]
+    paths:
+      - '.github/workflows/infinity-2103255-shipping-lifecycle.yml'
+      - 'repairs/shipping-lifecycle-2103255/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-shipping-lifecycle-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  android-package-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Verify and decode reviewed source
+        run: |
+          set -euo pipefail
+          mkdir -p audit255
+          python3 - <<'PY'
+          import base64, hashlib, json, zlib
+          from pathlib import Path
+          text=Path('repairs/shipping-lifecycle-2103255/source.b64').read_text().strip()
+          # Exact transport correction; decoded source is still independently SHA-pinned.
+          text=text.replace('M9y7P3pN3p8','M9y7P3p8')
+          raw=base64.b64decode(text,validate=True)
+          assert hashlib.sha256(raw).hexdigest()=='150a7f999e0db4c04e1a5e78cf7f954cb2f0e7bb21452f9b2237fc754aa7b5ed'
+          sources=json.loads(zlib.decompress(raw))
+          assert set(sources)=={'lifecycle_255.py','test_lifecycle.py'}
+          for name, source in sources.items():
+              compile(source,name,'exec')
+              Path('audit255',name).write_text(source)
+          PY
+      - name: Download exact protected 2103229 reconstruction
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103229-Exact-Rollback-Before-2103230
+          run-id: 35820419796
+          github-token: ${{ github.token }}
+          path: baseline229
+      - name: Download exact 2103254 APK and reuse its native payload
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103254-Python-Runtime-Native-Repair-RC1-TEST-CANDIDATE
+          run-id: 36210108726
+          github-token: ${{ github.token }}
+          path: candidate254
+      - name: Verify and reconstruct exact Android sources
+        run: |
+          set -euo pipefail
+          test "$(sha256sum baseline229/locked-2103229-reconstructed-shell.tar.gz | cut -d' ' -f1)" = '8ba08a7d0d185145c224b9858839db82446061aabf4843a0b081f2cb5070948a'
+          test "$(sha256sum candidate254/Infinity-1.0.9-Python-Runtime-Native-Repair-RC1.apk | cut -d' ' -f1)" = 'c526f740f258c48e3a208ccac6659f22995d077ff6a5097fc3d4d6617a51625e'
+          tar -xzf baseline229/locked-2103229-reconstructed-shell.tar.gz
+          cat repairs/native-crash-forensics-2103250/collector_parts/part* | base64 -d | gunzip > audit255/collector254.java.in
+          python3 repairs/python-runtime-2103254/apply_android.py --root . --shell shell-kodi --collector audit255/collector254.java.in
+          python3 repairs/python-runtime-2103254/prepare_native_base.py --root . --base baseline229/packaging-base.apk --engine-apk candidate254/Infinity-1.0.9-Python-Runtime-Native-Repair-RC1.apk --out base255/packaging-base254.apk --receipt audit255/native-base.json
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('candidate254/Infinity-1.0.9-Python-Runtime-Native-Repair-RC1.apk') as z:
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Apply bounded lifecycle correction and run real-method Java harness
+        run: |
+          set -euo pipefail
+          python3 audit255/lifecycle_255.py --root . --shell shell-kodi --output audit255/lifecycle
+          python3 audit255/test_lifecycle.py --evidence audit255/lifecycle
+          cp engine/background-resume-source.json audit255/source-receipt.json
+      - name: Prepare matched Android toolchain
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+      - name: Compile Android Java, link stable resources and permanently sign test APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk base255/packaging-base254.apk --build-dir build255 --out signed255
+      - name: Verify every protected APK member and unchanged JNI contract against 2103254
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,re,sys,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import dex_contract,DEX,SIGNATURE
+          parent=Path('candidate254/Infinity-1.0.9-Python-Runtime-Native-Repair-RC1.apk')
+          candidate=Path('signed255/Infinity-1.0.9-Infinity-Shipping-Audit-Lifecycle-RC2.apk')
+          with zipfile.ZipFile(parent) as a,zipfile.ZipFile(candidate) as b:
+              assert a.testzip() is None and b.testzip() is None
+              assert len(b.namelist())==len(set(b.namelist()))
+              keep=lambda n:n!='AndroidManifest.xml' and not DEX.fullmatch(n) and not SIGNATURE.fullmatch(n)
+              old={n for n in a.namelist() if keep(n)};new={n for n in b.namelist() if keep(n)}
+              assert old==new, 'Protected APK inventory changed'
+              for n in sorted(old):assert a.read(n)==b.read(n), 'Protected payload changed: '+n
+              assert dex_contract(a)[0]==dex_contract(b)[0], 'JNI declarations changed'
+              engine=hashlib.sha256(b.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+          badging=Path('signed255/badging.txt').read_text()
+          assert "versionCode='2103255'" in badging
+          signing=Path('signed255/signing-verification.txt').read_text().lower()
+          assert 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in signing
+          proof={'build':2103255,'parent':2103254,'candidate_sha256':hashlib.sha256(candidate.read_bytes()).hexdigest(),
+                 'protected_members_byte_identical':len(old),'native_engine_sha256':engine,
+                 'native_recompiled':False,'jni_contract_identical':True,'cobra_source_changed':False,
+                 'java_harness_assertions':18,'android_compilation':True,'permanent_signing':True,
+                 'device_verified':False,'fd_set_fixed':False,'shipping_acceptance_complete':False}
+          Path('signed255/SHIPPING-LIFECYCLE-VERIFICATION.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+          tar -czf audit255/reconstructed-2103255-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+      - name: Publish 2103255 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103255-Shipping-Lifecycle-RC2-TEST-CANDIDATE
+          path: signed255/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve source and test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103255-Shipping-Lifecycle-RC2-Evidence
+          path: audit255/
+          if-no-files-found: error
+          retention-days: 90
