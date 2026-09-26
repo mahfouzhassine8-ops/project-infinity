@@ -181,7 +181,7 @@ def patch_cpp(text: str) -> str:
     PyThreadState_DeleteCurrent();
     m_mainThreadState = nullptr;
 
-    // set stopped event
+    // set stopped event - this allows ::stop to run and kill remaining threads
 """,
         """    PyThreadState_Swap(m_mainThreadState);
     PyThreadState_Clear(m_mainThreadState);
@@ -189,7 +189,7 @@ def patch_cpp(text: str) -> str:
     m_mainThreadState = nullptr;
     m_invokerOwnsGil = false;
 
-    // set stopped event
+    // set stopped event - this allows ::stop to run and kill remaining threads
 """,
         "track final invoker GIL release",
     )
