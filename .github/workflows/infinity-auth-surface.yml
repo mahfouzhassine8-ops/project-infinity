@@ -1,4 +1,4 @@
-name: Infinity | Authorization Surface 0.1.0
+name: Infinity | Authorization Surface 0.2.0
 on:
   workflow_dispatch:
   push:
@@ -17,18 +17,18 @@ jobs:
           import xml.etree.ElementTree as ET
           ET.parse('addons/script.infinity.authsurface/addon.xml')
           s=open('addons/script.infinity.authsurface/default.py').read()
-          for x in ['traktAuth','realdebridAuth','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
+          assert 'authorize_trakt_everywhere' in s\n          assert 'trakt_sync.Auth().trakt_auth(mode="auth")' in s\n          for x in ['traktAuth','realdebridAuth','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
               assert x in s,x
           print('PASS')
           PY
       - name: Package
         run: |
           mkdir -p dist
-          cd addons && zip -qr ../dist/Infinity-Authorization-and-Accounts-0.1.0.zip script.infinity.authsurface
+          cd addons && zip -qr ../dist/Infinity-Authorization-and-Accounts-0.2.0.zip script.infinity.authsurface
           cd ..
-          sha256sum dist/Infinity-Authorization-and-Accounts-0.1.0.zip | tee dist/SHA256.txt
+          sha256sum dist/Infinity-Authorization-and-Accounts-0.2.0.zip | tee dist/SHA256.txt
       - uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Authorization-and-Accounts-0.1.0
+          name: Infinity-Authorization-and-Accounts-0.2.0
           path: dist/
           retention-days: 90
