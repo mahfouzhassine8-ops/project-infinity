@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <category label="Privacy &amp; Status">
+    <setting type="lsep" label="Infinity Authorization Manager"/>
+    <setting type="text" label="Authorization credentials are never stored by Infinity." enable="false"/>
+    <setting type="action" label="Open Authorization Manager" action="RunScript(script.infinity.authmanager)"/>
+    <setting type="action" label="Reauthorize Trakt" action="RunScript(script.infinity.authmanager,action=authorize,service=trakt)"/>
+  </category>
+</settings>
