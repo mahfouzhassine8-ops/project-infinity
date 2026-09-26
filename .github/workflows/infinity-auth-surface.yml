@@ -1,0 +1,34 @@
+name: Infinity | Authorization Surface 0.1.0
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-auth-manager-010-rc1]
+    paths: ['addons/script.infinity.authsurface/**','.github/workflows/infinity-auth-surface.yml']
+permissions: {contents: read}
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate
+        run: |
+          python3 -m py_compile addons/script.infinity.authsurface/default.py
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          ET.parse('addons/script.infinity.authsurface/addon.xml')
+          s=open('addons/script.infinity.authsurface/default.py').read()
+          for x in ['traktAuth','realdebridAuth','premiumizeAuth','alldebridAuth','torboxAuth','offcloudAuth','easynewsAuth','mdblistAuth']:
+              assert x in s,x
+          print('PASS')
+          PY
+      - name: Package
+        run: |
+          mkdir -p dist
+          cd addons && zip -qr ../dist/Infinity-Authorization-and-Accounts-0.1.0.zip script.infinity.authsurface
+          cd ..
+          sha256sum dist/Infinity-Authorization-and-Accounts-0.1.0.zip | tee dist/SHA256.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Authorization-and-Accounts-0.1.0
+          path: dist/
+          retention-days: 90
