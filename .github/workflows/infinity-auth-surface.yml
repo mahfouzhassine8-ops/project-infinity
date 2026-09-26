@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [infinity-auth-manager-010-rc1]
-    paths: ['addons/script.infinity.authsurface/**','.github/workflows/infinity-auth-surface.yml']
+    paths: ['addons/script.infinity.authsurface/**','.github/workflows/infinity-auth-surface.yml'] # trigger
 permissions: {contents: read}
 jobs:
   build:
