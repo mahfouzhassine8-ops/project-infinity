@@ -4,7 +4,7 @@ on:
   push:
     branches: [infinity-auth-manager-010-rc1]
     paths:
-      - 'addons/script.infinity.authmanager/**'
+      - 'addons/script.infinity.authmanager/**' # trigger
       - '.github/workflows/infinity-auth-manager-010.yml'
 permissions:
   contents: read
