@@ -45,7 +45,7 @@ def main():
       int natural=(int)Math.ceil(referenceHeight*scale);
       int height=Math.max(natural,MeasureSpec.getMode(hs)==MeasureSpec.EXACTLY?available:0);'''
     chooser=once(chooser,oldheight,'''      // Fit the entire portrait composition. Short landscape windows crop only the decorative floor.
-      float fittedHeight=w>viewport?(light?1340f:1205f):referenceHeight;
+      float fittedHeight=w>viewport?(light?1168f:1043f):referenceHeight;
       if(viewport>0)designWidth=Math.min(designWidth,viewport*referenceWidth/fittedHeight);
       scale=Math.max(.01f,designWidth/referenceWidth);left=(w-designWidth)/2;
       int height=viewport>0?viewport:(int)Math.ceil(referenceHeight*scale);''')
@@ -61,7 +61,8 @@ def main():
         assert before[A+'src/'+name+'.java.in']==after[A+'src/'+name+'.java.in']
     receiptfile=root/'engine/background-resume-source.json';receipt=json.loads(receiptfile.read_text())
     for f in changed+added:receipt['files'][f]={'before':before.get(f),'after':after[f]}
-    receipt.update(version_code=2103260,version_name='1.0.9-Recovery-Fixed-Chooser-RC1',source_parent=2103259,source_parent_commit=PARENT,physical_device_verified=False,native_engine_recompiled=False,recovery_glass=True,chooser_stationary=True)
+    receipt.update(version_code=2103260,version_name='1.0.9-Recovery-Fixed-Chooser-RC1',source_parent=2103253259,source_parent_commit=PARENT,physical_device_verified=False,native_engine_recompiled=False,recovery_glass=True,chooser_stationary=True)
+    receipt['source_parent']=2103259
     receiptfile.write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
     conf=root/'scripts/infinity_background_resume.py';t=conf.read_text();t=once(t,'VERSION_CODE = 2103259','VERSION_CODE = 2103260');t=once(t,"RELEASE = '1.0.9-Options-Health-Glass-Finish-RC1'","RELEASE = '1.0.9-Recovery-Fixed-Chooser-RC1'");t=once(t,"BASE_APK_SHA256 = '3f94abba544aee75d1e12ff10d1af98e3b277685e8f39f835b67e601dfbbeded'","BASE_APK_SHA256 = '"+APK+"'");conf.write_text(t)
     pack=root/'scripts/package_background_resume.py';t=pack.read_text().replace('Infinity-2103259-Options-Health-Glass-Finish-RC1','Infinity-2103260-Recovery-Fixed-Chooser-RC1').replace("'base_run':36304211423","'base_run':36305461854").replace("ROOT/'repairs/options-health-2103259/DEVICE-TEST.md'","ROOT/'repairs/recovery-fixed-2103260/DEVICE-TEST.md'").replace('Options and Health TEST CANDIDATE; exact 2103258','Recovery and fixed chooser TEST CANDIDATE; exact 2103259');pack.write_text(t)
