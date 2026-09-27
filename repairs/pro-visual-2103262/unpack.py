@@ -29,4 +29,10 @@ ui=root/'CobraProUi.java.in';s=ui.read_text()
 assert s.count('canvas.clipOutPath(edge);')==1
 s=s.replace('canvas.clipOutPath(edge);','if(Build.VERSION.SDK_INT>=26)canvas.clipOutPath(edge);else canvas.clipPath(edge,Region.Op.DIFFERENCE);')
 ui.write_text(s)
-print('PASS: source bundle verified; new Pro listener/tests use existing Media3; API-21 edge fallback retained')
+# At 10sp, antialiased white letter edges blend with red. Count bright neutral glyph
+# pixels (all RGB >220), not only near-solid white; an empty red badge still fails.
+p=root/'ProVisualTest.java';s=p.read_text()
+old='Color.red(color)>235&&Color.green(color)>235&&Color.blue(color)>235'
+assert s.count(old)==1
+p.write_text(s.replace(old,'Color.red(color)>220&&Color.green(color)>220&&Color.blue(color)>220'))
+print('PASS: verified bundle, existing Media3 types, API-21 edge fallback and actual LIVE text pixel test')
