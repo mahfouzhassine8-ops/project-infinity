@@ -81,7 +81,9 @@ public class GlassOptionsTest {
     for(float font:new float[]{1f,1.6f})for(boolean light:new boolean[]{false,true})for(boolean cobra:new boolean[]{false,true})for(int[] size:new int[][]{{296,600},{396,900},{436,296},{336,220}}){
       ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();Activity a=ctl.get();
       Configuration conf=new Configuration(a.getResources().getConfiguration());conf.fontScale=font;a.getResources().updateConfiguration(conf,a.getResources().getDisplayMetrics());
-      InfinityGlassOptions d=new InfinityGlassOptions(a,cobra,"Options",options(cobra),()->light,(x,y)->{});panelLayout(d,size[0],size[1]);
+      InfinityGlassOptions d=new InfinityGlassOptions(a,cobra,"Options",options(cobra),()->light,(x,y)->{});
+      // Directional focus requires a shown window, not merely a detached measured panel.
+      d.show();Shadows.shadowOf(Looper.getMainLooper()).idle();panelLayout(d,size[0],size[1]);
       InfinityGlassOptions.Panel p=d.panel;assertTrue(p.getMeasuredHeight()<=size[1]);assertTrue(p.header.getBottom()<p.scroll.getTop());assertTrue(p.scroll.getBottom()<=p.footer.getTop());
       assertTrue(p.cancel.getMeasuredHeight()>=48);assertTrue(p.scroll.getHeight()>0);
       for(int i=0;i<p.rows.getChildCount();i++){
@@ -89,7 +91,7 @@ public class GlassOptionsTest {
         TextView label=(TextView)((android.view.ViewGroup)row).getChildAt(1);assertNotNull(label.getLayout());
         assertTrue(label.getMeasuredHeight()>=label.getLayout().getHeight());
       }
-      p.scroll.scrollTo(0,p.rows.getHeight());assertTrue(p.scroll.getScrollY()>=0);assertTrue(p.cancel.requestFocusFromTouch());assertTrue(p.cancel.isFocused());
+      p.scroll.scrollTo(0,p.rows.getHeight());assertTrue(p.scroll.getScrollY()>=0);assertTrue("shown Cancel requests focus: "+font+" "+light+" "+cobra+" "+size[0]+"x"+size[1],p.cancel.requestFocusFromTouch());assertTrue("Cancel owns directional focus",p.cancel.isFocused());
       d.dismiss();ctl.pause().stop().destroy();
     }
   }
