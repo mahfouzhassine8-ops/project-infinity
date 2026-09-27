@@ -1,0 +1,154 @@
+name: Infinity | 2103260 Recovery Fixed Chooser RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103260-recovery-fixed-chooser-rc1]
+    paths:
+      - '.github/workflows/infinity-2103260-recovery-fixed.yml'
+      - 'repairs/recovery-fixed-2103260/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-recovery-fixed-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  recovery-fixed-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Download exact locked 2103259 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103259-Options-Health-Glass-Finish-RC1-TEST-CANDIDATE
+          run-id: 36305461854
+          github-token: ${{ github.token }}
+          path: parent259
+      - name: Download exact locked source and Health tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103259-Options-Health-Glass-Finish-RC1-Evidence
+          run-id: 36305461854
+          github-token: ${{ github.token }}
+          path: source259
+      - name: Reuse passed settings tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103258-Glass-Settings-Light-Dark-RC1-Evidence
+          run-id: 36304211423
+          github-token: ${{ github.token }}
+          path: source258
+      - name: Reuse passed chooser tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103257-Glass-Chooser-Light-Dark-RC1-Evidence
+          run-id: 36302398518
+          github-token: ${{ github.token }}
+          path: source257
+      - name: Verify exact parent and preserve native engine and recorder
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source259/reconstructed-2103259-shell.tar.gz | cut -d' ' -f1)" = 'ce6e0d26047f14c5cd78ccc3e4e26906de108621782e164e04988dd41cd7edc3'
+          test "$(sha256sum parent259/Infinity-2103259-Options-Health-Glass-Finish-RC1.apk | cut -d' ' -f1)" = '0e1edb8872ac4047e810fc1ee297b6edd53d86535b0f1ff722f68661bf88d969'
+          tar -xzf source259/reconstructed-2103259-shell.tar.gz
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent259/Infinity-2103259-Options-Health-Glass-Finish-RC1.apk') as z:
+              assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Apply only Recovery presentation and fixed chooser viewport
+        run: python3 repairs/recovery-fixed-2103260/apply.py --root . --evidence audit260
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+      - name: Compile Android interface only and sign candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent259/Infinity-2103259-Options-Health-Glass-Finish-RC1.apk --build-dir build260 --out signed260 2>&1 | tee audit260/android-build.log
+      - name: Test dragging window fit Recovery confirmations and all prior UI tests
+        run: |
+          set -euo pipefail
+          python3 repairs/recovery-fixed-2103260/stage_tests.py --build-dir build260 --evidence audit260/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build260
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.GlassChooserTest --tests com.projectinfinity.kodi.GlassOptionsTest --tests com.projectinfinity.kodi.GlassHealthFinishTest --tests com.projectinfinity.kodi.RecoveryFixedTest 2>&1 | tee ../audit260/android-view-tests.log
+      - name: Gate publication on exact preservation and all tests
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,xml.etree.ElementTree as ET
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          parent=Path('parent259/Infinity-2103259-Options-Health-Glass-Finish-RC1.apk')
+          apk=Path('signed260/Infinity-2103260-Recovery-Fixed-Chooser-RC1.apk')
+          kept=verify_bytes(parent,apk)
+          for name,count in [('GlassChooserTest',6),('GlassOptionsTest',7),('GlassHealthFinishTest',7),('RecoveryFixedTest',8)]:
+              t=ET.parse('build260/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
+              assert int(t.attrib['tests'])==count
+              assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped'])
+          shots=Path('audit260/screenshots');assert len(list(shots.glob('*.png')))==20
+          prior=Path('source259/screenshots')
+          preserved=[p.name for p in prior.glob('*.png') if '-settings-' in p.name or p.name.startswith('health-') or p.name in ['dark-941x1672.png','light-840x1873.png']]
+          assert len(preserved)==10
+          for name in preserved:assert (shots/name).read_bytes()==(prior/name).read_bytes(),'Locked visual changed: '+name
+          source=json.loads(Path('audit260/source-verification.json').read_text())
+          assert source['other_source_files_byte_identical']==226
+          assert source['recovery_labels_confirmation_and_actions_preserved'] and source['options_health_and_art_byte_identical']
+          result=json.loads(Path('signed260/background-resume-apk-audit.json').read_text());result.update(kept)
+          result.update(source_verification=source,android_test_methods=28,recovery_variants_rendered=4,
+              locked_reference_options_health_renders_byte_identical=10,chooser_drag_and_resize_tests=True,
+              physical_device_verified=False,visual_approval_pending=True,stable_lock=False,
+              startup_sound_integrated=False,historical_startup_hang_fixed=False)
+          Path('signed260/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed260/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Preserve exact source and test evidence
+        if: always()
+        run: |
+          mkdir -p audit260
+          cp -r repairs/recovery-fixed-2103260 audit260/repair-source
+          if [ -d build260/xbmc/build/test-results ]; then cp -r build260/xbmc/build/test-results audit260/; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit260/reconstructed-2103260-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103260-Recovery-Fixed-Chooser-RC1-TEST-CANDIDATE
+          path: signed260/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Publish screenshots and verification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103260-Recovery-Fixed-Chooser-RC1-Evidence
+          path: audit260/
+          if-no-files-found: error
+          retention-days: 90
