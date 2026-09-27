@@ -4,7 +4,7 @@ Expanded Java, patches, tests and acceptance documents are preserved in CI evide
 Test-only video artwork is never packaged in the APK.
 """
 from pathlib import Path
-import base64,hashlib,json,lzma
+import base64,hashlib,json,lzma,subprocess
 root=Path(__file__).resolve().parent
 encoded=''.join((root/('bundle'+str(i)+'.b64')).read_text().strip() for i in range(4))
 raw=lzma.decompress(base64.b64decode(encoded,validate=True))
@@ -23,4 +23,5 @@ patch.write_text(s.replace('com.google.android.exoplayer2.Player','androidx.medi
 for name in ['stage_tests.py','ProActionsTest.java']:
     path=root/name;s=path.read_text();assert s.count('com.google.android.exoplayer2.ExoPlayer')==1
     path.write_text(s.replace('com.google.android.exoplayer2.ExoPlayer','androidx.media3.exoplayer.ExoPlayer'))
+subprocess.run(['python3',str(root/'refine.py')],check=True)
 print('PASS: source bundle verified; new Pro listener/tests use existing Media3 types')
