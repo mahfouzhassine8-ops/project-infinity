@@ -61,6 +61,7 @@ jobs:
       - name: Apply presentation-only patch and prove startup and callbacks unchanged
         run: |
           set -euo pipefail
+          python3 repairs/glass-chooser-2103257/refine_materials.py
           python3 repairs/glass-chooser-2103257/apply.py --root . --evidence audit257
           mkdir -p audit257/gesture-preserved
           cp source256/InfinityLiveActivity-before.java.in audit257/gesture-preserved/
