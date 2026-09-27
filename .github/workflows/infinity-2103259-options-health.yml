@@ -1,0 +1,147 @@
+name: Infinity | 2103259 Options Health Glass Finish RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103259-options-health-glass-finish-rc1]
+    paths:
+      - '.github/workflows/infinity-2103259-options-health.yml'
+      - 'repairs/options-health-2103259/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-options-health-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  options-health-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Download exact passed 2103258 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103258-Glass-Settings-Light-Dark-RC1-TEST-CANDIDATE
+          run-id: 36304211423
+          github-token: ${{ github.token }}
+          path: parent258
+      - name: Download passed source and settings tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103258-Glass-Settings-Light-Dark-RC1-Evidence
+          run-id: 36304211423
+          github-token: ${{ github.token }}
+          path: source258
+      - name: Reuse exact passed chooser tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103257-Glass-Chooser-Light-Dark-RC1-Evidence
+          run-id: 36302398518
+          github-token: ${{ github.token }}
+          path: source257
+      - name: Verify parent and retain exact native engine and recorder
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source258/reconstructed-2103258-shell.tar.gz | cut -d' ' -f1)" = 'c7be71b4871ad1f2b983f58b00817e9854573245faa3590de67e01ad937f5d04'
+          test "$(sha256sum parent258/Infinity-2103258-Glass-Settings-Light-Dark-RC1.apk | cut -d' ' -f1)" = '3f94abba544aee75d1e12ff10d1af98e3b277685e8f39f835b67e601dfbbeded'
+          tar -xzf source258/reconstructed-2103258-shell.tar.gz
+          python3 - <<'PY'
+          import zipfile,hashlib
+          from pathlib import Path
+          with zipfile.ZipFile('parent258/Infinity-2103258-Glass-Settings-Light-Dark-RC1.apk') as z:
+              assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Apply only options surfaces and Health presentation
+        run: |
+          set -euo pipefail
+          python3 repairs/options-health-2103259/apply.py --root . --evidence audit259
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+      - name: Compile Android interface only and sign candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent258/Infinity-2103258-Glass-Settings-Light-Dark-RC1.apk --build-dir build259 --out signed259 2>&1 | tee audit259/android-build.log
+      - name: Test opaque glass plus Health and preserve prior chooser and options tests
+        run: |
+          set -euo pipefail
+          python3 repairs/options-health-2103259/stage_tests.py --build-dir build259 --evidence audit259/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build259
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.GlassChooserTest --tests com.projectinfinity.kodi.GlassOptionsTest --tests com.projectinfinity.kodi.GlassHealthFinishTest 2>&1 | tee ../audit259/android-view-tests.log
+      - name: Verify preserved payload and complete evidence before publishing
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,xml.etree.ElementTree as ET
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          parent=Path('parent258/Infinity-2103258-Glass-Settings-Light-Dark-RC1.apk')
+          apk=Path('signed259/Infinity-2103259-Options-Health-Glass-Finish-RC1.apk')
+          kept=verify_bytes(parent,apk)
+          for name,count in [('GlassChooserTest',6),('GlassOptionsTest',7),('GlassHealthFinishTest',7)]:
+              t=ET.parse('build259/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
+              assert int(t.attrib['tests'])==count
+              assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped'])
+          shots=Path('audit259/screenshots');assert len(list(shots.glob('*.png')))==16
+          prior={p.name for p in Path('source258/screenshots').glob('*.png') if '-settings-' not in p.name}
+          assert len(prior)==8
+          for name in prior:assert (shots/name).read_bytes()==(Path('source258/screenshots')/name).read_bytes(), 'Chooser render changed: '+name
+          source=json.loads(Path('audit259/source-verification.json').read_text())
+          assert source['all_other_source_files_byte_identical']==225
+          assert source['health_labels_and_callbacks_byte_identical'] and source['options_callback_and_lifecycle_byte_identical']
+          result=json.loads(Path('signed259/background-resume-apk-audit.json').read_text());result.update(kept)
+          result.update(source_verification=source,android_test_methods=20,settings_variants_rendered=4,health_variants_rendered=4,
+              prior_chooser_screenshots_byte_identical=8,physical_device_verified=False,visual_approval_pending=True,
+              stable_lock=False,startup_sound_integrated=False,historical_startup_hang_fixed=False)
+          Path('signed259/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed259/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Preserve exact source and evidence
+        if: always()
+        run: |
+          mkdir -p audit259
+          cp -r repairs/options-health-2103259 audit259/repair-source
+          if [ -d build259/xbmc/build/test-results ]; then cp -r build259/xbmc/build/test-results audit259/; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit259/reconstructed-2103259-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103259-Options-Health-Glass-Finish-RC1-TEST-CANDIDATE
+          path: signed259/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Publish screenshots and verification
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103259-Options-Health-Glass-Finish-RC1-Evidence
+          path: audit259/
+          if-no-files-found: error
+          retention-days: 90
