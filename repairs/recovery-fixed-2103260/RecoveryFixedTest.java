@@ -45,7 +45,7 @@ public class RecoveryFixedTest {
     RuntimeEnvironment.setQualifiers("w420dp-h936dp-mdpi");
     for(String mode:new String[]{"light","dark"})for(int[] size:new int[][]{{320,640},{420,936},{768,1024},{1024,768},{600,400},{336,220}}){
       ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();Activity a=ctl.get();
-      InfinityGlassChooser ui=new InfinityGlassChooser(a,new GlassChooserTest.Calls(mode));a.setContentView(ui);ui.content.setPadding(0,24,0,28);GlassChooserTest.layout(ui,size[0],size[1]);
+      InfinityGlassChooser ui=new InfinityGlassChooser(a,new GlassChooserTest.Calls(mode));a.setContentView(ui,new android.widget.FrameLayout.LayoutParams(size[0],size[1]));ui.content.setPadding(0,24,0,28);Shadows.shadowOf(Looper.getMainLooper()).idle();GlassChooserTest.layout(ui,size[0],size[1]);
       int x=ui.stage.infinity.getLeft(),y=ui.stage.infinity.getTop();
       assertFalse(ui.content instanceof android.widget.ScrollView);assertEquals(View.OVER_SCROLL_NEVER,ui.content.getOverScrollMode());fixed(ui);
       swipe(ui,size[0]/2f,size[1]*.8f,size[0]/2f,size[1]*.2f);swipe(ui,size[0]/2f,size[1]*.2f,size[0]/2f,size[1]*.8f);
@@ -54,6 +54,11 @@ public class RecoveryFixedTest {
         View gear=ui.findViewById(id);assertTrue(gear.requestFocusFromTouch());fixed(ui);
         Rect r=new Rect();gear.getDrawingRect(r);ui.offsetDescendantRectToMyCoords(gear,r);
         assertTrue(mode+" visible gear at "+size[0]+"x"+size[1],r.top>=24&&r.bottom<=size[1]-28&&r.left>=0&&r.right<=size[0]);
+      }
+      if(ui.light)for(InfinityGlassChooser.Card card:new InfinityGlassChooser.Card[]{ui.stage.infinity,ui.stage.cobra}){
+        Rect gear=new Rect(),pill=new Rect();card.gear.getHitRect(gear);card.pill.getHitRect(pill);
+        assertFalse("Gear and entry must not overlap: "+size[0]+"x"+size[1],Rect.intersects(gear,pill));
+        assertTrue(pill.bottom<=card.getHeight());assertTrue(card.pill.getHeight()>=48);assertTrue(card.gear.getWidth()>=48);
       }
       assertEquals(x,ui.stage.infinity.getLeft());assertEquals(y,ui.stage.infinity.getTop());ctl.pause().stop().destroy();
     }
