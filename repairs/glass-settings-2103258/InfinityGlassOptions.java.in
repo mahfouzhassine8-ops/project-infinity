@@ -120,9 +120,7 @@ final class InfinityGlassOptions extends Dialog {
       setTag("experience_glass_options_panel");setBackground(new GlassSurface(c,palette));
       setClipChildren(false);setClipToPadding(false);
       header=new LinearLayout(c);header.setGravity(Gravity.CENTER_VERTICAL);
-      ImageView mark=new ImageView(c);
-      mark.setImageBitmap(InfinityGlassArt.decode((light?"light_":"dark_")+(cobra?"cyan_mark":"gold_mark")));
-      mark.setScaleType(ImageView.ScaleType.FIT_CENTER);mark.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+      BrandMark mark=new BrandMark(c,cobra);
       LinearLayout.LayoutParams logo=new LinearLayout.LayoutParams(dp(64),dp(54));logo.rightMargin=dp(14);header.addView(mark,logo);
       title=text(c,heading,24,palette.ink,true);title.setGravity(Gravity.CENTER_VERTICAL);
       if(Build.VERSION.SDK_INT>=28)title.setAccessibilityHeading(true);
@@ -214,21 +212,45 @@ final class InfinityGlassOptions extends Dialog {
     final Palette palette;final Bitmap material;final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     final RectF box=new RectF(),inner=new RectF();final Path clip=new Path();final float radius;
     Shader base,edge;
-    GlassSurface(Context c,Palette p){palette=p;radius=dp(c,28);material=InfinityGlassArt.decode((p.light?"light_":"dark_")+(p.cobra?"cyan":"gold"));}
+    final Rect[] sourceFrame=new Rect[9];final RectF[] destFrame=new RectF[9];
+    GlassSurface(Context c,Palette p){palette=p;radius=dp(c,28);material=InfinityGlassArt.decode((p.light?"light_":"dark_")+(p.cobra?"cyan":"gold"));for(int i=0;i<9;i++){sourceFrame[i]=new Rect();destFrame[i]=new RectF();}}
     @Override protected void onBoundsChange(Rect r){
+      int w=material.getWidth(),h=material.getHeight(),border=Math.min(w,h)/10;
+      int[] sx={0,border,w-border,w},sy={0,border,h-border,h};
+      float rim=Math.min(radius,Math.min(r.width(),r.height())/4f);
+      float[] dx={r.left,r.left+rim,r.right-rim,r.right},dy={r.top,r.top+rim,r.bottom-rim,r.bottom};
+      for(int y=0;y<3;y++)for(int x=0;x<3;x++){int i=y*3+x;sourceFrame[i].set(sx[x],sy[y],sx[x+1],sy[y+1]);destFrame[i].set(dx[x],dy[y],dx[x+1],dy[y+1]);}
       box.set(r);clip.reset();clip.addRoundRect(box,radius,radius,Path.Direction.CW);inner.set(box);inner.inset(2,2);
       base=new LinearGradient(0,box.top,0,box.bottom,new int[]{palette.top,palette.bottom},null,Shader.TileMode.CLAMP);
       edge=new LinearGradient(box.left,box.top,box.right,box.bottom,new int[]{alpha(Color.WHITE,230),alpha(palette.accent,120),alpha(palette.accent,235)},null,Shader.TileMode.CLAMP);
     }
     @Override public void draw(Canvas c){
       int save=c.save();c.clipPath(clip);paint.setShader(base);paint.setStyle(Paint.Style.FILL);paint.setAlpha(255);c.drawRect(box,paint);
-      paint.setShader(null);paint.setAlpha(palette.light?205:225);c.drawBitmap(material,null,box,paint);
+      paint.setShader(null);paint.setAlpha(palette.light?225:245);
+      // Reuse only the eight frame slices: chooser-only decorative lines never sit behind option text.
+      for(int i=0;i<9;i++)if(i!=4)c.drawBitmap(material,sourceFrame[i],destFrame[i],paint);
       paint.setAlpha(255);paint.setShader(edge);paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(1.5f);c.drawRoundRect(inner,radius-2,radius-2,paint);
       paint.setShader(null);paint.setStyle(Paint.Style.FILL);c.restoreToCount(save);
     }
     @Override public void setAlpha(int alpha){}
     @Override public void setColorFilter(ColorFilter filter){}
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
+  }
+  /** No rectangular matte: reuse the approved transparent Cobra mark and native Infinity curve. */
+  static final class BrandMark extends View {
+    final boolean cobra;final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);final Path loop=new Path();final RectF bounds=new RectF();
+    BrandMark(Context c,boolean cobra){super(c);this.cobra=cobra;if(cobra)CobraEmblem.prepare(c);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){
+      bounds.set(0,0,w,h);if(cobra)return;
+      float cx=w/2f,cy=h/2f,rx=w*.42f,ry=h*.29f;loop.reset();loop.moveTo(cx,cy);
+      loop.cubicTo(cx-rx*.45f,cy-ry,cx-rx,cy-ry,cx-rx,cy);
+      loop.cubicTo(cx-rx,cy+ry,cx-rx*.45f,cy+ry,cx,cy);
+      loop.cubicTo(cx+rx*.45f,cy-ry,cx+rx,cy-ry,cx+rx,cy);
+      loop.cubicTo(cx+rx,cy+ry,cx+rx*.45f,cy+ry,cx,cy);
+      paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(Math.max(2,Math.min(w,h)*.07f));paint.setStrokeCap(Paint.Cap.ROUND);
+      paint.setShader(new LinearGradient(0,0,w,h,new int[]{0xffab7e20,0xffffe8a1,0xffb88b2c},null,Shader.TileMode.CLAMP));
+    }
+    @Override protected void onDraw(Canvas c){if(cobra)CobraEmblem.draw(c,bounds,Color.WHITE,255);else c.drawPath(loop,paint);}
   }
   /** Small line icons describe existing actions only; none is a new control or state badge. */
   static final class Glyph extends View {
