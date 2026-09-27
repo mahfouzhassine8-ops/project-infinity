@@ -1,0 +1,144 @@
+name: Infinity | 2103257 Glass Chooser Light Dark RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103257-glass-chooser-light-dark-rc1]
+    paths:
+      - '.github/workflows/infinity-2103257-glass-chooser.yml'
+      - 'repairs/glass-chooser-2103257/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-glass-chooser-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  android-chooser-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Download exact locked 2103256 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103256-Cobra-No-Hold-Menu-RC1-TEST-CANDIDATE
+          run-id: 36235662809
+          github-token: ${{ github.token }}
+          path: parent256
+      - name: Download exact locked reconstructed Android source
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103256-Cobra-No-Hold-Menu-RC1-Evidence
+          run-id: 36235662809
+          github-token: ${{ github.token }}
+          path: source256
+      - name: Verify parent hashes and preserve native engine and recorder
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source256/reconstructed-2103256-shell.tar.gz | cut -d' ' -f1)" = 'f5bddd1ddca6dd7fb3fef7148ea5006cde362927bddd84e924f3b22e9a4c2b55'
+          test "$(sha256sum parent256/Infinity-2103256-Cobra-No-Hold-Menu-RC1.apk | cut -d' ' -f1)" = '73e09e90680da6c8e31bff41b045cab4c6721723af1a1b31f6ff3ea1947603ca'
+          tar -xzf source256/reconstructed-2103256-shell.tar.gz
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent256/Infinity-2103256-Cobra-No-Hold-Menu-RC1.apk') as z:
+              assert z.testzip() is None
+              assert len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          art=Path('repairs/glass-chooser-2103257/assets/art.json').read_bytes()
+          assert hashlib.sha1(b'blob '+str(len(art)).encode()+b'\0'+art).hexdigest()=='b9a5471a1e19ebe12b597df435b6af5aec3602d3'
+          PY
+      - name: Apply presentation-only patch and prove startup and callbacks unchanged
+        run: |
+          set -euo pipefail
+          python3 repairs/glass-chooser-2103257/apply.py --root . --evidence audit257
+          mkdir -p audit257/gesture-preserved
+          cp source256/InfinityLiveActivity-before.java.in audit257/gesture-preserved/
+          python3 repairs/cobra-no-hold-2103256/test_gesture.py --source shell-kodi --evidence audit257/gesture-preserved
+      - name: Prepare matched Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+      - name: Compile Android interface only and permanently sign candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent256/Infinity-2103256-Cobra-No-Hold-Menu-RC1.apk --build-dir build257 --out signed257 2>&1 | tee audit257/android-build.log
+      - name: Test actual Android Views and render dark light Fold screenshots
+        run: |
+          set -euo pipefail
+          python3 repairs/glass-chooser-2103257/stage_tests.py --build-dir build257 --evidence audit257/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build257
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.GlassChooserTest 2>&1 | tee ../audit257/android-view-tests.log
+      - name: Verify final package and evidence before publishing test candidate
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,xml.etree.ElementTree as ET,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          parent=Path('parent256/Infinity-2103256-Cobra-No-Hold-Menu-RC1.apk')
+          candidate=Path('signed257/Infinity-2103257-Glass-Chooser-Light-Dark-RC1.apk')
+          kept=verify_bytes(parent,candidate)
+          tests=ET.parse('build257/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.GlassChooserTest.xml').getroot()
+          assert int(tests.attrib['tests'])==6
+          assert int(tests.attrib.get('failures',0))==0 and int(tests.attrib.get('errors',0))==0 and int(tests.attrib.get('skipped',0))==0
+          assert len(list(Path('audit257/screenshots').glob('*.png')))==8
+          source=json.loads(Path('audit257/source-verification.json').read_text())
+          assert source['startup_lifecycle_unchanged'] and source['settings_callbacks_unchanged']
+          assert source['all_other_source_files_byte_identical']==223
+          result=json.loads(Path('signed257/background-resume-apk-audit.json').read_text())
+          result.update(kept)
+          result.update(android_view_test_methods=6,native_canvas_screenshots=8,prior_gesture_callback_assertions=18,
+              source_verification=source,device_verified=False,pixel_perfect_verified=False,
+              historical_startup_hang_fixed=False,startup_sound_integrated=False,stable_lock=False,
+              final_stage='android-chooser-verification')
+          Path('signed257/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed257/SHA256SUMS.txt').write_text(hashlib.sha256(candidate.read_bytes()).hexdigest()+'  '+candidate.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Preserve source screenshots and verification evidence
+        if: always()
+        run: |
+          mkdir -p audit257
+          cp -r repairs/glass-chooser-2103257 audit257/repair-source
+          if [ -d build257/xbmc/build/test-results ]; then cp -r build257/xbmc/build/test-results audit257/; fi
+          if [ -d build257/xbmc/build/reports/tests ]; then cp -r build257/xbmc/build/reports/tests audit257/test-reports; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit257/reconstructed-2103257-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103257-Glass-Chooser-Light-Dark-RC1-TEST-CANDIDATE
+          path: signed257/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload diagnostic and visual evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103257-Glass-Chooser-Light-Dark-RC1-Evidence
+          path: audit257/
+          if-no-files-found: error
+          retention-days: 90
