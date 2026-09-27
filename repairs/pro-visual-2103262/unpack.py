@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Lossless transport only: verify the complete bundle before exposing plain source files.
-The expanded Java, patch, tests and acceptance documents are included in CI evidence.
-No downloaded code is evaluated here. Test-only video artwork is not packaged in the APK.
+"""Verify source transport, then apply explicitly bounded compatibility corrections.
+Expanded Java, patches, tests and acceptance documents are preserved in CI evidence.
+Test-only video artwork is never packaged in the APK.
 """
 from pathlib import Path
 import base64,hashlib,json,lzma
@@ -16,4 +16,11 @@ for name,data in files.items():
     assert Path(name).name==name
     payload=base64.b64decode(data,validate=True) if name.endswith('.webp') else data.encode('utf-8')
     (root/name).write_bytes(payload)
-print('PASS: expanded 10 checksum-verified source/test/contract files')
+# Existing application imports AndroidX Media3. Correct only the new Pro types.
+patch=root/'integration.patch';s=patch.read_text()
+assert s.count('com.google.android.exoplayer2.Player')==4
+patch.write_text(s.replace('com.google.android.exoplayer2.Player','androidx.media3.common.Player'))
+for name in ['stage_tests.py','ProActionsTest.java']:
+    path=root/name;s=path.read_text();assert s.count('com.google.android.exoplayer2.ExoPlayer')==1
+    path.write_text(s.replace('com.google.android.exoplayer2.ExoPlayer','androidx.media3.exoplayer.ExoPlayer'))
+print('PASS: source bundle verified; new Pro listener/tests use existing Media3 types')
