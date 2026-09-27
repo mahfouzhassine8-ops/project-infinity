@@ -24,4 +24,9 @@ for name in ['stage_tests.py','ProActionsTest.java']:
     path=root/name;s=path.read_text();assert s.count('com.google.android.exoplayer2.ExoPlayer')==1
     path.write_text(s.replace('com.google.android.exoplayer2.ExoPlayer','androidx.media3.exoplayer.ExoPlayer'))
 subprocess.run(['python3',str(root/'refine.py')],check=True)
-print('PASS: source bundle verified; new Pro listener/tests use existing Media3 types')
+# Preserve the existing API-21 minimum: clipOutPath was introduced at API 26.
+ui=root/'CobraProUi.java.in';s=ui.read_text()
+assert s.count('canvas.clipOutPath(edge);')==1
+s=s.replace('canvas.clipOutPath(edge);','if(Build.VERSION.SDK_INT>=26)canvas.clipOutPath(edge);else canvas.clipPath(edge,Region.Op.DIFFERENCE);')
+ui.write_text(s)
+print('PASS: source bundle verified; new Pro listener/tests use existing Media3; API-21 edge fallback retained')
