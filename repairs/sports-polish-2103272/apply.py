@@ -24,17 +24,23 @@ def once(s,old,new):
     return s.replace(old,new,1)
 
 def method_span(s,name):
-    import re
-    match=re.search(r'(?m)^  private [^\\n{]*\\b'+re.escape(name)+r'\\s*\\(',s)
-    if not match: raise AssertionError('Missing method declaration '+name)
-    start=match.start();p=match.end()-1;brace=s.find('{',p)
-    depth=0
-    for i in range(brace,len(s)):
-        if s[i]=='{': depth+=1
-        elif s[i]=='}':
-            depth-=1
-            if depth==0:return start,i+1
-    raise AssertionError('Unclosed method '+name)
+    needle=name+'('
+    pos=0
+    while True:
+        start=s.find('\n  private ',pos)
+        if start<0: raise AssertionError('Missing method declaration '+name)
+        start+=1;line_end=s.find('\n',start)
+        if line_end<0:line_end=len(s)
+        line=s[start:line_end]
+        if needle in line:
+            p=start+line.index(needle);brace=s.find('{',p);depth=0
+            for i in range(brace,len(s)):
+                if s[i]=='{': depth+=1
+                elif s[i]=='}':
+                    depth-=1
+                    if depth==0:return start,i+1
+            raise AssertionError('Unclosed method '+name)
+        pos=line_end
 
 def replace_method(s,name,code):
     a,b=method_span(s,name)
