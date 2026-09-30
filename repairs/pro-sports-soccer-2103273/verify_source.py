@@ -8,7 +8,7 @@ p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.a
 base=a.baseline;root=a.root
 
 def method(text,name):
-    m=re.search(r'(?m)^  private [^\n{]*\b'+re.escape(name)+r'\s*\(',text)
+    m=re.search(r'(?m)^\s+private [^\n{]*\b'+re.escape(name)+r'\s*\(',text)
     if not m: raise AssertionError('Missing method '+name)
     brace=text.find('{',m.end()-1);depth=0
     for i in range(brace,len(text)):
