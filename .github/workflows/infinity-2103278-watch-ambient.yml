@@ -93,8 +93,8 @@ jobs:
           assert len(counts)==29,counts
           assert counts['com.projectinfinity.kodi.WholeUiAmbientTest']==23,counts
           assert counts['com.projectinfinity.kodi.MiniPlayerFillTest']==13,counts
-          assert counts['com.projectinfinity.kodi.WatchAmbientTest']==23,counts
-          assert sum(counts.values())==297,counts
+          assert counts['com.projectinfinity.kodi.WatchAmbientTest']==26,counts
+          assert sum(counts.values())==300,counts
           locked=Path('source277/screenshots/protected');current=Path('audit278/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
           for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
           report=json.loads(Path('signed278/background-resume-apk-audit.json').read_text());report.update(parent_locked_commit='8e8b55b6e3c2bb731359e2d52aa11cdf07327729',automated_tests_passed=sum(counts.values()),test_methods=counts,protected_render_equality=len(names),physical_device_verified=False,candidate_locked=False,status='CI CANDIDATE ONLY — actual Fold visual acceptance required')

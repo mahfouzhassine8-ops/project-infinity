@@ -45,5 +45,44 @@ public class WatchAmbientTest {
  @Test public void repeatedPaintDoesNotAllocateBitmaps()throws Exception{button(160,40);ambient.illuminateWatch(null,root);Object palette=WholeUiAmbientTest.get(ambient,"watchPalette"),frame=WholeUiAmbientTest.get(ambient,"smoothed");Bitmap out=Bitmap.createBitmap(400,800,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(out);for(int i=0;i<100;i++)root.draw(c);assertSame(palette,WholeUiAmbientTest.get(ambient,"watchPalette"));assertSame(frame,WholeUiAmbientTest.get(ambient,"smoothed"));out.recycle();}
  @Test public void switchingBackToMiniRestoresWatchGlassAndUsesOneRenderer()throws Exception{Button b=button(160,40);Drawable base=b.getBackground();ambient.illuminateWatch(null,root);ambient.controlsOnly(false);assertSame(base,b.getBackground());assertNull(WholeUiAmbientTest.get(ambient,"watchPalette"));assertSame(ambient,root.getChildAt(0));}
  @Test public void suspendFadeClearsPaletteAndRestoresThumb()throws Exception{SeekBar seek=new SeekBar(a);root.addView(seek);Drawable base=seek.getThumb();ambient.illuminateWatch(null,root);ambient.state(false,false);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(300));assertNull(WholeUiAmbientTest.get(ambient,"watchPalette"));assertSame(base,seek.getThumb());assertEquals(false,WholeUiAmbientTest.get(ambient,"scheduled"));}
+ static final class SamplingTexture extends TextureView {
+  SamplingTexture(android.content.Context c){super(c);}
+  @Override public boolean isAvailable(){return true;}
+  @Override public Bitmap getBitmap(Bitmap out){Canvas canvas=new Canvas(out);Paint paint=new Paint();canvas.drawColor(Color.BLACK);int w=out.getWidth(),h=out.getHeight();paint.setColor(Color.BLUE);canvas.drawRect(0,0,w,h/2,paint);paint.setColor(Color.GREEN);canvas.drawRect(0,h/2,w,h,paint);paint.setColor(Color.RED);canvas.drawRect(0,0,w/10,h,paint);paint.setColor(Color.YELLOW);canvas.drawRect(w-w/10,0,w,h,paint);return out;}
+ }
+ CobraImmersiveAmbient activate(Cobra2103201ScrubberTest helper)throws Exception{
+  helper.before();InfinityLiveActivity activity=helper.a;
+  TextureView old=(TextureView)CobraNavigationUiTest.get(activity,"mPlayerTexture");FrameLayout overlay=helper.overlay;overlay.removeView(old);
+  SamplingTexture texture=new SamplingTexture(activity);overlay.addView(texture,0,new FrameLayout.LayoutParams(-1,-1));CobraNavigationUiTest.put(activity,"mPlayerTexture",texture);
+  helper.prefs.edit().putString(CobraPresentationEffects.AMBIENT,"immersive").commit();CobraNavigationUiTest.put(activity,"mCobraRotationResumed",true);
+  helper.ui.measure(activity,412,915);CobraNavigationUiTest.call(activity,"cobraRefreshAmbient");
+  return (CobraImmersiveAmbient)CobraNavigationUiTest.get(activity,"mCobraImmersiveAmbient");
+ }
+ @Test public void actualWatchActivityBindsFullscreenTextureAndSuspendsOnHiddenChrome()throws Exception{
+  Cobra2103201ScrubberTest helper=new Cobra2103201ScrubberTest();try{
+   CobraImmersiveAmbient engine=activate(helper);assertTrue(engine.isAmbientActive());assertSame(CobraNavigationUiTest.get(helper.a,"mPlayerTexture"),WholeUiAmbientTest.get(engine,"source"));assertEquals(true,WholeUiAmbientTest.get(engine,"controlsOnly"));
+   ((View)CobraNavigationUiTest.get(helper.a,"mPlayerChrome")).setVisibility(View.GONE);CobraNavigationUiTest.call(helper.a,"cobraRefreshImmersiveAmbient");assertFalse(engine.isAmbientActive());assertEquals(false,WholeUiAmbientTest.get(engine,"scheduled"));
+   assertEquals(0,helper.state.prepares);assertEquals(0,helper.state.mediaChanges);assertTrue(helper.state.seeks.isEmpty());
+  }finally{helper.after();}
+ }
+ @Test public void actualWatchPauseResumePipAndBackgroundKeepPlaybackOwnership()throws Exception{
+  Cobra2103201ScrubberTest helper=new Cobra2103201ScrubberTest();try{
+   CobraImmersiveAmbient engine=activate(helper);Object palette=WholeUiAmbientTest.get(engine,"watchPalette");helper.state.requested=false;CobraNavigationUiTest.call(helper.a,"cobraRefreshImmersiveAmbient");assertSame(palette,WholeUiAmbientTest.get(engine,"watchPalette"));assertEquals(false,WholeUiAmbientTest.get(engine,"scheduled"));
+   helper.state.requested=true;CobraNavigationUiTest.call(helper.a,"cobraRefreshImmersiveAmbient");assertEquals(true,WholeUiAmbientTest.get(engine,"scheduled"));
+   CobraNavigationUiTest.put(helper.a,"mInPictureInPicture",true);CobraNavigationUiTest.call(helper.a,"cobraRefreshImmersiveAmbient");assertFalse(engine.isAmbientActive());
+   CobraNavigationUiTest.put(helper.a,"mInPictureInPicture",false);CobraNavigationUiTest.put(helper.a,"mBackgroundStopped",true);CobraNavigationUiTest.call(helper.a,"cobraRefreshImmersiveAmbient");assertFalse(engine.isAmbientActive());assertEquals(false,WholeUiAmbientTest.get(engine,"scheduled"));assertEquals(0,helper.state.prepares);assertEquals(0,helper.state.mediaChanges);
+  }finally{helper.after();}
+ }
+ @Test public void realDisplayAndMoreSubmenusUseSharedPaletteAndReuseCaptureBuffers()throws Exception{
+  Cobra2103201ScrubberTest helper=new Cobra2103201ScrubberTest();try{
+   CobraImmersiveAmbient engine=activate(helper);Object capture=WholeUiAmbientTest.get(engine,"watchCapture"),working=WholeUiAmbientTest.get(engine,"raw"),palette=WholeUiAmbientTest.get(engine,"watchPalette");
+   java.lang.reflect.Method method=CobraImmersiveAmbient.class.getDeclaredMethod("capture");method.setAccessible(true);for(int i=0;i<30;i++)assertEquals(true,method.invoke(engine));
+   assertSame(capture,WholeUiAmbientTest.get(engine,"watchCapture"));assertSame(working,WholeUiAmbientTest.get(engine,"raw"));assertSame(palette,WholeUiAmbientTest.get(engine,"watchPalette"));
+   for(String menu:new String[]{"showCobraAspectPicker","showPlayerSettingsDrawer"}){
+    CobraNavigationUiTest.call(helper.a,menu);helper.ui.measure(helper.a,412,915);CobraNavigationUiTest.call(helper.a,"cobraRefreshAmbient");assertTrue(engine.isAmbientActive());assertNotNull(CobraNavigationUiTest.get(helper.a,"mCobraActionSheet"));assertTrue(((java.util.List<?>)WholeUiAmbientTest.get(engine,"glass")).size()>0);assertSame(palette,WholeUiAmbientTest.get(engine,"watchPalette"));
+   }
+   Bitmap rendered=Bitmap.createBitmap(412,915,Bitmap.Config.ARGB_8888);helper.overlay.draw(new Canvas(rendered));save(rendered,"actual-watch-more");rendered.recycle();assertEquals(0,helper.state.prepares);assertEquals(0,helper.state.mediaChanges);
+  }finally{helper.after();}
+ }
  void save(Bitmap b,String name){try{java.io.File dir=new java.io.File(System.getProperty("cobra.evidence","build/evidence"),"watch-ambient");dir.mkdirs();try(java.io.FileOutputStream out=new java.io.FileOutputStream(new java.io.File(dir,name+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}}catch(java.io.IOException e){throw new AssertionError(e);}}
 }

@@ -18,6 +18,6 @@ ambient without touching playback. Night Cinema retains precedence for its exist
 
 Off/Subtle and inactive protected renders remain exact. Mini-player field and fill remain
 locked behavior. Source verification permits only bounded Activity/ambient/version updates.
-274 locked tests plus 23 controls/crop/UI tests; protected renders and native/resources preserved.
+274 locked tests plus 26 controls/crop/UI tests; protected renders and native/resources preserved.
 Actual Fold visual/stress acceptance required. Mockup menu illustrates materials only;
 existing real Display options and all settings/actions are preserved, no redesigned menus.
