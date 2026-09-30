@@ -8,7 +8,7 @@ ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 CHOOSER='tools/android/packaging/xbmc/src/InfinityGlassChooser.java.in'
 PARENT_APK='de03a34643a4693162c2cd46912b826b4a77aaafbb4491ce46d1d33bf1f6d4e8'
 PARENT_COMMIT='46de646cc8a87c4dfafe2e7bf9b1776c011cadeb'
-ALLOWED=['isCompact','isMedium','isPortrait','cobraWidthDp','cobraHeightDp','toggleCobraDrawer']
+ALLOWED=['isCompact','isMedium','isPortrait','cobraWidthDp','cobraHeightDp','toggleCobraDrawer','cobraBuildPlayerChrome']
 HELPERS='''
   /** Current UI window, never the physical panel size. No navigation/media ownership. */
   private int cobraWindowPixels(boolean width){
@@ -36,7 +36,12 @@ def activity(s):
       FrameLayout.LayoutParams position=(FrameLayout.LayoutParams)panel.getLayoutParams();
       if(position.width!=next){position.width=next;panel.setLayoutParams(position);}
     });''')
+ s=s[:a]+v+s[b:]
+ a,b=span(s,'cobraBuildPlayerChrome');v=s[a:b]
+ v=once(v,'header.setPadding(left,top,right,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.4",6)));','header.setPadding(left,height<dp(240)?0:top,right,height<dp(240)?0:dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.4",6)));')
+ v=once(v,'footer.addView(programLine,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.27",30))));','if(height<dp(300))programLine.setVisibility(View.GONE);footer.addView(programLine,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.27",30))));')
  s=s[:a]+v+s[b:];return s[:s.rfind('\n}')]+HELPERS+s[s.rfind('\n}'):]
+
 def main():
  p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();shell=a.root/'shell-kodi';a.out.mkdir(parents=True,exist_ok=True)
  f=shell/ACTIVITY;before=f.read_text();assert sha(f.read_bytes())=='1eb04d22d7cfe344c34a270dc7d30949b6c0377360b95b65eb5525dbdf789bbc';f.write_text(activity(before))
