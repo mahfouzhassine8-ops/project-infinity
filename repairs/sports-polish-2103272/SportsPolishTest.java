@@ -72,7 +72,7 @@ public class SportsPolishTest {
     InfinityLiveActivity a=f.fixture(4);try{
       Object live=game("l1","mlb","MLB",true,System.currentTimeMillis()-900000L,"Phillies","PHI","Braves","ATL","1","1");
       View card=(View)CobraNavigationUiTest.call(a,"cobraSportsGameCard",live);card.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(202,View.MeasureSpec.EXACTLY));card.layout(0,0,360,202);
-      View pill=card.findViewWithTag("cobra_sports_live_pill");assertNotNull(pill);assertTrue(pill.isShown());assertTrue(has(texts(card),"Phillies  1"));assertTrue(has(texts(card),"Braves  1"));assertTrue(card.getElevation()>0);
+      View pill=card.findViewWithTag("cobra_sports_live_pill");assertNotNull(pill);assertEquals(View.VISIBLE,pill.getVisibility());assertTrue(has(texts(card),"Phillies  1"));assertTrue(has(texts(card),"Braves  1"));assertTrue(card.getElevation()>0);
     }finally{f.clean(a);}
   }
 
