@@ -1,0 +1,368 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.content.res.ColorStateList;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import java.util.ArrayList;
+
+/** Trusted built-in chooser presentation. No startup, player, JNI or data-store ownership.
+ * Art is independent text-free material plates, not a flattened interactive screenshot.
+ * All labels, marks, focus, hit areas and controls are independently laid out native Views.
+ */
+final class InfinityGlassChooser extends FrameLayout {
+  interface Actions {
+    void enter(String experience);
+    void settings(String experience);
+    void themes();
+    String appearance();
+    void appearanceChanged();
+  }
+  static final int ENTER_INFINITY=0x00f02571, ENTER_COBRA=0x00f02572;
+  static final int SETTINGS_INFINITY=0x00f02573, SETTINGS_COBRA=0x00f02574;
+  static final int PILL_INFINITY=0x00f02575, PILL_COBRA=0x00f02576;
+  private final Actions actions;
+  private final String mode;
+  final boolean light;
+  private final SharedPreferences preferences;
+  final FrameLayout content;
+  final Stage stage;
+  private boolean subscribed, refreshQueued;
+  private final Runnable refresh = new Runnable() {
+    @Override public void run() {
+      refreshQueued=false;
+      if (isAttachedToWindow() && !mode.equals(actions.appearance())) actions.appearanceChanged();
+    }
+  };
+  private final SharedPreferences.OnSharedPreferenceChangeListener listener = (prefs,key) -> {
+    if (key==null || "cobra_appearance_mode".equals(key) || "cobra_system_dark_variant".equals(key)) requestThemeCheck();
+  };
+  static int background(boolean light) {return light?0xffeef1f5:0xff041326;}
+  InfinityGlassChooser(Context context, Actions actions) {
+    super(context);
+    this.actions=actions;
+    mode=actions.appearance(); light="light".equals(mode);
+    preferences=context.getSharedPreferences("infinity_cobra_live",Context.MODE_PRIVATE);
+    setBackgroundColor(background(light));
+    setTag("infinity_glass_chooser_2103257");
+    stage=new Stage(context,light,actions);
+    content=new FrameLayout(context) {
+      @Override public void scrollTo(int x,int y) { super.scrollTo(0,0); }
+      @Override public boolean shouldDelayChildPressedState() { return false; }
+      @Override protected void onMeasure(int w,int h) {
+        stage.viewportHint=Math.max(0,MeasureSpec.getSize(h)-getPaddingTop()-getPaddingBottom());
+        super.onMeasure(w,h);
+      }
+    };
+    content.setClipToPadding(true);content.setClipChildren(true);
+    content.setOverScrollMode(OVER_SCROLL_NEVER);
+    content.addView(stage,new FrameLayout.LayoutParams(-1,-1));
+    addView(content,new FrameLayout.LayoutParams(-1,-1));
+  }
+  private void requestThemeCheck() {
+    if (!refreshQueued) {refreshQueued=true;post(refresh);}
+  }
+  @Override protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    if (!subscribed) {preferences.registerOnSharedPreferenceChangeListener(listener);subscribed=true;}
+    requestThemeCheck();
+  }
+  @Override protected void onDetachedFromWindow() {
+    if(subscribed){preferences.unregisterOnSharedPreferenceChangeListener(listener);subscribed=false;}
+    removeCallbacks(refresh);refreshQueued=false;super.onDetachedFromWindow();
+  }
+  @Override protected void onConfigurationChanged(Configuration config) {
+    super.onConfigurationChanged(config);requestThemeCheck();requestLayout();
+  }
+  void focusEntry(){stage.infinity.requestFocus();}
+
+  private static final class Box {
+    final View view; final float x,y,w,h; final boolean minimumTouch;
+    Box(View v,float x,float y,float w,float h,boolean touch){view=v;this.x=x;this.y=y;this.w=w;this.h=h;minimumTouch=touch;}
+  }
+  static final class Stage extends ViewGroup {
+    final boolean light; final Actions actions;
+    final ArrayList<Box> boxes=new ArrayList<>();
+    final float referenceWidth,referenceHeight;
+    final Material backdrop;
+    final Card infinity,cobra;
+    float scale,left;int viewportHint;
+    boolean responsive,stacked;final Rect infinityBounds=new Rect(),cobraBounds=new Rect();
+    final TextView responsiveHeading,responsiveBrand;
+    private int px(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
+    private TextView responsiveText(Context c,String value,float size,int ink){
+      TextView v=new TextView(c);v.setText(value);v.setTextColor(ink);v.setTextSize(size);v.setGravity(Gravity.CENTER);
+      v.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));v.setMaxLines(2);v.setIncludeFontPadding(false);addView(v);v.setVisibility(GONE);return v;
+    }
+    Stage(Context c, boolean light, Actions actions) {
+      super(c);this.light=light;this.actions=actions;
+      referenceWidth=light?840:941; referenceHeight=light?1873:1672;
+      setClipChildren(false);setClipToPadding(false);
+      setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+      backdrop=new Material(c,light?"light_background":"dark_background",true,light);
+      addView(backdrop);
+      int ink=light?0xff081c34:0xfff7f6f2;
+      int muted=light?0xff47617f:0xffb7c2d3;
+      responsiveHeading=responsiveText(c,"CHOOSE YOUR EXPERIENCE",20,ink);
+      responsiveBrand=responsiveText(c,"INFINITY  ·  ONE PLATFORM. YOUR WAY.",12,muted);
+      responsiveHeading.setTag("experience-responsive-heading");responsiveBrand.setTag("experience-responsive-brand");
+      add(new Mark(c,light,"header_mark"),light?338:372,light?86:68,light?162:186,light?76:82,false);
+      label("INFINITY",light?239:280,light?176:161,light?362:382,59,45,true,ink,.15f);
+      label("ONE PLATFORM. YOUR WAY.",light?206:263,light?225:214,light?432:422,27,19,false,ink,.17f);
+      add(new Material(c,light?"light_orb":"dark_orb",false,light),light?679:679,light?39:32,light?120:192,light?111:135,false);
+      label("HM",light?710:730,light?73:69,light?63:91,51,43,true,light?ink:0xffffe4a4,0);
+      label(light?"BUILT\nDIFFERENT\nFOR A HIGHER\nEXPERIENCE":"BUILT DIFFERENT\nFOR A HIGHER",
+          light?678:680,light?165:174,light?123:199,light?83:49,light?12:15,false,muted,.13f);
+      label("CHOOSE YOUR EXPERIENCE",light?59:77,light?330:296,light?722:789,72,light?48:57,true,ink,-.015f);
+      if(light)label("ENTERTAINMENT WITHOUT LIMITS",181,404,478,29,16,false,muted,.23f);
+      infinity=new Card(c,light,false,actions);cobra=new Card(c,light,true,actions);
+      add(infinity,light?29:58,light?474:438,light?385:400,light?670:581,false);
+      add(cobra,light?425:482,light?474:438,light?385:403,light?670:581,false);
+      label("INFINITY LIVES IN HOW YOU EXPERIENCE IT",light?173:182,light?1283:1135,light?504:578,30,16,false,light?ink:muted,.13f);
+      label("ANY SCREEN · YOUR PREFERENCES · ALWAYS WITH YOU",light?109:162,light?1200:1166,light?623:617,29,light?14:15,false,muted,.14f);
+      if(light)label("MOVIES  •  SHOWS  •  LIVE TV  •  AND MORE",171,1734,500,29,13,false,muted,.24f);
+      // Existing theme management remains available from the non-card background.
+      setOnLongClickListener(v->{actions.themes();return true;});
+      infinity.setNextFocusRightId(ENTER_COBRA);cobra.setNextFocusLeftId(ENTER_INFINITY);
+      infinity.setNextFocusUpId(SETTINGS_INFINITY);cobra.setNextFocusUpId(SETTINGS_COBRA);
+    }
+    private void label(String text,float x,float y,float w,float h,float size,boolean serif,int color,float tracking) {
+      Label t=new Label(getContext(),text,size,serif,color,tracking);add(t,x,y,w,h,false);
+    }
+    private void add(View v,float x,float y,float w,float h,boolean touch){boxes.add(new Box(v,x,y,w,h,touch));addView(v);}
+    @Override protected void onMeasure(int ws,int hs) {
+      int w=MeasureSpec.getSize(ws); if(w<=0)w=getResources().getDisplayMetrics().widthPixels;
+      int available=MeasureSpec.getSize(hs);
+      // The fixed viewport passes its current inset-adjusted height. Never use stale parent measurements.
+      int viewport=MeasureSpec.getMode(hs)==MeasureSpec.UNSPECIFIED?viewportHint:available;
+      float density=getResources().getDisplayMetrics().density;
+      boolean multi=getContext() instanceof android.app.Activity && ((android.app.Activity)getContext()).isInMultiWindowMode();
+      responsive=multi || (viewport>0 && viewport<px(280) && w>=px(280));
+      for(Box box:boxes)box.view.setVisibility(!responsive||box.view==infinity||box.view==cobra?VISIBLE:GONE);
+      responsiveHeading.setVisibility(responsive?VISIBLE:GONE);responsiveBrand.setVisibility(responsive&&viewport>=px(360)?VISIBLE:GONE);
+      backdrop.setVisibility(responsive?GONE:VISIBLE);infinity.responsive=responsive;cobra.responsive=responsive;
+      if(responsive){
+        int h=Math.max(1,viewport),margin=px(12),gap=px(12),header=px(h>=px(360)?88:64);
+        stacked=w<px(360)&&h>=px(440);
+        int usableW=Math.max(1,w-2*margin),usableH=Math.max(1,h-header-margin);
+        if(stacked){int ch=Math.max(1,(usableH-gap)/2);infinityBounds.set(margin,header,margin+usableW,header+ch);cobraBounds.set(margin,header+ch+gap,margin+usableW,h-margin);}
+        else{int cw=Math.max(1,(usableW-gap)/2);infinityBounds.set(margin,header,margin+cw,h-margin);cobraBounds.set(margin+cw+gap,header,w-margin,h-margin);}
+        for(Card card:new Card[]{infinity,cobra}){Rect r=card==infinity?infinityBounds:cobraBounds;card.measure(MeasureSpec.makeMeasureSpec(r.width(),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(r.height(),MeasureSpec.EXACTLY));}
+        responsiveHeading.measure(MeasureSpec.makeMeasureSpec(usableW,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(px(48),MeasureSpec.EXACTLY));
+        responsiveBrand.measure(MeasureSpec.makeMeasureSpec(usableW,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(px(24),MeasureSpec.EXACTLY));
+        setMeasuredDimension(w,h);return;
+      }
+      float designWidth=Math.min(w,600*density);
+      if(viewport>0 && w>viewport)designWidth=Math.min(designWidth,Math.max(320*density,viewport*.82f));
+      // Fit the entire portrait composition. Short landscape windows crop only the decorative floor.
+      float fittedHeight=w>viewport?(light?1168f:1043f):referenceHeight;
+      if(viewport>0)designWidth=Math.min(designWidth,viewport*referenceWidth/fittedHeight);
+      scale=Math.max(.01f,designWidth/referenceWidth);left=(w-designWidth)/2;
+      int height=viewport>0?viewport:(int)Math.ceil(referenceHeight*scale);
+      setMeasuredDimension(w,height);
+      backdrop.measure(MeasureSpec.makeMeasureSpec((int)designWidth,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY));
+      for(Box b:boxes){
+        int bw=Math.max(1,Math.round(b.w*scale)),bh=Math.max(1,Math.round(b.h*scale));
+        if(b.view instanceof Label)((Label)b.view).scale=scale;
+        if(b.view instanceof Card)((Card)b.view).scale=scale;
+        b.view.measure(MeasureSpec.makeMeasureSpec(bw,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(bh,MeasureSpec.EXACTLY));
+      }
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b) {
+      if(responsive){
+        responsiveHeading.layout(px(12),px(8),getWidth()-px(12),px(56));
+        responsiveBrand.layout(px(12),px(58),getWidth()-px(12),px(82));
+        infinity.layout(infinityBounds.left,infinityBounds.top,infinityBounds.right,infinityBounds.bottom);
+        cobra.layout(cobraBounds.left,cobraBounds.top,cobraBounds.right,cobraBounds.bottom);
+        infinity.setNextFocusRightId(stacked?SETTINGS_INFINITY:ENTER_COBRA);infinity.setNextFocusDownId(stacked?ENTER_COBRA:SETTINGS_INFINITY);
+        cobra.setNextFocusLeftId(stacked?SETTINGS_COBRA:ENTER_INFINITY);cobra.setNextFocusUpId(stacked?ENTER_INFINITY:SETTINGS_COBRA);return;
+      }
+      infinity.setNextFocusRightId(ENTER_COBRA);cobra.setNextFocusLeftId(ENTER_INFINITY);
+      infinity.setNextFocusUpId(SETTINGS_INFINITY);cobra.setNextFocusUpId(SETTINGS_COBRA);
+      infinity.setNextFocusDownId(View.NO_ID);cobra.setNextFocusDownId(View.NO_ID);
+      backdrop.layout(Math.round(left),0,Math.round(left+referenceWidth*scale),getMeasuredHeight());
+      for(Box box:boxes){int x=Math.round(left+box.x*scale),y=Math.round(box.y*scale);box.view.layout(x,y,x+box.view.getMeasuredWidth(),y+box.view.getMeasuredHeight());}
+    }
+  }
+
+  /** Pixel positions follow each golden master; text remains selectable by accessibility. */
+  static final class Label extends TextView {
+    final float designSize;final String approvedText;float scale=1,responsiveSize;
+    Label(Context c,String text,float size,boolean serif,int color,float tracking){
+      super(c);designSize=size;approvedText=text;setText(text);setTextColor(color);setGravity(Gravity.CENTER);
+      setTypeface(Typeface.create(serif?"serif":"sans-serif-light",Typeface.NORMAL));
+      setLetterSpacing(tracking);setIncludeFontPadding(false);setPadding(0,0,0,0);
+      setLineSpacing(0,1.10f);setMaxLines(text.split("\\n",-1).length);
+      setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
+    }
+    @Override protected void onMeasure(int ws,int hs){
+      float size=responsiveSize>0?responsiveSize*getResources().getDisplayMetrics().scaledDensity:designSize*scale;
+      // Respect font scaling without allowing a large accessibility setting to hide a control.
+      if(responsiveSize==0)size*=Math.min(1.20f,getResources().getConfiguration().fontScale);
+      int width=MeasureSpec.getSize(ws),height=MeasureSpec.getSize(hs);
+      setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+      String[] lines=getText().toString().split("\\n",-1);
+      for(int i=0;i<16;i++){
+        float widest=0;for(String line:lines)widest=Math.max(widest,getPaint().measureText(line));
+        if(widest<=width*.98f && getPaint().getFontSpacing()*lines.length<=height*1.15f)break;
+        size*=.955f;setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+      }
+      super.onMeasure(ws,hs);
+    }
+  }
+
+  static final class Card extends ViewGroup {
+    final boolean light,cobra;final Actions actions;final ArrayList<Box> parts=new ArrayList<>();
+    final Material material; final Gear gear;final Label pill;
+    boolean responsive;final java.util.IdentityHashMap<View,Rect> responsiveBoxes=new java.util.IdentityHashMap<>();
+    float scale=1;final float rw,rh; final Paint ring=new Paint(Paint.ANTI_ALIAS_FLAG);final RectF outline=new RectF();
+    Card(Context c,boolean light,boolean cobra,Actions actions){
+      super(c);this.light=light;this.cobra=cobra;this.actions=actions;rw=light?385:(cobra?403:400);rh=light?670:581;
+      setId(cobra?ENTER_COBRA:ENTER_INFINITY);setTag(cobra?"experience-enter-cobra":"experience-enter-infinity");
+      setContentDescription(cobra?"Cobra. Control your experience. Open Cobra.":"Infinity. Beyond entertainment. Open Infinity.");
+      setFocusable(true);setClickable(true);setWillNotDraw(false);setClipChildren(false);
+      setOnClickListener(v->actions.enter(cobra?"live":"infinity"));
+      setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+      material=new Material(c,(light?"light_":"dark_")+(cobra?"cyan":"gold"),false,light);addView(material);
+      int ink=light?0xff071c36:0xfff5f4f1;
+      gear=new Gear(c,light,cobra);gear.setId(cobra?SETTINGS_COBRA:SETTINGS_INFINITY);
+      gear.setTag(cobra?"experience-settings-cobra":"experience-settings-infinity");
+      gear.setContentDescription(cobra?"Cobra settings and recovery":"Infinity settings and Health Center");
+      gear.setOnClickListener(v->actions.settings(cobra?"live":"infinity"));
+      part(gear,light?245:258,light?30:31,light?112:115,112,true);
+      part(new Mark(c,light,cobra?"cyan_mark":"gold_mark"),light?(cobra?48:56):(cobra?61:75),light?(cobra?140:166):(cobra?145:178),light?(cobra?292:279):(cobra?281:244),light?(cobra?188:156):(cobra?169:128),false);
+      label(cobra?"COBRA":"INFINITY",20,light?328:320,rw-40,66,light?45:49,true,ink,.04f);
+      label(cobra?"CONTROL YOUR\nEXPERIENCE":"BEYOND\nENTERTAINMENT",30,light?423:409,rw-60,57,light?21:22,false,ink,.08f);
+      if(light){
+        pill=new Label(c,cobra?"ENTER COBRA  ›":"ENTER INFINITY  ›",19,false,ink,.055f);
+        pill.setId(cobra?PILL_COBRA:PILL_INFINITY);pill.setTag(cobra?"experience-pill-cobra":"experience-pill-infinity");
+        pill.setFocusable(true);pill.setClickable(true);pill.setContentDescription(cobra?"Enter Cobra":"Enter Infinity");
+        pill.setBackground(pillSurface(cobra));pill.setOnClickListener(v->actions.enter(cobra?"live":"infinity"));
+        part(pill,36,550,rw-72,78,true);pill.setNextFocusUpId(gear.getId());
+      }else pill=null;
+      gear.setNextFocusDownId(light?pill.getId():getId());
+      gear.setNextFocusLeftId(cobra?SETTINGS_INFINITY:SETTINGS_COBRA);
+      gear.setNextFocusRightId(cobra?SETTINGS_INFINITY:SETTINGS_COBRA);
+      ring.setStyle(Paint.Style.STROKE);ring.setColor(cobra?(light?0xff087797:0xff83e5ff):(light?0xff896018:0xffffdc86));
+    }
+    private Drawable pillSurface(boolean cobra){
+      GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xfaffffff,cobra?0xcbb5ebf6:0xcbeedcb2,0xeaffffff});
+      shape.setCornerRadius(100);shape.setStroke(2,0xfaffffff);
+      return new RippleDrawable(ColorStateList.valueOf(cobra?0x400098cc:0x408c621c),shape,null);
+    }
+    private void label(String text,float x,float y,float w,float h,float size,boolean serif,int color,float tracking){part(new Label(getContext(),text,size,serif,color,tracking),x,y,w,h,false);}
+    private void part(View v,float x,float y,float w,float h,boolean touch){parts.add(new Box(v,x,y,w,h,touch));addView(v);}
+    @Override protected void onMeasure(int ws,int hs){
+      int w=MeasureSpec.getSize(ws),h=MeasureSpec.getSize(hs);setMeasuredDimension(w,h);scale=w/rw;
+      material.setVisibility(responsive?GONE:VISIBLE);
+      if(responsive){measureResponsive(w,h);return;}
+      setBackground(null);for(Box part:parts){part.view.setVisibility(VISIBLE);if(part.view instanceof Label){((Label)part.view).setText(((Label)part.view).approvedText);((Label)part.view).responsiveSize=0;}}
+      material.measure(MeasureSpec.makeMeasureSpec(w,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(h,MeasureSpec.EXACTLY));
+      int min=Math.round(48*getResources().getDisplayMetrics().density);
+      for(Box b:parts){
+        int bw=Math.round(b.w*scale),bh=Math.round(b.h*scale);
+        if(b.minimumTouch){bw=Math.min(w,Math.max(min,bw));bh=Math.min(h,Math.max(min,bh));}
+        if(b.view instanceof Label)((Label)b.view).scale=scale;
+        if(b.view instanceof Gear)((Gear)b.view).visualSize=Math.round(b.w*scale);
+        b.view.measure(MeasureSpec.makeMeasureSpec(Math.max(1,bw),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Math.max(1,bh),MeasureSpec.EXACTLY));
+      }
+    }
+    private int px(float v){return Math.round(v*getResources().getDisplayMetrics().density);}
+    private void responsivePart(View v,int x,int y,int w,int h){
+      Rect r=new Rect(x,y,x+Math.max(1,w),y+Math.max(1,h));responsiveBoxes.put(v,r);
+      v.measure(MeasureSpec.makeMeasureSpec(r.width(),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(r.height(),MeasureSpec.EXACTLY));
+    }
+    private void measureResponsive(int w,int h){
+      responsiveBoxes.clear();
+      GradientDrawable glass=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{light?0xfaffffff:0xff14283a,light?(cobra?0xffd0edf4:0xfff4e7c9):0xff06101c});
+      glass.setCornerRadius(px(18));glass.setStroke(px(1),cobra?(light?0xff59b7d0:0xff53cbeb):(light?0xffcead6c:0xffd7ba74));setBackground(glass);
+      boolean artwork=h>=px(220)&&w>=px(140);int titleY=h<px(160)?px(8):artwork?px(116):px(68);
+      int titleHeight=px(32);int bottom=light?px(56):px(8);
+      for(Box part:parts){View v=part.view;v.setVisibility(VISIBLE);
+        if(v==gear){gear.visualSize=px(48);responsivePart(v,Math.max(0,w-px(56)),px(8),Math.min(w,px(48)),px(48));}
+        else if(v==pill){pill.setText(w<px(180)?"ENTER  ›":pill.approvedText);pill.responsiveSize=14;responsivePart(v,px(8),h-px(56),w-px(h<px(160)?72:16),px(48));}
+        else if(v instanceof Mark){if(!artwork){v.setVisibility(GONE);continue;}responsivePart(v,(w-px(96))/2,px(58),px(96),px(48));}
+        else if(v instanceof Label){Label label=(Label)v;
+          if(label.approvedText.equals("INFINITY")||label.approvedText.equals("COBRA")){label.responsiveSize=18;responsivePart(v,px(8),titleY,w-px(h<px(160)?72:16),titleHeight);}
+          else if(h-titleY-titleHeight-bottom>=px(44)){label.responsiveSize=12;responsivePart(v,px(8),titleY+titleHeight,w-px(16),px(40));}
+          else v.setVisibility(GONE);
+        }
+      }
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+      if(responsive){for(java.util.Map.Entry<View,Rect> item:responsiveBoxes.entrySet()){Rect box=item.getValue();item.getKey().layout(box.left,box.top,box.right,box.bottom);}outline.set(px(2),px(2),getWidth()-px(2),getHeight()-px(2));ring.setStrokeWidth(px(2));return;}
+      material.layout(0,0,getWidth(),getHeight());
+      for(Box p:parts){int w=p.view.getMeasuredWidth(),h=p.view.getMeasuredHeight();
+        int x=Math.round((p.x+p.w/2)*scale-w/2),y=Math.round((p.y+p.h/2)*scale-h/2);
+        x=Math.max(0,Math.min(getWidth()-w,x));y=Math.max(0,Math.min(getHeight()-h,y));p.view.layout(x,y,x+w,y+h);
+      }
+      outline.set(5*scale,5*scale,getWidth()-5*scale,getHeight()-5*scale);ring.setStrokeWidth(Math.max(2,4*scale));
+    }
+    @Override protected void dispatchDraw(Canvas c){super.dispatchDraw(c);if(isFocused()||isPressed())c.drawRoundRect(outline,48*scale,48*scale,ring);}
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+  }
+
+  /** The source-derived finish is decorative. It never owns text, focus or action callbacks. */
+  private static final class Material extends View {
+    private final Bitmap bitmap;private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    private final Rect src=new Rect();private final RectF dst=new RectF();private final boolean background,light;
+    Material(Context c,String key,boolean background,boolean light){super(c);this.background=background;this.light=light;bitmap=InfinityGlassArt.decode(key);if(bitmap==null)throw new IllegalStateException("Missing glass material "+key);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    @Override protected void onDraw(Canvas canvas){
+      super.onDraw(canvas);
+      if(!background){dst.set(0,0,getWidth(),getHeight());canvas.drawBitmap(bitmap,null,dst,paint);return;}
+      float referenceW=light?840:941,referenceH=light?1873:1672;
+      float scale=getWidth()/referenceW;float fixed=(light?1340:1205)*scale;
+      // Preserve card/header registration; extend only the quiet orbital floor for tall windows.
+      int seam=Math.round(bitmap.getHeight()*(light?1340f/1873f:1205f/1672f));
+      src.set(0,0,bitmap.getWidth(),seam);dst.set(0,0,getWidth(),fixed);canvas.drawBitmap(bitmap,src,dst,paint);
+      src.set(0,seam,bitmap.getWidth(),bitmap.getHeight());dst.set(0,fixed,getWidth(),getHeight());canvas.drawBitmap(bitmap,src,dst,paint);
+    }
+  }
+  static final class Gear extends View {
+    final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    final RectF frame=new RectF(),artBounds=new RectF();final Path cog=new Path();
+    final boolean light,cobra;final Bitmap material;int visualSize=Integer.MAX_VALUE;
+    Gear(Context c,boolean light,boolean cobra){super(c);this.light=light;this.cobra=cobra;
+      material=InfinityGlassArt.decode((light?"light":"dark")+(cobra?"_gear_cyan":"_gear_gold"));
+      setFocusable(true);setClickable(true);
+    }
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){
+      super.onSizeChanged(w,h,ow,oh);float s=Math.min(visualSize,Math.min(w,h)),cx=w/2f,cy=h/2f;
+      artBounds.set(cx-s*.5f,cy-s*.5f,cx+s*.5f,cy+s*.5f);
+      frame.set(cx-s*.42f,cy-s*.42f,cx+s*.42f,cy+s*.42f);cog.reset();
+      for(int i=0;i<40;i++){double angle=i*Math.PI/20-Math.PI/2;float rad=s*((i%5==1||i%5==2)? .123f:.097f);
+        float x=cx+(float)Math.cos(angle)*rad,y=cy+(float)Math.sin(angle)*rad;if(i==0)cog.moveTo(x,y);else cog.lineTo(x,y);}
+      cog.close();
+    }
+    @Override protected void onDraw(Canvas c){
+      float s=artBounds.width();p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);c.drawBitmap(material,null,artBounds,p);
+      p.setStyle(Paint.Style.STROKE);
+      if(isPressed()||isFocused()){p.setStrokeWidth(Math.max(2,s*.035f));p.setColor(cobra?0xff159acc:0xffbc9438);c.drawRoundRect(frame,s*(light?.42f:.27f),s*(light?.42f:.27f),p);}
+      p.setColor(light?0xff082339:0xffe1ebf3);p.setStrokeWidth(Math.max(1.5f,s*.022f));c.drawPath(cog,p);c.drawCircle(getWidth()/2f,getHeight()/2f,s*.036f,p);
+    }
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+  }
+  /** Independent approved brand artwork; not reinterpreted or recolored at runtime. */
+  private static final class Mark extends View {
+    final Bitmap bitmap;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);final RectF bounds=new RectF();
+    Mark(Context c,boolean light,String key){super(c);bitmap=InfinityGlassArt.decode((light?"light_":"dark_")+key);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){super.onSizeChanged(w,h,ow,oh);bounds.set(0,0,w,h);}
+    @Override protected void onDraw(Canvas c){
+      if(getParent() instanceof Card && ((Card)getParent()).responsive){float s=Math.min(getWidth()/(float)bitmap.getWidth(),getHeight()/(float)bitmap.getHeight());float w=bitmap.getWidth()*s,h=bitmap.getHeight()*s;RectF fit=new RectF((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2);c.drawBitmap(bitmap,null,fit,p);}
+      else c.drawBitmap(bitmap,null,bounds,p);
+    }
+  }
+}

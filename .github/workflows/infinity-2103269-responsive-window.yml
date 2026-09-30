@@ -1,0 +1,167 @@
+name: Infinity | 2103269 Responsive Window Audit RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-responsive-window-2103269-rc1]
+    paths: ['.github/workflows/infinity-2103269-responsive-window.yml', 'repairs/responsive-window-2103269/**']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: responsive-window-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  android-product-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103268-Cobra-Display-Player-RC1-TEST-CANDIDATE
+          run-id: 36699564793
+          github-token: ${{ github.token }}
+          path: parent268
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103268-Cobra-Display-Player-RC1-Evidence
+          run-id: 36699564793
+          github-token: ${{ github.token }}
+          path: source268
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103267-Cobra-Playing-Dot-Restore-RC1-Evidence
+          run-id: 36684966394
+          github-token: ${{ github.token }}
+          path: source267
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103265-Phone-Glass-Polish-RC1-Evidence
+          run-id: 36671687282
+          github-token: ${{ github.token }}
+          path: source265
+      - name: Verify exact locked baseline and preserve rollback
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          assert hashlib.sha256(Path('parent268/Infinity-2103268-Cobra-Display-Player-RC1.apk').read_bytes()).hexdigest()=='de03a34643a4693162c2cd46912b826b4a77aaafbb4491ce46d1d33bf1f6d4e8'
+          assert hashlib.sha256(Path('source268/reconstructed-2103268-shell.tar.gz').read_bytes()).hexdigest()=='2aedf1efe9d085184e670527d223edc3789d6c6b290411e831d06f89e53b24a5'
+          with zipfile.ZipFile('parent268/Infinity-2103268-Cobra-Display-Player-RC1.apk') as z:
+            Path('engine').mkdir(exist_ok=True)
+            Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          tar --no-same-owner -xzf source268/reconstructed-2103268-shell.tar.gz
+          mkdir -p rollback268/engine rollback268/scripts audit269
+          cp -a shell-kodi rollback268/
+          cp engine/background-resume-source.json rollback268/engine/
+          cp scripts/package_background_resume.py scripts/infinity_background_resume.py rollback268/scripts/
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Demonstrate two independent responsive product defects in the 268 checkpoint
+        run: |
+          set -euo pipefail
+          python3 - <<'PYBASE'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import package_background_resume as p
+          p.prepare(Path('shell-kodi').resolve(),Path('parent268/Infinity-2103268-Cobra-Display-Player-RC1.apk').resolve(),Path('build268').resolve(),Path('audit269').resolve())
+          PYBASE
+          python3 repairs/responsive-window-2103269/stage_tests.py --build build268 --evidence audit269/baseline-screenshots
+          cd build268
+          set +e
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests '*ResponsiveWindowTest.constrainedChooserIsReadableAndUsesTheActualWindowInsteadOfShrinkingPortraitArt' --tests '*ResponsiveWindowTest.cobraResponsiveHelpersUseActualDecorWhenPhysicalDisplayAndOrientationDisagree' 2>&1 | tee ../audit269/baseline-product-tests.log
+          code=${PIPESTATUS[0]}
+          set -e
+          test "$code" -ne 0
+          cd ..
+          python3 - <<'PYBASE'
+          import xml.etree.ElementTree as E
+          t=E.parse('build268/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.ResponsiveWindowTest.xml').getroot()
+          assert int(t.attrib['tests'])==2 and int(t.attrib['failures'])==2 and int(t.attrib.get('errors',0))==0,t.attrib
+          for c in t.findall('testcase'):
+            failure=c.find('failure');assert failure is not None and failure.attrib['type']=='java.lang.AssertionError',(c.attrib,failure.attrib if failure is not None else None)
+          PYBASE
+      - name: Apply scoped forward repairs and source-preservation gate
+        run: |
+          python3 repairs/responsive-window-2103269/apply.py --root . --out audit269
+          python3 repairs/responsive-window-2103269/verify_source.py --baseline rollback268 --root . --out audit269
+      - name: Compile and permanently sign one forward APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent268/Infinity-2103268-Cobra-Display-Player-RC1.apk --build-dir build269 --out signed269 2>&1 | tee audit269/android-build.log
+      - name: Run intended-outcome Display Player and locked preservation regressions
+        run: |
+          set -euo pipefail
+          python3 repairs/responsive-window-2103269/stage_tests.py --build build269 --evidence audit269/screenshots --inherited
+          cd build269
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+            --tests '*ResponsiveWindowTest' --tests '*Cobra2103268ProductAuditTest' --tests '*Cobra2103201ScrubberTest' \
+            --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103201MenuPolishTest' --tests '*Cobra2103202LifecycleTest' \
+            --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest' \
+            --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest' \
+            --tests '*Cobra2103229MultiViewStabilityFillTest' \
+            --tests '*GlassChooserTest' --tests '*GlassOptionsTest' --tests '*GlassHealthFinishTest' \
+            --tests '*RecoveryFixedTest' --tests '*ProVisualTest' --tests '*ProActionsTest' \
+            --tests '*PhoneGlassTest' --tests '*AmbientGlassTest' --tests '*Cobra2103267PlayingDotRestoreTest' \
+            2>&1 | tee ../audit269/android-product-tests.log
+      - name: Candidate acceptance and protected APK payload gate
+        run: |
+          set -euo pipefail
+          python3 repairs/responsive-window-2103269/verify_source.py --baseline rollback268 --root . --out audit269
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib,xml.etree.ElementTree as E
+          files=list(Path('build269/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==21,len(files)
+          counts={}
+          for f in files:
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
+          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==15 and counts['com.projectinfinity.kodi.ResponsiveWindowTest']==6,counts
+          locked=Path('source267/screenshots/protected');current=Path('audit269/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
+          report=json.loads(Path('signed269/background-resume-apk-audit.json').read_text());report.update(test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=len(names),physical_device_verified=False,update_over_install_device_verified=False,candidate_locked=False,status='AUTOMATED TEST CANDIDATE — PASS; physical-device acceptance required',responsive_native_infinity_verified=False,infinity_skin_touched=False)
+          Path('signed269/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          apk=Path('signed269/Infinity-2103269-Responsive-Window-RC1.apk');Path('signed269/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Preserve exact source tests renders and rollback manifest
+        if: always()
+        run: |
+          mkdir -p audit269/repair-source
+          cp -r repairs/responsive-window-2103269/* audit269/repair-source/
+          cp -r build268/xbmc/build/test-results audit269/baseline-test-results || true
+          cp -r build269/xbmc/build/test-results audit269/candidate-test-results || true
+          cp -r build269/xbmc/src/test audit269/staged-tests || true
+          tar -czf audit269/reconstructed-2103269-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          cp source267/source-verification.json audit269/locked-2103267-source-verification.json
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103269-Responsive-Window-RC1-TEST-CANDIDATE
+          path: signed269/
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103269-Responsive-Window-RC1-Evidence
+          path: audit269/
+          retention-days: 90
