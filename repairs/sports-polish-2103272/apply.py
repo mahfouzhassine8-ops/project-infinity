@@ -24,15 +24,10 @@ def once(s,old,new):
     return s.replace(old,new,1)
 
 def method_span(s,name):
-    token=name+'('
-    p=s.find(token)
-    if p<0: raise AssertionError('Missing method '+name)
-    start=s.rfind('\n  private ',0,p)
-    if start<0: start=s.rfind('\n  protected ',0,p)
-    if start<0: start=s.rfind('\n  void ',0,p)
-    if start<0: raise AssertionError('Missing method start '+name)
-    start+=1
-    brace=s.find('{',p)
+    import re
+    match=re.search(r'(?m)^  private [^\\n{]*\\b'+re.escape(name)+r'\\s*\\(',s)
+    if not match: raise AssertionError('Missing method declaration '+name)
+    start=match.start();p=match.end()-1;brace=s.find('{',p)
     depth=0
     for i in range(brace,len(s)):
         if s[i]=='{': depth+=1
