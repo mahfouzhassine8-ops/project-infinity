@@ -78,6 +78,7 @@ jobs:
           from pathlib import Path
           sys.path.insert(0,'scripts')
           import package_background_resume as p
+          p.BASE_APK_SHA256="de03a34643a4693162c2cd46912b826b4a77aaafbb4491ce46d1d33bf1f6d4e8"
           p.prepare(Path('shell-kodi').resolve(),Path('parent268/Infinity-2103268-Cobra-Display-Player-RC1.apk').resolve(),Path('build268').resolve(),Path('audit269').resolve())
           PYBASE
           python3 repairs/responsive-window-2103269/stage_tests.py --build build268 --evidence audit269/baseline-screenshots
@@ -134,7 +135,7 @@ jobs:
           counts={}
           for f in files:
             t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
-          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==15 and counts['com.projectinfinity.kodi.ResponsiveWindowTest']==6,counts
+          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==15 and counts['com.projectinfinity.kodi.ResponsiveWindowTest']==7,counts
           locked=Path('source267/screenshots/protected');current=Path('audit269/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
           for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
           report=json.loads(Path('signed269/background-resume-apk-audit.json').read_text());report.update(test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=len(names),physical_device_verified=False,update_over_install_device_verified=False,candidate_locked=False,status='AUTOMATED TEST CANDIDATE — PASS; physical-device acceptance required',responsive_native_infinity_verified=False,infinity_skin_touched=False)
