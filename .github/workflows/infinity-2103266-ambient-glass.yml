@@ -1,0 +1,141 @@
+name: Infinity | 2103266 Ambient Glass Cinema RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103266-ambient-glass-cinema-rc1]
+    paths:
+      - '.github/workflows/infinity-2103266-ambient-glass.yml'
+      - 'repairs/ambient-glass-2103266/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-phone-glass-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  phone-glass-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Download exact 2103265 signed candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103265-Phone-Glass-Polish-RC1-TEST-CANDIDATE
+          run-id: 36671687282
+          github-token: ${{ github.token }}
+          path: parent265
+      - name: Download exact 2103265 source and test evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103265-Phone-Glass-Polish-RC1-Evidence
+          run-id: 36671687282
+          github-token: ${{ github.token }}
+          path: source265
+      - name: Verify parent APK and source pairing
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source265/reconstructed-2103265-shell.tar.gz | cut -d' ' -f1)" = '06b74a5b307f016e2e26b379c5cbe36c1d83f42236d726d61cea36c1f7653260'
+          test "$(sha256sum parent265/Infinity-2103265-Phone-Glass-Polish-RC1.apk | cut -d' ' -f1)" = '6ae458dcc400c6259ac793f4d1fc26fc897aa592f6889febcd0fd084d860626c'
+          tar --no-same-owner -xzf source265/reconstructed-2103265-shell.tar.gz
+          mkdir -p audit266
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent265/Infinity-2103265-Phone-Glass-Polish-RC1.apk') as z:
+              assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Apply phone glass and isolate Pro styling
+        run: python3 repairs/ambient-glass-2103266/apply.py --root . --evidence audit266
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' 'ndk;21.4.7075529' >/dev/null
+      - name: Compile Android interface only and retain permanent signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent265/Infinity-2103265-Phone-Glass-Polish-RC1.apk --build-dir build266 --out signed266 2>&1 | tee audit266/android-build.log
+      - name: Run phone glass Pro actions and protected regressions
+        run: |
+          set -euo pipefail
+          mkdir -p audit266/screenshots
+          python3 repairs/ambient-glass-2103266/stage_tests.py --build-dir build266 --evidence audit266/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build266
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.GlassChooserTest --tests com.projectinfinity.kodi.GlassOptionsTest --tests com.projectinfinity.kodi.GlassHealthFinishTest --tests com.projectinfinity.kodi.RecoveryFixedTest --tests com.projectinfinity.kodi.ProVisualTest --tests com.projectinfinity.kodi.ProActionsTest --tests com.projectinfinity.kodi.PhoneGlassTest --tests com.projectinfinity.kodi.AmbientGlassTest 2>&1 | tee ../audit266/android-view-tests.log
+      - name: Gate APK on integrated Android views and preserved payload
+        run: |
+          set -euo pipefail
+          python3 - <<'CHECK'
+          import hashlib,json,sys,xml.etree.ElementTree as ET
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          apk=Path('signed266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk')
+          kept=verify_bytes(Path('parent265/Infinity-2103265-Phone-Glass-Polish-RC1.apk'),apk)
+          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':17,'ProActionsTest':5,'PhoneGlassTest':4,'AmbientGlassTest':5}
+          for name,count in counts.items():
+              t=ET.parse('build266/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
+              assert int(t.attrib['tests'])==count,(name,t.attrib)
+              assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(name,t.attrib)
+          locked=Path('source265/screenshots/protected');current=Path('audit266/screenshots/protected')
+          names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected chooser/settings render changed: '+name
+          locked_phone=Path('source265/screenshots/phone');phone=Path('audit266/screenshots/phone')
+          phone_names=sorted(p.name for p in locked_phone.glob('*.png'));assert len(phone_names)==32
+          for name in phone_names:assert (locked_phone/name).read_bytes()==(phone/name).read_bytes(),'Locked glass render changed with effects off: '+name
+          source=json.loads(Path('audit266/source-verification.json').read_text())
+          assert source['other_shell_files_byte_identical']==229
+          result=json.loads(Path('signed266/background-resume-apk-audit.json').read_text());result.update(kept)
+          result.update(source_verification=source,test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=20,ambient_glass_and_cinema_tests=True,
+              production_theme_live_text_test=True,actual_activity_drawer_and_chooser_test=True,actual_four_mode_shell_test=True,
+              test_data='deterministic fixtures and actual guide shells with six fixture channels, not live provider data',
+              physical_device_verified=False,real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)
+          Path('signed266/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed266/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(result,indent=2))
+          CHECK
+      - name: Preserve expanded source tests renders and audit
+        if: always()
+        run: |
+          mkdir -p audit266
+          cp -r repairs/ambient-glass-2103266 audit266/repair-source
+          if [ -d build266/xbmc/build/test-results ]; then cp -r build266/xbmc/build/test-results audit266/; fi
+          if [ -d build266/xbmc/src/test ]; then cp -r build266/xbmc/src/test audit266/staged-tests; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit266/reconstructed-2103266-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103266-Ambient-Glass-Cinema-RC1-TEST-CANDIDATE
+          path: signed266/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Publish glass polish and regression evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103266-Ambient-Glass-Cinema-RC1-Evidence
+          path: audit266/
+          if-no-files-found: error
+          retention-days: 90
