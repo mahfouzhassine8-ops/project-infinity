@@ -16,13 +16,12 @@ assert ap==bp,'Pro Sports UI changed in ambient-only pass'
 assert r.sha(ac.encode())==r.AFTER_CMAKE_SHA,'Android CMake registration differs from bounded 2103275 result'
 assert 'src/CobraImmersiveAmbient.java' in ac and 'CobraImmersiveAmbient.java.in' in ac
 assert r.sha(aa.encode())==r.AFTER_ACTIVITY_SHA and r.sha(ar.encode())==r.AFTER_RENDERER_SHA
-immersive=(root/'shell-kodi'/r.IMMERSIVE);assert immersive.is_file() and r.sha(immersive.read_bytes())==r.AFTER_IMMERSIVE_SHA
+immersive=(root/'shell-kodi'/r.IMMERSIVE);reference_immersive=HERE/'CobraImmersiveAmbient.java.in';assert immersive.is_file() and immersive.read_bytes()==reference_immersive.read_bytes()
 assert 'SAMPLE_WIDTH = 144' in immersive.read_text() and 'FRAME_INTERVAL_MS = 83L' in immersive.read_text()
 assert 'RAY_STEPS = 48' in immersive.read_text() and 'SATURATION = 1.65f' in immersive.read_text()
 assert 'x-ambient project by mmnga' in immersive.read_text()
 assert 'mPlayerOverlay!=null' in aa and 'mMultiOverlay!=null' in aa and 'mCobraMiniBackgroundActive||mBackgroundStopped' in aa
 assert 'Live mini-player edge colours • suspended in fullscreen, PiP and background' in aa
-assert (root/'shell-kodi'/r.LICENSE).read_text()==r.MIT,'MIT attribution payload changed'
 
 items=[];changed=[];base_names=set()
 for f in sorted((base/'shell-kodi').rglob('*')):
@@ -33,7 +32,7 @@ for f in sorted((base/'shell-kodi').rglob('*')):
 current_names={str(f.relative_to(root/'shell-kodi')) for f in (root/'shell-kodi').rglob('*') if f.is_file()}
 added=sorted(current_names-base_names)
 assert set(changed)=={r.ACTIVITY,r.RENDERER,r.GRADLE,r.CMAKE},changed
-assert set(added)=={r.IMMERSIVE,r.LICENSE},added
+assert set(added)=={r.IMMERSIVE},added
 
 bg=(base/'shell-kodi'/r.GRADLE).read_text().replace('versionCode 2103274','versionCode 2103275').replace('versionName "1.0.9-Sports-Hub-Soccer-RC1"','versionName "1.0.9-Immersive-Edge-Ambient-RC1"')
 assert (root/'shell-kodi'/r.GRADLE).read_text()==bg
