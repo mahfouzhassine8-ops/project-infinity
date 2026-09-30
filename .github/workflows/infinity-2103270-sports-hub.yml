@@ -1,0 +1,142 @@
+name: Infinity | 2103270 Cobra Sports Hub RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103270-sports-hub-rc1]
+    paths: ['.github/workflows/infinity-2103270-sports-hub.yml', 'repairs/sports-hub-2103270/**']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: sports-hub-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  android-sports-product-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103269-Responsive-Window-RC1-TEST-CANDIDATE
+          run-id: 36741769377
+          github-token: ${{ github.token }}
+          path: parent269
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103269-Responsive-Window-RC1-Evidence
+          run-id: 36741769377
+          github-token: ${{ github.token }}
+          path: source269
+      - name: Verify exact locked 2103269 rollback and reconstruct source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          apk=Path('parent269/Infinity-2103269-Responsive-Window-RC1.apk')
+          src=Path('source269/reconstructed-2103269-shell.tar.gz')
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='f71fdfad769ae30e57c2c96ab4dbaf51062fc483e54f1702114517fcf47befce'
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=='39b82ffa9d8f5deac2d3c78d5bfd8bde74112f5f9a7bcbb56198c36a901f4479'
+          with zipfile.ZipFile(apk) as z:
+            Path('engine').mkdir(exist_ok=True)
+            Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          tar --no-same-owner -xzf source269/reconstructed-2103269-shell.tar.gz
+          mkdir -p rollback269/engine rollback269/scripts audit270
+          cp -a shell-kodi rollback269/
+          cp engine/background-resume-source.json rollback269/engine/
+          cp scripts/package_background_resume.py scripts/infinity_background_resume.py rollback269/scripts/
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in').read_text()
+          assert '// 2103270 — Cobra Sports Hub' not in s
+          assert 'cobraDrawerDestination(library,"play","Sports","SPORTS"' not in s
+          print('PASS: Sports implementation is absent from the exact locked rollback.')
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Apply bounded Sports Hub forward implementation
+        run: |
+          set -euo pipefail
+          python3 repairs/sports-hub-2103270/apply.py --root . --out audit270
+          python3 repairs/sports-hub-2103270/verify_source.py --baseline rollback269 --root . --out audit270
+      - name: Compile and permanently sign one forward APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent269/Infinity-2103269-Responsive-Window-RC1.apk --build-dir build270 --out signed270 2>&1 | tee audit270/android-build.log
+      - name: Stage Sports tests and run inherited locked regressions
+        run: |
+          set -euo pipefail
+          python3 repairs/sports-hub-2103270/stage_tests.py --build build270 --evidence audit270/screenshots --inherited
+          cd build270
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+            --tests '*SportsHubTest' --tests '*ResponsiveWindowTest' --tests '*Cobra2103268ProductAuditTest' \
+            --tests '*Cobra2103201ScrubberTest' --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103201MenuPolishTest' \
+            --tests '*Cobra2103202LifecycleTest' --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest' \
+            --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest' \
+            --tests '*Cobra2103229MultiViewStabilityFillTest' --tests '*GlassChooserTest' --tests '*GlassOptionsTest' \
+            --tests '*GlassHealthFinishTest' --tests '*RecoveryFixedTest' --tests '*ProVisualTest' --tests '*ProActionsTest' \
+            --tests '*PhoneGlassTest' --tests '*AmbientGlassTest' --tests '*Cobra2103267PlayingDotRestoreTest' \
+            2>&1 | tee ../audit270/android-product-tests.log
+      - name: Candidate acceptance and protected-payload gate
+        run: |
+          set -euo pipefail
+          python3 repairs/sports-hub-2103270/verify_source.py --baseline rollback269 --root . --out audit270
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib,xml.etree.ElementTree as E
+          files=list(Path('build270/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==22,len(files)
+          counts={}
+          for f in files:
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
+          assert counts['com.projectinfinity.kodi.SportsHubTest']==6,counts
+          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==15 and counts['com.projectinfinity.kodi.ResponsiveWindowTest']==8,counts
+          assert sum(counts.values())==217,counts
+          locked=Path('source269/screenshots/protected');current=Path('audit270/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected locked render changed: '+name
+          report=json.loads(Path('signed270/background-resume-apk-audit.json').read_text());report.update(test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=len(names),sports_hub=True,sports_channel_resolver=True,smart_sports_multiview=True,manual_multiview_preserved=True,physical_device_verified=False,update_over_install_device_verified=False,candidate_locked=False,status='AUTOMATED SPORTS TEST CANDIDATE — PASS; physical-device acceptance required')
+          Path('signed270/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          apk=Path('signed270/Infinity-2103270-Sports-Hub-RC1.apk');Path('signed270/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Preserve exact implementation tests renders and rollback manifest
+        if: always()
+        run: |
+          mkdir -p audit270/repair-source
+          cp -r repairs/sports-hub-2103270/* audit270/repair-source/
+          cp -r build270/xbmc/build/test-results audit270/candidate-test-results || true
+          cp -r build270/xbmc/src/test audit270/staged-tests || true
+          tar -czf audit270/reconstructed-2103270-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          cp source269/source-verification.json audit270/locked-2103269-source-verification.json
+          cp repairs/sports-hub-2103270/ACCEPTANCE.md audit270/
+          cp repairs/sports-hub-2103270/DEVICE-TEST.md audit270/
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103270-Sports-Hub-RC1-TEST-CANDIDATE
+          path: signed270/
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103270-Sports-Hub-RC1-Evidence
+          path: audit270/
+          retention-days: 90
