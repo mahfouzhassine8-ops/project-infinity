@@ -105,6 +105,12 @@ public class Cobra2103267DisplayAllModesAuditTest {
     prefs.edit().putString(key,new JSONObject().put("schema",1).put("aspect",aspect).put("x",x).put("y",y).toString()).commit();
   }
 
+  void saveThroughOwner(Object ch,int aspect,float x,float y)throws Exception{
+    String key=(String)call(a,"cobraPreferenceKey",ch);Object p=call(a,"cobraReadPreferences",key);
+    put(p,"aspect",aspect);put(p,"x",x);put(p,"y",y);
+    assertEquals(true,call(a,"cobraSavePreferences",ch,key,p,false));
+  }
+
   @Test public void toolbarChannelDisplayContainsAllFifteenChoicesAndTruthfulSelection()throws Exception{
     Controlled c=new Controlled();TextureView t=texture(1600,900);Object ch=channel(0);prefs.edit().putInt("cobra_player_aspect_mode",3).commit();saved(ch,-1,1,1);bind(c,ch,t);
     int[] choices={12,13,-1,0,1,2,3,4,5,6,7,8,9,10,11};
@@ -156,15 +162,15 @@ public class Cobra2103267DisplayAllModesAuditTest {
   @Test public void customWidthHeightAreBoundedAndChannelScoped()throws Exception{
     Controlled c=new Controlled();TextureView t=texture(1600,900);Object ch=channel(0);saved(ch,11,1.33f,.77f);bind(c,ch,t);call(a,"applyCobraAspectTransform");rect(t,1600*1.33,900*.77);
     String key=(String)call(a,"cobraPreferenceKey",ch);
-    prefs.edit().putString(key,new JSONObject().put("schema",1).put("aspect",11).put("x",99).put("y",.01).toString()).commit();
+    saveThroughOwner(ch,11,99f,.01f);
     call(a,"applyCobraAspectTransform");rect(t,1600*1.8,900*.55);
   }
 
   @Test public void foldFitFoldFillReflowWithoutRestartAndPipReturnsToSelection()throws Exception{
     Controlled c=new Controlled();c.requested=false;TextureView t=texture(1812,2176);Object ch=channel(0);saved(ch,12,1,1);bind(c,ch,t);c.writes.clear();
-    for(int mode:new int[]{12,13}){saved(ch,mode,1,1);for(int[]v:new int[][]{{1812,2176},{2176,1812},{904,2316},{2316,904},{900,1600},{1600,900}}){resize((View)t.getParent(),v[0],v[1]);call(a,"applyCobraAspectTransform");double[]e=expected(mode,1920,1080,1f,v[0],v[1],1,1);rect(t,e[0],e[1]);}}
+    for(int mode:new int[]{12,13}){saveThroughOwner(ch,mode,1,1);for(int[]v:new int[][]{{1812,2176},{2176,1812},{904,2316},{2316,904},{900,1600},{1600,900}}){resize((View)t.getParent(),v[0],v[1]);call(a,"applyCobraAspectTransform");double[]e=expected(mode,1920,1080,1f,v[0],v[1],1,1);rect(t,e[0],e[1]);}}
     assertTrue("Display-only reflow cannot restart/prepare/seek/release",c.writes.isEmpty());
-    saved(ch,10,1,1);resize((View)t.getParent(),1600,900);call(a,"applyCobraAspectTransform");rect(t,3200,1800);
+    saveThroughOwner(ch,10,1,1);resize((View)t.getParent(),1600,900);call(a,"applyCobraAspectTransform");rect(t,3200,1800);
     put(a,"mInPictureInPicture",true);call(a,"applyCobraAspectTransform");rect(t,1600,900);
     put(a,"mInPictureInPicture",false);call(a,"applyCobraAspectTransform");rect(t,3200,1800);assertEquals(10,call(a,"cobraChannelAspect",ch));
   }
