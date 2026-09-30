@@ -49,12 +49,17 @@ public class MiniPlayerFillTest {
  }
  @Test public void fullscreenPipAndMultiViewDoNotActivateMiniFill(){assertTrue(InfinityLiveActivity.CobraMiniFillPolicy.active(true,false,false,false));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(true,true,false,false));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(true,false,true,false));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(true,false,false,true));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(false,false,false,false));}
  @Test public void nonPreviewRetainsLockedContainPolicy()throws Exception{CobraNavigationUiTest.put(a,"mCobraPreviewTexture",null);size.set(new VideoSize(640,480));float[] v=scale(412,232,0);assertTrue(v[0]<1f);assertEquals(1f,v[4],.0001f);}
+ float[] lockedFit(int mode)throws Exception{
+  Class<?> type=Class.forName(InfinityLiveActivity.class.getName()+"$CobraLayoutMath");
+  java.lang.reflect.Method method=type.getDeclaredMethod("fit",int.class,int.class,float.class,int.class,int.class,int.class,float.class,float.class);method.setAccessible(true);
+  return (float[])method.invoke(null,640,480,1f,412,232,mode,1f,1f);
+ }
  @Test public void fullscreenGeometryRemainsLockedAcrossAllAspectOptions()throws Exception{
   CobraNavigationUiTest.put(a,"mCobraPreviewTexture",null);CobraNavigationUiTest.put(a,"mPlayer",player);CobraNavigationUiTest.put(a,"mPlayerOverlay",new FrameLayout(a));size.set(new VideoSize(640,480));
   for(int mode=0;mode<=13;mode++){
    float[] expected=mode==0?InfinityLiveActivity.CobraFoldAspectPolicy.fill(640,480,1,412,232)
     :InfinityLiveActivity.CobraFoldAspectPolicy.foldMode(mode)?InfinityLiveActivity.CobraFoldAspectPolicy.scaleForMode(mode,640,480,1,412,232)
-    :InfinityLiveActivity.CobraLayoutMath.fit(640,480,1,412,232,mode,1,1);
+    :lockedFit(mode);
    float[] actual=scale(412,232,mode);assertEquals(expected[0],actual[0],.0001f);assertEquals(expected[1],actual[4],.0001f);
   }
   CobraNavigationUiTest.put(a,"mPlayer",null);CobraNavigationUiTest.put(a,"mPlayerOverlay",null);
