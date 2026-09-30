@@ -84,6 +84,7 @@ jobs:
       - name: Gate candidate on tests protected render equality and payload preservation
         run: |
           set -euo pipefail
+          python3 -m pip install 'Pillow==11.3.0'
           python3 - <<'PY'
           import hashlib,json,sys,xml.etree.ElementTree as ET,zipfile
           from pathlib import Path
