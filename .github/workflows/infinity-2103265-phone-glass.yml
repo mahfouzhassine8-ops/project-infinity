@@ -11,7 +11,7 @@ permissions:
   actions: read
 concurrency:
   group: infinity-phone-glass-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   phone-glass-verification:
     runs-on: ubuntu-22.04
