@@ -52,12 +52,16 @@ Best Fit, Crop / Fill and Fold Fill intentionally have equal proportional-cover 
 
 | Intended | Observed on locked baseline | Action |
 | --- | --- | --- |
-| A user can discover all 15 choices | Physical screenshot shows only initial rows; no explicit scroll cue. Android sheet lacks the new cue/selected auto-reveal | Add persistent scroll affordance, non-fading scrollbar, bottom edge fade, and reveal the selected row after layout; verify actual portrait/landscape bounds |
+| A user can discover all 15 choices | Physical screenshot shows only initial rows; no explicit scroll cue. Android sheet lacks the new cue/selected auto-reveal | Add persistent scroll affordance, non-fading scrollbar, bottom edge fade, and reveal the selected row after layout; pin the Display title/Close header so revealing a lower row cannot hide dismissal; verify actual portrait/landscape bounds |
 | Selected state reflects the choice | Live channel rows use actual preferences; non-live picker relied on “Selected” descriptive text | Use consistent selected/checkmark rows for non-live Display; preserve stored choice |
 | Custom values can be reset without clearing other settings | Per-channel custom editor lacks a reset control | Add scoped width/height reset; retain aspect 11 and other preferences |
 | Five transport controls remain inside a true cover pane | Strict actual-window test and 320×720 baseline screenshot PASS; controls fit with little side margin | Restrained polish: increase breathing room using compact spacing/widths with minimum 48dp targets; larger layouts retain sizing. This is not labeled an established baseline defect. |
 | Actual player Channels shows the authoritative playing state | Guide views have the locked dot; fullscreen Channels adapter only returns text buttons | Bind existing dot to drawer rows using the same actual-session ownership policy; preserve focus/selection independence and original row actions |
 | Only one player menu surface is open | Some entry paths only closed one peer surface | Display and More also close the Multi-View picker before opening; no player/session replacement |
+
+A candidate render exposed title/Close clipping after lower-choice auto-reveal. The Display header is therefore fixed outside its scrolling options, and the scroll height reserves space for that header and cue. Other sheets retain their locked arrangement.
+
+Fullscreen player chrome and sheets intentionally retain the locked dark viewing treatment even when app appearance is Light; the Light-pref renders verify readable white playback controls/dark glass, rather than falsely claiming a pearl fullscreen player. Browsing/Pro Light variants remain unchanged.
 
 Animations retain the current glass system, sheet easing and locked dot policy. No new decorative layer covers the video. Focus feedback for drawer rows must remain visible, accessible and truthful.
 

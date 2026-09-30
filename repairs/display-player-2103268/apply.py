@@ -122,6 +122,10 @@ def transform(s):
         'transport.addView(live,new LinearLayout.LayoutParams(dp(narrowTransport?48:52),dp(52)))')
     s=once(s,'dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.20",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.21",56))',
         'dp(narrowTransport?48:vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.20",56)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.21",56))')
+    s=once(s,'body.setOrientation(LinearLayout.VERTICAL);body.addView(header,new LinearLayout.LayoutParams(-1,-2));',
+        'body.setOrientation(LinearLayout.VERTICAL);if(cobraDisplaySheet(kind)){heading.setTag("cobra_display_heading");close.setTag("cobra_display_close");panel.addView(header,new LinearLayout.LayoutParams(-1,-2));}else body.addView(header,new LinearLayout.LayoutParams(-1,-2));')
+    s=once(s,'        super.onMeasure(w,View.MeasureSpec.makeMeasureSpec(Math.min(limit,mCobraSheetHeightLimit),View.MeasureSpec.AT_MOST));',
+        '        if(cobraDisplaySheet(kind))limit=Math.max(1,Math.min(limit,mCobraSheetHeightLimit)-header.getMeasuredHeight()-panel.getPaddingTop()-panel.getPaddingBottom()-dp(36));\n        super.onMeasure(w,View.MeasureSpec.makeMeasureSpec(Math.min(limit,mCobraSheetHeightLimit),View.MeasureSpec.AT_MOST));')
     s=once(s,'    scroll.setFillViewport(false);scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);',r'''    scroll.setFillViewport(false);scroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
     if(cobraDisplaySheet(kind)){scroll.setTag("cobra_display_scroll");scroll.setVerticalScrollBarEnabled(true);scroll.setScrollbarFadingEnabled(false);scroll.setVerticalFadingEdgeEnabled(true);scroll.setFadingEdgeLength(dp(18));}''')
     s=once(s,'    panel.addView(scroll,new LinearLayout.LayoutParams(-1,-2));',r'''    panel.addView(scroll,new LinearLayout.LayoutParams(-1,-2));

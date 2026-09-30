@@ -10,6 +10,10 @@ for n in ['cobra-feature-refinement-2103207/tests/Cobra2103207CallIntegrationTes
 shutil.copy2(here/'Cobra2103268ProductAuditTest.java',out/'Cobra2103268ProductAuditTest.java')
 # Replace the pre-2103267 hold expectation with the explicitly device-passed 2103267 oracle.
 t=out/'Cobra2103201ScrubberTest.java';s=t.read_text();old='actualVideoBackgroundHoldStillOpensChannels';assert s.count(old)==1;s=s.replace(old,'actualVideoBackgroundHoldNeverOpensChannels').replace('hold();assertNotNull(get(a,"mCobraPlayerDrawer"));event(MotionEvent.ACTION_CANCEL,p);','hold();assertNull(get(a,"mCobraPlayerDrawer"));event(MotionEvent.ACTION_CANCEL,p);');t.write_text(s)
+# Apply recorded 2103202 menu-route supersessions before 203 wording and 207 call behavior.
+spec=importlib.util.spec_from_file_location('historical202',here.parent/'cobra-player-refinement-2103202/adapt_inherited_tests.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+for name in ['Cobra2103201SubtitleTest.java','Cobra2103201MenuPolishTest.java']:
+ t=out/name;t.write_text(m.adapt(t.name,t.read_text()))
 # Apply recorded 2103203 wording supersession, then recorded locked-2103207
 # speaker/call and subtitle-label supersessions. Never infer oracles from 2103268.
 spec=importlib.util.spec_from_file_location('historical203',here.parent/'cobra-pip-call-2103203/adapt_inherited_tests.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
@@ -20,7 +24,7 @@ lines=source.splitlines(True);del lines[unused[0].lineno-1:unused[0].end_lineno]
 # overflow before track discovery. Retain growth when there is room, but check
 # scrollability/safe bounds when initially capped; keep focus/track/cue checks.
 t=out/'Cobra2103201SubtitleTest.java';s=t.read_text();anchor='int originalHeight=panel.getHeight();ScrollView originalScroll=scroll(panel);';assert s.count(anchor)==1;s=s.replace(anchor,anchor+'boolean initiallyBounded=originalScroll.canScrollVertically(1);')
-anchor='assertTrue("Panel must grow for discovered content when the viewport has room",panel.getHeight()>originalHeight);';assert s.count(anchor)==1;s=s.replace(anchor,'if(initiallyBounded){assertTrue("Capped sheet remains navigable and inside its parent",originalScroll.canScrollVertically(1)&&panel.getHeight()<=sheet.getHeight());}else '+anchor);t.write_text(s)
+anchor='assertTrue("Combined sheet must retain its bounded height for discovered content",panel.getHeight()>=originalHeight);';assert s.count(anchor)==1;s=s.replace(anchor,'if(initiallyBounded){assertTrue("Capped sheet remains navigable and inside its parent",originalScroll.canScrollVertically(1)&&panel.getHeight()<=sheet.getHeight());}else '+anchor);t.write_text(s)
 if a.inherited:shutil.copytree('source267/staged-tests/java/com/projectinfinity/kodi',out,dirs_exist_ok=True)
 fixture=Path('source265/screenshots/test-video-fixture.webp')
 a.evidence.mkdir(parents=True,exist_ok=True)
