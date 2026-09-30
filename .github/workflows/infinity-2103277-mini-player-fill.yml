@@ -1,0 +1,123 @@
+name: Infinity | 2103277 Cobra Mini-player Fill candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103277-mini-player-fill]
+    paths: ['.github/workflows/infinity-2103277-mini-player-fill.yml', 'repairs/mini-player-fill-2103277/**']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: mini-player-fill-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  android-whole-ui-ambient-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103276-Whole-UI-Ambient-RC1-TEST-CANDIDATE
+          run-id: 36787860835
+          github-token: ${{ github.token }}
+          path: parent276
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103276-Whole-UI-Ambient-RC1-Evidence
+          run-id: 36787860835
+          github-token: ${{ github.token }}
+          path: source276
+      - name: Verify exact locked source and create rollback before mutations
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD~1)" = 2359c77ef104cc9421da5afd9ec648579ae0f681 || git merge-base --is-ancestor 2359c77ef104cc9421da5afd9ec648579ae0f681 HEAD
+          mkdir -p audit277
+          git branch rollback-snapshot-2103276 2359c77ef104cc9421da5afd9ec648579ae0f681
+          git bundle create audit277/locked-2103276-rollback.bundle rollback-snapshot-2103276
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import hashlib,tarfile,zipfile,json,shutil
+          src=Path('source276/reconstructed-2103276-shell.tar.gz');apk=Path('parent276/Infinity-2103276-Whole-UI-Ambient-RC1.apk')
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=='18fdd3bdea1f4729c38dc31c612781e98ea92009556f9ab1e72636071d2b982f'
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='6ece90dc54b6078a3a58365bee3a13ec28e01329995d88c184de1507f5a62ac6'
+          with tarfile.open(src) as t:t.extractall('.',filter='data')
+          assert Path('shell-kodi/tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java.in').read_bytes()==Path('repairs/whole-ui-ambient-2103276/CobraImmersiveAmbient.java.in').read_bytes()
+          shutil.copytree('shell-kodi','rollback276/shell-kodi');shutil.copy2(src,'audit277/locked-2103276-source.tar.gz')
+          with zipfile.ZipFile(apk) as z:Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          CHECK
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Apply bounded forward mini-player fill repair
+        run: |
+          set -euo pipefail
+          python3 repairs/mini-player-fill-2103277/apply.py --root . --out audit277
+          python3 repairs/mini-player-fill-2103277/verify_source.py --baseline rollback276 --root . --out audit277
+      - name: Compile and permanently sign the candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent276/Infinity-2103276-Whole-UI-Ambient-RC1.apk --build-dir build277 --out signed277 2>&1 | tee audit277/android-build.log
+      - name: Run explicit mini-player tests and all locked regression suites
+        run: |
+          set -euo pipefail
+          python3 repairs/mini-player-fill-2103277/stage_tests.py --build build277
+          cd build277
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest             --tests '*MiniPlayerFillTest' --tests '*WholeUiAmbientTest' --tests '*ImmersiveEdgeAmbientTest' --tests '*SportsHubSoccerVisibilityTest' --tests '*ProSportsIntegrationTest'             --tests '*SportsDataRepairTest' --tests '*SportsHubTest' --tests '*ProVisualTest' --tests '*ProActionsTest'             --tests '*ResponsiveWindowTest' --tests '*Cobra2103268ProductAuditTest'             --tests '*Cobra2103201ScrubberTest' --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103201MenuPolishTest'             --tests '*Cobra2103202LifecycleTest' --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest'             --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest'             --tests '*Cobra2103229MultiViewStabilityFillTest' --tests '*GlassChooserTest' --tests '*GlassOptionsTest'             --tests '*GlassHealthFinishTest' --tests '*RecoveryFixedTest' --tests '*PhoneGlassTest' --tests '*AmbientGlassTest'             --tests '*Cobra2103267PlayingDotRestoreTest'             2>&1 | tee ../audit277/android-product-tests.log
+      - name: Enforce protected renders and candidate-only acceptance
+        run: |
+          set -euo pipefail
+          python3 repairs/mini-player-fill-2103277/verify_source.py --baseline rollback276 --root . --out audit277
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,hashlib,xml.etree.ElementTree as E
+          counts={}
+          for f in Path('build277/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
+          assert len(counts)==28,counts
+          assert counts['com.projectinfinity.kodi.WholeUiAmbientTest']==23,counts
+          assert counts['com.projectinfinity.kodi.MiniPlayerFillTest']==12,counts
+          assert sum(counts.values())==273,counts
+          locked=Path('source276/screenshots/protected');current=Path('audit277/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
+          report=json.loads(Path('signed277/background-resume-apk-audit.json').read_text());report.update(parent_locked_commit='2359c77ef104cc9421da5afd9ec648579ae0f681',automated_tests_passed=sum(counts.values()),test_methods=counts,protected_render_equality=len(names),physical_device_verified=False,candidate_locked=False,status='CI CANDIDATE ONLY — actual Fold visual acceptance required')
+          Path('signed277/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          apk=Path('signed277/Infinity-2103277-Mini-Player-Fill-RC1.apk');Path('signed277/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          CHECK
+      - name: Preserve source, rollback and test evidence
+        if: always()
+        run: |
+          mkdir -p audit277/repair-source
+          cp -r repairs/mini-player-fill-2103277/* audit277/repair-source/
+          cp -r build277/xbmc/build/test-results audit277/candidate-test-results || true
+          cp -r build277/xbmc/src/test audit277/staged-tests || true
+          tar -czf audit277/reconstructed-2103277-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103277-Mini-Player-Fill-RC1-TEST-CANDIDATE
+          path: signed277/
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103277-Mini-Player-Fill-RC1-Evidence
+          path: audit277/
+          retention-days: 90
