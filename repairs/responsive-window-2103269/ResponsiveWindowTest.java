@@ -25,6 +25,10 @@ import static org.junit.Assert.*;
 @LooperMode(LooperMode.Mode.PAUSED)
 public class ResponsiveWindowTest {
  public static class WindowHarness extends Activity {boolean multi;@Override public boolean isInMultiWindowMode(){return multi;}}
+ static class Calls implements InfinityGlassChooser.Actions {
+  final ArrayList<String> entered=new ArrayList<>(),settings=new ArrayList<>();final String mode;
+  Calls(String value){mode=value;}public void enter(String value){entered.add(value);}public void settings(String value){settings.add(value);}public void themes(){}public String appearance(){return mode;}public void appearanceChanged(){}
+ }
  static final int[][] PANES={{320,800},{320,480},{360,360},{720,320},{480,280},{600,400},{240,360},{900,240}};
  static void layout(View v,int w,int h){v.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));v.layout(0,0,w,h);}
  static void window(CobraNavigationUiTest f,InfinityLiveActivity a,int w,int h)throws Exception{
@@ -37,7 +41,7 @@ public class ResponsiveWindowTest {
  static void save(View v,String name)throws Exception{File dir=new File(System.getProperty("responsive.evidence"));dir.mkdirs();Bitmap b=render(v);try(FileOutputStream stream=new FileOutputStream(new File(dir,name+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,stream);}b.recycle();}
  @Test public void constrainedChooserIsReadableAndUsesTheActualWindowInsteadOfShrinkingPortraitArt()throws Exception{
   for(String mode:new String[]{"dark","light"})for(int[] pane:PANES){
-   ActivityController<WindowHarness> ctl=Robolectric.buildActivity(WindowHarness.class).setup();WindowHarness a=ctl.get();a.multi=true;GlassChooserTest.Calls calls=new GlassChooserTest.Calls(mode);InfinityGlassChooser ui=new InfinityGlassChooser(a,calls);a.setContentView(ui);layout(ui,pane[0],pane[1]);
+   ActivityController<WindowHarness> ctl=Robolectric.buildActivity(WindowHarness.class).setup();WindowHarness a=ctl.get();a.multi=true;Calls calls=new Calls(mode);InfinityGlassChooser ui=new InfinityGlassChooser(a,calls);a.setContentView(ui);layout(ui,pane[0],pane[1]);
    save(ui,"observed-chooser-"+mode+"-"+pane[0]+"x"+pane[1]);Rect first=bounds(ui,ui.stage.infinity),second=bounds(ui,ui.stage.cobra);assertFalse(Rect.intersects(first,second));visible(ui,ui.stage.infinity);visible(ui,ui.stage.cobra);
    assertTrue("Choices must use at least 55% of constrained window, rather than miniature portrait composition",(first.width()*first.height()+second.width()*second.height())/(float)(pane[0]*pane[1])>=.55f);
    for(int id:new int[]{InfinityGlassChooser.SETTINGS_INFINITY,InfinityGlassChooser.SETTINGS_COBRA}){View gear=ui.findViewById(id);visible(ui,gear);assertTrue(gear.getWidth()>=48&&gear.getHeight()>=48);}
@@ -49,14 +53,14 @@ public class ResponsiveWindowTest {
  }
  @Test public void resizeUsesSameControlsRoutesRealTouchesAndRestoresExactFullscreenPixels()throws Exception{
   for(String mode:new String[]{"dark","light"}){
-   ActivityController<WindowHarness> ctl=Robolectric.buildActivity(WindowHarness.class).setup();WindowHarness a=ctl.get();GlassChooserTest.Calls calls=new GlassChooserTest.Calls(mode);InfinityGlassChooser ui=new InfinityGlassChooser(a,calls);a.setContentView(ui);layout(ui,800,1000);ui.clearFocus();Bitmap before=render(ui);View infinity=ui.stage.infinity,cobra=ui.stage.cobra;
+   ActivityController<WindowHarness> ctl=Robolectric.buildActivity(WindowHarness.class).setup();WindowHarness a=ctl.get();Calls calls=new Calls(mode);InfinityGlassChooser ui=new InfinityGlassChooser(a,calls);a.setContentView(ui);layout(ui,800,1000);ui.clearFocus();Bitmap before=render(ui);View infinity=ui.stage.infinity,cobra=ui.stage.cobra;
    a.multi=true;for(int[] pane:PANES){layout(ui,pane[0],pane[1]);assertSame(infinity,ui.stage.infinity);assertSame(cobra,ui.stage.cobra);assertTrue(calls.entered.isEmpty());assertTrue(calls.settings.isEmpty());}
    layout(ui,320,800);View gear=ui.findViewById(InfinityGlassChooser.SETTINGS_COBRA);Rect r=bounds(ui,gear);long time=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent event=MotionEvent.obtain(time,time+20,action,r.centerX(),r.centerY(),0);assertTrue(ui.dispatchTouchEvent(event));event.recycle();}assertEquals(Arrays.asList("live"),calls.settings);assertTrue(calls.entered.isEmpty());ui.stage.infinity.performClick();assertEquals(Arrays.asList("infinity"),calls.entered);
    a.multi=false;layout(ui,800,1000);ui.clearFocus();ui.stage.infinity.clearFocus();ui.stage.cobra.clearFocus();Bitmap after=render(ui);assertTrue("Fullscreen restoration must recover identical approved composition",before.sameAs(after));before.recycle();after.recycle();save(ui,"restored-"+mode);ctl.pause().stop().destroy();
   }
  }
  @Test public void largeTextAndInsetConstrainedWindowsKeepSettingsAndChoicesSeparate()throws Exception{
-  for(String mode:new String[]{"dark","light"}){ActivityController<WindowHarness> ctl=Robolectric.buildActivity(WindowHarness.class).setup();WindowHarness a=ctl.get();a.multi=true;Configuration c=new Configuration(a.getResources().getConfiguration());c.fontScale=1.6f;a.getResources().updateConfiguration(c,a.getResources().getDisplayMetrics());InfinityGlassChooser ui=new InfinityGlassChooser(a,new GlassChooserTest.Calls(mode));a.setContentView(ui);ui.content.setPadding(12,24,12,28);for(int[] pane:new int[][]{{320,800},{720,320},{336,220}}){layout(ui,pane[0],pane[1]);for(int id:new int[]{InfinityGlassChooser.SETTINGS_INFINITY,InfinityGlassChooser.SETTINGS_COBRA}){visible(ui,ui.findViewById(id));assertTrue(bounds(ui,ui.findViewById(id)).top>=24);}save(ui,"insets-large-font-"+mode+"-"+pane[0]+"x"+pane[1]);}ctl.pause().stop().destroy();}
+  for(String mode:new String[]{"dark","light"}){ActivityController<WindowHarness> ctl=Robolectric.buildActivity(WindowHarness.class).setup();WindowHarness a=ctl.get();a.multi=true;Configuration c=new Configuration(a.getResources().getConfiguration());c.fontScale=1.6f;a.getResources().updateConfiguration(c,a.getResources().getDisplayMetrics());InfinityGlassChooser ui=new InfinityGlassChooser(a,new Calls(mode));a.setContentView(ui);ui.content.setPadding(12,24,12,28);for(int[] pane:new int[][]{{320,800},{720,320},{336,220}}){layout(ui,pane[0],pane[1]);TextView heading=ui.findViewWithTag("experience-responsive-heading");assertNotNull(heading);visible(ui,heading);assertNotNull(heading.getLayout());assertTrue("Heading lines must not clip at large font",heading.getLayout().getLineBottom(heading.getLayout().getLineCount()-1)<=heading.getHeight());for(int id:new int[]{InfinityGlassChooser.SETTINGS_INFINITY,InfinityGlassChooser.SETTINGS_COBRA}){visible(ui,ui.findViewById(id));assertTrue(bounds(ui,ui.findViewById(id)).top>=24);}save(ui,"insets-large-font-"+mode+"-"+pane[0]+"x"+pane[1]);}ctl.pause().stop().destroy();}
  }
  @Test public void cobraResponsiveHelpersUseActualDecorWhenPhysicalDisplayAndOrientationDisagree()throws Exception{
   CobraNavigationUiTest fixture=new CobraNavigationUiTest();fixture.clock();InfinityLiveActivity a=fixture.fixture(12);View decor=a.getWindow().getDecorView();layout(decor,320,720);

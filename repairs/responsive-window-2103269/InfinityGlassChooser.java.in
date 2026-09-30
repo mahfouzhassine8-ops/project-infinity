@@ -98,7 +98,7 @@ final class InfinityGlassChooser extends FrameLayout {
     final Material backdrop;
     final Card infinity,cobra;
     float scale,left;int viewportHint;
-    boolean responsive,stacked;final Rect infinityBounds=new Rect(),cobraBounds=new Rect();
+    boolean responsive,stacked;int responsiveHeader,headingHeight;final Rect infinityBounds=new Rect(),cobraBounds=new Rect();
     final TextView responsiveHeading,responsiveBrand;
     private int px(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
     private TextView responsiveText(Context c,String value,float size,int ink){
@@ -153,13 +153,20 @@ final class InfinityGlassChooser extends FrameLayout {
       responsiveHeading.setVisibility(responsive?VISIBLE:GONE);responsiveBrand.setVisibility(responsive&&viewport>=px(360)?VISIBLE:GONE);
       backdrop.setVisibility(responsive?GONE:VISIBLE);infinity.responsive=responsive;cobra.responsive=responsive;
       if(responsive){
-        int h=Math.max(1,viewport),margin=px(12),gap=px(12),header=px(h>=px(360)?88:64);
+        int h=Math.max(1,viewport),margin=px(12),gap=px(12);
+        float font=getResources().getConfiguration().fontScale;
+        responsiveHeading.setText(h<px(280)?"CHOOSE EXPERIENCE":"CHOOSE YOUR EXPERIENCE");
+        responsiveHeading.setTextSize(TypedValue.COMPLEX_UNIT_PX,px(20)*Math.min(1.4f,font));
+        responsiveHeading.measure(MeasureSpec.makeMeasureSpec(Math.max(1,w-2*margin),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(px(80),MeasureSpec.AT_MOST));
+        headingHeight=Math.max(px(32),responsiveHeading.getMeasuredHeight());
+        responsiveBrand.setText(w<px(480)||font>1.3f?"INFINITY  ·  YOUR WAY.":"INFINITY  ·  ONE PLATFORM. YOUR WAY.");
+        int header=px(16)+headingHeight+(responsiveBrand.getVisibility()==VISIBLE?px(28):0);responsiveHeader=header;
         stacked=w<px(360)&&h>=px(440);
         int usableW=Math.max(1,w-2*margin),usableH=Math.max(1,h-header-margin);
         if(stacked){int ch=Math.max(1,(usableH-gap)/2);infinityBounds.set(margin,header,margin+usableW,header+ch);cobraBounds.set(margin,header+ch+gap,margin+usableW,h-margin);}
         else{int cw=Math.max(1,(usableW-gap)/2);infinityBounds.set(margin,header,margin+cw,h-margin);cobraBounds.set(margin+cw+gap,header,w-margin,h-margin);}
         for(Card card:new Card[]{infinity,cobra}){Rect r=card==infinity?infinityBounds:cobraBounds;card.measure(MeasureSpec.makeMeasureSpec(r.width(),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(r.height(),MeasureSpec.EXACTLY));}
-        responsiveHeading.measure(MeasureSpec.makeMeasureSpec(usableW,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(px(48),MeasureSpec.EXACTLY));
+        responsiveHeading.measure(MeasureSpec.makeMeasureSpec(usableW,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(headingHeight,MeasureSpec.EXACTLY));
         responsiveBrand.measure(MeasureSpec.makeMeasureSpec(usableW,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(px(24),MeasureSpec.EXACTLY));
         setMeasuredDimension(w,h);return;
       }
@@ -181,8 +188,8 @@ final class InfinityGlassChooser extends FrameLayout {
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b) {
       if(responsive){
-        responsiveHeading.layout(px(12),px(8),getWidth()-px(12),px(56));
-        responsiveBrand.layout(px(12),px(58),getWidth()-px(12),px(82));
+        responsiveHeading.layout(px(12),px(8),getWidth()-px(12),px(8)+headingHeight);
+        responsiveBrand.layout(px(12),px(10)+headingHeight,getWidth()-px(12),px(34)+headingHeight);
         infinity.layout(infinityBounds.left,infinityBounds.top,infinityBounds.right,infinityBounds.bottom);
         cobra.layout(cobraBounds.left,cobraBounds.top,cobraBounds.right,cobraBounds.bottom);
         infinity.setNextFocusRightId(stacked?SETTINGS_INFINITY:ENTER_COBRA);infinity.setNextFocusDownId(stacked?ENTER_COBRA:SETTINGS_INFINITY);
