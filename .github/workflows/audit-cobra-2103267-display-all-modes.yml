@@ -1,0 +1,152 @@
+name: Audit | Cobra 2103267 Display All Modes
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [audit-cobra-2103267-display-all-modes-20260930]
+    paths:
+      - '.github/workflows/audit-cobra-2103267-display-all-modes.yml'
+      - 'audits/cobra-display-2103267/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  display-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+
+      - name: Download exact locked 2103267 candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103267-Cobra-Playing-Dot-Restore-RC1-TEST-CANDIDATE
+          run-id: 36684966394
+          github-token: ${{ github.token }}
+          path: candidate267
+
+      - name: Download exact locked 2103267 source evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103267-Cobra-Playing-Dot-Restore-RC1-Evidence
+          run-id: 36684966394
+          github-token: ${{ github.token }}
+          path: source267
+
+      - name: Download exact 2103266 parent APK for reproducible Android compile
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103266-Ambient-Glass-Cinema-RC1-TEST-CANDIDATE
+          run-id: 36675691445
+          github-token: ${{ github.token }}
+          path: parent266
+
+      - name: Download exact inherited test fixtures
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103265-Phone-Glass-Polish-RC1-Evidence
+          run-id: 36671687282
+          github-token: ${{ github.token }}
+          path: source265
+
+      - name: Verify locked source and candidate
+        run: |
+          set -euo pipefail
+          test "$(sha256sum candidate267/Infinity-2103267-Cobra-Playing-Dot-Restore-RC1.apk | cut -d' ' -f1)" = '686d606534906358d35934bf6430972279efeab387731b4178d2dfbd2fe12070'
+          test "$(sha256sum source267/reconstructed-2103267-shell.tar.gz | cut -d' ' -f1)" = '2d7444bfac5a9fa8a364c1edc6c3fb58886159d41cbb51bb6cee0d8252567e18'
+          test "$(sha256sum parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk | cut -d' ' -f1)" = '4624c1ca66d29a4ac8c5f63892ca9669e6ef757894fe6a2e0b4c4d356e3ec455'
+          tar --no-same-owner -xzf source267/reconstructed-2103267-shell.tar.gz
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = 'd3fcd9e9c027912c0ded7034ddfed4cacb9e478b98ebaead8773de05ed28612a'
+          mkdir -p display-audit engine
+          python3 audits/cobra-display-2103267/source_audit.py             --activity shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in             --out display-audit/source-audit.json
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk') as z:
+              assert z.testzip() is None
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' 'ndk;21.4.7075529' >/dev/null
+
+      - name: Recompile exact locked 2103267 Android source
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk             --build-dir build-display             --out rebuilt267 >/dev/null
+
+      - name: Stage exact inherited test harness plus full Display audit
+        run: |
+          set -euo pipefail
+          python3 repairs/ambient-glass-2103266/stage_tests.py --build-dir build-display --evidence display-audit/screenshots
+          TESTDIR=build-display/xbmc/src/test/java/com/projectinfinity/kodi
+          cp repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java "$TESTDIR/"
+          cp audits/cobra-display-2103267/Cobra2103267DisplayAllModesAuditTest.java "$TESTDIR/"
+
+      - name: Run actual Activity and TextureView Display tests
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build-display
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest             --tests com.projectinfinity.kodi.Cobra2103267DisplayAllModesAuditTest             2>&1 | tee ../display-audit/display-tests.log
+
+      - name: Summarize Display gate
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,xml.etree.ElementTree as ET
+          from pathlib import Path
+          p=Path('build-display/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103267DisplayAllModesAuditTest.xml')
+          root=ET.parse(p).getroot()
+          result={
+            'locked_build':2103267,
+            'apk_sha256':'686d606534906358d35934bf6430972279efeab387731b4178d2dfbd2fe12070',
+            'tests':int(root.attrib['tests']),
+            'failures':int(root.attrib.get('failures',0)),
+            'errors':int(root.attrib.get('errors',0)),
+            'skipped':int(root.attrib.get('skipped',0)),
+            'channel_display_choices':15,
+            'geometry_modes_verified':14,
+            'verified_behaviors':['all toolbar choices present','truthful selected state','per-channel persistence','inherit default','best fit','crop/fill','16:9','4:3','wide 1.10x','wide 1.25x','wide 1.40x','short + wide','zoom 1.25x','zoom 1.50x','zoom 2.00x','custom width/height bounds','Fold Fit','Fold Fill','mode-to-mode stale transform clearing','fold/rotation reflow','PiP Best Fit safety','video-size/pixel-ratio reflow','display diagnostics'],
+            'physical_device_verified':False,
+            'status':'PASS' if all(int(root.attrib.get(k,0))==0 for k in ('failures','errors','skipped')) else 'FAIL'
+          }
+          source=json.loads(Path('display-audit/source-audit.json').read_text())
+          result['related_settings_observation']={'default_fullscreen_picker_missing_custom_mode_11':source['related_default_fullscreen_picker_missing_custom_mode_11']}
+          Path('display-audit/RESULT.json').write_text(json.dumps(result,indent=2)+'\n')
+          assert result['status']=='PASS',result
+          print(json.dumps(result,indent=2))
+          PY
+
+      - name: Preserve Display audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103267-Cobra-Display-All-Modes-Audit
+          path: |
+            display-audit/
+            build-display/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103267DisplayAllModesAuditTest.xml
+            audits/cobra-display-2103267/
+          if-no-files-found: error
+          retention-days: 90
