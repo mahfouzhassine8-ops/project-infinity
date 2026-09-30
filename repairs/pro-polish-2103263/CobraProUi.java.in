@@ -1,0 +1,247 @@
+package @APP_PACKAGE@;
+
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.os.Build;
+import android.text.TextUtils;
+import android.view.*;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.*;
+
+/** Focus-only presentation. Owns no stream, player, provider, settings or navigation state. */
+final class CobraProUi {
+  static final int RESTING=0, PREVIEW=1, WATCHING=2;
+  static final int INK=0xff102640, MUTED=0xff5e748c, CYAN=0xff15bde4, PALE=0xfff4f9fd;
+  interface Actions { void preview(); void unmute(); void step(int delta); void control(int index); }
+  interface Art { void load(ImageView target,String url); }
+  static final class Program {
+    String channel="Choose a channel",title="Choose a channel",schedule="",next="",source="FROM CHANNELS",logo="",status="";
+    float progress=-1; boolean live,favorite;
+  }
+  /** Measured-window policy used by both the actual Focus shell and tests; dp units. */
+  static int[][] geometry(int width,int height,float font,int state){
+    int w=Math.max(1,width),h=Math.max(1,height),top=h<500?48:56,gap=8;
+    float f=Math.max(1,Math.min(2,font));int info=state==WATCHING?Math.round(122+(f-1)*65):0;
+    int[][] r=new int[4][4];r[0]=new int[]{0,0,w,top};int y=top+gap,avail=Math.max(0,h-y);
+    boolean wide=w>=700&&w>h;
+    if(wide){int main=Math.round(w*.60f),vw=main;int vh=Math.min(Math.max(200,main*9/16+16),Math.max(80,avail-info-gap));
+      r[1]=new int[]{0,y,vw,vh};r[2]=new int[]{0,y+vh,vw,info};r[3]=new int[]{main+12,y,w-main-12,avail};
+    }else{int nav=Math.round(68+(f-1)*18);int maxVideo=Math.max(112,avail-info-nav-80-2*gap);
+      int preferred=Math.max(state==WATCHING?208:272,Math.round(w*9/16f+74+(f-1)*72));int vh=Math.min(preferred,maxVideo);
+      r[1]=new int[]{0,y,w,vh};r[2]=new int[]{0,y+vh,w,info};r[3]=new int[]{0,y+vh+info+gap,w,Math.max(0,h-y-vh-info-gap)};
+    }
+    if(state!=WATCHING)r[2]=new int[]{0,0,0,0};
+    for(int i=1;i<4;i++)if(r[i][2]>16){r[i][0]+=8;r[i][2]-=16;}
+
+    for(int[] b:r){b[0]=Math.max(0,Math.min(w,b[0]));b[1]=Math.max(0,Math.min(h,b[1]));b[2]=Math.max(0,Math.min(b[2],w-b[0]));b[3]=Math.max(0,Math.min(b[3],h-b[1]));}
+    return r;
+  }
+  static int px(Context c,float dp){return Math.round(dp*c.getResources().getDisplayMetrics().density);}
+  static float font(Context c){return Math.max(1f,c.getResources().getConfiguration().fontScale);}
+  static GradientDrawable surface(Context c,boolean light,boolean active,float radius){
+    GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+        light?new int[]{0xfffcfeff,active?0xffdff4fc:0xfff0f6fb}:new int[]{0xf51b2b34,active?0xf2083440:0xf2071118});
+    d.setCornerRadius(px(c,radius));d.setStroke(px(c,active?1.5f:1),active?CYAN:light?0xffcbdfe9:0xff4a687c);return d;
+  }
+  static boolean motion(){return Build.VERSION.SDK_INT<26||ValueAnimator.areAnimatorsEnabled();}
+  static void exact(View v,int w,int h){v.measure(View.MeasureSpec.makeMeasureSpec(Math.max(0,w),View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(Math.max(0,h),View.MeasureSpec.EXACTLY));}
+  static void place(View v,int x,int y,int w,int h){exact(v,w,h);v.layout(x,y,x+Math.max(0,w),y+Math.max(0,h));}
+  static void detach(View v){if(v.getParent() instanceof ViewGroup)((ViewGroup)v.getParent()).removeView(v);}
+
+  /** A local text owner keeps the video overlays white even in the application's light theme. */
+  static final class Ink extends TextView {
+    private int ownInk;private Typeface ownFace;private boolean sealed;
+    Ink(Context c,int color,float sp,boolean title){super(c);ownInk=color;ownFace=Typeface.create(title?"sans-serif-medium":"sans-serif",Typeface.NORMAL);
+      super.setTextColor(color);super.setTypeface(ownFace);setTextSize(sp);setIncludeFontPadding(false);setPadding(0,0,0,0);
+      setSingleLine(true);setEllipsize(TextUtils.TruncateAt.END);sealed=true;}
+    @Override protected void onDraw(Canvas canvas){
+      if((getGravity()&Gravity.HORIZONTAL_GRAVITY_MASK)==Gravity.CENTER_HORIZONTAL){
+        android.text.TextPaint paint=getPaint();Paint.Align align=paint.getTextAlign();
+        paint.setColor(ownInk);paint.setTypeface(ownFace);paint.setTextAlign(Paint.Align.CENTER);
+        String value=fit(getText().toString(),paint,getWidth()-getPaddingLeft()-getPaddingRight());
+        canvas.drawText(value,getPaddingLeft()+(getWidth()-getPaddingLeft()-getPaddingRight())/2f,
+            getPaddingTop()+(getHeight()-getPaddingTop()-getPaddingBottom())/2f-(paint.ascent()+paint.descent())/2f,paint);
+        paint.setTextAlign(align);
+      }else super.onDraw(canvas);
+    }
+    void ink(int color){ownInk=color;super.setTextColor(color);}
+    void text(String value){String t=value==null?"":value;if(!t.contentEquals(getText()))setText(t);}
+    @Override public void setTextColor(int c){super.setTextColor(sealed?ownInk:c);}
+    @Override public void setTextColor(ColorStateList c){super.setTextColor(sealed?ColorStateList.valueOf(ownInk):c);}
+    @Override public void setTypeface(Typeface t){super.setTypeface(sealed?ownFace:t);}
+    @Override public void setTypeface(Typeface t,int s){super.setTypeface(sealed?ownFace:t,sealed?Typeface.NORMAL:s);}
+  }
+
+  /** Canvas icons are decorative; the enclosing native View owns actions and accessibility. */
+  static void icon(Canvas c,Paint p,String name,float x,float y,float size,int color){
+    c.save();c.translate(x,y);c.scale(size/24,size/24);p.setShader(null);p.setColor(color);p.setStrokeWidth(1.7f);p.setStyle(Paint.Style.STROKE);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);Path a=new Path();
+    if("play".equals(name)){a.moveTo(8,5);a.lineTo(19,12);a.lineTo(8,19);a.close();p.setStyle(Paint.Style.FILL);c.drawPath(a,p);}
+    else if("pause".equals(name)){p.setStyle(Paint.Style.FILL);c.drawRoundRect(6,5,9,19,1,1,p);c.drawRoundRect(15,5,18,19,1,1,p);}
+    else if("favorite".equals(name)){a.moveTo(12,20);a.cubicTo(9,17,2,12,2,7);a.cubicTo(2,1,10,1,12,6);a.cubicTo(14,1,22,1,22,7);a.cubicTo(22,12,15,17,12,20);c.drawPath(a,p);}
+    else if("left".equals(name)||"right".equals(name)){float d="left".equals(name)?-1:1;a.moveTo(12-d*3,5);a.lineTo(12+d*3,12);a.lineTo(12-d*3,19);c.drawPath(a,p);}
+    else if("mute".equals(name)||"audio".equals(name)){a.moveTo(3,9);a.lineTo(7,9);a.lineTo(12,5);a.lineTo(12,19);a.lineTo(7,15);a.lineTo(3,15);a.close();c.drawPath(a,p);if("mute".equals(name)){c.drawLine(16,8,22,16,p);c.drawLine(22,8,16,16,p);}else{c.drawArc(9,7,21,17,-65,130,false,p);c.drawArc(7,3,27,21,-60,120,false,p);}}
+    else if("cc".equals(name)){c.drawRoundRect(2,5,22,19,2,2,p);p.setStyle(Paint.Style.FILL);p.setTypeface(Typeface.create("sans-serif-medium",0));p.setTextAlign(Paint.Align.CENTER);p.setTextSize(9);c.drawText("CC",12,15,p);}
+    else if("fullscreen".equals(name)){a.moveTo(3,9);a.lineTo(3,3);a.lineTo(9,3);a.moveTo(15,3);a.lineTo(21,3);a.lineTo(21,9);a.moveTo(21,15);a.lineTo(21,21);a.lineTo(15,21);a.moveTo(9,21);a.lineTo(3,21);a.lineTo(3,15);c.drawPath(a,p);}
+    else if("search".equals(name)){c.drawCircle(10,10,7,p);c.drawLine(16,16,22,22,p);}
+    else if("recent".equals(name)){c.drawCircle(12,12,9,p);c.drawLine(12,6,12,12,p);c.drawLine(12,12,16,14,p);}
+    else if("groups".equals(name)){a.moveTo(2,8);a.lineTo(12,3);a.lineTo(22,8);a.lineTo(12,13);a.close();a.moveTo(2,12);a.lineTo(12,17);a.lineTo(22,12);a.moveTo(2,16);a.lineTo(12,21);a.lineTo(22,16);c.drawPath(a,p);}
+    else if("list".equals(name)){for(int i=0;i<3;i++){c.drawCircle(3,5+i*7,.7f,p);c.drawLine(8,5+i*7,22,5+i*7,p);}}
+    else {p.setStyle(Paint.Style.FILL);for(int i=0;i<3;i++)c.drawCircle(5+7*i,12,1.5f,p);}
+    c.restore();p.setStyle(Paint.Style.FILL);
+  }
+  static final class Action extends View {
+    final Paint p=new Paint(3);String glyph,label;boolean overlay,primary,stack,navigation;final boolean light;
+    Action(Context c,String glyph,String label,boolean overlay,boolean light,Runnable click){super(c);this.glyph=glyph;this.label=label;this.overlay=overlay;this.light=light;
+      setTag("pro_action_"+label.toLowerCase(java.util.Locale.ROOT).replace(' ','_'));setContentDescription(label);setFocusable(true);setClickable(true);setOnClickListener(v->click.run());}
+    void label(String glyph,String label){this.glyph=glyph;this.label=label;setContentDescription(label);invalidate();}
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo i){super.onInitializeAccessibilityNodeInfo(i);i.setClassName("android.widget.Button");i.setCheckable(false);i.setSelected(isSelected());}
+    @Override protected void onDraw(Canvas c){super.onDraw(c);float den=getResources().getDisplayMetrics().density,w=getWidth(),h=getHeight();boolean active=isEnabled()&&(primary||isSelected()||isPressed()||isFocused());
+      int ink=overlay?Color.WHITE:light?INK:Color.WHITE;
+      if(navigation){
+        p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(active?(light?0xffdef5fb:0xff08323e):Color.TRANSPARENT);c.drawRect(0,0,w,h,p);
+        if(active){p.setColor(CYAN);c.drawRect(den*10,h-den*2,w-den*10,h,p);}
+        icon(c,p,glyph,w/2-den*11,den*10,den*22,active?(light?0xff087b9c:CYAN):ink);
+        p.setTypeface(Typeface.create(active?"sans-serif-medium":"sans-serif",0));p.setTextSize(10.5f*getResources().getDisplayMetrics().scaledDensity);p.setTextAlign(Paint.Align.CENTER);p.setColor(ink);
+        c.drawText(fit(label,p,w-den*8),w/2,h-den*13,p);return;
+      }
+      // Edge chevrons have 48dp targets but no solid pill over the programme text.
+      if("left".equals(glyph)||"right".equals(glyph)){icon(c,p,glyph,"left".equals(glyph)?0:w-den*24,(h-den*24)/2,den*24,ink);return;}
+      float pad=den*2,r=Math.min(den*14,h*.45f);float bh=stack?h-den*17:h;
+      RectF b=new RectF(pad,pad,w-pad,bh-pad);p.setStyle(Paint.Style.FILL);p.setAlpha(isEnabled()?255:115);
+      p.setShader(new LinearGradient(0,0,0,bh,active?(primary?new int[]{0xff1397b5,0xff086384}:light&&!overlay?new int[]{0xffeffcff,0xffdbeefa}:new int[]{0xff185464,0xff092e39}):overlay?new int[]{0xc92a3e49,0xdf071219}:light?new int[]{0xfffdfeff,0xfff0f6fa}:new int[]{0xff1b2b34,0xff081219},null,Shader.TileMode.CLAMP));
+      c.drawRoundRect(b,r,r,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(den*(active?1.4f:1));p.setColor(active?CYAN:overlay?0xff7695a8:light?0xffcfdfeb:0xff436171);c.drawRoundRect(b,r,r,p);p.setStyle(Paint.Style.FILL);
+      float fs=12f*getResources().getDisplayMetrics().scaledDensity;boolean narrow=w<den*116;
+      if(stack){icon(c,p,glyph,w/2-den*11,Math.max(den*6,(bh-den*22)/2),den*22,ink);p.setTextSize(Math.min(fs,11*den*font(getContext())));p.setTypeface(Typeface.create("sans-serif",0));p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);String t=fit(label,p,w-den*4);c.drawText(t,w/2,h-den*2,p);}
+      else if(narrow&&label.length()>0&&h>=den*50){icon(c,p,glyph,w/2-den*10,den*8,den*20,ink);p.setTypeface(Typeface.create("sans-serif",0));p.setTextSize(fs);p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);c.drawText(fit(label,p,w-den*6),w/2,h-den*10,p);}
+      else {float s=den*21;p.setTextSize(fs);p.setTypeface(Typeface.create("sans-serif",0));float tw=label.isEmpty()?0:p.measureText(label);float x=(w-(s+(tw>0?den*8+tw:0)))/2;
+        icon(c,p,glyph,Math.max(den*8,x),(h-s)/2,s,ink);if(tw>0){p.setTextSize(fs);p.setColor(ink);p.setTextAlign(Paint.Align.LEFT);float tx=Math.max(den*8,x)+s+den*8;c.drawText(fit(label,p,w-tx-den*8),tx,h/2-(p.ascent()+p.descent())/2,p);}}
+      p.setAlpha(255);
+    }
+  }
+  static String fit(String value,Paint p,float width){if(width<=0)return "";if(p.measureText(value)<=width)return value;int n=p.breakText(value,true,Math.max(0,width-p.measureText("…")),null);return value.substring(0,Math.max(0,n))+"…";}
+  static final class Logo extends FrameLayout {
+    final Ink fallback;final ImageView image;String key="";
+    Logo(Context c,boolean light){super(c);fallback=new Ink(c,light?INK:Color.WHITE,16,false);fallback.setGravity(Gravity.CENTER);fallback.setBackground(surface(c,light,false,10));addView(fallback,new LayoutParams(-1,-1));image=new ImageView(c){
+      @Override public void setImageDrawable(Drawable value){super.setImageDrawable(value);if(fallback!=null)fallback.setVisibility(value==null?VISIBLE:INVISIBLE);}
+      @Override public void setImageBitmap(Bitmap value){super.setImageBitmap(value);if(fallback!=null)fallback.setVisibility(value==null?VISIBLE:INVISIBLE);}
+    };image.setScaleType(ImageView.ScaleType.FIT_CENTER);image.setPadding(px(c,3),px(c,3),px(c,3),px(c,3));addView(image,new LayoutParams(-1,-1));setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    void bind(String name,String url,Art art){String next=(name==null?"":name)+"|"+url;if(next.equals(key))return;key=next;image.setTag(null);image.setImageDrawable(null);String n=name==null?"TV":name.replaceFirst("^[^:]{1,12}:\\s*","").trim();fallback.text(n.substring(0,Math.min(2,n.length())).toUpperCase(java.util.Locale.ROOT));if(url!=null&&!url.isEmpty()&&art!=null)art.load(image,url);}
+  }
+  static final class Progress extends View {
+    final Paint p=new Paint(3);float value=-1;boolean dark;
+    Progress(Context c){super(c);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    void value(float f){value=f;setVisibility(f>=0?VISIBLE:INVISIBLE);invalidate();}
+    @Override protected void onDraw(Canvas c){float h=getHeight();p.setColor(dark?0xff42596c:0xffd4e1ec);c.drawRoundRect(0,0,getWidth(),h,h/2,h/2,p);p.setColor(CYAN);c.drawRoundRect(0,0,getWidth()*Math.max(0,Math.min(1,value)),h,h/2,h/2,p);}
+  }
+  static final class Details extends ViewGroup {
+    final Ink eyebrow,title,time,next;final Progress progress;final Logo logo;boolean inside=true,light;Program data=new Program();
+    Details(Context c,boolean light){super(c);this.light=light;setTag("pro_program_information");eyebrow=new Ink(c,CYAN,10,false);title=new Ink(c,Color.WHITE,22,true);time=new Ink(c,0xffdceaf4,12,false);next=new Ink(c,0xffdceaf4,12,false);progress=new Progress(c);logo=new Logo(c,light);for(View v:new View[]{eyebrow,title,time,next,progress,logo})addView(v);}
+    void bind(Program d,Art art){data=d;eyebrow.text((inside?"":"NOW PLAYING  /  ")+d.channel);title.text(d.title);time.text(d.schedule);next.text(d.next.isEmpty()?"":"Next  "+d.next);progress.value(d.progress);logo.bind(d.channel,d.logo,art);style(inside);}
+    void style(boolean in){inside=in;int text=in?Color.WHITE:light?INK:Color.WHITE,secondary=in?0xffdceaf4:light?MUTED:0xffa9c2d4;title.ink(text);time.ink(secondary);next.ink(secondary);progress.dark=in||!light;eyebrow.text((in?"":"NOW PLAYING  /  ")+data.channel);logo.setVisibility(in?GONE:VISIBLE);requestLayout();}
+    static int height(Context c,boolean in){return px(c,(in?104:122)+Math.max(0,font(c)-1)*65);}
+    @Override protected void onMeasure(int ws,int hs){setMeasuredDimension(MeasureSpec.getSize(ws),MeasureSpec.getSize(hs));}
+    @Override protected void onLayout(boolean ch,int l,int t,int r,int b){int w=r-l,h=b-t,d=px(getContext(),inside?20:12),f=px(getContext(),font(getContext()));int side=!inside&&w>=px(getContext(),330)?px(getContext(),54):0;
+      int textw=w-2*d-(side>0?side+d:0);int eh=px(getContext(),14*font(getContext())),th=px(getContext(),29*font(getContext())),sh=px(getContext(),17*font(getContext()));int y=inside?0:px(getContext(),8);
+      place(eyebrow,d,y,textw,eh);y+=eh+px(getContext(),4);place(title,d,y,textw,th);y+=th+px(getContext(),3);place(time,d,y,textw,sh);y+=sh+px(getContext(),2);place(next,d,y,textw,sh);
+      place(progress,d,Math.min(h-px(getContext(),4),Math.max(y+sh+px(getContext(),5),h-px(getContext(),5))),w-2*d,px(getContext(),3));if(side>0)place(logo,w-side-d,px(getContext(),20),side,side);else place(logo,0,0,0,0);
+    }
+  }
+  static final class Dots extends View {
+    final Paint p=new Paint(3);int count=1,index;
+    Dots(Context c){super(c);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    @Override protected void onDraw(Canvas c){float step=px(getContext(),13),start=(getWidth()-(count-1)*step)/2;for(int i=0;i<count;i++){p.setColor(i==index?CYAN:0xff7492a5);c.drawCircle(start+i*step,getHeight()/2f,px(getContext(),i==index?3.2f:2.4f),p);}}
+  }
+  static final class Hero extends ViewGroup {
+    final Actions actions;final Art art;final boolean light;final Ink live,source,muted,status;final Logo logo;final Details info;final Dots dots;
+    final Action preview,unmute,left,right;final Action[] player=new Action[6];final View shade,transport,muteIcon;int state=RESTING;boolean hasChannel;float downX,downY;boolean dragging;ViewGroup below;int animationToken;
+    Hero(Context c,boolean light,Actions actions,Art art){super(c);this.light=light;this.actions=actions;this.art=art;setTag("cobra_pro_hero_overlay");setWillNotDraw(false);setClickable(true);setClipChildren(false);
+      shade=new View(c);shade.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0x18000000,0x22000000,0xe9000000}));addView(shade);
+      transport=new View(c);transport.setBackground(surface(c,light,false,0));transport.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);addView(transport);
+      live=new Ink(c,Color.WHITE,10,false);live.setGravity(Gravity.CENTER);GradientDrawable liveBg=new GradientDrawable();liveBg.setColor(0xffdf2337);liveBg.setCornerRadius(px(c,7));live.setBackground(liveBg);addView(live);
+      source=new Ink(c,Color.WHITE,10,false);source.setTag("cobra_pro_source");source.setPadding(px(c,9),0,px(c,9),0);source.setGravity(Gravity.CENTER_VERTICAL);source.setBackground(surface(c,false,false,16));addView(source);
+      status=new Ink(c,Color.WHITE,10,false);status.setGravity(Gravity.RIGHT);addView(status);logo=new Logo(c,false);addView(logo);
+      info=new Details(c,light);addView(info);dots=new Dots(c);addView(dots);muted=new Ink(c,light?INK:Color.WHITE,10,false);muted.text("Muted");muted.setGravity(Gravity.CENTER_VERTICAL);addView(muted);
+      muteIcon=new View(c){final Paint paint=new Paint(3);@Override protected void onDraw(Canvas canvas){icon(canvas,paint,"mute",0,0,getWidth(),light?INK:Color.WHITE);}};muteIcon.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);addView(muteIcon);
+      preview=new Action(c,"play","Preview",true,false,actions::preview);preview.primary=true;preview.setTag("cobra_pro_preview");addView(preview);
+      unmute=new Action(c,"audio","Unmute",true,false,actions::unmute);unmute.primary=true;unmute.setTag("cobra_pro_unmute");addView(unmute);
+      left=new Action(c,"left","",true,false,()->actions.step(-1));left.setContentDescription("Previous Pro source");left.setTag("cobra_pro_previous");addView(left);
+      right=new Action(c,"right","",true,false,()->actions.step(1));right.setContentDescription("Next Pro source");right.setTag("cobra_pro_next");addView(right);
+      String[] glyphs={"pause","favorite","cc","audio","fullscreen","more"},names={"Pause","Favorite","Subtitles","Audio","Fullscreen","More"};
+      for(int i=0;i<6;i++){final int index=i;player[i]=new Action(c,glyphs[i],names[i],true,false,()->actions.control(index));player[i].stack=true;player[i].setTag("pro_player_"+i);addView(player[i]);}
+      setState(RESTING,null,false);
+    }
+    void bind(Program d,int index,int count){hasChannel=!"Choose a channel".equals(d.channel);source.text(d.source);source.setContentDescription(d.source+", item "+(index+1)+" of "+count);live.text("LIVE");live.setVisibility(d.live?VISIBLE:GONE);logo.bind(d.channel,d.logo,art);info.bind(d,art);dots.index=index;dots.count=Math.min(6,Math.max(1,count));dots.invalidate();dots.setVisibility(count>1?VISIBLE:INVISIBLE);left.setVisibility(count>1?VISIBLE:GONE);right.setVisibility(count>1?VISIBLE:GONE);preview.setEnabled(hasChannel);status.text(d.status);player[1].setSelected(d.favorite);}
+    void playback(boolean playing,boolean isMuted,boolean captions,boolean available){unmute.setEnabled(available);player[0].label(playing?"pause":"play",playing?"Pause":"Play");player[3].label(isMuted?"mute":"audio",isMuted?"Unmute":"Audio");player[2].setSelected(captions);for(int i=0;i<6;i++)player[i].setEnabled(available||i==1||i==5);}
+    void setState(int value,ViewGroup target,boolean animate){int old=state;state=value;
+      if(old!=state)shade.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+          state==WATCHING?new int[]{0x18000000,0x00000000,0x30000000}:new int[]{0x18000000,0x22000000,0xe9000000}));
+      if(target!=null)below=target;ViewGroup destination=state==WATCHING&&below!=null?below:this;
+      if(info.getParent()!=destination){final int token=++animationToken;final int[] before=new int[2];info.getLocationOnScreen(before);boolean was=info.isAttachedToWindow();info.animate().cancel();info.setTranslationX(0);info.setTranslationY(0);detach(info);destination.addView(info,new ViewGroup.LayoutParams(-1,-1));info.style(state!=WATCHING);
+        if(animate&&was&&motion()){
+          final ViewTreeObserver tree=destination.getViewTreeObserver();
+          tree.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener(){public boolean onPreDraw(){
+            if(tree.isAlive())tree.removeOnPreDrawListener(this);
+            if(token==animationToken&&info.isAttachedToWindow()){
+              int[] after=new int[2];info.getLocationOnScreen(after);
+              info.setTranslationX(before[0]-after[0]);info.setTranslationY(before[1]-after[1]);
+              info.animate().translationX(0).translationY(0).setDuration(260).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+            }return true;
+          }});
+        }
+      }
+      preview.setVisibility(state==RESTING?VISIBLE:GONE);unmute.setVisibility(state==PREVIEW?VISIBLE:GONE);muted.setVisibility(state!=WATCHING?VISIBLE:GONE);muteIcon.setVisibility(state!=WATCHING?VISIBLE:GONE);
+      for(Action a:player)a.setVisibility(state==WATCHING?VISIBLE:GONE);requestLayout();
+    }
+    @Override protected void dispatchDraw(Canvas canvas){
+      super.dispatchDraw(canvas);
+      // Explicit edge finish also renders correctly when the native View is drawn to a Canvas.
+      Path edge=new Path();float radius=px(getContext(),14);RectF bounds=new RectF(0,0,getWidth(),getHeight());
+      edge.addRoundRect(bounds,radius,radius,Path.Direction.CW);
+      canvas.save();if(Build.VERSION.SDK_INT>=26)canvas.clipOutPath(edge);else canvas.clipPath(edge,Region.Op.DIFFERENCE);canvas.drawColor(light?PALE:Color.BLACK);canvas.restore();
+      Paint outline=new Paint(Paint.ANTI_ALIAS_FLAG);outline.setStyle(Paint.Style.STROKE);outline.setStrokeWidth(px(getContext(),1.2f));outline.setColor(light?0xff8bd5e7:CYAN);
+      bounds.inset(px(getContext(),.6f),px(getContext(),.6f));canvas.drawRoundRect(bounds,radius,radius,outline);
+    }
+    @Override protected void onDetachedFromWindow(){info.animate().cancel();animationToken++;super.onDetachedFromWindow();}
+    @Override protected void onMeasure(int ws,int hs){setMeasuredDimension(MeasureSpec.getSize(ws),MeasureSpec.getSize(hs));}
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){int w=r-l,h=b-t,p=px(getContext(),12),bh=px(getContext(),48),top=px(getContext(),12),badge=px(getContext(),25),bed=px(getContext(),state==WATCHING?82:80),videoBottom=h-bed;place(shade,0,0,w,videoBottom);place(transport,0,videoBottom,w,bed);
+      int liveW=live.getVisibility()==VISIBLE?px(getContext(),43):0;place(live,p,top,liveW,badge);int sx=p+(liveW>0?liveW+px(getContext(),6):0);int sw=Math.round(source.getPaint().measureText(source.getText().toString()))+source.getPaddingLeft()+source.getPaddingRight();place(source,sx,top,Math.min(sw,Math.max(0,w-sx-p-px(getContext(),56))),badge);place(logo,w-p-px(getContext(),42),top,px(getContext(),42),px(getContext(),37));
+      place(status,px(getContext(),64),top+badge+px(getContext(),8),Math.max(0,w-px(getContext(),128)),px(getContext(),16*font(getContext())));
+      int centerY=Math.max(top+badge+px(getContext(),10),Math.min(h/2-bh/2,h-bh-p));place(left,px(getContext(),2),centerY,bh,bh);place(right,w-bh-px(getContext(),2),centerY,bh,bh);
+      int actionY=h-bh-px(getContext(),20);place(preview,(w-px(getContext(),124))/2,actionY,px(getContext(),124),bh);place(unmute,(w-px(getContext(),124))/2,actionY,px(getContext(),124),bh);place(muteIcon,p,actionY+px(getContext(),14),px(getContext(),20),px(getContext(),20));place(muted,p+px(getContext(),25),actionY,px(getContext(),50),bh);place(dots,(w-px(getContext(),90))/2,h-px(getContext(),14),px(getContext(),90),px(getContext(),10));
+      if(info.getParent()==this){int ih=Math.min(Details.height(getContext(),true),Math.max(px(getContext(),85),videoBottom-top-badge-px(getContext(),10)));place(info,p,Math.max(top+badge+px(getContext(),7),videoBottom-ih-px(getContext(),8)),w-2*p,ih);}
+      int controlPad=px(getContext(),8),cell=(w-2*controlPad)/6,controlH=px(getContext(),64);for(int i=0;i<6;i++)place(player[i],controlPad+i*cell,h-controlH-px(getContext(),13),cell,controlH);
+    }
+    @Override public boolean onInterceptTouchEvent(MotionEvent e){if(e.getActionMasked()==MotionEvent.ACTION_DOWN){downX=e.getX();downY=e.getY();dragging=false;}
+      if(e.getActionMasked()==MotionEvent.ACTION_MOVE){float dx=e.getX()-downX,dy=e.getY()-downY;if(Math.abs(dx)>ViewConfiguration.get(getContext()).getScaledTouchSlop()&&Math.abs(dx)>Math.abs(dy)*1.4f){dragging=true;getParent().requestDisallowInterceptTouchEvent(true);return true;}}return false;}
+    @Override public boolean onTouchEvent(MotionEvent e){if(e.getActionMasked()==MotionEvent.ACTION_DOWN){downX=e.getX();downY=e.getY();return true;}if(e.getActionMasked()==MotionEvent.ACTION_UP){float dx=e.getX()-downX,dy=e.getY()-downY;if(Math.abs(dx)>px(getContext(),48)&&Math.abs(dx)>Math.abs(dy)*1.4f)actions.step(dx<0?1:-1);else if(!dragging)performClick();dragging=false;getParent().requestDisallowInterceptTouchEvent(false);return true;}if(e.getActionMasked()==MotionEvent.ACTION_CANCEL){dragging=false;return true;}return true;}
+    @Override public boolean performClick(){super.performClick();return true;}
+    @Override public boolean onGenericMotionEvent(MotionEvent e){if((e.getSource()&InputDevice.SOURCE_CLASS_POINTER)!=0&&e.getAction()==MotionEvent.ACTION_SCROLL){float dx=e.getAxisValue(MotionEvent.AXIS_HSCROLL);if(dx!=0){actions.step(dx<0?1:-1);return true;}}return super.onGenericMotionEvent(e);}
+    @Override public boolean onKeyDown(int key,KeyEvent e){if(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT){actions.step(key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);return true;}return super.onKeyDown(key,e);}
+  }
+
+  static final class Filters extends HorizontalScrollView {
+    static final String[] LABELS={"All Channels","Favorites","Recents","Groups","Search"};final Action[] buttons=new Action[5];final ViewGroup strip;
+    Filters(Context c,boolean light,java.util.function.IntConsumer click){super(c);setTag("pro_five_action_row");setHorizontalScrollBarEnabled(false);setFillViewport(true);setBackground(surface(c,light,false,8));
+      strip=new ViewGroup(c){@Override protected void onMeasure(int ws,int hs){int w=Math.max(Filters.this.getMeasuredWidth(),px(getContext(),390*font(getContext()))),h=height(getContext(),w);setMeasuredDimension(w,h);for(Action a:buttons)exact(a,w/5,h);}
+        @Override protected void onLayout(boolean changed,int l,int t,int r,int b){int w=r-l;for(int i=0;i<5;i++)place(buttons[i],w*i/5,0,w*(i+1)/5-w*i/5,b-t);}};
+      addView(strip,new FrameLayout.LayoutParams(-2,-1));String[] icons={"list","favorite","recent","groups","search"};for(int i=0;i<5;i++){final int k=i;buttons[i]=new Action(c,icons[i],LABELS[i],false,light,()->click.accept(k));buttons[i].navigation=true;buttons[i].setTag("pro_filter_"+i);strip.addView(buttons[i]);}}
+    void selected(int i){for(int k=0;k<5;k++)buttons[k].setSelected(k==i);}
+    static int height(Context c,int width){return px(c,68+Math.max(0,font(c)-1)*18);}
+    @Override protected void onMeasure(int ws,int hs){super.onMeasure(ws,MeasureSpec.makeMeasureSpec(height(getContext(),MeasureSpec.getSize(ws)),MeasureSpec.EXACTLY));}
+  }
+  static final class ChannelRow extends ViewGroup {
+    final Ink number,name,program,time;final Logo logo;final Progress progress;final Action play;final Paint line=new Paint(3);boolean light;int widthDp;
+    ChannelRow(Context c,boolean light,Runnable select){super(c);this.light=light;setWillNotDraw(false);number=new Ink(c,light?MUTED:0xffbad1e3,11,false);number.setGravity(Gravity.CENTER_VERTICAL);name=new Ink(c,light?INK:Color.WHITE,14,true);program=new Ink(c,light?MUTED:0xffb5c8d8,12,false);time=new Ink(c,light?MUTED:0xffb5c8d8,11,false);logo=new Logo(c,light);progress=new Progress(c);play=new Action(c,"play","",false,light,select);play.setContentDescription("Preview channel");for(View v:new View[]{number,logo,name,program,time,progress,play})addView(v);setClickable(true);setFocusable(true);setOnClickListener(v->select.run());}
+    void bind(Program data,int position,boolean active,Art art){number.text(String.format(java.util.Locale.ROOT,"%03d",position+1));logo.bind(data.channel,data.logo,art);name.text(data.channel);program.text(data.title);time.text(data.schedule);progress.value(data.progress);progress.dark=!light;setSelected(active);setContentDescription(data.channel+", "+data.title+", "+data.schedule);play.setContentDescription("Preview "+data.channel);setBackground(active?surface(getContext(),light,true,10):null);}
+    static int height(Context c,int width){return px(c,(width<px(c,600)?90:74)+Math.max(0,font(c)-1)*45);}
+    @Override protected void onMeasure(int ws,int hs){int w=MeasureSpec.getSize(ws);setMeasuredDimension(w,height(getContext(),w));}
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){int w=r-l,h=b-t,p=px(getContext(),7),nw=px(getContext(),26),ls=px(getContext(),42),button=px(getContext(),48);boolean wide=w>=px(getContext(),600);int tx=p+nw+ls+px(getContext(),12),end=w-p-button-px(getContext(),8);place(number,p,0,nw,h);place(logo,p+nw,(h-ls)/2,ls,ls);place(play,w-p-button,(h-button)/2,button,button);
+      int nh=px(getContext(),20*font(getContext())),ph=px(getContext(),17*font(getContext()));if(wide){int copy=Math.round((end-tx)*.37f),clock=px(getContext(),132),pw=end-tx-copy-clock-px(getContext(),20);place(name,tx,(h-nh)/2,copy,nh);place(program,tx+copy+px(getContext(),8),(h-ph)/2,Math.max(0,pw),ph);place(time,end-clock,h/2-px(getContext(),18),clock,ph);place(progress,end-clock,h/2+px(getContext(),11),clock,px(getContext(),3));}
+      else {int y=px(getContext(),10),cw=end-tx;place(name,tx,y,cw,nh);place(program,tx,y+nh+px(getContext(),2),cw,ph);place(time,tx,y+nh+ph+px(getContext(),4),cw,ph);place(progress,tx,h-px(getContext(),8),cw,px(getContext(),3));}}
+    @Override protected void onDraw(Canvas c){super.onDraw(c);line.setColor(light?0xffd9e5ee:0xff274353);c.drawRect(px(getContext(),7),getHeight()-px(getContext(),1),getWidth()-px(getContext(),7),getHeight(),line);if(isFocused()){line.setStyle(Paint.Style.STROKE);line.setColor(CYAN);line.setStrokeWidth(px(getContext(),2));c.drawRoundRect(1,1,getWidth()-1,getHeight()-1,px(getContext(),10),px(getContext(),10),line);line.setStyle(Paint.Style.FILL);}}
+  }
+}

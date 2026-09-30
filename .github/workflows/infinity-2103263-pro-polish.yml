@@ -1,0 +1,142 @@
+name: Infinity | 2103263 Pro OLED Light Polish RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103263-pro-oled-light-polish-rc1]
+    paths:
+      - '.github/workflows/infinity-2103263-pro-polish.yml'
+      - 'repairs/pro-polish-2103263/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-pro-polish-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  pro-polish-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Download exact locked 2103262 signed candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103262-Pro-Visual-Correction-RC1-TEST-CANDIDATE
+          run-id: 36342321400
+          github-token: ${{ github.token }}
+          path: parent262
+      - name: Download exact locked 2103262 source and test evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103262-Pro-Visual-Correction-RC1-Evidence
+          run-id: 36342321400
+          github-token: ${{ github.token }}
+          path: source262
+      - name: Verify parent APK and source pairing
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source262/reconstructed-2103262-shell.tar.gz | cut -d' ' -f1)" = 'b02c0cf073d998bae2f97f1b9801967fbf653768ba98e16abf05e28e37ac7b62'
+          test "$(sha256sum parent262/Infinity-2103262-Pro-Visual-Correction-RC1.apk | cut -d' ' -f1)" = 'be06ce257594f4ba82f0c8bafe7a3b180bf44331cbe9605e47b0f41d1cd3865f'
+          tar -xzf source262/reconstructed-2103262-shell.tar.gz
+          mkdir -p audit263
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent262/Infinity-2103262-Pro-Visual-Correction-RC1.apk') as z:
+              assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Apply Pro polish and protect all other Activity code
+        run: python3 repairs/pro-polish-2103263/apply.py --root . --evidence audit263
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' 'ndk;21.4.7075529' >/dev/null
+      - name: Compile Android interface only and retain permanent signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent262/Infinity-2103262-Pro-Visual-Correction-RC1.apk --build-dir build263 --out signed263 2>&1 | tee audit263/android-build.log
+      - name: Run Pro actions and both themes plus 28 protected regressions
+        run: |
+          set -euo pipefail
+          mkdir -p audit263/screenshots
+          python3 repairs/pro-polish-2103263/stage_tests.py --build-dir build263 --evidence audit263/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build263
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.GlassChooserTest --tests com.projectinfinity.kodi.GlassOptionsTest --tests com.projectinfinity.kodi.GlassHealthFinishTest --tests com.projectinfinity.kodi.RecoveryFixedTest --tests com.projectinfinity.kodi.ProVisualTest --tests com.projectinfinity.kodi.ProActionsTest 2>&1 | tee ../audit263/android-view-tests.log
+      - name: Gate candidate on tests protected render equality and payload preservation
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,xml.etree.ElementTree as ET,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          apk=Path('signed263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk')
+          kept=verify_bytes(Path('parent262/Infinity-2103262-Pro-Visual-Correction-RC1.apk'),apk)
+          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':12,'ProActionsTest':5}
+          for name,count in counts.items():
+              t=ET.parse('build263/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
+              assert int(t.attrib['tests'])==count,(name,t.attrib)
+              assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(name,t.attrib)
+          locked=Path('source262/screenshots/protected');current=Path('audit263/screenshots/protected')
+          names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
+          assert len(list(Path('audit263/screenshots/pro').glob('*.png')))==24
+          with zipfile.ZipFile(apk) as z:
+              assert not any('fixture' in n or 'ProVisualTest' in n or 'ProActionsTest' in n for n in z.namelist())
+          source=json.loads(Path('audit263/source-verification.json').read_text())
+          assert source['other_shell_files_byte_identical']==229
+          assert source['all_activity_code_except_pro_style_byte_identical']
+          result=json.loads(Path('signed263/background-resume-apk-audit.json').read_text());result.update(kept)
+          result.update(source_verification=source,test_methods=counts,automated_tests_passed=45,protected_render_equality=20,
+              pro_native_component_renders=24,pro_render_data='deterministic test fixtures, not a live provider',
+              action_test_player='fake player with unchanged production method bodies',physical_device_verified=False,
+              real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)
+          Path('signed263/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed263/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Preserve expanded source tests renders and audit
+        if: always()
+        run: |
+          mkdir -p audit263
+          cp -r repairs/pro-polish-2103263 audit263/repair-source
+          if [ -d build263/xbmc/build/test-results ]; then cp -r build263/xbmc/build/test-results audit263/; fi
+          if [ -d build263/xbmc/src/test ]; then cp -r build263/xbmc/src/test audit263/staged-tests; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit263/reconstructed-2103263-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103263-Pro-OLED-Light-Polish-RC1-TEST-CANDIDATE
+          path: signed263/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Publish Pro polish and regression evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103263-Pro-OLED-Light-Polish-RC1-Evidence
+          path: audit263/
+          if-no-files-found: error
+          retention-days: 90
