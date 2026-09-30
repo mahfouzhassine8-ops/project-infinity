@@ -25,7 +25,10 @@ s=once(s,'    cobraRefreshLiveAmbientSurfaces(mode,live,mCobraAmbientTint);','''
     cobraRefreshGlassTree(drawer,mode,false);
     cobraRefreshGlassTree(cobraCurrentSheetPanel(),mode,cobraNightCinemaActive());
     cobraRefreshGlassTree(mCobraPlayerDrawer,mode,cobraNightCinemaActive());
-    cobraRefreshGlassTree(mPlayerChrome,mode,cobraNightCinemaActive());''')
+    cobraRefreshGlassTree(mPlayerChrome,mode,cobraNightCinemaActive());
+    if(mCobraModeToolbar!=null){View visuals=mCobraModeToolbar.findViewWithTag("cobra_mode_visuals");
+      if(visuals!=null)visuals.setSelected(cobraVisualEffectsAllowed()&&(CobraPresentationEffects.ambientMode(mPrefs)!=CobraPresentationEffects.OFF||mPrefs.getBoolean(CobraPresentationEffects.NIGHT,false)));
+    }''')
 s=once(s,'      if(pause!=null)pause.setBackground(surface(0xd9000000,14,blue,2));','      if(pause!=null)pause.setBackground(cobraPhoneGlass(false,40,true));\n      cobraRefreshGlassTree(mPlayerChrome,CobraPresentationEffects.OFF,true);')
 s=once(s,'    if(pause!=null)pause.setBackground(surface(0x9a000000,14,tintEdge,raw==CobraPresentationEffects.IMMERSIVE?2:1));','    if(pause!=null)pause.setBackground(cobraPhoneGlass(false,40,true));\n    cobraRefreshGlassTree(mPlayerChrome,raw,false);')
 # Factory supplies the active palette to newly created filters/cards before a refresh.
