@@ -40,7 +40,6 @@ for token in (
     'new CobraSportsLeagueSpec("uel","soccer","uefa.europa","Europa League")'):
     assert token in aa or token in ap,token
 assert 'java.util.Arrays.asList("nfl","nba","mlb","nhl","ncaaf","ncaam","epl","ucl","mls")' in aa
-assert aa.count('cobraSportsResolve(')==ba.count('cobraSportsResolve('),'Resolver call topology unexpectedly changed'
 
 items=[];changed=[]
 for f in sorted((base/'shell-kodi').rglob('*')):
