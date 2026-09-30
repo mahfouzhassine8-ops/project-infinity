@@ -294,12 +294,15 @@ final class InfinityGlassChooser extends FrameLayout {
       responsiveBoxes.clear();
       GradientDrawable glass=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{light?0xfaffffff:0xff14283a,light?(cobra?0xffd0edf4:0xfff4e7c9):0xff06101c});
       glass.setCornerRadius(px(18));glass.setStroke(px(1),cobra?(light?0xff59b7d0:0xff53cbeb):(light?0xffcead6c:0xffd7ba74));setBackground(glass);
-      boolean artwork=h>=px(220)&&w>=px(140);int titleY=h<px(160)?px(8):artwork?px(116):px(68);
+      boolean artwork=h>=px(220)&&w>=px(140);
+      int markW=Math.min(w-px(32),px(144)),markH=markW/2;
+      int groupTop=Math.max(px(60),(h-(light?px(56):px(8))-(artwork?markH+px(80):px(72)))/2);
+      int titleY=h<px(160)?px(8):artwork?groupTop+markH+px(8):Math.max(px(68),groupTop);
       int titleHeight=px(32);int bottom=light?px(56):px(8);
       for(Box part:parts){View v=part.view;v.setVisibility(VISIBLE);
         if(v==gear){gear.visualSize=px(48);responsivePart(v,Math.max(0,w-px(56)),px(8),Math.min(w,px(48)),px(48));}
         else if(v==pill){pill.setText(w<px(180)?"ENTER  ›":pill.approvedText);pill.responsiveSize=14;responsivePart(v,px(8),h-px(56),w-px(h<px(160)?72:16),px(48));}
-        else if(v instanceof Mark){if(!artwork){v.setVisibility(GONE);continue;}responsivePart(v,(w-px(96))/2,px(58),px(96),px(48));}
+        else if(v instanceof Mark){if(!artwork){v.setVisibility(GONE);continue;}responsivePart(v,(w-markW)/2,groupTop,markW,markH);}
         else if(v instanceof Label){Label label=(Label)v;
           if(label.approvedText.equals("INFINITY")||label.approvedText.equals("COBRA")){label.responsiveSize=18;responsivePart(v,px(8),titleY,w-px(h<px(160)?72:16),titleHeight);}
           else if(h-titleY-titleHeight-bottom>=px(44)){label.responsiveSize=12;responsivePart(v,px(8),titleY+titleHeight,w-px(16),px(40));}
@@ -364,11 +367,15 @@ final class InfinityGlassChooser extends FrameLayout {
   }
   /** Independent approved brand artwork; not reinterpreted or recolored at runtime. */
   private static final class Mark extends View {
-    final Bitmap bitmap;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);final RectF bounds=new RectF();
-    Mark(Context c,boolean light,String key){super(c);bitmap=InfinityGlassArt.decode((light?"light_":"dark_")+key);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    final boolean light,cobraMark;final Bitmap bitmap;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);final RectF bounds=new RectF();
+    Mark(Context c,boolean light,String key){super(c);this.light=light;this.cobraMark=key.startsWith("cyan");bitmap=InfinityGlassArt.decode((light?"light_":"dark_")+key);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
     @Override protected void onSizeChanged(int w,int h,int ow,int oh){super.onSizeChanged(w,h,ow,oh);bounds.set(0,0,w,h);}
     @Override protected void onDraw(Canvas c){
-      if(getParent() instanceof Card && ((Card)getParent()).responsive){float s=Math.min(getWidth()/(float)bitmap.getWidth(),getHeight()/(float)bitmap.getHeight());float w=bitmap.getWidth()*s,h=bitmap.getHeight()*s;RectF fit=new RectF((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2);c.drawBitmap(bitmap,null,fit,p);}
+      p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);
+      if(getParent() instanceof Card && ((Card)getParent()).responsive){float s=Math.min(getWidth()/(float)bitmap.getWidth(),getHeight()/(float)bitmap.getHeight());float w=bitmap.getWidth()*s,h=bitmap.getHeight()*s;RectF fit=new RectF((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2);
+        float radius=10*getResources().getDisplayMetrics().density;Path rim=new Path();rim.addRoundRect(fit,radius,radius,Path.Direction.CW);int saved=c.save();c.clipPath(rim);c.drawBitmap(bitmap,null,fit,p);c.restoreToCount(saved);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(getResources().getDisplayMetrics().density);p.setColor(cobraMark?(light?0x8059b7d0:0x8053cbeb):(light?0x80cead6c:0x80d7ba74));c.drawRoundRect(fit,radius,radius,p);p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);
+      }
       else c.drawBitmap(bitmap,null,bounds,p);
     }
   }
