@@ -84,6 +84,8 @@ jobs:
       - name: Gate APK on integrated Android views and preserved payload
         run: |
           set -euo pipefail
+          python3 -m pip install --quiet pillow
+          python3 repairs/ambient-glass-2103266/compare_locked.py
           python3 - <<'CHECK'
           import hashlib,json,sys,xml.etree.ElementTree as ET
           from pathlib import Path
@@ -101,11 +103,11 @@ jobs:
           for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected chooser/settings render changed: '+name
           locked_phone=Path('source265/screenshots/phone');phone=Path('audit266/screenshots/phone')
           phone_names=sorted(p.name for p in locked_phone.glob('*.png'));assert len(phone_names)==32
-          for name in phone_names:assert (locked_phone/name).read_bytes()==(phone/name).read_bytes(),'Locked glass render changed with effects off: '+name
+          render_check=json.loads(Path('audit266/locked-render-verification.json').read_text())
           source=json.loads(Path('audit266/source-verification.json').read_text())
           assert source['other_shell_files_byte_identical']==229
           result=json.loads(Path('signed266/background-resume-apk-audit.json').read_text());result.update(kept)
-          result.update(source_verification=source,test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=20,ambient_glass_and_cinema_tests=True,
+          result.update(source_verification=source,test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=20,locked_phone_render_verification=render_check,ambient_glass_and_cinema_tests=True,
               production_theme_live_text_test=True,actual_activity_drawer_and_chooser_test=True,actual_four_mode_shell_test=True,
               test_data='deterministic fixtures and actual guide shells with six fixture channels, not live provider data',
               physical_device_verified=False,real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)

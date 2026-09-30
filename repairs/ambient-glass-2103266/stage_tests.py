@@ -15,3 +15,12 @@ android.testOptions.unitTests.all {
 }
 dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.14.1' }
 ''')
+# Record exact time-ruler/list bounds for clock-aware comparison to the locked renders.
+p=out/'PhoneGlassTest.java';s=p.read_text();needle='      save(root,mode+"-"+(light?"light":"oled")+"-"+size[0]+"x"+size[1]);'
+assert s.count(needle)==1
+s=s.replace(needle,'''      if(mode.equals("grid")){
+        View ruler=(View)get(a,"mCobraGuideRuler");ViewGroup list=(ViewGroup)get(a,"mCobraGuideList");int[] rp=new int[2],lp=new int[2],origin=new int[2];ruler.getLocationOnScreen(rp);list.getLocationOnScreen(lp);root.getLocationOnScreen(origin);
+        int label=((Number)get(list.getChildAt(0),"labelWidth")).intValue();JSONObject meta=new JSONObject();meta.put("ruler",new org.json.JSONArray(new int[]{rp[0]-origin[0],rp[1]-origin[1],ruler.getWidth(),ruler.getHeight()}));meta.put("list",new org.json.JSONArray(new int[]{lp[0]-origin[0],lp[1]-origin[1],list.getWidth(),list.getHeight()}));meta.put("labelWidth",label);
+        File folder=new File(System.getProperty("glass.phone.evidence"));folder.mkdirs();try(FileWriter f=new FileWriter(new File(folder,"grid-"+(light?"light":"oled")+"-"+size[0]+"x"+size[1]+".png.clock.json"))){f.write(meta.toString());}
+      }
+'''+needle);p.write_text(s)
