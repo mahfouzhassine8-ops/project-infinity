@@ -65,7 +65,7 @@ jobs:
           test "$(sha256sum parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk | cut -d' ' -f1)" = '4624c1ca66d29a4ac8c5f63892ca9669e6ef757894fe6a2e0b4c4d356e3ec455'
           test "$(sha256sum reference237/audit237/InfinityLiveActivity-2103237-after.java.in | cut -d' ' -f1)" = 'afa638f0f881c2d437fb5cad56c22453972a5900dcee18eac962537dba0bc255'
           tar --no-same-owner -xzf source266/reconstructed-2103266-shell.tar.gz
-          mkdir -p audit267 engine
+          mkdir -p engine
           python3 - <<'PY'
           import hashlib,zipfile
           from pathlib import Path
