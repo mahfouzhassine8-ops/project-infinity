@@ -65,7 +65,7 @@ HELPERS=r'''
   }
   private final class CobraPlayerDrawerRow extends FrameLayout{
     final Button button=cobraTextButton("",true,()->{});final CobraPlayingDot playing=new CobraPlayingDot();
-    CobraPlayerDrawerRow(){super(InfinityLiveActivity.this);setFocusable(true);setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);setOnClickListener(v->button.performClick());setOnLongClickListener(v->button.performLongClick());addView(button,new FrameLayout.LayoutParams(-1,-1));FrameLayout.LayoutParams dot=new FrameLayout.LayoutParams(dp(18),dp(18),Gravity.RIGHT|Gravity.CENTER_VERTICAL);dot.rightMargin=dp(10);playing.setTag("cobra_player_playing_dot");addView(playing,dot);}
+    CobraPlayerDrawerRow(){super(InfinityLiveActivity.this);setFocusable(true);setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);setOnClickListener(v->button.performClick());setOnLongClickListener(v->button.performLongClick());button.setDuplicateParentStateEnabled(true);button.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);addView(button,new FrameLayout.LayoutParams(-1,-1));FrameLayout.LayoutParams dot=new FrameLayout.LayoutParams(dp(18),dp(18),Gravity.RIGHT|Gravity.CENTER_VERTICAL);dot.rightMargin=dp(10);playing.setTag("cobra_player_playing_dot");addView(playing,dot);}
     void bind(Channel channel){playing.bind(channel);setTag("cobra-player-channel-row:"+channel.id);button.setTag("cobra-player-channel:"+channel.id);}
     void group(){playing.bind(null);setTag(null);button.setTag(null);}
     void refreshPlaying(){playing.sync();}
@@ -132,7 +132,7 @@ def transform(s):
     s=once(s,'else {Channel c=channels.get(p);GuideProgram now=cobraCurrentProgram(c),next=cobraNextProgram(c);row.setText',
         'else {Channel c=channels.get(p);holder.bind(c);GuideProgram now=cobraCurrentProgram(c),next=cobraNextProgram(c);row.setText')
     s=once(s,'return true;});}\n        return row;}});\n    mCobraPlayerDrawerList.setAlpha',
-        'return true;});}\n        return holder;}});\n    mCobraPlayerDrawerList.setAlpha')
+        'return true;});}\n        holder.setSelected(row.isSelected());holder.setContentDescription(row.getText());return holder;}});\n    mCobraPlayerDrawerList.setAlpha')
     s=once(s,'  private void cobraRefreshPlayingIndicators(){\n    if(mCobraGuideList==null)return;',r'''  private void cobraRefreshPlayingIndicators(){
     if(mCobraPlayerDrawerList!=null)for(int i=0;i<mCobraPlayerDrawerList.getChildCount();i++){
       View child=mCobraPlayerDrawerList.getChildAt(i);if(child instanceof CobraPlayerDrawerRow)((CobraPlayerDrawerRow)child).refreshPlaying();

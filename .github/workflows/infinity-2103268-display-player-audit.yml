@@ -83,7 +83,8 @@ jobs:
             --tests '*Cobra2103268ProductAuditTest.displayScrollAffordanceIsVisibleAndSelectedBottomChoiceRevealsItself' \
             --tests '*Cobra2103268ProductAuditTest.channelCustomResetIsReachablePersistsAndDoesNotAffectOtherChannel' \
             --tests '*Cobra2103268ProductAuditTest.allFiveTransportControlsStayReachableOnCoverAndLargeText' \
-            --tests '*Cobra2103268ProductAuditTest.channelsDotTracksActualSessionIndependentlyOfDrawerFocus' 2>&1 | tee ../audit268/baseline-product-tests.log
+            --tests '*Cobra2103268ProductAuditTest.channelsDotTracksActualSessionIndependentlyOfDrawerFocus' \
+            --tests '*Cobra2103268ProductAuditTest.everyDisplayChoiceChangesActualPaneThroughItsVisibleControlAndRecordsObservation' 2>&1 | tee ../audit268/baseline-product-tests.log
           code=${PIPESTATUS[0]}
           set -e
           test "$code" -ne 0
@@ -91,9 +92,11 @@ jobs:
           python3 - <<'PY'
           import xml.etree.ElementTree as E
           t=E.parse('build267/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103268ProductAuditTest.xml').getroot()
-          assert int(t.attrib['tests'])==5 and int(t.attrib['failures'])==5 and int(t.attrib.get('errors',0))==0,t.attrib
+          assert int(t.attrib['tests'])==6 and int(t.attrib['failures'])==5 and int(t.attrib.get('errors',0))==0,t.attrib
           for c in t.findall('testcase'):
-            f=c.find('failure');assert f is not None and f.attrib['type']=='java.lang.AssertionError',(c.attrib,f.attrib if f is not None else None)
+            f=c.find('failure')
+            if c.attrib['name'].startswith('everyDisplayChoice'):assert f is None
+            else:assert f is not None and f.attrib['type']=='java.lang.AssertionError',(c.attrib,f.attrib if f is not None else None)
           PY
       - name: Apply scoped forward repairs and source-preservation gate
         run: |
@@ -117,6 +120,7 @@ jobs:
             --tests '*Cobra2103268ProductAuditTest' --tests '*Cobra2103201ScrubberTest' \
             --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103202LifecycleTest' \
             --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest' \
+            --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest' \
             --tests '*Cobra2103229MultiViewStabilityFillTest' \
             --tests '*GlassChooserTest' --tests '*GlassOptionsTest' --tests '*GlassHealthFinishTest' \
             --tests '*RecoveryFixedTest' --tests '*ProVisualTest' --tests '*ProActionsTest' \
@@ -129,11 +133,11 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import json,hashlib,xml.etree.ElementTree as E
-          files=list(Path('build268/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==16,len(files)
+          files=list(Path('build268/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==19,len(files)
           counts={}
           for f in files:
             t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
-          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==14,counts
+          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==15,counts
           locked=Path('source267/screenshots/protected');current=Path('audit268/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
           for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
           report=json.loads(Path('signed268/background-resume-apk-audit.json').read_text());report.update(test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=len(names),physical_device_verified=False,update_over_install_device_verified=False,candidate_locked=False,status='AUTOMATED TEST CANDIDATE — PASS; physical-device acceptance required',best_fit_interpretation='Fullscreen proportional full cover; physical review required',infinity_skin_touched=False)
