@@ -92,10 +92,10 @@ jobs:
           python3 - <<'PY'
           import xml.etree.ElementTree as E
           t=E.parse('build267/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.Cobra2103268ProductAuditTest.xml').getroot()
-          assert int(t.attrib['tests'])==6 and int(t.attrib['failures'])==5 and int(t.attrib.get('errors',0))==0,t.attrib
+          assert int(t.attrib['tests'])==6 and int(t.attrib['failures'])==4 and int(t.attrib.get('errors',0))==0,t.attrib
           for c in t.findall('testcase'):
             f=c.find('failure')
-            if c.attrib['name'].startswith('everyDisplayChoice'):assert f is None
+            if c.attrib['name'].startswith(('everyDisplayChoice','allFiveTransport')):assert f is None
             else:
               expected={'fullscreenBestFit':'No unexplained','displayScrollAffordance':'15 choices must announce scrolling','channelCustomReset':'cobra-channel-custom-reset','allFiveTransport':'escapes pane','channelsDot':'Actual player Channels must carry locked playing dot'}
               message=next(v for k,v in expected.items() if c.attrib['name'].startswith(k))
@@ -133,6 +133,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 repairs/display-player-2103268/verify_source.py --baseline rollback267 --root . --out audit268
+          python3 repairs/display-player-2103268/observations.py --evidence audit268
           python3 - <<'PY'
           from pathlib import Path
           import json,hashlib,xml.etree.ElementTree as E
