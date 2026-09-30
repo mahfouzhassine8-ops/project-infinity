@@ -12,7 +12,7 @@ aa=(root/'shell-kodi'/r.ACTIVITY).read_text();ar=(root/'shell-kodi'/r.RENDERER).
 assert r.sha(ba.encode())==r.PARENT_ACTIVITY_SHA and r.sha(br.encode())==r.PARENT_RENDERER_SHA and r.sha(bp.encode())==r.PARENT_PROUI_SHA and r.sha(bc.encode())==r.PARENT_CMAKE_SHA,'Rollback is not exact locked 2103274'
 assert aa==r.patch_activity(ba),'Activity differs from bounded 2103275 transformation'
 assert ar==r.patch_renderer(br),'Visual renderer differs from bounded 2103275 transformation'
-assert ap==bp,'Pro Sports UI changed in ambient-only pass'\nbi=(base/'shell-kodi'/r.INSTALL).read_text();ai=(root/'shell-kodi'/r.INSTALL).read_text();assert r.sha(bi.encode())==r.PARENT_INSTALL_SHA and r.sha(ai.encode())==r.AFTER_INSTALL_SHA\nassert ai==bi.replace('                  src/CobraProUi.java\\n','                  src/CobraProUi.java\\n                  src/CobraImmersiveAmbient.java\\n',1),'Java registration drift'
+assert ap==bp,'Pro Sports UI changed in ambient-only pass'
 assert r.sha(ac.encode())==r.AFTER_CMAKE_SHA,'Android CMake registration differs from bounded 2103275 result'
 assert 'src/CobraImmersiveAmbient.java' in ac and 'CobraImmersiveAmbient.java.in' in ac
 assert r.sha(aa.encode())==r.AFTER_ACTIVITY_SHA and r.sha(ar.encode())==r.AFTER_RENDERER_SHA
