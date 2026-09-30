@@ -6,14 +6,14 @@ ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 RENDERER='tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in'
 IMMERSIVE='tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java.in'
 PROUI='tools/android/packaging/xbmc/src/CobraProUi.java.in'
-GRADLE='tools/android/packaging/xbmc/build.gradle.in'
+GRADLE='tools/android/packaging/xbmc/build.gradle.in'\nCMAKE='cmake/scripts/android/Install.cmake'
 LICENSE='tools/android/packaging/xbmc/res/raw/x_ambient_mit_license.txt'
 PARENT_ACTIVITY_SHA='ab7bf1619090df8aa8fb5cff77a3e16ad1b503d1e45b26736fb959000c65915c'
 PARENT_RENDERER_SHA='6d6d2a7d48a49bcd6fc646374339914e761c8cc73dfbf68acf3c892088dc5df0'
-PARENT_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'
+PARENT_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'\nPARENT_CMAKE_SHA='809c8d60f539c743afb8d7a85c09f1517fb1cd6ec9912ff24dfa38d96590129d'
 AFTER_ACTIVITY_SHA='0ed5f50992bf637bd31ff7c4c299fc4837f5ae0ed3169a687511eec8ed07643c'
 AFTER_RENDERER_SHA='d4eecc66ee0d021eca32b8c2edd9337c53da9eb58c1a18c9f0a79df566c1537d'
-AFTER_IMMERSIVE_SHA='9ae2e8d83f953c2be8671eecb8244b3ba5e232075d81163a8e24d2742eb41b63'
+AFTER_IMMERSIVE_SHA='9ae2e8d83f953c2be8671eecb8244b3ba5e232075d81163a8e24d2742eb41b63'\nAFTER_CMAKE_SHA='4368634f2bd1fc17aa063b6961daeb0beb24f4ed9b22aed96233609b73c27eea'
 PARENT_APK='c07f9f8872d7be892a3e0877ec129a893cbe2c106e3af33ca69b2e300b594e12'
 PARENT_COMMIT='469afd4f2da4347ded4000164c48bf658a23fb33'
 PARENT_RUN=36775670821
@@ -85,22 +85,27 @@ def patch_renderer(s):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
     shell=a.root/'shell-kodi';a.out.mkdir(parents=True,exist_ok=True)
-    activity=shell/ACTIVITY;renderer=shell/RENDERER;pro=shell/PROUI
+    activity=shell/ACTIVITY;renderer=shell/RENDERER;pro=shell/PROUI;cmake=shell/CMAKE
     assert sha(activity.read_bytes())==PARENT_ACTIVITY_SHA,'Not exact locked 2103274 Activity'
     assert sha(renderer.read_bytes())==PARENT_RENDERER_SHA,'Not exact locked 2103274 renderer'
     assert sha(pro.read_bytes())==PARENT_PROUI_SHA,'Not exact locked 2103274 Pro UI'
+    assert sha(cmake.read_bytes())==PARENT_CMAKE_SHA,'Not exact locked 2103274 Android source registration'
     activity.write_text(patch_activity(activity.read_text()))
     renderer.write_text(patch_renderer(renderer.read_text()))
     shutil.copy2(a.root/'repairs/immersive-edge-ambient-2103275/CobraImmersiveAmbient.java.in',shell/IMMERSIVE)
+    c=cmake.read_text()
+    c=once(c,'                  src/CobraProUi.java\n','                  src/CobraProUi.java\n                  src/CobraImmersiveAmbient.java\n','CMake source list')
+    c=once(c,'configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in\n               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraVisualRenderer.java @ONLY)\n','configure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in\n               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraVisualRenderer.java @ONLY)\n\nconfigure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java.in\n               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java @ONLY)\n','CMake configure_file')
+    cmake.write_text(c)
     assert sha(activity.read_bytes())==AFTER_ACTIVITY_SHA,'Unexpected Activity result'
     assert sha(renderer.read_bytes())==AFTER_RENDERER_SHA,'Unexpected renderer result'
-    assert sha((shell/IMMERSIVE).read_bytes())==AFTER_IMMERSIVE_SHA,'Unexpected immersive renderer payload'
+    assert sha((shell/IMMERSIVE).read_bytes())==AFTER_IMMERSIVE_SHA,'Unexpected immersive renderer payload'\n    assert sha(cmake.read_bytes())==AFTER_CMAKE_SHA,'Unexpected Android source registration result'
     license_path=shell/LICENSE;license_path.parent.mkdir(parents=True,exist_ok=True);license_path.write_text(MIT)
     gradle=shell/GRADLE;g=gradle.read_text();g=once(g,'versionCode 2103274','versionCode 2103275','version code');g=once(g,'versionName "1.0.9-Sports-Hub-Soccer-RC1"','versionName "1.0.9-Immersive-Edge-Ambient-RC1"','version name');gradle.write_text(g)
     script=a.root/'scripts/infinity_background_resume.py';v=script.read_text();v=once(v,'VERSION_CODE = 2103274','VERSION_CODE = 2103275');v=once(v,"RELEASE = '1.0.9-Sports-Hub-Soccer-RC1'",f"RELEASE = '{RELEASE}'");v=once(v,"BASE_COMMIT = '6a89688f3e61b8f2f66d9d4cef942cc506befffd'",f"BASE_COMMIT = '{PARENT_COMMIT}'");v=once(v,"BASE_APK_SHA256 = '0f35b65e3eb8c92e1966c8116bbccb3a55d09e368d1b59db02e9c8828d15dc3f'",f"BASE_APK_SHA256 = '{PARENT_APK}'");script.write_text(v)
     package=a.root/'scripts/package_background_resume.py';v=package.read_text();v=v.replace('Infinity-2103274-Sports-Hub-Soccer-RC1','Infinity-2103275-Immersive-Edge-Ambient-RC1');v=once(v,"'base_run':36770912528",f"'base_run':{PARENT_RUN}");v=once(v,"ROOT/'repairs/sports-hub-soccer-2103274/DEVICE-TEST.md'","ROOT/'repairs/immersive-edge-ambient-2103275/DEVICE-TEST.md'");package.write_text(v)
     receipt=a.root/'engine/background-resume-source.json';r=json.loads(receipt.read_text());r.update(base_source_commit=PARENT_COMMIT,base_apk_sha256=PARENT_APK,version_code=VERSION_CODE,release=RELEASE,candidate_locked=False,physical_device_verified=False,complete_product_audit=False,cobra_immersive_edge_ambient=True,cobra_immersive_sample_width=144,cobra_immersive_frame_interval_ms=83,cobra_immersive_directional_edges=True,cobra_immersive_all_view_modes=True,cobra_immersive_fullscreen_suspended=True,cobra_immersive_pip_suspended=True,cobra_immersive_background_suspended=True,cobra_off_preserved=True,cobra_subtle_preserved=True,x_ambient_mit_attribution=True,pro_sports_preserved=True,sports_repository_preserved=True,sports_channel_resolver_preserved=True,manual_multiview_preserved=True)
-    for n in [ACTIVITY,RENDERER,IMMERSIVE,GRADLE,LICENSE]:r['files'].setdefault(n,{})['after']=sha((shell/n).read_bytes())
+    for n in [ACTIVITY,RENDERER,IMMERSIVE,GRADLE,CMAKE,LICENSE]:r['files'].setdefault(n,{})['after']=sha((shell/n).read_bytes())
     receipt.write_text(json.dumps(r,indent=2,sort_keys=True)+'\n')
     print('Applied 2103275 native x-ambient-style edge projection to Cobra Immersive mini-player only; locked 2103274 playback/data owners preserved.')
 
