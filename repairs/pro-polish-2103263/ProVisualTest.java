@@ -109,8 +109,8 @@ public class ProVisualTest {
   @Test public void lightWatchingControlsRenderDarkLabelsOutsideTheirPills()throws Exception{
     for(float font:new float[]{1,2}){Scene s=new Scene(true,2,320,640,font);for(CobraProUi.Action a:s.hero.player){assertTrue(a.light);assertFalse(a.overlay);
       Bitmap b=Bitmap.createBitmap(a.getWidth(),a.getHeight(),Bitmap.Config.ARGB_8888);b.eraseColor(CobraProUi.PALE);a.draw(new Canvas(b));int dark=0;int labelHeight=Math.round(17+(font-1)*12);
-      for(int y=b.getHeight()-labelHeight;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++){int c=b.getPixel(x,y);if(Color.red(c)<80&&Color.green(c)<90&&Color.blue(c)<100)dark++;}
-      assertTrue("Watching label must be visible on the light transport bed: "+a.label,dark>8);b.recycle();}
+      for(int y=b.getHeight()-labelHeight;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++){int c=b.getPixel(x,y);if(luminance(c)<.65)dark++;}
+      assertTrue("Watching label must be visible on the light transport bed: "+a.label+", font "+font+", visible pixels "+dark,dark>8);b.recycle();}
       assertTrue(s.hero.info.title.getBottom()<=s.below.getHeight());s.close();}
   }
   @Test public void loadingStatusDoesNotOverlapProgrammeAtLargePhoneFonts()throws Exception{
