@@ -73,7 +73,9 @@ public class MiniPlayerFillTest {
    TextureView current=(TextureView)CobraNavigationUiTest.get(a,"mCobraPreviewTexture");assertNotNull(current);assertNull(current.getBackground());assertEquals(1f,current.getAlpha(),0);
    assertEquals(host.getWidth(),current.getWidth());assertEquals(host.getHeight(),current.getHeight());
    texture=current;size.set(new VideoSize(640,480));float[] v=scale(Math.max(2,host.getWidth()),Math.max(2,host.getHeight()),0);assertEquals(1f,Math.min(v[0],v[4]),.0001f);
-   View controls=host.findViewWithTag("cobra_preview_controls");assertNotNull(controls);assertTrue(controls.getBottom()<=host.getHeight());assertTrue(controls.getTop()>=0);
+   View controls=host.findViewWithTag("cobra_preview_controls");assertNotNull(controls);assertEquals(6,((ViewGroup)controls).getChildCount());
+   if(controls.getVisibility()==View.VISIBLE){assertTrue(mode+" controls bottom "+controls.getBottom()+" host "+host.getHeight(),controls.getBottom()<=host.getHeight());assertTrue(mode+" controls top "+controls.getTop(),controls.getTop()>=0);}
+   if(mode.equals("focus")){View overlay=(View)CobraNavigationUiTest.get(a,"mCobraProOverlay");assertNotNull(overlay);assertEquals(host.getWidth(),overlay.getWidth());assertEquals(host.getHeight(),overlay.getHeight());}
   }
  }
  @Test public void pausedAmbientGeometryRefreshHasNoContinuousCadence()throws Exception{
