@@ -84,6 +84,10 @@ jobs:
       - name: Stage Sports tests and run inherited locked regressions
         run: |
           set -euo pipefail
+          rm -rf source267 source265
+          mkdir -p source267 source265
+          cp -a source269/staged-tests source267/staged-tests
+          cp -a source269/screenshots source265/screenshots
           python3 repairs/sports-hub-2103270/stage_tests.py --build build270 --evidence audit270/screenshots --inherited
           cd build270
           ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
