@@ -31,9 +31,9 @@ def method_span(s,name):
         if start<0: raise AssertionError('Missing method declaration '+name)
         start+=1;line_end=s.find('\n',start)
         if line_end<0:line_end=len(s)
-        line=s[start:line_end]
-        if needle in line:
-            p=start+line.index(needle);brace=s.find('{',p);depth=0
+        line=s[start:line_end];paren=line.find('(')
+        if paren>=0 and line[:paren].rstrip().endswith(name):
+            p=start+paren;brace=s.find('{',p);depth=0
             for i in range(brace,len(s)):
                 if s[i]=='{': depth+=1
                 elif s[i]=='}':
