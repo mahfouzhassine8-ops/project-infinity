@@ -6,11 +6,11 @@ ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 RENDERER='tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in'
 IMMERSIVE='tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java.in'
 PROUI='tools/android/packaging/xbmc/src/CobraProUi.java.in'
-GRADLE='tools/android/packaging/xbmc/build.gradle.in'
+GRADLE='tools/android/packaging/xbmc/build.gradle.in'\nINSTALL='cmake/scripts/android/Install.cmake'
 CMAKE='cmake/scripts/android/Install.cmake'
 PARENT_ACTIVITY_SHA='ab7bf1619090df8aa8fb5cff77a3e16ad1b503d1e45b26736fb959000c65915c'
 PARENT_RENDERER_SHA='6d6d2a7d48a49bcd6fc646374339914e761c8cc73dfbf68acf3c892088dc5df0'
-PARENT_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'
+PARENT_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'\nPARENT_INSTALL_SHA='809c8d60f539c743afb8d7a85c09f1517fb1cd6ec9912ff24dfa38d96590129d'\nAFTER_INSTALL_SHA='b7ecd52d6ae857c5dce4b9e4301d6d684b1a7c446e87d410151ec8c3d9cc926d'
 PARENT_CMAKE_SHA='809c8d60f539c743afb8d7a85c09f1517fb1cd6ec9912ff24dfa38d96590129d'
 AFTER_ACTIVITY_SHA='0ed5f50992bf637bd31ff7c4c299fc4837f5ae0ed3169a687511eec8ed07643c'
 AFTER_RENDERER_SHA='d4eecc66ee0d021eca32b8c2edd9337c53da9eb58c1a18c9f0a79df566c1537d'
@@ -67,7 +67,7 @@ def main():
     activity=shell/ACTIVITY;renderer=shell/RENDERER;pro=shell/PROUI;cmake=shell/CMAKE
     assert sha(activity.read_bytes())==PARENT_ACTIVITY_SHA,'Not exact locked 2103274 Activity'
     assert sha(renderer.read_bytes())==PARENT_RENDERER_SHA,'Not exact locked 2103274 renderer'
-    assert sha(pro.read_bytes())==PARENT_PROUI_SHA,'Not exact locked 2103274 Pro UI'
+    assert sha(pro.read_bytes())==PARENT_PROUI_SHA,'Not exact locked 2103274 Pro UI'\n    install=shell/INSTALL;assert sha(install.read_bytes())==PARENT_INSTALL_SHA,'Not exact locked 2103274 Java registration'
     assert sha(cmake.read_bytes())==PARENT_CMAKE_SHA,'Not exact locked 2103274 Android source registration'
     activity.write_text(patch_activity(activity.read_text()))
     renderer.write_text(patch_renderer(renderer.read_text()))
