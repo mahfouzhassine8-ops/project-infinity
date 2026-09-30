@@ -40,7 +40,7 @@ public class ProVisualTest {
       android.graphics.drawable.GradientDrawable border=new android.graphics.drawable.GradientDrawable();border.setColor(Color.BLACK);border.setCornerRadius(14);border.setStroke(1,CobraProUi.CYAN);video.setBackground(border);video.setClipToOutline(true);video.setElevation(3);
       browser=new LinearLayout(activity);browser.setOrientation(1);root.addView(browser,rect(r[3]));filters=new CobraProUi.Filters(activity,light,i->{});filters.selected(0);browser.addView(filters,new LinearLayout.LayoutParams(-1,-2));ListView list=new ListView(activity);list.setDividerHeight(0);list.setItemsCanFocus(true);list.setAdapter(new BaseAdapter(){public int getCount(){return 6;}public Object getItem(int i){return data(i);}public long getItemId(int i){return i;}public View getView(int i,View old,ViewGroup group){CobraProUi.ChannelRow row=new CobraProUi.ChannelRow(activity,light,()->{});row.bind(data(i),i,i==0,null);return row;}});browser.addView(list,new LinearLayout.LayoutParams(-1,0,1));layout(root,width,height);
     }
-    void close(){ctl.pause().stop().destroy();}
+    void close(){android.content.res.Configuration cfg=new android.content.res.Configuration(activity.getResources().getConfiguration());cfg.fontScale=1;activity.getResources().updateConfiguration(cfg,activity.getResources().getDisplayMetrics());ctl.pause().stop().destroy();}
   }
   @Test public void stateMovesTheSameMetadataViewAndNeverAddsASourceRail()throws Exception{
     Scene s=new Scene(true,0,412,915);assertSame(s.hero,s.hero.info.getParent());assertEquals(View.VISIBLE,s.hero.preview.getVisibility());assertEquals(View.GONE,s.hero.unmute.getVisibility());
@@ -112,5 +112,11 @@ public class ProVisualTest {
       for(int y=b.getHeight()-labelHeight;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++){int c=b.getPixel(x,y);if(Color.red(c)<80&&Color.green(c)<90&&Color.blue(c)<100)dark++;}
       assertTrue("Watching label must be visible on the light transport bed: "+a.label,dark>8);b.recycle();}
       assertTrue(s.hero.info.title.getBottom()<=s.below.getHeight());s.close();}
+  }
+  @Test public void loadingStatusDoesNotOverlapProgrammeAtLargePhoneFonts()throws Exception{
+    for(boolean light:new boolean[]{true,false})for(float font:new float[]{1,2})for(int state=0;state<2;state++){
+      Scene s=new Scene(light,state,320,640,font);CobraProUi.Program p=data(0);p.status="Connecting";s.hero.bind(p,0,6);layout(s.root,320,640);
+      assertFalse(Rect.intersects(new Rect(s.hero.info.getLeft(),s.hero.info.getTop(),s.hero.info.getRight(),s.hero.info.getBottom()),new Rect(s.hero.status.getLeft(),s.hero.status.getTop(),s.hero.status.getRight(),s.hero.status.getBottom())));
+      assertTrue(s.hero.status.getTop()>=s.hero.transport.getTop());assertEquals(light?CobraProUi.INK:Color.WHITE,s.hero.status.getCurrentTextColor());assertEquals(p.status,s.hero.status.getText().toString());s.close();}
   }
 }

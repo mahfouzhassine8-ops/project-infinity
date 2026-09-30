@@ -91,7 +91,7 @@ jobs:
           from package_background_resume import verify_bytes
           apk=Path('signed263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk')
           kept=verify_bytes(Path('parent262/Infinity-2103262-Pro-Visual-Correction-RC1.apk'),apk)
-          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':13,'ProActionsTest':5}
+          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':14,'ProActionsTest':5}
           for name,count in counts.items():
               t=ET.parse('build263/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
               assert int(t.attrib['tests'])==count,(name,t.attrib)
@@ -106,7 +106,7 @@ jobs:
           assert source['other_shell_files_byte_identical']==229
           assert source['all_activity_code_except_pro_style_byte_identical']
           result=json.loads(Path('signed263/background-resume-apk-audit.json').read_text());result.update(kept)
-          result.update(source_verification=source,test_methods=counts,automated_tests_passed=46,protected_render_equality=20,
+          result.update(source_verification=source,test_methods=counts,automated_tests_passed=47,protected_render_equality=20,
               pro_native_component_renders=36,pro_render_data='deterministic test fixtures, not a live provider',
               action_test_player='fake player with unchanged production method bodies',physical_device_verified=False,
               real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)
