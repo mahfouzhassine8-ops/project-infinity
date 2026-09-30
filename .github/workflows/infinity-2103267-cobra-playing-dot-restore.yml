@@ -50,6 +50,14 @@ jobs:
           github-token: ${{ github.token }}
           path: source266
 
+      - name: Download exact 2103265 fixture evidence required by inherited 2103266 tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103265-Phone-Glass-Polish-RC1-Evidence
+          run-id: 36671687282
+          github-token: ${{ github.token }}
+          path: source265
+
       - name: Download exact locked 2103237 playing-dot reference
         uses: actions/download-artifact@v8
         with:
