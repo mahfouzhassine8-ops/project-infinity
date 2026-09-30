@@ -61,6 +61,10 @@ public class PhoneGlassTest {
       assertTrue(((View)get(a,"mCobraModeToolbar")).getBackground() instanceof CobraVisualRenderer.Glass);
       assertTrue(((View)get(a,"mCobraGuideDetails")).getBackground() instanceof CobraVisualRenderer.Glass);
       assertNotNull(get(a,"mCobraGuideList"));assertEquals(6,((AbsListView)get(a,"mCobraGuideList")).getAdapter().getCount());
+      ViewGroup controls=(ViewGroup)((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_controls");
+      assertNotNull(controls);Drawable transport=controls.getChildAt(0).getBackground();assertTrue(transport instanceof CobraVisualRenderer.Glass);
+      transport.setBounds(0,0,80,40);transport.jumpToCurrentState();Bitmap contrast=Bitmap.createBitmap(80,40,Bitmap.Config.ARGB_8888);transport.draw(new Canvas(contrast));int inkBacking=contrast.getPixel(40,20);
+      assertTrue("White playback icons need dark glass in both appearances",Color.red(inkBacking)<100&&Color.green(inkBacking)<100&&Color.blue(inkBacking)<100);contrast.recycle();
       assertNull(get(a,"mCobraPreviewPlayer"));assertNull(get(a,"mPlayer"));
       save(root,mode+"-"+(light?"light":"oled")+"-"+size[0]+"x"+size[1]);((android.os.Handler)get(a,"mMain")).removeCallbacksAndMessages(null);a.finish();
     }

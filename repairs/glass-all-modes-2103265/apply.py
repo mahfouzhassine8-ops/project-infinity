@@ -38,8 +38,8 @@ def main():
     # Existing callbacks, clip/hit rectangles, and navigation timing stay unchanged.
     s=once(s,'panel.setTranslationX(-width);panel.setAlpha(.90f);panel.setScaleX(.99f);panel.setScaleY(.99f);panel.animate().translationX(0).alpha(1f).scaleX(1f).scaleY(1f).setDuration(vtheme().motion("cobra.toggleCobraDrawer.numbers.1",210)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();', 'panel.setTranslationX(cobraMotionEnabled()?-width:0);panel.setAlpha(cobraMotionEnabled()?.82f:1f);panel.animate().translationX(0).alpha(1f).setDuration(cobraMotionEnabled()?240L:0L).setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();')
     # Controls have glass in guide contexts; Pro keeps its current custom surfaces.
-    s=once(s,'vtheme().paint(b,"widget.cobraTextButton");return b;', 'if(!"focus".equals(mCobraGuideStyle)&&mCobraGuideShell!=null)b.setBackground(cobraModeSurface(12,false));vtheme().paint(b,"widget.cobraTextButton");return b;')
-    s=once(s,'button.setOnClickListener(click);cobraPolishFocusable(button);return button;', 'button.setOnClickListener(click);cobraPolishFocusable(button);if(!"focus".equals(mCobraGuideStyle)&&mCobraGuideShell!=null)button.setBackground(cobraModeSurface(12,false));return button;')
+    s=once(s,'vtheme().paint(b,"widget.cobraTextButton");return b;', 'if(!"focus".equals(mCobraGuideStyle)&&mCobraGuideShell!=null)b.setBackground(CobraVisualRenderer.phoneGlass(this,!dark,12,false));vtheme().paint(b,"widget.cobraTextButton");return b;')
+    s=once(s,'button.setOnClickListener(click);cobraPolishFocusable(button);return button;', 'button.setOnClickListener(click);cobraPolishFocusable(button);if(!"focus".equals(mCobraGuideStyle)&&mCobraGuideShell!=null)button.setBackground(CobraVisualRenderer.phoneGlass(this,!dark,12,false));return button;')
     live.write_text(s);(ev/'InfinityLiveActivity-before.java.in').write_text(old)
     pro=src/(A+'src/CobraProUi.java.in');s=pro.read_text()
     s=once(s,'  static int px(Context c,float dp)', '''  static boolean owns(View view){
