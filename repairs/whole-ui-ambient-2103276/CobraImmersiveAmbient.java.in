@@ -439,6 +439,12 @@ final class CobraImmersiveAmbient extends View {
     }
     @Override protected boolean onStateChange(int[] states){boolean changed=base.setState(states);invalidateSelf();return changed;}
     @Override public boolean isStateful(){return base.isStateful();}
+    @Override protected boolean onLevelChange(int level){return base.setLevel(level);}
+    @Override public int getIntrinsicWidth(){return base.getIntrinsicWidth();}
+    @Override public int getIntrinsicHeight(){return base.getIntrinsicHeight();}
+    @Override public int getMinimumWidth(){return base.getMinimumWidth();}
+    @Override public int getMinimumHeight(){return base.getMinimumHeight();}
+    @Override public boolean setVisible(boolean visible,boolean restart){boolean changed=base.setVisible(visible,restart);return super.setVisible(visible,restart)||changed;}
     @Override public boolean getPadding(Rect padding){return base.getPadding(padding);}
     @Override public void getOutline(android.graphics.Outline outline){base.getOutline(outline);}
     @Override public void setAlpha(int alpha){base.setAlpha(alpha);}

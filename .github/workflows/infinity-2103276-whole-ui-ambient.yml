@@ -93,8 +93,8 @@ jobs:
           for f in Path('build276/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
             t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
           assert len(counts)==27,counts
-          assert counts['com.projectinfinity.kodi.WholeUiAmbientTest']==22,counts
-          assert sum(counts.values())==260,counts
+          assert counts['com.projectinfinity.kodi.WholeUiAmbientTest']==23,counts
+          assert sum(counts.values())==261,counts
           locked=Path('source275/screenshots/protected');current=Path('audit276/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
           for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
           report=json.loads(Path('signed276/background-resume-apk-audit.json').read_text());report.update(parent_locked_commit='88b733f2a25eca1873673c27b75b51021e4ef56b',automated_tests_passed=sum(counts.values()),test_methods=counts,protected_render_equality=len(names),physical_device_verified=False,candidate_locked=False,status='CI CANDIDATE ONLY — actual Fold visual acceptance required')

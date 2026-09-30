@@ -54,5 +54,16 @@ public class WholeUiAmbientTest {
  }
  @Test public void channelChangeWaitsForANewSurfaceFrame()throws Exception{TextureView texture=new TextureView(activity);View host=new View(activity);ambient.bind(texture,host,false,"first");Bitmap b=field(false);b.recycle();ambient.bind(texture,host,false,"second");assertEquals(true,get(ambient,"awaitNewFrame"));assertNull(get(ambient,"smoothed"));assertEquals(0f,ambient.getAlpha(),.001f);}
  @Test public void buffersAreReusedBetweenFrames()throws Exception{Bitmap b=field(false);b.recycle();Object raw=get(ambient,"raw"),smooth=get(ambient,"smoothed"),cache=get(ambient,"field"),array=get(ambient,"filtered");b=field(false);b.recycle();assertSame(raw,get(ambient,"raw"));assertSame(smooth,get(ambient,"smoothed"));assertSame(cache,get(ambient,"field"));assertSame(array,get(ambient,"filtered"));}
+ @Test public void illuminationPreservesDrawableMetricsAndLevel(){
+   View card=new View(activity);android.graphics.drawable.Drawable base=new android.graphics.drawable.Drawable(){
+     public void draw(Canvas c){}public void setAlpha(int a){}public void setColorFilter(ColorFilter f){}public int getOpacity(){return -3;}
+     public int getIntrinsicWidth(){return 96;}public int getIntrinsicHeight(){return 72;}
+     public boolean getPadding(Rect p){p.set(3,4,5,6);return true;}
+   };
+   card.setBackground(base);root.addView(card);card.measure(0,0);int width=card.getMeasuredWidth(),height=card.getMeasuredHeight();
+   Bitmap b=field(false);b.recycle();ambient.illuminate(root);card.measure(0,0);assertEquals(width,card.getMeasuredWidth());assertEquals(height,card.getMeasuredHeight());
+   android.graphics.drawable.Drawable wrapper=card.getBackground();Rect padding=new Rect();assertTrue(wrapper.getPadding(padding));assertEquals(new Rect(3,4,5,6),padding);
+   wrapper.setLevel(31);assertEquals(31,base.getLevel());wrapper.setVisible(false,false);assertFalse(base.isVisible());ambient.restoreGlass();
+ }
  @Test public void glassRestoresOriginalDrawableAndSelection(){View card=new View(activity);CobraVisualRenderer.Glass base=new CobraVisualRenderer.Glass(activity,true,12,false);card.setBackground(base);card.setSelected(true);root.addView(card,new FrameLayout.LayoutParams(80,80));Bitmap b=field(true);b.recycle();ambient.illuminate(root);assertNotSame(base,card.getBackground());assertTrue(card.isSelected());ambient.restoreGlass();assertSame(base,card.getBackground());assertTrue(card.isSelected());assertSame(card,base.getCallback());}
 }
