@@ -6,14 +6,17 @@ ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 RENDERER='tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in'
 IMMERSIVE='tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java.in'
 PROUI='tools/android/packaging/xbmc/src/CobraProUi.java.in'
-GRADLE='tools/android/packaging/xbmc/build.gradle.in'\nCMAKE='cmake/scripts/android/Install.cmake'
+GRADLE='tools/android/packaging/xbmc/build.gradle.in'
+CMAKE='cmake/scripts/android/Install.cmake'
 LICENSE='tools/android/packaging/xbmc/res/raw/x_ambient_mit_license.txt'
 PARENT_ACTIVITY_SHA='ab7bf1619090df8aa8fb5cff77a3e16ad1b503d1e45b26736fb959000c65915c'
 PARENT_RENDERER_SHA='6d6d2a7d48a49bcd6fc646374339914e761c8cc73dfbf68acf3c892088dc5df0'
-PARENT_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'\nPARENT_CMAKE_SHA='809c8d60f539c743afb8d7a85c09f1517fb1cd6ec9912ff24dfa38d96590129d'
+PARENT_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'
+PARENT_CMAKE_SHA='809c8d60f539c743afb8d7a85c09f1517fb1cd6ec9912ff24dfa38d96590129d'
 AFTER_ACTIVITY_SHA='0ed5f50992bf637bd31ff7c4c299fc4837f5ae0ed3169a687511eec8ed07643c'
 AFTER_RENDERER_SHA='d4eecc66ee0d021eca32b8c2edd9337c53da9eb58c1a18c9f0a79df566c1537d'
-AFTER_IMMERSIVE_SHA='9ae2e8d83f953c2be8671eecb8244b3ba5e232075d81163a8e24d2742eb41b63'\nAFTER_CMAKE_SHA='4368634f2bd1fc17aa063b6961daeb0beb24f4ed9b22aed96233609b73c27eea'
+AFTER_IMMERSIVE_SHA='9ae2e8d83f953c2be8671eecb8244b3ba5e232075d81163a8e24d2742eb41b63'
+AFTER_CMAKE_SHA='4368634f2bd1fc17aa063b6961daeb0beb24f4ed9b22aed96233609b73c27eea'
 PARENT_APK='c07f9f8872d7be892a3e0877ec129a893cbe2c106e3af33ca69b2e300b594e12'
 PARENT_COMMIT='469afd4f2da4347ded4000164c48bf658a23fb33'
 PARENT_RUN=36775670821
@@ -99,7 +102,8 @@ def main():
     cmake.write_text(c)
     assert sha(activity.read_bytes())==AFTER_ACTIVITY_SHA,'Unexpected Activity result'
     assert sha(renderer.read_bytes())==AFTER_RENDERER_SHA,'Unexpected renderer result'
-    assert sha((shell/IMMERSIVE).read_bytes())==AFTER_IMMERSIVE_SHA,'Unexpected immersive renderer payload'\n    assert sha(cmake.read_bytes())==AFTER_CMAKE_SHA,'Unexpected Android source registration result'
+    assert sha((shell/IMMERSIVE).read_bytes())==AFTER_IMMERSIVE_SHA,'Unexpected immersive renderer payload'
+    assert sha(cmake.read_bytes())==AFTER_CMAKE_SHA,'Unexpected Android source registration result'
     license_path=shell/LICENSE;license_path.parent.mkdir(parents=True,exist_ok=True);license_path.write_text(MIT)
     gradle=shell/GRADLE;g=gradle.read_text();g=once(g,'versionCode 2103274','versionCode 2103275','version code');g=once(g,'versionName "1.0.9-Sports-Hub-Soccer-RC1"','versionName "1.0.9-Immersive-Edge-Ambient-RC1"','version name');gradle.write_text(g)
     script=a.root/'scripts/infinity_background_resume.py';v=script.read_text();v=once(v,'VERSION_CODE = 2103274','VERSION_CODE = 2103275');v=once(v,"RELEASE = '1.0.9-Sports-Hub-Soccer-RC1'",f"RELEASE = '{RELEASE}'");v=once(v,"BASE_COMMIT = '6a89688f3e61b8f2f66d9d4cef942cc506befffd'",f"BASE_COMMIT = '{PARENT_COMMIT}'");v=once(v,"BASE_APK_SHA256 = '0f35b65e3eb8c92e1966c8116bbccb3a55d09e368d1b59db02e9c8828d15dc3f'",f"BASE_APK_SHA256 = '{PARENT_APK}'");script.write_text(v)
