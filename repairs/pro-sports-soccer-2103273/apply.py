@@ -8,7 +8,7 @@ GRADLE='tools/android/packaging/xbmc/build.gradle.in'
 PARENT_ACTIVITY_SHA='9bc85e090e74d2c5e8c4170ae08978298863424725293ac3c86d0b6a349f72bd'
 PARENT_PROUI_SHA='cf6298ec08d5bdc274569da03ebb527dfc64c55adb059ef614313e2502bfcb13'
 AFTER_ACTIVITY_SHA='5bb21ec202221394f150ee62f7cb28d35dbc03c0cee7b47bf152ad0fd063832d'
-AFTER_PROUI_SHA='95deb58e7d8f4811460c03c2a51d1a42f3ce2c884afaa555e44d1d1ba0c6a263'
+AFTER_PROUI_SHA='2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'
 PARENT_APK='40de992889bda2c9f73862d2eee4937c252db10e5d9ca07777b4c4f9e37f4ad2'
 PARENT_COMMIT='1aea5afdfe4bf7253e3db8bb869815651a9218b4'
 PARENT_RUN=36759239156
@@ -29,6 +29,7 @@ def main():
     assert sha(pro.read_bytes())==PARENT_PROUI_SHA,'Not exact locked 2103271 CobraProUi'
     patch=zlib.decompress(base64.b64decode(PATCH_B64)).decode()
     subprocess.run(['patch','-p1','--batch','--forward'],cwd=shell,input=patch,text=True,check=True)
+    pv=pro.read_text();pv=once(pv,'if(view instanceof Ink||view instanceof Hero||view instanceof Details||view instanceof Filters||view instanceof ChannelRow||view instanceof Action)return true;','if(view instanceof Ink||view instanceof Hero||view instanceof Details||view instanceof Filters||view instanceof SportsTabs||view instanceof GameRow||view instanceof ChannelRow||view instanceof Action)return true;');pro.write_text(pv)
     assert sha(activity.read_bytes())==AFTER_ACTIVITY_SHA,'Unexpected Activity patch result'
     assert sha(pro.read_bytes())==AFTER_PROUI_SHA,'Unexpected CobraProUi patch result'
     gradle=shell/GRADLE;g=gradle.read_text();g=once(g,'versionCode 2103271','versionCode 2103273');g=once(g,'versionName "1.0.9-Sports-Data-RC1"','versionName "1.0.9-Pro-Sports-Soccer-RC1"');gradle.write_text(g)
