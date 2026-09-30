@@ -1,0 +1,445 @@
+package @APP_PACKAGE@;
+
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Path;
+import android.graphics.drawable.Drawable;
+import android.view.ViewGroup;
+import java.util.ArrayList;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.TextureView;
+import android.view.View;
+import android.view.animation.PathInterpolator;
+
+/**
+ * Presentation-only mini-player ambient renderer.
+ *
+ * The directional edge-projection approach is adapted from the MIT-licensed
+ * x-ambient project by mmnga (https://github.com/mmnga/x-ambient). Cobra keeps
+ * playback ownership in InfinityLiveActivity; this view only samples the
+ * already-visible TextureView at low resolution and draws behind the UI.
+ */
+final class CobraImmersiveAmbient extends View {
+  static final int SAMPLE_WIDTH = 144;
+  static final int MIN_SAMPLE_HEIGHT = 48;
+  static final int MAX_SAMPLE_HEIGHT = 144;
+  static final long FRAME_INTERVAL_MS = 83L; // <= ~12 fps, matching the reference design.
+  static final int RAY_STEPS = 48;
+  static final float SATURATION = 1.65f;
+  // Keep the upstream MIT notice in compiled bytecode without introducing an Android R resource.
+  static final String X_AMBIENT_MIT_NOTICE =
+      "MIT License\\n\\nCopyright (c) 2026 mmnga\\n\\n" +
+      "Permission is hereby granted, free of charge, to any person obtaining a copy " +
+      "of this software and associated documentation files (the \"Software\"), to deal " +
+      "in the Software without restriction, including without limitation the rights " +
+      "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell " +
+      "copies of the Software, and to permit persons to whom the Software is " +
+      "furnished to do so, subject to the following conditions:\\n\\n" +
+      "The above copyright notice and this permission notice shall be included in all " +
+      "copies or substantial portions of the Software.\\n\\n" +
+      "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR " +
+      "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, " +
+      "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE " +
+      "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER " +
+      "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, " +
+      "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
+
+  private final Handler main = new Handler(Looper.getMainLooper());
+  private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG);
+  private final Rect src = new Rect();
+  private final RectF dst = new RectF();
+  private final RectF sourceRect = new RectF();
+  private final int[] selfLocation = new int[2];
+  private final int[] hostLocation = new int[2];
+  private final ColorMatrixColorFilter saturation;
+  private TextureView source;
+  private View sourceHost;
+  private Bitmap raw;
+  private Bitmap smoothed;
+  private Canvas smoothCanvas;
+  private Bitmap field;
+  private Canvas fieldCanvas;
+  private int[] pixels, history, filtered, blurScratch;
+  private final RectF fieldAnchor = new RectF();
+  private final RectF windowRect = new RectF();
+  private boolean fieldDirty = true;
+  private boolean captureFailed;
+  private String session = "";
+  private final ArrayList<IlluminatedGlass> glass = new ArrayList<>();
+  private boolean enabled;
+  private boolean animateFrames;
+  private boolean haveFrame;
+  private boolean lightAppearance;
+  private boolean released;
+  private boolean scheduled;
+  private long lastCapture;
+  private ValueAnimator visibilityAnimator;
+  private int captures;
+  private boolean testFrameMode;
+  private boolean testPlainRendering;
+
+  private final Runnable frame = new Runnable() {
+    @Override public void run() {
+      scheduled = false;
+      if (!enabled || released || !isAttachedToWindow()) return;
+      long now = android.os.SystemClock.uptimeMillis();
+      if (now - lastCapture >= FRAME_INTERVAL_MS) {
+        capture();
+        lastCapture = now;
+      }
+      if (animateFrames && !captureFailed) schedule();
+    }
+  };
+
+  static boolean eligible(int mode, boolean visualAllowed, boolean fullscreen, boolean multiView, boolean pip,
+      boolean background, boolean shellAttached, boolean hostVisible, boolean textureReady, boolean playerReady) {
+    return mode == CobraPresentationEffects.IMMERSIVE && visualAllowed && !fullscreen && !multiView && !pip
+        && !background && shellAttached && hostVisible && textureReady && playerReady;
+  }
+
+  CobraImmersiveAmbient(Context context) {
+    super(context);
+    setTag("cobra_immersive_edge_ambient");
+    setClickable(false);
+    setFocusable(false);
+    setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+    setWillNotDraw(false);
+    setAlpha(0f);
+    ColorMatrix matrix = new ColorMatrix();
+    matrix.setSaturation(SATURATION);
+    saturation = new ColorMatrixColorFilter(matrix);
+    paint.setColorFilter(saturation);
+    // Blur the reused low-resolution field, then mask the video rectangle.
+    // A View RenderEffect would blur across that mask and onto the video.
+
+  }
+
+  void bind(TextureView texture, View host, boolean light, String key) {
+    if (!session.equals(key)) { session = key; clearFrames(); captureFailed = false; setAlpha(0f); }
+    bind(texture,host,light);
+  }
+
+  void bind(TextureView texture, View host, boolean light) {
+    if (source != texture) {
+      source = texture;
+      sourceHost = host;
+      clearFrames(); captureFailed = false;
+    } else sourceHost = host;
+    if (lightAppearance != light) {
+      lightAppearance = light; fieldDirty = true;
+      invalidate();
+    }
+  }
+
+  void state(boolean active, boolean moving) {
+    if (released) return;
+    animateFrames = active && moving;
+    if (enabled == active) {
+      if (enabled && !haveFrame) capture();
+      if (animateFrames && !captureFailed) schedule(); else cancelSchedule();
+      return;
+    }
+    enabled = active;
+    if (active) {
+      setVisibility(VISIBLE);
+      clearFrames(); captureFailed = false;
+      capture();
+      if (animateFrames && !captureFailed) schedule();
+    } else {
+      cancelSchedule();
+      fadeTo(0f, 180L);
+    }
+  }
+
+  void release() {
+    released = true;
+    enabled = false;
+    animateFrames = false;
+    cancelSchedule();
+    if (visibilityAnimator != null) visibilityAnimator.cancel();
+    visibilityAnimator = null;
+    restoreGlass(); clearFrames();
+    source = null;
+    sourceHost = null;
+  }
+
+  boolean isAmbientActive() { return enabled; }
+  int captureCount() { return captures; }
+  RectF sourceBoundsForTest() { return new RectF(sourceRect); }
+
+  private void fadeTo(float value, long duration) {
+    if (visibilityAnimator != null) visibilityAnimator.cancel();
+    if (!isAttachedToWindow() || Build.VERSION.SDK_INT < 11) {
+      setAlpha(value);
+      if (value == 0f) setVisibility(INVISIBLE);
+      return;
+    }
+    float start = getAlpha();
+    visibilityAnimator = ValueAnimator.ofFloat(start, value);
+    visibilityAnimator.setDuration(duration);
+    visibilityAnimator.setInterpolator(new PathInterpolator(.2f, 0f, 0f, 1f));
+    visibilityAnimator.addUpdateListener(a -> { setAlpha((Float) a.getAnimatedValue()); invalidateGlass(); });
+    visibilityAnimator.addListener(new android.animation.AnimatorListenerAdapter() {
+      @Override public void onAnimationEnd(android.animation.Animator animation) {
+        if (!enabled && value == 0f) { setVisibility(INVISIBLE); restoreGlass(); clearFrames(); }
+      }
+    });
+    visibilityAnimator.start();
+  }
+
+  private void schedule() {
+    if (scheduled || released || captureFailed || !enabled || !animateFrames) return;
+    scheduled = true;
+    main.postDelayed(frame, FRAME_INTERVAL_MS);
+  }
+
+  private void cancelSchedule() {
+    scheduled = false;
+    main.removeCallbacks(frame);
+  }
+
+  private void clearFrames() {
+    haveFrame = false;
+    testFrameMode = false;
+    captures = 0;
+    if (raw != null) raw.recycle();
+    if (smoothed != null) smoothed.recycle();
+    raw = null;
+    smoothed = null; smoothCanvas = null; pixels = null; history = null;
+    if (field != null) field.recycle();
+    field = null; fieldCanvas = null; filtered = null; blurScratch = null; fieldDirty = true;
+    invalidate();
+  }
+
+  private void ensureBuffers(int width, int height) {
+    if (raw != null && raw.getWidth() == width && raw.getHeight() == height
+        && smoothed != null && smoothed.getWidth() == width && smoothed.getHeight() == height) return;
+    clearFrames();
+    raw = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    smoothed = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    smoothCanvas = new Canvas(smoothed);
+    pixels = new int[width * height]; history = new int[width * height];
+  }
+
+  private boolean capture() {
+    try { return captureInternal(); }
+    catch (RuntimeException | OutOfMemoryError unavailable) {
+      captureFailed=true;cancelSchedule();clearFrames();invalidateGlass();return false;
+    }
+  }
+  private boolean captureInternal() {
+    testFrameMode = false;
+    TextureView texture = source;
+    View host = sourceHost;
+    if (captureFailed || !enabled || texture == null || host == null || !texture.isAvailable()
+        || !texture.isShown() || !host.isShown() || texture.getWidth() < 2 || texture.getHeight() < 2) return false;
+    int width = SAMPLE_WIDTH;
+    int height = Math.max(MIN_SAMPLE_HEIGHT, Math.min(MAX_SAMPLE_HEIGHT,
+        Math.round(width * (texture.getHeight() / (float) texture.getWidth()))));
+    ensureBuffers(width, height);
+    Bitmap value;
+    try { value = texture.getBitmap(raw); }
+    catch (RuntimeException unavailable) { captureFailed = true; clearFrames(); invalidateGlass(); return false; }
+    if (value == null) { captureFailed = true; clearFrames(); invalidateGlass(); return false; }
+    // Reject neutral/near-black energy rather than blooming gray or pale white.
+    raw.getPixels(pixels,0,width,0,0,width,height);
+    for (int i=0;i<pixels.length;i++) pixels[i]=lightPixel(pixels[i],lightAppearance);
+    for(int i=0;i<pixels.length;i++) {
+      int next=pixels[i],old=history[i];
+      if(!haveFrame)history[i]=next;
+      else {
+        float oa=Color.alpha(old)*.56f,na=Color.alpha(next)*.44f,total=oa+na;
+        history[i]=total<.5f?0:Color.argb(Math.round(total),
+          Math.round((Color.red(old)*oa+Color.red(next)*na)/total),
+          Math.round((Color.green(old)*oa+Color.green(next)*na)/total),
+          Math.round((Color.blue(old)*oa+Color.blue(next)*na)/total));
+      }
+    }
+    smoothed.setPixels(history,0,width,0,0,width,height);haveFrame=true;
+    paint.setColorFilter(saturation);
+    captures++; fieldDirty = true;
+    updateSourceRect();
+    invalidate(); invalidateGlass();
+    if (getAlpha() < .05f) fadeTo(1f, 260L);
+    return true;
+  }
+
+  private void updateSourceRect() {
+    if (testFrameMode) return;
+    View host = sourceHost;
+    if (host == null || getWidth() <= 0 || getHeight() <= 0) { sourceRect.setEmpty(); return; }
+    getLocationOnScreen(selfLocation);
+    host.getLocationOnScreen(hostLocation);
+    float left = hostLocation[0] - selfLocation[0];
+    float top = hostLocation[1] - selfLocation[1];
+    sourceRect.set(left, top, left + host.getWidth(), top + host.getHeight());
+  }
+
+  @Override protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    if (enabled) { capture(); if (animateFrames && !captureFailed) schedule(); }
+  }
+
+  @Override protected void onDetachedFromWindow() {
+    cancelSchedule();
+    super.onDetachedFromWindow();
+  }
+
+  @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+    updateSourceRect();
+  }
+
+  static int lightPixel(int color, boolean light) {
+    float r=Color.red(color)/255f,g=Color.green(color)/255f,b=Color.blue(color)/255f;
+    float max=Math.max(r,Math.max(g,b)),min=Math.min(r,Math.min(g,b));
+    float chroma=max-min;
+    float energy=Math.min(1f,Math.max(0f,(max-.045f)/.45f)) * Math.min(1f,chroma/.22f);
+    float luminance=.2126f*r+.7152f*g+.0722f*b;
+    if(light) energy*=1f-.70f*Math.max(0f,(luminance-.65f)/.35f);
+    return Color.argb(Math.round(255f*energy),Color.red(color),Color.green(color),Color.blue(color));
+  }
+
+  private void rebuildField() {
+    updateSourceRect();
+    if (!haveFrame || smoothed==null || getWidth()<2 || getHeight()<2 || sourceRect.isEmpty()) return;
+    int w=SAMPLE_WIDTH,h=Math.max(48,Math.min(512,Math.round(w*getHeight()/(float)getWidth())));
+    if(field==null||field.getWidth()!=w||field.getHeight()!=h) {
+      if(field!=null)field.recycle();
+      field=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);fieldCanvas=new Canvas(field);
+      filtered=new int[w*h];blurScratch=new int[w*h];fieldDirty=true;
+    }
+    if(!fieldAnchor.equals(sourceRect))fieldDirty=true;
+    if(!fieldDirty)return;
+    fieldAnchor.set(sourceRect);fieldDirty=false;
+    fieldCanvas.drawColor(Color.TRANSPARENT,android.graphics.PorterDuff.Mode.CLEAR);
+    int save=fieldCanvas.save();fieldCanvas.scale(w/(float)getWidth(),h/(float)getHeight());
+    float cx=sourceRect.centerX(),cy=sourceRect.centerY(),hw=sourceRect.width()/2f,hh=sourceRect.height()/2f;
+    float outerScale=Math.max(1f,Math.max(Math.max(cx/hw,(getWidth()-cx)/hw),Math.max(cy/hh,(getHeight()-cy)/hh)));
+    // Long falloff reaches far UI, with no enlarged frame or uniform tint pass.
+    float reach=Math.max(getWidth(),getHeight())*.80f;
+    int ex=Math.max(1,Math.round(smoothed.getWidth()*.04f)),ey=Math.max(1,Math.round(smoothed.getHeight()*.04f));
+    int intensity=lightAppearance?62:218;
+    paint.setColorFilter(saturation);
+    for(int i=0;i<RAY_STEPS;i++) {
+      float inner=1f+(outerScale-1f)*i/RAY_STEPS,outer=1f+(outerScale-1f)*(i+1f)/RAY_STEPS;
+      float l=cx-hw*outer,t=cy-hh*outer,dx=hw*(outer-inner)+1.2f,dy=hh*(outer-inner)+1.2f;
+      paint.setAlpha(Math.round(intensity*(float)Math.exp(-hh*(inner-1f)/reach)));
+      src.set(0,0,smoothed.getWidth(),ey);dst.set(l,t,cx+hw*outer,t+dy);fieldCanvas.drawBitmap(smoothed,src,dst,paint);
+      src.set(0,smoothed.getHeight()-ey,smoothed.getWidth(),smoothed.getHeight());
+      dst.set(l,cy+hh*inner-.6f,cx+hw*outer,cy+hh*inner-.6f+dy);fieldCanvas.drawBitmap(smoothed,src,dst,paint);
+      paint.setAlpha(Math.round(intensity*(float)Math.exp(-hw*(inner-1f)/reach)));
+      src.set(0,0,ex,smoothed.getHeight());dst.set(l,cy-hh*inner,l+dx,cy+hh*inner+.6f);fieldCanvas.drawBitmap(smoothed,src,dst,paint);
+      src.set(smoothed.getWidth()-ex,0,smoothed.getWidth(),smoothed.getHeight());
+      dst.set(cx+hw*inner-.6f,cy-hh*inner,cx+hw*inner-.6f+dx,cy+hh*inner+.6f);fieldCanvas.drawBitmap(smoothed,src,dst,paint);
+    }
+    fieldCanvas.restoreToCount(save);paint.setColorFilter(null);paint.setAlpha(255);
+    // Separable box blur in premultiplied colour. All arrays and bitmaps are reused.
+    field.getPixels(filtered,0,w,0,0,w,h);
+    blur(filtered,blurScratch,w,h,true);blur(blurScratch,filtered,w,h,false);
+    field.setPixels(filtered,0,w,0,0,w,h);
+  }
+
+  private static void blur(int[] input,int[] output,int w,int h,boolean horizontal) {
+    final int radius=4;
+    for(int y=0;y<h;y++)for(int x=0;x<w;x++) {
+      int sa=0,sr=0,sg=0,sb=0,count=0;
+      for(int d=-radius;d<=radius;d++) {
+        int xx=horizontal?x+d:x,yy=horizontal?y:y+d;
+        if(xx<0||xx>=w||yy<0||yy>=h)continue;
+        int c=input[yy*w+xx],a=Color.alpha(c);sa+=a;sr+=Color.red(c)*a;sg+=Color.green(c)*a;sb+=Color.blue(c)*a;count++;
+      }
+      output[y*w+x]=sa==0?0:Color.argb(sa/count,sr/sa,sg/sa,sb/sa);
+    }
+  }
+
+  @Override protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+    if(!haveFrame||getAlpha()<=0f)return;
+    rebuildField();if(field==null)return;
+    int save=canvas.save();canvas.clipOutRect(sourceRect);
+    windowRect.set(0,0,getWidth(),getHeight());paint.setColorFilter(null);paint.setAlpha(255);
+    canvas.drawBitmap(field,null,windowRect,paint);canvas.restoreToCount(save);
+  }
+
+  void restoreGlass() {
+    for(IlluminatedGlass item:glass)if(item.owner.getBackground()==item){item.owner.setBackground(item.base);item.base.setCallback(item.owner);}
+    glass.clear();
+  }
+  void illuminate(View root) {
+    restoreGlass();if(!enabled)return;collectGlass(root,0);
+  }
+  private void collectGlass(View view,int depth) {
+    if(view==null||view==sourceHost||view==this||view instanceof TextureView||view instanceof android.view.SurfaceView
+        ||view instanceof android.webkit.WebView||depth>24||glass.size()>=512)return;
+    Drawable background=view.getBackground();
+    // Structural containers retain their material identity. Add local transmission
+    // over existing surfaces, never replace text/focus/selection drawables.
+    if(background!=null && view!=getParent() && view!=rootViewForGlass() && !"cobra-browse-background".equals(view.getTag())) {
+      IlluminatedGlass item=new IlluminatedGlass(view,background);glass.add(item);view.setBackground(item);
+    }
+    if(view instanceof ViewGroup) {ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)collectGlass(group.getChildAt(i),depth+1);}
+  }
+  private View rootViewForGlass(){return getRootView();}
+  private void invalidateGlass(){for(IlluminatedGlass item:glass)item.invalidateSelf();}
+
+  private final class IlluminatedGlass extends Drawable implements Drawable.Callback {
+    final View owner;final Drawable base;final int[] location=new int[2];
+    final RectF local=new RectF(),projection=new RectF();final Path shape=new Path(),rim=new Path();
+    final Paint transmission=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    IlluminatedGlass(View view,Drawable drawable){owner=view;base=drawable;base.setCallback(this);}
+    @Override public void draw(Canvas canvas) {
+      base.setBounds(getBounds());base.draw(canvas);
+      if(!haveFrame||CobraImmersiveAmbient.this.getAlpha()<=0f||field==null||owner==sourceHost)return;
+      owner.getLocationOnScreen(location);getLocationOnScreen(selfLocation);
+      float x=location[0]-selfLocation[0],y=location[1]-selfLocation[1];
+      local.set(getBounds());float radius=base instanceof CobraVisualRenderer.Glass?((CobraVisualRenderer.Glass)base).radius:12f*getResources().getDisplayMetrics().density;
+      shape.reset();shape.addRoundRect(local,radius,radius,Path.Direction.CW);
+      projection.set(-x,-y,getWidth()-x,getHeight()-y);
+      int save=canvas.save();canvas.clipPath(shape);
+      // Keep the sacred player rectangle masked even for ancestor surfaces.
+      canvas.clipOutRect(sourceRect.left-x,sourceRect.top-y,sourceRect.right-x,sourceRect.bottom-y);
+      transmission.setAlpha(Math.round((lightAppearance?68:105)*CobraImmersiveAmbient.this.getAlpha()));canvas.drawBitmap(field,null,projection,transmission);
+      rim.reset();rim.addRoundRect(local,radius,radius,Path.Direction.CW);
+      dst.set(local);float lip=Math.max(1f,getResources().getDisplayMetrics().density*1.4f);dst.inset(lip,lip);
+      rim.addRoundRect(dst,Math.max(0,radius-lip),Math.max(0,radius-lip),Path.Direction.CCW);canvas.clipPath(rim);
+      transmission.setAlpha(Math.round((lightAppearance?220:245)*CobraImmersiveAmbient.this.getAlpha()));canvas.drawBitmap(field,null,projection,transmission);
+      canvas.restoreToCount(save);
+    }
+    @Override protected boolean onStateChange(int[] states){boolean changed=base.setState(states);invalidateSelf();return changed;}
+    @Override public boolean isStateful(){return base.isStateful();}
+    @Override public boolean getPadding(Rect padding){return base.getPadding(padding);}
+    @Override public void getOutline(android.graphics.Outline outline){base.getOutline(outline);}
+    @Override public void setAlpha(int alpha){base.setAlpha(alpha);}
+    @Override public void setColorFilter(android.graphics.ColorFilter filter){base.setColorFilter(filter);}
+    @Override public int getOpacity(){return android.graphics.PixelFormat.TRANSLUCENT;}
+    @Override public void jumpToCurrentState(){base.jumpToCurrentState();}
+    @Override public void invalidateDrawable(Drawable who){invalidateSelf();}
+    @Override public void scheduleDrawable(Drawable who,Runnable what,long when){scheduleSelf(what,when);}
+    @Override public void unscheduleDrawable(Drawable who,Runnable what){unscheduleSelf(what);}
+  }
+
+  // Deterministic rendering hooks for tests; production never calls these.
+  void testPlainRendering(boolean value) {
+    testPlainRendering = value;
+
+  }
+  void testAnchor(View host) {sourceHost=host;testFrameMode=false;fieldDirty=true;updateSourceRect();}
+  void testFrame(Bitmap bitmap, RectF rect, boolean light) {
+    if (bitmap == null) return;
+    ensureBuffers(bitmap.getWidth(), bitmap.getHeight());
+    Canvas c = new Canvas(smoothed);c.drawColor(Color.TRANSPARENT, android.graphics.PorterDuff.Mode.CLEAR);
+    paint.setColorFilter(null);paint.setAlpha(255);c.drawBitmap(bitmap, 0, 0, paint);paint.setColorFilter(saturation);
+    fieldDirty = true;haveFrame = true;enabled = true;testFrameMode = true;lightAppearance = light;sourceRect.set(rect);setAlpha(1f);setVisibility(VISIBLE);invalidate();
+  }
+}
