@@ -20,6 +20,8 @@ def patch_activity(s):
     mRoot = new LinearLayout(this);''')
  s=once(s,'      mCobraImmersiveAmbient=new CobraImmersiveAmbient(this);\n      mCobraGuideShell.addView(mCobraImmersiveAmbient,new FrameLayout.LayoutParams(-1,-1));\n','')
  s=once(s,'if(mCobraImmersiveAmbient!=null){mCobraImmersiveAmbient.release();mCobraImmersiveAmbient=null;}','if(mCobraImmersiveAmbient!=null){mCobraImmersiveAmbient.release();if(mCobraImmersiveAmbient.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)mCobraImmersiveAmbient.getParent()).removeView(mCobraImmersiveAmbient);mCobraImmersiveAmbient=null;}')
+ s=once(s,'    boolean host=mCobraPreviewHost!=null&&mCobraPreviewHost.isAttachedToWindow()&&mCobraPreviewHost.isShown();','    boolean host=mCobraPreviewHost!=null&&mCobraPreviewHost.isAttachedToWindow()&&mCobraPreviewHost.isShown()&&mCobraPreviewHost.getGlobalVisibleRect(new android.graphics.Rect());')
+ s=once(s,'eligible(mode,cobraVisualEffectsAllowed(),mPlayerOverlay!=null','eligible(mode,cobraVisualEffectsAllowed()&&mCobraRotationResumed,mPlayerOverlay!=null')
  s=once(s,'return mode==CobraPresentationEffects.IMMERSIVE&&cobraImmersiveAmbientEligible()?CobraPresentationEffects.SUBTLE:mode;','return mode==CobraPresentationEffects.IMMERSIVE&&cobraImmersiveAmbientEligible()?CobraPresentationEffects.OFF:mode;')
  s=once(s,'    int staticMode=reactive?CobraPresentationEffects.SUBTLE:mode;','    int staticMode=reactive?CobraPresentationEffects.OFF:mode;\n    if(mCobraImmersiveAmbient!=null)mCobraImmersiveAmbient.restoreGlass();')
  s=once(s,'ambient.bind(mCobraPreviewTexture,mCobraPreviewHost,!cobraModeDark());','ambient.bind(mCobraPreviewTexture,mCobraPreviewHost,!cobraModeDark(),mCobraPreviewSessionKey);')

@@ -43,7 +43,8 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD~1)" = 88b733f2a25eca1873673c27b75b51021e4ef56b || git merge-base --is-ancestor 88b733f2a25eca1873673c27b75b51021e4ef56b HEAD
           mkdir -p audit276
-          git bundle create audit276/locked-2103275-rollback.bundle 88b733f2a25eca1873673c27b75b51021e4ef56b
+          git branch rollback-snapshot-2103275 88b733f2a25eca1873673c27b75b51021e4ef56b
+          git bundle create audit276/locked-2103275-rollback.bundle rollback-snapshot-2103275
           python3 - <<'CHECK'
           from pathlib import Path
           import hashlib,tarfile,zipfile,json,shutil
