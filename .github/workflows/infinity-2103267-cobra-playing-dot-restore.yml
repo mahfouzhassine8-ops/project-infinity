@@ -1,0 +1,207 @@
+name: Infinity | 2103267 Cobra Playing Dot Restore RC1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103267-restore-playing-dot-rc1]
+    paths:
+      - '.github/workflows/infinity-2103267-cobra-playing-dot-restore.yml'
+      - 'repairs/cobra-playing-dot-restore-2103267/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-cobra-playing-dot-restore-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  android-package-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+
+      - name: Download exact locked 2103266 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103266-Ambient-Glass-Cinema-RC1-TEST-CANDIDATE
+          run-id: 36675691445
+          github-token: ${{ github.token }}
+          path: parent266
+
+      - name: Download exact locked 2103266 source and visual evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103266-Ambient-Glass-Cinema-RC1-Evidence
+          run-id: 36675691445
+          github-token: ${{ github.token }}
+          path: source266
+
+      - name: Download exact locked 2103237 playing-dot reference
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103237-Cobra-Playing-Dot-OLED-Micro-Polish-Evidence
+          run-id: 35950268449
+          github-token: ${{ github.token }}
+          path: reference237
+
+      - name: Verify exact parents and reconstruct 2103266 source
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source266/reconstructed-2103266-shell.tar.gz | cut -d' ' -f1)" = 'e5b138e9adee3fed4ec9df4d06bebccb3d1a13f99bfd67c91da07103e280432c'
+          test "$(sha256sum parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk | cut -d' ' -f1)" = '4624c1ca66d29a4ac8c5f63892ca9669e6ef757894fe6a2e0b4c4d356e3ec455'
+          test "$(sha256sum reference237/audit237/InfinityLiveActivity-2103237-after.java.in | cut -d' ' -f1)" = 'afa638f0f881c2d437fb5cad56c22453972a5900dcee18eac962537dba0bc255'
+          tar --no-same-owner -xzf source266/reconstructed-2103266-shell.tar.gz
+          mkdir -p audit267 engine
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          apk=Path('parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None
+              assert len(z.namelist()) == len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest() == 'c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+
+      - name: Restore only the locked Cobra playing-dot system
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-playing-dot-restore-2103267/apply.py \
+            --root . \
+            --evidence audit267 \
+            --reference237 reference237/audit237/InfinityLiveActivity-2103237-after.java.in
+          python3 repairs/cobra-playing-dot-restore-2103267/verify_source.py --root . --out audit267
+          grep -F 'mPlayerOverlay.setOnLongClickListener(v -> true);' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'static final long HANDOFF_MS=180L;' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'static final int CINEMA_AMBER=0xffffc247;' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+
+      - name: Compile Android layer and permanently sign 2103267
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk \
+            --build-dir build267 \
+            --out signed267 2>&1 | tee audit267/android-build.log
+
+      - name: Run inherited 2103266 regressions plus restored-dot tests
+        run: |
+          set -euo pipefail
+          mkdir -p audit267/screenshots
+          python3 repairs/ambient-glass-2103266/stage_tests.py --build-dir build267 --evidence audit267/screenshots
+          TESTDIR=build267/xbmc/src/test/java/com/projectinfinity/kodi
+          cp repairs/cobra-playing-dot-restore-2103267/Cobra2103267PlayingDotRestoreTest.java "$TESTDIR/"
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build267
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+            --tests com.projectinfinity.kodi.GlassChooserTest \
+            --tests com.projectinfinity.kodi.GlassOptionsTest \
+            --tests com.projectinfinity.kodi.GlassHealthFinishTest \
+            --tests com.projectinfinity.kodi.RecoveryFixedTest \
+            --tests com.projectinfinity.kodi.ProVisualTest \
+            --tests com.projectinfinity.kodi.ProActionsTest \
+            --tests com.projectinfinity.kodi.PhoneGlassTest \
+            --tests com.projectinfinity.kodi.AmbientGlassTest \
+            --tests com.projectinfinity.kodi.Cobra2103267PlayingDotRestoreTest \
+            2>&1 | tee ../audit267/android-view-tests.log
+
+      - name: Gate exact 2103266 preservation and playing-dot restoration
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,zipfile,xml.etree.ElementTree as ET
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          parent=Path('parent266/Infinity-2103266-Ambient-Glass-Cinema-RC1.apk')
+          apk=Path('signed267/Infinity-2103267-Cobra-Playing-Dot-Restore-RC1.apk')
+          assert hashlib.sha256(parent.read_bytes()).hexdigest()=='4624c1ca66d29a4ac8c5f63892ca9669e6ef757894fe6a2e0b4c4d356e3ec455'
+          kept=verify_bytes(parent,apk)
+          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':17,'ProActionsTest':5,'PhoneGlassTest':4,'AmbientGlassTest':5,'Cobra2103267PlayingDotRestoreTest':4}
+          for name,count in counts.items():
+              t=ET.parse('build267/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
+              assert int(t.attrib['tests'])==count,(name,t.attrib)
+              assert all(int(t.attrib.get(k,0))==0 for k in ('failures','errors','skipped')),(name,t.attrib)
+          locked=Path('source266/screenshots/protected');current=Path('audit267/screenshots/protected')
+          names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,names
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected non-Live render changed: '+name
+          source=json.loads(Path('audit267/source-verification.json').read_text())
+          dot=json.loads(Path('audit267/playing-dot-source-audit.json').read_text())
+          assert source['parent_version']==2103266 and source['changed_shell_files']==['tools/android/packaging/xbmc/build.gradle.in','tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in']
+          assert source['no_hold_preserved'] and source['ambient_glass_2103266_preserved'] and source['buffering_animation_untouched']
+          assert dot['passed'] and all(all(v.values()) for v in dot['views'].values())
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              joined=b''.join(z.read(n) for n in z.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              for token in (b'CobraPlayingIndicatorPolicy',b'CobraPlayingDot',b'CobraMobileChannelRow',b'CobraCompactChannelRow',b'CobraPosterChannelCard',b'CobraFocusQueueRow',b'CobraBroadcastRow'):
+                  assert token in joined,token
+          report=json.loads(Path('signed267/background-resume-apk-audit.json').read_text());report.update(kept)
+          report.update(parent_version=2103266,parent_commit='490e995e77ad1d37c5b64fd11315e6f4a704952c',restored_reference=2103237,
+              automated_tests_passed=sum(counts.values()),test_methods=counts,protected_render_equality=20,
+              true_live_playing_indicator=True,actual_session_owned=True,focus_independent=True,
+              playing_dot_views=['TV Grid','Mobile','Compact','Cards','Focus'],handoff_ms=180,color_morph_ms=240,
+              oled_core_floor_alpha=218,oled_glow_floor=0.58,night_cinema_color='#FFC247',
+              ambient_glass_2103266_preserved=True,no_video_hold_preserved=True,buffering_animation_untouched=True,
+              native_recompiled=False,physical_device_verified=False,stable_lock=False,
+              status='TEST CANDIDATE — automated gates passed; physical-device verification required')
+          Path('signed267/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          Path('signed267/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+
+      - name: Preserve source, diff, tests and reconstruction evidence
+        if: always()
+        run: |
+          mkdir -p audit267/repair-source
+          cp -r repairs/cobra-playing-dot-restore-2103267/* audit267/repair-source/ || true
+          if [ -d build267/xbmc/build/test-results ]; then cp -r build267/xbmc/build/test-results audit267/; fi
+          if [ -d build267/xbmc/src/test ]; then cp -r build267/xbmc/src/test audit267/staged-tests; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit267/reconstructed-2103267-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103267-Cobra-Playing-Dot-Restore-RC1-TEST-CANDIDATE
+          path: signed267/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish restoration and preservation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103267-Cobra-Playing-Dot-Restore-RC1-Evidence
+          path: audit267/
+          if-no-files-found: error
+          retention-days: 90
