@@ -1,0 +1,154 @@
+name: Infinity | 2103264 Pro LIVE Glass RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103264-pro-live-glass-rc1]
+    paths:
+      - '.github/workflows/infinity-2103264-pro-live.yml'
+      - 'repairs/pro-live-2103264/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-pro-live-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  pro-live-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Download exact locked 2103263 signed candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103263-Pro-OLED-Light-Polish-RC1-TEST-CANDIDATE
+          run-id: 36662814776
+          github-token: ${{ github.token }}
+          path: parent263
+      - name: Download exact locked 2103263 source and test evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103263-Pro-OLED-Light-Polish-RC1-Evidence
+          run-id: 36662814776
+          github-token: ${{ github.token }}
+          path: source263
+      - name: Verify parent APK and source pairing
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source263/reconstructed-2103263-shell.tar.gz | cut -d' ' -f1)" = 'e3af7601b3eab185f7b3cf0c1c4717a4e336775be81037712f432ec8f3db35e6'
+          test "$(sha256sum parent263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk | cut -d' ' -f1)" = '00c3f00eaf336ef2102e9f2226e8cb02e8d95767c043431690024018772153e4'
+          tar -xzf source263/reconstructed-2103263-shell.tar.gz
+          mkdir -p audit264
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk') as z:
+              assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+      - name: Apply badge-only delta and protect all Activity code
+        run: python3 repairs/pro-live-2103264/apply.py --root . --evidence audit264
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' 'ndk;21.4.7075529' >/dev/null
+      - name: Compile Android interface only and retain permanent signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk --build-dir build264 --out signed264 2>&1 | tee audit264/android-build.log
+      - name: Run badge visuals Pro actions and protected regressions
+        run: |
+          set -euo pipefail
+          mkdir -p audit264/screenshots
+          python3 repairs/pro-live-2103264/stage_tests.py --build-dir build264 --evidence audit264/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build264
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.GlassChooserTest --tests com.projectinfinity.kodi.GlassOptionsTest --tests com.projectinfinity.kodi.GlassHealthFinishTest --tests com.projectinfinity.kodi.RecoveryFixedTest --tests com.projectinfinity.kodi.ProVisualTest --tests com.projectinfinity.kodi.ProActionsTest 2>&1 | tee ../audit264/android-view-tests.log
+      - name: Gate candidate on tests protected render equality and payload preservation
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,xml.etree.ElementTree as ET,zipfile
+          from pathlib import Path
+          from PIL import Image,ImageChops
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+          apk=Path('signed264/Infinity-2103264-Pro-LIVE-Glass-RC1.apk')
+          kept=verify_bytes(Path('parent263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk'),apk)
+          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':17,'ProActionsTest':5}
+          for name,count in counts.items():
+              t=ET.parse('build264/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
+              assert int(t.attrib['tests'])==count,(name,t.attrib)
+              assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(name,t.attrib)
+          locked=Path('source263/screenshots/protected');current=Path('audit264/screenshots/protected')
+          names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
+          locked=Path('source263/screenshots/pro');current=Path('audit264/screenshots/pro')
+          names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==36
+          bounds={}
+          for name in names:
+              old=Image.open(locked/name).convert('RGB');new=Image.open(current/name).convert('RGB')
+              assert old.size==new.size
+              box=ImageChops.difference(old,new).getbbox();assert box is not None,'Badge did not change: '+name
+              w,h=new.size;font=2 if 'font2-' in name else 1
+              top=round((48 if h<500 else 56)+(font-1)*32)+8+12
+              assert box[0]>=20 and box[1]>=top and box[2]<=w-60 and box[3]<=top+25,('Change outside LIVE/source badge strip',name,box,top)
+              bounds[name]=box
+          with zipfile.ZipFile(apk) as z:
+              assert not any('fixture' in n or 'ProVisualTest' in n or 'ProActionsTest' in n for n in z.namelist())
+          source=json.loads(Path('audit264/source-verification.json').read_text())
+          assert source['other_shell_files_byte_identical']==230
+          assert source['all_activity_code_byte_identical']
+          result=json.loads(Path('signed264/background-resume-apk-audit.json').read_text());result.update(kept)
+          result.update(source_verification=source,test_methods=counts,automated_tests_passed=50,protected_render_equality=20,
+              pro_native_component_renders=36,pro_render_changes_confined_to_badge_strip=bounds,
+              pro_render_data='deterministic test fixtures, not a live provider',
+              action_test_player='fake player with unchanged production method bodies',physical_device_verified=False,
+              real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)
+          Path('signed264/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed264/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Preserve expanded source tests renders and audit
+        if: always()
+        run: |
+          mkdir -p audit264
+          cp -r repairs/pro-live-2103264 audit264/repair-source
+          if [ -d build264/xbmc/build/test-results ]; then cp -r build264/xbmc/build/test-results audit264/; fi
+          if [ -d build264/xbmc/src/test ]; then cp -r build264/xbmc/src/test audit264/staged-tests; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit264/reconstructed-2103264-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103264-Pro-LIVE-Glass-RC1-TEST-CANDIDATE
+          path: signed264/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+      - name: Publish badge polish and regression evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103264-Pro-LIVE-Glass-RC1-Evidence
+          path: audit264/
+          if-no-files-found: error
+          retention-days: 90
