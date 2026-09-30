@@ -19,8 +19,9 @@ import static org.junit.Assert.*;
 public class MiniPlayerFillTest {
  CobraNavigationUiTest helper;InfinityLiveActivity a;TextureView texture;AtomicReference<VideoSize> size;ExoPlayer player;
  @Before public void setup()throws Exception{
-  helper=new CobraNavigationUiTest();helper.clock();a=helper.fixture(20);texture=new TextureView(a);size=new AtomicReference<>(new VideoSize(1920,1080));
+  helper=new CobraNavigationUiTest();helper.clock();a=helper.fixture(20);texture=(TextureView)CobraNavigationUiTest.get(a,"mCobraPreviewTexture");if(texture==null)texture=new TextureView(a);size=new AtomicReference<>(new VideoSize(1920,1080));
   player=(ExoPlayer)Proxy.newProxyInstance(ExoPlayer.class.getClassLoader(),new Class[]{ExoPlayer.class},(p,m,args)->{
+   if(m.getName().matches("(set.*|clear.*|prepare|release|seek.*|stop|play)"))throw new AssertionError("Scaling mutated playback: "+m.getName());
    if(m.getName().equals("getVideoSize"))return size.get();if(m.getName().equals("hashCode"))return System.identityHashCode(p);if(m.getName().equals("equals"))return p==args[0];
    Class<?> t=m.getReturnType();if(t==boolean.class)return false;if(t==int.class)return 0;if(t==long.class)return 0L;if(t==float.class)return 0f;return null;
   });
@@ -48,6 +49,16 @@ public class MiniPlayerFillTest {
  }
  @Test public void fullscreenPipAndMultiViewDoNotActivateMiniFill(){assertTrue(InfinityLiveActivity.CobraMiniFillPolicy.active(true,false,false,false));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(true,true,false,false));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(true,false,true,false));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(true,false,false,true));assertFalse(InfinityLiveActivity.CobraMiniFillPolicy.active(false,false,false,false));}
  @Test public void nonPreviewRetainsLockedContainPolicy()throws Exception{CobraNavigationUiTest.put(a,"mCobraPreviewTexture",null);size.set(new VideoSize(640,480));float[] v=scale(412,232,0);assertTrue(v[0]<1f);assertEquals(1f,v[4],.0001f);}
+ @Test public void fullscreenGeometryRemainsLockedAcrossAllAspectOptions()throws Exception{
+  CobraNavigationUiTest.put(a,"mCobraPreviewTexture",null);CobraNavigationUiTest.put(a,"mPlayer",player);CobraNavigationUiTest.put(a,"mPlayerOverlay",new FrameLayout(a));size.set(new VideoSize(640,480));
+  for(int mode=0;mode<=13;mode++){
+   float[] expected=mode==0?InfinityLiveActivity.CobraFoldAspectPolicy.fill(640,480,1,412,232)
+    :InfinityLiveActivity.CobraFoldAspectPolicy.foldMode(mode)?InfinityLiveActivity.CobraFoldAspectPolicy.scaleForMode(mode,640,480,1,412,232)
+    :InfinityLiveActivity.CobraLayoutMath.fit(640,480,1,412,232,mode,1,1);
+   float[] actual=scale(412,232,mode);assertEquals(expected[0],actual[0],.0001f);assertEquals(expected[1],actual[4],.0001f);
+  }
+  CobraNavigationUiTest.put(a,"mPlayer",null);CobraNavigationUiTest.put(a,"mPlayerOverlay",null);
+ }
  @Test public void pipReturnRestoresFillWithoutReplacingSurface()throws Exception{size.set(new VideoSize(640,480));CobraNavigationUiTest.put(a,"mInPictureInPicture",true);assertTrue(scale(412,232,0)[0]<1f);CobraNavigationUiTest.put(a,"mInPictureInPicture",false);assertEquals(1f,scale(412,232,0)[0],.0001f);}
  @Test public void fiveModesShareFilledPreviewAndControlsInBothThemes()throws Exception{
   for(boolean dark:new boolean[]{false,true})for(String mode:new String[]{"mobile","grid","compact","cards","focus"}){
