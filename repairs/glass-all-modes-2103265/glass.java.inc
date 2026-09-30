@@ -38,5 +38,6 @@
     @Override public void setAlpha(int value){opacity=value;invalidateSelf();}
     @Override public void setColorFilter(ColorFilter value){filter=value;invalidateSelf();}
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
+    @Override public void getOutline(Outline out){out.setRoundRect(getBounds(),radius);}
     @Override public boolean getPadding(Rect out){out.set(0,0,0,0);return false;}
   }

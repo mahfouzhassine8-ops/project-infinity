@@ -31,7 +31,10 @@ def main():
         if(panel!=null)panel.setBackground(CobraVisualRenderer.phoneGlass(this,!cobraModeDark(),"grid".equals(mCobraGuideStyle)?6:16,true));
     }''')
     s=once(s,'tabs.setBackground(surface(cobraModeColor("panel"),16,vtheme().color("cobra.cobraModeFilters.colors.1",Color.TRANSPARENT),0));','tabs.setBackground(CobraVisualRenderer.phoneGlass(this,!cobraModeDark(),16,true));')
-    s=once(s,'cobraShowGuideShell();\n  }\n\n  private void cobraBuildProChrome()', 'cobraShowGuideShell();\n    if(!"focus".equals(mode)&&mCobraGuideBrowser!=null&&cobraMotionEnabled()){\n      cobraResetMotion(mCobraGuideBrowser);mCobraGuideBrowser.setAlpha(.65f);\n      mCobraGuideBrowser.animate().alpha(1f).setDuration(180L).setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();\n    }\n  }\n\n  private void cobraBuildProChrome()')
+    a,b=span(s,'cobraRenderGuideBrowser');part=s[a:b]
+    part=once(part,'mCobraGuideBrowser.setAlpha(.62f);mCobraGuideBrowser.setTranslationY(dp(7));mCobraGuideBrowser.animate().alpha(1f).translationY(0f).setDuration(vtheme().motion("cobra.cobraRenderGuideBrowser.numbers.1",190)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();mCobraRenderedMode=mCobraGuideStyle;',
+      'cobraResetMotion(mCobraGuideBrowser);if(cobraMotionEnabled()){mCobraGuideBrowser.setAlpha(.65f);mCobraGuideBrowser.animate().alpha(1f).setDuration(180L).setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();}mCobraRenderedMode=mCobraGuideStyle;')
+    s=s[:a]+part+s[b:]
     # Existing callbacks, clip/hit rectangles, and navigation timing stay unchanged.
     s=once(s,'panel.setTranslationX(-width);panel.setAlpha(.90f);panel.setScaleX(.99f);panel.setScaleY(.99f);panel.animate().translationX(0).alpha(1f).scaleX(1f).scaleY(1f).setDuration(vtheme().motion("cobra.toggleCobraDrawer.numbers.1",210)).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();', 'panel.setTranslationX(cobraMotionEnabled()?-width:0);panel.setAlpha(cobraMotionEnabled()?.82f:1f);panel.animate().translationX(0).alpha(1f).setDuration(cobraMotionEnabled()?240L:0L).setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();')
     # Controls have glass in guide contexts; Pro keeps its current custom surfaces.
@@ -69,7 +72,7 @@ def main():
         a,b=span(old,name);c,d=span(live.read_text(),name)
         if old[a:b]!=live.read_text()[c:d]:modified.append(name)
       except AssertionError:pass
-    assert set(modified)<=set(['cobraModeSurface','toggleCobraDrawer','cobraPolishDrawerRow','cobraDrawerDestination','cobraOpenSheet','cobraRestyleGuide','cobraModeFilters','cobraSwitchMode','cobraTextButton','cobraIcon']),modified
+    assert set(modified)<=set(['cobraModeSurface','toggleCobraDrawer','cobraPolishDrawerRow','cobraDrawerDestination','cobraOpenSheet','cobraRestyleGuide','cobraModeFilters','cobraRenderGuideBrowser','cobraTextButton','cobraIcon']),modified
     receiptpath=root/'engine/background-resume-source.json';receipt=json.loads(receiptpath.read_text())
     for name in changed:receipt['files'][name]={'before':before[name],'after':after[name]}
     receipt.update(version_code=2103265,version_name='1.0.9-Phone-Glass-Polish-RC1',source_parent=2103264,native_engine_recompiled=False,physical_device_verified=False);receiptpath.write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')

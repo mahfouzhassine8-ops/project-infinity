@@ -53,9 +53,14 @@ public class PhoneGlassTest {
   @Test public void allFourActualGuideShellsRenderGlassWithoutAPlayer()throws Exception{
     for(boolean light:new boolean[]{false,true})for(String mode:new String[]{"mobile","grid","compact","cards"})for(int[] size:new int[][]{{412,915},{320,640},{1024,600}}){
       InfinityLiveActivity a=activity(light,size[0],size[1]);put(a,"mCobraGuideStyle",mode);put(a,"mCobraPreviewAutoplayAllowed",false);
-      call(a,"cobraShowGuideShell");View root=(View)get(a,"mRoot");layout(root,size[0],size[1]);
+      Class<?> channelClass=Class.forName(InfinityLiveActivity.class.getName()+"$Channel");Constructor<?> channelCtor=channelClass.getDeclaredConstructor(String.class,String.class,String.class,String.class,String.class,String.class,String.class,Map.class);channelCtor.setAccessible(true);
+      ArrayList fixtureChannels=(ArrayList)get(a,"mChannels");
+      for(int i=0;i<6;i++)fixtureChannels.add(channelCtor.newInstance("fixture:"+i,"Channel "+(i+1),"Test group","","","https://fixture.invalid/test.ts","",new HashMap<String,String>()));
+      put(a,"mGuidePreviewChannel",fixtureChannels.get(0));put(a,"mCobraGuideRoute","channels");
+      call(a,"cobraShowGuideShell");View root=(View)get(a,"mRoot");layout(root,size[0],size[1]);((View)get(a,"mCobraGuideBrowser")).animate().cancel();((View)get(a,"mCobraGuideBrowser")).setAlpha(1f);
       assertTrue(((View)get(a,"mCobraModeToolbar")).getBackground() instanceof CobraVisualRenderer.Glass);
       assertTrue(((View)get(a,"mCobraGuideDetails")).getBackground() instanceof CobraVisualRenderer.Glass);
+      assertNotNull(get(a,"mCobraGuideList"));assertEquals(6,((AbsListView)get(a,"mCobraGuideList")).getAdapter().getCount());
       assertNull(get(a,"mCobraPreviewPlayer"));assertNull(get(a,"mPlayer"));
       save(root,mode+"-"+(light?"light":"oled")+"-"+size[0]+"x"+size[1]);((android.os.Handler)get(a,"mMain")).removeCallbacksAndMessages(null);a.finish();
     }
@@ -70,7 +75,7 @@ public class PhoneGlassTest {
     }
   }
   @Test public void stateTransitionsKeepHitGeometryAndProduceVisibleSelection()throws Exception{
-    Activity a=Robolectric.buildActivity(Activity.class).setup().get();Button b=new Button(a);b.setBackground(CobraVisualRenderer.phoneGlass(a,false,14,true));a.setContentView(b);layout(b,200,56);b.clearFocus();b.getBackground().jumpToCurrentState();Bitmap normal=render(b);
+    Activity a=Robolectric.buildActivity(Activity.class).setup().get();Button b=new Button(a);b.setBackground(CobraVisualRenderer.phoneGlass(a,false,14,true));a.setContentView(b);layout(b,200,56);b.setFocusable(false);b.clearFocus();b.getBackground().jumpToCurrentState();Bitmap normal=render(b);
     b.setSelected(true);b.getBackground().jumpToCurrentState();Bitmap selected=render(b);assertNotEquals(normal.getPixel(8,8),selected.getPixel(8,8));assertEquals(200,b.getWidth());assertEquals(56,b.getHeight());assertEquals(0,b.getTranslationX(),0);assertEquals(1,b.getScaleX(),0);normal.recycle();selected.recycle();
     b.setVisibility(View.GONE);assertFalse(b.getBackground().isVisible());
   }

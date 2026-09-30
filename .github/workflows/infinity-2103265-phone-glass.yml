@@ -26,14 +26,14 @@ jobs:
         with:
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
-      - name: Download exact locked 2103263 signed candidate
+      - name: Download exact 2103264 signed candidate
         uses: actions/download-artifact@v8
         with:
           name: Infinity-2103264-Pro-LIVE-Glass-RC1-TEST-CANDIDATE
           run-id: 36666385684
           github-token: ${{ github.token }}
           path: parent264
-      - name: Download exact locked 2103263 source and test evidence
+      - name: Download exact 2103264 source and test evidence
         uses: actions/download-artifact@v8
         with:
           name: Infinity-2103264-Pro-LIVE-Glass-RC1-Evidence
@@ -72,7 +72,7 @@ jobs:
             keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
           fi
           python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent264/Infinity-2103264-Pro-LIVE-Glass-RC1.apk --build-dir build265 --out signed265 2>&1 | tee audit265/android-build.log
-      - name: Run badge visuals Pro actions and protected regressions
+      - name: Run phone glass Pro actions and protected regressions
         run: |
           set -euo pipefail
           mkdir -p audit265/screenshots
@@ -104,7 +104,7 @@ jobs:
           result=json.loads(Path('signed265/background-resume-apk-audit.json').read_text());result.update(kept)
           result.update(source_verification=source,test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=20,
               production_theme_live_text_test=True,actual_activity_drawer_and_chooser_test=True,actual_four_mode_shell_test=True,
-              test_data='deterministic fixtures and empty actual guide shells, not live provider data',
+              test_data='deterministic fixtures and actual guide shells with six fixture channels, not live provider data',
               physical_device_verified=False,real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)
           Path('signed265/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
           Path('signed265/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
@@ -128,7 +128,7 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 90
-      - name: Publish badge polish and regression evidence
+      - name: Publish glass polish and regression evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
