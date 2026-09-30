@@ -58,7 +58,7 @@ public class ProSportsIntegrationTest {
     ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();Activity a=ctl.get();try{
       ArrayList<Integer> calls=new ArrayList<>();CobraProUi.SportsTabs tabs=new CobraProUi.SportsTabs(a,true,calls::add);a.setContentView(tabs);layout(tabs,412,CobraProUi.SportsTabs.height(a));
       assertArrayEquals(new String[]{"Live Now","My Teams","Upcoming","Leagues"},CobraProUi.SportsTabs.LABELS);
-      assertEquals("pro_sports_tabs",tabs.getTag());for(int i=0;i<4;i++){assertTrue(tabs.buttons[i].getWidth()>=48);assertTrue(tabs.buttons[i].getHeight()>=48);tabs.buttons[i].performClick();}
+      assertEquals("pro_sports_tabs",tabs.getTag());assertTrue(CobraProUi.owns(tabs));for(int i=0;i<4;i++){assertTrue(tabs.buttons[i].getWidth()>=48);assertTrue(tabs.buttons[i].getHeight()>=48);tabs.buttons[i].performClick();}
       assertEquals(Arrays.asList(0,1,2,3),calls);
     }finally{ctl.pause().stop().destroy();}
   }
@@ -79,7 +79,7 @@ public class ProSportsIntegrationTest {
     ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();Activity a=ctl.get();try{
       CobraProUi.SportsGame game=new CobraProUi.SportsGame();game.id="soc1";game.league="Premier League";game.away="Arsenal";game.awayAbbr="ARS";game.home="Chelsea";game.homeAbbr="CHE";game.score="Arsenal 2 • Chelsea 1";game.meta="LIVE • 2nd Half • 67' • NBC";game.live=true;game.soccer=true;
       CobraProUi.GameRow row=new CobraProUi.GameRow(a,true,()->{},()->{});row.bind(game,null);a.setContentView(row);layout(row,412,CobraProUi.GameRow.height(a,412));
-      assertTrue(row.league.getText().toString().contains("SOCCER"));assertTrue(row.matchup.getText().toString().contains("ARS"));assertTrue(row.matchup.getText().toString().contains("CHE"));assertTrue(row.meta.getText().toString().contains("67"));
+      assertTrue(CobraProUi.owns(row));assertTrue(row.league.getText().toString().contains("SOCCER"));assertTrue(row.matchup.getText().toString().contains("ARS"));assertTrue(row.matchup.getText().toString().contains("CHE"));assertTrue(row.meta.getText().toString().contains("67"));
     }finally{ctl.pause().stop().destroy();}
   }
 
