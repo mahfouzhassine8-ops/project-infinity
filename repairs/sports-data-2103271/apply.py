@@ -30,14 +30,14 @@ NEW_SCOREBOARD='''    @Override public ArrayList<CobraSportsGame> scoreboard(Cob
       ArrayList<java.util.concurrent.Callable<CobraSportsDayResult>> tasks=new ArrayList<>();
       for(String day:days)tasks.add(()->cobraSportsDay(spec,day));
       java.util.concurrent.ExecutorService pool=java.util.concurrent.Executors.newFixedThreadPool(Math.max(1,Math.min(4,tasks.size())));
-      ArrayList<String> failures=new ArrayList<>();int successfulDays=0;
+      Exception lastFailure=null;int failedDays=0,successfulDays=0;
       try{
         for(java.util.concurrent.Future<CobraSportsDayResult> future:pool.invokeAll(tasks)){
-          try{CobraSportsDayResult result=future.get();if(result.error!=null){failures.add(result.day+" "+cobraSportsErrorDetail(result.error));continue;}successfulDays++;for(CobraSportsGame game:result.games)merged.put(game.id,game);}
-          catch(Exception e){failures.add(cobraSportsErrorDetail(e));}
+          try{CobraSportsDayResult result=future.get();if(result.error!=null){failedDays++;lastFailure=result.error;continue;}successfulDays++;for(CobraSportsGame game:result.games)merged.put(game.id,game);}
+          catch(Exception e){failedDays++;lastFailure=e;}
         }
       }finally{pool.shutdownNow();}
-      if(successfulDays==0)throw new java.io.IOException(failures.isEmpty()?"No sports date requests completed":android.text.TextUtils.join("; ",failures));
+      if(successfulDays==0)throw new java.io.IOException(failedDays+" date requests failed • "+cobraSportsErrorDetail(lastFailure));
       return new ArrayList<>(merged.values());
     }
     private CobraSportsDayResult cobraSportsDay(CobraSportsLeagueSpec spec,String day){
@@ -66,7 +66,7 @@ NEW_JSON='''  private JSONObject cobraSportsJson(String url)throws Exception{
   }
   private static String cobraSportsDateKey(long when){return new SimpleDateFormat("yyyyMMdd",Locale.US).format(new Date(when));}
   private static ArrayList<String> cobraSportsDateKeys(long from,long to){ArrayList<String> out=new ArrayList<>();Calendar day=Calendar.getInstance();day.setTimeInMillis(Math.min(from,to));day.set(Calendar.HOUR_OF_DAY,12);day.set(Calendar.MINUTE,0);day.set(Calendar.SECOND,0);day.set(Calendar.MILLISECOND,0);Calendar end=Calendar.getInstance();end.setTimeInMillis(Math.max(from,to));end.set(Calendar.HOUR_OF_DAY,12);end.set(Calendar.MINUTE,0);end.set(Calendar.SECOND,0);end.set(Calendar.MILLISECOND,0);SimpleDateFormat f=new SimpleDateFormat("yyyyMMdd",Locale.US);for(int guard=0;!day.after(end)&&guard<12;guard++){out.add(f.format(day.getTime()));day.add(Calendar.DAY_OF_MONTH,1);}return out;}
-  private static String cobraSportsErrorDetail(Exception e){if(e==null)return "Unknown error";String name=e.getClass().getSimpleName(),message=e.getMessage();return message==null||message.trim().isEmpty()?name:name+": "+message.trim();}
+  private static String cobraSportsErrorDetail(Exception e){if(e==null)return "Unknown error";String name=e.getClass().getSimpleName(),message=e.getMessage();if(message==null||message.trim().isEmpty())return name;message=message.trim();if(message.length()>180)message=message.substring(0,180)+"…";return name+": "+message;}
 '''
 
 CACHE_ANCHOR='''  private static final class CobraSportsChannelInfo{
