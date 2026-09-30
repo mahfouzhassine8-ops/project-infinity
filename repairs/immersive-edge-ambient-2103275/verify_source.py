@@ -7,12 +7,14 @@ spec=importlib.util.spec_from_file_location('amb275',HERE/'apply.py');r=importli
 p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--baseline',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
 base=a.baseline;root=a.root
 
-ba=(base/'shell-kodi'/r.ACTIVITY).read_text();br=(base/'shell-kodi'/r.RENDERER).read_text();bp=(base/'shell-kodi'/r.PROUI).read_text()
-aa=(root/'shell-kodi'/r.ACTIVITY).read_text();ar=(root/'shell-kodi'/r.RENDERER).read_text();ap=(root/'shell-kodi'/r.PROUI).read_text()
-assert r.sha(ba.encode())==r.PARENT_ACTIVITY_SHA and r.sha(br.encode())==r.PARENT_RENDERER_SHA and r.sha(bp.encode())==r.PARENT_PROUI_SHA,'Rollback is not exact locked 2103274'
+ba=(base/'shell-kodi'/r.ACTIVITY).read_text();br=(base/'shell-kodi'/r.RENDERER).read_text();bp=(base/'shell-kodi'/r.PROUI).read_text();bc=(base/'shell-kodi'/r.CMAKE).read_text()
+aa=(root/'shell-kodi'/r.ACTIVITY).read_text();ar=(root/'shell-kodi'/r.RENDERER).read_text();ap=(root/'shell-kodi'/r.PROUI).read_text();ac=(root/'shell-kodi'/r.CMAKE).read_text()
+assert r.sha(ba.encode())==r.PARENT_ACTIVITY_SHA and r.sha(br.encode())==r.PARENT_RENDERER_SHA and r.sha(bp.encode())==r.PARENT_PROUI_SHA and r.sha(bc.encode())==r.PARENT_CMAKE_SHA,'Rollback is not exact locked 2103274'
 assert aa==r.patch_activity(ba),'Activity differs from bounded 2103275 transformation'
 assert ar==r.patch_renderer(br),'Visual renderer differs from bounded 2103275 transformation'
 assert ap==bp,'Pro Sports UI changed in ambient-only pass'
+assert r.sha(ac.encode())==r.AFTER_CMAKE_SHA,'Android CMake registration differs from bounded 2103275 result'
+assert 'src/CobraImmersiveAmbient.java' in ac and 'CobraImmersiveAmbient.java.in' in ac
 assert r.sha(aa.encode())==r.AFTER_ACTIVITY_SHA and r.sha(ar.encode())==r.AFTER_RENDERER_SHA
 immersive=(root/'shell-kodi'/r.IMMERSIVE);assert immersive.is_file() and r.sha(immersive.read_bytes())==r.AFTER_IMMERSIVE_SHA
 assert 'SAMPLE_WIDTH = 144' in immersive.read_text() and 'FRAME_INTERVAL_MS = 83L' in immersive.read_text()
@@ -30,7 +32,7 @@ for f in sorted((base/'shell-kodi').rglob('*')):
     if old!=new:changed.append(n)
 current_names={str(f.relative_to(root/'shell-kodi')) for f in (root/'shell-kodi').rglob('*') if f.is_file()}
 added=sorted(current_names-base_names)
-assert set(changed)=={r.ACTIVITY,r.RENDERER,r.GRADLE},changed
+assert set(changed)=={r.ACTIVITY,r.RENDERER,r.GRADLE,r.CMAKE},changed
 assert set(added)=={r.IMMERSIVE,r.LICENSE},added
 
 bg=(base/'shell-kodi'/r.GRADLE).read_text().replace('versionCode 2103274','versionCode 2103275').replace('versionName "1.0.9-Sports-Hub-Soccer-RC1"','versionName "1.0.9-Immersive-Edge-Ambient-RC1"')
