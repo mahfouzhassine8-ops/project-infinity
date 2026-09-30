@@ -21,6 +21,7 @@ public class ProVisualTest {
   static final class Calls implements CobraProUi.Actions {int preview,unmute;final ArrayList<Integer> steps=new ArrayList<>(),controls=new ArrayList<>();public void preview(){preview++;}public void unmute(){unmute++;}public void step(int d){steps.add(d);}public void control(int i){controls.add(i);}}
   static CobraProUi.Program data(int index){CobraProUi.Program p=new CobraProUi.Program();String[] channels={"Nicktoons West","Cartoon Network","Disney Channel","ESPN","FOX 17","HGTV"};String[] shows={"SpongeBob SquarePants","Teen Titans Go!","Bluey","SportsCenter","Local News","House Hunters"};p.channel=channels[index%6];p.title=shows[index%6];p.schedule="1:20 PM – 1:46 PM  ·  18 min left";p.next="Next scheduled programme";p.progress=.31f;p.live=true;p.favorite=index==0;p.source=index==0?"FROM RECENTLY WATCHED":"FROM FAVORITES";return p;}
   static void layout(View v,int w,int h){v.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));v.layout(0,0,w,h);}
+  static double luminance(int color){double[] v={Color.red(color)/255d,Color.green(color)/255d,Color.blue(color)/255d};for(int i=0;i<3;i++)v[i]=v[i]<=.04045?v[i]/12.92:Math.pow((v[i]+.055)/1.055,2.4);return v[0]*.2126+v[1]*.7152+v[2]*.0722;}
   static FrameLayout.LayoutParams rect(int[] r){FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(Math.max(1,r[2]),Math.max(1,r[3]));p.leftMargin=r[0];p.topMargin=r[1];return p;}
   static class Scene {
     final ActivityController<Activity> ctl;final Activity activity;final FrameLayout root,video;final LinearLayout below,browser;final CobraProUi.Hero hero;final CobraProUi.Filters filters;final Calls calls=new Calls();final boolean light;final int width,height;
@@ -90,7 +91,9 @@ public class ProVisualTest {
     for(boolean light:new boolean[]{true,false}){Scene s=new Scene(light,0,412,915);CobraProUi.Program p=data(0);p.source="FROM CHANNELS";s.hero.bind(p,0,6);layout(s.root,412,915);
       assertTrue(s.hero.source.getWidth()<s.hero.getWidth()/2);assertTrue(s.hero.info.getBottom()<=s.hero.transport.getTop());assertTrue(s.hero.info.getTop()>s.hero.source.getBottom());
       Bitmap b=Bitmap.createBitmap(s.hero.transport.getWidth(),s.hero.transport.getHeight(),Bitmap.Config.ARGB_8888);s.hero.transport.draw(new Canvas(b));int c=b.getPixel(b.getWidth()/2,b.getHeight()/2);
-      assertEquals(light,Color.red(c)>200&&Color.green(c)>200&&Color.blue(c)>200);assertEquals(light?CobraProUi.INK:Color.WHITE,s.hero.muted.getCurrentTextColor());b.recycle();s.close();}
+      assertEquals(light,Color.red(c)>200&&Color.green(c)>200&&Color.blue(c)>200);assertEquals(light?CobraProUi.INK:Color.WHITE,s.hero.muted.getCurrentTextColor());b.recycle();
+      Bitmap button=Bitmap.createBitmap(s.hero.preview.getWidth(),s.hero.preview.getHeight(),Bitmap.Config.ARGB_8888);s.hero.preview.draw(new Canvas(button));assertTrue("white Preview label needs readable fill contrast",1.05/(luminance(button.getPixel(40,8))+.05)>=4.5);button.recycle();
+      s.hero.setState(2,s.below,false);if(light)assertTrue((luminance(CobraProUi.PALE)+.05)/(luminance(s.hero.info.eyebrow.getCurrentTextColor())+.05)>=4.5);s.close();}
   }
   @Test public void largeFontsKeepNavigationAndPlayerTargetsUsable()throws Exception{
     Scene s=new Scene(true,2,320,640);android.content.res.Configuration original=new android.content.res.Configuration(s.activity.getResources().getConfiguration());

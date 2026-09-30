@@ -37,7 +37,7 @@ def main():
     if (mRoot != null) mRoot.setBackgroundColor(page);
     if (mStage != null) mStage.setBackgroundColor(page);
     if (mCobraGuideShell != null) mCobraGuideShell.setBackgroundColor(page);
-    if (mCobraBrowserHost != null) mCobraBrowserHost.setBackgroundColor(page);
+    if (mCobraGuideBrowser != null) mCobraGuideBrowser.setBackgroundColor(page);
   }'''
     new = old[:start] + style + old[end:]
     assert old[:start] == new[:start] and old[end:] == new[start+len(style):]

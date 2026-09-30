@@ -112,7 +112,7 @@ final class CobraProUi {
       if("left".equals(glyph)||"right".equals(glyph)){icon(c,p,glyph,"left".equals(glyph)?0:w-den*24,(h-den*24)/2,den*24,ink);return;}
       float pad=den*2,r=Math.min(den*14,h*.45f);float bh=stack?h-den*17:h;
       RectF b=new RectF(pad,pad,w-pad,bh-pad);p.setStyle(Paint.Style.FILL);p.setAlpha(isEnabled()?255:115);
-      p.setShader(new LinearGradient(0,0,0,bh,active?(primary?new int[]{0xff1397b5,0xff086384}:light&&!overlay?new int[]{0xffeffcff,0xffdbeefa}:new int[]{0xff185464,0xff092e39}):overlay?new int[]{0xc92a3e49,0xdf071219}:light?new int[]{0xfffdfeff,0xfff0f6fa}:new int[]{0xff1b2b34,0xff081219},null,Shader.TileMode.CLAMP));
+      p.setShader(new LinearGradient(0,0,0,bh,active?(primary?new int[]{0xff087c96,0xff075674}:light&&!overlay?new int[]{0xffeffcff,0xffdbeefa}:new int[]{0xff185464,0xff092e39}):overlay?new int[]{0xc92a3e49,0xdf071219}:light?new int[]{0xfffdfeff,0xfff0f6fa}:new int[]{0xff1b2b34,0xff081219},null,Shader.TileMode.CLAMP));
       c.drawRoundRect(b,r,r,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(den*(active?1.4f:1));p.setColor(active?CYAN:overlay?0xff7695a8:light?0xffcfdfeb:0xff436171);c.drawRoundRect(b,r,r,p);p.setStyle(Paint.Style.FILL);
       float fs=12f*getResources().getDisplayMetrics().scaledDensity;boolean narrow=w<den*116;
       if(stack){icon(c,p,glyph,w/2-den*11,Math.max(den*6,(bh-den*22)/2),den*22,ink);p.setTextSize(Math.min(fs,11*den*font(getContext())));p.setTypeface(Typeface.create("sans-serif",0));p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);String t=fit(label,p,w-den*4);c.drawText(t,w/2,h-den*2,p);}
@@ -141,7 +141,7 @@ final class CobraProUi {
     final Ink eyebrow,title,time,next;final Progress progress;final Logo logo;boolean inside=true,light;Program data=new Program();
     Details(Context c,boolean light){super(c);this.light=light;setTag("pro_program_information");eyebrow=new Ink(c,CYAN,10,false);title=new Ink(c,Color.WHITE,22,true);time=new Ink(c,0xffdceaf4,12,false);next=new Ink(c,0xffdceaf4,12,false);progress=new Progress(c);logo=new Logo(c,light);for(View v:new View[]{eyebrow,title,time,next,progress,logo})addView(v);}
     void bind(Program d,Art art){data=d;eyebrow.text((inside?"":"NOW PLAYING  /  ")+d.channel);title.text(d.title);time.text(d.schedule);next.text(d.next.isEmpty()?"":"Next  "+d.next);progress.value(d.progress);logo.bind(d.channel,d.logo,art);style(inside);}
-    void style(boolean in){inside=in;int text=in?Color.WHITE:light?INK:Color.WHITE,secondary=in?0xffdceaf4:light?MUTED:0xffa9c2d4;title.ink(text);time.ink(secondary);next.ink(secondary);progress.dark=in||!light;eyebrow.text((in?"":"NOW PLAYING  /  ")+data.channel);logo.setVisibility(in?GONE:VISIBLE);requestLayout();}
+    void style(boolean in){inside=in;int text=in?Color.WHITE:light?INK:Color.WHITE,secondary=in?0xffdceaf4:light?MUTED:0xffa9c2d4;title.ink(text);time.ink(secondary);next.ink(secondary);eyebrow.ink(in||!light?CYAN:0xff087b9c);progress.dark=in||!light;eyebrow.text((in?"":"NOW PLAYING  /  ")+data.channel);logo.setVisibility(in?GONE:VISIBLE);requestLayout();}
     static int height(Context c,boolean in){return px(c,(in?104:122)+Math.max(0,font(c)-1)*65);}
     @Override protected void onMeasure(int ws,int hs){setMeasuredDimension(MeasureSpec.getSize(ws),MeasureSpec.getSize(hs));}
     @Override protected void onLayout(boolean ch,int l,int t,int r,int b){int w=r-l,h=b-t,d=px(getContext(),inside?20:12),f=px(getContext(),font(getContext()));int side=!inside&&w>=px(getContext(),330)?px(getContext(),54):0;
