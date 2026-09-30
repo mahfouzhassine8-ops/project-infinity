@@ -67,11 +67,11 @@ public class PhoneGlassTest {
   }
   @Test public void actualDrawerAndChooserKeepTheirDestinationsAndFiveLayouts()throws Exception{
     for(boolean light:new boolean[]{false,true}){
-      InfinityLiveActivity a=activity(light,412,915);call(a,"toggleCobraDrawer");View decor=a.getWindow().getDecorView();layout(decor,412,915);View drawer=decor.findViewWithTag("cobra_experience_drawer");assertNotNull(drawer);
+      InfinityLiveActivity a=activity(light,412,915);call(a,"toggleCobraDrawer");View decor=a.getWindow().getDecorView();View drawer=decor.findViewWithTag("cobra_experience_drawer");assertNotNull(drawer);layout(drawer,412,915);View panel=((ViewGroup)drawer).getChildAt(0);panel.animate().cancel();panel.setTranslationX(0);panel.setAlpha(1);
       for(String destination:new String[]{"SEARCH","TV","MOVIES","SHOWS","RECORDINGS","MY LIST","SETTINGS"}){View row=drawer.findViewWithTag("cobra-destination:"+destination);assertNotNull(destination,row);assertTrue(row.getBackground() instanceof CobraVisualRenderer.Glass);}
-      assertNotNull(drawer.findViewWithTag("cobra-drawer-view"));assertNotNull(drawer.findViewWithTag("cobra_drawer_power"));save(decor,"drawer-"+light);assertEquals(true,call(a,"closeCobraExperienceDrawer"));assertNull(decor.findViewWithTag("cobra_experience_drawer"));
-      call(a,"cobraPremiumViewMenu");layout(decor,412,915);for(String mode:new String[]{"mobile","grid","compact","cards","focus"}){View card=decor.findViewWithTag("cobra-view-mode:"+mode);assertNotNull(mode,card);assertTrue(card.getBackground() instanceof CobraVisualRenderer.Glass);assertEquals(mode.equals("mobile"),card.isSelected());}
-      save(decor,"chooser-"+light);call(a,"closeCobraActionSheet");a.finish();
+      assertNotNull(drawer.findViewWithTag("cobra-drawer-view"));assertNotNull(drawer.findViewWithTag("cobra_drawer_power"));save(drawer,"drawer-"+light);assertEquals(true,call(a,"closeCobraExperienceDrawer"));assertNull(decor.findViewWithTag("cobra_experience_drawer"));
+      call(a,"cobraPremiumViewMenu");View chooser=(View)get(a,"mCobraActionSheet");layout(chooser,412,915);View chooserPanel=((ViewGroup)chooser).getChildAt(0);chooserPanel.animate().cancel();chooserPanel.setAlpha(1);chooserPanel.setTranslationY(0);chooserPanel.setScaleX(1);chooserPanel.setScaleY(1);for(String mode:new String[]{"mobile","grid","compact","cards","focus"}){View card=decor.findViewWithTag("cobra-view-mode:"+mode);assertNotNull(mode,card);assertTrue(card.getBackground() instanceof CobraVisualRenderer.Glass);assertEquals(mode.equals("mobile"),card.isSelected());}
+      save(chooser,"chooser-"+light);call(a,"closeCobraActionSheet");a.finish();
     }
   }
   @Test public void stateTransitionsKeepHitGeometryAndProduceVisibleSelection()throws Exception{
