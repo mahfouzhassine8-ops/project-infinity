@@ -94,6 +94,11 @@ def transform(s):
       });
     }cobraRevealDisplaySelection(rows);
   }''')
+    a,b=span(s,'cobraShowPlaybackDefaults');default=s[a:b]
+    default=once(default,'cobraAspectLabel(selected),null,"cobra-default-aspect:"','cobraAspectLabel(selected),cobraDisplayDescription(selected),"cobra-default-aspect:"')
+    default=once(default,'cobraShowPlaybackDefaults();});}\n    });','cobraShowPlaybackDefaults();});}cobraRevealDisplaySelection(choices);\n    });')
+    default=once(default,'Inherited in fullscreen. Previews keep Best Fit. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.','Inherited in fullscreen. Previews keep the complete picture. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.')
+    s=s[:a]+default+s[b:]
     a,b=span(s,'cobraShowChannelCustomAspect');old=s[a:b]
     new=old[:-1]+r'''  cobraAddDetail(rows,"recent","Reset width & height","Return both to 100%","cobra-channel-custom-reset",false,()->{
       CobraChannelPreferences p=cobraReadPreferences(key);p.aspect=11;p.x=1f;p.y=1f;

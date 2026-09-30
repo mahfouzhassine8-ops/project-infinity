@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse,hashlib,json,sys
 import apply as repair
-ALLOWED=['showCobraAspectPicker','cobraShowChannelAspect','cobraShowChannelCustomAspect','showPlayerSettingsDrawer','cobraBuildPlayerChrome','cobraOpenSheet','cobraRenderPlayerDrawer','cobraRefreshPlayingIndicators','cobraFitVideo']
+ALLOWED=['showCobraAspectPicker','cobraShowChannelAspect','cobraShowChannelCustomAspect','cobraShowPlaybackDefaults','showPlayerSettingsDrawer','cobraBuildPlayerChrome','cobraOpenSheet','cobraRenderPlayerDrawer','cobraRefreshPlayingIndicators','cobraFitVideo']
 def main():
  p=argparse.ArgumentParser();p.add_argument('--baseline',type=Path,required=True);p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
  before=(a.baseline/'shell-kodi'/repair.ACTIVITY).read_text();after=(a.root/'shell-kodi'/repair.ACTIVITY).read_text();assert repair.sha(before.encode())==repair.PARENT_HASH

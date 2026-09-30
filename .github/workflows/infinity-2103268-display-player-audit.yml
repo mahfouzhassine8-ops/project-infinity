@@ -96,7 +96,10 @@ jobs:
           for c in t.findall('testcase'):
             f=c.find('failure')
             if c.attrib['name'].startswith('everyDisplayChoice'):assert f is None
-            else:assert f is not None and f.attrib['type']=='java.lang.AssertionError',(c.attrib,f.attrib if f is not None else None)
+            else:
+              expected={'fullscreenBestFit':'No unexplained','displayScrollAffordance':'15 choices must announce scrolling','channelCustomReset':'cobra-channel-custom-reset','allFiveTransport':'escapes pane','channelsDot':'Actual player Channels must carry locked playing dot'}
+              message=next(v for k,v in expected.items() if c.attrib['name'].startswith(k))
+              assert f is not None and f.attrib['type']=='java.lang.AssertionError' and message in f.attrib.get('message',''),(c.attrib,f.attrib if f is not None else None)
           PY
       - name: Apply scoped forward repairs and source-preservation gate
         run: |
