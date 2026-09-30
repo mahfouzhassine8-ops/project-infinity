@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse,shutil,ast,importlib.util
 p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--evidence',type=Path,required=True);p.add_argument('--inherited',action='store_true');a=p.parse_args();here=Path(__file__).resolve().parent
 out=a.build/'xbmc/src/test/java/com/projectinfinity/kodi';out.mkdir(parents=True,exist_ok=True)
+a.evidence.mkdir(parents=True,exist_ok=True)
 paths=['cobra-navigation-2103157/tests/CobraNavigationUiTest.java','cobra-player-refinement-2103202/tests/Cobra2103202LifecycleTest.java','cobra-player-polish-2103201/tests/Cobra2103201ScrubberTest.java','cobra-player-polish-2103201/tests/Cobra2103201SubtitleTest.java','cobra-player-polish-2103201/tests/Cobra2103201MenuPolishTest.java','cobra-power-audit-2103199/tests/Cobra2103199DisplayRegressionTest.java','cobra-pip-call-2103203/tests/Cobra2103203PipControlsTest.java','cobra-media-calls-2103206/tests/Cobra2103206MediaCallsTest.java','multiview-stability-fill-2103229/tests/Cobra2103229MultiViewStabilityFillTest.java']
 for n in paths:shutil.copy2(here.parent/n,out/Path(n).name)
 for n in ['cobra-feature-refinement-2103207/tests/Cobra2103207CallIntegrationTest.java','cobra-feature-refinement-2103207/tests/Cobra2103207AudioStateTest.java','cobra-pip-call-2103203/tests/Cobra2103203SubtitleClarityTest.java']:shutil.copy2(here.parent/n,out/Path(n).name)
