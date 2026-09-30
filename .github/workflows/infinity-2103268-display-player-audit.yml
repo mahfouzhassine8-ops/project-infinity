@@ -121,7 +121,7 @@ jobs:
           cd build268
           ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
             --tests '*Cobra2103268ProductAuditTest' --tests '*Cobra2103201ScrubberTest' \
-            --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103202LifecycleTest' \
+            --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103201MenuPolishTest' --tests '*Cobra2103202LifecycleTest' \
             --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest' \
             --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest' \
             --tests '*Cobra2103229MultiViewStabilityFillTest' \
@@ -137,7 +137,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import json,hashlib,xml.etree.ElementTree as E
-          files=list(Path('build268/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==19,len(files)
+          files=list(Path('build268/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==20,len(files)
           counts={}
           for f in files:
             t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
