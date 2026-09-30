@@ -122,7 +122,7 @@ public class ProVisualTest {
   @Test public void liveBadgeRendersRedTextAndCyanGlassInEveryStateAndTheme()throws Exception{
     for(boolean light:new boolean[]{true,false})for(float font:new float[]{1,2})for(int state=0;state<3;state++){
       Scene s=new Scene(light,state,320,640,font);assertEquals("LIVE",s.hero.live.getText().toString());s.hero.live.setTextColor(Color.WHITE);assertEquals(0xffff6b75,s.hero.live.getCurrentTextColor());
-      Bitmap bg=Bitmap.createBitmap(s.hero.live.getWidth(),s.hero.live.getHeight(),Bitmap.Config.ARGB_8888);s.hero.live.getBackground().draw(new Canvas(bg));
+      Bitmap bg=Bitmap.createBitmap(s.hero.live.getWidth(),s.hero.live.getHeight(),Bitmap.Config.ARGB_8888);s.hero.live.getBackground().setBounds(0,0,bg.getWidth(),bg.getHeight());s.hero.live.getBackground().draw(new Canvas(bg));
       assertTrue("red LIVE label must retain 4.5:1 contrast over the capsule fill",(luminance(s.hero.live.getCurrentTextColor())+.05)/(luminance(bg.getPixel(bg.getWidth()/2,3))+.05)>=4.5);
       Bitmap badge=Bitmap.createBitmap(bg.getWidth(),bg.getHeight(),Bitmap.Config.ARGB_8888);s.hero.live.draw(new Canvas(badge));int red=0,cyan=0;
       for(int y=0;y<badge.getHeight();y++)for(int x=0;x<badge.getWidth();x++){int c=badge.getPixel(x,y);if(Color.red(c)>180&&Color.red(c)>Color.green(c)*1.5&&Color.red(c)>Color.blue(c)*1.4)red++;if(Color.green(c)>130&&Color.blue(c)>160&&Color.red(c)<90)cyan++;}
