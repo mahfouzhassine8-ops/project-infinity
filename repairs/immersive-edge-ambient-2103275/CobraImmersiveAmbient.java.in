@@ -1,0 +1,339 @@
+package @APP_PACKAGE@;
+
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.TextureView;
+import android.view.View;
+import android.view.animation.PathInterpolator;
+
+/**
+ * Presentation-only mini-player ambient renderer.
+ *
+ * The directional edge-projection approach is adapted from the MIT-licensed
+ * x-ambient project by mmnga (https://github.com/mmnga/x-ambient). Cobra keeps
+ * playback ownership in InfinityLiveActivity; this view only samples the
+ * already-visible TextureView at low resolution and draws behind the UI.
+ */
+final class CobraImmersiveAmbient extends View {
+  static final int SAMPLE_WIDTH = 144;
+  static final int MIN_SAMPLE_HEIGHT = 48;
+  static final int MAX_SAMPLE_HEIGHT = 144;
+  static final long FRAME_INTERVAL_MS = 83L; // <= ~12 fps, matching the reference design.
+  static final int RAY_STEPS = 48;
+  static final float SATURATION = 1.65f;
+
+  private final Handler main = new Handler(Looper.getMainLooper());
+  private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG);
+  private final Rect src = new Rect();
+  private final RectF dst = new RectF();
+  private final RectF sourceRect = new RectF();
+  private final int[] selfLocation = new int[2];
+  private final int[] hostLocation = new int[2];
+  private final ColorMatrixColorFilter saturation;
+  private TextureView source;
+  private View sourceHost;
+  private Bitmap raw;
+  private Bitmap smoothed;
+  private boolean enabled;
+  private boolean animateFrames;
+  private boolean haveFrame;
+  private boolean lightAppearance;
+  private boolean released;
+  private boolean scheduled;
+  private long lastCapture;
+  private ValueAnimator visibilityAnimator;
+  private int captures;
+  private boolean testFrameMode;
+  private boolean testPlainRendering;
+
+  private final Runnable frame = new Runnable() {
+    @Override public void run() {
+      scheduled = false;
+      if (!enabled || released || !isAttachedToWindow()) return;
+      long now = android.os.SystemClock.uptimeMillis();
+      if (now - lastCapture >= FRAME_INTERVAL_MS) {
+        capture();
+        lastCapture = now;
+      }
+      if (animateFrames) schedule();
+    }
+  };
+
+  static boolean eligible(int mode, boolean visualAllowed, boolean fullscreen, boolean multiView, boolean pip,
+      boolean background, boolean shellAttached, boolean hostVisible, boolean textureReady, boolean playerReady) {
+    return mode == CobraPresentationEffects.IMMERSIVE && visualAllowed && !fullscreen && !multiView && !pip
+        && !background && shellAttached && hostVisible && textureReady && playerReady;
+  }
+
+  CobraImmersiveAmbient(Context context) {
+    super(context);
+    setTag("cobra_immersive_edge_ambient");
+    setClickable(false);
+    setFocusable(false);
+    setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+    setWillNotDraw(false);
+    setAlpha(0f);
+    ColorMatrix matrix = new ColorMatrix();
+    matrix.setSaturation(SATURATION);
+    saturation = new ColorMatrixColorFilter(matrix);
+    paint.setColorFilter(saturation);
+    if (Build.VERSION.SDK_INT >= 31) {
+      float density = getResources().getDisplayMetrics().density;
+      Api31.blur(this, Math.max(18f, 18f * density)); // ~56 physical px on common Fold densities.
+    }
+  }
+
+  void bind(TextureView texture, View host, boolean light) {
+    if (source != texture) {
+      source = texture;
+      sourceHost = host;
+      clearFrames();
+    } else sourceHost = host;
+    if (lightAppearance != light) {
+      lightAppearance = light;
+      invalidate();
+    }
+  }
+
+  void state(boolean active, boolean moving) {
+    if (released) return;
+    animateFrames = active && moving;
+    if (enabled == active) {
+      if (enabled && !haveFrame) capture();
+      if (animateFrames) schedule(); else cancelSchedule();
+      return;
+    }
+    enabled = active;
+    if (active) {
+      setVisibility(VISIBLE);
+      capture();
+      fadeTo(1f, 260L);
+      if (animateFrames) schedule();
+    } else {
+      cancelSchedule();
+      fadeTo(0f, 180L);
+    }
+  }
+
+  void release() {
+    released = true;
+    enabled = false;
+    animateFrames = false;
+    cancelSchedule();
+    if (visibilityAnimator != null) visibilityAnimator.cancel();
+    visibilityAnimator = null;
+    clearFrames();
+    source = null;
+    sourceHost = null;
+  }
+
+  boolean isAmbientActive() { return enabled; }
+  int captureCount() { return captures; }
+  RectF sourceBoundsForTest() { return new RectF(sourceRect); }
+
+  private void fadeTo(float value, long duration) {
+    if (visibilityAnimator != null) visibilityAnimator.cancel();
+    if (!isAttachedToWindow() || Build.VERSION.SDK_INT < 11) {
+      setAlpha(value);
+      if (value == 0f) setVisibility(INVISIBLE);
+      return;
+    }
+    float start = getAlpha();
+    visibilityAnimator = ValueAnimator.ofFloat(start, value);
+    visibilityAnimator.setDuration(duration);
+    visibilityAnimator.setInterpolator(new PathInterpolator(.2f, 0f, 0f, 1f));
+    visibilityAnimator.addUpdateListener(a -> setAlpha((Float) a.getAnimatedValue()));
+    visibilityAnimator.addListener(new android.animation.AnimatorListenerAdapter() {
+      @Override public void onAnimationEnd(android.animation.Animator animation) {
+        if (!enabled && value == 0f) setVisibility(INVISIBLE);
+      }
+    });
+    visibilityAnimator.start();
+  }
+
+  private void schedule() {
+    if (scheduled || released || !enabled || !animateFrames) return;
+    scheduled = true;
+    main.postDelayed(frame, FRAME_INTERVAL_MS);
+  }
+
+  private void cancelSchedule() {
+    scheduled = false;
+    main.removeCallbacks(frame);
+  }
+
+  private void clearFrames() {
+    haveFrame = false;
+    testFrameMode = false;
+    captures = 0;
+    if (raw != null) raw.recycle();
+    if (smoothed != null) smoothed.recycle();
+    raw = null;
+    smoothed = null;
+    invalidate();
+  }
+
+  private void ensureBuffers(int width, int height) {
+    if (raw != null && raw.getWidth() == width && raw.getHeight() == height
+        && smoothed != null && smoothed.getWidth() == width && smoothed.getHeight() == height) return;
+    clearFrames();
+    raw = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    smoothed = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+  }
+
+  private boolean capture() {
+    testFrameMode = false;
+    TextureView texture = source;
+    View host = sourceHost;
+    if (!enabled || texture == null || host == null || !texture.isAvailable()
+        || !texture.isShown() || !host.isShown() || texture.getWidth() < 2 || texture.getHeight() < 2) return false;
+    int width = SAMPLE_WIDTH;
+    int height = Math.max(MIN_SAMPLE_HEIGHT, Math.min(MAX_SAMPLE_HEIGHT,
+        Math.round(width * (texture.getHeight() / (float) texture.getWidth()))));
+    ensureBuffers(width, height);
+    Bitmap value;
+    try { value = texture.getBitmap(raw); }
+    catch (RuntimeException unavailable) { return false; }
+    if (value == null) return false;
+    Canvas blend = new Canvas(smoothed);
+    if (!haveFrame) {
+      blend.drawColor(Color.TRANSPARENT, android.graphics.PorterDuff.Mode.CLEAR);
+      paint.setAlpha(255);
+      paint.setColorFilter(null);
+      blend.drawBitmap(raw, 0, 0, paint);
+      haveFrame = true;
+    } else {
+      // Temporal low-pass: scene changes stay responsive without flashing the whole UI.
+      paint.setAlpha(112);
+      paint.setColorFilter(null);
+      blend.drawBitmap(raw, 0, 0, paint);
+    }
+    paint.setColorFilter(saturation);
+    captures++;
+    updateSourceRect();
+    invalidate();
+    if (getAlpha() < .05f) fadeTo(1f, 260L);
+    return true;
+  }
+
+  private void updateSourceRect() {
+    if (testFrameMode) return;
+    View host = sourceHost;
+    if (host == null || getWidth() <= 0 || getHeight() <= 0) { sourceRect.setEmpty(); return; }
+    getLocationOnScreen(selfLocation);
+    host.getLocationOnScreen(hostLocation);
+    float left = hostLocation[0] - selfLocation[0];
+    float top = hostLocation[1] - selfLocation[1];
+    sourceRect.set(left, top, left + host.getWidth(), top + host.getHeight());
+  }
+
+  @Override protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    if (enabled) { capture(); if (animateFrames) schedule(); }
+  }
+
+  @Override protected void onDetachedFromWindow() {
+    cancelSchedule();
+    super.onDetachedFromWindow();
+  }
+
+  @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+    updateSourceRect();
+  }
+
+  @Override protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+    if (!enabled || !haveFrame || smoothed == null || smoothed.isRecycled()) return;
+    updateSourceRect();
+    if (sourceRect.width() <= 1f || sourceRect.height() <= 1f || getWidth() <= 1 || getHeight() <= 1) return;
+
+    final float cx = sourceRect.centerX(), cy = sourceRect.centerY();
+    final float halfWidth = sourceRect.width() * .5f, halfHeight = sourceRect.height() * .5f;
+    final float outerScale = Math.max(1f, Math.max(Math.max(cx / Math.max(1f, halfWidth),
+        (getWidth() - cx) / Math.max(1f, halfWidth)), Math.max(cy / Math.max(1f, halfHeight),
+        (getHeight() - cy) / Math.max(1f, halfHeight))));
+    final float density = getResources().getDisplayMetrics().density;
+    final float reach = Math.max(120f * density, Math.min(getWidth(), getHeight()) * .44f);
+    final int edgeX = Math.max(1, Math.round(smoothed.getWidth() * .045f));
+    final int edgeY = Math.max(1, Math.round(smoothed.getHeight() * .045f));
+    final int baseAlpha = lightAppearance ? 118 : 172;
+
+    paint.setColorFilter(saturation);
+    // A faint enlarged copy gives the same broad field feel as the reference renderer;
+    // directional edge strips below remain the dominant visible component.
+    paint.setAlpha(lightAppearance ? 18 : 26);
+    float broadX = Math.min(getWidth() * .22f, sourceRect.width() * .65f);
+    float broadY = Math.min(getHeight() * .22f, sourceRect.height() * .65f);
+    dst.set(sourceRect.left - broadX, sourceRect.top - broadY,
+        sourceRect.right + broadX, sourceRect.bottom + broadY);
+    canvas.drawBitmap(smoothed, null, dst, paint);
+
+    for (int i = 0; i < RAY_STEPS; i++) {
+      float inner = 1f + (outerScale - 1f) * i / RAY_STEPS;
+      float outer = 1f + (outerScale - 1f) * (i + 1f) / RAY_STEPS;
+      float left = cx - halfWidth * outer, top = cy - halfHeight * outer;
+      float bandX = halfWidth * (outer - inner) + 1.2f;
+      float bandY = halfHeight * (outer - inner) + 1.2f;
+      float alphaX = (float) Math.exp(-halfWidth * (inner - 1f) / reach);
+      float alphaY = (float) Math.exp(-halfHeight * (inner - 1f) / reach);
+
+      paint.setAlpha(Math.max(0, Math.min(255, Math.round(baseAlpha * alphaY))));
+      src.set(0, 0, smoothed.getWidth(), edgeY);
+      dst.set(left, top, cx + halfWidth * outer, top + bandY);
+      canvas.drawBitmap(smoothed, src, dst, paint);
+      src.set(0, smoothed.getHeight() - edgeY, smoothed.getWidth(), smoothed.getHeight());
+      dst.set(left, cy + halfHeight * inner - .6f, cx + halfWidth * outer,
+          cy + halfHeight * inner - .6f + bandY);
+      canvas.drawBitmap(smoothed, src, dst, paint);
+
+      paint.setAlpha(Math.max(0, Math.min(255, Math.round(baseAlpha * alphaX))));
+      src.set(0, 0, edgeX, smoothed.getHeight());
+      dst.set(left, cy - halfHeight * inner, left + bandX, cy + halfHeight * inner + .6f);
+      canvas.drawBitmap(smoothed, src, dst, paint);
+      src.set(smoothed.getWidth() - edgeX, 0, smoothed.getWidth(), smoothed.getHeight());
+      dst.set(cx + halfWidth * inner - .6f, cy - halfHeight * inner,
+          cx + halfWidth * inner - .6f + bandX, cy + halfHeight * inner + .6f);
+      canvas.drawBitmap(smoothed, src, dst, paint);
+    }
+    paint.setAlpha(255);
+  }
+
+  @android.annotation.TargetApi(31)
+  private static final class Api31 {
+    static void blur(View view, float radius) {
+      view.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(radius, radius, android.graphics.Shader.TileMode.CLAMP));
+    }
+    static void clear(View view) { view.setRenderEffect(null); }
+  }
+
+  // Deterministic rendering hooks for tests; production never calls these.
+  void testPlainRendering(boolean value) {
+    testPlainRendering = value;
+    if (Build.VERSION.SDK_INT >= 31) {
+      if (value) Api31.clear(this);
+      else {
+        float density = getResources().getDisplayMetrics().density;
+        Api31.blur(this, Math.max(18f, 18f * density));
+      }
+    }
+  }
+  void testFrame(Bitmap bitmap, RectF rect, boolean light) {
+    if (bitmap == null) return;
+    ensureBuffers(bitmap.getWidth(), bitmap.getHeight());
+    Canvas c = new Canvas(smoothed);c.drawColor(Color.TRANSPARENT, android.graphics.PorterDuff.Mode.CLEAR);
+    paint.setColorFilter(null);paint.setAlpha(255);c.drawBitmap(bitmap, 0, 0, paint);paint.setColorFilter(saturation);
+    haveFrame = true;enabled = true;testFrameMode = true;lightAppearance = light;sourceRect.set(rect);setAlpha(1f);setVisibility(VISIBLE);invalidate();
+  }
+}
