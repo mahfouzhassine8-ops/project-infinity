@@ -26,9 +26,12 @@ public class ProVisualTest {
   static class Scene {
     final ActivityController<Activity> ctl;final Activity activity;final FrameLayout root,video;final LinearLayout below,browser;final CobraProUi.Hero hero;final CobraProUi.Filters filters;final Calls calls=new Calls();final boolean light;final int width,height;
     Scene(boolean light,int state,int width,int height)throws Exception{
+      this(light,state,width,height,1);
+    }
+    Scene(boolean light,int state,int width,int height,float font)throws Exception{
       RuntimeEnvironment.setQualifiers("w"+width+"dp-h"+height+"dp-mdpi");this.width=width;this.height=height;this.light=light;
-      ctl=Robolectric.buildActivity(Activity.class).setup();activity=ctl.get();root=new FrameLayout(activity);root.setBackgroundColor(light?CobraProUi.PALE:Color.BLACK);activity.setContentView(root);
-      int[][] r=CobraProUi.geometry(width,height,1,state);
+      ctl=Robolectric.buildActivity(Activity.class).setup();activity=ctl.get();android.content.res.Configuration cfg=new android.content.res.Configuration(activity.getResources().getConfiguration());cfg.fontScale=font;activity.getResources().updateConfiguration(cfg,activity.getResources().getDisplayMetrics());root=new FrameLayout(activity);root.setBackgroundColor(light?CobraProUi.PALE:Color.BLACK);activity.setContentView(root);
+      int[][] r=CobraProUi.geometry(width,height,font,state);
       LinearLayout header=new LinearLayout(activity);header.setGravity(Gravity.CENTER_VERTICAL);CobraProUi.Action menu=new CobraProUi.Action(activity,"list","",false,light,()->{});menu.setContentDescription("Open Cobra navigation");header.addView(menu,new LinearLayout.LayoutParams(48,48));LinearLayout headerCopy=new LinearLayout(activity);headerCopy.setOrientation(1);headerCopy.setPadding(10,0,0,0);CobraProUi.Ink name=new CobraProUi.Ink(activity,light?CobraProUi.INK:Color.WHITE,22,true);name.text("Pro");headerCopy.addView(name);CobraProUi.Ink count=new CobraProUi.Ink(activity,light?CobraProUi.MUTED:0xffaacadd,10,false);count.text("COBRA LIVE  ·  TEST CHANNEL DATA");headerCopy.addView(count);header.addView(headerCopy,new LinearLayout.LayoutParams(0,-2,1));header.addView(new CobraProUi.Action(activity,"more","",false,light,()->{}),new LinearLayout.LayoutParams(48,48));header.addView(new CobraProUi.Action(activity,"groups","",false,light,()->{}),new LinearLayout.LayoutParams(48,48));root.addView(header,rect(r[0]));
       video=new FrameLayout(activity);video.setBackgroundColor(Color.BLACK);root.addView(video,rect(r[1]));ImageView frame=new ImageView(activity);frame.setScaleType(ImageView.ScaleType.CENTER_CROP);
       File fixture=new File(System.getProperty("pro.fixture",""));if(fixture.isFile()){byte[] bytes=java.nio.file.Files.readAllBytes(fixture.toPath());frame.setImageBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length));}else frame.setBackgroundColor(0xff145270);video.addView(frame,new FrameLayout.LayoutParams(-1,-1));
@@ -71,8 +74,9 @@ public class ProVisualTest {
   }
   @Test public void nativeScreenshotsAllStatesPhoneFoldAndLandscape()throws Exception{
     File out=new File(System.getProperty("pro.evidence","build/pro-evidence"));assertTrue(out.isDirectory()||out.mkdirs());
-    for(boolean light:new boolean[]{true,false})for(int[] size:new int[][]{{412,915},{320,640},{768,1024},{1024,600}})for(int state=0;state<3;state++){
-      Scene s=new Scene(light,state,size[0],size[1]);Bitmap b=Bitmap.createBitmap(size[0],size[1],Bitmap.Config.ARGB_8888);s.root.draw(new Canvas(b));try(FileOutputStream f=new FileOutputStream(new File(out,"pro-"+(light?"light":"oled")+"-"+state+"-"+size[0]+"x"+size[1]+".png"))){assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,f));}b.recycle();s.close();
+    for(float font:new float[]{1,2})for(boolean light:new boolean[]{true,false})for(int[] size:new int[][]{{412,915},{320,640},{768,1024},{1024,600}})for(int state=0;state<3;state++){
+      if(font>1&&size[0]>412)continue;
+      Scene s=new Scene(light,state,size[0],size[1],font);Bitmap b=Bitmap.createBitmap(size[0],size[1],Bitmap.Config.ARGB_8888);s.root.draw(new Canvas(b));try(FileOutputStream f=new FileOutputStream(new File(out,"pro-"+(light?"light":"oled")+"-"+state+"-"+(font>1?"font2-":"")+size[0]+"x"+size[1]+".png"))){assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,f));}b.recycle();s.close();
     }
   }
   @Test public void filtersStayInOneScrollableRowAndSearchRemainsReachable()throws Exception{
@@ -101,5 +105,12 @@ public class ProVisualTest {
       layout(s.filters,304,CobraProUi.Filters.height(s.activity,304));assertTrue(s.filters.getHeight()>=86);for(CobraProUi.Action a:s.filters.buttons){assertTrue(a.getWidth()>=156);assertTrue(a.getHeight()>=48);}
       layout(s.hero,304,207);for(CobraProUi.Action a:s.hero.player){assertTrue(a.getWidth()>=48);assertTrue(a.getHeight()>=48);}assertEquals(Typeface.create("sans-serif-medium",Typeface.NORMAL),s.hero.info.title.getTypeface());
     }finally{s.activity.getResources().updateConfiguration(original,s.activity.getResources().getDisplayMetrics());s.close();}
+  }
+  @Test public void lightWatchingControlsRenderDarkLabelsOutsideTheirPills()throws Exception{
+    for(float font:new float[]{1,2}){Scene s=new Scene(true,2,320,640,font);for(CobraProUi.Action a:s.hero.player){assertTrue(a.light);assertFalse(a.overlay);
+      Bitmap b=Bitmap.createBitmap(a.getWidth(),a.getHeight(),Bitmap.Config.ARGB_8888);b.eraseColor(CobraProUi.PALE);a.draw(new Canvas(b));int dark=0;int labelHeight=Math.round(17+(font-1)*12);
+      for(int y=b.getHeight()-labelHeight;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++){int c=b.getPixel(x,y);if(Color.red(c)<80&&Color.green(c)<90&&Color.blue(c)<100)dark++;}
+      assertTrue("Watching label must be visible on the light transport bed: "+a.label,dark>8);b.recycle();}
+      assertTrue(s.hero.info.title.getBottom()<=s.below.getHeight());s.close();}
   }
 }

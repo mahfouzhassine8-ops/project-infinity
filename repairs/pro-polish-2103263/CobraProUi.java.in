@@ -23,8 +23,8 @@ final class CobraProUi {
   }
   /** Measured-window policy used by both the actual Focus shell and tests; dp units. */
   static int[][] geometry(int width,int height,float font,int state){
-    int w=Math.max(1,width),h=Math.max(1,height),top=h<500?48:56,gap=8;
-    float f=Math.max(1,Math.min(2,font));int info=state==WATCHING?Math.round(122+(f-1)*65):0;
+    int w=Math.max(1,width),h=Math.max(1,height),gap=8;
+    float f=Math.max(1,Math.min(2,font));int top=Math.round((h<500?48:56)+(f-1)*32),info=state==WATCHING?Math.round(122+(f-1)*65):0;
     int[][] r=new int[4][4];r[0]=new int[]{0,0,w,top};int y=top+gap,avail=Math.max(0,h-y);
     boolean wide=w>=700&&w>h;
     if(wide){int main=Math.round(w*.60f),vw=main;int vh=Math.min(Math.max(200,main*9/16+16),Math.max(80,avail-info-gap));
@@ -110,12 +110,12 @@ final class CobraProUi {
       }
       // Edge chevrons have 48dp targets but no solid pill over the programme text.
       if("left".equals(glyph)||"right".equals(glyph)){icon(c,p,glyph,"left".equals(glyph)?0:w-den*24,(h-den*24)/2,den*24,ink);return;}
-      float pad=den*2,r=Math.min(den*14,h*.45f);float bh=stack?h-den*17:h;
+      float pad=den*2,r=Math.min(den*14,h*.45f);float bh=stack?h-den*(17+Math.max(0,font(getContext())-1)*12):h;
       RectF b=new RectF(pad,pad,w-pad,bh-pad);p.setStyle(Paint.Style.FILL);p.setAlpha(isEnabled()?255:115);
       p.setShader(new LinearGradient(0,0,0,bh,active?(primary?new int[]{0xff087c96,0xff075674}:light&&!overlay?new int[]{0xffeffcff,0xffdbeefa}:new int[]{0xff185464,0xff092e39}):overlay?new int[]{0xc92a3e49,0xdf071219}:light?new int[]{0xfffdfeff,0xfff0f6fa}:new int[]{0xff1b2b34,0xff081219},null,Shader.TileMode.CLAMP));
       c.drawRoundRect(b,r,r,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(den*(active?1.4f:1));p.setColor(active?CYAN:overlay?0xff7695a8:light?0xffcfdfeb:0xff436171);c.drawRoundRect(b,r,r,p);p.setStyle(Paint.Style.FILL);
       float fs=12f*getResources().getDisplayMetrics().scaledDensity;boolean narrow=w<den*116;
-      if(stack){icon(c,p,glyph,w/2-den*11,Math.max(den*6,(bh-den*22)/2),den*22,ink);p.setTextSize(Math.min(fs,11*den*font(getContext())));p.setTypeface(Typeface.create("sans-serif",0));p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);String t=fit(label,p,w-den*4);c.drawText(t,w/2,h-den*2,p);}
+      if(stack){icon(c,p,glyph,w/2-den*11,Math.max(den*6,(bh-den*22)/2),den*22,ink);p.setTextSize(Math.min(fs,11*den*font(getContext())));p.setTypeface(Typeface.create("sans-serif",0));p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);String t=fit(label,p,w-den*4);c.drawText(t,w/2,h-den*4-p.descent(),p);}
       else if(narrow&&label.length()>0&&h>=den*50){icon(c,p,glyph,w/2-den*10,den*8,den*20,ink);p.setTypeface(Typeface.create("sans-serif",0));p.setTextSize(fs);p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);c.drawText(fit(label,p,w-den*6),w/2,h-den*10,p);}
       else {float s=den*21;p.setTextSize(fs);p.setTypeface(Typeface.create("sans-serif",0));float tw=label.isEmpty()?0:p.measureText(label);float x=(w-(s+(tw>0?den*8+tw:0)))/2;
         icon(c,p,glyph,Math.max(den*8,x),(h-s)/2,s,ink);if(tw>0){p.setTextSize(fs);p.setColor(ink);p.setTextAlign(Paint.Align.LEFT);float tx=Math.max(den*8,x)+s+den*8;c.drawText(fit(label,p,w-tx-den*8),tx,h/2-(p.ascent()+p.descent())/2,p);}}
@@ -171,7 +171,7 @@ final class CobraProUi {
       left=new Action(c,"left","",true,false,()->actions.step(-1));left.setContentDescription("Previous Pro source");left.setTag("cobra_pro_previous");addView(left);
       right=new Action(c,"right","",true,false,()->actions.step(1));right.setContentDescription("Next Pro source");right.setTag("cobra_pro_next");addView(right);
       String[] glyphs={"pause","favorite","cc","audio","fullscreen","more"},names={"Pause","Favorite","Subtitles","Audio","Fullscreen","More"};
-      for(int i=0;i<6;i++){final int index=i;player[i]=new Action(c,glyphs[i],names[i],true,false,()->actions.control(index));player[i].stack=true;player[i].setTag("pro_player_"+i);addView(player[i]);}
+      for(int i=0;i<6;i++){final int index=i;player[i]=new Action(c,glyphs[i],names[i],false,light,()->actions.control(index));player[i].stack=true;player[i].setTag("pro_player_"+i);addView(player[i]);}
       setState(RESTING,null,false);
     }
     void bind(Program d,int index,int count){hasChannel=!"Choose a channel".equals(d.channel);source.text(d.source);source.setContentDescription(d.source+", item "+(index+1)+" of "+count);live.text("LIVE");live.setVisibility(d.live?VISIBLE:GONE);logo.bind(d.channel,d.logo,art);info.bind(d,art);dots.index=index;dots.count=Math.min(6,Math.max(1,count));dots.invalidate();dots.setVisibility(count>1?VISIBLE:INVISIBLE);left.setVisibility(count>1?VISIBLE:GONE);right.setVisibility(count>1?VISIBLE:GONE);preview.setEnabled(hasChannel);status.text(d.status);player[1].setSelected(d.favorite);}

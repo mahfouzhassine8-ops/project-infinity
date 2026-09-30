@@ -91,7 +91,7 @@ jobs:
           from package_background_resume import verify_bytes
           apk=Path('signed263/Infinity-2103263-Pro-OLED-Light-Polish-RC1.apk')
           kept=verify_bytes(Path('parent262/Infinity-2103262-Pro-Visual-Correction-RC1.apk'),apk)
-          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':12,'ProActionsTest':5}
+          counts={'GlassChooserTest':6,'GlassOptionsTest':7,'GlassHealthFinishTest':7,'RecoveryFixedTest':8,'ProVisualTest':13,'ProActionsTest':5}
           for name,count in counts.items():
               t=ET.parse('build263/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml').getroot()
               assert int(t.attrib['tests'])==count,(name,t.attrib)
@@ -99,15 +99,15 @@ jobs:
           locked=Path('source262/screenshots/protected');current=Path('audit263/screenshots/protected')
           names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20
           for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
-          assert len(list(Path('audit263/screenshots/pro').glob('*.png')))==24
+          assert len(list(Path('audit263/screenshots/pro').glob('*.png')))==36
           with zipfile.ZipFile(apk) as z:
               assert not any('fixture' in n or 'ProVisualTest' in n or 'ProActionsTest' in n for n in z.namelist())
           source=json.loads(Path('audit263/source-verification.json').read_text())
           assert source['other_shell_files_byte_identical']==229
           assert source['all_activity_code_except_pro_style_byte_identical']
           result=json.loads(Path('signed263/background-resume-apk-audit.json').read_text());result.update(kept)
-          result.update(source_verification=source,test_methods=counts,automated_tests_passed=45,protected_render_equality=20,
-              pro_native_component_renders=24,pro_render_data='deterministic test fixtures, not a live provider',
+          result.update(source_verification=source,test_methods=counts,automated_tests_passed=46,protected_render_equality=20,
+              pro_native_component_renders=36,pro_render_data='deterministic test fixtures, not a live provider',
               action_test_player='fake player with unchanged production method bodies',physical_device_verified=False,
               real_stream_continuity_verified=False,visual_approval_pending=True,stable_lock=False)
           Path('signed263/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
