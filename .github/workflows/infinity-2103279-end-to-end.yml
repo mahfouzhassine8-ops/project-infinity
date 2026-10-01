@@ -19,6 +19,8 @@ jobs:
   audit-build:
     runs-on: ubuntu-22.04
     timeout-minutes: 65
+    outputs:
+      runtime_ready: ${{ steps.runtime.outcome == 'success' }}
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0}
@@ -75,6 +77,7 @@ jobs:
           set -euo pipefail
           python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent278/Infinity-2103278-Watch-Ambient-RC1.apk --build-dir build279 --out signed279 2>&1 | tee audit279/android-build.log
       - name: Compile signed-product Android instrumentation
+        id: runtime
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -92,6 +95,11 @@ jobs:
         with:
           name: Cobra-2103279-Runtime-Instrumentation
           path: instrumentation279/
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103279-Internal-Runtime-Candidate
+          path: signed279/
           retention-days: 90
       - name: Run surface event tests and extended feature audit and all locked regression suites
         run: |
@@ -144,6 +152,7 @@ jobs:
 
   android-runtime:
     needs: audit-build
+    if: ${{ always() && needs.audit-build.outputs.runtime_ready == 'true' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     steps:
@@ -151,7 +160,7 @@ jobs:
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: actions/download-artifact@v8
-        with: {name: Infinity-2103279-End-to-End-Repair-RC1-TEST-CANDIDATE, path: candidate279}
+        with: {name: Cobra-2103279-Internal-Runtime-Candidate, path: candidate279}
       - uses: actions/download-artifact@v8
         with: {name: Cobra-2103279-Runtime-Instrumentation, path: instrumentation279}
       - uses: actions/download-artifact@v8
