@@ -1,0 +1,124 @@
+name: Infinity | 2103279 Cobra End-to-End candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103279-end-to-end]
+    paths: ['.github/workflows/infinity-2103279-end-to-end.yml', 'repairs/end-to-end-2103279/**']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: end-to-end-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103278-Watch-Ambient-RC1-TEST-CANDIDATE
+          run-id: 36794611568
+          github-token: ${{ github.token }}
+          path: parent278
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103278-Watch-Ambient-RC1-Evidence
+          run-id: 36794611568
+          github-token: ${{ github.token }}
+          path: source278
+      - name: Verify exact locked source and create rollback before mutations
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD~1)" = 41f08774a8b908d60c0f9e6647497e40d6bbe081 || git merge-base --is-ancestor 41f08774a8b908d60c0f9e6647497e40d6bbe081 HEAD
+          mkdir -p audit279
+          git branch rollback-snapshot-2103278 41f08774a8b908d60c0f9e6647497e40d6bbe081
+          git bundle create audit279/locked-2103278-rollback.bundle rollback-snapshot-2103278
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import hashlib,tarfile,zipfile,json,shutil
+          src=Path('source278/reconstructed-2103278-shell.tar.gz');apk=Path('parent278/Infinity-2103278-Watch-Ambient-RC1.apk')
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=='5d14fd27c6b6cec97cd7b5a26a9febde9c0fe9f8e0d492fe5089eea53ea6af14'
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='473eed44dbe8bb6152ec895a96d034361c4fc8fb3217edb9b26cc753e0f631f7'
+          with tarfile.open(src) as t:t.extractall('.',filter='data')
+          assert Path('shell-kodi/tools/android/packaging/xbmc/src/CobraImmersiveAmbient.java.in').read_bytes()!=b''
+          shutil.copytree('shell-kodi','rollback278/shell-kodi');shutil.copy2(src,'audit279/locked-2103278-source.tar.gz')
+          with zipfile.ZipFile(apk) as z:Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          CHECK
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Apply bounded forward end-to-end repair
+        run: |
+          set -euo pipefail
+          python3 repairs/end-to-end-2103279/apply.py --root . --out audit279
+          python3 repairs/end-to-end-2103279/verify_source.py --baseline rollback278 --root . --out audit279
+      - name: Compile and permanently sign the candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent278/Infinity-2103278-Watch-Ambient-RC1.apk --build-dir build279 --out signed279 2>&1 | tee audit279/android-build.log
+      - name: Run surface event tests and extended feature audit and all locked regression suites
+        run: |
+          set -euo pipefail
+          python3 repairs/end-to-end-2103279/stage_tests.py --build build279
+          python3 repairs/end-to-end-2103279/run_tests.py
+      - name: Enforce protected renders and candidate-only acceptance
+        run: |
+          set -euo pipefail
+          python3 repairs/end-to-end-2103279/verify_source.py --baseline rollback278 --root . --out audit279
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,hashlib,xml.etree.ElementTree as E
+          counts={}
+          for f in Path('build279/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
+          assert len(counts)==50,counts
+          assert counts['com.projectinfinity.kodi.WholeUiAmbientTest']==23,counts
+          assert counts['com.projectinfinity.kodi.MiniPlayerFillTest']==13,counts
+          assert counts['com.projectinfinity.kodi.WatchAmbientTest']==26,counts
+          assert counts['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest']==9,counts
+          assert sum(counts.values())>=400,counts
+          locked=Path('source278/screenshots/protected');current=Path('audit279/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
+          report=json.loads(Path('signed279/background-resume-apk-audit.json').read_text());report.update(parent_locked_commit='41f08774a8b908d60c0f9e6647497e40d6bbe081',automated_tests_passed=sum(counts.values()),test_methods=counts,protected_render_equality=len(names),physical_device_verified=False,candidate_locked=False,status='CANDIDATE — device/provider acceptance pending')
+          Path('signed279/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          apk=Path('signed279/Infinity-2103279-End-to-End-Repair-RC1.apk');Path('signed279/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          CHECK
+      - name: Preserve source, rollback and test evidence
+        if: always()
+        run: |
+          mkdir -p audit279/repair-source
+          cp -r repairs/end-to-end-2103279/* audit279/repair-source/
+          cp -r build279/xbmc/build/test-results audit279/candidate-test-results || true
+          cp -r build279/xbmc/src/test audit279/staged-tests || true
+          tar -czf audit279/reconstructed-2103279-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-TEST-CANDIDATE
+          path: signed279/
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-Evidence
+          path: audit279/
+          retention-days: 90

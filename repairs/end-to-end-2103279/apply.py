@@ -1,0 +1,46 @@
+from pathlib import Path
+import argparse,hashlib,json,re
+HERE=Path(__file__).parent
+BASE='41f08774a8b908d60c0f9e6647497e40d6bbe081'
+APK_SHA='473eed44dbe8bb6152ec895a96d034361c4fc8fb3217edb9b26cc753e0f631f7'
+RELEASE='1.0.9-End-to-End-Repair-RC1'
+ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
+PEEK='tools/android/packaging/xbmc/src/CobraQuickPeekSession.java.in'
+GRADLE='tools/android/packaging/xbmc/build.gradle.in'
+def once(s,a,b):
+ assert s.count(a)==1,(a[:100],s.count(a));return s.replace(a,b,1)
+def activity(s):
+ s=once(s,'    TextureView texture;View.OnLayoutChangeListener layoutListener;','    TextureView texture;View.OnLayoutChangeListener layoutListener;\n    VideoSize lastVideoSize=VideoSize.UNKNOWN;')
+ s=once(s,'@Override public void onVideoSizeChanged(VideoSize size){if(current()){cobraFitBinding(this);','@Override public void onVideoSizeChanged(VideoSize size){if(current()){if(size.width>0&&size.height>0)lastVideoSize=size;cobraFitBinding(this);')
+ s=once(s,'@Override public void onRenderedFirstFrame(){if(current()){lastFrameMs=','@Override public void onSurfaceSizeChanged(int width,int height){if(current())cobraFitBinding(this);}\n    @Override public void onRenderedFirstFrame(){if(current()){cobraFitBinding(this);lastFrameMs=')
+ s=once(s,'    if(binding.texture==texture)return;','    if(binding.texture==texture){cobraFitBinding(binding);return;}')
+ s=once(s,'    texture.addOnLayoutChangeListener(binding.layoutListener);','    texture.addOnLayoutChangeListener(binding.layoutListener);\n    cobraFitBinding(binding);')
+ s=once(s,'    VideoSize size=player.getVideoSize();\n    CobraPlayerBinding b=mCobraPlayerBindings.get(player);CobraChannelPreferences saved=', '''    VideoSize size=player.getVideoSize();
+    CobraPlayerBinding b=mCobraPlayerBindings.get(player);
+    if(b!=null){if(size.width>0&&size.height>0)b.lastVideoSize=size;else size=b.lastVideoSize;}
+    CobraChannelPreferences saved=''')
+ return s
+
+def peek(s):
+ s=once(s,'firstFrame=true;handler.removeCallbacks(startupTimeout);','firstFrame=true;fit();handler.removeCallbacks(startupTimeout);')
+ s=once(s,'    @Override public void onVideoSizeChanged(VideoSize size){fit();}','    @Override public void onVideoSizeChanged(VideoSize size){fit();}\n    @Override public void onSurfaceSizeChanged(int width,int height){fit();}')
+ s=once(s,'''    float aspect=size.width*Math.max(.01f,size.pixelWidthHeightRatio)/size.height;float viewport=(float)w/h;
+    Matrix matrix=new Matrix();matrix.setScale(aspect<viewport?aspect/viewport:1f,aspect>viewport?viewport/aspect:1f,w/2f,h/2f);texture.setTransform(matrix);''','''    float[] scale=InfinityLiveActivity.CobraFoldAspectPolicy.fill(size.width,size.height,size.pixelWidthHeightRatio,w,h);
+    Matrix matrix=new Matrix();matrix.setScale(scale[0],scale[1],w/2f,h/2f);texture.setTransform(matrix);''')
+ return s
+
+def main():
+ p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();root=a.root;shell=root/'shell-kodi'
+ for path,fn in [(ACTIVITY,activity),(PEEK,peek)]:
+  f=shell/path;f.write_text(fn(f.read_text()))
+ f=shell/GRADLE;f.write_text(once(once(f.read_text(),'versionCode 2103278','versionCode 2103279'),'1.0.9-Watch-Ambient-RC1',RELEASE))
+ f=root/'scripts/infinity_background_resume.py';s=f.read_text()
+ for key,value in [('VERSION_CODE','2103279'),('RELEASE',repr(RELEASE)),('BASE_COMMIT',repr(BASE)),('BASE_APK_SHA256',repr(APK_SHA))]:
+  s,n=re.subn(r'^'+key+r' = .*$',key+' = '+value,s,flags=re.M);assert n==1
+ f.write_text(s)
+ f=root/'scripts/package_background_resume.py';f.write_text(f.read_text().replace('Infinity-2103278-Watch-Ambient-RC1','Infinity-2103279-End-to-End-Repair-RC1').replace("'base_run':36790711206","'base_run':36794611568").replace('repairs/watch-ambient-2103278/DEVICE-TEST.md','repairs/end-to-end-2103279/DEVICE-TEST.md'))
+ f=root/'engine/background-resume-source.json';r=json.loads(f.read_text());r.update(base_source_commit=BASE,base_apk_sha256=APK_SHA,version_code=2103279,release=RELEASE,candidate_locked=False,physical_device_verified=False)
+ for path in [ACTIVITY,PEEK,GRADLE]:r['files'].setdefault(path,{})['after']=hashlib.sha256((shell/path).read_bytes()).hexdigest()
+ f.write_text(json.dumps(r,indent=2,sort_keys=True)+'\n');a.out.mkdir(parents=True,exist_ok=True)
+ print('Applied bounded surface lifecycle and Quick Peek fill repairs.')
+if __name__=='__main__':main()
