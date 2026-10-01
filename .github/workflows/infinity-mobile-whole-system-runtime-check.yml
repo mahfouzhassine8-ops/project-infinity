@@ -1,0 +1,116 @@
+name: Infinity Whole-System Android Reference Checks
+on:
+  push:
+    branches: [audit-infinity-mobile-whole-system-20261001]
+    paths: [.github/workflows/infinity-mobile-whole-system-runtime-check.yml]
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      NDK_VER: 21.4.7075529
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: c4da9c7f0140c1ffca3f7509759be77b995e2f7b
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v3
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v4
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: evidence284
+      - uses: actions/download-artifact@v4
+        with:
+          name: Infinity-2103284-Ambient-Surface-Candidate
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: candidate284
+      - uses: actions/download-artifact@v4
+        with:
+          name: Infinity-2103282-Native-Ambient-Candidate
+          run-id: 36829442559
+          github-token: ${{ github.token }}
+          path: locked282
+      - uses: actions/download-artifact@v4
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-Evidence
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: evidence279
+      - name: Verify exact source, APKs and signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit284
+          python3 - <<'PY'
+          import hashlib,tarfile,json
+          from pathlib import Path
+          files={
+            'evidence284/reconstructed-2103284-shell.tar.gz':'d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621',
+            'locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk':'2de48f4a269df9196e341c1083608a436fdce1e2d63d17fbb2b80d9c525f63bf',
+            'candidate284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk':'0986aedd4d5375b125d02ba5b6aec29c6f9788722eb2ee13d3e8d588eeaa3cd9'}
+          for name,sha in files.items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==sha,name
+          with tarfile.open('evidence284/reconstructed-2103284-shell.tar.gz') as t:
+            t.extractall('.',filter='data')
+          Path('audit284/verified-inputs.json').write_text(json.dumps(files,indent=2))
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/audit-debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Audit Test,O=Test,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/audit-debug.keystore" >> "$GITHUB_ENV"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk > audit284/parent-signature.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs candidate284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk > audit284/reference-signature.txt
+          grep -F 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' audit284/parent-signature.txt audit284/reference-signature.txt
+      - name: Stage and run actual Java regression suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts')
+          import package_background_resume as p
+          p.prepare(Path('shell-kodi').resolve(),Path('locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk').resolve(),Path('build284').resolve(),Path('audit284').resolve())
+          p.verify_bytes(Path('locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk'),Path('candidate284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk'))
+          PY
+          python3 repairs/infinity-ambient-surface-2103284/stage.py unit
+          python3 - <<'PY'
+          import subprocess,json
+          from pathlib import Path
+          args=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest']
+          for name in json.loads(Path('audit284/test-classes.json').read_text()):args+=['--tests',name]
+          with Path('audit284/java-tests.txt').open('w') as log:
+            result=subprocess.run(args,cwd='build284',stdout=log,stderr=subprocess.STDOUT)
+          if result.returncode:raise SystemExit(result.returncode)
+          PY
+      - name: Record actual counts and boundaries
+        if: always()
+        run: |
+          mkdir -p audit284
+          cp -r build284/xbmc/build/test-results audit284/test-results || true
+          python3 - <<'PY'
+          import json,xml.etree.ElementTree as E
+          from pathlib import Path
+          rows=[]
+          for path in Path('audit284/test-results').rglob('TEST-*.xml'):
+            e=E.parse(path).getroot();rows.append({k:e.get(k) for k in ('name','tests','errors','failures','skipped')})
+          Path('audit284/whole-system-reference-results.json').write_text(json.dumps({'suites':rows,'scope':'Fresh compilation and Robolectric tests of exact existing 2103284 reference. No APK rebuilt; no Kodi engine execution or physical Fold acceptance; not release promotion.'},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Whole-System-Android-Reference-Checks
+          path: audit284/
+          retention-days: 90
+          if-no-files-found: error
