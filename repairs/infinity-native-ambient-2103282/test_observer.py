@@ -13,7 +13,7 @@ class Harness:
         self.tick=0;self.steps=steps;self.change=change;self.events=[];self.images=[]
         self.props={'Infinity.AmbientHome.Mode':'immersive','Infinity.NativeAmbient.Profile':'test','Infinity.SystemTheme':'oled'}
         self.paused=False;self.buffering=False;self.has_video=True;self.window=10000;self.title='movie-a'
-        self.frames=0;self.captures=0;self.released=0;self.players=0;self.fail=False;self.blue=True;self.format='BGRA'
+        self.frames=0;self.captures=0;self.released=0;self.players=0;self.fail=False;self.blue=True;self.format='BGRA';self.first_not_ready=False
         self.lib=ctypes.CDLL(str(Path(os.environ.get('AMBIENT_HOST_LIB','engine/libinfinityambient-host.so')).resolve()))
         self.lib.infinity_ambient_set_active(1)
         recipes={'test':[{'overlay':40001,'parents':[],'probes':[40000],'radius':10}]}
@@ -41,13 +41,15 @@ class Harness:
             def __init__(s):h.players+=1
             def __getattr__(s,name):raise AssertionError('Playback owner/transport was accessed: '+name)
         class Capture:
-            def __init__(s):h.captures+=1
+            def __init__(s):h.captures+=1;s.calls=0
             def __del__(s):h.released+=1
             def getAspectRatio(s):return 1.5
             def capture(s,w,hh):assert w==144 and hh==96
             def getImageFormat(s):return h.format
             def getImage(s,timeout):
-                assert timeout<=30
+                assert timeout<=50
+                s.calls+=1
+                if h.first_not_ready and s.calls==1:return bytearray()
                 if h.fail:raise RuntimeError('capture unavailable')
                 h.frames+=1
                 return bytearray(Image.new('RGBA',(144,96),'blue' if h.blue else 'lime').tobytes('raw','BGRA'))
@@ -84,6 +86,11 @@ class Harness:
         return self
 
 class ObserverTests(unittest.TestCase):
+    def test_first_frame_not_ready_keeps_continuous_capture_alive(self):
+        h=Harness(change=lambda h:setattr(h,'first_not_ready',True)).run()
+        self.assertGreater(len(h.images),3)
+        self.assertEqual(h.captures,1,'transient first-frame miss must not recreate RenderCapture')
+
     def test_live_output_and_no_additional_playback_owner(self):
         h=Harness().run();self.assertGreater(len(h.images),3);self.assertEqual(h.players,1)
         self.assertEqual(h.captures,h.released);self.assertNotIn('Infinity.NativeAmbient.Active',h.props)
