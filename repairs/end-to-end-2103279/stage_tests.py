@@ -29,6 +29,9 @@ while True:
 # Historical suites predate approved defaults/menu deduplication; update only these
 # superseded expectations. The exact locked 300-test suite above is untouched.
 updates={
+ 'Cobra2103268ProductAuditTest':[
+  ('single(800,600);call("showCobraPlayerDrawer");f.ui.measure(a,800,600);android.widget.ListView list=',
+   'single(800,600);call("showCobraPlayerDrawer");f.ui.measure(a,800,600);f.ui.frames(15);f.ui.measure(a,800,600);android.widget.ListView list=')],
  'Cobra2103187TsAccessUnitCompatibilityTest':[
   ('keepsNonIdrKeyframesDisabled','retainsApproved2103188NonIdrCompatibility'),
   ('assertFalse(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes())','assertTrue(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes())'),

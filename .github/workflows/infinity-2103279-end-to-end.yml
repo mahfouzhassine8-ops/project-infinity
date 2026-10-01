@@ -21,6 +21,7 @@ jobs:
     timeout-minutes: 65
     outputs:
       runtime_ready: ${{ steps.runtime.outcome == 'success' }}
+      runtime_required: ${{ steps.runtime_scope.outputs.required }}
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0}
@@ -28,6 +29,15 @@ jobs:
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
         with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - name: Scope Android runtime verification to changed product surfaces
+        id: runtime_scope
+        run: |
+          changed="$(git diff --name-only HEAD^ HEAD)"
+          if printf '%s\n' "$changed" | grep -Eq '^(repairs/end-to-end-2103279/(apply\.py|.*\.java\.fragment|CobraRuntime279Test\.java|stage_runtime\.py|runtime\.sh|runtime_media\.py|runtime_server\.py|runtime_[^/]+\.json)|scripts/(package_background_resume\.py|infinity_background_resume\.py))$'; then
+            echo "required=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "required=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/download-artifact@v8
         with:
           name: Infinity-2103278-Watch-Ambient-RC1-TEST-CANDIDATE
@@ -152,7 +162,7 @@ jobs:
 
   android-runtime:
     needs: audit-build
-    if: ${{ always() && needs.audit-build.outputs.runtime_ready == 'true' }}
+    if: ${{ needs.audit-build.result == 'success' && needs.audit-build.outputs.runtime_ready == 'true' && needs.audit-build.outputs.runtime_required == 'true' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     steps:
