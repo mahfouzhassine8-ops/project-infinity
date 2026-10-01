@@ -16,6 +16,16 @@ extras={
 for folder,names in extras.items():
  for name in names:shutil.copy2(Path('repairs')/folder/'tests'/(name+'.java'),out/(name+'.java'))
 for name in ['SurfaceRuntimeRegressionTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
+# Reuse fixture helpers transitively without selecting their historical assertions.
+import re
+index={}
+for f in Path('repairs').rglob('*.java'):index.setdefault(f.stem,[]).append(f)
+while True:
+ missing=set()
+ for f in out.glob('*.java'):
+  missing.update(n for n in re.findall(r'\b([A-Z][A-Za-z0-9_]*(?:Test|Harness))\b',f.read_text()) if n in index and not (out/(n+'.java')).exists())
+ if not missing:break
+ for name in sorted(missing):shutil.copy2(sorted(index[name],key=lambda p:str(p))[-1],out/(name+'.java'))
 evidence=Path('audit279/screenshots').resolve();evidence.mkdir(parents=True,exist_ok=True)
 props={'cobra.evidence':evidence,'glass.evidence':evidence/'protected','pro.evidence':evidence/'pro','glass.phone.evidence':evidence/'phone','responsive.evidence':evidence/'responsive','pro.fixture':Path('source278/screenshots/test-video-fixture.webp').resolve()}
 with (a.build/'xbmc/build.gradle').open('a') as f:
