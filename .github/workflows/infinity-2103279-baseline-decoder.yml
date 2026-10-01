@@ -42,6 +42,8 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
+            adb root
+            adb wait-for-device
             adb install --no-incremental parent278/Infinity-2103278-Watch-Ambient-RC1.apk
             adb install --no-incremental instrumentation279/Cobra-2103279-runtime-tests.apk
             adb shell am instrument -w -r -e class com.projectinfinity.kodi.CobraRuntime279Test com.projectinfinity.kodi.test/androidx.test.runner.AndroidJUnitRunner | tee runtime279/baseline-instrumentation.txt
