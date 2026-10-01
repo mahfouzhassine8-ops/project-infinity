@@ -6,13 +6,16 @@ trap cleanup EXIT
 adb root
 adb wait-for-device
 adb install --no-incremental locked280/Infinity-2103280-Audit-Followup-RC1.apk | tee remaining-runtime/install.txt
-adb install --no-incremental instrumentation/Cobra-remaining-audit-tests.apk
+adb install --no-incremental instrumentation/Cobra-audit-followup-tests.apk
 adb logcat -c
-adb shell am instrument -w -r -e class com.projectinfinity.kodi.CobraRuntimeFollowupTest#remainingBoundaries com.projectinfinity.kodi.test/androidx.test.runner.AndroidJUnitRunner | tee remaining-runtime/journey.txt
-adb pull /sdcard/Android/data/com.projectinfinity.kodi/files/remaining-audit/runtime-results.json remaining-runtime/journey-results.json
-python3 - <<'PY'
+for method in additionalRuntimeJourney settingsAfterProcessRestart remainingBoundaries; do
+  if [ "$method" = settingsAfterProcessRestart ]; then adb shell am force-stop com.projectinfinity.kodi; fi
+  adb shell am instrument -w -r -e class "com.projectinfinity.kodi.CobraRuntimeFollowupTest#$method" com.projectinfinity.kodi.test/androidx.test.runner.AndroidJUnitRunner | tee "remaining-runtime/$method.txt"
+  adb pull /sdcard/Android/data/com.projectinfinity.kodi/files/remaining-audit/runtime-results.json "remaining-runtime/$method.json" || true
+done
+python3 - <<'CHECK'
 from pathlib import Path
-for f in ['journey.txt']:
- s=Path('remaining-runtime',f).read_text()
+for f in ['additionalRuntimeJourney','settingsAfterProcessRestart','remainingBoundaries']:
+ s=Path('remaining-runtime',f+'.txt').read_text()
  assert 'OK (1 test)' in s and 'FAILURES' not in s,(f,s[-6000:])
-PY
+CHECK
