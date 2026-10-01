@@ -1,0 +1,180 @@
+name: Infinity | 2103286 chooser responsive and long-press repair
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103286-chooser-responsive-longpress-repair]
+    paths:
+      - 'repairs/chooser-responsive-2103286/**'
+      - '.github/workflows/infinity-2103286-chooser-responsive.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103286-chooser-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: parent-source
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103285-Native-FD-Crash-Repair-RC1-Candidate
+          run-id: 36933314038
+          github-token: ${{ github.token }}
+          path: parent285
+      - name: Verify exact parent and reconstruct audited Android source
+        run: |
+          set -euo pipefail
+          test "$(sha256sum parent-source/reconstructed-2103284-shell.tar.gz | cut -d' ' -f1)" = d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621
+          test "$(sha256sum parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk | cut -d' ' -f1)" = 64ed5ce79096a3e09d02907cf72d3a5c4ad20186da231898c92db83e540d266b
+          tar -xzf parent-source/reconstructed-2103284-shell.tar.gz
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          apk=Path('parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              native=z.read('lib/arm64-v8a/libkodi.so')
+              recorder=z.read('lib/arm64-v8a/libinfinitycrash.so')
+          assert hashlib.sha256(native).hexdigest()=='f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'
+          Path('engine').mkdir(exist_ok=True)
+          Path('engine/libinfinitycrash.so').write_bytes(recorder)
+          PY
+          mkdir -p audit286
+          python3 repairs/chooser-responsive-2103286/apply.py --root . --out audit286
+          python3 repairs/chooser-responsive-2103286/test_geometry.py --root .
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+      - name: Build Android-only repair over exact 2103285 native engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk \
+            --build-dir build286 \
+            --out candidate286
+          python3 repairs/chooser-responsive-2103286/apply.py --root . --out audit286 --verify
+          python3 repairs/chooser-responsive-2103286/test_geometry.py --root .
+      - name: Enforce preservation and exact release payload
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          base=Path('parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk')
+          apk=Path('candidate286/Infinity-2103286-Chooser-Responsive-Repair-RC1.apk')
+          assert apk.is_file()
+          with zipfile.ZipFile(base) as a,zipfile.ZipFile(apk) as b:
+              assert b.testzip() is None
+              assert hashlib.sha256(b.read('lib/arm64-v8a/libkodi.so')).hexdigest()=='f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'
+              for n in a.namelist():
+                  if n.startswith('assets/') and not n.endswith('/'): assert a.read(n)==b.read(n),n
+              joined=b''.join(b.read(n) for n in b.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+              for token in (b'infinity_glass_chooser_2103286',b'Cobra Theme controls',b'chooserWindowPixels'):
+                  assert token in joined,token
+          audit=json.loads(Path('candidate286/background-resume-apk-audit.json').read_text())
+          assert audit['version_code']==2103286
+          assert audit['native_engine_sha256']=='f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'
+          Path('candidate286/DEVICE-TEST.md').write_text(Path('repairs/chooser-responsive-2103286/DEVICE-TEST.md').read_text())
+          digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          Path('candidate286/SHA256SUMS.txt').write_text(digest+'  '+apk.name+'\n')
+          print('PASS candidate',digest)
+          PY
+          cp audit286/source-proof.json candidate286/SOURCE-PROOF.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103286-Chooser-Responsive-Repair-RC1-Candidate
+          path: candidate286/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve exact rollback inputs
+        run: |
+          mkdir -p rollback286
+          cp parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk rollback286/
+          git bundle create rollback286/source-before-2103286.bundle rollback-infinity-2103285-before-chooser-responsive-20261001
+          printf '%s\n' 'Exact APK parent SHA-256: 64ed5ce79096a3e09d02907cf72d3a5c4ad20186da231898c92db83e540d266b' 'No uninstall/data-clear rollback is authorized.' > rollback286/README.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103285-Before-Chooser-Responsive-Exact-Rollback
+          path: rollback286/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+  android-smoke:
+    needs: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103286-Chooser-Responsive-Repair-RC1-Candidate
+          path: candidate286
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103285-Native-FD-Crash-Repair-RC1-Candidate
+          run-id: 36933314038
+          github-token: ${{ github.token }}
+          path: parent285
+      - name: Enable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            set -euo pipefail
+            mkdir -p runtime286
+            adb install --no-incremental parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk | tee runtime286/install-parent.txt
+            adb install --no-incremental -r candidate286/Infinity-2103286-Chooser-Responsive-Repair-RC1.apk | tee runtime286/update.txt
+            grep -q Success runtime286/update.txt
+            adb shell am start -W -n com.projectinfinity.kodi/.Splash | tee runtime286/start.txt
+            sleep 4
+            adb shell uiautomator dump /sdcard/before.xml >/dev/null
+            adb pull /sdcard/before.xml runtime286/before.xml >/dev/null
+            ! grep -q 'Cobra theme controls' runtime286/before.xml
+            adb shell input swipe 540 1450 540 1450 1500
+            sleep 2
+            adb shell uiautomator dump /sdcard/after-hold.xml >/dev/null
+            adb pull /sdcard/after-hold.xml runtime286/after-hold.xml >/dev/null
+            ! grep -q 'Cobra theme controls' runtime286/after-hold.xml
+            adb shell wm size 1080x1080
+            adb shell am force-stop com.projectinfinity.kodi
+            adb shell am start -W -n com.projectinfinity.kodi/.Splash >/dev/null
+            sleep 4
+            adb exec-out screencap -p > runtime286/square-chooser.png
+            adb shell dumpsys package com.projectinfinity.kodi > runtime286/package.txt
+            grep -q 'versionCode=2103286' runtime286/package.txt
+            printf '%s\n' 'PASS update install, chooser launch, background long-hold does not open theme dialog, square-window screenshot captured.' 'Physical Galaxy Fold acceptance remains required.' > runtime286/SUMMARY.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103286-Chooser-Android-Smoke
+          path: runtime286/
+          if-no-files-found: warn
+          retention-days: 90
