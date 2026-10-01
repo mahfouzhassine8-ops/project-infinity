@@ -12,19 +12,19 @@ public class ShortWindowAndThemeTest {
  @Test public void shortWindowsReachTheExistingChannelBrowserAcrossFiveModes()throws Exception{
   Object player=f.player,texture=f.texture;
   for(String mode:new String[]{"mobile","grid","compact","cards","focus"}){
-   f.put(f.a,"mCobraGuideStyle",mode);f.call(f.a,"cobraShowGuideShell");f.ui.measure(f.a,380,190);
+   f.put(f.a,"mCobraGuideStyle",mode);f.call(f.a,"cobraShowGuideShell");ResponsiveWindowTest.window(f.ui,f.a,380,190);
    View shell=(View)f.get(f.a,"mCobraGuideShell"),browser=(View)f.get(f.a,"mCobraGuideBrowser");
-   assertTrue((Integer)f.call(shell,"range")>0);shell.scrollTo(0,10000);
+   assertTrue(shell.canScrollVertically(1));shell.scrollTo(0,10000);
    Rect shown=new Rect();assertTrue(mode,browser.getGlobalVisibleRect(shown));assertTrue(mode,shown.height()>=100);
    assertNotNull(f.get(f.a,"mCobraGuideList"));assertSame(player,f.get(f.a,"mCobraPreviewPlayer"));assertSame(texture,f.get(f.a,"mCobraPreviewTexture"));
   }assertEquals(0,f.state.prepares);assertEquals(0,f.state.mediaChanges);
  }
  @Test public void expandingAWindowResetsOverflowWithoutReplacingTheSurface()throws Exception{
-  f.ui.measure(f.a,380,190);View shell=(View)f.get(f.a,"mCobraGuideShell");shell.scrollTo(0,10000);assertTrue(shell.getScrollY()>0);
-  f.ui.measure(f.a,412,915);assertEquals(0,shell.getScrollY());assertEquals(0,f.call(shell,"range"));assertSame(f.texture,f.get(f.a,"mCobraPreviewTexture"));
+  ResponsiveWindowTest.window(f.ui,f.a,380,190);View shell=(View)f.get(f.a,"mCobraGuideShell");shell.scrollTo(0,10000);assertTrue(shell.getScrollY()>0);
+  ResponsiveWindowTest.window(f.ui,f.a,412,915);assertEquals(0,shell.getScrollY());assertFalse(shell.canScrollVertically(1));assertSame(f.texture,f.get(f.a,"mCobraPreviewTexture"));
  }
  @Test public void normalWindowsDoNotAddScrollingOrChangeLockedGeometry()throws Exception{
-  View shell=(View)f.get(f.a,"mCobraGuideShell");assertEquals(0,f.call(shell,"range"));shell.scrollTo(0,1000);assertEquals(0,shell.getScrollY());
+  View shell=(View)f.get(f.a,"mCobraGuideShell");assertFalse(shell.canScrollVertically(1));shell.scrollTo(0,1000);assertEquals(0,shell.getScrollY());
   assertEquals(600,f.call(f.a,"cobraGuideWorkingHeight",600));assertEquals(240,f.call(f.a,"cobraGuideWorkingHeight",240));
  }
  @Test public void changingAppearanceRefreshesActualSystemBarContrast()throws Exception{
