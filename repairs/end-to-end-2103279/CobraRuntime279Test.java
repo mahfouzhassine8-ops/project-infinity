@@ -44,6 +44,7 @@ public class CobraRuntime279Test {
    for(String clip:new String[]{"Wide","Classic","Portrait","Odd"}){start(clip);assertFilled(mode+"-"+clip);}
    screenshot("mode-"+mode);
   });
+  runUi(()->{put(a,"mCobraGuideStyle","mobile");call(a,"cobraShowGuideShell");});
   check("Encoded black bars diagnostic",()->{start("Baked");SystemClock.sleep(1800);assertFilled("baked-bars");});
   check("Pause resume and fullscreen handoff preserve player",()->{
    start("Classic");ExoPlayer same=player();runUi(()->{View v=((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_play_pause");assertNotNull(v);assertTrue(v.performClick());});assertFalse("Pause must clear requested playback",ui(same::getPlayWhenReady));long position=ui(same::getCurrentPosition);SystemClock.sleep(600);assertTrue(Math.abs(ui(same::getCurrentPosition)-position)<100);runUi(()->{View v=((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_play_pause");assertNotNull(v);assertTrue(v.performClick());});assertTrue("Resume must request playback",ui(same::getPlayWhenReady));
@@ -54,27 +55,39 @@ public class CobraRuntime279Test {
   check("Quick Peek uses real independent decoder and clean release",()->{
    start("Wide");ExoPlayer main=player();Object other=channel("Peek");runUi(()->call(a,"cobraShowQuickPeek",other,get(a,"mCobraPreviewHost")));
    // M3U capacity policy may intentionally deny another connection; expose that accurately.
-   await("Quick Peek session",()->get(a,"mCobraQuickPeek")!=null,6000);Object session=ui(()->get(a,"mCobraQuickPeek"));await("Quick Peek decode",()->((ExoPlayer)get(session,"player")).getVideoSize().width>0,12000);screenshot("quick-peek");runUi(()->call(a,"closeCobraActionSheet"));assertSame(main,player());assertTrue("Quick Peek must preserve requested main playback",ui(main::getPlayWhenReady));
+   await("Quick Peek session",()->get(a,"mCobraQuickPeek")!=null,6000);Object session=ui(()->get(a,"mCobraQuickPeek"));await("Quick Peek decode",()->((ExoPlayer)get(session,"player")).getVideoSize().width>0&&Boolean.TRUE.equals(get(session,"firstFrame")),12000);screenshot("quick-peek");runUi(()->call(a,"closeCobraActionSheet"));assertSame(main,player());assertTrue("Quick Peek must preserve requested main playback",ui(main::getPlayWhenReady));
   });
   check("Multi-View 2/3/4 real decoders and fullscreen return",()->{
    runUi(()->{call(a,"closeCobraActionSheet");call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel"));});
    List<Object> selected=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd"})selected.add(channel(n));
-   for(int count=2;count<=4;count++){final int c=count;runUi(()->call(a,"openMultiView",new ArrayList<>(selected.subList(0,c))));await("multi "+c,()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");if(ps==null||ps.length!=c)return false;for(ExoPlayer p:ps)if(p==null||p.getVideoSize().width==0)return false;return true;},20000);screenshot("multi-"+c);}
+   runUi(()->call(a,"cobraSetMultiFillScreen",true));
+   for(int count=2;count<=4;count++){final int c=count;runUi(()->call(a,"openMultiView",new ArrayList<>(selected.subList(0,c))));await("multi "+c,()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");if(ps==null||ps.length!=c)return false;for(ExoPlayer p:ps)if(p==null||p.getVideoSize().width==0||!p.isPlaying())return false;return true;},20000);screenshot("multi-"+c);}
    ExoPlayer[] prior=ui(()->((ExoPlayer[])get(a,"mMultiPlayers")).clone());String key=(String)get(selected.get(1),"id");runUi(()->call(a,"cobraPromoteMultiTileFullscreen",key));SystemClock.sleep(500);runUi(()->call(a,"cobraReturnToMultiFromFullscreen"));ExoPlayer[] after=ui(()->(ExoPlayer[])get(a,"mMultiPlayers"));assertArrayEquals(prior,after);runUi(()->call(a,"setMultiAudio",2));assertEquals(2,ui(()->get(a,"mAudioTile")));runUi(()->{call(a,"releaseMulti");call(a,"showCobraPrimaryView");});
   });
   check("Android PiP and foreground return preserve player",()->{
    start("Wide");ExoPlayer same=player();runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));runUi(()->call(a,"enterCobraPictureInPicture"));await("actual PiP",a::isInPictureInPictureMode,8000);screenshot("pip");foreground();assertSame(same,ui(()->get(a,"mPlayer")));runUi(()->call(a,"closeFullscreenToCobraView"));assertSame(same,player());assertFilled("pip-return");
   });
+  check("Actual Android background pause / audio / foreground",()->{
+   start("Classic");ExoPlayer same=player();
+   for(boolean enabled:new boolean[]{false,true}){
+    runUi(()->((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_mini_background_playback",enabled).commit());
+    shell("input keyevent KEYCODE_HOME");await("background",()->!Boolean.TRUE.equals(get(a,"mCobraRotationResumed")),8000);SystemClock.sleep(1300);
+    assertSame(same,player());assertEquals("Requested background audio="+enabled,enabled,ui(same::getPlayWhenReady));
+    foreground();await("foreground playback resumes",same::isPlaying,8000);assertSame(same,player());assertFilled("background-return-"+enabled);
+   }
+  });
   check("Android resize and both themes",()->{
    runUi(()->{call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");});start("Classic");
    for(String size:new String[]{"720x1280","1280x720","600x1000","1000x600"}){shell("wm size "+size);SystemClock.sleep(800);assertFilled("resize-"+size);screenshot("resize-"+size);}
-   shell("wm size reset");for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraRestyleGuide");});SystemClock.sleep(400);screenshot("theme-"+theme);}
+   shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);screenshot("theme-"+theme);}
   });
   check("HTTP movie details / My List / playback / seek / subtitles / Smart Return",()->{
    runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});await("HTTP movie catalog",()->!((List<?>)get(a,"mCobraVodMoviesCatalog")).isEmpty(),12000);
    Object movie=ui(()->((List<?>)get(a,"mCobraVodMoviesCatalog")).get(0));runUi(()->call(a,"cobraShowVodDetails",movie));await("movie details",()->String.valueOf(get(a,"mCobraStageTitle")).contains("MOVIE DETAILS"),10000);screenshot("movie-details");
    runUi(()->call(a,"toggleWatchlist",movie));assertEquals(true,ui(()->call(a,"cobraVodWatchlistContains",movie)));runUi(()->call(a,"playMovie",movie));await("movie decoder",()->{ExoPlayer p=(ExoPlayer)get(a,"mPlayer");return p!=null&&p.getVideoSize().width>0&&p.getPlaybackState()==Player.STATE_READY;},15000);
-   ExoPlayer p=ui(()->(ExoPlayer)get(a,"mPlayer"));runUi(()->{p.seekTo(14000);call(a,"cobraSetCaptionsEnabled",p,true);});await("movie seek",()->p.getCurrentPosition()>=14000,8000);assertEquals(true,ui(()->call(a,"cobraCaptionsRequested",p)));screenshot("movie-captions");
+   ExoPlayer p=ui(()->(ExoPlayer)get(a,"mPlayer"));runUi(()->{p.seekTo(14000);call(a,"cobraSetCaptionsEnabled",p,true);});await("movie seek",()->p.getCurrentPosition()>=14000,8000);assertEquals(true,ui(()->call(a,"cobraCaptionsRequested",p)));
+   await("actual selected subtitle track",()->{for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups())if(g.getType()==androidx.media3.common.C.TRACK_TYPE_TEXT)for(int i=0;i<g.length;i++)if(g.isTrackSelected(i))return true;return false;},5000);screenshot("movie-captions");
+   runUi(()->{call(a,"showTrackChooser");int group=0;boolean changed=false;for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups()){if(g.getType()==androidx.media3.common.C.TRACK_TYPE_AUDIO)for(int i=0;i<g.length;i++)if(g.isTrackSupported(i)&&!g.isTrackSelected(i)){View row=a.getWindow().getDecorView().findViewWithTag("cobra-track:"+group+":"+i);assertNotNull(row);assertTrue(row.performClick());changed=true;break;}group++;if(changed)break;}assertTrue("A second real audio track must be selectable",changed);});SystemClock.sleep(400);screenshot("audio-and-subtitles");runUi(()->call(a,"closeCobraActionSheet"));
    runUi(()->call(a,"closeFullscreenToCobraView"));assertEquals("movies",ui(()->call(a,"cobraDrawerOwner")));screenshot("movie-return");
   });
   check("HTTP show seasons / episode playback / return",()->{
@@ -84,6 +97,12 @@ public class CobraRuntime279Test {
   });
   check("Drawer section memory and settings retain ownership",()->{
    for(String owner:new String[]{"MOVIES","SHOWS","RECORDINGS","MY LIST","SPORTS","TV"}){runUi(()->{call(a,"cobraSelectDrawerOwner",owner);call(a,"showCobraPrimaryView");});SystemClock.sleep(400);Object before=ui(()->call(a,"cobraDrawerOwner"));runUi(()->call(a,"showSettings"));SystemClock.sleep(200);runUi(()->call(a,"showCobraPrimaryView"));assertEquals(before,ui(()->call(a,"cobraDrawerOwner")));screenshot("section-"+owner.replace(' ','-'));}
+  });
+  check("Activity recreation preserves Movies and settings",()->{
+   runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});SystemClock.sleep(500);
+   InfinityLiveActivity old=a;runUi(old::recreate);
+   await("recreated Cobra",()->{for(android.app.Activity current:androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(androidx.test.runner.lifecycle.Stage.RESUMED))if(current instanceof InfinityLiveActivity&&current!=old){a=(InfinityLiveActivity)current;return true;}return false;},15000);
+   await("restored provider",()->((List<?>)get(a,"mChannels")).size()>=5,15000);assertEquals("movies",ui(()->call(a,"cobraDrawerOwner")));assertEquals("dark",ui(()->call(a,"cobraStoredAppearanceMode")));screenshot("recreated-movies");
   });
   saveResults();runUi(()->a.finish());assertTrue(errors.toString(),errors.isEmpty());
  }

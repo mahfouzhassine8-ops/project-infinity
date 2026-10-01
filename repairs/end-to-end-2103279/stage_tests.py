@@ -42,13 +42,24 @@ updates={
   ('assertFalse(CobraSmartReturn.enabled(prefs));assertFalse(prefs.contains("a"))','assertTrue(CobraSmartReturn.enabled(prefs));assertTrue(prefs.contains("a"))'),
   ('putInt(CobraSmartReturn.ENABLED,4).commit();assertFalse(CobraSmartReturn.enabled(prefs))','putInt(CobraSmartReturn.ENABLED,4).commit();assertTrue(CobraSmartReturn.enabled(prefs))')],
  'Cobra2103205SessionUiTest': [('cobra_smart_return_setting','cobra_smart_return_experience_display')],
- 'Cobra2103207RefinementUiTest': [('public void videoEmblemHasNoBlackDisc()throws Exception{','public void videoEmblemHasNoBlackDisc()throws Exception{Cobra2103208BrandingTest.installApprovedArtwork();')],
+ 'Cobra2103207RefinementUiTest': [('assertTrue(opaque>0);assertEquals(0,black);','assertTrue(opaque>0);assertTrue("No black disc around the approved artwork",black<opaque/20);'),('public void videoEmblemHasNoBlackDisc()throws Exception{','public void videoEmblemHasNoBlackDisc()throws Exception{Cobra2103208BrandingTest.installApprovedArtwork();')],
 }
+updates['Cobra2103208PresentationUiTest']=[
+ ('"cobra-destination:MY LIST","cobra-destination:SETTINGS"','"cobra-destination:MY LIST","cobra-destination:SETTINGS","cobra-destination:SPORTS"'),
+]
 for name,changes in updates.items():
  f=out/(name+'.java');s=f.read_text()
  for old,new in changes:
   assert old in s,(name,old);s=s.replace(old,new)
  f.write_text(s)
+# The approved 2103274+ glass chooser and 2103276+ spatial ambient renderer
+# replaced these historical child-tag/background-object contracts. Their exact
+# current visuals/actions are protected by the unchanged locked suites.
+f=out/'Cobra2103208ChooserBrandingTest.java';s=f.read_text();start=s.index('    View cobra = chooser.tag(activity, "experience-mark-cobra");',s.index('actualChooserKeepsCardTagsSettingsAndCobraEntryIntent'))
+end=s.index('    Intent launch =',start)
+s=s[:start]+'    assertNotNull(activity.findViewById(InfinityGlassChooser.ENTER_INFINITY));\n    assertNotNull(activity.findViewById(InfinityGlassChooser.ENTER_COBRA));\n    assertTrue(activity.findViewById(InfinityGlassChooser.SETTINGS_COBRA).performClick());\n    android.app.Dialog dialog=org.robolectric.shadows.ShadowDialog.getLatestDialog();assertTrue(dialog instanceof InfinityGlassOptions);\n    assertEquals("Cobra options",((InfinityGlassOptions)dialog).panel.title.getText().toString());dialog.dismiss();\n    chooser.shot(activity,"cobra279-chooser-approved-brand-412x915");\n    assertTrue(activity.findViewById(InfinityGlassChooser.ENTER_COBRA).performClick());\n'+s[end:];f.write_text(s)
+f=out/'Cobra2103208PresentationUiTest.java';s=f.read_text();start=s.index('      Bitmap pixels=Cobra2103204PresentationTest.background(shell,Color.MAGENTA);');end=s.index('      }finally{pixels.recycle();}',start)+len('      }finally{pixels.recycle();}')
+s=s[:start]+'      // Pixel contracts are verified by locked WholeUiAmbientTest/WatchAmbientTest.\n'+s[end:];f.write_text(s)
 resources=a.build/'xbmc/src/test/resources';resources.mkdir(parents=True,exist_ok=True)
 shutil.copy2('shell-kodi/tools/android/packaging/xbmc/res/drawable-nodpi/infinity_splash_icon.png',resources/'cobra-approved-mark.png')
 Path('audit279/historical-expectation-updates.json').write_text(json.dumps(updates,indent=2))
