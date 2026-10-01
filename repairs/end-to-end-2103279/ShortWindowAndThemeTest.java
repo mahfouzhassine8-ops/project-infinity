@@ -37,4 +37,17 @@ public class ShortWindowAndThemeTest {
    try{backdrop.getBackground().setBounds(0,0,8,8);backdrop.getBackground().draw(new android.graphics.Canvas(image));int pixel=image.getPixel(4,4);float luminance=.2126f*android.graphics.Color.red(pixel)+.7152f*android.graphics.Color.green(pixel)+.0722f*android.graphics.Color.blue(pixel);assertEquals("Backdrop contrast "+mode,"light".equals(mode),luminance>158);}finally{image.recycle();}
   }
  }
+ @Test public void channelDrawerReservesTransientNavigationAndRestoresPadding()throws Exception{
+  Cobra2103201ScrubberTest player=new Cobra2103201ScrubberTest();
+  try{
+   player.before();CobraNavigationUiTest.call(player.a,"showCobraPlayerDrawer");player.settle();
+   FrameLayout panel=(FrameLayout)CobraNavigationUiTest.get(player.a,"mCobraPlayerDrawer");View content=panel.getChildAt(0);
+   WindowInsets none=new WindowInsets.Builder().build();CobraNavigationUiTest.call(player.a,"cobraInsetPlayerDrawer",none);
+   int base=content.getPaddingBottom();View video=(View)CobraNavigationUiTest.get(player.a,"mPlayerTexture");int width=video.getWidth(),height=video.getHeight();
+   WindowInsets nav=new WindowInsets.Builder().setInsetsIgnoringVisibility(WindowInsets.Type.navigationBars(),android.graphics.Insets.of(0,0,0,48)).setVisible(WindowInsets.Type.navigationBars(),false).build();
+   CobraNavigationUiTest.call(player.a,"cobraInsetPlayerDrawer",nav);assertEquals(base+48,content.getPaddingBottom());
+   assertEquals(width,video.getWidth());assertEquals(height,video.getHeight());assertSame(player.player,CobraNavigationUiTest.get(player.a,"mPlayer"));
+   CobraNavigationUiTest.call(player.a,"cobraInsetPlayerDrawer",none);assertEquals(base,content.getPaddingBottom());
+  }finally{player.after();}
+ }
 }

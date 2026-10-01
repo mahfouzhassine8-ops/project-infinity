@@ -15,6 +15,7 @@ The approved parent is `41f08774a8b908d60c0f9e6647497e40d6bbe081`, Cobra 2103278
 * Direct Movies/Shows playback now restores the shared Watch ambient engine after guide teardown, instead of losing the approved illuminated controls. Showing/hiding controls refreshes illumination immediately instead of waiting for the one-second presentation ticker. Off/Subtle/background gates remain unchanged.
 * Runtime screenshots exposed unreachable channels in exceptionally short windows. Those windows can now scroll the existing guide vertically while retaining the same player/surface; normal-size layouts remain unchanged. Light/Dark theme changes also immediately refresh system-bar icon contrast.
 * Display help text now describes the actual embedded center-crop behavior.
+* The Channels drawer now reserves actual system-navigation/cutout insets inside its existing content. Native screenshot review caught its footer hint beneath transient Android navigation buttons. Player/video bounds remain unchanged; padding updates on layout and inset changes and resets when the inset disappears.
 
 Android texture readback omits the display transform. Ambient capture now maps the viewport back into source coordinates, so both embedded and Watch illumination sample the actual visible picture. The approved renderer, glass appearance, Off/Subtle behavior and fullscreen video policy are preserved; all other unmodified shell sources are checked byte-for-byte against the parent.
 

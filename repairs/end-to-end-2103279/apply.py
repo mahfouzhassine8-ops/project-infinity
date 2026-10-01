@@ -37,7 +37,15 @@ def activity(s):
  s=once(s,'final JSONObject ready=info;runOnUiThread(()->{status("Ready");cobraRenderVodDetails(item,ready);});','final JSONObject ready=info;cobraPublishNavigation(ticket,()->{if(!profile.equals(mFeatures.activeProfileId()))return;status("Ready");cobraRenderVodDetails(item,ready);});')
  s=once(s,'Fullscreen fitting follows the actual pane. Preview and PiP keep the complete picture.','Fullscreen fitting follows the actual pane. Previews fill their frame; PiP keeps the complete picture.')
  s=once(s,'Inherited in fullscreen. Previews keep the complete picture. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.','Inherited in fullscreen. Previews use center crop. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.')
- return short_window_ui(playback_ui(s))
+ return drawer_insets(short_window_ui(playback_ui(s)))
+
+def drawer_insets(s):
+ s=once(s,'  private void showCobraPlayerDrawer() {',(HERE/'drawer_insets.java.fragment').read_text()+'  private void showCobraPlayerDrawer() {')
+ s=once(s,'FrameLayout panel=new FrameLayout(this);mCobraPlayerDrawer=panel;','''FrameLayout panel=new FrameLayout(this);mCobraPlayerDrawer=panel;
+    panel.setOnApplyWindowInsetsListener((v,insets)->{cobraInsetPlayerDrawer(insets);return insets;});
+    panel.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->cobraInsetPlayerDrawer(Build.VERSION.SDK_INT>=23?panel.getRootWindowInsets():null));''')
+ s=once(s,'hint.setGravity(Gravity.CENTER);hint.setMaxLines(2);content.addView(hint,','hint.setTag("cobra_player_channel_hint");hint.setGravity(Gravity.CENTER);hint.setMaxLines(2);content.addView(hint,')
+ return s
 
 def short_window_ui(s):
  s=once(s,'  private void cobraShowGuideShell(){',(HERE/'guide_viewport.java.fragment').read_text()+'  private void cobraShowGuideShell(){')

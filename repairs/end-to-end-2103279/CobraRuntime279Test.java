@@ -68,6 +68,16 @@ public class CobraRuntime279Test {
   try(FileWriter f=new FileWriter(new File(out,"quick-peek-display.json"))){f.write(d.toString(2));}
   assertTrue("Quick Peek must display decoded picture: "+d,white>3);assertTrue("Quick Peek must fill its visible edges: "+d,black<total*.12f);
  }
+ void assertDrawerSafe()throws Exception{
+  JSONObject d=ui(()->{
+   View hint=a.getWindow().getDecorView().findViewWithTag("cobra_player_channel_hint");assertNotNull(hint);assertTrue(hint.isShown());
+   View decor=a.getWindow().getDecorView();WindowInsets insets=decor.getRootWindowInsets();assertNotNull(insets);
+   android.graphics.Insets nav=insets.getInsetsIgnoringVisibility(WindowInsets.Type.navigationBars());int[] h=new int[2],root=new int[2];hint.getLocationInWindow(h);decor.getLocationInWindow(root);
+   int safeBottom=root[1]+decor.getHeight()-nav.bottom;
+   JSONObject result=new JSONObject().put("hint_top",h[1]).put("hint_bottom",h[1]+hint.getHeight()).put("safe_bottom",safeBottom).put("navigation_bottom",nav.bottom);
+   assertTrue("Drawer hint must remain above navigation: "+result,h[1]+hint.getHeight()<=safeBottom);return result;
+  });try(FileWriter f=new FileWriter(new File(out,"channels-drawer-insets.json"))){f.write(d.toString(2));}
+ }
  EditText inputIn(View v){if(v instanceof EditText)return (EditText)v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){EditText edit=inputIn(((ViewGroup)v).getChildAt(i));if(edit!=null)return edit;}return null;}
  View described(View v,String text){if(text.contentEquals(v.getContentDescription()==null?"":v.getContentDescription()))return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=described(((ViewGroup)v).getChildAt(i),text);if(found!=null)return found;}return null;}
  void press(String label)throws Exception{runUi(()->{View v=described(a.getWindow().getDecorView(),label);assertNotNull("Control "+label,v);assertTrue("Control reachable "+label,v.isShown());assertTrue("Control callback "+label,v.performClick());});}
@@ -109,7 +119,7 @@ public class CobraRuntime279Test {
     assertTrue("Resume must request playback",ui(same::getPlayWhenReady));await("resume advances position",()->same.isPlaying()&&same.getCurrentPosition()>end+200,5000);assertSame(same,player());
    }
    runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));await("fullscreen first frame",()->get(a,"mPlayer")==same&&((TextureView)get(a,"mPlayerTexture")).isAvailable(),10000);screenshot("watch-fullscreen");
-   for(String menu:new String[]{"Channels","Display","More"}){runUi(()->call(a,"showPlayerChromeTemporarily"));press(menu);await(menu+" is visible",()->{View panel=(View)get(a,menu.equals("Channels")?"mCobraPlayerDrawer":"mCobraSheetPanel");return panel!=null&&panel.isShown()&&panel.getAlpha()>.95f&&panel.getHeight()>20;},8000);SystemClock.sleep(300);screenshot(menu);runUi(()->{call(a,"closeCobraActionSheet");call(a,"closeCobraPlayerDrawer");});}
+   for(String menu:new String[]{"Channels","Display","More"}){runUi(()->call(a,"showPlayerChromeTemporarily"));press(menu);await(menu+" is visible",()->{View panel=(View)get(a,menu.equals("Channels")?"mCobraPlayerDrawer":"mCobraSheetPanel");return panel!=null&&panel.isShown()&&panel.getAlpha()>.95f&&panel.getHeight()>20;},8000);SystemClock.sleep(300);if(menu.equals("Channels"))assertDrawerSafe();screenshot(menu);runUi(()->{call(a,"closeCobraActionSheet");call(a,"closeCobraPlayerDrawer");});}
    runUi(()->call(a,"closeFullscreenToCobraView"));await("preview return",()->get(a,"mCobraPreviewPlayer")==same,8000);assertFilled("fullscreen-return");
   });
   check("Quick Peek uses real independent decoder and clean release",()->{
