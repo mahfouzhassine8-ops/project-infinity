@@ -6,6 +6,7 @@ APK_SHA='473eed44dbe8bb6152ec895a96d034361c4fc8fb3217edb9b26cc753e0f631f7'
 RELEASE='1.0.9-End-to-End-Repair-RC1'
 ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 PEEK='tools/android/packaging/xbmc/src/CobraQuickPeekSession.java.in'
+CMAKE='cmake/scripts/android/Install.cmake'
 CROP='tools/android/packaging/xbmc/src/CobraEmbeddedCrop.java.in'
 GRADLE='tools/android/packaging/xbmc/build.gradle.in'
 def once(s,a,b):
@@ -44,9 +45,13 @@ def peek(s):
     Matrix matrix=new Matrix();matrix.setScale(scale[0],scale[1],w/2f,h/2f);texture.setTransform(matrix);crop.apply(texture,player,matrix,true);''')
  return s
 
+def cmake(s):
+ s=once(s,'                  src/CobraImmersiveAmbient.java','                  src/CobraImmersiveAmbient.java\n                  src/CobraEmbeddedCrop.java')
+ return s+'\nconfigure_file(${CMAKE_SOURCE_DIR}/tools/android/packaging/xbmc/src/CobraEmbeddedCrop.java.in\n               ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/src/CobraEmbeddedCrop.java @ONLY)\n'
+
 def main():
  p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();root=a.root;shell=root/'shell-kodi'
- for path,fn in [(ACTIVITY,activity),(PEEK,peek)]:
+ for path,fn in [(ACTIVITY,activity),(PEEK,peek),(CMAKE,cmake)]:
   f=shell/path;f.write_text(fn(f.read_text()))
  f=shell/'tools/android/packaging/xbmc/src/CobraEmbeddedCrop.java.in';f.write_text((HERE/'CobraEmbeddedCrop.java.in').read_text())
  f=shell/GRADLE;f.write_text(once(once(f.read_text(),'versionCode 2103278','versionCode 2103279'),'1.0.9-Watch-Ambient-RC1',RELEASE))
@@ -56,7 +61,7 @@ def main():
  f.write_text(s)
  f=root/'scripts/package_background_resume.py';f.write_text(f.read_text().replace('Infinity-2103278-Watch-Ambient-RC1','Infinity-2103279-End-to-End-Repair-RC1').replace("'base_run':36790711206","'base_run':36794611568").replace('repairs/watch-ambient-2103278/DEVICE-TEST.md','repairs/end-to-end-2103279/DEVICE-TEST.md'))
  f=root/'engine/background-resume-source.json';r=json.loads(f.read_text());r.update(base_source_commit=BASE,base_apk_sha256=APK_SHA,version_code=2103279,release=RELEASE,candidate_locked=False,physical_device_verified=False)
- for path in [ACTIVITY,PEEK,GRADLE,CROP]:r['files'].setdefault(path,{})['after']=hashlib.sha256((shell/path).read_bytes()).hexdigest()
+ for path in [ACTIVITY,PEEK,GRADLE,CROP,CMAKE]:r['files'].setdefault(path,{})['after']=hashlib.sha256((shell/path).read_bytes()).hexdigest()
  f.write_text(json.dumps(r,indent=2,sort_keys=True)+'\n');a.out.mkdir(parents=True,exist_ok=True)
  print('Applied bounded surface lifecycle and Quick Peek fill repairs.')
 if __name__=='__main__':main()
