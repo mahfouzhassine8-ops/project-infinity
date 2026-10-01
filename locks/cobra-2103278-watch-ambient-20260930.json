@@ -1,0 +1,23 @@
+{
+  "version_code": 2103278,
+  "name": "Cobra Watch Ambient RC1",
+  "status": "LOCKED — user approved",
+  "user_instruction": "Lock",
+  "approved_at": "2026-09-30T20:17:30-04:00",
+  "locked_source_commit": "41f08774a8b908d60c0f9e6647497e40d6bbe081",
+  "locked_source_branch": "locked-infinity-cobra-2103278-watch-ambient-user-approved-20260930",
+  "parent_locked_commit": "8e8b55b6e3c2bb731359e2d52aa11cdf07327729",
+  "apk": "Infinity-2103278-Watch-Ambient-RC1.apk",
+  "apk_sha256": "473eed44dbe8bb6152ec895a96d034361c4fc8fb3217edb9b26cc753e0f631f7",
+  "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "ci_run": 36794611568,
+  "automated_tests_passed": 300,
+  "protected_renders_byte_identical": 20,
+  "candidate_artifact_id": 11132603428,
+  "evidence_artifact_id": 11132748231,
+  "apk_library_file_id": "libfile_1add518843bc819198a142d712d6fb77",
+  "rollback": "locked 2103277 source and CI evidence rollback bundle",
+  "assistant_physical_device_testing": false,
+  "acceptance_basis": "User explicitly approved locking the delivered candidate; no additional physical device or thermal claims.",
+  "future_work": "Start forward candidates from exact locked source commit; never modify locked source branches."
+}
