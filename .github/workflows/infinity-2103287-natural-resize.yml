@@ -1,0 +1,222 @@
+name: Infinity | 2103287 whole-app natural window resize
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103287-natural-window-resize]
+    paths:
+      - 'repairs/natural-resize-2103287/**'
+      - '.github/workflows/infinity-2103287-natural-resize.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103287-natural-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+      - name: Reconstruct protected Kodi 21.3 / Infinity native source
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_1.sh
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          mkdir -p engine audit287
+          python3 scripts/infinity_python_invoker_hardening_v2.py apply --source kodi --receipt engine/pythoninvoker-threadstate-v2-source.json
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+          python3 scripts/infinity_python_invoker_hardening_v3.py apply --source kodi --receipt engine/pythoninvoker-runtime-v3-source.json
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 repairs/native-fd-2103285/apply.py --source kodi --receipt engine/native-fd-source.json
+          python3 repairs/natural-resize-2103287/native_profile_reload.py apply --source kodi --receipt engine/natural-resize-source.json
+          python3 repairs/natural-resize-2103287/test_native_contract.py --source kodi
+          sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit287/python-protected.txt
+      - name: Full ARM64 native rebuild preserving render hardening
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_2.sh
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
+          python3 repairs/natural-resize-2103287/native_profile_reload.py verify --source kodi --receipt engine/natural-resize-source.json
+          python3 repairs/natural-resize-2103287/test_native_contract.py --source kodi
+          sha256sum -c audit287/python-protected.txt
+      - name: Bind native binary to all preservation proofs
+        run: |
+          set -euo pipefail
+          mkdir -p engine287
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk')
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None
+              lib=z.read('lib/arm64-v8a/libkodi.so')
+          digest=hashlib.sha256(lib).hexdigest()
+          assert digest!='f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'
+          assert b'INFINITY_FD_POLL_V1' in lib
+          Path('engine287/libkodi.so').write_bytes(lib)
+          for name in ('pythoninvoker-threadstate-v2-source.json','pythoninvoker-runtime-v3-source.json','native-fd-source.json','natural-resize-source.json','gui-render-hardening-source.json'):
+              proof=json.loads((Path('engine')/name).read_text())
+              if 'checks' in proof: assert all(proof['checks'].values())
+              if name=='native-fd-source.json': assert proof['verified']
+          report={'schema':1,'native_engine_sha256':digest,
+                  'parent_2103285_native_sha256':'f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a',
+                  'kodi':'21.3-Omega','fd_repair_preserved':True,'python_repairs_preserved':True,
+                  'render_hardening_preserved':True,'skin_profile_re_evaluation':True,
+                  'physical_device_verified':False,'skin_payload_changed':False}
+          Path('engine287/ENGINE-PROOF.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          Path('engine287/SHA256SUMS.txt').write_text(digest+'  libkodi.so\n')
+          print('PASS native natural-resize engine',digest)
+          PY
+          cp engine/*source.json engine287/ || true
+          readelf -h -n -d -W engine287/libkodi.so > engine287/elf-identity.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103287-Natural-Resize-Native-Engine
+          path: engine287/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103287-Natural-Resize-Native-Evidence
+          path: audit287/
+          if-no-files-found: warn
+          retention-days: 90
+
+  package:
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: source284
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103285-Native-FD-Crash-Repair-RC1-Candidate
+          run-id: 36933314038
+          github-token: ${{ github.token }}
+          path: parent285
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103287-Natural-Resize-Native-Engine
+          path: engine287
+      - name: Reconstruct exact Android shell and prepare new native base
+        run: |
+          set -euo pipefail
+          test "$(sha256sum parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk | cut -d' ' -f1)" = 64ed5ce79096a3e09d02907cf72d3a5c4ad20186da231898c92db83e540d266b
+          test "$(sha256sum source284/reconstructed-2103284-shell.tar.gz | cut -d' ' -f1)" = d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621
+          tar -xzf source284/reconstructed-2103284-shell.tar.gz
+          mkdir -p base287 audit287 candidate287
+          python3 repairs/natural-resize-2103287/prepare_base.py \
+            --parent parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk \
+            --native engine287/libkodi.so --out base287/parent-native287.apk \
+            --proof audit287/base-proof.json
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json
+          p=json.load(open('audit287/base-proof.json'))
+          print('NATIVE287_SHA='+p['native_engine_sha256'])
+          print('BASE287_SHA='+p['prepared_base_sha256'])
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+      - name: Apply current-window Android shell repair
+        run: |
+          set -euo pipefail
+          python3 repairs/natural-resize-2103287/android_window.py apply --root . --out audit287 \
+            --version-name 1.0.9-Natural-Window-Resize-RC1 --version-code 2103287 \
+            --base-apk-sha "$BASE287_SHA" --native-sha "$NATIVE287_SHA" \
+            --base-commit c8a1adb7e8d7a2a8cd305a88944912c4861d94ea
+          python3 repairs/natural-resize-2103287/android_window.py verify --root . --out audit287
+      - name: Compile Android shell and permanently sign forward APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi \
+            --base-apk base287/parent-native287.apk --build-dir build287 --out candidate287
+      - name: Final whole-product preservation gates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          apk=Path('candidate287/Infinity-2103287-Natural-Window-Resize-RC1.apk')
+          assert apk.is_file()
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None
+              native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+              assert native==json.load(open('audit287/base-proof.json'))['native_engine_sha256']
+              joined=b''.join(z.read(n) for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+              for token in (b'infinity_glass_chooser_2103287',b'chooserWindowPixels',b'InfinityCoreBridge'):
+                  assert token in joined,token
+          audit=json.load(open('candidate287/background-resume-apk-audit.json'))
+          assert audit['version_code']==2103287
+          assert audit['native_engine_sha256']==native
+          Path('candidate287/DEVICE-TEST.md').write_text(Path('repairs/natural-resize-2103287/DEVICE-TEST.md').read_text())
+          Path('candidate287/NATIVE-ENGINE-PROOF.json').write_text(Path('engine287/ENGINE-PROOF.json').read_text())
+          Path('candidate287/NATURAL-RESIZE-SOURCE-PROOF.json').write_text(Path('audit287/android-resize-proof.json').read_text())
+          digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          Path('candidate287/SHA256SUMS.txt').write_text(digest+'  '+apk.name+'\n')
+          print('PASS signed 2103287',digest)
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103287-Natural-Window-Resize-RC1-Candidate
+          path: candidate287/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve exact source/APK rollback evidence
+        run: |
+          set -euo pipefail
+          mkdir -p rollback287
+          cp parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk rollback287/
+          git bundle create rollback287/source-before-2103287.bundle refs/remotes/origin/rollback-infinity-2103285-before-natural-resize-20261001 || \
+            git bundle create rollback287/source-before-2103287.bundle rollback-infinity-2103285-before-natural-resize-20261001
+          cp audit287/base-proof.json rollback287/
+          printf '%s\n' '2103285 parent SHA-256: 64ed5ce79096a3e09d02907cf72d3a5c4ad20186da231898c92db83e540d266b' 'Do not uninstall or clear data for rollback.' > rollback287/README.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103285-Before-Natural-Resize-Exact-Rollback
+          path: rollback287/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
