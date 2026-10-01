@@ -1,0 +1,52 @@
+{
+  "status": "automated_checks_passed_device_acceptance_pending",
+  "built_commit": "c4da9c7f0140c1ffca3f7509759be77b995e2f7b",
+  "workflow_run": 36853676275,
+  "parent_commit": "ec28a8574ecf8d7fccb3713133661c1e8c2246cb",
+  "parent_apk": 2103282,
+  "parent_skin": "1.0.5.176",
+  "rollback_branch": "rollback-infinity-2103282-before-surface-repair-20261001",
+  "apk": {
+    "filename": "Infinity-2103284-Ambient-Surface-Repair-RC1.apk",
+    "version_code": 2103284,
+    "sha256": "0986aedd4d5375b125d02ba5b6aec29c6f9788722eb2ee13d3e8d588eeaa3cd9",
+    "bytes": 95314288,
+    "artifact_id": 11157790669,
+    "signing_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+  },
+  "skin": {
+    "filename": "Infinity-Mobile-1.0.5.178-Ambient-Surface-Repair-RC1.zip",
+    "version": "1.0.5.178",
+    "requires_apk": 2103284,
+    "sha256": "8e14c98fa50dfc5defe16732588a509e819d9e99983b91541ba1edf23ca60cd3",
+    "bytes": 52939233,
+    "builder": "repairs/infinity-ambient-surface-2103284/build_skin178.py",
+    "command_center_unchanged": "0.3.5.17",
+    "modified_files": ["addon.xml", "infinity-skin.json", "Infinity-Protected-Manifest.json", "resources/lib/infinity_native_ambient.py"],
+    "all_layout_xml_byte_identical": true,
+    "unchanged_zip_entries": 1377
+  },
+  "verification": {
+    "native_and_observer_tests": 51,
+    "android_unit_tests": 532,
+    "protected_cobra_render_comparisons": 20,
+    "all_passed": true,
+    "cobra_java_source_unchanged": true,
+    "apk_byte_identical_members": 4167,
+    "unchanged_native_libraries": 46,
+    "kodi_native_engine_unchanged": true,
+    "signing_verified": true,
+    "emulator_update_over_install": "2103282 -> 2103284 passed",
+    "emulator_instrumentation_methods": 2,
+    "emulator_scenario_assertions": 3,
+    "emulator_scope": "API30 x86_64 Cobra fixture playback/navigation preservation, not ARM Kodi ambient visual acceptance",
+    "ci_build_evidence_artifact": 11158155431,
+    "ci_runtime_evidence_artifact": 11156863066
+  },
+  "implementation": "Read-only bounded PixelCopy from existing Kodi XBMCVideoView Surface; leased generation-checked native mailbox; retained RenderCapture warm-up for non-Surface renderers; unchanged approved skin geometry and Cobra implementation.",
+  "activation": "Install APK then paired skin ZIP, restart; Infinity drawer > AMBIENT HOME below SETTINGS > Immersive; play Kodi video and return to Home while playback continues.",
+  "failed_run_history": "36852836947 compiled and signed, then failed before Android tests due to inherited test-staging globals. Test harness isolated without production changes; complete run 36853676275 passed.",
+  "physical_device_verified": false,
+  "locked": false,
+  "pending": "Physical Fold Kodi capture-to-skin rendering, protected sources, lifecycle across all Home modes, sustained thermals and frame pacing. Do not lock without user acceptance."
+}
