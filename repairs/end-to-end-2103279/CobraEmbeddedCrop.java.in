@@ -16,6 +16,7 @@ final class CobraEmbeddedCrop implements AutoCloseable {
   private final Guard guard;private final Runnable changed;
   private final Handler handler=new Handler(Looper.getMainLooper());
   private final Matrix base=new Matrix(),result=new Matrix();
+  private final android.graphics.Rect visibleBounds=new android.graphics.Rect();
   private final float[] values=new float[9];
   private final int[] pixels=new int[96*64];
   private Bitmap sample;private TextureView texture;private ExoPlayer player;
@@ -30,7 +31,7 @@ final class CobraEmbeddedCrop implements AutoCloseable {
   }
   void refresh(){if(maySample())schedule(0L);else cancel();}
   private boolean maySample(){
-    if(closed||failed||!active||texture==null||player==null||!guard.active()||!texture.isAttachedToWindow()||!texture.isShown()||texture.getWindowVisibility()!=View.VISIBLE||!texture.isAvailable())return false;
+    if(closed||failed||!active||texture==null||player==null||!guard.active()||!texture.isAttachedToWindow()||!texture.isShown()||!texture.getGlobalVisibleRect(visibleBounds)||texture.getWindowVisibility()!=View.VISIBLE||!texture.isAvailable())return false;
     try{return player.isPlaying()&&player.getVideoSize().width>0&&player.getVideoSize().height>0;}catch(RuntimeException unavailable){return false;}
   }
   private void schedule(long delay){if(scheduled||!maySample())return;scheduled=true;handler.postDelayed(tick,delay);}

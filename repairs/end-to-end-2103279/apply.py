@@ -37,7 +37,16 @@ def activity(s):
  s=once(s,'final JSONObject ready=info;runOnUiThread(()->{status("Ready");cobraRenderVodDetails(item,ready);});','final JSONObject ready=info;cobraPublishNavigation(ticket,()->{if(!profile.equals(mFeatures.activeProfileId()))return;status("Ready");cobraRenderVodDetails(item,ready);});')
  s=once(s,'Fullscreen fitting follows the actual pane. Preview and PiP keep the complete picture.','Fullscreen fitting follows the actual pane. Previews fill their frame; PiP keeps the complete picture.')
  s=once(s,'Inherited in fullscreen. Previews keep the complete picture. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.','Inherited in fullscreen. Previews use center crop. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.')
- return playback_ui(s)
+ return short_window_ui(playback_ui(s))
+
+def short_window_ui(s):
+ s=once(s,'  private void cobraShowGuideShell(){',(HERE/'guide_viewport.java.fragment').read_text()+'  private void cobraShowGuideShell(){')
+ s=once(s,'mCobraGuideShell=new FrameLayout(this){','mCobraGuideShell=new CobraGuideViewport(){')
+ s=once(s,'Math.max(1,Math.round((h-top-bottom)/density)),getResources().getConfiguration().fontScale,mCobraModeGroupsExpanded)', 'cobraGuideWorkingHeight(Math.max(1,Math.round((h-top-bottom)/density))),getResources().getConfiguration().fontScale,mCobraModeGroupsExpanded)')
+ s=once(s,'  private void cobraLayoutGuide(){','  private int cobraGuideWorkingHeight(int measured){return measured<240?360:measured;}\n  private void cobraLayoutGuide(){')
+ s=once(s,'    View controls=mCobraGuideVideo.findViewWithTag("cobra_preview_controls");','    mCobraGuideShell.scrollTo(0,mCobraGuideShell.getScrollY());\n    View controls=mCobraGuideVideo.findViewWithTag("cobra_preview_controls");')
+ s=once(s,'    }else{buildShell();showSettings();}\n  }\n  private void showCobraSystemDarkPicker(){','    }else{buildShell();showSettings();}\n    cobraApplySystemBarsForSurface();\n  }\n  private void showCobraSystemDarkPicker(){')
+ return s
 
 def playback_ui(s):
  s=once(s,'    CobraImmersiveAmbient ambient=mCobraImmersiveAmbient;if(ambient==null)return;','''    CobraImmersiveAmbient ambient=mCobraImmersiveAmbient;

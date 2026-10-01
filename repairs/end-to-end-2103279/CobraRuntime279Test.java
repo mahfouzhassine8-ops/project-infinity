@@ -54,6 +54,7 @@ public class CobraRuntime279Test {
  void press(String label)throws Exception{runUi(()->{View v=described(a.getWindow().getDecorView(),label);assertNotNull("Control "+label,v);assertTrue("Control reachable "+label,v.isShown());assertTrue("Control callback "+label,v.performClick());});}
  void foreground()throws Exception{Intent i=new Intent(ins.getTargetContext(),InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);ins.getTargetContext().startActivity(i);await("foreground",()->(Boolean)get(a,"mCobraRotationResumed")&&!a.isInPictureInPictureMode(),8000);}
  void shell(String command)throws Exception{try(ParcelFileDescriptor fd=ins.getUiAutomation().executeShellCommand(command);InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(fd)){byte[] b=new byte[1024];while(in.read(b)!=-1){}}}
+ void swipe(float x,float from,float to)throws Exception{long down=SystemClock.uptimeMillis();for(int i=0;i<=12;i++){int action=i==0?MotionEvent.ACTION_DOWN:i==12?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;MotionEvent e=MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,x,from+(to-from)*i/12f,0);try{ins.sendPointerSync(e);}finally{e.recycle();}SystemClock.sleep(18);}}
  @Test public void fullRuntimeJourney()throws Exception{
   out=new File(ins.getTargetContext().getExternalFilesDir(null),"audit279");out.mkdirs();
   Context ctx=ins.getTargetContext();JSONObject source=new JSONObject().put("id","audit").put("type","m3u").put("name","Generated audit provider").put("playlist_url","http://10.0.2.2:8765/audit.m3u").put("epg_url","");
@@ -101,8 +102,16 @@ public class CobraRuntime279Test {
   });
   check("Android resize and both themes",()->{
    runUi(()->{call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");});start("Classic");
-   for(String size:new String[]{"720x1280","1280x720","600x1000","1000x600"}){shell("wm size "+size);SystemClock.sleep(800);assertFilled("resize-"+size);screenshot("resize-"+size);}
-   shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);screenshot("theme-"+theme);}
+   for(String size:new String[]{"720x1280","1280x720","600x1000","1000x600"}){
+    shell("wm size "+size);SystemClock.sleep(800);runUi(()->((View)get(a,"mCobraGuideShell")).scrollTo(0,0));SystemClock.sleep(300);assertFilled("resize-"+size);screenshot("resize-"+size);
+    if(ui(()->((Number)call(get(a,"mCobraGuideShell"),"range")).intValue())>0){
+     Rect bounds=ui(()->{Rect r=new Rect();((View)get(a,"mCobraGuideShell")).getGlobalVisibleRect(r);return r;});
+     for(int i=0;i<4;i++)swipe(bounds.left+bounds.width()*.2f,bounds.top+bounds.height()*.85f,bounds.top+bounds.height()*.15f);
+     await("short-window channel browser reachable",()->{View list=(View)get(a,"mCobraGuideList");Rect r=new Rect();return list!=null&&list.getGlobalVisibleRect(r)&&r.height()>=Math.min(90,bounds.height()/3);},5000);
+     screenshot("short-window-browser-"+size);runUi(()->((View)get(a,"mCobraGuideShell")).scrollTo(0,0));
+    }
+   }
+   shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);assertEquals("System bar contrast "+theme,theme.equals("light"),ui(()->(a.getWindow().getDecorView().getSystemUiVisibility()&View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)!=0));screenshot("theme-"+theme);}
   });
   check("Rapid channel switching and repeated mode changes release stale bindings",()->{
    List<Object> clips=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd","Baked"})clips.add(channel(n));

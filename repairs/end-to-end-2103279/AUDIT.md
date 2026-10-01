@@ -13,6 +13,7 @@ The approved parent is `41f08774a8b908d60c0f9e6647497e40d6bbe081`, Cobra 2103278
 * Delayed movie metadata is now gated by the current navigation request and profile, preventing stale results from replacing a newer drawer destination.
 * Runtime screenshot review exposed captions beneath the visible player footer and a movie timeline limited to Live TV. Adaptive captions now avoid the existing controls, and the existing timeline/transport seeks VOD without preparing a new player. Live TV retains its existing rewind policy.
 * Direct Movies/Shows playback now restores the shared Watch ambient engine after guide teardown, instead of losing the approved illuminated controls. Off/Subtle/background gates remain unchanged.
+* Runtime screenshots exposed unreachable channels in exceptionally short windows. Those windows can now scroll the existing guide vertically while retaining the same player/surface; normal-size layouts remain unchanged. Light/Dark theme changes also immediately refresh system-bar icon contrast.
 * Display help text now describes the actual embedded center-crop behavior.
 
 Android texture readback omits the display transform. Ambient capture now maps the viewport back into source coordinates, so both embedded and Watch illumination sample the actual visible picture. The approved renderer, glass appearance, Off/Subtle behavior and fullscreen video policy are preserved; all other unmodified shell sources are checked byte-for-byte against the parent.

@@ -1,0 +1,57 @@
+  /** Only unusually short windows scroll the existing guide; normal geometry is unchanged. */
+  private class CobraGuideViewport extends FrameLayout {
+    final android.widget.OverScroller scroller=new android.widget.OverScroller(InfinityLiveActivity.this);
+    final android.graphics.Rect visible=new android.graphics.Rect();
+    float downX,downY,lastY;boolean dragging,previewVisible=true;
+    CobraGuideViewport(){super(InfinityLiveActivity.this);setVerticalScrollBarEnabled(true);}
+    int range(){return mCobraModeLayout==null?0:Math.max(0,dp(mCobraModeLayout.height)-getHeight());}
+    @Override public void scrollTo(int x,int y){super.scrollTo(0,Math.max(0,Math.min(range(),y)));}
+    @Override protected int computeVerticalScrollRange(){return getHeight()+range();}
+    @Override protected void onScrollChanged(int x,int y,int oldX,int oldY){
+      super.onScrollChanged(x,y,oldX,oldY);
+      if(mCobraImmersiveAmbient!=null)mCobraImmersiveAmbient.geometryChanged();
+      boolean shown=mCobraPreviewHost!=null&&mCobraPreviewHost.getGlobalVisibleRect(visible);
+      if(shown!=previewVisible){previewVisible=shown;cobraRefreshImmersiveAmbient();}
+    }
+    @Override public boolean onInterceptTouchEvent(android.view.MotionEvent event){
+      if(range()==0)return super.onInterceptTouchEvent(event);
+      switch(event.getActionMasked()){
+        case android.view.MotionEvent.ACTION_DOWN:scroller.abortAnimation();downX=event.getX();downY=lastY=event.getY();dragging=false;break;
+        case android.view.MotionEvent.ACTION_MOVE:
+          if(Math.abs(event.getY()-downY)>android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop()
+              &&Math.abs(event.getY()-downY)>Math.abs(event.getX()-downX)){dragging=true;return true;}break;
+        case android.view.MotionEvent.ACTION_UP:case android.view.MotionEvent.ACTION_CANCEL:dragging=false;break;
+      }return dragging;
+    }
+    @Override public boolean onTouchEvent(android.view.MotionEvent event){
+      if(range()==0)return super.onTouchEvent(event);
+      if(event.getActionMasked()==android.view.MotionEvent.ACTION_DOWN){downX=event.getX();downY=lastY=event.getY();return true;}
+      if(event.getActionMasked()==android.view.MotionEvent.ACTION_MOVE){scrollBy(0,Math.round(lastY-event.getY()));lastY=event.getY();return true;}
+      if(event.getActionMasked()==android.view.MotionEvent.ACTION_UP||event.getActionMasked()==android.view.MotionEvent.ACTION_CANCEL){dragging=false;return true;}
+      return true;
+    }
+    @Override public boolean onGenericMotionEvent(android.view.MotionEvent event){
+      if(range()>0&&event.getAction()==android.view.MotionEvent.ACTION_SCROLL){scrollBy(0,Math.round(-event.getAxisValue(android.view.MotionEvent.AXIS_VSCROLL)*dp(48)));return true;}
+      return super.onGenericMotionEvent(event);
+    }
+    @Override public boolean requestChildRectangleOnScreen(View child,android.graphics.Rect rectangle,boolean immediate){
+      if(range()==0)return super.requestChildRectangleOnScreen(child,rectangle,immediate);
+      android.graphics.Rect target=new android.graphics.Rect(rectangle);offsetDescendantRectToMyCoords(child,target);
+      int y=getScrollY();if(target.top<y)y=target.top;else if(target.bottom>y+getHeight())y=target.bottom-getHeight();
+      int before=getScrollY();scrollTo(0,y);return before!=getScrollY();
+    }
+    @Override public void onInitializeAccessibilityNodeInfo(android.view.accessibility.AccessibilityNodeInfo info){
+      super.onInitializeAccessibilityNodeInfo(info);if(range()==0)return;info.setClassName(ScrollView.class.getName());info.setScrollable(true);
+      if(getScrollY()<range())info.addAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+      if(getScrollY()>0)info.addAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+    }
+    @Override public boolean performAccessibilityAction(int action,Bundle args){
+      if(range()>0&&(action==android.view.accessibility.AccessibilityNodeInfo.ACTION_SCROLL_FORWARD||action==android.view.accessibility.AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD)){
+        int target=Math.max(0,Math.min(range(),getScrollY()+(action==android.view.accessibility.AccessibilityNodeInfo.ACTION_SCROLL_FORWARD?1:-1)*getHeight()*3/4));
+        scroller.startScroll(0,getScrollY(),0,target-getScrollY(),180);postInvalidateOnAnimation();return true;
+      }return super.performAccessibilityAction(action,args);
+    }
+    @Override public void computeScroll(){if(scroller.computeScrollOffset()){scrollTo(0,scroller.getCurrY());postInvalidateOnAnimation();}}
+    @Override protected void onDetachedFromWindow(){scroller.abortAnimation();super.onDetachedFromWindow();}
+  }
+
