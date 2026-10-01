@@ -1,13 +1,13 @@
 from pathlib import Path
 import sys,json,shutil
-here=Path(__file__).parent
+ambient_here=Path(__file__).parent
 mode=sys.argv[1]
 if mode in ('runtime','unit'):
     filename='stage_runtime.py' if mode=='runtime' else 'stage_tests.py'
     source=Path('repairs/remaining-repair-2103281',filename).read_text().replace('build281','build282').replace('audit281','audit282')
     exec(compile(source,filename,'exec'))
     if mode=='unit':
-        shutil.copy2(here/'InfinityAmbientGateTest.java','build282/xbmc/src/test/java/com/projectinfinity/kodi/InfinityAmbientGateTest.java')
+        shutil.copy2(ambient_here/'InfinityAmbientGateTest.java','build282/xbmc/src/test/java/com/projectinfinity/kodi/InfinityAmbientGateTest.java')
         p=Path('audit282/test-classes.json');names=json.loads(p.read_text());names.append('com.projectinfinity.kodi.InfinityAmbientGateTest');p.write_text(json.dumps(names,indent=2))
 elif mode=='runner':
     text=Path('repairs/remaining-repair-2103281/runtime.sh').read_text()
