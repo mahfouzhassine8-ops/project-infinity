@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Insets;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.SystemClock;
@@ -115,8 +114,8 @@ final class InfinityResponsiveTrace {
         Rect insets=currentInsets(activity);
         int rotation=Surface.ROTATION_0;
         try{
-          if(Build.VERSION.SDK_INT>=30 && activity.getDisplay()!=null)rotation=activity.getDisplay().getRotation();
-          else if(activity.getWindowManager().getDefaultDisplay()!=null)rotation=activity.getWindowManager().getDefaultDisplay().getRotation();
+          if(activity.getWindowManager().getDefaultDisplay()!=null)
+            rotation=activity.getWindowManager().getDefaultDisplay().getRotation();
         }catch(Exception ignored){}
         boolean multi=Build.VERSION.SDK_INT>=24&&activity.isInMultiWindowMode();
         boolean pip=Build.VERSION.SDK_INT>=26&&activity.isInPictureInPictureMode();
@@ -151,9 +150,7 @@ final class InfinityResponsiveTrace {
   }
 
   private static Rect currentWindowBounds(Activity activity){
-    try{
-      if(Build.VERSION.SDK_INT>=30)return new Rect(activity.getWindowManager().getCurrentWindowMetrics().getBounds());
-    }catch(Exception ignored){}
+    try{if(Build.VERSION.SDK_INT>=30)return Api30.windowBounds(activity);}catch(Exception ignored){}
     View decor=activity.getWindow().getDecorView();int w=decor==null?0:decor.getWidth(),h=decor==null?0:decor.getHeight();
     if(w<=0)w=activity.getResources().getDisplayMetrics().widthPixels;
     if(h<=0)h=activity.getResources().getDisplayMetrics().heightPixels;
@@ -162,17 +159,12 @@ final class InfinityResponsiveTrace {
 
   private static Rect currentInsets(Activity activity){
     try{
+      if(Build.VERSION.SDK_INT>=30)return Api30.insets(activity);
       View decor=activity.getWindow().getDecorView();
       if(decor!=null && Build.VERSION.SDK_INT>=23){
         WindowInsets wi=decor.getRootWindowInsets();
-        if(wi!=null){
-          if(Build.VERSION.SDK_INT>=30){
-            Insets i=wi.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());
-            return new Rect(i.left,i.top,i.right,i.bottom);
-          }
-          return new Rect(wi.getSystemWindowInsetLeft(),wi.getSystemWindowInsetTop(),
-              wi.getSystemWindowInsetRight(),wi.getSystemWindowInsetBottom());
-        }
+        if(wi!=null)return new Rect(wi.getSystemWindowInsetLeft(),wi.getSystemWindowInsetTop(),
+            wi.getSystemWindowInsetRight(),wi.getSystemWindowInsetBottom());
       }
     }catch(Exception ignored){}
     return new Rect();
@@ -372,4 +364,18 @@ final class InfinityResponsiveTrace {
   }
 
   private static String clean(String value){return value==null?"unknown":value.replace('\t',' ').replace('\n',' ').replace('\r',' ');}
+
+  /** Keep API-30 WindowMetrics/Insets types out of class verification on Android 5-10. */
+  private static final class Api30 {
+    static Rect windowBounds(Activity activity){
+      return new Rect(activity.getWindowManager().getCurrentWindowMetrics().getBounds());
+    }
+    static Rect insets(Activity activity){
+      View decor=activity.getWindow().getDecorView();
+      WindowInsets wi=decor==null?null:decor.getRootWindowInsets();
+      if(wi==null)return new Rect();
+      android.graphics.Insets i=wi.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());
+      return new Rect(i.left,i.top,i.right,i.bottom);
+    }
+  }
 }
