@@ -15,7 +15,7 @@ extras={
 }
 for folder,names in extras.items():
  for name in names:shutil.copy2(Path('repairs')/folder/'tests'/(name+'.java'),out/(name+'.java'))
-for name in ['SurfaceRuntimeRegressionTest','EmbeddedBorderCropTest','VodCallbackGuardTest','AmbientVisibleCropTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
+for name in ['SurfaceRuntimeRegressionTest','EmbeddedBorderCropTest','VodCallbackGuardTest','AmbientVisibleCropTest','VodControlsAndCaptionsTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
 # Reuse fixture helpers transitively without selecting their historical assertions.
 import re
 index={}
@@ -70,5 +70,5 @@ with (a.build/'xbmc/build.gradle').open('a') as f:
  for k,v in props.items():f.write(' systemProperty "'+k+'", "'+str(v)+'"\n')
  f.write(' testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" }\n}\ndependencies { testImplementation "junit:junit:4.13.2"; testImplementation "org.robolectric:robolectric:4.14.1" }\n')
 locked=json.loads(Path('parent278/CANDIDATE-VERIFICATION.json').read_text())['test_methods']
-names=list(locked)+['com.projectinfinity.kodi.'+n for v in extras.values() for n in v]+['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest','com.projectinfinity.kodi.EmbeddedBorderCropTest','com.projectinfinity.kodi.VodCallbackGuardTest','com.projectinfinity.kodi.AmbientVisibleCropTest']
+names=list(locked)+['com.projectinfinity.kodi.'+n for v in extras.values() for n in v]+['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest','com.projectinfinity.kodi.EmbeddedBorderCropTest','com.projectinfinity.kodi.VodCallbackGuardTest','com.projectinfinity.kodi.AmbientVisibleCropTest','com.projectinfinity.kodi.VodControlsAndCaptionsTest']
 Path('audit279/test-classes.json').write_text(json.dumps(names,indent=2))

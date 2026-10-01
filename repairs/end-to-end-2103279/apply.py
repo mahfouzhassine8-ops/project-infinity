@@ -37,6 +37,59 @@ def activity(s):
  s=once(s,'final JSONObject ready=info;runOnUiThread(()->{status("Ready");cobraRenderVodDetails(item,ready);});','final JSONObject ready=info;cobraPublishNavigation(ticket,()->{if(!profile.equals(mFeatures.activeProfileId()))return;status("Ready");cobraRenderVodDetails(item,ready);});')
  s=once(s,'Fullscreen fitting follows the actual pane. Preview and PiP keep the complete picture.','Fullscreen fitting follows the actual pane. Previews fill their frame; PiP keeps the complete picture.')
  s=once(s,'Inherited in fullscreen. Previews keep the complete picture. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.','Inherited in fullscreen. Previews use center crop. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.')
+ return playback_ui(s)
+
+def playback_ui(s):
+ s=once(s,'  private boolean cobraTimeshiftTimelineAvailable(){','''  private boolean cobraVodSeekable(){
+    if(mPlayingVodKey==null||mPlayingVodKey.isEmpty()||mPlayer==null)return false;
+    try{return mPlayer.isCurrentMediaItemSeekable()&&mPlayer.getDuration()>0L&&mPlayer.getDuration()!=C.TIME_UNSET;}
+    catch(RuntimeException unavailable){return false;}
+  }
+  private void cobraSeekVodBy(long delta){
+    if(!cobraVodSeekable())return;
+    try{mPlayer.seekTo(Math.max(0L,Math.min(mPlayer.getDuration(),mPlayer.getCurrentPosition()+delta)));}
+    catch(RuntimeException unavailable){return;}
+    cobraUpdateTimeshiftSeek();cobraUpdateLiveRewindControls();showPlayerChromeTemporarily();
+  }
+  private boolean cobraTimeshiftTimelineAvailable(){
+    if(cobraVodSeekable())return true;''')
+ s=once(s,'boolean liveWindow=available&&!mCobraProviderCatchupActive;','boolean liveWindow=available&&!mCobraProviderCatchupActive&&mPlayingVodKey.isEmpty();')
+ s=once(s,'  private void cobraRewindLive(long amountMs){','  private void cobraRewindLive(long amountMs){\n    if(!mPlayingVodKey.isEmpty()){cobraSeekVodBy(-amountMs);return;}')
+ s=once(s,'  private void cobraGoLive(){','  private void cobraGoLive(){\n    if(!mPlayingVodKey.isEmpty()){cobraSeekVodBy(30000L);return;}')
+ s=once(s,'  private void cobraUpdateLiveRewindControls(){','''  private void cobraUpdateLiveRewindControls(){
+    if(!mPlayingVodKey.isEmpty()){
+      boolean enabled=cobraVodSeekable();
+      if(mCobraLiveRewindButton!=null){mCobraLiveRewindButton.setEnabled(enabled);mCobraLiveRewindButton.setAlpha(enabled?1f:.35f);mCobraLiveRewindButton.setContentDescription("Rewind 30 seconds");}
+      if(mCobraGoLiveButton!=null){mCobraGoLiveButton.setEnabled(enabled);mCobraGoLiveButton.setAlpha(enabled?1f:.35f);mCobraGoLiveButton.setSelected(false);mCobraGoLiveButton.caption("+30s");mCobraGoLiveButton.setContentDescription("Forward 30 seconds");}return;
+    }
+    if(mCobraGoLiveButton!=null)mCobraGoLiveButton.caption("LIVE");''')
+ s=once(s,'    if(mCobraPlayerUpcoming!=null)mCobraPlayerUpcoming.setText(next==null?"":"Next  "+next.title);','''    if(mCobraPlayerUpcoming!=null)mCobraPlayerUpcoming.setText(next==null?"":"Next  "+next.title);
+    if(!mPlayingVodKey.isEmpty()&&mPlayer!=null&&mCobraPlayerSchedule!=null){
+      long duration=mPlayer.getDuration(),position=Math.max(0L,mPlayer.getCurrentPosition());
+      mCobraPlayerSchedule.setText(duration>0L&&duration!=C.TIME_UNSET?android.text.format.DateUtils.formatElapsedTime(position/1000L)+" / "+android.text.format.DateUtils.formatElapsedTime(duration/1000L):"Loading playback…");
+    }''')
+ s=once(s,'  private final class CobraCaptionOverlay extends View {','''  private int cobraCaptionBottom(View captions){
+    int bottom=captions.getHeight();if(!cobraSubtitleAdaptive())return bottom;
+    View obstruction=null;
+    if(captions.getParent()==mPlayerOverlay&&mPlayerChrome!=null&&mPlayerChrome.isShown()&&mPlayerChrome.getChildCount()>0)
+      obstruction=mPlayerChrome.getChildAt(mPlayerChrome.getChildCount()-1);
+    else if(captions.getParent()==mCobraPreviewHost&&mCobraPreviewHost!=null)
+      obstruction=mCobraPreviewHost.findViewWithTag("cobra_preview_controls");
+    if(obstruction!=null&&obstruction.isShown()&&obstruction.getHeight()>0){
+      int top=obstruction.getTop()-captions.getTop();if(obstruction.getParent()==mPlayerChrome)top+=mPlayerChrome.getTop();
+      if(top>dp(36))bottom=Math.min(bottom,Math.max(1,top-dp(8)));
+    }return bottom;
+  }
+  private final class CobraCaptionOverlay extends View {''')
+ s=once(s,'int save=canvas.save();canvas.clipRect(0,0,w,h);\n      for(androidx.media3.common.text.Cue cue:cues){','int save=canvas.save();canvas.clipRect(0,0,w,h);int contentBottom=cobraCaptionBottom(this);\n      for(androidx.media3.common.text.Cue cue:cues){')
+ s=once(s,'Math.max(1,h-dp(12))/(float)Math.max(1,height)','Math.max(1,contentBottom-dp(12))/(float)Math.max(1,height)')
+ s=once(s,'y=Math.max(0,Math.min(h-drawHeight,y));','y=Math.max(0,Math.min(contentBottom-drawHeight,y));')
+ s=once(s,'    cobraResetMotion(chrome);chrome.setVisibility(View.VISIBLE);','    cobraResetMotion(chrome);chrome.setVisibility(View.VISIBLE);cobraRefreshCaptionStyle();')
+ s=once(s,'cobraResetMotion(mPlayerChrome);mPlayerChrome.setVisibility(View.GONE);}','cobraResetMotion(mPlayerChrome);mPlayerChrome.setVisibility(View.GONE);cobraRefreshCaptionStyle();}')
+ s=once(s,'if(!cobraMotionEnabled()){target.setVisibility(View.GONE);return;}','if(!cobraMotionEnabled()){target.setVisibility(View.GONE);cobraRefreshCaptionStyle();return;}')
+ s=once(s,'if(cobraChromeCanHide(target))target.setVisibility(View.GONE);','if(cobraChromeCanHide(target)){target.setVisibility(View.GONE);cobraRefreshCaptionStyle();}')
+ s=once(s,'mPlayerChrome.setVisibility(View.GONE);ensureCobraPlayerLockOverlay();','mPlayerChrome.setVisibility(View.GONE);cobraRefreshCaptionStyle();ensureCobraPlayerLockOverlay();')
+ s=once(s,'mPlayerChrome=chrome;chrome.setTag("cobra_player_refined_chrome");','mPlayerChrome=chrome;chrome.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->cobraRefreshCaptionStyle());chrome.setTag("cobra_player_refined_chrome");')
  return s
 
 def peek(s):
