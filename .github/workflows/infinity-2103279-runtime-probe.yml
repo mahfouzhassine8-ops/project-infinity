@@ -1,0 +1,48 @@
+name: Cobra 2103279 exact locked APK runtime probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103279-end-to-end]
+    paths: ['.github/workflows/infinity-2103279-runtime-probe.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  locked-runtime:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103278-Watch-Ambient-RC1-TEST-CANDIDATE
+          run-id: 36794611568
+          github-token: ${{ github.token }}
+          path: parent278
+      - name: Enable KVM
+        run: |
+          sudo chmod 666 /dev/kvm
+          mkdir -p runtime-probe
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb shell getprop ro.product.cpu.abilist | tee runtime-probe/abis.txt
+            adb install parent278/Infinity-2103278-Watch-Ambient-RC1.apk | tee runtime-probe/install.txt
+            adb install -r parent278/Infinity-2103278-Watch-Ambient-RC1.apk | tee runtime-probe/reinstall.txt
+            adb shell am start -W -n com.projectinfinity.kodi/.InfinityLiveActivity | tee runtime-probe/launch.txt
+            sleep 10
+            adb exec-out screencap -p > runtime-probe/launch.png
+            adb shell uiautomator dump /sdcard/window.xml
+            adb pull /sdcard/window.xml runtime-probe/window.xml
+            adb logcat -d > runtime-probe/logcat.txt
+            adb shell dumpsys activity activities > runtime-probe/activities.txt
+            adb shell dumpsys meminfo com.projectinfinity.kodi > runtime-probe/memory.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Cobra-2103279-Locked-Runtime-Probe, path: runtime-probe/, retention-days: 90}
