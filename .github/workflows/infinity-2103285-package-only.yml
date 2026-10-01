@@ -1,0 +1,138 @@
+name: Infinity | 2103285 native FD APK packaging only
+on:
+  push:
+    branches: [candidate-infinity-2103285-native-fd-recovery]
+    paths:
+      - '.github/workflows/infinity-2103285-package-only.yml'
+      - 'repairs/native-fd-2103285/package.py'
+      - 'repairs/native-fd-2103285/runtime.sh'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103285-package-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Candidate
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: parent284
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103285-Native-FD-Engine
+          run-id: 36925544128
+          github-token: ${{ github.token }}
+          path: native285
+      - name: Verify rollback/source lineage and prepare native-only update
+        run: |
+          set -euo pipefail
+          mkdir -p candidate285 rollback285
+          test "$(git rev-parse rollback-infinity-2103284-before-native-fd-repair-20261001)" = c8a1adb7e8d7a2a8cd305a88944912c4861d94ea
+          git bundle create rollback285/2103284-source-rollback.bundle refs/remotes/origin/rollback-infinity-2103284-before-native-fd-repair-20261001
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+          python3 repairs/native-fd-2103285/package.py prepare --parent parent284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk --native native285/libkodi.so --out candidate285
+          cp parent284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk rollback285/
+          cp native285/engine-proof.json candidate285/NATIVE-ENGINE-PROOF.json
+          printf '%s\n' 'Parent APK 2103284 SHA-256: 0986aedd4d5375b125d02ba5b6aec29c6f9788722eb2ee13d3e8d588eeaa3cd9' 'Source parent: c8a1adb7e8d7a2a8cd305a88944912c4861d94ea' 'Protected baseline snapshot only; Android version downgrades are not a normal install-over rollback.' > rollback285/README.txt
+      - name: Permanently sign and verify all protected payload bytes
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          : "${INFINITY_KEYSTORE_B64:?Permanent signer required}"
+          : "${INFINITY_STORE_PASSWORD:?Permanent signer required}"
+          : "${INFINITY_KEY_PASSWORD:?Permanent signer required}"
+          : "${INFINITY_KEY_ALIAS:?Permanent signer required}"
+          bash scripts/sign-infinity71.sh candidate285/unsigned.apk candidate285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk
+          python3 repairs/native-fd-2103285/package.py verify --parent parent284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk --candidate candidate285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk --out candidate285
+          rm candidate285/unsigned.apk
+      - name: Device-test instructions
+        run: |
+          cat > candidate285/DEVICE-TEST.txt <<'EOF'
+          INFINITY 2103285 - NATIVE FD CRASH REPAIR RC1 - TEST CANDIDATE
+
+          Install this APK as an UPDATE over the current Infinity app.
+          Do not uninstall. Do not clear data. Do not run Start Fresh.
+          No Kodi ZIP installer, builder or repair add-on is required for this APK.
+
+          First test: open Infinity, choose the Kodi side, and leave it open for
+          two minutes. Close and reopen it twice. Do not install another skin
+          until this crash test passes. If it crashes, export diagnostics from
+          the Android Choose Your Experience/Health Center again.
+
+          This candidate changes the native Kodi engine and app version only.
+          Java code, app resources, bundled assets and the other native libraries
+          are byte-identical to APK 2103284. It does not delete add-ons, change
+          accounts, reset settings or replace the installed skin.
+
+          The 1.0.5.179 profile-layout defect, 1.0.5.180 installation and the full
+          Infinity compatibility/ambient audit are separate outstanding gates.
+          A successful build or emulator test is not Galaxy Fold acceptance.
+          This candidate is NOT LOCKED.
+          EOF
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103285-Native-FD-Crash-Repair-RC1-Candidate
+          path: candidate285/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103284-Before-Native-FD-Exact-Rollback
+          path: rollback285/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+  android-smoke:
+    needs: package
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: {name: Infinity-2103285-Native-FD-Crash-Repair-RC1-Candidate, path: candidate285}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Candidate
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: parent284
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103285-Native-FD-Evidence
+          run-id: 36925544128
+          github-token: ${{ github.token }}
+          path: native-evidence
+      - name: Enable disposable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash repairs/native-fd-2103285/runtime.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103285-Android-Update-Smoke-Evidence
+          path: runtime285/
+          retention-days: 90
+          if-no-files-found: warn
