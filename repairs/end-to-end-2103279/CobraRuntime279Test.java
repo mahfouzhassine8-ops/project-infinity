@@ -117,7 +117,17 @@ public class CobraRuntime279Test {
    List<Object> clips=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd","Baked"})clips.add(channel(n));
    for(int i=0;i<15;i++){final Object c=clips.get(i%clips.size());runUi(()->call(a,"startCobraPreview",c));SystemClock.sleep(90);}
    await("final rapid retune",()->{ExoPlayer p=(ExoPlayer)get(a,"mCobraPreviewPlayer");return p!=null&&p.isPlaying()&&p.getVideoSize().width>0;},15000);SystemClock.sleep(2200);assertFilled("rapid-final");
-   ExoPlayer same=player();for(String mode:new String[]{"grid","compact","cards","focus","mobile","cards","mobile"}){runUi(()->{put(a,"mCobraGuideStyle",mode);call(a,"cobraShowGuideShell");});SystemClock.sleep(250);assertSame(same,player());}
+   ExoPlayer same=player();for(String mode:new String[]{"grid","compact","cards","focus","mobile","cards","mobile"}){
+    runUi(()->call(a,"cobraSwitchMode",mode));SystemClock.sleep(250);
+    if(mode.equals("focus")){
+     // Approved Pro entry restores its saved hero in the resting state. That
+     // intentional selection may retune; all peer bindings must still be released.
+     Object saved=ui(()->call(a,"findChannel",((SharedPreferences)get(a,"mPrefs")).getString("cobra_pro_hero_channel","")));
+     assertNotNull(saved);assertEquals(ui(()->call(a,"cobraChannelKey",saved)),ui(()->get(a,"mCobraPreviewSessionKey")));
+     assertFalse("Pro keeps its approved resting entry",ui(()->((ExoPlayer)get(a,"mCobraPreviewPlayer")).getPlayWhenReady()));same=player();
+    }else assertSame("Unchanged preview owner in "+mode,same,player());
+    assertEquals("No stale bindings in "+mode,1,ui(()->((Map<?,?>)get(a,"mCobraPlayerBindings")).size()).intValue());
+   }
    assertEquals("Only the active player may retain a binding",1,ui(()->((Map<?,?>)get(a,"mCobraPlayerBindings")).size()).intValue());
    assertFilled("rapid-modes-final");
   });
@@ -154,7 +164,9 @@ public class CobraRuntime279Test {
    for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_MOVE,MotionEvent.ACTION_UP}){MotionEvent e=MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,seekBounds.left+seekBounds.width()*.4f,seekBounds.exactCenterY(),0);try{ins.sendPointerSync(e);}finally{e.recycle();}SystemClock.sleep(60);}
    await("movie touch seek",()->p.getCurrentPosition()>60000&&p.getCurrentPosition()<90000,8000);
    press("Rewind 30 seconds");await("movie rewind control",()->p.getCurrentPosition()<55000,8000);press("Forward 30 seconds");await("movie forward control",()->p.getCurrentPosition()>60000,8000);assertEquals(true,ui(()->call(a,"cobraCaptionsRequested",p)));
-   await("actual selected subtitle track",()->{for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups())if(g.getType()==androidx.media3.common.C.TRACK_TYPE_TEXT)for(int i=0;i<g.length;i++)if(g.isTrackSelected(i))return true;return false;},5000);await("rendered subtitle cue",()->{Object binding=((Map<?,?>)get(a,"mCobraPlayerBindings")).get(p);return !((List<?>)get(get(binding,"captions"),"cues")).isEmpty();},8000);SystemClock.sleep(2500);runUi(()->call(a,"showPlayerChromeTemporarily"));SystemClock.sleep(300);screenshot("movie-captions");
+   await("actual selected subtitle track",()->{for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups())if(g.getType()==androidx.media3.common.C.TRACK_TYPE_TEXT)for(int i=0;i<g.length;i++)if(g.isTrackSelected(i))return true;return false;},5000);await("rendered subtitle cue",()->{Object binding=((Map<?,?>)get(a,"mCobraPlayerBindings")).get(p);return !((List<?>)get(get(binding,"captions"),"cues")).isEmpty();},8000);SystemClock.sleep(2500);runUi(()->call(a,"showPlayerChromeTemporarily"));SystemClock.sleep(300);
+   JSONObject watch=ui(()->{Object engine=get(a,"mCobraImmersiveAmbient");View control=described((View)get(a,"mPlayerChrome"),"Channels");JSONObject d=new JSONObject().put("alpha",((View)engine).getAlpha()).put("background",control.getBackground().getClass().getName());for(String field:new String[]{"enabled","haveFrame","captures","captureFailed","controlsOnly","sourceRect"})d.put(field,String.valueOf(get(engine,field)));d.put("glass_count",((List<?>)get(engine,"glass")).size());return d;});try(FileWriter f=new FileWriter(new File(out,"movie-watch-ambient.json"))){f.write(watch.toString(2));}
+   screenshot("movie-captions");
    runUi(()->{call(a,"showTrackChooser");int group=0;boolean changed=false;for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups()){if(g.getType()==androidx.media3.common.C.TRACK_TYPE_AUDIO)for(int i=0;i<g.length;i++)if(g.isTrackSupported(i)&&!g.isTrackSelected(i)){View row=a.getWindow().getDecorView().findViewWithTag("cobra-track:"+group+":"+i);assertNotNull(row);assertTrue(row.performClick());changed=true;break;}group++;if(changed)break;}assertTrue("A second real audio track must be selectable",changed);});SystemClock.sleep(400);screenshot("audio-and-subtitles");runUi(()->call(a,"closeCobraActionSheet"));
    runUi(()->call(a,"closeFullscreenToCobraView"));assertEquals("movies",ui(()->call(a,"cobraDrawerOwner")));screenshot("movie-return");
   });
