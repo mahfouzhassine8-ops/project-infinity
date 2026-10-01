@@ -111,7 +111,7 @@ public class CobraRuntime279Test {
      screenshot("short-window-browser-"+size);runUi(()->((View)get(a,"mCobraGuideShell")).scrollTo(0,0));
     }
    }
-   shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);assertEquals("System bar contrast "+theme,theme.equals("light"),ui(()->(a.getWindow().getDecorView().getSystemUiVisibility()&View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)!=0));screenshot("theme-"+theme);}
+   shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);assertEquals("System bar contrast "+theme,theme.equals("light"),ui(()->(a.getWindow().getDecorView().getSystemUiVisibility()&View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)!=0));Bitmap screen=ins.getUiAutomation().takeScreenshot();try{int pixel=screen.getPixel(screen.getWidth()/2,Math.max(1,ui(()->((View)get(a,"mRoot")).getPaddingTop())/2));float luminance=.2126f*Color.red(pixel)+.7152f*Color.green(pixel)+.0722f*Color.blue(pixel);assertEquals("Visible status backdrop "+theme,theme.equals("light"),luminance>158);}finally{screen.recycle();}screenshot("theme-"+theme);}
   });
   check("Rapid channel switching and repeated mode changes release stale bindings",()->{
    List<Object> clips=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd","Baked"})clips.add(channel(n));

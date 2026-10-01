@@ -14,7 +14,7 @@ public class ShortWindowAndThemeTest {
   for(String mode:new String[]{"mobile","grid","compact","cards","focus"}){
    f.put(f.a,"mCobraGuideStyle",mode);f.call(f.a,"cobraShowGuideShell");ResponsiveWindowTest.window(f.ui,f.a,380,190);
    View shell=(View)f.get(f.a,"mCobraGuideShell"),browser=(View)f.get(f.a,"mCobraGuideBrowser");
-   assertTrue(shell.canScrollVertically(1));shell.scrollTo(0,10000);
+   shell.scrollTo(0,0);assertTrue(mode+" must expose a scroll range",shell.canScrollVertically(1));shell.scrollTo(0,10000);
    Rect shown=new Rect();assertTrue(mode,browser.getGlobalVisibleRect(shown));assertTrue(mode,shown.height()>=100);
    assertNotNull(f.get(f.a,"mCobraGuideList"));assertSame(player,f.get(f.a,"mCobraPreviewPlayer"));assertSame(texture,f.get(f.a,"mCobraPreviewTexture"));
   }assertEquals(0,f.state.prepares);assertEquals(0,f.state.mediaChanges);
@@ -33,6 +33,8 @@ public class ShortWindowAndThemeTest {
    prefs.edit().putString("cobra_appearance_mode",mode).commit();f.call(f.a,"cobraApplyAppearanceSettings");
    boolean darkIcons=(f.a.getWindow().getDecorView().getSystemUiVisibility()&View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)!=0;
    assertEquals(mode,"light".equals(mode),darkIcons);
+   View backdrop=(View)f.get(f.a,"mCobraBrowseBackground");android.graphics.Bitmap image=android.graphics.Bitmap.createBitmap(8,8,android.graphics.Bitmap.Config.ARGB_8888);
+   try{backdrop.getBackground().setBounds(0,0,8,8);backdrop.getBackground().draw(new android.graphics.Canvas(image));int pixel=image.getPixel(4,4);float luminance=.2126f*android.graphics.Color.red(pixel)+.7152f*android.graphics.Color.green(pixel)+.0722f*android.graphics.Color.blue(pixel);assertEquals("Backdrop contrast "+mode,"light".equals(mode),luminance>158);}finally{image.recycle();}
   }
  }
 }

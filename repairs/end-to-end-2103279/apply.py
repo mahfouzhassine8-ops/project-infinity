@@ -46,6 +46,11 @@ def short_window_ui(s):
  s=once(s,'  private void cobraLayoutGuide(){','  private int cobraGuideWorkingHeight(int measured){return measured<240?360:measured;}\n  private void cobraLayoutGuide(){')
  s=once(s,'    View controls=mCobraGuideVideo.findViewWithTag("cobra_preview_controls");','    mCobraGuideShell.scrollTo(0,mCobraGuideShell.getScrollY());\n    View controls=mCobraGuideVideo.findViewWithTag("cobra_preview_controls");')
  s=once(s,'    }else{buildShell();showSettings();}\n  }\n  private void showCobraSystemDarkPicker(){','    }else{buildShell();showSettings();}\n    cobraApplySystemBarsForSurface();\n  }\n  private void showCobraSystemDarkPicker(){')
+ s=once(s,'    mCobraPaletteSourceStamp=Long.MIN_VALUE;mCobraPaletteCache=null;mTheme=Theme.load(this);','''    mCobraPaletteSourceStamp=Long.MIN_VALUE;mCobraPaletteCache=null;mTheme=Theme.load(this);
+    if(mCobraBrowseBackground!=null){
+      mCobraBrowseBackground.setBackgroundColor(cobraThemeColor("background",mTheme.background));
+      vtheme().paint(mCobraBrowseBackground,"screen");mCobraBrowseBackground.invalidate();
+    }''')
  return s
 
 def playback_ui(s):
