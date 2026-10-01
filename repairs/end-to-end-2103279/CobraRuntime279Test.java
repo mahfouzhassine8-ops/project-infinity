@@ -81,6 +81,18 @@ public class CobraRuntime279Test {
    for(String size:new String[]{"720x1280","1280x720","600x1000","1000x600"}){shell("wm size "+size);SystemClock.sleep(800);assertFilled("resize-"+size);screenshot("resize-"+size);}
    shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);screenshot("theme-"+theme);}
   });
+  check("Real-time TS rewind / live edge / interrupted provider recovery",()->{
+   runUi(()->((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_live_rewind_enabled",true).commit());start("Rewind");
+   Object session=ui(()->get(a,"mCobraTimeshiftSession"));assertNotNull("Live TS must create rewind history",session);
+   await("real-time rewind history",()->Boolean.TRUE.equals(call(session,"ready")),40000);
+   ExoPlayer same=player();runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));runUi(()->call(a,"cobraRewindLive",10000L));
+   await("rewind decoder",()->get(a,"mCobraTimeshiftPlayer")==same&&same.isCurrentMediaItemSeekable()&&same.getPlaybackState()==Player.STATE_READY,15000);assertSame(same,ui(()->get(a,"mPlayer")));screenshot("live-rewind");
+   runUi(()->call(a,"cobraGoLive"));await("live edge plays",same::isPlaying,10000);
+   int prior=((Number)ui(()->call(session,"reconnects"))).intValue();new java.net.URL("http://10.0.2.2:8765/audit-outage").openConnection().getInputStream().close();
+   await("provider reconnect",()->((Number)call(session,"reconnects")).intValue()>prior,15000);
+   await("recovered playback",()->same.getPlaybackState()==Player.STATE_READY&&same.getPlayWhenReady(),20000);assertSame(same,ui(()->get(a,"mPlayer")));screenshot("live-after-outage");
+   runUi(()->{call(a,"closeFullscreenToCobraView");((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_live_rewind_enabled",false).commit();});start("Wide");
+  });
   check("HTTP movie details / My List / playback / seek / subtitles / Smart Return",()->{
    runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});await("HTTP movie catalog",()->!((List<?>)get(a,"mCobraVodMoviesCatalog")).isEmpty(),12000);
    Object movie=ui(()->((List<?>)get(a,"mCobraVodMoviesCatalog")).get(0));runUi(()->call(a,"cobraShowVodDetails",movie));await("movie details",()->String.valueOf(get(a,"mCobraStageTitle")).contains("MOVIE DETAILS"),10000);screenshot("movie-details");
@@ -89,6 +101,12 @@ public class CobraRuntime279Test {
    await("actual selected subtitle track",()->{for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups())if(g.getType()==androidx.media3.common.C.TRACK_TYPE_TEXT)for(int i=0;i<g.length;i++)if(g.isTrackSelected(i))return true;return false;},5000);screenshot("movie-captions");
    runUi(()->{call(a,"showTrackChooser");int group=0;boolean changed=false;for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups()){if(g.getType()==androidx.media3.common.C.TRACK_TYPE_AUDIO)for(int i=0;i<g.length;i++)if(g.isTrackSupported(i)&&!g.isTrackSelected(i)){View row=a.getWindow().getDecorView().findViewWithTag("cobra-track:"+group+":"+i);assertNotNull(row);assertTrue(row.performClick());changed=true;break;}group++;if(changed)break;}assertTrue("A second real audio track must be selectable",changed);});SystemClock.sleep(400);screenshot("audio-and-subtitles");runUi(()->call(a,"closeCobraActionSheet"));
    runUi(()->call(a,"closeFullscreenToCobraView"));assertEquals("movies",ui(()->call(a,"cobraDrawerOwner")));screenshot("movie-return");
+  });
+  check("Delayed movie metadata cannot replace a newer drawer destination",()->{
+   runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});await("movie catalog",()->!((List<?>)get(a,"mCobraVodMoviesCatalog")).isEmpty(),12000);
+   Object movie=ui(()->((List<?>)get(a,"mCobraVodMoviesCatalog")).get(0));runUi(()->call(a,"cobraShowVodDetails",movie));SystemClock.sleep(150);
+   runUi(()->{call(a,"cobraSelectDrawerOwner","SHOWS");call(a,"showCobraPrimaryView");});SystemClock.sleep(2000);
+   assertEquals("shows",ui(()->call(a,"cobraDrawerOwner")));assertFalse(String.valueOf(ui(()->get(a,"mCobraStageTitle"))).contains("MOVIE DETAILS"));screenshot("delayed-metadata-navigation");
   });
   check("HTTP show seasons / episode playback / return",()->{
    runUi(()->{call(a,"cobraSelectDrawerOwner","SHOWS");call(a,"showCobraPrimaryView");});await("HTTP show catalog",()->!((List<?>)get(a,"mCobraVodShowsCatalog")).isEmpty(),12000);

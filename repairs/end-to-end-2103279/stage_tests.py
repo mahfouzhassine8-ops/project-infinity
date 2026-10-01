@@ -15,7 +15,7 @@ extras={
 }
 for folder,names in extras.items():
  for name in names:shutil.copy2(Path('repairs')/folder/'tests'/(name+'.java'),out/(name+'.java'))
-for name in ['SurfaceRuntimeRegressionTest','EmbeddedBorderCropTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
+for name in ['SurfaceRuntimeRegressionTest','EmbeddedBorderCropTest','VodCallbackGuardTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
 # Reuse fixture helpers transitively without selecting their historical assertions.
 import re
 index={}
@@ -42,7 +42,7 @@ updates={
   ('assertFalse(CobraSmartReturn.enabled(prefs));assertFalse(prefs.contains("a"))','assertTrue(CobraSmartReturn.enabled(prefs));assertTrue(prefs.contains("a"))'),
   ('putInt(CobraSmartReturn.ENABLED,4).commit();assertFalse(CobraSmartReturn.enabled(prefs))','putInt(CobraSmartReturn.ENABLED,4).commit();assertTrue(CobraSmartReturn.enabled(prefs))')],
  'Cobra2103205SessionUiTest': [('cobra_smart_return_setting','cobra_smart_return_experience_display')],
- 'Cobra2103207RefinementUiTest': [('assertTrue(opaque>0);assertEquals(0,black);','assertTrue(opaque>0);assertTrue("No black disc around the approved artwork",black<opaque/20);'),('public void videoEmblemHasNoBlackDisc()throws Exception{','public void videoEmblemHasNoBlackDisc()throws Exception{Cobra2103208BrandingTest.installApprovedArtwork();')],
+ 'Cobra2103207RefinementUiTest': [('assertEquals(0,Color.alpha(b.getPixel(1,20)))','assertTrue("Outer mark edge is transparent apart from a one-step antialias fringe",Color.alpha(b.getPixel(1,20))<=1)'),('assertTrue(opaque>0);assertEquals(0,black);','assertTrue(opaque>0);assertTrue("No black disc around the approved artwork",black<opaque/20);'),('public void videoEmblemHasNoBlackDisc()throws Exception{','public void videoEmblemHasNoBlackDisc()throws Exception{Cobra2103208BrandingTest.installApprovedArtwork();')],
 }
 updates['Cobra2103208PresentationUiTest']=[
  ('"cobra-destination:MY LIST","cobra-destination:SETTINGS"','"cobra-destination:MY LIST","cobra-destination:SETTINGS","cobra-destination:SPORTS"'),
@@ -70,5 +70,5 @@ with (a.build/'xbmc/build.gradle').open('a') as f:
  for k,v in props.items():f.write(' systemProperty "'+k+'", "'+str(v)+'"\n')
  f.write(' testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" }\n}\ndependencies { testImplementation "junit:junit:4.13.2"; testImplementation "org.robolectric:robolectric:4.14.1" }\n')
 locked=json.loads(Path('parent278/CANDIDATE-VERIFICATION.json').read_text())['test_methods']
-names=list(locked)+['com.projectinfinity.kodi.'+n for v in extras.values() for n in v]+['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest','com.projectinfinity.kodi.EmbeddedBorderCropTest']
+names=list(locked)+['com.projectinfinity.kodi.'+n for v in extras.values() for n in v]+['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest','com.projectinfinity.kodi.EmbeddedBorderCropTest','com.projectinfinity.kodi.VodCallbackGuardTest']
 Path('audit279/test-classes.json').write_text(json.dumps(names,indent=2))

@@ -10,6 +10,7 @@ The approved parent is `41f08774a8b908d60c0f9e6647497e40d6bbe081`, Cobra 2103278
 * The main binding now reapplies its transform on same-surface attachment and first-frame/surface events, and retains valid video dimensions through transient UNKNOWN metadata.
 * Real Android decoding of the locked APK reproduced encoded pillarboxing: 45.45% of the measured boundary remained black in the padded fixture. A bounded embedded-only detector removes persistent symmetric black padding with proportional additional crop. Dark scenes and asymmetric shadows do not establish a crop.
 * The detector reuses one 96×64 bitmap and matrix/pixel buffers. It requires repeated evidence, samples initially at 200 ms and then every two seconds, suspends when paused/hidden/backgrounded, and releases callbacks/buffers with its binding. Fullscreen, PiP and Multi-View retain their existing scaling policies. Failed captures restore the previous transform and stop probing that session.
+* Delayed movie metadata is now gated by the current navigation request and profile, preventing stale results from replacing a newer drawer destination.
 * Display help text now describes the actual embedded center-crop behavior.
 
 The ambient implementation and all other unmodified shell sources are checked byte-for-byte against the parent. Ambient captures the displayed texture, including its current crop.
@@ -24,7 +25,7 @@ The ambient implementation and all other unmodified shell sources are checked by
 | Movies / Shows / audio / CC | Generated Xtream-compatible HTTP provider, actual video/audio/text tracks and return navigation | User-provider authentication, catalog quirks and supported languages still required |
 | Background / PiP / recreation | Android framework transitions against the installed signed product | Samsung pop-up/PiP and process pressure still required |
 | Responsive / visuals | Native screenshots and multiple window sizes; Light/Dark/OLED; protected reference renders | Physical Fold inner/cover/fold transitions and thermals still required |
-| Sports, providers, timeshift, rewind, settings, navigation | Locked regression suite plus historical feature-policy/integration suites | Authenticated services, recording destinations, external YouTube/trailer apps, long-running live TS/network recovery still require representative integration testing |
+| Sports, providers, timeshift, rewind, settings, navigation | Locked regression suite plus historical feature-policy/integration suites | Authenticated services, recording destinations, external YouTube/trailer apps, long-running provider-specific TS/network recovery still require representative integration testing |
 
 The HTTP fixtures are generated test content, not proof that every external provider or add-on works. Emulator captures are not physical Fold acceptance.
 
