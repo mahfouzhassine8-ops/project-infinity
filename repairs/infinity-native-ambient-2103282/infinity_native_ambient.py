@@ -16,6 +16,8 @@ import xbmcvfs
 
 PREFIX = 'Infinity.NativeAmbient.'
 CADENCE = 1.0 / 12.0
+CAPTURE_WAIT_MS = 50
+MAX_CAPTURE_MISSES = 12
 MAX_SURFACES = 24
 HOME = 10000
 
@@ -138,6 +140,7 @@ class Session:
         self.capture = None
         self.height = 0
         self.fresh = 0
+        self.capture_misses = 0
         self.ready = False
         self.glass = []
         self.last_frame = None
@@ -149,6 +152,7 @@ class Session:
         self.capture = None  # RenderCapture destructor releases the native capture.
         self.height = 0
         self.fresh = 0
+        self.capture_misses = 0
         self.ready = False
         self.last_frame = None
         self.last_light = None
@@ -251,17 +255,34 @@ def main():
                         session.fresh = 0
                         if session.capture.getImageFormat() != 'BGRA':
                             raise RuntimeError('unsupported capture format')
-                    frame = session.capture.getImage(30)
-                    if len(frame) != 144*session.height*4 or identity(observer) != key:
-                        raise RuntimeError('capture not current')
-                    session.fresh += 1
-                    # Drop initial buffers on every session/foreground transition.
-                    if session.fresh > 2:
-                        raw = (ctypes.c_ubyte * len(frame)).from_buffer(frame) if isinstance(frame,bytearray) else ctypes.create_string_buffer(frame)
-                        session.ready = bool(lib.infinity_ambient_feed(session.handle,raw,len(frame),144,session.height,int(appearance)))
-                        session.last_frame = frame
-                        session.last_light = appearance
-                        changed = session.ready
+                    try:
+                        frame = session.capture.getImage(CAPTURE_WAIT_MS)
+                    except RuntimeError:
+                        # A continuous RenderCapture can legitimately have no first
+                        # frame yet on Android. Keep the SAME capture handle alive;
+                        # recreating it here restarts warm-up forever on slower paths.
+                        frame = bytearray()
+                    if identity(observer) != key:
+                        raise RuntimeError('capture session changed')
+                    expected = 144*session.height*4
+                    if len(frame) != expected:
+                        session.capture_misses += 1
+                        if session.ready:
+                            home.setProperty(PREFIX+'Status','active-hold')
+                        else:
+                            clear('warming-frame')
+                        if session.capture_misses >= MAX_CAPTURE_MISSES:
+                            raise RuntimeError('capture warmup timed out')
+                    else:
+                        session.capture_misses = 0
+                        session.fresh += 1
+                        # Drop initial buffers on every session/foreground transition.
+                        if session.fresh > 2:
+                            raw = (ctypes.c_ubyte * len(frame)).from_buffer(frame) if isinstance(frame,bytearray) else ctypes.create_string_buffer(frame)
+                            session.ready = bool(lib.infinity_ambient_feed(session.handle,raw,len(frame),144,session.height,int(appearance)))
+                            session.last_frame = frame
+                            session.last_light = appearance
+                            changed = session.ready
                 elif appearance != session.last_light and session.last_frame is not None:
                     frame = session.last_frame
                     raw = (ctypes.c_ubyte * len(frame)).from_buffer(frame) if isinstance(frame,bytearray) else ctypes.create_string_buffer(frame)
