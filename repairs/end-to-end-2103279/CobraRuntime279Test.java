@@ -49,6 +49,25 @@ public class CobraRuntime279Test {
    assertTrue(name+" visible black edge fraction="+((float)black/total)+" "+diagnostic,black<total*.12f);
   }finally{screen.recycle();}
  }
+ void assertPeekDisplayed(Object session)throws Exception{
+  await("Quick Peek live state is published",()->{TextView state=a.getWindow().getDecorView().findViewWithTag("cobra_quick_peek_state");return state!=null&&state.getText().toString().startsWith("Live preview");},4000);
+  Rect bounds=ui(()->{Rect r=new Rect();assertTrue(((TextureView)get(session,"texture")).getGlobalVisibleRect(r));return r;});
+  int white=0,black=0,total=0;long until=SystemClock.uptimeMillis()+4000;
+  // A decoder first-frame callback precedes compositor presentation. Require
+  // the fixture's light grid on the actual screen, not just decoder state.
+  do{
+   SystemClock.sleep(150);ins.waitForIdleSync();Bitmap screen=ins.getUiAutomation().takeScreenshot();white=black=total=0;
+   try{
+    for(int y=10;y<90;y+=4)for(int x=10;x<90;x+=4){int c=screen.getPixel(bounds.left+bounds.width()*x/100,bounds.top+bounds.height()*y/100);if(Color.red(c)>140&&Color.green(c)>140&&Color.blue(c)>140)white++;}
+    for(int y=20;y<80;y+=2)for(int x:new int[]{2,97}){int c=screen.getPixel(bounds.left+bounds.width()*x/100,bounds.top+bounds.height()*y/100);if(Color.red(c)<16&&Color.green(c)<16&&Color.blue(c)<16)black++;total++;}
+    try(FileOutputStream f=new FileOutputStream(new File(out,"quick-peek.png"))){screen.compress(Bitmap.CompressFormat.PNG,100,f);}
+   }finally{screen.recycle();}
+   if(white>3)break;
+  }while(SystemClock.uptimeMillis()<until);
+  JSONObject d=new JSONObject().put("bounds",bounds.toShortString()).put("visible_grid_pixels",white).put("black_edge_fraction",black/(float)total);
+  try(FileWriter f=new FileWriter(new File(out,"quick-peek-display.json"))){f.write(d.toString(2));}
+  assertTrue("Quick Peek must display decoded picture: "+d,white>3);assertTrue("Quick Peek must fill its visible edges: "+d,black<total*.12f);
+ }
  EditText inputIn(View v){if(v instanceof EditText)return (EditText)v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){EditText edit=inputIn(((ViewGroup)v).getChildAt(i));if(edit!=null)return edit;}return null;}
  View described(View v,String text){if(text.contentEquals(v.getContentDescription()==null?"":v.getContentDescription()))return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=described(((ViewGroup)v).getChildAt(i),text);if(found!=null)return found;}return null;}
  void press(String label)throws Exception{runUi(()->{View v=described(a.getWindow().getDecorView(),label);assertNotNull("Control "+label,v);assertTrue("Control reachable "+label,v.isShown());assertTrue("Control callback "+label,v.performClick());});}
@@ -96,7 +115,7 @@ public class CobraRuntime279Test {
   check("Quick Peek uses real independent decoder and clean release",()->{
    start("Wide");ExoPlayer main=player();Object other=channel("Peek");runUi(()->call(a,"cobraShowQuickPeek",other,get(a,"mCobraPreviewHost")));
    // M3U capacity policy may intentionally deny another connection; expose that accurately.
-   await("Quick Peek session",()->get(a,"mCobraQuickPeek")!=null,6000);Object session=ui(()->get(a,"mCobraQuickPeek"));await("Quick Peek decode",()->((ExoPlayer)get(session,"player")).getVideoSize().width>0&&Boolean.TRUE.equals(get(session,"firstFrame")),12000);screenshot("quick-peek");runUi(()->call(a,"closeCobraActionSheet"));assertSame(main,player());assertTrue("Quick Peek must preserve requested main playback",ui(main::getPlayWhenReady));
+   await("Quick Peek session",()->get(a,"mCobraQuickPeek")!=null,6000);Object session=ui(()->get(a,"mCobraQuickPeek"));await("Quick Peek decode",()->((ExoPlayer)get(session,"player")).getVideoSize().width>0&&Boolean.TRUE.equals(get(session,"firstFrame")),12000);assertPeekDisplayed(session);runUi(()->call(a,"closeCobraActionSheet"));assertSame(main,player());assertTrue("Quick Peek must preserve requested main playback",ui(main::getPlayWhenReady));
   });
   check("Multi-View 2/3/4 real decoders and fullscreen return",()->{
    runUi(()->{call(a,"closeCobraActionSheet");call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel"));});
