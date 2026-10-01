@@ -93,6 +93,46 @@
   "physical_fold": false,
   "authenticated_user_providers": false,
   "repair_candidate_version": 2103280,
-  "repair_candidate_run_id": 36817533390,
-  "repair_candidate_status": "build and runtime verification pending"
+  "repair_candidate_run_id": 36818383789,
+  "repair_candidate_status": "build, signing, 522 regression tests, 20 render comparisons and 2 recording runtime scenarios passed; candidate not locked",
+  "repair_candidate": {
+    "source_commit": "29ec5acd15d3565df665e340de71ae610193f834",
+    "apk_sha256": "e12654c0d81b6b04c4507f2c8bfde9e92761ab5a93ac16b86a3f89f9b7656870",
+    "bytes": 93536543,
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "artifact_id": 11142822751,
+    "artifact_zip_sha256": "c9a45d77c1b48be3b34960cac1bcb888032eaa88b168e64284177daf909f1ec4",
+    "runtime_artifact_id": 11142569561,
+    "runtime_artifact_zip_sha256": "b3b54afa8cde668d2614e8c7cbb4fad302d9d8a71e5c496fac5773ae492af480",
+    "runtime": {
+      "kind": "signed APK / real Android runtime / generated HTTP provider content",
+      "device": "sdk_gphone_x86_64",
+      "api": 30,
+      "tests": [
+        {
+          "passed": true,
+          "pss_kb": 86100,
+          "java_heap_bytes": 8905776,
+          "native_heap_bytes": 21479920,
+          "name": "Recording start stop saved bytes local decode and Smart Return",
+          "elapsed_ms": 17037
+        },
+        {
+          "passed": true,
+          "pss_kb": 100285,
+          "java_heap_bytes": 7252072,
+          "native_heap_bytes": 46005760,
+          "name": "Finished recording clears active UI and permits next recording",
+          "elapsed_ms": 6835
+        }
+      ],
+      "physical_fold": false,
+      "cobra_activity_startup_ms": 912
+    },
+    "screenshots_reviewed": [
+      "recording-seek.png"
+    ],
+    "full_brief_completed": false,
+    "locked": false
+  }
 }
