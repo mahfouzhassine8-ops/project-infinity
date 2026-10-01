@@ -2,7 +2,7 @@ from pathlib import Path
 import argparse,hashlib,json,importlib.util
 spec=importlib.util.spec_from_file_location('repair',Path(__file__).with_name('apply.py'));r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
 p=argparse.ArgumentParser();p.add_argument('--baseline',type=Path,required=True);p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();b=a.baseline/'shell-kodi';n=a.root/'shell-kodi'
-expected={r.ACTIVITY:r.activity((b/r.ACTIVITY).read_text()),r.PEEK:r.peek((b/r.PEEK).read_text()),r.GRADLE:(b/r.GRADLE).read_text().replace('versionCode 2103278','versionCode 2103279').replace('1.0.9-Watch-Ambient-RC1',r.RELEASE)}
+expected={r.CROP:Path(__file__).with_name('CobraEmbeddedCrop.java.in').read_text(),r.ACTIVITY:r.activity((b/r.ACTIVITY).read_text()),r.PEEK:r.peek((b/r.PEEK).read_text()),r.GRADLE:(b/r.GRADLE).read_text().replace('versionCode 2103278','versionCode 2103279').replace('1.0.9-Watch-Ambient-RC1',r.RELEASE)}
 for name,value in expected.items():assert (n/name).read_text()==value,name
 unchanged=0
 for f in b.rglob('*'):

@@ -108,7 +108,7 @@ jobs:
           counts={}
           for f in Path('build279/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
             t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
-          assert len(counts)==50,counts
+          assert len(counts)==len(json.loads(Path('audit279/test-classes.json').read_text())),counts
           assert counts['com.projectinfinity.kodi.WholeUiAmbientTest']==23,counts
           assert counts['com.projectinfinity.kodi.MiniPlayerFillTest']==13,counts
           assert counts['com.projectinfinity.kodi.WatchAmbientTest']==26,counts

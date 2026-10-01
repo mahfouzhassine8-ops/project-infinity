@@ -21,7 +21,7 @@ public class CobraRuntime279Test {
  <T>T ui(Callable<T> c)throws Exception{final Object[] r=new Object[2];ins.runOnMainSync(()->{try{r[0]=c.call();}catch(Throwable e){r[1]=e;}});if(r[1]!=null)throw new Exception((Throwable)r[1]);return (T)r[0];}
  void runUi(Action c)throws Exception{ui(()->{c.run();return null;});}
  void await(String label,Callable<Boolean> condition,long ms)throws Exception{long end=SystemClock.uptimeMillis()+ms;while(SystemClock.uptimeMillis()<end){if(ui(condition))return;SystemClock.sleep(150);}throw new AssertionError("Timeout: "+label);}
- void check(String name,Action action){long start=SystemClock.elapsedRealtime();JSONObject record=new JSONObject();try{action.run();record.put("passed",true);}catch(Throwable e){errors.add(name+": "+e);try{record.put("passed",false).put("error",android.util.Log.getStackTraceString(e));}catch(Exception ignored){}}try{record.put("name",name).put("elapsed_ms",SystemClock.elapsedRealtime()-start);results.put(record);saveResults();}catch(Exception e){throw new RuntimeException(e);}}
+ void check(String name,Action action){long start=SystemClock.elapsedRealtime();JSONObject record=new JSONObject();try{action.run();record.put("passed",true);}catch(Throwable e){errors.add(name+": "+e);try{record.put("passed",false).put("error",android.util.Log.getStackTraceString(e));}catch(Exception ignored){}}try{record.put("name",name).put("elapsed_ms",SystemClock.elapsedRealtime()-start);results.put(record);android.util.Log.i("CobraAudit279",record.toString());saveResults();}catch(Exception e){throw new RuntimeException(e);}}
  void saveResults()throws Exception{try(FileWriter w=new FileWriter(new File(out,"runtime-results.json"))){w.write(new JSONObject().put("kind","signed APK / real Android runtime / generated HTTP provider content").put("device",Build.MODEL).put("api",Build.VERSION.SDK_INT).put("tests",results).put("physical_fold",false).toString(2));}}
  void screenshot(String name)throws Exception{Bitmap b=ins.getUiAutomation().takeScreenshot();assertNotNull(b);try(FileOutputStream f=new FileOutputStream(new File(out,name+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,f);}finally{b.recycle();}}
  ExoPlayer player()throws Exception{return ui(()->(ExoPlayer)get(a,"mCobraPreviewPlayer"));}
@@ -42,7 +42,7 @@ public class CobraRuntime279Test {
    for(String clip:new String[]{"Wide","Classic","Portrait","Odd"}){start(clip);assertFilled(mode+"-"+clip);}
    screenshot("mode-"+mode);
   });
-  check("Encoded black bars diagnostic",()->{start("Baked");assertFilled("baked-bars");});
+  check("Encoded black bars diagnostic",()->{start("Baked");SystemClock.sleep(1800);assertFilled("baked-bars");});
   check("Pause resume and fullscreen handoff preserve player",()->{
    start("Classic");ExoPlayer same=player();runUi(()->call(a,"toggleCobraPreviewPlayPause"));assertFalse(ui(same::getPlayWhenReady));long position=ui(same::getCurrentPosition);SystemClock.sleep(600);assertTrue(Math.abs(ui(same::getCurrentPosition)-position)<100);runUi(()->call(a,"toggleCobraPreviewPlayPause"));assertTrue(ui(same::getPlayWhenReady));
    runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));await("fullscreen first frame",()->get(a,"mPlayer")==same&&((TextureView)get(a,"mPlayerTexture")).isAvailable(),10000);screenshot("watch-fullscreen");

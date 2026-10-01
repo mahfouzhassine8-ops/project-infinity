@@ -6,6 +6,7 @@ APK_SHA='473eed44dbe8bb6152ec895a96d034361c4fc8fb3217edb9b26cc753e0f631f7'
 RELEASE='1.0.9-End-to-End-Repair-RC1'
 ACTIVITY='tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in'
 PEEK='tools/android/packaging/xbmc/src/CobraQuickPeekSession.java.in'
+CROP='tools/android/packaging/xbmc/src/CobraEmbeddedCrop.java.in'
 GRADLE='tools/android/packaging/xbmc/build.gradle.in'
 def once(s,a,b):
  assert s.count(a)==1,(a[:100],s.count(a));return s.replace(a,b,1)
@@ -19,20 +20,35 @@ def activity(s):
     CobraPlayerBinding b=mCobraPlayerBindings.get(player);
     if(b!=null){if(size.width>0&&size.height>0)b.lastVideoSize=size;else size=b.lastVideoSize;}
     CobraChannelPreferences saved=''')
+ s=once(s,'    final CobraSessionVitals vitals;CobraCaptionOverlay captions;','    final CobraSessionVitals vitals;CobraCaptionOverlay captions;final CobraEmbeddedCrop embeddedCrop;')
+ s=once(s,'CobraPlayerBinding(ExoPlayer p,Channel c){player=p;channel=c;vitals=new CobraSessionVitals(p,c);}','''CobraPlayerBinding(ExoPlayer p,Channel c){player=p;channel=c;vitals=new CobraSessionVitals(p,c);
+      embeddedCrop=new CobraEmbeddedCrop(()->current()&&texture==mCobraPreviewTexture&&mPlayerOverlay==null&&!mInPictureInPicture&&!mBackgroundStopped&&mCobraRotationResumed,
+          ()->{if(mCobraImmersiveAmbient!=null)mCobraImmersiveAmbient.geometryChanged();});}''')
+ s=once(s,'@Override public void onIsPlayingChanged(boolean playing){if(current()){if(player==mPlayer)', '@Override public void onIsPlayingChanged(boolean playing){if(current()){embeddedCrop.refresh();if(player==mPlayer)')
+ s=once(s,'if(binding!=null){binding.closed=true;player.removeListener(binding);','if(binding!=null){binding.closed=true;binding.embeddedCrop.close();player.removeListener(binding);')
+ s=once(s,'  private void cobraStartPresentationTicker() {','  private void cobraStartPresentationTicker() {\n    for(CobraPlayerBinding binding:mCobraPlayerBindings.values())binding.embeddedCrop.refresh();')
+ s=once(s,'    if((embedded||(texture==mPlayerTexture&&mPlayerOverlay!=null))&&mCobraImmersiveAmbient!=null)', '    if(b!=null)b.embeddedCrop.apply(texture,player,matrix,embedded);\n    if((embedded||(texture==mPlayerTexture&&mPlayerOverlay!=null))&&mCobraImmersiveAmbient!=null)')
+ s=once(s,'texture.setTransform(matrix);}'+'\n    }else cobraFitVideo','texture.setTransform(matrix);binding.embeddedCrop.apply(texture,binding.player,matrix,false);}'+'\n    }else cobraFitVideo')
+ s=once(s,'Fullscreen fitting follows the actual pane. Preview and PiP keep the complete picture.','Fullscreen fitting follows the actual pane. Previews fill their frame; PiP keeps the complete picture.')
+ s=once(s,'Inherited in fullscreen. Previews keep the complete picture. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.','Inherited in fullscreen. Previews use center crop. Multi-View tiles inherit Fold Fit / Fold Fill unless a channel overrides them.')
  return s
 
 def peek(s):
+ s=once(s,'  private Listener listener;','  private Listener listener;\n  private final CobraEmbeddedCrop crop=new CobraEmbeddedCrop(()->!this.closed,null);')
+ s=once(s,'    @Override public void onVideoSizeChanged(VideoSize size){fit();}','    @Override public void onIsPlayingChanged(boolean playing){crop.refresh();}\n    @Override public void onVideoSizeChanged(VideoSize size){fit();}')
+ s=once(s,'    if(closed)return;closed=true;handler.removeCallbacksAndMessages(null);listener=null;','    if(closed)return;closed=true;crop.close();handler.removeCallbacksAndMessages(null);listener=null;')
  s=once(s,'firstFrame=true;handler.removeCallbacks(startupTimeout);','firstFrame=true;fit();handler.removeCallbacks(startupTimeout);')
  s=once(s,'    @Override public void onVideoSizeChanged(VideoSize size){fit();}','    @Override public void onVideoSizeChanged(VideoSize size){fit();}\n    @Override public void onSurfaceSizeChanged(int width,int height){fit();}')
  s=once(s,'''    float aspect=size.width*Math.max(.01f,size.pixelWidthHeightRatio)/size.height;float viewport=(float)w/h;
     Matrix matrix=new Matrix();matrix.setScale(aspect<viewport?aspect/viewport:1f,aspect>viewport?viewport/aspect:1f,w/2f,h/2f);texture.setTransform(matrix);''','''    float[] scale=InfinityLiveActivity.CobraFoldAspectPolicy.fill(size.width,size.height,size.pixelWidthHeightRatio,w,h);
-    Matrix matrix=new Matrix();matrix.setScale(scale[0],scale[1],w/2f,h/2f);texture.setTransform(matrix);''')
+    Matrix matrix=new Matrix();matrix.setScale(scale[0],scale[1],w/2f,h/2f);texture.setTransform(matrix);crop.apply(texture,player,matrix,true);''')
  return s
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();root=a.root;shell=root/'shell-kodi'
  for path,fn in [(ACTIVITY,activity),(PEEK,peek)]:
   f=shell/path;f.write_text(fn(f.read_text()))
+ f=shell/'tools/android/packaging/xbmc/src/CobraEmbeddedCrop.java.in';f.write_text((HERE/'CobraEmbeddedCrop.java.in').read_text())
  f=shell/GRADLE;f.write_text(once(once(f.read_text(),'versionCode 2103278','versionCode 2103279'),'1.0.9-Watch-Ambient-RC1',RELEASE))
  f=root/'scripts/infinity_background_resume.py';s=f.read_text()
  for key,value in [('VERSION_CODE','2103279'),('RELEASE',repr(RELEASE)),('BASE_COMMIT',repr(BASE)),('BASE_APK_SHA256',repr(APK_SHA))]:
@@ -40,7 +56,7 @@ def main():
  f.write_text(s)
  f=root/'scripts/package_background_resume.py';f.write_text(f.read_text().replace('Infinity-2103278-Watch-Ambient-RC1','Infinity-2103279-End-to-End-Repair-RC1').replace("'base_run':36790711206","'base_run':36794611568").replace('repairs/watch-ambient-2103278/DEVICE-TEST.md','repairs/end-to-end-2103279/DEVICE-TEST.md'))
  f=root/'engine/background-resume-source.json';r=json.loads(f.read_text());r.update(base_source_commit=BASE,base_apk_sha256=APK_SHA,version_code=2103279,release=RELEASE,candidate_locked=False,physical_device_verified=False)
- for path in [ACTIVITY,PEEK,GRADLE]:r['files'].setdefault(path,{})['after']=hashlib.sha256((shell/path).read_bytes()).hexdigest()
+ for path in [ACTIVITY,PEEK,GRADLE,CROP]:r['files'].setdefault(path,{})['after']=hashlib.sha256((shell/path).read_bytes()).hexdigest()
  f.write_text(json.dumps(r,indent=2,sort_keys=True)+'\n');a.out.mkdir(parents=True,exist_ok=True)
  print('Applied bounded surface lifecycle and Quick Peek fill repairs.')
 if __name__=='__main__':main()

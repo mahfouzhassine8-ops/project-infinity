@@ -13,7 +13,7 @@ public class SurfaceRuntimeRegressionTest {
  Object get(Object o,String n)throws Exception{return CobraNavigationUiTest.get(o,n);} void put(Object o,String n,Object v)throws Exception{CobraNavigationUiTest.put(o,n,v);}
  Object call(Object o,String n,Object...args)throws Exception{return CobraNavigationUiTest.call(o,n,args);}
  @Before public void before()throws Exception{
-  CobraVisualRenderer.loading.set(true);CobraVisualRenderer.active=CobraVisualTheme.builtin();CobraVisualRenderer.clients.clear();ui=new CobraNavigationUiTest();ui.clock();a=ui.fixture(12);ui.measure(a,412,915);
+  CobraVisualRenderer.loading.set(true);CobraVisualRenderer.active=CobraVisualTheme.builtin();CobraVisualRenderer.clients.clear();ui=new CobraNavigationUiTest();ui.clock();a=ui.fixture(12);call(a,"cobraShowGuideShell");ui.measure(a,412,915);
   texture=(TextureView)get(a,"mCobraPreviewTexture");state=new Cobra2103201ScrubberTest.Controlled();
   player=(ExoPlayer)Proxy.newProxyInstance(ExoPlayer.class.getClassLoader(),new Class[]{ExoPlayer.class},(p,m,args)->m.getName().equals("getVideoSize")?size.get():state.invoke(p,m,args));
   Object channel=((List<?>)get(a,"mChannels")).get(0);binding=CobraNavigationUiTest.construct("CobraPlayerBinding",a,player,channel);((Map)get(a,"mCobraPlayerBindings")).put(player,binding);put(a,"mCobraPreviewPlayer",player);listener=(Player.Listener)binding;

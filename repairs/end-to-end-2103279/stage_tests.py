@@ -15,7 +15,7 @@ extras={
 }
 for folder,names in extras.items():
  for name in names:shutil.copy2(Path('repairs')/folder/'tests'/(name+'.java'),out/(name+'.java'))
-for name in ['SurfaceRuntimeRegressionTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
+for name in ['SurfaceRuntimeRegressionTest','EmbeddedBorderCropTest']:shutil.copy2(Path(__file__).parent/(name+'.java'),out/(name+'.java'))
 # Reuse fixture helpers transitively without selecting their historical assertions.
 import re
 index={}
@@ -26,6 +26,32 @@ while True:
   missing.update(n for n in re.findall(r'\b([A-Z][A-Za-z0-9_]*(?:Test|Harness))\b',f.read_text()) if n in index and not (out/(n+'.java')).exists())
  if not missing:break
  for name in sorted(missing):shutil.copy2(sorted(index[name],key=lambda p:str(p))[-1],out/(name+'.java'))
+# Historical suites predate approved defaults/menu deduplication; update only these
+# superseded expectations. The exact locked 300-test suite above is untouched.
+updates={
+ 'Cobra2103187TsAccessUnitCompatibilityTest':[
+  ('keepsNonIdrKeyframesDisabled','retainsApproved2103188NonIdrCompatibility'),
+  ('assertFalse(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes())','assertTrue(InfinityLiveActivity.CobraTsParserPolicy.allowsNonIdrKeyframes())'),
+  ('assertEquals(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS,','assertEquals(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS | androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES,')],
+ 'Cobra2103198CompleteProductAuditTest':[
+  ('"Fold Adaptive"','"Fold Fit"'),
+  ('"Audio & subtitles","Aspect / Display","Cast / Route"','"Audio & subtitles","Cast / Route"'),
+  ('"Aspect / display","Preferred audio language","Subtitles","Configured stream fallback"','"Restart live playback","Picture-in-picture","Play in background","Live TV Rewind","Configured stream fallback"')],
+ 'Cobra2103205SessionPolicyTest':[
+  ('smartReturnDefaultsOffAndDoesNotWriteSnapshot','smartReturnRetainsApprovedOnDefaultAndWritesSnapshot'),
+  ('assertFalse(CobraSmartReturn.enabled(prefs));assertFalse(prefs.contains("a"))','assertTrue(CobraSmartReturn.enabled(prefs));assertTrue(prefs.contains("a"))'),
+  ('putInt(CobraSmartReturn.ENABLED,4).commit();assertFalse(CobraSmartReturn.enabled(prefs))','putInt(CobraSmartReturn.ENABLED,4).commit();assertTrue(CobraSmartReturn.enabled(prefs))')],
+ 'Cobra2103205SessionUiTest': [('cobra_smart_return_setting','cobra_smart_return_experience_display')],
+ 'Cobra2103207RefinementUiTest': [('public void videoEmblemHasNoBlackDisc()throws Exception{','public void videoEmblemHasNoBlackDisc()throws Exception{Cobra2103208BrandingTest.installApprovedArtwork();')],
+}
+for name,changes in updates.items():
+ f=out/(name+'.java');s=f.read_text()
+ for old,new in changes:
+  assert old in s,(name,old);s=s.replace(old,new)
+ f.write_text(s)
+resources=a.build/'xbmc/src/test/resources';resources.mkdir(parents=True,exist_ok=True)
+shutil.copy2('shell-kodi/tools/android/packaging/xbmc/res/drawable-nodpi/infinity_splash_icon.png',resources/'cobra-approved-mark.png')
+Path('audit279/historical-expectation-updates.json').write_text(json.dumps(updates,indent=2))
 evidence=Path('audit279/screenshots').resolve();evidence.mkdir(parents=True,exist_ok=True)
 props={'cobra.evidence':evidence,'glass.evidence':evidence/'protected','pro.evidence':evidence/'pro','glass.phone.evidence':evidence/'phone','responsive.evidence':evidence/'responsive','pro.fixture':Path('source278/screenshots/test-video-fixture.webp').resolve()}
 with (a.build/'xbmc/build.gradle').open('a') as f:
@@ -33,5 +59,5 @@ with (a.build/'xbmc/build.gradle').open('a') as f:
  for k,v in props.items():f.write(' systemProperty "'+k+'", "'+str(v)+'"\n')
  f.write(' testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" }\n}\ndependencies { testImplementation "junit:junit:4.13.2"; testImplementation "org.robolectric:robolectric:4.14.1" }\n')
 locked=json.loads(Path('parent278/CANDIDATE-VERIFICATION.json').read_text())['test_methods']
-names=list(locked)+['com.projectinfinity.kodi.'+n for v in extras.values() for n in v]+['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest']
+names=list(locked)+['com.projectinfinity.kodi.'+n for v in extras.values() for n in v]+['com.projectinfinity.kodi.SurfaceRuntimeRegressionTest','com.projectinfinity.kodi.EmbeddedBorderCropTest']
 Path('audit279/test-classes.json').write_text(json.dumps(names,indent=2))

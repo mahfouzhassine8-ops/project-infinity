@@ -1,0 +1,75 @@
+package @APP_PACKAGE@;
+
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.TextureView;
+import android.view.View;
+import androidx.media3.exoplayer.ExoPlayer;
+
+/** Conservatively removes persistent symmetric black padding encoded in embedded feeds.
+ * Never owns a decoder, surface listener, audio, playback state, or fullscreen policy. */
+final class CobraEmbeddedCrop implements AutoCloseable {
+  interface Guard { boolean active(); }
+  private final Guard guard;private final Runnable changed;
+  private final Handler handler=new Handler(Looper.getMainLooper());
+  private final Matrix base=new Matrix(),restore=new Matrix(),identity=new Matrix(),result=new Matrix();
+  private final float[] values=new float[9];
+  private final int[] pixels=new int[96*64];
+  private Bitmap sample;private TextureView texture;private ExoPlayer player;
+  private boolean active,scheduled,closed,failed;private float zoom=1f,contentX=1f,contentY=1f,candidateX=1f,candidateY=1f;private int consistent,probes;
+  private final int[] borders=new int[4];
+  private final Runnable tick=()->{scheduled=false;if(!maySample())return;probe();schedule(++probes<4?200L:2000L);};
+  CobraEmbeddedCrop(Guard guard,Runnable changed){this.guard=guard;this.changed=changed;}
+  float zoom(){return zoom;}
+  void apply(TextureView view,ExoPlayer source,Matrix transform,boolean enabled){
+    if(closed)return;if(player!=source){zoom=contentX=contentY=candidateX=candidateY=1f;consistent=probes=0;failed=false;}player=source;texture=view;base.set(transform);active=enabled;
+    drawTransform();refresh();
+  }
+  void refresh(){if(maySample())schedule(0L);else cancel();}
+  private boolean maySample(){
+    if(closed||failed||!active||texture==null||player==null||!guard.active()||!texture.isAttachedToWindow()||!texture.isShown()||texture.getWindowVisibility()!=View.VISIBLE||!texture.isAvailable())return false;
+    try{return player.isPlaying()&&player.getVideoSize().width>0&&player.getVideoSize().height>0;}catch(RuntimeException unavailable){return false;}
+  }
+  private void schedule(long delay){if(scheduled||!maySample())return;scheduled=true;handler.postDelayed(tick,delay);}
+  private void cancel(){handler.removeCallbacks(tick);scheduled=false;}
+  private void drawTransform(){
+    if(texture==null)return;base.getValues(values);zoom=active?requiredZoom(values[Matrix.MSCALE_X],values[Matrix.MSCALE_Y],contentX,contentY):1f;
+    result.set(base);if(active&&zoom>1f)result.setScale(values[Matrix.MSCALE_X]*zoom,values[Matrix.MSCALE_Y]*zoom,texture.getWidth()/2f,texture.getHeight()/2f);texture.setTransform(result);
+  }
+  static float requiredZoom(float sx,float sy,float contentX,float contentY){return Math.max(1f,Math.max(1f/Math.max(.01f,sx*contentX),1f/Math.max(.01f,sy*contentY)));}
+  private void probe(){
+    TextureView target=texture;if(target==null)return;
+    try{
+      if(sample==null)sample=Bitmap.createBitmap(96,64,Bitmap.Config.ARGB_8888);
+      // Capture the uncropped texture and restore the displayed transform before
+      // returning to the UI loop; the next presented frame always uses the crop.
+      target.getTransform(restore);
+      try{target.setTransform(identity);target.getBitmap(sample);}finally{target.setTransform(restore);}
+      sample.getPixels(pixels,0,96,0,0,96,64);if(!detectBorders(pixels,96,64,borders))return;
+      float x=1f-(borders[0]+borders[1])/96f,y=1f-(borders[2]+borders[3])/64f;
+      if(Math.abs(x-candidateX)<.02f&&Math.abs(y-candidateY)<.03f)consistent++;else{candidateX=x;candidateY=y;consistent=1;}
+      if(consistent>=3&&(Math.abs(contentX-candidateX)>.015f||Math.abs(contentY-candidateY)>.015f)){contentX=candidateX;contentY=candidateY;drawTransform();if(changed!=null)changed.run();}
+    }catch(RuntimeException|OutOfMemoryError unavailable){failed=true;cancel();}
+  }
+  private static boolean black(int value){return Color.red(value)<18&&Color.green(value)<18&&Color.blue(value)<18;}
+  private static boolean row(int[] p,int w,int h,int y){int black=0;for(int x=0;x<w;x++)if(black(p[y*w+x]))black++;return black>=w*.99f;}
+  private static boolean col(int[] p,int w,int h,int x){int black=0;for(int y=0;y<h;y++)if(black(p[y*w+x]))black++;return black>=h*.99f;}
+  /** False means insufficient evidence; retain prior crop across dark/transient frames. */
+  static boolean detectBorders(int[] p,int w,int h,int[] out){
+    if(p==null||w<8||h<8||p.length<w*h)return false;
+    int bright=0,total=0;for(int y=h/3;y<h*2/3;y++)for(int x=w/3;x<w*2/3;x++){int c=p[y*w+x];if(Math.max(Color.red(c),Math.max(Color.green(c),Color.blue(c)))>48)bright++;total++;}
+    if(bright<total*.55f)return false;
+    int left=0,right=0,top=0,bottom=0;
+    while(left<w*.4f&&col(p,w,h,left))left++;while(right<w*.4f&&col(p,w,h,w-1-right))right++;
+    while(top<h*.4f&&row(p,w,h,top))top++;while(bottom<h*.4f&&row(p,w,h,h-1-bottom))bottom++;
+    // Symmetric, straight black borders only. Do not chase a dark side of a scene.
+    if(Math.abs(left-right)>1||Math.abs(top-bottom)>1)return false;
+    if(Math.min(left,right)<2)left=right=0;if(Math.min(top,bottom)<2)top=bottom=0;
+    if(left>=w*.4f||right>=w*.4f||top>=h*.4f||bottom>=h*.4f)return false;
+    out[0]=left;out[1]=right;out[2]=top;out[3]=bottom;return true;
+  }
+  @Override public void close(){if(closed)return;closed=true;cancel();if(sample!=null)sample.recycle();sample=null;texture=null;player=null;}
+}
