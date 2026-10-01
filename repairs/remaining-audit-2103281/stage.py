@@ -8,7 +8,7 @@ out=Path('compile-evidence').resolve();out.mkdir(exist_ok=True)
 prepare(Path('shell-kodi').resolve(),Path('parent279/Infinity-2103279-End-to-End-Repair-RC1.apk').resolve(),build,out)
 tests=build/'xbmc/src/androidTest/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
 here=Path(__file__).parent
-source=(here/'CobraRuntimeFollowupTest.java').read_text()+(here/'helpers.java.fragment').read_text()+(here/'journey.java.fragment').read_text()
+source=(here/'CobraRuntimeFollowupTest.java').read_text()+(here/'helpers.java.fragment').read_text()+(here/'journey.java.fragment').read_text().rstrip()[:-1]+(here/'final-boundaries.java.fragment').read_text()+'\n}\n'
 (tests/'CobraRuntimeFollowupTest.java').write_text(source)
 with (build/'xbmc/build.gradle').open('a') as f:
  f.write('''
