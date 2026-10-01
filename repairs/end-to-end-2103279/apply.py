@@ -40,6 +40,16 @@ def activity(s):
  return playback_ui(s)
 
 def playback_ui(s):
+ s=once(s,'    CobraImmersiveAmbient ambient=mCobraImmersiveAmbient;if(ambient==null)return;','''    CobraImmersiveAmbient ambient=mCobraImmersiveAmbient;
+    // Entering Movies/Shows releases the guide's renderer. Direct Watch playback
+    // must be able to restore the same shared engine behind the browse content.
+    if(ambient==null&&cobraWatchAmbientEligible()&&mCobraBrowseBackground!=null
+        &&mCobraBrowseBackground.getParent() instanceof FrameLayout){
+      FrameLayout parent=(FrameLayout)mCobraBrowseBackground.getParent();
+      ambient=new CobraImmersiveAmbient(this);mCobraImmersiveAmbient=ambient;
+      parent.addView(ambient,parent.indexOfChild(mCobraBrowseBackground)+1,new FrameLayout.LayoutParams(-1,-1));
+    }
+    if(ambient==null)return;''')
  s=once(s,'  private boolean cobraTimeshiftTimelineAvailable(){','''  private boolean cobraVodSeekable(){
     if(mPlayingVodKey==null||mPlayingVodKey.isEmpty()||mPlayer==null)return false;
     try{return mPlayer.isCurrentMediaItemSeekable()&&mPlayer.getDuration()>0L&&mPlayer.getDuration()!=C.TIME_UNSET;}

@@ -138,6 +138,7 @@ public class CobraRuntime279Test {
    runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});await("HTTP movie catalog",()->!((List<?>)get(a,"mCobraVodMoviesCatalog")).isEmpty(),12000);
    Object movie=ui(()->((List<?>)get(a,"mCobraVodMoviesCatalog")).get(0));runUi(()->call(a,"cobraShowVodDetails",movie));await("movie details",()->String.valueOf(get(a,"mCobraStageTitle")).contains("MOVIE DETAILS"),10000);screenshot("movie-details");
    runUi(()->call(a,"toggleWatchlist",movie));assertEquals(true,ui(()->call(a,"cobraVodWatchlistContains",movie)));runUi(()->call(a,"playMovie",movie));await("movie decoder",()->{ExoPlayer p=(ExoPlayer)get(a,"mPlayer");return p!=null&&p.getVideoSize().width>0&&p.getPlaybackState()==Player.STATE_READY;},15000);
+   await("direct movie Watch ambient",()->{Object engine=get(a,"mCobraImmersiveAmbient");return engine!=null&&Boolean.TRUE.equals(call(engine,"isAmbientActive"))&&((Number)get(engine,"captures")).intValue()>0;},8000);
    ExoPlayer p=ui(()->(ExoPlayer)get(a,"mPlayer"));runUi(()->{call(a,"showPlayerChromeTemporarily");call(a,"cobraSetCaptionsEnabled",p,true);});
    await("movie timeline visible",()->{View seek=(View)get(a,"mCobraTimeshiftSeek");return seek!=null&&seek.isShown()&&seek.getWidth()>50;},8000);
    Rect seekBounds=ui(()->{Rect r=new Rect();((View)get(a,"mCobraTimeshiftSeek")).getGlobalVisibleRect(r);return r;});long down=SystemClock.uptimeMillis();
