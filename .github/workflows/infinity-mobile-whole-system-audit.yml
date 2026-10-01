@@ -1,0 +1,43 @@
+name: Infinity Mobile Whole-System Audit
+on:
+  push:
+    branches: [audit-infinity-mobile-whole-system-20261001]
+    paths: [.github/workflows/infinity-mobile-whole-system-audit.yml, audits/mobile-whole-system-20261001/**]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preserve locked source and independent repair references
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit-output
+          parent=ec28a8574ecf8d7fccb3713133661c1e8c2246cb
+          test "$(git rev-parse "$parent^{tree}")" = fde8ebd3e2e6d6e920a5a1d6daf461e0097960cd
+          git branch audit-snapshot-locked "$parent"
+          git bundle create audit-output/Infinity-locked-ec28a857.bundle audit-snapshot-locked
+          git archive "$parent" | gzip -n > audit-output/Infinity-locked-ec28a857-source.tar.gz
+          git ls-tree -r --full-tree "$parent" > audit-output/locked-git-tree.txt
+          git log -15 --format='%H %s' "$parent" > audit-output/locked-lineage.txt
+          for ref in candidate-infinity-1.0.5.177-native-ambient-warmup-repair candidate-infinity-2103283-mediacodec-surface-ambient candidate-infinity-2103284-ambient-surface-repair; do
+            if git rev-parse --verify "refs/remotes/origin/$ref" >/dev/null 2>&1; then
+              git archive "refs/remotes/origin/$ref" | gzip -n > "audit-output/$ref.tar.gz"
+              git log -8 --format='%H %s' "refs/remotes/origin/$ref" > "audit-output/$ref-lineage.txt"
+            fi
+          done
+          printf '%s\n' 'Source preservation only. No runtime edits, APK build, device acceptance, or release promotion.' > audit-output/STATUS.txt
+          (cd audit-output && sha256sum *.bundle *.tar.gz > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Mobile-Whole-System-Baseline
+          path: audit-output/
+          if-no-files-found: error
+          retention-days: 90
