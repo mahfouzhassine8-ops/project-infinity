@@ -27,6 +27,8 @@ def activity(s):
           ()->{if(mCobraImmersiveAmbient!=null)mCobraImmersiveAmbient.geometryChanged();});}''')
  s=once(s,'@Override public void onIsPlayingChanged(boolean playing){if(current()){if(player==mPlayer)', '@Override public void onIsPlayingChanged(boolean playing){if(current()){embeddedCrop.refresh();if(player==mPlayer)')
  s=once(s,'if(binding!=null){binding.closed=true;player.removeListener(binding);','if(binding!=null){binding.closed=true;binding.embeddedCrop.close();player.removeListener(binding);')
+ s=once(s,'mCobraRotationResumed=true;cobraApplyPlayerRotation("resume");','mCobraRotationResumed=true;for(CobraPlayerBinding binding:mCobraPlayerBindings.values())binding.embeddedCrop.refresh();cobraApplyPlayerRotation("resume");')
+ s=once(s,'mCobraPlaybackPolicy.pause();cobraSuspendImmersiveAmbient();','mCobraPlaybackPolicy.pause();for(CobraPlayerBinding binding:mCobraPlayerBindings.values())binding.embeddedCrop.refresh();cobraSuspendImmersiveAmbient();')
  s=once(s,'  private void cobraStartPresentationTicker() {','  private void cobraStartPresentationTicker() {\n    for(CobraPlayerBinding binding:mCobraPlayerBindings.values())binding.embeddedCrop.refresh();')
  s=once(s,'    if((embedded||(texture==mPlayerTexture&&mPlayerOverlay!=null))&&mCobraImmersiveAmbient!=null)', '    if(b!=null)b.embeddedCrop.apply(texture,player,matrix,embedded);\n    if((embedded||(texture==mPlayerTexture&&mPlayerOverlay!=null))&&mCobraImmersiveAmbient!=null)')
  s=once(s,'texture.setTransform(matrix);}'+'\n    }else cobraFitVideo','texture.setTransform(matrix);binding.embeddedCrop.apply(texture,binding.player,matrix,false);}'+'\n    }else cobraFitVideo')
