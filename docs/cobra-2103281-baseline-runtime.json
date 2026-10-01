@@ -1,0 +1,127 @@
+{
+  "version": 2103280,
+  "apk_sha256": "e12654c0d81b6b04c4507f2c8bfde9e92761ab5a93ac16b86a3f89f9b7656870",
+  "run_id": 36822167443,
+  "artifact_id": 11143732950,
+  "artifact_sha256": "cfc8bf26615204776e6003f7e4fb6a32ff5ddb4c51fb796712150f61b69eda17",
+  "passed": 12,
+  "total": 14,
+  "scenarios": [
+    {
+      "passed": true,
+      "pss_kb": 63062,
+      "java_heap_bytes": 3575760,
+      "native_heap_bytes": 18895888,
+      "name": "Additional settings survive a distinct Android process",
+      "elapsed_ms": 373
+    },
+    {
+      "passed": false,
+      "error": "java.lang.AssertionError: Old Sports action opened video over Movies expected null, but was:<android.widget.FrameLayout{7cb451f VFE...CL. ........ 0,0-1080,1920}>\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.failNotNull(Assert.java:756)\n\tat org.junit.Assert.assertNull(Assert.java:738)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.lambda$remainingBoundaries$99$com-projectinfinity-kodi-CobraRuntimeFollowupTest(CobraRuntimeFollowupTest.java:161)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest$$ExternalSyntheticLambda128.run(Unknown Source:2)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.check(CobraRuntimeFollowupTest.java:24)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.remainingBoundaries(CobraRuntimeFollowupTest.java:160)\n\tat java.lang.reflect.Method.invoke(Native Method)\n\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)\n\tat org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)\n\tat org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)\n\tat org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)\n\tat org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)\n\tat org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)\n\tat org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)\n\tat org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\n\tat org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\n\tat org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\n\tat org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\n\tat org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.ParentRunner.run(ParentRunner.java:413)\n\tat androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)\n\tat org.junit.runners.Suite.runChild(Suite.java:128)\n\tat org.junit.runners.Suite.runChild(Suite.java:27)\n\tat org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\n\tat org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\n\tat org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\n\tat org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\n\tat org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.ParentRunner.run(ParentRunner.java:413)\n\tat org.junit.runner.JUnitCore.run(JUnitCore.java:137)\n\tat org.junit.runner.JUnitCore.run(JUnitCore.java:115)\n\tat androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)\n\tat androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)\n\tat androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)\n\tat android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2205)\n",
+      "pss_kb": 102949,
+      "java_heap_bytes": 26037736,
+      "native_heap_bytes": 37442256,
+      "name": "Late Sports Watch result cannot open playback after drawer navigation",
+      "elapsed_ms": 4779
+    },
+    {
+      "passed": false,
+      "error": "java.lang.AssertionError: Old Sports action opened Multi-View after leaving expected null, but was:<android.widget.FrameLayout{74067f V.E...... ........ 0,0-1080,1920}>\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.failNotNull(Assert.java:756)\n\tat org.junit.Assert.assertNull(Assert.java:738)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.lambda$remainingBoundaries$103$com-projectinfinity-kodi-CobraRuntimeFollowupTest(CobraRuntimeFollowupTest.java:164)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest$$ExternalSyntheticLambda129.run(Unknown Source:2)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.check(CobraRuntimeFollowupTest.java:24)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.remainingBoundaries(CobraRuntimeFollowupTest.java:163)\n\tat java.lang.reflect.Method.invoke(Native Method)\n\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)\n\tat org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)\n\tat org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)\n\tat org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)\n\tat org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)\n\tat org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)\n\tat org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)\n\tat org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\n\tat org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\n\tat org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\n\tat org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\n\tat org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.ParentRunner.run(ParentRunner.java:413)\n\tat androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)\n\tat org.junit.runners.Suite.runChild(Suite.java:128)\n\tat org.junit.runners.Suite.runChild(Suite.java:27)\n\tat org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\n\tat org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\n\tat org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\n\tat org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\n\tat org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.ParentRunner.run(ParentRunner.java:413)\n\tat org.junit.runner.JUnitCore.run(JUnitCore.java:137)\n\tat org.junit.runner.JUnitCore.run(JUnitCore.java:115)\n\tat androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)\n\tat androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)\n\tat androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)\n\tat android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2205)\n",
+      "pss_kb": 94102,
+      "java_heap_bytes": 11726384,
+      "native_heap_bytes": 46839024,
+      "name": "Late Smart Sports Multi-View result cannot replace a newer drawer destination",
+      "elapsed_ms": 4145
+    },
+    {
+      "passed": true,
+      "pss_kb": 95386,
+      "java_heap_bytes": 16048128,
+      "native_heap_bytes": 37052304,
+      "name": "Extended background setting starts native foreground service and Normal releases it",
+      "elapsed_ms": 7277
+    },
+    {
+      "passed": true,
+      "pss_kb": 98376,
+      "java_heap_bytes": 18289904,
+      "native_heap_bytes": 38460528,
+      "name": "Profile selection isolates favorites and rejects an incorrect PIN",
+      "elapsed_ms": 607
+    },
+    {
+      "passed": true,
+      "pss_kb": 89310,
+      "java_heap_bytes": 13137536,
+      "native_heap_bytes": 22681344,
+      "name": "System file picker result plays a content URI and preserves section on return",
+      "elapsed_ms": 4255
+    },
+    {
+      "passed": true,
+      "pss_kb": 107219,
+      "java_heap_bytes": 20275376,
+      "native_heap_bytes": 47268064,
+      "name": "Player lock blocks touch and unlock restores controls; video long press has no Channels popup",
+      "elapsed_ms": 11467
+    },
+    {
+      "passed": true,
+      "pss_kb": 104137,
+      "java_heap_bytes": 10890552,
+      "native_heap_bytes": 48489104,
+      "name": "Channel PiP Off prevents framework PiP and returns to the same decoder",
+      "elapsed_ms": 19261
+    },
+    {
+      "passed": true,
+      "pss_kb": 116581,
+      "java_heap_bytes": 20896304,
+      "native_heap_bytes": 53961904,
+      "name": "Fullscreen Display changes the existing decoder and retains its selected override",
+      "elapsed_ms": 14852
+    },
+    {
+      "passed": true,
+      "pss_kb": 108794,
+      "java_heap_bytes": 14665944,
+      "native_heap_bytes": 56697840,
+      "name": "Recording survives actual Activity recreation, stops, and a second recording can start",
+      "elapsed_ms": 14937
+    },
+    {
+      "passed": true,
+      "pss_kb": 79831,
+      "java_heap_bytes": 6611280,
+      "native_heap_bytes": 23006976,
+      "name": "Sports Watch Live and Smart Multi-View resolve fixture broadcasts into real playback",
+      "elapsed_ms": 7151
+    },
+    {
+      "passed": true,
+      "pss_kb": 83039,
+      "java_heap_bytes": 9234912,
+      "native_heap_bytes": 23444272,
+      "name": "Trailer callback hands the provider URL to Android and keeps Movies ownership",
+      "elapsed_ms": 479
+    },
+    {
+      "passed": true,
+      "pss_kb": 85518,
+      "java_heap_bytes": 11145088,
+      "native_heap_bytes": 24751152,
+      "name": "Diagnostics action exports a readable ZIP through Android content provider",
+      "elapsed_ms": 406
+    },
+    {
+      "passed": true,
+      "pss_kb": 89639,
+      "java_heap_bytes": 9358760,
+      "native_heap_bytes": 30340704,
+      "name": "Additional settings callbacks change real policies and persist across process restart",
+      "elapsed_ms": 2586
+    }
+  ],
+  "physical_fold": false,
+  "authenticated_user_providers": false
+}

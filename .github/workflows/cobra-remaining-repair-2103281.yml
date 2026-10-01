@@ -1,0 +1,159 @@
+name: Cobra | 2103281 remaining audit repair candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103281-remaining-audit]
+    paths: ['repairs/remaining-repair-2103281/**', 'repairs/remaining-audit-2103281/**', '.github/workflows/cobra-remaining-repair-2103281.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-remaining-repair-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  build-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Cobra-2103280-Recording-Repair-Evidence
+          run-id: 36818383789
+          github-token: ${{ github.token }}
+          path: evidence280
+      - uses: actions/download-artifact@v8
+        with:
+          name: Cobra-2103280-Recording-Repair-Candidate
+          run-id: 36818383789
+          github-token: ${{ github.token }}
+          path: locked280
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-Evidence
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: evidence279
+      - name: Snapshot exact locked source then apply forward repair
+        run: |
+          set -euo pipefail
+          mkdir -p audit281
+          git branch rollback-2103280 ad18f93633ecc3ec74d121acf50bda873cd33cd0
+          git bundle create audit281/locked-2103280-rollback.bundle rollback-2103280
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,tarfile,zipfile,shutil
+          archive=Path('evidence280/reconstructed-2103280-shell.tar.gz');apk=Path('locked280/Infinity-2103280-Audit-Followup-RC1.apk')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()=='e4d95e389d57bf91d32ae01c905ce5bc11e0c1447302f04b11044b285560f4ec'
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='e12654c0d81b6b04c4507f2c8bfde9e92761ab5a93ac16b86a3f89f9b7656870'
+          with tarfile.open(archive) as t:t.extractall('.',filter='data')
+          shutil.copytree('shell-kodi','rollback280/shell-kodi')
+          with zipfile.ZipFile(apk) as z:Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          python3 repairs/remaining-repair-2103281/apply.py
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Build and sign forward candidate and instrumentation
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk locked280/Infinity-2103280-Audit-Followup-RC1.apk --build-dir build281 --out candidate281
+          python3 repairs/remaining-repair-2103281/stage_runtime.py
+          (cd build281 && ./gradlew --no-daemon --console=plain :xbmc:assembleReleaseAndroidTest)
+          mkdir -p instrumentation
+          testapk=$(find build281/xbmc/build/outputs/apk/androidTest -name '*.apk' | head -1)
+          bash scripts/sign-infinity71.sh "$testapk" instrumentation/Cobra-audit-followup-tests.apk
+      - name: Run inherited regression suites and recording lifecycle checks
+        run: |
+          python3 repairs/remaining-repair-2103281/stage_tests.py
+          python3 - <<'PY'
+          import subprocess,json
+          from pathlib import Path
+          classes=json.loads(Path('audit281/test-classes.json').read_text())
+          args=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest']
+          for name in classes:args+=['--tests',name]
+          subprocess.run(args,cwd='build281',check=True)
+          PY
+      - name: Enforce source and render preservation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,xml.etree.ElementTree as E
+          allowed={'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in','tools/android/packaging/xbmc/build.gradle.in'}
+          changed=set();count=0
+          for f in Path('rollback280/shell-kodi').rglob('*'):
+            if not f.is_file():continue
+            relative=str(f.relative_to('rollback280/shell-kodi'));current=Path('shell-kodi')/relative
+            if f.read_bytes()!=current.read_bytes():changed.add(relative)
+            else:count+=1
+          assert changed==allowed,changed
+          names=[p.name for p in Path('evidence279/screenshots/protected').glob('*.png')];assert len(names)==20
+          for name in names:assert Path('evidence279/screenshots/protected',name).read_bytes()==Path('audit281/screenshots/protected',name).read_bytes(),name
+          tests={}
+          for f in Path('build281/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);tests[t.attrib['name']]=int(t.attrib['tests'])
+          assert sum(tests.values())==522,tests
+          Path('candidate281/AUDIT-VERIFICATION.json').write_text(json.dumps({'parent_lock':'ad18f93633ecc3ec74d121acf50bda873cd33cd0','test_count':522,'test_methods':tests,'protected_renders':20,'other_source_files_unchanged':count,'changed_source_files':sorted(changed),'physical_device_verified':False,'locked':False},indent=2))
+          PY
+      - uses: actions/upload-artifact@v7
+        with: {name: Cobra-2103281-Remaining-Repair-Candidate, path: candidate281/, retention-days: 90}
+      - uses: actions/upload-artifact@v7
+        with: {name: Cobra-2103281-Instrumentation, path: instrumentation/, retention-days: 90}
+      - name: Archive source and regression evidence
+        if: always()
+        run: |
+          mkdir -p audit281
+          cp -r build281/xbmc/build/test-results audit281/test-results || true
+          tar -czf audit281/reconstructed-2103281-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Cobra-2103281-Remaining-Repair-Evidence, path: audit281/, retention-days: 90}
+  runtime:
+    needs: build-test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: {name: Cobra-2103281-Remaining-Repair-Candidate, path: candidate281}
+      - uses: actions/download-artifact@v8
+        with: {name: Cobra-2103281-Instrumentation, path: instrumentation}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Cobra-2103280-Recording-Repair-Candidate
+          run-id: 36818383789
+          github-token: ${{ github.token }}
+          path: locked280
+      - name: Start generated provider
+        run: |
+          sudo chmod 666 /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 repairs/remaining-audit-2103281/media.py
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash repairs/remaining-repair-2103281/runtime.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Cobra-2103281-Remaining-Runtime-Evidence, path: remaining-runtime/, retention-days: 90}

@@ -1,9 +1,6 @@
 name: Cobra | Locked 2103280 remaining runtime audit
 on:
   workflow_dispatch:
-  push:
-    branches: [candidate-cobra-2103281-remaining-audit]
-    paths: ['repairs/remaining-audit-2103281/**', '.github/workflows/cobra-remaining-audit-2103281.yml']
 permissions: {contents: read, actions: read}
 concurrency:
   group: cobra-followup-${{ github.ref }}
