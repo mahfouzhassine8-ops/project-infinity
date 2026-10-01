@@ -24,6 +24,14 @@ s=replace(s,'      session.future = pool.submit(() -> record(session, url, final
       catch(java.util.concurrent.RejectedExecutionException stopped){sessions.remove(finalSession,session);InfinityCobraFeatureRuntime.recordingFinished(finalSession,session);if(sessions.isEmpty()){stopForeground(true);stopSelfResult(startId);}}''')
 s=replace(s,'  public void onDestroy() {\n    for (Session session : sessions.values()) session.cancel.set(true);','  public void onDestroy() {\n    for (Session session : sessions.values()) {session.cancel.set(true);InfinityCobraFeatureRuntime.recordingFinished(session.id,session);}')
 s=replace(s,'      sessions.remove(session.id);','      sessions.remove(session.id,session);\n      InfinityCobraFeatureRuntime.recordingFinished(session.id,session);')
+s=replace(s,'''      if (sessions.isEmpty()) {
+        stopForeground(true);
+        stopSelf();
+      }''','''      // Serialize the last-session check with onStartCommand. A finishing
+      // worker must not stop a newer recording that started in the meantime.
+      new android.os.Handler(getMainLooper()).post(() -> {
+        if (sessions.isEmpty()) { stopForeground(true); stopSelf(); }
+      });''')
 f.write_text(s)
 
 f=src/'InfinityLiveActivity.java.in';s=f.read_text()

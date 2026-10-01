@@ -33,7 +33,11 @@ The added checks target previously unverified paths:
 - Settings changed through real callbacks, then checked after a separate force-stopped process restart.
 
 Initial runtime run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/36816481777
-Results are pending; no check above is marked passed merely because its test has been written.
+Results: **8 of 9 additional scenarios passed**. The failed scenario confirmed that a naturally completed recording leaves the Activity-held recording ID active, so the UI continues offering Stop recording. Full logs, 21 screenshots and 36 memory snapshots were retained. The independent force-stop/restart settings check passed.
+
+A forward 2103280 repair is being validated by run 36817533390. It adds service-owned recording status, clears stale recording UI, preserves the owned session ID across Activity recreation, and avoids starting an idle foreground service to stop an already-finished session. It retains the approved player layouts and native engine. Its result is pending. See [structured runtime evidence](cobra-2103280-additional-runtime.json).
+
+The inherited test evidence correction above does not alter the 519 passing result. The physical/account-dependent items below remain open; this additional run does not establish full brief completion.
 
 ## Access-dependent acceptance still required
 

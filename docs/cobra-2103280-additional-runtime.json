@@ -1,0 +1,98 @@
+{
+  "tested_version": 2103279,
+  "tested_apk_sha256": "cf7aedadded921e5ddc023ba08161638d8f6207dd7002f3258daf178073679cd",
+  "locked_commit": "60e1893d8591a29fab7e952ea2d3caedb0b13fa5",
+  "instrumentation_source_commit": "22f1af4c28ce6326add95d666b16c097e9d0e84f",
+  "run_id": 36816481777,
+  "artifact_id": 11141821827,
+  "artifact_sha256": "1cb4cf1d9153e7b8f032ba9d3d4a03b613cb8fb297e869a01fa7f320c1f299d0",
+  "passed": 8,
+  "failed": 1,
+  "scenarios": [
+    {
+      "passed": true,
+      "pss_kb": 99895,
+      "java_heap_bytes": 28143632,
+      "native_heap_bytes": 24959312,
+      "name": "Multi-View real PiP return retains channels audio owner and paused state",
+      "elapsed_ms": 46178
+    },
+    {
+      "passed": true,
+      "pss_kb": 77750,
+      "java_heap_bytes": 7998080,
+      "native_heap_bytes": 22294080,
+      "name": "Recording start stop saved bytes local decode and Smart Return",
+      "elapsed_ms": 15510
+    },
+    {
+      "passed": false,
+      "error": "org.junit.ComparisonFailure: Completed service must not leave a stale active recording expected:<[]> but was:<[rec-1a0f5ccb599]>\n\tat org.junit.Assert.assertEquals(Assert.java:117)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.lambda$additionalRuntimeJourney$51$com-projectinfinity-kodi-CobraRuntimeFollowupTest(CobraRuntimeFollowupTest.java:137)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest$$ExternalSyntheticLambda38.run(Unknown Source:2)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.check(CobraRuntimeFollowupTest.java:24)\n\tat com.projectinfinity.kodi.CobraRuntimeFollowupTest.additionalRuntimeJourney(CobraRuntimeFollowupTest.java:134)\n\tat java.lang.reflect.Method.invoke(Native Method)\n\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)\n\tat org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)\n\tat org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)\n\tat org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)\n\tat org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)\n\tat org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)\n\tat org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)\n\tat org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\n\tat org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\n\tat org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\n\tat org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\n\tat org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.ParentRunner.run(ParentRunner.java:413)\n\tat androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)\n\tat org.junit.runners.Suite.runChild(Suite.java:128)\n\tat org.junit.runners.Suite.runChild(Suite.java:27)\n\tat org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\n\tat org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\n\tat org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\n\tat org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\n\tat org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\n\tat org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\n\tat org.junit.runners.ParentRunner.run(ParentRunner.java:413)\n\tat org.junit.runner.JUnitCore.run(JUnitCore.java:137)\n\tat org.junit.runner.JUnitCore.run(JUnitCore.java:115)\n\tat androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)\n\tat androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)\n\tat androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)\n\tat android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2205)\n",
+      "pss_kb": 97137,
+      "java_heap_bytes": 12363088,
+      "native_heap_bytes": 49518048,
+      "name": "Finished recording clears active UI and permits next recording",
+      "elapsed_ms": 7230
+    },
+    {
+      "passed": true,
+      "pss_kb": 103695,
+      "java_heap_bytes": 13895568,
+      "native_heap_bytes": 54776752,
+      "name": "Subtitle languages off state sizes and audio selection survive PiP fullscreen",
+      "elapsed_ms": 32115
+    },
+    {
+      "passed": true,
+      "pss_kb": 101446,
+      "java_heap_bytes": 12995720,
+      "native_heap_bytes": 52437648,
+      "name": "Real Android audio focus interruption preserves decoder and user mute",
+      "elapsed_ms": 4413
+    },
+    {
+      "passed": true,
+      "pss_kb": 107208,
+      "java_heap_bytes": 13045384,
+      "native_heap_bytes": 56776208,
+      "name": "Player sheets fit visible window in Light Dark OLED",
+      "elapsed_ms": 18759
+    },
+    {
+      "passed": true,
+      "pss_kb": 128687,
+      "java_heap_bytes": 28745680,
+      "native_heap_bytes": 49047296,
+      "name": "Four decoder sustained playback and release observations",
+      "elapsed_ms": 200509
+    },
+    {
+      "passed": true,
+      "pss_kb": 114895,
+      "java_heap_bytes": 30305896,
+      "native_heap_bytes": 37637760,
+      "name": "Settings changed through callbacks persist before process restart",
+      "elapsed_ms": 12267
+    },
+    {
+      "passed": true,
+      "pss_kb": 62591,
+      "java_heap_bytes": 6641152,
+      "native_heap_bytes": 17171792,
+      "name": "Settings and owner survive actual force-stop process restart",
+      "elapsed_ms": 354
+    }
+  ],
+  "soak": {
+    "seconds": 180,
+    "samples": 36,
+    "pss_min_kb": 125949,
+    "pss_max_kb": 146698,
+    "limits": "Generated low-resolution 12fps streams on API30 emulator. Memory snapshots and decoder state; not physical thermal, battery, frame-rate or long-term leak proof."
+  },
+  "physical_fold": false,
+  "authenticated_user_providers": false,
+  "repair_candidate_version": 2103280,
+  "repair_candidate_run_id": 36817533390,
+  "repair_candidate_status": "build and runtime verification pending"
+}
