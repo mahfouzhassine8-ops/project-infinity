@@ -12,4 +12,9 @@ public class DirectWatchAmbientTest {
  @Test public void directWatchRestoresOneSharedEngineAfterGuideRelease()throws Exception{CobraImmersiveAmbient engine=(CobraImmersiveAmbient)refresh();assertNotNull(engine);assertNotSame(old,engine);assertTrue(engine.isAttachedToWindow());assertTrue(engine.isAmbientActive());assertEquals(true,CobraNavigationUiTest.get(engine,"controlsOnly"));assertSame(CobraNavigationUiTest.get(f.a,"mPlayerTexture"),CobraNavigationUiTest.get(engine,"source"));for(int i=0;i<10;i++)assertSame(engine,refresh());assertEquals(0,f.state.prepares);assertEquals(0,f.state.mediaChanges);}
  @Test public void offAndSubtleDoNotCreateWatchRenderer()throws Exception{for(String mode:new String[]{"off","subtle"}){f.prefs.edit().putString(CobraPresentationEffects.AMBIENT,mode).commit();assertNull(refresh());}}
  @Test public void backgroundedWatchDoesNotCreateOrSampleRenderer()throws Exception{CobraNavigationUiTest.put(f.a,"mBackgroundStopped",true);assertNull(refresh());}
+ @Test public void showingAndHidingChromeRefreshesIlluminationWithoutWaitingForTicker()throws Exception{
+  CobraImmersiveAmbient engine=(CobraImmersiveAmbient)refresh();assertTrue(engine.isAmbientActive());
+  CobraNavigationUiTest.call(f.a,"togglePlayerChrome");assertFalse(engine.isAmbientActive());
+  CobraNavigationUiTest.call(f.a,"showPlayerChromeTemporarily");assertTrue(engine.isAmbientActive());assertSame(engine,refresh());
+ }
 }

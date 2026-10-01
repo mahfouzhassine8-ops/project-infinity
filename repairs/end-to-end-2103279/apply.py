@@ -103,11 +103,11 @@ def playback_ui(s):
  s=once(s,'int save=canvas.save();canvas.clipRect(0,0,w,h);\n      for(androidx.media3.common.text.Cue cue:cues){','int save=canvas.save();canvas.clipRect(0,0,w,h);int contentBottom=cobraCaptionBottom(this);\n      for(androidx.media3.common.text.Cue cue:cues){')
  s=once(s,'Math.max(1,h-dp(12))/(float)Math.max(1,height)','Math.max(1,contentBottom-dp(12))/(float)Math.max(1,height)')
  s=once(s,'y=Math.max(0,Math.min(h-drawHeight,y));','y=Math.max(0,Math.min(contentBottom-drawHeight,y));')
- s=once(s,'    cobraResetMotion(chrome);chrome.setVisibility(View.VISIBLE);','    cobraResetMotion(chrome);chrome.setVisibility(View.VISIBLE);cobraRefreshCaptionStyle();')
- s=once(s,'cobraResetMotion(mPlayerChrome);mPlayerChrome.setVisibility(View.GONE);}','cobraResetMotion(mPlayerChrome);mPlayerChrome.setVisibility(View.GONE);cobraRefreshCaptionStyle();}')
- s=once(s,'if(!cobraMotionEnabled()){target.setVisibility(View.GONE);return;}','if(!cobraMotionEnabled()){target.setVisibility(View.GONE);cobraRefreshCaptionStyle();return;}')
- s=once(s,'if(cobraChromeCanHide(target))target.setVisibility(View.GONE);','if(cobraChromeCanHide(target)){target.setVisibility(View.GONE);cobraRefreshCaptionStyle();}')
- s=once(s,'mPlayerChrome.setVisibility(View.GONE);ensureCobraPlayerLockOverlay();','mPlayerChrome.setVisibility(View.GONE);cobraRefreshCaptionStyle();ensureCobraPlayerLockOverlay();')
+ s=once(s,'    cobraResetMotion(chrome);chrome.setVisibility(View.VISIBLE);','    cobraResetMotion(chrome);chrome.setVisibility(View.VISIBLE);cobraRefreshCaptionStyle();cobraRefreshImmersiveAmbient();')
+ s=once(s,'cobraResetMotion(mPlayerChrome);mPlayerChrome.setVisibility(View.GONE);}','cobraResetMotion(mPlayerChrome);mPlayerChrome.setVisibility(View.GONE);cobraRefreshCaptionStyle();cobraRefreshImmersiveAmbient();}')
+ s=once(s,'if(!cobraMotionEnabled()){target.setVisibility(View.GONE);return;}','if(!cobraMotionEnabled()){target.setVisibility(View.GONE);cobraRefreshCaptionStyle();cobraRefreshImmersiveAmbient();return;}')
+ s=once(s,'if(cobraChromeCanHide(target))target.setVisibility(View.GONE);','if(cobraChromeCanHide(target)){target.setVisibility(View.GONE);cobraRefreshCaptionStyle();cobraRefreshImmersiveAmbient();}')
+ s=once(s,'mPlayerChrome.setVisibility(View.GONE);ensureCobraPlayerLockOverlay();','mPlayerChrome.setVisibility(View.GONE);cobraRefreshCaptionStyle();cobraRefreshImmersiveAmbient();ensureCobraPlayerLockOverlay();')
  s=once(s,'mPlayerChrome=chrome;chrome.setTag("cobra_player_refined_chrome");','mPlayerChrome=chrome;chrome.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->cobraRefreshCaptionStyle());chrome.setTag("cobra_player_refined_chrome");')
  return s
 
