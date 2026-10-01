@@ -43,6 +43,17 @@ s=replace(s,'    LinearLayout rows=cobraOpenSheet("Player settings","Viewing pre
 s=replace(s,'    rows.addView(cobraSheetRow("record",mRecordingSession.isEmpty()?"Record now":"Stop recording",null,false,true,()->{if(mPlaying!=null)toggleRecording(mPlaying);}));','    LinearLayout recording=cobraSheetRow("record",mRecordingSession.isEmpty()?"Record now":"Stop recording",null,false,true,()->{if(mPlaying!=null)toggleRecording(mPlaying);});recording.setTag("cobra_recording_action");rows.addView(recording);')
 s=replace(s,'      if (!cobraGuidePresentationActive()) return;','      if (!cobraGuidePresentationActive()) return;\n      cobraSyncRecordingState();')
 s=replace(s,'    cobraEndMiniBackgroundPlayback();\n    InfinityExtendedBackgroundService.sync(this);','    cobraEndMiniBackgroundPlayback();\n    cobraSyncRecordingState();\n    InfinityExtendedBackgroundService.sync(this);')
+s=replace(s,'  private boolean cobraVodSeekable(){','''  private boolean cobraFinitePlayback(){
+    if(mPlayingVodKey!=null&&!mPlayingVodKey.isEmpty())return true;
+    return mPlaying!=null&&mPlaying.id!=null&&(mPlaying.id.startsWith("recording:")||mPlaying.id.startsWith("local:"));
+  }
+  private boolean cobraVodSeekable(){''')
+s=replace(s,'if(mPlayingVodKey==null||mPlayingVodKey.isEmpty()||mPlayer==null)return false;','if(!cobraFinitePlayback()||mPlayer==null)return false;')
+s=replace(s,'if(!mPlayingVodKey.isEmpty()){cobraSeekVodBy(-amountMs);return;}','if(cobraFinitePlayback()){cobraSeekVodBy(-amountMs);return;}')
+s=replace(s,'if(!mPlayingVodKey.isEmpty()){cobraSeekVodBy(30000L);return;}','if(cobraFinitePlayback()){cobraSeekVodBy(30000L);return;}')
+s=replace(s,'    if(!mPlayingVodKey.isEmpty()){\n      boolean enabled=cobraVodSeekable();','    if(cobraFinitePlayback()){\n      boolean enabled=cobraVodSeekable();')
+s=replace(s,'boolean liveWindow=available&&!mCobraProviderCatchupActive&&mPlayingVodKey.isEmpty();','boolean liveWindow=available&&!mCobraProviderCatchupActive&&!cobraFinitePlayback();')
+s=replace(s,'if(!mPlayingVodKey.isEmpty()&&mPlayer!=null&&mCobraPlayerSchedule!=null){','if(cobraFinitePlayback()&&mPlayer!=null&&mCobraPlayerSchedule!=null){')
 f.write_text(s)
 
 f=root/'shell-kodi/tools/android/packaging/xbmc/build.gradle.in';s=f.read_text().replace('versionCode 2103279','versionCode 2103280').replace('1.0.9-End-to-End-Repair-RC1','1.0.9-Audit-Followup-RC1');f.write_text(s)
