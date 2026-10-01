@@ -1,0 +1,34 @@
+name: Infinity | 2103285 native FD source audit
+on:
+  push:
+    branches: [candidate-infinity-2103285-native-fd-recovery]
+    paths: ['.github/workflows/infinity-2103285-fd-source-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Preserve pinned source and inventory descriptor users
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source-inputs
+          git cat-file -e c8a1adb7e8d7a2a8cd305a88944912c4861d94ea^{commit}
+          git archive c8a1adb7e8d7a2a8cd305a88944912c4861d94ea | gzip -n > source-inputs/project-2103284-source.tar.gz
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          git -C kodi archive HEAD | gzip -n > source-inputs/kodi-21.3-a3a448d-source.tar.gz
+          git -C kodi grep -n -E 'FD_SET\(|FD_ISSET\(|FD_CLR\(|select\(' -- xbmc lib tools/depends > source-inputs/descriptor-call-sites.txt || test "$?" = 1
+          sha256sum source-inputs/*.tar.gz > source-inputs/SHA256SUMS.txt
+          printf '%s\n' 'Source audit only. No native binary built, no device changes, no stable promotion.' > source-inputs/STATUS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103285-FD-Source-Inputs
+          path: source-inputs/
+          retention-days: 30
+          if-no-files-found: error
