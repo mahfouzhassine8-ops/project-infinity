@@ -69,7 +69,26 @@ public class CobraRuntime279Test {
   runUi(()->{put(a,"mCobraGuideStyle","mobile");call(a,"cobraShowGuideShell");});
   check("Encoded black bars diagnostic",()->{start("Baked");SystemClock.sleep(1800);assertFilled("baked-bars");});
   check("Pause resume and fullscreen handoff preserve player",()->{
-   start("Classic");ExoPlayer same=player();runUi(()->{View v=((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_play_pause");assertNotNull(v);assertTrue(v.performClick());});assertFalse("Pause must clear requested playback",ui(same::getPlayWhenReady));long position=ui(same::getCurrentPosition);SystemClock.sleep(600);assertTrue(Math.abs(ui(same::getCurrentPosition)-position)<100);runUi(()->{View v=((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_play_pause");assertNotNull(v);assertTrue(v.performClick());});assertTrue("Resume must request playback",ui(same::getPlayWhenReady));
+   start("Classic");ExoPlayer same=player();
+   JSONArray pauses=new JSONArray();
+   for(int cycle=0;cycle<3;cycle++){
+    runUi(()->{View v=((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_play_pause");assertNotNull(v);assertTrue(v.performClick());});
+    assertFalse("Pause must immediately clear requested playback",ui(same::getPlayWhenReady));
+    long requestedPosition=ui(same::getCurrentPosition),pauseAt=SystemClock.elapsedRealtime();
+    // setPlayWhenReady updates application state before the playback thread has
+    // processed the command. A bounded message acknowledgement observes that
+    // thread without mutating the player or weakening the stationary check.
+    androidx.media3.exoplayer.PlayerMessage ack=ui(()->same.createMessage((type,payload)->{}).send());
+    assertTrue("Playback thread must acknowledge pause",ack.blockUntilDelivered(2000));
+    long position=ui(same::getCurrentPosition),ackMs=SystemClock.elapsedRealtime()-pauseAt;
+    SystemClock.sleep(600);long end=ui(same::getCurrentPosition);
+    JSONObject sample=new JSONObject().put("cycle",cycle).put("requested_position_ms",requestedPosition).put("acknowledged_position_ms",position).put("after_600_ms",end).put("ack_ms",ackMs).put("play_when_ready",ui(same::getPlayWhenReady)).put("is_playing",ui(same::isPlaying));
+    pauses.put(sample);try(FileWriter f=new FileWriter(new File(out,"pause-acknowledgement.json"))){f.write(pauses.toString(2));}
+    assertFalse("Pause remains requested",ui(same::getPlayWhenReady));assertFalse("Paused renderer cannot report playing",ui(same::isPlaying));
+    assertTrue("Paused position must remain stationary: "+sample,Math.abs(end-position)<100);
+    runUi(()->{View v=((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_play_pause");assertNotNull(v);assertTrue(v.performClick());});
+    assertTrue("Resume must request playback",ui(same::getPlayWhenReady));await("resume advances position",()->same.isPlaying()&&same.getCurrentPosition()>end+200,5000);assertSame(same,player());
+   }
    runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));await("fullscreen first frame",()->get(a,"mPlayer")==same&&((TextureView)get(a,"mPlayerTexture")).isAvailable(),10000);screenshot("watch-fullscreen");
    for(String menu:new String[]{"Channels","Display","More"}){runUi(()->call(a,"showPlayerChromeTemporarily"));press(menu);await(menu+" is visible",()->{View panel=(View)get(a,menu.equals("Channels")?"mCobraPlayerDrawer":"mCobraSheetPanel");return panel!=null&&panel.isShown()&&panel.getAlpha()>.95f&&panel.getHeight()>20;},8000);SystemClock.sleep(300);screenshot(menu);runUi(()->{call(a,"closeCobraActionSheet");call(a,"closeCobraPlayerDrawer");});}
    runUi(()->call(a,"closeFullscreenToCobraView"));await("preview return",()->get(a,"mCobraPreviewPlayer")==same,8000);assertFilled("fullscreen-return");
