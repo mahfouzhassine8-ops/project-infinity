@@ -9,18 +9,29 @@ The approved parent is `41f08774a8b908d60c0f9e6647497e40d6bbe081`, Cobra 2103278
 * Quick Peek used its own Fit transform and bypassed the earlier embedded Fill policy. It now shares the proportional Fill calculation and refits after the first frame, surface changes, and layout changes.
 * The main binding now reapplies its transform on same-surface attachment and first-frame/surface events, and retains valid video dimensions through transient UNKNOWN metadata.
 * Real Android decoding of the locked APK reproduced encoded pillarboxing: 45.45% of the measured boundary remained black in the padded fixture. A bounded embedded-only detector removes persistent symmetric black padding with proportional additional crop. Dark scenes and asymmetric shadows do not establish a crop.
-* The detector reuses one 96×64 bitmap and matrix/pixel buffers. It requires repeated evidence, samples initially at 200 ms and then every two seconds, suspends when paused/hidden/backgrounded, and releases callbacks/buffers with its binding. Fullscreen, PiP and Multi-View retain their existing scaling policies. Failed captures restore the previous transform and stop probing that session.
+* The detector reuses one 96×64 bitmap and matrix/pixel buffers. It requires repeated evidence, samples initially at 200 ms and then every two seconds, suspends when paused/hidden/backgrounded, and releases callbacks/buffers with its binding. Fullscreen, PiP and Multi-View retain their existing scaling policies. Capture never changes the live display transform; failed captures stop probing that session.
 * Delayed movie metadata is now gated by the current navigation request and profile, preventing stale results from replacing a newer drawer destination.
 * Display help text now describes the actual embedded center-crop behavior.
 
-The ambient implementation and all other unmodified shell sources are checked byte-for-byte against the parent. Ambient captures the displayed texture, including its current crop.
+Android texture readback omits the display transform. Ambient capture now maps the viewport back into source coordinates, so both embedded and Watch illumination sample the actual visible picture. The approved renderer, glass appearance, Off/Subtle behavior and fullscreen video policy are preserved; all other unmodified shell sources are checked byte-for-byte against the parent.
+
+## Runtime surface map
+
+| Path | Actual surface and owner | Treatment |
+|---|---|---|
+| Mobile / TV Grid / Compact / Cards / Pro | Reused `cobraPreviewPanel` TextureView and `CobraPlayerBinding` | Shared minimum Fill, resize/attachment refit, bounded encoded-border detection |
+| Quick Peek | Separate TextureView and disposable `CobraQuickPeekSession` | Same proportional Fill calculation; independent buffer lifetime; no main-player transport changes |
+| Fullscreen Live / Movies / Shows | `mPlayerTexture` and the existing player binding | Existing display preference preserved |
+| Multi-View | One `CobraVideoTile` TextureView/binding per pane | Existing Fit / Fill Screen policy preserved |
+| PiP | Existing fullscreen/session transfer | Existing PiP framing and playback owner preserved |
+| YouTube / provider trailer links | Existing external ACTION_VIEW integration | No replacement player or new provider dependency |
 
 ## Evidence and limits
 
 | Area | Evidence collected or scheduled | Acceptance limit |
 |---|---|---|
 | Installation and launch | Exact signed arm64 APK installed on API 30 Google APIs emulator with ARM translation; update-over-parent workflow | Physical Samsung update still required |
-| Mini-player | Real HTTP clips in 16:9, 4:3, portrait, odd aspect and encoded padding; five modes; TextureView pixel captures | Representative user channels and protected feeds still required |
+| Mini-player | Real HTTP clips in 16:9, 4:3, portrait, odd aspect and encoded padding; five modes; composed-screen pixel captures and per-surface transform diagnostics | Representative user channels and protected feeds still required |
 | Player / Multi-View | Real decoders, visible player callbacks, 2/3/4 panes, audio selection, fullscreen handoffs | Physical decoder capacity, phone calls and Samsung lifecycle still required |
 | Movies / Shows / audio / CC | Generated Xtream-compatible HTTP provider, actual video/audio/text tracks and return navigation | User-provider authentication, catalog quirks and supported languages still required |
 | Background / PiP / recreation | Android framework transitions against the installed signed product | Samsung pop-up/PiP and process pressure still required |

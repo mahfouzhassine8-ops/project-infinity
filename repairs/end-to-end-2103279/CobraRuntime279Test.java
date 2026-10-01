@@ -28,7 +28,27 @@ public class CobraRuntime279Test {
  List<?> channels()throws Exception{return ui(()->new ArrayList<>((List<?>)get(a,"mChannels")));}
  Object channel(String name)throws Exception{for(Object c:channels())if(name.equals(get(c,"name")))return c;throw new AssertionError("Missing HTTP/M3U channel "+name);}
  void start(String name)throws Exception{Object c=channel(name);runUi(()->{call(a,"closeCobraActionSheet");if(get(a,"mMultiOverlay")!=null)call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");if(Boolean.TRUE.equals(get(a,"mCobraProActive"))){call(a,"cobraProSelectChannel",c,"FROM CHANNELS");call(a,"cobraProPreview");}else call(a,"startCobraPreview",c);});await("decoded "+name,()->{ExoPlayer p=(ExoPlayer)get(a,"mCobraPreviewPlayer");return p!=null&&p.getPlaybackState()==Player.STATE_READY&&p.getVideoSize().width>0&&p.isPlaying();},15000);runUi(()->((ExoPlayer)get(a,"mCobraPreviewPlayer")).setRepeatMode(Player.REPEAT_MODE_ALL));SystemClock.sleep(600);}
- void assertFilled(String name)throws Exception{Bitmap b=ui(()->{TextureView t=(TextureView)get(a,"mCobraPreviewTexture");assertTrue(t.isAvailable());return t.getBitmap(144,90);});assertNotNull(b);try{int black=0,total=0;for(int y=10;y<80;y++)for(int x:new int[]{1,2,141,142}){int c=b.getPixel(x,y);if(Color.red(c)<16&&Color.green(c)<16&&Color.blue(c)<16)black++;total++;}for(int x=8;x<136;x++)for(int y:new int[]{1,2,87,88}){int c=b.getPixel(x,y);if(Color.red(c)<16&&Color.green(c)<16&&Color.blue(c)<16)black++;total++;}try(FileOutputStream f=new FileOutputStream(new File(out,name+"-decoded.png"))){b.compress(Bitmap.CompressFormat.PNG,100,f);}assertTrue(name+" black edge fraction="+((float)black/total),black<total*.12f);}finally{b.recycle();}}
+ void assertFilled(String name)throws Exception{
+  // Validate the composed display, not getBitmap(), which omits TextureView's transform.
+  final Rect bounds=new Rect();JSONObject diagnostic=ui(()->{
+   TextureView t=(TextureView)get(a,"mCobraPreviewTexture");assertTrue(t.isAvailable());assertTrue(t.getGlobalVisibleRect(bounds));
+   float[] matrix=new float[9];t.getTransform(new Matrix()).getValues(matrix);JSONObject d=new JSONObject().put("bounds",bounds.toShortString()).put("matrix",Arrays.toString(matrix));
+   Object binding=((Map<?,?>)get(a,"mCobraPlayerBindings")).get(get(a,"mCobraPreviewPlayer"));Object crop=get(binding,"embeddedCrop");
+   for(String f:new String[]{"zoom","contentX","contentY","consistent","probes","active","failed"})d.put(f,get(crop,f));return d;
+  });
+  Bitmap screen=ins.getUiAutomation().takeScreenshot();assertNotNull(screen);
+  try{
+   try(FileOutputStream f=new FileOutputStream(new File(out,name+"-screen.png"))){screen.compress(Bitmap.CompressFormat.PNG,100,f);}
+   assertTrue(bounds.left>=0&&bounds.top>=0&&bounds.right<=screen.getWidth()&&bounds.bottom<=screen.getHeight());
+   int black=0,total=0;
+   // Central edge segments avoid approved rounded corners and overlaid controls.
+   for(int n=30;n<60;n++){int y=bounds.top+bounds.height()*n/100;for(int side:new int[]{2,97}){int x=bounds.left+bounds.width()*side/100;int c=screen.getPixel(x,y);if(Color.red(c)<16&&Color.green(c)<16&&Color.blue(c)<16)black++;total++;}}
+   for(int n=35;n<65;n++){int x=bounds.left+bounds.width()*n/100;int y=bounds.top+Math.max(3,bounds.height()/30);int c=screen.getPixel(x,y);if(Color.red(c)<16&&Color.green(c)<16&&Color.blue(c)<16)black++;total++;}
+   diagnostic.put("black_edge_fraction",(float)black/total);
+   try(FileWriter f=new FileWriter(new File(out,name+"-surface.json"))){f.write(diagnostic.toString(2));}
+   assertTrue(name+" visible black edge fraction="+((float)black/total)+" "+diagnostic,black<total*.12f);
+  }finally{screen.recycle();}
+ }
  View described(View v,String text){if(text.contentEquals(v.getContentDescription()==null?"":v.getContentDescription()))return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=described(((ViewGroup)v).getChildAt(i),text);if(found!=null)return found;}return null;}
  void press(String label)throws Exception{runUi(()->{View v=described(a.getWindow().getDecorView(),label);assertNotNull("Control "+label,v);assertTrue("Control reachable "+label,v.isShown());assertTrue("Control callback "+label,v.performClick());});}
  void foreground()throws Exception{Intent i=new Intent(ins.getTargetContext(),InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);ins.getTargetContext().startActivity(i);await("foreground",()->(Boolean)get(a,"mCobraRotationResumed")&&!a.isInPictureInPictureMode(),8000);}

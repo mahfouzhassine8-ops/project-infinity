@@ -15,7 +15,7 @@ final class CobraEmbeddedCrop implements AutoCloseable {
   interface Guard { boolean active(); }
   private final Guard guard;private final Runnable changed;
   private final Handler handler=new Handler(Looper.getMainLooper());
-  private final Matrix base=new Matrix(),restore=new Matrix(),identity=new Matrix(),result=new Matrix();
+  private final Matrix base=new Matrix(),result=new Matrix();
   private final float[] values=new float[9];
   private final int[] pixels=new int[96*64];
   private Bitmap sample;private TextureView texture;private ExoPlayer player;
@@ -44,10 +44,9 @@ final class CobraEmbeddedCrop implements AutoCloseable {
     TextureView target=texture;if(target==null)return;
     try{
       if(sample==null)sample=Bitmap.createBitmap(96,64,Bitmap.Config.ARGB_8888);
-      // Capture the uncropped texture and restore the displayed transform before
-      // returning to the UI loop; the next presented frame always uses the crop.
-      target.getTransform(restore);
-      try{target.setTransform(identity);target.getBitmap(sample);}finally{target.setTransform(restore);}
+      // TextureView readback excludes its display transform. Never change the
+      // live transform for sampling: even a temporary reset can reach RenderThread.
+      if(target.getBitmap(sample)==null){failed=true;cancel();return;}
       sample.getPixels(pixels,0,96,0,0,96,64);if(!detectBorders(pixels,96,64,borders))return;
       float x=1f-(borders[0]+borders[1])/96f,y=1f-(borders[2]+borders[3])/64f;
       if(Math.abs(x-candidateX)<.02f&&Math.abs(y-candidateY)<.03f)consistent++;else{candidateX=x;candidateY=y;consistent=1;}
