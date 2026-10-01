@@ -1,0 +1,93 @@
+name: Cobra | Locked 2103280 remaining runtime audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103281-remaining-audit]
+    paths: ['repairs/remaining-audit-2103281/**', '.github/workflows/cobra-remaining-audit-2103281.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-followup-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  additional-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Cobra-2103280-Recording-Repair-Evidence
+          run-id: 36818383789
+          github-token: ${{ github.token }}
+          path: evidence280
+      - uses: actions/download-artifact@v8
+        with:
+          name: Cobra-2103280-Recording-Repair-Candidate
+          run-id: 36818383789
+          github-token: ${{ github.token }}
+          path: locked280
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-TEST-CANDIDATE
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: parent279
+      - name: Recover exact locked source and verify APK without rebuilding it
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,tarfile
+          archive=Path('evidence280/reconstructed-2103280-shell.tar.gz')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()=='e4d95e389d57bf91d32ae01c905ce5bc11e0c1447302f04b11044b285560f4ec'
+          assert hashlib.sha256(Path('locked280/Infinity-2103280-Audit-Followup-RC1.apk').read_bytes()).hexdigest()=='e12654c0d81b6b04c4507f2c8bfde9e92761ab5a93ac16b86a3f89f9b7656870'
+          with tarfile.open(archive) as t:t.extractall('.',filter='data')
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Compile only additional instrumentation against locked source
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/remaining-audit-2103281/stage.py
+          (cd build-followup && ./gradlew --no-daemon --console=plain :xbmc:assembleReleaseAndroidTest)
+          mkdir -p instrumentation
+          testapk=$(find build-followup/xbmc/build/outputs/apk/androidTest -name '*.apk' | head -1)
+          bash scripts/sign-infinity71.sh "$testapk" instrumentation/Cobra-audit-followup-tests.apk
+      - name: Generate additional media fixtures
+        run: |
+          sudo chmod 666 /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 repairs/remaining-audit-2103281/media.py
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash repairs/remaining-audit-2103281/runtime.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-2103280-Remaining-Audit-Evidence
+          path: |
+            remaining-runtime/
+            compile-evidence/
+          retention-days: 90

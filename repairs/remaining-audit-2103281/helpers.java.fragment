@@ -1,0 +1,24 @@
+ void launch(boolean seed)throws Exception{
+  Context ctx=ins.getTargetContext();out=new File(ctx.getExternalFilesDir(null),"remaining-audit");out.mkdirs();
+  if(seed){
+   JSONObject source=new JSONObject().put("id","audit").put("type","m3u").put("name","Generated audit provider").put("playlist_url","http://10.0.2.2:8765/audit.m3u").put("epg_url","");
+   ctx.getSharedPreferences("infinity_cobra_live",0).edit().clear().putString("sources_json",new JSONArray().put(source).toString()).putString("active_source","audit").putBoolean("cobra_live_rewind_enabled",false).putString("cobra_appearance_mode","dark").putString("cobra_ambient_mode","immersive").commit();
+  }
+  long began=SystemClock.elapsedRealtime();a=(InfinityLiveActivity)ins.startActivitySync(new Intent(ctx,InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));startupMs=SystemClock.elapsedRealtime()-began;
+  await("provider loaded",()->((List<?>)get(a,"mChannels")).size()>=5,20000);
+ }
+ void tag(String name)throws Exception{runUi(()->{View v=a.getWindow().getDecorView().findViewWithTag(name);assertNotNull(name,v);assertTrue(name+" callback",v.performClick());});ins.waitForIdleSync();}
+ View textView(View root,String label){if(root instanceof TextView&&label.contentEquals(((TextView)root).getText()))return root;if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){View v=textView(((ViewGroup)root).getChildAt(i),label);if(v!=null)return v;}return null;}
+ void tapText(String label)throws Exception{
+  Rect b=ui(()->{for(View root:android.view.inspector.WindowInspector.getGlobalWindowViews()){View v=textView(root,label);Rect r=new Rect();if(v!=null&&v.getGlobalVisibleRect(r))return r;}return null;});assertNotNull("Visible touch target: "+label,b);
+  long t=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent e=MotionEvent.obtain(t,SystemClock.uptimeMillis(),action,b.exactCenterX(),b.exactCenterY(),0);try{ins.sendPointerSync(e);}finally{e.recycle();}}ins.waitForIdleSync();
+ }
+ void toGuide()throws Exception{runUi(()->{call(a,"closeCobraActionSheet");if(get(a,"mMultiOverlay")!=null)call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");call(a,"cobraSelectDrawerOwner","TV");call(a,"showCobraPrimaryView");});}
+ void watch(String name)throws Exception{toGuide();start(name);runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));await("Watch playing",()->get(a,"mPlayer")!=null&&((ExoPlayer)get(a,"mPlayer")).isPlaying(),10000);}
+ boolean recordingServiceRunning(){ActivityManager m=(ActivityManager)a.getSystemService(Context.ACTIVITY_SERVICE);for(ActivityManager.RunningServiceInfo s:m.getRunningServices(100))if(s.service.getClassName().equals("com.projectinfinity.kodi.InfinityCobraRecordingService"))return true;return false;}
+ File recorded(String prefix)throws Exception{Object features=get(a,"mFeatures");JSONArray recordings=(JSONArray)call(features,"recordings");for(int i=0;i<recordings.length();i++){JSONObject item=recordings.getJSONObject(i);if(item.getString("name").contains(prefix))return new File(item.getString("path"));}return null;}
+ void selectTrack(int type,String language)throws Exception{
+  runUi(()->call(a,"showTrackChooser"));ExoPlayer p=ui(()->(ExoPlayer)get(a,"mPlayer"));
+  String selected=ui(()->{int group=0;for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups()){for(int i=0;i<g.length;i++)if(g.getType()==type&&language.equals(g.getTrackFormat(i).language)&&g.isTrackSupported(i))return "cobra-track:"+group+":"+i;group++;}return null;});assertNotNull("Available language "+language,selected);tag(selected);
+  await("selected "+language,()->{for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups())if(g.getType()==type)for(int i=0;i<g.length;i++)if(g.isTrackSelected(i)&&language.equals(g.getTrackFormat(i).language))return true;return false;},8000);
+ }
