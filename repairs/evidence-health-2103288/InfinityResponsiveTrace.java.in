@@ -1,0 +1,375 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Insets;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.SystemClock;
+import android.view.Surface;
+import android.view.View;
+import android.view.WindowInsets;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+/** Evidence-only responsive/Fold trace.
+ *
+ * No settings repair, skin mutation, Kodi command, network upload, root, adb, media playback
+ * control or automatic recovery. The user explicitly starts/stops each trace from Health Center.
+ */
+final class InfinityResponsiveTrace {
+  private static final String PREFS="infinity_responsive_trace";
+  private static final String ENABLED="enabled";
+  private static final String SESSION="session";
+  private static final String START_MS="start_ms";
+  private static final String KODI_OFFSET="kodi_offset";
+  private static final long MAX_EVENT_BYTES=512*1024;
+  private static final long MAX_KODI_READ=1024*1024;
+  private static final int MAX_ARCHIVE_FILE=2*1024*1024;
+  private static final String EVENT_FILE="android-window-events.tsv";
+  private static final String BASELINE_FILE="kodi-baseline-events.txt";
+  private static final String POST_FILE="kodi-resize-events.txt";
+  private static final String SUMMARY_FILE="SUMMARY.txt";
+  private static final Object LOCK=new Object();
+
+  private InfinityResponsiveTrace(){}
+
+  static boolean isEnabled(Context context){
+    return context!=null && context.getSharedPreferences(PREFS,Context.MODE_PRIVATE).getBoolean(ENABLED,false);
+  }
+
+  static String start(Context context){
+    if(context==null)throw new IllegalArgumentException("context");
+    synchronized(LOCK){
+      File dir=directory(context);
+      resetOwnedFiles(dir);
+      String session=new SimpleDateFormat("yyyyMMdd-HHmmss",Locale.US).format(new Date());
+      File kodi=kodiLog(context);
+      long offset=kodi.isFile()?kodi.length():0L;
+      SharedPreferences prefs=context.getSharedPreferences(PREFS,Context.MODE_PRIVATE);
+      prefs.edit().putBoolean(ENABLED,true).putString(SESSION,session)
+          .putLong(START_MS,System.currentTimeMillis()).putLong(KODI_OFFSET,offset).apply();
+      writeText(new File(dir,"session.txt"),
+          "schema=1\nsession="+session+"\nstarted_ms="+System.currentTimeMillis()+
+          "\nnetwork_upload=false\nautomatic_repair=false\n");
+      writeText(new File(dir,"enabled"),session+"\n");
+      writeText(new File(dir,BASELINE_FILE),filteredKodiTail(kodi,512*1024,200));
+      return session;
+    }
+  }
+
+  static File stopAndBuildArchive(Context context){
+    if(context==null)throw new IllegalArgumentException("context");
+    synchronized(LOCK){
+      SharedPreferences prefs=context.getSharedPreferences(PREFS,Context.MODE_PRIVATE);
+      String session=prefs.getString(SESSION,"unknown");
+      File dir=directory(context);
+      prefs.edit().putBoolean(ENABLED,false).apply();
+      File enabled=new File(dir,"enabled");if(enabled.exists())enabled.delete();
+      File kodi=kodiLog(context);
+      long offset=prefs.getLong(KODI_OFFSET,0L);
+      writeText(new File(dir,POST_FILE),filteredKodiSince(kodi,offset,MAX_KODI_READ,400));
+      writeText(new File(dir,SUMMARY_FILE),buildSummary(context,dir));
+      File out=new File(context.getCacheDir(),"Infinity-Responsive-Trace-"+session+".zip");
+      if(out.exists()&&!out.delete())throw new IllegalStateException("Old responsive trace archive is busy");
+      zipOwned(dir,out);
+      return out;
+    }
+  }
+
+  static String latestSummary(Context context){
+    File summary=new File(directory(context),SUMMARY_FILE);
+    if(!summary.isFile())return "No completed Responsive/Fold trace is available yet.";
+    try{return readBounded(summary,128*1024);}catch(Exception e){return "Responsive/Fold trace summary could not be read: "+e.getClass().getSimpleName();}
+  }
+
+  static void capture(Activity activity,String event,View mainView,long[] state,long publishedViewSize,long managedSize){
+    if(activity==null||!isEnabled(activity))return;
+    synchronized(LOCK){
+      File dir=directory(activity),file=new File(dir,EVENT_FILE);
+      if(file.isFile()&&file.length()>=MAX_EVENT_BYTES)return;
+      try(FileWriter out=new FileWriter(file,true)){
+        Rect bounds=currentWindowBounds(activity);
+        View decor=activity.getWindow().getDecorView();
+        int dw=decor==null?0:decor.getWidth(),dh=decor==null?0:decor.getHeight();
+        int vw=mainView==null?0:mainView.getWidth(),vh=mainView==null?0:mainView.getHeight();
+        Configuration c=activity.getResources().getConfiguration();
+        Rect insets=currentInsets(activity);
+        int rotation=Surface.ROTATION_0;
+        try{
+          if(Build.VERSION.SDK_INT>=30 && activity.getDisplay()!=null)rotation=activity.getDisplay().getRotation();
+          else if(activity.getWindowManager().getDefaultDisplay()!=null)rotation=activity.getWindowManager().getDefaultDisplay().getRotation();
+        }catch(Exception ignored){}
+        boolean multi=Build.VERSION.SDK_INT>=24&&activity.isInMultiWindowMode();
+        boolean pip=Build.VERSION.SDK_INT>=26&&activity.isInPictureInPictureMode();
+        long elapsed=SystemClock.elapsedRealtime();
+        out.write("epoch_ms="+System.currentTimeMillis());
+        out.write("\telapsed_ms="+elapsed);
+        out.write("\tevent="+clean(event));
+        out.write("\twindow="+bounds.width()+"x"+bounds.height());
+        out.write("\tdecor="+dw+"x"+dh);
+        out.write("\tmain_view="+vw+"x"+vh);
+        out.write("\tconfig_dp="+c.screenWidthDp+"x"+c.screenHeightDp);
+        out.write("\tdensity="+activity.getResources().getDisplayMetrics().density);
+        out.write("\torientation="+c.orientation);
+        out.write("\trotation="+rotation);
+        out.write("\tmulti="+multi+"\tpip="+pip);
+        out.write("\tinsets="+insets.left+","+insets.top+","+insets.right+","+insets.bottom);
+        out.write("\tpublished="+width(publishedViewSize)+"x"+height(publishedViewSize));
+        out.write("\tmanaged_size="+width(managedSize)+"x"+height(managedSize));
+        if(state!=null&&state.length>=16){
+          out.write("\tbridge="+state[0]+"\tcapabilities="+state[1]);
+          out.write("\tactive="+state[2]+"\tengine_ready="+state[3]+"\tsurface_ready="+state[4]);
+          out.write("\tgeneration="+state[5]);
+          out.write("\trequested_seq="+state[6]+"\trequested="+state[7]+"x"+state[8]);
+          out.write("\tcommitted_seq="+state[9]+"\tcommitted="+state[10]+"x"+state[11]);
+          out.write("\ttheme="+state[12]+"\ttheme_revision="+state[13]+"\tmode="+state[14]+"\tmanaged="+state[15]);
+        }else out.write("\tbridge_state=unavailable");
+        out.write("\n");
+      }catch(Exception ignored){
+        // Evidence collection must never become a runtime failure.
+      }
+    }
+  }
+
+  private static Rect currentWindowBounds(Activity activity){
+    try{
+      if(Build.VERSION.SDK_INT>=30)return new Rect(activity.getWindowManager().getCurrentWindowMetrics().getBounds());
+    }catch(Exception ignored){}
+    View decor=activity.getWindow().getDecorView();int w=decor==null?0:decor.getWidth(),h=decor==null?0:decor.getHeight();
+    if(w<=0)w=activity.getResources().getDisplayMetrics().widthPixels;
+    if(h<=0)h=activity.getResources().getDisplayMetrics().heightPixels;
+    return new Rect(0,0,Math.max(0,w),Math.max(0,h));
+  }
+
+  private static Rect currentInsets(Activity activity){
+    try{
+      View decor=activity.getWindow().getDecorView();
+      if(decor!=null && Build.VERSION.SDK_INT>=23){
+        WindowInsets wi=decor.getRootWindowInsets();
+        if(wi!=null){
+          if(Build.VERSION.SDK_INT>=30){
+            Insets i=wi.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());
+            return new Rect(i.left,i.top,i.right,i.bottom);
+          }
+          return new Rect(wi.getSystemWindowInsetLeft(),wi.getSystemWindowInsetTop(),
+              wi.getSystemWindowInsetRight(),wi.getSystemWindowInsetBottom());
+        }
+      }
+    }catch(Exception ignored){}
+    return new Rect();
+  }
+
+  private static long width(long packed){return packed<=0?0:(packed>>>32);}
+  private static long height(long packed){return packed<=0?0:(packed&0xffffffffL);}
+
+  private static File directory(Context context){
+    File external=context.getExternalFilesDir(null);
+    File root=external!=null?external:context.getFilesDir();
+    File dir=new File(root,".kodi/temp/infinity-responsive-trace");
+    if(!dir.isDirectory()&&!dir.mkdirs())throw new IllegalStateException("Responsive trace directory unavailable");
+    return dir;
+  }
+
+  private static File kodiLog(Context context){
+    File external=context.getExternalFilesDir(null);
+    return new File(external!=null?external:context.getFilesDir(),".kodi/temp/kodi.log");
+  }
+
+  private static void resetOwnedFiles(File dir){
+    for(String name:new String[]{EVENT_FILE,BASELINE_FILE,POST_FILE,SUMMARY_FILE,"session.txt","enabled"}){
+      File f=new File(dir,name);if(f.exists())f.delete();
+    }
+  }
+
+  private static boolean usefulKodiLine(String line){
+    if(line==null)return false;
+    return line.contains("Loading skin file:") ||
+        line.contains("Infinity geometry committed:") ||
+        line.contains("Infinity native fact applied:") ||
+        line.contains("Infinity natural resize:") ||
+        line.contains("surfaceChanged:") ||
+        line.contains("onResizeWindow") ||
+        line.contains("[InfinityLayout]") ||
+        line.contains("Window Init (") ||
+        line.contains("Window Deinit (") ||
+        line.contains("Loading skin includes from");
+  }
+
+  private static String filteredKodiTail(File file,long maxBytes,int maxLines){
+    if(!file.isFile())return "Kodi log was not available when trace started.\n";
+    long start=Math.max(0,file.length()-maxBytes);
+    return filteredKodiRange(file,start,maxBytes,maxLines);
+  }
+
+  private static String filteredKodiSince(File file,long offset,long maxBytes,int maxLines){
+    if(!file.isFile())return "Kodi log was not available when trace stopped.\n";
+    long length=file.length();long start=length<offset?0:offset;
+    if(length-start>maxBytes)start=length-maxBytes;
+    return filteredKodiRange(file,start,maxBytes,maxLines);
+  }
+
+  private static String filteredKodiRange(File file,long start,long maxBytes,int maxLines){
+    ArrayList<String> matches=new ArrayList<>();
+    try(RandomAccessFile in=new RandomAccessFile(file,"r")){
+      in.seek(Math.max(0,start));
+      if(start>0)in.readLine(); // discard a possible partial line
+      long consumed=0;
+      String line;
+      while((line=in.readLine())!=null && consumed<maxBytes){
+        consumed+=line.length()+1;
+        String decoded=new String(line.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        if(usefulKodiLine(decoded)){
+          matches.add(redact(decoded));
+          if(matches.size()>maxLines)matches.remove(0);
+        }
+      }
+    }catch(Exception e){return "Kodi resize-event extraction failed: "+e.getClass().getSimpleName()+"\n";}
+    if(matches.isEmpty())return "No matching Kodi resize/profile events were observed in this interval.\n";
+    StringBuilder out=new StringBuilder();for(String line:matches)out.append(line).append('\n');return out.toString();
+  }
+
+  private static String redact(String value){
+    String s=value;
+    s=s.replaceAll("(?i)(authorization|token|apikey|api_key|password)=([^&\\\\s]+)","$1=<redacted>");
+    s=s.replaceAll("(?i)(https?://)([^/@\\\\s]+)@","$1<redacted>@");
+    return s;
+  }
+
+  private static String buildSummary(Context context,File dir){
+    List<Map<String,String>> events=parseEvents(new File(dir,EVENT_FILE));
+    Map<String,String> first=events.isEmpty()?new LinkedHashMap<>():events.get(0);
+    Map<String,String> last=events.isEmpty()?new LinkedHashMap<>():events.get(events.size()-1);
+    String baseline=readQuiet(new File(dir,BASELINE_FILE),256*1024);
+    String post=readQuiet(new File(dir,POST_FILE),256*1024);
+    String initialWindow=first.getOrDefault("window","unknown");
+    String finalWindow=last.getOrDefault("window","unknown");
+    String requested=last.getOrDefault("requested","unknown");
+    String committed=last.getOrDefault("committed","unknown");
+    String published=last.getOrDefault("published","unknown");
+    String baselineProfile=lastSkinProfile(baseline);
+    String postProfile=lastSkinProfile(post);
+    boolean geometryMatch=finalWindow.equals(committed)||finalWindow.equals(published);
+    boolean aspectChanged=!aspectClass(initialWindow).equals(aspectClass(finalWindow));
+    boolean profileEvent=post.contains("Loading skin file:");
+    String ownership;
+    if(events.isEmpty())ownership="NO ANDROID TRACE EVENTS — collection did not observe the reproduction.";
+    else if(!geometryMatch)ownership="ANDROID → KODI GEOMETRY MISMATCH — investigate Android/native surface or geometry commit ownership.";
+    else if(aspectChanged&&!profileEvent)ownership="KODI GEOMETRY UPDATED; SKIN PROFILE RELOAD NOT OBSERVED — investigate Kodi skin/profile routing before changing layout XML.";
+    else if(profileEvent)ownership="WINDOW/GEOMETRY AND SKIN LOAD EVENTS PRESENT — compare selected profile with the approved skin matrix/control XML.";
+    else ownership="GEOMETRY MATCHED IN THE LAST SNAPSHOT — inspect the event timeline before assigning ownership.";
+
+    StringBuilder out=new StringBuilder();
+    out.append("INFINITY RESPONSIVE / FOLD TRACE\n");
+    out.append("Evidence only — no automatic repair was performed.\n\n");
+    out.append("Session: ").append(context.getSharedPreferences(PREFS,Context.MODE_PRIVATE).getString(SESSION,"unknown")).append('\n');
+    out.append("Events captured: ").append(events.size()).append('\n');
+    out.append("Initial Android window: ").append(initialWindow).append(" (").append(aspectClass(initialWindow)).append(")\n");
+    out.append("Final Android window: ").append(finalWindow).append(" (").append(aspectClass(finalWindow)).append(")\n");
+    out.append("Last published view size: ").append(published).append('\n');
+    out.append("Last native requested geometry: ").append(requested).append('\n');
+    out.append("Last native committed geometry: ").append(committed).append('\n');
+    out.append("Baseline observed skin profile: ").append(baselineProfile).append('\n');
+    out.append("Post-reproduction observed skin profile: ").append(postProfile).append('\n');
+    out.append("Aspect class changed: ").append(aspectChanged).append('\n');
+    out.append("Skin load/profile event after start: ").append(profileEvent).append('\n');
+    out.append("\nOWNERSHIP SIGNAL\n").append(ownership).append('\n');
+    out.append("\nInterpretation is deliberately conservative. Missing Kodi log lines do not prove that an event never occurred.\n");
+    return out.toString();
+  }
+
+  private static List<Map<String,String>> parseEvents(File file){
+    ArrayList<Map<String,String>> out=new ArrayList<>();
+    if(!file.isFile())return out;
+    try(BufferedReader in=new BufferedReader(new FileReader(file))){
+      String line;
+      while((line=in.readLine())!=null){
+        LinkedHashMap<String,String> row=new LinkedHashMap<>();
+        for(String part:line.split("\\t")){
+          int at=part.indexOf('=');if(at>0)row.put(part.substring(0,at),part.substring(at+1));
+        }
+        if(!row.isEmpty())out.add(row);
+      }
+    }catch(Exception ignored){}
+    return out;
+  }
+
+  private static String aspectClass(String size){
+    try{
+      String[] p=size.split("x");float w=Float.parseFloat(p[0]),h=Float.parseFloat(p[1]);
+      if(w<=0||h<=0)return "unknown";float r=w/h;
+      if(r<.82f)return "portrait";if(r<1.22f)return "square-ish";if(r<2f)return "landscape";return "ultrawide";
+    }catch(Exception e){return "unknown";}
+  }
+
+  private static String lastSkinProfile(String text){
+    String found="not observed";
+    for(String line:text.split("\\n")){
+      int at=line.indexOf("skin.infinity");
+      if(at<0)continue;
+      String tail=line.substring(at).replace('\\','/');
+      String[] parts=tail.split("/");
+      if(parts.length>=2 && parts[1].length()>0)found=parts[1];
+    }
+    return found;
+  }
+
+  private static void zipOwned(File dir,File destination){
+    long total=0;
+    try(ZipOutputStream zip=new ZipOutputStream(new FileOutputStream(destination))){
+      for(String name:new String[]{"session.txt",EVENT_FILE,BASELINE_FILE,POST_FILE,SUMMARY_FILE}){
+        File file=new File(dir,name);if(!file.isFile())continue;
+        long size=file.length();if(size<0||size>MAX_ARCHIVE_FILE||total+size>8L*1024*1024)continue;
+        zip.putNextEntry(new ZipEntry(name));
+        try(FileInputStream in=new FileInputStream(file)){
+          byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))>0)zip.write(buffer,0,n);
+        }
+        zip.closeEntry();total+=size;
+      }
+      zip.putNextEntry(new ZipEntry("READ-ME.txt"));
+      zip.write(("Infinity Responsive/Fold diagnostic trace. Evidence only; no repair, reset, network upload or credential collection was performed.\\n"+
+          "android-window-events.tsv correlates Android window, SurfaceView and native bridge requested/committed geometry.\\n"+
+          "Kodi event files contain only allowlisted resize/skin-loading lines from the local Kodi log.\\n").getBytes(StandardCharsets.UTF_8));
+      zip.closeEntry();
+    }catch(Exception e){if(destination.exists())destination.delete();throw new IllegalStateException("Responsive trace archive failed",e);}
+  }
+
+  private static void writeText(File file,String text){
+    try{
+      File parent=file.getParentFile();if(parent!=null&&!parent.isDirectory())parent.mkdirs();
+      try(FileOutputStream out=new FileOutputStream(file,false)){out.write(text.getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
+    }catch(Exception e){throw new IllegalStateException("Trace file write failed: "+file.getName(),e);}
+  }
+
+  private static String readQuiet(File file,int max){
+    try{return readBounded(file,max);}catch(Exception e){return "";}
+  }
+
+  private static String readBounded(File file,int max)throws Exception{
+    try(FileInputStream in=new FileInputStream(file);ByteArrayOutputStream out=new ByteArrayOutputStream()){
+      byte[] b=new byte[8192];int total=0,n;
+      while((n=in.read(b))>0&&total<max){int keep=Math.min(n,max-total);out.write(b,0,keep);total+=keep;}
+      return out.toString("UTF-8");
+    }
+  }
+
+  private static String clean(String value){return value==null?"unknown":value.replace('\t',' ').replace('\n',' ').replace('\r',' ');}
+}
