@@ -1,0 +1,19 @@
+  private void cobraSyncRecordingState(){
+    if(mFeatures==null||mPrefs==null)return;
+    if(mRecordingSession.isEmpty())mRecordingSession=mPrefs.getString("cobra_active_recording_session","");
+    if(!mRecordingSession.isEmpty()&&!mFeatures.recordingActive(mRecordingSession)){
+      mRecordingSession="";mPrefs.edit().remove("cobra_active_recording_session").apply();
+    }
+    View control=mCobraActionSheet==null?null:mCobraActionSheet.findViewWithTag("cobra_recording_action");
+    if(control instanceof LinearLayout){
+      String label=mRecordingSession.isEmpty()?"Record now":"Stop recording";
+      LinearLayout row=(LinearLayout)control;row.setContentDescription(label);
+      if(row.getChildCount()>1&&row.getChildAt(1) instanceof LinearLayout){
+        LinearLayout copy=(LinearLayout)row.getChildAt(1);
+        if(copy.getChildCount()>0&&copy.getChildAt(0) instanceof TextView){
+          TextView title=(TextView)copy.getChildAt(0);if(!label.contentEquals(title.getText()))title.setText(label);
+        }
+      }
+    }
+  }
+

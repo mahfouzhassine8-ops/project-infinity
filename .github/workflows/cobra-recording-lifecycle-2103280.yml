@@ -1,0 +1,153 @@
+name: Cobra | 2103280 recording lifecycle repair candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103280-audit-followup]
+    paths: ['repairs/recording-lifecycle-2103280/**', '.github/workflows/cobra-recording-lifecycle-2103280.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-recording-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  build-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-Evidence
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: evidence279
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-TEST-CANDIDATE
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: locked279
+      - name: Snapshot exact locked source then apply forward recording repair
+        run: |
+          set -euo pipefail
+          mkdir -p audit280
+          git branch rollback-2103279 60e1893d8591a29fab7e952ea2d3caedb0b13fa5
+          git bundle create audit280/locked-2103279-rollback.bundle rollback-2103279
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,tarfile,zipfile,shutil
+          archive=Path('evidence279/reconstructed-2103279-shell.tar.gz');apk=Path('locked279/Infinity-2103279-End-to-End-Repair-RC1.apk')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()=='42ee8ce49a8fbff520f310c4e12ac9c052fa1fc9ed60ebd6d1b1bdec6e3129d0'
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='cf7aedadded921e5ddc023ba08161638d8f6207dd7002f3258daf178073679cd'
+          with tarfile.open(archive) as t:t.extractall('.',filter='data')
+          shutil.copytree('shell-kodi','rollback279/shell-kodi')
+          with zipfile.ZipFile(apk) as z:Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          python3 repairs/recording-lifecycle-2103280/apply_recording_repair.py
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Build and sign forward candidate and instrumentation
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk locked279/Infinity-2103279-End-to-End-Repair-RC1.apk --build-dir build280 --out candidate280
+          python3 repairs/recording-lifecycle-2103280/stage_runtime.py
+          (cd build280 && ./gradlew --no-daemon --console=plain :xbmc:assembleReleaseAndroidTest)
+          mkdir -p instrumentation280
+          testapk=$(find build280/xbmc/build/outputs/apk/androidTest -name '*.apk' | head -1)
+          bash scripts/sign-infinity71.sh "$testapk" instrumentation280/Cobra-2103280-runtime-tests.apk
+      - name: Run inherited regression suites and recording lifecycle checks
+        run: |
+          python3 repairs/recording-lifecycle-2103280/stage_tests.py
+          python3 - <<'PY'
+          import subprocess,json
+          from pathlib import Path
+          classes=json.loads(Path('audit280/test-classes.json').read_text())
+          args=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest']
+          for name in classes:args+=['--tests',name]
+          subprocess.run(args,cwd='build280',check=True)
+          PY
+      - name: Enforce source and render preservation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,xml.etree.ElementTree as E
+          allowed={'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in','tools/android/packaging/xbmc/src/InfinityCobraFeatureRuntime.java.in','tools/android/packaging/xbmc/src/InfinityCobraRecordingService.java.in','tools/android/packaging/xbmc/build.gradle.in'}
+          changed=set();count=0
+          for f in Path('rollback279/shell-kodi').rglob('*'):
+            if not f.is_file():continue
+            relative=str(f.relative_to('rollback279/shell-kodi'));current=Path('shell-kodi')/relative
+            if f.read_bytes()!=current.read_bytes():changed.add(relative)
+            else:count+=1
+          assert changed==allowed,changed
+          names=[p.name for p in Path('evidence279/screenshots/protected').glob('*.png')];assert len(names)==20
+          for name in names:assert Path('evidence279/screenshots/protected',name).read_bytes()==Path('audit280/screenshots/protected',name).read_bytes(),name
+          tests={}
+          for f in Path('build280/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);tests[t.attrib['name']]=int(t.attrib['tests'])
+          assert sum(tests.values())==522,tests
+          Path('candidate280/AUDIT-VERIFICATION.json').write_text(json.dumps({'parent_lock':'60e1893d8591a29fab7e952ea2d3caedb0b13fa5','test_count':522,'test_methods':tests,'protected_renders':20,'other_source_files_unchanged':count,'changed_source_files':sorted(changed),'physical_device_verified':False,'locked':False},indent=2))
+          PY
+      - uses: actions/upload-artifact@v7
+        with: {name: Cobra-2103280-Recording-Repair-Candidate, path: candidate280/, retention-days: 90}
+      - uses: actions/upload-artifact@v7
+        with: {name: Cobra-2103280-Instrumentation, path: instrumentation280/, retention-days: 90}
+      - name: Archive source and regression evidence
+        if: always()
+        run: |
+          mkdir -p audit280
+          cp -r build280/xbmc/build/test-results audit280/test-results || true
+          tar -czf audit280/reconstructed-2103280-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Cobra-2103280-Recording-Repair-Evidence, path: audit280/, retention-days: 90}
+  runtime:
+    needs: build-test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: {name: Cobra-2103280-Recording-Repair-Candidate, path: candidate280}
+      - uses: actions/download-artifact@v8
+        with: {name: Cobra-2103280-Instrumentation, path: instrumentation280}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-TEST-CANDIDATE
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: locked279
+      - name: Start generated provider
+        run: |
+          sudo chmod 666 /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 repairs/audit-followup-2103280/media.py
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash repairs/recording-lifecycle-2103280/runtime.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Cobra-2103280-Recording-Runtime-Evidence, path: runtime280/, retention-days: 90}

@@ -1,0 +1,17 @@
+  // The foreground DVR service is authoritative; an Activity-held session ID
+  // alone does not prove that a recording is still running. Pending starts get
+  // a bounded grace period and worker completion removes only its own token.
+  private static final java.util.concurrent.ConcurrentHashMap<String,Object> RECORDING_OWNERS=new java.util.concurrent.ConcurrentHashMap<>();
+  static void recordingRequested(String id){RECORDING_OWNERS.put(id,Long.valueOf(android.os.SystemClock.elapsedRealtime()+30000L));}
+  static void recordingStarted(String id,Object owner){RECORDING_OWNERS.put(id,owner);}
+  static void recordingFinished(String id,Object owner){
+    if(id==null||id.isEmpty())return;
+    if(owner!=null){RECORDING_OWNERS.remove(id,owner);return;}
+    Object pending=RECORDING_OWNERS.get(id);if(pending instanceof Long)RECORDING_OWNERS.remove(id,pending);
+  }
+  public boolean recordingActive(String id){
+    if(id==null||id.isEmpty())return false;Object owner=RECORDING_OWNERS.get(id);
+    if(owner instanceof Long&&android.os.SystemClock.elapsedRealtime()>((Long)owner).longValue()){RECORDING_OWNERS.remove(id,owner);return false;}
+    return owner!=null;
+  }
+
