@@ -50,6 +50,7 @@ private:
     return s
 
 def patch_cpp(s):
+    s=once(s,"#include <mutex>\n","#include <cmath>\n#include <mutex>\n","cmath include")
     anchor="""bool CGUIWindow::NeedLoad() const
 {
   return !m_windowLoaded || CServiceBroker::GetGUI()->GetInfoManager().ConditionsChangedValues(m_xmlIncludeConditions);
