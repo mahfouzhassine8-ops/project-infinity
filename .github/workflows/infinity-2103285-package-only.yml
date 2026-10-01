@@ -38,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p candidate285 rollback285
-          test "$(git rev-parse rollback-infinity-2103284-before-native-fd-repair-20261001)" = c8a1adb7e8d7a2a8cd305a88944912c4861d94ea
+          test "$(git rev-parse refs/remotes/origin/rollback-infinity-2103284-before-native-fd-repair-20261001)" = c8a1adb7e8d7a2a8cd305a88944912c4861d94ea
           git bundle create rollback285/2103284-source-rollback.bundle refs/remotes/origin/rollback-infinity-2103284-before-native-fd-repair-20261001
           sdkmanager 'build-tools;34.0.0' >/dev/null
           python3 repairs/native-fd-2103285/package.py prepare --parent parent284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk --native native285/libkodi.so --out candidate285
