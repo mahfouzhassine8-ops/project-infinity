@@ -1,0 +1,16 @@
+package @APP_PACKAGE@;
+
+/** Fails closed. No dependency on a playback owner or transport. */
+final class InfinityKodiAmbientGate {
+  private static boolean loaded;
+  private static native void setActive(boolean active);
+  static {
+    try { System.loadLibrary("infinityambient"); loaded=true; }
+    catch(LinkageError | SecurityException unavailable) { loaded=false; }
+  }
+  static void update(boolean resumed, boolean pip) {
+    if(!loaded)return;
+    try { setActive(resumed&&!pip); }
+    catch(LinkageError | RuntimeException unavailable) { loaded=false; }
+  }
+}
