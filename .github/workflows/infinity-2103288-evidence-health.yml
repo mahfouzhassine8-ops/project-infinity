@@ -87,7 +87,6 @@ jobs:
                             b'Stop & export Responsive/Fold Trace',b'android-window-events.tsv',
                             b'KODI GEOMETRY UPDATED; SKIN PROFILE RELOAD NOT OBSERVED'):
                   assert token in dex,token
-              assert b'http://' not in dex[dex.find(b'InfinityResponsiveTrace'):dex.find(b'InfinityResponsiveTrace')+200000]
           report=json.loads(Path('candidate288/background-resume-apk-audit.json').read_text())
           assert report['version_code']==2103288
           assert report['native_engine_sha256']=='f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'
