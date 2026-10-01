@@ -1,0 +1,267 @@
+{
+  "candidate": "Cobra 2103279 End-to-End Repair RC1",
+  "status": "candidate; not locked; physical Fold/provider acceptance pending",
+  "locked_source_commit": "41f08774a8b908d60c0f9e6647497e40d6bbe081",
+  "product_runtime_source_commit": "7c91b569ccb3056ea33439434707c2c52d2bd828",
+  "final_test_report_commit": "92dbd3bb9547e1afe03cfda382abdad6773d7a14",
+  "final_build_test_run": {
+    "id": 36810766190,
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/36810766190",
+    "conclusion": "success",
+    "tests_passed": 519,
+    "locked_test_files_unchanged": 35,
+    "locked_suite_test_count": 300,
+    "protected_renders_identical": 20,
+    "runtime_job": "skipped because the commit only changed test/workflow files; exact app APK had already passed the runtime job"
+  },
+  "runtime_run": {
+    "id": 36808284951,
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/36808284951",
+    "conclusion_for_android_runtime_job": "success",
+    "passed": 21,
+    "total": 21,
+    "artifact_id": 11138861575,
+    "artifact_sha256": "bd88882c8c3a3b67e98795c67a878677a93a78ad47b64b241686413c4d70fa4f"
+  },
+  "apk": {
+    "file": "Infinity-2103279-End-to-End-Repair-RC1.apk",
+    "sha256": "cf7aedadded921e5ddc023ba08161638d8f6207dd7002f3258daf178073679cd",
+    "bytes": 93536543,
+    "version_code": 2103279,
+    "version_name": "1.0.9-End-to-End-Repair-RC1",
+    "runtime_binary_hash_match": true,
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+  },
+  "preservation": {
+    "native_libraries_identical": 46,
+    "assets_identical": 4039,
+    "android_resources_identical": true,
+    "unchanged_other_shell_files": 228,
+    "locked_regression_sources_identical": 35,
+    "protected_renders_identical": 20
+  },
+  "drawer_insets": {
+    "assertion": {
+      "hint_top": 1668,
+      "hint_bottom": 1757,
+      "safe_bottom": 1794,
+      "navigation_bottom": 126
+    },
+    "clearance_px": 37,
+    "screenshot": "results/Channels.png",
+    "screenshot_reviewed": true
+  },
+  "runtime_measurements": {
+    "device": "sdk_gphone_x86_64",
+    "api": 30,
+    "startup_ms": 1050,
+    "scenario_count": 21,
+    "scenarios": [
+      {
+        "passed": true,
+        "pss_kb": 87199,
+        "java_heap_bytes": 12944176,
+        "native_heap_bytes": 29796768,
+        "name": "Cobra launch and real HTTP M3U provider load",
+        "elapsed_ms": 7642
+      },
+      {
+        "passed": true,
+        "pss_kb": 96480,
+        "java_heap_bytes": 8893040,
+        "native_heap_bytes": 33060272,
+        "name": "Decoded crop / mobile",
+        "elapsed_ms": 18144
+      },
+      {
+        "passed": true,
+        "pss_kb": 100778,
+        "java_heap_bytes": 8311200,
+        "native_heap_bytes": 33244448,
+        "name": "Decoded crop / grid",
+        "elapsed_ms": 17527
+      },
+      {
+        "passed": true,
+        "pss_kb": 102257,
+        "java_heap_bytes": 11656984,
+        "native_heap_bytes": 33698784,
+        "name": "Decoded crop / compact",
+        "elapsed_ms": 17633
+      },
+      {
+        "passed": true,
+        "pss_kb": 105184,
+        "java_heap_bytes": 14392344,
+        "native_heap_bytes": 34139728,
+        "name": "Decoded crop / cards",
+        "elapsed_ms": 18971
+      },
+      {
+        "passed": true,
+        "pss_kb": 116323,
+        "java_heap_bytes": 28143968,
+        "native_heap_bytes": 35622768,
+        "name": "Decoded crop / focus",
+        "elapsed_ms": 16202
+      },
+      {
+        "passed": true,
+        "pss_kb": 100710,
+        "java_heap_bytes": 9382208,
+        "native_heap_bytes": 35599648,
+        "name": "Encoded black bars diagnostic",
+        "elapsed_ms": 5395
+      },
+      {
+        "passed": true,
+        "pss_kb": 123691,
+        "java_heap_bytes": 15551264,
+        "native_heap_bytes": 49181072,
+        "name": "Pause resume and fullscreen handoff preserve player",
+        "elapsed_ms": 16016
+      },
+      {
+        "passed": true,
+        "pss_kb": 112789,
+        "java_heap_bytes": 19069576,
+        "native_heap_bytes": 40371888,
+        "name": "Quick Peek uses real independent decoder and clean release",
+        "elapsed_ms": 42679
+      },
+      {
+        "passed": true,
+        "pss_kb": 106650,
+        "java_heap_bytes": 25205440,
+        "native_heap_bytes": 27000912,
+        "name": "Multi-View 2/3/4 real decoders and fullscreen return",
+        "elapsed_ms": 18228
+      },
+      {
+        "passed": true,
+        "pss_kb": 137348,
+        "java_heap_bytes": 27543496,
+        "native_heap_bytes": 53625344,
+        "name": "Android PiP and foreground return preserve player",
+        "elapsed_ms": 8258
+      },
+      {
+        "passed": true,
+        "pss_kb": 141686,
+        "java_heap_bytes": 41119552,
+        "native_heap_bytes": 45917440,
+        "name": "Actual Android background pause / audio / foreground",
+        "elapsed_ms": 20618
+      },
+      {
+        "passed": true,
+        "pss_kb": 114387,
+        "java_heap_bytes": 12426776,
+        "native_heap_bytes": 40606864,
+        "name": "Android resize and both themes",
+        "elapsed_ms": 42606
+      },
+      {
+        "passed": true,
+        "pss_kb": 111675,
+        "java_heap_bytes": 12153184,
+        "native_heap_bytes": 40182176,
+        "name": "Rapid channel switching and repeated mode changes release stale bindings",
+        "elapsed_ms": 21317
+      },
+      {
+        "passed": true,
+        "pss_kb": 119540,
+        "java_heap_bytes": 18887584,
+        "native_heap_bytes": 43321392,
+        "name": "Favorites / Recents / Search produce real results without interrupting playback",
+        "elapsed_ms": 6554
+      },
+      {
+        "passed": true,
+        "pss_kb": 107523,
+        "java_heap_bytes": 12284064,
+        "native_heap_bytes": 40908448,
+        "name": "Real-time TS rewind / live edge / interrupted provider recovery",
+        "elapsed_ms": 30049
+      },
+      {
+        "passed": true,
+        "pss_kb": 104455,
+        "java_heap_bytes": 15650792,
+        "native_heap_bytes": 32728592,
+        "name": "HTTP movie details / My List / playback / seek / subtitles / Smart Return",
+        "elapsed_ms": 11910
+      },
+      {
+        "passed": true,
+        "pss_kb": 106034,
+        "java_heap_bytes": 17170728,
+        "native_heap_bytes": 33414816,
+        "name": "Delayed movie metadata cannot replace a newer drawer destination",
+        "elapsed_ms": 2393
+      },
+      {
+        "passed": true,
+        "pss_kb": 99216,
+        "java_heap_bytes": 10184800,
+        "native_heap_bytes": 28890992,
+        "name": "HTTP show seasons / episode playback / return",
+        "elapsed_ms": 1797
+      },
+      {
+        "passed": true,
+        "pss_kb": 311490,
+        "java_heap_bytes": 28045152,
+        "native_heap_bytes": 247762144,
+        "name": "Drawer section memory and settings retain ownership",
+        "elapsed_ms": 7995
+      },
+      {
+        "passed": true,
+        "pss_kb": 377433,
+        "java_heap_bytes": 29857832,
+        "native_heap_bytes": 305818944,
+        "name": "Activity recreation preserves Movies and settings",
+        "elapsed_ms": 1624
+      }
+    ],
+    "physical_fold": false,
+    "screenshot_count": 74,
+    "pause_cycles": [
+      {
+        "cycle": 0,
+        "requested_position_ms": 1160,
+        "acknowledged_position_ms": 1160,
+        "after_600_ms": 1160,
+        "ack_ms": 1,
+        "play_when_ready": false,
+        "is_playing": false
+      },
+      {
+        "cycle": 1,
+        "requested_position_ms": 1976,
+        "acknowledged_position_ms": 1976,
+        "after_600_ms": 1976,
+        "ack_ms": 12,
+        "play_when_ready": false,
+        "is_playing": false
+      },
+      {
+        "cycle": 2,
+        "requested_position_ms": 2426,
+        "acknowledged_position_ms": 2426,
+        "after_600_ms": 2426,
+        "ack_ms": 0,
+        "play_when_ready": false,
+        "is_playing": false
+      }
+    ]
+  },
+  "limits": [
+    "No physical Galaxy Fold/cover-display, split-screen, pop-up-window or thermal test was available.",
+    "Generated HTTP/M3U/Xtream fixtures do not verify authenticated user providers.",
+    "Long-duration leak, battery, and physical frame-rate checks remain open.",
+    "Recording destinations, phone-call interruption, external YouTube/trailer/casting hardware and provider-specific formats remain unverified."
+  ]
+}
