@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class CobraRuntime279Test {
  final Instrumentation ins=InstrumentationRegistry.getInstrumentation();InfinityLiveActivity a;File out;
- final JSONArray results=new JSONArray();final List<String> errors=new ArrayList<>();
+ long startupMs;final JSONArray results=new JSONArray();final List<String> errors=new ArrayList<>();
  interface Action {void run()throws Exception;}
  static Field field(Object o,String n)throws Exception{Class<?> c=o instanceof Class?(Class<?>)o:o.getClass();while(c!=null){try{Field f=c.getDeclaredField(n);f.setAccessible(true);return f;}catch(NoSuchFieldException e){c=c.getSuperclass();}}throw new NoSuchFieldException(n);}
  static Object get(Object o,String n)throws Exception{return field(o,n).get(o instanceof Class?null:o);}
@@ -21,8 +21,8 @@ public class CobraRuntime279Test {
  <T>T ui(Callable<T> c)throws Exception{final Object[] r=new Object[2];ins.runOnMainSync(()->{try{r[0]=c.call();}catch(Throwable e){r[1]=e;}});if(r[1]!=null)throw new Exception((Throwable)r[1]);return (T)r[0];}
  void runUi(Action c)throws Exception{ui(()->{c.run();return null;});}
  void await(String label,Callable<Boolean> condition,long ms)throws Exception{long end=SystemClock.uptimeMillis()+ms;while(SystemClock.uptimeMillis()<end){if(ui(condition))return;SystemClock.sleep(150);}throw new AssertionError("Timeout: "+label);}
- void check(String name,Action action){long start=SystemClock.elapsedRealtime();JSONObject record=new JSONObject();try{action.run();record.put("passed",true);}catch(Throwable e){errors.add(name+": "+e);try{record.put("passed",false).put("error",android.util.Log.getStackTraceString(e));}catch(Exception ignored){}}try{record.put("name",name).put("elapsed_ms",SystemClock.elapsedRealtime()-start);results.put(record);android.util.Log.i("CobraAudit279",record.toString());saveResults();}catch(Exception e){throw new RuntimeException(e);}}
- void saveResults()throws Exception{try(FileWriter w=new FileWriter(new File(out,"runtime-results.json"))){w.write(new JSONObject().put("kind","signed APK / real Android runtime / generated HTTP provider content").put("device",Build.MODEL).put("api",Build.VERSION.SDK_INT).put("tests",results).put("physical_fold",false).toString(2));}}
+ void check(String name,Action action){long start=SystemClock.elapsedRealtime();JSONObject record=new JSONObject();try{action.run();record.put("passed",true);}catch(Throwable e){errors.add(name+": "+e);try{screenshot("failure-"+name.replaceAll("[^A-Za-z0-9]+","-"));}catch(Exception ignored){}try{record.put("passed",false).put("error",android.util.Log.getStackTraceString(e));}catch(Exception ignored){}}try{Debug.MemoryInfo memory=new Debug.MemoryInfo();Debug.getMemoryInfo(memory);record.put("pss_kb",memory.getTotalPss()).put("java_heap_bytes",Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()).put("native_heap_bytes",Debug.getNativeHeapAllocatedSize());record.put("name",name).put("elapsed_ms",SystemClock.elapsedRealtime()-start);results.put(record);android.util.Log.i("CobraAudit279",record.toString());saveResults();}catch(Exception e){throw new RuntimeException(e);}}
+ void saveResults()throws Exception{try(FileWriter w=new FileWriter(new File(out,"runtime-results.json"))){w.write(new JSONObject().put("kind","signed APK / real Android runtime / generated HTTP provider content").put("device",Build.MODEL).put("api",Build.VERSION.SDK_INT).put("tests",results).put("physical_fold",false).put("cobra_activity_startup_ms",startupMs).toString(2));}}
  void screenshot(String name)throws Exception{Bitmap b=ins.getUiAutomation().takeScreenshot();assertNotNull(b);try(FileOutputStream f=new FileOutputStream(new File(out,name+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,f);}finally{b.recycle();}}
  ExoPlayer player()throws Exception{return ui(()->(ExoPlayer)get(a,"mCobraPreviewPlayer"));}
  List<?> channels()throws Exception{return ui(()->new ArrayList<>((List<?>)get(a,"mChannels")));}
@@ -49,6 +49,7 @@ public class CobraRuntime279Test {
    assertTrue(name+" visible black edge fraction="+((float)black/total)+" "+diagnostic,black<total*.12f);
   }finally{screen.recycle();}
  }
+ EditText inputIn(View v){if(v instanceof EditText)return (EditText)v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){EditText edit=inputIn(((ViewGroup)v).getChildAt(i));if(edit!=null)return edit;}return null;}
  View described(View v,String text){if(text.contentEquals(v.getContentDescription()==null?"":v.getContentDescription()))return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=described(((ViewGroup)v).getChildAt(i),text);if(found!=null)return found;}return null;}
  void press(String label)throws Exception{runUi(()->{View v=described(a.getWindow().getDecorView(),label);assertNotNull("Control "+label,v);assertTrue("Control reachable "+label,v.isShown());assertTrue("Control callback "+label,v.performClick());});}
  void foreground()throws Exception{Intent i=new Intent(ins.getTargetContext(),InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);ins.getTargetContext().startActivity(i);await("foreground",()->(Boolean)get(a,"mCobraRotationResumed")&&!a.isInPictureInPictureMode(),8000);}
@@ -57,7 +58,7 @@ public class CobraRuntime279Test {
   out=new File(ins.getTargetContext().getExternalFilesDir(null),"audit279");out.mkdirs();
   Context ctx=ins.getTargetContext();JSONObject source=new JSONObject().put("id","audit").put("type","m3u").put("name","Generated audit provider").put("playlist_url","http://10.0.2.2:8765/audit.m3u").put("epg_url","");
   ctx.getSharedPreferences("infinity_cobra_live",0).edit().clear().putString("sources_json",new JSONArray().put(source).put(new JSONObject().put("id","peek").put("type","m3u").put("name","Independent preview audit source").put("playlist_url","http://10.0.2.2:8765/peek.m3u").put("epg_url","" )).put(new JSONObject().put("id","vod").put("type","xtream").put("name","Generated VOD audit provider").put("server","http://10.0.2.2:8765").put("username","audit").put("password","audit")).toString()).putString("active_source","audit").putBoolean("cobra_live_rewind_enabled",false).putString("cobra_appearance_mode","dark").putString("cobra_ambient_mode","immersive").commit();
-  Intent launch=new Intent(ctx,InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);a=(InfinityLiveActivity)ins.startActivitySync(launch);
+  Intent launch=new Intent(ctx,InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);long launchAt=SystemClock.elapsedRealtime();a=(InfinityLiveActivity)ins.startActivitySync(launch);startupMs=SystemClock.elapsedRealtime()-launchAt;
   check("Cobra launch and real HTTP M3U provider load",()->{await("provider channels",()->((List<?>)get(a,"mChannels")).size()>=5,20000);screenshot("01-live-launch");});
   for(String mode:new String[]{"mobile","grid","compact","cards","focus"})check("Decoded crop / "+mode,()->{
    runUi(()->{put(a,"mCobraGuideStyle",mode);call(a,"cobraShowGuideShell");});
@@ -82,7 +83,9 @@ public class CobraRuntime279Test {
    List<Object> selected=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd"})selected.add(channel(n));
    runUi(()->call(a,"cobraSetMultiFillScreen",true));
    for(int count=2;count<=4;count++){final int c=count;runUi(()->call(a,"openMultiView",new ArrayList<>(selected.subList(0,c))));await("multi "+c,()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");if(ps==null||ps.length!=c)return false;for(ExoPlayer p:ps)if(p==null||p.getVideoSize().width==0||!p.isPlaying()||((Number)get(get(((Map<?,?>)get(a,"mCobraPlayerBindings")).get(p),"vitals"),"firstFrameAt")).longValue()<0)return false;return true;},20000);SystemClock.sleep(600);screenshot("multi-"+c);}
-   ExoPlayer[] prior=ui(()->((ExoPlayer[])get(a,"mMultiPlayers")).clone());String key=(String)get(selected.get(1),"id");runUi(()->call(a,"cobraPromoteMultiTileFullscreen",key));SystemClock.sleep(500);runUi(()->call(a,"cobraReturnToMultiFromFullscreen"));ExoPlayer[] after=ui(()->(ExoPlayer[])get(a,"mMultiPlayers"));assertArrayEquals(prior,after);runUi(()->call(a,"setMultiAudio",2));assertEquals(2,ui(()->get(a,"mAudioTile")));runUi(()->{call(a,"releaseMulti");call(a,"showCobraPrimaryView");});
+   ExoPlayer[] prior=ui(()->((ExoPlayer[])get(a,"mMultiPlayers")).clone());String key=(String)get(selected.get(1),"id");runUi(()->call(a,"cobraPromoteMultiTileFullscreen",key));SystemClock.sleep(500);runUi(()->call(a,"cobraReturnToMultiFromFullscreen"));ExoPlayer[] after=ui(()->(ExoPlayer[])get(a,"mMultiPlayers"));assertArrayEquals(prior,after);runUi(()->call(a,"setMultiAudio",2));assertEquals(2,ui(()->get(a,"mAudioTile")));
+   Object replacement=channel("Baked");runUi(()->call(a,"replaceCobraMultiTileClean",3,replacement));await("replacement pane",()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");return ps.length==4&&ps[3].isPlaying()&&((Number)get(get(((Map<?,?>)get(a,"mCobraPlayerBindings")).get(ps[3]),"vitals"),"firstFrameAt")).longValue()>=0;},15000);
+   ExoPlayer[] replaced=ui(()->(ExoPlayer[])get(a,"mMultiPlayers"));for(int i=0;i<3;i++)assertSame("Replacement preserves peer "+i,prior[i],replaced[i]);assertNotSame(prior[3],replaced[3]);SystemClock.sleep(600);screenshot("multi-replacement");runUi(()->{call(a,"releaseMulti");call(a,"showCobraPrimaryView");});
   });
   check("Android PiP and foreground return preserve player",()->{
    start("Wide");ExoPlayer same=player();runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));runUi(()->call(a,"enterCobraPictureInPicture"));await("actual PiP",a::isInPictureInPictureMode,8000);screenshot("pip");foreground();assertSame(same,ui(()->get(a,"mPlayer")));runUi(()->call(a,"closeFullscreenToCobraView"));assertSame(same,player());assertFilled("pip-return");
@@ -100,6 +103,24 @@ public class CobraRuntime279Test {
    runUi(()->{call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");});start("Classic");
    for(String size:new String[]{"720x1280","1280x720","600x1000","1000x600"}){shell("wm size "+size);SystemClock.sleep(800);assertFilled("resize-"+size);screenshot("resize-"+size);}
    shell("wm size reset");SystemClock.sleep(1800);for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});SystemClock.sleep(400);screenshot("theme-"+theme);}
+  });
+  check("Rapid channel switching and repeated mode changes release stale bindings",()->{
+   List<Object> clips=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd","Baked"})clips.add(channel(n));
+   for(int i=0;i<15;i++){final Object c=clips.get(i%clips.size());runUi(()->call(a,"startCobraPreview",c));SystemClock.sleep(90);}
+   await("final rapid retune",()->{ExoPlayer p=(ExoPlayer)get(a,"mCobraPreviewPlayer");return p!=null&&p.isPlaying()&&p.getVideoSize().width>0;},15000);SystemClock.sleep(2200);assertFilled("rapid-final");
+   ExoPlayer same=player();for(String mode:new String[]{"grid","compact","cards","focus","mobile","cards","mobile"}){runUi(()->{put(a,"mCobraGuideStyle",mode);call(a,"cobraShowGuideShell");});SystemClock.sleep(250);assertSame(same,player());}
+   assertEquals("Only the active player may retain a binding",1,ui(()->((Map<?,?>)get(a,"mCobraPlayerBindings")).size()).intValue());
+   assertFilled("rapid-modes-final");
+  });
+  check("Favorites / Recents / Search produce real results without interrupting playback",()->{
+   start("Wide");ExoPlayer same=player();Object selected=channel("Wide");String id=String.valueOf(get(selected,"id"));
+   runUi(()->{View favorite=a.getWindow().getDecorView().findViewWithTag("cobra_preview_favorite");assertNotNull(favorite);favorite.performClick();});assertTrue(ui(()->((Set<?>)get(a,"mFavorites")).contains(id)));
+   runUi(()->call(a,"selectCobraCategory","FAVORITES"));await("favorite result",()->((android.widget.BaseAdapter)get(a,"mCobraGuideAdapter")).getCount()==1,8000);
+   assertTrue(ui(()->((List<?>)get(a,"mRecents")).contains(id)));runUi(()->call(a,"selectCobraCategory","RECENT"));assertTrue(ui(()->((android.widget.BaseAdapter)get(a,"mCobraGuideAdapter")).getCount()>0));
+   runUi(()->{call(a,"cobraShowChannelSearch");EditText input=inputIn((View)get(a,"mCobraActionSheet"));assertNotNull(input);input.setText("Classic");});
+   runUi(()->{View row=described((View)get(a,"mCobraActionSheet"),"Search");assertNotNull(row);assertTrue(row.performClick());});
+   await("filtered search result",()->{android.widget.BaseAdapter adapter=(android.widget.BaseAdapter)get(a,"mCobraGuideAdapter");return adapter.getCount()==1&&String.valueOf(get(adapter.getItem(0),"name")).equals("Classic");},8000);assertSame(same,player());assertTrue(ui(same::isPlaying));screenshot("favorite-recent-search");
+   runUi(()->{put(a,"mSearch","");call(a,"selectCobraCategory","ALL");});
   });
   check("Real-time TS rewind / live edge / interrupted provider recovery",()->{
    runUi(()->((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_live_rewind_enabled",true).commit());start("Rewind");

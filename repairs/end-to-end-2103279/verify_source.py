@@ -8,5 +8,5 @@ for name,value in expected.items():assert (n/name).read_text()==value,name
 unchanged=0
 for f in b.rglob('*'):
  if f.is_file() and str(f.relative_to(b)) not in expected:assert f.read_bytes()==(n/f.relative_to(b)).read_bytes(),str(f);unchanged+=1
-report=dict(locked_source_commit=r.BASE,changed_shell_files=list(expected),other_shell_files_byte_identical=unchanged,ambient_capture_only_delta=True,fullscreen_policy_unchanged=True,physical_device_verified=False)
+report=dict(locked_source_commit=r.BASE,changed_shell_files=list(expected),other_shell_files_byte_identical=unchanged,ambient_capture_only_delta=True,fullscreen_scaling_policy_unchanged=True,physical_device_verified=False)
 a.out.mkdir(parents=True,exist_ok=True);(a.out/'source-verification.json').write_text(json.dumps(report,indent=2)+'\n');print('PASS source preservation:',unchanged,'unchanged shell files')
