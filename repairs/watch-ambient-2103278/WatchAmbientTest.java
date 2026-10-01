@@ -52,6 +52,7 @@ public class WatchAmbientTest {
  }
  CobraImmersiveAmbient activate(Cobra2103201ScrubberTest helper)throws Exception{
   helper.before();InfinityLiveActivity activity=helper.a;
+  CobraNavigationUiTest.put(activity,"mCobraEffects",new CobraPresentationEffects(activity));
   TextureView old=(TextureView)CobraNavigationUiTest.get(activity,"mPlayerTexture");FrameLayout overlay=helper.overlay;overlay.removeView(old);
   SamplingTexture texture=new SamplingTexture(activity);overlay.addView(texture,0,new FrameLayout.LayoutParams(-1,-1));CobraNavigationUiTest.put(activity,"mPlayerTexture",texture);
   helper.prefs.edit().putString(CobraPresentationEffects.AMBIENT,"immersive").commit();CobraNavigationUiTest.put(activity,"mCobraRotationResumed",true);
