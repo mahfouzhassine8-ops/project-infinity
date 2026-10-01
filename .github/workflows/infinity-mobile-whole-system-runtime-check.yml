@@ -78,11 +78,15 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import sys
+          import sys,zipfile,json
           sys.path.insert(0,'scripts')
           import package_background_resume as p
-          p.prepare(Path('shell-kodi').resolve(),Path('locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk').resolve(),Path('build284').resolve(),Path('audit284').resolve())
-          p.verify_bytes(Path('locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk'),Path('candidate284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk'))
+          parent=Path('locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk')
+          with zipfile.ZipFile(parent) as z:
+            Path('engine/libinfinitycrash.so').write_bytes(z.read(p.CRASH_RECORDER_APK_PATH))
+          p.prepare(Path('shell-kodi').resolve(),parent.resolve(),Path('build284').resolve(),Path('audit284').resolve())
+          verified=p.verify_bytes(parent,Path('candidate284/Infinity-2103284-Ambient-Surface-Repair-RC1.apk'))
+          Path('audit284/apk-preservation.json').write_text(json.dumps(verified,indent=2))
           PY
           python3 repairs/infinity-ambient-surface-2103284/stage.py unit
           python3 - <<'PY'
