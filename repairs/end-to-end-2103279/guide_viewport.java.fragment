@@ -11,7 +11,7 @@
       super.onScrollChanged(x,y,oldX,oldY);
       if(mCobraImmersiveAmbient!=null)mCobraImmersiveAmbient.geometryChanged();
       boolean shown=mCobraPreviewHost!=null&&mCobraPreviewHost.getGlobalVisibleRect(visible);
-      if(shown!=previewVisible){previewVisible=shown;cobraRefreshImmersiveAmbient();}
+      if(shown!=previewVisible){previewVisible=shown;cobraRefreshImmersiveAmbient();for(CobraPlayerBinding binding:mCobraPlayerBindings.values())binding.embeddedCrop.refresh();}
     }
     @Override public boolean onInterceptTouchEvent(android.view.MotionEvent event){
       if(range()==0)return super.onInterceptTouchEvent(event);
@@ -54,4 +54,3 @@
     @Override public void computeScroll(){if(scroller.computeScrollOffset()){scrollTo(0,scroller.getCurrY());postInvalidateOnAnimation();}}
     @Override protected void onDetachedFromWindow(){scroller.abortAnimation();super.onDetachedFromWindow();}
   }
-
