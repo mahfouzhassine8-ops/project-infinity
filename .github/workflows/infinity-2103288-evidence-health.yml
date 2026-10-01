@@ -41,6 +41,15 @@ jobs:
           test "$(sha256sum source284/reconstructed-2103284-shell.tar.gz | cut -d' ' -f1)" = d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621
           test "$(sha256sum parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk | cut -d' ' -f1)" = 64ed5ce79096a3e09d02907cf72d3a5c4ad20186da231898c92db83e540d266b
           tar -xzf source284/reconstructed-2103284-shell.tar.gz
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          apk=Path('parent285/Infinity-2103285-Native-FD-Crash-Repair-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              recorder=z.read('lib/arm64-v8a/libinfinitycrash.so')
+          Path('engine').mkdir(exist_ok=True)
+          Path('engine/libinfinitycrash.so').write_bytes(recorder)
+          PY
           mkdir -p audit288
           python3 repairs/evidence-health-2103288/apply.py apply --root . --out audit288
           python3 repairs/evidence-health-2103288/apply.py verify --root . --out audit288
