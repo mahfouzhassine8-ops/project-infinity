@@ -1,0 +1,52 @@
+name: Cobra 2103279 locked baseline real-decoder comparison
+on:
+  push:
+    branches: [candidate-cobra-2103279-end-to-end]
+    paths: ['.github/workflows/infinity-2103279-baseline-decoder.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  baseline-decoder:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103278-Watch-Ambient-RC1-TEST-CANDIDATE
+          run-id: 36794611568
+          github-token: ${{ github.token }}
+          path: parent278
+      - uses: actions/download-artifact@v8
+        with:
+          name: Cobra-2103279-Runtime-Instrumentation
+          run-id: 36796792183
+          github-token: ${{ github.token }}
+          path: instrumentation279
+      - name: Generated media fixtures
+        run: |
+          sudo chmod 666 /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 repairs/end-to-end-2103279/runtime_media.py
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
+          mkdir -p runtime279
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb install --no-incremental parent278/Infinity-2103278-Watch-Ambient-RC1.apk
+            adb install --no-incremental instrumentation279/Cobra-2103279-runtime-tests.apk
+            adb shell am instrument -w -r -e class com.projectinfinity.kodi.CobraRuntime279Test com.projectinfinity.kodi.test/androidx.test.runner.AndroidJUnitRunner | tee runtime279/baseline-instrumentation.txt
+            adb logcat -d > runtime279/logcat.txt
+            adb pull /sdcard/Android/data/com.projectinfinity.kodi/files/audit279 runtime279/results
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Cobra-2103279-Locked-Decoder-Evidence, path: runtime279/, retention-days: 90}

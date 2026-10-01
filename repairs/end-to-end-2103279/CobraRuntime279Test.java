@@ -34,7 +34,7 @@ public class CobraRuntime279Test {
  @Test public void fullRuntimeJourney()throws Exception{
   out=new File(ins.getTargetContext().getExternalFilesDir(null),"audit279");out.mkdirs();
   Context ctx=ins.getTargetContext();JSONObject source=new JSONObject().put("id","audit").put("type","m3u").put("name","Generated audit provider").put("playlist_url","http://10.0.2.2:8765/audit.m3u").put("epg_url","");
-  ctx.getSharedPreferences("infinity_cobra_live",0).edit().clear().putString("sources_json",new JSONArray().put(source).put(new JSONObject().put("id","peek").put("type","m3u").put("name","Independent preview audit source").put("playlist_url","http://10.0.2.2:8765/peek.m3u").put("epg_url","" )).toString()).putString("active_source","audit").putBoolean("cobra_live_rewind_enabled",false).putString("cobra_appearance_mode","dark").putString("cobra_ambient_mode","immersive").commit();
+  ctx.getSharedPreferences("infinity_cobra_live",0).edit().clear().putString("sources_json",new JSONArray().put(source).put(new JSONObject().put("id","peek").put("type","m3u").put("name","Independent preview audit source").put("playlist_url","http://10.0.2.2:8765/peek.m3u").put("epg_url","" )).put(new JSONObject().put("id","vod").put("type","xtream").put("name","Generated VOD audit provider").put("server","http://10.0.2.2:8765").put("username","audit").put("password","audit")).toString()).putString("active_source","audit").putBoolean("cobra_live_rewind_enabled",false).putString("cobra_appearance_mode","dark").putString("cobra_ambient_mode","immersive").commit();
   Intent launch=new Intent(ctx,InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);a=(InfinityLiveActivity)ins.startActivitySync(launch);
   check("Cobra launch and real HTTP M3U provider load",()->{await("provider channels",()->((List<?>)get(a,"mChannels")).size()>=5,20000);screenshot("01-live-launch");});
   for(String mode:new String[]{"mobile","grid","compact","cards","focus"})check("Decoded crop / "+mode,()->{
@@ -67,6 +67,18 @@ public class CobraRuntime279Test {
    runUi(()->{call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");});start("Classic");
    for(String size:new String[]{"720x1280","1280x720","600x1000","1000x600"}){shell("wm size "+size);SystemClock.sleep(800);assertFilled("resize-"+size);screenshot("resize-"+size);}
    shell("wm size reset");for(String theme:new String[]{"light","oled","dark"}){runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraRestyleGuide");});SystemClock.sleep(400);screenshot("theme-"+theme);}
+  });
+  check("HTTP movie details / My List / playback / seek / subtitles / Smart Return",()->{
+   runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});await("HTTP movie catalog",()->!((List<?>)get(a,"mCobraVodMoviesCatalog")).isEmpty(),12000);
+   Object movie=ui(()->((List<?>)get(a,"mCobraVodMoviesCatalog")).get(0));runUi(()->call(a,"cobraShowVodDetails",movie));await("movie details",()->String.valueOf(get(a,"mCobraStageTitle")).contains("MOVIE DETAILS"),10000);screenshot("movie-details");
+   runUi(()->call(a,"toggleWatchlist",movie));assertEquals(true,ui(()->call(a,"cobraVodWatchlistContains",movie)));runUi(()->call(a,"playMovie",movie));await("movie decoder",()->{ExoPlayer p=(ExoPlayer)get(a,"mPlayer");return p!=null&&p.getVideoSize().width>0&&p.getPlaybackState()==Player.STATE_READY;},15000);
+   ExoPlayer p=ui(()->(ExoPlayer)get(a,"mPlayer"));runUi(()->{p.seekTo(14000);call(a,"cobraSetCaptionsEnabled",p,true);});await("movie seek",()->p.getCurrentPosition()>=14000,8000);assertEquals(true,ui(()->call(a,"cobraCaptionsRequested",p)));screenshot("movie-captions");
+   runUi(()->call(a,"closeFullscreenToCobraView"));assertEquals("movies",ui(()->call(a,"cobraDrawerOwner")));screenshot("movie-return");
+  });
+  check("HTTP show seasons / episode playback / return",()->{
+   runUi(()->{call(a,"cobraSelectDrawerOwner","SHOWS");call(a,"showCobraPrimaryView");});await("HTTP show catalog",()->!((List<?>)get(a,"mCobraVodShowsCatalog")).isEmpty(),12000);
+   Object show=ui(()->((List<?>)get(a,"mCobraVodShowsCatalog")).get(0));runUi(()->call(a,"openSeries",show));await("episode list",()->!((List<?>)get(a,"mEpisodeQueue")).isEmpty(),10000);screenshot("series-episodes");
+   Object episode=ui(()->((List<?>)get(a,"mEpisodeQueue")).get(0));runUi(()->call(a,"cobraPlaySeriesEpisode",show,episode,new ArrayList<>((List<?>)get(a,"mEpisodeQueue"))));await("episode decoder",()->{ExoPlayer p=(ExoPlayer)get(a,"mPlayer");return p!=null&&p.getVideoSize().width>0;},15000);screenshot("episode-playing");runUi(()->call(a,"closeFullscreenToCobraView"));assertEquals("shows",ui(()->call(a,"cobraDrawerOwner")));
   });
   check("Drawer section memory and settings retain ownership",()->{
    for(String owner:new String[]{"MOVIES","SHOWS","RECORDINGS","MY LIST","SPORTS","TV"}){runUi(()->{call(a,"cobraSelectDrawerOwner",owner);call(a,"showCobraPrimaryView");});SystemClock.sleep(400);Object before=ui(()->call(a,"cobraDrawerOwner"));runUi(()->call(a,"showSettings"));SystemClock.sleep(200);runUi(()->call(a,"showCobraPrimaryView"));assertEquals(before,ui(()->call(a,"cobraDrawerOwner")));screenshot("section-"+owner.replace(' ','-'));}

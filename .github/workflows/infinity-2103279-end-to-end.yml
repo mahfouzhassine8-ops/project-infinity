@@ -166,7 +166,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           python3 repairs/end-to-end-2103279/runtime_media.py
-          python3 -m http.server 8765 --directory runtime-media > runtime-http.log 2>&1 &
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
           mkdir -p runtime279
       - uses: reactivecircus/android-emulator-runner@v2
         with:
