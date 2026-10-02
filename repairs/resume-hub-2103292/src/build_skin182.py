@@ -118,8 +118,9 @@ def main():
     addon.write_text(text); changed.append('addon.xml')
 
     release={'baseline':'1.0.5.181','title':'Infinity Resume Hub 2 RC1','controller':COMMAND_VERSION,
-             'requires_apk':2103291,'native_changed':False,'runtime_tested':False,
-             'status':'device_acceptance_pending','scope':'Local Trakt-replacement menus/state; existing responsive geometry and player surfaces preserved'}
+             'requires_apk':2103292,'native_changed':False,'runtime_tested':False,
+             'status':'device_acceptance_pending','scope':'Local Trakt-replacement menus/state plus watched/playcount skin bridge; existing responsive geometry and player surfaces preserved',
+             'resume_hub_watched_contract':'Kodi playcount/overlay + Infinity.ResumeHub.Watched'}
     p=skin/'infinity-skin.json'; data=json.loads(p.read_text()); data['previous_release_metadata']=data.get('current_release'); data['current_release']=release
     data.update(candidate=182,candidate_name='Infinity Resume Hub 2 RC1',skin_version=VERSION,resume_hub_api='2.0'); p.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n'); changed.append('infinity-skin.json')
     p=skin/'Infinity-Protected-Manifest.json'; data=json.loads(p.read_text()); data['previous_release_metadata']=data.get('current_release'); data['current_release']=release
@@ -145,7 +146,7 @@ def main():
             if token not in text: raise RuntimeError(f'{d} missing {token}')
     for d in INCLUDE_DIRS:
         text=(skin/d/'Includes_InfinityHomeUnified.xml').read_text()
-        for token in ('InfinityMoviesPrimaryPath','InfinityMoviesSecondaryPath','InfinityTVPrimaryPath','InfinityTVSecondaryPath'):
+        for token in ('InfinityMoviesPrimaryPath','InfinityMoviesSecondaryPath','InfinityTVPrimaryPath','InfinityTVSecondaryPath','InfinityResumeHubWatchedState'):
             if token not in text: raise RuntimeError(f'{d} missing {token}')
 
     output=out/OUT_NAME
@@ -155,7 +156,7 @@ def main():
     with zipfile.ZipFile(output) as z:
         if z.testzip() is not None: raise RuntimeError('Output CRC failure')
     proof={'schema':1,'parent_sha256':EXPECTED_PARENT,'skin_version':VERSION,'controller_min':COMMAND_VERSION,
-           'requires_apk':2103291,'candidate_sha256':sha(output),'native_changed':False,
+           'requires_apk':2103292,'candidate_sha256':sha(output),'native_changed':False,
            'home_profiles_changed':len([x for x in changed if x.endswith('/Home.xml')]),
            'unified_include_profiles_changed':len([x for x in changed if x.endswith('/Includes_InfinityHomeUnified.xml')]),
            'trakt_sections_preserved':True,'infinity_movies_tv_added':True,'player_xml_changed':False,
