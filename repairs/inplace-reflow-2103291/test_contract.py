@@ -19,6 +19,8 @@ def method_span(s, signature):
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--source',type=Path,required=True);a=ap.parse_args()
     root=a.source
+    skin=(root/'xbmc/addons/Skin.cpp').read_text()
+    font=(root/'xbmc/guilib/GUIFontManager.cpp').read_text()
     control=(root/'xbmc/guilib/GUIControl.cpp').read_text()
     group=(root/'xbmc/guilib/GUIControlGroup.cpp').read_text()
     factory=(root/'xbmc/guilib/GUIControlFactory.cpp').read_text()
@@ -66,7 +68,7 @@ def main():
     for token in ('"left"','"right"','"centerleft"','"centerright"','"width"','"posx"',
                   '"top"','"bottom"','"centertop"','"centerbottom"','"height"','"posy"'):
         assert token in factory,token
-    joined=control+group+factory+window
+    joined=skin+font+control+group+factory+window
     for required in ('UsesNativeWindowAdaptation','GetNativeWindowResolution',
                      'infinity-android-adaptive','legacy-adaptive'):
         assert required in joined,required
