@@ -101,8 +101,9 @@ def splash(s):
  return s
 
 def trace(s):
- s=s.replace('line.contains("Infinity natural resize:") ||',
-             'line.contains("Infinity natural resize:") ||\\n        line.contains("Infinity responsive viewport:") ||\\n        line.contains("Infinity responsive window:") ||')
+ old='line.contains("Infinity natural resize:") ||'
+ new='line.contains("Infinity natural resize:") ||\n        line.contains("Infinity responsive viewport:") ||\n        line.contains("Infinity responsive window:") ||'
+ s=s.replace(old,new)
  # Record exact installed skin contract instead of assuming a version from conversation history.
  anchor='''  private static File kodiLog(Context context){
     File external=context.getExternalFilesDir(null);
@@ -117,7 +118,7 @@ def trace(s):
     String version="not_found";
     try{
       String xml=readBounded(addon,128*1024);
-      java.util.regex.Matcher m=java.util.regex.Pattern.compile("<addon[^>]*\\\\bversion=\\\\\\\"([^\\\\\\\"]+)\\\\\\\"").matcher(xml);
+      java.util.regex.Matcher m=java.util.regex.Pattern.compile("<addon[^>]*\\\\bversion=\\\\\"([^\\\\\"]+)\\\\\"").matcher(xml);
       if(m.find())version=m.group(1);
     }catch(Exception ignored){}
     boolean responsive=new File(skin,"resources/infinity-native-responsive-v1.json").isFile();
@@ -125,9 +126,10 @@ def trace(s):
   }
 '''
  s=once(s,anchor,helper,"trace installed skin helper")
- s=once(s,'out.append("Events captured: ").append(events.size()).append(\\'\\\\n\\');',
-        'out.append("Events captured: ").append(events.size()).append(\\'\\\\n\\');\\n    out.append("Installed skin: ").append(installedSkinState(context)).append(\\'\\\\n\\');',
-        "trace installed skin summary")
+ old_summary="""    out.append("Events captured: ").append(events.size()).append('\\n');"""
+ new_summary="""    out.append("Events captured: ").append(events.size()).append('\\n');
+    out.append("Installed skin: ").append(installedSkinState(context)).append('\\n');"""
+ s=once(s,old_summary,new_summary,"trace installed skin summary")
  return s
 
 def apply(root,receipt):
