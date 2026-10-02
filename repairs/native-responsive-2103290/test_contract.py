@@ -46,6 +46,13 @@ def main():
     assert 'responsiveRoot' in resp and '"base"' in resp
     assert 'm_defaultRes' not in resp
     assert 'std::min_element' not in resp
+    paths_start=skin.index('void CSkinInfo::GetSkinPaths')
+    paths_end=skin.index('bool CSkinInfo::TranslateResolution',paths_start)
+    paths_block=skin[paths_start:paths_end]
+    responsive_paths=paths_block[paths_block.index('if (UsesNativeResponsiveLayout())'):
+                                 paths_block.index('RESOLUTION_INFO res;')]
+    assert responsive_paths.count('paths.push_back')==1, responsive_paths
+    assert 'responsiveRoot, "base"' not in responsive_paths
 
     # Active windows reload only after a settled resize and preserve focus/control state.
     for token in ('std::chrono::milliseconds(90)','SaveControlStates();','FreeResources(true);',
