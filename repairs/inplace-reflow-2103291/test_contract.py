@@ -3,6 +3,19 @@
 from pathlib import Path
 import argparse,re
 
+def method_span(s, signature):
+    start=s.index(signature)
+    brace=s.index("{",start)
+    depth=0
+    for i in range(brace,len(s)):
+        ch=s[i]
+        if ch=="{": depth+=1
+        elif ch=="}":
+            depth-=1
+            if depth==0:
+                return start,i+1
+    raise AssertionError("Unbalanced method body for "+signature)
+
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--source',type=Path,required=True);a=ap.parse_args()
     root=a.source
@@ -12,10 +25,7 @@ def main():
     window=(root/'xbmc/guilib/GUIWindow.cpp').read_text()
 
     # The active resize path must retain the existing window/control tree.
-    start=window.index('void CGUIWindow::InfinityReloadNativeResponsiveLayout()')
-    match=re.search(r'\nvoid CGUIWindow::DoProcess\s*\(',window[start:])
-    assert match,'GUIWindow DoProcess boundary missing'
-    end=start+match.start()+1
+    start,end=method_span(window,'void CGUIWindow::InfinityReloadNativeResponsiveLayout()')
     method=window[start:end]
     for forbidden in ('FreeResources(true)','AllocResources(true)','SaveControlStates()',
                       'RestoreControlStates()','ClearAll()','Load('):
