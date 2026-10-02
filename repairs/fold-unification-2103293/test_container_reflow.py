@@ -83,3 +83,43 @@ def main():
   subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-O2',str(f),'-o',d+'/test'],check=True)
   subprocess.run([d+'/test'],check=True)
 if __name__=='__main__':main()
+
+# Execute the opt-in dimension method itself over cover/inner/landscape bounds.
+from container_reflow import ITEM_METHOD
+ITEM_STUB=r'''
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+struct Group{float w=0,h=0;int reflows=0;void SetWidth(float v){w=v;}void SetHeight(float v){h=v;}void ReflowResponsiveLayout(float,float){reflows++;}};
+struct CGUIListItemLayout{
+ float m_width=310,m_height=594,m_responsiveAspect=310.0f/594.0f;
+ std::string m_responsiveWidth,m_responsiveHeight;Group m_group;int focusedChild=17;bool invalid=false;
+ void SetInvalid(){invalid=true;}bool ReflowResponsiveSize(float,float);
+};
+'''
+ITEM_TEST=r'''
+int main(){
+ int checks=0;
+ for(float width:{240.f,640.f,940.f,1361.f,2320.f})for(float height:{80.f,210.f,424.f,616.f,980.f}){
+  CGUIListItemLayout l;l.m_responsiveWidth="auto";l.m_responsiveHeight="100%";
+  l.ReflowResponsiveSize(width,height);
+  assert(l.m_width<=width&&l.m_height<=height+0.01f);
+  assert(std::abs(l.m_width/l.m_height-l.m_responsiveAspect)<0.001f);
+  assert(l.focusedChild==17);auto count=l.m_group.reflows;
+  assert(!l.ReflowResponsiveSize(width,height));assert(l.m_group.reflows==count);
+  l.ReflowResponsiveSize(940,600);assert(l.focusedChild==17);checks++;
+  CGUIListItemLayout row;row.m_responsiveWidth="100%";row.ReflowResponsiveSize(width,height);
+  assert(row.m_width==width&&row.m_height==594);checks++;
+  CGUIListItemLayout fixed;assert(!fixed.ReflowResponsiveSize(width,height));assert(fixed.m_width==310&&fixed.m_height==594);checks++;
+ }
+ std::cout<<"PASS "<<checks<<" compiled item size/preservation scenarios\n";
+}
+'''
+if __name__=='__main__':
+ with tempfile.TemporaryDirectory() as d:
+  f=Path(d)/'items.cpp';f.write_text(ITEM_STUB+ITEM_METHOD+ITEM_TEST)
+  subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-O2',str(f),'-o',d+'/items'],check=True)
+  subprocess.run([d+'/items'],check=True)
