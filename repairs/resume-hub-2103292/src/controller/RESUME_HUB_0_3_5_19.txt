@@ -1,0 +1,10 @@
+INFINITY RESUME HUB 2 — COMMAND CENTER 0.3.5.19
+
+- Existing continue-watching.json is upgraded in place to schema 2.
+- In-progress playback remains provider-neutral and local-first.
+- Completion/onPlayBackEnded or >=95% marks the item Watched, keeps history, and removes it from Continue Playing.
+- Manual Watched/Unwatched, Reset Progress, Watchlist, Collection, 1–10 rating, and custom lists are available from Resume Hub context menus.
+- Infinity Movies exposes Continue Playing, Watchlist, Collection, Watched History, Ratings and Custom Lists.
+- Infinity TV exposes Next Episodes, Progress Shows, Continue Playing, Watchlist, Collection, Watched History, Ratings and Custom Lists.
+- Watched items publish Kodi-compatible playcount/overlay state; Kodi-library DBIDs are synchronized best-effort.
+- Trakt remains optional and existing Trakt/provider integrations are not removed or rewritten.
