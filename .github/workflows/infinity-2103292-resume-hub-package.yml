@@ -1,0 +1,231 @@
+name: Infinity | 2103292 Resume Hub 2 Package Only
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103292-resume-hub]
+    paths:
+      - 'repairs/resume-hub-2103292/src/controller/**'
+      - 'repairs/resume-hub-2103292/apply_android.py'
+      - 'repairs/resume-hub-2103292/package_apk.py'
+      - 'repairs/resume-hub-2103292/InfinityResumeHubInstaller.java.in'
+      - 'repairs/resume-hub-2103292/DEVICE-TEST.md'
+      - '.github/workflows/infinity-2103292-resume-hub-package.yml'
+
+permissions: {contents: read, actions: read}
+
+concurrency:
+  group: infinity-2103292-resume-hub-package
+  cancel-in-progress: true
+
+env:
+  NDK_VER: 21.4.7075529
+  PARENT3291_SHA: 02f2c4049a5205927c1698e675ca64dcc77659677bd9441f82e2fe92f4f25ece
+  NATIVE3291_SHA: 36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94
+  SIGNER_SHA: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+
+      - name: Download locked 2103291 parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103291-InPlace-Responsive-Reflow-RC1-Candidate
+          run-id: 36978504958
+          github-token: ${{ github.token }}
+          path: parent3291
+
+      - name: Download exact Android source shell
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: source284
+
+      - name: Verify locked parent and build Resume Hub controller asset
+        run: |
+          set -euo pipefail
+          PARENT=parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk
+          test -f "$PARENT"
+          test "$(sha256sum "$PARENT" | cut -d' ' -f1)" = "$PARENT3291_SHA"
+          python3 - <<'PY'
+          import hashlib, zipfile
+          from pathlib import Path
+          apk=Path('parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None
+              native=z.read('lib/arm64-v8a/libkodi.so')
+          assert hashlib.sha256(native).hexdigest() == '36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94'
+          print('PASS locked 2103291 parent/native')
+          PY
+
+          python3 -m py_compile repairs/resume-hub-2103292/src/controller/*.py
+          mkdir -p build3292
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, zipfile
+          src=Path('repairs/resume-hub-2103292/src/controller')
+          out=Path('build3292/resume-hub-controller.zip')
+          with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for p in sorted(src.rglob('*')):
+                  if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc':
+                      z.write(p,Path('script.infinity.commandcenter')/p.relative_to(src))
+          with zipfile.ZipFile(out) as z:
+              assert z.testzip() is None
+              names=set(z.namelist())
+              required={
+                'script.infinity.commandcenter/RESUME_HUB_0_3_5_19.txt',
+                'script.infinity.commandcenter/addon.xml',
+                'script.infinity.commandcenter/experience.py',
+                'script.infinity.commandcenter/plugin.py',
+                'script.infinity.commandcenter/resources/settings.xml',
+                'script.infinity.commandcenter/resume_hub.py',
+                'script.infinity.commandcenter/service.py',
+                'script.infinity.commandcenter/skin_upgrade.py',
+              }
+              assert names == required, (names-required, required-names)
+          digest=hashlib.sha256(out.read_bytes()).hexdigest()
+          Path('/tmp/controller.env').write_text('CONTROLLER_SHA='+digest+'\n')
+          print('PASS controller asset',digest,out.stat().st_size)
+          PY
+          cat /tmp/controller.env >> "$GITHUB_ENV"
+
+      - name: Reconstruct exact 2103291 Android source and apply only 2103292 package delta
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source284/reconstructed-2103284-shell.tar.gz | cut -d' ' -f1)" = d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621
+          tar -xzf source284/reconstructed-2103284-shell.tar.gz
+          mkdir -p audit3292 engine candidate3292 final3292
+
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          apk=Path('parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+
+          python3 repairs/evidence-health-2103288/apply.py apply --root . --out audit3292/evidence-health
+          python3 repairs/native-responsive-2103290/android_shell.py apply             --root shell-kodi --receipt audit3292/android-shell-3290.json
+          python3 repairs/native-responsive-2103290/android_shell.py verify             --root shell-kodi --receipt audit3292/android-shell-3290-verify.json
+
+          python3 repairs/native-responsive-2103290/package_metadata.py             --root . --base-apk-sha "$PARENT3291_SHA" --native-sha "$NATIVE3291_SHA"             --proof audit3292/package-binding-3290.json
+
+          python3 repairs/inplace-reflow-2103291/android_package_delta.py             --root . --base-apk-sha "$PARENT3291_SHA" --native-sha "$NATIVE3291_SHA"             --proof audit3292/package-binding-3291.json
+
+          python3 repairs/resume-hub-2103292/apply_android.py apply             --root . --controller-sha "$CONTROLLER_SHA"             --parent-apk-sha "$PARENT3291_SHA" --native-sha "$NATIVE3291_SHA"             --proof audit3292/package-binding-3292.json
+
+          python3 repairs/resume-hub-2103292/apply_android.py verify             --root . --controller-sha "$CONTROLLER_SHA"
+
+          python3 -m py_compile             repairs/resume-hub-2103292/apply_android.py             repairs/resume-hub-2103292/package_apk.py
+
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore"               -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048               -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+
+      - name: Compile Android shell only
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk             --build-dir android3292             --out candidate3292
+
+          test -f candidate3292/Infinity-2103292-Resume-Hub-2-RC1.apk
+          python3 - <<'PY'
+          import hashlib, zipfile
+          from pathlib import Path
+          p=Path('candidate3292/Infinity-2103292-Resume-Hub-2-RC1.apk')
+          with zipfile.ZipFile(p) as z:
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest() == '36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94'
+          print('PASS Android-only compiled candidate; native unchanged')
+          PY
+
+      - name: Inject Resume Hub controller asset and permanently re-sign
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/resume-hub-2103292/package_apk.py build             --parent parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk             --compiled candidate3292/Infinity-2103292-Resume-Hub-2-RC1.apk             --controller build3292/resume-hub-controller.zip             --unsigned final3292/Infinity-2103292-Resume-Hub-2-RC1-unsigned.apk
+
+          bash scripts/sign-infinity71.sh             final3292/Infinity-2103292-Resume-Hub-2-RC1-unsigned.apk             final3292/Infinity-2103292-Resume-Hub-2-RC1.apk
+          rm final3292/Infinity-2103292-Resume-Hub-2-RC1-unsigned.apk
+
+          python3 repairs/resume-hub-2103292/package_apk.py verify             --parent parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk             --final final3292/Infinity-2103292-Resume-Hub-2-RC1.apk             --controller build3292/resume-hub-controller.zip
+
+      - name: Final preservation, identity and Resume Hub gates
+        run: |
+          set -euo pipefail
+          APK=final3292/Infinity-2103292-Resume-Hub-2-RC1.apk
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | tee final3292/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103292' versionName='1.0.9-Resume-Hub-2-RC1'" final3292/badging.txt
+          grep -q "application-label:'Infinity'" final3292/badging.txt
+          test "$(grep -c '^launchable-activity:' final3292/badging.txt)" -eq 1
+
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee final3292/signing.txt
+          grep -qi "$SIGNER_SHA" final3292/signing.txt
+
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          parent=Path('parent3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk')
+          apk=Path('final3292/Infinity-2103292-Resume-Hub-2-RC1.apk')
+          controller=Path('build3292/resume-hub-controller.zip')
+          H=lambda b:hashlib.sha256(b).hexdigest()
+          with zipfile.ZipFile(parent) as p,zipfile.ZipFile(apk) as z:
+              assert p.testzip() is None and z.testzip() is None
+              assert H(z.read('lib/arm64-v8a/libkodi.so')) == '36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94'
+              assert z.read('assets/infinity/resume-hub-controller.zip') == controller.read_bytes()
+              dex=b''.join(z.read(n) for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+              for token in (b'InfinityResumeHubInstaller',b'resume-hub-controller.zip',b'0.3.5.19',b'1.0.5.182'):
+                  assert token in dex,token
+          proof={
+              'schema':1,
+              'parent_apk_sha256':H(parent.read_bytes()),
+              'apk_sha256':H(apk.read_bytes()),
+              'native_engine_sha256':'36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94',
+              'controller_asset_sha256':H(controller.read_bytes()),
+              'version_code':2103292,
+              'version_name':'1.0.9-Resume-Hub-2-RC1',
+              'command_center':'0.3.5.19',
+              'skin_target':'1.0.5.182',
+              'native_changed':False,
+              'native_recompiled':False,
+              'trakt_preserved':True,
+              'player_xml_changed':False,
+              'physical_device_verified':False,
+          }
+          Path('final3292/RESUME-HUB-2-PROOF.json').write_text(json.dumps(proof,indent=2,sort_keys=True)+'\n')
+          Path('final3292/SHA256SUMS.txt').write_text(proof['apk_sha256']+'  '+apk.name+'\n')
+          Path('final3292/DEVICE-TEST.md').write_text(Path('repairs/resume-hub-2103292/DEVICE-TEST.md').read_text())
+          Path('final3292/COMMAND-CENTER-PROOF.json').write_text(Path('repairs/resume-hub-2103292/src/COMMAND-CENTER-PROOF.json').read_text())
+          Path('final3292/SKIN-PROOF.json').write_text(Path('repairs/resume-hub-2103292/src/SKIN-PROOF.json').read_text())
+          print('PASS PACKAGE-ONLY 2103292',proof['apk_sha256'])
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103292-Resume-Hub-2-RC1-Candidate
+          path: final3292/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
