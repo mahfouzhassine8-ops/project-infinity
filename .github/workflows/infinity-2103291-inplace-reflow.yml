@@ -74,18 +74,38 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/infinity_live_app_ci_2.sh
-          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
-          python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
-          # 2103291 intentionally replaces the 2103290 window-reload/log contract.
-          # Do not run the superseded 2103290 post-build verifier against the transformed source.
-          # Instead, assert its core responsive resolver remains present, then run the 2103291 verifier.
-          grep -Fq 'GetNativeResponsiveResolution' kodi/xbmc/addons/Skin.cpp
-          grep -Fq 'responsive/base' kodi/xbmc/addons/Skin.cpp
-          grep -Fq 'UsesNativeResponsiveLayout' kodi/xbmc/addons/Skin.cpp
-          grep -Fq 'Infinity responsive viewport:' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
-          python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
-          python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
-          sha256sum -c audit3291/python-protected.txt
+
+          # Diagnostic fan-out: after the expensive native build succeeds, run every preservation/
+          # responsive verifier and report all failures in this one attempt instead of stopping at
+          # the first red gate and paying for another full native compile just to discover the next.
+          failures=0
+          gate() {
+            local label="$1"; shift
+            echo "::group::DIAGNOSTIC GATE: $label"
+            if "$@"; then
+              echo "PASS: $label"
+            else
+              rc=$?
+              echo "::error title=$label::FAILED (exit $rc)"
+              failures=$((failures + 1))
+            fi
+            echo "::endgroup::"
+          }
+
+          gate "Python runtime hardening v3"             python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          gate "Native FD preservation"             python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
+          gate "Responsive resolver API"             grep -Fq 'GetNativeResponsiveResolution' kodi/xbmc/addons/Skin.cpp
+          gate "Responsive base fallback"             grep -Fq 'responsive/base' kodi/xbmc/addons/Skin.cpp
+          gate "Responsive opt-in API"             grep -Fq 'UsesNativeResponsiveLayout' kodi/xbmc/addons/Skin.cpp
+          gate "Android responsive viewport trace"             grep -Fq 'Infinity responsive viewport:' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          gate "2103291 in-place reflow verifier"             python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
+          gate "2103291 contract tests"             python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
+          gate "Protected Python source hashes"             sha256sum -c audit3291/python-protected.txt
+
+          if [ "$failures" -ne 0 ]; then
+            echo "::error title=2103291 diagnostic fan-out::$failures post-build gate(s) failed; see grouped results above."
+            exit 1
+          fi
 
       - name: Bind 2103291 native engine contract
         run: |
