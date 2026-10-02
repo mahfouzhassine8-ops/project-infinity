@@ -21,6 +21,6 @@ def main():
  base=H(a.out.read_bytes());a.proof.parent.mkdir(parents=True,exist_ok=True);a.proof.write_text(json.dumps({
   'schema':1,'parent_apk_sha256':PARENT,'parent_native_sha256':OLD,'native_engine_sha256':new,
   'prepared_base_sha256':base,'only_payload_replaced':'lib/arm64-v8a/libkodi.so',
-  'evidence_health_shell_preserved':True,'signatures_removed_for_final_repack':True},indent=2)+'\\n')
+  'evidence_health_shell_preserved':True,'signatures_removed_for_final_repack':True},indent=2)+'\n')
  print(base,new)
 if __name__=='__main__':main()
