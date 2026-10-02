@@ -24,13 +24,13 @@ def once(s,a,b,label):
 
 def chooser(s):
  s=once(s,'setTag("infinity_glass_chooser_2103257");',
-        'setTag("infinity_glass_chooser_2103290");\\n    setLongClickable(false);',"chooser tag")
+        'setTag("infinity_glass_chooser_2103290");\n    setLongClickable(false);',"chooser tag")
  s=once(s,'content.setClipToPadding(true);content.setClipChildren(true);',
         'content.setClipToPadding(true);content.setClipChildren(true);content.setLongClickable(false);',"content long press")
- s=once(s,'float scale,left;int viewportHint;\\n    boolean responsive,stacked;',
-        'float scale,left,positionScaleX,positionScaleY;int viewportHint;\\n    boolean responsive,stacked,naturalWindow;',"stage state")
- s=once(s,'      // Existing theme management remains available from the non-card background.\\n      setOnLongClickListener(v->{actions.themes();return true;});',
-        '      // Theme controls are explicit gear actions. Empty-space holds never change presentation.\\n      setLongClickable(false);',"stage global long press")
+ s=once(s,'float scale,left;int viewportHint;\n    boolean responsive,stacked;',
+        'float scale,left,positionScaleX,positionScaleY;int viewportHint;\n    boolean responsive,stacked,naturalWindow;',"stage state")
+ s=once(s,'      // Existing theme management remains available from the non-card background.\n      setOnLongClickListener(v->{actions.themes();return true;});',
+        '      // Theme controls are explicit gear actions. Empty-space holds never change presentation.\n      setLongClickable(false);',"stage global long press")
  old='''      boolean multi=getContext() instanceof android.app.Activity && ((android.app.Activity)getContext()).isInMultiWindowMode();
       responsive=multi || (viewport>0 && viewport<px(280) && w>=px(280));
       for(Box box:boxes)box.view.setVisibility(!responsive||box.view==infinity||box.view==cobra?VISIBLE:GONE);
