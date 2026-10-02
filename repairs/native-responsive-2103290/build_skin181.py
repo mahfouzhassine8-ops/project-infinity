@@ -157,6 +157,10 @@ def build(parent_zip,out_dir):
         if cls!='base' and alternate.exists():
           src=alternate;src_ref=ref;optimized+=1
         convert_xml(src,dest/name,src_ref)
+      # Kodi loads the fontset when the skin starts, not on every responsive class transition.
+      # Keep one normalized font contract across every class.
+      if cls!='base':
+        shutil.copy2(resp/'base'/'Font.xml',dest/'Font.xml')
       manifest['classes'][cls]={'files':len(names),'overlay_source':overlay,
                                 'optimized_files':optimized,'reference':list(ref)}
     marker=skin/'resources/infinity-native-responsive-v1.json'
