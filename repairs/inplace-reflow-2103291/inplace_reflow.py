@@ -113,8 +113,9 @@ def patch_skin_cpp(s):
   // Preserve the skin profile's logical area while matching the live Android window aspect.
   // This avoids skinny/tall or wide/flat distortion without assuming a specific phone/Fold model.
   const double area = std::max(1.0, static_cast<double>(source.iWidth) * source.iHeight);
-  int width = std::max(1, static_cast<int>(std::lround(std::sqrt(area * targetRatio))));
-  int height = std::max(1, static_cast<int>(std::lround(std::sqrt(area / targetRatio))));
+  const double targetRatioD = static_cast<double>(targetRatio);
+  int width = std::max(1, static_cast<int>(std::lround(std::sqrt(area * targetRatioD))));
+  int height = std::max(1, static_cast<int>(std::lround(std::sqrt(area / targetRatioD))));
   width = std::max(8, ((width + 4) / 8) * 8);
   height = std::max(8, ((height + 4) / 8) * 8);
 
