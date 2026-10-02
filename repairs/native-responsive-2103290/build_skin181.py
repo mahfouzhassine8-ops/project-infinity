@@ -76,6 +76,28 @@ def ref_size(el,pw,ph):
     if h is None:h=max(1.0,ph-top)
     return w,h
 
+def convert_property_block(el,pw,ph,scale):
+    # Include/default/definition fragments become control properties after Kodi resolves them.
+    # Treat their edge positions as parent-relative and only stretch large structural dimensions.
+    for tag in POSITIONS:
+      node=el.find(tag)
+      if node is None or not node.text:continue
+      v=number(node.text)
+      if v is None:continue
+      axis=pw if tag in {'left','posx','right','centerleft','centerright'} else ph
+      node.text=fmt(v*scale) if v<0 else pct(v,axis)
+    for tag,axis in (('width',pw),('height',ph)):
+      node=el.find(tag)
+      if node is None or not node.text:continue
+      v=number(node.text)
+      if v is None:continue
+      node.text=pct(v,axis) if axis and v/axis>=0.30 else fmt(v*scale)
+    for tag in SCALARS:
+      node=el.find(tag)
+      if node is not None and node.text:
+        v=number(node.text)
+        if v is not None:node.text=fmt(v*scale)
+
 def convert_control(el,pw,ph,scale):
     ctype=(el.get('type') or '').lower()
     ow,oh=ref_size(el,pw,ph)
@@ -136,11 +158,19 @@ def convert_xml(src,dst,ref):
       controls=root.find('controls')
       if controls is not None:
         for c in controls.findall('control'):convert_control(c,rw,rh,scale)
-    # Includes are named root-sized fragments; nested groups establish their own reference bounds.
-    if root.tag in ('includes','include') or root.find('include') is not None:
-      for inc in root.findall('.//include'):
-        for c in [x for x in list(inc) if x.tag=='control']:
-          convert_control(c,rw,rh,scale)
+    # Includes/defaults/definitions are fragments that Kodi merges into controls before factory
+    # creation. Convert their property blocks too, and process each top-level control exactly once.
+    parent={child:par for par in root.iter() for child in par}
+    for block in root.iter():
+      if block.tag in ('include','default','definition'):
+        convert_property_block(block,rw,rh,scale)
+    for ctl in root.iter('control'):
+      par=parent.get(ctl)
+      # Direct window controls were already converted above; nested controls are recursively owned
+      # by their nearest top-level control. This catches controls rooted in include/definition blocks.
+      if par is not None and par.tag in ('controls','control','itemlayout','focusedlayout'):
+        continue
+      convert_control(ctl,rw,rh,scale)
     dst.parent.mkdir(parents=True,exist_ok=True)
     tree.write(dst,encoding='utf-8',xml_declaration=True)
 
