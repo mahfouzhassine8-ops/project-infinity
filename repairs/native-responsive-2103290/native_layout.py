@@ -254,8 +254,10 @@ void CSkinInfo::RefreshNativeResponsiveIncludes()
   if (UsesNativeResponsiveLayout())
   {
     const std::string responsiveRoot = URIUtils::AddFileToFolder(Path(), "responsive");
+    // Every Infinity responsive class is a complete XML universe. Scan only the active class for
+    // custom windows; adding responsive/base here would register the same custom window IDs twice.
+    // Per-file GetSkinPath() still has responsive/base as a corruption/missing-file safety fallback.
     paths.push_back(URIUtils::AddFileToFolder(responsiveRoot, GetNativeResponsiveClass()));
-    paths.push_back(URIUtils::AddFileToFolder(responsiveRoot, "base"));
     return;
   }
 
