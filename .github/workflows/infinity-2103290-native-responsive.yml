@@ -1,0 +1,254 @@
+name: Infinity | 2103290 Native Responsive Layout
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103290-native-responsive-layout]
+    paths:
+      - 'repairs/native-responsive-2103290/**'
+      - '.github/workflows/infinity-2103290-native-responsive.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103290-native-responsive-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+      - name: Reconstruct protected Kodi 21.3 and apply only approved native repairs
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_1.sh
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          mkdir -p engine audit3290
+          python3 scripts/infinity_python_invoker_hardening_v2.py apply --source kodi --receipt engine/pythoninvoker-threadstate-v2-source.json
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+          python3 scripts/infinity_python_invoker_hardening_v3.py apply --source kodi --receipt engine/pythoninvoker-runtime-v3-source.json
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 repairs/native-fd-2103285/apply.py --source kodi --receipt engine/native-fd-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py apply --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
+          sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit3290/python-protected.txt
+      - name: Full ARM64 native rebuild
+        run: |
+          set -euo pipefail
+          bash scripts/infinity_live_app_ci_2.sh
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
+          sha256sum -c audit3290/python-protected.txt
+      - name: Bind native engine to preservation and responsive contracts
+        run: |
+          set -euo pipefail
+          mkdir -p engine3290
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk')
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None
+              lib=z.read('lib/arm64-v8a/libkodi.so')
+          digest=hashlib.sha256(lib).hexdigest()
+          assert digest!='f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'
+          assert b'INFINITY_FD_POLL_V1' in lib
+          for token in (b'infinity-native-responsive-v1.json',b'Infinity responsive viewport:',
+                        b'Infinity responsive window:',b'responsive/base'):
+              assert token in lib, token
+          Path('engine3290/libkodi.so').write_bytes(lib)
+          responsive=json.loads(Path('engine/native-responsive-source.json').read_text())
+          assert responsive['native_window_authoritative'] is True
+          assert responsive['uniform_aspect_canvas'] is True
+          report={'schema':1,'native_engine_sha256':digest,
+                  'parent_2103288_apk_sha256':'caba1c375cbdee32a0a9a24c7292babfeb6cba157aba8be92a6096137e17e398',
+                  'parent_2103285_native_sha256':'f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a',
+                  'kodi':'21.3-Omega','fd_repair_preserved':True,'python_repairs_preserved':True,
+                  'native_responsive_layout_v1':True,'logical_short_axis':1080,
+                  'physical_device_verified':False,'skin_payload_changed':False}
+          Path('engine3290/ENGINE-PROOF.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          Path('engine3290/SHA256SUMS.txt').write_text(digest+'  libkodi.so\n')
+          print('PASS native responsive engine',digest)
+          PY
+          cp engine/*source.json engine3290/ || true
+          readelf -h -n -d -W engine3290/libkodi.so > engine3290/elf-identity.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103290-Native-Responsive-Engine
+          path: engine3290/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103290-Native-Responsive-Evidence
+          path: audit3290/
+          if-no-files-found: warn
+          retention-days: 90
+
+  package:
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: source284
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103288-Evidence-First-Health-RC1-Candidate
+          run-id: 36941180186
+          github-token: ${{ github.token }}
+          path: parent288
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103290-Native-Responsive-Engine
+          path: engine3290
+      - name: Reconstruct exact shell and prepare responsive native base
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source284/reconstructed-2103284-shell.tar.gz | cut -d' ' -f1)" = d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621
+          test "$(sha256sum parent288/Infinity-2103288-Evidence-First-Health-RC1.apk | cut -d' ' -f1)" = caba1c375cbdee32a0a9a24c7292babfeb6cba157aba8be92a6096137e17e398
+          tar -xzf source284/reconstructed-2103284-shell.tar.gz
+          mkdir -p audit3290 base3290 candidate3290 engine
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          apk=Path('parent288/Infinity-2103288-Evidence-First-Health-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              recorder=z.read('lib/arm64-v8a/libinfinitycrash.so')
+          Path('engine/libinfinitycrash.so').write_bytes(recorder)
+          PY
+          python3 repairs/native-responsive-2103290/prepare_base.py \
+            --parent parent288/Infinity-2103288-Evidence-First-Health-RC1.apk \
+            --native engine3290/libkodi.so --out base3290/parent-native3290.apk \
+            --proof audit3290/base-proof.json
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json
+          p=json.load(open('audit3290/base-proof.json'))
+          print('NATIVE3290_SHA='+p['native_engine_sha256'])
+          print('BASE3290_SHA='+p['prepared_base_sha256'])
+          PY
+      - name: Reapply Evidence-First Health and whole-composition Android responsive shell
+        run: |
+          set -euo pipefail
+          python3 repairs/evidence-health-2103288/apply.py apply --root . --out audit3290/evidence-health
+          python3 repairs/native-responsive-2103290/android_shell.py apply \
+            --root shell-kodi --receipt audit3290/android-shell-proof.json
+          python3 repairs/native-responsive-2103290/android_shell.py verify \
+            --root shell-kodi --receipt audit3290/android-shell-verify.json
+          python3 repairs/native-responsive-2103290/package_metadata.py \
+            --root . --base-apk-sha "$BASE3290_SHA" --native-sha "$NATIVE3290_SHA" \
+            --proof audit3290/package-binding.json
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+      - name: Compile shell and permanently sign 2103290
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi --base-apk base3290/parent-native3290.apk \
+            --build-dir build3290 --out candidate3290
+      - name: Final preservation and architecture gates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          parent=Path('parent288/Infinity-2103288-Evidence-First-Health-RC1.apk')
+          apk=Path('candidate3290/Infinity-2103290-Native-Responsive-Layout-RC1.apk')
+          assert apk.is_file()
+          H=lambda b:hashlib.sha256(b).hexdigest()
+          native_expected=json.load(open('audit3290/base-proof.json'))['native_engine_sha256']
+          with zipfile.ZipFile(parent) as a,zipfile.ZipFile(apk) as b:
+              assert a.testzip() is None and b.testzip() is None
+              assert H(b.read('lib/arm64-v8a/libkodi.so'))==native_expected
+              for n in a.namelist():
+                  if n.startswith('lib/') and not n.endswith('/') and n!='lib/arm64-v8a/libkodi.so':
+                      assert a.read(n)==b.read(n),n
+                  if n.startswith('assets/') and not n.endswith('/'):
+                      assert a.read(n)==b.read(n),n
+              native=b.read('lib/arm64-v8a/libkodi.so')
+              for token in (b'INFINITY_FD_POLL_V1',b'infinity-native-responsive-v1.json',
+                            b'Infinity responsive viewport:',b'Infinity responsive window:'):
+                  assert token in native,token
+              dex=b''.join(b.read(n) for n in b.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+              for token in (b'infinity_glass_chooser_2103290',b'InfinityResponsiveTrace',
+                            b'Start Responsive/Fold Trace',b'native_responsive_contract='):
+                  assert token in dex,token
+          audit=json.load(open('candidate3290/background-resume-apk-audit.json'))
+          assert audit['version_code']==2103290
+          assert audit['native_engine_sha256']==native_expected
+          digest=H(apk.read_bytes())
+          Path('candidate3290/SHA256SUMS.txt').write_text(digest+'  '+apk.name+'\n')
+          Path('candidate3290/DEVICE-TEST.md').write_text(Path('repairs/native-responsive-2103290/DEVICE-TEST.md').read_text())
+          Path('candidate3290/NATIVE-ENGINE-PROOF.json').write_text(Path('engine3290/ENGINE-PROOF.json').read_text())
+          Path('candidate3290/NATIVE-RESPONSIVE-SOURCE.json').write_text(Path('engine3290/native-responsive-source.json').read_text())
+          Path('candidate3290/ANDROID-SHELL-PROOF.json').write_text(Path('audit3290/android-shell-proof.json').read_text())
+          print('PASS signed 2103290',digest)
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103290-Native-Responsive-Layout-RC1-Candidate
+          path: candidate3290/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve exact rollback parent
+        run: |
+          set -euo pipefail
+          mkdir -p rollback3290
+          cp parent288/Infinity-2103288-Evidence-First-Health-RC1.apk rollback3290/
+          cp audit3290/base-proof.json rollback3290/
+          printf '%s\n' \
+            'Parent: 2103288 Evidence-First Health' \
+            'APK SHA-256: caba1c375cbdee32a0a9a24c7292babfeb6cba157aba8be92a6096137e17e398' \
+            'Native parent is the accepted 2103285 FD repair.' \
+            'Do not uninstall or clear data for rollback.' > rollback3290/README.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103288-Before-Native-Responsive-Exact-Rollback
+          path: rollback3290/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
