@@ -109,7 +109,7 @@ class ResumeHub2Tests(unittest.TestCase):
 
     def test_watched_listitem_drives_kodi_overlay_and_starts_fresh(self):
         self.start(); self.player.onPlayBackEnded(); d=self.data(); entry=next(iter(d['watched'].values())); target,li=plugin._list_item(entry,d,'history','')
-        self.assertEqual(li.info['playcount'],1); self.assertEqual(li.info['overlay'],6); self.assertEqual(li.props['ResumeTime'],'0'); self.assertEqual(li.props['Infinity.ResumeHub.Watched'],'true'); self.assertEqual(li.ids['tmdb'],'329865')
+        self.assertEqual(li.info['playcount'],1); self.assertEqual(li.info['overlay'],6); self.assertEqual(li.props['ResumeTime'],'0'); self.assertEqual(li.props['Infinity.ResumeHub.Watched'],'true'); self.assertEqual(li.props['PlayCount'],'1'); self.assertEqual(li.props['Overlay'],'6'); self.assertEqual(li.props['Watched'],'true'); self.assertEqual(li.props['Infinity.ResumeHub.State'],'watched'); self.assertEqual(li.ids['tmdb'],'329865')
 
     def test_in_progress_watched_rewatch_keeps_resume(self):
         self.start(); self.player.onPlayBackEnded(); self.player=service.InfinityPlayer(PROFILE); self.player.playing=True; self.player.position=300.; self.player.duration=1200.; self.player.onAVStarted(); self.player.poll(); d=self.data(); entry=next(iter(d['items'].values())); target,li=plugin._list_item(entry,d,'continue',''); self.assertEqual(li.info['playcount'],1); self.assertEqual(li.props['ResumeTime'],'300.0')
@@ -145,7 +145,7 @@ class SkinTests(unittest.TestCase):
         with zipfile.ZipFile(self.candidate) as z:
             for d in ('responsive/base','responsive/wide','responsive/ultrawide','responsive/landscape','responsive/square','responsive/portrait','responsive/tall'):
                 text=z.read('skin.infinity.diggz/'+d+'/Includes_InfinityHomeUnified.xml').decode()
-                for token in ('InfinityMoviesPrimaryPath','InfinityMoviesSecondaryPath','InfinityTVPrimaryPath','InfinityTVSecondaryPath','action=library&amp;media=movie','action=library&amp;media=tv'): self.assertIn(token,text)
+                for token in ('InfinityMoviesPrimaryPath','InfinityMoviesSecondaryPath','InfinityTVPrimaryPath','InfinityTVSecondaryPath','InfinityResumeHubWatchedState','action=library&amp;media=movie','action=library&amp;media=tv'): self.assertIn(token,text)
     def test_player_and_non_scoped_files_byte_identical(self):
         with zipfile.ZipFile(self.parent) as a, zipfile.ZipFile(self.candidate) as b:
             changed=[]
