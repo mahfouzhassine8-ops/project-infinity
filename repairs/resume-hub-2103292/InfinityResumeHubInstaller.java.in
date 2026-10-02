@@ -33,6 +33,7 @@ public final class InfinityResumeHubInstaller {
   private static final String ADDON_ID = "script.infinity.commandcenter";
   private static final String FROM_VERSION = "0.3.5.17";
   private static final String TO_VERSION = "0.3.5.19";
+  private static final String SKIN_TARGET = "1.0.5.182";
 
   private static final Set<String> ALLOWED = new HashSet<>();
   static {
@@ -120,7 +121,7 @@ public final class InfinityResumeHubInstaller {
     if (!TO_VERSION.equals(installed)) {
       throw new IllegalStateException("Command Center version did not advance");
     }
-    Log.i(TAG, "Resume Hub 2 Command Center overlay installed");
+    Log.i(TAG, "Resume Hub 2 Command Center overlay installed; skin target " + SKIN_TARGET);
   }
 
   private static void commit(Pending p) throws Exception {
