@@ -139,7 +139,7 @@ def apply(root,receipt):
  result=verify(root);receipt.parent.mkdir(parents=True,exist_ok=True);receipt.write_text(json.dumps(result,indent=2,sort_keys=True)+'\\n')
 
 def verify(root):
- blob='\\n'.join((root/CHOOSER).read_text()+(root/SPLASH).read_text()+(root/TRACE).read_text())
+ blob=(root/CHOOSER).read_text()+(root/SPLASH).read_text()+(root/TRACE).read_text()
  required=['infinity_glass_chooser_2103290','positionScaleX=w/referenceWidth','positionScaleY=height/referenceHeight',
            'Math.min(positionScaleX,positionScaleY)','backdrop.layout(0,0,getWidth(),getMeasuredHeight())',
            'setLongClickable(false)','Infinity responsive viewport:','Infinity responsive window:',
