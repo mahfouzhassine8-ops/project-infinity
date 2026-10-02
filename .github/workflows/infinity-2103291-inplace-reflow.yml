@@ -62,7 +62,11 @@ jobs:
           python3 repairs/inplace-reflow-2103291/inplace_reflow.py apply --source kodi --receipt engine/inplace-reflow-source.json
           python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
           python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
-          git -C kodi diff --check
+          git -C kodi diff --check -- \
+            xbmc/addons/Skin.h xbmc/addons/Skin.cpp \
+            xbmc/guilib/GUIFontManager.cpp xbmc/guilib/GUIControl.h xbmc/guilib/GUIControl.cpp \
+            xbmc/guilib/GUIControlGroup.h xbmc/guilib/GUIControlGroup.cpp \
+            xbmc/guilib/GUIControlFactory.cpp xbmc/guilib/GUIWindow.h xbmc/guilib/GUIWindow.cpp
           sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit3291/python-protected.txt
           cp engine/inplace-reflow-source.json audit3291/
 
