@@ -302,6 +302,35 @@ private:
     return s
 
 def patch_window_cpp(s):
+    # Window/dialog root origins historically used XMLUtils::GetFloat, so "25%" was treated as
+    # the number 25 instead of 25 percent. Make root coordinates use Kodi's existing position
+    # grammar, matching ordinary controls and <origin> attributes.
+    old='''    else if (strValue == "coordinates")
+    {
+      XMLUtils::GetFloat(pChild, "posx", m_posX);
+      XMLUtils::GetFloat(pChild, "posy", m_posY);
+      XMLUtils::GetFloat(pChild, "left", m_posX);
+      XMLUtils::GetFloat(pChild, "top", m_posY);
+
+      TiXmlElement *originElement = pChild->FirstChildElement("origin");
+'''
+    new='''    else if (strValue == "coordinates")
+    {
+      const auto readResponsivePosition = [pChild](const char* tag, float parent, float& value)
+      {
+        const TiXmlElement* node = pChild->FirstChildElement(tag);
+        if (node && node->FirstChild())
+          value = CGUIControlFactory::ParsePosition(node->FirstChild()->Value(), parent);
+      };
+      readResponsivePosition("posx", static_cast<float>(m_coordsRes.iWidth), m_posX);
+      readResponsivePosition("posy", static_cast<float>(m_coordsRes.iHeight), m_posY);
+      readResponsivePosition("left", static_cast<float>(m_coordsRes.iWidth), m_posX);
+      readResponsivePosition("top", static_cast<float>(m_coordsRes.iHeight), m_posY);
+
+      TiXmlElement *originElement = pChild->FirstChildElement("origin");
+'''
+    s=once(s,old,new,"GUIWindow percent root coordinates")
+
     # Publish source resolution/path on successful load.
     old='''  if (ret)
   {
