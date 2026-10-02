@@ -118,8 +118,12 @@ def trace(s):
     String version="not_found";
     try{
       String xml=readBounded(addon,128*1024);
-      java.util.regex.Matcher m=java.util.regex.Pattern.compile("<addon[^>]*\\\\bversion=\\\\\"([^\\\\\"]+)\\\\\"").matcher(xml);
-      if(m.find())version=m.group(1);
+      String key="version=\\\"";
+      int at=xml.indexOf(key);
+      if(at>=0){
+        int start=at+key.length(),end=xml.indexOf('\\\"',start);
+        if(end>start)version=xml.substring(start,end);
+      }
     }catch(Exception ignored){}
     boolean responsive=new File(skin,"resources/infinity-native-responsive-v1.json").isFile();
     return "skin.infinity.diggz version="+version+" native_responsive_contract="+responsive;
