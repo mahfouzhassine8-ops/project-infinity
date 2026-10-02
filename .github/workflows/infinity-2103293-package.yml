@@ -1,0 +1,60 @@
+name: Infinity | 2103293 Verified Engine Packaging
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103293-fold-unification]
+    paths: ['.github/workflows/infinity-2103293-package.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103293-package
+  cancel-in-progress: true
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with: {ref: aa6fdad9f725d2018d62e3f097d8455ea3f58022}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103293-Fold-Unification-Engine
+          run-id: 37014887883
+          github-token: ${{ github.token }}
+          path: engine3293
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103292-Resume-Hub-2-RC1-Candidate
+          run-id: 36994742604
+          github-token: ${{ github.token }}
+          path: parent3292
+      - name: Preserve every locked APK payload except native UI and integer version code
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+          mkdir -p final3293
+          python3 repairs/fold-unification-2103293/package_apk.py build --parent parent3292/Infinity-2103292-Resume-Hub-2-RC1.apk --native engine3293/libkodi.so --out final3293/unsigned.apk --proof final3293/unsigned-proof.json
+          bash scripts/sign-infinity71.sh final3293/unsigned.apk final3293/Infinity-2103293-Fold-Unification-RC1.apk
+          rm final3293/unsigned.apk
+          python3 repairs/fold-unification-2103293/package_apk.py verify --parent parent3292/Infinity-2103292-Resume-Hub-2-RC1.apk --out final3293/Infinity-2103293-Fold-Unification-RC1.apk --proof final3293/APK-PRESERVATION.json
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging final3293/Infinity-2103293-Fold-Unification-RC1.apk > final3293/badging.txt
+          grep -q "versionCode='2103293'" final3293/badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs final3293/Infinity-2103293-Fold-Unification-RC1.apk > final3293/signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' final3293/signing.txt
+          sha256sum final3293/Infinity-2103293-Fold-Unification-RC1.apk > final3293/SHA256SUMS.txt
+          cp engine3293/*json final3293/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103293-Fold-Unification-RC1-Candidate
+          path: final3293/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
