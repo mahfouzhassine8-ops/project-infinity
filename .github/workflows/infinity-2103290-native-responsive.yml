@@ -51,6 +51,7 @@ jobs:
           python3 repairs/native-fd-2103285/apply.py --source kodi --receipt engine/native-fd-source.json
           python3 repairs/native-responsive-2103290/native_layout.py apply --source kodi --receipt engine/native-responsive-source.json
           python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/test_contract.py --source kodi
           sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit3290/python-protected.txt
       - name: Full ARM64 native rebuild
         run: |
@@ -59,6 +60,7 @@ jobs:
           python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
           python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
           python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/test_contract.py --source kodi
           sha256sum -c audit3290/python-protected.txt
       - name: Bind native engine to preservation and responsive contracts
         run: |
