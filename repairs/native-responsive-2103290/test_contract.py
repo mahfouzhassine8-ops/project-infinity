@@ -56,8 +56,10 @@ def main():
 
     # Active windows reload only after a settled resize and preserve focus/control state.
     for token in ('std::chrono::milliseconds(90)','SaveControlStates();','FreeResources(true);',
-                  'AllocResources(true);','RestoreControlStates();','InfinityPublishResponsiveProperties'):
+                  'AllocResources(true);','RestoreControlStates();','InfinityPublishResponsiveProperties',
+                  'readResponsivePosition("left"', 'CGUIControlFactory::ParsePosition'):
         assert token in win,token
+    assert 'XMLUtils::GetFloat(pChild, "left", m_posX)' not in win
     method=win[win.index('void CGUIWindow::InfinityReloadNativeResponsiveLayout()'):
                win.index('void CGUIWindow::AllocResources')]
     assert method.index('SaveControlStates();') < method.index('FreeResources(true);')
