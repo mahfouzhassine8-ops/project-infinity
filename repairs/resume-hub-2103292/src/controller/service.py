@@ -20,6 +20,7 @@ from common import (ADDON_ID, addon_profile, atomic_json, jsonrpc, log, read_jso
 from view_mode import resolve_effective_view_mode
 from experience import ExperienceController
 import resume_hub as hub
+import skin_upgrade
 
 HOME = xbmcgui.Window(10000)
 COMMAND_ADDON = xbmcaddon.Addon()
@@ -1205,6 +1206,8 @@ class DisplayReflowController:
 def main():
     profile = addon_profile()
     profile.mkdir(parents=True, exist_ok=True)
+    skin_upgrade_status = skin_upgrade.apply_and_reload()
+    _set('Infinity.ResumeHubSkinUpgrade', skin_upgrade_status)
     scan_guardian(profile)
     publish_refresh_state()
     publish_runtime_capabilities()
