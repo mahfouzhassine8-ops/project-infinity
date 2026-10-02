@@ -76,8 +76,13 @@ jobs:
           bash scripts/infinity_live_app_ci_2.sh
           python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
           python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
-          python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
-          python3 repairs/native-responsive-2103290/test_contract.py --source kodi
+          # 2103291 intentionally replaces the 2103290 window-reload/log contract.
+          # Do not run the superseded 2103290 post-build verifier against the transformed source.
+          # Instead, assert its core responsive resolver remains present, then run the 2103291 verifier.
+          grep -Fq 'GetNativeResponsiveResolution' kodi/xbmc/addons/Skin.cpp
+          grep -Fq 'responsive/base' kodi/xbmc/addons/Skin.cpp
+          grep -Fq 'UsesNativeResponsiveLayout' kodi/xbmc/addons/Skin.cpp
+          grep -Fq 'Infinity responsive viewport:' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
           python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
           python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
           sha256sum -c audit3291/python-protected.txt
