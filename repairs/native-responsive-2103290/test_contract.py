@@ -35,6 +35,7 @@ def main():
     skin=(root/'xbmc/addons/Skin.cpp').read_text()
     win=(root/'xbmc/guilib/GUIWindow.cpp').read_text()
     android=(root/'xbmc/windowing/android/WinSystemAndroid.cpp').read_text()
+    fonts=(root/'xbmc/guilib/GUIFontManager.cpp').read_text()
 
     # Architecture ownership: responsive resolver is marker-gated and cannot fall into the
     # legacy default/fallback profile while the marker exists.
@@ -67,6 +68,12 @@ def main():
     assert method.index('AllocResources(true);') < method.index('RestoreControlStates();')
     assert 'RunLoadActions();' not in method
 
+    # Fonts use the same current logical canvas on every resize instead of retaining the startup
+    # aspect, which would otherwise make text fat/thin even when controls are correct.
+    for token in ('Infinity responsive fonts:','m_skinResolution = g_SkinInfo->GetNativeResponsiveResolution()',
+                  'fontInfo.sourceRes = m_skinResolution'):
+        assert token in fonts,token
+
     # Native geometry remains Android-window-owned; Kodi only derives the logical skin canvas after
     # the committed physical geometry is authoritative.
     assert 'Infinity geometry committed:' in android
@@ -94,7 +101,7 @@ def main():
                 (1.94,'wide'),(1.95,'ultrawide')]
     for r,expected in boundaries:
         assert cls(r*1000,1000)==expected,(r,cls(r*1000,1000),expected)
-    joined=skin+win+android
+    joined=skin+win+fonts+android
     for forbidden in ('SM-F976','Galaxy Fold','Z Fold','q8q'):
         assert forbidden not in joined,forbidden
 
