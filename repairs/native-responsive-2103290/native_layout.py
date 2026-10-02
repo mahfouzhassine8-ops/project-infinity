@@ -157,6 +157,8 @@ void CSkinInfo::RefreshNativeResponsiveIncludes()
   const std::string current = GetNativeResponsiveClass();
   if (current == m_nativeResponsiveIncludesClass)
     return;
+  // Keep Skin.AspectRatio / current-aspect consumers aligned with Kodi's responsive class.
+  m_currentAspect = current;
   LoadIncludes();
 }
 
