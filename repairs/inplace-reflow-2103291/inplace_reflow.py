@@ -645,7 +645,19 @@ def verify(root):
 
     win=(root/WINDOW_CPP).read_text()
     a=win.index("void CGUIWindow::InfinityReloadNativeResponsiveLayout()")
-    b=win.index("\n\nvoid CGUIWindow::DoProcess",a)
+    # Extract structurally; following method order changed in the 2103290 parent.
+    brace=win.index("{",a)
+    depth=0
+    b=None
+    for i in range(brace,len(win)):
+      ch=win[i]
+      if ch=="{": depth+=1
+      elif ch=="}":
+        depth-=1
+        if depth==0:
+          b=i+1
+          break
+    if b is None: raise RuntimeError("unterminated InfinityReloadNativeResponsiveLayout")
     method=win[a:b]
     for forbidden in ("FreeResources(true)", "AllocResources(true)", "SaveControlStates()",
                       "RestoreControlStates()", "RunLoadActions()", "RunUnloadActions()"):
