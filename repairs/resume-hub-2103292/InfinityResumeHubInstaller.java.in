@@ -1,0 +1,193 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.util.Log;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+/**
+ * Package-only Resume Hub 2 bootstrap.
+ *
+ * This class never touches native libraries, providers, accounts, playback databases or user
+ * settings. It overlays only the approved Command Center 0.3.5.19 files into the already-installed
+ * 0.3.5.17 addon. Command Center then performs the separately guarded skin 1.0.5.181 -> 1.0.5.182
+ * transaction.
+ */
+public final class InfinityResumeHubInstaller {
+  private static final String TAG = "InfinityResumeHub";
+  private static final String ASSET = "infinity/resume-hub-controller.zip";
+  private static final String ASSET_SHA256 = "@CONTROLLER_ASSET_SHA256@";
+  private static final String ADDON_ID = "script.infinity.commandcenter";
+  private static final String FROM_VERSION = "0.3.5.17";
+  private static final String TO_VERSION = "0.3.5.19";
+
+  private static final Set<String> ALLOWED = new HashSet<>();
+  static {
+    ALLOWED.add("RESUME_HUB_0_3_5_19.txt");
+    ALLOWED.add("addon.xml");
+    ALLOWED.add("experience.py");
+    ALLOWED.add("plugin.py");
+    ALLOWED.add("resources/settings.xml");
+    ALLOWED.add("resume_hub.py");
+    ALLOWED.add("service.py");
+    ALLOWED.add("skin_upgrade.py");
+  }
+
+  private InfinityResumeHubInstaller() {}
+
+  public static void apply(Context context) {
+    try {
+      applyChecked(context.getApplicationContext());
+    } catch (Throwable error) {
+      Log.e(TAG, "Resume Hub controller overlay deferred: " +
+          error.getClass().getSimpleName() + ": " + String.valueOf(error.getMessage()));
+    }
+  }
+
+  private static void applyChecked(Context context) throws Exception {
+    File storage = context.getExternalFilesDir(null);
+    if (storage == null) storage = context.getFilesDir();
+    File addon = new File(new File(new File(storage, ".kodi"), "addons"), ADDON_ID);
+    File addonXml = new File(addon, "addon.xml");
+    if (!addonXml.isFile()) {
+      Log.w(TAG, "Command Center is not installed; Resume Hub overlay skipped");
+      return;
+    }
+
+    String current = version(readText(addonXml, 256 * 1024));
+    if (TO_VERSION.equals(current) && new File(addon, "skin_upgrade.py").isFile()) {
+      return;
+    }
+    if (!FROM_VERSION.equals(current) && !TO_VERSION.equals(current)) {
+      Log.w(TAG, "Unexpected Command Center parent " + current + "; Resume Hub overlay skipped");
+      return;
+    }
+
+    byte[] payload = readAll(context.getAssets().open(ASSET), 2 * 1024 * 1024);
+    String digest = hex(MessageDigest.getInstance("SHA-256").digest(payload));
+    if (!ASSET_SHA256.equals(digest)) {
+      throw new IllegalStateException("Resume Hub controller asset checksum mismatch");
+    }
+
+    ArrayList<Pending> pending = new ArrayList<>();
+    ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(payload));
+    ZipEntry entry;
+    while ((entry = zin.getNextEntry()) != null) {
+      if (entry.isDirectory()) continue;
+      String name = entry.getName();
+      String prefix = ADDON_ID + "/";
+      if (!name.startsWith(prefix)) throw new IllegalStateException("Unexpected archive root");
+      String relative = name.substring(prefix.length());
+      if (!ALLOWED.contains(relative) || relative.contains("..") || relative.startsWith("/") ||
+          relative.contains("\\")) {
+        throw new IllegalStateException("Unexpected Resume Hub file " + relative);
+      }
+      byte[] data = readAll(zin, 2 * 1024 * 1024);
+      File target = new File(addon, relative);
+      File parent = target.getParentFile();
+      if (parent == null || (!parent.isDirectory() && !parent.mkdirs())) {
+        throw new IllegalStateException("Cannot create " + relative);
+      }
+      File temp = new File(parent, target.getName() + ".rh3292.tmp");
+      write(temp, data);
+      pending.add(new Pending(relative, target, temp));
+    }
+    zin.close();
+
+    if (pending.size() != ALLOWED.size()) {
+      throw new IllegalStateException("Incomplete Resume Hub controller payload");
+    }
+
+    // addon.xml is the commit marker. Replace it last so 0.3.5.19 is never reported while
+    // another approved file is still pending.
+    for (Pending p : pending) if (!"addon.xml".equals(p.relative)) commit(p);
+    for (Pending p : pending) if ("addon.xml".equals(p.relative)) commit(p);
+
+    String installed = version(readText(addonXml, 256 * 1024));
+    if (!TO_VERSION.equals(installed)) {
+      throw new IllegalStateException("Command Center version did not advance");
+    }
+    Log.i(TAG, "Resume Hub 2 Command Center overlay installed");
+  }
+
+  private static void commit(Pending p) throws Exception {
+    if (p.target.exists() && !p.target.delete()) {
+      throw new IllegalStateException("Cannot replace " + p.relative);
+    }
+    if (!p.temp.renameTo(p.target)) {
+      throw new IllegalStateException("Cannot commit " + p.relative);
+    }
+  }
+
+  private static byte[] readAll(InputStream in, int limit) throws Exception {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    byte[] buffer = new byte[16384];
+    int total = 0;
+    for (int n; (n = in.read(buffer)) >= 0;) {
+      if (n == 0) continue;
+      total += n;
+      if (total > limit) throw new IllegalStateException("Resume Hub asset too large");
+      out.write(buffer, 0, n);
+    }
+    return out.toByteArray();
+  }
+
+  private static String readText(File file, int limit) throws Exception {
+    FileInputStream in = new FileInputStream(file);
+    try {
+      return new String(readAll(in, limit), StandardCharsets.UTF_8);
+    } finally {
+      in.close();
+    }
+  }
+
+  private static void write(File file, byte[] data) throws Exception {
+    FileOutputStream out = new FileOutputStream(file);
+    try {
+      out.write(data);
+      out.flush();
+      out.getFD().sync();
+    } finally {
+      out.close();
+    }
+  }
+
+  private static String version(String xml) {
+    String key = "version=\"";
+    int at = xml.indexOf(key);
+    if (at < 0) return "";
+    int start = at + key.length();
+    int end = xml.indexOf('\"', start);
+    return end > start ? xml.substring(start, end) : "";
+  }
+
+  private static String hex(byte[] bytes) {
+    StringBuilder out = new StringBuilder(bytes.length * 2);
+    for (byte b : bytes) out.append(String.format(Locale.US, "%02x", b & 0xff));
+    return out.toString();
+  }
+
+  private static final class Pending {
+    final String relative;
+    final File target;
+    final File temp;
+    Pending(String relative, File target, File temp) {
+      this.relative = relative;
+      this.target = target;
+      this.temp = temp;
+    }
+  }
+}
