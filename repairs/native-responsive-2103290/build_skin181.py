@@ -211,10 +211,26 @@ def build(parent_zip,out_dir):
     addon=skin/'addon.xml';text=addon.read_text()
     if 'version="1.0.5.178"' not in text:raise RuntimeError("Parent skin version mismatch")
     addon.write_text(text.replace('version="1.0.5.178"',f'version="{VERSION}"',1))
+    font_hashes=set()
     for cls in CLASSES:
       files=list((resp/cls).glob('*.xml'))
       if len(files)!=183:raise RuntimeError(f"Incomplete responsive class {cls}")
-      for p in files:ET.parse(p)
+      if not (resp/cls/'MyVideoNav.xml').is_file():raise RuntimeError(f"Missing MyVideoNav in {cls}")
+      font_hashes.add(sha(resp/cls/'Font.xml'))
+      for p in files:
+        tree=ET.parse(p);rootxml=tree.getroot()
+        parent={child:par for par in rootxml.iter() for child in par}
+        # Root dialog/window coordinates and include-property positions must no longer carry a
+        # positive fixed legacy pixel offset. Negative fixed offsets remain valid short-axis units.
+        for node in rootxml.iter():
+          if node.tag not in ('left','top','right','bottom','posx','posy','centerleft','centerright','centertop','centerbottom') or not node.text:
+            continue
+          raw=node.text.strip();v=number(raw)
+          if v is None or v<0:continue
+          par=parent.get(node)
+          if par is not None and par.tag in ('coordinates','include','default','definition'):
+            raise RuntimeError(f"Unconverted responsive position {p.name}: {par.tag}/{node.tag}={raw}")
+    if len(font_hashes)!=1:raise RuntimeError("Responsive classes must share one normalized Font.xml")
     output=out_dir/OUT_NAME
     with zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
       for p in sorted(root.rglob('*')):
