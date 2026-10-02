@@ -210,7 +210,11 @@ def build(parent_zip,out_dir):
     marker.write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
     addon=skin/'addon.xml';text=addon.read_text()
     if 'version="1.0.5.178"' not in text:raise RuntimeError("Parent skin version mismatch")
-    addon.write_text(text.replace('version="1.0.5.178"',f'version="{VERSION}"',1))
+    text=text.replace('version="1.0.5.178"',f'version="{VERSION}"',1)
+    old_description='Infinity Experience 1–9 RC1 extends the locked 1.0.5.172 glass skin with a responsive command palette, health orb and artwork atmosphere. Preserves existing Home layouts, navigation and player surfaces in OLED and light appearances. Install Command Center 0.3.5.17 first. Device acceptance pending.'
+    new_description='Infinity Native Responsive Layout RC1 preserves the approved 1.0.5.178 presentation and adds the Kodi-owned responsive presentation contract. Window geometry is owned by Kodi; this skin supplies complete visual/layout intent for every responsive class. Install Command Center 0.3.5.17 first. Physical Fold acceptance pending.'
+    if old_description not in text:raise RuntimeError("Unexpected parent description")
+    addon.write_text(text.replace(old_description,new_description,1))
     font_hashes=set()
     for cls in CLASSES:
       files=list((resp/cls).glob('*.xml'))
