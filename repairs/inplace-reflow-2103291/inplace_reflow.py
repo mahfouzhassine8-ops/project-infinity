@@ -32,6 +32,19 @@ def once(s,a,b,label):
     if n!=1: raise RuntimeError(f"{label}: expected one anchor, found {n}")
     return s.replace(a,b,1)
 
+def method_span(s, signature):
+    start=s.index(signature)
+    brace=s.index("{",start)
+    depth=0
+    for i in range(brace,len(s)):
+        ch=s[i]
+        if ch=="{": depth+=1
+        elif ch=="}":
+            depth-=1
+            if depth==0:
+                return start,i+1
+    raise RuntimeError("Unbalanced method body for "+signature)
+
 def patch_control_h(s):
     s=once(s,"#include <vector>\n","#include <string>\n#include <vector>\n","GUIControl string include")
     anchor='''struct GUICONTROLSTATS
@@ -521,10 +534,7 @@ def patch_window_cpp(s):
 '''
     s=once(s,anchor,root_method+anchor,"GUIWindow root in-place reflow")
     # Replace the 2103290 unload/reallocate body with in-place geometry recompute.
-    start=s.index("void CGUIWindow::InfinityReloadNativeResponsiveLayout()")
-    match=re.search(r"\nvoid CGUIWindow::DoProcess\s*\(",s[start:])
-    if not match: raise RuntimeError("GUIWindow DoProcess boundary not found after 2103290 transform")
-    end=start+match.start()+1
+    start,end=method_span(s,"void CGUIWindow::InfinityReloadNativeResponsiveLayout()")
     old=s[start:end]
     new=r'''void CGUIWindow::InfinityReloadNativeResponsiveLayout()
 {
