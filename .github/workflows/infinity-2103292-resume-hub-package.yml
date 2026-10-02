@@ -196,8 +196,21 @@ jobs:
               assert H(z.read('lib/arm64-v8a/libkodi.so')) == '36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94'
               assert z.read('assets/infinity/resume-hub-controller.zip') == controller.read_bytes()
               dex=b''.join(z.read(n) for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n))
-              for token in (b'InfinityResumeHubInstaller',b'resume-hub-controller.zip',b'0.3.5.19',b'1.0.5.182'):
+              for token in (b'InfinityResumeHubInstaller',b'resume-hub-controller.zip',b'0.3.5.19'):
                   assert token in dex,token
+
+              # 1.0.5.182 is a Command Center skin-upgrade target, not an Android runtime
+              # string contract. Verify it inside the exact checksummed controller asset where
+              # the transaction actually lives instead of incorrectly requiring it in classes.dex.
+              controller_bytes=z.read('assets/infinity/resume-hub-controller.zip')
+              import io
+              with zipfile.ZipFile(io.BytesIO(controller_bytes)) as controller_zip:
+                  assert controller_zip.testzip() is None
+                  skin_upgrade=controller_zip.read('script.infinity.commandcenter/skin_upgrade.py')
+                  addon_xml=controller_zip.read('script.infinity.commandcenter/addon.xml')
+                  assert b'1.0.5.181' in skin_upgrade
+                  assert b'1.0.5.182' in skin_upgrade
+                  assert b'0.3.5.19' in addon_xml
           proof={
               'schema':1,
               'parent_apk_sha256':H(parent.read_bytes()),
