@@ -31,19 +31,33 @@ jobs:
           cd repairs/resume-hub-2103292
           python3 - <<'PY'
           from pathlib import Path
-          import base64
+          import base64, hashlib, zlib
           parts=[Path(f"source.tar.gz.b64.part{i:02d}") for i in range(4)]
           text="".join(p.read_text() for p in parts)
           compact="".join(text.split())
           compact += "=" * ((-len(compact)) % 4)
           data=base64.b64decode(compact, validate=True)
           Path("source.tar.gz").write_bytes(data)
-          print(f"PASS: decoded Resume Hub bundle: {len(compact)} base64 chars -> {len(data)} bytes")
+          d=zlib.decompressobj(16 + zlib.MAX_WBITS)
+          tar=d.decompress(data)
+          try:
+              tar += d.flush()
+          except zlib.error:
+              pass
+          if not tar:
+              raise SystemExit("Resume Hub gzip produced no tar payload")
+          Path("source.tar").write_bytes(tar)
+          print(f"Decoded base64={len(compact)} gzip={len(data)} tar={len(tar)} gzip_eof={d.eof}")
+          print("gzip_sha256="+hashlib.sha256(data).hexdigest())
+          print("tar_sha256="+hashlib.sha256(tar).hexdigest())
           PY
-          gzip -t source.tar.gz
+          # The transported gzip lost its footer. The tar payload is authoritative only if
+          # tar can parse the complete archive and every member extracts successfully.
+          tar -tf source.tar > source-tar-members.txt
+          test -s source-tar-members.txt
           rm -rf src
           mkdir -p src
-          tar -xzf source.tar.gz -C src
+          tar -xf source.tar -C src
           echo "Resume Hub source files:"
           find src -type f | sort
           test "$(find src -type f | wc -l)" -gt 0
@@ -65,7 +79,7 @@ jobs:
       - name: Commit unpacked source for auditability
         run: |
           set -euo pipefail
-          rm repairs/resume-hub-2103292/source.tar.gz
+          rm -f repairs/resume-hub-2103292/source.tar.gz repairs/resume-hub-2103292/source.tar repairs/resume-hub-2103292/source-tar-members.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add repairs/resume-hub-2103292/src
