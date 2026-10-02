@@ -1,0 +1,332 @@
+name: Infinity | 2103291 Native Fast Lane
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103291-native-fast]
+    paths:
+      - 'repairs/inplace-reflow-2103291/inplace_reflow.py'
+      - 'repairs/inplace-reflow-2103291/test_contract.py'
+      - 'scripts/infinity_live_app_ci_2.sh'
+      - '.github/workflows/infinity-2103291-native-fast.yml'
+permissions: {contents: read, actions: write}
+concurrency:
+  group: infinity-2103291-native-fast
+  cancel-in-progress: true
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - name: Ensure ccache is available
+        run: |
+          set -euo pipefail
+          if ! command -v ccache >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y ccache
+          fi
+          ccache --version
+      - name: Restore native compiler/dependency cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-2103291-native-fast-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            infinity-2103291-native-fast-${{ runner.os }}-
+            infinity-deep-audio-21.3-arm64-${{ runner.os }}-
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Source preflight before expensive native build
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            repairs/inplace-reflow-2103291/inplace_reflow.py \
+            repairs/inplace-reflow-2103291/test_contract.py \
+            repairs/inplace-reflow-2103291/prepare_base.py \
+            repairs/inplace-reflow-2103291/android_package_delta.py
+          bash scripts/infinity_live_app_ci_1.sh
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          mkdir -p engine audit3291
+          python3 scripts/infinity_python_invoker_hardening_v2.py apply --source kodi --receipt engine/pythoninvoker-threadstate-v2-source.json
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+          python3 scripts/infinity_python_invoker_hardening_v3.py apply --source kodi --receipt engine/pythoninvoker-runtime-v3-source.json
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 repairs/native-fd-2103285/apply.py --source kodi --receipt engine/native-fd-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py apply --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/test_contract.py --source kodi
+          python3 repairs/inplace-reflow-2103291/inplace_reflow.py apply --source kodi --receipt engine/inplace-reflow-source.json
+          python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
+          python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
+          git -C kodi diff --check -- \
+            xbmc/addons/Skin.h xbmc/addons/Skin.cpp \
+            xbmc/guilib/GUIFontManager.cpp xbmc/guilib/GUIControl.h xbmc/guilib/GUIControl.cpp \
+            xbmc/guilib/GUIControlGroup.h xbmc/guilib/GUIControlGroup.cpp \
+            xbmc/guilib/GUIControlFactory.cpp xbmc/guilib/GUIWindow.h xbmc/guilib/GUIWindow.cpp
+          sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit3291/python-protected.txt
+          cp engine/inplace-reflow-source.json audit3291/
+
+      - name: Full ARM64 native rebuild
+        run: |
+          set -euo pipefail
+          INFINITY_NATIVE_ONLY=1 INFINITY_USE_CCACHE=1 bash scripts/infinity_live_app_ci_2.sh
+
+          # Diagnostic fan-out: after the expensive native build succeeds, run every preservation/
+          # responsive verifier and report all failures in this one attempt instead of stopping at
+          # the first red gate and paying for another full native compile just to discover the next.
+          failures=0
+          gate() {
+            local label="$1"; shift
+            echo "::group::DIAGNOSTIC GATE: $label"
+            if "$@"; then
+              echo "PASS: $label"
+            else
+              rc=$?
+              echo "::error title=$label::FAILED (exit $rc)"
+              failures=$((failures + 1))
+            fi
+            echo "::endgroup::"
+          }
+
+          gate "Python runtime hardening v3"             python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          gate "Native FD preservation"             python3 repairs/native-fd-2103285/apply.py --verify --source kodi --receipt engine/native-fd-source.json
+          gate "Responsive resolver API"             grep -Fq 'GetNativeResponsiveResolution' kodi/xbmc/addons/Skin.cpp
+          gate "Responsive base fallback"             grep -Fq 'responsive/base' kodi/xbmc/addons/Skin.cpp
+          gate "Responsive opt-in API"             grep -Fq 'UsesNativeResponsiveLayout' kodi/xbmc/addons/Skin.cpp
+          gate "Android responsive viewport trace"             grep -Fq 'Infinity responsive viewport:' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          gate "2103291 in-place reflow verifier"             python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
+          gate "2103291 contract tests"             python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
+          gate "Protected Python source hashes"             sha256sum -c audit3291/python-protected.txt
+
+          if [ "$failures" -ne 0 ]; then
+            echo "::error title=2103291 diagnostic fan-out::$failures post-build gate(s) failed; see grouped results above."
+            exit 1
+          fi
+
+      - name: Bind 2103291 native engine contract
+        run: |
+          set -euo pipefail
+          mkdir -p engine3291
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          lib_path=Path('engine/native-fast-libkodi.so')
+          assert lib_path.is_file(), lib_path
+          lib=lib_path.read_bytes()
+          digest=hashlib.sha256(lib).hexdigest()
+          assert digest!='16bb23fb27bdefe1464a4c11d65195069f0819948ae5213872f8519decd8c3cc'
+          for token in (b'INFINITY_FD_POLL_V1',b'infinity-native-responsive-v1.json',
+                        b'Infinity responsive viewport:',b'Infinity in-place responsive reflow:',
+                        b'controls_reused=true window_reload=false'):
+              assert token in lib,token
+          source=json.loads(Path('engine/inplace-reflow-source.json').read_text())
+          assert source['window_objects_reused'] is True
+          assert source['controls_reused'] is True
+          assert source['full_window_reload_on_resize'] is False
+          Path('engine3291/libkodi.so').write_bytes(lib)
+          report={
+            'schema':1,'native_engine_sha256':digest,
+            'parent_2103290_native_sha256':'16bb23fb27bdefe1464a4c11d65195069f0819948ae5213872f8519decd8c3cc',
+            'parent_2103290_apk_sha256':'cefb61ab84d5eae78110bae7ef381f36f2e1f3f7b770e2f7792e9dfd196b6eef',
+            'kodi':'21.3-Omega','fd_repair_preserved':True,'python_repairs_preserved':True,
+            'native_responsive_layout_v1_preserved':True,'inplace_responsive_reflow_v1':True,
+            'window_objects_reused':True,'controls_reused':True,'skin_payload_changed':False,
+            'physical_device_verified':False}
+          Path('engine3291/ENGINE-PROOF.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          Path('engine3291/INPLACE-REFLOW-SOURCE.json').write_text(Path('engine/inplace-reflow-source.json').read_text())
+          Path('engine3291/SHA256SUMS.txt').write_text(digest+'  libkodi.so\n')
+          print('PASS 2103291 native engine',digest)
+          PY
+          readelf -h -n -d -W engine3291/libkodi.so > engine3291/elf-identity.txt
+
+      - name: Save native compiler/dependency cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-2103291-native-fast-${{ runner.os }}-${{ github.run_id }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103291-NativeFast-Engine
+          path: engine3291/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103291-NativeFast-Evidence
+          path: audit3291/
+          if-no-files-found: warn
+          retention-days: 90
+
+  package:
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: source284
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103290-Native-Responsive-Layout-RC1-Package-Only
+          run-id: 36953068920
+          github-token: ${{ github.token }}
+          path: parent3290
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103291-NativeFast-Engine
+          path: engine3291
+
+      - name: Prepare exact 2103290 parent with 2103291 engine
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source284/reconstructed-2103284-shell.tar.gz | cut -d' ' -f1)" = d373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621
+          test "$(sha256sum parent3290/Infinity-2103290-Native-Responsive-Layout-RC1.apk | cut -d' ' -f1)" = cefb61ab84d5eae78110bae7ef381f36f2e1f3f7b770e2f7792e9dfd196b6eef
+          tar -xzf source284/reconstructed-2103284-shell.tar.gz
+          mkdir -p audit3291 base3291 candidate3291 engine
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          apk=Path('parent3290/Infinity-2103290-Native-Responsive-Layout-RC1.apk')
+          with zipfile.ZipFile(apk) as z:
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          python3 repairs/inplace-reflow-2103291/prepare_base.py \
+            --parent parent3290/Infinity-2103290-Native-Responsive-Layout-RC1.apk \
+            --native engine3291/libkodi.so \
+            --out base3291/parent-native3291.apk \
+            --proof audit3291/base-proof.json
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json
+          p=json.load(open('audit3291/base-proof.json'))
+          print('NATIVE3291_SHA='+p['native_engine_sha256'])
+          print('BASE3291_SHA='+p['prepared_base_sha256'])
+          PY
+
+      - name: Reconstruct 2103290 shell and apply only 2103291 metadata/trace delta
+        run: |
+          set -euo pipefail
+          python3 repairs/evidence-health-2103288/apply.py apply --root . --out audit3291/evidence-health
+          python3 repairs/native-responsive-2103290/android_shell.py apply \
+            --root shell-kodi --receipt audit3291/android-shell-3290.json
+          python3 repairs/native-responsive-2103290/android_shell.py verify \
+            --root shell-kodi --receipt audit3291/android-shell-3290-verify.json
+          python3 repairs/native-responsive-2103290/package_metadata.py \
+            --root . --base-apk-sha "$BASE3291_SHA" --native-sha "$NATIVE3291_SHA" \
+            --proof audit3291/package-binding-3290.json
+          python3 repairs/inplace-reflow-2103291/android_package_delta.py \
+            --root . --base-apk-sha "$BASE3291_SHA" --native-sha "$NATIVE3291_SHA" \
+            --proof audit3291/package-binding-3291.json
+          python3 -m py_compile repairs/inplace-reflow-2103291/android_package_delta.py
+          python3 - <<'PY'
+          import json
+          for p in ('audit3291/base-proof.json','audit3291/android-shell-3290.json',
+                    'audit3291/package-binding-3290.json','audit3291/package-binding-3291.json',
+                    'engine/background-resume-source.json'):
+              json.load(open(p))
+          print('PASS 2103291 package metadata preflight')
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+
+      - name: Compile Android shell and permanently sign 2103291
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk base3291/parent-native3291.apk \
+            --build-dir build3291 \
+            --out candidate3291
+
+      - name: Final preservation and in-place gates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          parent=Path('parent3290/Infinity-2103290-Native-Responsive-Layout-RC1.apk')
+          apk=Path('candidate3291/Infinity-2103291-InPlace-Responsive-Reflow-RC1.apk')
+          assert apk.is_file()
+          H=lambda b:hashlib.sha256(b).hexdigest()
+          engine=json.load(open('engine3291/ENGINE-PROOF.json'))
+          native_expected=engine['native_engine_sha256']
+          with zipfile.ZipFile(parent) as a,zipfile.ZipFile(apk) as b:
+              assert a.testzip() is None and b.testzip() is None
+              assert H(b.read('lib/arm64-v8a/libkodi.so'))==native_expected
+              for n in a.namelist():
+                  if n.startswith('lib/') and not n.endswith('/') and n!='lib/arm64-v8a/libkodi.so':
+                      assert a.read(n)==b.read(n),n
+                  if n.startswith('assets/') and not n.endswith('/'):
+                      assert a.read(n)==b.read(n),n
+              native=b.read('lib/arm64-v8a/libkodi.so')
+              for token in (b'INFINITY_FD_POLL_V1',b'infinity-native-responsive-v1.json',
+                            b'Infinity responsive viewport:',b'Infinity in-place responsive reflow:',
+                            b'controls_reused=true window_reload=false'):
+                  assert token in native,token
+              dex=b''.join(b.read(n) for n in b.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+              for token in (b'infinity_glass_chooser_2103290',b'InfinityResponsiveTrace',
+                            b'Start Responsive/Fold Trace',b'native_responsive_contract=',
+                            b'Infinity in-place responsive reflow:'):
+                  assert token in dex,token
+          audit=json.load(open('candidate3291/background-resume-apk-audit.json'))
+          assert audit['version_code']==2103291
+          assert audit['native_engine_sha256']==native_expected
+          digest=H(apk.read_bytes())
+          Path('candidate3291/SHA256SUMS.txt').write_text(digest+'  '+apk.name+'\n')
+          Path('candidate3291/DEVICE-TEST.md').write_text(Path('repairs/inplace-reflow-2103291/DEVICE-TEST.md').read_text())
+          Path('candidate3291/NATIVE-ENGINE-PROOF.json').write_text(Path('engine3291/ENGINE-PROOF.json').read_text())
+          Path('candidate3291/INPLACE-REFLOW-SOURCE.json').write_text(Path('engine3291/INPLACE-REFLOW-SOURCE.json').read_text())
+          print('PASS signed 2103291 candidate',digest)
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103291-NativeFast-Reflow-RC1-Candidate
+          path: candidate3291/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
