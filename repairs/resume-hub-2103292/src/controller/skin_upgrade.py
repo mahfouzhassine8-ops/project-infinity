@@ -50,6 +50,11 @@ VARIABLES = r'''
     <value condition="String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)">plugin://script.infinity.commandcenter/?action=library&amp;media=tv&amp;bucket=progress&amp;rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]</value>
     <value>plugin://plugin.video.umbrella/?action=shows_progress&amp;url=progresstv&amp;folderName=Progress+Shows&amp;reload=$INFO[Window(Home).Property(widgetreload)]$INFO[Window(Home).Property(widgetreload2)]$INFO[Window(Home).Property(Infinity.WidgetReloadRevision)]</value>
   </variable>
+  <variable name="InfinityResumeHubWatchedState">
+    <value condition="String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true)">true</value>
+    <value condition="Integer.IsGreater(ListItem.PlayCount,0)">true</value>
+    <value>false</value>
+  </variable>
 '''
 
 def _sha(data: bytes) -> str:
@@ -255,11 +260,12 @@ def upgrade_installed_skin() -> tuple[bool, str]:
         "baseline": FROM_VERSION,
         "title": "Infinity Resume Hub 2 RC1",
         "controller": COMMAND_VERSION,
-        "requires_apk": 2103291,
+        "requires_apk": 2103292,
         "native_changed": False,
         "runtime_tested": False,
         "status": "device_acceptance_pending",
-        "scope": "Local Trakt-replacement menus/state; existing responsive geometry and player surfaces preserved",
+        "scope": "Local Trakt-replacement menus/state plus watched/playcount skin bridge; existing responsive geometry and player surfaces preserved",
+        "resume_hub_watched_contract": "Kodi playcount/overlay + Infinity.ResumeHub.Watched",
     }
     skin_data = json.loads(original["infinity-skin.json"])
     skin_data["previous_release_metadata"] = skin_data.get("current_release")
@@ -297,7 +303,7 @@ def upgrade_installed_skin() -> tuple[bool, str]:
                 raise RuntimeError(f"{d} missing {token}")
     for d in INCLUDE_DIRS:
         data = staged[f"{d}/Includes_InfinityHomeUnified.xml"].decode("utf-8")
-        for token in ("InfinityMoviesPrimaryPath", "InfinityMoviesSecondaryPath", "InfinityTVPrimaryPath", "InfinityTVSecondaryPath"):
+        for token in ("InfinityMoviesPrimaryPath", "InfinityMoviesSecondaryPath", "InfinityTVPrimaryPath", "InfinityTVSecondaryPath", "InfinityResumeHubWatchedState"):
             if token not in data:
                 raise RuntimeError(f"{d} missing {token}")
 
