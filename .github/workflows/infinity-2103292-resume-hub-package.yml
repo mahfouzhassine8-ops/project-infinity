@@ -207,9 +207,15 @@ jobs:
               with zipfile.ZipFile(io.BytesIO(controller_bytes)) as controller_zip:
                   assert controller_zip.testzip() is None
                   skin_upgrade=controller_zip.read('script.infinity.commandcenter/skin_upgrade.py')
+                  plugin_py=controller_zip.read('script.infinity.commandcenter/plugin.py')
                   addon_xml=controller_zip.read('script.infinity.commandcenter/addon.xml')
                   assert b'1.0.5.181' in skin_upgrade
                   assert b'1.0.5.182' in skin_upgrade
+                  assert b'requires_apk": 2103292' in skin_upgrade
+                  assert b'InfinityResumeHubWatchedState' in skin_upgrade
+                  for token in (b'Infinity.ResumeHub.Watched', b'Infinity.ResumeHub.State',
+                                b"setProperty('PlayCount'", b"setProperty('Overlay'"):
+                      assert token in plugin_py,token
                   assert b'0.3.5.19' in addon_xml
           proof={
               'schema':1,
@@ -231,7 +237,12 @@ jobs:
           Path('final3292/SHA256SUMS.txt').write_text(proof['apk_sha256']+'  '+apk.name+'\n')
           Path('final3292/DEVICE-TEST.md').write_text(Path('repairs/resume-hub-2103292/DEVICE-TEST.md').read_text())
           Path('final3292/COMMAND-CENTER-PROOF.json').write_text(Path('repairs/resume-hub-2103292/src/COMMAND-CENTER-PROOF.json').read_text())
-          Path('final3292/SKIN-PROOF.json').write_text(Path('repairs/resume-hub-2103292/src/SKIN-PROOF.json').read_text())
+          skin_proof=json.loads(Path('repairs/resume-hub-2103292/src/SKIN-PROOF.json').read_text())
+          assert skin_proof['requires_apk'] == 2103292
+          assert skin_proof['skin_version'] == '1.0.5.182'
+          assert skin_proof['runtime_upgrade_authoritative'] is True
+          assert skin_proof['watched_state_bridge'] is True
+          Path('final3292/SKIN-PROOF.json').write_text(json.dumps(skin_proof,indent=2,sort_keys=True)+'\n')
           print('PASS PACKAGE-ONLY 2103292',proof['apk_sha256'])
           PY
 
