@@ -12,8 +12,9 @@ The skin remains declarative: the factory records the original left/right/center
 already present in the XML. Fixed dimensions stay fixed; percentage / reverse / edge constraints are
 re-evaluated against the new parent size. Group children recurse against the group's new bounds.
 
-This is marker-gated by the existing Infinity Native Responsive Layout v1 path at the window level.
-Non-responsive Kodi skins keep the upstream behavior and never call the new reflow path.
+Infinity's marker-based responsive skin keeps its class-specific presentation. On Android, legacy
+skins also receive a generic adaptive logical canvas so Kodi never stretches X and Y independently
+when the window becomes tall/narrow. No device model is hardcoded.
 """
 from pathlib import Path
 import argparse, hashlib, json, re
@@ -711,8 +712,10 @@ def patch_window_cpp(s):
   m_coordsRes = next;
   if (g_SkinInfo->UsesNativeResponsiveLayout())
     g_SkinInfo->RefreshNativeResponsiveIncludes();
-  SetProperty("Infinity.NativeResponsive", true);
-  SetProperty("Infinity.ResponsiveClass", g_SkinInfo->GetNativeResponsiveClass());
+  SetProperty("Infinity.NativeResponsive", g_SkinInfo->UsesNativeResponsiveLayout());
+  SetProperty("Infinity.ResponsiveClass",
+              g_SkinInfo->UsesNativeResponsiveLayout() ? g_SkinInfo->GetNativeResponsiveClass()
+                                                       : "legacy-adaptive");
   SetProperty("Infinity.LogicalWidth", next.iWidth);
   SetProperty("Infinity.LogicalHeight", next.iHeight);
   SetProperty("Infinity.InPlaceReflow", true);
@@ -761,7 +764,7 @@ def patch_window_cpp(s):
           message.GetParam1() == GUI_MSG_WINDOW_RESIZE)
 '''
     new='''        if (message.GetParam1() == GUI_MSG_WINDOW_RESIZE && g_SkinInfo &&
-            g_SkinInfo->UsesNativeResponsiveLayout())
+            g_SkinInfo->UsesNativeWindowAdaptation())
         {
           m_infinityResponsiveReloadPending = true;
           m_infinityResponsiveResizeAt = std::chrono::steady_clock::now();
@@ -827,13 +830,15 @@ def verify(root):
       "schema":1,
       "build":2103291,
       "parent":"2103290-native-responsive-layout",
-      "contract":"Infinity In-Place Responsive Reflow v1",
+      "contract":"Infinity In-Place Responsive Reflow v1 + Android Legacy Adaptive Canvas",
       "window_objects_reused":True,
       "controls_reused":True,
       "full_window_reload_on_resize":False,
       "focus_preserved_by_identity":True,
       "drawer_state_preserved_by_identity":True,
       "device_specific_routing_added":False,
+      "legacy_android_skin_adaptation":True,
+      "nonuniform_xy_skin_stretch_removed":True,
       "resize_debounce_ms":90,
       "files":{str(p):sha(root/p) for p in required}
     }
