@@ -47,6 +47,7 @@ def main():
     assert 'responsiveRoot' in resp and '"base"' in resp
     assert 'm_defaultRes' not in resp
     assert 'std::min_element' not in resp
+    assert 'm_currentAspect = current;' in skin
     paths_start=skin.index('void CSkinInfo::GetSkinPaths')
     paths_end=skin.index('bool CSkinInfo::TranslateResolution',paths_start)
     paths_block=skin[paths_start:paths_end]
