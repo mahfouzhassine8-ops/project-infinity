@@ -48,9 +48,48 @@ make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
 cd "$GITHUB_WORKSPACE"
 CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
 test -x "$CMAKE_BIN"
-"$CMAKE_BIN" -S "$GITHUB_WORKSPACE/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+CMAKE_ARGS=(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+if [ "${INFINITY_USE_CCACHE:-0}" = "1" ] && command -v ccache >/dev/null 2>&1; then
+  export CCACHE_DIR="${CCACHE_DIR:-$HOME/.ccache}"
+  export CCACHE_BASEDIR="$GITHUB_WORKSPACE"
+  export CCACHE_NOHASHDIR=1
+  mkdir -p "$CCACHE_DIR"
+  ccache --set-config=max_size=5G
+  CMAKE_ARGS+=(
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+  )
+  ccache --zero-stats || true
+fi
+
+"$CMAKE_BIN" -S "$GITHUB_WORKSPACE/kodi" -B "$BUILD_DIR" "${CMAKE_ARGS[@]}"
 python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
 make -C "$BUILD_DIR" -j"$(nproc)"
+
+# Fast native lane: stop after libkodi.so is linked. Packaging/signing is a separate job,
+# so a native repair does not pay the Gradle/APK cost just to prove the engine.
+if [ "${INFINITY_NATIVE_ONLY:-0}" = "1" ]; then
+  python3 - <<'PY'
+from pathlib import Path
+import os, shutil
+
+build=Path(os.environ["BUILD_DIR"])
+candidates=[p for p in build.rglob("libkodi.so") if p.is_file() and p.stat().st_size > 1024*1024]
+if not candidates:
+    raise SystemExit("libkodi.so not found after native build")
+src=max(candidates, key=lambda p:p.stat().st_size)
+dst=Path("engine/native-fast-libkodi.so")
+dst.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2(src,dst)
+print(f"PASS native-only libkodi: {src} -> {dst} ({dst.stat().st_size} bytes)")
+PY
+  if command -v ccache >/dev/null 2>&1; then
+    ccache --show-stats || true
+  fi
+  exit 0
+fi
+
 make -C "$BUILD_DIR" apk -j"$(nproc)"
 
 APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
