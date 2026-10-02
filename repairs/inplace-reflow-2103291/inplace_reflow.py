@@ -18,6 +18,9 @@ Non-responsive Kodi skins keep the upstream behavior and never call the new refl
 from pathlib import Path
 import argparse, hashlib, json, re
 
+SKIN_H=Path("xbmc/addons/Skin.h")
+SKIN_CPP=Path("xbmc/addons/Skin.cpp")
+FONT_CPP=Path("xbmc/guilib/GUIFontManager.cpp")
 CONTROL_H=Path("xbmc/guilib/GUIControl.h")
 CONTROL_CPP=Path("xbmc/guilib/GUIControl.cpp")
 GROUP_H=Path("xbmc/guilib/GUIControlGroup.h")
@@ -44,6 +47,152 @@ def method_span(s, signature):
             if depth==0:
                 return start,i+1
     raise RuntimeError("Unbalanced method body for "+signature)
+
+def patch_skin_h(s):
+    s=once(s,
+"""  bool UsesNativeResponsiveLayout() const;
+  std::string GetNativeResponsiveClass() const;
+  RESOLUTION_INFO GetNativeResponsiveResolution() const;
+  void RefreshNativeResponsiveIncludes();
+""",
+"""  bool UsesNativeResponsiveLayout() const;
+  bool UsesNativeWindowAdaptation() const;
+  std::string GetNativeResponsiveClass() const;
+  RESOLUTION_INFO GetNativeResponsiveResolution() const;
+  RESOLUTION_INFO GetNativeWindowResolution(const RESOLUTION_INFO& source) const;
+  void RefreshNativeResponsiveIncludes();
+""","Skin adaptive public API")
+    return s
+
+def patch_skin_cpp(s):
+    # 2103290 already added <cmath> and InfinityUsableSize.
+    anchor='''RESOLUTION_INFO CSkinInfo::GetNativeResponsiveResolution() const
+{
+'''
+    if anchor not in s: raise RuntimeError("2103290 responsive resolution method missing")
+
+    insert=r'''bool CSkinInfo::UsesNativeWindowAdaptation() const
+{
+  if (UsesNativeResponsiveLayout())
+    return true;
+#if defined(TARGET_ANDROID)
+  // Kodi's traditional skin resolver is landscape-centric and its GUI scaler may stretch X/Y
+  // independently when an Android window becomes tall/narrow. On Android, keep one uniform
+  // logical-to-physical scale even for ordinary legacy skins. No device-model routing.
+  return true;
+#else
+  return false;
+#endif
+}
+
+'''
+    s=once(s,anchor,insert+anchor,"Skin native-window adaptation method")
+
+    # Insert generic legacy-skin adaptive resolution immediately after the responsive method.
+    responsive_start=s.index("RESOLUTION_INFO CSkinInfo::GetNativeResponsiveResolution() const")
+    refresh_start=s.index("void CSkinInfo::RefreshNativeResponsiveIncludes()",responsive_start)
+    generic=r'''RESOLUTION_INFO CSkinInfo::GetNativeWindowResolution(const RESOLUTION_INFO& source) const
+{
+  if (UsesNativeResponsiveLayout())
+    return GetNativeResponsiveResolution();
+
+#if defined(TARGET_ANDROID)
+  const RESOLUTION_INFO target = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+  float usableWidth = 1.0f, usableHeight = 1.0f;
+  InfinityUsableSize(target, usableWidth, usableHeight);
+  const float targetRatio = usableWidth / usableHeight;
+  const float sourceRatio =
+      source.iWidth > 0 && source.iHeight > 0 ? static_cast<float>(source.iWidth) / source.iHeight
+                                             : targetRatio;
+  const float mismatch = std::max(targetRatio / std::max(0.01f, sourceRatio),
+                                  sourceRatio / std::max(0.01f, targetRatio));
+  if (mismatch <= 1.03f)
+    return source;
+
+  // Preserve the skin profile's logical area while matching the live Android window aspect.
+  // This avoids skinny/tall or wide/flat distortion without assuming a specific phone/Fold model.
+  const double area = std::max(1.0, static_cast<double>(source.iWidth) * source.iHeight);
+  int width = std::max(1, static_cast<int>(std::lround(std::sqrt(area * targetRatio))));
+  int height = std::max(1, static_cast<int>(std::lround(std::sqrt(area / targetRatio))));
+  width = std::max(8, ((width + 4) / 8) * 8);
+  height = std::max(8, ((height + 4) / 8) * 8);
+
+  RESOLUTION_INFO result = source;
+  result.iWidth = width;
+  result.iHeight = height;
+  result.iScreenWidth = width;
+  result.iScreenHeight = height;
+  result.iSubtitles = height;
+  result.fPixelRatio = 1.0f;
+  result.strId = "infinity-android-adaptive";
+  // Keep source.strMode unchanged: presentation still comes from the skin's own selected folder.
+  return result;
+#else
+  return source;
+#endif
+}
+
+'''
+    s=s[:refresh_start]+generic+s[refresh_start:]
+
+    # Legacy GetSkinPath: keep folder choice, but return an aspect-matched logical canvas on Android.
+    old='''  *res = *std::min_element(m_resolutions.begin(), m_resolutions.end(), closestRes(target));
+
+  std::string strPath = URIUtils::AddFileToFolder(strPathToUse, res->strMode, strFile);
+  if (CFileUtils::Exists(strPath))
+    return strPath;
+
+  // use the default resolution
+  *res = m_defaultRes;
+
+  return URIUtils::AddFileToFolder(strPathToUse, res->strMode, strFile);
+'''
+    new='''  *res = *std::min_element(m_resolutions.begin(), m_resolutions.end(), closestRes(target));
+
+  std::string strPath = URIUtils::AddFileToFolder(strPathToUse, res->strMode, strFile);
+  if (CFileUtils::Exists(strPath))
+  {
+    if (UsesNativeWindowAdaptation())
+      *res = GetNativeWindowResolution(*res);
+    return strPath;
+  }
+
+  // use the default resolution
+  *res = m_defaultRes;
+  const std::string defaultPath = URIUtils::AddFileToFolder(strPathToUse, res->strMode, strFile);
+  if (UsesNativeWindowAdaptation())
+    *res = GetNativeWindowResolution(*res);
+  return defaultPath;
+'''
+    s=once(s,old,new,"Skin legacy Android adaptive resolution")
+    return s
+
+def patch_font_cpp(s):
+    old='''  if (g_SkinInfo && g_SkinInfo->UsesNativeResponsiveLayout())
+  {
+    // Responsive Font.xml uses one short-axis-normalized font contract for every class.
+    // Refresh the source resolution before the normal font scaler runs so a Fold/aspect
+    // transition cannot reintroduce independent X/Y font distortion from the startup canvas.
+    m_skinResolution = g_SkinInfo->GetNativeResponsiveResolution();
+    for (auto& fontInfo : m_vecFontInfo)
+      fontInfo.sourceRes = m_skinResolution;
+    CLog::Log(LOGDEBUG, "Infinity responsive fonts: logical={}x{}",
+              m_skinResolution.iWidth, m_skinResolution.iHeight);
+  }
+'''
+    new='''  if (g_SkinInfo && g_SkinInfo->UsesNativeWindowAdaptation())
+  {
+    // Keep glyphs on the same uniform scale as the live Kodi canvas. This applies to the
+    // Infinity responsive skin and, on Android, ordinary legacy skins such as Estuary.
+    m_skinResolution = g_SkinInfo->GetNativeWindowResolution(m_skinResolution);
+    for (auto& fontInfo : m_vecFontInfo)
+      fontInfo.sourceRes = m_skinResolution;
+    CLog::Log(LOGDEBUG, "Infinity adaptive fonts: logical={}x{} responsive_skin={}",
+              m_skinResolution.iWidth, m_skinResolution.iHeight,
+              g_SkinInfo->UsesNativeResponsiveLayout());
+  }
+'''
+    return once(s,old,new,"adaptive font source resolution")
 
 def patch_control_h(s):
     s=once(s,"#include <vector>\n","#include <string>\n#include <vector>\n","GUIControl string include")
@@ -560,7 +709,8 @@ def patch_window_cpp(s):
   // Cobra-like ownership: retain the live window/control objects. Kodi changes the logical
   // viewport and asks every existing control to recompute its original XML geometry in place.
   m_coordsRes = next;
-  g_SkinInfo->RefreshNativeResponsiveIncludes();
+  if (g_SkinInfo->UsesNativeResponsiveLayout())
+    g_SkinInfo->RefreshNativeResponsiveIncludes();
   SetProperty("Infinity.NativeResponsive", true);
   SetProperty("Infinity.ResponsiveClass", g_SkinInfo->GetNativeResponsiveClass());
   SetProperty("Infinity.LogicalWidth", next.iWidth);
@@ -598,7 +748,7 @@ def patch_window_cpp(s):
 
     # Responsive resize messages schedule the reflow and do not immediately fan out against old bounds.
     old='''        if (message.GetParam1() == GUI_MSG_WINDOW_RESIZE && g_SkinInfo &&
-            g_SkinInfo->UsesNativeResponsiveLayout())
+            g_SkinInfo->UsesNativeWindowAdaptation())
         {
           m_infinityResponsiveReloadPending = true;
           m_infinityResponsiveResizeAt = std::chrono::steady_clock::now();
@@ -629,6 +779,9 @@ def patch_window_cpp(s):
 
 def verify(root):
     required={
+      SKIN_H:["UsesNativeWindowAdaptation","GetNativeWindowResolution"],
+      SKIN_CPP:["infinity-android-adaptive","Preserve the skin profile's logical area","mismatch <= 1.03f"],
+      FONT_CPP:["Infinity adaptive fonts:","GetNativeWindowResolution"],
       CONTROL_H:["GUIResponsiveLayoutSpec","ReflowResponsiveLayout(float parentWidth"],
       CONTROL_CPP:["InfinityResolveResponsiveAxis","CGUIControl::ReflowResponsiveLayout"],
       GROUP_H:["ReflowResponsiveLayout(float parentWidth, float parentHeight) override"],
@@ -693,6 +846,7 @@ def main():
     a=ap.parse_args();root=a.source.resolve()
     if a.mode=="apply":
       for p,fn in [
+        (SKIN_H,patch_skin_h),(SKIN_CPP,patch_skin_cpp),(FONT_CPP,patch_font_cpp),
         (CONTROL_H,patch_control_h),(CONTROL_CPP,patch_control_cpp),
         (GROUP_H,patch_group_h),(GROUP_CPP,patch_group_cpp),
         (FACTORY_CPP,patch_factory_cpp),(WINDOW_H,patch_window_h),(WINDOW_CPP,patch_window_cpp)
