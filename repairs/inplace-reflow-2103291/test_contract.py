@@ -13,7 +13,9 @@ def main():
 
     # The active resize path must retain the existing window/control tree.
     start=window.index('void CGUIWindow::InfinityReloadNativeResponsiveLayout()')
-    end=window.index('\n\nvoid CGUIWindow::DoProcess',start)
+    match=re.search(r'\nvoid CGUIWindow::DoProcess\s*\(',window[start:])
+    assert match,'GUIWindow DoProcess boundary missing'
+    end=start+match.start()+1
     method=window[start:end]
     for forbidden in ('FreeResources(true)','AllocResources(true)','SaveControlStates()',
                       'RestoreControlStates()','ClearAll()','Load('):
