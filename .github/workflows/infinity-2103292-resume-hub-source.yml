@@ -1,0 +1,67 @@
+name: Infinity | 2103292 Resume Hub Source Prep
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103292-resume-hub]
+    paths:
+      - 'repairs/resume-hub-2103292/source.tar.gz.b64.part*'
+      - '.github/workflows/infinity-2103292-resume-hub-source.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: infinity-2103292-resume-hub-source
+  cancel-in-progress: true
+
+jobs:
+  unpack-validate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: candidate-infinity-2103292-resume-hub
+
+      - name: Reconstruct Resume Hub source bundle
+        run: |
+          set -euo pipefail
+          cd repairs/resume-hub-2103292
+          cat source.tar.gz.b64.part00 source.tar.gz.b64.part01               source.tar.gz.b64.part02 source.tar.gz.b64.part03 | base64 -d > source.tar.gz
+          gzip -t source.tar.gz
+          rm -rf src
+          mkdir -p src
+          tar -xzf source.tar.gz -C src
+          echo "Resume Hub source files:"
+          find src -type f | sort
+          test "$(find src -type f | wc -l)" -gt 0
+
+      - name: Python/XML preflight
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import py_compile, xml.etree.ElementTree as ET
+          root=Path('repairs/resume-hub-2103292/src')
+          for p in root.rglob('*.py'):
+              py_compile.compile(str(p), doraise=True)
+          for p in root.rglob('*.xml'):
+              ET.parse(p)
+          print('PASS: Resume Hub source Python/XML preflight')
+          PY
+
+      - name: Commit unpacked source for auditability
+        run: |
+          set -euo pipefail
+          rm repairs/resume-hub-2103292/source.tar.gz
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add repairs/resume-hub-2103292/src
+          if git diff --cached --quiet; then
+            echo "No extracted source changes to commit"
+          else
+            git commit -m "Unpack and validate Resume Hub 2103292 source"
+            git push origin HEAD:candidate-infinity-2103292-resume-hub
+          fi
