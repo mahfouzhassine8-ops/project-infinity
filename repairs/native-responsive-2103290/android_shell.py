@@ -138,7 +138,7 @@ def apply(root,receipt):
  gradle=g.read_text();gradle=once(gradle,'versionCode 2103288',f'versionCode {VERSION_CODE}',"version code")
  gradle=once(gradle,'versionName "1.0.9-Evidence-First-Health-RC1"',f'versionName "{VERSION_NAME}"',"version name")
  g.write_text(gradle)
- result=verify(root);receipt.parent.mkdir(parents=True,exist_ok=True);receipt.write_text(json.dumps(result,indent=2,sort_keys=True)+'\\n')
+ result=verify(root);receipt.parent.mkdir(parents=True,exist_ok=True);receipt.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
 
 def verify(root):
  blob=(root/CHOOSER).read_text()+(root/SPLASH).read_text()+(root/TRACE).read_text()
@@ -160,5 +160,5 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('mode',choices=['apply','verify']);ap.add_argument('--root',type=Path,required=True);ap.add_argument('--receipt',type=Path,required=True);a=ap.parse_args()
  if a.mode=='apply':apply(a.root.resolve(),a.receipt.resolve())
  else:
-  result=verify(a.root.resolve());a.receipt.parent.mkdir(parents=True,exist_ok=True);a.receipt.write_text(json.dumps(result,indent=2,sort_keys=True)+'\\n');print("PASS: 2103290 Android shell responsive contract verified")
+  result=verify(a.root.resolve());a.receipt.parent.mkdir(parents=True,exist_ok=True);a.receipt.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n');print("PASS: 2103290 Android shell responsive contract verified")
 if __name__=='__main__':main()
