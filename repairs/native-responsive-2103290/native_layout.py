@@ -16,6 +16,7 @@ SKIN_H=Path("xbmc/addons/Skin.h")
 SKIN_CPP=Path("xbmc/addons/Skin.cpp")
 WIN_H=Path("xbmc/guilib/GUIWindow.h")
 WIN_CPP=Path("xbmc/guilib/GUIWindow.cpp")
+FONT_CPP=Path("xbmc/guilib/GUIFontManager.cpp")
 ANDROID=Path("xbmc/windowing/android/WinSystemAndroid.cpp")
 
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -469,6 +470,37 @@ void CGUIWindow::InfinityReloadNativeResponsiveLayout()
     s=once(s,old,new,"GUIWindow resize schedule")
     return s
 
+def patch_font_cpp(s):
+    old='''void GUIFontManager::ReloadTTFFonts(void)
+{
+  CWinSystemBase* const winSystem = CServiceBroker::GetWinSystem();
+  if (m_vecFonts.empty() || !winSystem)
+    return; // we haven't even loaded fonts in yet
+
+  for (size_t i = 0; i < m_vecFonts.size(); ++i)
+'''
+    new='''void GUIFontManager::ReloadTTFFonts(void)
+{
+  CWinSystemBase* const winSystem = CServiceBroker::GetWinSystem();
+  if (m_vecFonts.empty() || !winSystem)
+    return; // we haven't even loaded fonts in yet
+
+  if (g_SkinInfo && g_SkinInfo->UsesNativeResponsiveLayout())
+  {
+    // Responsive Font.xml uses one short-axis-normalized font contract for every class.
+    // Refresh the source resolution before the normal font scaler runs so a Fold/aspect
+    // transition cannot reintroduce independent X/Y font distortion from the startup canvas.
+    m_skinResolution = g_SkinInfo->GetNativeResponsiveResolution();
+    for (auto& fontInfo : m_vecFontInfo)
+      fontInfo.sourceRes = m_skinResolution;
+    CLog::Log(LOGDEBUG, "Infinity responsive fonts: logical={}x{}",
+              m_skinResolution.iWidth, m_skinResolution.iHeight);
+  }
+
+  for (size_t i = 0; i < m_vecFonts.size(); ++i)
+'''
+    return once(s,old,new,"responsive font source resolution")
+
 def patch_android(s):
     s=once(s,'#include "ServiceBroker.h"\n',
            '#include "ServiceBroker.h"\n#include "addons/Skin.h"\n',"Android Skin include")
@@ -511,6 +543,7 @@ def verify(root):
       SKIN_CPP:["infinity-native-responsive-v1.json","responsive/base","InfinityUsableSize","INFINITY_RESPONSIVE_SHORT_AXIS"],
       WIN_H:["m_infinityResponsiveReloadPending","InfinityReloadNativeResponsiveLayout"],
       WIN_CPP:["std::chrono::milliseconds(90)","Infinity responsive window:","Infinity.ResolvedXML"],
+      FONT_CPP:["Infinity responsive fonts:","GetNativeResponsiveResolution","fontInfo.sourceRes = m_skinResolution"],
       ANDROID:["Infinity responsive viewport:","Infinity.NativeResponsive"],
     }
     for p,tokens in required.items():
@@ -539,7 +572,7 @@ def main():
     a=ap.parse_args(); root=a.source.resolve()
     if a.mode=="apply":
       patches=[(SKIN_H,patch_skin_h),(SKIN_CPP,patch_skin_cpp),(WIN_H,patch_window_h),
-               (WIN_CPP,patch_window_cpp),(ANDROID,patch_android)]
+               (WIN_CPP,patch_window_cpp),(FONT_CPP,patch_font_cpp),(ANDROID,patch_android)]
       for p,fn in patches:
         path=root/p; path.write_text(fn(path.read_text()),encoding="utf-8")
     result=verify(root); a.receipt.parent.mkdir(parents=True,exist_ok=True)
