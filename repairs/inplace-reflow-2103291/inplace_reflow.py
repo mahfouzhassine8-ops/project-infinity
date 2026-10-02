@@ -683,6 +683,47 @@ def patch_window_cpp(s):
 
 '''
     s=once(s,anchor,root_method+anchor,"GUIWindow root in-place reflow")
+    s=once(s,
+'''  if (!m_windowLoaded || !g_SkinInfo || !g_SkinInfo->UsesNativeResponsiveLayout())
+    return false;
+''',
+'''  if (!m_windowLoaded || !g_SkinInfo || !g_SkinInfo->UsesNativeWindowAdaptation())
+    return false;
+''',"GUIWindow adaptive eligibility")
+
+    s=once(s,
+'''  RESOLUTION_INFO candidate;
+  const std::string resolved = g_SkinInfo->GetSkinPath(xmlFile, &candidate);
+  if (next)
+    *next = candidate;
+''',
+'''  RESOLUTION_INFO candidate;
+  const std::string resolved = g_SkinInfo->GetSkinPath(xmlFile, &candidate);
+  if (!g_SkinInfo->UsesNativeResponsiveLayout() &&
+      m_coordsRes.strId == "infinity-android-adaptive")
+  {
+    // Preserve the live legacy skin's logical area across Fold/rotation changes instead of
+    // jumping scale when Kodi's closest legacy profile happens to change.
+    candidate = g_SkinInfo->GetNativeWindowResolution(m_coordsRes);
+  }
+  if (next)
+    *next = candidate;
+''',"GUIWindow preserve legacy adaptive scale")
+
+    s=once(s,
+'''  if (!g_SkinInfo || !g_SkinInfo->UsesNativeResponsiveLayout())
+    return;
+  SetProperty("Infinity.NativeResponsive", true);
+  SetProperty("Infinity.ResponsiveClass", g_SkinInfo->GetNativeResponsiveClass());
+''',
+'''  if (!g_SkinInfo || !g_SkinInfo->UsesNativeWindowAdaptation())
+    return;
+  SetProperty("Infinity.NativeResponsive", g_SkinInfo->UsesNativeResponsiveLayout());
+  SetProperty("Infinity.ResponsiveClass",
+              g_SkinInfo->UsesNativeResponsiveLayout() ? g_SkinInfo->GetNativeResponsiveClass()
+                                                       : "legacy-adaptive");
+''',"GUIWindow publish adaptive properties")
+
     # Replace the 2103290 unload/reallocate body with in-place geometry recompute.
     start,end=method_span(s,"void CGUIWindow::InfinityReloadNativeResponsiveLayout()")
     old=s[start:end]
@@ -751,7 +792,7 @@ def patch_window_cpp(s):
 
     # Responsive resize messages schedule the reflow and do not immediately fan out against old bounds.
     old='''        if (message.GetParam1() == GUI_MSG_WINDOW_RESIZE && g_SkinInfo &&
-            g_SkinInfo->UsesNativeWindowAdaptation())
+            g_SkinInfo->UsesNativeResponsiveLayout())
         {
           m_infinityResponsiveReloadPending = true;
           m_infinityResponsiveResizeAt = std::chrono::steady_clock::now();
