@@ -60,3 +60,21 @@ The final in-place reflow line must report:
 `controls_reused=true window_reload=false`.
 
 Physical device acceptance remains required before promotion beyond candidate.
+
+
+## Default Kodi skin core check
+
+This is now a required core-Kodi acceptance case, independent of the Infinity skin.
+
+1. Switch to Kodi's bundled Estuary/default skin.
+2. Start on the inner/main Fold screen and confirm normal proportions.
+3. Fold to the tall cover/front screen without restarting Kodi.
+4. The UI must not become horizontally squeezed or vertically stretched.
+5. Text glyphs/icons must preserve their aspect ratio.
+6. Touch targets must continue to match the rendered controls.
+7. Fold back to the inner screen and verify the same window/focus remains usable.
+
+The user reproduced the pre-fix failure with Estuary itself: the inner view was acceptable, while the
+cover view showed the entire Kodi GUI compressed horizontally. That proves the remaining defect is
+not Infinity-skin-only. 2103291 therefore includes an Android legacy-skin adaptive logical canvas in
+addition to the Infinity marker-based responsive path.
