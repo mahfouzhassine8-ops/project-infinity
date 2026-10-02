@@ -549,6 +549,12 @@ def patch_window_cpp(s):
   // viewport and asks every existing control to recompute its original XML geometry in place.
   m_coordsRes = next;
   g_SkinInfo->RefreshNativeResponsiveIncludes();
+  SetProperty("Infinity.NativeResponsive", true);
+  SetProperty("Infinity.ResponsiveClass", g_SkinInfo->GetNativeResponsiveClass());
+  SetProperty("Infinity.LogicalWidth", next.iWidth);
+  SetProperty("Infinity.LogicalHeight", next.iHeight);
+  SetProperty("Infinity.InPlaceReflow", true);
+  SetProperty("Infinity.ResponsiveCandidateXML", resolved);
   InfinityReflowRootGeometry();
 
   m_width = 0.0f;
