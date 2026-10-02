@@ -10,7 +10,7 @@ on:
 permissions: {contents: read, actions: read}
 concurrency:
   group: infinity-2103291-inplace-reflow
-  cancel-in-progress: false
+  cancel-in-progress: true
 env:
   NDK_VER: 21.4.7075529
 
