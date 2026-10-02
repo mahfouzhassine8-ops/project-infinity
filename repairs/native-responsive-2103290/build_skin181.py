@@ -120,6 +120,19 @@ def convert_xml(src,dst,ref):
         v=number(n.text)
         if v is not None:n.text=fmt(v*scale)
     if root.tag=='window':
+      # Window/dialog origin is presentation too. Keep it proportional to the dynamic Kodi canvas
+      # so dialogs do not remain pinned to old 1920x1080 coordinates after a Fold resize.
+      coords=root.find('coordinates')
+      if coords is not None:
+        for tag,axis in (('left',rw),('posx',rw),('top',rh),('posy',rh)):
+          node=coords.find(tag)
+          if node is not None and node.text:
+            v=number(node.text)
+            if v is not None: node.text=fmt(v*scale) if v<0 else pct(v,axis)
+        for origin in coords.findall('origin'):
+          for attr,axis in (('x',rw),('y',rh)):
+            v=number(origin.get(attr))
+            if v is not None: origin.set(attr,fmt(v*scale) if v<0 else pct(v,axis))
       controls=root.find('controls')
       if controls is not None:
         for c in controls.findall('control'):convert_control(c,rw,rh,scale)
