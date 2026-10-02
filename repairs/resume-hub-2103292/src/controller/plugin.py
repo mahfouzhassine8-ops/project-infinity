@@ -138,6 +138,15 @@ def _list_item(entry, data, bucket='', list_name=''):
     li.setProperty('IsPlayable', 'true')
     li.setProperty('Infinity.ResumeHub.Key', key)
     li.setProperty('Infinity.ResumeHub.Watched', 'true' if watched else 'false')
+    li.setProperty('Infinity.ResumeHub.InProgress', 'true' if in_progress else 'false')
+    li.setProperty('Infinity.ResumeHub.State', 'in-progress' if in_progress else ('watched' if watched else 'unwatched'))
+    li.setProperty('Infinity.ResumeHub.Revision', str(data.get('revision', 0) or 0))
+    # Publish both the dedicated Resume Hub state and Kodi-compatible fallbacks. Existing Infinity
+    # watched overlays already consume Kodi playcount/overlay state; these properties let shared
+    # skin includes consume the same state without inventing a second watched database.
+    li.setProperty('Watched', 'true' if watched else 'false')
+    li.setProperty('PlayCount', '1' if watched else '0')
+    li.setProperty('Overlay', '6' if watched else '0')
     li.setProperty('Infinity.ResumeHub.Bucket', bucket)
     if rating:
         li.setProperty('Rating', str(rating))
