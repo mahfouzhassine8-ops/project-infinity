@@ -1,16 +1,6 @@
 name: Infinity | 2103290 Native Responsive Layout
 on:
   workflow_dispatch:
-  push:
-    branches: [candidate-infinity-2103290-native-responsive-layout]
-    paths:
-      - 'repairs/native-responsive-2103290/native_layout.py'
-      - 'repairs/native-responsive-2103290/android_shell.py'
-      - 'repairs/native-responsive-2103290/prepare_base.py'
-      - 'repairs/native-responsive-2103290/package_metadata.py'
-      - 'repairs/native-responsive-2103290/test_contract.py'
-      - 'repairs/native-responsive-2103290/DEVICE-TEST.md'
-      - '.github/workflows/infinity-2103290-native-responsive.yml'
 permissions: {contents: read, actions: read}
 concurrency:
   group: infinity-2103290-native-responsive-${{ github.sha }}
