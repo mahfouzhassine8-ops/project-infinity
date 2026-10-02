@@ -16,7 +16,7 @@ This is marker-gated by the existing Infinity Native Responsive Layout v1 path a
 Non-responsive Kodi skins keep the upstream behavior and never call the new reflow path.
 """
 from pathlib import Path
-import argparse, hashlib, json
+import argparse, hashlib, json, re
 
 CONTROL_H=Path("xbmc/guilib/GUIControl.h")
 CONTROL_CPP=Path("xbmc/guilib/GUIControl.cpp")
@@ -522,7 +522,9 @@ def patch_window_cpp(s):
     s=once(s,anchor,root_method+anchor,"GUIWindow root in-place reflow")
     # Replace the 2103290 unload/reallocate body with in-place geometry recompute.
     start=s.index("void CGUIWindow::InfinityReloadNativeResponsiveLayout()")
-    end=s.index("\n\nvoid CGUIWindow::DoProcess",start)
+    match=re.search(r"\nvoid CGUIWindow::DoProcess\s*\(",s[start:])
+    if not match: raise RuntimeError("GUIWindow DoProcess boundary not found after 2103290 transform")
+    end=start+match.start()+1
     old=s[start:end]
     new=r'''void CGUIWindow::InfinityReloadNativeResponsiveLayout()
 {
