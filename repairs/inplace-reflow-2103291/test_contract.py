@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Host/source contract checks for Infinity 2103291 in-place responsive reflow."""
 from pathlib import Path
-import argparse,re
+import argparse,re,math
 
 def method_span(s, signature):
     start=s.index(signature)
@@ -36,6 +36,22 @@ def main():
                      'controls_reused=true window_reload=false'):
         assert required in method,required
 
+
+    # The user's default Estuary reproduction is a core-Kodi test: a 4:3 source canvas must become
+    # aspect-matched rather than independently squeezed when moving between the near-square inner
+    # window and the very tall cover window.
+    def adaptive(source_w, source_h, target_w, target_h):
+        ratio=target_w/target_h
+        area=source_w*source_h
+        w=max(8,round(math.sqrt(area*ratio)/8)*8)
+        h=max(8,round(math.sqrt(area/ratio)/8)*8)
+        return w,h
+    for target in ((1384,1536),(658,1536)):
+        w,h=adaptive(1920,1440,*target)
+        sx=target[0]/w; sy=target[1]/h
+        assert abs(sx-sy) < 0.01,(target,(w,h),sx,sy)
+        assert abs((w/h)-(target[0]/target[1])) < 0.01,(target,(w,h))
+
     # Generic control geometry is driven by the same XML grammar Kodi used at load time.
     for required in ('InfinityResponsiveParse','InfinityResolveResponsiveAxis',
                      "if (*end == 'r')","else if (*end == '%')",
@@ -51,6 +67,9 @@ def main():
                   '"top"','"bottom"','"centertop"','"centerbottom"','"height"','"posy"'):
         assert token in factory,token
     joined=control+group+factory+window
+    for required in ('UsesNativeWindowAdaptation','GetNativeWindowResolution',
+                     'infinity-android-adaptive','legacy-adaptive'):
+        assert required in joined,required
     for forbidden in ('SM-F976','Galaxy Fold','Z Fold','q8q'):
         assert forbidden not in joined,forbidden
 
