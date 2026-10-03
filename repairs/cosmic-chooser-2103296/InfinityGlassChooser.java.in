@@ -1,0 +1,368 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.Typeface;
+import android.os.SystemClock;
+import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+/** Android chooser presentation only. The existing Actions retain routing/settings ownership.
+ * Kodi's native responsive engine, playback, providers and skin are never called or changed here.
+ * Both palettes instantiate this exact control tree and the same window-local geometry.
+ */
+final class InfinityGlassChooser extends FrameLayout {
+  interface Actions {
+    void enter(String experience);
+    void settings(String experience);
+    void themes();
+    String appearance();
+    void appearanceChanged();
+  }
+  static final int ENTER_INFINITY=0x00f02571, ENTER_COBRA=0x00f02572;
+  static final int SETTINGS_INFINITY=0x00f02573, SETTINGS_COBRA=0x00f02574;
+  // Retained source compatibility; the approved target has no theme-specific entry pills.
+  static final int PILL_INFINITY=0x00f02575, PILL_COBRA=0x00f02576;
+  final Actions actions;
+  final boolean light;
+  final String mode;
+  final FrameLayout content;
+  final ScrollView scroll;
+  final Stage stage;
+  final CosmicBackdrop backdrop;
+  private final SharedPreferences preferences;
+  private boolean subscribed,refreshQueued,attached;
+  private final Runnable refresh=()->{
+    refreshQueued=false;
+    if(attached && !mode.equals(actions.appearance())) actions.appearanceChanged();
+  };
+  private final SharedPreferences.OnSharedPreferenceChangeListener listener=(p,key)->{
+    if("cobra_appearance_mode".equals(key)||"cobra_system_dark_variant".equals(key)) requestThemeCheck();
+  };
+  static int background(boolean light){return light?0xffeaf3fc:0xff030914;}
+
+  InfinityGlassChooser(Context context,Actions actions){
+    super(context);this.actions=actions;mode=actions.appearance();light="light".equals(mode);
+    preferences=context.getSharedPreferences("infinity_cobra_live",Context.MODE_PRIVATE);
+    setTag("infinity_cosmic_chooser_candidate");setLongClickable(false);
+    setBackgroundColor(background(light));
+    backdrop=new CosmicBackdrop(context,light);addView(backdrop,new LayoutParams(-1,-1));
+    stage=new Stage(context,light,actions);
+    content=new FrameLayout(context){
+      @Override protected void onMeasure(int w,int h){
+        stage.viewportHint=Math.max(1,MeasureSpec.getSize(h)-getPaddingTop()-getPaddingBottom());
+        super.onMeasure(w,h);
+      }
+    };
+    content.setClipToPadding(true);content.setClipChildren(true);content.setLongClickable(false);
+    scroll=new ScrollView(context);scroll.setFillViewport(true);scroll.setOverScrollMode(OVER_SCROLL_NEVER);
+    scroll.setVerticalScrollBarEnabled(false);scroll.setClipToPadding(true);
+    scroll.addView(stage,new ScrollView.LayoutParams(-1,-2));
+    content.addView(scroll,new LayoutParams(-1,-1));addView(content,new LayoutParams(-1,-1));
+  }
+  private void requestThemeCheck(){if(!refreshQueued){refreshQueued=true;post(refresh);}}
+  @Override protected void onAttachedToWindow(){
+    super.onAttachedToWindow();attached=true;
+    if(!subscribed){preferences.registerOnSharedPreferenceChangeListener(listener);subscribed=true;}
+    requestThemeCheck();
+  }
+  @Override protected void onDetachedFromWindow(){
+    attached=false;if(subscribed){preferences.unregisterOnSharedPreferenceChangeListener(listener);subscribed=false;}
+    removeCallbacks(refresh);refreshQueued=false;super.onDetachedFromWindow();
+  }
+  @Override protected void onConfigurationChanged(Configuration configuration){
+    super.onConfigurationChanged(configuration);requestThemeCheck();requestLayout();
+  }
+  void focusEntry(){stage.infinity.requestFocus();}
+  private static int px(Context c,float value){return Math.round(value*c.getResources().getDisplayMetrics().density);}
+
+  /** Uses the live inset-adjusted Android viewport, not handset IDs or display-global coordinates.
+   * Short windows scroll the same composition, rather than hiding settings or replacing the design.
+   */
+  static final class Stage extends ViewGroup {
+    final boolean light;
+    final Card infinity,cobra;
+    final Label time,date,weather,choose,experience,subtitle,hmCopy,footer,footerAccent;
+    final Orb orb;
+    int viewportHint;
+    final InfinityChooserWeather weatherData;
+    private boolean ticking;
+    private final Runnable clockTick=()->{if(ticking){updateClock();postDelayed(this.clockTick(),1000);}};
+    // Method avoids referring to a not-yet-initialized field in the lambda initializer.
+    private Runnable clockTick(){return clockTick;}
+    Stage(Context c,boolean light,Actions actions){
+      super(c);this.light=light;setClipChildren(true);setClipToPadding(true);setLongClickable(false);
+      int ink=light?0xff071a30:0xfff5f7fc;
+      time=label("live-time","",30,ink,0,Gravity.START|Gravity.CENTER_VERTICAL);
+      date=label("live-full-date","",12,ink,0,Gravity.START|Gravity.CENTER_VERTICAL);
+      weather=label("live-weather","Weather unavailable",12,ink,0,Gravity.START|Gravity.CENTER_VERTICAL);
+      weather.setEllipsize(TextUtils.TruncateAt.END);
+      weatherData=new InfinityChooserWeather(c,weather);
+      orb=new Orb(c,light);orb.setTag("hm-orb");addView(orb);
+      hmCopy=label("hm-copy","BUILT DIFFERENT\nFOR A HIGHER",9,ink,0,Gravity.CENTER);
+      choose=label("choose-heading","CHOOSE YOUR",17,ink,.28f,Gravity.CENTER);
+      experience=label("experience-heading","EXPERIENCE",36,ink,.16f,Gravity.CENTER);
+      experience.gradient=true;
+      subtitle=label("choose-subtitle","TWO UNIVERSES. ONE HIGHER STANDARD.",10,ink,.12f,Gravity.CENTER);
+      infinity=new Card(c,light,false,actions);cobra=new Card(c,light,true,actions);addView(infinity);addView(cobra);
+      footer=label("choose-footer","MORE THAN ENTERTAINMENT",9,ink,.18f,Gravity.CENTER);
+      footerAccent=label("choose-footer-accent","A HIGHER EXPERIENCE",12,light?0xff78520f:0xffffd48b,.24f,Gravity.CENTER);
+      infinity.setNextFocusRightId(ENTER_COBRA);cobra.setNextFocusLeftId(ENTER_INFINITY);
+      infinity.setNextFocusDownId(SETTINGS_INFINITY);cobra.setNextFocusDownId(SETTINGS_COBRA);
+      updateClock();
+    }
+    private Label label(String tag,String text,float size,int color,float tracking,int gravity){
+      Label v=new Label(getContext(),text,size,color,tracking,gravity);v.setTag(tag);addView(v);return v;
+    }
+    private void updateClock(){
+      Date now=new Date();time.setText(android.text.format.DateFormat.getTimeFormat(getContext()).format(now));
+      date.setText(DateFormat.getDateInstance(DateFormat.FULL,Locale.getDefault()).format(now));
+    }
+    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();weatherData.start();syncClock();}
+    @Override protected void onDetachedFromWindow(){weatherData.stop();ticking=false;removeCallbacks(clockTick);super.onDetachedFromWindow();}
+    @Override protected void onWindowVisibilityChanged(int visibility){super.onWindowVisibilityChanged(visibility);syncClock();if(weatherData!=null){if(visibility==VISIBLE&&isAttachedToWindow())weatherData.start();else weatherData.stop();}}
+    private void syncClock(){
+      removeCallbacks(clockTick);ticking=isAttachedToWindow()&&getWindowVisibility()==VISIBLE&&isShown();
+      if(ticking){updateClock();postDelayed(clockTick,1000);}
+    }
+    private void measure(View v,int w,int h){v.measure(MeasureSpec.makeMeasureSpec(Math.max(1,w),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Math.max(1,h),MeasureSpec.EXACTLY));}
+    @Override protected void onMeasure(int ws,int hs){
+      int w=Math.max(1,MeasureSpec.getSize(ws));
+      int h=Math.max(viewportHint,px(getContext(),620));
+      int margin=Math.min(w/12,px(getContext(),24)),orbW=Math.min(px(getContext(),62),w/5);
+      int dataW=Math.max(1,w-2*margin-orbW-px(getContext(),12));
+      measure(time,dataW,px(getContext(),40));measure(date,dataW,px(getContext(),24));measure(weather,dataW,px(getContext(),26));
+      measure(orb,orbW,orbW);measure(hmCopy,orbW+margin,px(getContext(),32));
+      int headingW=w-2*margin;
+      measure(choose,headingW,px(getContext(),32));measure(experience,headingW,px(getContext(),56));measure(subtitle,headingW,px(getContext(),25));
+      int gap=Math.max(px(getContext(),12),Math.min(px(getContext(),28),w/30));
+      int cardW=Math.min((w-2*margin-gap)/2,Math.min(px(getContext(),340),Math.round(h*.28f)));
+      cardW=Math.max(1,cardW);int cardH=Math.max(px(getContext(),228),Math.round(cardW*1.5f));
+      measure(infinity,cardW,cardH);measure(cobra,cardW,cardH);
+      measure(footer,headingW,px(getContext(),24));measure(footerAccent,headingW,px(getContext(),28));
+      // Enough quiet horizon remains below cards. Everything stays reachable at large font scales.
+      h=Math.max(h,px(getContext(),265)+cardH+px(getContext(),100));
+      setMeasuredDimension(w,h);
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+      int w=getWidth(),h=getHeight(),margin=Math.min(w/12,px(getContext(),24));
+      int top=px(getContext(),12),orbW=orb.getMeasuredWidth();
+      place(time,margin,top);place(date,margin,top+time.getMeasuredHeight());
+      place(weather,margin,top+time.getMeasuredHeight()+date.getMeasuredHeight());
+      place(orb,w-margin-orbW,top);place(hmCopy,w-margin-orbW-margin/2,top+orbW+px(getContext(),5));
+      int headingTop=Math.max(px(getContext(),136),Math.round(h*.20f));
+      place(choose,margin,headingTop);place(experience,margin,headingTop+choose.getMeasuredHeight());
+      place(subtitle,margin,headingTop+choose.getMeasuredHeight()+experience.getMeasuredHeight());
+      int gap=Math.max(px(getContext(),12),Math.min(px(getContext(),28),w/30));
+      int cardW=infinity.getMeasuredWidth(),cardH=infinity.getMeasuredHeight();
+      int cardTop=Math.max(headingTop+choose.getMeasuredHeight()+experience.getMeasuredHeight()+subtitle.getMeasuredHeight()+px(getContext(),22),Math.round(h*.39f));
+      cardTop=Math.min(cardTop,h-cardH-px(getContext(),96));
+      int x=(w-(cardW*2+gap))/2;place(infinity,x,cardTop);place(cobra,x+cardW+gap,cardTop);
+      place(footer,margin,h-px(getContext(),66));place(footerAccent,margin,h-px(getContext(),42));
+    }
+    private void place(View v,int x,int y){v.layout(x,y,x+v.getMeasuredWidth(),y+v.getMeasuredHeight());}
+  }
+
+  static final class Label extends TextView {
+    final float size;boolean gradient;
+    Label(Context c,String text,float size,int color,float tracking,int gravity){
+      super(c);this.size=size;setText(text);setTextColor(color);setGravity(gravity);
+      setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));setLetterSpacing(tracking);
+      setIncludeFontPadding(false);setPadding(0,0,0,0);setMaxLines(text.contains("\n")?3:1);
+      setEllipsize(TextUtils.TruncateAt.END);setClickable(false);setFocusable(false);
+    }
+    @Override protected void onMeasure(int ws,int hs){
+      float target=px(getContext(),size)*Math.min(1.3f,getResources().getConfiguration().fontScale);
+      setTextSize(TypedValue.COMPLEX_UNIT_PX,target);
+      int w=MeasureSpec.getSize(ws),h=MeasureSpec.getSize(hs);
+      String[] lines=getText().toString().split("\n");
+      // Long live weather is ellipsized, not made microscopic. Static headings fit the window.
+      if(!"live-weather".equals(getTag())&&!"live-full-date".equals(getTag())){
+        for(int i=0;i<30;i++){
+          float widest=0;for(String line:lines)widest=Math.max(widest,getPaint().measureText(line));
+          if(widest<=w*.97f&&getPaint().getFontSpacing()*lines.length<=h*1.06f)break;
+          target*=.96f;setTextSize(TypedValue.COMPLEX_UNIT_PX,target);
+        }
+      }
+      super.onMeasure(ws,hs);
+    }
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){
+      super.onSizeChanged(w,h,ow,oh);
+      if(gradient)getPaint().setShader(new LinearGradient(0,0,w,0,new int[]{0xffd1a14b,0xfffce2a0,0xff88d4fa,0xff3ca6db},null,Shader.TileMode.CLAMP));
+    }
+  }
+
+  /** Cards and children remain fixed while only their sibling background animates. */
+  static final class Card extends ViewGroup {
+    final boolean light,cobra;final Gear gear;final Label title,tagline;final Brand mark;
+    private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF rect=new RectF();private float radius;
+    Card(Context c,boolean light,boolean cobra,Actions actions){
+      super(c);this.light=light;this.cobra=cobra;setWillNotDraw(false);setClipChildren(true);
+      setId(cobra?ENTER_COBRA:ENTER_INFINITY);setTag(cobra?"experience-enter-cobra":"experience-enter-infinity");
+      setFocusable(true);setClickable(true);setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+      setContentDescription(cobra?"Cobra. Faster. Bolder. Relentless. Open Cobra.":"Infinity. Cleaner. Smarter. Higher. Open Infinity.");
+      setOnClickListener(v->actions.enter(cobra?"live":"infinity"));
+      mark=new Brand(c,cobra);addView(mark);
+      int ink=light?0xff071a30:cobra?0xffa2ecff:0xffffdf99;
+      title=new Label(c,cobra?"COBRA":"INFINITY",24,ink,.12f,Gravity.CENTER);title.setTag(cobra?"cobra-title":"infinity-title");addView(title);
+      tagline=new Label(c,cobra?"FASTER.\nBOLDER.\nRELENTLESS.":"CLEANER.\nSMARTER.\nHIGHER.",11,light?0xff071a30:0xffedf5fa,.14f,Gravity.CENTER);
+      tagline.setTag(cobra?"cobra-tagline":"infinity-tagline");addView(tagline);
+      gear=new Gear(c,light,cobra);gear.setId(cobra?SETTINGS_COBRA:SETTINGS_INFINITY);
+      gear.setTag(cobra?"experience-settings-cobra":"experience-settings-infinity");
+      gear.setContentDescription(cobra?"Cobra settings and recovery":"Infinity settings and Health Center");
+      gear.setOnClickListener(v->actions.settings(cobra?"live":"infinity"));addView(gear);
+      gear.setNextFocusUpId(getId());gear.setNextFocusLeftId(cobra?SETTINGS_INFINITY:ENTER_COBRA);
+      gear.setNextFocusRightId(cobra?ENTER_INFINITY:SETTINGS_COBRA);
+    }
+    @Override protected void onMeasure(int ws,int hs){
+      int w=MeasureSpec.getSize(ws),h=MeasureSpec.getSize(hs);setMeasuredDimension(w,h);
+      int inset=Math.max(6,w/14),gearSize=Math.min(w-inset*2,px(getContext(),48));
+      exact(mark,w-inset*2,Math.round(h*.30f));exact(title,w-inset*2,Math.round(h*.13f));
+      exact(tagline,w-inset*2,Math.round(h*.22f));exact(gear,gearSize,gearSize);
+    }
+    private void exact(View v,int w,int h){v.measure(MeasureSpec.makeMeasureSpec(Math.max(1,w),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Math.max(1,h),MeasureSpec.EXACTLY));}
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+      int w=getWidth(),h=getHeight();center(mark,Math.round(h*.13f));center(title,Math.round(h*.46f));
+      center(tagline,Math.round(h*.60f));center(gear,h-gear.getMeasuredHeight()-Math.max(px(getContext(),12),h/20));
+      radius=Math.min(px(getContext(),23),w*.10f);rect.set(3,3,w-3,h-3);
+    }
+    private void center(View v,int y){int x=(getWidth()-v.getMeasuredWidth())/2;v.layout(x,y,x+v.getMeasuredWidth(),y+v.getMeasuredHeight());}
+    @Override protected void onDraw(Canvas c){
+      int accent=cobra?0xff42dbfc:0xffffcb67;
+      paint.setStyle(Paint.Style.FILL);paint.setShader(new LinearGradient(0,0,getWidth(),getHeight(),
+          light?new int[]{0xf2ffffff,cobra?0xdba3dff5:0xdbe9d6ac,0xf2f6fbff}:new int[]{cobra?0xea072330:0xea261d0b,0xf202060b,cobra?0xf0083342:0xf035250b},null,Shader.TileMode.CLAMP));
+      c.drawRoundRect(rect,radius,radius,paint);paint.setShader(null);paint.setStyle(Paint.Style.STROKE);
+      for(int i=4;i>=1;i--){paint.setStrokeWidth(i*2f);paint.setColor((i==1?0xee000000:0x14000000)|(accent&0xffffff));c.drawRoundRect(rect,radius,radius,paint);}
+      paint.setStrokeWidth(1.2f);paint.setColor(light?0xdfffffff:0x9fffffff);
+      c.drawRoundRect(8,8,getWidth()-8,getHeight()-8,Math.max(1,radius-5),Math.max(1,radius-5),paint);
+    }
+    @Override protected void dispatchDraw(Canvas c){
+      super.dispatchDraw(c);if(isFocused()||isPressed()){
+        paint.setShader(null);paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(4);
+        paint.setColor(cobra?0xffb2f2ff:0xffffe4a5);c.drawRoundRect(rect,radius,radius,paint);
+      }
+    }
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+  }
+  static final class Gear extends View {
+    final boolean light,cobra;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);final Path cog=new Path();
+    Gear(Context c,boolean light,boolean cobra){super(c);this.light=light;this.cobra=cobra;setFocusable(true);setClickable(true);}
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){
+      float s=Math.min(w,h),cx=w/2f,cy=h/2f;cog.reset();
+      for(int i=0;i<40;i++){double a=i*Math.PI/20-Math.PI/2;float rad=s*((i%5==1||i%5==2)?.25f:.20f);
+        float x=cx+(float)Math.cos(a)*rad,y=cy+(float)Math.sin(a)*rad;if(i==0)cog.moveTo(x,y);else cog.lineTo(x,y);}
+      cog.close();
+    }
+    @Override protected void onDraw(Canvas c){
+      float s=Math.min(getWidth(),getHeight()),cx=getWidth()/2f,cy=getHeight()/2f;
+      int ink=light?0xff092338:0xfff5f8fa;p.setShader(null);p.setColor(ink);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.3f);
+      c.drawCircle(cx,cy,s*.46f,p);p.setStyle(Paint.Style.FILL);c.drawPath(cog,p);
+      p.setColor(light?0xfff1f6fa:cobra?0xff092432:0xff211a0c);c.drawCircle(cx,cy,s*.085f,p);
+      if(isFocused()||isPressed()){p.setColor(cobra?0xff4cddff:0xffffd077);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3);c.drawCircle(cx,cy,s*.46f,p);}
+    }
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+  }
+  static final class Orb extends View {
+    final boolean light;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
+    Orb(Context c,boolean light){super(c);this.light=light;setContentDescription("HM. Built different for a higher.");}
+    @Override protected void onDraw(Canvas c){
+      float s=Math.min(getWidth(),getHeight()),cx=getWidth()/2f,cy=getHeight()/2f;
+      p.setColor(light?0xff071a30:0xfff4f7fc);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.4f);c.drawCircle(cx,cy,s*.43f,p);
+      p.setStyle(Paint.Style.FILL);p.setTextSize(s*.32f);p.setTypeface(Typeface.create("sans-serif-medium",0));p.setTextAlign(Paint.Align.CENTER);
+      c.drawText("HM",cx,cy-(p.ascent()+p.descent())/2,p);
+    }
+  }
+  static final class Brand extends View {
+    final boolean cobra;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);final RectF dst=new RectF();
+    final Bitmap infinity;
+    Brand(Context c,boolean cobra){super(c);this.cobra=cobra;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+      infinity=cobra?null:InfinityGlassArt.decode("dark_gold_mark");if(cobra)CobraEmblem.prepare(c);
+    }
+    @Override protected void onDraw(Canvas c){
+      dst.set(0,0,getWidth(),getHeight());if(cobra){CobraEmblem.draw(c,dst,Color.WHITE,255);return;}
+      if(infinity==null)return;float scale=Math.min(getWidth()/(float)infinity.getWidth(),getHeight()/(float)infinity.getHeight());
+      float w=infinity.getWidth()*scale,h=infinity.getHeight()*scale;dst.set((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2);c.drawBitmap(infinity,null,dst,p);
+    }
+  }
+
+  /** No decoder, Surface, native calls, worker thread or activity reference. One capped callback.
+   * Static artwork remains visible if motion is disabled, lifecycle-paused or cannot be scheduled.
+   */
+  static final class CosmicBackdrop extends View {
+    final boolean light;Bitmap plate;boolean framePending,attached,focused=true,motionDisabled;
+    final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);final RectF dst=new RectF();
+    final float[] seeds=new float[96*4];long phaseMillis;private long lastFrame;
+    final Runnable frame=()->{
+      framePending=false;if(!eligible())return;
+      long now=SystemClock.uptimeMillis();phaseMillis+=Math.min(66,Math.max(0,now-lastFrame));lastFrame=now;
+      invalidate();schedule();
+    };
+    CosmicBackdrop(Context c,boolean light){
+      super(c);this.light=light;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);setClickable(false);setFocusable(false);
+      java.util.Random random=new java.util.Random(0x1f1f1026L);for(int i=0;i<seeds.length;i++)seeds[i]=random.nextFloat();
+      plate=InfinityCosmicArt.decode(light);setBackgroundColor(background(light));
+    }
+    boolean eligible(){return attached&&focused&&!motionDisabled&&getWindowVisibility()==VISIBLE&&isShown()&&isHardwareAccelerated();}
+    private void schedule(){if(eligible()&&!framePending){framePending=true;postDelayed(frame,33);}}
+    private void sync(){removeCallbacks(frame);framePending=false;lastFrame=SystemClock.uptimeMillis();schedule();invalidate();}
+    void setMotionDisabled(boolean disabled){motionDisabled=disabled;sync();}
+    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();attached=true;focused=hasWindowFocus();if(plate==null)plate=InfinityCosmicArt.decode(light);sync();}
+    @Override protected void onDetachedFromWindow(){attached=false;removeCallbacks(frame);framePending=false;plate=null;super.onDetachedFromWindow();}
+    @Override public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);focused=focus;sync();}
+    @Override protected void onWindowVisibilityChanged(int visibility){super.onWindowVisibilityChanged(visibility);sync();}
+    @Override protected void onVisibilityChanged(View changed,int visibility){super.onVisibilityChanged(changed,visibility);if(p!=null)sync();}
+    @Override protected void onDraw(Canvas c){
+      int w=getWidth(),h=getHeight();if(w<=0||h<=0)return;
+      if(plate!=null){
+        // Uniform center-crop only. Spheres/logos are never stretched to the new aspect ratio.
+        float scale=Math.max(w/(float)plate.getWidth(),h/(float)plate.getHeight());
+        float bw=plate.getWidth()*scale,bh=plate.getHeight()*scale;
+        // Anchor the horizon, not the image center, when wider windows reveal/crop more artwork.
+        float top=Math.max(h-bh,Math.min(0,h*.75f-plate.getHeight()*.72f*scale));
+        dst.set((w-bw)/2,top,(w+bw)/2,top+bh);p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);c.drawBitmap(plate,null,dst,p);
+      }
+      // Transparent contrast veil protects native live text in both materials; no black-strip patch.
+      p.setShader(new LinearGradient(0,0,0,h,light?new int[]{0x75ffffff,0x22ffffff,0x60ffffff}:new int[]{0x7a000714,0x22000714,0x44000714},new float[]{0,.45f,1},Shader.TileMode.CLAMP));
+      c.drawRect(0,0,w,h,p);p.setShader(null);
+      if(motionDisabled)return;
+      float seconds=phaseMillis/1000f,cx=w*.5f,cy=h*.42f;
+      double cycle=seconds%19f;float burst=cycle>14&&cycle<16?(float)Math.sin((cycle-14)*Math.PI/2)*.45f:0;
+      for(int i=0;i<96;i++){
+        int at=i*4;float depth=.2f+seeds[at+2]*.8f;
+        double a=seeds[at]*Math.PI*2;
+        float travel=(seeds[at+1]+seconds*(.009f+depth*.012f))%1f;
+        float radius=(.08f+travel*travel)*Math.max(w,h)*.7f;
+        float x=cx+(float)Math.cos(a)*radius,y=cy+(float)Math.sin(a)*radius;
+        // Separate background sibling: it can never draw on top of cards/live-data controls.
+        int alpha=(int)((light?55:95)*Math.sin(travel*Math.PI));
+        p.setColor((alpha<<24)|(light?0x284f79:(i%7==0?0xffdaa2:0xaedaff)));
+        p.setStrokeWidth(.6f+depth*.75f);
+        float streak=(1.5f+burst*16)*depth;
+        c.drawLine(x,y,x+(float)Math.cos(a)*streak,y+(float)Math.sin(a)*streak,p);
+      }
+    }
+  }
+}
