@@ -52,10 +52,11 @@ final class InfinityGlassChooser extends FrameLayout {
   final CosmicBackdrop backdrop;
   private final SharedPreferences preferences;
   private boolean subscribed,refreshQueued,attached;
-  private final Runnable refresh=()->{
+  private final Runnable refresh=()->checkAppearance();
+  private void checkAppearance(){
     refreshQueued=false;
     if(attached && !mode.equals(actions.appearance())) actions.appearanceChanged();
-  };
+  }
   private final SharedPreferences.OnSharedPreferenceChangeListener listener=(p,key)->{
     if("cobra_appearance_mode".equals(key)||"cobra_system_dark_variant".equals(key)) requestThemeCheck();
   };
