@@ -82,8 +82,9 @@ public class CosmicChooserTest {
     RuntimeEnvironment.setQualifiers("mdpi");ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();
     InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new Calls("dark"));ctl.get().setContentView(ui);
     View focus=ui.stage.cobra.gear;InfinityGlassChooser.Stage stage=ui.stage;
+    layout(ui,658,1536);assertTrue("Initial gear focus",focus.requestFocus());
     for(int[] size:new int[][]{{658,1536},{1840,1536},{658,1536},{900,400},{360,240}}){
-      layout(ui,size[0],size[1]);assertSame(stage,ui.stage);assertTrue(focus.requestFocus());assertTrue(focus.isFocused());
+      layout(ui,size[0],size[1]);assertSame(stage,ui.stage);assertTrue("Retained gear focus at "+size[0]+"x"+size[1],focus.isFocused());
       Rect left=new Rect(),right=new Rect();ui.stage.infinity.getHitRect(left);ui.stage.cobra.getHitRect(right);
       assertFalse(Rect.intersects(left,right));assertTrue(left.left>=0);assertTrue(right.right<=size[0]);
       assertEquals(left.height(),right.height());
