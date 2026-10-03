@@ -21,10 +21,14 @@ import static org.junit.Assert.*;
 
 /** Real Splash + Android looper tests; Kodi ARM64 and OEM process/task execution excluded. */
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk=35)
+@Config(sdk=35,shadows=StartupReliabilityTest.StoragePermission.class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @LooperMode(LooperMode.Mode.PAUSED)
 public class StartupReliabilityTest {
+  @Implements(Environment.class)
+  public static class StoragePermission extends ShadowEnvironment {
+    @Implementation(minSdk=30) protected static boolean isExternalStorageManager(){return true;}
+  }
   static class Deferred implements Executor {
     final Queue<Runnable> jobs=new ArrayDeque<>();int count;
     public void execute(Runnable task){jobs.add(task);count++;}
@@ -39,7 +43,6 @@ public class StartupReliabilityTest {
     Main.MainActivity=null;
     ShadowEnvironment.addExternalDir("primary");
     ShadowEnvironment.setExternalStorageState(Environment.MEDIA_MOUNTED);
-    ShadowEnvironment.setIsExternalStorageManager(true);
     executor=new Deferred();
     manager=new InfinityStartupPreparation(executor,(app,trace)->{
       assertNotSame(Looper.getMainLooper(),Looper.myLooper());
