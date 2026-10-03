@@ -4,6 +4,8 @@ Normal Close backgrounds existing Android Main, waits for its pause/stop callbac
 to return, then requests Kodi's original graceful Application.Quit. It NEVER
 turns a slow normal close into an automatic force stop.
 Force Close is a separate explicit Java command, bypassing the Chef/Python route.
+It stops Kodi's sticky continuity service first without changing the user's
+background-mode preference; Cobra recording owners are not explicitly cancelled.
 Force Close can lose unsaved changes; do not use it as normal Close.
 Only two existing power-button onclick commands are patched at runtime in known
 Infinity profiles. Original XML is backed up privately; appearance is unchanged.

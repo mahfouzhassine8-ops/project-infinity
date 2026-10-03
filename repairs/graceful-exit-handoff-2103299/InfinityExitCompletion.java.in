@@ -90,10 +90,19 @@ final class InfinityExitCompletion {
     final int pid = android.os.Process.myPid();
     // Separate thread: never queue emergency stop behind a stuck graceful JNI request.
     Thread force = new Thread(() -> {
-      try { write(app, "exit.force.userRequested"); }
-      finally { android.os.Process.killProcess(pid); }
+      finishForce(app, () -> android.os.Process.killProcess(pid));
     }, "InfinityUserForceClose");
     force.setDaemon(true); force.start();
+  }
+  static void finishForce(Context app, Runnable terminator) {
+    try {
+      // Cancel this Kodi continuity service's sticky restart before process end.
+      // Keep the user's Extended preference; don't touch Cobra recording owners.
+      // stopService requests AMS cleanup, not NativeActivity graceful teardown.
+      try { app.stopService(new android.content.Intent(app, InfinityExtendedBackgroundService.class)); }
+      catch (RuntimeException denied) { android.util.Log.w("InfinityPower", "Continuity service stop refused", denied); }
+      write(app, "exit.force.userRequested");
+    } finally { terminator.run(); }
   }
   static void record(Context context, String phase) {
     final Context app = context.getApplicationContext(); RECORDS.execute(() -> write(app, phase));

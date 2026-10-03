@@ -47,6 +47,25 @@ public class GracefulExitHandoffTest {
     assertTrue(p.force());assertFalse(p.force());assertFalse(p.stopped(false));
     p.destroying();p.completed();assertEquals(InfinityExitCompletion.Plan.Phase.FORCED,p.phase());
   }
+  @Test public void forcedWorkStopsOnlyKodiContinuityServiceBeforeTerminating(){
+    android.content.Context app=RuntimeEnvironment.getApplication();int[] ended={0};
+    InfinityExitCompletion.finishForce(app,()->ended[0]++);assertEquals(1,ended[0]);
+    android.content.Intent stopped=Shadows.shadowOf(RuntimeEnvironment.getApplication()).getNextStoppedService();
+    assertNotNull(stopped);assertEquals(InfinityExtendedBackgroundService.class.getName(),stopped.getComponent().getClassName());
+    assertNull(Shadows.shadowOf(RuntimeEnvironment.getApplication()).getNextStoppedService());
+  }
+  @Test public void forceTerminationStillOccursWhenDiagnosticPersistenceFails(){
+    android.content.Context app=new android.content.ContextWrapper(RuntimeEnvironment.getApplication()){
+      @Override public android.content.SharedPreferences getSharedPreferences(String name,int mode){throw new IllegalStateException("simulated storage failure");}
+    };int[] ended={0};
+    try{InfinityExitCompletion.finishForce(app,()->ended[0]++);fail("Expected simulated diagnostic failure");}catch(IllegalStateException expected){}
+    assertEquals(1,ended[0]);
+  }
+  @Test public void forceTerminationDoesNotDependOnServiceStopSuccess(){
+    android.content.Context app=new android.content.ContextWrapper(RuntimeEnvironment.getApplication()){
+      @Override public boolean stopService(android.content.Intent intent){throw new SecurityException("simulated service denial");}
+    };int[] ended={0};InfinityExitCompletion.finishForce(app,()->ended[0]++);assertEquals(1,ended[0]);
+  }
   @Test public void closeRelaunchCycleResetsOnlyWithNewOwner(){
     for(int i=0;i<20;i++){
       InfinityExitCompletion.Plan old=new InfinityExitCompletion.Plan();old.requestNormal();old.stopped(false);old.destroying();old.completed();
