@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse,csv,hashlib,json,zipfile,xml.etree.ElementTree as ET
+import argparse,csv,hashlib,json,re,zipfile,xml.etree.ElementTree as ET
 from pathlib import Path
 PARENT='e46f1745668d6cd6b3df05ae12785e8a3a952e94c9e14cec70a2901ed0bd9dc5'
 LOCKED='e0e70f6a0fc8ff9fbd8836f5979f90c64de4678fe0d468336fc59ce7cf4e9f0c'
@@ -13,9 +13,9 @@ with zipfile.ZipFile(a.parent) as parent,zipfile.ZipFile(a.locked_parent) as loc
     assert set(parent.namelist())==set(locked.namelist())==set(ancestor.namelist())==set(candidate.namelist())
     for name in sorted(candidate.namelist()):
         b=parent.read(name);lock=locked.read(name);old=ancestor.read(name);c=candidate.read(name);same=b==c
-        allowed=('AndroidManifest.xml','classes.dex','META-INF/INFINITY.RSA','META-INF/INFINITY.SF','META-INF/MANIFEST.MF')
-        assert same or name in allowed,name
-        assert old==c or name in allowed,name
+        allowed=name in ('AndroidManifest.xml','META-INF/INFINITY.RSA','META-INF/INFINITY.SF','META-INF/MANIFEST.MF') or re.fullmatch(r'classes(?:\d+)?\.dex',name)
+        assert same or allowed,name
+        assert old==c or allowed,name
         rows.append({'path':name,'parent_2103299_bytes':len(b),'candidate_2103300_bytes':len(c),'parent_2103299_sha256':H(b),
             'candidate_2103300_sha256':H(c),'locked_2103297_sha256':H(lock),'ancestor_2103295_sha256':H(old),'status':'unchanged' if same else 'changed'})
         if name.startswith('lib/') and not name.endswith('/'):

@@ -84,6 +84,8 @@ def apply_source(root: Path, out: Path) -> None:
     source = source.replace('37105329683', '37117015142')
     source = source.replace('repairs/graceful-exit-handoff-2103300/DEVICE-TEST.txt',
                             'repairs/stale-main-task-2103300/DEVICE-TEST.txt')
+    source = once(source, 'PASS: Java-only 2103300 over exact signed 2103298;',
+                  'PASS: Java-only 2103300 over exact signed 2103299;')
     old_bridge_audit = '''    app=next(n for n in new['children'] if n['tag']=='application')
     bridge=[n for n in app['children'] if n['tag']=='activity' and 'InfinityPowerControlActivity' in n['attrs'].get('android:name','')]
     require(len(bridge)==1,'Exactly one private power bridge required')

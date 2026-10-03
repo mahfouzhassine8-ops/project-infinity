@@ -96,7 +96,7 @@ jobs:
             keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
           fi
           python3 forward3299/scripts/package_background_resume.py --source forward3299/shell-kodi --base-apk parent3299/candidate/Infinity-2103299-Graceful-Exit-Handoff-RC1.apk --build-dir release-build3300 --out evidence3300/candidate 2>&1 | tee evidence3300/package.log
-          python3 repairs/stale-main-task-2103300/audit_payload.py --parent parent3299/candidate/Infinity-2103299-Graceful-Exit-Handoff-RC1.apk --locked-parent parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --ancestor parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --candidate evidence3300/candidate/Infinity-2103300-Clean-Task-Relaunch-RC1.apk --out evidence3300/candidate
+          python3 repairs/stale-main-task-2103300/audit_payload.py --parent parent3299/candidate/Infinity-2103299-Graceful-Exit-Handoff-RC1.apk --locked-parent parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --ancestor parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --candidate evidence3300/candidate/Infinity-2103300-1.0.9-Clean-Task-Relaunch-RC1.apk --out evidence3300/candidate
       - name: Gather Android results and exact repaired source
         if: always()
         run: |
