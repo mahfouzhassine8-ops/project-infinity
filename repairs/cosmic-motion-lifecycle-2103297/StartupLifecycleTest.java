@@ -58,13 +58,13 @@ public class StartupLifecycleTest {
     ActivityController<Activity> c=Robolectric.buildActivity(Activity.class).setup();
     Intent incoming=new Intent(Intent.ACTION_VIEW,android.net.Uri.parse("content://test/movie"));
     incoming.putExtra("preserved","yes");incoming.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED|Intent.FLAG_ACTIVITY_CLEAR_TASK|
-        Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_GRANT_READ_URI_PERMISSION);
+        Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_GRANT_READ_URI_PERMISSION);
     for(boolean live:new boolean[]{false,true}){
       Intent target=InfinityStartupHandoff.mainIntent(c.get(),incoming,live);
       assertEquals(Main.class.getName(),target.getComponent().getClassName());assertEquals(incoming.getData(),target.getData());
       assertEquals("yes",target.getStringExtra("preserved"));assertEquals(Intent.ACTION_VIEW,target.getAction());
       int f=target.getFlags();assertEquals(0,f&(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_MULTIPLE_TASK));
-      assertTrue((f&Intent.FLAG_ACTIVITY_GRANT_READ_URI_PERMISSION)!=0);assertTrue((f&Intent.FLAG_ACTIVITY_SINGLE_TOP)!=0);
+      assertTrue((f&Intent.FLAG_GRANT_READ_URI_PERMISSION)!=0);assertTrue((f&Intent.FLAG_ACTIVITY_SINGLE_TOP)!=0);
       assertEquals(live,(f&Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)!=0);
     }
     c.pause().stop().destroy();
