@@ -79,6 +79,7 @@ public class CosmicChooserTest {
     }
   }
   @Test public void foldReflowRetainsSameInstancesFocusAndUsableTargets(){
+    androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().setInTouchMode(false);
     RuntimeEnvironment.setQualifiers("mdpi");ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();
     InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new Calls("dark"));ctl.get().setContentView(ui);
     View focus=ui.stage.cobra.gear;InfinityGlassChooser.Stage stage=ui.stage;
@@ -94,6 +95,7 @@ public class CosmicChooserTest {
     cleanup(ctl);
   }
   @Test public void actualTouchAfterWindowTranslationHitsOnlyGear(){
+    androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().setInTouchMode(true);
     RuntimeEnvironment.setQualifiers("mdpi");ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();Calls c=new Calls("light");
     FrameHost host=new FrameHost(ctl.get());InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),c);host.addView(ui,new ViewGroup.LayoutParams(420,936));ctl.get().setContentView(host);
     host.measure(View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(1600,View.MeasureSpec.EXACTLY));host.layout(0,0,800,1600);ui.layout(130,300,550,1236);layoutChildren(ui,420,936);
@@ -115,6 +117,13 @@ public class CosmicChooserTest {
     ui.backdrop.onWindowFocusChanged(false);assertFalse(ui.backdrop.framePending);
     ctl.get().setContentView(new View(ctl.get()));assertFalse(ui.backdrop.attached);assertFalse(ui.backdrop.framePending);assertNull(ui.backdrop.plate);
     assertFalse(ui.stage.weatherData.started);assertNull(ui.stage.weatherData.worker);cleanup(ctl);
+  }
+  @Test public void systemAnimationDisabledUsesStaticArtwork(){
+    ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();
+    android.provider.Settings.Global.putFloat(ctl.get().getContentResolver(),android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,0f);
+    InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new Calls("dark"));ctl.get().setContentView(ui);layout(ui,420,936);
+    assertTrue(ui.backdrop.reducedMotion);assertFalse(ui.backdrop.framePending);assertNotNull(ui.backdrop.plate);
+    android.provider.Settings.Global.putFloat(ctl.get().getContentResolver(),android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,1f);cleanup(ctl);
   }
   @Test public void realClockFullDateAndWeatherUnavailableAreNotBakedArtwork(){
     ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new Calls("dark"));ctl.get().setContentView(ui);layout(ui,420,936);
