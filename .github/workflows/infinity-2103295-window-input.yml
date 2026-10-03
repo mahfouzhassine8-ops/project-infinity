@@ -73,6 +73,10 @@ jobs:
           python3 repairs/text-reflow-2103294/text_reflow.py verify --source kodi --receipt engine/text-reflow-source.json
           python3 repairs/text-reflow-2103294/test_text_reflow.py --source kodi | tee audit3295/text-cache-tests.txt
           cp engine/text-reflow-source.json engine/TEXT-REFLOW-BYTE-MANIFEST.json audit3295/
+          # Complete the inherited 3294 render-hardening baseline before protecting
+          # its hashes. This is the same parent transform formerly run in CI stage 2.
+          python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json
+          python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
           python3 repairs/window-input-2103295/window_input.py apply --source kodi --receipt engine/window-input-source.json
           python3 repairs/window-input-2103295/window_input.py verify --source kodi --receipt engine/window-input-source.json
           python3 repairs/window-input-2103295/test_window_input.py --source kodi | tee audit3295/window-input-tests.txt
@@ -92,7 +96,17 @@ jobs:
       - name: Full ARM64 native rebuild
         run: |
           set -euo pipefail
-          bash scripts/infinity_live_app_ci_2.sh
+          # Preserve the parent build recipe; its one baseline apply has already
+          # happened before the candidate's whole-source byte snapshot.
+          python3 - <<'PY'
+          from pathlib import Path
+          stage=Path('scripts/infinity_live_app_ci_2.sh').read_text()
+          inherited='python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json'
+          assert stage.count(inherited)==1
+          stage=stage.replace(inherited,'python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi',1)
+          Path('audit3295/inherited-native-build.sh').write_text(stage)
+          PY
+          bash audit3295/inherited-native-build.sh
 
           # Diagnostic fan-out: after the expensive native build succeeds, run every preservation/
           # responsive verifier and report all failures in this one attempt instead of stopping at
