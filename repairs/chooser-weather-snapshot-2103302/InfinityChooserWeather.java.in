@@ -1,0 +1,154 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Xml;
+import android.widget.TextView;
+import org.json.JSONObject;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/** Chooser reads an atomic local snapshot of existing Kodi weather. No JNI or network.
+ * Kodi owns the read-only producer; cold chooser uses its original observation time.
+ */
+final class InfinityChooserWeather {
+  interface Reader { String read(); default void cancel() {} }
+  final TextView label;
+  final SharedPreferences cache;
+  final Handler main=new Handler(Looper.getMainLooper());
+  final Reader reader;
+  ExecutorService worker;
+  boolean started,inFlight;
+  int generation;
+  final Runnable refresh=()->refresh();
+  static final String REQUEST="{\"jsonrpc\":\"2.0\",\"id\":\"chooser-weather\",\"method\":\"XBMC.GetInfoLabels\",\"params\":{\"labels\":[\"Weather.Location\",\"Weather.Temperature\",\"Weather.Conditions\",\"Weather.FanartCode\"]}}";
+  InfinityChooserWeather(Context c,TextView label){this(c,label,new LocalReader(c.getApplicationContext()));}
+  InfinityChooserWeather(Context c,TextView label,Reader reader){
+    this.label=label;this.reader=reader;
+    cache=c.getApplicationContext().getSharedPreferences("infinity_chooser_weather",Context.MODE_PRIVATE);
+  }
+  void start(){if(started)return;started=true;generation++;renderCached();refresh();}
+  void stop(){
+    started=false;generation++;main.removeCallbacks(refresh);
+    if(worker!=null){worker.shutdownNow();worker=null;}
+    reader.cancel();inFlight=false;
+  }
+  private void refresh(){
+    if(!started||inFlight)return;
+    if(worker==null)worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityWeatherSnapshot");t.setDaemon(true);return t;});
+    final int token=generation;inFlight=true;
+    worker.execute(()->{
+      String data=null;try{data=reader.read();}catch(RuntimeException ignored){}
+      final String result=data;
+      main.post(()->{
+        if(!started||token!=generation)return;inFlight=false;
+        boolean accepted=accept(result);renderCached();main.postDelayed(refresh,accepted?60000:10000);
+      });
+    });
+  }
+  boolean accept(String response){
+    if(response==null)return false;
+    try{
+      JSONObject envelope=new JSONObject(response),result=envelope.optJSONObject("result");if(result==null)return false;
+      long now=System.currentTimeMillis(),observed=envelope.optLong("captured_at_ms",now);
+      if(observed<=0||observed>now||now-observed>24*60*60*1000L)return false;
+      String location=clean(result.optString("Weather.Location")),temperature=clean(result.optString("Weather.Temperature")),condition=clean(result.optString("Weather.Conditions"));
+      if(location.isEmpty()||temperature.isEmpty()||condition.isEmpty()||temperature.equals("N/A"))return false;
+      if(observed==cache.getLong("timestamp",0)&&location.equals(cache.getString("location",""))&&temperature.equals(cache.getString("temperature",""))&&condition.equals(cache.getString("condition","")))return true;
+      cache.edit().putString("location",location).putString("temperature",temperature).putString("condition",condition)
+          .putString("icon",clean(result.optString("Weather.FanartCode"))).putLong("timestamp",observed).apply();return true;
+    }catch(Exception malformed){return false;}
+  }
+  static String clean(String value){return value==null?"":value.replaceAll("[\\p{Cntrl}]"," ").trim();}
+  static String icon(String condition){
+    String c=condition.toLowerCase(Locale.ROOT);
+    if(c.contains("snow"))return "❄";if(c.contains("thunder"))return "ϟ";
+    if(c.contains("rain")||c.contains("shower"))return "☂";if(c.contains("cloud")||c.contains("overcast"))return "☁";
+    if(c.contains("sun")||c.contains("clear"))return "☀";return "◌";
+  }
+  void renderCached(){
+    if(label==null)return;
+    long timestamp=cache.getLong("timestamp",0),age=System.currentTimeMillis()-timestamp;
+    if(timestamp<=0||age<0||age>24*60*60*1000L){label.setText("Weather unavailable");label.setContentDescription("Weather unavailable. No recent Kodi weather reading is cached.");return;}
+    String location=cache.getString("location",""),temperature=cache.getString("temperature",""),condition=cache.getString("condition","");
+    boolean current=Main.infinityLiveActivity()!=null&&age<2*60*1000L;
+    String value=icon(condition)+"  "+location+"  •  "+temperature+"  "+condition;
+    if(!current)value+="  •  last known";
+    label.setText(value);label.setContentDescription(value+". Observed "+java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(timestamp)));
+  }
+
+  static File snapshotFile(Context app){return new File(app.getFilesDir(),"infinity-chooser-weather/snapshot.json");}
+  static final class LocalReader implements Reader {
+    final Context app;
+    LocalReader(Context app){this.app=app;}
+    @Override public String read(){
+      if(Thread.currentThread().isInterrupted())return null;
+      File file=snapshotFile(app);if(!file.isFile()||file.length()>16384)return null;
+      try{
+        byte[] bytes=bounded(new FileInputStream(file),16384);
+        String text=new String(bytes,StandardCharsets.UTF_8);JSONObject data=new JSONObject(text);
+        long observed=data.optLong("captured_at_ms",0),now=System.currentTimeMillis();
+        if(data.optInt("schema",0)!=1||!"Kodi.Weather".equals(data.optString("source"))||observed<=0||observed>now||now-observed>24*60*60*1000L)return null;
+        JSONObject result=data.optJSONObject("result");if(result==null)return null;
+        for(String key:new String[]{"Weather.Location","Weather.Temperature","Weather.Conditions"}){
+          String value=clean(result.optString(key));if(value.isEmpty()||value.length()>512||"N/A".equalsIgnoreCase(value))return null;
+        }
+        return text;
+      }catch(Exception unavailable){return null;}
+    }
+    static byte[] bounded(InputStream source,int limit) throws IOException {
+      try(InputStream input=source;ByteArrayOutputStream out=new ByteArrayOutputStream()){
+        byte[] buffer=new byte[4096];int n;
+        while((n=input.read(buffer))!=-1){
+          if(Thread.currentThread().isInterrupted())throw new InterruptedIOException();
+          if(n==0||out.size()+n>limit)throw new IOException("Weather input limit");
+          out.write(buffer,0,n);
+        }
+        return out.toByteArray();
+      }
+    }
+  }
+
+  // Install only this owned producer into the disposable extracted APK cache.
+  // Original APK assets, user add-ons, provider settings and databases are untouched.
+  static final String BRIDGE_ID="service.infinity.chooser.weather.snapshot";
+  static final String ADDON="<?xml version=\"1.0\" encoding=\"UTF-8\"?><addon id=\""+BRIDGE_ID+"\" name=\"Choose Your Experience Weather Snapshot\" version=\"1.0.0\" provider-name=\"Project Infinity\"><requires><import addon=\"xbmc.python\" version=\"3.0.0\"/></requires><extension point=\"xbmc.service\" library=\"weather_snapshot.py\"/><extension point=\"xbmc.addon.metadata\"><summary lang=\"en_GB\">Read-only existing weather snapshot for the Android chooser.</summary><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>";
+  static void prepareSnapshotBridge(Context app,File home) throws Exception {
+    File manifest=new File(home,"assets/system/addon-manifest.xml");
+    if(!manifest.isFile()||manifest.length()>256*1024)throw new IOException("Missing bundled addon manifest");
+    String original=new String(LocalReader.bounded(new FileInputStream(manifest),256*1024),StandardCharsets.UTF_8);
+    org.xmlpull.v1.XmlPullParser parser=Xml.newPullParser();
+    parser.setFeature(org.xmlpull.v1.XmlPullParser.FEATURE_PROCESS_DOCDECL,false);parser.setInput(new StringReader(original));
+    boolean found=false,root=false;int close=-1,event;
+    while((event=parser.next())!=org.xmlpull.v1.XmlPullParser.END_DOCUMENT){
+      if(event==org.xmlpull.v1.XmlPullParser.DOCDECL)throw new IOException("DTD refused");
+      if(event!=org.xmlpull.v1.XmlPullParser.START_TAG)continue;
+      if(parser.getDepth()==1){if(!"addons".equals(parser.getName()))throw new IOException("Invalid addon manifest");root=true;}
+      if(parser.getDepth()==2&&"addon".equals(parser.getName())){
+        String optional=parser.getAttributeValue(null,"optional"),id=parser.nextText().trim();
+        if(BRIDGE_ID.equals(id)){if(found||!"true".equals(optional))throw new IOException("Conflicting weather bridge registration");found=true;}
+      }
+    }
+    close=original.lastIndexOf("</addons>");if(!root||close<0)throw new IOException("Invalid addon manifest end");
+    File addon=new File(home,"assets/addons/"+BRIDGE_ID);if(!addon.isDirectory()&&!addon.mkdirs())throw new IOException("Cannot prepare weather bridge");
+    atomicWrite(new File(addon,"weather_snapshot.py"),PRODUCER);
+    atomicWrite(new File(addon,"snapshot_config.py"),"SNAPSHOT_FILE = "+JSONObject.quote(snapshotFile(app).getAbsolutePath())+"\n");
+    atomicWrite(new File(addon,"addon.xml"),ADDON);
+    if(!found)atomicWrite(manifest,original.substring(0,close)+"  <addon optional=\"true\">"+BRIDGE_ID+"</addon>\n"+original.substring(close));
+  }
+  static void atomicWrite(File target,String text) throws IOException {
+    if(target.isFile()&&target.length()<1024*1024){
+      String old=new String(LocalReader.bounded(new FileInputStream(target),1024*1024),StandardCharsets.UTF_8);if(text.equals(old))return;
+    }
+    File temporary=new File(target.getParentFile(),target.getName()+".pending");
+    try(FileOutputStream out=new FileOutputStream(temporary)){out.write(text.getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
+    if(!temporary.renameTo(target)){temporary.delete();throw new IOException("Cannot publish weather bridge file");}
+  }
+  static final String PRODUCER="# SPDX-License-Identifier: GPL-2.0-or-later\n\"\"\"Publish existing Kodi weather for Android Choose Your Experience. Local files only.\"\"\"\nimport json\nimport os\nimport time\n\nSOURCE = 'Kodi.Weather'\nMAX_AGE_MS = 24 * 60 * 60 * 1000\n\n\ndef reading(kodi, now_ms):\n    # This service is started by Kodi's add-on manager after native initialization.\n    # Never launch a weather provider, change its settings, or contact a network API.\n    if not kodi.getCondVisibility('Weather.IsFetched'):\n        return None\n    labels = ('Weather.Location', 'Weather.Temperature', 'Weather.Conditions', 'Weather.FanartCode')\n    values = {name: str(kodi.getInfoLabel(name) or '').strip() for name in labels}\n    if any(not values[name] for name in labels[:3]):\n        return None\n    if values['Weather.Temperature'].upper() in ('N/A', 'NA', 'BUSY', '?'):\n        return None\n    if any(len(value) > 512 for value in values.values()):\n        return None\n    return {'schema': 1, 'source': SOURCE, 'captured_at_ms': now_ms, 'result': values}\n\n\ndef publish(kodi, target, monitor, now_ms=None):\n    if monitor.abortRequested():\n        return False\n    try:\n        snapshot = reading(kodi, int(time.time() * 1000) if now_ms is None else now_ms)\n        if snapshot is None or monitor.abortRequested():\n            return False\n        parent = os.path.dirname(target)\n        os.makedirs(parent, exist_ok=True)\n        temporary = target + '.pending'\n        with open(temporary, 'w', encoding='utf-8') as out:\n            json.dump(snapshot, out, ensure_ascii=False, separators=(',', ':'))\n            out.flush()\n            os.fsync(out.fileno())\n        if monitor.abortRequested():\n            os.remove(temporary)\n            return False\n        os.replace(temporary, target)\n        return True\n    except (OSError, ValueError, TypeError, RuntimeError):\n        # Weather failure never changes the provider, existing reading, or Kodi UI.\n        return False\n\n\ndef main(kodi, target):\n    monitor = kodi.Monitor()\n    while not monitor.abortRequested():\n        publish(kodi, target, monitor)\n        if monitor.waitForAbort(30):\n            break\n\n\nif __name__ == '__main__':\n    import xbmc\n    from snapshot_config import SNAPSHOT_FILE\n    main(xbmc, SNAPSHOT_FILE)\n";
+}

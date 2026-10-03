@@ -1,0 +1,24 @@
+2103302 — Choose Your Experience Weather Snapshot RC1 — UNLOCKED
+
+Scope: chooser weather data only. Existing APK assets/resources/native libraries,
+chooser layout/motion, skin, providers, playback and exit/relaunch policy are preserved.
+A tiny read-only weather producer is installed in the disposable extracted APK cache.
+Its optional registration is added to that cache's add-on manifest only. Packaged
+manifest, user add-ons, provider settings and databases are not rewritten by Android.
+Kodi's regular add-on manager discovers and starts the producer after native setup.
+The producer reads existing Weather labels and publishes an atomic local snapshot.
+Android never calls Kodi JNI or any web service to obtain chooser weather.
+
+1. Update over 2103301 without clearing data. Enter Infinity once and allow its
+   existing working weather to appear. Wait up to 30 seconds for the first snapshot.
+2. Use normal Exit/Close, then open Infinity from Home. Choose Your Experience
+   should show the same city, temperature and conditions, marked last known.
+3. Repeat after explicit Force Close and after removing the task. Weather must
+   display before choosing an experience, without a local web service enabled.
+4. Verify time/date, chooser stars, light/dark treatment and Fold cover/inner layout.
+5. Verify normal relaunch and playback still work, with no new native crash.
+6. A real cached reading older than 24 hours remains unavailable. No fabricated
+   weather, GPS/IP lookup, external weather API or provider/location change is used.
+
+One successful launch does not validate every close/playback case. Do not lock until
+physical Samsung Android 17 validation passes.
