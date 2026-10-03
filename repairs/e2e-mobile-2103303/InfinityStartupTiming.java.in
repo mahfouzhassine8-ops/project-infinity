@@ -1,0 +1,28 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+/** Monotonic timing policy. Time on the chooser is never Kodi startup work. */
+final class InfinityStartupTiming {
+  private final long processStart;
+  private long splashVisible = -1;
+  private long chooserVisible = -1;
+  private long kodiRequested = -1;
+  InfinityStartupTiming(long now) { processStart = now; }
+  synchronized void observe(String event, long now) {
+    if ("splash.firstFrame".equals(event) && splashVisible < 0) splashVisible = now;
+    if ("chooser.firstFrame".equals(event) && chooserVisible < 0) chooserVisible = now;
+    if ("handoff.requested".equals(event) && kodiRequested < 0) kodiRequested = now;
+    if ("handoff.waitClosingOwner".equals(event)) kodiRequested = -1;
+  }
+  synchronized long handoffMillis(long now) {
+    return kodiRequested < 0 ? -1 : Math.max(0, now - kodiRequested);
+  }
+  synchronized long chooserMillis(long now) {
+    return chooserVisible < 0 ? -1 : Math.max(0, (kodiRequested < 0 ? now : kodiRequested) - chooserVisible);
+  }
+  synchronized boolean slow(String event, long now) {
+    if ("splash.firstFrame".equals(event)) return splashVisible >= 0 && splashVisible - processStart >= 5000;
+    if ("chooser.firstFrame".equals(event)) return chooserVisible >= 0 && chooserVisible - processStart >= 5000;
+    return "main.afterSuper".equals(event) && handoffMillis(now) >= 5000;
+  }
+}

@@ -1,0 +1,125 @@
+name: Infinity | 2103303 first repair source validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103303-e2e-repair]
+    paths:
+      - 'repairs/e2e-mobile-2103303/**'
+      - '.github/workflows/infinity-2103303-source-validation.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103303-source-validation
+  cancel-in-progress: true
+jobs:
+  source-compile-and-tests:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: parent284-artifact
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103295-Window-Local-Input-RC1-Candidate
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37092252001
+          github-token: ${{ github.token }}
+          path: parent3295
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103297-Cosmic-Motion-Lifecycle-RC1-Candidate
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37100003228
+          github-token: ${{ github.token }}
+          path: parent3297
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103298-Startup-Reliability-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37105329683
+          github-token: ${{ github.token }}
+          path: parent3298
+      - name: Download exact 2103299 direct parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103299-Graceful-Exit-Handoff-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37117015142
+          github-token: ${{ github.token }}
+          path: parent3299
+      - name: Download exact 2103300 direct parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103300-Clean-Task-Relaunch-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37123017872
+          github-token: ${{ github.token }}
+          path: parent3300
+      - name: Download exact 2103301 direct parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103301-Weather-Native-Isolation-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37143916577
+          github-token: ${{ github.token }}
+          path: parent3301
+      - name: Reconstruct audited lineage and repair chooser weather snapshot
+        run: |
+          set -euo pipefail
+          echo 'd373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621  parent284-artifact/reconstructed-2103284-shell.tar.gz' | sha256sum -c -
+          echo 'dba26141addbacd64f334bcc32633669ffcc3c4677961e7ce3e23f01684416a0  parent3295/Infinity-2103295-Window-Local-Input-RC1.apk' | sha256sum -c -
+          echo 'e0e70f6a0fc8ff9fbd8836f5979f90c64de4678fe0d468336fc59ce7cf4e9f0c  parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk' | sha256sum -c -
+          echo 'c816160d25648741882e4a13f47af1ef20f08bda057a777e205a8fe13be2a237  parent3298/candidate/Infinity-2103298-Startup-Reliability-RC1.apk' | sha256sum -c -
+          echo 'e46f1745668d6cd6b3df05ae12785e8a3a952e94c9e14cec70a2901ed0bd9dc5  parent3299/candidate/Infinity-2103299-Graceful-Exit-Handoff-RC1.apk' | sha256sum -c -
+          mkdir -p forward3299 evidence3301
+          tar --no-same-owner -xzf parent284-artifact/reconstructed-2103284-shell.tar.gz -C forward3299
+          python3 repairs/evidence-health-2103288/apply.py apply --root forward3299 --out evidence3301/inherited-health
+          python3 repairs/native-responsive-2103290/android_shell.py apply --root forward3299/shell-kodi --receipt evidence3301/inherited-responsive.json
+          python3 repairs/cosmic-chooser-2103296/restore_parent.py --root forward3299 --out evidence3301/inherited
+          python3 repairs/cosmic-chooser-2103296/apply.py --root forward3299 --base parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --out evidence3301
+          python3 repairs/cosmic-motion-lifecycle-2103297/apply.py --root forward3299 --out evidence3301
+          python3 repairs/startup-reliability-2103298/apply.py --root forward3299 --parent parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --out evidence3301
+          python3 repairs/graceful-exit-handoff-2103299/apply.py --root forward3299 --parent parent3298/candidate/Infinity-2103298-Startup-Reliability-RC1.apk --out evidence3301/inherited-3299
+          python3 repairs/stale-main-task-2103300/apply.py --root forward3299 --parent parent3299/candidate/Infinity-2103299-Graceful-Exit-Handoff-RC1.apk --out evidence3301
+          echo '2dc49a92bf2299118bc30001678d4949bfac7dfd5db4a91fe2bfb1c26f848dcc  parent3300/candidate/Infinity-2103300-1.0.9-Clean-Task-Relaunch-RC1.apk' | sha256sum -c -
+          python3 repairs/weather-native-isolation-2103301/apply.py --root forward3299 --parent parent3300/candidate/Infinity-2103300-1.0.9-Clean-Task-Relaunch-RC1.apk --out evidence3301
+          echo 'f95f844463acfde03e0865cb64d0eed55583fda1b752a573db5d19c83e876c42  parent3301/candidate/Infinity-2103301-1.0.9-Weather-Native-Isolation-RC1.apk' | sha256sum -c -
+          python3 repairs/chooser-weather-snapshot-2103302/apply.py --root forward3299 --parent parent3301/candidate/Infinity-2103301-1.0.9-Weather-Native-Isolation-RC1.apk --out evidence3301
+          python3 repairs/e2e-mobile-2103303/apply_android.py --source forward3299/shell-kodi --receipt evidence3301/repair-changes.json
+          python3 repairs/chooser-weather-snapshot-2103302/prepare_diagnostics.py --root forward3299 --build chooser-build3301 --evidence evidence3301
+          cp repairs/e2e-mobile-2103303/MobileRepairTest.java chooser-build3301/xbmc/src/test/java/com/projectinfinity/kodi/
+          cp repairs/e2e-mobile-2103303/README.md evidence3301/
+          cp repairs/chooser-weather-snapshot-2103302/LINEAGE.txt evidence3301/
+          cp repairs/chooser-weather-snapshot-2103302/DEVICE-TEST.txt evidence3301/
+      - name: Compile Android Java and test chooser snapshot and lifecycle
+        working-directory: chooser-build3301
+        run: |
+          set -euo pipefail
+          python3 ../repairs/chooser-weather-snapshot-2103302/test_weather_snapshot.py 2>&1 | tee ../evidence3301/producer-tests.log
+          ./gradlew --no-daemon --console=plain :xbmc:compileDebugJavaWithJavac :xbmc:testDebugUnitTest 2>&1 | tee ../evidence3301/android-tests.log
+      - name: Verify compiled weather classes cannot reach Kodi JNI
+        run: |
+          python3 repairs/chooser-weather-snapshot-2103302/audit_weather.py --root forward3299 --classes chooser-build3301/xbmc/build/intermediates/javac --out evidence3301
+      - name: Gather source validation evidence (no APK)
+        if: always()
+        run: |
+          mkdir -p evidence3301
+          if test -d chooser-build3301/xbmc/build/test-results; then cp -a chooser-build3301/xbmc/build/test-results evidence3301/; fi
+          if test -d chooser-build3301/xbmc/build/reports/tests; then cp -a chooser-build3301/xbmc/build/reports/tests evidence3301/test-reports; fi
+          if test -d forward3299/shell-kodi; then tar -czf evidence3301/repaired-shell-source.tar.gz -C forward3299 shell-kodi; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103303-First-Repair-Source-Validation-NO-APK
+          path: evidence3301/
+          if-no-files-found: error
+          retention-days: 90

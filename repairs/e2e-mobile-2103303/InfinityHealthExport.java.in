@@ -1,0 +1,111 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.os.Build;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Explicit, bounded local export. Call on a worker; never decode native traces. */
+final class InfinityHealthExport {
+  static final int TRACE_LIMIT = 2 * 1024 * 1024;
+  static final int MAX_TRACES = 4;
+  private InfinityHealthExport() {}
+
+  static void write(Context context, OutputStream destination, String report) throws Exception {
+    try (ZipOutputStream zip = new ZipOutputStream(destination)) {
+      put(zip, "report.txt", report.getBytes(StandardCharsets.UTF_8));
+      JSONObject manifest = new JSONObject();
+      manifest.put("schema", 1);
+      manifest.put("exported_at_ms", System.currentTimeMillis());
+      manifest.put("package", context.getPackageName());
+      manifest.put("trace_limit_bytes", TRACE_LIMIT);
+      manifest.put("max_traces", MAX_TRACES);
+      manifest.put("ownership", "Historical exits. Installed APK version is not proof of the build that produced an exit. Match trace build IDs to exact native symbols.");
+      JSONArray records = new JSONArray();
+      manifest.put("records", records);
+      if (Build.VERSION.SDK_INT >= 30) Api30.collect(context, zip, records);
+      put(zip, "exit-manifest.json", manifest.toString(2).getBytes(StandardCharsets.UTF_8));
+    }
+  }
+
+  private static void put(ZipOutputStream zip, String name, byte[] bytes) throws Exception {
+    zip.putNextEntry(new ZipEntry(name));
+    zip.write(bytes);
+    zip.closeEntry();
+  }
+
+  /** Returns true if at least one byte was omitted. Keeps original byte order. */
+  static boolean copyBounded(InputStream input, OutputStream output, int limit) throws Exception {
+    if (limit < 0) throw new IllegalArgumentException("negative limit");
+    byte[] buffer = new byte[8192];
+    int total = 0;
+    while (total < limit) {
+      int count = input.read(buffer, 0, Math.min(buffer.length, limit - total));
+      if (count < 0) return false;
+      if (count == 0) {
+        int one = input.read();
+        if (one < 0) return false;
+        output.write(one);
+        total++;
+      } else {
+        output.write(buffer, 0, count);
+        total += count;
+      }
+    }
+    return input.read() != -1;
+  }
+
+  private static final class Api30 {
+    static void collect(Context context, ZipOutputStream zip, JSONArray records) throws Exception {
+      android.app.ActivityManager manager = (android.app.ActivityManager)
+          context.getSystemService(Context.ACTIVITY_SERVICE);
+      if (manager == null) return;
+      java.util.List<android.app.ApplicationExitInfo> exits =
+          manager.getHistoricalProcessExitReasons(context.getPackageName(), 0, 12);
+      if (exits == null) return;
+      int attempts = 0;
+      for (android.app.ApplicationExitInfo exit : exits) {
+        int reason = exit.getReason();
+        if (reason != android.app.ApplicationExitInfo.REASON_CRASH_NATIVE &&
+            reason != android.app.ApplicationExitInfo.REASON_ANR) continue;
+        if (attempts++ >= MAX_TRACES) break;
+        JSONObject row = new JSONObject();
+        records.put(row);
+        row.put("timestamp_ms", exit.getTimestamp());
+        row.put("pid", exit.getPid());
+        row.put("reason", reason);
+        row.put("process", exit.getProcessName());
+        row.put("producer_apk_version", JSONObject.NULL);
+        boolean nativeCrash = reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
+        row.put("format", nativeCrash ? "android-native-tombstone-protobuf" : "android-anr-text");
+        if (nativeCrash && Build.VERSION.SDK_INT < 31) {
+          row.put("available", false);
+          continue;
+        }
+        InputStream trace;
+        try { trace = exit.getTraceInputStream(); }
+        catch (Exception unavailable) {
+          row.put("available", false);
+          row.put("error", unavailable.getClass().getSimpleName());
+          continue;
+        }
+        row.put("available", trace != null);
+        if (trace == null) continue;
+        String name = "traces/" + attempts + "-" + exit.getTimestamp() +
+            (nativeCrash ? ".tombstone.pb" : ".anr.txt");
+        row.put("path", name);
+        zip.putNextEntry(new ZipEntry(name));
+        try (InputStream source = trace) {
+          row.put("truncated", copyBounded(source, zip, TRACE_LIMIT));
+        }
+        zip.closeEntry();
+      }
+    }
+  }
+}
