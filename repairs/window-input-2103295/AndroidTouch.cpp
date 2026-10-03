@@ -79,6 +79,7 @@ void CAndroidTouch::RefreshInputViewport(JNIEnv* env, jobject activity)
     return;
 
   static jfieldID mainViewField{nullptr};
+  static jfieldID currentActivityField{nullptr};
   static jfieldID createdField{nullptr};
   static jmethodID locationMethod{nullptr};
   static jmethodID widthMethod{nullptr};
@@ -92,12 +93,28 @@ void CAndroidTouch::RefreshInputViewport(JNIEnv* env, jobject activity)
   }
 
   jobject view{nullptr};
+  jclass activityClass = env->GetObjectClass(activity);
   if (mainViewField == nullptr)
   {
-    jclass activityClass = env->GetObjectClass(activity);
     const std::string signature = std::string("L") + CCompileInfo::GetClass() + "/XBMCMainView;";
     if (activityClass != nullptr)
       mainViewField = env->GetFieldID(activityClass, "mMainView", signature.c_str());
+  }
+  if (!env->ExceptionCheck() && activityClass != nullptr && currentActivityField == nullptr)
+  {
+    const std::string signature = std::string("L") + CCompileInfo::GetClass() + "/Main;";
+    currentActivityField = env->GetStaticFieldID(activityClass, "MainActivity", signature.c_str());
+  }
+  if (!env->ExceptionCheck() && currentActivityField != nullptr)
+  {
+    jobject currentActivity = env->GetStaticObjectField(activityClass, currentActivityField);
+    if (!env->ExceptionCheck() && !env->IsSameObject(activity, currentActivity))
+    {
+      // Main's inherited frame callback can outlive an Activity. Only the
+      // current Activity may replace the input viewport of its live surface.
+      env->PopLocalFrame(nullptr);
+      return;
+    }
   }
   if (!env->ExceptionCheck() && mainViewField != nullptr)
     view = env->GetObjectField(activity, mainViewField);
@@ -149,6 +166,7 @@ void CAndroidTouch::RefreshInputViewport(JNIEnv* env, jobject activity)
     // Optional geometry lookup must not poison the existing frame callback.
     env->ExceptionClear();
     mainViewField = nullptr;
+    currentActivityField = nullptr;
     locationMethod = nullptr;
     next = ReadViewport();
     if (next.known)

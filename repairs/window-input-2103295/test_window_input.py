@@ -32,6 +32,12 @@ struct JNIEnv {
   void check(){assert(ui==std::this_thread::get_id());++calls;}
   bool ExceptionCheck(){check();return exception;}
   void ExceptionClear(){check();exception=false;}
+  jfieldID GetStaticFieldID(jclass,const char* n,const char* sig){check();
+    assert(std::string(n)=="MainActivity" && std::string(sig)=="Lorg/xbmc/kodi/Main;");
+    return reinterpret_cast<void*>(11);}
+  jobject GetStaticObjectField(jclass,jfieldID f){check();assert(f==reinterpret_cast<void*>(11));
+    return reinterpret_cast<void*>(10);}
+  bool IsSameObject(jobject a,jobject b){check();return a==b;}
   int PushLocalFrame(int){check();++frames;return 0;}
   jobject PopLocalFrame(jobject o){check();--frames;return o;}
   jclass GetObjectClass(jobject){check();return reinterpret_cast<void*>(1);}
@@ -194,6 +200,13 @@ int main(int argc,char**){
   // Actual input-thread routing must not touch JNI/Android Views.
   int calls=env.calls;
   std::thread worker([&]{tap(9,26);});worker.join();assert(env.calls==calls);++cases;
+  // Old Main callbacks still deliver their inherited frame tick but cannot
+  // overwrite the viewport of the current Activity, even with an absent surface.
+  const int savedWidth=env.width,savedTop=env.top;
+  env.width=0;env.top=500;
+  int oldFrames=app.frames;CJNIMainActivity::_doFrame(&env,reinterpret_cast<void*>(999),123);
+  assert(app.frames==oldFrames+1 && env.frames==0);
+  env.width=savedWidth;env.top=savedTop;tap(9,26);++cases;
   assert(env.frames==0);std::cout<<"PASS production window-input router: "<<cases<<" cases; JNI UI-only; no physical-device claim\n";
 }
 '''
