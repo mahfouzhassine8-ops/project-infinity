@@ -7,7 +7,8 @@ import org.robolectric.util.ReflectionHelpers;
 import static org.junit.Assert.*;
 
 /** Policy/lifecycle tests, not proof of real native shutdown or displayed frames. */
-@RunWith(RobolectricTestRunner.class) @Config(sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,shadows=StartupReliabilityTest.StoragePermission.class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
 public class GracefulExitHandoffTest {
   @After public void reset(){Main.MainActivity=null;}
   @Test public void ordinaryHomeDoesNotRequestQuit(){
@@ -70,5 +71,33 @@ public class GracefulExitHandoffTest {
   @Test public void diagnosticsDoNotClaimNativeOrPhysicalPass(){
     android.app.Activity a=Robolectric.buildActivity(android.app.Activity.class).setup().get();
     String report=InfinityExitCompletion.report(a);assertTrue(report.contains("NO timed force-stop"));assertTrue(report.contains("require physical validation"));
+  }
+  private org.robolectric.android.controller.ActivityController<Splash> splash(int w,int h){
+    org.robolectric.shadows.ShadowEnvironment.addExternalDir("primary");
+    System.setProperty("xbmc.proploaded","yes");
+    InfinityStartupPreparation deferred=new InfinityStartupPreparation(task->{},(app,trace)->new InfinityStartupPreparation.Result(null,null,null,0));
+    ReflectionHelpers.setStaticField(InfinityStartupPreparation.class,"shared",deferred);
+    org.robolectric.android.controller.ActivityController<Splash> c=Robolectric.buildActivity(Splash.class,new android.content.Intent(android.content.Intent.ACTION_MAIN));
+    c.get().getSharedPreferences("infinity_experience",0).edit().clear().commit();c.create().start().resume().visible();
+    StartupReliabilityTest.frame(c.get(),w,h);return c;
+  }
+  @Test public void actualSplashCannotFreshLaunchAnExplicitlyClosingMainAcrossWindows(){
+    for(int[] size:new int[][]{{420,936},{900,768},{360,640},{360,240}}){
+      Main old=Robolectric.buildActivity(Main.class).get();ReflectionHelpers.setField(old,"mInfinityLaunchReady",true);old.mInfinityExitPlan.requestNormal();
+      org.robolectric.android.controller.ActivityController<Splash> c=splash(size[0],size[1]);
+      c.get().startXBMC();assertTrue(ReflectionHelpers.<Boolean>getField(c.get(),"mInfinityChooserVisible"));
+      android.view.View root=StartupReliabilityTest.frame(c.get(),size[0],size[1]);StartupLifecycleTest.draw(root).recycle();
+      Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertNull(Shadows.shadowOf(c.get()).getNextStartedActivity());
+      assertFalse(c.get().isFinishing());c.pause().stop().destroy();Main.MainActivity=null;
+    }
+  }
+  @Test public void queuedLiveHandoffRechecksCloseBeforeDispatchInsteadOfFreshLaunching(){
+    Main old=Robolectric.buildActivity(Main.class).get();ReflectionHelpers.setField(old,"mInfinityLaunchReady",true);
+    org.robolectric.android.controller.ActivityController<Splash> c=splash(420,936);c.get().startXBMC();
+    old.mInfinityExitPlan.requestNormal();
+    android.view.View root=StartupReliabilityTest.frame(c.get(),420,936);StartupLifecycleTest.draw(root).recycle();
+    Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertNull(Shadows.shadowOf(c.get()).getNextStartedActivity());
+    assertFalse(ReflectionHelpers.<Boolean>getField(c.get(),"mInfinityLaunchQueued"));assertFalse(c.get().isFinishing());
+    c.pause().stop().destroy();
   }
 }

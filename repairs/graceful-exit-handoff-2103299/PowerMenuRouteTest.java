@@ -52,15 +52,15 @@ public class PowerMenuRouteTest {
     android.content.Context app=org.robolectric.RuntimeEnvironment.getApplication();
     File data=new File(app.getFilesDir(),"power-fixture-data");File skin=new File(data,".kodi/addons/skin.infinity.diggz");
     File file=new File(skin,"16x9/DialogButtonMenu.xml");assertTrue(file.getParentFile().mkdirs());
-    String original=fixture("16x9");java.nio.file.Files.writeString(file.toPath(),original);
+    String original=fixture("16x9");java.nio.file.Files.write(file.toPath(),original.getBytes(StandardCharsets.UTF_8));
     String previous=System.getProperty("xbmc.data");
     try{
       System.setProperty("xbmc.data",data.getAbsolutePath());InfinityPowerMenuRoutes.apply(app);
-      String after=java.nio.file.Files.readString(file.toPath());assertEquals(masked(original),masked(after));
+      String after=new String(java.nio.file.Files.readAllBytes(file.toPath()),StandardCharsets.UTF_8);assertEquals(masked(original),masked(after));
       assertTrue(after.contains(InfinityPowerMenuRoutes.command(true)));
       File[] backups=new File(app.getFilesDir(),"infinity-power-route-originals-2103299").listFiles();assertNotNull(backups);assertEquals(1,backups.length);
-      assertEquals(original,java.nio.file.Files.readString(backups[0].toPath()));
-      InfinityPowerMenuRoutes.apply(app);assertEquals(after,java.nio.file.Files.readString(file.toPath()));
+      assertEquals(original,new String(java.nio.file.Files.readAllBytes(backups[0].toPath()),StandardCharsets.UTF_8));
+      InfinityPowerMenuRoutes.apply(app);assertEquals(after,new String(java.nio.file.Files.readAllBytes(file.toPath()),StandardCharsets.UTF_8));
     }finally{if(previous==null)System.clearProperty("xbmc.data");else System.setProperty("xbmc.data",previous);}
   }
 }
