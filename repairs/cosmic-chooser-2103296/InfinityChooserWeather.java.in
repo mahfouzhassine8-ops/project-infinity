@@ -1,0 +1,81 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.TextView;
+import org.json.JSONObject;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/** Read-only existing JNI JSON-RPC client; never starts Kodi, changes weather providers,
+ * asks for location permission, makes a network request or blocks chooser startup.
+ * Before Kodi runs, only a timestamped real last-known snapshot can be shown.
+ */
+final class InfinityChooserWeather {
+  interface Reader { String read(); }
+  final TextView label;
+  final SharedPreferences cache;
+  final Handler main=new Handler(Looper.getMainLooper());
+  final Reader reader;
+  ExecutorService worker;
+  boolean started,inFlight;
+  int generation;
+  final Runnable refresh=()->refresh();
+  static final String REQUEST="{\"jsonrpc\":\"2.0\",\"id\":\"chooser-weather\",\"method\":\"XBMC.GetInfoLabels\",\"params\":{\"labels\":[\"Weather.Location\",\"Weather.Temperature\",\"Weather.Conditions\",\"Weather.FanartCode\"]}}";
+  InfinityChooserWeather(Context c,TextView label){this(c,label,()->{
+    // No Kodi instance at cold launch: do not load a library or boot a player to get weather.
+    Main owner=Main.MainActivity;
+    if(owner==null||owner.isDestroyed()||owner.isFinishing()||owner.mMainView==null)return null;
+    try{return new XBMCJsonRPC().request_string(REQUEST);}
+    catch(RuntimeException|LinkageError unavailable){return null;}
+  });}
+  InfinityChooserWeather(Context c,TextView label,Reader reader){
+    this.label=label;this.reader=reader;
+    cache=c.getApplicationContext().getSharedPreferences("infinity_chooser_weather",Context.MODE_PRIVATE);
+  }
+  void start(){if(started)return;started=true;generation++;renderCached();refresh();}
+  void stop(){started=false;generation++;main.removeCallbacks(refresh);if(worker!=null){worker.shutdownNow();worker=null;}inFlight=false;}
+  private void refresh(){
+    if(!started||inFlight)return;
+    if(worker==null)worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityChooserWeather");t.setDaemon(true);return t;});
+    final int token=generation;inFlight=true;
+    worker.execute(()->{
+      String data=null;try{data=reader.read();}catch(RuntimeException ignored){}
+      final String result=data;
+      main.post(()->{
+        if(!started||token!=generation)return;inFlight=false;
+        accept(result);renderCached();main.postDelayed(refresh,60000);
+      });
+    });
+  }
+  boolean accept(String response){
+    if(response==null)return false;
+    try{
+      JSONObject result=new JSONObject(response).optJSONObject("result");if(result==null)return false;
+      String location=clean(result.optString("Weather.Location")),temperature=clean(result.optString("Weather.Temperature")),condition=clean(result.optString("Weather.Conditions"));
+      if(location.isEmpty()||temperature.isEmpty()||condition.isEmpty()||temperature.equals("N/A"))return false;
+      cache.edit().putString("location",location).putString("temperature",temperature).putString("condition",condition)
+          .putString("icon",clean(result.optString("Weather.FanartCode"))).putLong("timestamp",System.currentTimeMillis()).apply();return true;
+    }catch(Exception malformed){return false;}
+  }
+  static String clean(String value){return value==null?"":value.replaceAll("[\\p{Cntrl}]"," ").trim();}
+  static String icon(String condition){
+    String c=condition.toLowerCase(Locale.ROOT);
+    if(c.contains("snow"))return "❄";if(c.contains("thunder"))return "ϟ";
+    if(c.contains("rain")||c.contains("shower"))return "☂";if(c.contains("cloud")||c.contains("overcast"))return "☁";
+    if(c.contains("sun")||c.contains("clear"))return "☀";return "◌";
+  }
+  void renderCached(){
+    long timestamp=cache.getLong("timestamp",0),age=System.currentTimeMillis()-timestamp;
+    if(timestamp<=0||age<0||age>24*60*60*1000L){label.setText("Weather unavailable");label.setContentDescription("Weather unavailable. Kodi weather has not supplied a recent reading.");return;}
+    String location=cache.getString("location",""),temperature=cache.getString("temperature",""),condition=cache.getString("condition","");
+    boolean current=Main.MainActivity!=null&&age<2*60*1000L;
+    String value=icon(condition)+"  "+location+"  •  "+temperature+"  "+condition;
+    if(!current)value+="  •  last known";
+    label.setText(value);label.setContentDescription(value+". Observed "+java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(timestamp)));
+  }
+}
