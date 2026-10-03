@@ -123,7 +123,7 @@ final class InfinityGlassChooser extends FrameLayout {
       hmCopy=label("hm-copy","BUILT DIFFERENT\nFOR A HIGHER",9,ink,0,Gravity.CENTER);
       choose=label("choose-heading","CHOOSE YOUR",17,ink,.28f,Gravity.CENTER);
       experience=label("experience-heading","EXPERIENCE",36,ink,.16f,Gravity.CENTER);
-      experience.gradient=true;
+      experience.gradient=true;experience.themeLight=light;
       subtitle=label("choose-subtitle","TWO UNIVERSES. ONE HIGHER STANDARD.",10,ink,.12f,Gravity.CENTER);
       infinity=new Card(c,light,false,actions);cobra=new Card(c,light,true,actions);addView(infinity);addView(cobra);
       footer=label("choose-footer","MORE THAN ENTERTAINMENT",9,ink,.18f,Gravity.CENTER);
@@ -185,7 +185,7 @@ final class InfinityGlassChooser extends FrameLayout {
   }
 
   static final class Label extends TextView {
-    final float size;boolean gradient;
+    final float size;boolean gradient,themeLight;
     Label(Context c,String text,float size,int color,float tracking,int gravity){
       super(c);this.size=size;setText(text);setTextColor(color);setGravity(gravity);
       setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));setLetterSpacing(tracking);
@@ -209,7 +209,8 @@ final class InfinityGlassChooser extends FrameLayout {
     }
     @Override protected void onSizeChanged(int w,int h,int ow,int oh){
       super.onSizeChanged(w,h,ow,oh);
-      if(gradient)getPaint().setShader(new LinearGradient(0,0,w,0,new int[]{0xffd1a14b,0xfffce2a0,0xff88d4fa,0xff3ca6db},null,Shader.TileMode.CLAMP));
+      if(gradient)getPaint().setShader(new LinearGradient(0,0,w,0,themeLight?
+          new int[]{0xff835006,0xffb28029,0xff123d61,0xff0a5684}:new int[]{0xffd1a14b,0xfffce2a0,0xff88d4fa,0xff3ca6db},null,Shader.TileMode.CLAMP));
     }
   }
 
@@ -221,7 +222,7 @@ final class InfinityGlassChooser extends FrameLayout {
     Card(Context c,boolean light,boolean cobra,Actions actions){
       super(c);this.light=light;this.cobra=cobra;setWillNotDraw(false);setClipChildren(true);
       setId(cobra?ENTER_COBRA:ENTER_INFINITY);setTag(cobra?"experience-enter-cobra":"experience-enter-infinity");
-      setFocusable(true);setClickable(true);setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+      setFocusable(true);setFocusableInTouchMode(true);setClickable(true);setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
       setContentDescription(cobra?"Cobra. Faster. Bolder. Relentless. Open Cobra.":"Infinity. Cleaner. Smarter. Higher. Open Infinity.");
       setOnClickListener(v->actions.enter(cobra?"live":"infinity"));
       mark=new Brand(c,cobra);addView(mark);
@@ -269,7 +270,7 @@ final class InfinityGlassChooser extends FrameLayout {
   }
   static final class Gear extends View {
     final boolean light,cobra;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);final Path cog=new Path();
-    Gear(Context c,boolean light,boolean cobra){super(c);this.light=light;this.cobra=cobra;setFocusable(true);setClickable(true);}
+    Gear(Context c,boolean light,boolean cobra){super(c);this.light=light;this.cobra=cobra;setFocusable(true);setFocusableInTouchMode(true);setClickable(true);}
     @Override protected void onSizeChanged(int w,int h,int ow,int oh){
       float s=Math.min(w,h),cx=w/2f,cy=h/2f;cog.reset();
       for(int i=0;i<40;i++){double a=i*Math.PI/20-Math.PI/2;float rad=s*((i%5==1||i%5==2)?.25f:.20f);
@@ -298,14 +299,19 @@ final class InfinityGlassChooser extends FrameLayout {
   }
   static final class Brand extends View {
     final boolean cobra;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);final RectF dst=new RectF();
-    final Bitmap infinity;
+    final Bitmap bitmap;final android.graphics.Rect source=new android.graphics.Rect();
     Brand(Context c,boolean cobra){super(c);this.cobra=cobra;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
-      infinity=cobra?null:InfinityGlassArt.decode("dark_gold_mark");if(cobra)CobraEmblem.prepare(c);
+      bitmap=InfinityCosmicArt.decodeMark(cobra);
+      if(bitmap!=null){
+        int w=bitmap.getWidth(),h=bitmap.getHeight(),left=w,top=h,right=0,bottom=0;
+        int[] pixels=new int[w*h];bitmap.getPixels(pixels,0,w,0,0,w,h);
+        for(int y=0;y<h;y++)for(int x=0;x<w;x++)if(Color.alpha(pixels[y*w+x])>8){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+1);bottom=Math.max(bottom,y+1);}
+        if(right>left&&bottom>top)source.set(left,top,right,bottom);
+      }
     }
     @Override protected void onDraw(Canvas c){
-      dst.set(0,0,getWidth(),getHeight());if(cobra){CobraEmblem.draw(c,dst,Color.WHITE,255);return;}
-      if(infinity==null)return;float scale=Math.min(getWidth()/(float)infinity.getWidth(),getHeight()/(float)infinity.getHeight());
-      float w=infinity.getWidth()*scale,h=infinity.getHeight()*scale;dst.set((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2);c.drawBitmap(infinity,null,dst,p);
+      if(bitmap==null||source.isEmpty())return;float scale=Math.min(getWidth()/(float)source.width(),getHeight()/(float)source.height());
+      float w=source.width()*scale,h=source.height()*scale;dst.set((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2);c.drawBitmap(bitmap,source,dst,p);
     }
   }
 
