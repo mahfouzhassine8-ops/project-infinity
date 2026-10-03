@@ -1,0 +1,29 @@
+name: Infinity 2103302 baseline source verification
+on:
+  push:
+    branches: [candidate-infinity-2103303-e2e-repair]
+    paths: ['.github/workflows/infinity-2103303-baseline-source.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103302-Chooser-Weather-Snapshot-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37146313126
+          github-token: ${{ github.token }}
+          path: baseline
+      - name: Export shutdown source for exact baseline verification
+        run: |
+          python3 - <<'PY'
+          import pathlib, hashlib, base64
+          for name in ('InfinityExitCompletion','InfinityPowerMenuRoutes'):
+              p=pathlib.Path('baseline/source')/(name+'.java.in')
+              data=p.read_bytes()
+              print('BASELINE_FILE',name,hashlib.sha256(data).hexdigest())
+              print(base64.b64encode(data).decode())
+              print('BASELINE_END',name)
+          PY
