@@ -95,7 +95,7 @@ void CAndroidTouch::RefreshInputViewport(JNIEnv* env, jobject activity)
   if (mainViewField == nullptr)
   {
     jclass activityClass = env->GetObjectClass(activity);
-    const std::string signature = "L" + CCompileInfo::GetClass() + "/XBMCMainView;";
+    const std::string signature = std::string("L") + CCompileInfo::GetClass() + "/XBMCMainView;";
     if (activityClass != nullptr)
       mainViewField = env->GetFieldID(activityClass, "mMainView", signature.c_str());
   }

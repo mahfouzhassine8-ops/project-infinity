@@ -221,7 +221,7 @@ def main():
                  'android/input.h':INPUT_STUB,
                  'input/touch/generic/GenericTouchInputHandler.h':GENERIC_STUB,
                  'input/touch/generic/GenericTouchActionHandler.h':'#pragma once\n#include "GenericTouchInputHandler.h"\n',
-                 'CompileInfo.h':'#pragma once\n#include <string>\nclass CCompileInfo {public: static std::string GetClass(){return "org/xbmc/kodi";}};\n',
+                 'CompileInfo.h':'#pragma once\nclass CCompileInfo {public: static const char* GetClass(){return "org/xbmc/kodi";}};\n',
                  'platform/android/activity/XBMCApp.h':'#pragma once\nclass CXBMCApp {public: static void android_printf(const char*,...) {}};\n',
                  'test.cpp':TEST.replace('// FRAME_HOOK',hook)}
         for name, content in files.items():
