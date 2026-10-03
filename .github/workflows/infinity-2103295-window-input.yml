@@ -106,7 +106,9 @@ jobs:
           stage=stage.replace(inherited,'python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi',1)
           Path('audit3295/inherited-native-build.sh').write_text(stage)
           PY
-          bash audit3295/inherited-native-build.sh
+          # Persist the complete native transcript even when compilation fails so
+          # the always-uploaded evidence artifact contains the actionable error.
+          bash audit3295/inherited-native-build.sh 2>&1 | tee audit3295/native-build.log
 
           # Diagnostic fan-out: after the expensive native build succeeds, run every preservation/
           # responsive verifier and report all failures in this one attempt instead of stopping at
