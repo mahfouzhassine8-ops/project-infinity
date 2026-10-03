@@ -47,7 +47,7 @@ public class ChooserWeatherSnapshotTest {
   @Test public void bridgeRegistrationIsOptionalIdempotentAndPreservesExistingManifest()throws Exception{
     File h=home(),manifest=new File(h,"assets/system/addon-manifest.xml");String original=read(manifest);InfinityChooserWeather.prepareSnapshotBridge(app,h);String added=read(manifest);
     String registration="  <addon optional=\"true\">"+InfinityChooserWeather.BRIDGE_ID+"</addon>\n";assertEquals(original,added.replace(registration,""));InfinityChooserWeather.prepareSnapshotBridge(app,h);assertEquals(added,read(manifest));
-    File addon=new File(h,"assets/addons/"+InfinityChooserWeather.BRIDGE_ID);assertEquals(InfinityChooserWeather.PRODUCER,read(new File(addon,"weather_snapshot.py")));assertTrue(read(new File(addon,"snapshot_config.py")).contains(file.getAbsolutePath()));
+    File addon=new File(h,"assets/addons/"+InfinityChooserWeather.BRIDGE_ID);assertEquals(InfinityChooserWeather.PRODUCER,read(new File(addon,"weather_snapshot.py")));assertEquals(file.getAbsolutePath(),new JSONObject(read(new File(addon,"snapshot_config.json"))).getString("snapshot_file"));
   }
   @Test public void malformedManifestCannotBeRewritten()throws Exception{
     File h=home(),manifest=new File(h,"assets/system/addon-manifest.xml");InfinityChooserWeather.atomicWrite(manifest,"<addons>broken");try{InfinityChooserWeather.prepareSnapshotBridge(app,h);fail();}catch(Exception expected){}assertEquals("<addons>broken",read(manifest));

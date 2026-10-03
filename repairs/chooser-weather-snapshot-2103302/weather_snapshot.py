@@ -58,5 +58,6 @@ def main(kodi, target):
 
 if __name__ == '__main__':
     import xbmc
-    from snapshot_config import SNAPSHOT_FILE
-    main(xbmc, SNAPSHOT_FILE)
+    with open(os.path.join(os.path.dirname(__file__), 'snapshot_config.json'), encoding='utf-8') as config:
+        target = json.load(config)['snapshot_file']
+    main(xbmc, target)

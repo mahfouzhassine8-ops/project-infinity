@@ -44,6 +44,10 @@ class Tests(unittest.TestCase):
         def aborted():calls.append(1);return len(calls)>=3
         monitor.abortRequested=aborted
         self.assertFalse(weather.publish(self.kodi,str(self.target),monitor));self.assertEqual(self.target.read_text(),'previous');self.assertFalse(pathlib.Path(str(self.target)+'.pending').exists())
+    def test_android_json_config_preserves_escaped_filesystem_path(self):
+        path=str(pathlib.Path(self.tmp.name)/'weather snapshot.json')
+        android_json=json.dumps({'snapshot_file':path}).replace('/', '\\/')
+        self.assertEqual(json.loads(android_json)['snapshot_file'],path)
     def test_service_exits_on_abort_without_extra_poll(self):
         monitor=Monitor();monitor.waitForAbort=lambda seconds:True;self.kodi.Monitor=lambda:monitor
         with patch.object(weather,'publish') as publish:weather.main(self.kodi,str(self.target));self.assertEqual(publish.call_count,1)
