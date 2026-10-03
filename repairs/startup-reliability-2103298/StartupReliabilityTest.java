@@ -107,7 +107,12 @@ public class StartupReliabilityTest {
     ActivityController<Splash> recreated=create(900,768);Splash current=recreated.get();draw(current,900,768);choose(current);
     assertEquals("One application-owned cache worker",1,executor.count);
     executor.complete();idle();draw(current,900,768);
-    assertNull(Shadows.shadowOf(stale).getNextStartedActivity());assertNotNull(Shadows.shadowOf(current).getNextStartedActivity());
+    // Robolectric's started-activity queue is application-wide, not per Activity.
+    // Inspect the cancelled owner's ticket/state, then drain the shared launch queue once.
+    assertTrue(stale.isDestroyed());assertFalse(ReflectionHelpers.<Boolean>getField(stale,"mInfinityPreparationReady"));
+    InfinityStartupPreparation.Ticket ticket=ReflectionHelpers.getField(stale,"mInfinityPreparation");
+    assertTrue(ReflectionHelpers.<Boolean>getField(ticket,"closed"));assertNull(ReflectionHelpers.getField(ticket,"callback"));
+    assertNotNull(Shadows.shadowOf(current).getNextStartedActivity());
     assertNull(Shadows.shadowOf(current).getNextStartedActivity());dispose(recreated);
   }
 
