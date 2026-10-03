@@ -83,6 +83,18 @@ def apply_source(root: Path, out: Path) -> None:
     source = source.replace('37105329683', '37117015142')
     source = source.replace('repairs/graceful-exit-handoff-2103300/DEVICE-TEST.txt',
                             'repairs/stale-main-task-2103300/DEVICE-TEST.txt')
+    old_bridge_audit = '''    app=next(n for n in new['children'] if n['tag']=='application')
+    bridge=[n for n in app['children'] if n['tag']=='activity' and 'InfinityPowerControlActivity' in n['attrs'].get('android:name','')]
+    require(len(bridge)==1,'Exactly one private power bridge required')
+    node=bridge[0]
+    require(set(node['attrs'])=={'android:name','android:exported','android:excludeFromRecents','android:noHistory','android:theme'} and not node['children'],'Power bridge manifest expanded unexpectedly')
+    require(node['attrs']['android:exported']=='(type 0x12)0x0','Power bridge must be private')
+    require(node['attrs']['android:excludeFromRecents']=='(type 0x12)0xffffffff' and node['attrs']['android:noHistory']=='(type 0x12)0xffffffff','Power bridge must be transient')
+    require(node['attrs']['android:theme']=='@0x01030055','Power bridge must use framework Theme.NoDisplay')
+    app['children'].remove(node)
+    require(old==new,'Compiled manifest drift beyond versions and exact private power bridge')'''
+    source = once(source, old_bridge_audit,
+                  "    require(old==new,'Compiled manifest drift from exact 2103299 base outside version identity')")
     packager.write_text(source)
 
     out.mkdir(parents=True, exist_ok=True)
