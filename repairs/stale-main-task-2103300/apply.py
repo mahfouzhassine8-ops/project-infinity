@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 PARENT_SHA = 'e46f1745668d6cd6b3df05ae12785e8a3a952e94c9e14cec70a2901ed0bd9dc5'
@@ -96,6 +97,10 @@ def apply_source(root: Path, out: Path) -> None:
     source = once(source, old_bridge_audit,
                   "    require(old==new,'Compiled manifest drift from exact 2103299 base outside version identity')")
     packager.write_text(source)
+
+    checklist_dir = root / 'repairs/stale-main-task-2103300'
+    checklist_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(Path(__file__).parent / 'DEVICE-TEST.txt', checklist_dir / 'DEVICE-TEST.txt')
 
     out.mkdir(parents=True, exist_ok=True)
     changes = []
