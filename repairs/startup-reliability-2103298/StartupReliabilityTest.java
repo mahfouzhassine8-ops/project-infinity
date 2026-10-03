@@ -131,6 +131,16 @@ public class StartupReliabilityTest {
     assertTrue((launch.getFlags()&Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)!=0);dispose(c);
   }
 
+  @Test public void ownerBeginningExitBetweenEnqueueAndDispatchRequiresFreshPreparation() throws Exception {
+    Main main=Robolectric.buildActivity(Main.class).get();ReflectionHelpers.setField(main,"mInfinityLaunchReady",true);
+    ActivityController<Splash> c=create(420,936);Splash a=c.get();draw(a,420,936);
+    assertEquals(0,executor.count);assertNull(Shadows.shadowOf(a).getNextStartedActivity());
+    main.finish();draw(a,420,936);
+    assertEquals(1,executor.count);assertNull(Shadows.shadowOf(a).getNextStartedActivity());
+    executor.complete();idle();draw(a,420,936);Intent launch=Shadows.shadowOf(a).getNextStartedActivity();assertNotNull(launch);
+    assertEquals(0,launch.getFlags()&Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);assertNull(Shadows.shadowOf(a).getNextStartedActivity());dispose(c);
+  }
+
   @Test public void missingDisposablePathsResolveImmediatelyWithoutTwentySecondLoops() throws Exception {
     Activity a=Robolectric.buildActivity(Activity.class).setup().get();InfinityStartupTrace trace=new InfinityStartupTrace(a);
     File fallback=new File(a.getCacheDir(),"apk");

@@ -54,6 +54,19 @@ def splash(s):
     mInfinityLaunchQueued = mInfinityHandoff.enqueue(() -> {''')
     s=once(s,'      Log.i(TAG,"Infinity launch handoff: " + (live ? "live Main" : "fresh Main"));',
         '      mInfinityStartupTrace.event(live ? "handoff.liveMain" : "handoff.freshMain");\n      Log.i(TAG,"Infinity launch handoff: " + (live ? "live Main" : "fresh Main"));')
+    s=once(s,'      Intent target = InfinityStartupHandoff.mainIntent(this,request,live);','''      if (!live && !mInfinityPreparationReady) {
+        // The previously live owner can begin Exit between enqueue and dispatch.
+        // A fresh NativeActivity must not inherit the live-owner preparation bypass.
+        mInfinityStartupTrace.event("handoff.ownerExpired.prepareFresh");
+        mInfinityLaunchQueued = false;
+        mInfinityHandoff.close();
+        mInfinityHandoff = new InfinityStartupHandoff(this,findViewById(android.R.id.content));
+        if (mInfinityResumed) mInfinityHandoff.resume();
+        mInfinityPendingMain = new Intent(request);
+        infinityInitializeStartup();
+        return;
+      }
+      Intent target = InfinityStartupHandoff.mainIntent(this,request,live);''')
     # The approved chooser rendering/body is untouched. Only attach evidence for its first draw.
     anchor='  private void showInfinityExperienceChooser()\n  { '
     if anchor not in s:anchor='  private void showInfinityExperienceChooser()\n  {\n'
