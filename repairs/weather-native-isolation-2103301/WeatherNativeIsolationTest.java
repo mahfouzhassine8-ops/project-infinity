@@ -2,11 +2,10 @@ package com.projectinfinity.kodi;
 import android.content.Context;
 import android.widget.TextView;
 import java.io.*;
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.robolectric.*;
@@ -16,29 +15,55 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class) @Config(sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
 public class WeatherNativeIsolationTest {
   private Context app;
-  private HttpServer server;
+  private ServerSocket server;
   private ExecutorService executor;
+  private volatile boolean serving;
+  private final ConcurrentHashMap<String,Response> routes=new ConcurrentHashMap<>();
+  interface Response { void send(Socket socket,String request,String authorization) throws Exception; }
   private final AtomicInteger calls=new AtomicInteger();
   private final AtomicReference<String> body=new AtomicReference<>(),auth=new AtomicReference<>();
   private static final String REAL="{\"result\":{\"Weather.Location\":\"Configured city\",\"Weather.Temperature\":\"15°C\",\"Weather.Conditions\":\"Cloudy\"}}";
   @Before public void setup() throws Exception {
     app=RuntimeEnvironment.getApplication();Main.MainActivity=null;
     app.getSharedPreferences("infinity_chooser_weather",0).edit().clear().commit();
-    server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
-    executor=Executors.newCachedThreadPool();server.setExecutor(executor);
+    server=new ServerSocket();server.bind(new InetSocketAddress("127.0.0.1",0));
+    executor=Executors.newCachedThreadPool();
   }
-  @After public void teardown(){server.stop(0);executor.shutdownNow();Main.MainActivity=null;}
+  @After public void teardown() throws Exception {serving=false;server.close();executor.shutdownNow();Main.MainActivity=null;}
   private InfinityChooserWeather.Settings settings(){
-    InfinityChooserWeather.Settings s=new InfinityChooserWeather.Settings();s.enabled=true;s.port=server.getAddress().getPort();return s;
+    InfinityChooserWeather.Settings s=new InfinityChooserWeather.Settings();s.enabled=true;s.port=server.getLocalPort();return s;
+  }
+  private static String line(InputStream input) throws IOException {
+    ByteArrayOutputStream out=new ByteArrayOutputStream();int b;
+    while((b=input.read())!=-1&&b!='\n'){if(b!='\r')out.write(b);if(out.size()>8192)throw new IOException();}
+    return out.toString("UTF-8");
+  }
+  private static void send(Socket socket,int status,byte[] data,String location) throws IOException {
+    OutputStream out=socket.getOutputStream();
+    String headers="HTTP/1.1 "+status+" Result\r\nContent-Type: application/json\r\nContent-Length: "+data.length+"\r\nConnection: close\r\n";
+    if(location!=null)headers+="Location: "+location+"\r\n";
+    out.write((headers+"\r\n").getBytes(StandardCharsets.UTF_8));out.write(data);out.flush();
+  }
+  private void startServer(){
+    serving=true;executor.execute(()->{while(serving){
+      try{Socket socket=server.accept();executor.execute(()->{try(Socket peer=socket){
+        peer.setSoTimeout(4000);InputStream input=peer.getInputStream();String first=line(input),header,authorization=null;int length=0;
+        while(!(header=line(input)).isEmpty()){
+          if(header.toLowerCase(java.util.Locale.ROOT).startsWith("content-length:"))length=Integer.parseInt(header.substring(15).trim());
+          if(header.toLowerCase(java.util.Locale.ROOT).startsWith("authorization:"))authorization=header.substring(14).trim();
+        }
+        if(length<0||length>8192)throw new IOException();byte[] request=new byte[length];int offset=0;
+        while(offset<length){int n=input.read(request,offset,length-offset);if(n<0)throw new IOException();offset+=n;}
+        Response response=routes.get(first.split(" ")[1]);if(response==null)throw new IOException();
+        response.send(peer,new String(request,StandardCharsets.UTF_8),authorization);
+      }catch(Exception ignored){}});}catch(IOException closed){break;}
+    }});
   }
   private void serve(int status,String payload){
-    server.createContext("/jsonrpc",e->{
-      calls.incrementAndGet();auth.set(e.getRequestHeaders().getFirst("Authorization"));
-      body.set(new String(e.getRequestBody().readAllBytes(),StandardCharsets.UTF_8));
-      if(status==302)e.getResponseHeaders().set("Location","http://127.0.0.1:"+server.getAddress().getPort()+"/forbidden");
-      byte[] data=payload.getBytes(StandardCharsets.UTF_8);e.sendResponseHeaders(status,data.length);
-      e.getResponseBody().write(data);e.close();
-    });server.start();
+    routes.put("/jsonrpc",(socket,request,authorization)->{
+      calls.incrementAndGet();auth.set(authorization);body.set(request);
+      send(socket,status,payload.getBytes(StandardCharsets.UTF_8),status==302?"http://127.0.0.1:"+server.getLocalPort()+"/forbidden":null);
+    });startServer();
   }
   @Test public void readOnlyLoopbackWorksWithoutLoadingKodiAndPreservesValidCache(){
     serve(200,REAL);InfinityChooserWeather.LocalReader reader=new InfinityChooserWeather.LocalReader(app);
@@ -58,9 +83,9 @@ public class WeatherNativeIsolationTest {
     s.enabled=true;s.ssl=true;assertNull(reader.request(s));assertEquals(0,calls.get());
   }
   @Test public void redirectsAndOversizedResponsesCannotEscapeBoundary(){
-    AtomicInteger redirected=new AtomicInteger();server.createContext("/forbidden",e->{redirected.incrementAndGet();e.close();});
+    AtomicInteger redirected=new AtomicInteger();routes.put("/forbidden",(socket,request,authorization)->{redirected.incrementAndGet();});
     serve(302,"redirect");assertNull(new InfinityChooserWeather.LocalReader(app).request(settings()));assertEquals(0,redirected.get());
-    server.removeContext("/jsonrpc");server.createContext("/jsonrpc",e->{byte[] data=new byte[17000];e.sendResponseHeaders(200,data.length);e.getResponseBody().write(data);e.close();});
+    routes.put("/jsonrpc",(socket,request,authorization)->send(socket,200,new byte[17000],null));
     assertNull(new InfinityChooserWeather.LocalReader(app).request(settings()));
   }
   @Test public void unavailableEndpointDoesNotEraseCachedWeather(){
@@ -88,7 +113,7 @@ public class WeatherNativeIsolationTest {
   }
   @Test public void unresponsiveServerHasFiniteReadTimeout() throws Exception {
     CountDownLatch entered=new CountDownLatch(1),release=new CountDownLatch(1);
-    server.createContext("/jsonrpc",e->{entered.countDown();try{release.await(4,TimeUnit.SECONDS);}catch(InterruptedException ignored){}e.close();});server.start();
+    routes.put("/jsonrpc",(socket,request,authorization)->{entered.countDown();try{release.await(4,TimeUnit.SECONDS);}catch(InterruptedException ignored){}});startServer();
     Future<String> result=executor.submit(()->new InfinityChooserWeather.LocalReader(app).request(settings()));
     try{assertTrue(entered.await(2,TimeUnit.SECONDS));assertNull(result.get(3,TimeUnit.SECONDS));}finally{release.countDown();}
   }
