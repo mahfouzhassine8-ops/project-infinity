@@ -1,0 +1,27 @@
+2103299 DEVICE TRACE REVIEW — SM-F976U1 / ANDROID 17
+
+The supplied Health Center report records three SIGSEGV native-crash exits:
+
+- 07:29:31.555: fresh Main handoff at 07:29:31.296; main.afterSuper at
+  07:29:31.427. Crash follows 128 ms later.
+- 07:29:38.096: fresh Main handoff at 07:29:37.952; main.afterSuper at
+  07:29:37.995. Crash follows 101 ms later.
+- 07:29:50.165: fresh Main handoff at 07:29:50.014; main.afterSuper at
+  07:29:50.058. Crash follows 107 ms later.
+
+The traces include Kodi initialization frames, including CSettings::Initialize
+and CJNIXBMCMainView::waitForSurface. This tightly links each recorded native
+crash to the new Main startup, but does not identify a faulty native instruction.
+
+The first run showed chooser.firstFrame about 51 ms after Splash creation and
+freshMain about 109 seconds later. That interval is time spent on the visible
+chooser before selection; it is not evidence that the app took 109 seconds to
+show its first usable chooser frame. The old DELAYED_STARTUP label counted the
+user's chooser time.
+
+Source review found that Kodi Main is singleInstance. The prior intent helper
+removed CLEAR_TASK for both live and stale cases. When Main was stale, Android
+could reuse its prior task record instead of creating the required clean native
+activity. 2103300 makes CLEAR_TASK conditional on the no-live-Main path and
+keeps the live-Main path intact. This is the leading source-supported cause,
+not a physical proof; repeated device retesting is still required.
