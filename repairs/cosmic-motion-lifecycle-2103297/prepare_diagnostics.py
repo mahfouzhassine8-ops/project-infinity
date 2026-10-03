@@ -13,6 +13,6 @@ tests=a.build/'xbmc/src/test/java/com/projectinfinity/kodi'
 for name in ('MotionFrameTest.java','StartupLifecycleTest.java'):
     shutil.copy2(here/name,tests/name)
 manifest=a.build/'xbmc/AndroidManifest.xml';s=manifest.read_text().replace('/></manifest>','><activity android:name=".Splash" android:launchMode="singleInstance"/><activity android:name=".Main" android:launchMode="singleInstance"/></application></manifest>')
-manifest.write_text(s)
+manifest.write_text(s.replace('<application ', '<application android:hardwareAccelerated="false" '))
 (a.evidence/'DIAGNOSTIC-SCOPE.json').write_text(json.dumps({'full_actual_java_shell_compilation':True,'actual_splash_exercised':True,'native_kodi_execution':False,
     'runtime':'Robolectric API 35 native graphics; Android activity/looper lifecycle simulation','physical_fold_verified':False,'kodi_health':'source preservation supplemental only; device report pending','locked':False},indent=2)+'\n')

@@ -95,6 +95,7 @@ public class StartupLifecycleTest {
 
   @Test public void actualSplashCreatesContentBeforeFreshLaunchAndSuppressesDuplicateIntents(){
     Main.MainActivity=null;
+    org.robolectric.shadows.ShadowEnvironment.addExternalDir("primary");
     ActivityController<Splash> c=Robolectric.buildActivity(Splash.class,new Intent(Intent.ACTION_MAIN));
     Splash a=c.get();a.getSharedPreferences("infinity_experience",0).edit().putString("default","infinity").commit();
     c.create();Handler machine=ReflectionHelpers.getField(a,"mStateMachine");machine.removeCallbacksAndMessages(null);

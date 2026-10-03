@@ -37,6 +37,10 @@ public class MotionFrameTest {
       ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();
       InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new CosmicChooserTest.Calls(theme));
       ctl.get().setContentView(ui);CosmicChooserTest.layout(ui,size[0],size[1]);
+      // Robolectric native graphics defaults AttachInfo to accelerated even for bitmap draws.
+      // Explicitly simulate the real software-window attachment; rasterization stays native Canvas.
+      Object attach=org.robolectric.util.ReflectionHelpers.getField(ui.backdrop,"mAttachInfo");
+      org.robolectric.util.ReflectionHelpers.setField(attach,"mHardwareAccelerated",false);
       assertFalse("Software View must be eligible",ui.backdrop.isHardwareAccelerated());
       ui.backdrop.onWindowFocusChanged(true);assertTrue(ui.backdrop.eligible());assertTrue(ui.backdrop.framePending);
       Map<String,String> bounds=CosmicChooserTest.tree(ui,ui);
