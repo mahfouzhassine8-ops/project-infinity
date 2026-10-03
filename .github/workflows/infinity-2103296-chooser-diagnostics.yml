@@ -55,3 +55,58 @@ jobs:
           path: evidence3296/
           if-no-files-found: error
           retention-days: 90
+  chooser-candidate:
+    needs: chooser-only
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: parent284-artifact
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103295-Window-Local-Input-RC1-Candidate
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37092252001
+          github-token: ${{ github.token }}
+          path: parent3295
+      - name: Bind chooser-only delta to exact successful 2103295
+        run: |
+          set -euo pipefail
+          echo 'd373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621  parent284-artifact/reconstructed-2103284-shell.tar.gz' | sha256sum -c -
+          echo 'dba26141addbacd64f334bcc32633669ffcc3c4677961e7ce3e23f01684416a0  parent3295/Infinity-2103295-Window-Local-Input-RC1.apk' | sha256sum -c -
+          mkdir -p chooser3296 candidate3296
+          tar --no-same-owner -xzf parent284-artifact/reconstructed-2103284-shell.tar.gz -C chooser3296
+          python3 repairs/evidence-health-2103288/apply.py apply --root chooser3296 --out candidate3296/parent-health
+          python3 repairs/native-responsive-2103290/android_shell.py apply --root chooser3296/shell-kodi --receipt candidate3296/parent-responsive.json
+          python3 repairs/cosmic-chooser-2103296/apply.py --root chooser3296 --base parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --out candidate3296
+      - name: Compile Java only and permanently sign chooser candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if ! test -f "$HOME/.android/debug.keystore"; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 chooser3296/scripts/package_background_resume.py --source chooser3296/shell-kodi --base-apk parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --build-dir chooser3296-build --out candidate3296 2>&1 | tee candidate3296/package.log
+          sha256sum candidate3296/Infinity-2103296-Cosmic-Chooser-RC1.apk > candidate3296/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103296-Cosmic-Chooser-RC1-Candidate
+          path: candidate3296/
+          if-no-files-found: error
+          retention-days: 90

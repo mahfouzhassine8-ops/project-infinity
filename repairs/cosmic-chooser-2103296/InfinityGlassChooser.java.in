@@ -105,7 +105,7 @@ final class InfinityGlassChooser extends FrameLayout {
     final Card infinity,cobra;
     final Label time,date,weather,choose,experience,subtitle,hmCopy,footer,footerAccent;
     final Orb orb;
-    int viewportHint;
+    int viewportHint,headingTop,cardTop;
     final InfinityChooserWeather weatherData;
     private boolean ticking;
     private final Runnable clockTick=()->{if(ticking){updateClock();postDelayed(this.clockTick(),1000);}};
@@ -116,6 +116,7 @@ final class InfinityGlassChooser extends FrameLayout {
       int ink=light?0xff071a30:0xfff5f7fc;
       time=label("live-time","",30,ink,0,Gravity.START|Gravity.CENTER_VERTICAL);
       date=label("live-full-date","",12,ink,0,Gravity.START|Gravity.CENTER_VERTICAL);
+      date.setMaxLines(2);
       weather=label("live-weather","Weather unavailable",12,ink,0,Gravity.START|Gravity.CENTER_VERTICAL);
       weather.setEllipsize(TextUtils.TruncateAt.END);
       weatherData=new InfinityChooserWeather(c,weather);
@@ -149,20 +150,23 @@ final class InfinityGlassChooser extends FrameLayout {
     private void measure(View v,int w,int h){v.measure(MeasureSpec.makeMeasureSpec(Math.max(1,w),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Math.max(1,h),MeasureSpec.EXACTLY));}
     @Override protected void onMeasure(int ws,int hs){
       int w=Math.max(1,MeasureSpec.getSize(ws));
-      int h=Math.max(viewportHint,px(getContext(),620));
+      int h=Math.max(viewportHint,px(getContext(),500));
       int margin=Math.min(w/12,px(getContext(),24)),orbW=Math.min(px(getContext(),62),w/5);
       int dataW=Math.max(1,w-2*margin-orbW-px(getContext(),12));
-      measure(time,dataW,px(getContext(),40));measure(date,dataW,px(getContext(),24));measure(weather,dataW,px(getContext(),26));
+      measure(time,dataW,px(getContext(),40));measure(date,dataW,px(getContext(),32));measure(weather,dataW,px(getContext(),26));
       measure(orb,orbW,orbW);measure(hmCopy,orbW+margin,px(getContext(),32));
       int headingW=w-2*margin;
-      measure(choose,headingW,px(getContext(),32));measure(experience,headingW,px(getContext(),56));measure(subtitle,headingW,px(getContext(),25));
+      measure(choose,headingW,px(getContext(),28));measure(experience,headingW,px(getContext(),48));measure(subtitle,headingW,px(getContext(),24));
       int gap=Math.max(px(getContext(),12),Math.min(px(getContext(),28),w/30));
-      int cardW=Math.min((w-2*margin-gap)/2,Math.min(px(getContext(),340),Math.round(h*.28f)));
-      cardW=Math.max(1,cardW);int cardH=Math.max(px(getContext(),228),Math.round(cardW*1.5f));
+      headingTop=Math.max(px(getContext(),116),Math.round(h*.20f));
+      cardTop=Math.max(headingTop+px(getContext(),114),Math.round(h*.38f));
+      int availableCardH=h-px(getContext(),80)-cardTop;
+      int cardW=Math.min((w-2*margin-gap)/2,Math.min(px(getContext(),340),Math.round(availableCardH/1.5f)));
+      cardW=Math.max(1,cardW);int cardH=Math.max(px(getContext(),190),Math.round(cardW*1.5f));
       measure(infinity,cardW,cardH);measure(cobra,cardW,cardH);
       measure(footer,headingW,px(getContext(),24));measure(footerAccent,headingW,px(getContext(),28));
       // Enough quiet horizon remains below cards. Everything stays reachable at large font scales.
-      h=Math.max(h,px(getContext(),265)+cardH+px(getContext(),100));
+      h=Math.max(h,cardTop+cardH+px(getContext(),80));
       setMeasuredDimension(w,h);
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
@@ -171,13 +175,10 @@ final class InfinityGlassChooser extends FrameLayout {
       place(time,margin,top);place(date,margin,top+time.getMeasuredHeight());
       place(weather,margin,top+time.getMeasuredHeight()+date.getMeasuredHeight());
       place(orb,w-margin-orbW,top);place(hmCopy,w-margin-orbW-margin/2,top+orbW+px(getContext(),5));
-      int headingTop=Math.max(px(getContext(),136),Math.round(h*.20f));
       place(choose,margin,headingTop);place(experience,margin,headingTop+choose.getMeasuredHeight());
       place(subtitle,margin,headingTop+choose.getMeasuredHeight()+experience.getMeasuredHeight());
       int gap=Math.max(px(getContext(),12),Math.min(px(getContext(),28),w/30));
       int cardW=infinity.getMeasuredWidth(),cardH=infinity.getMeasuredHeight();
-      int cardTop=Math.max(headingTop+choose.getMeasuredHeight()+experience.getMeasuredHeight()+subtitle.getMeasuredHeight()+px(getContext(),22),Math.round(h*.39f));
-      cardTop=Math.min(cardTop,h-cardH-px(getContext(),96));
       int x=(w-(cardW*2+gap))/2;place(infinity,x,cardTop);place(cobra,x+cardW+gap,cardTop);
       place(footer,margin,h-px(getContext(),66));place(footerAccent,margin,h-px(getContext(),42));
     }

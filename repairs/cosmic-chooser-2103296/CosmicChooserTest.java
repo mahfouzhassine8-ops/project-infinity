@@ -122,6 +122,20 @@ public class CosmicChooserTest {
     assertEquals(android.text.format.DateFormat.getTimeFormat(ctl.get()).format(new java.util.Date()),ui.stage.time.getText().toString());
     ui.stage.weatherData.stop();ui.stage.weatherData.cache.edit().clear().commit();ui.stage.weatherData.renderCached();assertEquals("Weather unavailable",ui.stage.weather.getText().toString());cleanup(ctl);
   }
+  @Test public void fullFoldPixelSizesRespectDensityWithoutForcedPortraitScrolling(){
+    for(String qualifier:new String[]{"mdpi","xhdpi","xxhdpi"}){
+      RuntimeEnvironment.setQualifiers(qualifier);
+      for(int[] size:new int[][]{{658,1536},{1840,1536}}){
+        ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new Calls("dark"));ctl.get().setContentView(ui);layout(ui,size[0],size[1]);
+        assertEquals("Full Fold composition height "+qualifier,ui.content.getHeight(),ui.stage.getHeight());
+        assertTrue("Heading above cards",ui.stage.subtitle.getBottom()<ui.stage.infinity.getTop());
+        assertTrue("Cards above footer",ui.stage.infinity.getBottom()<ui.stage.footer.getTop());
+        assertTrue("Gear above card edge",ui.stage.cobra.gear.getBottom()<=ui.stage.cobra.getHeight());
+        float density=ui.getResources().getDisplayMetrics().density;assertTrue(ui.stage.cobra.gear.getWidth()>=48*density);
+        cleanup(ctl);
+      }
+    }
+  }
   @Test public void weatherCacheAcceptsOnlyRealResponseAndMarksColdReadingLastKnown(){
     ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();TextView label=new TextView(ctl.get());InfinityChooserWeather w=new InfinityChooserWeather(ctl.get(),label,()->null);
     w.cache.edit().clear().commit();assertFalse(w.accept("{}"));assertFalse(w.accept("{\"result\":{\"Weather.Location\":\"Somewhere\"}}"));
