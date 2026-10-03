@@ -1,0 +1,119 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.os.SystemClock;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/** Explicit power commands only. Normal close NEVER escalates to a timed kill.
+ * Pause/stop Android while Kodi still accepts lifecycle messages, THEN request
+ * Kodi's existing graceful Application.Quit. Native destruction keeps ownership
+ * of persistence and process completion. Force is a separate user command.
+ */
+final class InfinityExitCompletion {
+  static final String NORMAL = "@APP_PACKAGE@.action.CLOSE_KODI";
+  static final String FORCE = "@APP_PACKAGE@.action.FORCE_CLOSE_KODI";
+  static final String QUIT = "{\"jsonrpc\":\"2.0\",\"id\":\"infinity-normal-close\",\"method\":\"Application.Quit\"}";
+  private static final String PREFS = "infinity_exit_completion";
+  private static final ExecutorService IO = Executors.newSingleThreadExecutor(r -> {
+    Thread t = new Thread(r, "InfinityExplicitExit"); t.setDaemon(true); return t;
+  });
+  private static final ExecutorService RECORDS = Executors.newSingleThreadExecutor(r -> {
+    Thread t = new Thread(r, "InfinityExitEvidence"); t.setDaemon(true); return t;
+  });
+  static final class Plan {
+    enum Phase { RUNNING, WAITING_FOR_STOP, QUIT_QUEUED, DESTROYING, COMPLETE, FORCED }
+    private Phase phase = Phase.RUNNING;
+    synchronized Phase phase() { return phase; }
+    synchronized boolean pending() { return phase != Phase.RUNNING && phase != Phase.COMPLETE; }
+    synchronized boolean requestNormal() {
+      if (phase != Phase.RUNNING) return false;
+      phase = Phase.WAITING_FOR_STOP; return true;
+    }
+    synchronized boolean stopped(boolean configurationChange) {
+      if (configurationChange || phase != Phase.WAITING_FOR_STOP) return false;
+      phase = Phase.QUIT_QUEUED; return true;
+    }
+    synchronized boolean cancelBeforeQuit() {
+      if (phase != Phase.WAITING_FOR_STOP) return false;
+      phase = Phase.RUNNING; return true;
+    }
+    synchronized boolean force() {
+      if (phase == Phase.FORCED || phase == Phase.COMPLETE) return false;
+      phase = Phase.FORCED; return true;
+    }
+    synchronized void destroying() { if (phase != Phase.FORCED) phase = Phase.DESTROYING; }
+    synchronized void completed() { if (phase != Phase.FORCED) phase = Phase.COMPLETE; }
+  }
+  static boolean requestNormal(Main owner) {
+    if (owner == null || owner.isDestroyed() || owner.isFinishing()) return false;
+    if (!owner.mInfinityExitPlan.requestNormal()) return owner.mInfinityExitPlan.pending();
+    owner.infinityStopWeatherCapture();
+    record(owner, "exit.normal.requested");
+    // Kodi's Android pause/stop callbacks can synchronously contact its core.
+    // Do not begin Quit until those callbacks have returned.
+    if (owner.mInfinityStopped) { afterStop(owner); return true; }
+    if (!owner.moveTaskToBack(true)) {
+      owner.mInfinityExitPlan.cancelBeforeQuit();
+      record(owner, "exit.normal.backgroundRejected.noQuit"); return false;
+    }
+    return true;
+  }
+  static void afterStop(Main owner) {
+    if (!owner.mInfinityExitPlan.stopped(owner.isChangingConfigurations())) return;
+    record(owner, "exit.normal.androidStopped");
+    final WeakReference<Main> weak = new WeakReference<>(owner);
+    final Context app = owner.getApplicationContext();
+    IO.execute(() -> {
+      Main current = weak.get();
+      if (current == null || Main.MainActivity != current || current.isDestroyed() ||
+          current.isFinishing() || current.mInfinityExitPlan.phase() != Plan.Phase.QUIT_QUEUED) {
+        write(app, "exit.normal.ownerAlreadyClosing.noSecondQuit"); return;
+      }
+      write(app, "exit.normal.quitDispatch");
+      try {
+        String response = new XBMCJsonRPC().request_string(QUIT);
+        boolean accepted = response != null && new org.json.JSONObject(response).optString("result").equals("OK");
+        write(app, accepted ? "exit.normal.quitAccepted" : "exit.normal.quitUnconfirmed");
+      } catch (Exception | LinkageError failure) {
+        write(app, "exit.normal.quitFailed." + failure.getClass().getSimpleName());
+      }
+      // No timer, finish(), database write or kill on normal close.
+    });
+  }
+  static void requestForce(Main owner, Context context) {
+    if (owner == null || owner.isDestroyed() || !owner.mInfinityExitPlan.force()) return;
+    owner.infinityStopWeatherCapture();
+    final Context app = context.getApplicationContext();
+    final int pid = android.os.Process.myPid();
+    // Separate thread: never queue emergency stop behind a stuck graceful JNI request.
+    Thread force = new Thread(() -> {
+      try { write(app, "exit.force.userRequested"); }
+      finally { android.os.Process.killProcess(pid); }
+    }, "InfinityUserForceClose");
+    force.setDaemon(true); force.start();
+  }
+  static void record(Context context, String phase) {
+    final Context app = context.getApplicationContext(); RECORDS.execute(() -> write(app, phase));
+  }
+  private static synchronized void write(Context app, String phase) {
+    InfinityStartupTrace.mainEvent(phase);
+    android.content.SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    String[] lines = prefs.getString("history", "").split("\n"); StringBuilder next = new StringBuilder();
+    for (int i = Math.max(0, lines.length - 23); i < lines.length; i++)
+      if (!lines[i].isEmpty()) next.append(lines[i]).append('\n');
+    next.append(System.currentTimeMillis()).append(" elapsed=").append(SystemClock.elapsedRealtime())
+        .append(" pid=").append(android.os.Process.myPid()).append(' ').append(phase).append('\n');
+    prefs.edit().putString("history", next.toString()).commit();
+  }
+  static String report(Context context) {
+    String history = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("history", "");
+    return "Explicit close / force-close evidence\n====================================\n" +
+        (history.isEmpty() ? "No explicit close records captured.\n" : history) +
+        "Normal close has NO timed force-stop fallback. Native cleanup and usable-frame timing require physical validation.\n" +
+        InfinityPowerMenuRoutes.report(context);
+  }
+  private InfinityExitCompletion() {}
+}

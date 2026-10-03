@@ -1,0 +1,48 @@
+INFINITY 2103299 — UNLOCKED PHYSICAL FOLD TEST CANDIDATE
+
+Normal Close backgrounds existing Android Main, waits for its pause/stop callbacks
+to return, then requests Kodi's original graceful Application.Quit. It NEVER
+turns a slow normal close into an automatic force stop.
+Force Close is a separate explicit Java command, bypassing the Chef/Python route.
+Force Close can lose unsaved changes; do not use it as normal Close.
+Only two existing power-button onclick commands are patched at runtime in known
+Infinity profiles. Original XML is backed up privately; appearance is unchanged.
+Main captures real Kodi weather while open. Cold chooser shows a recent last-known
+reading. No GPS, IP lookup, external weather API or Kodi provider setting changes.
+Missing/expired readings are not invented.
+
+SHUTDOWN ORDERING IS A HYPOTHESIS, NOT A PHYSICAL PASS:
+The Close-vs-Force difference points to shutdown. Pause/stop-before-Quit addresses
+a possible lifecycle/core-message ordering wait. It does not prove that an
+unrelated native/add-on shutdown delay is eliminated.
+
+Record video BEFORE each close command through a usable chooser/app frame.
+Timing begins at launcher tap, not Splash.onCreate. Export chooser Health Center
+after reproducing. Diagnostics and automated Java tests are supplemental, not
+proof of real native shutdown, actual screen presentation or physical Fold behavior.
+
+1. Check Health -> power route audit. Known skin has 13 validated profiles.
+   Missing/incomplete audit is NOT a pass; do not claim repaired wiring then.
+2. Open Infinity, let configured Kodi weather appear, then normal Close Kodi.
+   Tap launcher immediately. Repeat 10 times. Record tap-to-chooser time and
+   logo/black delay. Also repeat after waiting 5 seconds following Close.
+3. Separately repeat Force Close -> launcher 5 times. Confirm full process stop,
+   fast chooser return, no duplicate Main or reliance on Chef addon.
+4. Active Infinity -> Android Home -> return: retain SAME working session.
+   No Quit, kill, reset or Kodi reinitialization on this ordinary Home path.
+5. Home -> several other apps -> extended idle/recreation eligibility -> return.
+   Run both ordinary Home and explicit Close variants; distinguish them.
+6. Repeat 2–5 on cover and inner display, full-screen and freeform/split-window.
+7. Fold/unfold with chooser visible: stable controls and visible star motion.
+8. Playback: foreground, PiP and Extended background ownership; no exit on
+   ordinary Home/Fold/configuration change. Stop only on explicit exit.
+9. Resume Hub/watched/resume state and settings survive NORMAL Close.
+   Cobra, providers, accounts and player behavior remain unchanged.
+10. Check 2103295 window-local touch and 2103291 in-place reflow.
+11. Weather: after real Kodi weather appeared, cold chooser shows city, temperature
+    and condition labelled last known. Offline/expired cache stays honest.
+    Re-enter Kodi and confirm capture updates.
+
+Fail if normal Close -> immediate launcher retains the previous >=5s logo/black
+delay, if ordinary Home ends a session, or if state/geometry/touch regresses.
+Do not lock automatically. User must confirm all required physical results.

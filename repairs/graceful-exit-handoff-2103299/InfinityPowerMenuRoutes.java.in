@@ -1,0 +1,111 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.util.AtomicFile;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.regex.*;
+
+/** User-approved exception: ONLY two existing power-button onclick bodies in
+ * known Infinity profiles. Original bytes backed up; atomic, idempotent edits.
+ */
+final class InfinityPowerMenuRoutes {
+  static final String[] PROFILES = {"16x9","20x9","6x5","5x6","portrait","fallback",
+      "responsive/base","responsive/wide","responsive/ultrawide","responsive/landscape",
+      "responsive/square","responsive/portrait","responsive/tall"};
+  static final String PREFS = "infinity_power_routes";
+  private static final java.util.concurrent.atomic.AtomicBoolean INSTALLING = new java.util.concurrent.atomic.AtomicBoolean();
+  static void applyAsync(Context context) {
+    if (!INSTALLING.compareAndSet(false, true)) return;
+    final Context app = context.getApplicationContext();
+    Thread worker = new Thread(() -> { try { apply(app); } finally { INSTALLING.set(false); } }, "InfinityPowerRoutes");
+    worker.setDaemon(true); worker.start();
+  }
+  static String command(boolean force) {
+    String action = force ? InfinityExitCompletion.FORCE : InfinityExitCompletion.NORMAL;
+    return "StartAndroidActivity(@APP_PACKAGE@," + action + ",,,,,,,@APP_PACKAGE@.InfinityPowerControlActivity)";
+  }
+  static String patch(String source) throws IOException {
+    validateXml(source);
+    String next = patchButton(source, "200", "CLOSE KODI", false);
+    next = patchButton(next, "300", "FORCE CLOSE KODI", true);
+    validateXml(next); return next;
+  }
+  private static String patchButton(String source, String id, String label, boolean force) throws IOException {
+    Pattern button = Pattern.compile("<control\\b(?=[^>]*\\btype=\"button\")(?=[^>]*\\bid=\"" + id + "\")[^>]*>.*?</control>", Pattern.DOTALL);
+    Matcher match = button.matcher(source);
+    if (!match.find()) throw new IOException("Missing power button " + id);
+    int start = match.start(), end = match.end(); String body = match.group();
+    if (match.find() || !body.contains("<label>" + label + "</label>")) throw new IOException("Ambiguous power button " + id);
+    Matcher click = Pattern.compile("<onclick>(.*?)</onclick>", Pattern.DOTALL).matcher(body);
+    if (!click.find()) throw new IOException("Missing command " + id);
+    int a = click.start(1), b = click.end(1); String old = click.group(1);
+    if (click.find()) throw new IOException("Multiple commands " + id);
+    String desired = command(force);
+    if (old.equals(desired)) return source;
+    boolean approved = force ? old.startsWith("ActivateWindow(10001,\"plugin://plugin.program.chef21/?") &&
+        old.contains("mode=18&amp;name=Force%20Close") && old.endsWith("\",return)") : old.equals("Quit()");
+    if (!approved) throw new IOException("Unknown command preserved " + id);
+    String replacement = body.substring(0, a) + desired + body.substring(b);
+    return source.substring(0, start) + replacement + source.substring(end);
+  }
+  private static void validateXml(String xml) throws IOException {
+    try {
+      if (xml.contains("<!DOCTYPE") || xml.contains("<!ENTITY")) throw new IOException("DTD not allowed");
+      javax.xml.parsers.DocumentBuilderFactory f = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+      f.setExpandEntityReferences(false);
+      f.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+    } catch (Exception e) { throw new IOException("Invalid power XML", e); }
+  }
+  static synchronized void apply(Context context) {
+    Context app = context.getApplicationContext(); StringBuilder audit = new StringBuilder(); int found = 0, changed = 0;
+    try {
+      String configured = XBMCProperties.getStringProperty("xbmc.data", "");
+      File data = configured.isEmpty() ? app.getExternalFilesDir(null) : new File(configured);
+      if (data == null) data = app.getDir(app.getPackageName(), Context.MODE_PRIVATE);
+      File skin = new File(data, ".kodi/addons/skin.infinity.diggz");
+      if (!skin.isDirectory()) throw new IOException("Infinity skin not installed at configured data path");
+      File backup = new File(app.getFilesDir(), "infinity-power-route-originals-2103299");
+      for (String profile : PROFILES) {
+        File file = new File(skin, profile + "/DialogButtonMenu.xml"); if (!file.isFile()) continue;
+        if (!file.getCanonicalPath().equals(file.getAbsolutePath())) throw new IOException("Linked profile preserved");
+        byte[] before = read(file); String decoded = new String(before, StandardCharsets.UTF_8);
+        if (!java.util.Arrays.equals(before, decoded.getBytes(StandardCharsets.UTF_8))) throw new IOException("Non-UTF8 profile preserved");
+        byte[] after = patch(decoded).getBytes(StandardCharsets.UTF_8); found++;
+        String first = hash(before), second = hash(after);
+        if (!java.util.Arrays.equals(before, after)) {
+          if (!backup.isDirectory() && !backup.mkdirs()) throw new IOException("Backup unavailable");
+          File original = new File(backup, first + ".xml"); if (!original.isFile()) writeAtomic(original, before);
+          writeAtomic(file, after); changed++;
+        }
+        audit.append(profile).append(" before=").append(first).append(" after=").append(second).append('\n');
+      }
+      audit.insert(0, "Validated profiles: " + found + "; commands updated: " + changed + ".\n");
+      if (found == 0) audit.append("No power profiles found; repair NOT applied.\n");
+    } catch (Exception failure) { audit.append("Route install incomplete: ").append(failure.getMessage()).append(". Unknown files were not overwritten.\n"); }
+    app.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString("audit", audit.toString()).commit();
+  }
+  private static byte[] read(File file) throws IOException {
+    if (file.length() > 1024 * 1024) throw new IOException("Oversized power XML preserved");
+    try (InputStream in = new FileInputStream(file); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      byte[] buffer = new byte[8192]; int n;
+      while ((n = in.read(buffer)) != -1) { if (out.size() + n > 1024 * 1024) throw new IOException("Oversized power XML"); out.write(buffer, 0, n); }
+      return out.toByteArray();
+    }
+  }
+  private static String hash(byte[] bytes) throws Exception {
+    StringBuilder s = new StringBuilder();
+    for (byte b : MessageDigest.getInstance("SHA-256").digest(bytes)) s.append(String.format(java.util.Locale.ROOT, "%02x", b & 255)); return s.toString();
+  }
+  private static void writeAtomic(File file, byte[] bytes) throws IOException {
+    AtomicFile atomic = new AtomicFile(file); FileOutputStream out = null;
+    try { out = atomic.startWrite(); out.write(bytes); atomic.finishWrite(out); }
+    catch (IOException failure) { if (out != null) atomic.failWrite(out); throw failure; }
+  }
+  static String report(Context context) {
+    return "Power-button route audit (only onclick bodies)\n" + context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("audit", "No route installation evidence.\n");
+  }
+  private InfinityPowerMenuRoutes() {}
+}
