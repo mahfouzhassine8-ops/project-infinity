@@ -8,6 +8,14 @@ def replace_region(text, start, end, new):
 
 
 def repair_health_export(text):
+    for old, new in (
+        ('"Export diagnostic report","Save a shareable Infinity diagnostic text report."',
+         '"Export diagnostics ZIP","Save the report and available Android crash or ANR traces."'),
+        ('"Copy diagnostic report","Copy the full report to your clipboard for quick sharing."',
+         '"Copy diagnostic summary","Copy a text summary for quick sharing."'),
+    ):
+        assert text.count(old) == 2
+        text = text.replace(old, new)
     text = replace_region(text,
         '    if (requestCode == INFINITY_HEALTH_EXPORT_RESULT_CODE)',
         '    if (requestCode == PERMISSION_RESULT_CODE)',

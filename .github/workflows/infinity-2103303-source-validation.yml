@@ -95,8 +95,7 @@ jobs:
           echo 'f95f844463acfde03e0865cb64d0eed55583fda1b752a573db5d19c83e876c42  parent3301/candidate/Infinity-2103301-1.0.9-Weather-Native-Isolation-RC1.apk' | sha256sum -c -
           python3 repairs/chooser-weather-snapshot-2103302/apply.py --root forward3299 --parent parent3301/candidate/Infinity-2103301-1.0.9-Weather-Native-Isolation-RC1.apk --out evidence3301
           python3 repairs/e2e-mobile-2103303/apply_android.py --source forward3299/shell-kodi --receipt evidence3301/repair-changes.json
-          python3 repairs/chooser-weather-snapshot-2103302/prepare_diagnostics.py --root forward3299 --build chooser-build3301 --evidence evidence3301
-          cp repairs/e2e-mobile-2103303/MobileRepairTest.java chooser-build3301/xbmc/src/test/java/com/projectinfinity/kodi/
+          python3 repairs/e2e-mobile-2103303/prepare_diagnostics.py --root forward3299 --build chooser-build3301 --evidence evidence3301
           cp repairs/e2e-mobile-2103303/README.md evidence3301/
           cp repairs/chooser-weather-snapshot-2103302/LINEAGE.txt evidence3301/
           cp repairs/chooser-weather-snapshot-2103302/DEVICE-TEST.txt evidence3301/
