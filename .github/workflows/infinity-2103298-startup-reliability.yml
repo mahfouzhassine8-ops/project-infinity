@@ -52,8 +52,8 @@ jobs:
           python3 repairs/evidence-health-2103288/apply.py apply --root forward3298 --out evidence3298/inherited-health
           python3 repairs/native-responsive-2103290/android_shell.py apply --root forward3298/shell-kodi --receipt evidence3298/inherited-responsive.json
           python3 repairs/cosmic-chooser-2103296/restore_parent.py --root forward3298 --out evidence3298/inherited
-          python3 repairs/cosmic-chooser-2103296/apply.py --root forward3298 --base parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --out evidence3298/inherited3296
-          python3 repairs/cosmic-motion-lifecycle-2103297/apply.py --root forward3298 --out evidence3298/inherited3297
+          python3 repairs/cosmic-chooser-2103296/apply.py --root forward3298 --base parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --out evidence3298
+          python3 repairs/cosmic-motion-lifecycle-2103297/apply.py --root forward3298 --out evidence3298
           python3 repairs/startup-reliability-2103298/apply.py --root forward3298 --parent parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --out evidence3298
           python3 repairs/startup-reliability-2103298/prepare_diagnostics.py --root forward3298 --build chooser-build3298 --evidence evidence3298
           cp repairs/startup-reliability-2103298/LOCKED-PARENT-2103297.txt evidence3298/
@@ -85,7 +85,11 @@ jobs:
           if test -d chooser-build3298/xbmc/build/reports/tests; then cp -a chooser-build3298/xbmc/build/reports/tests evidence3298/test-reports; fi
           if test -d forward3298/shell-kodi/tools/android/packaging/xbmc/src; then
             mkdir -p evidence3298/source
-            cp forward3298/shell-kodi/tools/android/packaging/xbmc/src/{Splash,Main,InfinityStartupHandoff,InfinityStartupPreparation,InfinityStartupTrace,InfinityGlassChooser}.java.in evidence3298/source/
+            for startup_class in Splash Main InfinityStartupHandoff InfinityStartupPreparation InfinityStartupTrace InfinityGlassChooser; do
+              if test -f "forward3298/shell-kodi/tools/android/packaging/xbmc/src/$startup_class.java.in"; then
+                cp "forward3298/shell-kodi/tools/android/packaging/xbmc/src/$startup_class.java.in" evidence3298/source/
+              fi
+            done
           fi
       - uses: actions/upload-artifact@v7
         if: always()
