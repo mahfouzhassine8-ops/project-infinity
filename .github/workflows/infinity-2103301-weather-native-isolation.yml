@@ -95,7 +95,7 @@ jobs:
           ./gradlew --no-daemon --console=plain :xbmc:compileDebugJavaWithJavac :xbmc:testDebugUnitTest 2>&1 | tee ../evidence3301/android-tests.log
       - name: Verify compiled weather classes cannot reach Kodi JNI
         run: |
-          python3 repairs/weather-native-isolation-2103301/audit_weather.py --root forward3299 --classes chooser-build3301/xbmc/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes --out evidence3301
+          python3 repairs/weather-native-isolation-2103301/audit_weather.py --root forward3299 --classes chooser-build3301/xbmc/build/intermediates/javac --out evidence3301
       - name: Compile Java DEX donor and sign exact-parent package for unlocked device testing
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}

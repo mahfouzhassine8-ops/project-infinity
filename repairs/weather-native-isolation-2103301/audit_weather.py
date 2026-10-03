@@ -7,7 +7,7 @@ assert 'XBMCJsonRPC' not in source and 'request_string' not in source
 assert '127.0.0.1:' in source and 'Proxy.NO_PROXY' in source
 assert 'setInstanceFollowRedirects(false)' in source
 assert 'setConnectTimeout(1500)' in source and 'setReadTimeout(1500)' in source
-paths=sorted((a.classes/'com/projectinfinity/kodi').glob('InfinityChooserWeather*.class'))
+paths=sorted(a.classes.rglob('InfinityChooserWeather*.class'))
 assert len(paths)>=4,'Compiled weather classes missing'
 reports=[]
 for f in paths:
