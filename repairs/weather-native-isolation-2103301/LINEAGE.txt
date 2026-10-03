@@ -1,0 +1,10 @@
+2103301 is a Java-only forward candidate over exact 2103300.
+Direct parent APK SHA-256:
+2dc49a92bf2299118bc30001678d4949bfac7dfd5db4a91fe2bfb1c26f848dcc
+Direct parent source commit: ee2f338baf86304bd5d585a1f76bcafaec904b3e
+Native/assets/resources must remain identical to 2103300, locked 2103297 and 2103295.
+2103299 introduced immediate Main weather JNI capture; 2103300 inherited it.
+2103300 failed physical validation. Its stale-task cause claim is retracted.
+2103301 removes the weather JNI call at both chooser and Main capture entry points.
+No arbitrary startup delay and no new native readiness assumption.
+Candidate remains unlocked; CI cannot prove native usable-frame or device stability.

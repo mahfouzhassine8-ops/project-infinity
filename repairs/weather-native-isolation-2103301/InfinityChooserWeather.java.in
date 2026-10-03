@@ -1,0 +1,173 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Base64;
+import android.util.Xml;
+import android.widget.TextView;
+import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.Proxy;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/** Weather never enters JNI. Only an already enabled, plain HTTP Kodi loopback
+ * service supplies readings; no service, provider or location settings are changed.
+ * Cold chooser retains a timestamped reading without starting Kodi.
+ */
+final class InfinityChooserWeather {
+  interface Reader { String read(); default void cancel() {} }
+  final TextView label;
+  final SharedPreferences cache;
+  final Handler main=new Handler(Looper.getMainLooper());
+  final Reader reader;
+  ExecutorService worker;
+  boolean started,inFlight;
+  int generation;
+  final Runnable refresh=()->refresh();
+  static final String REQUEST="{\"jsonrpc\":\"2.0\",\"id\":\"chooser-weather\",\"method\":\"XBMC.GetInfoLabels\",\"params\":{\"labels\":[\"Weather.Location\",\"Weather.Temperature\",\"Weather.Conditions\",\"Weather.FanartCode\"]}}";
+  InfinityChooserWeather(Context c,TextView label){this(c,label,new LocalReader(c.getApplicationContext()));}
+  InfinityChooserWeather(Context c,TextView label,Reader reader){
+    this.label=label;this.reader=reader;
+    cache=c.getApplicationContext().getSharedPreferences("infinity_chooser_weather",Context.MODE_PRIVATE);
+  }
+  void start(){if(started)return;started=true;generation++;renderCached();refresh();}
+  void stop(){
+    started=false;generation++;main.removeCallbacks(refresh);
+    if(worker!=null){worker.shutdownNow();worker=null;}
+    reader.cancel();inFlight=false;
+  }
+  private void refresh(){
+    if(!started||inFlight)return;
+    if(worker==null)worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityWeatherHTTP");t.setDaemon(true);return t;});
+    final int token=generation;inFlight=true;
+    worker.execute(()->{
+      String data=null;try{data=reader.read();}catch(RuntimeException ignored){}
+      final String result=data;
+      main.post(()->{
+        if(!started||token!=generation)return;inFlight=false;
+        boolean accepted=accept(result);renderCached();main.postDelayed(refresh,accepted?60000:10000);
+      });
+    });
+  }
+  boolean accept(String response){
+    if(response==null)return false;
+    try{
+      JSONObject result=new JSONObject(response).optJSONObject("result");if(result==null)return false;
+      String location=clean(result.optString("Weather.Location")),temperature=clean(result.optString("Weather.Temperature")),condition=clean(result.optString("Weather.Conditions"));
+      if(location.isEmpty()||temperature.isEmpty()||condition.isEmpty()||temperature.equals("N/A"))return false;
+      cache.edit().putString("location",location).putString("temperature",temperature).putString("condition",condition)
+          .putString("icon",clean(result.optString("Weather.FanartCode"))).putLong("timestamp",System.currentTimeMillis()).apply();return true;
+    }catch(Exception malformed){return false;}
+  }
+  static String clean(String value){return value==null?"":value.replaceAll("[\\p{Cntrl}]"," ").trim();}
+  static String icon(String condition){
+    String c=condition.toLowerCase(Locale.ROOT);
+    if(c.contains("snow"))return "❄";if(c.contains("thunder"))return "ϟ";
+    if(c.contains("rain")||c.contains("shower"))return "☂";if(c.contains("cloud")||c.contains("overcast"))return "☁";
+    if(c.contains("sun")||c.contains("clear"))return "☀";return "◌";
+  }
+  void renderCached(){
+    if(label==null)return;
+    long timestamp=cache.getLong("timestamp",0),age=System.currentTimeMillis()-timestamp;
+    if(timestamp<=0||age<0||age>24*60*60*1000L){label.setText("Weather unavailable");label.setContentDescription("Weather unavailable. No recent Kodi weather reading is cached.");return;}
+    String location=cache.getString("location",""),temperature=cache.getString("temperature",""),condition=cache.getString("condition","");
+    boolean current=Main.infinityLiveActivity()!=null&&age<2*60*1000L;
+    String value=icon(condition)+"  "+location+"  •  "+temperature+"  "+condition;
+    if(!current)value+="  •  last known";
+    label.setText(value);label.setContentDescription(value+". Observed "+java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(timestamp)));
+  }
+
+  static final class Settings {
+    boolean enabled,ssl,authenticated;
+    int port=8080;
+    String user="",password="";
+    static Settings parse(InputStream input) throws Exception {
+      Settings out=new Settings();
+      XmlPullParser p=Xml.newPullParser();p.setFeature(XmlPullParser.FEATURE_PROCESS_DOCDECL,false);
+      p.setInput(input,"UTF-8");int event;
+      while((event=p.next())!=XmlPullParser.END_DOCUMENT){
+        if(event==XmlPullParser.DOCDECL)throw new IOException("DTD refused");
+        if(event!=XmlPullParser.START_TAG||!"setting".equals(p.getName()))continue;
+        String id=p.getAttributeValue(null,"id");
+        if(id==null||!id.startsWith("services.webserver"))continue;
+        String value=p.nextText();
+        switch(id){
+          case "services.webserver":out.enabled="true".equals(value.trim());break;
+          case "services.webserverssl":out.ssl="true".equals(value.trim());break;
+          case "services.webserverauthentication":out.authenticated="true".equals(value.trim());break;
+          case "services.webserverport":out.port=Integer.parseInt(value.trim());break;
+          case "services.webserverusername":out.user=value;break;
+          case "services.webserverpassword":out.password=value;break;
+          default:break;
+        }
+      }
+      if(out.port<1||out.port>65535)throw new IOException("Invalid local port");
+      return out;
+    }
+  }
+  static final class LocalReader implements Reader {
+    final Context app;
+    private HttpURLConnection active;
+    LocalReader(Context app){this.app=app;}
+    @Override public String read(){
+      // A Java Activity is only a reason to try a local socket, never proof of native readiness.
+      if(Main.infinityLiveActivity()==null||Thread.currentThread().isInterrupted())return null;
+      try{
+        String configured=XBMCProperties.getStringProperty("xbmc.data","");
+        File data=configured.isEmpty()?app.getExternalFilesDir(null):new File(configured);
+        if(data==null)data=app.getDir(app.getPackageName(),Context.MODE_PRIVATE);
+        File file=new File(data,".kodi/userdata/guisettings.xml");
+        if(!file.isFile()||file.length()>1024*1024)return null;
+        Settings settings;
+        try(InputStream input=new ByteArrayInputStream(bounded(new FileInputStream(file),1024*1024))){settings=Settings.parse(input);}
+        return request(settings);
+      }catch(Exception unavailable){return null;}
+    }
+    String request(Settings settings){
+      if(!settings.enabled||settings.ssl||Thread.currentThread().isInterrupted())return null;
+      HttpURLConnection connection=null;
+      try{
+        connection=(HttpURLConnection)new URL("http://127.0.0.1:"+settings.port+"/jsonrpc").openConnection(Proxy.NO_PROXY);
+        synchronized(this){active=connection;}
+        if(Thread.currentThread().isInterrupted())return null;
+        connection.setConnectTimeout(1500);connection.setReadTimeout(1500);
+        connection.setInstanceFollowRedirects(false);connection.setUseCaches(false);
+        connection.setRequestMethod("POST");connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type","application/json; charset=utf-8");
+        if(settings.authenticated){
+          String credentials=settings.user+":"+settings.password;
+          connection.setRequestProperty("Authorization","Basic "+Base64.encodeToString(credentials.getBytes(StandardCharsets.UTF_8),Base64.NO_WRAP));
+        }
+        byte[] bytes=REQUEST.getBytes(StandardCharsets.UTF_8);connection.setFixedLengthStreamingMode(bytes.length);
+        try(OutputStream out=connection.getOutputStream()){out.write(bytes);}
+        if(connection.getResponseCode()!=200)return null;
+        return new String(bounded(connection.getInputStream(),16384),StandardCharsets.UTF_8);
+      }catch(Exception unavailable){return null;}
+      finally{
+        if(connection!=null)connection.disconnect();
+        synchronized(this){if(active==connection)active=null;}
+      }
+    }
+    @Override public void cancel(){synchronized(this){if(active!=null)active.disconnect();}}
+    static byte[] bounded(InputStream source,int limit) throws IOException {
+      try(InputStream input=source;ByteArrayOutputStream out=new ByteArrayOutputStream()){
+        byte[] buffer=new byte[4096];int n;
+        while((n=input.read(buffer))!=-1){
+          if(Thread.currentThread().isInterrupted())throw new InterruptedIOException();
+          if(n==0||out.size()+n>limit)throw new IOException("Weather input limit");
+          out.write(buffer,0,n);
+        }
+        return out.toByteArray();
+      }
+    }
+  }
+}

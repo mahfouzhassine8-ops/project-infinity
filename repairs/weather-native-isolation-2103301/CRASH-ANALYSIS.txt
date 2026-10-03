@@ -1,0 +1,38 @@
+2103300 failed physical validation; do not lock it.
+
+Supplied device records:
+PID 27527: Main.javaReady 1791049714994; native fault 1791049715001 (7ms later).
+PID 29251: Main.javaReady 1791049836168; native fault 1791049836174 (6ms later).
+PID 926: new Main startup followed by Android native crash; final trace truncated.
+The 5–6s Splash-to-Main duration includes chooser dwell; it does not establish an ANR.
+
+Faulting thread names in complete records are InfinityChooser. Existing Android
+thread-name truncation hides the Weather suffix. The original fatal records have
+signal=11, si_code=1 and fault_address=0x4c. Android's final SI_TKILL trace passes
+through libinfinitycrash.restore_and_reraise; that is the recording/reraise path,
+not the original faulting instruction.
+
+Exact preserved libkodi.so dynamic symbols and AArch64 instructions identify:
+relative PC 0x18b35ec = CLog::CanLogComponent(unsigned int) const +0x0c
+instruction: ldrb w9, [x8, #0x4c]
+relative LR 0x206d74c = CLog::Log<string const&> return address
+call at 0x206d748: bl 0x18b35e0
+Original LR minus PC = 0x7ba160 in both new records, exactly matching this pair.
+The PC/LR page offsets and null-field fault agree. This is an instruction-level
+correlation; the pasted report does not supply original complete memory maps.
+
+Source identifies an immediate Main.onResume weather worker introduced in 2103299,
+inherited unchanged by 2103300. It calls XBMCJsonRPC.request_string, entering
+JSONRPC::CJSONRPC::MethodCall, before native logging/application setup completes.
+Java view creation/live-Activity status is not a Kodi readiness signal. Java catches
+cannot intercept a native SIGSEGV. shutdownNow does not stop an already entered JNI call.
+
+2103301 removes that weather JNI boundary completely, rather than adding a delay.
+Only an existing enabled Kodi loopback web service supplies fresh readings. HTTP
+timeouts/disconnects are bounded; stale completion cannot change the weather cache.
+No external weather API, provider change, service enablement or location request.
+Native libraries, assets, skin XML, resources, chooser motion and exit policy unchanged.
+
+Correction: 2103300's claimed stale-task root cause was not established. Fresh-task
+flags remain inherited so this candidate isolates the weather transport change.
+Normal exit/force exit/usable Kodi frame require physical device validation.
