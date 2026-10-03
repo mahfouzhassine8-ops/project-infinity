@@ -25,12 +25,13 @@ def apply(root,base,out):
     src=root/'shell-kodi'
     assert H(src/JAVA/'InfinityGlassChooser.java.in')=='36f25bc517cae1ca07876643f2eaa1ce2ce4493a90064fab8495c57814a65031'
     assert H(src/JAVA/'Splash.java.in')=='0f3a7919c67a29f7de13ea0441f9cd1b736438d5c3ea18e11bca4afd0df5d255'
-    # Complete the already-inherited 3291 trace-only baseline before defining this UI delta.
-    trace=src/JAVA/'InfinityResponsiveTrace.java.in';t=trace.read_text()
-    if 'Infinity in-place responsive reflow:' not in t:
-        t=once(t,'        line.contains("Infinity responsive window:") ||',
-               '        line.contains("Infinity responsive window:") ||\n        line.contains("Infinity in-place responsive reflow:") ||')
-        trace.write_text(t)
+    # Require the complete accepted source lineage, including the protected 3292
+    # installer and Main hook. Never waive the compiled parent-class preservation gate.
+    inherited=json.loads((out/'inherited/INHERITED-RESUME-HUB-SOURCE.json').read_text())
+    assert H(src/JAVA/'Main.java.in')==inherited['main_sha256']
+    assert H(src/JAVA/'InfinityResumeHubInstaller.java.in')==inherited['installer_sha256']
+    assert (src/JAVA/'Main.java.in').read_text().count('InfinityResumeHubInstaller.apply(this);')==1
+    assert 'Infinity in-place responsive reflow:' in (src/JAVA/'InfinityResponsiveTrace.java.in').read_text()
     before={str(p.relative_to(src)):H(p) for p in src.rglob('*') if p.is_file()}
     for name in ('InfinityGlassChooser.java.in','InfinityCosmicArt.java.in','InfinityChooserWeather.java.in'):
         shutil.copy2(HERE/name,src/JAVA/name)
@@ -38,8 +39,8 @@ def apply(root,base,out):
     install.write_text(once(install.read_text(),'                  src/InfinityGlassChooser.java',
                        '                  src/InfinityGlassChooser.java\n                  src/InfinityCosmicArt.java\n                  src/InfinityChooserWeather.java'))
     gradle=src/'tools/android/packaging/xbmc/build.gradle.in';t=gradle.read_text()
-    t=once(t,'versionCode 2103290',f'versionCode {VC}')
-    t=once(t,'versionName "1.0.9-Native-Responsive-Layout-RC1"',f'versionName "{REL}"');gradle.write_text(t)
+    t=once(t,'versionCode 2103292',f'versionCode {VC}')
+    t=once(t,'versionName "1.0.9-Resume-Hub-2-RC1"',f'versionName "{REL}"');gradle.write_text(t)
     t=once(t,'    ndkPath "@NDKROOT@"\n','')
     gradle.write_text(t)  # Java-only donor compilation has no NDK/toolchain dependency.
     after={str(p.relative_to(src)):H(p) for p in src.rglob('*') if p.is_file()}
@@ -50,16 +51,17 @@ def apply(root,base,out):
     assert not (set(before)-set(after))
     with zipfile.ZipFile(base) as z:
         assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()==NATIVE
+        assert hashlib.sha256(z.read('assets/infinity/resume-hub-controller.zip')).hexdigest()==inherited['controller_asset_sha256']
         # Use the parent bytes of every non-Kodi native library, never rebuild observer/crash code.
         for name in ('libinfinityambient.so','libinfinitycrash.so'):
             (root/'engine'/name).write_bytes(z.read('lib/arm64-v8a/'+name))
     metadata=root/'scripts/infinity_background_resume.py';t=metadata.read_text()
     for old,new in [
-        ('VERSION_CODE = 2103288',f'VERSION_CODE = {VC}'),
-        ("RELEASE = '1.0.9-Evidence-First-Health-RC1'",f"RELEASE = '{REL}'"),
-        ("BASE_COMMIT = 'c0c150b30008cee17df39e2a79a0c07e9a91f72a'",f"BASE_COMMIT = '{COMMIT}'"),
-        ("BASE_APK_SHA256 = '64ed5ce79096a3e09d02907cf72d3a5c4ad20186da231898c92db83e540d266b'",f"BASE_APK_SHA256 = '{PARENT}'"),
-        ("BASE_ENGINE_SHA256 = 'f6eb05f091bfe7a624105a0a83744a292e229b385d39c1b6a23f8bf954a2522a'",f"BASE_ENGINE_SHA256 = '{NATIVE}'")]:
+        ('VERSION_CODE = 2103292',f'VERSION_CODE = {VC}'),
+        ("RELEASE = '1.0.9-Resume-Hub-2-RC1'",f"RELEASE = '{REL}'"),
+        ("BASE_COMMIT = '9205bf2d508194102667e3048b0bb59e6c08fe1e'",f"BASE_COMMIT = '{COMMIT}'"),
+        ("BASE_APK_SHA256 = '02f2c4049a5205927c1698e675ca64dcc77659677bd9441f82e2fe92f4f25ece'",f"BASE_APK_SHA256 = '{PARENT}'"),
+        ("BASE_ENGINE_SHA256 = '36a8feba9e8f7c857ca987b7d6ec868d847fcfc46f5369654ddac3b3e7038b94'",f"BASE_ENGINE_SHA256 = '{NATIVE}'")]:
         t=once(t,old,new)
     metadata.write_text(t)
     receipt={'schema':1,'base_source_commit':COMMIT,'base_apk_sha256':PARENT,'native_engine_sha256':NATIVE,
@@ -73,10 +75,10 @@ def apply(root,base,out):
     t=once(t,old,'original_native')
     old="dex_contract(a)[0] | {('Lcom/projectinfinity/kodi/InfinityKodiSurfaceSampler;', 'requestToken', '()J'), ('Lcom/projectinfinity/kodi/InfinityKodiSurfaceSampler;', 'surfaceAvailable', '(Z)V'), ('Lcom/projectinfinity/kodi/InfinityKodiSurfaceSampler;', 'publish', '(J[III)V'), ('Lcom/projectinfinity/kodi/InfinityKodiSurfaceSampler;', 'failure', '(JI)V')}"
     t=once(t,old,'dex_contract(a)[0]')
-    t=t.replace('Infinity-2103288-Evidence-First-Health-RC1',f'Infinity-{VC}-Cosmic-Chooser-RC1')
-    t=once(t,"'base_run':36933314038","'base_run':37092252001")
+    t=t.replace('Infinity-2103292-Resume-Hub-2-RC1',f'Infinity-{VC}-Cosmic-Chooser-RC1')
+    t=once(t,"'base_run':36941180186","'base_run':37092252001")
     t=once(t,"'updated_presentation_library':'libinfinityambient.so'","'updated_presentation_library':None")
-    t=once(t,"shutil.copy2(ROOT/'repairs/evidence-health-2103288/DEVICE-TEST.md',out/'DEVICE-TEST.md')",
+    t=once(t,"shutil.copy2(ROOT/'repairs/resume-hub-2103292/DEVICE-TEST.md',out/'DEVICE-TEST.md')",
              "shutil.copy2(ROOT/'repairs/cosmic-chooser-2103296/DEVICE-TEST.txt',out/'DEVICE-TEST.txt')")
     t=once(t,"        native,_=dex_contract(b)",
              "        for name in an:\n            if name.startswith('lib/') and not name.endswith('/'):\n                require(a.read(name)==b.read(name),'Native library changed: '+name)\n        native,_=dex_contract(b)")
@@ -94,6 +96,7 @@ def apply(root,base,out):
     (out/'CHOOSER-SOURCE-AUDIT.json').write_text(json.dumps({'version_code':VC,'version_name':REL,'base_apk_sha256':PARENT,
         'native_sha256':NATIVE,'changed_source_files':changed,'added_source_files':added,'unexpected_source_changes':0,
         'native_rebuilt':False,'skin_modified':False,'main_splash_cobra_player_provider_sources_modified':False,
+        'inherited_resume_hub_installer_and_main_hook_preserved':True,'controller_asset_sha256':inherited['controller_asset_sha256'],
         'live_time_date':True,'weather_before_cold_kodi':'real last-known reading or unavailable; not fresh without running Kodi',
         'physical_verified':False,'locked':False},indent=2)+'\n')
     print('PASS: exact chooser-only source delta; Main/Splash/Cobra/player/skin unchanged')

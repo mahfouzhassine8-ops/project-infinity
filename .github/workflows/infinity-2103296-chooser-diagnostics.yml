@@ -35,6 +35,7 @@ jobs:
           tar --no-same-owner -xzf parent284-artifact/reconstructed-2103284-shell.tar.gz -C parent284
           python3 repairs/evidence-health-2103288/apply.py apply --root parent284 --out evidence3296/parent-health
           python3 repairs/native-responsive-2103290/android_shell.py apply --root parent284/shell-kodi --receipt evidence3296/parent-responsive.json
+          python3 repairs/cosmic-chooser-2103296/restore_parent.py --root parent284 --out evidence3296/inherited
           python3 repairs/cosmic-chooser-2103296/prepare_diagnostics.py --root parent284 --build chooser-build --evidence evidence3296
           sha256sum repairs/cosmic-chooser-2103296/*.java* > evidence3296/CHOOSER-SOURCE-SHA256.txt
       - name: Compile actual Android shell and run presentation diagnostics
@@ -88,6 +89,7 @@ jobs:
           tar --no-same-owner -xzf parent284-artifact/reconstructed-2103284-shell.tar.gz -C chooser3296
           python3 repairs/evidence-health-2103288/apply.py apply --root chooser3296 --out candidate3296/parent-health
           python3 repairs/native-responsive-2103290/android_shell.py apply --root chooser3296/shell-kodi --receipt candidate3296/parent-responsive.json
+          python3 repairs/cosmic-chooser-2103296/restore_parent.py --root chooser3296 --out candidate3296/inherited
           python3 repairs/cosmic-chooser-2103296/apply.py --root chooser3296 --base parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --out candidate3296
       - name: Compile Java only and permanently sign chooser candidate
         env:

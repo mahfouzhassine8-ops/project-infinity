@@ -26,6 +26,8 @@ def config(text):
     return text
 protected={str(p.relative_to(src)):hashlib.sha256(p.read_bytes()).hexdigest() for p in src.rglob('*') if p.is_file()}
 original=pack/'xbmc/src'
+assert (original/'Main.java.in').read_text().count('InfinityResumeHubInstaller.apply(this);')==1
+assert 'cb6a2de4ecf9a47b3953d06ab8eccdf8cfbbcb4fb3a209b87f2ccc41f71c6688' in (original/'InfinityResumeHubInstaller.java.in').read_text()
 for p in original.rglob('*.java.in'):
     dest=app/'java/com/projectinfinity/kodi'/str(p.relative_to(original))[:-3]
     dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(config(p.read_text()))
