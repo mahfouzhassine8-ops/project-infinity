@@ -1,0 +1,96 @@
+name: Infinity | 2103298 Startup Reliability
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103298-startup-reliability]
+    paths:
+      - 'repairs/startup-reliability-2103298/**'
+      - '.github/workflows/infinity-2103298-startup-reliability.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103298-startup-reliability
+  cancel-in-progress: true
+jobs:
+  java-test-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103284-Ambient-Surface-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 36853676275
+          github-token: ${{ github.token }}
+          path: parent284-artifact
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103295-Window-Local-Input-RC1-Candidate
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37092252001
+          github-token: ${{ github.token }}
+          path: parent3295
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103297-Cosmic-Motion-Lifecycle-RC1-Candidate
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37100003228
+          github-token: ${{ github.token }}
+          path: parent3297
+      - name: Reproduce exact locked 2103297 Java shell and apply strict forward delta
+        run: |
+          set -euo pipefail
+          echo 'd373f689b447f08deade747fef565085e634de8dcedb024ae1ff39eeb6d24621  parent284-artifact/reconstructed-2103284-shell.tar.gz' | sha256sum -c -
+          echo 'dba26141addbacd64f334bcc32633669ffcc3c4677961e7ce3e23f01684416a0  parent3295/Infinity-2103295-Window-Local-Input-RC1.apk' | sha256sum -c -
+          echo 'e0e70f6a0fc8ff9fbd8836f5979f90c64de4678fe0d468336fc59ce7cf4e9f0c  parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk' | sha256sum -c -
+          mkdir -p forward3298 evidence3298
+          tar --no-same-owner -xzf parent284-artifact/reconstructed-2103284-shell.tar.gz -C forward3298
+          python3 repairs/evidence-health-2103288/apply.py apply --root forward3298 --out evidence3298/inherited-health
+          python3 repairs/native-responsive-2103290/android_shell.py apply --root forward3298/shell-kodi --receipt evidence3298/inherited-responsive.json
+          python3 repairs/cosmic-chooser-2103296/restore_parent.py --root forward3298 --out evidence3298/inherited
+          python3 repairs/cosmic-chooser-2103296/apply.py --root forward3298 --base parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --out evidence3298/inherited3296
+          python3 repairs/cosmic-motion-lifecycle-2103297/apply.py --root forward3298 --out evidence3298/inherited3297
+          python3 repairs/startup-reliability-2103298/apply.py --root forward3298 --parent parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --out evidence3298
+          python3 repairs/startup-reliability-2103298/prepare_diagnostics.py --root forward3298 --build chooser-build3298 --evidence evidence3298
+          cp repairs/startup-reliability-2103298/LOCKED-PARENT-2103297.txt evidence3298/
+          cp repairs/startup-reliability-2103298/DEVICE-TEST.txt evidence3298/
+      - name: Compile actual Android Java shell and run lifecycle/motion tests
+        working-directory: chooser-build3298
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon --console=plain :xbmc:compileDebugJavaWithJavac :xbmc:testDebugUnitTest 2>&1 | tee ../evidence3298/android-tests.log
+      - name: Compile Java DEX donor and permanently sign exact-parent package
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if ! test -f "$HOME/.android/debug.keystore"; then
+            keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 forward3298/scripts/package_background_resume.py --source forward3298/shell-kodi --base-apk parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --build-dir release-build3298 --out evidence3298/candidate 2>&1 | tee evidence3298/package.log
+          python3 repairs/startup-reliability-2103298/audit_payload.py --parent parent3297/Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk --ancestor parent3295/Infinity-2103295-Window-Local-Input-RC1.apk --candidate evidence3298/candidate/Infinity-2103298-Startup-Reliability-RC1.apk --out evidence3298/candidate
+      - name: Gather Android results and exact repaired source
+        if: always()
+        run: |
+          mkdir -p evidence3298
+          if test -d chooser-build3298/xbmc/build/test-results; then cp -a chooser-build3298/xbmc/build/test-results evidence3298/; fi
+          if test -d chooser-build3298/xbmc/build/reports/tests; then cp -a chooser-build3298/xbmc/build/reports/tests evidence3298/test-reports; fi
+          if test -d forward3298/shell-kodi/tools/android/packaging/xbmc/src; then
+            mkdir -p evidence3298/source
+            cp forward3298/shell-kodi/tools/android/packaging/xbmc/src/{Splash,Main,InfinityStartupHandoff,InfinityStartupPreparation,InfinityStartupTrace,InfinityGlassChooser}.java.in evidence3298/source/
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103298-Startup-Reliability-RC1-Candidate-and-Evidence
+          path: evidence3298/
+          if-no-files-found: error
+          retention-days: 90

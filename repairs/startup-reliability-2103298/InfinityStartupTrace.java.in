@@ -1,0 +1,61 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.os.Looper;
+import android.os.SystemClock;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.*;
+
+/** Bounded, Kodi-independent startup evidence. No paths, credentials or media identifiers. */
+final class InfinityStartupTrace {
+  private static final ExecutorService writer=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityStartupEvidence");t.setDaemon(true);return t;});
+  private static final ArrayDeque<String> recent=new ArrayDeque<>();
+  private static volatile InfinityStartupTrace current;
+  private final Context app;
+  private final long began=SystemClock.elapsedRealtime();
+  private final String session=android.os.Process.myPid()+"-"+System.currentTimeMillis();
+  private long firstDraw=-1;
+  InfinityStartupTrace(Context context) { app=context.getApplicationContext();current=this;event("splash.create"); }
+  static void mainEvent(String name) { InfinityStartupTrace trace=current;if(trace!=null)trace.event(name); }
+  void event(String name) {
+    long elapsed=Math.max(0,SystemClock.elapsedRealtime()-began);
+    if(name.equals("splash.firstFrame"))firstDraw=elapsed;
+    String row=System.currentTimeMillis()+" session="+session+" +"+elapsed+"ms "+
+        (Looper.myLooper()==Looper.getMainLooper()?"UI ":"worker ")+name;
+    if((name.equals("splash.firstFrame")||name.equals("chooser.firstFrame")||name.equals("main.afterSuper"))&&elapsed>=5000)
+      row+=" DELAYED_STARTUP";
+    android.util.Log.i("InfinityStartup",row);
+    synchronized(recent) { recent.addLast(row);while(recent.size()>192)recent.removeFirst(); }
+    final String line=row;
+    writer.execute(()->{
+      try {
+        File log=new File(app.getFilesDir(),"infinity-startup-trace.txt");
+        if(log.length()>98304) {
+          File old=new File(app.getFilesDir(),"infinity-startup-trace.previous.txt");
+          if(old.exists()&&!old.delete())return;
+          if(!log.renameTo(old))return;
+        }
+        try(OutputStream out=new FileOutputStream(log,true)){out.write((line+"\n").getBytes(StandardCharsets.UTF_8));}
+      }catch(IOException ignored){}
+    });
+  }
+  static String report(Context context) {
+    StringBuilder out=new StringBuilder("Android startup / relaunch timing\n================================\n");
+    out.append("Evidence only; no automatic reset. Durations start at Splash.onCreate, not the launcher tap.\n")
+       .append("DELAYED_STARTUP marks observed first-frame/Main milestones >=5000ms; not an ANR verdict.\n")
+       .append("No startup records means no evidence, not a pass. Kodi usable-frame timing requires physical validation.\n");
+    LinkedHashSet<String> rows=new LinkedHashSet<>();
+    for(String name:new String[]{"infinity-startup-trace.previous.txt","infinity-startup-trace.txt"}) {
+      try(BufferedReader reader=new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir(),name)),StandardCharsets.UTF_8))) {
+        String line;int count=0;while((line=reader.readLine())!=null&&count++<1024)rows.add(line);
+      }catch(IOException ignored){}
+    }
+    synchronized(recent){rows.addAll(recent);}
+    int skip=Math.max(0,rows.size()-192),i=0;for(String line:rows)if(i++>=skip)out.append(line).append('\n');
+    if(rows.isEmpty())out.append("No startup timing evidence captured.\n");
+    return out.toString();
+  }
+}

@@ -1,0 +1,28 @@
+INFINITY 2103297 — USER-CONFIRMED LOCK WITH KNOWN ISSUE
+
+Confirmed by user on 2026-10-03 (America/Detroit): "Yes love"
+Installed version: 1.0.9-Cosmic-Motion-Lifecycle-RC1 (2103297)
+APK: Infinity-2103297-Cosmic-Motion-Lifecycle-RC1.apk
+SHA-256: e0e70f6a0fc8ff9fbd8836f5979f90c64de4678fe0d468336fc59ce7cf4e9f0c
+Source commit: 83d51d49ed07687fbccef94ec2892000f6feae1e
+Permanent signing certificate SHA-256:
+d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7
+
+KNOWN ISSUE / EXPLICIT ACCEPTANCE EXCEPTION
+User accepted locking this parent despite delayed Exit → Home → relaunch.
+Video 16912.mp4 shows launch at approximately 00:57.75 and chooser at
+01:24.25 (about 26.5 seconds). This is a delayed startup, not proof of
+a permanent hang or a specific cause. Diagnostics record a normal self exit.
+The source has blocking 20-second environment-path retry loops; attribution
+of this exact physical delay remains a hypothesis until timed evidence exists.
+This lock is not a claim that every physical test passed or that delay is fixed.
+
+PRESERVATION
+Do not overwrite or rebuild this APK. New work is 2103298, unlocked, using
+this exact signed 2103297 APK as its direct payload parent.
+Locked ancestor 2103295 remains preserved:
+dba26141addbacd64f334bcc32633669ffcc3c4677961e7ce3e23f01684416a0
+Ancestor source: c562d7d1b0a5cb71df90484dc56a3fae6bf17001
+No native rebuild, skin/Home architecture change, Cobra/player behavior change,
+Resume Hub/Command Center change, or touch/Fold repair change is authorized.
+2103298 must not lock automatically.
