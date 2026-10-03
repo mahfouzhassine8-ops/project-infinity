@@ -36,7 +36,9 @@ public class MotionFrameTest {
     for(String theme:new String[]{"dark","light"})for(int[] size:new int[][]{{420,936},{900,768},{900,400},{360,240}}){
       ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();
       InfinityGlassChooser ui=new InfinityGlassChooser(ctl.get(),new CosmicChooserTest.Calls(theme));
-      ctl.get().setContentView(ui);CosmicChooserTest.layout(ui,size[0],size[1]);
+      ctl.get().setContentView(ui,new android.view.ViewGroup.LayoutParams(size[0],size[1]));
+      Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100));
+      CosmicChooserTest.layout(ui,size[0],size[1]);
       // Robolectric native graphics defaults AttachInfo to accelerated even for bitmap draws.
       // Explicitly simulate the real software-window attachment; rasterization stays native Canvas.
       Object attach=org.robolectric.util.ReflectionHelpers.getField(ui.backdrop,"mAttachInfo");
