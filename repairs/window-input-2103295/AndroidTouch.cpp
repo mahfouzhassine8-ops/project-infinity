@@ -279,7 +279,9 @@ bool CAndroidTouch::onTouchEvent(AInputEvent* event)
     if (m_downTraceCount++ < 24)
       CXBMCApp::android_printf(
           "Infinity input down: window=%.1f,%.1f surface=%.1f,%.1f origin=%d,%d serial=%llu",
-          AMotionEvent_getX(event, pointer), AMotionEvent_getY(event, pointer), x, y,
+          static_cast<double>(AMotionEvent_getX(event, pointer)),
+          static_cast<double>(AMotionEvent_getY(event, pointer)), static_cast<double>(x),
+          static_cast<double>(y),
           current.left, current.top, static_cast<unsigned long long>(current.serial));
   }
   if (touchEvent == TouchInputDown)
