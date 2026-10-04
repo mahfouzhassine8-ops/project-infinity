@@ -16,10 +16,10 @@ successful validation export at commit
 `70309e66ab33d3f12df93b7a46ddb153f1f02f97`. Every one of its 250 source files
 was independently hash-checked before edits.
 
-2103299 is the recovered earlier *repair candidate*. The available history does
-not establish it as a user-accepted successful normal-Close build. The explicit
-earlier device success found in the audit concerned Force Close. This comparison
-must not be presented as proof that a working normal-Close APK was identified.
+The user reports that Close previously worked. The exact APK accepted at that
+time cannot be identified from the recovered artifacts or incomplete conversation
+history. 2103299 is an earlier *repair candidate*, not a verified identification
+of that accepted APK. Do not infer that the reported earlier success never happened.
 
 ## What changed and what remained
 
@@ -97,3 +97,46 @@ Drawer geometry/focus polish, provider-owned source/resolver sizing and Back
 handling, and idle takeover ownership/lifecycle remain pending skin recovery.
 Native shutdown ownership, signed packaging, physical foldable tests, both
 themes, all orientations, live resizing and Close/relaunch are still gates.
+
+## Exact native shutdown owner recovery (October 4 follow-up)
+
+The two source owners missing from the Android export have now been recovered.
+They are audit copies, not changes to the native engine or its build recipe.
+Both match the full-source manifest from native run 37189319805 exactly:
+
+| Owner | Verified SHA-256 |
+| --- | --- |
+| `xbmc/platform/android/activity/XBMCApp.cpp` | `9feadf50fd1864815e819b598221cb2b20f78fea069aba7fb0a771b84ad95f49` |
+| `xbmc/platform/android/activity/android_main.cpp` | `d70d38cef4471a74f70e3bc80ed0c100f6ae3dd8c54fc44f3bf482ccce263a32` |
+
+Recovery used official Kodi commit `a3a448d26b8d560a65655dab2cd122994dc4e146`,
+the existing audited 7.1 patch with zero fuzz and before/after hash guards, the
+existing audio-policy owner transform, inherited v2 render-hardening transform
+used by the v3 workflow, and the existing Android keyboard/health transforms.
+No alternate native source or skin was substituted.
+
+The unstripped library in that same downloaded artifact was independently read
+and matches `2b0897a286a7286e17109e8f5c7c2ec152c838dc91686ce349be3100eea69eac`.
+The source-manifest file matches
+`b870052cc344b8d419ed8fb29eb5dbc019fdbc9a528219a576576dcc4332b82b`.
+
+The verified source shows the two-stage Android finish/quit path. `Quit()` posts
+the second-stage shutdown message and joins the application thread; `android_main`
+then destroys `CXBMCApp`, records native cleanup completion, and exits the process.
+The join and other synchronous callback waits are investigation points, not
+proven owners of the user's hang. Moving or timing out native destruction without
+a current blocked-thread trace would be speculative and could damage saves or
+renderer ownership. No such change is included.
+
+The newest recovered device report is `Infinity-Diagnostics-20261003-184051.txt`,
+uploaded October 3 at 22:41 UTC, and explicitly reports APK **2103302**. Its
+`exit.beforeNativeDestroy` records cannot establish what the current 2103304
+engine did. This is not a current-build teardown pass or crash symbolication.
+
+The exact 1.0.5.195 full ZIP is not present in the repository. The recoverable
+1.0.5.194, 1.0.5.193 and 1.0.5.192 saved archives again failed to download with
+HTTP 502. No skin files were changed. Continuing the UI repair requires the exact
+locked 195 ZIP, or successful recovery of exact 194 and checksum-identical
+reconstruction of 195. Current shutdown diagnosis requires a 2103304 Health
+Center report captured after reproducing Close, ideally including the blocked
+thread/native trace. No APK or updated skin ZIP has been produced in this follow-up.
