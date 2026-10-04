@@ -91,14 +91,17 @@ def prepare(source: Path, base: Path, build: Path, out: Path):
     return original_ids
 
 
-def elf_id(path, output):
+def elf_identity(path, output):
     data=path.read_bytes()
     require(data[:6]==b'\x7fELF\x02\x01','Expected ELF64 little-endian native engine')
     require(struct.unpack_from('<HH',data,16)==(3,183),'Expected ARM64 shared library')
     notes=run('readelf','-h','-n','-W',path,output=output)
     ids=re.findall(r'Build ID: ([0-9a-f]+)',notes)
-    require(len(ids)==1,'Native engine must have one reproducible build ID')
-    return ids[0]
+    require(len(ids)<=1,'Native engine has multiple build IDs')
+    # The Kodi/NDK21 link is reproducible but does not emit a GNU build-ID.
+    # Preserve the exact unstripped SHA in the proof and require strip to
+    # preserve the ELF metadata state when no linker build-ID is present.
+    return ('build-id',ids[0]) if ids else ('content-sha256',sha(data))
 
 
 def prepare_native(engine, out):
@@ -108,18 +111,23 @@ def prepare_native(engine, out):
     require(proof['skin_id']=='skin.infinity.diggz','Wrong skin ID')
     original=engine/'libkodi.so'
     require(sha(original.read_bytes())==proof['native_sha256'],'Native engine differs from full-build proof')
-    build_id=elf_id(original,out/'unstripped-elf-identity.txt')
+    identity=elf_identity(original,out/'unstripped-elf-identity.txt')
     require(all(token in original.read_bytes() for token in
                 (b'/InfinityAndroidKeyboard',b'_infinityHeartbeat')),'Matched JNI registration not found')
     packaged=out/'libkodi.so'
     shutil.copy2(original,packaged)
     strip=Path(os.environ['ANDROID_HOME'])/'ndk'/os.environ.get('NDK_VER','21.4.7075529')/'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip'
     run(strip,'--strip-unneeded',packaged)
-    require(elf_id(packaged,out/'packaged-elf-identity.txt')==build_id,'Stripping changed native build identity')
+    packaged_identity=elf_identity(packaged,out/'packaged-elf-identity.txt')
+    require(packaged_identity[0]==identity[0],'Stripping changed native ELF identity kind')
+    if identity[0]=='build-id':
+        require(packaged_identity==identity,'Stripping changed native build ID')
     shutil.copy2(engine/'ENGINE-PROOF.json',out/'ENGINE-PROOF.json')
     shutil.copy2(engine/'source-manifest.json',out/'native-source-manifest.json')
     return packaged, {'unstripped_native_sha256':proof['native_sha256'],
-                      'packaged_native_sha256':sha(packaged.read_bytes()),'native_build_id':build_id}
+                      'packaged_native_sha256':sha(packaged.read_bytes()),
+                      'native_build_id':identity[1] if identity[0]=='build-id' else None,
+                      'native_identity_kind':identity[0]}
 
 
 def merge(base, donor, native, output):
