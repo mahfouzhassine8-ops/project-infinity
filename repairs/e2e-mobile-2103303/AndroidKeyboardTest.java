@@ -64,4 +64,27 @@ public class AndroidKeyboardTest {
     shadowOf(a.getPackageManager()).setSystemFeature(PackageManager.FEATURE_LEANBACK,true);
     assertFalse(InfinityAndroidKeyboard.isMobile(a));
   }
+  @Test public void numericAddressTimeAndDateValidationKeepsInvalidInputInEditor(){
+    assertTrue(InfinityAndroidKeyboard.valid(2,"192.168.1.255"));
+    assertFalse(InfinityAndroidKeyboard.valid(2,"192.168.1.256"));
+    assertFalse(InfinityAndroidKeyboard.valid(2,"192.168.1"));
+    assertTrue(InfinityAndroidKeyboard.valid(3,"23:59"));
+    assertFalse(InfinityAndroidKeyboard.valid(3,"24:00"));
+    assertTrue(InfinityAndroidKeyboard.valid(5,"125:45:59"));
+    assertFalse(InfinityAndroidKeyboard.valid(5,"1:60:00"));
+    assertTrue(InfinityAndroidKeyboard.valid(4,"2024-02-29"));
+    assertFalse(InfinityAndroidKeyboard.valid(4,"2025-02-29"));
+    Activity a=Robolectric.buildActivity(Activity.class).setup().get();Capture sink=new Capture();
+    InfinityAndroidKeyboard.Editor e=InfinityAndroidKeyboard.show(a,6,"300.0.0.1","IP address",false,false,2,sink);
+    e.finish(true);assertTrue(e.dialog.isShowing());assertEquals(0,sink.completed);
+    assertNotNull(e.input.getError());e.input.setText("10.0.0.1");e.finish(true);
+    assertEquals(1,sink.completed);assertEquals("10.0.0.1",sink.finalText);
+  }
+  @Test public void numericPasswordIsMaskedAndSubmittedOnce(){
+    Activity a=Robolectric.buildActivity(Activity.class).setup().get();Capture sink=new Capture();
+    InfinityAndroidKeyboard.Editor e=InfinityAndroidKeyboard.show(a,7,"","PIN",true,false,1,sink);
+    assertTrue(e.input.getTransformationMethod() instanceof android.text.method.PasswordTransformationMethod);
+    e.input.setText("0123");e.finish(true);e.finish(false);
+    assertEquals(1,sink.completed);assertTrue(sink.accepted);assertEquals("0123",sink.finalText);
+  }
 }

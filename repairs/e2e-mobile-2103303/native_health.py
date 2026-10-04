@@ -13,7 +13,7 @@ def apply(root):
                                            'after':hashlib.sha256(after).hexdigest()})
     change('xbmc/platform/android/activity/InfinityResponsiveness.h',lambda _:(HERE/'InfinityResponsiveness.h').read_text())
     def manager(s):
-        s=once(s,'#include "GUIWindowManager.h"', '#include "GUIWindowManager.h"\n#if defined(TARGET_ANDROID)\n#include "platform/android/activity/InfinityResponsiveness.h"\n#endif')
+        s=once(s,'#include "GUIWindowManager.h"', '#include "GUIWindowManager.h"\n#if defined(TARGET_ANDROID)\n#include "addons/Skin.h"\n#include "platform/android/activity/InfinityResponsiveness.h"\n#endif')
         old='''  for (auto& itr : m_dirtyregions)
     m_tracker.MarkDirtyRegion(itr);
 }'''
@@ -21,7 +21,7 @@ def apply(root):
 #if defined(TARGET_ANDROID)
   // Publish on the GUI owner thread. Watchdogs read only these atomics: no GUI
   // calls, renderer locks, JNI View access or JSON-RPC on the observer thread.
-  const int64_t now = INFINITY::HEALTH::UptimeMillis();
+  const int64_t now = InfinityHealth::UptimeMillis();
   static const int64_t sessionStart = now;
   static int64_t lastPublished = 0;
   if (now - lastPublished >= 500)
@@ -37,19 +37,53 @@ def apply(root):
     const int lw = active ? active->GetCoordsRes().iWidth : 0;
     const int lh = active ? active->GetCoordsRes().iHeight : 0;
     const int aspect = lh <= 0 ? 0 : lw * 100 < lh * 80 ? 1 : lw * 100 > lh * 125 ? 3 : 2;
-    INFINITY::HEALTH::Publish({1, now, GetActiveWindow(), GetTopmostDialog(), flags,
+    const uint64_t requested = InfinityHealth::requestedGeometry.load();
+    const uint64_t committed = InfinityHealth::committedGeometry.load();
+    InfinityHealth::Publish({1, now, GetActiveWindow(), GetTopmostDialog(), flags,
         background && background->IsVisible() ? 1 : 0,
         home && home->GetProperty("Infinity.NativeAmbient.Active").asString() == "true" ? 1 : 0,
-        gfx.GetWidth(), gfx.GetHeight(), lw, lh, INFINITY::HEALTH::skinGeneration.load(),
-        aspect, sessionStart});
+        gfx.GetWidth(), gfx.GetHeight(), lw, lh, InfinityHealth::skinGeneration.load(),
+        aspect, sessionStart, int(requested >> 32), int(uint32_t(requested)),
+        int(committed >> 32), int(uint32_t(committed)), InfinityHealth::windowGeneration.load(),
+        InfinityHealth::requestedAt.load(), InfinityHealth::committedAt.load(),
+        g_SkinInfo && g_SkinInfo->ID() == "skin.infinity.diggz" ? 1 : 0});
   }
 #endif
 }'''
         return once(s,old,new)
     change('xbmc/guilib/GUIWindowManager.cpp',manager)
+    def geometry(s):
+        s=once(s,'#include "WinSystemAndroidGLESContext.h"',
+            '#include "WinSystemAndroidGLESContext.h"\n#include "platform/android/activity/InfinityResponsiveness.h"')
+        s=once(s,'  m_pGLContext.DestroySurface();\n\n  if (!CWinSystemAndroid::CreateNewWindow',
+            '  InfinityHealth::ClearGeometry();\n  InfinityHealth::RequestGeometry(res.iWidth, res.iHeight);\n  m_pGLContext.DestroySurface();\n\n  if (!CWinSystemAndroid::CreateNewWindow')
+        s=once(s,'''  if (!m_pGLContext.BindContext())
+  {
+    return false;
+  }
+
+  return true;''','''  if (!m_pGLContext.BindContext())
+  {
+    return false;
+  }
+  InfinityHealth::CommitGeometry(res.iWidth, res.iHeight);
+  return true;''')
+        s=once(s,'''  CRenderSystemGLES::ResetRenderSystem(newWidth, newHeight);
+  return true;''','''  InfinityHealth::RequestGeometry(newWidth, newHeight);
+  const bool accepted = CRenderSystemGLES::ResetRenderSystem(newWidth, newHeight);
+  if (accepted) InfinityHealth::CommitGeometry(newWidth, newHeight);
+  return accepted;''')
+        return s
+    change('xbmc/windowing/android/WinSystemAndroidGLESContext.cpp',geometry)
+    def clear_geometry(s):
+        s=once(s,'#include "WinSystemAndroid.h"',
+            '#include "WinSystemAndroid.h"\n#include "platform/android/activity/InfinityResponsiveness.h"')
+        return once(s,'  m_nativeWindow.reset();\n  m_bWindowCreated = false;',
+            '  InfinityHealth::ClearGeometry();\n  m_nativeWindow.reset();\n  m_bWindowCreated = false;')
+    change('xbmc/windowing/android/WinSystemAndroid.cpp',clear_geometry)
     change('xbmc/addons/Skin.cpp',lambda s:once(once(s,'#include "Skin.h"',
         '#include "Skin.h"\n#if defined(TARGET_ANDROID)\n#include "platform/android/activity/InfinityResponsiveness.h"\n#endif'),
-        'void CSkinInfo::Start()\n{','void CSkinInfo::Start()\n{\n#if defined(TARGET_ANDROID)\n  ++INFINITY::HEALTH::skinGeneration;\n#endif'))
+        'void CSkinInfo::Start()\n{','void CSkinInfo::Start()\n{\n#if defined(TARGET_ANDROID)\n  ++InfinityHealth::skinGeneration;\n#endif'))
     change('xbmc/platform/android/activity/JNIMainActivity.h',lambda s:once(s,
         '  static void _doFrame(JNIEnv *env, jobject context, jlong frameTimeNanos);',
         '  static void _doFrame(JNIEnv *env, jobject context, jlong frameTimeNanos);\n  static jlongArray _infinityHeartbeat(JNIEnv* env, jclass);'))
@@ -59,8 +93,8 @@ def apply(root):
                     '        {"_doFrame", "(J)V", reinterpret_cast<void*>(&CJNIMainActivity::_doFrame)},\n        {"_infinityHeartbeat", "()[J", reinterpret_cast<void*>(&CJNIMainActivity::_infinityHeartbeat)},')
         return once(s,'CJNIRect CJNIMainActivity::getDisplayRect()', '''jlongArray CJNIMainActivity::_infinityHeartbeat(JNIEnv* env, jclass)
 {
-  std::array<int64_t,INFINITY::HEALTH::FIELD_COUNT> snapshot{};
-  if (!INFINITY::HEALTH::Read(snapshot)) return nullptr;
+  std::array<int64_t,InfinityHealth::FIELD_COUNT> snapshot{};
+  if (!InfinityHealth::Read(snapshot)) return nullptr;
   jlongArray result = env->NewLongArray(snapshot.size());
   if (result) env->SetLongArrayRegion(result,0,snapshot.size(),reinterpret_cast<const jlong*>(snapshot.data()));
   return result;

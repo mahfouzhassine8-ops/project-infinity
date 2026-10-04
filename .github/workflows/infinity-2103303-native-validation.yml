@@ -29,13 +29,16 @@ jobs:
       - uses: android-actions/setup-android@v4
         with: {packages: platform-tools}
       - uses: actions/cache/restore@v4
+        id: native-cache
         with:
           path: |
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
             ~/.ccache
-          key: infinity-deep-audio-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json', 'patches/infinity-refresh/**', 'patches/infinity-media/**', 'patches/infinity-audio-policy/**') }}
+          key: infinity-e2e-3303-arm64-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
+            infinity-e2e-3303-arm64-${{ runner.os }}-
+            infinity-deep-audio-21.3-arm64-${{ runner.os }}-
             infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
             infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
 
@@ -105,6 +108,13 @@ jobs:
           subprocess.run(['git','-C','kodi','diff','--check','--',*changed],check=True)
           PYCODE
 
+      - uses: actions/cache/restore@v4
+        id: depends-build-cache
+        with:
+          path: kodi/tools/depends
+          key: infinity-e2e-3303-depends-build-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: infinity-e2e-3303-depends-build-${{ runner.os }}-
+
       - name: Compile full ARM64 library with exact inherited engine recipe
         run: |
           set -euo pipefail
@@ -137,6 +147,19 @@ jobs:
           readelf -h -n -W engine3303/libkodi.so > engine3303/elf-identity.txt
           sha256sum engine3303/libkodi.so > engine3303/SHA256SUMS.txt
 
+      - uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+      - uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: kodi/tools/depends
+          key: ${{ steps.depends-build-cache.outputs.cache-primary-key }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:

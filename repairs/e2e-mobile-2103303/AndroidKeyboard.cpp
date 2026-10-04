@@ -25,6 +25,7 @@ jmethodID openMethod{nullptr}, closeMethod{nullptr}, replaceMethod{nullptr}, mob
 std::atomic<uint64_t> nextToken{1};
 std::mutex registryMutex;
 std::unordered_map<uint64_t, std::weak_ptr<InfinityKeyboardState>> editors;
+thread_local int inputKind = 0;
 
 jstring ToJava(JNIEnv* env, const std::string& text)
 {
@@ -48,6 +49,10 @@ void CloseJava(uint64_t token)
 }
 }
 
+int CAndroidKeyboard::InputKind() { return inputKind; }
+CAndroidKeyboard::InputScope::InputScope(int kind) : previous(inputKind) { inputKind=kind; }
+CAndroidKeyboard::InputScope::~InputScope() { inputKind=previous; }
+
 void CAndroidKeyboard::RegisterNatives(JNIEnv* env)
 {
   const std::string name = std::string(CCompileInfo::GetClass()) + "/InfinityAndroidKeyboard";
@@ -56,7 +61,7 @@ void CAndroidKeyboard::RegisterNatives(JNIEnv* env)
   keyboardClass = static_cast<jclass>(env->NewGlobalRef(local));
   JNINativeMethod methods[] = {{"changed", "(JLjava/lang/String;ZZ)V", reinterpret_cast<void*>(&Changed)}};
   env->RegisterNatives(local, methods, 1);
-  openMethod = env->GetStaticMethodID(local,"open","(JLjava/lang/String;Ljava/lang/String;ZZ)V");
+  openMethod = env->GetStaticMethodID(local,"open","(JLjava/lang/String;Ljava/lang/String;ZZI)V");
   closeMethod = env->GetStaticMethodID(local,"close","(J)V");
   replaceMethod = env->GetStaticMethodID(local,"replace","(JLjava/lang/String;Z)V");
   mobileMethod = env->GetStaticMethodID(local,"isMobile","()Z");
@@ -119,7 +124,7 @@ bool CAndroidKeyboard::ShowAndGetInput(char_callback_t callback,const std::strin
   jstring text = ToJava(env,initial), title = ToJava(env,heading);
   if (text && title && !env->ExceptionCheck())
     env->CallStaticVoidMethod(keyboardClass,openMethod,static_cast<jlong>(state->token),text,title,
-                             static_cast<jboolean>(hidden),static_cast<jboolean>(m_search));
+                             static_cast<jboolean>(hidden),static_cast<jboolean>(m_search),m_kind);
   const bool failed = JavaFailed(env) || !text || !title;
   if (text) env->DeleteLocalRef(text);
   if (title) env->DeleteLocalRef(title);

@@ -309,7 +309,74 @@ def branding(root):
                 c.set('type', 'image')
                 remove(c, 'label', 'font', 'textcolor', 'align', 'aligny')
                 put(c, 'texture', MARK); put(c, 'aspectratio', 'keep'); changed = True
+            elif text.startswith('∞ '):
+                put(c,'label',text[2:]);changed=True
+        for el in t.iter():
+            if el.tag in ('icon','texture') and el.text=='infinity_ui/icons/infinity.png':
+                el.text=MARK;changed=True
         if changed: write(root, f.name, t)
+
+
+def movie_details(root):
+    t=read(root,'DialogVideoInfo.xml');r=t.getroot();cs=r.find('controls')
+    original=copy.deepcopy(cs)
+    preview='String.IsEqual(Window(Home).Property(Infinity.InfoTrailer),true) + Player.HasVideo'
+    for e in r.findall('onload'):
+        if e.text=='Dialog.Close(all)':e.text='Dialog.Close(videoinfo)'
+    for event in ('onload','onunload'):
+        E.SubElement(r,event).text='ClearProperty(Infinity.InfoTrailer,Home)'
+    E.SubElement(r,'onback',condition='!['+preview+']').text='Dialog.Close(videoinfo)'
+    E.SubElement(r,'onback',condition=preview).text='ClearProperty(Infinity.InfoTrailer,Home)'
+    for c in list(cs):cs.remove(c)
+    scrim(cs)
+    g=control(cs,'group',centerleft='50%',centertop='50%',width='94%',height='92%',visible='!['+preview+']')
+    g.find('width').set('max','1440');g.find('height').set('max','1700');glass(g)
+    image(g,MARK,left=28,top=32,width=96,height=48,aspectratio='keep')
+    label(g,'Media details',left=144,right=128,top=24,height=72)
+    # 10 means Get Artwork and 15 means Manage Extras to Kodi. Custom skin
+    # commands must use unreserved IDs or a tap can dispatch both destinations.
+    close(g,9010,'Dialog.Close(videoinfo)')
+    body=control(g,'grouplist',9100,left=28,right=28,top=128,bottom=24,orientation='vertical',
+                 itemgap=20,scrolltime=140,usecontrolcoords='false')
+    summary=control(body,'group',width='100%',height=404)
+    image(summary,'$VAR[PosterThumb]',left=0,top=0,width=240,height=360,aspectratio='keep')
+    title=label(summary,'$INFO[ListItem.Title]',1,left=264,right=0,top=0,height=76)
+    put(title,'font','InfinityTitle')
+    label(summary,'$INFO[ListItem.Year]  •  $INFO[ListItem.Duration]  •  $INFO[ListItem.MPAA]',
+          left=264,right=0,top=88,height=48)
+    label(summary,'$INFO[ListItem.Genre]',left=264,right=0,top=144,height=48)
+    plot=copy.deepcopy(original.find(".//control[@id='400']"));remove(plot,'width','height')
+    for k,v in dict(left=264,right=0,top=208,bottom=0).items():put(plot,k,v)
+    put(plot,'font','InfinitySmall');summary.append(plot)
+    actions=control(body,'grouplist',9000,width='100%',height=104,orientation='horizontal',itemgap=12,scrolltime=140)
+    for old_id,new_id,name,width in [('8','8','PLAY',200),('15','9015','TRAILER',232),('5','9005','CAST',180)]:
+        b=copy.deepcopy(original.find(f".//control[@id='{old_id}']"));b.set('id',new_id)
+        remove(b,'left','right','top','bottom','animation','onup','ondown','onleft','onright')
+        put(b,'width',width);put(b,'height',96);put(b,'font','InfinitySmall');put(b,'label',name)
+        put(b,'onup',9010);put(b,'ondown',50)
+        if old_id=='15':
+            action=E.Element('onclick',condition='!Player.HasVideo');action.text='SetProperty(Infinity.InfoTrailer,true,Home)'
+            b.insert(0,action)
+        actions.append(b)
+    cast=copy.deepcopy(original.find(".//control[@id='50']"));remove(cast,'left','right','top','bottom')
+    put(cast,'width','100%');put(cast,'height',228);put(cast,'onup',8);put(cast,'ondown',8)
+    for layout in cast.findall('itemlayout')+cast.findall('focusedlayout'):
+        layout.attrib.clear();layout.set('width','184');layout.set('height','220')
+    body.append(cast)
+    metadata=control(body,'group',width='100%',height=344)
+    for index,(name,value) in enumerate([('Director','Director'),('Writer','Writer'),('Studio','Studio'),
+                                        ('Release','Premiered'),('Rating','Rating')]):
+        label(metadata,name,left=0,top=index*64,width=184,height=56)
+        label(metadata,'$INFO[ListItem.'+value+']',left=208,right=0,top=index*64,height=56)
+    for cid in ('49','61'):
+        cs.append(copy.deepcopy(original.find(f".//control[@id='{cid}']")))
+    video=copy.deepcopy(original.find("control[@type='videowindow']"))
+    # The explicitly deferred movie-video rectangle is byte-for-byte unchanged.
+    # It owns the foreground only after the user activates this page's trailer.
+    put(video,'visible',preview);cs.append(video)
+    trailer_close=button(cs,9016,'Back to details',right=24,top=24,width=264,height=88,visible=preview)
+    put(trailer_close,'onclick','ClearProperty(Infinity.InfoTrailer,Home)')
+    write(root,'DialogVideoInfo.xml',t)
 
 
 def player(root):
@@ -451,7 +518,10 @@ def main():
         p = root / name
         if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != expected:
             raise SystemExit('Baseline mismatch: ' + name)
-    for repair in (home, drawer, confirm, busy, settings, context, select, branding, player): repair(root)
+    for repair in (home, drawer, confirm, busy, settings, context, select, movie_details, branding, player): repair(root)
+    from ambient_lifecycle import repair as repair_ambient
+    ambient=root/'resources/lib/infinity_native_ambient.py'
+    ambient.write_text(repair_ambient(ambient.read_text()))
     addon = E.parse(str(root / 'addon.xml'))
     assert addon.getroot().get('id') == 'skin.infinity.diggz'
     assert addon.getroot().get('name') == 'Infinity'

@@ -52,6 +52,8 @@ final class InfinityResponsiveness {
   private volatile boolean foreground,closed;
   private volatile String geometry="unavailable";
   private String lastGeometry="";
+  private String lastNativeGeometry="";
+  private long lastAspect=-1;
   private final Stall ui=new Stall(),nativeUi=new Stall();
   InfinityResponsiveness(Activity owner,NativeSnapshot snapshot) {
     app=owner.getApplicationContext();activity=new WeakReference<>(owner);nativeSnapshot=snapshot;
@@ -90,8 +92,17 @@ final class InfinityResponsiveness {
       recovered=nativeUi.recover(nativeState[1]);
       if(recovered>=0)record("internal_native_ui_freeze_recovered",recovered,nativeState,false);
     }
-    if(!geometry.equals(lastGeometry)) {
-      lastGeometry=geometry;record("window_geometry",now,nativeState,false);
+    String nativeGeometry="unavailable";
+    if(nativeState!=null && nativeState.length>=22) {
+      StringBuilder signature=new StringBuilder();
+      for(int index:new int[]{7,8,9,10,11,12,14,15,16,17,18,21})signature.append(nativeState[index]).append(',');
+      nativeGeometry=signature.toString();
+      if(lastAspect!=nativeState[12]) {
+        lastAspect=nativeState[12];record("aspect_class_transition",now,nativeState,false);
+      }
+    }
+    if(!geometry.equals(lastGeometry) || !nativeGeometry.equals(lastNativeGeometry)) {
+      lastGeometry=geometry;lastNativeGeometry=nativeGeometry;record("window_geometry",now,nativeState,false);
     }
   }
   private void record(String event,long since,long[] state,boolean stack) {
@@ -110,7 +121,17 @@ final class InfinityResponsiveness {
         JSONObject nativeData=new JSONObject();for(int i=0;i<names.length;i++)nativeData.put(names[i],state[i]);
         nativeData.put("player_flags_legend","video=1,audio=2,paused=4");
         nativeData.put("aspect_class_legend","cover=1,square=2,landscape=3");
-        nativeData.put("profile_reason","existing skin folder retained; native window adaptation owns logical geometry");
+        if(state.length>=22) {
+          String[] extra={"native_requested_width","native_requested_height","native_committed_width",
+              "native_committed_height","native_window_generation","native_requested_uptime_ms",
+              "native_committed_uptime_ms","bundled_infinity_skin_active"};
+          for(int i=0;i<extra.length;i++)nativeData.put(extra[i],state[i+14]);
+          nativeData.put("geometry_owner","Kodi Android EGL window creation / render resize acceptance");
+          nativeData.put("profile",state[21]==1?"unified":"another skin");
+          nativeData.put("profile_reason",state[21]==1?
+              "skin.infinity.diggz declares unified; retained native adaptation selects cover/square/landscape geometry without fallback XML":
+              "active skin differs from the bundled Infinity skin");
+        }
         row.put("native",nativeData);
       }else row.put("native_heartbeat","unavailable");
       if(stack) {
@@ -139,10 +160,39 @@ final class InfinityResponsiveness {
       try(FileInputStream in=new FileInputStream(f)) {
         byte[] bytes=new byte[(int)Math.min(f.length(),LIMIT)];int count=0,n;
         while(count<bytes.length && (n=in.read(bytes,count,bytes.length-count))>0)count+=n;
-        out.append(name).append('\n').append(new String(bytes,0,count,StandardCharsets.UTF_8)).append('\n');
+        String evidence=new String(bytes,0,count,StandardCharsets.UTF_8);
+        out.append(name).append('\n').append(name.endsWith(".jsonl")?correlate(context,evidence):evidence).append('\n');
       }catch(Exception unavailable){out.append(name).append(": unavailable\n");}
     }
     out.append("Internal freezes are not Android-recorded ANRs or crashes. Chooser waiting is user time; no automatic reset is performed.\n");
     return out.toString();
+  }
+  static String correlate(Context context,String evidence) {
+    if(android.os.Build.VERSION.SDK_INT<30)return evidence;
+    try {
+      android.app.ActivityManager manager=(android.app.ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+      java.util.List<android.app.ApplicationExitInfo> exits=manager.getHistoricalProcessExitReasons(context.getPackageName(),0,32);
+      StringBuilder result=new StringBuilder();
+      for(String line:evidence.split("\n")) {
+        if(line.isEmpty())continue;
+        try {
+          JSONObject row=new JSONObject(line);
+          android.app.ApplicationExitInfo match=null;
+          for(android.app.ApplicationExitInfo exit:exits)
+            if(exit.getPid()==row.optInt("pid",-1) && exit.getTimestamp()>=row.optLong("epoch_ms",Long.MAX_VALUE) &&
+                (match==null || exit.getTimestamp()<match.getTimestamp()))match=exit;
+          if(match!=null) {
+            int reason=match.getReason();JSONObject exit=new JSONObject();
+            exit.put("epoch_ms",match.getTimestamp());exit.put("reason",reason);
+            exit.put("classification",reason==android.app.ApplicationExitInfo.REASON_ANR?"Android-recorded ANR":
+                reason==android.app.ApplicationExitInfo.REASON_CRASH || reason==android.app.ApplicationExitInfo.REASON_CRASH_NATIVE?
+                "Crash":"Other Android-recorded exit");
+            exit.put("association","same pid; first recorded exit after observation");row.put("later_android_exit",exit);
+          }
+          result.append(row).append('\n');
+        }catch(Exception malformed){result.append(line).append('\n');}
+      }
+      return result.toString();
+    }catch(RuntimeException unavailable){return evidence;}
   }
 }

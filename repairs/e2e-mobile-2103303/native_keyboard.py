@@ -26,23 +26,23 @@ def apply(root):
         s=once(s,'  bool useKodiKeyboard = true;',
             '  bool useKodiKeyboard = true;\n#if defined(TARGET_ANDROID)\n  useKodiKeyboard = !CAndroidKeyboard::UseAndroidIME();\n#endif')
         s=once(s,'#endif // defined(TARGET_DARWIN_EMBEDDED)\n\n  if (kb)',
-            '#endif // defined(TARGET_DARWIN_EMBEDDED)\n#if defined(TARGET_ANDROID)\n  else\n  {\n    auto* touch = winManager.GetWindow<CGUIDialogKeyboardTouch>(WINDOW_DIALOG_KEYBOARD_TOUCH);\n    if (touch) touch->SetSearchMode(m_filtering == FILTERING_SEARCH);\n    kb = touch;\n  }\n#endif\n\n  if (kb)')
+            '#endif // defined(TARGET_DARWIN_EMBEDDED)\n#if defined(TARGET_ANDROID)\n  else\n  {\n    auto* touch = winManager.GetWindow<CGUIDialogKeyboardTouch>(WINDOW_DIALOG_KEYBOARD_TOUCH);\n    if (touch) touch->SetInputMode(m_filtering == FILTERING_SEARCH, CAndroidKeyboard::InputKind());\n    kb = touch;\n  }\n#endif\n\n  if (kb)')
         return s
     change('xbmc/guilib/GUIKeyboardFactory.cpp',factory)
     def touch_h(s):
         s=once(s,'  CGUIDialogKeyboardTouch();','''  CGUIDialogKeyboardTouch();
 #if defined(TARGET_ANDROID)
-  void SetSearchMode(bool search) { m_search = search; }
+  void SetInputMode(bool search, int kind) { m_search = search; m_inputKind = kind; }
   bool OnBack(int actionID) override;
   void OnDeinitWindow(int nextWindowID) override;
 #endif''')
-        return once(s,'  bool m_confirmed;','  bool m_confirmed;\n  bool m_search{false};')
+        return once(s,'  bool m_confirmed;','  bool m_confirmed;\n  bool m_search{false};\n  int m_inputKind{0};')
     change('xbmc/dialogs/GUIDialogKeyboardTouch.h',touch_h)
     def touch(s):
         s=once(s,'#include "GUIDialogKeyboardTouch.h"',
             '#include "GUIDialogKeyboardTouch.h"\n#if defined(TARGET_ANDROID)\n#include "platform/android/activity/AndroidKeyboard.h"\n#endif')
         s=once(s,'  m_keyboard.reset(new CDarwinEmbedKeyboard());\n#endif',
-            '  m_keyboard.reset(new CDarwinEmbedKeyboard());\n#elif defined(TARGET_ANDROID)\n  m_keyboard = std::make_unique<CAndroidKeyboard>(this, m_search);\n#endif')
+            '  m_keyboard.reset(new CDarwinEmbedKeyboard());\n#elif defined(TARGET_ANDROID)\n  m_keyboard = std::make_unique<CAndroidKeyboard>(this, m_search, m_inputKind);\n#endif')
         s=once(s,'  m_keyboard.reset();','''#if defined(TARGET_ANDROID)
   // A force-close/deinit cancels the wait before the editor object is destroyed.
   Cancel();
@@ -71,6 +71,8 @@ void CGUIDialogKeyboardTouch::OnDeinitWindow(int nextWindowID)
 #endif''')
         return s
     change('xbmc/dialogs/GUIDialogKeyboardTouch.cpp',touch)
+    from native_numeric import repair
+    change('xbmc/dialogs/GUIDialogNumeric.cpp',repair)
     return changes
 
 if __name__=='__main__':
