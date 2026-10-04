@@ -1,4 +1,4 @@
-name: Build Map Point APK
+name: Build Map Point Navigator APK
 
 on:
   pull_request:
@@ -58,13 +58,13 @@ jobs:
       - name: Rename APK
         run: |
           mkdir -p out
-          cp map-point/app/build/outputs/apk/debug/app-debug.apk out/Apple-Map-Point-1.2.0.apk
+          cp map-point/app/build/outputs/apk/debug/app-debug.apk out/Map-Point-Navigator-2.0.0.apk
 
       - name: SHA-256
-        run: sha256sum out/Apple-Map-Point-1.2.0.apk | tee out/SHA256.txt
+        run: sha256sum out/Map-Point-Navigator-2.0.0.apk | tee out/SHA256.txt
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Apple-Map-Point-1.2.0-APK
+          name: Map-Point-Navigator-2.0.0-APK
           path: out/*
