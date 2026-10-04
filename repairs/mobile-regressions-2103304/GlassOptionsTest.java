@@ -42,11 +42,17 @@ public class GlassOptionsTest {
       assertEquals(3,d.panel.launchChoices.getChildCount());
       for(int j=0;j<3;j++)assertEquals(options(cobra)[j],((TextView)d.panel.launchChoices.getChildAt(j)).getText().toString());
       for(int j=3;j<options(cobra).length;j++)assertEquals(options(cobra)[j],d.panel.findViewById(InfinityGlassOptions.ROW_ID+j).getContentDescription());
-      View row=d.panel.findViewById(InfinityGlassOptions.ROW_ID+index);assertTrue(row.performClick());
+      View row=d.panel.findViewById(InfinityGlassOptions.ROW_ID+index);
+      assertTrue(row.isClickable());
       if(index<3) {
+        // RadioButton changes its checked state without an OnClickListener;
+        // performClick's listener return value is not its selection outcome.
+        row.performClick();
+        assertTrue(((android.widget.RadioButton)row).isChecked());
+        assertEquals(InfinityGlassOptions.ROW_ID+index,d.panel.launchChoices.getCheckedRadioButtonId());
         assertTrue(calls.isEmpty());assertTrue(d.isShowing());
         row=d.panel.findViewWithTag("experience_launch_apply");assertTrue(row.performClick());
-      }
+      } else assertTrue(row.performClick());
       assertEquals(Arrays.asList(index),calls);assertFalse(d.isShowing());row.performClick();assertEquals(1,calls.size());c.pause().stop().destroy();
     }
   }
