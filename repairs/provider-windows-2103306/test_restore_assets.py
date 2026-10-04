@@ -34,6 +34,24 @@ class PreservationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'No exact locked PNG hash match'):
             recover(at_time(values, START), hashlib.sha256(png()).hexdigest())
 
+    def test_splash_creation_and_write_times_are_independent(self):
+        from datetime import timedelta
+        expected = at_time(chunks(png()), START + timedelta(seconds=6), START)
+        current = at_time(chunks(expected), START + timedelta(days=5, seconds=8),
+                          START + timedelta(days=5))
+        recovered, moment = recover(current, hashlib.sha256(expected).hexdigest())
+        self.assertEqual(recovered, expected)
+        self.assertEqual(moment, {'tIME': (START + timedelta(seconds=6)).isoformat(),
+                                  'text': START.isoformat()})
+        self.assertEqual(fixed_chunks(current), fixed_chunks(recovered))
+
+    def test_creation_time_outside_bound_is_not_accepted(self):
+        from datetime import timedelta
+        expected = at_time(chunks(png()), START + timedelta(seconds=61), START)
+        current = at_time(chunks(expected), START + timedelta(days=5))
+        with self.assertRaisesRegex(ValueError, 'No exact locked PNG hash match'):
+            recover(current, hashlib.sha256(expected).hexdigest())
+
     def test_corrupt_crc_is_rejected(self):
         data = bytearray(png())
         data[20] ^= 1

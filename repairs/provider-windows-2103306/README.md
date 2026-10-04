@@ -82,3 +82,11 @@ in `native_patch.py` are unchanged. The new source tests cover exact-byte recove
 altered-pixel rejection, CRC rejection, already-identical files, and receipt
 authentication. Their passing result is not proof that runner-generated PNGs
 have been recovered or that the complete native engine has compiled.
+
+Run 37244316603 recovered 31 PNGs exactly and refused five splash copies before
+any source write. Its captured PNGs show separate canvas creation and final write
+timestamps (5-6 seconds apart), which the first implementation incorrectly
+treated as one timestamp. Recovery now searches these two timestamps separately
+within the original four-minute interval and a maximum 60-second render gap.
+All chunks still participate in the original full-file hash; the locked receipt,
+complete source-map constant and native preimages remain unchanged.

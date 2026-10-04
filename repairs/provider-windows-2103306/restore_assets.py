@@ -24,6 +24,11 @@ MAP_SHA = 'dc3cd4dce5abcfe7bb4b4a316a8b6a3ce9f69f308546ffe721e4d7b6787ebd1c'
 # exception: recovery succeeds only on an exact original full-file hash.
 START = datetime(2026, 10, 4, 8, 33, tzinfo=timezone.utc)
 SECONDS = 240
+# ImageMagick records the canvas creation time in date:create/date:modify,
+# while tIME is written after rendering. The captured splash PNGs differ by
+# 5-6 seconds within a single file. Search only up to 60 seconds of render time;
+# the complete original hash remains the sole acceptance condition.
+RENDER_SECONDS = 60
 SIGNATURE = b'\x89PNG\r\n\x1a\n'
 
 
@@ -65,9 +70,9 @@ def fixed_chunks(data):
             if not timestamp_chunk(kind, value)]
 
 
-def at_time(parts, moment):
+def at_time(parts, moment, text_moment=None):
     output = bytearray(SIGNATURE)
-    text_date = moment.isoformat(timespec='seconds').encode('ascii')
+    text_date = (text_moment or moment).isoformat(timespec='seconds').encode('ascii')
     for kind, value in parts:
         if kind == b'tIME':
             if len(value) != 7:
@@ -94,6 +99,27 @@ def recover(data, expected, start=START, seconds=SECONDS):
             if fixed_chunks(data) != fixed_chunks(candidate):
                 raise ValueError('Non-timestamp bytes changed')
             return candidate, moment.isoformat()
+    # Avoid hashing the large, identical IDAT payload for every possible text
+    # timestamp. Hash the prefix once per tIME value, then copy its digest state
+    # for each short metadata suffix. No chunk is omitted from the final hash.
+    text_index = next((i for i, (kind, value) in enumerate(parts)
+                       if kind == b'tEXt' and timestamp_chunk(kind, value)), None)
+    if text_index is not None and any(kind == b'tIME' for kind, _ in parts):
+        for second in range(seconds):
+            moment = start + timedelta(seconds=second)
+            prefix = at_time(parts[:text_index], moment)
+            prefix_hash = hashlib.sha256(prefix)
+            for offset in range(1, min(RENDER_SECONDS, second) + 1):
+                created = moment - timedelta(seconds=offset)
+                suffix = at_time(parts[text_index:], moment, created)[len(SIGNATURE):]
+                digest = prefix_hash.copy()
+                digest.update(suffix)
+                if digest.hexdigest() == expected:
+                    candidate = prefix + suffix
+                    if sha(candidate) != expected or fixed_chunks(data) != fixed_chunks(candidate):
+                        raise ValueError('Exact timestamp-only verification failed')
+                    return candidate, {'tIME': moment.isoformat(),
+                                       'text': created.isoformat()}
     raise ValueError('No exact locked PNG hash match; no replacement accepted')
 
 
