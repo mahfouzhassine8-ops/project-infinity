@@ -1,0 +1,76 @@
+name: Infinity | locked 304 Power route validation (NO APK)
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103303-194-responsive-regressions]
+    paths:
+      - 'repairs/mobile-followup-2103305/**'
+      - '.github/workflows/infinity-2103305-power-source-validation.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103305-power-source-validation
+  cancel-in-progress: false
+jobs:
+  power-source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - name: Fetch exact successful 304 Android source export
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-303-194-Repair-Android-Validation-NO-APK
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37189658834
+          github-token: ${{ github.token }}
+          path: parent3304
+      - name: Verify rollback source and apply one guarded helper edit
+        run: |
+          set -euo pipefail
+          echo '6c98056a4c395aa9144f4d09a5611eecb306218cb4d067522988947123eca466  parent3304/repaired-shell-source.tar.gz' | sha256sum -c -
+          echo 'f825d43f01885a661c718e91b5fa99592369709dbe83d9672c07735bf9da36e4  parent3304/ANDROID-SOURCE-PROOF.json' | sha256sum -c -
+          mkdir -p forward3305 evidence3305
+          tar --no-same-owner -xzf parent3304/repaired-shell-source.tar.gz -C forward3305
+          python3 repairs/mobile-followup-2103305/ci_delta.py apply --source forward3305/shell-kodi --parent-proof parent3304/ANDROID-SOURCE-PROOF.json --receipt evidence3305/source-delta.json
+          python3 repairs/mobile-regressions-2103304/prepare_diagnostics.py --root forward3305 --build power-build3305 --evidence evidence3305
+          python3 repairs/mobile-followup-2103305/prepare_tests.py --build power-build3305
+      - name: Run host regression and preserve inherited compile and tests
+        run: |
+          set -euo pipefail
+          python3 repairs/mobile-followup-2103305/test_power_routes.py 2>&1 | tee evidence3305/host-power-routes.log
+          cd power-build3305
+          python3 ../repairs/chooser-weather-snapshot-2103302/test_weather_snapshot.py 2>&1 | tee ../evidence3305/producer-tests.log
+          ./gradlew --no-daemon --console=plain :xbmc:compileDebugJavaWithJavac :xbmc:testDebugUnitTest 2>&1 | tee ../evidence3305/android-tests.log
+      - name: Verify protected source and weather isolation
+        run: |
+          set -euo pipefail
+          python3 repairs/chooser-weather-snapshot-2103302/audit_weather.py --root forward3305 --classes power-build3305/xbmc/build/intermediates/javac --out evidence3305
+          python3 repairs/mobile-followup-2103305/ci_delta.py verify --source forward3305/shell-kodi --receipt evidence3305/source-delta.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data=json.loads(Path('evidence3305/source-delta.json').read_text())
+          proof={'schema':1,'source_commit':os.environ['GITHUB_SHA'],'files':data['after'],
+                 'weather_isolation_audit_passed':True,'native_changed':False,
+                 'installable_apk':False,'physical_device_verified':False}
+          Path('evidence3305/ANDROID-SOURCE-PROOF.json').write_text(json.dumps(proof,indent=2)+'\n')
+          PY
+      - name: Gather evidence with explicit acceptance boundaries
+        if: always()
+        run: |
+          mkdir -p evidence3305
+          cp repairs/mobile-followup-2103305/README.md evidence3305/
+          if test -d power-build3305/xbmc/build/test-results; then cp -a power-build3305/xbmc/build/test-results evidence3305/; fi
+          if test -d power-build3305/xbmc/build/reports/tests; then cp -a power-build3305/xbmc/build/reports/tests evidence3305/test-reports; fi
+          if test -d forward3305/shell-kodi; then tar -czf evidence3305/repaired-shell-source.tar.gz -C forward3305 shell-kodi; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-304-Power-Route-Validation-NO-APK
+          path: evidence3305/
+          if-no-files-found: error
+          retention-days: 90
