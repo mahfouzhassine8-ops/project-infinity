@@ -19,6 +19,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with: {python-version: '3.12'}
+      - name: Validate locked receipt and metadata-only PNG recovery
+        run: python3 repairs/provider-windows-2103306/test_restore_assets.py
       - name: Validate exact native preimages and compile real resolver
         run: |
           set -euo pipefail

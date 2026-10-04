@@ -96,6 +96,12 @@ jobs:
           sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit3295/python-protected.txt
           cp engine/inplace-reflow-source.json engine/container-reflow-source.json audit3295/
 
+      - name: Restore exact locked PNG timestamp bytes before parent receipts
+        run: |
+          set -euo pipefail
+          python3 repairs/provider-windows-2103306/test_restore_assets.py
+          python3 repairs/provider-windows-2103306/restore_assets.py --source kodi --evidence engine3306/asset-preservation
+
       - name: Apply declared controls IME and evidence delta
         run: |
           set -euo pipefail
