@@ -1,0 +1,1438 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1198" type="dialog">
+  <defaultcontrol>1198101</defaultcontrol>
+  <onload>SetProperty(Infinity.DrawerOpen,true,home)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(Infinity.CinemaOpenViewModes),true)">SetFocus(1198201)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(Infinity.CinemaOpenViewModes),true)">ClearProperty(Infinity.CinemaOpenViewModes,home)</onload>
+  <onunload>ClearProperty(Infinity.DrawerOpen,home)</onunload>
+  <onback>Dialog.Close(1198)</onback>
+  <controls>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityDrawerScrim]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="group" id="1198888">
+      <left>10</left>
+      <top>6</top>
+      <width max="680">92%</width>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityDrawerPanel]" border="24">infinity_polish/surface.png</texture>
+      </control>
+      <control type="image" id="1198880">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="58FFFFFF" diffuse="infinity_polish/surface.png"/>
+        <visible>String.IsEqual(Window(Home).Property(Infinity.NativeAmbient.Active),true)</visible>
+      </control>
+      <control type="image" id="1198901">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityGlassFocus]" border="24">infinity_polish/rim.png</texture>
+      </control>
+      <control type="image">
+        <left>24</left>
+        <top>34</top>
+        <width>64</width>
+        <height>34</height>
+        <texture>infinity_polish/infinity_mark.png</texture>
+      </control>
+      <control type="label">
+        <left>105</left>
+        <top>20</top>
+        <right>112</right>
+        <height>48</height>
+        <label>INFINITY</label>
+        <font>InfinityTitle</font>
+        <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+        <aligny>center</aligny>
+      </control>
+      <control type="label">
+        <left>105</left>
+        <top>66</top>
+        <right>110</right>
+        <height>28</height>
+        <label>WITHOUT LIMITS</label>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <aligny>center</aligny>
+      </control>
+      <control type="button" id="1198999">
+        <right>18</right>
+        <top>18</top>
+        <width>80</width>
+        <height>80</height>
+        <label/>
+        <font>InfinitySmall</font>
+        <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+        <onclick>Dialog.Close(1198)</onclick>
+        <ondown>1198101</ondown>
+        <onleft>1198101</onleft>
+      </control>
+      <control type="image">
+        <width>32</width>
+        <height>32</height>
+        <texture colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/close.png</texture>
+        <right>42</right>
+        <top>42</top>
+      </control>
+      <control type="image" id="1198903">
+        <left>24</left>
+        <right>24</right>
+        <top>114</top>
+        <height>1</height>
+        <texture colordiffuse="$VAR[InfinityGlassBorderSoft]">infinity_ui/contract_white.png</texture>
+      </control>
+      <control type="grouplist" id="1198899">
+        <left>18</left>
+        <right>18</right>
+        <top>132</top>
+        <bottom>18</bottom>
+        <orientation>vertical</orientation>
+        <itemgap>6</itemgap>
+        <usecontrolcoords>false</usecontrolcoords>
+        <scrolltime>180</scrolltime>
+        <onback>Dialog.Close(1198)</onback>
+        <onleft>1198999</onleft>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>NAVIGATION</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198101">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(Home)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Home</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198101)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/home.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198102">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(Videos,plugin://script.infinity.commandcenter/?action=movies,return)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Movies</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198102)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/movies.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198103">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(Videos,plugin://script.infinity.commandcenter/?action=tv,return)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>TV Shows</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198103)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/tv.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198107">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.OPEN_LIVE)</onclick>
+            <enable>System.Platform.Android</enable>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Live TV</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198107)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/tv.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>LIBRARY</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198104">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(Videos)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Library</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198104)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/library.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198105">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(AddonBrowser)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Add-ons</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198105)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/addons.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>SYSTEM</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198303">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(SkinSettings)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Settings</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198303)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/settings.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198305">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(InterfaceSettings)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>UI Theme</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198305)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/settings.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198304">
+            <align>left</align>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Power</label>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(shutdownmenu)</onclick>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198304)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/power.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>EXPLORE</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198108">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(Music)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Music</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198108)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/music.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198109">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(Videos)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Discover</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198109)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/search.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198301">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(favouritesbrowser)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Favourites</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198301)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/favorite.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>VIEW MODE</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198201">
+            <align>left</align>
+            <onclick>Skin.SetString(Infinity.VisualMode,normal)</onclick>
+            <onclick>Skin.SetString(Infinity.HomeView,auto)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,view-mode,normal)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>SetFocus(9090)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Normal</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198201)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/menu.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198202">
+            <align>left</align>
+            <onclick>Skin.SetString(Infinity.VisualMode,cinema)</onclick>
+            <onclick>Skin.SetString(Infinity.HomeView,cinema)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,view-mode,cinema)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <onclick>ClearProperty(Infinity.CinemaDrawerLevel,home)</onclick>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>SetFocus(8601)</onclick>
+            <onclick>SetFocus(8602)</onclick>
+            <onclick>SetFocus(8606)</onclick>
+            <onclick>SetFocus(8607)</onclick>
+            <onclick>SetFocus(8610)</onclick>
+            <onclick>SetFocus(8605)</onclick>
+            <onclick>SetFocus(8604)</onclick>
+            <onclick>SetFocus(8603)</onclick>
+            <onclick>SetFocus(8611)</onclick>
+            <onclick>SetFocus(8609)</onclick>
+            <onclick>SetFocus(8608)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Cinema</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198202)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/movies.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198203">
+            <align>left</align>
+            <onclick>Skin.SetString(Infinity.VisualMode,compact)</onclick>
+            <onclick>Skin.SetString(Infinity.HomeView,compact)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,view-mode,compact)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Compact</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198203)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/menu.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198204">
+            <align>left</align>
+            <onclick>Skin.SetString(Infinity.VisualMode,twopane)</onclick>
+            <onclick>Skin.SetString(Infinity.HomeView,twopane)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,view-mode,twopane)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Two-Pane</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198204)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/library.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>PERFORMANCE &amp; AMBIENT</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198410">
+            <align>left</align>
+            <onclick>RunScript(script.infinity.commandcenter,performance,toggle)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Performance mode</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198410)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/refresh.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198305">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(1192)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Performance &amp; refresh</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198305)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/settings.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198306">
+            <align>left</align>
+            <enable>System.HasAddon(script.infinity.commandcenter)</enable>
+            <onclick>RunScript(script.infinity.commandcenter,ambient-home)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Ambient Home</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198306)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/ambient.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198503">
+            <align>left</align>
+            <onclick>Dialog.Close(1198)</onclick>
+            <onclick>ActivateWindow(1191)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>System Hub</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198503)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/settings.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>38</height>
+          <control type="label">
+            <left>16</left>
+            <top>0</top>
+            <right>16</right>
+            <height>36</height>
+            <label>REFRESH RATE</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <aligny>center</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198401">
+            <align>center</align>
+            <onclick>Skin.SetString(Infinity.RefreshRequest,auto)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,refresh-cap,auto)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Auto</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198401)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/refresh.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198402">
+            <align>center</align>
+            <onclick>Skin.SetString(Infinity.RefreshRequest,60)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,refresh-cap,60)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>60 Hz</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198402)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/refresh.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198403">
+            <align>center</align>
+            <onclick>Skin.SetString(Infinity.RefreshRequest,90)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,refresh-cap,90)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>90 Hz</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198403)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/refresh.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198404">
+            <align>center</align>
+            <onclick>Skin.SetString(Infinity.RefreshRequest,120)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,refresh-cap,120)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>120 Hz</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198404)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/refresh.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>80</height>
+          <control type="button" id="1198405">
+            <align>center</align>
+            <onclick>Skin.SetString(Infinity.RefreshRequest,max)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,refresh-cap,highest)</onclick>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <textoffsetx>74</textoffsetx>
+            <textwidth>308</textwidth>
+            <aligny>center</aligny>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+            <label>Max</label>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>80</height>
+            <visible>Control.HasFocus(1198405)</visible>
+            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+          </control>
+          <control type="image">
+            <left>20</left>
+            <top>24</top>
+            <width>32</width>
+            <height>32</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/refresh.png</texture>
+          </control>
+          <control type="image">
+            <right>16</right>
+            <top>30</top>
+            <width>20</width>
+            <height>20</height>
+            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+          </control>
+        </control>
+        <control type="group">
+          <control type="image" id="1198960">
+            <texture colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_ui/contract_white.png</texture>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>104</height>
+          </control>
+          <control type="label" id="1198411">
+            <top>10.0</top>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <label>Requested $INFO[Window(Home).Property(Infinity.RefreshRuntime.RequestedHz)]  •  Active $INFO[Window(Home).Property(Infinity.RefreshRuntime.ActiveHz)]  •  $INFO[Window(Home).Property(Infinity.RefreshRuntime.Status)]</label>
+            <visible>false</visible>
+            <left>20.0</left>
+            <width>130</width>
+            <height>36</height>
+          </control>
+          <control type="label" id="1198971">
+            <top>20.0</top>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <label>Requested</label>
+            <align>center</align>
+            <left>34.0</left>
+            <width>130</width>
+            <height>36</height>
+          </control>
+          <control type="label" id="1198973">
+            <top>20.0</top>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <label>Active</label>
+            <align>center</align>
+            <left>184.0</left>
+            <width>130</width>
+            <height>36</height>
+          </control>
+          <control type="label" id="1198975">
+            <top>20.0</top>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <label>Status</label>
+            <align>center</align>
+            <left>300</left>
+            <width>130</width>
+            <height>36</height>
+          </control>
+          <control type="label" id="1198972">
+            <top>50.0</top>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <label>$INFO[Window(Home).Property(Infinity.RefreshRuntime.RequestedHz)]</label>
+            <align>center</align>
+            <left>34.0</left>
+            <width>130</width>
+            <height>36</height>
+          </control>
+          <control type="label" id="1198974">
+            <top>50.0</top>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+            <label>$INFO[Window(Home).Property(Infinity.RefreshRuntime.ActiveHz)]</label>
+            <align>center</align>
+            <left>184.0</left>
+            <width>130</width>
+            <height>36</height>
+          </control>
+          <control type="label" id="1198976">
+            <top>50.0</top>
+            <font>InfinitySmall</font>
+            <textcolor>$VAR[InfinityGlassFocus]</textcolor>
+            <label>$INFO[Window(Home).Property(Infinity.RefreshRuntime.Status)]</label>
+            <align>center</align>
+            <left>300</left>
+            <width>130</width>
+            <height>36</height>
+            <scroll>true</scroll>
+          </control>
+          <width>100%</width>
+          <height>110</height>
+        </control>
+        <control type="group">
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+            <label>INFINITY  •  $INFO[Skin.String(Infinity.HomeView)]  •  $INFO[Skin.String(Infinity.RefreshRequest)]</label>
+            <left>16</left>
+            <right>16</right>
+            <top>8</top>
+            <height>60</height>
+            <wrapmultiline>true</wrapmultiline>
+          </control>
+          <width>100%</width>
+          <height>110</height>
+        </control>
+      </control>
+      <height max="1120">88%</height>
+      <animation effect="zoom" start="11.47,10.89" end="100,100" center="0,0" time="210" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+      <animation effect="zoom" start="100,100" end="11.47,10.89" center="0,0" time="165" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+    </control>
+  </controls>
+  <onunload condition="Window.IsActive(home)">SetFocus(9000)</onunload>
+</window>
