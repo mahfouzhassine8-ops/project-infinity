@@ -65,10 +65,12 @@ The report's `0x0` native geometry and fallback profile occur in a retained trac
 dated October 1. They are not evidence of the current October 3 launch geometry.
 The reported absence of Android ANRs does not establish the absence of UI freezes.
 
-Remaining work needs the current installed Infinity skin and relevant add-on
-source/configuration, plus original binary tombstones and exact build-ID-matched
-symbols for each affected build. Available archives include skin 1.0.5.189 and a
-1.0.5.190 candidate; this report does not establish which is actually installed.
+The user has confirmed `addons/skin.infinity.diggz` as the authoritative existing
+Infinity skin. The internal ID remains unchanged; visible branding is Infinity.
+The existing .190 source archive is snapshotted by `skin-baseline-sha256.json` and
+all edits are made to an isolated copy. No replacement skin is used. Historical
+crash attribution still needs original binary tombstones and exact build-ID-matched
+symbols for each affected build.
 No device/ADB connection is available in this workspace.
 
 Useful reproducible findings for the continuation:
@@ -108,3 +110,30 @@ telemetry. The deferred movie-video framing issue is untouched.
 
 The existing weather snapshot implementation, provider/add-on data, native engine,
 Resume Hub, installed skin and playback have not been changed by this checkpoint.
+
+## Active skin and input implementation checkpoint
+
+`repair_skin.py` applies guarded edits to the existing .190 source: compact home
+capsule; downward drawer; Infinity hub routes; centered confirmation/select/busy
+layouts; compact category tiles; right-anchored switches; official logo images;
+one horizontal player rail and separate native volume slider with inactivity
+timer. `controller-ambient.patch` marks the Ambient Home selector before opening
+it and clears its compact-layout marker in `finally`. The deferred movie-video
+framing is unchanged. These are source candidates, not visually accepted builds.
+
+`native_controls.py` reserves radio label space without splitting touch targets,
+adds responsive dimension caps, gives the skin confirmation explicit Keep/Revert
+actions, and repairs stale hold callbacks and movement-at-release tap dispatch.
+The compiled actual recognizer and original detectors pass seven race scenarios
+under AddressSanitizer and UndefinedBehaviorSanitizer. LeakSanitizer is unsupported
+in the execution environment; the local run uses `ASAN_OPTIONS=detect_leaks=0`.
+All 2,026 candidate skin XML files parse; changed primary windows have no duplicate
+literal control IDs. These checks do not establish rendered appearance or device
+touch behavior.
+
+`native_keyboard.py` and `android_keyboard.py` add a token-scoped Android EditText
+and installed-IME bridge through the existing native touch-keyboard dialog. TV and
+remote-only devices retain Kodi's keyboard. The Java half has new lifecycle,
+selection, Unicode, submission and password tests. Full native compilation and
+physical IME/Back behavior are still pending. The Android validation workflow is
+compile/test only, so it must not be mistaken for a signed APK release.

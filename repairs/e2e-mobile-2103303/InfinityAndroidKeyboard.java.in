@@ -1,0 +1,176 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+/** Android owns composition, selection, paste and the installed IME. UI thread only.
+ * Tokens reject callbacks from a dismissed editor; text is never logged or saved.
+ */
+final class InfinityAndroidKeyboard {
+  interface Sink { void change(long token,String text,boolean finished,boolean accepted); }
+  private static native void changed(long token,String text,boolean finished,boolean accepted);
+  private static final Handler UI=new Handler(Looper.getMainLooper());
+  private static Editor active;
+  private static long lastClosed;
+
+  static boolean isMobile() {
+    Activity a=Main.MainActivity;
+    return a==null || isMobile(a);
+  }
+  static boolean isMobile(Activity a) {
+    int type=a.getResources().getConfiguration().uiMode & Configuration.UI_MODE_TYPE_MASK;
+    PackageManager pm=a.getPackageManager();
+    return type!=Configuration.UI_MODE_TYPE_TELEVISION &&
+        !pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK) &&
+        pm.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN);
+  }
+  static void open(long token,String initial,String heading,boolean hidden,boolean search) {
+    UI.post(()-> {
+      if(token<=lastClosed){changed(token,"",true,false);return;}
+      Main owner=Main.MainActivity;
+      if(owner==null || owner.isFinishing() || owner.isDestroyed() || owner.mInfinityStopped) {
+        changed(token,"",true,false); return;
+      }
+      show(owner,token,initial,heading,hidden,search,InfinityAndroidKeyboard::changed);
+    });
+  }
+  static Editor show(Activity owner,long token,String initial,String heading,boolean hidden,
+                     boolean search,Sink sink) {
+    if(active!=null) active.finish(false);
+    active=new Editor(owner,token,initial,heading,hidden,search,sink);
+    active.dialog.show();
+    active.fit();
+    final Editor editor=active;
+    editor.input.requestFocus();
+    editor.input.post(()-> {
+      if(active==editor && !editor.done)
+        ((InputMethodManager)owner.getSystemService(Context.INPUT_METHOD_SERVICE))
+            .showSoftInput(editor.input,InputMethodManager.SHOW_IMPLICIT);
+    });
+    return editor;
+  }
+  static void replace(long token,String text,boolean confirm) {
+    UI.post(()-> {
+      Editor e=active;if(e==null || e.token!=token || e.done)return;
+      if(!e.input.getText().toString().equals(text)) {
+        int start=e.input.getSelectionStart(),end=e.input.getSelectionEnd();
+        e.input.setText(text);
+        e.input.setSelection(Math.max(0,Math.min(start,text.length())),
+                             Math.max(0,Math.min(end,text.length())));
+      }
+      if(confirm)e.finish(true);
+    });
+  }
+  static void close(long token) {
+    UI.post(()-> {lastClosed=Math.max(lastClosed,token);if(active!=null && active.token==token)active.finish(false);});
+  }
+  static void cancelOwner(Activity owner) {
+    if(active!=null && active.owner==owner)active.finish(false);
+  }
+  static void resized(Activity owner) {
+    if(active!=null && active.owner==owner)active.fit();
+  }
+  static final class Editor {
+    final Activity owner;final long token;final Sink sink;final Dialog dialog;final EditText input;
+    boolean done;
+    Editor(Activity a,long id,String initial,String heading,boolean hidden,boolean search,Sink callback) {
+      owner=a;token=id;sink=callback;
+      boolean light=(a.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+          ==Configuration.UI_MODE_NIGHT_NO;
+      int ink=light?0xff082231:Color.WHITE;
+      dialog=new Dialog(a);dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+      LinearLayout panel=new LinearLayout(a);panel.setOrientation(LinearLayout.VERTICAL);
+      panel.setPadding(dp(16),dp(12),dp(16),dp(16));
+      GradientDrawable glass=new GradientDrawable();glass.setColor(light?0xf2edf8fc:0xf209141b);
+      glass.setCornerRadius(dp(22));glass.setStroke(dp(1),0xff29cfe0);panel.setBackground(glass);
+      LinearLayout header=new LinearLayout(a);header.setGravity(Gravity.CENTER_VERTICAL);
+      ImageView logo=new ImageView(a);logo.setImageBitmap(InfinityCosmicArt.decodeMark(false));
+      logo.setScaleType(ImageView.ScaleType.FIT_CENTER);logo.setContentDescription("Infinity");
+      header.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(32)));
+      TextView title=new TextView(a);title.setText(heading);title.setTextColor(ink);title.setTextSize(18);
+      title.setMaxLines(2);title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+      LinearLayout.LayoutParams titleBounds=new LinearLayout.LayoutParams(0,-2,1);titleBounds.leftMargin=dp(12);
+      header.addView(title,titleBounds);
+      Button x=new Button(a);x.setText("×");x.setTextColor(ink);x.setContentDescription("Cancel text entry");
+      x.setOnClickListener(v->finish(false));header.addView(x,new LinearLayout.LayoutParams(dp(48),dp(48)));
+      panel.addView(header,new LinearLayout.LayoutParams(-1,-2));
+      input=new EditText(a);input.setSingleLine(true);input.setTextColor(ink);input.setTextSize(18);
+      // Kodi text inputs historically do not autocorrect URLs, paths or credentials.
+      input.setInputType(InputType.TYPE_CLASS_TEXT | (hidden?InputType.TYPE_TEXT_VARIATION_PASSWORD:
+          InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS));
+      input.setImeOptions((search?EditorInfo.IME_ACTION_SEARCH:EditorInfo.IME_ACTION_DONE) |
+          EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
+      if(hidden)input.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance());
+      input.setText(initial);input.setSelection(input.length());
+      input.setSaveEnabled(false);input.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
+      input.addTextChangedListener(new TextWatcher(){
+        public void beforeTextChanged(CharSequence s,int start,int count,int after){}
+        public void onTextChanged(CharSequence s,int start,int before,int count){}
+        public void afterTextChanged(Editable text){if(!done)sink.change(token,text.toString(),false,false);}
+      });
+      input.setOnEditorActionListener((v,action,event)-> {
+        if(action==EditorInfo.IME_ACTION_DONE || action==EditorInfo.IME_ACTION_SEARCH ||
+            (event!=null && event.getKeyCode()==android.view.KeyEvent.KEYCODE_ENTER &&
+             event.getAction()==android.view.KeyEvent.ACTION_UP)) {finish(true);return true;}
+        return false;
+      });
+      panel.addView(input,new LinearLayout.LayoutParams(-1,dp(56)));
+      Button accept=new Button(a);accept.setText(search?"Search":"Done");accept.setTextColor(ink);
+      accept.setOnClickListener(v->finish(true));panel.addView(accept,new LinearLayout.LayoutParams(-1,dp(48)));
+      dialog.setContentView(panel);dialog.setCanceledOnTouchOutside(false);
+      // Android dismisses its IME on the first Back. A later Back cancels this dialog.
+      dialog.setOnCancelListener(d->finish(false));
+      dialog.setOnDismissListener(d->{if(!done)finish(false);});
+      Window w=dialog.getWindow();
+      if(w!=null) {
+        w.setBackgroundDrawableResource(android.R.color.transparent);
+        w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        w.setDimAmount(.35f);
+        w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
+                           WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if(hidden)w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+      }
+    }
+    void fit() {
+      Window w=dialog.getWindow();if(w==null)return;
+      int available=owner.getWindow().getDecorView().getWidth();
+      if(available<=0)available=owner.getResources().getDisplayMetrics().widthPixels;
+      w.setLayout(Math.max(dp(160),Math.min(dp(560),available-dp(24))),-2);
+      w.setGravity(Gravity.CENTER);
+    }
+    void finish(boolean accepted) {
+      if(done)return;done=true;
+      lastClosed=Math.max(lastClosed,token);
+      String result=input.getText().toString();
+      ((InputMethodManager)owner.getSystemService(Context.INPUT_METHOD_SERVICE))
+          .hideSoftInputFromWindow(input.getWindowToken(),0);
+      if(active==this)active=null;
+      dialog.dismiss();input.setText("");
+      sink.change(token,result,true,accepted);
+    }
+    int dp(float value){return Math.round(value*owner.getResources().getDisplayMetrics().density);}
+  }
+  private InfinityAndroidKeyboard() {}
+}

@@ -61,6 +61,8 @@ def apply(root):
     text=once(text, 'StringBuilder out=new StringBuilder();\n    if(Build.VERSION.SDK_INT<30){',
               'StringBuilder out=new StringBuilder("Exit records are historical. The current APK version does not identify the version that produced each older exit.\\n");\n    if(Build.VERSION.SDK_INT<30){')
     p.write_text(text)
+    from android_keyboard import apply as apply_keyboard
+    apply_keyboard(root)
     after={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
            for p in root.rglob('*') if p.is_file()}
     changes=[{'path':p,'before':before.get(p),'after':after.get(p)} for p in sorted(set(before)|set(after)) if before.get(p)!=after.get(p)]

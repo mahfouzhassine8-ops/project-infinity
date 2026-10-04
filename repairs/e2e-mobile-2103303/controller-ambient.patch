@@ -1,0 +1,17 @@
+--- a/default.py
++++ b/default.py
+@@ -299,8 +299,12 @@
+     elif action == 'ambient-home':
+         modes = ('off', 'subtle', 'immersive')
+         current = addon().getSetting('ambient_home') or 'subtle'
+-        choice = xbmcgui.Dialog().select('Infinity Ambient Home', ['Off', 'Subtle', 'Immersive'],
+-                                         preselect=modes.index(current) if current in modes else 1)
++        home.setProperty('Infinity.Select.Compact', 'true')
++        try:
++            choice = xbmcgui.Dialog().select('Infinity Ambient Home', ['Off', 'Subtle', 'Immersive'],
++                                             preselect=modes.index(current) if current in modes else 1)
++        finally:
++            home.clearProperty('Infinity.Select.Compact')
+         if choice >= 0:
+             addon().setSetting('ambient_home', modes[choice])
+             home.setProperty('Infinity.AmbientHome.Mode', modes[choice])
