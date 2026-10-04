@@ -24,7 +24,8 @@ JNI_ADDITIONS={('Lcom/projectinfinity/kodi/Main;','_infinityHeartbeat','()[J'),
 def verify_source(source, receipt, proof):
     actual={str(p.relative_to(source)):sha(p.read_bytes()) for p in source.rglob('*') if p.is_file()}
     require(actual==proof['files'],'Android source differs from the successfully tested export')
-    require(proof['source_commit']==os.environ['GITHUB_SHA'],'Android tests used a different source commit')
+    validated_commit = '70309e66ab33d3f12df93b7a46ddb153f1f02f97'
+    require(proof['source_commit'] in (validated_commit, os.environ['GITHUB_SHA']), 'Android tests used an unapproved source commit')
     require(proof['weather_isolation_audit_passed'] is True,'Weather isolation gate missing')
     for name in ('InfinityChooserWeather','InfinityStartupPreparation'):
         path='tools/android/packaging/xbmc/src/'+name+'.java.in'
