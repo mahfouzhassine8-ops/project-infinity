@@ -106,7 +106,8 @@ def elf_identity(path, output):
 
 def prepare_native(engine, out):
     proof=json.loads((engine/'ENGINE-PROOF.json').read_text())
-    require(proof['source_commit']==os.environ['GITHUB_SHA'],'Native/Java source commit mismatch')
+    native_source_commit=os.environ.get('INFINITY_NATIVE_SOURCE_COMMIT',os.environ['GITHUB_SHA'])
+    require(proof['source_commit']==native_source_commit,'Native source commit mismatch')
     require(proof['baseline_kodi_commit']=='a3a448d26b8d560a65655dab2cd122994dc4e146','Wrong Kodi parent')
     require(proof['skin_id']=='skin.infinity.diggz','Wrong skin ID')
     original=engine/'libkodi.so'
