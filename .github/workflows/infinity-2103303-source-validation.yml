@@ -1,6 +1,7 @@
-name: Infinity | 2103303 first repair source validation
+name: Infinity | 2103303 Android repair source validation
 on:
   workflow_dispatch:
+  workflow_call:
   push:
     branches: [candidate-infinity-2103303-e2e-repair]
     paths:
@@ -8,7 +9,7 @@ on:
       - '.github/workflows/infinity-2103303-source-validation.yml'
 permissions: {contents: read, actions: read}
 concurrency:
-  group: infinity-2103303-source-validation
+  group: infinity-2103303-source-validation-${{ github.workflow }}
   cancel-in-progress: true
 jobs:
   source-compile-and-tests:
@@ -108,6 +109,18 @@ jobs:
       - name: Verify compiled weather classes cannot reach Kodi JNI
         run: |
           python3 repairs/chooser-weather-snapshot-2103302/audit_weather.py --root forward3299 --classes chooser-build3301/xbmc/build/intermediates/javac --out evidence3301
+      - name: Bind successful Android and weather tests to exact source
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path('forward3299/shell-kodi')
+          files={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
+                 for p in root.rglob('*') if p.is_file()}
+          proof={'schema':1,'source_commit':os.environ['GITHUB_SHA'],
+                 'weather_isolation_audit_passed':True,'files':files}
+          Path('evidence3301/ANDROID-SOURCE-PROOF.json').write_text(json.dumps(proof,indent=2)+'\n')
+          PYCODE
       - name: Gather source validation evidence (no APK)
         if: always()
         run: |

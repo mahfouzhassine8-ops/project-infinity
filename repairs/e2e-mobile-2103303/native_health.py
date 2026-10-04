@@ -96,14 +96,16 @@ def apply(root):
   std::array<int64_t,InfinityHealth::FIELD_COUNT> snapshot{};
   if (!InfinityHealth::Read(snapshot)) return nullptr;
   jlongArray result = env->NewLongArray(snapshot.size());
-  if (result) env->SetLongArrayRegion(result,0,snapshot.size(),reinterpret_cast<const jlong*>(snapshot.data()));
+  std::array<jlong,InfinityHealth::FIELD_COUNT> javaValues{};
+  for (size_t i = 0; i < snapshot.size(); ++i) javaValues[i] = snapshot[i];
+  if (result) env->SetLongArrayRegion(result,0,javaValues.size(),javaValues.data());
   return result;
 }
 
 CJNIRect CJNIMainActivity::getDisplayRect()''')
     change('xbmc/platform/android/activity/JNIMainActivity.cpp',jni)
     def cleanup(s):
-        s=once(s,'#include <thread>','#include <thread>\n#include <fstream>\n#include <chrono>\n#include <cstdio>')
+        s=once(s,'#include <thread>','#include <thread>\n#include <chrono>\n#include <cstdio>')
         s=once(s,'extern void android_main(struct android_app* state)\n{',
         '''extern void android_main(struct android_app* state)
 {
@@ -116,14 +118,17 @@ CJNIRect CJNIMainActivity::getDisplayRect()''')
     if (!cleanupPath.empty())
     {
       const std::string temporary = cleanupPath + ".tmp";
-      std::ofstream record(temporary,std::ios::trunc);
+      FILE* record = std::fopen(temporary.c_str(), "w");
       const auto epoch = std::chrono::duration_cast<std::chrono::milliseconds>(
           std::chrono::system_clock::now().time_since_epoch()).count();
-      record << "{\\"schema\\":1,\\"milestone\\":\\"native.CXBMCApp.Destroy.complete\\",\\"pid\\":"
-             << getpid() << ",\\"epoch_ms\\":" << epoch << "}\\n";
-      record.flush();
-      const bool written = record.good();
-      record.close();
+      const int written = record && std::fprintf(record,
+          "{\\"schema\\":1,\\"milestone\\":\\"native.CXBMCApp.Destroy.complete\\",\\"pid\\":%d,\\"epoch_ms\\":%lld}\\n",
+          getpid(), static_cast<long long>(epoch)) >= 0;
+      if (record)
+      {
+        std::fflush(record);
+        std::fclose(record);
+      }
       if (written && std::rename(temporary.c_str(),cleanupPath.c_str()) == 0)
         CXBMCApp::android_printf("Infinity native cleanup completion persisted");
     }

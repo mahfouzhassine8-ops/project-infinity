@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Narrow first repair tranche. Apply only to the verified 2103302 Android shell.
+"""Android repair delta. Apply only to the verified 2103302 Android shell.
 
 This is not the complete user brief and must not be advertised as an installable
 end-to-end candidate. No version bump/signing/native mutation happens here.
@@ -77,4 +77,4 @@ if __name__=='__main__':
     changes=apply(a.source)
     a.receipt.parent.mkdir(parents=True,exist_ok=True)
     a.receipt.write_text(json.dumps({'complete_brief':False,'apk_produced':False,'changes':changes},indent=2)+'\n')
-    print('Applied first Android tranche:',len(changes),'files; remaining brief is not implemented.')
+    print('Applied Android repair delta:',len(changes),'files; physical acceptance remains pending.')

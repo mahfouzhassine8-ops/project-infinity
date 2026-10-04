@@ -147,6 +147,20 @@ bool CGUIControlFactory::GetDimensions'''
 #else
   m_loadType = KEEP_IN_MEMORY;
 #endif'''))
+    # KaiToast is modeless, so the default manager never sends it pointer input.
+    # Offer only left-click/move to its hit-tested controls; unhandled events
+    # continue to the real foreground window. Never give toast keyboard focus.
+    change('xbmc/guilib/GUIWindowManager.cpp',lambda s:once(s,
+        '''    CGUIWindow *dialog = m_activeDialogs[--topmost];
+    lock.unlock();
+    if (dialog->IsModalDialog())''',
+        '''    CGUIWindow *dialog = m_activeDialogs[--topmost];
+    lock.unlock();
+    if (dialog->GetID() == WINDOW_DIALOG_KAI_TOAST &&
+        (action.GetID() == ACTION_MOUSE_LEFT_CLICK || action.GetID() == ACTION_MOUSE_MOVE) &&
+        !dialog->IsAnimating(ANIM_TYPE_WINDOW_CLOSE) && dialog->OnAction(action))
+      return true;
+    if (dialog->IsModalDialog())'''))
     return changes
 
 

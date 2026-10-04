@@ -223,6 +223,11 @@ def notification(root):
     for c in list(cs):cs.remove(c)
     g=control(cs,'group',centerleft='50%',top=24,width='92%',height=184)
     g.find('width').set('max','1040');glass(g)
+    for animation in old.findall("control/animation"):
+        if animation.get('condition','').startswith('Player.HasVideo'):
+            # Preserve the existing EPG/playlist-noise suppression and make its
+            # new dismissal target ineligible for touch while suppressed.
+            put(g,'visible','!['+animation.get('condition')+']')
     image(g,MARK,left=24,top=36,width=80,height=40,aspectratio='keep')
     icon=copy.deepcopy(old.find(".//control[@id='400']"))
     for k,v in dict(left=32,top=100,width=64,height=56).items():put(icon,k,v)
@@ -520,6 +525,17 @@ def player(root):
         put(b,'onback','Skin.Reset(Infinity.PlayerDrawerOpen)');E.SubElement(b,'onback').text='SetFocus(257)'
         commands.append(b)
     write(root,'VideoOSD.xml',t)
+    # Volume actions also open Kodi's modeless top volume bar. Suppress that
+    # duplicate presentation while the explicit player capsule owns volume.
+    volume_bar=read(root,'DialogVolumeBar.xml');vc=volume_bar.getroot().find('controls')
+    previous=list(vc)
+    for node in previous:vc.remove(node)
+    vg=control(vc,'group',visible=normal)
+    for node in previous:vg.append(node)
+    write(root,'DialogVolumeBar.xml',volume_bar)
+    seek_bar=read(root,'DialogSeekBar.xml');sr=seek_bar.getroot()
+    put(sr,'visible','['+sr.findtext('visible')+'] + !Window.IsVisible(videoosd)')
+    write(root,'DialogSeekBar.xml',seek_bar)
     timers=read(root,'Timers.xml'); tr=timers.getroot()
     auto=next(x for x in tr if x.findtext('name')=='autoclosevideoosd')
     guard='!Skin.HasSetting(Infinity.PlayerDrawerOpen) + '+normal
@@ -542,6 +558,11 @@ def release_metadata(root):
     assert node.get('id')=='skin.infinity.diggz' and node.get('version')=='1.0.5.190'
     node.set('version',version)
     node.find("requires/import[@addon='script.infinity.commandcenter']").set('version','0.3.5.20')
+    node.find("extension[@point='xbmc.addon.metadata']/description").text=(
+        'Infinity 1.0.5.191 Mobile Repair RC1, based on the existing 1.0.5.190 skin. '
+        'Requires the matched APK 2103303 and Command Center 0.3.5.20. '
+        'Preserves existing assets, provider configuration and Resume Hub data. '
+        'Physical acceptance is pending; this candidate is not locked.')
     (root/'addon.xml').write_bytes(E.tostring(addon,encoding='utf-8',xml_declaration=True)+b'\n')
     current={'version':version,'title':'Mobile repair candidate','baseline':'1.0.5.190 / APK 2103302',
              'requires_apk':2103303,'command_center':'0.3.5.20','profiles':['unified'],
@@ -573,9 +594,11 @@ def main():
         if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != expected:
             raise SystemExit('Baseline mismatch: ' + name)
     for repair in (home, drawer, confirm, busy, notification, settings, context, select, movie_details, branding, player): repair(root)
-    from ambient_lifecycle import repair as repair_ambient
+    from ambient_lifecycle import repair as repair_ambient, repair_continuity
     ambient=root/'resources/lib/infinity_native_ambient.py'
     ambient.write_text(repair_ambient(ambient.read_text()))
+    continuity=root/'resources/lib/infinity_continuity.py'
+    continuity.write_text(repair_continuity(continuity.read_text()))
     release_metadata(root)
     addon = E.parse(str(root / 'addon.xml'))
     assert addon.getroot().get('id') == 'skin.infinity.diggz'
