@@ -47,6 +47,7 @@ jobs:
           path: validated-native
       - name: Package and sign fast update
         env:
+          INFINITY_NATIVE_SOURCE_COMMIT: dcfb7a097fa542c69f1aae1130305e7b409d968b
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
           INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
