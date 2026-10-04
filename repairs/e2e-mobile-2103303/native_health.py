@@ -40,7 +40,7 @@ def apply(root):
     const uint64_t requested = InfinityHealth::requestedGeometry.load();
     const uint64_t committed = InfinityHealth::committedGeometry.load();
     InfinityHealth::Publish({1, now, GetActiveWindow(), GetTopmostDialog(), flags,
-        background && background->IsVisible() ? 1 : 0,
+        GetActiveWindow() == WINDOW_HOME && background && background->IsVisible() ? 1 : 0,
         home && home->GetProperty("Infinity.NativeAmbient.Active").asString() == "true" ? 1 : 0,
         gfx.GetWidth(), gfx.GetHeight(), lw, lh, InfinityHealth::skinGeneration.load(),
         aspect, sessionStart, int(requested >> 32), int(uint32_t(requested)),

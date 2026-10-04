@@ -153,6 +153,13 @@ def home(root):
         if g.get('id') in ('19593', '19594', '19590'):
             put(g, 'left', -18)
     write(root, 'Home.xml', t)
+    background=read(root,'Includes_InfinityHomePlayback.xml')
+    video=background.find(".//control[@id='29901']")
+    assert video is not None
+    # Kodi videowindows normally turn a click into fullscreen. This one is a
+    # decorative background; only the existing Now Playing dock owns actions.
+    E.SubElement(video,'hitrect',x='-10000',y='-10000',w='0',h='0')
+    write(root,'Includes_InfinityHomePlayback.xml',background)
 
 
 def drawer(root):
@@ -208,6 +215,24 @@ def busy(root):
     put(p, 'texturebg', 'infinity_legacy/track.png', colordiffuse='$VAR[InfinityLegacyTrack]')
     put(p, 'midtexture', 'infinity_legacy/track.png', colordiffuse='$VAR[InfinityLegacyAccent]')
     write(root, 'DialogBusy.xml', r)
+
+
+def notification(root):
+    t=read(root,'DialogNotification.xml');r=t.getroot();cs=r.find('controls')
+    old=copy.deepcopy(cs)
+    for c in list(cs):cs.remove(c)
+    g=control(cs,'group',centerleft='50%',top=24,width='92%',height=184)
+    g.find('width').set('max','1040');glass(g)
+    image(g,MARK,left=24,top=36,width=80,height=40,aspectratio='keep')
+    icon=copy.deepcopy(old.find(".//control[@id='400']"))
+    for k,v in dict(left=32,top=100,width=64,height=56).items():put(icon,k,v)
+    g.append(icon)
+    for cid,top,font in [(401,24,'InfinityBody'),(402,92,'InfinitySmall')]:
+        text=copy.deepcopy(old.find(f".//control[@id='{cid}']"));remove(text,'width')
+        for k,v in dict(left=128,right=120,top=top,height=64,font=font).items():put(text,k,v)
+        g.append(text)
+    close(g,9010,'Dialog.Close(10107)')
+    write(root,'DialogNotification.xml',t)
 
 
 def settings(root):
@@ -511,6 +536,35 @@ def player(root):
     write(root,'Timers.xml',timers)
 
 
+def release_metadata(root):
+    version='1.0.5.191'
+    addon=E.parse(str(root/'addon.xml'));node=addon.getroot()
+    assert node.get('id')=='skin.infinity.diggz' and node.get('version')=='1.0.5.190'
+    node.set('version',version)
+    node.find("requires/import[@addon='script.infinity.commandcenter']").set('version','0.3.5.20')
+    (root/'addon.xml').write_bytes(E.tostring(addon,encoding='utf-8',xml_declaration=True)+b'\n')
+    current={'version':version,'title':'Mobile repair candidate','baseline':'1.0.5.190 / APK 2103302',
+             'requires_apk':2103303,'command_center':'0.3.5.20','profiles':['unified'],
+             'native_responsive_marker_enabled':False,'runtime_tested':False,
+             'status':'source candidate; physical acceptance pending; historical crash and takeover ownership unproven'}
+    for name in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
+        p=root/name;data=json.loads(p.read_text())
+        data.update(candidate=191,skin_version=version,current_release=current)
+        if name=='infinity-skin.json':
+            health=data['ui_health'];health['schema']=3
+            health['required_ids']['Home.xml']=[9000,9100,9090]
+            health['required_ids']['VideoOSD.xml']=[87,200,201,202,204,205,250,252,253,255,257,260,261,262,263,264,265]
+            health['compatibility_ids']['VideoOSD.xml']=[]
+        else:
+            data.update(candidate_version=version,candidate_locked=False)
+            # Only the user's declared repair changes refresh this integrity
+            # receipt. All preimages were checked before the first XML edit.
+            for rel in data['protected_files']:
+                assert rel!=name
+                data['protected_files'][rel]=hashlib.sha256((root/rel).read_bytes()).hexdigest()
+        p.write_text(json.dumps(data,indent=2,ensure_ascii=False)+'\n')
+
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('skin', type=Path); args = ap.parse_args()
     root = args.skin.resolve(); baseline = json.loads((HERE / 'skin-baseline-sha256.json').read_text())
@@ -518,10 +572,11 @@ def main():
         p = root / name
         if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != expected:
             raise SystemExit('Baseline mismatch: ' + name)
-    for repair in (home, drawer, confirm, busy, settings, context, select, movie_details, branding, player): repair(root)
+    for repair in (home, drawer, confirm, busy, notification, settings, context, select, movie_details, branding, player): repair(root)
     from ambient_lifecycle import repair as repair_ambient
     ambient=root/'resources/lib/infinity_native_ambient.py'
     ambient.write_text(repair_ambient(ambient.read_text()))
+    release_metadata(root)
     addon = E.parse(str(root / 'addon.xml'))
     assert addon.getroot().get('id') == 'skin.infinity.diggz'
     assert addon.getroot().get('name') == 'Infinity'

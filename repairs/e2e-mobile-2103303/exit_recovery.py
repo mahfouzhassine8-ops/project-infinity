@@ -31,7 +31,7 @@ def apply(root):
     s=s.replace('// No timer, finish(), database write or kill on normal close.',
         '// The bounded observer records only. Normal close never calls finish() or kills the process.')
     s=once(s,'Normal close has NO timed force-stop fallback. Native cleanup and usable-frame timing require physical validation.',
-        'Normal close is observed for 15 seconds without an automatic kill. If still closing, the chooser offers an explicit close-stalled-instance action. Native cleanup and usable-frame timing require physical validation.')
+        'Normal close has NO timed force-stop fallback. The 15-second observer records only; the chooser offers explicit user recovery if still closing. Native cleanup and usable-frame timing require physical validation.')
     p.write_text(s)
     p=java/'Splash.java.in';s=p.read_text()
     anchor='  private void showCobraRecovery(){'

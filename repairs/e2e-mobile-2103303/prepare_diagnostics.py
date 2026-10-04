@@ -18,6 +18,16 @@ tests = a.build/'xbmc/src/test/java/com/projectinfinity/kodi'
 shutil.copy2(HERE/'MobileRepairTest.java', tests/'MobileRepairTest.java')
 shutil.copy2(HERE/'AndroidKeyboardTest.java', tests/'AndroidKeyboardTest.java')
 shutil.copy2(HERE/'ResponsivenessTest.java', tests/'ResponsivenessTest.java')
+p=tests/'PowerMenuRouteTest.java'
+text=p.read_text()
+assert text.count('assertEquals(13,InfinityPowerMenuRoutes.PROFILES.length)')==1
+text=text.replace('assertEquals(13,InfinityPowerMenuRoutes.PROFILES.length)',
+                  'assertEquals(14,InfinityPowerMenuRoutes.PROFILES.length)')
+text=text.replace('allThirteenProfilesChangeOnlyTwoOnclickBodies','allFourteenProfilesChangeOnlyTwoOnclickBodies')
+p.write_text(text)
+fixture=a.build/'xbmc/src/test/resources/power-profiles/unified'
+fixture.mkdir(parents=True,exist_ok=True)
+shutil.copy2(HERE/'fixtures/unified-DialogButtonMenu.xml',fixture/'DialogButtonMenu.xml')
 p = tests/'MotionFrameTest.java'
 text = p.read_text()
 old = '        View v=ui.stage.getChildAt(i);Rect r=new Rect();'
