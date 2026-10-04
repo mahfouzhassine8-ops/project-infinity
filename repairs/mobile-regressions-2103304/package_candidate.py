@@ -218,7 +218,6 @@ def main():
     (out/'APK-AUDIT.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
     shutil.copy2(a.source_proof,out/'ANDROID-SOURCE-PROOF.json')
     shutil.copy2(a.source_receipt,out/'android-repair-changes.json')
-    shutil.copy2(HERE/'DEVICE-TEST.md',out/'DEVICE-TEST.md')
     unsigned.unlink();native.unlink()
     print('PASS: matched source-built Java/ARM64 candidate; protected assets/resources/native companions preserved; not device accepted')
 
