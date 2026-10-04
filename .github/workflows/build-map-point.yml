@@ -36,7 +36,9 @@ jobs:
 
       - name: Install Android platform
         run: |
-          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"             "platforms;android-35"             "build-tools;35.0.0"
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -56,13 +58,13 @@ jobs:
       - name: Rename APK
         run: |
           mkdir -p out
-          cp map-point/app/build/outputs/apk/debug/app-debug.apk out/Map-Point-1.1.0.apk
+          cp map-point/app/build/outputs/apk/debug/app-debug.apk out/Apple-Map-Point-1.2.0.apk
 
       - name: SHA-256
-        run: sha256sum out/Map-Point-1.1.0.apk | tee out/SHA256.txt
+        run: sha256sum out/Apple-Map-Point-1.2.0.apk | tee out/SHA256.txt
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Map-Point-1.1.0-Directions-APK
+          name: Apple-Map-Point-1.2.0-APK
           path: out/*
