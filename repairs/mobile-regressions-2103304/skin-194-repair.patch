@@ -1,0 +1,2279 @@
+diff --git a/addons/skin.infinity.diggz/unified/Custom_1197_InfinityDisplayMode.xml b/addons/skin.infinity.diggz/unified/Custom_1197_InfinityDisplayMode.xml
+index 656aedf..c003e2d 100644
+--- a/addons/skin.infinity.diggz/unified/Custom_1197_InfinityDisplayMode.xml
++++ b/addons/skin.infinity.diggz/unified/Custom_1197_InfinityDisplayMode.xml
+@@ -8,139 +8,114 @@
+       <top>0%</top>
+       <width>100%</width>
+       <height>100%</height>
+-      <texture colordiffuse="C8000000">infinity_reference/white.png</texture>
++      <texture colordiffuse="$VAR[InfinityDrawerScrim]">infinity_reference/white.png</texture>
+     </control>
+-    <control type="image">
+-      <left>13.9815%</left>
+-      <top>38.3333%</top>
+-      <width>71.9444%</width>
+-      <height>23.333313%</height>
+-      <texture border="24" colordiffuse="$VAR[InfinityLegacySurface]">infinity_glass/surface.png</texture>
+-    </control>
+-    <control type="image">
+-      <description>Infinity glass specular rim</description>
+-      <left>13.9815%</left>
+-      <top>38.3333%</top>
+-      <width>71.9444%</width>
+-      <height>23.333313%</height>
+-      <texture border="24" colordiffuse="$VAR[InfinityGlassSpecular]">infinity_glass/rim.png</texture>
+-    </control>
+-    <control type="label">
+-      <left>16.5741%</left>
+-      <top>39.9167%</top>
+-      <width>57.5%</width>
+-      <height>56</height>
+-      <font>InfinityBody</font>
+-      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-      <label>Display Mode</label>
+-    </control>
+-    <control type="label">
+-      <left>16.5741%</left>
+-      <top>42.1667%</top>
+-      <width>57.5%</width>
+-      <height>34</height>
+-      <font>InfinityTiny</font>
+-      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+-      <label>Quick picture modes and advanced display controls</label>
+-    </control>
+-    <control type="button" id="5399">
+-      <left>78.5185%</left>
+-      <top>39.6667%</top>
+-      <width>52</width>
+-      <height>52</height>
+-      <label>×</label>
+-      <font>InfinityBody</font>
+-      <align>center</align>
+-      <aligny>center</aligny>
+-      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-      <onclick>Action(Back)</onclick>
+-      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-    </control>
+-    <control type="button" id="5301">
+-      <left>16.5741%</left>
+-      <top>44.5833%</top>
+-      <width>66.7593%</width>
+-      <height>84</height>
+-      <label>Cycle picture mode</label>
+-      <font>InfinitySmall</font>
+-      <textoffsetx>28</textoffsetx>
+-      <aligny>center</aligny>
+-      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-      <onclick>Action(AspectRatio)</onclick>
+-      <onup>5303</onup>
+-      <ondown>5302</ondown>
+-      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-    </control>
+-    <control type="label">
+-      <left>19.1667%</left>
+-      <top>46.8333%</top>
+-      <width>61.5741%</width>
+-      <height>22</height>
+-      <font>InfinityTiny</font>
+-      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+-      <label>Cycle Kodi quick view modes (fit / zoom / stretch as configured)</label>
+-    </control>
+-    <control type="button" id="5302">
+-      <left>16.5741%</left>
+-      <top>48.75%</top>
+-      <width>66.7593%</width>
+-      <height>84</height>
+-      <label>Advanced video settings</label>
+-      <font>InfinitySmall</font>
+-      <textoffsetx>28</textoffsetx>
+-      <aligny>center</aligny>
+-      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-      <onclick>ActivateWindow(OSDVideoSettings)</onclick>
+-      <onup>5301</onup>
+-      <ondown>5303</ondown>
+-      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-    </control>
+-    <control type="label">
+-      <left>19.1667%</left>
+-      <top>51%</top>
+-      <width>61.5741%</width>
+-      <height>22</height>
+-      <font>InfinityTiny</font>
+-      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+-      <label>Open View mode, zoom, pixel ratio and orientation controls</label>
+-    </control>
+-    <control type="button" id="5303">
+-      <left>16.5741%</left>
+-      <top>52.9167%</top>
+-      <width>66.7593%</width>
+-      <height>84</height>
+-      <label>Done</label>
+-      <font>InfinitySmall</font>
+-      <textoffsetx>28</textoffsetx>
+-      <aligny>center</aligny>
+-      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-      <onclick>Action(Back)</onclick>
+-      <onup>5302</onup>
+-      <ondown>5301</ondown>
+-      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-    </control>
+-    <control type="label">
+-      <left>19.1667%</left>
+-      <top>55.1667%</top>
+-      <width>61.5741%</width>
+-      <height>22</height>
+-      <font>InfinityTiny</font>
+-      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+-      <label>Return to playback</label>
++    <control type="group">
++      <centerleft>50%</centerleft>
++      <centertop>50%</centertop>
++      <width max="960">86%</width>
++      <height max="88%">560</height>
++      <control type="image">
++        <left>0</left>
++        <top>0</top>
++        <width>100%</width>
++        <height>100%</height>
++        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
++      </control>
++      <control type="image">
++        <left>0</left>
++        <top>0</top>
++        <width>100%</width>
++        <height>100%</height>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassBorder]">infinity_polish/rim.png</texture>
++      </control>
++      <control type="label">
++        <font>InfinityBody</font>
++        <textcolor>$VAR[InfinityLegacyText]</textcolor>
++        <label>Display Mode</label>
++        <left>32</left>
++        <right>120</right>
++        <top>26</top>
++        <height>72</height>
++      </control>
++      <control type="button" id="5399">
++        <label>×</label>
++        <font>InfinityBody</font>
++        <align>center</align>
++        <aligny>center</aligny>
++        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++        <textcolor>$VAR[InfinityLegacyText]</textcolor>
++        <onclick>Action(Back)</onclick>
++        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++        <right>20</right>
++        <top>20</top>
++        <width>80</width>
++        <height>80</height>
++      </control>
++      <control type="grouplist" id="5390">
++        <left>24</left>
++        <right>24</right>
++        <top>126</top>
++        <bottom>24</bottom>
++        <orientation>vertical</orientation>
++        <itemgap>12</itemgap>
++        <scrolltime>160</scrolltime>
++        <control type="button" id="5301">
++          <label>Cycle picture mode</label>
++          <font>InfinitySmall</font>
++          <textoffsetx>28</textoffsetx>
++          <aligny>center</aligny>
++          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++          <textcolor>$VAR[InfinityLegacyText]</textcolor>
++          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++          <onclick>Action(AspectRatio)</onclick>
++          <onup>263</onup>
++          <ondown>5302</ondown>
++          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++          <width>100%</width>
++          <height>96</height>
++        </control>
++        <control type="button" id="5302">
++          <label>Advanced video settings</label>
++          <font>InfinitySmall</font>
++          <textoffsetx>28</textoffsetx>
++          <aligny>center</aligny>
++          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++          <textcolor>$VAR[InfinityLegacyText]</textcolor>
++          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++          <onclick>ActivateWindow(OSDVideoSettings)</onclick>
++          <onup>5301</onup>
++          <ondown>263</ondown>
++          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++          <width>100%</width>
++          <height>96</height>
++        </control>
++        <control type="button" id="263">
++          <label>Rotation policy</label>
++          <font>InfinitySmall</font>
++          <description>Player rotation policy: Follow Device / Unlocked During Video (selection, not Android grant status)</description>
++          <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
++          <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
++          <onclick condition="System.Platform.Android + Player.HasVideo + !Skin.HasSetting(Infinity.PlayerRotationUnlocked)">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.PLAYER_ROTATION_UNLOCKED)</onclick>
++          <onclick condition="System.Platform.Android + Player.HasVideo + Skin.HasSetting(Infinity.PlayerRotationUnlocked)">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.PLAYER_ROTATION_FOLLOW_DEVICE)</onclick>
++          <onclick condition="System.Platform.Android + Player.HasVideo">Skin.ToggleSetting(Infinity.PlayerRotationUnlocked)</onclick>
++          <enable>System.Platform.Android + Player.HasVideo + true</enable>
++          <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="[Control.HasFocus(263)] + [String.IsEmpty(Window(Home).Property(Infinity.RuntimeCapabilitiesReady)) | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),true)]">Conditional</animation>
++          <align>left</align>
++          <textoffsetx>24</textoffsetx>
++          <onback>Action(Back)</onback>
++          <width>100%</width>
++          <height>96</height>
++          <onup>5302</onup>
++          <ondown>5301</ondown>
++        </control>
++      </control>
+     </control>
+   </controls>
+   <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+   <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+-</window>
+\ No newline at end of file
++</window>
+diff --git a/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml b/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
+index 1ee65bb..66f162b 100644
+--- a/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
++++ b/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
+@@ -2,7 +2,6 @@
+ <window id="1198" type="dialog">
+   <defaultcontrol>1198101</defaultcontrol>
+   <onload>SetProperty(Infinity.DrawerOpen,true,home)</onload>
+-  <onload condition="String.IsEqual(Window(Home).Property(Infinity.CinemaOpenViewModes),true)">Skin.SetBool(Infinity.Drawer.More)</onload>
+   <onload condition="String.IsEqual(Window(Home).Property(Infinity.CinemaOpenViewModes),true)">SetFocus(1198201)</onload>
+   <onload condition="String.IsEqual(Window(Home).Property(Infinity.CinemaOpenViewModes),true)">ClearProperty(Infinity.CinemaOpenViewModes,home)</onload>
+   <onunload>ClearProperty(Infinity.DrawerOpen,home)</onunload>
+@@ -16,8 +15,8 @@
+       <texture colordiffuse="$VAR[InfinityDrawerScrim]">infinity_ui/contract_white.png</texture>
+     </control>
+     <control type="group" id="1198888">
+-      <left>18</left>
+-      <top>18</top>
++      <left>10</left>
++      <top>6</top>
+       <width max="680">92%</width>
+       <control type="image">
+         <left>0</left>
+@@ -99,7 +98,7 @@
+         <left>18</left>
+         <right>18</right>
+         <top>132</top>
+-        <bottom>116</bottom>
++        <bottom>18</bottom>
+         <orientation>vertical</orientation>
+         <itemgap>6</itemgap>
+         <usecontrolcoords>false</usecontrolcoords>
+@@ -457,6 +456,50 @@
+             <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+           </control>
+         </control>
++        <control type="group">
++          <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198305">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            <onclick>ActivateWindow(InterfaceSettings)</onclick>
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>UI Theme</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198305)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/settings.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+@@ -504,13 +547,12 @@
+         <control type="group">
+           <width>100%</width>
+           <height>38</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="label">
+             <left>16</left>
+             <top>0</top>
+             <right>16</right>
+             <height>36</height>
+-            <label>MORE</label>
++            <label>EXPLORE</label>
+             <font>InfinityTiny</font>
+             <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+             <aligny>center</aligny>
+@@ -519,7 +561,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198108">
+             <align>left</align>
+             <onclick>Dialog.Close(1198)</onclick>
+@@ -564,7 +605,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198109">
+             <align>left</align>
+             <onclick>Dialog.Close(1198)</onclick>
+@@ -609,7 +649,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198301">
+             <align>left</align>
+             <onclick>Dialog.Close(1198)</onclick>
+@@ -654,7 +693,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>38</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="label">
+             <left>16</left>
+             <top>0</top>
+@@ -669,7 +707,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198201">
+             <align>left</align>
+             <onclick>Skin.SetString(Infinity.VisualMode,normal)</onclick>
+@@ -718,7 +755,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198202">
+             <align>left</align>
+             <onclick>Skin.SetString(Infinity.VisualMode,cinema)</onclick>
+@@ -778,7 +814,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198203">
+             <align>left</align>
+             <onclick>Skin.SetString(Infinity.VisualMode,compact)</onclick>
+@@ -825,7 +860,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198204">
+             <align>left</align>
+             <onclick>Skin.SetString(Infinity.VisualMode,twopane)</onclick>
+@@ -872,7 +906,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>38</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="label">
+             <left>16</left>
+             <top>0</top>
+@@ -887,7 +920,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198410">
+             <align>left</align>
+             <onclick>RunScript(script.infinity.commandcenter,performance,toggle)</onclick>
+@@ -932,7 +964,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198305">
+             <align>left</align>
+             <onclick>Dialog.Close(1198)</onclick>
+@@ -977,7 +1008,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198306">
+             <align>left</align>
+             <enable>System.HasAddon(script.infinity.commandcenter)</enable>
+@@ -1022,7 +1052,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198503">
+             <align>left</align>
+             <onclick>Dialog.Close(1198)</onclick>
+@@ -1067,7 +1096,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>38</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="label">
+             <left>16</left>
+             <top>0</top>
+@@ -1082,7 +1110,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198401">
+             <align>center</align>
+             <onclick>Skin.SetString(Infinity.RefreshRequest,auto)</onclick>
+@@ -1128,7 +1155,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198402">
+             <align>center</align>
+             <onclick>Skin.SetString(Infinity.RefreshRequest,60)</onclick>
+@@ -1174,7 +1200,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198403">
+             <align>center</align>
+             <onclick>Skin.SetString(Infinity.RefreshRequest,90)</onclick>
+@@ -1220,7 +1245,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198404">
+             <align>center</align>
+             <onclick>Skin.SetString(Infinity.RefreshRequest,120)</onclick>
+@@ -1266,7 +1290,6 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+           <control type="button" id="1198405">
+             <align>center</align>
+             <onclick>Skin.SetString(Infinity.RefreshRequest,max)</onclick>
+@@ -1390,7 +1413,6 @@
+           </control>
+           <width>100%</width>
+           <height>110</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+         </control>
+         <control type="group">
+           <control type="label">
+@@ -1405,59 +1427,11 @@
+           </control>
+           <width>100%</width>
+           <height>110</height>
+-          <visible>Skin.HasSetting(Infinity.Drawer.More)</visible>
+-        </control>
+-      </control>
+-      <control type="group">
+-        <control type="button" id="1198500">
+-          <align>left</align>
+-          <onclick>Skin.ToggleSetting(Infinity.Drawer.More)</onclick>
+-          <left>0</left>
+-          <top>0</top>
+-          <width>100%</width>
+-          <height>80</height>
+-          <textoffsetx>74</textoffsetx>
+-          <textwidth>308</textwidth>
+-          <aligny>center</aligny>
+-          <font>InfinitySmall</font>
+-          <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+-          <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-          <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-          <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-          <label>More options</label>
+-          <onup condition="!Skin.HasSetting(Infinity.Drawer.More)">1198304</onup>
+-          <onup condition="Skin.HasSetting(Infinity.Drawer.More)">1198405</onup>
+-        </control>
+-        <control type="image">
+-          <left>0</left>
+-          <top>0</top>
+-          <width>100%</width>
+-          <height>80</height>
+-          <visible>Control.HasFocus(1198500)</visible>
+-          <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+-        </control>
+-        <control type="image">
+-          <left>20</left>
+-          <top>24</top>
+-          <width>32</width>
+-          <height>32</height>
+-          <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/more.png</texture>
+         </control>
+-        <control type="image">
+-          <right>16</right>
+-          <top>30</top>
+-          <width>20</width>
+-          <height>20</height>
+-          <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+-        </control>
+-        <left>18</left>
+-        <right>18</right>
+-        <bottom>18</bottom>
+-        <height>80</height>
+       </control>
+-      <height max="1040">88%</height>
+-      <animation effect="zoom" start="34.12,10" end="100,100" center="0,0" time="210" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+-      <animation effect="zoom" start="100,100" end="34.12,10" center="0,0" time="165" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
++      <height max="1120">88%</height>
++      <animation effect="zoom" start="11.47,10.89" end="100,100" center="0,0" time="210" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
++      <animation effect="zoom" start="100,100" end="11.47,10.89" center="0,0" time="165" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+     </control>
+   </controls>
+   <onunload condition="Window.IsActive(home)">SetFocus(9000)</onunload>
+diff --git a/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml b/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml
+index 0212180..a224a7e 100644
+--- a/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml
++++ b/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml
+@@ -1,6 +1,6 @@
+ <?xml version='1.0' encoding='utf-8'?>
+ <window type="buttonMenu">
+-  <defaultcontrol>300</defaultcontrol>
++  <defaultcontrol>200</defaultcontrol>
+   <onback>PreviousMenu</onback>
+   <depth>DepthDialog+</depth>
+   <controls>
+@@ -28,7 +28,7 @@
+         <top>0</top>
+         <width>100%</width>
+         <height>100%</height>
+-        <texture colordiffuse="58FFFFFF" diffuse="infinity_polish/surface.png" />
++        <texture colordiffuse="58FFFFFF" diffuse="infinity_polish/surface.png"/>
+         <visible>String.IsEqual(Window(Home).Property(Infinity.NativeAmbient.Active),true)</visible>
+       </control>
+       <control type="image" id="1198901">
+@@ -171,7 +171,7 @@
+             <align>left</align>
+             <textcolor>$VAR[InfinityLegacyText]</textcolor>
+             <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-            <onclick>ActivateWindow(10001,"plugin://plugin.program.chef21/?description=Force%20Close%20Kodi&amp;fanart=C%3a%5cUsers%5cjeddi%5cAppData%5cRoaming%5cKodi%5caddons%5cplugin.program.chef21%5cresources%5cfanart.jpg&amp;icon=C%3a%5cUsers%5cjeddi%5cAppData%5cRoaming%5cKodi%5caddons%5cplugin.program.chef21%5cresources%5cicon.png&amp;mode=18&amp;name=Force%20Close&amp;name2&amp;url&amp;version",return)</onclick>
++            <onclick condition="!System.Platform.Android">ActivateWindow(10001,"plugin://plugin.program.chef21/?description=Force%20Close%20Kodi&amp;fanart=C%3a%5cUsers%5cjeddi%5cAppData%5cRoaming%5cKodi%5caddons%5cplugin.program.chef21%5cresources%5cfanart.jpg&amp;icon=C%3a%5cUsers%5cjeddi%5cAppData%5cRoaming%5cKodi%5caddons%5cplugin.program.chef21%5cresources%5cicon.png&amp;mode=18&amp;name=Force%20Close&amp;name2&amp;url&amp;version",return)</onclick>
+             <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+             <left>0</left>
+             <top>0</top>
+@@ -182,6 +182,7 @@
+             <aligny>top</aligny>
+             <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+             <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <onclick condition="System.Platform.Android">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.FORCE_CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)</onclick>
+           </control>
+           <control type="image">
+             <aspectratio>keep</aspectratio>
+@@ -212,7 +213,7 @@
+             <align>left</align>
+             <textcolor>$VAR[InfinityLegacyText]</textcolor>
+             <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-            <onclick>Quit()</onclick>
++            <onclick condition="!System.Platform.Android">Quit()</onclick>
+             <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+             <left>0</left>
+             <top>0</top>
+@@ -223,6 +224,7 @@
+             <aligny>top</aligny>
+             <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+             <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <onclick condition="System.Platform.Android">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)</onclick>
+           </control>
+           <control type="image">
+             <aspectratio>keep</aspectratio>
+diff --git a/addons/skin.infinity.diggz/unified/DialogMediaSource.xml b/addons/skin.infinity.diggz/unified/DialogMediaSource.xml
+index d9845c0..a9e9ac6 100644
+--- a/addons/skin.infinity.diggz/unified/DialogMediaSource.xml
++++ b/addons/skin.infinity.diggz/unified/DialogMediaSource.xml
+@@ -12,214 +12,58 @@
+       <texture colordiffuse="$VAR[InfinityLegacyScrim]">infinity_ui/contract_white.png</texture>
+     </control>
+     <control type="group">
+-      <description>InfinityLegacy responsive fit</description>
+-      <include content="InfinityLegacy_DialogBackgroundCommons">
+-        <param name="DialogBackgroundWidth" value="1200" />
+-        <param name="DialogBackgroundHeight" value="750" />
+-        <param name="DialogHeaderWidth" value="940" />
+-        <param name="DialogHeaderLabel" value="$LOCALIZE[13406]" />
+-        <param name="DialogHeaderId" value="2" />
+-        <param name="CloseButtonLeft" value="1025" />
+-        <param name="CloseButtonNav" value="10" />
+-      </include>
+-      <control type="label">
+-        <description>path label</description>
+-        <left>1.5625%</left>
+-        <top>9.0741%</top>
+-        <width>59.375%</width>
+-        <height>45</height>
+-        <align>center</align>
+-        <aligny>center</aligny>
+-        <font>InfinityTiny</font>
+-        <label>1021</label>
+-        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-        <shadowcolor>00000000</shadowcolor>
+-      </control>
+-      <control type="list" id="10">
+-        <left>2.3438%</left>
+-        <top>14.6296%</top>
+-        <width>41.0417%</width>
+-        <height>31.2963%</height>
+-        <onup>9001</onup>
+-        <onleft>9000</onleft>
+-        <onright>60</onright>
+-        <ondown>12</ondown>
+-        <pagecontrol>60</pagecontrol>
+-        <scrolltime>200</scrolltime>
+-        <itemlayout height="68">
+-          <control type="image">
+-            <left>0%</left>
+-            <top>0%</top>
+-            <width>100%</width>
+-            <height>88.2353%</height>
+-            <texture border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture>
+-          </control>
+-          <control type="label">
+-            <left>1.9036%</left>
+-            <top>0%</top>
+-            <width>93.2741%</width>
+-            <height>88.2353%</height>
+-            <font>InfinitySmall</font>
+-            <align>left</align>
+-            <aligny>center</aligny>
+-            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-            <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
+-            <info>ListItem.Label</info>
+-          </control>
+-        </itemlayout>
+-        <focusedlayout height="68">
+-          <control type="image">
+-            <left>0%</left>
+-            <top>0%</top>
+-            <width>100%</width>
+-            <height>88.2353%</height>
+-            <visible>!Control.HasFocus(10)</visible>
+-            <texture border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture>
+-          </control>
+-          <control type="image">
+-            <left>0%</left>
+-            <top>0%</top>
+-            <width>100%</width>
+-            <height>91.1765%</height>
+-            <visible>Control.HasFocus(10)</visible>
+-            <texture border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texture>
+-          </control>
+-          <control type="label">
+-            <left>1.9036%</left>
+-            <top>0%</top>
+-            <width>93.2741%</width>
+-            <height>88.2353%</height>
+-            <font>InfinitySmall</font>
+-            <align>left</align>
+-            <aligny>center</aligny>
+-            <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
+-            <info>ListItem.Label</info>
+-            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-          </control>
+-        </focusedlayout>
++      <control type="image">
++        <left>0</left>
++        <top>0</top>
++        <width>100%</width>
++        <height>100%</height>
++        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
+       </control>
+-      <control type="scrollbar" id="60">
+-        <left>43.3333%</left>
+-        <top>14.6296%</top>
+-        <width>38</width>
+-        <height>31.296233%</height>
+-        <texturesliderbackground border="6" colordiffuse="$VAR[InfinityLegacyField]">infinity_legacy/track.png</texturesliderbackground>
+-        <texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar>
+-        <texturesliderbarfocus border="6" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/track.png</texturesliderbarfocus>
+-        <textureslidernib colordiffuse="$VAR[InfinityLegacyTrack]" border="6">infinity_legacy/track.png</textureslidernib>
+-        <textureslidernibfocus colordiffuse="$VAR[InfinityLegacyTrack]" border="6">infinity_legacy/track.png</textureslidernibfocus>
+-        <onleft>10</onleft>
+-        <onright>9000</onright>
+-        <showonepage>false</showonepage>
+-        <orientation>vertical</orientation>
++      <control type="image">
++        <left>0</left>
++        <top>0</top>
++        <width>100%</width>
++        <height>100%</height>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassBorder]">infinity_polish/rim.png</texture>
+       </control>
+-      <control type="group" id="9000">
+-        <left>45.3125%</left>
+-        <top>14.6296%</top>
+-        <control type="button" id="11">
+-          <description>Browse Button</description>
+-          <left>0%</left>
+-          <top>0%</top>
+-          <width>14.84375%</width>
+-          <height>60</height>
+-          <label>1024</label>
+-          <font>InfinityBodyBold</font>
+-          <align>center</align>
+-          <aligny>center</aligny>
+-          <onup>18</onup>
+-          <onleft>60</onleft>
+-          <onright>10</onright>
+-          <ondown>13</ondown>
+-          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-          <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-        </control>
+-        <control type="button" id="13">
+-          <description>Add Path Button</description>
+-          <left>0%</left>
+-          <top>7.3753%</top>
+-          <width>14.84375%</width>
+-          <height>60</height>
+-          <label>15019</label>
+-          <font>InfinityBodyBold</font>
+-          <align>center</align>
+-          <aligny>center</aligny>
+-          <onup>11</onup>
+-          <onleft>60</onleft>
+-          <onright>10</onright>
+-          <ondown>14</ondown>
+-          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-          <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-        </control>
+-        <control type="button" id="14">
+-          <description>Remove Path Button</description>
+-          <left>0%</left>
+-          <top>14.6421%</top>
+-          <width>14.84375%</width>
+-          <height>60</height>
+-          <label>1210</label>
+-          <font>InfinityBodyBold</font>
+-          <align>center</align>
+-          <aligny>center</aligny>
+-          <onup>13</onup>
+-          <onleft>60</onleft>
+-          <onright>10</onright>
+-          <ondown>12</ondown>
+-          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-          <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-        </control>
++      <control type="image">
++        <left>28</left>
++        <top>37</top>
++        <width>64</width>
++        <height>32</height>
++        <aspectratio>keep</aspectratio>
++        <texture>infinity_polish/infinity_mark.png</texture>
+       </control>
+-      <control type="label">
+-        <description>Name label</description>
+-        <left>2.3438%</left>
+-        <top>46.4815%</top>
+-        <width>57.8125%</width>
+-        <height>45</height>
+-        <align>center</align>
++      <control type="label" id="2">
++        <left>112</left>
++        <right>120</right>
++        <top>22</top>
++        <height>64</height>
++        <font>InfinityTitle</font>
++        <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+         <aligny>center</aligny>
+-        <font>InfinityTiny</font>
+-        <label>1022</label>
+-        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-        <shadowcolor>00000000</shadowcolor>
++        <label>$LOCALIZE[13406]</label>
+       </control>
+-      <control type="edit" id="12">
+-        <description>Name Button</description>
+-        <left>2.3438%</left>
+-        <top>51.3889%</top>
+-        <width>57.8125%</width>
+-        <height>60</height>
++      <control type="button" id="1999">
++        <right>20</right>
++        <top>18</top>
++        <width>80</width>
++        <height>80</height>
++        <label>×</label>
++        <font>InfinityTitle</font>
+         <align>center</align>
+         <aligny>center</aligny>
+-        <label />
+-        <font>InfinitySmall</font>
+-        <onup>10</onup>
+-        <onleft>12</onleft>
+-        <onright>19</onright>
+-        <ondown>9001</ondown>
+-        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+-        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+-        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+-        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+-        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+-        <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
++        <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++        <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++        <texturefocus border="16" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++        <texturenofocus border="16" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++        <onclick>Action(Back)</onclick>
++        <ondown>10</ondown>
+       </control>
++      <description>InfinityLegacy responsive fit</description>
+       <control type="group" id="9001">
+-        <left>14.8438%</left>
+-        <top>60.3704%</top>
+         <control type="button" id="18">
+           <description>Ok Button</description>
+-          <left>0%</left>
+-          <top>0%</top>
+-          <width>15.625053%</width>
+-          <height>60</height>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>186</label>
+@@ -233,13 +77,13 @@
+           <textcolor>$VAR[InfinityLegacyText]</textcolor>
+           <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+           <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++          <left>0</left>
++          <top>0</top>
++          <width>48%</width>
++          <height>88</height>
+         </control>
+         <control type="button" id="19">
+           <description>Cancel Button</description>
+-          <left>19.2661%</left>
+-          <top>0%</top>
+-          <width>18.348667%</width>
+-          <height>60</height>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>222</label>
+@@ -253,14 +97,223 @@
+           <textcolor>$VAR[InfinityLegacyText]</textcolor>
+           <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+           <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++          <right>0</right>
++          <top>0</top>
++          <width>48%</width>
++          <height>88</height>
++        </control>
++        <left>28</left>
++        <right>28</right>
++        <bottom>28</bottom>
++        <height>88</height>
++      </control>
++      <centerleft>50%</centerleft>
++      <centertop>50%</centertop>
++      <width max="1120">92%</width>
++      <height max="92%">760</height>
++      <control type="grouplist" id="9002">
++        <left>28</left>
++        <right>28</right>
++        <top>116</top>
++        <bottom>144</bottom>
++        <orientation>vertical</orientation>
++        <itemgap>10</itemgap>
++        <scrolltime>160</scrolltime>
++        <usecontrolcoords>false</usecontrolcoords>
++        <control type="label">
++          <description>path label</description>
++          <align>left</align>
++          <aligny>center</aligny>
++          <font>InfinityTiny</font>
++          <label>1021</label>
++          <textcolor>$VAR[InfinityLegacyText]</textcolor>
++          <shadowcolor>00000000</shadowcolor>
++          <left>0</left>
++          <top>0</top>
++          <width>100%</width>
++          <height>64</height>
++        </control>
++        <control type="group">
++          <width>100%</width>
++          <height>246</height>
++          <control type="list" id="10">
++            <onup>9001</onup>
++            <onleft>9000</onleft>
++            <onright>60</onright>
++            <ondown>12</ondown>
++            <pagecontrol>60</pagecontrol>
++            <scrolltime>200</scrolltime>
++            <itemlayout height="68">
++              <control type="image">
++                <left>0%</left>
++                <top>0%</top>
++                <width>100%</width>
++                <height>88.2353%</height>
++                <texture border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture>
++              </control>
++              <control type="label">
++                <left>1.9036%</left>
++                <top>0%</top>
++                <width>93.2741%</width>
++                <height>88.2353%</height>
++                <font>InfinitySmall</font>
++                <align>left</align>
++                <aligny>center</aligny>
++                <textcolor>$VAR[InfinityLegacyText]</textcolor>
++                <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
++                <info>ListItem.Label</info>
++              </control>
++            </itemlayout>
++            <focusedlayout height="68">
++              <control type="image">
++                <left>0%</left>
++                <top>0%</top>
++                <width>100%</width>
++                <height>88.2353%</height>
++                <visible>!Control.HasFocus(10)</visible>
++                <texture border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture>
++              </control>
++              <control type="image">
++                <left>0%</left>
++                <top>0%</top>
++                <width>100%</width>
++                <height>91.1765%</height>
++                <visible>Control.HasFocus(10)</visible>
++                <texture border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texture>
++              </control>
++              <control type="label">
++                <left>1.9036%</left>
++                <top>0%</top>
++                <width>93.2741%</width>
++                <height>88.2353%</height>
++                <font>InfinitySmall</font>
++                <align>left</align>
++                <aligny>center</aligny>
++                <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
++                <info>ListItem.Label</info>
++                <textcolor>$VAR[InfinityLegacyText]</textcolor>
++              </control>
++            </focusedlayout>
++            <left>0</left>
++            <right>242</right>
++            <top>0</top>
++            <height>246</height>
++          </control>
++          <control type="scrollbar" id="60">
++            <texturesliderbackground border="6" colordiffuse="$VAR[InfinityLegacyField]">infinity_legacy/track.png</texturesliderbackground>
++            <texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar>
++            <texturesliderbarfocus border="6" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/track.png</texturesliderbarfocus>
++            <textureslidernib colordiffuse="$VAR[InfinityLegacyTrack]" border="6">infinity_legacy/track.png</textureslidernib>
++            <textureslidernibfocus colordiffuse="$VAR[InfinityLegacyTrack]" border="6">infinity_legacy/track.png</textureslidernibfocus>
++            <onleft>10</onleft>
++            <onright>9000</onright>
++            <showonepage>false</showonepage>
++            <orientation>vertical</orientation>
++            <right>208</right>
++            <top>0</top>
++            <width>28</width>
++            <height>246</height>
++          </control>
++          <control type="group" id="9000">
++            <control type="button" id="11">
++              <description>Browse Button</description>
++              <label>1024</label>
++              <font>InfinitySmall</font>
++              <align>center</align>
++              <aligny>center</aligny>
++              <onup>18</onup>
++              <onleft>60</onleft>
++              <onright>10</onright>
++              <ondown>13</ondown>
++              <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++              <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++              <textcolor>$VAR[InfinityLegacyText]</textcolor>
++              <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++              <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++              <left>0</left>
++              <top>0</top>
++              <width>100%</width>
++              <height>78</height>
++            </control>
++            <control type="button" id="13">
++              <description>Add Path Button</description>
++              <label>15019</label>
++              <font>InfinitySmall</font>
++              <align>center</align>
++              <aligny>center</aligny>
++              <onup>11</onup>
++              <onleft>60</onleft>
++              <onright>10</onright>
++              <ondown>14</ondown>
++              <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++              <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++              <textcolor>$VAR[InfinityLegacyText]</textcolor>
++              <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++              <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++              <left>0</left>
++              <top>84</top>
++              <width>100%</width>
++              <height>78</height>
++            </control>
++            <control type="button" id="14">
++              <description>Remove Path Button</description>
++              <label>1210</label>
++              <font>InfinitySmall</font>
++              <align>center</align>
++              <aligny>center</aligny>
++              <onup>13</onup>
++              <onleft>60</onleft>
++              <onright>10</onright>
++              <ondown>12</ondown>
++              <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++              <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++              <textcolor>$VAR[InfinityLegacyText]</textcolor>
++              <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++              <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++              <left>0</left>
++              <top>168</top>
++              <width>100%</width>
++              <height>78</height>
++            </control>
++            <right>0</right>
++            <top>0</top>
++            <width>192</width>
++            <height>246</height>
++          </control>
++        </control>
++        <control type="label">
++          <description>Name label</description>
++          <align>left</align>
++          <aligny>center</aligny>
++          <font>InfinityTiny</font>
++          <label>1022</label>
++          <textcolor>$VAR[InfinityLegacyText]</textcolor>
++          <shadowcolor>00000000</shadowcolor>
++          <width>100%</width>
++          <height>48</height>
++        </control>
++        <control type="edit" id="12">
++          <description>Name Button</description>
++          <align>center</align>
++          <aligny>center</aligny>
++          <label/>
++          <font>InfinitySmall</font>
++          <onup>10</onup>
++          <onleft>12</onleft>
++          <onright>19</onright>
++          <ondown>9001</ondown>
++          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
++          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
++          <textcolor>$VAR[InfinityLegacyText]</textcolor>
++          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
++          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
++          <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
++          <width>100%</width>
++          <height>88</height>
+         </control>
+       </control>
+-      <left>0</left>
+-      <top>0</top>
+-      <width>100%</width>
+-      <height>100%</height>
+     </control>
+   </controls>
+   <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+   <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+-</window>
+\ No newline at end of file
++</window>
+diff --git a/addons/skin.infinity.diggz/unified/Home.xml b/addons/skin.infinity.diggz/unified/Home.xml
+index 36bd9d8..e5f56fd 100644
+--- a/addons/skin.infinity.diggz/unified/Home.xml
++++ b/addons/skin.infinity.diggz/unified/Home.xml
+@@ -8570,10 +8570,6 @@
+       <visible>false</visible>
+     </control>
+     <control type="group" id="19080">
+-      <left>18</left>
+-      <top>18</top>
+-      <width>232</width>
+-      <height>104</height>
+       <control type="image">
+         <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
+         <left>0</left>
+@@ -8590,35 +8586,36 @@
+       </control>
+       <control type="image">
+         <texture>infinity_polish/infinity_mark.png</texture>
+-        <left>20</left>
+-        <top>28</top>
+-        <width>96</width>
+-        <height>48</height>
+         <aspectratio>keep</aspectratio>
++        <left>12</left>
++        <top>17</top>
++        <width>54</width>
++        <height>28</height>
+       </control>
+       <control type="button" id="9090">
+-        <label></label>
++        <label/>
+         <font>InfinitySmall</font>
+         <align>center</align>
+         <aligny>center</aligny>
+         <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+         <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-        <left>128</left>
+-        <top>8</top>
+-        <width>96</width>
+-        <height>88</height>
+         <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-        <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-        <onclick>ActivateWindow(1198)</onclick>
++        <texturenofocus border="20" colordiffuse="00000000">infinity_polish/field.png</texturenofocus>
+         <ondown>9000</ondown>
+         <onright>9000</onright>
++        <left>0</left>
++        <top>52</top>
++        <width>78</width>
++        <height>70</height>
++        <onclick>SetFocus(9000)</onclick>
++        <onclick>ActivateWindow(1198)</onclick>
+       </control>
+       <control type="image">
+-        <texture>infinity_ui/icons/menu.png</texture>
+-        <left>158</left>
+-        <top>34</top>
+-        <width>36</width>
+-        <height>36</height>
++        <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_ui/icons/menu.png</texture>
++        <left>25</left>
++        <top>78</top>
++        <width>28</width>
++        <height>28</height>
+       </control>
+       <control type="image">
+         <texture border="24" colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/focus_rim.png</texture>
+@@ -8628,6 +8625,10 @@
+         <height>100%</height>
+         <visible>String.IsEqual(Window(Home).Property(Infinity.DrawerOpen),true)</visible>
+       </control>
++      <left>10</left>
++      <top>6</top>
++      <width>78</width>
++      <height>122</height>
+     </control>
+   </controls>
+ </window>
+diff --git a/addons/skin.infinity.diggz/unified/IncludesVariables.xml b/addons/skin.infinity.diggz/unified/IncludesVariables.xml
+index 904d3b3..916aeea 100644
+--- a/addons/skin.infinity.diggz/unified/IncludesVariables.xml
++++ b/addons/skin.infinity.diggz/unified/IncludesVariables.xml
+@@ -814,7 +814,7 @@
+     <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + Integer.IsGreater(Window.Property(Movies.Count),0) + Integer.IsGreater(Window.Property(TVShows.Count),0) + !Integer.IsGreater(Window.Property(MusicVideos.Count),0)">[B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20342]: [/COLOR][/B]$INFO[Window.Property(Movies.Count)]    [B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20343]: [/COLOR][/B]$INFO[Window.Property(TVShows.Count)]</value>
+     <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + Integer.IsGreater(Window.Property(Movies.Count),0) + !Integer.IsGreater(Window.Property(TVShows.Count),0) + Integer.IsGreater(Window.Property(MusicVideos.Count),0)">[B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20342]: [/COLOR][/B]$INFO[Window.Property(Movies.Count)]    [B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20389]: [/COLOR][/B]$INFO[Window.Property(MusicVideos.Count)]</value>
+     <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + Integer.IsGreater(Window.Property(Movies.Count),0) + !Integer.IsGreater(Window.Property(TVShows.Count),0) + !Integer.IsGreater(Window.Property(MusicVideos.Count),0)">[B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20342]: [/COLOR][/B]$INFO[Window.Property(Movies.Count)]</value>
+-    <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + !Integer.IsGreater(Window.Property(Movies.Count),0) + !Integer.IsGreater(Window.Property(TVShows.Count),0) + !Integer.IsGreater(Window.Property(MusicVideos.Count),0)" />
++    <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + !Integer.IsGreater(Window.Property(Movies.Count),0) + !Integer.IsGreater(Window.Property(TVShows.Count),0) + !Integer.IsGreater(Window.Property(MusicVideos.Count),0)"/>
+     <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + !Integer.IsGreater(Window.Property(Movies.Count),0) + Integer.IsGreater(Window.Property(TVShows.Count),0) + Integer.IsGreater(Window.Property(MusicVideos.Count),0)">[B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20343]: [/COLOR][/B]$INFO[Window.Property(TVShows.Count)]    [B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20389]: [/COLOR][/B]$INFO[Window.Property(MusicVideos.Count)]</value>
+     <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + !Integer.IsGreater(Window.Property(Movies.Count),0) + !Integer.IsGreater(Window.Property(TVShows.Count),0) + Integer.IsGreater(Window.Property(MusicVideos.Count),0)">[B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20389]: [/COLOR][/B]$INFO[Window.Property(MusicVideos.Count)]</value>
+     <value condition="String.IsEqual(Container(9000).ListItem.Property(HiLiteItem),Videos) + !Integer.IsGreater(Window.Property(Movies.Count),0) + Integer.IsGreater(Window.Property(TVShows.Count),0) + !Integer.IsGreater(Window.Property(MusicVideos.Count),0)">[B][COLOR=$VAR[ThemeLabelColor]]$LOCALIZE[20343]: [/COLOR][/B]$INFO[Window.Property(TVShows.Count)]</value>
+@@ -2436,77 +2436,77 @@
+   <variable name="UsrDefItemOneWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.1.WidgetFormat),Poster) + Skin.String(HomeItem.1.Widget) + !String.IsEqual(Skin.String(HomeItem.1.Widget),None) + !String.IsEqual(Skin.String(HomeItem.1.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.1.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.1.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.1.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.1.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.1.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.1.WidgetFormat),Thumb) + Skin.String(HomeItem.1.Widget) + !String.IsEqual(Skin.String(HomeItem.1.Widget),None) + !String.IsEqual(Skin.String(HomeItem.1.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.1.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.1.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.1.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.1.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemTwoWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.2.WidgetFormat),Poster) + Skin.String(HomeItem.2.Widget) + !String.IsEqual(Skin.String(HomeItem.2.Widget),None) + !String.IsEqual(Skin.String(HomeItem.2.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.2.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.2.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.2.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.2.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.2.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.2.WidgetFormat),Thumb)  + Skin.String(HomeItem.2.Widget)+ !String.IsEqual(Skin.String(HomeItem.2.Widget),None) + !String.IsEqual(Skin.String(HomeItem.2.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.2.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.2.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.2.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.2.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemThreeWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.3.WidgetFormat),Poster) + Skin.String(HomeItem.3.Widget) + !String.IsEqual(Skin.String(HomeItem.3.Widget),None) + !String.IsEqual(Skin.String(HomeItem.3.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.3.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.3.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.3.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.3.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.3.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.3.WidgetFormat),Thumb) + Skin.String(HomeItem.3.Widget) + !String.IsEqual(Skin.String(HomeItem.3.Widget),None) + !String.IsEqual(Skin.String(HomeItem.3.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.3.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.3.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.3.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.3.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemFourWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.4.WidgetFormat),Poster) + Skin.String(HomeItem.4.Widget) + !String.IsEqual(Skin.String(HomeItem.4.Widget),None) + !String.IsEqual(Skin.String(HomeItem.4.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.4.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.4.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.4.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.4.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.4.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.4.WidgetFormat),Thumb) + Skin.String(HomeItem.4.Widget) + !String.IsEqual(Skin.String(HomeItem.4.Widget),None) + !String.IsEqual(Skin.String(HomeItem.4.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.4.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.4.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.4.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.4.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemFiveWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.5.WidgetFormat),Poster) + Skin.String(HomeItem.5.Widget) + !String.IsEqual(Skin.String(HomeItem.5.Widget),None) + !String.IsEqual(Skin.String(HomeItem.5.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.5.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.5.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.5.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.5.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.5.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.5.WidgetFormat),Thumb) + Skin.String(HomeItem.5.Widget) + !String.IsEqual(Skin.String(HomeItem.5.Widget),None) + !String.IsEqual(Skin.String(HomeItem.5.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.5.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.5.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.5.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.5.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemSixWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.6.WidgetFormat),Poster) + Skin.String(HomeItem.6.Widget) + !String.IsEqual(Skin.String(HomeItem.6.Widget),None) + !String.IsEqual(Skin.String(HomeItem.6.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.6.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.6.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.6.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.6.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.6.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.6.WidgetFormat),Thumb) + Skin.String(HomeItem.6.Widget) + !String.IsEqual(Skin.String(HomeItem.6.Widget),None) + !String.IsEqual(Skin.String(HomeItem.6.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.6.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.6.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.6.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.6.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemSevenWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.7.WidgetFormat),Poster) + Skin.String(HomeItem.7.Widget) + !String.IsEqual(Skin.String(HomeItem.7.Widget),None) + !String.IsEqual(Skin.String(HomeItem.7.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.7.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.7.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.7.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.7.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.7.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.7.WidgetFormat),Thumb) + Skin.String(HomeItem.7.Widget) + !String.IsEqual(Skin.String(HomeItem.7.Widget),None) + !String.IsEqual(Skin.String(HomeItem.7.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.7.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.7.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.7.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.7.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemEightWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.8.WidgetFormat),Poster) + Skin.String(HomeItem.8.Widget) + !String.IsEqual(Skin.String(HomeItem.8.Widget),None) + !String.IsEqual(Skin.String(HomeItem.8.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.8.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.8.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.8.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.8.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.8.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.8.WidgetFormat),Thumb) + Skin.String(HomeItem.8.Widget) + !String.IsEqual(Skin.String(HomeItem.8.Widget),None) + !String.IsEqual(Skin.String(HomeItem.8.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.8.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.8.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.8.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.8.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemNineWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.9.WidgetFormat),Poster) + Skin.String(HomeItem.9.Widget) + !String.IsEqual(Skin.String(HomeItem.9.Widget),None) + !String.IsEqual(Skin.String(HomeItem.9.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.9.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.9.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.9.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.9.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.9.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.9.WidgetFormat),Thumb) + Skin.String(HomeItem.9.Widget) + !String.IsEqual(Skin.String(HomeItem.9.Widget),None) + !String.IsEqual(Skin.String(HomeItem.9.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.9.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.9.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.9.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.9.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemTenWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.10.WidgetFormat),Poster) + Skin.String(HomeItem.10.Widget) + !String.IsEqual(Skin.String(HomeItem.10.Widget),None) + !String.IsEqual(Skin.String(HomeItem.10.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.10.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.10.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.10.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.10.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.10.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.10.WidgetFormat),Thumb) + Skin.String(HomeItem.10.Widget) + !String.IsEqual(Skin.String(HomeItem.10.Widget),None) + !String.IsEqual(Skin.String(HomeItem.10.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.10.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.10.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.10.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.10.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemElevenWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.11.WidgetFormat),Poster) + Skin.String(HomeItem.11.Widget) + !String.IsEqual(Skin.String(HomeItem.11.Widget),None) + !String.IsEqual(Skin.String(HomeItem.11.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.11.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.11.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.11.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.11.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.11.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.11.WidgetFormat),Thumb) + Skin.String(HomeItem.11.Widget) + !String.IsEqual(Skin.String(HomeItem.11.Widget),None) + !String.IsEqual(Skin.String(HomeItem.11.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.11.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.11.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.11.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.11.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemTwelveWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.12.WidgetFormat),Poster) + Skin.String(HomeItem.12.Widget) + !String.IsEqual(Skin.String(HomeItem.12.Widget),None) + !String.IsEqual(Skin.String(HomeItem.12.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.12.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.12.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.12.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.12.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.12.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.12.WidgetFormat),Thumb) + Skin.String(HomeItem.12.Widget) + !String.IsEqual(Skin.String(HomeItem.12.Widget),None) + !String.IsEqual(Skin.String(HomeItem.12.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.12.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.12.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.12.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.12.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemThirteenWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.13.WidgetFormat),Poster) + Skin.String(HomeItem.13.Widget) + !String.IsEqual(Skin.String(HomeItem.13.Widget),None) + !String.IsEqual(Skin.String(HomeItem.13.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.13.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.13.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.13.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.13.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.13.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.13.WidgetFormat),Thumb) + Skin.String(HomeItem.13.Widget) + !String.IsEqual(Skin.String(HomeItem.13.Widget),None) + !String.IsEqual(Skin.String(HomeItem.13.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.13.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.13.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.13.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.13.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemFourteenWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.14.WidgetFormat),Poster) + Skin.String(HomeItem.14.Widget) + !String.IsEqual(Skin.String(HomeItem.14.Widget),None) + !String.IsEqual(Skin.String(HomeItem.14.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.14.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.14.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.14.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.14.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.14.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.14.WidgetFormat),Thumb) + Skin.String(HomeItem.14.Widget) + !String.IsEqual(Skin.String(HomeItem.14.Widget),None) + !String.IsEqual(Skin.String(HomeItem.14.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.14.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.14.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.14.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.14.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="UsrDefItemFifteenWidgetType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.15.WidgetFormat),Poster) + Skin.String(HomeItem.15.Widget) + !String.IsEqual(Skin.String(HomeItem.15.Widget),None) + !String.IsEqual(Skin.String(HomeItem.15.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.15.Widget),WeatherExtended) + !String.IsEqual(Skin.String(HomeItem.15.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.15.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.15.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.15.Widget),SuggestedAlbums)">$LOCALIZE[20021]</value>
+     <value condition="String.IsEqual(Skin.String(HomeItem.15.WidgetFormat),Thumb) + Skin.String(HomeItem.15.Widget) + !String.IsEqual(Skin.String(HomeItem.15.Widget),None) + !String.IsEqual(Skin.String(HomeItem.15.Widget),Weather) + !String.IsEqual(Skin.String(HomeItem.15.Widget),RandomArtists) + !String.IsEqual(Skin.String(HomeItem.15.Widget),RecentAlbums) + !String.IsEqual(Skin.String(HomeItem.15.Widget),RandomAlbums) + !String.IsEqual(Skin.String(HomeItem.15.Widget),SuggestedAlbums)">$LOCALIZE[21371]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="MenuOneBackgroundType" type="text">
+     <value condition="String.IsEqual(Skin.String(HomeItem.1.Type),Weather) + String.IsEmpty(Skin.String(HomeItem.1.Display))">Live</value>
+@@ -3635,12 +3635,12 @@
+     <value>lf_classic/button/button-focus2.png</value>
+   </variable>
+   <variable name="GenreLabelFanart">
+-    <value condition="String.IsEmpty(Skin.String(MovieGenreFanart.path))" />
++    <value condition="String.IsEmpty(Skin.String(MovieGenreFanart.path))"/>
+     <value>$INFO[Skin.String(MovieGenreFanart.path)]$INFO[ListItem.Label,,.jpg]</value>
+   </variable>
+   <variable name="GenreFolderFanart">
+-    <value condition="String.IsEmpty(Skin.String(MovieGenreFanart.path))" />
+-    <value condition="String.IsEqual(ListItem.Label,..) + String.IsEqual(Container.FolderName,Genres)" />
++    <value condition="String.IsEmpty(Skin.String(MovieGenreFanart.path))"/>
++    <value condition="String.IsEqual(ListItem.Label,..) + String.IsEqual(Container.FolderName,Genres)"/>
+     <value condition="String.IsEqual(ListItem.Label,..) + !String.IsEqual(Container.FolderName,Genres)">$INFO[Skin.String(MovieGenreFanart.path)]$INFO[Container.FolderName,,.jpg]</value>
+     <value>$INFO[Skin.String(MovieGenreFanart.path)]$INFO[ListItem.Label,,.jpg]</value>
+   </variable>
+@@ -3656,7 +3656,7 @@
+   <variable name="WeatherFanartPath">
+     <value condition="!String.IsEmpty(Skin.String(WeatherFanartDir))">$INFO[Skin.String(WeatherFanartDir)]</value>
+     <value condition="!String.IsEmpty(Skin.String(WeatherFanart.path))">$INFO[Skin.String(WeatherFanart.path)]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="CurrentWeatherFanart">
+     <value condition="!String.IsEmpty(Skin.String(WeatherFanartDir))">$INFO[Skin.String(WeatherFanartDir)]$INFO[Window(Weather).Property(Current.FanartCode),,.jpg]</value>
+@@ -3729,7 +3729,7 @@
+   <variable name="SkinBackgroundPath">
+     <value condition="!String.IsEmpty(Skin.String(AlternativeBackgroundPath))">$INFO[Skin.String(AlternativeBackgroundPath)]</value>
+     <value condition="!String.IsEmpty(Skin.String(SkinFanart.path))">$INFO[Skin.String(SkinFanart.path)]</value>
+-    <value />
++    <value/>
+   </variable>
+   <variable name="DialogPath">
+     <value condition="String.IsEmpty(Skin.String(DialogLAF))">lf_classic/</value>
+@@ -3746,7 +3746,7 @@
+     <value condition="!String.IsEmpty(ListItem.Property(AirDay))">$INFO[ListItem.Premiered] @ $INFO[ListItem.Property(AirTime)]</value>
+   </variable>
+   <variable name="WeatherIconExt">
+-    <value condition="String.Contains(Skin.String(WeatherIcons.path),animated)" />
++    <value condition="String.Contains(Skin.String(WeatherIcons.path),animated)"/>
+     <value condition="!String.IsEmpty(Skin.String(WeatherIcons.ext))">$INFO[Skin.String(WeatherIcons.ext)]</value>
+     <value>.png</value>
+   </variable>
+@@ -4118,23 +4118,23 @@
+     <value>73000000</value>
+   </variable>
+   <variable name="InfinityPlayerHeaderTexture">
+-    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/header_dark.png</value>
++    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/header_light.png</value>
+     <value>infinity_reference/header_oled.png</value>
+   </variable>
+   <variable name="InfinityPlayerFooterTexture">
+-    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/footer_dark.png</value>
++    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/footer_light.png</value>
+     <value>infinity_reference/footer_oled.png</value>
+   </variable>
+   <variable name="InfinityPlayerVolumeTexture">
+-    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/volume_dark.png</value>
++    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/volume_light.png</value>
+     <value>infinity_reference/volume_oled.png</value>
+   </variable>
+   <variable name="InfinityPlayerButtonTexture">
+-    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/button_dark.png</value>
++    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/button_light.png</value>
+     <value>infinity_reference/button_oled.png</value>
+   </variable>
+   <variable name="InfinityPlayerButtonFocusTexture">
+-    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/button_focus_dark.png</value>
++    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">infinity_reference/button_focus_light.png</value>
+     <value>infinity_reference/button_focus_oled.png</value>
+   </variable>
+   <variable name="InfinityOLEDControlSurface16">
+@@ -4227,4 +4227,9 @@
+     <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">800D3553</value>
+     <value>80FFFFFF</value>
+   </variable>
++  <variable name="InfinityPlayerRepeatLabel">
++    <value condition="Playlist.IsRepeatOne">Repeat: One</value>
++    <value condition="Playlist.IsRepeat">Repeat: All</value>
++    <value>Repeat: Off</value>
++  </variable>
+ </includes>
+diff --git a/addons/skin.infinity.diggz/unified/VideoOSD.xml b/addons/skin.infinity.diggz/unified/VideoOSD.xml
+index 2b726dd..06f0a5f 100644
+--- a/addons/skin.infinity.diggz/unified/VideoOSD.xml
++++ b/addons/skin.infinity.diggz/unified/VideoOSD.xml
+@@ -3,7 +3,7 @@
+   <onload>Skin.Reset(Infinity.PlayerDrawerOpen)</onload>
+   <onload condition="String.IsEmpty(Skin.String(AutoCloseVideoOSD))">Skin.SetString(AutoCloseVideoOSD,3)</onload>
+   <onunload>Skin.Reset(Infinity.PlayerDrawerOpen)</onunload>
+-  <defaultcontrol always="true">202</defaultcontrol>
++  <defaultcontrol always="true">257</defaultcontrol>
+   <backgroundcolor>00000000</backgroundcolor>
+   <animation effect="fade" start="0" end="100" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+   <animation effect="fade" start="100" end="0" time="90" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+@@ -15,14 +15,14 @@
+       <height>152</height>
+       <visible>!String.IsEqual(Window(Home).Property(Infinity.PlayerVolumeMode),true)</visible>
+       <control type="image">
+-        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassSurfaceElevated]">infinity_polish/surface.png</texture>
+         <left>0</left>
+         <top>0</top>
+         <width>100%</width>
+         <height>100%</height>
+       </control>
+       <control type="image">
+-        <texture border="24" colordiffuse="$VAR[InfinityGlassBorderSoft]">infinity_polish/rim.png</texture>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassBorder]">infinity_polish/rim.png</texture>
+         <left>0</left>
+         <top>0</top>
+         <width>100%</width>
+@@ -66,6 +66,18 @@
+       <bottom>168</bottom>
+       <height>122</height>
+       <visible>!String.IsEqual(Window(Home).Property(Infinity.PlayerVolumeMode),true)</visible>
++      <control type="label">
++        <centerleft>50%</centerleft>
++        <top>0</top>
++        <width>30%</width>
++        <height>48</height>
++        <font>InfinityTiny</font>
++        <align>center</align>
++        <aligny>center</aligny>
++        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
++        <label>$VAR[InfinityPlayerRepeatLabel]</label>
++        <visible>Control.HasFocus(265)</visible>
++      </control>
+       <control type="label">
+         <label>$INFO[Player.Time(hh:mm:ss)]</label>
+         <font>InfinityBody</font>
+@@ -95,9 +107,9 @@
+         <info>Player.Progress</info>
+         <texturebg border="8">infinity_reference/track_dark.png</texturebg>
+         <midtexture border="8">infinity_reference/fill.png</midtexture>
+-        <lefttexture></lefttexture>
+-        <righttexture></righttexture>
+-        <overlaytexture></overlaytexture>
++        <lefttexture/>
++        <righttexture/>
++        <overlaytexture/>
+       </control>
+       <control type="slider" id="87">
+         <left>0</left>
+@@ -119,19 +131,19 @@
+     </control>
+     <control type="group">
+       <centerleft>50%</centerleft>
+-      <width max="1360">94%</width>
++      <width max="1120">94%</width>
+       <bottom>24</bottom>
+-      <height>128</height>
++      <height>112</height>
+       <visible>!String.IsEqual(Window(Home).Property(Infinity.PlayerVolumeMode),true)</visible>
+       <control type="image">
+-        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassSurfaceElevated]">infinity_polish/surface.png</texture>
+         <left>0</left>
+         <top>0</top>
+         <width>100%</width>
+         <height>100%</height>
+       </control>
+       <control type="image">
+-        <texture border="24" colordiffuse="$VAR[InfinityGlassBorderSoft]">infinity_polish/rim.png</texture>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassBorder]">infinity_polish/rim.png</texture>
+         <left>0</left>
+         <top>0</top>
+         <width>100%</width>
+@@ -140,20 +152,16 @@
+       <control type="grouplist" id="290">
+         <left>12</left>
+         <right>12</right>
+-        <top>12</top>
+-        <bottom>12</bottom>
++        <top>8</top>
++        <bottom>8</bottom>
+         <orientation>horizontal</orientation>
+         <itemgap>8</itemgap>
+         <scrolltime>140</scrolltime>
+         <usecontrolcoords>false</usecontrolcoords>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="257">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Drawer</description>
+@@ -167,29 +175,29 @@
+             <ondown>87</ondown>
+             <onleft>257</onleft>
+             <onright>264</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/list.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/list.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="264">
+-            <label></label>
++            <label/>
+             <font>InfinitySmall</font>
+             <align>center</align>
+             <aligny>center</aligny>
+             <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+             <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+             <description>Volume</description>
+@@ -200,23 +208,23 @@
+             <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+             <onclick>SetProperty(Infinity.PlayerVolumeMode,true,Home)</onclick>
+             <onclick>SetFocus(260)</onclick>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/volume.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/volume.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="201">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label>−30</label>
+             <font>InfinitySmall</font>
+             <description>Back 30</description>
+@@ -229,16 +237,16 @@
+             <ondown>87</ondown>
+             <onleft>264</onleft>
+             <onright>200</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="200">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Previous</description>
+@@ -251,23 +259,23 @@
+             <ondown>87</ondown>
+             <onleft>201</onleft>
+             <onright>202</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/prev.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/prev.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="202">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Play/Pause</description>
+@@ -280,32 +288,32 @@
+             <ondown>87</ondown>
+             <onleft>200</onleft>
+             <onright>205</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/play.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/play.png</texture>
++            <visible>Player.Paused</visible>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+-            <visible>Player.Paused</visible>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/pause.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/pause.png</texture>
++            <visible>!Player.Paused</visible>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+-            <visible>!Player.Paused</visible>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="205">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Next</description>
+@@ -318,23 +326,23 @@
+             <ondown>87</ondown>
+             <onleft>202</onleft>
+             <onright>204</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/next.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/next.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="204">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label>+30</label>
+             <font>InfinitySmall</font>
+             <description>Forward 30</description>
+@@ -347,16 +355,16 @@
+             <ondown>87</ondown>
+             <onleft>205</onleft>
+             <onright>253</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="253">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Stop</description>
+@@ -369,23 +377,23 @@
+             <ondown>87</ondown>
+             <onleft>204</onleft>
+             <onright>250</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/stop.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/stop.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="250">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Subtitles</description>
+@@ -398,23 +406,23 @@
+             <ondown>87</ondown>
+             <onleft>253</onleft>
+             <onright>255</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/subtitles.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/subtitles.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="255">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Display</description>
+@@ -427,48 +435,72 @@
+             <ondown>87</ondown>
+             <onleft>250</onleft>
+             <onright>265</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_reference/display.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/display.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="265">
+-            <label>Repeat</label>
++            <label></label>
+             <font>InfinityTiny</font>
+             <align>center</align>
+             <aligny>center</aligny>
+             <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+             <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-            <description>Repeat</description>
++            <description>$VAR[InfinityPlayerRepeatLabel]</description>
+             <onup>87</onup>
+             <ondown>87</ondown>
+             <onleft>255</onleft>
+             <onright>262</onright>
+             <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+             <onclick>PlayerControl(Repeat)</onclick>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
++          </control>
++          <control type="image">
++            <left>28</left>
++            <top>28</top>
++            <width>40</width>
++            <height>40</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">osd_modern/osdrepeat.png</texture>
++            <visible>!Playlist.IsRepeatOne + !Playlist.IsRepeat</visible>
++          </control>
++          <control type="image">
++            <left>28</left>
++            <top>28</top>
++            <width>40</width>
++            <height>40</height>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]">osd_modern/osdrepeatone.png</texture>
++            <visible>Playlist.IsRepeatOne</visible>
++          </control>
++          <control type="image">
++            <left>28</left>
++            <top>28</top>
++            <width>40</width>
++            <height>40</height>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]">osd_modern/osdrepeatall.png</texture>
++            <visible>Playlist.IsRepeat + !Playlist.IsRepeatOne</visible>
+           </control>
+         </control>
+         <control type="group">
+-          <width>104</width>
+-          <height>104</height>
++          <width>96</width>
++          <height>96</height>
+           <control type="button" id="262">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>104</width>
+-            <height>104</height>
+             <label/>
+             <font/>
+             <description>Lock</description>
+@@ -483,11 +515,15 @@
+             <ondown>87</ondown>
+             <onleft>265</onleft>
+             <onright>262</onright>
++            <left>0</left>
++            <top>0</top>
++            <width>96</width>
++            <height>96</height>
+           </control>
+           <control type="image">
+-            <texture>infinity_ui/icons/lock.png</texture>
+-            <left>32</left>
+-            <top>32</top>
++            <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_ui/icons/lock.png</texture>
++            <left>28</left>
++            <top>28</top>
+             <width>40</width>
+             <height>40</height>
+           </control>
+@@ -495,20 +531,16 @@
+       </control>
+     </control>
+     <control type="group">
+-      <right>5%</right>
+-      <centertop>50%</centertop>
+-      <width>180</width>
+-      <height>620</height>
+       <visible>String.IsEqual(Window(Home).Property(Infinity.PlayerVolumeMode),true)</visible>
+       <control type="image">
+-        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassSurfaceElevated]">infinity_polish/surface.png</texture>
+         <left>0</left>
+         <top>0</top>
+         <width>100%</width>
+         <height>100%</height>
+       </control>
+       <control type="image">
+-        <texture border="24" colordiffuse="$VAR[InfinityGlassBorderSoft]">infinity_polish/rim.png</texture>
++        <texture border="24" colordiffuse="$VAR[InfinityGlassBorder]">infinity_polish/rim.png</texture>
+         <left>0</left>
+         <top>0</top>
+         <width>100%</width>
+@@ -516,40 +548,30 @@
+       </control>
+       <control type="label">
+         <label>$INFO[Control.GetLabel(260)]</label>
+-        <font>InfinityBody</font>
++        <font>InfinitySmall</font>
+         <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+         <aligny>center</aligny>
+-        <left>12</left>
+-        <right>12</right>
+-        <top>16</top>
+-        <height>52</height>
+         <align>center</align>
++        <left>4</left>
++        <right>4</right>
++        <top>8</top>
++        <height>44</height>
+       </control>
+-      <control type="button" id="266">
+-        <label>+</label>
+-        <font>InfinitySmall</font>
+-        <align>center</align>
+-        <aligny>center</aligny>
+-        <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+-        <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-        <left>46</left>
+-        <top>76</top>
+-        <width>88</width>
+-        <height>72</height>
+-        <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-        <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-        <onclick>Action(VolumeUp)</onclick>
+-        <ondown>260</ondown>
+-        <onback>ClearProperty(Infinity.PlayerVolumeMode,Home)</onback>
+-        <onback>SetFocus(264)</onback>
+-        <onback>Skin.TimerStart(autoclosevideoosd)</onback>
++      <control type="progress">
++        <centerleft>50%</centerleft>
++        <centertop>157</centertop>
++        <width>202</width>
++        <height>12</height>
++        <info>Player.Volume</info>
++        <texturebg border="6">infinity_reference/track_dark.png</texturebg>
++        <midtexture border="6">infinity_reference/fill.png</midtexture>
++        <lefttexture></lefttexture>
++        <righttexture></righttexture>
++        <overlaytexture></overlaytexture>
++        <animation effect="rotate" start="270" end="270" center="auto" time="0" condition="true">Conditional</animation>
+       </control>
+       <control type="slider" id="260">
+-        <left>62</left>
+-        <top>172</top>
+-        <width>56</width>
+-        <height>256</height>
+-        <texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar>
++        <texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_reference/slider_transparent.png</texturesliderbar>
+         <texturesliderbardisabled>infinity_reference/slider_transparent.png</texturesliderbardisabled>
+         <textureslidernib>infinity_reference/knob.png</textureslidernib>
+         <textureslidernibfocus>infinity_reference/knob_focus.png</textureslidernibfocus>
+@@ -558,36 +580,17 @@
+         <action>volume</action>
+         <orientation>vertical</orientation>
+         <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+-        <onleft>266</onleft>
+-        <onright>267</onright>
+-        <onback>ClearProperty(Infinity.PlayerVolumeMode,Home)</onback>
+-        <onback>SetFocus(264)</onback>
+-        <onback>Skin.TimerStart(autoclosevideoosd)</onback>
+-      </control>
+-      <control type="button" id="267">
+-        <label>−</label>
+-        <font>InfinitySmall</font>
+-        <align>center</align>
+-        <aligny>center</aligny>
+-        <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+-        <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-        <left>46</left>
+-        <top>452</top>
+-        <width>88</width>
+-        <height>64</height>
+-        <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-        <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-        <onclick>Action(VolumeDown)</onclick>
+-        <onup>260</onup>
+-        <ondown>261</ondown>
++        <onleft>261</onleft>
++        <onright>261</onright>
+         <onback>ClearProperty(Infinity.PlayerVolumeMode,Home)</onback>
+         <onback>SetFocus(264)</onback>
+         <onback>Skin.TimerStart(autoclosevideoosd)</onback>
++        <left>16</left>
++        <top>56</top>
++        <width>72</width>
++        <height>202</height>
+       </control>
+       <control type="button" id="261">
+-        <left>46</left>
+-        <width>88</width>
+-        <height>88</height>
+         <label/>
+         <font/>
+         <description>Mute</description>
+@@ -596,28 +599,35 @@
+         <onclick>Mute</onclick>
+         <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+         <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(261)">Conditional</animation>
+-        <bottom>16</bottom>
+-        <onup>267</onup>
++        <onup>260</onup>
+         <onback>ClearProperty(Infinity.PlayerVolumeMode,Home)</onback>
+         <onback>SetFocus(264)</onback>
+         <onback>Skin.TimerStart(autoclosevideoosd)</onback>
++        <left>4</left>
++        <bottom>8</bottom>
++        <width>96</width>
++        <height>96</height>
+       </control>
+       <control type="image">
+-        <texture>infinity_reference/volume.png</texture>
+-        <left>70</left>
+-        <bottom>40</bottom>
++        <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/volume.png</texture>
++        <visible>!Player.Muted</visible>
++        <left>32</left>
++        <bottom>36</bottom>
+         <width>40</width>
+         <height>40</height>
+-        <visible>!Player.Muted</visible>
+       </control>
+       <control type="image">
+-        <texture>infinity_reference/mute.png</texture>
+-        <left>70</left>
+-        <bottom>40</bottom>
++        <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/mute.png</texture>
++        <visible>Player.Muted</visible>
++        <left>32</left>
++        <bottom>36</bottom>
+         <width>40</width>
+         <height>40</height>
+-        <visible>Player.Muted</visible>
+       </control>
++      <left>10.5%</left>
++      <bottom>48</bottom>
++      <width>104</width>
++      <height>370</height>
+     </control>
+     <control type="group">
+       <visible>Skin.HasSetting(Infinity.PlayerDrawerOpen) + !String.IsEqual(Window(Home).Property(Infinity.PlayerVolumeMode),true)</visible>
+@@ -666,7 +676,7 @@
+           <height>72</height>
+         </control>
+         <control type="button" id="271">
+-          <label></label>
++          <label/>
+           <font>InfinitySmall</font>
+           <align>center</align>
+           <aligny>center</aligny>
+@@ -706,9 +716,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -724,9 +734,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -742,9 +752,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -761,9 +771,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -779,9 +789,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -797,9 +807,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -815,9 +825,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -833,9 +843,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -851,9 +861,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -864,14 +874,14 @@
+           <control type="button" id="281">
+             <width>100%</width>
+             <height>96</height>
+-            <label>Playback Diagnostics</label>
++            <label>Playback Info</label>
+             <onclick>ActivateWindow(playerprocessinfo)</onclick>
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -887,9 +897,9 @@
+             <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+             <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+             <font>InfinitySmall</font>
+-            <textcolor>FFFFFFFF</textcolor>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+             <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+-            <focusedcolor>FFFFFFFF</focusedcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+             <align>left</align>
+             <textoffsetx>24</textoffsetx>
+             <aligny>center</aligny>
+@@ -897,40 +907,6 @@
+             <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(282)">Conditional</animation>
+             <onback>SetFocus(257)</onback>
+           </control>
+-          <control type="button" id="252">
+-            <width>100%</width>
+-            <height>96</height>
+-            <label>Audio settings</label>
+-            <font>InfinitySmall</font>
+-            <description>Audio settings</description>
+-            <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+-            <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+-            <onclick>ActivateWindow(OSDAudioSettings)</onclick>
+-            <enable>true</enable>
+-            <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(252)">Conditional</animation>
+-            <align>left</align>
+-            <textoffsetx>24</textoffsetx>
+-            <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+-            <onback>SetFocus(257)</onback>
+-          </control>
+-          <control type="button" id="263">
+-            <width>100%</width>
+-            <height>96</height>
+-            <label>Rotation policy</label>
+-            <font>InfinitySmall</font>
+-            <description>Player rotation policy: Follow Device / Unlocked During Video (selection, not Android grant status)</description>
+-            <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+-            <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+-            <onclick condition="System.Platform.Android + Player.HasVideo + !Skin.HasSetting(Infinity.PlayerRotationUnlocked)">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.PLAYER_ROTATION_UNLOCKED)</onclick>
+-            <onclick condition="System.Platform.Android + Player.HasVideo + Skin.HasSetting(Infinity.PlayerRotationUnlocked)">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.PLAYER_ROTATION_FOLLOW_DEVICE)</onclick>
+-            <onclick condition="System.Platform.Android + Player.HasVideo">Skin.ToggleSetting(Infinity.PlayerRotationUnlocked)</onclick>
+-            <enable>System.Platform.Android + Player.HasVideo + true</enable>
+-            <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="[Control.HasFocus(263)] + [String.IsEmpty(Window(Home).Property(Infinity.RuntimeCapabilitiesReady)) | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),true)]">Conditional</animation>
+-            <align>left</align>
+-            <textoffsetx>24</textoffsetx>
+-            <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+-            <onback>SetFocus(257)</onback>
+-          </control>
+         </control>
+       </control>
+     </control>
