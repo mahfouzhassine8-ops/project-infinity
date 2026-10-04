@@ -1,0 +1,40 @@
+name: Infinity | 3306 provider and 197 browser source validation (NO APK)
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103303-194-responsive-regressions]
+    paths:
+      - 'repairs/provider-windows-2103306/**'
+      - 'repairs/skin-followup-1.0.5.197/**'
+      - '.github/workflows/infinity-2103306-provider-source-validation.yml'
+permissions: {contents: read}
+concurrency:
+  group: infinity-2103306-provider-source-validation
+  cancel-in-progress: false
+jobs:
+  source-contracts:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - name: Validate exact native preimages and compile real resolver
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3306
+          python3 repairs/provider-windows-2103306/prepare_host.py --output host3306
+          python3 repairs/provider-windows-2103306/test_native.py --source host3306 2>&1 | tee evidence3306/native-host-tests.log
+      - name: Validate stable browser focus over exact skin 196
+        run: |
+          set -euo pipefail
+          python3 repairs/skin-followup-1.0.5.197/test_delta.py 2>&1 | tee evidence3306/browser-source-tests.log
+          cp repairs/provider-windows-2103306/README.md repairs/provider-windows-2103306/AUDIT.md evidence3306/
+          cp repairs/skin-followup-1.0.5.197/package-proof.json evidence3306/browser-package-proof.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-3306-197-Source-Evidence-NO-APK-NO-SKIN-ZIP
+          path: evidence3306/
+          if-no-files-found: error
+          retention-days: 90
