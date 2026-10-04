@@ -74,8 +74,19 @@ route preservation, Android component/arguments, unknown-action refusal,
 idempotence, original backup contents and per-profile failure isolation. The
 host Android stand-ins do not simulate device lifecycle or native shutdown.
 
-The new source workflow preserves the inherited Android compile/test suite and
-adds seven Robolectric regressions. Its output is source evidence, not an APK.
+The source workflow succeeded at commit
+`671b3a91d2d32aeeb727d68b4ece98135ae16c74` in
+[run 37221584705](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/37221584705).
+Full production Android compilation passed. All 104 Android/Robolectric tests
+passed with zero failures, errors or skipped tests, retaining the inherited
+suite and adding seven regressions. Ten weather producer tests and the compiled
+weather-isolation audit also passed. No native compilation was triggered.
+
+Artifact 11310551059 is unexpired through January 2, 2027. Its ZIP SHA-256 is
+`56c99d8eb92d3dde467a3ecf0a35f5c4b59563142fbeea3c648d5654b734ce32`.
+The downloaded ZIP passed CRC checks, and every archived source file was read
+back and compared against the exact-commit 250-file proof. This evidence
+contains no APK or installable skin ZIP.
 
 The complete skin archive's transfer failed repeatedly. Replaying the Power
 patch on the repository fixture provides the required conditional-route test
