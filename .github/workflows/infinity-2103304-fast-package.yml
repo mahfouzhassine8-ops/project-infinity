@@ -54,8 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p verified-source candidate "$HOME/.android"
-          unzip -q baseline303/*.zip -d baseline303/unpacked
-          cp baseline303/unpacked/Infinity-2103303-1.0.9-E2E-Mobile-Repair-RC1.apk baseline303/base.apk
+          cp baseline303/Infinity-2103303-1.0.9-E2E-Mobile-Repair-RC1.apk baseline303/base.apk
           tar --no-same-owner -xzf validated-android/repaired-shell-source.tar.gz -C verified-source
           keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
           python3 repairs/mobile-regressions-2103304/package_candidate.py \
