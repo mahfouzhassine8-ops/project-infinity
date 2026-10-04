@@ -113,8 +113,7 @@ void CGUIRadioButtonControl::Render()''')
 bool CGUIControlFactory::GetDimensions'''
         new='''  value = ParsePosition(pNode->FirstChild()->Value(), parentSize);
   // Optional responsive cap. Existing dimensions without max are unchanged.
-  // Retained reflow uses this same resolver, so window resize recomputes both
-  // the visual bounds and the actual control hit rectangle.
+  // The retained resolver applies the identical cap on later resizes.
   if (pNode->Attribute("max"))
   {
     const float maximum = ParsePosition(pNode->Attribute("max"), parentSize);
@@ -127,6 +126,27 @@ bool CGUIControlFactory::GetDimensions'''
 bool CGUIControlFactory::GetDimensions'''
         return once(s,old,new)
     change('xbmc/guilib/GUIControlFactory.cpp',dimensions)
+    change('xbmc/guilib/GUIControl.cpp',lambda s:once(s,
+        '''  value = InfinityResponsiveParse(spec.size, parentSize);
+  return true;''',
+        '''  value = InfinityResponsiveParse(spec.size, parentSize);
+  if (!spec.sizeMax.empty())
+  {
+    const float maximum = InfinityResponsiveParse(spec.sizeMax, parentSize);
+    if (maximum > 0.0f)
+      value = std::min(value, maximum);
+  }
+  return true;'''))
+    # DialogSelect's caller sets its compact-layout property before each Open.
+    # Re-evaluate conditional includes for that invocation; retaining the first
+    # loaded XML would accidentally reuse Ambient's size for source selection.
+    change('xbmc/dialogs/GUIDialogSelect.cpp',lambda s:once(s,
+        '  m_loadType = KEEP_IN_MEMORY;',
+        '''#if defined(TARGET_ANDROID)
+  m_loadType = LOAD_EVERY_TIME;
+#else
+  m_loadType = KEEP_IN_MEMORY;
+#endif'''))
     return changes
 
 

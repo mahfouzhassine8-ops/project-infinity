@@ -14,7 +14,7 @@ from lxml import etree as E
 HERE = Path(__file__).resolve().parent
 MARK = 'infinity_polish/infinity_mark.png'
 MOTION = '!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)'
-WIDE = 'Integer.IsGreater(Window(Home).Property(Infinity.LogicalWidth),1280)'
+WIDE = 'Integer.IsGreater(Window.Property(Infinity.LogicalWidth),1280)'
 
 
 def put(node, key, value, **attrs):
@@ -334,8 +334,15 @@ def player(root):
     seek = control(cs, 'group', left='5%', width='90%', bottom=168, height=122, visible=normal)
     label(seek, '$INFO[Player.Time(hh:mm:ss)]', left=0, top=0, width='45%', height=48)
     label(seek, '$INFO[Player.Duration(hh:mm:ss)]', right=0, top=0, width='45%', height=48, align='right')
+    progress = control(seek, 'progress', left=0, top=54, width='100%', height=64,
+                       info='Player.Progress')
+    put(progress,'texturebg','infinity_reference/track_dark.png',border='8')
+    put(progress,'midtexture','infinity_reference/fill.png',border='8')
+    for texture in ('lefttexture','righttexture','overlaytexture'): put(progress,texture,'')
     s = originals['87']; remove(s, 'right', 'bottom')
     for k, v in dict(left=0, top=54, width='100%', height=64, onup=202, ondown=202).items(): put(s, k, v)
+    # Left/right are native seek actions; the removed header arrow cannot own focus.
+    remove(s,'onleft','onright')
     seek.append(s)
     # Native adaptive canvas width is published by the existing reflow owner.
     # A compact centred maximum on wide canvases; safe gutters on narrow ones.

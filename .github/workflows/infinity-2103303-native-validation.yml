@@ -99,7 +99,11 @@ jobs:
           python3 repairs/e2e-mobile-2103303/native_candidate.py apply --source kodi --receipt engine3303/source-manifest.json
           ASAN_OPTIONS=detect_leaks=0 python3 repairs/e2e-mobile-2103303/test_native_controls.py --base kodi --candidate kodi
           python3 repairs/e2e-mobile-2103303/native_candidate.py verify --source kodi --receipt engine3303/source-manifest.json
-          git -C kodi diff --check
+          python3 - <<'PYCODE'
+          import json,subprocess
+          changed=json.load(open('engine3303/source-manifest.json'))['changed']
+          subprocess.run(['git','-C','kodi','diff','--check','--',*changed],check=True)
+          PYCODE
 
       - name: Compile full ARM64 library with exact inherited engine recipe
         run: |

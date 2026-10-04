@@ -33,8 +33,9 @@ def apply(root):
     const int flags = appPlayer ? (appPlayer->IsPlayingVideo() ? 1 : 0) |
         (appPlayer->IsPlayingAudio() ? 2 : 0) | (appPlayer->IsPausedPlayback() ? 4 : 0) : 0;
     const auto& gfx = CServiceBroker::GetWinSystem()->GetGfxContext();
-    const int lw = home ? home->GetCoordsRes().iWidth : 0;
-    const int lh = home ? home->GetCoordsRes().iHeight : 0;
+    const auto* active = GetWindow(GetActiveWindow());
+    const int lw = active ? active->GetCoordsRes().iWidth : 0;
+    const int lh = active ? active->GetCoordsRes().iHeight : 0;
     const int aspect = lh <= 0 ? 0 : lw * 100 < lh * 80 ? 1 : lw * 100 > lh * 125 ? 3 : 2;
     INFINITY::HEALTH::Publish({1, now, GetActiveWindow(), GetTopmostDialog(), flags,
         background && background->IsVisible() ? 1 : 0,
