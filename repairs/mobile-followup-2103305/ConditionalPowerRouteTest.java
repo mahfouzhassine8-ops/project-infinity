@@ -33,6 +33,9 @@ public class ConditionalPowerRouteTest {
   private void write(File file,String value)throws Exception {
     file.getParentFile().mkdirs();Files.write(file.toPath(),value.getBytes(StandardCharsets.UTF_8));
   }
+  private String read(File file)throws Exception {
+    return new String(Files.readAllBytes(file.toPath()),StandardCharsets.UTF_8);
+  }
   @Test public void approvedConditionalRoutesKeepEveryByte()throws Exception {
     for(boolean reverse:new boolean[]{false,true}){
       String source=paired(reverse);assertEquals(source,InfinityPowerMenuRoutes.patch(source));
@@ -71,14 +74,14 @@ public class ConditionalPowerRouteTest {
     try{
       System.setProperty("xbmc.data",data.getAbsolutePath());
       InfinityPowerMenuRoutes.apply(app);
-      assertEquals(approved,Files.readString(unified.toPath()));
-      assertEquals(bad,Files.readString(invalid.toPath()));
-      assertEquals(InfinityPowerMenuRoutes.patch(legacy),Files.readString(later.toPath()));
+      assertEquals(approved,read(unified));
+      assertEquals(bad,read(invalid));
+      assertEquals(InfinityPowerMenuRoutes.patch(legacy),read(later));
       assertTrue(InfinityPowerMenuRoutes.report(app).contains("Validated profiles: 2; commands updated: 1; rejected profiles: 1"));
       File[] backups=new File(app.getFilesDir(),"infinity-power-route-originals-2103299").listFiles();
       assertNotNull(backups);
       boolean original=false;
-      for(File backup:backups)if(Files.readString(backup.toPath()).equals(legacy))original=true;
+      for(File backup:backups)if(read(backup).equals(legacy))original=true;
       assertTrue(original);
       InfinityPowerMenuRoutes.apply(app);
       assertTrue(InfinityPowerMenuRoutes.report(app).contains("commands updated: 0"));
