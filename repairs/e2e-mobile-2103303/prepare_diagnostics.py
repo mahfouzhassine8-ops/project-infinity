@@ -17,6 +17,7 @@ subprocess.run([sys.executable, str(HERE.parent/'chooser-weather-snapshot-210330
 tests = a.build/'xbmc/src/test/java/com/projectinfinity/kodi'
 shutil.copy2(HERE/'MobileRepairTest.java', tests/'MobileRepairTest.java')
 shutil.copy2(HERE/'AndroidKeyboardTest.java', tests/'AndroidKeyboardTest.java')
+shutil.copy2(HERE/'ResponsivenessTest.java', tests/'ResponsivenessTest.java')
 p = tests/'MotionFrameTest.java'
 text = p.read_text()
 old = '        View v=ui.stage.getChildAt(i);Rect r=new Rect();'

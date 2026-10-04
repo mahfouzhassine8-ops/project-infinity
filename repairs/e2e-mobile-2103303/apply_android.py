@@ -63,6 +63,8 @@ def apply(root):
     p.write_text(text)
     from android_keyboard import apply as apply_keyboard
     apply_keyboard(root)
+    from android_health import apply as apply_health
+    apply_health(root)
     after={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
            for p in root.rglob('*') if p.is_file()}
     changes=[{'path':p,'before':before.get(p),'after':after.get(p)} for p in sorted(set(before)|set(after)) if before.get(p)!=after.get(p)]

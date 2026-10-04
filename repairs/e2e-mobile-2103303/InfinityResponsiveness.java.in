@@ -1,0 +1,148 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Process;
+import android.os.SystemClock;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.lang.ref.WeakReference;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Evidence only. No player commands, network, automatic resets or process kills. */
+final class InfinityResponsiveness {
+  static final long STALL_MS=5000;
+  static final int LIMIT=256*1024;
+  interface NativeSnapshot { long[] read(); }
+  static final class Stall {
+    long started=-1;
+    boolean observe(long now,long beat) {
+      if(beat>0 && now-beat>=STALL_MS && started<0){started=beat;return true;}
+      return false;
+    }
+    long recover(long beat) {
+      if(started>=0 && beat>started){long value=started;started=-1;return value;}
+      return -1;
+    }
+  }
+  private final Context app;
+  private final WeakReference<Activity> activity;
+  private final NativeSnapshot nativeSnapshot;
+  private final Handler main=new Handler(Looper.getMainLooper());
+  private final ScheduledExecutorService worker=Executors.newSingleThreadScheduledExecutor(r->{
+    Thread t=new Thread(r,"InfinityResponsiveness");t.setDaemon(true);return t;
+  });
+  private final AtomicBoolean pending=new AtomicBoolean();
+  private final String session=UUID.randomUUID().toString();
+  private final long sessionStarted=System.currentTimeMillis();
+  private volatile long beat;
+  private volatile long foregroundSince;
+  private volatile boolean foreground,closed;
+  private volatile String geometry="unavailable";
+  private String lastGeometry="";
+  private final Stall ui=new Stall(),nativeUi=new Stall();
+  InfinityResponsiveness(Activity owner,NativeSnapshot snapshot) {
+    app=owner.getApplicationContext();activity=new WeakReference<>(owner);nativeSnapshot=snapshot;
+    worker.scheduleWithFixedDelay(this::sample,0,500,TimeUnit.MILLISECONDS);
+  }
+  void resume(){beat=foregroundSince=SystemClock.uptimeMillis();foreground=true;}
+  void pause(){
+    foreground=false;main.removeCallbacksAndMessages(null);pending.set(false);
+    if(!closed)worker.execute(()->{ui.started=-1;nativeUi.started=-1;});
+  }
+  void close(){closed=true;foreground=false;main.removeCallbacksAndMessages(null);worker.shutdownNow();activity.clear();}
+  private void sample() {
+    if(closed || !foreground)return;
+    final long now=SystemClock.uptimeMillis();
+    if(pending.compareAndSet(false,true))main.post(()-> {
+      pending.set(false);
+      Activity owner=activity.get();if(closed || !foreground || owner==null)return;
+      beat=SystemClock.uptimeMillis();
+      try {
+        Rect bounds=android.os.Build.VERSION.SDK_INT>=30?
+            owner.getWindowManager().getCurrentWindowMetrics().getBounds():
+            new Rect(0,0,owner.getWindow().getDecorView().getWidth(),owner.getWindow().getDecorView().getHeight());
+        android.content.res.Configuration c=owner.getResources().getConfiguration();
+        geometry=bounds.left+","+bounds.top+","+bounds.width()+","+bounds.height()+
+            " dp="+c.screenWidthDp+"x"+c.screenHeightDp+" orientation="+c.orientation+
+            " multi="+(android.os.Build.VERSION.SDK_INT>=24 && owner.isInMultiWindowMode());
+      }catch(RuntimeException unavailable){geometry="unavailable";}
+    });
+    long[] nativeState=null;
+    try{nativeState=nativeSnapshot.read();}catch(RuntimeException|LinkageError unavailable){}
+    if(ui.observe(now,beat))record("internal_ui_freeze_start",ui.started,nativeState,true);
+    long recovered=ui.recover(beat);
+    if(recovered>=0)record("internal_ui_freeze_recovered",recovered,nativeState,false);
+    if(now-foregroundSince>=STALL_MS && nativeState!=null && nativeState.length>=14 && nativeState[1]>0) {
+      if(nativeUi.observe(now,nativeState[1]))record("internal_native_ui_freeze_start",nativeUi.started,nativeState,true);
+      recovered=nativeUi.recover(nativeState[1]);
+      if(recovered>=0)record("internal_native_ui_freeze_recovered",recovered,nativeState,false);
+    }
+    if(!geometry.equals(lastGeometry)) {
+      lastGeometry=geometry;record("window_geometry",now,nativeState,false);
+    }
+  }
+  private void record(String event,long since,long[] state,boolean stack) {
+    try {
+      JSONObject row=new JSONObject();long now=SystemClock.uptimeMillis();
+      row.put("schema",1);row.put("event",event);row.put("session",session);
+      row.put("session_started_epoch_ms",sessionStarted);row.put("epoch_ms",System.currentTimeMillis());
+      row.put("uptime_ms",now);row.put("observed_start_uptime_ms",since);
+      row.put("duration_ms",Math.max(0,now-since));row.put("pid",Process.myPid());
+      row.put("activity","Main");row.put("android_window",geometry);
+      row.put("official_android_anr",false);row.put("classification","internal observation; correlate Android exit records separately");
+      if(state!=null && state.length>=14) {
+        String[] names={"schema","native_heartbeat_uptime_ms","kodi_window","active_dialog","player_flags",
+            "background_video_visible","ambient_active","render_width","render_height",
+            "logical_width","logical_height","skin_load_sequence","aspect_class","native_session_start_uptime_ms"};
+        JSONObject nativeData=new JSONObject();for(int i=0;i<names.length;i++)nativeData.put(names[i],state[i]);
+        nativeData.put("player_flags_legend","video=1,audio=2,paused=4");
+        nativeData.put("aspect_class_legend","cover=1,square=2,landscape=3");
+        nativeData.put("profile_reason","existing skin folder retained; native window adaptation owns logical geometry");
+        row.put("native",nativeData);
+      }else row.put("native_heartbeat","unavailable");
+      if(stack) {
+        JSONArray frames=new JSONArray();StackTraceElement[] trace=Looper.getMainLooper().getThread().getStackTrace();
+        for(int i=0;i<Math.min(48,trace.length);i++)frames.put(trace[i].toString());
+        row.put("main_thread_stack",frames);
+      }
+      append(app,row.toString()+"\n");
+    }catch(Exception unavailable) {
+      android.util.Log.w("InfinityHealth","Responsiveness evidence unavailable: "+unavailable.getClass().getSimpleName());
+    }
+  }
+  private static synchronized void append(Context context,String row)throws Exception {
+    File file=new File(context.getFilesDir(),"infinity-responsiveness.jsonl");
+    if(file.length()>LIMIT) {
+      File old=new File(context.getFilesDir(),"infinity-responsiveness.previous.jsonl");
+      if(old.exists()&&!old.delete())return;
+      if(!file.renameTo(old))return;
+    }
+    try(FileOutputStream out=new FileOutputStream(file,true)){out.write(row.getBytes(StandardCharsets.UTF_8));}
+  }
+  static String report(Context context) {
+    StringBuilder out=new StringBuilder("Internal responsiveness observations\n====================================\n");
+    for(String name:new String[]{"infinity-responsiveness.previous.jsonl","infinity-responsiveness.jsonl","infinity-native-cleanup.json"}) {
+      File f=new File(context.getFilesDir(),name);if(!f.isFile())continue;
+      try(FileInputStream in=new FileInputStream(f)) {
+        byte[] bytes=new byte[(int)Math.min(f.length(),LIMIT)];int count=0,n;
+        while(count<bytes.length && (n=in.read(bytes,count,bytes.length-count))>0)count+=n;
+        out.append(name).append('\n').append(new String(bytes,0,count,StandardCharsets.UTF_8)).append('\n');
+      }catch(Exception unavailable){out.append(name).append(": unavailable\n");}
+    }
+    out.append("Internal freezes are not Android-recorded ANRs or crashes. Chooser waiting is user time; no automatic reset is performed.\n");
+    return out.toString();
+  }
+}
