@@ -151,7 +151,7 @@ public class GlassOptionsTest {
       ActivityController<Activity> ctl=Robolectric.buildActivity(Activity.class).setup();Activity a=ctl.get();
       InfinityGlassChooser chooser=new InfinityGlassChooser(a,new InfinityGlassChooser.Actions(){
         public void enter(String s){}public void settings(String s){}public void themes(){}public String appearance(){return light?"light":"dark";}public void appearanceChanged(){}
-      });a.setContentView(chooser);GlassChooserTest.layout(chooser,840,1873);
+      });a.setContentView(chooser);CosmicChooserTest.layout(chooser,840,1873);
       chooser.setFocusableInTouchMode(true);chooser.requestFocus();
       InfinityGlassOptions d=open(a,light,cobra,new ArrayList<>());panelLayout(d,792,1780);
       Bitmap b=Bitmap.createBitmap(840,1873,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);chooser.draw(canvas);
