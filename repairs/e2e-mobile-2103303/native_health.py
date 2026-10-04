@@ -28,7 +28,7 @@ def apply(root):
   {
     lastPublished = now;
     const auto appPlayer = CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>();
-    const auto* home = GetWindow(WINDOW_HOME);
+    auto* home = GetWindow(WINDOW_HOME);
     const auto* background = home ? home->GetControl(29900) : nullptr;
     const int flags = appPlayer ? (appPlayer->IsPlayingVideo() ? 1 : 0) |
         (appPlayer->IsPlayingAudio() ? 2 : 0) | (appPlayer->IsPausedPlayback() ? 4 : 0) : 0;
