@@ -91,7 +91,7 @@ public class ProSports307Test {
  }
  @Test public void channelsSportsTabIsProOnlyAndGroupsStaySelected()throws Exception{
   InfinityLiveActivity a=f.fixture(8);try{pro(a);assertEquals(true,call(a,"cobraProPlayerSportsEnabled"));put(a,"mPlayer",new Cobra2103201ScrubberTest().proxy(new Cobra2103201ScrubberTest.Controlled()));put(a,"mPlaying",((List<?>)get(a,"mChannels")).get(0));call(a,"openPlayerOverlay",get(a,"mPlaying"));f.measure(a,412,915);call(a,"showCobraPlayerDrawer");f.measure(a,412,915);
-   View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer.findViewWithTag("cobra_player_tab_SPORTS"));call(a,"cobraRenderPlayerDrawer","CATEGORIES");assertTrue(drawer.findViewWithTag("cobra_player_tab_CATEGORIES").isSelected());call(a,"cobraRenderPlayerDrawer","SPORTS");assertTrue(drawer.findViewWithTag("cobra_player_tab_SPORTS").isSelected());assertTrue(text(drawer).contains("No games are live right now."));
+   View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer.findViewWithTag("cobra_player_tab_SPORTS"));call(a,"cobraRenderPlayerDrawer","CATEGORIES");assertTrue(drawer.findViewWithTag("cobra_player_tab_CATEGORIES").isSelected());put(a,"mCobraSportsLoading",false);put(a,"mCobraSportsLastRefresh",System.currentTimeMillis());call(a,"cobraRenderPlayerDrawer","SPORTS");assertTrue(drawer.findViewWithTag("cobra_player_tab_SPORTS").isSelected());assertTrue(text(drawer).contains("No games are live right now."));
    ((SharedPreferences)get(a,"mPrefs")).edit().putString("guide_view_mode","grid").commit();assertEquals(false,call(a,"cobraProPlayerSportsEnabled"));
   }finally{f.clean(a);}
  }
@@ -133,6 +133,22 @@ public class ProSports307Test {
  @Test public void proScorePollingStopsForBackgroundAndPip()throws Exception{
   InfinityLiveActivity a=f.fixture(8);try{add(a,game("live","mlb","in","1","1"));pro(a);call(a,"cobraProFilter",4);Object policy=get(a,"mCobraPlaybackPolicy");
    call(policy,"resume",false);assertEquals(true,call(a,"cobraSportsVisible"));call(policy,"pause");assertEquals(false,call(a,"cobraSportsVisible"));call(policy,"resume",true);put(a,"mInPictureInPicture",true);assertEquals(false,call(a,"cobraSportsVisible"));
+  }finally{f.clean(a);}
+ }
+
+ @Test public void successfulEmptyFeedDoesNotCauseARefreshLoop()throws Exception{
+  InfinityLiveActivity a=f.fixture(8);try{put(a,"mCobraSportsLastRefresh",System.currentTimeMillis());pro(a);call(a,"cobraProFilter",4);PendingIo io=(PendingIo)get(a,"mIo");int tasks=io.tasks.size();
+   call(a,"cobraProOnSportsDataChanged");call(a,"cobraSportsRefresh",false);assertEquals(false,get(a,"mCobraSportsLoading"));assertEquals(tasks,io.tasks.size());assertTrue(text((View)get(a,"mCobraGuideBrowser")).contains("No games are live right now."));
+  }finally{f.clean(a);}
+ }
+
+ @Test public void compactHeroKeepsInformationAboveItsControls()throws Exception{
+  InfinityLiveActivity a=f.fixture(4);try{CobraProUi.Hero hero=new CobraProUi.Hero(a,false,new ProSportsIntegrationTest.Calls(),null);
+   CobraProUi.Program sport=(CobraProUi.Program)call(a,"cobraProSportsProgram",game("live","mlb","in","1","1"));hero.bind(sport,5,6);ProSportsIntegrationTest.layout(hero,396,216);
+   assertTrue(hero.sportsMeta.getBottom()<=hero.transport.getTop());assertTrue(hero.sportsMatchup.getTop()>=hero.source.getBottom());save(hero,"compact-sports-hero");
+   CobraProUi.Program normal=new CobraProUi.Program();normal.title="Current channel";normal.next="Following programme";hero.bind(normal,0,6);ProSportsIntegrationTest.layout(hero,396,216);
+   assertTrue(hero.info.getTop()+hero.info.getHeight()*hero.info.getScaleY()<=hero.transport.getTop());
+   ProSportsIntegrationTest.layout(hero,396,304);assertEquals(1f,hero.info.getScaleY(),.001f);
   }finally{f.clean(a);}
  }
 
