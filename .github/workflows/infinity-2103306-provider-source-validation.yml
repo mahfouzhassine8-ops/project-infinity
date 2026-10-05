@@ -27,6 +27,11 @@ jobs:
           mkdir -p evidence3306
           python3 repairs/provider-windows-2103306/prepare_host.py --output host3306
           python3 repairs/provider-windows-2103306/test_native.py --source host3306 2>&1 | tee evidence3306/native-host-tests.log
+      - name: Validate fail-closed native packaging and run provenance
+        run: |
+          set -euo pipefail
+          python3 repairs/provider-windows-2103306/test_package_native.py 2>&1 | tee evidence3306/package-contract-tests.log
+          python3 repairs/provider-windows-2103306/test_wait_native.py 2>&1 | tee evidence3306/native-run-gate-tests.log
       - name: Validate stable browser focus over exact skin 196
         run: |
           set -euo pipefail
