@@ -56,7 +56,8 @@ dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.
  donor=build/'xbmc/build/outputs/apk/release/xbmc-release.apk'
  require(resource_ids(bt/'aapt2',base,out/'base-resources.txt')==resource_ids(bt/'aapt2',donor,out/'compiled-resources.txt'),'Resource IDs changed')
  unsigned=out/'Cobra-Pro-3307-unsigned.apk';old.merge(base,donor,unsigned)
- verify_manifest_pair(run(bt/'aapt','dump','xmltree',base,'AndroidManifest.xml'),run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml'))
+ verify_manifest_pair(run(bt/'aapt','dump','xmltree',base,'AndroidManifest.xml',output=out/'base-manifest.txt'),run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=out/'manifest.txt'))
+ for name in ('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS'):require(bool(os.environ.get(name)),'Missing permanent signing configuration: '+name)
  final=out/f'Infinity-{VERSION}-Cobra-Pro-Sports-RC1.apk';run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
  cert=run(bt/'apksigner','verify','--verbose','--print-certs',final,output=out/'signing-verification.txt');require(old.CERT in cert.lower(),'Permanent signer mismatch')
  evidence=old.verify_bytes(base,final)
