@@ -102,4 +102,14 @@ public class ProSports307Test {
    put(g2,"state","post");call(a,"cobraProChooseResolved",g2,((List<?>)get(a,"mChannels")).get(1),choices);assertEquals(1,choices.size());assertTrue(text((View)get(a,"mCobraActionSheet")).contains("no longer available"));
   }finally{f.clean(a);}
  }
+ @Test public void proMultiLaunchKeepsPinnedPlayersAndTheirAudioOwner()throws Exception{
+  Cobra2103202LifecycleTest h=new Cobra2103202LifecycleTest();h.before();try{h.multi(2);InfinityLiveActivity a=h.a;Object g=game("third","mlb","in","3","2");add(a,g);
+   LinkedHashMap<String,Object> choices=new LinkedHashMap<>();choices.put("third",h.channels.get(2));Object p0=h.states.get(0).player,p1=h.states.get(1).player;
+   String profile=(String)call(get(a,"mFeatures"),"activeProfileId");call(a,"cobraProLaunchMulti",choices,profile);
+   assertNotNull(get(a,"mMultiOverlay"));assertEquals(3,java.lang.reflect.Array.getLength(get(a,"mMultiChannels")));
+   Map<?,?> entries=(Map<?,?>)get(get(a,"mCobraTiles"),"entries");assertSame(p0,get(entries.get("fixture:0"),"player"));assertSame(p1,get(entries.get("fixture:1"),"player"));
+   for(Cobra2103202LifecycleTest.State state:h.states){assertEquals(0,state.prepares);assertEquals(0,state.releases);}
+  }finally{h.after();}
+ }
+
 }

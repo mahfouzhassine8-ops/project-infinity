@@ -16,6 +16,12 @@ TESTS=[
 'repairs/whole-ui-ambient-2103276/WholeUiAmbientTest.java',
 'repairs/watch-ambient-2103278/WatchAmbientTest.java',
 'repairs/cobra-player-polish-2103201/tests/Cobra2103201ScrubberTest.java',
+ 'repairs/cobra-player-refinement-2103202/tests/Cobra2103202LifecycleTest.java',
+'repairs/cobra-pip-call-2103203/tests/Cobra2103203PipControlsTest.java',
+'repairs/cobra-media-calls-2103206/tests/Cobra2103206MediaCallsTest.java',
+'repairs/cobra-feature-refinement-2103207/tests/Cobra2103207CallIntegrationTest.java',
+'repairs/multiview-stability-fill-2103229/tests/Cobra2103229MultiViewStabilityFillTest.java',
+'repairs/end-to-end-2103279/EmbeddedBorderCropTest.java',
 'repairs/pro-sports-2103307/ProSports307Test.java']
 def main():
  p=argparse.ArgumentParser();p.add_argument('mode',choices=['prepare','package']);p.add_argument('--source',type=Path,required=True);p.add_argument('--base',type=Path,required=True);p.add_argument('--build',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
