@@ -90,7 +90,7 @@ public class ProSports307Test {
   InfinityLiveActivity a=f.fixture(4);try{Object g=game("live","mlb","in","3","2");((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_sports_hide_scores",true).commit();CobraProUi.SportsGame d=(CobraProUi.SportsGame)call(a,"cobraProSportsUiGame",g);assertEquals("Scores hidden",d.score);assertEquals("3",get(get(g,"away"),"score"));}finally{f.clean(a);}
  }
  @Test public void channelsSportsTabIsProOnlyAndGroupsStaySelected()throws Exception{
-  InfinityLiveActivity a=f.fixture(8);try{pro(a);assertEquals(true,call(a,"cobraProPlayerSportsEnabled"));put(a,"mPlayer",Cobra2103201ScrubberTest.proxy(new Cobra2103201ScrubberTest.Controlled()));call(a,"openPlayerOverlay",((List<?>)get(a,"mChannels")).get(0));call(a,"showCobraPlayerDrawer");f.measure(a,412,915);
+  InfinityLiveActivity a=f.fixture(8);try{pro(a);assertEquals(true,call(a,"cobraProPlayerSportsEnabled"));put(a,"mPlayer",new Cobra2103201ScrubberTest().proxy(new Cobra2103201ScrubberTest.Controlled()));call(a,"openPlayerOverlay",((List<?>)get(a,"mChannels")).get(0));call(a,"showCobraPlayerDrawer");f.measure(a,412,915);
    View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer.findViewWithTag("cobra_player_tab_SPORTS"));call(a,"cobraRenderPlayerDrawer","CATEGORIES");assertTrue(drawer.findViewWithTag("cobra_player_tab_CATEGORIES").isSelected());call(a,"cobraRenderPlayerDrawer","SPORTS");assertTrue(drawer.findViewWithTag("cobra_player_tab_SPORTS").isSelected());assertTrue(text(drawer).contains("No games are live right now."));
    ((SharedPreferences)get(a,"mPrefs")).edit().putString("guide_view_mode","grid").commit();assertEquals(false,call(a,"cobraProPlayerSportsEnabled"));
   }finally{f.clean(a);}
