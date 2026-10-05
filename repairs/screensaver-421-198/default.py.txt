@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+import xbmc
+import xbmcaddon
+
+from resources.lib import utils
+from resources.lib.screensaver import Screensaver
+
+
+def main():
+    utils.sync_skinstrings_from_addon_settings()
+    addon = xbmcaddon.Addon()
+    while True:
+        saver = Screensaver('screensaver-arctic-mirage-addon.xml', addon.getAddonInfo('path'), 'Default', '1080i')
+        reopen = False
+        try:
+            saver.run()
+            reopen = saver.should_reopen_for_resize()
+            if not reopen:
+                if saver.should_restore_paused_video_osd_after_close():
+                    saver.restore_paused_video_osd()
+                elif saver.should_open_info_after_close():
+                    saver.open_last_item_info()
+        except Exception as exc:
+            utils.log('Screensaver run/wake failed: {}'.format(exc), xbmc.LOGERROR)
+        finally:
+            saver.close_screensaver()
+        if not reopen:
+            break
+        del saver
+    # Do not clear sys.modules while Kodi may still be dispatching callbacks.
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,204 @@
+class Screensaver(xbmcgui.WindowXMLDialog):
+    """One script-owned loop; callbacks request work instead of closing mid-read."""
+
+    class ExitMonitor(xbmc.Monitor):
+        def __init__(self, deactivated_callback):
+            super().__init__()
+            self.deactivated_callback = deactivated_callback
+
+        def onScreensaverActivated(self):
+            utils.log('Screensaver Activated')
+
+        def onScreensaverDeactivated(self):
+            callback = self.deactivated_callback
+            if callback:
+                callback()
+
+    def __init__(self, *args, **kwargs):
+        self.path = utils.get_saved_widget_path()
+        self.name = utils.get_saved_widget_name()
+        self.open_info_on_wake = utils.get_bool_setting(OPEN_INFO_ON_WAKE_SETTING, True)
+        # Never shadow the restore_paused_video_osd() method with a bool.
+        self._restore_paused_osd_enabled = utils.get_bool_setting(RESTORE_PAUSED_VIDEO_OSD_SETTING, True)
+        self._paused_video_on_start = self._video_is_paused()
+        self._paused_video_path = xbmc.getInfoLabel('Player.FilenameAndPath') or ''
+        self._started_in_fullscreen = bool(xbmc.getCondVisibility('Window.IsActive(fullscreenvideo)'))
+        self._exit_requested = False
+        self._close_requested = False
+        self._closed = False
+        self._info_requested = False
+        self._ready = False
+        self._last_item = {}
+        self._snapshot_key = None
+        self._next_snapshot = 0.0
+        self._close_reason = ''
+        self._viewport = self._read_viewport()
+        self._viewport_candidate = self._viewport
+        self._viewport_since = 0.0
+        self._next_viewport_check = 0.0
+        self.exit_monitor = self.ExitMonitor(self.onScreensaverDeactivated)
+
+    def onInit(self):
+        self._ready = True
+        if self.path:
+            self.setProperty('screensaver.arctic.mirage.path', self.path)
+        if self.name:
+            self.setProperty('screensaver.arctic.mirage.name', self.name)
+        self.setProperty('screensaver.arctic.mirage.info_enabled', 'true' if self.open_info_on_wake else 'false')
+        self.setProperty('screensaver.arctic.mirage.compact', 'true' if self.getHeight() < 1100 else 'false')
+        self._snapshot_key = None
+        utils.log('Window ready; logical canvas {}x{}'.format(self.getWidth(), self.getHeight()), xbmc.LOGINFO)
+
+    def on_screensaver_deactivated(self):
+        return self.onScreensaverDeactivated()
+
+    def _video_is_paused(self):
+        try:
+            return bool(xbmc.getCondVisibility('Player.HasVideo') and xbmc.getCondVisibility('Player.Paused'))
+        except Exception:
+            return False
+
+    def _paused_video_should_take_priority(self):
+        return self._restore_paused_osd_enabled and (self._paused_video_on_start or self._video_is_paused())
+
+    def _request_close(self, reason, explicit_info=False, cancel=False):
+        if self._closed:
+            return
+        self._close_reason = reason
+        self._exit_requested = self._exit_requested or cancel
+        if explicit_info and self.open_info_on_wake:
+            self._info_requested = True
+        self._close_requested = True
+
+    def onScreensaverDeactivated(self):
+        # Deactivation has no action/reason parameter. In particular it cannot
+        # distinguish Kodi-consumed Back from OK, touch or a lifecycle change.
+        # Never infer a request for a second modal from this callback.
+        self._request_close('deactivated')
+
+    def onAction(self, action):
+        action_id = action.getId()
+        if action_id in (9, ACTION_PREVIOUS_MENU, ACTION_NAV_BACK, ACTION_STOP):
+            self._request_close('back-or-stop', cancel=True)
+        elif action_id in (ACTION_SELECT_ITEM, ACTION_SHOW_INFO):
+            self._request_close('explicit-info', explicit_info=True)
+        elif action_id == ACTION_MOUSE_LEFT_CLICK:
+            # A plain tap wakes; only the Details control requests metadata.
+            self._request_close('touch')
+
+    def onClick(self, control_id):
+        if control_id == INFO_BUTTON_ID:
+            self._request_close('details-button', explicit_info=True)
+        elif control_id == WIDGET_LIST_ID:
+            self._request_close('widget-select', explicit_info=True)
+
+    def _capture_if_changed(self):
+        if not self._ready or self._close_requested or self._closed:
+            return
+        now = time.monotonic()
+        if now < self._next_snapshot:
+            return
+        self._next_snapshot = now + 2.0
+        key = (self._get_container_label('FileNameAndPath'), self._get_container_label('Title'))
+        # Retry a list that has not finished loading; avoid fetching all item
+        # fields every second when the selected item has not changed.
+        if key == self._snapshot_key and self._last_item:
+            return
+        snapshot = self.capture_selected_item(log_failures=False)
+        if snapshot:
+            self._snapshot_key = key
+
+    def _read_viewport(self):
+        try:
+            width = int(xbmc.getInfoLabel('System.ScreenWidth'))
+            height = int(xbmc.getInfoLabel('System.ScreenHeight'))
+            return (width, height) if width > 0 and height > 0 else None
+        except (ValueError, TypeError):
+            return None
+
+    def _check_viewport(self):
+        now = time.monotonic()
+        if now < self._next_viewport_check:
+            return
+        self._next_viewport_check = now + 0.2
+        viewport = self._read_viewport()
+        if not viewport:
+            return
+        if self._viewport is None:
+            self._viewport = self._viewport_candidate = viewport
+            return
+        if viewport == self._viewport:
+            self._viewport_candidate = viewport
+            return
+        if viewport != self._viewport_candidate:
+            self._viewport_candidate = viewport
+            self._viewport_since = now
+        elif now - self._viewport_since >= 0.4:
+            # These Python windows have absolute XML paths and are excluded by
+            # the existing native in-place reflow guard. Recreate only our saver
+            # after size changes settle; never reload Home or restart playback.
+            self._request_close('viewport-resize', cancel=True)
+
+    def should_reopen_for_resize(self):
+        return bool(self._close_reason == 'viewport-resize'
+                    and xbmc.getCondVisibility('System.ScreenSaverActive'))
+
+    def run(self):
+        try:
+            self.show()
+            while not self._close_requested:
+                if self.exit_monitor.abortRequested():
+                    self._request_close('kodi-abort', cancel=True)
+                    break
+                self._check_viewport()
+                self._capture_if_changed()
+                # Kodi's waitForAbort pumps the owning script's pending callbacks
+                # at <=100ms intervals. There are no daemon GUI readers.
+                if self.exit_monitor.waitForAbort(0.1):
+                    self._request_close('kodi-abort', cancel=True)
+            if self._info_requested and self._ready and not self._exit_requested:
+                self.capture_selected_item(log_failures=False)
+        finally:
+            try:
+                self.close_screensaver()
+            finally:
+                monitor = self.exit_monitor
+                self.exit_monitor = None
+                if monitor:
+                    monitor.deactivated_callback = None
+                del monitor
+
+    def close_screensaver(self):
+        if self._closed:
+            return
+        self._closed = True
+        self._ready = False
+        self.close()
+        utils.log('Window closed; reason={}'.format(self._close_reason or 'cleanup'), xbmc.LOGINFO)
+
+    def exit(self):
+        self._request_close('exit', cancel=True)
+
+    def should_restore_paused_video_osd_after_close(self):
+        if not (self._closed and self._restore_paused_osd_enabled and not self._exit_requested
+                and self._paused_video_on_start and self._started_in_fullscreen and self._video_is_paused()):
+            return False
+        # Do not resurrect playback, select another title, or leave Home after
+        # a paused background video. Restore only the same foreground session.
+        path = xbmc.getInfoLabel('Player.FilenameAndPath') or ''
+        return bool(self._paused_video_path and path == self._paused_video_path
+                    and xbmc.getCondVisibility('Window.IsActive(fullscreenvideo)'))
+
+    def restore_paused_video_osd(self):
+        if not self.should_restore_paused_video_osd_after_close():
+            return False
+        if not xbmc.getCondVisibility('Window.IsActive(videoosd)'):
+            # Queue one explicit dialog activation; no OSD toggle or sync wait.
+            xbmc.executebuiltin('ActivateWindow(videoosd)', wait=False)
+            utils.log('Queued paused foreground video OSD restore', xbmc.LOGINFO)
+        return True
+
+    def should_open_info_after_close(self):
+        return bool(self._closed and self._info_requested and self.open_info_on_wake
+                    and not self._exit_requested and self._last_item
+                    and not self._paused_video_should_take_priority())
