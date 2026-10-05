@@ -57,7 +57,11 @@ public class ProSports307Test {
    Object texture=get(a,"mCobraPreviewTexture"),adapter=get(a,"mCobraGuideAdapter"),channel=((List<?>)get(a,"mChannels")).get(0);
    put(a,"mCobraProSportsResolvedChannel",channel);put(a,"mCobraProSportsResolvingId","preserve-request");put(get(g,"home"),"score","2");call(a,"cobraProOnSportsDataChanged");f.measure(a,412,915);
    assertSame(adapter,get(a,"mCobraGuideAdapter"));assertSame(texture,get(a,"mCobraPreviewTexture"));assertSame(channel,get(a,"mCobraProSportsResolvedChannel"));assertEquals("preserve-request",get(a,"mCobraProSportsResolvingId"));
-   assertTrue(text((View)get(a,"mCobraGuideBrowser")).contains("1  -  2"));save((View)get(a,"mCobraGuideShell"),"compact-live-production");
+   assertTrue(text((View)get(a,"mCobraGuideBrowser")).contains("1  -  2"));f.frames(24);
+   CobraProUi.GameRow liveRow=(CobraProUi.GameRow)((ListView)get(a,"mCobraGuideList")).getChildAt(0);
+   Bitmap bitmap=Bitmap.createBitmap(liveRow.getWidth(),liveRow.getHeight(),Bitmap.Config.ARGB_8888);liveRow.draw(new Canvas(bitmap));int white=0;
+   for(int y=liveRow.score.getTop();y<liveRow.score.getBottom();y++)for(int x=liveRow.score.getLeft();x<liveRow.score.getRight();x++){int c=bitmap.getPixel(x,y);if(Color.red(c)>210&&Color.green(c)>210)white++;}
+   System.out.println("ATTACHED_SCORE text="+liveRow.score.getText()+" bounds="+liveRow.score.getLeft()+","+liveRow.score.getTop()+","+liveRow.score.getWidth()+","+liveRow.score.getHeight()+" scroll="+liveRow.score.getScrollX()+","+liveRow.score.getScrollY()+" alpha="+liveRow.score.getAlpha()+" white="+white);bitmap.recycle();assertTrue("Actual list must paint its score",white>35);save((View)get(a,"mCobraGuideShell"),"compact-live-production");
   }finally{f.clean(a);}
  }
  @Test public void upcomingHasExactDateLocalTimeZoneAndNoScore()throws Exception{
