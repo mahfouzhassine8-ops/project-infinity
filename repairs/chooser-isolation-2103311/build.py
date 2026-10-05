@@ -44,7 +44,7 @@ def prepare(source,base,build,out,proof):
     factory.prepare(source,base,build,out)
     process_probe.prepare(build,source)
     tests=build/'xbmc/src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
-    for name in ['IsolatedCloseRingTest','KodiProcessStatusTest']:shutil.copy2(HERE/(name+'.java'),tests/(name+'.java'))
+    for name in ['IsolatedCloseRingTest','KodiProcessStatusTest','HealthExportStatusTest']:shutil.copy2(HERE/(name+'.java'),tests/(name+'.java'))
     with (build/'xbmc/build.gradle').open('a') as f:
         f.write('''
 android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "ring.evidence", "'''+str(out/'screenshots')+'''"; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
@@ -94,7 +94,7 @@ def compare_dex(base,donor,build,out):
                     subprocess.run(['java','-cp',classpath,'org.jf.baksmali.Main','disassemble',str(dex),'-o',str(target)],check=True)
     old={p.relative_to(out/'smali-base').as_posix():p.read_text() for p in (out/'smali-base').rglob('*.smali')}
     new={p.relative_to(out/'smali-donor').as_posix():p.read_text() for p in (out/'smali-donor').rglob('*.smali')}
-    allowed=re.compile(r'com/projectinfinity/kodi/(?:InfinityGlassChooser|Splash|Main|InfinityExitCompletion|InfinityPowerControlActivity|InfinityKodiEntryActivity|InfinityKodiShutdown)(?:\$[^/]*)?\.smali$')
+    allowed=re.compile(r'com/projectinfinity/kodi/(?:InfinityGlassChooser|Splash|Main|InfinityExitCompletion|InfinityPowerControlActivity|InfinityKodiEntryActivity|InfinityKodiShutdown|InfinityChooserWeather|InfinityResponsiveTrace|InfinityHealthExport)(?:\$[^/]*)?\.smali$')
     changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))
     unexpected=[n for n in changed if not allowed.fullmatch(n) and n!='com/projectinfinity/kodi/BuildConfig.smali']
     require(not unexpected,'DEX behavior changed outside declared owners: '+repr(unexpected))
@@ -136,12 +136,12 @@ def main():
     if a.mode=='prepare':prepare(source,base,build,out,proof);return
     bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0';donor=build/'xbmc/build/outputs/apk/release/xbmc-release.apk'
     require(resource_ids(bt/'aapt2',base,out/'base-resources.txt')==resource_ids(bt/'aapt2',donor,out/'compiled-resources.txt'),'Compiled resource IDs changed')
-    suites=list((build/'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));require(len(suites)==2,'Missing production test suites')
+    suites=list((build/'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));require(len(suites)==3,'Missing production test suites')
     tested={}
     for suite in suites:
         test=E.parse(suite).getroot();tested[test.get('name')]=int(test.get('tests'))
         require(all(int(test.get(k,'0'))==0 for k in ['failures','errors','skipped']),'Failed or skipped tests')
-    require(tested=={'com.projectinfinity.kodi.IsolatedCloseRingTest':10,'com.projectinfinity.kodi.KodiProcessStatusTest':8},'Missing required tests')
+    require(tested=={'com.projectinfinity.kodi.IsolatedCloseRingTest':10,'com.projectinfinity.kodi.KodiProcessStatusTest':8,'com.projectinfinity.kodi.HealthExportStatusTest':2},'Missing required tests')
     probe=list((build/'processprobe/build/outputs/androidTest-results/connected').rglob('TEST-*.xml'))
     require(bool(probe),'Missing real Android process-exit test')
     count=0
@@ -160,7 +160,7 @@ def main():
     report={'candidate':VERSION,'apk_parent':2103310,'base_sha256':proof['apk_sha256'],'apk_sha256':sha(final.read_bytes()),
         'source_commit':os.environ['GITHUB_SHA'],'skin_parent':'1.0.5.201','skin_changed':False,'cobra_source_changed':False,
         'native_recompiled':False,'native_sha256':proof['native_sha256'],'permanent_signer':factory.CERT,
-        'tests_passed':19,'android_process_exit_probe_passed':True,'native_cleanup_in_probe_simulated':True,'physical_device_verified':False,'locked':False,**kept,**bytecode}
+        'tests_passed':21,'android_process_exit_probe_passed':True,'native_cleanup_in_probe_simulated':True,'physical_device_verified':False,'locked':False,**kept,**bytecode}
     (out/'APK-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
     print('PASS: process-isolated Kodi candidate signed; complete 3310 native/assets/resources and all other DEX classes preserved.')
 

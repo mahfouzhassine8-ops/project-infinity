@@ -3,7 +3,8 @@ import argparse,hashlib,json,re
 from pathlib import Path
 PREFIX='tools/android/packaging/xbmc/src/'
 SOURCE_MAP='c0c30e22376fcebf86ca8412829352f13906f79f7b5fd876fb8d0b73d69e2d24'
-CHANGED={PREFIX+n+'.java.in' for n in ['Splash','Main','InfinityExitCompletion','InfinityPowerControlActivity','InfinityGlassChooser']}|{'tools/android/packaging/xbmc/AndroidManifest.xml.in','cmake/scripts/android/Install.cmake'}
+OWNERS=['Splash','Main','InfinityExitCompletion','InfinityPowerControlActivity','InfinityGlassChooser','InfinityChooserWeather','InfinityResponsiveTrace','InfinityHealthExport']
+CHANGED={PREFIX+n+'.java.in' for n in OWNERS}|{'tools/android/packaging/xbmc/AndroidManifest.xml.in','cmake/scripts/android/Install.cmake'}
 ADDED={PREFIX+n+'.java.in' for n in ['InfinityKodiShutdown','InfinityKodiEntryActivity']}
 PROCESSES=['.Main','.InfinityBackgroundControlActivity','.InfinityPowerControlActivity','.InfinityExtendedBackgroundService','.XBMCBroadcastReceiver','.content.XBMCMediaContentProvider','.content.XBMCFileContentProvider','.content.XBMCYTDLContentProvider','.XBMCSearchableActivity','.channels.SyncChannelJobService','.channels.SyncProgramsJobService']
 def sha(b):return hashlib.sha256(b).hexdigest()
@@ -80,12 +81,38 @@ def transform(name,s):
   s=once(s,'if(!cobra && (closePending || closeReady)){','if(!cobra && (closePending || closeReady || closeFailed)){')
   s=s.replace('p.setColor(light?0xff079de8:0xff39caff);','p.setColor(closeFailed?0xffffac45:(light?0xff079de8:0xff39caff));')
   s=once(s,'if(!wasPending){displayed=0;closeTargetSweep=0;}','if(!wasPending && !failed){displayed=0;closeTargetSweep=0;}')
+ elif name=='InfinityChooserWeather':
+  s=once(s,'boolean current=Main.infinityLiveActivity()!=null&&age<2*60*1000L;','boolean current=(Main.infinityLiveActivity()!=null || InfinityKodiShutdown.live())&&age<2*60*1000L;')
+ elif name=='InfinityResponsiveTrace':
+  s=once(s,'return context!=null && context.getSharedPreferences(PREFS,Context.MODE_PRIVATE).getBoolean(ENABLED,false);','return context!=null && new File(directory(context),"enabled").isFile();')
+ elif name=='InfinityHealthExport':
+  s=once(s,'      JSONArray records = new JSONArray();','''      JSONArray diagnostics = new JSONArray();
+      manifest.put("diagnostic_files", diagnostics);
+      attach(context, zip, diagnostics, "infinity-kodi-process.json", "kodi-process-state.json", 8192);
+      attach(context, zip, diagnostics, "infinity-native-cleanup.json", "native-cleanup.json", 4096);
+      JSONArray records = new JSONArray();''')
+  s=once(s,'  private static void put(ZipOutputStream zip, String name, byte[] bytes) throws Exception {','''  private static void attach(Context context, ZipOutputStream zip, JSONArray diagnostics,
+      String sourceName, String name, int limit) throws Exception {
+    java.io.File source = new java.io.File(context.getFilesDir(), sourceName);
+    if (!source.isFile()) return;
+    JSONObject row = new JSONObject(); row.put("path", name); row.put("limit_bytes", limit);
+    diagnostics.put(row);
+    java.io.InputStream input;
+    try { input = new java.io.FileInputStream(source); }
+    catch (java.io.IOException unavailable) { row.put("available", false); return; }
+    row.put("available", true);
+    zip.putNextEntry(new ZipEntry(name));
+    try (java.io.InputStream bytes = input) { row.put("truncated", copyBounded(bytes, zip, limit)); }
+    zip.closeEntry();
+  }
+
+  private static void put(ZipOutputStream zip, String name, byte[] bytes) throws Exception {''')
  else:raise AssertionError(name)
  return s
 
 def apply(source,out):
  before=manifest(source);assert len(before)==250 and sha(json.dumps(before,sort_keys=True,separators=(',',':')).encode())==SOURCE_MAP,'Wrong complete 3310 parent'
- for name in ['Splash','Main','InfinityExitCompletion','InfinityPowerControlActivity','InfinityGlassChooser']:
+ for name in OWNERS:
   p=source/(PREFIX+name+'.java.in');p.write_text(transform(name,p.read_text()))
  for name in ['InfinityKodiShutdown','InfinityKodiEntryActivity']:
   (source/(PREFIX+name+'.java.in')).write_text((Path(__file__).parent/(name+'.java.in')).read_text())
@@ -97,7 +124,7 @@ def apply(source,out):
  p.write_text(s)
  after=manifest(source);assert set(after)-set(before)==ADDED and {n for n in before if before[n]!=after[n]}==CHANGED
  out.mkdir(parents=True,exist_ok=True)
- (out/'SOURCE-PRESERVATION.json').write_text(json.dumps({'apk_parent':2103310,'before':before,'after':after,'changed':sorted(CHANGED),'added':sorted(ADDED),'unchanged_files':243,'cobra_source_changed':False,'skin_changed':False,'native_changed':False},indent=2)+'\n')
+ (out/'SOURCE-PRESERVATION.json').write_text(json.dumps({'apk_parent':2103310,'before':before,'after':after,'changed':sorted(CHANGED),'added':sorted(ADDED),'unchanged_files':len(before)-len(CHANGED),'cobra_source_changed':False,'skin_changed':False,'native_changed':False},indent=2)+'\n')
  print('PASS: exact 3310 parent; only chooser isolation, Kodi routing/status and declared registration changed. Cobra, native and skin source retained.')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();apply(a.source,a.out)

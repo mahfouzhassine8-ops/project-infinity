@@ -60,6 +60,10 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Verify chooser survival across a real Android process exit
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
         with:
           api-level: 35
           arch: x86_64
@@ -67,7 +71,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: cd build3311 && ./gradlew --no-daemon --console=plain :processprobe:connectedDebugAndroidTest
+          script: export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"; cd build3311 && ./gradlew --no-daemon --console=plain :processprobe:connectedDebugAndroidTest
       - name: Verify protected payload and bytecode then permanently sign
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}

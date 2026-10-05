@@ -9,6 +9,11 @@ now live together in :kodi. Splash/Choose Your Experience and all Cobra componen
 keep their original default process. No native replacement or shutdown-policy
 change; Kodi's final exit(0) and data saving remain intact.
 
+Weather freshness reads the cross-process live status. Responsive/Fold tracing
+uses its existing shared enable file so Kodi sees chooser start/stop immediately.
+Health Center exports the bounded process state and native cleanup receipt,
+alongside existing exit records and Android traces, for PID/time correlation.
+
 A bounded atomic status file replaces chooser reads of Main's process-local
 static objects. Reads/writes run on workers. Immutable snapshots carry the owner
 PID, process token, launch token and completed lifecycle stage. A separate entry
@@ -28,8 +33,8 @@ Diggz Arctic Mirage 421 and permanent signing are preserved. The declared APK
 manifest delta is limited to Kodi process attributes and one private entry
 activity. No profile reset or automatic timed force-stop.
 
-Validation: 18 production Robolectric tests for rendered gears, ownership,
-receipts, failures and lifecycle; an Android 35 emulator probe uses the production
+Validation: 20 production Robolectric tests for rendered gears, ownership,
+receipts, failures, lifecycle and bounded diagnostic export; an Android 35 emulator probe uses the production
 status reader/writer, an actual second process and System.exit(0), and verifies
 the chooser stays alive and receives completion. The probe SIMULATES the native
 cleanup receipt; it does not run the ARM64 Kodi engine. Packaging compares all
