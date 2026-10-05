@@ -1,0 +1,536 @@
+--- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+@@ -145,6 +145,11 @@
+   private float mCobraProDownX,mCobraProDownY;
+   // 2103273 Pro Sports: presentation state only. Sports repository/player/provider owners remain authoritative.
+   private boolean mCobraProSportsActive=false;
++  private float mCobraProSportsCollapse=0f;
++  private boolean mCobraProSportsCompact=false;
++  private android.animation.ValueAnimator mCobraProSportsResize;
++  private CobraProSportsAdapter mCobraProSportsAdapter,mCobraProDrawerSportsAdapter;
++  private long mCobraProMultiSerial;
+   private String mCobraProSportsSection="live",mCobraProSportsLeagueKey="",mCobraProSportsGameId="",mCobraProSportsResolvingId="";
+   private Channel mCobraProSportsResolvedChannel;
+   private String mCobraRenderedMode="",mCobraListStateKey="";
+@@ -499,6 +504,7 @@
+   @Override
+   protected void onResume() {
+     super.onResume();
++    mMain.post(()->{if(cobraSportsVisible())cobraSportsRefresh(false);});
+     if(mCobraEffects!=null)mCobraEffects.setForeground(true);
+     CobraPresentationSafety.onResume(this);
+     mMain.post(()->{cobraConsumeLauncherPipReturn();cobraApplySystemBarsForSurface();});
+@@ -526,6 +532,8 @@
+ 
+   @Override
+   protected void onPause() {
++    mMain.removeCallbacks(mCobraSportsTick);
++    cobraProSetSportsCompact(mCobraProSportsCompact,false);
+     mCobraWelcomePending=false;if(mCobraEffects!=null)mCobraEffects.setForeground(false);
+     cobraSaveSmartReturn();if("quick-peek".equals(mCobraSheetKind))closeCobraActionSheet();else cobraCloseQuickPeekSession();
+     mCobraRotationResumed=false;cobraRequestPlayerOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,"pause");
+@@ -8947,7 +8955,10 @@
+     panel.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->cobraInsetPlayerDrawer(Build.VERSION.SDK_INT>=23?panel.getRootWindowInsets():null));panel.setTag("cobra_player_channel_drawer");panel.setBackground(cobraPanelSurface(vtheme().color("cobra.showCobraPlayerDrawer.colors.1",0xfc080b11),0,0xff293244));panel.setElevation(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.1",12)));
+     LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.2",10)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.3",8)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.4",10)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.5",14)));panel.addView(content,new FrameLayout.LayoutParams(-1,-1));
+     LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);TextView title=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.1","Live TV"),vtheme().color("cobra.showCobraPlayerDrawer.colors.2",Color.WHITE),18);title.setTypeface(vtheme().font("cobra.showCobraPlayerDrawer.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));head.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.6",48)),1));head.addView(cobraIcon("close","Close channel drawer",true,v->closeCobraPlayerDrawer()),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.7",48)),dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.8",48))));content.addView(head,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.9",50))));
+-    LinearLayout tabs=new LinearLayout(this);String[] labels={"Favorites","Recent","All","Groups"},filters={"FAVORITES","RECENT","ALL","CATEGORIES"};for(int i=0;i<labels.length;i++){final String filter=filters[i];tabs.addView(cobraTextButton(labels[i],true,()->cobraRenderPlayerDrawer(filter)),new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.10",48)),1));}content.addView(tabs,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.11",48))));
++    LinearLayout tabs=new LinearLayout(this);tabs.setTag("cobra_player_tabs");boolean pro=cobraProPlayerSportsEnabled();
++    String[] labels=pro?new String[]{"Favorites","Recent","All","Groups","Sports"}:new String[]{"Favorites","Recent","All","Groups"};
++    String[] filters=pro?new String[]{"FAVORITES","RECENT","ALL","CATEGORIES","SPORTS"}:new String[]{"FAVORITES","RECENT","ALL","CATEGORIES"};
++    for(int i=0;i<labels.length;i++){final String filter=filters[i];Button tab=cobraTextButton(labels[i],true,()->cobraRenderPlayerDrawer(filter));tab.setTag("cobra_player_tab_"+filter);tabs.addView(tab,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.10",48)),1));}content.addView(tabs,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.11",48))));
+     mCobraPlayerDrawerList=new android.widget.ListView(this);mCobraPlayerDrawerList.setDividerHeight(0);mCobraPlayerDrawerList.setSelector(android.R.color.transparent);mCobraPlayerDrawerList.setFastScrollEnabled(true);content.addView(mCobraPlayerDrawerList,new LinearLayout.LayoutParams(-1,0,1));
+     TextView hint=cobraText(vtheme().copy("cobra.showCobraPlayerDrawer.copy.2","Tap to tune • tap playing channel to expand • hold for Quick Peek"),vtheme().color("cobra.showCobraPlayerDrawer.colors.3",0xff91a8be),11);hint.setTag("cobra_player_channel_hint");hint.setGravity(Gravity.CENTER);hint.setMaxLines(2);content.addView(hint,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.12",34))));
+     mPlayerOverlay.addView(panel,new FrameLayout.LayoutParams(1,1));mPlayerChrome.setVisibility(View.GONE);cobraRenderPlayerDrawer(mCobraDrawerFilter);cobraLayoutPlayerPanels();panel.post(()->{if(panel==mCobraPlayerDrawer&&panel.isAttachedToWindow())cobraAnimatePanelIn(panel,!isPortrait());});vtheme().tree(content,"player.channels");cobraRefreshVisualEffects();
+@@ -8956,11 +8967,14 @@
+ 
+   private boolean closeCobraPlayerDrawer() {
+     if(mCobraPlayerDrawer==null)return false;cobraResetMotion(mCobraPlayerDrawer);if(mCobraPlayerDrawer.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)mCobraPlayerDrawer.getParent()).removeView(mCobraPlayerDrawer);
+-    mCobraPlayerDrawer=null;mCobraPlayerDrawerList=null;cobraLayoutPlayerPanels();showPlayerChromeTemporarily();return true;
++    mCobraProDrawerSportsAdapter=null;mCobraPlayerDrawer=null;mCobraPlayerDrawerList=null;cobraLayoutPlayerPanels();showPlayerChromeTemporarily();return true;
+   }
+ 
+   private void cobraRenderPlayerDrawer(String filter) {
+-    if(mCobraPlayerDrawerList==null)return;mCobraDrawerFilter=filter;final boolean groups="CATEGORIES".equals(filter);
++    if(mCobraPlayerDrawerList==null)return;if("SPORTS".equals(filter)&&!cobraProPlayerSportsEnabled())filter="ALL";
++    mCobraDrawerFilter=filter;cobraProUpdatePlayerTabs();
++    if("SPORTS".equals(filter)){cobraProRenderPlayerSports();cobraSportsRefresh(false);cobraSportsScheduleNext();return;}
++    mCobraProDrawerSportsAdapter=null;final boolean groups="CATEGORIES".equals(filter);
+     final ArrayList<String> names=new ArrayList<>();final ArrayList<Channel> channels=new ArrayList<>();
+     if(groups){java.util.TreeSet<String> g=new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);for(Channel c:mChannels)if(cobraChannelAllowed(c)&&c.group!=null&&!c.group.isEmpty())g.add(c.group);names.addAll(g);}
+     else if("RECENT".equals(filter)){for(String id:mRecents){Channel c=findChannel(id);if(cobraChannelAllowed(c))channels.add(c);}}
+@@ -9214,6 +9228,195 @@
+     CobraProSlot(){this.source="LIVE SPORTS";this.channel=null;this.sports=true;}
+   }
+ 
++  // 2103307: Pro presentation and explicit game selection. Existing players retain ownership.
++  private boolean cobraProPlayerSportsEnabled(){return cobraTouchFirstDevice()&&"focus".equals(cobraGuideViewMode());}
++
++  private void cobraProSetSportsCompact(boolean compact,boolean animate){
++    mCobraProSportsCompact=compact;
++    if(mCobraProSportsResize!=null){mCobraProSportsResize.removeAllUpdateListeners();mCobraProSportsResize.cancel();mCobraProSportsResize=null;}
++    float target=compact?1f:0f;
++    if(!animate||!cobraMotionEnabled()||!mCobraProActive||mCobraGuideShell==null||!mCobraGuideShell.isAttachedToWindow()){
++      mCobraProSportsCollapse=target;if(mCobraProActive)cobraLayoutGuide();return;
++    }
++    if(Math.abs(target-mCobraProSportsCollapse)<.001f)return;
++    android.animation.ValueAnimator animator=android.animation.ValueAnimator.ofFloat(mCobraProSportsCollapse,target);
++    mCobraProSportsResize=animator;animator.setDuration(340);
++    animator.setInterpolator(new android.view.animation.PathInterpolator(.22f,0f,.12f,1f));
++    animator.addUpdateListener(value->{
++      if(mCobraProSportsResize!=value||!mCobraProActive)return;
++      mCobraProSportsCollapse=(float)value.getAnimatedValue();cobraLayoutGuide();
++    });
++    animator.addListener(new android.animation.AnimatorListenerAdapter(){@Override public void onAnimationEnd(android.animation.Animator a){
++      if(mCobraProSportsResize==a){mCobraProSportsResize=null;cobraRefreshAmbient();cobraRefreshImmersiveAmbient();}
++    }});animator.start();
++  }
++
++  private void cobraProAnimateRows(android.widget.ListView list){
++    if(!cobraMotionEnabled())return;
++    list.post(()->{if(!list.isAttachedToWindow())return;
++      for(int i=0;i<Math.min(6,list.getChildCount());i++){
++        View row=list.getChildAt(i);row.animate().cancel();row.setAlpha(.35f);row.setTranslationY(dp(9));
++        row.animate().alpha(1).translationY(0).setStartDelay(i*22L).setDuration(230)
++          .setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();
++      }
++    });
++  }
++
++  private ArrayList<CobraSportsGame> cobraProRowGames(boolean drawer){
++    ArrayList<CobraSportsGame> games=new ArrayList<>();long now=System.currentTimeMillis();
++    for(CobraSportsGame game:mCobraSportsGames){
++      if(drawer?game.live():"live".equals(mCobraProSportsSection)?game.live():
++          "myteams".equals(mCobraProSportsSection)?cobraSportsFavoriteGame(game)&&game.startMs>now-86400000L:
++          "upcoming".equals(mCobraProSportsSection)?game.upcoming()&&game.startMs>=now-3600000L:
++          "league".equals(mCobraProSportsSection)&&mCobraProSportsLeagueKey.equals(game.leagueKey))games.add(game);
++    }
++    games.sort(cobraSportsComparator());return games;
++  }
++
++  private final class CobraProSportsAdapter extends android.widget.BaseAdapter {
++    final boolean drawer;final ArrayList<CobraSportsGame> values=new ArrayList<>();
++    CobraProSportsAdapter(boolean drawer){this.drawer=drawer;values.addAll(cobraProRowGames(drawer));}
++    void refresh(){
++      values.clear();values.addAll(cobraProRowGames(drawer));
++      if(values.isEmpty()){
++        if(drawer)cobraProRenderPlayerSports();else cobraRenderGuideBrowser();return;
++      }
++      notifyDataSetChanged();
++    }
++    public int getCount(){return values.size();}
++    public CobraSportsGame getItem(int position){return values.get(position);}
++    public long getItemId(int position){CobraSportsGame g=getItem(position);return CobraModeLayout.stableId(g.leagueKey+"|"+g.id);}
++    public boolean hasStableIds(){return true;}
++    public View getView(int position,View old,android.view.ViewGroup parent){
++      CobraSportsGame game=getItem(position);boolean light=!drawer&&!cobraModeDark();
++      CobraProUi.GameRow row=old instanceof CobraProUi.GameRow&&((CobraProUi.GameRow)old).light==light?
++        (CobraProUi.GameRow)old:new CobraProUi.GameRow(InfinityLiveActivity.this,light,()->{},()->{});
++      row.setTag("pro_sports_game_"+game.id);
++      row.select=drawer?()->cobraSportsWatch(game):()->cobraProSelectSportsGame(game);
++      row.watch=game.live()?()->cobraSportsWatch(game):()->cobraProSportsOptions(game);
++      row.options=()->cobraProSportsOptions(game);row.bind(cobraProSportsUiGame(game),(image,url)->cobraLoadVodArtwork(image,url));
++      int width=parent.getWidth()>0?Math.round(parent.getWidth()/getResources().getDisplayMetrics().density):cobraWidthDp();
++      row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,CobraProUi.GameRow.height(InfinityLiveActivity.this,width)));return row;
++    }
++  }
++
++  private void cobraProSportsOptions(CobraSportsGame game){
++    LinearLayout rows=cobraOpenSheet("Game options",cobraSportsMatchup(game),"pro-sports-options");boolean dark=cobraSheetIsDark();
++    if(game.live())rows.addView(cobraSheetRow("play","Watch Live",null,false,dark,()->cobraSportsWatch(game)));
++    rows.addView(cobraSheetRow("stats","Stats",null,false,dark,()->showCobraSportsStats(game)));
++    rows.addView(cobraSheetRow("multi","Multi-View","Choose live games",false,dark,this::cobraProSportsMulti));
++    rows.addView(cobraSheetRow("guide","Record / Schedule from guide",null,false,dark,()->cobraSportsRecord(game)));
++  }
++
++  private void cobraProUpdatePlayerTabs(){
++    if(mCobraPlayerDrawer==null||!cobraProPlayerSportsEnabled())return;
++    View tabs=mCobraPlayerDrawer.findViewWithTag("cobra_player_tabs");if(!(tabs instanceof android.view.ViewGroup))return;
++    String key=mCobraDrawerFilter.startsWith("GROUP:")?"CATEGORIES":mCobraDrawerFilter;
++    for(int i=0;i<((android.view.ViewGroup)tabs).getChildCount();i++){
++      View tab=((android.view.ViewGroup)tabs).getChildAt(i);boolean active=("cobra_player_tab_"+key).equals(tab.getTag());
++      tab.setSelected(active);tab.setBackground(active?CobraProUi.surface(this,false,true,8):cobraPressSurface(true));
++      if(tab instanceof TextView)((TextView)tab).setTextColor(active?CobraProUi.CYAN:Color.WHITE);
++    }
++  }
++
++  private void cobraProRenderPlayerSports(){
++    if(mCobraPlayerDrawerList==null)return;
++    ArrayList<CobraSportsGame> games=cobraProRowGames(true);
++    if(games.isEmpty()){
++      mCobraProDrawerSportsAdapter=null;
++      final String text=mCobraSportsLoading?"Loading sports…":"No games are live right now.";
++      mCobraPlayerDrawerList.setAdapter(new android.widget.BaseAdapter(){
++        public int getCount(){return 1;}public Object getItem(int p){return text;}public long getItemId(int p){return 0;}
++        public boolean isEnabled(int p){return false;}
++        public View getView(int p,View old,android.view.ViewGroup parent){TextView row=cobraText(text,Color.WHITE,14);row.setGravity(Gravity.CENTER);row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,dp(100)));return row;}
++      });
++    }else{mCobraProDrawerSportsAdapter=new CobraProSportsAdapter(true);mCobraPlayerDrawerList.setAdapter(mCobraProDrawerSportsAdapter);cobraProAnimateRows(mCobraPlayerDrawerList);}
++  }
++
++  private boolean cobraProPinned(Channel channel){
++    if(channel==null||mMultiChannels==null)return false;
++    for(Channel c:mMultiChannels)if(c!=null&&c.id.equals(channel.id))return true;return false;
++  }
++  private int cobraProMultiCount(Map<String,Channel> choices){
++    HashSet<String> ids=new HashSet<>();if(mMultiChannels!=null)for(Channel c:mMultiChannels)if(c!=null)ids.add(c.id);
++    for(Channel c:choices.values())if(c!=null)ids.add(c.id);return ids.size();
++  }
++  private void cobraProMultiPicker(LinkedHashMap<String,Channel> choices,String message){
++    LinearLayout rows=cobraOpenSheet("Sports Multi-View",message.isEmpty()?"Choose live games • up to four screens":message,"pro-sports-multi");
++    final String profile=mFeatures.activeProfileId();boolean dark=cobraSheetIsDark();
++    if(mMultiChannels!=null)for(Channel c:mMultiChannels)if(c!=null)cobraInfoText(rows,"Pinned • "+c.name);
++    ArrayList<CobraSportsGame> live=new ArrayList<>();for(CobraSportsGame g:mCobraSportsGames)if(g.live())live.add(g);
++    live.sort(cobraSportsComparator());
++    // Drop games that ended or whose provider was removed while the picker was open.
++    java.util.Iterator<Map.Entry<String,Channel>> it=choices.entrySet().iterator();
++    while(it.hasNext()){Map.Entry<String,Channel> e=it.next();CobraSportsGame g=cobraSportsGame(e.getKey());if(g==null||!g.live()||!cobraChannelAllowed(e.getValue()))it.remove();}
++    if(live.isEmpty())cobraInfoText(rows,"No games are live right now.");
++    for(CobraSportsGame game:live){
++      Channel chosen=choices.get(game.id);String subtitle=chosen==null?cobraSportsMeta(game):"Selected • "+chosen.name;
++      View row=cobraSheetRow(chosen==null?"sports":"check",cobraSportsMatchup(game),subtitle,false,dark,()->{
++        if(!profile.equals(mFeatures.activeProfileId()))return;
++        if(choices.remove(game.id)!=null){cobraProMultiPicker(choices,"");return;}
++        if(cobraProMultiCount(choices)>=4){cobraProMultiPicker(choices,"Four screens selected. Remove a selection to choose another.");return;}
++        cobraProChooseBroadcast(game,choices);
++      });row.setTag("pro_multi_game_"+game.id);row.setSelected(chosen!=null);rows.addView(row);
++    }
++    int count=cobraProMultiCount(choices);
++    View start=cobraSheetRow("multi","Watch "+count+" screens",count<2?"Select at least two different broadcasts":"Keep pinned screens and open your selection",false,dark,()->cobraProLaunchMulti(choices,profile));
++    start.setTag("pro_multi_launch");start.setEnabled(count>=2);start.setAlpha(count>=2?1:.5f);rows.addView(start);
++  }
++
++  private void cobraProChooseBroadcast(CobraSportsGame game,LinkedHashMap<String,Channel> choices){
++    LinearLayout rows=cobraOpenSheet("Choose broadcast",cobraSportsMatchup(game),"pro-sports-resolving");
++    cobraInfoText(rows,"Finding available broadcasts…");final FrameLayout sheet=mCobraActionSheet;
++    final long request=++mCobraProMultiSerial;final String profile=mFeatures.activeProfileId();
++    final ArrayList<CobraSportsChannelInfo> snapshot=cobraSportsChannelSnapshot();
++    boolean submitted=submitCobraIo(()->{
++      ArrayList<CobraSportsMatch> matches;try{matches=cobraSportsResolve(game,snapshot);}catch(Exception error){matches=new ArrayList<>();}
++      final ArrayList<CobraSportsMatch> result=matches;
++      publishCobraUi(()->{
++        if(request!=mCobraProMultiSerial||mCobraActionSheet!=sheet||!profile.equals(mFeatures.activeProfileId()))return;
++        if(cobraSportsUniqueStrong(result)){cobraProChooseResolved(game,result.get(0).channel,choices);return;}
++        rows.removeAllViews();
++        cobraInfoText(rows,result.isEmpty()?"No matching broadcast found in your providers. Try another game or check your channel guide.":"Several broadcasts match. Choose the channel you want.");
++        for(CobraSportsMatch match:result){
++          if(!cobraChannelAllowed(match.channel))continue;
++          rows.addView(cobraSheetRow("play",match.channel.name,match.evidence,false,cobraSheetIsDark(),()->cobraProChooseResolved(game,match.channel,choices)));
++        }
++        rows.addView(cobraSheetRow("back","Back to games",null,false,cobraSheetIsDark(),()->cobraProMultiPicker(choices,"")));
++      });
++    });
++    if(!submitted){rows.removeAllViews();cobraInfoText(rows,"Broadcast lookup is busy. Try again.");rows.addView(cobraSheetRow("back","Back to games",null,false,cobraSheetIsDark(),()->cobraProMultiPicker(choices,"")));}
++  }
++
++  private void cobraProChooseResolved(CobraSportsGame game,Channel channel,LinkedHashMap<String,Channel> choices){
++    CobraSportsGame current=cobraSportsGame(game.id);
++    if(current==null||!current.live()||!cobraChannelAllowed(channel)){cobraProMultiPicker(choices,"This broadcast is no longer available. Choose another game.");return;}
++    boolean duplicate=cobraProPinned(channel);for(Channel chosen:choices.values())if(chosen.id.equals(channel.id))duplicate=true;
++    if(duplicate){cobraProMultiPicker(choices,"That broadcast is already selected or pinned.");return;}
++    if(cobraProMultiCount(choices)>=4){cobraProMultiPicker(choices,"All four screens are selected.");return;}
++    choices.put(game.id,channel);cobraProMultiPicker(choices,"");
++  }
++
++  private void cobraProLaunchMulti(LinkedHashMap<String,Channel> choices,String profile){
++    if(!profile.equals(mFeatures.activeProfileId())||!isCobraAsyncAlive())return;
++    ArrayList<Channel> channels=new ArrayList<>();HashSet<String> ids=new HashSet<>();
++    if(mMultiChannels!=null)for(Channel c:mMultiChannels)if(c!=null&&ids.add(c.id))channels.add(c);
++    Map<String,CobraSportsGame> assignments=new LinkedHashMap<>(mCobraSportsMultiAssignments);
++    for(Map.Entry<String,Channel> e:choices.entrySet()){
++      CobraSportsGame game=cobraSportsGame(e.getKey());Channel channel=e.getValue();
++      if(game==null||!game.live()||!cobraChannelAllowed(channel))continue;
++      if(channels.size()<4&&ids.add(channel.id)){channels.add(channel);assignments.put(channel.id,game);}
++    }
++    if(channels.size()<2){cobraProMultiPicker(choices,"Choose at least two available broadcasts.");return;}
++    try{
++      openMultiView(channels);
++      if(mMultiOverlay==null||mMultiChannels==null||mMultiChannels.length<2){cobraProMultiPicker(choices,"Multi-View could not start. Try another selection.");return;}
++      mCobraSportsMultiAssignments.clear();for(Channel c:mMultiChannels)if(assignments.containsKey(c.id))mCobraSportsMultiAssignments.put(c.id,assignments.get(c.id));
++      cobraSportsRefreshMultiOverlays();cobraSportsScheduleNext();
++      for(Channel c:channels)if(mCobraTiles.get(c.id)==null){toast("A broadcast could not start; other screens were kept");break;}
++    }catch(RuntimeException error){cobraProMultiPicker(choices,"A broadcast could not start. Existing screens were kept; try another selection.");}
++  }
++
+   // 2103273 — Pro Sports presentation bridge. Reuses the 2103271 Sports repository/resolver without owning playback.
+   private int cobraProSportsSectionIndex(){return "myteams".equals(mCobraProSportsSection)?1:"upcoming".equals(mCobraProSportsSection)?2:("leagues".equals(mCobraProSportsSection)||"league".equals(mCobraProSportsSection))?3:0;}
+   private int cobraProSportsSlotIndex(){for(int i=0;i<mCobraProSlots.size();i++)if(mCobraProSlots.get(i).sports)return i;return -1;}
+@@ -9228,12 +9431,20 @@
+   private boolean cobraSportsSoccer(CobraSportsGame game){return game!=null&&"soccer".equals(game.sport);}
+   private String cobraProSportGroup(CobraSportsLeagueSpec spec){if(spec==null)return "SPORTS";if("soccer".equals(spec.sport))return "SOCCER";if("basketball".equals(spec.sport))return "BASKETBALL";if("baseball".equals(spec.sport))return "BASEBALL";if("hockey".equals(spec.sport))return "HOCKEY";return "FOOTBALL";}
+   private CobraProUi.SportsGame cobraProSportsUiGame(CobraSportsGame game){
+-    CobraProUi.SportsGame data=new CobraProUi.SportsGame();if(game==null)return data;data.id=game.id;data.league=game.leagueLabel;data.live=game.live();data.upcoming=game.upcoming();data.favorite=cobraSportsFavoriteGame(game);data.soccer=cobraSportsSoccer(game);
+-    if(game.away!=null){data.away=game.away.shortName;data.awayAbbr=game.away.abbreviation;data.awayLogo=game.away.logo;}if(game.home!=null){data.home=game.home.shortName;data.homeAbbr=game.home.abbreviation;data.homeLogo=game.home.logo;}
+-    data.score=game.live()||game.finalGame()?cobraSportsScoreLine(game):"";data.meta=cobraSportsMeta(game);data.selected=game.id.equals(mCobraProSportsGameId);return data;
+-  }
++    CobraProUi.SportsGame data=new CobraProUi.SportsGame();if(game==null)return data;
++    data.id=game.id;data.league=game.leagueLabel;data.leagueLogo=game.leagueLogo;data.live=game.live();data.upcoming=game.upcoming();
++    data.favorite=cobraSportsFavoriteGame(game);data.soccer=cobraSportsSoccer(game);
++    if(game.away!=null){data.away=game.away.shortName;data.awayAbbr=game.away.abbreviation;data.awayLogo=game.away.logo;}
++    if(game.home!=null){data.home=game.home.shortName;data.homeAbbr=game.home.abbreviation;data.homeLogo=game.home.logo;}
++    if(game.live()||game.finalGame())data.score=cobraSportsHideScores()?"Scores hidden":cobraSportsScore(game.away)+"  -  "+cobraSportsScore(game.home);
++    data.status=game.detail;data.network=android.text.TextUtils.join(" / ",game.broadcasts);
++    data.date=game.startMs>0?new SimpleDateFormat("MMM d, yyyy",Locale.getDefault()).format(new Date(game.startMs)):"Date TBA";
++    data.time=game.startMs>0?new SimpleDateFormat("h:mm a z",Locale.getDefault()).format(new Date(game.startMs)):"Time TBA";
++    data.meta=cobraSportsMeta(game);data.selected=game.id.equals(mCobraProSportsGameId);return data;
++  }
++
+   private CobraProUi.Program cobraProSportsProgram(CobraSportsGame game){
+-    CobraProUi.Program data=new CobraProUi.Program();data.sports=true;data.source="LIVE SPORTS";data.channel=game==null?"LIVE SPORTS":game.leagueLabel;data.live=game!=null&&game.live();data.sportsAvailable=game!=null;data.sportsMultiAvailable=game!=null&&game.live();
++    CobraProUi.Program data=new CobraProUi.Program();data.sports=true;data.source="LIVE SPORTS";if(game!=null&&!game.live())game=null;data.channel=game==null?"LIVE SPORTS":game.leagueLabel;data.live=game!=null&&game.live();data.sportsAvailable=game!=null;data.sportsMultiAvailable=game!=null&&game.live();
+     if(game==null){data.title=mCobraSportsLoading?"Loading live sports…":"No games live right now";CobraSportsGame next=cobraProPreferredSportsGame();data.schedule=next==null?"Open Sports for schedules":cobraSportsMatchup(next);data.next=next==null?"":cobraSportsMeta(next);return data;}
+     data.title=cobraSportsMatchup(game);data.schedule=game.live()||game.finalGame()?cobraSportsScoreLine(game):cobraSportsClock(game.startMs);data.next=cobraSportsMeta(game);data.favorite=cobraSportsFavoriteGame(game);
+     data.sportsAway=game.away==null?"":game.away.shortName;data.sportsAwayAbbr=game.away==null?"":game.away.abbreviation;data.sportsAwayLogo=game.away==null?"":game.away.logo;data.sportsHome=game.home==null?"":game.home.shortName;data.sportsHomeAbbr=game.home==null?"":game.home.abbreviation;data.sportsHomeLogo=game.home==null?"":game.home.logo;data.sportsScore=game.live()||game.finalGame()?cobraSportsScoreLine(game):cobraSportsClock(game.startMs);data.sportsMeta=cobraSportsMeta(game);
+@@ -9252,10 +9463,22 @@
+   }
+   private void cobraProSportsWatch(){CobraSportsGame game=cobraProCurrentSportsGame();if(game!=null)cobraSportsWatch(game);else toast("No sports game is selected");}
+   private void cobraProSportsStats(){CobraSportsGame game=cobraProCurrentSportsGame();if(game!=null)showCobraSportsStats(game);else toast("No sports game is selected");}
+-  private void cobraProSportsMulti(){CobraSportsGame game=cobraProCurrentSportsGame();if(game!=null&&game.live())cobraSportsOpenSmartMultiView(game.leagueKey,game.id);else cobraSportsOpenSmartMultiView("live",null);}
++  private void cobraProSportsMulti(){cobraProMultiPicker(new LinkedHashMap<>(),"");}
++
+   private void cobraProOnSportsDataChanged(){
+-    if(!mCobraProActive)return;CobraSportsGame current=cobraSportsGame(mCobraProSportsGameId);if(current==null){CobraSportsGame next=cobraProPreferredSportsGame();mCobraProSportsGameId=next==null?"":next.id;}if(cobraProSportsHeroActive())cobraProRetuneSports(cobraProCurrentSportsGame(),false);if(mCobraProSportsActive)cobraRenderGuideBrowser();
+-  }
++    if(mCobraProActive){
++      // Score refresh is presentation only. Never stop, pause, retune or recreate the active video.
++      if(cobraProSportsHeroActive())cobraRefreshProHero();
++      if(mCobraProSportsActive){
++        if(mCobraGuideAdapter==mCobraProSportsAdapter&&mCobraProSportsAdapter!=null)mCobraProSportsAdapter.refresh();
++        else cobraRenderGuideBrowser();
++      }
++    }
++    if(mCobraPlayerDrawer!=null&&"SPORTS".equals(mCobraDrawerFilter)){
++      if(mCobraProDrawerSportsAdapter!=null)mCobraProDrawerSportsAdapter.refresh();else cobraRenderPlayerDrawer("SPORTS");
++    }
++  }
++
+   private void cobraRenderProSportsLeagues(LinearLayout parent){
+     ScrollView scroll=new ScrollView(this);LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(4),dp(4),dp(4),dp(16));scroll.addView(body);Set<String> enabled=cobraSportsEnabledLeagues();String group="";
+     for(CobraSportsLeagueSpec spec:COBRA_SPORTS_SPECS)if(enabled.contains(spec.key)){String next=cobraProSportGroup(spec);if(!next.equals(group)){group=next;TextView heading=cobraText(group,cobraModeColor("muted"),11);heading.setLetterSpacing(.10f);heading.setPadding(dp(8),dp(8),0,0);body.addView(heading,new LinearLayout.LayoutParams(-1,dp(34)));}final CobraSportsLeagueSpec chosen=spec;CobraProUi.Action row=new CobraProUi.Action(this,"sports",spec.label,false,!cobraModeDark(),()->{mCobraProSportsSection="league";mCobraProSportsLeagueKey=chosen.key;cobraRenderGuideBrowser();});row.setContentDescription(spec.label+", "+group.toLowerCase(Locale.US));body.addView(row,new LinearLayout.LayoutParams(-1,dp(54)));}
+@@ -9266,15 +9489,21 @@
+     if("leagues".equals(mCobraProSportsSection)){cobraRenderProSportsLeagues(parent);return;}
+     ArrayList<CobraSportsGame> games=new ArrayList<>();long now=System.currentTimeMillis();for(CobraSportsGame game:mCobraSportsGames){if("live".equals(mCobraProSportsSection)&&game.live())games.add(game);else if("myteams".equals(mCobraProSportsSection)&&cobraSportsFavoriteGame(game)&&game.startMs>now-86400000L)games.add(game);else if("upcoming".equals(mCobraProSportsSection)&&game.upcoming()&&game.startMs>=now-3600000L)games.add(game);else if("league".equals(mCobraProSportsSection)&&mCobraProSportsLeagueKey.equals(game.leagueKey))games.add(game);}
+     games.sort(cobraSportsComparator());if(games.isEmpty()){String text=mCobraSportsLoading?"Loading sports…":"live".equals(mCobraProSportsSection)?"No games are live right now.":"myteams".equals(mCobraProSportsSection)?"Follow teams in Sports to see their games here.":"upcoming".equals(mCobraProSportsSection)?"No upcoming games in the current window.":"No games for this league in the current window.";cobraModeEmpty(parent,text);return;}
+-    android.widget.ListView list=new android.widget.ListView(this);list.setTag("pro_sports_game_list");list.setDividerHeight(0);list.setSelector(android.R.color.transparent);list.setItemsCanFocus(true);final ArrayList<CobraSportsGame> values=games;android.widget.BaseAdapter adapter=new android.widget.BaseAdapter(){public int getCount(){return values.size();}public CobraSportsGame getItem(int p){return values.get(p);}public long getItemId(int p){return CobraModeLayout.stableId(values.get(p).leagueKey+"|"+values.get(p).id);}public boolean hasStableIds(){return true;}public View getView(int p,View old,android.view.ViewGroup host){CobraSportsGame game=getItem(p);CobraProUi.GameRow row=old instanceof CobraProUi.GameRow?(CobraProUi.GameRow)old:new CobraProUi.GameRow(InfinityLiveActivity.this,!cobraModeDark(),()->{},()->{});row.select=()->cobraProSelectSportsGame(game);row.watch=()->cobraSportsWatch(game);row.bind(cobraProSportsUiGame(game),(image,url)->cobraLoadVodArtwork(image,url));row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,CobraProUi.GameRow.height(InfinityLiveActivity.this,cobraWidthDp())));return row;}};
+-    mCobraGuideList=list;mCobraGuideAdapter=adapter;list.setAdapter(adapter);parent.addView(list,new LinearLayout.LayoutParams(-1,0,1));
++    android.widget.ListView list=new android.widget.ListView(this);list.setTag("pro_sports_game_list");list.setDividerHeight(dp(6));list.setDivider(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));list.setSelector(android.R.color.transparent);list.setItemsCanFocus(true);
++    mCobraProSportsAdapter=new CobraProSportsAdapter(false);mCobraGuideList=list;mCobraGuideAdapter=mCobraProSportsAdapter;
++    list.setAdapter(mCobraProSportsAdapter);parent.addView(list,new LinearLayout.LayoutParams(-1,0,1));
++    cobraProAnimateRows(list);
++
+   }
+ 
+   private void cobraRenderFocusMode(LinearLayout parent,ArrayList<Channel> channels){
+     cobraEnterProMode(channels);
+     CobraProUi.Filters filters=new CobraProUi.Filters(this,!cobraModeDark(),index->cobraProFilter(index));
+-    int selected=mCobraProSportsActive?4:!mSearch.isEmpty()?5:"FAVORITES".equals(mCategory)?1:"RECENT".equals(mCategory)?2:!"ALL".equals(mCategory)?3:0;
+-    filters.selected(selected);parent.addView(filters,new LinearLayout.LayoutParams(-1,-2));
++    int selected=mCobraProSportsActive?4:!"channels".equals(mCobraGuideRoute)?3:!mSearch.isEmpty()?5:"FAVORITES".equals(mCategory)?1:"RECENT".equals(mCategory)?2:!"ALL".equals(mCategory)?3:0;
++    filters.selected(selected);
++    filters.buttons[4].setOnLongClickListener(v->{if(!mCobraProSportsActive)cobraProFilter(4);cobraProSetSportsCompact(false,true);return true;});
++    filters.buttons[4].setContentDescription("Sports. Tap to shrink video; press and hold to restore normal size.");
++    parent.addView(filters,new LinearLayout.LayoutParams(-1,-2));
+     if(mCobraProSportsActive){cobraRenderProSports(parent);return;}
+     if(!"channels".equals(mCobraGuideRoute)){cobraDirectory(parent,"sources".equals(mCobraGuideRoute));return;}
+     if(channels.isEmpty()){cobraModeEmpty(parent,!mSearch.isEmpty()?"No channels match your search.":"FAVORITES".equals(mCategory)?"No favorite channels yet.":"RECENT".equals(mCategory)?"No recently watched channels yet.":"No channels in this group.");return;}
+@@ -9291,8 +9520,10 @@
+ 
+   private void cobraProFilter(int index){
+     if(!mCobraProActive)return;
++    if(index!=4)cobraProSetSportsCompact(false,true);
+     if(index==3){mCobraProSportsActive=false;cobraOpenTvDirectory(false);return;}
+-    if(index==4){mCobraProSportsActive=true;mSearch="";mCobraGuideRoute="channels";mCobraInspectedChannel=null;mCobraInspectedProgram=null;int sports=cobraProSportsSlotIndex();if(sports>=0)mCobraProHeroIndex=sports;cobraProRetuneSports(cobraProCurrentSportsGame(),true);cobraRenderGuideBrowser();return;}
++    if(index==4){mCobraProSportsActive=true;mSearch="";mCobraGuideRoute="channels";mCobraInspectedChannel=null;mCobraInspectedProgram=null;
++      cobraRenderGuideBrowser();cobraProSetSportsCompact(true,true);cobraSportsRefresh(false);cobraSportsScheduleNext();return;}
+     if(index==5){mCobraProSportsActive=false;cobraShowChannelSearch();return;}
+     mCobraProSportsActive=false;cobraRememberModeScroll();mCategory=index==1?"FAVORITES":index==2?"RECENT":"ALL";mSearch="";mCobraGuideRoute="channels";
+     mCobraInspectedChannel=null;mCobraInspectedProgram=null;cobraRenderGuideBrowser();
+@@ -9316,7 +9547,7 @@
+   }
+ 
+   private void cobraExitProMode(){
+-    if(!mCobraProActive)return;mCobraProActive=false;
++    if(!mCobraProActive)return;cobraProSetSportsCompact(false,false);mCobraProSportsAdapter=null;mCobraProActive=false;
+     if(mCobraProObserved!=null&&mCobraProListener!=null)mCobraProObserved.removeListener(mCobraProListener);mCobraProObserved=null;mCobraProListener=null;
+     if(mCobraProHeroUi!=null){CobraProUi.detach(mCobraProHeroUi.info);mCobraProHeroUi.info.animate().cancel();}
+     if(mCobraPreviewHost!=null){
+@@ -9485,7 +9716,7 @@
+   }
+   private void cobraAdjustProLayout(CobraModeLayout layout){
+     if(layout==null)return;
+-    int[][] boxes=CobraProUi.geometry(layout.width,layout.height,getResources().getConfiguration().fontScale,mCobraProState);
++    int[][] boxes=CobraProUi.sportsGeometry(layout.width,layout.height,getResources().getConfiguration().fontScale,mCobraProState,mCobraProSportsCollapse);
+     int[][] target={layout.toolbar,layout.video,layout.details,layout.browser};for(int i=0;i<4;i++)System.arraycopy(boxes[i],0,target[i],0,4);
+     CobraModeLayout.box(layout.rail,0,0,0,0);CobraModeLayout.box(layout.directory,0,0,0,0);CobraModeLayout.box(layout.footer,0,0,0,0);
+   }
+@@ -13741,6 +13972,7 @@
+     String score="";
+   }
+   private static final class CobraSportsGame{
++    String leagueLogo="";
+     String id="",leagueKey="",leagueLabel="",sport="",league="",name="",shortName="",state="pre",detail="",venue="";
+     long startMs=0L;boolean completed=false;
+     CobraSportsTeam home,away;
+@@ -13848,7 +14080,8 @@
+   private static CobraSportsLeagueSpec cobraSportsSpec(String key){for(CobraSportsLeagueSpec spec:COBRA_SPORTS_SPECS)if(spec.key.equals(key))return spec;return null;}
+   private static long cobraSportsIso(String value){if(value==null||value.isEmpty())return 0L;String[] patterns={"yyyy-MM-dd'T'HH:mmX","yyyy-MM-dd'T'HH:mm:ssX","yyyy-MM-dd'T'HH:mm:ss.SSSX","yyyy-MM-dd'T'HH:mm:ssXXX"};for(String p:patterns)try{SimpleDateFormat f=new SimpleDateFormat(p,Locale.US);f.setTimeZone(TimeZone.getTimeZone("UTC"));Date d=f.parse(value);if(d!=null)return d.getTime();}catch(Exception ignored){}return 0L;}
+   private static CobraSportsTeam cobraSportsParseTeam(CobraSportsLeagueSpec spec,JSONObject team,JSONObject competitor){if(team==null)return null;CobraSportsTeam out=new CobraSportsTeam();out.id=team.optString("id","");if(out.id.isEmpty())return null;out.leagueKey=spec.key;out.key=spec.key+"|"+out.id;out.name=team.optString("displayName",team.optString("name","Team"));out.shortName=team.optString("shortDisplayName",team.optString("name",out.name));out.abbreviation=team.optString("abbreviation","");out.logo=team.optString("logo","");if(competitor!=null){out.score=competitor.optString("score","");JSONArray records=competitor.optJSONArray("records");if(records!=null&&records.length()>0){JSONObject rec=records.optJSONObject(0);if(rec!=null)out.record=rec.optString("summary","");}}return out;}
+-  private static ArrayList<CobraSportsGame> cobraSportsParseScoreboard(CobraSportsLeagueSpec spec,JSONObject root){ArrayList<CobraSportsGame> out=new ArrayList<>();JSONArray events=root==null?null:root.optJSONArray("events");if(events==null)return out;for(int i=0;i<events.length();i++){JSONObject e=events.optJSONObject(i);if(e==null)continue;JSONArray comps=e.optJSONArray("competitions");JSONObject c=comps!=null&&comps.length()>0?comps.optJSONObject(0):null;if(c==null)continue;CobraSportsGame g=new CobraSportsGame();g.id=e.optString("id","");if(g.id.isEmpty())continue;g.leagueKey=spec.key;g.leagueLabel=spec.label;g.sport=spec.sport;g.league=spec.league;g.name=e.optString("name","");g.shortName=e.optString("shortName",g.name);g.startMs=cobraSportsIso(e.optString("date",""));JSONObject status=e.optJSONObject("status"),type=status==null?null:status.optJSONObject("type");g.state=type==null?"pre":type.optString("state","pre");g.detail=type==null?"":type.optString("shortDetail",type.optString("detail",""));g.completed=type!=null&&type.optBoolean("completed",false);JSONObject venue=c.optJSONObject("venue");g.venue=venue==null?"":venue.optString("fullName","");JSONArray competitors=c.optJSONArray("competitors");if(competitors!=null)for(int j=0;j<competitors.length();j++){JSONObject competitor=competitors.optJSONObject(j);JSONObject team=competitor==null?null:competitor.optJSONObject("team");CobraSportsTeam parsed=cobraSportsParseTeam(spec,team,competitor);if(parsed==null)continue;if("home".equals(competitor.optString("homeAway","")))g.home=parsed;else g.away=parsed;}JSONArray broadcasts=c.optJSONArray("broadcasts");if(broadcasts!=null)for(int b=0;b<broadcasts.length();b++){JSONObject br=broadcasts.optJSONObject(b);JSONArray names=br==null?null:br.optJSONArray("names");if(names!=null)for(int n=0;n<names.length();n++){String name=names.optString(n,"").trim();if(!name.isEmpty()&&!g.broadcasts.contains(name))g.broadcasts.add(name);}}if(g.home!=null&&g.away!=null)out.add(g);}return out;}
++  private static ArrayList<CobraSportsGame> cobraSportsParseScoreboard(CobraSportsLeagueSpec spec,JSONObject root){ArrayList<CobraSportsGame> out=new ArrayList<>();JSONArray events=root==null?null:root.optJSONArray("events");if(events==null)return out;for(int i=0;i<events.length();i++){JSONObject e=events.optJSONObject(i);if(e==null)continue;JSONArray comps=e.optJSONArray("competitions");JSONObject c=comps!=null&&comps.length()>0?comps.optJSONObject(0):null;if(c==null)continue;CobraSportsGame g=new CobraSportsGame();g.id=e.optString("id","");if(g.id.isEmpty())continue;g.leagueKey=spec.key;g.leagueLabel=spec.label;
++      JSONArray leagueEntries=root.optJSONArray("leagues");JSONObject leagueEntry=leagueEntries==null?null:leagueEntries.optJSONObject(0);JSONArray marks=leagueEntry==null?null:leagueEntry.optJSONArray("logos");JSONObject mark=marks==null?null:marks.optJSONObject(0);g.leagueLogo=mark==null?"":mark.optString("href","");g.sport=spec.sport;g.league=spec.league;g.name=e.optString("name","");g.shortName=e.optString("shortName",g.name);g.startMs=cobraSportsIso(e.optString("date",""));JSONObject status=e.optJSONObject("status"),type=status==null?null:status.optJSONObject("type");g.state=type==null?"pre":type.optString("state","pre");g.detail=type==null?"":type.optString("shortDetail",type.optString("detail",""));g.completed=type!=null&&type.optBoolean("completed",false);JSONObject venue=c.optJSONObject("venue");g.venue=venue==null?"":venue.optString("fullName","");JSONArray competitors=c.optJSONArray("competitors");if(competitors!=null)for(int j=0;j<competitors.length();j++){JSONObject competitor=competitors.optJSONObject(j);JSONObject team=competitor==null?null:competitor.optJSONObject("team");CobraSportsTeam parsed=cobraSportsParseTeam(spec,team,competitor);if(parsed==null)continue;if("home".equals(competitor.optString("homeAway","")))g.home=parsed;else g.away=parsed;}JSONArray broadcasts=c.optJSONArray("broadcasts");if(broadcasts!=null)for(int b=0;b<broadcasts.length();b++){JSONObject br=broadcasts.optJSONObject(b);JSONArray names=br==null?null:br.optJSONArray("names");if(names!=null)for(int n=0;n<names.length();n++){String name=names.optString(n,"").trim();if(!name.isEmpty()&&!g.broadcasts.contains(name))g.broadcasts.add(name);}}if(g.home!=null&&g.away!=null)out.add(g);}return out;}
+ 
+   private static void cobraSportsCollectStandings(JSONObject node,ArrayList<String> out,int depth){if(node==null||depth>5)return;String group=node.optString("name",node.optString("abbreviation",""));JSONObject standings=node.optJSONObject("standings");JSONArray entries=standings==null?null:standings.optJSONArray("entries");if(entries!=null&&entries.length()>0){if(!group.isEmpty())out.add(group.toUpperCase(Locale.US));for(int i=0;i<entries.length();i++){JSONObject entry=entries.optJSONObject(i),team=entry==null?null:entry.optJSONObject("team");if(team==null)continue;StringBuilder line=new StringBuilder(team.optString("displayName","Team"));JSONArray stats=entry.optJSONArray("stats");String wins="",losses="",ties="",summary="";if(stats!=null)for(int s=0;s<stats.length();s++){JSONObject st=stats.optJSONObject(s);if(st==null)continue;String name=st.optString("name","");if("wins".equals(name))wins=st.optString("displayValue","");else if("losses".equals(name))losses=st.optString("displayValue","");else if("ties".equals(name))ties=st.optString("displayValue","");else if("overall".equals(name))summary=st.optString("displayValue","");}if(!summary.isEmpty())line.append("  •  ").append(summary);else if(!wins.isEmpty()||!losses.isEmpty()){line.append("  •  ").append(wins).append("-").append(losses);if(!ties.isEmpty()&&!"0".equals(ties))line.append("-").append(ties);}out.add(line.toString());}}
+     JSONArray children=node.optJSONArray("children");if(children!=null)for(int i=0;i<children.length();i++)cobraSportsCollectStandings(children.optJSONObject(i),out,depth+1);
+@@ -13860,8 +14093,14 @@
+   private boolean cobraSportsMultiOverlay(){return mPrefs.getBoolean(COBRA_SPORTS_MULTI_OVERLAY,true);}
+   private boolean cobraSportsFavorite(CobraSportsTeam team){return team!=null&&cobraSportsFavoriteTeams().contains(team.key);}
+   private boolean cobraSportsFavoriteGame(CobraSportsGame game){return game!=null&&(cobraSportsFavorite(game.home)||cobraSportsFavorite(game.away));}
+-  private void cobraSportsToggleFavorite(CobraSportsTeam team){if(team==null)return;Set<String> favorites=cobraSportsFavoriteTeams();if(!favorites.add(team.key))favorites.remove(team.key);mPrefs.edit().putStringSet(COBRA_SPORTS_FAVORITES,favorites).apply();if(cobraSportsVisible())cobraSportsRenderCurrent();}
+-  private boolean cobraSportsVisible(){String title=mCobraStageTitle==null?"":mCobraStageTitle;return COBRA_OWNER_SPORTS.equals(cobraDrawerOwner())&&title.startsWith("COBRA • SPORTS");}
++  private boolean cobraSportsVisible(){
++    if(!mCobraPlaybackPolicy.resumed||isCobraInPictureInPicture())return false;
++    if(mCobraPlayerDrawer!=null&&"SPORTS".equals(mCobraDrawerFilter)&&cobraProPlayerSportsEnabled())return true;
++    if(mMultiOverlay!=null)return !mCobraSportsMultiAssignments.isEmpty();
++    if(mPlayerOverlay==null&&mCobraProActive&&(mCobraProSportsActive||cobraProSportsHeroActive()))return true;
++    String title=mCobraStageTitle==null?"":mCobraStageTitle;return COBRA_OWNER_SPORTS.equals(cobraDrawerOwner())&&title.startsWith("COBRA • SPORTS");
++  }
++
+   private String cobraSportsClock(long time){if(time<=0)return "Time unavailable";return new SimpleDateFormat("EEE • MMM d • h:mm a",Locale.US).format(new Date(time));}
+   private String cobraSportsScore(CobraSportsTeam team){if(team==null)return "";if(cobraSportsHideScores())return "—";return team.score==null||team.score.isEmpty()?"—":team.score;}
+   private String cobraSportsMatchup(CobraSportsGame game){if(game==null)return "Game";String a=game.away==null?"Away":game.away.shortName,h=game.home==null?"Home":game.home.shortName;return a+" @ "+h;}
+@@ -13943,7 +14182,7 @@
+ 
+   private void cobraSportsOpenSmartMultiView(String scope,String focusId){if(mMultiChannels!=null&&mMultiChannels.length>=4){toast("All four Multi-View slots are already pinned");return;}ArrayList<CobraSportsGame> candidates=new ArrayList<>();for(CobraSportsGame g:mCobraSportsGames){if(!g.live())continue;if("myteams".equals(scope)&&!cobraSportsFavoriteGame(g))continue;if(!"live".equals(scope)&&!"myteams".equals(scope)&&!scope.equals(g.leagueKey))continue;candidates.add(g);}candidates.sort((a,b)->{if(focusId!=null){if(focusId.equals(a.id))return -1;if(focusId.equals(b.id))return 1;}boolean af=cobraSportsFavoriteGame(a),bf=cobraSportsFavoriteGame(b);if(af!=bf)return af?-1:1;return Long.compare(a.startMs,b.startMs);});if(candidates.isEmpty()){toast("No live games are available for this Smart Multi-View");return;}final long request=++mCobraSportsActionSerial,ticket=mCobraNavigation.current();final String owner=cobraDrawerOwner(),profile=mFeatures.activeProfileId();final ArrayList<CobraSportsChannelInfo> snapshot=cobraSportsChannelSnapshot();toast("Building Smart Sports Multi-View…");submitCobraIo(()->{LinkedHashMap<String,CobraSportsGame> selected=new LinkedHashMap<>();for(CobraSportsGame g:candidates){ArrayList<CobraSportsMatch> matches=cobraSportsResolve(g,snapshot);if(!cobraSportsUniqueStrong(matches))continue;String id=matches.get(0).channel.id;if(!selected.containsKey(id))selected.put(id,g);if(selected.size()>=4)break;}publishCobraUi(()->{if(request!=mCobraSportsActionSerial||!mCobraNavigation.accepts(ticket)||!owner.equals(cobraDrawerOwner())||!profile.equals(mFeatures.activeProfileId()))return;cobraSportsLaunchSmartMulti(selected,snapshot);});});}
+   private void cobraSportsLaunchSmartMulti(LinkedHashMap<String,CobraSportsGame> selected,List<CobraSportsChannelInfo> snapshot){ArrayList<Channel> out=new ArrayList<>();Map<String,CobraSportsGame> assignments=new LinkedHashMap<>();if(mMultiChannels!=null)for(Channel c:mMultiChannels)if(c!=null&&out.size()<4){out.add(c);CobraSportsGame old=mCobraSportsMultiAssignments.get(c.id);if(old!=null)assignments.put(c.id,old);}for(Map.Entry<String,CobraSportsGame> entry:selected.entrySet()){if(out.size()>=4)break;Channel channel=null;for(CobraSportsChannelInfo info:snapshot)if(info.channel.id.equals(entry.getKey())){channel=info.channel;break;}if(channel==null)continue;boolean duplicate=false;for(Channel c:out)if(c.id.equals(channel.id)){duplicate=true;break;}if(!duplicate){out.add(channel);assignments.put(channel.id,entry.getValue());}}if(out.size()<2){if(out.size()==1&&mMultiChannels==null){playChannel(out.get(0));return;}toast("Fewer than two unambiguous live broadcasts were found");return;}mCobraSportsMultiAssignments.clear();mCobraSportsMultiAssignments.putAll(assignments);openMultiView(out);mMain.post(this::cobraSportsRefreshMultiOverlays);}
+-  private void cobraSportsRefreshMultiOverlays(){if(mCobraTiles==null||mCobraTiles.isEmpty())return;for(CobraVideoTile tile:mCobraTiles.values()){View old=tile.view.findViewWithTag("cobra_sports_multi_overlay");if(old!=null)tile.view.removeView(old);CobraSportsGame g=mCobraSportsMultiAssignments.get(tile.channel.id);if(g==null||!cobraSportsMultiOverlay())continue;TextView label=cobraText(cobraSportsScoreLine(g)+"\n"+(g.live()?"LIVE • ":"")+g.detail,Color.WHITE,11);label.setTag("cobra_sports_multi_overlay");label.setMaxLines(2);label.setPadding(dp(8),dp(5),dp(8),dp(5));label.setBackgroundColor(0xbb07111c);FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-2,-2,Gravity.LEFT|Gravity.TOP);p.leftMargin=dp(8);p.topMargin=dp(8);tile.view.addView(label,p);}}
++  private void cobraSportsRefreshMultiOverlays(){if(mCobraTiles==null||mCobraTiles.isEmpty())return;for(CobraVideoTile tile:mCobraTiles.values()){View old=tile.view.findViewWithTag("cobra_sports_multi_overlay");if(old!=null)tile.view.removeView(old);CobraSportsGame g=mCobraSportsMultiAssignments.get(tile.channel.id);if(g!=null){CobraSportsGame fresh=cobraSportsGame(g.id);if(fresh!=null){g=fresh;mCobraSportsMultiAssignments.put(tile.channel.id,fresh);}}if(g==null||!cobraSportsMultiOverlay())continue;TextView label=cobraText(cobraSportsScoreLine(g)+"\n"+(g.live()?"LIVE • ":"")+g.detail,Color.WHITE,11);label.setTag("cobra_sports_multi_overlay");label.setMaxLines(2);label.setPadding(dp(8),dp(5),dp(8),dp(5));label.setBackgroundColor(0xbb07111c);FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-2,-2,Gravity.LEFT|Gravity.TOP);p.leftMargin=dp(8);p.topMargin=dp(8);tile.view.addView(label,p);}}
+ 
+   private void showCobraSportsSettings(){LinearLayout rows=cobraOpenSheet("Sports settings","Favorite teams • leagues • spoilers • Multi-View","sports-settings");boolean dark=cobraSheetIsDark();rows.addView(cobraSheetRow("favorite","Favorite teams",cobraSportsFavoriteTeams().size()+" followed",false,dark,()->showCobraSportsFavoriteLeagues()));rows.addView(cobraSheetRow("guide","Enabled leagues",cobraSportsEnabledLeagues().size()+" enabled",false,dark,()->showCobraSportsLeagueSettings()));rows.addView(cobraSheetRow("settings","Hide scores",cobraSportsHideScores()?"On":"Off",cobraSportsHideScores(),dark,()->{mPrefs.edit().putBoolean(COBRA_SPORTS_HIDE_SCORES,!cobraSportsHideScores()).apply();closeCobraActionSheet();showCobraSportsSettings();cobraSportsRenderCurrent();cobraSportsRefreshMultiOverlays();}));rows.addView(cobraSheetRow("multiview","Sports Multi-View overlay",cobraSportsMultiOverlay()?"On":"Off",cobraSportsMultiOverlay(),dark,()->{mPrefs.edit().putBoolean(COBRA_SPORTS_MULTI_OVERLAY,!cobraSportsMultiOverlay()).apply();closeCobraActionSheet();showCobraSportsSettings();cobraSportsRefreshMultiOverlays();}));rows.addView(cobraSheetRow("health","Sports diagnostics","Resolver and data-source status",false,dark,()->showCobraSportsDiagnostics()));}
+   private void showCobraSportsLeagueSettings(){LinearLayout rows=cobraOpenSheet("Enabled sports leagues","Tap to enable or disable • at least one remains enabled","sports-leagues");Set<String> enabled=cobraSportsEnabledLeagues();for(CobraSportsLeagueSpec spec:COBRA_SPORTS_SPECS){boolean selected=enabled.contains(spec.key);rows.addView(cobraSheetRow("guide",spec.label,selected?"Enabled":"Disabled",selected,cobraSheetIsDark(),()->{Set<String> next=cobraSportsEnabledLeagues();if(next.contains(spec.key)){if(next.size()==1){toast("Keep at least one league enabled");return;}next.remove(spec.key);}else next.add(spec.key);mPrefs.edit().putStringSet(COBRA_SPORTS_LEAGUES,next).apply();mCobraSportsLastRefresh=0;closeCobraActionSheet();showCobraSportsLeagueSettings();cobraSportsRefresh(true);}));}}
+--- a/tools/android/packaging/xbmc/src/CobraProUi.java.in
++++ b/tools/android/packaging/xbmc/src/CobraProUi.java.in
+@@ -23,6 +23,7 @@
+     float progress=-1; boolean live,favorite,sports,sportsAvailable,sportsMultiAvailable;
+   }
+   static final class SportsGame {
++    String leagueLogo="",network="",status="",date="",time="";
+     String id="",league="",away="Away",awayAbbr="",awayLogo="",home="Home",homeAbbr="",homeLogo="",score="",meta="";
+     boolean live,upcoming,favorite,soccer,selected;
+   }
+@@ -43,6 +44,14 @@
+ 
+     for(int[] b:r){b[0]=Math.max(0,Math.min(w,b[0]));b[1]=Math.max(0,Math.min(h,b[1]));b[2]=Math.max(0,Math.min(b[2],w-b[0]));b[3]=Math.max(0,Math.min(b[3],h-b[1]));}
+     return r;
++  }
++  static int[][] sportsGeometry(int width,int height,float font,int state,float collapse){
++    int[][] boxes=geometry(width,height,font,state);float amount=Math.max(0,Math.min(1,collapse));
++    int original=boxes[1][3],compact=Math.min(original,Math.max(152,Math.round((original-74)*.5f+74)));
++    int delta=Math.round((original-compact)*amount);boxes[1][3]-=delta;
++    if(boxes[2][3]>0)boxes[2][1]-=delta;
++    if(boxes[3][1]>boxes[1][1]){boxes[3][1]-=delta;boxes[3][3]+=delta;}
++    return boxes;
+   }
+   static boolean owns(View view){
+     for(int depth=0;view!=null&&depth<24;depth++){
+@@ -111,6 +120,13 @@
+       setTag("pro_action_"+label.toLowerCase(java.util.Locale.ROOT).replace(' ','_'));setContentDescription(label);setFocusable(true);setClickable(true);setOnClickListener(v->click.run());}
+     void label(String glyph,String label){this.glyph=glyph;this.label=label;setContentDescription(label);invalidate();}
+     @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
++    @Override public void setPressed(boolean pressed){
++      super.setPressed(pressed);animate().cancel();float scale=pressed?.97f:1f;
++      if(motion()&&isAttachedToWindow())animate().scaleX(scale).scaleY(scale).setDuration(pressed?100:200)
++          .setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();
++      else{setScaleX(scale);setScaleY(scale);}
++    }
++    @Override protected void onDetachedFromWindow(){animate().cancel();setScaleX(1);setScaleY(1);super.onDetachedFromWindow();}
+     @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo i){super.onInitializeAccessibilityNodeInfo(i);i.setClassName("android.widget.Button");i.setCheckable(false);i.setSelected(isSelected());}
+     @Override protected void onDraw(Canvas c){super.onDraw(c);float den=getResources().getDisplayMetrics().density,w=getWidth(),h=getHeight();boolean active=isEnabled()&&(primary||isSelected()||isPressed()||isFocused());
+       int ink=overlay?Color.WHITE:light?INK:Color.WHITE;
+@@ -191,7 +207,7 @@
+       setState(RESTING,null,false);
+     }
+     void bind(Program d,int index,int count){sportsMode=d.sports;hasChannel=!"Choose a channel".equals(d.channel);source.text(d.source);source.setContentDescription(d.source+", item "+(index+1)+" of "+count);live.text("LIVE");live.setVisibility(d.live?VISIBLE:GONE);dots.index=index;dots.count=Math.min(6,Math.max(1,count));dots.invalidate();dots.setVisibility(count>1?VISIBLE:INVISIBLE);left.setVisibility(count>1?VISIBLE:GONE);right.setVisibility(count>1?VISIBLE:GONE);status.text(d.status);player[1].setSelected(d.favorite);
+-      if(sportsMode){logo.setVisibility(GONE);info.setVisibility(GONE);sportsAway.setVisibility(VISIBLE);sportsHome.setVisibility(VISIBLE);sportsMatchup.setVisibility(VISIBLE);sportsScore.setVisibility(VISIBLE);sportsMeta.setVisibility(VISIBLE);sportsAway.bind(d.sportsAway.isEmpty()?d.sportsAwayAbbr:d.sportsAway,d.sportsAwayLogo,art);sportsHome.bind(d.sportsHome.isEmpty()?d.sportsHomeAbbr:d.sportsHome,d.sportsHomeLogo,art);String matchup=(d.sportsAwayAbbr.isEmpty()?d.sportsAway:d.sportsAwayAbbr)+"   @   "+(d.sportsHomeAbbr.isEmpty()?d.sportsHome:d.sportsHomeAbbr);sportsMatchup.text(matchup.trim().isEmpty()?d.title:matchup);sportsScore.text(d.sportsScore.isEmpty()?d.schedule:d.sportsScore);sportsMeta.text(d.sportsMeta.isEmpty()?d.next:d.sportsMeta);sportsWatch.setEnabled(d.sportsAvailable);sportsStats.setEnabled(d.sportsAvailable);sportsMulti.setEnabled(d.sportsMultiAvailable);}
++      if(sportsMode){logo.setVisibility(GONE);info.setVisibility(GONE);sportsAway.setVisibility(d.live?VISIBLE:GONE);sportsHome.setVisibility(d.live?VISIBLE:GONE);sportsMatchup.setVisibility(d.live?VISIBLE:GONE);sportsScore.setVisibility(d.live?VISIBLE:GONE);sportsMeta.setVisibility(d.live?VISIBLE:GONE);sportsAway.bind(d.sportsAway.isEmpty()?d.sportsAwayAbbr:d.sportsAway,d.sportsAwayLogo,art);sportsHome.bind(d.sportsHome.isEmpty()?d.sportsHomeAbbr:d.sportsHome,d.sportsHomeLogo,art);String matchup=(d.sportsAwayAbbr.isEmpty()?d.sportsAway:d.sportsAwayAbbr)+"   @   "+(d.sportsHomeAbbr.isEmpty()?d.sportsHome:d.sportsHomeAbbr);sportsMatchup.text(matchup.trim().isEmpty()?d.title:matchup);sportsScore.text(d.sportsScore.isEmpty()?d.schedule:d.sportsScore);sportsMeta.text(d.sportsMeta.isEmpty()?d.next:d.sportsMeta);sportsWatch.setEnabled(d.sportsAvailable);sportsStats.setEnabled(d.sportsAvailable);sportsMulti.setEnabled(d.sportsMultiAvailable);}
+       else{logo.setVisibility(VISIBLE);info.setVisibility(VISIBLE);sportsAway.setVisibility(GONE);sportsHome.setVisibility(GONE);sportsMatchup.setVisibility(GONE);sportsScore.setVisibility(GONE);sportsMeta.setVisibility(GONE);logo.bind(d.channel,d.logo,art);info.bind(d,art);preview.setEnabled(hasChannel);}
+       applyModeVisibility();
+     }
+@@ -263,14 +279,72 @@
+     @Override protected void onMeasure(int ws,int hs){int w=MeasureSpec.getSize(ws),h=height(getContext());setMeasuredDimension(w,h);for(Action a:buttons)exact(a,w/4,h);}
+     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){int w=r-l;for(int i=0;i<4;i++)place(buttons[i],w*i/4,0,w*(i+1)/4-w*i/4,b-t);}
+   }
++  /** A live row owns presentation only; callbacks retain the existing playback owners. */
+   static final class GameRow extends ViewGroup {
+-    final Ink league,matchup,score,meta;final Logo away,home;final Action play;final Paint line=new Paint(3);boolean light;Runnable select,watch;SportsGame data=new SportsGame();
+-    GameRow(Context c,boolean light,Runnable select,Runnable watch){super(c);this.light=light;this.select=select;this.watch=watch;setWillNotDraw(false);league=new Ink(c,light?0xff087b9c:CYAN,10,true);matchup=new Ink(c,light?INK:Color.WHITE,15,true);matchup.setGravity(Gravity.CENTER);score=new Ink(c,light?INK:Color.WHITE,13,true);score.setGravity(Gravity.CENTER);meta=new Ink(c,light?MUTED:0xffb5c8d8,11,false);meta.setGravity(Gravity.CENTER);away=new Logo(c,light);home=new Logo(c,light);play=new Action(c,"play","",false,light,()->{if(this.watch!=null)this.watch.run();});play.setContentDescription("Watch game");for(View v:new View[]{league,away,matchup,score,home,meta,play})addView(v);setClickable(true);setFocusable(true);setOnClickListener(v->{if(this.select!=null)this.select.run();});}
+-    void bind(SportsGame d,Art art){data=d;league.text(d.league+(d.live?"  •  LIVE":"")+(d.soccer?"  •  SOCCER":""));away.bind(d.away,d.awayLogo,art);home.bind(d.home,d.homeLogo,art);String a=d.awayAbbr.isEmpty()?d.away:d.awayAbbr,h=d.homeAbbr.isEmpty()?d.home:d.homeAbbr;matchup.text(a+"   @   "+h);score.text(d.score.isEmpty()?d.away+" @ "+d.home:d.score);meta.text(d.meta);setSelected(d.selected);setBackground(d.selected?surface(getContext(),light,true,12):null);setContentDescription(d.league+", "+d.away+" at "+d.home+", "+d.meta);play.setContentDescription(d.live?"Watch live "+d.away+" at "+d.home:"Game options for "+d.away+" at "+d.home);}
+-    static int height(Context c,int widthDp){return px(c,(widthDp<600?96:78)+Math.max(0,font(c)-1)*34);}
+-    @Override protected void onMeasure(int ws,int hs){int w=MeasureSpec.getSize(ws);setMeasuredDimension(w,MeasureSpec.getSize(hs)>0?MeasureSpec.getSize(hs):height(getContext(),Math.round(w/getResources().getDisplayMetrics().density)));}
+-    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){int w=r-l,h=b-t,p=px(getContext(),7),logo=px(getContext(),42),button=px(getContext(),48),end=w-p-button-px(getContext(),8),start=p+px(getContext(),58),mid=Math.max(0,end-start);place(league,p,px(getContext(),5),px(getContext(),100),px(getContext(),18));place(away,p+px(getContext(),4),(h-logo)/2,logo,logo);place(home,end-logo,(h-logo)/2,logo,logo);place(play,w-p-button,(h-button)/2,button,button);int centerStart=start+logo/2,centerEnd=end-logo-px(getContext(),8),centerW=Math.max(0,centerEnd-centerStart);place(matchup,centerStart,px(getContext(),8),centerW,px(getContext(),24));place(score,centerStart,px(getContext(),32),centerW,px(getContext(),22));place(meta,centerStart,px(getContext(),55),centerW,Math.max(px(getContext(),18),h-px(getContext(),58)));}
+-    @Override protected void onDraw(Canvas c){super.onDraw(c);line.setColor(light?0xffd9e5ee:0xff274353);c.drawRect(px(getContext(),7),getHeight()-px(getContext(),1),getWidth()-px(getContext(),7),getHeight(),line);if(isFocused()){line.setStyle(Paint.Style.STROKE);line.setColor(CYAN);line.setStrokeWidth(px(getContext(),2));c.drawRoundRect(1,1,getWidth()-1,getHeight()-1,px(getContext(),10),px(getContext(),10),line);line.setStyle(Paint.Style.FILL);}}
++    final Ink league,matchup,score,meta,network,awayName,homeName,badge;
++    final Logo away,home,leagueMark;final Action play,more;final Paint line=new Paint(3);
++    boolean light;Runnable select,watch,options;SportsGame data=new SportsGame();
++    GameRow(Context c,boolean light,Runnable select,Runnable watch){
++      super(c);this.light=light;this.select=select;this.watch=watch;setWillNotDraw(false);
++      league=new Ink(c,light?0xff087b9c:CYAN,10,true);
++      matchup=new Ink(c,light?INK:Color.WHITE,14,true);matchup.setVisibility(GONE);
++      score=new Ink(c,light?INK:Color.WHITE,22,true);score.setGravity(Gravity.CENTER);
++      meta=new Ink(c,light?MUTED:0xffb5c8d8,12,false);meta.setGravity(Gravity.CENTER);
++      network=new Ink(c,light?MUTED:0xffb5c8d8,11,false);network.setGravity(Gravity.CENTER);
++      awayName=new Ink(c,light?INK:Color.WHITE,14,true);awayName.setGravity(Gravity.CENTER);
++      homeName=new Ink(c,light?INK:Color.WHITE,14,true);homeName.setGravity(Gravity.CENTER);
++      badge=new Ink(c,Color.WHITE,10,true);badge.setGravity(Gravity.CENTER);
++      away=new Logo(c,light);home=new Logo(c,light);leagueMark=new Logo(c,light);
++      play=new Action(c,"play","",false,light,()->{if(this.watch!=null)this.watch.run();});
++      more=new Action(c,"more","",false,light,()->{if(this.options!=null)this.options.run();});
++      for(View v:new View[]{league,leagueMark,away,awayName,matchup,score,meta,network,homeName,home,badge,play,more})addView(v);
++      score.setTag("pro_game_score");meta.setTag("pro_game_status");network.setTag("pro_game_network");badge.setTag("pro_game_badge");
++      setClickable(true);setFocusable(true);setOnClickListener(v->{if(this.select!=null)this.select.run();});
++    }
++    void bind(SportsGame d,Art art){
++      boolean changed=!data.id.isEmpty()&&data.id.equals(d.id)&&d.live&&!data.score.equals(d.score);
++      data=d;league.text(d.league+(d.soccer?" • SOCCER":""));leagueMark.bind(d.league,d.leagueLogo,art);
++      leagueMark.setVisibility(d.leagueLogo.isEmpty()?GONE:VISIBLE);
++      away.bind(d.away,d.awayLogo,art);home.bind(d.home,d.homeLogo,art);
++      awayName.text(d.awayAbbr.isEmpty()?d.away:d.awayAbbr);homeName.text(d.homeAbbr.isEmpty()?d.home:d.homeAbbr);
++      matchup.text(awayName.getText()+" @ "+homeName.getText());
++      score.animate().cancel();score.setAlpha(1);score.setTranslationY(0);
++      score.text(d.upcoming?d.date:d.score);score.setTextSize(d.upcoming?13:22);
++      meta.text(d.upcoming?d.time:d.status.isEmpty()?d.meta:d.status);network.text(d.network);
++      badge.text(d.live?"● LIVE":d.upcoming?"UPCOMING":"FINAL");
++      GradientDrawable pill=new GradientDrawable();pill.setColor(d.live?0xffdf2948:light?0xffd1e1eb:0xff294252);
++      pill.setCornerRadius(px(getContext(),12));badge.setBackground(pill);badge.ink(d.live?Color.WHITE:light?INK:Color.WHITE);
++      setSelected(d.selected);setBackground(surface(getContext(),light,d.selected,12));
++      setContentDescription(d.league+", "+d.away+" at "+d.home+", "+score.getText()+", "+meta.getText()+", "+d.network);
++      play.setContentDescription(d.live?"Watch live "+d.away+" at "+d.home:"Game options for "+d.away+" at "+d.home);
++      more.setContentDescription("More options for "+d.away+" at "+d.home);
++      if(changed&&motion()&&isAttachedToWindow()){
++        score.setAlpha(.45f);score.setTranslationY(px(getContext(),5));
++        score.animate().alpha(1).translationY(0).setDuration(240)
++            .setInterpolator(new android.view.animation.PathInterpolator(.2f,0f,0f,1f)).start();
++      }
++    }
++    static int height(Context c,int widthDp){return px(c,(widthDp<480?128:96)+Math.max(0,font(c)-1)*48);}
++    @Override protected void onMeasure(int ws,int hs){int w=MeasureSpec.getSize(ws);setMeasuredDimension(w,height(getContext(),Math.round(w/getResources().getDisplayMetrics().density)));}
++    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
++      int w=r-l,h=b-t,p=px(getContext(),8),button=px(getContext(),44),ls=px(getContext(),36);
++      boolean compact=w<px(getContext(),480);int controls=2*button,content=Math.max(0,w-2*p-controls);
++      int header=compact?px(getContext(),30):0,left=compact?p:p+px(getContext(),72);
++      int end=p+content,span=Math.max(0,end-left),team=Math.round(span*(compact?.22f:.25f));
++      int center=left+team,centerW=Math.max(0,span-2*team),cy=header+(h-header)/2;
++      place(leagueMark,p,compact?px(getContext(),4):px(getContext(),9),px(getContext(),22),px(getContext(),20));
++      place(league,p+(data.leagueLogo.isEmpty()?0:px(getContext(),26)),compact?px(getContext(),5):px(getContext(),10),compact?Math.max(0,content-px(getContext(),98)):px(getContext(),42),px(getContext(),19));
++      place(badge,compact?Math.max(p,end-px(getContext(),76)):p,compact?px(getContext(),5):px(getContext(),47),px(getContext(),72),px(getContext(),22));
++      place(away,left+Math.max(0,(team-ls)/2),cy-ls/2-px(getContext(),9),Math.min(ls,team),ls);
++      place(home,end-team+Math.max(0,(team-ls)/2),cy-ls/2-px(getContext(),9),Math.min(ls,team),ls);
++      place(awayName,left,cy+px(getContext(),12),team,px(getContext(),22));place(homeName,end-team,cy+px(getContext(),12),team,px(getContext(),22));
++      int sh=px(getContext(),data.upcoming?22:30),mh=px(getContext(),20*font(getContext()));
++      place(score,center,cy-sh/2-mh/2,centerW,sh);place(meta,center,cy+sh/2-mh/2,centerW,mh);
++      place(network,center,cy+sh/2+mh/2,centerW,px(getContext(),18*font(getContext())));
++      place(play,w-p-controls,(h-button)/2,button,button);place(more,w-p-button,(h-button)/2,button,button);
++    }
++    @Override protected void onDetachedFromWindow(){score.animate().cancel();score.setAlpha(1);score.setTranslationY(0);animate().cancel();setAlpha(1);setTranslationY(0);super.onDetachedFromWindow();}
++    @Override protected void onDraw(Canvas c){super.onDraw(c);if(isFocused()){line.setStyle(Paint.Style.STROKE);line.setColor(CYAN);line.setStrokeWidth(px(getContext(),2));c.drawRoundRect(1,1,getWidth()-1,getHeight()-1,px(getContext(),12),px(getContext(),12),line);}}
+   }
+   static final class ChannelRow extends ViewGroup {
+     final Ink number,name,program,time;final Logo logo;final Progress progress;final Action play;final Paint line=new Paint(3);boolean light;int widthDp;
