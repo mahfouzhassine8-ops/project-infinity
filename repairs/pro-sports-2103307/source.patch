@@ -453,7 +453,7 @@
        else{logo.setVisibility(VISIBLE);info.setVisibility(VISIBLE);sportsAway.setVisibility(GONE);sportsHome.setVisibility(GONE);sportsMatchup.setVisibility(GONE);sportsScore.setVisibility(GONE);sportsMeta.setVisibility(GONE);logo.bind(d.channel,d.logo,art);info.bind(d,art);preview.setEnabled(hasChannel);}
        applyModeVisibility();
      }
-@@ -263,14 +279,72 @@
+@@ -263,14 +279,74 @@
      @Override protected void onMeasure(int ws,int hs){int w=MeasureSpec.getSize(ws),h=height(getContext());setMeasuredDimension(w,h);for(Action a:buttons)exact(a,w/4,h);}
      @Override protected void onLayout(boolean changed,int l,int t,int r,int b){int w=r-l;for(int i=0;i<4;i++)place(buttons[i],w*i/4,0,w*(i+1)/4-w*i/4,b-t);}
    }
@@ -488,6 +488,8 @@
 +    }
 +    void bind(SportsGame d,Art art){
 +      boolean changed=!data.id.isEmpty()&&data.id.equals(d.id)&&d.live&&!data.score.equals(d.score);
++      boolean materialChanged=getBackground()==null||data.selected!=d.selected;
++      boolean badgeChanged=badge.getBackground()==null||data.live!=d.live||data.upcoming!=d.upcoming;
 +      data=d;league.text(d.league+(d.soccer?" • SOCCER":""));leagueMark.bind(d.league,d.leagueLogo,art);
 +      leagueMark.setVisibility(d.leagueLogo.isEmpty()?GONE:VISIBLE);
 +      away.bind(d.away,d.awayLogo,art);home.bind(d.home,d.homeLogo,art);
@@ -498,8 +500,8 @@
 +      meta.text(d.upcoming?d.time:d.status.isEmpty()?d.meta:d.status);network.text(d.network);
 +      badge.text(d.live?"● LIVE":d.upcoming?"UPCOMING":"FINAL");
 +      GradientDrawable pill=new GradientDrawable();pill.setColor(d.live?0xffdf2948:light?0xffd1e1eb:0xff294252);
-+      pill.setCornerRadius(px(getContext(),12));badge.setBackground(pill);badge.ink(d.live?Color.WHITE:light?INK:Color.WHITE);
-+      setSelected(d.selected);setBackground(surface(getContext(),light,d.selected,12));
++      pill.setCornerRadius(px(getContext(),12));if(badgeChanged)badge.setBackground(pill);badge.ink(d.live?Color.WHITE:light?INK:Color.WHITE);
++      setSelected(d.selected);if(materialChanged)setBackground(surface(getContext(),light,d.selected,12));
 +      setContentDescription(d.league+", "+d.away+" at "+d.home+", "+score.getText()+", "+meta.getText()+", "+d.network);
 +      play.setContentDescription(d.live?"Watch live "+d.away+" at "+d.home:"Game options for "+d.away+" at "+d.home);
 +      more.setContentDescription("More options for "+d.away+" at "+d.home);

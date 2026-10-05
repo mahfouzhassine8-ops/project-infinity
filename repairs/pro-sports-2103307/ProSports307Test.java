@@ -86,7 +86,7 @@ public class ProSports307Test {
   InfinityLiveActivity a=f.fixture(4);try{Object g=game("live","mlb","in","3","2");((SharedPreferences)get(a,"mPrefs")).edit().putBoolean("cobra_sports_hide_scores",true).commit();CobraProUi.SportsGame d=(CobraProUi.SportsGame)call(a,"cobraProSportsUiGame",g);assertEquals("Scores hidden",d.score);assertEquals("3",get(get(g,"away"),"score"));}finally{f.clean(a);}
  }
  @Test public void channelsSportsTabIsProOnlyAndGroupsStaySelected()throws Exception{
-  InfinityLiveActivity a=f.fixture(8);try{pro(a);assertEquals(true,call(a,"cobraProPlayerSportsEnabled"));call(a,"openPlayerOverlay",((List<?>)get(a,"mChannels")).get(0));call(a,"showCobraPlayerDrawer");f.measure(a,412,915);
+  InfinityLiveActivity a=f.fixture(8);try{pro(a);assertEquals(true,call(a,"cobraProPlayerSportsEnabled"));put(a,"mPlayer",Cobra2103201ScrubberTest.proxy(new Cobra2103201ScrubberTest.Controlled()));call(a,"openPlayerOverlay",((List<?>)get(a,"mChannels")).get(0));call(a,"showCobraPlayerDrawer");f.measure(a,412,915);
    View drawer=(View)get(a,"mCobraPlayerDrawer");assertNotNull(drawer.findViewWithTag("cobra_player_tab_SPORTS"));call(a,"cobraRenderPlayerDrawer","CATEGORIES");assertTrue(drawer.findViewWithTag("cobra_player_tab_CATEGORIES").isSelected());call(a,"cobraRenderPlayerDrawer","SPORTS");assertTrue(drawer.findViewWithTag("cobra_player_tab_SPORTS").isSelected());assertTrue(text(drawer).contains("No games are live right now."));
    ((SharedPreferences)get(a,"mPrefs")).edit().putString("guide_view_mode","grid").commit();assertEquals(false,call(a,"cobraProPlayerSportsEnabled"));
   }finally{f.clean(a);}
@@ -106,10 +106,30 @@ public class ProSports307Test {
   Cobra2103202LifecycleTest h=new Cobra2103202LifecycleTest();h.before();try{h.multi(2);InfinityLiveActivity a=h.a;Object g=game("third","mlb","in","3","2");add(a,g);
    LinkedHashMap<String,Object> choices=new LinkedHashMap<>();choices.put("third",h.channels.get(2));Object p0=h.states.get(0).player,p1=h.states.get(1).player;
    String profile=(String)call(get(a,"mFeatures"),"activeProfileId");call(a,"cobraProLaunchMulti",choices,profile);
-   assertNotNull(get(a,"mMultiOverlay"));assertEquals(3,java.lang.reflect.Array.getLength(get(a,"mMultiChannels")));
+   assertNotNull(get(a,"mMultiOverlay"));assertEquals(3,java.lang.reflect.Array.getLength(get(a,"mMultiChannels")));assertEquals(1,get(a,"mAudioTile"));
    Map<?,?> entries=(Map<?,?>)get(get(a,"mCobraTiles"),"entries");assertSame(p0,get(entries.get("fixture:0"),"player"));assertSame(p1,get(entries.get("fixture:1"),"player"));
    for(Cobra2103202LifecycleTest.State state:h.states){assertEquals(0,state.prepares);assertEquals(0,state.releases);}
   }finally{h.after();}
+ }
+
+ @Test public void scoreRefreshPreservesAmbientIllumination()throws Exception{
+  WholeUiAmbientTest h=new WholeUiAmbientTest();h.setup();try{
+   CobraProUi.GameRow row=new CobraProUi.GameRow(h.activity,false,()->{},()->{});CobraProUi.SportsGame first=new CobraProUi.SportsGame();first.id="live";first.live=true;first.score="1 - 1";row.bind(first,null);h.root.addView(row,new FrameLayout.LayoutParams(400,128));WholeUiAmbientTest.layout(h.root,400,800);
+   h.ambient.testFrame(h.sample,new RectF(0,0,400,200),false);h.ambient.illuminate(h.root);Object surface=row.getBackground(),badge=row.badge.getBackground();assertTrue(surface.getClass().getName().contains("IlluminatedGlass"));
+   CobraProUi.SportsGame second=new CobraProUi.SportsGame();second.id="live";second.live=true;second.score="2 - 1";row.bind(second,null);assertSame(surface,row.getBackground());assertSame(badge,row.badge.getBackground());assertEquals("2 - 1",row.score.getText().toString());
+  }finally{h.cleanup();}
+ }
+
+ @Test public void unavailableBroadcastLeavesActionableFeedbackInsteadOfDismissing()throws Exception{
+  InfinityLiveActivity a=f.fixture(8);try{Object g=game("unmatched","mlb","in","1","1");add(a,g);pro(a);
+   PendingIo io=(PendingIo)get(a,"mIo");int before=io.tasks.size();call(a,"cobraProChooseBroadcast",g,new LinkedHashMap<String,Object>());
+   assertTrue(io.tasks.size()>before);io.tasks.get(before).run();f.frames(2);View sheet=(View)get(a,"mCobraActionSheet");assertNotNull(sheet);assertTrue(text(sheet).contains("No matching broadcast"));assertTrue(text(sheet).contains("Back to games"));assertNull(get(a,"mMultiOverlay"));
+  }finally{f.clean(a);}
+ }
+ @Test public void proScorePollingStopsForBackgroundAndPip()throws Exception{
+  InfinityLiveActivity a=f.fixture(8);try{add(a,game("live","mlb","in","1","1"));pro(a);call(a,"cobraProFilter",4);Object policy=get(a,"mCobraPlaybackPolicy");
+   call(policy,"resume",false);assertEquals(true,call(a,"cobraSportsVisible"));call(policy,"pause");assertEquals(false,call(a,"cobraSportsVisible"));call(policy,"resume",true);put(a,"mInPictureInPicture",true);assertEquals(false,call(a,"cobraSportsVisible"));
+  }finally{f.clean(a);}
  }
 
 }

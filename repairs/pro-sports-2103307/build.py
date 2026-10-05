@@ -36,6 +36,18 @@ def main():
   old.package304.prepare(source,base,build,out)
   tests=build/'xbmc/src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
   for name in TESTS:shutil.copy2(ROOT/name,tests/Path(name).name)
+  # Replay only the already-approved 207 call-audio and 267 background-hold oracles.
+  # These repository tests predate the locked base; do not change production to match stale behavior.
+  import ast
+  adaptation=(HERE.parent/'cobra-feature-refinement-2103207/adapt_tests.py').read_text()
+  nodes=[n for n in ast.walk(ast.parse(adaptation)) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='edit']
+  lines=adaptation.splitlines(True)
+  for n in sorted(nodes,key=lambda n:n.lineno,reverse=True):del lines[n.lineno-1:n.end_lineno]
+  namespace={};exec(''.join(lines),namespace);namespace['adapt'](tests,out/'historical-test-adaptations.json')
+  scrub=tests/'Cobra2103201ScrubberTest.java';text=scrub.read_text()
+  anchor='hold();assertNotNull(get(a,"mCobraPlayerDrawer"));event(MotionEvent.ACTION_CANCEL,p);'
+  require(text.count(anchor)==1,'267 hold fixture drift')
+  scrub.write_text(text.replace('actualVideoBackgroundHoldStillOpensChannels','actualVideoBackgroundHoldNeverOpensChannels').replace(anchor,anchor.replace('assertNotNull','assertNull')))
   with (build/'xbmc/build.gradle').open('a') as f:
    f.write('''\nandroid { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "cobra.evidence", "'''+str(out/'screenshots')+'''"; systemProperty "ambient.evidence", "'''+str(out/'ambient')+'''"; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
 dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.14.1' }
