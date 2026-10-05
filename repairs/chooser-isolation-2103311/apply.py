@@ -12,7 +12,7 @@ def manifest(p):return {f.relative_to(p).as_posix():sha(f.read_bytes()) for f in
 def once(s,a,b):assert s.count(a)==1,(a[:80],s.count(a));return s.replace(a,b,1)
 def transform(name,s):
  if name=='Splash':
-  s=once(s,'  private InfinityStartupPreparation.Ticket mInfinityPreparation;','  private InfinityStartupPreparation.Ticket mInfinityPreparation;\n  private InfinityKodiShutdown.Watch mInfinityKodiWatch;\n  private String mInfinityKodiLaunchToken="", mInfinityCloseError="";\n  private boolean mInfinitySawClosing, mInfinityBootstrapped, mInfinityKodiStateReady;')
+  s=once(s,'  private InfinityStartupPreparation.Ticket mInfinityPreparation;','  private InfinityStartupPreparation.Ticket mInfinityPreparation;\n  private InfinityKodiShutdown.Watch mInfinityKodiWatch;\n  private String mInfinityKodiLaunchToken="", mInfinityCloseError="";\n  private boolean mInfinitySawClosing, mInfinityBootstrapped, mInfinityKodiStateReady, mInfinityInitializationStarted;')
   s=s.replace('Main.infinityClosePending()', 'InfinityKodiShutdown.pending()').replace('Main.infinityLiveActivity() != null','InfinityKodiShutdown.live()').replace('Main.infinityLiveActivity() == null','!InfinityKodiShutdown.live()')
   start=s.index('  private void showInfinityClosingRecovery(){');end=s.index('\n  private void showCobraRecovery()',start)
   s=s[:start]+'''  private void showInfinityClosingRecovery(){
@@ -51,7 +51,9 @@ def transform(name,s):
       if(mInfinityBootstrapped && mInfinityResumed && mInfinityPreparation==null && !mInfinityPreparationReady)infinityInitializeStartup();
     });''')
   s=once(s,'    // A genuine live Main bypasses properties/cache work completely.','''    if(!mInfinityKodiStateReady)return;
-    if(InfinityKodiShutdown.pending()){mInfinitySawClosing=true;showInfinityExperienceChooser();return;}
+    if(InfinityKodiShutdown.pending()){mInfinitySawClosing=true;if(!mInfinityChooserVisible)showInfinityExperienceChooser();return;}
+    if(mInfinityInitializationStarted && mInfinityPendingMain==null)return;
+    mInfinityInitializationStarted=true;
     // A genuine live Main bypasses properties/cache work completely.''')
   s=once(s,'    if (mInfinityPreparation != null) mInfinityPreparation.close();','    if (mInfinityKodiWatch != null) mInfinityKodiWatch.close();\n    if (mInfinityPreparation != null) mInfinityPreparation.close();')
  elif name=='Main':
