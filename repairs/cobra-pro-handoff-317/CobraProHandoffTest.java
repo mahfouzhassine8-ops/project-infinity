@@ -58,6 +58,8 @@ public class CobraProHandoffTest {
   @Test public void unconfirmedUpcomingFeedTimeNeverDisplaysPlaceholderClock()throws Exception{org.json.JSONObject root=new CobraProSeason317Test().schedule();org.json.JSONObject event=root.getJSONArray("events").getJSONObject(0);event.put("timeValid",false);Object game=((List)call(a,"cobraSportsParseScoreboard",call(a,"cobraSportsSpec","nfl"),root)).get(0);assertEquals(false,get(game,"timeConfirmed"));CobraProUi.SportsGame data=(CobraProUi.SportsGame)call(a,"cobraProSportsUiGame",game);assertEquals("Time TBA",data.time);assertFalse(data.date.contains("TBA"));assertTrue(data.meta.contains("Time TBA"));assertFalse(data.meta.contains(":"));}
   @Test public void fullscreenSportsSelectionCreatesSecondTileAndKeepsFirstSession()throws Exception{
     pro();((CobraNavigationUiTest.PendingIo)get(a,"mIo")).tasks.clear();
+    put(channel(1),"group","Sports");put(channel(2),"group","Sports");
+    assertTrue("Fixture must include several eligible sports feeds",((List)call(a,"cobraSportsChannelSnapshot")).size()>1);
     Object game=SportsHubTest.game();put(game,"away",SportsHubTest.team("wild","nfl|wild","Wild","WLD","1"));put(game,"home",SportsHubTest.team("coast","nfl|coast","Coastlines","CST","2"));((List)get(a,"mCobraSportsGames")).add(game);
     activeMini(0);call(a,"promoteCobraPreviewToFullscreen",channel(0));call(a,"showCobraMultiPicker",false);call(a,"renderCobraMultiPicker","SPORTS");
     View picker=(View)get(a,"mCobraMultiPicker");ListView list=(ListView)picker.findViewWithTag("cobra_multi_picker_list");
