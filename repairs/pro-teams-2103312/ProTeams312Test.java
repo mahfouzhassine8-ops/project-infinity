@@ -43,7 +43,11 @@ public class ProTeams312Test {
  @Test public void twoPinnedTeamsAndManualReminderShareOneAlarm()throws Exception{
    choices.toggle(CobraSportsPreferences.PINS,"nfl|DET");choices.toggle(CobraSportsPreferences.PINS,"nfl|GB");Object g=game("both","DET","GB","pre");games(g);call(a,"cobraSyncSportsReminders");assertEquals(1,runtime.reminders().length());
    call(a,"cobraSportsToggleGameReminder",g);assertEquals(1,runtime.reminders().length());JSONObject item=runtime.sportsReminder("nfl|both");assertTrue(item.optBoolean("automatic"));assertTrue(item.optBoolean("manual"));
-   assertFalse(runtime.consumeSportsReminder("sports:nfl|both"));org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMinutes(55));assertTrue(runtime.consumeSportsReminder("sports:nfl|both"));assertFalse(runtime.consumeSportsReminder("sports:nfl|both"));
+   assertFalse(runtime.consumeSportsReminder("sports:nfl|both"));
+   // Make the persisted alarm due through the real rescheduling path. Android uptime
+   // is not a substitute for the JVM wall clock used by this production runtime.
+   runtime.sportsReminder("nfl|both","nfl|DET","nfl|GB","DET @ GB",System.currentTimeMillis()+5*60000L,true,true);
+   assertEquals(1,runtime.reminders().length());assertTrue(runtime.consumeSportsReminder("sports:nfl|both"));assertFalse(runtime.consumeSportsReminder("sports:nfl|both"));
  }
  @Test public void unpinKeepsIndependentReminderAndRemovalDoesNotRecreateIt()throws Exception{
    long start=System.currentTimeMillis()+3600000;choices.toggle(CobraSportsPreferences.PINS,"nfl|DET");runtime.sportsReminder("nfl|1","nfl|DET","nfl|GB","Lions @ Packers",start,true,true);
