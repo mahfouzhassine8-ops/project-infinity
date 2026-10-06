@@ -150,9 +150,9 @@ public class CobraProHandoffTest {
   @Test public void appearanceAndAmbientMatrixRendersAllFiveModes()throws Exception{
     for(String appearance:new String[]{"light","dark"})for(String mode:new String[]{"mobile","grid","compact","cards","focus"})for(String ambient:new String[]{"off","subtle","immersive"}){
       prefs.edit().putString("cobra_appearance_mode",appearance).putString(CobraPresentationEffects.AMBIENT,ambient).commit();
-      put(a,"mCobraGuideStyle",mode);call(a,"cobraShowGuideShell");call(a,"cobraApplyAppearanceSettings");call(a,"cobraRefreshAmbient");f.measure(a,412,915);
+      put(a,"mCobraGuideStyle",mode);call(a,"cobraShowGuideShell");f.measure(a,412,915);call(a,"cobraApplyAppearanceSettings");call(a,"cobraRefreshAmbient");f.measure(a,412,915);
       String label=appearance+" "+mode+" "+ambient;assertEquals(label,appearance.equals("light")?"light":"oled",call(a,"cobraEffectiveAppearanceMode"));
-      assertEquals(label,appearance,prefs.getString("cobra_appearance_mode",""));assertNotNull(get(a,"mCobraGuideBrowser"));
+      assertEquals(label,appearance,prefs.getString("cobra_appearance_mode",""));assertTrue(label+" actual guide is visible",((View)get(a,"mCobraGuideShell")).isShown());assertTrue(label+" actual guide is attached",((View)get(a,"mCobraGuideShell")).isAttachedToWindow());
       int panel=(Integer)call(a,"cobraModeColor","panel"),text=(Integer)call(a,"cobraModeColor","text");
       if(appearance.equals("light")){assertTrue(label+" light panel",Color.red(panel)>120&&Color.green(panel)>120);assertTrue(label+" readable ink",Color.red(text)<150);assertFalse((Boolean)call(a,"cobraProOled"));}
       else if(ambient.equals("off")){assertEquals(label,Color.BLACK,panel);assertTrue(label+" light ink",Color.red(text)>150);}
