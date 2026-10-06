@@ -26,7 +26,7 @@ def prepare(base,build,out):
     parent.factory.BASE_APK_SHA256=BASE;parent.factory.VERSION_CODE=VERSION;parent.factory.RELEASE=RELEASE
     parent.factory.prepare(dest.resolve(),base.resolve(),build.resolve(),out.resolve())
     tests=build/'xbmc/src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
-    for name in ['repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java','repairs/sports-hub-2103270/SportsHubTest.java','repairs/pro-teams-2103312/ProTeams312Test.java','repairs/cobra-pro-season-2103317/CobraProSeason317Test.java']:
+    for name in ['repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java','repairs/sports-hub-2103270/SportsHubTest.java','repairs/pro-teams-2103312/ProTeams312Test.java','repairs/cobra-pro-season-2103317/CobraProSeason317Test.java','repairs/whole-ui-ambient-2103276/WholeUiAmbientTest.java','repairs/multiview-stability-fill-2103229/tests/Cobra2103229MultiViewStabilityFillTest.java']:
         shutil.copy2(ROOT/name,tests/Path(name).name)
     previous=tests/'ProTeams312Test.java';s=previous.read_text();s=s.replace('@Test public void proDrawerSportsOpensSameHubAndSelectionSurvivesRerender()', '/* Sports drawer destination intentionally removed in 317; Pro tab is tested instead. */ public void proDrawerSportsOpensSameHubAndSelectionSurvivesRerender()');previous.write_text(s)
     with (build/'xbmc/build.gradle').open('a') as f:f.write('''

@@ -16,6 +16,7 @@
   private static final class CobraTeamSeason {
     CobraSportsTeam team;String year="",division="";long at;
     final ArrayList<CobraTeamWeek> weeks=new ArrayList<>();
+    final Set<String> timeUnknown=new HashSet<>();
   }
   private String cobraTeamFeed(CobraSportsLeagueSpec spec){return "https://site.api.espn.com/apis/site/v2/sports/"+spec.sport+"/"+spec.league;}
   private static String cobraTeamLogo(JSONObject team){
@@ -44,6 +45,8 @@
       JSONObject original=source.optJSONObject(i);if(original==null)continue;JSONObject event=new JSONObject(original.toString());JSONArray comps=event.optJSONArray("competitions");JSONObject c=comps==null?null:comps.optJSONObject(0);if(c==null)continue;
       // Team schedules put status in the competition and use score objects.
       if(event.optJSONObject("status")==null&&c.optJSONObject("status")!=null)event.put("status",c.optJSONObject("status"));
+      JSONObject status=event.optJSONObject("status"),type=status==null?null:status.optJSONObject("type");
+      if(!event.optBoolean("timeValid",true)||!c.optBoolean("timeValid",true)||(type!=null&&type.optString("detail","").contains("TBD")))out.timeUnknown.add(event.optString("id",""));
       JSONArray teams=c.optJSONArray("competitors");if(teams!=null)for(int t=0;t<teams.length();t++){JSONObject cp=teams.optJSONObject(t);if(cp==null)continue;JSONObject team=cp.optJSONObject("team");if(team!=null)team.put("logo",cobraTeamLogo(team));JSONObject score=cp.optJSONObject("score");if(score!=null)cp.put("score",score.optString("displayValue",""));}
       JSONArray br=c.optJSONArray("broadcasts");if(br!=null)for(int t=0;t<br.length();t++){JSONObject b=br.optJSONObject(t);JSONObject media=b==null?null:b.optJSONObject("media");if(b!=null&&b.optJSONArray("names")==null&&media!=null)b.put("names",new JSONArray().put(media.optString("shortName","")));}
       normalized.put(event);long date=cobraSportsIso(event.optString("date",""));if(date>0)earliest=Math.min(earliest,date);
@@ -104,12 +107,12 @@
     String request="season:"+selected.key,error=mCobraProTeamsErrors.get(request);if(season==null){cobraInfoText(body,error==null?"Loading season schedule…":error);if(error==null)cobraLoadProTeamSeason(selected);else body.addView(cobraTextButton("Retry",cobraModeDark(),()->{mCobraProTeamsErrors.remove(request);cobraLoadProTeamSeason(selected);cobraRenderGuideBrowser();}),new LinearLayout.LayoutParams(-1,dp(48)));return;}
     if(season.weeks.isEmpty()){cobraInfoText(body,"No season games are available for this team.");return;}
     if(mCobraProTeamWeek<0){long now=System.currentTimeMillis();CobraTeamWeek near=season.weeks.get(0);for(CobraTeamWeek w:season.weeks){if(w.from<=now)near=w;if(w.from<=now&&w.to>now)break;}mCobraProTeamWeek=near.number;}
-    HorizontalScrollView weeks=new HorizontalScrollView(this);weeks.setHorizontalScrollBarEnabled(false);weeks.setTag("pro_team_weeks");LinearLayout rail=new LinearLayout(this);weeks.addView(rail);CobraTeamWeek chosen=null;int chosenX=0;
+    android.widget.HorizontalScrollView weeks=new android.widget.HorizontalScrollView(this);weeks.setHorizontalScrollBarEnabled(false);weeks.setTag("pro_team_weeks");LinearLayout rail=new LinearLayout(this);weeks.addView(rail);CobraTeamWeek chosen=null;int chosenX=0;
     for(int i=0;i<season.weeks.size();i++){CobraTeamWeek w=season.weeks.get(i);boolean active=w.number==mCobraProTeamWeek;if(active){chosen=w;chosenX=dp(i*90);}LinearLayout chip=new LinearLayout(this);chip.setOrientation(LinearLayout.VERTICAL);chip.setGravity(Gravity.CENTER);chip.setBackground(CobraProUi.surface(this,!cobraModeDark(),active,12));chip.setSelected(active);chip.setTag("pro_team_week_"+w.number);chip.setFocusable(true);chip.setContentDescription("Week "+w.number+", "+cobraTeamRange(w)+(active?", selected":""));TextView title=cobraText("Week "+w.number,cobraModeColor("text"),13);title.setGravity(Gravity.CENTER);chip.addView(title);TextView range=cobraText(cobraTeamRange(w),cobraModeColor("muted"),10);range.setGravity(Gravity.CENTER);chip.addView(range);chip.setOnClickListener(v->{mCobraProTeamWeek=w.number;cobraRenderGuideBrowser();});LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(dp(84),dp(58));wp.rightMargin=dp(6);rail.addView(chip,wp);}
     LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(-1,dp(66));wp.topMargin=dp(8);body.addView(weeks,wp);final int scrollX=chosenX;weeks.post(()->weeks.scrollTo(Math.max(0,scrollX-dp(170)),0));
     if(chosen==null)return;LinearLayout games=new LinearLayout(this);games.setOrientation(LinearLayout.VERTICAL);games.setBackground(CobraProUi.surface(this,!cobraModeDark(),false,12));TextView title=cobraText("Week "+chosen.number+" Games",cobraModeColor("text"),19);title.setPadding(dp(12),dp(12),dp(12),dp(12));games.addView(title,new LinearLayout.LayoutParams(-1,-2));
     if(chosen.games.isEmpty())cobraInfoText(games,"No games scheduled this week.");
-    for(CobraSportsGame cached:chosen.games){CobraSportsGame fresh=cobraSportsGame(cached.id);CobraSportsGame game=fresh!=null&&fresh.leagueKey.equals(cached.leagueKey)?fresh:cached;CobraProUi.WeekGameRow row=new CobraProUi.WeekGameRow(this,!cobraModeDark());row.bind(cobraProSportsUiGame(game),new SimpleDateFormat("EEE, MMM d",Locale.getDefault()).format(new Date(game.startMs)),(image,url)->cobraLoadVodArtwork(image,url));row.setTag("pro_team_game_"+game.id);row.setOnClickListener(v->cobraProSportsOptions(game));games.addView(row,new LinearLayout.LayoutParams(-1,CobraProUi.WeekGameRow.height(this)));}
+    for(CobraSportsGame cached:chosen.games){CobraSportsGame fresh=cobraSportsGame(cached.id);CobraSportsGame game=fresh!=null&&fresh.leagueKey.equals(cached.leagueKey)?fresh:cached;CobraProUi.SportsGame data=cobraProSportsUiGame(game);if(game.upcoming()&&season.timeUnknown.contains(game.id))data.time="Time TBA";CobraProUi.WeekGameRow row=new CobraProUi.WeekGameRow(this,!cobraModeDark());row.bind(data,new SimpleDateFormat("EEE, MMM d",Locale.getDefault()).format(new Date(game.startMs)),(image,url)->cobraLoadVodArtwork(image,url));row.setTag("pro_team_game_"+game.id);row.setOnClickListener(v->cobraProSportsOptions(game));games.addView(row,new LinearLayout.LayoutParams(-1,CobraProUi.WeekGameRow.height(this)));}
     body.addView(games,new LinearLayout.LayoutParams(-1,-2));
     if(System.currentTimeMillis()-season.at>5*60000L&&error==null)cobraLoadProTeamSeason(selected);
   }
@@ -125,6 +128,6 @@
       ArrayList<CobraSportsMatch> eligible=new ArrayList<>();for(CobraSportsMatch m:matches)if(cobraChannelAllowed(m.channel)&&!cobraProPinned(m.channel)&&(mPlaying==null||!mPlaying.id.equals(m.channel.id)))eligible.add(m);
       if(eligible.isEmpty()){toast("No additional matching channel found in your providers");return;}if(cobraSportsUniqueStrong(eligible)){Channel channel=eligible.get(0).channel;selectCobraMultiChannel(channel);mCobraSportsMultiAssignments.put(channel.id,game);mMain.post(this::cobraSportsRefreshMultiOverlays);return;}
       // Keep the picker/session alive while the user chooses a possible feed.
-      android.widget.ListView list=(android.widget.ListView)picker.findViewWithTag("cobra_multi_picker_list");ArrayList<Channel> channels=new ArrayList<>();for(CobraSportsMatch m:eligible)channels.add(m.channel);list.setAdapter(cobraMultiChannelAdapter(channels));toast("Choose the broadcast for "+cobraSportsMatchup(game));
+      android.widget.ListView list=(android.widget.ListView)picker.findViewWithTag("cobra_multi_picker_list");ArrayList<Channel> channels=new ArrayList<>();for(CobraSportsMatch m:eligible)channels.add(m.channel);mCobraMultiPickerFilter="SPORTS_CHANNELS:"+game.id;list.setAdapter(cobraMultiChannelAdapter(channels));toast("Choose the broadcast for "+cobraSportsMatchup(game));
     });
   }
