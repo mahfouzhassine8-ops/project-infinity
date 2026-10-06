@@ -395,6 +395,24 @@
    }
    static final class SportsGame {
      String priority="";
+@@ -129,7 +129,7 @@
+   }
+   static final class Action extends View implements MaterialSurface {
+     public void refreshMaterial(){invalidate();}
+-    final Paint p=new Paint(3);String glyph,label;boolean overlay,primary,stack,navigation;final boolean light;
++    final Paint p=new Paint(3);String glyph,label;boolean overlay,primary,stack,navigation,videoLabel;final boolean light;
+     Action(Context c,String glyph,String label,boolean overlay,boolean light,Runnable click){super(c);this.glyph=glyph;this.label=label;this.overlay=overlay;this.light=light;
+       setTag("pro_action_"+label.toLowerCase(java.util.Locale.ROOT).replace(' ','_'));setContentDescription(label);setFocusable(true);setClickable(true);setOnClickListener(v->click.run());}
+     void label(String glyph,String label){this.glyph=glyph;this.label=label;setContentDescription(label);invalidate();}
+@@ -160,7 +160,7 @@
+       if(oled(getContext())||(owner(getContext())!=null&&(owner(getContext()).cobraProCinema()||owner(getContext()).cobraProMaterialMode()==CobraPresentationEffects.SUBTLE))){p.setShader(null);p.setColor(material(getContext(),light&&!overlay?(active?0xffdbeefa:0xfff0f6fa):(active?0xff185464:0xff1b2b34)));}
+       c.drawRoundRect(b,r,r,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(den*(active?1.4f:1));p.setColor(active?CYAN:overlay?0xff7695a8:light?0xffcfdfeb:0xff436171);c.drawRoundRect(b,r,r,p);p.setStyle(Paint.Style.FILL);
+       float fs=12f*getResources().getDisplayMetrics().scaledDensity;boolean narrow=w<den*116;
+-      if(stack){icon(c,p,glyph,w/2-den*11,Math.max(den*6,(bh-den*22)/2),den*22,ink);p.setTextSize(Math.min(fs,11*den*font(getContext())));p.setTypeface(Typeface.create("sans-serif",0));p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);String t=fit(label,p,w-den*4);c.drawText(t,w/2,h-den*4-p.descent(),p);}
++      if(stack){icon(c,p,glyph,w/2-den*11,Math.max(den*6,(bh-den*22)/2),den*22,ink);p.setTextSize(Math.min(fs,11*den*font(getContext())));p.setTypeface(Typeface.create("sans-serif",0));p.setColor(videoLabel?Color.WHITE:ink);p.setTextAlign(Paint.Align.CENTER);String t=fit(label,p,w-den*4);c.drawText(t,w/2,h-den*4-p.descent(),p);}
+       else if(narrow&&label.length()>0&&h>=den*50){icon(c,p,glyph,w/2-den*10,den*8,den*20,ink);p.setTypeface(Typeface.create("sans-serif",0));p.setTextSize(fs);p.setColor(ink);p.setTextAlign(Paint.Align.CENTER);c.drawText(fit(label,p,w-den*6),w/2,h-den*10,p);}
+       else {float s=den*21;p.setTextSize(fs);p.setTypeface(Typeface.create("sans-serif",0));float tw=label.isEmpty()?0:p.measureText(label);float x=(w-(s+(tw>0?den*8+tw:0)))/2;
+         icon(c,p,glyph,Math.max(den*8,x),(h-s)/2,s,ink);if(tw>0){p.setTextSize(fs);p.setColor(ink);p.setTextAlign(Paint.Align.LEFT);float tx=Math.max(den*8,x)+s+den*8;c.drawText(fit(label,p,w-tx-den*8),tx,h/2-(p.ascent()+p.descent())/2,p);}}
 @@ -224,17 +224,17 @@
      @Override protected void onDraw(Canvas c){float step=px(getContext(),13),start=(getWidth()-(count-1)*step)/2;for(int i=0;i<count;i++){p.setColor(i==index?CYAN:0xff7492a5);c.drawCircle(start+i*step,getHeight()/2f,px(getContext(),i==index?3.2f:2.4f),p);}}
    }
@@ -424,7 +442,7 @@
 -      for(int i=0;i<6;i++){final int index=i;player[i]=new Action(c,glyphs[i],names[i],false,light,()->actions.control(index));player[i].stack=true;player[i].setTag("pro_player_"+i);addView(player[i]);}
 +      controlScroll=new HorizontalScrollView(c);controlScroll.setTag("pro_player_control_scroll");controlScroll.setHorizontalScrollBarEnabled(false);controlScroll.setFillViewport(true);controlStrip=new LinearLayout(c);controlStrip.setOrientation(LinearLayout.HORIZONTAL);controlScroll.addView(controlStrip,new FrameLayout.LayoutParams(-2,-1));addView(controlScroll);
 +      String[] glyphs={"pause","favorite","cc","audio","fullscreen","more","stats","groups"},names={"Pause","Favorite","Subtitles","Audio","Fullscreen","More","Stats","Multi-View"};
-+      for(int i=0;i<player.length;i++){final int index=i;player[i]=new Action(c,glyphs[i],names[i],false,light,()->{revealControls();actions.control(index);});player[i].stack=true;player[i].setTag("pro_player_"+i);controlStrip.addView(player[i],new LinearLayout.LayoutParams(px(c,62),-1));}
++      for(int i=0;i<player.length;i++){final int index=i;player[i]=new Action(c,glyphs[i],names[i],false,light,()->{revealControls();actions.control(index);});player[i].stack=true;player[i].videoLabel=true;player[i].setTag("pro_player_"+i);controlStrip.addView(player[i],new LinearLayout.LayoutParams(px(c,62),-1));}
        setState(RESTING,null,false);
      }
 -    void bind(Program d,int index,int count){sportsMode=d.sports;hasChannel=!"Choose a channel".equals(d.channel);source.text(d.source);source.setContentDescription(d.source+", item "+(index+1)+" of "+count);live.text("LIVE");live.setVisibility(d.live?VISIBLE:GONE);dots.index=index;dots.count=Math.min(6,Math.max(1,count));dots.invalidate();dots.setVisibility(count>1?VISIBLE:INVISIBLE);left.setVisibility(count>1?VISIBLE:GONE);right.setVisibility(count>1?VISIBLE:GONE);status.text(d.status);player[1].setSelected(d.favorite);

@@ -186,7 +186,7 @@ public class CobraProHandoffTest {
     call(a,"closeCobraActionSheet");assertSame(player,get(a,"mPlayer"));call(a,"showCobraPlayerDrawer");assertEquals("SPORTS",get(a,"mCobraDrawerFilter"));assertNotNull(get(a,"mCobraPlayerDrawerList"));
   }
   @Test public void sportsControlStripScrollDoesNotSwipeHeroAndActionsWork()throws Exception{
-    pro();addLiveGameForChannel(0);activeMini(0);call(a,"cobraProFilter",4);f.measure(a,412,915);CobraProUi.Hero h=hero();h.revealControls();f.measure(a,412,915);
+    prefs.edit().putString("cobra_appearance_mode","light").commit();pro();addLiveGameForChannel(0);activeMini(0);call(a,"cobraProFilter",4);f.measure(a,412,915);CobraProUi.Hero h=hero();h.revealControls();f.measure(a,412,915);
     assertEquals(View.VISIBLE,h.player[6].getVisibility());assertEquals(View.VISIBLE,h.player[7].getVisibility());assertTrue(h.controlStrip.getWidth()>h.controlScroll.getWidth());int pane=(Integer)get(a,"mCobraProHeroIndex");
     float y=h.controlScroll.getTop()+20;assertFalse(h.onInterceptTouchEvent(MotionEvent.obtain(0,0,MotionEvent.ACTION_DOWN,300,y,0)));assertFalse(h.onInterceptTouchEvent(MotionEvent.obtain(0,100,MotionEvent.ACTION_MOVE,50,y,0)));assertEquals(pane,get(a,"mCobraProHeroIndex"));assertFalse(state.released);
     h.controlScroll.scrollTo(h.controlStrip.getWidth(),0);capture("sports-controls-stats-multiview");h.player[6].performClick();assertEquals("sports-stats",get(a,"mCobraSheetKind"));call(a,"closeCobraActionSheet");h.player[7].performClick();assertEquals("pro-sports-multi",get(a,"mCobraSheetKind"));
@@ -206,7 +206,10 @@ public class CobraProHandoffTest {
   }
   @Test public void favoriteScoreOverUnrelatedVideoFadesAndOnlyNewEventReturns()throws Exception{
     pro();activeMini(0);call(a,"promoteCobraPreviewToFullscreen",channel(0));Object game=favoriteScoreFixture();call(a,"cobraRefreshScoreTicker");assertNotNull(get(a,"mCobraScoreTicker"));assertTrue(((TextView)get(a,"mCobraScoreTicker")).getText().toString().contains("Lions"));long until=(Long)get(a,"mCobraScoreUntil");
-    put(game,"detail","10:32 - 1st");call(a,"cobraRefreshScoreTicker");assertEquals(until,get(a,"mCobraScoreUntil"));Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(7));assertNull(get(a,"mCobraScoreTicker"));call(a,"cobraRefreshScoreTicker");assertNull(get(a,"mCobraScoreTicker"));
+    put(game,"detail","10:32 - 1st");call(a,"cobraRefreshScoreTicker");assertEquals(until,get(a,"mCobraScoreUntil"));
+    f.frames(440);
+    assertNull("Alert must expire after 7 seconds; now="+SystemClock.uptimeMillis()+", initialUntil="+until+", currentUntil="+get(a,"mCobraScoreUntil")+", pending="+get(a,"mCobraScorePending")+", context="+get(a,"mCobraScoreContext"),get(a,"mCobraScoreTicker"));
+    call(a,"cobraRefreshScoreTicker");assertNull("An unchanged event must not reopen the alert",get(a,"mCobraScoreTicker"));
     put(get(game,"away"),"score","14");call(a,"cobraRefreshScoreTicker");assertNotNull(get(a,"mCobraScoreTicker"));assertTrue(((TextView)get(a,"mCobraScoreTicker")).getText().toString().contains("14"));assertSame(player,get(a,"mPlayer"));assertEquals(0,state.prepares);capture("favorite-score-over-other-channel");
     new CobraSportsPreferences(prefs).protection(true);call(a,"cobraRefreshScoreTicker");assertNull(get(a,"mCobraScoreTicker"));assertSame(player,get(a,"mPlayer"));
   }
