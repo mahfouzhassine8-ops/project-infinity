@@ -51,9 +51,9 @@ def package(base,build,out):
     badging=run(bt/'aapt','dump','badging',final,output=out/'badging.txt');require(f"package: name='{parent.PACKAGE}' versionCode='{VERSION}' versionName='{RELEASE}'" in badging,'Wrong identity')
     # Reuse the strict smali comparison with exactly the declared presentation families.
     import inspect
-    code=inspect.getsource(parent.compare_dex).replace('InfinityExitCompletion|InfinityGlassChooser|Splash|BuildConfig','InfinityLiveActivity|CobraProUi|CobraVisualRenderer|BuildConfig').replace("'cobra_classes_unchanged':True", "'infinity_kodi_classes_unchanged':True")
+    code=inspect.getsource(parent.compare_dex).replace('InfinityExitCompletion|InfinityGlassChooser|Splash|BuildConfig','InfinityLiveActivity|CobraProUi|BuildConfig').replace("'cobra_classes_unchanged':True", "'infinity_kodi_classes_unchanged':True")
     # Retain exact protected-class compiler differences before the strict guard.
-    code=code.replace("    changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))","    import sys;sys.path.insert(0,str(HERE.parent/'cobra-pro-season-2103317'))\n    from bridge_preservation import verify\n    old,new,bridge_report=verify(old,new,out)\n    changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))")
+    code=code.replace("    changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))","    import sys;sys.path.insert(0,str(HERE.parent/'cobra-pro-carousel-2103320'))\n    from bridge_preservation import verify\n    old,new,bridge_report=verify(old,new,out)\n    changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))")
     code=code.replace("'all_other_classes_bytecode_identical':True","'all_other_classes_behavior_identical':True, 'api_bridge_renumbering_verified':True").replace("'infinity_kodi_classes_unchanged':True","'infinity_kodi_source_and_behavior_preserved':True")
     code=code.replace("    require(not unexpected,",'''    diagnostic=out/'compiler-diffs';diagnostic.mkdir(exist_ok=True)
     for name in unexpected:
