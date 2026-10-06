@@ -55,14 +55,29 @@
     if(earliest==Long.MAX_VALUE)return out;long first=cobraTeamMonday(earliest);Map<Integer,CobraTeamWeek> buckets=new java.util.TreeMap<>();
     for(CobraSportsGame g:cobraSportsParseScoreboard(spec,new JSONObject().put("events",normalized))){
       if(!selected.key.equals(g.away.key)&&!selected.key.equals(g.home.key))continue;
-      int number=official?weekById.getOrDefault(g.id,0):Math.max(1,(int)((cobraTeamMonday(g.startMs)-first+3600000L)/(7L*86400000L))+1);if(number<1)continue;
+      int number=official?weekById.getOrDefault(g.id,Math.max(1,(int)((cobraTeamMonday(g.startMs)-first+3600000L)/(7L*86400000L))+1)):Math.max(1,(int)((cobraTeamMonday(g.startMs)-first+3600000L)/(7L*86400000L))+1);if(number<1)continue;
       CobraTeamWeek w=buckets.get(number);if(w==null){w=new CobraTeamWeek();w.number=number;w.from=cobraTeamMonday(g.startMs);w.to=cobraTeamDays(w.from,7);buckets.put(number,w);}w.games.add(g);
     }
-    if(official&&!buckets.isEmpty()){
+    if(!buckets.isEmpty()){
       CobraTeamWeek reference=buckets.values().iterator().next();long origin=cobraTeamDays(reference.from,-7*(reference.number-1));int last=Collections.max(buckets.keySet());
       for(int n=1;n<=last;n++)if(!buckets.containsKey(n)){CobraTeamWeek w=new CobraTeamWeek();w.number=n;w.from=cobraTeamDays(origin,7*(n-1));w.to=cobraTeamDays(w.from,7);buckets.put(n,w);}
     }
     for(CobraTeamWeek w:buckets.values()){w.games.sort((a,b)->Long.compare(a.startMs,b.startMs));out.weeks.add(w);}return out;
+  }
+  private static JSONObject cobraMergeTeamSchedules(CobraSportsLeagueSpec spec,JSONObject regular,JSONObject current,JSONObject fixtures)throws Exception{
+    JSONObject merged=new JSONObject(regular.toString());Map<String,JSONObject> events=new LinkedHashMap<>();JSONArray main=regular.optJSONArray("events");int lastWeek=0;
+    if(main!=null)for(int i=0;i<main.length();i++){JSONObject event=main.optJSONObject(i);if(event==null)continue;events.put(event.optString("id",""),event);JSONObject w=event.optJSONObject("week");if(w!=null)lastWeek=Math.max(lastWeek,w.optInt("number",0));}
+    JSONObject phase=current==null?null:current.optJSONObject("season");int type=phase==null?2:phase.optInt("type",2);
+    for(JSONObject extra:new JSONObject[]{current,fixtures}){if(extra==null||(extra==current&&"football".equals(spec.sport)&&type==1))continue;JSONArray rows=extra.optJSONArray("events");if(rows==null)continue;for(int i=0;i<rows.length();i++){JSONObject original=rows.optJSONObject(i);if(original==null)continue;JSONObject event=new JSONObject(original.toString());JSONObject w=event.optJSONObject("week");if(extra==current&&"football".equals(spec.sport)&&type==3&&w!=null)w.put("number",lastWeek+w.optInt("number",1));String id=event.optString("id","");if(!id.isEmpty())events.put(id,event);}}
+    JSONArray all=new JSONArray();for(JSONObject event:events.values())all.put(event);merged.put("events",all);return merged;
+  }
+  private JSONObject cobraFetchTeamSeason(CobraSportsLeagueSpec spec,CobraSportsTeam team)throws Exception{
+    String endpoint=cobraTeamFeed(spec)+"/teams/"+URLEncoder.encode(team.id,"UTF-8")+"/schedule";JSONObject current=cobraSportsJson(endpoint);JSONObject info=current.optJSONObject("season");String year=info==null?"":info.optString("year","");
+    if(year.isEmpty())return current;String suffix="?season="+URLEncoder.encode(year,"UTF-8");
+    if("soccer".equals(spec.sport))return cobraMergeTeamSchedules(spec,current,null,cobraSportsJson(endpoint+suffix+"&fixture=true&limit=1000"));
+    // Regular season is requested explicitly: the default can contain only
+    // preseason or playoffs. Merge the current phase without inventing scores.
+    JSONObject regular=cobraSportsJson(endpoint+suffix+"&seasontype=2&limit=1000");return cobraMergeTeamSchedules(spec,regular,current,null);
   }
   private boolean cobraTeamsCurrent(String profile,long generation){return isCobraAsyncAlive()&&mCobraProActive&&mCobraProSportsActive&&profile.equals(mFeatures.activeProfileId())&&generation==mCobraProTeamsGeneration;}
   private void cobraLoadProTeams(CobraSportsLeagueSpec spec){
@@ -74,7 +89,7 @@
   private void cobraLoadProTeamSeason(CobraSportsTeam team){
     String request="season:"+team.key;if(!mCobraProTeamsLoading.add(request))return;CobraSportsLeagueSpec spec=cobraSportsSpec(team.leagueKey);if(spec==null){mCobraProTeamsLoading.remove(request);return;}
     final String profile=mFeatures.activeProfileId();final long generation=mCobraProTeamsGeneration;
-    if(!submitCobraIo(()->{CobraTeamSeason season=null;String error="";try{season=cobraParseTeamSeason(spec,team,cobraSportsJson(cobraTeamFeed(spec)+"/teams/"+URLEncoder.encode(team.id,"UTF-8")+"/schedule"),System.currentTimeMillis());}catch(Exception e){error="Season schedule is unavailable right now.";}final CobraTeamSeason data=season;final String failure=error;
+    if(!submitCobraIo(()->{CobraTeamSeason season=null;String error="";try{season=cobraParseTeamSeason(spec,team,cobraFetchTeamSeason(spec,team),System.currentTimeMillis());}catch(Exception e){error="Season schedule is unavailable right now.";}final CobraTeamSeason data=season;final String failure=error;
       publishCobraUi(()->{if(!profile.equals(mFeatures.activeProfileId())||generation!=mCobraProTeamsGeneration)return;mCobraProTeamsLoading.remove(request);if(data!=null){mCobraProTeamSeasons.put(team.key,data);mCobraProTeamsErrors.remove(request);}else mCobraProTeamsErrors.put(request,failure);if(cobraTeamsCurrent(profile,generation)&&"team".equals(mCobraProSportsSection)&&team.key.equals(mCobraProTeamKey))cobraRenderGuideBrowser();});
     })){mCobraProTeamsLoading.remove(request);mCobraProTeamsErrors.put(request,"Season schedule is unavailable right now.");}
   }
