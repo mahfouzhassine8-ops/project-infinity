@@ -92,4 +92,9 @@ public class ProTeams312Test {
  @Test public void renderNewControlsAndSportsSettings()throws Exception{
    games(game("favorite","DET","GB","in"),game("pinned","KC","ATL","in"));choices.toggle(CobraSportsPreferences.FAVORITES,"nfl|DET");choices.toggle(CobraSportsPreferences.PINS,"nfl|KC");pro();call(a,"cobraProFilter",4);f.frames(30);save("favorite-and-pinned");choices.protection(true);call(a,"cobraSportsPresentationChanged");save("spoiler-protection");call(a,"showCobraSportsSettings");save("sports-settings");
  }
+ @Test public void reminderTapOpensGameOptionsWithoutTuningAndMissingGameShowsLookup()throws Exception{
+   Object g=game("reminder","DET","GB","pre");games(g);a.setIntent(new Intent().putExtra("cobra_sports_reminder_game","nfl|reminder"));call(a,"cobraConsumeSportsReminder");assertEquals("pro-sports-options",get(a,"mCobraSheetKind"));assertNull(get(a,"mPlayer"));assertFalse(a.getIntent().hasExtra("cobra_sports_reminder_game"));
+   a.setIntent(new Intent().putExtra("cobra_sports_reminder_game","nfl|missing"));call(a,"cobraConsumeSportsReminder");assertEquals("sports-reminder-lookup",get(a,"mCobraSheetKind"));assertTrue(text((View)get(a,"mCobraActionSheet")).contains("Finding your game"));
+ }
+
 }
