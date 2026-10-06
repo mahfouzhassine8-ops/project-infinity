@@ -15,7 +15,7 @@ public class CobraProHandoffTest {
   @After public void cleanup()throws Exception{f.clean(a);}
   Object channel(int index)throws Exception{return ((List)get(a,"mChannels")).get(index);}
   void pro()throws Exception{prefs.edit().putString("guide_view_mode","focus").commit();put(a,"mCobraGuideStyle","focus");call(a,"cobraShowGuideShell");f.measure(a,412,915);}
-  void activeMini(int index)throws Exception{Object c=channel(index);put(a,"mGuidePreviewChannel",c);put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));put(a,"mCobraPreviewMuted",false);put(a,"mCobraProPlaybackOwned",true);put(a,"mCobraProState",CobraProUi.WATCHING);call(a,"cobraProSelectPlayingSlot",c);call(a,"cobraRefreshProHero");}
+  void activeMini(int index)throws Exception{Object c=channel(index);put(a,"mGuidePreviewChannel",c);put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));put(a,"mCobraPreviewMuted",false);put(a,"mCobraProPlaybackOwned",true);put(a,"mCobraProState",CobraProUi.WATCHING);call(a,"cobraProSelectPlayingSlot",c);call(a,"cobraRefreshProHero");call(a,"cobraSetProState",CobraProUi.WATCHING,false);}
   CobraProUi.Hero hero()throws Exception{return (CobraProUi.Hero)get(a,"mCobraProHeroUi");}
   View browser()throws Exception{return (View)get(a,"mCobraGuideBrowser");}
   String text(View v){String s=v instanceof TextView?((TextView)v).getText().toString():"";if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++)s+="\n"+text(((ViewGroup)v).getChildAt(i));return s;}
@@ -212,5 +212,10 @@ public class CobraProHandoffTest {
   }
   @Test public void proPlayingDotUsesActualPlaybackAndExistingCinemaColor()throws Exception{
     pro();activeMini(0);Object binding=construct("CobraPlayerBinding",a,player,channel(0));((Map)get(a,"mCobraPlayerBindings")).put(player,binding);call(a,"cobraRenderGuideBrowser");f.measure(a,412,915);ListView list=(ListView)get(a,"mCobraGuideList");CobraProUi.ChannelRow row=(CobraProUi.ChannelRow)list.getAdapter().getView(0,null,list);assertNotNull(row.playing);assertEquals(View.VISIBLE,row.playing.getVisibility());state.playing=false;call(row.playing,"sync");assertEquals(View.INVISIBLE,row.playing.getVisibility());state.playing=true;call(row.playing,"sync");prefs.edit().putBoolean(CobraPresentationEffects.NIGHT,true).commit();assertEquals(0xffffc247,((Integer)call(a,"cobraPlayingIndicatorColor")).intValue());
+  }
+
+  @Test public void sportsFeedAddsPreviewPanesWithoutRetuningMain()throws Exception{
+    pro();call(a,"cobraProFilter",4);assertEquals(1,((List)get(a,"mCobraProSlots")).size());Object game=addLiveGameForChannel(0);call(a,"cobraProOnSportsDataChanged");assertEquals(2,((List)get(a,"mCobraProSlots")).size());assertEquals(0,get(a,"mCobraProHeroIndex"));assertNull(get(a,"mCobraPreviewPlayer"));
+    activeMini(0);call(a,"cobraProOnSportsDataChanged");assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);call(a,"cobraProFilter",0);assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);
   }
 }

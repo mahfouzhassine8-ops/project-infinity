@@ -287,7 +287,7 @@
    private void cobraSportsRecord(CobraSportsGame game){cobraSportsResolveAsync(game,matches->{CobraSportsMatch best=matches.isEmpty()?null:matches.get(0);if(best==null||!best.strong()){toast("No reliable recordable channel match found");return;}GuideProgram p=best.program;if(p==null){ArrayList<GuideProgram> programs=cobraPrograms(best.channel);if(programs!=null)for(GuideProgram candidate:programs)if(candidate.stop>=game.startMs-3600000L&&candidate.start<=game.startMs+4*3600000L){String text=cobraSportsNorm(candidate.title+" "+candidate.description);if(cobraSportsTeamHit(text,game.home)||cobraSportsTeamHit(text,game.away)){p=candidate;break;}}}if(p==null){toast("No recordable guide event found for this game");return;}showProgramActions(best.channel,p);});}
  
    private void cobraSportsOpenSmartMultiView(String scope,String focusId){if(mMultiChannels!=null&&mMultiChannels.length>=4){toast("All four Multi-View slots are already pinned");return;}ArrayList<CobraSportsGame> candidates=new ArrayList<>();for(CobraSportsGame g:mCobraSportsGames){if(!g.live())continue;if("myteams".equals(scope)&&!cobraSportsFavoriteGame(g))continue;if(!"live".equals(scope)&&!"myteams".equals(scope)&&!scope.equals(g.leagueKey))continue;candidates.add(g);}candidates.sort((a,b)->{if(focusId!=null){if(focusId.equals(a.id))return -1;if(focusId.equals(b.id))return 1;}boolean af=cobraSportsFavoriteGame(a),bf=cobraSportsFavoriteGame(b);if(af!=bf)return af?-1:1;return Long.compare(a.startMs,b.startMs);});if(candidates.isEmpty()){toast("No live games are available for this Smart Multi-View");return;}final long request=++mCobraSportsActionSerial,ticket=mCobraNavigation.current();final String owner=cobraDrawerOwner(),profile=mFeatures.activeProfileId();final ArrayList<CobraSportsChannelInfo> snapshot=cobraSportsChannelSnapshot();toast("Building Smart Sports Multi-View…");submitCobraIo(()->{LinkedHashMap<String,CobraSportsGame> selected=new LinkedHashMap<>();for(CobraSportsGame g:candidates){ArrayList<CobraSportsMatch> matches=cobraSportsResolve(g,snapshot);if(!cobraSportsUniqueStrong(matches))continue;String id=matches.get(0).channel.id;if(!selected.containsKey(id))selected.put(id,g);if(selected.size()>=4)break;}publishCobraUi(()->{if(request!=mCobraSportsActionSerial||!mCobraNavigation.accepts(ticket)||!owner.equals(cobraDrawerOwner())||!profile.equals(mFeatures.activeProfileId()))return;cobraSportsLaunchSmartMulti(selected,snapshot);});});}
-@@ -14560,24 +14614,78 @@
+@@ -14560,24 +14614,82 @@
      rows.addView(cobraSheetRow("settings","Sports settings","Spoiler Protection • score ticker • teams",false,dark,this::showCobraSportsSettings));
    }
    private TextView mCobraScoreTicker;
@@ -298,7 +298,11 @@
 +  private long mCobraScoreUntil;
 +  private final Runnable mCobraScoreDismiss=()->{
 +    if(mCobraScoreTicker==null)return;final TextView view=mCobraScoreTicker;
-+    if(cobraMotionEnabled())view.animate().alpha(0f).setDuration(380).withEndAction(()->{if(mCobraScoreTicker==view){cobraRemoveScoreTicker();cobraRefreshScoreTicker();}}).start();
++    if(cobraMotionEnabled()){
++      view.animate().alpha(0f).setDuration(380).start();
++      // Removal has a bounded lifetime even if a render frame/animation callback is delayed.
++      mMain.postDelayed(()->{if(mCobraScoreTicker==view){cobraRemoveScoreTicker();cobraRefreshScoreTicker();}},380L);
++    }
 +    else{cobraRemoveScoreTicker();cobraRefreshScoreTicker();}
 +  };
 +  private void cobraRemoveScoreTicker(){
