@@ -9,6 +9,8 @@ inherited_outlines=_previous.outlines;CALL=_previous.CALL;OWNERS=_previous.OWNER
 ALLOWED=re.compile(r'com/projectinfinity/kodi/(?:InfinityLiveActivity|CobraProUi|BuildConfig)(?:\$[^/]*)?\.smali$')
 def verify(old,new,out):
     left,before,lh=inherited_outlines(old);right,after,rh=inherited_outlines(new)
+    lh={n:'\n'.join(line for line in t.splitlines() if line.strip()) for n,t in lh.items()}
+    rh={n:'\n'.join(line for line in t.splitlines() if line.strip()) for n,t in rh.items()}
     require(lh==rh,'API outline class metadata changed')
     def canonical(text,table):
         def substitute(m):
