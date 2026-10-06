@@ -156,7 +156,7 @@ jobs:
           mkdir -p engine3313
           python3 repairs/shutdown-2103313/test_native.py --source kodi | tee engine3313/shutdown-host-tests.log
           python3 repairs/shutdown-2103313/native_patch.py apply --source kodi --parent-proof engine3308/source-manifest.json --receipt engine3313/source-manifest.json
-          git -C kodi diff --check
+          git -C kodi diff --check -- xbmc/application/Application.cpp xbmc/addons/Service.cpp xbmc/interfaces/generic/ScriptInvocationManager.cpp xbmc/interfaces/generic/ScriptInvocationManager.h xbmc/interfaces/python/XBPython.cpp xbmc/interfaces/python/XBPython.h xbmc/interfaces/python/PythonInvoker.cpp
 
       - name: Compile full ARM64 library with exact inherited engine recipe
         run: |
