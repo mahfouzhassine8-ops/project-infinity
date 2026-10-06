@@ -37,6 +37,11 @@ s = one(s, '    mCobraProHeroUi.bringToFront();', '''    // Keep the active deco
     if(mCobraPreviewTexture!=null)mCobraPreviewTexture.setAlpha(mCobraProHeroBrowsing||(cobraProSportsHeroActive()&&cobraProLiveGameForChannel(mGuidePreviewChannel)==null)?0f:1f);
     mCobraProHeroUi.bringToFront();''')
 s = one(s, 'mCobraProHeroUi=null;mCobraProOverlay=null;mCobraPreviewAutoplayAllowed=', 'mCobraProHeroUi=null;mCobraProOverlay=null;if(mCobraPreviewTexture!=null)mCobraPreviewTexture.setAlpha(1f);mCobraPreviewAutoplayAllowed=')
+s = one(s, '    configureCobraPip(false);cobraUpdatePlaybackLabels();cobraStartPresentationTicker();cobraRefreshImmersiveAmbient();', '''    if(mCobraProActive&&mCobraProSportsActive){
+      cobraProEnforceSportsPlayback();int sports=cobraProSportsSlotIndex();
+      if(sports>=0){mCobraProHeroIndex=sports;cobraProRetuneSports(cobraProCurrentSportsGame(),false);}
+    }
+    configureCobraPip(false);cobraUpdatePlaybackLabels();cobraStartPresentationTicker();cobraRefreshImmersiveAmbient();''')
 # Gate Sports only at Sports actions/data boundaries. Carousel stepping alone
 # must never stop, release, retune, or start an owned stream.
 s = one(s, 'mCobraProSportsResolvingId="";mCobraProHeroBrowsing=mCobraProPlaybackOwned;', 'mCobraProSportsResolvingId="";')

@@ -127,13 +127,25 @@ public class CobraProHandoffTest {
     assertNull(get(a,"mCobraPreviewPlayer"));assertNull(get(a,"mGuidePreviewChannel"));assertTrue(state.released);assertTrue(text(hero().info).contains("No games are live right now."));
   }
   @Test public void liveGameElsewhereDoesNotAllowUnrelatedChannelInSports()throws Exception{
-    pro();addLiveGameForChannel(1);activeMini(0);call(a,"cobraProFilter",4);assertNull(get(a,"mCobraPreviewPlayer"));assertTrue(state.released);
+    pro();((CobraNavigationUiTest.PendingIo)get(a,"mIo")).tasks.clear();addLiveGameForChannel(1);activeMini(0);call(a,"cobraProFilter",4);assertNull(get(a,"mCobraPreviewPlayer"));assertTrue(state.released);
     ((CobraNavigationUiTest.PendingIo)get(a,"mIo")).drain();call(a,"cobraRefreshProHero");
     assertNull(get(a,"mCobraPreviewPlayer"));assertEquals(0,state.prepares);assertFalse((Boolean)get(a,"mCobraPreviewAutoplayAllowed"));
   }
   @Test public void selectingExpiredGameCannotStartAnOldBroadcast()throws Exception{
     pro();Object game=addLiveGameForChannel(0);put(game,"state","post");call(a,"cobraPlaySportsBroadcast",game,channel(0));
     assertNull(get(a,"mCobraPreviewPlayer"));assertNull(get(a,"mPlayer"));assertTrue(org.robolectric.shadows.ShadowToast.getTextOfLatestToast().contains("not live"));
+  }
+  @Test public void sportsFullscreenReturnKeepsConfirmedPlayerAndDedicatedHero()throws Exception{
+    pro();addLiveGameForChannel(0);activeMini(0);call(a,"cobraProFilter",4);
+    call(a,"promoteCobraPreviewToFullscreen",channel(0));call(a,"closeFullscreenToCobraView");
+    assertSame(player,get(a,"mCobraPreviewPlayer"));assertTrue(state.playing);assertFalse(state.released);
+    assertTrue((Boolean)call(a,"cobraProSportsHeroActive"));assertFalse(hero().browsing);assertEquals(CobraProUi.WATCHING,get(a,"mCobraProState"));
+  }
+  @Test public void returningUnrelatedFullscreenChannelToSportsClearsIt()throws Exception{
+    pro();addLiveGameForChannel(0);activeMini(0);call(a,"cobraProFilter",4);
+    call(a,"promoteCobraPreviewToFullscreen",channel(0));put(a,"mPlaying",channel(2));call(a,"closeFullscreenToCobraView");
+    assertNull(get(a,"mCobraPreviewPlayer"));assertTrue(state.released);assertTrue((Boolean)call(a,"cobraProSportsHeroActive"));
+    assertEquals(View.INVISIBLE,((View)get(a,"mCobraPreviewTexture")).getVisibility());
   }
   @Test public void appearanceAndAmbientMatrixRendersAllFiveModes()throws Exception{
     for(String appearance:new String[]{"light","dark"})for(String mode:new String[]{"mobile","grid","compact","cards","focus"})for(String ambient:new String[]{"off","subtle","immersive"}){
