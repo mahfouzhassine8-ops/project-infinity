@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-06T03:00:38-04:00",
+  "timezone": "America/Detroit",
+  "user_instruction": "316 is base lock it",
+  "status": "user_locked_base",
+  "current_base": {
+    "package_id": "com.projectinfinity.kodi",
+    "apk_version_code": 2103316,
+    "apk_version_name": "1.0.9-Close-Progress-Isolation-RC1",
+    "apk_file": "Infinity-2103316-Close-Progress-Isolation-RC1.apk",
+    "apk_bytes": 157897159,
+    "apk_sha256": "8a9884f872e454cba178facd92e638cb76919334de9bf77b67f1f447d38d154b",
+    "signing_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "skin_id": "skin.infinity.diggz",
+    "skin_version": "1.0.5.201",
+    "diggz_arctic_mirage_build": 421,
+    "apk_source_commit": "c99d0f66406efa6d352c9c249b9c5233f55a31b8",
+    "android_source_files": 254,
+    "android_source_map_sha256": "44d687c75f63fce4bc7ccd2bba344074a53d6f253f45ebc52bac1014e3d5e9ca",
+    "apk_workflow_run": 37426137427,
+    "apk_artifact_id": 11394218853,
+    "verification_artifact_id": 11394873944,
+    "native_engine_sha256": "b4b2630e37abd56a6e522ca633649a65b255b44bd6b39bcb9f8b84866b822aa6",
+    "library_file_id": "libfile_c84c0e0c409c8191bb42ec66c64ecf98"
+  },
+  "previous_locked_base_preserved": {
+    "apk_version_code": 2103312,
+    "skin_version": "1.0.5.201",
+    "apk_sha256": "6d6543dda3d54fd8b4ff12cdf79995c198a399839a29e71e1bf741789332deed",
+    "apk_source_commit": "1df07a46469040bbeee6bae34b13b4b3f8a7970d",
+    "apk_workflow_run": 37397392525
+  },
+  "preservation": {
+    "kodi_engine_and_other_native_libraries_byte_identical": true,
+    "skin_assets_and_resources_byte_identical": true,
+    "cobra_player_and_close_classes_byte_identical": true,
+    "permanent_signer_preserved": true,
+    "data_reset": false
+  },
+  "accepted_behavior": [
+    "Infinity uses the tested 2103315 Android task-removal close route.",
+    "Infinity gear shows a moving indeterminate arc while Kodi shuts down and a complete ring after matching native cleanup and process exit.",
+    "Cobra launch bypasses Infinity pending-close state; Cobra player, close path, controls and gear remain independent."
+  ],
+  "verification": {
+    "focused_automated_tests_passed": 28,
+    "signed_apk_and_preservation_checks_passed": true,
+    "lock_basis": "Explicit user instruction after delivery of the tested APK.",
+    "on_device_testing_independently_verified_by_codex": false
+  },
+  "future_work": "Use 2103316 / skin 1.0.5.201 as the parent for separately versioned candidates. Preserve this exact APK and the 2103312 rollback.",
+  "provenance": "Build-time candidate reports remain unchanged. This later user-authorized lock record controls baseline status.",
+  "changes_made_for_lock": "Lock documentation only; no rebuild or changes to the APK, application code, data, skin, engine or Cobra."
+}
