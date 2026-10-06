@@ -6,7 +6,7 @@
 - Parent SHA-256: `49407bd19436e17a54579cfd1c4e59e99868962e5bc723eb56e57d47c6e20ab3`.
 - Parent source: `70c4c31799879c9c8ad8d1debe3ec138cf1e3ab4`, successful workflow run `37391709971`.
 - Bundled skin remains **skin.infinity.diggz 1.0.5.201**. All 3311 native libraries, assets and Android resources are reused byte for byte.
-- Infinity chooser, process isolation, power route and all other non-Cobra DEX classes must match 3311. Candidate is **not locked** until device acceptance.
+- Infinity chooser, process isolation and power-route source remain identical to 3311. Protected DEX must match, except for two proven identical D8 API helper relocations and Splash's two calls to the moved helper. Candidate is **not locked** until device acceptance.
 
 ## Agreed additions
 
@@ -22,5 +22,7 @@
 ## Verification
 
 The workflow applies the declared source patch to the full verified 3311 source, compiles production Java, runs existing Cobra navigation/ambient/player/call/PiP/Multi-View and Infinity process tests plus new team/reminder/spoiler tests. It then runs the Android process-survival probe, compares all protected APK entries and every non-Cobra DEX class, and signs with the existing permanent certificate.
+
+D8 moved the existing `getDisplay` and `getDisplayCutout` forwarders from the generated Cobra hero outline to the generated Main outline. The check requires their complete instructions to be identical, no fields or class initializers, Main's remaining outline to match byte for byte, and Splash to match after resolving exactly two calls to that same `getDisplayCutout` body. It does not rewrite APK code or allow other protected changes. The receipt lists this compiler relocation explicitly.
 
 Sports UI tests use controlled feed data; no live provider, physical-device decoder, notification delivery latency or real provider recording is claimed by these tests. Android notification permission is required, and OS alarm/network restrictions can affect timing. Upcoming dates use the device timezone. The existing provider/EPG matching and recording implementation remains authoritative.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile the declared Android presentation delta and retain the complete 3310 payload."""
+"""Compile the declared Android presentation delta and retain the complete 3311 payload."""
 import argparse
 import copy
 import importlib.util
@@ -98,6 +98,49 @@ def verify_bytes(base,final):
             'asset_files_byte_identical':sum(n.startswith('assets/') and not n.endswith('/') for n in kept),
             'android_resources_byte_identical':True,'protected_entries':len(kept)}
 
+def verify_api_bridge_relocation(old,new):
+    """Prove the two D8 API bridges moved without changing their instructions.
+
+    This is not an owner allowlist expansion: strip only these exact, stateless
+    forwarders, then require Main's helper and Splash to equal the parent.
+    No APK instructions are rewritten by this verification.
+    """
+    prefix='com/projectinfinity/kodi/'
+    previous=prefix+'CobraProUi$Hero$$ExternalSyntheticApiModelOutline0.smali'
+    current=prefix+'Main$$ExternalSyntheticApiModelOutline0.smali'
+    splash=prefix+'Splash.smali'
+    if old[current]==new[current] and old[splash]==new[splash]:return [],set()
+    signatures=[
+        ('m(Lcom/projectinfinity/kodi/InfinityLiveActivity;)Landroid/view/Display;',
+         'Lcom/projectinfinity/kodi/InfinityLiveActivity;->getDisplay()Landroid/view/Display;'),
+        ('m(Landroid/view/WindowInsets;)Landroid/view/DisplayCutout;',
+         'Landroid/view/WindowInsets;->getDisplayCutout()Landroid/view/DisplayCutout;')]
+    for name in [previous,current]:
+        for classes in [old,new]:
+            require('<clinit>' not in classes[name] and '.field ' not in classes[name],
+                    'API outline acquired state or initialization')
+    normalized=new[current];relocations=[]
+    for signature,target in signatures:
+        body=('.method public static bridge synthetic '+signature+'\n'
+            '    .registers 1\n\n    invoke-virtual {p0}, '+target+'\n\n'
+            '    move-result-object p0\n\n    return-object p0\n.end method\n\n')
+        require(old[previous].count(body)==1 and new[current].count(body)==1,
+                'API bridge instructions changed: '+signature)
+        require(signature not in old[current] and signature not in new[previous],
+                'API bridge relocation differs: '+signature)
+        normalized=normalized.replace(body,'',1)
+        relocations.append({'signature':signature,'from':previous,'to':current,
+                            'instructions_identical':True})
+    require(normalized==old[current],'Main outline changed beyond exact bridge relocation')
+    signature=signatures[1][0]
+    old_call='L'+previous[:-6]+';->'+signature
+    new_call='L'+current[:-6]+';->'+signature
+    require(old[splash].count(old_call)==2 and new[splash].count(new_call)==2,
+            'Unexpected Splash bridge callsites')
+    require(new[splash].replace(new_call,old_call)==old[splash],
+            'Splash changed beyond identical API forwarding target')
+    return relocations,{current,splash}
+
 def compare_dex(base,donor,build,out):
     classpath=(build/'preservation-classpath.txt').read_text()
     for label,apk in [('base',base),('donor',donor)]:
@@ -112,10 +155,13 @@ def compare_dex(base,donor,build,out):
     new={p.relative_to(out/'smali-donor').as_posix():p.read_text() for p in (out/'smali-donor').rglob('*.smali')}
     allowed=re.compile(r'com/projectinfinity/kodi/(?:InfinityLiveActivity|CobraProUi|InfinityCobraFeatureRuntime|InfinityCobraReminderReceiver|CobraSportsPreferences|CobraSportsReminderJob)(?:\$[^/]*)?\.smali$')
     changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))
-    unexpected=[n for n in changed if not allowed.fullmatch(n) and n!='com/projectinfinity/kodi/BuildConfig.smali']
+    relocations,equivalent=verify_api_bridge_relocation(old,new)
+    unexpected=[n for n in changed if not allowed.fullmatch(n) and n!='com/projectinfinity/kodi/BuildConfig.smali' and n not in equivalent]
     require(not unexpected,'DEX behavior changed outside declared owners: '+repr(unexpected))
     report={'changed_classes':changed,'unchanged_classes':len(old.keys()&new.keys())-sum(n in old and n in new for n in changed),
-        'infinity_classes_unchanged':True,'all_other_dex_classes_unchanged':True}
+        'infinity_dex_behavior_unchanged':True,'compiler_api_bridge_relocations':relocations,
+        'splash_api_bridge_callsites_equivalent':len(equivalent)>0,
+        'all_other_protected_dex_classes_identical':True}
     (out/'DEX-PRESERVATION.json').write_text(json.dumps(report,indent=2)+'\n')
     # Keep the small manifest, not tens of thousands of redundant disassembled files.
     for name in ['dex-base','dex-donor','smali-base','smali-donor']:shutil.rmtree(out/name)
@@ -160,7 +206,6 @@ def main():
         'native_recompiled':False,'native_sha256':proof['native_sha256'],'permanent_signer':factory.CERT,
         'tests_passed':sum(tested.values())+1,'test_suites':tested,'android_process_exit_probe_passed':True,'native_cleanup_in_probe_simulated':True,'physical_device_verified':False,'locked':False,**kept,**bytecode}
     (out/'APK-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('PASS: Cobra Pro candidate signed; complete 3311 Infinity/native/assets/resources and all other DEX classes preserved.')
+    print('PASS: Cobra Pro candidate signed; 3311 native/assets/resources identical; protected DEX behavior preserved.')
 
 if __name__=='__main__':main()
-
