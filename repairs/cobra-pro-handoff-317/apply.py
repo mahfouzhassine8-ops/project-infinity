@@ -21,6 +21,7 @@ s=one(s,'  private void playChannel(Channel channel) {','  private void playChan
 s=one(s,'    // The guide shell and its original TextureView remain mounted behind fullscreen.','    if(mCobraProActive){mCobraProPlaybackOwned=true;mCobraProHeroBrowsing=false;mCobraProState=COBRA_PRO_WATCHING;mCobraPreviewMuted=cobraMediaMuted(session);cobraProSelectPlayingSlot(channel);}\n    // The guide shell and its original TextureView remain mounted behind fullscreen.')
 s=one(s,'    if(mCobraProActive){\n      if(mCobraProObserved!=null','    if(mCobraProActive){\n      mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;\n      if(mCobraProObserved!=null')
 s=one(s,'    if(!mCobraProActive)return;cobraProSetSportsCompact(false,false);mCobraProSportsAdapter=null;mCobraProActive=false;','    if(!mCobraProActive)return;cobraProSetSportsCompact(false,false);mCobraProSportsAdapter=null;mCobraProActive=false;mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;')
+s=one(s,'    if(!mCobraProActive)return;cobraProSetSportsCompact(false,false);','    if(!mCobraProActive)return;if(mCobraProPlaybackOwned){mCobraProPriorAutoplayAllowed=mCobraPreviewAutoplayAllowed;ExoPlayer current=mCobraPreviewPlayer;if(current!=null){mCobraProPriorPlaying=current.getPlayWhenReady();mCobraProPriorMuted=cobraMediaMuted(current);}}cobraProSetSportsCompact(false,false);')
 s=one(s,'    if(first){mCobraProActive=true;mCobraProState=COBRA_PRO_RESTING;','    if(first){mCobraProActive=true;mCobraProState=COBRA_PRO_RESTING;mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;')
 # Explicit Play owns the stream. Focus/browsing owns only the carousel selection.
 s=method(s,'  private void cobraProRetuneResting(','  private void cobraProPauseAndMute(){','''  private void cobraProSelectPlayingSlot(Channel channel){
@@ -69,6 +70,22 @@ s=method(s,'  private void cobraProRetuneSports(','  private void cobraProSports
   }
 ''')
 s=one(s,'"No games live right now"','"No games are live right now."')
+# A date can be published while its time is explicitly unconfirmed.
+s=one(s,'long startMs=0L;boolean completed=false;','long startMs=0L;boolean completed=false,timeConfirmed=true;')
+s=one(s,'g.completed=type!=null&&type.optBoolean("completed",false);JSONObject venue=', 'g.completed=type!=null&&type.optBoolean("completed",false);g.timeConfirmed=g.startMs>0&&e.optBoolean("timeValid",true)&&c.optBoolean("timeValid",true)&&!g.detail.toUpperCase(Locale.US).contains("TBD")&&!g.detail.toUpperCase(Locale.US).contains("TBA");JSONObject venue=')
+s=one(s,'data.time=game.startMs>0?new SimpleDateFormat("h:mm a z",Locale.getDefault()).format(new Date(game.startMs)):"Time TBA";', 'data.time=game.startMs>0&&game.timeConfirmed?new SimpleDateFormat("h:mm a z",Locale.getDefault()).format(new Date(game.startMs)):"Time TBA";')
+s=one(s,'game.finalGame()?"FINAL":cobraSportsClock(game.startMs);','game.finalGame()?"FINAL":game.timeConfirmed?cobraSportsClock(game.startMs):(game.startMs>0?new SimpleDateFormat("EEE • MMM d, yyyy",Locale.getDefault()).format(new Date(game.startMs))+" • Time TBA":"Date and time TBA");')
+# A resolver result is metadata; only a successfully allocated second player is a launch.
+s=one(s,'selectCobraMultiChannel(channel);mCobraSportsMultiAssignments.put(channel.id,game);mMain.post(this::cobraSportsRefreshMultiOverlays);return;','cobraLaunchMultiSportsChannel(channel,current);return;')
+s=one(s,'selectCobraMultiChannel(channel);mCobraSportsMultiAssignments.put(channel.id,latest);mMain.post(InfinityLiveActivity.this::cobraSportsRefreshMultiOverlays);','cobraLaunchMultiSportsChannel(channel,latest);')
+s=one(s,'  private void cobraPickMultiSportsGame(','''  private boolean cobraLaunchMultiSportsChannel(Channel channel,CobraSportsGame game){
+    if(channel==null||game==null||!game.live()||!cobraChannelAllowed(channel))return false;
+    try{selectCobraMultiChannel(channel);}catch(RuntimeException error){toast("Unable to open this broadcast; choose another channel");return false;}
+    CobraVideoTile tile=mCobraTiles.get(channel.id);
+    if(mMultiOverlay==null||mMultiChannels==null||mMultiChannels.length<2||tile==null||tile.player==null){toast("Broadcast screen unavailable; choose another channel");return false;}
+    mCobraSportsMultiAssignments.put(channel.id,game);mMain.post(this::cobraSportsRefreshMultiOverlays);return true;
+  }
+  private void cobraPickMultiSportsGame(''')
 # The hero has navigation and real programme identity; scores and matchup marks remain in game rows.
 s=one(s,'data.title=cobraSportsMatchup(game);data.schedule=game.live()||game.finalGame()?cobraSportsScoreLine(game):cobraSportsClock(game.startMs);data.next=cobraSportsMeta(game);','data.title="Live Sports";data.schedule=game.leagueLabel;data.next="Select a game below to watch";')
 # Plain page backgrounds previously erased the ambient finish at each Pro restyle.
@@ -121,7 +138,7 @@ s=one(s,'  static String fit(String value,Paint p,float width){','''  static fin
     void pressed(boolean value){down=value;invalidateSelf();}
     void activate(View owner,Runnable action){
       if(busy)return;busy=true;
-      if(!motion()||!owner.isAttachedToWindow()){action.run();return;}
+      if(!motion()||!owner.isAttachedToWindow()){busy=false;action.run();return;}
       animator=ValueAnimator.ofFloat(0,1);animator.setDuration(280);animator.setInterpolator(new android.view.animation.DecelerateInterpolator());
       animator.addUpdateListener(a->{progress=(float)a.getAnimatedValue();invalidateSelf();});
       animator.addListener(new android.animation.AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(android.animation.Animator a){cancelled=true;}@Override public void onAnimationEnd(android.animation.Animator a){progress=0;down=false;busy=false;invalidateSelf();if(!cancelled&&owner.isAttachedToWindow())action.run();}});
