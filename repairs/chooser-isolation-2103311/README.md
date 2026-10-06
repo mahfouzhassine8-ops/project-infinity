@@ -39,6 +39,8 @@ status reader/writer, an actual second process and System.exit(0), and verifies
 the chooser stays alive and receives completion. The probe SIMULATES the native
 cleanup receipt; it does not run the ARM64 Kodi engine. Packaging compares all
 other DEX classes, JNI declarations, resources, native/assets bytes and manifest.
+The emulator probe runs through adb am instrument with Android JUnit, retaining
+its raw completion status and logcat. Packaging requires the one test to pass.
 Phone startup, native cleanup, providers, PiP, keyboard/media/background routing
 and rapid close/reopen still require physical validation.
 

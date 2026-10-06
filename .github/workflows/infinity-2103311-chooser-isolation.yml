@@ -7,7 +7,7 @@ on:
 permissions: {contents: read, actions: read}
 concurrency:
   group: infinity-2103311-chooser-isolation
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   candidate-apk:
     runs-on: ubuntu-22.04
@@ -52,7 +52,7 @@ jobs:
           set -euo pipefail
           export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
           cd build3311
-          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3311/android-build.log
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest :xbmc:assembleRelease :xbmc:exportPreservationTools :processprobe:assembleDebug :processprobe:assembleDebugAndroidTest 2>&1 | tee ../evidence3311/android-build.log
       - name: Enable Android emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -71,7 +71,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"; cd build3311 && ./gradlew --no-daemon --console=plain :processprobe:connectedDebugAndroidTest
+          script: python3 repairs/chooser-isolation-2103311/run_process_probe.py --build build3311 --out evidence3311
       - name: Verify protected payload and bytecode then permanently sign
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}

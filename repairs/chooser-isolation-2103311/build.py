@@ -14,6 +14,7 @@ import xml.etree.ElementTree as E
 import zipfile
 from apply import SOURCE_MAP,CHANGED,ADDED,PROCESSES,manifest
 import process_probe
+import run_process_probe
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 sys.path.insert(0,str(HERE.parent/'mobile-regressions-2103304'))
@@ -142,13 +143,7 @@ def main():
         test=E.parse(suite).getroot();tested[test.get('name')]=int(test.get('tests'))
         require(all(int(test.get(k,'0'))==0 for k in ['failures','errors','skipped']),'Failed or skipped tests')
     require(tested=={'com.projectinfinity.kodi.IsolatedCloseRingTest':10,'com.projectinfinity.kodi.KodiProcessStatusTest':8,'com.projectinfinity.kodi.HealthExportStatusTest':2},'Missing required tests')
-    probe=list((build/'processprobe/build/outputs/androidTest-results/connected').rglob('TEST-*.xml'))
-    require(bool(probe),'Missing real Android process-exit test')
-    count=0
-    for result in probe:
-        test=E.parse(result).getroot();count+=int(test.get('tests',0))
-        require(all(int(test.get(k,'0'))==0 for k in ['failures','errors','skipped']),'Android process test failed')
-    require(count==1,'Missing Android survival assertion')
+    run_process_probe.validate((out/'process-exit-instrumentation.txt').read_text())
     bytecode=compare_dex(base,donor,build,out)
     unsigned=out/'Infinity-3311-unsigned.apk';merge(base,donor,unsigned)
     verify_process_manifest(run(bt/'aapt','dump','xmltree',base,'AndroidManifest.xml',output=out/'base-manifest.txt'),run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=out/'manifest.txt'))
