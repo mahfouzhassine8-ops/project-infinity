@@ -94,10 +94,10 @@ index 0000000..4f0f575
 +}
 diff --git a/tools/android/packaging/xbmc/src/CobraSportsReminderJob.java.in b/tools/android/packaging/xbmc/src/CobraSportsReminderJob.java.in
 new file mode 100644
-index 0000000..fff9802
+index 0000000..8f53e84
 --- /dev/null
 +++ b/tools/android/packaging/xbmc/src/CobraSportsReminderJob.java.in
-@@ -0,0 +1,94 @@
+@@ -0,0 +1,100 @@
 +package @APP_PACKAGE@;
 +
 +import android.app.job.JobInfo;
@@ -121,6 +121,7 @@ index 0000000..fff9802
 +/** Refreshes opted-in team schedules without opening a player or starting Kodi. */
 +public final class CobraSportsReminderJob extends JobService {
 +  static final int JOB=331201;
++  private volatile int generation;
 +  private volatile boolean stopped;
 +  private volatile Thread worker;
 +  private volatile HttpURLConnection connection;
@@ -170,30 +171,35 @@ index 0000000..fff9802
 +    }catch(Exception ignored){}
 +  }
 +  @Override public boolean onStartJob(JobParameters params){
-+    stopped=false;worker=new Thread(()->{
++    stopped=false;final int token=++generation;worker=new Thread(()->{
 +      boolean failed=false;
 +      try{
 +        InfinityCobraFeatureRuntime runtime=new InfinityCobraFeatureRuntime(this);runtime.reconcileSportsReminders();
 +        Set<String> leagues=leagues(this);
-+        long now=System.currentTimeMillis();SimpleDateFormat date=new SimpleDateFormat("yyyyMMdd",Locale.US);
-+        String dates=date.format(new Date(now))+"-"+date.format(new Date(now+7*86400000L));
-+        for(String league:leagues){if(stopped)break;String route=route(league);if(route.isEmpty())continue;
-+          try{
-+            connection=(HttpURLConnection)new URL("https://site.api.espn.com/apis/site/v2/sports/"+route+"/scoreboard?dates="+dates+"&limit=1000"+("ncaaf".equals(league)?"&groups=80":"ncaam".equals(league)?"&groups=50":"")).openConnection();
-+            connection.setConnectTimeout(8000);connection.setReadTimeout(10000);connection.setRequestProperty("User-Agent","Cobra-Sports/2103312");
-+            try(InputStream in=connection.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){
-+              byte[] buffer=new byte[8192];int n,total=0;while(!stopped&&(n=in.read(buffer))!=-1){total+=n;if(total>4*1024*1024)throw new java.io.IOException("Schedule too large");out.write(buffer,0,n);}
-+              if(!stopped)ingest(this,league,new JSONObject(out.toString("UTF-8")));
-+            }
-+          }catch(Exception e){failed=true;}finally{if(connection!=null)connection.disconnect();connection=null;}
++        long now=System.currentTimeMillis(),deadline=android.os.SystemClock.elapsedRealtime()+120000L;SimpleDateFormat date=new SimpleDateFormat("yyyyMMdd",Locale.US);
++        outer: for(String league:leagues){String route=route(league);if(route.isEmpty())continue;
++          for(int day=0;day<8;day++){
++            if(stopped||token!=generation)break outer;
++            if(android.os.SystemClock.elapsedRealtime()>deadline){failed=true;break outer;}
++            HttpURLConnection request=null;
++            try{
++              String dates=date.format(new Date(now+day*86400000L));
++              request=(HttpURLConnection)new URL("https://site.api.espn.com/apis/site/v2/sports/"+route+"/scoreboard?dates="+dates+"&limit=1000"+("ncaaf".equals(league)?"&groups=80":"ncaam".equals(league)?"&groups=50":"")).openConnection();connection=request;
++              request.setConnectTimeout(8000);request.setReadTimeout(10000);request.setRequestProperty("User-Agent","Cobra-Sports/2103312");
++              try(InputStream in=request.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){
++                byte[] buffer=new byte[8192];int n,total=0;while(!stopped&&token==generation&&(n=in.read(buffer))!=-1){total+=n;if(total>4*1024*1024)throw new java.io.IOException("Schedule too large");out.write(buffer,0,n);}
++                if(!stopped&&token==generation)ingest(this,league,new JSONObject(out.toString("UTF-8")));
++              }
++            }catch(Exception e){failed=true;break;}finally{if(request!=null)request.disconnect();if(connection==request)connection=null;}
++          }
 +        }
-+      }finally{if(!stopped)jobFinished(params,failed);worker=null;}
++      }finally{if(!stopped&&token==generation){jobFinished(params,failed);worker=null;}}
 +    },"Cobra-team-reminders");worker.start();return true;
 +  }
-+  @Override public boolean onStopJob(JobParameters params){stopped=true;if(connection!=null)connection.disconnect();if(worker!=null)worker.interrupt();return true;}
++  @Override public boolean onStopJob(JobParameters params){stopped=true;generation++;if(connection!=null)connection.disconnect();if(worker!=null)worker.interrupt();return true;}
 +}
 diff --git a/tools/android/packaging/xbmc/src/InfinityCobraFeatureRuntime.java.in b/tools/android/packaging/xbmc/src/InfinityCobraFeatureRuntime.java.in
-index 4c758a5..a8a061f 100644
+index 4c758a5..bd4d5dc 100644
 --- a/tools/android/packaging/xbmc/src/InfinityCobraFeatureRuntime.java.in
 +++ b/tools/android/packaging/xbmc/src/InfinityCobraFeatureRuntime.java.in
 @@ -314,6 +314,7 @@ public final class InfinityCobraFeatureRuntime {
@@ -204,7 +210,17 @@ index 4c758a5..a8a061f 100644
      JSONArray list = schedules();
      long now = System.currentTimeMillis();
      for (int i = 0; i < list.length(); i++) {
-@@ -361,6 +362,54 @@ public final class InfinityCobraFeatureRuntime {
+@@ -340,6 +341,9 @@ public final class InfinityCobraFeatureRuntime {
+   }
+ 
+   public String addReminder(String sourceId, String channelId, String program, long when) {
++    synchronized(InfinityCobraFeatureRuntime.class){return addReminderLocked(sourceId,channelId,program,when);}
++  }
++  private String addReminderLocked(String sourceId,String channelId,String program,long when) {
+     String id = "rem-" + Long.toHexString(System.currentTimeMillis());
+     JSONObject item = new JSONObject();
+     try {
+@@ -361,7 +365,58 @@ public final class InfinityCobraFeatureRuntime {
      catch (Exception e) { return new JSONArray(); }
    }
  
@@ -249,7 +265,7 @@ index 4c758a5..a8a061f 100644
 +      JSONArray list=reminders();for(int i=0;i<list.length();i++){JSONObject item=list.optJSONObject(i);
 +        if(item==null||!id.equals(item.optString("id")))continue;
 +        CobraSportsPreferences choices=new CobraSportsPreferences(context);
-+        if(item.optBoolean("delivered")||item.optLong("start")<System.currentTimeMillis()-60000L||
++        if(item.optBoolean("delivered")||item.optLong("when")>System.currentTimeMillis()+1000L||item.optLong("start")<System.currentTimeMillis()-60000L||
 +            (!item.optBoolean("manual")&&!choices.automatic(item.optString("away"),item.optString("home"))))return false;
 +        try{item.put("delivered",true);prefs.edit().putString(REMINDERS,list.toString()).commit();return true;}catch(Exception e){return false;}
 +      }return false;
@@ -257,9 +273,13 @@ index 4c758a5..a8a061f 100644
 +  }
 +
    public void removeReminder(String id) {
++    synchronized(InfinityCobraFeatureRuntime.class){removeReminderLocked(id);}
++  }
++  private void removeReminderLocked(String id) {
      JSONArray src = reminders();
      JSONArray dst = new JSONArray();
-@@ -448,6 +497,8 @@ public final class InfinityCobraFeatureRuntime {
+     for (int i = 0; i < src.length(); i++) {
+@@ -448,6 +503,8 @@ public final class InfinityCobraFeatureRuntime {
        Intent fill = new Intent(context, InfinityCobraReminderReceiver.class)
            .setAction(ACTION_REMINDER)
            .putExtra("id", item.getString("id"))
@@ -268,7 +288,7 @@ index 4c758a5..a8a061f 100644
            .putExtra(EXTRA_SOURCE_ID, item.optString("source_id"))
            .putExtra(EXTRA_CHANNEL_ID, item.optString("channel_id"))
            .putExtra(EXTRA_PROGRAM, item.optString("program"));
-@@ -463,6 +514,7 @@ public final class InfinityCobraFeatureRuntime {
+@@ -463,6 +520,7 @@ public final class InfinityCobraFeatureRuntime {
    private PendingIntent reminderPendingIntent(String id) {
      Intent intent = new Intent(context, InfinityCobraReminderReceiver.class)
          .setAction(ACTION_REMINDER)

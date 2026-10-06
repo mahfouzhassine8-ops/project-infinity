@@ -11,7 +11,7 @@
 ## Agreed additions
 
 1. Favorite team > pinned team > followed team > other games. Apply consistently to My Teams, Live Now, Upcoming and the ready-to-watch Sports preview. Preserve existing follows. Explicit game selection is sticky; data refresh never retunes playback.
-2. Favorite/pinned teams automatically receive one pregame notification per game, about five minutes before scheduled airtime. A persisted Android job refreshes opted-in schedules. Existing OS reminder alarms and reboot handling are reused.
+2. Favorite/pinned teams automatically receive one pregame notification per game, about five minutes before scheduled airtime. A persisted Android job refreshes opted-in and individual-reminder schedules every six hours, using bounded per-date requests and no video or Kodi startup. Existing OS reminder alarms and reboot handling are reused.
 3. Separate **Set a Reminder** in Game options for any upcoming game. Manual and team intent share one alarm; removing either does not erase the other. Preserve **Record / Schedule from guide**, Stats and Multi-View.
 4. Extend existing Hide Scores to **Spoiler Protection**, in Sports settings, with per-game reveal and Reveal all. Apply to rows, hero, accessible text, ticker, Multi-View overlays and statistics entry points. Notifications contain matchup only.
 5. Optional Live score ticker, disabled initially. Uses existing score polling and player presentation lifecycle; hides during PiP, background, lock, menus and Multi-View. Does not own a player or audio focus.
