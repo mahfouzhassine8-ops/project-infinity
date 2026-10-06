@@ -18,6 +18,7 @@ jobs:
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
+        timeout-minutes: 5
         with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
       - name: Download the exact 3311 source and matching build proof
         uses: actions/download-artifact@v8
@@ -107,4 +108,3 @@ jobs:
             !evidence3312/*.apk
           retention-days: 90
           if-no-files-found: error
-
