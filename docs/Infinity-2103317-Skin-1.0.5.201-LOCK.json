@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-06T06:35:25-04:00",
+  "timezone": "America/Detroit",
+  "user_instruction": "That is are new bace lock it",
+  "status": "user_locked_base",
+  "current_base": {
+    "package_id": "com.projectinfinity.kodi",
+    "apk_version_code": 2103317,
+    "apk_version_name": "1.0.9-Cobra-Pro-Season-OLED-RC1",
+    "apk_file": "Infinity-2103317-Cobra-Pro-Season-OLED-RC1.apk",
+    "apk_bytes": 157913543,
+    "apk_sha256": "7f21205b1abe980f398a6dc4b87825bf84190395b9972d939d26aaeaf7b0946c",
+    "signing_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "skin_id": "skin.infinity.diggz",
+    "skin_version": "1.0.5.201",
+    "diggz_arctic_mirage_build": 421,
+    "apk_source_commit": "57888a4c35159ecf9ed77d69c5364cc52b74bcb3",
+    "android_source_files": 254,
+    "apk_workflow_run": 37442289420,
+    "apk_delivery_artifact_ids": [
+      11401687982,
+      11401643180,
+      11401578373,
+      11401563598,
+      11401369018,
+      11401369030,
+      11401284270,
+      11401284260
+    ],
+    "verification_artifact_id": 11401244503,
+    "native_engine_sha256": "b4b2630e37abd56a6e522ca633649a65b255b44bd6b39bcb9f8b84866b822aa6",
+    "library_file_id": "libfile_2783fe50d0e88191997ff5e6b3a4f333"
+  },
+  "previous_locked_base_preserved": {
+    "apk_version_code": 2103316,
+    "apk_version_name": "1.0.9-Close-Progress-Isolation-RC1",
+    "skin_version": "1.0.5.201",
+    "locked_branch": "locked/2103316-close-progress-isolation",
+    "lock_commit": "9cde720d3aedc68d8dfddffa95bd51225ca399e7",
+    "apk_sha256": "8a9884f872e454cba178facd92e638cb76919334de9bf77b67f1f447d38d154b",
+    "apk_source_commit": "c99d0f66406efa6d352c9c249b9c5233f55a31b8",
+    "apk_workflow_run": 37426137427
+  },
+  "preservation": {
+    "infinity_kodi_source_and_behavior_preserved": true,
+    "kodi_engine_and_other_native_libraries_byte_identical": true,
+    "other_native_libraries_byte_identical": 46,
+    "skin_assets_and_resources_byte_identical": true,
+    "skin_changed": false,
+    "native_recompiled": false,
+    "permanent_signer_preserved": true,
+    "data_reset": false,
+    "preserved_apk_entries": 4168,
+    "unchanged_dex_classes": 8011,
+    "all_other_classes_behavior_identical": true,
+    "api_bridge_renumbering_verified": true
+  },
+  "declared_product_delta": {
+    "android_source_files": [
+      "tools/android/packaging/xbmc/src/CobraProUi.java.in",
+      "tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in",
+      "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in"
+    ],
+    "scope": "Cobra presentation and Pro sports behavior only."
+  },
+  "accepted_behavior": [
+    "Mobile removes only the duplicate top Views button; Visual Settings occupies that position while bottom Views and every view mode remain.",
+    "Ambient Off uses OLED black across Cobra view modes, drawers and sheets; Subtle works in Pro; Immersive and Night Cinema remain preserved.",
+    "Pro category-row Play starts the chosen channel directly while normal row selection and the hero Preview remain.",
+    "Fullscreen Multi-View includes a Sports category containing actual live games.",
+    "Fullscreen Channels long-hold Quick Peek displays above the channel drawer and keeps its intentional muted preview.",
+    "Sports is removed from the Cobra main drawer while Pro Sports and fullscreen sports features remain.",
+    "Pro Sports includes Teams grouped by league with team favorite, pin and follow actions.",
+    "Team details show real season schedules, official football weeks and published date ranges, scores, networks, bye weeks and Time TBA when needed.",
+    "Existing favorite over pin over follow priority, reminders, recording, live score ticker and spoiler protection remain integrated.",
+    "Sports tap shrinks the embedded Pro video and Sports long-hold restores its normal size.",
+    "Approved animations and all protected Cobra and Infinity behavior remain."
+  ],
+  "verification": {
+    "automated_checks_passed": 63,
+    "signed_apk_and_preservation_checks_passed": true,
+    "downloaded_apk_hash_verified": true,
+    "local_kodi_engine_bytes_verified": true,
+    "physical_device_verified_by_codex": false,
+    "lock_basis": "Explicit user instruction after delivery of the tested signed APK."
+  },
+  "future_work": "Use APK 2103317 and skin 1.0.5.201 as the parent for separately versioned candidates. Preserve this exact APK and keep APK 2103316 as rollback.",
+  "provenance": "Build-time candidate reports remain historical evidence. This later user-authorized lock record controls baseline status.",
+  "changes_made_for_lock": "Lock documentation only; no rebuild or changes to the APK, application code, data, skin, native engine or Cobra behavior."
+}
