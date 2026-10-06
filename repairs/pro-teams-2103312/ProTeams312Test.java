@@ -97,4 +97,8 @@ public class ProTeams312Test {
    a.setIntent(new Intent().putExtra("cobra_sports_reminder_game","nfl|missing"));call(a,"cobraConsumeSportsReminder");assertEquals("sports-reminder-lookup",get(a,"mCobraSheetKind"));assertTrue(text((View)get(a,"mCobraActionSheet")).contains("Finding your game"));
  }
 
+ @Test public void firstTeamPreferenceFetchesScheduleWithoutWaitingForPeriodicJob()throws Exception{
+   put(a,"mCobraSportsLastRefresh",0L);Object team=SportsHubTest.team("8","nfl|8","Lions","DET","");call(a,"cobraSportsChangeTeam",team,CobraSportsPreferences.PINS);assertEquals(true,get(a,"mCobraSportsLoading"));assertTrue(choices.automaticTeams().contains("nfl|8"));assertNull(get(a,"mPlayer"));
+ }
+
 }
