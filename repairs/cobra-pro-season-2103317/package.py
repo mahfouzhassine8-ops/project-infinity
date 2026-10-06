@@ -48,6 +48,16 @@ def package(base,build,out):
     # Reuse the strict smali comparison with exactly the declared presentation families.
     import inspect
     code=inspect.getsource(parent.compare_dex).replace('InfinityExitCompletion|InfinityGlassChooser|Splash|BuildConfig','InfinityLiveActivity|CobraProUi|CobraVisualRenderer|BuildConfig').replace("'cobra_classes_unchanged':True", "'infinity_kodi_classes_unchanged':True")
+    # Retain exact protected-class compiler differences before the strict guard.
+    code=code.replace("    require(not unexpected,",'''    diagnostic=out/'compiler-diffs';diagnostic.mkdir(exist_ok=True)
+    for name in unexpected:
+        import difflib
+        (diagnostic/(Path(name).name+'.diff')).write_text(''.join(difflib.unified_diff(old.get(name,'').splitlines(True),new.get(name,'').splitlines(True),fromfile='base/'+name,tofile='candidate/'+name)))
+    for name in sorted(old.keys()|new.keys()):
+        if 'ExternalSyntheticApiModelOutline' in name and name.startswith('com/projectinfinity/kodi/'):
+            for label,classes in [('base',old),('candidate',new)]:
+                if name in classes:(diagnostic/(label+'-'+Path(name).name)).write_text(classes[name])
+    require(not unexpected,''')
     ns=parent.__dict__.copy();exec(code,ns);dex=ns['compare_dex'](base,final,build,out)
     report={'candidate':VERSION,'apk_parent':2103316,'base_apk_sha256':BASE,'apk_sha256':sha(final.read_bytes()),'native_sha256':parent.BASE_NATIVE,'source_commit':os.environ['GITHUB_SHA'],'signer_certificate_sha256':parent.CERT,'skin_parent':'1.0.5.201','skin_changed':False,'native_recompiled':False,'data_reset':False,'physical_device_verified':False,'locked':False,'android_source_delta':receipt['changed'],**parent.verify_payload(base,final),**dex}
     (out/'APK-VERIFICATION.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')

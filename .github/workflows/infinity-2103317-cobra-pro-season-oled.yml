@@ -137,3 +137,11 @@ jobs:
             build3317/xbmc/build/test-results/testReleaseUnitTest
           retention-days: 90
           if-no-files-found: warn
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103317-Compiler-Diffs
+          path: evidence3317/compiler-diffs
+          retention-days: 90
+          if-no-files-found: warn

@@ -32,6 +32,11 @@ s=replace(s,'  private boolean cobraVisualEffectsAllowed(){','  boolean cobraPro
 s=replace(s,'  private void cobraRenderProSportsLeagues(LinearLayout parent){',(Path(__file__).parent/'teams.java.fragment').read_text()+'\n  private void cobraRenderProSportsLeagues(LinearLayout parent){')
 s=replace(s,'  private void reloadProfileCollections() {','  private void reloadProfileCollections() {\n    mCobraProTeamsGeneration++;mCobraProTeamsLoading.clear();mCobraProTeamsErrors.clear();mCobraProTeamKey="";mCobraProTeamWeek=-1;')
 s=replace(s,'paint.setColor(cobraModeDark()?vtheme().color("cobra.CobraChannelMark.colors.1",0xff24384c):vtheme().color("cobra.CobraChannelMark.colors.2",0xffdae6f0));','paint.setColor(cobraOledOff()?Color.BLACK:cobraModeDark()?vtheme().color("cobra.CobraChannelMark.colors.1",0xff24384c):vtheme().color("cobra.CobraChannelMark.colors.2",0xffdae6f0));')
+# Cards placeholders also use OLED black when Ambient is explicitly off.
+old=next(x for x in s.splitlines() if 'hero.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR' in x)
+start=old.index('hero.setBackground(');end=old.index(';category.setText',start)
+new=old[:start]+old[start:end].replace('hero.setBackground(new GradientDrawable(', 'hero.setBackground(cobraOledOff()?new android.graphics.drawable.ColorDrawable(Color.BLACK):new GradientDrawable(',1)+old[end:]
+s=replace(s,old,new)
 p.write_text(s)
 p=src/'CobraVisualRenderer.java.in';s=p.read_text()
 s=replace(s,'    float emphasis;boolean active,enabled=true;int opacity=255;ColorFilter filter;','    boolean oled;void oled(boolean value){if(oled!=value){oled=value;invalidateSelf();}}\n    float emphasis;boolean active,enabled=true;int opacity=255;ColorFilter filter;')
