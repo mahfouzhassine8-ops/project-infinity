@@ -1,0 +1,124 @@
+  // Pro browse state has no playback ownership. Requests publish only into the
+  // same profile/browser generation; neither scores nor week taps tune video.
+  private String mCobraMultiPickerFilter="";
+  private String mCobraProTeamsLeague="",mCobraProTeamKey="";
+  private int mCobraProTeamWeek=-1;
+  private long mCobraProTeamsGeneration;
+  private final Map<String,ArrayList<CobraSportsTeam>> mCobraProTeamDirectory=new LinkedHashMap<>();
+  private final Map<String,CobraTeamSeason> mCobraProTeamSeasons=new LinkedHashMap<>();
+  private final Set<String> mCobraProTeamsLoading=new HashSet<>();
+  private final Map<String,String> mCobraProTeamsErrors=new HashMap<>();
+  private static final class CobraTeamWeek {
+    int number;long from,to;final ArrayList<CobraSportsGame> games=new ArrayList<>();
+    String key(){return Integer.toString(number);}
+  }
+  private static final class CobraTeamSeason {
+    CobraSportsTeam team;String year="",division="";long at;
+    final ArrayList<CobraTeamWeek> weeks=new ArrayList<>();
+  }
+  private String cobraTeamFeed(CobraSportsLeagueSpec spec){return "https://site.api.espn.com/apis/site/v2/sports/"+spec.sport+"/"+spec.league;}
+  private static String cobraTeamLogo(JSONObject team){
+    if(team==null)return "";String logo=team.optString("logo","");JSONArray logos=team.optJSONArray("logos");
+    if(logo.isEmpty()&&logos!=null&&logos.optJSONObject(0)!=null)logo=logos.optJSONObject(0).optString("href","");return logo;
+  }
+  private static CobraSportsTeam cobraDirectoryTeam(CobraSportsLeagueSpec spec,JSONObject raw){
+    CobraSportsTeam team=cobraSportsParseTeam(spec,raw,null);if(team==null)return null;team.logo=cobraTeamLogo(raw);team.record=raw.optString("recordSummary","");
+    JSONObject record=raw.optJSONObject("record");JSONArray records=record==null?null:record.optJSONArray("items");
+    if(team.record.isEmpty()&&records!=null)for(int i=0;i<records.length();i++){JSONObject r=records.optJSONObject(i);if(r!=null&&"total".equals(r.optString("type","")))team.record=r.optString("summary","");}
+    return team;
+  }
+  private static long cobraTeamMonday(long date){java.util.Calendar c=java.util.Calendar.getInstance();c.setTimeInMillis(date);c.set(java.util.Calendar.HOUR_OF_DAY,0);c.set(java.util.Calendar.MINUTE,0);c.set(java.util.Calendar.SECOND,0);c.set(java.util.Calendar.MILLISECOND,0);int day=(c.get(java.util.Calendar.DAY_OF_WEEK)+5)%7;c.add(java.util.Calendar.DAY_OF_MONTH,-day);return c.getTimeInMillis();}
+  private static long cobraTeamDays(long from,int days){java.util.Calendar c=java.util.Calendar.getInstance();c.setTimeInMillis(from);c.add(java.util.Calendar.DAY_OF_MONTH,days);return c.getTimeInMillis();}
+  private static CobraTeamSeason cobraParseTeamSeason(CobraSportsLeagueSpec spec,CobraSportsTeam selected,JSONObject root,long now)throws Exception{
+    CobraTeamSeason out=new CobraTeamSeason();out.at=now;JSONObject raw=root.optJSONObject("team");out.team=raw==null?selected:cobraDirectoryTeam(spec,raw);if(out.team==null)out.team=selected;
+    if(raw!=null)out.division=raw.optString("standingSummary","");JSONObject season=root.optJSONObject("season");out.year=season==null?root.optString("requestedSeason",""):season.optString("displayName",season.optString("year",""));
+    JSONArray source=root.optJSONArray("events");if(source==null)return out;
+    JSONArray normalized=new JSONArray();Map<String,Integer> weekById=new HashMap<>();long earliest=Long.MAX_VALUE;boolean official=false;
+    for(int i=0;i<source.length();i++){
+      JSONObject original=source.optJSONObject(i);if(original==null)continue;JSONObject event=new JSONObject(original.toString());JSONArray comps=event.optJSONArray("competitions");JSONObject c=comps==null?null:comps.optJSONObject(0);if(c==null)continue;
+      // Team schedules put status in the competition and use score objects.
+      if(event.optJSONObject("status")==null&&c.optJSONObject("status")!=null)event.put("status",c.optJSONObject("status"));
+      JSONArray teams=c.optJSONArray("competitors");if(teams!=null)for(int t=0;t<teams.length();t++){JSONObject cp=teams.optJSONObject(t);if(cp==null)continue;JSONObject team=cp.optJSONObject("team");if(team!=null)team.put("logo",cobraTeamLogo(team));JSONObject score=cp.optJSONObject("score");if(score!=null)cp.put("score",score.optString("displayValue",""));}
+      JSONArray br=c.optJSONArray("broadcasts");if(br!=null)for(int t=0;t<br.length();t++){JSONObject b=br.optJSONObject(t);JSONObject media=b==null?null:b.optJSONObject("media");if(b!=null&&b.optJSONArray("names")==null&&media!=null)b.put("names",new JSONArray().put(media.optString("shortName","")));}
+      normalized.put(event);long date=cobraSportsIso(event.optString("date",""));if(date>0)earliest=Math.min(earliest,date);
+      JSONObject week=event.optJSONObject("week");int number=week==null?0:week.optInt("number",0);if(number>0){official=true;weekById.put(event.optString("id",""),number);}
+    }
+    if(earliest==Long.MAX_VALUE)return out;long first=cobraTeamMonday(earliest);Map<Integer,CobraTeamWeek> buckets=new java.util.TreeMap<>();
+    for(CobraSportsGame g:cobraSportsParseScoreboard(spec,new JSONObject().put("events",normalized))){
+      if(!selected.key.equals(g.away.key)&&!selected.key.equals(g.home.key))continue;
+      int number=official?weekById.getOrDefault(g.id,0):Math.max(1,(int)((cobraTeamMonday(g.startMs)-first+3600000L)/(7L*86400000L))+1);if(number<1)continue;
+      CobraTeamWeek w=buckets.get(number);if(w==null){w=new CobraTeamWeek();w.number=number;w.from=cobraTeamMonday(g.startMs);w.to=cobraTeamDays(w.from,7);buckets.put(number,w);}w.games.add(g);
+    }
+    if(official&&!buckets.isEmpty()){
+      CobraTeamWeek reference=buckets.values().iterator().next();long origin=cobraTeamDays(reference.from,-7*(reference.number-1));int last=Collections.max(buckets.keySet());
+      for(int n=1;n<=last;n++)if(!buckets.containsKey(n)){CobraTeamWeek w=new CobraTeamWeek();w.number=n;w.from=cobraTeamDays(origin,7*(n-1));w.to=cobraTeamDays(w.from,7);buckets.put(n,w);}
+    }
+    for(CobraTeamWeek w:buckets.values()){w.games.sort((a,b)->Long.compare(a.startMs,b.startMs));out.weeks.add(w);}return out;
+  }
+  private boolean cobraTeamsCurrent(String profile,long generation){return isCobraAsyncAlive()&&mCobraProActive&&mCobraProSportsActive&&profile.equals(mFeatures.activeProfileId())&&generation==mCobraProTeamsGeneration;}
+  private void cobraLoadProTeams(CobraSportsLeagueSpec spec){
+    if(!mCobraProTeamsLoading.add(spec.key))return;final String profile=mFeatures.activeProfileId();final long generation=mCobraProTeamsGeneration;
+    if(!submitCobraIo(()->{ArrayList<CobraSportsTeam> result=new ArrayList<>();String error="";try{JSONObject root=cobraSportsJson(cobraTeamFeed(spec)+"/teams?limit=1000");JSONArray sports=root.optJSONArray("sports");if(sports!=null)for(int i=0;i<sports.length();i++){JSONObject sport=sports.optJSONObject(i);JSONArray leagues=sport==null?null:sport.optJSONArray("leagues");if(leagues==null)continue;for(int j=0;j<leagues.length();j++){JSONObject league=leagues.optJSONObject(j);JSONArray teams=league==null?null:league.optJSONArray("teams");if(teams==null)continue;for(int k=0;k<teams.length();k++){JSONObject wrap=teams.optJSONObject(k);CobraSportsTeam team=cobraDirectoryTeam(spec,wrap==null?null:wrap.optJSONObject("team"));if(team!=null)result.add(team);}}}if(result.isEmpty())throw new java.io.IOException("No teams returned");}catch(Exception e){error="Teams are unavailable right now.";}
+      final String failure=error;publishCobraUi(()->{if(!profile.equals(mFeatures.activeProfileId())||generation!=mCobraProTeamsGeneration)return;mCobraProTeamsLoading.remove(spec.key);if(failure.isEmpty()){mCobraProTeamDirectory.put(spec.key,result);mCobraProTeamsErrors.remove(spec.key);}else mCobraProTeamsErrors.put(spec.key,failure);if(cobraTeamsCurrent(profile,generation)&&"teams".equals(mCobraProSportsSection)&&spec.key.equals(mCobraProTeamsLeague))cobraRenderGuideBrowser();});
+    })){mCobraProTeamsLoading.remove(spec.key);mCobraProTeamsErrors.put(spec.key,"Teams are unavailable right now.");}
+  }
+  private void cobraLoadProTeamSeason(CobraSportsTeam team){
+    String request="season:"+team.key;if(!mCobraProTeamsLoading.add(request))return;CobraSportsLeagueSpec spec=cobraSportsSpec(team.leagueKey);if(spec==null){mCobraProTeamsLoading.remove(request);return;}
+    final String profile=mFeatures.activeProfileId();final long generation=mCobraProTeamsGeneration;
+    if(!submitCobraIo(()->{CobraTeamSeason season=null;String error="";try{season=cobraParseTeamSeason(spec,team,cobraSportsJson(cobraTeamFeed(spec)+"/teams/"+URLEncoder.encode(team.id,"UTF-8")+"/schedule"),System.currentTimeMillis());}catch(Exception e){error="Season schedule is unavailable right now.";}final CobraTeamSeason data=season;final String failure=error;
+      publishCobraUi(()->{if(!profile.equals(mFeatures.activeProfileId())||generation!=mCobraProTeamsGeneration)return;mCobraProTeamsLoading.remove(request);if(data!=null){mCobraProTeamSeasons.put(team.key,data);mCobraProTeamsErrors.remove(request);}else mCobraProTeamsErrors.put(request,failure);if(cobraTeamsCurrent(profile,generation)&&"team".equals(mCobraProSportsSection)&&team.key.equals(mCobraProTeamKey))cobraRenderGuideBrowser();});
+    })){mCobraProTeamsLoading.remove(request);mCobraProTeamsErrors.put(request,"Season schedule is unavailable right now.");}
+  }
+  private CobraSportsTeam cobraProDirectoryTeam(String key){for(ArrayList<CobraSportsTeam> teams:mCobraProTeamDirectory.values())for(CobraSportsTeam t:teams)if(t.key.equals(key))return t;return mCobraSportsTeams.get(key);}
+  private void cobraProOpenTeam(CobraSportsTeam team){mCobraProTeamKey=team.key;mCobraProTeamWeek=-1;mCobraProSportsSection="team";cobraRenderGuideBrowser();}
+  private void cobraRenderProTeams(LinearLayout parent){
+    ScrollView scroll=new ScrollView(this);scroll.setTag("pro_teams_scroll");LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(4),dp(8),dp(4),dp(16));scroll.addView(body);parent.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+    if("team".equals(mCobraProSportsSection)){cobraRenderProTeamSeason(body);return;}
+    TextView hint=cobraText("♡  Press and hold to favorite     Season schedule & scores ›",cobraModeColor("muted"),11);hint.setMaxLines(2);hint.setPadding(dp(8),dp(8),dp(8),dp(12));body.addView(hint,new LinearLayout.LayoutParams(-1,-2));
+    for(CobraSportsLeagueSpec spec:COBRA_SPORTS_SPECS)if(cobraSportsEnabledLeagues().contains(spec.key)){
+      boolean expanded=spec.key.equals(mCobraProTeamsLeague);LinearLayout card=new LinearLayout(this);card.setOrientation(LinearLayout.VERTICAL);card.setBackground(CobraProUi.surface(this,!cobraModeDark(),false,14));
+      LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);head.setPadding(dp(12),dp(4),dp(12),dp(4));
+      CobraIconButton mark=cobraIcon("sports",spec.label,false,v->{});mark.setClickable(false);mark.setFocusable(false);head.addView(mark,new LinearLayout.LayoutParams(dp(36),dp(36)));
+      TextView label=cobraText(spec.label,cobraModeColor("text"),18);head.addView(label,new LinearLayout.LayoutParams(0,dp(46),1));TextView chevron=cobraText(expanded?"⌃":"⌄",cobraModeColor("text"),23);head.addView(chevron,new LinearLayout.LayoutParams(dp(28),dp(42)));
+      head.setTag("pro_team_league_"+spec.key);head.setContentDescription(spec.label+", "+(expanded?"collapse teams":"expand teams"));head.setFocusable(true);head.setOnClickListener(v->{mCobraProTeamsLeague=expanded?"":spec.key;mCobraProTeamsAll=false;cobraRenderGuideBrowser();});card.addView(head,new LinearLayout.LayoutParams(-1,dp(56)));
+      if(expanded){ArrayList<CobraSportsTeam> cached=mCobraProTeamDirectory.get(spec.key);if(cached==null){String error=mCobraProTeamsErrors.get(spec.key);cobraInfoText(card,error==null?"Loading teams…":error);if(error==null)cobraLoadProTeams(spec);else card.addView(cobraTextButton("Retry",cobraModeDark(),()->{mCobraProTeamsErrors.remove(spec.key);cobraLoadProTeams(spec);cobraRenderGuideBrowser();}),new LinearLayout.LayoutParams(-1,dp(48)));}
+        else {ArrayList<CobraSportsTeam> teams=new ArrayList<>(cached);teams.sort((a,b)->{int rank=Integer.compare(cobraSportsChoices().rank(a.key),cobraSportsChoices().rank(b.key));return rank!=0?rank:a.name.compareToIgnoreCase(b.name);});int limit=mCobraProTeamsAll?teams.size():Math.min(3,teams.size());for(int i=0;i<limit;i++){CobraSportsTeam team=teams.get(i);CobraProUi.TeamRow row=new CobraProUi.TeamRow(this,!cobraModeDark(),false);row.bind(team.name,team.logo,cobraSportsHideScores()?"Scores protected":team.record.isEmpty()?spec.label:team.record,cobraSportsChoices().rank(team.key)==0,(image,url)->cobraLoadVodArtwork(image,url));row.setTag("pro_team_"+team.key);row.setOnClickListener(v->cobraProOpenTeam(team));row.setOnLongClickListener(v->{cobraSportsTeamOptions(team);return true;});card.addView(row,new LinearLayout.LayoutParams(-1,CobraProUi.TeamRow.height(this,false)));}
+          if(!mCobraProTeamsAll&&teams.size()>3){CobraProUi.Action all=new CobraProUi.Action(this,"list","View all "+spec.label+" teams",false,!cobraModeDark(),()->{mCobraProTeamsAll=true;cobraRenderGuideBrowser();});all.setTag("pro_team_all_"+spec.key);card.addView(all,new LinearLayout.LayoutParams(-1,dp(48)));}}
+      }
+      LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,-2);cp.bottomMargin=dp(8);body.addView(card,cp);
+    }
+    cobraAnimateChildrenIn(body);
+  }
+  private boolean mCobraProTeamsAll;
+  private void cobraRenderProTeamSeason(LinearLayout body){
+    CobraProUi.Action back=new CobraProUi.Action(this,"left","Back to Sports",false,!cobraModeDark(),()->{mCobraProSportsSection="teams";cobraRenderGuideBrowser();});back.setTag("pro_team_back");body.addView(back,new LinearLayout.LayoutParams(-1,dp(40)));
+    CobraSportsTeam selected=cobraProDirectoryTeam(mCobraProTeamKey);if(selected==null){cobraInfoText(body,"Select a team from Teams.");return;}CobraTeamSeason season=mCobraProTeamSeasons.get(selected.key);CobraSportsTeam team=season==null?selected:season.team;CobraSportsLeagueSpec spec=cobraSportsSpec(selected.leagueKey);
+    String meta=(spec==null?"":spec.label)+(season==null||season.division.isEmpty()?"":"  •  "+season.division)+(season==null||season.year.isEmpty()?"":"  •  "+season.year)+"\n"+(cobraSportsHideScores()?"Scores protected":team.record);
+    CobraProUi.TeamRow header=new CobraProUi.TeamRow(this,!cobraModeDark(),true);header.bind(team.name,team.logo,meta,cobraSportsChoices().rank(team.key)==0,(image,url)->cobraLoadVodArtwork(image,url));header.setTag("pro_team_header");header.favorite.setOnClickListener(v->{cobraSportsChangeTeam(selected,CobraSportsPreferences.FAVORITES);});header.setOnLongClickListener(v->{cobraSportsTeamOptions(selected);return true;});body.addView(header,new LinearLayout.LayoutParams(-1,CobraProUi.TeamRow.height(this,true)));
+    String request="season:"+selected.key,error=mCobraProTeamsErrors.get(request);if(season==null){cobraInfoText(body,error==null?"Loading season schedule…":error);if(error==null)cobraLoadProTeamSeason(selected);else body.addView(cobraTextButton("Retry",cobraModeDark(),()->{mCobraProTeamsErrors.remove(request);cobraLoadProTeamSeason(selected);cobraRenderGuideBrowser();}),new LinearLayout.LayoutParams(-1,dp(48)));return;}
+    if(season.weeks.isEmpty()){cobraInfoText(body,"No season games are available for this team.");return;}
+    if(mCobraProTeamWeek<0){long now=System.currentTimeMillis();CobraTeamWeek near=season.weeks.get(0);for(CobraTeamWeek w:season.weeks){if(w.from<=now)near=w;if(w.from<=now&&w.to>now)break;}mCobraProTeamWeek=near.number;}
+    HorizontalScrollView weeks=new HorizontalScrollView(this);weeks.setHorizontalScrollBarEnabled(false);weeks.setTag("pro_team_weeks");LinearLayout rail=new LinearLayout(this);weeks.addView(rail);CobraTeamWeek chosen=null;int chosenX=0;
+    for(int i=0;i<season.weeks.size();i++){CobraTeamWeek w=season.weeks.get(i);boolean active=w.number==mCobraProTeamWeek;if(active){chosen=w;chosenX=dp(i*90);}LinearLayout chip=new LinearLayout(this);chip.setOrientation(LinearLayout.VERTICAL);chip.setGravity(Gravity.CENTER);chip.setBackground(CobraProUi.surface(this,!cobraModeDark(),active,12));chip.setSelected(active);chip.setTag("pro_team_week_"+w.number);chip.setFocusable(true);chip.setContentDescription("Week "+w.number+", "+cobraTeamRange(w)+(active?", selected":""));TextView title=cobraText("Week "+w.number,cobraModeColor("text"),13);title.setGravity(Gravity.CENTER);chip.addView(title);TextView range=cobraText(cobraTeamRange(w),cobraModeColor("muted"),10);range.setGravity(Gravity.CENTER);chip.addView(range);chip.setOnClickListener(v->{mCobraProTeamWeek=w.number;cobraRenderGuideBrowser();});LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(dp(84),dp(58));wp.rightMargin=dp(6);rail.addView(chip,wp);}
+    LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(-1,dp(66));wp.topMargin=dp(8);body.addView(weeks,wp);final int scrollX=chosenX;weeks.post(()->weeks.scrollTo(Math.max(0,scrollX-dp(170)),0));
+    if(chosen==null)return;LinearLayout games=new LinearLayout(this);games.setOrientation(LinearLayout.VERTICAL);games.setBackground(CobraProUi.surface(this,!cobraModeDark(),false,12));TextView title=cobraText("Week "+chosen.number+" Games",cobraModeColor("text"),19);title.setPadding(dp(12),dp(12),dp(12),dp(12));games.addView(title,new LinearLayout.LayoutParams(-1,-2));
+    if(chosen.games.isEmpty())cobraInfoText(games,"No games scheduled this week.");
+    for(CobraSportsGame cached:chosen.games){CobraSportsGame fresh=cobraSportsGame(cached.id);CobraSportsGame game=fresh!=null&&fresh.leagueKey.equals(cached.leagueKey)?fresh:cached;CobraProUi.WeekGameRow row=new CobraProUi.WeekGameRow(this,!cobraModeDark());row.bind(cobraProSportsUiGame(game),new SimpleDateFormat("EEE, MMM d",Locale.getDefault()).format(new Date(game.startMs)),(image,url)->cobraLoadVodArtwork(image,url));row.setTag("pro_team_game_"+game.id);row.setOnClickListener(v->cobraProSportsOptions(game));games.addView(row,new LinearLayout.LayoutParams(-1,CobraProUi.WeekGameRow.height(this)));}
+    body.addView(games,new LinearLayout.LayoutParams(-1,-2));
+    if(System.currentTimeMillis()-season.at>5*60000L&&error==null)cobraLoadProTeamSeason(selected);
+  }
+  private String cobraTeamRange(CobraTeamWeek w){SimpleDateFormat f=new SimpleDateFormat("MMM d",Locale.getDefault());return f.format(new Date(w.from))+" – "+f.format(new Date(cobraTeamDays(w.to,-1)));}
+  private void cobraRenderMultiSports(android.widget.ListView list){
+    ArrayList<CobraSportsGame> games=new ArrayList<>();for(CobraSportsGame game:mCobraSportsGames)if(game.live())games.add(game);games.sort(cobraSportsComparator());final String profile=mFeatures.activeProfileId();
+    if(games.isEmpty()){String text=mCobraSportsLoading?"Loading live games…":"No games are live right now.";list.setAdapter(new android.widget.BaseAdapter(){public int getCount(){return 1;}public Object getItem(int p){return text;}public long getItemId(int p){return 0;}public boolean isEnabled(int p){return false;}public View getView(int p,View old,android.view.ViewGroup host){TextView row=cobraText(text,Color.WHITE,14);row.setGravity(Gravity.CENTER);row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,dp(96)));return row;}});if(System.currentTimeMillis()-mCobraSportsLastRefresh>COBRA_SPORTS_STALE_MS)cobraSportsRefresh(false);return;}
+    list.setItemsCanFocus(true);list.setAdapter(new android.widget.BaseAdapter(){public int getCount(){return games.size();}public Object getItem(int p){return games.get(p);}public long getItemId(int p){return CobraModeLayout.stableId(games.get(p).leagueKey+"|"+games.get(p).id);}public View getView(int p,View old,android.view.ViewGroup host){CobraSportsGame game=games.get(p);CobraProUi.GameRow row=new CobraProUi.GameRow(InfinityLiveActivity.this,false,()->cobraPickMultiSportsGame(game,profile),()->cobraPickMultiSportsGame(game,profile));row.options=()->cobraPickMultiSportsGame(game,profile);row.bind(cobraProSportsUiGame(game),(image,url)->cobraLoadVodArtwork(image,url));row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,CobraProUi.GameRow.height(InfinityLiveActivity.this,Math.round(host.getWidth()/getResources().getDisplayMetrics().density))));return row;}});
+  }
+  private void cobraPickMultiSportsGame(CobraSportsGame game,String profile){
+    final FrameLayout picker=mCobraMultiPicker;if(picker==null||!game.live()||!profile.equals(mFeatures.activeProfileId()))return;
+    cobraSportsResolveAsync(game,matches->{if(picker!=mCobraMultiPicker||!"SPORTS".equals(mCobraMultiPickerFilter)||!profile.equals(mFeatures.activeProfileId()))return;CobraSportsGame current=cobraSportsGame(game.id);if(current==null||!current.live()){toast("This game is no longer live");renderCobraMultiPicker("SPORTS");return;}
+      ArrayList<CobraSportsMatch> eligible=new ArrayList<>();for(CobraSportsMatch m:matches)if(cobraChannelAllowed(m.channel)&&!cobraProPinned(m.channel)&&(mPlaying==null||!mPlaying.id.equals(m.channel.id)))eligible.add(m);
+      if(eligible.isEmpty()){toast("No additional matching channel found in your providers");return;}if(cobraSportsUniqueStrong(eligible)){Channel channel=eligible.get(0).channel;selectCobraMultiChannel(channel);mCobraSportsMultiAssignments.put(channel.id,game);mMain.post(this::cobraSportsRefreshMultiOverlays);return;}
+      // Keep the picker/session alive while the user chooses a possible feed.
+      android.widget.ListView list=(android.widget.ListView)picker.findViewWithTag("cobra_multi_picker_list");ArrayList<Channel> channels=new ArrayList<>();for(CobraSportsMatch m:eligible)channels.add(m.channel);list.setAdapter(cobraMultiChannelAdapter(channels));toast("Choose the broadcast for "+cobraSportsMatchup(game));
+    });
+  }
