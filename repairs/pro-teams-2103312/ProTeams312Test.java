@@ -26,7 +26,7 @@ public class ProTeams312Test {
  @SuppressWarnings("unchecked") void games(Object...values)throws Exception{((List<Object>)get(a,"mCobraSportsGames")).addAll(Arrays.asList(values));}
  void pro()throws Exception{choices.prefs.edit().putString("guide_view_mode","focus").commit();put(a,"mCobraGuideStyle","focus");call(a,"cobraShowGuideShell");f.measure(a,412,915);}
  String text(View view){String result=view instanceof TextView?((TextView)view).getText().toString():"";if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)result+="\n"+text(((ViewGroup)view).getChildAt(i));return result;}
- void save(String name)throws Exception{f.measure(a,412,915);View view=a.getWindow().getDecorView();Bitmap bitmap=Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);view.draw(new Canvas(bitmap));File file=new File(System.getProperty("cobra.evidence"),"teams/"+name+".png");file.getParentFile().mkdirs();try(FileOutputStream out=new FileOutputStream(file)){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}bitmap.recycle();}
+ void save(String name)throws Exception{f.measure(a,412,915);f.frames(30);f.measure(a,412,915);View view=a.getWindow().getDecorView();Bitmap bitmap=Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);view.draw(new Canvas(bitmap));File file=new File(System.getProperty("cobra.evidence"),"teams/"+name+".png");file.getParentFile().mkdirs();try(FileOutputStream out=new FileOutputStream(file)){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}bitmap.recycle();}
  @Test public void priorityIsFavoriteThenPinnedThenFollowedInEverySportsList()throws Exception{
    Object ordinary=game("a","BUF","NYJ","in"),follow=game("b","CHI","GB","in"),pin=game("c","KC","ATL","in"),favorite=game("d","DET","MIN","in");
    choices.toggle(CobraSportsPreferences.FOLLOWS,"nfl|CHI");choices.toggle(CobraSportsPreferences.PINS,"nfl|KC");choices.toggle(CobraSportsPreferences.FAVORITES,"nfl|DET");games(ordinary,follow,pin,favorite);
@@ -67,7 +67,7 @@ public class ProTeams312Test {
  @Test public void spoilerProtectionRedactsRowsHeroStatsAndAccessibility()throws Exception{
    Object g=game("hidden","DET","GB","in");put(g,"detail","Lions win 24-17");games(g);choices.protection(true);
    CobraProUi.SportsGame data=(CobraProUi.SportsGame)call(a,"cobraProSportsUiGame",g);assertEquals("Scores hidden",data.score);assertFalse(data.status.contains("24"));
-   CobraProUi.Program hero=(CobraProUi.Program)call(a,"cobraProSportsProgram",g);assertFalse(hero.sportsScore.contains("24"));assertFalse(hero.sportsMeta.contains("win"));
+   CobraProUi.Program hero=(CobraProUi.Program)call(a,"cobraProSportsProgram",g);assertEquals("Scores hidden",hero.sportsScore);assertFalse(hero.sportsScore.contains("24"));assertFalse(hero.sportsMeta.contains("win"));
    CobraProUi.GameRow row=new CobraProUi.GameRow(a,false,()->{},()->{});row.bind(data,(v,u)->{});assertFalse(row.getContentDescription().toString().contains("24"));
    call(a,"showCobraSportsStats",g);assertEquals("sports-reveal-stats",get(a,"mCobraSheetKind"));assertFalse(text((View)get(a,"mCobraActionSheet")).contains("24"));
  }
@@ -78,7 +78,7 @@ public class ProTeams312Test {
  @Test public void gameOptionsContainIndependentReminderTeamChoicesAndExistingRecording()throws Exception{
    Object game=game("upcoming","DET","GB","pre");call(a,"cobraProSportsOptions",game);String copy=text((View)get(a,"mCobraActionSheet"));assertTrue(copy.contains("Set a Reminder"));assertTrue(copy.contains("Record / Schedule from guide"));assertTrue(copy.contains("DET"));assertTrue(copy.contains("GB"));save("game-options");
  }
- @Test public void proPreviewMuteBadgeIsGoneInBothThemes()throws Exception{
+ @Test public void proPreviewMuteBadgeIsGoneInRestingAndPreview()throws Exception{
    pro();CobraProUi.Hero hero=(CobraProUi.Hero)get(a,"mCobraProHeroUi");assertEquals(View.GONE,hero.muted.getVisibility());assertEquals(View.GONE,hero.muteIcon.getVisibility());hero.setState(CobraProUi.PREVIEW,null,false);assertEquals(View.GONE,hero.muted.getVisibility());assertEquals(View.GONE,hero.muteIcon.getVisibility());
  }
  @Test public void tickerRespectsProtectionAndPipWithoutChangingPlayers()throws Exception{
@@ -89,7 +89,7 @@ public class ProTeams312Test {
    games(game("live","DET","GB","in"));pro();f.drawer(a,"Sports");f.measure(a,412,915);assertTrue((Boolean)get(a,"mCobraProSportsActive"));assertEquals(true,call(a,"cobraSurfaceMatchesDrawerOwner"));
    call(a,"cobraProSportsTab",2);call(a,"cobraRenderGuideBrowser");assertEquals("upcoming",get(a,"mCobraProSportsSection"));call(a,"cobraProFilter",3);assertEquals("live",call(a,"cobraDrawerOwner"));
  }
- @Test public void renderNewControlsAcrossThemesAndSportsSettings()throws Exception{
+ @Test public void renderNewControlsAndSportsSettings()throws Exception{
    games(game("favorite","DET","GB","in"),game("pinned","KC","ATL","in"));choices.toggle(CobraSportsPreferences.FAVORITES,"nfl|DET");choices.toggle(CobraSportsPreferences.PINS,"nfl|KC");pro();call(a,"cobraProFilter",4);f.frames(30);save("favorite-and-pinned");choices.protection(true);call(a,"cobraSportsPresentationChanged");save("spoiler-protection");call(a,"showCobraSportsSettings");save("sports-settings");
  }
 }

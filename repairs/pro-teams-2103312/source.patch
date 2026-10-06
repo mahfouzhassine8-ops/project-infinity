@@ -24,7 +24,7 @@ index d599644..e41a015 100644
              <intent-filter>
                  <action android:name="android.intent.action.BOOT_COMPLETED" />
 diff --git a/tools/android/packaging/xbmc/src/CobraProUi.java.in b/tools/android/packaging/xbmc/src/CobraProUi.java.in
-index ad7b5c7..cd40522 100644
+index ad7b5c7..76a1cf2 100644
 --- a/tools/android/packaging/xbmc/src/CobraProUi.java.in
 +++ b/tools/android/packaging/xbmc/src/CobraProUi.java.in
 @@ -23,6 +23,7 @@ final class CobraProUi {
@@ -35,7 +35,12 @@ index ad7b5c7..cd40522 100644
      String leagueLogo="",network="",status="",date="",time="";
      String id="",league="",away="Away",awayAbbr="",awayLogo="",home="Home",homeAbbr="",homeLogo="",score="",meta="";
      boolean live,upcoming,favorite,soccer,selected;
-@@ -213,7 +214,7 @@ final class CobraProUi {
+@@ -209,11 +210,11 @@ final class CobraProUi {
+       setState(RESTING,null,false);
+     }
+     void bind(Program d,int index,int count){sportsMode=d.sports;hasChannel=!"Choose a channel".equals(d.channel);source.text(d.source);source.setContentDescription(d.source+", item "+(index+1)+" of "+count);live.text("LIVE");live.setVisibility(d.live?VISIBLE:GONE);dots.index=index;dots.count=Math.min(6,Math.max(1,count));dots.invalidate();dots.setVisibility(count>1?VISIBLE:INVISIBLE);left.setVisibility(count>1?VISIBLE:GONE);right.setVisibility(count>1?VISIBLE:GONE);status.text(d.status);player[1].setSelected(d.favorite);
+-      if(sportsMode){logo.setVisibility(GONE);info.setVisibility(GONE);sportsAway.setVisibility(d.live?VISIBLE:GONE);sportsHome.setVisibility(d.live?VISIBLE:GONE);sportsMatchup.setVisibility(d.live?VISIBLE:GONE);sportsScore.setVisibility(d.live?VISIBLE:GONE);sportsMeta.setVisibility(d.live?VISIBLE:GONE);sportsAway.bind(d.sportsAway.isEmpty()?d.sportsAwayAbbr:d.sportsAway,d.sportsAwayLogo,art);sportsHome.bind(d.sportsHome.isEmpty()?d.sportsHomeAbbr:d.sportsHome,d.sportsHomeLogo,art);String matchup=(d.sportsAwayAbbr.isEmpty()?d.sportsAway:d.sportsAwayAbbr)+"   @   "+(d.sportsHomeAbbr.isEmpty()?d.sportsHome:d.sportsHomeAbbr);sportsMatchup.text(matchup.trim().isEmpty()?d.title:matchup);sportsScore.text(d.sportsScore.isEmpty()?d.schedule:d.sportsScore);sportsMeta.text(d.sportsMeta.isEmpty()?d.next:d.sportsMeta);sportsWatch.setEnabled(d.sportsAvailable);sportsStats.setEnabled(d.sportsAvailable);sportsMulti.setEnabled(d.sportsMultiAvailable);}
++      if(sportsMode){logo.setVisibility(GONE);info.setVisibility(GONE);sportsAway.setVisibility(d.live?VISIBLE:GONE);sportsHome.setVisibility(d.live?VISIBLE:GONE);sportsMatchup.setVisibility(d.live?VISIBLE:GONE);sportsScore.setVisibility(d.live?VISIBLE:GONE);sportsMeta.setVisibility(d.live?VISIBLE:GONE);sportsAway.bind(d.sportsAway.isEmpty()?d.sportsAwayAbbr:d.sportsAway,d.sportsAwayLogo,art);sportsHome.bind(d.sportsHome.isEmpty()?d.sportsHomeAbbr:d.sportsHome,d.sportsHomeLogo,art);String matchup=(d.sportsAwayAbbr.isEmpty()?d.sportsAway:d.sportsAwayAbbr)+"   @   "+(d.sportsHomeAbbr.isEmpty()?d.sportsHome:d.sportsHomeAbbr);sportsMatchup.text(matchup.trim().isEmpty()?d.title:matchup);sportsScore.text(d.sportsScore.isEmpty()?d.schedule:d.sportsScore);sportsScore.setTextSize("Scores hidden".equals(d.sportsScore)?14:28);sportsMeta.text(d.sportsMeta.isEmpty()?d.next:d.sportsMeta);sportsWatch.setEnabled(d.sportsAvailable);sportsStats.setEnabled(d.sportsAvailable);sportsMulti.setEnabled(d.sportsMultiAvailable);}
        else{logo.setVisibility(VISIBLE);info.setVisibility(VISIBLE);sportsAway.setVisibility(GONE);sportsHome.setVisibility(GONE);sportsMatchup.setVisibility(GONE);sportsScore.setVisibility(GONE);sportsMeta.setVisibility(GONE);logo.bind(d.channel,d.logo,art);info.bind(d,art);preview.setEnabled(hasChannel);}
        applyModeVisibility();
      }
@@ -328,7 +333,7 @@ index 052c393..dea322d 100644
    }
  }
 diff --git a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
-index 5233ef0..918c3dc 100644
+index 5233ef0..fc00ac8 100644
 --- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 +++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
 @@ -213,7 +213,7 @@ public final class InfinityLiveActivity extends Activity {
@@ -452,11 +457,18 @@ index 5233ef0..918c3dc 100644
 -    if(game.live()||game.finalGame())data.score=cobraSportsHideScores()?"Scores hidden":cobraSportsScore(game.away)+"  -  "+cobraSportsScore(game.home);
 -    data.status=game.detail;data.network=android.text.TextUtils.join(" / ",game.broadcasts);
 +    if(game.live()||game.finalGame())data.score=cobraSportsHidden(game)?"Scores hidden":cobraSportsRawScore(game.away)+"  -  "+cobraSportsRawScore(game.home);
-+    data.priority=cobraSportsRank(game)==0?"★":cobraSportsRank(game)==1?"PIN":"";data.status=cobraSportsHidden(game)?"Scores hidden":game.detail;data.network=android.text.TextUtils.join(" / ",game.broadcasts);
++    data.priority=cobraSportsRank(game)==0?"★":cobraSportsRank(game)==1?"PIN":"";data.status=cobraSportsHidden(game)?"Reveal in menu":game.detail;data.network=android.text.TextUtils.join(" / ",game.broadcasts);
      data.date=game.startMs>0?new SimpleDateFormat("MMM d, yyyy",Locale.getDefault()).format(new Date(game.startMs)):"Date TBA";
      data.time=game.startMs>0?new SimpleDateFormat("h:mm a z",Locale.getDefault()).format(new Date(game.startMs)):"Time TBA";
      data.meta=cobraSportsMeta(game);data.selected=game.id.equals(mCobraProSportsGameId);return data;
-@@ -9453,9 +9458,9 @@ public final class InfinityLiveActivity extends Activity {
+@@ -9447,15 +9452,15 @@ public final class InfinityLiveActivity extends Activity {
+     CobraProUi.Program data=new CobraProUi.Program();data.sports=true;data.source="LIVE SPORTS";if(game!=null&&!game.live())game=null;data.channel=game==null?"LIVE SPORTS":game.leagueLabel;data.live=game!=null&&game.live();data.sportsAvailable=game!=null;data.sportsMultiAvailable=game!=null&&game.live();
+     if(game==null){data.title=mCobraSportsLoading?"Loading live sports…":"No games live right now";CobraSportsGame next=cobraProPreferredSportsGame();data.schedule=next==null?"Open Sports for schedules":cobraSportsMatchup(next);data.next=next==null?"":cobraSportsMeta(next);return data;}
+     data.title=cobraSportsMatchup(game);data.schedule=game.live()||game.finalGame()?cobraSportsScoreLine(game):cobraSportsClock(game.startMs);data.next=cobraSportsMeta(game);data.favorite=cobraSportsFavoriteGame(game);
+-    data.sportsAway=game.away==null?"":game.away.shortName;data.sportsAwayAbbr=game.away==null?"":game.away.abbreviation;data.sportsAwayLogo=game.away==null?"":game.away.logo;data.sportsHome=game.home==null?"":game.home.shortName;data.sportsHomeAbbr=game.home==null?"":game.home.abbreviation;data.sportsHomeLogo=game.home==null?"":game.home.logo;data.sportsScore=game.live()||game.finalGame()?cobraSportsScoreLine(game):cobraSportsClock(game.startMs);data.sportsMeta=cobraSportsMeta(game);
++    data.sportsAway=game.away==null?"":game.away.shortName;data.sportsAwayAbbr=game.away==null?"":game.away.abbreviation;data.sportsAwayLogo=game.away==null?"":game.away.logo;data.sportsHome=game.home==null?"":game.home.shortName;data.sportsHomeAbbr=game.home==null?"":game.home.abbreviation;data.sportsHomeLogo=game.home==null?"":game.home.logo;data.sportsScore=cobraSportsHidden(game)?"Scores hidden":cobraSportsRawScore(game.away)+"  -  "+cobraSportsRawScore(game.home);data.sportsMeta=cobraSportsMeta(game);
+     return data;
+   }
    private void cobraProSportsTab(int index){
      if(!mCobraProActive)return;mCobraProSportsSection=index==1?"myteams":index==2?"upcoming":index==3?"leagues":"live";if(index!=3)mCobraProSportsLeagueKey="";cobraRenderGuideBrowser();
    }
