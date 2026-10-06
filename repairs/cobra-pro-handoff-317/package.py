@@ -32,7 +32,7 @@ def prepare(base,build,out):
     tests=build/'xbmc/src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
     for name in ['repairs/cobra-navigation-2103157/tests/CobraNavigationUiTest.java','repairs/sports-hub-2103270/SportsHubTest.java','repairs/pro-teams-2103312/ProTeams312Test.java','repairs/cobra-pro-season-2103317/CobraProSeason317Test.java','repairs/cobra-pro-handoff-317/CobraProHandoffTest.java','repairs/cobra-power-audit-2103199/tests/Cobra2103199TimeshiftRegressionTest.java','repairs/whole-ui-ambient-2103276/WholeUiAmbientTest.java','repairs/multiview-stability-fill-2103229/tests/Cobra2103229MultiViewStabilityFillTest.java']:
         shutil.copy2(ROOT/name,tests/Path(name).name)
-    resources=build/'xbmc/src/test/resources';resources.mkdir(parents=True);shutil.copy2(HERE/'schedule-fixtures.json',resources/'schedule-fixtures.json')
+    resources=build/'xbmc/src/test/resources';resources.mkdir(parents=True);shutil.copy2(HERE.parent/'cobra-pro-season-2103317/schedule-fixtures.json',resources/'schedule-fixtures.json')
     previous=tests/'ProTeams312Test.java';s=previous.read_text();s=s.replace('@Test public void proDrawerSportsOpensSameHubAndSelectionSurvivesRerender()', '/* Sports drawer destination intentionally removed in 317; Pro tab is tested instead. */ public void proDrawerSportsOpensSameHubAndSelectionSurvivesRerender()');previous.write_text(s)
     with (build/'xbmc/build.gradle').open('a') as f:f.write('''
 android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "cobra.evidence", rootProject.file("../evidence3318/screenshots").absolutePath; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
