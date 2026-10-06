@@ -115,7 +115,7 @@
   }
   private boolean mCobraProTeamsAll;
   private void cobraRenderProTeamSeason(LinearLayout body){
-    CobraProUi.Action back=new CobraProUi.Action(this,"left","Back to Sports",false,!cobraModeDark(),()->{mCobraProSportsSection="teams";cobraRenderGuideBrowser();});back.setTag("pro_team_back");body.addView(back,new LinearLayout.LayoutParams(-1,dp(40)));
+    CobraProUi.Action back=new CobraProUi.Action(this,"back","Back to Sports",false,!cobraModeDark(),()->{mCobraProSportsSection="teams";cobraRenderGuideBrowser();});back.setTag("pro_team_back");body.addView(back,new LinearLayout.LayoutParams(-1,dp(40)));
     CobraSportsTeam selected=cobraProDirectoryTeam(mCobraProTeamKey);if(selected==null){cobraInfoText(body,"Select a team from Teams.");return;}CobraTeamSeason season=mCobraProTeamSeasons.get(selected.key);CobraSportsTeam team=season==null?selected:season.team;CobraSportsLeagueSpec spec=cobraSportsSpec(selected.leagueKey);
     String meta=(spec==null?"":spec.label)+(season==null||season.division.isEmpty()||cobraSportsHideScores()?"":"  •  "+season.division)+(season==null||season.year.isEmpty()?"":"  •  "+season.year)+"\n"+(cobraSportsHideScores()?"Scores protected":team.record);
     CobraProUi.TeamRow header=new CobraProUi.TeamRow(this,!cobraModeDark(),true);header.bind(team.name,team.logo,meta,cobraSportsChoices().rank(team.key)==0,(image,url)->cobraLoadVodArtwork(image,url));header.setTag("pro_team_header");header.favorite.setOnClickListener(v->{cobraSportsChangeTeam(selected,CobraSportsPreferences.FAVORITES);});header.setOnLongClickListener(v->{cobraSportsTeamOptions(selected);return true;});body.addView(header,new LinearLayout.LayoutParams(-1,CobraProUi.TeamRow.height(this,true)));

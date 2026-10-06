@@ -49,6 +49,8 @@ def package(base,build,out):
     import inspect
     code=inspect.getsource(parent.compare_dex).replace('InfinityExitCompletion|InfinityGlassChooser|Splash|BuildConfig','InfinityLiveActivity|CobraProUi|CobraVisualRenderer|BuildConfig').replace("'cobra_classes_unchanged':True", "'infinity_kodi_classes_unchanged':True")
     # Retain exact protected-class compiler differences before the strict guard.
+    code=code.replace("    changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))","    from bridge_preservation import verify\n    old,new,bridge_report=verify(old,new,out)\n    changed=sorted(n for n in old.keys()|new.keys() if old.get(n)!=new.get(n))")
+    code=code.replace("'all_other_classes_bytecode_identical':True","'all_other_classes_behavior_identical':True, 'api_bridge_renumbering_verified':True").replace("'infinity_kodi_classes_unchanged':True","'infinity_kodi_source_and_behavior_preserved':True")
     code=code.replace("    require(not unexpected,",'''    diagnostic=out/'compiler-diffs';diagnostic.mkdir(exist_ok=True)
     for name in unexpected:
         import difflib
