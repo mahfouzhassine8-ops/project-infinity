@@ -12,7 +12,13 @@ def prepare(base,build,out):
     require(sha(base.read_bytes())==BASE,'Wrong locked 316 APK')
     proofs=list(Path('parent3316').rglob('ANDROID-SOURCE-DELTA.json'));require(bool(proofs),'Missing parent source receipt')
     proof=json.loads(proofs[0].read_text());expected=proof['after'];require(len(expected)==254 and sha(json.dumps(expected,sort_keys=True,separators=(',',':')).encode())=='44d687c75f63fce4bc7ccd2bba344074a53d6f253f45ebc52bac1014e3d5e9ca','Wrong locked 316 source map')
-    sources=[p.parents[3] for p in Path('parent3316').rglob('Install.cmake') if p.parent.name=='android'];source=next((p for p in sources if snapshot(p)==expected),None);require(source is not None,'Exact locked 316 source unavailable')
+    sources=[p.parents[3] for p in Path('parent3316').rglob('Install.cmake') if p.parent.name=='android']
+    metadata=json.loads((HERE/'parent-metadata.json').read_text())
+    for candidate in sources:
+        for name,content in metadata.items():
+            target=candidate/name
+            if not target.exists():target.parent.mkdir(parents=True,exist_ok=True);target.write_text(content)
+    source=next((p for p in sources if snapshot(p)==expected),None);require(source is not None,'Exact locked 316 source unavailable')
     dest=out/'android-source';shutil.copytree(source,dest);subprocess.run([sys.executable,str(HERE/'apply.py'),str(dest)],check=True)
     actual=snapshot(dest);changed=sorted(n for n in expected if expected[n]!=actual.get(n));allowed=['tools/android/packaging/xbmc/src/'+n+'.java.in' for n in ['CobraProUi','CobraVisualRenderer','InfinityLiveActivity']]
     require(changed==allowed and actual.keys()==expected.keys(),'Source changes outside the three Cobra UI families')
