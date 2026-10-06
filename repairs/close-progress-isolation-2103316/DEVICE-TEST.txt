@@ -1,0 +1,34 @@
+Infinity 2103316 — Close Progress and Cobra Isolation test candidate
+
+Locked parent remains APK 2103312 / skin 1.0.5.201. This candidate retains
+2103315's tested Android task-removal close route. Install as an update over
+your current candidate; do not uninstall or clear data.
+
+1. Open Infinity/Kodi, choose Power > Close Kodi, and return to Choose Your
+   Experience immediately. Watch the blue Infinity gear arc: it should keep
+   moving while native cleanup runs, including the observed roughly one-minute
+   case. This is a busy indicator, not a percentage or countdown.
+2. Before Kodi finishes, tap Cobra. Cobra must open immediately without the
+   Kodi-closing warning. Its settings gear, controls, playback and normal Exit
+   action should behave as before. Exit Cobra and return to the chooser while
+   Kodi is still closing; the Infinity indicator should still reflect Kodi.
+3. Keep the chooser visible through a complete close cycle. The Infinity ring
+   must become a still full circle only after that same Kodi PID ends with its
+   matching native cleanup receipt. Infinity should then reopen normally.
+4. Repeat after rotation, background/foreground and Samsung pop-up resizing.
+   The arc should resume when visible. With Android animations disabled, a
+   static busy arc is intentional; completion must still await real evidence.
+5. Set Cobra as the remembered default, close Kodi, and launch the app again.
+   Cobra must open without waiting for Kodi preparation or shutdown. Restore
+   Ask every time afterward if that is your preference.
+6. Test Cobra alone with no Kodi session: launch, settings, playback, and Exit
+   should remain unchanged. The Cobra gear must never show a close ring.
+
+If a path fails, export Health Center after the event and note the action/time.
+Preserve the existing data and profile. A fresh chooser opened after a completed
+close uses the ordinary Infinity gear; it does not replay an old completion ring.
+
+Native engine, all other native libraries, skin, bundled assets/resources,
+manifest/process declarations, permanent signer and Cobra player/close classes
+are preserved. This candidate makes no claim to shorten native cleanup.
+Do not lock or call this device-verified until both experience paths pass on-device.

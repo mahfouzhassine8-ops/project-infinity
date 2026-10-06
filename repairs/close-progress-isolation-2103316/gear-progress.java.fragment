@@ -1,0 +1,51 @@
+    private final RectF closeArc=new RectF();
+    private boolean closePending,closeReady,closeFailed,closeObserved,progressPosted;
+    private int closePid;
+    private String closeOwner="";
+    private long closeAt,closeAnimationAt;
+    private final Runnable closeTick=()->syncCloseProgress();
+    private boolean closeVisible(){
+      return !cobra && isAttachedToWindow() && getWindowVisibility()==VISIBLE && isShown();
+    }
+    private boolean closeMotion(){
+      return android.os.Build.VERSION.SDK_INT<26 || android.animation.ValueAnimator.areAnimatorsEnabled();
+    }
+    // Animation time controls only the busy arc's motion, never completion.
+    // Kodi supplies no intermediate work percentage. Keep this indeterminate.
+    private float displayedCloseStart(long now){
+      if(!closePending || !closeMotion() || !hasWindowFocus())return -90;
+      return -90+(Math.max(0,now-closeAnimationAt)%1800)*360f/1800f;
+    }
+    private float displayedCloseSweep(long now){
+      if(closeReady)return 360;
+      if(closeFailed)return 90;
+      if(!closePending)return 0;
+      if(!closeMotion() || !hasWindowFocus())return 110;
+      return 110+30*(float)Math.sin(Math.max(0,now-closeAnimationAt)*Math.PI/950);
+    }
+    private void syncCloseProgress(){
+      removeCallbacks(closeTick);progressPosted=false;
+      if(!closeVisible())return;
+      InfinityKodiShutdown.Snapshot state=InfinityKodiShutdown.state();
+      boolean sameClose=closePid==state.pid && closeAt==state.closeAt && closeOwner.equals(state.owner);
+      boolean wasReady=sameClose && closeReady;
+      boolean pending=state.pending();
+      boolean observed=(sameClose && closeObserved) || pending;
+      boolean ready=sameClose && state.complete && observed;
+      boolean failed=!state.alive && state.closeAt>0 && !state.complete;
+      boolean changed=!sameClose || pending!=closePending || ready!=closeReady || failed!=closeFailed;
+      if(!sameClose || (pending && !closePending))closeAnimationAt=SystemClock.uptimeMillis();
+      closePid=state.pid;closeOwner=state.owner;closeAt=state.closeAt;
+      closePending=pending;closeReady=ready;closeFailed=failed;closeObserved=observed;
+      if(changed){
+        setContentDescription(failed ? "Kodi ended without confirmed cleanup. Open Health Center" :
+            pending ? "Infinity is closing; progress is indeterminate. Settings and Health Center" :
+            state.complete ? "Infinity is ready to reopen. Settings and Health Center" :
+            "Infinity settings and Health Center");
+        if(!wasReady && ready)announceForAccessibility("Infinity is ready to reopen");
+        invalidate();
+      }
+      boolean animate=closePending && hasWindowFocus() && closeMotion();
+      if(animate)invalidate();
+      progressPosted=postDelayed(closeTick,animate?33:250);
+    }
