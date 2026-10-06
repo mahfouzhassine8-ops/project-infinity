@@ -202,13 +202,13 @@ public class CobraProHandoffTest {
   }
   Object favoriteScoreFixture()throws Exception{
     Object game=SportsHubTest.game();put(game,"id","lions-alert");put(game,"state","in");put(game,"period",1);put(game,"away",SportsHubTest.team("DET","nfl|DET","Lions","DET","7"));put(game,"home",SportsHubTest.team("GB","nfl|GB","Packers","GB","0"));((List)get(a,"mCobraSportsGames")).add(game);
-    CobraSportsPreferences choice=new CobraSportsPreferences(a);choice.toggle(CobraSportsPreferences.FAVORITES,"nfl|DET");prefs.edit().putBoolean(CobraSportsPreferences.TICKER,true).commit();put(get(a,"mCobraPlaybackPolicy"),"resumed",true);return game;
+    CobraSportsPreferences choice=new CobraSportsPreferences(prefs);choice.toggle(CobraSportsPreferences.FAVORITES,"nfl|DET");prefs.edit().putBoolean(CobraSportsPreferences.TICKER,true).commit();put(get(a,"mCobraPlaybackPolicy"),"resumed",true);return game;
   }
   @Test public void favoriteScoreOverUnrelatedVideoFadesAndOnlyNewEventReturns()throws Exception{
     pro();activeMini(0);call(a,"promoteCobraPreviewToFullscreen",channel(0));Object game=favoriteScoreFixture();call(a,"cobraRefreshScoreTicker");assertNotNull(get(a,"mCobraScoreTicker"));assertTrue(((TextView)get(a,"mCobraScoreTicker")).getText().toString().contains("Lions"));long until=(Long)get(a,"mCobraScoreUntil");
     put(game,"detail","10:32 - 1st");call(a,"cobraRefreshScoreTicker");assertEquals(until,get(a,"mCobraScoreUntil"));Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(7));assertNull(get(a,"mCobraScoreTicker"));call(a,"cobraRefreshScoreTicker");assertNull(get(a,"mCobraScoreTicker"));
     put(get(game,"away"),"score","14");call(a,"cobraRefreshScoreTicker");assertNotNull(get(a,"mCobraScoreTicker"));assertTrue(((TextView)get(a,"mCobraScoreTicker")).getText().toString().contains("14"));assertSame(player,get(a,"mPlayer"));assertEquals(0,state.prepares);capture("favorite-score-over-other-channel");
-    new CobraSportsPreferences(a).protection(true);call(a,"cobraRefreshScoreTicker");assertNull(get(a,"mCobraScoreTicker"));assertSame(player,get(a,"mPlayer"));
+    new CobraSportsPreferences(prefs).protection(true);call(a,"cobraRefreshScoreTicker");assertNull(get(a,"mCobraScoreTicker"));assertSame(player,get(a,"mPlayer"));
   }
   @Test public void proPlayingDotUsesActualPlaybackAndExistingCinemaColor()throws Exception{
     pro();activeMini(0);Object binding=construct("CobraPlayerBinding",a,player,channel(0));((Map)get(a,"mCobraPlayerBindings")).put(player,binding);call(a,"cobraRenderGuideBrowser");f.measure(a,412,915);ListView list=(ListView)get(a,"mCobraGuideList");CobraProUi.ChannelRow row=(CobraProUi.ChannelRow)list.getAdapter().getView(0,null,list);assertNotNull(row.playing);assertEquals(View.VISIBLE,row.playing.getVisibility());state.playing=false;call(row.playing,"sync");assertEquals(View.INVISIBLE,row.playing.getVisibility());state.playing=true;call(row.playing,"sync");prefs.edit().putBoolean(CobraPresentationEffects.NIGHT,true).commit();assertEquals(0xffffc247,((Integer)call(a,"cobraPlayingIndicatorColor")).intValue());
