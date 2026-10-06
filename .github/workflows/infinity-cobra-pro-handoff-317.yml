@@ -5,7 +5,7 @@ on:
     branches: [repair/cobra-pro-handoff-317]
     paths: ['repairs/cobra-pro-handoff-317/**', '.github/workflows/infinity-cobra-pro-handoff-317.yml']
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103318, cancel-in-progress: false}
+concurrency: {group: infinity-2103318, cancel-in-progress: true}
 jobs:
   candidate-apk:
     runs-on: ubuntu-22.04
