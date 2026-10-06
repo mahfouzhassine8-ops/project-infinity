@@ -5,12 +5,13 @@
   private int mCobraProTeamWeek=-1;
   private long mCobraProTeamsGeneration;
   private final Map<String,ArrayList<CobraSportsTeam>> mCobraProTeamDirectory=new LinkedHashMap<>();
+  private final Map<String,JSONArray> mCobraProTeamCalendars=new java.util.concurrent.ConcurrentHashMap<>();
   private final Map<String,CobraTeamSeason> mCobraProTeamSeasons=new LinkedHashMap<>();
   private final Set<String> mCobraProTeamsLoading=new HashSet<>();
   private final Map<String,String> mCobraProTeamsErrors=new HashMap<>();
   private final Map<String,String> mCobraProTeamFacts=new HashMap<>();
   private static final class CobraTeamWeek {
-    int number;long from,to;final ArrayList<CobraSportsGame> games=new ArrayList<>();
+    int number;long from,to;String range="";final ArrayList<CobraSportsGame> games=new ArrayList<>();
     String key(){return Integer.toString(number);}
   }
   private static final class CobraTeamSeason {
@@ -62,7 +63,8 @@
       CobraTeamWeek reference=buckets.values().iterator().next();long origin=cobraTeamDays(reference.from,-7*(reference.number-1));int last=Collections.max(buckets.keySet());
       for(int n=1;n<=last;n++)if(!buckets.containsKey(n)){CobraTeamWeek w=new CobraTeamWeek();w.number=n;w.from=cobraTeamDays(origin,7*(n-1));w.to=cobraTeamDays(w.from,7);buckets.put(n,w);}
     }
-    for(CobraTeamWeek w:buckets.values()){w.games.sort((a,b)->Long.compare(a.startMs,b.startMs));out.weeks.add(w);}return out;
+    JSONArray calendar=root.optJSONArray("weekCalendar");if(calendar!=null)for(int i=0;i<calendar.length();i++){JSONObject entry=calendar.optJSONObject(i);if(entry==null)continue;int number=entry.optInt("number",0);CobraTeamWeek w=buckets.get(number);if(w==null)continue;long from=cobraSportsIso(entry.optString("startDate","")),to=cobraSportsIso(entry.optString("endDate",""));if(from>0&&to>=from){w.from=from;w.to=to+60000L;w.range=entry.optString("detail","").replace("-"," – ");}}
+    for(CobraTeamWeek w:buckets.values()){if(official&&"football".equals(spec.sport)&&w.range.isEmpty())w.range="Dates unavailable";w.games.sort((a,b)->Long.compare(a.startMs,b.startMs));out.weeks.add(w);}return out;
   }
   private static JSONObject cobraMergeTeamSchedules(CobraSportsLeagueSpec spec,JSONObject regular,JSONObject current,JSONObject fixtures)throws Exception{
     JSONObject merged=new JSONObject(regular.toString());Map<String,JSONObject> events=new LinkedHashMap<>();JSONArray main=regular.optJSONArray("events");int lastWeek=0;
@@ -77,7 +79,12 @@
     if("soccer".equals(spec.sport))return cobraMergeTeamSchedules(spec,current,null,cobraSportsJson(endpoint+suffix+"&fixture=true&limit=1000"));
     // Regular season is requested explicitly: the default can contain only
     // preseason or playoffs. Merge the current phase without inventing scores.
-    JSONObject regular=cobraSportsJson(endpoint+suffix+"&seasontype=2&limit=1000");return cobraMergeTeamSchedules(spec,regular,current,null);
+    JSONObject regular=cobraSportsJson(endpoint+suffix+"&seasontype=2&limit=1000");JSONObject merged=cobraMergeTeamSchedules(spec,regular,current,null);
+    if("football".equals(spec.sport)){String key=spec.key+"|"+year;JSONArray weeks=mCobraProTeamCalendars.get(key);if(weeks==null)try{JSONObject board=cobraSportsJson(cobraTeamFeed(spec)+"/scoreboard?dates="+URLEncoder.encode(year,"UTF-8")+"&seasontype=2&limit=1");JSONArray leagues=board.optJSONArray("leagues");JSONObject league=leagues==null?null:leagues.optJSONObject(0);JSONArray phases=league==null?null:league.optJSONArray("calendar");weeks=new JSONArray();int regularLast=0;if(phases!=null)for(int i=0;i<phases.length();i++){JSONObject phase=phases.optJSONObject(i);if(phase==null||phase.optInt("value",0)!=2)continue;JSONArray entries=phase.optJSONArray("entries");if(entries!=null)for(int j=0;j<entries.length();j++){JSONObject entry=entries.optJSONObject(j);if(entry==null)continue;JSONObject copy=new JSONObject(entry.toString());int n=entry.optInt("value",0);regularLast=Math.max(regularLast,n);copy.put("number",n);weeks.put(copy);}}
+      if(phases!=null)for(int i=0;i<phases.length();i++){JSONObject phase=phases.optJSONObject(i);if(phase==null||phase.optInt("value",0)!=3)continue;JSONArray entries=phase.optJSONArray("entries");if(entries!=null)for(int j=0;j<entries.length();j++){JSONObject entry=entries.optJSONObject(j);if(entry!=null)weeks.put(new JSONObject(entry.toString()).put("number",regularLast+entry.optInt("value",0)));}}
+      if(weeks.length()>0)mCobraProTeamCalendars.put(key,weeks);else weeks=null;
+    }catch(Exception calendarUnavailable){weeks=null;}if(weeks!=null)merged.put("weekCalendar",weeks);}
+    return merged;
   }
   private boolean cobraTeamsCurrent(String profile,long generation){return isCobraAsyncAlive()&&mCobraProActive&&mCobraProSportsActive&&profile.equals(mFeatures.activeProfileId())&&generation==mCobraProTeamsGeneration;}
   private void cobraLoadProTeams(CobraSportsLeagueSpec spec){
@@ -131,7 +138,7 @@
     body.addView(games,new LinearLayout.LayoutParams(-1,-2));
     if(System.currentTimeMillis()-season.at>5*60000L&&error==null)cobraLoadProTeamSeason(selected);
   }
-  private String cobraTeamRange(CobraTeamWeek w){SimpleDateFormat f=new SimpleDateFormat("MMM d",Locale.getDefault());return f.format(new Date(w.from))+" – "+f.format(new Date(cobraTeamDays(w.to,-1)));}
+  private String cobraTeamRange(CobraTeamWeek w){if(!w.range.isEmpty())return w.range;SimpleDateFormat f=new SimpleDateFormat("MMM d",Locale.getDefault());return f.format(new Date(w.from))+" – "+f.format(new Date(cobraTeamDays(w.to,-1)));}
   private void cobraRenderMultiSports(android.widget.ListView list){
     ArrayList<CobraSportsGame> games=new ArrayList<>();for(CobraSportsGame game:mCobraSportsGames)if(game.live())games.add(game);games.sort(cobraSportsComparator());final String profile=mFeatures.activeProfileId();
     if(games.isEmpty()){String text=mCobraSportsLoading?"Loading live games…":"No games are live right now.";list.setAdapter(new android.widget.BaseAdapter(){public int getCount(){return 1;}public Object getItem(int p){return text;}public long getItemId(int p){return 0;}public boolean isEnabled(int p){return false;}public View getView(int p,View old,android.view.ViewGroup host){TextView row=cobraText(text,Color.WHITE,14);row.setGravity(Gravity.CENTER);row.setLayoutParams(new android.widget.AbsListView.LayoutParams(-1,dp(96)));return row;}});if(System.currentTimeMillis()-mCobraSportsLastRefresh>COBRA_SPORTS_STALE_MS)cobraSportsRefresh(false);return;}
