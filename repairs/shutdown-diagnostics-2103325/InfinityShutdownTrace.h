@@ -11,7 +11,7 @@
 #include <cstring>
 #include <exception>
 #include <fcntl.h>
-#include <pthread.h>
+#include <sys/prctl.h>
 #include <sys/syscall.h>
 #include <time.h>
 #include <unistd.h>
@@ -66,7 +66,9 @@ inline void Event(const char* kind,const char* phase,long long invoker=-1,
   const long long boot=Clock(CLOCK_BOOTTIME), mono=Clock(CLOCK_MONOTONIC);
   const long long epoch=Clock(CLOCK_REALTIME);
   char threadName[16]{},safeThread[16]{},safeAddon[97]{},safePhase[81]{},safeTarget[65]{};
-  ::pthread_getname_np(::pthread_self(),threadName,sizeof(threadName));
+  // PR_GET_NAME reads this thread without the API-26-only pthread getter.
+  // Keep the locked Android API-21 native baseline; names remain best effort.
+  const int named=::prctl(PR_GET_NAME,threadName,0UL,0UL,0UL); (void)named;
   Token(threadName,safeThread,sizeof(safeThread)); Token(addon,safeAddon,sizeof(safeAddon));
   Token(phase,safePhase,sizeof(safePhase)); Token(target,safeTarget,sizeof(safeTarget));
   if (serial==MAX_EVENTS) {kind="limit"; std::strcpy(safePhase,"capture.event_limit");outcome="truncated";}

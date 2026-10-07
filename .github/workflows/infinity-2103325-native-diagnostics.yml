@@ -10,7 +10,7 @@ on:
       - 'repairs/shutdown-diagnostics-2103325/test_native.py'
       - '.github/workflows/infinity-2103325-native-diagnostics.yml'
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103325-native-diagnostics, cancel-in-progress: false}
+concurrency: {group: infinity-2103325-native-diagnostics, cancel-in-progress: true}
 env:
   NDK_VER: 21.4.7075529
 jobs:
@@ -37,6 +37,7 @@ jobs:
             ~/.ccache
           key: infinity-diagnostics-3325-arm64-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
+            infinity-diagnostics-3325-arm64-${{ runner.os }}-
             infinity-shutdown-3313-arm64-${{ runner.os }}-
             infinity-close-3308-arm64-${{ runner.os }}-
             infinity-provider-3306-arm64-${{ runner.os }}-

@@ -73,6 +73,20 @@ class NativeEvidence(unittest.TestCase):
    text=(SOURCE/name).read_text();self.assertEqual(native_patch.digest(text.encode()),parent[name])
    changed=native_patch.transform(name,text);self.assertNotEqual(changed,text)
    self.assertNotIn('killProcess',changed);self.assertNotIn('BeginShutdown()',changed)
+def android_api21_smoke():
+ # CI has the exact inherited NDK. Link, but do not execute, an ARM64/API-21
+ # program using the complete writer. This catches host-only API assumptions.
+ if os.environ.get('GITHUB_ACTIONS')!='true':return
+ compiler=Path(os.environ['ANDROID_HOME'])/'ndk'/os.environ.get('NDK_VER','21.4.7075529')/'toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++'
+ assert compiler.is_file(),'Exact Android API-21 compiler missing'
+ out=Path('engine3325');out.mkdir(exist_ok=True)
+ code=out/'trace-api21.cpp'
+ code.write_text('#include "InfinityShutdownTrace.h"\nint main() { InfinityShutdownTrace::Configure("/not-executed"); InfinityShutdownTrace::Begin(); InfinityShutdownTrace::Scope scope("api21.link.check"); return 0; }\n')
+ command=[str(compiler),'-std=c++17','-Wall','-Wextra','-Werror','-Wconversion','-Wshadow','-I'+str(HERE),str(code),'-o',str(out/'trace-api21')]
+ subprocess.run(command,check=True)
+ print('PASS: exact NDK ARM64/API-21 trace writer compilation and link; no minimum SDK increase',flush=True)
+
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path);args,rest=p.parse_known_args();SOURCE=args.source
+ android_api21_smoke()
  unittest.main(argv=['test_native.py',*rest],verbosity=2)
