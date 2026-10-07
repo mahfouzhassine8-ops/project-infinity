@@ -1,0 +1,154 @@
+name: Infinity | 2103325 Health Center diagnostic APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-shutdown-diagnostics-2103325]
+    paths:
+      - 'repairs/shutdown-diagnostics-2103325/android.patch'
+      - 'repairs/shutdown-diagnostics-2103325/android_apply.py'
+      - 'repairs/shutdown-diagnostics-2103325/package.py'
+      - 'repairs/shutdown-diagnostics-2103325/ShutdownDiagnostics325Test.java'
+      - 'repairs/shutdown-diagnostics-2103325/test_android.py'
+      - '.github/workflows/infinity-2103325-package-diagnostics.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103325-package-diagnostics, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+  INFINITY_NATIVE_SOURCE_COMMIT: dc320bc1921dc0f643a763818c3e701e132fe498
+jobs:
+  diagnostic-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37578532123
+          name: Infinity-2103324-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3324
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37578532123
+          name: Infinity-2103324-Chooser-Close-Owner-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3324
+      - name: Test diagnostic source boundaries on exact locked shell
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3325
+          python3 -m py_compile repairs/shutdown-diagnostics-2103325/*.py
+          python3 - <<'PY'
+          import tarfile
+          with tarfile.open('parent3324/repaired-shell-source.tar.gz') as archive:
+              archive.extractall('host-parent',filter='data')
+          PY
+          python3 repairs/shutdown-diagnostics-2103325/test_android.py --source host-parent/shell-kodi --proof parent3324/SOURCE-PRESERVATION.json 2>&1 | tee evidence3325/android-source-tests.log
+          python3 repairs/shutdown-diagnostics-2103325/package.py --help > evidence3325/packager-import-check.txt
+      - name: Require successful exact native diagnostic build, never substitute an old engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/${{ github.repository }}/actions/runs/37600529076 --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
+          gh run watch 37600529076 --repo '${{ github.repository }}' --exit-status --interval 30
+          gh api repos/${{ github.repository }}/actions/runs/37600529076 > evidence3325/native-run.json
+          python3 - <<'PY'
+          import json,os
+          run=json.load(open('evidence3325/native-run.json'))
+          assert run['conclusion']=='success' and run['head_sha']==os.environ['INFINITY_NATIVE_SOURCE_COMMIT']
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37600529076
+          name: Infinity-2103325-Shutdown-Native-Validation
+          github-token: ${{ github.token }}
+          path: native3325
+      - name: Prepare source-built Android donor and bind actual native identity
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/shutdown-diagnostics-2103325/package.py prepare --base base3324/Infinity-2103324-Chooser-Close-Owner-RC1.apk --build build3325 --out evidence3325 --engine native3325
+      - name: Compile diagnostic exporter and all locked regression suites
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3325
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.CobraSportsLiveFeedTest --tests com.projectinfinity.kodi.KodiOwnerLeaseTest --tests com.projectinfinity.kodi.KodiProcessStatusTest --tests com.projectinfinity.kodi.CloseProgress316Test --tests com.projectinfinity.kodi.CobraCloseIsolation316Test --tests com.projectinfinity.kodi.AndroidTaskRemoval315Test --tests com.projectinfinity.kodi.CobraProRefinementTest --tests com.projectinfinity.kodi.CobraProControlsRefinementTest --tests com.projectinfinity.kodi.CobraProPausedReturnTest --tests com.projectinfinity.kodi.CobraProHandoffTest --tests com.projectinfinity.kodi.CobraProSeason317Test --tests com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest --tests com.projectinfinity.kodi.ProTeams312Test --tests com.projectinfinity.kodi.WholeUiAmbientTest --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest --tests com.projectinfinity.kodi.ShutdownDiagnostics325Test :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3325/android-build.log
+      - name: Verify preserved APK payload, DEX and permanent install-over signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/shutdown-diagnostics-2103325/package.py package --base base3324/Infinity-2103324-Chooser-Close-Owner-RC1.apk --build build3325 --out evidence3325 --engine native3325
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103325-Shutdown-Diagnostics-RC1-APK
+          path: evidence3325/Infinity-2103325-Shutdown-Diagnostics-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare compact evidence and verified delivery parts
+        if: success()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          apk=Path('evidence3325/Infinity-2103325-Shutdown-Diagnostics-RC1.apk')
+          data=apk.read_bytes();parts=Path('delivery3325');parts.mkdir()
+          manifest={'file':apk.name,'size':len(data),'sha256':hashlib.sha256(data).hexdigest(),'parts':[]}
+          for i,start in enumerate(range(0,len(data),24*1024*1024)):
+              piece=data[start:start+24*1024*1024];name=f'part{i:02d}';(parts/name).write_bytes(piece)
+              manifest['parts'].append({'file':name,'size':len(piece),'sha256':hashlib.sha256(piece).hexdigest()})
+          compact=Path('compact3325');compact.mkdir()
+          (compact/'DELIVERY.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          for f in Path('evidence3325').iterdir():
+              if f.is_file() and f.suffix not in ('.apk','.so') and f.stat().st_size<24*1024*1024:shutil.copy2(f,compact/f.name)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103325-Delivery-Evidence
+          path: compact3325/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103325-Delivery-Parts
+          path: delivery3325/
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103325-Verification
+          path: |
+            evidence3325/
+            !evidence3325/*.apk
+            !evidence3325/*.so
+            build3325/xbmc/build/test-results/testReleaseUnitTest/
+            build3325/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
