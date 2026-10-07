@@ -41,9 +41,9 @@ EXPECTED_SUITES = {
     'CobraProSeason317Test': 13,
     'ProTeams312Test': 17,
     'WholeUiAmbientTest': 23,
-    'CobraProRefinementTest': 1,
-    'CobraProControlsRefinementTest': 1,
-    'CobraProPausedReturnTest': 1,
+    'CobraProRefinementTest': 12,
+    'CobraProControlsRefinementTest': 11,
+    'CobraProPausedReturnTest': 8,
 }
 
 

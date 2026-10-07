@@ -119,7 +119,12 @@ public class CobraProRefinementTest {
   }
 
   @Test public void alertRevealFadeAndRemovalNeverAlterVideoBoundsCropOrControls() throws Exception {
-    sports();CobraProUi.Hero hero=base.hero();hero.revealControls();base.f.measure(a,412,915);
+    sports();
+    // Complete the approved Sports collapse before testing alert geometry.
+    base.f.frames(30);base.f.measure(a,412,915);
+    assertNull("Sports collapse animation completed",get(a,"mCobraProSportsResize"));
+    assertEquals(1f,(Float)get(a,"mCobraProSportsCollapse"),0f);
+    CobraProUi.Hero hero=base.hero();hero.revealControls();base.f.measure(a,412,915);
     View[] stable={(View)get(a,"mCobraGuideVideo"),(View)get(a,"mCobraPreviewHost"),
       (View)get(a,"mCobraPreviewTexture"),(View)get(a,"mCobraGuideBrowser"),hero.transport,hero};
     int[][] original=new int[stable.length][];for(int i=0;i<stable.length;i++)original[i]=bounds(stable[i]);
@@ -246,10 +251,17 @@ public class CobraProRefinementTest {
 
   @Test public void leavingSportsRemovesItsAlertAndOldDismissCannotRemoveANewSessionAlert() throws Exception {
     Object game=sports();refresh();TextView old=ticker();long firstUntil=(Long)get(a,"mCobraScoreUntil");
+    // Replace during the old fade so the replacement still has reading time.
+    advanceTo(firstUntil+32);assertSame(old,ticker());
+    assertNotNull(get(a,"mCobraScoreFadeRemoval"));
     call(a,"cobraProStep",-1);refresh();assertNull(ticker());assertNull(old.getParent());assertTrue(base.state.released);
-    call(a,"cobraProStep",1);base.freshPlayer();base.sportsMini(0,game);score(game,"35");base.f.frames(30);refresh();
+    assertNull(get(a,"mCobraScoreFadeRemoval"));
+    call(a,"cobraProStep",1);base.freshPlayer();base.sportsMini(0,game);score(game,"35");refresh();
     TextView replacement=ticker();assertNotNull(replacement);assertNotSame(old,replacement);
-    advanceTo(firstUntil+400);assertSame("Cancelled old deadline must not dismiss a new alert",replacement,ticker());
+    long replacementUntil=(Long)get(a,"mCobraScoreUntil");
+    assertTrue(replacementUntil>firstUntil+416);
+    advanceTo(firstUntil+416);assertSame("Cancelled old deadline must not dismiss a new alert",replacement,ticker());
+    assertEquals(replacementUntil,get(a,"mCobraScoreUntil"));
     assertSame(base.player,get(a,"mCobraPreviewPlayer"));assertFalse(base.state.released);
     finishCurrent();assertNull(ticker());
   }
