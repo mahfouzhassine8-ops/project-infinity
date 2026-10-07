@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE)
 public class KodiOwnerLeaseTest {
   File dir;final String owner=UUID.randomUUID().toString();final List<Process> children=new ArrayList<>();
+  final Map<Process,Integer> childPids=new IdentityHashMap<>();
   @Before public void before()throws Exception{dir=Files.createTempDirectory("kodi-owner-lease").toFile();}
   @After public void after()throws Exception{
     for(Process p:children){if(p.isAlive())p.destroyForcibly();p.waitFor(5,TimeUnit.SECONDS);}
@@ -30,12 +31,14 @@ public class KodiOwnerLeaseTest {
   Process hold(String token)throws Exception{
     File path=InfinityKodiShutdown.leasePath(dir,token);Files.write(path.toPath(),new byte[0]);
     Process p=new ProcessBuilder("python3","-u","-c",
-      "import fcntl,sys; f=open(sys.argv[1],'r+'); fcntl.lockf(f,fcntl.LOCK_EX); print('held',flush=True); sys.stdin.read()",
+      "import fcntl,sys,os; f=open(sys.argv[1],'r+'); fcntl.lockf(f,fcntl.LOCK_EX); print('held '+str(os.getpid()),flush=True); sys.stdin.read()",
       path.getAbsolutePath()).redirectErrorStream(true).start();children.add(p);
     java.util.concurrent.ExecutorService wait=java.util.concurrent.Executors.newSingleThreadExecutor();
-    try{assertEquals("held",wait.submit(()->new BufferedReader(new InputStreamReader(p.getInputStream())).readLine()).get(5,TimeUnit.SECONDS));}
+    try{String ready=wait.submit(()->new BufferedReader(new InputStreamReader(p.getInputStream())).readLine()).get(5,TimeUnit.SECONDS);
+      assertTrue(ready,ready!=null&&ready.startsWith("held "));childPids.put(p,Integer.parseInt(ready.substring(5)));}
     finally{wait.shutdownNow();}return p;
   }
+  int pid(Process p){return childPids.get(p);}
   void stop(Process p)throws Exception{p.getOutputStream().close();assertTrue(p.waitFor(5,TimeUnit.SECONDS));assertEquals(0,p.exitValue());}
   InfinityKodiShutdown.Life life(){return (pid,token)->InfinityKodiShutdown.ownerAlive(dir,pid,token);}
   InfinityKodiShutdown.Snapshot read()throws Exception{return InfinityKodiShutdown.read(dir,life(),InfinityKodiShutdown.Snapshot.empty());}
@@ -44,7 +47,7 @@ public class KodiOwnerLeaseTest {
       .put("milestone","native.CXBMCApp.Destroy.complete").toString().getBytes(StandardCharsets.UTF_8));
   }
   @Test public void legacyPidReusedByAnUnrelatedLiveProcessCannotBlockChooser()throws Exception{
-    Process unrelated=hold(UUID.randomUUID().toString());row(1,(int)unrelated.pid(),"old-kodi","DESTROYING");
+    Process unrelated=hold(UUID.randomUUID().toString());row(1,pid(unrelated),"old-kodi","DESTROYING");
     assertTrue(unrelated.isAlive());assertFalse(read().alive);assertFalse(read().pending());assertFalse(read().complete);
   }
   @Test public void persistedLeaseFileAfterProcessExitOrRebootIsNotAlive()throws Exception{
@@ -52,23 +55,23 @@ public class KodiOwnerLeaseTest {
     assertFalse(read().pending());assertFalse(read().alive);assertFalse(read().complete);
   }
   @Test public void exactOwnerHeldBySeparateProcessRemainsPending()throws Exception{
-    Process p=hold(owner);row(2,(int)p.pid(),owner,"DESTROYING");
+    Process p=hold(owner);row(2,pid(p),owner,"DESTROYING");
     assertTrue(read().alive);assertTrue(read().pending());assertTrue(read().stalled());assertFalse(read().complete);
   }
   @Test public void processReleaseCannotLeaveAPersistedLeasePending()throws Exception{
-    Process p=hold(owner);int pid=(int)p.pid();row(2,pid,owner,"DESTROYING");assertTrue(read().pending());stop(p);
+    Process p=hold(owner);int pid=pid(p);row(2,pid,owner,"DESTROYING");assertTrue(read().pending());stop(p);
     assertTrue(InfinityKodiShutdown.leasePath(dir,owner).exists());assertFalse(read().pending());assertFalse(read().complete);
   }
   @Test public void anotherOwnerLeaseCannotReviveAnOldRecord()throws Exception{
-    Process p=hold(UUID.randomUUID().toString());row(2,(int)p.pid(),owner,"DESTROYING");
+    Process p=hold(UUID.randomUUID().toString());row(2,pid(p),owner,"DESTROYING");
     assertTrue(p.isAlive());assertFalse(read().alive);assertFalse(read().pending());
   }
   @Test public void nativeReceiptCannotCompleteWhileLeaseIsHeld()throws Exception{
-    Process p=hold(owner);row(2,(int)p.pid(),owner,"DESTROYING");receipt((int)p.pid(),3000);
+    Process p=hold(owner);row(2,pid(p),owner,"DESTROYING");receipt(pid(p),3000);
     assertTrue(read().pending());assertFalse(read().complete);
   }
   @Test public void matchingNativeReceiptAndReleasedLeaseCompleteClose()throws Exception{
-    Process p=hold(owner);int pid=(int)p.pid();row(2,pid,owner,"DESTROYING");receipt(pid,3000);stop(p);
+    Process p=hold(owner);int pid=pid(p);row(2,pid,owner,"DESTROYING");receipt(pid,3000);stop(p);
     assertTrue(read().complete);assertFalse(read().pending());assertEquals(InfinityExitCompletion.Plan.Phase.COMPLETE,read().phase);
   }
   @Test public void oldReceiptsNeverCompleteANewInstance()throws Exception{
@@ -78,15 +81,15 @@ public class KodiOwnerLeaseTest {
     row(2,123,owner,"FORCED");receipt(123,3000);assertFalse(read().complete);assertEquals(InfinityExitCompletion.Plan.Phase.FORCED,read().phase);
   }
   @Test public void liveAcknowledgementRequiresTheExactHeldInstance()throws Exception{
-    Process p=hold(owner);row(2,(int)p.pid(),owner,"RUNNING");assertTrue(read().live);assertFalse(read().pending());stop(p);assertFalse(read().live);
+    Process p=hold(owner);row(2,pid(p),owner,"RUNNING");assertTrue(read().live);assertFalse(read().pending());stop(p);assertFalse(read().live);
   }
   @Test public void missingStatusRevalidatesCachedOwnerRatherThanKeepingItForever()throws Exception{
-    Process p=hold(owner);row(2,(int)p.pid(),owner,"DESTROYING");InfinityKodiShutdown.Snapshot cached=read();
+    Process p=hold(owner);row(2,pid(p),owner,"DESTROYING");InfinityKodiShutdown.Snapshot cached=read();
     assertTrue(new File(dir,InfinityKodiShutdown.STATE).delete());assertTrue(InfinityKodiShutdown.read(dir,life(),cached).pending());
     stop(p);assertFalse(InfinityKodiShutdown.read(dir,life(),cached).pending());
   }
   @Test public void corruptStatusFallbackRevalidatesCachedOwner()throws Exception{
-    Process p=hold(owner);row(2,(int)p.pid(),owner,"DESTROYING");InfinityKodiShutdown.Snapshot cached=read();
+    Process p=hold(owner);row(2,pid(p),owner,"DESTROYING");InfinityKodiShutdown.Snapshot cached=read();
     Files.write(new File(dir,InfinityKodiShutdown.STATE).toPath(),"invalid".getBytes(StandardCharsets.UTF_8));
     try{read();fail();}catch(Exception expected){}
     assertTrue(InfinityKodiShutdown.recheck(life(),cached).pending());stop(p);assertFalse(InfinityKodiShutdown.recheck(life(),cached).pending());
