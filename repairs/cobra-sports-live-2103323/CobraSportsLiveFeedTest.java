@@ -215,21 +215,25 @@ public class CobraSportsLiveFeedTest {
   }
 
   @Test public void scoreboardHttpBypassesCachesAndRejectsExpiredCachedResponses()throws Exception{
-    com.sun.net.httpserver.HttpServer server=com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1",0),0);
-    java.util.concurrent.atomic.AtomicInteger age=new java.util.concurrent.atomic.AtomicInteger(0);
+    java.net.ServerSocket server=new java.net.ServerSocket(0,2,java.net.InetAddress.getByName("127.0.0.1"));
     Map<String,String> headers=new java.util.concurrent.ConcurrentHashMap<>();
-    server.createContext("/scoreboard",exchange->{
-      headers.put("Cache-Control",String.valueOf(exchange.getRequestHeaders().getFirst("Cache-Control")));
-      headers.put("Pragma",String.valueOf(exchange.getRequestHeaders().getFirst("Pragma")));
-      exchange.getResponseHeaders().set("Age",Integer.toString(age.get()));byte[] data="{\"events\":[]}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
-      exchange.sendResponseHeaders(200,data.length);try(java.io.OutputStream out=exchange.getResponseBody()){out.write(data);}
-    });server.start();
+    java.util.concurrent.atomic.AtomicReference<Throwable> failure=new java.util.concurrent.atomic.AtomicReference<>();
+    Thread responder=new Thread(()->{
+      try{for(int i=0;i<2;i++)try(java.net.Socket client=server.accept()){
+        client.setSoTimeout(3000);java.io.BufferedReader reader=new java.io.BufferedReader(new java.io.InputStreamReader(client.getInputStream(),java.nio.charset.StandardCharsets.US_ASCII));
+        String line;while((line=reader.readLine())!=null&&!line.isEmpty()){int colon=line.indexOf(':');if(colon>0)headers.put(line.substring(0,colon).toLowerCase(Locale.US),line.substring(colon+1).trim());}
+        byte[] body="{\"events\":[]}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        String response="HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAge: "+(i==0?0:121)+"\r\nContent-Length: "+body.length+"\r\nConnection: close\r\n\r\n";
+        java.io.OutputStream out=client.getOutputStream();out.write(response.getBytes(java.nio.charset.StandardCharsets.US_ASCII));out.write(body);out.flush();
+      }}catch(Throwable error){failure.set(error);}
+    },"scoreboard-fixture-http");responder.setDaemon(true);responder.start();
     try{
-      String url="http://127.0.0.1:"+server.getAddress().getPort()+"/scoreboard";
+      String url="http://127.0.0.1:"+server.getLocalPort()+"/scoreboard";
       JSONObject fresh=(JSONObject)call(a,"cobraSportsJsonOnce",url);assertEquals(0,fresh.getJSONArray("events").length());
-      assertEquals("no-cache",headers.get("Cache-Control"));assertEquals("no-cache",headers.get("Pragma"));
-      age.set(121);try{call(a,"cobraSportsJsonOnce",url);fail("Expired HTTP cache accepted as fresh scoreboard");}
+      assertEquals("no-cache",headers.get("cache-control"));assertEquals("no-cache",headers.get("pragma"));
+      try{call(a,"cobraSportsJsonOnce",url);fail("Expired HTTP cache accepted as fresh scoreboard");}
       catch(AssertionError expected){assertTrue(expected.getCause() instanceof IOException);assertTrue(expected.getCause().getMessage().contains("stale"));}
-    }finally{server.stop(0);}
+      responder.join(1000L);assertNull(failure.get());
+    }finally{server.close();}
   }
 }
