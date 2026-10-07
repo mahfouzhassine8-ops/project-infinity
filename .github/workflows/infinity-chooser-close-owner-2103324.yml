@@ -1,0 +1,148 @@
+name: Infinity | 2103324 Chooser close owner correction
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/chooser-close-owner-2103324]
+    paths: ['repairs/chooser-close-owner-2103324/**', '.github/workflows/infinity-chooser-close-owner-2103324.yml']
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103324, cancel-in-progress: true}
+jobs:
+  candidate-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37574574345
+          name: Infinity-2103323-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3323
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37574574345
+          name: Infinity-2103323-Cobra-Sports-Live-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3323
+      - name: Verify locked 2103323 source and stage only shutdown correction
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3324 "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/chooser-close-owner-2103324/package.py prepare --base base3323/Infinity-2103323-Cobra-Sports-Live-RC1.apk --build build3324 --out evidence3324
+      - name: Compile and run shutdown owner checks and all locked regression suites
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3324
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.CobraSportsLiveFeedTest --tests com.projectinfinity.kodi.KodiOwnerLeaseTest --tests com.projectinfinity.kodi.KodiProcessStatusTest --tests com.projectinfinity.kodi.CloseProgress316Test --tests com.projectinfinity.kodi.CobraCloseIsolation316Test --tests com.projectinfinity.kodi.AndroidTaskRemoval315Test --tests com.projectinfinity.kodi.CobraProRefinementTest --tests com.projectinfinity.kodi.CobraProControlsRefinementTest --tests com.projectinfinity.kodi.CobraProPausedReturnTest --tests com.projectinfinity.kodi.CobraProHandoffTest --tests com.projectinfinity.kodi.CobraProSeason317Test --tests com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest --tests com.projectinfinity.kodi.ProTeams312Test --tests com.projectinfinity.kodi.WholeUiAmbientTest --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3324/android-build.log
+      - name: Verify protected payload and sign install-over APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/chooser-close-owner-2103324/package.py package --base base3323/Infinity-2103323-Cobra-Sports-Live-RC1.apk --build build3324 --out evidence3324
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103324-Chooser-Close-Owner-RC1-APK
+          path: evidence3324/Infinity-2103324-Chooser-Close-Owner-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare verified delivery parts
+        if: success()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          apk=Path('evidence3324/Infinity-2103324-Chooser-Close-Owner-RC1.apk')
+          data=apk.read_bytes(); parts=Path('delivery3324');parts.mkdir()
+          manifest={'file':apk.name,'size':len(data),'sha256':hashlib.sha256(data).hexdigest(),'parts':[]}
+          for i,start in enumerate(range(0,len(data),24*1024*1024)):
+              piece=data[start:start+24*1024*1024];name=f'part{i:02d}'
+              (parts/name).write_bytes(piece)
+              manifest['parts'].append({'file':name,'size':len(piece),'sha256':hashlib.sha256(piece).hexdigest()})
+          assert len(manifest['parts'])<=8
+          compact=Path('compact3324');compact.mkdir()
+          (compact/'DELIVERY.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          for f in Path('evidence3324').iterdir():
+              if f.is_file() and f.suffix not in ('.apk','.so') and f.stat().st_size<24*1024*1024:
+                  shutil.copy2(f,compact/f.name)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103324-Delivery-Evidence
+          path: compact3324/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part00') != ''
+        with: {name: Infinity-2103324-Delivery-Part00, path: delivery3324/part00, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part01') != ''
+        with: {name: Infinity-2103324-Delivery-Part01, path: delivery3324/part01, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part02') != ''
+        with: {name: Infinity-2103324-Delivery-Part02, path: delivery3324/part02, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part03') != ''
+        with: {name: Infinity-2103324-Delivery-Part03, path: delivery3324/part03, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part04') != ''
+        with: {name: Infinity-2103324-Delivery-Part04, path: delivery3324/part04, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part05') != ''
+        with: {name: Infinity-2103324-Delivery-Part05, path: delivery3324/part05, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part06') != ''
+        with: {name: Infinity-2103324-Delivery-Part06, path: delivery3324/part06, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3324/part07') != ''
+        with: {name: Infinity-2103324-Delivery-Part07, path: delivery3324/part07, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103324-Verification
+          path: |
+            evidence3324/
+            !evidence3324/*.apk
+            build3324/xbmc/build/test-results/testReleaseUnitTest/
+            build3324/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
+
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103324-UI-Checks
+          path: |
+            evidence3324/screenshots
+            build3324/xbmc/build/test-results/testReleaseUnitTest
+          retention-days: 90
+          if-no-files-found: warn
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103324-Compiler-Diffs
+          path: evidence3324/compiler-diffs
+          retention-days: 90
+          if-no-files-found: warn
+
