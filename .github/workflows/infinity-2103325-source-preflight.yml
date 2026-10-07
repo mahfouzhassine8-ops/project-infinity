@@ -22,18 +22,20 @@ jobs:
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
-        with: {packages: platform-tools}
-      - name: Recover reviewed earlier diagnostic sources without merging behavior
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - name: Recover immutable build recipes without merging shutdown behavior
         run: |
           set -euo pipefail
-          mkdir -p recovered3314
+          mkdir -p recovered3314 source325
           git archive 7b193fec11b7140c0f27dc295b21425eefdbc671 repairs/shutdown-2103314 .github/workflows/infinity-2103314-shutdown-evidence.yml | tar -x -C recovered3314
+          test ! -e .github/workflows/infinity-2103313-shutdown.yml
+          test ! -e repairs/shutdown-2103313
+          git archive 5183a91b5ea49819d8beef706a80720bad1879bd .github/workflows/infinity-2103313-shutdown.yml repairs/shutdown-2103313 | tar -x
       - name: Reconstruct the exact 3308 engine inherited by locked 2103324
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y python3-yaml
-          mkdir -p source325
           python3 - <<'PY'
           from pathlib import Path
           import yaml
@@ -49,6 +51,7 @@ jobs:
           else:
               raise RuntimeError('Locked source reconstruction endpoint not found')
           assert len(selected)==6, len(selected)
+          assert not any('shutdown-2103313/native_patch.py apply' in item for item in selected)
           Path('source325/reconstruct.sh').write_text('#!/usr/bin/env bash\nset -euo pipefail\n'+'\n'.join(selected))
           PY
           bash source325/reconstruct.sh 2>&1 | tee source325/reconstruction.log
@@ -60,6 +63,7 @@ jobs:
           actual={p.relative_to('kodi').as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
                   for p in Path('kodi').rglob('*') if p.is_file() and '.git' not in p.relative_to('kodi').parts}
           assert actual==expected, 'Native preimage does not match complete locked 3308 map'
+          assert hashlib.sha256(json.dumps(actual,sort_keys=True,separators=(',',':')).encode()).hexdigest()=='5a3b93bc966f4918ed582f92d01b1659a79968f07c498c6ee4c1834beb394f15'
           Path('source325/NATIVE-PARENT-MAP.json').write_text(json.dumps(proof,indent=2)+'\n')
           with tarfile.open('source325/reviewed-source.tar.gz','w:gz') as out:
               for root in ('kodi/xbmc','kodi/cmake','kodi/tools/android/packaging', 'repairs/chooser-close-owner-2103324',
