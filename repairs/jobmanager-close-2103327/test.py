@@ -19,6 +19,17 @@ new = """    job_text = job_cpp.read_text()
 if implementation.count(old) != 1:
     raise RuntimeError('Unexpected JobManager test preimage')
 implementation = implementation.replace(old, new, 1)
+
+# The original harness used unnamed pointer parameters without whitespace, which
+# the C++ lexer reads as the '*=' operator. Name those test-only parameters; the
+# production trace API is not changed.
+implementation = implementation.replace(
+    'const char* addon=nullptr, const char*="observed", const char*=nullptr) noexcept',
+    'const char* addon=nullptr, const char* outcome="observed", const char* target=nullptr) noexcept')
+implementation = implementation.replace(
+    'Scope(const char* phase, long long=-1, const char* addon=nullptr, const char*=nullptr) noexcept',
+    'Scope(const char* phase, long long=-1, const char* addon=nullptr, const char* target=nullptr) noexcept')
+
 namespace = {'__name__': 'jobmanager_test_impl', '__file__': str(HERE / 'test_jobmanager.py')}
 exec(compile(implementation, str(HERE / 'test_jobmanager.py'), 'exec'), namespace)
 
