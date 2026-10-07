@@ -13,6 +13,7 @@ public class CobraProHandoffTest {
   CobraNavigationUiTest f;InfinityLiveActivity a;SharedPreferences prefs;Stub state;ExoPlayer player;
   @Before public void setup()throws Exception{f=new CobraNavigationUiTest();f.clock();a=f.fixture(8);prefs=(SharedPreferences)get(a,"mPrefs");prefs.edit().putBoolean("cobra_live_rewind_enabled",true).putString("cobra_appearance_mode","dark").commit();put(a,"mCobraSportsLastRefresh",System.currentTimeMillis());put(a,"mCobraEffects",new CobraPresentationEffects(a));state=new Stub();player=(ExoPlayer)Proxy.newProxyInstance(ExoPlayer.class.getClassLoader(),new Class[]{ExoPlayer.class},state);}
   @After public void cleanup()throws Exception{f.clean(a);}
+  void freshPlayer(){state=new Stub();player=(ExoPlayer)Proxy.newProxyInstance(ExoPlayer.class.getClassLoader(),new Class[]{ExoPlayer.class},state);}
   Object channel(int index)throws Exception{return ((List)get(a,"mChannels")).get(index);}
   void pro()throws Exception{prefs.edit().putString("guide_view_mode","focus").commit();put(a,"mCobraGuideStyle","focus");call(a,"cobraShowGuideShell");f.measure(a,412,915);}
   void activeMini(int index)throws Exception{Object c=channel(index);put(a,"mGuidePreviewChannel",c);put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));put(a,"mCobraPreviewMuted",false);put(a,"mCobraProPlaybackOwned",true);put(a,"mCobraProState",CobraProUi.WATCHING);call(a,"cobraProSelectPlayingSlot",c);call(a,"cobraRefreshProHero");call(a,"cobraSetProState",CobraProUi.WATCHING,false);}
@@ -52,7 +53,7 @@ public class CobraProHandoffTest {
   }
   @Test public void previewUnmuteKeepsPaneSessionAndHeroContextWithoutChangingMain()throws Exception{
     pro();activeMini(0);Object main=channel(0);call(a,"cobraProStep",1);assertNull(get(a,"mCobraPreviewPlayer"));Object selected=get(a,"mGuidePreviewChannel");
-    put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",selected));state.volume=1;state.playing=false;
+    freshPlayer();put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",selected));state.volume=1;state.playing=false;
     call(a,"cobraProPreview");assertSame(player,get(a,"mCobraPreviewPlayer"));assertEquals(0,state.volume,0);assertTrue(state.playing);assertEquals(CobraProUi.PREVIEW,get(a,"mCobraProState"));assertSame(hero(),hero().info.getParent());
     int pane=(Integer)get(a,"mCobraProHeroIndex");call(a,"cobraProUnmute");f.measure(a,412,915);
     assertSame(player,get(a,"mCobraPreviewPlayer"));assertEquals(pane,get(a,"mCobraProHeroIndex"));assertSame(main,get(a,"mCobraProMainChannel"));assertFalse((Boolean)get(a,"mCobraProPlaybackOwned"));assertEquals(1,state.volume,0);assertTrue(state.playing);assertSame(hero(),hero().info.getParent());assertEquals(0,state.prepares);assertEquals(0,state.changes);assertNull(get(a,"mPlayerOverlay"));capture("preview-unmuted-keeps-hero");
@@ -200,7 +201,7 @@ public class CobraProHandoffTest {
     h.controlScroll.scrollTo(h.controlStrip.getWidth(),0);capture("sports-controls-stats-multiview");h.player[6].performClick();assertEquals("sports-stats",get(a,"mCobraSheetKind"));call(a,"closeCobraActionSheet");h.player[7].performClick();assertEquals("pro-sports-multi",get(a,"mCobraSheetKind"));
   }
   @Test public void sportsIsStandaloneAndRemembersGameWhileRegularPreviewIsVisited()throws Exception{
-    pro();activeMini(2);Object main=channel(2);Object game=addLiveGameForChannel(0);call(a,"cobraProFilter",4);assertTrue(state.released);assertNull(get(a,"mCobraPreviewPlayer"));state.released=false;sportsMini(0,game);
+    pro();activeMini(2);Object main=channel(2);Object game=addLiveGameForChannel(0);call(a,"cobraProFilter",4);assertTrue(state.released);assertNull(get(a,"mCobraPreviewPlayer"));freshPlayer();sportsMini(0,game);
     int sports=(Integer)call(a,"cobraProSportsSlotIndex");call(a,"cobraProStep",-1);assertTrue(state.released);assertEquals(get(game,"id"),get(a,"mCobraProSportsGameId"));assertFalse((Boolean)get(call(a,"cobraProCurrentSlot"),"sports"));assertNull(get(a,"mCobraPreviewPlayer"));assertEquals("Preview",hero().preview.getContentDescription().toString());
     call(a,"cobraProStep",1);assertEquals(sports,get(a,"mCobraProHeroIndex"));assertNull(get(a,"mCobraPreviewPlayer"));assertSame(game,call(a,"cobraProCurrentSportsGame"));assertSame(main,get(a,"mCobraProMainChannel"));assertEquals(View.VISIBLE,hero().sportsWatch.getVisibility());assertEquals(View.GONE,hero().preview.getVisibility());
     call(a,"cobraProFilter",0);assertEquals(0,get(a,"mCobraProHeroIndex"));assertSame(main,get(a,"mGuidePreviewChannel"));assertNull(get(a,"mCobraPreviewPlayer"));
@@ -235,7 +236,7 @@ public class CobraProHandoffTest {
     assertTrue((Boolean)call(a,"cobraProSportsHeroActive"));assertSame(main,get(a,"mCobraProMainChannel"));assertEquals(get(main,"id"),prefs.getString("cobra_pro_main_channel",""));ExoPlayer sport=(ExoPlayer)get(a,"mCobraPreviewPlayer");assertNotNull(sport);assertTrue(sport.getPlayWhenReady());assertEquals(0,sport.getVolume(),0);assertEquals(CobraProUi.WATCHING,get(a,"mCobraProState"));assertTrue(hero().sportsMode);assertEquals(View.VISIBLE,hero().player[6].getVisibility());assertEquals(View.VISIBLE,hero().player[7].getVisibility());
   }
   @Test public void rowPlayFromPreviewOverridesIntoMutedMainAndFullscreenKeepsMute()throws Exception{
-    pro();call(a,"cobraProStep",1);Object c=get(a,"mGuidePreviewChannel");put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));call(a,"cobraProPreview");call(a,"playChannel",c);
+    pro();call(a,"cobraProStep",1);Object c=get(a,"mGuidePreviewChannel");freshPlayer();put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));call(a,"cobraProPreview");call(a,"playChannel",c);
     assertEquals(0,get(a,"mCobraProHeroIndex"));assertSame(c,get(a,"mCobraProMainChannel"));assertSame(player,get(a,"mCobraPreviewPlayer"));assertEquals(0,state.volume,0);
     call(a,"promoteCobraPreviewToFullscreen",c);assertEquals(0,state.volume,0);assertSame(player,get(a,"mPlayer"));call(a,"closeFullscreenToCobraView");assertSame(player,get(a,"mCobraPreviewPlayer"));assertEquals(0,state.volume,0);assertTrue(state.playing);assertEquals(CobraProUi.WATCHING,get(a,"mCobraProState"));assertEquals(0,state.prepares);assertEquals(0,state.changes);
   }
@@ -267,9 +268,9 @@ public class CobraProHandoffTest {
   }
 
   @Test public void mutedSportsViewModeReturnKeepsSessionAndRegularMain()throws Exception{
-    pro();activeMini(2);Object main=channel(2);Object game=addLiveGameForChannel(0);call(a,"cobraProFilter",4);sportsMini(0,game);call(a,"cobraProMuteSession",player);call(a,"cobraExitProMode");call(a,"cobraEnterProMode",new ArrayList((List)get(a,"mChannels")));assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);assertTrue(state.playing);assertEquals(0,state.volume,0);assertTrue((Boolean)call(a,"cobraProSportsHeroActive"));assertSame(main,get(a,"mCobraProMainChannel"));assertEquals(CobraProUi.WATCHING,get(a,"mCobraProState"));
+    pro();activeMini(2);Object main=channel(2);Object game=addLiveGameForChannel(0);call(a,"cobraProFilter",4);freshPlayer();sportsMini(0,game);call(a,"cobraProMuteSession",player);call(a,"cobraExitProMode");call(a,"cobraEnterProMode",new ArrayList((List)get(a,"mChannels")));assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);assertTrue(state.playing);assertEquals(0,state.volume,0);assertTrue((Boolean)call(a,"cobraProSportsHeroActive"));assertSame(main,get(a,"mCobraProMainChannel"));assertEquals(CobraProUi.WATCHING,get(a,"mCobraProState"));
   }
   @Test public void previewViewModeReturnKeepsPreviewOwnershipAndOriginalMain()throws Exception{
-    pro();activeMini(0);Object main=channel(0);call(a,"cobraProStep",1);Object c=get(a,"mGuidePreviewChannel");put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));call(a,"cobraProPreview");call(a,"cobraProUnmute");call(a,"cobraExitProMode");call(a,"cobraEnterProMode",new ArrayList((List)get(a,"mChannels")));assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);assertTrue(state.playing);assertEquals(1,state.volume,0);assertSame(main,get(a,"mCobraProMainChannel"));assertFalse((Boolean)get(a,"mCobraProPlaybackOwned"));assertFalse((Boolean)get(call(a,"cobraProCurrentSlot"),"main"));assertSame(hero(),hero().info.getParent());
+    pro();activeMini(0);Object main=channel(0);call(a,"cobraProStep",1);Object c=get(a,"mGuidePreviewChannel");freshPlayer();put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));call(a,"cobraProPreview");call(a,"cobraProUnmute");call(a,"cobraExitProMode");call(a,"cobraEnterProMode",new ArrayList((List)get(a,"mChannels")));assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);assertTrue(state.playing);assertEquals(1,state.volume,0);assertSame(main,get(a,"mCobraProMainChannel"));assertFalse((Boolean)get(a,"mCobraProPlaybackOwned"));assertFalse((Boolean)get(call(a,"cobraProCurrentSlot"),"main"));assertSame(hero(),hero().info.getParent());
   }
 }
