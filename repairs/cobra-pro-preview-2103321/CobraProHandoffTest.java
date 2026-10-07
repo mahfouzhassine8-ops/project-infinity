@@ -265,4 +265,11 @@ public class CobraProHandoffTest {
   @Test public void wideSportsCardKeepsLiveHeaderOutsideTeamMarks()throws Exception{
     pro();Object game=addLiveGameForChannel(0);CobraProUi.GameRow row=new CobraProUi.GameRow(a,false,()->{},()->{});row.bind((CobraProUi.SportsGame)call(a,"cobraProSportsUiGame",game),(v,u)->{});row.measure(View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(96,View.MeasureSpec.EXACTLY));row.layout(0,0,800,96);assertTrue(row.badge.getRight()<row.away.getLeft());assertTrue(row.play.getLeft()>=row.home.getRight());assertTrue(row.score.getRight()<=row.homeName.getLeft());
   }
+
+  @Test public void mutedSportsViewModeReturnKeepsSessionAndRegularMain()throws Exception{
+    pro();activeMini(2);Object main=channel(2);Object game=addLiveGameForChannel(0);call(a,"cobraProFilter",4);sportsMini(0,game);call(a,"cobraProMuteSession",player);call(a,"cobraExitProMode");call(a,"cobraEnterProMode",new ArrayList((List)get(a,"mChannels")));assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);assertTrue(state.playing);assertEquals(0,state.volume,0);assertTrue((Boolean)call(a,"cobraProSportsHeroActive"));assertSame(main,get(a,"mCobraProMainChannel"));assertEquals(CobraProUi.WATCHING,get(a,"mCobraProState"));
+  }
+  @Test public void previewViewModeReturnKeepsPreviewOwnershipAndOriginalMain()throws Exception{
+    pro();activeMini(0);Object main=channel(0);call(a,"cobraProStep",1);Object c=get(a,"mGuidePreviewChannel");put(a,"mCobraPreviewPlayer",player);put(a,"mCobraPreviewSessionKey",call(a,"cobraChannelKey",c));call(a,"cobraProPreview");call(a,"cobraProUnmute");call(a,"cobraExitProMode");call(a,"cobraEnterProMode",new ArrayList((List)get(a,"mChannels")));assertSame(player,get(a,"mCobraPreviewPlayer"));assertFalse(state.released);assertTrue(state.playing);assertEquals(1,state.volume,0);assertSame(main,get(a,"mCobraProMainChannel"));assertFalse((Boolean)get(a,"mCobraProPlaybackOwned"));assertFalse((Boolean)get(call(a,"cobraProCurrentSlot"),"main"));assertSame(hero(),hero().info.getParent());
+  }
 }
