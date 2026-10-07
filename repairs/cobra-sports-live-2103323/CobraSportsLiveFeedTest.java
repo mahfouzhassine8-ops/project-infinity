@@ -189,6 +189,15 @@ public class CobraSportsLiveFeedTest {
     assertEquals(new HashSet<>(Arrays.asList("nfl","nba")),new HashSet<>(requests));
   }
 
+  @Test public void failedLeagueWithNoCachedGamesRetriesAlongsideHealthyLiveLeague()throws Exception{
+    ui.base.prefs.edit().putStringSet("cobra_sports_enabled_leagues",new HashSet<>(Arrays.asList("nfl","nba"))).commit();
+    Object nfl=game("nfl","live","7","3","in",1);replies.put("nfl",board(Arrays.asList(nfl),Collections.emptyList()));replies.put("nba",new IOException("NBA initially unavailable"));fetch(true);
+    assertTrue(((Set)get(a,"mCobraSportsFailedLeagues")).contains("nba"));assertEquals(1,ui.games().size());
+    requests.clear();replies.put("nba",board(Arrays.asList(game("nba","new-live","10","12","in",1)),Collections.emptyList()));due();fetch(false);
+    assertEquals(new HashSet<>(Arrays.asList("nfl","nba")),new HashSet<>(requests));assertEquals(2,ui.games().size());assertTrue(((Set)get(a,"mCobraSportsFailedLeagues")).isEmpty());
+    assertEquals("",get(a,"mCobraSportsLastError"));
+  }
+
   @Test public void frequentUiSchedulingCannotPostponeAnAlreadyDueFeedCheck()throws Exception{
     ui.games().add(game("nba","live","67","93","in",3));
     // Main-looper uptime is virtual; Java's wall clock must be modelled explicitly.

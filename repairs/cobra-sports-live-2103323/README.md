@@ -43,7 +43,8 @@ Ligue 1 and Europa League.
   ticker entries. Recovery with identical scores does not invent a new alert.
 - Track full-league checks independently; include imminent games in fast polling.
   Schedule polls against the existing due time rather than resetting the delay;
-  an upcoming start advances an otherwise idle poll.
+  an upcoming start advances an otherwise idle poll. Failed leagues join fast
+  retries even if their initial request returned no cached games.
 - Request HTTP revalidation and reject scoreboards whose HTTP Age exceeds two minutes.
 
 Local receipt freshness does not prove an upstream provider has updated its own
@@ -65,7 +66,7 @@ unchanged parent payload and checks the permanent signing certificate.
 
 ## Validation
 
-The workflow runs all nine parent suites (151 tests) plus 15 new tests. The new
+The workflow runs all nine parent suites (151 tests) plus 16 new tests. The new
 suite exercises production parsing, cache hits, partial date aggregation, the real
 refresh callback, score presentation and ticker with controlled responses across
 all 15 leagues. It also covers midnight/DST/time zones, empty/malformed responses,

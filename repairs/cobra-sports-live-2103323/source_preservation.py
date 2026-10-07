@@ -41,10 +41,11 @@ def verify(before, after, out):
         after = remove_body(after, name, new=True)
     after = remove_body(after, 'CobraSportsBoardResult', new=True, is_class=True)
     after = after.replace('mCobraSportsLastRefresh=0L,mCobraSportsLastFullRefresh=0L', 'mCobraSportsLastRefresh=0L')
+    after = after.replace('private final Set<String> mCobraSportsFailedLeagues=new HashSet<>();', '')
     after = after.replace('long feedUpdatedAtMs=System.currentTimeMillis();boolean feedAvailable=true;', '')
     after = after.replace('CobraSportsBoardResult scoreboard(', 'ArrayList<CobraSportsGame> scoreboard(')
     assert tokens(before) == tokens(after), 'Changes outside the explicitly reviewed Sports data scope'
     Path(out).write_text(json.dumps({'protected_java_tokens_identical': True,
         'changed_methods': list(EXISTING), 'added_methods': list(ADDED),
-        'added_state': ['per-event feed receipt and availability', 'independent full-sweep timestamp', 'partial date-result container'],
+        'added_state': ['per-event feed receipt and availability', 'independent full-sweep timestamp', 'partial date-result container', 'failed league retry set'],
         'CobraProUi_source_unchanged': True}, indent=2) + '\n')
