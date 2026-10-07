@@ -1,0 +1,140 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.*;
+import android.content.*;
+import android.content.pm.ServiceInfo;
+import android.os.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.*;
+import org.json.JSONObject;
+
+/** User-requested, bounded shutdown ownership. Runs OUTSIDE :kodi so its timeout,
+ * notification and owner-death handling do not depend on NativeActivity.onDestroy.
+ * No timers kill Kodi or certify cleanup. No sticky start and no AUTO_CREATE binding. */
+public final class InfinityCloseGuardService extends Service {
+  static final long MAX_PROTECTION_MS=150000; // below Android's shortService allowance
+  static final String CHANNEL="infinity_normal_close";
+  static final int NOTICE=10936;
+  // A foreground client's important binding lifts the existing :kodi service out
+  // of cached state. Omitting AUTO_CREATE prevents restart after Kodi exits.
+  static final int BIND_FLAGS=Context.BIND_IMPORTANT;
+  private final Handler ui=new Handler(Looper.getMainLooper());
+  private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityCloseGuard");t.setDaemon(true);return t;});
+  private boolean binding,ended;
+  private Session session;
+  static final class Session {
+    final String ticket,owner;final int pid;final long started;
+    Session(String ticket,String owner,int pid,long started){this.ticket=ticket;this.owner=owner;this.pid=pid;this.started=started;}
+    static Session from(Intent intent,long now) {
+      if(intent==null)return null;
+      String ticket=intent.getStringExtra(InfinityCloseNativeLease.TICKET),owner=intent.getStringExtra(InfinityCloseNativeLease.TOKEN);
+      int pid=intent.getIntExtra(InfinityCloseNativeLease.PID,-1);long start=intent.getLongExtra(InfinityCloseNativeLease.START,-1);
+      if(!uuid(ticket)||!uuid(owner)||pid<=0||start<0||now<start||now-start>10000)return null;
+      return new Session(ticket,owner,pid,start);
+    }
+    private static boolean uuid(String value){return value!=null&&value.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");}
+    boolean same(Session other){return other!=null&&pid==other.pid&&ticket.equals(other.ticket)&&owner.equals(other.owner)&&started==other.started;}
+    boolean expired(long now){return now-started>=MAX_PROTECTION_MS;}
+    Bundle bundle(){Bundle b=new Bundle();b.putString(InfinityCloseNativeLease.TICKET,ticket);b.putString(InfinityCloseNativeLease.TOKEN,owner);b.putInt(InfinityCloseNativeLease.PID,pid);return b;}
+  }
+  private final ServiceConnection connection=new ServiceConnection(){
+    @Override public void onServiceConnected(ComponentName name,IBinder binder){
+      if(ended||session==null)return;
+      final Session target=session;
+      worker.execute(()->{
+        boolean held;
+        try{held=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}
+        catch(IOException unknown){held=false;}
+        final boolean valid=held;
+        ui.post(()->{
+          if(ended || session!=target)return;
+          if(!valid){end("owner_not_held_before_dispatch");return;}
+          try {
+            Message ready=Message.obtain(null,InfinityCloseNativeLease.READY);ready.setData(target.bundle());
+            new Messenger(binder).send(ready);
+            evidence("guard.ready_bound_before_quit");
+          }catch(RemoteException dead){end("owner_disconnected_before_dispatch");}
+        });
+      });
+    }
+    @Override public void onServiceDisconnected(ComponentName name){end("owner_process_disconnected");}
+    @Override public void onBindingDied(ComponentName name){end("binding_died_no_restart");}
+    @Override public void onNullBinding(ComponentName name){end("binding_refused");}
+  };
+  @Override public int onStartCommand(Intent intent,int flags,int startId){
+    Session next=Session.from(intent,SystemClock.elapsedRealtime());
+    if(ended){stopSelf(startId);return START_NOT_STICKY;}
+    if(session!=null){
+      // Duplicate or stale starts cannot extend this owner's fixed lifetime or
+      // replace its binding while native destruction may be in progress.
+      if(!session.same(next))evidence("guard.ignored_different_start");
+      return START_NOT_STICKY;
+    }
+    if(next==null){stopSelf(startId);return START_NOT_STICKY;}
+    session=next;
+    try {
+      NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+      if(Build.VERSION.SDK_INT>=26){
+        NotificationChannel channel=new NotificationChannel(CHANNEL,"Infinity shutdown",NotificationManager.IMPORTANCE_LOW);
+        channel.setShowBadge(false);manager.createNotificationChannel(channel);
+      }
+      Intent open=new Intent(this,Splash.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+      int pending=PendingIntent.FLAG_UPDATE_CURRENT|(Build.VERSION.SDK_INT>=23?PendingIntent.FLAG_IMMUTABLE:0);
+      Notification.Builder builder=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL):new Notification.Builder(this);
+      Notification notice=builder.setSmallIcon(android.R.drawable.stat_notify_sync).setContentTitle("Closing Infinity")
+          .setContentText("Finishing Kodi cleanup").setOngoing(true).setOnlyAlertOnce(true)
+          .setContentIntent(PendingIntent.getActivity(this,NOTICE,open,pending)).build();
+      if(Build.VERSION.SDK_INT>=34)startForeground(NOTICE,notice,ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE);
+      else if(Build.VERSION.SDK_INT>=29)startForeground(NOTICE,notice,0);
+      else startForeground(NOTICE,notice);
+      evidence("guard.foreground_started");
+      binding=bindService(new Intent(this,InfinityCloseNativeLease.class),connection,BIND_FLAGS);
+      if(!binding){end("existing_native_service_not_bound");return START_NOT_STICKY;}
+      ui.post(poll);
+      ui.postDelayed(()->end("guard.time_bound_cleanup_unconfirmed"),Math.max(0,MAX_PROTECTION_MS-(SystemClock.elapsedRealtime()-session.started)));
+    }catch(RuntimeException denied){end("guard.unavailable_"+denied.getClass().getSimpleName());}
+    return START_NOT_STICKY;
+  }
+  private final Runnable poll=new Runnable(){public void run(){
+    if(ended||session==null)return;
+    final Session target=session;
+    worker.execute(()->{
+      Boolean alive=null;
+      try{alive=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}catch(IOException unknown){}
+      final Boolean result=alive;
+      ui.post(()->{
+        if(ended||session!=target)return;
+        if(Boolean.FALSE.equals(result)){end("guard.owner_lease_released_not_a_clean_exit_verdict");return;}
+        ui.postDelayed(poll,500);
+      });
+    });
+  }};
+  private void evidence(String phase){
+    final Session target=session;if(target==null)return;
+    final long elapsed=SystemClock.elapsedRealtime(),epoch=System.currentTimeMillis();
+    try{worker.execute(()->{
+      try{
+        File path=new File(getFilesDir(),"infinity-close-guard.jsonl");
+        // One bounded report, independent of Kodi's own status/lease files.
+        if(path.length()>128*1024)return;
+        JSONObject row=new JSONObject();row.put("phase",phase);row.put("target_pid",target.pid);row.put("owner",target.owner);
+        row.put("ticket",target.ticket);row.put("epoch_ms",epoch);row.put("elapsed_ms",elapsed);row.put("clean_exit_claim",false);
+        try(FileOutputStream out=new FileOutputStream(path,true)){out.write((row.toString()+"\n").getBytes(StandardCharsets.UTF_8));}
+      }catch(Exception unavailable){}
+    });}catch(RejectedExecutionException unavailable){}
+  }
+  private void end(String reason){
+    if(ended)return;ended=true;
+    evidence(reason);ui.removeCallbacksAndMessages(null);
+    if(binding){binding=false;try{unbindService(connection);}catch(RuntimeException ignored){}}
+    // Stop only our temporary lease service, not the app, playback or databases.
+    try{stopService(new Intent(this,InfinityCloseNativeLease.class));}catch(RuntimeException ignored){}
+    stopForeground(true);stopSelf();
+  }
+  @Override public IBinder onBind(Intent intent){return null;}
+  @Override public void onTimeout(int startId){end("guard.android_timeout_cleanup_unconfirmed");}
+  @Override public void onTimeout(int startId,int fgsType){end("guard.android_timeout_cleanup_unconfirmed");}
+  @Override public void onDestroy(){end("guard.destroyed");worker.shutdown();super.onDestroy();}
+}

@@ -1,0 +1,79 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.*;
+import java.lang.ref.WeakReference;
+import java.util.UUID;
+
+/** Existing :kodi process only. Nonsticky and never automatically recreated by a binding.
+ * Contains no native loader. The separate foreground guard binds before quit dispatch. */
+public final class InfinityCloseNativeLease extends Service {
+  static final String TICKET="close_ticket", TOKEN="close_owner", PID="close_pid", START="close_start";
+  static final int READY=3326;
+  private static String ticket="";
+  private static WeakReference<Main> activity=new WeakReference<>(null);
+  private static InfinityCloseNativeLease instance;
+  private final Handler ui=new Handler(Looper.getMainLooper());
+  private final Messenger endpoint=new Messenger(new Handler(Looper.getMainLooper(),message->{
+    if(message.what!=READY)return false;
+    Bundle data=message.getData();
+    Main current=activity.get();
+    if(message.sendingUid!=android.os.Process.myUid() || !matches(data,current))return true;
+    ui.removeCallbacks(this.startBound);
+    InfinityExitCompletion.guardedReady(current);
+    return true;
+  }));
+  private final Runnable startBound=()->fail("guard_handshake_timeout");
+
+  static boolean acquire(Main owner) {
+    if(owner==null || Main.MainActivity!=owner)return false;
+    ticket=UUID.randomUUID().toString();activity=new WeakReference<>(owner);
+    try {
+      Intent start=new Intent(owner,InfinityCloseNativeLease.class).putExtra(TICKET,ticket);
+      if(owner.startService(start)!=null)return true;
+    }catch(RuntimeException denied){ android.util.Log.w("InfinityClose","Lease start refused",denied); }
+    activity.clear();ticket="";return false;
+  }
+  private static boolean matches(Bundle data,Main owner) {
+    return owner!=null && Main.MainActivity==owner && !owner.isDestroyed() && !owner.isFinishing() &&
+        ticket.equals(data.getString(TICKET)) && data.getInt(PID,-1)==android.os.Process.myPid() &&
+        InfinityKodiShutdown.localOwnerToken().equals(data.getString(TOKEN)) && owner.mInfinityExitPlan.guardedWaiting();
+  }
+  @Override public int onStartCommand(Intent intent,int flags,int startId) {
+    Main owner=activity.get();
+    if(intent==null || !ticket.equals(intent.getStringExtra(TICKET)) || owner==null ||
+        Main.MainActivity!=owner || !owner.mInfinityExitPlan.guardedWaiting()) {
+      stopSelf(startId);return START_NOT_STICKY;
+    }
+    instance=this;
+    Intent guard=new Intent(this,InfinityCloseGuardService.class).putExtra(TICKET,ticket)
+        .putExtra(PID,android.os.Process.myPid()).putExtra(TOKEN,InfinityKodiShutdown.localOwnerToken())
+        .putExtra(START,SystemClock.elapsedRealtime());
+    ui.postDelayed(startBound,10000);
+    try {
+      if(Build.VERSION.SDK_INT>=26)startForegroundService(guard);else startService(guard);
+    }catch(RuntimeException denied){fail("guard_start_refused");}
+    return START_NOT_STICKY;
+  }
+  @Override public IBinder onBind(Intent intent) { return endpoint.getBinder(); }
+  private void fail(String reason) {
+    Main owner=activity.get();
+    if(owner!=null && Main.MainActivity==owner)InfinityExitCompletion.guardedFailed(owner,reason);
+    stopSelf();
+  }
+  static void release(Context context) {
+    try { context.stopService(new Intent(context,InfinityCloseGuardService.class)); }catch(RuntimeException ignored){}
+    try { context.stopService(new Intent(context,InfinityCloseNativeLease.class)); }catch(RuntimeException ignored){}
+  }
+  @Override public void onDestroy() {
+    ui.removeCallbacksAndMessages(null);
+    if(instance==this)instance=null;
+    Main owner=activity.get();
+    if(owner!=null && Main.MainActivity==owner && owner.mInfinityExitPlan.guardedWaiting())
+      InfinityExitCompletion.guardedFailed(owner,"lease_ended_before_dispatch");
+    super.onDestroy();
+  }
+}

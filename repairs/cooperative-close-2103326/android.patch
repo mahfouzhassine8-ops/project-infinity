@@ -1,0 +1,176 @@
+--- a/cmake/scripts/android/Install.cmake
++++ b/cmake/scripts/android/Install.cmake
+@@ -37,6 +37,8 @@
+                   build.gradle
+                   src/Splash.java
+                   src/InfinityExitCompletion.java
++                                 src/InfinityCloseGuardService.java
++                                 src/InfinityCloseNativeLease.java
+                   src/InfinityPowerControlActivity.java
+                   src/InfinityPowerMenuRoutes.java
+                   src/InfinityKodiShutdown.java
+--- a/tools/android/packaging/xbmc/AndroidManifest.xml.in
++++ b/tools/android/packaging/xbmc/AndroidManifest.xml.in
+@@ -163,6 +163,11 @@
+         <activity android:name=".InfinityPowerControlActivity" android:process=":kodi"
+             android:exported="false" android:excludeFromRecents="true"
+             android:noHistory="true" android:theme="@android:style/Theme.NoDisplay" />
++        <service android:name=".InfinityCloseGuardService"
++            android:exported="false" android:stopWithTask="false"
++            android:foregroundServiceType="shortService" />
++        <service android:name=".InfinityCloseNativeLease" android:process=":kodi"
++            android:exported="false" android:stopWithTask="false" />
+         <service android:name=".InfinityExtendedBackgroundService" android:process=":kodi"
+             android:exported="false" android:stopWithTask="false"
+             android:foregroundServiceType="specialUse|mediaPlayback">
+--- a/tools/android/packaging/xbmc/src/InfinityExitCompletion.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityExitCompletion.java.in
+@@ -8,9 +8,10 @@
+ import java.util.concurrent.Executors;
+ 
+ /** Explicit power commands only. Normal close NEVER escalates to a timed kill.
+- * Normal close removes the Android task; NativeActivity destruction owns native
+- * cleanup. The older stopped-then-Quit path remains for its existing callers.
+- * Diagnostic events do not change either route. Force is a separate user command.
++ * Normal close first acquires temporary Android lifecycle protection, then asks
++ * Kodi to stop cooperatively while its Activity still accepts cleanup callbacks.
++ * Native stage one finishes the Activity; stage two retains final cleanup.
++ * Force remains a separate user command. No time bound declares success.
+  */
+ final class InfinityExitCompletion {
+   static final String NORMAL = "@APP_PACKAGE@.action.CLOSE_KODI";
+@@ -47,6 +48,21 @@
+     enum Phase { RUNNING, ANDROID_TASK_REMOVAL, WAITING_FOR_STOP, QUIT_QUEUED, DESTROYING, COMPLETE, FORCED }
+     private Phase phase = Phase.RUNNING;
+     private long requestedAt=-1;
++    private boolean guarded;
++    synchronized boolean guardedWaiting() { return guarded && phase==Phase.WAITING_FOR_STOP; }
++    synchronized boolean requestGuardedClose() {
++      if(phase!=Phase.RUNNING)return false;
++      guarded=true;requestedAt=SystemClock.elapsedRealtime();phase=Phase.WAITING_FOR_STOP;
++      observeClose(this);return true;
++    }
++    synchronized boolean claimGuardedDispatch() {
++      if(!guardedWaiting())return false;
++      phase=Phase.QUIT_QUEUED;return true;
++    }
++    synchronized boolean cancelGuardedClose() {
++      if(!guardedWaiting())return false;
++      guarded=false;requestedAt=-1;phase=Phase.RUNNING;forgetClose(this);return true;
++    }
+     synchronized boolean stalled(long now) {
+       return requestedAt>=0 && now-requestedAt>=STALL_BOUND_MS &&
+           (phase==Phase.ANDROID_TASK_REMOVAL || phase==Phase.WAITING_FOR_STOP || phase==Phase.QUIT_QUEUED || phase==Phase.DESTROYING);
+@@ -66,7 +82,7 @@
+       phase=Phase.RUNNING;forgetClose(this);return true;
+     }
+     synchronized boolean stopped(boolean configurationChange) {
+-      if (configurationChange || phase != Phase.WAITING_FOR_STOP) return false;
++      if (guarded || configurationChange || phase != Phase.WAITING_FOR_STOP) return false;
+       phase = Phase.QUIT_QUEUED; return true;
+     }
+     synchronized boolean cancelBeforeQuit() {
+@@ -81,26 +97,47 @@
+     synchronized void completed() { if (phase != Phase.FORCED) phase = Phase.COMPLETE; }
+   }
+   static boolean requestNormal(Main owner) {
+-    if (owner == null || owner.isDestroyed() || owner.isFinishing()) return false;
+-    if (!owner.mInfinityExitPlan.requestAndroidTaskRemoval()) return owner.mInfinityExitPlan.pending();
++    if(owner==null || owner.isDestroyed() || owner.isFinishing())return false;
++    if(!owner.mInfinityExitPlan.requestGuardedClose())return owner.mInfinityExitPlan.pending();
+     owner.infinityStopWeatherCapture();
+-    record(owner, "exit.androidTaskRemoval.requested");
++    record(owner,"exit.normal.guardRequested");
+     final WeakReference<Main> observed=new WeakReference<>(owner);
+-    WATCH.schedule(() -> {
++    WATCH.schedule(()->{
+       Main current=observed.get();
+       if(current!=null && current.mInfinityExitPlan.stalled(SystemClock.elapsedRealtime()))
+-        record(current,"exit.androidTaskRemoval.boundExceeded.userRecoveryAvailable");
+-    }, STALL_BOUND_MS, java.util.concurrent.TimeUnit.MILLISECONDS);
+-    // Match Android Recents removal: remove the NativeActivity task and let
+-    // Android deliver its normal lifecycle destruction. Do not issue
+-    // Application.Quit; Main.onDestroy owns NativeActivity cleanup.
+-    try { owner.finishAndRemoveTask(); }
+-    catch (RuntimeException denied) {
+-      owner.mInfinityExitPlan.cancelAndroidTaskRemoval();
+-      record(owner, "exit.androidTaskRemoval.rejected." + denied.getClass().getSimpleName());
+-      return false;
+-    }
+-    return true;
++        record(current,"exit.normal.boundExceeded.userRecoveryAvailable");
++    },STALL_BOUND_MS,java.util.concurrent.TimeUnit.MILLISECONDS);
++    if(InfinityCloseNativeLease.acquire(owner))return true;
++    owner.mInfinityExitPlan.cancelGuardedClose();
++    record(owner,"exit.normal.guardUnavailable.noTaskRemoval");
++    return false;
++  }
++  static void guardedFailed(Main owner,String reason) {
++    if(owner==null || !owner.mInfinityExitPlan.cancelGuardedClose())return;
++    record(owner,"exit.normal."+reason+".noTaskRemoval");
++    android.widget.Toast.makeText(owner,"Infinity could not begin normal close. Nothing was force-stopped.",android.widget.Toast.LENGTH_LONG).show();
++  }
++  static void guardedReady(Main owner) {
++    if(owner==null || owner!=Main.MainActivity || owner.isDestroyed() || owner.isFinishing() ||
++        !owner.mInfinityExitPlan.claimGuardedDispatch())return;
++    record(owner,"exit.normal.guardReady.quitQueuedBeforeTaskRemoval");
++    final WeakReference<Main> observed=new WeakReference<>(owner);
++    final Context app=owner.getApplicationContext();
++    IO.execute(()->{
++      Main current=observed.get();
++      if(current==null || current!=Main.MainActivity || current.isDestroyed() || current.isFinishing() ||
++          current.mInfinityExitPlan.phase()!=Plan.Phase.QUIT_QUEUED){
++        write(app,"exit.normal.ownerAlreadyClosing.noSecondQuit");return;
++      }
++      write(app,"exit.normal.quitDispatch.beforeActivityFinish");
++      try{
++        String response=new XBMCJsonRPC().request_string(QUIT);
++        boolean accepted=response!=null && new org.json.JSONObject(response).optString("result").equals("OK");
++        write(app,accepted?"exit.normal.quitAccepted":"exit.normal.quitUnconfirmed");
++      }catch(Exception | LinkageError failure){write(app,"exit.normal.quitFailed."+failure.getClass().getSimpleName());}
++      // Kodi's existing pre-destruction phase owns Activity finish. Never replace
++      // an unconfirmed result or elapsed timer with a kill or a success receipt.
++    });
+   }
+   static void afterStop(Main owner) {
+     if(owner.mInfinityExitPlan.phase()==Plan.Phase.ANDROID_TASK_REMOVAL){
+--- a/tools/android/packaging/xbmc/src/InfinityHealthExport.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityHealthExport.java.in
+@@ -15,6 +15,7 @@
+ final class InfinityHealthExport {
+   static final int TRACE_LIMIT = 2 * 1024 * 1024;
+   static final int MAX_TRACES = 4;
++  static final int NATIVE_TRACE_LIMIT = 8 * 1024 * 1024;
+   private InfinityHealthExport() {}
+ 
+   static void write(Context context, OutputStream destination, String report) throws Exception {
+@@ -33,12 +34,16 @@
+       attach(context, zip, diagnostics, "infinity-native-cleanup.json", "native-cleanup.json", 4096);
+       // Diagnostic evidence only: never declare clean exit from a returned
+       // scope, elapsed timeout, missing row or process.exit_requested marker.
+-      manifest.put("shutdown_trace_engine", "infinity-shutdown-2103325-v1");
++      manifest.put("shutdown_trace_engine", "infinity-shutdown-2103326-v1");
+       manifest.put("shutdown_packaged_native_sha256", "e244f0ef2de7f0943659c6e721c4b26045f7f2cca18d50bc0c6298a29428ede1");
+       manifest.put("shutdown_trace_semantics", "Scope returned is not success. Exit requested is not process death. Missing or truncated data is unknown. Compare producer PID and session clocks.");
+-      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl", "shutdown/native.jsonl", TRACE_LIMIT);
+-      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.previous", "shutdown/native.previous.jsonl", TRACE_LIMIT);
++      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl", "shutdown/native.jsonl", NATIVE_TRACE_LIMIT);
++      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.previous", "shutdown/native.previous.jsonl", NATIVE_TRACE_LIMIT);
+       attachShutdown(context, zip, diagnostics, "infinity-close-history.txt", "shutdown/java-close-history.txt", 65536);
++      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.critical", "shutdown/critical.jsonl", 2 * 1024 * 1024);
++      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.critical.previous", "shutdown/critical.previous.jsonl", 2 * 1024 * 1024);
++      attachShutdown(context, zip, diagnostics, "infinity-close-guard.jsonl", "shutdown/android-guard.jsonl", 160 * 1024);
++      manifest.put("shutdown_critical_semantics", "Independent budget for high-level native phases; sequence gaps are expected in this selected mirror. Guard lifetime is not a clean-exit verdict.");
+       JSONArray records = new JSONArray();
+       manifest.put("records", records);
+       if (Build.VERSION.SDK_INT >= 30) Api30.collect(context, zip, records);
+--- a/tools/android/packaging/xbmc/src/InfinityKodiShutdown.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityKodiShutdown.java.in
+@@ -44,6 +44,7 @@
+     boolean pending(){return alive && phase!=InfinityExitCompletion.Plan.Phase.RUNNING && phase!=InfinityExitCompletion.Plan.Phase.COMPLETE;}
+     boolean stalled(){return pending() && closeAt>0 && System.currentTimeMillis()-closeAt>=15000;}
+   }
++  static String localOwnerToken(){return processToken;}
+   static Snapshot state(){return cached;}
+   static boolean initialized(){return initialized;}
+   static boolean pending(){return cached.pending();}
