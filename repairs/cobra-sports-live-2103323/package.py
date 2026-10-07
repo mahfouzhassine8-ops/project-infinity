@@ -44,7 +44,7 @@ EXPECTED_SUITES = {
     'CobraProRefinementTest': 12,
     'CobraProControlsRefinementTest': 11,
     'CobraProPausedReturnTest': 8,
-    'CobraSportsLiveFeedTest': 14,
+    'CobraSportsLiveFeedTest': 15,
 }
 
 

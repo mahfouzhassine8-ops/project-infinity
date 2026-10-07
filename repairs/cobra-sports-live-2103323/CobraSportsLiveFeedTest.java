@@ -190,11 +190,25 @@ public class CobraSportsLiveFeedTest {
   }
 
   @Test public void frequentUiSchedulingCannotPostponeAnAlreadyDueFeedCheck()throws Exception{
-    ui.games().add(game("nba","live","67","93","in",3));put(a,"mCobraSportsLastRefresh",System.currentTimeMillis()-44000L);
-    for(int i=0;i<3;i++){call(a,"cobraSportsScheduleNext");Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(250));}
+    ui.games().add(game("nba","live","67","93","in",3));
+    // Main-looper uptime is virtual; Java's wall clock must be modelled explicitly.
+    for(int i=0;i<3;i++){
+      put(a,"mCobraSportsLastRefresh",System.currentTimeMillis()-44000L-i*250L);
+      call(a,"cobraSportsScheduleNext");Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(250));
+    }
+    put(a,"mCobraSportsLastRefresh",System.currentTimeMillis()-45001L);
     Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(300));
     assertTrue("Refresh must already be queued near its original 45-second deadline",(Boolean)get(a,"mCobraSportsLoading"));
     assertFalse(((PendingIo)get(a,"mIo")).tasks.isEmpty());
+  }
+
+  @Test public void scheduledKickoffAdvancesTheIdlePollDeadline()throws Exception{
+    clearGames();Object upcoming=game("nba","next","0","0","pre",0);
+    long now=System.currentTimeMillis();put(upcoming,"startMs",now+60000L);ui.games().add(upcoming);put(a,"mCobraSportsLastRefresh",now);
+    assertEquals(300000L,call(a,"cobraSportsRefreshInterval",now));call(a,"cobraSportsScheduleNext");
+    Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(59));assertFalse((Boolean)get(a,"mCobraSportsLoading"));
+    put(a,"mCobraSportsLastRefresh",System.currentTimeMillis()-61000L);put(upcoming,"startMs",System.currentTimeMillis()-1000L);
+    Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));assertTrue("A scheduled game must be checked at its start instead of waiting five minutes",(Boolean)get(a,"mCobraSportsLoading"));
   }
 
   @Test public void staleVisibleAndQueuedScoresAreSuppressedWithoutLosingSeenSignature()throws Exception{
@@ -224,7 +238,7 @@ public class CobraSportsLiveFeedTest {
         String line;while((line=reader.readLine())!=null&&!line.isEmpty()){int colon=line.indexOf(':');if(colon>0)headers.put(line.substring(0,colon).toLowerCase(Locale.US),line.substring(colon+1).trim());}
         byte[] body="{\"events\":[]}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         String response="HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAge: "+(i==0?0:121)+"\r\nContent-Length: "+body.length+"\r\nConnection: close\r\n\r\n";
-        java.io.OutputStream out=client.getOutputStream();out.write(response.getBytes(java.nio.charset.StandardCharsets.US_ASCII));out.write(body);out.flush();
+        java.io.OutputStream out=client.getOutputStream();out.write((response+"{\"events\":[]}").getBytes(java.nio.charset.StandardCharsets.UTF_8));out.flush();
       }}catch(Throwable error){failure.set(error);}
     },"scoreboard-fixture-http");responder.setDaemon(true);responder.start();
     try{

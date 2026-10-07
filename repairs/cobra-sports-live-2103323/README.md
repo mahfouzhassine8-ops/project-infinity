@@ -42,7 +42,8 @@ Ligue 1 and Europa League.
 - Display `Score delayed` instead of stale points/clock details and suppress its
   ticker entries. Recovery with identical scores does not invent a new alert.
 - Track full-league checks independently; include imminent games in fast polling.
-  Schedule polls against the existing due time rather than resetting the delay.
+  Schedule polls against the existing due time rather than resetting the delay;
+  an upcoming start advances an otherwise idle poll.
 - Request HTTP revalidation and reject scoreboards whose HTTP Age exceeds two minutes.
 
 Local receipt freshness does not prove an upstream provider has updated its own
@@ -64,7 +65,7 @@ unchanged parent payload and checks the permanent signing certificate.
 
 ## Validation
 
-The workflow runs all nine parent suites (151 tests) plus 14 new tests. The new
+The workflow runs all nine parent suites (151 tests) plus 15 new tests. The new
 suite exercises production parsing, cache hits, partial date aggregation, the real
 refresh callback, score presentation and ticker with controlled responses across
 all 15 leagues. It also covers midnight/DST/time zones, empty/malformed responses,
@@ -76,3 +77,8 @@ and records actual responses, failures and cache headers separately from fixture
 results. No physical device or continuous upstream freshness claim is made by CI.
 
 2103323 remains a candidate until the user's device acceptance and explicit lock.
+
+Initial live endpoint observation: 30/30 requests succeeded on 2026-10-07,
+covering current and previous dates for all 15 leagues. Lakers–Warriors event
+401898390 was returned by the October 6 scoreboard with a UTC start on October 7,
+corroborating the need to retain the previous scoreboard date after midnight.
