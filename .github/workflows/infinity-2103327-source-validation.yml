@@ -9,10 +9,16 @@ on:
       - '.github/workflows/infinity-2103327-source-validation.yml'
 permissions: {contents: read}
 concurrency: {group: infinity-2103327-source-validation, cancel-in-progress: true}
+env:
+  NDK_VER: 21.4.7075529
 jobs:
   source-validation:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0}
