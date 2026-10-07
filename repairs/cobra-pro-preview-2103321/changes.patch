@@ -105,16 +105,17 @@
      cobraStartPresentationTicker();cobraUpdatePlaybackLabels();configureCobraPip(true);cobraSetTimeshiftUiState((local||proxy)&&mCobraTimeshiftSession.ready()?"READY":(local||proxy)?"RECORDING":cobraChannelRewindEnabled(channel)&&cobraLiveChannel(channel)?"UNSUPPORTED":"OFF",(local||proxy)?Math.round(mCobraTimeshiftSession.windowDurationMs()/1000f)+"s":"");
      if(mDeviceBridge!=null)mDeviceBridge.onPlaybackChanged(local?"preview-timeshift-fullscreen":"preview-fullscreen");
    }
-@@ -2422,14 +2423,19 @@
+@@ -2422,14 +2423,20 @@
      mCobraPlayerProgram=null;mCobraPlayerSchedule=null;mCobraPlayerUpcoming=null;mCobraPlayerProgramProgress=null;
      mGuidePreviewChannel=channel;mGuidePreviewKey=cobraChannelKey(channel);mGuidePreviewArmed=true;
      mCobraPreviewPlayer=session;mCobraPreviewSessionKey=cobraChannelKey(channel);
 -    if(mCobraProActive){mCobraProPlaybackOwned=true;mCobraProHeroBrowsing=false;mCobraProState=COBRA_PRO_WATCHING;mCobraPreviewMuted=cobraMediaMuted(session);cobraProSelectPlayingSlot(channel);}
-+    if(mCobraProActive){mCobraProPlaybackOwned=true;mCobraProHeroBrowsing=false;mCobraProState=COBRA_PRO_WATCHING;mCobraPreviewMuted=cobraMediaMuted(session);
++    if(mCobraProActive){mCobraProHeroBrowsing=false;mCobraProState=COBRA_PRO_WATCHING;mCobraPreviewMuted=cobraMediaMuted(session);
 +      CobraProSlot pane=cobraProCurrentSlot();
 +      if(cobraChannelKey(channel).equals(mCobraProSportsPlaybackChannelKey)&&!mCobraProSportsPlaybackGameId.isEmpty()){
-+        int sports=cobraProSportsSlotIndex();if(sports>=0)mCobraProHeroIndex=sports;mCobraProSource="LIVE SPORTS";
-+      }else if(pane==null||(!pane.sports&&(pane.channel==null||!channel.id.equals(pane.channel.id))))cobraProSelectPlayingSlot(channel);
++        mCobraProPlaybackOwned=true;int sports=cobraProSportsSlotIndex();if(sports>=0)mCobraProHeroIndex=sports;mCobraProSource="LIVE SPORTS";
++      }else if(pane==null||(!pane.sports&&(pane.channel==null||!channel.id.equals(pane.channel.id)))){mCobraProPlaybackOwned=true;cobraProSelectPlayingSlot(channel);}
++      else if(pane.main||pane.sports)mCobraProPlaybackOwned=true;
 +    }
      // The guide shell and its original TextureView remain mounted behind fullscreen.
      showCobraPrimaryView();
@@ -127,7 +128,7 @@
        cobraProEnforceSportsPlayback();int sports=cobraProSportsSlotIndex();
        if(sports>=0){mCobraProHeroIndex=sports;cobraProRetuneSports(cobraProCurrentSportsGame(),false);}
      }
-@@ -9326,10 +9332,17 @@
+@@ -9326,10 +9333,17 @@
        row.setTag("pro_sports_game_"+game.id);
        row.select=drawer?()->cobraSportsWatch(game):()->cobraProSelectSportsGame(game);
        row.watch=game.live()?()->cobraSportsWatch(game):()->cobraProSportsOptions(game);
@@ -146,7 +147,7 @@
    }
  
    private void cobraProSportsOptions(CobraSportsGame game){
-@@ -9459,7 +9472,7 @@
+@@ -9459,7 +9473,7 @@
    private boolean mCobraProSportsManualSelection;
    private CobraSportsGame cobraProCurrentSportsGame(){
      CobraProSlot pane=cobraProCurrentSlot();if(pane!=null&&pane.sports&&!pane.main)return cobraSportsGame(pane.gameId);
@@ -155,7 +156,7 @@
    }
    private CobraSportsGame cobraProPreferredSportsGame(){
      ArrayList<CobraSportsGame> live=new ArrayList<>();for(CobraSportsGame game:mCobraSportsGames)if(game.live())live.add(game);
-@@ -9492,7 +9505,12 @@
+@@ -9492,7 +9506,12 @@
    private void cobraProSportsTab(int index){
      if(!mCobraProActive)return;mCobraProSportsSection=index==1?"myteams":index==2?"upcoming":index==3?"leagues":index==4?"teams":"live";if(index!=3)mCobraProSportsLeagueKey="";cobraRenderGuideBrowser();
    }
@@ -169,7 +170,7 @@
    private void cobraProRetuneSports(CobraSportsGame requested,boolean animate){
      if(requested==null)mCobraProSportsManualSelection=false;CobraSportsGame game=requested==null?cobraProPreferredSportsGame():requested;
      mCobraProSource="LIVE SPORTS";mCobraProSportsResolvedChannel=null;mCobraProSportsResolvingId="";
-@@ -9504,10 +9522,6 @@
+@@ -9504,10 +9523,6 @@
      submitCobraIo(()->{ArrayList<CobraSportsMatch> matches=cobraSportsResolve(game,snapshot);publishCobraUi(()->{
        if(!mCobraProActive||!cobraProSportsHeroActive()||!profile.equals(mFeatures.activeProfileId())||paneGeneration!=mCobraProPaneGeneration||cobraProCurrentSportsGame()==null||!gameId.equals(cobraProCurrentSportsGame().id)||!gameId.equals(mCobraProSportsResolvingId))return;
        mCobraProSportsResolvingId="";CobraSportsGame current=cobraSportsGame(gameId);if(current!=null&&current.live()&&cobraSportsUniqueStrong(matches))mCobraProSportsResolvedChannel=matches.get(0).channel;
@@ -180,7 +181,7 @@
        cobraRefreshProHero();
      });});
    }
-@@ -9539,10 +9553,14 @@
+@@ -9539,10 +9554,14 @@
    }
    private void cobraPlaySportsBroadcast(CobraSportsGame game,Channel channel){
      CobraSportsGame current=game==null?null:cobraSportsGame(game.id);
@@ -197,7 +198,7 @@
      }
      playChannel(channel);
    }
-@@ -9552,19 +9570,13 @@
+@@ -9552,19 +9571,13 @@
    private void cobraProSportsMulti(){cobraProMultiPicker(new LinkedHashMap<>(),"");}
  
    private void cobraSyncSportsPreviewSlots(){
@@ -219,7 +220,7 @@
        CobraSportsGame preferred=cobraProPreferredSportsGame();
        if(mCobraProSportsActive&&cobraProSportsHeroActive()&&cobraProCurrentSlot().main&&!mCobraProSportsManualSelection&&mCobraProState==COBRA_PRO_RESTING&&preferred!=null&&preferred.live()&&cobraSportsRank(preferred)<2
            &&!preferred.id.equals(mCobraProSportsGameId)&&(mCobraPreviewPlayer==null||!mCobraPreviewPlayer.getPlayWhenReady())){
-@@ -9791,9 +9803,9 @@
+@@ -9791,9 +9804,9 @@
      if(!mCobraProActive)return;
      cobraSelectDrawerOwner(index==4?"SPORTS":"TV");
      if(index!=4)cobraProSetSportsCompact(false,true);
@@ -231,7 +232,7 @@
        cobraRenderGuideBrowser();cobraProSetSportsCompact(true,true);
        CobraSportsGame preferred=cobraProPreferredSportsGame();
        int slot=cobraProSportsSlotIndex();if(slot>=0){mCobraProHeroIndex=slot;CobraSportsGame playing=mCobraProPlaybackOwned?cobraProLiveGameForChannel(mGuidePreviewChannel):null;if(playing!=null){mCobraProSportsGameId=playing.id;mCobraProSportsManualSelection=true;}cobraProRetuneSports(playing!=null?playing:cobraProCurrentSportsGame(),true);}
-@@ -9809,20 +9821,32 @@
+@@ -9809,20 +9822,32 @@
      if(first){mCobraProActive=true;mCobraProState=COBRA_PRO_RESTING;mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;
        mCobraProPriorPlaying=mCobraPreviewPlayer==null?mCobraPreviewAutoplayAllowed:mCobraPreviewPlayer.getPlayWhenReady();
        mCobraProPriorMuted=mCobraPreviewPlayer==null?mCobraPreviewMuted:cobraMediaMuted(mCobraPreviewPlayer);mCobraProPriorAutoplayAllowed=mCobraPreviewAutoplayAllowed;
@@ -267,7 +268,7 @@
      if(mCobraProObserved!=null&&mCobraProListener!=null)mCobraProObserved.removeListener(mCobraProListener);mCobraProObserved=null;mCobraProListener=null;
      if(mCobraProHeroUi!=null){CobraProUi.detach(mCobraProHeroUi.info);mCobraProHeroUi.info.animate().cancel();}
      if(mCobraPreviewHost!=null){
-@@ -9902,14 +9926,8 @@
+@@ -9902,14 +9927,8 @@
  
    private void cobraBuildProSlots(ArrayList<Channel> visible){
      mCobraProSlots.clear();mCobraProSlotsSports=mCobraProSportsActive;HashSet<String> seen=new HashSet<>();ArrayList<Channel> safe=visible==null?new ArrayList<>():visible;
@@ -283,7 +284,7 @@
      mCobraProSlots.add(new CobraProSlot("MAIN",mCobraProMainChannel,false,true,""));
      Channel saved=findChannel(mPrefs.getString("cobra_pro_hero_channel",""));if(saved!=null&&safe.contains(saved))cobraAddProSlot(seen,cobraProSourceForSelection(saved),saved);
      for(String id:mRecents){Channel c=findChannel(id);if(c!=null&&safe.contains(c)&&!seen.contains(c.id)){cobraAddProSlot(seen,"RECENT CHANNEL",c);break;}}
-@@ -9918,6 +9936,10 @@
+@@ -9918,6 +9937,10 @@
      if(mGuidePreviewChannel!=null&&safe.contains(mGuidePreviewChannel))cobraAddProSlot(seen,cobraProSourceForSelection(mGuidePreviewChannel),mGuidePreviewChannel);
      for(Channel c:safe){if(mFavorites.contains(c.id))cobraAddProSlot(seen,"FROM FAVORITES",c);if(cobraProRegularSlotCount()>=COBRA_PRO_MAX_SLOTS-2)break;}
      for(Channel c:safe){cobraAddProSlot(seen,"FROM CHANNELS",c);if(cobraProRegularSlotCount()>=COBRA_PRO_MAX_SLOTS-2)break;}
@@ -294,7 +295,7 @@
      mCobraProSlots.add(new CobraProSlot());
      if(mCobraProHeroIndex>=mCobraProSlots.size())mCobraProHeroIndex=Math.max(0,mCobraProSlots.size()-1);
    }
-@@ -9940,21 +9962,20 @@
+@@ -9940,21 +9963,20 @@
      cobraProStopForPane();int size=mCobraProSlots.size();mCobraProHeroIndex=(mCobraProHeroIndex+(direction<0?-1:1)+size)%size;
      CobraProSlot slot=cobraProCurrentSlot();
      if(slot.sports)cobraProRetuneSports(cobraProCurrentSportsGame(),true);
@@ -305,7 +306,7 @@
      mCobraProPaneGeneration++;mCobraProSportsResolvingId="";mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;mCobraProState=COBRA_PRO_RESTING;
      stopCobraPreviewPlayerOnly();mCobraPreviewMuted=true;mCobraPreviewAutoplayAllowed=false;mGuidePreviewChannel=null;mGuidePreviewKey="";mGuidePreviewArmed=false;
 -    mCobraProPriorPlaying=false;mCobraProPriorAutoplayAllowed=false;cobraRemoveScoreTicker();cobraRefreshPlayingIndicators();
-+    mCobraProPriorPlaying=false;mCobraProPriorOwned=false;mCobraProPriorPreview=false;mCobraProPriorAutoplayAllowed=false;cobraRemoveScoreTicker();cobraRefreshPlayingIndicators();
++    mCobraProSportsPlaybackGameId="";mCobraProSportsPlaybackChannelKey="";mCobraProPriorPlaying=false;mCobraProPriorOwned=false;mCobraProPriorPreview=false;mCobraProPriorAutoplayAllowed=false;cobraRemoveScoreTicker();cobraRefreshPlayingIndicators();
    }
    private void cobraProSelectChannel(Channel channel,String source){
 -    if(channel==null||!cobraChannelAllowed(channel)||mCobraProPlaybackOwned)return;int index=cobraFindProSlot(channel);
@@ -320,7 +321,7 @@
      mCobraProMainChannel=channel;mPrefs.edit().putString("cobra_pro_main_channel",channel.id).apply();
      CobraProSlot main=new CobraProSlot("MAIN",channel,false,true,"");
      if(!mCobraProSlots.isEmpty()&&mCobraProSlots.get(0).main&&!mCobraProSlots.get(0).sports)mCobraProSlots.set(0,main);else mCobraProSlots.add(0,main);
-@@ -9962,40 +9983,50 @@
+@@ -9962,40 +9984,50 @@
    }
    private void cobraProPlayChannel(Channel channel){
      if(channel==null||!cobraChannelAllowed(channel)||!isCobraAsyncAlive())return;
@@ -386,7 +387,7 @@
    }
    private void cobraSetProState(int state,boolean animate){
      mCobraProState=Math.max(COBRA_PRO_RESTING,Math.min(COBRA_PRO_WATCHING,state));
-@@ -10031,6 +10062,7 @@
+@@ -10031,6 +10063,7 @@
      View label=mCobraPreviewHost==null?null:mCobraPreviewHost.findViewWithTag("cobra_preview_label");
      if(label instanceof TextView){String value=((TextView)label).getText().toString();data.status="Paused".equalsIgnoreCase(value)?"":value;label.setAlpha(0f);}
      data.main=cobraProCurrentSlot()!=null&&cobraProCurrentSlot().main;
@@ -394,7 +395,7 @@
      mCobraProHeroUi.browsing(mCobraProHeroBrowsing);mCobraProHeroUi.bind(data,mCobraProHeroIndex,mCobraProSlots.size());
      if(mCobraProPlaybackOwned)mCobraProHeroUi.player[1].setSelected(mGuidePreviewChannel!=null&&mFavorites.contains(mGuidePreviewChannel.id));
      mCobraProHeroUi.playback(player!=null&&player.getPlayWhenReady(),player==null||cobraMediaMuted(player),player!=null&&cobraCaptionsRequested(player),player!=null);
-@@ -10038,7 +10070,7 @@
+@@ -10038,7 +10071,7 @@
    }
    private void cobraAdjustProLayout(CobraModeLayout layout){
      if(layout==null)return;
@@ -403,7 +404,7 @@
      int[][] target={layout.toolbar,layout.video,layout.details,layout.browser};for(int i=0;i<4;i++)System.arraycopy(boxes[i],0,target[i],0,4);
      CobraModeLayout.box(layout.rail,0,0,0,0);CobraModeLayout.box(layout.directory,0,0,0,0);CobraModeLayout.box(layout.footer,0,0,0,0);
    }
-@@ -10219,7 +10251,7 @@
+@@ -10219,7 +10252,7 @@
  
    private void cobraRefreshPlayingIndicators(){
      if(mCobraPlayerDrawerList!=null)for(int i=0;i<mCobraPlayerDrawerList.getChildCount();i++){
@@ -412,7 +413,7 @@
      }
      if(mCobraGuideList==null)return;
      for(int i=0;i<mCobraGuideList.getChildCount();i++){
-@@ -10229,6 +10261,7 @@
+@@ -10229,6 +10262,7 @@
        else if(child instanceof CobraCompactChannelRow)((CobraCompactChannelRow)child).refreshPlaying();
        else if(child instanceof CobraPosterChannelCard)((CobraPosterChannelCard)child).refreshPlaying();
        else if(child instanceof CobraFocusQueueRow)((CobraFocusQueueRow)child).refreshPlaying();
@@ -420,7 +421,7 @@
        else if(child instanceof CobraProUi.ChannelRow){View dot=((CobraProUi.ChannelRow)child).playing;if(dot instanceof CobraPlayingDot)((CobraPlayingDot)dot).sync();}
      }
    }
-@@ -14641,7 +14674,7 @@
+@@ -14641,7 +14675,7 @@
        cobraRemoveScoreTicker();mCobraScoreSeen.clear();mCobraScorePending.clear();mCobraScoreContext="";return;
      }
      Channel channel=mPlayerOverlay!=null?(mPlayingVodKey.isEmpty()?mPlaying:null):mGuidePreviewChannel;
@@ -429,7 +430,7 @@
      if(!context.equals(mCobraScoreContext)){cobraRemoveScoreTicker();mCobraScoreSeen.clear();mCobraScorePending.clear();mCobraScoreWatchedGame="";mCobraScoreContext=context;}
      CobraSportsGame watched=cobraProLiveGameForChannel(channel);if(watched!=null)mCobraScoreWatchedGame=watched.id;
      long now=android.os.SystemClock.uptimeMillis();
-@@ -14649,8 +14682,7 @@
+@@ -14649,8 +14683,7 @@
      Set<String> eligible=new HashSet<>();
      for(CobraSportsGame game:games){
        String key=cobraSportsKey(game);
@@ -439,7 +440,7 @@
        eligible.add(key);String signature=cobraScoreEventSignature(game),previous=mCobraScoreSeen.put(key,signature);
        if(!signature.equals(previous))mCobraScorePending.put(key,now);
      }
-@@ -14662,32 +14694,33 @@
+@@ -14662,32 +14695,33 @@
      if(mCobraSportsLastRefresh>0&&System.currentTimeMillis()-mCobraSportsLastRefresh>COBRA_SPORTS_STALE_MS){cobraRemoveScoreTicker();mCobraScorePending.clear();return;}
      // Do not reset the visible duration on redraws, clock ticks or control changes.
      if(mCobraScoreTicker!=null&&mCobraScoreTicker.getParent()==host){
