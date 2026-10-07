@@ -1,0 +1,87 @@
+name: Infinity | 2103325 shutdown source preflight
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-shutdown-diagnostics-2103325]
+    paths: ['.github/workflows/infinity-2103325-source-preflight.yml']
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103325-source-preflight, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  exact-source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - name: Recover reviewed earlier diagnostic sources without merging behavior
+        run: |
+          set -euo pipefail
+          mkdir -p recovered3314
+          git archive 7b193fec11b7140c0f27dc295b21425eefdbc671 repairs/shutdown-2103314 .github/workflows/infinity-2103314-shutdown-evidence.yml | tar -x -C recovered3314
+      - name: Reconstruct the exact 3308 engine inherited by locked 2103324
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml
+          mkdir -p source325
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+          recipe=yaml.safe_load(Path('.github/workflows/infinity-2103313-shutdown.yml').read_text())
+          steps=recipe['jobs']['native-engine']['steps']
+          selected=[]
+          endpoint='Test and apply captured shutdown-owner delta'
+          for step in steps:
+              if 'run' in step:
+                  selected.append('echo '+repr('SOURCE STEP: '+step.get('name',''))+'\n'+step['run'])
+              if step.get('name')==endpoint:
+                  break
+          else:
+              raise RuntimeError('Locked source reconstruction endpoint not found')
+          assert len(selected)==6, len(selected)
+          Path('source325/reconstruct.sh').write_text('#!/usr/bin/env bash\nset -euo pipefail\n'+'\n'.join(selected))
+          PY
+          bash source325/reconstruct.sh 2>&1 | tee source325/reconstruction.log
+          python3 - <<'PY'
+          import hashlib,json,tarfile
+          from pathlib import Path
+          proof=json.loads(Path('engine3308/source-manifest.json').read_text())
+          expected=proof['after']
+          actual={p.relative_to('kodi').as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in Path('kodi').rglob('*') if p.is_file() and '.git' not in p.relative_to('kodi').parts}
+          assert actual==expected, 'Native preimage does not match complete locked 3308 map'
+          Path('source325/NATIVE-PARENT-MAP.json').write_text(json.dumps(proof,indent=2)+'\n')
+          with tarfile.open('source325/reviewed-source.tar.gz','w:gz') as out:
+              for root in ('kodi/xbmc','kodi/cmake','kodi/tools/android/packaging', 'repairs/chooser-close-owner-2103324',
+                           'repairs/shutdown-2103313','repairs/close-reopen-2103308','recovered3314',
+                           '.github/workflows/infinity-2103313-shutdown.yml',
+                           '.github/workflows/infinity-chooser-close-owner-2103324.yml',
+                           'scripts/infinity_live_app_ci_2.sh'):
+                  path=Path(root)
+                  if path.is_file():
+                      out.add(path,arcname=str(path),recursive=False)
+                  else:
+                      for p in sorted(path.rglob('*')):
+                          if p.is_file() and not p.is_symlink() and p.suffix.lower() in ('.cpp','.h','.hpp','.c','.inl','.in','.py','.json','.yml','.cmake','.txt','.sh','.md','.java'):
+                              out.add(p,arcname=str(p),recursive=False)
+          Path('source325/STATUS.json').write_text(json.dumps({'apk_parent':2103324,'native_parent':2103308,
+              'native_parent_sha256':'b4b2630e37abd56a6e522ca633649a65b255b44bd6b39bcb9f8b84866b822aa6',
+              'complete_source_map_verified':True,'apk_built':False,'native_modified':False,'locked':False},indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103325-Exact-Source-Preflight
+          path: source325/
+          retention-days: 90
+          if-no-files-found: error
