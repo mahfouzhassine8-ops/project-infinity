@@ -30,6 +30,24 @@ implementation = implementation.replace(
     'Scope(const char* phase, long long=-1, const char* addon=nullptr, const char*=nullptr) noexcept',
     'Scope(const char* phase, long long=-1, const char* addon=nullptr, const char* target=nullptr) noexcept')
 
+# CJobManager can legitimately reuse the first idle worker if two AddJob calls
+# race before that worker moves the first item into m_processing. Start and
+# observe the cooperative item before adding the second item so this host test
+# deterministically owns two active workers. This changes only the test schedule.
+racy = """  assert(manager.AddJob(new CooperativeJob(cooperative), &callback, CJob::PRIORITY_DEDICATED) != 0);
+  assert(manager.AddJob(new SlowUncooperativeJob(slow), &callback, CJob::PRIORITY_DEDICATED) != 0);
+  waitStarted(cooperative);
+  waitStarted(slow);
+"""
+deterministic = """  assert(manager.AddJob(new CooperativeJob(cooperative), &callback, CJob::PRIORITY_DEDICATED) != 0);
+  waitStarted(cooperative);
+  assert(manager.AddJob(new SlowUncooperativeJob(slow), &callback, CJob::PRIORITY_DEDICATED) != 0);
+  waitStarted(slow);
+"""
+if implementation.count(racy) != 1:
+    raise RuntimeError('Unexpected JobManager worker-scheduling test preimage')
+implementation = implementation.replace(racy, deterministic, 1)
+
 namespace = {'__name__': 'jobmanager_test_impl', '__file__': str(HERE / 'test_jobmanager.py')}
 exec(compile(implementation, str(HERE / 'test_jobmanager.py'), 'exec'), namespace)
 
