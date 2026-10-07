@@ -258,4 +258,11 @@ public class CobraProHandoffTest {
   @Test public void compactScoreAlertSitsAtEdgeWithoutChangingMiniBounds()throws Exception{
     pro();activeMini(0);Object game=favoriteScoreFixture();View host=(View)get(a,"mCobraPreviewHost");f.measure(a,412,915);int[] before=bounds(host);call(a,"cobraRefreshScoreTicker");f.measure(a,412,915);TextView ticker=(TextView)get(a,"mCobraScoreTicker");assertNotNull(ticker);FrameLayout.LayoutParams pos=(FrameLayout.LayoutParams)ticker.getLayoutParams();assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT,pos.width);assertTrue((pos.gravity&Gravity.RIGHT)==Gravity.RIGHT);assertTrue(ticker.getBottom()<host.getHeight()/2);assertArrayEquals(before,bounds(host));hero().collapseControls();call(a,"cobraRefreshScoreTicker");assertSame(ticker,get(a,"mCobraScoreTicker"));capture("mini-compact-score-at-edge");
   }
+
+  @Test public void endedSportsSelectionFallsBackToAnotherLiveGameWithoutAutoplay()throws Exception{
+    pro();Object game=addLiveGameForChannel(0);Object other=SportsHubTest.game();put(other,"id","still-live");put(other,"state","in");((List)get(a,"mCobraSportsGames")).add(other);call(a,"cobraProFilter",4);sportsMini(0,game);put(game,"state","post");put(game,"completed",true);call(a,"cobraProOnSportsDataChanged");assertTrue(state.released);assertNull(get(a,"mCobraPreviewPlayer"));assertSame(other,call(a,"cobraProCurrentSportsGame"));assertTrue(hero().sportsWatch.isEnabled());assertFalse(text(hero().info).contains("No games are live right now."));
+  }
+  @Test public void wideSportsCardKeepsLiveHeaderOutsideTeamMarks()throws Exception{
+    pro();Object game=addLiveGameForChannel(0);CobraProUi.GameRow row=new CobraProUi.GameRow(a,false,()->{},()->{});row.bind((CobraProUi.SportsGame)call(a,"cobraProSportsUiGame",game),(v,u)->{});row.measure(View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(96,View.MeasureSpec.EXACTLY));row.layout(0,0,800,96);assertTrue(row.badge.getRight()<row.away.getLeft());assertTrue(row.play.getLeft()>=row.home.getRight());assertTrue(row.score.getRight()<=row.homeName.getLeft());
+  }
 }
