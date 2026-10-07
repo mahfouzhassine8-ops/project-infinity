@@ -11,10 +11,10 @@ on:
       - 'repairs/shutdown-diagnostics-2103325/test_android.py'
       - '.github/workflows/infinity-2103325-package-diagnostics.yml'
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103325-package-diagnostics, cancel-in-progress: false}
+concurrency: {group: infinity-2103325-package-diagnostics, cancel-in-progress: true}
 env:
   NDK_VER: 21.4.7075529
-  INFINITY_NATIVE_SOURCE_COMMIT: dc320bc1921dc0f643a763818c3e701e132fe498
+  INFINITY_NATIVE_SOURCE_COMMIT: 5f27da83c149dcb8232b537628637324422efba6
 jobs:
   diagnostic-apk:
     runs-on: ubuntu-22.04
@@ -58,9 +58,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test "$(gh api repos/${{ github.repository }}/actions/runs/37600529076 --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
-          gh run watch 37600529076 --repo '${{ github.repository }}' --exit-status --interval 30
-          gh api repos/${{ github.repository }}/actions/runs/37600529076 > evidence3325/native-run.json
+          test "$(gh api repos/${{ github.repository }}/actions/runs/37603168381 --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
+          gh run watch 37603168381 --repo '${{ github.repository }}' --exit-status --interval 30
+          gh api repos/${{ github.repository }}/actions/runs/37603168381 > evidence3325/native-run.json
           python3 - <<'PY'
           import json,os
           run=json.load(open('evidence3325/native-run.json'))
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           repository: mahfouzhassine8-ops/project-infinity
-          run-id: 37600529076
+          run-id: 37603168381
           name: Infinity-2103325-Shutdown-Native-Validation
           github-token: ${{ github.token }}
           path: native3325
