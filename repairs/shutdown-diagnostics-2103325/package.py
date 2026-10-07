@@ -142,8 +142,17 @@ def package(base,build,out,engine):
     badging=run(bt/'aapt','dump','badging',final,output=out/'badging.txt')
     require(f"package: name='com.projectinfinity.kodi' versionCode='{VERSION}' versionName='{RELEASE}'" in badging,'Wrong APK identity')
     require('application-debuggable' not in badging,'Release is debuggable')
-    parent.ALLOWED_DEX=re.compile(r'com/projectinfinity/kodi/(?:InfinityExitCompletion|Main|InfinityHealthExport|InfinityExitDiagnostics|BuildConfig)(?:\$[^/]*)?\.smali$')
+    diagnostic_dex=re.compile(r'com/projectinfinity/kodi/(?:InfinityExitCompletion|Main|InfinityHealthExport|InfinityExitDiagnostics|BuildConfig)(?:\$[^/]*)?\.smali$')
+    # The inherited 2103324 bridge guard has a second allow-list. Keep that
+    # exact-body protection enabled for every unrelated class while declaring
+    # only the four Android diagnostic families intentionally changed here.
+    import bridge_preservation as bridge_guard
+    parent.ALLOWED_DEX=diagnostic_dex
+    bridge_guard.ALLOWED=diagnostic_dex
     dex=parent.compare_dex(base,final,build,out)
+    require(dex['all_other_classes_behavior_identical'] is True and
+            dex['api_bridge_renumbering_verified'] is True,
+            'Diagnostic DEX preservation guard did not prove unrelated behavior unchanged')
     suites=[]
     for path in sorted((build/'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml')):
         a=ET.parse(path).getroot().attrib
