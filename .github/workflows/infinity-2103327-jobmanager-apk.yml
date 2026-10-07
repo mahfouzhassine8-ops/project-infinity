@@ -1,0 +1,167 @@
+name: Infinity | 2103327 JobManager close APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-jobmanager-close-2103327]
+    paths:
+      - 'repairs/jobmanager-close-2103327/android_identity.py'
+      - 'repairs/jobmanager-close-2103327/native-delta.json'
+      - 'repairs/jobmanager-close-2103327/package.py'
+      - 'repairs/jobmanager-close-2103327/ShutdownDiagnostics327ExportTest.java'
+      - '.github/workflows/infinity-2103327-jobmanager-apk.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103327-jobmanager-apk, cancel-in-progress: true}
+env:
+  NDK_VER: 21.4.7075529
+  INFINITY_NATIVE_SOURCE_COMMIT: 541fdbb25dae16d6e38d7814948a5a8ae54ad13e
+  INFINITY_NATIVE_RUN_ID: '37687334233'
+jobs:
+  repair-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37675559057
+          name: Infinity-2103326-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3326
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37675559057
+          name: Infinity-2103326-Cooperative-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3326
+      - name: Verify packaging inputs and exact passed parent
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3327
+          python3 -m py_compile repairs/jobmanager-close-2103327/*.py
+          python3 repairs/jobmanager-close-2103327/package.py --help > evidence3327/packager-import-check.txt
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          expected='bcf04b0146099b05a51d00659c8b95e86809978f4cf34d9fc8db17f1beba74c8'
+          apk=Path('base3326/Infinity-2103326-Cooperative-Close-RC1.apk')
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()==expected
+          receipt=json.loads(Path('parent3326/APK-VERIFICATION.json').read_text())
+          assert receipt['candidate']==2103326
+          assert receipt['apk_sha256']==expected
+          assert receipt['validation_run']=='37675559057'
+          assert receipt['physical_device_verified'] is False
+          PY
+      - name: Require exact repaired native run with no fallback
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/${{ github.repository }}/actions/runs/$INFINITY_NATIVE_RUN_ID --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
+          gh run watch "$INFINITY_NATIVE_RUN_ID" --repo '${{ github.repository }}' --exit-status --interval 30
+          gh api repos/${{ github.repository }}/actions/runs/$INFINITY_NATIVE_RUN_ID > evidence3327/native-run.json
+          python3 - <<'PY'
+          import json,os
+          run=json.load(open('evidence3327/native-run.json'))
+          assert run['conclusion']=='success'
+          assert run['head_sha']==os.environ['INFINITY_NATIVE_SOURCE_COMMIT']
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687334233
+          name: Infinity-2103327-JobManager-Native-Validation
+          github-token: ${{ github.token }}
+          path: native3327
+      - name: Prepare exact Android parent and bind repaired native identity
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/jobmanager-close-2103327/package.py prepare --base base3326/Infinity-2103326-Cooperative-Close-RC1.apk --build build3327 --out evidence3327 --engine native3327
+      - name: Compile exporter and all inherited regression suites
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3327
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+            --tests com.projectinfinity.kodi.CobraSportsLiveFeedTest \
+            --tests com.projectinfinity.kodi.KodiOwnerLeaseTest \
+            --tests com.projectinfinity.kodi.KodiProcessStatusTest \
+            --tests com.projectinfinity.kodi.CloseProgress316Test \
+            --tests com.projectinfinity.kodi.CobraCloseIsolation316Test \
+            --tests com.projectinfinity.kodi.AndroidTaskRemoval315Test \
+            --tests com.projectinfinity.kodi.CobraProRefinementTest \
+            --tests com.projectinfinity.kodi.CobraProControlsRefinementTest \
+            --tests com.projectinfinity.kodi.CobraProPausedReturnTest \
+            --tests com.projectinfinity.kodi.CobraProHandoffTest \
+            --tests com.projectinfinity.kodi.CobraProSeason317Test \
+            --tests com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest \
+            --tests com.projectinfinity.kodi.ProTeams312Test \
+            --tests com.projectinfinity.kodi.WholeUiAmbientTest \
+            --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest \
+            --tests com.projectinfinity.kodi.CooperativeClose326Test \
+            --tests com.projectinfinity.kodi.ShutdownDiagnostics327ExportTest \
+            :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3327/android-build.log
+      - name: Verify DEX, payload, manifest and permanent install-over signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/jobmanager-close-2103327/package.py package --base base3326/Infinity-2103326-Cooperative-Close-RC1.apk --build build3327 --out evidence3327 --engine native3327
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103327-JobManager-Close-RC1-APK
+          path: evidence3327/Infinity-2103327-JobManager-Close-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare compact delivery evidence
+        if: success()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          apk=Path('evidence3327/Infinity-2103327-JobManager-Close-RC1.apk')
+          compact=Path('compact3327');compact.mkdir()
+          manifest={'file':apk.name,'size':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()}
+          (compact/'DELIVERY.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          for item in Path('evidence3327').iterdir():
+              if item.is_file() and item.suffix not in ('.apk','.so') and item.stat().st_size < 24*1024*1024:
+                  shutil.copy2(item,compact/item.name)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103327-Delivery-Evidence
+          path: compact3327/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103327-Verification
+          path: |
+            evidence3327/
+            !evidence3327/*.apk
+            !evidence3327/*.so
+            build3327/xbmc/build/test-results/testReleaseUnitTest/
+            build3327/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
