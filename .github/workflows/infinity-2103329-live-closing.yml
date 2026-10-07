@@ -1,0 +1,171 @@
+name: Infinity | 2103329 live closing presentation
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-live-closing-2103329]
+    paths:
+      - 'repairs/live-closing-2103329/**'
+      - '.github/workflows/infinity-2103329-live-closing.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103329-live-closing, cancel-in-progress: true}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  android-polish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37699829878
+          name: Infinity-2103328-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3328
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37699829878
+          name: Infinity-2103328-Closing-Infinity-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3328
+
+      - name: Verify exact accepted parents and no native rebuild
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3329
+          python3 -m py_compile repairs/live-closing-2103329/*.py
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          apk=Path('base3328/Infinity-2103328-Closing-Infinity-RC1.apk')
+          expected='f74f0f30047da89bd4d196f54ddd46b6be2ad972ab71346a0e42b4e1805bdcc6'
+          native='a3f95a64b4433a999df37c18ecc48a3a43876c0cc49ae6c5433e82c98835764c'
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()==expected
+          receipt=json.loads(Path('parent3328/APK-VERIFICATION.json').read_text())
+          assert receipt['candidate']==2103328
+          assert receipt['source_commit']=='b659037704e603cc5163db92d90b0cff377e33cc'
+          assert receipt['validation_run']=='37699829878'
+          assert receipt['apk_sha256']==expected
+          assert receipt['native_sha256']==native
+          assert receipt['skin_parent']=='1.0.5.201'
+          with zipfile.ZipFile(apk) as z:
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()==native
+          skin=json.loads(Path('repairs/live-closing-2103329/SKIN-PROOF.json').read_text())
+          assert skin['base_sha256']=='42fc05048d3873670e1cba63a1ea44a3f2fdae0fbd20102923115db58b74ea4a'
+          assert skin['sha256']=='08b187afa4306bf5b6cf968d3c09341057e413ac0f30456e8ae06fdf432c065b'
+          assert skin['locked'] is False
+          PY
+
+      - name: Prepare exact Android parent and test independent live presentation
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/live-closing-2103329/package.py prepare \
+            --base base3328/Infinity-2103328-Closing-Infinity-RC1.apk \
+            --build build3329 --out evidence3329
+          python3 repairs/live-closing-2103329/test_source.py --source evidence3329/android-source --proof evidence3329/SOURCE-PRESERVATION.json | tee evidence3329/closing-contracts.log
+
+      - name: Compile Android layer and all inherited regression suites
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3329
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+            --tests com.projectinfinity.kodi.CobraSportsLiveFeedTest \
+            --tests com.projectinfinity.kodi.KodiOwnerLeaseTest \
+            --tests com.projectinfinity.kodi.KodiProcessStatusTest \
+            --tests com.projectinfinity.kodi.CloseProgress316Test \
+            --tests com.projectinfinity.kodi.CobraCloseIsolation316Test \
+            --tests com.projectinfinity.kodi.AndroidTaskRemoval315Test \
+            --tests com.projectinfinity.kodi.CobraProRefinementTest \
+            --tests com.projectinfinity.kodi.CobraProControlsRefinementTest \
+            --tests com.projectinfinity.kodi.CobraProPausedReturnTest \
+            --tests com.projectinfinity.kodi.CobraProHandoffTest \
+            --tests com.projectinfinity.kodi.CobraProSeason317Test \
+            --tests com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest \
+            --tests com.projectinfinity.kodi.ProTeams312Test \
+            --tests com.projectinfinity.kodi.WholeUiAmbientTest \
+            --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest \
+            --tests com.projectinfinity.kodi.CooperativeClose326Test \
+            --tests com.projectinfinity.kodi.ShutdownDiagnostics327ExportTest \
+            --tests com.projectinfinity.kodi.ClosingInfinity328Test \
+            --tests com.projectinfinity.kodi.LiveClosing329Test \
+            :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3329/android-build.log
+
+      - name: Verify DEX payload native identity and permanent signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/live-closing-2103329/package.py package \
+            --base base3328/Infinity-2103328-Closing-Infinity-RC1.apk \
+            --build build3329 --out evidence3329
+
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103329-Live-Closing-RC1-APK
+          path: evidence3329/Infinity-2103329-Live-Closing-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Prepare compact delivery evidence
+        if: success()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          apk=Path('evidence3329/Infinity-2103329-Live-Closing-RC1.apk')
+          compact=Path('compact3329');compact.mkdir()
+          (compact/'DELIVERY.json').write_text(json.dumps({
+            'file':apk.name,'size':apk.stat().st_size,
+            'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+            'skin_candidate':'skin.infinity.diggz-1.0.5.203-Live-Closing-Polish-RC1.zip',
+            'skin_sha256':'08b187afa4306bf5b6cf968d3c09341057e413ac0f30456e8ae06fdf432c065b'
+          },indent=2)+'\n')
+          for item in Path('evidence3329').iterdir():
+              if item.is_file() and item.suffix not in ('.apk','.so') and item.stat().st_size < 24*1024*1024:
+                  shutil.copy2(item,compact/item.name)
+          shutil.copy2('repairs/live-closing-2103329/SKIN-PROOF.json',compact/'SKIN-PROOF.json')
+          PY
+
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103329-Delivery-Evidence
+          path: compact3329/
+          retention-days: 90
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103329-Verification
+          path: |
+            evidence3329/
+            !evidence3329/*.apk
+            !evidence3329/*.so
+            build3329/xbmc/build/test-results/testReleaseUnitTest/
+            build3329/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
