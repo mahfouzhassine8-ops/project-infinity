@@ -45,5 +45,5 @@ for forbidden in ['killProcess(', 'forceStopPackage(', 'System.exit(', 'BIND_AUT
 
 require(text.count('startForeground(')==3,'Foreground service API branches unexpectedly changed')
 require(text.count('new NotificationChannel(')==1,'Unexpected notification-channel count')
-require(text.count('bindService(')==1,'Native lease binding count changed')
+require(text.count('binding=bindService(')==1,'Native lease binding call changed')
 print('PASS: Closing Infinity notification polish preserves 2103327 shutdown ownership and safety contracts')
