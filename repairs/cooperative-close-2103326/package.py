@@ -5,6 +5,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 import zipfile
 import apply as repair_apply
+import dex_equivalence
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
 BASE='160646dd3c20df85bdea280f247d35b2a7d809b3a476ab4f51f673c672ba130e'
@@ -172,14 +173,20 @@ def package(base,build,out,engine):
     badging=run(bt/'aapt','dump','badging',final,output=out/'badging.txt')
     require(f"package: name='com.projectinfinity.kodi' versionCode='{VERSION}' versionName='{RELEASE}'" in badging,'Wrong APK identity')
     require('application-debuggable' not in badging,'Release is debuggable')
-    diagnostic_dex=re.compile(r'com/projectinfinity/kodi/(?:InfinityExitCompletion|InfinityKodiShutdown|InfinityHealthExport|InfinityExitDiagnostics|InfinityCloseGuardService|InfinityCloseNativeLease|BuildConfig)(?:\$[^/]*)?\.smali$')
-    # The inherited 2103324 bridge guard has a second allow-list. Keep that
-    # exact-body protection enabled for every unrelated class while declaring
-    # only the reviewed close/guard/export/version families changed here.
+    recording=dex_equivalence.verify(base,final,build,out,DEX,require)
+    diagnostic_dex=re.compile(
+        r'com/projectinfinity/kodi/(?:InfinityExitCompletion|InfinityKodiShutdown|InfinityHealthExport|'
+        r'InfinityExitDiagnostics|InfinityCloseGuardService|InfinityCloseNativeLease|BuildConfig)'
+        r'(?:\$[^/]*)?\.smali$|'
+        r'com/projectinfinity/kodi/InfinityCobraRecordingService'
+        r'(?:\$\$ExternalSyntheticLambda\d+)?\.smali$')
+    # Keep the inherited exact-body guard active everywhere else. The only Cobra
+    # exception is separately proven above to be generated-lambda renumbering.
     import bridge_preservation as bridge_guard
     parent.ALLOWED_DEX=diagnostic_dex
     bridge_guard.ALLOWED=diagnostic_dex
     dex=parent.compare_dex(base,final,build,out)
+    dex['cobra_recording_compiler_equivalence']=recording
     require(dex['all_other_classes_behavior_identical'] is True and
             dex['api_bridge_renumbering_verified'] is True,
             'Diagnostic DEX preservation guard did not prove unrelated behavior unchanged')
