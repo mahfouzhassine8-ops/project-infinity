@@ -1,0 +1,69 @@
+name: Infinity | 2103327 JobManager source validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-jobmanager-close-2103327]
+    paths:
+      - 'repairs/jobmanager-close-2103327/native_repair.py'
+      - 'repairs/jobmanager-close-2103327/test_jobmanager.py'
+      - '.github/workflows/infinity-2103327-source-validation.yml'
+permissions: {contents: read}
+concurrency: {group: infinity-2103327-source-validation, cancel-in-progress: true}
+jobs:
+  source-validation:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Reconstruct exact passed 2103326 native source
+        run: |
+          set -euo pipefail
+          mkdir -p engine3327
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev
+          git archive 5183a91b5ea49819d8beef706a80720bad1879bd .github/workflows/infinity-2103313-shutdown.yml repairs/shutdown-2103313 | tar -x
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+          recipe=yaml.safe_load(Path('.github/workflows/infinity-2103313-shutdown.yml').read_text())
+          selected=[]
+          for step in recipe['jobs']['native-engine']['steps']:
+              if 'run' in step:selected.append(step['run'])
+              if step.get('name')=='Test and apply captured shutdown-owner delta':break
+          else:raise RuntimeError('Native parent endpoint missing')
+          assert len(selected)==6
+          assert not any('shutdown-2103313/native_patch.py apply' in x for x in selected)
+          Path('engine3327/reconstruct.sh').write_text('set -euo pipefail\n'+'\n'.join(selected))
+          PY
+          bash engine3327/reconstruct.sh 2>&1 | tee engine3327/source-reconstruction.log
+          python3 repairs/shutdown-diagnostics-2103325/native_patch.py apply --source kodi --parent-proof engine3308/source-manifest.json --receipt engine3327/parent325-source.json
+          python3 repairs/cooperative-close-2103326/native_repair.py --source kodi --proof engine3327/parent325-source.json --receipt engine3327/parent326-source.json
+      - name: Apply and exercise exact JobManager repair
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/jobmanager-close-2103327/*.py
+          python3 repairs/jobmanager-close-2103327/native_repair.py --source kodi --proof engine3327/parent326-source.json --receipt engine3327/source-manifest.json
+          python3 repairs/jobmanager-close-2103327/test_jobmanager.py --source kodi 2>&1 | tee engine3327/jobmanager-host-tests.log
+          python3 - <<'PY'
+          import hashlib,json,shutil
+          from pathlib import Path
+          receipt=json.loads(Path('engine3327/source-manifest.json').read_text())
+          assert receipt['candidate']==2103327 and receipt['final_worker_join_preserved'] is True
+          for name,digest in receipt['after'].items():
+              assert hashlib.sha256((Path('kodi')/name).read_bytes()).hexdigest()==digest,name
+          for name in receipt['changed']:
+              target=Path('engine3327/transformed')/name
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copy2(Path('kodi')/name,target)
+          Path('engine3327/OUTPUT-HASHES.json').write_text(json.dumps(
+              {name:receipt['after'][name] for name in receipt['changed']},indent=2,sort_keys=True)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103327-JobManager-Source-Validation
+          path: engine3327/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
