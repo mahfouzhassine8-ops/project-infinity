@@ -27,6 +27,7 @@ ENGINE='lib/arm64-v8a/libkodi.so'
 
 sys.path.insert(0,str(HERE.parent/'mobile-regressions-2103304'))
 sys.path.insert(0,str(HERE.parent/'chooser-close-owner-2103324'))
+sys.path.insert(0,str(HERE.parent/'jobmanager-close-2103327'))
 
 from packaging_checks import DEX,SIGNATURE,dex_contract,require,resource_ids,run,sha,verify_manifest_pair
 
