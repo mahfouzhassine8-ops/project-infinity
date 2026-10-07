@@ -5,6 +5,7 @@ on:
     branches: [repair/infinity-jobmanager-close-2103327]
     paths:
       - 'repairs/jobmanager-close-2103327/native_repair.py'
+      - 'repairs/jobmanager-close-2103327/apply.py'
       - 'repairs/jobmanager-close-2103327/test_jobmanager.py'
       - '.github/workflows/infinity-2103327-source-validation.yml'
 permissions: {contents: read}
@@ -53,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m py_compile repairs/jobmanager-close-2103327/*.py
-          python3 repairs/jobmanager-close-2103327/native_repair.py --source kodi --proof engine3327/parent326-source.json --receipt engine3327/source-manifest.json
+          python3 repairs/jobmanager-close-2103327/apply.py --source kodi --proof engine3327/parent326-source.json --receipt engine3327/source-manifest.json
           python3 repairs/jobmanager-close-2103327/test_jobmanager.py --source kodi 2>&1 | tee engine3327/jobmanager-host-tests.log
           python3 - <<'PY'
           import hashlib,json,shutil
