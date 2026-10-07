@@ -1,0 +1,134 @@
+name: Infinity | 2103325 native shutdown diagnostics
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-shutdown-diagnostics-2103325]
+    paths:
+      - 'repairs/shutdown-diagnostics-2103325/native_patch.py'
+      - 'repairs/shutdown-diagnostics-2103325/InfinityShutdownTrace.h'
+      - 'repairs/shutdown-diagnostics-2103325/preimages.json'
+      - 'repairs/shutdown-diagnostics-2103325/test_native.py'
+      - '.github/workflows/infinity-2103325-native-diagnostics.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103325-native-diagnostics, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/cache/restore@v4
+        id: native-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-diagnostics-3325-arm64-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-shutdown-3313-arm64-${{ runner.os }}-
+            infinity-close-3308-arm64-${{ runner.os }}-
+            infinity-provider-3306-arm64-${{ runner.os }}-
+            infinity-repair-3304-arm64-${{ runner.os }}-
+            infinity-e2e-3303-arm64-${{ runner.os }}-
+            infinity-deep-audio-21.3-arm64-${{ runner.os }}-
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+      - name: Recover exact native parent recipe and reconstruct only through 3308
+        run: |
+          set -euo pipefail
+          mkdir -p engine3325
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev
+          git archive 5183a91b5ea49819d8beef706a80720bad1879bd .github/workflows/infinity-2103313-shutdown.yml repairs/shutdown-2103313 | tar -x
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+          recipe=yaml.safe_load(Path('.github/workflows/infinity-2103313-shutdown.yml').read_text())
+          selected=[]
+          for step in recipe['jobs']['native-engine']['steps']:
+              if 'run' in step:selected.append(step['run'])
+              if step.get('name')=='Test and apply captured shutdown-owner delta':break
+          else:raise RuntimeError('Native parent endpoint missing')
+          assert len(selected)==6
+          assert not any('shutdown-2103313/native_patch.py apply' in x for x in selected)
+          Path('engine3325/reconstruct.sh').write_text('set -euo pipefail\n'+'\n'.join(selected))
+          PY
+          bash engine3325/reconstruct.sh 2>&1 | tee engine3325/source-reconstruction.log
+      - name: Test and apply measurement-only native delta
+        run: |
+          set -euo pipefail
+          python3 repairs/shutdown-diagnostics-2103325/test_native.py --source kodi 2>&1 | tee engine3325/native-host-tests.log
+          python3 repairs/shutdown-diagnostics-2103325/native_patch.py apply --source kodi --parent-proof engine3308/source-manifest.json --receipt engine3325/source-manifest.json
+          python3 - <<'PY'
+          import json,subprocess
+          r=json.load(open('engine3325/source-manifest.json'))
+          subprocess.run(['git','-C','kodi','diff','--check','--',*r['changed']],check=True)
+          PY
+      - uses: actions/cache/restore@v4
+        id: depends-build-cache
+        with:
+          path: kodi/tools/depends
+          key: infinity-diagnostics-3325-depends-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-provider-3306-depends-build-${{ runner.os }}-
+            infinity-repair-3304-depends-build-${{ runner.os }}-
+            infinity-e2e-3303-depends-build-${{ runner.os }}-
+      - name: Compile ARM64 native library without rebuilding the old Android shell
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          stage=Path('scripts/infinity_live_app_ci_2.sh').read_text()
+          old='python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json'
+          assert stage.count(old)==1
+          stage=stage.replace(old,'python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi')
+          marker='make -C "$BUILD_DIR" apk -j"$(nproc)"'
+          assert stage.count(marker)==1
+          Path('engine3325/compile.sh').write_text(stage[:stage.index(marker)])
+          PY
+          bash engine3325/compile.sh 2>&1 | tee engine3325/native-build.log
+          python3 repairs/shutdown-diagnostics-2103325/native_patch.py verify --source kodi --receipt engine3325/source-manifest.json
+          python3 - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          libs=list(Path(os.environ['BUILD_DIR']).rglob('libkodi.so'))
+          assert len(libs)==1,libs
+          source=libs[0];data=source.read_bytes()
+          assert b'infinity-shutdown-2103325-v1' in data
+          assert b'infinity-shutdown-native.jsonl' in data
+          shutil.copy2(source,'engine3325/libkodi.so')
+          proof={'candidate':2103325,'locked_apk_parent':2103324,'source_commit':os.environ['GITHUB_SHA'],
+                 'native_sha256':hashlib.sha256(data).hexdigest(),'baseline_kodi_commit':'a3a448d26b8d560a65655dab2cd122994dc4e146',
+                 'parent_packaged_native_sha256':'b4b2630e37abd56a6e522ca633649a65b255b44bd6b39bcb9f8b84866b822aa6',
+                 'diagnostics_only':True,'shutdown_behavior_changed':False,'physical_device_verified':False,'locked':False,'installable_apk':False}
+          Path('engine3325/ENGINE-PROOF.json').write_text(json.dumps(proof,indent=2)+'\n')
+          PY
+          readelf -h -n -W engine3325/libkodi.so > engine3325/elf-identity.txt
+      - uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103325-Shutdown-Native-Validation
+          path: engine3325/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
