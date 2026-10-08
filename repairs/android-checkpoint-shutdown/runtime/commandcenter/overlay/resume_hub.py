@@ -343,7 +343,7 @@ def next_episodes(data):
 
 
 def sync_kodi_playcount(entry, watched, preserve_playcount=False):
-    """Best-effort bridge for Kodi-library items; provider-only items remain local."""
+    """Checked bridge for Kodi-library items; provider-only items remain local."""
     if not isinstance(entry, dict):
         return False
     try:
@@ -375,15 +375,13 @@ def sync_kodi_playcount(entry, watched, preserve_playcount=False):
                'params': {field: dbid, 'playcount': 1 if watched else 0}}
     try:
         response = json.loads(xbmc.executeJSONRPC(json.dumps(payload)))
-        if not isinstance(response, dict) or 'error' in response:
+        if not isinstance(response, dict) or 'error' in response or response.get('result') != 'OK':
             return False
-        if preserve_playcount:
-            if response.get('result') != 'OK':
-                return False
-            details = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
-            playcount = details.get('result', {}).get(detail_field, {}).get('playcount')
-            return type(playcount) is int and (playcount > 0 if watched else playcount == 0)
-        return True
+        details = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+        playcount = details.get('result', {}).get(detail_field, {}).get('playcount')
+        expected = 1 if watched else 0
+        return type(playcount) is int and (playcount > 0 if watched and preserve_playcount
+                                          else playcount == expected)
     except Exception:
         return False
 
@@ -403,19 +401,25 @@ def queue_kodi_sync(data, entry, watched):
 
 
 def flush_kodi_sync(profile, preserve_playcount=False):
-    """Drain checked RPCs without holding the cross-interpreter file gate."""
-    with persistence_scope():
-        pending = dict(load(profile).get('pending_kodi_sync', {}))
-    for key, operation in pending.items():
-        if not isinstance(operation, dict) or not sync_kodi_playcount(operation.get('entry'), operation.get('watched'), preserve_playcount):
-            return False
+    """Keep each queued mutation, synchronous RPC/readback and ack in one lease.
+
+    The audited VideoLibrary Get/SetMovie/EpisodeDetails path performs database
+    work directly and queues notifications; it never waits for a Python callback
+    or an interactive dialog. Releasing the gate before the RPC would allow an
+    old client operation to overwrite a newer checkpointed watched state.
+    """
+    while True:
         with persistence_scope():
+            pending = load(profile).get('pending_kodi_sync', {})
+            if not pending:
+                return True
+            key, operation = next(iter(pending.items()))
+            if not isinstance(operation, dict) or not sync_kodi_playcount(operation.get('entry'), operation.get('watched'), preserve_playcount):
+                return False  # Keep the durable operation for retry/checkpoint failure.
             current = load(profile)
             if current.get('pending_kodi_sync', {}).get(key, {}).get('operation') == operation.get('operation'):
                 current['pending_kodi_sync'].pop(key, None)
                 save(profile, current)
-    with persistence_scope():
-        return not load(profile).get('pending_kodi_sync')
 
 
 def publish_home(data):

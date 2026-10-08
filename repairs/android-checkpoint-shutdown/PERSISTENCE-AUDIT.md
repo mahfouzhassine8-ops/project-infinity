@@ -23,6 +23,10 @@ full script.infinity.commandcenter 0.3.5.19 add-on.
 | Infinity session | experience.py capture_session/shutdown | Independent checkpoint path required; must not wait for global Monitor abort. |
 | Watchdog clean-stop marker | service.py clean_stop | Mark clean only after all required persistence, bound to the same session. Preserve truthful crash/force classification. |
 | Kodi-library watched mirror | resume_hub.py sync_kodi_playcount | Currently best effort. Required mapped-library updates must report failure; provider-only entries need explicit not-applicable classification. |
+| Accepted info-dialog ratings | music/dialogs/GUIDialogSongInfo.cpp, GUIDialogMusicInfo.cpp; video/dialogs/GUIDialogVideoInfo.cpp | Values can remain in dialog memory until window deinit. Capture only changed accepted ratings, resolve their actual library identity, and check write/readback before the database barrier seals. |
+| Calibration edits | settings/windows/GUIWindowSettingsScreenCalibration.cpp; settings/DisplaySettings.cpp | Live resolution/control values must reach the serializable calibration collection. Verify every changed supported resolution and XML field; a settings-file save alone can serialize stale calibration state. |
+| Delayed accepted settings values | settings/dialogs/GUIDialogSettingsBase.cpp | A control value can wait for a timer/deinit. Apply the exact accepted assignment without replaying a toggle, action or interactive chooser. Preserve failed obligations. |
+| Game video defaults | games/dialogs/osd/DialogGameVideoSelect.cpp | Active dialog values are copied to persistent defaults on deinit. Capture dirty accepted defaults explicitly, check the save, and avoid copying unrelated later game state during retry. |
 
 ## SQLite and queued writes
 
@@ -76,3 +80,18 @@ Kodi's native database and file wrappers. A generic native flush cannot prove
 their application memory is saved. Each required writer needs an explicit
 participant contract or a defensible noncritical classification. Otherwise the
 transaction must remain CHECKPOINT_FAILED with user recovery available.
+
+## Job and installed-code coverage
+
+An outstanding-job count is not a persistence contract. Network probes and
+in-memory notifications may remain alive after the barrier; accepted required
+writers still need their checked owner outcomes. A successful generic job return
+does not prove private file output or callback state is durable. Unknown native
+jobs require a retained obligation even after their completion, just as unknown
+Python invocations do. See `runtime-tests/NATIVE_JOB_CONTRACT_AUDIT.md` and
+`runtime-tests/NATIVE_LAMBDA_CONTRACT_AUDIT.md` for source-bound classifications.
+
+The available device trace identifies historical add-on launches but not exact
+installed source/dependency hashes. `runtime-tests/INSTALLED_OWNER_COVERAGE.md`
+records the resulting coverage gap. No missing source, completed interpreter,
+empty client map or returned worker join grants permission to terminate.

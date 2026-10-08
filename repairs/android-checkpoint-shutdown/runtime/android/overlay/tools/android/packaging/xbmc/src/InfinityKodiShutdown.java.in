@@ -25,6 +25,25 @@ final class InfinityKodiShutdown {
   // PID existence, wall time and persisted phase are not proof of that ownership.
   private static RandomAccessFile processLeaseFile;
   private static FileLock processLease;
+  private static File processLeaseDirectory;
+  private static boolean processLeaseDurable;
+  interface LeaseDurability {
+    void syncFile(RandomAccessFile file)throws IOException;
+    void syncDirectory(File directory)throws IOException;
+  }
+  private static final LeaseDurability DEVICE_LEASE_DURABILITY=new LeaseDurability(){
+    public void syncFile(RandomAccessFile file)throws IOException{file.getFD().sync();}
+    public void syncDirectory(File directory)throws IOException{
+      java.io.FileDescriptor opened=null;
+      try{
+        opened=android.system.Os.open(directory.getAbsolutePath(),android.system.OsConstants.O_RDONLY,0);
+        if(!android.system.OsConstants.S_ISDIR(android.system.Os.fstat(opened).st_mode))
+          throw new IOException("Kodi owner lease parent is not a directory");
+        android.system.Os.fsync(opened);
+      }catch(android.system.ErrnoException failure){throw new IOException("Kodi owner lease directory commit failed",failure);}
+      finally{if(opened!=null)try{android.system.Os.close(opened);}catch(android.system.ErrnoException ignored){}}
+    }
+  };
   private static final ExecutorService writes=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityKodiStatus");t.setDaemon(true);return t;});
   private static final ScheduledExecutorService reads=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"InfinityChooserStatus");t.setDaemon(true);return t;});
   private static volatile Snapshot cached=Snapshot.empty();
@@ -52,7 +71,7 @@ final class InfinityKodiShutdown {
   }
   static String localOwnerToken(){return processToken;}
   static synchronized String confirmedLocalOwnerToken(){
-    return processLease!=null&&processLease.isValid()?processToken:"";
+    return processLeaseDurable&&processLease!=null&&processLease.isValid()?processToken:"";
   }
   static boolean ownerRetired(File directory,int pid,String owner)throws IOException{
     // Missing or invalid evidence is not proof of retirement. Do not reopen our own locked inode.
@@ -105,13 +124,29 @@ final class InfinityKodiShutdown {
     return new File(directory,"infinity-kodi-owner-"+owner+".lock");
   }
   private static synchronized void retainProcessLease(File directory)throws IOException{
-    if(processLease!=null && processLease.isValid())return;
-    RandomAccessFile opened=new RandomAccessFile(leasePath(directory,processToken),"rw");
-    try{
-      FileLock acquired=opened.getChannel().tryLock();
-      if(acquired==null)throw new IOException("Kodi owner lease unavailable");
-      processLeaseFile=opened;processLease=acquired;
-    }catch(IOException | RuntimeException failed){opened.close();throw failed;}
+    retainProcessLease(directory,DEVICE_LEASE_DURABILITY);
+  }
+  private static synchronized void retainProcessLease(File directory,LeaseDurability durability)throws IOException{
+    File actualDirectory=directory.getCanonicalFile();
+    if(processLease!=null && processLease.isValid()){
+      if(!actualDirectory.equals(processLeaseDirectory))throw new IOException("Kodi owner lease directory changed");
+      if(processLeaseDurable)return;
+    }else{
+      processLeaseDurable=false;
+      RandomAccessFile opened=new RandomAccessFile(leasePath(actualDirectory,processToken),"rw");
+      try{
+        FileLock acquired=opened.getChannel().tryLock();
+        if(acquired==null)throw new IOException("Kodi owner lease unavailable");
+        processLeaseFile=opened;processLease=acquired;processLeaseDirectory=actualDirectory;
+      }catch(IOException | RuntimeException failed){opened.close();throw failed;}
+    }
+    // engine.json may outlive this process. Its UUID lease inode and directory
+    // entry must be durable before native can publish that identity. A failed
+    // sync retains this same lock/token for observation and a checked retry;
+    // never release a live lease or claim confirmed startup ownership on failure.
+    durability.syncFile(processLeaseFile);
+    durability.syncDirectory(processLeaseDirectory);
+    processLeaseDurable=true;
   }
   static boolean ownerAlive(File directory,int pid,String owner)throws IOException{
     if(pid<=0)return false;

@@ -64,6 +64,18 @@ def prepare():
     os.environ["INFINITY_RUNTIME_NATIVE"] = str(Path("kodi").resolve())
     run(sys.executable, str(HERE / "native/test_runtime_file_saves.py"))
     run(sys.executable, str(HERE / "native/test_runtime_dirty_owners.py"))
+    run(sys.executable, str(HERE / "native/test_runtime_deferred_dialogs.py"))
+    run(sys.executable, str(HERE / "runtime-tests/test_pending_gui_owners.py"),
+        "--source-root", "kodi")
+    run(sys.executable, str(HERE / "runtime-tests/test_system_info_checkpoint_job.py"),
+        "--runtime", "kodi")
+    run(sys.executable, str(HERE / "runtime-tests/test_pvr_event_job_contract.py"),
+        "--source-root", "kodi")
+    run(sys.executable, str(HERE / "runtime-tests/test_pvr_lambda_contracts.py"),
+        "--source-root", "kodi")
+    for name in ("test_job_checkpoint.py", "test_job_manager_runtime.py",
+                 "test_directory_checkpoint_admission.py", "test_texture_job_checkpoint.py"):
+        run(sys.executable, str(HERE / "runtime-tests" / name), "--runtime", "kodi")
     runtime_delta.materialize_commandcenter(OUT / "commandcenter")
     runtime_delta.materialize("embedded-addons", OUT / "embedded-addons")
     run(sys.executable, str(HERE / "native/test_compat_participant.py"),
@@ -76,6 +88,8 @@ def prepare():
     run(sys.executable, str(HERE / "runtime-tests/test_pvr_checkpoint_admission.py"),
         "--source-root", "kodi")
     run(sys.executable, str(HERE / "runtime-tests/test_runtime_checkpoint.py"),
+        "--runtime", str(OUT / "commandcenter"))
+    run(sys.executable, str(HERE / "runtime-tests/test_runtime_rpc_admission.py"),
         "--runtime", str(OUT / "commandcenter"))
     run(sys.executable, str(HERE / "runtime-tests/run_resume_preservation.py"),
         "--runtime", str(OUT / "commandcenter"))

@@ -10,6 +10,8 @@ python repairs/android-checkpoint-shutdown/runtime-tests/run_resume_preservation
   --runtime /absolute/path/to/script.infinity.commandcenter
 python repairs/android-checkpoint-shutdown/runtime-tests/test_runtime_relaunch.py \
   --runtime /absolute/path/to/script.infinity.commandcenter --cycles 500
+python repairs/android-checkpoint-shutdown/runtime-tests/test_runtime_rpc_admission.py \
+  --runtime /absolute/path/to/script.infinity.commandcenter
 ```
 
 The test loads real `service.py`, `common.py`, `resume_hub.py`, `plugin.py`,
@@ -34,3 +36,11 @@ data, and rejects a wrong prior owner. The harness supplies the registration and
 uses completed subprocess exit as its death proof; it does not verify Android
 startup timing, the Java owner lease, JNI, or physical close/relaunch behavior.
 `relaunch-journal-result.json` records the scoped 500-process result.
+
+The fourth command uses two real host processes and the actual participant flock
+to hold an older watched RPC in flight while a newer plugin mutation and a
+checkpoint attempt admission. A shared SQLite-backed Kodi RPC double verifies
+that the older RPC completes before the new mutation, and that the final watched
+mirror agrees with the managed JSON. Failed readback and malformed RPC responses
+retain the required queued operation. This tests the Python admission ordering;
+it does not replace the separate native database durability barrier.

@@ -248,7 +248,7 @@ bool CPVRClients::RequestRestart(const std::string& addonId,
                                  ADDON::AddonInstanceId instanceId,
                                  bool bDataChanged)
 {
-  CServiceBroker::GetJobManager()->Submit([this, addonId, instanceId] {
+  CServiceBroker::GetJobManager()->SubmitForCheckpoint("pvr", "pvr.request_client_restart", [this, addonId, instanceId] {
     UpdateClients(addonId, instanceId);
     return true;
   });
@@ -298,7 +298,7 @@ void CPVRClients::OnAddonEvent(const AddonEvent& event)
     const ADDON::AddonInstanceId instanceId = event.instanceId;
     if (CServiceBroker::GetAddonMgr().HasType(addonId, AddonType::PVRDLL))
     {
-      CServiceBroker::GetJobManager()->Submit([this, addonId, instanceId] {
+      CServiceBroker::GetJobManager()->SubmitForCheckpoint("pvr", "pvr.addon_event_update_clients", [this, addonId, instanceId] {
         UpdateClients(addonId, instanceId);
         return true;
       });

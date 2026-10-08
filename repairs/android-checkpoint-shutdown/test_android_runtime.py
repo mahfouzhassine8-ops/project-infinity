@@ -122,6 +122,32 @@ final class CheckpointWireTest {
  static boolean retired(java.io.File directory,int pid,String owner){
   try{return InfinityKodiShutdown.ownerRetired(directory,pid,owner);}catch(java.io.IOException unavailable){return false;}
  }
+ static final class HostLeaseDurability implements InfinityKodiShutdown.LeaseDurability {
+  boolean failFile,failDirectory;int fileCalls,directoryCalls;
+  public void syncFile(java.io.RandomAccessFile file)throws java.io.IOException{
+   fileCalls++;if(failFile)throw new java.io.IOException("injected file sync failure");file.getFD().sync();
+  }
+  public void syncDirectory(java.io.File directory)throws java.io.IOException{
+   directoryCalls++;if(failDirectory)throw new java.io.IOException("injected directory sync failure");
+   try(java.nio.channels.FileChannel channel=java.nio.channels.FileChannel.open(directory.toPath(),java.nio.file.StandardOpenOption.READ)){channel.force(true);}
+  }
+ }
+ static void retainLease(java.io.File directory,InfinityKodiShutdown.LeaseDurability durability)throws Exception{
+  java.lang.reflect.Method retain=InfinityKodiShutdown.class.getDeclaredMethod("retainProcessLease",java.io.File.class,InfinityKodiShutdown.LeaseDurability.class);
+  retain.setAccessible(true);
+  try{retain.invoke(null,directory,durability);}catch(java.lang.reflect.InvocationTargetException failed){
+   if(failed.getCause() instanceof java.io.IOException)throw (java.io.IOException)failed.getCause();throw failed;
+  }
+ }
+ static void assertLeaseHeldInOtherProcess(java.io.File path)throws Exception{
+  Process probe=new ProcessBuilder(System.getProperty("java.home")+"/bin/java","-cp",System.getProperty("java.class.path"),
+       CheckpointWireTest.class.getName(),"probe-lease",path.getAbsolutePath()).redirectError(ProcessBuilder.Redirect.INHERIT).start();
+  try{
+   check(probe.waitFor(5,java.util.concurrent.TimeUnit.SECONDS),"lease proof subprocess did not finish");
+   String result=new java.io.BufferedReader(new java.io.InputStreamReader(probe.getInputStream(),java.nio.charset.StandardCharsets.UTF_8)).readLine();
+   check(probe.exitValue()==0&&"HELD".equals(result),"sync failure released the live OS lease");
+  }finally{if(probe.isAlive())probe.destroyForcibly();}
+ }
  static void ownerLeases()throws Exception {
   java.nio.file.Path directory=java.nio.file.Files.createTempDirectory("infinity-owner-retirement-");
   Process child=null;java.util.concurrent.ExecutorService reader=java.util.concurrent.Executors.newSingleThreadExecutor();
@@ -135,14 +161,26 @@ final class CheckpointWireTest {
    check(!retired(directory.toFile(),42,"../invalid"),"invalid UUID proved retirement");
    check(!retired(directory.toFile(),0,O),"invalid PID proved retirement");
    check(InfinityKodiShutdown.confirmedLocalOwnerToken().isEmpty(),"unheld owner confirmed");
-   java.lang.reflect.Method retain=InfinityKodiShutdown.class.getDeclaredMethod("retainProcessLease",java.io.File.class);
-   retain.setAccessible(true);retain.invoke(null,directory.toFile());
+   HostLeaseDurability durability=new HostLeaseDurability();durability.failFile=true;
+   String localToken=InfinityKodiShutdown.localOwnerToken();
+   try{retainLease(directory.toFile(),durability);throw new AssertionError("file sync failure accepted");}catch(java.io.IOException expected){}
    java.lang.reflect.Field leaseField=InfinityKodiShutdown.class.getDeclaredField("processLease");leaseField.setAccessible(true);
    java.lang.reflect.Field fileField=InfinityKodiShutdown.class.getDeclaredField("processLeaseFile");fileField.setAccessible(true);
    ownLease=(java.nio.channels.FileLock)leaseField.get(null);ownFile=(java.io.RandomAccessFile)fileField.get(null);
+   check(ownLease.isValid()&&InfinityKodiShutdown.confirmedLocalOwnerToken().isEmpty(),"file sync failure confirmed or released owner");
+   check(durability.directoryCalls==0,"directory durability attempted after failed file sync");
+   assertLeaseHeldInOtherProcess(InfinityKodiShutdown.leasePath(directory.toFile(),localToken));
+   durability.failFile=false;durability.failDirectory=true;
+   try{retainLease(directory.toFile(),durability);throw new AssertionError("directory sync failure accepted");}catch(java.io.IOException expected){}
+   check(ownLease==leaseField.get(null)&&ownFile==fileField.get(null)&&ownLease.isValid(),"directory sync retry replaced or released owner lease");
+   check(InfinityKodiShutdown.confirmedLocalOwnerToken().isEmpty()&&localToken.equals(InfinityKodiShutdown.localOwnerToken()),"failed sync confirmed or rotated owner");
+   assertLeaseHeldInOtherProcess(InfinityKodiShutdown.leasePath(directory.toFile(),localToken));
+   durability.failDirectory=false;retainLease(directory.toFile(),durability);
    String current=InfinityKodiShutdown.confirmedLocalOwnerToken();
    check(current.equals(InfinityKodiShutdown.localOwnerToken()),"retained owner token mismatch");
-   retain.invoke(null,directory.toFile());check(current.equals(InfinityKodiShutdown.confirmedLocalOwnerToken()),"activity recreation changed live owner");
+   check(durability.fileCalls==3&&durability.directoryCalls==2,"checked same-lease durability retry did not complete");
+   retainLease(directory.toFile(),durability);check(current.equals(InfinityKodiShutdown.confirmedLocalOwnerToken()),"activity recreation changed live owner");
+   check(durability.fileCalls==3&&durability.directoryCalls==2,"activity recreation repeated durable lease acquisition");
    check(!retired(directory.toFile(),42,current)&&ownLease.isValid(),"own lease falsely retired or released");
    child=new ProcessBuilder(System.getProperty("java.home")+"/bin/java","-cp",System.getProperty("java.class.path"),
        CheckpointWireTest.class.getName(),"hold-lease",missing.getAbsolutePath()).redirectError(ProcessBuilder.Redirect.INHERIT).start();
@@ -160,7 +198,7 @@ final class CheckpointWireTest {
    java.nio.file.Files.delete(missing.toPath());
    check(!retired(directory.toFile(),42,O)&&!missing.exists(),"removed evidence recreated or accepted");
    check(ownLease.isValid(),"previous-owner proof released current owner lease");
-   System.out.println("PASS actual UUID lease retirement: missing/invalid fail closed, separate live process, released owner, PID reuse, stable current lease");
+   System.out.println("PASS actual UUID lease durability and retirement: file/directory failures retain unconfirmed live lock, checked same-token retry, separate-process death and PID reuse");
   }finally{
    if(child!=null&&child.isAlive()){child.destroyForcibly();child.waitFor(5,java.util.concurrent.TimeUnit.SECONDS);}
    reader.shutdownNow();
@@ -172,6 +210,11 @@ final class CheckpointWireTest {
  }
  public static void main(String[] args)throws Exception {
   if(args.length==2&&args[0].equals("hold-lease")){holdLease(args[1]);return;}
+  if(args.length==2&&args[0].equals("probe-lease")){
+   try(java.io.FileInputStream file=new java.io.FileInputStream(args[1]);java.nio.channels.FileLock lock=file.getChannel().tryLock(0,Long.MAX_VALUE,true)){
+    System.out.println(lock==null?"HELD":"FREE");
+   }return;
+  }
   check(accepted(valid()),"valid proof rejected");
   JSONObject row=valid();row.put("session",O);check(!accepted(row),"wrong session accepted");
   row=valid();row.put("owner",S);check(!accepted(row),"wrong owner accepted");

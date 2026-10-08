@@ -13,7 +13,7 @@ Only these existing files change:
 | `default.py` | Existing ambient preference setter uses the admitted settings helper. |
 | `experience.py` | Existing source-memory/progress RMW scope combines the existing callback lock and shared OS gate. |
 | `plugin.py` | Manual watched/list/rating mutations hold the shared gate for their complete RMW; dialogs happen before locking and reload afterward; required Kodi watched updates are durably queued before RPC. |
-| `resume_hub.py` | Durable pending Kodi watched-sync queue with checked RPC and compare-by-operation removal; existing schema, watched semantics, local lists and provider routes preserved. |
+| `resume_hub.py` | Durable pending Kodi watched-sync queue; each queue snapshot, checked synchronous RPC/readback and compare-by-operation removal holds one shared admission scope. Failures retain the operation. Existing schema, watched semantics, local lists and provider routes are preserved. |
 | `service.py` | Resident checkpoint loop and Monitor marker; callback admission; final memory/persistence shared scope; watched-sync queue drain; clean-stop marker uses checked removal. Normal observers park during checkpoint while callback delivery remains active. |
 
 Two new runtime modules:
@@ -58,9 +58,19 @@ requires an explicit successful RPC and checked readback. Nonseekable streams
 with a verified zero duration do not invent a resume clock; seekable media with
 an unavailable final clock still fails the checkpoint.
 
+Manual plugin RPCs use the same admission gate as the checkpoint drain. A delayed
+old RPC cannot execute after a newer checkpointed watched operation. The exact
+native VideoLibrary Get/SetMovie/EpisodeDetails path performs database work
+synchronously and queues notifications; it does not synchronously await Python
+callbacks. No dialog runs while this gate is held. This covers the exact pinned
+`plugin.py` entry point as a client participant; `default.py` restore/install
+operations require wider contracts and remain unresolved.
+
 ## Verification
 
 Thirteen actual-runtime tests and fourteen original Resume Hub behavior tests pass.
+The two-process real-flock RPC ordering test and failed-readback/acknowledgement
+retention checks also pass against the actual runtime source.
 The fifteen persistence invariant tests also pass against the runtime helper
 (adapting only the hook name from legacy `stop_playback` to `freeze_playback`),
 including contention between three independent processes and injected fsync

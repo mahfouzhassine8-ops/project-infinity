@@ -19,7 +19,7 @@ final class InfinityCheckpointProtocol {
   static final String GATE="checkpoint_authority", JSON="checkpoint_json", GENERATION="checkpoint_generation", PROOF="checkpoint_proof";
   static final String RECEIPT="infinity-checkpoint-close.json", EVIDENCE="infinity-android-checkpoint.jsonl";
   static final long CHECKPOINT_TIMEOUT_MS=30000;
-  static final String REQUIRED_OWNER_NAMES="native_admission,python_services,background_jobs,playback,command_center,compat,kodi_settings,profiles,skin_settings,addon_settings,favourites,peripherals,audio_policy,xml_files,native_databases,pvr";
+  static final String REQUIRED_OWNER_NAMES="native_admission,python_services,background_jobs,playback,command_center,compat,kodi_settings,profiles,skin_settings,addon_settings,favourites,peripherals,audio_policy,deferred_dialog_state,xml_files,native_databases,pvr";
   /** Actual Binder authorization state; platform-independent so revoke/consume races are host-tested. */
   static final class AuthorizationGate {
     private final String session,owner;private final int pid;private final long started,deadline;

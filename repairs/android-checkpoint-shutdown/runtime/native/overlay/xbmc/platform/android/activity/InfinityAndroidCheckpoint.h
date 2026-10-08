@@ -17,6 +17,7 @@ bool AuthorizeTermination(const std::string& session, const std::string& owner, 
 void NotifyLegacyTeardown(const char* operation);
 void Pump(CApplication& application);
 bool IsActive();
+bool IsRequiredOwner(const std::string& owner);
 bool IsPersistingOnThisThread();
 bool IsAcceptedPlaybackWorkOnThisThread();
 bool AllowNativeWrite(const char* owner);
@@ -30,6 +31,9 @@ bool HasFailureSince(std::uint64_t generation);
 bool CheckpointLoadedAddonSettings();
 bool CheckpointSkinSettings();
 bool CheckpointAudioPolicyFile();
+bool CheckpointDeferredDialogState();
+bool CheckpointPendingSettingsDialogs();
+bool CheckpointPendingGameDialogs();
 void MarkAddonSettingsManagerDirty(const void* manager);
 std::string ClassifyScript(const std::string& script, const std::string& addon);
 

@@ -651,7 +651,7 @@ bool CApplication::Initialize()
   CDatabaseManager &databaseManager = m_ServiceManager->GetDatabaseManager();
 
   CEvent event(true);
-  CServiceBroker::GetJobManager()->Submit([&databaseManager, &event]() {
+  CServiceBroker::GetJobManager()->SubmitForCheckpoint("native_databases", "database-initialization", [&databaseManager, &event]() {
     databaseManager.Initialize();
     event.Set();
   });

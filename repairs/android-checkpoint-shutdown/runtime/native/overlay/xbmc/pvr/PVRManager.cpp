@@ -366,7 +366,7 @@ void CPVRManager::Init()
 {
   // initial check for enabled addons
   // if at least one pvr addon is enabled, PVRManager start up
-  CServiceBroker::GetJobManager()->Submit([this] {
+  CServiceBroker::GetJobManager()->SubmitForCheckpoint("pvr", "pvr.initial_clients_start", [this] {
     Clients()->Start();
     return true;
   });

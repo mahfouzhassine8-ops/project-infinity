@@ -3,8 +3,9 @@
 
 Android Context/Os/Log are host adapters; org.json is the real Android library.
 Os rename uses an atomic filesystem move and fsync uses real FileChannel.force.
-The production APK asset is not built here: a deterministic synthetic exact-parent
-code fixture is used to test transaction semantics without user data.
+By default a synthetic exact-parent code fixture tests transaction semantics.
+--production-asset/--parent-addon exercise the unmodified production hash pin and
+reviewed payload against all preserved original add-on files, without user data.
 """
 import argparse
 import hashlib
@@ -19,6 +20,7 @@ FILES = ["common.py", "default.py", "experience.py", "plugin.py", "resume_hub.py
 OLD = {name: ("print('old " + name + "')\n").encode() for name in FILES[:6]}
 NEW = {name: ("print('new " + name + "')\n").encode() for name in FILES}
 MARKER = b'<addon id="script.infinity.commandcenter" version="0.3.5.19"/>\n'
+PRESERVED = {"skin_upgrade.py": b"PRESERVED unrelated code\n"}
 STUBS = {
 "android/content/Context.java": """package android.content;
 import java.io.*;
@@ -108,7 +110,10 @@ def initialize(root, asset):
     (addon / "addon.xml").write_bytes(MARKER)
     for name, data in OLD.items():
         (addon / name).write_bytes(data)
-    (addon / "skin_upgrade.py").write_bytes(b"PRESERVED unrelated code\n")
+    for name, data in PRESERVED.items():
+        target = addon / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
     user = root / "external/.kodi/userdata/addon_data/script.infinity.commandcenter"
     user.mkdir(parents=True)
     (user / "resume_hub.json").write_bytes(b"PRESERVED resume state\n")
@@ -120,13 +125,31 @@ def contents(root):
 
 
 def main():
+    global OLD, NEW, MARKER, PRESERVED
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--android-jar", type=Path, required=True)
+    parser.add_argument("--production-asset", type=Path)
+    parser.add_argument("--parent-addon", type=Path)
     args = parser.parse_args()
+    if bool(args.production_asset) != bool(args.parent_addon):
+        parser.error("--production-asset and --parent-addon must be supplied together")
     with tempfile.TemporaryDirectory(prefix="infinity-installer-test-") as temporary:
         work = Path(temporary)
-        asset = make_asset(work)
+        if args.production_asset:
+            import participant_asset
+            asset = args.production_asset.read_bytes()
+            assert asset == participant_asset.build(), "Production asset differs from reviewed build"
+            parent = contents(args.parent_addon)
+            delta = json.loads((Path(__file__).parent / "runtime/commandcenter/manifest.json").read_text())
+            assert {name: sha(data) for name, data in parent.items()} == delta["before"], "Wrong original add-on preimages"
+            OLD = {name: parent[name] for name in FILES if name in parent}
+            MARKER = parent["addon.xml"]
+            PRESERVED = {name: data for name, data in parent.items() if name not in FILES and name != "addon.xml"}
+            with zipfile.ZipFile(args.production_asset) as archive:
+                NEW = {name: archive.read("payload/" + name) for name in FILES}
+        else:
+            asset = make_asset(work)
         sources = work / "src"
         for relative, text in STUBS.items():
             path = sources / relative
@@ -134,10 +157,13 @@ def main():
             path.write_text(text)
         production = args.source / "tools/android/packaging/xbmc/src/InfinityCheckpointAddonInstaller.java.in"
         code = production.read_text().replace("@APP_PACKAGE@", "com.projectinfinity.kodi")
-        # Test the actual algorithm with this synthetic fixture's trusted asset digest.
         import re
-        code, count = re.subn(r'ASSET_SHA256 = "[^"]+";', 'ASSET_SHA256 = "' + sha(asset) + '";', code)
-        assert count == 1
+        if args.production_asset:
+            assert 'ASSET_SHA256 = "' + sha(asset) + '";' in code, "Unmodified production installer hash mismatch"
+        else:
+            # The synthetic fixture changes only the trusted digest in the test copy.
+            code, count = re.subn(r'ASSET_SHA256 = "[^"]+";', 'ASSET_SHA256 = "' + sha(asset) + '";', code)
+            assert count == 1
         (sources / "com/projectinfinity/kodi/InfinityCheckpointAddonInstaller.java").write_text(code)
         classes = work / "classes"
         subprocess.run(["java", "com.sun.tools.javac.Main", "--release", "8", "-Xlint:all", "-Werror",
@@ -156,7 +182,8 @@ def main():
             for name, data in NEW.items():
                 assert (addon / name).read_bytes() == data
             assert (addon / "addon.xml").read_bytes() == MARKER
-            assert (addon / "skin_upgrade.py").read_bytes() == b"PRESERVED unrelated code\n"
+            for name, data in PRESERVED.items():
+                assert (addon / name).read_bytes() == data
 
         root = work / "success"
         addon = initialize(root, asset)
@@ -211,11 +238,16 @@ def main():
         root = work / "recovery-corrupt"
         addon = initialize(root, asset)
         run(root, mode="crash", expected=73)
-        (root / "private/infinity-checkpoint-code-transaction/backup-0").write_bytes(b"damaged backup")
+        transaction = root / "private/infinity-checkpoint-code-transaction"
+        journal = json.loads((transaction / "journal.json").read_text())
+        backup_index = next(index for index, entry in enumerate(journal["files"]) if entry["existed"])
+        (transaction / ("backup-" + str(backup_index))).write_bytes(b"damaged backup")
         before = contents(root / "external")
         run(root, expected=10)
         assert contents(root / "external") == before
         print("PASS corrupt backup blocks recovery before any installed-file mutation")
+        if args.production_asset:
+            print("PASS all installer recovery cases used the unchanged production hash pin, exact reviewed asset, and original 0.3.5.19 preimages")
 
 
 if __name__ == "__main__":

@@ -619,7 +619,7 @@ CVideoPlayer::CVideoPlayer(IPlayerCallback& callback)
     m_CurrentRadioRDS(STREAM_RADIO_RDS, VideoPlayer_RDS),
     m_CurrentAudioID3(STREAM_AUDIO_ID3, VideoPlayer_ID3),
     m_messenger("player"),
-    m_outboundEvents(std::make_unique<CJobQueue>(false, 1, CJob::PRIORITY_NORMAL)),
+    m_outboundEvents(std::make_unique<CJobQueue>(false, 1, CJob::PRIORITY_NORMAL, "playback")),
     m_pInputStream(nullptr),
     m_pDemuxer(nullptr),
     m_pSubtitleDemuxer(nullptr),

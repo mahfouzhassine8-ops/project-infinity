@@ -21,6 +21,7 @@
 #include <functional>
 #include <mutex>
 #include <stdexcept>
+#include <typeinfo>
 
 using namespace std::chrono_literals;
 
@@ -84,8 +85,14 @@ void CJobWorker::Process()
       CLog::Log(LOGERROR, "{} error processing job {}", __FUNCTION__, jobType);
     }
 #if defined(TARGET_ANDROID)
-    if (!success && InfinityAndroidCheckpoint::IsActive())
-      InfinityAndroidCheckpoint::RecordFailure("background_jobs", jobType.c_str());
+    if (CJobManager::IsRequiredCheckpointJob(job) && !job->CheckpointSucceeded(success) &&
+        InfinityAndroidCheckpoint::IsActive())
+    {
+      const char* operation = job->GetCheckpointOperation();
+      const std::string failure = std::string("job_failed:") +
+          (operation && *operation ? operation : typeid(*job).name());
+      InfinityAndroidCheckpoint::RecordFailure("background_jobs", failure.c_str());
+    }
 #endif
     m_jobManager->OnJobComplete(success, job);
   }
@@ -97,8 +104,9 @@ void CJobQueue::CJobPointer::CancelJob()
   m_id = 0;
 }
 
-CJobQueue::CJobQueue(bool lifo, unsigned int jobsAtOnce, CJob::PRIORITY priority)
-: m_jobsAtOnce(jobsAtOnce), m_priority(priority), m_lifo(lifo)
+CJobQueue::CJobQueue(bool lifo, unsigned int jobsAtOnce, CJob::PRIORITY priority, const char* checkpointOwner)
+: m_jobsAtOnce(jobsAtOnce), m_priority(priority), m_lifo(lifo),
+  m_checkpointOwner(checkpointOwner ? checkpointOwner : "")
 {
   auto& registry = QueueRegistry();
   std::lock_guard<std::mutex> lock(registry.mutex);
@@ -159,6 +167,7 @@ bool CJobQueue::AddJob(CJob *job)
     return false;
   }
 
+  CJobManager::TrackCheckpointJob(job, this, "queue_pending", m_checkpointOwner);
   if (m_lifo)
     m_jobQueue.emplace_back(job);
   else
@@ -372,6 +381,21 @@ void CJobManager::CancelJobs()
 unsigned int CJobManager::AddJob(CJob *job, IJobCallback *callback, CJob::PRIORITY priority,
                                bool checkpointPreviouslyAccepted)
 {
+#if defined(TARGET_ANDROID)
+  // Direct admissions need the same lease as queue admissions. A boolean
+  // pre-check alone could pass immediately before PREPARE and publish a job
+  // after the required-owner snapshot was already empty.
+  std::unique_ptr<InfinityAndroidCheckpoint::CheckpointWriteGuard> admission;
+  if (!checkpointPreviouslyAccepted)
+  {
+    admission = std::make_unique<InfinityAndroidCheckpoint::CheckpointWriteGuard>("jobs");
+    if (!*admission)
+    {
+      delete job;
+      return 0;
+    }
+  }
+#endif
   std::unique_lock<CCriticalSection> lock(m_section);
 
 #if defined(TARGET_ANDROID)
@@ -397,12 +421,47 @@ unsigned int CJobManager::AddJob(CJob *job, IJobCallback *callback, CJob::PRIORI
   if (m_jobCounter == 0)
     m_jobCounter++;
 
+  TrackCheckpointJob(job, callback, "manager_pending");
+  TrackCheckpointPhase(job, "manager_pending", m_jobCounter);
+
   // create a work item for this job
   CWorkItem work(job, m_jobCounter, priority, callback);
   m_jobQueue[priority].push_back(work);
 
   StartWorkers(priority);
   return work.m_id;
+}
+
+void CJobManager::TrackCheckpointJob(CJob* job, IJobCallback* callback, const char* phase,
+                                     const std::string& queueOwner)
+{
+#if defined(TARGET_ANDROID)
+  if (!job->m_checkpointRecord)
+  {
+    const auto role = job->GetCheckpointResponsibility(callback);
+    const std::string owner = queueOwner.empty() ? job->GetCheckpointPersistenceOwner() : queueOwner;
+    const bool required = !queueOwner.empty() || role != CJob::CheckpointResponsibility::NonPersistent;
+    const bool unknown = required && (!InfinityAndroidCheckpoint::IsRequiredOwner(owner) ||
+        (queueOwner.empty() && role == CJob::CheckpointResponsibility::Unknown));
+    job->m_checkpointRecord = JobCheckpoint::Admit(required, unknown, owner,
+        job->GetCheckpointOperation() ? job->GetCheckpointOperation() : "",
+        typeid(*job).name(), phase);
+  }
+#else
+  (void)job; (void)callback; (void)phase; (void)queueOwner;
+#endif
+}
+void CJobManager::TrackCheckpointPhase(CJob* job, const char* phase, uint64_t id)
+{
+  JobCheckpoint::Phase(job->m_checkpointRecord, phase, id);
+}
+bool CJobManager::IsRequiredCheckpointJob(const CJob* job)
+{
+  return !job->m_checkpointRecord || job->m_checkpointRecord->required;
+}
+JobCheckpoint::Snapshot CJobManager::AndroidCheckpointSnapshot()
+{
+  return JobCheckpoint::GetSnapshot();
 }
 
 std::size_t CJobManager::AndroidCheckpointOutstandingJobs() const
@@ -472,6 +531,7 @@ CJob *CJobManager::PopJob()
       // add to the processing vector
       m_processing.push_back(job);
       job.m_job->m_callback = this;
+      TrackCheckpointPhase(job.m_job, "running", job.m_id);
       return job.m_job;
     }
   }
@@ -569,6 +629,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
   {
     // tell any listeners we're done with the job, then delete it
     CWorkItem item(*i);
+    TrackCheckpointPhase(job, "callback", item.m_id);
     lock.unlock();
     try
     {
@@ -578,6 +639,10 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     catch (...)
     {
       CLog::Log(LOGERROR, "{} error processing job {}", __FUNCTION__, item.m_job->GetType());
+#if defined(TARGET_ANDROID)
+      if (IsRequiredCheckpointJob(item.m_job) && InfinityAndroidCheckpoint::IsActive())
+        InfinityAndroidCheckpoint::RecordFailure("background_jobs", "required_job_callback_exception");
+#endif
     }
     lock.lock();
     Processing::iterator j = find(m_processing.begin(), m_processing.end(), job);
@@ -585,6 +650,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
       m_processing.erase(j);
     ++m_checkpointCompletingJobs;
     lock.unlock();
+    TrackCheckpointPhase(item.m_job, "destructor", item.m_id);
     item.FreeJob();
     lock.lock();
     --m_checkpointCompletingJobs;

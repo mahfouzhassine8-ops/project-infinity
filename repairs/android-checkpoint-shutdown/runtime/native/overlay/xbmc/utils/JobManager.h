@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Job.h"
+#include "JobCheckpoint.h"
 #include "threads/CriticalSection.h"
 #include "threads/Thread.h"
 
@@ -32,10 +33,20 @@ private:
 };
 
 template<typename F>
-class CLambdaJob : public CJob
+class CLambdaJob final : public CJob
 {
 public:
   CLambdaJob(F&& f) : m_f(std::forward<F>(f)) {}
+  CLambdaJob(const char* owner, const char* operation, F&& f)
+    : m_f(std::forward<F>(f)), m_owner(owner ? owner : ""),
+      m_operation(operation ? operation : "") {}
+  CheckpointResponsibility GetCheckpointResponsibility(const IJobCallback* callback) const override
+  {
+    return callback == nullptr && !m_owner.empty() ? CheckpointResponsibility::Required :
+                                                    CheckpointResponsibility::Unknown;
+  }
+  const char* GetCheckpointPersistenceOwner() const override { return m_owner.c_str(); }
+  const char* GetCheckpointOperation() const override { return m_operation.c_str(); }
   bool DoWork() override
   {
     m_f();
@@ -47,6 +58,8 @@ public:
   };
 private:
   F m_f;
+  const std::string m_owner;
+  const std::string m_operation;
 };
 
 /*!
@@ -95,7 +108,8 @@ public:
    \param priority priority of this queue.
    \sa CJob
    */
-  CJobQueue(bool lifo = false, unsigned int jobsAtOnce = 1, CJob::PRIORITY priority = CJob::PRIORITY_LOW);
+  CJobQueue(bool lifo = false, unsigned int jobsAtOnce = 1, CJob::PRIORITY priority = CJob::PRIORITY_LOW,
+            const char* checkpointOwner = "");
 
   /*!
    \brief CJobQueue destructor
@@ -193,6 +207,7 @@ private:
   CJob::PRIORITY m_priority;
   mutable CCriticalSection m_section;
   bool m_lifo;
+  const std::string m_checkpointOwner;
   std::shared_ptr<std::atomic<std::size_t>> m_checkpointCount{
       std::make_shared<std::atomic<std::size_t>>(0)};
 };
@@ -258,7 +273,20 @@ public:
    */
   unsigned int AddJob(CJob *job, IJobCallback *callback, CJob::PRIORITY priority = CJob::PRIORITY_LOW,
                       bool checkpointPreviouslyAccepted = false);
+  // Only audited call sites may map a complete lambda lifetime to a required
+  // participant. Child jobs are independently classified at their admission.
+  template<typename F>
+  void SubmitForCheckpoint(const char* owner, const char* operation, F&& function,
+                           CJob::PRIORITY priority = CJob::PRIORITY_LOW)
+  {
+    AddJob(new CLambdaJob<F>(owner, operation, std::forward<F>(function)), nullptr, priority);
+  }
   std::size_t AndroidCheckpointOutstandingJobs() const;
+  static JobCheckpoint::Snapshot AndroidCheckpointSnapshot();
+  static bool IsRequiredCheckpointJob(const CJob* job);
+  static void TrackCheckpointJob(CJob* job, IJobCallback* callback, const char* phase,
+                                 const std::string& queueOwner = "");
+  static void TrackCheckpointPhase(CJob* job, const char* phase, uint64_t id = 0);
 
   /*!
    \brief Add a function f to this job manager for asynchronously execution.

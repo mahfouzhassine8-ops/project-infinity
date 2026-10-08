@@ -16,6 +16,7 @@ import tempfile
 STUBS = r'''
 #pragma once
 #include "utils/Variant.h"
+#include "utils/JobCheckpoint.h"
 #include "platform/android/activity/InfinityAndroidCheckpoint.h"
 #include "platform/android/activity/InfinityCheckpointFile.h"
 #include <cassert>
@@ -31,8 +32,8 @@ namespace Test {
 inline std::string root;
 inline bool initialized=true, pvrStopped=true, pvrOwners=false, settingsOk=true, profilesOk=true;
 inline bool skinOk=true, addonsOk=true, favouritesOk=true, peripheralsOk=true;
-inline bool playbackOk=true, playbackPending=false, ownLease=true, oldRetired=true, audioOk=true;
-inline int residents=1, compatResidents=1, jobs=0, queueJobs=0, freezes=0, saves=0;
+inline bool playbackOk=true, playbackPending=false, ownLease=true, oldRetired=true, audioOk=true, deferredOk=true;
+inline int residents=1, compatResidents=1, jobs=0, queueJobs=0, unknownJobs=0, optionalJobs=0, freezes=0, saves=0;
 inline std::vector<std::string> foreign;
 inline std::map<std::string,CVariant> parsed;
 inline std::string Escape(const std::string& s) {
@@ -75,7 +76,9 @@ class CScriptInvocationManager {public: static CScriptInvocationManager& GetInst
  std::size_t AndroidCheckpointCompatCount()const{return Test::compatResidents;}
  std::vector<std::string> AndroidCheckpointUnresolvedWriters()const{return Test::foreign;}};
 class CJobQueue {public:static std::size_t AndroidCheckpointOutstandingQueues(){return Test::queueJobs;}};
-class CJobManager {public:void UnPauseJobs(){}; std::size_t AndroidCheckpointOutstandingJobs()const{return Test::jobs;}};
+class CJobManager {public:void UnPauseJobs(){}; std::size_t AndroidCheckpointOutstandingJobs()const{return Test::jobs;}
+ static JobCheckpoint::Snapshot AndroidCheckpointSnapshot(){JobCheckpoint::Snapshot s;s.required=Test::jobs+Test::queueJobs+Test::unknownJobs;s.unknown=Test::unknownJobs;s.nonPersistent=Test::optionalJobs;
+ if(s.required){JobCheckpoint::Entry e;e.owner="native_databases";e.type="test-peer-job";e.operation="test-operation";e.unknown=Test::unknownJobs!=0;e.phase=e.unknown?"completed_without_owner_receipt":"callback";s.blockers.push_back(e);}return s;}};
 class CSettings {public:bool Save(){++Test::saves;return Test::settingsOk;}};
 class CProfileManager {public:bool Save(){return Test::profilesOk;}};
 class CSettingsComponent {public:std::shared_ptr<CSettings>GetSettings(){static auto s=std::make_shared<CSettings>();return s;}
@@ -100,6 +103,7 @@ namespace InfinityAndroidCheckpoint {
 bool CheckpointLoadedAddonSettings(){return Test::addonsOk;}
 bool CheckpointSkinSettings(){return Test::skinOk;}
 bool CheckpointAudioPolicyFile(){return Test::audioOk;}
+bool CheckpointDeferredDialogState(){return Test::deferredOk;}
 void MarkAddonSettingsManagerDirty(const void*){}
 }
 '''
@@ -164,9 +168,12 @@ int main(int argc,char**argv){
  if(mode=="busy"){Test::jobs=1;Pump(app);assert(Get().phase=="QUIESCE");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));Test::jobs=0;}
  if(mode=="settings-fail")Test::settingsOk=false;
  if(mode=="audio-fail")Test::audioOk=false;
+ if(mode=="deferred-fail")Test::deferredOk=false;
+ if(mode=="unknown-job")Test::unknownJobs=1;
+ if(mode=="optional-job")Test::optionalJobs=1;
  if(mode=="foreign")Test::foreign.clear(); // Finished thread cannot erase retained writer obligations.
  Pump(app);
- if(mode=="settings-fail"||mode=="audio-fail"||mode=="foreign"){assert(Get().phase=="CHECKPOINT_FAILED");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));return 0;}
+ if(mode=="settings-fail"||mode=="audio-fail"||mode=="deferred-fail"||mode=="unknown-job"||mode=="foreign"){assert(Get().phase=="CHECKPOINT_FAILED");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));return 0;}
  assert(Get().phase=="SAFE_TO_TERMINATE");const auto safe=Status(SESSION,OWNER,getpid());assert(safe==Status(SESSION,OWNER,getpid()));
  if(mode=="latewrite"){
    CheckpointWriteGuard refused("kodi_settings");assert(!refused);
@@ -195,7 +202,7 @@ def main():
         for rel in ["platform/android/activity/InfinityAndroidCheckpoint.cpp",
                     "platform/android/activity/InfinityAndroidCheckpoint.h",
                     "platform/android/activity/InfinityCheckpointFile.h",
-                    "dbwrappers/InfinityDatabaseBarrier.h", "utils/Variant.h", "utils/Variant.cpp"]:
+                    "dbwrappers/InfinityDatabaseBarrier.h", "utils/JobCheckpoint.h", "utils/Variant.h", "utils/Variant.cpp"]:
             target = temp / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source / rel, target)
@@ -224,7 +231,7 @@ def main():
                  "malformed-response", "busy", "settings-fail", "foreign", "latewrite", "deadline", "lifecycle",
                  "compat-fail", "compat-malformed", "source-drift", "audio-fail",
                  "startup-cas", "startup-old-live", "startup-own-lost", "startup-malformed",
-                 "pvr-retained", "pvr-late", "own-lease-lost"]
+                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "optional-job"]
         for mode in modes:
             output = subprocess.check_output([str(binary), mode, str(temp / mode)], text=True, timeout=10)
             if mode == "fixture" and args.fixture:

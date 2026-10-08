@@ -45,7 +45,7 @@ using Clock = std::chrono::steady_clock;
 constexpr auto DEADLINE = std::chrono::seconds(25);
 constexpr const char* REQUIRED[] = {"native_admission", "python_services", "background_jobs",
   "playback", "command_center", "compat", "kodi_settings", "profiles", "skin_settings", "addon_settings",
-  "favourites", "peripherals", "audio_policy", "xml_files", "native_databases", "pvr"};
+  "favourites", "peripherals", "audio_policy", "deferred_dialog_state", "xml_files", "native_databases", "pvr"};
 
 struct Owner
 {
@@ -89,6 +89,7 @@ struct State
   std::string directory;
   std::vector<std::string> unresolvedForeignOwners;
   std::string safeStatus; // Immutable full receipt while SAFE remains valid.
+  JobCheckpoint::Snapshot jobs;
 };
 State& Get()
 {
@@ -171,6 +172,23 @@ std::string EncodeStatusLocked(const State& s)
   result["safe_to_terminate_utc_ms"] = s.safeUtcMs;
   result["elapsed_ms"] = Elapsed(s);
   result["active_native_writers"] = static_cast<uint64_t>(s.activeWrites);
+  result["required_jobs"] = static_cast<uint64_t>(s.jobs.required);
+  result["unknown_job_owners"] = static_cast<uint64_t>(s.jobs.unknown);
+  result["nonpersistent_jobs"] = static_cast<uint64_t>(s.jobs.nonPersistent);
+  result["blocking_jobs"] = CVariant(CVariant::VariantTypeArray);
+  for (const auto& job : s.jobs.blockers)
+  {
+    CVariant value(CVariant::VariantTypeObject);
+    value["token"] = job.token;
+    value["job_id"] = job.jobId;
+    value["owner"] = job.owner;
+    value["operation"] = job.operation;
+    value["actual_type"] = job.type;
+    value["phase"] = job.phase;
+    value["unknown"] = job.unknown;
+    value["elapsed_ms"] = job.elapsedMs;
+    result["blocking_jobs"].push_back(value);
+  }
   result["required_owners"] = CVariant(CVariant::VariantTypeArray);
   result["owners"] = CVariant(CVariant::VariantTypeArray);
   for (const char* name : REQUIRED)
@@ -334,6 +352,29 @@ bool OwnerIdentity(const CVariant& value, const char* tokenField)
     value["pid"].asInteger() <= 2147483647 && value[tokenField].isString() &&
     Token(value[tokenField].asString());
 }
+bool RequiredJobsDrained()
+{
+  const auto snapshot = CJobManager::AndroidCheckpointSnapshot();
+  auto& s = Get();
+  std::lock_guard<std::mutex> lock(s.mutex);
+  s.jobs = snapshot;
+  if (snapshot.unknown != 0)
+  {
+    std::string detail = "unknown_native_job_persistence_contract";
+    for (const auto& job : snapshot.blockers)
+      if (job.unknown) detail += ";" + job.type;
+    FailLocked(s, "background_jobs", detail.substr(0, 384));
+    return false;
+  }
+  for (const auto& job : snapshot.blockers)
+    if (std::none_of(std::begin(REQUIRED), std::end(REQUIRED),
+                     [&](const char* owner) { return job.owner == owner; }))
+    {
+      FailLocked(s, "background_jobs", "job_mapped_to_unregistered_persistence_owner");
+      return false;
+    }
+  return snapshot.required == 0;
+}
 bool PvrOwnersAbsent()
 {
   const auto& manager = CServiceBroker::GetPVRManager();
@@ -457,6 +498,11 @@ bool PublishStartupOwner()
   }
 }
 bool IsActive() { return Get().active.load(); }
+bool IsRequiredOwner(const std::string& owner)
+{
+  return std::any_of(std::begin(REQUIRED), std::end(REQUIRED),
+                     [&](const char* candidate) { return owner == candidate; });
+}
 bool IsAcceptedPlaybackWorkOnThisThread() { return acceptedPlaybackDepth != 0; }
 bool IsPersistingOnThisThread()
 {
@@ -481,8 +527,8 @@ CheckpointWriteGuard::CheckpointWriteGuard(const char* name)
   auto& s = Get();
   std::lock_guard<std::mutex> lock(s.mutex);
   const std::string owner = name ? name : "unknown";
-  const bool newCommand = owner == "playback-command" || owner == "pvr-start";
-  const bool newJob = owner == "jobs" || newCommand;
+  const bool newCommand = owner == "playback-command" || owner == "pvr-start" || owner == "optional-cache-work";
+  const bool newJob = owner == "jobs" || owner == "directory-work" || newCommand;
   m_admitted = !s.active.load() ||
     (!newJob && !s.sealed && s.phase != "CHECKPOINT_FAILED") ||
     (owner == "jobs" && acceptedPlaybackDepth != 0 && !s.sealed && s.phase == "QUIESCE") ||
@@ -532,10 +578,16 @@ AcceptedPlaybackWorkScope::~AcceptedPlaybackWorkScope()
 }
 void RecordPersistenceFailure(const char* owner, const char* detail)
 {
+  const bool jobFailure = owner && std::string(owner) == "background_jobs";
+  const auto jobs = jobFailure ? CJobManager::AndroidCheckpointSnapshot() : JobCheckpoint::Snapshot{};
   auto& s = Get();
   std::lock_guard<std::mutex> lock(s.mutex);
   if (s.active.load())
+  {
+    if (jobFailure)
+      s.jobs = jobs;
     FailLocked(s, owner ? owner : "unknown", detail ? detail : "unspecified_failure");
+  }
   else if (startupWriteDepth != 0)
     s.startupError = std::string(owner ? owner : "unknown") + ":" +
                      (detail ? detail : "unspecified_startup_failure");
@@ -755,8 +807,7 @@ void Pump(CApplication& application)
       }
       Complete("python_services", false);
       Operation("background_jobs");
-      if (CServiceBroker::GetJobManager()->AndroidCheckpointOutstandingJobs() != 0 ||
-          CJobQueue::AndroidCheckpointOutstandingQueues() != 0)
+      if (!RequiredJobsDrained())
         return;
       Complete("background_jobs", false);
       if (CScriptInvocationManager::GetInstance().AndroidCheckpointResidentCount() != 1 ||
@@ -787,6 +838,11 @@ void Pump(CApplication& application)
       if (!databasePermission.IsValid())
       { RecordFailure("native_databases", "checkpoint_database_scope_rejected"); return; }
       const uint64_t errors = ErrorGeneration();
+      Operation("deferred_dialog_state");
+      if (!CheckpointDeferredDialogState())
+      { RecordFailure("deferred_dialog_state", "pending_dialog_state_checkpoint_failed"); return; }
+      if (HasFailureSince(errors))
+        return;
       Operation("skin_settings");
       if (!CheckpointSkinSettings())
       { RecordFailure("skin_settings", "skin_settings_save_failed"); return; }
@@ -830,8 +886,7 @@ void Pump(CApplication& application)
       // and destructor lifetimes must drain too; a pre-save empty snapshot is
       // not evidence that no later accepted work exists.
       Operation("background_jobs");
-      if (CServiceBroker::GetJobManager()->AndroidCheckpointOutstandingJobs() != 0 ||
-          CJobQueue::AndroidCheckpointOutstandingQueues() != 0)
+      if (!RequiredJobsDrained())
         return;
       Complete("background_jobs", false);
       Operation("native_databases");
@@ -845,6 +900,7 @@ void Pump(CApplication& application)
       if (!InfinityDatabaseBarrier::Seal(s.generation))
       { RecordFailure("native_databases", "database_barrier_not_durable_or_drained"); return; }
       Complete("native_databases", true);
+      Complete("deferred_dialog_state", true); // Captured state now covered by settings save + DB seal.
       std::lock_guard<std::mutex> lock(s.mutex);
       CheckDeadlineLocked(s);
       if (s.phase == "CHECKPOINT_FAILED" || s.activeWrites != 0)

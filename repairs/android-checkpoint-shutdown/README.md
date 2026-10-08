@@ -122,6 +122,18 @@ XML saves with metadata preservation, loaded add-on/skin settings participation,
 favorites/peripheral save owners, and the actual resident Command Center service
 and plugin write paths. Force Close remains a separate recovery action.
 
+The checkpoint captures accepted pending rating, calibration, delayed settings
+and game-default changes without window deinitialization. Checked write/readback
+and serialization failures retain their obligations; unsupported pending actions
+are reported instead of replaying UI commands. The GUI owner completes only
+after the final settings/database barrier.
+
+Job admission records the actual implementation and callback responsibility.
+Audited in-memory jobs can remain alive; required jobs stay attached to their
+checked persistence owner through callbacks and destruction. Unknown jobs remain
+named lifetime obligations even after returning true. Neither a global job count
+nor worker completion serves as a durability receipt.
+
 Startup registers the actual held Android engine-owner lease before native
 activity creation. Native publishes that identity before starting Python
 services. Relaunch checks the previous engine and participant journal owners
@@ -140,6 +152,10 @@ The Command Center update changes only eight code files. Its version, settings
 schema, skin-upgrade code and UI resources remain unchanged. A pre-native
 installer verifies all original or retry postimages before applying the pinned
 payload; its journal permits rollback/recovery without touching user data.
+Resume Hub's queued native-library RPC, checked readback and queue acknowledgement
+share one admitted cross-interpreter scope. This prevents an older operation
+from overwriting a newer checkpointed watched value. The plugin has a separate
+exact-source client contract; restore/install commands remain unresolved.
 
 Unaudited foreign Python/private binary add-on writers, unsupported player
 backends and uncovered active PVR owners are explicit coverage gaps. Script exit,
@@ -153,9 +169,12 @@ lack a checked participant or an audited nonpersistent classification.
 `native_ci.py` reconstructs the complete inherited Infinity engine recipe before
 applying the reviewed overlay and protects all 9,374 parent source inputs.
 `android_ci.py` compiles the complete current shell as a non-distributed donor.
-The full Android shell compiled successfully at work commit
-`d13881ad2f7ccfad8bdbed092847e69e3ef11c19`; that result predates the startup-owner
-and embedded-participant additions and must not certify the later source.
+The full Android shell compiled successfully at work commits
+`d13881ad2f7ccfad8bdbed092847e69e3ef11c19` and
+`8b56d1b7ddeacba43f87403b981239f4fe45a440`. The latter includes startup ownership
+and embedded compat assets but predates the final GUI-owner/RPC-scope additions;
+it must not certify the later source. Native ARM64 compilation remains a separate
+required gate.
 The work-branch workflow does not publish an APK or alter accepted refs. Build
 success is separate from the Fold and dirty-state acceptance matrix below.
 

@@ -62,6 +62,8 @@ int main(int argc,char** argv){
  for(const char*root:{"special://home/addons/","special://xbmc/addons/"}){
   const std::string base=root;
   assert(ClassifyScript(base+"script.infinity.commandcenter/service.py","script.infinity.commandcenter")=="command_center");
+  assert(ClassifyScript(base+"script.infinity.commandcenter/plugin.py","script.infinity.commandcenter")=="command_center_client");
+  assert(ClassifyScript(base+"script.infinity.commandcenter/default.py","script.infinity.commandcenter").empty());
   assert(ClassifyScript(base+"service.infinity.compat/service.py","service.infinity.compat")=="compat");
   assert(ClassifyScript(base+"service.infinity.compat/layout_service.py","service.infinity.compat")=="nonpersistent:layout-properties");
   assert(ClassifyScript(base+"service.infinity.compat/theme_contract.py","service.infinity.compat")=="reconstructible-cache:theme-revision");
@@ -77,6 +79,7 @@ int main(int argc,char** argv){
  assert(ClassifyScript("special://xbmc/addons/service.infinity.compat/service.py","service.infinity.compat")=="compat");
  Test::digests.erase("special://home/addons/script.infinity.commandcenter/resume_hub.py");
  assert(ClassifyScript("special://home/addons/script.infinity.commandcenter/service.py","script.infinity.commandcenter").empty());
+ assert(ClassifyScript("special://home/addons/script.infinity.commandcenter/plugin.py","script.infinity.commandcenter").empty());
  std::cout<<"PASS: actual source classifier, both roots, dependency mismatch, missing source, arbitrary path/addon, unknown writer\n";
 }
 ''')

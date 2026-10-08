@@ -7,7 +7,9 @@ on:
       - 'repairs/android-checkpoint-shutdown/**'
       - '.github/workflows/infinity-android-checkpoint-work.yml'
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-android-checkpoint-work, cancel-in-progress: true}
+# Let an in-progress native build finish and retain its checked dependency cache.
+# A queued source revision still runs its own complete reconstruction/build gates.
+concurrency: {group: infinity-android-checkpoint-work, cancel-in-progress: false}
 env:
   NDK_VER: 21.4.7075529
 jobs:
