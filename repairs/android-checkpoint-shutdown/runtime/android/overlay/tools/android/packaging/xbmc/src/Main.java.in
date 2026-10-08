@@ -180,7 +180,7 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
     XBMCProperties.getStringProperty("xbmc.proploaded", "");
     InfinityKodiShutdown.boot(this,getIntent().getStringExtra(InfinityKodiShutdown.TOKEN));
     InfinityStartupTrace.mainEvent("main.beforeNative");
-    if (!InfinityCheckpointAddonInstaller.applyBeforeNative(this))
+    if (!InfinityInstalledCheckpointInstaller.applyBeforeNative(this))
       InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "checkpoint.addonParticipant.installUnconfirmed");
     System.loadLibrary("@APP_NAME_LC@");
     try {

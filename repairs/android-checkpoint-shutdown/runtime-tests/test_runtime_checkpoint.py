@@ -49,7 +49,7 @@ class Monitor:
 
 class Addon:
     settings = {}
-    version = '0.3.5.19'
+    version = __import__('xml.etree.ElementTree', fromlist=['parse']).parse(RUNTIME / 'addon.xml').getroot().get('version')
     def __init__(self, *args): pass
     def getAddonInfo(self, name): return {'profile': str(PROFILE), 'version': self.version, 'icon': ''}.get(name, '')
     def getSetting(self, key): return self.settings.get(key, '')
@@ -125,7 +125,7 @@ class RuntimeTests(unittest.TestCase):
         self.control = PROFILE / '.android-checkpoint'; self.control.mkdir()
         runtime.durable_json(self.control / 'engine.json', {'schema': 1, 'native_api': 1, 'pid': os.getpid(), 'owner': OWNER})
         runtime._stores.clear(); RPC.clear(); RPC_FAILURE = False; RPC_PLAYCOUNT = 0
-        Window.properties.clear(); Addon.settings.clear(); Addon.version = '0.3.5.19'
+        Window.properties.clear(); Addon.settings.clear(); Addon.version = __import__('xml.etree.ElementTree', fromlist=['parse']).parse(RUNTIME / 'addon.xml').getroot().get('version')
         plugin.PROFILE = self.profile
         self.player = service.InfinityPlayer(self.profile)
         self.player.key, self.player.readable = 'audio-key', 'movie'

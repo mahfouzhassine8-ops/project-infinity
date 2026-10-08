@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+from __future__ import annotations
+from pathlib import Path
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcvfs
+
+from compat_runtime import publish_runtime_status
+import layout_service
+import theme_contract
+from checkpoint_runtime import CompatCheckpoint
+
+TAG='[InfinityCompat] '
+
+class RuntimeMonitor(xbmc.Monitor):
+    def __init__(self, addon, profile, checkpoint):
+        super().__init__()
+        self.addon=addon
+        self.profile=profile
+        self.checkpoint=checkpoint
+
+    def publish_all(self, force=False):
+        with self.checkpoint.lock:
+            if not self.checkpoint.parked:
+                self._publish_all(force)
+
+    def _publish_all(self, force=False):
+        publish_runtime_status()
+        try:
+            layout_service.publish(force=force)
+            xbmcgui.Window(10000).setProperty('Infinity.LayoutServiceReady','true')
+        except Exception as e:
+            xbmcgui.Window(10000).setProperty('Infinity.LayoutServiceReady','false')
+            xbmc.log(TAG+'layout publish failed: '+type(e).__name__,xbmc.LOGWARNING)
+        try:
+            theme_contract.publish(self.addon,self.profile,force=force)
+            xbmcgui.Window(10000).setProperty('Infinity.ThemeServiceReady','true')
+        except Exception as e:
+            xbmcgui.Window(10000).setProperty('Infinity.ThemeServiceReady','false')
+            xbmc.log(TAG+'theme publish failed: '+type(e).__name__,xbmc.LOGWARNING)
+
+    def onSettingsChanged(self):
+        self.publish_all(force=True)
+    def onNotification(self,sender,method,data):
+        self.publish_all(force=False)
+    def onScreensaverDeactivated(self):
+        self.publish_all(force=True)
+    def onDPMSDeactivated(self):
+        self.publish_all(force=True)
+
+def main():
+    addon=xbmcaddon.Addon()
+    profile=Path(xbmcvfs.translatePath(addon.getAddonInfo('profile')))
+    profile.mkdir(parents=True,exist_ok=True)
+    checkpoint=CompatCheckpoint(xbmcvfs.translatePath(
+        'special://profile/addon_data/script.infinity.commandcenter/.android-checkpoint'))
+    mon=RuntimeMonitor(addon,profile,checkpoint)
+    xbmc.log(TAG+'dual-skin clean-core runtime coordinator 0.8.1 started',xbmc.LOGINFO)
+    mon.publish_all(force=True)
+    while not mon.abortRequested():
+        if checkpoint.poll():
+            while not mon.waitForAbort(0.25):
+                pass
+            return
+        if mon.waitForAbort(2.0):
+            break
+        mon.publish_all(force=False)
+
+if __name__=='__main__':
+    main()

@@ -126,9 +126,12 @@ int main(int argc,char**argv){
  if(mode=="pvr-retained")Test::pvrOwners=true;
  if(mode=="init")Test::initialized=false;
  assert(!Request(SESSION,OWNER,getpid()));
+ assert(Status(SESSION,OWNER,getpid()).find("startup_engine_owner_not_registered")!=std::string::npos);
+ assert(!AuthorizeTermination(SESSION,OWNER,getpid()));
  assert(RegisterStartupOwner(OWNER,getpid(),Test::root));
  assert(!RegisterStartupOwner("33333333-3333-4333-8333-333333333333",getpid(),Test::root));
  assert(!Request(SESSION,OWNER,getpid()));
+ assert(Status(SESSION,OWNER,getpid()).find("startup_owner_publication_pending")!=std::string::npos);
  const std::string dir=Test::root+"/addon_data/script.infinity.commandcenter/.android-checkpoint";
  std::filesystem::create_directories(dir);
  if(mode.rfind("startup-",0)==0){
@@ -195,6 +198,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runtime", type=Path, required=True)
     parser.add_argument("--fixture", type=Path)
+    parser.add_argument("--installed-versions", action="store_true")
     args = parser.parse_args()
     source = args.runtime / "xbmc"
     with tempfile.TemporaryDirectory(prefix="native-coordinator-host-") as temp:
@@ -219,7 +223,7 @@ def main():
             target = temp / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text('#pragma once\n#include "stubs.h"\n')
-        (temp / "harness.cpp").write_text(HARNESS)
+        (temp / "harness.cpp").write_text(HARNESS.replace("0.3.5.19", "0.3.5.20").replace("0.7.2", "0.8.2") if args.installed_versions else HARNESS)
         binary = temp / "test"
         subprocess.run(["g++", "-std=c++17", "-DTARGET_ANDROID", "-Wno-unused-parameter",
                         "-I", str(temp), "-c", str(temp / "utils/Variant.cpp"),

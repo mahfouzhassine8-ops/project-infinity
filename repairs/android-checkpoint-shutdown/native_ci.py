@@ -21,6 +21,20 @@ DEPENDENCY_PROOF = Path("android-tools/INFINITY-DEPENDENCIES-COMPLETE.json")
 
 
 def dependency_identity():
+    import importlib.util
+    installed_spec = importlib.util.spec_from_file_location("installed_build", HERE / "installed/build.py")
+    installed = importlib.util.module_from_spec(installed_spec)
+    installed_spec.loader.exec_module(installed)
+    installed.materialize(OUT / "installed-addons")
+    shutil.copytree(OUT / "embedded-addons/service.infinity.refresh",
+                    OUT / "installed-addons/service.infinity.refresh", dirs_exist_ok=True)
+    run(sys.executable, str(HERE / "runtime-tests/test_script_contracts.py"),
+        "--runtime", "kodi", "--command-center", str(OUT / "installed-addons/script.infinity.commandcenter"),
+        "--embedded", str(OUT / "installed-addons"), "--compat-script", "runtime_service.py")
+    run(sys.executable, str(HERE / "runtime-tests/test_runtime_checkpoint.py"),
+        "--runtime", str(OUT / "installed-addons/script.infinity.commandcenter"))
+    run(sys.executable, str(HERE / "installed/test_compat82.py"))
+    run(sys.executable, str(HERE / "runtime-tests/test_native_coordinator.py"), "--runtime", "kodi", "--installed-versions")
     manifest = json.loads((HERE / "runtime/native/manifest.json").read_text())
     inputs = {name: digest for name, digest in manifest["before"].items()
               if name.startswith("tools/depends/")}

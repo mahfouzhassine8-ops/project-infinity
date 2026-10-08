@@ -18,6 +18,10 @@ import zipfile
 
 import runtime_delta
 import participant_asset
+import importlib.util
+_spec = importlib.util.spec_from_file_location("installed_build", Path(__file__).resolve().parent / "installed/build.py")
+installed_build = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(installed_build)
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -77,10 +81,8 @@ def stage_compat_assets(base, assets, evidence, runtime_root=None):
         raise ValueError("Native script contract source hash mismatch")
     native_pins = {}
     for name, digest in re.findall(r'\{"([^"\n]+)", "([0-9a-f]{64})"\}', contracts.decode("utf-8")):
-        if name in native_pins and native_pins[name] != digest:
-            raise ValueError("Conflicting native script contract pin: " + name)
-        native_pins[name] = digest
-    if any(native_pins.get(name) != after[name] for name in COMPAT_FILES):
+        native_pins.setdefault(name, set()).add(digest)
+    if any(after[name] not in native_pins.get(name, set()) for name in COMPAT_FILES):
         raise ValueError("Native compiled contract/compatibility postimage mismatch")
     with zipfile.ZipFile(base) as archive:
         names = archive.namelist()
@@ -149,6 +151,12 @@ def main():
     target = args.build / "xbmc/assets/infinity/checkpoint-controller.zip"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(asset)
+    installed_assets = installed_build.stage(args.build / "xbmc/assets")
+    for filename, installer_name in [('checkpoint-controller-20.zip', 'InfinityCheckpointController20Installer'),
+                                     ('checkpoint-compat-82.zip', 'InfinityCheckpointCompat82Installer')]:
+        code = (args.source / ('tools/android/packaging/xbmc/src/'+installer_name+'.java.in')).read_text()
+        if 'ASSET_SHA256 = "'+installed_assets['assets/infinity/'+filename]+'"' not in code:
+            raise ValueError('Installed participant installer/asset mismatch: '+filename)
     compat_assets = stage_compat_assets(args.base, args.build / "xbmc/assets",
                                        args.out / "COMPAT-ASSET-ASSOCIATION.json")
     # Keep the inherited native-trace exporter regression running against the
@@ -166,6 +174,7 @@ dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.
         "schema": 1, "source_commit": os.environ.get("GITHUB_SHA"),
         "parent_apk_sha256": parent["parent_apk_sha256"],
         "participant_asset_sha256": digest,
+        "installed_participant_assets": installed_assets,
         "compatibility_asset_postimages": compat_assets,
         "partial_asset_donor": True, "full_apk_asset_association_verified": False,
         "purpose": "complete Android source compilation and exporter regression",

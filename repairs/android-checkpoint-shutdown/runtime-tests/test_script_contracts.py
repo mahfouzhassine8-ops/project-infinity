@@ -13,11 +13,13 @@ def main():
     parser.add_argument("--runtime", type=Path, required=True)
     parser.add_argument("--command-center", type=Path, required=True)
     parser.add_argument("--embedded", type=Path, required=True)
+    parser.add_argument("--compat-script", default="service.py")
     args = parser.parse_args()
     files = {f"script.infinity.commandcenter/{p.name}": p for p in args.command_center.glob("*.py")}
     files["script.infinity.commandcenter/addon.xml"] = args.command_center / "addon.xml"
-    for p in args.embedded.rglob("*.py"):
-        files[p.relative_to(args.embedded).as_posix()] = p
+    for p in args.embedded.rglob("*"):
+        if p.is_file() and p.suffix in (".py", ".xml"):
+            files[p.relative_to(args.embedded).as_posix()] = p
     with tempfile.TemporaryDirectory(prefix="script-contract-host-") as name:
         root = Path(name)
         for rel in ["platform/android/activity/InfinityScriptCheckpointContracts.cpp",
@@ -82,7 +84,7 @@ int main(int argc,char** argv){
  assert(ClassifyScript("special://home/addons/script.infinity.commandcenter/plugin.py","script.infinity.commandcenter").empty());
  std::cout<<"PASS: actual source classifier, both roots, dependency mismatch, missing source, arbitrary path/addon, unknown writer\n";
 }
-''')
+'''.replace('service.infinity.compat/service.py', 'service.infinity.compat/'+args.compat_script))
         binary = root / "test"
         subprocess.run(["g++", "-std=c++17", "-Wall", "-Wextra", "-Werror", "-I", str(root),
                         str(root / "harness.cpp"), "-o", str(binary)], check=True)

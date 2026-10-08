@@ -16,7 +16,8 @@ args = parser.parse_args()
 source = args.source / 'tools/android/packaging/xbmc/src'
 names = ['InfinityCheckpointProtocol', 'InfinityCloseGuardService', 'InfinityCloseNativeLease',
          'InfinityExitCompletion', 'InfinityKodiShutdown', 'InfinityCloseProgress', 'InfinityHealthExport',
-         'InfinityCheckpointAddonInstaller']
+         'InfinityCheckpointAddonInstaller', 'InfinityCheckpointController20Installer',
+         'InfinityCheckpointCompat82Installer', 'InfinityInstalledCheckpointInstaller']
 peers = '''package com.projectinfinity.kodi;
 class Main extends android.app.Activity {
  static Main MainActivity;

@@ -7,10 +7,10 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, require, resource_ids, run, sha, verify_manifest_pair
-VERSION = 2103336
-RELEASE = '1.0.9-Checkpoint-Test-RC1'
+VERSION = 2103337
+RELEASE = '1.0.9-Checkpoint-Installed-Fix-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
-GREEN_SHA = 'a2ca04454e484e4a3428256e4a3f6b887d4f62ad'
+GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 
 def verify_class_coverage(old_classes, new_classes):
     # The reviewed source rewrite may remove old anonymous/nested classes.
@@ -93,6 +93,7 @@ def finish(args):
     receipt=json.loads((args.out/'COMPAT-ASSET-ASSOCIATION.json').read_text())
     replacements={n:v['after'] for n,v in receipt['staged_assets'].items()}
     replacements['assets/infinity/checkpoint-controller.zip']=sha(participant_asset.build())
+    replacements.update({'assets/infinity/'+name: sha(android_ci.installed_build.build(addon)) for addon,name in [('script.infinity.commandcenter','checkpoint-controller-20.zip'),('service.infinity.compat','checkpoint-compat-82.zip')]})
     donor=args.build/'xbmc/build/outputs/apk/release/xbmc-release.apk'
     bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
     require(resource_ids(bt/'aapt2',args.base,args.out/'base-resources.txt') == resource_ids(bt/'aapt2',donor,args.out/'donor-resources.txt'), 'Resource ID drift')
@@ -101,7 +102,7 @@ def finish(args):
     verify_manifest_pair(run(bt/'aapt','dump','xmltree',args.base,'AndroidManifest.xml',output=args.out/'base-manifest.txt'), run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'manifest.txt'))
     for key in ('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS'):
         require(bool(os.environ.get(key)), 'Missing permanent signer: '+key)
-    final=args.out/f'Infinity-{VERSION}-Checkpoint-Test-RC1.apk'
+    final=args.out/f'Infinity-{VERSION}-Checkpoint-Installed-Fix-RC1.apk'
     run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
     for label,path in [('base',args.base),('final',final)]:
         certificate=run(bt/'apksigner','verify','--verbose','--print-certs',path,output=args.out/(label+'-signer.txt'))
@@ -121,11 +122,11 @@ def finish(args):
     (args.out/'DELIVERY.json').write_text(json.dumps({
         'file':final.name,'size':final.stat().st_size,'sha256':sha(final.read_bytes()),
         'candidate':VERSION,'source_commit':os.environ['GITHUB_SHA'],
-        'native_source_commit':GREEN_SHA,'native_validation_run':37758034088,
+        'native_source_commit':GREEN_SHA,'native_validation_run':int(os.environ['INFINITY_NATIVE_RUN_ID']),
         'native_unstripped_sha256':proof['native_sha256'],'native_packaged_sha256':sha(native.read_bytes()),
         'parent_apk_sha256':parent['parent_apk_sha256'],'protected_entries':len(kept),
         'signer_certificate_sha256':parent['signer_certificate_sha256'],
-        'native_recompiled':False,'device_accepted':False,'locked':False,
+        'native_recompiled':True,'device_accepted':False,'locked':False,
         'installed_owner_audit_complete':False,'unknown_writers_block_normal_close':True,
         'purpose':'Fold test candidate; unresolved saves must block termination'
     },indent=2)+'\n')

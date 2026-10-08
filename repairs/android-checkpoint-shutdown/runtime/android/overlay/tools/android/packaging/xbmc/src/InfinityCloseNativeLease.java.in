@@ -75,7 +75,14 @@ public final class InfinityCloseNativeLease extends Service {
     try{
       cancelEngineJobs();
       if(!owner.infinityRequestPersistenceCheckpoint(ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid())){
-        fail("native_checkpoint_request_rejected");return;
+        String raw=owner.infinityPersistenceCheckpointStatus(ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid());
+        JSONObject rejected=InfinityCheckpointProtocol.status(raw,ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid());
+        String reason=rejected.optString("error","native_checkpoint_request_rejected");
+        if("startup_owner_publication_pending".equals(reason)&&inTime()){
+          worker.schedule(()->prepare(owner),150,TimeUnit.MILLISECONDS);return;
+        }
+        send(InfinityCheckpointProtocol.STATUS,raw);
+        fail(reason);return;
       }
       poll(owner);
     }catch(Exception|LinkageError unavailable){fail("native_checkpoint_request_"+unavailable.getClass().getSimpleName());}

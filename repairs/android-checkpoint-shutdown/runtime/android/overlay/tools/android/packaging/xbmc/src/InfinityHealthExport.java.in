@@ -32,6 +32,7 @@ final class InfinityHealthExport {
       manifest.put("diagnostic_files", diagnostics);
       attach(context, zip, diagnostics, "infinity-kodi-process.json", "kodi-process-state.json", 8192);
       attach(context, zip, diagnostics, "infinity-native-cleanup.json", "native-cleanup.json", 4096);
+      attachShutdown(context, zip, diagnostics, "infinity-checkpoint-install.json", "checkpoint/installed-participants.json", 8192);
       attachShutdown(context, zip, diagnostics, InfinityCheckpointProtocol.RECEIPT, "checkpoint/coordinator-receipt.json", 256 * 1024);
       attachShutdown(context, zip, diagnostics, InfinityCheckpointProtocol.EVIDENCE, "checkpoint/android-timeline.jsonl", 160 * 1024);
       attachShutdown(context, zip, diagnostics, InfinityCheckpointProtocol.EVIDENCE+".previous", "checkpoint/android-timeline.previous.jsonl", 160 * 1024);

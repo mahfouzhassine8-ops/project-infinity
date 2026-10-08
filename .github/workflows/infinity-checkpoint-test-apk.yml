@@ -1,43 +1,26 @@
-name: Infinity | 2103336 checkpoint test APK (reuse green engine)
+name: Infinity | 2103337 installed participant repair APK (reuse compiled shell)
 on:
   workflow_dispatch:
-  push:
-    branches: [work/android-checkpoint-shutdown-2103335]
-    paths:
-      - 'tools/checkpoint-apk/**'
-      - '.github/workflows/infinity-checkpoint-test-apk.yml'
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-checkpoint-test-apk, cancel-in-progress: false}
 env:
   NDK_VER: 21.4.7075529
 jobs:
   package-test-apk:
-    if: github.ref == 'refs/heads/work/android-checkpoint-shutdown-2103335'
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'work/android-checkpoint-shutdown-2103335'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
-        with: {fetch-depth: 0}
+        with: {fetch-depth: 0, ref: '${{ github.event.workflow_run.head_sha }}'}
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
           log-accepted-android-sdk-licenses: false
-      - name: Require successful pinned engine and unchanged reviewed runtime
-        env: {GH_TOKEN: '${{ github.token }}'}
-        run: |
-          set -euo pipefail
-          mkdir -p evidence
-          gh api repos/${{ github.repository }}/actions/runs/37758034088 > evidence/green-run.json
-          python3 - <<'PY'
-          import json,subprocess
-          from pathlib import Path
-          r=json.load(open('evidence/green-run.json'))
-          assert r['conclusion']=='success' and r['head_sha']=='a2ca04454e484e4a3428256e4a3f6b887d4f62ad'
-          PY
-          git diff --exit-code a2ca04454e484e4a3428256e4a3f6b887d4f62ad -- repairs/android-checkpoint-shutdown
-          python3 tools/checkpoint-apk/test_package.py
+      - name: Verify packaging gates
+        run: python3 tools/checkpoint-apk/test_package.py
       - uses: actions/download-artifact@v8
         with:
           run-id: 37735801149
@@ -52,42 +35,39 @@ jobs:
           path: base
       - uses: actions/download-artifact@v8
         with:
-          run-id: 37758034088
+          run-id: ${{ github.event.workflow_run.id }}
           name: Infinity-Checkpoint-Work-Native-Internal
           github-token: ${{ github.token }}
           path: engine
       - uses: actions/download-artifact@v8
         with:
-          run-id: 37758034088
+          run-id: ${{ github.event.workflow_run.id }}
           name: Infinity-Checkpoint-Work-Native-Validation
           github-token: ${{ github.token }}
           path: engine-proof
-      - name: Stage protected shell and participant assets
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Infinity-2103337-Android-Donor-Internal
+          github-token: ${{ github.token }}
+          path: shell/xbmc/build/outputs/apk/release
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Infinity-Checkpoint-Work-Android-Validation
+          github-token: ${{ github.token }}
+          path: evidence
+      - name: Restore already compiled shell and associated native proof
         run: |
           set -euo pipefail
           cp engine-proof/ENGINE-PROOF.json engine/ENGINE-PROOF.json
-          mkdir -p source "$HOME/.android"
-          tar --no-same-owner -xzf parent/repaired-shell-source.tar.gz -C source
-          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
-          python3 tools/checkpoint-apk/package.py stage --source source/shell-kodi --base base/Infinity-2103335-Native-Trace-Bridge-RC1.apk --build shell --out evidence --engine engine
-      - name: Compile Android only and run inherited regression tests
-        env:
-          KODI_ANDROID_KEY_ALIAS: androiddebugkey
-          KODI_ANDROID_KEY_PASSWORD: android
-          KODI_ANDROID_STORE_PASSWORD: android
-          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
-        run: |
-          set -euo pipefail
-          ./shell/gradlew --no-daemon --console=plain -p shell :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee evidence/android-build.log
-      - name: Retain compiled Android donor for packaging recovery
-        uses: actions/upload-artifact@v7
-        with:
-          name: Infinity-2103336-Android-Donor-Internal
-          path: shell/xbmc/build/outputs/apk/release/xbmc-release.apk
-          retention-days: 90
-          if-no-files-found: error
+          mkdir -p source
+          tar --no-same-owner -xzf evidence/runtime-shell-source.tar.gz -C source
       - name: Associate green engine and verify preserved payload and permanent signer
         env:
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          INFINITY_ENGINE_SOURCE_COMMIT: ${{ github.event.workflow_run.head_sha }}
+          INFINITY_NATIVE_RUN_ID: ${{ github.event.workflow_run.id }}
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
           INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
@@ -98,15 +78,15 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103336-Checkpoint-Test-RC1-APK
-          path: evidence/Infinity-2103336-Checkpoint-Test-RC1.apk
+          name: Infinity-2103337-Checkpoint-Installed-Fix-RC1-APK
+          path: evidence/Infinity-2103337-Checkpoint-Installed-Fix-RC1.apk
           compression-level: 0
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-2103336-Checkpoint-Test-Evidence
+          name: Infinity-2103337-Checkpoint-Test-Evidence
           path: |
             evidence/
             !evidence/*.apk

@@ -297,7 +297,7 @@ bool CompatIdentity(const CVariant& value, const State& s, bool session)
   return SameIdentity(value, s, session) &&
     value["participant"].isString() && value["participant"].asString() == "infinity-compat" &&
     value["participant_api"].isInteger() && value["participant_api"].asInteger() == 1 &&
-    value["addon_version"].isString() && value["addon_version"].asString() == "0.7.2" &&
+    value["addon_version"].isString() && (value["addon_version"].asString() == "0.7.2" || value["addon_version"].asString() == "0.8.2") &&
     value["global_safe_to_terminate"].isBoolean() && !value["global_safe_to_terminate"].asBoolean();
 }
 bool CompatResponse(State& s)
@@ -383,21 +383,27 @@ bool PvrOwnersAbsent()
 }
 bool BeginEngineHandshake(State& s)
 {
+  const auto reject = [&](const char* detail) {
+    std::lock_guard<std::mutex> lock(s.mutex);
+    if (s.startupError.empty())
+      s.startupError = detail;
+    return false;
+  };
   const auto* activity = jni::CJNIMainActivity::GetAppInstance();
   if (!activity || !activity->infinityCheckpointOwnsOwner(s.pid, s.owner))
-    return false;
+    return reject("startup_engine_owner_lease_not_held");
   if (!XFILE::CDirectory::Create(s.directory) || !CheckpointCreatedDirectory(s.directory))
-    return false;
+    return reject("startup_checkpoint_control_directory_unconfirmed");
   // First launch can create this whole private add-on hierarchy. Persist each
   // new directory entry, not only the final control-directory inode contents.
   const auto addonDirectory = s.directory.substr(0, s.directory.rfind('/'));
   const auto addonDataDirectory = addonDirectory.substr(0, addonDirectory.rfind('/'));
   if (!CheckpointCreatedDirectory(addonDirectory) || !CheckpointCreatedDirectory(addonDataDirectory))
-    return false;
+    return reject("startup_checkpoint_parent_directories_unconfirmed");
   CVariant previous;
   bool hadPrevious = false;
   if (!ReadOptionalJson(s.directory + "/engine.json", previous, hadPrevious))
-    return false;
+    return reject("startup_previous_engine_identity_unreadable");
   CVariant engine(CVariant::VariantTypeObject);
   engine["schema"] = 1;
   engine["pid"] = s.pid;
@@ -657,7 +663,32 @@ std::string Status(const std::string& session, const std::string& owner, int pid
   auto& s = Get();
   std::lock_guard<std::mutex> lock(s.mutex);
   if (!Matches(s, session, owner, pid))
+  {
+    // A rejected request must retain its real cause. This is diagnostic only;
+    // it cannot create a checkpoint, change admission, or authorize termination.
+    if (Token(session) && Token(owner) && pid == static_cast<int>(::getpid()) &&
+        (!s.ownerRegistered || (s.owner == owner && s.pid == pid)))
+    {
+      CVariant result(CVariant::VariantTypeObject);
+      result["schema"] = 1;
+      result["session"] = session;
+      result["owner"] = owner;
+      result["pid"] = pid;
+      result["phase"] = "CHECKPOINT_FAILED";
+      result["error"] = s.lifecycleTeardown ? "legacy_teardown_already_started" :
+          !s.ownerRegistered ? "startup_engine_owner_not_registered" :
+          !s.startupError.empty() ? s.startupError :
+          !s.ownerPublished || s.ownerPublishing ? "startup_owner_publication_pending" :
+          "native_checkpoint_request_identity_rejected";
+      result["startup_owner_registered"] = s.ownerRegistered;
+      result["startup_owner_published"] = s.ownerPublished;
+      result["startup_owner_publishing"] = s.ownerPublishing;
+      std::string encoded;
+      if (CJSONVariantWriter::Write(result, encoded, true))
+        return encoded;
+    }
     return "{\"schema\":1,\"phase\":\"CHECKPOINT_FAILED\",\"error\":\"stale_or_foreign_identity\"}";
+  }
   CheckDeadlineLocked(s);
   return s.phase == "SAFE_TO_TERMINATE" ? s.safeStatus : EncodeStatusLocked(s);
 }
@@ -735,7 +766,7 @@ void Pump(CApplication& application)
       if (!ReadJson(s.directory + "/active.json", active) || !SameIdentity(active, s, false) ||
           !active["status"].isString() || active["status"].asString() != "ACTIVE" ||
           !active["participant_api"].isInteger() || active["participant_api"].asInteger() != 1 ||
-          !active["addon_version"].isString() || active["addon_version"].asString() != "0.3.5.19")
+          !active["addon_version"].isString() || (active["addon_version"].asString() != "0.3.5.19" && active["addon_version"].asString() != "0.3.5.20"))
         return;
       if (CScriptInvocationManager::GetInstance().AndroidCheckpointResidentCount() != 1)
       { RecordFailure("command_center", "exactly_one_canonical_resident_required"); return; }

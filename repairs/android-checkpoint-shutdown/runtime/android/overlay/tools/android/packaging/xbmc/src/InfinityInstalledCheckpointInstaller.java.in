@@ -1,0 +1,61 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.MessageDigest;
+import org.json.JSONObject;
+
+/** Checked installed-version routing before NativeActivity starts Python. */
+final class InfinityInstalledCheckpointInstaller {
+  static boolean applyBeforeNative(Context context) {
+    boolean controller=false,compat=false;
+    String controllerVersion="unknown",compatVersion="unknown";
+    try {
+      File storage=context.getExternalFilesDir(null);
+      if(storage==null)storage=context.getFilesDir();
+      File addons=new File(new File(storage,".kodi"),"addons");
+      String cc=hash(new File(addons,"script.infinity.commandcenter/addon.xml"));
+      if(CC20.equals(cc)) {
+        controllerVersion="0.3.5.20";
+        controller=InfinityCheckpointController20Installer.applyBeforeNative(context);
+      } else {
+        controllerVersion="legacy_or_unknown";
+        controller=InfinityCheckpointAddonInstaller.applyBeforeNative(context);
+      }
+      File marker=new File(addons,"service.infinity.compat/addon.xml");
+      if(COMPAT82.equals(hash(marker))) {
+        compatVersion="0.8.2";
+        compat=InfinityCheckpointCompat82Installer.applyBeforeNative(context);
+      } else if(!marker.exists()) {
+        // The immutable built-in 0.7.2 participant is part of the checked APK.
+        compatVersion="built_in";
+        compat=true;
+      }
+    } catch(Exception failure) {
+      android.util.Log.w("InfinityCheckpointCode","Installed checkpoint routing failed: "+failure.getClass().getSimpleName());
+    }
+    try {
+      JSONObject row=new JSONObject();row.put("schema",1);row.put("pid",android.os.Process.myPid());
+      row.put("epoch_ms",System.currentTimeMillis());
+      row.put("command_center_version",controllerVersion);row.put("command_center_applied",controller);
+      row.put("compat_version",compatVersion);row.put("compat_applied",compat);
+      InfinityCheckpointProtocol.atomic(new File(context.getFilesDir(),"infinity-checkpoint-install.json"),row);
+    } catch(Exception failure) {android.util.Log.w("InfinityCheckpointCode","Installer evidence unavailable");}
+    return controller&&compat;
+  }
+  private static String hash(File file)throws Exception {
+    if(!file.isFile())return "";
+    File resolved=new File(file.getParentFile().getCanonicalFile(),file.getName());
+    if(!resolved.equals(file.getCanonicalFile()))throw new java.io.IOException("Linked add-on marker");
+    MessageDigest digest=MessageDigest.getInstance("SHA-256");
+    try(FileInputStream stream=new FileInputStream(file)) {
+      byte[] buffer=new byte[8192];int count,total=0;
+      while((count=stream.read(buffer))!=-1) {total+=count;if(total>65536)throw new java.io.IOException("Oversized add-on marker");digest.update(buffer,0,count);}
+    }
+    StringBuilder result=new StringBuilder();for(byte value:digest.digest())result.append(String.format(java.util.Locale.ROOT,"%02x",value&255));
+    return result.toString();
+  }
+  private static final String CC20="23320bab6c3a1d661987ee30533dc7a8890ca67ed4ff87b2fc6e6014e2e5b69a";
+  private static final String COMPAT82="6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720";
+}

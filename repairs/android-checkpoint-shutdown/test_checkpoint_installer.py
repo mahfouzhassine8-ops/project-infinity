@@ -131,6 +131,7 @@ def main():
     parser.add_argument("--android-jar", type=Path, required=True)
     parser.add_argument("--production-asset", type=Path)
     parser.add_argument("--parent-addon", type=Path)
+    parser.add_argument("--controller20", action="store_true")
     args = parser.parse_args()
     if bool(args.production_asset) != bool(args.parent_addon):
         parser.error("--production-asset and --parent-addon must be supplied together")
@@ -139,9 +140,15 @@ def main():
         if args.production_asset:
             import participant_asset
             asset = args.production_asset.read_bytes()
-            assert asset == participant_asset.build(), "Production asset differs from reviewed build"
+            if args.controller20:
+                import android_ci
+                assert asset == android_ci.installed_build.build('script.infinity.commandcenter')
+            else:
+                assert asset == participant_asset.build(), "Production asset differs from reviewed build"
             parent = contents(args.parent_addon)
             delta = json.loads((Path(__file__).parent / "runtime/commandcenter/manifest.json").read_text())
+            if args.controller20:
+                delta = json.loads((Path(__file__).parent / 'installed/manifest.json').read_text())['script.infinity.commandcenter']
             assert {name: sha(data) for name, data in parent.items()} == delta["before"], "Wrong original add-on preimages"
             OLD = {name: parent[name] for name in FILES if name in parent}
             MARKER = parent["addon.xml"]
@@ -156,7 +163,13 @@ def main():
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
         production = args.source / "tools/android/packaging/xbmc/src/InfinityCheckpointAddonInstaller.java.in"
+        if args.controller20:
+            production = production.with_name('InfinityCheckpointController20Installer.java.in')
         code = production.read_text().replace("@APP_PACKAGE@", "com.projectinfinity.kodi")
+        if args.controller20:
+            code = code.replace('InfinityCheckpointController20Installer', 'InfinityCheckpointAddonInstaller')
+            code = code.replace('checkpoint-controller-20.zip', 'checkpoint-controller.zip')
+            code = code.replace('infinity-infinitycheckpointcontroller20installer', 'infinity-checkpoint-code')
         import re
         if args.production_asset:
             assert 'ASSET_SHA256 = "' + sha(asset) + '";' in code, "Unmodified production installer hash mismatch"
@@ -247,7 +260,7 @@ def main():
         assert contents(root / "external") == before
         print("PASS corrupt backup blocks recovery before any installed-file mutation")
         if args.production_asset:
-            print("PASS all installer recovery cases used the unchanged production hash pin, exact reviewed asset, and original 0.3.5.19 preimages")
+            print("PASS all installer recovery cases used the unchanged production hash pin, exact reviewed asset, and exact original add-on preimages")
 
 
 if __name__ == "__main__":

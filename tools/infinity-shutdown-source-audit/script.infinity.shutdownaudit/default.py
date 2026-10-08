@@ -24,6 +24,51 @@ def vfs_digest(path):
     return digest.hexdigest()
 
 
+def export_verified(source_path, output_path, expected_digest):
+    """Write through Kodi's VFS so Android folder-picker URIs are supported."""
+    target = None
+    created = False
+    try:
+        target = xbmcvfs.File(output_path, "w")
+        created = True
+        with open(source_path, "rb") as source:
+            while True:
+                chunk = source.read(1024 * 1024)
+                if not chunk:
+                    break
+                if not target.write(bytearray(chunk)):
+                    raise ValueError("Kodi could not write the ZIP to the selected folder.")
+    except Exception:
+        if target is not None:
+            try:
+                target.close()
+            except Exception:
+                pass
+        if created:
+            try:
+                xbmcvfs.delete(output_path)
+            except Exception:
+                pass
+        raise
+    finally:
+        if target is not None:
+            target.close()
+    try:
+        actual_digest = vfs_digest(output_path)
+    except Exception as error:
+        try:
+            xbmcvfs.delete(output_path)
+        except Exception:
+            pass
+        raise ValueError("The ZIP was written, but Kodi could not read it back for verification: " + str(error))
+    if actual_digest != expected_digest:
+        try:
+            xbmcvfs.delete(output_path)
+        except Exception:
+            pass
+        raise ValueError("The saved ZIP did not match the source. The incomplete export was removed.")
+
+
 def main():
     dialog = xbmcgui.Dialog()
     destination = dialog.browseSingle(3, "Choose a folder for the source ZIP", "files")
@@ -67,8 +112,7 @@ def main():
             raise ValueError("An export with this name already exists. Run again in a moment.")
         progress.update(95, message="Saving and checking the ZIP")
         expected = digest_file(temporary)
-        if not xbmcvfs.copy(temporary, output) or vfs_digest(output) != expected:
-            raise ValueError("The export could not be copied and verified in that folder.")
+        export_verified(temporary, output, expected)
         status = "Some sources are unresolved; that is recorded in the ZIP." if report["errors"] or missing else "Code snapshot verified."
         dialog.ok("Infinity Source Audit", status + "\n\n" + name + "\n\nUpload this exported ZIP in our chat.")
     except Exception as error:
