@@ -1,0 +1,115 @@
+name: Infinity | 2103331 stable restore version-only APK
+on:
+  push:
+    branches: [repair/infinity-2103331-stable-restamp]
+    paths:
+      - 'repairs/rollback-2103331/restamp.py'
+      - '.github/workflows/infinity-2103331-stable-restore.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-stable-restore-2103331, cancel-in-progress: false}
+jobs:
+  stable-restore:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-JobManager-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: locked3327
+      - name: Verify exact 3327 APK and restamp only manifest code/name
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p delivery3331
+          python3 repairs/rollback-2103331/restamp.py \
+            locked3327/Infinity-2103327-JobManager-Close-RC1.apk \
+            delivery3331/Unsigned-2103331.apk \
+            delivery3331/UNSIGNED-PROOF.json
+      - name: Sign with same permanent release key (fail closed)
+        shell: bash
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for k in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!k:-}" ]]; then echo "::error::Stable signing secret absent: $k"; exit 2; fi
+          done
+          bash scripts/sign-infinity71.sh \
+            delivery3331/Unsigned-2103331.apk \
+            delivery3331/Infinity-2103331-Stable-Restore-RC1.apk
+      - name: Verify signed APK, native/DEX payload, and Android install-over identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL=delivery3331/Infinity-2103331-Stable-Restore-RC1.apk
+          BT="${ANDROID_HOME}/build-tools/34.0.0"
+          "$BT/apksigner" verify --verbose --print-certs "$FINAL" > delivery3331/RELEASE-CERTIFICATE.txt
+          grep -F 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' delivery3331/RELEASE-CERTIFICATE.txt
+          grep -F 'Verified using v2 scheme (APK Signature Scheme v2): true' delivery3331/RELEASE-CERTIFICATE.txt
+          grep -F 'Verified using v3 scheme (APK Signature Scheme v3): true' delivery3331/RELEASE-CERTIFICATE.txt
+          "$BT/zipalign" -c -p 4 "$FINAL"
+          "$BT/aapt" dump badging "$FINAL" > delivery3331/BADGING.txt
+          grep -F "package: name='com.projectinfinity.kodi' versionCode='2103331' versionName='1.0.9-Rollback-2103331-RC1'" delivery3331/BADGING.txt
+          python3 - <<'PY'
+          import hashlib,json,sys,zipfile
+          from pathlib import Path
+          sys.path.insert(0,"repairs/rollback-2103331")
+          import restamp
+          base=Path("locked3327/Infinity-2103327-JobManager-Close-RC1.apk")
+          final=Path("delivery3331/Infinity-2103331-Stable-Restore-RC1.apk")
+          assert hashlib.sha256(base.read_bytes()).hexdigest()==restamp.PARENT_SHA
+          untouched=restamp.verify_payload(base,final)
+          assert untouched >= 4100, f"Unexpectedly few identical payload entries: {untouched}"
+          with zipfile.ZipFile(final) as z:
+              attrs=restamp.read_axml(z.read("AndroidManifest.xml"))
+              assert attrs["versionCode"]["data"]==2103331
+              assert attrs["versionName"]["value"]=="1.0.9-Rollback-2103331-RC1"
+              assert attrs["package"]["value"]=="com.projectinfinity.kodi"
+              assert not any("InfinityClosingActivity" in n for n in z.namelist())
+          sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+          receipt={
+              "candidate":2103331,"parent":2103327,"parent_sha256":restamp.PARENT_SHA,
+              "version_name":restamp.NEW_NAME,"apk_sha256":sha(final),
+              "native_sha256":restamp.LIB_SHA,"payload_entries_byte_identical":untouched,
+              "signer_certificate_sha256":"d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+              "apk_behavior_delta":"None; manifest versionCode and versionName only",
+              "old_experimental_closing_activity_absent":True,
+              "skin_companion":"1.0.5.205 derived only from exact locked 1.0.5.201",
+              "install_over_supported":True,"no_uninstall_or_data_clear_required":True,
+              "device_verified":False,"locked":False
+          }
+          Path("delivery3331/VERIFICATION.json").write_text(json.dumps(receipt,indent=2)+"\n")
+          print(json.dumps(receipt,indent=2))
+          PY
+      - name: Remove unsigned APK from published evidence
+        run: rm -f delivery3331/Unsigned-2103331.apk
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103331-Stable-Restore-RC1-APK
+          path: delivery3331/Infinity-2103331-Stable-Restore-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103331-Restore-Evidence
+          path: |
+            delivery3331/*.json
+            delivery3331/*.txt
+            delivery3331/*.sha256
+          retention-days: 90
+          if-no-files-found: warn
