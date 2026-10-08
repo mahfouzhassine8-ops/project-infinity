@@ -135,8 +135,8 @@ def compare_dex(base, final, build, out):
             if name in new_all: new[name] = new_all[name]
     changed = sorted(name for name in old.keys() | new.keys() if old.get(name) != new.get(name))
     allowed = re.compile(
-        r"com/projectinfinity/kodi/(?:InfinityHealthExport|BuildConfig)(?:\\$[^/]*)?\\.smali$|"
-        r"com/projectinfinity/kodi/InfinityCobraRecordingService(?:\\$\\$ExternalSyntheticLambda\\d+)?\\.smali$")
+        r"com/projectinfinity/kodi/(?:InfinityHealthExport|BuildConfig)(?:\$[^/]*)?\.smali$|"
+        r"com/projectinfinity/kodi/InfinityCobraRecordingService(?:\$\$ExternalSyntheticLambda\d+)?\.smali$")
     unexpected = [name for name in changed if not allowed.fullmatch(name)]
     if unexpected:
         diag = out / "compiler-diffs"; diag.mkdir(exist_ok=True)
