@@ -104,6 +104,20 @@ def scenario(name):
             assert observer.finish()
             assert not failures, failures
             assert target.read_text() == 'saved'
+        elif name == 'descriptor_cache':
+            connection.close()
+            class Accessor:
+                mkdir = os.mkdir
+                opened = os.open
+                write = os.write
+            cached = Accessor()
+            cached.mkdir(root / 'cached')
+            descriptor = cached.opened(root / 'cached' / 'state', os.O_WRONLY | os.O_CREAT, 0o600)
+            cached.write(descriptor, b'saved')
+            os.close(descriptor)
+            assert observer.finish()
+            assert not failures, failures
+            assert (root / 'cached' / 'state').read_bytes() == b'saved'
         else:
             raise AssertionError(name)
         # Restore only for test cleanup; production never restores retired bindings.
@@ -119,7 +133,7 @@ def main():
         scenario(args.scenario)
         return
     for name in ('committed', 'pending', 'collected', 'write_failure',
-                 'binding_replaced', 'sql_failure', 'rollback', 'nested_directories'):
+                 'binding_replaced', 'sql_failure', 'rollback', 'nested_directories', 'descriptor_cache'):
         subprocess.run([sys.executable, __file__, '--scenario', name], check=True)
     print('PASS: checked saves, pending-data retention, swallowed failures and explicit rollback')
 

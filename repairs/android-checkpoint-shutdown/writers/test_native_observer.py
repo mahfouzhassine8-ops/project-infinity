@@ -34,6 +34,7 @@ int main(int argc,char** argv) {
   if(mode=="external")script="import subprocess\nsubprocess.run(['/bin/true'],check=True)\n";
   if(mode=="workers")script="import threading\ne=threading.Event()\nt=threading.Thread(target=e.wait);t.start()\n";
   if(mode=="nested")script="from pathlib import Path\np=Path(root)/'health'/'sessions'/'session'/'state.json'\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text('saved')\n";
+  if(mode=="descriptor-cache")script="import os\nclass Accessor:\n mkdir=os.mkdir\n opened=os.open\n write=os.write\na=Accessor()\na.mkdir(root+'/cached')\nfd=a.opened(root+'/cached/state',os.O_WRONLY|os.O_CREAT,0o600)\na.write(fd,b'saved')\nos.close(fd)\n";
   assert(script && PyRun_SimpleString(script)==0);
   InfinityPythonPersistence::Finish(context,owner);
   if(PyErr_Occurred())PyErr_Print();
@@ -52,7 +53,7 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested";
+  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="descriptor-cache";
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else assert(!InfinityScriptPersistence::Failure().empty());
   auto* interpreter=owner->interp;
@@ -105,7 +106,7 @@ def main():
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'external', 'workers', 'nested'):
+        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'external', 'workers', 'nested', 'descriptor-cache'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)

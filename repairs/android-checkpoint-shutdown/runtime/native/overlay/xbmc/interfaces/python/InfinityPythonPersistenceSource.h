@@ -10,6 +10,7 @@ teardown. Native admission, thread retirement and filesystem durability are
 separate required proofs.
 """
 import builtins
+from functools import partial
 import io
 import os
 import sqlite3
@@ -177,7 +178,7 @@ class Observer:
                 except Exception:
                     observer.error('raw_file_'+_name+'_failed')
                     raise
-            self.patch(os, name, operated)
+            self.patch(os, name, partial(operated))
         for name in ('open', 'rename', 'replace', 'remove', 'unlink', 'mkdir', 'rmdir', 'truncate'):
             original = getattr(os, name)
             def namespace_op(*args, _original=original, _name=name, **kwargs):
@@ -204,7 +205,9 @@ class Observer:
                     raise
                 finally:
                     if _name == 'open': self.touch(args[0], 'checked-open-end')
-            self.patch(os, name, namespace_op)
+            # Builtin os functions do not bind when cached on an accessor class.
+            # Preserve that behavior for Python 3.10 pathlib and addon helpers.
+            self.patch(os, name, partial(namespace_op))
         if self.vfs is not None:
             original = self.vfs.File
             def vfs_file(path, mode=None):
