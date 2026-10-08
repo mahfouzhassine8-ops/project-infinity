@@ -1,0 +1,38 @@
+name: Infinity | 2103334 real CPython abort tests
+on:
+  push:
+    branches: [repair/infinity-python-exit-2103334]
+    paths:
+      - 'repairs/python-exit-2103334/InfinityPythonAbort.h'
+      - 'repairs/python-exit-2103334/test_abort.*'
+      - '.github/workflows/infinity-2103334-abort-tests.yml'
+permissions: {contents: read, actions: read}
+jobs:
+  python-abort-tests:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.11.7'}
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37722882671
+          name: Infinity-2103334-Exact-Source-Review
+          github-token: ${{ github.token }}
+          path: parent-review
+      - name: Test exact parent operation and shipping repair on matching CPython
+        run: |
+          set -euo pipefail
+          mkdir -p native-parent abort-tests
+          tar -xzf parent-review/native-review.tar.gz -C native-parent
+          grep -q '^VERSION=3.11.7$' native-parent/tools/depends/target/python3/PYTHON3-VERSION
+          python repairs/python-exit-2103334/test_abort.py --source native-parent --expect-python 3.11.7 --out abort-tests 2>&1 | tee abort-tests/test.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103334-CPython-Abort-Tests
+          path: abort-tests/
+          retention-days: 90
+          if-no-files-found: error
