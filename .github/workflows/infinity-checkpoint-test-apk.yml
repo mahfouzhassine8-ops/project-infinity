@@ -79,6 +79,13 @@ jobs:
         run: |
           set -euo pipefail
           ./shell/gradlew --no-daemon --console=plain -p shell :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee evidence/android-build.log
+      - name: Retain compiled Android donor for packaging recovery
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103336-Android-Donor-Internal
+          path: shell/xbmc/build/outputs/apk/release/xbmc-release.apk
+          retention-days: 90
+          if-no-files-found: error
       - name: Associate green engine and verify preserved payload and permanent signer
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}

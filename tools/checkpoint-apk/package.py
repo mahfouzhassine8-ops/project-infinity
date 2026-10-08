@@ -12,6 +12,20 @@ RELEASE = '1.0.9-Checkpoint-Test-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = 'a2ca04454e484e4a3428256e4a3f6b887d4f62ad'
 
+def verify_class_coverage(old_classes, new_classes):
+    # The reviewed source rewrite may remove old anonymous/nested classes.
+    # Top-level owners and every class outside those exact Java files stay required.
+    manifest = json.loads((RUNTIME/'runtime/android/manifest.json').read_text())
+    changed_owners = {
+        'Lcom/projectinfinity/kodi/' + Path(name).name.removesuffix('.java.in')
+        for name in manifest['changed'] if name.endswith('.java.in')
+    }
+    removed = old_classes-new_classes
+    unexpected = sorted(name for name in removed
+                        if '$' not in name or name.split('$', 1)[0] not in changed_owners)
+    require(not unexpected, 'Protected DEX classes removed: '+repr(unexpected))
+    return sorted(removed)
+
 def stage(args):
     sys.argv = ['android_ci', '--source', str(args.source), '--base', str(args.base), '--build', str(args.build), '--out', str(args.out)]
     android_ci.main()
@@ -47,7 +61,13 @@ def merge(base, donor, native, output, replacements):
         require(not any(n.startswith('lib/') and not n.endswith('/') for n in b.namelist()), 'Unexpected donor native libraries')
         old_jni, old_classes = dex_contract(a)
         new_jni, new_classes = dex_contract(b)
-        require(old_jni <= new_jni and old_classes <= new_classes, 'Existing JNI/class removed')
+        require(old_jni <= new_jni, 'Existing JNI declaration removed: '+repr(sorted(old_jni-new_jni)))
+        removed = verify_class_coverage(old_classes, new_classes)
+        (output.parent/'DEX-CLASS-COVERAGE.json').write_text(json.dumps({
+            'removed_reviewed_nested_classes': removed,
+            'existing_top_level_and_unrelated_classes_preserved': True,
+            'existing_jni_declarations_preserved': True,
+        }, indent=2)+'\n')
         allowed = {
             ('Lcom/projectinfinity/kodi/Main;', 'infinityRegisterCheckpointOwner', '(Ljava/lang/String;ILjava/lang/String;)Z'),
             ('Lcom/projectinfinity/kodi/Main;', 'infinityRequestPersistenceCheckpoint', '(Ljava/lang/String;Ljava/lang/String;I)Z'),

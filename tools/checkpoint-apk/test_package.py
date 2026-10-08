@@ -15,6 +15,12 @@ NEW=OLD|{
  ('Lcom/projectinfinity/kodi/Main;','infinityPersistenceCheckpointStatus','(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;'),
  ('Lcom/projectinfinity/kodi/Main;','infinityAuthorizeCheckpointTermination','(Ljava/lang/String;Ljava/lang/String;I)Z')}
 class PackagingTests(unittest.TestCase):
+ def test_reviewed_nested_class_removal_does_not_allow_protected_class_removal(self):
+  owner='Lcom/projectinfinity/kodi/InfinityKodiShutdown'
+  self.assertEqual(p.verify_class_coverage({owner+';',owner+'$OldWorker;'}, {owner+';'}), [owner+'$OldWorker;'])
+  for missing in [owner+';', 'Lcom/projectinfinity/kodi/InfinityCobraRecordingService$Worker;', 'Lother/library/Worker;']:
+   with self.assertRaisesRegex(RuntimeError,'Protected DEX classes removed'):
+    p.verify_class_coverage({missing}, set())
  def test_merge_preserves_payload_and_rejects_unreviewed_changes(self):
   with tempfile.TemporaryDirectory() as d:
    r=Path(d); base=r/'base.apk'; donor=r/'donor.apk'; native=r/'libkodi.so'; out=r/'out.apk'
