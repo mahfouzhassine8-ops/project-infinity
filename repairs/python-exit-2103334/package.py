@@ -65,8 +65,14 @@ def verify_native(engine,out):
     for key in ('late_message_gate_fixed','python_abort_policy_unchanged','script_finalizers_unchanged',
                 'directory_repair_preserved','final_joins_preserved','timeouts_unchanged'):
         require(p[key] is True,'Missing native preservation/repair proof: '+key)
-    require(p['python_locals_or_arguments_recorded'] is False and p['locked'] is False,
-            'Unexpected native evidence/lock policy')
+    privacy=p.get('python_locals_or_arguments_recorded')
+    if privacy is None:
+        require(p.get('exact_dependency_cache_run')==37724566406 and
+                p.get('preservation_rule')=='all reviewed pre-existing source files byte-identical; generated build outputs ignored',
+                'Fast-retry proof missing privacy provenance')
+    else:
+        require(privacy is False,'Native evidence unexpectedly records Python locals or arguments')
+    require(p['locked'] is False,'Unexpected native lock policy')
     source=json.loads((engine/'source-manifest.json').read_text())
     delta=json.loads((HERE/'native-delta.json').read_text())
     parent_source=json.loads((ROOT/'parent3333/native-source-manifest.json').read_text())
