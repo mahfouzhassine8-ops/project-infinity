@@ -85,7 +85,7 @@ class CSettingsComponent {public:std::shared_ptr<CSettings>GetSettings(){static 
  std::shared_ptr<CProfileManager>GetProfileManager(){static auto p=std::make_shared<CProfileManager>();return p;}};
 class CFavouritesService {public:bool CheckpointForAndroidExit(){return Test::favouritesOk;}};
 namespace PERIPHERALS {class CPeripherals {public:bool CheckpointForAndroidExit(){return Test::peripheralsOk;}};}
-namespace PVR {class CPVRClients {public:bool HasAndroidCheckpointOwners()const{return Test::pvrOwners;}};class CPVRManager {public:bool IsStopped()const{return Test::pvrStopped;} std::shared_ptr<CPVRClients>Clients()const{static auto c=std::make_shared<CPVRClients>();return c;}};}
+namespace PVR {class CPVRClients {public:bool HasAndroidCheckpointOwners()const{return Test::pvrOwners;}};class CPVRManager {public:bool IsStoppedForAndroidCheckpoint()const{return IsStopped();} std::shared_ptr<CPVRClients>Clients()const{static auto c=std::make_shared<CPVRClients>();return c;} private:bool IsStopped()const{return Test::pvrStopped;}};}
 namespace ANNOUNCEMENT {enum AnnouncementFlag {Other=1};class CAnnouncementManager {public:void Announce(AnnouncementFlag,const std::string&,const std::string&,const CVariant&){} };}
 class CServiceBroker {public:
  static std::shared_ptr<CJobManager>GetJobManager(){static auto p=std::make_shared<CJobManager>();return p;}

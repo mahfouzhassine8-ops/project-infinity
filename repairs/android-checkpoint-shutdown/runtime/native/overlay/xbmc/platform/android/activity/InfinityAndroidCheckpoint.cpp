@@ -379,7 +379,7 @@ bool PvrOwnersAbsent()
 {
   const auto& manager = CServiceBroker::GetPVRManager();
   const auto clients = manager.Clients();
-  return manager.IsStopped() && clients && !clients->HasAndroidCheckpointOwners();
+  return manager.IsStoppedForAndroidCheckpoint() && clients && !clients->HasAndroidCheckpointOwners();
 }
 bool BeginEngineHandshake(State& s)
 {
