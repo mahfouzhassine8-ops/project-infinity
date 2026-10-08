@@ -35,7 +35,7 @@ termination. This includes diagnostic subprocesses until their process lifetime
 and output ownership have explicit coverage. No unknown add-on is simply marked
 safe because its script returned.
 
-Local validation: seven real file/SQLite observer scenarios; six actual CPython
+Local validation: eight real file/SQLite observer scenarios; seven actual CPython
 subinterpreter scenarios; 30 production coordinator scenarios; retained unknown
 writer lifetime checks; 13 Command Center shutdown scenarios and 14 Resume Hub
 preservation checks. Android/ARM64 compilation and physical device acceptance are

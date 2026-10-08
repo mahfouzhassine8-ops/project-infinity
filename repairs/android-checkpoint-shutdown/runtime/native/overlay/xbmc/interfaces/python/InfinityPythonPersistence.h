@@ -83,7 +83,11 @@ inline int Audit(const char* event,PyObject* args,void*)
       InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_deletion");
     if(count)Touch(context,at(0),false);
   }
-  else if(std::strcmp(event,"os.mkdir")==0) {if(count)Touch(context,at(0),true,true);}
+  else if(std::strcmp(event,"os.mkdir")==0) {
+    if(count>2 && PyLong_Check(at(2)) && PyLong_AsLong(at(2))!=-1)
+      InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_directory_creation");
+    if(count)Touch(context,at(0),true,true);
+  }
   else if(std::strcmp(event,"os.truncate")==0) {if(count)Touch(context,at(0));}
   else if(std::strcmp(event,"sys.unraisablehook")==0)
     InfinityScriptPersistence::Fail(context->id,"unraisable_python_cleanup_or_write_failure");

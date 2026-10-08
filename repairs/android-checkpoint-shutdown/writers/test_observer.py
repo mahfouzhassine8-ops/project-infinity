@@ -96,6 +96,14 @@ def scenario(name):
             assert observer.finish()
             assert not failures
             assert read_connection(database).execute('select value from state').fetchall() == []
+        elif name == 'nested_directories':
+            connection.close()
+            target = root / 'health' / 'sessions' / 'session' / 'state.json'
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text('saved')
+            assert observer.finish()
+            assert not failures, failures
+            assert target.read_text() == 'saved'
         else:
             raise AssertionError(name)
         # Restore only for test cleanup; production never restores retired bindings.
@@ -111,7 +119,7 @@ def main():
         scenario(args.scenario)
         return
     for name in ('committed', 'pending', 'collected', 'write_failure',
-                 'binding_replaced', 'sql_failure', 'rollback'):
+                 'binding_replaced', 'sql_failure', 'rollback', 'nested_directories'):
         subprocess.run([sys.executable, __file__, '--scenario', name], check=True)
     print('PASS: checked saves, pending-data retention, swallowed failures and explicit rollback')
 

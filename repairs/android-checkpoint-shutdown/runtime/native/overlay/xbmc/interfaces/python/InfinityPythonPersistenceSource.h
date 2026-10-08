@@ -185,6 +185,8 @@ class Observer:
                     flags = args[1] if len(args) > 1 else kwargs.get('flags', 0)
                     if not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND):
                         return _original(*args, **kwargs)
+                    if kwargs.get('dir_fd') is not None:
+                        self.error('unobserved_directory_relative_file_open')
                 self.check_live()
                 if _name == 'open': self.touch(args[0], 'checked-open-begin')
                 try:
@@ -193,7 +195,9 @@ class Observer:
                     if _name not in ('open', 'mkdir'): self.error('namespace_'+_name+'_failed')
                     raise
                 except FileNotFoundError:
-                    if _name not in ('remove', 'unlink', 'rmdir'): self.error('namespace_'+_name+'_failed')
+                    # pathlib creates missing parents after an initial mkdir miss.
+                    # Native namespace proof still requires the final directories.
+                    if _name not in ('remove', 'unlink', 'rmdir', 'mkdir'): self.error('namespace_'+_name+'_failed')
                     raise
                 except Exception:
                     self.error('namespace_'+_name+'_failed')
