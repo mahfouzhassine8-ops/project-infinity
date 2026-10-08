@@ -1,26 +1,43 @@
 name: Infinity | 2103337 installed participant repair APK (reuse compiled shell)
 on:
   workflow_dispatch:
+  push:
+    branches: [work/android-checkpoint-shutdown-2103335]
+    paths: ['.github/workflows/infinity-checkpoint-test-apk.yml']
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-checkpoint-test-apk, cancel-in-progress: false}
 env:
   NDK_VER: 21.4.7075529
 jobs:
   package-test-apk:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'work/android-checkpoint-shutdown-2103335'
+    if: github.ref == 'refs/heads/work/android-checkpoint-shutdown-2103335'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
-        with: {fetch-depth: 0, ref: '${{ github.event.workflow_run.head_sha }}'}
+        with: {fetch-depth: 0}
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
           log-accepted-android-sdk-licenses: false
-      - name: Verify packaging gates
-        run: python3 tools/checkpoint-apk/test_package.py
+      - name: Require passed compiled inputs and unchanged runtime
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          gh api repos/${{ github.repository }}/actions/runs/37771220035 > evidence/compiled-run.json
+          gh api repos/${{ github.repository }}/actions/runs/37771220035/jobs > evidence/compiled-jobs.json
+          python3 - <<'PYCODE'
+          import json
+          run=json.load(open('evidence/compiled-run.json'))
+          assert run['head_sha']=='e6e3c884b80d3f21a27112769b0916acdef738a8'
+          jobs={job['name']:job for job in json.load(open('evidence/compiled-jobs.json'))['jobs']}
+          assert all(jobs[name]['conclusion']=='success' for name in ('android-shell','native-engine'))
+          PYCODE
+          git diff --exit-code e6e3c884b80d3f21a27112769b0916acdef738a8 -- repairs/android-checkpoint-shutdown
+          python3 tools/checkpoint-apk/test_package.py
       - uses: actions/download-artifact@v8
         with:
           run-id: 37735801149
@@ -35,25 +52,25 @@ jobs:
           path: base
       - uses: actions/download-artifact@v8
         with:
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: 37771220035
           name: Infinity-Checkpoint-Work-Native-Internal
           github-token: ${{ github.token }}
           path: engine
       - uses: actions/download-artifact@v8
         with:
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: 37771220035
           name: Infinity-Checkpoint-Work-Native-Validation
           github-token: ${{ github.token }}
           path: engine-proof
       - uses: actions/download-artifact@v8
         with:
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: 37771220035
           name: Infinity-2103337-Android-Donor-Internal
           github-token: ${{ github.token }}
           path: shell/xbmc/build/outputs/apk/release
       - uses: actions/download-artifact@v8
         with:
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: 37771220035
           name: Infinity-Checkpoint-Work-Android-Validation
           github-token: ${{ github.token }}
           path: evidence
@@ -62,12 +79,14 @@ jobs:
           set -euo pipefail
           cp engine-proof/ENGINE-PROOF.json engine/ENGINE-PROOF.json
           mkdir -p source
-          tar --no-same-owner -xzf evidence/runtime-shell-source.tar.gz -C source
+          test -f evidence/checkpoint-android/runtime-shell-source.tar.gz
+          test -f evidence/checkpoint-android/COMPAT-ASSET-ASSOCIATION.json
+          cp evidence/checkpoint-android/COMPAT-ASSET-ASSOCIATION.json evidence/COMPAT-ASSET-ASSOCIATION.json
+          tar --no-same-owner -xzf evidence/checkpoint-android/runtime-shell-source.tar.gz -C source
       - name: Associate green engine and verify preserved payload and permanent signer
         env:
-          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
-          INFINITY_ENGINE_SOURCE_COMMIT: ${{ github.event.workflow_run.head_sha }}
-          INFINITY_NATIVE_RUN_ID: ${{ github.event.workflow_run.id }}
+          INFINITY_ENGINE_SOURCE_COMMIT: e6e3c884b80d3f21a27112769b0916acdef738a8
+          INFINITY_NATIVE_RUN_ID: 37771220035
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
           INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
