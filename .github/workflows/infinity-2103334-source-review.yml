@@ -1,0 +1,35 @@
+name: Infinity | 2103334 exact source review
+on:
+  push:
+    branches: [repair/infinity-python-exit-2103334]
+    paths: ['.github/workflows/infinity-2103334-source-review.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  source-review:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Reconstruct exact current engine without compiling
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev
+          mkdir -p review3334
+          git archive --format=tar.gz HEAD > review3334/recipes.tar.gz
+          python3 repairs/directory-close-2103330/native_ci.py prepare 2>&1 | tee review3334/reconstruction.log
+          tar -czf review3334/native-review.tar.gz -C kodi xbmc tools/depends/target/python3
+          cp engine3330/source-manifest.json review3334/PARENT-NATIVE-SOURCE.json
+          sha256sum review3334/*.gz > review3334/SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103334-Exact-Source-Review
+          path: review3334/
+          retention-days: 90
+          if-no-files-found: error
