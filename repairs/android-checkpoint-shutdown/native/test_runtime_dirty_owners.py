@@ -2,6 +2,7 @@
 """Compile production skin/favourites/peripheral checkpoint bodies with fixtures."""
 from pathlib import Path
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -16,6 +17,46 @@ def extract(source, signature):
 
 
 class DirtyOwnerTests(unittest.TestCase):
+    def test_production_addon_copy_preserves_settings_and_ownership(self):
+        source = (RUNTIME / "xbmc/addons/Addon.cpp").read_text()
+        header = (RUNTIME / "xbmc/addons/Addon.h").read_text()
+        signature = "CAddon(const CAddon& other)"
+        clean_header = re.sub(r'/\*.*?\*/|//[^\n]*', '', header, flags=re.S)
+        self.assertEqual(clean_header.count(signature), 1)
+        access = re.findall(r'^\s*(public|protected|private)\s*:',
+                            clean_header[:clean_header.index(signature)], flags=re.M)
+        self.assertEqual(access[-1], "public")
+        self.assertRegex(clean_header, r'#if\s+defined\(TARGET_ANDROID\)\s*' +
+                         re.escape(signature) + r';\s*#endif')
+        constructor = extract(source, "CAddon::" + signature)
+        for registration in ("TrackCreatedAddonTree", "TrackLoadedAddonTree",
+                             "MarkAddonSettingsManagerDirty"):
+            self.assertNotIn(registration, constructor)
+        # Production data layout and constructor are retained. Only the unrelated
+        # IAddon virtual interface and add-on metadata/settings services are stubs.
+        data_start = header.index("struct CSettingsData")
+        data_end = header.index("\n  };", data_start) + len("\n  };")
+        fields = []
+        for name in ("m_addonInfo", "m_checkpointSettingsMutex", "m_settings", "m_type"):
+            matches = re.findall(r'^\s*(?:const |mutable )?[^\n;{}]+\b' + name + r';',
+                                 header, flags=re.M)
+            self.assertEqual(len(matches), 1, name)
+            fields.append(matches[0].strip())
+        code = ADDON_COPY_TEST.replace("// @SETTINGS_DATA@", header[data_start:data_end]).replace(
+            "// @FIELDS@", "\n".join(fields)).replace("// @COPY_DECLARATION@", signature + ";").replace(
+            "// @COPY_CONSTRUCTOR@", constructor)
+        with tempfile.TemporaryDirectory(prefix="infinity-addon-copy-") as directory:
+            cpp, binary = Path(directory) / "copy.cpp", Path(directory) / "copy"
+            cpp.write_text(code)
+            compiled = subprocess.run([shutil.which("c++") or "c++", "-std=c++17", "-DTARGET_ANDROID",
+                                       "-Wall", "-Wextra", "-Werror", "-pedantic", "-O2", "-pthread",
+                                       str(cpp), "-o", str(binary)],
+                                      text=True, capture_output=True, timeout=60)
+            self.assertEqual(compiled.returncode, 0, compiled.stdout + compiled.stderr)
+            tested = subprocess.run([str(binary)], text=True, capture_output=True, timeout=10)
+            self.assertEqual(tested.returncode, 0, tested.stdout + tested.stderr)
+            self.assertIn("PASS production addon copy", tested.stdout)
+
     def test_production_dirty_owner_callbacks(self):
         peripheral = (RUNTIME / "xbmc/peripherals/devices/Peripheral.cpp").read_text()
         favourite = (RUNTIME / "xbmc/favourites/FavouritesService.cpp").read_text()
@@ -43,6 +84,110 @@ class DirtyOwnerTests(unittest.TestCase):
             tested = subprocess.run([str(binary)], text=True, capture_output=True, timeout=30)
             self.assertEqual(tested.returncode, 0, tested.stdout + tested.stderr)
             self.assertIn("PASS", tested.stdout)
+
+
+ADDON_COPY_TEST = r'''
+#include <chrono>
+#include <cstdint>
+#include <future>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <utility>
+using CCriticalSection = std::recursive_mutex;
+#define CHECK(x) do { if (!(x)) throw std::runtime_error(std::string("line ") + std::to_string(__LINE__) + ": " #x); } while(false)
+namespace ADDON {
+enum class AddonType { UNKNOWN, SCREENSAVER };
+using AddonInstanceId = std::uint32_t;
+struct CAddonInfo {};
+using AddonInfoPtr = std::shared_ptr<CAddonInfo>;
+struct CAddonSettings { bool dirty = true; };
+class IAddon : public std::enable_shared_from_this<IAddon> {
+public:
+  virtual ~IAddon() = default;
+};
+class CAddon : public IAddon {
+public:
+  CAddon(const AddonInfoPtr& info, AddonType type) : m_addonInfo(info), m_type(type) {}
+  // @COPY_DECLARATION@
+  // Fields are public only in this fixture so the preserved state can be observed.
+  // @SETTINGS_DATA@
+  // @FIELDS@
+};
+// @COPY_CONSTRUCTOR@
+}
+int main() {
+ try {
+  using namespace ADDON;
+  auto source = std::make_shared<CAddon>(std::make_shared<CAddonInfo>(), AddonType::SCREENSAVER);
+  auto settings = std::make_shared<CAddonSettings>();
+  CAddon::CSettingsData global;
+  global.m_loadSettingsFailed = true;
+  global.m_hasUserSettings = true;
+  global.m_addonSettingsPath = "resources/settings.xml";
+  global.m_userSettingsPath = "profile/settings.xml";
+  global.m_addonSettings = settings;
+  source->m_settings[0] = global;
+  source->m_settings[23] = {};
+
+  std::unique_lock<CCriticalSection> sourceLock(source->m_checkpointSettingsMutex);
+  std::promise<void> entering;
+  auto entered = entering.get_future();
+  auto copying = std::async(std::launch::async, [&] {
+    entering.set_value();
+    return std::make_shared<CAddon>(*source);
+  });
+  entered.get();
+  const bool waited = copying.wait_for(std::chrono::milliseconds(30)) == std::future_status::timeout;
+  source->m_settings[23].m_userSettingsPath = "profile/instance-settings-23.xml";
+  sourceLock.unlock();
+  auto copy = copying.get();
+  CHECK(waited);
+  CHECK(copy->m_addonInfo == source->m_addonInfo && copy->m_type == source->m_type);
+  CHECK(copy->m_settings.size() == 2);
+  const auto& copied = copy->m_settings.at(0);
+  CHECK(copied.m_loadSettingsFailed && copied.m_hasUserSettings);
+  CHECK(copied.m_addonSettingsPath == "resources/settings.xml");
+  CHECK(copied.m_userSettingsPath == "profile/settings.xml");
+  CHECK(copied.m_addonSettings == settings && settings->dirty);
+  CHECK(!copy->m_settings.at(23).m_loadSettingsFailed);
+  CHECK(!copy->m_settings.at(23).m_hasUserSettings);
+  CHECK(copy->m_settings.at(23).m_userSettingsPath == "profile/instance-settings-23.xml");
+  CHECK(!copy->m_settings.at(23).m_addonSettings);
+  CHECK(&copy->m_settings != &source->m_settings);
+  copy->m_settings.erase(23);
+  copy->m_settings.at(0).m_hasUserSettings = false;
+  CHECK(source->m_settings.size() == 2 && source->m_settings.at(0).m_hasUserSettings);
+
+  sourceLock.lock();
+  auto independentLock = std::async(std::launch::async, [&] {
+    std::unique_lock<CCriticalSection> lock(copy->m_checkpointSettingsMutex);
+  });
+  const bool independent = independentLock.wait_for(std::chrono::seconds(1)) == std::future_status::ready;
+  sourceLock.unlock();
+  independentLock.get();
+  CHECK(independent && &copy->m_checkpointSettingsMutex != &source->m_checkpointSettingsMutex);
+  CHECK(source->shared_from_this().get() == source.get());
+  CHECK(copy->shared_from_this().get() == copy.get());
+  CAddon detached(*source);
+  CHECK(detached.weak_from_this().expired());
+  std::weak_ptr<CAddonSettings> registered = settings;
+  settings.reset();
+  global.m_addonSettings.reset();
+  detached.m_settings.clear();
+  source->m_settings.clear();
+  source.reset();
+  CHECK(!registered.expired());
+  CHECK(registered.lock() == copy->m_settings.at(0).m_addonSettings);
+  CHECK(registered.lock()->dirty);
+  std::cout << "PASS production addon copy preserves flags, paths, shared dirty owner, separate map/mutex and fresh shared ownership\n";
+  return 0;
+ } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
+}
+'''
 
 
 PRELUDE = r'''

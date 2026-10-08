@@ -260,6 +260,17 @@ CAddon::CAddon(const AddonInfoPtr& addonInfo, AddonType addonType)
 {
 }
 
+#if defined(TARGET_ANDROID)
+CAddon::CAddon(const CAddon& other)
+  : IAddon(other), m_addonInfo(other.m_addonInfo), m_type(other.m_type)
+{
+  // The settings map is per add-on, while its settings trees retain the original
+  // shared identity and checkpoint registration. The new mutex starts unlocked.
+  std::unique_lock<CCriticalSection> settingsLock(other.m_checkpointSettingsMutex);
+  m_settings = other.m_settings;
+}
+#endif
+
 AddonType CAddon::MainType() const
 {
   return m_addonInfo->MainType();

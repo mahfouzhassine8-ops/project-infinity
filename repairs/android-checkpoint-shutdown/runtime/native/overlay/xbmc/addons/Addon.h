@@ -38,6 +38,9 @@ class CAddon : public IAddon
 {
 public:
   explicit CAddon(const AddonInfoPtr& addonInfo, AddonType addonType);
+#if defined(TARGET_ANDROID)
+  CAddon(const CAddon& other);
+#endif
   ~CAddon() override = default;
 
   /**
