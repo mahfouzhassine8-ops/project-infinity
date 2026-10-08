@@ -1,0 +1,7 @@
+Infinity Command Center 0.3.5.14 — Stability / Property Coalescing
+
+Base: exact locked 0.3.5.13.
+Change: Window(Home) properties are written only when the value differs.
+Purpose: reduce redundant GUI invalidation, property-observer churn and accessibility content-change traffic while preserving every published property name/value and existing cadence.
+No Continue Watching, refresh, watchdog, recovery, UI-health, reflow, or player-memory semantics were changed.
+Candidate only until device acceptance.

@@ -1,0 +1,261 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.*;
+import android.content.*;
+import android.content.pm.ServiceInfo;
+import android.os.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.*;
+import org.json.JSONObject;
+
+/** Single Android-owned Normal Close coordinator, outside :kodi. Never executes legacy teardown. */
+public final class InfinityCloseGuardService extends Service {
+  static final long MAX_PROTECTION_MS=150000;
+  static final String CHANNEL="infinity_normal_close_v2";
+  static final int NOTICE=10936,BIND_FLAGS=Context.BIND_IMPORTANT;
+  private final Handler ui=new Handler(Looper.getMainLooper());
+  private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityCheckpointCoordinator");t.setDaemon(true);return t;});
+  private final Object authorityLock=new Object();
+  private boolean binding;
+  private volatile boolean ended,consumed,revoked,checkpointSaved;
+  private volatile String phase="IDLE",error="";
+  private Session session;
+  private InfinityCheckpointProtocol.AuthorizationGate gate;
+  private Messenger engine;
+  private String safeJson="",safeProof="",lastNativeJson="";
+  private long generation;
+  private volatile long safeEpoch,safeElapsed,terminateEpoch,terminateElapsed,consumedEpoch,consumedElapsed,deathEpoch,deathElapsed;
+  static final class Session {
+    final String ticket,owner;final int pid;final long started,epoch;
+    Session(String ticket,String owner,int pid,long started){this.ticket=ticket;this.owner=owner;this.pid=pid;this.started=started;this.epoch=System.currentTimeMillis();}
+    static Session from(Intent intent,long now){
+      if(intent==null)return null;
+      String ticket=intent.getStringExtra(InfinityCloseNativeLease.TICKET),owner=intent.getStringExtra(InfinityCloseNativeLease.TOKEN);
+      int pid=intent.getIntExtra(InfinityCloseNativeLease.PID,-1);long start=intent.getLongExtra(InfinityCloseNativeLease.START,-1);
+      if(!InfinityCheckpointProtocol.uuid(ticket)||!InfinityCheckpointProtocol.uuid(owner)||pid<=0||start<0||now<start||now-start>10000)return null;
+      return new Session(ticket,owner,pid,start);
+    }
+    boolean same(Session other){return other!=null&&pid==other.pid&&ticket.equals(other.ticket)&&owner.equals(other.owner)&&started==other.started;}
+    Bundle bundle(){Bundle b=new Bundle();b.putString(InfinityCloseNativeLease.TICKET,ticket);b.putString(InfinityCloseNativeLease.TOKEN,owner);b.putInt(InfinityCloseNativeLease.PID,pid);return b;}
+  }
+  private boolean inTime(){long now=SystemClock.elapsedRealtime();return session!=null&&now>=session.started&&now-session.started<InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS;}
+  private final Binder authority=new Binder(){
+    @Override protected boolean onTransact(int code,Parcel data,Parcel reply,int flags)throws RemoteException{
+      if(code!=InfinityCheckpointProtocol.CONSUME&&code!=InfinityCheckpointProtocol.CANCEL_FORCE)return super.onTransact(code,data,reply,flags);
+      data.enforceInterface(InfinityCheckpointProtocol.DESCRIPTOR);
+      String ticket=data.readString(),owner=data.readString();int pid=data.readInt();long requestedGeneration=data.readLong();String proof=data.readString();
+      boolean accepted=false;
+      synchronized(authorityLock){
+        if(code==InfinityCheckpointProtocol.CANCEL_FORCE&&Binder.getCallingUid()==android.os.Process.myUid()&&
+            Binder.getCallingPid()==pid&&session!=null&&session.ticket.equals(ticket)&&session.owner.equals(owner)&&session.pid==pid){
+          revoked=true;if(gate!=null)gate.revoke();accepted=true;ui.post(()->fail("explicit_force_close"));
+        }
+        if(code==InfinityCheckpointProtocol.CONSUME&&Binder.getCallingUid()==android.os.Process.myUid()&&Binder.getCallingPid()==pid&&session!=null&&
+            session.ticket.equals(ticket)&&session.owner.equals(owner)&&session.pid==pid&&!ended&&!revoked&&!consumed&&
+            checkpointSaved&&"ENGINE_TERMINATING".equals(phase)&&gate!=null&&
+            gate.consume(ticket,owner,pid,requestedGeneration,proof,SystemClock.elapsedRealtime())){
+          consumed=true;consumedEpoch=System.currentTimeMillis();consumedElapsed=SystemClock.elapsedRealtime();accepted=true;
+        }
+      }
+      if(reply!=null){reply.writeNoException();reply.writeInt(accepted?1:0);}
+      if(accepted)evidence(code==InfinityCheckpointProtocol.CONSUME?"authorization.consumed":"force.explicitly_requested",phase,"");
+      return true;
+    }
+  };
+  private final Messenger replies=new Messenger(new Handler(Looper.getMainLooper(),message->{
+    if(ended||session==null||message.sendingUid!=android.os.Process.myUid()||engine==null||message.replyTo==null||
+        !engine.getBinder().equals(message.replyTo.getBinder())||
+        !InfinityCheckpointProtocol.matches(message.getData(),session.ticket,session.owner,session.pid))return true;
+    String raw=message.getData().getString(InfinityCheckpointProtocol.JSON,"");
+    if(message.what==InfinityCheckpointProtocol.FAILED){fail(raw);return true;}
+    if(message.what!=InfinityCheckpointProtocol.STATUS)return true;
+    if(!inTime()){deadline();return true;}
+    try{
+      JSONObject row=InfinityCheckpointProtocol.status(raw,session.ticket,session.owner,session.pid);
+      lastNativeJson=raw;
+      String reported=row.getString("phase");
+      if("CHECKPOINT_FAILED".equals(reported)){fail(row.optString("error","native_checkpoint_failed"));return true;}
+      if(InfinityCheckpointProtocol.safe(row)){acceptSafe(raw,row);return true;}
+      if("QUIESCE".equals(reported)||"CHECKPOINT_REQUESTED".equals(reported)||"PERSISTING".equals(reported)){
+        if(safeJson.isEmpty()&&!checkpointSaved&&!"ENGINE_TERMINATING".equals(phase)&&!phase.equals(reported))transition(reported,"");
+      }else fail("unknown_native_checkpoint_phase");
+    }catch(Exception invalid){fail("invalid_native_checkpoint_acknowledgement");}
+    return true;
+  }));
+  private final ServiceConnection connection=new ServiceConnection(){
+    @Override public void onServiceConnected(ComponentName name,IBinder binder){
+      if(ended||session==null)return;
+      engine=new Messenger(binder);final Session target=session;
+      worker.execute(()->{
+        boolean alive=false;try{alive=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}catch(IOException unknown){}
+        final boolean held=alive;ui.post(()->{
+          if(ended||session!=target)return;
+          if(!held){fail("engine_owner_lease_not_held");return;}
+          try{
+            transition("CHECKPOINT_REQUESTED","");
+            Message request=Message.obtain(null,InfinityCheckpointProtocol.PREPARE);Bundle data=target.bundle();data.putBinder(InfinityCheckpointProtocol.GATE,authority);
+            request.setData(data);request.replyTo=replies;engine.send(request);
+          }catch(RemoteException lost){fail("checkpoint_request_transport_failed");}
+        });
+      });
+    }
+    @Override public void onServiceDisconnected(ComponentName name){checkOwner();}
+    @Override public void onBindingDied(ComponentName name){checkOwner();}
+    @Override public void onNullBinding(ComponentName name){fail("engine_endpoint_refused");}
+  };
+  @Override public int onStartCommand(Intent intent,int flags,int startId){
+    Session next=Session.from(intent,SystemClock.elapsedRealtime());
+    if(ended){stopSelf(startId);return START_NOT_STICKY;}
+    if(session!=null){if(!session.same(next))evidence("ignored_stale_start",phase,"");return START_NOT_STICKY;}
+    if(next==null){stopSelf(startId);return START_NOT_STICKY;}
+    session=next;
+    gate=new InfinityCheckpointProtocol.AuthorizationGate(next.ticket,next.owner,next.pid,next.started,next.started+InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS);
+    worker.execute(()->{try{File current=new File(getFilesDir(),InfinityCheckpointProtocol.EVIDENCE),previous=new File(getFilesDir(),InfinityCheckpointProtocol.EVIDENCE+".previous");
+      if(current.isFile()){if(previous.isFile())previous.delete();current.renameTo(previous);}}catch(RuntimeException ignored){}});
+    try{
+      NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+      if(Build.VERSION.SDK_INT>=26){NotificationChannel channel=new NotificationChannel(CHANNEL,"Infinity closing",NotificationManager.IMPORTANCE_LOW);
+        channel.setShowBadge(false);channel.setSound(null,null);channel.enableVibration(false);manager.createNotificationChannel(channel);}
+      Notification notice=notice("Preparing to save");
+      if(Build.VERSION.SDK_INT>=34)startForeground(NOTICE,notice,ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE);
+      else if(Build.VERSION.SDK_INT>=29)startForeground(NOTICE,notice,0);else startForeground(NOTICE,notice);
+      transition("QUIESCE","");
+      binding=bindService(new Intent(this,InfinityCloseNativeLease.class),connection,BIND_FLAGS);
+      if(!binding){fail("existing_engine_endpoint_not_bound");return START_NOT_STICKY;}
+      // Shell stays responsive while the native checkpoint runs; do not finish NativeActivity.
+      startActivity(new Intent(this,Splash.class).putExtra("infinity_checkpoint_chooser",true)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));
+      ui.post(poll);ui.postDelayed(this::deadline,Math.max(0,InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS-(SystemClock.elapsedRealtime()-session.started)));
+      ui.postDelayed(()->{if(!ended){error="termination_confirmation_unavailable";evidence("guard_lifetime_expired",phase,error);end();}},MAX_PROTECTION_MS);
+    }catch(RuntimeException denied){fail("coordinator_start_"+denied.getClass().getSimpleName());}
+    return START_NOT_STICKY;
+  }
+  private Notification notice(String message){
+    Intent open=new Intent(this,Splash.class).putExtra("infinity_checkpoint_chooser",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    int flags=PendingIntent.FLAG_UPDATE_CURRENT|(Build.VERSION.SDK_INT>=23?PendingIntent.FLAG_IMMUTABLE:0);
+    Notification.Builder builder=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL):new Notification.Builder(this);
+    if(Build.VERSION.SDK_INT>=31)builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+    return builder.setSmallIcon(R.drawable.notif_icon).setContentTitle("Closing Infinity").setContentText(message)
+        .setProgress(0,0,true).setOngoing(true).setOnlyAlertOnce(true).setShowWhen(true)
+        .setWhen(session.epoch).setCategory(Notification.CATEGORY_PROGRESS).setColor(0xFF39BEE8)
+        .setContentIntent(PendingIntent.getActivity(this,NOTICE,open,flags)).build();
+  }
+  private String presentation(String state){
+    if("QUIESCE".equals(state)||"CHECKPOINT_REQUESTED".equals(state))return "Preparing to save";
+    if("PERSISTING".equals(state))return "Saving your progress and settings";
+    if("SAFE_TO_TERMINATE".equals(state)||"ENGINE_TERMINATING".equals(state))return "Saved — closing engine";
+    if("COMPLETE".equals(state))return "Infinity is ready";
+    return "Save could not be confirmed — recovery available";
+  }
+  private void transition(String next,String detail){
+    if(ended)return;
+    phase=next;error=detail;
+    present(next);
+    evidence("phase."+next,next,detail);
+    final JSONObject row=receipt(next,detail);worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),row);}catch(IOException unavailable){ui.post(()->fail("coordinator_receipt_write_failed"));}});
+  }
+  private void present(String next){
+    InfinityCloseProgress.display=new InfinityCloseProgress.Display(session.pid,session.owner,session.started,next,presentation(next),false);
+    try{((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(NOTICE,notice(presentation(next)));}catch(RuntimeException ignored){}
+  }
+  private JSONObject receipt(String state,String detail){
+    JSONObject row=new JSONObject();try{
+      row.put("schema",1);row.put("session",session.ticket);row.put("owner",session.owner);row.put("pid",session.pid);
+      row.put("started_elapsed_ms",session.started);row.put("started_epoch_ms",session.epoch);
+      row.put("updated_epoch_ms",System.currentTimeMillis());row.put("updated_elapsed_ms",SystemClock.elapsedRealtime());
+      row.put("phase",state);row.put("error",detail);row.put("generation",generation);
+      row.put("checkpoint_saved",checkpointSaved);row.put("authorization_consumed",consumed);
+      row.put("safe_epoch_ms",safeEpoch);row.put("safe_elapsed_ms",safeElapsed);
+      row.put("terminate_requested_epoch_ms",terminateEpoch);row.put("terminate_requested_elapsed_ms",terminateElapsed);
+      row.put("authorization_consumed_epoch_ms",consumedEpoch);row.put("authorization_consumed_elapsed_ms",consumedElapsed);
+      row.put("engine_death_epoch_ms",deathEpoch);row.put("engine_death_elapsed_ms",deathElapsed);
+      row.put("total_duration_ms",Math.max(0,(deathElapsed>0?deathElapsed:SystemClock.elapsedRealtime())-session.started));
+      if(!lastNativeJson.isEmpty())row.put("last_native_status",new JSONObject(lastNativeJson));
+      if(!safeJson.isEmpty()){row.put("native_receipt",new JSONObject(safeJson));row.put("native_json",safeJson);row.put("native_proof_sha256",safeProof);}
+    }catch(Exception impossible){throw new IllegalStateException(impossible);}return row;
+  }
+  private void acceptSafe(String raw,JSONObject nativeReceipt)throws Exception{
+    if(checkpointSaved||"SAFE_TO_TERMINATE".equals(phase)||"ENGINE_TERMINATING".equals(phase))return;
+    safeJson=raw;safeProof=InfinityCheckpointProtocol.proof(raw);generation=nativeReceipt.getLong("generation");
+    safeEpoch=System.currentTimeMillis();safeElapsed=SystemClock.elapsedRealtime();
+    phase="SAFE_TO_TERMINATE";
+    // Durable coordinator receipt must precede the engine-termination command. No stale write can pass.
+    final JSONObject durable=receipt("SAFE_TO_TERMINATE","");durable.put("checkpoint_saved",true);
+    worker.execute(()->{
+      try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),durable);}
+      catch(IOException unavailable){ui.post(()->fail("checkpoint_receipt_commit_failed"));return;}
+      ui.post(()->{
+        if(ended||revoked||!inTime()){deadline();return;}
+        synchronized(authorityLock){checkpointSaved=true;phase="ENGINE_TERMINATING";terminateEpoch=System.currentTimeMillis();terminateElapsed=SystemClock.elapsedRealtime();}
+        evidence("checkpoint.safe_to_terminate","SAFE_TO_TERMINATE","");
+        present("ENGINE_TERMINATING");
+        final JSONObject dispatched=receipt("ENGINE_TERMINATING","");
+        worker.execute(()->{
+          try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),dispatched);}
+          catch(IOException unavailable){ui.post(()->fail("termination_receipt_commit_failed"));return;}
+          ui.post(()->{
+            if(ended||revoked||!inTime()){deadline();return;}
+            if(!gate.arm(generation,safeProof,SystemClock.elapsedRealtime())){fail("termination_authority_arm_rejected");return;}
+            try{
+              Message command=Message.obtain(null,InfinityCheckpointProtocol.TERMINATE);Bundle data=session.bundle();
+              data.putLong(InfinityCheckpointProtocol.GENERATION,generation);data.putString(InfinityCheckpointProtocol.PROOF,safeProof);
+              command.setData(data);command.replyTo=replies;engine.send(command);
+            }catch(RemoteException unavailable){fail("termination_command_transport_failed");}
+          });
+        });
+      });
+    });
+  }
+  private final Runnable poll=new Runnable(){public void run(){if(ended)return;checkOwner();ui.postDelayed(this,250);}};
+  private void checkOwner(){
+    if(ended||session==null)return;final Session target=session;
+    worker.execute(()->{
+      Boolean alive=null;try{alive=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}catch(IOException unknown){}
+      final Boolean result=alive;ui.post(()->{
+        if(ended||session!=target||!Boolean.FALSE.equals(result))return;
+        if(checkpointSaved&&!revoked&&("ENGINE_TERMINATING".equals(phase)||"SAFE_TO_TERMINATE".equals(phase))){
+          deathEpoch=System.currentTimeMillis();deathElapsed=SystemClock.elapsedRealtime();
+          phase="COMPLETE";error="";final JSONObject done=receipt("COMPLETE","");
+          worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),done);}
+            catch(IOException unavailable){evidence("completion_receipt_failed","COMPLETE","");}
+            ui.post(()->{evidence("engine.owner_lease_released","COMPLETE","");end();});});
+        }else fail("engine_ended_without_checkpoint_acknowledgement");
+      });
+    });
+  }
+  private void deadline(){
+    synchronized(authorityLock){
+      if(ended||"COMPLETE".equals(phase))return;
+      if(consumed){error="termination_confirmation_pending";evidence("deadline_after_authorization",phase,error);return;}
+    }
+    fail("checkpoint_deadline_exceeded");
+  }
+  private void fail(String reason){
+    synchronized(authorityLock){if(ended||"COMPLETE".equals(phase)||"CHECKPOINT_FAILED".equals(phase))return;revoked=true;if(gate!=null)gate.revoke();phase="CHECKPOINT_FAILED";error=reason;}
+    evidence("checkpoint.failed",phase,reason);final JSONObject failed=receipt("CHECKPOINT_FAILED",reason);
+    worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),failed);}catch(IOException ignored){}
+      ui.post(()->{InfinityCloseProgress.display=new InfinityCloseProgress.Display(session.pid,session.owner,session.started,"CHECKPOINT_FAILED",presentation("CHECKPOINT_FAILED"),true);end();});});
+  }
+  private void evidence(String event,String state,String detail){
+    if(session==null)return;final Session target=session;final long epoch=System.currentTimeMillis(),elapsed=SystemClock.elapsedRealtimeNanos();
+    try{worker.execute(()->{try{
+      File file=new File(getFilesDir(),InfinityCheckpointProtocol.EVIDENCE);if(file.length()>128*1024)return;
+      JSONObject row=new JSONObject();row.put("schema",1);row.put("session",target.ticket);row.put("owner",target.owner);row.put("pid",target.pid);
+      row.put("event",event);row.put("phase",state);row.put("detail",detail);row.put("epoch_ms",epoch);row.put("elapsed_ns",elapsed);
+      try(FileOutputStream out=new FileOutputStream(file,true)){out.write((row.toString()+"\n").getBytes(StandardCharsets.UTF_8));}
+    }catch(Exception ignored){}});}catch(RejectedExecutionException ignored){}
+  }
+  private void end(){
+    synchronized(authorityLock){if(ended)return;ended=true;revoked=true;if(gate!=null)gate.revoke();}
+    ui.removeCallbacksAndMessages(null);
+    if(binding){binding=false;try{unbindService(connection);}catch(RuntimeException ignored){}}
+    try{stopService(new Intent(this,InfinityCloseNativeLease.class));}catch(RuntimeException ignored){}
+    stopForeground(true);stopSelf();
+  }
+  @Override public IBinder onBind(Intent intent){return null;}
+  @Override public void onTimeout(int startId){deadline();end();}
+  @Override public void onTimeout(int startId,int type){deadline();end();}
+  @Override public void onDestroy(){end();worker.shutdown();super.onDestroy();}
+}

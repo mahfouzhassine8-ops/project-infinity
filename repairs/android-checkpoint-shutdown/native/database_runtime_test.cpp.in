@@ -1,0 +1,294 @@
+#include "InfinityDatabaseBarrier.h"
+#if __has_include(<sqlite3.h>)
+#include <sqlite3.h>
+#else
+extern "C" {
+struct sqlite3; struct sqlite3_stmt;
+int sqlite3_open(const char*, sqlite3**);
+int sqlite3_close(sqlite3*);
+int sqlite3_exec(sqlite3*, const char*, int (*)(void*, int, char**, char**), void*, char**);
+int sqlite3_get_autocommit(sqlite3*);
+const char* sqlite3_errmsg(sqlite3*);
+const char* sqlite3_libversion();
+int sqlite3_busy_timeout(sqlite3*, int);
+int sqlite3_set_authorizer(sqlite3*, int (*)(void*, int, const char*, const char*, const char*, const char*), void*);
+void sqlite3_free(void*);
+int sqlite3_prepare_v2(sqlite3*, const char*, int, sqlite3_stmt**, const char**);
+int sqlite3_step(sqlite3_stmt*);
+int sqlite3_finalize(sqlite3_stmt*);
+int sqlite3_column_count(sqlite3_stmt*);
+const char* sqlite3_column_name(sqlite3_stmt*, int);
+int sqlite3_column_type(sqlite3_stmt*, int);
+long long sqlite3_column_int64(sqlite3_stmt*, int);
+double sqlite3_column_double(sqlite3_stmt*, int);
+const unsigned char* sqlite3_column_text(sqlite3_stmt*, int);
+int sqlite3_column_bytes(sqlite3_stmt*, int);
+}
+constexpr int SQLITE_OK=0, SQLITE_DENY=1, SQLITE_MISUSE=21, SQLITE_READ=20,
+ SQLITE_SELECT=21, SQLITE_FUNCTION=31, SQLITE_ROW=100, SQLITE_DONE=101,
+ SQLITE_INTEGER=1, SQLITE_FLOAT=2, SQLITE_TEXT=3, SQLITE_BLOB=4, SQLITE_NULL=5;
+#endif
+#include <atomic>
+#include <cstdarg>
+#include <cstdio>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <vector>
+
+namespace InfinityShutdownTrace { struct Scope { Scope(const char*, int, const void*, const void*) {} }; }
+constexpr int LOGERROR=1;
+struct CLog { template<typename... Args> static void Log(int, const char*, Args&&...) {} };
+class DbErrors {
+  std::string error;
+public:
+  explicit DbErrors(const char* format, ...) {
+    char message[2048]; va_list args; va_start(args,format);
+    std::vsnprintf(message,sizeof(message),format,args); va_end(args); error=message;
+  }
+  const char* getMsg() const { return error.c_str(); }
+};
+class SqliteDatabase {
+public:
+  sqlite3* conn=nullptr; bool active=false; bool _in_transaction=false;
+  std::string error;
+  int InfinityExecute(const char*,int (*)(void*,int,char**,char**),void*,char**);
+  void InfinityRefreshTransaction();
+  static int InfinityAuthorize(void*,int,const char*,const char*,const char*,const char*);
+  void start_transaction(); void commit_transaction(); void rollback_transaction();
+  bool in_transaction() { return _in_transaction; }
+  int setErr(int code,const char* query) {
+    if(code!=SQLITE_OK && code!=SQLITE_ROW && code!=SQLITE_DONE)
+      InfinityDatabaseBarrier::RecordFailure("test.sqlite.result");
+    error=std::string(query)+": "+sqlite3_errmsg(conn); return code;
+  }
+  const char* getErrorMsg() { return error.c_str(); }
+};
+struct field_value {
+  std::string value;
+  void set_asInt64(long long v) {value=std::to_string(v);}
+  void set_asDouble(double v) {value=std::to_string(v);}
+  void set_asString(const char* s,int count) {value=s ? std::string(s,static_cast<size_t>(count)) : "";}
+  void set_asString(const char* s) {value=s;}
+  void set_isNull() {}
+};
+using sql_record=std::vector<field_value>;
+using StringList=std::vector<std::string>;
+struct Header {std::string name;};
+struct Result {
+  std::vector<Header> record_header;
+  std::vector<sql_record*> records;
+  void clear() { for(auto* row:records) delete row; records.clear(); record_header.clear(); }
+  ~Result(){clear();}
+};
+constexpr int dsInactive=0, dsSelect=1, dsInsert=2, dsEdit=3, dsDelete=4;
+struct Dataset {
+  int ds_state=dsInactive;
+  static void parse_sql(std::string&) {}
+  virtual void make_insert()=0;
+  virtual void make_edit()=0;
+  virtual void make_deletion()=0;
+  void post(); void del(); void deletion();
+};
+int callback(void*,int,char**,char**) { return 0; }
+class SqliteDataset:public Dataset {
+public:
+  explicit SqliteDataset(SqliteDatabase* connection):db(connection){}
+  SqliteDatabase* db;
+  std::vector<int> exec_res;
+  Result result;
+  bool active=false, autocommit=true, autorefresh=false;
+  StringList inserts,deletes;
+  sqlite3* handle(){return db ? db->conn : nullptr;}
+  int exec(const std::string&);
+  bool query(const std::string&);
+  void make_query(StringList&);
+  void close(){result.clear();ds_state=dsInactive;active=false;}
+  void first(){}
+  void refresh(){}
+  void insert(){ds_state=dsInsert;}
+  void add_insert_sql(const std::string& s){inserts.push_back(s);}
+  void add_delete_sql(const std::string& s){deletes.push_back(s);}
+  void clear_insert_sql(){inserts.clear();}
+  void clear_delete_sql(){deletes.clear();}
+  void make_insert() override {make_query(inserts);}
+  void make_edit() override {throw std::runtime_error("unused dataset edit");}
+  void make_deletion() override {make_query(deletes);}
+};
+class CDatabase {
+public:
+  explicit CDatabase(SqliteDatabase* db):m_pDB(db),m_pDS(new SqliteDataset(db)),m_pDS2(new SqliteDataset(db)){}
+  ~CDatabase(){InfinityDatabaseBarrier::ForgetOwner(this);}
+  SqliteDatabase* m_pDB;
+  std::unique_ptr<SqliteDataset> m_pDS,m_pDS2;
+  bool m_multipleExecute=false,m_bMultiInsert=false,m_bMultiDelete=false;
+  std::vector<std::string> m_multipleQueries;
+  void InfinityUpdateQueued();
+  bool BeginMultipleExecute(); bool CommitMultipleExecute();
+  bool ExecuteQuery(const std::string&);
+  bool QueueInsertQuery(const std::string&); bool CommitInsertQueries();
+  bool QueueDeleteQuery(const std::string&); bool CommitDeleteQueries();
+  void BeginTransaction(); bool CommitTransaction(); void RollbackTransaction();
+};
+
+// @PRODUCTION_FUNCTIONS@
+
+void require(bool condition,const char* message){if(!condition)throw std::runtime_error(message);}
+struct Connection:SqliteDatabase {
+  explicit Connection(const std::string& path=":memory:") {
+    require(sqlite3_open(path.c_str(),&conn)==SQLITE_OK,"open");active=true;
+    require(sqlite3_set_authorizer(conn,InfinityAuthorize,this)==SQLITE_OK,"authorizer");
+    sqlite3_busy_timeout(conn,0);
+  }
+  ~Connection(){
+    sqlite3_set_authorizer(conn,nullptr,nullptr);
+    if(!sqlite3_get_autocommit(conn))sqlite3_exec(conn,"ROLLBACK",nullptr,nullptr,nullptr);
+    sqlite3_close(conn);conn=nullptr;active=false;
+    InfinityRefreshTransaction();InfinityDatabaseBarrier::ForgetOwner(this);
+  }
+};
+void sql(SqliteDatabase& db,const char* statement){
+  if(db.InfinityExecute(statement,nullptr,nullptr,nullptr)!=SQLITE_OK)
+    throw std::runtime_error(std::string(statement)+": "+sqlite3_errmsg(db.conn));
+}
+int rows(SqliteDatabase& db){
+  int count=-1;
+  require(db.InfinityExecute("SELECT count(*) FROM items",[](void* out,int,char** data,char**)->int{
+    *static_cast<int*>(out)=std::stoi(data[0]);return 0;
+  },&count,nullptr)==SQLITE_OK,"read count");return count;
+}
+uint64_t generation=0;
+uint64_t begin(){++generation;require(InfinityDatabaseBarrier::Begin(generation),"begin checkpoint");return generation;}
+void end(uint64_t session){require(InfinityDatabaseBarrier::End(session),"end checkpoint");}
+int main(int argc,char** argv){
+  require(argc==2,"scratch directory expected");
+  const std::string directory=argv[1];
+  int failures=0;
+  auto run=[&](const char* name,std::function<void()> test){
+    try{test();std::cout<<"PASS "<<name<<'\n';}
+    catch(const DbErrors& e){++failures;std::cout<<"FAIL "<<name<<": "<<e.getMsg()<<'\n';}
+    catch(const std::exception& e){++failures;std::cout<<"FAIL "<<name<<": "<<e.what()<<'\n';}
+  };
+  run("idle_connections_and_reads_are_clean",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");
+    auto session=begin();require(InfinityDatabaseBarrier::GetSnapshot().Ready(),"idle connection blocked");
+    SqliteDataset dataset(&connection);require(dataset.query("SELECT * FROM items"),"ordinary query rejected");
+    require(rows(connection)==0,"read failed");require(InfinityDatabaseBarrier::GetSnapshot().Ready(),"read left dirty state");end(session);
+  });
+  run("late_exec_and_mutable_query_are_fenced",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");
+    auto session=begin();SqliteDataset dataset(&connection);
+    bool rejected=false;try{dataset.exec("/* comment */ INSERT INTO items VALUES(1)");}catch(const DbErrors&){rejected=true;}
+    require(rejected,"late exec mutated");
+    rejected=false;try{dataset.query("INSERT INTO items SELECT 2 RETURNING value");}catch(const DbErrors&){rejected=true;}
+    require(rejected,"mutable query bypassed gate");require(rows(connection)==0,"rejected SQL persisted");
+    auto state=InfinityDatabaseBarrier::GetSnapshot();require(state.failures>0 && state.rejectedWrites>=2,"rejections not sticky");
+    require(!InfinityDatabaseBarrier::Seal(session),"failed session sealed");end(session);
+  });
+  run("checkpoint_permission_is_thread_bound",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");auto session=begin();
+    {InfinityDatabaseBarrier::CheckpointWriteScope permit(session);require(permit.IsValid(),"permission invalid");
+      SqliteDataset dataset(&connection);dataset.exec("INSERT INTO items VALUES(1)");
+      std::atomic<int> result{SQLITE_OK};std::thread other([&]{result=connection.InfinityExecute("INSERT INTO items VALUES(2)",nullptr,nullptr,nullptr);});other.join();
+      require(result!=SQLITE_OK,"permission escaped to other thread");}
+    require(rows(connection)==1,"authorized write incorrect");require(!InfinityDatabaseBarrier::GetSnapshot().Ready(),"late writer was ignored");end(session);
+  });
+  run("swallowed_sql_error_remains_sticky",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER UNIQUE); INSERT INTO items VALUES(1)");auto session=begin();
+    {InfinityDatabaseBarrier::CheckpointWriteScope permit(session);CDatabase database(&connection);
+      require(!database.ExecuteQuery("INSERT INTO items VALUES(1)"),"query error reported success");
+      require(database.ExecuteQuery("INSERT INTO items VALUES(2)"),"ordinary subsequent write failed");}
+    require(rows(connection)==2,"ordinary authorized work changed");
+    require(InfinityDatabaseBarrier::GetSnapshot().failures>0,"caught SQL error disappeared");require(!InfinityDatabaseBarrier::Seal(session),"failed query session sealed");end(session);
+  });
+  run("accepted_transaction_must_finish_before_ready",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");connection.start_transaction();
+    auto session=begin();require(InfinityDatabaseBarrier::GetSnapshot().activeTransactions==1,"active txn missing");
+    require(!InfinityDatabaseBarrier::Seal(session),"live transaction sealed");
+    sql(connection,"INSERT INTO items VALUES(1)");connection.commit_transaction();
+    require(InfinityDatabaseBarrier::GetSnapshot().Ready(),"completed transaction not drained");end(session);
+  });
+  run("busy_commit_preserves_transaction_and_failure",[&]{
+    const std::string path=directory+"/runtime-busy.db";Connection writer(path),reader(path);
+    sql(writer,"PRAGMA journal_mode=DELETE; CREATE TABLE items(value INTEGER); INSERT INTO items VALUES(1)");
+    sql(reader,"BEGIN; SELECT * FROM items");writer.start_transaction();sql(writer,"INSERT INTO items VALUES(2)");
+    auto session=begin();CDatabase database(&writer);require(!database.CommitTransaction(),"busy commit escaped");
+    require(writer._in_transaction && !sqlite3_get_autocommit(writer.conn),"busy transaction lost");
+    sql(reader,"COMMIT");require(database.CommitTransaction(),"retry failed");require(rows(writer)==2,"retry lost data");
+    require(InfinityDatabaseBarrier::GetSnapshot().failures>0,"failure cleared by retry");end(session);
+  });
+  run("accepted_insert_delete_and_multiple_queues_drain",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");CDatabase database(&connection);
+    require(database.QueueInsertQuery("INSERT INTO items VALUES(1)"),"queue insert");
+    require(database.QueueDeleteQuery("DELETE FROM items WHERE value=9"),"queue delete");
+    require(database.BeginMultipleExecute(),"begin batch");require(database.ExecuteQuery("INSERT INTO items VALUES(2)"),"queue batch");
+    auto session=begin();require(InfinityDatabaseBarrier::GetSnapshot().queuedOwners==1,"buffers absent");
+    require(!InfinityDatabaseBarrier::Seal(session),"pending queue sealed");
+    require(database.CommitInsertQueries() && database.CommitDeleteQueries() && database.CommitMultipleExecute(),"accepted buffers failed drain");
+    require(rows(connection)==2,"drain failed persistence");require(InfinityDatabaseBarrier::GetSnapshot().Ready(),"drained queue remained dirty");end(session);
+  });
+  run("failed_queue_stays_pending_and_late_queue_rejects",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER UNIQUE); INSERT INTO items VALUES(1)");CDatabase database(&connection);
+    require(database.QueueInsertQuery("INSERT INTO items VALUES(1)"),"queue");auto session=begin();
+    require(!database.CommitInsertQueries(),"bad queue reported success");
+    require(InfinityDatabaseBarrier::GetSnapshot().queuedOwners==1,"failed buffer discarded");
+    require(!database.QueueDeleteQuery("DELETE FROM items"),"late buffer accepted");
+    require(!InfinityDatabaseBarrier::Seal(session),"bad buffer sealed");end(session);
+    database.m_pDS2->inserts.clear();require(database.CommitInsertQueries(),"fixture recovery drain");
+  });
+  run("intervening_reads_cannot_discard_queued_writes",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER); INSERT INTO items VALUES(9)");CDatabase database(&connection);
+    require(database.QueueInsertQuery("INSERT INTO items VALUES(1)"),"queue insert");
+    require(database.QueueDeleteQuery("DELETE FROM items WHERE value=9"),"queue delete");
+    require(database.m_pDS2->query("SELECT * FROM items"),"intervening insert-dataset read");
+    require(database.m_pDS->query("SELECT * FROM items"),"intervening delete-dataset read");
+    auto session=begin();
+    require(database.CommitInsertQueries() && database.CommitDeleteQueries(),"buffers failed drain");
+    require(rows(connection)==1,"dataset state silently discarded queued SQL");
+    require(database.m_pDS->query("SELECT value FROM items"),"readback");
+    require(database.m_pDS->result.records.at(0)->at(0).value=="1","wrong row survived deletion");
+    require(InfinityDatabaseBarrier::GetSnapshot().Ready(),"drained queue dirty");end(session);
+  });
+  run("queue_begin_failure_preserves_existing_transaction",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");CDatabase database(&connection);
+    require(database.QueueInsertQuery("INSERT INTO items VALUES(2)"),"queue insert");
+    require(database.BeginMultipleExecute() && database.ExecuteQuery("INSERT INTO items VALUES(3)"),"queue batch");
+    connection.start_transaction();sql(connection,"INSERT INTO items VALUES(1)");
+    auto session=begin();
+    require(!database.CommitInsertQueries(),"nested dataset begin reported success");
+    require(connection._in_transaction && rows(connection)==1,"dataset rolled back another owner's transaction");
+    require(!database.CommitMultipleExecute(),"nested batch begin reported success");
+    require(connection._in_transaction && rows(connection)==1,"batch committed or modified another owner's transaction");
+    require(InfinityDatabaseBarrier::GetSnapshot().queuedOwners==1,"failed queue discarded");
+    connection.commit_transaction();end(session);
+    require(database.CommitInsertQueries() && database.CommitMultipleExecute(),"owner retry failed");
+    require(rows(connection)==3,"retry did not preserve all accepted data");
+  });
+  run("inflight_operation_prevents_seal",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");
+    std::atomic<bool> entered{false},release{false};
+    std::pair<std::atomic<bool>*,std::atomic<bool>*> flags{&entered,&release};
+    std::thread reader([&]{
+      connection.InfinityExecute("SELECT 1",[](void* context,int,char**,char**)->int{
+        auto* flags=static_cast<std::pair<std::atomic<bool>*,std::atomic<bool>*>*>(context);
+        *flags->first=true;while(!*flags->second)std::this_thread::yield();return 0;
+      },&flags,nullptr);
+    });
+    while(!entered)std::this_thread::yield();
+    auto session=begin();
+    bool refused=!InfinityDatabaseBarrier::Seal(session);release=true;reader.join();
+    require(refused,"executing SQL sealed");require(InfinityDatabaseBarrier::GetSnapshot().Ready(),"finished read not drained");end(session);
+  });
+  run("sealed_gate_is_irreversible_and_rejects_late_write",[&]{
+    Connection connection;sql(connection,"CREATE TABLE items(value INTEGER)");auto session=begin();
+    require(InfinityDatabaseBarrier::Seal(session),"clean seal failed");
+    require(!InfinityDatabaseBarrier::End(session),"sealed gate reopened");
+    InfinityDatabaseBarrier::CheckpointWriteScope permit(session);require(!permit.IsValid(),"post-seal permission granted");
+    require(connection.InfinityExecute("INSERT INTO items VALUES(1)",nullptr,nullptr,nullptr)!=SQLITE_OK,"post-seal write accepted");
+    require(rows(connection)==0,"post-seal mutation occurred");
+  });
+  std::cout<<"SQLite "<<sqlite3_libversion()<<"; failures="<<failures<<'\n';return failures?1:0;
+}

@@ -4,11 +4,11 @@ This work starts from the delivered **2103335 Native Trace Bridge RC1** source
 revision `515992ed6ac98a365bb75f42c117007ae94c2aed`. Its native engine is the
 2103334 engine. Neither candidate is accepted as a shutdown repair.
 
-**Status: source implementation prerequisites, not an integrated shutdown or an
-installable candidate.** The new components in this directory must not be used
-to authorize process termination until the integration obligations below are
-met. No runtime route, APK version, signing identity, installed skin, or user
-data is changed by adding these sources.
+**Status: runtime integration on the isolated work branch; build and device
+acceptance remain open.** `runtime/` contains the actual Android, native and
+Command Center source overlays, each with a complete protected parent manifest
+and enumerated postimages. These are not a locked candidate or a device-ready
+APK. Unknown persistence owners explicitly prevent a safe acknowledgment.
 
 ## Contract
 
@@ -25,8 +25,9 @@ leaves the engine running and explicitly exposes recovery. Force Close remains
 a separate user action. A timer, lifecycle callback, missing PID, native teardown
 receipt, or completed IPC send cannot substitute for a persistence acknowledgment.
 
-The supplied brief ends at item 7, “verify those operations returned”. No
-unseen continuation is assumed.
+The continuation of the brief authorizes publication to the separate shutdown
+work branch only. It does not authorize merging to main, replacing the rollback
+lineage, locking the architecture, or distributing a device-ready APK.
 
 ## Parent evidence
 
@@ -49,7 +50,7 @@ InfinityPowerControlActivity, InfinityCloseNativeLease and the continuity
 service in `:kodi`. Splash, Cobra and InfinityCloseGuardService remain in the
 default process. A new process split is unnecessary.
 
-The current close route is:
+The preserved parent close route was:
 
 1. InfinityPowerControlActivity calls InfinityExitCompletion.requestNormal.
 2. InfinityCloseNativeLease acquires a ticket and starts the default-process guard.
@@ -58,21 +59,24 @@ The current close route is:
 4. InfinityExitCompletion.guardedReady sends Application.Quit.
 5. Native activity destruction enters the legacy shutdown chain.
 
-Replace the fourth step with the new checkpoint protocol. Keep Main alive until
-the checkpoint succeeds. An early finish/remove-task would reenter the very
-teardown dependency this architecture removes. The old afterStop dispatch and
-Activity-local Plan cannot remain competing authoritative owners.
+The runtime overlay replaces the fourth step with asynchronous JNI request,
+status and one-shot termination authorization. Main stays alive during the
+checkpoint. The default-process guard writes the matched persistence receipt,
+then authorizes the bound `:kodi` endpoint; that endpoint rechecks native safety
+immediately before terminating itself. The old afterStop dispatch and
+Activity-local Plan no longer certify Normal Close.
 
-InfinityKodiShutdown currently calls completion only after an owner lease is
-released and a matching `native.CXBMCApp.Destroy.complete` receipt exists. The
-new path needs a distinct, session-bound persistence receipt plus engine-death
-evidence. Never forge a destructor completion receipt. Chooser and Health Center
-must report which completion proof was used.
+The parent InfinityKodiShutdown called completion only after an owner lease was
+released and a matching `native.CXBMCApp.Destroy.complete` receipt existed. The
+new route uses a distinct session-bound persistence receipt plus observed
+engine death. It never forges a destructor receipt. Chooser and Health Center
+identify checkpoint completion and the blocking persistence owner on failure.
 
 ## Runtime integration obligations
 
-The staged components are deliberately disconnected until the following work
-is complete. Tests of these components do not certify these obligations.
+The following are the review obligations for the runtime integration. Source
+and host-test results do not by themselves certify native ABI compilation,
+packaging, installed-owner coverage or physical-device behavior.
 
 1. Wire the Java transaction to the default-process guard, its existing Messenger
    binding, durable coordinator receipts, chooser snapshots and engine-death
@@ -106,6 +110,32 @@ is complete. Tests of these components do not certify these obligations.
 
 The coordinator may not classify missing instrumentation as a clean owner.
 There is no production adapter that returns SAFE unconditionally in this patch.
+
+## Implemented runtime scope and remaining coverage
+
+The integration includes the resident Android coordinator, authenticated Binder
+consumption gate, explicit JNI operations, player-thread freeze and checked final
+playback writes, real SQLite transaction/queued-write accounting, atomic checked
+XML saves with metadata preservation, loaded add-on/skin settings participation,
+favorites/peripheral save owners, and the actual resident Command Center service
+and plugin write paths. Force Close remains a separate recovery action.
+
+The Command Center update changes only eight code files. Its version, settings
+schema, skin-upgrade code and UI resources remain unchanged. A pre-native
+installer verifies all original or retry postimages before applying the pinned
+payload; its journal permits rollback/recovery without touching user data.
+
+Unaudited foreign Python/private binary add-on writers, unsupported player
+backends and uncovered active PVR owners are explicit coverage gaps. Script exit,
+thread disappearance and elapsed deadlines are not persistence acknowledgments.
+The current work must not be declared accepted while required installed owners
+lack a checked participant or an audited nonpersistent classification.
+
+`native_ci.py` reconstructs the complete inherited Infinity engine recipe before
+applying the reviewed overlay and protects all 9,374 parent source inputs.
+`android_ci.py` compiles the complete current shell as a non-distributed donor.
+The work-branch workflow does not publish an APK or alter accepted refs. Build
+success is separate from the Fold and dirty-state acceptance matrix below.
 
 ## Acceptance evidence required before an APK is called a fix
 

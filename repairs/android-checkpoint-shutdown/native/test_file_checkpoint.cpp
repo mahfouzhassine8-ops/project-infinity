@@ -58,7 +58,7 @@ enum class Failure
 {
   None, Write, ZeroWrite, SyncTemporary, SyncExisting, SyncDirectory,
   Rename, CloseTemporary, CloseExisting, CloseFinalDirectory, Read, Chmod,
-  Create, OpenExisting, Stat, Unlink,
+  Create, OpenExisting, Stat, Unlink, ListAttributes, SetAttribute,
 };
 
 class TestIo : public file::PosixIo
@@ -139,6 +139,14 @@ public:
     if (Interrupt("chmod"))
       return -1;
     return failure == Failure::Chmod ? Fail(EPERM) : PosixIo::Chmod(fd, mode);
+  }
+  ssize_t ListAttributes(int fd, char* names, size_t size) override
+  {
+    return failure == Failure::ListAttributes ? Fail(EACCES) : PosixIo::ListAttributes(fd, names, size);
+  }
+  int SetAttribute(int fd, const char* name, const void* value, size_t size) override
+  {
+    return failure == Failure::SetAttribute ? Fail(EPERM) : PosixIo::SetAttribute(fd, name, value, size);
   }
   int Sync(int fd) override
   {
@@ -231,6 +239,40 @@ void MatchingDirtyFileIsSyncedWithoutRewrite()
     CHECK(io.writes == 0 && io.temporaryCreates == 0 && io.renames == 0);
     CHECK(io.fileSyncs == 1 && io.directorySyncs == 1);
     CHECK(io.descriptors.empty());
+  }
+}
+
+void ExtendedAttributesAndOwnershipSurviveReplacement()
+{
+  Fixture f;
+  f.Seed("old");
+  const char value[] = "private-checkpoint-metadata";
+  CHECK(::setxattr(f.path.c_str(), "user.infinity.test", value, sizeof(value), 0) == 0);
+  CHECK(::setxattr(f.path.c_str(), "user.infinity.empty", "", 0, 0) == 0);
+  const auto before = f.Stat();
+  CHECK(file::SaveDirty(f.path, "replacement").ok);
+  CHECK(f.Stat().st_uid == before.st_uid && f.Stat().st_gid == before.st_gid);
+  char actual[sizeof(value)]{};
+  CHECK(::getxattr(f.path.c_str(), "user.infinity.test", actual, sizeof(actual)) == sizeof(value));
+  CHECK(std::memcmp(actual, value, sizeof(value)) == 0);
+  CHECK(::getxattr(f.path.c_str(), "user.infinity.empty", nullptr, 0) == 0);
+  f.NoTemporaries();
+}
+
+void MetadataFailureNeverReplacesOriginal()
+{
+  for (const Failure failure : {Failure::ListAttributes, Failure::SetAttribute})
+  {
+    Fixture f;
+    f.Seed("old");
+    CHECK(::setxattr(f.path.c_str(), "user.infinity.test", "saved", 5, 0) == 0);
+    TestIo io;
+    io.failure = failure;
+    const auto result = file::SaveDirty(f.path, "replacement", io);
+    CHECK(!result.ok && !result.renameAttempted && io.renames == 0);
+    CHECK(result.stage == (failure == Failure::ListAttributes ? file::Stage::ReadMetadata : file::Stage::PreserveMetadata));
+    CHECK(f.Content() == "old" && io.descriptors.empty());
+    f.NoTemporaries();
   }
 }
 
@@ -401,6 +443,8 @@ int main()
   {
     ReplaceAndPreserveMode();
     MatchingDirtyFileIsSyncedWithoutRewrite();
+    ExtendedAttributesAndOwnershipSurviveReplacement();
+    MetadataFailureNeverReplacesOriginal();
     NewFileUsesPrivateMode();
     FailuresBeforeRenamePreserveOriginal();
     RenameFailureIsNotAcknowledged();

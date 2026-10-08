@@ -1,0 +1,100 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.os.Bundle;
+import android.os.IBinder;
+import android.util.AtomicFile;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HashSet;
+import org.json.*;
+
+/** Shared wire validation only. Neither a lifecycle observation nor a timer is save proof. */
+final class InfinityCheckpointProtocol {
+  static final int PREPARE=333601, STATUS=333602, TERMINATE=333603, FAILED=333604;
+  static final int CONSUME=IBinder.FIRST_CALL_TRANSACTION+36;
+  static final int CANCEL_FORCE=IBinder.FIRST_CALL_TRANSACTION+37;
+  static final String DESCRIPTOR="@APP_PACKAGE@.InfinityCheckpointAuthority.v1";
+  static final String GATE="checkpoint_authority", JSON="checkpoint_json", GENERATION="checkpoint_generation", PROOF="checkpoint_proof";
+  static final String RECEIPT="infinity-checkpoint-close.json", EVIDENCE="infinity-android-checkpoint.jsonl";
+  static final long CHECKPOINT_TIMEOUT_MS=30000;
+  /** Actual Binder authorization state; platform-independent so revoke/consume races are host-tested. */
+  static final class AuthorizationGate {
+    private final String session,owner;private final int pid;private final long started,deadline;
+    private long generation;private String proof="";private boolean armed,revoked,consumed;
+    AuthorizationGate(String session,String owner,int pid,long started,long deadline){
+      if(!uuid(session)||!uuid(owner)||pid<=0||started<0||deadline<=started)throw new IllegalArgumentException("checkpoint authority identity");
+      this.session=session;this.owner=owner;this.pid=pid;this.started=started;this.deadline=deadline;
+    }
+    private boolean inTime(long now){return now>=started&&now<deadline;}
+    synchronized boolean arm(long generation,String proof,long now){
+      if(armed||revoked||consumed||generation<=0||proof==null||!proof.matches("[0-9a-f]{64}")||!inTime(now))return false;
+      this.generation=generation;this.proof=proof;armed=true;return true;
+    }
+    synchronized boolean consume(String session,String owner,int pid,long generation,String proof,long now){
+      if(!armed||revoked||consumed||!this.session.equals(session)||!this.owner.equals(owner)||this.pid!=pid||
+          this.generation!=generation||!this.proof.equals(proof)||!inTime(now))return false;
+      consumed=true;return true;
+    }
+    synchronized boolean revoke(){revoked=true;return !consumed;}
+    synchronized boolean consumed(){return consumed;}
+  }
+  static boolean uuid(String value){return value!=null&&value.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");}
+  static boolean matches(Bundle data,String session,String owner,int pid){return data!=null&&
+      session.equals(data.getString(InfinityCloseNativeLease.TICKET))&&owner.equals(data.getString(InfinityCloseNativeLease.TOKEN))&&
+      pid==data.getInt(InfinityCloseNativeLease.PID,-1);}
+  static JSONObject status(String raw,String session,String owner,int pid)throws Exception{
+    if(raw==null||raw.length()>65536)throw new IOException("invalid native checkpoint status length");
+    JSONObject row=new JSONObject(raw);
+    if(row.getInt("schema")!=1||!session.equals(row.getString("session"))||!owner.equals(row.getString("owner"))||row.getInt("pid")!=pid)
+      throw new IOException("native checkpoint identity mismatch");
+    return row;
+  }
+  static boolean safe(JSONObject row)throws Exception{
+    if(!"SAFE_TO_TERMINATE".equals(row.getString("phase")))return false;
+    if(!row.getBoolean("admission_sealed")||row.getLong("generation")<=0)throw new IOException("unsealed native checkpoint");
+    JSONArray owners=row.getJSONArray("owners");
+    if(owners.length()==0||owners.length()>64)throw new IOException("missing native persistence owners");
+    HashSet<String> names=new HashSet<>();
+    for(int i=0;i<owners.length();i++){
+      JSONObject result=owners.getJSONObject(i);String name=result.getString("owner");
+      if(!name.matches("[a-z][a-z0-9_.-]{0,63}")||!names.add(name)||!result.getBoolean("required_writes_finished")||
+          result.getBoolean("dirty")||result.getBoolean("dirty_remaining")||
+          result.getLong("checkpoint_generation")!=row.getLong("generation")||result.getLong("generation")<0||
+          result.getLong("generation")!=result.getLong("durable_generation")||
+          !(result.getBoolean("dirty_before")?"COMMITTED":"ALREADY_DURABLE").equals(result.getString("result")))
+        throw new IOException("unconfirmed native persistence owner");
+    }
+    // Exact registry coverage is independently enforced by the native manager before it publishes
+    // SAFE and again by its one-shot authorize API. Java requires its declared registry to match.
+    JSONArray required=row.getJSONArray("required_owners");HashSet<String> expected=new HashSet<>();
+    for(int i=0;i<required.length();i++)if(!expected.add(required.getString(i)))throw new IOException("duplicate required owner");
+    if(!expected.equals(names))throw new IOException("native persistence registry mismatch");
+    return true;
+  }
+  static String proof(String raw)throws Exception{
+    StringBuilder out=new StringBuilder();for(byte b:MessageDigest.getInstance("SHA-256").digest(raw.getBytes(StandardCharsets.UTF_8)))
+      out.append(String.format(java.util.Locale.ROOT,"%02x",b&255));return out.toString();
+  }
+  static void atomic(File path,JSONObject row)throws IOException{
+    AtomicFile file=new AtomicFile(path);FileOutputStream out=null;
+    byte[] bytes=row.toString().getBytes(StandardCharsets.UTF_8);if(bytes.length>262144)throw new IOException("oversized checkpoint receipt");
+    try{out=file.startWrite();out.write(bytes);out.getFD().sync();file.finishWrite(out);out=null;
+      java.io.FileDescriptor directory=null;
+      try{directory=android.system.Os.open(path.getParentFile().getAbsolutePath(),android.system.OsConstants.O_RDONLY,0);
+        if(!android.system.OsConstants.S_ISDIR(android.system.Os.fstat(directory).st_mode))throw new IOException("checkpoint parent is not a directory");
+        android.system.Os.fsync(directory);
+      }catch(android.system.ErrnoException failure){throw new IOException("checkpoint directory commit failed",failure);}
+      finally{if(directory!=null)try{android.system.Os.close(directory);}catch(android.system.ErrnoException ignored){}}
+      if(!java.util.Arrays.equals(bytes,file.readFully()))throw new IOException("checkpoint receipt replacement unconfirmed");
+    }
+    catch(IOException error){if(out!=null)file.failWrite(out);throw error;}
+  }
+  static JSONObject read(File directory)throws Exception{
+    byte[] bytes=new AtomicFile(new File(directory,RECEIPT)).readFully();
+    if(bytes.length>262144)throw new IOException("oversized checkpoint receipt");
+    return new JSONObject(new String(bytes,StandardCharsets.UTF_8));
+  }
+  private InfinityCheckpointProtocol(){}
+}

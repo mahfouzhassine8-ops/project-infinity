@@ -1,0 +1,2173 @@
+package @APP_PACKAGE@;
+
+import static android.content.pm.PackageManager.FEATURE_LEANBACK;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.provider.Settings;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.lang.System;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+public class Splash extends Activity
+{
+
+  private static final int Uninitialized = 0;
+  private static final int InError = 1;
+  private static final int Checking = 2;
+  private static final int ChecksDone = 3;
+  private static final int Clearing = 4;
+  private static final int Caching = 5;
+  private static final int CachingDone = 6;
+  private static final int WaitingStorageChecked = 7;
+  private static final int StorageChecked = 8;
+  private static final int CheckingPermissions = 9;
+  private static final int CheckingPermissionsDone = 10;
+  private static final int CheckingPermissionsInfo = 11;
+  private static final int CheckExternalStorage = 12;
+  private static final int RecordAudioPermission = 13;
+  private static final int StartingXBMC = 99;
+
+  private static final String TAG = "@APP_NAME@";
+
+  private static final int RECORDAUDIO_RESULT_CODE = 8946;
+  private static final int PERMISSION_RESULT_CODE = 8947;
+
+  private String mErrorMsg = "";
+
+  private ProgressBar mProgress = null;
+  private TextView mTextView = null;
+
+  private int mState = Uninitialized;
+  private InfinityStartupHandoff mInfinityHandoff;
+  private boolean mInfinityLaunchQueued;
+  private InfinityStartupHandoff mInfinityBootstrap, mInfinityChooserFrame;
+  private InfinityStartupPreparation.Ticket mInfinityPreparation;
+  private InfinityKodiShutdown.Watch mInfinityKodiWatch;
+  private String mInfinityKodiLaunchToken="", mInfinityCloseError="";
+  private boolean mInfinitySawClosing, mInfinityBootstrapped, mInfinityKodiStateReady, mInfinityInitializationStarted;
+  private InfinityStartupTrace mInfinityStartupTrace;
+  private Intent mInfinityPendingMain;
+  private boolean mInfinityPreparationReady, mInfinityChooserVisible, mInfinityResumed;
+  private long mInfinityAbnormalExit;
+  public AlertDialog myAlertDialog;
+
+  private String sPackagePath = "";
+  private String sXbmcHome = "";
+  private String sXbmcdata = "";
+  private File fPackagePath = null;
+  private File fXbmcHome = null;
+  private String sXbmcTemp = "";
+
+  private BroadcastReceiver mExternalStorageReceiver = null;
+  private boolean mExternalStorageChecked = false;
+  private boolean mCachingDone = false;
+  private boolean mPermissionOK = false;
+
+  private class StateMachine extends Handler
+  {
+
+    private Splash mSplash = null;
+
+    StateMachine(Splash a)
+    {
+      super(Looper.myLooper());
+      this.mSplash = a;
+    }
+
+
+    @Override
+    public void handleMessage(Message msg)
+    {
+      if (mSplash.isFinishing() || mSplash.isDestroyed()) return;
+      mSplash.mState = msg.what;
+      switch (mSplash.mState)
+      {
+        case InError:
+          showErrorDialog(mSplash, "Error", mErrorMsg);
+          break;
+        case CheckingPermissionsInfo:
+          AlertDialog dialog = new AlertDialog.Builder(mSplash).create();
+          dialog.setCancelable(false);
+          dialog.setTitle("Infinity");
+          dialog.setMessage("Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.");
+          dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Continue", new DialogInterface.OnClickListener()
+          {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+              mStateMachine.sendEmptyMessage(RecordAudioPermission);
+            }
+          });
+          dialog.show();
+          break;
+        case RecordAudioPermission:
+          mSplash.mTextView.setText("Preparing Infinity permissions...");
+          mSplash.mProgress.setVisibility(View.INVISIBLE);
+
+          requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
+                  RECORDAUDIO_RESULT_CODE);
+          break;
+        case CheckingPermissions:
+          if (Build.VERSION.SDK_INT >= 33 || (Build.VERSION.SDK_INT >= 30 && !isAndroidTV()))
+          {
+            try
+            {
+              Intent intent = new Intent();
+              intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+              intent.setData(Uri.parse(String.format("package:%s", getPackageName())));
+              startActivityForResult(intent, PERMISSION_RESULT_CODE);
+            }
+            catch (Exception e)
+            {
+              Log.d(TAG, "Exception asking for permissions: " + e.getMessage());
+            }
+          }
+          else
+          {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_RESULT_CODE);
+          }
+          break;
+        case CheckingPermissionsDone:
+          if (mPermissionOK)
+            sendEmptyMessage(CheckExternalStorage);
+          else
+          {
+            mErrorMsg = "Permission denied. Infinity cannot continue.";
+            sendEmptyMessage(InError);
+            break;
+          }
+          break;
+        case Checking:
+          break;
+        case Clearing:
+          mSplash.mTextView.setText("Refreshing Infinity...");
+          mSplash.mProgress.setVisibility(View.INVISIBLE);
+          break;
+        case Caching:
+          if (!mCachingDone)
+            mSplash.infinityBeginPreparation();
+          else
+            mStateMachine.sendEmptyMessage(CachingDone);
+          break;
+        case CachingDone:
+          mSplash.mCachingDone = true;
+          sendEmptyMessage(StartingXBMC);
+          break;
+        case CheckExternalStorage:
+          if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+          {
+            mExternalStorageChecked = true;
+            sendEmptyMessage(StorageChecked);
+          }
+          else
+          {
+            startWatchingExternalStorage();
+            sendEmptyMessage(WaitingStorageChecked);
+          }
+          break;
+        case WaitingStorageChecked:
+          mSplash.mTextView.setText("Waiting for storage...");
+          mSplash.mProgress.setVisibility(View.INVISIBLE);
+          break;
+        case StorageChecked:
+          mExternalStorageChecked = true;
+          mSplash.stopWatchingExternalStorage();
+          mSplash.infinityBeginPreparation();
+          break;
+        case StartingXBMC:
+          mSplash.mTextView.setText("Starting Infinity...");
+          mSplash.mProgress.setVisibility(View.INVISIBLE);
+          mSplash.startXBMC();
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  private StateMachine mStateMachine = new StateMachine(this);
+
+  public void showErrorDialog(final Activity act, final String title, final String message)
+  {
+    if (myAlertDialog != null && myAlertDialog.isShowing())
+      return;
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    builder.setTitle(title);
+    builder.setIcon(android.R.drawable.ic_dialog_alert);
+    if (Build.VERSION.SDK_INT >= 24) {
+      builder.setMessage(Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY));
+    } else {
+      builder.setMessage(Html.fromHtml(message));
+    }
+    builder.setPositiveButton("Exit",
+            new DialogInterface.OnClickListener()
+            {
+              public void onClick(DialogInterface dialog, int arg1)
+              {
+                dialog.dismiss();
+                act.finish();
+              }
+            });
+    builder.setCancelable(false);
+    myAlertDialog = builder.create();
+    myAlertDialog.show();
+
+    // Make links actually clickable
+    ((TextView) myAlertDialog.findViewById(android.R.id.message))
+            .setMovementMethod(LinkMovementMethod.getInstance());
+  }
+
+  private boolean CheckPermissions()
+  {
+    boolean retVal = false;
+    if (Build.VERSION.SDK_INT >= 33 || (Build.VERSION.SDK_INT >= 30 && !isAndroidTV()))
+    {
+      if (Environment.isExternalStorageManager())
+      {
+        retVal = true;
+      }
+    }
+    else if (Build.VERSION.SDK_INT > 22)
+    {
+      int permissionCheck;
+      permissionCheck = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+      if (permissionCheck == PERMISSION_GRANTED)
+        retVal = true;
+    }
+    else
+      retVal=  true;
+
+    return retVal;
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+  {
+    switch (requestCode)
+    {
+      case PERMISSION_RESULT_CODE:
+      {
+        // If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0
+                && grantResults[0] == PERMISSION_GRANTED)
+        {
+          mPermissionOK = true;
+        }
+        mStateMachine.sendEmptyMessage(CheckingPermissionsDone);
+        break;
+      }
+      case RECORDAUDIO_RESULT_CODE:
+      {
+        mStateMachine.sendEmptyMessage(CheckingPermissions);
+      }
+    }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data)
+  {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == INFINITY_RESPONSIVE_TRACE_EXPORT_RESULT_CODE)
+    {
+      if (resultCode == RESULT_OK && data != null && data.getData() != null &&
+          mInfinityResponsiveTraceExportFile != null && mInfinityResponsiveTraceExportFile.isFile())
+      {
+        java.io.InputStream input=null;java.io.OutputStream output=null;
+        try
+        {
+          input=new java.io.FileInputStream(mInfinityResponsiveTraceExportFile);
+          output=getContentResolver().openOutputStream(data.getData(),"w");
+          if(output==null)throw new java.io.IOException("No document output stream");
+          byte[] buffer=new byte[8192];int read;
+          while((read=input.read(buffer))>0)output.write(buffer,0,read);
+          output.flush();
+          android.widget.Toast.makeText(this,"Responsive/Fold evidence ZIP saved.",android.widget.Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e)
+        {
+          android.widget.Toast.makeText(this,"Could not save the Responsive/Fold evidence ZIP.",android.widget.Toast.LENGTH_LONG).show();
+        }
+        finally
+        {
+          if(input!=null)try{input.close();}catch(Exception ignored){}
+          if(output!=null)try{output.close();}catch(Exception ignored){}
+        }
+      }
+      if(mInfinityResponsiveTraceExportFile!=null)mInfinityResponsiveTraceExportFile.delete();
+      mInfinityResponsiveTraceExportFile=null;
+      return;
+    }
+    if (requestCode == INFINITY_HEALTH_EXPORT_RESULT_CODE)
+    {
+      if (resultCode == RESULT_OK && data != null && data.getData() != null)
+        infinitySaveHealthArchive(data.getData());
+      return;
+    }
+    if (requestCode == PERMISSION_RESULT_CODE)
+    {
+      if (Environment.isExternalStorageManager())
+      {
+        mPermissionOK = true;
+      }
+      mStateMachine.sendEmptyMessage(CheckingPermissionsDone);
+    }
+  }
+
+  void updateExternalStorageState()
+  {
+    String state = Environment.getExternalStorageState();
+    Log.d(TAG, "External storage = " + Environment.getExternalStorageDirectory().getAbsolutePath() + "; state = " + state);
+    if (Environment.MEDIA_MOUNTED.equals(state))
+    {
+      mStateMachine.sendEmptyMessage(StorageChecked);
+    }
+    else
+    {
+      mExternalStorageChecked = false;
+    }
+  }
+
+  void startWatchingExternalStorage()
+  {
+    if (mExternalStorageReceiver != null) return;
+    mExternalStorageReceiver = new BroadcastReceiver()
+    {
+      @Override
+      public void onReceive(Context context, Intent intent)
+      {
+        Log.i(TAG, "Storage: " + intent.getData());
+        updateExternalStorageState();
+      }
+    };
+    IntentFilter filter = new IntentFilter();
+    filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+    filter.addAction(Intent.ACTION_MEDIA_REMOVED);
+    filter.addAction(Intent.ACTION_MEDIA_SHARED);
+    filter.addAction(Intent.ACTION_MEDIA_UNMOUNTABLE);
+    filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+    filter.addDataScheme("file");
+    registerReceiver(mExternalStorageReceiver, filter);
+  }
+
+  void stopWatchingExternalStorage()
+  {
+    if (mExternalStorageReceiver != null) {
+      unregisterReceiver(mExternalStorageReceiver);
+      mExternalStorageReceiver = null;
+    }
+  }
+
+  private static final String INFINITY_EXPERIENCE_PREFS = "infinity_experience";
+  private static final String INFINITY_EXPERIENCE_DEFAULT = "default";
+  private static final int INFINITY_HEALTH_EXPORT_RESULT_CODE = 8951;
+  private static final int INFINITY_RESPONSIVE_TRACE_EXPORT_RESULT_CODE = 8952;
+  private final java.util.concurrent.atomic.AtomicBoolean mInfinityHealthBusy = new java.util.concurrent.atomic.AtomicBoolean();
+  private java.io.File mInfinityResponsiveTraceExportFile = null;
+
+  // Cobra owns its own Android/player lifecycle. A remembered Cobra launch
+  // bypasses Kodi state, preparation and shutdown, but never overrides a choice.
+  private boolean infinityLaunchPreferredCobra() {
+    if(mInfinityChooserVisible || mInfinityPendingMain!=null || mInfinityLaunchQueued ||
+        (getIntent()!=null && getIntent().getBooleanExtra("infinity_checkpoint_chooser",false)))return false;
+    Intent incoming=getIntent();
+    if(incoming!=null && incoming.getAction()!=null && !Intent.ACTION_MAIN.equals(incoming.getAction()))return false;
+    if(!"live".equals(getSharedPreferences(INFINITY_EXPERIENCE_PREFS,MODE_PRIVATE)
+        .getString(INFINITY_EXPERIENCE_DEFAULT,"")))return false;
+    launchInfinityExperience("live",false,false);return true;
+  }
+
+  protected void startXBMC()
+  {
+    if (isFinishing() || isDestroyed() || mInfinityLaunchQueued) return;
+    if (getIntent()!=null && getIntent().getBooleanExtra("infinity_checkpoint_chooser",false)) {
+      mInfinitySawClosing=true;showInfinityExperienceChooser();return;
+    }
+    if (infinityLaunchPreferredCobra()) return;
+    if (InfinityKodiShutdown.pending()) {
+      Intent request=getIntent();
+      boolean wantsInfinity=!mInfinityChooserVisible &&
+          ((request!=null && request.getAction()!=null && !Intent.ACTION_MAIN.equals(request.getAction())) ||
+          "infinity".equals(getSharedPreferences(INFINITY_EXPERIENCE_PREFS,MODE_PRIVATE)
+              .getString(INFINITY_EXPERIENCE_DEFAULT,"")));
+      mInfinityStartupTrace.event(wantsInfinity?"handoff.waitClosingOwner":"chooser.pendingKodiOwner");
+      if(wantsInfinity)showInfinityClosingRecovery();
+      showInfinityExperienceChooser(); return;
+    }
+    if (InfinityKodiShutdown.live()) {
+      launchInfinityExperience("infinity",false,false);
+      return;
+    }
+    if(mInfinitySawClosing){showInfinityExperienceChooser();return;}
+    Intent incoming = getIntent();
+    if (incoming != null && incoming.getAction() != null &&
+        !Intent.ACTION_MAIN.equals(incoming.getAction()))
+    {
+      launchInfinityExperience("infinity",false,false);
+      return;
+    }
+
+    if (infinityShouldOfferCrashRecovery())
+    {
+      android.widget.Toast.makeText(this,
+          "Infinity recovered from an abnormal exit. Health Center is available from either experience settings.",
+          android.widget.Toast.LENGTH_LONG).show();
+      showInfinityExperienceChooser();
+      return;
+    }
+
+    String preferred = getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE)
+        .getString(INFINITY_EXPERIENCE_DEFAULT, "");
+    if ("live".equals(preferred) || "infinity".equals(preferred))
+    {
+      launchInfinityExperience(preferred,false,false);
+      return;
+    }
+    if (!mInfinityChooserVisible) showInfinityExperienceChooser();
+  }
+
+  private int chooserDp(int value)
+  {
+    return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
+  }
+
+  private String chooserAppearanceMode()
+  {
+    // Read Cobra's existing appearance preference; the chooser has no separate setting.
+    android.content.SharedPreferences prefs = getSharedPreferences("infinity_cobra_live", MODE_PRIVATE);
+    String mode = prefs.getString("cobra_appearance_mode", "dark");
+    if ("system".equals(mode))
+    {
+      boolean night = (getResources().getConfiguration().uiMode &
+          android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+          android.content.res.Configuration.UI_MODE_NIGHT_YES;
+      return night ? ("oled".equals(prefs.getString("cobra_system_dark_variant", "dark"))
+          ? "oled" : "dark") : "light";
+    }
+    return "light".equals(mode) ? "light" : "oled".equals(mode) ? "oled" : "dark";
+  }
+
+  private int chooserBuiltinColor(String role, int light, int dark)
+  {
+    return vtheme().color("chooser.builtin." + role,
+        "light".equals(chooserAppearanceMode()) ? light : dark);
+  }
+
+  private void chooserPrepareBuiltinSystemBars()
+  {
+    int background = chooserBuiltinColor("background", android.graphics.Color.WHITE, android.graphics.Color.BLACK);
+    boolean darkIcons = cobraChooserDarkStatusIcons(background);
+    android.view.Window window = getWindow();
+    View decor = window.getDecorView();
+    // Keep the fallback's existing fitted layout. Only the bar colors and icon contrast change.
+    // The matching window underlay also covers OS-enforced transparent bars on newer Android.
+    decor.setBackgroundColor(background);
+    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+        | android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+    window.setStatusBarColor(Build.VERSION.SDK_INT >= 23 ? background : android.graphics.Color.BLACK);
+    window.setNavigationBarColor(Build.VERSION.SDK_INT >= 26 ? background : android.graphics.Color.BLACK);
+    if (Build.VERSION.SDK_INT >= 29)
+    {
+      window.setStatusBarContrastEnforced(false);
+      window.setNavigationBarContrastEnforced(false);
+    }
+    if (Build.VERSION.SDK_INT >= 30)
+    {
+      android.view.WindowInsetsController controller = window.getInsetsController();
+      if (controller != null)
+      {
+        int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+        controller.setSystemBarsAppearance(darkIcons ? mask : 0, mask);
+      }
+    }
+    else
+    {
+      int flags = decor.getSystemUiVisibility();
+      if (Build.VERSION.SDK_INT >= 23)
+        flags = darkIcons ? flags | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR : flags & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      if (Build.VERSION.SDK_INT >= 26)
+        flags = darkIcons ? flags | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR : flags & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+      decor.setSystemUiVisibility(flags);
+    }
+  }
+
+  private android.graphics.drawable.Drawable chooserControlSurface(int fill, int stroke, int radius)
+  {
+    return chooserControlSurface(fill, stroke, radius,
+        chooserBuiltinColor("accent", 0xff145fdf, 0xff62aaff));
+  }
+
+  private android.graphics.drawable.Drawable chooserControlSurface(int fill, int stroke, int radius, int focus)
+  {
+    android.graphics.drawable.StateListDrawable states = new android.graphics.drawable.StateListDrawable();
+    states.addState(new int[]{android.R.attr.state_focused}, chooserSurface(fill, focus, radius));
+    states.addState(new int[]{}, chooserSurface(fill, stroke, radius));
+    return new android.graphics.drawable.RippleDrawable(
+        android.content.res.ColorStateList.valueOf((focus & 0x00ffffff) | 0x24000000),
+        states, chooserSurface(android.graphics.Color.WHITE, android.graphics.Color.WHITE, radius));
+  }
+
+  private android.graphics.drawable.GradientDrawable chooserSurface(int fill, int stroke, int radius)
+  {
+    android.graphics.drawable.GradientDrawable shape =
+        new android.graphics.drawable.GradientDrawable();
+    shape.setColor(fill);
+    shape.setCornerRadius(chooserDp(radius));
+    shape.setStroke(Math.max(1, chooserDp(vtheme().dimension("chooser.chooserSurface.dimensions.1",1))), stroke);
+    return shape;
+  }
+
+  private android.widget.TextView chooserText(String value, int color, float size)
+  {
+    android.widget.TextView view = new android.widget.TextView(this);
+    view.setText(value);
+    view.setTextColor(color);
+    view.setTextSize(size);
+    view.setTypeface(vtheme().font("chooser.chooserText.styles.1", android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)));
+    view.setGravity(android.view.Gravity.CENTER);
+    view.setPadding(chooserDp(vtheme().dimension("chooser.chooserText.dimensions.1",12)), chooserDp(vtheme().dimension("chooser.chooserText.dimensions.2",8)), chooserDp(vtheme().dimension("chooser.chooserText.dimensions.3",12)), chooserDp(vtheme().dimension("chooser.chooserText.dimensions.4",8)));
+    return view;
+  }
+
+  private android.widget.Button chooserCard(String value, int fill, int stroke)
+  {
+    android.widget.Button card = new android.widget.Button(this);
+    boolean narrow = getResources().getConfiguration().screenWidthDp < 360;
+    card.setText(value);
+    card.setTextColor(chooserBuiltinColor("text", 0xff101b2c, 0xfff7faff));
+    card.setTextSize(vtheme().number("chooser.chooserCard.numbers.2",16,8f,96f));
+    card.setGravity(android.view.Gravity.CENTER);
+    card.setAllCaps(false);
+    card.setTypeface(vtheme().font("chooser.chooserCard.styles.1", android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)));
+    card.setLetterSpacing(vtheme().number("chooser.chooserCard.numbers.1",0.03f,-0.02f,0.25f));
+    // Keep the existing corner settings control clear of both the title and copy.
+    card.setPadding(chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.1",narrow ? 12 : 16)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.2",66)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.3",narrow ? 12 : 16)), chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.4",18)));
+    card.setMinHeight(chooserDp(vtheme().dimension("chooser.chooserCard.dimensions.5",210)));
+    card.setFocusable(true);
+    card.setBackground(chooserControlSurface(fill, stroke, 24));
+    return card;
+  }
+
+  private void setChooserCardState(android.widget.Button card, boolean infinity, boolean active)
+  {
+    int fill = active ? chooserBuiltinColor("selected", 0xffedf3fc, 0xff111f32)
+        : chooserBuiltinColor("panel", 0xfff5f8fd, "oled".equals(chooserAppearanceMode()) ? 0xff070a10 : 0xff0b0f16);
+    int stroke = active ? chooserBuiltinColor("accent", 0xff145fdf, 0xff62aaff)
+        : chooserBuiltinColor("rim", 0xffcbd7e8, 0xff293244);
+    card.setBackground(chooserControlSurface(fill, stroke, 24));
+  }
+
+
+
+
+
+        private void showExperienceCardSettings(String experience)
+  {
+    final boolean cobra = "live".equals(experience);
+    final String title = cobra ? "Cobra options" : "Infinity options";
+    final String label = cobra ? "Cobra" : "Infinity";
+    final String[] options = cobra ? new String[]{
+        "Remember & launch " + label,
+        "Launch " + label + " just this time",
+        "Ask every time",
+        "Infinity Health Center",
+        "Cobra Recovery"
+    } : new String[]{
+        "Remember & launch " + label,
+        "Launch " + label + " just this time",
+        "Ask every time",
+        "Infinity Health Center"
+    };
+
+    // The approved glass treatment extends to BOTH settings panels, not only colors.
+    final android.content.DialogInterface.OnClickListener existingAction = (dialogInterface, which) -> {
+          if (which == 0)
+          {
+            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+                .putString(INFINITY_EXPERIENCE_DEFAULT, experience).apply();
+            launchInfinityExperience(experience);
+          }
+          else if (which == 1)
+          {
+            launchInfinityExperience(experience);
+          }
+          else if (which == 2)
+          {
+            getSharedPreferences(INFINITY_EXPERIENCE_PREFS, MODE_PRIVATE).edit()
+                .remove(INFINITY_EXPERIENCE_DEFAULT).apply();
+            android.widget.Toast.makeText(this,
+                "Infinity will ask which experience to open next time.",
+                android.widget.Toast.LENGTH_SHORT).show();
+          }
+          else if (which == 3)
+          {
+            showInfinityHealthCenter();
+          }
+          else if (which == 4 && cobra)
+          {
+            showCobraRecovery();
+          }
+        };
+    if (!isAndroidTV() && !CobraPresentationSafety.isSafe(this)) {
+      InfinityGlassOptions glass = null;
+      try {
+        glass = new InfinityGlassOptions(this, cobra, title, options,
+            () -> "light".equals(chooserAppearanceMode()), existingAction);
+        glass.show();
+        return;
+      } catch (RuntimeException presentationFailure) {
+        if (glass != null && glass.isShowing()) glass.dismiss();
+        android.util.Log.e("InfinityChooser", "Glass options unavailable; using recovery presentation", presentationFailure);
+      }
+    }
+
+    // This menu is intentionally self-contained so fixing it cannot restyle any
+    // other Cobra/Infinity dialog. Infinity uses the chooser gold accent; Cobra
+    // uses the chooser cyan accent. Behavior below is unchanged from 2103221.
+    final boolean glassLight = "light".equals(chooserAppearanceMode());
+    final int accent = glassLight ? (cobra ? 0xff087797 : 0xff896018) : (cobra ? 0xff35c7d9 : 0xffb59a5a);
+    final int text = glassLight ? 0xff081c34 : 0xfff5f7fb;
+    final int panelTop = glassLight ? 0xfff8fbff : (cobra ? 0xff0d1720 : 0xff15130f);
+    final int panelBottom = glassLight ? 0xffe8edf3 : 0xff080d14;
+
+    android.widget.ArrayAdapter<String> adapter =
+        new android.widget.ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, options)
+        {
+          @Override
+          public android.view.View getView(int position, android.view.View convertView,
+                                           android.view.ViewGroup parent)
+          {
+            android.widget.TextView row =
+                (android.widget.TextView)super.getView(position, convertView, parent);
+            row.setTag("experience_options_ui_row");
+            row.setTextColor(text);
+            row.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
+            row.setTypeface(android.graphics.Typeface.create(
+                "sans-serif", android.graphics.Typeface.NORMAL));
+            row.setLetterSpacing(0.01f);
+            row.setIncludeFontPadding(false);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setMinHeight(chooserDp(54));
+            row.setPadding(chooserDp(18), chooserDp(2), chooserDp(18), chooserDp(2));
+
+            int focusFill = (accent & 0x00ffffff) | 0x24000000;
+            int focusLine = (accent & 0x00ffffff) | 0xb8000000;
+            android.graphics.drawable.GradientDrawable normal =
+                new android.graphics.drawable.GradientDrawable();
+            normal.setColor(android.graphics.Color.TRANSPARENT);
+            normal.setCornerRadius(chooserDp(14));
+            android.graphics.drawable.GradientDrawable focused =
+                new android.graphics.drawable.GradientDrawable();
+            focused.setColor(focusFill);
+            focused.setCornerRadius(chooserDp(14));
+            focused.setStroke(Math.max(1, chooserDp(1)), focusLine);
+            android.graphics.drawable.StateListDrawable states =
+                new android.graphics.drawable.StateListDrawable();
+            states.addState(new int[]{android.R.attr.state_pressed}, focused);
+            states.addState(new int[]{android.R.attr.state_focused}, focused);
+            states.addState(new int[]{android.R.attr.state_selected}, focused);
+            states.addState(new int[]{}, normal);
+            row.setBackground(states);
+            return row;
+          }
+        };
+
+    final android.app.AlertDialog dialog =
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        .setTitle(title)
+        .setAdapter(adapter, existingAction)
+        .setNegativeButton("Cancel", null)
+        .create();
+
+    dialog.setOnShowListener(ignored -> {
+      android.view.Window window = dialog.getWindow();
+      if (window != null)
+      {
+        window.getDecorView().setTag("experience_options_ui_dialog");
+        android.graphics.drawable.GradientDrawable surface =
+            new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{panelTop, panelBottom});
+        surface.setCornerRadius(chooserDp(24));
+        surface.setStroke(Math.max(1, chooserDp(1)),
+            (accent & 0x00ffffff) | 0x8f000000);
+        window.setBackgroundDrawable(surface);
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        window.setDimAmount(0.48f);
+        int available = getResources().getDisplayMetrics().widthPixels - chooserDp(32);
+        window.setLayout(Math.min(available, chooserDp(460)),
+            android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+      }
+
+      int titleId = getResources().getIdentifier("alertTitle", "id", "android");
+      android.view.View titleView = dialog.findViewById(titleId);
+      if (titleView instanceof android.widget.TextView)
+      {
+        android.widget.TextView heading = (android.widget.TextView)titleView;
+        heading.setTextColor(text);
+        heading.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 20);
+        heading.setTypeface(android.graphics.Typeface.create(
+            "sans-serif-medium", android.graphics.Typeface.NORMAL));
+        heading.setLetterSpacing(0.015f);
+      }
+
+      android.widget.ListView list = dialog.getListView();
+      if (list != null)
+      {
+        list.setDivider(new android.graphics.drawable.ColorDrawable(
+            android.graphics.Color.TRANSPARENT));
+        list.setDividerHeight(chooserDp(4));
+        list.setPadding(chooserDp(10), chooserDp(4), chooserDp(10), chooserDp(4));
+        list.setClipToPadding(false);
+        list.setSelector(new android.graphics.drawable.ColorDrawable(
+            android.graphics.Color.TRANSPARENT));
+      }
+
+      android.widget.Button cancel =
+          dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE);
+      if (cancel != null)
+      {
+        cancel.setTextColor(accent);
+        cancel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14);
+        cancel.setTypeface(android.graphics.Typeface.create(
+            "sans-serif-medium", android.graphics.Typeface.NORMAL));
+        cancel.setLetterSpacing(0.04f);
+      }
+    });
+    dialog.show();
+  }
+
+  /** Crash-safe diagnostics owned by the Android/Infinity chooser, not Kodi or Cobra. */
+  private android.widget.TextView infinityHealthText(String value,int color,float size,int gravity)
+  {
+    android.widget.TextView view=new android.widget.TextView(this);
+    view.setText(value);view.setTextColor(color);view.setTextSize(size);view.setGravity(gravity);
+    view.setTypeface(vtheme().font("chooser.health.text",android.graphics.Typeface.create("sans-serif",android.graphics.Typeface.NORMAL)));
+    view.setPadding(chooserDp(4),chooserDp(2),chooserDp(4),chooserDp(2));
+    return view;
+  }
+
+  private android.view.View infinityHealthRow(String glyph,String title,String subtitle,int panel,int rim,int accent,int text,int muted,Runnable action)
+  {
+    android.widget.LinearLayout row=new android.widget.LinearLayout(this);
+    row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+    row.setFocusable(true);row.setClickable(true);
+    row.setPadding(chooserDp(14),chooserDp(10),chooserDp(14),chooserDp(10));
+    row.setBackground(chooserControlSurface(panel,rim,16,accent));
+
+    android.widget.TextView icon=infinityHealthText(glyph,accent,22,android.view.Gravity.CENTER);
+    android.widget.LinearLayout.LayoutParams iconLp=new android.widget.LinearLayout.LayoutParams(chooserDp(42),chooserDp(42));
+    row.addView(icon,iconLp);
+
+    android.widget.LinearLayout copy=new android.widget.LinearLayout(this);
+    copy.setOrientation(android.widget.LinearLayout.VERTICAL);
+    copy.setPadding(chooserDp(8),0,chooserDp(4),0);
+    android.widget.TextView heading=infinityHealthText(title,text,15,android.view.Gravity.LEFT|android.view.Gravity.CENTER_VERTICAL);
+    heading.setTypeface(vtheme().font("chooser.health.row.title",android.graphics.Typeface.create("sans-serif-medium",android.graphics.Typeface.NORMAL)));
+    android.widget.TextView detail=infinityHealthText(subtitle,muted,11,android.view.Gravity.LEFT|android.view.Gravity.CENTER_VERTICAL);
+    detail.setMaxLines(2);
+    copy.addView(heading,new android.widget.LinearLayout.LayoutParams(-1,chooserDp(24)));
+    copy.addView(detail,new android.widget.LinearLayout.LayoutParams(-1,chooserDp(34)));
+    row.addView(copy,new android.widget.LinearLayout.LayoutParams(0,chooserDp(58),1));
+
+    android.widget.TextView arrow=infinityHealthText("›",muted,24,android.view.Gravity.CENTER);
+    row.addView(arrow,new android.widget.LinearLayout.LayoutParams(chooserDp(24),chooserDp(44)));
+
+    row.setOnClickListener(v->action.run());
+    return row;
+  }
+
+  private android.app.Dialog infinityHealthDialog(String title,String subtitle,boolean scrollBody)
+  {
+    final boolean light="light".equals(chooserAppearanceMode());
+    final boolean oled="oled".equals(chooserAppearanceMode());
+    final int background=chooserBuiltinColor("background",0xfff7f9fc,android.graphics.Color.BLACK);
+    final int panel=chooserBuiltinColor("panel",0xffffffff,oled?0xff05080d:0xff0b0f16);
+    final int rim=chooserBuiltinColor("rim",0xffcbd7e8,0xff293244);
+    final int accent=chooserBuiltinColor("accent",0xff145fdf,0xff62aaff);
+    final int text=chooserBuiltinColor("text",0xff101b2c,0xfff7faff);
+    final int muted=chooserBuiltinColor("muted",0xff526176,0xffb1bfd2);
+
+    android.app.Dialog dialog=new android.app.Dialog(this);
+    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+    android.widget.LinearLayout shell=new android.widget.LinearLayout(this);
+    shell.setOrientation(android.widget.LinearLayout.VERTICAL);
+    shell.setPadding(chooserDp(18),chooserDp(18),chooserDp(18),chooserDp(14));
+    shell.setBackground(chooserSurface(panel,accent,24));
+
+    android.widget.LinearLayout header=new android.widget.LinearLayout(this);
+    header.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    header.setGravity(android.view.Gravity.CENTER_VERTICAL);
+    android.widget.TextView mark=infinityHealthText("∞",accent,31,android.view.Gravity.CENTER);
+    header.addView(mark,new android.widget.LinearLayout.LayoutParams(chooserDp(54),chooserDp(54)));
+    android.widget.LinearLayout copy=new android.widget.LinearLayout(this);
+    copy.setOrientation(android.widget.LinearLayout.VERTICAL);
+    android.widget.TextView heading=infinityHealthText(title,text,20,android.view.Gravity.LEFT|android.view.Gravity.CENTER_VERTICAL);
+    heading.setTypeface(vtheme().font("chooser.health.header",android.graphics.Typeface.create("sans-serif-medium",android.graphics.Typeface.BOLD)));
+    android.widget.TextView sub=infinityHealthText(subtitle,muted,11,android.view.Gravity.LEFT|android.view.Gravity.CENTER_VERTICAL);
+    copy.addView(heading,new android.widget.LinearLayout.LayoutParams(-1,chooserDp(30)));
+    copy.addView(sub,new android.widget.LinearLayout.LayoutParams(-1,chooserDp(24)));
+    header.addView(copy,new android.widget.LinearLayout.LayoutParams(0,chooserDp(58),1));
+    shell.addView(header,new android.widget.LinearLayout.LayoutParams(-1,chooserDp(64)));
+
+    android.view.View divider=new android.view.View(this);
+    divider.setBackgroundColor(rim);
+    android.widget.LinearLayout.LayoutParams dividerLp=new android.widget.LinearLayout.LayoutParams(-1,Math.max(1,chooserDp(1)));
+    dividerLp.setMargins(0,chooserDp(4),0,chooserDp(10));
+    shell.addView(divider,dividerLp);
+
+    dialog.setContentView(shell);
+    android.view.Window window=dialog.getWindow();
+    if(window!=null){
+      window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+      window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+      android.view.WindowManager.LayoutParams lp=window.getAttributes();
+      lp.dimAmount=.56f;window.setAttributes(lp);
+    }
+    dialog.setOnShowListener(d->{
+      android.view.Window w=dialog.getWindow();if(w==null)return;
+      int available=getResources().getDisplayMetrics().widthPixels-chooserDp(28);
+      int width=Math.min(chooserDp(500),available);
+      w.setLayout(width,android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+      w.setGravity(android.view.Gravity.CENTER);
+    });
+    dialog.getWindow().getDecorView().setTag(new Object[]{shell,panel,rim,accent,text,muted,background});
+    return dialog;
+  }
+
+  private android.widget.LinearLayout infinityHealthDialogShell(android.app.Dialog dialog)
+  {
+    Object tag=dialog.getWindow().getDecorView().getTag();
+    return tag instanceof Object[]?(android.widget.LinearLayout)((Object[])tag)[0]:null;
+  }
+
+  private int infinityHealthDialogColor(android.app.Dialog dialog,int index)
+  {
+    Object tag=dialog.getWindow().getDecorView().getTag();
+    return tag instanceof Object[]?(Integer)((Object[])tag)[index]:android.graphics.Color.WHITE;
+  }
+
+  /** Same Health labels/actions; presentation shared with the two gear panels. */
+  private boolean showGlassHealthCenter() {
+    if(isAndroidTV() || CobraPresentationSafety.isSafe(this)) return false;
+    InfinityGlassHealth created=null;
+    try {
+      final InfinityGlassHealth dialog=new InfinityGlassHealth(this,"Infinity Health Center",
+          "DIAGNOSTICS  •  RECOVERY",()->"light".equals(chooserAppearanceMode()));
+      created=dialog;
+    final boolean responsiveTracing=InfinityResponsiveTrace.isEnabled(this);
+    String[][] rows={
+      {"↔",responsiveTracing?"Stop & export Responsive/Fold Trace":"Start Responsive/Fold Trace",
+        responsiveTracing?"Stop the evidence capture and save one diagnostic ZIP.":"Record Android window, Kodi bridge geometry and safe skin/profile events while you reproduce the resize problem."},
+      {"↺","Recent crashes & exits","See Android-reported Infinity crashes, ANRs and abnormal exits."},
+      {"⇧","Export diagnostics ZIP","Save the report and available Android crash or ANR traces."},
+      {"⧉","Copy diagnostic summary","Copy a text summary for quick sharing."},
+      {"ⓘ","Build & device info","View Infinity version, Android build and device details."}
+    };
+    Runnable[] actions=new Runnable[]{
+      ()->{dialog.dismiss();if(responsiveTracing)infinityExportResponsiveTrace();else infinityStartResponsiveTrace();},
+      ()->{dialog.dismiss();infinityShowHealthText("Recent crashes & exits",infinityHealthExitHistory(false));},
+      ()->{dialog.dismiss();infinityExportHealthReport();},
+      ()->{infinityCopyHealthReport();},
+      ()->{dialog.dismiss();infinityShowHealthText("Build & device info",infinityHealthBuildInfo());}
+    };
+      dialog.menu(rows,actions);dialog.show();return true;
+    } catch(RuntimeException failure) {
+      if(created!=null && created.isShowing())created.dismiss();
+      android.util.Log.e("InfinityChooser","Health presentation unavailable; using original",failure);
+      return false;
+    }
+  }
+  private boolean showGlassHealthText(String title,String body) {
+    if(isAndroidTV() || CobraPresentationSafety.isSafe(this)) return false;
+    InfinityGlassHealth dialog=null;
+    try {
+      dialog=new InfinityGlassHealth(this,title,"INFINITY DIAGNOSTICS",()->"light".equals(chooserAppearanceMode()));
+      dialog.report(body==null||body.trim().isEmpty()?"No diagnostic information available.":body);
+      dialog.show();return true;
+    } catch(RuntimeException failure) {
+      if(dialog!=null && dialog.isShowing())dialog.dismiss();
+      android.util.Log.e("InfinityChooser","Health text presentation unavailable; using original",failure);
+      return false;
+    }
+  }
+
+  private void showInfinityHealthCenter()
+  {
+    if(showGlassHealthCenter()) return;
+    final android.app.Dialog dialog=infinityHealthDialog("Infinity Health Center","DIAGNOSTICS  •  RECOVERY",false);
+    final android.widget.LinearLayout shell=infinityHealthDialogShell(dialog);
+    final int panel=infinityHealthDialogColor(dialog,1);
+    final int rim=infinityHealthDialogColor(dialog,2);
+    final int accent=infinityHealthDialogColor(dialog,3);
+    final int text=infinityHealthDialogColor(dialog,4);
+    final int muted=infinityHealthDialogColor(dialog,5);
+
+    final boolean responsiveTracing=InfinityResponsiveTrace.isEnabled(this);
+    String[][] rows={
+      {"↔",responsiveTracing?"Stop & export Responsive/Fold Trace":"Start Responsive/Fold Trace",
+        responsiveTracing?"Stop the evidence capture and save one diagnostic ZIP.":"Record Android window, Kodi bridge geometry and safe skin/profile events while you reproduce the resize problem."},
+      {"↺","Recent crashes & exits","See Android-reported Infinity crashes, ANRs and abnormal exits."},
+      {"⇧","Export diagnostics ZIP","Save the report and available Android crash or ANR traces."},
+      {"⧉","Copy diagnostic summary","Copy a text summary for quick sharing."},
+      {"ⓘ","Build & device info","View Infinity version, Android build and device details."}
+    };
+    Runnable[] actions=new Runnable[]{
+      ()->{dialog.dismiss();if(responsiveTracing)infinityExportResponsiveTrace();else infinityStartResponsiveTrace();},
+      ()->{dialog.dismiss();infinityShowHealthText("Recent crashes & exits",infinityHealthExitHistory(false));},
+      ()->{dialog.dismiss();infinityExportHealthReport();},
+      ()->{infinityCopyHealthReport();},
+      ()->{dialog.dismiss();infinityShowHealthText("Build & device info",infinityHealthBuildInfo());}
+    };
+    for(int i=0;i<rows.length;i++){
+      android.view.View row=infinityHealthRow(rows[i][0],rows[i][1],rows[i][2],panel,rim,accent,text,muted,actions[i]);
+      android.widget.LinearLayout.LayoutParams lp=new android.widget.LinearLayout.LayoutParams(-1,chooserDp(78));
+      lp.bottomMargin=chooserDp(9);shell.addView(row,lp);
+    }
+
+    android.widget.Button close=new android.widget.Button(this);
+    close.setText("Close");close.setAllCaps(false);close.setTextSize(13);close.setTextColor(accent);
+    close.setTypeface(vtheme().font("chooser.health.close",android.graphics.Typeface.create("sans-serif-medium",android.graphics.Typeface.NORMAL)));
+    close.setBackground(chooserControlSurface(panel,rim,14,accent));
+    close.setOnClickListener(v->dialog.dismiss());
+    android.widget.LinearLayout.LayoutParams closeLp=new android.widget.LinearLayout.LayoutParams(-1,chooserDp(48));
+    closeLp.topMargin=chooserDp(2);shell.addView(close,closeLp);
+    dialog.show();
+  }
+
+  private void infinityShowHealthText(String title,String body)
+  {
+    if(showGlassHealthText(title,body)) return;
+    final android.app.Dialog dialog=infinityHealthDialog(title,"INFINITY DIAGNOSTICS",true);
+    final android.widget.LinearLayout shell=infinityHealthDialogShell(dialog);
+    final int panel=infinityHealthDialogColor(dialog,1);
+    final int rim=infinityHealthDialogColor(dialog,2);
+    final int accent=infinityHealthDialogColor(dialog,3);
+    final int text=infinityHealthDialogColor(dialog,4);
+
+    android.widget.TextView output=infinityHealthText(
+        body==null||body.trim().isEmpty()?"No diagnostic information available.":body,
+        text,12,android.view.Gravity.LEFT|android.view.Gravity.TOP);
+    output.setTextIsSelectable(true);output.setLineSpacing(chooserDp(2),1.0f);
+    android.widget.ScrollView scroll=new android.widget.ScrollView(this);
+    scroll.setFillViewport(false);scroll.setBackground(chooserSurface(panel,rim,14));
+    output.setPadding(chooserDp(14),chooserDp(12),chooserDp(14),chooserDp(12));
+    scroll.addView(output,new android.widget.ScrollView.LayoutParams(-1,-2));
+    android.widget.LinearLayout.LayoutParams scrollLp=new android.widget.LinearLayout.LayoutParams(-1,0,1);
+    scrollLp.bottomMargin=chooserDp(10);shell.addView(scroll,scrollLp);
+
+    android.widget.Button close=new android.widget.Button(this);
+    close.setText("Close");close.setAllCaps(false);close.setTextColor(accent);close.setTextSize(13);
+    close.setBackground(chooserControlSurface(panel,rim,14,accent));close.setOnClickListener(v->dialog.dismiss());
+    shell.addView(close,new android.widget.LinearLayout.LayoutParams(-1,chooserDp(48)));
+    dialog.show();
+    android.view.Window w=dialog.getWindow();
+    if(w!=null){
+      int available=getResources().getDisplayMetrics().widthPixels-chooserDp(28);
+      int width=Math.min(chooserDp(520),available);
+      int maxHeight=(int)(getResources().getDisplayMetrics().heightPixels*.78f);
+      w.setLayout(width,maxHeight);
+    }
+  }
+
+
+
+  private String infinityHealthBuildInfo()
+  {
+    String versionName="unknown";long versionCode=0L;
+    try{
+      android.content.pm.PackageInfo info=getPackageManager().getPackageInfo(getPackageName(),0);
+      versionName=info.versionName==null?"unknown":info.versionName;
+      versionCode=Build.VERSION.SDK_INT>=28?info.getLongVersionCode():info.versionCode;
+    }catch(Exception ignored){}
+    StringBuilder out=new StringBuilder();
+    out.append("Infinity diagnostic environment\n\n");
+    out.append("Package: ").append(getPackageName()).append('\n');
+    out.append("Version: ").append(versionName).append(" (").append(versionCode).append(")\n");
+    out.append("Device: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
+    out.append("Android: ").append(Build.VERSION.RELEASE).append(" / API ").append(Build.VERSION.SDK_INT).append('\n');
+    out.append("Build fingerprint: ").append(Build.FINGERPRINT).append('\n');
+    out.append("Device elapsed uptime: ").append(android.os.SystemClock.elapsedRealtime()/1000L).append("s\n");
+    out.append("Diagnostics owner: Infinity Android chooser (Kodi-independent)\n");
+    return out.toString();
+  }
+
+  private String infinityExitReasonName(int reason)
+  {
+    switch(reason){
+      case 1:return "self exit";
+      case 2:return "signal";
+      case 3:return "low memory";
+      case 4:return "Java crash";
+      case 5:return "native crash";
+      case 6:return "ANR";
+      case 7:return "initialization failure";
+      case 8:return "permission change";
+      case 9:return "excessive resource use";
+      case 10:return "user requested";
+      case 11:return "user stopped";
+      case 12:return "dependency died";
+      case 13:return "other";
+      case 14:return "freezer";
+      case 15:return "package state change";
+      case 16:return "package updated";
+      default:return "unknown ("+reason+")";
+    }
+  }
+
+  private long infinityNewestAbnormalExit()
+  {
+    if(Build.VERSION.SDK_INT<30)return 0L;
+    try{
+      ActivityManager manager=(ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+      if(manager==null)return 0L;
+      java.util.List<android.app.ApplicationExitInfo> rows=
+          manager.getHistoricalProcessExitReasons(getPackageName(),0,12);
+      for(android.app.ApplicationExitInfo row:rows){
+        int reason=row.getReason();
+        if(reason==4||reason==5||reason==6)return row.getTimestamp();
+      }
+    }catch(Exception ignored){}
+    return 0L;
+  }
+
+  private boolean infinityShouldOfferCrashRecovery()
+  {
+    long timestamp=mInfinityAbnormalExit;
+    if(timestamp<=0L)return false;
+    android.content.SharedPreferences prefs=getSharedPreferences(INFINITY_EXPERIENCE_PREFS,MODE_PRIVATE);
+    long seen=prefs.getLong("health_last_acknowledged_exit",0L);
+    if(timestamp<=seen)return false;
+    prefs.edit().putLong("health_last_acknowledged_exit",timestamp).apply();
+    return true;
+  }
+
+  private String infinityHealthExitHistory(boolean includeTrace)
+  {
+    StringBuilder out=new StringBuilder("Exit records are historical. The current APK version does not identify the version that produced each older exit.\n");
+    if(Build.VERSION.SDK_INT<30){
+      out.append("Android exit history requires Android 11 or newer.\n");
+      return out.toString();
+    }
+    try{
+      ActivityManager manager=(ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+      if(manager==null)return "Android ActivityManager is unavailable.\n";
+      java.util.List<android.app.ApplicationExitInfo> rows=
+          manager.getHistoricalProcessExitReasons(getPackageName(),0,12);
+      if(rows==null||rows.isEmpty())return "No recent Infinity process exits were reported by Android.\n";
+      java.text.SimpleDateFormat stamp=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss",java.util.Locale.US);
+      int index=0;
+      for(android.app.ApplicationExitInfo row:rows){
+        out.append("#").append(++index).append("  ")
+            .append(stamp.format(new java.util.Date(row.getTimestamp()))).append('\n');
+        out.append("Reason: ").append(infinityExitReasonName(row.getReason())).append('\n');
+        out.append("Process: ").append(row.getProcessName()).append('\n');
+        if(row.getDescription()!=null&&!row.getDescription().trim().isEmpty())
+          out.append("Description: ").append(row.getDescription().trim()).append('\n');
+        out.append("Status: ").append(row.getStatus()).append("  Importance: ").append(row.getImportance()).append('\n');
+        out.append("PSS/RSS: ").append(row.getPss()).append('/').append(row.getRss()).append(" KB\n");
+        out.append('\n');
+      }
+    }catch(Exception e){
+      out.append("Could not read Android exit history: ").append(e.getClass().getSimpleName()).append('\n');
+    }
+    return out.toString();
+  }
+
+  private String infinityHealthReport()
+  {
+    String trace=InfinityResponsiveTrace.isEnabled(this)
+        ?"Responsive/Fold trace: ACTIVE — reproduce the problem, then return to Health Center and stop/export it.\n"
+        :"Historical completed Responsive/Fold trace\n=========================================\nThis retained trace has its own session/date below. It is not a measurement of this launch.\n"+InfinityResponsiveTrace.latestSummary(this)+"\n";
+    return infinityHealthBuildInfo()+"\n"+InfinityStartupTrace.report(this)+"\n"+InfinityExitCompletion.report(this)+"\n"+InfinityResponsiveness.report(this)+"\n"+trace+"\nRecent process exits\n====================\n"+
+        infinityHealthExitHistory(false)+"\nRaw Android crash/ANR traces are included separately in Export diagnostics ZIP when available.\n";
+  }
+
+  private void infinityStartResponsiveTrace()
+  {
+    try
+    {
+      InfinityResponsiveTrace.start(this);
+      android.widget.Toast.makeText(this,
+          "Responsive/Fold trace started. Reproduce the resize problem, then return to Health Center.",
+          android.widget.Toast.LENGTH_LONG).show();
+    }
+    catch(Exception e)
+    {
+      android.widget.Toast.makeText(this,"Could not start Responsive/Fold trace: "+e.getClass().getSimpleName(),
+          android.widget.Toast.LENGTH_LONG).show();
+    }
+  }
+
+  private void infinityExportResponsiveTrace()
+  {
+    try
+    {
+      mInfinityResponsiveTraceExportFile=InfinityResponsiveTrace.stopAndBuildArchive(this);
+      Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+      intent.addCategory(Intent.CATEGORY_OPENABLE);intent.setType("application/zip");
+      intent.putExtra(Intent.EXTRA_TITLE,mInfinityResponsiveTraceExportFile.getName());
+      startActivityForResult(intent,INFINITY_RESPONSIVE_TRACE_EXPORT_RESULT_CODE);
+    }
+    catch(Exception e)
+    {
+      mInfinityResponsiveTraceExportFile=null;
+      android.widget.Toast.makeText(this,"Could not finish Responsive/Fold trace: "+e.getClass().getSimpleName(),
+          android.widget.Toast.LENGTH_LONG).show();
+    }
+  }
+
+  private void infinityHealthToast(String message)
+  {
+    runOnUiThread(() -> {
+      if (!isFinishing() && !isDestroyed())
+        android.widget.Toast.makeText(this,message,android.widget.Toast.LENGTH_LONG).show();
+    });
+  }
+
+  private void infinityCopyHealthReport()
+  {
+    if (!mInfinityHealthBusy.compareAndSet(false,true)) return;
+    Thread worker=new Thread(() -> {
+      try {
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        String report=infinityHealthReport();
+        // Binder/clipboard stays bounded, even if a retained report grows.
+        final String copy=report.length()>120000
+            ?report.substring(0,120000)+"\n[Clipboard summary truncated; export diagnostics ZIP for full evidence.]"
+            :report;
+        runOnUiThread(() -> {
+          if (isFinishing() || isDestroyed()) return;
+          try {
+            android.content.ClipboardManager clipboard=(android.content.ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard!=null) {
+              clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Infinity diagnostics",copy));
+              infinityHealthToast("Infinity diagnostic summary copied.");
+            }
+          } catch (RuntimeException failure) { infinityHealthToast("Could not copy the diagnostic summary."); }
+        });
+      } catch (Exception failure) { infinityHealthToast("Could not collect the diagnostic summary."); }
+      finally { mInfinityHealthBusy.set(false); }
+    },"InfinityHealthCopy");
+    worker.setDaemon(true);worker.start();
+  }
+
+  private void infinityExportHealthReport()
+  {
+    if (mInfinityHealthBusy.get()) return;
+    Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType("application/zip");
+    String stamp=new java.text.SimpleDateFormat("yyyyMMdd-HHmmss",java.util.Locale.US).format(new java.util.Date());
+    intent.putExtra(Intent.EXTRA_TITLE,"Infinity-Diagnostics-"+stamp+".zip");
+    try{startActivityForResult(intent,INFINITY_HEALTH_EXPORT_RESULT_CODE);}
+    catch(Exception e){infinityHealthToast("No compatible file saver is available.");}
+  }
+
+  private void infinitySaveHealthArchive(android.net.Uri destination)
+  {
+    if (!mInfinityHealthBusy.compareAndSet(false,true)) return;
+    final Context app=getApplicationContext();
+    Thread worker=new Thread(() -> {
+      try {
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        String report=infinityHealthReport();
+        try (java.io.OutputStream output=app.getContentResolver().openOutputStream(destination,"w")) {
+          if(output==null)throw new java.io.IOException("No document output stream");
+          InfinityHealthExport.write(app,output,report);
+        }
+        infinityHealthToast("Infinity diagnostic ZIP saved.");
+      } catch (Exception failure) {
+        android.util.Log.w("InfinityHealth","Diagnostic export failed: "+failure.getClass().getSimpleName());
+        infinityHealthToast("Could not finish the diagnostic ZIP. The selected file may be incomplete.");
+      } finally { mInfinityHealthBusy.set(false); }
+    },"InfinityHealthExport");
+    worker.setDaemon(true);worker.start();
+  }
+
+  private void showInfinityExperienceChooser()
+  {
+    mInfinityChooserVisible = true;
+    if (mInfinityStartupTrace != null) {
+      mInfinityStartupTrace.event("chooser.compose");
+      if (mInfinityChooserFrame != null) mInfinityChooserFrame.close();
+      mInfinityChooserFrame = new InfinityStartupHandoff(this,findViewById(android.R.id.content));
+      mInfinityChooserFrame.enqueue(() -> mInfinityStartupTrace.event("chooser.firstFrame"));
+      if (mInfinityResumed) mInfinityChooserFrame.resume();
+    }
+    if (showLockedGlassChooser()) return;
+    ExperienceTheme theme = loadExperienceTheme();
+    if(theme==null&&vtheme().installed()){
+      try{org.json.JSONObject defaults=new org.json.JSONObject();defaults.put("schema",1);defaults.put("scope","infinity-experience-chooser");defaults.put("minimum_bridge",1);defaults.put("copy",new org.json.JSONObject());defaults.put("palette",new org.json.JSONObject());theme=new ExperienceTheme(defaults);}catch(Exception invalid){theme=null;}
+    }
+    if (theme == null)
+    {
+      showLegacyInfinityExperienceChooser();
+      return;
+    }
+    showStyledInfinityExperienceChooser(resolveVisualExperienceTheme(theme));
+  }
+
+  /** Built-in locked phone visual; original native routing/recovery own all actions. */
+  private boolean showLockedGlassChooser() {
+    if (isAndroidTV() || CobraPresentationSafety.isSafe(this)) return false;
+    try {
+      InfinityGlassChooser glass = new InfinityGlassChooser(this, new InfinityGlassChooser.Actions() {
+        public void enter(String experience) { launchInfinityExperience(experience); }
+        public void settings(String experience) { showExperienceCardSettings(experience); }
+        public void themes() { vtheme().manager(Splash.this); }
+        public String appearance() { return chooserAppearanceMode(); }
+        public void appearanceChanged() { cobraRefreshSafetyChooser(); }
+      });
+      org.json.JSONObject spec = new org.json.JSONObject();
+      spec.put("schema",1);spec.put("scope","infinity-experience-chooser");spec.put("minimum_bridge",1);
+      spec.put("copy",new org.json.JSONObject());
+      org.json.JSONObject palette = new org.json.JSONObject();
+      palette.put("background",glass.light?"#EEF1F5":"#041326");spec.put("palette",palette);
+      ExperienceTheme bars = new ExperienceTheme(spec);
+      setContentView(glass);
+      cobraPrepareExperienceSystemBars(bars,glass,glass.content);
+      glass.focusEntry();
+      return true;
+    } catch (RuntimeException | org.json.JSONException failed) {
+      // Presentation failure returns to the existing native chooser; never reset user data.
+      android.util.Log.e("InfinityChooser","Glass presentation unavailable; using existing chooser",failed);
+      return false;
+    }
+  }
+
+  void cobraRefreshSafetyChooser(){if(!isFinishing()&&!isDestroyed())showInfinityExperienceChooser();}
+
+  private InfinityGlassRecovery.Builder cobraRecoveryDialog(){
+    return new InfinityGlassRecovery.Builder(this,()->"light".equals(chooserAppearanceMode()),
+        new CobraVisualRenderer.DialogBuilder(this,vtheme(),"chooser.recovery"),
+        !isAndroidTV() && !CobraPresentationSafety.isSafe(this));
+  }
+
+  private void showInfinityClosingRecovery(){
+    InfinityKodiShutdown.Snapshot owner=InfinityKodiShutdown.state();
+    if(!owner.stalled())return;
+    cobraRecoveryDialog().setTitle("Infinity is still closing")
+        .setMessage("Required saves could not yet be confirmed. You can keep waiting, or explicitly Force Close this instance and reopen Infinity. Force Close may interrupt unfinished saves.")
+        .setPositiveButton("Close stalled instance",(dialog,which)->{
+          InfinityKodiShutdown.Snapshot current=InfinityKodiShutdown.state();
+          if(current.pid==owner.pid&&current.owner.equals(owner.owner)&&current.stalled())
+            startActivity(InfinityKodiShutdown.force(this,current));
+        }).setNegativeButton("Keep waiting",null).show();
+  }
+
+  private void showCobraRecovery(){
+    cobraRecoveryDialog()
+        .setTitle("Cobra Recovery")
+        .setItems(new String[]{"Start Cobra in Safe Mode","Restore Built-in Theme"},(dialog,which)->{
+          if(which==0)launchInfinityExperience("live",true,true);
+          else cobraRecoveryDialog()
+              .setTitle("Restore Built-in Theme?")
+              .setMessage("Restore Cobra's built-in presentation. Your themes, sources, settings and playback data are kept.")
+              .setPositiveButton("Restore",(d,w)->CobraPresentationSafety.restoreBuiltIn(this,null))
+              .setNegativeButton("Cancel",null).show();
+        }).setNegativeButton("Close",null).show();
+  }
+
+  // Custom chooser scenes may hide or move their own gear slot. This native
+  // instance of the same Cobra gear remains outside imported scene ownership.
+  private void cobraAttachRecoveryGear(android.widget.FrameLayout root){
+    // The approved built-in/legacy chooser keeps its original card gear exactly.
+    // Only imported visual scenes can arbitrarily hide the escape route.
+    if(root==null||!vtheme().visualInstalled())return;
+    View hostView=findViewById(android.R.id.content);if(!(hostView instanceof android.widget.FrameLayout))return;
+    android.widget.FrameLayout host=(android.widget.FrameLayout)hostView;
+    if(mCobraRecoveryGear!=null&&mCobraRecoveryGear.getParent()==host)return;
+    View prior=root.findViewWithTag("experience-settings-cobra");
+    if(prior!=null&&prior.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)prior.getParent()).removeView(prior);
+    android.widget.Button gear=new android.widget.Button(this);gear.setText("Cobra ⚙");gear.setAllCaps(false);
+    gear.setTextColor(0xfff7faff);gear.setTextSize(13);gear.setTypeface(android.graphics.Typeface.create("sans-serif-medium",0));
+    gear.setContentDescription("Cobra settings and recovery");gear.setTag("experience-settings-cobra");mCobraRecoveryGear=gear;
+    android.graphics.drawable.GradientDrawable bg=new android.graphics.drawable.GradientDrawable();bg.setColor(0xff0b0f16);bg.setCornerRadius(chooserDp(14));bg.setStroke(Math.max(1,chooserDp(1)),0xff62aaff);gear.setBackground(bg);
+    gear.setPadding(chooserDp(12),0,chooserDp(12),0);gear.setMinHeight(chooserDp(48));gear.setOnClickListener(v->showExperienceCardSettings("live"));
+    android.widget.FrameLayout.LayoutParams p=new android.widget.FrameLayout.LayoutParams(-2,chooserDp(48),android.view.Gravity.END|android.view.Gravity.TOP);p.setMargins(chooserDp(12),chooserDp(12),chooserDp(12),0);host.addView(gear,p);
+    gear.setElevation(chooserDp(20));
+    gear.setOnApplyWindowInsetsListener((view,insets)->{android.widget.FrameLayout.LayoutParams lp=(android.widget.FrameLayout.LayoutParams)gear.getLayoutParams();lp.topMargin=chooserDp(12)+insets.getSystemWindowInsetTop();lp.rightMargin=chooserDp(12)+insets.getSystemWindowInsetRight();gear.setLayoutParams(lp);return insets;});gear.requestApplyInsets();
+  }
+  private View mCobraRecoveryGear;
+
+  private void showLegacyInfinityExperienceChooser()
+  {
+    final int white = chooserBuiltinColor("text", 0xff101b2c, 0xfff7faff);
+    final int muted = chooserBuiltinColor("muted", 0xff526176, 0xffb1bfd2);
+    final int panel = chooserBuiltinColor("panel", 0xfff5f8fd, "oled".equals(chooserAppearanceMode()) ? 0xff070a10 : 0xff0b0f16);
+    final int rim = chooserBuiltinColor("rim", 0xffcbd7e8, 0xff293244);
+    final int[] selected = {0};
+
+    android.widget.LinearLayout root = new android.widget.LinearLayout(this);
+    root.setOrientation(android.widget.LinearLayout.VERTICAL);
+    root.setGravity(android.view.Gravity.CENTER);
+    int outer = getResources().getConfiguration().screenWidthDp < 360 ? 20 : 36;
+    root.setPadding(chooserDp(outer), chooserDp(28), chooserDp(outer), chooserDp(22));
+    root.setBackgroundColor(chooserBuiltinColor("background", android.graphics.Color.WHITE, android.graphics.Color.BLACK));
+    android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+    scroll.setFillViewport(true); scroll.setClipToPadding(false);
+    scroll.setBackgroundColor(chooserBuiltinColor("background", android.graphics.Color.WHITE, android.graphics.Color.BLACK));
+    scroll.addView(root, new android.widget.ScrollView.LayoutParams(-1, -2));
+
+    android.widget.TextView brand = chooserText("INFINITY 2-IN-1", muted, 14);
+    brand.setLetterSpacing(0.14f);
+    brand.setMinHeight(chooserDp(34));
+    root.addView(brand, new android.widget.LinearLayout.LayoutParams(
+        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+
+    android.widget.TextView title = chooserText("Choose Your Experience", white, 32);
+    title.setTypeface(vtheme().font("chooser.title", android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)));
+    title.setMinHeight(chooserDp(58));
+    root.addView(title, new android.widget.LinearLayout.LayoutParams(
+        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+
+    android.widget.TextView subtitle = chooserText(
+        "Two separate environments  •  One seamless application", muted, 16);
+    subtitle.setMinHeight(chooserDp(42));
+    root.addView(subtitle, new android.widget.LinearLayout.LayoutParams(
+        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+
+    android.widget.LinearLayout cards = new android.widget.LinearLayout(this);
+    cards.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    cards.setGravity(android.view.Gravity.CENTER);
+    cards.setMinimumHeight(chooserDp(230));
+    android.widget.LinearLayout.LayoutParams cardsParams =
+        new android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+    cardsParams.topMargin = chooserDp(18);
+    root.addView(cards, cardsParams);
+
+    android.widget.Button infinity = chooserCard(
+        "∞  INFINITY\n\nYour Home for Movies, Shows,\nLive TV and More",
+        panel, rim);
+    android.widget.Button cobra = chooserCard(
+        "◈  COBRA\n\nLive TV Focused. Fast.\nSimple. Powerful.",
+        panel, rim);
+
+    android.widget.FrameLayout infinityCard = new android.widget.FrameLayout(this);
+    infinityCard.addView(infinity, new android.widget.FrameLayout.LayoutParams(
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+    android.widget.Button infinitySettings = new android.widget.Button(this);
+    infinitySettings.setText("⚙");
+    infinitySettings.setTextColor(white);
+    infinitySettings.setTextSize(18);
+    infinitySettings.setAllCaps(false);
+    infinitySettings.setPadding(0, 0, 0, 0);
+    infinitySettings.setMinHeight(0);
+    infinitySettings.setMinWidth(0);
+    infinitySettings.setContentDescription("Infinity settings");
+    infinitySettings.setBackground(chooserControlSurface(panel, rim, 18));
+    android.widget.FrameLayout.LayoutParams infinityGearParams =
+        new android.widget.FrameLayout.LayoutParams(
+            chooserDp(48), chooserDp(48), android.view.Gravity.TOP | android.view.Gravity.END);
+    infinityGearParams.setMargins(0, chooserDp(10), chooserDp(10), 0);
+    infinityCard.addView(infinitySettings, infinityGearParams);
+
+    android.widget.FrameLayout cobraCard = new android.widget.FrameLayout(this);
+    cobraCard.addView(cobra, new android.widget.FrameLayout.LayoutParams(
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+        android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+    android.widget.Button cobraSettings = new android.widget.Button(this);
+    cobraSettings.setText("⚙");
+    cobraSettings.setTextColor(white);
+    cobraSettings.setTextSize(18);
+    cobraSettings.setAllCaps(false);
+    cobraSettings.setPadding(0, 0, 0, 0);
+    cobraSettings.setMinHeight(0);
+    cobraSettings.setMinWidth(0);
+    cobraSettings.setContentDescription("Cobra settings");
+    cobraSettings.setBackground(chooserControlSurface(panel, rim, 18));
+    android.widget.FrameLayout.LayoutParams cobraGearParams =
+        new android.widget.FrameLayout.LayoutParams(
+            chooserDp(48), chooserDp(48), android.view.Gravity.TOP | android.view.Gravity.END);
+    cobraGearParams.setMargins(0, chooserDp(10), chooserDp(10), 0);
+    cobraCard.addView(cobraSettings, cobraGearParams);
+
+    android.widget.LinearLayout.LayoutParams infinityParams =
+        new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
+    infinityParams.rightMargin = chooserDp(10);
+    cards.addView(infinityCard, infinityParams);
+    android.widget.LinearLayout.LayoutParams cobraParams =
+        new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
+    cobraParams.leftMargin = chooserDp(10);
+    cards.addView(cobraCard, cobraParams);
+
+    infinity.setOnClickListener(v -> launchInfinityExperience("infinity"));
+    cobra.setOnClickListener(v -> launchInfinityExperience("live"));
+    infinitySettings.setOnClickListener(v -> showExperienceCardSettings("infinity"));
+    cobraSettings.setOnClickListener(v -> showExperienceCardSettings("live"));
+
+    // D-pad/remote focus remains visual only; activation still happens on click.
+    infinity.setOnFocusChangeListener((v, hasFocus) -> {
+      if (hasFocus) {
+        setChooserCardState(infinity, true, true);
+        setChooserCardState(cobra, false, false);
+      }
+    });
+    cobra.setOnFocusChangeListener((v, hasFocus) -> {
+      if (hasFocus) {
+        setChooserCardState(cobra, false, true);
+        setChooserCardState(infinity, true, false);
+      }
+    });
+    infinity.requestFocus();
+    setChooserCardState(infinity, true, true);
+    setChooserCardState(cobra, false, false);
+
+    setContentView(scroll);
+    chooserPrepareBuiltinSystemBars();
+  }
+
+  private static final int INFINITY_EXPERIENCE_THEME_BRIDGE = 1;
+  private static final String INFINITY_EXPERIENCE_THEME_FILE =
+      ".kodi/addons/script.infinity.cobra.theme/resources/experience-chooser.json";
+
+  private static final class ExperienceTheme
+  {
+    final String brand, brandTagline, title, initials, personalization;
+    final String infinityTitle, infinitySubtitle, cobraTitle, cobraSubtitle;
+    final String footerBrand, footerTagline;
+    final int background, backgroundGlow, text, muted;
+    final int infinityTop, infinityBottom, infinityBorder, infinityGlow;
+    final int cobraTop, cobraBottom, cobraBorder, cobraGlow;
+    final int badgeFill, badgeBorder, horizon;
+    final int outerPadding, cardRadius, cardGap, cardHeight, stackBelowWidth, motionMs;
+
+    ExperienceTheme(org.json.JSONObject root) throws org.json.JSONException
+    {
+      if (root.optInt("schema", 0) != 1 ||
+          !"infinity-experience-chooser".equals(root.optString("scope")) ||
+          root.optInt("minimum_bridge", Integer.MAX_VALUE) > INFINITY_EXPERIENCE_THEME_BRIDGE)
+        throw new org.json.JSONException("Unsupported experience theme contract");
+      org.json.JSONObject copy = root.getJSONObject("copy");
+      org.json.JSONObject palette = root.getJSONObject("palette");
+      org.json.JSONObject layout = root.optJSONObject("layout");
+      brand = chooserThemeText(copy, "brand", "INFINITY", 28, false);
+      brandTagline = chooserThemeText(copy, "brand_tagline", "BEYOND ENTERTAINMENT", 40, false);
+      title = chooserThemeText(copy, "title", "Choose Your Experience", 48, false);
+      initials = chooserInitials(copy.optString("initials", "HM"));
+      personalization = chooserThemeText(copy, "personalization", "PERSONALIZED FOR YOU", 40, false);
+      infinityTitle = chooserThemeText(copy, "infinity_title", "INFINITY", 24, false);
+      infinitySubtitle = chooserThemeText(copy, "infinity_subtitle", "YOUR HOME FOR MOVIES, SHOWS AND MORE", 72, true);
+      cobraTitle = chooserThemeText(copy, "cobra_title", "COBRA", 24, false);
+      cobraSubtitle = chooserThemeText(copy, "cobra_subtitle", "FOCUSED. FAST. POWERFUL.", 72, true);
+      footerBrand = chooserThemeText(copy, "footer_brand", "INFINITY BY HASSINE MAHFOUZ", 56, false);
+      footerTagline = chooserThemeText(copy, "footer_tagline", "ONE APP • YOUR WORLD", 48, false);
+      background = chooserThemeColor(palette, "background", "#030713");
+      backgroundGlow = chooserThemeColor(palette, "background_glow", "#14253B");
+      text = chooserThemeColor(palette, "text", "#F4F8FF");
+      muted = chooserThemeColor(palette, "muted", "#91A4BB");
+      infinityTop = chooserThemeColor(palette, "infinity_top", "#0B4771");
+      infinityBottom = chooserThemeColor(palette, "infinity_bottom", "#082B4A");
+      infinityBorder = chooserThemeColor(palette, "infinity_border", "#28D9FF");
+      infinityGlow = chooserThemeColor(palette, "infinity_glow", "#1AB8F0");
+      cobraTop = chooserThemeColor(palette, "cobra_top", "#66151D");
+      cobraBottom = chooserThemeColor(palette, "cobra_bottom", "#351017");
+      cobraBorder = chooserThemeColor(palette, "cobra_border", "#FF3B4F");
+      cobraGlow = chooserThemeColor(palette, "cobra_glow", "#E21D35");
+      badgeFill = chooserThemeColor(palette, "badge_fill", "#10213A");
+      badgeBorder = chooserThemeColor(palette, "badge_border", "#4AA7FF");
+      horizon = chooserThemeColor(palette, "horizon", "#17B6FF");
+      outerPadding = chooserThemeBound(layout, "outer_padding_dp", 24, 12, 48);
+      cardRadius = chooserThemeBound(layout, "card_radius_dp", 22, 10, 40);
+      cardGap = chooserThemeBound(layout, "card_gap_dp", 14, 6, 30);
+      cardHeight = chooserThemeBound(layout, "card_height_dp", 230, 180, 320);
+      stackBelowWidth = chooserThemeBound(layout, "stack_below_width_dp", 330, 280, 480);
+      motionMs = chooserThemeBound(layout, "motion_ms", 180, 0, 400);
+    }
+  }
+
+  private static String chooserThemeText(org.json.JSONObject object, String key,
+      String fallback, int max, boolean forbidLegacy) throws org.json.JSONException
+  {
+    String value = object.optString(key, fallback).trim();
+    if (value.isEmpty() || value.length() > max || value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0)
+      throw new org.json.JSONException("Invalid experience copy: " + key);
+    String lower = value.toLowerCase(java.util.Locale.US);
+    if (forbidLegacy && (lower.contains("live tv") || lower.contains("2-in-1") || lower.contains("2 in 1")))
+      throw new org.json.JSONException("Legacy chooser copy rejected");
+    return value;
+  }
+
+  private static String chooserInitials(String value) throws org.json.JSONException
+  {
+    String initials = value == null ? "" : value.trim().toUpperCase(java.util.Locale.US);
+    if (!initials.matches("[A-Z]{1,3}"))
+      throw new org.json.JSONException("Invalid chooser initials");
+    return initials;
+  }
+
+  private static int chooserThemeColor(org.json.JSONObject object, String key, String fallback)
+      throws org.json.JSONException
+  {
+    String value = object.optString(key, fallback).trim();
+    if (!value.matches("#[0-9A-Fa-f]{6}|#[0-9A-Fa-f]{8}"))
+      throw new org.json.JSONException("Invalid experience color: " + key);
+    return android.graphics.Color.parseColor(value);
+  }
+
+  private static int chooserThemeBound(org.json.JSONObject object, String key,
+      int fallback, int low, int high)
+  {
+    int value = object == null ? fallback : object.optInt(key, fallback);
+    return Math.max(low, Math.min(high, value));
+  }
+
+  private ExperienceTheme loadExperienceTheme()
+  {
+    File root = CobraPresentationSafety.legacyDirectory(this);
+    if (root == null)
+      return null;
+    File file = new File(root, "resources/experience-chooser.json");
+    try
+    {
+      if (!file.isFile() || file.length() <= 0 || file.length() > 65536)
+        return null;
+      File addon = new File(root, "resources");
+      String parent = addon.getCanonicalPath() + File.separator;
+      if (!file.getCanonicalPath().startsWith(parent))
+        return null;
+      int size = (int) file.length();
+      byte[] data = new byte[size]; int offset = 0;
+      try (java.io.FileInputStream input = new java.io.FileInputStream(file))
+      {
+        while (offset < size)
+        {
+          int read = input.read(data, offset, size - offset);
+          if (read < 0) break;
+          if (read == 0) throw new java.io.IOException("Stalled experience theme read");
+          offset += read;
+        }
+      }
+      if (offset != size) return null;
+      return new ExperienceTheme(new org.json.JSONObject(
+          new String(data, java.nio.charset.StandardCharsets.UTF_8)));
+    }
+    catch (Exception failure)
+    {
+      Log.w(TAG, "Experience theme ignored: " + failure.getClass().getSimpleName());
+      return null;
+    }
+  }
+
+  private android.graphics.drawable.GradientDrawable chooserGradient(
+      int top, int bottom, int stroke, int radius, boolean active)
+  {
+    android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable(
+        android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+        new int[]{top, bottom});
+    shape.setCornerRadius(chooserDp(radius));
+    shape.setStroke(chooserDp(active ? 2 : 1), stroke);
+    return shape;
+  }
+  private final class ExperienceBackdrop extends View
+  {
+    private final ExperienceTheme theme;
+    private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+    ExperienceBackdrop(ExperienceTheme value) { super(Splash.this); theme = value; setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO); }
+    @Override protected void onDraw(android.graphics.Canvas canvas)
+    {
+      if(vtheme().draw(canvas,"chooser.background",0,0,getWidth(),getHeight(),"cover"))return;
+      int w = getWidth(), h = getHeight();
+      canvas.drawColor(theme.background);
+      paint.setShader(new android.graphics.RadialGradient(w * .5f, h * .35f,
+          Math.max(w, h) * .68f, theme.backgroundGlow, theme.background,
+          android.graphics.Shader.TileMode.CLAMP));
+      canvas.drawRect(0, 0, w, h, paint); paint.setShader(null);
+      paint.setStyle(android.graphics.Paint.Style.STROKE);
+      paint.setStrokeWidth(Math.max(1, chooserDp(vtheme().dimension("chooser.ExperienceBackdrop.dimensions.1",1))));
+      paint.setColor((theme.horizon & 0x00ffffff) | 0x55000000);
+      android.graphics.RectF horizon = new android.graphics.RectF(-w * .12f, h * .70f, w * 1.12f, h * 1.28f);
+      canvas.drawArc(horizon, 196, 148, false, paint);
+      paint.setColor((theme.horizon & 0x00ffffff) | 0x22000000);
+      for (int i = 1; i <= 4; ++i)
+      {
+        float inset = i * chooserDp(vtheme().dimension("chooser.ExperienceBackdrop.dimensions.2",12));
+        android.graphics.RectF echo = new android.graphics.RectF(
+            horizon.left + inset, horizon.top + inset * .45f,
+            horizon.right - inset, horizon.bottom - inset * .45f);
+        canvas.drawArc(echo, 198, 144, false, paint);
+      }
+      paint.setStyle(android.graphics.Paint.Style.FILL);
+    }
+  }
+
+  private final class ExperienceMark extends View
+  {
+    private final boolean cobra;
+    private final int color;
+    private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+    private final android.graphics.RectF cobraBounds = new android.graphics.RectF();
+    ExperienceMark(boolean isCobra, int ink) { super(Splash.this); cobra = isCobra; color = ink; if(cobra)CobraEmblem.prepare(getContext()); setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO); }
+    @Override protected void onDraw(android.graphics.Canvas canvas)
+    {
+      // Cobra identity is the approved shared artwork; Infinity's theme slot is unchanged.
+      if(cobra){cobraBounds.set(0,0,getWidth(),getHeight());CobraEmblem.draw(canvas,cobraBounds,android.graphics.Color.WHITE,255);return;}
+      if(vtheme().draw(canvas,"chooser.mark.infinity",0,0,getWidth(),getHeight(),"contain"))return;
+      int w = getWidth(), h = getHeight(); float cx = w / 2f, cy = h / 2f;
+      paint.setStyle(android.graphics.Paint.Style.STROKE); paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+      paint.setStrokeJoin(android.graphics.Paint.Join.ROUND); paint.setStrokeWidth(Math.max(2, Math.min(w, h) * .065f)); paint.setColor(color);
+      android.graphics.Path path = new android.graphics.Path();
+      if (!cobra)
+      {
+        float rx = w * .33f, ry = h * .25f;
+        path.moveTo(cx, cy);
+        path.cubicTo(cx - rx * .45f, cy - ry, cx - rx, cy - ry, cx - rx, cy);
+        path.cubicTo(cx - rx, cy + ry, cx - rx * .45f, cy + ry, cx, cy);
+        path.cubicTo(cx + rx * .45f, cy - ry, cx + rx, cy - ry, cx + rx, cy);
+        path.cubicTo(cx + rx, cy + ry, cx + rx * .45f, cy + ry, cx, cy);
+      }
+      canvas.drawPath(path, paint);
+    }
+  }
+  private android.widget.TextView chooserStyledText(String value, int color, float sp,
+      boolean medium, int gravity)
+  {
+    android.widget.TextView text = chooserText(value, color, sp);
+    text.setPadding(0, 0, 0, 0);
+    text.setGravity(gravity);
+    text.setTypeface(vtheme().font("chooser.chooserStyledText.styles.1",android.graphics.Typeface.create(medium ? "sans-serif-medium" : "sans-serif", android.graphics.Typeface.NORMAL)));
+    text.setIncludeFontPadding(false);
+    return text;
+  }
+
+  private android.widget.FrameLayout chooserExperienceCard(ExperienceTheme theme,
+      boolean infinity, Runnable launch, Runnable settings)
+  {
+    int border = infinity ? theme.infinityBorder : theme.cobraBorder;
+    int top = infinity ? theme.infinityTop : theme.cobraTop;
+    int bottom = infinity ? theme.infinityBottom : theme.cobraBottom;
+    int glow = infinity ? theme.infinityGlow : theme.cobraGlow;
+    String title = infinity ? theme.infinityTitle : theme.cobraTitle;
+    String subtitle = infinity ? theme.infinitySubtitle : theme.cobraSubtitle;
+
+    android.widget.FrameLayout card = new android.widget.FrameLayout(this);
+    card.setFocusable(true); card.setClickable(true); card.setTag(infinity ? "experience-card-infinity" : "experience-card-cobra");
+    card.setContentDescription(title + ", " + subtitle);
+    card.setBackground(chooserGradient(top, bottom, border, theme.cardRadius, false));
+    card.setPadding(chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.1",18)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.2",16)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.3",18)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.4",14)));
+
+    android.widget.LinearLayout body = new android.widget.LinearLayout(this);
+    body.setOrientation(android.widget.LinearLayout.VERTICAL); body.setGravity(android.view.Gravity.CENTER);
+    ExperienceMark mark = new ExperienceMark(!infinity, border); mark.setTag(infinity ? "experience-mark-infinity" : "experience-mark-cobra");
+    body.addView(mark, new android.widget.LinearLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.5",112)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.6",78))));
+    android.widget.TextView heading = chooserStyledText(title, theme.text, 23, true, android.view.Gravity.CENTER); heading.setLetterSpacing(vtheme().number("chooser.chooserExperienceCard.numbers.1",.12f,-0.02f,0.25f)); body.addView(heading);
+    android.widget.TextView copy = chooserStyledText(subtitle, theme.text, 12, false, android.view.Gravity.CENTER); copy.setLetterSpacing(vtheme().number("chooser.chooserExperienceCard.numbers.2",.06f,-0.02f,0.25f)); copy.setMaxLines(3);
+    android.widget.LinearLayout.LayoutParams copyParams = new android.widget.LinearLayout.LayoutParams(-1, -2); copyParams.topMargin = chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.7",10)); body.addView(copy, copyParams);
+    card.addView(body, new android.widget.FrameLayout.LayoutParams(-1, -1));
+
+    android.widget.TextView gear = chooserStyledText(vtheme().copy("chooser.chooserExperienceCard.copy.1","⚙"), theme.text, 17, false, android.view.Gravity.CENTER);
+    gear.setFocusable(true); gear.setClickable(true); gear.setTag(infinity ? "experience-settings-infinity" : "experience-settings-cobra"); gear.setContentDescription(title + " settings");
+    gear.setBackground(chooserControlSurface((top & 0x00ffffff) | 0xdd000000, border, 16, glow));
+    if(!infinity&&!vtheme().visualInstalled()){
+      // Legacy chooser palette files can contain equal foreground/background
+      // colors. Keep the existing Cobra gear and bounds, with independent ink.
+      boolean light="light".equals(chooserAppearanceMode());gear.setText("⚙");
+      gear.setTextColor(light?0xff101b2c:0xfff7faff);
+      gear.setTypeface(android.graphics.Typeface.create("sans-serif",0));
+      gear.setBackground(chooserControlSurface(light?0xfff5f8fd:0xff0b0f16,light?0xff145fdf:0xff62aaff,16,light?0xff145fdf:0xff62aaff));
+    }
+    gear.setOnClickListener(v -> settings.run());
+    android.widget.FrameLayout.LayoutParams gearParams = new android.widget.FrameLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.8",44)), chooserDp(vtheme().dimension("chooser.chooserExperienceCard.dimensions.9",44)), android.view.Gravity.TOP | android.view.Gravity.END);
+    card.addView(gear, gearParams);
+
+    card.setOnClickListener(v -> launch.run());
+    card.setOnFocusChangeListener((v, focused) -> {
+      card.setBackground(chooserGradient(top, bottom, focused ? glow : border, theme.cardRadius, focused));
+      card.animate().cancel();
+      long duration = vtheme().motion("chooser.layout.motion_ms", theme.motionMs);
+      if (duration == 0) { card.setScaleX(focused ? 1.015f : 1f); card.setScaleY(focused ? 1.015f : 1f); }
+      else card.animate().scaleX(focused ? 1.015f : 1f).scaleY(focused ? 1.015f : 1f)
+          .setDuration(duration).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+      card.setElevation(chooserDp(focused ? 9 : 3));vtheme().paint(card,infinity?"chooser.card.infinity":"chooser.card.cobra");
+    });
+    vtheme().tree(card,infinity?"chooser.card.infinity":"chooser.card.cobra");return card;
+  }
+  private void showStyledInfinityExperienceChooser(ExperienceTheme theme)
+  {
+    if(showVisualExperienceScene(theme))return;
+    android.widget.FrameLayout root = new android.widget.FrameLayout(this);
+    root.setTag("experience-themed-root");
+    root.addView(new ExperienceBackdrop(theme), new android.widget.FrameLayout.LayoutParams(-1, -1));
+
+    android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+    scroll.setFillViewport(true); scroll.setClipToPadding(false);
+    android.widget.LinearLayout content = new android.widget.LinearLayout(this);
+    content.setOrientation(android.widget.LinearLayout.VERTICAL); content.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+    int heightDp=Math.round(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
+    boolean compactHeight=heightDp<700;
+    content.setPadding(chooserDp(theme.outerPadding), chooserDp(compactHeight?8:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.1",20)), chooserDp(theme.outerPadding), chooserDp(compactHeight?8:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.2",18)));
+    scroll.addView(content, new android.widget.ScrollView.LayoutParams(-1, -2));
+    android.widget.FrameLayout safeContent=new android.widget.FrameLayout(this);safeContent.setTag("experience-safe-content");
+    safeContent.addView(scroll,new android.widget.FrameLayout.LayoutParams(-1,-1));
+    root.addView(safeContent, new android.widget.FrameLayout.LayoutParams(-1, -1));
+
+    android.widget.FrameLayout identity = new android.widget.FrameLayout(this);
+    android.widget.LinearLayout center = new android.widget.LinearLayout(this); center.setOrientation(android.widget.LinearLayout.VERTICAL); center.setGravity(android.view.Gravity.CENTER);
+    ExperienceMark infinityMark = new ExperienceMark(false, theme.infinityBorder); center.addView(infinityMark, new android.widget.LinearLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.3",94)), chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.4",54))));
+    android.widget.TextView brand = chooserStyledText(theme.brand, theme.text, 22, true, android.view.Gravity.CENTER); brand.setLetterSpacing(vtheme().number("chooser.showStyledInfinityExperienceChooser.numbers.1",.28f,-0.02f,0.25f)); center.addView(brand);
+    android.widget.TextView brandTag = chooserStyledText(theme.brandTagline, theme.muted, 10, false, android.view.Gravity.CENTER); brandTag.setLetterSpacing(vtheme().number("chooser.showStyledInfinityExperienceChooser.numbers.2",.24f,-0.02f,0.25f)); center.addView(brandTag);
+    identity.addView(center, new android.widget.FrameLayout.LayoutParams(-1, -2, android.view.Gravity.CENTER));
+
+    android.widget.LinearLayout personalized = new android.widget.LinearLayout(this); personalized.setOrientation(android.widget.LinearLayout.VERTICAL); personalized.setGravity(android.view.Gravity.CENTER);
+    android.widget.TextView initials = chooserStyledText(theme.initials, theme.text, 15, true, android.view.Gravity.CENTER); initials.setTag("experience-initials"); initials.setBackground(chooserSurface(theme.badgeFill, theme.badgeBorder, 24));
+    personalized.addView(initials, new android.widget.LinearLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.5",48)), chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.6",48))));
+    android.widget.TextView personal = chooserStyledText(theme.personalization, theme.muted, 8, false, android.view.Gravity.CENTER); personal.setLetterSpacing(vtheme().number("chooser.showStyledInfinityExperienceChooser.numbers.3",.12f,-0.02f,0.25f)); personal.setMaxLines(1); personalized.addView(personal);
+    android.widget.FrameLayout.LayoutParams personalizedParams = new android.widget.FrameLayout.LayoutParams(chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.7",128)), -2, android.view.Gravity.END | android.view.Gravity.TOP);
+    identity.addView(personalized, personalizedParams);
+    content.addView(identity, new android.widget.LinearLayout.LayoutParams(-1, chooserDp(compactHeight?74:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.8",98))));
+
+    android.widget.TextView title = chooserStyledText(theme.title, theme.text, 30, true, android.view.Gravity.CENTER); title.setTag("experience-title");
+    android.widget.LinearLayout.LayoutParams titleParams = new android.widget.LinearLayout.LayoutParams(-1, -2); titleParams.topMargin = chooserDp(compactHeight?6:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.9",18)); content.addView(title, titleParams);
+
+    android.widget.LinearLayout cards = new android.widget.LinearLayout(this);
+    int widthDp = Math.round(getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density);
+    boolean stacked = widthDp < theme.stackBelowWidth;
+    cards.setOrientation(stacked ? android.widget.LinearLayout.VERTICAL : android.widget.LinearLayout.HORIZONTAL); cards.setGravity(android.view.Gravity.CENTER);
+    android.widget.LinearLayout.LayoutParams cardsParams = new android.widget.LinearLayout.LayoutParams(-1, -2); cardsParams.topMargin = chooserDp(compactHeight?10:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.10",26)); content.addView(cards, cardsParams);
+    int adaptiveCardHeight=compactHeight?Math.min(theme.cardHeight,Math.max(200,heightDp-285)):theme.cardHeight;
+
+    android.widget.FrameLayout infinity = chooserExperienceCard(theme, true,
+        () -> launchInfinityExperience("infinity"), () -> showExperienceCardSettings("infinity"));
+    android.widget.FrameLayout cobra = chooserExperienceCard(theme, false,
+        () -> launchInfinityExperience("live"), () -> showExperienceCardSettings("live"));
+    if (stacked)
+    {
+      android.widget.LinearLayout.LayoutParams first = new android.widget.LinearLayout.LayoutParams(-1, chooserDp(adaptiveCardHeight)); first.bottomMargin = chooserDp(theme.cardGap); cards.addView(infinity, first);
+      cards.addView(cobra, new android.widget.LinearLayout.LayoutParams(-1, chooserDp(adaptiveCardHeight)));
+    }
+    else
+    {
+      android.widget.LinearLayout.LayoutParams first = new android.widget.LinearLayout.LayoutParams(0, chooserDp(adaptiveCardHeight), 1); first.rightMargin = chooserDp(theme.cardGap / 2); cards.addView(infinity, first);
+      android.widget.LinearLayout.LayoutParams second = new android.widget.LinearLayout.LayoutParams(0, chooserDp(adaptiveCardHeight), 1); second.leftMargin = chooserDp(theme.cardGap / 2); cards.addView(cobra, second);
+    }
+
+    android.widget.TextView footer = chooserStyledText(theme.footerBrand, theme.muted, 9, false, android.view.Gravity.CENTER); footer.setLetterSpacing(vtheme().number("chooser.showStyledInfinityExperienceChooser.numbers.4",.10f,-0.02f,0.25f));
+    android.widget.LinearLayout.LayoutParams footerParams = new android.widget.LinearLayout.LayoutParams(-1, -2); footerParams.topMargin = chooserDp(compactHeight?10:vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.11",34)); content.addView(footer, footerParams);
+    android.widget.TextView footerTag = chooserStyledText(theme.footerTagline, theme.muted, 8, false, android.view.Gravity.CENTER); footerTag.setLetterSpacing(vtheme().number("chooser.showStyledInfinityExperienceChooser.numbers.5",.18f,-0.02f,0.25f)); content.addView(footerTag);
+
+    if(!compactHeight&&vtheme().hasImage("chooser.footer"))content.addView(vtheme().art(this,"chooser.footer",60),new android.widget.LinearLayout.LayoutParams(-1,chooserDp(vtheme().dimension("chooser.footer.height",60))));
+    setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);cobraAttachRecoveryGear(root);
+    infinity.requestFocus();
+    infinity.setBackground(chooserGradient(theme.infinityTop, theme.infinityBottom, theme.infinityGlow, theme.cardRadius, true));
+    infinity.setElevation(chooserDp(vtheme().dimension("chooser.showStyledInfinityExperienceChooser.dimensions.12",9)));vtheme().tree(root,"chooser");vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});
+  }
+
+
+
+  private void launchInfinityExperience(String experience)
+  {
+    launchInfinityExperience(experience,true,false);
+  }
+
+  private void launchInfinityExperience(String experience,boolean explicit,boolean safe)
+  {
+    if (isFinishing() || isDestroyed() || (!"live".equals(experience) && mInfinityLaunchQueued)) return;
+    if (!"live".equals(experience) && InfinityKodiShutdown.pending()) {
+      mInfinityStartupTrace.event("handoff.waitClosingOwner");
+      showInfinityClosingRecovery();
+      showInfinityExperienceChooser();
+      android.widget.Toast.makeText(this,"Infinity is finishing its normal close. Saved data is not being reset.",android.widget.Toast.LENGTH_LONG).show();
+      return;
+    }
+    Intent intent = getIntent()==null?new Intent():new Intent(getIntent());
+    intent.removeExtra(CobraPresentationSafety.EXTRA_SAFE);
+    intent.removeExtra(CobraPresentationSafety.EXTRA_ENTRY_TOKEN);
+    if("live".equals(experience)){
+      if(safe)intent.putExtra(CobraPresentationSafety.EXTRA_SAFE,true);
+      if(explicit)intent.putExtra(CobraPresentationSafety.EXTRA_ENTRY_TOKEN,java.util.UUID.randomUUID().toString());
+    }
+    intent.setClass(this, "live".equals(experience) ?
+        @APP_PACKAGE@.InfinityLiveActivity.class : @APP_PACKAGE@.Main.class);
+    if ("live".equals(experience))
+      intent.putExtra("infinity_live_profile", "cobra");
+    if ("live".equals(experience)) {
+      // Cancel only this chooser's queued Kodi handoff; never close Cobra or
+      // signal the Kodi process. Preserve Cobra's routing, extras and flags.
+      mInfinityPendingMain=null;mInfinityLaunchQueued=false;mInfinityKodiLaunchToken="";
+      if(mInfinityHandoff!=null)mInfinityHandoff.close();
+      intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+      startActivity(intent);
+      finish();
+      return;
+    }
+    mInfinityStartupTrace.event("handoff.requested");
+    infinityQueueMainRequest(intent);
+  }
+
+  private void infinityQueueMainRequest(Intent request) {
+    if (isFinishing() || isDestroyed() || mInfinityLaunchQueued) return;
+    if (!InfinityKodiShutdown.live() && !mInfinityPreparationReady) {
+      mInfinityPendingMain = new Intent(request);
+      mInfinityStartupTrace.event("main.waitPreparation");
+      android.widget.Toast.makeText(this,"Preparing Infinity; your selection is saved.",android.widget.Toast.LENGTH_SHORT).show();
+      return;
+    }
+    mInfinityPendingMain = null;
+    mInfinityLaunchQueued = mInfinityHandoff.enqueue(() -> {
+      // Revalidate at dispatch: an Exit can finish the former owner after enqueue.
+      if (InfinityKodiShutdown.pending()) {
+        mInfinityStartupTrace.event("handoff.waitClosingOwner");
+      showInfinityClosingRecovery();
+        mInfinityLaunchQueued = false;
+        mInfinityHandoff.close();
+        mInfinityHandoff = new InfinityStartupHandoff(this,findViewById(android.R.id.content));
+        if (mInfinityResumed) mInfinityHandoff.resume();
+        showInfinityExperienceChooser(); return;
+      }
+      boolean live = InfinityKodiShutdown.live();
+      if (!live && !mInfinityPreparationReady) {
+        // The previously live owner can begin Exit between enqueue and dispatch.
+        // A fresh NativeActivity must not inherit the live-owner preparation bypass.
+        mInfinityStartupTrace.event("handoff.ownerExpired.prepareFresh");
+        mInfinityLaunchQueued = false;
+        mInfinityHandoff.close();
+        mInfinityHandoff = new InfinityStartupHandoff(this,findViewById(android.R.id.content));
+        if (mInfinityResumed) mInfinityHandoff.resume();
+        mInfinityPendingMain = new Intent(request);
+        infinityInitializeStartup();
+        return;
+      }
+      Intent target = new Intent(request);
+      target.setClass(this,InfinityKodiEntryActivity.class);
+      target.setFlags((request.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION)) | Intent.FLAG_ACTIVITY_NEW_TASK);
+      mInfinityKodiLaunchToken=java.util.UUID.randomUUID().toString();
+      target.putExtra(InfinityKodiShutdown.TOKEN,mInfinityKodiLaunchToken);
+      mInfinityStartupTrace.event(live ? "handoff.liveMain" : "handoff.freshMain");
+      Log.i(TAG,"Infinity launch handoff: " + (live ? "live Main" : "fresh Main"));
+      startActivity(target);
+      // Keep chooser ownership until the Kodi process acknowledges a live Main.
+    });
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState)
+  {
+    super.onCreate(savedInstanceState);
+    // Every early-return route owns real non-black content before it can hand off.
+    setContentView(R.layout.activity_splash);
+    mProgress = (ProgressBar) findViewById(R.id.progressBar1);
+    mTextView = (TextView) findViewById(R.id.textView1);
+    View startup = findViewById(android.R.id.content);
+    int startupColor = "light".equals(chooserAppearanceMode()) ? 0xffeaf3fc : 0xff10233a;
+    if (startup instanceof android.view.ViewGroup && ((android.view.ViewGroup)startup).getChildCount() > 0)
+      ((android.view.ViewGroup)startup).getChildAt(0).setBackgroundColor(startupColor);
+    getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(startupColor));
+    mTextView.setText("Starting Infinity...");
+    mTextView.setTextColor("light".equals(chooserAppearanceMode()) ? 0xff071a30 : 0xfff5f7fc);
+    mInfinityHandoff = new InfinityStartupHandoff(this,startup);
+
+    mInfinityStartupTrace = new InfinityStartupTrace(this);
+    mInfinityKodiWatch=new InfinityKodiShutdown.Watch(this,status->{
+      if(isFinishing()||isDestroyed())return;
+      mInfinityKodiStateReady=true;
+      if(status.pending())mInfinitySawClosing=true;
+      if(mInfinityLaunchQueued && status.launch.equals(mInfinityKodiLaunchToken) && status.live && status.alive && !status.pending()){
+        finish();return;
+      }
+      if(mInfinityLaunchQueued && (status.pending() || (!status.error.isEmpty()&&status.launch.equals(mInfinityKodiLaunchToken)))){
+        mInfinityLaunchQueued=false;mInfinityKodiLaunchToken="";
+        mInfinityHandoff.close();mInfinityHandoff=new InfinityStartupHandoff(this,findViewById(android.R.id.content));
+        if(mInfinityResumed)mInfinityHandoff.resume();showInfinityExperienceChooser();
+      }
+      if(!status.error.isEmpty()&&!status.error.equals(mInfinityCloseError)){
+        mInfinityCloseError=status.error;
+        android.widget.Toast.makeText(this,status.error,android.widget.Toast.LENGTH_LONG).show();
+      }
+      if(mInfinityBootstrapped && mInfinityResumed && mInfinityPreparation==null && !mInfinityPreparationReady)infinityInitializeStartup();
+    });
+    mInfinityBootstrap = new InfinityStartupHandoff(this,startup);
+    mInfinityBootstrap.enqueue(() -> {
+      mInfinityBootstrapped=true;
+      mInfinityStartupTrace.event("splash.firstFrame");
+      infinityInitializeStartup();
+    });
+  }
+
+  private void infinityInitializeStartup() {
+    if (isFinishing() || isDestroyed()) return;
+    if(infinityLaunchPreferredCobra())return;
+    if(!mInfinityKodiStateReady)return;
+    if(InfinityKodiShutdown.pending()){mInfinitySawClosing=true;if(!mInfinityChooserVisible)showInfinityExperienceChooser();return;}
+    if(mInfinityInitializationStarted && mInfinityPendingMain==null)return;
+    mInfinityInitializationStarted=true;
+    // A genuine live Main bypasses properties/cache work completely.
+    if (InfinityKodiShutdown.live()) { startXBMC(); return; }
+    mExternalStorageChecked = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+    mPermissionOK = CheckPermissions();
+    if (!mPermissionOK) {
+      mInfinityStartupTrace.event("permissions.required");
+      mStateMachine.sendEmptyMessage(CheckingPermissionsInfo);
+    } else if (!mExternalStorageChecked) {
+      mInfinityStartupTrace.event("storage.wait");
+      startWatchingExternalStorage();
+      mStateMachine.sendEmptyMessage(WaitingStorageChecked);
+    } else infinityBeginPreparation();
+  }
+
+  private void infinityBeginPreparation() {
+    if (isFinishing() || isDestroyed() || mInfinityPreparation != null || mInfinityPreparationReady) return;
+    // Chooser is Kodi-independent; don't keep Android's logo visible during cache/property I/O.
+    Intent incoming=getIntent();
+    String preferred=getSharedPreferences(INFINITY_EXPERIENCE_PREFS,MODE_PRIVATE).getString(INFINITY_EXPERIENCE_DEFAULT, "");
+    if ((incoming==null || incoming.getAction()==null || Intent.ACTION_MAIN.equals(incoming.getAction())) &&
+        !"infinity".equals(preferred) && !"live".equals(preferred) && !mInfinityChooserVisible)
+      showInfinityExperienceChooser();
+    mInfinityStartupTrace.event("prepare.subscribe");
+    mInfinityPreparation=InfinityStartupPreparation.shared().subscribe(this,mInfinityStartupTrace,result -> {
+      if (isFinishing() || isDestroyed()) return;
+      if (result.error != null) {
+        mInfinityPendingMain=null;mErrorMsg=result.error;mStateMachine.sendEmptyMessage(InError);return;
+      }
+      fXbmcHome=result.home;fPackagePath=result.apk;
+      sXbmcHome=result.home.getAbsolutePath();sPackagePath=result.apk.getAbsolutePath();
+      mInfinityAbnormalExit=result.abnormalExit;
+      mCachingDone=true;mInfinityPreparationReady=true;
+      mInfinityStartupTrace.event("prepare.delivered");
+      if (mInfinityPendingMain != null) infinityQueueMainRequest(mInfinityPendingMain);
+      else startXBMC();
+    });
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+    mInfinityResumed=true;
+    if (mInfinityBootstrap != null) mInfinityBootstrap.resume();
+    if (mInfinityChooserFrame != null) mInfinityChooserFrame.resume();
+    if (mInfinityStartupTrace != null) mInfinityStartupTrace.event("splash.resume");
+    if (mInfinityHandoff != null) mInfinityHandoff.resume();
+  }
+
+  @Override public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (mInfinityStartupTrace != null) {
+      mInfinityStartupTrace.event(hasFocus ? (mInfinityChooserVisible ? "chooser.windowFocused" : "splash.windowFocused") : "splash.windowUnfocused");
+      if (hasFocus && mInfinityChooserVisible) {
+        final android.view.View visible = findViewById(android.R.id.content);
+        visible.postOnAnimation(() -> {
+          if (!isFinishing() && !isDestroyed() && hasWindowFocus() && visible.isShown()) mInfinityStartupTrace.event("chooser.focusedFrame");
+        });
+      }
+    }
+  }
+  @Override protected void onPause() {
+    mInfinityResumed=false;
+    if (mInfinityBootstrap != null) mInfinityBootstrap.pause();
+    if (mInfinityChooserFrame != null) mInfinityChooserFrame.pause();
+    if (mInfinityStartupTrace != null) mInfinityStartupTrace.event("splash.pause");
+    if (mInfinityHandoff != null) mInfinityHandoff.pause();
+    super.onPause();
+  }
+
+  @Override protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    setIntent(intent);
+    if(intent!=null && intent.getBooleanExtra("infinity_checkpoint_chooser",false)){mInfinitySawClosing=true;showInfinityExperienceChooser();return;}
+    if (!mInfinityLaunchQueued && mCachingDone && mExternalStorageChecked && mPermissionOK)
+      startXBMC();
+  }
+
+  @Override protected void onDestroy() {
+    if (mInfinityBootstrap != null) mInfinityBootstrap.close();
+    if (mInfinityChooserFrame != null) mInfinityChooserFrame.close();
+    if (mInfinityKodiWatch != null) mInfinityKodiWatch.close();
+    if (mInfinityPreparation != null) mInfinityPreparation.close();
+    mInfinityPendingMain=null;
+    if (mInfinityStartupTrace != null) mInfinityStartupTrace.event("splash.destroy");
+    if (mInfinityHandoff != null) mInfinityHandoff.close();
+    mStateMachine.removeCallbacksAndMessages(null);
+    stopWatchingExternalStorage();
+    super.onDestroy();
+  }
+
+  private boolean isAndroidTV()
+  {
+    if (getPackageManager().hasSystemFeature(FEATURE_LEANBACK))
+    {
+      Log.d(TAG, "Running on an Android TV Device");
+      return true;
+    }
+    else
+    {
+      Log.d(TAG, "Running on a non Android TV Device");
+      return false;
+    }
+  }
+
+  private CobraVisualRenderer mVisualTheme;
+  private CobraVisualRenderer vtheme(){if(mVisualTheme==null)mVisualTheme=new CobraVisualRenderer(this);return mVisualTheme.mode(chooserAppearanceMode());}
+  private boolean showVisualExperienceScene(ExperienceTheme theme){
+    org.json.JSONObject scene=vtheme().scene("chooser");if(scene==null)return false;
+    int availableHeightDp=Math.round(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
+    if(availableHeightDp<700)return false;
+    try{
+      java.util.Map<String,View> slots=new java.util.LinkedHashMap<>();
+      for(String experience:new String[]{"infinity","cobra"}){
+        final String destination=experience.equals("infinity")?"infinity":"live";
+        android.widget.TextView enter=chooserStyledText(vtheme().copy("chooser.showVisualExperienceScene.copy.1","ENTER ")+experience.toUpperCase(java.util.Locale.ROOT),theme.text,18,true,android.view.Gravity.CENTER);
+        enter.setFocusable(true);enter.setClickable(true);enter.setTag("experience-card-"+experience);enter.setContentDescription("Enter "+experience);enter.setOnClickListener(v->launchInfinityExperience(destination));
+        enter.setBackground(chooserSurface(theme.background,experience.equals("infinity")?theme.infinityBorder:theme.cobraBorder,24));slots.put("enter."+experience,enter);
+        android.widget.TextView settings=chooserStyledText(vtheme().copy("chooser.showVisualExperienceScene.copy.2","Settings"),theme.text,14,false,android.view.Gravity.CENTER);settings.setFocusable(true);settings.setClickable(true);settings.setTag("experience-settings-"+experience);settings.setContentDescription(experience+" settings");settings.setOnClickListener(v->showExperienceCardSettings(destination));
+        settings.setBackground(chooserSurface(theme.background,experience.equals("infinity")?theme.infinityBorder:theme.cobraBorder,16));slots.put("settings."+experience,settings);
+      }
+      int width=Math.round(getResources().getDisplayMetrics().widthPixels/getResources().getDisplayMetrics().density);
+      View view=CobraVisualScene.build(this,vtheme(),scene,slots,width);if(view==null)return false;
+      android.widget.FrameLayout root=new android.widget.FrameLayout(this);root.setTag("experience-themed-root");
+      root.addView(new ExperienceBackdrop(theme),new android.widget.FrameLayout.LayoutParams(-1,-1));
+      android.widget.FrameLayout safeContent=new android.widget.FrameLayout(this);safeContent.setTag("experience-safe-content");
+      safeContent.addView(view,new android.widget.FrameLayout.LayoutParams(-1,-1));
+      root.addView(safeContent,new android.widget.FrameLayout.LayoutParams(-1,-1));
+      root.setLongClickable(false);
+      setContentView(root);cobraPrepareExperienceSystemBars(theme,root,safeContent);cobraAttachRecoveryGear(root);slots.get("enter.infinity").requestFocus();vtheme().whenReady(()->{if(!isFinishing())showInfinityExperienceChooser();});return true;
+    }catch(Exception failed){android.util.Log.w("CobraTheme","Custom chooser could not be laid out; using safe chooser",failed);return false;}
+  }
+
+
+  private ExperienceTheme resolveVisualExperienceTheme(ExperienceTheme fallback){
+    try{
+      org.json.JSONObject root=new org.json.JSONObject(),copy=new org.json.JSONObject(),colors=new org.json.JSONObject(),layout=new org.json.JSONObject();
+      root.put("schema",1);root.put("scope","infinity-experience-chooser");root.put("minimum_bridge",1);root.put("copy",copy);root.put("palette",colors);root.put("layout",layout);
+      copy.put("brand",vtheme().copy("chooser.label.brand",fallback.brand));
+      copy.put("brand_tagline",vtheme().copy("chooser.label.brand_tagline",fallback.brandTagline));
+      copy.put("title",vtheme().copy("chooser.label.title",fallback.title));
+      copy.put("personalization",vtheme().copy("chooser.label.personalization",fallback.personalization));
+      copy.put("infinity_title",vtheme().copy("chooser.label.infinity_title",fallback.infinityTitle));
+      copy.put("infinity_subtitle",vtheme().copy("chooser.label.infinity_subtitle",fallback.infinitySubtitle));
+      copy.put("cobra_title",vtheme().copy("chooser.label.cobra_title",fallback.cobraTitle));
+      copy.put("cobra_subtitle",vtheme().copy("chooser.label.cobra_subtitle",fallback.cobraSubtitle));
+      copy.put("footer_brand",vtheme().copy("chooser.label.footer_brand",fallback.footerBrand));
+      copy.put("footer_tagline",vtheme().copy("chooser.label.footer_tagline",fallback.footerTagline));
+      copy.put("initials",vtheme().copy("chooser.label.initials",fallback.initials));
+      colors.put("background",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.background",fallback.background)));
+      colors.put("background_glow",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.background_glow",fallback.backgroundGlow)));
+      colors.put("text",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.text",fallback.text)));
+      colors.put("muted",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.muted",fallback.muted)));
+      colors.put("infinity_top",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.infinity_top",fallback.infinityTop)));
+      colors.put("infinity_bottom",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.infinity_bottom",fallback.infinityBottom)));
+      colors.put("infinity_border",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.infinity_border",fallback.infinityBorder)));
+      colors.put("infinity_glow",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.infinity_glow",fallback.infinityGlow)));
+      colors.put("cobra_top",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.cobra_top",fallback.cobraTop)));
+      colors.put("cobra_bottom",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.cobra_bottom",fallback.cobraBottom)));
+      colors.put("cobra_border",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.cobra_border",fallback.cobraBorder)));
+      colors.put("cobra_glow",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.cobra_glow",fallback.cobraGlow)));
+      colors.put("badge_fill",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.badge_fill",fallback.badgeFill)));
+      colors.put("badge_border",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.badge_border",fallback.badgeBorder)));
+      colors.put("horizon",String.format(java.util.Locale.ROOT,"#%08X",vtheme().color("chooser.palette.horizon",fallback.horizon)));
+      layout.put("outer_padding_dp",vtheme().dimension("chooser.layout.outer_padding_dp",fallback.outerPadding));
+      layout.put("card_radius_dp",vtheme().dimension("chooser.layout.card_radius_dp",fallback.cardRadius));
+      layout.put("card_gap_dp",vtheme().dimension("chooser.layout.card_gap_dp",fallback.cardGap));
+      layout.put("card_height_dp",vtheme().dimension("chooser.layout.card_height_dp",fallback.cardHeight));
+      layout.put("stack_below_width_dp",vtheme().dimension("chooser.layout.stack_below_width_dp",fallback.stackBelowWidth));
+      layout.put("motion_ms",vtheme().motion("chooser.layout.motion_ms",fallback.motionMs));
+      return new ExperienceTheme(root);
+    }catch(org.json.JSONException invalid){return fallback;}
+  }
+
+  private void cobraPrepareExperienceSystemBars(ExperienceTheme theme, android.widget.FrameLayout root, View safeContent){
+    if(theme==null||root==null||safeContent==null)return;
+    android.view.Window window=getWindow();View decor=window.getDecorView();
+
+    androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window,false);
+    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+        |android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
+        |android.view.WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+    window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
+    if(Build.VERSION.SDK_INT>=29)window.setStatusBarContrastEnforced(false);
+
+    // Root/backdrop remains physically full-screen. Insets belong to foreground content only.
+    root.setPadding(0,0,0,0);
+    decor.setBackgroundColor(theme.background);
+
+    int flags=decor.getSystemUiVisibility();
+    flags&=~View.SYSTEM_UI_FLAG_FULLSCREEN;
+    flags|=View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+    boolean darkIcons=cobraChooserDarkStatusIcons(theme.background);
+    if(Build.VERSION.SDK_INT>=23&&Build.VERSION.SDK_INT<30){
+      if(darkIcons)flags|=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+      else flags&=~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+    }
+    decor.setSystemUiVisibility(flags);
+
+    if(Build.VERSION.SDK_INT>=30){
+      android.view.WindowInsetsController controller=window.getInsetsController();
+      if(controller!=null){
+        controller.show(android.view.WindowInsets.Type.statusBars());
+        controller.setSystemBarsAppearance(
+            darkIcons?android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS:0,
+            android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+      }
+    }
+
+    final int[] stableVerticalInsets=new int[]{0,0};
+    safeContent.setOnApplyWindowInsetsListener((v,insets)->{
+      int left=0,top=0,right=0,bottom=0;
+      if(Build.VERSION.SDK_INT>=30){
+        android.graphics.Insets bars=insets.getInsets(android.view.WindowInsets.Type.systemBars());
+        android.graphics.Insets cut=insets.getInsets(android.view.WindowInsets.Type.displayCutout());
+        left=Math.max(bars.left,cut.left);top=Math.max(bars.top,cut.top);
+        right=Math.max(bars.right,cut.right);bottom=Math.max(bars.bottom,cut.bottom);
+      }else{
+        left=insets.getSystemWindowInsetLeft();top=insets.getSystemWindowInsetTop();
+        right=insets.getSystemWindowInsetRight();bottom=insets.getSystemWindowInsetBottom();
+        if(Build.VERSION.SDK_INT>=28&&insets.getDisplayCutout()!=null){
+          android.view.DisplayCutout cut=insets.getDisplayCutout();
+          left=Math.max(left,cut.getSafeInsetLeft());top=Math.max(top,cut.getSafeInsetTop());
+          right=Math.max(right,cut.getSafeInsetRight());bottom=Math.max(bottom,cut.getSafeInsetBottom());
+        }
+      }
+      if(top>0)stableVerticalInsets[0]=top;else if(stableVerticalInsets[0]>0)top=stableVerticalInsets[0];
+      if(bottom>0)stableVerticalInsets[1]=bottom;else if(stableVerticalInsets[1]>0)bottom=stableVerticalInsets[1];
+      if(v.getPaddingLeft()!=left||v.getPaddingTop()!=top||v.getPaddingRight()!=right||v.getPaddingBottom()!=bottom)
+        v.setPadding(left,top,right,bottom);
+      return insets;
+    });
+    safeContent.requestApplyInsets();
+  }
+
+
+  private boolean cobraChooserDarkStatusIcons(int background){
+    int r=android.graphics.Color.red(background),g=android.graphics.Color.green(background),b=android.graphics.Color.blue(background);
+    return r*299+g*587+b*114>=186000;
+  }
+
+}

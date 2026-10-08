@@ -1,0 +1,262 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.os.Build;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Explicit, bounded local export. Call on a worker; never decode native traces. */
+final class InfinityHealthExport {
+  static final int TRACE_LIMIT = 2 * 1024 * 1024;
+  static final int MAX_TRACES = 4;
+  static final int NATIVE_TRACE_LIMIT = 8 * 1024 * 1024;
+  private InfinityHealthExport() {}
+
+  static void write(Context context, OutputStream destination, String report) throws Exception {
+    try (ZipOutputStream zip = new ZipOutputStream(destination)) {
+      put(zip, "report.txt", reportWithNativeShutdownEvidence(context, report).getBytes(StandardCharsets.UTF_8));
+      JSONObject manifest = new JSONObject();
+      manifest.put("schema", 1);
+      manifest.put("exported_at_ms", System.currentTimeMillis());
+      manifest.put("package", context.getPackageName());
+      manifest.put("trace_limit_bytes", TRACE_LIMIT);
+      manifest.put("max_traces", MAX_TRACES);
+      manifest.put("ownership", "Historical exits. Installed APK version is not proof of the build that produced an exit. Match trace build IDs to exact native symbols.");
+      JSONArray diagnostics = new JSONArray();
+      manifest.put("diagnostic_files", diagnostics);
+      attach(context, zip, diagnostics, "infinity-kodi-process.json", "kodi-process-state.json", 8192);
+      attach(context, zip, diagnostics, "infinity-native-cleanup.json", "native-cleanup.json", 4096);
+      attachShutdown(context, zip, diagnostics, InfinityCheckpointProtocol.RECEIPT, "checkpoint/coordinator-receipt.json", 256 * 1024);
+      attachShutdown(context, zip, diagnostics, InfinityCheckpointProtocol.EVIDENCE, "checkpoint/android-timeline.jsonl", 160 * 1024);
+      attachShutdown(context, zip, diagnostics, InfinityCheckpointProtocol.EVIDENCE+".previous", "checkpoint/android-timeline.previous.jsonl", 160 * 1024);
+      manifest.put("checkpoint_native_contract", "InfinityAndroidCheckpoint-v1");
+      manifest.put("checkpoint_completion_semantics", "Matched native persistence acknowledgement, coordinator authorization, and owner lease release. Legacy destructor completion is independent historical evidence.");
+      // Diagnostic evidence only: never declare clean exit from a returned
+      // scope, elapsed timeout, missing row or process.exit_requested marker.
+      manifest.put("shutdown_trace_engine", "infinity-shutdown-2103334-v1");
+      manifest.put("shutdown_preservation_parent_native_sha256", "6378c986ea534284e599dc60dffa597e6c1b3f308c599d4143e7cfd7af5aae23");
+      manifest.put("shutdown_trace_semantics", "Scope returned is not success. Exit requested is not process death. Missing or truncated data is unknown. Compare producer PID and session clocks.");
+      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl", "shutdown/native.jsonl", NATIVE_TRACE_LIMIT);
+      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.previous", "shutdown/native.previous.jsonl", NATIVE_TRACE_LIMIT);
+      attachShutdown(context, zip, diagnostics, "infinity-close-history.txt", "shutdown/java-close-history.txt", 65536);
+      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.critical", "shutdown/critical.jsonl", 2 * 1024 * 1024);
+      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.critical.previous", "shutdown/critical.previous.jsonl", 2 * 1024 * 1024);
+      attachShutdown(context, zip, diagnostics, "infinity-close-guard.jsonl", "shutdown/android-guard.jsonl", 160 * 1024);
+      manifest.put("shutdown_critical_semantics", "Independent budget for high-level native phases; sequence gaps are expected in this selected mirror. Guard lifetime is not a clean-exit verdict.");
+      JSONArray records = new JSONArray();
+      manifest.put("records", records);
+      if (Build.VERSION.SDK_INT >= 30) Api30.collect(context, zip, records);
+      put(zip, "exit-manifest.json", manifest.toString(2).getBytes(StandardCharsets.UTF_8));
+    }
+  }
+
+  private static void attach(Context context, ZipOutputStream zip, JSONArray diagnostics,
+      String sourceName, String name, int limit) throws Exception {
+    java.io.File source = new java.io.File(context.getFilesDir(), sourceName);
+    if (!source.isFile()) return;
+    JSONObject row = new JSONObject(); row.put("path", name); row.put("limit_bytes", limit);
+    diagnostics.put(row);
+    java.io.InputStream input;
+    try { input = new java.io.FileInputStream(source); }
+    catch (java.io.IOException unavailable) { row.put("available", false); return; }
+    row.put("available", true);
+    zip.putNextEntry(new ZipEntry(name));
+    try (java.io.InputStream bytes = input) { row.put("truncated", copyBounded(bytes, zip, limit)); }
+    zip.closeEntry();
+  }
+
+  // These are fixed, app-private diagnostic filenames, not an arbitrary file
+  // collector. No settings, credentials, provider databases or media are read.
+  private static void attachShutdown(Context context, ZipOutputStream zip, JSONArray diagnostics,
+      String sourceName, String name, int limit) throws Exception {
+    JSONObject row = new JSONObject();
+    row.put("path", name); row.put("limit_bytes", limit); row.put("available", false);
+    row.put("snapshot_only", true); diagnostics.put(row);
+    java.io.File source = new java.io.File(context.getFilesDir(), sourceName);
+    java.io.InputStream input;
+    try {
+      if (!source.isFile()) { row.put("status", "not_present"); return; }
+      // Reject symlinks and unexpected locations; retain original diagnostic files.
+      if (!source.getCanonicalFile().equals(new java.io.File(context.getFilesDir().getCanonicalFile(), sourceName))) {
+        row.put("status", "noncanonical_path_rejected"); return;
+      }
+      input = new java.io.FileInputStream(source);
+    } catch (java.io.IOException | SecurityException unavailable) {
+      row.put("status", "not_readable"); return;
+    }
+    row.put("available", true); row.put("status", "snapshot_collected_not_diagnosed");
+    zip.putNextEntry(new ZipEntry(name));
+    try (java.io.InputStream bytes = input) {
+      row.put("truncated", copyBounded(bytes, zip, limit));
+    }
+    zip.closeEntry();
+  }
+
+  private static String reportWithNativeShutdownEvidence(Context context, String report)
+  {
+    StringBuilder output = new StringBuilder(report == null ? "" : report);
+    appendCheckpointEvidence(output, context);
+    appendNativeShutdownEvidence(output, context, "Previous / failed native shutdown critical timeline",
+        "infinity-shutdown-native.jsonl.critical.previous");
+    appendNativeShutdownEvidence(output, context, "Current native shutdown critical timeline",
+        "infinity-shutdown-native.jsonl.critical");
+    return output.toString();
+  }
+
+  static void appendCheckpointEvidence(StringBuilder output, Context context) {
+    output.append("\n\nLatest Android-owned shutdown checkpoint\n========================================\n");
+    try {
+      JSONObject row=InfinityCheckpointProtocol.read(context.getFilesDir());
+      String session=row.getString("session"),owner=row.getString("owner");int pid=row.getInt("pid");
+      boolean persisted=false;
+      if(row.optBoolean("checkpoint_saved",false)) {
+        String raw=row.getString("native_json");
+        JSONObject saved=InfinityCheckpointProtocol.status(raw,session,owner,pid);
+        persisted=InfinityCheckpointProtocol.safe(saved)&&row.getLong("generation")==saved.getLong("generation")&&
+            InfinityCheckpointProtocol.proof(raw).equals(row.getString("native_proof_sha256"));
+      }
+      output.append("Session: ").append(session).append("\nEngine PID: ").append(pid).append("\nEngine owner: ").append(owner)
+          .append("\nCoordinator phase: ").append(row.getString("phase"))
+          .append("\nWas all required state persisted? ").append(persisted?"YES — matched explicit native save acknowledgement":"NOT CONFIRMED")
+          .append("\nSAFE_TO_TERMINATE issued: ").append(persisted?"yes":"no confirmed acknowledgement")
+          .append("\nAndroid termination command requested: ").append(row.optLong("terminate_requested_elapsed_ms",0)>0?"yes":"no")
+          .append("\nOne-shot authorization consumed: ").append(row.optBoolean("authorization_consumed",false)?"yes":"no")
+          .append("\nObserved engine death: ").append("COMPLETE".equals(row.optString("phase"))&&persisted&&row.optLong("engine_death_elapsed_ms",0)>0?"yes":"not confirmed")
+          .append("\nTotal observed duration: ").append(row.optLong("total_duration_ms",0)).append(" ms\n");
+      String[] events={"started","safe","terminate_requested","authorization_consumed","engine_death"};
+      for(String event:events) output.append(event).append(": epoch_ms=").append(row.optLong(event+"_epoch_ms",0))
+          .append(" elapsed_ms=").append(row.optLong(event+"_elapsed_ms",0)).append('\n');
+      JSONObject nativeStatus=row.optJSONObject("last_native_status");
+      if(nativeStatus==null)nativeStatus=row.optJSONObject("native_receipt");
+      String blocking=row.optString("error","");
+      if(nativeStatus!=null){
+        String named=nativeStatus.optString("blocking_operation","");if(!named.isEmpty())blocking=named;
+        JSONArray owners=nativeStatus.optJSONArray("owners");
+        if(owners!=null){
+          output.append("Required owner operations (elapsed times are native checkpoint clock):\n");
+          for(int i=0;i<owners.length()&&i<64;i++){
+            JSONObject operation=owners.getJSONObject(i);String name=operation.getString("owner"),status=operation.optString("status",operation.optString("result","UNKNOWN"));
+            output.append("  ").append(name).append(": result=").append(operation.optString("result",status))
+                .append(" status=").append(status).append(" start_ms=").append(operation.optLong("start_elapsed_ms",0))
+                .append(" end_ms=").append(operation.optLong("end_elapsed_ms",0))
+                .append(" duration_ms=").append(operation.optLong("duration_ms",operation.optLong("elapsed_ms",0)))
+                .append(" generation=").append(operation.optLong("generation",-1))
+                .append(" durable_generation=").append(operation.optLong("durable_generation",-1))
+                .append(" dirty_before=").append(operation.optBoolean("dirty_before",false))
+                .append(" dirty_remaining=").append(operation.optBoolean("dirty_remaining",true))
+                .append(" error=").append(operation.optString("error","")).append('\n');
+            if(!persisted&&blocking.isEmpty()&&!"COMPLETE".equals(status))blocking=name;
+          }
+        }
+      }
+      output.append("Blocking operation: ").append(persisted?"none — save barrier acknowledged":blocking.isEmpty()?"unknown / checkpoint not yet reported":blocking).append('\n');
+      output.append("A termination request is not observed process death. No legacy cleanup marker is synthesized.\n");
+    } catch(Exception unavailable) {
+      output.append("Required persistence: NOT CONFIRMED. No complete, valid checkpoint receipt is available (available diagnostics retained).\n");
+    }
+  }
+
+  private static void appendNativeShutdownEvidence(
+      StringBuilder output, Context context, String title, String fileName)
+  {
+    java.io.File source = new java.io.File(context.getFilesDir(), fileName);
+    output.append("\n\n").append(title).append("\n")
+        .append("========================================\n");
+    if (!source.isFile()) {
+      output.append("[not present — absence is not a clean-exit verdict]\n");
+      return;
+    }
+    try (java.io.InputStream input = new java.io.FileInputStream(source);
+         java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream()) {
+      final int limit = 512 * 1024;
+      boolean truncated = copyBounded(input, bytes, limit);
+      output.append(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
+      if (truncated)
+        output.append("\n[critical timeline truncated to ").append(limit).append(" bytes]\n");
+    } catch (Exception failure) {
+      output.append("[could not read native timeline: ")
+          .append(failure.getClass().getSimpleName()).append("]\n");
+    }
+  }
+
+  private static void put(ZipOutputStream zip, String name, byte[] bytes) throws Exception {
+    zip.putNextEntry(new ZipEntry(name));
+    zip.write(bytes);
+    zip.closeEntry();
+  }
+
+  /** Returns true if at least one byte was omitted. Keeps original byte order. */
+  static boolean copyBounded(InputStream input, OutputStream output, int limit) throws Exception {
+    if (limit < 0) throw new IllegalArgumentException("negative limit");
+    byte[] buffer = new byte[8192];
+    int total = 0;
+    while (total < limit) {
+      int count = input.read(buffer, 0, Math.min(buffer.length, limit - total));
+      if (count < 0) return false;
+      if (count == 0) {
+        int one = input.read();
+        if (one < 0) return false;
+        output.write(one);
+        total++;
+      } else {
+        output.write(buffer, 0, count);
+        total += count;
+      }
+    }
+    return input.read() != -1;
+  }
+
+  private static final class Api30 {
+    static void collect(Context context, ZipOutputStream zip, JSONArray records) throws Exception {
+      android.app.ActivityManager manager = (android.app.ActivityManager)
+          context.getSystemService(Context.ACTIVITY_SERVICE);
+      if (manager == null) return;
+      java.util.List<android.app.ApplicationExitInfo> exits =
+          manager.getHistoricalProcessExitReasons(context.getPackageName(), 0, 12);
+      if (exits == null) return;
+      int attempts = 0;
+      for (android.app.ApplicationExitInfo exit : exits) {
+        int reason = exit.getReason();
+        if (reason != android.app.ApplicationExitInfo.REASON_CRASH_NATIVE &&
+            reason != android.app.ApplicationExitInfo.REASON_ANR) continue;
+        if (attempts++ >= MAX_TRACES) break;
+        JSONObject row = new JSONObject();
+        records.put(row);
+        row.put("timestamp_ms", exit.getTimestamp());
+        row.put("pid", exit.getPid());
+        row.put("reason", reason);
+        row.put("process", exit.getProcessName());
+        row.put("producer_apk_version", JSONObject.NULL);
+        boolean nativeCrash = reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
+        row.put("format", nativeCrash ? "android-native-tombstone-protobuf" : "android-anr-text");
+        if (nativeCrash && Build.VERSION.SDK_INT < 31) {
+          row.put("available", false);
+          continue;
+        }
+        InputStream trace;
+        try { trace = exit.getTraceInputStream(); }
+        catch (Exception unavailable) {
+          row.put("available", false);
+          row.put("error", unavailable.getClass().getSimpleName());
+          continue;
+        }
+        row.put("available", trace != null);
+        if (trace == null) continue;
+        String name = "traces/" + attempts + "-" + exit.getTimestamp() +
+            (nativeCrash ? ".tombstone.pb" : ".anr.txt");
+        row.put("path", name);
+        zip.putNextEntry(new ZipEntry(name));
+        try (InputStream source = trace) {
+          row.put("truncated", copyBounded(source, zip, TRACE_LIMIT));
+        }
+        zip.closeEntry();
+      }
+    }
+  }
+}

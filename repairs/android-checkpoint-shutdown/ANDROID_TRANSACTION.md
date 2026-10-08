@@ -1,6 +1,10 @@
-# Android transaction core — staged, not installed
+# Android transaction core and runtime integration — not installed
 
-The Java 8 classes in `src/com/projectinfinity/kodi/shutdown` implement the transaction and engine-side authorization protocol. They do not modify the recovered 2103335 parent, replace the Kodi engine, ship an APK, implement a native save barrier, or claim a device fix.
+The later runtime implementation is captured together with native and Command Center changes by the canonical hash-protected `runtime_delta.py` workflow. It replaces the existing Normal Close dispatcher with an Android-owned `InfinityCloseGuardService`, an authenticated Messenger endpoint in `InfinityCloseNativeLease`, a one-shot Binder authorization gate, and the dedicated native checkpoint APIs. It also updates chooser completion semantics, Health Center output, Android work admission, and the pre-native Command Center installer hook. The installer body and native persistence implementation are separately owned changes. The existing `:kodi`/shell process split and Force Close route are retained.
+
+`test_android_runtime.py --source PATH --android-jar PATH` compiles the actual runtime shutdown/export/installer templates against Android APIs, with narrow unchanged UI peer stubs. It tests the actual receipt parser and actual authorization gate, including 100 revoke/consume races. `--native-receipt PATH` checks a receipt emitted by the real native serializer. This targeted check does not replace a complete APK build or device validation.
+
+The separate Java 8 classes in `src/com/projectinfinity/kodi/shutdown` are the initial transport-independent transaction model and host tests. They do not replace the actual Android runtime adapter described above, implement a native save barrier, or claim a device fix.
 
 Run `python repairs/android-checkpoint-shutdown/test_android.py` from the repository root. It compiles with `--release 8`, all compiler warnings enabled and treated as errors, then runs the host protocol tests. Classes are created only in an automatically removed temporary directory. `java com.sun.tools.javac.Main` works if the JDK compiler module exists without a `javac` executable. No external dependency or downloaded compiler is required.
 
@@ -17,15 +21,15 @@ Run `python repairs/android-checkpoint-shutdown/test_android.py` from the reposi
 - Completion requires matched engine-death evidence. A missing Activity, lifecycle return, transport disconnect, timeout or observer report cannot complete the transaction.
 - A failed dispatch, lost binding or deadline revokes a capability not yet consumed. After consumption, termination is irreversible: a transport exception records `termination_confirmation_pending` and preserves `ENGINE_TERMINATING` until matching death is proven. It cannot truthfully promise cancellation after an engine was already authorized to terminate.
 
-## Mandatory Android integration work still absent
+## Initial transport-independent model boundary
 
-The classes are transport-independent protocol code. No Messenger/Binder adapter or JNI/native backend is provided here. In particular, the in-memory `TerminationAuthorization` must **not** be serialized into a plain boolean, a historical file receipt, or a replayable permission flag.
+The standalone `src/` classes are transport-independent protocol code. The later actual adapter uses its own Binder gate; it does not serialize the initial in-memory `TerminationAuthorization` into a plain boolean, a historical file receipt, or a replayable permission flag.
 
 A real process adapter must retain the capability in the authoritative shell coordinator and expose an authenticated, one-shot Binder consumption gate. The engine must bind that gate to the established coordinator peer, verify sender UID, session, engine-owner UUID, PID and connection UUID, and supply its locally verified native receipt for exact comparison. Failure/revocation and consume must share one serialized authority. If consume was already accepted, a subsequently lost response is an uncertain termination, not proof of revocation. The native backend must retain its sealed state through this exchange and fail closed if it cannot prove its final barrier.
 
 The current direct endpoint implementation is useful for a same-process protocol harness and for implementing the engine adapter's validation rules. Wiring two Android processes requires replacing that direct call with the authenticated capability gate above. No claim is made that transferring a Java object or copying its fields implements Binder authentication.
 
-Other required integration:
+Integration and validation requirements (runtime entry-point work is present in the patch; native implementation and full validation are separate):
 
 1. Recover and audit the exact parent native writer registry; implement the real quiescence and persistence operations, including provider/Python/Resume Hub writers and dirty database/file owners.
 2. Convert the existing default-process close guard into the single coordinator. Retain the nonsticky existing-engine binding; never auto-create or restart the engine to deliver shutdown.

@@ -1,0 +1,166 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.Service;
+import android.content.*;
+import android.os.*;
+import java.lang.ref.WeakReference;
+import java.util.UUID;
+import java.util.concurrent.*;
+import org.json.JSONObject;
+
+/** Authenticated endpoint in the existing :kodi process. Never sticky or auto-created by binding. */
+public final class InfinityCloseNativeLease extends Service {
+  static final String TICKET="close_ticket",TOKEN="close_owner",PID="close_pid",START="close_start";
+  private static String ticket="";
+  private static long started;
+  private static WeakReference<Main> activity=new WeakReference<>(null);
+  private static InfinityCloseNativeLease instance;
+  private final Handler ui=new Handler(Looper.getMainLooper());
+  private final ScheduledExecutorService worker=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"InfinityCheckpointEngine");t.setDaemon(true);return t;});
+  private Messenger coordinator;
+  private IBinder authority;
+  private volatile boolean ended,prepared,terminationDispatched;
+  private String safeJson="",safeProof="";
+  private long safeGeneration;
+  private final Messenger endpoint=new Messenger(new Handler(Looper.getMainLooper(),message->{
+    Main current=activity.get();Bundle data=message.getData();
+    if(message.sendingUid!=android.os.Process.myUid()||!matches(data,current))return true;
+    if(message.what==InfinityCheckpointProtocol.PREPARE){
+      if(prepared||ended||message.replyTo==null||data.getBinder(InfinityCheckpointProtocol.GATE)==null)return true;
+      prepared=true;coordinator=message.replyTo;authority=data.getBinder(InfinityCheckpointProtocol.GATE);
+      ui.removeCallbacks(this.startBound);InfinityExitCompletion.guardedReady(current);
+      worker.execute(()->prepare(current));return true;
+    }
+    if(message.what==InfinityCheckpointProtocol.TERMINATE){
+      if(ended||!prepared||coordinator==null||message.replyTo==null||
+          !coordinator.getBinder().equals(message.replyTo.getBinder())||terminationDispatched)return true;
+      final long generation=data.getLong(InfinityCheckpointProtocol.GENERATION,-1);
+      final String proof=data.getString(InfinityCheckpointProtocol.PROOF,"");
+      terminationDispatched=true;worker.execute(()->terminate(current,generation,proof));return true;
+    }
+    return true;
+  }));
+  private final Runnable startBound=()->fail("coordinator_handshake_timeout");
+
+  static boolean acquire(Main owner){
+    if(owner==null||Main.MainActivity!=owner)return false;
+    ticket=UUID.randomUUID().toString();started=SystemClock.elapsedRealtime();activity=new WeakReference<>(owner);
+    try{if(owner.startService(new Intent(owner,InfinityCloseNativeLease.class).putExtra(TICKET,ticket))!=null)return true;}
+    catch(RuntimeException refused){android.util.Log.w("InfinityClose","Checkpoint endpoint start refused",refused);}
+    activity.clear();ticket="";return false;
+  }
+  private static boolean matches(Bundle data,Main owner){
+    return owner!=null&&Main.MainActivity==owner&&!owner.isDestroyed()&&!owner.isFinishing()&&
+        InfinityCheckpointProtocol.matches(data,ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid())&&
+        owner.mInfinityExitPlan.checkpointPending();
+  }
+  private boolean inTime(){long now=SystemClock.elapsedRealtime();return now>=started&&now-started<InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS;}
+  private Bundle identity(){Bundle out=new Bundle();out.putString(TICKET,ticket);out.putString(TOKEN,InfinityKodiShutdown.localOwnerToken());out.putInt(PID,android.os.Process.myPid());return out;}
+  @Override public int onStartCommand(Intent intent,int flags,int startId){
+    Main owner=activity.get();
+    if(intent==null||!ticket.equals(intent.getStringExtra(TICKET))||owner==null||Main.MainActivity!=owner||!owner.mInfinityExitPlan.guardedWaiting()){
+      stopSelf(startId);return START_NOT_STICKY;
+    }
+    if(instance==this)return START_NOT_STICKY;
+    instance=this;Intent guard=new Intent(this,InfinityCloseGuardService.class).putExtra(TICKET,ticket)
+        .putExtra(PID,android.os.Process.myPid()).putExtra(TOKEN,InfinityKodiShutdown.localOwnerToken()).putExtra(START,started);
+    ui.postDelayed(startBound,10000);
+    try{if(Build.VERSION.SDK_INT>=26)startForegroundService(guard);else startService(guard);}
+    catch(RuntimeException refused){fail("coordinator_start_refused");}
+    return START_NOT_STICKY;
+  }
+  private void prepare(Main owner){
+    if(ended||!inTime()){fail("checkpoint_deadline_exceeded");return;}
+    try{
+      cancelEngineJobs();
+      if(!owner.infinityRequestPersistenceCheckpoint(ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid())){
+        fail("native_checkpoint_request_rejected");return;
+      }
+      poll(owner);
+    }catch(Exception|LinkageError unavailable){fail("native_checkpoint_request_"+unavailable.getClass().getSimpleName());}
+  }
+  private void poll(Main owner){
+    if(ended||terminationDispatched)return;
+    if(!inTime()){fail("checkpoint_deadline_exceeded");return;}
+    try{
+      String raw=owner.infinityPersistenceCheckpointStatus(ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid());
+      JSONObject row=InfinityCheckpointProtocol.status(raw,ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid());
+      String phase=row.getString("phase");
+      if("CHECKPOINT_FAILED".equals(phase)){send(InfinityCheckpointProtocol.STATUS,raw);fail(row.optString("error","native_checkpoint_failed"));return;}
+      if(InfinityCheckpointProtocol.safe(row)){
+        safeJson=raw;safeProof=InfinityCheckpointProtocol.proof(raw);safeGeneration=row.getLong("generation");
+        send(InfinityCheckpointProtocol.STATUS,raw);return;
+      }
+      send(InfinityCheckpointProtocol.STATUS,raw);
+      worker.schedule(()->poll(owner),150,TimeUnit.MILLISECONDS);
+    }catch(Exception|LinkageError unavailable){fail("native_checkpoint_status_"+unavailable.getClass().getSimpleName());}
+  }
+  private void terminate(Main owner,long generation,String proof){
+    if(ended||!inTime()||safeJson.isEmpty()||generation!=safeGeneration||!safeProof.equals(proof)){
+      fail("termination_command_rejected");return;
+    }
+    try{
+      JSONObject fresh=InfinityCheckpointProtocol.status(owner.infinityPersistenceCheckpointStatus(ticket,
+          InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid()),ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid());
+      if(!InfinityCheckpointProtocol.safe(fresh)||fresh.getLong("generation")!=generation){fail("native_barrier_changed");return;}
+      // Cancel engine-only Android restart owners before irreversible authorization.
+      stopService(new Intent(this,InfinityExtendedBackgroundService.class));
+      cancelEngineJobs();
+      if(!consumeGuard(generation,proof)){fail("coordinator_authorization_revoked");return;}
+      if(!inTime()){fail("termination_deadline_exceeded");return;}
+      // Final native check, followed immediately by Android termination. No Activity finish or legacy Quit.
+      if(owner.infinityAuthorizeCheckpointTermination(ticket,InfinityKodiShutdown.localOwnerToken(),android.os.Process.myPid())){
+        android.os.Process.killProcess(android.os.Process.myPid());
+      }else fail("native_final_authorization_rejected");
+    }catch(Exception|LinkageError unavailable){fail("termination_dispatch_"+unavailable.getClass().getSimpleName());}
+  }
+  private boolean consumeGuard(long generation,String proof)throws RemoteException{
+    if(authority==null)return false;Parcel data=Parcel.obtain(),reply=Parcel.obtain();
+    try{data.writeInterfaceToken(InfinityCheckpointProtocol.DESCRIPTOR);data.writeString(ticket);
+      data.writeString(InfinityKodiShutdown.localOwnerToken());data.writeInt(android.os.Process.myPid());data.writeLong(generation);data.writeString(proof);
+      if(!authority.transact(InfinityCheckpointProtocol.CONSUME,data,reply,0))return false;
+      reply.readException();return reply.readInt()==1;
+    }finally{data.recycle();reply.recycle();}
+  }
+  private void cancelEngineJobs(){
+    android.app.job.JobScheduler scheduler=(android.app.job.JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
+    if(scheduler==null)return;
+    for(android.app.job.JobInfo job:scheduler.getAllPendingJobs()){
+      ComponentName service=job.getService();String name=service.getClassName();
+      if(getPackageName().equals(service.getPackageName())&&
+          (name.equals(getPackageName()+".channels.SyncChannelJobService")||name.equals(getPackageName()+".channels.SyncProgramsJobService")))
+        scheduler.cancel(job.getId());
+    }
+  }
+  private void send(int what,String value)throws RemoteException{
+    Messenger target=coordinator;if(target==null)throw new RemoteException("No checkpoint coordinator");
+    Message message=Message.obtain(null,what);Bundle data=identity();data.putString(InfinityCheckpointProtocol.JSON,value);message.setData(data);message.replyTo=endpoint;target.send(message);
+  }
+  private void fail(String reason){
+    if(ended)return;ended=true;
+    ui.post(()->{Main owner=activity.get();if(owner!=null&&Main.MainActivity==owner)InfinityExitCompletion.checkpointFailed(owner,reason);});
+    try{send(InfinityCheckpointProtocol.FAILED,reason);}catch(RemoteException unavailable){}
+    // Preserve live engine and sealed owners for explicit recovery. Never escalate.
+  }
+  @Override public IBinder onBind(Intent intent){return endpoint.getBinder();}
+  static void forceRequested(){
+    InfinityCloseNativeLease endpoint=instance;if(endpoint==null)return;
+    endpoint.ended=true;IBinder gate=endpoint.authority;if(gate==null)return;
+    Parcel data=Parcel.obtain();
+    try{data.writeInterfaceToken(InfinityCheckpointProtocol.DESCRIPTOR);data.writeString(ticket);
+      data.writeString(InfinityKodiShutdown.localOwnerToken());data.writeInt(android.os.Process.myPid());data.writeLong(-1);data.writeString("");
+      gate.transact(InfinityCheckpointProtocol.CANCEL_FORCE,data,null,IBinder.FLAG_ONEWAY);
+    }catch(RemoteException|RuntimeException unavailable){}finally{data.recycle();}
+  }
+  static void release(Context context){
+    try{context.stopService(new Intent(context,InfinityCloseGuardService.class));}catch(RuntimeException ignored){}
+    try{context.stopService(new Intent(context,InfinityCloseNativeLease.class));}catch(RuntimeException ignored){}
+  }
+  @Override public void onDestroy(){
+    ended=true;ui.removeCallbacksAndMessages(null);worker.shutdown();if(instance==this)instance=null;
+    Main owner=activity.get();if(owner!=null&&Main.MainActivity==owner&&owner.mInfinityExitPlan.guardedWaiting())
+      InfinityExitCompletion.checkpointFailed(owner,"endpoint_ended_before_checkpoint");
+    super.onDestroy();
+  }
+}

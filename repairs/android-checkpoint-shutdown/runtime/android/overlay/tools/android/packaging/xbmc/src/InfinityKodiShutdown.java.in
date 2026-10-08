@@ -1,0 +1,201 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.util.AtomicFile;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.util.UUID;
+import java.util.concurrent.*;
+import org.json.JSONObject;
+
+/** Kodi writes; the chooser reads. No native load, Activity retention or automatic kill. */
+final class InfinityKodiShutdown {
+  static final String TOKEN="infinity_kodi_launch_token", OWNER="infinity_kodi_owner_token", PID="infinity_kodi_owner_pid";
+  static final String STATE="infinity-kodi-process.json";
+  private static final String processToken=UUID.randomUUID().toString();
+  private static final long processEpoch=System.currentTimeMillis();
+  // An instance owns this lease until its process exits, including native cleanup.
+  // PID existence, wall time and persisted phase are not proof of that ownership.
+  private static RandomAccessFile processLeaseFile;
+  private static FileLock processLease;
+  private static final ExecutorService writes=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityKodiStatus");t.setDaemon(true);return t;});
+  private static final ScheduledExecutorService reads=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"InfinityChooserStatus");t.setDaemon(true);return t;});
+  private static volatile Snapshot cached=Snapshot.empty();
+  private static volatile boolean initialized;
+  private static String launchToken="";
+  private static long closeEpoch;
+  interface Listener { void changed(Snapshot state); }
+  interface Life { boolean alive(int pid,String owner)throws IOException; }
+  static final class Snapshot {
+    final int pid;final String owner,launch,error;final long began,closeAt;
+    final InfinityExitCompletion.Plan.Phase phase;
+    final boolean alive,live,complete;
+    Snapshot(int pid,String owner,String launch,String error,long began,long closeAt,InfinityExitCompletion.Plan.Phase phase,boolean alive,boolean live,boolean complete){
+      this.pid=pid;this.owner=owner;this.launch=launch;this.error=error;this.began=began;this.closeAt=closeAt;this.phase=phase;this.alive=alive;this.live=live;this.complete=complete;
+    }
+    static Snapshot empty(){return new Snapshot(0,"","","",0,0,InfinityExitCompletion.Plan.Phase.RUNNING,false,false,false);}
+    boolean pending(){return alive && phase!=InfinityExitCompletion.Plan.Phase.RUNNING && phase!=InfinityExitCompletion.Plan.Phase.COMPLETE;}
+    boolean stalled(){
+      if(!pending())return false;
+      if(phase==InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED)return true;
+      InfinityCloseProgress.Display display=InfinityCloseProgress.display;
+      if(display!=null&&display.matches(pid,owner))return SystemClock.elapsedRealtime()-display.started>=15000;
+      return closeAt>0&&System.currentTimeMillis()-closeAt>=15000;
+    }
+  }
+  static String localOwnerToken(){return processToken;}
+  static Snapshot state(){return cached;}
+  static boolean initialized(){return initialized;}
+  static boolean pending(){return cached.pending();}
+  static boolean live(){return cached.alive&&cached.live&&!cached.pending();}
+  static InfinityExitCompletion.Plan.Phase phase(){return cached.phase;}
+
+  static synchronized void publish(Context context,String token){
+    if(token!=null&&!token.isEmpty())launchToken=token;
+    Main owner=Main.MainActivity;
+    InfinityExitCompletion.Plan.Phase phase=owner==null?InfinityExitCompletion.Plan.Phase.RUNNING:owner.mInfinityExitPlan.phase();
+    if(owner!=null && owner.isFinishing() && phase==InfinityExitCompletion.Plan.Phase.RUNNING)phase=InfinityExitCompletion.Plan.Phase.WAITING_FOR_STOP;
+    if(phase==InfinityExitCompletion.Plan.Phase.RUNNING)closeEpoch=0;
+    if(phase!=InfinityExitCompletion.Plan.Phase.RUNNING&&closeEpoch==0)closeEpoch=System.currentTimeMillis();
+    write(context,phase,Main.infinityLiveActivity()!=null,"");
+  }
+  static synchronized void boot(Context context,String token){launchToken=token==null?"":token;write(context,InfinityExitCompletion.Plan.Phase.RUNNING,false,"");}
+  static synchronized void failed(Context context,String token,String error){launchToken=token;write(context,InfinityExitCompletion.Plan.Phase.RUNNING,false,error);}
+  private static void write(Context context,InfinityExitCompletion.Plan.Phase phase,boolean live,String error){
+    final File file=new File(context.getFilesDir(),STATE);
+    final JSONObject row=new JSONObject();
+    try{
+      retainProcessLease(context.getFilesDir());
+      row.put("schema",2);row.put("pid",android.os.Process.myPid());row.put("owner",processToken);row.put("launch",launchToken);
+      row.put("began",processEpoch);row.put("close_at",closeEpoch);row.put("phase",phase.name());row.put("live",live);row.put("error",error);
+    }catch(Exception impossible){return;}
+    final byte[] bytes=row.toString().getBytes(StandardCharsets.UTF_8);
+    writes.execute(()->{AtomicFile atomic=new AtomicFile(file);FileOutputStream out=null;
+      try{out=atomic.startWrite();out.write(bytes);atomic.finishWrite(out);}
+      catch(IOException failure){if(out!=null)atomic.failWrite(out);}
+    });
+  }
+  static boolean expected(Intent request){return request==null || !request.hasExtra(OWNER) ||
+      (request.getIntExtra(PID,-1)==android.os.Process.myPid()&&processToken.equals(request.getStringExtra(OWNER)));}
+  static Intent force(Context context,Snapshot state){return new Intent(context,InfinityPowerControlActivity.class)
+      .setAction(InfinityExitCompletion.FORCE).putExtra(PID,state.pid).putExtra(OWNER,state.owner);}
+  static File leasePath(File directory,String owner)throws IOException{
+    if(owner==null || !owner.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
+      throw new IOException("Invalid Kodi owner");
+    return new File(directory,"infinity-kodi-owner-"+owner+".lock");
+  }
+  private static synchronized void retainProcessLease(File directory)throws IOException{
+    if(processLease!=null && processLease.isValid())return;
+    RandomAccessFile opened=new RandomAccessFile(leasePath(directory,processToken),"rw");
+    try{
+      FileLock acquired=opened.getChannel().tryLock();
+      if(acquired==null)throw new IOException("Kodi owner lease unavailable");
+      processLeaseFile=opened;processLease=acquired;
+    }catch(IOException | RuntimeException failed){opened.close();throw failed;}
+  }
+  static boolean ownerAlive(File directory,int pid,String owner)throws IOException{
+    if(pid<=0)return false;
+    // Do not open/close a second descriptor for our own lease: on some systems
+    // closing any descriptor for a locked inode releases this process's lock.
+    if(processToken.equals(owner))return pid==android.os.Process.myPid() && processLease!=null && processLease.isValid();
+    File path=leasePath(directory,owner);if(!path.isFile())return false;
+    try(RandomAccessFile probe=new RandomAccessFile(path,"rw")){
+      try(FileLock free=probe.getChannel().tryLock()){
+        return free==null;
+      }catch(OverlappingFileLockException held){return true;}
+    }
+  }
+  static Snapshot recheck(Life life,Snapshot previous)throws IOException{
+    if(previous.pid<=0)return Snapshot.empty();
+    boolean alive=life.alive(previous.pid,previous.owner);
+    return new Snapshot(previous.pid,previous.owner,previous.launch,previous.error,previous.began,previous.closeAt,
+        previous.phase,alive,alive&&previous.live,previous.complete&&!alive);
+  }
+  static Snapshot read(File directory,Life life,Snapshot previous)throws Exception{
+    File path=new File(directory,STATE);if(!path.exists())return recheck(life,previous);
+    byte[] bytes=new AtomicFile(path).readFully();if(bytes.length>8192)throw new IOException("Status too large");
+    JSONObject row=new JSONObject(new String(bytes,StandardCharsets.UTF_8));
+    int schema=row.getInt("schema");if(schema!=1 && schema!=2)throw new IOException("Status schema");
+    int pid=row.getInt("pid");String owner=row.getString("owner"),launch=row.optString("launch"),error=row.optString("error");
+    long began=row.getLong("began"),closeAt=row.getLong("close_at");
+    InfinityExitCompletion.Plan.Phase phase=InfinityExitCompletion.Plan.Phase.valueOf(row.getString("phase"));
+    // Schema 1 is preserved as historical evidence. It contains no instance
+    // lease, so a recycled PID can never promote it into a current owner.
+    boolean alive=schema==2 && life.alive(pid,owner),complete=false;
+    if(phase==InfinityExitCompletion.Plan.Phase.COMPLETE)phase=InfinityExitCompletion.Plan.Phase.DESTROYING;
+    boolean checkpoint=phase==InfinityExitCompletion.Plan.Phase.QUIESCE || phase==InfinityExitCompletion.Plan.Phase.CHECKPOINT_REQUESTED ||
+        phase==InfinityExitCompletion.Plan.Phase.PERSISTING || phase==InfinityExitCompletion.Plan.Phase.SAFE_TO_TERMINATE ||
+        phase==InfinityExitCompletion.Plan.Phase.ENGINE_TERMINATING || phase==InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;
+    boolean awaitingCoordinator=false;
+    try{
+      JSONObject close=InfinityCheckpointProtocol.read(directory);
+      if(close.getInt("schema")==1 && close.getInt("pid")==pid && owner.equals(close.getString("owner")) &&
+          InfinityCheckpointProtocol.uuid(close.getString("session")) && close.getLong("started_elapsed_ms")>=0 &&
+          phase!=InfinityExitCompletion.Plan.Phase.FORCED){
+        checkpoint=true;
+        if(closeAt==0)closeAt=close.getLong("started_epoch_ms");
+        String closingPhase=close.getString("phase");
+        boolean saved=false;
+        if(close.optBoolean("checkpoint_saved",false)){
+          String raw=close.getString("native_json");
+          JSONObject nativeReceipt=InfinityCheckpointProtocol.status(raw,close.getString("session"),owner,pid);
+          saved=InfinityCheckpointProtocol.safe(nativeReceipt) && close.getLong("generation")==nativeReceipt.getLong("generation") &&
+              InfinityCheckpointProtocol.proof(raw).equals(close.getString("native_proof_sha256"));
+        }
+        if("COMPLETE".equals(closingPhase) && saved && !alive){complete=true;phase=InfinityExitCompletion.Plan.Phase.COMPLETE;}
+        else if("CHECKPOINT_FAILED".equals(closingPhase)){
+          phase=InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;
+          error="Infinity could not confirm that everything was saved. Open Health Center or use Force Close.";
+        }else if("QUIESCE".equals(closingPhase)||"CHECKPOINT_REQUESTED".equals(closingPhase)||"PERSISTING".equals(closingPhase)||
+            "SAFE_TO_TERMINATE".equals(closingPhase)||"ENGINE_TERMINATING".equals(closingPhase)){
+          phase=InfinityExitCompletion.Plan.Phase.valueOf(closingPhase);
+          awaitingCoordinator=saved&&!alive;
+        }
+      }
+    }catch(Exception unavailable){}
+    // A failed diagnostic-file write must still expose recovery in the surviving shell.
+    // This presentation signal can report failure only; it can never report SAFE or COMPLETE.
+    InfinityCloseProgress.Display display=InfinityCloseProgress.display;
+    if(alive&&display!=null&&display.matches(pid,owner)&&"CHECKPOINT_FAILED".equals(display.stage)){
+      checkpoint=true;phase=InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;
+      error="Infinity could not confirm that everything was saved. Open Health Center or use Force Close.";
+    }
+    if(!checkpoint && !alive && closeAt>0 && phase!=InfinityExitCompletion.Plan.Phase.FORCED){
+      File receipt=new File(directory,"infinity-native-cleanup.json");
+      if(receipt.length()>0&&receipt.length()<4096){
+        try(FileInputStream in=new FileInputStream(receipt)){
+          byte[] data=new byte[(int)receipt.length()];int at=0,n;while(at<data.length&&(n=in.read(data,at,data.length-at))>0)at+=n;
+          JSONObject end=new JSONObject(new String(data,0,at,StandardCharsets.UTF_8));
+          complete=end.optInt("pid",-1)==pid && end.optLong("epoch_ms",0)>=Math.max(began,closeAt) &&
+              "native.CXBMCApp.Destroy.complete".equals(end.optString("milestone"));
+        }catch(Exception unavailable){}
+      }
+      if(complete)phase=InfinityExitCompletion.Plan.Phase.COMPLETE;
+    }
+    if(!alive && !complete && !awaitingCoordinator && error.isEmpty())error=closeAt>0 ? "Infinity ended without a confirmed save checkpoint. Health Center has the exit evidence." : "Kodi stopped during startup or playback. Open Health Center for the exit evidence.";
+    return new Snapshot(pid,owner,launch,error,began,closeAt,phase,alive,alive&&row.optBoolean("live"),complete);
+  }
+  static final class Watch implements AutoCloseable {
+    private volatile boolean closed;private ScheduledFuture<?> task;
+    Watch(Context context,Listener listener){
+      final File directory=context.getApplicationContext().getFilesDir();final Handler ui=new Handler(Looper.getMainLooper());
+      final Life life=(pid,owner)->ownerAlive(directory,pid,owner);
+      task=reads.scheduleWithFixedDelay(()->{
+        if(closed)return;Snapshot next;
+        try{next=read(directory,life,cached);}
+        catch(Exception unavailable){try{next=recheck(life,cached);}catch(IOException unknown){next=cached;}}
+        final Snapshot delivered=next;
+        ui.post(()->{if(!closed){cached=delivered;initialized=true;listener.changed(delivered);}});
+      },0,250,TimeUnit.MILLISECONDS);
+    }
+    public void close(){closed=true;if(task!=null)task.cancel(false);}
+  }
+  private InfinityKodiShutdown(){}
+}

@@ -1,0 +1,374 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.system.Os;
+import android.system.OsConstants;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+/** Exact, recoverable Command Center code overlay, before any Kodi/Python owner starts. */
+public final class InfinityCheckpointAddonInstaller {
+  private static final String TAG = "InfinityCheckpointCode";
+  private static final String ASSET = "infinity/checkpoint-controller.zip";
+  private static final String ASSET_SHA256 = "a73073d9219e6632e189bb9a8a4a599483ffa091960df328f98ee2f41ee24d54";
+  private static final String ADDON = "script.infinity.commandcenter";
+  private static final int FILE_LIMIT = 4 * 1024 * 1024;
+  private static final int PAYLOAD_LIMIT = 16 * 1024 * 1024;
+  private static final Set<String> FILES = new HashSet<>(Arrays.asList(
+      "common.py", "default.py", "experience.py", "plugin.py", "resume_hub.py", "service.py",
+      "checkpoint_runtime.py", "persistence_participant.py"));
+  private static final Set<String> NEW_FILES = new HashSet<>(Arrays.asList(
+      "checkpoint_runtime.py", "persistence_participant.py"));
+
+  private InfinityCheckpointAddonInstaller() {}
+
+  public static boolean applyBeforeNative(Context suppliedContext) {
+    Context context = suppliedContext.getApplicationContext();
+    if (context == null) context = suppliedContext;
+    File lockFile = new File(context.getFilesDir(), "infinity-checkpoint-code.lock");
+    try (RandomAccessFile lockHandle = new RandomAccessFile(lockFile, "rw");
+         FileLock lock = lockHandle.getChannel().tryLock()) {
+      if (lock == null) {
+        Log.w(TAG, "Checkpoint code preparation already owned by another process");
+        return false;
+      }
+      return applyLocked(context);
+    } catch (Throwable failure) {
+      // No file contents, tokens, provider configuration, or user data in diagnostics.
+      Log.e(TAG, "Checkpoint code preparation blocked: " + failure.getClass().getSimpleName());
+      return false;
+    }
+  }
+
+  private static final class Change {
+    String path;
+    String before;
+    String after;
+    byte[] data;
+  }
+
+  private static final class Payload {
+    String addonXml;
+    ArrayList<Change> changes = new ArrayList<>();
+    Map<String, Change> byPath = new HashMap<>();
+  }
+
+  private static boolean applyLocked(Context context) throws Exception {
+    // Validate the complete trusted payload before examining or changing installed code.
+    Payload payload = loadPayload(context);
+    File storage = context.getExternalFilesDir(null);
+    if (storage == null) storage = context.getFilesDir();
+    File addon = new File(new File(new File(storage, ".kodi"), "addons"), ADDON).getCanonicalFile();
+    File marker = target(addon, "addon.xml");
+    if (!marker.isFile() || !payload.addonXml.equals(fileHash(marker))) {
+      Log.w(TAG, "Exact installed Command Center 0.3.5.19 parent is unavailable");
+      return false;
+    }
+
+    File transaction = new File(context.getFilesDir(), "infinity-checkpoint-code-transaction");
+    File journalFile = new File(transaction, "journal.json");
+    if (journalFile.isFile()) {
+      JSONObject oldJournal = new JSONObject(new String(readFile(journalFile, 64 * 1024), StandardCharsets.UTF_8));
+      recover(addon, transaction, payload, oldJournal);
+    } else if (transaction.exists()) {
+      // No durable journal means no installed file was eligible for mutation.
+      removePrivateTransaction(transaction);
+    }
+
+    ArrayList<Change> pending = new ArrayList<>();
+    // Preflight EVERY file. A customized or unknown parent is never overwritten.
+    for (Change change : payload.changes) {
+      File installed = target(addon, change.path);
+      String current = installed.exists() ? fileHash(installed) : null;
+      if (change.after.equals(current)) continue; // Idempotent retry/already-installed code.
+      if (!equal(change.before, current)) {
+        Log.w(TAG, "Installed checkpoint code preimage differs; overlay not applied");
+        return false;
+      }
+      pending.add(change);
+    }
+    if (pending.isEmpty()) return true;
+    if (!transaction.mkdir()) throw new IllegalStateException("Cannot create transaction directory");
+    syncDirectory(transaction.getParentFile());
+
+    JSONObject journal = new JSONObject();
+    journal.put("schema", 1);
+    journal.put("asset_sha256", ASSET_SHA256);
+    journal.put("phase", "prepared");
+    JSONArray entries = new JSONArray();
+    for (int index = 0; index < pending.size(); index++) {
+      Change change = pending.get(index);
+      File installed = target(addon, change.path);
+      JSONObject entry = new JSONObject();
+      entry.put("path", change.path);
+      entry.put("existed", installed.exists());
+      entry.put("before", change.before == null ? JSONObject.NULL : change.before);
+      entry.put("after", change.after);
+      if (installed.exists()) {
+        byte[] original = readFile(installed, FILE_LIMIT);
+        if (!change.before.equals(hash(original))) throw new IllegalStateException("Parent changed during staging");
+        atomicWrite(new File(transaction, "backup-" + index), original);
+      }
+      atomicWrite(new File(transaction, "new-" + index), change.data);
+      entries.put(entry);
+    }
+    journal.put("files", entries);
+    writeJournal(transaction, journal); // Durable backups and plan precede installed-file mutation.
+
+    try {
+      journal.put("phase", "applying");
+      writeJournal(transaction, journal);
+      validatePlan(addon, transaction, payload, journal, false);
+      for (int index = 0; index < entries.length(); index++) {
+        JSONObject entry = entries.getJSONObject(index);
+        File installed = target(addon, entry.getString("path"));
+        String expected = nullableHash(entry, "before");
+        if (!equal(expected, installed.exists() ? fileHash(installed) : null))
+          throw new IllegalStateException("Installed code changed during transaction");
+        byte[] staged = readFile(new File(transaction, "new-" + index), FILE_LIMIT);
+        if (!entry.getString("after").equals(hash(staged)))
+          throw new IllegalStateException("Staged code changed");
+        atomicWrite(installed, staged);
+      }
+      verifyInstalled(addon, payload);
+      journal.put("phase", "committed");
+      writeJournal(transaction, journal);
+    } catch (Throwable failure) {
+      // Rollback checks the entire plan first and refuses to overwrite unknown edits.
+      // If recovery itself fails, the durable journal remains for next startup.
+      try { recover(addon, transaction, payload, journal); }
+      catch (Throwable rollbackFailure) {
+        Log.e(TAG, "Checkpoint code recovery remains pending: " + rollbackFailure.getClass().getSimpleName());
+      }
+      throw new IllegalStateException("Checkpoint code transaction incomplete", failure);
+    }
+    try { removePrivateTransaction(transaction); }
+    catch (Exception deferredCleanup) {
+      // A committed verified overlay remains usable; restart re-verifies its commit journal.
+      Log.w(TAG, "Verified checkpoint code transaction cleanup deferred");
+    }
+    Log.i(TAG, "Checkpoint participant code installed and verified; existing add-on version preserved");
+    return true;
+  }
+
+  private static Payload loadPayload(Context context) throws Exception {
+    byte[] archive;
+    try (InputStream input = context.getAssets().open(ASSET)) { archive = readAll(input, PAYLOAD_LIMIT); }
+    if (!ASSET_SHA256.matches("[0-9a-f]{64}") || !ASSET_SHA256.equals(hash(archive)))
+      throw new IllegalStateException("Checkpoint code asset checksum mismatch");
+    Map<String, byte[]> zipFiles = new HashMap<>();
+    int total = 0;
+    try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(archive))) {
+      for (ZipEntry entry; (entry = zip.getNextEntry()) != null;) {
+        String name = entry.getName();
+        if (entry.isDirectory() || !("manifest.json".equals(name) ||
+            (name.startsWith("payload/") && FILES.contains(name.substring(8)))))
+          throw new IllegalStateException("Unexpected checkpoint code archive member");
+        if (zipFiles.containsKey(name)) throw new IllegalStateException("Duplicate checkpoint archive member");
+        byte[] bytes = readAll(zip, "manifest.json".equals(name) ? 64 * 1024 : FILE_LIMIT);
+        total += bytes.length;
+        if (total > PAYLOAD_LIMIT) throw new IllegalStateException("Checkpoint archive too large");
+        zipFiles.put(name, bytes);
+      }
+    }
+    if (zipFiles.size() != FILES.size() + 1 || !zipFiles.containsKey("manifest.json"))
+      throw new IllegalStateException("Incomplete checkpoint code archive");
+    JSONObject manifest = new JSONObject(new String(zipFiles.get("manifest.json"), StandardCharsets.UTF_8));
+    if (manifest.getInt("schema") != 1 || !ADDON.equals(manifest.getString("addon_id")) ||
+        !"0.3.5.19".equals(manifest.getString("addon_version")))
+      throw new IllegalStateException("Checkpoint manifest identity mismatch");
+    Payload payload = new Payload();
+    payload.addonXml = checkedHash(manifest.getString("addon_xml_sha256"));
+    JSONArray files = manifest.getJSONArray("files");
+    if (files.length() != FILES.size()) throw new IllegalStateException("Manifest file set mismatch");
+    for (int index = 0; index < files.length(); index++) {
+      JSONObject file = files.getJSONObject(index);
+      Change change = new Change();
+      change.path = file.getString("path");
+      if (!FILES.contains(change.path) || payload.byPath.containsKey(change.path))
+        throw new IllegalStateException("Unexpected or duplicate manifest path");
+      change.before = nullableHash(file, "before");
+      if (NEW_FILES.contains(change.path) != (change.before == null))
+        throw new IllegalStateException("Unexpected new-file preimage");
+      change.after = checkedHash(file.getString("after"));
+      change.data = zipFiles.get("payload/" + change.path);
+      if (change.data == null || !change.after.equals(hash(change.data)))
+        throw new IllegalStateException("Checkpoint file checksum mismatch");
+      payload.changes.add(change);
+      payload.byPath.put(change.path, change);
+    }
+    return payload;
+  }
+
+  private static void recover(File addon, File transaction, Payload payload, JSONObject journal) throws Exception {
+    String phase = journal.getString("phase");
+    if ("committed".equals(phase)) {
+      validatePlan(addon, transaction, payload, journal, true);
+      verifyInstalled(addon, payload);
+      removePrivateTransaction(transaction);
+      return;
+    }
+    if (!"prepared".equals(phase) && !"applying".equals(phase))
+      throw new IllegalStateException("Unknown checkpoint transaction phase");
+    validatePlan(addon, transaction, payload, journal, false);
+    JSONArray entries = journal.getJSONArray("files");
+    for (int index = entries.length() - 1; index >= 0; index--) {
+      JSONObject entry = entries.getJSONObject(index);
+      File installed = target(addon, entry.getString("path"));
+      String original = nullableHash(entry, "before");
+      String current = installed.exists() ? fileHash(installed) : null;
+      if (equal(original, current)) continue;
+      if (entry.getBoolean("existed")) {
+        atomicWrite(installed, readFile(new File(transaction, "backup-" + index), FILE_LIMIT));
+      } else {
+        if (!installed.delete()) throw new IllegalStateException("Cannot remove uncommitted new code");
+        syncDirectory(addon);
+      }
+    }
+    for (int index = 0; index < entries.length(); index++) {
+      JSONObject entry = entries.getJSONObject(index);
+      File installed = target(addon, entry.getString("path"));
+      if (!equal(nullableHash(entry, "before"), installed.exists() ? fileHash(installed) : null))
+        throw new IllegalStateException("Rollback verification failed");
+    }
+    removePrivateTransaction(transaction);
+  }
+
+  private static void validatePlan(File addon, File transaction, Payload payload,
+                                   JSONObject journal, boolean committed) throws Exception {
+    if (journal.getInt("schema") != 1 || !ASSET_SHA256.equals(journal.getString("asset_sha256")))
+      throw new IllegalStateException("Recovery journal identity mismatch");
+    JSONArray entries = journal.getJSONArray("files");
+    if (entries.length() == 0 || entries.length() > FILES.size())
+      throw new IllegalStateException("Invalid recovery plan");
+    Set<String> seen = new HashSet<>();
+    for (int index = 0; index < entries.length(); index++) {
+      JSONObject entry = entries.getJSONObject(index);
+      String path = entry.getString("path");
+      Change expected = payload.byPath.get(path);
+      if (expected == null || !seen.add(path) || !equal(expected.before, nullableHash(entry, "before")) ||
+          !expected.after.equals(entry.getString("after")) || entry.getBoolean("existed") != (expected.before != null))
+        throw new IllegalStateException("Recovery plan is not the approved overlay");
+      File installed = target(addon, path);
+      String current = installed.exists() ? fileHash(installed) : null;
+      if (committed ? !expected.after.equals(current) :
+          !(equal(expected.before, current) || expected.after.equals(current)))
+        throw new IllegalStateException("Unknown installed edit blocks safe recovery");
+      if (!committed && expected.before != null &&
+          !expected.before.equals(fileHash(new File(transaction, "backup-" + index))))
+        throw new IllegalStateException("Original recovery backup checksum mismatch");
+    }
+  }
+
+  private static void verifyInstalled(File addon, Payload payload) throws Exception {
+    if (!payload.addonXml.equals(fileHash(target(addon, "addon.xml"))))
+      throw new IllegalStateException("Parent marker changed");
+    for (Change change : payload.changes)
+      if (!change.after.equals(fileHash(target(addon, change.path))))
+        throw new IllegalStateException("Installed checkpoint code verification failed");
+  }
+
+  private static File target(File addon, String name) throws Exception {
+    if (!(FILES.contains(name) || "addon.xml".equals(name))) throw new IllegalStateException("Invalid target");
+    File file = new File(addon, name).getAbsoluteFile();
+    if (!file.equals(file.getCanonicalFile())) throw new IllegalStateException("Symlink target refused");
+    if (file.exists() && !file.isFile()) throw new IllegalStateException("Non-file target refused");
+    return file;
+  }
+  private static String nullableHash(JSONObject value, String key) throws Exception {
+    if (!value.has(key)) throw new IllegalStateException("Missing digest field");
+    return value.isNull(key) ? null : checkedHash(value.getString(key));
+  }
+  private static String checkedHash(String hash) {
+    if (!hash.matches("[0-9a-f]{64}")) throw new IllegalStateException("Invalid digest");
+    return hash;
+  }
+  private static boolean equal(String first, String second) { return first == null ? second == null : first.equals(second); }
+  private static String fileHash(File file) throws Exception { return hash(readFile(file, FILE_LIMIT)); }
+  private static byte[] readFile(File file, int limit) throws Exception {
+    if (!file.isFile()) throw new IllegalStateException("Required file unavailable");
+    try (InputStream input = new FileInputStream(file)) { return readAll(input, limit); }
+  }
+  private static byte[] readAll(InputStream input, int limit) throws Exception {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    byte[] buffer = new byte[16384];
+    for (int count; (count = input.read(buffer)) != -1;) {
+      if (count == 0) continue;
+      if (output.size() > limit - count) throw new IllegalStateException("File exceeds bounded size");
+      output.write(buffer, 0, count);
+    }
+    return output.toByteArray();
+  }
+  private static String hash(byte[] bytes) throws Exception {
+    byte[] digest = MessageDigest.getInstance("SHA-256").digest(bytes);
+    StringBuilder text = new StringBuilder(64);
+    for (byte value : digest) { text.append(Character.forDigit((value >>> 4) & 15, 16)); text.append(Character.forDigit(value & 15, 16)); }
+    return text.toString();
+  }
+  private static void writeJournal(File directory, JSONObject journal) throws Exception {
+    atomicWrite(new File(directory, "journal.json"), journal.toString().getBytes(StandardCharsets.UTF_8));
+  }
+  private static void atomicWrite(File target, byte[] bytes) throws Exception {
+    File parent = target.getParentFile();
+    if (parent == null || !parent.isDirectory()) throw new IllegalStateException("Missing destination directory");
+    File temporary = File.createTempFile(".infinity-checkpoint-", ".tmp", parent);
+    try {
+      try (FileOutputStream output = new FileOutputStream(temporary)) {
+        output.write(bytes);
+        output.getFD().sync();
+      }
+      Os.rename(temporary.getAbsolutePath(), target.getAbsolutePath());
+      syncDirectory(parent);
+    } finally {
+      if (temporary.exists() && !temporary.delete()) Log.w(TAG, "Private staging cleanup deferred");
+    }
+  }
+  private static void syncDirectory(File directory) throws Exception {
+    FileDescriptor descriptor = Os.open(directory.getAbsolutePath(), OsConstants.O_RDONLY, 0);
+    try {
+      if (!OsConstants.S_ISDIR(Os.fstat(descriptor).st_mode))
+        throw new IllegalStateException("Durability target is not a directory");
+      Os.fsync(descriptor);
+    } finally { Os.close(descriptor); }
+  }
+  private static void removePrivateTransaction(File directory) throws Exception {
+    if (!directory.exists()) return;
+    // Withdraw the recovery authority durably before removing its backups.
+    // A crash during cleanup can then leave only disposable staging files,
+    // never a live rollback journal referring to backups already deleted.
+    File journal = new File(directory, "journal.json");
+    if (journal.exists()) {
+      if (!journal.isFile() || !journal.delete()) throw new IllegalStateException("Cannot retire transaction journal");
+      syncDirectory(directory);
+    }
+    File[] children = directory.listFiles();
+    if (children == null) throw new IllegalStateException("Cannot inspect private transaction");
+    for (File child : children) {
+      if (!child.isFile() || !child.delete()) throw new IllegalStateException("Cannot clean private transaction");
+    }
+    if (!directory.delete()) throw new IllegalStateException("Cannot clean private transaction directory");
+    syncDirectory(directory.getParentFile());
+  }
+}

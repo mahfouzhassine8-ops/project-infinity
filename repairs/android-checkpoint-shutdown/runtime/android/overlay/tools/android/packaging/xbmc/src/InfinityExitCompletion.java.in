@@ -1,0 +1,232 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.os.SystemClock;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/** User power routes. The default-process coordinator owns checkpointed Normal Close.
+ * Activity lifecycle is evidence only; Force remains a separate explicit user action. */
+final class InfinityExitCompletion {
+  static final String NORMAL = "@APP_PACKAGE@.action.CLOSE_KODI";
+  static final String FORCE = "@APP_PACKAGE@.action.FORCE_CLOSE_KODI";
+  private static final String PREFS = "infinity_exit_completion";
+  private static final ExecutorService IO = Executors.newSingleThreadExecutor(r -> {
+    Thread t = new Thread(r, "InfinityExplicitExit"); t.setDaemon(true); return t;
+  });
+  private static final ExecutorService RECORDS = Executors.newSingleThreadExecutor(r -> {
+    Thread t = new Thread(r, "InfinityExitEvidence"); t.setDaemon(true); return t;
+  });
+  static final long STALL_BOUND_MS=15000;
+  private static final java.util.concurrent.ScheduledExecutorService WATCH = Executors.newSingleThreadScheduledExecutor(r -> {
+    Thread t=new Thread(r,"InfinityExitBound");t.setDaemon(true);return t;
+  });
+  // Keep the last close plan, not an Activity or a saved preference. A missing
+  // Activity slot or elapsed timeout must never be presented as completed cleanup.
+  private static volatile Plan observedClosePlan;
+  private static final java.util.concurrent.atomic.AtomicLong planGeneration=new java.util.concurrent.atomic.AtomicLong();
+  private static synchronized void observeClose(Plan plan) {
+    Plan current=observedClosePlan;
+    if(current==null || current.generation<=plan.generation) observedClosePlan=plan;
+  }
+  private static synchronized void forgetClose(Plan plan) {
+    if(observedClosePlan==plan) observedClosePlan=null;
+  }
+  static Plan.Phase closePhase() {
+    Plan plan=observedClosePlan;
+    return plan==null ? Plan.Phase.RUNNING : plan.phase();
+  }
+  static final class Plan {
+    private final long generation=planGeneration.incrementAndGet();
+    enum Phase { RUNNING, ANDROID_TASK_REMOVAL, WAITING_FOR_STOP, QUIT_QUEUED, DESTROYING, QUIESCE, CHECKPOINT_REQUESTED, PERSISTING, SAFE_TO_TERMINATE, ENGINE_TERMINATING, CHECKPOINT_FAILED, COMPLETE, FORCED }
+    private Phase phase = Phase.RUNNING;
+    private long requestedAt=-1;
+    private boolean guarded;
+    synchronized boolean guardedWaiting() { return guarded && phase==Phase.QUIESCE; }
+    synchronized boolean requestGuardedClose() {
+      if(phase!=Phase.RUNNING)return false;
+      guarded=true;requestedAt=SystemClock.elapsedRealtime();phase=Phase.QUIESCE;
+      observeClose(this);return true;
+    }
+    synchronized boolean claimGuardedDispatch() {
+      if(!guardedWaiting())return false;
+      phase=Phase.CHECKPOINT_REQUESTED;return true;
+    }
+    synchronized boolean cancelGuardedClose() {
+      if(!guardedWaiting())return false;
+      guarded=false;requestedAt=-1;phase=Phase.RUNNING;forgetClose(this);return true;
+    }
+    synchronized boolean checkpointPending() { return guarded && phase!=Phase.FORCED && phase!=Phase.COMPLETE && phase!=Phase.CHECKPOINT_FAILED; }
+    synchronized void checkpointFailed() { if(guarded && phase!=Phase.FORCED && phase!=Phase.COMPLETE)phase=Phase.CHECKPOINT_FAILED; }
+    synchronized boolean stalled(long now) {
+      return phase==Phase.CHECKPOINT_FAILED || (requestedAt>=0 && now-requestedAt>=STALL_BOUND_MS && pending());
+    }
+    synchronized Phase phase() { return phase; }
+    synchronized boolean pending() { return phase != Phase.RUNNING && phase != Phase.COMPLETE; }
+    synchronized boolean requestNormal() {
+      if (phase != Phase.RUNNING) return false;
+      requestedAt=SystemClock.elapsedRealtime();phase = Phase.WAITING_FOR_STOP; observeClose(this); return true;
+    }
+    synchronized boolean requestAndroidTaskRemoval() {
+      if (phase != Phase.RUNNING) return false;
+      requestedAt=SystemClock.elapsedRealtime();phase=Phase.ANDROID_TASK_REMOVAL;observeClose(this);return true;
+    }
+    synchronized boolean cancelAndroidTaskRemoval() {
+      if (phase != Phase.ANDROID_TASK_REMOVAL) return false;
+      phase=Phase.RUNNING;forgetClose(this);return true;
+    }
+    synchronized boolean stopped(boolean configurationChange) {
+      if (guarded || configurationChange || phase != Phase.WAITING_FOR_STOP) return false;
+      phase = Phase.QUIT_QUEUED; return true;
+    }
+    synchronized boolean cancelBeforeQuit() {
+      if (phase != Phase.WAITING_FOR_STOP) return false;
+      phase = Phase.RUNNING; forgetClose(this); return true;
+    }
+    synchronized boolean force() {
+      if (phase == Phase.FORCED || phase == Phase.COMPLETE) return false;
+      phase = Phase.FORCED; observeClose(this); return true;
+    }
+    synchronized void destroying() { if (!guarded && phase != Phase.FORCED) phase = Phase.DESTROYING; observeClose(this); }
+    synchronized void completed() { if (!guarded && phase != Phase.FORCED) phase = Phase.COMPLETE; }
+  }
+  static boolean requestNormal(Main owner) {
+    if(owner==null || owner.isDestroyed() || owner.isFinishing())return false;
+    if(!owner.mInfinityExitPlan.requestGuardedClose())return owner.mInfinityExitPlan.pending();
+    owner.infinityStopWeatherCapture();
+    record(owner,"exit.normal.guardRequested");
+    final WeakReference<Main> observed=new WeakReference<>(owner);
+    WATCH.schedule(()->{
+      Main current=observed.get();
+      if(current!=null && current.mInfinityExitPlan.stalled(SystemClock.elapsedRealtime()))
+        record(current,"exit.normal.boundExceeded.userRecoveryAvailable");
+    },STALL_BOUND_MS,java.util.concurrent.TimeUnit.MILLISECONDS);
+    if(InfinityCloseNativeLease.acquire(owner))return true;
+    owner.mInfinityExitPlan.cancelGuardedClose();
+    record(owner,"exit.normal.guardUnavailable.noTaskRemoval");
+    return false;
+  }
+  static void guardedFailed(Main owner,String reason) { checkpointFailed(owner,reason); }
+  static void checkpointFailed(Main owner,String reason) {
+    if(owner==null)return;
+    owner.mInfinityExitPlan.checkpointFailed();
+    record(owner,"exit.checkpoint.failed."+reason);
+    android.widget.Toast.makeText(owner,"Infinity could not confirm that everything was saved. Force Close remains available.",android.widget.Toast.LENGTH_LONG).show();
+  }
+  static void guardedReady(Main owner) {
+    if(owner==null || owner!=Main.MainActivity || owner.isDestroyed() || owner.isFinishing() ||
+        !owner.mInfinityExitPlan.claimGuardedDispatch())return;
+    record(owner,"exit.checkpoint.coordinatorReady");
+    // NativeLease requests the dedicated asynchronous persistence API. No legacy quit dispatch.
+  }
+  static void afterStop(Main owner) {
+    if(owner.mInfinityExitPlan.pending())trace(owner,"exit.checkpoint.androidStopped.observationOnly");
+  }
+  static void requestForce(Main owner, Context context) {
+    if (owner == null || owner.isDestroyed() || !owner.mInfinityExitPlan.force()) return;
+    owner.infinityStopWeatherCapture();
+    final Context app = context.getApplicationContext();
+    final int pid = android.os.Process.myPid();
+    // Separate thread: never queue emergency stop behind a stuck graceful JNI request.
+    Thread force = new Thread(() -> {
+      InfinityCloseNativeLease.forceRequested();
+      finishForce(app, () -> android.os.Process.killProcess(pid));
+    }, "InfinityUserForceClose");
+    force.setDaemon(true); force.start();
+  }
+  static void finishForce(Context app, Runnable terminator) {
+    try {
+      // Cancel this Kodi continuity service's sticky restart before process end.
+      // Keep the user's Extended preference; don't touch Cobra recording owners.
+      // stopService requests AMS cleanup, not NativeActivity graceful teardown.
+      try { app.stopService(new android.content.Intent(app, InfinityExtendedBackgroundService.class)); }
+      catch (RuntimeException denied) { android.util.Log.w("InfinityPower", "Continuity service stop refused", denied); }
+      write(app, "exit.force.userRequested");
+    } finally { terminator.run(); }
+  }
+  // Capture at the producer, before publishing lifecycle state or queuing I/O.
+  // These values are evidence only: never use them to complete/kill an owner.
+  private static final java.util.concurrent.atomic.AtomicLong eventSequence =
+      new java.util.concurrent.atomic.AtomicLong();
+  private static final String eventProcess = java.util.UUID.randomUUID().toString();
+  static final class Event {
+    final String phase, thread, process;
+    final long epochMs, elapsedNs, sequence;
+    final int pid, tid;
+    private Event(String phase) {
+      this.epochMs = System.currentTimeMillis();
+      this.elapsedNs = SystemClock.elapsedRealtimeNanos();
+      this.pid = android.os.Process.myPid();
+      this.tid = android.os.Process.myTid();
+      this.thread = token(Thread.currentThread().getName());
+      this.process = eventProcess;
+      this.sequence = eventSequence.incrementAndGet();
+      this.phase = phase;
+    }
+    static Event capture(String phase) { return new Event(phase); }
+    private static String token(String value) {
+      StringBuilder clean = new StringBuilder();
+      for (int i = 0; i < value.length() && i < 64; i++) {
+        char c = value.charAt(i);
+        clean.append((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+            (c >= '0' && c <= '9') || c == '_' || c == '-' || c == '.' ? c : '_');
+      }
+      return clean.length() == 0 ? "unnamed" : clean.toString();
+    }
+  }
+  static void record(Context context, String phase) {
+    final Event event = Event.capture(phase);
+    InfinityKodiShutdown.publish(context,null);
+    final Context app = context.getApplicationContext();
+    RECORDS.execute(() -> write(app, event));
+  }
+  // Additional measurement boundaries must not publish or mutate ownership.
+  static void trace(Context context, String phase) {
+    try {
+      final Event event = Event.capture(phase);
+      final Context app = context.getApplicationContext();
+      RECORDS.execute(() -> write(app, event));
+    } catch (RuntimeException | LinkageError unavailable) {
+      // Best effort only. Do not prevent legitimate teardown if evidence fails.
+    }
+  }
+  private static void write(Context app, String phase) {
+    write(app, Event.capture(phase));
+  }
+  private static synchronized void write(Context app, Event event) {
+    final long writerStartedNs = SystemClock.elapsedRealtimeNanos();
+    InfinityStartupTrace.mainEvent(event.phase);
+    android.content.SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    String[] lines = prefs.getString("history", "").split("\n"); StringBuilder next = new StringBuilder();
+    for (int i = Math.max(0, lines.length - 23); i < lines.length; i++)
+      if (!lines[i].isEmpty()) next.append(lines[i]).append('\n');
+    // Preserve the existing prefix; append versioned provenance for new readers.
+    next.append(event.epochMs).append(" elapsed=").append(event.elapsedNs / 1000000L)
+        .append(" pid=").append(event.pid).append(' ').append(event.phase)
+        .append(" event_v=2 elapsed_ns=").append(event.elapsedNs)
+        .append(" tid=").append(event.tid).append(" thread=").append(event.thread)
+        .append(" process=").append(event.process).append(" seq=").append(event.sequence)
+        .append(" writer_started_ns=").append(writerStartedNs)
+        .append(" dispatch_lag_ns=").append(Math.max(0L, writerStartedNs - event.elapsedNs))
+        .append('\n');
+    prefs.edit().putString("history", next.toString()).commit();
+    android.util.AtomicFile file=new android.util.AtomicFile(new java.io.File(app.getFilesDir(),"infinity-close-history.txt"));
+    java.io.FileOutputStream output=null;
+    try{output=file.startWrite();output.write(next.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));file.finishWrite(output);}
+    catch(java.io.IOException failure){if(output!=null)file.failWrite(output);}
+  }
+  static String report(Context context) {
+    String history = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("history", "");
+    try{
+      byte[] bytes=new android.util.AtomicFile(new java.io.File(context.getFilesDir(),"infinity-close-history.txt")).readFully();
+      if(bytes.length<65536)history=new String(bytes,java.nio.charset.StandardCharsets.UTF_8);
+    }catch(java.io.IOException unavailable){}
+    return "Explicit close / force-close evidence\n====================================\n" +
+        (history.isEmpty() ? "No explicit close records captured.\n" : history) +
+        "Normal close requires a matched native persistence acknowledgement and one-shot Android coordinator authorization before terminating the engine. Timeouts never terminate. The chooser offers explicit Force Close recovery. Physical validation is required.\n" +
+        InfinityPowerMenuRoutes.report(context);
+  }
+  private InfinityExitCompletion() {}
+}
