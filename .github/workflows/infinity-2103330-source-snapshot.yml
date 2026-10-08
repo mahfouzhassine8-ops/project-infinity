@@ -1,0 +1,21 @@
+name: Infinity | 2103330 source snapshot
+on:
+  push:
+    branches: [repair/infinity-directory-close-2103330]
+    paths: ['.github/workflows/infinity-2103330-source-snapshot.yml']
+permissions: {contents: read}
+jobs:
+  source:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: |
+          mkdir snapshot
+          git archive --format=tar.gz HEAD > snapshot/recipes.tar.gz
+          sha256sum snapshot/recipes.tar.gz > snapshot/SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103330-Recipe-Snapshot
+          path: snapshot/
+          retention-days: 90
+          if-no-files-found: error
