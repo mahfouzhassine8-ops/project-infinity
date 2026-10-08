@@ -11,8 +11,8 @@ permissions: {contents: read, actions: read}
 concurrency: {group: infinity-2103334-script-exit-apk, cancel-in-progress: false}
 env:
   NDK_VER: 21.4.7075529
-  INFINITY_NATIVE_SOURCE_COMMIT: 82a8a039726e4587fcfd36b8fa8c1c07a081f984
-  INFINITY_NATIVE_RUN_ID: '37724566406'
+  INFINITY_NATIVE_SOURCE_COMMIT: 927e7a8be98a440a53759ef976463fe824e2fb28
+  INFINITY_NATIVE_RUN_ID: '37730777127'
 jobs:
   repair-apk:
     runs-on: ubuntu-22.04
@@ -77,8 +77,8 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           repository: mahfouzhassine8-ops/project-infinity
-          run-id: 37724566406
-          name: Infinity-2103334-Python-Exit-Native-Validation
+          run-id: 37730777127
+          name: Infinity-2103334-Python-Exit-Native-Fast-Retry
           github-token: ${{ github.token }}
           path: native3334
       - uses: actions/download-artifact@v8

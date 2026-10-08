@@ -33,8 +33,9 @@ BASE_NATIVE=android_identity.OLD_NATIVE
 VERSION=2103334
 RELEASE='1.0.9-Script-Exit-RC1'
 FILENAME='Infinity-2103334-Script-Exit-RC1.apk'
-NATIVE_COMMIT='82a8a039726e4587fcfd36b8fa8c1c07a081f984'
-NATIVE_RUN='37724566406'
+NATIVE_COMMIT='927e7a8be98a440a53759ef976463fe824e2fb28'
+NATIVE_REVIEW_COMMIT='82a8a039726e4587fcfd36b8fa8c1c07a081f984'
+NATIVE_RUN='37730777127'
 core.BASE_NATIVE=BASE_NATIVE
 EXPECTED=dict(core.EXPECTED_SUITES,ClosingInfinity328Test=2,LiveClosing334Test=24)
 EXPECTED['ShutdownDiagnostics334ExportTest']=EXPECTED.pop('ShutdownDiagnostics327ExportTest')
@@ -193,7 +194,7 @@ def package(base,build,out,engine):
         base_apk_sha256=BASE,base_source_commit=BASE_COMMIT,base_validation_run=BASE_RUN,
         source_commit=os.environ['GITHUB_SHA'],validation_run=os.environ['GITHUB_RUN_ID'],
         apk_sha256=sha(final.read_bytes()),native_sha256=sha(lib.read_bytes()),
-        native_source_commit=NATIVE_COMMIT,native_validation_run=NATIVE_RUN,native_parent=2103330,
+        native_source_commit=NATIVE_COMMIT,native_review_source_commit=NATIVE_REVIEW_COMMIT,native_validation_run=NATIVE_RUN,native_retry_from_run='37724566406',native_parent=2103330,
         signer_certificate_sha256=core.parent.parent.CERT,skin_parent='1.0.5.201',installed_skin_pairing='1.0.5.204',
         skin_changed=False,native_recompiled=True,directory_repair_preserved=True,python_abort_policy_changed=False,
         late_message_gate_fixed=True,targeted_exit_evidence=True,shutdown_timeouts_changed=False,
