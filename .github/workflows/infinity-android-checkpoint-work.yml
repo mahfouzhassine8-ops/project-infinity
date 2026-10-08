@@ -61,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103337-Android-Donor-Internal
+          name: Infinity-2103338-Android-Donor-Internal
           path: checkpoint-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
           retention-days: 90
           if-no-files-found: error
@@ -189,7 +189,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           run-id: ${{ github.run_id }}
-          name: Infinity-2103337-Android-Donor-Internal
+          name: Infinity-2103338-Android-Donor-Internal
           github-token: ${{ github.token }}
           path: shell/xbmc/build/outputs/apk/release
       - uses: actions/download-artifact@v8
@@ -202,8 +202,9 @@ jobs:
         run: |
           set -euo pipefail
           cp engine-proof/ENGINE-PROOF.json engine/ENGINE-PROOF.json
+          cp evidence/checkpoint-android/COMPAT-ASSET-ASSOCIATION.json evidence/COMPAT-ASSET-ASSOCIATION.json
           mkdir -p source
-          tar --no-same-owner -xzf evidence/runtime-shell-source.tar.gz -C source
+          tar --no-same-owner -xzf evidence/checkpoint-android/runtime-shell-source.tar.gz -C source
       - name: Associate green engine and verify preserved payload and permanent signer
         env:
           GITHUB_SHA: ${{ github.sha }}
@@ -219,15 +220,15 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103337-Checkpoint-Installed-Fix-RC1-APK
-          path: evidence/Infinity-2103337-Checkpoint-Installed-Fix-RC1.apk
+          name: Infinity-2103338-Checkpoint-Connected-Save-RC1-APK
+          path: evidence/Infinity-2103338-Checkpoint-Connected-Save-RC1.apk
           compression-level: 0
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-2103337-Checkpoint-Test-Evidence
+          name: Infinity-2103338-Checkpoint-Test-Evidence
           path: |
             evidence/
             !evidence/*.apk

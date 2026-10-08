@@ -22,6 +22,7 @@ def method(source, marker):
 
 
 PEERS = r'''
+#include "platform/android/activity/InfinityScriptPersistence.h"
 #include <cassert>
 #include <map>
 #include <memory>
@@ -91,7 +92,7 @@ def main():
              method(source,'void CScriptInvocationManager::OnExecutionDone(int scriptId)')]
     with tempfile.TemporaryDirectory(prefix='script-lifetime-') as directory:
         directory=Path(directory);(directory/'test.cpp').write_text(PEERS+'\n'.join(methods)+TEST)
-        subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-Wall','-Wextra','-Werror','-pthread',str(directory/'test.cpp'),'-o',str(directory/'test')],check=True)
+        subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-Wall','-Wextra','-Werror','-pthread','-I',str(args.runtime/'xbmc'),str(directory/'test.cpp'),'-o',str(directory/'test')],check=True)
         subprocess.run([str(directory/'test')],check=True)
     print('PASS: production admission/completion/removal/ledger methods retain unknown lifetime obligations')
 if __name__=='__main__':main()

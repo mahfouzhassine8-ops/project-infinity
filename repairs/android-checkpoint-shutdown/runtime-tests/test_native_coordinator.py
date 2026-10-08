@@ -121,7 +121,8 @@ static void response(const std::string& status,bool malformed=false){auto v=iden
 static void ready(CApplication& app){Pump(app);active();Pump(app);assert(Test::freezes==1);response("PLAYBACK_CHECKPOINTED");Pump(app);response("PARTICIPANT_COMPLETE");compatResponse();}
 int main(int argc,char**argv){
  assert(argc==3);std::string mode=argv[1];Test::root=argv[2];CApplication app;
- if(mode=="foreign")Test::foreign={"service.unknown:service.py"};
+ if(mode=="foreign" || mode=="generic-save")Test::foreign={"service.unknown:service.py"};
+ if(mode=="generic-save"){InfinityScriptPersistence::Admit(123,"service.unknown:service.py");InfinityScriptPersistence::Observed(123);}
  if(mode=="pvr")Test::pvrStopped=false;
  if(mode=="pvr-retained")Test::pvrOwners=true;
  if(mode=="init")Test::initialized=false;
@@ -174,10 +175,12 @@ int main(int argc,char**argv){
  if(mode=="deferred-fail")Test::deferredOk=false;
  if(mode=="unknown-job")Test::unknownJobs=1;
  if(mode=="optional-job")Test::optionalJobs=1;
- if(mode=="foreign")Test::foreign.clear(); // Finished thread cannot erase retained writer obligations.
- Pump(app);
+ if(mode=="generic-save"){const auto path=Test::root+"/provider.json";std::ofstream(path)<<"saved";InfinityScriptPersistence::Touch(123,path);InfinityScriptPersistence::Retired(123);Test::foreign.clear();}
+ if(mode=="foreign"){Test::foreign.clear();Get().expires=Clock::now();} // A disappeared thread still has no durability receipt.
+ for(int attempt=0;attempt<100 && Get().phase=="QUIESCE";++attempt){Pump(app);std::this_thread::sleep_for(std::chrono::milliseconds(1));}
  if(mode=="settings-fail"||mode=="audio-fail"||mode=="deferred-fail"||mode=="unknown-job"||mode=="foreign"){assert(Get().phase=="CHECKPOINT_FAILED");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));return 0;}
  assert(Get().phase=="SAFE_TO_TERMINATE");const auto safe=Status(SESSION,OWNER,getpid());assert(safe==Status(SESSION,OWNER,getpid()));
+ if(mode=="generic-late"){InfinityScriptPersistence::Admit(124,"late:service.py");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));assert(Get().phase=="CHECKPOINT_FAILED");return 0;}
  if(mode=="latewrite"){
    CheckpointWriteGuard refused("kodi_settings");assert(!refused);
    RecordFailure("xml_files","late_required_save");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));return 0;
@@ -206,6 +209,7 @@ def main():
         for rel in ["platform/android/activity/InfinityAndroidCheckpoint.cpp",
                     "platform/android/activity/InfinityAndroidCheckpoint.h",
                     "platform/android/activity/InfinityCheckpointFile.h",
+                    "platform/android/activity/InfinityScriptPersistence.h",
                     "dbwrappers/InfinityDatabaseBarrier.h", "utils/JobCheckpoint.h", "utils/Variant.h", "utils/Variant.cpp"]:
             target = temp / rel
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -235,7 +239,7 @@ def main():
                  "malformed-response", "busy", "settings-fail", "foreign", "latewrite", "deadline", "lifecycle",
                  "compat-fail", "compat-malformed", "source-drift", "audio-fail",
                  "startup-cas", "startup-old-live", "startup-own-lost", "startup-malformed",
-                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "optional-job"]
+                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "optional-job", "generic-save", "generic-late"]
         for mode in modes:
             output = subprocess.check_output([str(binary), mode, str(temp / mode)], text=True, timeout=10)
             if mode == "fixture" and args.fixture:

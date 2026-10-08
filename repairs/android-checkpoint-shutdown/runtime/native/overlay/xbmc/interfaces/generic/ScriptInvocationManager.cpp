@@ -14,6 +14,7 @@
 #endif
 #if defined(TARGET_ANDROID)
 #include "platform/android/activity/InfinityAndroidCheckpoint.h"
+#include "platform/android/activity/InfinityScriptPersistence.h"
 #endif
 
 #include "interfaces/generic/ILanguageInvocationHandler.h"
@@ -156,7 +157,10 @@ std::size_t CScriptInvocationManager::AndroidCheckpointCompatCount() const
 std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
-  std::vector<std::string> result = m_checkpointUnresolvedWriterLedger;
+  std::vector<std::string> result;
+  for (const auto& name : m_checkpointUnresolvedWriterLedger)
+    if (!InfinityScriptPersistence::DurableRetirement(name))
+      result.push_back(name);
   if (result.size() >= 8)
     return result;
   for (const auto& entry : m_scripts)
@@ -401,6 +405,11 @@ int CScriptInvocationManager::ExecuteAsync(
     const auto existing = m_scripts.find(invokerThread->GetId());
     if (existing != m_scripts.end())
       existing->second.checkpointContract = checkpointContract;
+#if defined(TARGET_ANDROID)
+    if (checkpointContract.empty())
+      InfinityScriptPersistence::Admit(invokerThread->GetId(),
+        (addon ? addon->ID() : "unidentified") + ":" + URIUtils::GetFileName(script));
+#endif
     invokerThread->Execute(script, arguments);
 
     return invokerThread->GetId();
@@ -422,6 +431,11 @@ int CScriptInvocationManager::ExecuteAsync(
   // Create signals its start event before running the script. Do not let
   // BeginShutdown pass this registration before the thread is actually started.
   CLanguageInvokerThreadPtr invokerThread = m_lastInvokerThread;
+#if defined(TARGET_ANDROID)
+  if (checkpointContract.empty())
+    InfinityScriptPersistence::Admit(invokerThread->GetId(),
+      (addon ? addon->ID() : "unidentified") + ":" + URIUtils::GetFileName(script));
+#endif
   invokerThread->Execute(script, arguments);
 
   return invokerThread->GetId();
@@ -560,7 +574,10 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
   {
 #if defined(TARGET_ANDROID)
     if (InfinityAndroidCheckpoint::IsActive() &&
-        VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty())
+        VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty() &&
+        !InfinityScriptPersistence::DurableRetirement(
+          (script->second.thread->GetAddon() ? script->second.thread->GetAddon()->ID() : "unidentified") + ":" +
+          URIUtils::GetFileName(script->second.script)))
       InfinityAndroidCheckpoint::RecordFailure("python_services", "foreign_invoker_finished_without_persistence_receipt");
 #endif
     script->second.done = true;

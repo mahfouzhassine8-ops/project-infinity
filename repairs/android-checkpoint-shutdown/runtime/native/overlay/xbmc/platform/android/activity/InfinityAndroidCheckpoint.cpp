@@ -1,4 +1,5 @@
 #include "InfinityAndroidCheckpoint.h"
+#include "InfinityScriptPersistence.h"
 
 #include "InfinityCheckpointXml.h"
 #include "InfinityPlaybackCheckpoint.h"
@@ -172,6 +173,20 @@ std::string EncodeStatusLocked(const State& s)
   result["safe_to_terminate_utc_ms"] = s.safeUtcMs;
   result["elapsed_ms"] = Elapsed(s);
   result["active_native_writers"] = static_cast<uint64_t>(s.activeWrites);
+  const auto scripts = InfinityScriptPersistence::Snapshot();
+  CVariant scriptEvidence(CVariant::VariantTypeObject);
+  scriptEvidence["active_writers"] = static_cast<uint64_t>(scripts.active);
+  scriptEvidence["observed_writers"] = static_cast<uint64_t>(scripts.observed);
+  scriptEvidence["retired_writers"] = static_cast<uint64_t>(scripts.retired);
+  scriptEvidence["tracked_paths"] = static_cast<uint64_t>(scripts.paths);
+  scriptEvidence["sync_started"] = scripts.syncStarted;
+  scriptEvidence["sync_finished"] = scripts.syncFinished;
+  scriptEvidence["durable"] = scripts.durable;
+  scriptEvidence["error"] = scripts.failure;
+  scriptEvidence["pending_writers"] = CVariant(CVariant::VariantTypeArray);
+  for (const auto& name : scripts.pending)
+    scriptEvidence["pending_writers"].push_back(name);
+  result["script_persistence"] = scriptEvidence;
   result["required_jobs"] = static_cast<uint64_t>(s.jobs.required);
   result["unknown_job_owners"] = static_cast<uint64_t>(s.jobs.unknown);
   result["nonpersistent_jobs"] = static_cast<uint64_t>(s.jobs.nonPersistent);
@@ -711,6 +726,14 @@ bool AuthorizeTermination(const std::string& session, const std::string& owner, 
     RecordFailure("pvr", "pvr_owner_present_at_termination");
     return false;
   }
+  const auto scripts = InfinityScriptPersistence::Snapshot();
+  if (!scripts.failure.empty())
+  {
+    RecordFailure("python_services", scripts.failure.c_str());
+    return false;
+  }
+  if (!scripts.durable || scripts.active != 0)
+    return false;
   const auto database = InfinityDatabaseBarrier::GetSnapshot();
   std::lock_guard<std::mutex> lock(s.mutex);
   CheckDeadlineLocked(s);
@@ -792,6 +815,10 @@ void Pump(CApplication& application)
       if (playback != InfinityPlaybackCheckpoint::PollResult::Complete)
         return;
       Complete("playback", true);
+      // Let already-admitted generic add-on writers run their normal cleanup
+      // with a frozen player clock. This sends cooperative abort notifications;
+      // it never injects exceptions, joins on the GUI thread, or kills workers.
+      CScriptInvocationManager::GetInstance().BeginAndroidCheckpoint();
       Operation("command_center");
       CVariant request = Identity(s);
       request["phase"] = "PREPARE";
@@ -828,15 +855,17 @@ void Pump(CApplication& application)
         return;
       Complete("compat", true);
       Operation("python_services");
-      if (!s.unresolvedForeignOwners.empty())
-      {
-        std::string detail = "unproven_raw_file_or_sqlite_writer_contracts";
-        for (const auto& writer : s.unresolvedForeignOwners)
-          detail += ";" + writer;
-        RecordFailure("python_services", detail.substr(0, 384).c_str());
+      const auto scriptFailure = InfinityScriptPersistence::Failure();
+      if (!scriptFailure.empty())
+      { RecordFailure("python_services", scriptFailure.c_str()); return; }
+      for (const auto& name : s.unresolvedForeignOwners)
+        if (!InfinityScriptPersistence::DurableRetirement(name))
+          return;
+      if (!CScriptInvocationManager::GetInstance().AndroidCheckpointUnresolvedWriters().empty())
         return;
-      }
-      Complete("python_services", false);
+      if (!InfinityScriptPersistence::PollCommit())
+        return; // Native filesystem sync is asynchronous; the GUI keeps pumping.
+      Complete("python_services", true);
       Operation("background_jobs");
       if (!RequiredJobsDrained())
         return;
