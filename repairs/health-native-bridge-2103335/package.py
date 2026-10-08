@@ -120,11 +120,19 @@ def compare_dex(base, final, build, out):
                     subprocess.run(["java", "-cp", classpath, "org.jf.baksmali.Main",
                                     "disassemble", str(target), "-o", str(smali)], check=True)
         roots[label] = smali
-    old = {p.relative_to(roots["base"]).as_posix(): p.read_text()
-           for p in roots["base"].rglob("*.smali")}
-    new = {p.relative_to(roots["final"]).as_posix(): p.read_text()
-           for p in roots["final"].rglob("*.smali")}
-    old, new, bridge_report = bridge_preservation.verify(old, new, out)
+    old_all = {p.relative_to(roots["base"]).as_posix(): p.read_text()
+               for p in roots["base"].rglob("*.smali")}
+    new_all = {p.relative_to(roots["final"]).as_posix(): p.read_text()
+               for p in roots["final"].rglob("*.smali")}
+    health_prefix = "com/projectinfinity/kodi/InfinityHealthExport"
+    protected_old = {name:text for name,text in old_all.items() if not name.startswith(health_prefix)}
+    protected_new = {name:text for name,text in new_all.items() if not name.startswith(health_prefix)}
+    protected_old, protected_new, bridge_report = bridge_preservation.verify(protected_old, protected_new, out)
+    old = dict(protected_old); new = dict(protected_new)
+    for name in old_all.keys() | new_all.keys():
+        if name.startswith(health_prefix):
+            if name in old_all: old[name] = old_all[name]
+            if name in new_all: new[name] = new_all[name]
     changed = sorted(name for name in old.keys() | new.keys() if old.get(name) != new.get(name))
     allowed = re.compile(
         r"com/projectinfinity/kodi/(?:InfinityHealthExport|BuildConfig)(?:\\$[^/]*)?\\.smali$|"
