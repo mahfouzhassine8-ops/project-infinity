@@ -47,7 +47,7 @@ jobs:
           KODI_ANDROID_KEY_ALIAS: androiddebugkey
           KODI_ANDROID_KEY_PASSWORD: android
           KODI_ANDROID_STORE_PASSWORD: android
-          KODI_ANDROID_STORE_FILE: ${{ runner.home }}/.android/debug.keystore
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
         run: |
           set -euo pipefail
           ./build3335/gradlew --no-daemon --console=plain -p build3335             :xbmc:testReleaseUnitTest             --tests com.projectinfinity.kodi.NativeTraceBridge335Test             :xbmc:assembleRelease :xbmc:exportPreservationTools
