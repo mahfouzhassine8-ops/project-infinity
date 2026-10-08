@@ -41,6 +41,9 @@ set(package_files strings.xml
                                  src/InfinityCloseNativeLease.java
                   src/InfinityCheckpointProtocol.java
                   src/InfinityCheckpointAddonInstaller.java
+                  src/InfinityCheckpointController20Installer.java
+                  src/InfinityCheckpointCompat82Installer.java
+                  src/InfinityInstalledCheckpointInstaller.java
                   src/InfinityPowerControlActivity.java
                   src/InfinityCloseProgress.java
                   src/InfinityPowerMenuRoutes.java
