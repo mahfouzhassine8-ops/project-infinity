@@ -1,4 +1,5 @@
-#include "InfinityPythonAbort.h"
+#include "InfinityPythonAbort.h" // Investigation only; not the shipping abort path.
+#include "InfinityPythonExitEvidence.h"
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -59,10 +60,18 @@ void repaired_request(PyThreadState* helper) {
   });
   assert(count==targets);
 }
-void request(bool repaired) {
+void request(bool repaired, bool inject=true) {
   PyThreadState* helper=PyThreadState_New(PyThreadState_GetInterpreter(gates[0].target));assert(helper);
   PyEval_RestoreThread(helper);
-  if(repaired)repaired_request(helper);else parent_request(helper);
+  int frames=0;
+  PyErr_SetString(PyExc_ValueError,"preserve-this-exception");
+  InfinityPythonExitEvidence::Capture(helper,[&](unsigned long id,const char* file,const char* function,int line){
+    assert(id!=helper->thread_id && line>0 && function && file);
+    assert(!std::strchr(file,'/') && !std::strchr(file,'\\'));++frames;
+  });
+  assert(frames==targets && PyErr_ExceptionMatches(PyExc_ValueError));PyErr_Clear();
+  assert(std::string(InfinityPythonExitEvidence::Basename("/private/path/module.py"))=="module.py");
+  if(inject){if(repaired)repaired_request(helper);else parent_request(helper);}
   assert(gates[1].target->async_exc==nullptr); // unrelated sub-interpreter untouched
   if(repaired)assert(helper->async_exc==nullptr); // never abort the helper
   PyThreadState_Clear(helper);PyThreadState_DeleteCurrent();
@@ -115,12 +124,20 @@ int main(int argc,char**argv){
   std::thread a(worker,0),b(worker,1);entered[0].wait();entered[1].wait();
   std::thread c,d;
   if(group){c=std::thread(worker,2);d=std::thread(worker,3);entered[2].wait();entered[3].wait();}
-  if(!normal)request(repaired);
+  request(repaired,!normal);
   open(0);
   const bool finished=returned[0].wait_for(500ms)==std::future_status::ready;
   std::cout<<"Python "<<PY_VERSION<<" mode="<<mode<<" finished_without_rescue="<<finished<<std::endl;
   if(repaired)assert(finished);
-  else {assert(!finished);request(true);assert(returned[0].wait_for(3s)==std::future_status::ready);}
+  else {
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 11
+    // Matching-runtime evidence RULED OUT this proposed cause: 3.11 checks
+    // async_exc again on GIL reacquisition. Do not ship an API-only "fix".
+    assert(finished);
+#else
+    if(!finished){request(true);assert(returned[0].wait_for(3s)==std::future_status::ready);}
+#endif
+  }
   savedOnce(0,!normal);
   if(group) {
     // Staggered reacquisition: first thread consumes its interrupt before the

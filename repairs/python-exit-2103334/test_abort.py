@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile the shipping helper against real CPython; exercise actual interpreters.
+"""Compare the discarded abort hypothesis and test read-only evidence on real CPython; exercise actual interpreters.
 
 This does not mock Python APIs. The parent fragment is verified against the
 exact native source before testing. Device/native-backend acceptance is separate.
@@ -50,9 +50,10 @@ def main():
             (out/'output.txt').write_text(run.stdout+run.stderr)
             results.append(dict(mode=mode,repetition=repetition,passed=True))
     evidence=dict(python=sys.version.split()[0],tests=results,
-        helper_sha256=hashlib.sha256((HERE/'InfinityPythonAbort.h').read_bytes()).hexdigest(),
+        evidence_helper_sha256=hashlib.sha256((HERE/'InfinityPythonExitEvidence.h').read_bytes()).hexdigest(),
         parent_fragment_sha256=parent_hash,real_interpreters=True,
-        parent_failure_reproduced=True,finally_persistence=True,subinterpreter_isolation=True,
+        abort_change_not_shipped=True,matching_runtime_disproves_initial_hypothesis=sys.version_info[:2]==(3,11),
+        frame_capture_preserves_pending_exception=True,finally_persistence=True,subinterpreter_isolation=True,
         three_target_threads=True,real_owner_joins=True,helper_excluded=True,
         physical_device_verified=False)
     (a.out/'ABORT-TESTS.json').write_text(json.dumps(evidence,indent=2)+'\n')
