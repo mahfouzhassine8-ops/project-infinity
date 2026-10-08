@@ -1,0 +1,67 @@
+{
+  "verified_at_utc": "2026-10-08T06:49:19.980920+00:00",
+  "scope": "host component tests only; no runtime integration or Android/device validation",
+  "passed": true,
+  "normal_close_integrated": false,
+  "apk_built": false,
+  "physical_device_verified": false,
+  "results": [
+    {
+      "suite": "android_transaction",
+      "passed": true,
+      "exit_code": 0,
+      "output": "PASS happy path, duplicate close and ack\nPASS required owners cannot disappear\nPASS dirty, uncommitted, duplicate and schema failures\nPASS stale session, PID owner and bound channel\nPASS timeout rejects late acknowledgement\nPASS failure, death and lost transport cannot certify save\nPASS out of order acknowledgement\nPASS one shot, semantic IPC proof, revocation and expiry\nPASS failed dispatch revokes delayed capability\nPASS consumed capability needs matching process death\nPASS observers cannot construct authorization\nPASS 100 concurrent revoke/consume races\nPASS endpoint requires exact native save proof\nPASS endpoint rejects failed native proof\nPASS 14 protocol test groups; no native persistence implementation or device claim\n"
+    },
+    {
+      "suite": "native_barrier",
+      "passed": true,
+      "exit_code": 0,
+      "output": "PASS: 12 barrier scenarios, including 200 admission races\n"
+    },
+    {
+      "suite": "checked_sqlite",
+      "passed": true,
+      "exit_code": 0,
+      "output": "test_actual_patched_production_functions_against_real_sqlite (__main__.CheckedSQLiteTests.test_actual_patched_production_functions_against_real_sqlite) ... PASS ordinary_commit_and_rollback\nPASS busy_begin_does_not_claim_active_transaction\nPASS nested_begin_preserves_actual_active_transaction\nPASS busy_commit_retains_transaction_and_retry_persists\nPASS deferred_constraint_commit_failure_preserves_transaction\nPASS sqlite_full_automatic_rollback_clears_stale_transaction\nPASS rollback_error_preserves_actual_transaction\nPASS no_transaction_commit_and_rollback_reject\nPASS missing_or_inactive_connection_rejects\nSQLite 3.45.1; failures=0\nok\ntest_original_production_functions_reproduce_regressions (__main__.CheckedSQLiteTests.test_original_production_functions_reproduce_regressions) ... PASS original 3334 functions reproduce the transaction reporting defects\nok\ntest_preimage_and_output_guards_preserve_parent (__main__.CheckedSQLiteTests.test_preimage_and_output_guards_preserve_parent) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.980s\n\nOK\n"
+    },
+    {
+      "suite": "critical_file_io",
+      "passed": true,
+      "exit_code": 0,
+      "output": ".\n----------------------------------------------------------------------\nRan 1 test in 1.794s\n\nOK\n"
+    },
+    {
+      "suite": "resume_participant",
+      "passed": true,
+      "exit_code": 0,
+      "output": "test_checkpoint_commits_final_position_before_stopping_and_fences (test_persistence_participant.PersistenceTests.test_checkpoint_commits_final_position_before_stopping_and_fences) ... ok\ntest_cross_interpreter_read_modify_write_loses_no_updates (test_persistence_participant.PersistenceTests.test_cross_interpreter_read_modify_write_loses_no_updates) ... ok\ntest_directory_fsync_failure_leaves_uncommitted_generation (test_persistence_participant.PersistenceTests.test_directory_fsync_failure_leaves_uncommitted_generation) ... ok\ntest_failed_failure_marker_poison_stops_same_live_transaction (test_persistence_participant.PersistenceTests.test_failed_failure_marker_poison_stops_same_live_transaction) ... ok\ntest_failure_never_reopens_admission_or_returns_receipt (test_persistence_participant.PersistenceTests.test_failure_never_reopens_admission_or_returns_receipt) ... ok\ntest_invalid_json_is_not_replaced_with_default (test_persistence_participant.PersistenceTests.test_invalid_json_is_not_replaced_with_default) ... ok\ntest_live_generation_cannot_regress_to_older_valid_journal (test_persistence_participant.PersistenceTests.test_live_generation_cannot_regress_to_older_valid_journal) ... ok\ntest_lock_deadline_fails_without_cutting_off_active_writer (test_persistence_participant.PersistenceTests.test_lock_deadline_fails_without_cutting_off_active_writer) ... ok\ntest_nonparticipant_write_detected_before_receipt (test_persistence_participant.PersistenceTests.test_nonparticipant_write_detected_before_receipt) ... ok\ntest_noop_does_not_dirty_generation (test_persistence_participant.PersistenceTests.test_noop_does_not_dirty_generation) ... ok\ntest_omitted_required_file_proof_never_completes (test_persistence_participant.PersistenceTests.test_omitted_required_file_proof_never_completes) ... ok\ntest_parseable_corrupt_journal_rejected_by_read_bind_and_checkpoint (test_persistence_participant.PersistenceTests.test_parseable_corrupt_journal_rejected_by_read_bind_and_checkpoint) ... ok\ntest_required_ended_event_can_remove_resume_and_preserve_history (test_persistence_participant.PersistenceTests.test_required_ended_event_can_remove_resume_and_preserve_history) ... ok\ntest_unchecked_truthy_hook_is_not_success (test_persistence_participant.PersistenceTests.test_unchecked_truthy_hook_is_not_success) ... ok\ntest_wrong_pid_owner_and_stale_session_cannot_write (test_persistence_participant.PersistenceTests.test_wrong_pid_owner_and_stale_session_cannot_write) ... ok\n\n----------------------------------------------------------------------\nRan 15 tests in 0.252s\n\nOK\n"
+    }
+  ],
+  "source_sha256": {
+    ".gitignore": "0e2718ce9d6d05b5155cc67270ec5696800a83766bc391db0350f66d35293448",
+    "ANDROID_TRANSACTION.md": "6e576d273b36ff6aba8ebe1f95aae2787ea2e928d884bd6605c648d526ee5734",
+    "PARENT.json": "d7a5d3f1fb9fbff2e4d30960a91340998309a9d0dc071e4d43f6913adafd9256",
+    "PERSISTENCE-AUDIT.md": "ea0c7c8bc57193e505bb979480a529ea24bcd9083121e7d5ec52be9676ee9eb3",
+    "README.md": "98600aeb34bbb73da94f03835f6b0908c29b0a10ef461f58b98624a9551008ee",
+    "native/InfinityCheckpointFile.h": "e6e133eebd4c72abeea513e603215938229baa3842a998056740316a3d64c706",
+    "native/InfinityPersistenceBarrier.h": "952cf8ad50ca725b8ecb3ab7f618253300d67b0af1777fb50b5a49efd08e3921",
+    "native/README.md": "ba4803926f851e967050a494f38cca890250dc9f9958719207ebbe39efa16047",
+    "native/checked_sqlite.py": "467f5342990c22e6d8bb93e1215b7118e5881ef9f5f3d35cea0026b2a0a24a3c",
+    "native/preimages.json": "86e96ea19a239f92046ad11b5fb13a8066a8cc224f88c4181ecd915cc7dd7a2d",
+    "native/sqlite_transactions_test.cpp.in": "0dd5625bbfc4a6cd16e026541d002d9da8c1a927d8cdfd182fa08618c91102e8",
+    "native/test_barrier.cpp": "90804733d4a3828bece907638af2d78d9570fd19825c3550655c81c42385a844",
+    "native/test_barrier.py": "a86ab975c557d62e07ebc6680ab1616994a68320a3f7c545e32e0c0a8cc30faa",
+    "native/test_checked_sqlite.py": "8be66fcb366e6a1cd3f4411b3aa0569bf726f3e9d29eb80298645758eb23ca2c",
+    "native/test_file_checkpoint.cpp": "356eb5986ba94211f058f55ee66bdc29168626bd81c8fbe200a73dd9c642eb1f",
+    "native/test_file_checkpoint.py": "c5b73ebce395d2b470c80fb6d6146717669b113d17fd45912b73ecdf550b9a33",
+    "resume/README.md": "bb1a3e37b7e55d58d2ac4f75d638bd18c5876891d5157821aac18550c68cd608",
+    "resume/persistence_participant.py": "d406a1a490f5ea8ad7f4c0ee0f71404cb02800364bfc3287f1c0d225ca44599b",
+    "resume/test_persistence_participant.py": "5808bc33f330c7300f5e7d81e99646fe8ce661c1d866642229c277b31aaa09ba",
+    "run_checks.py": "25e41e20626e0d4674e6c1f198b5b267b272843c1d2089a6977b3c768e36fb37",
+    "src/com/projectinfinity/kodi/shutdown/InfinityCheckpointEndpoint.java": "d5e714e86e11ff16e45ec7bf4d90cf77c2080e40aca38d80e79225fbbccf2477",
+    "src/com/projectinfinity/kodi/shutdown/InfinityShutdownTransaction.java": "8d60ddbc4b0cfb66b1fb7673547c35f069e9e6c40313b426edbd6a602ba9b424",
+    "test/com/projectinfinity/kodi/shutdown/ShutdownTransactionTest.java": "3ebea71ddba2554f6b771019da9b969dc0f9cccce7aa8c5107f8ae01a4cfddee",
+    "test_android.py": "996bd79f48d88097fb3939eb9fb49ae0d8426d538d43c9b14c4c014e2d4bd6ec"
+  },
+  "post_test_non_executable_edit": "Removed blank final line from .gitignore to satisfy git diff --check; executable sources unchanged."
+}
