@@ -1,0 +1,151 @@
+name: Infinity | 2103330 directory close and notification APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-directory-close-2103330]
+    paths:
+      - 'repairs/directory-close-2103330/android_repair.py'
+      - 'repairs/directory-close-2103330/android-delta.json'
+      - 'repairs/directory-close-2103330/package.py'
+      - 'repairs/directory-close-2103330/make_tests.py'
+      - 'repairs/directory-close-2103330/test_source.py'
+      - '.github/workflows/infinity-2103330-directory-apk.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103330-directory-apk, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+  INFINITY_NATIVE_SOURCE_COMMIT: 16cb5ccebb2b85107132ca0a04a5e639208476e0
+  INFINITY_NATIVE_RUN_ID: '37709784725'
+jobs:
+  repair-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3327
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-JobManager-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3327
+      - name: Check exact source delta and remove all extra-window routes
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3330
+          python3 -m py_compile repairs/directory-close-2103330/*.py
+          python3 repairs/directory-close-2103330/package.py --help > evidence3330/import-check.txt
+          python3 - <<'PY'
+          import hashlib,json,tarfile
+          from pathlib import Path
+          apk=Path('base3327/Infinity-2103327-JobManager-Close-RC1.apk')
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='02449fea9c76ad6a370f2ca26a88fdee3a681f83bdc3efa73f8e213f22d4c4d5'
+          with tarfile.open('parent3327/repaired-shell-source.tar.gz') as archive:
+              archive.extractall('host-parent',filter='data')
+          PY
+          python3 repairs/directory-close-2103330/test_source.py --source host-parent/shell-kodi --proof parent3327/SOURCE-PRESERVATION.json 2>&1 | tee evidence3330/android-source-tests.log
+      - name: Require the exact successful repaired native run with no fallback
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/${{ github.repository }}/actions/runs/$INFINITY_NATIVE_RUN_ID --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
+          gh run watch "$INFINITY_NATIVE_RUN_ID" --repo '${{ github.repository }}' --exit-status --interval 30
+          gh api repos/${{ github.repository }}/actions/runs/$INFINITY_NATIVE_RUN_ID > evidence3330/native-run.json
+          python3 - <<'PY'
+          import json,os
+          r=json.load(open('evidence3330/native-run.json'))
+          assert r['conclusion']=='success' and r['head_sha']==os.environ['INFINITY_NATIVE_SOURCE_COMMIT']
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37709784725
+          name: Infinity-2103330-Directory-Native-Validation
+          github-token: ${{ github.token }}
+          path: native3330
+      - name: Bind new native identity and prepare preserved Android parent
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/directory-close-2103330/package.py prepare --base base3327/Infinity-2103327-JobManager-Close-RC1.apk --build build3330 --out evidence3330 --engine native3330
+      - name: Compile and test all 19 required regression suites
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          python3 - <<'PY' 2>&1 | tee evidence3330/android-build.log
+          import subprocess,sys
+          sys.path.insert(0,'repairs/directory-close-2103330')
+          import package
+          args=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest']
+          for name in sorted(package.EXPECTED):args += ['--tests','com.projectinfinity.kodi.'+name]
+          args += [':xbmc:assembleRelease',':xbmc:exportPreservationTools']
+          subprocess.run(args,cwd='build3330',check=True)
+          PY
+      - name: Verify full payload JNI DEX original manifest and permanent signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/directory-close-2103330/package.py package --base base3327/Infinity-2103327-JobManager-Close-RC1.apk --build build3330 --out evidence3330 --engine native3330
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103330-Directory-Close-RC1-APK
+          path: evidence3330/Infinity-2103330-Directory-Close-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare compact evidence
+        if: success()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          out=Path('compact3330');out.mkdir()
+          apk=Path('evidence3330/Infinity-2103330-Directory-Close-RC1.apk')
+          (out/'DELIVERY.json').write_text(json.dumps({'file':apk.name,'size':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()},indent=2)+'\n')
+          for p in Path('evidence3330').iterdir():
+              if p.is_file() and p.suffix not in ('.apk','.so') and p.stat().st_size<24*1024*1024:shutil.copy2(p,out/p.name)
+          shutil.copy2('repairs/directory-close-2103330/SKIN-PROOF.json',out/'SKIN-PROOF.json')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103330-Delivery-Evidence
+          path: compact3330/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103330-Verification
+          path: |
+            evidence3330/
+            !evidence3330/*.apk
+            !evidence3330/*.so
+            build3330/xbmc/build/test-results/testReleaseUnitTest/
+            build3330/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
