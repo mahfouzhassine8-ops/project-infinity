@@ -51,7 +51,9 @@ def verify_manifest_pair(original,compiled):
     for flag in ('android:excludeFromRecents','android:noHistory','android:resizeableActivity'):
         require(a[flag]=='(type 0x12)0xffffffff','Closing activity flag changed: '+flag)
     require('com.projectinfinity.kodi.closing' in a['android:taskAffinity'],'Wrong task affinity')
-    require(a['android:theme'].lower().startswith('@0x1'),'Theme must be a platform dialog resource')
+    require(a['android:theme'].lower()=='@0x0103023c','Wrong platform dialog theme')
+    require(a['android:launchMode']=='(type 0x10)0x1','Closing activity must be singleTop')
+    require(a['android:configChanges']=='(type 0x11)0x40001f80','Unexpected handled configuration flags')
     app['children']=retained
     for tree in (old,new):
         for key in ('android:versionCode','android:versionName'):tree['attrs'].pop(key,None)
