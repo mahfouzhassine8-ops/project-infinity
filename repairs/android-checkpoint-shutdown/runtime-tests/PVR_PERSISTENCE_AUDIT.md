@@ -1,10 +1,12 @@
 # Native PVR persistence checkpoint audit
 
-Audit date: 2026-10-08. Source: the preserved 2103334 transformed native lineage, inspected in `runtime-native/xbmc/pvr`; the PVR files were not modified for this audit. References below are relative to `xbmc/`. This is an owner inventory and integration proposal, not a successful PVR checkpoint implementation or device acceptance result.
+Audit date: 2026-10-08. Source: the preserved 2103334 transformed native lineage, inspected in `runtime-native/xbmc/pvr`. References below are relative to `xbmc/` and use parent line positions before the narrow admission additions described below. This is an owner inventory and integration proposal, not a successful active-PVR checkpoint implementation or device acceptance result.
 
 ## Current disposition
 
 The Android coordinator must keep reporting `pvr / active_pvr_owner_has_no_persistence_participant` for a running native PVR manager. The present source does not justify replacing that refusal with success, `CPVRChannelGroups::PersistAll()`, a zero SQL transaction count, or `CPVRClient::Stop()`. No preservation-parent file was edited.
+
+The runtime work copy adds only an inactive-owner safety prerequisite: full-scope `pvr-start` leases around `CPVRManager::Start` and `CPVRClients::Start/UpdateClients`, and a locked `HasAndroidCheckpointOwners()` query that checks every retained client-map entry, including clients not yet `ReadyToUse`. The registry also latches private-client admission before construction for the process lifetime: `DestroyInstance` has no checked private-state durability receipt, so later removal from the map does not establish safety. The coordinator must require both stopped manager and absent private-owner history, after startup operations drain, before acknowledging the inactive PVR case. These additions do not enable active PVR checkpoints or invoke PVR teardown.
 
 Native Kodi PVR is not synonymous with all live media. Plugin-provided live streams played by native VideoPlayer, and playback in a distinct Cobra process, require their own observed player/owner inventory. This audit neither rejects nor proves those routes. Physical testing must establish which route the installed configuration actually uses.
 

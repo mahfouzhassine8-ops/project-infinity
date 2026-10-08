@@ -414,6 +414,12 @@ bool CApplication::Create()
   CDirectory::Create(profileManager->GetUserDataFolder());
   CDirectory::Create(profileManager->GetProfileUserDataFolder());
   profileManager->CreateProfileFolders();
+#ifdef TARGET_ANDROID
+  // Establish the process lifetime owner before any profile Python service can
+  // read its persistence journal; a first-Close handshake is too late on relaunch.
+  if (!InfinityAndroidCheckpoint::PublishStartupOwner())
+    CLog::Log(LOGERROR, "Infinity checkpoint startup owner publication failed; Normal Close unavailable");
+#endif
 
   update_emu_environ();//apply the GUI settings
 

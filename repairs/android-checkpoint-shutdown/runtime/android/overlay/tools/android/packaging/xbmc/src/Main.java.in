@@ -111,8 +111,17 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
   native void _doFrame(long frameTimeNanos);
   static native long[] _infinityHeartbeat();
   public native boolean infinityRequestPersistenceCheckpoint(String session,String owner,int pid);
+  public native boolean infinityRegisterCheckpointOwner(String owner,int pid,String filesDir);
   public native String infinityPersistenceCheckpointStatus(String session,String owner,int pid);
   public native boolean infinityAuthorizeCheckpointTermination(String session,String owner,int pid);
+  public boolean infinityCheckpointOwnsOwner(int pid,String owner) {
+    return pid==android.os.Process.myPid() && owner!=null && !owner.isEmpty()
+        && owner.equals(InfinityKodiShutdown.confirmedLocalOwnerToken());
+  }
+  public boolean infinityCheckpointOwnerRetired(int pid,String owner) {
+    try { return InfinityKodiShutdown.ownerRetired(getFilesDir(),pid,owner); }
+    catch (java.io.IOException | RuntimeException unavailable) { return false; }
+  }
   private InfinityResponsiveness mInfinityResponsiveness;
 
   native void _onVisibleBehindCanceled();
@@ -174,6 +183,13 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
     if (!InfinityCheckpointAddonInstaller.applyBeforeNative(this))
       InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "checkpoint.addonParticipant.installUnconfirmed");
     System.loadLibrary("@APP_NAME_LC@");
+    try {
+      String checkpointOwner=InfinityKodiShutdown.confirmedLocalOwnerToken();
+      if(checkpointOwner.isEmpty() || !infinityRegisterCheckpointOwner(checkpointOwner,android.os.Process.myPid(),getFilesDir().getAbsolutePath()))
+        InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "checkpoint.engineOwner.registrationUnconfirmed");
+    } catch(RuntimeException | LinkageError unavailable) {
+      InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "checkpoint.engineOwner.registrationUnavailable");
+    }
     InfinityStartupTrace.mainEvent("main.nativeLoaded");
     InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.kodiNative.loaded");
 

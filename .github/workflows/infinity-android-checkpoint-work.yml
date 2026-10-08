@@ -7,7 +7,7 @@ on:
       - 'repairs/android-checkpoint-shutdown/**'
       - '.github/workflows/infinity-android-checkpoint-work.yml'
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-android-checkpoint-work, cancel-in-progress: false}
+concurrency: {group: infinity-android-checkpoint-work, cancel-in-progress: true}
 env:
   NDK_VER: 21.4.7075529
 jobs:
@@ -43,6 +43,7 @@ jobs:
           mkdir -p checkpoint-source checkpoint-android "$HOME/.android"
           tar --no-same-owner -xzf checkpoint-parent/repaired-shell-source.tar.gz -C checkpoint-source
           keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          python3 repairs/android-checkpoint-shutdown/test_android_assets.py --base checkpoint-base/Infinity-2103335-Native-Trace-Bridge-RC1.apk
           python3 repairs/android-checkpoint-shutdown/android_ci.py --source checkpoint-source/shell-kodi --base checkpoint-base/Infinity-2103335-Native-Trace-Bridge-RC1.apk --build checkpoint-shell-build --out checkpoint-android
       - name: Compile every Java class and run inherited exporter tests
         env:
@@ -79,15 +80,19 @@ jobs:
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
         with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
-      - name: Restore completed preservation-parent dependencies
+      - name: Restore work-branch preservation-parent dependencies
         id: parent-cache
         uses: actions/cache/restore@v4
         with:
           path: |
             android-tools/xbmc-depends
             android-tools/xbmc-tarballs
+            android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
             ~/.ccache
-          key: infinity-python-exit-3334-arm64-${{ runner.os }}-37724566406
+          key: infinity-checkpoint-3334-deps-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-checkpoint-3334-deps-${{ runner.os }}-
+            infinity-python-exit-3334-arm64-${{ runner.os }}-37724566406
       - name: Reconstruct protected lineage and run source and persistence gates
         run: |
           set -euo pipefail
@@ -96,15 +101,23 @@ jobs:
           sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev
           python3 repairs/android-checkpoint-shutdown/native_ci.py prepare 2>&1 | tee checkpoint-build/prepare.log
       - name: Compile reviewed native runtime integration
-        env:
-          CACHE_HIT: ${{ steps.parent-cache.outputs.cache-hit }}
         run: |
           set -euo pipefail
-          if [ "$CACHE_HIT" = true ]; then
+          if python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies; then
             python3 repairs/android-checkpoint-shutdown/native_ci.py compile --completed-cache 2>&1 | tee checkpoint-build/compile.log
           else
             python3 repairs/android-checkpoint-shutdown/native_ci.py compile 2>&1 | tee checkpoint-build/compile.log
           fi
+      - name: Preserve dependencies for subsequent work-branch builds
+        uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
+            ~/.ccache
+          key: infinity-checkpoint-3334-deps-${{ runner.os }}-${{ github.run_id }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:

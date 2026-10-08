@@ -1,5 +1,6 @@
 set(SOURCES android_main.cpp
             InfinityAndroidCheckpoint.cpp
+            InfinityScriptCheckpointContracts.cpp
             InfinityPlaybackCheckpoint.cpp
             InfinityAudioPolicy.cpp
             AndroidFeatures.cpp

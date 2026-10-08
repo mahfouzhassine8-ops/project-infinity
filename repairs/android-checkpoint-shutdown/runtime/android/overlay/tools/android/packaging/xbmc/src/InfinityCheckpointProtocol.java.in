@@ -19,6 +19,7 @@ final class InfinityCheckpointProtocol {
   static final String GATE="checkpoint_authority", JSON="checkpoint_json", GENERATION="checkpoint_generation", PROOF="checkpoint_proof";
   static final String RECEIPT="infinity-checkpoint-close.json", EVIDENCE="infinity-android-checkpoint.jsonl";
   static final long CHECKPOINT_TIMEOUT_MS=30000;
+  static final String REQUIRED_OWNER_NAMES="native_admission,python_services,background_jobs,playback,command_center,compat,kodi_settings,profiles,skin_settings,addon_settings,favourites,peripherals,audio_policy,xml_files,native_databases,pvr";
   /** Actual Binder authorization state; platform-independent so revoke/consume races are host-tested. */
   static final class AuthorizationGate {
     private final String session,owner;private final int pid;private final long started,deadline;
@@ -70,7 +71,8 @@ final class InfinityCheckpointProtocol {
     // SAFE and again by its one-shot authorize API. Java requires its declared registry to match.
     JSONArray required=row.getJSONArray("required_owners");HashSet<String> expected=new HashSet<>();
     for(int i=0;i<required.length();i++)if(!expected.add(required.getString(i)))throw new IOException("duplicate required owner");
-    if(!expected.equals(names))throw new IOException("native persistence registry mismatch");
+    HashSet<String> audited=new HashSet<>(java.util.Arrays.asList(REQUIRED_OWNER_NAMES.split(",")));
+    if(!expected.equals(audited)||!expected.equals(names))throw new IOException("native persistence registry mismatch");
     return true;
   }
   static String proof(String raw)throws Exception{

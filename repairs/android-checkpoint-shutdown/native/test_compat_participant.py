@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--source-root', type=Path, required=True,
                     help='runtime-embedded-addons directory')
 args, remaining = parser.parse_known_args()
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(args.source_root / 'service.infinity.compat'))
 import checkpoint_runtime as runtime
 

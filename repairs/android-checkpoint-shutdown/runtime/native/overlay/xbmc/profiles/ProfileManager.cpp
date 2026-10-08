@@ -348,6 +348,10 @@ bool CProfileManager::LoadProfile(unsigned int index)
   settings->SetLoaded();
 
   CreateProfileFolders();
+#ifdef TARGET_ANDROID
+  if (!InfinityAndroidCheckpoint::PublishStartupOwner())
+    CLog::Log(LOGERROR, "Infinity checkpoint profile owner publication failed; Normal Close unavailable");
+#endif
 
   CServiceBroker::GetDatabaseManager().Initialize();
   CServiceBroker::GetInputManager().LoadKeymaps();

@@ -51,6 +51,19 @@ final class InfinityKodiShutdown {
     }
   }
   static String localOwnerToken(){return processToken;}
+  static synchronized String confirmedLocalOwnerToken(){
+    return processLease!=null&&processLease.isValid()?processToken:"";
+  }
+  static boolean ownerRetired(File directory,int pid,String owner)throws IOException{
+    // Missing or invalid evidence is not proof of retirement. Do not reopen our own locked inode.
+    if(pid<=0||processToken.equals(owner))return false;
+    // Open existing-only, once. The observer's read/write probe may create a missing lease;
+    // that is unsuitable for authorizing replay of a previous process's saved state.
+    try(FileInputStream existing=new FileInputStream(leasePath(directory,owner))){
+      try(FileLock free=existing.getChannel().tryLock(0,Long.MAX_VALUE,true)){return free!=null;}
+      catch(OverlappingFileLockException held){return false;}
+    }
+  }
   static Snapshot state(){return cached;}
   static boolean initialized(){return initialized;}
   static boolean pending(){return cached.pending();}
@@ -105,9 +118,10 @@ final class InfinityKodiShutdown {
     // Do not open/close a second descriptor for our own lease: on some systems
     // closing any descriptor for a locked inode releases this process's lock.
     if(processToken.equals(owner))return pid==android.os.Process.myPid() && processLease!=null && processLease.isValid();
-    File path=leasePath(directory,owner);if(!path.isFile())return false;
-    try(RandomAccessFile probe=new RandomAccessFile(path,"rw")){
-      try(FileLock free=probe.getChannel().tryLock()){
+    // Missing evidence is unknown, not observed death. Never create or replace the inode
+    // whose lock proves this UUID's process lifetime.
+    try(FileInputStream probe=new FileInputStream(leasePath(directory,owner))){
+      try(FileLock free=probe.getChannel().tryLock(0,Long.MAX_VALUE,true)){
         return free==null;
       }catch(OverlappingFileLockException held){return true;}
     }

@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <array>
+#include <string>
 
 #include <androidjni/Activity.h>
 #include <androidjni/InputManager.h>
@@ -27,6 +28,7 @@ public:
   static CJNIMainActivity* GetAppInstance() { return m_appInstance; }
 
   static void RegisterNatives(JNIEnv* env);
+  static jboolean _infinityRegisterCheckpointOwner(JNIEnv*, jobject, jstring, jint, jstring);
   static jboolean _infinityRequestPersistenceCheckpoint(JNIEnv*, jobject, jstring, jstring, jint);
   static jstring _infinityPersistenceCheckpointStatus(JNIEnv*, jobject, jstring, jstring, jint);
   static jboolean _infinityAuthorizeCheckpointTermination(JNIEnv*, jobject, jstring, jstring, jint);
@@ -57,6 +59,8 @@ public:
   void infinityNotifyPlaybackChanged();
   uint64_t infinityGetWindowSize() const;
   bool infinityIsPictureInPicture() const;
+  bool infinityCheckpointOwnsOwner(int pid, const std::string& owner) const;
+  bool infinityCheckpointOwnerRetired(int pid, const std::string& owner) const;
 
   static void _callNative(JNIEnv *env, jobject context, jlong funcAddr, jlong variantAddr);
   static void runNativeOnUiThread(void (*callback)(void*), void* variant);

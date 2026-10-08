@@ -6,7 +6,7 @@ revision `515992ed6ac98a365bb75f42c117007ae94c2aed`. Its native engine is the
 
 **Status: runtime integration on the isolated work branch; build and device
 acceptance remain open.** `runtime/` contains the actual Android, native and
-Command Center source overlays, each with a complete protected parent manifest
+Command Center and embedded add-on source overlays, each with a complete protected parent manifest
 and enumerated postimages. These are not a locked candidate or a device-ready
 APK. Unknown persistence owners explicitly prevent a safe acknowledgment.
 
@@ -35,7 +35,8 @@ lineage, locking the architecture, or distributing a device-ready APK.
 source commit and workflow runs. The downloaded APK digest was independently
 verified. A recovered native review archive was transformed by the exact 3334
 delta; all 4,479 recovered files match the compiled source manifest. This is a
-verified source subset, not a complete reconstruction of all 9,374 inputs.
+verified local source subset. The work-branch CI subsequently reconstructed and
+verified all 9,374 parent inputs before applying the runtime delta.
 
 The delivered build records skin parent 1.0.5.204. The skin is installed content,
 not a replacement skin bundled in the APK. The APK contains the 0.3.5.19 Resume
@@ -99,7 +100,8 @@ packaging, installed-owner coverage or physical-device behavior.
 7. Propagate storage errors through every relevant save adapter. A low-level
    SQLite fix or durable-file helper alone does not fix callers that discard
    results. Preserve dirty generations on partial failure and retry idempotently.
-8. Classify running third-party Python/binary add-on writes. Direct Python
+8. Classify every admitted third-party Python/binary add-on writer, including
+   invocations that completed before Close. Direct Python
    sqlite3/file IO bypasses native database wrappers. Require an acknowledged
    participant, a justified noncritical classification, or fail closed.
 9. Prove no required writer can resume between SAFE and termination. Validate
@@ -120,6 +122,20 @@ XML saves with metadata preservation, loaded add-on/skin settings participation,
 favorites/peripheral save owners, and the actual resident Command Center service
 and plugin write paths. Force Close remains a separate recovery action.
 
+Startup registers the actual held Android engine-owner lease before native
+activity creation. Native publishes that identity before starting Python
+services. Relaunch checks the previous engine and participant journal owners
+independently through the existing Android lease mechanism. Missing lease
+evidence is unknown, never proof of process death; numeric PID reuse is not an
+ownership transfer. The participant journal uses exact previous-owner CAS.
+
+The embedded compat service participates in the same checkpoint and parks its
+writers after checked file and startup-marker persistence. Only three compat
+code files change; its settings, resources and the other embedded add-ons remain
+hash protected. This prevents successful normal checkpoint closes from being
+miscounted as unclean service exits. Audio-policy file durability is a separate
+native owner; an unaudited active/completed policy dialog is still unresolved.
+
 The Command Center update changes only eight code files. Its version, settings
 schema, skin-upgrade code and UI resources remain unchanged. A pre-native
 installer verifies all original or retry postimages before applying the pinned
@@ -128,12 +144,18 @@ payload; its journal permits rollback/recovery without touching user data.
 Unaudited foreign Python/private binary add-on writers, unsupported player
 backends and uncovered active PVR owners are explicit coverage gaps. Script exit,
 thread disappearance and elapsed deadlines are not persistence acknowledgments.
+An unresolved-script obligation is recorded at admission and survives invocation
+completion, exceptions and registry removal for the process lifetime. Verified
+code contracts bind actual entry and dependency hashes, not just add-on IDs.
 The current work must not be declared accepted while required installed owners
 lack a checked participant or an audited nonpersistent classification.
 
 `native_ci.py` reconstructs the complete inherited Infinity engine recipe before
 applying the reviewed overlay and protects all 9,374 parent source inputs.
 `android_ci.py` compiles the complete current shell as a non-distributed donor.
+The full Android shell compiled successfully at work commit
+`d13881ad2f7ccfad8bdbed092847e69e3ef11c19`; that result predates the startup-owner
+and embedded-participant additions and must not certify the later source.
 The work-branch workflow does not publish an APK or alter accepted refs. Build
 success is separate from the Fold and dirty-state acceptance matrix below.
 

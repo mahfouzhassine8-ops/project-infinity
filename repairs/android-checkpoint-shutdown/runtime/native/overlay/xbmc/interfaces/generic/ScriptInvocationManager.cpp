@@ -89,12 +89,21 @@ void CScriptInvocationManager::BeginShutdown()
 
 namespace
 {
-bool IsCheckpointCommandCenter(const std::string& script, const CLanguageInvokerThreadPtr& thread)
+std::string VerifiedCheckpointContract(const std::string& script,
+                                       const CLanguageInvokerThreadPtr& thread,
+                                       const std::string& admittedContract)
 {
+#if defined(TARGET_ANDROID)
   const auto& addon = thread->GetAddon();
-  return addon && addon->ID() == "script.infinity.commandcenter" &&
-         CSpecialProtocol::TranslatePath(script) == CSpecialProtocol::TranslatePath(
-           "special://home/addons/script.infinity.commandcenter/service.py");
+  if (!admittedContract.empty() && addon &&
+      InfinityAndroidCheckpoint::ClassifyScript(script, addon->ID()) == admittedContract)
+    return admittedContract;
+#else
+  (void)script;
+  (void)thread;
+  (void)admittedContract;
+#endif
+  return {};
 }
 }
 
@@ -105,7 +114,7 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
     std::unique_lock<CCriticalSection> lock(m_critSection);
     m_shutdownRequested = true;
     for (const auto& entry : m_scripts)
-      if (!entry.second.done && !IsCheckpointCommandCenter(entry.second.script, entry.second.thread))
+      if (!entry.second.done && VerifiedCheckpointContract(entry.second.script, entry.second.thread, entry.second.checkpointContract).empty())
         pending.push_back(entry.second.thread);
   }
 #if defined(TARGET_ANDROID) && defined(HAS_PYTHON)
@@ -119,7 +128,7 @@ std::size_t CScriptInvocationManager::AndroidCheckpointForeignScripts() const
   std::unique_lock<CCriticalSection> lock(m_critSection);
   std::size_t active = 0;
   for (const auto& entry : m_scripts)
-    if (!entry.second.done && !IsCheckpointCommandCenter(entry.second.script, entry.second.thread))
+    if (!entry.second.done && VerifiedCheckpointContract(entry.second.script, entry.second.thread, entry.second.checkpointContract).empty())
       ++active;
   return active;
 }
@@ -129,7 +138,17 @@ std::size_t CScriptInvocationManager::AndroidCheckpointResidentCount() const
   std::unique_lock<CCriticalSection> lock(m_critSection);
   std::size_t active = 0;
   for (const auto& entry : m_scripts)
-    if (!entry.second.done && IsCheckpointCommandCenter(entry.second.script, entry.second.thread))
+    if (!entry.second.done && VerifiedCheckpointContract(entry.second.script, entry.second.thread, entry.second.checkpointContract) == "command_center")
+      ++active;
+  return active;
+}
+
+std::size_t CScriptInvocationManager::AndroidCheckpointCompatCount() const
+{
+  std::unique_lock<CCriticalSection> lock(m_critSection);
+  std::size_t active = 0;
+  for (const auto& entry : m_scripts)
+    if (!entry.second.done && VerifiedCheckpointContract(entry.second.script, entry.second.thread, entry.second.checkpointContract) == "compat")
       ++active;
   return active;
 }
@@ -137,10 +156,12 @@ std::size_t CScriptInvocationManager::AndroidCheckpointResidentCount() const
 std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
-  std::vector<std::string> result;
+  std::vector<std::string> result = m_checkpointUnresolvedWriterLedger;
+  if (result.size() >= 8)
+    return result;
   for (const auto& entry : m_scripts)
   {
-    if (entry.second.done || IsCheckpointCommandCenter(entry.second.script, entry.second.thread))
+    if (entry.second.done || !VerifiedCheckpointContract(entry.second.script, entry.second.thread, entry.second.checkpointContract).empty())
       continue;
     const auto& addon = entry.second.thread->GetAddon();
     result.push_back((addon ? addon->ID() : "unidentified") + ":" + URIUtils::GetFileName(entry.second.script));
@@ -353,9 +374,22 @@ int CScriptInvocationManager::ExecuteAsync(
     return -1;
   }
 
+  std::string checkpointContract;
+#if defined(TARGET_ANDROID)
+  if (!reuseable && addon)
+    checkpointContract = InfinityAndroidCheckpoint::ClassifyScript(script, addon->ID());
+#endif
   std::unique_lock<CCriticalSection> lock(m_critSection);
   if (m_shutdownRequested)
     return -1;
+
+#if defined(TARGET_ANDROID)
+  // Capture before Execute can finish (or fail) and before Process may erase
+  // the invoker. A completed unknown interpreter is still an unproved writer.
+  if (checkpointContract.empty() && m_checkpointUnresolvedWriterLedger.size() < 8)
+    m_checkpointUnresolvedWriterLedger.push_back(
+        (addon ? addon->ID() : "unidentified") + ":" + URIUtils::GetFileName(script));
+#endif
 
   if (m_lastInvokerThread && m_lastInvokerThread->GetInvoker() == languageInvoker)
   {
@@ -364,6 +398,9 @@ int CScriptInvocationManager::ExecuteAsync(
 
     // Keep dispatch serialized with BeginShutdown; no script join occurs here.
     CLanguageInvokerThreadPtr invokerThread = m_lastInvokerThread;
+    const auto existing = m_scripts.find(invokerThread->GetId());
+    if (existing != m_scripts.end())
+      existing->second.checkpointContract = checkpointContract;
     invokerThread->Execute(script, arguments);
 
     return invokerThread->GetId();
@@ -379,7 +416,7 @@ int CScriptInvocationManager::ExecuteAsync(
   m_lastInvokerThread->SetId(m_nextId++);
   m_lastPluginHandle = pluginHandle;
 
-  LanguageInvokerThread thread = {m_lastInvokerThread, script, false};
+  LanguageInvokerThread thread = {m_lastInvokerThread, script, false, checkpointContract};
   m_scripts.insert(std::make_pair(m_lastInvokerThread->GetId(), thread));
   m_scriptPaths.insert(std::make_pair(script, m_lastInvokerThread->GetId()));
   // Create signals its start event before running the script. Do not let
@@ -523,7 +560,7 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
   {
 #if defined(TARGET_ANDROID)
     if (InfinityAndroidCheckpoint::IsActive() &&
-        !IsCheckpointCommandCenter(script->second.script, script->second.thread))
+        VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty())
       InfinityAndroidCheckpoint::RecordFailure("python_services", "foreign_invoker_finished_without_persistence_receipt");
 #endif
     script->second.done = true;

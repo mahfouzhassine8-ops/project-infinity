@@ -24,6 +24,7 @@ class Main extends android.app.Activity {
  void infinityStopWeatherCapture(){}
  static Main infinityLiveActivity(){return MainActivity;}
  public native boolean infinityRequestPersistenceCheckpoint(String session,String owner,int pid);
+ public native boolean infinityRegisterCheckpointOwner(String owner,int pid,String filesDir);
  public native String infinityPersistenceCheckpointStatus(String session,String owner,int pid);
  public native boolean infinityAuthorizeCheckpointTermination(String session,String owner,int pid);
 }
@@ -43,9 +44,12 @@ final class CheckpointWireTest {
  static JSONObject valid()throws Exception {
   JSONObject row=new JSONObject();row.put("schema",1);row.put("session",S);row.put("owner",O);row.put("pid",42);
   row.put("generation",7);row.put("phase","SAFE_TO_TERMINATE");row.put("admission_sealed",true);
-  row.put("required_owners",new JSONArray().put("settings"));
-  row.put("owners",new JSONArray().put(new JSONObject().put("owner","settings").put("checkpoint_generation",7).put("generation",7)
-   .put("durable_generation",7).put("dirty",false).put("dirty_before",true).put("dirty_remaining",false).put("result","COMMITTED").put("required_writes_finished",true)));
+  JSONArray names=new JSONArray(),owners=new JSONArray();
+  for(String owner:InfinityCheckpointProtocol.REQUIRED_OWNER_NAMES.split(",")){
+   names.put(owner);owners.put(new JSONObject().put("owner",owner).put("checkpoint_generation",7).put("generation",7)
+    .put("durable_generation",7).put("dirty",false).put("dirty_before",true).put("dirty_remaining",false).put("result","COMMITTED").put("required_writes_finished",true));
+  }
+  row.put("required_owners",names);row.put("owners",owners);
   return row;
  }
  static void check(boolean value,String why){if(!value)throw new AssertionError(why);}
@@ -109,7 +113,65 @@ final class CheckpointWireTest {
    }
   }
  }
+ static void holdLease(String path)throws Exception {
+  try(java.io.RandomAccessFile file=new java.io.RandomAccessFile(path,"rw");
+      java.nio.channels.FileLock lock=file.getChannel().lock()){
+   System.out.println("READY");System.out.flush();System.in.read();
+  }
+ }
+ static boolean retired(java.io.File directory,int pid,String owner){
+  try{return InfinityKodiShutdown.ownerRetired(directory,pid,owner);}catch(java.io.IOException unavailable){return false;}
+ }
+ static void ownerLeases()throws Exception {
+  java.nio.file.Path directory=java.nio.file.Files.createTempDirectory("infinity-owner-retirement-");
+  Process child=null;java.util.concurrent.ExecutorService reader=java.util.concurrent.Executors.newSingleThreadExecutor();
+  java.nio.channels.FileLock ownLease=null;java.io.RandomAccessFile ownFile=null;
+  try{
+   java.io.File missing=InfinityKodiShutdown.leasePath(directory.toFile(),O);
+   check(!retired(directory.toFile(),42,O),"missing owner evidence proved retirement");
+   check(!missing.exists(),"retirement probe created missing evidence");
+   try{InfinityKodiShutdown.ownerAlive(directory.toFile(),42,O);throw new AssertionError("missing observer evidence proved death");}
+   catch(java.io.IOException unknown){}
+   check(!retired(directory.toFile(),42,"../invalid"),"invalid UUID proved retirement");
+   check(!retired(directory.toFile(),0,O),"invalid PID proved retirement");
+   check(InfinityKodiShutdown.confirmedLocalOwnerToken().isEmpty(),"unheld owner confirmed");
+   java.lang.reflect.Method retain=InfinityKodiShutdown.class.getDeclaredMethod("retainProcessLease",java.io.File.class);
+   retain.setAccessible(true);retain.invoke(null,directory.toFile());
+   java.lang.reflect.Field leaseField=InfinityKodiShutdown.class.getDeclaredField("processLease");leaseField.setAccessible(true);
+   java.lang.reflect.Field fileField=InfinityKodiShutdown.class.getDeclaredField("processLeaseFile");fileField.setAccessible(true);
+   ownLease=(java.nio.channels.FileLock)leaseField.get(null);ownFile=(java.io.RandomAccessFile)fileField.get(null);
+   String current=InfinityKodiShutdown.confirmedLocalOwnerToken();
+   check(current.equals(InfinityKodiShutdown.localOwnerToken()),"retained owner token mismatch");
+   retain.invoke(null,directory.toFile());check(current.equals(InfinityKodiShutdown.confirmedLocalOwnerToken()),"activity recreation changed live owner");
+   check(!retired(directory.toFile(),42,current)&&ownLease.isValid(),"own lease falsely retired or released");
+   child=new ProcessBuilder(System.getProperty("java.home")+"/bin/java","-cp",System.getProperty("java.class.path"),
+       CheckpointWireTest.class.getName(),"hold-lease",missing.getAbsolutePath()).redirectError(ProcessBuilder.Redirect.INHERIT).start();
+   final Process holder=child;
+   String ready=reader.submit(()->new java.io.BufferedReader(new java.io.InputStreamReader(holder.getInputStream(),java.nio.charset.StandardCharsets.UTF_8)).readLine()).get(5,java.util.concurrent.TimeUnit.SECONDS);
+   check("READY".equals(ready),"lease holder did not start");
+   check(!retired(directory.toFile(),42,O),"live old owner falsely retired");
+   check(InfinityKodiShutdown.ownerAlive(directory.toFile(),42,O),"observer lost live old owner");
+   check(!retired(directory.toFile(),99,O),"numeric PID changed live UUID ownership");
+   child.getOutputStream().close();check(child.waitFor(5,java.util.concurrent.TimeUnit.SECONDS),"lease holder did not exit");
+   check(child.exitValue()==0,"lease holder failed");
+   check(retired(directory.toFile(),42,O),"released existing UUID not retired");
+   check(!InfinityKodiShutdown.ownerAlive(directory.toFile(),42,O),"observer retained dead UUID owner");
+   check(retired(directory.toFile(),99,O),"reused numeric PID prevented old UUID retirement");
+   java.nio.file.Files.delete(missing.toPath());
+   check(!retired(directory.toFile(),42,O)&&!missing.exists(),"removed evidence recreated or accepted");
+   check(ownLease.isValid(),"previous-owner proof released current owner lease");
+   System.out.println("PASS actual UUID lease retirement: missing/invalid fail closed, separate live process, released owner, PID reuse, stable current lease");
+  }finally{
+   if(child!=null&&child.isAlive()){child.destroyForcibly();child.waitFor(5,java.util.concurrent.TimeUnit.SECONDS);}
+   reader.shutdownNow();
+   if(ownLease!=null)ownLease.release();if(ownFile!=null)ownFile.close();
+   try(java.util.stream.Stream<java.nio.file.Path> files=java.nio.file.Files.walk(directory)){
+    files.sorted(java.util.Comparator.reverseOrder()).forEach(path->{try{java.nio.file.Files.delete(path);}catch(java.io.IOException e){throw new java.io.UncheckedIOException(e);}});
+   }
+  }
+ }
  public static void main(String[] args)throws Exception {
+  if(args.length==2&&args[0].equals("hold-lease")){holdLease(args[1]);return;}
   check(accepted(valid()),"valid proof rejected");
   JSONObject row=valid();row.put("session",O);check(!accepted(row),"wrong session accepted");
   row=valid();row.put("owner",S);check(!accepted(row),"wrong owner accepted");
@@ -118,6 +180,7 @@ final class CheckpointWireTest {
   row=valid();row.put("admission_sealed",false);check(!accepted(row),"unsealed proof accepted");
   row=valid();row.put("owners",new JSONArray());check(!accepted(row),"empty owners accepted");
   row=valid();row.getJSONArray("required_owners").put("resume_hub");check(!accepted(row),"missing owner accepted");
+  row=valid();row.getJSONArray("required_owners").remove(0);row.getJSONArray("owners").remove(0);check(!accepted(row),"native self-declared incomplete registry accepted");
   row=valid();row.getJSONArray("owners").put(row.getJSONArray("owners").getJSONObject(0));check(!accepted(row),"duplicate owner accepted");
   row=valid();row.getJSONArray("owners").getJSONObject(0).put("durable_generation",6);check(!accepted(row),"uncommitted generation accepted");
   row=valid();row.getJSONArray("owners").getJSONObject(0).put("checkpoint_generation",6);check(!accepted(row),"stale checkpoint generation accepted");
@@ -128,9 +191,10 @@ final class CheckpointWireTest {
   row=valid();row.getJSONArray("owners").getJSONObject(0).put("dirty_before",false);check(!accepted(row),"unneeded commit treated as clean proof");
   row=valid();row.getJSONArray("owners").getJSONObject(0).put("dirty_before",false).put("result","ALREADY_DURABLE");check(accepted(row),"clean durable owner rejected");
   check(InfinityCheckpointProtocol.proof("abc").equals("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"),"SHA256 proof incorrect");
-  System.out.println("PASS 18 actual Android wire/proof checks");
+  System.out.println("PASS 19 actual Android wire/proof checks");
   gates();
   completionReceipts();
+  ownerLeases();
   if(args.length>0){
    String raw=new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(args[0])),java.nio.charset.StandardCharsets.UTF_8);
    JSONObject fixture=new JSONObject(raw);
@@ -168,4 +232,8 @@ assert endpoint.count('android.os.Process.killProcess(') == 1
 assert 'if(owner.infinityAuthorizeCheckpointTermination' in endpoint
 assert 'consumeGuard(generation,proof)' in endpoint
 assert 'BIND_AUTO_CREATE' not in (source / 'InfinityCloseGuardService.java.in').read_text()
+main = (source / 'Main.java.in').read_text()
+assert main.index('InfinityKodiShutdown.boot(this') < main.index('System.loadLibrary("@APP_NAME_LC@")') < main.index('!infinityRegisterCheckpointOwner(') < main.index('super.onCreate(savedInstanceState)')
+assert 'InfinityKodiShutdown.ownerRetired(getFilesDir(),pid,owner)' in main
+assert 'public boolean infinityCheckpointOwnsOwner(int pid,String owner)' in main
 print('PASS runtime route, explicit native authorization, and no-restart binding checks')

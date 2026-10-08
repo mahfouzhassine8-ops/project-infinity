@@ -35,6 +35,7 @@ public:
   void BeginAndroidCheckpoint();
   std::size_t AndroidCheckpointForeignScripts() const;
   std::size_t AndroidCheckpointResidentCount() const;
+  std::size_t AndroidCheckpointCompatCount() const;
   std::vector<std::string> AndroidCheckpointUnresolvedWriters() const;
 
   void RegisterLanguageInvocationHandler(ILanguageInvocationHandler *invocationHandler, const std::string &extension);
@@ -148,6 +149,7 @@ private:
     CLanguageInvokerThreadPtr thread;
     std::string script;
     bool done;
+    std::string checkpointContract;
   } LanguageInvokerThread;
   typedef std::map<int, LanguageInvokerThread> LanguageInvokerThreadMap;
   typedef std::map<std::string, ILanguageInvocationHandler*> LanguageInvocationHandlerMap;
@@ -163,4 +165,7 @@ private:
   int m_nextId = 0;
   mutable CCriticalSection m_critSection;
   bool m_shutdownRequested{false}; // guarded by m_critSection
+  // Durable ownership is not implied by OnExecutionDone/Py_EndInterpreter.
+  // Retain bounded diagnostics for all unknown process-lifetime admissions.
+  std::vector<std::string> m_checkpointUnresolvedWriterLedger;
 };

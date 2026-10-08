@@ -80,6 +80,81 @@ inline bool SaveCheckpointXml(const std::string& filename, std::string_view byte
   }
 }
 
+// For an audited synchronous producer which has already committed its bytes
+// and has no live writer. Preserve the exact file and metadata; check both the
+// inode and its namespace entry without parsing, rewriting or inventing state.
+// The caller must establish producer quiescence before invoking this helper.
+inline bool CheckpointExistingFile(const std::string& filename, const char* owner,
+                                   infinity::checkpoint::files::PosixIo& io)
+{
+  if (!IsPersistingOnThisThread())
+  {
+    RecordFailure(owner, "unauthorized_existing_file_checkpoint");
+    return false;
+  }
+  using namespace infinity::checkpoint::files;
+  std::string path;
+  if (!LocalCheckpointPath(filename, path))
+    return false;
+  Result result;
+  std::string leaf;
+  int directory = detail::OpenParent(io, path, leaf, result);
+  int file = -1;
+  const auto finish = [&]() {
+    detail::Close(io, file, result, Stage::CloseExisting);
+    detail::Close(io, directory, result, Stage::CloseDirectory);
+    if (result.stage != Stage::None)
+    {
+      RecordFailure(owner, StageName(result.stage));
+      CLog::Log(LOGERROR, "Infinity checkpoint existing file failed: owner={} stage={} errno={}",
+                owner, StageName(result.stage), result.error);
+      return false;
+    }
+    return true;
+  };
+  if (directory < 0)
+    return finish();
+  file = detail::RetryInterrupted([&] {
+    return io.OpenAt(directory, leaf.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK, 0);
+  });
+  if (file < 0)
+  {
+    if (errno != ENOENT)
+      detail::Fail(result, Stage::OpenExisting, errno);
+    return finish(); // Absence is valid; do not create a default configuration.
+  }
+  struct stat state{};
+  if (detail::RetryInterrupted([&] { return io.Stat(file, &state); }) != 0)
+  {
+    detail::Fail(result, Stage::StatExisting, errno);
+    return finish();
+  }
+  if (!S_ISREG(state.st_mode))
+  {
+    detail::Fail(result, Stage::ValidateExisting, EINVAL);
+    return finish();
+  }
+  if (detail::RetryInterrupted([&] { return io.Sync(file); }) != 0)
+  {
+    detail::Fail(result, Stage::SyncExisting, errno);
+    return finish();
+  }
+  if (!detail::Close(io, file, result, Stage::CloseExisting))
+    return finish();
+  if (detail::RetryInterrupted([&] { return io.Sync(directory); }) != 0)
+  {
+    detail::Fail(result, Stage::SyncDirectory, errno);
+    return finish();
+  }
+  return finish();
+}
+
+inline bool CheckpointExistingFile(const std::string& filename, const char* owner)
+{
+  infinity::checkpoint::files::PosixIo io;
+  return CheckpointExistingFile(filename, owner, io);
+}
+
 // Sync the parent entry of a directory in this checkpoint's targeted add-on
 // settings hierarchy. Repeat on retries even if mkdir already succeeded during
 // a failed attempt; existence alone does not prove the entry became durable.

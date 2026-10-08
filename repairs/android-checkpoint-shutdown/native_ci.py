@@ -17,6 +17,30 @@ import runtime_delta
 
 HERE = Path(__file__).resolve().parent
 OUT = Path("checkpoint-build")
+DEPENDENCY_PROOF = Path("android-tools/INFINITY-DEPENDENCIES-COMPLETE.json")
+
+
+def dependency_identity():
+    manifest = json.loads((HERE / "runtime/native/manifest.json").read_text())
+    inputs = {name: digest for name, digest in manifest["before"].items()
+              if name.startswith("tools/depends/")}
+    for name in inputs:
+        if manifest["after"].get(name) != inputs[name]:
+            raise ValueError("A reviewed dependency source changed; reuse requires a new identity")
+    return {"schema": 1, "ndk": os.environ.get("NDK_VER"), "host": "aarch64-linux-android",
+            "debug": True, "dependency_inputs_sha256": hashlib.sha256(
+                json.dumps(inputs, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+            "inherited_recipe_sha256": hashlib.sha256(Path("scripts/infinity_live_app_ci_2.sh").read_bytes()).hexdigest()}
+
+
+def verify_dependencies():
+    if not DEPENDENCY_PROOF.is_file() or json.loads(DEPENDENCY_PROOF.read_text()) != dependency_identity():
+        raise ValueError("Completed dependency identity unavailable; rebuild required")
+    prefix = Path(os.environ["DEPENDS"])
+    for name in ("x86_64-linux-gnu-native/bin/cmake", "x86_64-linux-gnu-native/bin/pkg-config",
+                 "aarch64-linux-android-21-debug/include", "aarch64-linux-android-21-debug/lib"):
+        if not (prefix / name).exists():
+            raise ValueError("Completed dependency prefix is incomplete: " + name)
 
 
 def run(*command):
@@ -41,9 +65,21 @@ def prepare():
     run(sys.executable, str(HERE / "native/test_runtime_file_saves.py"))
     run(sys.executable, str(HERE / "native/test_runtime_dirty_owners.py"))
     runtime_delta.materialize_commandcenter(OUT / "commandcenter")
+    runtime_delta.materialize("embedded-addons", OUT / "embedded-addons")
+    run(sys.executable, str(HERE / "native/test_compat_participant.py"),
+        "--source-root", str(OUT / "embedded-addons"))
+    run(sys.executable, str(HERE / "runtime-tests/test_script_contracts.py"),
+        "--runtime", "kodi", "--command-center", str(OUT / "commandcenter"),
+        "--embedded", str(OUT / "embedded-addons"))
+    run(sys.executable, str(HERE / "runtime-tests/test_script_writer_lifetime.py"),
+        "--runtime", "kodi")
+    run(sys.executable, str(HERE / "runtime-tests/test_pvr_checkpoint_admission.py"),
+        "--source-root", "kodi")
     run(sys.executable, str(HERE / "runtime-tests/test_runtime_checkpoint.py"),
         "--runtime", str(OUT / "commandcenter"))
     run(sys.executable, str(HERE / "runtime-tests/run_resume_preservation.py"),
+        "--runtime", str(OUT / "commandcenter"))
+    run(sys.executable, str(HERE / "runtime-tests/test_runtime_relaunch.py"),
         "--runtime", str(OUT / "commandcenter"))
     manifest = json.loads((HERE / "runtime/native/manifest.json").read_text())
     (OUT / "SOURCE-MANIFEST.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
@@ -58,6 +94,7 @@ def compile_engine(use_cache):
     assert stage.count(inherited) == 1
     stage = stage.replace(inherited, "python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi")
     if use_cache:
+        verify_dependencies()
         old = '''rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz" "$TARBALLS/fontconfig-2.14.0.tar.xz.sha512"
 make -C target/fontconfig FULL_URL=https://gstreamer.freedesktop.org/data/src/mirror/fontconfig-2.14.0.tar.xz download
 make -j"$(nproc)"
@@ -69,6 +106,13 @@ test -d "$DEPENDS/aarch64-linux-android-21-debug/lib"
 make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"'''
         assert stage.count(old) == 1
         stage = stage.replace(old, cached)
+    else:
+        complete = 'make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"'
+        assert stage.count(complete) == 1
+        # Only emit this marker after the dependency make returned successfully.
+        # Subsequent compile failures may safely preserve that completed prefix.
+        mark = 'python3 "$GITHUB_WORKSPACE/repairs/android-checkpoint-shutdown/native_ci.py" mark-dependencies\n'
+        stage = stage.replace(complete, mark + complete)
     marker = 'make -C "$BUILD_DIR" apk -j"$(nproc)"'
     assert stage.count(marker) == 1
     script = OUT / "compile-native.sh"
@@ -101,9 +145,19 @@ make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"'''
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("prepare", "compile"))
+    parser.add_argument("mode", choices=("prepare", "compile", "verify-dependencies", "mark-dependencies"))
     parser.add_argument("--completed-cache", action="store_true")
     args = parser.parse_args()
+    # The marker call is made from tools/depends after its successful make.
+    if args.mode == "mark-dependencies":
+        os.chdir(os.environ["GITHUB_WORKSPACE"])
+        DEPENDENCY_PROOF.parent.mkdir(parents=True, exist_ok=True)
+        DEPENDENCY_PROOF.write_text(json.dumps(dependency_identity(), indent=2, sort_keys=True) + "\n")
+        verify_dependencies()
+        return
+    if args.mode == "verify-dependencies":
+        verify_dependencies()
+        return
     OUT.mkdir(exist_ok=True)
     if args.mode == "prepare":
         prepare()

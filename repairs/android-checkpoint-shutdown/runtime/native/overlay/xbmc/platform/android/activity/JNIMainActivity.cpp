@@ -40,6 +40,13 @@ std::string CheckpointJniString(JNIEnv* env, jstring value)
 }
 }
 
+jboolean CJNIMainActivity::_infinityRegisterCheckpointOwner(
+    JNIEnv* env, jobject, jstring owner, jint pid, jstring filesDirectory)
+{
+  return InfinityAndroidCheckpoint::RegisterStartupOwner(CheckpointJniString(env, owner), pid,
+      CheckpointJniString(env, filesDirectory)) ? JNI_TRUE : JNI_FALSE;
+}
+
 jboolean CJNIMainActivity::_infinityRequestPersistenceCheckpoint(
     JNIEnv* env, jobject, jstring session, jstring owner, jint pid)
 {
@@ -85,6 +92,8 @@ void CJNIMainActivity::RegisterNatives(JNIEnv* env)
   if (cMain)
   {
     JNINativeMethod methods[] = {
+        {"infinityRegisterCheckpointOwner", "(Ljava/lang/String;ILjava/lang/String;)Z",
+         reinterpret_cast<void*>(&CJNIMainActivity::_infinityRegisterCheckpointOwner)},
         {"infinityRequestPersistenceCheckpoint", "(Ljava/lang/String;Ljava/lang/String;I)Z",
          reinterpret_cast<void*>(&CJNIMainActivity::_infinityRequestPersistenceCheckpoint)},
         {"infinityPersistenceCheckpointStatus", "(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;",
@@ -199,6 +208,34 @@ jint InfinityReadIntSnapshot(JNIEnv* env, jobject context, const char* method)
   return InfinityClearException(env) ? 0 : value;
 }
 } // namespace
+
+bool CJNIMainActivity::infinityCheckpointOwnsOwner(int pid, const std::string& owner) const
+{
+  JNIEnv* env = xbmc_jnienv();
+  if (!env || InfinityClearException(env))
+    return false;
+  jstring token = env->NewStringUTF(owner.c_str());
+  if (InfinityClearException(env) || !token)
+    return false;
+  const jboolean owns = call_method<jboolean>(m_context, "infinityCheckpointOwnsOwner",
+                                             "(ILjava/lang/String;)Z", static_cast<jint>(pid), token);
+  env->DeleteLocalRef(token);
+  return !InfinityClearException(env) && owns == JNI_TRUE;
+}
+
+bool CJNIMainActivity::infinityCheckpointOwnerRetired(int pid, const std::string& owner) const
+{
+  JNIEnv* env = xbmc_jnienv();
+  if (!env || InfinityClearException(env))
+    return false;
+  jstring token = env->NewStringUTF(owner.c_str());
+  if (InfinityClearException(env) || !token)
+    return false;
+  const jboolean retired = call_method<jboolean>(m_context, "infinityCheckpointOwnerRetired",
+                                                "(ILjava/lang/String;)Z", static_cast<jint>(pid), token);
+  env->DeleteLocalRef(token);
+  return !InfinityClearException(env) && retired == JNI_TRUE;
+}
 
 jboolean CJNIMainActivity::_infinityHasActiveVideo(JNIEnv* env, jobject context)
 {

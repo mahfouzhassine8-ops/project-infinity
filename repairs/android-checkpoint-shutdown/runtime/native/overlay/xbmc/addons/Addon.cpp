@@ -149,6 +149,20 @@ void InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(const void* manage
       entry.dirtyOwner = entry.settings.lock();
 }
 
+bool InfinityAndroidCheckpoint::CheckpointAudioPolicyFile()
+{
+  CheckpointWriteGuard checkpointWrite("audio_policy");
+  if (!checkpointWrite || !IsPersistingOnThisThread())
+  {
+    RecordFailure("audio_policy", "unauthorized_checkpoint");
+    return false;
+  }
+  // Exact 2103335 embedded script.infinity.audiopolicy/default.py writes this
+  // file synchronously with file fsync + replace. A running invocation is an
+  // unresolved Python owner, so the coordinator cannot reach this save phase.
+  return CheckpointExistingFile("special://profile/infinity-audio-policy.json", "audio_policy");
+}
+
 bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()
 {
   CheckpointWriteGuard checkpointWrite("addon_settings");

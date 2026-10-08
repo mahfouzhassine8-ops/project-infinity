@@ -25,6 +25,7 @@ def function(source, signature):
 class RuntimeFileSavesTest(unittest.TestCase):
     def test_checked_xml_and_actual_loaded_owner_ledger(self):
         addon = (RUNTIME / "xbmc/addons/Addon.cpp").read_text()
+        self.assertIn('CheckpointExistingFile("special://profile/infinity-audio-policy.json", "audio_policy")', addon)
         start = addon.index("namespace\n{\nstruct CheckpointAddonTree")
         registry = addon[start:addon.index("\n#endif\n\nnamespace ADDON", start)]
         xml1 = function((RUNTIME / "xbmc/utils/XBMCTinyXML.cpp").read_text(),
@@ -155,11 +156,62 @@ void Reset() {
   InfinityAndroidCheckpoint::failures.clear(); InfinityAndroidCheckpoint::persist = true;
   InfinityAndroidCheckpoint::admit = true;
 }
+struct ExistingFileIo : infinity::checkpoint::files::PosixIo {
+  std::map<int, bool> descriptors;
+  int filesSynced = 0, directoriesSynced = 0, writes = 0, renames = 0;
+  bool failFileSync = false, failDirectorySync = false, failFileClose = false;
+  int OpenAt(int directory, const char* path, int flags, mode_t mode) override {
+    const int fd = PosixIo::OpenAt(directory, path, flags, mode);
+    if (fd >= 0) descriptors[fd] = (flags & O_DIRECTORY) != 0;
+    return fd;
+  }
+  int Sync(int fd) override {
+    const bool directory = descriptors.at(fd);
+    if (directory) ++directoriesSynced; else ++filesSynced;
+    if ((directory && failDirectorySync) || (!directory && failFileSync)) { errno = EIO; return -1; }
+    return PosixIo::Sync(fd);
+  }
+  int Close(int fd) override {
+    const bool file = !descriptors.at(fd);
+    descriptors.erase(fd);
+    const int result = PosixIo::Close(fd);
+    if (file && failFileClose) { errno = EINTR; return -1; }
+    return result;
+  }
+  ssize_t Write(int fd, const void* data, size_t size) override {
+    ++writes; return PosixIo::Write(fd, data, size);
+  }
+  int RenameAt(int from, const char* oldName, int to, const char* newName) override {
+    ++renames; return PosixIo::RenameAt(from, oldName, to, newName);
+  }
+};
 int main(int argc, char** argv) {
   try {
     CHECK(argc == 2);
     const std::string root = argv[1];
     const std::string path = root + "/settings.xml";
+    const std::string policy = root + "/infinity-audio-policy.json";
+    ExistingFileIo missing;
+    CHECK(InfinityAndroidCheckpoint::CheckpointExistingFile(policy, "audio_policy", missing));
+    CHECK(!fs::exists(policy) && missing.filesSynced == 0 && missing.descriptors.empty());
+    Seed(policy, "{\"schema\":1,\"video\":\"movie\"}\n");
+    const std::string policyBytes = Read(policy); const auto policyInode = Inode(policy);
+    ExistingFileIo completed;
+    CHECK(InfinityAndroidCheckpoint::CheckpointExistingFile(policy, "audio_policy", completed));
+    CHECK(completed.filesSynced == 1 && completed.directoriesSynced == 1);
+    CHECK(completed.writes == 0 && completed.renames == 0 && completed.descriptors.empty());
+    CHECK(Read(policy) == policyBytes && Inode(policy) == policyInode);
+    for (int fault = 0; fault < 3; ++fault) {
+      ExistingFileIo failed;
+      failed.failFileSync = fault == 0; failed.failDirectorySync = fault == 1; failed.failFileClose = fault == 2;
+      CHECK(!InfinityAndroidCheckpoint::CheckpointExistingFile(policy, "audio_policy", failed));
+      CHECK(failed.descriptors.empty()); CHECK(Read(policy) == policyBytes && Inode(policy) == policyInode);
+    }
+    const std::string policyLink = root + "/policy-link";
+    CHECK(::symlink(policy.c_str(), policyLink.c_str()) == 0);
+    CHECK(!InfinityAndroidCheckpoint::CheckpointExistingFile(policyLink, "audio_policy"));
+    CHECK(!InfinityAndroidCheckpoint::CheckpointExistingFile(root, "audio_policy"));
+    CHECK(!InfinityAndroidCheckpoint::CheckpointExistingFile(root + "/missing-parent/policy.json", "audio_policy"));
     CXBMCTinyXML doc; doc.bytes = "<settings>state</settings>";
     CHECK(doc.SaveFile(path)); CHECK(Read(path) == doc.bytes);
     const auto inode = Inode(path); CHECK(doc.SaveFile(path)); CHECK(Inode(path) == inode);

@@ -2,6 +2,7 @@
 
 #include "InfinityCheckpointXml.h"
 #include "InfinityPlaybackCheckpoint.h"
+#include "JNIMainActivity.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
 #include "application/Application.h"
@@ -15,6 +16,7 @@
 #include "peripherals/Peripherals.h"
 #include "profiles/ProfileManager.h"
 #include "pvr/PVRManager.h"
+#include "pvr/addons/PVRClients.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/JSONVariantParser.h"
@@ -26,7 +28,6 @@
 #include <atomic>
 #include <cerrno>
 #include <chrono>
-#include <csignal>
 #include <ctime>
 #include <fcntl.h>
 #include <map>
@@ -43,8 +44,8 @@ namespace
 using Clock = std::chrono::steady_clock;
 constexpr auto DEADLINE = std::chrono::seconds(25);
 constexpr const char* REQUIRED[] = {"native_admission", "python_services", "background_jobs",
-  "playback", "command_center", "kodi_settings", "profiles", "skin_settings", "addon_settings",
-  "favourites", "peripherals", "xml_files", "native_databases", "pvr"};
+  "playback", "command_center", "compat", "kodi_settings", "profiles", "skin_settings", "addon_settings",
+  "favourites", "peripherals", "audio_policy", "xml_files", "native_databases", "pvr"};
 
 struct Owner
 {
@@ -65,6 +66,11 @@ struct State
   bool authorized{false};
   bool requestReady{false};
   bool lifecycleTeardown{false};
+  bool ownerRegistered{false};
+  bool ownerPublished{false};
+  bool ownerPublishing{false};
+  std::string filesDirectory;
+  std::string startupError;
   std::string session;
   std::string owner;
   int pid{0};
@@ -91,6 +97,7 @@ State& Get()
 }
 thread_local unsigned int permissionDepth = 0;
 thread_local unsigned int acceptedPlaybackDepth = 0;
+thread_local unsigned int startupWriteDepth = 0;
 
 bool Token(const std::string& token)
 {
@@ -267,34 +274,194 @@ bool ParticipantResponse(State& s, const char* expected)
     response["global_safe_to_terminate"].isBoolean() &&
     !response["global_safe_to_terminate"].asBoolean();
 }
+bool CompatIdentity(const CVariant& value, const State& s, bool session)
+{
+  return SameIdentity(value, s, session) &&
+    value["participant"].isString() && value["participant"].asString() == "infinity-compat" &&
+    value["participant_api"].isInteger() && value["participant_api"].asInteger() == 1 &&
+    value["addon_version"].isString() && value["addon_version"].asString() == "0.7.2" &&
+    value["global_safe_to_terminate"].isBoolean() && !value["global_safe_to_terminate"].asBoolean();
+}
+bool CompatResponse(State& s)
+{
+  CVariant response;
+  if (!ReadJson(s.directory + "/compat-response.json", response) || !CompatIdentity(response, s, true))
+    return false;
+  if (response["status"].isString() && response["status"].asString() == "CHECKPOINT_FAILED")
+  {
+    const auto detail = std::string("compat_participant_failed:") + response["error"].asString();
+    RecordFailure("compat", detail.substr(0, 384).c_str());
+    return false;
+  }
+  if (!response["status"].isString() || response["status"].asString() != "PARTICIPANT_COMPLETE" ||
+      !response["guard_frozen"].isBoolean() || !response["guard_frozen"].asBoolean() ||
+      !response["operations"].isArray() || response["operations"].size() != 2)
+    return false;
+  bool files = false;
+  bool marker = false;
+  for (auto it = response["operations"].begin_array(); it != response["operations"].end_array(); ++it)
+  {
+    if (!(*it)["name"].isString() || !(*it)["ok"].isBoolean() || !(*it)["ok"].asBoolean())
+      return false;
+    if ((*it)["name"].asString() == "critical_files")
+    {
+      if (files) return false;
+      files = true;
+    }
+    else if ((*it)["name"].asString() == "clean_marker")
+    {
+      if (marker) return false;
+      marker = true;
+    }
+    else return false;
+  }
+  return files && marker;
+}
+bool ReadOptionalJson(const std::string& path, CVariant& value, bool& present)
+{
+  struct stat info{};
+  if (::lstat(path.c_str(), &info) != 0)
+  {
+    present = false;
+    return errno == ENOENT;
+  }
+  present = true;
+  return S_ISREG(info.st_mode) && ReadJson(path, value);
+}
+bool OwnerIdentity(const CVariant& value, const char* tokenField)
+{
+  return value.isObject() && value["pid"].isInteger() && value["pid"].asInteger() > 0 &&
+    value["pid"].asInteger() <= 2147483647 && value[tokenField].isString() &&
+    Token(value[tokenField].asString());
+}
+bool PvrOwnersAbsent()
+{
+  const auto& manager = CServiceBroker::GetPVRManager();
+  const auto clients = manager.Clients();
+  return manager.IsStopped() && clients && !clients->HasAndroidCheckpointOwners();
+}
 bool BeginEngineHandshake(State& s)
 {
-  s.directory = CSpecialProtocol::TranslatePath(
-      "special://profile/addon_data/script.infinity.commandcenter/.android-checkpoint");
+  const auto* activity = jni::CJNIMainActivity::GetAppInstance();
+  if (!activity || !activity->infinityCheckpointOwnsOwner(s.pid, s.owner))
+    return false;
   if (!XFILE::CDirectory::Create(s.directory) || !CheckpointCreatedDirectory(s.directory))
     return false;
+  // First launch can create this whole private add-on hierarchy. Persist each
+  // new directory entry, not only the final control-directory inode contents.
+  const auto addonDirectory = s.directory.substr(0, s.directory.rfind('/'));
+  const auto addonDataDirectory = addonDirectory.substr(0, addonDirectory.rfind('/'));
+  if (!CheckpointCreatedDirectory(addonDirectory) || !CheckpointCreatedDirectory(addonDataDirectory))
+    return false;
   CVariant previous;
-  const bool hadPrevious = ReadJson(s.directory + "/engine.json", previous);
-  CVariant engine = Identity(s);
+  bool hadPrevious = false;
+  if (!ReadOptionalJson(s.directory + "/engine.json", previous, hadPrevious))
+    return false;
+  CVariant engine(CVariant::VariantTypeObject);
+  engine["schema"] = 1;
+  engine["pid"] = s.pid;
+  engine["owner"] = s.owner;
   engine["native_api"] = 1;
-  if (hadPrevious && previous["owner"].asString() != s.owner)
+  const auto retired = [&](const CVariant& value, const char* tokenField) {
+    return OwnerIdentity(value, tokenField) &&
+      activity->infinityCheckpointOwnerRetired(static_cast<int>(value["pid"].asInteger()),
+                                               value[tokenField].asString());
+  };
+  const auto current = [&](const CVariant& value, const char* tokenField) {
+    return OwnerIdentity(value, tokenField) && value["pid"].asInteger() == s.pid &&
+      value[tokenField].asString() == s.owner;
+  };
+  if (hadPrevious)
   {
-    const auto oldPid = previous["pid"].asInteger();
-    const std::string oldOwner = previous["owner"].asString();
-    if (oldPid <= 0 || oldPid == s.pid || oldPid > 2147483647 || !Token(oldOwner) ||
-        ::kill(static_cast<pid_t>(oldPid), 0) == 0 || errno != ESRCH)
-      return false; // Never infer previous owner death from a missing receipt alone.
-    engine["previous_owner"]["pid"] = oldPid;
-    engine["previous_owner"]["token"] = oldOwner;
+    if (!previous["schema"].isInteger() || previous["schema"].asInteger() != 1 ||
+        !previous["native_api"].isInteger() || previous["native_api"].asInteger() != 1 ||
+        (!current(previous, "owner") && !retired(previous, "owner")))
+      return false;
+    // Re-entry before all interpreters bind must retain the previous CAS proof.
+    if (current(previous, "owner") && previous.isMember("previous_owner"))
+    {
+      if (!retired(previous["previous_owner"], "token"))
+        return false;
+      engine["previous_owner"] = previous["previous_owner"];
+    }
   }
+  CVariant journal;
+  bool hadJournal = false;
+  if (!ReadOptionalJson(s.directory + "/participant.json", journal, hadJournal))
+    return false;
+  if (hadJournal)
+  {
+    // A process can die after publishing engine.json but before rebinding its
+    // journal. CAS targets the real journal owner, not the most recent engine.
+    const auto& journalOwner = journal["owner"];
+    if (!current(journalOwner, "token"))
+    {
+      if (!retired(journalOwner, "token"))
+        return false;
+      engine["previous_owner"] = journalOwner;
+    }
+  }
+  else if (hadPrevious && !current(previous, "owner"))
+  {
+    engine["previous_owner"]["pid"] = previous["pid"];
+    engine["previous_owner"]["token"] = previous["owner"];
+  }
+  if (!activity->infinityCheckpointOwnsOwner(s.pid, s.owner))
+    return false;
   return WriteJson(s.directory + "/engine.json", engine);
 }
 } // namespace
 
+bool RegisterStartupOwner(const std::string& owner, int pid, const std::string& filesDirectory)
+{
+  if (!Token(owner) || pid != static_cast<int>(::getpid()) || filesDirectory.empty() ||
+      filesDirectory.front() != '/' || filesDirectory.find('\0') != std::string::npos)
+    return false;
+  auto& s = Get();
+  std::lock_guard<std::mutex> lock(s.mutex);
+  if (s.lifecycleTeardown || s.active.load())
+    return false;
+  if (s.ownerRegistered)
+    return s.owner == owner && s.pid == pid && s.filesDirectory == filesDirectory;
+  s.ownerRegistered = true;
+  s.owner = owner;
+  s.pid = pid;
+  s.filesDirectory = filesDirectory;
+  return true;
+}
+bool PublishStartupOwner()
+{
+  auto& s = Get();
+  {
+    std::lock_guard<std::mutex> lock(s.mutex);
+    if (!s.ownerRegistered || s.active.load() || s.lifecycleTeardown || s.ownerPublishing)
+      return false;
+    s.ownerPublishing = true;
+    s.ownerPublished = false;
+    s.startupError.clear();
+    s.directory = CSpecialProtocol::TranslatePath(
+        "special://profile/addon_data/script.infinity.commandcenter/.android-checkpoint");
+  }
+  bool published = false;
+  ++startupWriteDepth;
+  try { published = BeginEngineHandshake(s); }
+  catch (...) { published = false; }
+  --startupWriteDepth;
+  {
+    std::lock_guard<std::mutex> lock(s.mutex);
+    s.ownerPublishing = false;
+    s.ownerPublished = published && !s.lifecycleTeardown && s.startupError.empty();
+    if (!s.ownerPublished && s.startupError.empty())
+      s.startupError = "startup_owner_identity_or_durability_proof_failed";
+    return s.ownerPublished;
+  }
+}
 bool IsActive() { return Get().active.load(); }
 bool IsAcceptedPlaybackWorkOnThisThread() { return acceptedPlaybackDepth != 0; }
 bool IsPersistingOnThisThread()
 {
+  if (startupWriteDepth != 0)
+    return true; // Native identity publication only, before any profile services start.
   if (permissionDepth == 0)
     return false;
   auto& s = Get();
@@ -314,11 +481,12 @@ CheckpointWriteGuard::CheckpointWriteGuard(const char* name)
   auto& s = Get();
   std::lock_guard<std::mutex> lock(s.mutex);
   const std::string owner = name ? name : "unknown";
-  const bool newJob = owner == "jobs" || owner == "playback-command";
+  const bool newCommand = owner == "playback-command" || owner == "pvr-start";
+  const bool newJob = owner == "jobs" || newCommand;
   m_admitted = !s.active.load() ||
     (!newJob && !s.sealed && s.phase != "CHECKPOINT_FAILED") ||
     (owner == "jobs" && acceptedPlaybackDepth != 0 && !s.sealed && s.phase == "QUIESCE") ||
-    (permissionDepth != 0 && s.phase == "PERSISTING");
+    (!newCommand && permissionDepth != 0 && s.phase == "PERSISTING");
   if (m_admitted)
   {
     ++s.activeWrites;
@@ -368,6 +536,9 @@ void RecordPersistenceFailure(const char* owner, const char* detail)
   std::lock_guard<std::mutex> lock(s.mutex);
   if (s.active.load())
     FailLocked(s, owner ? owner : "unknown", detail ? detail : "unspecified_failure");
+  else if (startupWriteDepth != 0)
+    s.startupError = std::string(owner ? owner : "unknown") + ":" +
+                     (detail ? detail : "unspecified_startup_failure");
 }
 uint64_t ErrorGeneration()
 {
@@ -389,10 +560,14 @@ bool Request(const std::string& session, const std::string& owner, int pid)
 {
   if (!Token(session) || !Token(owner) || pid != static_cast<int>(::getpid()))
     return false;
+  const auto* activity = jni::CJNIMainActivity::GetAppInstance();
+  if (!activity || !activity->infinityCheckpointOwnsOwner(pid, owner))
+    return false;
   auto& s = Get();
   {
     std::lock_guard<std::mutex> lock(s.mutex);
-    if (s.lifecycleTeardown)
+    if (s.lifecycleTeardown || !s.ownerRegistered || !s.ownerPublished || s.ownerPublishing ||
+        s.owner != owner || s.pid != pid)
       return false;
     if (s.active.load())
       return Matches(s, session, owner, pid) && s.phase != "CHECKPOINT_FAILED";
@@ -437,6 +612,22 @@ std::string Status(const std::string& session, const std::string& owner, int pid
 bool AuthorizeTermination(const std::string& session, const std::string& owner, int pid)
 {
   auto& s = Get();
+  {
+    std::lock_guard<std::mutex> lock(s.mutex);
+    if (!Matches(s, session, owner, pid))
+      return false;
+  }
+  const auto* activity = jni::CJNIMainActivity::GetAppInstance();
+  if (!activity || !activity->infinityCheckpointOwnsOwner(pid, owner))
+  {
+    RecordFailure("native_admission", "engine_owner_lease_not_held_at_termination");
+    return false;
+  }
+  if (!PvrOwnersAbsent())
+  {
+    RecordFailure("pvr", "pvr_owner_present_at_termination");
+    return false;
+  }
   const auto database = InfinityDatabaseBarrier::GetSnapshot();
   std::lock_guard<std::mutex> lock(s.mutex);
   CheckDeadlineLocked(s);
@@ -477,11 +668,12 @@ void Pump(CApplication& application)
       { RecordFailure("native_admission", "application_not_initialized"); return; }
       CScriptInvocationManager::GetInstance().BeginShutdown(); // Admission only; no Stop/join.
       CServiceBroker::GetJobManager()->UnPauseJobs(); // Drain previously accepted low-priority work.
-      if (!CServiceBroker::GetPVRManager().IsStopped())
-      { RecordFailure("pvr", "active_pvr_owner_has_no_persistence_participant"); return; }
+      if (!PvrOwnersAbsent())
+      { RecordFailure("pvr", "active_or_retained_pvr_owner_has_no_persistence_participant"); return; }
       Complete("pvr", false);
-      if (!BeginEngineHandshake(s))
-      { RecordFailure("command_center", "engine_owner_handshake_write_or_previous_owner_failed"); return; }
+      const auto* activity = jni::CJNIMainActivity::GetAppInstance();
+      if (!activity || !activity->infinityCheckpointOwnsOwner(s.pid, s.owner))
+      { RecordFailure("command_center", "engine_owner_lease_not_held"); return; }
       s.stage = 1;
     }
     if (s.stage == 1)
@@ -495,6 +687,14 @@ void Pump(CApplication& application)
         return;
       if (CScriptInvocationManager::GetInstance().AndroidCheckpointResidentCount() != 1)
       { RecordFailure("command_center", "exactly_one_canonical_resident_required"); return; }
+      Operation("compat");
+      if (CScriptInvocationManager::GetInstance().AndroidCheckpointCompatCount() != 1)
+      { RecordFailure("compat", "exactly_one_hash_verified_compat_resident_required"); return; }
+      CVariant compatActive;
+      if (!ReadJson(s.directory + "/compat-active.json", compatActive) ||
+          !CompatIdentity(compatActive, s, false) || !compatActive["status"].isString() ||
+          compatActive["status"].asString() != "ACTIVE")
+        return;
       {
         std::lock_guard<std::mutex> lock(s.mutex);
         if (s.activeWrites != 0)
@@ -540,6 +740,10 @@ void Pump(CApplication& application)
       if (!ParticipantResponse(s, "PARTICIPANT_COMPLETE"))
         return;
       Complete("command_center", true);
+      Operation("compat");
+      if (!CompatResponse(s))
+        return;
+      Complete("compat", true);
       Operation("python_services");
       if (!s.unresolvedForeignOwners.empty())
       {
@@ -555,6 +759,10 @@ void Pump(CApplication& application)
           CJobQueue::AndroidCheckpointOutstandingQueues() != 0)
         return;
       Complete("background_jobs", false);
+      if (CScriptInvocationManager::GetInstance().AndroidCheckpointResidentCount() != 1 ||
+          CScriptInvocationManager::GetInstance().AndroidCheckpointCompatCount() != 1 ||
+          CScriptInvocationManager::GetInstance().AndroidCheckpointForeignScripts() != 0)
+      { RecordFailure("python_services", "source_contract_changed_or_unproven_writer_admitted"); return; }
       {
         std::lock_guard<std::mutex> lock(s.mutex);
         if (s.activeWrites != 0 || s.phase == "CHECKPOINT_FAILED")
@@ -597,6 +805,10 @@ void Pump(CApplication& application)
       if (!CServiceBroker::GetPeripherals().CheckpointForAndroidExit())
       { RecordFailure("peripherals", "peripheral_settings_save_failed"); return; }
       Complete("peripherals", true);
+      Operation("audio_policy");
+      if (!CheckpointAudioPolicyFile())
+      { RecordFailure("audio_policy", "audio_policy_file_checkpoint_failed"); return; }
+      Complete("audio_policy", true);
       // Save base settings after add-on/skin callbacks, so any accepted setting
       // effects from their serialization are included in the final snapshot.
       Operation("kodi_settings");
@@ -614,7 +826,22 @@ void Pump(CApplication& application)
     }
     if (s.stage == 6)
     {
+      // Checkpoint callbacks can enqueue accepted persistence jobs. Their queue
+      // and destructor lifetimes must drain too; a pre-save empty snapshot is
+      // not evidence that no later accepted work exists.
+      Operation("background_jobs");
+      if (CServiceBroker::GetJobManager()->AndroidCheckpointOutstandingJobs() != 0 ||
+          CJobQueue::AndroidCheckpointOutstandingQueues() != 0)
+        return;
+      Complete("background_jobs", false);
       Operation("native_databases");
+      if (!PvrOwnersAbsent())
+      { RecordFailure("pvr", "pvr_owner_present_before_final_seal"); return; }
+      const auto database = InfinityDatabaseBarrier::GetSnapshot();
+      if (database.failures || database.rejectedWrites || database.unsupportedOwners)
+      { RecordFailure("native_databases", "database_owner_failed_before_final_seal"); return; }
+      if (!database.Ready())
+        return;
       if (!InfinityDatabaseBarrier::Seal(s.generation))
       { RecordFailure("native_databases", "database_barrier_not_durable_or_drained"); return; }
       Complete("native_databases", true);

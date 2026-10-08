@@ -9,6 +9,8 @@ namespace InfinityAndroidCheckpoint
 {
 // Android's default-process guard is the sole shutdown coordinator. This native
 // participant never destroys the Activity, stops Kodi, or terminates a process.
+bool RegisterStartupOwner(const std::string& owner, int pid, const std::string& filesDirectory);
+bool PublishStartupOwner();
 bool Request(const std::string& session, const std::string& owner, int pid);
 std::string Status(const std::string& session, const std::string& owner, int pid);
 bool AuthorizeTermination(const std::string& session, const std::string& owner, int pid);
@@ -27,7 +29,9 @@ std::uint64_t ErrorGeneration();
 bool HasFailureSince(std::uint64_t generation);
 bool CheckpointLoadedAddonSettings();
 bool CheckpointSkinSettings();
+bool CheckpointAudioPolicyFile();
 void MarkAddonSettingsManagerDirty(const void* manager);
+std::string ClassifyScript(const std::string& script, const std::string& addon);
 
 class CheckpointWriteGuard
 {

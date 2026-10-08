@@ -11,7 +11,7 @@ from pathlib import Path
 import shutil
 
 HERE = Path(__file__).resolve().parent
-GROUPS = ("native", "android", "commandcenter")
+GROUPS = ("native", "android", "commandcenter", "embedded-addons")
 
 
 def sha(data):
@@ -88,21 +88,27 @@ def apply(group, source):
     print(f"PASS {group}: reviewed overlay applied; every protected source postimage verified")
 
 
-def materialize_commandcenter(source):
+def materialize(group, source):
+    if group not in ("commandcenter", "embedded-addons"):
+        raise ValueError("Only captured add-on sources can be materialized")
     if source.exists():
-        raise ValueError("Command Center materialization requires a new directory")
-    folder = HERE / "runtime" / "commandcenter"
+        raise ValueError("Add-on materialization requires a new directory")
+    folder = HERE / "runtime" / group
     manifest = json.loads((folder / "manifest.json").read_text())
     for name, digest in manifest["after"].items():
         origin = checked_path(folder / ("overlay" if name in manifest["changed"] else "unchanged"), name)
         if not origin.is_file() or sha(origin.read_bytes()) != digest:
-            raise ValueError("Candidate Command Center input mismatch: " + name)
+            raise ValueError("Candidate add-on input mismatch: " + name)
     for name in manifest["after"]:
         origin = checked_path(folder / ("overlay" if name in manifest["changed"] else "unchanged"), name)
         target = checked_path(source, name)
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(origin, target)
     verify(source, manifest["after"])
+
+
+def materialize_commandcenter(source):
+    materialize("commandcenter", source)
 
 
 def main():
@@ -120,9 +126,9 @@ def main():
     elif args.mode == "apply":
         apply(args.group, args.source)
     elif args.mode == "materialize":
-        if args.group != "commandcenter":
-            parser.error("Only the exact captured Command Center source can be materialized")
-        materialize_commandcenter(args.source)
+        if args.group not in ("commandcenter", "embedded-addons"):
+            parser.error("Only exact captured add-on sources can be materialized")
+        materialize(args.group, args.source)
     else:
         manifest = json.loads((HERE / "runtime" / args.group / "manifest.json").read_text())
         verify(args.source, manifest["after"])
