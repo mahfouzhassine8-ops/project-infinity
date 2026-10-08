@@ -1,0 +1,162 @@
+name: Infinity | 2103332 exact 3327 restoration
+on:
+  workflow_dispatch:
+  push:
+    branches: [restore/infinity-2103332-exact-3327]
+    paths:
+      - 'repairs/stable-rollback-2103332/restore.py'
+      - 'repairs/stable-rollback-2103332/test_restore.py'
+      - 'repairs/stable-rollback-2103332/baseline_tests.py'
+      - '.github/workflows/infinity-2103332-exact-restoration.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103332-exact-restoration, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  baseline-regressions:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-JobManager-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: parent327
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: source327
+      - name: Rerun exact baseline Android tests only; never rebuild native or delivery DEX
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android" baseline-evidence
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          python3 repairs/stable-rollback-2103332/baseline_tests.py 2>&1 | tee baseline-evidence/tests.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103332-Baseline-Tests
+          path: |
+            baseline-evidence/*.json
+            baseline-evidence/*.log
+            baseline-evidence/screenshots/
+            baseline-build/xbmc/build/test-results/testReleaseUnitTest/
+          retention-days: 90
+          if-no-files-found: warn
+  exact-restoration:
+    needs: baseline-regressions
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-JobManager-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: parent327
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37715622384
+          name: Infinity-2103331-Stable-Restore-RC1-APK
+          github-token: ${{ github.token }}
+          path: compare331
+      - name: Recheck previous rollback and test fail-closed restamping
+        run: |
+          set -euo pipefail
+          mkdir -p evidence332
+          export RESTORE_BASE_APK=parent327/Infinity-2103327-JobManager-Close-RC1.apk
+          python3 -m py_compile repairs/stable-rollback-2103332/*.py
+          python3 repairs/stable-rollback-2103332/test_restore.py 2>&1 | tee evidence332/metadata-tests.log
+          python3 repairs/stable-rollback-2103332/restore.py compare331 --base "$RESTORE_BASE_APK" --output compare331/Infinity-2103331-Stable-Restore-RC1.apk --proof evidence332/327-VS-331.json
+          python3 repairs/stable-rollback-2103332/restore.py build-apk --base "$RESTORE_BASE_APK" --output unsigned332.apk --proof evidence332/UNSIGNED-PRESERVATION.json
+      - name: Sign only with the original permanent certificate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for k in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            test -n "${!k:-}" || { echo "Missing permanent signing configuration: $k"; exit 2; }
+          done
+          bash scripts/sign-infinity71.sh unsigned332.apk evidence332/Infinity-2103332-Exact-327-Restore.apk
+      - name: Independently verify signatures, Android identity and every payload byte
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          BASE=parent327/Infinity-2103327-JobManager-Close-RC1.apk
+          OLD=compare331/Infinity-2103331-Stable-Restore-RC1.apk
+          FINAL=evidence332/Infinity-2103332-Exact-327-Restore.apk
+          "$BT/apksigner" verify --verbose --print-certs "$BASE" > evidence332/PARENT-SIGNATURE.txt
+          "$BT/apksigner" verify --verbose --print-certs "$OLD" > evidence332/331-SIGNATURE.txt
+          "$BT/apksigner" verify --verbose --print-certs "$FINAL" > evidence332/CANDIDATE-SIGNATURE.txt
+          for f in evidence332/*-SIGNATURE.txt; do
+            grep -F 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' "$f"
+          done
+          grep -F 'Verified using v2 scheme (APK Signature Scheme v2): true' evidence332/CANDIDATE-SIGNATURE.txt
+          grep -F 'Verified using v3 scheme (APK Signature Scheme v3): true' evidence332/CANDIDATE-SIGNATURE.txt
+          "$BT/zipalign" -c -p 4 "$FINAL"
+          "$BT/aapt" dump badging "$FINAL" > evidence332/BADGING.txt
+          "$BT/aapt" dump xmltree "$BASE" AndroidManifest.xml > evidence332/PARENT-MANIFEST.txt
+          "$BT/aapt" dump xmltree "$FINAL" AndroidManifest.xml > evidence332/CANDIDATE-MANIFEST.txt
+          grep -F "package: name='com.projectinfinity.kodi' versionCode='2103332' versionName='1.0.9-Rollback-2103332-RC1'" evidence332/BADGING.txt
+          python3 repairs/stable-rollback-2103332/restore.py verify-apk --base "$BASE" --output "$FINAL" --proof evidence332/APK-PRESERVATION.json
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('evidence332')
+          strip=lambda t:[x for x in t.splitlines() if 'A: android:versionCode' not in x and 'A: android:versionName' not in x]
+          assert strip((p/'PARENT-MANIFEST.txt').read_text())==strip((p/'CANDIDATE-MANIFEST.txt').read_text())
+          assert 'application-debuggable' not in (p/'BADGING.txt').read_text()
+          r=json.loads((p/'APK-PRESERVATION.json').read_text())
+          summary={k:v for k,v in r.items() if k not in ('before','after','native_libraries')}
+          summary.update(source_commit=os.environ['GITHUB_SHA'],validation_run=os.environ['GITHUB_RUN_ID'],signer_certificate_sha256='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7',install_over_identity_checks_passed=True,physical_install_test_performed=False)
+          (p/'VERIFICATION.json').write_text(json.dumps(summary,indent=2)+'\n')
+          print(json.dumps(summary,indent=2))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103332-Exact-327-Restore-APK
+          path: evidence332/Infinity-2103332-Exact-327-Restore.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103332-Restoration-Evidence
+          path: |
+            evidence332/*.json
+            evidence332/*.txt
+            evidence332/*.log
+            evidence332/*.sha256
+          retention-days: 90
+          if-no-files-found: warn
