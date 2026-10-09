@@ -167,6 +167,8 @@ def main():
                     tests / "NativeTraceBridge335Test.java")
     shutil.copyfile(HERE / "runtime-tests/CheckpointCrashExportTest.java",
                     tests / "CheckpointCrashExportTest.java")
+    shutil.copyfile(HERE / "runtime-tests/CheckpointLifecycleTest.java",
+                    tests / "CheckpointLifecycleTest.java")
     with (args.build / "xbmc/build.gradle").open("a") as output:
         output.write('''
 android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "2g"; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }

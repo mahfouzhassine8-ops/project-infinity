@@ -15,6 +15,26 @@ NEW=OLD|{
  ('Lcom/projectinfinity/kodi/Main;','infinityPersistenceCheckpointStatus','(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;'),
  ('Lcom/projectinfinity/kodi/Main;','infinityAuthorizeCheckpointTermination','(Ljava/lang/String;Ljava/lang/String;I)Z')}
 class PackagingTests(unittest.TestCase):
+ def test_manifest_gate_accepts_only_reviewed_main_task_change(self):
+  old='''E: manifest
+  A: android:versionCode=(type 0x10)0x1
+  E: application
+    E: activity
+      A: android:name="com.projectinfinity.kodi.Main"
+      A: android:process=":kodi"
+      A: android:finishOnTaskLaunch=(type 0x12)0xffffffff
+    E: activity
+      A: android:name="com.projectinfinity.kodi.InfinityLiveActivity"
+      A: android:exported=(type 0x12)0xffffffff
+'''
+  new=old.replace('android:versionCode=(type 0x10)0x1','android:versionCode=(type 0x10)0x2').replace(
+   'android:finishOnTaskLaunch=(type 0x12)0xffffffff','android:finishOnTaskLaunch=(type 0x12)0x0\n      A: android:excludeFromRecents=(type 0x12)0x0\n      A: android:taskAffinity="com.projectinfinity.kodi.infinity.kodi"')
+  p.verify_checkpoint_manifest(old,new)
+  for wrong in [new.replace('android:excludeFromRecents=(type 0x12)0x0','android:excludeFromRecents=(type 0x12)0xffffffff'),
+                new.replace('com.projectinfinity.kodi.infinity.kodi','com.projectinfinity.kodi'),
+                new.replace('android:exported=(type 0x12)0xffffffff','android:exported=(type 0x12)0x0'),
+                new.replace('android:process=":kodi"','android:process=":other"')]:
+   with self.assertRaises(RuntimeError):p.verify_checkpoint_manifest(old,wrong)
  def test_reviewed_nested_class_removal_does_not_allow_protected_class_removal(self):
   owner='Lcom/projectinfinity/kodi/InfinityKodiShutdown'
   self.assertEqual(p.verify_class_coverage({owner+';',owner+'$OldWorker;'}, {owner+';'}), [owner+'$OldWorker;'])

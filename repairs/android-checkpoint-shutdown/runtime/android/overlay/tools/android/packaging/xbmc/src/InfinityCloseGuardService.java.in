@@ -124,13 +124,17 @@ public final class InfinityCloseGuardService extends Service {
       transition("QUIESCE","");
       binding=bindService(new Intent(this,InfinityCloseNativeLease.class),connection,BIND_FLAGS);
       if(!binding){fail("existing_engine_endpoint_not_bound");return START_NOT_STICKY;}
-      // Shell stays responsive while the native checkpoint runs; do not finish NativeActivity.
-      startActivity(new Intent(this,Splash.class).putExtra("infinity_checkpoint_chooser",true)
-          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));
+      // Close Infinity leaves the app. The foreground coordinator keeps saving;
+      // never finish NativeActivity or open the chooser as a side effect of Close.
+      startActivity(homeIntent());
       ui.post(poll);ui.postDelayed(this::deadline,Math.max(0,InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS-(SystemClock.elapsedRealtime()-session.started)));
       ui.postDelayed(()->{if(!ended){error="termination_confirmation_unavailable";evidence("guard_lifetime_expired",phase,error);end();}},MAX_PROTECTION_MS);
     }catch(RuntimeException denied){fail("coordinator_start_"+denied.getClass().getSimpleName());}
     return START_NOT_STICKY;
+  }
+  static Intent homeIntent(){
+    return new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
   }
   private Notification notice(String message){
     Intent open=new Intent(this,Splash.class).putExtra("infinity_checkpoint_chooser",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);

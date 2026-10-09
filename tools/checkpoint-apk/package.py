@@ -6,11 +6,34 @@ ROOT = Path(__file__).resolve().parents[2]
 RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
-from packaging_checks import DEX, SIGNATURE, dex_contract, require, resource_ids, run, sha, verify_manifest_pair
-VERSION = 2103345
-RELEASE = '1.0.9-Checkpoint-Raw-IO-Settings-Fix-RC1'
+from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
+VERSION = 2103346
+RELEASE = '1.0.9-Checkpoint-Lifecycle-Recovery-RC1'
+FILE_LABEL = 'Checkpoint-Lifecycle-Recovery-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
+
+def verify_checkpoint_manifest(original, compiled):
+    old, new = manifest_tree(original), manifest_tree(compiled)
+    def main(tree):
+        app = next(node for node in tree['children'] if node['tag']=='application')
+        found = [node for node in app['children'] if node['tag']=='activity' and
+                 node['attrs'].get('android:name','').split(' (Raw:')[0] in
+                 ('"com.projectinfinity.kodi.Main"','".Main"')]
+        require(len(found)==1, 'Expected exactly one Kodi Main activity')
+        return found[0]['attrs']
+    before, after = main(old), main(new)
+    require(before.get('android:finishOnTaskLaunch')=='(type 0x12)0xffffffff' and
+            'android:excludeFromRecents' not in before and 'android:taskAffinity' not in before,
+            'Unexpected preservation Main task preimage')
+    require(after.pop('android:finishOnTaskLaunch',None)=='(type 0x12)0x0' and
+            after.pop('android:excludeFromRecents',None)=='(type 0x12)0x0' and
+            after.pop('android:taskAffinity','').split(' (Raw:')[0]=='"com.projectinfinity.kodi.infinity.kodi"',
+            'Kodi task must remain visible and survive Recents restoration')
+    before.pop('android:finishOnTaskLaunch')
+    for tree in (old,new):
+        for key in ('android:versionCode','android:versionName'):tree['attrs'].pop(key,None)
+    require(old==new, 'Manifest drift outside reviewed Kodi task attributes and candidate identity')
 
 def verify_class_coverage(old_classes, new_classes):
     # The reviewed source rewrite may remove old anonymous/nested classes.
@@ -99,10 +122,10 @@ def finish(args):
     require(resource_ids(bt/'aapt2',args.base,args.out/'base-resources.txt') == resource_ids(bt/'aapt2',donor,args.out/'donor-resources.txt'), 'Resource ID drift')
     unsigned=args.out/'checkpoint-unsigned.apk'
     merge(args.base, donor, native, unsigned, replacements)
-    verify_manifest_pair(run(bt/'aapt','dump','xmltree',args.base,'AndroidManifest.xml',output=args.out/'base-manifest.txt'), run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'manifest.txt'))
+    verify_checkpoint_manifest(run(bt/'aapt','dump','xmltree',args.base,'AndroidManifest.xml',output=args.out/'base-manifest.txt'), run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'manifest.txt'))
     for key in ('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS'):
         require(bool(os.environ.get(key)), 'Missing permanent signer: '+key)
-    final=args.out/f'Infinity-{VERSION}-Checkpoint-Raw-IO-Settings-Fix-RC1.apk'
+    final=args.out/f'Infinity-{VERSION}-{FILE_LABEL}.apk'
     run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
     for label,path in [('base',args.base),('final',final)]:
         certificate=run(bt/'apksigner','verify','--verbose','--print-certs',path,output=args.out/(label+'-signer.txt'))
@@ -127,7 +150,7 @@ def finish(args):
         'native_unstripped_sha256':proof['native_sha256'],'native_packaged_sha256':sha(native.read_bytes()),
         'parent_apk_sha256':parent['parent_apk_sha256'],'protected_entries':len(kept),
         'signer_certificate_sha256':parent['signer_certificate_sha256'],
-        'native_recompiled':True,'device_accepted':False,'locked':False,
+        'native_recompiled':GREEN_SHA==os.environ['GITHUB_SHA'],'device_accepted':False,'locked':False,
         'installed_owner_audit_complete':False,'unknown_writers_block_normal_close':True,
         'purpose':'Fold test candidate; unresolved saves must block termination'
     },indent=2)+'\n')

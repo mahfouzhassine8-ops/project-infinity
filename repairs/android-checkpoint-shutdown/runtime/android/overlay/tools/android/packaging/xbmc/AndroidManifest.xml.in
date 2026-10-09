@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?><!-- BEGIN_INCLUDE(manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:installLocation="auto"
+    android:versionCode="@APP_VERSION_CODE_ANDROID@"
+    android:versionName="@APP_VERSION@">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen.multitouch"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.type.television"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
+    <application
+        android:appCategory="video"
+        android:banner="@drawable/banner"
+        android:hasCode="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:logo="@drawable/banner"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".Splash"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation|touchscreen|screenLayout|screenSize|smallestScreenSize|density|uiMode|colorMode"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:exported="true"
+            android:screenOrientation="unspecified"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="video/*" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="image/*" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="ftp" />
+                <data android:scheme="ftps" />
+                <data android:scheme="rtp" />
+                <data android:scheme="rtsp" />
+                <data android:scheme="mms" />
+                <data android:scheme="dav" />
+                <data android:scheme="davs" />
+                <data android:scheme="ssh" />
+                <data android:scheme="sftp" />
+                <data android:scheme="smb" />
+            </intent-filter>
+        </activity>
+
+        <!--
+             Our activity is the built-in NativeActivity framework class.
+             This will take care of integrating with our NDK code.
+        -->
+        <activity
+            android:name=".Main" android:process=":kodi"
+            android:taskAffinity="@APP_PACKAGE@.infinity.kodi"
+            android:excludeFromRecents="false"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation|touchscreen|screenLayout|screenSize|smallestScreenSize|density|uiMode|colorMode"
+            android:finishOnTaskLaunch="false"
+            android:launchMode="singleInstance"
+            android:exported="true"
+            android:screenOrientation="unspecified"
+            android:theme="@style/AppTheme">
+
+            <!-- Infinity player-only rotation control. These actions are handled
+                 inside the existing singleInstance Main activity. -->
+            <intent-filter>
+                <action android:name="@APP_PACKAGE@.action.PLAYER_ROTATION_FOLLOW_DEVICE" />
+                <action android:name="@APP_PACKAGE@.action.PLAYER_ROTATION_UNLOCKED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Tell NativeActivity the name of or .so -->
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="@APP_NAME_LC@" />
+        </activity>
+
+        <activity android:name=".InfinityKodiEntryActivity" android:process=":kodi"
+            android:exported="false" android:launchMode="singleTask" android:excludeFromRecents="true"
+            android:theme="@style/AppTheme" />
+
+        <!-- Infinity Live is a second, isolated Android environment inside
+             the same Infinity package. It owns Live-TV playback and can be
+             launched directly without making Kodi the Live player. -->
+        <meta-data android:name="android.supports_size_changes" android:value="true" />
+
+        <activity
+            android:name=".InfinityLiveActivity"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation|touchscreen|screenLayout|screenSize|smallestScreenSize|colorMode|density|fontScale|layoutDirection|locale|uiMode"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="unspecified"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="@APP_PACKAGE@.action.OPEN_LIVE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".InfinityBackgroundControlActivity" android:process=":kodi"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="com.projectinfinity.kodi.action.BACKGROUND_MODE_NORMAL" />
+                <action android:name="com.projectinfinity.kodi.action.BACKGROUND_MODE_EXTENDED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".InfinityPowerControlActivity" android:process=":kodi"
+            android:exported="false" android:excludeFromRecents="true"
+            android:noHistory="true" android:theme="@android:style/Theme.NoDisplay" />
+        <service android:name=".InfinityCloseGuardService"
+            android:exported="false" android:stopWithTask="false"
+            android:foregroundServiceType="shortService" />
+        <service android:name=".InfinityCloseNativeLease" android:process=":kodi"
+            android:exported="false" android:stopWithTask="false" />
+        <service android:name=".InfinityExtendedBackgroundService" android:process=":kodi"
+            android:exported="false" android:stopWithTask="false"
+            android:foregroundServiceType="specialUse|mediaPlayback">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-enabled Infinity media session continuity with visible stop control; ends on explicit task removal." />
+        </service>
+        <service
+            android:name=".InfinityCobraRecordingService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <receiver android:name=".InfinityCobraReminderReceiver" android:exported="false" />
+        <service android:name=".CobraSportsReminderJob" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="false" />
+        <receiver android:name=".InfinityCobraBootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".XBMCBroadcastReceiver" android:process=":kodi"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DREAMING_STOPPED" />
+                <action android:name="android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name=".content.XBMCMediaContentProvider" android:process=":kodi"
+            android:authorities="@APP_PACKAGE@.media"
+            android:exported="true" />
+
+        <provider
+            android:name=".content.XBMCFileContentProvider" android:process=":kodi"
+            android:authorities="@APP_PACKAGE@.file"
+            android:exported="true" />
+        <provider
+            android:name=".content.XBMCYTDLContentProvider" android:process=":kodi"
+            android:authorities="@APP_PACKAGE@.ytdl"
+            android:exported="true" />
+
+        <activity android:name=".XBMCSearchableActivity" android:process=":kodi" 
+                  android:exported="true">
+             <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+       <service
+           android:name=".channels.SyncChannelJobService" android:process=":kodi"
+           android:exported="false"
+           android:permission="android.permission.BIND_JOB_SERVICE" />
+
+       <service
+           android:name=".channels.SyncProgramsJobService" android:process=":kodi"
+           android:exported="false"
+           android:permission="android.permission.BIND_JOB_SERVICE" />
+
+    </application>
+
+    <queries>
+      <intent>
+        <action android:name="android.speech.RecognitionService" />
+      </intent>
+      <intent>
+        <action android:name="android.intent.action.MAIN" />
+      </intent>
+    </queries>
+
+</manifest><!-- END_INCLUDE(manifest) -->

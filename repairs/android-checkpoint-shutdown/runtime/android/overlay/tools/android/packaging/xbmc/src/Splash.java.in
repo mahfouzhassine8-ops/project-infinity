@@ -424,7 +424,7 @@ public class Splash extends Activity
           ((request!=null && request.getAction()!=null && !Intent.ACTION_MAIN.equals(request.getAction())) ||
           "infinity".equals(getSharedPreferences(INFINITY_EXPERIENCE_PREFS,MODE_PRIVATE)
               .getString(INFINITY_EXPERIENCE_DEFAULT,"")));
-      mInfinityStartupTrace.event(wantsInfinity?"handoff.waitClosingOwner":"chooser.pendingKodiOwner");
+      mInfinityStartupTrace.event(wantsInfinity?infinityBlockedCloseEvent():"chooser.pendingKodiOwner");
       if(wantsInfinity)showInfinityClosingRecovery();
       showInfinityExperienceChooser(); return;
     }
@@ -1284,13 +1284,20 @@ public class Splash extends Activity
   private void showInfinityClosingRecovery(){
     InfinityKodiShutdown.Snapshot owner=InfinityKodiShutdown.state();
     if(!owner.stalled())return;
-    cobraRecoveryDialog().setTitle("Infinity is still closing")
-        .setMessage("Required saves could not yet be confirmed. You can keep waiting, or explicitly Force Close this instance and reopen Infinity. Force Close may interrupt unfinished saves.")
-        .setPositiveButton("Close stalled instance",(dialog,which)->{
-          InfinityKodiShutdown.Snapshot current=InfinityKodiShutdown.state();
-          if(current.pid==owner.pid&&current.owner.equals(owner.owner)&&current.stalled())
-            startActivity(InfinityKodiShutdown.force(this,current));
-        }).setNegativeButton("Keep waiting",null).show();
+    android.content.DialogInterface.OnClickListener force=(dialog,which)->{
+      InfinityKodiShutdown.Snapshot current=InfinityKodiShutdown.state();
+      if(current.pid==owner.pid&&current.owner.equals(owner.owner)&&current.stalled())
+        startActivity(InfinityKodiShutdown.force(this,current));
+    };
+    InfinityGlassRecovery.Builder recovery=cobraRecoveryDialog().setTitle(owner.closeTitle()).setMessage(owner.closeMessage());
+    if(owner.checkpointFailed())
+      recovery.setPositiveButton("Health Center",(dialog,which)->showInfinityHealthCenter()).setNegativeButton("Force Close",force);
+    else recovery.setPositiveButton("Force Close",force).setNegativeButton("Keep waiting",null);
+    recovery.show();
+  }
+
+  private String infinityBlockedCloseEvent(){
+    return InfinityKodiShutdown.state().checkpointFailed()?"handoff.checkpointFailed.recoveryAvailable":"handoff.waitClosingOwner";
   }
 
   private void showCobraRecovery(){
@@ -1803,10 +1810,10 @@ public class Splash extends Activity
   {
     if (isFinishing() || isDestroyed() || (!"live".equals(experience) && mInfinityLaunchQueued)) return;
     if (!"live".equals(experience) && InfinityKodiShutdown.pending()) {
-      mInfinityStartupTrace.event("handoff.waitClosingOwner");
+      mInfinityStartupTrace.event(infinityBlockedCloseEvent());
       showInfinityClosingRecovery();
       showInfinityExperienceChooser();
-      android.widget.Toast.makeText(this,"Infinity is finishing its normal close. Saved data is not being reset.",android.widget.Toast.LENGTH_LONG).show();
+      android.widget.Toast.makeText(this,InfinityKodiShutdown.state().closeNotice(),android.widget.Toast.LENGTH_LONG).show();
       return;
     }
     Intent intent = getIntent()==null?new Intent():new Intent(getIntent());
@@ -1846,7 +1853,7 @@ public class Splash extends Activity
     mInfinityLaunchQueued = mInfinityHandoff.enqueue(() -> {
       // Revalidate at dispatch: an Exit can finish the former owner after enqueue.
       if (InfinityKodiShutdown.pending()) {
-        mInfinityStartupTrace.event("handoff.waitClosingOwner");
+        mInfinityStartupTrace.event(infinityBlockedCloseEvent());
       showInfinityClosingRecovery();
         mInfinityLaunchQueued = false;
         mInfinityHandoff.close();

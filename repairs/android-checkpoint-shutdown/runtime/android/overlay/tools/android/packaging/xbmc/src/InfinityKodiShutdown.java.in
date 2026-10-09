@@ -61,6 +61,14 @@ final class InfinityKodiShutdown {
     }
     static Snapshot empty(){return new Snapshot(0,"","","",0,0,InfinityExitCompletion.Plan.Phase.RUNNING,false,false,false);}
     boolean pending(){return alive && phase!=InfinityExitCompletion.Plan.Phase.RUNNING && phase!=InfinityExitCompletion.Plan.Phase.COMPLETE;}
+    boolean checkpointFailed(){return phase==InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;}
+    String closeTitle(){return checkpointFailed()?"Infinity save checkpoint failed":"Infinity is still closing";}
+    String closeMessage(){return checkpointFailed()?
+        "The save check failed. Waiting will not complete this checkpoint. Open Health Center for the details, or explicitly Force Close this instance. Force Close may interrupt unfinished saves.":
+        "Required saves have not yet been confirmed. You can keep waiting, open Health Center, or explicitly Force Close this instance. Force Close may interrupt unfinished saves.";}
+    String closeNotice(){return checkpointFailed()?
+        "Infinity's save check failed. Open Health Center or use Force Close to recover.":
+        "Infinity is finishing its normal close. Saved data is not being reset.";}
     boolean stalled(){
       if(!pending())return false;
       if(phase==InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED)return true;
