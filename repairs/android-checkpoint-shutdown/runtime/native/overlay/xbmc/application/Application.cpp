@@ -2886,11 +2886,17 @@ void CApplication::StopPlaying()
 
   if (gui)
   {
-    int iWin = gui->GetWindowManager().GetActiveWindow();
     const auto appPlayer = GetComponent<CApplicationPlayer>();
     if (appPlayer->IsPlaying())
     {
-      appPlayer->ClosePlayer();
+      {
+        // Let script threads enter the GUI while the player closes.
+        CSingleExit exitGfx(CServiceBroker::GetWinSystem()->GetGfxContext());
+        CSingleExit exitFrameMove(m_frameMoveGuard);
+        appPlayer->ClosePlayer();
+      }
+
+      const int iWin = gui->GetWindowManager().GetActiveWindow();
 
       // turn off visualisation window when stopping
       if ((iWin == WINDOW_VISUALISATION ||

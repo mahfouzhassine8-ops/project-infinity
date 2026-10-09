@@ -5389,7 +5389,7 @@
     "xbmc/application/AppParamParser.h": "6101f83c3244a72193f3ea0a2297440e7b95371a443f8fa2925fbe2fbe3d047c",
     "xbmc/application/AppParams.cpp": "b511a34d00a75f75959ce576e127ff5901e80bc2c8b3ae5406029602f40d73be",
     "xbmc/application/AppParams.h": "9cca0c9540ae4d967adbc9a76b90629f81181e80a281350274473b578b1f9ecf",
-    "xbmc/application/Application.cpp": "dce1c7d253272bd013c02be9af4fd37abd0513b360108901644ccebc5741734b",
+    "xbmc/application/Application.cpp": "3f064f1a6dd941d78c1a58383b29fce8c0c553ed5cb030e319c9955c4ae4be06",
     "xbmc/application/Application.h": "49dc82eddbb68cf7df44ca154fb83f00dcb6f7b2995f0581e9955c61e605320e",
     "xbmc/application/ApplicationActionListeners.cpp": "ba39641ad5e50f975a96df4fda9108b4ecda88c11d768a36d28850ad84fb1b7f",
     "xbmc/application/ApplicationActionListeners.h": "daf0f8d10b52df2496548583c4e0a9941d83646287756f2d30a9af0b99741d93",
@@ -7215,6 +7215,7 @@
     "xbmc/interfaces/generic/ILanguageInvocationHandler.h": "95e24980564b879e5abf22451ef4c0832920feaf74ace33544d0168f42b824d6",
     "xbmc/interfaces/generic/ILanguageInvoker.cpp": "4cc680d87d77f3f368e5435243dce6e4868a3ddb1c4cb79d330105aea816e03a",
     "xbmc/interfaces/generic/ILanguageInvoker.h": "6f50ac247c20fd8c425d724d8984366ddffbcaa27c129145378db911e4d91fb8",
+    "xbmc/interfaces/generic/InfinityInvokerTarget.h": "d9297b351baf1865f98bf207fe0d4a8ee03e0721468715e316a3fbea201b720e",
     "xbmc/interfaces/generic/LanguageInvokerThread.cpp": "2e3c93f629fc4e5dab61e5dbf7e8fad366bcb909256af4b3462f40280e9f7a33",
     "xbmc/interfaces/generic/LanguageInvokerThread.h": "86810da8d7efc15014ab26c7bb900f0b25a4b214c754ab04985f2bb14753bcb8",
     "xbmc/interfaces/generic/RunningScriptObserver.cpp": "ee7dfe808fca13b809c04f29faf744717b224a637546e3da57dd01245169b102",
@@ -7777,7 +7778,7 @@
     "xbmc/platform/android/activity/InfinityResponsiveness.h": "8217aa4d5a95d4bbfdf26d06280875626762bc1c846b5f4969cef5caaacadba8",
     "xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp": "bb9ef6eb15538ba9e1da090ed71a17b153b529f0fdf4b97b62fa815554aeb159",
     "xbmc/platform/android/activity/InfinityScriptPersistence.h": "6c71ba7bd4ba05f6586a9d4ea13c63386cf3d6c651eb97f0fbd08b7e4280c043",
-    "xbmc/platform/android/activity/InfinityShutdownTrace.h": "1b003945c29eef38a960d749e147ff1b0d696e7cddf9862396ea013eeb49bdf0",
+    "xbmc/platform/android/activity/InfinityShutdownTrace.h": "e1426cecbb4a9cd007bbfb71c8636130ec9f1d548d780fea79921b09e0cae02c",
     "xbmc/platform/android/activity/JNIMainActivity.cpp": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f",
     "xbmc/platform/android/activity/JNIMainActivity.h": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853",
     "xbmc/platform/android/activity/JNIXBMCAudioManagerOnAudioFocusChangeListener.cpp": "df658efb6d2c07660af5c87f45ada5a1f5551c2c9fe802e53820400b1e6850ed",
@@ -9400,8 +9401,7 @@
     "xbmc/windows/GUIWindowStartup.cpp": "86c87a792e432b91b78fd0c2686f496c99561caa8bc22e6650d6d86a21016df3",
     "xbmc/windows/GUIWindowStartup.h": "0f32dc630ead09fb66f1a2f16f4a5127e5170240f46272f9825671d48f4c72f6",
     "xbmc/windows/GUIWindowSystemInfo.cpp": "75f0e19d4db571ba0cb4df1fd36ed1ec6ffa07dff6eabb05e383bda63e866464",
-    "xbmc/windows/GUIWindowSystemInfo.h": "7bf009e9872c046e3b4269aaf4e47f062a55155bf2c194a88d60f2f980a1b284",
-    "xbmc/interfaces/generic/InfinityInvokerTarget.h": "d9297b351baf1865f98bf207fe0d4a8ee03e0721468715e316a3fbea201b720e"
+    "xbmc/windows/GUIWindowSystemInfo.h": "7bf009e9872c046e3b4269aaf4e47f062a55155bf2c194a88d60f2f980a1b284"
   },
   "before": {
     ".clang-format": "febb4d71bd8e1d905c8980706c46fc368eb12fa2be432ee8995595da2aba2f38",

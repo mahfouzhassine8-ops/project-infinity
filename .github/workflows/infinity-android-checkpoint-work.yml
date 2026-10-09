@@ -61,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103338-Android-Donor-Internal
+          name: Infinity-2103340-Android-Donor-Internal
           path: checkpoint-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
           retention-days: 90
           if-no-files-found: error
@@ -189,7 +189,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           run-id: ${{ github.run_id }}
-          name: Infinity-2103338-Android-Donor-Internal
+          name: Infinity-2103340-Android-Donor-Internal
           github-token: ${{ github.token }}
           path: shell/xbmc/build/outputs/apk/release
       - uses: actions/download-artifact@v8
@@ -220,15 +220,15 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103338-Checkpoint-Diagnostic-Save-RC1-APK
-          path: evidence/Infinity-2103338-Checkpoint-Diagnostic-Save-RC1.apk
+          name: Infinity-2103340-Checkpoint-Combined-Diagnostic-RC1-APK
+          path: evidence/Infinity-2103340-Checkpoint-Combined-Diagnostic-RC1.apk
           compression-level: 0
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-2103338-Checkpoint-Test-Evidence
+          name: Infinity-2103340-Checkpoint-Test-Evidence
           path: |
             evidence/
             !evidence/*.apk
