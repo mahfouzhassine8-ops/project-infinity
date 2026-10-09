@@ -59,6 +59,13 @@ struct Owner
   int64_t elapsed{0};
   int64_t started{0};
 };
+struct Blocker
+{
+  std::string owner;
+  std::string detail;
+  unsigned count{1};
+  bool fatal{false};
+};
 struct State
 {
   std::mutex mutex;
@@ -80,6 +87,9 @@ struct State
   size_t activeWrites{0};
   std::string phase{"IDLE"};
   std::string error;
+  std::vector<Blocker> blockers;
+  bool blockerOverflow{false};
+  bool inventoryComplete{false};
   std::string blocking{"native_admission"};
   std::string pendingDetail;
   int64_t safeUtcMs{0};
@@ -118,22 +128,56 @@ int64_t Elapsed(const State& s)
 {
   return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - s.started).count();
 }
-void FailLocked(State& s, const std::string& owner, const std::string& detail)
+void BlockLocked(State& s, const std::string& ownerName, const std::string& detail, bool fatal=false)
 {
   ++s.errors;
-  s.phase = "CHECKPOINT_FAILED";
-  s.sealed = true;
-  s.error = (owner + ": " + detail).substr(0, 512);
-  s.owners[owner].error = detail.substr(0, 384);
-  s.owners[owner].complete = false;
+  const auto safeOwner=ownerName.substr(0,128),safeDetail=detail.substr(0,384);
+  bool found=false;
+  for(auto& blocker:s.blockers)
+    if(blocker.owner==safeOwner && blocker.detail==safeDetail && blocker.fatal==fatal) {
+      if(blocker.count<UINT_MAX)++blocker.count;
+      found=true;break;
+    }
+  if(!found) {
+    if(s.blockers.size()<128)s.blockers.push_back({safeOwner,safeDetail,1,fatal});
+    else s.blockerOverflow=true;
+  }
+  if(s.error.empty())s.error=(safeOwner+": "+safeDetail).substr(0,512);
+  auto& owner=s.owners[safeOwner];
+  if(owner.error.empty())owner.error=safeDetail;
+  owner.complete=false;owner.dirty=true;
+  s.safeStatus.clear();
+  if(fatal) {
+    s.phase="CHECKPOINT_FAILED";
+    s.sealed=true;
+    s.inventoryComplete=true;
+  }
+}
+void FailLocked(State& s, const std::string& owner, const std::string& detail)
+{
+  BlockLocked(s,owner,detail,true);
+}
+void FinalizeInventoryFailureLocked(State& s)
+{
+  s.phase="CHECKPOINT_FAILED";
+  s.sealed=true;
+  s.inventoryComplete=true;
   s.safeStatus.clear();
 }
 void CheckDeadlineLocked(State& s)
 {
-  if (s.active.load() && s.phase != "CHECKPOINT_FAILED" && s.phase != "ENGINE_TERMINATING" &&
-      Clock::now() >= s.expires)
-    FailLocked(s, s.blocking.empty() ? "native_admission" : s.blocking,
-               "checkpoint_deadline_exceeded; owner proof incomplete");
+  if (!s.active.load() || s.phase=="CHECKPOINT_FAILED" || s.phase=="ENGINE_TERMINATING" ||
+      s.phase=="SAFE_TO_TERMINATE" || Clock::now()<s.expires)
+    return;
+  for(const char* name:REQUIRED) {
+    auto& owner=s.owners[name];
+    if(!owner.complete && owner.error.empty())
+      BlockLocked(s,name,"checkpoint_deadline_exceeded; owner proof incomplete");
+  }
+  const auto scripts=InfinityScriptPersistence::Snapshot();
+  for(const auto& name:scripts.pending)
+    BlockLocked(s,"python_services","pending_writer:"+name);
+  FinalizeInventoryFailureLocked(s);
 }
 void Operation(const char* owner)
 {
@@ -151,6 +195,7 @@ void Complete(const char* name, bool committed)
   if (s.phase == "CHECKPOINT_FAILED")
     return;
   auto& owner = s.owners[name];
+  if(!owner.error.empty())return;
   owner.complete = true;
   owner.dirty = false;
   owner.committed = committed;
@@ -167,7 +212,17 @@ std::string EncodeStatusLocked(const State& s)
   result["generation"] = s.generation;
   result["phase"] = s.phase;
   result["admission_sealed"] = s.sealed;
+  result["inventory_complete"] = s.inventoryComplete;
   result["error"] = s.error;
+  result["blocker_count"] = static_cast<uint64_t>(s.blockers.size());
+  result["blocker_overflow"] = s.blockerOverflow;
+  result["blockers"] = CVariant(CVariant::VariantTypeArray);
+  for(const auto& blocker:s.blockers) {
+    CVariant item(CVariant::VariantTypeObject);
+    item["owner"]=blocker.owner;item["detail"]=blocker.detail;
+    item["count"]=static_cast<uint64_t>(blocker.count);item["fatal"]=blocker.fatal;
+    result["blockers"].push_back(item);
+  }
   result["blocking_operation"] = s.blocking;
   result["pending_detail"] = s.pendingDetail;
   result["safe_to_terminate_utc_ms"] = s.safeUtcMs;
@@ -178,6 +233,7 @@ std::string EncodeStatusLocked(const State& s)
   scriptEvidence["active_writers"] = static_cast<uint64_t>(scripts.active);
   scriptEvidence["observed_writers"] = static_cast<uint64_t>(scripts.observed);
   scriptEvidence["retired_writers"] = static_cast<uint64_t>(scripts.retired);
+  scriptEvidence["failed_settled_writers"] = static_cast<uint64_t>(scripts.failedSettled);
   scriptEvidence["tracked_paths"] = static_cast<uint64_t>(scripts.paths);
   scriptEvidence["sync_started"] = scripts.syncStarted;
   scriptEvidence["sync_finished"] = scripts.syncFinished;
@@ -186,6 +242,15 @@ std::string EncodeStatusLocked(const State& s)
   scriptEvidence["failure_writer_id"] = scripts.failureWriterId;
   scriptEvidence["failure_writer"] = scripts.failureWriter;
   scriptEvidence["failure_detail"] = scripts.failureDetail;
+  scriptEvidence["blocker_overflow"] = scripts.blockerOverflow;
+  scriptEvidence["blockers"] = CVariant(CVariant::VariantTypeArray);
+  for(const auto& blocker:scripts.blockers) {
+    CVariant value(CVariant::VariantTypeObject);
+    value["writer_id"]=blocker.writerId;value["writer"]=blocker.writer;
+    value["reason"]=blocker.reason;value["detail"]=blocker.detail;
+    value["count"]=static_cast<uint64_t>(blocker.count);
+    scriptEvidence["blockers"].push_back(value);
+  }
   scriptEvidence["pending_writers"] = CVariant(CVariant::VariantTypeArray);
   for (const auto& name : scripts.pending)
     scriptEvidence["pending_writers"].push_back(name);
@@ -302,7 +367,7 @@ bool ParticipantResponse(State& s, const char* expected)
     for (auto it = operations.begin_array(); it != operations.end_array(); ++it)
       if ((*it)["ok"].isBoolean() && !(*it)["ok"].asBoolean())
         detail += ";" + (*it)["name"].asString().substr(0, 80);
-    RecordFailure("command_center", detail.substr(0, 384).c_str());
+    {std::lock_guard<std::mutex> lock(s.mutex);FailLocked(s,"command_center",detail.substr(0,384));}
     return false;
   }
   return response["participant"].isString() && response["participant"].asString() == "command-center-json" &&
@@ -326,7 +391,7 @@ bool CompatResponse(State& s)
   if (response["status"].isString() && response["status"].asString() == "CHECKPOINT_FAILED")
   {
     const auto detail = std::string("compat_participant_failed:") + response["error"].asString();
-    RecordFailure("compat", detail.substr(0, 384).c_str());
+    {std::lock_guard<std::mutex> lock(s.mutex);FailLocked(s,"compat",detail.substr(0,384));}
     return false;
   }
   if (!response["status"].isString() || response["status"].asString() != "PARTICIPANT_COMPLETE" ||
@@ -610,11 +675,16 @@ void RecordPersistenceFailure(const char* owner, const char* detail)
   {
     if (jobFailure)
       s.jobs = jobs;
-    FailLocked(s, owner ? owner : "unknown", detail ? detail : "unspecified_failure");
+    BlockLocked(s, owner ? owner : "unknown", detail ? detail : "unspecified_failure");
   }
   else if (startupWriteDepth != 0)
     s.startupError = std::string(owner ? owner : "unknown") + ":" +
                      (detail ? detail : "unspecified_startup_failure");
+}
+void RecordFatalFailure(const char* owner,const char* detail)
+{
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  if(s.active.load())FailLocked(s,owner?owner:"unknown",detail?detail:"unspecified_failure");
 }
 uint64_t ErrorGeneration()
 {
@@ -655,6 +725,9 @@ bool Request(const std::string& session, const std::string& owner, int pid)
     s.expires = s.started + DEADLINE;
     s.phase = "QUIESCE";
     s.stage = 0;
+    s.sealed=false;s.authorized=false;s.inventoryComplete=false;
+    s.error.clear();s.errors=0;s.blockers.clear();s.blockerOverflow=false;
+    s.safeStatus.clear();s.blocking="native_admission";s.pendingDetail.clear();
     for (const char* name : REQUIRED)
     {
       auto& participant = s.owners[name];
@@ -720,28 +793,17 @@ bool AuthorizeTermination(const std::string& session, const std::string& owner, 
   }
   const auto* activity = jni::CJNIMainActivity::GetAppInstance();
   if (!activity || !activity->infinityCheckpointOwnsOwner(pid, owner))
-  {
-    RecordFailure("native_admission", "engine_owner_lease_not_held_at_termination");
     return false;
-  }
   if (!PvrOwnersAbsent())
-  {
-    RecordFailure("pvr", "pvr_owner_present_at_termination");
     return false;
-  }
   const auto scripts = InfinityScriptPersistence::Snapshot();
-  if (!scripts.failure.empty())
-  {
-    RecordFailure("python_services", scripts.failure.c_str());
-    return false;
-  }
-  if (!scripts.durable || scripts.active != 0)
+  if (!scripts.failure.empty() || !scripts.blockers.empty() || !scripts.durable || scripts.active != 0)
     return false;
   const auto database = InfinityDatabaseBarrier::GetSnapshot();
   std::lock_guard<std::mutex> lock(s.mutex);
   CheckDeadlineLocked(s);
   if (!Matches(s, session, owner, pid) || s.lifecycleTeardown ||
-      s.phase != "SAFE_TO_TERMINATE" || !s.sealed ||
+      s.phase != "SAFE_TO_TERMINATE" || !s.sealed || !s.blockers.empty() ||
       s.authorized || s.activeWrites != 0 || !database.sealed || !database.Ready() ||
       database.session != s.generation)
     return false;
