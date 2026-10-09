@@ -49,6 +49,16 @@ class CSpecialProtocol {public:static std::string TranslatePath(const std::strin
             p = root / rel
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(content)
+        # Exact reviewed phone observer and its inherited lifecycle repair.
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'e2e-mobile-2103303'))
+        from ambient_lifecycle import repair
+        ambient = Path(__file__).with_name('fixtures') / 'infinity_native_ambient.py'
+        ambient_current = root / 'ambient-current.py'
+        ambient_current.write_text(repair(ambient.read_text()))
+        assert hashlib.sha256(ambient.read_bytes()).hexdigest() == '3e33144282d81aa727466f530fd3d37deaee8357c5973c0c7b932bbcc3db1f5f'
+        assert hashlib.sha256(ambient_current.read_bytes()).hexdigest() == 'de30a5114302a303638c589342024b348d3070c5aa76ba4a360d2506dd4402f7'
+        files['skin.infinity.diggz/resources/lib/infinity_native_ambient.py'] = ambient_current
         mapping = root / "digests"
         mapping.write_text("".join(f"{alias}{rel} {hashlib.sha256(path.read_bytes()).hexdigest()}\n"
                                    for rel, path in files.items()
@@ -77,6 +87,25 @@ int main(int argc,char** argv){
  const std::string dependency="special://home/addons/service.infinity.compat/checkpoint_runtime.py";
  Test::digests[dependency]="changed";
  assert(ClassifyScript("special://home/addons/service.infinity.compat/service.py","service.infinity.compat").empty());
+ // The no-addon Home RunScript requires exact full path, source and APK library.
+ const std::string ambient="special://home/addons/skin.infinity.diggz/resources/lib/infinity_native_ambient.py";
+ const std::string native="/trusted-libs/libinfinityambient.so";
+ const auto ambientHash=Test::digests[ambient];
+ assert(ClassifyScript(ambient,"").empty()); // Native library location not registered.
+ setenv("KODI_ANDROID_LIBS","/trusted-libs",1);
+ assert(ClassifyScript(ambient,"").empty()); // Library missing.
+ Test::digests[native]="a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684";
+ assert(ClassifyScript(ambient,"")=="nonpersistent:ambient-glass");
+ assert(ClassifyScript(ambient,"skin.infinity.diggz")=="nonpersistent:ambient-glass");
+ assert(ClassifyScript(ambient,"wrong.addon").empty());
+ assert(ClassifyScript("/untrusted/infinity_native_ambient.py","").empty());
+ Test::digests[ambient]="3e33144282d81aa727466f530fd3d37deaee8357c5973c0c7b932bbcc3db1f5f";
+ assert(ClassifyScript(ambient,"")=="nonpersistent:ambient-glass");
+ Test::digests[ambient]="changed";assert(ClassifyScript(ambient,"").empty());
+ Test::digests[ambient]=ambientHash;
+ Test::digests[native]="changed";assert(ClassifyScript(ambient,"").empty());
+ Test::digests.erase(native);assert(ClassifyScript(ambient,"").empty());
+ unsetenv("KODI_ANDROID_LIBS");
  // A different unmodified trusted root remains independently verifiable.
  assert(ClassifyScript("special://xbmc/addons/service.infinity.compat/service.py","service.infinity.compat")=="compat");
  Test::digests.erase("special://home/addons/script.infinity.commandcenter/resume_hub.py");

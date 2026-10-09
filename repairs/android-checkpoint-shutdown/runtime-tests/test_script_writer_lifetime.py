@@ -42,12 +42,15 @@ struct CLanguageInvokerThread{
  void Execute(const std::string&,const std::vector<std::string>&){}
 };using CLanguageInvokerThreadPtr=std::shared_ptr<CLanguageInvokerThread>;
 struct Handler{void Process(){}};
+namespace Test {inline std::vector<int> aborted;}
+struct Python {void NotifyScriptAborting(CLanguageInvokerThread* t){Test::aborted.push_back(t->GetId());}};
+struct CServiceBroker {static Python& GetXBPython(){static Python p;return p;}};
 struct CFileUtils{static bool Exists(const std::string&,bool){return true;}};
 struct URIUtils{static std::string GetFileName(const std::string&s){return s;}};
 constexpr int LOGERROR=1;struct CLog{template<class...T>static void Log(T...) {}};
 namespace InfinityAndroidCheckpoint {
  inline bool active=false;inline int failures=0;inline std::string lastFailure;
- std::string ClassifyScript(const std::string&s,const std::string&){return s=="known.py"?"known":std::string{};}
+ std::string ClassifyScript(const std::string&s,const std::string&){return s=="known.py"?"known":s=="ambient.py"?"nonpersistent:ambient-glass":std::string{};}
  bool IsActive(){return active;}void RecordFailure(const char*,const char* detail){++failures;lastFailure=detail;}
 }
 std::string VerifiedCheckpointContract(const std::string&s,const CLanguageInvokerThreadPtr&,const std::string& c){return InfinityAndroidCheckpoint::ClassifyScript(s,"addon")==c?c:std::string{};}
@@ -60,7 +63,7 @@ class CScriptInvocationManager {public:
  std::vector<std::string>m_checkpointUnresolvedWriterLedger;
  int ExecuteAsync(const std::string&,const LanguageInvokerPtr&,const ADDON::AddonPtr&,const std::vector<std::string>&,bool,int);
  std::vector<std::string>AndroidCheckpointUnresolvedWriters()const;
- void OnExecutionDone(int);void Process();
+ void OnExecutionDone(int);void Process();void BeginAndroidCheckpoint();
 };
 '''
 TEST = r'''
@@ -81,6 +84,40 @@ int main(){
  CScriptInvocationManager closed;closed.m_shutdownRequested=true;assert(closed.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1)==-1);assert(closed.AndroidCheckpointUnresolvedWriters().empty());
  InfinityAndroidCheckpoint::active=true;int x=known.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1);known.OnExecutionDone(x);assert(InfinityAndroidCheckpoint::failures==1);
  assert(InfinityAndroidCheckpoint::lastFailure=="foreign_invoker_finished_without_persistence_receipt;id="+std::to_string(x)+";addon=addon;script=unknown.py");
+ // A no-addon exact memory-only contract is cooperatively stopped, while
+ // the canonical resident stays alive to complete its PREPARE/FINALIZE protocol.
+ CScriptInvocationManager stopping;stopping.m_nextId=2000;
+ const int resident=stopping.ExecuteAsync("known.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ const int ambient=stopping.ExecuteAsync("ambient.py",std::make_shared<Invoker>(),nullptr,{},false,-1);
+ const int unknown=stopping.ExecuteAsync("other.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ assert(stopping.m_scripts[ambient].checkpointContract=="nonpersistent:ambient-glass");
+ stopping.BeginAndroidCheckpoint();assert(stopping.m_shutdownRequested);
+ assert(Test::aborted==std::vector<int>({ambient,unknown}));
+ assert(stopping.m_scripts[resident].checkpointContract=="known");
+ // Two Command Center default invocations overlap. Each completion must use
+ // its own actual interpreter retirement, never the shared basename counter.
+ CScriptInvocationManager concurrent;concurrent.m_nextId=1000;
+ const int first=concurrent.ExecuteAsync("default.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ const int second=concurrent.ExecuteAsync("default.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ InfinityScriptPersistence::Observed(first);InfinityScriptPersistence::Retired(first);
+ assert(!InfinityScriptPersistence::DurableRetirement("addon:default.py"));
+ const int failureCount=InfinityAndroidCheckpoint::failures;
+ concurrent.OnExecutionDone(first);assert(InfinityAndroidCheckpoint::failures==failureCount);
+ assert(!InfinityScriptPersistence::TakeInterpreterRetirement(first)); // One-use manager receipt.
+ InfinityScriptPersistence::Observed(second);InfinityScriptPersistence::Retired(second);
+ concurrent.OnExecutionDone(second);assert(InfinityAndroidCheckpoint::failures==failureCount);
+ // An unrelated writer's sticky failure blocks GLOBAL saving but does not
+ // masquerade as a missing receipt in a healthy Command Center invocation.
+ InfinityScriptPersistence::Admit(999,"ambient.py");
+ InfinityScriptPersistence::Fail(999,"external_or_opaque_writer_requires_explicit_participant");
+ const int healthy=concurrent.ExecuteAsync("default.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ InfinityScriptPersistence::Observed(healthy);InfinityScriptPersistence::Retired(healthy);
+ concurrent.OnExecutionDone(healthy);
+ assert(InfinityAndroidCheckpoint::lastFailure=="python_writer:external_or_opaque_writer_requires_explicit_participant");
+ assert(!InfinityScriptPersistence::PollCommit());
+ // Re-admission clears stale invocation proof; missing retirement still fails.
+ InfinityScriptPersistence::Admit(healthy,"addon:default.py");
+ assert(!InfinityScriptPersistence::TakeInterpreterRetirement(healthy));
 }
 '''
 
@@ -90,10 +127,11 @@ def main():
     methods=[method(source,'void CScriptInvocationManager::Process()'),
              method(source,'std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const'),
              method(source,'int CScriptInvocationManager::ExecuteAsync(\n    const std::string& script,\n    const LanguageInvokerPtr&'),
-             method(source,'void CScriptInvocationManager::OnExecutionDone(int scriptId)')]
+             method(source,'void CScriptInvocationManager::OnExecutionDone(int scriptId)'),
+             method(source,'void CScriptInvocationManager::BeginAndroidCheckpoint()')]
     with tempfile.TemporaryDirectory(prefix='script-lifetime-') as directory:
         directory=Path(directory);(directory/'test.cpp').write_text(PEERS+'\n'.join(methods)+TEST)
-        subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-Wall','-Wextra','-Werror','-pthread','-I',str(args.runtime/'xbmc'),str(directory/'test.cpp'),'-o',str(directory/'test')],check=True)
+        subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-DHAS_PYTHON','-Wall','-Wextra','-Werror','-pthread','-I',str(args.runtime/'xbmc'),str(directory/'test.cpp'),'-o',str(directory/'test')],check=True)
         subprocess.run([str(directory/'test')],check=True)
     print('PASS: production admission/completion/removal/ledger methods retain unknown lifetime obligations')
 if __name__=='__main__':main()

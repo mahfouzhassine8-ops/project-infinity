@@ -7,9 +7,9 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103346
-RELEASE = '1.0.9-Checkpoint-Lifecycle-Recovery-RC1'
-FILE_LABEL = 'Checkpoint-Lifecycle-Recovery-RC1'
+VERSION = 2103347
+RELEASE = '1.0.9-Checkpoint-Script-Retirement-RC1'
+FILE_LABEL = 'Checkpoint-Script-Retirement-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 
@@ -111,6 +111,10 @@ def merge(base, donor, native, output, replacements):
 def finish(args):
     parent = json.loads((RUNTIME/'PARENT.json').read_text())
     require(sha(args.base.read_bytes()) == parent['parent_apk_sha256'], 'Wrong parent APK')
+    with zipfile.ZipFile(args.base) as base:
+        require(sha(base.read('lib/arm64-v8a/libinfinityambient.so')) ==
+                'a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684',
+                'APK ambient image differs from reviewed memory-only contract')
     runtime_delta.verify(args.source, json.loads((RUNTIME/'runtime/android/manifest.json').read_text())['after'])
     native, proof = associated_native(args)
     receipt=json.loads((args.out/'COMPAT-ASSET-ASSOCIATION.json').read_text())

@@ -42,6 +42,7 @@ struct State
   bool commitFinished{false};
   bool committed{false};
   unsigned retired{0};
+  std::set<int> retiredInvokers;
 };
 inline State& Get() { static State* state = new State; return *state; }
 inline void Admit(int id, const std::string& name)
@@ -49,6 +50,7 @@ inline void Admit(int id, const std::string& name)
   auto& s=Get(); std::lock_guard<std::mutex> lock(s.mutex);
   if(s.commitStarted || s.totals.size()>=8192 || s.writers.size()>=512)
   {s.failure="script_writer_admission_after_seal_or_limit";return;}
+  s.retiredInvokers.erase(id); // Reusing an ID starts a new retirement obligation.
   ++s.writers[id].admissions[name]; ++s.totals[name].first;
 }
 inline bool Pending(int id)
@@ -116,7 +118,17 @@ inline void Retired(int id)
   const auto found=s.writers.find(id);if(found==s.writers.end())return;
   if(!found->second.observed || !found->second.failure.empty())return;
   for(const auto& item:found->second.admissions)s.totals[item.first].second+=item.second;
+  if(s.retiredInvokers.size()>=512){s.failure="interpreter_retirement_receipt_limit";return;}
+  s.retiredInvokers.insert(id);
   ++s.retired;s.writers.erase(found);
+}
+// Completion is per invocation. Another active invocation of the same script,
+// or another writer's failure, cannot revoke THIS interpreter's actual proof.
+// Global checkpoint acceptance still requires Failure(), all names and PollCommit.
+inline bool TakeInterpreterRetirement(int id)
+{
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  return s.retiredInvokers.erase(id)!=0;
 }
 inline bool DurableRetirement(const std::string& name)
 {

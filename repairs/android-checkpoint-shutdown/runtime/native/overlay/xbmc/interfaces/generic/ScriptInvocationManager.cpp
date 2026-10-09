@@ -96,8 +96,8 @@ std::string VerifiedCheckpointContract(const std::string& script,
 {
 #if defined(TARGET_ANDROID)
   const auto& addon = thread->GetAddon();
-  if (!admittedContract.empty() && addon &&
-      InfinityAndroidCheckpoint::ClassifyScript(script, addon->ID()) == admittedContract)
+  if (!admittedContract.empty() &&
+      InfinityAndroidCheckpoint::ClassifyScript(script, addon ? addon->ID() : "") == admittedContract)
     return admittedContract;
 #else
   (void)script;
@@ -115,8 +115,14 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
     std::unique_lock<CCriticalSection> lock(m_critSection);
     m_shutdownRequested = true;
     for (const auto& entry : m_scripts)
-      if (!entry.second.done && VerifiedCheckpointContract(entry.second.script, entry.second.thread, entry.second.checkpointContract).empty())
-        pending.push_back(entry.second.thread);
+      if (!entry.second.done)
+      {
+        const auto contract = VerifiedCheckpointContract(entry.second.script, entry.second.thread,
+                                                         entry.second.checkpointContract);
+        if (contract.empty() || contract.rfind("nonpersistent:", 0) == 0 ||
+            contract.rfind("reconstructible-cache:", 0) == 0)
+          pending.push_back(entry.second.thread);
+      }
   }
 #if defined(TARGET_ANDROID) && defined(HAS_PYTHON)
   for (const auto& thread : pending)
@@ -386,8 +392,8 @@ int CScriptInvocationManager::ExecuteAsync(
 
   std::string checkpointContract;
 #if defined(TARGET_ANDROID)
-  if (!reuseable && addon)
-    checkpointContract = InfinityAndroidCheckpoint::ClassifyScript(script, addon->ID());
+  if (!reuseable)
+    checkpointContract = InfinityAndroidCheckpoint::ClassifyScript(script, addon ? addon->ID() : "");
 #endif
   std::unique_lock<CCriticalSection> lock(m_critSection);
   if (m_shutdownRequested)
@@ -579,18 +585,24 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
   if (script != m_scripts.end())
   {
 #if defined(TARGET_ANDROID)
+    const bool retired = InfinityScriptPersistence::TakeInterpreterRetirement(scriptId);
     if (InfinityAndroidCheckpoint::IsActive() &&
-        VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty() &&
-        !InfinityScriptPersistence::DurableRetirement(
-          (script->second.thread->GetAddon() ? script->second.thread->GetAddon()->ID() : "unidentified") + ":" +
-          URIUtils::GetFileName(script->second.script)))
+        VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty())
     {
-      const std::string addon = script->second.thread->GetAddon() ?
-          script->second.thread->GetAddon()->ID() : "unidentified";
-      const std::string detail = "foreign_invoker_finished_without_persistence_receipt;id=" +
-          std::to_string(scriptId) + ";addon=" + addon +
-          ";script=" + URIUtils::GetFileName(script->second.script);
-      InfinityAndroidCheckpoint::RecordFailure("python_services", detail.c_str());
+      // Preserve the originating failure instead of blaming whichever healthy
+      // Command Center/client invocation happens to finish next.
+      const auto failure = InfinityScriptPersistence::Failure();
+      if (!failure.empty())
+        InfinityAndroidCheckpoint::RecordFailure("python_services", failure.c_str());
+      else if (!retired)
+      {
+        const std::string addon = script->second.thread->GetAddon() ?
+            script->second.thread->GetAddon()->ID() : "unidentified";
+        const std::string detail = "foreign_invoker_finished_without_persistence_receipt;id=" +
+            std::to_string(scriptId) + ";addon=" + addon +
+            ";script=" + URIUtils::GetFileName(script->second.script);
+        InfinityAndroidCheckpoint::RecordFailure("python_services", detail.c_str());
+      }
     }
 #endif
     script->second.done = true;

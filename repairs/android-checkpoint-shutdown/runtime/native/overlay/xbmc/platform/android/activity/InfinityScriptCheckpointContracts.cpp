@@ -4,6 +4,7 @@
 #include "filesystem/SpecialProtocol.h"
 #include "utils/Digest.h"
 
+#include <cstdlib>
 #include <string>
 #include <utility>
 #include <vector>
@@ -117,6 +118,28 @@ std::string ClassifyScript(const std::string& script, const std::string& addon)
   try
   {
     const std::string actual = CSpecialProtocol::TranslatePath(script);
+    // Home RunScript has no add-on object. Only these reviewed skin sources and
+    // the exact APK-owned native image implement this memory-only contract.
+    // Same basenames, unknown source revisions and user-supplied libraries fail closed.
+    if (addon.empty() || addon == "skin.infinity.diggz")
+    {
+      for (const char* root : {"special://home/addons/", "special://xbmc/addons/"})
+      {
+        const std::string ambient = std::string(root) +
+            "skin.infinity.diggz/resources/lib/infinity_native_ambient.py";
+        if (actual != CSpecialProtocol::TranslatePath(ambient))
+          continue;
+        const auto digest = CUtil::GetFileDigest(ambient, KODI::UTILITY::CDigest::Type::SHA256);
+        const char* libraries = std::getenv("KODI_ANDROID_LIBS");
+        if ((digest == "3e33144282d81aa727466f530fd3d37deaee8357c5973c0c7b932bbcc3db1f5f" ||
+             digest == "de30a5114302a303638c589342024b348d3070c5aa76ba4a360d2506dd4402f7") &&
+            libraries && libraries[0] == '/' &&
+            CUtil::GetFileDigest(std::string(libraries) + "/libinfinityambient.so",
+                                KODI::UTILITY::CDigest::Type::SHA256) ==
+                "a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684")
+          return "nonpersistent:ambient-glass";
+      }
+    }
     for (const auto& contract : Contracts())
     {
       if (addon != contract.addon)
