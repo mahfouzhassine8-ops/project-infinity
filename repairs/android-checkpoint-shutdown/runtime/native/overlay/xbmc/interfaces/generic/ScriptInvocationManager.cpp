@@ -126,7 +126,15 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
   }
 #if defined(TARGET_ANDROID) && defined(HAS_PYTHON)
   for (const auto& thread : pending)
+  {
+    // Cooperative checkpoint shutdown has two safe parts:
+    // 1) notify xbmc.Monitor so running scripts can finish normally;
+    // 2) release reusable invoker waits so scripts that already returned can
+    //    reach onExecutionDone immediately. This never injects SystemExit,
+    //    never joins the GUI thread and never bypasses persistence finalization.
     CServiceBroker::GetXBPython().NotifyScriptAborting(thread.get());
+    thread->Release();
+  }
 #endif
 }
 
@@ -165,7 +173,8 @@ std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWr
   std::unique_lock<CCriticalSection> lock(m_critSection);
   std::vector<std::string> result;
   for (const auto& name : m_checkpointUnresolvedWriterLedger)
-    if (!InfinityScriptPersistence::DurableRetirement(name))
+    if (!InfinityScriptPersistence::DurableRetirement(name) &&
+        !InfinityScriptPersistence::BlockedRetirement(name))
       result.push_back(name);
   if (result.size() >= 8)
     return result;
