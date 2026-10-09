@@ -1,0 +1,160 @@
+name: Infinity | 2103339 selective Kodi22 test APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/kodi22-selective-shutdown-2103339]
+    paths:
+      - 'repairs/kodi22-selective-2103339/package.py'
+      - '.github/workflows/infinity-2103339-selective-apk.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103339-selective-apk, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+  INFINITY_NATIVE_SOURCE_COMMIT: bd4e25402ee77e94ab745a05ad4bc348d1226c18
+  INFINITY_NATIVE_RUN_ID: '37865197244'
+jobs:
+  test-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3327
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37687616440
+          name: Infinity-2103327-JobManager-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3327
+      - name: Verify actual parent and identity-only Android preimages
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3339
+          python3 -m py_compile repairs/kodi22-selective-2103339/*.py
+          python3 repairs/kodi22-selective-2103339/package.py --help > evidence3339/import-check.txt
+          python3 - <<'PY' | tee evidence3339/source-precheck.log
+          import json,sys,tarfile,tempfile
+          from pathlib import Path
+          sys.path.insert(0,'repairs/kodi22-selective-2103339')
+          import package
+          package.verify_parent(Path('base3327/Infinity-2103327-JobManager-Close-RC1.apk'))
+          with tempfile.TemporaryDirectory() as tmp:
+              root=Path(tmp)
+              with tarfile.open('parent3327/repaired-shell-source.tar.gz') as archive:
+                  archive.extractall(root,filter='data')
+              source=root/'shell-kodi'
+              metadata=json.loads(Path('repairs/cobra-pro-season-2103317/parent-metadata.json').read_text())
+              for name,text in metadata.items():
+                  dest=source/name
+                  if not dest.exists():dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
+              package.update_identity(source,root,'1'*64)
+              package.stage_tests(root/'test-staging')
+          print('PASS: exact 3327 APK/source/signature; two diagnostic identity files only; all inherited suites staged, not yet run')
+          PY
+      - name: Require exact successful new native engine with no old-engine fallback
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/${{ github.repository }}/actions/runs/$INFINITY_NATIVE_RUN_ID --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
+          gh run watch "$INFINITY_NATIVE_RUN_ID" --repo '${{ github.repository }}' --exit-status --interval 30
+          gh api repos/${{ github.repository }}/actions/runs/$INFINITY_NATIVE_RUN_ID > evidence3339/native-run.json
+          python3 - <<'PY'
+          import json,os
+          r=json.load(open('evidence3339/native-run.json'))
+          assert r['head_sha']==os.environ['INFINITY_NATIVE_SOURCE_COMMIT'] and r['conclusion']=='success'
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37865197244
+          name: Infinity-2103339-Selective-Native
+          github-token: ${{ github.token }}
+          path: native3339
+      - name: Bind newly compiled native binary to protected Android shell
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/kodi22-selective-2103339/package.py prepare --base base3327/Infinity-2103327-JobManager-Close-RC1.apk --build build3339 --out evidence3339 --engine native3339
+      - name: Run inherited Android regression suites and assemble donor
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          python3 - <<'PY' 2>&1 | tee evidence3339/android-build.log
+          import subprocess,sys
+          sys.path.insert(0,'repairs/kodi22-selective-2103339')
+          import package
+          args=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest']
+          for name in sorted(package.legacy.EXPECTED_SUITES):args+=['--tests','com.projectinfinity.kodi.'+name]
+          args+=[':xbmc:assembleRelease',':xbmc:exportPreservationTools']
+          subprocess.run(args,cwd='build3339',check=True)
+          PY
+      - name: Verify payload and DEX preservation then permanent install-over signature
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/kodi22-selective-2103339/package.py package --base base3327/Infinity-2103327-JobManager-Close-RC1.apk --build build3339 --out evidence3339 --engine native3339
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103339-Selective-Shutdown-Test-APK
+          path: evidence3339/Infinity-2103339-Kodi22-Selective-Shutdown-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Retain compact provenance for the test candidate
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,shutil
+          from pathlib import Path
+          out=Path('compact3339');out.mkdir()
+          apk=Path('evidence3339/Infinity-2103339-Kodi22-Selective-Shutdown-RC1.apk')
+          digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          (out/'DELIVERY.json').write_text(json.dumps({'file':apk.name,'size':apk.stat().st_size,'sha256':digest,'test_candidate':True,'locked':False,'physical_device_verified':False},indent=2)+'\n')
+          (out/'SHA256SUMS.txt').write_text(digest+'  '+apk.name+'\n')
+          for p in Path('evidence3339').iterdir():
+              if p.is_file() and p.suffix not in ('.apk','.so') and p.stat().st_size<24*1024*1024:
+                  shutil.copy2(p,out/p.name)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103339-Delivery-Evidence
+          path: compact3339/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103339-APK-Verification
+          path: |
+            evidence3339/*.json
+            evidence3339/*.txt
+            evidence3339/*.log
+            build3339/xbmc/build/test-results/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
