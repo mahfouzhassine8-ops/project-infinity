@@ -378,6 +378,12 @@ bool CPythonInvoker::execute(const std::string& script, std::vector<std::wstring
     m_systemExitThrown = true;
     CLog::Log(LOGDEBUG, "CPythonInvoker({}, {}): script aborted", GetId(), m_sourceFile);
     stateToSet = InvokerStateFailed;
+#if defined(TARGET_ANDROID)
+    // This SystemExit has already been classified as an aborted script. Consume
+    // it before onAbort so it cannot masquerade as a later cleanup failure.
+    // New callback errors and the persistence ledger remain authoritative.
+    PyErr_Clear();
+#endif
     onAbort();
   }
   else

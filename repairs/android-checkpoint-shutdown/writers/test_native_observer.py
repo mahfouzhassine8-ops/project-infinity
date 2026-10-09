@@ -2,6 +2,7 @@
 """Compile native audit + ledger against an actual CPython subinterpreter."""
 import argparse
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -35,10 +36,23 @@ int main(int argc,char** argv) {
   if(mode=="workers")script="import threading\ne=threading.Event()\nt=threading.Thread(target=e.wait);t.start()\n";
   if(mode=="nested")script="from pathlib import Path\np=Path(root)/'health'/'sessions'/'session'/'state.json'\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text('saved')\n";
   if(mode=="readonly-child")script="import subprocess,tempfile\nwith tempfile.TemporaryFile(dir=root) as output:\n subprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=output,stderr=subprocess.PIPE,check=True)\n output.seek(0)\n result=output.read()\nwith open(root+'/diagnostic.txt','wb') as f: f.write(result)\n";
-  assert(script && PyRun_SimpleString(script)==0);
+  if(mode=="system-exit" || mode=="system-exit-pending" || mode=="abort-callback-error") {
+    script=mode=="system-exit-pending" ?
+      "import sqlite3\nc=sqlite3.connect(root+'/state.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\nraise SystemExit\n" :
+      "f=open(root+'/state.json','w');f.write('saved')\nraise SystemExit\n";
+    auto* globals=PyModule_GetDict(PyImport_AddModule("__main__"));
+    auto* executed=PyRun_String(script,Py_file_input,globals,globals);
+    assert(!executed && PyErr_ExceptionMatches(PyExc_SystemExit));
+    HandleProductionAbort(mode=="abort-callback-error");
+    if(mode=="abort-callback-error") {
+      assert(PyErr_ExceptionMatches(PyExc_RuntimeError));
+      InfinityScriptPersistence::Fail(1,"python_cleanup_failed_before_save_retirement");
+      PyErr_Clear();
+    } else assert(!PyErr_Occurred());
+  } else assert(script && PyRun_SimpleString(script)==0);
   InfinityPythonPersistence::Finish(context,owner);
   if(PyErr_Occurred())PyErr_Print();
-  if(mode=="pending") {
+  if(mode=="pending" || mode=="system-exit-pending") {
     assert(context->preservePending && !context->finalized);
     assert(!InfinityScriptPersistence::PollCommit());
     assert(!InfinityScriptPersistence::Failure().empty());
@@ -53,10 +67,19 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="readonly-child";
+  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="readonly-child" || mode=="system-exit";
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
-  else assert(!InfinityScriptPersistence::Failure().empty());
+  else {
+    assert(!InfinityScriptPersistence::Failure().empty());
+    const auto first=InfinityScriptPersistence::Snapshot();
+    assert(first.failureWriterId==1 && first.failureWriter=="provider:service.py");
+    InfinityScriptPersistence::Admit(2,"other:service.py");
+    InfinityScriptPersistence::Fail(2,"later_failure");
+    const auto second=InfinityScriptPersistence::Snapshot();
+    assert(second.failureWriterId==1 && second.failureWriter==first.failureWriter);
+    assert(second.failure==first.failure);
+  }
   auto* interpreter=owner->interp;
   Py_EndInterpreter(owner);
   InfinityPythonPersistence::End(context,interpreter);
@@ -98,7 +121,12 @@ def main():
         raise RuntimeError('Actual CPython shared library required')
     with tempfile.TemporaryDirectory(prefix='native-python-save-') as directory:
         directory = Path(directory)
-        (directory / 'test.cpp').write_text(HARNESS)
+        invoker = (args.runtime / 'xbmc/interfaces/python/PythonInvoker.cpp').read_text()
+        branch = invoker.split('else if (PyErr_ExceptionMatches(PyExc_SystemExit))', 1)[1].split('\n  else\n', 1)[0]
+        branch = re.sub(r'    CLog::Log[^\n]*\n', '', branch)
+        abort = '\n#define TARGET_ANDROID\nvoid HandleProductionAbort(bool callbackError) {\n bool m_systemExitThrown=false; int stateToSet=0; constexpr int InvokerStateFailed=1;\n auto onAbort=[&](){if(callbackError)PyErr_SetString(PyExc_RuntimeError,"real abort cleanup error");};\n' + branch + '\n (void)m_systemExitThrown;(void)stateToSet;\n}\n'
+        code = HARNESS.replace('int main(int argc,char** argv) {', abort + 'int main(int argc,char** argv) {')
+        (directory / 'test.cpp').write_text(code)
         binary = directory / 'test'
         subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pthread',
                         '-I', str(include), '-I', str(args.runtime / 'xbmc'),
@@ -107,7 +135,7 @@ def main():
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'external', 'workers', 'nested', 'readonly-child'):
+        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'external', 'workers', 'nested', 'readonly-child', 'system-exit', 'system-exit-pending', 'abort-callback-error'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)

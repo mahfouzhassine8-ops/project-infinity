@@ -36,6 +36,8 @@ struct State
   std::map<std::string, Namespace> paths;
   std::string failure;
   bool commitStarted{false};
+  int failureWriterId{-1};
+  std::string failureWriter;
   bool commitFinished{false};
   bool committed{false};
   unsigned retired{0};
@@ -62,7 +64,12 @@ inline void Fail(int id, const std::string& reason)
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   auto found=s.writers.find(id);
   if(found!=s.writers.end() && found->second.failure.empty()) found->second.failure=reason;
-  if(s.failure.empty())s.failure="python_writer:"+reason;
+  if(s.failure.empty()) {
+    s.failure="python_writer:"+reason;
+    s.failureWriterId=id;
+    if(found!=s.writers.end() && !found->second.admissions.empty())
+      s.failureWriter=found->second.admissions.begin()->first.substr(0,512);
+  }
 }
 inline std::string Absolute(const std::string& input)
 {
@@ -122,6 +129,8 @@ struct Evidence
   std::size_t active{0}, observed{0}, retired{0}, paths{0};
   bool syncStarted{false}, syncFinished{false}, durable{false};
   std::string failure;
+  int failureWriterId{-1};
+  std::string failureWriter;
   std::vector<std::string> pending;
 };
 inline Evidence Snapshot()
@@ -130,6 +139,7 @@ inline Evidence Snapshot()
   result.active=s.writers.size();result.retired=s.retired;result.paths=s.paths.size();
   result.syncStarted=s.commitStarted;result.syncFinished=s.commitFinished;
   result.durable=s.committed && s.failure.empty();result.failure=s.failure;
+  result.failureWriterId=s.failureWriterId;result.failureWriter=s.failureWriter;
   for(const auto& item:s.writers) {
     if(item.second.observed)++result.observed;
     for(const auto& admission:item.second.admissions)

@@ -183,6 +183,8 @@ std::string EncodeStatusLocked(const State& s)
   scriptEvidence["sync_finished"] = scripts.syncFinished;
   scriptEvidence["durable"] = scripts.durable;
   scriptEvidence["error"] = scripts.failure;
+  scriptEvidence["failure_writer_id"] = scripts.failureWriterId;
+  scriptEvidence["failure_writer"] = scripts.failureWriter;
   scriptEvidence["pending_writers"] = CVariant(CVariant::VariantTypeArray);
   for (const auto& name : scripts.pending)
     scriptEvidence["pending_writers"].push_back(name);

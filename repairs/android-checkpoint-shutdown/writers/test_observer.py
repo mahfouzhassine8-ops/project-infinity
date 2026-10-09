@@ -16,16 +16,70 @@ def scenario(name):
     import sqlite3
     import builtins
     import gc
+    import types
     read_connection = sqlite3.connect
     with tempfile.TemporaryDirectory(prefix='infinity-save-') as folder:
         root = Path(folder)
         failures, mutations = [], []
-        observer = module.Observer(failures.append, lambda path, kind: mutations.append((path, kind)))
+        vfs = None
+        if name.startswith('vfs_'):
+            class NativeFile:
+                def __init__(self, path, mode=None):
+                    self.path, self.mode, self.closed = path, mode, False
+                    if name == 'vfs_open_failure' and mode == 'w': raise OSError('native open failed')
+                def write(self, value):
+                    if name == 'vfs_write_failure': return False
+                    self.value = value
+                    return True
+                def close(self):
+                    if name == 'vfs_close_failure' and self.mode == 'w': raise OSError('native close failed')
+                    self.closed = True
+            def rmdir(path, force=False):
+                if isinstance(force, str): raise TypeError("'str' object cannot be interpreted as an integer")
+                return True
+            vfs = types.SimpleNamespace(File=NativeFile, translatePath=lambda path: str(path),
+                copy=lambda a,b: True, rename=lambda a,b: True, delete=lambda p: True,
+                mkdir=lambda p: True, mkdirs=lambda p: True, rmdir=rmdir)
+        observer = module.Observer(failures.append, lambda path, kind: mutations.append((path, kind)), vfs=vfs)
         database = root / 'state.db'
         connection = sqlite3.connect(database)
         connection.execute('create table state (value)')
         connection.commit()
-        if name == 'committed':
+        if name.startswith('vfs_'):
+            connection.close()
+            for mode in (None, 'r', 'a'):
+                handle = vfs.File(str(root / 'read'), mode) if mode else vfs.File(str(root / 'read'))
+                assert isinstance(handle, NativeFile) and handle.mode == mode
+                handle.close()
+            if name == 'vfs_open_failure':
+                try: vfs.File(str(root / 'state'), 'w')
+                except OSError: pass
+                else: raise AssertionError('VFS open failure was swallowed')
+                assert 'vfs_open_for_write_failed' in failures
+                for target, attr, original, replacement in reversed(observer.originals):
+                    setattr(target, attr, original)
+                return
+            handle = vfs.File(str(root / 'state'), 'w')
+            assert isinstance(handle, module.VFSFile)
+            assert handle.handle.mode == 'w'
+            result = handle.write('saved')
+            if name == 'vfs_write_failure':
+                assert result is False and 'vfs_write_failed' in failures
+                handle.close()
+            elif name == 'vfs_close_failure':
+                try: handle.close()
+                except OSError: pass
+                else: raise AssertionError('VFS close error was swallowed')
+                assert not handle.closed and handle in observer.held_handles
+                assert not observer.finish()
+                assert 'vfs_close_failed' in failures
+            else:
+                assert result is True
+                assert observer.finish()
+                assert handle.closed and handle.handle.closed
+                assert not failures, failures
+                assert (str(root / 'state'), 'write') in mutations
+        elif name == 'committed':
             connection.execute('insert into state values (42)')
             connection.commit()
             connection.close()
@@ -131,7 +185,8 @@ def main():
         scenario(args.scenario)
         return
     for name in ('committed', 'pending', 'collected', 'write_failure',
-                 'binding_replaced', 'sql_failure', 'rollback', 'nested_directories', 'descriptor_cache'):
+                 'binding_replaced', 'sql_failure', 'rollback', 'nested_directories', 'descriptor_cache',
+                 'vfs_normal', 'vfs_write_failure', 'vfs_close_failure', 'vfs_open_failure'):
         subprocess.run([sys.executable, __file__, '--scenario', name], check=True)
     print('PASS: checked saves, pending-data retention, swallowed failures and explicit rollback')
 

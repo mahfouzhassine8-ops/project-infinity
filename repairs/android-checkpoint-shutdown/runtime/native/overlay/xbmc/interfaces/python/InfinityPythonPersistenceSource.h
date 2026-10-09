@@ -223,12 +223,16 @@ class Observer:
             self.install_children()
         if self.vfs is not None:
             original = self.vfs.File
-            def vfs_file(path, mode=None):
+            def vfs_file(path, mode=None, _original=original):
                 if mode is None or not str(mode).startswith('w'):
-                    return original(path) if mode is None else original(path, mode)
+                    return _original(path) if mode is None else _original(path, mode)
                 observer.check_live()
                 observer.touch(self.vfs.translatePath(path), 'write')
-                handle = VFSFile(original(path, mode), observer)
+                try:
+                    handle = VFSFile(_original(path, mode), observer)
+                except Exception:
+                    observer.error('vfs_open_for_write_failed')
+                    raise
                 observer.handles.add(handle)
                 return handle
             self.patch(self.vfs, 'File', vfs_file)
@@ -399,11 +403,14 @@ class VFSFile(File):
     def flush(self): return None  # The native VFS close flushes; native durability is separate.
     def close(self):
         if self.closed: return
-        try: return self.handle.close()
+        try:
+            result = self.handle.close()
+            self.closed = True
+            return result
         except Exception:
+            self.observer.held_handles.add(self)
             self.observer.error('vfs_close_failed')
             raise
-        finally: self.closed = True
 
 
 def _writes(sql):
