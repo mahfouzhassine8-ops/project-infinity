@@ -165,6 +165,8 @@ def main():
     tests.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(HERE.parent / "health-native-bridge-2103335/NativeTraceBridge335Test.java",
                     tests / "NativeTraceBridge335Test.java")
+    shutil.copyfile(HERE / "runtime-tests/CheckpointCrashExportTest.java",
+                    tests / "CheckpointCrashExportTest.java")
     with (args.build / "xbmc/build.gradle").open("a") as output:
         output.write('''
 android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "2g"; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }

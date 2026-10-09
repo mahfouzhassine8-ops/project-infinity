@@ -46,9 +46,9 @@ struct CFileUtils{static bool Exists(const std::string&,bool){return true;}};
 struct URIUtils{static std::string GetFileName(const std::string&s){return s;}};
 constexpr int LOGERROR=1;struct CLog{template<class...T>static void Log(T...) {}};
 namespace InfinityAndroidCheckpoint {
- inline bool active=false;inline int failures=0;
+ inline bool active=false;inline int failures=0;inline std::string lastFailure;
  std::string ClassifyScript(const std::string&s,const std::string&){return s=="known.py"?"known":std::string{};}
- bool IsActive(){return active;}void RecordFailure(const char*,const char*){++failures;}
+ bool IsActive(){return active;}void RecordFailure(const char*,const char* detail){++failures;lastFailure=detail;}
 }
 std::string VerifiedCheckpointContract(const std::string&s,const CLanguageInvokerThreadPtr&,const std::string& c){return InfinityAndroidCheckpoint::ClassifyScript(s,"addon")==c?c:std::string{};}
 class CScriptInvocationManager {public:
@@ -80,6 +80,7 @@ int main(){
  CScriptInvocationManager known;int k=known.ExecuteAsync("known.py",std::make_shared<Invoker>(),addon,{},false,-1);known.OnExecutionDone(k);known.Process();assert(known.AndroidCheckpointUnresolvedWriters().empty());
  CScriptInvocationManager closed;closed.m_shutdownRequested=true;assert(closed.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1)==-1);assert(closed.AndroidCheckpointUnresolvedWriters().empty());
  InfinityAndroidCheckpoint::active=true;int x=known.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1);known.OnExecutionDone(x);assert(InfinityAndroidCheckpoint::failures==1);
+ assert(InfinityAndroidCheckpoint::lastFailure=="foreign_invoker_finished_without_persistence_receipt;id="+std::to_string(x)+";addon=addon;script=unknown.py");
 }
 '''
 

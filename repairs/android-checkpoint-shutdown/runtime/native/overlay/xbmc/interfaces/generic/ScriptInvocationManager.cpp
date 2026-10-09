@@ -584,7 +584,14 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
         !InfinityScriptPersistence::DurableRetirement(
           (script->second.thread->GetAddon() ? script->second.thread->GetAddon()->ID() : "unidentified") + ":" +
           URIUtils::GetFileName(script->second.script)))
-      InfinityAndroidCheckpoint::RecordFailure("python_services", "foreign_invoker_finished_without_persistence_receipt");
+    {
+      const std::string addon = script->second.thread->GetAddon() ?
+          script->second.thread->GetAddon()->ID() : "unidentified";
+      const std::string detail = "foreign_invoker_finished_without_persistence_receipt;id=" +
+          std::to_string(scriptId) + ";addon=" + addon +
+          ";script=" + URIUtils::GetFileName(script->second.script);
+      InfinityAndroidCheckpoint::RecordFailure("python_services", detail.c_str());
+    }
 #endif
     script->second.done = true;
   }

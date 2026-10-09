@@ -464,6 +464,52 @@ void RejectsUnsafeTargets()
   f.NoTemporaries();
 }
 
+void MetadataReadFailuresIdentifyOperationAndPreserveOriginal()
+{
+  class MetadataIo : public TestIo
+  {
+  public:
+    bool failValue{false};
+    ssize_t ListAttributes(int, char* names, size_t size) override
+    {
+      const char name[] = "user.checkpoint_test";
+      if (names && size >= sizeof(name))
+        std::memcpy(names, name, sizeof(name));
+      return sizeof(name);
+    }
+    ssize_t GetAttribute(int, const char*, void*, size_t size) override
+    {
+      if (!failValue || size)
+        return Fail(ENODATA);
+      return 8;
+    }
+  };
+  for (bool failValue : {false, true})
+  {
+    Fixture f;
+    f.Seed("original");
+    const auto before = f.Stat();
+    MetadataIo io;
+    io.failValue = failValue;
+    const auto result = file::SaveDirty(f.path, "updated", io);
+    CHECK(!result.ok && result.stage == file::Stage::ReadMetadata && result.error == ENODATA);
+    CHECK(std::string(result.metadataOperation) == (failValue ? "fgetxattr_value" : "fgetxattr_size"));
+    CHECK(result.metadataAttribute == "user.checkpoint_test");
+    CHECK(!result.replaced && !result.renameAttempted && !result.dataAndDirectorySynced);
+    CHECK(f.Content() == "original" && f.Stat().st_ino == before.st_ino);
+    CHECK(io.renames == 0 && io.descriptors.empty());
+    f.NoTemporaries();
+  }
+  Fixture f;
+  f.Seed("original");
+  TestIo io;
+  io.failure = Failure::ListAttributes;
+  const auto result = file::SaveDirty(f.path, "updated", io);
+  CHECK(!result.ok && result.error == EACCES);
+  CHECK(std::string(result.metadataOperation) == "flistxattr_size");
+  CHECK(result.metadataAttribute.empty() && f.Content() == "original");
+}
+
 int main()
 {
   try
@@ -472,6 +518,7 @@ int main()
     MatchingDirtyFileIsSyncedWithoutRewrite();
     ExtendedAttributesAndOwnershipSurviveReplacement();
     MetadataFailureNeverReplacesOriginal();
+    MetadataReadFailuresIdentifyOperationAndPreserveOriginal();
     NewFileUsesPrivateMode();
     FailuresBeforeRenamePreserveOriginal();
     RenameFailureIsNotAcknowledged();

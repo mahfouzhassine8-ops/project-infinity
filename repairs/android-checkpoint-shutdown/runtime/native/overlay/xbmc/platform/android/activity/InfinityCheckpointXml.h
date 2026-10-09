@@ -65,7 +65,11 @@ inline bool SaveCheckpointXml(const std::string& filename, std::string_view byte
     if (!saved.ok)
     {
       const char* stage = infinity::checkpoint::files::StageName(saved.stage);
-      const std::string detail = std::string(stage) + "_errno_" + std::to_string(saved.error);
+      std::string detail = std::string(stage) + "_errno_" + std::to_string(saved.error);
+      if (saved.metadataOperation)
+        detail += ";operation=" + std::string(saved.metadataOperation) +
+                  ";attribute=" + saved.metadataAttribute;
+      detail += ";file=" + path.substr(path.rfind('/') + 1);
       RecordFailure("xml_files", detail.c_str());
       CLog::Log(LOGERROR,
                 "Infinity checkpoint XML failed: stage={} errno={} renamed={} durable={}",

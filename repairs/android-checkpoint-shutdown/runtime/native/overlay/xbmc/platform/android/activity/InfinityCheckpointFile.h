@@ -86,6 +86,9 @@ struct Result
   bool ok{false};
   Stage stage{Stage::None};
   int error{0};
+  // Metadata diagnostics contain names only, never attribute values.
+  const char* metadataOperation{nullptr};
+  std::string metadataAttribute;
   // The first additional cleanup failure is retained without masking the cause.
   Stage cleanupStage{Stage::None};
   int cleanupError{0};
@@ -156,13 +159,22 @@ inline void Fail(Result& result, Stage stage, int error)
 inline bool ReadAttributes(PosixIo& io, int fd, Attributes& attributes,
                            Result& result, Stage stage)
 {
+  const auto failMetadata = [&](const char* operation, int error,
+                                const std::string& attribute = std::string{}) {
+    if (result.stage == Stage::None)
+    {
+      result.metadataOperation = operation;
+      result.metadataAttribute = attribute;
+    }
+    Fail(result, stage, error);
+    return false;
+  };
   // Linux caps the list and each value at 64 KiB. Bound allocations and reject
   // a concurrently changing set: the caller must hold its namespace fence.
   const auto count = RetryInterrupted([&] { return io.ListAttributes(fd, nullptr, 0); });
   if (count < 0 || count > 65536)
   {
-    Fail(result, stage, count < 0 ? errno : E2BIG);
-    return false;
+    return failMetadata("flistxattr_size", count < 0 ? errno : E2BIG);
   }
   if (!count)
     return true;
@@ -170,8 +182,7 @@ inline bool ReadAttributes(PosixIo& io, int fd, Attributes& attributes,
   const auto actual = RetryInterrupted([&] { return io.ListAttributes(fd, names.data(), names.size()); });
   if (actual != count)
   {
-    Fail(result, stage, actual < 0 ? errno : EBUSY);
-    return false;
+    return failMetadata("flistxattr_names", actual < 0 ? errno : EBUSY);
   }
   for (size_t start = 0; start < names.size();)
   {
@@ -180,22 +191,19 @@ inline bool ReadAttributes(PosixIo& io, int fd, Attributes& attributes,
       ++end;
     if (end == names.size() || end == start)
     {
-      Fail(result, stage, EINVAL);
-      return false;
+      return failMetadata("flistxattr_parse", EINVAL);
     }
     const std::string name(names.data() + start, end - start);
     const auto size = RetryInterrupted([&] { return io.GetAttribute(fd, name.c_str(), nullptr, 0); });
     if (size < 0 || size > 65536)
     {
-      Fail(result, stage, size < 0 ? errno : E2BIG);
-      return false;
+      return failMetadata("fgetxattr_size", size < 0 ? errno : E2BIG, name);
     }
     std::vector<char> value(static_cast<size_t>(size));
     const auto read = RetryInterrupted([&] { return io.GetAttribute(fd, name.c_str(), value.data(), value.size()); });
     if (read != size)
     {
-      Fail(result, stage, read < 0 ? errno : EBUSY);
-      return false;
+      return failMetadata("fgetxattr_value", read < 0 ? errno : EBUSY, name);
     }
     attributes.emplace_back(name, std::move(value));
     start = end + 1;
