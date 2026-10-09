@@ -795,11 +795,22 @@ bool AuthorizeTermination(const std::string& session, const std::string& owner, 
   }
   const auto* activity = jni::CJNIMainActivity::GetAppInstance();
   if (!activity || !activity->infinityCheckpointOwnsOwner(pid, owner))
+  {
+    RecordFatalFailure("native_admission","engine_owner_lease_not_held_at_termination");
     return false;
+  }
   if (!PvrOwnersAbsent())
+  {
+    RecordFatalFailure("pvr","pvr_owner_present_at_termination");
     return false;
+  }
   const auto scripts = InfinityScriptPersistence::Snapshot();
-  if (!scripts.failure.empty() || !scripts.blockers.empty() || !scripts.durable || scripts.active != 0)
+  if (!scripts.failure.empty() || !scripts.blockers.empty())
+  {
+    RecordFatalFailure("python_services",scripts.failure.empty()?"python_blocker_after_safe":scripts.failure.c_str());
+    return false;
+  }
+  if (!scripts.durable || scripts.active != 0)
     return false;
   const auto database = InfinityDatabaseBarrier::GetSnapshot();
   std::lock_guard<std::mutex> lock(s.mutex);
