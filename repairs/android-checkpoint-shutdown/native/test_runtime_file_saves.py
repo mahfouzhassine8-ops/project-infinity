@@ -189,6 +189,16 @@ int main(int argc, char** argv) {
   try {
     CHECK(argc == 2);
     const std::string root = argv[1];
+    const std::string control = root + "/.android-checkpoint";
+    fs::create_directory(control);
+    const std::string engine = control + "/engine.json";
+    CHECK(InfinityAndroidCheckpoint::SaveCheckpointProtocol(engine, "current-owner"));
+    InfinityAndroidCheckpoint::persist = false;
+    CHECK(!InfinityAndroidCheckpoint::SaveCheckpointProtocol(engine, "unauthorized-owner"));
+    CHECK(Read(engine) == "current-owner");
+    InfinityAndroidCheckpoint::persist = true;
+    CHECK(!InfinityAndroidCheckpoint::SaveCheckpointProtocol(control + "/settings.xml", "bad"));
+    CHECK(!fs::exists(control + "/settings.xml"));
     const std::string path = root + "/settings.xml";
     const std::string policy = root + "/infinity-audio-policy.json";
     ExistingFileIo missing;

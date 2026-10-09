@@ -61,6 +61,8 @@ inline bool LocalCheckpointPath(const std::string& p,std::string& out){out=CSpec
 inline bool CheckpointCreatedDirectory(const std::string&){return true;}
 inline bool SaveCheckpointXml(const std::string& p,std::string_view bytes){
  auto saved=infinity::checkpoint::files::SaveDirty(p,bytes);if(!saved.ok)RecordFailure("xml_files","test_boundary_write_failed");return saved.ok;}
+inline bool SaveCheckpointProtocol(const std::string& p,std::string_view bytes){
+ auto saved=infinity::checkpoint::files::SaveProtocolRecord(p,bytes);if(!saved.ok)RecordFailure("xml_files","test_boundary_write_failed");return saved.ok;}
 }
 namespace jni { class CJNIMainActivity {public: static CJNIMainActivity*GetAppInstance(){static CJNIMainActivity a;return &a;}
  bool infinityCheckpointOwnsOwner(int,const std::string&)const{return Test::ownLease;}
@@ -113,11 +115,12 @@ HARNESS = r'''
 #include <iostream>
 using namespace InfinityAndroidCheckpoint;
 static const std::string SESSION="11111111-1111-4111-8111-111111111111", OWNER="22222222-2222-4222-8222-222222222222";
+static bool WritePeerJson(const std::string& p,const CVariant& v){std::string bytes;return CJSONVariantWriter::Write(v,bytes,true)&&SaveCheckpointXml(p,bytes);}
 static CVariant identity(){CVariant v(CVariant::VariantTypeObject);v["schema"]=1;v["session"]=SESSION;v["owner"]=OWNER;v["pid"]=static_cast<int>(getpid());return v;}
 static CVariant compat(){auto v=identity();v["status"]="ACTIVE";v["participant"]="infinity-compat";v["participant_api"]=1;v["addon_version"]="0.7.2";v["global_safe_to_terminate"]=false;return v;}
-static void active(bool malformed=false){auto v=identity();v["status"]="ACTIVE";v["participant_api"]=1;v["addon_version"]="0.3.5.19";if(malformed)v["pid"]=true;assert(WriteJson(Get().directory+"/active.json",v));assert(WriteJson(Get().directory+"/compat-active.json",compat()));}
-static void compatResponse(const std::string& status="PARTICIPANT_COMPLETE",bool malformed=false){auto v=compat();v["status"]=status;v["guard_frozen"]=!malformed;v["operations"]=CVariant(CVariant::VariantTypeArray);for(const char*name:{"critical_files","clean_marker"}){CVariant op(CVariant::VariantTypeObject);op["name"]=name;op["ok"]=true;v["operations"].push_back(op);}assert(WriteJson(Get().directory+"/compat-response.json",v));}
-static void response(const std::string& status,bool malformed=false){auto v=identity();v["status"]=status;v["participant"]="command-center-json";if(!malformed)v["global_safe_to_terminate"]=false;assert(WriteJson(Get().directory+"/response.json",v));}
+static void active(bool malformed=false){auto v=identity();v["status"]="ACTIVE";v["participant_api"]=1;v["addon_version"]="0.3.5.19";if(malformed)v["pid"]=true;assert(WritePeerJson(Get().directory+"/active.json",v));assert(WritePeerJson(Get().directory+"/compat-active.json",compat()));}
+static void compatResponse(const std::string& status="PARTICIPANT_COMPLETE",bool malformed=false){auto v=compat();v["status"]=status;v["guard_frozen"]=!malformed;v["operations"]=CVariant(CVariant::VariantTypeArray);for(const char*name:{"critical_files","clean_marker"}){CVariant op(CVariant::VariantTypeObject);op["name"]=name;op["ok"]=true;v["operations"].push_back(op);}assert(WritePeerJson(Get().directory+"/compat-response.json",v));}
+static void response(const std::string& status,bool malformed=false){auto v=identity();v["status"]=status;v["participant"]="command-center-json";if(!malformed)v["global_safe_to_terminate"]=false;assert(WritePeerJson(Get().directory+"/response.json",v));}
 static void ready(CApplication& app){Pump(app);active();Pump(app);assert(Test::freezes==1);response("PLAYBACK_CHECKPOINTED");Pump(app);response("PARTICIPANT_COMPLETE");compatResponse();}
 int main(int argc,char**argv){
  assert(argc==3);std::string mode=argv[1];Test::root=argv[2];CApplication app;
@@ -140,7 +143,7 @@ int main(int argc,char**argv){
    assert(WriteJson(dir+"/engine.json",old));
    auto journal=CVariant(CVariant::VariantTypeObject);journal["owner"]["pid"]=static_cast<int>(getpid());
    journal["owner"]["token"]="55555555-5555-4555-8555-555555555555";
-   assert(WriteJson(dir+"/participant.json",journal));
+   assert(WritePeerJson(dir+"/participant.json",journal));
    if(mode=="startup-old-live")Test::oldRetired=false;
    if(mode=="startup-own-lost")Test::ownLease=false;
    if(mode=="startup-malformed"){std::ofstream f(dir+"/engine.json");f<<"malformed";}

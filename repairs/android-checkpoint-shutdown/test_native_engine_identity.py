@@ -12,7 +12,7 @@ class EngineIdentityTest(unittest.TestCase):
             source = Path(work)
             header = source / 'xbmc/platform/android/activity/InfinityShutdownTrace.h'
             header.parent.mkdir(parents=True)
-            tag = 'infinity-checkpoint-blocker-diagnostics-2103342-v1'
+            tag = 'infinity-checkpoint-protocol-fix-2103343-v1'
             header.write_text('constexpr const char* ENGINE_TAG = "' + tag + '";\n')
             features = [b'SAFE_TO_TERMINATE', b'infinityRequestPersistenceCheckpoint',
                         b'infinityAuthorizeCheckpointTermination', b'CHECKPOINT_FAILED',

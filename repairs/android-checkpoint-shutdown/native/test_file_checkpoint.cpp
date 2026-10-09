@@ -464,6 +464,77 @@ void RejectsUnsafeTargets()
   f.NoTemporaries();
 }
 
+void ProtocolRecordsUseFreshPrivateInodesAndRetainDurabilityGates()
+{
+  class ProtocolIo : public TestIo
+  {
+  public:
+    int metadataReads{0};
+    ssize_t ListAttributes(int, char*, size_t) override
+    {
+      ++metadataReads;
+      return Fail(ENODATA);
+    }
+  };
+  Fixture f;
+  const std::string control = f.directory + "/.android-checkpoint";
+  fs::create_directory(control);
+  f.path = control + "/engine.json";
+  f.Seed("retired-engine", 0640);
+  const auto old = f.Stat();
+  ProtocolIo io;
+  const auto saved = file::SaveProtocolRecord(f.path, "current-engine", io);
+  CHECK(saved.ok && saved.replaced && saved.dataAndDirectorySynced);
+  CHECK(f.Content() == "current-engine" && f.Stat().st_ino != old.st_ino);
+  CHECK((f.Stat().st_mode & 07777) == 0600);
+  CHECK(io.metadataReads == 0 && io.fileSyncs == 1 && io.directorySyncs == 1);
+  CHECK(io.descriptors.empty());
+
+  for (Failure failure : {Failure::Write, Failure::ZeroWrite, Failure::SyncTemporary,
+                         Failure::CloseTemporary, Failure::Rename, Failure::Chmod,
+                         Failure::Create, Failure::OpenExisting, Failure::Stat,
+                         Failure::CloseExisting})
+  {
+    f.Seed("previous-engine");
+    const auto before = f.Stat();
+    ProtocolIo failed;
+    failed.failure = failure;
+    failed.shortIo = true;
+    const auto result = file::SaveProtocolRecord(f.path, "new-engine-longer", failed);
+    CHECK(!result.ok && !result.replaced && !result.dataAndDirectorySynced);
+    CHECK(f.Content() == "previous-engine" && f.Stat().st_ino == before.st_ino);
+    CHECK(failed.metadataReads == 0 && failed.descriptors.empty());
+    for (const auto& entry : fs::directory_iterator(control))
+      CHECK(entry.path().filename().string().find(".infinity-checkpoint-") != 0);
+  }
+  ProtocolIo unsynced;
+  unsynced.failure = Failure::SyncDirectory;
+  const auto uncertain = file::SaveProtocolRecord(f.path, "visible-unconfirmed", unsynced);
+  CHECK(!uncertain.ok && uncertain.replaced && !uncertain.dataAndDirectorySynced);
+  CHECK(uncertain.stage == file::Stage::SyncDirectory && unsynced.descriptors.empty());
+  ProtocolIo failedClose;
+  failedClose.failure = Failure::CloseFinalDirectory;
+  const auto closeFailure = file::SaveProtocolRecord(f.path, "closed-unconfirmed", failedClose);
+  CHECK(!closeFailure.ok && closeFailure.stage == file::Stage::CloseDirectory);
+  CHECK(failedClose.descriptors.empty());
+
+  const auto rejected = file::SaveProtocolRecord(control + "/settings.xml", "bad", io);
+  CHECK(!rejected.ok && rejected.stage == file::Stage::ValidatePath);
+  CHECK(!file::SaveProtocolRecord(f.directory + "/engine.json", "bad", io).ok);
+  const auto request = file::SaveProtocolRecord(control + "/request.json", "request", io);
+  CHECK(request.ok && request.dataAndDirectorySynced);
+  // The XML/user-state policy is still strict even inside the same directory.
+  const auto strict = file::SaveDirty(f.path, "changed-user-state", io);
+  CHECK(!strict.ok && strict.stage == file::Stage::ReadMetadata && strict.error == ENODATA);
+  CHECK(f.Content() == "closed-unconfirmed");
+  const std::string userFile = f.directory + "/user-settings.xml";
+  { std::ofstream file(userFile); file << "keep-user-data"; }
+  fs::remove(f.path);
+  CHECK(::symlink(userFile.c_str(), f.path.c_str()) == 0);
+  CHECK(!file::SaveProtocolRecord(f.path, "bad", io).ok);
+  { std::ifstream file(userFile); std::string bytes; file >> bytes; CHECK(bytes == "keep-user-data"); }
+}
+
 void MetadataReadFailuresIdentifyOperationAndPreserveOriginal()
 {
   class MetadataIo : public TestIo
@@ -519,6 +590,7 @@ int main()
     ExtendedAttributesAndOwnershipSurviveReplacement();
     MetadataFailureNeverReplacesOriginal();
     MetadataReadFailuresIdentifyOperationAndPreserveOriginal();
+    ProtocolRecordsUseFreshPrivateInodesAndRetainDurabilityGates();
     NewFileUsesPrivateMode();
     FailuresBeforeRenamePreserveOriginal();
     RenameFailureIsNotAcknowledged();

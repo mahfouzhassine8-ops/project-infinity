@@ -267,7 +267,7 @@ bool ReadJson(const std::string& path, CVariant& value)
 bool WriteJson(const std::string& path, const CVariant& value)
 {
   std::string bytes;
-  return CJSONVariantWriter::Write(value, bytes, true) && SaveCheckpointXml(path, bytes);
+  return CJSONVariantWriter::Write(value, bytes, true) && SaveCheckpointProtocol(path, bytes);
 }
 CVariant Identity(const State& s)
 {

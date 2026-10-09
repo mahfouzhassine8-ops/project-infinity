@@ -369,7 +369,10 @@ inline int OpenParent(PosixIo& io, const std::string& path,
 }
 } // namespace detail
 
-inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo& io)
+namespace detail
+{
+inline Result SaveDirtyImpl(const std::string& path, std::string_view bytes, PosixIo& io,
+                            bool freshProtocolRecord)
 {
   Result result;
   std::string leaf;
@@ -427,9 +430,10 @@ inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo
       detail::Fail(result, Stage::ValidateExisting, EINVAL);
       return finish();
     }
-    mode = state.st_mode & 07777;
+    if (!freshProtocolRecord)
+      mode = state.st_mode & 07777;
     original = state;
-    same = state.st_size >= 0 &&
+    same = !freshProtocolRecord && state.st_size >= 0 &&
            static_cast<uintmax_t>(state.st_size) == static_cast<uintmax_t>(bytes.size());
     size_t offset = 0;
     char buffer[8192];
@@ -465,7 +469,8 @@ inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo
       detail::Fail(result, Stage::SyncExisting, errno);
       return finish();
     }
-    if (!same && !detail::ReadAttributes(io, existing, attributes, result, Stage::ReadMetadata))
+    if (!same && !freshProtocolRecord &&
+        !detail::ReadAttributes(io, existing, attributes, result, Stage::ReadMetadata))
       return finish();
     if (!detail::Close(io, existing, result, Stage::CloseExisting))
       return finish();
@@ -516,7 +521,7 @@ inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo
       }
       offset += static_cast<size_t>(count);
     }
-    if (replacing)
+    if (replacing && !freshProtocolRecord)
     {
       struct stat created{};
       if (detail::RetryInterrupted([&] { return io.Stat(temporary, &created); }) != 0)
@@ -536,7 +541,7 @@ inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo
       detail::Fail(result, Stage::PreserveMode, errno);
       return finish();
     }
-    if (replacing)
+    if (replacing && !freshProtocolRecord)
     {
       if (!detail::PreserveAttributes(io, temporary, attributes, result))
         return finish();
@@ -572,6 +577,40 @@ inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo
   }
   result.dataAndDirectorySynced = true;
   return finish();
+}
+} // namespace detail
+
+inline Result SaveDirty(const std::string& path, std::string_view bytes, PosixIo& io)
+{
+  return detail::SaveDirtyImpl(path, bytes, io, false);
+}
+
+// These two native-generated control records are fresh messages, not user
+// settings. Publish a newly created 0600 sibling exactly as the Python
+// participant publishes its protocol JSON. Do not transplant metadata from a
+// retired message inode. All path, write, close, rename and durability checks
+// are shared with SaveDirty; user files always retain its strict metadata policy.
+inline Result SaveProtocolRecord(const std::string& path, std::string_view bytes, PosixIo& io)
+{
+  const auto slash = path.rfind('/');
+  const std::string leaf = slash == std::string::npos ? std::string{} : path.substr(slash + 1);
+  const std::string parent = slash == std::string::npos ? std::string{} : path.substr(0, slash);
+  constexpr const char* control = "/.android-checkpoint";
+  const size_t length = std::strlen(control);
+  if ((leaf != "engine.json" && leaf != "request.json") || parent.size() < length ||
+      parent.compare(parent.size() - length, length, control) != 0)
+  {
+    Result result;
+    detail::Fail(result, Stage::ValidatePath, EINVAL);
+    return result;
+  }
+  return detail::SaveDirtyImpl(path, bytes, io, true);
+}
+
+inline Result SaveProtocolRecord(const std::string& path, std::string_view bytes)
+{
+  PosixIo io;
+  return SaveProtocolRecord(path, bytes, io);
 }
 
 inline Result SaveDirty(const std::string& path, std::string_view bytes)

@@ -49,7 +49,8 @@ inline bool LocalCheckpointPath(const std::string& filename, std::string& resolv
   return true;
 }
 
-inline bool SaveCheckpointXml(const std::string& filename, std::string_view bytes)
+inline bool SaveCheckpointFile(const std::string& filename, std::string_view bytes,
+                               bool protocolRecord)
 {
   if (!IsPersistingOnThisThread())
   {
@@ -61,7 +62,9 @@ inline bool SaveCheckpointXml(const std::string& filename, std::string_view byte
     std::string path;
     if (!LocalCheckpointPath(filename, path))
       return false;
-    const auto saved = infinity::checkpoint::files::SaveDirty(path, bytes);
+    const auto saved = protocolRecord ?
+        infinity::checkpoint::files::SaveProtocolRecord(path, bytes) :
+        infinity::checkpoint::files::SaveDirty(path, bytes);
     if (!saved.ok)
     {
       const char* stage = infinity::checkpoint::files::StageName(saved.stage);
@@ -72,8 +75,8 @@ inline bool SaveCheckpointXml(const std::string& filename, std::string_view byte
       detail += ";file=" + path.substr(path.rfind('/') + 1);
       RecordFailure("xml_files", detail.c_str());
       CLog::Log(LOGERROR,
-                "Infinity checkpoint XML failed: stage={} errno={} renamed={} durable={}",
-                stage, saved.error, saved.replaced, saved.dataAndDirectorySynced);
+                "Infinity checkpoint file failed: detail={} renamed={} durable={}",
+                detail, saved.replaced, saved.dataAndDirectorySynced);
       return false;
     }
     return true;
@@ -83,6 +86,16 @@ inline bool SaveCheckpointXml(const std::string& filename, std::string_view byte
     RecordFailure("xml_files", "checkpoint_save_exception");
     return false;
   }
+}
+
+inline bool SaveCheckpointXml(const std::string& filename, std::string_view bytes)
+{
+  return SaveCheckpointFile(filename, bytes, false);
+}
+
+inline bool SaveCheckpointProtocol(const std::string& filename, std::string_view bytes)
+{
+  return SaveCheckpointFile(filename, bytes, true);
 }
 
 // For an audited synchronous producer which has already committed its bytes
