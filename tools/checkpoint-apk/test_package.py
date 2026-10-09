@@ -60,6 +60,13 @@ class PackagingTests(unittest.TestCase):
     with self.assertRaisesRegex(RuntimeError,'JNI declaration'):p.merge(base,donor,native,out,allowed)
    with zipfile.ZipFile(donor,'a') as z:z.writestr('assets/unreviewed',b'bad')
    with self.assertRaisesRegex(RuntimeError,'Unreviewed donor asset'):p.merge(base,donor,native,out,allowed)
+ def test_pillow_native_contract_is_explicit_and_complete(self):
+  self.assertEqual(set(p.PINNED_PIL_NATIVE), {
+   'lib/arm64-v8a/lib_imaging.so','lib/arm64-v8a/lib_imagingft.so',
+   'lib/arm64-v8a/lib_imagingmath.so','lib/arm64-v8a/lib_imagingmorph.so',
+   'lib/arm64-v8a/lib_imagingtk.so'})
+  self.assertTrue(all(len(value)==64 and all(c in '0123456789abcdef' for c in value)
+                      for value in p.PINNED_PIL_NATIVE.values()))
  def test_jni_allowlist_matches_native_registration(self):
   source=(p.RUNTIME/'runtime/native/overlay/xbmc/platform/android/activity/JNIMainActivity.cpp').read_text()
   for _,name,descriptor in NEW-OLD:self.assertIn('{"'+name+'", "'+descriptor+'"',source)
