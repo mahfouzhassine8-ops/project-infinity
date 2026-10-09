@@ -207,7 +207,13 @@ void CScriptInvocationManager::Uninitialize()
   {
     if (!it.done)
       {
-        InfinityShutdownTrace::Scope evidence("scripts.join_remaining", it.thread->GetId(), nullptr, nullptr);
+        const auto& addon = it.thread->GetAddon();
+        // Match this script basename and add-on to scripts.target_before_join
+        // by invoker_id in the same PID/session. target_thread is a label here.
+        const std::string scriptName = URIUtils::GetFileName(it.script);
+        InfinityShutdownTrace::Scope evidence("scripts.join_remaining", it.thread->GetId(),
+                                               addon ? addon->ID().c_str() : nullptr,
+                                               scriptName.c_str());
         it.thread->Stop(true);
       }
   }
