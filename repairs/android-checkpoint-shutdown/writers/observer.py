@@ -13,6 +13,8 @@ import io
 import _io
 import os
 import sqlite3
+# Marker is embedded into libkodi.so and checked by the native build gate.
+DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
 try:
     import subprocess
 except ImportError:
@@ -168,8 +170,10 @@ class Observer:
                         raise
             self.patch(_io, name, CheckedBuffer)
             self.patch(io, name, CheckedBuffer)
-        original_connection = sqlite3.Connection
-        original_cursor = sqlite3.Cursor
+        native_sqlite = importlib.import_module('_sqlite3')
+        dbapi2 = importlib.import_module('sqlite3.dbapi2')
+        original_connection = native_sqlite.Connection
+        original_cursor = native_sqlite.Cursor
 
         class Cursor(original_cursor):
             def execute(self, sql, *args, **kwargs):
@@ -246,7 +250,10 @@ class Observer:
                         observer.error('sqlite_transaction_inspection_failed')
 
         original_connect = sqlite3.connect
-        def connect(database, *args, **kwargs):
+        original_dbapi_connect = dbapi2.connect
+        original_native_connect = native_sqlite.connect
+
+        def checked_connect(original, database, *args, **kwargs):
             observer.check_live()
             positional = list(args)
             factory = positional[4] if len(positional) > 4 else kwargs.get('factory', Connection)
@@ -254,10 +261,26 @@ class Observer:
                 observer.error('unobserved_sqlite_connection_factory')
             if len(positional) > 4: positional[4] = Connection if factory is original_connection else factory
             else: kwargs['factory'] = Connection if factory is original_connection else factory
-            return original_connect(database, *positional, **kwargs)
+            return original(database, *positional, **kwargs)
+
+        def connect(database, *args, **kwargs):
+            return checked_connect(original_connect, database, *args, **kwargs)
+        def dbapi_connect(database, *args, **kwargs):
+            return checked_connect(original_dbapi_connect, database, *args, **kwargs)
+        def native_connect(database, *args, **kwargs):
+            return checked_connect(original_native_connect, database, *args, **kwargs)
+
         self.connection_type = Connection
+        # sqlite3, sqlite3.dbapi2 and _sqlite3 all expose the same native entry
+        # points through different module attributes. Patch every standard route
+        # before add-on module initialization so direct users still receive the
+        # tracked Connection subclass and preserve their own commit/rollback logic.
         self.patch(sqlite3, 'Connection', Connection)
         self.patch(sqlite3, 'connect', connect)
+        self.patch(dbapi2, 'Connection', Connection)
+        self.patch(dbapi2, 'connect', dbapi_connect)
+        self.patch(native_sqlite, 'Connection', Connection)
+        self.patch(native_sqlite, 'connect', native_connect)
         native_os = importlib.import_module(os.name)
         for name in ('write', 'pwrite', 'ftruncate', 'sendfile', 'copy_file_range'):
             if not hasattr(os, name): continue
