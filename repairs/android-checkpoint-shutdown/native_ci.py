@@ -59,7 +59,7 @@ def verify_engine_identity(source, binary):
                   b"scripts.target_before_nonblocking_stop", b"os_tid.%u.stage.%s",
                   b"interpreter_retirement_receipt_limit", b"nonpersistent:ambient-glass", b"PIL._imaging",
                   b"python_bytecode_cache_boundary_rename", b"direct_sqlite_connect_observed",
-                  b"full_blocker_inventory_v1"):
+                  b"full_blocker_inventory_v1", b"python_retirement_batch_v1"):
         if token not in binary:
             raise ValueError("Compiled engine is missing required identity/feature: " + repr(token))
     return tags[0]
