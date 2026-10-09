@@ -102,11 +102,11 @@ inline bool ApprovedBundledPythonExtension(const char* module,const std::string&
   while(root.size()>1 && root.back()=='/')root.pop_back();
   struct Extension{const char* module;const char* library;};
   static constexpr Extension approved[]={
-    {"PIL._imaging","lib_imaging.so"},{"_imaging","lib_imaging.so"},
-    {"PIL._imagingft","lib_imagingft.so"},{"_imagingft","lib_imagingft.so"},
-    {"PIL._imagingmath","lib_imagingmath.so"},{"_imagingmath","lib_imagingmath.so"},
-    {"PIL._imagingmorph","lib_imagingmorph.so"},{"_imagingmorph","lib_imagingmorph.so"},
-    {"PIL._imagingtk","lib_imagingtk.so"},{"_imagingtk","lib_imagingtk.so"},
+    {"PIL._imaging","lib_imaging.so"},
+    {"PIL._imagingft","lib_imagingft.so"},
+    {"PIL._imagingmath","lib_imagingmath.so"},
+    {"PIL._imagingmorph","lib_imagingmorph.so"},
+    {"PIL._imagingtk","lib_imagingtk.so"},
   };
   for(const auto& item:approved)
     if(std::strcmp(module,item.module)==0 && filename==root+"/"+item.library)return true;
