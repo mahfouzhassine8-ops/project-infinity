@@ -49,7 +49,7 @@ int main(int argc,char** argv) {
   Py_Initialize();auto* main=PyThreadState_Get();auto* owner=Py_NewInterpreter();
   assert(owner);
   InfinityScriptPersistence::Admit(1,"provider:service.py");
-  assert(PyRun_SimpleString("import _io\ncached_raw_open = _io.open\n")==0);
+  assert(PyRun_SimpleString("import _io, _sqlite3\ncached_raw_open = _io.open\ncached_sqlite_connect = _sqlite3.connect\n")==0);
   auto* context=InfinityPythonPersistence::Start(1,owner->interp);
   if(PyErr_Occurred())PyErr_Print();
   assert(context && InfinityScriptPersistence::Failure().empty());
@@ -70,7 +70,10 @@ int main(int argc,char** argv) {
   if(mode=="checked-raw")script="import _io\nf=_io.open(root+'/raw.json','w');f.write('saved')\nf.close()\nr=_io.FileIO(root+'/raw.bin','w');r.write(b'raw');r.close()\n";
   if(mode=="raw-write-failure")script="import _io\nr=_io.FileIO('/dev/full','w')\ntry: r.write(b'unsaved')\nexcept OSError: pass\nr.close()\n";
   if(mode=="import-cache")script="with open(root+'/fresh.py','w') as f: f.write('answer=42\\n')\nimport sys\nsys.path.insert(0,root)\nimport fresh\nassert fresh.answer==42\n";
-  if(mode=="direct-sqlite")script="import _sqlite3\nc=_sqlite3.connect(root+'/direct.db');c.close()\n";
+  if(mode=="direct-sqlite")script="import _sqlite3\nc=_sqlite3.connect(root+'/direct.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\nc.commit()\nc.close()\n";
+  if(mode=="dbapi2-sqlite")script="import sqlite3.dbapi2 as dbapi2\nc=dbapi2.connect(root+'/dbapi2.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\nc.commit()\nc.close()\n";
+  if(mode=="direct-sqlite-pending")script="import _sqlite3\nc=_sqlite3.connect(root+'/direct-pending.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\n";
+  if(mode=="cached-direct-sqlite")script="c=cached_sqlite_connect(root+'/cached-direct.db')\nc.close()\n";
   if(mode=="external")script="import subprocess\nsubprocess.run(['/bin/true'],check=True)\n";
   if(mode=="workers")script="import threading\ne=threading.Event()\nt=threading.Thread(target=e.wait);t.start()\n";
   if(mode=="nested")script="from pathlib import Path\np=Path(root)/'health'/'sessions'/'session'/'state.json'\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text('saved')\n";
@@ -98,7 +101,7 @@ int main(int argc,char** argv) {
   if(mode=="layered-raw") {
     assert(PyRun_SimpleString("assert f.closed and b.closed and r.closed\nassert open(root+'/layered.txt').read()=='saved layers'\n")==0);
   }
-  if(mode=="pending" || mode=="system-exit-pending") {
+  if(mode=="pending" || mode=="system-exit-pending" || mode=="direct-sqlite-pending") {
     assert(context->preservePending && !context->finalized);
     assert(!InfinityScriptPersistence::PollCommit());
     assert(!InfinityScriptPersistence::Failure().empty());
@@ -113,7 +116,7 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="readonly-child" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw";
+  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="readonly-child" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else {
@@ -129,6 +132,8 @@ int main(int argc,char** argv) {
       assert(first.failureDetail.find("raw.json")!=std::string::npos);
       assert(first.failureDetail.find("frame=<string>")!=std::string::npos);
     }
+    if(mode=="cached-direct-sqlite")
+      assert(first.failureDetail.find("cached-direct.db")!=std::string::npos);
   }
   auto* interpreter=owner->interp;
   Py_EndInterpreter(owner);
@@ -185,11 +190,11 @@ def main():
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'external', 'workers', 'nested', 'readonly-child', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
+        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'readonly-child', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)
-    print('PASS: real subinterpreter saves, retained transactions, worker retirement and bypass refusal')
+    print('PASS: direct SQLite routes are observed; retained transactions, cached bypasses and writer failures remain fail-closed')
 
 
 if __name__ == '__main__':
