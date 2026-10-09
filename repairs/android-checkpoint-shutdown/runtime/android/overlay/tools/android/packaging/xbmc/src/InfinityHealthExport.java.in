@@ -192,20 +192,25 @@ final class InfinityHealthExport {
           String scriptFailure=scripts.optString("error","");
           String scriptWriter=scripts.optString("failure_writer","");
           String scriptDetail=scripts.optString("failure_detail","");
-          output.append("Python writer failure: ").append(scriptFailure.isEmpty()?"none reported":scriptFailure).append('\n')
-              .append("Python failure writer: ").append(scriptWriter.isEmpty()?"unknown":scriptWriter).append('\n')
-              .append("Python failure writer id: ").append(scripts.optInt("failure_writer_id",-1)).append('\n')
-              .append("Python failure detail: ").append(scriptDetail.isEmpty()?"not captured":scriptDetail).append('\n')
+          output.append("Python blocking failure: ").append(scriptFailure.isEmpty()?"none reported":scriptFailure).append('\n')
+              .append("Python blocking writer: ").append(scriptWriter.isEmpty()?"unknown":scriptWriter).append('\n')
+              .append("Python blocking writer id: ").append(scripts.optInt("failure_writer_id",-1)).append('\n')
+              .append("Python blocking detail: ").append(scriptDetail.isEmpty()?"not captured":scriptDetail).append('\n')
               .append("Python writers: active=").append(scripts.optInt("active_writers",-1))
               .append(" observed=").append(scripts.optInt("observed_writers",-1))
               .append(" retired=").append(scripts.optInt("retired_writers",-1))
+              .append(" advisory_retired=").append(scripts.optInt("advisory_retired_writers",-1))
               .append(" failed_settled=").append(scripts.optInt("failed_settled_writers",-1))
+              .append(" blocking_count=").append(scripts.optInt("blocking_count",-1))
+              .append(" advisory_count=").append(scripts.optInt("advisory_count",-1))
               .append(" tracked_paths=").append(scripts.optInt("tracked_paths",-1)).append('\n');
           JSONArray scriptBlockers=scripts.optJSONArray("blockers");
           if(scriptBlockers!=null&&scriptBlockers.length()>0){
-            output.append("Python writer blockers:\n");
+            boolean wroteHard=false,wroteAdvisory=false;
             for(int i=0;i<scriptBlockers.length()&&i<128;i++){
               JSONObject blocker=scriptBlockers.getJSONObject(i);
+              if(!blocker.optBoolean("blocking",true))continue;
+              if(!wroteHard){output.append("Python save blockers:\n");wroteHard=true;}
               output.append("  ").append(blocker.optString("writer","unknown"))
                   .append(" — ").append(blocker.optString("reason","unspecified"));
               String detail=blocker.optString("detail","");
@@ -213,9 +218,23 @@ final class InfinityHealthExport {
               output.append(" count=").append(blocker.optInt("count",1))
                   .append(" writer_id=").append(blocker.optInt("writer_id",-1)).append('\n');
             }
+            for(int i=0;i<scriptBlockers.length()&&i<128;i++){
+              JSONObject blocker=scriptBlockers.getJSONObject(i);
+              if(blocker.optBoolean("blocking",true))continue;
+              if(!wroteAdvisory){output.append("Python recovered/advisory history:\n");wroteAdvisory=true;}
+              output.append("  ").append(blocker.optString("writer","unknown"))
+                  .append(" — ").append(blocker.optString("reason","unspecified"));
+              String detail=blocker.optString("detail","");
+              if(!detail.isEmpty())output.append(" — ").append(detail);
+              output.append(" count=").append(blocker.optInt("count",1))
+                  .append(" writer_id=").append(blocker.optInt("writer_id",-1))
+                  .append(" [retirement proof still required]").append('\n');
+            }
           }
-          if(scripts.optBoolean("blocker_overflow",false))
-            output.append("  [additional Python blockers omitted: bounded inventory overflow]\n");
+          if(scripts.optBoolean("blocking_overflow",false))
+            output.append("  [additional BLOCKING Python entries omitted: bounded inventory overflow]\n");
+          else if(scripts.optBoolean("blocker_overflow",false))
+            output.append("  [additional advisory Python entries omitted: bounded inventory overflow]\n");
           if(!persisted&&!scriptFailure.isEmpty())
             blocking="python_services"+(scriptWriter.isEmpty()?"":" / "+scriptWriter);
         }
