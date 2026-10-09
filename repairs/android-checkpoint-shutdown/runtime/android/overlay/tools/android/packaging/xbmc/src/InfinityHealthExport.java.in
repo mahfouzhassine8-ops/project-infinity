@@ -159,6 +159,24 @@ final class InfinityHealthExport {
           }
         }
       }
+      if(nativeStatus!=null){
+        JSONObject scripts=nativeStatus.optJSONObject("script_persistence");
+        if(scripts!=null){
+          String scriptFailure=scripts.optString("error","");
+          String scriptWriter=scripts.optString("failure_writer","");
+          String scriptDetail=scripts.optString("failure_detail","");
+          output.append("Python writer failure: ").append(scriptFailure.isEmpty()?"none reported":scriptFailure).append('\n')
+              .append("Python failure writer: ").append(scriptWriter.isEmpty()?"unknown":scriptWriter).append('\n')
+              .append("Python failure writer id: ").append(scripts.optInt("failure_writer_id",-1)).append('\n')
+              .append("Python failure detail: ").append(scriptDetail.isEmpty()?"not captured":scriptDetail).append('\n')
+              .append("Python writers: active=").append(scripts.optInt("active_writers",-1))
+              .append(" observed=").append(scripts.optInt("observed_writers",-1))
+              .append(" retired=").append(scripts.optInt("retired_writers",-1))
+              .append(" tracked_paths=").append(scripts.optInt("tracked_paths",-1)).append('\n');
+          if(!persisted&&!scriptFailure.isEmpty())
+            blocking="python_services"+(scriptWriter.isEmpty()?"":" / "+scriptWriter);
+        }
+      }
       output.append("Blocking operation: ").append(persisted?"none — save barrier acknowledged":blocking.isEmpty()?"unknown / checkpoint not yet reported":blocking).append('\n');
       output.append("A termination request is not observed process death. No legacy cleanup marker is synthesized.\n");
     } catch(Exception unavailable) {
