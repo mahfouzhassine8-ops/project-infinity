@@ -7,9 +7,9 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103350
-RELEASE = '1.0.9-Checkpoint-SQLite-Bridge-RC1'
-FILE_LABEL = 'Checkpoint-SQLite-Bridge-RC1'
+VERSION = 2103351
+RELEASE = '1.0.9-Full-Blocker-Inventory-RC1'
+FILE_LABEL = 'Full-Blocker-Inventory-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 PINNED_PIL_NATIVE = {
