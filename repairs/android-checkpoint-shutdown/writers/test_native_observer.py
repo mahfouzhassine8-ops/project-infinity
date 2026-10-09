@@ -18,6 +18,16 @@ HARNESS = r'''
 #include <iostream>
 int main(int argc,char** argv) {
   assert(argc==3);
+  const std::string libraryRoot=argv[2];
+  setenv("KODI_ANDROID_LIBS",libraryRoot.c_str(),1);
+  assert(InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging",libraryRoot+"/lib_imaging.so"));
+  assert(InfinityPythonPersistence::ApprovedBundledPythonExtension("_imagingft",libraryRoot+"/lib_imagingft.so"));
+  assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging",libraryRoot+"/lib_imagingft.so"));
+  assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("evil._imaging",libraryRoot+"/lib_imaging.so"));
+  assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging","/tmp/lib_imaging.so"));
+  const auto nativeDetail=InfinityPythonPersistence::NativeExtensionEvidence("evil.native","/tmp/evil.so");
+  assert(nativeDetail.find("module=evil.native")!=std::string::npos && nativeDetail.find("path=/tmp/evil.so")!=std::string::npos);
+  unsetenv("KODI_ANDROID_LIBS");
   const std::string mode=argv[1];
   Py_Initialize();auto* main=PyThreadState_Get();auto* owner=Py_NewInterpreter();
   assert(owner);
