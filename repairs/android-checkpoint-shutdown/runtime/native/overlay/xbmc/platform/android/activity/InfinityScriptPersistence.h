@@ -56,23 +56,6 @@ struct State
   std::set<int> retiredInvokers;
 };
 inline State& Get() { static State* state = new State; return *state; }
-inline void Admit(int id, const std::string& name)
-{
-  auto& s=Get(); std::lock_guard<std::mutex> lock(s.mutex);
-  if(s.commitStarted || s.totals.size()>=8192 || s.writers.size()>=512)
-  {s.failure="script_writer_admission_after_seal_or_limit";return;}
-  s.retiredInvokers.erase(id); // Reusing an ID starts a new retirement obligation.
-  ++s.writers[id].admissions[name]; ++s.totals[name].first;
-}
-inline bool Pending(int id)
-{
-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.writers.count(id)!=0;
-}
-inline void Observed(int id)
-{
-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  const auto found=s.writers.find(id);if(found!=s.writers.end())found->second.observed=true;
-}
 inline void AddBlockerLocked(State& s,int id,const std::string& writer,
                              const std::string& reason,const std::string& detail)
 {
@@ -85,6 +68,26 @@ inline void AddBlockerLocked(State& s,int id,const std::string& writer,
     }
   if(s.blockers.size()>=128){s.blockerOverflow=true;return;}
   s.blockers.push_back({id,safeWriter,safeReason,safeDetail,1});
+}
+inline void Admit(int id, const std::string& name)
+{
+  auto& s=Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  if(s.commitStarted || s.totals.size()>=8192 || s.writers.size()>=512) {
+    AddBlockerLocked(s,id,name,"script_writer_admission_after_seal_or_limit",{});
+    if(s.failure.empty()){s.failure="python_writer:script_writer_admission_after_seal_or_limit";s.failureWriterId=id;s.failureWriter=name.substr(0,512);}
+    return;
+  }
+  s.retiredInvokers.erase(id); // Reusing an ID starts a new retirement obligation.
+  ++s.writers[id].admissions[name]; ++s.totals[name].first;
+}
+inline bool Pending(int id)
+{
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.writers.count(id)!=0;
+}
+inline void Observed(int id)
+{
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  const auto found=s.writers.find(id);if(found!=s.writers.end())found->second.observed=true;
 }
 inline void Fail(int id, const std::string& reason, const std::string& detail={})
 {
@@ -121,8 +124,18 @@ inline void Touch(int id,const std::string& path,bool present=true,bool director
 {
   const auto absolute=Absolute(path);if(absolute.empty()){Fail(id,"unsupported_persistence_path");return;}
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  if(s.commitStarted || s.paths.size()>=65536){s.failure="file_mutation_after_seal_or_limit";return;}
-  if(!s.writers.count(id)){s.failure="file_mutation_without_admitted_writer";return;}
+  if(s.commitStarted || s.paths.size()>=65536) {
+    std::string writer;const auto found=s.writers.find(id);
+    if(found!=s.writers.end()&&!found->second.admissions.empty())writer=found->second.admissions.begin()->first;
+    AddBlockerLocked(s,id,writer,"file_mutation_after_seal_or_limit",absolute);
+    if(s.failure.empty()){s.failure="python_writer:file_mutation_after_seal_or_limit";s.failureWriterId=id;s.failureWriter=writer;s.failureDetail=absolute.substr(0,2048);}
+    return;
+  }
+  if(!s.writers.count(id)) {
+    AddBlockerLocked(s,id,{},"file_mutation_without_admitted_writer",absolute);
+    if(s.failure.empty()){s.failure="python_writer:file_mutation_without_admitted_writer";s.failureWriterId=id;s.failureDetail=absolute.substr(0,2048);}
+    return;
+  }
   s.paths[absolute]={present,directory};
 }
 inline void SQLiteCompanions(int id,const std::string& path)
@@ -130,8 +143,13 @@ inline void SQLiteCompanions(int id,const std::string& path)
   const auto absolute=Absolute(path);
   if(absolute.empty()){Fail(id,"unsupported_sqlite_companion_path");return;}
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  if(s.commitStarted || s.paths.size()>65534 || !s.writers.count(id))
-  {s.failure="sqlite_companion_after_seal_or_limit_or_without_writer";return;}
+  if(s.commitStarted || s.paths.size()>65534 || !s.writers.count(id)) {
+    std::string writer;const auto found=s.writers.find(id);
+    if(found!=s.writers.end()&&!found->second.admissions.empty())writer=found->second.admissions.begin()->first;
+    AddBlockerLocked(s,id,writer,"sqlite_companion_after_seal_or_limit_or_without_writer",absolute);
+    if(s.failure.empty()){s.failure="python_writer:sqlite_companion_after_seal_or_limit_or_without_writer";s.failureWriterId=id;s.failureWriter=writer;s.failureDetail=absolute.substr(0,2048);}
+    return;
+  }
   for(const char* suffix:{"-wal","-journal"}) {
     const auto name=absolute+suffix;
     if(!s.paths.count(name))s.paths[name]={true,false,true};
