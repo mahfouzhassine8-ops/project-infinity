@@ -124,17 +124,24 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
 {
   if(!PyUnicode_Check(executable) || (!PyList_Check(command) && !PyTuple_Check(command)))return false;
   const auto count=PySequence_Size(command);
-  const auto executableName=Path(executable);
+  const char* executableText=PyUnicode_AsUTF8(executable);
+  if(!executableText){PyErr_Clear();return false;}
+  const std::string executableRaw(executableText);
+  const auto executableName=executableRaw=="getprop" ? executableRaw : Path(executable);
 
   if(executableName=="getprop" || executableName=="/system/bin/getprop") {
     if(count<1 || count>2)return false;
     PyObject* first=PySequence_GetItem(command,0);
-    const auto firstName=first && PyUnicode_Check(first)?Path(first):std::string{};
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
     Py_XDECREF(first);
     if(firstName!="getprop" && firstName!="/system/bin/getprop")return false;
     if(count==1)return true;
     PyObject* keyObject=PySequence_GetItem(command,1);
-    const auto key=keyObject && PyUnicode_Check(keyObject)?Path(keyObject):std::string{};
+    const char* keyText=keyObject && PyUnicode_Check(keyObject)?PyUnicode_AsUTF8(keyObject):nullptr;
+    const std::string key=keyText?keyText:std::string{};
+    if(!keyText && PyErr_Occurred())PyErr_Clear();
     Py_XDECREF(keyObject);
     if(key.empty() || key.size()>128)return false;
     for(const unsigned char ch:key)
