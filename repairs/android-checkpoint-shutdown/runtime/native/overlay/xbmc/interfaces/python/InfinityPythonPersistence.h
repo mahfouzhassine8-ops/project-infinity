@@ -26,6 +26,7 @@ struct Context
   bool waitingWorkers{false};
   std::map<PyThreadState*,unsigned> checkedOpens;
   std::map<PyThreadState*,unsigned> readonlyChildren;
+  std::map<PyThreadState*,std::string> sqliteTargets;
 };
 inline std::map<PyInterpreterState*,Context*>& Contexts()
 {static auto* contexts=new std::map<PyInterpreterState*,Context*>;return *contexts;}
@@ -251,9 +252,17 @@ inline int Audit(const char* event,PyObject* args,void*)
           std::strcmp(event,"sqlite3.load_extension")==0 ||
           std::strcmp(event,"sqlite3.enable_load_extension")==0)
     InfinityScriptPersistence::Fail(context->id,"unclassified_native_persistence_operation");
+  else if(std::strcmp(event,"sqlite3.connect")==0) {
+    context->sqliteTargets[thread]=count?Path(at(0)):std::string{};
+  }
   else if(std::strcmp(event,"sqlite3.connect/handle")==0) {
-    if(!context->connectionType || count!=1 || PyObject_IsInstance(at(0),context->connectionType)!=1)
-      InfinityScriptPersistence::Fail(context->id,"sqlite_connection_bypassed_checked_commit_observer");
+    if(!context->connectionType || count!=1 || PyObject_IsInstance(at(0),context->connectionType)!=1) {
+      const auto target=context->sqliteTargets.find(thread);
+      const std::string detail=target==context->sqliteTargets.end() ? "path=unknown" :
+          "path="+target->second.substr(0,1024);
+      InfinityScriptPersistence::Fail(context->id,"sqlite_connection_bypassed_checked_commit_observer",detail);
+    }
+    context->sqliteTargets.erase(thread);
   }
   else if(std::strcmp(event,"subprocess.Popen")==0) {
     if(!context->readonlyChildren[thread] || count<4 || !ReadonlyCommand(at(0),at(1)) || at(3)!=Py_None)
