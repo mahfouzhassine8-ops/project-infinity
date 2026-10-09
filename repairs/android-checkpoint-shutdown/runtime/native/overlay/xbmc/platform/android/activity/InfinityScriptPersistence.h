@@ -20,6 +20,7 @@ struct Writer
 {
   std::map<std::string, unsigned> admissions;
   bool observed{false};
+  bool blockingFailure{false};
   std::string failure;
 };
 struct Blocker
@@ -29,6 +30,7 @@ struct Blocker
   std::string reason;
   std::string detail;
   unsigned count{1};
+  bool blocking{true};
 };
 struct Namespace
 {
@@ -45,7 +47,9 @@ struct State
   std::string failure;
   std::vector<Blocker> blockers;
   bool blockerOverflow{false};
+  bool blockingOverflow{false};
   unsigned failedSettled{0};
+  unsigned advisoryRetired{0};
   bool commitStarted{false};
   int failureWriterId{-1};
   std::string failureWriter;
@@ -56,18 +60,36 @@ struct State
   std::set<int> retiredInvokers;
 };
 inline State& Get() { static State* state = new State; return *state; }
+inline bool AdvisoryFailureReason(const std::string& reason)
+{
+  // These are runtime/operation diagnostics, not proof that state remains
+  // dirty at checkpoint retirement. Finalization still must prove no pending
+  // transaction, no unflushed handle and no unobserved persistence path.
+  return reason=="uncaught_script_failure_before_persistence_receipt" ||
+         reason=="sqlite_write_failed" ||
+         reason=="sqlite_script_failed" ||
+         reason=="sqlite_commit_failed" ||
+         reason=="unraisable_python_cleanup_or_write_failure";
+}
 inline void AddBlockerLocked(State& s,int id,const std::string& writer,
-                             const std::string& reason,const std::string& detail)
+                             const std::string& reason,const std::string& detail,
+                             bool blocking=true)
 {
   const auto safeWriter=writer.substr(0,512),safeReason=reason.substr(0,384),safeDetail=detail.substr(0,2048);
   for(auto& blocker:s.blockers)
     if(blocker.writerId==id && blocker.writer==safeWriter &&
-       blocker.reason==safeReason && blocker.detail==safeDetail) {
+       blocker.reason==safeReason && blocker.detail==safeDetail && blocker.blocking==blocking) {
       if(blocker.count<UINT_MAX)++blocker.count;
       return;
     }
-  if(s.blockers.size()>=128){s.blockerOverflow=true;return;}
-  s.blockers.push_back({id,safeWriter,safeReason,safeDetail,1});
+  if(s.blockers.size()>=128){s.blockerOverflow=true;if(blocking)s.blockingOverflow=true;return;}
+  s.blockers.push_back({id,safeWriter,safeReason,safeDetail,1,blocking});
+}
+inline bool HasBlockingBlockerLocked(const State& s)
+{
+  if(s.blockingOverflow)return true;
+  for(const auto& blocker:s.blockers)if(blocker.blocking)return true;
+  return false;
 }
 inline void Admit(int id, const std::string& name)
 {
@@ -93,12 +115,16 @@ inline void Fail(int id, const std::string& reason, const std::string& detail={}
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   auto found=s.writers.find(id);
-  if(found!=s.writers.end() && found->second.failure.empty()) found->second.failure=reason;
+  const bool blocking=!AdvisoryFailureReason(reason);
+  if(found!=s.writers.end() && blocking) {
+    found->second.blockingFailure=true;
+    if(found->second.failure.empty())found->second.failure=reason;
+  }
   std::string writer;
   if(found!=s.writers.end() && !found->second.admissions.empty())
     writer=found->second.admissions.begin()->first.substr(0,512);
-  AddBlockerLocked(s,id,writer,reason,detail);
-  if(s.failure.empty()) {
+  AddBlockerLocked(s,id,writer,reason,detail,blocking);
+  if(blocking && s.failure.empty()) {
     s.failure="python_writer:"+reason;
     s.failureWriterId=id;
     s.failureDetail=detail.substr(0,2048);
@@ -162,11 +188,15 @@ inline void Retired(int id)
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   const auto found=s.writers.find(id);if(found==s.writers.end())return;
   if(!found->second.observed)return;
-  if(!found->second.failure.empty()) {
+  if(found->second.blockingFailure) {
     ++s.failedSettled;
-    s.writers.erase(found); // Interpreter ended, but no durable retirement receipt is granted.
+    s.writers.erase(found); // Hard persistence uncertainty never receives a durable receipt.
     return;
   }
+  bool hadAdvisory=false;
+  for(const auto& blocker:s.blockers)
+    if(!blocker.blocking && blocker.writerId==id){hadAdvisory=true;break;}
+  if(hadAdvisory)++s.advisoryRetired;
   for(const auto& item:found->second.admissions)s.totals[item.first].second+=item.second;
   if(s.retiredInvokers.size()>=512){
     std::string writer;
@@ -195,15 +225,16 @@ inline bool DurableRetirement(const std::string& name)
 inline bool BlockedRetirement(const std::string& name)
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  for(const auto& blocker:s.blockers)if(blocker.writer==name)return true;
+  for(const auto& blocker:s.blockers)if(blocker.blocking && blocker.writer==name)return true;
   return false;
 }
 inline std::string Failure()
 {auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.failure;}
 struct Evidence
 {
-  std::size_t active{0}, observed{0}, retired{0}, failedSettled{0}, paths{0};
-  bool syncStarted{false}, syncFinished{false}, durable{false}, blockerOverflow{false};
+  std::size_t active{0}, observed{0}, retired{0}, failedSettled{0}, advisoryRetired{0}, paths{0};
+  std::size_t blockingCount{0}, advisoryCount{0};
+  bool syncStarted{false}, syncFinished{false}, durable{false}, blockerOverflow{false}, blockingOverflow{false};
   std::string failure;
   int failureWriterId{-1};
   std::string failureWriter;
@@ -214,11 +245,16 @@ struct Evidence
 inline Evidence Snapshot()
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);Evidence result;
-  result.active=s.writers.size();result.retired=s.retired;result.failedSettled=s.failedSettled;result.paths=s.paths.size();
+  result.active=s.writers.size();result.retired=s.retired;result.failedSettled=s.failedSettled;
+  result.advisoryRetired=s.advisoryRetired;result.paths=s.paths.size();
   result.syncStarted=s.commitStarted;result.syncFinished=s.commitFinished;
-  result.durable=s.committed && s.failure.empty() && s.blockers.empty();result.failure=s.failure;
-  result.failureWriterId=s.failureWriterId;result.failureWriter=s.failureWriter;
+  result.failure=s.failure;result.failureWriterId=s.failureWriterId;result.failureWriter=s.failureWriter;
   result.failureDetail=s.failureDetail;result.blockers=s.blockers;result.blockerOverflow=s.blockerOverflow;
+  result.blockingOverflow=s.blockingOverflow;
+  for(const auto& blocker:s.blockers) {
+    if(blocker.blocking)++result.blockingCount;else ++result.advisoryCount;
+  }
+  result.durable=s.committed && s.failure.empty() && result.blockingCount==0 && !result.blockingOverflow;
   for(const auto& item:s.writers) {
     if(item.second.observed)++result.observed;
     for(const auto& admission:item.second.admissions)
@@ -298,6 +334,6 @@ inline bool PollCommit()
 {
   if(!PollInventory())return false;
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  return s.committed && s.failure.empty() && s.blockers.empty();
+  return s.committed && s.failure.empty() && !HasBlockingBlockerLocked(s);
 }
 } // namespace InfinityScriptPersistence
