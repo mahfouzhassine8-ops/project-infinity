@@ -48,6 +48,20 @@ int main(int argc,char** argv) {
   const std::string mode=argv[1];
   Py_Initialize();auto* main=PyThreadState_Get();auto* owner=Py_NewInterpreter();
   assert(owner);
+  {
+    auto* exec=PyUnicode_FromString("getprop");
+    auto* good=Py_BuildValue("[ss]","getprop","ro.product.cpu.abi");
+    auto* badKey=Py_BuildValue("[ss]","getprop","ro.product.cpu.abi;id");
+    auto* tooMany=Py_BuildValue("[sss]","getprop","ro.product.cpu.abi","extra");
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,good));
+    assert(!InfinityPythonPersistence::ReadonlyCommand(exec,badKey));
+    assert(!InfinityPythonPersistence::ReadonlyCommand(exec,tooMany));
+    Py_DECREF(good);Py_DECREF(badKey);Py_DECREF(tooMany);Py_DECREF(exec);
+    exec=PyUnicode_FromString("/system/bin/getprop");
+    good=Py_BuildValue("[ss]","/system/bin/getprop","ro.build.version.sdk");
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,good));
+    Py_DECREF(good);Py_DECREF(exec);
+  }
   InfinityScriptPersistence::Admit(1,"provider:service.py");
   assert(PyRun_SimpleString("import _io, _sqlite3\ncached_raw_open = _io.open\ncached_sqlite_connect = _sqlite3.connect\n")==0);
   auto* context=InfinityPythonPersistence::Start(1,owner->interp);
