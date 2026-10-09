@@ -5,6 +5,7 @@
 #if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
 #include "filesystem/SpecialProtocol.h"
 #endif
+#include <cstdlib>
 #include <cstring>
 #include <frameobject.h>
 #include <map>
@@ -89,6 +90,34 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
   }
   return true;
 }
+
+inline bool ApprovedBundledPythonExtension(const char* module,const std::string& filename)
+{
+  // Importing a native module is not itself a persistence write. Only the
+  // exact Pillow images shipped by the signed Infinity APK may cross this
+  // gate; all other add-on native extensions remain fail-closed.
+  const char* libraries=std::getenv("KODI_ANDROID_LIBS");
+  if(!module || !libraries || libraries[0]!='/' || filename.empty())return false;
+  std::string root(libraries);
+  while(root.size()>1 && root.back()=='/')root.pop_back();
+  struct Extension{const char* module;const char* library;};
+  static constexpr Extension approved[]={
+    {"PIL._imaging","lib_imaging.so"},{"_imaging","lib_imaging.so"},
+    {"PIL._imagingft","lib_imagingft.so"},{"_imagingft","lib_imagingft.so"},
+    {"PIL._imagingmath","lib_imagingmath.so"},{"_imagingmath","lib_imagingmath.so"},
+    {"PIL._imagingmorph","lib_imagingmorph.so"},{"_imagingmorph","lib_imagingmorph.so"},
+    {"PIL._imagingtk","lib_imagingtk.so"},{"_imagingtk","lib_imagingtk.so"},
+  };
+  for(const auto& item:approved)
+    if(std::strcmp(module,item.module)==0 && filename==root+"/"+item.library)return true;
+  return false;
+}
+inline std::string NativeExtensionEvidence(const char* module,const std::string& filename)
+{
+  return "module="+std::string(module?module:"unknown").substr(0,256)+
+         ";path="+filename.substr(0,1024);
+}
+
 inline std::string OpenEvidence(PyObject* path,long flags)
 {
   // Diagnostic inspection must preserve any exception pending in the caller.
@@ -154,8 +183,10 @@ inline int Audit(const char* event,PyObject* args,void*)
     if(module && (std::strcmp(module,"_dbm")==0 || std::strcmp(module,"_gdbm")==0))
       InfinityScriptPersistence::Fail(context->id,"unobserved_dbm_persistence_backend");
     if(filename.size()>=3 && filename.compare(filename.size()-3,3,".so")==0 &&
-       filename.find("/lib-dynload/")==std::string::npos)
-      InfinityScriptPersistence::Fail(context->id,"unclassified_addon_native_extension");
+       filename.find("/lib-dynload/")==std::string::npos &&
+       !ApprovedBundledPythonExtension(module,filename))
+      InfinityScriptPersistence::Fail(context->id,"unclassified_addon_native_extension",
+                                      NativeExtensionEvidence(module,filename));
   }
   else if(std::strcmp(event,"os.chmod")==0 || std::strcmp(event,"os.chown")==0 ||
           std::strcmp(event,"os.utime")==0 || std::strcmp(event,"os.setxattr")==0 ||
