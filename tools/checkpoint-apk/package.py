@@ -7,11 +7,18 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103347
-RELEASE = '1.0.9-Checkpoint-Script-Retirement-RC1'
-FILE_LABEL = 'Checkpoint-Script-Retirement-RC1'
+VERSION = 2103348
+RELEASE = '1.0.9-Checkpoint-Native-Writer-RC1'
+FILE_LABEL = 'Checkpoint-Native-Writer-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
+PINNED_PIL_NATIVE = {
+    'lib/arm64-v8a/lib_imaging.so': '28a55b715475872f510396cdc4bc089de1344e98054ded16ef3c501f2ad86c79',
+    'lib/arm64-v8a/lib_imagingft.so': 'd27a82cbe5d5e08404c9ef6a1b39fb3c697474e460ccd21c0874e95ead0bd6f4',
+    'lib/arm64-v8a/lib_imagingmath.so': 'a3fd521072ac8ee1c7c40029b281763962ecb2970f0b27cef598e8d3ae45fb56',
+    'lib/arm64-v8a/lib_imagingmorph.so': '91a4eec5bb308892854b1f4678129c585fde8c6c44dae19ba3455b130a9323d9',
+    'lib/arm64-v8a/lib_imagingtk.so': 'a870d048acdc1400f3cf88307547527d91d6d1ca7a91f621c981b55ad6bdfebd',
+}
 
 def verify_checkpoint_manifest(original, compiled):
     old, new = manifest_tree(original), manifest_tree(compiled)
@@ -115,6 +122,9 @@ def finish(args):
         require(sha(base.read('lib/arm64-v8a/libinfinityambient.so')) ==
                 'a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684',
                 'APK ambient image differs from reviewed memory-only contract')
+        for name, expected in PINNED_PIL_NATIVE.items():
+            require(sha(base.read(name)) == expected,
+                    'APK Pillow native image differs from reviewed non-persistent import contract: '+name)
     runtime_delta.verify(args.source, json.loads((RUNTIME/'runtime/android/manifest.json').read_text())['after'])
     native, proof = associated_native(args)
     receipt=json.loads((args.out/'COMPAT-ASSET-ASSOCIATION.json').read_text())
@@ -145,6 +155,9 @@ def finish(args):
         require(b.testzip() is None, 'Final APK integrity failure')
         for n in kept: require(a.read(n)==b.read(n),'Protected entry changed: '+n)
         for n,h in replacements.items(): require(sha(b.read(n))==h,'Final asset changed: '+n)
+        for n,h in PINNED_PIL_NATIVE.items():
+            require(sha(a.read(n))==h and sha(b.read(n))==h,
+                    'Pinned Pillow native image changed in final APK: '+n)
         require(b.read(ENGINE)==native.read_bytes(), 'Packaged native mismatch')
     (args.out/'DELIVERY.json').write_text(json.dumps({
         'file':final.name,'size':final.stat().st_size,'sha256':sha(final.read_bytes()),
@@ -155,7 +168,7 @@ def finish(args):
         'parent_apk_sha256':parent['parent_apk_sha256'],'protected_entries':len(kept),
         'signer_certificate_sha256':parent['signer_certificate_sha256'],
         'native_recompiled':GREEN_SHA==os.environ['GITHUB_SHA'],'device_accepted':False,'locked':False,
-        'installed_owner_audit_complete':False,'unknown_writers_block_normal_close':True,
+        'installed_owner_audit_complete':False,'unknown_writers_block_normal_close':True,'pillow_native_contract_pinned':True,
         'purpose':'Fold test candidate; unresolved saves must block termination'
     },indent=2)+'\n')
     unsigned.unlink(); native.unlink()
