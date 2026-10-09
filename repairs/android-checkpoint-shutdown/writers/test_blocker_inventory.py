@@ -69,18 +69,65 @@ int main() {
 }
 '''
 
+ADVISORY_HARNESS = r'''
+#include "platform/android/activity/InfinityScriptPersistence.h"
+#include <cassert>
+#include <chrono>
+#include <iostream>
+#include <thread>
+using namespace InfinityScriptPersistence;
+
+int main() {
+  for (const auto& item : std::vector<std::pair<int,std::string>>{
+      {10,"recover.sqlite:service.py"},
+      {11,"recover.script:default.py"},
+      {12,"recover.cleanup:service.py"}}) {
+    Admit(item.first,item.second);
+    Observed(item.first);
+  }
+  Fail(10,"sqlite_write_failed","statement_failed_but_rolled_back");
+  Fail(11,"uncaught_script_failure_before_persistence_receipt");
+  Fail(12,"unraisable_python_cleanup_or_write_failure");
+  Retired(10);Retired(11);Retired(12);
+
+  auto before=Snapshot();
+  assert(before.active==0);
+  assert(before.retired==3);
+  assert(before.failedSettled==0);
+  assert(before.advisoryRetired==3);
+  assert(before.blockingCount==0);
+  assert(before.advisoryCount==3);
+  assert(before.failure.empty());
+  assert(DurableRetirement("recover.sqlite:service.py"));
+  assert(DurableRetirement("recover.script:default.py"));
+  assert(DurableRetirement("recover.cleanup:service.py"));
+  assert(!BlockedRetirement("recover.sqlite:service.py"));
+
+  for(int i=0;i<1000 && !PollCommit();++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  assert(PollCommit());
+  auto after=Snapshot();
+  assert(after.durable);
+  assert(after.blockingCount==0);
+  assert(after.advisoryCount==3);
+  std::cout<<"PASS: recovered operation/script diagnostics remain visible without poisoning a durable retirement\n";
+}
+'''
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--runtime",type=Path,required=True)
     args=parser.parse_args()
     with tempfile.TemporaryDirectory(prefix="script-blocker-inventory-") as temp:
         temp=Path(temp)
-        source=temp/"test.cpp"
-        source.write_text(HARNESS)
-        binary=temp/"test"
-        subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pthread",
-                        "-I",str(args.runtime/"xbmc"),str(source),"-o",str(binary)],check=True)
-        subprocess.run([str(binary)],check=True,timeout=10)
+        for name, harness in (("blocking", HARNESS), ("advisory", ADVISORY_HARNESS)):
+            source=temp/(name+".cpp")
+            source.write_text(harness)
+            binary=temp/name
+            subprocess.run(["g++","-std=c++17","-Wall","-Wextra","-Werror","-pthread",
+                            "-I",str(args.runtime/"xbmc"),str(source),"-o",str(binary)],check=True)
+            subprocess.run([str(binary)],check=True,timeout=10)
 
 if __name__=="__main__":
     main()
