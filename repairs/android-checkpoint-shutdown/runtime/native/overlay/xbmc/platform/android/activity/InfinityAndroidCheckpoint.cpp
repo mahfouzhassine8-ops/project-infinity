@@ -249,6 +249,9 @@ std::string EncodeStatusLocked(const State& s)
   scriptEvidence["observed_writers"] = static_cast<uint64_t>(scripts.observed);
   scriptEvidence["retired_writers"] = static_cast<uint64_t>(scripts.retired);
   scriptEvidence["failed_settled_writers"] = static_cast<uint64_t>(scripts.failedSettled);
+  scriptEvidence["advisory_retired_writers"] = static_cast<uint64_t>(scripts.advisoryRetired);
+  scriptEvidence["blocking_count"] = static_cast<uint64_t>(scripts.blockingCount);
+  scriptEvidence["advisory_count"] = static_cast<uint64_t>(scripts.advisoryCount);
   scriptEvidence["tracked_paths"] = static_cast<uint64_t>(scripts.paths);
   scriptEvidence["sync_started"] = scripts.syncStarted;
   scriptEvidence["sync_finished"] = scripts.syncFinished;
@@ -258,12 +261,14 @@ std::string EncodeStatusLocked(const State& s)
   scriptEvidence["failure_writer"] = scripts.failureWriter;
   scriptEvidence["failure_detail"] = scripts.failureDetail;
   scriptEvidence["blocker_overflow"] = scripts.blockerOverflow;
+  scriptEvidence["blocking_overflow"] = scripts.blockingOverflow;
   scriptEvidence["blockers"] = CVariant(CVariant::VariantTypeArray);
   for(const auto& blocker:scripts.blockers) {
     CVariant value(CVariant::VariantTypeObject);
     value["writer_id"]=blocker.writerId;value["writer"]=blocker.writer;
     value["reason"]=blocker.reason;value["detail"]=blocker.detail;
     value["count"]=static_cast<uint64_t>(blocker.count);
+    value["blocking"]=blocker.blocking;
     scriptEvidence["blockers"].push_back(value);
   }
   scriptEvidence["pending_writers"] = CVariant(CVariant::VariantTypeArray);
@@ -818,7 +823,7 @@ bool AuthorizeTermination(const std::string& session, const std::string& owner, 
     return false;
   }
   const auto scripts = InfinityScriptPersistence::Snapshot();
-  if (!scripts.failure.empty() || !scripts.blockers.empty())
+  if (!scripts.failure.empty() || scripts.blockingCount != 0 || scripts.blockingOverflow)
   {
     RecordFatalFailure("python_services",scripts.failure.empty()?"python_blocker_after_safe":scripts.failure.c_str());
     return false;
@@ -950,7 +955,7 @@ void Pump(CApplication& application)
       // A failed interpreter may settle without receiving a durable retirement receipt.
       Operation("python_services");
       auto scripts = InfinityScriptPersistence::Snapshot();
-      if (!scripts.blockers.empty())
+      if (scripts.blockingCount != 0 || scripts.blockingOverflow)
       {
         std::lock_guard<std::mutex> lock(s.mutex);
         if (s.owners["python_services"].error.empty())
@@ -965,7 +970,7 @@ void Pump(CApplication& application)
       if (!InfinityScriptPersistence::PollInventory())
         return; // Durability sync may finish even when a writer-level blocker is retained.
       scripts = InfinityScriptPersistence::Snapshot();
-      if (scripts.blockers.empty() && scripts.durable)
+      if (scripts.blockingCount == 0 && !scripts.blockingOverflow && scripts.durable)
         Complete("python_services", true);
       else
       {
