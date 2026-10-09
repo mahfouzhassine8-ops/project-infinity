@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -47,7 +48,22 @@ def run(*command):
     subprocess.run(command, check=True)
 
 
+def verify_engine_identity(source, binary):
+    header = (source / "xbmc/platform/android/activity/InfinityShutdownTrace.h").read_text()
+    tags = re.findall(r'constexpr const char\* ENGINE_TAG = "([^"]+)";', header)
+    if len(tags) != 1:
+        raise ValueError("Expected exactly one reviewed engine trace identity")
+    for token in (b"SAFE_TO_TERMINATE", b"infinityRequestPersistenceCheckpoint",
+                  b"infinityAuthorizeCheckpointTermination", b"CHECKPOINT_FAILED",
+                  tags[0].encode(), b"scripts.target_before_join",
+                  b"scripts.target_before_nonblocking_stop", b"os_tid.%u.stage.%s"):
+        if token not in binary:
+            raise ValueError("Compiled engine is missing required identity/feature: " + repr(token))
+    return tags[0]
+
+
 def prepare():
+    run(sys.executable, str(HERE / "test_native_engine_identity.py"))
     # This inherited recipe replays all accepted Infinity/Cobra/audio/Fold/
     # provider/player deltas and every intervening source guard. It does not
     # substitute an upstream engine. The complete 9374-file compiled-parent
@@ -155,14 +171,12 @@ make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"'''
     libraries = list(Path(os.environ["BUILD_DIR"]).rglob("libkodi.so"))
     assert len(libraries) == 1, libraries
     binary = libraries[0].read_bytes()
-    for token in (b"SAFE_TO_TERMINATE", b"infinityRequestPersistenceCheckpoint",
-                  b"infinityAuthorizeCheckpointTermination", b"CHECKPOINT_FAILED",
-                  b"infinity-shutdown-2103334-v1"):
-        assert token in binary, token
+    engine_tag = verify_engine_identity(source, binary)
     shutil.copyfile(libraries[0], OUT / "libkodi.so")
     proof = {"schema": 1, "purpose": "unaccepted shutdown work-branch native validation",
              "source_commit": os.environ["GITHUB_SHA"], "parent_apk": 2103335,
              "parent_native": 2103334,
+             "engine_tag": engine_tag,
              "native_sha256": hashlib.sha256(binary).hexdigest(),
              "source_manifest_sha256": hashlib.sha256((HERE / "runtime/native/manifest.json").read_bytes()).hexdigest(),
              "enumerated_native_changes": manifest["changed"],

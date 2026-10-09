@@ -123,6 +123,7 @@ def finish(args):
         'file':final.name,'size':final.stat().st_size,'sha256':sha(final.read_bytes()),
         'candidate':VERSION,'source_commit':os.environ['GITHUB_SHA'],
         'native_source_commit':GREEN_SHA,'native_validation_run':int(os.environ['INFINITY_NATIVE_RUN_ID']),
+        'android_validation_run':int(os.environ.get('INFINITY_ANDROID_RUN_ID',os.environ['GITHUB_RUN_ID'])),
         'native_unstripped_sha256':proof['native_sha256'],'native_packaged_sha256':sha(native.read_bytes()),
         'parent_apk_sha256':parent['parent_apk_sha256'],'protected_entries':len(kept),
         'signer_certificate_sha256':parent['signer_certificate_sha256'],
