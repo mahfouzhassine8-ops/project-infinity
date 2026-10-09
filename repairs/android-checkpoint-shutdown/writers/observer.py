@@ -8,17 +8,22 @@ teardown. Native admission, thread retirement and filesystem durability are
 separate required proofs.
 """
 import builtins
-from functools import partial
+import importlib
 import io
 import os
 import sqlite3
+try:
+    import subprocess
+except ImportError:
+    subprocess = None
 import threading
+import types
 import weakref
 from urllib.parse import unquote, urlsplit, parse_qs
 
 
 class Observer:
-    def __init__(self, fail, touch, vfs=None):
+    def __init__(self, fail, touch, vfs=None, host_probe=False):
         self.fail = fail
         self.touch = touch
         self.lock = threading.RLock()
@@ -26,6 +31,9 @@ class Observer:
         self.connections = weakref.WeakSet()
         self.held_connections = set()
         self.held_handles = set()
+        self.children = set()
+        self.host_probe = host_probe
+        self.child_scope = threading.local()
         self.originals = []
         self.retired = False
         self.vfs = vfs
@@ -36,6 +44,8 @@ class Observer:
 
     def patch(self, module, name, replacement):
         original = getattr(module, name)
+        if isinstance(replacement, types.FunctionType):
+            replacement = Operation(replacement)
         setattr(module, name, replacement)
         self.originals.append((module, name, original, replacement))
         return original
@@ -60,7 +70,7 @@ class Observer:
             raise
         finally:
             self.touch(path, 'checked-open-end')
-        self.touch(path, 'write')
+        self.touch(handle.fileno(), 'write')
         proxy = File(handle, self)
         self.handles.add(proxy)
         return proxy
@@ -162,12 +172,13 @@ class Observer:
         self.connection_type = Connection
         self.patch(sqlite3, 'Connection', Connection)
         self.patch(sqlite3, 'connect', connect)
-        for name in ('write', 'pwrite', 'ftruncate'):
+        native_os = importlib.import_module(os.name)
+        for name in ('write', 'pwrite', 'ftruncate', 'sendfile', 'copy_file_range'):
             if not hasattr(os, name): continue
             original = getattr(os, name)
             def operated(*args, _original=original, _name=name, **kwargs):
                 observer.check_live()
-                observer.touch(args[0], 'write')
+                observer.touch(args[1] if _name == 'copy_file_range' else args[0], 'write')
                 try:
                     result = _original(*args, **kwargs)
                     if _name in ('write', 'pwrite') and result != len(args[1]):
@@ -176,7 +187,8 @@ class Observer:
                 except Exception:
                     observer.error('raw_file_'+_name+'_failed')
                     raise
-            self.patch(os, name, partial(operated))
+            self.patch(os, name, operated)
+            if hasattr(native_os, name): self.patch(native_os, name, operated)
         for name in ('open', 'rename', 'replace', 'remove', 'unlink', 'mkdir', 'rmdir', 'truncate'):
             original = getattr(os, name)
             def namespace_op(*args, _original=original, _name=name, **kwargs):
@@ -184,12 +196,12 @@ class Observer:
                     flags = args[1] if len(args) > 1 else kwargs.get('flags', 0)
                     if not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND):
                         return _original(*args, **kwargs)
-                    if kwargs.get('dir_fd') is not None:
-                        self.error('unobserved_directory_relative_file_open')
                 self.check_live()
                 if _name == 'open': self.touch(args[0], 'checked-open-begin')
                 try:
-                    return _original(*args, **kwargs)
+                    result = _original(*args, **kwargs)
+                    if _name == 'open': self.touch(result, 'write')
+                    return result
                 except FileExistsError:
                     if _name not in ('open', 'mkdir'): self.error('namespace_'+_name+'_failed')
                     raise
@@ -203,9 +215,10 @@ class Observer:
                     raise
                 finally:
                     if _name == 'open': self.touch(args[0], 'checked-open-end')
-            # Builtin os functions do not bind when cached on an accessor class.
-            # Preserve that behavior for Python 3.10 pathlib and addon helpers.
-            self.patch(os, name, partial(namespace_op))
+            self.patch(os, name, namespace_op)
+            if hasattr(native_os, name): self.patch(native_os, name, namespace_op)
+        if subprocess is not None:
+            self.install_children()
         if self.vfs is not None:
             original = self.vfs.File
             def vfs_file(path, mode=None):
@@ -236,6 +249,57 @@ class Observer:
                         raise
                 self.patch(self.vfs, name, vfs_op)
 
+    def install_children(self):
+        observer = self
+        original_popen = subprocess.Popen
+        class Popen(original_popen):
+            def __init__(child, command, *args, **kwargs):
+                observer.check_live()
+                allowed = ['/system/bin/logcat', '--uid='+str(os.getuid()), '-b', 'crash', '-d', '-t', '200', '-v', 'threadtime']
+                if observer.host_probe:
+                    allowed_fixture = ['/bin/echo', 'infinity-diagnostic-fixture']
+                else:
+                    allowed_fixture = None
+                readonly = (isinstance(command, (list, tuple)) and
+                            list(command) in (allowed, allowed_fixture) and not args and
+                            not kwargs.get('shell', False) and kwargs.get('env') is None and
+                            kwargs.get('cwd') is None and kwargs.get('preexec_fn') is None and
+                            not kwargs.get('pass_fds', ()) and
+                            (observer.host_probe or not any(name.startswith(('LD_', 'DYLD_')) for name in os.environ)) and
+                            kwargs.get('executable') in (None, command[0]))
+                if readonly:
+                    for name, fallback in (('stdout', 1), ('stderr', 2)):
+                        output = kwargs.get(name)
+                        if isinstance(output, File): observer.touch(output.fileno(), 'write')
+                        elif output is None: observer.touch(fallback, 'write')
+                        elif output not in (subprocess.PIPE, subprocess.STDOUT):
+                            observer.error('unobserved_diagnostic_child_output')
+                    observer.touch(None, 'readonly-child-begin')
+                    observer.child_scope.readonly = True
+                try:
+                    super().__init__(command, **kwargs) if not args else super().__init__(command, *args, **kwargs)
+                    if readonly: observer.children.add(child)
+                finally:
+                    if readonly:
+                        observer.child_scope.readonly = False
+                        observer.touch(None, 'readonly-child-end')
+        self.patch(subprocess, 'Popen', Popen)
+        # subprocess captures the C fork function at import. Check both aliases
+        # so importing the lower-level module cannot evade child ownership.
+        try:
+            native_process = importlib.import_module('_posixsubprocess')
+        except ImportError:
+            native_process = None
+        if native_process is not None:
+            fork_exec = native_process.fork_exec
+            def checked_fork_exec(*args, **kwargs):
+                if not getattr(observer.child_scope, 'readonly', False):
+                    observer.error('unobserved_native_child_process')
+                return fork_exec(*args, **kwargs)
+            self.patch(native_process, 'fork_exec', checked_fork_exec)
+            if hasattr(subprocess, '_fork_exec'):
+                self.patch(subprocess, '_fork_exec', checked_fork_exec)
+
     def finish(self):
         # Called with the GIL after all interpreter child threads have retired.
         # Native code separately checks the thread list and actual destruction.
@@ -244,6 +308,12 @@ class Observer:
                 if getattr(module, name) is not replacement:
                     self.error('persistence_observer_binding_replaced:'+name)
             safe = True
+            for child in set(self.children):
+                if child.poll() is None:
+                    self.error('diagnostic_child_not_retired')
+                    safe = False
+                else:
+                    self.children.discard(child)
             for connection in set(self.connections) | self.held_connections:
                 if not connection._infinity_closed:
                     if connection.in_transaction:
@@ -265,7 +335,11 @@ class File:
         self.handle, self.observer = handle, observer
     def __getattr__(self, name):
         if name in ('buffer', 'raw', 'detach'):
-            self.observer.error('unobserved_raw_buffer_access')
+            try:
+                anonymous = os.fstat(self.handle.fileno()).st_nlink == 0
+            except (OSError, ValueError):
+                anonymous = False
+            if not anonymous: self.observer.error('unobserved_raw_buffer_access')
         return getattr(self.handle, name)
     def __iter__(self): return iter(self.handle)
     def __next__(self): return next(self.handle)
@@ -333,3 +407,10 @@ class VFSFile(File):
 def _writes(sql):
     if not isinstance(sql, str) or not sql.strip(): return False
     return sql.lstrip().split(None, 1)[0].upper() not in ('SELECT', 'EXPLAIN')
+
+
+class Operation:
+    """Match a native function's non-descriptor behavior in cached class aliases."""
+    def __init__(self, function): self.function = function
+    def __call__(self, *args, **kwargs): return self.function(*args, **kwargs)
+    def __getattr__(self, name): return getattr(self.function, name)

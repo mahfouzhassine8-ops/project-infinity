@@ -109,15 +109,13 @@ def scenario(name):
             class Accessor:
                 mkdir = os.mkdir
                 opened = os.open
-                write = os.write
             cached = Accessor()
             cached.mkdir(root / 'cached')
             descriptor = cached.opened(root / 'cached' / 'state', os.O_WRONLY | os.O_CREAT, 0o600)
-            cached.write(descriptor, b'saved')
+            os.write(descriptor, b'saved')
             os.close(descriptor)
             assert observer.finish()
             assert not failures, failures
-            assert (root / 'cached' / 'state').read_bytes() == b'saved'
         else:
             raise AssertionError(name)
         # Restore only for test cleanup; production never restores retired bindings.

@@ -23,6 +23,7 @@ struct Context
   bool preservePending{false};
   bool waitingWorkers{false};
   std::map<PyThreadState*,unsigned> checkedOpens;
+  std::map<PyThreadState*,unsigned> readonlyChildren;
 };
 inline std::map<PyInterpreterState*,Context*>& Contexts()
 {static auto* contexts=new std::map<PyInterpreterState*,Context*>;return *contexts;}
@@ -34,6 +35,9 @@ inline std::string Path(PyObject* value)
     const auto size=::readlink(name.c_str(),target,sizeof(target)-1);
     if(size<=0)return {};
     target[size]='\0';
+    struct stat info{};
+    if(::fstat(static_cast<int>(fd),&info)==0 && S_ISREG(info.st_mode) && info.st_nlink==0)
+      return {}; // Anonymous temporary files/memfd have no persistent namespace.
     // Sockets/pipes/stdout carry no persistent file contents.
     if(target[0]!='/')return {};
     return target;
@@ -54,8 +58,35 @@ inline void Touch(Context* context,PyObject* path,bool present=true,bool directo
 {
   if(context->retiring){InfinityScriptPersistence::Fail(context->id,"write_during_interpreter_retirement");return;}
   const auto value=Path(path);
-  if(value.empty() && PyLong_Check(path))return;
+  if(value.empty() && PyLong_Check(path)) {
+    struct stat info{};const long fd=PyLong_AsLong(path);
+    if(fd<0 || PyErr_Occurred() || ::fstat(static_cast<int>(fd),&info)!=0 ||
+       (S_ISREG(info.st_mode) && info.st_nlink!=0)) {
+      PyErr_Clear();InfinityScriptPersistence::Fail(context->id,"persistent_descriptor_identity_unconfirmed");
+    }
+    return;
+  }
   InfinityScriptPersistence::Touch(context->id,value,present,directory);
+}
+inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
+{
+  if(!PyUnicode_Check(executable) || (!PyList_Check(command) && !PyTuple_Check(command)))return false;
+  const auto count=PySequence_Size(command);
+  const auto executableName=Path(executable);
+  std::vector<std::string> expected;
+  if(executableName=="/system/bin/logcat")
+    expected={"/system/bin/logcat","--uid="+std::to_string(::getuid()),"-b","crash","-d","-t","200","-v","threadtime"};
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  else if(executableName=="/bin/echo")expected={"/bin/echo","infinity-diagnostic-fixture"};
+#endif
+  else return false;
+  if(count!=static_cast<Py_ssize_t>(expected.size()))return false;
+  for(Py_ssize_t i=0;i<count;++i) {
+    PyObject* item=PySequence_GetItem(command,i);
+    const bool matches=item && PyUnicode_Check(item) && Path(item)==expected[i];
+    Py_XDECREF(item);if(!matches)return false;
+  }
+  return true;
 }
 inline int Audit(const char* event,PyObject* args,void*)
 {
@@ -69,7 +100,9 @@ inline int Audit(const char* event,PyObject* args,void*)
     if((flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))!=0) {
       if(!context->checkedOpens[thread])
         InfinityScriptPersistence::Fail(context->id,"file_open_bypassed_checked_buffer_observer");
-      Touch(context,at(0));
+      // A checked adapter registers the actual returned descriptor. This also
+      // handles custom openers and anonymous temporary files without a fake path.
+      if(!context->checkedOpens[thread])Touch(context,at(0));
     }
   }
   else if(std::strcmp(event,"os.rename")==0 && count>=2) {
@@ -111,7 +144,15 @@ inline int Audit(const char* event,PyObject* args,void*)
     if(!context->connectionType || count!=1 || PyObject_IsInstance(at(0),context->connectionType)!=1)
       InfinityScriptPersistence::Fail(context->id,"sqlite_connection_bypassed_checked_commit_observer");
   }
-  else if(std::strcmp(event,"subprocess.Popen")==0 || std::strcmp(event,"os.system")==0 ||
+  else if(std::strcmp(event,"subprocess.Popen")==0) {
+    if(!context->readonlyChildren[thread] || count<4 || !ReadonlyCommand(at(0),at(1)) || at(3)!=Py_None)
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant");
+  }
+  else if(std::strcmp(event,"os.posix_spawn")==0) {
+    if(!context->readonlyChildren[thread] || count<2 || !ReadonlyCommand(at(0),at(1)))
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant");
+  }
+  else if(std::strcmp(event,"os.system")==0 ||
           std::strcmp(event,"os.fork")==0 || std::strcmp(event,"os.posix_spawn")==0 ||
           std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0 ||
           std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
@@ -133,6 +174,14 @@ inline PyObject* Mutation(PyObject* self,PyObject* args)
 {
   auto* context=Capsule(self);PyObject* path=nullptr;const char* kind=nullptr;
   if(!context || !PyArg_ParseTuple(args,"Os",&path,&kind))return nullptr;
+  if(std::strcmp(kind,"readonly-child-begin")==0) {
+    ++context->readonlyChildren[PyThreadState_Get()];Py_RETURN_NONE;
+  }
+  if(std::strcmp(kind,"readonly-child-end")==0) {
+    auto& depth=context->readonlyChildren[PyThreadState_Get()];
+    if(depth)--depth;else InfinityScriptPersistence::Fail(context->id,"unbalanced_readonly_child_scope");
+    Py_RETURN_NONE;
+  }
   if(std::strcmp(kind,"checked-open-begin")==0) {
     ++context->checkedOpens[PyThreadState_Get()];Py_RETURN_NONE;
   }
@@ -171,8 +220,12 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   if(!vfs){PyErr_Clear();vfs=Py_None;Py_INCREF(vfs);}
 #endif
   PyObject* klass=PyDict_GetItemString(context->globals,"Observer");
+  PyObject* hostProbe=Py_False;
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  hostProbe=Py_True;
+#endif
   if(klass && !PyErr_Occurred() && vfs)
-    context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,nullptr);
+    context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,nullptr);
   Py_XDECREF(vfs);Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(capsule);
   if(context->observer)context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
   if(!context->observer || !context->connectionType || PyErr_Occurred())
