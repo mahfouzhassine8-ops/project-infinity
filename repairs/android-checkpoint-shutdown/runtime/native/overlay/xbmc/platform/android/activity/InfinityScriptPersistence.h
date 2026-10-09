@@ -38,6 +38,7 @@ struct State
   bool commitStarted{false};
   int failureWriterId{-1};
   std::string failureWriter;
+  std::string failureDetail;
   bool commitFinished{false};
   bool committed{false};
   unsigned retired{0};
@@ -59,7 +60,7 @@ inline void Observed(int id)
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   const auto found=s.writers.find(id);if(found!=s.writers.end())found->second.observed=true;
 }
-inline void Fail(int id, const std::string& reason)
+inline void Fail(int id, const std::string& reason, const std::string& detail={})
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   auto found=s.writers.find(id);
@@ -67,6 +68,7 @@ inline void Fail(int id, const std::string& reason)
   if(s.failure.empty()) {
     s.failure="python_writer:"+reason;
     s.failureWriterId=id;
+    s.failureDetail=detail.substr(0,2048);
     if(found!=s.writers.end() && !found->second.admissions.empty())
       s.failureWriter=found->second.admissions.begin()->first.substr(0,512);
   }
@@ -131,6 +133,7 @@ struct Evidence
   std::string failure;
   int failureWriterId{-1};
   std::string failureWriter;
+  std::string failureDetail;
   std::vector<std::string> pending;
 };
 inline Evidence Snapshot()
@@ -140,6 +143,7 @@ inline Evidence Snapshot()
   result.syncStarted=s.commitStarted;result.syncFinished=s.commitFinished;
   result.durable=s.committed && s.failure.empty();result.failure=s.failure;
   result.failureWriterId=s.failureWriterId;result.failureWriter=s.failureWriter;
+  result.failureDetail=s.failureDetail;
   for(const auto& item:s.writers) {
     if(item.second.observed)++result.observed;
     for(const auto& admission:item.second.admissions)

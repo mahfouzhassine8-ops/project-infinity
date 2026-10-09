@@ -6,6 +6,7 @@
 #include "filesystem/SpecialProtocol.h"
 #endif
 #include <cstring>
+#include <frameobject.h>
 #include <map>
 #include <mutex>
 #include <string>
@@ -88,6 +89,28 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
   }
   return true;
 }
+inline std::string OpenEvidence(PyObject* path,long flags)
+{
+  // Diagnostic inspection must preserve any exception pending in the caller.
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  std::string result="path="+Path(path).substr(0,512)+";flags="+std::to_string(flags);
+  auto* frame=PyEval_GetFrame();Py_XINCREF(frame);
+  for(unsigned count=0;frame && count<4;++count) {
+    auto* code=PyFrame_GetCode(frame);
+    PyObject* filename=code?PyObject_GetAttrString(reinterpret_cast<PyObject*>(code),"co_filename"):nullptr;
+    PyObject* name=code?PyObject_GetAttrString(reinterpret_cast<PyObject*>(code),"co_name"):nullptr;
+    const char* file=filename && PyUnicode_Check(filename)?PyUnicode_AsUTF8(filename):nullptr;
+    const char* function=name && PyUnicode_Check(name)?PyUnicode_AsUTF8(name):nullptr;
+    result+=";frame="+std::string(file?file:"unknown").substr(0,160)+":"+
+            std::to_string(PyFrame_GetLineNumber(frame))+":"+
+            std::string(function?function:"unknown").substr(0,80);
+    Py_XDECREF(filename);Py_XDECREF(name);Py_XDECREF(code);
+    auto* back=PyFrame_GetBack(frame);Py_DECREF(frame);frame=back;
+  }
+  Py_XDECREF(frame);PyErr_Clear();PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
 inline int Audit(const char* event,PyObject* args,void*)
 {
   auto* thread=PyThreadState_Get();if(!thread)return 0;
@@ -99,7 +122,8 @@ inline int Audit(const char* event,PyObject* args,void*)
     const auto flags=PyLong_Check(at(2))?PyLong_AsLong(at(2)):0;
     if((flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))!=0) {
       if(!context->checkedOpens[thread])
-        InfinityScriptPersistence::Fail(context->id,"file_open_bypassed_checked_buffer_observer");
+        InfinityScriptPersistence::Fail(context->id,"file_open_bypassed_checked_buffer_observer",
+                                        OpenEvidence(at(0),flags));
       // A checked adapter registers the actual returned descriptor. This also
       // handles custom openers and anonymous temporary files without a fake path.
       if(!context->checkedOpens[thread])Touch(context,at(0));

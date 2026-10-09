@@ -75,6 +75,7 @@ def prepare():
     run(sys.executable, str(HERE / "native/test_file_checkpoint.py"))
     run(sys.executable, str(HERE / "writers/test_observer.py"))
     run(sys.executable, str(HERE / "writers/test_native_observer.py"), "--runtime", "kodi")
+    run(sys.executable, str(HERE / "runtime-tests/test_addon_settings_runtime.py"), "--runtime", "kodi")
     run(sys.executable, str(HERE / "native/test_database_runtime.py"), "--source-root", "kodi")
     run(sys.executable, str(HERE / "native/test_playback_poll.py"), "--source-root", "kodi")
     run(sys.executable, str(HERE / "native/test_playback_freeze.py"), "--source-root", "kodi")

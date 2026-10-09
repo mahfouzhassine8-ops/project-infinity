@@ -12,6 +12,7 @@ separate required proofs.
 import builtins
 import importlib
 import io
+import _io
 import os
 import sqlite3
 try:
@@ -78,12 +79,97 @@ class Observer:
         return proxy
 
     def install(self):
-        for module in (builtins, io):
+        for module in (builtins, io, _io):
             original = module.open
             def opened(path, mode='r', *args, _original=original, **kwargs):
                 return self.file(_original, path, mode, *args, **kwargs)
             self.patch(module, 'open', opened)
         observer = self
+        original_raw = _io.FileIO
+        class RawFile(original_raw):
+            _infinity_depth = 0
+            def __init__(self, file, mode='r', closefd=True, opener=None):
+                self._infinity_writable = isinstance(mode, str) and any(c in mode for c in 'wax+')
+                if not self._infinity_writable:
+                    super().__init__(file, mode, closefd, opener)
+                    return
+                observer.check_live()
+                observer.touch(file, 'checked-open-begin')
+                try:
+                    super().__init__(file, mode, closefd, opener)
+                except Exception:
+                    if not ('x' in mode and os.path.exists(file)):
+                        observer.error('raw_file_open_for_write_failed')
+                    raise
+                finally:
+                    observer.touch(file, 'checked-open-end')
+                observer.touch(self.fileno(), 'write')
+                observer.handles.add(self)
+            def write(self, value):
+                observer.check_live()
+                try:
+                    result = super().write(value)
+                    if result != len(value): observer.error('short_raw_buffer_write')
+                    return result
+                except Exception:
+                    observer.error('raw_buffer_write_failed')
+                    raise
+            def writelines(self, values):
+                for value in values: self.write(value)
+            def truncate(self, size=None):
+                observer.check_live()
+                try: return super().truncate(size)
+                except Exception:
+                    observer.error('raw_buffer_truncate_failed')
+                    raise
+            def close(self):
+                if self.closed: return
+                try: return super().close()
+                except Exception:
+                    if getattr(self, '_infinity_writable', False):
+                        observer.held_handles.add(self)
+                        observer.error('raw_buffer_close_failed')
+                    raise
+        self.patch(_io, 'FileIO', RawFile)
+        self.patch(io, 'FileIO', RawFile)
+        for name in ('BufferedWriter', 'BufferedRandom', 'TextIOWrapper'):
+            base = getattr(_io, name)
+            class CheckedBuffer(base):
+                _infinity_depth = 2 if name == 'TextIOWrapper' else 1
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, **kwargs)
+                    if self.writable(): observer.handles.add(self)
+                def write(self, value):
+                    observer.check_live()
+                    try:
+                        result = super().write(value)
+                        if result != len(value): observer.error('short_layered_buffer_write')
+                        return result
+                    except Exception:
+                        observer.error('layered_buffer_write_failed')
+                        raise
+                def writelines(self, values):
+                    for value in values: self.write(value)
+                def flush(self):
+                    try: return super().flush()
+                    except Exception:
+                        observer.error('layered_buffer_flush_failed')
+                        raise
+                def truncate(self, size=None):
+                    observer.check_live()
+                    try: return super().truncate(size)
+                    except Exception:
+                        observer.error('layered_buffer_truncate_failed')
+                        raise
+                def close(self):
+                    if self.closed: return
+                    try: return super().close()
+                    except Exception:
+                        observer.held_handles.add(self)
+                        observer.error('layered_buffer_close_failed')
+                        raise
+            self.patch(_io, name, CheckedBuffer)
+            self.patch(io, name, CheckedBuffer)
         original_connection = sqlite3.Connection
         original_cursor = sqlite3.Cursor
 
@@ -329,9 +415,22 @@ class Observer:
                         continue
                     try: connection.close()
                     except Exception: safe = False
-            for handle in set(self.handles) | self.held_handles:
-                try: handle.close()
-                except Exception: safe = False
+            handles = sorted(set(self.handles) | self.held_handles,
+                             key=lambda h: getattr(h, '_infinity_depth', 2), reverse=True)
+            flushed = True
+            for handle in handles:
+                try:
+                    if not handle.closed: handle.flush()
+                except Exception:
+                    self.held_handles.add(handle)
+                    self.error('buffer_flush_before_retirement_failed')
+                    flushed = False
+            if flushed:
+                for handle in handles:
+                    try: handle.close()
+                    except Exception: safe = False
+            else:
+                safe = False
             if safe: self.retired = True
             return safe
 
