@@ -836,15 +836,15 @@ void Pump(CApplication& application)
     {
       Operation("native_admission");
       if (!application.IsInitialized())
-      { RecordFailure("native_admission", "application_not_initialized"); return; }
+      { RecordFatalFailure("native_admission", "application_not_initialized"); return; }
       CScriptInvocationManager::GetInstance().BeginShutdown(); // Admission only; no Stop/join.
       CServiceBroker::GetJobManager()->UnPauseJobs(); // Drain previously accepted low-priority work.
       if (!PvrOwnersAbsent())
-      { RecordFailure("pvr", "active_or_retained_pvr_owner_has_no_persistence_participant"); return; }
+      { RecordFatalFailure("pvr", "active_or_retained_pvr_owner_has_no_persistence_participant"); return; }
       Complete("pvr", false);
       const auto* activity = jni::CJNIMainActivity::GetAppInstance();
       if (!activity || !activity->infinityCheckpointOwnsOwner(s.pid, s.owner))
-      { RecordFailure("command_center", "engine_owner_lease_not_held"); return; }
+      { RecordFatalFailure("command_center", "engine_owner_lease_not_held"); return; }
       s.stage = 1;
     }
     if (s.stage == 1)
@@ -857,10 +857,10 @@ void Pump(CApplication& application)
           !active["addon_version"].isString() || (active["addon_version"].asString() != "0.3.5.19" && active["addon_version"].asString() != "0.3.5.20"))
         return;
       if (CScriptInvocationManager::GetInstance().AndroidCheckpointResidentCount() != 1)
-      { RecordFailure("command_center", "exactly_one_canonical_resident_required"); return; }
+      { RecordFatalFailure("command_center", "exactly_one_canonical_resident_required"); return; }
       Operation("compat");
       if (CScriptInvocationManager::GetInstance().AndroidCheckpointCompatCount() != 1)
-      { RecordFailure("compat", "exactly_one_hash_verified_compat_resident_required"); return; }
+      { RecordFatalFailure("compat", "exactly_one_hash_verified_compat_resident_required"); return; }
       CVariant compatActive;
       if (!ReadJson(s.directory + "/compat-active.json", compatActive) ||
           !CompatIdentity(compatActive, s, false) || !compatActive["status"].isString() ||
@@ -876,7 +876,7 @@ void Pump(CApplication& application)
       const auto playback = InfinityPlaybackCheckpoint::Poll(
           *application.GetComponent<CApplicationPlayer>(), application, s.session, failure);
       if (playback == InfinityPlaybackCheckpoint::PollResult::Failed)
-      { RecordFailure("playback", failure.c_str()); return; }
+      { RecordFatalFailure("playback", failure.c_str()); return; }
       if (playback != InfinityPlaybackCheckpoint::PollResult::Complete)
         return;
       Complete("playback", true);
@@ -888,7 +888,7 @@ void Pump(CApplication& application)
       CVariant request = Identity(s);
       request["phase"] = "PREPARE";
       if (!WriteJson(s.directory + "/request.json", request))
-      { RecordFailure("command_center", "prepare_request_write_failed"); return; }
+      { RecordFatalFailure("command_center", "prepare_request_write_failed"); return; }
       s.stage = 2;
     }
     if (s.stage == 2)
@@ -906,7 +906,7 @@ void Pump(CApplication& application)
       request["phase"] = "FINALIZE";
       request["player_freeze_complete"] = true;
       if (!WriteJson(s.directory + "/request.json", request))
-      { RecordFailure("command_center", "finalize_request_write_failed"); return; }
+      { RecordFatalFailure("command_center", "finalize_request_write_failed"); return; }
       s.stage = 4;
     }
     if (s.stage == 4)
@@ -919,18 +919,36 @@ void Pump(CApplication& application)
       if (!CompatResponse(s))
         return;
       Complete("compat", true);
+
+      // Inventory every script writer before deciding the global checkpoint.
+      // A failed interpreter may settle without receiving a durable retirement receipt.
       Operation("python_services");
-      const auto scriptFailure = InfinityScriptPersistence::Failure();
-      if (!scriptFailure.empty())
-      { RecordFailure("python_services", scriptFailure.c_str()); return; }
+      auto scripts = InfinityScriptPersistence::Snapshot();
+      if (!scripts.blockers.empty())
+      {
+        std::lock_guard<std::mutex> lock(s.mutex);
+        if (s.owners["python_services"].error.empty())
+          BlockLocked(s, "python_services", "python_writer_blockers_present");
+      }
       for (const auto& name : s.unresolvedForeignOwners)
-        if (!InfinityScriptPersistence::DurableRetirement(name))
+        if (!InfinityScriptPersistence::DurableRetirement(name) &&
+            !InfinityScriptPersistence::BlockedRetirement(name))
           return;
       if (!CScriptInvocationManager::GetInstance().AndroidCheckpointUnresolvedWriters().empty())
         return;
-      if (!InfinityScriptPersistence::PollCommit())
-        return; // Native filesystem sync is asynchronous; the GUI keeps pumping.
-      Complete("python_services", true);
+      if (!InfinityScriptPersistence::PollInventory())
+        return; // Durability sync may finish even when a writer-level blocker is retained.
+      scripts = InfinityScriptPersistence::Snapshot();
+      if (scripts.blockers.empty() && scripts.durable)
+        Complete("python_services", true);
+      else
+      {
+        std::lock_guard<std::mutex> lock(s.mutex);
+        if (s.owners["python_services"].error.empty())
+          BlockLocked(s, "python_services", scripts.failure.empty() ?
+              "python_persistence_not_durable" : scripts.failure);
+      }
+
       Operation("background_jobs");
       if (!RequiredJobsDrained())
         return;
@@ -938,7 +956,7 @@ void Pump(CApplication& application)
       if (CScriptInvocationManager::GetInstance().AndroidCheckpointResidentCount() != 1 ||
           CScriptInvocationManager::GetInstance().AndroidCheckpointCompatCount() != 1 ||
           CScriptInvocationManager::GetInstance().AndroidCheckpointForeignScripts() != 0)
-      { RecordFailure("python_services", "source_contract_changed_or_unproven_writer_admitted"); return; }
+      { RecordFatalFailure("python_services", "source_contract_changed_or_unproven_writer_admitted"); return; }
       {
         std::lock_guard<std::mutex> lock(s.mutex);
         if (s.activeWrites != 0 || s.phase == "CHECKPOINT_FAILED")
@@ -947,7 +965,7 @@ void Pump(CApplication& application)
         s.phase = "PERSISTING";
       }
       if (!InfinityDatabaseBarrier::Begin(s.generation))
-      { RecordFailure("native_databases", "database_barrier_begin_failed"); return; }
+      { RecordFatalFailure("native_databases", "database_barrier_begin_failed"); return; }
       Complete("native_admission", false);
       s.stage = 5;
     }
@@ -956,76 +974,124 @@ void Pump(CApplication& application)
       Operation("native_databases");
       const auto pendingDatabase = InfinityDatabaseBarrier::GetSnapshot();
       if (pendingDatabase.failures || pendingDatabase.rejectedWrites || pendingDatabase.unsupportedOwners)
-      { RecordFailure("native_databases", "failed_or_unsupported_database_owner"); return; }
+        RecordFailure("native_databases", "failed_or_unsupported_database_owner");
       if (!pendingDatabase.Ready())
         return;
       InfinityDatabaseBarrier::CheckpointWriteScope databasePermission(s.generation);
       if (!databasePermission.IsValid())
-      { RecordFailure("native_databases", "checkpoint_database_scope_rejected"); return; }
-      const uint64_t errors = ErrorGeneration();
+      { RecordFatalFailure("native_databases", "checkpoint_database_scope_rejected"); return; }
+
       Operation("deferred_dialog_state");
-      if (!CheckpointDeferredDialogState())
-      { RecordFailure("deferred_dialog_state", "pending_dialog_state_checkpoint_failed"); return; }
-      if (HasFailureSince(errors))
-        return;
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CheckpointDeferredDialogState();
+        if(!ok)RecordFailure("deferred_dialog_state","pending_dialog_state_checkpoint_failed");
+        (void)before; // Completion waits for final database seal.
+      }
+
       Operation("skin_settings");
-      if (!CheckpointSkinSettings())
-      { RecordFailure("skin_settings", "skin_settings_save_failed"); return; }
-      if (HasFailureSince(errors))
-        return;
-      Complete("skin_settings", true);
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CheckpointSkinSettings();
+        if(!ok)RecordFailure("skin_settings","skin_settings_save_failed");
+        if(ok && !HasFailureSince(before))Complete("skin_settings",true);
+      }
+
       Operation("addon_settings");
-      if (!CheckpointLoadedAddonSettings())
-      { RecordFailure("addon_settings", "loaded_addon_settings_save_failed"); return; }
-      Complete("addon_settings", true);
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CheckpointLoadedAddonSettings();
+        if(!ok)RecordFailure("addon_settings","loaded_addon_settings_save_failed");
+        if(ok && !HasFailureSince(before))Complete("addon_settings",true);
+      }
+
       Operation("favourites");
-      if (!CServiceBroker::GetFavouritesService().CheckpointForAndroidExit())
-      { RecordFailure("favourites", "favourites_save_failed"); return; }
-      Complete("favourites", true);
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CServiceBroker::GetFavouritesService().CheckpointForAndroidExit();
+        if(!ok)RecordFailure("favourites","favourites_save_failed");
+        if(ok && !HasFailureSince(before))Complete("favourites",true);
+      }
+
       Operation("peripherals");
-      if (!CServiceBroker::GetPeripherals().CheckpointForAndroidExit())
-      { RecordFailure("peripherals", "peripheral_settings_save_failed"); return; }
-      Complete("peripherals", true);
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CServiceBroker::GetPeripherals().CheckpointForAndroidExit();
+        if(!ok)RecordFailure("peripherals","peripheral_settings_save_failed");
+        if(ok && !HasFailureSince(before))Complete("peripherals",true);
+      }
+
       Operation("audio_policy");
-      if (!CheckpointAudioPolicyFile())
-      { RecordFailure("audio_policy", "audio_policy_file_checkpoint_failed"); return; }
-      Complete("audio_policy", true);
-      // Save base settings after add-on/skin callbacks, so any accepted setting
-      // effects from their serialization are included in the final snapshot.
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CheckpointAudioPolicyFile();
+        if(!ok)RecordFailure("audio_policy","audio_policy_file_checkpoint_failed");
+        if(ok && !HasFailureSince(before))Complete("audio_policy",true);
+      }
+
+      // Save base settings after add-on/skin callbacks, so accepted setting
+      // effects are included even when another independent owner already failed.
       Operation("kodi_settings");
-      if (!CServiceBroker::GetSettingsComponent()->GetSettings()->Save())
-      { RecordFailure("kodi_settings", "settings_save_failed"); return; }
-      Complete("kodi_settings", true);
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
+        if(!ok)RecordFailure("kodi_settings","settings_save_failed");
+        if(ok && !HasFailureSince(before))Complete("kodi_settings",true);
+      }
+
       Operation("profiles");
-      if (!CServiceBroker::GetSettingsComponent()->GetProfileManager()->Save())
-      { RecordFailure("profiles", "profiles_save_failed"); return; }
-      Complete("profiles", true);
-      if (HasFailureSince(errors))
-        return;
-      Complete("xml_files", true);
+      {
+        const auto before=ErrorGeneration();
+        const bool ok=CServiceBroker::GetSettingsComponent()->GetProfileManager()->Save();
+        if(!ok)RecordFailure("profiles","profiles_save_failed");
+        if(ok && !HasFailureSince(before))Complete("profiles",true);
+      }
+
+      {
+        std::lock_guard<std::mutex> lock(s.mutex);
+        if(s.owners["xml_files"].error.empty()) {
+          auto& owner=s.owners["xml_files"];
+          owner.complete=true;owner.dirty=false;owner.committed=true;
+          owner.durableGeneration=owner.generation;owner.elapsed=Elapsed(s);
+        }
+      }
       s.stage = 6;
     }
     if (s.stage == 6)
     {
       // Checkpoint callbacks can enqueue accepted persistence jobs. Their queue
-      // and destructor lifetimes must drain too; a pre-save empty snapshot is
-      // not evidence that no later accepted work exists.
+      // and destructor lifetimes must drain before final inventory can close.
       Operation("background_jobs");
       if (!RequiredJobsDrained())
         return;
       Complete("background_jobs", false);
+
       Operation("native_databases");
       if (!PvrOwnersAbsent())
-      { RecordFailure("pvr", "pvr_owner_present_before_final_seal"); return; }
+      { RecordFatalFailure("pvr", "pvr_owner_present_before_final_seal"); return; }
       const auto database = InfinityDatabaseBarrier::GetSnapshot();
       if (database.failures || database.rejectedWrites || database.unsupportedOwners)
-      { RecordFailure("native_databases", "database_owner_failed_before_final_seal"); return; }
+        RecordFailure("native_databases", "database_owner_failed_before_final_seal");
       if (!database.Ready())
         return;
       if (!InfinityDatabaseBarrier::Seal(s.generation))
-      { RecordFailure("native_databases", "database_barrier_not_durable_or_drained"); return; }
-      Complete("native_databases", true);
-      Complete("deferred_dialog_state", true); // Captured state now covered by settings save + DB seal.
+        RecordFailure("native_databases", "database_barrier_not_durable_or_drained");
+
+      bool databaseBlocked=false;
+      {
+        std::lock_guard<std::mutex> lock(s.mutex);
+        databaseBlocked=!s.owners["native_databases"].error.empty();
+      }
+      if(!databaseBlocked)Complete("native_databases", true);
+
+      bool deferredBlocked=false;
+      {
+        std::lock_guard<std::mutex> lock(s.mutex);
+        deferredBlocked=!s.owners["deferred_dialog_state"].error.empty();
+      }
+      if(!deferredBlocked && !databaseBlocked)
+        Complete("deferred_dialog_state", true); // Captured state covered by settings save + DB seal.
+
       std::lock_guard<std::mutex> lock(s.mutex);
       CheckDeadlineLocked(s);
       if (s.phase == "CHECKPOINT_FAILED" || s.activeWrites != 0)
@@ -1033,9 +1099,16 @@ void Pump(CApplication& application)
       for (const char* name : REQUIRED)
       {
         const auto& owner = s.owners.at(name);
-        if (!owner.complete || owner.dirty || owner.generation != owner.durableGeneration || !owner.error.empty())
-        { FailLocked(s, name, "required_owner_not_durable"); return; }
+        if ((!owner.complete || owner.dirty || owner.generation != owner.durableGeneration) &&
+            owner.error.empty())
+          BlockLocked(s, name, "required_owner_not_durable");
       }
+      if(!s.blockers.empty() || s.blockerOverflow) {
+        FinalizeInventoryFailureLocked(s);
+        s.blocking=s.blockers.empty()?"blocker_inventory_overflow":s.blockers.front().owner;
+        return;
+      }
+      s.inventoryComplete=true;
       s.phase = "SAFE_TO_TERMINATE";
       s.pendingDetail.clear();
       s.blocking.clear();
@@ -1046,11 +1119,11 @@ void Pump(CApplication& application)
   }
   catch (const std::exception&)
   {
-    RecordFailure("native_admission", "checkpoint_exception");
+    RecordFatalFailure("native_admission", "checkpoint_exception");
   }
   catch (...)
   {
-    RecordFailure("native_admission", "checkpoint_unknown_exception");
+    RecordFatalFailure("native_admission", "checkpoint_unknown_exception");
   }
 }
 } // namespace InfinityAndroidCheckpoint
