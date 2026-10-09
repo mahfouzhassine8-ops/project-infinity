@@ -21,7 +21,8 @@ int main(int argc,char** argv) {
   const std::string libraryRoot=argv[2];
   setenv("KODI_ANDROID_LIBS",libraryRoot.c_str(),1);
   assert(InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging",libraryRoot+"/lib_imaging.so"));
-  assert(InfinityPythonPersistence::ApprovedBundledPythonExtension("_imagingft",libraryRoot+"/lib_imagingft.so"));
+  assert(InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imagingft",libraryRoot+"/lib_imagingft.so"));
+  assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("_imaging",libraryRoot+"/lib_imaging.so"));
   assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging",libraryRoot+"/lib_imagingft.so"));
   assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("evil._imaging",libraryRoot+"/lib_imaging.so"));
   assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging","/tmp/lib_imaging.so"));
