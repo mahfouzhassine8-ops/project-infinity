@@ -1,0 +1,24 @@
+{
+  "diagnostic_only": true,
+  "root_cause_fixed": false,
+  "apk_built": false,
+  "physical_device_tested": false,
+  "github_modified": false,
+  "locked": false,
+  "source_scope": "Two verified preimages; not a whole-engine reconstruction or historical APK proof.",
+  "before": {
+    "xbmc/interfaces/generic/LanguageInvokerThread.cpp": "abf0632a0904345c22c7f32cab4b9006b342bce5d80b42f3858853655fbafe3f",
+    "xbmc/interfaces/generic/LanguageInvokerThread.h": "b4f3cdee3d365eb8c70b5d2f6546b0f770c3aef3ca4055a2e209d4a24625d8e2"
+  },
+  "after": {
+    "xbmc/interfaces/generic/LanguageInvokerThread.cpp": "2e3c93f629fc4e5dab61e5dbf7e8fad366bcb909256af4b3462f40280e9f7a33",
+    "xbmc/interfaces/generic/LanguageInvokerThread.h": "86810da8d7efc15014ab26c7bb900f0b25a4b214c754ab04985f2bb14753bcb8",
+    "xbmc/interfaces/generic/InfinityInvokerTarget.h": "d9297b351baf1865f98bf207fe0d4a8ee03e0721468715e316a3fbea201b720e"
+  },
+  "original_tree_unchanged": true,
+  "new_trace_phases": [
+    "scripts.target_before_stop",
+    "scripts.target_before_join",
+    "scripts.target_before_nonblocking_stop"
+  ]
+}

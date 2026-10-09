@@ -1,0 +1,41 @@
+{
+  "native_provenance": {
+    "candidate": 2103334,
+    "apk_parent": 2103333,
+    "native_parent": 2103330,
+    "locked_rollback": 2103327,
+    "source_commit": "927e7a8be98a440a53759ef976463fe824e2fb28",
+    "native_sha256": "039ae65ede548550a88187af6892f0b6b0320771f1057581513ac7724a390609",
+    "baseline_kodi_commit": "a3a448d26b8d560a65655dab2cd122994dc4e146",
+    "parent_packaged_native_sha256": "22f56ef1836c53930f7b2c9fa89d1a3658482db9444c088bdc175c5a641b477d",
+    "late_message_gate_fixed": true,
+    "python_abort_policy_unchanged": true,
+    "script_finalizers_unchanged": true,
+    "directory_repair_preserved": true,
+    "final_joins_preserved": true,
+    "timeouts_unchanged": true,
+    "exact_dependency_cache_run": 37724566406,
+    "preservation_rule": "all reviewed pre-existing source files byte-identical; generated build outputs ignored",
+    "physical_device_verified": false,
+    "locked": false
+  },
+  "files": {
+    "xbmc/interfaces/generic/LanguageInvokerThread.cpp": {
+      "sha256": "abf0632a0904345c22c7f32cab4b9006b342bce5d80b42f3858853655fbafe3f",
+      "upstream_blob_sha1": "67f3d1487522ef6adb6776dc17ad55126643ba0d",
+      "matched_retained_source_receipt": true
+    },
+    "xbmc/interfaces/generic/LanguageInvokerThread.h": {
+      "sha256": "b4f3cdee3d365eb8c70b5d2f6546b0f770c3aef3ca4055a2e209d4a24625d8e2",
+      "upstream_blob_sha1": "a1844bab8278075c0bebbcae79481eb34601d2fb",
+      "matched_retained_source_receipt": true
+    }
+  },
+  "scope": "Only these two files reconstructed; not a full engine reconstruction. Exact historical APK remains unknown.",
+  "retained_archive": {
+    "name": "Infinity-2103334-Native-Investigation.zip",
+    "sha256": "e633f2171db60896b7da2448ab4d28b45fc167f685fadc4269f064e13693682e"
+  },
+  "upstream_tag": "21.3-Omega",
+  "reconstruction_note": "Upstream blobs independently matched to published Git blob SHA-1s; inherited Infinity diagnostic transform reproduced; resulting two files matched retained after-map SHA-256s exactly."
+}

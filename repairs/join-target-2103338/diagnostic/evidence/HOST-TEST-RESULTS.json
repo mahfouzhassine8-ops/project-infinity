@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "HOST_ONLY_DIAGNOSTIC_TESTS",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "python": "3.13.5",
+  "android_cross_compile": false,
+  "physical_device_tested": false,
+  "historical_anr_reproduced": false,
+  "root_cause_fixed": false,
+  "checks": [
+    {
+      "name": "exact_two_file_parent_hashes_and_source_tree_unchanged",
+      "passed": true
+    },
+    {
+      "name": "all_original_nonblank_source_lines_preserved_in_order",
+      "passed": true
+    },
+    {
+      "name": "wrong_parent_refused_before_output_creation",
+      "passed": true
+    },
+    {
+      "name": "existing_output_and_source_nested_output_refused",
+      "passed": true
+    },
+    {
+      "name": "git_apply_exact_round_trip_in_temporary_tree",
+      "passed": true
+    },
+    {
+      "name": "actual_transformed_cpp_compiles_with_android_guard_and_mocked_boundaries",
+      "passed": true
+    },
+    {
+      "name": "eight_real_host_thread_scenarios_pass_three_repetitions",
+      "passed": true
+    },
+    {
+      "name": "non_android_guard_path_compiles_with_mocked_boundaries",
+      "passed": true
+    },
+    {
+      "name": "new_phases_use_existing_scripts_critical_stream_prefix",
+      "passed": true
+    }
+  ],
+  "host_runs": [
+    {
+      "iteration": 1,
+      "exit_code": 0,
+      "stdout": "PASS atomic_snapshot_and_format_bounds\nPASS null_invoker_no_fake_join\nPASS active_execution_stop_unchanged\nPASS finalizer_join_preserved target=os_tid.984.stage.finalizer\nPASS manager_callback_join_preserved target=os_tid.986.stage.manager_callback\nPASS exception_finalizer_join_preserved target=os_tid.988.stage.exception_finalizer\nPASS nonblocking_stop_distinguished target=os_tid.990.stage.finalizer\nPASS missing_addon_not_invented target=os_tid.992.stage.finalizer\nHOST TESTS ONLY: mocked Kodi/CPython boundaries, real host threads and joins.\n",
+      "stderr": ""
+    },
+    {
+      "iteration": 2,
+      "exit_code": 0,
+      "stdout": "PASS atomic_snapshot_and_format_bounds\nPASS null_invoker_no_fake_join\nPASS active_execution_stop_unchanged\nPASS finalizer_join_preserved target=os_tid.997.stage.finalizer\nPASS manager_callback_join_preserved target=os_tid.999.stage.manager_callback\nPASS exception_finalizer_join_preserved target=os_tid.1001.stage.exception_finalizer\nPASS nonblocking_stop_distinguished target=os_tid.1003.stage.finalizer\nPASS missing_addon_not_invented target=os_tid.1005.stage.finalizer\nHOST TESTS ONLY: mocked Kodi/CPython boundaries, real host threads and joins.\n",
+      "stderr": ""
+    },
+    {
+      "iteration": 3,
+      "exit_code": 0,
+      "stdout": "PASS atomic_snapshot_and_format_bounds\nPASS null_invoker_no_fake_join\nPASS active_execution_stop_unchanged\nPASS finalizer_join_preserved target=os_tid.1010.stage.finalizer\nPASS manager_callback_join_preserved target=os_tid.1012.stage.manager_callback\nPASS exception_finalizer_join_preserved target=os_tid.1014.stage.exception_finalizer\nPASS nonblocking_stop_distinguished target=os_tid.1016.stage.finalizer\nPASS missing_addon_not_invented target=os_tid.1018.stage.finalizer\nHOST TESTS ONLY: mocked Kodi/CPython boundaries, real host threads and joins.\n",
+      "stderr": ""
+    }
+  ],
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "compile_output": ""
+}
