@@ -28,6 +28,22 @@ int main(int argc,char** argv) {
   assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging","/tmp/lib_imaging.so"));
   const auto nativeDetail=InfinityPythonPersistence::NativeExtensionEvidence("evil.native","/tmp/evil.so");
   assert(nativeDetail.find("module=evil.native")!=std::string::npos && nativeDetail.find("path=/tmp/evil.so")!=std::string::npos);
+  assert(InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/python3.11/lib/python3.11/importlib/__pycache__/__init__.cpython-311.opt-1.pyc.12970367414572004272"));
+  assert(InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/10/com.projectinfinity.kodi/cache/apk/assets/python3.11/lib/python3.11/importlib/__pycache__/abc.cpython-311.pyc"));
+  assert(InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/data/com.projectinfinity.kodi/cache/apk/assets/python3.11/lib/python3.11/importlib/__pycache__",true));
+  assert(!InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/0/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/plugin.video.pov/__pycache__/settings.pyc"));
+  assert(!InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/0/com.projectinfinity.kodi/cache/apk/state.json"));
+  assert(!InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/0/other.package/cache/apk/__pycache__/state.pyc"));
+  assert(!InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/0/com.projectinfinity.kodi/cache/apk/__pycache__/state.pyc.tmp"));
+  assert(!InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
+      "/data/user/0/com.projectinfinity.kodi/cache/../files/.kodi/userdata/__pycache__/state.pyc"));
   unsetenv("KODI_ANDROID_LIBS");
   const std::string mode=argv[1];
   Py_Initialize();auto* main=PyThreadState_Get();auto* owner=Py_NewInterpreter();
