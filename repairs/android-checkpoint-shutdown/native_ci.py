@@ -57,7 +57,7 @@ def verify_engine_identity(source, binary):
                   b"infinityAuthorizeCheckpointTermination", b"CHECKPOINT_FAILED",
                   tags[0].encode(), b"scripts.target_before_join",
                   b"scripts.target_before_nonblocking_stop", b"os_tid.%u.stage.%s",
-                  b"interpreter_retirement_receipt_limit", b"nonpersistent:ambient-glass"):
+                  b"interpreter_retirement_receipt_limit", b"nonpersistent:ambient-glass", b"PIL._imaging"):
         if token not in binary:
             raise ValueError("Compiled engine is missing required identity/feature: " + repr(token))
     return tags[0]
