@@ -168,8 +168,18 @@ void FinalizeInventoryFailureLocked(State& s)
 void CheckDeadlineLocked(State& s)
 {
   if (!s.active.load() || s.phase=="CHECKPOINT_FAILED" || s.phase=="ENGINE_TERMINATING" ||
-      s.phase=="SAFE_TO_TERMINATE" || Clock::now()<s.expires)
+      Clock::now()<s.expires)
     return;
+
+  // SAFE is still a time-bounded authorization capability. Expiry must revoke
+  // it even when every save owner was durable, exactly as the pre-inventory
+  // checkpoint did.
+  if (s.phase=="SAFE_TO_TERMINATE")
+  {
+    FailLocked(s,"native_admission","checkpoint_deadline_exceeded; authorization_window_expired");
+    return;
+  }
+
   for(const char* name:REQUIRED) {
     auto& owner=s.owners[name];
     if(!owner.complete && owner.error.empty())
@@ -178,6 +188,9 @@ void CheckDeadlineLocked(State& s)
   const auto scripts=InfinityScriptPersistence::Snapshot();
   for(const auto& name:scripts.pending)
     BlockLocked(s,"python_services","pending_writer:"+name);
+  if(s.blockers.empty())
+    BlockLocked(s,s.blocking.empty()?"native_admission":s.blocking,
+                "checkpoint_deadline_exceeded; owner proof incomplete");
   FinalizeInventoryFailureLocked(s);
 }
 void Operation(const char* owner)
