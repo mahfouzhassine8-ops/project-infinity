@@ -12,6 +12,7 @@ import importlib
 import io
 import _io
 import os
+import shutil
 import sqlite3
 # Marker is embedded into libkodi.so and checked by the native build gate.
 DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
@@ -365,16 +366,35 @@ class Observer:
     def install_children(self):
         observer = self
         original_popen = subprocess.Popen
+
+        def readonly_command(command):
+            if not isinstance(command, (list, tuple)):
+                return False
+            command = list(command)
+            logcat = ['/system/bin/logcat', '--uid='+str(os.getuid()), '-b', 'crash', '-d', '-t', '200', '-v', 'threadtime']
+            if command == logcat:
+                return True
+            if observer.host_probe and command == ['/bin/echo', 'infinity-diagnostic-fixture']:
+                return True
+            # Android property reads are a common capability probe and cannot
+            # mutate persistent state. Resolve PATH-based spelling to the
+            # immutable system binary before allowing it.
+            if 1 <= len(command) <= 2 and command[0] in ('getprop', '/system/bin/getprop'):
+                resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+                if resolved != '/system/bin/getprop':
+                    return False
+                if len(command) == 2:
+                    key = command[1]
+                    if not isinstance(key, str) or not key or len(key) > 128 or any(
+                            not (ch.isalnum() or ch in '._-') for ch in key):
+                        return False
+                return True
+            return False
+
         class Popen(original_popen):
             def __init__(child, command, *args, **kwargs):
                 observer.check_live()
-                allowed = ['/system/bin/logcat', '--uid='+str(os.getuid()), '-b', 'crash', '-d', '-t', '200', '-v', 'threadtime']
-                if observer.host_probe:
-                    allowed_fixture = ['/bin/echo', 'infinity-diagnostic-fixture']
-                else:
-                    allowed_fixture = None
-                readonly = (isinstance(command, (list, tuple)) and
-                            list(command) in (allowed, allowed_fixture) and not args and
+                readonly = (readonly_command(command) and not args and
                             not kwargs.get('shell', False) and kwargs.get('env') is None and
                             kwargs.get('cwd') is None and kwargs.get('preexec_fn') is None and
                             not kwargs.get('pass_fds', ()) and
