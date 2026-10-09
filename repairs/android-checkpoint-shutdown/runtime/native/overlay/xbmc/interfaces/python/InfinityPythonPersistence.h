@@ -166,6 +166,25 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
   return true;
 }
 
+inline std::string ChildProcessEvidence(PyObject* executable,PyObject* command)
+{
+  // Keep diagnostics useful without copying child arguments, URLs, tokens or environment.
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  std::string name="unknown";
+  if(PyUnicode_Check(executable)) {
+    const char* raw=PyUnicode_AsUTF8(executable);
+    if(raw)name=raw;else PyErr_Clear();
+  } else {
+    const auto path=Path(executable);if(!path.empty())name=path;
+  }
+  const auto count=(PyList_Check(command)||PyTuple_Check(command))?PySequence_Size(command):-1;
+  if(PyErr_Occurred())PyErr_Clear();
+  const std::string result="executable="+name.substr(0,256)+";argc="+std::to_string(count);
+  PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
+
 inline bool ApprovedBundledPythonExtension(const char* module,const std::string& filename)
 {
   // Importing a native module is not itself a persistence write. Only the
@@ -291,18 +310,21 @@ inline int Audit(const char* event,PyObject* args,void*)
   }
   else if(std::strcmp(event,"subprocess.Popen")==0) {
     if(!context->readonlyChildren[thread] || count<4 || !ReadonlyCommand(at(0),at(1)) || at(3)!=Py_None)
-      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant");
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                      ChildProcessEvidence(at(0),at(1)));
   }
   else if(std::strcmp(event,"os.posix_spawn")==0) {
     if(!context->readonlyChildren[thread] || count<2 || !ReadonlyCommand(at(0),at(1)))
-      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant");
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                      ChildProcessEvidence(at(0),at(1)));
   }
   else if(std::strcmp(event,"os.system")==0 ||
           std::strcmp(event,"os.fork")==0 || std::strcmp(event,"os.posix_spawn")==0 ||
           std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0 ||
           std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
           std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0)
-    InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant");
+    InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                    "event="+std::string(event).substr(0,128));
   // An audit observer does not alter original add-on operations or clear their
   // Python exceptions. Its failure persists in the native owner ledger.
   return 0;
