@@ -56,10 +56,59 @@ inline std::string Path(PyObject* value)
 #endif
   return result;
 }
+
+inline bool PrivateInfinityCachePrefix(const std::string& path)
+{
+  static constexpr char package[]="com.projectinfinity.kodi";
+  if(path.empty() || path[0]!='/' || path.find("//")!=std::string::npos ||
+     path.find("/../")!=std::string::npos || path.find("/./")!=std::string::npos ||
+     (path.size()>=3 && path.compare(path.size()-3,3,"/..")==0) ||
+     (path.size()>=2 && path.compare(path.size()-2,2,"/.")==0))
+    return false;
+  const std::string direct="/data/data/"+std::string(package)+"/cache/";
+  if(path.rfind(direct,0)==0)return true;
+  static constexpr char userRoot[]="/data/user/";
+  if(path.rfind(userRoot,0)!=0)return false;
+  std::size_t position=std::strlen(userRoot),first=position;
+  while(position<path.size() && path[position]>='0' && path[position]<='9')++position;
+  if(position==first || position>=path.size() || path[position]!='/')return false;
+  const std::string suffix="/"+std::string(package)+"/cache/";
+  return path.compare(position,suffix.size(),suffix)==0;
+}
+inline bool ApprovedNonPersistentPythonBytecodeCachePath(const std::string& filename,bool directory=false)
+{
+  if(!PrivateInfinityCachePrefix(filename))return false;
+#if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  const auto slash=filename.rfind('/');
+  if(slash==std::string::npos || slash==0)return false;
+  char resolved[PATH_MAX]{};
+  const std::string parent=filename.substr(0,slash);
+  if(!::realpath(parent.c_str(),resolved))return false;
+  std::string canonical(resolved);canonical.push_back('/');
+  if(!PrivateInfinityCachePrefix(canonical))return false;
+#endif
+  static constexpr char marker[]="/__pycache__";
+  const auto cache=filename.find(marker);
+  if(cache==std::string::npos)return false;
+  const auto after=cache+std::strlen(marker);
+  if(directory)return after==filename.size();
+  if(after>=filename.size() || filename[after]!='/')return false;
+  const std::string leaf=filename.substr(after+1);
+  if(leaf.empty() || leaf.find('/')!=std::string::npos)return false;
+  const auto pyc=leaf.rfind(".pyc");
+  if(pyc==std::string::npos || pyc==0)return false;
+  const auto suffix=pyc+4;
+  if(suffix==leaf.size())return true;
+  if(leaf[suffix]!='.' || suffix+1>=leaf.size())return false;
+  for(std::size_t i=suffix+1;i<leaf.size();++i)
+    if(leaf[i]<'0' || leaf[i]>'9')return false;
+  return true;
+}
 inline void Touch(Context* context,PyObject* path,bool present=true,bool directory=false)
 {
   if(context->retiring){InfinityScriptPersistence::Fail(context->id,"write_during_interpreter_retirement");return;}
   const auto value=Path(path);
+  if(ApprovedNonPersistentPythonBytecodeCachePath(value,directory))return;
   if(value.empty() && PyLong_Check(path)) {
     struct stat info{};const long fd=PyLong_AsLong(path);
     if(fd<0 || PyErr_Occurred() || ::fstat(static_cast<int>(fd),&info)!=0 ||
@@ -150,11 +199,14 @@ inline int Audit(const char* event,PyObject* args,void*)
   if(std::strcmp(event,"open")==0 && count>=3) {
     const auto flags=PyLong_Check(at(2))?PyLong_AsLong(at(2)):0;
     if((flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))!=0) {
-      if(!context->checkedOpens[thread])
+      if(!context->checkedOpens[thread] &&
+         !ApprovedNonPersistentPythonBytecodeCachePath(Path(at(0)),false))
         InfinityScriptPersistence::Fail(context->id,"file_open_bypassed_checked_buffer_observer",
                                         OpenEvidence(at(0),flags));
-      // A checked adapter registers the actual returned descriptor. This also
-      // handles custom openers and anonymous temporary files without a fake path.
+      // CPython's own atomic bytecode-cache temp writes under Infinity's private
+      // cache are regenerable runtime cache, not user state. Touch() independently
+      // refuses only that exact cache class; every other unchecked writer remains
+      // fail-closed and tracked.
       if(!context->checkedOpens[thread])Touch(context,at(0));
     }
   }
@@ -162,12 +214,16 @@ inline int Audit(const char* event,PyObject* args,void*)
     if(count>2 && ((PyLong_Check(at(2)) && PyLong_AsLong(at(2))!=-1) ||
                    (PyLong_Check(at(3)) && PyLong_AsLong(at(3))!=-1)))
       InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_rename");
+    const bool sourceBytecode=ApprovedNonPersistentPythonBytecodeCachePath(Path(at(0)),false);
+    const bool targetBytecode=ApprovedNonPersistentPythonBytecodeCachePath(Path(at(1)),false);
+    if(sourceBytecode!=targetBytecode)
+      InfinityScriptPersistence::Fail(context->id,"python_bytecode_cache_boundary_rename");
     Touch(context,at(0),false);Touch(context,at(1));
   }
   else if(std::strcmp(event,"os.remove")==0 || std::strcmp(event,"os.rmdir")==0) {
     if(count>1 && PyLong_Check(at(1)) && PyLong_AsLong(at(1))!=-1)
       InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_deletion");
-    if(count)Touch(context,at(0),false);
+    if(count)Touch(context,at(0),false,std::strcmp(event,"os.rmdir")==0);
   }
   else if(std::strcmp(event,"os.mkdir")==0) {
     if(count>2 && PyLong_Check(at(2)) && PyLong_AsLong(at(2))!=-1)
