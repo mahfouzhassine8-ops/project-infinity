@@ -56,6 +56,7 @@ def prepare():
     run(sys.executable, str(HERE / "run_checks.py"), "--native-source", "kodi",
         "--report", str(OUT / "foundation-tests.json"))
     runtime_delta.apply("native", Path("kodi"))
+    run(sys.executable, str(HERE / "native/test_file_checkpoint.py"))
     run(sys.executable, str(HERE / "writers/test_observer.py"))
     run(sys.executable, str(HERE / "writers/test_native_observer.py"), "--runtime", "kodi")
     run(sys.executable, str(HERE / "native/test_database_runtime.py"), "--source-root", "kodi")

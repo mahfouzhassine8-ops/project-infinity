@@ -302,7 +302,7 @@ final class InfinityGlassChooser extends FrameLayout {
       InfinityKodiShutdown.Snapshot state=InfinityKodiShutdown.state();
       boolean sameClose=closePid==state.pid && closeAt==state.closeAt && closeOwner.equals(state.owner);
       boolean wasReady=sameClose && closeReady;
-      boolean pending=state.pending();
+      boolean pending=state.pending() && state.phase!=InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;
       boolean observed=(sameClose && closeObserved) || pending;
       boolean ready=sameClose && state.complete && observed;
       boolean failed=!state.error.isEmpty() && state.closeAt>0 && !state.complete;

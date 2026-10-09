@@ -7,8 +7,9 @@ on:
       - 'repairs/android-checkpoint-shutdown/**'
       - '.github/workflows/infinity-android-checkpoint-work.yml'
 permissions: {contents: read, actions: read}
-# Replace obsolete source revisions; the last passed dependency/compiler cache remains reusable.
-concurrency: {group: infinity-android-checkpoint-work, cancel-in-progress: true}
+# Let the compiling revision retain its compiler cache before the corrected
+# candidate starts. Its APK remains a separate candidate identity.
+concurrency: {group: infinity-android-checkpoint-work, cancel-in-progress: false}
 env:
   NDK_VER: 21.4.7075529
 jobs:
@@ -61,7 +62,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103340-Android-Donor-Internal
+          name: Infinity-2103341-Android-Donor-Internal
           path: checkpoint-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
           retention-days: 90
           if-no-files-found: error
@@ -189,7 +190,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           run-id: ${{ github.run_id }}
-          name: Infinity-2103340-Android-Donor-Internal
+          name: Infinity-2103341-Android-Donor-Internal
           github-token: ${{ github.token }}
           path: shell/xbmc/build/outputs/apk/release
       - uses: actions/download-artifact@v8
@@ -220,15 +221,15 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103340-Checkpoint-Combined-Diagnostic-RC1-APK
-          path: evidence/Infinity-2103340-Checkpoint-Combined-Diagnostic-RC1.apk
+          name: Infinity-2103341-Checkpoint-Directory-Fix-RC1-APK
+          path: evidence/Infinity-2103341-Checkpoint-Directory-Fix-RC1.apk
           compression-level: 0
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-2103340-Checkpoint-Test-Evidence
+          name: Infinity-2103341-Checkpoint-Test-Evidence
           path: |
             evidence/
             !evidence/*.apk

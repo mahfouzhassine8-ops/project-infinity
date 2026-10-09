@@ -278,8 +278,11 @@ struct ScopeExit
   ~ScopeExit() { function(); }
 };
 
-// Open every parent with O_NOFOLLOW instead of silently following an ancestor
-// symlink. Reject '..' to keep the caller's chosen namespace unambiguous.
+// Traverse ancestors without requiring permission to list them. Android can
+// grant search access to an app's own directory while denying ancestor reads.
+// O_PATH handles still pin each O_NOFOLLOW directory. Only the final parent is
+// opened for reading, because its namespace must be fsynced after the save.
+// Reject '..' to keep the caller's chosen namespace unambiguous.
 inline int OpenParent(PosixIo& io, const std::string& path,
                       std::string& leaf, Result& result)
 {
@@ -313,7 +316,7 @@ inline int OpenParent(PosixIo& io, const std::string& path,
     }
     components.push_back(component);
   }
-  constexpr int flags = O_RDONLY | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW;
+  constexpr int flags = O_PATH | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW;
   int directory = RetryInterrupted([&] {
     return io.OpenAt(AT_FDCWD, path.front() == '/' ? "/" : ".", flags, 0);
   });
@@ -340,7 +343,21 @@ inline int OpenParent(PosixIo& io, const std::string& path,
     }
     directory = next;
   }
-  return directory;
+  int parent = RetryInterrupted([&] {
+    return io.OpenAt(directory, ".", O_RDONLY | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW, 0);
+  });
+  if (parent < 0)
+  {
+    Fail(result, Stage::OpenDirectory, errno);
+    Close(io, directory, result, Stage::CloseDirectory);
+    return -1;
+  }
+  if (!Close(io, directory, result, Stage::CloseDirectory))
+  {
+    Close(io, parent, result, Stage::CloseDirectory);
+    return -1;
+  }
+  return parent;
 }
 } // namespace detail
 

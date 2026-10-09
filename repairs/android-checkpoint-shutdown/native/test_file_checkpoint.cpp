@@ -1,4 +1,4 @@
-#include "InfinityCheckpointFile.h"
+#include "../runtime/native/overlay/xbmc/platform/android/activity/InfinityCheckpointFile.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -69,6 +69,8 @@ public:
   bool interruptOnce{false};
   bool shortIo{false};
   bool failCleanupUnlink{false};
+  bool denyAncestorReads{false};
+  bool denyFinalParentRead{false};
   int writes{0};
   int renames{0};
   int fileSyncs{0};
@@ -94,6 +96,12 @@ public:
   {
     if (Interrupt("open"))
       return -1;
+    if ((flags & O_DIRECTORY) && !(flags & O_PATH))
+    {
+      if ((denyAncestorReads && std::strcmp(path, ".") != 0) ||
+          (denyFinalParentRead && std::strcmp(path, ".") == 0))
+        return Fail(EACCES);
+    }
     const Kind kind = (flags & O_DIRECTORY) ? Kind::Directory :
                       ((flags & O_CREAT) ? Kind::Temporary : Kind::Existing);
     if (kind == Kind::Temporary && failure == Failure::Create)
@@ -410,6 +418,25 @@ void InterruptedAndShortIoIsRetried()
   CHECK(io.writes == 3 && io.descriptors.empty());
 }
 
+void TraversesSearchOnlyAncestorsAndStillCommitsParent()
+{
+  Fixture f;
+  f.Seed("old");
+  TestIo io;
+  io.denyAncestorReads = true;
+  const auto replaced = file::SaveDirty(f.path, "new", io);
+  CHECK(replaced.ok && replaced.replaced && replaced.dataAndDirectorySynced);
+  CHECK(f.Content() == "new" && io.fileSyncs == 1 && io.directorySyncs == 1);
+  const auto unchanged = file::SaveDirty(f.path, "new", io);
+  CHECK(unchanged.ok && !unchanged.replaced && unchanged.dataAndDirectorySynced);
+  CHECK(io.fileSyncs == 2 && io.directorySyncs == 2 && io.descriptors.empty());
+  io.denyFinalParentRead = true;
+  const auto denied = file::SaveDirty(f.path, "bad", io);
+  CHECK(!denied.ok && denied.stage == file::Stage::OpenDirectory && denied.error == EACCES);
+  CHECK(f.Content() == "new" && io.descriptors.empty());
+  f.NoTemporaries();
+}
+
 void RejectsUnsafeTargets()
 {
   Fixture f;
@@ -453,6 +480,7 @@ int main()
     PrimaryAndCleanupErrorsRemainVisible();
     FinalDirectoryCloseIsChecked();
     InterruptedAndShortIoIsRetried();
+    TraversesSearchOnlyAncestorsAndStillCommitsParent();
     RejectsUnsafeTargets();
     std::cout << "PASS: critical file checkpoint contracts and injected failures\n";
     return 0;

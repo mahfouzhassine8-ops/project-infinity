@@ -7,8 +7,8 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, require, resource_ids, run, sha, verify_manifest_pair
-VERSION = 2103340
-RELEASE = '1.0.9-Checkpoint-Combined-Diagnostic-RC1'
+VERSION = 2103341
+RELEASE = '1.0.9-Checkpoint-Directory-Fix-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 
@@ -102,7 +102,7 @@ def finish(args):
     verify_manifest_pair(run(bt/'aapt','dump','xmltree',args.base,'AndroidManifest.xml',output=args.out/'base-manifest.txt'), run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'manifest.txt'))
     for key in ('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS'):
         require(bool(os.environ.get(key)), 'Missing permanent signer: '+key)
-    final=args.out/f'Infinity-{VERSION}-Checkpoint-Combined-Diagnostic-RC1.apk'
+    final=args.out/f'Infinity-{VERSION}-Checkpoint-Directory-Fix-RC1.apk'
     run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
     for label,path in [('base',args.base),('final',final)]:
         certificate=run(bt/'apksigner','verify','--verbose','--print-certs',path,output=args.out/(label+'-signer.txt'))
