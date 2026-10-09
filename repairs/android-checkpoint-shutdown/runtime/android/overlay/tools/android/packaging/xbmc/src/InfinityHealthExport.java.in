@@ -157,7 +157,34 @@ final class InfinityHealthExport {
                 .append(" error=").append(operation.optString("error","")).append('\n');
             if(!persisted&&blocking.isEmpty()&&!"COMPLETE".equals(status))blocking=name;
           }
+          output.append("Passed / durable owners:\n");
+          boolean durableOwner=false;
+          for(int i=0;i<owners.length()&&i<64;i++){
+            JSONObject operation=owners.getJSONObject(i);
+            String result=operation.optString("result","");
+            if("COMMITTED".equals(result)||"ALREADY_DURABLE".equals(result)){
+              output.append("  ").append(operation.optString("owner","unknown")).append(" — ").append(result).append('\n');
+              durableOwner=true;
+            }
+          }
+          if(!durableOwner)output.append("  [none proven in this checkpoint]\n");
         }
+        output.append("Remaining Save Blockers:\n");
+        boolean anyBlocker=false;
+        JSONArray blockers=nativeStatus.optJSONArray("blockers");
+        if(blockers!=null)for(int i=0;i<blockers.length()&&i<128;i++){
+          JSONObject blocker=blockers.getJSONObject(i);
+          output.append("  ").append(blocker.optString("owner","unknown")).append(" — ")
+              .append(blocker.optString("detail","unspecified"))
+              .append(" count=").append(blocker.optInt("count",1))
+              .append(blocker.optBoolean("fatal",false)?" [fatal]":"").append('\n');
+          anyBlocker=true;
+        }
+        if(nativeStatus.optBoolean("blocker_overflow",false)){
+          output.append("  [additional blockers omitted: bounded inventory overflow]\n");
+          anyBlocker=true;
+        }
+        if(!anyBlocker)output.append("  [none recorded]\n");
       }
       if(nativeStatus!=null){
         JSONObject scripts=nativeStatus.optJSONObject("script_persistence");
@@ -172,7 +199,23 @@ final class InfinityHealthExport {
               .append("Python writers: active=").append(scripts.optInt("active_writers",-1))
               .append(" observed=").append(scripts.optInt("observed_writers",-1))
               .append(" retired=").append(scripts.optInt("retired_writers",-1))
+              .append(" failed_settled=").append(scripts.optInt("failed_settled_writers",-1))
               .append(" tracked_paths=").append(scripts.optInt("tracked_paths",-1)).append('\n');
+          JSONArray scriptBlockers=scripts.optJSONArray("blockers");
+          if(scriptBlockers!=null&&scriptBlockers.length()>0){
+            output.append("Python writer blockers:\n");
+            for(int i=0;i<scriptBlockers.length()&&i<128;i++){
+              JSONObject blocker=scriptBlockers.getJSONObject(i);
+              output.append("  ").append(blocker.optString("writer","unknown"))
+                  .append(" — ").append(blocker.optString("reason","unspecified"));
+              String detail=blocker.optString("detail","");
+              if(!detail.isEmpty())output.append(" — ").append(detail);
+              output.append(" count=").append(blocker.optInt("count",1))
+                  .append(" writer_id=").append(blocker.optInt("writer_id",-1)).append('\n');
+            }
+          }
+          if(scripts.optBoolean("blocker_overflow",false))
+            output.append("  [additional Python blockers omitted: bounded inventory overflow]\n");
           if(!persisted&&!scriptFailure.isEmpty())
             blocking="python_services"+(scriptWriter.isEmpty()?"":" / "+scriptWriter);
         }
