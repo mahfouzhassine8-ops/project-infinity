@@ -23,6 +23,7 @@ def method(source, marker):
 
 PEERS = r'''
 #include "platform/android/activity/InfinityScriptPersistence.h"
+#include <algorithm>
 #include <cassert>
 #include <map>
 #include <memory>
@@ -40,9 +41,11 @@ struct CLanguageInvokerThread{
  void SetAddon(const ADDON::AddonPtr&a){addon=a;} ADDON::AddonPtr GetAddon()const{return addon;}
  void SetId(int i){id=i;}int GetId()const{return id;}
  void Execute(const std::string&,const std::vector<std::string>&){}
+ void Release();
 };using CLanguageInvokerThreadPtr=std::shared_ptr<CLanguageInvokerThread>;
 struct Handler{void Process(){}};
-namespace Test {inline std::vector<int> aborted;}
+namespace Test {inline std::vector<int> aborted;inline std::vector<int> released;}
+inline void CLanguageInvokerThread::Release(){Test::released.push_back(GetId());}
 struct Python {void NotifyScriptAborting(CLanguageInvokerThread* t){Test::aborted.push_back(t->GetId());}};
 struct CServiceBroker {static Python& GetXBPython(){static Python p;return p;}};
 struct CFileUtils{static bool Exists(const std::string&,bool){return true;}};
@@ -93,6 +96,8 @@ int main(){
  assert(stopping.m_scripts[ambient].checkpointContract=="nonpersistent:ambient-glass");
  stopping.BeginAndroidCheckpoint();assert(stopping.m_shutdownRequested);
  assert(Test::aborted==std::vector<int>({ambient,unknown}));
+ assert(Test::released==std::vector<int>({ambient,unknown}));
+ assert(std::find(Test::released.begin(),Test::released.end(),resident)==Test::released.end());
  assert(stopping.m_scripts[resident].checkpointContract=="known");
  // Two Command Center default invocations overlap. Each completion must use
  // its own actual interpreter retirement, never the shared basename counter.
