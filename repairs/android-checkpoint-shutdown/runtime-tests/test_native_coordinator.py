@@ -176,12 +176,29 @@ int main(int argc,char**argv){
  if(mode=="settings-fail")Test::settingsOk=false;
  if(mode=="audio-fail")Test::audioOk=false;
  if(mode=="deferred-fail")Test::deferredOk=false;
+ if(mode=="multi-owner-fail"){Test::skinOk=false;Test::settingsOk=false;Test::profilesOk=false;}
  if(mode=="unknown-job")Test::unknownJobs=1;
  if(mode=="optional-job")Test::optionalJobs=1;
  if(mode=="generic-save"){const auto path=Test::root+"/provider.json";std::ofstream(path)<<"saved";InfinityScriptPersistence::Touch(123,path);InfinityScriptPersistence::Retired(123);Test::foreign.clear();}
  if(mode=="foreign"){Test::foreign.clear();Get().expires=Clock::now();} // A disappeared thread still has no durability receipt.
  for(int attempt=0;attempt<100 && Get().phase=="QUIESCE";++attempt){Pump(app);std::this_thread::sleep_for(std::chrono::milliseconds(1));}
- if(mode=="settings-fail"||mode=="audio-fail"||mode=="deferred-fail"||mode=="unknown-job"||mode=="foreign"){assert(Get().phase=="CHECKPOINT_FAILED");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));return 0;}
+ if(mode=="settings-fail"||mode=="audio-fail"||mode=="deferred-fail"||mode=="unknown-job"||mode=="foreign"){
+   assert(Get().phase=="CHECKPOINT_FAILED");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));
+   const auto status=Status(SESSION,OWNER,getpid());
+   assert(status.find("\"blockers\"")!=std::string::npos);
+   return 0;
+ }
+ if(mode=="multi-owner-fail"){
+   assert(Get().phase=="CHECKPOINT_FAILED");assert(Get().inventoryComplete);assert(!AuthorizeTermination(SESSION,OWNER,getpid()));
+   const auto status=Status(SESSION,OWNER,getpid());
+   assert(status.find("skin_settings_save_failed")!=std::string::npos);
+   assert(status.find("settings_save_failed")!=std::string::npos);
+   assert(status.find("profiles_save_failed")!=std::string::npos);
+   assert(Get().owners["favourites"].complete);
+   assert(Get().owners["peripherals"].complete);
+   assert(Get().owners["audio_policy"].complete);
+   return 0;
+ }
  assert(Get().phase=="SAFE_TO_TERMINATE");const auto safe=Status(SESSION,OWNER,getpid());assert(safe==Status(SESSION,OWNER,getpid()));
  if(mode=="generic-late"){InfinityScriptPersistence::Admit(124,"late:service.py");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));assert(Get().phase=="CHECKPOINT_FAILED");return 0;}
  if(mode=="latewrite"){
@@ -242,7 +259,7 @@ def main():
                  "malformed-response", "busy", "settings-fail", "foreign", "latewrite", "deadline", "lifecycle",
                  "compat-fail", "compat-malformed", "source-drift", "audio-fail",
                  "startup-cas", "startup-old-live", "startup-own-lost", "startup-malformed",
-                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "optional-job", "generic-save", "generic-late"]
+                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "optional-job", "generic-save", "generic-late", "multi-owner-fail"]
         for mode in modes:
             output = subprocess.check_output([str(binary), mode, str(temp / mode)], text=True, timeout=10)
             if mode == "fixture" and args.fixture:
