@@ -22,6 +22,14 @@ struct Writer
   bool observed{false};
   std::string failure;
 };
+struct Blocker
+{
+  int writerId{-1};
+  std::string writer;
+  std::string reason;
+  std::string detail;
+  unsigned count{1};
+};
 struct Namespace
 {
   bool present{true};
@@ -35,6 +43,9 @@ struct State
   std::map<std::string, std::pair<unsigned,unsigned>> totals;
   std::map<std::string, Namespace> paths;
   std::string failure;
+  std::vector<Blocker> blockers;
+  bool blockerOverflow{false};
+  unsigned failedSettled{0};
   bool commitStarted{false};
   int failureWriterId{-1};
   std::string failureWriter;
@@ -62,17 +73,33 @@ inline void Observed(int id)
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   const auto found=s.writers.find(id);if(found!=s.writers.end())found->second.observed=true;
 }
+inline void AddBlockerLocked(State& s,int id,const std::string& writer,
+                             const std::string& reason,const std::string& detail)
+{
+  const auto safeWriter=writer.substr(0,512),safeReason=reason.substr(0,384),safeDetail=detail.substr(0,2048);
+  for(auto& blocker:s.blockers)
+    if(blocker.writerId==id && blocker.writer==safeWriter &&
+       blocker.reason==safeReason && blocker.detail==safeDetail) {
+      if(blocker.count<UINT_MAX)++blocker.count;
+      return;
+    }
+  if(s.blockers.size()>=128){s.blockerOverflow=true;return;}
+  s.blockers.push_back({id,safeWriter,safeReason,safeDetail,1});
+}
 inline void Fail(int id, const std::string& reason, const std::string& detail={})
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   auto found=s.writers.find(id);
   if(found!=s.writers.end() && found->second.failure.empty()) found->second.failure=reason;
+  std::string writer;
+  if(found!=s.writers.end() && !found->second.admissions.empty())
+    writer=found->second.admissions.begin()->first.substr(0,512);
+  AddBlockerLocked(s,id,writer,reason,detail);
   if(s.failure.empty()) {
     s.failure="python_writer:"+reason;
     s.failureWriterId=id;
     s.failureDetail=detail.substr(0,2048);
-    if(found!=s.writers.end() && !found->second.admissions.empty())
-      s.failureWriter=found->second.admissions.begin()->first.substr(0,512);
+    s.failureWriter=writer;
   }
 }
 inline std::string Absolute(const std::string& input)
@@ -116,9 +143,14 @@ inline void Retired(int id)
   // and actual Py_EndInterpreter. No Python callable can invoke this operation.
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   const auto found=s.writers.find(id);if(found==s.writers.end())return;
-  if(!found->second.observed || !found->second.failure.empty())return;
+  if(!found->second.observed)return;
+  if(!found->second.failure.empty()) {
+    ++s.failedSettled;
+    s.writers.erase(found); // Interpreter ended, but no durable retirement receipt is granted.
+    return;
+  }
   for(const auto& item:found->second.admissions)s.totals[item.first].second+=item.second;
-  if(s.retiredInvokers.size()>=512){s.failure="interpreter_retirement_receipt_limit";return;}
+  if(s.retiredInvokers.size()>=512){Fail(id,"interpreter_retirement_receipt_limit");return;}
   s.retiredInvokers.insert(id);
   ++s.retired;s.writers.erase(found);
 }
@@ -134,28 +166,35 @@ inline bool DurableRetirement(const std::string& name)
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
   const auto found=s.totals.find(name);
-  return s.failure.empty() && found!=s.totals.end() && found->second.first==found->second.second;
+  return found!=s.totals.end() && found->second.first==found->second.second;
+}
+inline bool BlockedRetirement(const std::string& name)
+{
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  for(const auto& blocker:s.blockers)if(blocker.writer==name)return true;
+  return false;
 }
 inline std::string Failure()
 {auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.failure;}
 struct Evidence
 {
-  std::size_t active{0}, observed{0}, retired{0}, paths{0};
-  bool syncStarted{false}, syncFinished{false}, durable{false};
+  std::size_t active{0}, observed{0}, retired{0}, failedSettled{0}, paths{0};
+  bool syncStarted{false}, syncFinished{false}, durable{false}, blockerOverflow{false};
   std::string failure;
   int failureWriterId{-1};
   std::string failureWriter;
   std::string failureDetail;
   std::vector<std::string> pending;
+  std::vector<Blocker> blockers;
 };
 inline Evidence Snapshot()
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);Evidence result;
-  result.active=s.writers.size();result.retired=s.retired;result.paths=s.paths.size();
+  result.active=s.writers.size();result.retired=s.retired;result.failedSettled=s.failedSettled;result.paths=s.paths.size();
   result.syncStarted=s.commitStarted;result.syncFinished=s.commitFinished;
-  result.durable=s.committed && s.failure.empty();result.failure=s.failure;
+  result.durable=s.committed && s.failure.empty() && s.blockers.empty();result.failure=s.failure;
   result.failureWriterId=s.failureWriterId;result.failureWriter=s.failureWriter;
-  result.failureDetail=s.failureDetail;
+  result.failureDetail=s.failureDetail;result.blockers=s.blockers;result.blockerOverflow=s.blockerOverflow;
   for(const auto& item:s.writers) {
     if(item.second.observed)++result.observed;
     for(const auto& admission:item.second.admissions)
@@ -206,20 +245,35 @@ inline void CommitWorker(std::map<std::string,Namespace> paths)
   if(error.empty())for(const auto& directory:directories)
     if(!SyncOne(directory,true,error))break;
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  if(!error.empty() && s.failure.empty())s.failure=error;
-  s.committed=s.failure.empty();s.commitFinished=true;
+  if(!error.empty()) {
+    AddBlockerLocked(s,-1,"python_services",error,{});
+    if(s.failure.empty()) {
+      s.failure=error;s.failureWriterId=-1;s.failureWriter="python_services";s.failureDetail.clear();
+    }
+  }
+  s.committed=error.empty();s.commitFinished=true;
 }
-inline bool PollCommit()
+inline bool PollInventory()
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  if(!s.failure.empty() || !s.writers.empty())return false;
+  if(!s.writers.empty())return false;
   if(!s.commitStarted) {
     s.commitStarted=true;
     if(s.paths.empty()) {s.commitFinished=true;s.committed=true;return true;}
     const auto paths=s.paths;
     try {std::thread([paths]{CommitWorker(paths);}).detach();}
-    catch(...) {s.failure="script_durability_worker_start_failed";s.commitFinished=true;}
+    catch(...) {
+      AddBlockerLocked(s,-1,"python_services","script_durability_worker_start_failed",{});
+      if(s.failure.empty()) {s.failure="script_durability_worker_start_failed";s.failureWriter="python_services";}
+      s.committed=false;s.commitFinished=true;
+    }
   }
-  return s.commitFinished && s.committed;
+  return s.commitFinished;
+}
+inline bool PollCommit()
+{
+  if(!PollInventory())return false;
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  return s.committed && s.failure.empty() && s.blockers.empty();
 }
 } // namespace InfinityScriptPersistence
