@@ -280,4 +280,7 @@ main = (source / 'Main.java.in').read_text()
 assert main.index('InfinityKodiShutdown.boot(this') < main.index('System.loadLibrary("@APP_NAME_LC@")') < main.index('!infinityRegisterCheckpointOwner(') < main.index('super.onCreate(savedInstanceState)')
 assert 'InfinityKodiShutdown.ownerRetired(getFilesDir(),pid,owner)' in main
 assert 'public boolean infinityCheckpointOwnsOwner(int pid,String owner)' in main
-print('PASS runtime route, explicit native authorization, and no-restart binding checks')
+health = (source / 'InfinityHealthExport.java.in').read_text()
+for token in ('Python writer failure:', 'Python failure writer:', 'Python failure detail:', 'failure_detail'):
+    assert token in health
+print('PASS runtime route, explicit native authorization, failure detail export, and no-restart binding checks')
