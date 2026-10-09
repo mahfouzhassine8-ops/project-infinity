@@ -150,7 +150,13 @@ inline void Retired(int id)
     return;
   }
   for(const auto& item:found->second.admissions)s.totals[item.first].second+=item.second;
-  if(s.retiredInvokers.size()>=512){Fail(id,"interpreter_retirement_receipt_limit");return;}
+  if(s.retiredInvokers.size()>=512){
+    std::string writer;
+    if(!found->second.admissions.empty())writer=found->second.admissions.begin()->first.substr(0,512);
+    AddBlockerLocked(s,id,writer,"interpreter_retirement_receipt_limit",{});
+    if(s.failure.empty()){s.failure="python_writer:interpreter_retirement_receipt_limit";s.failureWriterId=id;s.failureWriter=writer;}
+    return;
+  }
   s.retiredInvokers.insert(id);
   ++s.retired;s.writers.erase(found);
 }
