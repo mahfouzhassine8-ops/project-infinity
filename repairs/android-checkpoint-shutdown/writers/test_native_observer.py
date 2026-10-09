@@ -148,6 +148,10 @@ int main(int argc,char** argv) {
     }
     if(mode=="cached-direct-sqlite")
       assert(first.failureDetail.find("cached-direct.db")!=std::string::npos);
+    if(mode=="external") {
+      assert(first.failureDetail.find("executable=/bin/true")!=std::string::npos);
+      assert(first.failureDetail.find("argc=1")!=std::string::npos);
+    }
   }
   auto* interpreter=owner->interp;
   Py_EndInterpreter(owner);
