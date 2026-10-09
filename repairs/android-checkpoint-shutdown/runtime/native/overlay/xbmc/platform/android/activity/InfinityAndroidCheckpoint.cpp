@@ -221,6 +221,7 @@ std::string EncodeStatusLocked(const State& s)
   CVariant result(CVariant::VariantTypeObject);
   result["schema"] = 1;
   result["blocker_inventory_contract"] = "full_blocker_inventory_v1";
+  result["python_retirement_contract"] = "python_retirement_batch_v1";
   result["session"] = s.session;
   result["owner"] = s.owner;
   result["pid"] = s.pid;
