@@ -7,9 +7,9 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103358
-RELEASE = '1.0.9-Checkpoint-Observer-Finalization-RC1'
-FILE_LABEL = 'Checkpoint-Observer-Finalization-RC1'
+VERSION = 2103359
+RELEASE = '1.0.9-Final-Blocker-Detail-Inventory-RC1'
+FILE_LABEL = 'Final-Blocker-Detail-Inventory-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 PINNED_PIL_NATIVE = {
@@ -171,7 +171,8 @@ def finish(args):
         'installed_owner_audit_complete':False,'unknown_writers_block_normal_close':True,'pillow_native_contract_pinned':True,
         'checkpoint_retirement_escalation':'3s cooperative grace; max 8 parallel foreign-writer escalations off UI thread',
         'checkpoint_observer_finalization':'consume only escalation-owned SystemExit; one bounded observer retry; dirty state still blocks',
-        'purpose':'Fold test candidate; Redlight late checkpoint SystemExit must not poison persistence finalization'
+        'final_blocker_detail_inventory':'all Python durability path failures and add-on settings conflict paths are retained in one checkpoint receipt',
+        'purpose':'Fold diagnostic candidate; expose every remaining exact save blocker without weakening fail-closed behavior'
     },indent=2)+'\n')
     unsigned.unlink(); native.unlink()
 
