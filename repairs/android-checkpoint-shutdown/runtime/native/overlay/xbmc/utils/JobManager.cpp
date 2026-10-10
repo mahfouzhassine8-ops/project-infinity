@@ -85,12 +85,16 @@ void CJobWorker::Process()
       CLog::Log(LOGERROR, "{} error processing job {}", __FUNCTION__, jobType);
     }
 #if defined(TARGET_ANDROID)
+    const std::string checkpointType = typeid(*job).name();
+    const bool databaseOwnedJob =
+        checkpointType.find("CRepositoryUpdateJob") != std::string::npos ||
+        checkpointType.find("CVideoLibraryScanningJob") != std::string::npos;
     if (CJobManager::IsRequiredCheckpointJob(job) && !job->CheckpointSucceeded(success) &&
-        InfinityAndroidCheckpoint::IsActive())
+        !databaseOwnedJob && InfinityAndroidCheckpoint::IsActive())
     {
       const char* operation = job->GetCheckpointOperation();
       const std::string failure = std::string("job_failed:") +
-          (operation && *operation ? operation : typeid(*job).name());
+          (operation && *operation ? operation : checkpointType);
       InfinityAndroidCheckpoint::RecordFailure("background_jobs", failure.c_str());
     }
 #endif
@@ -438,14 +442,62 @@ void CJobManager::TrackCheckpointJob(CJob* job, IJobCallback* callback, const ch
 #if defined(TARGET_ANDROID)
   if (!job->m_checkpointRecord)
   {
-    const auto role = job->GetCheckpointResponsibility(callback);
-    const std::string owner = queueOwner.empty() ? job->GetCheckpointPersistenceOwner() : queueOwner;
+    auto role = job->GetCheckpointResponsibility(callback);
+    std::string owner = queueOwner.empty() ? job->GetCheckpointPersistenceOwner() : queueOwner;
+    std::string operation = job->GetCheckpointOperation() ? job->GetCheckpointOperation() : "";
+    const std::string actualType = typeid(*job).name();
+
+    // Fold inventory 2103353 exposed the exact remaining stock-Kodi job
+    // implementations. Classify only those proven types; every unrecognized
+    // implementation remains fail-closed and is retained in the inventory.
+    if (queueOwner.empty() && role == CJob::CheckpointResponsibility::Unknown)
+    {
+      if (actualType.find("CRepositoryUpdateJob") != std::string::npos)
+      {
+        role = CJob::CheckpointResponsibility::Required;
+        owner = "native_databases";
+        operation = "repository_update";
+      }
+      else if (actualType.find("CVideoLibraryScanningJob") != std::string::npos)
+      {
+        role = CJob::CheckpointResponsibility::Required;
+        owner = "native_databases";
+        operation = "video_library_scan";
+      }
+      else if (actualType.find("CApplication10Initialize") != std::string::npos)
+      {
+        // Startup database/font/add-on initialization is complete long before
+        // close in the observed session. If one is still active, wait for it;
+        // database writes are independently sealed by native_databases.
+        role = CJob::CheckpointResponsibility::Required;
+        owner = "native_databases";
+        operation = "application_initialize";
+      }
+      else if (actualType.find("CEventSource") != std::string::npos &&
+               actualType.find("Publish") != std::string::npos)
+      {
+        role = CJob::CheckpointResponsibility::Required;
+        owner = "native_admission";
+        operation = "event_dispatch";
+      }
+      else if (actualType.find("CDirectoryJob") != std::string::npos ||
+               actualType.find("CWeatherJob") != std::string::npos ||
+               actualType.find("CRecentlyAddedJob") != std::string::npos ||
+               actualType.find("CImageLoader") != std::string::npos)
+      {
+        // GUI directory/weather/recently-added work and large-art decoding
+        // produce display state or reconstructible caches. Any child Python,
+        // database or newly admitted job is independently tracked.
+        role = CJob::CheckpointResponsibility::NonPersistent;
+        operation = "reconstructible_or_display_job";
+      }
+    }
+
     const bool required = !queueOwner.empty() || role != CJob::CheckpointResponsibility::NonPersistent;
     const bool unknown = required && (!InfinityAndroidCheckpoint::IsRequiredOwner(owner) ||
         (queueOwner.empty() && role == CJob::CheckpointResponsibility::Unknown));
     job->m_checkpointRecord = JobCheckpoint::Admit(required, unknown, owner,
-        job->GetCheckpointOperation() ? job->GetCheckpointOperation() : "",
-        typeid(*job).name(), phase);
+        operation, actualType, phase);
   }
 #else
   (void)job; (void)callback; (void)phase; (void)queueOwner;
