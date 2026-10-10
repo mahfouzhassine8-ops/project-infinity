@@ -113,7 +113,18 @@ int main(int argc,char** argv) {
   if(mode=="readonly-child")script="import subprocess,tempfile\nwith tempfile.TemporaryFile(dir=root) as output:\n subprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=output,stderr=subprocess.PIPE,check=True)\n output.seek(0)\n result=output.read()\nwith open(root+'/diagnostic.txt','wb') as f: f.write(result)\n";
   if(mode=="readonly-child-env")script="import os,subprocess\nenv=dict(os.environ)\nenv['LC_ALL']='C'\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=True)\n";
   if(mode=="readonly-child-bad-env")script="import os,subprocess\nenv=dict(os.environ)\nenv['LC_ALL']='C'\nenv['INFINITY_UNREVIEWED']='1'\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=True)\n";
-  if(mode=="system-exit" || mode=="system-exit-pending" || mode=="abort-callback-error") {
+  const bool checkpointLateSystemExit =
+      mode=="checkpoint-late-system-exit" || mode=="checkpoint-late-system-exit-pending";
+  if(checkpointLateSystemExit) {
+    script=mode=="checkpoint-late-system-exit-pending" ?
+      "import sqlite3\nc=sqlite3.connect(root+'/state.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\n" :
+      "f=open(root+'/state.json','w');f.write('saved')\n";
+    assert(PyRun_SimpleString(script)==0);
+    // Models the exact 2103357 Fold failure: checkpoint force retirement has
+    // ended bytecode, but its SystemExit is still pending when the native
+    // persistence observer starts finalization.
+    PyErr_SetNone(PyExc_SystemExit);
+  } else if(mode=="system-exit" || mode=="system-exit-pending" || mode=="abort-callback-error") {
     script=mode=="system-exit-pending" ?
       "import sqlite3\nc=sqlite3.connect(root+'/state.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\nraise SystemExit\n" :
       "f=open(root+'/state.json','w');f.write('saved')\nraise SystemExit\n";
@@ -127,7 +138,7 @@ int main(int argc,char** argv) {
       PyErr_Clear();
     } else assert(!PyErr_Occurred());
   } else assert(script && PyRun_SimpleString(script)==0);
-  InfinityPythonPersistence::Finish(context,owner);
+  InfinityPythonPersistence::Finish(context,owner,checkpointLateSystemExit);
   if(PyErr_Occurred())PyErr_Print();
   if(mode=="layered-failure") {
     assert(context->preservePending && !context->finalized);
@@ -136,7 +147,8 @@ int main(int argc,char** argv) {
   if(mode=="layered-raw") {
     assert(PyRun_SimpleString("assert f.closed and b.closed and r.closed\nassert open(root+'/layered.txt').read()=='saved layers'\n")==0);
   }
-  if(mode=="pending" || mode=="system-exit-pending" || mode=="direct-sqlite-pending") {
+  if(mode=="pending" || mode=="system-exit-pending" || mode=="direct-sqlite-pending" ||
+     mode=="checkpoint-late-system-exit-pending") {
     assert(context->preservePending && !context->finalized);
     assert(!InfinityScriptPersistence::PollCommit());
     assert(!InfinityScriptPersistence::Failure().empty());
@@ -151,7 +163,7 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="readonly-child-env" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
+  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="readonly-child-env" || mode=="system-exit" || mode=="checkpoint-late-system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else {
@@ -229,7 +241,7 @@ def main():
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'readonly-child-env', 'readonly-child-bad-env', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
+        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'readonly-child-env', 'readonly-child-bad-env', 'system-exit', 'system-exit-pending', 'checkpoint-late-system-exit', 'checkpoint-late-system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)
