@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <climits>
+#include <chrono>
 #include <fcntl.h>
 #include <map>
 #include <memory>
@@ -39,6 +40,7 @@
 #include <set>
 #include <string>
 #include <sys/stat.h>
+#include <thread>
 #include <unistd.h>
 #include <utility>
 #include <vector>
@@ -429,6 +431,10 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
   {
     std::unique_lock<CCriticalSection> lock(m_critSection);
     m_shutdownRequested = true;
+    m_androidCheckpointRetirementStarted = std::chrono::steady_clock::now();
+    m_androidCheckpointRetirementArmed = true;
+    m_androidCheckpointEscalatedIds.clear();
+    m_androidCheckpointEscalationsActive = 0;
     for (const auto& entry : m_scripts)
       if (!entry.second.done)
       {
@@ -442,11 +448,8 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
 #if defined(TARGET_ANDROID) && defined(HAS_PYTHON)
   for (const auto& thread : pending)
   {
-    // Cooperative checkpoint shutdown supports both service generations:
-    // CPython Stop(false) has a checkpoint-only branch that sets the legacy
-    // xbmc.abortRequested signal and notifies Monitor without waiting or
-    // escalating to SystemExit. Release then exits reusable invoker waits.
-    // Observer finalization still refuses pending transactions/buffers.
+    // First pass is deliberately cooperative. Give add-ons a chance to observe
+    // Monitor/legacy abort and flush their own state before any escalation.
     CServiceBroker::GetXBPython().NotifyScriptAborting(thread.get());
     const auto invoker = thread->GetInvoker();
     if (invoker)
@@ -454,6 +457,93 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
     thread->Release();
   }
 #endif
+}
+
+void CScriptInvocationManager::PumpAndroidCheckpointRetirement(bool force)
+{
+#if defined(TARGET_ANDROID) && defined(HAS_PYTHON)
+  struct Candidate
+  {
+    int id;
+    CLanguageInvokerThreadPtr thread;
+    std::string addon;
+    std::string script;
+  };
+  constexpr std::size_t MAX_PARALLEL_ESCALATIONS = 8;
+  const auto grace = std::chrono::seconds(3);
+  std::vector<Candidate> launch;
+  {
+    std::unique_lock<CCriticalSection> lock(m_critSection);
+    if (!m_androidCheckpointRetirementArmed)
+      return;
+    if (!force && std::chrono::steady_clock::now() - m_androidCheckpointRetirementStarted < grace)
+      return;
+    if (m_androidCheckpointEscalationsActive >= MAX_PARALLEL_ESCALATIONS)
+      return;
+    std::size_t available = MAX_PARALLEL_ESCALATIONS - m_androidCheckpointEscalationsActive;
+    for (const auto& entry : m_scripts)
+    {
+      if (available == 0)
+        break;
+      if (entry.second.done ||
+          !VerifiedCheckpointContract(entry.second.script, entry.second.thread,
+                                      entry.second.checkpointContract).empty() ||
+          m_androidCheckpointEscalatedIds.count(entry.first) != 0)
+        continue;
+      const auto& addon = entry.second.thread->GetAddon();
+      m_androidCheckpointEscalatedIds.insert(entry.first);
+      ++m_androidCheckpointEscalationsActive;
+      launch.push_back({entry.first, entry.second.thread,
+                        addon ? addon->ID() : "unidentified",
+                        URIUtils::GetFileName(entry.second.script)});
+      --available;
+    }
+  }
+
+  for (const auto& item : launch)
+  {
+    InfinityShutdownTrace::Event("milestone", "scripts.checkpoint_escalation_start", item.id,
+                                 0, 0, 0, item.addon.c_str(), "started", item.script.c_str());
+    try
+    {
+      std::thread([this, item]() {
+        const bool stopped = item.thread->Stop(true);
+        InfinityShutdownTrace::Event("milestone", "scripts.checkpoint_escalation_end", item.id,
+                                     0, 0, 0, item.addon.c_str(),
+                                     stopped ? "stop_returned" : "stop_rejected",
+                                     item.script.c_str());
+        std::unique_lock<CCriticalSection> lock(m_critSection);
+        if (m_androidCheckpointEscalationsActive > 0)
+          --m_androidCheckpointEscalationsActive;
+        if (!stopped)
+        {
+          const auto found = m_scripts.find(item.id);
+          if (found != m_scripts.end() && !found->second.done)
+            m_androidCheckpointEscalatedIds.erase(item.id);
+        }
+      }).detach();
+    }
+    catch (...)
+    {
+      {
+        std::unique_lock<CCriticalSection> lock(m_critSection);
+        if (m_androidCheckpointEscalationsActive > 0)
+          --m_androidCheckpointEscalationsActive;
+        m_androidCheckpointEscalatedIds.erase(item.id);
+      }
+      InfinityAndroidCheckpoint::RecordFailure(
+          "python_services", "checkpoint_retirement_escalation_worker_start_failed");
+    }
+  }
+#else
+  (void)force;
+#endif
+}
+
+std::size_t CScriptInvocationManager::AndroidCheckpointEscalationsActive() const
+{
+  std::unique_lock<CCriticalSection> lock(m_critSection);
+  return m_androidCheckpointEscalationsActive;
 }
 
 std::size_t CScriptInvocationManager::AndroidCheckpointForeignScripts() const
@@ -927,8 +1017,12 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
 
   std::string quarantineAddon;
   std::string quarantineScript;
+  std::string checkpointAddon;
+  std::string checkpointScript;
   bool quarantineFailure = false;
   bool quarantineSuccess = false;
+  bool checkpointEscalated = false;
+  bool checkpointRetired = false;
   std::unique_lock<CCriticalSection> lock(m_critSection);
   LanguageInvokerThreadMap::iterator script = m_scripts.find(scriptId);
   if (script != m_scripts.end())
@@ -937,6 +1031,14 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
     const bool cleanUncaughtFailure = InfinityScriptPersistence::AdvisoryInterpreterRetirement(
         scriptId, "uncaught_script_failure_before_persistence_receipt");
     const bool retired = InfinityScriptPersistence::TakeInterpreterRetirement(scriptId);
+    checkpointEscalated = m_androidCheckpointEscalatedIds.erase(scriptId) != 0;
+    if (checkpointEscalated)
+    {
+      const auto& addon = script->second.thread->GetAddon();
+      checkpointAddon = addon ? addon->ID() : "unidentified";
+      checkpointScript = URIUtils::GetFileName(script->second.script);
+      checkpointRetired = retired;
+    }
     if (InfinityAndroidCheckpoint::IsActive() &&
         VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty())
     {
@@ -961,13 +1063,21 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
       quarantineAddon = script->second.thread->GetAddon()->ID();
       quarantineScript = script->second.script;
       quarantineFailure = cleanUncaughtFailure;
-      quarantineSuccess = !cleanUncaughtFailure;
+      // A service that required checkpoint escalation did not demonstrate a
+      // normal clean lifetime. Do not use shutdown force as evidence that a
+      // previously quarantined add-on is healthy again.
+      quarantineSuccess = !cleanUncaughtFailure && !checkpointEscalated;
     }
 #endif
     script->second.done = true;
   }
   lock.unlock();
 #if defined(TARGET_ANDROID)
+  if (checkpointEscalated)
+    InfinityShutdownTrace::Event("milestone", "scripts.checkpoint_escalated_retired", scriptId,
+                                 0, 0, 0, checkpointAddon.c_str(),
+                                 checkpointRetired ? "durable_retirement" : "retirement_without_receipt",
+                                 checkpointScript.c_str());
   if (quarantineFailure)
     InfinityAddonQuarantine::RecordCleanFailure(quarantineAddon, quarantineScript);
   else if (quarantineSuccess)
