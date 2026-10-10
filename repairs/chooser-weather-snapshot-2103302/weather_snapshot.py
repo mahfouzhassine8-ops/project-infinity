@@ -27,25 +27,35 @@ def reading(kodi, now_ms):
 def publish(kodi, target, monitor, now_ms=None):
     if monitor.abortRequested():
         return False
+    temporary = target + '.pending'
+    committed = False
     try:
         snapshot = reading(kodi, int(time.time() * 1000) if now_ms is None else now_ms)
         if snapshot is None or monitor.abortRequested():
             return False
         parent = os.path.dirname(target)
         os.makedirs(parent, exist_ok=True)
-        temporary = target + '.pending'
         with open(temporary, 'w', encoding='utf-8') as out:
             json.dump(snapshot, out, ensure_ascii=False, separators=(',', ':'))
             out.flush()
             os.fsync(out.fileno())
         if monitor.abortRequested():
-            os.remove(temporary)
             return False
         os.replace(temporary, target)
+        committed = True
         return True
     except (OSError, ValueError, TypeError, RuntimeError):
         # Weather failure never changes the provider, existing reading, or Kodi UI.
         return False
+    finally:
+        # Checkpoint retirement can raise SystemExit at any bytecode boundary.
+        # Never leave the atomic staging namespace behind or marked as live.
+        if not committed:
+            try:
+                if os.path.exists(temporary):
+                    os.remove(temporary)
+            except OSError:
+                pass
 
 
 def main(kodi, target):
