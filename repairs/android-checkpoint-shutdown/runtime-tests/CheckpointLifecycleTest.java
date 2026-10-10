@@ -41,6 +41,16 @@ public class CheckpointLifecycleTest {
     assertEquals(ActivityInfo.LAUNCH_SINGLE_INSTANCE,info.launchMode);
     assertEquals("com.projectinfinity.kodi:kodi",info.processName);
   }
+  @Test public void successfulChooserHandoffRemovesItsOwnSingleInstanceTask(){
+    final boolean[] removed={false},plainFinished={false};
+    Activity chooser=new Activity(){
+      @Override public void finishAndRemoveTask(){removed[0]=true;}
+      @Override public void finish(){plainFinished[0]=true;}
+    };
+    Splash.finishSuccessfulExperienceHandoff(chooser);
+    assertTrue(removed[0]);assertFalse(plainFinished[0]);
+  }
+
   @Test public void mainHandoffStripsExclusionButKeepsDeepLinkAndLiveTask(){
     Activity activity=Robolectric.buildActivity(Activity.class).create().get();
     Intent input=new Intent(Intent.ACTION_VIEW,android.net.Uri.parse("content://example/movie"))
