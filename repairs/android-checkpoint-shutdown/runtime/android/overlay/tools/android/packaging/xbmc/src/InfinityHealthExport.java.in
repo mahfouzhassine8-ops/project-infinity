@@ -169,8 +169,8 @@ final class InfinityHealthExport {
       boolean any = false;
       for (String line : lines) {
         if (line.isEmpty() || "infinity-addon-quarantine-v1".equals(line)) continue;
-        String[] fields = line.split("\\t", 4);
-        if (fields.length != 4) continue;
+        String[] fields = line.split("\\t", 5);
+        if (fields.length < 4) continue;
         output.append("  ").append(fields[0])
             .append(": failures=").append(fields[1])
             .append(" quarantined=").append("1".equals(fields[2]) ? "yes" : "no")
