@@ -102,7 +102,7 @@ inline Snapshot GetSnapshot()
     if (!job->required) { ++result.nonPersistent; continue; }
     if (job->unknown) ++result.unknown;
     ++result.required;
-    if (result.blockers.size() < 8)
+    if (result.blockers.size() < 32)
       result.blockers.push_back({job->token, job->jobId, job->required, job->unknown, job->owner, job->operation,
         job->type, job->unknown && job->retained && job.use_count() == 2 ? "completed_without_owner_receipt" : job->phase,
         std::chrono::duration_cast<std::chrono::milliseconds>(now - job->admitted).count()});
