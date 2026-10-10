@@ -206,14 +206,18 @@ final class InfinityKodiShutdown {
           saved=InfinityCheckpointProtocol.safe(nativeReceipt) && close.getLong("generation")==nativeReceipt.getLong("generation") &&
               InfinityCheckpointProtocol.proof(raw).equals(close.getString("native_proof_sha256"));
         }
-        if("COMPLETE".equals(closingPhase) && saved && !alive){complete=true;phase=InfinityExitCompletion.Plan.Phase.COMPLETE;}
-        else if("CHECKPOINT_FAILED".equals(closingPhase)){
+        if(InfinityCheckpointProtocol.confirmedComplete(close,close.getString("session"),owner,pid,alive,saved)){
+          complete=true;phase=InfinityExitCompletion.Plan.Phase.COMPLETE;
+        }else if("COMPLETE".equals(closingPhase)){
+          phase=InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;
+          error="Shutdown ended without confirmed consumed termination authorization.";
+        }else if("CHECKPOINT_FAILED".equals(closingPhase)){
           phase=InfinityExitCompletion.Plan.Phase.CHECKPOINT_FAILED;
           error="Infinity could not confirm that everything was saved. Open Health Center or use Force Close.";
         }else if("QUIESCE".equals(closingPhase)||"CHECKPOINT_REQUESTED".equals(closingPhase)||"PERSISTING".equals(closingPhase)||
             "SAFE_TO_TERMINATE".equals(closingPhase)||"ENGINE_TERMINATING".equals(closingPhase)){
           phase=InfinityExitCompletion.Plan.Phase.valueOf(closingPhase);
-          awaitingCoordinator=saved&&!alive;
+          awaitingCoordinator=saved&&!alive&&close.optBoolean("authorization_consumed",false);
         }
       }
     }catch(Exception unavailable){}
