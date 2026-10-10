@@ -7,9 +7,9 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103360
-RELEASE = '1.0.9-Weather-Temp-Retirement-RC1'
-FILE_LABEL = 'Weather-Temp-Retirement-RC1'
+VERSION = 2103361
+RELEASE = '1.0.9-Runtime-Probe-Recents-RC1'
+FILE_LABEL = 'Runtime-Probe-Recents-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 PINNED_PIL_NATIVE = {
@@ -173,7 +173,9 @@ def finish(args):
         'checkpoint_observer_finalization':'consume only escalation-owned SystemExit; one bounded observer retry; dirty state still blocks',
         'final_blocker_detail_inventory':'all Python durability path failures and add-on settings conflict paths are retained in one checkpoint receipt',
         'weather_temp_retirement':'chooser weather atomic .pending namespace is removed in finally, including checkpoint SystemExit',
-        'purpose':'Fold repair candidate; weather atomic temp namespace must not survive or poison checkpoint durability'
+        'runtime_probe_detail':'read-only uname is admitted; ctypes/SQLite/VFS blockers retain exact identities and paths',
+        'failed_close_recents':'pending/failed Kodi owner remains alive but its task is excluded while chooser recovery is foreground',
+        'purpose':'Fold repair/diagnostic candidate; remove false read-only probe blockers, preserve true dirty-state failures, and keep one Infinity Recents card'
     },indent=2)+'\n')
     unsigned.unlink(); native.unlink()
 
