@@ -16,6 +16,7 @@
 #if defined(TARGET_ANDROID)
 #include "InfinityPythonExitEvidence.h"
 #include "InfinityPythonPersistence.h"
+#include "interfaces/generic/ScriptInvocationManager.h"
 #include "platform/android/activity/InfinityAndroidCheckpoint.h"
 #endif
 #include "platform/android/activity/InfinityShutdownTrace.h"
@@ -887,6 +888,15 @@ void CPythonInvoker::onError(const std::string& exceptionType /* = "" */,
                              const std::string& exceptionValue /* = "" */,
                              const std::string& exceptionTraceback /* = "" */)
 {
+#if defined(TARGET_ANDROID)
+  if (m_addon && CScriptInvocationManager::AndroidQuarantineSuppressErrorToast(
+                     m_addon->ID(), m_sourceFile))
+  {
+    CLog::Log(LOGWARNING, "Infinity quarantine probation: suppressed service error toast for {}",
+              m_addon->ID());
+    return;
+  }
+#endif
   CPyThreadState releaseGil;
   std::unique_lock<CCriticalSection> gc(CServiceBroker::GetWinSystem()->GetGfxContext());
 
