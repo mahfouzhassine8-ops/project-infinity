@@ -546,6 +546,14 @@ std::size_t CScriptInvocationManager::AndroidCheckpointEscalationsActive() const
   return m_androidCheckpointEscalationsActive;
 }
 
+bool CScriptInvocationManager::AndroidCheckpointWasEscalated(int scriptId) const
+{
+  if (scriptId < 0)
+    return false;
+  std::unique_lock<CCriticalSection> lock(m_critSection);
+  return m_androidCheckpointEscalatedIds.count(scriptId) != 0;
+}
+
 std::size_t CScriptInvocationManager::AndroidCheckpointForeignScripts() const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
