@@ -172,6 +172,24 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
     return true;
   }
 
+  if(executableName=="uname" || executableName=="/system/bin/uname") {
+    if(count<1 || count>2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);
+    if(firstName!="uname" && firstName!="/system/bin/uname")return false;
+    if(count==1)return true;
+    PyObject* optionObject=PySequence_GetItem(command,1);
+    const char* optionText=optionObject && PyUnicode_Check(optionObject)?PyUnicode_AsUTF8(optionObject):nullptr;
+    const std::string option=optionText?optionText:std::string{};
+    if(!optionText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(optionObject);
+    return option=="-a" || option=="-s" || option=="-n" || option=="-r" ||
+           option=="-v" || option=="-m" || option=="-p" || option=="-i" || option=="-o";
+  }
+
   if(executableName=="/system/bin/ip") {
     if(count!=2)return false;
     PyObject* first=PySequence_GetItem(command,0);
@@ -237,6 +255,31 @@ inline std::string ChildProcessEvidence(PyObject* executable,PyObject* command)
   const auto count=(PyList_Check(command)||PyTuple_Check(command))?PySequence_Size(command):-1;
   if(PyErr_Occurred())PyErr_Clear();
   const std::string result="executable="+name.substr(0,256)+";argc="+std::to_string(count);
+  PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
+
+inline std::string NativeCallEvidence(const char* event,PyObject* args)
+{
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  const auto count=PyTuple_Check(args)?PyTuple_GET_SIZE(args):0;
+  Py_ssize_t valueIndex=-1;
+  if(std::strcmp(event,"ctypes.dlopen")==0)valueIndex=0;
+  else if(std::strcmp(event,"ctypes.dlsym")==0 || std::strcmp(event,"ctypes.dlsym/handle")==0)valueIndex=1;
+  std::string value;
+  if(valueIndex>=0 && valueIndex<count) {
+    PyObject* item=PyTuple_GET_ITEM(args,valueIndex);
+    if(item==Py_None)value="none";
+    else if(PyUnicode_Check(item)) {
+      const char* raw=PyUnicode_AsUTF8(item);
+      if(raw)value=raw;else PyErr_Clear();
+    } else if(PyBytes_Check(item))
+      value.assign(PyBytes_AS_STRING(item),static_cast<std::size_t>(PyBytes_GET_SIZE(item)));
+  }
+  if(PyErr_Occurred())PyErr_Clear();
+  std::string result="event="+std::string(event?event:"unknown").substr(0,128);
+  if(!value.empty())result+=";name="+value.substr(0,768);
   PyErr_Restore(errorType,errorValue,errorTrace);
   return result;
 }
@@ -388,11 +431,13 @@ inline int Audit(const char* event,PyObject* args,void*)
   }
   else if(std::strcmp(event,"os.system")==0 ||
           std::strcmp(event,"os.fork")==0 || std::strcmp(event,"os.posix_spawn")==0 ||
-          std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0 ||
-          std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
-          std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0)
+          std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0)
     InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
                                     "event="+std::string(event).substr(0,128));
+  else if(std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
+          std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0)
+    InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                    NativeCallEvidence(event,args));
   // An audit observer does not alter original add-on operations or clear their
   // Python exceptions. Its failure persists in the native owner ledger.
   return 0;
@@ -401,9 +446,9 @@ inline Context* Capsule(PyObject* self)
 {return static_cast<Context*>(PyCapsule_GetPointer(self,"Infinity.Persistence.Observer"));}
 inline PyObject* Error(PyObject* self,PyObject* args)
 {
-  auto* context=Capsule(self);const char* reason=nullptr;
-  if(!context || !PyArg_ParseTuple(args,"s",&reason))return nullptr;
-  InfinityScriptPersistence::Fail(context->id,reason);Py_RETURN_NONE;
+  auto* context=Capsule(self);const char* reason=nullptr;const char* detail=nullptr;
+  if(!context || !PyArg_ParseTuple(args,"s|z",&reason,&detail))return nullptr;
+  InfinityScriptPersistence::Fail(context->id,reason,detail?detail:"");Py_RETURN_NONE;
 }
 inline PyObject* Mutation(PyObject* self,PyObject* args)
 {
