@@ -172,6 +172,24 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
     return true;
   }
 
+  if(executableRaw=="uname" || executableName=="/system/bin/uname") {
+    if(count<1 || count>2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);
+    if(firstName!="uname" && firstName!="/system/bin/uname")return false;
+    if(count==1)return true;
+    PyObject* flagObject=PySequence_GetItem(command,1);
+    const char* flagText=flagObject && PyUnicode_Check(flagObject)?PyUnicode_AsUTF8(flagObject):nullptr;
+    const std::string flag=flagText?flagText:std::string{};
+    if(!flagText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(flagObject);
+    return flag=="-a" || flag=="-m" || flag=="-s" || flag=="-r" ||
+           flag=="-v" || flag=="-n" || flag=="-p" || flag=="-i" || flag=="-o";
+  }
+
   if(executableName=="/system/bin/ip") {
     if(count!=2)return false;
     PyObject* first=PySequence_GetItem(command,0);
@@ -237,6 +255,35 @@ inline std::string ChildProcessEvidence(PyObject* executable,PyObject* command)
   const auto count=(PyList_Check(command)||PyTuple_Check(command))?PySequence_Size(command):-1;
   if(PyErr_Occurred())PyErr_Clear();
   const std::string result="executable="+name.substr(0,256)+";argc="+std::to_string(count);
+  PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
+
+inline std::string NativeLookupEvidence(const char* event,PyObject* args)
+{
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  std::string result="event="+std::string(event?event:"unknown").substr(0,128);
+  const auto count=PyTuple_Check(args)?PyTuple_GET_SIZE(args):0;
+  if(count>0) {
+    PyObject* first=PyTuple_GET_ITEM(args,0);
+    const auto target=Path(first);
+    if(!target.empty())result+=";target="+target.substr(0,512);
+    else if(PyUnicode_Check(first)) {
+      const char* raw=PyUnicode_AsUTF8(first);
+      if(raw)result+=";target="+std::string(raw).substr(0,512);
+      else PyErr_Clear();
+    }
+  }
+  if(count>1) {
+    PyObject* second=PyTuple_GET_ITEM(args,1);
+    if(PyUnicode_Check(second)) {
+      const char* raw=PyUnicode_AsUTF8(second);
+      if(raw)result+=";symbol="+std::string(raw).substr(0,256);
+      else PyErr_Clear();
+    }
+  }
+  PyErr_Clear();
   PyErr_Restore(errorType,errorValue,errorTrace);
   return result;
 }
@@ -386,11 +433,14 @@ inline int Audit(const char* event,PyObject* args,void*)
       InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
                                       ChildProcessEvidence(at(0),at(1)));
   }
+  else if(std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
+          std::strcmp(event,"ctypes.dlsym/handle")==0)
+    InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                    NativeLookupEvidence(event,args));
   else if(std::strcmp(event,"os.system")==0 ||
           std::strcmp(event,"os.fork")==0 || std::strcmp(event,"os.posix_spawn")==0 ||
           std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0 ||
-          std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
-          std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0)
+          std::strcmp(event,"ctypes.call_function")==0)
     InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
                                     "event="+std::string(event).substr(0,128));
   // An audit observer does not alter original add-on operations or clear their
