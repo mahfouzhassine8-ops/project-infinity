@@ -132,6 +132,10 @@ def main():
     parser.add_argument("--production-asset", type=Path)
     parser.add_argument("--parent-addon", type=Path)
     parser.add_argument("--controller20", action="store_true")
+    parser.add_argument("--previous-addon", type=Path,
+                        help="Exercise exact green 2103362 -> current code upgrade and rollback")
+    parser.add_argument("--legacy-installer", type=Path)
+    parser.add_argument("--legacy-asset", type=Path)
     args = parser.parse_args()
     if bool(args.production_asset) != bool(args.parent_addon):
         parser.error("--production-asset and --parent-addon must be supplied together")
@@ -175,7 +179,7 @@ def main():
             assert 'ASSET_SHA256 = "' + sha(asset) + '";' in code, "Unmodified production installer hash mismatch"
         else:
             # The synthetic fixture changes only the trusted digest in the test copy.
-            code, count = re.subn(r'ASSET_SHA256 = "[^"]+";', 'ASSET_SHA256 = "' + sha(asset) + '";', code)
+            code, count = re.subn(r'(?<!PREVIOUS_)ASSET_SHA256 = "[^"]+";', 'ASSET_SHA256 = "' + sha(asset) + '";', code)
             assert count == 1
         (sources / "com/projectinfinity/kodi/InfinityCheckpointAddonInstaller.java").write_text(code)
         classes = work / "classes"
@@ -183,9 +187,21 @@ def main():
                         "-cp", str(args.android_jar), "-d", str(classes),
                         *[str(path) for path in sorted(sources.rglob("*.java"))]], check=True)
 
-        def run(root, mode="", expected=0):
+        legacy_classes = work / 'legacy-classes'
+        if args.legacy_installer:
+            assert args.legacy_asset and args.previous_addon
+            legacy = args.legacy_installer.read_text().replace('@APP_PACKAGE@', 'com.projectinfinity.kodi')
+            legacy = legacy.replace('InfinityCheckpointController20Installer', 'InfinityCheckpointAddonInstaller').replace('checkpoint-controller-20.zip', 'checkpoint-controller.zip').replace('infinity-infinitycheckpointcontroller20installer', 'infinity-checkpoint-code')
+            path = sources / 'com/projectinfinity/kodi/InfinityCheckpointAddonInstaller.java'
+            path.write_text(legacy)
+            subprocess.run(['java', 'com.sun.tools.javac.Main', '--release', '8', '-Xlint:all', '-Werror',
+                            '-cp', str(args.android_jar), '-d', str(legacy_classes),
+                            *[str(p) for p in sorted(sources.rglob('*.java'))]], check=True)
+            path.write_text(code)
+
+        def run(root, mode="", expected=0, legacy=False):
             result = subprocess.run(["java", "-Dinfinity.test.mode=" + mode,
-                                     "-cp", str(classes) + ":" + str(args.android_jar),
+                                     "-cp", str(legacy_classes if legacy else classes) + ":" + str(args.android_jar),
                                      "com.projectinfinity.kodi.InstallerMain", str(root)],
                                     text=True, capture_output=True, timeout=20)
             assert result.returncode == expected, result.stdout + result.stderr
@@ -206,6 +222,50 @@ def main():
         run(root)
         assert contents(root / "external") == before
         print("PASS successful exact overlay and idempotent retry preserve marker/unrelated files/data")
+
+        if args.previous_addon:
+            previous = contents(args.previous_addon)
+            with zipfile.ZipFile(args.production_asset) as archive:
+                plan = json.loads(archive.read('manifest.json'))
+            for entry in plan['files']:
+                assert sha(previous[entry['path']]) == entry['previous']
+            for mode, expected in [('', 0), ('fail', 10), ('crash', 73)]:
+                root = work / ('previous-' + (mode or 'success'))
+                addon = initialize(root, asset)
+                for name in FILES:
+                    (addon / name).write_bytes(previous[name])
+                before = contents(root / 'external')
+                run(root, mode=mode, expected=expected)
+                if mode == 'fail':
+                    assert contents(root / 'external') == before
+                if mode:
+                    run(root)
+                check_installed(addon)
+                run(root)
+                check_installed(addon)
+            print('PASS exact green upgrade, rollback to green preimages, interrupted upgrade recovery and idempotency')
+
+        if args.legacy_installer:
+            for phase in ('applying', 'committed', 'corrupt'):
+                root = work / ('legacy-' + phase)
+                addon = initialize(root, args.legacy_asset.read_bytes())
+                run(root, mode='crash', expected=73, legacy=True)
+                journal_path = root / 'private/infinity-checkpoint-code-transaction/journal.json'
+                journal = json.loads(journal_path.read_text())
+                if phase == 'committed':
+                    for name in FILES:
+                        (addon / name).write_bytes(previous[name])
+                    journal['phase'] = 'committed'; journal_path.write_text(json.dumps(journal))
+                if phase == 'corrupt':
+                    journal['asset_sha256'] = '0' * 64; journal_path.write_text(json.dumps(journal))
+                (root / 'assets/infinity/checkpoint-controller.zip').write_bytes(asset)
+                before = contents(root / 'external')
+                run(root, expected=10 if phase == 'corrupt' else 0)
+                if phase == 'corrupt':
+                    assert contents(root / 'external') == before
+                else:
+                    check_installed(addon)
+            print('PASS actual old-installer interrupted/committed journals recover before upgrade; unknown legacy identity refuses mutation')
 
         root = work / "unknown"
         addon = initialize(root, asset)

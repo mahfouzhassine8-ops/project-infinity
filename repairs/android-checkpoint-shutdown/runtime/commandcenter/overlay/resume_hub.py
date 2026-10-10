@@ -12,6 +12,8 @@ from pathlib import Path
 import json
 import re
 import time
+import stat
+import threading
 
 import xbmc
 
@@ -89,6 +91,65 @@ def load(profile: Path):
     return _normalize(data)
 
 
+_view_lock = threading.RLock()
+_view_cache = None
+
+
+def _view_signature(profile):
+    """Observe atomic replacements and owner/journal changes without opening a writer gate."""
+    signature = []
+    for path in (profile / CONTINUE_FILE, profile / '.android-checkpoint' / 'participant.json',
+                 profile / '.android-checkpoint' / 'engine.json'):
+        try:
+            value = path.lstat()
+        except FileNotFoundError:
+            signature.append(None)
+            continue
+        except OSError:
+            return None
+        if not stat.S_ISREG(value.st_mode):
+            return None  # Symlinks/unknown types must use the original verified read.
+        signature.append((value.st_dev, value.st_ino, value.st_size,
+                          value.st_mtime_ns, value.st_ctime_ns))
+    return tuple(signature)
+
+
+def _view_data(profile: Path):
+    """Internal read-only snapshot; never passed to mutations or checkpoint proof."""
+    global _view_cache
+    profile = Path(profile).resolve()
+    before = _view_signature(profile)
+    with _view_lock:
+        if before is not None and _view_cache is not None and _view_cache[:2] == (profile, before):
+            return _view_cache[2]
+        _view_cache = None
+    # Never hold a display lock while load() acquires the persistence gate:
+    # admitted save() invalidates the cache while it already owns that gate.
+    data = load(profile)
+    after = _view_signature(profile)
+    if before is not None and before == after:
+        with _view_lock:
+            _view_cache = (profile, after, data)
+    return data
+
+
+def load_view(profile: Path):
+    """One bounded display snapshot, returned as a private copy.
+
+    A cache miss uses load() and its participant digest/owner verification. The
+    data file, participant journal and engine identity all invalidate the view,
+    including same-sized atomic replacements. Authoritative reads stay fresh.
+    """
+    return deepcopy(_view_data(profile))
+
+
+def poll_kodi_sync(profile):
+    """Idle fast path only; real queued writes keep the fresh admitted RPC/readback path."""
+    if not _view_data(profile).get('pending_kodi_sync'):
+        return True
+    return flush_kodi_sync(profile)
+
+
 def counts(data):
     data = _normalize(data)
     def media_count(bucket, media):
@@ -107,6 +168,7 @@ def counts(data):
 
 
 def save(profile: Path, data, publish=None):
+    global _view_cache
     data = _normalize(data)
     for name, limit in BUCKET_LIMITS.items():
         data[name] = _ordered(data[name], limit)
@@ -118,6 +180,8 @@ def save(profile: Path, data, publish=None):
     data['revision'] = int(time.time() * 1000)
     data['updated'] = _now()
     atomic_json(Path(profile) / CONTINUE_FILE, data)
+    with _view_lock:
+        _view_cache = None
     if publish:
         publish(data)
     return data

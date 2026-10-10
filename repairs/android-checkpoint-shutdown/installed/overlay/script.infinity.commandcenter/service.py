@@ -492,7 +492,7 @@ def _save_continue(profile: Path, data):
 
 
 def _publish_continue_state(profile: Path):
-    _publish_resume_hub(_load_continue(profile))
+    _publish_resume_hub(hub.load_view(profile))
 
 def _widget_signature(sig):
     # Rebind dynamic widgets only for semantic display geometry changes. Native
@@ -1245,6 +1245,10 @@ class CheckpointMonitor(xbmc.Monitor):
 def main():
     profile = addon_profile()
     profile.mkdir(parents=True, exist_ok=True)
+    # Make local saved history available before skin maintenance/health scans.
+    _publish_continue_state(profile)
+    if _prop('Infinity.WidgetReloadRevision', '') == '':
+        _bump_widget_revision()
     skin_upgrade_status = skin_upgrade.apply_and_reload()
     _set('Infinity.ResumeHubSkinUpgrade', skin_upgrade_status)
     scan_guardian(profile)
@@ -1284,7 +1288,7 @@ def main():
                 break
             continue
         player.poll()
-        hub.flush_kodi_sync(profile)
+        hub.poll_kodi_sync(profile)
         now = time.monotonic()
         if not foreground_gate.visible():
             if suspended_at is None:

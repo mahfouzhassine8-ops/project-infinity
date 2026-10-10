@@ -32,7 +32,8 @@ import java.util.zip.ZipInputStream;
 public final class InfinityCheckpointAddonInstaller {
   private static final String TAG = "InfinityCheckpointCode";
   private static final String ASSET = "infinity/checkpoint-controller.zip";
-  private static final String ASSET_SHA256 = "44fe57cc792d8269fd057346555607bab69e2835ae5ecbfe9c6ef6c5ddf88596";
+  private static final String ASSET_SHA256 = "2ecce01bbdaec01c4d37f6f7223ed4d7e0c049cb7698b73dbc26ed19a42ec9de";
+  private static final String PREVIOUS_ASSET_SHA256 = "44fe57cc792d8269fd057346555607bab69e2835ae5ecbfe9c6ef6c5ddf88596";
   private static final String ADDON = "script.infinity.commandcenter";
   private static final int FILE_LIMIT = 4 * 1024 * 1024;
   private static final int PAYLOAD_LIMIT = 16 * 1024 * 1024;
@@ -65,11 +66,14 @@ public final class InfinityCheckpointAddonInstaller {
   private static final class Change {
     String path;
     String before;
+    String previous;
+    String installedBefore;
     String after;
     byte[] data;
   }
 
   private static final class Payload {
+    String assetHash = ASSET_SHA256;
     String addonXml;
     ArrayList<Change> changes = new ArrayList<>();
     Map<String, Change> byPath = new HashMap<>();
@@ -103,10 +107,11 @@ public final class InfinityCheckpointAddonInstaller {
       File installed = target(addon, change.path);
       String current = installed.exists() ? fileHash(installed) : null;
       if (change.after.equals(current)) continue; // Idempotent retry/already-installed code.
-      if (!equal(change.before, current)) {
+      if (!(equal(change.before, current) || (change.previous != null && change.previous.equals(current)))) {
         Log.w(TAG, "Installed checkpoint code preimage differs; overlay not applied");
         return false;
       }
+      change.installedBefore = current;
       pending.add(change);
     }
     if (pending.isEmpty()) return true;
@@ -124,11 +129,11 @@ public final class InfinityCheckpointAddonInstaller {
       JSONObject entry = new JSONObject();
       entry.put("path", change.path);
       entry.put("existed", installed.exists());
-      entry.put("before", change.before == null ? JSONObject.NULL : change.before);
+      entry.put("before", change.installedBefore == null ? JSONObject.NULL : change.installedBefore);
       entry.put("after", change.after);
       if (installed.exists()) {
         byte[] original = readFile(installed, FILE_LIMIT);
-        if (!change.before.equals(hash(original))) throw new IllegalStateException("Parent changed during staging");
+        if (!change.installedBefore.equals(hash(original))) throw new IllegalStateException("Parent changed during staging");
         atomicWrite(new File(transaction, "backup-" + index), original);
       }
       atomicWrite(new File(transaction, "new-" + index), change.data);
@@ -210,6 +215,7 @@ public final class InfinityCheckpointAddonInstaller {
       if (!FILES.contains(change.path) || payload.byPath.containsKey(change.path))
         throw new IllegalStateException("Unexpected or duplicate manifest path");
       change.before = nullableHash(file, "before");
+      change.previous = file.has("previous") ? checkedHash(file.getString("previous")) : null;
       if (NEW_FILES.contains(change.path) != (change.before == null))
         throw new IllegalStateException("Unexpected new-file preimage");
       change.after = checkedHash(file.getString("after"));
@@ -223,6 +229,20 @@ public final class InfinityCheckpointAddonInstaller {
   }
 
   private static void recover(File addon, File transaction, Payload payload, JSONObject journal) throws Exception {
+    // A known green installer may have left a durable transaction awaiting cleanup.
+    // Recover that exact plan with its reviewed preimages before applying new code.
+    if (PREVIOUS_ASSET_SHA256.equals(journal.getString("asset_sha256"))) {
+      Payload prior = new Payload();
+      prior.assetHash = PREVIOUS_ASSET_SHA256;
+      prior.addonXml = payload.addonXml;
+      for (Change current : payload.changes) {
+        if (current.previous == null) throw new IllegalStateException("Missing reviewed previous code");
+        Change old = new Change();
+        old.path = current.path; old.before = current.before; old.after = current.previous;
+        prior.changes.add(old); prior.byPath.put(old.path, old);
+      }
+      payload = prior;
+    }
     String phase = journal.getString("phase");
     if ("committed".equals(phase)) {
       validatePlan(addon, transaction, payload, journal, true);
@@ -258,7 +278,7 @@ public final class InfinityCheckpointAddonInstaller {
 
   private static void validatePlan(File addon, File transaction, Payload payload,
                                    JSONObject journal, boolean committed) throws Exception {
-    if (journal.getInt("schema") != 1 || !ASSET_SHA256.equals(journal.getString("asset_sha256")))
+    if (journal.getInt("schema") != 1 || !payload.assetHash.equals(journal.getString("asset_sha256")))
       throw new IllegalStateException("Recovery journal identity mismatch");
     JSONArray entries = journal.getJSONArray("files");
     if (entries.length() == 0 || entries.length() > FILES.size())
@@ -268,16 +288,18 @@ public final class InfinityCheckpointAddonInstaller {
       JSONObject entry = entries.getJSONObject(index);
       String path = entry.getString("path");
       Change expected = payload.byPath.get(path);
-      if (expected == null || !seen.add(path) || !equal(expected.before, nullableHash(entry, "before")) ||
-          !expected.after.equals(entry.getString("after")) || entry.getBoolean("existed") != (expected.before != null))
+      String original = nullableHash(entry, "before");
+      if (expected == null || !seen.add(path) ||
+          !(equal(expected.before, original) || (expected.previous != null && expected.previous.equals(original))) ||
+          !expected.after.equals(entry.getString("after")) || entry.getBoolean("existed") != (original != null))
         throw new IllegalStateException("Recovery plan is not the approved overlay");
       File installed = target(addon, path);
       String current = installed.exists() ? fileHash(installed) : null;
       if (committed ? !expected.after.equals(current) :
-          !(equal(expected.before, current) || expected.after.equals(current)))
+          !(equal(original, current) || expected.after.equals(current)))
         throw new IllegalStateException("Unknown installed edit blocks safe recovery");
-      if (!committed && expected.before != null &&
-          !expected.before.equals(fileHash(new File(transaction, "backup-" + index))))
+      if (!committed && original != null &&
+          !original.equals(fileHash(new File(transaction, "backup-" + index))))
         throw new IllegalStateException("Original recovery backup checksum mismatch");
     }
   }

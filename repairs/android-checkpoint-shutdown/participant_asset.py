@@ -23,6 +23,9 @@ def build():
                 "addon_version": "0.3.5.19", "addon_xml_sha256": delta["before"]["addon.xml"],
                 "files": [{"path": name, "before": delta["before"].get(name),
                            "after": delta["after"][name]} for name in sorted(FILES)]}
+    green = json.loads((HERE / "resume-speed/GREEN-2103362.json").read_text())
+    for entry in manifest['files']:
+        entry['previous'] = green['commandcenter19'][entry['path']]
     entries = {"manifest.json": (json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n").encode()}
     for name in sorted(FILES):
         data = (root / "overlay" / name).read_bytes()

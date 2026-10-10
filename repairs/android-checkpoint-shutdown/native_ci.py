@@ -114,6 +114,8 @@ def prepare():
         "--source-root", "kodi")
     run(sys.executable, str(HERE / "runtime-tests/test_runtime_checkpoint.py"),
         "--runtime", str(OUT / "commandcenter"))
+    run(sys.executable, str(HERE / "resume-speed/test_speed.py"),
+        "--runtime", str(OUT / "commandcenter"))
     run(sys.executable, str(HERE / "runtime-tests/test_runtime_rpc_admission.py"),
         "--runtime", str(OUT / "commandcenter"))
     run(sys.executable, str(HERE / "runtime-tests/run_resume_preservation.py"),
@@ -131,6 +133,8 @@ def prepare():
         "--runtime", "kodi", "--command-center", str(OUT / "installed-addons/script.infinity.commandcenter"),
         "--embedded", str(OUT / "installed-addons"), "--compat-script", "runtime_service.py")
     run(sys.executable, str(HERE / "runtime-tests/test_runtime_checkpoint.py"),
+        "--runtime", str(OUT / "installed-addons/script.infinity.commandcenter"))
+    run(sys.executable, str(HERE / "resume-speed/test_speed.py"),
         "--runtime", str(OUT / "installed-addons/script.infinity.commandcenter"))
     run(sys.executable, str(HERE / "installed/test_compat82.py"))
     run(sys.executable, str(HERE / "runtime-tests/test_native_coordinator.py"), "--runtime", "kodi", "--installed-versions")

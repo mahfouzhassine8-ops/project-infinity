@@ -25,26 +25,36 @@ def _url(**params):
     return 'plugin://script.infinity.commandcenter/?' + urlencode(params)
 
 
-def _has_tmdb_helper():
+def _has_addon(addon_id, render=None):
+    if render is None:
+        return bool(xbmc.getCondVisibility('System.HasAddon(%s)' % addon_id))
+    installed = render['installed']
+    if addon_id not in installed:
+        installed[addon_id] = bool(xbmc.getCondVisibility('System.HasAddon(%s)' % addon_id))
+    return installed[addon_id]
+
+
+def _has_tmdb_helper(render=None):
     try:
-        return bool(xbmc.getCondVisibility('System.HasAddon(plugin.video.themoviedb.helper)'))
+        return _has_addon('plugin.video.themoviedb.helper', render)
     except Exception:
         return False
 
 
-def _target(entry, sources=None):
-    if setting_bool('source_memory_enabled', True):
+def _target(entry, sources=None, render=None):
+    source_memory = render['source_memory'] if render is not None else setting_bool('source_memory_enabled', True)
+    if source_memory:
         preference = sources.get(entry.get('key'), {}) if isinstance(sources, dict) else {}
         if not isinstance(preference, dict):
             preference = {}
         route = stable_route(preference.get('route') or entry.get('stable_source', ''))
         if route and number(preference.get('failures')) < 2:
             host = route.split('/')[2] if route.startswith('plugin://') else ''
-            if not host or xbmc.getCondVisibility('System.HasAddon(%s)' % host):
+            if not host or _has_addon(host, render):
                 return route
     tmdb = str(entry.get('tmdb') or '').strip()
     media = entry.get('media')
-    if tmdb.isdigit() and _has_tmdb_helper():
+    if tmdb.isdigit() and _has_tmdb_helper(render):
         if media == 'tv':
             season = str(int(number(entry.get('season'))))
             episode = str(int(number(entry.get('episode'))))
@@ -101,9 +111,9 @@ def _apply_identity(li, entry):
         li.setProperty('Infinity.UniqueID.' + name, value)
 
 
-def _list_item(entry, data, bucket='', list_name=''):
+def _list_item(entry, data, bucket='', list_name='', render=None):
     key = str(entry.get('key') or '')
-    target = _target(entry, data.get('sources', {}))
+    target = _target(entry, data.get('sources', {}), render)
     if not target:
         target = _url(action='unavailable')
     kind = entry.get('media')
@@ -129,9 +139,10 @@ def _list_item(entry, data, bucket='', list_name=''):
     li.setInfo('video', info)
     _apply_identity(li, entry)
     art = {}
-    tier = xbmcgui.Window(10000).getProperty('Infinity.Artwork.Quality') or 'standard'
+    tier = render['tier'] if render is not None else (xbmcgui.Window(10000).getProperty('Infinity.Artwork.Quality') or 'standard')
     if entry.get('poster'):
-        art.update({'poster': artwork(entry['poster'], tier), 'thumb': artwork(entry['poster'], tier)})
+        poster = artwork(entry['poster'], tier)
+        art.update({'poster': poster, 'thumb': poster})
     if entry.get('fanart'):
         art['fanart'] = artwork(entry['fanart'], tier, True)
     if art:
@@ -187,11 +198,14 @@ def _values_for(data, media, bucket, list_name=''):
 
 
 def listing(media='all', bucket='continue', list_name=''):
-    data = hub.load(PROFILE)
+    data = hub.load_view(PROFILE)
     values = _values_for(data, media, bucket, list_name)
+    render = {'source_memory': setting_bool('source_memory_enabled', True),
+              'tier': xbmcgui.Window(10000).getProperty('Infinity.Artwork.Quality') or 'standard',
+              'installed': {}}
     xbmcplugin.setContent(HANDLE, 'episodes' if media == 'tv' else ('movies' if media == 'movie' else 'videos'))
     for entry in values[:100]:
-        target, li = _list_item(entry, data, bucket, list_name)
+        target, li = _list_item(entry, data, bucket, list_name, render)
         xbmcplugin.addDirectoryItem(HANDLE, target, li, isFolder=False)
     xbmcplugin.endOfDirectory(HANDLE, succeeded=True, updateListing=False, cacheToDisc=False)
 
