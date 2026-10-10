@@ -37,6 +37,8 @@ public:
   std::size_t AndroidCheckpointResidentCount() const;
   std::size_t AndroidCheckpointCompatCount() const;
   std::vector<std::string> AndroidCheckpointUnresolvedWriters() const;
+  static bool AndroidQuarantineSuppressErrorToast(const std::string& addonId,
+                                                  const std::string& script);
 
   void RegisterLanguageInvocationHandler(ILanguageInvocationHandler *invocationHandler, const std::string &extension);
   void RegisterLanguageInvocationHandler(ILanguageInvocationHandler *invocationHandler, const std::set<std::string> &extensions);
