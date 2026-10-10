@@ -955,7 +955,8 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
         InfinityAndroidCheckpoint::RecordFailure("python_services", detail.c_str());
       }
     }
-    if (retired && script->second.thread->GetAddon())
+    if (retired && script->second.thread->GetAddon() &&
+        InfinityAddonQuarantine::ServiceScript(script->second.script))
     {
       quarantineAddon = script->second.thread->GetAddon()->ID();
       quarantineScript = script->second.script;
