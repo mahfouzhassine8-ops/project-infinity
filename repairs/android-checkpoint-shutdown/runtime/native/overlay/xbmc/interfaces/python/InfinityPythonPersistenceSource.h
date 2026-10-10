@@ -45,8 +45,11 @@ class Observer:
         self.vfs = vfs
         self.install()
 
-    def error(self, operation):
-        self.fail(operation)
+    def error(self, operation, detail=None):
+        if detail is None:
+            self.fail(operation)
+        else:
+            self.fail(operation, str(detail)[:2048])
 
     def patch(self, module, name, replacement):
         original = getattr(module, name)
@@ -232,11 +235,14 @@ class Observer:
                     observer.held_connections.add(self)
                     observer.error('sqlite_closed_with_pending_transaction')
                     raise sqlite3.ProgrammingError('Pending transaction requires explicit commit or rollback')
-                try: return super().close()
-                except Exception:
-                    observer.error('sqlite_close_failed')
+                try:
+                    return super().close()
+                except Exception as error:
+                    observer.error('sqlite_close_failed',
+                                   'type='+type(error).__name__+';message='+str(error))
                     raise
-                finally: self._infinity_closed = True
+                finally:
+                    self._infinity_closed = True
             def __exit__(self, exc_type, exc, tb):
                 # Preserve SQLite's commit-on-success / rollback-on-exception.
                 try: return super().__exit__(exc_type, exc, tb)
@@ -353,10 +359,11 @@ class Observer:
                     observer.check_live()
                     try:
                         result = _original(*args, **kwargs)
+                        translated = self.vfs.translatePath(args[_target])
                         if result is not True:
-                            observer.error('vfs_'+_name+'_failed')
+                            observer.error('vfs_'+_name+'_failed', 'path='+str(translated))
                         else:
-                            observer.touch(self.vfs.translatePath(args[_target]),
+                            observer.touch(translated,
                                            'delete' if _name in ('delete','rmdir') else 'directory' if _name in ('mkdir','mkdirs') else 'write')
                             if _name == 'rename': observer.touch(self.vfs.translatePath(args[0]), 'delete')
                         return result
@@ -391,6 +398,17 @@ class Observer:
                             not (ch.isalnum() or ch in '._-') for ch in key):
                         return False
                 return True
+
+            # platform.uname()/processor probes used by normal add-ons are
+            # display-only. Accept only Android's immutable system uname with
+            # no option or one conventional read-only option.
+            if 1 <= len(command) <= 2 and command[0] in ('uname', '/system/bin/uname'):
+                resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+                if resolved != '/system/bin/uname':
+                    return False
+                if len(command) == 1:
+                    return True
+                return command[1] in ('-a', '-s', '-n', '-r', '-v', '-m', '-p', '-i', '-o')
 
             # SlyGuy probes Android network state with read-only system tools.
             # Keep this allowlist intentionally narrow: "ip" receives exactly
