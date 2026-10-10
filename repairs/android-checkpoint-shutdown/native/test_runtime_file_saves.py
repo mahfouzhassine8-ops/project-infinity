@@ -152,7 +152,7 @@ void Seed(const std::string& path, const std::string& value) {
 }
 ino_t Inode(const std::string& path) { struct stat st{}; CHECK(::stat(path.c_str(), &st) == 0); return st.st_ino; }
 void Reset() {
-  g_checkpointAddonTrees.clear(); g_checkpointAddonSaves.clear(); g_checkpointAddonDeletions.clear();
+  g_checkpointAddonTrees.clear(); g_checkpointAddonSaves.clear(); g_checkpointAddonSaveGenerations.clear(); g_checkpointAddonDeletions.clear();
   InfinityAndroidCheckpoint::failures.clear(); InfinityAndroidCheckpoint::persist = true;
   InfinityAndroidCheckpoint::admit = true;
 }
@@ -268,6 +268,38 @@ int main(int argc, char** argv) {
     InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(left.get());
     InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(right.get());
     CHECK(!InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()); CHECK(Read(path) == "baseline");
+    CHECK(InfinityAndroidCheckpoint::failures.back().find("conflicting_loaded_owners") != std::string::npos);
+
+    // A checked real settings SaveFile may rebase only the exact writer. A second
+    // loaded owner still retains its own baseline; an unsaved conflicting edit
+    // must not be lost or silently declared durable at shutdown.
+    Reset(); Seed(path, "baseline");
+    left = std::make_shared<ADDON::CAddonSettings>(); left->bytes = "baseline";
+    right = std::make_shared<ADDON::CAddonSettings>(); right->bytes = "baseline";
+    TrackCreatedAddonTree(left, path); TrackLoadedAddonTree(left, path);
+    TrackCreatedAddonTree(right, path); TrackLoadedAddonTree(right, path);
+    CXBMCTinyXML committed; committed.bytes = "left-committed";
+    left->bytes = committed.bytes;
+    CHECK(committed.SaveFile(path)); // actual checked synchronous settings file write
+    CHECK(ConfirmAddonSave(left, path, committed));
+    CHECK(g_checkpointAddonSaveGenerations.at(path) == 1);
+    CHECK(g_checkpointAddonSaves.at(path).bytes == committed.bytes);
+    CHECK(InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings());
+    CHECK(Read(path) == "left-committed");
+    CHECK(g_checkpointAddonSaves.empty());
+    // Save evidence must be rechecked; only the matching writer's baseline advanced.
+    Reset(); Seed(path, "baseline");
+    left = std::make_shared<ADDON::CAddonSettings>(); left->bytes = "baseline";
+    right = std::make_shared<ADDON::CAddonSettings>(); right->bytes = "baseline";
+    TrackCreatedAddonTree(left, path); TrackLoadedAddonTree(left, path);
+    TrackCreatedAddonTree(right, path); TrackLoadedAddonTree(right, path);
+    committed.bytes = "committed-value"; left->bytes = committed.bytes;
+    CHECK(committed.SaveFile(path));
+    CHECK(ConfirmAddonSave(left, path, committed));
+    right->bytes = "other-unsaved-change";
+    InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(right.get());
+    CHECK(!InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings());
+    CHECK(Read(path) == "committed-value"); // conflict remains fail-closed
     CHECK(InfinityAndroidCheckpoint::failures.back().find("conflicting_loaded_owners") != std::string::npos);
 
     Reset(); owner = std::make_shared<ADDON::CAddonSettings>(); owner->bytes = "unproven";
