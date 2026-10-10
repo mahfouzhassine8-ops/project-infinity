@@ -28,6 +28,11 @@ int main(int argc,char** argv) {
   assert(!InfinityPythonPersistence::ApprovedBundledPythonExtension("PIL._imaging","/tmp/lib_imaging.so"));
   const auto nativeDetail=InfinityPythonPersistence::NativeExtensionEvidence("evil.native","/tmp/evil.so");
   assert(nativeDetail.find("module=evil.native")!=std::string::npos && nativeDetail.find("path=/tmp/evil.so")!=std::string::npos);
+  auto* dlopenArgs=Py_BuildValue("(s)","/system/lib64/libc.so");
+  const auto dlopenDetail=InfinityPythonPersistence::NativeCallEvidence("ctypes.dlopen",dlopenArgs);
+  Py_DECREF(dlopenArgs);
+  assert(dlopenDetail.find("event=ctypes.dlopen")!=std::string::npos &&
+         dlopenDetail.find("name=/system/lib64/libc.so")!=std::string::npos);
   assert(InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
       "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/python3.11/lib/python3.11/importlib/__pycache__/__init__.cpython-311.opt-1.pyc.12970367414572004272"));
   assert(InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
@@ -70,6 +75,15 @@ int main(int argc,char** argv) {
     assert(!InfinityPythonPersistence::ReadonlyCommand(exec,ipBadVerb));
     assert(!InfinityPythonPersistence::ReadonlyCommand(exec,ipMutation));
     Py_DECREF(good);Py_DECREF(ipBadVerb);Py_DECREF(ipMutation);Py_DECREF(exec);
+
+    exec=PyUnicode_FromString("uname");
+    auto* unameMachine=Py_BuildValue("[ss]","uname","-m");
+    auto* unameAll=Py_BuildValue("[ss]","uname","-a");
+    auto* unameBad=Py_BuildValue("[ss]","uname","--write-state");
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,unameMachine));
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,unameAll));
+    assert(!InfinityPythonPersistence::ReadonlyCommand(exec,unameBad));
+    Py_DECREF(unameMachine);Py_DECREF(unameAll);Py_DECREF(unameBad);Py_DECREF(exec);
 
     exec=PyUnicode_FromString("/system/bin/ifconfig");
     auto* allInterfaces=Py_BuildValue("[s]","/system/bin/ifconfig");
