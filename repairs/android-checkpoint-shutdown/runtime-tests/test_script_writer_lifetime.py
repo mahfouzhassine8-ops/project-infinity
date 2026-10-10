@@ -131,6 +131,11 @@ int main(){
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--runtime',type=Path,required=True);args=parser.parse_args()
     source=(args.runtime/'xbmc/interfaces/generic/ScriptInvocationManager.cpp').read_text()
+    python=(args.runtime/'xbmc/interfaces/python/PythonInvoker.cpp').read_text()
+    assert 'if (!abort && InfinityAndroidCheckpoint::IsActive())' in python
+    assert '(!m_stop || InfinityAndroidCheckpoint::IsActive())' in python
+    checkpoint_branch=python.split('if (!abort && InfinityAndroidCheckpoint::IsActive())',1)[1].split('#endif',1)[0]
+    assert 'PyExc_SystemExit' not in checkpoint_branch and 'm_stoppedEvent.Wait' not in checkpoint_branch
     methods=[method(source,'void CScriptInvocationManager::Process()'),
              method(source,'std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const'),
              method(source,'int CScriptInvocationManager::ExecuteAsync(\n    const std::string& script,\n    const LanguageInvokerPtr&'),
