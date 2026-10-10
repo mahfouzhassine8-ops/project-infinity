@@ -180,6 +180,7 @@ bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()
     pending = g_checkpointAddonSaves;
     deletions = g_checkpointAddonDeletions;
   }
+  bool inventoryOk = true;
   for (const auto& entry : trees)
   {
     const auto settings = entry.dirtyOwner ? entry.dirtyOwner : entry.settings.lock();
@@ -189,16 +190,20 @@ bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()
       continue; // Definitions alone have no loaded persistent user values.
     if (!entry.loadedBaselineKnown)
     {
-      RecordFailure("addon_settings", "loaded_owner_baseline_unknown");
-      return false;
+      const std::string detail = "loaded_owner_baseline_unknown;path=" + entry.path;
+      RecordFailure("addon_settings", detail.c_str());
+      inventoryOk = false;
+      continue;
     }
     CXBMCTinyXML doc;
     std::string bytes;
     if (!settings->Save(doc) ||
         !CheckpointAddonBytes(doc, bytes))
     {
-      RecordFailure("addon_settings", "loaded_owner_not_serializable");
-      return false;
+      const std::string detail = "loaded_owner_not_serializable;path=" + entry.path;
+      RecordFailure("addon_settings", detail.c_str());
+      inventoryOk = false;
+      continue;
     }
     if (bytes == entry.loadedBytes)
       continue;
@@ -206,11 +211,15 @@ bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()
     if (prior != pending.end() && prior->second.settings != settings &&
         prior->second.bytes != bytes)
     {
-      RecordFailure("addon_settings", "conflicting_loaded_owners");
-      return false;
+      const std::string detail = "conflicting_loaded_owners;path=" + entry.path;
+      RecordFailure("addon_settings", detail.c_str());
+      inventoryOk = false;
+      continue;
     }
     pending[entry.path] = {settings, std::move(bytes)};
   }
+  if (!inventoryOk)
+    return false;
   for (const auto& entry : pending)
   {
     const std::string addonDirectory = URIUtils::GetDirectory(entry.first);
@@ -221,7 +230,8 @@ bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()
         !CheckpointCreatedDirectory(addonDirectory) ||
         !SaveCheckpointXml(entry.first, entry.second.bytes))
     {
-      RecordFailure("addon_settings", "loaded_owner_save");
+      const std::string detail = "loaded_owner_save;path=" + entry.first;
+      RecordFailure("addon_settings", detail.c_str());
       return false;
     }
   }
@@ -231,7 +241,8 @@ bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()
     // Do not recreate the deleted settings using an old retained tree.
     if (CFile::Exists(path))
     {
-      RecordFailure("addon_settings", "deleted_settings_reappeared");
+      const std::string detail = "deleted_settings_reappeared;path=" + path;
+      RecordFailure("addon_settings", detail.c_str());
       return false;
     }
     if (!CheckpointCreatedDirectory(path))
