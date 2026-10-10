@@ -44,6 +44,11 @@ int main(int argc,char** argv) {
       "/data/user/0/com.projectinfinity.kodi/cache/apk/__pycache__/state.pyc.tmp"));
   assert(!InfinityPythonPersistence::ApprovedNonPersistentPythonBytecodeCachePath(
       "/data/user/0/com.projectinfinity.kodi/cache/../files/.kodi/userdata/__pycache__/state.pyc"));
+  auto* lookupArgs=Py_BuildValue("(ss)","/tmp/libprobe.so","probe_symbol");
+  const auto lookupDetail=InfinityPythonPersistence::NativeLookupEvidence("ctypes.dlsym",lookupArgs);
+  Py_DECREF(lookupArgs);
+  assert(lookupDetail.find("target=/tmp/libprobe.so")!=std::string::npos);
+  assert(lookupDetail.find("symbol=probe_symbol")!=std::string::npos);
   unsetenv("KODI_ANDROID_LIBS");
   const std::string mode=argv[1];
   Py_Initialize();auto* main=PyThreadState_Get();auto* owner=Py_NewInterpreter();
