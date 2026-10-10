@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import os
+import re
 import sys
+import tempfile
 import time
 
 import xbmc
@@ -245,6 +248,8 @@ def direct_command(argv) -> bool:
         runtime_sync(quiet=(value == 'true')); return True
     if action == 'baseline-check':
         baseline_check(quiet=(value == 'true')); return True
+    if action == 'quarantine-test':
+        quarantine_test(value); return True
     commands = {
         'mark-good': mark_good,
         'restore-good': restore_good,
@@ -421,7 +426,85 @@ def restore_menu():
         xbmc.executebuiltin('ReloadSkin()')
 
 
+def _quarantine_control() -> Path:
+    return addon_profile() / '.android-checkpoint'
+
+
+def _quarantine_rows():
+    path = _quarantine_control() / 'addon-quarantine.tsv'
+    try:
+        lines = path.read_text(encoding='utf-8').splitlines()
+    except (OSError, UnicodeError):
+        return []
+    rows = []
+    for line in lines:
+        if not line or line == 'infinity-addon-quarantine-v1':
+            continue
+        fields = line.split('\t')
+        if len(fields) < 4:
+            continue
+        addon_id, failures, quarantined, reason = fields[:4]
+        if re.fullmatch(r'[A-Za-z0-9._-]{1,128}', addon_id) and quarantined == '1':
+            rows.append({'addon_id': addon_id, 'failures': failures, 'reason': reason})
+    return rows
+
+
+def _durable_probation_request(addon_id: str):
+    control = _quarantine_control()
+    control.mkdir(parents=True, exist_ok=True)
+    if control.is_symlink():
+        raise OSError('checkpoint control directory is a symlink')
+    fd, temporary = tempfile.mkstemp(prefix='.addon-probation.', dir=str(control))
+    try:
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write((addon_id + '\n').encode('utf-8'))
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, control / 'addon-probation.request')
+        directory = os.open(str(control), os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+
+
+def quarantine_test(addon_id: str = ''):
+    rows = _quarantine_rows()
+    if not rows:
+        xbmcgui.Dialog().ok('Add-on Probation', 'No services are currently quarantined.')
+        return
+    selected = None
+    if addon_id:
+        selected = next((row for row in rows if row['addon_id'] == addon_id), None)
+        if selected is None:
+            xbmcgui.Dialog().ok('Add-on Probation', addon_id + ' is not currently quarantined.')
+            return
+    else:
+        labels = [row['addon_id'] + '  •  ' + row['reason'] for row in rows]
+        index = xbmcgui.Dialog().select('Test quarantined service again', labels)
+        if index < 0:
+            return
+        selected = rows[index]
+    if not xbmcgui.Dialog().yesno(
+            'Run monitored probation?',
+            selected['addon_id'],
+            'Infinity will allow this service to run once on the next start.',
+            'It is restored only if runtime AND save/durability checks both pass.'):
+        return
+    try:
+        _durable_probation_request(selected['addon_id'])
+        notify('Probation armed for ' + selected['addon_id'] + ' — tested on next start')
+    except Exception as error:
+        xbmcgui.Dialog().ok('Add-on Probation', 'Could not arm probation: ' + type(error).__name__)
+
+
 def quarantine_menu():
+    quarantined = _quarantine_rows()
     khc = Path(xbmcvfs.translatePath('special://profile/addon_data/script.kodihealthcenter/health-bridge.json'))
     bridge = read_json(khc, {})
     suspects = []
@@ -433,6 +516,16 @@ def quarantine_menu():
         path = addon_profile() / 'guardian-state.json'
         state = read_json(path, {})
         suspects = state.get('suspects', [])
+    if quarantined:
+        actions = ['Test quarantined service again…']
+        if suspects:
+            actions.append('Review recently changed add-ons — ' + source)
+        action = xbmcgui.Dialog().select('Crash Recovery / Quarantine', actions)
+        if action < 0:
+            return
+        if action == 0:
+            quarantine_test()
+            return
     if not suspects:
         xbmcgui.Dialog().ok(TITLE, 'No recently changed add-ons are currently correlated with an unclean Infinity start.', 'Correlation is never treated as proof of cause.')
         return
