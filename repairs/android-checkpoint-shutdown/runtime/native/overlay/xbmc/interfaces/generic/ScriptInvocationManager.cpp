@@ -956,7 +956,7 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
       }
     }
     if (retired && script->second.thread->GetAddon() &&
-        InfinityAddonQuarantine::ServiceScript(script->second.script))
+        URIUtils::GetFileName(script->second.script) == "service.py")
     {
       quarantineAddon = script->second.thread->GetAddon()->ID();
       quarantineScript = script->second.script;
