@@ -127,12 +127,14 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
 #if defined(TARGET_ANDROID) && defined(HAS_PYTHON)
   for (const auto& thread : pending)
   {
-    // Cooperative checkpoint shutdown has two safe parts:
-    // 1) notify xbmc.Monitor so running scripts can finish normally;
-    // 2) release reusable invoker waits so scripts that already returned can
-    //    reach onExecutionDone immediately. This never injects SystemExit,
-    //    never joins the GUI thread and never bypasses persistence finalization.
-    CServiceBroker::GetXBPython().NotifyScriptAborting(thread.get());
+    // Cooperative checkpoint shutdown supports both service generations:
+    // CPython Stop(false) has a checkpoint-only branch that sets the legacy
+    // xbmc.abortRequested signal and notifies Monitor without waiting or
+    // escalating to SystemExit. Release then exits reusable invoker waits.
+    // Observer finalization still refuses pending transactions/buffers.
+    const auto invoker = thread->GetInvoker();
+    if (invoker)
+      invoker->Stop(false);
     thread->Release();
   }
 #endif
