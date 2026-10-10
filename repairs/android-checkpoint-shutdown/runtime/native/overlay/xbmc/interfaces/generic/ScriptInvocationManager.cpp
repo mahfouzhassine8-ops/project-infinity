@@ -261,6 +261,16 @@ bool ShouldSuppress(const std::string& addon, const std::string& script)
   if (requested || codeChanged)
   {
     registry.probation.insert(addon);
+    if (codeChanged)
+    {
+      // Consume this code revision as the automatic retry candidate now. If the
+      // probation later hits hard persistence uncertainty, the unchanged code
+      // will be quarantined on the next launch instead of auto-retried forever.
+      found->second.signature = signature;
+      found->second.reason = "probation_code_change";
+      PersistLocked(registry);
+      changed = false;
+    }
     CLog::Log(LOGINFO, "Infinity quarantine: probation granted for {} ({})", addon,
               requested ? "Health Center request" : "service code changed");
     return false;
