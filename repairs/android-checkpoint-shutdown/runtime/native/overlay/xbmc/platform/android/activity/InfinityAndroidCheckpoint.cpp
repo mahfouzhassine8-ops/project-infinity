@@ -954,7 +954,14 @@ void Pump(CApplication& application)
 
       // Inventory every script writer before deciding the global checkpoint.
       // A failed interpreter may settle without receiving a durable retirement receipt.
+      // Foreign writers first receive a cooperative grace window. Anything still
+      // alive after that is escalated on bounded worker threads; the application
+      // thread never blocks on CPython teardown.
       Operation("python_services");
+      auto& scriptManager = CScriptInvocationManager::GetInstance();
+      scriptManager.PumpAndroidCheckpointRetirement();
+      if (scriptManager.AndroidCheckpointEscalationsActive() != 0)
+        return;
       auto scripts = InfinityScriptPersistence::Snapshot();
       if (scripts.blockingCount != 0 || scripts.blockingOverflow)
       {
@@ -966,7 +973,7 @@ void Pump(CApplication& application)
         if (!InfinityScriptPersistence::DurableRetirement(name) &&
             !InfinityScriptPersistence::BlockedRetirement(name))
           return;
-      if (!CScriptInvocationManager::GetInstance().AndroidCheckpointUnresolvedWriters().empty())
+      if (!scriptManager.AndroidCheckpointUnresolvedWriters().empty())
         return;
       if (!InfinityScriptPersistence::PollInventory())
         return; // Durability sync may finish even when a writer-level blocker is retained.
