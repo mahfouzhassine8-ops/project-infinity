@@ -821,7 +821,6 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
         InfinityAndroidCheckpoint::RecordFailure("python_services", detail.c_str());
       }
     }
-#if defined(TARGET_ANDROID)
     if (retired && script->second.thread->GetAddon())
     {
       quarantineAddon = script->second.thread->GetAddon()->ID();
