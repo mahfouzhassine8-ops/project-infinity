@@ -172,6 +172,8 @@ def main():
     assert 'PyExc_SystemExit' not in checkpoint_branch and 'm_stoppedEvent.Wait' not in checkpoint_branch
     assert 'script.module.slyguy' in source and 'seeded_fold_startup_error' in source
     assert 'record.failures >= 2' in source and 'RecordCleanSuccess' in source
+    assert 'ConsumeProbeRequest' in source and 'registry.probation' in source
+    assert 'restored_after_probation' in source and 'AndroidQuarantineSuppressErrorToast' in source
     methods=[method(source,'void CScriptInvocationManager::Process()'),
              method(source,'std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const'),
              method(source,'int CScriptInvocationManager::ExecuteAsync(\n    const std::string& script,\n    const LanguageInvokerPtr&'),
