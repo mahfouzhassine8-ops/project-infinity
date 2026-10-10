@@ -395,6 +395,8 @@ class Observer:
             # one display-only noun, while ifconfig receives at most one
             # interface/display argument. Mutation forms require additional
             # arguments and remain fail-closed.
+            if not command or not isinstance(command[0], str):
+                return False
             resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
             if resolved == '/system/bin/ip':
                 return (len(command) == 2 and isinstance(command[1], str) and
