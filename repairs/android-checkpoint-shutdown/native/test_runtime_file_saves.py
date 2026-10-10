@@ -301,6 +301,7 @@ int main(int argc, char** argv) {
     CHECK(!InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings());
     CHECK(Read(path) == "committed-value"); // conflict remains fail-closed
     CHECK(InfinityAndroidCheckpoint::failures.back().find("conflicting_loaded_owners") != std::string::npos);
+    Seed(path, "baseline"); // Restore the next inherited fixture after conflict verification.
 
     Reset(); owner = std::make_shared<ADDON::CAddonSettings>(); owner->bytes = "unproven";
     TrackCreatedAddonTree(owner, path);

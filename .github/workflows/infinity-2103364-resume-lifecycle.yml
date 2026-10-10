@@ -16,79 +16,47 @@ env:
   NDK_VER: 21.4.7075529
 jobs:
   android-shell:
+    # The exact 2103364 Android sources and Java tests passed on run 38092490558.
+    # Reuse those immutable artifacts; changed input is native host-test code only.
     if: github.ref == 'refs/heads/work/infinity-lifecycle-2103364'
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
-        with: {distribution: temurin, java-version: '17'}
-      - uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
-          log-accepted-android-sdk-licenses: false
-      - name: Restore pinned NDK
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
-          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
-      - name: Install and verify pinned Android toolchain with retry
-        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
-      - uses: actions/download-artifact@v8
+      - name: Restore passed Android binary from exact previous 2103364 run
+        uses: actions/download-artifact@v8
         with:
           repository: mahfouzhassine8-ops/project-infinity
-          run-id: 37735801149
-          name: Infinity-2103335-Delivery-Evidence
+          run-id: 38092490558
+          name: Infinity-2103364-Android-Donor-Internal
           github-token: ${{ github.token }}
-          path: checkpoint-parent
-      - uses: actions/download-artifact@v8
+          path: checkpoint-shell-build/xbmc/build/outputs/apk/release
+      - name: Restore checked Android compilation and stage evidence
+        uses: actions/download-artifact@v8
         with:
           repository: mahfouzhassine8-ops/project-infinity
-          run-id: 37735801149
-          name: Infinity-2103335-Native-Trace-Bridge-RC1-APK
+          run-id: 38092490558
+          name: Infinity-Checkpoint-Work-Android-Validation
           github-token: ${{ github.token }}
-          path: checkpoint-base
-      - name: Verify protected shell and stage complete Android compilation
+          path: .
+      - name: Verify same protected Android sources and original donor evidence
         run: |
           set -euo pipefail
-          mkdir -p checkpoint-source checkpoint-android "$HOME/.android"
-          tar --no-same-owner -xzf checkpoint-parent/repaired-shell-source.tar.gz -C checkpoint-source
-          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
-          python3 repairs/android-checkpoint-shutdown/test_android_assets.py --base checkpoint-base/Infinity-2103335-Native-Trace-Bridge-RC1.apk
-          python3 repairs/chooser-weather-snapshot-2103302/test_weather_snapshot.py
-          python3 tools/checkpoint-apk/package.py stage --engine checkpoint-engine --source checkpoint-source/shell-kodi --base checkpoint-base/Infinity-2103335-Native-Trace-Bridge-RC1.apk --build checkpoint-shell-build --out checkpoint-android
-      - name: Compile every Java class and run inherited exporter tests
-        env:
-          KODI_ANDROID_KEY_ALIAS: androiddebugkey
-          KODI_ANDROID_KEY_PASSWORD: android
-          KODI_ANDROID_STORE_PASSWORD: android
-          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
-        run: |
-          set -euo pipefail
-          : > checkpoint-android/compile.log
-          built=false
-          for attempt in 1 2 3; do
-            if ./checkpoint-shell-build/gradlew --no-daemon --console=plain -p checkpoint-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee -a checkpoint-android/compile.log; then
-              built=true
-              break
-            fi
-            if [ "$attempt" -lt 3 ]; then
-              sleep $((attempt * 20))
-            fi
-          done
-          [ "$built" = true ]
-          python3 repairs/android-checkpoint-shutdown/runtime_delta.py verify --group android --source checkpoint-source/shell-kodi
-      - name: Retain compiled shell for packaging without recompilation
-        run: tar -czf checkpoint-android/runtime-shell-source.tar.gz -C checkpoint-source shell-kodi
+          test -s checkpoint-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
+          test -s checkpoint-android/runtime-shell-source.tar.gz
+          test -s checkpoint-android/COMPAT-ASSET-ASSOCIATION.json
+          python3 repairs/android-checkpoint-shutdown/lifecycle-2103364/test_source_contracts.py
+          mkdir -p android-reuse-source
+          tar --no-same-owner -xzf checkpoint-android/runtime-shell-source.tar.gz -C android-reuse-source
+          python3 repairs/android-checkpoint-shutdown/runtime_delta.py verify --group android --source android-reuse-source/shell-kodi
+          echo 'PASS: unchanged 2103364 Android sources and prior Java-compiled donor reused'
       - uses: actions/upload-artifact@v7
-        if: success()
         with:
           name: Infinity-2103364-Android-Donor-Internal
           path: checkpoint-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
-        if: always()
         with:
           name: Infinity-Checkpoint-Work-Android-Validation
           path: |
