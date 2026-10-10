@@ -7,9 +7,9 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103352
-RELEASE = '1.0.9-Python-Retirement-Batch-RC1'
-FILE_LABEL = 'Python-Retirement-Batch-RC1'
+VERSION = 2103353
+RELEASE = '1.0.9-Save-Blocker-Repair-RC1'
+FILE_LABEL = 'Save-Blocker-Repair-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 PINNED_PIL_NATIVE = {
