@@ -24,16 +24,21 @@ def method(source, marker):
 PEERS = r'''
 #include "platform/android/activity/InfinityScriptPersistence.h"
 #include <algorithm>
+#include <atomic>
 #include <cassert>
+#include <chrono>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
+#include <thread>
 #include <vector>
 using CCriticalSection=std::recursive_mutex;
 namespace ADDON {struct Addon {std::string ID()const{return "addon";}};using AddonPtr=std::shared_ptr<Addon>;}
-inline int checkpointStops=0;
-struct Invoker{bool Stop(bool abort){assert(!abort);++checkpointStops;return true;}};using LanguageInvokerPtr=std::shared_ptr<Invoker>;
+inline std::atomic<int> checkpointStops{0};
+inline std::atomic<int> forcedStops{0};
+struct Invoker{bool Stop(bool abort){if(abort)++forcedStops;else ++checkpointStops;return true;}};using LanguageInvokerPtr=std::shared_ptr<Invoker>;
 class CScriptInvocationManager;
 struct CLanguageInvokerThread{
  LanguageInvokerPtr inv;ADDON::AddonPtr addon;int id=-1;
@@ -43,6 +48,7 @@ struct CLanguageInvokerThread{
  void SetId(int i){id=i;}int GetId()const{return id;}
  void Execute(const std::string&,const std::vector<std::string>&){}
  void Release();
+ bool Stop(bool wait){Release();return inv->Stop(wait);}
 };using CLanguageInvokerThreadPtr=std::shared_ptr<CLanguageInvokerThread>;
 struct Handler{void Process(){}};
 namespace Test {
@@ -55,6 +61,10 @@ struct CServiceBroker {static Python& GetXBPython(){static Python p;return p;}};
 struct CFileUtils{static bool Exists(const std::string&,bool){return true;}};
 struct URIUtils{static std::string GetFileName(const std::string&s){return s;}};
 constexpr int LOGERROR=1,LOGINFO=2;struct CLog{template<class...T>static void Log(T...) {}};
+namespace InfinityShutdownTrace {
+inline void Event(const char*,const char*,long long=-1,unsigned long long=0,unsigned long long=0,
+                  long long=0,const char*=nullptr,const char*="observed",const char*=nullptr) noexcept {}
+}
 namespace InfinityAndroidCheckpoint {
  inline bool active=false;inline int failures=0;inline std::string lastFailure;
  std::string ClassifyScript(const std::string&s,const std::string&){return s=="known.py"?"known":s=="ambient.py"?"nonpersistent:ambient-glass":std::string{};}
@@ -72,10 +82,15 @@ class CScriptInvocationManager {public:
  LanguageInvokerThreadMap m_scripts;std::map<std::string,int>m_scriptPaths;
  std::map<int,Handler*>m_invocationHandlers;CLanguageInvokerThreadPtr m_lastInvokerThread;
  int m_lastPluginHandle=-1,m_nextId=0;mutable CCriticalSection m_critSection;bool m_shutdownRequested=false;
+ std::chrono::steady_clock::time_point m_androidCheckpointRetirementStarted{};
+ bool m_androidCheckpointRetirementArmed=false;
+ std::set<int>m_androidCheckpointEscalatedIds;
+ std::size_t m_androidCheckpointEscalationsActive=0;
  std::vector<std::string>m_checkpointUnresolvedWriterLedger;
  int ExecuteAsync(const std::string&,const LanguageInvokerPtr&,const ADDON::AddonPtr&,const std::vector<std::string>&,bool,int);
  std::vector<std::string>AndroidCheckpointUnresolvedWriters()const;
- void OnExecutionDone(int);void Process();void BeginAndroidCheckpoint();
+ std::size_t AndroidCheckpointEscalationsActive()const;
+ void OnExecutionDone(int);void Process();void BeginAndroidCheckpoint();void PumpAndroidCheckpointRetirement(bool=false);
 };
 '''
 TEST = r'''
@@ -113,6 +128,16 @@ int main(){
  assert(Test::released==std::vector<int>({ambient,unknown}));
  assert(std::find(Test::released.begin(),Test::released.end(),resident)==Test::released.end());
  assert(stopping.m_scripts[resident].checkpointContract=="known");
+ // Only the still-running FOREIGN writer is escalated. Verified resident and
+ // nonpersistent contracts are never forced by the checkpoint escalation pass.
+ stopping.PumpAndroidCheckpointRetirement(true);
+ for(int n=0;n<200 && stopping.AndroidCheckpointEscalationsActive()!=0;++n)
+   std::this_thread::sleep_for(std::chrono::milliseconds(1));
+ assert(stopping.AndroidCheckpointEscalationsActive()==0);
+ assert(forcedStops.load()==1);
+ assert(stopping.m_androidCheckpointEscalatedIds.count(unknown)==1);
+ assert(stopping.m_androidCheckpointEscalatedIds.count(resident)==0);
+ assert(stopping.m_androidCheckpointEscalatedIds.count(ambient)==0);
  // Two Command Center default invocations overlap. Each completion must use
  // its own actual interpreter retirement, never the shared basename counter.
  CScriptInvocationManager concurrent;concurrent.m_nextId=1000;
@@ -148,6 +173,14 @@ int main(){
  InfinityScriptPersistence::Observed(qs);InfinityScriptPersistence::Retired(qs);
  quarantine.OnExecutionDone(qs);
  assert(Test::quarantineSuccesses==1);
+ // Checkpoint-forced retirement is diagnostic evidence, not proof that a
+ // quarantined service had a normal clean runtime. It must not auto-heal.
+ const int qe=quarantine.ExecuteAsync("service.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ InfinityScriptPersistence::Observed(qe);InfinityScriptPersistence::Retired(qe);
+ quarantine.m_androidCheckpointEscalatedIds.insert(qe);
+ quarantine.OnExecutionDone(qe);
+ assert(Test::quarantineSuccesses==1);
+ assert(quarantine.m_androidCheckpointEscalatedIds.count(qe)==0);
  // Hard persistence uncertainty never becomes a quarantine excuse.
  const int qb=quarantine.ExecuteAsync("service.py",std::make_shared<Invoker>(),addon,{},false,-1);
  InfinityScriptPersistence::Observed(qb);
@@ -174,14 +207,17 @@ def main():
     assert 'record.failures >= 2' in source and 'RecordCleanSuccess' in source
     assert 'ConsumeProbeRequest' in source and 'registry.probation' in source
     assert 'restored_after_probation' in source and 'AndroidQuarantineSuppressErrorToast' in source
+    assert 'scripts.checkpoint_escalation_start' in source and '!checkpointEscalated' in source
     methods=[method(source,'void CScriptInvocationManager::Process()'),
              method(source,'std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const'),
              method(source,'int CScriptInvocationManager::ExecuteAsync(\n    const std::string& script,\n    const LanguageInvokerPtr&'),
              method(source,'void CScriptInvocationManager::OnExecutionDone(int scriptId)'),
-             method(source,'void CScriptInvocationManager::BeginAndroidCheckpoint()')]
+             method(source,'void CScriptInvocationManager::BeginAndroidCheckpoint()'),
+             method(source,'void CScriptInvocationManager::PumpAndroidCheckpointRetirement(bool force)'),
+             method(source,'std::size_t CScriptInvocationManager::AndroidCheckpointEscalationsActive() const')]
     with tempfile.TemporaryDirectory(prefix='script-lifetime-') as directory:
         directory=Path(directory);(directory/'test.cpp').write_text(PEERS+'\n'.join(methods)+TEST)
         subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-DHAS_PYTHON','-Wall','-Wextra','-Werror','-pthread','-I',str(args.runtime/'xbmc'),str(directory/'test.cpp'),'-o',str(directory/'test')],check=True)
         subprocess.run([str(directory/'test')],check=True)
-    print('PASS: production script lifetime + persistence-gated error quarantine; unsafe writers remain blocking')
+    print('PASS: production script lifetime + bounded checkpoint escalation + persistence-gated quarantine')
 if __name__=='__main__':main()
