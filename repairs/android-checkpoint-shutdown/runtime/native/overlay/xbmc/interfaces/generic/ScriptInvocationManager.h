@@ -12,6 +12,7 @@
 #include "interfaces/generic/ILanguageInvoker.h"
 #include "threads/CriticalSection.h"
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <set>
@@ -33,6 +34,11 @@ public:
   // Checkpoint admission only: preserve owners, broadcast cooperative monitor
   // abort to foreign scripts, and inspect completion without any Stop or join.
   void BeginAndroidCheckpoint();
+  // Give foreign writers a cooperative grace window, then escalate stubborn
+  // invokers off the application thread. force=true exists for deterministic
+  // host tests only; production callers use the timed policy.
+  void PumpAndroidCheckpointRetirement(bool force = false);
+  std::size_t AndroidCheckpointEscalationsActive() const;
   std::size_t AndroidCheckpointForeignScripts() const;
   std::size_t AndroidCheckpointResidentCount() const;
   std::size_t AndroidCheckpointCompatCount() const;
@@ -167,6 +173,10 @@ private:
   int m_nextId = 0;
   mutable CCriticalSection m_critSection;
   bool m_shutdownRequested{false}; // guarded by m_critSection
+  std::chrono::steady_clock::time_point m_androidCheckpointRetirementStarted{};
+  bool m_androidCheckpointRetirementArmed{false};
+  std::set<int> m_androidCheckpointEscalatedIds;
+  std::size_t m_androidCheckpointEscalationsActive{0};
   // Durable ownership is not implied by OnExecutionDone/Py_EndInterpreter.
   // Retain bounded diagnostics for all unknown process-lifetime admissions.
   std::vector<std::string> m_checkpointUnresolvedWriterLedger;
