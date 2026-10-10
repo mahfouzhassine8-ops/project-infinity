@@ -45,17 +45,25 @@ struct CLanguageInvokerThread{
  void Release();
 };using CLanguageInvokerThreadPtr=std::shared_ptr<CLanguageInvokerThread>;
 struct Handler{void Process(){}};
-namespace Test {inline std::vector<int> aborted;inline std::vector<int> released;}
+namespace Test {
+inline std::vector<int> aborted;inline std::vector<int> released;
+inline bool suppress=false;inline int quarantinedFailures=0;inline int quarantineSuccesses=0;
+}
 inline void CLanguageInvokerThread::Release(){Test::released.push_back(GetId());}
 struct Python {void NotifyScriptAborting(CLanguageInvokerThread* t){Test::aborted.push_back(t->GetId());}};
 struct CServiceBroker {static Python& GetXBPython(){static Python p;return p;}};
 struct CFileUtils{static bool Exists(const std::string&,bool){return true;}};
 struct URIUtils{static std::string GetFileName(const std::string&s){return s;}};
-constexpr int LOGERROR=1;struct CLog{template<class...T>static void Log(T...) {}};
+constexpr int LOGERROR=1,LOGINFO=2;struct CLog{template<class...T>static void Log(T...) {}};
 namespace InfinityAndroidCheckpoint {
  inline bool active=false;inline int failures=0;inline std::string lastFailure;
  std::string ClassifyScript(const std::string&s,const std::string&){return s=="known.py"?"known":s=="ambient.py"?"nonpersistent:ambient-glass":std::string{};}
  bool IsActive(){return active;}void RecordFailure(const char*,const char* detail){++failures;lastFailure=detail;}
+}
+namespace InfinityAddonQuarantine {
+ bool ShouldSuppress(const std::string&,const std::string&){return Test::suppress;}
+ void RecordCleanFailure(const std::string&,const std::string&){++Test::quarantinedFailures;}
+ void RecordCleanSuccess(const std::string&,const std::string&){++Test::quarantineSuccesses;}
 }
 std::string VerifiedCheckpointContract(const std::string&s,const CLanguageInvokerThreadPtr&,const std::string& c){return InfinityAndroidCheckpoint::ClassifyScript(s,"addon")==c?c:std::string{};}
 class CScriptInvocationManager {public:
@@ -74,6 +82,10 @@ TEST = r'''
 int main(){
  auto addon=std::make_shared<ADDON::Addon>();
  CScriptInvocationManager m;
+ Test::suppress=true;
+ assert(m.ExecuteAsync("service.py",std::make_shared<Invoker>(),addon,{},false,-1)==-1);
+ assert(m.AndroidCheckpointUnresolvedWriters().empty());
+ Test::suppress=false;
  const int id=m.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1);
  assert(id>=0);assert(m.AndroidCheckpointUnresolvedWriters().size()==2);
  m.OnExecutionDone(id);assert(InfinityAndroidCheckpoint::failures==0);
@@ -122,6 +134,28 @@ int main(){
  concurrent.OnExecutionDone(healthy);
  assert(InfinityAndroidCheckpoint::lastFailure=="python_writer:external_or_opaque_writer_requires_explicit_participant");
  assert(!InfinityScriptPersistence::PollCommit());
+ // A cleanly retired uncaught SERVICE failure may become a quarantine strike.
+ CScriptInvocationManager quarantine;
+ const int q=quarantine.ExecuteAsync("service.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ InfinityScriptPersistence::Observed(q);
+ InfinityScriptPersistence::Fail(q,"uncaught_script_failure_before_persistence_receipt");
+ InfinityScriptPersistence::Retired(q);
+ quarantine.OnExecutionDone(q);
+ assert(Test::quarantinedFailures==1);
+ assert(Test::quarantineSuccesses==0);
+ // A later clean service retirement clears a pending strike in the real policy.
+ const int qs=quarantine.ExecuteAsync("service.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ InfinityScriptPersistence::Observed(qs);InfinityScriptPersistence::Retired(qs);
+ quarantine.OnExecutionDone(qs);
+ assert(Test::quarantineSuccesses==1);
+ // Hard persistence uncertainty never becomes a quarantine excuse.
+ const int qb=quarantine.ExecuteAsync("service.py",std::make_shared<Invoker>(),addon,{},false,-1);
+ InfinityScriptPersistence::Observed(qb);
+ InfinityScriptPersistence::Fail(qb,"external_or_opaque_writer_requires_explicit_participant");
+ InfinityScriptPersistence::Retired(qb);
+ quarantine.OnExecutionDone(qb);
+ assert(Test::quarantinedFailures==1);
+
  // Re-admission clears stale invocation proof; missing retirement still fails.
  InfinityScriptPersistence::Admit(healthy,"addon:default.py");
  assert(!InfinityScriptPersistence::TakeInterpreterRetirement(healthy));
@@ -136,6 +170,8 @@ def main():
     assert '(!m_stop || InfinityAndroidCheckpoint::IsActive())' in python
     checkpoint_branch=python.split('if (!abort && InfinityAndroidCheckpoint::IsActive())',1)[1].split('#endif',1)[0]
     assert 'PyExc_SystemExit' not in checkpoint_branch and 'm_stoppedEvent.Wait' not in checkpoint_branch
+    assert 'script.module.slyguy' in source and 'seeded_fold_startup_error' in source
+    assert 'record.failures >= 2' in source and 'RecordCleanSuccess' in source
     methods=[method(source,'void CScriptInvocationManager::Process()'),
              method(source,'std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWriters() const'),
              method(source,'int CScriptInvocationManager::ExecuteAsync(\n    const std::string& script,\n    const LanguageInvokerPtr&'),
@@ -145,5 +181,5 @@ def main():
         directory=Path(directory);(directory/'test.cpp').write_text(PEERS+'\n'.join(methods)+TEST)
         subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-DHAS_PYTHON','-Wall','-Wextra','-Werror','-pthread','-I',str(args.runtime/'xbmc'),str(directory/'test.cpp'),'-o',str(directory/'test')],check=True)
         subprocess.run([str(directory/'test')],check=True)
-    print('PASS: production admission/completion/removal/ledger methods retain unknown lifetime obligations')
+    print('PASS: production script lifetime + persistence-gated error quarantine; unsafe writers remain blocking')
 if __name__=='__main__':main()
