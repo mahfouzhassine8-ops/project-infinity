@@ -16,6 +16,7 @@
 #if defined(TARGET_ANDROID)
 #include "InfinityPythonExitEvidence.h"
 #include "InfinityPythonPersistence.h"
+#include "platform/android/activity/InfinityAndroidCheckpoint.h"
 #endif
 #include "platform/android/activity/InfinityShutdownTrace.h"
 
@@ -510,6 +511,25 @@ bool CPythonInvoker::stop(bool abort)
   InfinityShutdownTrace::Scope lockEvidence("python.stop.lock", GetId());
   std::unique_lock<CCriticalSection> lock(m_critical);
   lockEvidence.End();
+#if defined(TARGET_ANDROID)
+  if (!abort && InfinityAndroidCheckpoint::IsActive())
+  {
+    // Checkpoint retirement needs both generations of service API:
+    // Monitor users receive AbortNotification(), while legacy xbmc.abortRequested()
+    // observes m_stop. Do not wait here and never reach the SystemExit escalation
+    // below; persistence finalization remains the authority after bytecode returns.
+    m_stop = true;
+    if (!IsRunning() && !m_threadState)
+      return false;
+    if (m_threadState != NULL && IsRunning())
+    {
+      setState(InvokerStateStopping);
+      lock.unlock();
+      AbortNotification();
+    }
+    return true;
+  }
+#endif
   m_stop = true;
 
   if (!IsRunning() && !m_threadState)
@@ -689,7 +709,8 @@ void CPythonInvoker::onExecutionDone()
       // or an unflushed buffer. The coordinator fails with a specific save reason;
       // retain that state until an explicit legacy stop or process force-close.
       auto* persistence = static_cast<InfinityPythonPersistence::Context*>(m_infinityPersistenceObserver);
-      while ((persistence->preservePending || persistence->waitingWorkers) && !m_stop)
+      while ((persistence->preservePending || persistence->waitingWorkers) &&
+             (!m_stop || InfinityAndroidCheckpoint::IsActive()))
       {
         PyEval_ReleaseThread(m_threadState);
         m_invokerOwnsGil = false;
