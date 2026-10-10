@@ -114,6 +114,49 @@ int main() {
 }
 '''
 
+PATH_DETAIL_HARNESS = r'''
+#include "platform/android/activity/InfinityScriptPersistence.h"
+#include <cassert>
+#include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <thread>
+using namespace InfinityScriptPersistence;
+
+int main() {
+  const auto root=std::filesystem::temp_directory_path()/"infinity-path-inventory";
+  std::error_code ec;std::filesystem::remove_all(root,ec);std::filesystem::create_directories(root);
+  const auto missing=(root/"missing.db").string();
+  const auto wrongType=(root/"wrong-type").string();
+  std::filesystem::create_directories(wrongType);
+
+  Admit(21,"paths:service.py");
+  Observed(21);
+  Touch(21,missing,true,false);
+  Touch(21,wrongType,true,false);
+  Retired(21);
+
+  for(int i=0;i<1000 && !PollInventory();++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  const auto snap=Snapshot();
+  assert(snap.syncStarted && snap.syncFinished && !snap.durable);
+  assert(snap.blockingCount>=2);
+  bool sawMissing=false,sawWrongType=false;
+  for(const auto& blocker:snap.blockers) {
+    if(blocker.reason=="script_file_identity_or_type_unconfirmed" &&
+       blocker.detail=="path="+missing)sawMissing=true;
+    if(blocker.reason=="script_file_identity_or_type_unconfirmed" &&
+       blocker.detail=="path="+wrongType)sawWrongType=true;
+  }
+  assert(sawMissing && sawWrongType);
+  assert(snap.failure=="script_file_identity_or_type_unconfirmed");
+  assert(!snap.failureDetail.empty());
+  std::filesystem::remove_all(root,ec);
+  std::cout<<"PASS: durability sync inventories every failing path with exact detail\n";
+}
+'''
+
 
 def main():
     parser=argparse.ArgumentParser()
@@ -121,7 +164,8 @@ def main():
     args=parser.parse_args()
     with tempfile.TemporaryDirectory(prefix="script-blocker-inventory-") as temp:
         temp=Path(temp)
-        for name, harness in (("blocking", HARNESS), ("advisory", ADVISORY_HARNESS)):
+        for name, harness in (("blocking", HARNESS), ("advisory", ADVISORY_HARNESS),
+                              ("path-detail", PATH_DETAIL_HARNESS)):
             source=temp/(name+".cpp")
             source.write_text(harness)
             binary=temp/name
