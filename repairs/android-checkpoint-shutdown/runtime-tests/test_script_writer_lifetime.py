@@ -96,6 +96,7 @@ int main(){
  const int unknown=stopping.ExecuteAsync("other.py",std::make_shared<Invoker>(),addon,{},false,-1);
  assert(stopping.m_scripts[ambient].checkpointContract=="nonpersistent:ambient-glass");
  stopping.BeginAndroidCheckpoint();assert(stopping.m_shutdownRequested);
+ assert(Test::aborted==std::vector<int>({ambient,unknown}));
  assert(checkpointStops==2);
  assert(Test::released==std::vector<int>({ambient,unknown}));
  assert(std::find(Test::released.begin(),Test::released.end(),resident)==Test::released.end());
