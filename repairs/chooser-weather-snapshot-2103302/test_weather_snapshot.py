@@ -39,6 +39,14 @@ class Tests(unittest.TestCase):
         self.target.write_text('previous')
         with patch.object(weather.os,'replace',side_effect=OSError('simulated')):self.assertFalse(weather.publish(self.kodi,str(self.target),Monitor()))
         self.assertEqual(self.target.read_text(),'previous')
+        self.assertFalse(pathlib.Path(str(self.target)+'.pending').exists())
+    def test_checkpoint_system_exit_cleans_pending_namespace(self):
+        self.target.write_text('previous')
+        with patch.object(weather.os,'replace',side_effect=SystemExit()):
+            with self.assertRaises(SystemExit):
+                weather.publish(self.kodi,str(self.target),Monitor())
+        self.assertEqual(self.target.read_text(),'previous')
+        self.assertFalse(pathlib.Path(str(self.target)+'.pending').exists())
     def test_abort_before_commit_keeps_existing_reading(self):
         self.target.write_text('previous');monitor=Monitor();calls=[]
         def aborted():calls.append(1);return len(calls)>=3
