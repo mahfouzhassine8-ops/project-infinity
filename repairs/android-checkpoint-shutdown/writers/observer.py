@@ -408,11 +408,23 @@ class Observer:
                         0 < len(command[1]) <= 64 and '\x00' not in command[1])
             return False
 
+        def readonly_environment(env):
+            if env is None:
+                return True
+            # CPython uuid.getnode() copies os.environ verbatim and changes only
+            # LC_ALL=C before its read-only ip/ifconfig probes. Accept exactly
+            # that shape; arbitrary child environments remain fail-closed.
+            if not isinstance(env, dict):
+                return False
+            expected = dict(os.environ)
+            expected['LC_ALL'] = 'C'
+            return env == expected
+
         class Popen(original_popen):
             def __init__(child, command, *args, **kwargs):
                 observer.check_live()
                 readonly = (readonly_command(command) and not args and
-                            not kwargs.get('shell', False) and kwargs.get('env') is None and
+                            not kwargs.get('shell', False) and readonly_environment(kwargs.get('env')) and
                             kwargs.get('cwd') is None and kwargs.get('preexec_fn') is None and
                             not kwargs.get('pass_fds', ()) and
                             (observer.host_probe or not any(name.startswith(('LD_', 'DYLD_')) for name in os.environ)) and
