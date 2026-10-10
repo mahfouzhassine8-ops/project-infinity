@@ -73,6 +73,8 @@ class CApplication:public CApplicationPlayerCallback {public: bool IsInitialized
  template<class T>std::shared_ptr<T>GetComponent(){static auto p=std::make_shared<T>();return p;}};
 class CScriptInvocationManager {public: static CScriptInvocationManager& GetInstance(){static CScriptInvocationManager m;return m;}
  void BeginShutdown(){}; void BeginAndroidCheckpoint(){};
+ void PumpAndroidCheckpointRetirement(bool=false){}
+ std::size_t AndroidCheckpointEscalationsActive()const{return 0;}
  std::size_t AndroidCheckpointForeignScripts()const{return Test::foreign.size();}
  std::size_t AndroidCheckpointResidentCount()const{return Test::residents;}
  std::size_t AndroidCheckpointCompatCount()const{return Test::compatResidents;}
