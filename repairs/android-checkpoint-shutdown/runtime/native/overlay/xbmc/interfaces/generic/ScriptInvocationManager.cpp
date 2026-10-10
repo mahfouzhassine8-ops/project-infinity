@@ -172,13 +172,11 @@ void LoadLocked(Registry& registry)
   // Physical Fold evidence 2026-10-09: this service is already throwing a
   // startup error and the user does not use it. Quarantine ONLY its resident
   // service; keep the shared module installed for dependencies that import it.
-  auto& slyguy = registry.records["script.module.slyguy"];
-  bool changed = !slyguy.quarantined || slyguy.reason != "seeded_fold_startup_error";
-  slyguy.failures = std::max(slyguy.failures, 2u);
-  slyguy.quarantined = true;
-  slyguy.reason = "seeded_fold_startup_error";
-  if (changed)
+  if (registry.records.find("script.module.slyguy") == registry.records.end())
+  {
+    registry.records["script.module.slyguy"] = {2u, true, "seeded_fold_startup_error"};
     PersistLocked(registry);
+  }
 }
 bool ShouldSuppress(const std::string& addon, const std::string& script)
 {
