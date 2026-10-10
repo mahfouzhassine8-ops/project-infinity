@@ -1300,6 +1300,16 @@ public class Splash extends Activity
     return InfinityKodiShutdown.state().checkpointFailed()?"handoff.checkpointFailed.recoveryAvailable":"handoff.waitClosingOwner";
   }
 
+  static void finishSuccessfulExperienceHandoff(android.app.Activity chooser){
+    // Splash is a separate singleInstance chooser task. Plain finish() leaves
+    // that empty task as a stale Samsung Recents card beside the live experience.
+    chooser.finishAndRemoveTask();
+  }
+
+  private void finishSuccessfulExperienceHandoff(){
+    finishSuccessfulExperienceHandoff(this);
+  }
+
   private void showCobraRecovery(){
     cobraRecoveryDialog()
         .setTitle("Cobra Recovery")
@@ -1834,7 +1844,7 @@ public class Splash extends Activity
       if(mInfinityHandoff!=null)mInfinityHandoff.close();
       intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
       startActivity(intent);
-      finish();
+      finishSuccessfulExperienceHandoff();
       return;
     }
     mInfinityStartupTrace.event("handoff.requested");
@@ -1909,7 +1919,7 @@ public class Splash extends Activity
       mInfinityKodiStateReady=true;
       if(status.pending())mInfinitySawClosing=true;
       if(mInfinityLaunchQueued && status.launch.equals(mInfinityKodiLaunchToken) && status.live && status.alive && !status.pending()){
-        finish();return;
+        finishSuccessfulExperienceHandoff();return;
       }
       if(mInfinityLaunchQueued && (status.pending() || (!status.error.isEmpty()&&status.launch.equals(mInfinityKodiLaunchToken)))){
         mInfinityLaunchQueued=false;mInfinityKodiLaunchToken="";
