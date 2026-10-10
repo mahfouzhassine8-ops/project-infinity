@@ -211,6 +211,14 @@ inline void Retired(int id)
 // Completion is per invocation. Another active invocation of the same script,
 // or another writer's failure, cannot revoke THIS interpreter's actual proof.
 // Global checkpoint acceptance still requires Failure(), all names and PollCommit.
+inline bool AdvisoryInterpreterRetirement(int id, const std::string& reason)
+{
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  if(!s.retiredInvokers.count(id))return false;
+  for(const auto& blocker:s.blockers)
+    if(!blocker.blocking && blocker.writerId==id && blocker.reason==reason)return true;
+  return false;
+}
 inline bool TakeInterpreterRetirement(int id)
 {
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
