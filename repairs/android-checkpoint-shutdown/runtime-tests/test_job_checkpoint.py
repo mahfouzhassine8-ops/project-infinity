@@ -33,6 +33,12 @@ class RequiredJob:public CJob{public:bool DoWork()override{return true;}
  const char*GetCheckpointPersistenceOwner()const override{return "native_databases";}
  const char*GetCheckpointOperation()const override{return "checked-database-write";}
  ~RequiredJob(){assert(CJobManager::AndroidCheckpointSnapshot().required>0);}};
+class CRepositoryUpdateJob:public CJob{public:bool DoWork()override{return false;}const char*GetType()const override{return "ProgressJob";}};
+class CVideoLibraryScanningJob:public CJob{public:bool DoWork()override{return true;}const char*GetType()const override{return "VideoLibraryScanningJob";}};
+class CDirectoryJob:public CJob{public:bool DoWork()override{return true;}const char*GetType()const override{return "directory";}};
+class CWeatherJob:public CJob{public:bool DoWork()override{return true;}};
+class CRecentlyAddedJob:public CJob{public:bool DoWork()override{return true;}};
+class CImageLoader:public CJob{public:bool DoWork()override{return true;}};
 '''
 TEST=r'''
 int main(int argc,char**argv){assert(argc==2);std::string mode=argv[1];
@@ -68,6 +74,18 @@ int main(int argc,char**argv){assert(argc==2);std::string mode=argv[1];
   CJobManager::TrackCheckpointJob(j,&queue,"queue_pending","playback");assert(CJobManager::AndroidCheckpointSnapshot().unknown==0);delete j;
   assert(CJobManager::AndroidCheckpointSnapshot().required==0);return 0;
  }
+ if(mode=="known-stock"){
+  {auto*j=new CRepositoryUpdateJob;CJobManager::TrackCheckpointJob(j,nullptr,"done");auto s=CJobManager::AndroidCheckpointSnapshot();
+   assert(s.required==1&&s.unknown==0&&s.blockers[0].owner=="native_databases"&&s.blockers[0].operation=="repository_update");delete j;}
+  {auto*j=new CVideoLibraryScanningJob;CJobManager::TrackCheckpointJob(j,nullptr,"running");auto s=CJobManager::AndroidCheckpointSnapshot();
+   assert(s.required==1&&s.unknown==0&&s.blockers[0].owner=="native_databases"&&s.blockers[0].operation=="video_library_scan");delete j;}
+  for(CJob*j:{static_cast<CJob*>(new CDirectoryJob),static_cast<CJob*>(new CWeatherJob),static_cast<CJob*>(new CRecentlyAddedJob),static_cast<CJob*>(new CImageLoader)}){
+   CJobManager::TrackCheckpointJob(j,nullptr,"running");auto s=CJobManager::AndroidCheckpointSnapshot();
+   assert(s.required==0&&s.unknown==0&&s.nonPersistent==1);delete j;
+   assert(CJobManager::AndroidCheckpointSnapshot().nonPersistent==0);
+  }
+  return 0;
+ }
  if(mode=="bad-owner"){
   auto f=[]{};auto*j=new CLambdaJob<decltype(f)>("made-up-owner","bad-mapping",std::move(f));
   CJobManager::TrackCheckpointJob(j,nullptr,"pending");delete j;assert(CJobManager::AndroidCheckpointSnapshot().unknown==1);return 0;
@@ -96,7 +114,7 @@ def main():
         (temp/'threads/Thread.h').write_text('#pragma once\nclass CEvent {}; class CThread {public: virtual ~CThread()=default;virtual void Process(){};};\n')
         (temp/'test.cpp').write_text(PEERS+'\n'.join(methods)+TEST)
         subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-Wall','-Wextra','-Werror','-Wno-unused-parameter','-pthread','-I',str(temp),str(temp/'test.cpp'),'-o',str(temp/'test')],check=True)
-        for mode in ['unknown','callback','memory','required','queue-owner','bad-owner','race']:
+        for mode in ['unknown','callback','memory','required','queue-owner','known-stock','bad-owner','race']:
             subprocess.run([str(temp/'test'),mode],check=True,timeout=10)
-    print('PASS: actual job metadata + registry; 7 cases, 200 phase races, lifetime unknown retention, callbacks/destructors and 10000-invocation bound')
+    print('PASS: actual job metadata + registry; 8 cases, 200 phase races, lifetime unknown retention, callbacks/destructors and 10000-invocation bound')
 if __name__=='__main__':main()
