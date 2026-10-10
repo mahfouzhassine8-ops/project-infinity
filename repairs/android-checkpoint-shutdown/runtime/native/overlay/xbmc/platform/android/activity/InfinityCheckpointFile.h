@@ -195,6 +195,42 @@ inline bool ReadAttributes(PosixIo& io, int fd, Attributes& attributes,
     }
     const std::string name(names.data() + start, end - start);
     const auto size = RetryInterrupted([&] { return io.GetAttribute(fd, name.c_str(), nullptr, 0); });
+    if (size < 0 && errno == ENODATA && name == "system.posix_acl_access")
+    {
+      // A listed optional ACL with no readable value can be synthetic on
+      // Android. Only a stable, demonstrably absent ACL may be omitted.
+      // All real ACL/SELinux metadata and uncertain cases remain mandatory.
+      struct stat before{}, after{};
+      if (io.Stat(fd, &before) != 0 || !S_ISREG(before.st_mode))
+        return failMetadata("acl_absence_stat", EBUSY, name);
+      bool absent = true;
+      for (unsigned retry = 0; retry < 2; ++retry)
+      {
+        const auto probe = RetryInterrupted([&] {
+          return io.GetAttribute(fd, name.c_str(), nullptr, 0);
+        });
+        if (probe >= 0 || errno != ENODATA)
+        {
+          absent = false;
+          break;
+        }
+      }
+      const auto listedSize = RetryInterrupted([&] {
+        return io.ListAttributes(fd, nullptr, 0);
+      });
+      std::vector<char> confirmedNames(names.size());
+      const auto listed = listedSize == static_cast<ssize_t>(names.size()) ?
+          RetryInterrupted([&] { return io.ListAttributes(fd, confirmedNames.data(), confirmedNames.size()); }) : -1;
+      if (io.Stat(fd, &after) != 0 || !absent ||
+          listed != static_cast<ssize_t>(names.size()) ||
+          confirmedNames != names || before.st_dev != after.st_dev ||
+          before.st_ino != after.st_ino || before.st_uid != after.st_uid ||
+          before.st_gid != after.st_gid || before.st_mode != after.st_mode ||
+          before.st_ctime != after.st_ctime || before.st_size != after.st_size)
+        return failMetadata("acl_absence_not_verified", EBUSY, name);
+      start = end + 1;
+      continue;
+    }
     if (size < 0 || size > 65536)
     {
       return failMetadata("fgetxattr_size", size < 0 ? errno : E2BIG, name);
