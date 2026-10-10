@@ -37,9 +37,14 @@ def scenario(name):
             def rmdir(path, force=False):
                 if isinstance(force, str): raise TypeError("'str' object cannot be interpreted as an integer")
                 return True
+            def mkdirs(path):
+                if name == 'vfs_mkdir_existing':
+                    Path(path).mkdir(parents=True, exist_ok=True)
+                    return False
+                return True
             vfs = types.SimpleNamespace(File=NativeFile, translatePath=lambda path: str(path),
                 copy=lambda a,b: True, rename=lambda a,b: True, delete=lambda p: True,
-                mkdir=lambda p: True, mkdirs=lambda p: True, rmdir=rmdir)
+                mkdir=lambda p: True, mkdirs=mkdirs, rmdir=rmdir)
         observer = module.Observer(failures.append, lambda path, kind: mutations.append((path, kind)), vfs=vfs)
         database = root / 'state.db'
         connection = sqlite3.connect(database)
@@ -59,6 +64,12 @@ def scenario(name):
                 for target, attr, original, replacement in reversed(observer.originals):
                     setattr(target, attr, original)
                 return
+            if name == 'vfs_mkdir_existing':
+                target = root / 'already-created'
+                assert vfs.mkdirs(str(target)) is False
+                assert target.is_dir()
+                assert 'vfs_mkdirs_failed' not in failures
+                assert (str(target), 'directory') in mutations
             handle = vfs.File(str(root / 'state'), 'w')
             assert isinstance(handle, module.VFSFile)
             assert handle.handle.mode == 'w'
@@ -150,6 +161,14 @@ def scenario(name):
             assert observer.finish()
             assert not failures
             assert read_connection(database).execute('select value from state').fetchall() == []
+        elif name == 'sqlite_external_close':
+            # Simulate an add-on that cached the original native close method
+            # before the observer installed its Connection subclass.
+            base = type(connection).__mro__[1]
+            base.close(connection)
+            assert observer.finish()
+            assert connection._infinity_closed
+            assert 'sqlite_close_failed' not in failures
         elif name == 'nested_directories':
             connection.close()
             target = root / 'health' / 'sessions' / 'session' / 'state.json'
@@ -185,10 +204,10 @@ def main():
         scenario(args.scenario)
         return
     for name in ('committed', 'pending', 'collected', 'write_failure',
-                 'binding_replaced', 'sql_failure', 'rollback', 'nested_directories', 'descriptor_cache',
-                 'vfs_normal', 'vfs_write_failure', 'vfs_close_failure', 'vfs_open_failure'):
+                 'binding_replaced', 'sql_failure', 'rollback', 'sqlite_external_close', 'nested_directories', 'descriptor_cache',
+                 'vfs_normal', 'vfs_mkdir_existing', 'vfs_write_failure', 'vfs_close_failure', 'vfs_open_failure'):
         subprocess.run([sys.executable, __file__, '--scenario', name], check=True)
-    print('PASS: checked saves, pending-data retention, swallowed failures and explicit rollback')
+    print('PASS: checked saves distinguish dirty state from already-closed SQLite and idempotent VFS directories')
 
 
 if __name__ == '__main__':
