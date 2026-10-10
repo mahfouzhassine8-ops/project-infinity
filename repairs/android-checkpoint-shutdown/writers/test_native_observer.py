@@ -61,6 +61,24 @@ int main(int argc,char** argv) {
     good=Py_BuildValue("[ss]","/system/bin/getprop","ro.build.version.sdk");
     assert(InfinityPythonPersistence::ReadonlyCommand(exec,good));
     Py_DECREF(good);Py_DECREF(exec);
+
+    exec=PyUnicode_FromString("/system/bin/ip");
+    good=Py_BuildValue("[ss]","/system/bin/ip","route");
+    auto* ipBadVerb=Py_BuildValue("[ss]","/system/bin/ip","set");
+    auto* ipMutation=Py_BuildValue("[ssss]","/system/bin/ip","link","set","wlan0");
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,good));
+    assert(!InfinityPythonPersistence::ReadonlyCommand(exec,ipBadVerb));
+    assert(!InfinityPythonPersistence::ReadonlyCommand(exec,ipMutation));
+    Py_DECREF(good);Py_DECREF(ipBadVerb);Py_DECREF(ipMutation);Py_DECREF(exec);
+
+    exec=PyUnicode_FromString("/system/bin/ifconfig");
+    auto* allInterfaces=Py_BuildValue("[s]","/system/bin/ifconfig");
+    auto* oneInterface=Py_BuildValue("[ss]","/system/bin/ifconfig","wlan0");
+    auto* ifconfigMutation=Py_BuildValue("[sss]","/system/bin/ifconfig","wlan0","down");
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,allInterfaces));
+    assert(InfinityPythonPersistence::ReadonlyCommand(exec,oneInterface));
+    assert(!InfinityPythonPersistence::ReadonlyCommand(exec,ifconfigMutation));
+    Py_DECREF(allInterfaces);Py_DECREF(oneInterface);Py_DECREF(ifconfigMutation);Py_DECREF(exec);
   }
   InfinityScriptPersistence::Admit(1,"provider:service.py");
   assert(PyRun_SimpleString("import _io, _sqlite3\ncached_raw_open = _io.open\ncached_sqlite_connect = _sqlite3.connect\n")==0);
@@ -91,6 +109,7 @@ int main(int argc,char** argv) {
   if(mode=="external")script="import subprocess\nsubprocess.run(['/bin/true'],check=True)\n";
   if(mode=="workers")script="import threading\ne=threading.Event()\nt=threading.Thread(target=e.wait);t.start()\n";
   if(mode=="nested")script="from pathlib import Path\np=Path(root)/'health'/'sessions'/'session'/'state.json'\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text('saved')\n";
+  if(mode=="dirfd-delete")script="import os\nbase=root+'/dirfd'\nos.mkdir(base)\nwith open(base+'/stale.tmp','w') as f: f.write('stale')\nos.mkdir(base+'/empty')\nfd=os.open(base,os.O_RDONLY)\ntry:\n os.remove('stale.tmp',dir_fd=fd)\n os.rmdir('empty',dir_fd=fd)\nfinally:\n os.close(fd)\nassert not os.path.exists(base+'/stale.tmp') and not os.path.exists(base+'/empty')\n";
   if(mode=="readonly-child")script="import subprocess,tempfile\nwith tempfile.TemporaryFile(dir=root) as output:\n subprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=output,stderr=subprocess.PIPE,check=True)\n output.seek(0)\n result=output.read()\nwith open(root+'/diagnostic.txt','wb') as f: f.write(result)\n";
   if(mode=="system-exit" || mode=="system-exit-pending" || mode=="abort-callback-error") {
     script=mode=="system-exit-pending" ?
@@ -130,7 +149,7 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="readonly-child" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
+  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else {
@@ -208,11 +227,11 @@ def main():
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'readonly-child', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
+        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)
-    print('PASS: direct SQLite routes are observed; retained transactions, cached bypasses and writer failures remain fail-closed')
+    print('PASS: direct SQLite, dir_fd deletion and narrow Android read-only probes are observed; unsafe writers remain fail-closed')
 
 
 if __name__ == '__main__':
