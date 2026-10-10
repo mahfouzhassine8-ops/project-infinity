@@ -389,6 +389,21 @@ class Observer:
                             not (ch.isalnum() or ch in '._-') for ch in key):
                         return False
                 return True
+
+            # SlyGuy probes Android network state with read-only system tools.
+            # Keep this allowlist intentionally narrow: "ip" receives exactly
+            # one display-only noun, while ifconfig receives at most one
+            # interface/display argument. Mutation forms require additional
+            # arguments and remain fail-closed.
+            resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+            if resolved == '/system/bin/ip':
+                return (len(command) == 2 and isinstance(command[1], str) and
+                        command[1] in ('addr', 'address', 'link', 'route', 'neigh', 'rule'))
+            if resolved == '/system/bin/ifconfig':
+                if len(command) == 1:
+                    return True
+                return (len(command) == 2 and isinstance(command[1], str) and
+                        0 < len(command[1]) <= 64 and '\x00' not in command[1])
             return False
 
         class Popen(original_popen):
