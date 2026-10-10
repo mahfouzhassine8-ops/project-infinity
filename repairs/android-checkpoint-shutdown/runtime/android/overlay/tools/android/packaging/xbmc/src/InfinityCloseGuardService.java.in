@@ -219,13 +219,19 @@ public final class InfinityCloseGuardService extends Service {
       Boolean alive=null;try{alive=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}catch(IOException unknown){}
       final Boolean result=alive;ui.post(()->{
         if(ended||session!=target||!Boolean.FALSE.equals(result))return;
-        if(checkpointSaved&&!revoked&&("ENGINE_TERMINATING".equals(phase)||"SAFE_TO_TERMINATE".equals(phase))){
+        if(checkpointSaved&&consumed&&!revoked&&"ENGINE_TERMINATING".equals(phase)){
           deathEpoch=System.currentTimeMillis();deathElapsed=SystemClock.elapsedRealtime();
-          phase="COMPLETE";error="";final JSONObject done=receipt("COMPLETE","");
+          final JSONObject done=receipt("COMPLETE","");
+          try{
+            if(!InfinityCheckpointProtocol.confirmedComplete(done,target.ticket,target.owner,target.pid,false,true)){
+              fail("incomplete_termination_authorization_evidence");return;
+            }
+          }catch(Exception unverified){fail("invalid_completion_evidence");return;}
+          phase="COMPLETE";error="";
           worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),done);}
             catch(IOException unavailable){evidence("completion_receipt_failed","COMPLETE","");}
             ui.post(()->{evidence("engine.owner_lease_released","COMPLETE","");end();});});
-        }else fail("engine_ended_without_checkpoint_acknowledgement");
+        }else fail("engine_ended_without_consumed_termination_authorization");
       });
     });
   }
