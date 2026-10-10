@@ -4,6 +4,7 @@ import @APP_PACKAGE@.channels.util.TvUtil;
 
 import static android.content.pm.PackageManager.FEATURE_LEANBACK;
 
+import android.app.ActivityManager;
 import android.app.NativeActivity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -332,19 +333,44 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
     Choreographer.getInstance().postFrameCallback(this);
   }
 
+  private void infinitySetKodiTaskInRecents(boolean visible)
+  {
+    try
+    {
+      ActivityManager manager = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+      if (manager == null) return;
+      final int currentTask = getTaskId();
+      for (ActivityManager.AppTask task : manager.getAppTasks())
+      {
+        ActivityManager.RecentTaskInfo info = task.getTaskInfo();
+        if (info != null && info.id == currentTask)
+        {
+          task.setExcludeFromRecents(!visible);
+          return;
+        }
+      }
+    }
+    catch (RuntimeException error)
+    {
+      Log.w(TAG, "Unable to update Infinity Recents visibility", error);
+    }
+  }
+
   @Override
   public void onResume()
   {
     super.onResume();
     InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.onResume");
     if(mInfinityExitPlan.pending()){
-      // Recents may restore this still-owned task during a sealed checkpoint.
-      // Show shell recovery; never re-enable Kodi controls or create a second engine.
+      // Keep the failed/pending Kodi owner alive for safe recovery, but do not
+      // leave its task beside the recovery chooser as a second Infinity card.
+      infinitySetKodiTaskInRecents(false);
       InfinityExitCompletion.record(this,"exit.checkpoint.recentsResumeRecovery");
       startActivity(new Intent(this,Splash.class).putExtra("infinity_checkpoint_chooser",true)
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));
       return;
     }
+    infinitySetKodiTaskInRecents(true);
     if (mInfinityResponsiveness != null) mInfinityResponsiveness.resume();
 
     if (Build.VERSION.SDK_INT >= 30)
