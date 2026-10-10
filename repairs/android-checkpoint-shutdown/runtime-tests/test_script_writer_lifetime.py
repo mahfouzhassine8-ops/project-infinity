@@ -32,7 +32,8 @@ PEERS = r'''
 #include <vector>
 using CCriticalSection=std::recursive_mutex;
 namespace ADDON {struct Addon {std::string ID()const{return "addon";}};using AddonPtr=std::shared_ptr<Addon>;}
-struct Invoker{};using LanguageInvokerPtr=std::shared_ptr<Invoker>;
+inline int checkpointStops=0;
+struct Invoker{bool Stop(bool abort){assert(!abort);++checkpointStops;return true;}};using LanguageInvokerPtr=std::shared_ptr<Invoker>;
 class CScriptInvocationManager;
 struct CLanguageInvokerThread{
  LanguageInvokerPtr inv;ADDON::AddonPtr addon;int id=-1;
@@ -87,7 +88,7 @@ int main(){
  CScriptInvocationManager closed;closed.m_shutdownRequested=true;assert(closed.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1)==-1);assert(closed.AndroidCheckpointUnresolvedWriters().empty());
  InfinityAndroidCheckpoint::active=true;int x=known.ExecuteAsync("unknown.py",std::make_shared<Invoker>(),addon,{},false,-1);known.OnExecutionDone(x);assert(InfinityAndroidCheckpoint::failures==1);
  assert(InfinityAndroidCheckpoint::lastFailure=="foreign_invoker_finished_without_persistence_receipt;id="+std::to_string(x)+";addon=addon;script=unknown.py");
- // A no-addon exact memory-only contract is cooperatively stopped, while
+ // A no-addon exact memory-only contract receives the checkpoint-safe stop signal, while
  // the canonical resident stays alive to complete its PREPARE/FINALIZE protocol.
  CScriptInvocationManager stopping;stopping.m_nextId=2000;
  const int resident=stopping.ExecuteAsync("known.py",std::make_shared<Invoker>(),addon,{},false,-1);
@@ -95,7 +96,7 @@ int main(){
  const int unknown=stopping.ExecuteAsync("other.py",std::make_shared<Invoker>(),addon,{},false,-1);
  assert(stopping.m_scripts[ambient].checkpointContract=="nonpersistent:ambient-glass");
  stopping.BeginAndroidCheckpoint();assert(stopping.m_shutdownRequested);
- assert(Test::aborted==std::vector<int>({ambient,unknown}));
+ assert(checkpointStops==2);
  assert(Test::released==std::vector<int>({ambient,unknown}));
  assert(std::find(Test::released.begin(),Test::released.end(),resident)==Test::released.end());
  assert(stopping.m_scripts[resident].checkpointContract=="known");
