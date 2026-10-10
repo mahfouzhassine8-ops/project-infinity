@@ -1,0 +1,278 @@
+name: Infinity | Checkpoint observer finalization 2103358
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/infinity-redlight-observer-finalization-2103358]
+    paths:
+      - 'repairs/android-checkpoint-shutdown/**'
+      - '.github/workflows/infinity-2103358-checkpoint-observer-finalization.yml'
+      - 'tools/checkpoint-apk/**'
+permissions: {contents: read, actions: read}
+# Let the compiling revision retain its compiler cache before the corrected
+# candidate starts. Its APK remains a separate candidate identity.
+concurrency: {group: infinity-checkpoint-observer-finalization-2103358, cancel-in-progress: true}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  android-shell:
+    if: github.ref == 'refs/heads/work/infinity-redlight-observer-finalization-2103358'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Restore pinned NDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Install and verify pinned Android toolchain with retry
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37735801149
+          name: Infinity-2103335-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: checkpoint-parent
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37735801149
+          name: Infinity-2103335-Native-Trace-Bridge-RC1-APK
+          github-token: ${{ github.token }}
+          path: checkpoint-base
+      - name: Verify protected shell and stage complete Android compilation
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-source checkpoint-android "$HOME/.android"
+          tar --no-same-owner -xzf checkpoint-parent/repaired-shell-source.tar.gz -C checkpoint-source
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          python3 repairs/android-checkpoint-shutdown/test_android_assets.py --base checkpoint-base/Infinity-2103335-Native-Trace-Bridge-RC1.apk
+          python3 tools/checkpoint-apk/package.py stage --engine checkpoint-engine --source checkpoint-source/shell-kodi --base checkpoint-base/Infinity-2103335-Native-Trace-Bridge-RC1.apk --build checkpoint-shell-build --out checkpoint-android
+      - name: Compile every Java class and run inherited exporter tests
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          : > checkpoint-android/compile.log
+          built=false
+          for attempt in 1 2 3; do
+            if ./checkpoint-shell-build/gradlew --no-daemon --console=plain -p checkpoint-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee -a checkpoint-android/compile.log; then
+              built=true
+              break
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 20))
+            fi
+          done
+          [ "$built" = true ]
+          python3 repairs/android-checkpoint-shutdown/runtime_delta.py verify --group android --source checkpoint-source/shell-kodi
+      - name: Retain compiled shell for packaging without recompilation
+        run: tar -czf checkpoint-android/runtime-shell-source.tar.gz -C checkpoint-source shell-kodi
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103358-Android-Donor-Internal
+          path: checkpoint-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Checkpoint-Work-Android-Validation
+          path: |
+            checkpoint-android/
+            checkpoint-shell-build/xbmc/build/test-results/testReleaseUnitTest/
+            checkpoint-shell-build/xbmc/build/reports/tests/testReleaseUnitTest/
+          retention-days: 90
+          if-no-files-found: error
+  native-engine:
+    if: github.ref == 'refs/heads/work/infinity-redlight-observer-finalization-2103358'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - name: Restore pinned NDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Install and verify pinned Android toolchain with retry
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Restore work-branch preservation-parent dependencies
+        id: parent-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
+            ~/.ccache
+          key: infinity-checkpoint-3334-deps-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37988206145
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37924572074
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37912556867
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37903323079
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37893896767
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37887463358
+            infinity-checkpoint-3334-deps-${{ runner.os }}-37881036799
+            infinity-checkpoint-3334-deps-${{ runner.os }}-
+            infinity-python-exit-3334-arm64-${{ runner.os }}-37724566406
+      - name: Reconstruct protected lineage and run source and persistence gates
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-build
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev
+          python3 repairs/android-checkpoint-shutdown/native_ci.py prepare 2>&1 | tee checkpoint-build/prepare.log
+      - name: Compile reviewed native runtime integration
+        run: |
+          set -euo pipefail
+          if python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies; then
+            python3 repairs/android-checkpoint-shutdown/native_ci.py compile --completed-cache 2>&1 | tee checkpoint-build/compile.log
+          else
+            python3 repairs/android-checkpoint-shutdown/native_ci.py compile 2>&1 | tee checkpoint-build/compile.log
+          fi
+      - name: Preserve dependencies for subsequent work-branch builds
+        uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
+            ~/.ccache
+          key: infinity-checkpoint-3334-deps-${{ runner.os }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Checkpoint-Work-Native-Validation
+          path: |
+            checkpoint-build/
+            !checkpoint-build/libkodi.so
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-Checkpoint-Work-Native-Internal
+          path: checkpoint-build/libkodi.so
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
+  package-test-apk:
+    needs: [android-shell, native-engine]
+    if: github.ref == 'refs/heads/work/infinity-redlight-observer-finalization-2103358'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}'}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - name: Restore pinned NDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Install and verify pinned Android toolchain with retry
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Verify packaging gates
+        run: python3 tools/checkpoint-apk/test_package.py
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 37735801149
+          name: Infinity-2103335-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 37735801149
+          name: Infinity-2103335-Native-Trace-Bridge-RC1-APK
+          github-token: ${{ github.token }}
+          path: base
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.run_id }}
+          name: Infinity-Checkpoint-Work-Native-Internal
+          github-token: ${{ github.token }}
+          path: engine
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.run_id }}
+          name: Infinity-Checkpoint-Work-Native-Validation
+          github-token: ${{ github.token }}
+          path: engine-proof
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.run_id }}
+          name: Infinity-2103358-Android-Donor-Internal
+          github-token: ${{ github.token }}
+          path: shell/xbmc/build/outputs/apk/release
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.run_id }}
+          name: Infinity-Checkpoint-Work-Android-Validation
+          github-token: ${{ github.token }}
+          path: evidence
+      - name: Restore already compiled shell and associated native proof
+        run: |
+          set -euo pipefail
+          cp engine-proof/ENGINE-PROOF.json engine/ENGINE-PROOF.json
+          cp evidence/checkpoint-android/COMPAT-ASSET-ASSOCIATION.json evidence/COMPAT-ASSET-ASSOCIATION.json
+          mkdir -p source
+          tar --no-same-owner -xzf evidence/checkpoint-android/runtime-shell-source.tar.gz -C source
+      - name: Associate green engine and verify preserved payload and permanent signer
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          INFINITY_ENGINE_SOURCE_COMMIT: ${{ github.sha }}
+          INFINITY_NATIVE_RUN_ID: ${{ github.run_id }}
+          INFINITY_ANDROID_RUN_ID: ${{ github.run_id }}
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 tools/checkpoint-apk/package.py package --source source/shell-kodi --base base/Infinity-2103335-Native-Trace-Bridge-RC1.apk --build shell --out evidence --engine engine
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103358-Checkpoint-Observer-Finalization-RC1-APK
+          path: evidence/Infinity-2103358-Checkpoint-Observer-Finalization-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103358-Checkpoint-Test-Evidence
+          path: |
+            evidence/
+            !evidence/*.apk
+            !evidence/*.so
+            shell/xbmc/build/test-results/testReleaseUnitTest/
+          retention-days: 90
+          if-no-files-found: error
