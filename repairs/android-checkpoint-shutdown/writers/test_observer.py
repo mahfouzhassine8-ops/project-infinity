@@ -20,7 +20,11 @@ def scenario(name):
     read_connection = sqlite3.connect
     with tempfile.TemporaryDirectory(prefix='infinity-save-') as folder:
         root = Path(folder)
-        failures, mutations = [], []
+        failures, failure_details, mutations = [], [], []
+        def fail(reason, detail=None):
+            failures.append(reason)
+            if detail is not None:
+                failure_details.append((reason, str(detail)))
         vfs = None
         if name.startswith('vfs_'):
             class NativeFile:
@@ -39,8 +43,8 @@ def scenario(name):
                 return True
             vfs = types.SimpleNamespace(File=NativeFile, translatePath=lambda path: str(path),
                 copy=lambda a,b: True, rename=lambda a,b: True, delete=lambda p: True,
-                mkdir=lambda p: True, mkdirs=lambda p: True, rmdir=rmdir)
-        observer = module.Observer(failures.append, lambda path, kind: mutations.append((path, kind)), vfs=vfs)
+                mkdir=lambda p: True, mkdirs=lambda p: False if name == 'vfs_mkdirs_failure' else True, rmdir=rmdir)
+        observer = module.Observer(fail, lambda path, kind: mutations.append((path, kind)), vfs=vfs)
         database = root / 'state.db'
         connection = sqlite3.connect(database)
         connection.execute('create table state (value)')
@@ -58,6 +62,14 @@ def scenario(name):
                 assert 'vfs_open_for_write_failed' in failures
                 for target, attr, original, replacement in reversed(observer.originals):
                     setattr(target, attr, original)
+                return
+            if name == 'vfs_mkdirs_failure':
+                target = str(root / 'missing-parent')
+                assert vfs.mkdirs(target) is False
+                assert 'vfs_mkdirs_failed' in failures
+                assert ('vfs_mkdirs_failed', 'path='+target) in failure_details
+                for target_obj, attr, original, replacement in reversed(observer.originals):
+                    setattr(target_obj, attr, original)
                 return
             handle = vfs.File(str(root / 'state'), 'w')
             assert isinstance(handle, module.VFSFile)
@@ -186,7 +198,8 @@ def main():
         return
     for name in ('committed', 'pending', 'collected', 'write_failure',
                  'binding_replaced', 'sql_failure', 'rollback', 'nested_directories', 'descriptor_cache',
-                 'vfs_normal', 'vfs_write_failure', 'vfs_close_failure', 'vfs_open_failure'):
+                 'vfs_normal', 'vfs_write_failure', 'vfs_close_failure', 'vfs_open_failure',
+                 'vfs_mkdirs_failure'):
         subprocess.run([sys.executable, __file__, '--scenario', name], check=True)
     print('PASS: checked saves, pending-data retention, swallowed failures and explicit rollback')
 
