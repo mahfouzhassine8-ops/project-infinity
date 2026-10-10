@@ -78,6 +78,7 @@ def prepare():
     run(sys.executable, str(HERE / "native/test_file_checkpoint.py"))
     run(sys.executable, str(HERE / "writers/test_observer.py"))
     run(sys.executable, str(HERE / "writers/test_native_observer.py"), "--runtime", "kodi")
+    run(sys.executable, str(HERE / "writers/test_weather_staging_contract.py"), "--runtime", "kodi")
     run(sys.executable, str(HERE / "writers/test_blocker_inventory.py"), "--runtime", "kodi")
     run(sys.executable, str(HERE / "runtime-tests/test_addon_settings_runtime.py"), "--runtime", "kodi")
     run(sys.executable, str(HERE / "native/test_database_runtime.py"), "--source-root", "kodi")
@@ -98,7 +99,7 @@ def prepare():
     run(sys.executable, str(HERE / "runtime-tests/test_pvr_lambda_contracts.py"),
         "--source-root", "kodi")
     for name in ("test_job_checkpoint.py", "test_job_manager_runtime.py",
-                 "test_directory_checkpoint_admission.py", "test_texture_job_checkpoint.py"):
+                 "test_directory_checkpoint_admission.py", "test_texture_job_checkpoint.py", "test_completion_callbacks.py"):
         run(sys.executable, str(HERE / "runtime-tests" / name), "--runtime", "kodi")
     runtime_delta.materialize_commandcenter(OUT / "commandcenter")
     runtime_delta.materialize("embedded-addons", OUT / "embedded-addons")

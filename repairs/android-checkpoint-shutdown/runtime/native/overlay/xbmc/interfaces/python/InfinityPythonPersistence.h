@@ -125,6 +125,19 @@ inline void Touch(Context* context,PyObject* path,bool present=true,bool directo
 {
   if(context->retiring){InfinityScriptPersistence::Fail(context->id,"write_during_interpreter_retirement");return;}
   const auto value=Path(path);
+  // A null device consumes bytes and has no durable contents or namespace
+  // mutation. Confirm the actual descriptor/device, never a filename alone.
+  struct stat nullInfo{}, targetInfo{};
+  if(value=="/dev/null" && ::lstat("/dev/null",&nullInfo)==0 && S_ISCHR(nullInfo.st_mode)) {
+    bool same=false;
+    if(PyLong_Check(path)) {
+      const long fd=PyLong_AsLong(path);
+      same=fd>=0 && ::fstat(static_cast<int>(fd),&targetInfo)==0 &&
+           S_ISCHR(targetInfo.st_mode) && targetInfo.st_rdev==nullInfo.st_rdev &&
+           targetInfo.st_dev==nullInfo.st_dev && targetInfo.st_ino==nullInfo.st_ino;
+    }
+    if(same)return;
+  }
   if(ApprovedNonPersistentPythonBytecodeCachePath(value,directory))return;
   if(value.empty() && PyLong_Check(path)) {
     struct stat info{};const long fd=PyLong_AsLong(path);
@@ -337,6 +350,9 @@ inline std::string OpenEvidence(PyObject* path,long flags)
   Py_XDECREF(frame);PyErr_Clear();PyErr_Restore(errorType,errorValue,errorTrace);
   return result;
 }
+} // namespace InfinityPythonPersistence
+#include "InfinityPythonCryptoContract.h"
+namespace InfinityPythonPersistence {
 inline int Audit(const char* event,PyObject* args,void*)
 {
   auto* thread=PyThreadState_Get();if(!thread)return 0;
@@ -435,8 +451,14 @@ inline int Audit(const char* event,PyObject* args,void*)
   }
   else if(std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
           std::strcmp(event,"ctypes.dlsym/handle")==0)
-    InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
-                                    NativeLookupEvidence(event,args));
+  {
+    PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+    PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+    if(!ApprovedNativeLookup(event,args))
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                      NativeLookupEvidence(event,args));
+    PyErr_Clear();PyErr_Restore(errorType,errorValue,errorTrace);
+  }
   else if(std::strcmp(event,"os.system")==0 ||
           std::strcmp(event,"os.fork")==0 || std::strcmp(event,"os.posix_spawn")==0 ||
           std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0 ||
@@ -451,9 +473,9 @@ inline Context* Capsule(PyObject* self)
 {return static_cast<Context*>(PyCapsule_GetPointer(self,"Infinity.Persistence.Observer"));}
 inline PyObject* Error(PyObject* self,PyObject* args)
 {
-  auto* context=Capsule(self);const char* reason=nullptr;
-  if(!context || !PyArg_ParseTuple(args,"s",&reason))return nullptr;
-  InfinityScriptPersistence::Fail(context->id,reason);Py_RETURN_NONE;
+  auto* context=Capsule(self);const char* reason=nullptr;const char* detail="";
+  if(!context || !PyArg_ParseTuple(args,"s|s",&reason,&detail))return nullptr;
+  InfinityScriptPersistence::Fail(context->id,reason,detail);Py_RETURN_NONE;
 }
 inline PyObject* Mutation(PyObject* self,PyObject* args)
 {

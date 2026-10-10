@@ -58,7 +58,18 @@ bool CTextureCacheJob::operator==(const CJob* job) const
 
 bool CTextureCacheJob::CheckpointSucceeded(bool success) const
 {
-  return success || (typeid(*this) == typeid(CTextureCacheJob) && m_checkpointNoOp);
+  (void)success;
+  // A failed image fetch writes no authoritative metadata. Cache pixels are
+  // regenerable; the exact callback's DB result is the required state receipt.
+  return typeid(*this)==typeid(CTextureCacheJob) && m_checkpointCallbackComplete;
+}
+
+CJob::CheckpointResponsibility CTextureCacheJob::GetCheckpointResponsibility(
+    const IJobCallback* callback) const
+{
+  if(typeid(*this)==typeid(CTextureCacheJob) && callback && typeid(*callback)==typeid(CTextureCache))
+    return CheckpointResponsibility::Required;
+  return CheckpointResponsibility::Unknown;
 }
 
 bool CTextureCacheJob::DoWork()

@@ -108,6 +108,7 @@ int main(int argc,char** argv) {
   auto* root=PyUnicode_FromString(argv[2]);
   PyDict_SetItemString(PyModule_GetDict(PyImport_AddModule("__main__")),"root",root);Py_DECREF(root);
   const char* script=nullptr;
+  if(mode=="sqlite-advisory")script="import sqlite3\nc=sqlite3.connect(root+'/state.db')\ntry:c.execute('insert into absent values (42)')\nexcept sqlite3.OperationalError:pass\nc.close()\n";
   if(mode=="committed")script="import sqlite3\nc=sqlite3.connect(root+'/state.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\nc.commit()\nc.close()\nf=open(root+'/state.json','w');f.write('saved')\n";
   if(mode=="pending")script="import sqlite3\nc=sqlite3.connect(root+'/state.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\n";
   if(mode=="raw-open")script="import _io\nf=cached_raw_open(root+'/raw.json','w');f.write('saved');f.close()\n";
@@ -125,6 +126,8 @@ int main(int argc,char** argv) {
   if(mode=="nested")script="from pathlib import Path\np=Path(root)/'health'/'sessions'/'session'/'state.json'\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text('saved')\n";
   if(mode=="dirfd-delete")script="import os\nbase=root+'/dirfd'\nos.mkdir(base)\nwith open(base+'/stale.tmp','w') as f: f.write('stale')\nos.mkdir(base+'/empty')\nfd=os.open(base,os.O_RDONLY)\ntry:\n os.remove('stale.tmp',dir_fd=fd)\n os.rmdir('empty',dir_fd=fd)\nfinally:\n os.close(fd)\nassert not os.path.exists(base+'/stale.tmp') and not os.path.exists(base+'/empty')\n";
   if(mode=="readonly-child")script="import subprocess,tempfile\nwith tempfile.TemporaryFile(dir=root) as output:\n subprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=output,stderr=subprocess.PIPE,check=True)\n output.seek(0)\n result=output.read()\nwith open(root+'/diagnostic.txt','wb') as f: f.write(result)\n";
+  if(mode=="atomic-replace")script="import os\nfrom pathlib import Path\np=Path(root)/'weather.json.pending'\nwith open(p,'w') as f:f.write('saved')\nos.replace(p,Path(root)/'weather.json')\n";
+  if(mode=="devnull")script="import subprocess\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True)\n";
   if(mode=="readonly-uname")script="import subprocess\nr=subprocess.run(['uname','-m'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True)\nassert r.stdout\n";
   if(mode=="readonly-child-env")script="import os,subprocess\nenv=dict(os.environ)\nenv['LC_ALL']='C'\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=True)\n";
   if(mode=="readonly-child-bad-env")script="import os,subprocess\nenv=dict(os.environ)\nenv['LC_ALL']='C'\nenv['INFINITY_UNREVIEWED']='1'\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=True)\n";
@@ -178,7 +181,8 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="readonly-child-env" || mode=="readonly-uname" || mode=="system-exit" || mode=="checkpoint-late-system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
+  const bool expected=mode=="sqlite-advisory" || mode=="atomic-replace" || mode=="devnull" || mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="readonly-child-env" || mode=="readonly-uname" || mode=="system-exit" || mode=="checkpoint-late-system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
+  if(mode=="sqlite-advisory"){auto inventory=InfinityScriptPersistence::Snapshot();assert(inventory.advisoryCount==1);assert(inventory.blockers[0].detail=="exception=OperationalError;sqlite_code=1;verb=INSERT");}
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else {
@@ -252,11 +256,11 @@ def main():
         subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pthread',
                         '-I', str(include), '-I', str(args.runtime / 'xbmc'),
                         '-I', str(args.runtime / 'xbmc/interfaces/python'),
-                        str(directory / 'test.cpp'), str(library), '-ldl', '-lm',
+                        str(directory / 'test.cpp'), str(library), '-ldl', '-lm', '-lcrypto',
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'readonly-child-env', 'readonly-uname', 'readonly-child-bad-env', 'system-exit', 'system-exit-pending', 'checkpoint-late-system-exit', 'checkpoint-late-system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
+        for mode in ('sqlite-advisory', 'atomic-replace', 'devnull', 'committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'readonly-child-env', 'readonly-uname', 'readonly-child-bad-env', 'system-exit', 'system-exit-pending', 'checkpoint-late-system-exit', 'checkpoint-late-system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)

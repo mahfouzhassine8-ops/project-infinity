@@ -90,6 +90,7 @@ void CJobWorker::Process()
         checkpointType.find("CRepositoryUpdateJob") != std::string::npos ||
         checkpointType.find("CVideoLibraryScanningJob") != std::string::npos;
     if (CJobManager::IsRequiredCheckpointJob(job) && !job->CheckpointSucceeded(success) &&
+        !job->RequiresCheckpointCompletionReceipt() &&
         !databaseOwnedJob && InfinityAndroidCheckpoint::IsActive())
     {
       const char* operation = job->GetCheckpointOperation();
@@ -497,7 +498,7 @@ void CJobManager::TrackCheckpointJob(CJob* job, IJobCallback* callback, const ch
     const bool unknown = required && (!InfinityAndroidCheckpoint::IsRequiredOwner(owner) ||
         (queueOwner.empty() && role == CJob::CheckpointResponsibility::Unknown));
     job->m_checkpointRecord = JobCheckpoint::Admit(required, unknown, owner,
-        operation, actualType, phase);
+        operation, actualType, phase, job->RequiresCheckpointCompletionReceipt());
   }
 #else
   (void)job; (void)callback; (void)phase; (void)queueOwner;
@@ -683,6 +684,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     CWorkItem item(*i);
     TrackCheckpointPhase(job, "callback", item.m_id);
     lock.unlock();
+    bool callbackSucceeded=true;
     try
     {
       if (item.m_callback)
@@ -690,6 +692,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     }
     catch (...)
     {
+      callbackSucceeded=false;
       CLog::Log(LOGERROR, "{} error processing job {}", __FUNCTION__, item.m_job->GetType());
 #if defined(TARGET_ANDROID)
       if (IsRequiredCheckpointJob(item.m_job) && InfinityAndroidCheckpoint::IsActive())
@@ -703,6 +706,9 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     ++m_checkpointCompletingJobs;
     lock.unlock();
     TrackCheckpointPhase(item.m_job, "destructor", item.m_id);
+    if(item.m_job->RequiresCheckpointCompletionReceipt())
+      JobCheckpoint::Complete(item.m_job->m_checkpointRecord,
+          callbackSucceeded && item.m_job->CheckpointSucceeded(success));
     item.FreeJob();
     lock.lock();
     --m_checkpointCompletingJobs;

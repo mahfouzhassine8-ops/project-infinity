@@ -122,6 +122,7 @@ public:
   virtual const char* GetCheckpointOperation() const { return GetType(); }
   virtual const char* GetCheckpointPersistenceOwner() const { return ""; }
   virtual bool CheckpointSucceeded(bool success) const { return success; }
+  virtual bool RequiresCheckpointCompletionReceipt() const { return false; }
   /*!
    \brief Priority levels for jobs, specified by clients when adding jobs to the CJobManager.
    \sa CJobManager

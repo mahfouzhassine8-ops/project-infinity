@@ -45,7 +45,7 @@ def scenario(name):
             vfs = types.SimpleNamespace(File=NativeFile, translatePath=lambda path: str(path),
                 copy=lambda a,b: True, rename=lambda a,b: True, delete=lambda p: True,
                 mkdir=lambda p: True, mkdirs=mkdirs, rmdir=rmdir)
-        observer = module.Observer(failures.append, lambda path, kind: mutations.append((path, kind)), vfs=vfs)
+        observer = module.Observer(lambda reason, *detail: failures.append(reason), lambda path, kind: mutations.append((path, kind)), vfs=vfs)
         database = root / 'state.db'
         connection = sqlite3.connect(database)
         connection.execute('create table state (value)')

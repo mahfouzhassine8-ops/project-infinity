@@ -467,17 +467,27 @@ bool RequiredJobsDrained()
     std::string detail = "unknown_native_job_persistence_contract";
     for (const auto& job : snapshot.blockers)
       if (job.unknown) detail += ";" + job.type;
-    FailLocked(s, "background_jobs", detail.substr(0, 384));
-    return false;
+    if(s.owners["background_jobs"].error.empty())
+      BlockLocked(s, "background_jobs", detail.substr(0, 384));
   }
+  bool allSettled=snapshot.required==snapshot.blockers.size();
   for (const auto& job : snapshot.blockers)
+  {
+    if(job.phase=="completed_without_owner_receipt" || job.phase=="completed_write_failed") {
+      if(s.owners["background_jobs"].error.empty())
+        BlockLocked(s,"background_jobs",job.phase+":"+job.operation);
+      continue; // Inventory may save independent owners; final authorization stays blocked.
+    }
+    allSettled=false;
+    if(job.unknown)continue;
     if (std::none_of(std::begin(REQUIRED), std::end(REQUIRED),
                      [&](const char* owner) { return job.owner == owner; }))
     {
       FailLocked(s, "background_jobs", "job_mapped_to_unregistered_persistence_owner");
       return false;
     }
-  return snapshot.required == 0;
+  }
+  return snapshot.required == 0 || allSettled;
 }
 bool PvrOwnersAbsent()
 {

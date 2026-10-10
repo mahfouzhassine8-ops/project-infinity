@@ -162,7 +162,24 @@ inline void Touch(int id,const std::string& path,bool present=true,bool director
     if(s.failure.empty()){s.failure="python_writer:file_mutation_without_admitted_writer";s.failureWriterId=id;s.failureDetail=absolute.substr(0,2048);}
     return;
   }
-  s.paths[absolute]={present,directory};
+  // The chooser producer copies existing Weather labels; its staging file
+  // contains no authoritative user state. Accept absence only for this exact
+  // producer and app-private leaf after all interpreters have retired.
+  const auto& admissions=s.writers.at(id).admissions;
+  const std::string suffix="/com.projectinfinity.kodi/files/infinity-chooser-weather/snapshot.json.pending";
+  bool privateWeather=absolute=="/data/data"+suffix;
+  if(absolute.rfind("/data/user/",0)==0) {
+    const auto slash=absolute.find('/',11);
+    if(slash!=std::string::npos && slash>11 &&
+       absolute.substr(11,slash-11).find_first_not_of("0123456789")==std::string::npos &&
+       absolute.substr(slash)==suffix)privateWeather=true;
+  }
+  const bool staging=privateWeather && !directory && admissions.size()==1 && admissions.count(
+      "service.infinity.chooser.weather.snapshot:weather_snapshot.py")!=0;
+  const auto previous=s.paths.find(absolute);
+  // A second, unreviewed writer must never inherit an optional contract.
+  const bool optional=staging && (previous==s.paths.end() || previous->second.optional);
+  s.paths[absolute]={present,directory,optional};
 }
 inline void SQLiteCompanions(int id,const std::string& path)
 {
@@ -296,11 +313,12 @@ inline void CommitWorker(std::map<std::string,Namespace> paths)
     if(failures.size()<128)failures.push_back({reason,detail});
   };
   for(const auto& item:paths) {
+    bool absentOptional=false;
     if(item.second.optional) {
       struct stat info{};
-      if(::lstat(item.first.c_str(),&info)!=0 && errno==ENOENT)continue;
+      absentOptional=::lstat(item.first.c_str(),&info)!=0 && errno==ENOENT;
     }
-    if(item.second.present) {
+    if(item.second.present && !absentOptional) {
       std::string error;
       if(!SyncOne(item.first,item.second.directory,error))
         retainFailure(error,"path="+item.first);

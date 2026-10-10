@@ -58,6 +58,11 @@ public:
   bool operator==(const CJob *job) const override;
   bool DoWork() override;
   bool CheckpointSucceeded(bool success) const override;
+  CheckpointResponsibility GetCheckpointResponsibility(const IJobCallback* callback) const override;
+  const char* GetCheckpointPersistenceOwner() const override { return "native_databases"; }
+  const char* GetCheckpointOperation() const override { return "texture-cache-metadata"; }
+  bool RequiresCheckpointCompletionReceipt() const override { return true; }
+  void SetCheckpointCompletionReceipt(bool ok) { m_checkpointCallbackComplete=ok; }
 
   /*! \brief retrieve a hash for the given image
    Combines the size, ctime and mtime of the image file into a "unique" hash
@@ -78,6 +83,7 @@ private:
    \return a hash string for this image
    */
   bool m_checkpointNoOp{false};
+  bool m_checkpointCallbackComplete{false};
   static std::string GetImageHash(const std::string &url);
 
   /*! \brief Decode an image URL to the underlying image, width, height and orientation

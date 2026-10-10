@@ -33,6 +33,7 @@ inline std::string root;
 inline bool initialized=true, pvrStopped=true, pvrOwners=false, settingsOk=true, profilesOk=true;
 inline bool skinOk=true, addonsOk=true, favouritesOk=true, peripheralsOk=true;
 inline bool playbackOk=true, playbackPending=false, ownLease=true, oldRetired=true, audioOk=true, deferredOk=true;
+inline bool unknownRunning=false,receiptMissing=false;
 inline int residents=1, compatResidents=1, jobs=0, queueJobs=0, unknownJobs=0, optionalJobs=0, freezes=0, saves=0;
 inline std::vector<std::string> foreign;
 inline std::map<std::string,CVariant> parsed;
@@ -81,8 +82,8 @@ class CScriptInvocationManager {public: static CScriptInvocationManager& GetInst
  std::vector<std::string> AndroidCheckpointUnresolvedWriters()const{return Test::foreign;}};
 class CJobQueue {public:static std::size_t AndroidCheckpointOutstandingQueues(){return Test::queueJobs;}};
 class CJobManager {public:void UnPauseJobs(){}; std::size_t AndroidCheckpointOutstandingJobs()const{return Test::jobs;}
- static JobCheckpoint::Snapshot AndroidCheckpointSnapshot(){JobCheckpoint::Snapshot s;s.required=Test::jobs+Test::queueJobs+Test::unknownJobs;s.unknown=Test::unknownJobs;s.nonPersistent=Test::optionalJobs;
- if(s.required){JobCheckpoint::Entry e;e.owner="native_databases";e.type="test-peer-job";e.operation="test-operation";e.unknown=Test::unknownJobs!=0;e.phase=e.unknown?"completed_without_owner_receipt":"callback";s.blockers.push_back(e);}return s;}};
+ static JobCheckpoint::Snapshot AndroidCheckpointSnapshot(){JobCheckpoint::Snapshot s;s.required=Test::jobs+Test::queueJobs+Test::unknownJobs;s.unknown=Test::receiptMissing?0:Test::unknownJobs;s.nonPersistent=Test::optionalJobs;
+ if(s.required){JobCheckpoint::Entry e;e.owner="native_databases";e.type="test-peer-job";e.operation="test-operation";e.unknown=Test::unknownJobs!=0 && !Test::receiptMissing;e.phase=(e.unknown&&!Test::unknownRunning)||Test::receiptMissing?"completed_without_owner_receipt":"callback";s.blockers.push_back(e);}return s;}};
 class CSettings {public:bool Save(){++Test::saves;return Test::settingsOk;}};
 class CProfileManager {public:bool Save(){return Test::profilesOk;}};
 class CSettingsComponent {public:std::shared_ptr<CSettings>GetSettings(){static auto s=std::make_shared<CSettings>();return s;}
@@ -179,14 +180,17 @@ int main(int argc,char**argv){
  if(mode=="audio-fail")Test::audioOk=false;
  if(mode=="deferred-fail")Test::deferredOk=false;
  if(mode=="multi-owner-fail"){Test::skinOk=false;Test::settingsOk=false;Test::profilesOk=false;}
- if(mode=="unknown-job")Test::unknownJobs=1;
+ if(mode=="unknown-job"||mode=="unknown-running"||mode=="receipt-missing")Test::unknownJobs=1;
+ if(mode=="receipt-missing")Test::receiptMissing=true;
+ if(mode=="unknown-running"){Test::unknownRunning=true;Pump(app);assert(!Get().owners["kodi_settings"].complete);assert(!AuthorizeTermination(SESSION,OWNER,getpid()));Test::unknownRunning=false;}
  if(mode=="optional-job")Test::optionalJobs=1;
  if(mode=="generic-save"){const auto path=Test::root+"/provider.json";std::ofstream(path)<<"saved";InfinityScriptPersistence::Touch(123,path);InfinityScriptPersistence::Retired(123);Test::foreign.clear();}
  if(mode=="foreign"){Test::foreign.clear();Get().expires=Clock::now();} // A disappeared thread still has no durability receipt.
  for(int attempt=0;attempt<100 && Get().phase=="QUIESCE";++attempt){Pump(app);std::this_thread::sleep_for(std::chrono::milliseconds(1));}
- if(mode=="settings-fail"||mode=="audio-fail"||mode=="deferred-fail"||mode=="unknown-job"||mode=="foreign"){
+ if(mode=="settings-fail"||mode=="audio-fail"||mode=="deferred-fail"||mode=="unknown-job"||mode=="unknown-running"||mode=="receipt-missing"||mode=="foreign"){
    assert(Get().phase=="CHECKPOINT_FAILED");assert(!AuthorizeTermination(SESSION,OWNER,getpid()));
    const auto status=Status(SESSION,OWNER,getpid());
+   if(mode=="unknown-job"){assert(Get().owners["kodi_settings"].complete);assert(Get().owners["profiles"].complete);assert(Get().owners["native_databases"].complete);}
    assert(status.find("\"blockers\"")!=std::string::npos);
    return 0;
  }
@@ -261,7 +265,7 @@ def main():
                  "malformed-response", "busy", "settings-fail", "foreign", "latewrite", "deadline", "lifecycle",
                  "compat-fail", "compat-malformed", "source-drift", "audio-fail",
                  "startup-cas", "startup-old-live", "startup-own-lost", "startup-malformed",
-                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "optional-job", "generic-save", "generic-late", "multi-owner-fail"]
+                 "pvr-retained", "pvr-late", "own-lease-lost", "deferred-fail", "unknown-job", "unknown-running", "receipt-missing", "optional-job", "generic-save", "generic-late", "multi-owner-fail"]
         for mode in modes:
             output = subprocess.check_output([str(binary), mode, str(temp / mode)], text=True, timeout=10)
             if mode == "fixture" and args.fixture:

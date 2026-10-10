@@ -43,8 +43,20 @@ class Observer:
         self.vfs = vfs
         self.install()
 
-    def error(self, operation):
-        self.fail(operation)
+    def error(self, operation, detail=''):
+        if detail:
+            self.fail(operation, detail)
+        else:
+            self.fail(operation)
+
+    def sqlite_error(self, operation, error, sql=''):
+        # Retain the failure class without SQL values, parameters or credentials.
+        verb = str(sql).lstrip().split(None, 1)[0].upper() if str(sql).strip() else ''
+        if verb not in ('INSERT', 'UPDATE', 'DELETE', 'REPLACE', 'CREATE', 'ALTER', 'DROP', 'PRAGMA', 'BEGIN', 'COMMIT', 'ROLLBACK'):
+            verb = 'OTHER'
+        code = getattr(error, 'sqlite_errorcode', -1)
+        self.error(operation, 'exception=%s;sqlite_code=%s;verb=%s' %
+                   (type(error).__name__, code if isinstance(code, int) else -1, verb))
 
     def patch(self, module, name, replacement):
         original = getattr(module, name)
@@ -180,19 +192,19 @@ class Observer:
             def execute(self, sql, *args, **kwargs):
                 try:
                     return super().execute(sql, *args, **kwargs)
-                except Exception:
-                    if _writes(sql): observer.error('sqlite_write_failed')
+                except Exception as error:
+                    if _writes(sql): observer.sqlite_error('sqlite_write_failed', error, sql)
                     raise
             def executemany(self, sql, *args, **kwargs):
                 try:
                     return super().executemany(sql, *args, **kwargs)
-                except Exception:
-                    if _writes(sql): observer.error('sqlite_write_failed')
+                except Exception as error:
+                    if _writes(sql): observer.sqlite_error('sqlite_write_failed', error, sql)
                     raise
             def executescript(self, sql):
                 try: return super().executescript(sql)
-                except Exception:
-                    observer.error('sqlite_script_failed')
+                except Exception as error:
+                    observer.sqlite_error('sqlite_script_failed', error, sql)
                     raise
 
         class Connection(original_connection):
@@ -222,8 +234,8 @@ class Observer:
             def commit(self):
                 observer.check_live()
                 try: return super().commit()
-                except Exception:
-                    observer.error('sqlite_commit_failed')
+                except Exception as error:
+                    observer.sqlite_error('sqlite_commit_failed', error, 'COMMIT')
                     raise
             def close(self):
                 if self._infinity_closed:
@@ -340,6 +352,7 @@ class Observer:
                     if _name == 'open': self.touch(args[0], 'checked-open-end')
             self.patch(os, name, namespace_op)
             if hasattr(native_os, name): self.patch(native_os, name, namespace_op)
+        self.install_crypto_loads()
         if subprocess is not None:
             self.install_children()
         if self.vfs is not None:
@@ -382,6 +395,21 @@ class Observer:
                         observer.error('vfs_'+_name+'_exception')
                         raise
                 self.patch(self.vfs, name, vfs_op)
+
+    def install_crypto_loads(self):
+        # Resolve only the reviewed bundled crypto names to the APK library
+        # root before dlopen. Native audit independently verifies exact bytes.
+        import ctypes
+        native = importlib.import_module('_ctypes')
+        original = native.dlopen
+        names = ('libCryptodome_Cipher__Salsa20.so', 'libCryptodome_Cipher__chacha20.so', 'libCryptodome_Cipher__raw_aes.so', 'libCryptodome_Cipher__raw_cbc.so', 'libCryptodome_Cipher__raw_cfb.so', 'libCryptodome_Cipher__raw_ctr.so', 'libCryptodome_Cipher__raw_ecb.so', 'libCryptodome_Cipher__raw_ocb.so', 'libCryptodome_Cipher__raw_ofb.so', 'libCryptodome_Hash__BLAKE2s.so', 'libCryptodome_Hash__MD5.so', 'libCryptodome_Hash__SHA1.so', 'libCryptodome_Hash__SHA256.so', 'libCryptodome_Hash__ghash_portable.so', 'libCryptodome_Hash__poly1305.so', 'libCryptodome_Protocol__scrypt.so', 'libCryptodome_Util__cpuid_c.so', 'libCryptodome_Util__strxor.so')
+        def loaded(name, *args, **kwargs):
+            root = os.environ.get('KODI_ANDROID_LIBS', '')
+            if name in names and root.startswith('/'):
+                name = os.path.join(os.path.realpath(root), name)
+            return original(name, *args, **kwargs)
+        self.patch(native, 'dlopen', loaded)
+        self.patch(ctypes, '_dlopen', loaded)
 
     def install_children(self):
         observer = self
@@ -467,8 +495,9 @@ class Observer:
                         output = kwargs.get(name)
                         if isinstance(output, File): observer.touch(output.fileno(), 'write')
                         elif output is None: observer.touch(fallback, 'write')
-                        elif output not in (subprocess.PIPE, subprocess.STDOUT):
-                            observer.error('unobserved_diagnostic_child_output')
+                        elif output not in (subprocess.PIPE, subprocess.STDOUT, subprocess.DEVNULL):
+                            observer.error('unobserved_diagnostic_child_output',
+                                           'stream=%s;type=%s' % (name, type(output).__name__))
                     observer.touch(None, 'readonly-child-begin')
                     observer.child_scope.readonly = True
                 try:

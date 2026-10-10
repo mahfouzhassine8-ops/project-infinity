@@ -1,0 +1,329 @@
+{
+  "apk_parent": 2103361,
+  "reviewed_source": "Legrandin/pycryptodome@d8edf1a6a70d3a65dcda18ee24d96161525f2825 (v3.12.0)",
+  "libraries": [
+    {
+      "library": "libCryptodome_Cipher__Salsa20.so",
+      "sha256": "a6b27534731b443931a50bc081fe89c9bfa3644c0810b26062a79ad11fe66173",
+      "symbols": [
+        "Salsa20_8_core",
+        "Salsa20_stream_destroy",
+        "Salsa20_stream_encrypt",
+        "Salsa20_stream_init"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__chacha20.so",
+      "sha256": "573bc77521e4c75cda9818b686987af221e9c1738268d88f97218c2c0206148f",
+      "symbols": [
+        "chacha20_destroy",
+        "chacha20_encrypt",
+        "chacha20_init",
+        "chacha20_seek",
+        "hchacha20"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_aes.so",
+      "sha256": "49dccf26bf84844090778e0d5980ede18f2fdb99c7f28ed57807d50413473aaf",
+      "symbols": [
+        "AES_start_operation",
+        "AES_stop_operation"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "calloc",
+        "free"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_cbc.so",
+      "sha256": "069a680c2643c5a05a77a20cb043070e550d344a268e767ea38b36c2cfd04848",
+      "symbols": [
+        "CBC_decrypt",
+        "CBC_encrypt",
+        "CBC_start_operation",
+        "CBC_stop_operation"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_cfb.so",
+      "sha256": "fb3ab550f9a22f5a043678786f40eb52cffbd306485fe38be17a8ed1c6214f0b",
+      "symbols": [
+        "CFB_decrypt",
+        "CFB_encrypt",
+        "CFB_start_operation",
+        "CFB_stop_operation"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "calloc",
+        "free",
+        "memcpy",
+        "memmove"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_ctr.so",
+      "sha256": "a08cf702e9341789861d259dd30c4bd3dae3629fabf9de24eb6553681fb1e448",
+      "symbols": [
+        "CTR_decrypt",
+        "CTR_encrypt",
+        "CTR_start_operation",
+        "CTR_stop_operation"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "posix_memalign"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_ecb.so",
+      "sha256": "5dcc7bddf9cf7db3b3605a90b390cea3ae6afbda1ddd9209fbabdef21a54f811",
+      "symbols": [
+        "ECB_decrypt",
+        "ECB_encrypt",
+        "ECB_start_operation",
+        "ECB_stop_operation"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_ocb.so",
+      "sha256": "966cd086b785d05ce397d733fee8a46e710ff22ece6a6dbda146b69f7a602a1d",
+      "symbols": [
+        "OCB_decrypt",
+        "OCB_digest",
+        "OCB_encrypt",
+        "OCB_start_operation",
+        "OCB_stop_operation",
+        "OCB_transcrypt",
+        "OCB_update"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Cipher__raw_ofb.so",
+      "sha256": "77de679c6932e4ff59db0c58300d7b750fedd0e38d12e9f668988afa5a630869",
+      "symbols": [
+        "OFB_decrypt",
+        "OFB_encrypt",
+        "OFB_start_operation",
+        "OFB_stop_operation"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy"
+      ]
+    },
+    {
+      "library": "libCryptodome_Hash__BLAKE2s.so",
+      "sha256": "ae590e31568b2706725f7006b583dc593d4c4e6b438f2e56aa01825c1e16c1c2",
+      "symbols": [
+        "blake2s_copy",
+        "blake2s_destroy",
+        "blake2s_digest",
+        "blake2s_init",
+        "blake2s_update"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Hash__MD5.so",
+      "sha256": "5ba9f38a40d6f920cb5a2835c4150adaa9f975ba585cc0d086d4b0288144907c",
+      "symbols": [
+        "MD5_copy",
+        "MD5_destroy",
+        "MD5_digest",
+        "MD5_init",
+        "MD5_pbkdf2_hmac_assist",
+        "MD5_update"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Hash__SHA1.so",
+      "sha256": "61e8ba022e1ecb79fc8b64a4e60ec67acde9c3b1486c2f839f662e9a6fcd3392",
+      "symbols": [
+        "SHA1_copy",
+        "SHA1_destroy",
+        "SHA1_digest",
+        "SHA1_init",
+        "SHA1_pbkdf2_hmac_assist",
+        "SHA1_update"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Hash__SHA256.so",
+      "sha256": "77aea79e5c4db591467e12b6bffe0fd4c237af3e764404b9db02506d722af434",
+      "symbols": [
+        "SHA256_copy",
+        "SHA256_destroy",
+        "SHA256_digest",
+        "SHA256_init",
+        "SHA256_pbkdf2_hmac_assist",
+        "SHA256_update"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Hash__ghash_portable.so",
+      "sha256": "37acc302aff53118835c1b262a159c7d4b6cdb2705b7dc098b8eee4984c29010",
+      "symbols": [
+        "ghash_destroy_portable",
+        "ghash_expand_portable",
+        "ghash_portable"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Hash__poly1305.so",
+      "sha256": "7716c738b5ab8f3548087d78a77232051b78831061ac04797986dda93f5fdd73",
+      "symbols": [
+        "poly1305_destroy",
+        "poly1305_digest",
+        "poly1305_init",
+        "poly1305_update"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "__stack_chk_fail",
+        "calloc",
+        "free",
+        "memcpy",
+        "memset"
+      ]
+    },
+    {
+      "library": "libCryptodome_Protocol__scrypt.so",
+      "sha256": "c695b6a659cf06f9ea03705616663a84ea4a380eefe67d5130dad7198ce1137a",
+      "symbols": [
+        "scryptROMix"
+      ],
+      "imports": [
+        "__assert2",
+        "__cxa_atexit",
+        "__cxa_finalize",
+        "calloc",
+        "free",
+        "memcpy"
+      ]
+    },
+    {
+      "library": "libCryptodome_Util__cpuid_c.so",
+      "sha256": "d7a81665ef377989555c89ddc8c3d3b8cce13dfa0255bc6b228964847d11e40d",
+      "symbols": [
+        "have_aes_ni",
+        "have_clmul"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize"
+      ]
+    },
+    {
+      "library": "libCryptodome_Util__strxor.so",
+      "sha256": "c368ec648f91889d2d4032b401c0ac83cb530dd103291453b572a4b7395540eb",
+      "symbols": [
+        "strxor",
+        "strxor_c"
+      ],
+      "imports": [
+        "__cxa_atexit",
+        "__cxa_finalize"
+      ]
+    }
+  ]
+}

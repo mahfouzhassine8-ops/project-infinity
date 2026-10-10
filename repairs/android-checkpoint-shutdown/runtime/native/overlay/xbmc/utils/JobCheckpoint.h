@@ -20,6 +20,7 @@ struct CJobCheckpointRecord
   std::string type;
   std::string phase;
   bool retained{false};
+  bool receiptRequired{false};
   std::chrono::steady_clock::time_point admitted;
 };
 
@@ -50,6 +51,8 @@ struct Registry
   uint64_t next{0};
   std::vector<std::weak_ptr<CJobCheckpointRecord>> jobs;
   std::map<std::string, std::shared_ptr<CJobCheckpointRecord>> unresolved;
+  std::map<uint64_t, std::shared_ptr<CJobCheckpointRecord>> pendingReceipts;
+  bool receiptOverflow{false};
 };
 inline Registry& Get()
 {
@@ -57,7 +60,7 @@ inline Registry& Get()
   return *registry;
 }
 inline std::shared_ptr<CJobCheckpointRecord> Admit(bool required, bool unknown, std::string owner, std::string operation,
-                                                   std::string type, const char* phase)
+                                                   std::string type, const char* phase, bool receiptRequired=false)
 {
   auto& registry = Get();
   std::lock_guard<std::mutex> lock(registry.mutex);
@@ -69,6 +72,7 @@ inline std::shared_ptr<CJobCheckpointRecord> Admit(bool required, bool unknown, 
   job->operation = operation.empty() ? "unclassified_native_job" : operation.substr(0, 96);
   job->type = type.substr(0, 128);
   job->phase = phase;
+  job->receiptRequired=receiptRequired && !unknown;
   job->admitted = std::chrono::steady_clock::now();
   if ((registry.next % 64) == 0)
     registry.jobs.erase(std::remove_if(registry.jobs.begin(), registry.jobs.end(),
@@ -78,6 +82,11 @@ inline std::shared_ptr<CJobCheckpointRecord> Admit(bool required, bool unknown, 
   // frequently repeated anonymous task must not grow history per invocation.
   if (unknown && registry.unresolved.size() < 512)
     job->retained = registry.unresolved.emplace(job->type + "\n" + job->operation, job).second;
+  if(job->receiptRequired) {
+    if(registry.pendingReceipts.size()<4096) {
+      registry.pendingReceipts.emplace(job->token,job);job->retained=true;
+    } else registry.receiptOverflow=true; // A bounded ledger must fail closed.
+  }
   return job;
 }
 inline void Phase(const std::shared_ptr<CJobCheckpointRecord>& job, const char* phase,
@@ -87,6 +96,19 @@ inline void Phase(const std::shared_ptr<CJobCheckpointRecord>& job, const char* 
   std::lock_guard<std::mutex> lock(Get().mutex);
   job->phase = phase;
   if (jobId) job->jobId = jobId;
+}
+inline void Complete(const std::shared_ptr<CJobCheckpointRecord>& job, bool success)
+{
+  if(!job || job->unknown)return; // Unknown work still requires its own reviewed contract.
+  auto& registry=Get();std::lock_guard<std::mutex> lock(registry.mutex);
+  job->phase=success?"completion_receipt_verified":"completed_write_failed";
+  registry.pendingReceipts.erase(job->token);
+  job->retained=false;
+  if(!success) {
+    // Keep semantic write/callback failure even if it occurred before Close.
+    job->retained=true;
+    registry.unresolved[job->type+"\n"+job->operation]=job;
+  }
 }
 inline Snapshot GetSnapshot()
 {
@@ -104,8 +126,13 @@ inline Snapshot GetSnapshot()
     ++result.required;
     if (result.blockers.size() < 32)
       result.blockers.push_back({job->token, job->jobId, job->required, job->unknown, job->owner, job->operation,
-        job->type, job->unknown && job->retained && job.use_count() == 2 ? "completed_without_owner_receipt" : job->phase,
+        job->type, job->retained && job.use_count() == 2 && job->phase!="completed_write_failed" ? "completed_without_owner_receipt" : job->phase,
         std::chrono::duration_cast<std::chrono::milliseconds>(now - job->admitted).count()});
+  }
+  if(registry.receiptOverflow) {
+    ++result.required;++result.unknown;
+    if(result.blockers.size()<32)result.blockers.push_back({0,0,true,true,"background_jobs",
+        "completion_receipt_inventory_limit","JobCheckpoint","completed_write_failed",0});
   }
   return result;
 }

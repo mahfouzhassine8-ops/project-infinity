@@ -47,6 +47,7 @@ public:
   }
   const char* GetCheckpointPersistenceOwner() const override { return m_owner.c_str(); }
   const char* GetCheckpointOperation() const override { return m_operation.c_str(); }
+  bool RequiresCheckpointCompletionReceipt() const override { return !m_owner.empty(); }
   bool DoWork() override
   {
     m_f();

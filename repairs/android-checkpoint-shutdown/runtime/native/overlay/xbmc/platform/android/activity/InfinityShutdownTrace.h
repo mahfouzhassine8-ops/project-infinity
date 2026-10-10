@@ -19,7 +19,7 @@
 namespace InfinityShutdownTrace
 {
 constexpr unsigned MAX_EVENTS = 8192;
-constexpr const char* ENGINE_TAG = "infinity-checkpoint-python-retirement-batch-2103352-v1";
+constexpr const char* ENGINE_TAG = "infinity-checkpoint-shutdown-contracts-2103362-v1";
 inline char path[1024]{};
 inline std::atomic<bool> configured{false};
 inline std::atomic<bool> begun{false};

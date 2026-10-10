@@ -36,17 +36,17 @@ int main(){
  Test::active=true;assert(job.DoWork());assert(Test::opens==0&&Test::commits==0&&Test::scopes==0);
  Test::active=false;assert(job.DoWork());assert(Test::opens==1&&Test::commits==1&&Test::scopes==0);
  CTextureCacheJob image("image");
- Test::cached=true;assert(!image.DoWork());assert(image.CheckpointSucceeded(false));
+ Test::cached=true;assert(!image.DoWork());assert(!image.CheckpointSucceeded(false));image.SetCheckpointCompletionReceipt(true);assert(image.CheckpointSucceeded(false));
  Test::cached=false;Test::already=true;assert(!image.DoWork());assert(image.CheckpointSucceeded(false));
- Test::already=false;Test::cacheOk=false;assert(!image.DoWork());assert(!image.CheckpointSucceeded(false));
+ Test::already=false;Test::cacheOk=false;assert(!image.DoWork());image.SetCheckpointCompletionReceipt(false);assert(!image.CheckpointSucceeded(false));
  Test::cancel=true;assert(!image.DoWork());assert(!image.CheckpointSucceeded(false));
- Test::cancel=false;Test::cacheOk=true;assert(image.DoWork());assert(image.CheckpointSucceeded(true));
- assert(image.GetCheckpointResponsibility(&cache)==R::Unknown);
+ Test::cancel=false;Test::cacheOk=true;assert(image.DoWork());assert(!image.CheckpointSucceeded(true));image.SetCheckpointCompletionReceipt(true);assert(image.CheckpointSucceeded(true));
+ assert(image.GetCheckpointResponsibility(&cache)==R::Required);assert(image.GetCheckpointResponsibility(&other)==R::Unknown);assert(image.GetCheckpointResponsibility(&derivedCache)==R::Unknown);assert(image.GetCheckpointResponsibility(nullptr)==R::Unknown);
 }
 '''
 def main():
  p=argparse.ArgumentParser();p.add_argument('--runtime',type=Path,required=True);a=p.parse_args();root=a.runtime/'xbmc'
- source=(root/'TextureCacheJob.cpp').read_text();markers=['CTextureCacheJob::CTextureCacheJob(', 'bool CTextureCacheJob::operator==(', 'bool CTextureCacheJob::CheckpointSucceeded(', 'bool CTextureCacheJob::DoWork()', 'CTextureUseCountJob::CTextureUseCountJob(', 'bool CTextureUseCountJob::operator==(', 'CJob::CheckpointResponsibility CTextureUseCountJob::GetCheckpointResponsibility(', 'bool CTextureUseCountJob::DoWork()']
+ source=(root/'TextureCacheJob.cpp').read_text();markers=['CTextureCacheJob::CTextureCacheJob(', 'bool CTextureCacheJob::operator==(', 'bool CTextureCacheJob::CheckpointSucceeded(', 'CJob::CheckpointResponsibility CTextureCacheJob::GetCheckpointResponsibility(', 'bool CTextureCacheJob::DoWork()', 'CTextureUseCountJob::CTextureUseCountJob(', 'bool CTextureUseCountJob::operator==(', 'CJob::CheckpointResponsibility CTextureUseCountJob::GetCheckpointResponsibility(', 'bool CTextureUseCountJob::DoWork()']
  methods=[function(source,m) for m in markers]
  with tempfile.TemporaryDirectory(prefix='texture-job-checkpoint-') as temp:
   temp=Path(temp)

@@ -1,0 +1,142 @@
+{
+  "scope": "Host/source tests; not physical-device acceptance",
+  "physical_device_verified": false,
+  "all_passed": true,
+  "suites": [
+    {
+      "suite": "foundation",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/foundation.log"
+    },
+    {
+      "suite": "python-observer",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/python-observer.log"
+    },
+    {
+      "suite": "python-native",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/python-native.log"
+    },
+    {
+      "suite": "python-inventory",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/python-inventory.log"
+    },
+    {
+      "suite": "crypto-pins",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/crypto-pins.log"
+    },
+    {
+      "suite": "weather-staging",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/weather-staging.log"
+    },
+    {
+      "suite": "job-ledger",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/job-ledger.log"
+    },
+    {
+      "suite": "job-manager",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/job-manager.log"
+    },
+    {
+      "suite": "job-callbacks",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/job-callbacks.log"
+    },
+    {
+      "suite": "texture-contract",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/texture-contract.log"
+    },
+    {
+      "suite": "coordinator",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/coordinator.log"
+    },
+    {
+      "suite": "native-database",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/native-database.log"
+    },
+    {
+      "suite": "settings",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/settings.log"
+    },
+    {
+      "suite": "pending-gui",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/pending-gui.log"
+    },
+    {
+      "suite": "files",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/files.log"
+    },
+    {
+      "suite": "dirty-owners",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/dirty-owners.log"
+    },
+    {
+      "suite": "deferred",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/deferred.log"
+    },
+    {
+      "suite": "engine-identity",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/engine-identity.log"
+    },
+    {
+      "suite": "packaging",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/packaging.log"
+    },
+    {
+      "suite": "health",
+      "passed": true,
+      "exit_code": 0,
+      "log": "evidence/targeted/health.log"
+    },
+    {
+      "suite": "resume-hub",
+      "passed": true,
+      "tests": 14
+    },
+    {
+      "suite": "host-relaunch",
+      "passed": true,
+      "cycles": 500,
+      "physical_device_verified": false
+    },
+    {
+      "suite": "baseline-apk-identity-and-negative-drift",
+      "passed": true
+    }
+  ]
+}

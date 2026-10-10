@@ -7,11 +7,12 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103361
-RELEASE = '1.0.9-Runtime-Probe-Retirement-RC1'
-FILE_LABEL = 'Runtime-Probe-Retirement-RC1'
+VERSION = 2103362
+RELEASE = '1.0.9-Shutdown-Contracts-RC1'
+FILE_LABEL = 'Shutdown-Contracts-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
+PINNED_CRYPTO_NATIVE = {'lib/arm64-v8a/'+x['library']:x['sha256'] for x in json.loads((RUNTIME/'CRYPTO-2103362-AUDIT.json').read_text())['libraries']}
 PINNED_PIL_NATIVE = {
     'lib/arm64-v8a/lib_imaging.so': '28a55b715475872f510396cdc4bc089de1344e98054ded16ef3c501f2ad86c79',
     'lib/arm64-v8a/lib_imagingft.so': 'd27a82cbe5d5e08404c9ef6a1b39fb3c697474e460ccd21c0874e95ead0bd6f4',
@@ -122,7 +123,7 @@ def finish(args):
         require(sha(base.read('lib/arm64-v8a/libinfinityambient.so')) ==
                 'a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684',
                 'APK ambient image differs from reviewed memory-only contract')
-        for name, expected in PINNED_PIL_NATIVE.items():
+        for name, expected in (PINNED_PIL_NATIVE | PINNED_CRYPTO_NATIVE).items():
             require(sha(base.read(name)) == expected,
                     'APK Pillow native image differs from reviewed non-persistent import contract: '+name)
     runtime_delta.verify(args.source, json.loads((RUNTIME/'runtime/android/manifest.json').read_text())['after'])
@@ -155,7 +156,7 @@ def finish(args):
         require(b.testzip() is None, 'Final APK integrity failure')
         for n in kept: require(a.read(n)==b.read(n),'Protected entry changed: '+n)
         for n,h in replacements.items(): require(sha(b.read(n))==h,'Final asset changed: '+n)
-        for n,h in PINNED_PIL_NATIVE.items():
+        for n,h in (PINNED_PIL_NATIVE | PINNED_CRYPTO_NATIVE).items():
             require(sha(a.read(n))==h and sha(b.read(n))==h,
                     'Pinned Pillow native image changed in final APK: '+n)
         require(b.read(ENGINE)==native.read_bytes(), 'Packaged native mismatch')
