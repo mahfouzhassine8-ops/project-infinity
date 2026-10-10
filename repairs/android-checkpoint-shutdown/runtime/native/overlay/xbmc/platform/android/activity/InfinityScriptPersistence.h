@@ -289,37 +289,53 @@ inline bool SyncOne(const std::string& path, bool directory, std::string& error)
 }
 inline void CommitWorker(std::map<std::string,Namespace> paths)
 {
-  std::string error;std::set<std::string> directories;
+  struct SyncFailure { std::string reason; std::string detail; };
+  std::vector<SyncFailure> failures;
+  std::set<std::string> directories;
+  const auto retainFailure=[&](const std::string& reason,const std::string& detail) {
+    if(failures.size()<128)failures.push_back({reason,detail});
+  };
   for(const auto& item:paths) {
     if(item.second.optional) {
       struct stat info{};
       if(::lstat(item.first.c_str(),&info)!=0 && errno==ENOENT)continue;
     }
-    if(item.second.present && !SyncOne(item.first,item.second.directory,error))break;
+    if(item.second.present) {
+      std::string error;
+      if(!SyncOne(item.first,item.second.directory,error))
+        retainFailure(error,"path="+item.first);
+    }
     auto parent=item.first.substr(0,item.first.rfind('/'));if(parent.empty())parent="/";
+    bool parentConfirmed=true;
     // Persist every changed namespace parent. New nested directories themselves
     // have separate mkdir audit entries, including their own parents.
     while(parent!="/") {
       struct stat info{};
       if(::lstat(parent.c_str(),&info)==0)break;
       const auto known=paths.find(parent);
-      if(errno!=ENOENT || known==paths.end() || known->second.present)
-      {error="script_namespace_parent_unconfirmed";break;}
+      if(errno!=ENOENT || known==paths.end() || known->second.present) {
+        retainFailure("script_namespace_parent_unconfirmed",
+                      "path="+item.first+";parent="+parent);
+        parentConfirmed=false;
+        break;
+      }
       parent=parent.substr(0,parent.rfind('/'));if(parent.empty())parent="/";
     }
-    if(!error.empty())break;
-    directories.insert(parent);
+    if(parentConfirmed)directories.insert(parent);
   }
-  if(error.empty())for(const auto& directory:directories)
-    if(!SyncOne(directory,true,error))break;
+  for(const auto& directory:directories) {
+    std::string error;
+    if(!SyncOne(directory,true,error))
+      retainFailure(error,"path="+directory+";directory=1");
+  }
   auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
-  if(!error.empty()) {
-    AddBlockerLocked(s,-1,"python_services",error,{});
-    if(s.failure.empty()) {
-      s.failure=error;s.failureWriterId=-1;s.failureWriter="python_services";s.failureDetail.clear();
-    }
+  for(const auto& failure:failures)
+    AddBlockerLocked(s,-1,"python_services",failure.reason,failure.detail);
+  if(!failures.empty() && s.failure.empty()) {
+    s.failure=failures.front().reason;s.failureWriterId=-1;s.failureWriter="python_services";
+    s.failureDetail=failures.front().detail.substr(0,2048);
   }
-  s.committed=error.empty();s.commitFinished=true;
+  s.committed=failures.empty();s.commitFinished=true;
 }
 inline bool PollInventory()
 {
