@@ -39,6 +39,7 @@ public:
   // host tests only; production callers use the timed policy.
   void PumpAndroidCheckpointRetirement(bool force = false);
   std::size_t AndroidCheckpointEscalationsActive() const;
+  bool AndroidCheckpointWasEscalated(int scriptId) const;
   std::size_t AndroidCheckpointForeignScripts() const;
   std::size_t AndroidCheckpointResidentCount() const;
   std::size_t AndroidCheckpointCompatCount() const;
