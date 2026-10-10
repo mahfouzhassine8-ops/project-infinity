@@ -36,6 +36,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <set>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -50,12 +51,14 @@ struct Record
   unsigned failures{0};
   bool quarantined{false};
   std::string reason;
+  std::string signature;
 };
 struct Registry
 {
   std::mutex mutex;
   bool loaded{false};
   std::map<std::string, Record> records;
+  std::set<std::string> probation;
 };
 Registry& Get()
 {
@@ -86,6 +89,55 @@ std::string Path()
   return CSpecialProtocol::TranslatePath(
       "special://profile/addon_data/script.infinity.commandcenter/.android-checkpoint/addon-quarantine.tsv");
 }
+
+std::string ProbeRequestPath()
+{
+  return CSpecialProtocol::TranslatePath(
+      "special://profile/addon_data/script.infinity.commandcenter/.android-checkpoint/addon-probation.request");
+}
+std::string ServiceSignature(const std::string& script)
+{
+  const std::string path = CSpecialProtocol::TranslatePath(script);
+  struct stat info{};
+  if (path.empty() || ::lstat(path.c_str(), &info) != 0 || !S_ISREG(info.st_mode) || S_ISLNK(info.st_mode))
+    return {};
+  return std::to_string(static_cast<long long>(info.st_size)) + ":" +
+         std::to_string(static_cast<long long>(info.st_mtime));
+}
+bool ConsumeProbeRequest(const std::string& addon)
+{
+  const std::string path = ProbeRequestPath();
+  const int fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+  if (fd < 0)
+    return false;
+  struct stat info{};
+  bool ok = ::fstat(fd, &info) == 0 && S_ISREG(info.st_mode) && info.st_size > 0 && info.st_size <= 256;
+  std::string value;
+  if (ok)
+  {
+    value.resize(static_cast<size_t>(info.st_size));
+    size_t offset = 0;
+    while (offset < value.size())
+    {
+      ssize_t count = ::read(fd, &value[offset], value.size() - offset);
+      if (count < 0 && errno == EINTR) continue;
+      if (count <= 0) { ok = false; break; }
+      offset += static_cast<size_t>(count);
+    }
+  }
+  ::close(fd);
+  while (!value.empty() && (value.back() == '\n' || value.back() == '\r'))
+    value.pop_back();
+  if (!ok || value != addon)
+    return false;
+  if (::unlink(path.c_str()) != 0)
+    return false;
+  const auto slash = path.rfind('/');
+  const std::string parent = slash == std::string::npos ? "." : path.substr(0, slash);
+  const int dir = ::open(parent.c_str(), O_RDONLY | O_CLOEXEC | O_DIRECTORY);
+  if (dir >= 0) { ::fsync(dir); ::close(dir); }
+  return true;
+}
 void PersistLocked(const Registry& registry)
 {
   std::string bytes = "infinity-addon-quarantine-v1\n";
@@ -95,7 +147,8 @@ void PersistLocked(const Registry& registry)
       continue;
     bytes += entry.first + "\t" + std::to_string(entry.second.failures) + "\t" +
              (entry.second.quarantined ? "1" : "0") + "\t" +
-             entry.second.reason.substr(0, 96) + "\n";
+             entry.second.reason.substr(0, 96) + "\t" +
+             entry.second.signature.substr(0, 96) + "\n";
   }
   const auto result = infinity::checkpoint::files::SaveDirty(Path(), bytes);
   if (!result.ok)
@@ -160,7 +213,11 @@ void LoadLocked(Registry& registry)
             Record record;
             record.failures = failures;
             record.quarantined = quarantine == "1";
-            record.reason = line.substr(third + 1, 96);
+            const auto fourth = line.find('\t', third + 1);
+            record.reason = line.substr(third + 1, fourth == std::string::npos ? 96 :
+                                        std::min<std::size_t>(96, fourth - third - 1));
+            if (fourth != std::string::npos)
+              record.signature = line.substr(fourth + 1, 96);
             registry.records[addon] = std::move(record);
           }
         }
@@ -174,7 +231,7 @@ void LoadLocked(Registry& registry)
   // service; keep the shared module installed for dependencies that import it.
   if (registry.records.find("script.module.slyguy") == registry.records.end())
   {
-    registry.records["script.module.slyguy"] = {2u, true, "seeded_fold_startup_error"};
+    registry.records["script.module.slyguy"] = {2u, true, "seeded_fold_startup_error", {}};
     PersistLocked(registry);
   }
 }
@@ -185,8 +242,40 @@ bool ShouldSuppress(const std::string& addon, const std::string& script)
   auto& registry = Get();
   std::lock_guard<std::mutex> lock(registry.mutex);
   LoadLocked(registry);
-  const auto found = registry.records.find(addon);
-  return found != registry.records.end() && found->second.quarantined;
+  auto found = registry.records.find(addon);
+  if (found == registry.records.end() || !found->second.quarantined)
+    return false;
+  if (registry.probation.count(addon))
+    return false;
+
+  const std::string signature = ServiceSignature(script);
+  bool changed = false;
+  if (found->second.signature.empty() && !signature.empty())
+  {
+    found->second.signature = signature;
+    changed = true;
+  }
+  const bool codeChanged = !signature.empty() && !found->second.signature.empty() &&
+                           signature != found->second.signature;
+  const bool requested = ConsumeProbeRequest(addon);
+  if (requested || codeChanged)
+  {
+    registry.probation.insert(addon);
+    CLog::Log(LOGINFO, "Infinity quarantine: probation granted for {} ({})", addon,
+              requested ? "Health Center request" : "service code changed");
+    return false;
+  }
+  if (changed)
+    PersistLocked(registry);
+  return true;
+}
+bool SuppressErrorToast(const std::string& addon, const std::string& script)
+{
+  if (!ServiceScript(script))
+    return false;
+  auto& registry = Get();
+  std::lock_guard<std::mutex> lock(registry.mutex);
+  return registry.probation.count(addon) != 0;
 }
 void RecordCleanFailure(const std::string& addon, const std::string& script)
 {
@@ -197,13 +286,25 @@ void RecordCleanFailure(const std::string& addon, const std::string& script)
   LoadLocked(registry);
   auto& record = registry.records[addon];
   if (record.quarantined)
+  {
+    if (registry.probation.erase(addon) != 0)
+    {
+      if (record.failures < UINT_MAX) ++record.failures;
+      record.reason = "probation_runtime_failure";
+      record.signature = ServiceSignature(script);
+      PersistLocked(registry);
+    }
     return;
+  }
   if (record.failures < UINT_MAX)
     ++record.failures;
   record.reason = record.failures >= 2 ? "repeated_clean_uncaught_service_failure" :
                                         "clean_uncaught_service_failure_candidate";
   if (record.failures >= 2)
+  {
     record.quarantined = true;
+    record.signature = ServiceSignature(script);
+  }
   PersistLocked(registry);
 }
 void RecordCleanSuccess(const std::string& addon, const std::string& script)
@@ -214,11 +315,20 @@ void RecordCleanSuccess(const std::string& addon, const std::string& script)
   std::lock_guard<std::mutex> lock(registry.mutex);
   LoadLocked(registry);
   const auto found = registry.records.find(addon);
-  if (found != registry.records.end() && !found->second.quarantined)
+  if (found == registry.records.end())
+    return;
+  if (found->second.quarantined)
   {
-    registry.records.erase(found); // consecutive-failure policy
-    PersistLocked(registry);
+    if (registry.probation.erase(addon) != 0)
+    {
+      registry.records.erase(found); // Runtime + persistence both passed probation.
+      PersistLocked(registry);
+      CLog::Log(LOGINFO, "Infinity quarantine: {} restored after clean probation", addon);
+    }
+    return;
   }
+  registry.records.erase(found); // consecutive-failure policy
+  PersistLocked(registry);
 }
 } // namespace InfinityAddonQuarantine
 #endif
@@ -381,6 +491,16 @@ std::vector<std::string> CScriptInvocationManager::AndroidCheckpointUnresolvedWr
       break;
   }
   return result;
+}
+bool CScriptInvocationManager::AndroidQuarantineSuppressErrorToast(
+    const std::string& addonId, const std::string& script)
+{
+#if defined(TARGET_ANDROID)
+  return InfinityAddonQuarantine::SuppressErrorToast(addonId, script);
+#else
+  (void)addonId; (void)script;
+  return false;
+#endif
 }
 
 void CScriptInvocationManager::Uninitialize()
