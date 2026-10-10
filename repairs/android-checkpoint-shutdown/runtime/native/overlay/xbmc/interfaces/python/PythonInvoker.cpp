@@ -698,10 +698,15 @@ void CPythonInvoker::onExecutionDone()
       if (PyErr_Occurred())
         InfinityScriptPersistence::Fail(GetId(), "python_cleanup_failed_before_save_retirement");
       PyErr_Clear();
+      const bool checkpointEscalated =
+          CScriptInvocationManager::GetInstance().AndroidCheckpointWasEscalated(GetId());
       InfinityPythonPersistence::Finish(
-        static_cast<InfinityPythonPersistence::Context*>(m_infinityPersistenceObserver), m_threadState);
+        static_cast<InfinityPythonPersistence::Context*>(m_infinityPersistenceObserver),
+        m_threadState, checkpointEscalated);
       if (PyErr_Occurred())
-        InfinityScriptPersistence::Fail(GetId(), "python_observer_retirement_failed");
+        InfinityScriptPersistence::Fail(GetId(), "python_observer_retirement_failed",
+                                       checkpointEscalated ?
+                                           "checkpoint_escalated_observer_exception" : "");
       PyErr_Clear();
       // Do not destroy an interpreter that still owns an uncommitted transaction
       // or an unflushed buffer. The coordinator fails with a specific save reason;
@@ -719,7 +724,7 @@ void CPythonInvoker::onExecutionDone()
         lock.lock();
         if (persistence->waitingWorkers)
         {
-          InfinityPythonPersistence::Finish(persistence, m_threadState);
+          InfinityPythonPersistence::Finish(persistence, m_threadState, checkpointEscalated);
           if (PyErr_Occurred())
           {
             InfinityScriptPersistence::Fail(GetId(), "python_worker_retirement_finalization_failed");
