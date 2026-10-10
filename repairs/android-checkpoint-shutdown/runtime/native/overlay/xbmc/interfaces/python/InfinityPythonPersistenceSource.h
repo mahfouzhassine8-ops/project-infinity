@@ -228,11 +228,24 @@ class Observer:
                     observer.error('sqlite_commit_failed')
                     raise
             def close(self):
-                if not self._infinity_closed and self.in_transaction:
+                if self._infinity_closed:
+                    return
+                try:
+                    pending = self.in_transaction
+                except sqlite3.ProgrammingError:
+                    # A cached/original sqlite close may have already closed the
+                    # native connection. Treat that as retired, not a failed save.
+                    self._infinity_closed = True
+                    return
+                if pending:
                     observer.held_connections.add(self)
                     observer.error('sqlite_closed_with_pending_transaction')
                     raise sqlite3.ProgrammingError('Pending transaction requires explicit commit or rollback')
                 try: return super().close()
+                except sqlite3.ProgrammingError:
+                    # Another valid owner may have closed the native handle
+                    # through a cached base-class method between inspection and close.
+                    return
                 except Exception:
                     observer.error('sqlite_close_failed')
                     raise
@@ -353,10 +366,17 @@ class Observer:
                     observer.check_live()
                     try:
                         result = _original(*args, **kwargs)
-                        if result is not True:
+                        translated = self.vfs.translatePath(args[_target])
+                        confirmed = result is True
+                        if not confirmed and _name in ('mkdir', 'mkdirs'):
+                            try:
+                                confirmed = os.path.isdir(translated)
+                            except (OSError, TypeError, ValueError):
+                                confirmed = False
+                        if not confirmed:
                             observer.error('vfs_'+_name+'_failed')
                         else:
-                            observer.touch(self.vfs.translatePath(args[_target]),
+                            observer.touch(translated,
                                            'delete' if _name in ('delete','rmdir') else 'directory' if _name in ('mkdir','mkdirs') else 'write')
                             if _name == 'rename': observer.touch(self.vfs.translatePath(args[0]), 'delete')
                         return result
@@ -391,6 +411,19 @@ class Observer:
                             not (ch.isalnum() or ch in '._-') for ch in key):
                         return False
                 return True
+
+            # Common add-ons probe kernel/ABI identity with uname. This is
+            # display-only when restricted to the immutable system binary and
+            # a single information flag.
+            if 1 <= len(command) <= 2 and command[0] in ('uname', '/system/bin/uname'):
+                resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+                host_uname = observer.host_probe and resolved in ('/bin/uname', '/usr/bin/uname')
+                if resolved != '/system/bin/uname' and not host_uname:
+                    return False
+                if len(command) == 1:
+                    return True
+                return isinstance(command[1], str) and command[1] in (
+                    '-a', '-m', '-s', '-r', '-v', '-n', '-p', '-i', '-o')
 
             # SlyGuy probes Android network state with read-only system tools.
             # Keep this allowlist intentionally narrow: "ip" receives exactly
@@ -480,7 +513,12 @@ class Observer:
                     self.children.discard(child)
             for connection in set(self.connections) | self.held_connections:
                 if not connection._infinity_closed:
-                    if connection.in_transaction:
+                    try:
+                        pending = connection.in_transaction
+                    except sqlite3.ProgrammingError:
+                        connection._infinity_closed = True
+                        continue
+                    if pending:
                         self.held_connections.add(connection)
                         self.error('sqlite_pending_transaction_at_retirement')
                         safe = False
