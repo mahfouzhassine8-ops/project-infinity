@@ -34,6 +34,7 @@
 #include <utility>
 #include <vector>
 #if defined(TARGET_ANDROID)
+#include <cstdint>
 #include <map>
 #include <mutex>
 #include <set>
@@ -57,6 +58,7 @@ struct CheckpointAddonTree
   std::string path;
   std::string loadedBytes;
   bool loadedBaselineKnown{false};
+  std::uint64_t committedGeneration{0};
 };
 struct CheckpointAddonSave
 {
@@ -66,6 +68,7 @@ struct CheckpointAddonSave
 std::mutex g_checkpointAddonMutex;
 std::vector<CheckpointAddonTree> g_checkpointAddonTrees;
 std::map<std::string, CheckpointAddonSave> g_checkpointAddonSaves;
+std::map<std::string, std::uint64_t> g_checkpointAddonSaveGenerations;
 std::set<std::string> g_checkpointAddonDeletions;
 
 void TrackCreatedAddonTree(const std::shared_ptr<ADDON::CAddonSettings>& settings,
@@ -129,10 +132,39 @@ void TrackAddonSave(const std::shared_ptr<ADDON::CAddonSettings>& settings,
   g_checkpointAddonSaves[path] = {settings, std::move(bytes)};
 }
 
+
+bool ConfirmAddonSave(const std::shared_ptr<ADDON::CAddonSettings>& settings,
+                      const std::string& path, const CXBMCTinyXML& doc)
+{
+  // Only a checked successful file save can rebase a settings instance.
+  // Other loaded owners are never silently merged or considered durable.
+  std::string bytes;
+  if (!CheckpointAddonBytes(doc, bytes))
+  {
+    InfinityAndroidCheckpoint::RecordFailure("addon_settings", "committed_save_not_serializable");
+    return false;
+  }
+  std::lock_guard<std::mutex> lock(g_checkpointAddonMutex);
+  const std::uint64_t generation = ++g_checkpointAddonSaveGenerations[path];
+  g_checkpointAddonDeletions.erase(path);
+  g_checkpointAddonSaves[path] = {settings, bytes};
+  for (auto& entry : g_checkpointAddonTrees)
+  {
+    if (entry.path == path && entry.settings.lock() == settings)
+    {
+      entry.loadedBytes = bytes;
+      entry.loadedBaselineKnown = true;
+      entry.committedGeneration = generation;
+    }
+  }
+  return true;
+}
+
 void TrackAddonDeletion(const std::string& path)
 {
   std::lock_guard<std::mutex> lock(g_checkpointAddonMutex);
   g_checkpointAddonSaves.erase(path);
+  g_checkpointAddonSaveGenerations.erase(path);
   g_checkpointAddonDeletions.insert(path);
   g_checkpointAddonTrees.erase(
       std::remove_if(g_checkpointAddonTrees.begin(), g_checkpointAddonTrees.end(),
@@ -706,6 +738,10 @@ bool CAddon::SaveSettings(AddonInstanceId id /* = ADDON_SETTINGS_ID */)
     return false;
   }
 
+#if defined(TARGET_ANDROID)
+  if (!ConfirmAddonSave(data.m_addonSettings, data.m_userSettingsPath, doc))
+    return false;
+#endif
   data.m_hasUserSettings = true;
 
 #if defined(TARGET_ANDROID)
