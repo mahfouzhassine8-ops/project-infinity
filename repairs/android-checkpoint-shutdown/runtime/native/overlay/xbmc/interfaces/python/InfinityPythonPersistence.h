@@ -58,6 +58,22 @@ inline std::string Path(PyObject* value)
   return result;
 }
 
+inline std::string PathAt(PyObject* value,PyObject* dirFdObject)
+{
+  const auto path=Path(value);
+  if(path.empty() || path.front()=='/' || !dirFdObject || dirFdObject==Py_None)return path;
+  if(!PyLong_Check(dirFdObject))return {};
+  const long fd=PyLong_AsLong(dirFdObject);
+  if(PyErr_Occurred()){PyErr_Clear();return {};}
+  if(fd==-1)return path;
+  if(fd<0)return {};
+  struct stat info{};
+  if(::fstat(static_cast<int>(fd),&info)!=0 || !S_ISDIR(info.st_mode))return {};
+  const auto root=Path(dirFdObject);
+  if(root.empty() || root.front()!='/')return {};
+  return root+(root.back()=='/'?"":"/")+path;
+}
+
 inline bool PrivateInfinityCachePrefix(const std::string& path)
 {
   static constexpr char package[]="com.projectinfinity.kodi";
@@ -120,6 +136,12 @@ inline void Touch(Context* context,PyObject* path,bool present=true,bool directo
   }
   InfinityScriptPersistence::Touch(context->id,value,present,directory);
 }
+inline void TouchResolved(Context* context,const std::string& value,bool present=true,bool directory=false)
+{
+  if(context->retiring){InfinityScriptPersistence::Fail(context->id,"write_during_interpreter_retirement");return;}
+  if(ApprovedNonPersistentPythonBytecodeCachePath(value,directory))return;
+  InfinityScriptPersistence::Touch(context->id,value,present,directory);
+}
 inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
 {
   if(!PyUnicode_Check(executable) || (!PyList_Check(command) && !PyTuple_Check(command)))return false;
@@ -148,6 +170,40 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
       if(!((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||(ch>='0'&&ch<='9')||
            ch=='.'||ch=='_'||ch=='-'))return false;
     return true;
+  }
+
+  if(executableName=="/system/bin/ip") {
+    if(count!=2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    PyObject* verbObject=PySequence_GetItem(command,1);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const char* verbText=verbObject && PyUnicode_Check(verbObject)?PyUnicode_AsUTF8(verbObject):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    const std::string verb=verbText?verbText:std::string{};
+    if((!firstText || !verbText) && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);Py_XDECREF(verbObject);
+    return firstName=="/system/bin/ip" &&
+           (verb=="addr" || verb=="address" || verb=="link" || verb=="route" ||
+            verb=="neigh" || verb=="rule");
+  }
+  if(executableName=="/system/bin/ifconfig") {
+    if(count<1 || count>2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);
+    if(firstName!="/system/bin/ifconfig")return false;
+    if(count==1)return true;
+    PyObject* targetObject=PySequence_GetItem(command,1);
+    Py_ssize_t targetSize=0;
+    const char* targetText=targetObject && PyUnicode_Check(targetObject)?
+        PyUnicode_AsUTF8AndSize(targetObject,&targetSize):nullptr;
+    const bool safe=targetText && targetSize>0 && targetSize<=64 &&
+                    std::memchr(targetText,'\0',static_cast<std::size_t>(targetSize))==nullptr;
+    if(!targetText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(targetObject);
+    return safe;
   }
 
   std::vector<std::string> expected;
@@ -266,9 +322,18 @@ inline int Audit(const char* event,PyObject* args,void*)
     Touch(context,at(0),false);Touch(context,at(1));
   }
   else if(std::strcmp(event,"os.remove")==0 || std::strcmp(event,"os.rmdir")==0) {
-    if(count>1 && PyLong_Check(at(1)) && PyLong_AsLong(at(1))!=-1)
-      InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_deletion");
-    if(count)Touch(context,at(0),false,std::strcmp(event,"os.rmdir")==0);
+    if(count) {
+      const bool directoryRelative=count>1 && PyLong_Check(at(1)) && PyLong_AsLong(at(1))!=-1;
+      if(directoryRelative) {
+        const auto resolved=PathAt(at(0),at(1));
+        if(resolved.empty())
+          InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_deletion");
+        else
+          TouchResolved(context,resolved,false,std::strcmp(event,"os.rmdir")==0);
+      } else {
+        Touch(context,at(0),false,std::strcmp(event,"os.rmdir")==0);
+      }
+    }
   }
   else if(std::strcmp(event,"os.mkdir")==0) {
     if(count>2 && PyLong_Check(at(2)) && PyLong_AsLong(at(2))!=-1)
