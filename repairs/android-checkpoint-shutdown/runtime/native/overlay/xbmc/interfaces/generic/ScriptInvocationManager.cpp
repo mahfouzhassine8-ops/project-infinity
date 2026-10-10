@@ -28,6 +28,7 @@
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <cerrno>
 #include <climits>
 #include <fcntl.h>
