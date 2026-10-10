@@ -514,10 +514,11 @@ bool CPythonInvoker::stop(bool abort)
 #if defined(TARGET_ANDROID)
   if (!abort && InfinityAndroidCheckpoint::IsActive())
   {
-    // Checkpoint retirement needs both generations of service API:
-    // Monitor users receive AbortNotification(), while legacy xbmc.abortRequested()
-    // observes m_stop. Do not wait here and never reach the SystemExit escalation
-    // below; persistence finalization remains the authority after bytecode returns.
+    // Checkpoint retirement needs both generations of service API.
+    // ScriptInvocationManager already sent the proven Monitor notification;
+    // legacy xbmc.abortRequested() observes m_stop here. Do not wait and never
+    // reach the SystemExit escalation below; persistence finalization remains
+    // the authority after bytecode returns.
     m_stop = true;
     if (!IsRunning() && !m_threadState)
       return false;
