@@ -14,6 +14,7 @@
 #endif
 #if defined(TARGET_ANDROID)
 #include "platform/android/activity/InfinityAndroidCheckpoint.h"
+#include "platform/android/activity/InfinityCheckpointFile.h"
 #include "platform/android/activity/InfinityScriptPersistence.h"
 #endif
 
@@ -28,10 +29,200 @@
 #include "utils/log.h"
 
 #include <cerrno>
+#include <climits>
+#include <fcntl.h>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <sstream>
+#include <string>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <utility>
 #include <vector>
+
+#if defined(TARGET_ANDROID)
+namespace InfinityAddonQuarantine
+{
+struct Record
+{
+  unsigned failures{0};
+  bool quarantined{false};
+  std::string reason;
+};
+struct Registry
+{
+  std::mutex mutex;
+  bool loaded{false};
+  std::map<std::string, Record> records;
+};
+Registry& Get()
+{
+  static auto* registry = new Registry;
+  return *registry;
+}
+bool ValidAddonId(const std::string& addon)
+{
+  return !addon.empty() && addon.size() <= 128 &&
+         std::all_of(addon.begin(), addon.end(), [](unsigned char c) {
+           return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                  (c >= '0' && c <= '9') || c == '.' || c == '_' || c == '-';
+         });
+}
+bool Protected(const std::string& addon)
+{
+  return addon == "script.infinity.commandcenter" ||
+         addon == "service.infinity.compat" ||
+         addon == "script.kodihealthcenter" ||
+         addon == "service.infinity.continuity";
+}
+bool ServiceScript(const std::string& script)
+{
+  return URIUtils::GetFileName(script) == "service.py";
+}
+std::string Path()
+{
+  return CSpecialProtocol::TranslatePath(
+      "special://profile/addon_data/script.infinity.commandcenter/.android-checkpoint/addon-quarantine.tsv");
+}
+void PersistLocked(const Registry& registry)
+{
+  std::string bytes = "infinity-addon-quarantine-v1\n";
+  for (const auto& entry : registry.records)
+  {
+    if (!ValidAddonId(entry.first))
+      continue;
+    bytes += entry.first + "\t" + std::to_string(entry.second.failures) + "\t" +
+             (entry.second.quarantined ? "1" : "0") + "\t" +
+             entry.second.reason.substr(0, 96) + "\n";
+  }
+  const auto result = infinity::checkpoint::files::SaveDirty(Path(), bytes);
+  if (!result.ok)
+    CLog::Log(LOGWARNING, "Infinity add-on quarantine ledger save failed at {}",
+              infinity::checkpoint::files::StageName(result.stage));
+}
+void LoadLocked(Registry& registry)
+{
+  if (registry.loaded)
+    return;
+  registry.loaded = true;
+  const std::string path = Path();
+  const int fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+  if (fd >= 0)
+  {
+    struct stat info{};
+    if (::fstat(fd, &info) == 0 && S_ISREG(info.st_mode) && info.st_size >= 0 && info.st_size <= 65536)
+    {
+      std::string bytes(static_cast<size_t>(info.st_size), '\0');
+      size_t offset = 0;
+      while (offset < bytes.size())
+      {
+        ssize_t count = ::read(fd, &bytes[offset], bytes.size() - offset);
+        if (count < 0 && errno == EINTR)
+          continue;
+        if (count <= 0)
+        {
+          bytes.clear();
+          break;
+        }
+        offset += static_cast<size_t>(count);
+      }
+      if (!bytes.empty())
+      {
+        std::istringstream input(bytes);
+        std::string line;
+        if (std::getline(input, line) && line == "infinity-addon-quarantine-v1")
+        {
+          while (std::getline(input, line))
+          {
+            const auto first = line.find('\t');
+            const auto second = first == std::string::npos ? first : line.find('\t', first + 1);
+            const auto third = second == std::string::npos ? second : line.find('\t', second + 1);
+            if (first == std::string::npos || second == std::string::npos || third == std::string::npos)
+              continue;
+            const std::string addon = line.substr(0, first);
+            if (!ValidAddonId(addon) || Protected(addon))
+              continue;
+            unsigned failures = 0;
+            try
+            {
+              const auto parsed = std::stoul(line.substr(first + 1, second - first - 1));
+              failures = parsed > UINT_MAX ? UINT_MAX : static_cast<unsigned>(parsed);
+            }
+            catch (...)
+            {
+              continue;
+            }
+            const std::string quarantine = line.substr(second + 1, third - second - 1);
+            if (quarantine != "0" && quarantine != "1")
+              continue;
+            Record record;
+            record.failures = failures;
+            record.quarantined = quarantine == "1";
+            record.reason = line.substr(third + 1, 96);
+            registry.records[addon] = std::move(record);
+          }
+        }
+      }
+    }
+    ::close(fd);
+  }
+
+  // Physical Fold evidence 2026-10-09: this service is already throwing a
+  // startup error and the user does not use it. Quarantine ONLY its resident
+  // service; keep the shared module installed for dependencies that import it.
+  auto& slyguy = registry.records["script.module.slyguy"];
+  bool changed = !slyguy.quarantined || slyguy.reason != "seeded_fold_startup_error";
+  slyguy.failures = std::max(slyguy.failures, 2u);
+  slyguy.quarantined = true;
+  slyguy.reason = "seeded_fold_startup_error";
+  if (changed)
+    PersistLocked(registry);
+}
+bool ShouldSuppress(const std::string& addon, const std::string& script)
+{
+  if (!ValidAddonId(addon) || Protected(addon) || !ServiceScript(script))
+    return false;
+  auto& registry = Get();
+  std::lock_guard<std::mutex> lock(registry.mutex);
+  LoadLocked(registry);
+  const auto found = registry.records.find(addon);
+  return found != registry.records.end() && found->second.quarantined;
+}
+void RecordCleanFailure(const std::string& addon, const std::string& script)
+{
+  if (!ValidAddonId(addon) || Protected(addon) || !ServiceScript(script))
+    return;
+  auto& registry = Get();
+  std::lock_guard<std::mutex> lock(registry.mutex);
+  LoadLocked(registry);
+  auto& record = registry.records[addon];
+  if (record.quarantined)
+    return;
+  if (record.failures < UINT_MAX)
+    ++record.failures;
+  record.reason = record.failures >= 2 ? "repeated_clean_uncaught_service_failure" :
+                                        "clean_uncaught_service_failure_candidate";
+  if (record.failures >= 2)
+    record.quarantined = true;
+  PersistLocked(registry);
+}
+void RecordCleanSuccess(const std::string& addon, const std::string& script)
+{
+  if (!ValidAddonId(addon) || Protected(addon) || !ServiceScript(script))
+    return;
+  auto& registry = Get();
+  std::lock_guard<std::mutex> lock(registry.mutex);
+  LoadLocked(registry);
+  const auto found = registry.records.find(addon);
+  if (found != registry.records.end() && !found->second.quarantined)
+  {
+    registry.records.erase(found); // consecutive-failure policy
+    PersistLocked(registry);
+  }
+}
+} // namespace InfinityAddonQuarantine
+#endif
 
 CScriptInvocationManager::~CScriptInvocationManager()
 {
@@ -396,6 +587,14 @@ int CScriptInvocationManager::ExecuteAsync(
   if (script.empty() || languageInvoker == NULL)
     return -1;
 
+#if defined(TARGET_ANDROID)
+  if (addon && InfinityAddonQuarantine::ShouldSuppress(addon->ID(), script))
+  {
+    CLog::Log(LOGINFO, "Infinity quarantine: suppressing failing background service {}", addon->ID());
+    return -1;
+  }
+#endif
+
   if (!CFileUtils::Exists(script, false))
   {
     CLog::Log(LOGERROR, "{} - Not executing non-existing script {}", __FUNCTION__, script);
@@ -592,11 +791,17 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
   if (scriptId < 0)
     return;
 
+  std::string quarantineAddon;
+  std::string quarantineScript;
+  bool quarantineFailure = false;
+  bool quarantineSuccess = false;
   std::unique_lock<CCriticalSection> lock(m_critSection);
   LanguageInvokerThreadMap::iterator script = m_scripts.find(scriptId);
   if (script != m_scripts.end())
   {
 #if defined(TARGET_ANDROID)
+    const bool cleanUncaughtFailure = InfinityScriptPersistence::AdvisoryInterpreterRetirement(
+        scriptId, "uncaught_script_failure_before_persistence_receipt");
     const bool retired = InfinityScriptPersistence::TakeInterpreterRetirement(scriptId);
     if (InfinityAndroidCheckpoint::IsActive() &&
         VerifiedCheckpointContract(script->second.script, script->second.thread, script->second.checkpointContract).empty())
@@ -616,9 +821,24 @@ void CScriptInvocationManager::OnExecutionDone(int scriptId)
         InfinityAndroidCheckpoint::RecordFailure("python_services", detail.c_str());
       }
     }
+#if defined(TARGET_ANDROID)
+    if (retired && script->second.thread->GetAddon())
+    {
+      quarantineAddon = script->second.thread->GetAddon()->ID();
+      quarantineScript = script->second.script;
+      quarantineFailure = cleanUncaughtFailure;
+      quarantineSuccess = !cleanUncaughtFailure;
+    }
 #endif
     script->second.done = true;
   }
+  lock.unlock();
+#if defined(TARGET_ANDROID)
+  if (quarantineFailure)
+    InfinityAddonQuarantine::RecordCleanFailure(quarantineAddon, quarantineScript);
+  else if (quarantineSuccess)
+    InfinityAddonQuarantine::RecordCleanSuccess(quarantineAddon, quarantineScript);
+#endif
 }
 
 CScriptInvocationManager::LanguageInvokerThread CScriptInvocationManager::getInvokerThread(int scriptId) const
