@@ -132,6 +132,7 @@ void CScriptInvocationManager::BeginAndroidCheckpoint()
     // xbmc.abortRequested signal and notifies Monitor without waiting or
     // escalating to SystemExit. Release then exits reusable invoker waits.
     // Observer finalization still refuses pending transactions/buffers.
+    CServiceBroker::GetXBPython().NotifyScriptAborting(thread.get());
     const auto invoker = thread->GetInvoker();
     if (invoker)
       invoker->Stop(false);
