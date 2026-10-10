@@ -321,13 +321,18 @@ void RecordCleanSuccess(const std::string& addon, const std::string& script)
   {
     if (registry.probation.erase(addon) != 0)
     {
-      registry.records.erase(found); // Runtime + persistence both passed probation.
+      found->second.failures = 0;
+      found->second.quarantined = false;
+      found->second.reason = "restored_after_probation";
+      found->second.signature = ServiceSignature(script);
       PersistLocked(registry);
       CLog::Log(LOGINFO, "Infinity quarantine: {} restored after clean probation", addon);
     }
     return;
   }
-  registry.records.erase(found); // consecutive-failure policy
+  if (found->second.reason == "restored_after_probation")
+    return; // Keep a durable Health Center recovery receipt.
+  registry.records.erase(found); // first-strike candidate recovered normally
   PersistLocked(registry);
 }
 } // namespace InfinityAddonQuarantine
