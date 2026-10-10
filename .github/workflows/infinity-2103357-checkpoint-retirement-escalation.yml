@@ -63,7 +63,18 @@ jobs:
           KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
         run: |
           set -euo pipefail
-          ./checkpoint-shell-build/gradlew --no-daemon --console=plain -p checkpoint-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee checkpoint-android/compile.log
+          : > checkpoint-android/compile.log
+          built=false
+          for attempt in 1 2 3; do
+            if ./checkpoint-shell-build/gradlew --no-daemon --console=plain -p checkpoint-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee -a checkpoint-android/compile.log; then
+              built=true
+              break
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 20))
+            fi
+          done
+          [ "$built" = true ]
           python3 repairs/android-checkpoint-shutdown/runtime_delta.py verify --group android --source checkpoint-source/shell-kodi
       - name: Retain compiled shell for packaging without recompilation
         run: tar -czf checkpoint-android/runtime-shell-source.tar.gz -C checkpoint-source shell-kodi
