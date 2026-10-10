@@ -52,6 +52,9 @@ final class InfinityHealthExport {
       attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.critical", "shutdown/critical.jsonl", 2 * 1024 * 1024);
       attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.critical.previous", "shutdown/critical.previous.jsonl", 2 * 1024 * 1024);
       attachShutdown(context, zip, diagnostics, "infinity-close-guard.jsonl", "shutdown/android-guard.jsonl", 160 * 1024);
+      attachAddonQuarantine(context, zip, diagnostics);
+      manifest.put("addon_quarantine_contract", "infinity-addon-quarantine-v1");
+      manifest.put("addon_quarantine_semantics", "A quarantined service is launch-suppressed only after persistence-safe failure evidence or an explicit reviewed seed. Shared add-on modules remain installed. Unresolved writes still block close.");
       manifest.put("shutdown_critical_semantics", "Independent budget for high-level native phases; sequence gaps are expected in this selected mirror. Guard lifetime is not a clean-exit verdict.");
       JSONArray records = new JSONArray();
       manifest.put("records", records);
@@ -105,12 +108,80 @@ final class InfinityHealthExport {
   private static String reportWithNativeShutdownEvidence(Context context, String report)
   {
     StringBuilder output = new StringBuilder(report == null ? "" : report);
+    appendAddonQuarantineEvidence(output, context);
     appendCheckpointEvidence(output, context);
     appendNativeShutdownEvidence(output, context, "Previous / failed native shutdown critical timeline",
         "infinity-shutdown-native.jsonl.critical.previous");
     appendNativeShutdownEvidence(output, context, "Current native shutdown critical timeline",
         "infinity-shutdown-native.jsonl.critical");
     return output.toString();
+  }
+
+  private static java.io.File addonQuarantineFile(Context context) throws Exception {
+    java.io.File storage = context.getExternalFilesDir(null);
+    if (storage == null) storage = context.getFilesDir();
+    java.io.File root = storage.getCanonicalFile();
+    java.io.File source = new java.io.File(root,
+        ".kodi/userdata/addon_data/script.infinity.commandcenter/.android-checkpoint/addon-quarantine.tsv").getCanonicalFile();
+    String rootPath = root.getPath();
+    String sourcePath = source.getPath();
+    if (!sourcePath.startsWith(rootPath + java.io.File.separator))
+      throw new java.io.IOException("Quarantine path escaped app storage");
+    return source;
+  }
+
+  private static void attachAddonQuarantine(
+      Context context, ZipOutputStream zip, JSONArray diagnostics) throws Exception {
+    JSONObject row = new JSONObject();
+    row.put("path", "checkpoint/addon-quarantine.tsv");
+    row.put("limit_bytes", 65536);
+    row.put("available", false);
+    row.put("snapshot_only", true);
+    diagnostics.put(row);
+    java.io.File source;
+    try { source = addonQuarantineFile(context); }
+    catch (Exception invalid) { row.put("status", "path_unavailable"); return; }
+    if (!source.isFile()) { row.put("status", "not_present"); return; }
+    row.put("available", true);
+    row.put("status", "snapshot_collected");
+    zip.putNextEntry(new ZipEntry("checkpoint/addon-quarantine.tsv"));
+    try (java.io.InputStream input = new java.io.FileInputStream(source)) {
+      row.put("truncated", copyBounded(input, zip, 65536));
+    }
+    zip.closeEntry();
+  }
+
+  private static void appendAddonQuarantineEvidence(StringBuilder output, Context context) {
+    output.append("\n\nAdd-on error quarantine\n=======================\n");
+    try {
+      java.io.File source = addonQuarantineFile(context);
+      if (!source.isFile()) {
+        output.append("[no quarantine ledger present]\n");
+        return;
+      }
+      byte[] bytes;
+      try (java.io.InputStream input = new java.io.FileInputStream(source);
+           java.io.ByteArrayOutputStream collected = new java.io.ByteArrayOutputStream()) {
+        copyBounded(input, collected, 65536);
+        bytes = collected.toByteArray();
+      }
+      String[] lines = new String(bytes, StandardCharsets.UTF_8).split("\\r?\\n");
+      boolean any = false;
+      for (String line : lines) {
+        if (line.isEmpty() || "infinity-addon-quarantine-v1".equals(line)) continue;
+        String[] fields = line.split("\\t", 4);
+        if (fields.length != 4) continue;
+        output.append("  ").append(fields[0])
+            .append(": failures=").append(fields[1])
+            .append(" quarantined=").append("1".equals(fields[2]) ? "yes" : "no")
+            .append(" reason=").append(fields[3]).append('\n');
+        any = true;
+      }
+      if (!any) output.append("[no quarantined/candidate services]\n");
+      output.append("Quarantine never substitutes for unresolved SQLite/file durability proof.\n");
+    } catch (Exception unavailable) {
+      output.append("[quarantine ledger unavailable]\n");
+    }
   }
 
   static void appendCheckpointEvidence(StringBuilder output, Context context) {
