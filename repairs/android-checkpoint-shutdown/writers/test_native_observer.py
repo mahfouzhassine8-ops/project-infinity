@@ -182,7 +182,7 @@ int main(int argc,char** argv) {
     assert(!context->waitingWorkers && context->finalized);
   }
   const bool expected=mode=="sqlite-advisory" || mode=="atomic-replace" || mode=="devnull" || mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="readonly-child-env" || mode=="readonly-uname" || mode=="system-exit" || mode=="checkpoint-late-system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
-  if(mode=="sqlite-advisory"){auto inventory=InfinityScriptPersistence::Snapshot();assert(inventory.advisoryCount==1);assert(inventory.blockers[0].detail=="exception=OperationalError;sqlite_code=1;verb=INSERT");}
+  if(mode=="sqlite-advisory"){auto inventory=InfinityScriptPersistence::Snapshot();assert(inventory.advisoryCount==1);assert(inventory.blockers[0].detail==std::string("exception=OperationalError;sqlite_code=")+(PY_VERSION_HEX>=0x030b0000?"1":"-1")+";verb=INSERT");}
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else {
