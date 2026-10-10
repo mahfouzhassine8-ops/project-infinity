@@ -468,20 +468,31 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   else InfinityScriptPersistence::Observed(id);
   return context;
 }
-inline void Finish(Context* context,PyThreadState* owner)
+inline void Finish(Context* context,PyThreadState* owner,bool checkpointEscalated=false)
 {
   if(!context)return;
   context->waitingWorkers=false;
   for(auto* thread=PyInterpreterState_ThreadHead(owner->interp);thread;thread=PyThreadState_Next(thread))
     if(thread!=owner){context->waitingWorkers=true;return;}
   if(context->observer) {
+    // A checkpoint escalation deliberately injects SystemExit to retire stubborn
+    // bytecode. That exact termination exception is not persistence evidence and
+    // must not poison the observer that runs after bytecode has already stopped.
+    // No other exception is consumed here.
+    if(checkpointEscalated && PyErr_ExceptionMatches(PyExc_SystemExit))
+      PyErr_Clear();
     PyObject* result=PyObject_CallMethod(context->observer,"finish",nullptr);
+    if(!result && checkpointEscalated && PyErr_ExceptionMatches(PyExc_SystemExit)) {
+      PyErr_Clear();
+      result=PyObject_CallMethod(context->observer,"finish",nullptr); // one bounded retry
+    }
     if(result) {
       context->finalized=PyObject_IsTrue(result)==1;Py_DECREF(result);
       if(!context->finalized)context->preservePending=true;
     }
     else {
-      InfinityScriptPersistence::Fail(context->id,"checked_python_observer_finalization_failed");
+      InfinityScriptPersistence::Fail(context->id,"checked_python_observer_finalization_failed",
+        checkpointEscalated?"checkpoint_escalated_observer_exception":"");
       context->preservePending=true;
     }
   }
