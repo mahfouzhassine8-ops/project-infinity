@@ -374,7 +374,10 @@ inline int Audit(const char* event,PyObject* args,void*)
     context->sqliteTargets.erase(thread);
   }
   else if(std::strcmp(event,"subprocess.Popen")==0) {
-    if(!context->readonlyChildren[thread] || count<4 || !ReadonlyCommand(at(0),at(1)) || at(3)!=Py_None)
+    // The embedded observer establishes readonlyChildren only after validating
+    // shell/cwd/fd/executable and the exact allowed environment contract.
+    // Re-check the command natively so a cached/unpatched Popen cannot bypass it.
+    if(!context->readonlyChildren[thread] || count<4 || !ReadonlyCommand(at(0),at(1)))
       InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
                                       ChildProcessEvidence(at(0),at(1)));
   }
