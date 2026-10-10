@@ -62,8 +62,9 @@ struct CFileUtils{static bool Exists(const std::string&,bool){return true;}};
 struct URIUtils{static std::string GetFileName(const std::string&s){return s;}};
 constexpr int LOGERROR=1,LOGINFO=2;struct CLog{template<class...T>static void Log(T...) {}};
 namespace InfinityShutdownTrace {
-inline void Event(const char*,const char*,long long=-1,unsigned long long=0,unsigned long long=0,
-                  long long=0,const char*=nullptr,const char*="observed",const char*=nullptr) noexcept {}
+inline void Event(const char*, const char*, long long = -1, unsigned long long = 0,
+                  unsigned long long = 0, long long = 0, const char* = nullptr,
+                  const char* = "observed", const char* = nullptr) noexcept {}
 }
 namespace InfinityAndroidCheckpoint {
  inline bool active=false;inline int failures=0;inline std::string lastFailure;
