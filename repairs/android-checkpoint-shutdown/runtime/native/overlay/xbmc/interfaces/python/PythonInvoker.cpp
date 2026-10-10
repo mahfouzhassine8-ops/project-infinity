@@ -522,11 +522,7 @@ bool CPythonInvoker::stop(bool abort)
     if (!IsRunning() && !m_threadState)
       return false;
     if (m_threadState != NULL && IsRunning())
-    {
       setState(InvokerStateStopping);
-      lock.unlock();
-      AbortNotification();
-    }
     return true;
   }
 #endif
