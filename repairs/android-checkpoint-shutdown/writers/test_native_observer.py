@@ -111,6 +111,8 @@ int main(int argc,char** argv) {
   if(mode=="nested")script="from pathlib import Path\np=Path(root)/'health'/'sessions'/'session'/'state.json'\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text('saved')\n";
   if(mode=="dirfd-delete")script="import os\nbase=root+'/dirfd'\nos.mkdir(base)\nwith open(base+'/stale.tmp','w') as f: f.write('stale')\nos.mkdir(base+'/empty')\nfd=os.open(base,os.O_RDONLY)\ntry:\n os.remove('stale.tmp',dir_fd=fd)\n os.rmdir('empty',dir_fd=fd)\nfinally:\n os.close(fd)\nassert not os.path.exists(base+'/stale.tmp') and not os.path.exists(base+'/empty')\n";
   if(mode=="readonly-child")script="import subprocess,tempfile\nwith tempfile.TemporaryFile(dir=root) as output:\n subprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=output,stderr=subprocess.PIPE,check=True)\n output.seek(0)\n result=output.read()\nwith open(root+'/diagnostic.txt','wb') as f: f.write(result)\n";
+  if(mode=="readonly-child-env")script="import os,subprocess\nenv=dict(os.environ)\nenv['LC_ALL']='C'\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=True)\n";
+  if(mode=="readonly-child-bad-env")script="import os,subprocess\nenv=dict(os.environ)\nenv['LC_ALL']='C'\nenv['INFINITY_UNREVIEWED']='1'\nsubprocess.run(['/bin/echo','infinity-diagnostic-fixture'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=True)\n";
   if(mode=="system-exit" || mode=="system-exit-pending" || mode=="abort-callback-error") {
     script=mode=="system-exit-pending" ?
       "import sqlite3\nc=sqlite3.connect(root+'/state.db')\nc.execute('create table state (value)')\nc.execute('insert into state values (42)')\nraise SystemExit\n" :
@@ -149,7 +151,7 @@ int main(int argc,char** argv) {
     InfinityPythonPersistence::Finish(context,owner);
     assert(!context->waitingWorkers && context->finalized);
   }
-  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
+  const bool expected=mode=="committed" || mode=="workers" || mode=="nested" || mode=="dirfd-delete" || mode=="readonly-child" || mode=="readonly-child-env" || mode=="system-exit" || mode=="import-cache" || mode=="checked-raw" || mode=="layered-raw" || mode=="direct-sqlite" || mode=="dbapi2-sqlite";
   if(expected && !InfinityScriptPersistence::Failure().empty())std::cerr<<mode<<": "<<InfinityScriptPersistence::Failure()<<std::endl;
   if(expected)assert(InfinityScriptPersistence::Failure().empty());
   else {
@@ -227,11 +229,11 @@ def main():
                         '-o', str(binary)], check=True)
         environment = dict(os.environ, PYTHONHOME=sys.prefix,
                            LD_LIBRARY_PATH=str(library_folder))
-        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
+        for mode in ('committed', 'pending', 'raw-open', 'direct-sqlite', 'dbapi2-sqlite', 'direct-sqlite-pending', 'cached-direct-sqlite', 'external', 'workers', 'nested', 'dirfd-delete', 'readonly-child', 'readonly-child-env', 'readonly-child-bad-env', 'system-exit', 'system-exit-pending', 'abort-callback-error', 'import-cache', 'checked-raw', 'raw-write-failure', 'layered-raw', 'layered-failure'):
             folder = directory / mode
             folder.mkdir()
             subprocess.run([str(binary), mode, str(folder)], env=environment, check=True, timeout=15)
-    print('PASS: direct SQLite, dir_fd deletion and narrow Android read-only probes are observed; unsafe writers remain fail-closed')
+    print('PASS: direct SQLite, dir_fd deletion, exact uuid child environment and narrow read-only probes are observed; unsafe writers remain fail-closed')
 
 
 if __name__ == '__main__':
