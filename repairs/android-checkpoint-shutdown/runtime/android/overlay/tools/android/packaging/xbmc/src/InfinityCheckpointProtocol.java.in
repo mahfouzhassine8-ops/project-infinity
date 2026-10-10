@@ -79,6 +79,24 @@ final class InfinityCheckpointProtocol {
     StringBuilder out=new StringBuilder();for(byte b:MessageDigest.getInstance("SHA-256").digest(raw.getBytes(StandardCharsets.UTF_8)))
       out.append(String.format(java.util.Locale.ROOT,"%02x",b&255));return out.toString();
   }
+  /** Shared completion truth: save proof alone never proves authorized death. */
+  static boolean confirmedComplete(JSONObject row,String session,String owner,int pid,
+                                   boolean ownerStillAlive,boolean nativeSaved)throws Exception{
+    if(ownerStillAlive||!nativeSaved||row.optInt("schema",-1)!=1||
+        !"COMPLETE".equals(row.optString("phase"))||
+        !session.equals(row.optString("session"))||!owner.equals(row.optString("owner"))||
+        pid!=row.optInt("pid",-1)||!row.optBoolean("checkpoint_saved",false)||
+        !row.optBoolean("authorization_consumed",false)||row.optLong("generation",0)<=0)
+      return false;
+    long start=row.optLong("started_elapsed_ms",-1),safe=row.optLong("safe_elapsed_ms",0),
+         dispatch=row.optLong("terminate_requested_elapsed_ms",0),
+         consumed=row.optLong("authorization_consumed_elapsed_ms",0),
+         death=row.optLong("engine_death_elapsed_ms",0);
+    return start>=0&&safe>=start&&dispatch>=safe&&consumed>=dispatch&&
+           death>=consumed&&safe>0&&dispatch>0&&consumed>0&&death>0&&
+           row.optLong("safe_epoch_ms",0)>0&&row.optLong("authorization_consumed_epoch_ms",0)>0&&
+           row.optLong("engine_death_epoch_ms",0)>0;
+  }
   static void atomic(File path,JSONObject row)throws IOException{
     AtomicFile file=new AtomicFile(path);FileOutputStream out=null;
     byte[] bytes=row.toString().getBytes(StandardCharsets.UTF_8);if(bytes.length>262144)throw new IOException("oversized checkpoint receipt");
