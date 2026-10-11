@@ -1,0 +1,80 @@
+name: Dual Infinity | G0 decoy shell namespace probe
+on:
+  push:
+    branches: [experiment/dual-infinity-2103368-g0]
+    paths:
+      - 'experiments/dual-infinity/android/**'
+      - 'experiments/dual-infinity/stage_decoy.py'
+      - 'experiments/dual-infinity/verify_decoy_donor.py'
+      - 'experiments/dual-infinity/test_decoy_stage.py'
+      - '.github/workflows/dual-infinity-g0-decoy-shell.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: dual-infinity-g0-decoy-shell, cancel-in-progress: false}
+jobs:
+  compile-decoy-shell-probe:
+    if: github.ref == 'refs/heads/experiment/dual-infinity-2103368-g0'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38137092930
+          name: Infinity-2103368-Installer-Close-Evidence
+          github-token: ${{ github.token }}
+          path: protected-shell-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38137092930
+          name: Infinity-2103368-Installer-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: protected-apk
+      - name: Recover exact shell and stage installation identity probe
+        run: |
+          python3 -m unittest discover -s experiments/dual-infinity -p 'test_*.py' -v
+          python3 - <<'PY'
+          import tarfile
+          from pathlib import Path
+          paths=list(Path('protected-shell-evidence').rglob('runtime-shell-source.tar.gz'))
+          assert len(paths)==1
+          Path('protected-shell').mkdir()
+          with tarfile.open(paths[0]) as archive:
+              archive.extractall('protected-shell')
+          PY
+          python3 experiments/dual-infinity/stage_decoy.py --source protected-shell/shell-kodi --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --build decoy-shell-build --output decoy-shell-evidence
+          mkdir -p compile-only-signing
+          keytool -genkeypair -noprompt -keystore compile-only-signing/compile.keystore -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 30 -dname 'CN=Compile Only,O=Android,C=US'
+      - name: Compile namespace-retaining shell and execute ownership tests
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          export KODI_ANDROID_STORE_FILE="$GITHUB_WORKSPACE/compile-only-signing/compile.keystore"
+          ./decoy-shell-build/gradlew --no-daemon --console=plain -p decoy-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee decoy-shell-evidence/compile.log
+          python3 experiments/dual-infinity/verify_decoy_donor.py --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --donor decoy-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk --build-tools "$ANDROID_HOME/build-tools/34.0.0" --output decoy-shell-evidence
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Dual-Infinity-G0-Decoy-Shell-Compilation-Evidence
+          path: |
+            decoy-shell-evidence/
+            decoy-shell-build/xbmc/build/test-results/testReleaseUnitTest/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Dual-Infinity-G0-Compile-Only-Donor-Internal
+          path: decoy-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
+          retention-days: 90
+          if-no-files-found: error

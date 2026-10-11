@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "purpose": "G0 exact assets only",
+  "compiled_parent_commit": "2515c1a281abf9e57cfdbf570244c69f751a1437",
+  "renderer_sha256": "155b8939ccdff0d526eb3a4868b40fb534234617a0b8dc753840031a80d405e8",
+  "recovery_recipe_sha256": "d440d62055dcc4e5b03ad5e1c2c2861c5f3d74da3462eb0deb3b4f0b70cdedde",
+  "environment": {
+    "imagemagick": "8:6.9.11.60+dfsg-1.3ubuntu0.22.04.5",
+    "fonts-dejavu-core": "2.37-2build1",
+    "convert": "Version: ImageMagick 6.9.11-60 Q16 x86_64 2021-01-25 https://imagemagick.org\nCopyright: (C) 1999-2021 ImageMagick Studio LLC\nLicense: https://imagemagick.org/script/license.php\nFeatures: Cipher DPC Modules OpenMP(4.5) \nDelegates (built-in): bzlib djvu fftw fontconfig freetype heic jbig jng jp2 jpeg lcms lqr ltdl lzma openexr pangocairo png tiff webp wmf x xml zlib\n",
+    "font_sha256": "690243adfefe0ce154b547db6205794bd30ac4277275179517a90994f4980648"
+  },
+  "expected_files": 37,
+  "verified_files": 37,
+  "errors": [],
+  "files": [
+    {
+      "path": "media/applaunch_screen.png",
+      "expected_sha256": "373300ebed04c9fda07f773886d3c1496873d37039d036fd08263c72e199af14",
+      "generated_sha256": "7238b83bd4e0298734a6a7ec17c24e98befbb67b86fbacfa08ec326edcecd5bc",
+      "recovered_sha256": "373300ebed04c9fda07f773886d3c1496873d37039d036fd08263c72e199af14",
+      "timestamp_recovery": {
+        "tIME": "2026-10-04T08:35:10+00:00",
+        "text": "2026-10-04T08:35:04+00:00"
+      },
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/banner.png",
+      "expected_sha256": "bb0e7fe3177a313961964bd1157c7f1a0ed2f6300e6ea46a554eb5c68111d7c4",
+      "generated_sha256": "3fda0fbfc4a449180561d85487d6e18733662567854611d15064b39bfb39d52e",
+      "recovered_sha256": "bb0e7fe3177a313961964bd1157c7f1a0ed2f6300e6ea46a554eb5c68111d7c4",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/icon120x120.png",
+      "expected_sha256": "cfadcfc7f3b5200b4a4af9358804006ca1be96f84cc8f1266b3b37f695155e56",
+      "generated_sha256": "9cdf60816c942c0f38673a69819f0e713ecf7ba2d34f7e98ca07ac3f98503879",
+      "recovered_sha256": "cfadcfc7f3b5200b4a4af9358804006ca1be96f84cc8f1266b3b37f695155e56",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/icon16x16.png",
+      "expected_sha256": "ccaf350e7496349612aadfd76fa5ed70dd6de5d5aa996e9282327e342946e07b",
+      "generated_sha256": "fd584e25da8cac1834f7f6e48d52ec060971f47704264515c21e83cb24b726e5",
+      "recovered_sha256": "ccaf350e7496349612aadfd76fa5ed70dd6de5d5aa996e9282327e342946e07b",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/icon256x256.png",
+      "expected_sha256": "31673d5f6b4675c0830d5fda23517271a30fc6bc736378c85776ba2c5e93ada9",
+      "generated_sha256": "b32456b0884e65145f009d89ef8f9204c00841d3652b5b88accc0cb223e5d035",
+      "recovered_sha256": "31673d5f6b4675c0830d5fda23517271a30fc6bc736378c85776ba2c5e93ada9",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/icon32x32.png",
+      "expected_sha256": "c7fc08410fc0aa3415f31e39a63fde616de00f6342e71da2f573bdebac67e929",
+      "generated_sha256": "a8e8c7d16aa8846f9b40a7e90fc1c5a2eede8ca4f9fa3a996a180d930afe291e",
+      "recovered_sha256": "c7fc08410fc0aa3415f31e39a63fde616de00f6342e71da2f573bdebac67e929",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/icon48x48.png",
+      "expected_sha256": "d4a30219aa44fcc87267e65fcd93643b951d76b44165502e909fb721f045cd99",
+      "generated_sha256": "4322a66a98c9e5e94810032422d059467c134d23746827f5b244579384fd8e78",
+      "recovered_sha256": "d4a30219aa44fcc87267e65fcd93643b951d76b44165502e909fb721f045cd99",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/icon80x80.png",
+      "expected_sha256": "1804c96df9c47b15e74c36833e192bad8f0746e7ea4e01e4706fc9cd64f01a13",
+      "generated_sha256": "783da729ea7a24047f18dde1366e247ccbcd969189b67297827ac4ddd81f39eb",
+      "recovered_sha256": "1804c96df9c47b15e74c36833e192bad8f0746e7ea4e01e4706fc9cd64f01a13",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/infinity_launch_dark.png",
+      "expected_sha256": "0bf01eccb5e867ca675ea0fbb85b74111288e1f269e8ca5fe9c59d3eeae10ce3",
+      "generated_sha256": "7ad609f8a9e9083ee938d3eba3cc16fca7f484803ba898315c43f05b62f839ff",
+      "recovered_sha256": "0bf01eccb5e867ca675ea0fbb85b74111288e1f269e8ca5fe9c59d3eeae10ce3",
+      "timestamp_recovery": {
+        "tIME": "2026-10-04T08:35:19+00:00",
+        "text": "2026-10-04T08:35:13+00:00"
+      },
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/splash.jpg",
+      "expected_sha256": "d545e6204da44a279d1f8d374fe65c9e33c5b26d702bf0f5bc87c5780579a831",
+      "generated_sha256": "d545e6204da44a279d1f8d374fe65c9e33c5b26d702bf0f5bc87c5780579a831",
+      "recovered_sha256": "d545e6204da44a279d1f8d374fe65c9e33c5b26d702bf0f5bc87c5780579a831",
+      "timestamp_recovery": null,
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/vendor_icon.png",
+      "expected_sha256": "e2124443c990b895915b03e0db5eeec37fa8b761cfa92b7f58f422c487f09a13",
+      "generated_sha256": "58fcd4f027627be098f0f8f967a8db36e2005299609a8c0336a13b017da6cad6",
+      "recovered_sha256": "e2124443c990b895915b03e0db5eeec37fa8b761cfa92b7f58f422c487f09a13",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "media/vendor_logo.png",
+      "expected_sha256": "6ecdaa47c8194801d60d75d6c72fd532576b1e3f70dc90ec47146effb8604e1c",
+      "generated_sha256": "a4b0cee9496fb183142ad6316c9a00c8dd51d9f05a4557c0de2eafe80ffcb7d0",
+      "recovered_sha256": "6ecdaa47c8194801d60d75d6c72fd532576b1e3f70dc90ec47146effb8604e1c",
+      "timestamp_recovery": "2026-10-04T08:35:28+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-hdpi/ic_launcher.png",
+      "expected_sha256": "59d7896e6d2dc5317322a5c1ef486e5c16a5a6ebbe845cad9996c5a4b82f1045",
+      "generated_sha256": "09b9fbb46e425882f609ae7d24e3e156460985eea718ebcd3d5cc9e12a7a4f97",
+      "recovered_sha256": "59d7896e6d2dc5317322a5c1ef486e5c16a5a6ebbe845cad9996c5a4b82f1045",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-ldpi/ic_launcher.png",
+      "expected_sha256": "401f9777cc4ae62bde3c396e6b81fdf838805782886e2dbe853006eeb4dba5ee",
+      "generated_sha256": "db210c2242fa98f0b5fbb885e077dd27213e577f80149d804ee03460379079bc",
+      "recovered_sha256": "401f9777cc4ae62bde3c396e6b81fdf838805782886e2dbe853006eeb4dba5ee",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-mdpi/ic_launcher.png",
+      "expected_sha256": "7e22e7f8c81eb52142495dc76af69cad46ac89dcd56b9cdb535f600cb52352cb",
+      "generated_sha256": "f466bffad562388f11826e7232cfbadc3a62a838802e8642caad4463d20403b7",
+      "recovered_sha256": "7e22e7f8c81eb52142495dc76af69cad46ac89dcd56b9cdb535f600cb52352cb",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-xhdpi/banner.png",
+      "expected_sha256": "628e89d0a024705b58dd6459b7faa7541c90c30d2209e2f74b3e99a762989faf",
+      "generated_sha256": "24fc34f1594514ef136606d9489c6b7fdc52224e69a8c4dfb3952e34bdf27ed8",
+      "recovered_sha256": "628e89d0a024705b58dd6459b7faa7541c90c30d2209e2f74b3e99a762989faf",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-xhdpi/ic_launcher.png",
+      "expected_sha256": "cc6d3e72c6219353071fa3c4ea4400f6d263a663974cf8bb67b2ba2af5627c52",
+      "generated_sha256": "7605a09b9409455f4a9b7c75573fc5632ca49f5526e447b9a934623dcc796de2",
+      "recovered_sha256": "cc6d3e72c6219353071fa3c4ea4400f6d263a663974cf8bb67b2ba2af5627c52",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-xxhdpi/ic_launcher.png",
+      "expected_sha256": "08c1604f686d6d611aeba5c76ba211ad4a86dff37d0d36cc9b48ebda9418fbca",
+      "generated_sha256": "0b37bf68249050905db6c31c92bb069eee505a33262e11efa2355ebb1ed9f844",
+      "recovered_sha256": "08c1604f686d6d611aeba5c76ba211ad4a86dff37d0d36cc9b48ebda9418fbca",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/media/drawable-xxxhdpi/ic_launcher.png",
+      "expected_sha256": "b8bb3a4d5bc14b2dd25f0c76b2f6d8b802c1d0f3186ce1e63a84d5305735fc5b",
+      "generated_sha256": "00998f830bc6d1f5d452e1240cf80ac4b34a65f4d0b78834df8aae56a46edd5a",
+      "recovered_sha256": "b8bb3a4d5bc14b2dd25f0c76b2f6d8b802c1d0f3186ce1e63a84d5305735fc5b",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable-night-xxxhdpi/applaunch_screen.png",
+      "expected_sha256": "af5e58fb38f0360184c821c3e835761da65634cadc4abd98e85402a398164560",
+      "generated_sha256": "22ce9e9c0c457a7ad86b2d052bcef6f9a808eb4856be17ca56c779ae06798fae",
+      "recovered_sha256": "af5e58fb38f0360184c821c3e835761da65634cadc4abd98e85402a398164560",
+      "timestamp_recovery": {
+        "tIME": "2026-10-04T08:35:43+00:00",
+        "text": "2026-10-04T08:35:38+00:00"
+      },
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable-night/applaunch_screen.png",
+      "expected_sha256": "2e1ce98e2063b2bbc161eb30101398d228a423468adb59f4498ccdca84fd1d66",
+      "generated_sha256": "5ca8c1748ada850ef511daa684a285a65a24c361b931b3bb672088f2d19e3331",
+      "recovered_sha256": "2e1ce98e2063b2bbc161eb30101398d228a423468adb59f4498ccdca84fd1d66",
+      "timestamp_recovery": {
+        "tIME": "2026-10-04T08:35:34+00:00",
+        "text": "2026-10-04T08:35:28+00:00"
+      },
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable-nodpi/infinity_icon_background_bitmap.png",
+      "expected_sha256": "2ad34ab8ec51129acc9ebdcd0095c165fbc40f9997a10081d9a083e02d1d3cef",
+      "generated_sha256": "d3a254e6b9a9a08546616ef32711a327221c90f8599f642339c6bb10d7ad220c",
+      "recovered_sha256": "2ad34ab8ec51129acc9ebdcd0095c165fbc40f9997a10081d9a083e02d1d3cef",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable-nodpi/infinity_icon_foreground.png",
+      "expected_sha256": "5c44d9a0e00b75375fafa13c7d3363cf58a5beaed609f5f5bb9fcbfd9efdeab1",
+      "generated_sha256": "e7a0183c1d88da432cde27bf9c109c9927d50644ad5695a237a192096c3c46fa",
+      "recovered_sha256": "5c44d9a0e00b75375fafa13c7d3363cf58a5beaed609f5f5bb9fcbfd9efdeab1",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable-nodpi/infinity_icon_monochrome.png",
+      "expected_sha256": "7c8132a6f1c9b95042d340b44265eb6fcebdb4cfd613a233eaf97cd3650bfbff",
+      "generated_sha256": "ebd7dd1126a81f011a4ab61b14184ee551b351bff9cadde6362d0f62816129bb",
+      "recovered_sha256": "7c8132a6f1c9b95042d340b44265eb6fcebdb4cfd613a233eaf97cd3650bfbff",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable-nodpi/infinity_splash_icon.png",
+      "expected_sha256": "7194181adbc065b5a9248d7fe6ca9b73b87d050f9d472d5e7b54629ca1a1eb2c",
+      "generated_sha256": "e2dc1488ff33a98e3a989775ffa01696ad3169c2fee7430d5d96fff87724319d",
+      "recovered_sha256": "7194181adbc065b5a9248d7fe6ca9b73b87d050f9d472d5e7b54629ca1a1eb2c",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/drawable/notif_icon.png",
+      "expected_sha256": "28075b43f073025ffb94cf57acdee9c362debcbf9b619e5adf48c2893d10c49d",
+      "generated_sha256": "b257adb687e6ee7b187f8078c8b71741b3bbb0b1ac1dd8017dad4eac847e6a9c",
+      "recovered_sha256": "28075b43f073025ffb94cf57acdee9c362debcbf9b619e5adf48c2893d10c49d",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-hdpi/ic_launcher.png",
+      "expected_sha256": "59d7896e6d2dc5317322a5c1ef486e5c16a5a6ebbe845cad9996c5a4b82f1045",
+      "generated_sha256": "09b9fbb46e425882f609ae7d24e3e156460985eea718ebcd3d5cc9e12a7a4f97",
+      "recovered_sha256": "59d7896e6d2dc5317322a5c1ef486e5c16a5a6ebbe845cad9996c5a4b82f1045",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-hdpi/ic_launcher_round.png",
+      "expected_sha256": "59d7896e6d2dc5317322a5c1ef486e5c16a5a6ebbe845cad9996c5a4b82f1045",
+      "generated_sha256": "09b9fbb46e425882f609ae7d24e3e156460985eea718ebcd3d5cc9e12a7a4f97",
+      "recovered_sha256": "59d7896e6d2dc5317322a5c1ef486e5c16a5a6ebbe845cad9996c5a4b82f1045",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-mdpi/ic_launcher.png",
+      "expected_sha256": "7e22e7f8c81eb52142495dc76af69cad46ac89dcd56b9cdb535f600cb52352cb",
+      "generated_sha256": "f466bffad562388f11826e7232cfbadc3a62a838802e8642caad4463d20403b7",
+      "recovered_sha256": "7e22e7f8c81eb52142495dc76af69cad46ac89dcd56b9cdb535f600cb52352cb",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-mdpi/ic_launcher_round.png",
+      "expected_sha256": "7e22e7f8c81eb52142495dc76af69cad46ac89dcd56b9cdb535f600cb52352cb",
+      "generated_sha256": "f466bffad562388f11826e7232cfbadc3a62a838802e8642caad4463d20403b7",
+      "recovered_sha256": "7e22e7f8c81eb52142495dc76af69cad46ac89dcd56b9cdb535f600cb52352cb",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-xhdpi/ic_launcher.png",
+      "expected_sha256": "cc6d3e72c6219353071fa3c4ea4400f6d263a663974cf8bb67b2ba2af5627c52",
+      "generated_sha256": "7605a09b9409455f4a9b7c75573fc5632ca49f5526e447b9a934623dcc796de2",
+      "recovered_sha256": "cc6d3e72c6219353071fa3c4ea4400f6d263a663974cf8bb67b2ba2af5627c52",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-xhdpi/ic_launcher_round.png",
+      "expected_sha256": "cc6d3e72c6219353071fa3c4ea4400f6d263a663974cf8bb67b2ba2af5627c52",
+      "generated_sha256": "7605a09b9409455f4a9b7c75573fc5632ca49f5526e447b9a934623dcc796de2",
+      "recovered_sha256": "cc6d3e72c6219353071fa3c4ea4400f6d263a663974cf8bb67b2ba2af5627c52",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-xxhdpi/ic_launcher.png",
+      "expected_sha256": "08c1604f686d6d611aeba5c76ba211ad4a86dff37d0d36cc9b48ebda9418fbca",
+      "generated_sha256": "0b37bf68249050905db6c31c92bb069eee505a33262e11efa2355ebb1ed9f844",
+      "recovered_sha256": "08c1604f686d6d611aeba5c76ba211ad4a86dff37d0d36cc9b48ebda9418fbca",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "expected_sha256": "08c1604f686d6d611aeba5c76ba211ad4a86dff37d0d36cc9b48ebda9418fbca",
+      "generated_sha256": "0b37bf68249050905db6c31c92bb069eee505a33262e11efa2355ebb1ed9f844",
+      "recovered_sha256": "08c1604f686d6d611aeba5c76ba211ad4a86dff37d0d36cc9b48ebda9418fbca",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-xxxhdpi/ic_launcher.png",
+      "expected_sha256": "b8bb3a4d5bc14b2dd25f0c76b2f6d8b802c1d0f3186ce1e63a84d5305735fc5b",
+      "generated_sha256": "00998f830bc6d1f5d452e1240cf80ac4b34a65f4d0b78834df8aae56a46edd5a",
+      "recovered_sha256": "b8bb3a4d5bc14b2dd25f0c76b2f6d8b802c1d0f3186ce1e63a84d5305735fc5b",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "tools/android/packaging/xbmc/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "expected_sha256": "b8bb3a4d5bc14b2dd25f0c76b2f6d8b802c1d0f3186ce1e63a84d5305735fc5b",
+      "generated_sha256": "00998f830bc6d1f5d452e1240cf80ac4b34a65f4d0b78834df8aae56a46edd5a",
+      "recovered_sha256": "b8bb3a4d5bc14b2dd25f0c76b2f6d8b802c1d0f3186ce1e63a84d5305735fc5b",
+      "timestamp_recovery": "2026-10-04T08:35:47+00:00",
+      "non_timestamp_bytes_preserved": true
+    },
+    {
+      "path": "xbmc/platform/darwin/tvos/Assets.xcassets/LaunchImage.launchimage/applaunch_screen.png",
+      "expected_sha256": "373300ebed04c9fda07f773886d3c1496873d37039d036fd08263c72e199af14",
+      "generated_sha256": "7238b83bd4e0298734a6a7ec17c24e98befbb67b86fbacfa08ec326edcecd5bc",
+      "recovered_sha256": "373300ebed04c9fda07f773886d3c1496873d37039d036fd08263c72e199af14",
+      "timestamp_recovery": {
+        "tIME": "2026-10-04T08:35:10+00:00",
+        "text": "2026-10-04T08:35:04+00:00"
+      },
+      "non_timestamp_bytes_preserved": true
+    }
+  ],
+  "native_compiled": false,
+  "apk_created": false,
+  "device_pass": false,
+  "complete": true
+}

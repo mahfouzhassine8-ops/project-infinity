@@ -1,0 +1,124 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package com.projectinfinity.kodi;
+
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+/** Install identity is separate from the retained, verified JNI class namespace.
+ * G0 has ONE engine only; no shared-profile copy, second slot, or dual audio.
+ */
+public final class InfinityDecoyIdentity {
+  public static final String INSTALL_ID = "com.projectinfinity.kodi.dualtest";
+  public static final String JNI_NAMESPACE = "com.projectinfinity.kodi";
+  public static final String RPC_PORT = "18080";
+  private static final Set<String> SELF_COMPONENTS = new HashSet<>(Arrays.asList(
+      JNI_NAMESPACE + ".Main", JNI_NAMESPACE + ".Splash",
+      JNI_NAMESPACE + ".InfinityKodiEntryActivity",
+      JNI_NAMESPACE + ".InfinityPowerControlActivity",
+      JNI_NAMESPACE + ".InfinityBackgroundControlActivity"));
+  private static final Set<String> SELF_ACTIONS = new HashSet<>(Arrays.asList(
+      JNI_NAMESPACE + ".action.CLOSE_KODI", JNI_NAMESPACE + ".action.FORCE_CLOSE_KODI",
+      JNI_NAMESPACE + ".action.PLAYER_ROTATION_FOLLOW_DEVICE",
+      JNI_NAMESPACE + ".action.PLAYER_ROTATION_UNLOCKED",
+      JNI_NAMESPACE + ".action.BACKGROUND_MODE_NORMAL",
+      JNI_NAMESPACE + ".action.BACKGROUND_MODE_EXTENDED"));
+
+  public static void requireDecoy(Context context) {
+    if (context == null || !INSTALL_ID.equals(context.getPackageName()) ||
+        !INSTALL_ID.equals(context.getApplicationInfo().packageName))
+      throw new SecurityException("Experimental shell cannot run in the production installation");
+  }
+
+  private static File directory(File root, String child) throws IOException {
+    if (root == null) throw new IOException("Instance storage unavailable");
+    File canonical = root.getCanonicalFile();
+    File requested = child.isEmpty() ? canonical : new File(canonical, child);
+    if (!requested.getCanonicalFile().equals(requested.getAbsoluteFile()))
+      throw new IOException("Linked instance path refused");
+    if (!requested.isDirectory() && !requested.mkdirs())
+      throw new IOException("Cannot prepare instance storage");
+    return requested;
+  }
+
+  /** Runs in Application.attachBaseContext, before providers, extraction or native load. */
+  public static synchronized void configure(Context context) throws IOException {
+    requireDecoy(context);
+    File internal = context.getApplicationInfo().dataDir == null ? null :
+        new File(context.getApplicationInfo().dataDir).getCanonicalFile();
+    File files = context.getFilesDir().getCanonicalFile();
+    File cache = context.getCacheDir().getCanonicalFile();
+    if (internal == null || !files.equals(new File(internal, "files")) ||
+        !cache.equals(new File(internal, "cache")))
+      throw new IOException("Unexpected Android private-data ownership");
+    File external = context.getExternalFilesDir(null);
+    if (external == null) throw new IOException("Decoy external storage unavailable");
+    String managed = external.getCanonicalPath();
+    if (!managed.endsWith("/Android/data/" + INSTALL_ID + "/files"))
+      throw new IOException("External data root is not the decoy's managed directory");
+    File data = directory(external, "");
+    File home = directory(cache, "apk");
+    File temp = directory(cache, "temp");
+    // Do not read the device-global xbmc_env.properties or inherit its data path.
+    System.setProperty("xbmc.proploaded", "yes");
+    System.setProperty("xbmc.data", data.getAbsolutePath());
+    System.setProperty("xbmc.home", home.getAbsolutePath());
+    System.setProperty("xbmc.temp", temp.getAbsolutePath());
+    System.setProperty("xbmc.jsonPort", RPC_PORT);
+    if (!(INSTALL_ID + ":kodi").equals(android.app.Application.getProcessName())) return;
+    File profile = directory(data, ".kodi/userdata");
+    File settings = new File(profile, "guisettings.xml");
+    // Fresh decoy only. Existing settings are never overwritten or cloned from
+    // a live production database/profile. The initial servers stay disabled.
+    if (!settings.exists()) {
+      String xml = "<settings version=\"2\">" +
+          "<setting id=\"services.webserver\">false</setting>" +
+          "<setting id=\"services.webserverport\">" + RPC_PORT + "</setting>" +
+          "<setting id=\"services.esenabled\">false</setting>" +
+          "<setting id=\"services.esport\">19777</setting>" +
+          "<setting id=\"services.upnpserver\">false</setting>" +
+          "<setting id=\"services.upnprenderer\">false</setting></settings>";
+      android.util.AtomicFile atomic = new android.util.AtomicFile(settings);
+      FileOutputStream out = null;
+      try {
+        out = atomic.startWrite();
+        out.write(xml.getBytes(StandardCharsets.UTF_8)); out.getFD().sync();
+        atomic.finishWrite(out);
+      } catch (IOException failed) {
+        if (out != null) atomic.failWrite(out);
+        throw failed;
+      }
+    }
+  }
+
+  /** Keep the approved Power XML bytes; map its reviewed self commands here. */
+  public static Intent ownIntent(Context context, Intent incoming) {
+    requireDecoy(context);
+    if (incoming == null) throw new IllegalArgumentException("Missing launch intent");
+    Intent target = new Intent(incoming);
+    ComponentName component = target.getComponent();
+    String packageName = component == null ? target.getPackage() : component.getPackageName();
+    if (JNI_NAMESPACE.equals(packageName)) {
+      if (component != null) {
+        if (!SELF_COMPONENTS.contains(component.getClassName()))
+          throw new SecurityException("Unreviewed production component refused");
+        target.setComponent(new ComponentName(INSTALL_ID, component.getClassName()));
+      } else if (!SELF_ACTIONS.contains(target.getAction())) {
+        throw new SecurityException("Unreviewed production action refused");
+      }
+      target.setPackage(INSTALL_ID);
+    } else if (packageName == null && SELF_ACTIONS.contains(target.getAction())) {
+      target.setPackage(INSTALL_ID);
+    }
+    return target;
+  }
+
+  private InfinityDecoyIdentity() {}
+}

@@ -1,0 +1,23 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package com.projectinfinity.kodi;
+
+/** G0 bootstrap only. Never pretends to be the completed two-window feature. */
+public final class InfinityDecoyLauncher extends android.app.Activity {
+  @Override public void onCreate(android.os.Bundle state) {
+    super.onCreate(state);
+    InfinityDecoyIdentity.requireDecoy(this);
+    android.widget.LinearLayout column = new android.widget.LinearLayout(this);
+    column.setOrientation(android.widget.LinearLayout.VERTICAL);
+    int padding = (int)(24 * getResources().getDisplayMetrics().density);
+    column.setPadding(padding, padding, padding, padding);
+    android.widget.TextView text = new android.widget.TextView(this);
+    text.setText("Infinity experimental setup\n\nSeparate saved data. Two-window tests are not enabled yet.");
+    column.addView(text);
+    android.widget.Button open = new android.widget.Button(this);
+    open.setText("Open Infinity test window");
+    open.setOnClickListener(view -> startActivity(new android.content.Intent(this,
+        InfinityKodiEntryActivity.class).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)));
+    column.addView(open);
+    setContentView(column);
+  }
+}
