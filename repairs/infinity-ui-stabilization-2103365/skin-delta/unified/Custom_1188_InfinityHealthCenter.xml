@@ -1,0 +1,940 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1188" type="dialog">
+  <defaultcontrol>1188101</defaultcontrol>
+  <onback>Dialog.Close(1188)</onback>
+  <animation effect="fade" start="0" end="100" time="150" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="100" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+  <controls>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityLegacyScrim]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="group" id="9900">
+      <left>3.5%</left>
+      <right>3.5%</right>
+      <top>3.5%</top>
+      <bottom>3.5%</bottom>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityUIRepairSurface]" border="24">infinity_glass/surface.png</texture>
+      </control>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityGlassSpecular]" border="24">infinity_glass/rim.png</texture>
+      </control>
+      <control type="button" id="1188199">
+        <right>18</right>
+        <top>18</top>
+        <width>64</width>
+        <height>64</height>
+        <label />
+        <onclick>Dialog.Close(1188)</onclick>
+        <onleft>1188101</onleft>
+        <onright>1188101</onright>
+        <onup>1188101</onup>
+        <ondown>1188101</ondown>
+        <texturefocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/close_focus.png</texturefocus>
+        <texturenofocus colordiffuse="$VAR[InfinityLegacyText]">infinity_legacy/close.png</texturenofocus>
+      </control>
+      <control type="image">
+        <left>24</left>
+        <top>22</top>
+        <width>64</width>
+        <height>64</height>
+        <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_health.png</texture>
+        <aspectratio>keep</aspectratio>
+      </control>
+      <control type="label">
+        <left>108</left>
+        <top>18</top>
+        <right>270</right>
+        <height>44</height>
+        <font>InfinityBodyBold</font>
+        <label>Kodi Health Center</label>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+      </control>
+      <control type="label">
+        <left>108</left>
+        <top>64</top>
+        <right>270</right>
+        <height>32</height>
+        <font>InfinityTiny</font>
+        <label>Diagnose • Repair • Maintain</label>
+        <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+      </control>
+      <control type="button" id="1188151">
+        <label>SCAN</label>
+        <textoffsetx>0</textoffsetx>
+        <textoffsety>0</textoffsety>
+        <onclick>RunScript(script.kodihealthcenter,scan)</onclick>
+        <right>104</right>
+        <top>24</top>
+        <width>136</width>
+        <height>64</height>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <font>InfinitySmall</font>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+        <align>center</align>
+        <onup>1188199</onup>
+        <ondown>1188101</ondown>
+      </control>
+      <control type="grouplist" id="1188000">
+        <left>24</left>
+        <top>122</top>
+        <right>60</right>
+        <bottom>64</bottom>
+        <orientation>vertical</orientation>
+        <itemgap>16</itemgap>
+        <scrolltime>140</scrolltime>
+        <pagecontrol>1188060</pagecontrol>
+        <onleft>1188199</onleft>
+        <onright>1188060</onright>
+        <onup>1188151</onup>
+        <ondown>1188151</ondown>
+        <control type="group">
+          <height>310</height>
+          <width>100%</width>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>100%</height>
+            <texture colordiffuse="$VAR[InfinityUIRepairSurface]" border="24">infinity_glass/surface.png</texture>
+          </control>
+          <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>100%</height>
+            <texture colordiffuse="$VAR[InfinityGlassSpecular]" border="24">infinity_glass/rim.png</texture>
+          </control>
+          <control type="label">
+            <left>20</left>
+            <top>14</top>
+            <right>20</right>
+            <height>30</height>
+            <font>InfinityTiny</font>
+            <label>Reported system status</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="label">
+            <left>20</left>
+            <top>50</top>
+            <right>20</right>
+            <height>40</height>
+            <font>InfinityBodyBold</font>
+            <label>$VAR[InfinityUIHealthStatus]</label>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+            <textcolor>$VAR[InfinityUIHealthStatusColor]</textcolor>
+          </control>
+          <control type="textbox">
+            <left>20</left>
+            <top>98</top>
+            <right>20</right>
+            <height>76</height>
+            <label>$INFO[Window(Home).Property(KHC.StatusDetail)]</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <align>left</align>
+          </control>
+          <control type="label">
+            <left>20</left>
+            <top>184</top>
+            <right>20</right>
+            <height>32</height>
+            <font>InfinityTiny</font>
+            <label>Saved scan: $INFO[Window(Home).Property(KHC.LastScan)]</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="label">
+            <left>20</left>
+            <top>224</top>
+            <right>20</right>
+            <height>28</height>
+            <font>InfinityTiny</font>
+            <label>Saved baseline (reported)</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="textbox">
+            <left>20</left>
+            <top>260</top>
+            <right>20</right>
+            <height>44</height>
+            <label>$INFO[Window(Home).Property(KHC.Baseline)]</label>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <align>left</align>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>84</height>
+          <control type="label">
+            <left>4</left>
+            <top>6</top>
+            <right>4</right>
+            <height>38</height>
+            <font>InfinityBodyBold</font>
+            <label>Diagnostics</label>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="label">
+            <left>4</left>
+            <top>48</top>
+            <right>4</right>
+            <height>30</height>
+            <font>InfinityTiny</font>
+            <label>Find and understand current issues.</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188101">
+            <label>Scan Kodi</label>
+            <onclick>RunScript(script.kodihealthcenter,scan)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188151</onup>
+            <ondown>1188102</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_scan.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Check your system for current issues, errors and optimizations.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188102">
+            <label>Crash Center</label>
+            <onclick>RunScript(script.kodihealthcenter,crash)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188101</onup>
+            <ondown>1188103</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_crash.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Review recent crashes, logs, incidents and recorder status.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188103">
+            <label>Start Fresh</label>
+            <onclick>RunScript(script.kodihealthcenter,start-fresh)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188102</onup>
+            <ondown>1188111</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_fresh.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Reset diagnostic history and begin a new crash baseline.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>84</height>
+          <control type="label">
+            <left>4</left>
+            <top>6</top>
+            <right>4</right>
+            <height>38</height>
+            <font>InfinityBodyBold</font>
+            <label>Repair &amp; Maintenance</label>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="label">
+            <left>4</left>
+            <top>48</top>
+            <right>4</right>
+            <height>30</height>
+            <font>InfinityTiny</font>
+            <label>Inspect and maintain your installation.</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188111">
+            <label>Refresh Codes</label>
+            <onclick>RunScript(script.kodihealthcenter,refresh-codes)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188103</onup>
+            <ondown>1188112</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_refresh.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Reset diagnostic codes and local correlation counters.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188112">
+            <label>Add-on Doctor</label>
+            <onclick>RunScript(script.kodihealthcenter,doctor)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188111</onup>
+            <ondown>1188113</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_doctor.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Detect missing or disabled dependencies and add-on issues.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188113">
+            <label>Auto Repair</label>
+            <onclick>RunScript(script.kodihealthcenter,auto-repair)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188112</onup>
+            <ondown>1188114</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_repair.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Run approved automatic maintenance and common safe fixes.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188114">
+            <label>Clean Mode</label>
+            <onclick>RunScript(script.kodihealthcenter,clean)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188113</onup>
+            <ondown>1188115</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_clean.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Clear cache, packages and selected temporary files safely.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188115">
+            <label>Repository Manager</label>
+            <onclick>RunScript(script.kodihealthcenter,repositories)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188114</onup>
+            <ondown>1188121</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_repo.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Manage, inspect, enable, disable and recover repositories.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>84</height>
+          <control type="label">
+            <left>4</left>
+            <top>6</top>
+            <right>4</right>
+            <height>38</height>
+            <font>InfinityBodyBold</font>
+            <label>Export &amp; Support</label>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="label">
+            <left>4</left>
+            <top>48</top>
+            <right>4</right>
+            <height>30</height>
+            <font>InfinityTiny</font>
+            <label>Create exports and support packages.</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188121">
+            <label>Infinity Skin Export</label>
+            <onclick>RunScript(script.kodihealthcenter,skin-export)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188115</onup>
+            <ondown>1188122</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_skin.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Export the current Infinity skin and saved skin data.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188122">
+            <label>Add-on Exporter</label>
+            <onclick>RunScript(script.kodihealthcenter,addon-export)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188121</onup>
+            <ondown>1188123</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_export.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Export installed add-ons with optional saved settings/data.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188123">
+            <label>Send Logs for Help</label>
+            <onclick>RunScript(script.kodihealthcenter,send-logs)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188122</onup>
+            <ondown>1188131</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_send.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Create a bounded diagnostic package for troubleshooting.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>84</height>
+          <control type="label">
+            <left>4</left>
+            <top>6</top>
+            <right>4</right>
+            <height>38</height>
+            <font>InfinityBodyBold</font>
+            <label>Tools &amp; Help</label>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+          <control type="label">
+            <left>4</left>
+            <top>48</top>
+            <right>4</right>
+            <height>30</height>
+            <font>InfinityTiny</font>
+            <label>More tools and practical guidance.</label>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188131">
+            <label>More Tools</label>
+            <onclick>RunScript(script.kodihealthcenter,more-tools)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188123</onup>
+            <ondown>1188141</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_tools.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Manual repair, dependencies, storage, backup and recovery tools.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+        <control type="group">
+          <width>100%</width>
+          <height>156</height>
+          <control type="button" id="1188141">
+            <label>Help &amp; Guide</label>
+            <onclick>RunScript(script.kodihealthcenter,help)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>156</height>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <font>InfinitySmall</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <aligny>top</aligny>
+            <textoffsetx>82</textoffsetx>
+            <textoffsety>14</textoffsety>
+            <onup>1188131</onup>
+            <ondown>1188151</ondown>
+            <onleft>1188199</onleft>
+            <onright>1188060</onright>
+          </control>
+          <control type="image">
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_health/icon_help.png</texture>
+            <aspectratio>keep</aspectratio>
+            <left>20</left>
+            <top>20</top>
+            <width>44</width>
+            <height>44</height>
+          </control>
+          <control type="label">
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Learn what Health Center tools do and which actions are safe.</label>
+            <align>left</align>
+            <wrapmultiline>true</wrapmultiline>
+            <left>82</left>
+            <top>60</top>
+            <right>22</right>
+            <height>80</height>
+            <font>InfinityTiny</font>
+            <aligny>top</aligny>
+          </control>
+        </control>
+      </control>
+      <control type="scrollbar" id="1188060">
+        <right>22</right>
+        <top>122</top>
+        <width>26</width>
+        <bottom>64</bottom>
+        <texturesliderbackground border="6" colordiffuse="$VAR[InfinityLegacyField]">infinity_legacy/track.png</texturesliderbackground>
+        <texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar>
+        <texturesliderbarfocus border="6" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/track.png</texturesliderbarfocus>
+        <textureslidernib border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</textureslidernib>
+        <textureslidernibfocus border="6" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/track.png</textureslidernibfocus>
+        <onleft>1188101</onleft>
+        <onright>1188101</onright>
+        <onup>1188101</onup>
+        <ondown>1188101</ondown>
+        <showonepage>false</showonepage>
+        <orientation>vertical</orientation>
+      </control>
+      <control type="label">
+        <left>24</left>
+        <bottom>18</bottom>
+        <right>24</right>
+        <height>30</height>
+        <font>InfinityTiny</font>
+        <label>Health Center $INFO[Window(Home).Property(KHC.Version)]</label>
+        <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+      </control>
+    </control>
+  </controls>
+</window>

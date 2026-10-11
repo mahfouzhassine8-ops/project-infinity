@@ -1,0 +1,1010 @@
+{
+  "baseline": "1.0.5.204 Closing Status Polish RC1",
+  "candidate": "1.0.5.207 UI Stability RC1",
+  "branch": "work/infinity-ui-stabilization-2103365",
+  "protected_repo_parent": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
+  "repairs": [
+    {
+      "id": "U01",
+      "screen": "Add-on Information",
+      "owner": "unified/DialogAddonInfo.xml",
+      "defect": "Reported overflowing buttons, colliding artwork/text and unbounded descriptions.",
+      "implemented_behavior": "Viewport panel; separate artwork/actions and metadata/description panes; scrolling action/description regions; bounded close. Native controls/actions retained.",
+      "evidence": "18347; actual .204 XML",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "U02",
+      "screen": "Global context menus",
+      "owner": "unified/DialogContextMenu.xml",
+      "defect": "Percentage background height minus fixed native list maximum becomes negative on short adaptive canvases.",
+      "implemented_behavior": "Fixed 104-unit chrome via inset parent; bounded auto-height native list/template; opaque theme surface; close anchored to panel; no focus zoom overflow. Options and IDs 996/999/1000 retained.",
+      "evidence": "18355/18361; .204 XML; official Kodi 21.3 SetupButtons",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "U03",
+      "screen": "Provider source menus",
+      "owner": "unified/DialogContextMenu.xml; unified/View_50_List.xml",
+      "defect": "Reported broken long-press source popup; source title/metadata rectangles overlap by 3 units.",
+      "implemented_behavior": "Shared native popup corrected; compact/regular/core provider rows now separate title and metadata, with bounded icons/header/scroll. Provider internals and source actions untouched.",
+      "evidence": "18357; .204 row rectangles",
+      "status": "SHARED_REPAIR_IMPLEMENTED_ACTUAL_PROVIDER_OWNER_PENDING"
+    },
+    {
+      "id": "U04",
+      "screen": "Playback resume prompt",
+      "owner": "unified/DialogContextMenu.xml",
+      "defect": "Existing two-action native prompt uses broken shared geometry.",
+      "implemented_behavior": "Same shared popup repair preserves existing saved position/Resume/Play From Beginning authority. Neutral heading avoids an unverified media title; no new resume dialog.",
+      "evidence": "18359/18361; native two-action contract",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED_RUNTIME_RESUME_PENDING"
+    },
+    {
+      "id": "U05",
+      "screen": "Kodi Health Center",
+      "owner": "unified/Custom_1188_InfinityHealthCenter.xml; unified/Includes_InfinityUIRepair.xml",
+      "defect": "Overlapping flat cards/sections, poor scroll and hard-coded green status despite Needs attention.",
+      "implemented_behavior": "Scrollable 13-card dashboard and separate section headers; wrapped descriptions/icons; all actions preserved; neutral unverified/blank state and explicit saved timestamps; backend taxonomy not invented.",
+      "evidence": "18351; .204 XML; read-only backend legacy properties",
+      "status": "GEOMETRY_IMPLEMENTED_RICH_STATUS_CONTRACT_PENDING"
+    },
+    {
+      "id": "U06",
+      "screen": "Navigation drawer",
+      "owner": "unified/Custom_1198_InfinityNav.xml",
+      "defect": "Redundant Live TV entry and System Hub in the wrong primary section.",
+      "implemented_behavior": "Remove only 1198107; place 1198503 directly after UI Theme before original Power. Primary sections approved; existing scrolling Explore/view/performance/refresh extras retained.",
+      "evidence": "18349/18353; exact .204 order/bindings",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "U07",
+      "screen": "System Hub",
+      "owner": "unified/Custom_1191_InfinitySystemHub.xml",
+      "defect": "Duplicate Power control and its focus targets.",
+      "implemented_behavior": "Remove only 1191105 and its row; repair dangling navigation to retained targets; all other six actions kept, long text scroll enabled. Main Power XML unchanged.",
+      "evidence": "Explicit approved request; .204 XML",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "U08",
+      "screen": "Watched UI preparation",
+      "owner": "unified/Includes_InfinityUIRepair.xml",
+      "defect": "Need verified completed badge without false tracking or unsupported mutations.",
+      "implemented_behavior": "Dormant small blue badge requires verified/completed parameters, both false by default. No consumers or context actions activated; existing progress and backend persistence untouched.",
+      "evidence": "Approved interface brief; no final verified backend route available",
+      "status": "PREPARED_INACTIVE_BACKEND_CONTRACT_PENDING"
+    },
+    {
+      "id": "P01",
+      "screen": "Shared selection dialog",
+      "owner": "unified/Includes_InfinityLegacy.xml (InfinityLegacy_DefaultDialogSelectLayout only)",
+      "defect": "Conditional partial backgrounds and item-count slides could move panel/page label; artwork/list/footer competed for partial width.",
+      "implemented_behavior": "Single bounded surface/list; artwork and text separated; manual/cancel footer retained and moved below lists; obsolete geometry slides removed. Other definitions byte identical.",
+      "evidence": "Confirmed .204 authored source",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "P02",
+      "screen": "Settings/add-on settings",
+      "owner": "unified/DialogSettings.xml; unified/DialogAddonSettings.xml",
+      "defect": "Fixed/percentage row mix collapses native spin/slider rows in short windows; footer/category bounds depend on unrelated canvas percentages.",
+      "implemented_behavior": "Consistent 88-unit native row templates; separate bounded header/category/content/footer; original IDs, values and action bindings retained.",
+      "evidence": "Confirmed .204 source, short adaptive logical canvas",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "P03",
+      "screen": "Text viewer",
+      "owner": "unified/DialogTextViewer.xml",
+      "defect": "Body, paging control and close use inconsistent panel bounds.",
+      "implemented_behavior": "Bounded heading/body/scrollbar/close; native content/paging IDs retained.",
+      "evidence": "Confirmed .204 authored source",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "P04",
+      "screen": "Keyboard",
+      "owner": "unified/DialogKeyboard.xml",
+      "defect": "Twelve fixed 75-unit character keys plus percentage function key exceed narrow portrait row width.",
+      "implemented_behavior": "Five bounded equal tracks, percentage character/function keys; matching text/graphical overlays; all native key IDs and semantics retained.",
+      "evidence": "Confirmed .204 authored source",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "P05",
+      "screen": "Cinema metadata rows",
+      "owner": "unified/Includes_CinemaBrowse.xml (InfinityCinemaBrowseList only)",
+      "defect": "Percentage row height can become shorter than title/metadata on landscape reflow.",
+      "implemented_behavior": "88-unit rows with disjoint title/metadata and bounded trailing affordances; unrelated cinema definitions unchanged.",
+      "evidence": "Confirmed .204 authored source",
+      "status": "IMPLEMENTED_SOURCE_VALIDATED"
+    },
+    {
+      "id": "P06",
+      "screen": "Panel opacity/themes",
+      "owner": "unified/Includes_InfinityUIRepair.xml; unified/Includes.xml",
+      "defect": "Reported excessive transparency causes underlying rows to compete with modal content.",
+      "implemented_behavior": "Local opaque repaired modal surfaces retain existing theme RGB, textures, fonts and corner treatment. Existing global theme variables remain byte identical.",
+      "evidence": "Reported evidence and actual .204 tokens",
+      "status": "IMPLEMENTED_SOURCE_AND_CONTRAST_VALIDATED"
+    }
+  ],
+  "source_window_inventory": [
+    {
+      "path": "unified/AddonBrowser.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1188_InfinityHealthCenter.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 15,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1190_InfinityPalette.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1191_InfinitySystemHub.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 7,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1192_InfinityPerformance.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 12,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1193_InfinityBrowse.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1194_InfinityCommandCenter.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 11,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1195_InfinityAudioSubtitles.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1196_InfinityPlaybackSpeed.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1197_InfinityDisplayMode.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_1198_InfinityNav.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 25,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_5001_skins.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Custom_5002.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 9,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogAddonInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogAddonSettings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogBusy.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogButtonMenu.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 10,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogColorPicker.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogConfirm.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogContextMenu.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogExtendedProgressBar.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogFavourites.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 3,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogFullScreenInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogGameControllers.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogKeyboard.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogMediaSource.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogMusicInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 9,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogNotification.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogNumeric.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRChannelGuide.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRChannelManager.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRChannelsOSD.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRGroupManager.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRGuideControls.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 12,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRGuideSearch.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPVRRadioRDSInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPictureInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogPlayerProcessInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogSeekBar.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogSelect.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogSettings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogSlider.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogSubtitles.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogTextViewer.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogVideoInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogVideoManager.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/DialogVolumeBar.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/EventLog.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/FileBrowser.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/FileManager.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 5,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/GameOSD.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Home.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 38,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/LoginScreen.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MusicOSD.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 14,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MusicVisualisation.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyFavourites.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyGames.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyMusicNav.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 8,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyMusicPlaylistEditor.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPVRChannels.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPVRGuide.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPVRRecordings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPVRSearch.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPVRTimers.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPics.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 3,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPlaylist.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyPrograms.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 3,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyVideoNav.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 9,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/MyWeather.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/PlayerControls.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 22,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Pointer.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/RecordPrefs.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Settings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SettingsCategory.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SettingsProfile.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SettingsScreenCalibration.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SettingsSystemInfo.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SkinSettings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 75,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SlideShow.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SmartPlaylistEditor.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/SmartPlaylistRule.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/Startup.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/VideoFullScreen.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/VideoOSD.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 25,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/VideoOSDBookmarks.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1101_Startup.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1110_TMDbHelper_Recommendations.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1111_TMDbHelper.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1112_TextViewer.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1113_FullscreenFanart.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1114_DialogSettings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1117_AddonStatus.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 27,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1119_ExtrasDialog.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 7,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1126_Confirm.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 3,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1127_OverlayIcons.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1128_WindowCustomizer.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 4,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1129_Select.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1130_Views.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1131_ViewSettings.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 6,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1132_DisableViews.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 23,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1133_Apps.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1134_PausedOverlay.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1135_ReplaceWindow.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1140_Colors.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 26,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1142_Skins2.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/custom_1199_InfinityVideoLock.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/screensaver-arctic-mirage-addon.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-RSS_Editor-rssEditor.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-RSS_Editor-setEditor.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-XBMC_Lyrics-main.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-cu-lrclyrics-main.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-embuary-image.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-embuary-person.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 2,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-embuary-video.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 6,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-globalsearch-main.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-globalsearch.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 1,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-script.module.t9.search-Main.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-skinshortcuts.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 16,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/script-tmdbhelper-recommendations.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/service-CoreELEC-Settings-mainWindow.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    },
+    {
+      "path": "unified/service-LibreELEC-Settings-mainWindow.xml",
+      "changed": false,
+      "xml_parsed": true,
+      "action_controls": 0,
+      "runtime_walkthrough": "NOT_RUN"
+    }
+  ],
+  "source_window_count": 122,
+  "active_xml_documents_parsed": 186,
+  "runtime_end_to_end_walkthrough_completed": false,
+  "physical_fold_accepted": false,
+  "additional_unverified_possibilities": [
+    "Provider may own a custom source dialog; installed call site unavailable.",
+    "Packed/legacy texture references without standalone files need runtime resolution before calling them missing.",
+    "Android insets, live-resize focus/touch restoration, loading truthfulness and foreground/idle transitions need physical runtime evidence.",
+    "UI stall/resource growth and backend delays cannot be diagnosed from XML geometry alone."
+  ],
+  "preserved_screen_families": [
+    "Choose Your Experience/Home/header/hero/widgets and artwork",
+    "Movie/TV poster views, episodes and detail data",
+    "Settings values/theme/view selections",
+    "Player overlays, native playback and PVR",
+    "Provider scraping/authentication/source ordering",
+    "Power/Close behavior and protected .204 delta",
+    "Command Center/Resume Hub identities, persistence and source hashes"
+  ],
+  "runtime_limit": "No Kodi executable, physical Fold session or Android/device bridge in this environment; source checks/projections cannot prove runtime rendering or interaction."
+}

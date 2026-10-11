@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window>
+  <defaultcontrol>996</defaultcontrol>
+  <include>InfinityLegacy_dialogeffect</include>
+  <coordinates>
+    <left>0%</left>
+    <top>0%</top>
+  </coordinates>
+  <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+  <controls>
+    <control type="group" id="9900">
+      <left>0</left>
+      <top>0</top>
+      <width>90%</width>
+      <height>90%</height>
+      <control type="image" id="999">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityUIRepairSurface]" border="24">infinity_glass/surface.png</texture>
+        <bordertexture border="24" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</bordertexture>
+        <bordersize>2</bordersize>
+      </control>
+      <control type="button" id="995">
+        <right>18</right>
+        <top>18</top>
+        <width>64</width>
+        <height>64</height>
+        <label />
+        <onclick>PreviousMenu</onclick>
+        <onleft>996</onleft>
+        <onright>996</onright>
+        <onup>996</onup>
+        <ondown>996</ondown>
+        <texturefocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/close_focus.png</texturefocus>
+        <texturenofocus colordiffuse="$VAR[InfinityLegacyText]">infinity_legacy/close.png</texturenofocus>
+      </control>
+      <control type="label">
+        <left>24</left>
+        <top>18</top>
+        <right>106</right>
+        <height>64</height>
+        <font>InfinitySmall</font>
+        <label>Choose an action</label>
+        <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+      </control>
+      <control type="group" id="9901">
+        <left>18</left>
+        <right>18</right>
+        <top>88</top>
+        <bottom>16</bottom>
+        <control type="grouplist" id="996">
+          <left>0</left>
+          <top>0</top>
+          <width>100%</width>
+          <height max="100%" min="1">auto</height>
+          <itemgap>6</itemgap>
+          <orientation>vertical</orientation>
+          <scrolltime>120</scrolltime>
+          <onleft>995</onleft>
+          <onright>995</onright>
+          <onup>996</onup>
+          <ondown>996</ondown>
+          <control type="button" id="1000">
+            <description>button template</description>
+            <font>InfinityBody</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textoffsetx>24</textoffsetx>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>82</height>
+            <scroll>true</scroll>
+          </control>
+        </control>
+      </control>
+    </control>
+  </controls>
+</window>

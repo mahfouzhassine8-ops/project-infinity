@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<includes>
+  <variable name="InfinityUIRepairSurface">
+    <value condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema)">FF000000</value>
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FF000000</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FFFFFFFF</value>
+    <value>FF0A111A</value>
+  </variable>
+  <variable name="InfinityUIHealthStatus">
+    <value condition="!String.IsEmpty(Window(Home).Property(KHC.Status))">$INFO[Window(Home).Property(KHC.Status)]</value>
+    <value>Unknown / not verified</value>
+  </variable>
+  <variable name="InfinityUIHealthStatusColor">
+    <value condition="String.IsEqual(Window(Home).Property(KHC.Status),Needs attention)">$VAR[InfinityLegacyDanger]</value>
+    <value>$VAR[InfinityLegacySecondary]</value>
+  </variable>
+  <include name="InfinityUIVerifiedWatchedBadge">
+    <param name="verified" default="false" />
+    <param name="completed" default="false" />
+    <definition>
+      <control type="image">
+        <right>8</right>
+        <top>8</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FF24A8FF">infinity_legacy/check_on.png</texture>
+        <visible>$PARAM[verified] + $PARAM[completed]</visible>
+        <aspectratio>keep</aspectratio>
+      </control>
+    </definition>
+  </include>
+</includes>

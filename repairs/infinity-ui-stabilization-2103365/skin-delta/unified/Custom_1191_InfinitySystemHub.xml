@@ -1,0 +1,378 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1191" type="dialog">
+  <defaultcontrol>1191101</defaultcontrol>
+  <onback>Dialog.Close(1191)</onback>
+  <controls>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityDrawerScrim]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="group" id="1198888">
+      <left>10%</left>
+      <right>10%</right>
+      <top>10%</top>
+      <bottom>10%</bottom>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityDrawerPanel]" border="24">infinity_polish/surface.png</texture>
+      </control>
+      <control type="image" id="1198880">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="58FFFFFF" diffuse="infinity_polish/surface.png" />
+        <visible>String.IsEqual(Window(Home).Property(Infinity.NativeAmbient.Active),true)</visible>
+      </control>
+      <control type="image" id="1198901">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityGlassFocus]" border="24">infinity_polish/rim.png</texture>
+      </control>
+      <control type="image">
+        <left>26</left>
+        <top>34</top>
+        <width>68</width>
+        <height>34</height>
+        <texture>infinity_polish/infinity_mark.png</texture>
+      </control>
+      <control type="label">
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <label>INFINITY SYSTEM HUB</label>
+        <aligny>center</aligny>
+        <left>116</left>
+        <top>24</top>
+        <right>112</right>
+        <height>48</height>
+        <font>InfinityTitle</font>
+        <scroll>true</scroll>
+      </control>
+      <control type="label">
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityLegacyAccent]</textcolor>
+        <label>SYSTEM • RECOVERY • ACCOUNTS • DIAGNOSTICS</label>
+        <aligny>center</aligny>
+        <left>116</left>
+        <top>74</top>
+        <right>112</right>
+        <height>34</height>
+        <scroll>true</scroll>
+      </control>
+      <control type="button" id="1191199">
+        <label>×</label>
+        <font>InfinityTitle</font>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <onclick>Dialog.Close(1191)</onclick>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <right>20</right>
+        <top>24</top>
+        <width>80</width>
+        <height>80</height>
+        <onleft>1191101</onleft>
+        <onright>1191101</onright>
+        <onup>1191101</onup>
+        <ondown>1191101</ondown>
+      </control>
+      <control type="grouplist" id="1191888">
+        <control type="group">
+          <control type="button" id="1191101">
+            <label>COBRA</label>
+            <font>InfinitySmall</font>
+            <align>left</align>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <enable>System.Platform.Android</enable>
+            <onclick>Dialog.Close(1191)</onclick>
+            <onclick>StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.OPEN_LIVE)</onclick>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>112</height>
+            <textoffsetx>84</textoffsetx>
+            <textoffsety>16</textoffsety>
+            <aligny>top</aligny>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+          </control>
+          <control type="image">
+            <aspectratio>keep</aspectratio>
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_ui/icons/command.png</texture>
+            <left>22</left>
+            <top>34</top>
+            <width>40</width>
+            <height>40</height>
+          </control>
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Open the native Cobra environment</label>
+            <aligny>center</aligny>
+            <left>84</left>
+            <top>58</top>
+            <right>22</right>
+            <height>34</height>
+            <scroll>true</scroll>
+          </control>
+          <width>100%</width>
+          <height>112</height>
+        </control>
+        <control type="group">
+          <control type="button" id="1191102">
+            <label>COMMAND CENTER</label>
+            <font>InfinitySmall</font>
+            <align>left</align>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <enable>System.HasAddon(script.infinity.commandcenter)</enable>
+            <onclick>RunScript(script.infinity.commandcenter,runtime-sync,true)</onclick>
+            <onclick>Dialog.Close(1191)</onclick>
+            <onclick>ActivateWindow(1194)</onclick>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>112</height>
+            <textoffsetx>84</textoffsetx>
+            <textoffsety>16</textoffsety>
+            <aligny>top</aligny>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+          </control>
+          <control type="image">
+            <aspectratio>keep</aspectratio>
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_ui/icons/command.png</texture>
+            <left>22</left>
+            <top>34</top>
+            <width>40</width>
+            <height>40</height>
+          </control>
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Performance, display modes and Infinity runtime</label>
+            <aligny>center</aligny>
+            <left>84</left>
+            <top>58</top>
+            <right>22</right>
+            <height>34</height>
+            <scroll>true</scroll>
+          </control>
+          <width>100%</width>
+          <height>112</height>
+        </control>
+        <control type="group">
+          <control type="button" id="1191103">
+            <label>INFINITY HEALTH CENTER</label>
+            <font>InfinitySmall</font>
+            <align>left</align>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <enable>System.HasAddon(script.kodihealthcenter)</enable>
+            <onclick>Dialog.Close(1191)</onclick>
+            <onclick>RunAddon(script.kodihealthcenter)</onclick>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>112</height>
+            <textoffsetx>84</textoffsetx>
+            <textoffsety>16</textoffsety>
+            <aligny>top</aligny>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+          </control>
+          <control type="image">
+            <aspectratio>keep</aspectratio>
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_ui/icons/info.png</texture>
+            <left>22</left>
+            <top>34</top>
+            <width>40</width>
+            <height>40</height>
+          </control>
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Diagnose, verify and recover</label>
+            <aligny>center</aligny>
+            <left>84</left>
+            <top>58</top>
+            <right>22</right>
+            <height>34</height>
+            <scroll>true</scroll>
+          </control>
+          <control type="image">
+            <texture border="0" colordiffuse="$VAR[InfinityHealthOrbColor]">infinity_experience/health-orb.png</texture>
+            <right>18</right>
+            <top>40</top>
+            <width>28</width>
+            <height>28</height>
+          </control>
+          <width>100%</width>
+          <height>112</height>
+        </control>
+        <control type="group">
+          <control type="button" id="1191104">
+            <label>KODI SETTINGS</label>
+            <font>InfinitySmall</font>
+            <align>left</align>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <onclick>Dialog.Close(1191)</onclick>
+            <onclick>ActivateWindow(Settings)</onclick>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>112</height>
+            <textoffsetx>84</textoffsetx>
+            <textoffsety>16</textoffsety>
+            <aligny>top</aligny>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+          </control>
+          <control type="image">
+            <aspectratio>keep</aspectratio>
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_ui/icons/settings.png</texture>
+            <left>22</left>
+            <top>34</top>
+            <width>40</width>
+            <height>40</height>
+          </control>
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Kodi system and application settings</label>
+            <aligny>center</aligny>
+            <left>84</left>
+            <top>58</top>
+            <right>22</right>
+            <height>34</height>
+            <scroll>true</scroll>
+          </control>
+          <width>100%</width>
+          <height>112</height>
+        </control>
+        <control type="group">
+          <control type="button" id="1191106">
+            <label>UPDATE</label>
+            <font>InfinitySmall</font>
+            <align>left</align>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <enable>System.HasAddon(script.infinity.kodiupdate)</enable>
+            <onclick>Dialog.Close(1191)</onclick>
+            <onclick>RunAddon(script.infinity.kodiupdate)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>112</height>
+            <textoffsetx>84</textoffsetx>
+            <textoffsety>16</textoffsety>
+            <aligny>top</aligny>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+          </control>
+          <control type="image">
+            <aspectratio>keep</aspectratio>
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_ui/icons/info.png</texture>
+            <left>22</left>
+            <top>34</top>
+            <width>40</width>
+            <height>40</height>
+          </control>
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Check Kodi updates and export update status</label>
+            <aligny>center</aligny>
+            <left>84</left>
+            <top>58</top>
+            <right>22</right>
+            <height>34</height>
+            <scroll>true</scroll>
+          </control>
+          <width>100%</width>
+          <height>112</height>
+        </control>
+        <control type="group">
+          <control type="button" id="1191107">
+            <label>AUTHORIZATION &amp; ACCOUNTS</label>
+            <font>InfinitySmall</font>
+            <align>left</align>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <enable>System.HasAddon(script.infinity.authsurface)</enable>
+            <onclick>Dialog.Close(1191)</onclick>
+            <onclick>RunAddon(script.infinity.authsurface)</onclick>
+            <left>0</left>
+            <top>0</top>
+            <width>100%</width>
+            <height>112</height>
+            <textoffsetx>84</textoffsetx>
+            <textoffsety>16</textoffsety>
+            <aligny>top</aligny>
+            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+          </control>
+          <control type="image">
+            <aspectratio>keep</aspectratio>
+            <texture colordiffuse="$VAR[InfinityLegacyAccent]">infinity_ui/icons/lock.png</texture>
+            <left>22</left>
+            <top>34</top>
+            <width>40</width>
+            <height>40</height>
+          </control>
+          <control type="label">
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+            <label>Trakt, Debrid and connected service authorization</label>
+            <aligny>center</aligny>
+            <left>84</left>
+            <top>58</top>
+            <right>22</right>
+            <height>34</height>
+            <scroll>true</scroll>
+          </control>
+          <width>100%</width>
+          <height>112</height>
+        </control>
+        <left>24</left>
+        <right>24</right>
+        <top>140</top>
+        <bottom>74</bottom>
+        <orientation>vertical</orientation>
+        <itemgap>10</itemgap>
+        <usecontrolcoords>false</usecontrolcoords>
+      </control>
+      <control type="label">
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+        <label>Infinity system tools • native Cobra • protected power routing</label>
+        <align>center</align>
+        <left>24</left>
+        <right>24</right>
+        <bottom>20</bottom>
+        <height>34</height>
+        <scroll>true</scroll>
+      </control>
+    </control>
+  </controls>
+  <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+</window>

@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window>
+  <defaultcontrol always="true">5</defaultcontrol>
+  <backgroundcolor>00000000</backgroundcolor>
+  <include>InfinityLegacy_dialogeffect</include>
+  <onload>SetProperty(Infinity.DialogDesign,reference-c26,home)</onload>
+  <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+  <controls>
+    <control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityLegacyScrim]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="group" id="9900">
+      <left>3.5%</left>
+      <right>3.5%</right>
+      <top>3.5%</top>
+      <bottom>3.5%</bottom>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityUIRepairSurface]" border="24">infinity_glass/surface.png</texture>
+      </control>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityGlassSpecular]" border="24">infinity_glass/rim.png</texture>
+      </control>
+      <control type="button" id="9002">
+        <right>18</right>
+        <top>18</top>
+        <width>64</width>
+        <height>64</height>
+        <label />
+        <onclick>Action(Back)</onclick>
+        <onleft>5</onleft>
+        <onright>5</onright>
+        <onup>5</onup>
+        <ondown>5</ondown>
+        <texturefocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/close_focus.png</texturefocus>
+        <texturenofocus colordiffuse="$VAR[InfinityLegacyText]">infinity_legacy/close.png</texturenofocus>
+      </control>
+      <control type="label" id="2">
+        <aligny>center</aligny>
+        <left>24</left>
+        <top>18</top>
+        <right>106</right>
+        <height>64</height>
+        <font>InfinityBodyBold</font>
+        <scroll>true</scroll>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+      </control>
+      <control type="grouplist" id="5">
+        <itemgap>12</itemgap>
+        <pagecontrol>60</pagecontrol>
+        <onup>9001</onup>
+        <ondown>9001</ondown>
+        <onleft>60</onleft>
+        <onright>60</onright>
+        <left>24</left>
+        <top>104</top>
+        <right>62</right>
+        <bottom>112</bottom>
+        <scrolltime>140</scrolltime>
+      </control>
+      <control type="scrollbar" id="60">
+        <texturesliderbackground border="6" colordiffuse="$VAR[InfinityLegacyField]">infinity_legacy/track.png</texturesliderbackground>
+        <texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar>
+        <texturesliderbarfocus border="6" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/track.png</texturesliderbarfocus>
+        <textureslidernib colordiffuse="$VAR[InfinityLegacyAccent]">infinity_reference/white.png</textureslidernib>
+        <textureslidernibfocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_reference/white.png</textureslidernibfocus>
+        <onleft>5</onleft>
+        <onright>5</onright>
+        <showonepage>false</showonepage>
+        <orientation>vertical</orientation>
+        <right>22</right>
+        <top>104</top>
+        <width>26</width>
+        <bottom>112</bottom>
+      </control>
+      <control type="button" id="7">
+        <description>Default Button</description>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <textoffsetx>30</textoffsetx>
+        <aligny>center</aligny>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <width>100%</width>
+        <height>88</height>
+        <scroll>true</scroll>
+      </control>
+      <control type="radiobutton" id="8">
+        <textureradiooffdisabled colordiffuse="$VAR[InfinityLegacyDisabled]">infinity_legacy/switch_off.png</textureradiooffdisabled>
+        <textureradiooffnofocus colordiffuse="$VAR[InfinityLegacySecondary]">infinity_legacy/switch_off.png</textureradiooffnofocus>
+        <textureradioofffocus colordiffuse="$VAR[InfinityLegacySecondary]">infinity_legacy/switch_off.png</textureradioofffocus>
+        <textureradioondisabled colordiffuse="$VAR[InfinityLegacyDisabled]">infinity_legacy/switch_on.png</textureradioondisabled>
+        <textureradioonnofocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/switch_on.png</textureradioonnofocus>
+        <textureradioonfocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/switch_on.png</textureradioonfocus>
+        <radioheight>32</radioheight>
+        <radiowidth>64</radiowidth>
+        <radioposy>0</radioposy>
+        <radioposx>0</radioposx>
+        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <textoffsetx>18</textoffsetx>
+        <aligny>center</aligny>
+        <shadowcolor>00000000</shadowcolor>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <font>InfinitySettingsRow</font>
+        <description>Default RadioButton</description>
+        <width>100%</width>
+        <height>88</height>
+        <scroll>true</scroll>
+      </control>
+      <control type="spincontrolex" id="9">
+        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <textoffsetx>18</textoffsetx>
+        <aligny>center</aligny>
+        <shadowcolor>00000000</shadowcolor>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <font>InfinitySettingsRow</font>
+        <description>Default SpinControlex</description>
+        <spinwidth>36</spinwidth>
+        <spinheight>36</spinheight>
+        <textureup colordiffuse="$VAR[InfinityLegacySecondary]">infinity_legacy/up.png</textureup>
+        <textureupfocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/up.png</textureupfocus>
+        <texturedown colordiffuse="$VAR[InfinityLegacySecondary]">infinity_legacy/down.png</texturedown>
+        <texturedownfocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/down.png</texturedownfocus>
+        <reverse>yes</reverse>
+        <textureupdisabled colordiffuse="$VAR[InfinityLegacyDisabled]">infinity_legacy/up.png</textureupdisabled>
+        <texturedowndisabled colordiffuse="$VAR[InfinityLegacyDisabled]">infinity_legacy/down.png</texturedowndisabled>
+        <width>100%</width>
+        <height>88</height>
+        <scroll>true</scroll>
+      </control>
+      <control type="image" id="11">
+        <description>separator image</description>
+        <texture colordiffuse="$VAR[InfinityLegacyBorder]">infinity_reference/white.png</texture>
+        <width>100%</width>
+        <height>3</height>
+      </control>
+      <control type="edit" id="12">
+        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <textoffsetx>18</textoffsetx>
+        <aligny>center</aligny>
+        <shadowcolor>00000000</shadowcolor>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <font>InfinitySettingsRow</font>
+        <description>Default Edit</description>
+        <selectedcolor>$VAR[InfinityLegacyAccent]</selectedcolor>
+        <width>100%</width>
+        <height>88</height>
+        <scroll>true</scroll>
+      </control>
+      <control type="sliderex" id="13">
+        <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <textoffsetx>18</textoffsetx>
+        <aligny>center</aligny>
+        <shadowcolor>00000000</shadowcolor>
+        <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+        <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <font>InfinitySettingsRow</font>
+        <description>Default Slider</description>
+        <texturesliderbar colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar>
+        <textureslidernib colordiffuse="$VAR[InfinityLegacySecondary]">infinity_legacy/thumb.png</textureslidernib>
+        <textureslidernibfocus colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/thumb.png</textureslidernibfocus>
+        <width>100%</width>
+        <height>88</height>
+        <scroll>true</scroll>
+      </control>
+      <control type="label" id="14">
+        <description>Default Heading</description>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+        <aligny>center</aligny>
+        <width>100%</width>
+        <height>52</height>
+      </control>
+      <control type="grouplist" id="9001">
+        <orientation>horizontal</orientation>
+        <align>center</align>
+        <control type="button" id="28">
+          <description>OK Button</description>
+          <align>center</align>
+          <aligny>center</aligny>
+          <font>InfinitySmall</font>
+          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+          <textcolor>$VAR[InfinityLegacyText]</textcolor>
+          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+          <onup>5</onup>
+          <ondown>5</ondown>
+          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+          <width>30%</width>
+          <height>72</height>
+          <scroll>true</scroll>
+        </control>
+        <control type="button" id="29">
+          <description>Cancel Button</description>
+          <align>center</align>
+          <aligny>center</aligny>
+          <font>InfinitySmall</font>
+          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+          <textcolor>$VAR[InfinityLegacyText]</textcolor>
+          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+          <onup>5</onup>
+          <ondown>5</ondown>
+          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+          <width>30%</width>
+          <height>72</height>
+          <scroll>true</scroll>
+        </control>
+        <control type="button" id="30">
+          <description>Settings Button</description>
+          <align>center</align>
+          <aligny>center</aligny>
+          <font>InfinitySmall</font>
+          <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+          <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+          <textcolor>$VAR[InfinityLegacyText]</textcolor>
+          <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+          <onup>5</onup>
+          <ondown>5</ondown>
+          <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+          <width>30%</width>
+          <height>72</height>
+          <scroll>true</scroll>
+        </control>
+        <left>24</left>
+        <bottom>22</bottom>
+        <right>24</right>
+        <height>72</height>
+        <itemgap>12</itemgap>
+      </control>
+    </control>
+  </controls>
+</window>
