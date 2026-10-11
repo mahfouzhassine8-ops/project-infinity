@@ -1,0 +1,94 @@
+name: Infinity | Verified-series candidate protected 2103365 rollback
+on:
+  push:
+    branches: [work/infinity-stability-rollback-scope-2103366]
+    paths:
+      - 'tools/checkpoint-apk/rollback_2103365.py'
+      - 'tools/checkpoint-apk/test_rollback_2103365.py'
+      - '.github/workflows/infinity-2103366-scope-rollback.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-stability-rollback-scope-2103366, cancel-in-progress: true}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  rollback-android:
+    if: github.ref == 'refs/heads/work/infinity-stability-rollback-scope-2103366'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Restore exact pinned toolchain
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38100173431
+          name: Infinity-2103365-Android-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: protected
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38100173431
+          name: Infinity-Checkpoint-Work-Android-Validation
+          github-token: ${{ github.token }}
+          path: protected-evidence
+      - name: Exercise exact code/native rollback and transaction recovery
+        run: |
+          set -euo pipefail
+          mkdir -p rollback-source rollback-out "$HOME/.android"
+          curl --fail --location --retry 3 --output rollback-out/json.jar https://repo.maven.apache.org/maven2/org/json/json/20240303/json-20240303.jar
+          python3 tools/checkpoint-apk/test_rollback_2103365.py --baseline protected/Infinity-2103365-Android-Close-RC1.apk --json-jar rollback-out/json.jar
+          tar --no-same-owner -xzf protected-evidence/checkpoint-android/runtime-shell-source.tar.gz -C rollback-source
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          python3 tools/checkpoint-apk/rollback_2103365.py stage --source rollback-source/shell-kodi --baseline protected/Infinity-2103365-Android-Close-RC1.apk --build rollback-build --out rollback-out
+      - name: Compile complete protected Android shell with reviewed code restoration
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          built=false
+          for attempt in 1 2 3; do
+            if ./rollback-build/gradlew --no-daemon --console=plain -p rollback-build :xbmc:assembleRelease 2>&1 | tee -a rollback-out/compile.log; then built=true; break; fi
+          done
+          [ "$built" = true ]
+      - name: Preserve exact green engine, sign and verify all protected payloads
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 tools/checkpoint-apk/rollback_2103365.py package --source rollback-source/shell-kodi --baseline protected/Infinity-2103365-Android-Close-RC1.apk --build rollback-build --out rollback-out
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103366-2103365-Code-Rollback-RC2-APK
+          path: rollback-out/Infinity-2103366-2103365-Code-Rollback-RC2.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103365-Code-Rollback-Evidence
+          path: |
+            rollback-out/
+            !rollback-out/*.apk
+            !rollback-out/json.jar
+          retention-days: 90
+          if-no-files-found: error
