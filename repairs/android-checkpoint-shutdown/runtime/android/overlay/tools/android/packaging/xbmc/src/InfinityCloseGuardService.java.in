@@ -18,7 +18,7 @@ public final class InfinityCloseGuardService extends Service {
   private final Handler ui=new Handler(Looper.getMainLooper());
   private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityCheckpointCoordinator");t.setDaemon(true);return t;});
   private final Object authorityLock=new Object();
-  private boolean binding;
+  private boolean binding, completing;
   private volatile boolean ended,consumed,revoked,checkpointSaved;
   private volatile String phase="IDLE",error="";
   private Session session;
@@ -124,9 +124,10 @@ public final class InfinityCloseGuardService extends Service {
       transition("QUIESCE","");
       binding=bindService(new Intent(this,InfinityCloseNativeLease.class),connection,BIND_FLAGS);
       if(!binding){fail("existing_engine_endpoint_not_bound");return START_NOT_STICKY;}
-      // Close Infinity leaves the app. The foreground coordinator keeps saving;
-      // never finish NativeActivity or open the chooser as a side effect of Close.
-      startActivity(homeIntent());
+      // Preserve the live NativeActivity until native saving is verified.
+      // Moving Home here can trigger Android NativeActivity destruction before
+      // the checkpoint seals on the physical Fold.
+      evidence("navigation.deferred_until_confirmed_death",phase,"");
       ui.post(poll);ui.postDelayed(this::deadline,Math.max(0,InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS-(SystemClock.elapsedRealtime()-session.started)));
       ui.postDelayed(()->{if(!ended){error="termination_confirmation_unavailable";evidence("guard_lifetime_expired",phase,error);end();}},MAX_PROTECTION_MS);
     }catch(RuntimeException denied){fail("coordinator_start_"+denied.getClass().getSimpleName());}
@@ -220,6 +221,8 @@ public final class InfinityCloseGuardService extends Service {
       final Boolean result=alive;ui.post(()->{
         if(ended||session!=target||!Boolean.FALSE.equals(result))return;
         if(checkpointSaved&&consumed&&!revoked&&"ENGINE_TERMINATING".equals(phase)){
+          if(completing)return; // Exactly one confirmed completion/handoff.
+          completing=true;
           deathEpoch=System.currentTimeMillis();deathElapsed=SystemClock.elapsedRealtime();
           final JSONObject done=receipt("COMPLETE","");
           try{
@@ -227,11 +230,27 @@ public final class InfinityCloseGuardService extends Service {
               fail("incomplete_termination_authorization_evidence");return;
             }
           }catch(Exception unverified){fail("invalid_completion_evidence");return;}
-          phase="COMPLETE";error="";
-          worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),done);}
-            catch(IOException unavailable){evidence("completion_receipt_failed","COMPLETE","");}
-            ui.post(()->{evidence("engine.owner_lease_released","COMPLETE","");end();});});
-        }else fail("engine_ended_without_consumed_termination_authorization");
+          // Persist COMPLETE before returning Home. Failure retains recovery
+          // without claiming a successful exit or clearing saved evidence.
+          worker.execute(()->{
+            try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),done);}
+            catch(IOException unavailable){
+              evidence("completion_receipt_failed","ENGINE_TERMINATING","");
+              ui.post(()->fail("completion_receipt_commit_failed"));return;
+            }
+            ui.post(()->{
+              if(ended||session!=target)return;
+              phase="COMPLETE";error="";
+              evidence("engine.owner_lease_released","COMPLETE","");
+              // Old :kodi process is verified dead; only now leave for Home.
+              try{startActivity(homeIntent());}
+              catch(RuntimeException unavailable){
+                evidence("navigation.home_after_death_unavailable","COMPLETE",unavailable.getClass().getSimpleName());
+              }
+              finally{end();}
+            });
+          });
+        }else if(!completing)fail("engine_ended_without_consumed_termination_authorization");
       });
     });
   }
