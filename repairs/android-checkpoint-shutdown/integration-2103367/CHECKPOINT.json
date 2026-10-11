@@ -45,6 +45,15 @@
     "2103367 release/native identity and exact protected APK/JNI/asset gates",
     "Verified dependency transfer into isolated candidate branch"
   ],
+  "delivery": {
+    "apk_sha256": "271afd764c64b6677fac6a58f3338181e7b7f23a97e77703425acf4485d491bc",
+    "evidence_sha256": "9631cad006da2c6c51000512f7b2cfef7f377d940f3f2cf666b5439ec6be530a",
+    "files": [
+      "Infinity-2103367-Recovery-Integration-RC1.apk",
+      "Infinity-2103367-Recovery-Integration-Evidence.zip"
+    ],
+    "saved": true
+  },
   "implementation_parent": "48dc19c221fc41f88f3d52614beef8a877e426d6",
   "implementation_source_commit": "e16b62c668871860015c15af9e0c020637a0f328",
   "new_workflow_started": true,
@@ -54,19 +63,19 @@
   "recovery": {
     "build_running": false,
     "current_blocker": "Physical Fold acceptance and active native PVR inventory remain unverified; no implementation/build blocker remains.",
-    "last_completed_step": "Run 38133883015 is green: native compilation, exact Android reuse, permanent signing and protected APK verification passed. Downloaded APK and all compilation associations verified.",
+    "last_completed_step": "Signed candidate and combined evidence passed compilation, preservation and transfer checks, and both final downloads were saved successfully.",
     "local_changes_preserved": true,
-    "next_step": "Deliver the retained signed candidate and evidence; execute the physical acceptance matrix before release lock.",
+    "next_step": "Record the physical Fold acceptance matrix and active native PVR inventory before release lock.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T11:27:51.992950+00:00",
+  "recovery_verified_at": "2026-10-11T11:30:07.810362+00:00",
   "release_locked": false,
   "remaining": [
     "Physical Fold acceptance, repeated close/reopen and measured visible-card timing",
     "Exact active native PVR inventory and any required client-specific coverage"
   ],
   "schema": 1,
-  "state": "signed_candidate_verified_physical_acceptance_pending",
+  "state": "delivery_complete_physical_acceptance_pending",
   "tests": {
     "actual_java_receipt_mirror": {
       "passed": true
