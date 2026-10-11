@@ -177,6 +177,8 @@ public:
    \sa CJobManager
    */
   virtual const char* GetType() const { return ""; }
+  // Optional numeric instrumentation. Default is inert for every other job.
+  virtual void ObserveQueued(size_t, size_t) {}
 
   virtual bool operator==(const CJob* job) const
   {

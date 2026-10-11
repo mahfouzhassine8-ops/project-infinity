@@ -32,7 +32,7 @@ import java.util.zip.ZipInputStream;
 public final class InfinityCheckpointAddonInstaller {
   private static final String TAG = "InfinityCheckpointCode";
   private static final String ASSET = "infinity/checkpoint-controller.zip";
-  private static final String ASSET_SHA256 = "1febb015c7f8ca71e06a5d7aec1afa937ffa98b8cfda21e56ef17a0c56a0fa40";
+  private static final String ASSET_SHA256 = "003e4dcc415dc92253e42cbe302bda82e10a08780e88f1cf2eba86d398962f0c";
   private static final String PREVIOUS_ASSET_SHA256 = "44fe57cc792d8269fd057346555607bab69e2835ae5ecbfe9c6ef6c5ddf88596";
   private static final String REJECTED_ASSET_SHA256 = "e420fb3af40845609e572628c0bf7d260ad6df1f1e70281b494a585960948f4c";
   private static final String BASELINE_ASSET_SHA256 = "2ecce01bbdaec01c4d37f6f7223ed4d7e0c049cb7698b73dbc26ed19a42ec9de";
@@ -41,9 +41,9 @@ public final class InfinityCheckpointAddonInstaller {
   private static final int PAYLOAD_LIMIT = 16 * 1024 * 1024;
   private static final Set<String> FILES = new HashSet<>(Arrays.asList(
       "common.py", "default.py", "experience.py", "plugin.py", "resume_hub.py", "service.py",
-      "checkpoint_runtime.py", "persistence_participant.py"));
+      "checkpoint_runtime.py", "persistence_participant.py", "addon.xml", "context.py"));
   private static final Set<String> NEW_FILES = new HashSet<>(Arrays.asList(
-      "checkpoint_runtime.py", "persistence_participant.py"));
+      "checkpoint_runtime.py", "persistence_participant.py", "context.py"));
 
   private InfinityCheckpointAddonInstaller() {}
 
@@ -90,7 +90,8 @@ public final class InfinityCheckpointAddonInstaller {
     if (storage == null) storage = context.getFilesDir();
     File addon = new File(new File(new File(storage, ".kodi"), "addons"), ADDON).getCanonicalFile();
     File marker = target(addon, "addon.xml");
-    if (!marker.isFile() || !payload.addonXml.equals(fileHash(marker))) {
+    if (!marker.isFile() || !(payload.addonXml.equals(fileHash(marker)) ||
+        payload.byPath.get("addon.xml").after.equals(fileHash(marker)))) {
       Log.w(TAG, "Exact installed Command Center 0.3.5.19 parent is unavailable");
       return false;
     }
@@ -219,9 +220,9 @@ public final class InfinityCheckpointAddonInstaller {
       if (!FILES.contains(change.path) || payload.byPath.containsKey(change.path))
         throw new IllegalStateException("Unexpected or duplicate manifest path");
       change.before = nullableHash(file, "before");
-      change.previous = file.has("previous") ? checkedHash(file.getString("previous")) : null;
-      change.baseline = file.has("baseline") ? checkedHash(file.getString("baseline")) : null;
-      change.rejected = file.has("rejected") ? checkedHash(file.getString("rejected")) : null;
+      change.previous = file.has("previous") ? nullableHash(file, "previous") : null;
+      change.baseline = file.has("baseline") ? nullableHash(file, "baseline") : null;
+      change.rejected = file.has("rejected") ? nullableHash(file, "rejected") : null;
       if (NEW_FILES.contains(change.path) != (change.before == null))
         throw new IllegalStateException("Unexpected new-file preimage");
       change.after = checkedHash(file.getString("after"));
@@ -242,6 +243,7 @@ public final class InfinityCheckpointAddonInstaller {
       prior.assetHash = PREVIOUS_ASSET_SHA256;
       prior.addonXml = payload.addonXml;
       for (Change current : payload.changes) {
+        if ("addon.xml".equals(current.path) || "context.py".equals(current.path)) continue;
         if (current.previous == null) throw new IllegalStateException("Missing reviewed previous code");
         Change old = new Change();
         old.path = current.path; old.before = current.before; old.after = current.previous;
@@ -254,6 +256,7 @@ public final class InfinityCheckpointAddonInstaller {
       prior.assetHash = BASELINE_ASSET_SHA256;
       prior.addonXml = payload.addonXml;
       for (Change current : payload.changes) {
+        if ("addon.xml".equals(current.path) || "context.py".equals(current.path)) continue;
         if (current.baseline == null) throw new IllegalStateException("Missing reviewed baseline code");
         Change old = new Change();
         old.path = current.path; old.before = current.before;
@@ -267,6 +270,7 @@ public final class InfinityCheckpointAddonInstaller {
       prior.assetHash = REJECTED_ASSET_SHA256;
       prior.addonXml = payload.addonXml;
       for (Change current : payload.changes) {
+        if ("addon.xml".equals(current.path) || "context.py".equals(current.path)) continue;
         if (current.rejected == null) throw new IllegalStateException("Missing reviewed rejected-candidate code");
         Change old = new Change();
         old.path = current.path; old.before = current.before;
@@ -338,7 +342,9 @@ public final class InfinityCheckpointAddonInstaller {
   }
 
   private static void verifyInstalled(File addon, Payload payload) throws Exception {
-    if (!payload.addonXml.equals(fileHash(target(addon, "addon.xml"))))
+    Change marker = payload.byPath.get("addon.xml");
+    String expectedMarker = marker == null ? payload.addonXml : marker.after;
+    if (!expectedMarker.equals(fileHash(target(addon, "addon.xml"))))
       throw new IllegalStateException("Parent marker changed");
     for (Change change : payload.changes)
       if (!change.after.equals(fileHash(target(addon, change.path))))

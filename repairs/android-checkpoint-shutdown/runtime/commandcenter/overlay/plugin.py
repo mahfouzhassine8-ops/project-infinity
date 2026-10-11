@@ -231,9 +231,9 @@ def listing(media='all', bucket='continue', list_name=''):
     for entry in values[:100]:
         target, li = _list_item(entry, data, bucket, list_name, render)
         xbmcplugin.addDirectoryItem(HANDLE, target, li, isFolder=False)
-    hub.trace_timing('directory_items', rendered, items=min(len(values), 100), **timing)
+    hub.trace_timing('directory_items', rendered, items=min(len(values), 100), revision=int(data.get("revision") or 0), **timing)
     xbmcplugin.endOfDirectory(HANDLE, succeeded=True, updateListing=False, cacheToDisc=False)
-    hub.trace_timing('plugin_complete', started, items=min(len(values), 100), **timing)
+    hub.trace_timing('plugin_complete', started, items=min(len(values), 100), revision=int(data.get("revision") or 0), **timing)
 
 
 def _directory(label, url, label2=''):
@@ -364,8 +364,23 @@ def _mutate_locked(op, key, list_name, choice=None, name=''):
     return changed, notice
 
 
+def play_saved(key):
+    if hub.KEY_RE.fullmatch(key):
+        data = hub.load_view(PROFILE)
+        entry = data.get('items', {}).get(key)
+        if entry and hub.entry_identity(entry) and not entry.get('synthetic_next'):
+            target = _target(entry, data.get('sources', {}))
+            if target:
+                _, item = _list_item(entry, data, 'continue')
+                xbmcplugin.setResolvedUrl(HANDLE, True, item)
+                return
+    xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
+
+
 def main():
     action = PARAMS.get('action', 'continue')
+    if action == 'play-saved':
+        play_saved(PARAMS.get('key', '')); return
     if action == 'commands':
         query = xbmcgui.Window(10000).getProperty('Infinity.Palette.Query')
         for key, label, description in commands(query):

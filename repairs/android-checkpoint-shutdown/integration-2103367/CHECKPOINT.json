@@ -7,37 +7,49 @@
     "CC19/CC20 idempotent media completion and canonical identity protections",
     "Coordinated compiled source pins and deterministic update payloads",
     "Exact 2103366 code preimages and installer-journal recovery support",
-    "Recovered-source integration gate: protected preimages and authority, exact native CC19/CC20 pins, deterministic installer payloads"
+    "Recovered-source integration gate: protected preimages and authority, exact native CC19/CC20 pins, deterministic installer payloads",
+    "Guarded Kodi context-item ingress into existing CC19/CC20 participant",
+    "Conditional My List/watched/remove/verified-resume actions without provider menu replacement",
+    "Native construction/enqueue/queue/start/layout/artwork/presentation timing",
+    "Timestamped exact private-receipt diagnostic mirror with separate provenance",
+    "Preserved locked Health 2.5.19; conditional reference parser refuses stale/mismatched/unavailable evidence",
+    "Nested/concurrent and bounded/over-limit large-install production coverage",
+    "2103367 release/native identity and exact protected APK/JNI/asset gates",
+    "Verified dependency transfer into isolated candidate branch"
   ],
   "implementation_parent": "48dc19c221fc41f88f3d52614beef8a877e426d6",
   "new_workflow_started": false,
   "physically_tested": false,
-  "previous_saved_checkpoint": "76f4b22bcd84e1cf89c997d2d527b3017c2f0a27",
+  "previous_saved_checkpoint": "1331e615abf12612ae33327275655922f37147f2",
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
     "build_running": false,
-    "current_blocker": "Guarded context-item ingress, remaining integration gates and 2103367 release/CI identity wiring; full Android/native compilation and Fold acceptance remain unexecuted.",
-    "last_completed_step": "Four recovered-source integration contracts passed after strict diagnostic-only preservation exceptions.",
+    "current_blocker": "Combined Android/native compilation and signed packaging remain to be executed; physical Fold evidence unavailable.",
+    "last_completed_step": "Critical host gates passed: media 24/family, context 22/family, installer DoWork 21, filesystem/restoration 21, actual JobManager, Java receipt mirror and preserved authorization wire/lease tests.",
     "local_changes_preserved": true,
-    "next_step": "Guarded context-item ingress, then first-visible timing and conditional Health identity/freshness gates.",
+    "next_step": "Run isolated combined compilation with verified dependencies from transfer run 38132105717.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T10:05:24.349326+00:00",
+  "recovery_verified_at": "2026-10-11T10:42:03.933293+00:00",
   "release_locked": false,
   "remaining": [
     "Full Android and native compilation",
-    "Additional nested/concurrent/large-install fault coverage",
-    "Guarded context-item ingress",
-    "End-to-end first-visible-card timing coverage",
-    "Health installed-identity conditional application and evidence freshness verification",
-    "Candidate/version/signing/package provenance gates",
+    "Signed APK and exact compiled provenance verification",
     "Physical Fold acceptance and active native PVR inventory"
   ],
   "schema": 1,
-  "state": "implementation_checkpoint_not_release",
+  "state": "implementation_complete_pending_combined_compilation",
   "tests": {
+    "actual_java_receipt_mirror": {
+      "passed": true
+    },
     "android_installed_code_exporter_host": {
       "passed": true
+    },
+    "android_wire_authorization_receipt_lease_host": {
+      "consume_revoke_races": 100,
+      "passed": true,
+      "wire_cases": 19
     },
     "command_center_19_media_and_checkpoint": {
       "passed": 24
@@ -48,18 +60,30 @@
     "complete_production_job_manager_and_cancellation": {
       "passed": true
     },
+    "context_ingress_19": {
+      "passed": 22
+    },
+    "context_ingress_20": {
+      "passed": 22
+    },
+    "health_mirror_freshness": {
+      "passed": 4
+    },
     "job_checkpoint_registry": {
       "bounded_invocations": 10000,
       "cases": 8,
       "passed": true,
       "phase_races": 200
     },
+    "native_render_presentation_timing": {
+      "passed": true
+    },
     "native_script_classifier_cc20": {
       "mismatched_missing_unknown_sources_refused": true,
       "passed": true
     },
     "production_filesystem_and_matching_restoration_proof": {
-      "passed": 16
+      "passed": 21
     },
     "production_installer_work_download_dependency_install_callback_package_cache": {
       "external_kodi_peers": "fault_injection_stubs",
@@ -67,9 +91,18 @@
       "passed": 21,
       "sqlite": "real_host_engine"
     },
+    "protected_apk_gate_tests": {
+      "passed": 4
+    },
     "recovered_source_integration_contracts": {
       "passed": 4,
       "protected_authority_exceptions": "Only two exact pre-existing diagnostic hooks; no shutdown authorization changes"
     }
+  },
+  "verified_dependencies": {
+    "run_id": 38132105717,
+    "source_branch": "work/infinity-system-stability-2103366",
+    "source_cache_run_id": 38112176211,
+    "source_runtime_unchanged_by_transfer": true
   }
 }

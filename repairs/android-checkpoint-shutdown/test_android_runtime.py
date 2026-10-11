@@ -90,7 +90,10 @@ final class CheckpointWireTest {
    String nativeJson=valid().toString();
    JSONObject receipt=new JSONObject().put("schema",1).put("pid",42).put("owner",O).put("session",S)
     .put("started_epoch_ms",10).put("started_elapsed_ms",100).put("phase","COMPLETE").put("checkpoint_saved",true)
-    .put("generation",7).put("native_json",nativeJson).put("native_proof_sha256",InfinityCheckpointProtocol.proof(nativeJson));
+    .put("generation",7).put("native_json",nativeJson).put("native_proof_sha256",InfinityCheckpointProtocol.proof(nativeJson))
+    .put("authorization_consumed",true).put("safe_elapsed_ms",101).put("terminate_requested_elapsed_ms",102)
+    .put("authorization_consumed_elapsed_ms",103).put("engine_death_elapsed_ms",104)
+    .put("safe_epoch_ms",11).put("authorization_consumed_epoch_ms",12).put("engine_death_epoch_ms",13);
    java.nio.file.Path path=directory.resolve(InfinityCheckpointProtocol.RECEIPT);
    java.nio.file.Files.write(path,receipt.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
    InfinityKodiShutdown.Snapshot result=InfinityKodiShutdown.read(directory.toFile(),(pid,owner)->false,InfinityKodiShutdown.Snapshot.empty());
@@ -286,6 +289,6 @@ assert 'infinitySetCurrentTaskExcludedFromRecents(true);' in main
 assert 'infinitySetCurrentTaskExcludedFromRecents(false);' in main
 assert main.index('infinitySetCurrentTaskExcludedFromRecents(true);') < main.index('exit.checkpoint.recentsResumeRecovery')
 health = (source / 'InfinityHealthExport.java.in').read_text()
-for token in ('Python writer failure:', 'Python failure writer:', 'Python failure detail:', 'failure_detail'):
+for token in ('Python blocking failure:', 'Python blocking writer:', 'Python blocking detail:', 'failure_detail'):
     assert token in health
 print('PASS runtime route, explicit native authorization, failure detail export, and no-restart binding checks')

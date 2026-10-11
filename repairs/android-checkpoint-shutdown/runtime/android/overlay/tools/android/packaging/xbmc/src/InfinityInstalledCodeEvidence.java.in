@@ -85,10 +85,14 @@ final class InfinityInstalledCodeEvidence {
         row.put("id", id); row.put("version", version); row.put("state", "OBSERVED_CODE");
         reason = "CODE_READ_UNVERIFIED";
         JSONObject files = new JSONObject(); row.put("code_sha256", files);
-        for (String file : new String[]{"addon.xml", "default.py", "service.py", "plugin.py",
+        for (String file : new String[]{"addon.xml", "default.py", "service.py", "plugin.py", "context.py",
             "resume_hub.py", "khc_lifecycle.py", "khc_safe_recovery.py", "runtime_service.py"}) {
           File source = checked(addon, file);
           if (source.isFile()) files.put(file, digest(source));
+        }
+        if ("script.kodihealthcenter".equals(id)) {
+          row.put("repair_policy", "2.5.19".equals(version) ? "PRESERVE_SEPARATE_LOCKED_RELEASE" : "EXACT_PREIMAGES_REQUIRED");
+          row.put("overlay_applied", false);
         }
       } catch (Exception unavailable) { row.put("state", "UNVERIFIED"); row.put("reason", reason); }
     }
@@ -139,7 +143,7 @@ final class InfinityInstalledCodeEvidence {
           JSONObject raw = new JSONObject(line.substring(marker + "INFINITY_RESUME_TIMING ".length()).trim());
           JSONObject row = new JSONObject(); row.put("schema", 1);
           String stage = raw.getString("stage");
-          if (!stage.matches("service_start|saved_state_published|cache_validation|snapshot_load|plugin_start|saved_state_ready|filter_group|directory_items|plugin_complete|card_visible|native_queued|native_start|native_fetch_return|artwork_metadata_ready|skin_directory_bound")) continue;
+          if (!stage.matches("service_start|saved_state_published|cache_validation|snapshot_load|plugin_start|saved_state_ready|filter_group|directory_items|plugin_complete|card_visible|native_constructed|native_queued|native_start|native_fetch_return|artwork_metadata_ready|skin_directory_bound|native_cancelled|native_job_retired|card_layout_ready|card_art_ready|first_layout_presented|first_card_presented")) continue;
           row.put("stage", stage);
           for (String key : new String[]{"request", "media", "bucket"}) {
             if (raw.has(key)) {
@@ -149,7 +153,7 @@ final class InfinityInstalledCodeEvidence {
                   ("bucket".equals(key) && value.matches("continue|history|watched|list"))) row.put(key, value);
             }
           }
-          for (String key : new String[]{"monotonic_ms", "elapsed_ms", "items", "revision", "cache_hit", "pid"}) {
+          for (String key : new String[]{"monotonic_ms", "elapsed_ms", "items", "revision", "cache_hit", "pid", "queued", "active", "window", "control", "art_ready", "art_fallback"}) {
             if (raw.has(key)) {
               double value = raw.getDouble(key);
               if (!Double.isNaN(value) && !Double.isInfinite(value) && value >= 0) row.put(key, value);

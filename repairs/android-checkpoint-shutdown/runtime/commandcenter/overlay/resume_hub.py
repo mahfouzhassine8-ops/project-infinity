@@ -415,13 +415,13 @@ def remove_resume_data(data, key):
     return reset_progress_data(data, key)
 
 
-def _toggle_bucket(data, key, bucket):
+def _toggle_bucket(data, key, bucket, incoming=None):
     data = _normalize(data)
     key = str(key)
     if key in data[bucket]:
         entry = data[bucket].pop(key)
         return data, False, entry
-    entry = find_entry(data, key)
+    entry = find_entry(data, key) or incoming
     if not entry:
         return data, False, None
     entry = _stamp(entry, 'added_at')
@@ -429,8 +429,8 @@ def _toggle_bucket(data, key, bucket):
     return data, True, entry
 
 
-def toggle_watchlist_data(data, key):
-    return _toggle_bucket(data, key, 'watchlist')
+def toggle_watchlist_data(data, key, incoming=None):
+    return _toggle_bucket(data, key, 'watchlist', incoming)
 
 
 def toggle_collection_data(data, key):

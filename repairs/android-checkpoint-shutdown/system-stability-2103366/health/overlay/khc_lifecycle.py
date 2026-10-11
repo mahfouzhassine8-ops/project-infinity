@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import re
+import time
 
 OWNER_NAMES=set('native_admission,python_services,background_jobs,playback,command_center,compat,kodi_settings,profiles,skin_settings,addon_settings,favourites,peripherals,audio_policy,deferred_dialog_state,xml_files,native_databases,pvr'.split(','))
 
@@ -24,14 +25,33 @@ def marker_state(lines,failures,successes):
     return 'RECOVERED / SUCCESS AFTER ERROR'
 
 def read_checkpoint(home):
-    path=os.path.join(os.path.dirname(os.path.normpath(home)),'infinity-checkpoint-close.json')
+    root=os.path.dirname(os.path.realpath(home))
+    path=os.path.join(root,'infinity-checkpoint-close.json')
     try:
+        if os.path.realpath(path)!=path:raise ValueError('linked receipt')
         with open(path,'rb') as f:
             data=f.read(262145)
         if len(data)>262144:raise ValueError('oversize')
-        return checkpoint_state(json.loads(data))
-    except FileNotFoundError:return {'state':'UNAVAILABLE','active':False,'detail':'No checkpoint receipt available; shutdown is unverified.'}
-    except (OSError,ValueError,TypeError):return {'state':'UNVERIFIED','active':True,'detail':'Checkpoint receipt could not be verified.'}
+        row=json.loads(data);require(isinstance(row,dict));result=checkpoint_state(row)
+        metadata=os.path.join(root,'infinity-checkpoint-mirror.json')
+        if os.path.realpath(metadata)!=metadata:raise ValueError('linked provenance')
+        with open(metadata,'rb') as f:raw=f.read(8193)
+        if len(raw)>8192:raise ValueError('oversize provenance')
+        mirror=json.loads(raw);require(isinstance(mirror,dict))
+        require(type(mirror['schema']) is int and mirror['schema']==1 and mirror['read_only'] is True)
+        require(mirror['source']=='private-coordinator-receipt')
+        require(mirror['receipt_sha256']==hashlib.sha256(data).hexdigest())
+        require(mirror['session']==row.get('session','') and mirror['receipt_pid']==row.get('pid',0) and mirror['phase']==row.get('phase',''))
+        require(mirror['publication'] in ('startup_snapshot','coordinator_write'))
+        require(all(type(mirror[k]) is int and mirror[k]>0 for k in ('captured_epoch_ms','source_modified_epoch_ms','collector_pid')))
+        now=int(time.time()*1000);require(mirror['captured_epoch_ms']<=now+60000)
+        result.update(receipt_epoch_ms=row.get('engine_death_epoch_ms') or row.get('started_epoch_ms'),
+                      mirror_captured_epoch_ms=mirror['captured_epoch_ms'],
+                      freshness='CURRENT_PUBLICATION' if mirror['publication']=='coordinator_write' and now-mirror['captured_epoch_ms']<=86400000 else 'SAVED_RECEIPT',
+                      current_process_health='UNVERIFIED')
+        return result
+    except FileNotFoundError:return {'state':'UNAVAILABLE','active':False,'current_process_health':'UNVERIFIED','detail':'Current receipt/provenance unavailable; shutdown is unverified.'}
+    except (OSError,ValueError,TypeError,KeyError):return {'state':'UNVERIFIED','active':True,'current_process_health':'UNVERIFIED','detail':'Checkpoint receipt/provenance could not be verified.'}
 
 def require(value):
     if not value:raise ValueError("unconfirmed checkpoint")
@@ -46,7 +66,7 @@ def checkpoint_state(row):
     if phase!='COMPLETE':return result
     try:
         raw=row['native_json'];native=json.loads(raw)
-        require(row['schema']==1 and native['schema']==1)
+        require(type(row['schema']) is int and row['schema']==1 and type(native['schema']) is int and native['schema']==1)
         require(type(row['pid']) is int and row['pid']>0)
         require(type(row['generation']) is int)
         require(all(isinstance(row[k],str) and re.fullmatch(r'[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}',row[k]) for k in ('session','owner')))
@@ -58,6 +78,8 @@ def checkpoint_state(row):
         require(all(x > 0 for x in times[1:]) and times == sorted(times))
         require(all(type(row[k]) is int and row[k] > 0 for k in
             ('safe_epoch_ms', 'authorization_consumed_epoch_ms', 'engine_death_epoch_ms')))
+        epochs=[row[k] for k in ('safe_epoch_ms','authorization_consumed_epoch_ms','engine_death_epoch_ms')]
+        require(epochs==sorted(epochs))
         require(row['native_proof_sha256']==hashlib.sha256(raw.encode()).hexdigest())
         require(native==row['native_receipt'] and native['phase']=='SAFE_TO_TERMINATE')
         require(native['admission_sealed'] is True and native['active_native_writers']==0)

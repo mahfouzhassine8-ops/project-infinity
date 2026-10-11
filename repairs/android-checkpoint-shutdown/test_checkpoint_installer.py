@@ -16,10 +16,12 @@ import tempfile
 import zipfile
 
 FILES = ["common.py", "default.py", "experience.py", "plugin.py", "resume_hub.py", "service.py",
-         "checkpoint_runtime.py", "persistence_participant.py"]
+         "checkpoint_runtime.py", "persistence_participant.py", "addon.xml", "context.py"]
 OLD = {name: ("print('old " + name + "')\n").encode() for name in FILES[:6]}
 NEW = {name: ("print('new " + name + "')\n").encode() for name in FILES}
 MARKER = b'<addon id="script.infinity.commandcenter" version="0.3.5.19"/>\n'
+OLD['addon.xml'] = MARKER
+NEW['addon.xml'] = b'<addon id="script.infinity.commandcenter" version="0.3.5.19"><extension point="kodi.context.item"/></addon>\n'
 PRESERVED = {"skin_upgrade.py": b"PRESERVED unrelated code\n"}
 STUBS = {
 "android/content/Context.java": """package android.content;
@@ -213,7 +215,7 @@ def main():
         def check_installed(addon):
             for name, data in NEW.items():
                 assert (addon / name).read_bytes() == data
-            assert (addon / "addon.xml").read_bytes() == MARKER
+            assert (addon / "addon.xml").read_bytes() == NEW['addon.xml']
             for name, data in PRESERVED.items():
                 assert (addon / name).read_bytes() == data
 
@@ -231,12 +233,13 @@ def main():
             with zipfile.ZipFile(args.production_asset) as archive:
                 plan = json.loads(archive.read('manifest.json'))
             for entry in plan['files']:
-                assert sha(previous[entry['path']]) == entry[args.previous_field]
+                assert (sha(previous[entry['path']]) if entry['path'] in previous else None) == entry[args.previous_field]
             for mode, expected in [('', 0), ('fail', 10), ('crash', 73)]:
                 root = work / ('previous-' + (mode or 'success'))
                 addon = initialize(root, asset)
                 for name in FILES:
-                    (addon / name).write_bytes(previous[name])
+                    if name in previous:
+                        (addon / name).write_bytes(previous[name])
                 before = contents(root / 'external')
                 run(root, mode=mode, expected=expected)
                 if mode == 'fail':
@@ -257,7 +260,8 @@ def main():
                 journal = json.loads(journal_path.read_text())
                 if phase == 'committed':
                     for name in FILES:
-                        (addon / name).write_bytes(previous[name])
+                        if name in previous:
+                            (addon / name).write_bytes(previous[name])
                     journal['phase'] = 'committed'; journal_path.write_text(json.dumps(journal))
                 if phase == 'corrupt':
                     journal['asset_sha256'] = '0' * 64; journal_path.write_text(json.dumps(journal))

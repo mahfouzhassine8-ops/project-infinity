@@ -25,6 +25,15 @@
 
 using namespace std::chrono_literals;
 
+std::pair<std::size_t, std::size_t> CJobManager::InfinityQueueCounts() const
+{
+  std::unique_lock<CCriticalSection> lock(m_section);
+  std::size_t queued = 0;
+  for (const auto& queue : m_jobQueue)
+    queued += queue.size();
+  return {queued, m_processing.size()};
+}
+
 namespace
 {
 struct CheckpointQueues
@@ -437,6 +446,13 @@ unsigned int CJobManager::AddJob(CJob *job, IJobCallback *callback, CJob::PRIORI
   // create a work item for this job
   CWorkItem work(job, m_jobCounter, priority, callback);
   m_jobQueue[priority].push_back(work);
+  // The job is still owned under m_section, before a worker can retire it.
+  // Observation exceptions cannot change admission, scheduling or completion.
+  try {
+    std::size_t queued = 0;
+    for (const auto& queue : m_jobQueue) queued += queue.size();
+    job->ObserveQueued(queued, m_processing.size());
+  } catch (...) { /* Diagnostic only. */ }
 
   StartWorkers(priority);
   return work.m_id;

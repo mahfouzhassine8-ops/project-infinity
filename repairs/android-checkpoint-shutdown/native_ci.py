@@ -140,8 +140,16 @@ def prepare():
     run(sys.executable, str(HERE / "runtime-tests/test_native_coordinator.py"), "--runtime", "kodi", "--installed-versions")
     for runtime in (OUT / "commandcenter", OUT / "installed-addons/script.infinity.commandcenter"):
         run(sys.executable, str(HERE / "system-stability-2103366/test_resume.py"), "--runtime", str(runtime))
-    for name in ("test_installer.py", "test_jobs.py"):
-        run(sys.executable, str(HERE / "system-stability-2103366" / name), "--runtime", "kodi")
+    run(sys.executable, str(HERE / "system-stability-2103366/test_jobs.py"), "--runtime", "kodi")
+    # Execute the production filesystem, DoWork and callback paths. The old
+    # 2103366 same-name fixture assumed that success could erase another scope.
+    for name in ("test_installer_work.py", "test_installer_recovery.py"):
+        run(sys.executable, str(HERE / "integration-2103367" / name), "--runtime", "kodi")
+    for runtime in (OUT / "commandcenter", OUT / "installed-addons/script.infinity.commandcenter"):
+        for name in ("test_media.py", "test_context.py"):
+            run(sys.executable, str(HERE / "integration-2103367" / name), "--runtime", str(runtime))
+    run(sys.executable, str(HERE / "integration-2103367/test_timing.py"))
+    run(sys.executable, str(HERE / "integration-2103367/test_health_freshness.py"))
     run(sys.executable, str(HERE / "system-stability-2103366/test_health.py"),
         "--receipt", str(HERE / "system-stability-2103366/protected-close-fixture.json"))
     manifest = json.loads((HERE / "runtime/native/manifest.json").read_text())

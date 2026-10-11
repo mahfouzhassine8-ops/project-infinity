@@ -32,6 +32,7 @@ int FixtureFsync(int fd) {
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <atomic>
 namespace fs=std::filesystem;
 static std::string mode;
 static int renames=0;
@@ -73,9 +74,39 @@ int main(int argc,char**argv) {
  fs::create_directories(root/"addons/addon-a");
  std::ofstream(root/"source/addon.xml")<<"new installation";
  std::ofstream(root/"addons/addon-a/addon.xml")<<"original installation";
+ if(mode.rfind("large-",0)==0) {
+  const size_t size=mode=="large-overlimit"?40U*1024U*1024U:12U*1024U*1024U;
+  std::ofstream(root/"addons/addon-a/blob",std::ios::binary)<<std::string(size,'o');
+  std::ofstream(root/"source/blob",std::ios::binary)<<std::string(size,'n');
+ }
  const auto before=InfinityAddonFileReceipt::Capture((root/"addons/addon-a").string());
- assert(before.valid);
+ assert(before.valid==(mode!="large-overlimit"));
  CFilesystemInstaller installer;installer.m_addonFolder=(root/"addons").string();installer.m_tempFolder=(root/"addons/temp").string();
+ if(mode=="nested"||mode=="concurrent") {
+  if(mode=="nested") {
+   bool outer=false,child=false;
+   { CAddonOperationReceipt receipt("addon_install","addon-a",outer);
+     { CAddonOperationReceipt dependency("addon_install","addon-b",child);
+       child=installer.InstallToFilesystem((root/"source").string(),"addon-b"); }
+     assert(child); outer=installer.InstallToFilesystem((root/"source").string(),"addon-a"); }
+   assert(outer);
+  } else {
+   std::atomic<unsigned> completed{0};
+   auto work=[&] {
+    bool durable=false;
+    { CAddonOperationReceipt receipt("addon_install","addon-a",durable);
+      CFilesystemInstaller local;local.m_addonFolder=installer.m_addonFolder;local.m_tempFolder=installer.m_tempFolder;
+      durable=local.InstallToFilesystem((root/"source").string(),"addon-a"); }
+    assert(durable);++completed;
+   };
+   std::thread a(work),b(work);a.join();b.join();assert(completed==2);
+  }
+  assert(JobCheckpoint::GetSnapshot().required==0);
+  assert(InfinityAddonFileReceipt::Existing((root/"addons/addon-a").string(),true));
+  std::cout<<"PASS actual nested/concurrent filesystem installation scopes "<<mode<<"\n";return 0;
+ }
+ const auto originalMode=mode;
+ if(mode=="large-restored"||mode=="large-overlimit")mode="new-move";
  if(mode=="recovery-restored"||mode=="callback-recovery") {
   const bool callbackFailed=mode=="callback-recovery";
   auto outer=JobCheckpoint::Admit(true,false,"native_databases","addon_install","installer","queued",true,"addon-a");
@@ -123,13 +154,13 @@ int main(int argc,char**argv) {
  }
  const auto snapshot=JobCheckpoint::GetSnapshot();
  const bool unresolved=mode=="sql-failed"||mode=="unknown-resource"||mode=="restore-move"||
-   mode=="cleanup"||mode=="partial-delete"||mode=="fsync-unresolved";
+   mode=="cleanup"||mode=="partial-delete"||mode=="fsync-unresolved"||originalMode=="large-overlimit";
  // Uninstall cleanup failure restored the complete original, while install
  // cleanup failure keeps the new installed tree and a required backup obligation.
  const bool uninstall=(std::string(argv[1])=="uninstall-restored");
  assert(snapshot.required==(unresolved&&!uninstall?1U:0U));
  assert(durable==(!unresolved||uninstall));
- if(std::string(argv[1])=="success")assert(business);
+ if(std::string(argv[1])=="success"||originalMode=="large-success")assert(business);
  else assert(!business);
  if(durable && !business && std::string(argv[1])!="sql-failed") {
   assert(snapshot.resolvedHistory.size()==1);
@@ -158,7 +189,8 @@ def main():
         'bool CFilesystemInstaller::InstallToFilesystem(', 'bool CFilesystemInstaller::UnInstallFromFilesystem('))
     modes=('success','dependency-rejected','create','unpack','old-move','new-move','restore-move',
            'cleanup','sql-failed','unknown-resource','fsync-restored','fsync-unresolved',
-           'uninstall-restored','partial-delete','recovery-restored','callback-recovery')
+           'uninstall-restored','partial-delete','recovery-restored','callback-recovery',
+           'nested','concurrent','large-success','large-restored','large-overlimit')
     with tempfile.TemporaryDirectory(prefix='installer-recovery-') as tmp:
         tmp=Path(tmp);(tmp/'test.cpp').write_text(PEERS.replace('// @PRODUCTION@',production))
         subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-DINFINITY_DATABASE_BARRIER_TEST',

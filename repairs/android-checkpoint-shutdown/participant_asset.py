@@ -9,7 +9,7 @@ import zipfile
 
 HERE = Path(__file__).resolve().parent
 FILES = {"common.py", "default.py", "experience.py", "plugin.py", "resume_hub.py",
-         "service.py", "checkpoint_runtime.py", "persistence_participant.py"}
+         "service.py", "checkpoint_runtime.py", "persistence_participant.py", "addon.xml", "context.py"}
 
 
 def build():
@@ -17,17 +17,27 @@ def build():
     delta = json.loads((root / "manifest.json").read_text())
     if set(delta["changed"]) != FILES:
         raise ValueError("Unexpected participant source scope")
-    if delta["before"]["addon.xml"] != delta["after"]["addon.xml"]:
+    import xml.etree.ElementTree as ET
+    original = ET.fromstring((root / 'unchanged/addon.xml').read_bytes())
+    updated = ET.fromstring((root / 'overlay/addon.xml').read_bytes())
+    if original.attrib != updated.attrib:
         raise ValueError("Participant overlay may not change add-on identity")
+    extensions = updated.findall('extension')
+    context = [e for e in extensions if e.get('point') == 'kodi.context.item']
+    if len(context) != 1 or any(e.get('library') != 'context.py' for e in context[0].findall('./menu/item')):
+        raise ValueError('Unexpected context extension')
+    updated.remove(context[0])
+    if ET.tostring(original) != ET.tostring(updated):
+        raise ValueError('Unrelated add-on metadata change')
     manifest = {"schema": 1, "addon_id": "script.infinity.commandcenter",
                 "addon_version": "0.3.5.19", "addon_xml_sha256": delta["before"]["addon.xml"],
                 "files": [{"path": name, "before": delta["before"].get(name),
                            "after": delta["after"][name]} for name in sorted(FILES)]}
     green = json.loads((HERE / "resume-speed/GREEN-2103362.json").read_text())
     for entry in manifest['files']:
-        entry['previous'] = green['commandcenter19'][entry['path']]
-        entry['baseline'] = json.loads((HERE / 'system-stability-2103366/GREEN-2103365.json').read_text())['commandcenter19'][entry['path']]
-        entry['rejected'] = json.loads((HERE / 'integration-2103367/GREEN-2103366.json').read_text())['commandcenter19'][entry['path']]
+        entry['previous'] = green['commandcenter19'].get(entry['path'])
+        entry['baseline'] = json.loads((HERE / 'system-stability-2103366/GREEN-2103365.json').read_text())['commandcenter19'].get(entry['path'])
+        entry['rejected'] = json.loads((HERE / 'integration-2103367/GREEN-2103366.json').read_text())['commandcenter19'].get(entry['path'])
     entries = {"manifest.json": (json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n").encode()}
     for name in sorted(FILES):
         data = (root / "overlay" / name).read_bytes()

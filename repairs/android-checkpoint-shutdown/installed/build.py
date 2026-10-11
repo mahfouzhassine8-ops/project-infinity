@@ -35,9 +35,9 @@ def build(addon):
     if addon == 'script.infinity.commandcenter':
         green = json.loads((HERE.parent / 'resume-speed/GREEN-2103362.json').read_text())
         for entry in manifest['files']:
-            entry['previous'] = green['commandcenter20'][entry['path']]
-            entry['baseline'] = json.loads((HERE.parent / 'system-stability-2103366/GREEN-2103365.json').read_text())['commandcenter20'][entry['path']]
-            entry['rejected'] = json.loads((HERE.parent / 'integration-2103367/GREEN-2103366.json').read_text())['commandcenter20'][entry['path']]
+            entry['previous'] = green['commandcenter20'].get(entry['path'])
+            entry['baseline'] = json.loads((HERE.parent / 'system-stability-2103366/GREEN-2103365.json').read_text())['commandcenter20'].get(entry['path'])
+            entry['rejected'] = json.loads((HERE.parent / 'integration-2103367/GREEN-2103366.json').read_text())['commandcenter20'].get(entry['path'])
     entries = {'manifest.json': (json.dumps(manifest, sort_keys=True, separators=(',', ':'))+'\n').encode()}
     entries.update({'payload/'+n: final[n] for n in changed})
     output = io.BytesIO()

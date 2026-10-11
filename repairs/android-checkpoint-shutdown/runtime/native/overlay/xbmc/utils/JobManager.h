@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 class CJobManager;
 
@@ -261,6 +262,8 @@ class CJobManager final
 
 public:
   CJobManager();
+  // Numeric read-only scheduler observations; no job names or scheduler changes.
+  std::pair<std::size_t, std::size_t> InfinityQueueCounts() const;
 
   /*!
    \brief Add a job to the threaded job manager.

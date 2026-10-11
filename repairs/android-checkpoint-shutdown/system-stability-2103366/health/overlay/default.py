@@ -760,7 +760,7 @@ def _scan_collect(source='scan-kodi'):
         'source':source,
         'captured_epoch':time.time(),
         'health_center_version':xbmcaddon.Addon(ADDON_ID).getAddonInfo('version'),
-        'status':'NEEDS ATTENTION' if (actual or issues or runtime_findings or checkpoint.get('active') or authorization.get('needs_attention_count',0)) else 'GOOD',
+        'status':'NEEDS ATTENTION' if (actual or issues or runtime_findings or checkpoint.get('active') or authorization.get('needs_attention_count',0)) else ('UNVERIFIED' if checkpoint.get('state') in ('UNVERIFIED','UNAVAILABLE') else 'GOOD'),
         'status_reason':{'likely_crashes_script_failures':len(actual),'actionable_issues':len(issues),'runtime_findings':len(runtime_findings),'recovered_runtime_findings':len(recovered_runtime_findings),'authorization_findings':authorization.get('needs_attention_count',0)},
         'counts':{
             'current_errors':len(errors),

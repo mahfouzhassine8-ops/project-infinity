@@ -68,8 +68,13 @@ public:
       m_limit(limit),
       m_browse(browse),
       m_parentID(parentID)
-  { }
-  ~CDirectoryJob() override = default;
+  {
+    const auto counts = CServiceBroker::GetJobManager()->InfinityQueueCounts();
+    m_timing.Mark("native_constructed", 0, counts.first, counts.second);
+  }
+  ~CDirectoryJob() override { m_timing.Mark("native_job_retired"); }
+  void ObserveQueued(size_t queued, size_t active) override
+  { m_timing.Mark("native_queued", 0, queued, active); }
 
   const char* GetType() const override { return "directory"; }
   bool operator==(const CJob *job) const override
@@ -85,19 +90,18 @@ public:
 
   bool DoWork() override
   {
-    m_timing.Mark("native_start");
+    const auto counts = CServiceBroker::GetJobManager()->InfinityQueueCounts();
+    m_timing.Mark("native_start", 0, counts.first, counts.second);
 #if defined(TARGET_ANDROID)
     // Display-only work checks the existing JobManager cancellation contract.
-    if (ShouldCancel(0, 0))
-      return false;
+    if (ShouldCancel(0, 0)) { m_timing.Mark("native_cancelled"); return false; }
     InfinityShutdownTrace::Scope fetchEvidence("directory.fetch");
 #endif
     CFileItemList items;
     const bool fetched = CDirectory::GetDirectory(m_timing.RequestUrl(m_url), items, "", DIR_FLAG_DEFAULTS);
 #if defined(TARGET_ANDROID)
     fetchEvidence.End();
-    if (ShouldCancel(0, 0))
-      return false;
+    if (ShouldCancel(0, 0)) { m_timing.Mark("native_cancelled"); return false; }
 #endif
     m_timing.Mark("native_fetch_return", items.Size());
     if (fetched)
@@ -116,8 +120,7 @@ public:
       for (int i = 0; i < limit; i++)
       {
 #if defined(TARGET_ANDROID)
-        if (ShouldCancel(static_cast<unsigned int>(i), static_cast<unsigned int>(limit)))
-          return false;
+        if (ShouldCancel(static_cast<unsigned int>(i), static_cast<unsigned int>(limit))) { m_timing.Mark("native_cancelled", i); return false; }
         InfinityShutdownTrace::Scope itemEvidence("directory.metadata_item");
 #endif
         CGUIStaticItemPtr item(new CGUIStaticItem(*items[i]));
@@ -202,7 +205,8 @@ public:
     return itemTypes;
   }
 public:
-  void MarkBound() const { m_timing.Mark("skin_directory_bound", m_items.size()); }
+  void MarkBound() const { m_timing.Mark("skin_directory_bound", m_items.size(), 0, 0,
+      m_items.empty() ? 0 : m_items.front()->GetProperty("Infinity.ResumeHub.Revision").asInteger()); }
 private:
   InfinityResumeTiming::Observation m_timing;
   std::string m_url;

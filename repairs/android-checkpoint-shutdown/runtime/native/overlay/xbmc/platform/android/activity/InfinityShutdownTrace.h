@@ -19,7 +19,7 @@
 namespace InfinityShutdownTrace
 {
 constexpr unsigned MAX_EVENTS = 8192;
-constexpr const char* ENGINE_TAG = "infinity-checkpoint-system-stability-2103366-v1";
+constexpr const char* ENGINE_TAG = "infinity-checkpoint-recovery-integration-2103367-v1";
 inline char path[1024]{};
 inline std::atomic<bool> configured{false};
 inline std::atomic<bool> begun{false};

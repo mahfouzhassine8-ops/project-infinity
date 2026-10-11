@@ -75,6 +75,7 @@ int main(int argc,char** argv){
   const std::string base=root;
   assert(ClassifyScript(base+"script.infinity.commandcenter/service.py","script.infinity.commandcenter")=="command_center");
   assert(ClassifyScript(base+"script.infinity.commandcenter/plugin.py","script.infinity.commandcenter")=="command_center_client");
+  assert(ClassifyScript(base+"script.infinity.commandcenter/context.py","script.infinity.commandcenter")=="command_center_client");
   assert(ClassifyScript(base+"script.infinity.commandcenter/default.py","script.infinity.commandcenter").empty());
   assert(ClassifyScript(base+"service.infinity.compat/service.py","service.infinity.compat")=="compat");
   assert(ClassifyScript(base+"service.infinity.compat/layout_service.py","service.infinity.compat")=="nonpersistent:layout-properties");
