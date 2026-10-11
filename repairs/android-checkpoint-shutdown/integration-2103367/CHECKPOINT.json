@@ -38,13 +38,13 @@
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
     "build_running": true,
-    "current_blocker": "Native persistence gates, native compilation, permanent signing and exact final artifact verification remain pending.",
-    "last_completed_step": "GitHub exact-input Android reuse succeeded in run 38133883015; original complete compilation and all 14 exporter regressions retained from run 38133236811.",
+    "current_blocker": "Native compiler, permanent signing and exact final artifact verification are running or pending.",
+    "last_completed_step": "Complete native protected-source and persistence preparation gates passed in run 38133883015. Exact-input Android reuse already succeeded.",
     "local_changes_preserved": true,
-    "next_step": "Finish native gates and compilation; package the verified Android shell with the newly compiled native image.",
+    "next_step": "Retain the compiled native image, sign the matched APK, and verify final preservation and provenance.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T11:00:49.924526+00:00",
+  "recovery_verified_at": "2026-10-11T11:05:11.210088+00:00",
   "release_locked": false,
   "remaining": [
     "Native gates and full native compilation",
@@ -52,7 +52,7 @@
     "Physical Fold acceptance and active native PVR inventory"
   ],
   "schema": 1,
-  "state": "native_validation_running_android_reused",
+  "state": "native_compilation_running_android_reused",
   "tests": {
     "actual_java_receipt_mirror": {
       "passed": true
@@ -99,6 +99,13 @@
     },
     "context_ingress_20": {
       "passed": 22
+    },
+    "full_native_preparation": {
+      "native_manifest_sha256": "f3fa4fc1bb2335090d13a2dc710c188538025044ee5606647e887a2699f22e79",
+      "passed": true,
+      "protected_source_reconstructed": true,
+      "run_id": 38133883015,
+      "source_commit": "e16b62c668871860015c15af9e0c020637a0f328"
     },
     "health_mirror_freshness": {
       "passed": 4
