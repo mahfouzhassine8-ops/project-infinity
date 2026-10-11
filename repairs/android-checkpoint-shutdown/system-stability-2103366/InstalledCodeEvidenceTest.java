@@ -42,6 +42,7 @@ public final class InstalledCodeEvidenceTest {
     assertTrue(InfinityHealthExport.nativeTraceScope(context,old).startsWith("HISTORICAL"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,old+matched).startsWith("MIXED"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,matched+"partial").startsWith("MIXED"));
+    assertTrue(InfinityHealthExport.nativeTraceScope(context,matched+"{\"pid\":19842}").startsWith("MIXED"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,"{\"pid\":19842}").startsWith("UNVERIFIED"));
   }
 

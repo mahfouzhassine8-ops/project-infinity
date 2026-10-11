@@ -362,7 +362,7 @@ final class InfinityHealthExport {
         if(line.trim().isEmpty())continue;
         JSONObject row;
         try {row=new JSONObject(line);}catch(Exception partial){++unverified;continue;}
-        if(!row.has("engine"))continue;
+        if(!row.has("engine")){++unverified;continue;}
         if(!"infinity-checkpoint-system-stability-2103366-v1".equals(row.optString("engine")) || row.optInt("pid",-1)!=pid) {
           ++other;continue;
         }
