@@ -72,7 +72,8 @@ public final class InfinityDecoyIdentity {
     System.setProperty("xbmc.home", home.getAbsolutePath());
     System.setProperty("xbmc.temp", temp.getAbsolutePath());
     System.setProperty("xbmc.jsonPort", RPC_PORT);
-    if (!(INSTALL_ID + ":kodi").equals(android.app.Application.getProcessName())) return;
+    if (android.os.Build.VERSION.SDK_INT < 28 ||
+        !(INSTALL_ID + ":kodi").equals(android.app.Application.getProcessName())) return;
     File profile = directory(data, ".kodi/userdata");
     File settings = new File(profile, "guisettings.xml");
     // Fresh decoy only. Existing settings are never overwritten or cloned from

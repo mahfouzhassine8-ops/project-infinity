@@ -196,7 +196,7 @@ def main():
     app = args.build / 'xbmc'; app.mkdir()
     values = {'APP_PACKAGE': NAMESPACE, 'APP_NAME': 'Kodi', 'APP_NAME_LC': 'kodi',
               'APP_VERSION': '0.1.0-G0-Identity-Probe', 'APP_VERSION_CODE_ANDROID': '1',
-              'TARGET_MINSDK': '28', 'TARGET_SDK': '35', 'NDKROOT': str(sdk / 'ndk/unused')}
+              'TARGET_MINSDK': '21', 'TARGET_SDK': '35', 'NDKROOT': str(sdk / 'ndk/unused')}
     manifest_text = manifest(configured(packaging / 'xbmc/AndroidManifest.xml.in', values))
     validate_manifest(manifest_text)
     (app / 'AndroidManifest.xml').write_text(manifest_text)

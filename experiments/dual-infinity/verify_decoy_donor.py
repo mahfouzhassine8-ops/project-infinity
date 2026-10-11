@@ -45,6 +45,11 @@ def main():
         native, classes = dex_contract(new)
         stage.require(native == original_native, 'JNI declaration/class identity drift')
         own_classes = {name for name in original_classes if name.startswith('Lcom/projectinfinity/kodi/')}
+        missing = sorted(own_classes - classes)
+        (args.output / 'DEX-CLASS-INVENTORY.json').write_text(json.dumps({
+            'original_classes': len(own_classes), 'missing': missing,
+            'added': sorted(classes - original_classes),
+            'jni_declarations_unchanged': native == original_native}, indent=2) + '\n')
         stage.require(own_classes <= classes, 'Verified original classes lost')
         stage.require('Lcom/projectinfinity/kodi/InfinityDecoyIdentity;' in classes,
                       'Decoy identity guard missing from compiled DEX')

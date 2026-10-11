@@ -73,9 +73,9 @@ jobs:
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
-        if: success()
+        if: always()
         with:
           name: Dual-Infinity-G0-Compile-Only-Donor-Internal
           path: decoy-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk
           retention-days: 90
-          if-no-files-found: error
+          if-no-files-found: warn
