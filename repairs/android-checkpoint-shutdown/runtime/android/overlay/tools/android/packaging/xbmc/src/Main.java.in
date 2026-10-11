@@ -362,6 +362,13 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
     super.onResume();
     InfinityExitDiagnostics.breadcrumb(getApplicationContext(), "main.onResume");
     if(mInfinityExitPlan.pending()){
+      // During guarded normal Close, keep the existing NativeActivity as
+      // the live checkpoint owner. Activity resume is not authorization
+      // to open the chooser or change task state while saving.
+      if(mInfinityExitPlan.checkpointPending()){
+        InfinityExitCompletion.record(this,"exit.checkpoint.resumedDuringSave.ownerRetained");
+        return;
+      }
       // Keep the failed/still-owned engine alive, but do not show its hidden
       // recovery owner beside the chooser as a second Samsung Recents card.
       infinitySetCurrentTaskExcludedFromRecents(true);
