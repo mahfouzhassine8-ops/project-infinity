@@ -6,20 +6,23 @@
     "Callback completion retained until verified",
     "CC19/CC20 idempotent media completion and canonical identity protections",
     "Coordinated compiled source pins and deterministic update payloads",
-    "Exact 2103366 code preimages and installer-journal recovery support"
+    "Exact 2103366 code preimages and installer-journal recovery support",
+    "Recovered-source integration gate: protected preimages and authority, exact native CC19/CC20 pins, deterministic installer payloads"
   ],
   "implementation_parent": "48dc19c221fc41f88f3d52614beef8a877e426d6",
   "new_workflow_started": false,
   "physically_tested": false,
-  "previous_saved_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536",
+  "previous_saved_checkpoint": "76f4b22bcd84e1cf89c997d2d527b3017c2f0a27",
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
     "build_running": false,
-    "current_blocker": "Remaining integration and full native/Android compilation gates; no physical Fold acceptance.",
+    "current_blocker": "Guarded context-item ingress, remaining integration gates and 2103367 release/CI identity wiring; full Android/native compilation and Fold acceptance remain unexecuted.",
+    "last_completed_step": "Four recovered-source integration contracts passed after strict diagnostic-only preservation exceptions.",
     "local_changes_preserved": true,
+    "next_step": "Guarded context-item ingress, then first-visible timing and conditional Health identity/freshness gates.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T10:00:31.262633+00:00",
+  "recovery_verified_at": "2026-10-11T10:05:24.349326+00:00",
   "release_locked": false,
   "remaining": [
     "Full Android and native compilation",
@@ -63,6 +66,10 @@
       "filesystem": "real_host_files",
       "passed": 21,
       "sqlite": "real_host_engine"
+    },
+    "recovered_source_integration_contracts": {
+      "passed": 4,
+      "protected_authority_exceptions": "Only two exact pre-existing diagnostic hooks; no shutdown authorization changes"
     }
   }
 }
