@@ -19,6 +19,7 @@
 
 namespace InfinityAddonFileReceipt
 {
+inline void ObserveFailure(const char* operation, int error);
 // Independent add-ons may run concurrently. The same target cannot be replaced
 // while a failed operation verifies/restores its exact preimage.
 class ResourceLock
@@ -72,18 +73,25 @@ inline bool Sync(int fd)
   for (unsigned attempt = 0; attempt < 4; ++attempt)
   {
     if (::fsync(fd) == 0) return true;
-    if (errno != EINTR) return false;
+    if (errno != EINTR) { ObserveFailure("fsync", errno); return false; }
   }
+  ObserveFailure("fsync_interrupted", EINTR);
   return false;
 }
 inline int OpenParent(const std::string& path, std::string& name)
 {
-  if (path.empty() || path.front() != '/' || path.back() == '/') return -1;
+  if (path.empty() || path.front() != '/' || path.back() == '/')
+  { ObserveFailure("invalid_path", EINVAL); return -1; }
   const auto split = path.find_last_of('/');
   name = path.substr(split + 1);
-  if (name.empty() || name == "." || name == "..") return -1;
-  int fd = ::open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
-  if (fd < 0) return -1;
+  if (name.empty() || name == "." || name == "..")
+  { ObserveFailure("invalid_name", EINVAL); return -1; }
+  // Android storage ancestors may be searchable without being listable. Only
+  // the actual parent needs a readable/syncable handle. O_PATH retains the
+  // descriptor-relative walk and O_NOFOLLOW protection without requesting
+  // unrelated directory enumeration permissions.
+  int fd = ::open("/", O_PATH | O_DIRECTORY | O_CLOEXEC);
+  if (fd < 0) { ObserveFailure("open_root", errno); return -1; }
   size_t pos = 1;
   while (pos < split)
   {
@@ -92,15 +100,21 @@ inline int OpenParent(const std::string& path, std::string& name)
     const auto part = path.substr(pos, end - pos);
     if (!part.empty())
     {
-      if (part == "." || part == "..") { ::close(fd); return -1; }
-      const int next = ::openat(fd, part.c_str(), O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+      if (part == "." || part == "..")
+      { ::close(fd); ObserveFailure("invalid_ancestor", EINVAL); return -1; }
+      const int next = ::openat(fd, part.c_str(), O_PATH | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+      const int error = errno;
       ::close(fd);
       fd = next;
-      if (fd < 0) return -1;
+      if (fd < 0) { ObserveFailure("open_ancestor", error); return -1; }
     }
     pos = end + 1;
   }
-  return fd;
+  const int parent = ::openat(fd, ".", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  const int error = errno;
+  ::close(fd);
+  if (parent < 0) ObserveFailure("open_parent", error);
+  return parent;
 }
 inline bool Tree(int fd, unsigned depth, size_t& remaining)
 {
@@ -283,6 +297,7 @@ public:
         for (const auto& entry : m_settled) m_previous->m_settled[entry.first] = entry.second;
         m_previous->m_restored = m_previous->m_restored || m_restored;
         m_previous->m_unknown = m_previous->m_unknown || m_unknown;
+        if (m_previous->m_failure.empty()) m_previous->m_failure = m_failure;
       }
       catch (...) { m_previous->m_unknown = true; }
     }
@@ -326,6 +341,13 @@ public:
     return same;
   }
   void Unknown() { m_unknown = true; }
+  void NoteFailure(const char* operation, int error)
+  {
+    if (m_failure.empty())
+      m_failure = std::string(operation).substr(0, 48) + ":errno=" + std::to_string(error);
+  }
+  std::string FailureDetail() const
+  { return m_failure.empty() ? "unsettled_file_scope" : m_failure; }
   bool Proven() const
   {
     if (m_unknown) return false;
@@ -365,7 +387,12 @@ private:
   std::map<std::string, Image> m_before;
   std::map<std::string, bool> m_settled;
   bool m_restored{false}; bool m_unknown{false};
+  std::string m_failure;
   size_t m_remaining{64U * 1024U * 1024U};
   static inline thread_local WriteScope* s_current{nullptr};
 };
+inline void ObserveFailure(const char* operation, int error)
+{
+  if (auto* scope = WriteScope::Current()) scope->NoteFailure(operation, error);
+}
 } // namespace InfinityAddonFileReceipt

@@ -145,6 +145,7 @@ def prepare():
     # 2103366 same-name fixture assumed that success could erase another scope.
     for name in ("test_installer_work.py", "test_installer_recovery.py"):
         run(sys.executable, str(HERE / "integration-2103367" / name), "--runtime", "kodi")
+    run(sys.executable, str(HERE / "installer-close-2103368/test_storage_paths.py"), "--runtime", "kodi")
     for runtime in (OUT / "commandcenter", OUT / "installed-addons/script.infinity.commandcenter"):
         for name in ("test_media.py", "test_context.py"):
             run(sys.executable, str(HERE / "integration-2103367" / name), "--runtime", str(runtime))

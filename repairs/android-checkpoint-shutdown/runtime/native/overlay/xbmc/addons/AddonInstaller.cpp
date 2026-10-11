@@ -91,13 +91,17 @@ public:
   ~CAddonOperationReceipt()
   {
     const bool installed = m_complete;
-    m_complete = m_files.Proven() && m_database.Durable();
+    const bool filesDurable = m_files.Proven();
+    const bool databaseDurable = m_database.Durable();
+    m_complete = filesDurable && databaseDurable;
     const auto outcome = !m_complete ? CJobDurability::Unresolved :
         installed || m_database.Wrote() ? CJobDurability::VerifiedCommitted :
         m_files.WasRestored() ? CJobDurability::VerifiedRestored :
         m_files.Touched() ? CJobDurability::VerifiedCommitted : CJobDurability::VerifiedUnchanged;
-    JobCheckpoint::WorkResult(m_record, outcome, installed);
-    if (!m_complete && m_database.Durable())
+    const std::string failure = !filesDurable ? "files:" + m_files.FailureDetail() :
+        !databaseDurable ? "database:unsettled_write_scope" : "";
+    JobCheckpoint::WorkResult(m_record, outcome, installed, failure);
+    if (!m_complete && databaseDurable)
     {
       size_t bytes = 0;
       auto proof = m_files.RestorationProof(bytes);

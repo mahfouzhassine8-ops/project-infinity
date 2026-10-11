@@ -291,6 +291,7 @@ std::string EncodeStatusLocked(const State& s)
     value["resource"] = job.resource;
     value["actual_type"] = job.type;
     value["phase"] = job.phase;
+    value["failure_detail"] = job.failureDetail;
     value["unknown"] = job.unknown;
     value["elapsed_ms"] = job.elapsedMs;
     result["blocking_jobs"].push_back(value);

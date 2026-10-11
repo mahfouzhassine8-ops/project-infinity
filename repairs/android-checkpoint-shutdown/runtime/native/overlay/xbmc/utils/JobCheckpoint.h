@@ -24,6 +24,7 @@ struct CJobCheckpointRecord
   std::string type;
   std::string phase;
   std::string resource;
+  std::string failureDetail;
   bool retained{false};
   bool resolved{false};
   bool receiptRequired{false};
@@ -51,6 +52,7 @@ struct Entry
   std::string phase;
   int64_t elapsedMs{0};
   std::string resource{};
+  std::string failureDetail{};
 };
 struct Snapshot
 {
@@ -93,13 +95,15 @@ private:
   std::shared_ptr<CJobCheckpointRecord> m_previous;
 };
 inline void WorkResult(const std::shared_ptr<CJobCheckpointRecord>& job,
-                       CJobDurability durability, bool operationSucceeded)
+                       CJobDurability durability, bool operationSucceeded,
+                       const std::string& failureDetail = {})
 {
   if (!job || job->unknown) return;
   std::lock_guard<std::mutex> lock(Get().mutex);
   job->durability = durability;
   job->operationSucceeded = operationSucceeded;
   job->outcomeReviewed = true;
+  job->failureDetail = failureDetail.substr(0, 160);
 }
 inline void RecoveryProof(const std::shared_ptr<CJobCheckpointRecord>& job,
                           std::function<bool()> proof, size_t bytes)
@@ -255,7 +259,7 @@ inline Snapshot GetSnapshot()
     if (result.blockers.size() < 32)
       result.blockers.push_back({job->token, job->jobId, job->required, job->unknown, job->owner, job->operation,
         job->type, job->retained && job.use_count() == 2 && job->phase!="completed_write_failed" ? "completed_without_owner_receipt" : job->phase,
-        std::chrono::duration_cast<std::chrono::milliseconds>(now - job->admitted).count(), job->resource});
+        std::chrono::duration_cast<std::chrono::milliseconds>(now - job->admitted).count(), job->resource, job->failureDetail});
   }
   result.resolvedHistory = registry.resolvedHistory;
   result.resolvedCount = registry.resolvedCount;

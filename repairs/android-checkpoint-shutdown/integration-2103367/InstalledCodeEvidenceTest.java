@@ -48,9 +48,9 @@ public final class InstalledCodeEvidenceTest {
     JSONObject receipt=new JSONObject().put("schema",1).put("pid",19842)
         .put("started_epoch_ms",1000).put("engine_death_epoch_ms",2000);
     Files.write(new File(context.getFilesDir(),InfinityCheckpointProtocol.RECEIPT).toPath(),receipt.toString().getBytes(StandardCharsets.UTF_8));
-    String matched=new JSONObject().put("engine","infinity-checkpoint-recovery-integration-2103367-v1")
+    String matched=new JSONObject().put("engine","infinity-checkpoint-installer-close-2103368-v1")
         .put("pid",19842).put("epoch_ns",1500000000L).toString()+"\n";
-    String old=new JSONObject().put("engine","infinity-checkpoint-recovery-integration-2103367-v1")
+    String old=new JSONObject().put("engine","infinity-checkpoint-installer-close-2103368-v1")
         .put("pid",19842).put("epoch_ns",500000000L).toString()+"\n";
     assertTrue(InfinityHealthExport.nativeTraceScope(context,matched).startsWith("MATCHED PREVIOUS"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,old).startsWith("HISTORICAL"));

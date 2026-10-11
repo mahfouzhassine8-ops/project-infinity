@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "state": "repair_verified_locally_build_pending",
+  "candidate_version": 2103368,
+  "protected_baseline_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
+  "completed_integration_commit": "fa37772",
+  "diagnostic": {
+    "name": "Infinity-Diagnostics-20261011-073138.zip",
+    "sha256": "13408884ad997883e0fb7f41e2685e6ea1b274ee6f35b7035b6c5e587443f565",
+    "pid": 23794,
+    "session": "d9616b46-56c2-4dbc-ac93-dc9060b7949d",
+    "duration_ms": 9504,
+    "phase": "CHECKPOINT_FAILED",
+    "blockers": [
+      {
+        "resource": "metalchris.distrotv.epg",
+        "token": 136
+      },
+      {
+        "resource": "plugin.video.themoviedb.helper",
+        "token": 137
+      },
+      {
+        "resource": "script.kodihealthcenter",
+        "token": 215
+      },
+      {
+        "resource": "script.kodihealthcenter",
+        "token": 217
+      },
+      {
+        "resource": "script.kodihealthcenter",
+        "token": 218
+      },
+      {
+        "resource": "metalchris.distrotv.epg",
+        "token": 265
+      },
+      {
+        "resource": "plugin.video.themoviedb.helper",
+        "token": 266
+      }
+    ],
+    "observed_health_version": "2.5.18"
+  },
+  "finding": "Production file-receipt path walk requests O_RDONLY on every ancestor; fails for searchable but non-listable app storage ancestors. Reproduced with unprivileged production installer. Supplied diagnostic has no errno, so exact device syscall remains unconfirmed.",
+  "repair": "O_PATH descriptor-relative ancestor traversal; same no-follow and real parent/file/directory fsync requirements. Bounded file/database failure detail exported without user paths.",
+  "tests": {
+    "old_source_new_storage_fixture": "FAIL before.valid",
+    "repaired_storage_cases": 9,
+    "existing_filesystem_cases": 21,
+    "existing_dowork_cases": 21,
+    "protected_source_contracts": 18,
+    "packaging_tests": 5,
+    "preservation_tests": 4
+  },
+  "physical_acceptance": "pending",
+  "release_locked": false
+}
