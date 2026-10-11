@@ -1,0 +1,37 @@
+name: Dual Infinity | G0 exact source assets only
+on:
+  push:
+    branches: [experiment/dual-infinity-2103368-g0]
+    paths:
+      - 'experiments/dual-infinity/recover_assets.py'
+      - 'experiments/dual-infinity/test_asset_recovery.py'
+      - '.github/workflows/dual-infinity-g0-assets.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: dual-infinity-g0-source-assets, cancel-in-progress: false}
+jobs:
+  recover-source-assets:
+    if: github.ref == 'refs/heads/experiment/dual-infinity-2103368-g0'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Restore protected source renderer packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y imagemagick=8:6.9.11.60+dfsg-1.3ubuntu0.22.04.5 fonts-dejavu-core=2.37-2build1
+      - name: Test exact-source acceptance and reproduce protected assets
+        run: |
+          python3 -m unittest discover -s experiments/dual-infinity -p 'test_*.py' -v
+          python3 experiments/dual-infinity/recover_assets.py --output g0-asset-recovery
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Dual-Infinity-G0-Exact-Source-Assets
+          path: |
+            g0-asset-recovery/ASSET-RECOVERY.json
+            g0-asset-recovery/SHA256SUMS
+            g0-asset-recovery/exact-parent-assets.tar.gz
+          retention-days: 90
+          if-no-files-found: error
