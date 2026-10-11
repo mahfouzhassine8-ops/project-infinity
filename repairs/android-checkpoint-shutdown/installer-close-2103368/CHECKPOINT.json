@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "state": "build_running",
+  "state": "delivery_complete_physical_acceptance_pending",
   "candidate_version": 2103368,
   "protected_baseline_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "completed_integration_commit": "fa37772",
@@ -52,11 +52,67 @@
     "existing_dowork_cases": 21,
     "protected_source_contracts": 18,
     "packaging_tests": 5,
-    "preservation_tests": 4
+    "preservation_tests": 4,
+    "android_junit": 14,
+    "native_coordinator_scenarios_per_family": 33,
+    "full_native_compilation": "passed",
+    "full_android_compilation": "passed",
+    "permanent_signing_and_payload_comparison": "passed"
   },
   "physical_acceptance": "pending",
   "release_locked": false,
   "source_commit": "2515c1a281abf9e57cfdbf570244c69f751a1437",
   "build_run": 38137092930,
-  "build_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38137092930"
+  "build_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38137092930",
+  "build_conclusion": "success",
+  "native_job": 114463078006,
+  "android_job": 114463078141,
+  "package_job": 114467913928,
+  "apk": {
+    "file": "Infinity-2103368-Installer-Close-RC1.apk",
+    "size": 159245111,
+    "sha256": "a6b22a0b761ddc9eba108e1f235001c961592dd911edff8c48a0abc6fb3592c8",
+    "candidate": 2103368,
+    "source_commit": "2515c1a281abf9e57cfdbf570244c69f751a1437",
+    "native_source_commit": "2515c1a281abf9e57cfdbf570244c69f751a1437",
+    "native_validation_run": 38137092930,
+    "android_validation_run": 38137092930,
+    "native_unstripped_sha256": "4b048fba3aef50c7dc3e88e5279d41fd0385d13506e4140f17c6fea3ad1c1852",
+    "native_packaged_sha256": "bd6be87e3c7d6c510973a55018029ed0e3488cd5328d7a81565cbbfdd44fefb9",
+    "parent_apk_sha256": "dbf3bc094307394c5a99a592f0d0aea831fb736f3137f2028aa5c7c9063837ab",
+    "protected_entries": 4165,
+    "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "native_recompiled": true,
+    "device_accepted": false,
+    "locked": false,
+    "installed_owner_audit_complete": false,
+    "unknown_writers_block_normal_close": true,
+    "pillow_native_contract_pinned": true,
+    "checkpoint_retirement_escalation": "3s cooperative grace; max 8 parallel foreign-writer escalations off UI thread",
+    "checkpoint_observer_finalization": "consume only escalation-owned SystemExit; one bounded observer retry; dirty state still blocks",
+    "final_blocker_detail_inventory": "all Python durability path failures and add-on settings conflict paths are retained in one checkpoint receipt",
+    "weather_temp_retirement": "chooser weather atomic .pending namespace is removed in finally, including checkpoint SystemExit",
+    "failed_close_recents": "failed/still-owned Kodi task is hidden from Recents while chooser owns recovery; engine is not killed",
+    "runtime_probe_retirement": "uname is bounded read-only; idempotent VFS mkdirs and externally closed SQLite handles do not create false save blockers",
+    "purpose": "Fold repair candidate; remove false runtime/save blockers while retaining exact fail-closed persistence boundaries"
+  },
+  "protected_payload_entries": 4169,
+  "deliverables": [
+    {
+      "file": "Infinity-2103368-Installer-Close-RC1.apk",
+      "sha256": "a6b22a0b761ddc9eba108e1f235001c961592dd911edff8c48a0abc6fb3592c8",
+      "bytes": 159245111,
+      "library_file_id": "libfile_116cce8896d88191b47f3f27cdd5fa50",
+      "file_id": "file_00000000605081f59532ad393df7e321",
+      "saved": true
+    },
+    {
+      "file": "Infinity-2103368-Installer-Close-Evidence.zip",
+      "sha256": "5df3e68b952b2653b9d9aa7de10256722fba7bd340d79e5df4a9096ff5425ceb",
+      "bytes": 16592969,
+      "library_file_id": "libfile_901528f124388191ad36afb2342b3c17",
+      "file_id": "file_00000000331881f7acf62105fcaff152",
+      "saved": true
+    }
+  ]
 }
