@@ -12,6 +12,12 @@ confirmed native death. Those original artifacts and source branch are retained.
   never consumes the previous episode's route/source/database ID. Existing
   unfinished resume and original-episode replay retain their own provider route.
   Season zero is a real season. Missing resolver metadata remains unavailable.
+* Series identity: Kodi item unique IDs can describe the episode. Only a checked
+  GetEpisodeDetails → GetTVShowDetails relationship supplies series IDs for a
+  synthetic resolver route. This read occurs during playback arming; listings add
+  no RPC/network work. Ambiguous legacy next cards remain unavailable, without
+  rewriting saved state or altering original resume/replay routes. Verified series
+  IDs also group library episodes correctly across different episode IDs.
 * Timing: bounded numeric/PID/request observations cover service publication,
   verified snapshot loading, filtering, list construction, native queue/fetch,
   artwork metadata and skin binding. Read-only visibility observation recognizes

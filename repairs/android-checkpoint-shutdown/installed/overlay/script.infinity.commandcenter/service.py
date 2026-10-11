@@ -403,6 +403,51 @@ def _continue_player_item(player_id):
     return item if isinstance(item, dict) else {}
 
 
+def _continue_show_identity(item_type, dbid, season, episode, show):
+    """Resolve series IDs from the actual library owner, never episode unique IDs.
+
+    Runs once while arming playback, not during widget generation. Unknown or
+    conflicting identity stays unavailable; no network/provider lookup is added.
+    """
+    if item_type != 'episode' or type(dbid) is not int or dbid <= 0 or not show:
+        return {}
+    if season < 0 or episode < 0:
+        return {}
+    try:
+        if not xbmc.getCondVisibility('Library.HasContent(TVShows)'):
+            return {}
+        response = jsonrpc('VideoLibrary.GetEpisodeDetails', {
+            'episodeid': dbid, 'properties': ['season', 'episode', 'showtitle', 'tvshowid']})
+        details = response.get('result', {}).get('episodedetails', {})
+        if ('error' in response or not isinstance(details, dict) or
+                details.get('episodeid') != dbid or type(details.get('episodeid')) is not int or
+                hub.episode_number(details.get('season')) != season or
+                hub.episode_number(details.get('episode')) != episode or
+                str(details.get('showtitle') or '').strip().casefold() != show.casefold()):
+            return {}
+        show_id = details.get('tvshowid')
+        if type(show_id) is not int or show_id <= 0:
+            return {}
+        response = jsonrpc('VideoLibrary.GetTVShowDetails', {
+            'tvshowid': show_id, 'properties': ['title', 'uniqueid']})
+        details = response.get('result', {}).get('tvshowdetails', {})
+        if ('error' in response or not isinstance(details, dict) or
+                type(details.get('tvshowid')) is not int or details['tvshowid'] != show_id or
+                str(details.get('title') or '').strip().casefold() != show.casefold()):
+            return {}
+        unique = details.get('uniqueid')
+        if not isinstance(unique, dict):
+            return {}
+        tmdb, tvdb = (str(unique.get(name) or '').strip() for name in ('tmdb', 'tvdb'))
+        if not ((tmdb.isdigit() and int(tmdb) > 0) or (tvdb.isdigit() and int(tvdb) > 0)):
+            return {}
+        return {'show_ids_verified': True,
+                'show_tmdb': tmdb if tmdb.isdigit() and int(tmdb) > 0 else '',
+                'show_tvdb': tvdb if tvdb.isdigit() and int(tvdb) > 0 else ''}
+    except Exception:
+        return {}
+
+
 def _continue_identity(item):
     item_type = str(item.get('type') or '').strip().lower()
     show = str(item.get('showtitle') or xbmc.getInfoLabel('VideoPlayer.TVShowTitle') or '').strip()
@@ -440,6 +485,9 @@ def _continue_identity(item):
     else:
         return None
 
+    show_identity = (_continue_show_identity(item_type, dbid, season, episode, show)
+                     if media == 'tv' and type(item.get('id')) is int else {})
+
     import hashlib
     key = hashlib.sha256(raw.encode('utf-8', errors='replace')).hexdigest()
     art = item.get('art') if isinstance(item.get('art'), dict) else {}
@@ -460,6 +508,7 @@ def _continue_identity(item):
         'source': source,
         'poster': poster,
         'fanart': fanart,
+        **show_identity,
     }
 
 

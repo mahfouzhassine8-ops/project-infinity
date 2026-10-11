@@ -390,6 +390,17 @@ def entries(data, media='all', bucket='items', list_name=''):
     return values
 
 
+def _show_key(value, key):
+    if value.get('show_ids_verified') is True:
+        for namespace in ('tmdb', 'tvdb'):
+            verified = str(value.get('show_' + namespace) or '')
+            if verified.isdigit() and int(verified) > 0:
+                return 'series:' + namespace + ':' + verified
+    # Keep legacy grouping unchanged; legacy item IDs do not authorize a new route.
+    return str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
+               value.get('showtitle') or value.get('title') or key).casefold()
+
+
 def progress_shows(data):
     """Return the newest known episode per show, preferring in-progress episodes."""
     data = _normalize(data)
@@ -398,8 +409,7 @@ def progress_shows(data):
         for key, value in data[bucket].items():
             if not isinstance(value, dict) or value.get('media') != 'tv':
                 continue
-            show_key = str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
-                           value.get('showtitle') or value.get('title') or key).casefold()
+            show_key = _show_key(value, key)
             marker = (priority, episode_number(value.get('season')), episode_number(value.get('episode')),
                       int(value.get('updated') or value.get('watched_at') or 0))
             if show_key not in chosen or marker > chosen[show_key][0]:
@@ -413,15 +423,15 @@ def next_episodes(data):
     """Build conservative next-up candidates from locally observed TV state.
 
     An unfinished episode remains the next item. Once completed, a synthetic next episode is
-    offered only when a TMDb/TVDb identity and concrete season/episode are known. The normal
-    provider/TMDb Helper resolver validates playback; no guessed stream URL is stored.
+    offered from concrete local season/episode state. Only verified series IDs may
+    authorize the existing TMDb Helper resolver; ambiguous legacy cards stay unavailable.
+    Episode unique IDs are never promoted to series IDs; no guessed stream URL is stored.
     """
     data = _normalize(data)
     progress = {}
     for key, value in data['items'].items():
         if isinstance(value, dict) and value.get('media') == 'tv':
-            show_key = str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
-                           value.get('showtitle') or value.get('title') or key).casefold()
+            show_key = _show_key(value, key)
             current = progress.get(show_key)
             marker = (episode_number(value.get('season')), episode_number(value.get('episode')), int(value.get('updated') or 0))
             if current is None or marker > current[0]:
@@ -432,13 +442,13 @@ def next_episodes(data):
     for key, value in data['watched'].items():
         if not isinstance(value, dict) or value.get('media') != 'tv':
             continue
-        show_key = str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
-                       value.get('showtitle') or value.get('title') or key).casefold()
+        show_key = _show_key(value, key)
         if show_key in progress:
             continue
         season = episode_number(value.get('season'))
         episode = episode_number(value.get('episode'))
-        if season < 0 or episode < 0 or not (value.get('tmdb') or value.get('tvdb')):
+        if season < 0 or episode < 0 or not (value.get('tmdb') or value.get('tvdb') or
+                (value.get('show_ids_verified') is True and (value.get('show_tmdb') or value.get('show_tvdb')))):
             continue
         marker = (season, episode, int(value.get('watched_at') or value.get('updated') or 0))
         if show_key not in watched_latest or marker > watched_latest[show_key][0]:
@@ -450,7 +460,10 @@ def next_episodes(data):
         show = str(last.get('showtitle') or last.get('title') or 'TV Show')
         candidate = {
             'media': 'tv', 'showtitle': show, 'title': show,
-            'tmdb': last.get('tmdb', ''), 'tvdb': last.get('tvdb', ''),
+            'tmdb': last.get('show_tmdb', '') if last.get('show_ids_verified') is True else '',
+            'tvdb': last.get('show_tvdb', '') if last.get('show_ids_verified') is True else '',
+            'show_tmdb': last.get('show_tmdb', '') if last.get('show_ids_verified') is True else '',
+            'show_ids_verified': last.get('show_ids_verified') is True,
             'season': marker[0], 'episode': marker[1] + 1,
             'position': 0.0, 'percentage': 0.0, 'watched': False,
             'synthetic_next': True,

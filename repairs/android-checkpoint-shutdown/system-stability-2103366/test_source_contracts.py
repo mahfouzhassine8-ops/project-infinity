@@ -15,7 +15,7 @@ class Contracts(android['AndroidCloseHandoffTests'], native['SourceContracts']):
     def test_resume_and_identity_preserved(self):
         package = Path('tools/checkpoint-apk/package.py').read_text()
         self.assertIn('VERSION = 2103366', package)
-        self.assertIn('1.0.9-System-Stability-RC1', package)
+        self.assertIn('1.0.9-System-Stability-RC2', package)
 
     def test_inherited_resume_speed_contracts(self):
         self.test_resume_and_identity_preserved()
