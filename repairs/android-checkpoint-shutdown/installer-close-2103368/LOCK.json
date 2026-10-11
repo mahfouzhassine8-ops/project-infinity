@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "candidate_version": 2103368,
+  "status": "official_candidate_locked",
+  "lock_scope": "official candidate snapshot",
+  "authorized_by": "user",
+  "user_instruction": "Lock. This is officially a candidate",
+  "user_instruction_at": "2026-10-11T13:42:42-04:00",
+  "user_instruction_timezone": "America/Detroit",
+  "source_commit": "2515c1a281abf9e57cfdbf570244c69f751a1437",
+  "delivery_checkpoint_commit": "66c9eb57d99df8d71b9008c9ef5df73b262eacb3",
+  "apk": {
+    "file": "Infinity-2103368-Installer-Close-RC1.apk",
+    "bytes": 159245111,
+    "sha256": "a6b22a0b761ddc9eba108e1f235001c961592dd911edff8c48a0abc6fb3592c8",
+    "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+  },
+  "retained_build_evidence": {
+    "file": "Infinity-2103368-Installer-Close-Evidence.zip",
+    "sha256": "5df3e68b952b2653b9d9aa7de10256722fba7bd340d79e5df4a9096ff5425ceb",
+    "bytes": 16592969,
+    "library_file_id": "libfile_901528f124388191ad36afb2342b3c17",
+    "file_id": "file_00000000331881f7acf62105fcaff152",
+    "saved": true
+  },
+  "build": {
+    "run": 38137092930,
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38137092930",
+    "conclusion": "success"
+  },
+  "physical_acceptance": {
+    "scope": "recorded physical shutdown test",
+    "diagnostic_file": "Infinity-Diagnostics-20261011-133450.zip",
+    "diagnostic_sha256": "908336b938f77c265e07869a7723fefeeda2464c85ef80dd26abdd8ba0e58fcd",
+    "package": "com.projectinfinity.kodi",
+    "version_code": 2103368,
+    "version_name": "1.0.9-Installer-Close-RC1",
+    "device_model": "Samsung SM-F976U1",
+    "android_api": 37,
+    "session": "b7934632-bd23-4b44-97de-fb76326c013f",
+    "pid": 27311,
+    "native_producer": "infinity-checkpoint-installer-close-2103368-v1",
+    "final_phase": "COMPLETE",
+    "checkpoint_saved": true,
+    "authorization_consumed": true,
+    "engine_death_confirmed": true,
+    "duration_ms": 9427,
+    "required_owners": 17,
+    "durable_required_owners": 17,
+    "required_owner_outcomes": [
+      "COMMITTED",
+      "ALREADY_DURABLE"
+    ],
+    "blockers": 0,
+    "required_jobs": 0,
+    "unknown_job_owners": 0,
+    "active_native_writers": 0,
+    "native_json_sha256": "9bdd55b82ba33b84a76112febd2cdcfc05317260dfb12255178f836a3cc1d348",
+    "native_receipt_matches_last_native_status": true,
+    "installer_business_outcomes": "Four failed install outcomes settled with durable commits; phase installation_failed_verified_committed. This does not claim successful add-on installation.",
+    "nonblocking_python_advisories": 7,
+    "installed_versions": {
+      "skin": "1.0.5.207",
+      "command_center": "0.3.5.20",
+      "compat": "0.8.2",
+      "health_center": "2.5.18",
+      "seren": "4.3.214",
+      "umbrella": "6.7.90",
+      "pov": "6.10.05"
+    },
+    "separate_health_center_2_5_19_update_installed": false
+  },
+  "rollback_baseline": {
+    "candidate_version": 2103365,
+    "commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
+    "apk_sha256": "251851c1a97eac0430632aa7f74cde45d306bbbda1094629dfb26820412baa72",
+    "protected_payload_entries_unchanged": 4169
+  },
+  "preservation_rules": [
+    "Retain the exact signed APK, source commit and build evidence recorded here.",
+    "Make subsequent implementation changes under a new candidate version; do not replace this candidate artifact.",
+    "Preserve the protected 2103365 rollback baseline.",
+    "Acceptance is limited to the verified physical shutdown test and existing recorded build/regression evidence."
+  ],
+  "production_release_published": false
+}

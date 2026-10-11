@@ -19,7 +19,26 @@ and 2103367 APK hashes still match. Completed 2103367 integration assets and
 all 17-owner close requirements are preserved.
 
 The reproduced storage-ancestor permission defect is fixed and regression
-verified. Physical close remains unconfirmed; the diagnostic supplied before
-this repair has no syscall error. See DIAGNOSIS.md for the evidence limits.
-Install as an update, retry add-on installation, then test Close and retain a
-new diagnostic if it fails. Release remains unlocked pending physical acceptance.
+verified. The subsequent physical phone shutdown test passed: all 17 required
+owners were durable, with zero blockers, checkpoint save and shutdown
+authorization confirmed, and engine death observed. The coordinator reached
+COMPLETE in 9.427 seconds.
+
+Acceptance evidence is `Infinity-Diagnostics-20261011-133450.zip`, SHA-256
+`908336b938f77c265e07869a7723fefeeda2464c85ef80dd26abdd8ba0e58fcd`,
+session `b7934632-bd23-4b44-97de-fb76326c013f`, PID 27311.
+The native receipt matches the final native status; its JSON SHA-256 is
+`9bdd55b82ba33b84a76112febd2cdcfc05317260dfb12255178f836a3cc1d348`.
+
+The user explicitly designated 2103368 an official candidate and requested
+the lock on 2026-10-11: "Lock. This is officially a candidate".
+The exact signed APK and source above are now the locked official candidate.
+See LOCK.json for the acceptance record and preservation rules. The protected
+2103365 rollback baseline remains retained. This documentation lock does not
+rebuild or publish a production release.
+
+The accepted phone has Health Center 2.5.18; the separate 2.5.19 update is not
+part of this accepted installation. Four failed installer business outcomes
+were durably settled and did not block shutdown. Their persistence acceptance
+does not assert successful add-on installation. See DIAGNOSIS.md for the
+original investigation and evidence limits.

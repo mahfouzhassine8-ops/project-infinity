@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "state": "delivery_complete_physical_acceptance_pending",
+  "state": "official_candidate_locked",
   "candidate_version": 2103368,
   "protected_baseline_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "completed_integration_commit": "fa37772",
@@ -59,8 +59,8 @@
     "full_android_compilation": "passed",
     "permanent_signing_and_payload_comparison": "passed"
   },
-  "physical_acceptance": "pending",
-  "release_locked": false,
+  "physical_acceptance": "accepted_for_recorded_shutdown_test",
+  "release_locked": true,
   "source_commit": "2515c1a281abf9e57cfdbf570244c69f751a1437",
   "build_run": 38137092930,
   "build_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38137092930",
@@ -114,5 +114,57 @@
       "file_id": "file_00000000331881f7acf62105fcaff152",
       "saved": true
     }
-  ]
+  ],
+  "candidate_status": "official_candidate",
+  "candidate_locked": true,
+  "lock_scope": "official candidate snapshot",
+  "production_release_published": false,
+  "apk_status_semantics": "The apk object is an unchanged build-time CI receipt. Its device_accepted and locked fields describe build-time status; post-delivery acceptance and candidate lock are recorded in acceptance and LOCK.json.",
+  "acceptance": {
+    "scope": "recorded physical shutdown test",
+    "diagnostic_file": "Infinity-Diagnostics-20261011-133450.zip",
+    "diagnostic_sha256": "908336b938f77c265e07869a7723fefeeda2464c85ef80dd26abdd8ba0e58fcd",
+    "package": "com.projectinfinity.kodi",
+    "version_code": 2103368,
+    "version_name": "1.0.9-Installer-Close-RC1",
+    "device_model": "Samsung SM-F976U1",
+    "android_api": 37,
+    "session": "b7934632-bd23-4b44-97de-fb76326c013f",
+    "pid": 27311,
+    "native_producer": "infinity-checkpoint-installer-close-2103368-v1",
+    "final_phase": "COMPLETE",
+    "checkpoint_saved": true,
+    "authorization_consumed": true,
+    "engine_death_confirmed": true,
+    "duration_ms": 9427,
+    "required_owners": 17,
+    "durable_required_owners": 17,
+    "required_owner_outcomes": [
+      "COMMITTED",
+      "ALREADY_DURABLE"
+    ],
+    "blockers": 0,
+    "required_jobs": 0,
+    "unknown_job_owners": 0,
+    "active_native_writers": 0,
+    "native_json_sha256": "9bdd55b82ba33b84a76112febd2cdcfc05317260dfb12255178f836a3cc1d348",
+    "native_receipt_matches_last_native_status": true,
+    "installer_business_outcomes": "Four failed install outcomes settled with durable commits; phase installation_failed_verified_committed. This does not claim successful add-on installation.",
+    "nonblocking_python_advisories": 7,
+    "installed_versions": {
+      "skin": "1.0.5.207",
+      "command_center": "0.3.5.20",
+      "compat": "0.8.2",
+      "health_center": "2.5.18",
+      "seren": "4.3.214",
+      "umbrella": "6.7.90",
+      "pov": "6.10.05"
+    },
+    "separate_health_center_2_5_19_update_installed": false
+  },
+  "lock_record": "LOCK.json",
+  "lock_authorization": {
+    "user_instruction": "Lock. This is officially a candidate",
+    "user_instruction_at": "2026-10-11T13:42:42-04:00"
+  }
 }
