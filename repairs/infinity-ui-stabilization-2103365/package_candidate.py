@@ -12,7 +12,7 @@ POWER_SHA='149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78'
 def sha(data):return hashlib.sha256(data).hexdigest()
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--base',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--delta',type=Path,default=HERE/'skin-delta');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--base',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--delta',type=Path,default=HERE/'skin-delta');p.add_argument('--lock-ui-source',action='store_true',help='Mark this exact presentation-only ZIP as an isolated UI-source lock; never implies device acceptance');a=p.parse_args()
  if sha(a.base.read_bytes())!=BASE_SHA:raise ValueError('Only the verified .204 package is permitted')
  changes={'skin.infinity.diggz/'+str(x.relative_to(a.delta)):x.read_bytes() for x in a.delta.rglob('*') if x.is_file()}
  if POWER in changes:raise ValueError('Approved Power XML must not be patched')
@@ -54,7 +54,8 @@ def main():
   'unchanged_entries':len(original)-len(actual&original.keys()),'removed_entries':0,'active_xml_parsed':len(xml),
   'power_byte_identical':True,'power_sha256':POWER_SHA,'all_other_entries_byte_identical':True,
   'native_rebuild':False,'backend_or_provider_code_changed':False,'settings_reset':False,
-  'physical_fold_tested':False,'combined_release_accepted':False,'locked':False,
+  'physical_fold_tested':False,'combined_release_accepted':False,'locked':a.lock_ui_source,
+  'lock_scope':'ISOLATED_UI_SOURCE_CANDIDATE' if a.lock_ui_source else 'UNLOCKED_CANDIDATE',
   'rollback':'Install the original .204 ZIP over this skin without removing settings or userdata; do not automatically revert to .201.',
  }
  a.out.with_suffix('.manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

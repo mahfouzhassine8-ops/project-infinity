@@ -1,6 +1,6 @@
 # Infinity .207 UI Stability RC1 candidate
 
-Actual presentation repairs are implemented in `skin-delta/`. Candidate **1.0.5.207 UI Stability RC1** is built directly from the approved .204 archive; it is not a .206 upgrade. It is a skin-only installable ZIP, with no native compilation or user-data reset. All 2,926 other entries remain byte identical. The branch remains `work/infinity-ui-stabilization-2103365` and is not merged into the backend workstream.
+Actual presentation repairs are implemented in `skin-delta/`. Candidate **1.0.5.207 UI Stability RC1** is built directly from the approved .204 archive; it is not a .206 upgrade. Its exact source ZIP is now locked as an isolated UI candidate, with no native compilation or user-data reset. All 2,926 other entries remain byte identical. The branch remains `work/infinity-ui-stabilization-2103365` and is not merged into the backend workstream. See `lock-record.json` for the lock identity. Device, backend integration and combined application acceptance remain pending.
 
 `candidate-manifest.json` lists all 15 XML changes and their exact before/after SHA256 hashes. `implementation-inventory.json` maps repairs to evidence and ownership. `validation-results.json` records 11 passing source-check groups, 960 bounds checks across 16 representative usable-window profiles, and primary/secondary/warning text contrast for four theme palettes. These results establish source preservation and authored geometry, not physical device acceptance.
 
