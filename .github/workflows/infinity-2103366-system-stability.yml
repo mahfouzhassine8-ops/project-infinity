@@ -21,6 +21,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
@@ -139,7 +140,6 @@ jobs:
             infinity-checkpoint-3334-deps-${{ runner.os }}-37912556867
             infinity-checkpoint-3334-deps-${{ runner.os }}-37903323079
             infinity-checkpoint-3334-deps-${{ runner.os }}-37893896767
-            infinity-checkpoint-3334-deps-${{ runner.os }}-37887463358
             infinity-checkpoint-3334-deps-${{ runner.os }}-
       - name: Reconstruct protected lineage and run source and persistence gates
         run: |
