@@ -119,7 +119,7 @@ final class InfinityHealthExport {
     appendCheckpointEvidence(output, context);
     appendNativeShutdownEvidence(output, context, "Previous / failed native shutdown critical timeline",
         "infinity-shutdown-native.jsonl.critical.previous");
-    appendNativeShutdownEvidence(output, context, "Latest native critical timeline — producer identity must match the checkpoint",
+    appendNativeShutdownEvidence(output, context, "Current native shutdown critical timeline — producer identity must match the checkpoint",
         "infinity-shutdown-native.jsonl.critical");
     return output.toString();
   }
@@ -357,18 +357,24 @@ final class InfinityHealthExport {
       int pid=receipt.getInt("pid");long begin=receipt.getLong("started_epoch_ms");
       long end=receipt.optLong("engine_death_epoch_ms",0);
       if(begin<=0)return "UNVERIFIED — checkpoint clock unavailable";
-      int observations=0;
+      int matched=0,other=0,unverified=0;
       for(String line:evidence.split("\n")) {
         if(line.trim().isEmpty())continue;
-        JSONObject row=new JSONObject(line);
+        JSONObject row;
+        try {row=new JSONObject(line);}catch(Exception partial){++unverified;continue;}
         if(!row.has("engine"))continue;
-        if(!"infinity-checkpoint-system-stability-2103366-v1".equals(row.getString("engine")) || row.getInt("pid")!=pid)
-          return "HISTORICAL / OTHER PRODUCER — does not establish this checkpoint failure";
+        if(!"infinity-checkpoint-system-stability-2103366-v1".equals(row.optString("engine")) || row.optInt("pid",-1)!=pid) {
+          ++other;continue;
+        }
         long epoch=row.optLong("epoch_ns",0)/1000000;
-        if(epoch<begin || (end>0&&epoch>end))return "HISTORICAL / OTHER INTERVAL — does not establish this checkpoint failure";
-        ++observations;
+        if(epoch<=0){++unverified;continue;}
+        if(epoch<begin || (end>0&&epoch>end)){++other;continue;}
+        ++matched;
       }
-      return observations>0?"MATCHED PREVIOUS CHECKPOINT — trace is diagnostic, not a completion receipt":"UNVERIFIED — no complete producer rows";
+      if(matched>0) return other==0&&unverified==0?
+          "MATCHED PREVIOUS CHECKPOINT — trace is diagnostic, not a completion receipt":
+          "MIXED TIMELINE — matched="+matched+", historical_or_other="+other+", unverified="+unverified+"; retain each scope, no success verdict";
+      return other>0?"HISTORICAL / OTHER PRODUCER OR INTERVAL — does not establish this checkpoint failure":"UNVERIFIED — no complete producer rows";
     } catch(Exception unknown) {return "UNVERIFIED — producer/session match not established";}
   }
 
