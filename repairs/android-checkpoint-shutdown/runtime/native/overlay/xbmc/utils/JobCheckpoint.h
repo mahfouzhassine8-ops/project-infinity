@@ -9,6 +9,9 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <functional>
+
+enum class CJobDurability { Pending, VerifiedUnchanged, VerifiedCommitted, VerifiedRestored, Unresolved };
 
 struct CJobCheckpointRecord
 {
@@ -24,6 +27,12 @@ struct CJobCheckpointRecord
   bool retained{false};
   bool resolved{false};
   bool receiptRequired{false};
+  CJobDurability durability{CJobDurability::Pending};
+  bool operationSucceeded{false};
+  bool outcomeReviewed{false};
+  bool completionRecorded{false};
+  std::function<bool()> recoveryProof;
+  size_t recoveryBytes{0};
   std::chrono::steady_clock::time_point admitted;
 };
 
@@ -61,11 +70,82 @@ struct Registry
   bool receiptOverflow{false};
   std::vector<Entry> resolvedHistory;
   uint64_t resolvedCount{0};
+  size_t recoveryBytes{0};
 };
 inline Registry& Get()
 {
   static auto* registry = new Registry;
   return *registry;
+}
+// Work and callback use the same admitted operation. Synchronous and nested
+// operations still create their own receipts; identity labels grant no bypass.
+inline thread_local std::shared_ptr<CJobCheckpointRecord> currentOperation;
+class WorkBinding
+{
+public:
+  explicit WorkBinding(std::shared_ptr<CJobCheckpointRecord> record)
+    : m_previous(currentOperation) { currentOperation = std::move(record); }
+  ~WorkBinding() { currentOperation = std::move(m_previous); }
+  WorkBinding(const WorkBinding&) = delete;
+  WorkBinding& operator=(const WorkBinding&) = delete;
+private:
+  std::shared_ptr<CJobCheckpointRecord> m_previous;
+};
+inline void WorkResult(const std::shared_ptr<CJobCheckpointRecord>& job,
+                       CJobDurability durability, bool operationSucceeded)
+{
+  if (!job || job->unknown) return;
+  std::lock_guard<std::mutex> lock(Get().mutex);
+  job->durability = durability;
+  job->operationSucceeded = operationSucceeded;
+  job->outcomeReviewed = true;
+}
+inline void RecoveryProof(const std::shared_ptr<CJobCheckpointRecord>& job,
+                          std::function<bool()> proof, size_t bytes)
+{
+  if (!job || !proof) return;
+  auto& registry = Get(); std::lock_guard<std::mutex> lock(registry.mutex);
+  if (bytes > 64U * 1024U * 1024U - registry.recoveryBytes) return;
+  registry.recoveryBytes += bytes; job->recoveryBytes = bytes; job->recoveryProof = std::move(proof);
+}
+// A later operation may retire only the exact outstanding scopes whose saved
+// preimages have actually been restored and synced. Labels/success alone grant
+// no recovery. Proof executes outside the registry lock and without mutation.
+inline void RecoverRestored(const std::string& operation, const std::string& resource,
+                            uint64_t currentToken)
+{
+  auto& registry = Get();
+  std::vector<std::shared_ptr<CJobCheckpointRecord>> candidates;
+  auto peer = [&]() {
+    for (const auto& weak : registry.jobs) if (auto job = weak.lock())
+      if (job->token != currentToken && !job->resolved && !job->completionRecorded &&
+          job->resource == resource) return true;
+    return false;
+  };
+  {
+    std::lock_guard<std::mutex> lock(registry.mutex);
+    if (peer()) return;
+    for (const auto& value : registry.unresolved)
+      if (value.second->operation == operation && value.second->resource == resource &&
+          value.second->completionRecorded && value.second->recoveryProof) candidates.push_back(value.second);
+  }
+  for (const auto& job : candidates)
+  {
+    bool verified = false;
+    try { verified = job->recoveryProof(); } catch (...) { verified = false; }
+    if (!verified) continue;
+    std::lock_guard<std::mutex> lock(registry.mutex);
+    if (job->resolved || peer()) continue;
+    job->resolved = true; job->retained = false; job->durability = CJobDurability::VerifiedRestored;
+    for (auto i = registry.unresolved.begin(); i != registry.unresolved.end();)
+      if (i->second == job) i = registry.unresolved.erase(i); else ++i;
+    ++registry.resolvedCount;
+    if (registry.resolvedHistory.size() == 16) registry.resolvedHistory.erase(registry.resolvedHistory.begin());
+    registry.resolvedHistory.push_back({job->token, job->jobId, job->required, job->unknown,
+        job->owner, job->operation, job->type, "installation_failed_verified_restored",
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - job->admitted).count(), job->resource});
+    registry.recoveryBytes -= job->recoveryBytes; job->recoveryBytes = 0; job->recoveryProof = {};
+  }
 }
 inline std::shared_ptr<CJobCheckpointRecord> Admit(bool required, bool unknown, std::string owner, std::string operation,
                                                    std::string type, const char* phase, bool receiptRequired=false, std::string resource={})
@@ -110,40 +190,32 @@ inline void Complete(const std::shared_ptr<CJobCheckpointRecord>& job, bool succ
 {
   if(!job || job->unknown)return; // Unknown work still requires its own reviewed contract.
   auto& registry=Get();std::lock_guard<std::mutex> lock(registry.mutex);
+  if (job->completionRecorded) return;
+  if (job->outcomeReviewed && (job->durability == CJobDurability::Unresolved || job->durability == CJobDurability::Pending)) success = false;
+  job->completionRecorded = true;
+  // General installation success cannot prove recovery of a prior operation's
+  // staging, package-cache, dependency or database resources.
+  (void)verifiedReplacement;
   job->phase=success?"completion_receipt_verified":"completed_write_failed";
+  if (success && job->durability == CJobDurability::Pending)
+    job->durability = CJobDurability::VerifiedCommitted;
+  if (!success) job->durability = CJobDurability::Unresolved;
   registry.pendingReceipts.erase(job->token);
   job->retained=false;
-  if (success && verifiedReplacement && job->receiptRequired && !job->resource.empty())
+  if (success && job->outcomeReviewed && !job->operationSucceeded && job->receiptRequired &&
+      (job->durability == CJobDurability::VerifiedUnchanged ||
+       job->durability == CJobDurability::VerifiedRestored ||
+       job->durability == CJobDurability::VerifiedCommitted))
   {
-    const auto sameResource = [&job](const auto& other) {
-      return other->required && !other->unknown && other->receiptRequired &&
-          other->owner == job->owner && other->operation == job->operation &&
-          other->resource == job->resource;
-    };
-    // A competing/older unfinished writer prevents repair retirement.
-    bool pending = false;
-    for (const auto& entry : registry.pendingReceipts)
-      if (sameResource(entry.second)) pending = true;
-    if (!pending)
-    {
-      for (auto it = registry.unresolved.begin(); it != registry.unresolved.end();)
-      {
-        auto& prior = it->second;
-        if (sameResource(prior) && prior->token < job->token && prior->phase == "completed_write_failed")
-        {
-          prior->resolved = true;
-          prior->retained = false;
-          prior->phase = "resolved_by_verified_replacement";
-          ++registry.resolvedCount;
-          if (registry.resolvedHistory.size() == 16) registry.resolvedHistory.erase(registry.resolvedHistory.begin());
-          registry.resolvedHistory.push_back({prior->token, prior->jobId, prior->required, prior->unknown,
-              prior->owner, prior->operation, prior->type, prior->phase,
-              std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - prior->admitted).count(), prior->resource});
-          it = registry.unresolved.erase(it);
-        }
-        else ++it;
-      }
-    }
+    const char* outcome = job->durability == CJobDurability::VerifiedUnchanged ?
+        "installation_failed_verified_unchanged" :
+        job->durability == CJobDurability::VerifiedRestored ?
+        "installation_failed_verified_restored" : "installation_failed_verified_committed";
+    ++registry.resolvedCount;
+    if (registry.resolvedHistory.size() == 16) registry.resolvedHistory.erase(registry.resolvedHistory.begin());
+    registry.resolvedHistory.push_back({job->token, job->jobId, job->required, job->unknown,
+        job->owner, job->operation, job->type, outcome,
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - job->admitted).count(), job->resource});
   }
   if(!success) {
     // Keep semantic write/callback failure even if it occurred before Close.

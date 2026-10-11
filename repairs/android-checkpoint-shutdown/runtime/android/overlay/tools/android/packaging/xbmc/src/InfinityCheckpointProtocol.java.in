@@ -110,6 +110,7 @@ final class InfinityCheckpointProtocol {
       if(!java.util.Arrays.equals(bytes,file.readFully()))throw new IOException("checkpoint receipt replacement unconfirmed");
     }
     catch(IOException error){if(out!=null)file.failWrite(out);throw error;}
+    InfinityCheckpointEvidence.mirror(path,row);
   }
   static JSONObject read(File directory)throws Exception{
     byte[] bytes=new AtomicFile(new File(directory,RECEIPT)).readFully();

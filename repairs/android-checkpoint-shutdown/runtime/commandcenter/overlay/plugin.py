@@ -52,12 +52,15 @@ def _target(entry, sources=None, render=None):
             host = route.split('/')[2] if route.startswith('plugin://') else ''
             if not host or _has_addon(host, render):
                 return route
-    if entry.get('synthetic_next') and (entry.get('show_ids_verified') is not True or
+    if entry.get('synthetic_next') and (entry.get('next_verified') is not True or
+            entry.get('show_ids_verified') is not True or
             str(entry.get('show_tmdb') or '').strip() != str(entry.get('tmdb') or '').strip()):
         return ''
     media = entry.get('media')
+    # An episode TMDb ID cannot authorize a show resolver. Original verified
+    # episode routes remain usable; unknown series identity stays unavailable.
     tmdb = str((entry.get('show_tmdb') if media == 'tv' and entry.get('show_ids_verified') is True
-                else entry.get('tmdb')) or '').strip()
+                else entry.get('tmdb') if media == 'movie' else '') or '').strip()
     if tmdb.isdigit() and _has_tmdb_helper(render):
         if media == 'tv':
             season = hub.episode_number(entry.get('season'))

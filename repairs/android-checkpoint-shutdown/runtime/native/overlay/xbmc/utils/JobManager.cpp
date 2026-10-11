@@ -76,6 +76,7 @@ void CJobWorker::Process()
     InfinityShutdownTrace::Scope jobEvidence("jobs.worker_execute", jobId, jobType.c_str());
 #endif
     bool success = false;
+    JobCheckpoint::WorkBinding operation(CJobManager::CheckpointRecord(job));
     try
     {
       success = job->DoWork();
@@ -690,6 +691,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
   {
     // tell any listeners we're done with the job, then delete it
     CWorkItem item(*i);
+    JobCheckpoint::WorkBinding operation(item.m_job->m_checkpointRecord);
     TrackCheckpointPhase(job, "callback", item.m_id);
     lock.unlock();
     bool callbackSucceeded=!item.m_job->RequiresCheckpointCallback() || item.m_callback != nullptr;
@@ -703,7 +705,8 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
       callbackSucceeded=false;
       CLog::Log(LOGERROR, "{} error processing job {}", __FUNCTION__, item.m_job->GetType());
 #if defined(TARGET_ANDROID)
-      if (IsRequiredCheckpointJob(item.m_job) && InfinityAndroidCheckpoint::IsActive())
+      if (IsRequiredCheckpointJob(item.m_job) &&
+          !item.m_job->RequiresCheckpointCompletionReceipt() && InfinityAndroidCheckpoint::IsActive())
         InfinityAndroidCheckpoint::RecordFailure("background_jobs", "required_job_callback_exception");
 #endif
     }

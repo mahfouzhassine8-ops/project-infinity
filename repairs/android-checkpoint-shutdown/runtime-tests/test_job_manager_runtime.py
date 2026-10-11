@@ -79,7 +79,9 @@ int main(int argc,char**argv){assert(argc==2);std::string mode=argv[1];manager=n
   assert(s.required==1&&s.unknown==0);assert(s.blockers[0].phase=="completed_write_failed");
  }
  else assert(s.required==0);
- assert(InfinityAndroidCheckpoint::failures==((mode=="failure" || mode=="callback-failure")?1:0));
+ // Reviewed callback failure is the retained required receipt above. It must
+ // not additionally publish an irreversible duplicate coordinator failure.
+ assert(InfinityAndroidCheckpoint::failures==(mode=="failure"?1:0));
  if(mode=="callback")assert(callback.called==1);
 }
 '''

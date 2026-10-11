@@ -4,10 +4,13 @@ package @APP_PACKAGE@;
 import android.content.Context;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,41 +23,80 @@ final class InfinityInstalledCodeEvidence {
     report.put("read_only", true); report.put("proves_shutdown_or_health", false);
     File storage = context.getExternalFilesDir(null);
     if (storage == null) storage = context.getFilesDir();
-    File addons = new File(storage, ".kodi/addons");
+    // Android may expose a platform path alias. Resolve that trusted root once;
+    // add-on children and code files must still be contained and unlinked.
+    File addons = new File(storage.getCanonicalFile(), ".kodi/addons");
+    if (!addons.isDirectory()) {
+      File internal = new File(context.getFilesDir().getCanonicalFile(), ".kodi/addons");
+      if (internal.isDirectory()) addons = internal;
+    }
     JSONArray identities = new JSONArray(); report.put("addons", identities);
     for (String id : new String[]{"skin.infinity.diggz", "script.kodihealthcenter",
         "script.infinity.commandcenter", "service.infinity.compat",
         "plugin.video.seren", "plugin.video.umbrella", "plugin.video.pov"}) {
       JSONObject row = new JSONObject(); row.put("requested_id", id); identities.put(row);
+      String reason = "PATH_UNVERIFIED";
       try {
         File addon = new File(addons, id).getAbsoluteFile();
         if (!addon.equals(addon.getCanonicalFile())) throw new java.io.IOException("noncanonical");
         File marker = checked(addon, "addon.xml");
-        if (!marker.isFile()) { row.put("state", "UNAVAILABLE"); continue; }
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        factory.setXIncludeAware(false); factory.setExpandEntityReferences(false);
-        org.w3c.dom.Element element;
+        if (!marker.isFile()) { row.put("state", "UNAVAILABLE"); row.put("reason", "CODE_MARKER_ABSENT"); continue; }
+        reason = "XML_UNVERIFIED";
         if (marker.length() > 128 * 1024) throw new java.io.IOException("oversize");
+        byte[] xml;
         try (FileInputStream input = new FileInputStream(marker)) {
-          element = factory.newDocumentBuilder().parse(input).getDocumentElement();
+          ByteArrayOutputStream output = new ByteArrayOutputStream(); byte[] buffer = new byte[8192];
+          for (int count; (count = input.read(buffer)) != -1;) {
+            if (output.size() + count > 128 * 1024) throw new java.io.IOException("growing marker");
+            output.write(buffer, 0, count);
+          }
+          xml = output.toByteArray();
         }
+        // This independent guard keeps DTD/entity protection on Android XML
+        // implementations that reject the Apache-specific feature URI.
+        String source = StandardCharsets.UTF_8.newDecoder()
+            .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+            .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+            .decode(java.nio.ByteBuffer.wrap(xml)).toString();
+        if (source.indexOf('\0') >= 0 || java.util.regex.Pattern.compile("<!\\s*(DOCTYPE|ENTITY)\\b", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(source).find())
+          throw new java.io.IOException("unsupported declarations");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        feature(factory, "http://apache.org/xml/features/disallow-doctype-decl", true);
+        feature(factory, "http://xml.org/sax/features/external-general-entities", false);
+        feature(factory, "http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setNamespaceAware(false); factory.setValidating(false);
+        try { factory.setXIncludeAware(false); } catch (UnsupportedOperationException unavailable) { /* No namespace/XInclude processing. */ }
+        factory.setExpandEntityReferences(false);
+        org.w3c.dom.Element element;
+        try (ByteArrayInputStream input = new ByteArrayInputStream(xml)) {
+          javax.xml.parsers.DocumentBuilder parser = factory.newDocumentBuilder();
+          parser.setEntityResolver((publicId, systemId) -> { throw new org.xml.sax.SAXException("External entity prohibited"); });
+          parser.setErrorHandler(new org.xml.sax.helpers.DefaultHandler() {
+            @Override public void error(org.xml.sax.SAXParseException error) throws org.xml.sax.SAXException { throw error; }
+            @Override public void fatalError(org.xml.sax.SAXParseException error) throws org.xml.sax.SAXException { throw error; }
+          });
+          element = parser.parse(input).getDocumentElement();
+        }
+        reason = "ADDON_IDENTITY_MISMATCH";
         if (!"addon".equals(element.getTagName()) || !id.equals(element.getAttribute("id")))
           throw new java.io.IOException("identity");
         String version = element.getAttribute("version");
         if (!version.matches("[A-Za-z0-9_.+-]{1,80}")) throw new java.io.IOException("version");
         row.put("id", id); row.put("version", version); row.put("state", "OBSERVED_CODE");
+        reason = "CODE_READ_UNVERIFIED";
         JSONObject files = new JSONObject(); row.put("code_sha256", files);
         for (String file : new String[]{"addon.xml", "default.py", "service.py", "plugin.py",
             "resume_hub.py", "khc_lifecycle.py", "khc_safe_recovery.py", "runtime_service.py"}) {
           File source = checked(addon, file);
           if (source.isFile()) files.put(file, digest(source));
         }
-      } catch (Exception unavailable) { row.put("state", "UNVERIFIED"); }
+      } catch (Exception unavailable) { row.put("state", "UNVERIFIED"); row.put("reason", reason); }
     }
     return report;
+  }
+  private static void feature(DocumentBuilderFactory factory, String name, boolean value) {
+    try { factory.setFeature(name, value); }
+    catch (ParserConfigurationException unsupported) { /* The bounded DTD/entity guard remains mandatory. */ }
   }
   private static File checked(File parent, String name) throws Exception {
     File file = new File(parent, name).getAbsoluteFile();

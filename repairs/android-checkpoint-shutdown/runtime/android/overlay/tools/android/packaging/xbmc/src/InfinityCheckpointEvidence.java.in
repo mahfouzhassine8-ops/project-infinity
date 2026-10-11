@@ -1,0 +1,44 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.util.AtomicFile;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import org.json.JSONObject;
+
+/** Disposable read-only mirror of the exact coordinator evidence. No authority. */
+final class InfinityCheckpointEvidence {
+  private static File privateRoot, publicRoot;
+  private InfinityCheckpointEvidence() {}
+  static synchronized void register(Context context) {
+    try {
+      privateRoot = context.getFilesDir().getCanonicalFile();
+      File storage = context.getExternalFilesDir(null);
+      publicRoot = (storage == null ? privateRoot : storage.getCanonicalFile());
+      File receipt = new File(privateRoot, InfinityCheckpointProtocol.RECEIPT);
+      if (receipt.isFile()) mirror(receipt, InfinityCheckpointProtocol.read(privateRoot));
+    } catch (Exception unavailable) { android.util.Log.w("InfinityEvidence", "Receipt mirror unavailable"); }
+  }
+  static synchronized void mirror(File source, JSONObject row) {
+    try {
+      if (privateRoot == null || publicRoot == null ||
+          !source.getCanonicalFile().equals(new File(privateRoot, InfinityCheckpointProtocol.RECEIPT))) return;
+      byte[] bytes = row.toString().getBytes(StandardCharsets.UTF_8);
+      if (bytes.length > 262144) return;
+      File destination = new File(publicRoot, InfinityCheckpointProtocol.RECEIPT);
+      if (!destination.getAbsoluteFile().equals(destination.getCanonicalFile()) || destination.equals(source)) return;
+      AtomicFile output = new AtomicFile(destination);
+      FileOutputStream stream = null;
+      try {
+        stream = output.startWrite(); stream.write(bytes); stream.getFD().sync();
+        output.finishWrite(stream); stream = null;
+        java.io.FileDescriptor directory = android.system.Os.open(publicRoot.getAbsolutePath(), android.system.OsConstants.O_RDONLY, 0);
+        try { android.system.Os.fsync(directory); } finally { android.system.Os.close(directory); }
+        if (!Arrays.equals(bytes, output.readFully())) throw new java.io.IOException("mirror readback");
+      } catch (Exception failed) { if (stream != null) output.failWrite(stream); throw failed; }
+    } catch (Exception unavailable) { android.util.Log.w("InfinityEvidence", "Receipt mirror unavailable"); }
+  }
+}

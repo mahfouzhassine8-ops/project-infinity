@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
+#include <set>
 #include <unordered_map>
 
 #if defined(TARGET_ANDROID) && !defined(INFINITY_DATABASE_BARRIER_TEST)
@@ -177,6 +178,7 @@ inline void SetUnsupported(const void* owner, bool unsupported)
   if (unsupported)
     state.unsupportedBackendEncountered = true;
 }
+inline void ObserveRetirement(const void* owner, bool settled);
 inline void ForgetOwner(const void* owner)
 {
   auto& state = Detail::State();
@@ -184,6 +186,8 @@ inline void ForgetOwner(const void* owner)
   auto found = state.owners.find(owner);
   if (found == state.owners.end())
     return;
+  ObserveRetirement(owner, found->second.operations == 0 && !found->second.transaction &&
+                    !found->second.queued && !found->second.unsupported);
   if (found->second.operations != 0 || found->second.transaction || found->second.queued)
   {
     ++state.abandonedOwners;
@@ -212,6 +216,55 @@ private:
   uint64_t m_previous;
   bool m_valid{false};
 };
+
+// Installer evidence observes the existing SQLite gate. It cannot commit,
+// reset a failure serial, recover another transaction or issue authorization.
+class WriteObservation
+{
+public:
+  WriteObservation() : m_previous(s_current), m_failureSerial(ThreadFailureSerial())
+  { s_current = this; }
+  ~WriteObservation() { s_current = m_previous; }
+  static void Note(const void* owner)
+  {
+    for (auto* observation = s_current; observation; observation = observation->m_previous)
+    {
+      if (observation->m_owners.size() >= 4096)
+      { observation->m_overflow = true; continue; }
+      observation->m_owners.insert(owner);
+    }
+  }
+  static void Retired(const void* owner, bool settled)
+  {
+    if (settled) return;
+    for (auto* observation = s_current; observation; observation = observation->m_previous)
+      if (observation->m_owners.count(owner)) observation->m_overflow = true;
+  }
+  bool Wrote() const { return !m_owners.empty(); }
+  bool Durable() const
+  {
+    if (m_overflow || m_failureSerial != ThreadFailureSerial()) return false;
+    auto& state = Detail::State();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    for (const auto* owner : m_owners)
+    {
+      const auto found = state.owners.find(owner);
+      if (found != state.owners.end() &&
+          (found->second.operations || found->second.transaction ||
+           found->second.queued || found->second.unsupported)) return false;
+    }
+    return true;
+  }
+  WriteObservation(const WriteObservation&) = delete;
+  WriteObservation& operator=(const WriteObservation&) = delete;
+private:
+  WriteObservation* m_previous;
+  uint64_t m_failureSerial;
+  std::set<const void*> m_owners;
+  bool m_overflow{false};
+  static inline thread_local WriteObservation* s_current{nullptr};
+};
+inline void ObserveRetirement(const void* owner, bool settled) { WriteObservation::Retired(owner, settled); }
 
 // Scope includes the entire SQLite call, including preparation/callbacks and
 // final transaction-state publication. Merely checking a counter before calling
@@ -243,7 +296,10 @@ public:
     auto& state = Detail::State();
     std::lock_guard<std::mutex> lock(state.mutex);
     if (!state.sealed && (m_admitted || Detail::PermittedLocked(state)))
+    {
+      WriteObservation::Note(m_owner);
       return true;
+    }
     Detail::RejectLocked(state);
     return false;
   }
@@ -256,7 +312,10 @@ public:
     auto& state = Detail::State();
     std::lock_guard<std::mutex> lock(state.mutex);
     if (state.session == 0 && !state.sealed)
+    {
+      WriteObservation::Note(owner);
       return true;
+    }
     Detail::RejectLocked(state);
     return false;
   }

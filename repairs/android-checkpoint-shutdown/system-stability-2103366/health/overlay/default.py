@@ -2435,22 +2435,27 @@ def _publish_dashboard_state():
     try:
         scan=_scan_collect('dashboard-fresh-read')
         needs=scan.get('status')=='NEEDS ATTENTION'
-        home.setProperty('KHC.Status','Needs attention' if needs else 'Healthy')
-        home.setProperty('KHC.StatusDetail','Current verification needs attention' if needs else 'No current verified failures')
+        checkpoint=scan.get('shutdown_checkpoint',{})
+        unknown=checkpoint.get('state') in ('UNVERIFIED','UNAVAILABLE')
+        home.setProperty('KHC.Status','Needs attention' if needs else 'Unverified' if unknown else 'Healthy')
+        home.setProperty('KHC.StatusDetail','Current verification needs attention' if needs else
+                         'Shutdown evidence unavailable; coverage unverified' if unknown else
+                         'No current verified failures • prior close '+str(checkpoint.get('state','UNVERIFIED')))
+        home.setProperty('KHC.LastScan',time.strftime('%b %d, %I:%M %p',time.localtime()))
     except Exception:
         home.setProperty('KHC.Status','Unverified')
         home.setProperty('KHC.StatusDetail','Current health scan unavailable')
     try:
         when=time.localtime(os.path.getmtime(SCAN_STATE_FILE))
-        home.setProperty('KHC.LastScan',time.strftime('%b %d, %I:%M %p',when))
+        home.setProperty('KHC.StoredScan',time.strftime('%b %d, %I:%M %p',when))
     except Exception:
-        home.setProperty('KHC.LastScan','Not scanned yet')
+        home.setProperty('KHC.StoredScan','Not scanned yet')
     try:
         path=os.path.join(PROFILE,'diagnostics-v3','baseline.json')
         with open(path,'r',encoding='utf-8') as f: baseline=json.load(f)
         epoch=float(baseline.get('epoch') or 0)
         if epoch:
-            home.setProperty('KHC.Baseline','Fresh baseline • '+time.strftime('%b %d, %I:%M %p',time.localtime(epoch)))
+            home.setProperty('KHC.Baseline','Baseline captured • '+time.strftime('%b %d, %I:%M %p',time.localtime(epoch)))
         else:
             home.setProperty('KHC.Baseline','Crash baseline not set')
     except Exception:

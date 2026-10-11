@@ -288,6 +288,8 @@ public:
   static void TrackCheckpointJob(CJob* job, IJobCallback* callback, const char* phase,
                                  const std::string& queueOwner = "");
   static void TrackCheckpointPhase(CJob* job, const char* phase, uint64_t id = 0);
+  static std::shared_ptr<CJobCheckpointRecord> CheckpointRecord(const CJob* job)
+  { return job ? job->m_checkpointRecord : nullptr; }
 
   /*!
    \brief Add a function f to this job manager for asynchronously execution.

@@ -9,6 +9,7 @@ import org.json.JSONObject;
 /** Checked installed-version routing before NativeActivity starts Python. */
 final class InfinityInstalledCheckpointInstaller {
   static boolean applyBeforeNative(Context context) {
+    InfinityCheckpointEvidence.register(context);
     boolean controller=false,compat=false;
     String controllerVersion="unknown",compatVersion="unknown";
     try {

@@ -106,6 +106,7 @@ public final class InfinityCloseGuardService extends Service {
     @Override public void onNullBinding(ComponentName name){fail("engine_endpoint_refused");}
   };
   @Override public int onStartCommand(Intent intent,int flags,int startId){
+    InfinityCheckpointEvidence.register(this);
     Session next=Session.from(intent,SystemClock.elapsedRealtime());
     if(ended){stopSelf(startId);return START_NOT_STICKY;}
     if(session!=null){if(!session.same(next))evidence("ignored_stale_start",phase,"");return START_NOT_STICKY;}

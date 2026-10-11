@@ -210,14 +210,13 @@ class ResidentCheckpoint:
             if completed or percent >= 95.0:
                 # A periodic >=95% save or an earlier ended event may already
                 # have marked this playback. Never increment it twice at exit.
-                if not hub.is_watched(data, key):
-                    final = dict(entry, position=round(position, 3), duration=round(duration, 3))
-                    data, watched = hub.mark_watched_data(data, key, final, completed=True)
+                final = dict(entry, position=round(position, 3), duration=round(duration, 3))
+                data, watched = hub.mark_watched_data(data, key, final, completed=True)
+                if watched:
                     hub.queue_kodi_sync(data, watched, True)
                     hub.save(self.profile, data, self.api["publish"])
-                else:
-                    watched = data["watched"][key]
-            elif position >= 30.0 and duration >= 120.0 and percent >= 1.0:
+            elif (position >= 30.0 and duration >= 120.0 and percent >= 1.0 and
+                  not hub.occurrence_completed(data, key, entry.get('playback_occurrence'))):
                 final = dict(entry, position=round(position, 3), duration=round(duration, 3),
                              percentage=round(percent, 2))
                 previous = data.setdefault("items", {}).get(key, {})

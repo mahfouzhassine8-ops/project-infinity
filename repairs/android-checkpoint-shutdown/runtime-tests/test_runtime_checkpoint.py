@@ -73,7 +73,9 @@ def rpc(raw):
         return json.dumps({'error': {'message': 'injected database failure'}})
     if payload['method'] in ('VideoLibrary.GetMovieDetails', 'VideoLibrary.GetEpisodeDetails'):
         field = 'moviedetails' if payload['method'].endswith('MovieDetails') else 'episodedetails'
-        return json.dumps({'result': {field: {'playcount': RPC_PLAYCOUNT}}})
+        id_field = 'movieid' if field == 'moviedetails' else 'episodeid'
+        return json.dumps({'result': {field: {id_field: payload['params'][id_field],
+            'uniqueid': {'tmdb': '123'}, 'playcount': RPC_PLAYCOUNT, 'season': 1, 'episode': 2}}})
     if payload['method'].startswith('VideoLibrary.Set'):
         RPC_PLAYCOUNT = payload['params']['playcount']
     return json.dumps({'result': 'OK'})
@@ -130,7 +132,10 @@ class RuntimeTests(unittest.TestCase):
         self.player = service.InfinityPlayer(self.profile)
         self.player.key, self.player.readable = 'audio-key', 'movie'
         self.player.cw_key = KEY
-        self.player.cw_item = {'key': KEY, 'media': 'movie', 'dbid': 42, 'title': 'Movie', 'label': 'Movie'}
+        self.player.cw_item = {'key': KEY, 'media': 'movie', 'dbid': 42, 'title': 'Movie', 'label': 'Movie',
+            'tmdb': '123', 'identity': hub.media_identity('movie', {'tmdb': '123'}),
+            'playback_occurrence': '1' * 32}
+        self.player.cw_occurrence = '1' * 32
         self.experience = experience.ExperienceController(self.profile, self.player, {
             'xbmc': xbmc, 'gui': gui, 'read': common.read_json, 'atomic': common.atomic_json,
             'bool': common.setting_bool, 'str': common.setting_str, 'set': service._set,

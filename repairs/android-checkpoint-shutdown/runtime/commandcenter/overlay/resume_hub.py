@@ -20,6 +20,7 @@ import xbmc
 
 from common import atomic_json, read_json, persistence_scope
 import uuid
+import hashlib
 
 CONTINUE_FILE = 'continue-watching.json'
 SCHEMA = 2
@@ -30,6 +31,106 @@ BUCKET_LIMITS = {
     'watchlist': 500,
     'collection': 1000,
 }
+
+def verified_ids(values):
+    """Retain explicit namespaces; numeric IDs from different systems never alias."""
+    result = {}
+    for namespace, value in _dict(values).items():
+        value = str(value or '').strip()
+        if namespace in ('tmdb', 'tvdb') and re.fullmatch(r'[1-9][0-9]{0,19}', value):
+            result[namespace] = value
+        elif namespace == 'imdb' and re.fullmatch(r'tt[0-9]{5,12}', value):
+            result[namespace] = value
+    return result
+
+
+def media_identity(media, ids, season=-1, episode=-1, show_ids=None):
+    """Producer supplies a typed movie/episode, never just a title or folder."""
+    ids = verified_ids(ids)
+    if media == 'movie' and ids:
+        return {'schema': 1, 'kind': 'movie', 'scope': 'movie', 'ids': ids}
+    season, episode = episode_number(season), episode_number(episode)
+    if media != 'tv' or season < 0 or episode < 0:
+        return None
+    series = verified_ids(show_ids)
+    if series:
+        return {'schema': 1, 'kind': 'episode', 'scope': 'show_episode', 'ids': series,
+                'season': season, 'episode': episode}
+    if ids:
+        return {'schema': 1, 'kind': 'episode', 'scope': 'episode', 'ids': ids,
+                'season': season, 'episode': episode}
+    return None
+
+
+def entry_identity(entry):
+    """Validate additive identity; legacy records remain readable without guessing."""
+    value = _dict(_dict(entry).get('identity'))
+    if type(value.get('schema')) is not int or value.get('schema') != 1:
+        return None
+    media = _dict(entry).get('media')
+    if media == 'movie' and value.get('kind') == 'movie' and value.get('scope') == 'movie':
+        return media_identity('movie', value.get('ids'))
+    if media == 'tv' and value.get('kind') == 'episode' and value.get('scope') in ('episode', 'show_episode'):
+        season, episode = episode_number(value.get('season')), episode_number(value.get('episode'))
+        if (season, episode) != (episode_number(entry.get('season')), episode_number(entry.get('episode'))):
+            return None
+        return media_identity('tv', value.get('ids') if value['scope'] == 'episode' else {},
+                              season, episode, value.get('ids') if value['scope'] == 'show_episode' else {})
+    return None
+
+
+def identity_key(identity):
+    if not isinstance(identity, dict):
+        return ''
+    ids = verified_ids(identity.get('ids'))
+    for namespace in ('tmdb', 'imdb', 'tvdb'):
+        if namespace in ids:
+            raw = identity['scope'] + '|' + namespace + ':' + ids[namespace]
+            if identity['kind'] == 'episode':
+                raw += '|%s|%s' % (identity['season'], identity['episode'])
+            return hashlib.sha256(raw.encode('ascii')).hexdigest()
+    return ''
+
+
+def same_identity(left, right):
+    if not left or not right or left.get('kind') != right.get('kind') or left.get('scope') != right.get('scope'):
+        return False
+    if left['kind'] == 'episode' and (left['season'], left['episode']) != (right['season'], right['episode']):
+        return False
+    common = set(left['ids']) & set(right['ids'])
+    return bool(common) and all(left['ids'][namespace] == right['ids'][namespace] for namespace in common)
+
+
+def compatible_key(data, entry):
+    """Reuse one proven row; legacy identity is bound only on exact route replay."""
+    identity = entry_identity(entry)
+    if not identity:
+        return ''
+    canonical, legacy = set(), set()
+    observed_ids = verified_ids({name: entry.get(name) for name in ('tmdb', 'tvdb', 'imdb')})
+    source = str(entry.get('source') or '')
+    for bucket in ('items', 'watched', 'watchlist', 'collection'):
+        for key, old in _dict(_dict(data).get(bucket)).items():
+            if not KEY_RE.fullmatch(str(key)) or not isinstance(old, dict):
+                continue
+            old_identity = entry_identity(old)
+            if old_identity and same_identity(identity, old_identity):
+                canonical.add(key)
+            elif (not old_identity and source.startswith('plugin://') and old.get('source') == source
+                  and old.get('media') == entry.get('media')):
+                ids = verified_ids({name: old.get(name) for name in ('tmdb', 'tvdb', 'imdb')})
+                common = set(ids) & set(observed_ids)
+                if (common and all(ids[name] == observed_ids[name] for name in common) and
+                        (entry['media'] == 'movie' or
+                         (episode_number(old.get('season')), episode_number(old.get('episode'))) ==
+                         (identity['season'], identity['episode']))):
+                    legacy.add(key)
+    matches = canonical or legacy
+    return next(iter(matches)) if len(matches) == 1 else identity_key(identity)
+
+
+def occurrence_completed(data, key, occurrence):
+    return bool(occurrence and _dict(_dict(_dict(data).get('watched')).get(key)).get('completed_occurrence') == occurrence)
 
 
 def episode_number(value):
@@ -270,6 +371,10 @@ def mark_watched_data(data, key, entry=None, completed=False):
     if not entry:
         return data, None
     prior = _dict(data['watched'].get(key))
+    occurrence = str(entry.get('playback_occurrence') or '')
+    occurrence = occurrence if re.fullmatch(r'[a-f0-9]{32}', occurrence) else ''
+    if prior and (not completed or not occurrence or prior.get('completed_occurrence') == occurrence):
+        return data, None
     play_count = int(prior.get('play_count') or 0)
     if completed or not prior:
         play_count += 1
@@ -282,6 +387,8 @@ def mark_watched_data(data, key, entry=None, completed=False):
         'percentage': 100.0,
         'position': duration if duration > 0 else float(entry.get('position') or 0.0),
     })
+    if completed and occurrence:
+        entry['completed_occurrence'] = occurrence
     data['items'].pop(key, None)
     data['watched'][key] = entry
     return data, entry
@@ -396,9 +503,8 @@ def _show_key(value, key):
             verified = str(value.get('show_' + namespace) or '')
             if verified.isdigit() and int(verified) > 0:
                 return 'series:' + namespace + ':' + verified
-    # Keep legacy grouping unchanged; legacy item IDs do not authorize a new route.
-    return str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
-               value.get('showtitle') or value.get('title') or key).casefold()
+    # Ambiguous legacy rows keep their own identities and are not title-merged.
+    return 'legacy-record:' + str(key)
 
 
 def progress_shows(data):
@@ -447,13 +553,21 @@ def next_episodes(data):
             continue
         season = episode_number(value.get('season'))
         episode = episode_number(value.get('episode'))
-        if season < 0 or episode < 0 or not (value.get('tmdb') or value.get('tvdb') or
-                (value.get('show_ids_verified') is True and (value.get('show_tmdb') or value.get('show_tvdb')))):
+        if season < 0 or episode < 0 or value.get('show_ids_verified') is not True:
             continue
         marker = (season, episode, int(value.get('watched_at') or value.get('updated') or 0))
         if show_key not in watched_latest or marker > watched_latest[show_key][0]:
             watched_latest[show_key] = (marker, _entry_copy(value, key))
     for marker, last in watched_latest.values():
+        successor = _dict(last.get('verified_next'))
+        # The catalogue's successor must match the completed episode and series.
+        # Adding one to an episode number does not prove an episode exists.
+        if (successor.get('verified') is not True or
+                successor.get('after') != [marker[0], marker[1]] or
+                str(successor.get('show_tmdb') or '') != str(last.get('show_tmdb') or '') or
+                episode_number(successor.get('season')) < 0 or
+                episode_number(successor.get('episode')) < 0):
+            continue
         # A show preference is not an episode route. Copy only series identity;
         # old DB IDs, stream URLs, episode titles/durations/art and watched data
         # must never be attributed to this locally inferred successor.
@@ -464,16 +578,18 @@ def next_episodes(data):
             'tvdb': last.get('show_tvdb', '') if last.get('show_ids_verified') is True else '',
             'show_tmdb': last.get('show_tmdb', '') if last.get('show_ids_verified') is True else '',
             'show_ids_verified': last.get('show_ids_verified') is True,
-            'season': marker[0], 'episode': marker[1] + 1,
+            'season': episode_number(successor['season']), 'episode': episode_number(successor['episode']),
             'position': 0.0, 'percentage': 0.0, 'watched': False,
             'synthetic_next': True,
+            'next_verified': True,
             'updated': int(last.get('watched_at') or last.get('updated') or 0),
-            'label': f"{show} • S{marker[0]:02d}E{marker[1] + 1:02d}",
         }
-        # Key is intentionally deterministic but distinct from the completed episode.
-        import hashlib
-        raw = 'tv|' + str(candidate.get('tmdb') or candidate.get('tvdb') or show.casefold()) + f'|{marker[0]}|{marker[1] + 1}'
-        candidate['key'] = hashlib.sha256(raw.encode('utf-8', errors='replace')).hexdigest()
+        candidate['label'] = f"{show} • S{candidate['season']:02d}E{candidate['episode']:02d}"
+        candidate['identity'] = media_identity('tv', {}, candidate['season'], candidate['episode'],
+                                              {'tmdb': candidate['show_tmdb']})
+        candidate['key'] = identity_key(candidate['identity'])
+        if not candidate['key']:
+            continue
         result.append(candidate)
     result.sort(key=lambda e: int(e.get('updated') or 0), reverse=True)
     return result
@@ -483,53 +599,71 @@ def sync_kodi_playcount(entry, watched, preserve_playcount=False):
     """Checked bridge for Kodi-library items; provider-only items remain local."""
     if not isinstance(entry, dict):
         return False
-    try:
-        dbid = int(entry.get('dbid'))
-    except (TypeError, ValueError):
-        return False
-    if dbid < 0:
+    identity = entry_identity(entry)
+    dbid = entry.get('dbid')
+    if not identity or type(dbid) is not int or dbid <= 0:
         return False
     method = 'VideoLibrary.SetEpisodeDetails' if entry.get('media') == 'tv' else 'VideoLibrary.SetMovieDetails'
     field = 'episodeid' if entry.get('media') == 'tv' else 'movieid'
     read_method = 'VideoLibrary.GetEpisodeDetails' if entry.get('media') == 'tv' else 'VideoLibrary.GetMovieDetails'
     detail_field = 'episodedetails' if entry.get('media') == 'tv' else 'moviedetails'
     query = {'jsonrpc': '2.0', 'id': 1, 'method': read_method,
-             'params': {field: dbid, 'properties': ['playcount']}}
-    if watched and preserve_playcount:
-        # Native frozen-player persistence owns the actual watched increment.
-        # Existing nonzero native counts are already the required watched state;
-        # never overwrite a higher count with the inherited absolute SET(1).
-        try:
-            details = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
-            playcount = details.get('result', {}).get(detail_field, {}).get('playcount')
-            if type(playcount) is not int or playcount < 0:
-                return False
-            if playcount > 0:
-                return True
-        except Exception:
+             'params': {field: dbid, 'properties': (['playcount', 'uniqueid', 'season', 'episode', 'tvshowid']
+                                                   if entry['media'] == 'tv' else ['playcount', 'uniqueid'])}}
+    def checked_details():
+        response = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
+        details = _dict(_dict(response.get('result')).get(detail_field))
+        if 'error' in response or type(details.get(field)) is not int or details[field] != dbid:
+            return None
+        if entry['media'] == 'tv':
+            if (episode_number(details.get('season')), episode_number(details.get('episode'))) != (identity['season'], identity['episode']):
+                return None
+            ids = details.get('uniqueid')
+            if identity['scope'] == 'show_episode':
+                show_id = details.get('tvshowid')
+                if type(show_id) is not int or show_id <= 0:
+                    return None
+                show = json.loads(xbmc.executeJSONRPC(json.dumps({
+                    'jsonrpc': '2.0', 'id': 1, 'method': 'VideoLibrary.GetTVShowDetails',
+                    'params': {'tvshowid': show_id, 'properties': ['uniqueid']}})))
+                series = _dict(_dict(show.get('result')).get('tvshowdetails'))
+                if 'error' in show or type(series.get('tvshowid')) is not int or series['tvshowid'] != show_id:
+                    return None
+                ids = series.get('uniqueid')
+            actual = media_identity('tv', ids if identity['scope'] == 'episode' else {},
+                                    details['season'], details['episode'],
+                                    ids if identity['scope'] == 'show_episode' else {})
+        else:
+            actual = media_identity('movie', details.get('uniqueid'))
+        return details if same_identity(identity, actual) else None
+    try:
+        details = checked_details()
+        playcount = details.get('playcount') if details else None
+        if type(playcount) is not int or playcount < 0:
             return False
+        # Preserve native replay counts during ordinary synchronization too.
+        if (watched and playcount > 0) or (not watched and playcount == 0):
+            return True
+    except Exception:
+        return False
     payload = {'jsonrpc': '2.0', 'id': 1, 'method': method,
                'params': {field: dbid, 'playcount': 1 if watched else 0}}
     try:
         response = json.loads(xbmc.executeJSONRPC(json.dumps(payload)))
         if not isinstance(response, dict) or 'error' in response or response.get('result') != 'OK':
             return False
-        details = json.loads(xbmc.executeJSONRPC(json.dumps(query)))
-        playcount = details.get('result', {}).get(detail_field, {}).get('playcount')
+        details = checked_details()
+        playcount = details.get('playcount') if details else None
         expected = 1 if watched else 0
-        return type(playcount) is int and (playcount > 0 if watched and preserve_playcount
-                                          else playcount == expected)
+        return type(playcount) is int and (playcount > 0 if watched else playcount == expected)
     except Exception:
         return False
 
 
 def queue_kodi_sync(data, entry, watched):
     """Persist required library mirroring before crossing into Kodi JSON-RPC."""
-    try:
-        dbid = int(entry.get('dbid'))
-    except (TypeError, ValueError):
-        return data
-    if dbid < 0:
+    dbid = entry.get('dbid')
+    if type(dbid) is not int or dbid <= 0:
         return data
     key = ('episode:' if entry.get('media') == 'tv' else 'movie:') + str(dbid)
     data.setdefault('pending_kodi_sync', {})[key] = {

@@ -75,20 +75,55 @@ class CAddonOperationReceipt
 {
 public:
   CAddonOperationReceipt(const char* operation, const std::string& resource, bool& complete)
-    : m_complete(complete), m_serial(InfinityDatabaseBarrier::ThreadFailureSerial()),
-      m_record(JobCheckpoint::Admit(true, false, "native_databases", operation,
-                                   "CAddonOperationReceipt", "installer_work", true, resource))
-  { m_complete = false; }
+    : m_complete(complete),
+      m_outer(JobCheckpoint::currentOperation && !JobCheckpoint::currentOperation->unknown &&
+          JobCheckpoint::currentOperation->owner == "native_databases" &&
+          JobCheckpoint::currentOperation->operation == operation &&
+          JobCheckpoint::currentOperation->resource == resource),
+      m_record(m_outer ? JobCheckpoint::currentOperation :
+          JobCheckpoint::Admit(true, false, "native_databases", operation,
+                              "CAddonOperationReceipt", "installer_work", true, resource)),
+      m_binding(m_record)
+  {
+    m_complete = false;
+    JobCheckpoint::RecoverRestored(operation, resource, m_record->token);
+  }
   ~CAddonOperationReceipt()
   {
-    m_complete = m_complete && InfinityDatabaseBarrier::ThreadFailureSerial() == m_serial;
-    JobCheckpoint::Complete(m_record, m_complete, m_record->operation == "addon_install");
+    const bool installed = m_complete;
+    m_complete = m_files.Proven() && m_database.Durable();
+    const auto outcome = !m_complete ? CJobDurability::Unresolved :
+        installed || m_database.Wrote() ? CJobDurability::VerifiedCommitted :
+        m_files.WasRestored() ? CJobDurability::VerifiedRestored :
+        m_files.Touched() ? CJobDurability::VerifiedCommitted : CJobDurability::VerifiedUnchanged;
+    JobCheckpoint::WorkResult(m_record, outcome, installed);
+    if (!m_complete && m_database.Durable())
+    {
+      size_t bytes = 0;
+      auto proof = m_files.RestorationProof(bytes);
+      JobCheckpoint::RecoveryProof(m_record, std::move(proof), bytes);
+    }
+    if (!m_outer) JobCheckpoint::Complete(m_record, m_complete);
   }
+  void Unknown() { m_files.Unknown(); }
 private:
   bool& m_complete;
-  uint64_t m_serial;
+  bool m_outer;
   std::shared_ptr<CJobCheckpointRecord> m_record;
+  JobCheckpoint::WorkBinding m_binding;
+  InfinityAddonFileReceipt::WriteScope m_files;
+  InfinityDatabaseBarrier::WriteObservation m_database;
 };
+bool DeletePackage(const std::string& path)
+{
+  const auto local = CSpecialProtocol::TranslatePath(path);
+  auto* scope = InfinityAddonFileReceipt::WriteScope::Current();
+  if (!scope) return false; // No admitted operation can verify an orphan write.
+  scope->Touch(local);
+  const bool removed = CFile::Delete(path);
+  const bool durable = scope->Deleted(local);
+  return durable && (removed || InfinityAddonFileReceipt::Removed(local));
+}
 #endif
 class CAddonInstallJob : public CFileOperationJob
 {
@@ -107,14 +142,14 @@ public:
   }
   const char* GetCheckpointPersistenceOwner() const override { return "native_databases"; }
   const char* GetCheckpointOperation() const override { return "addon_install"; }
-  bool CheckpointReplacesPriorFailure() const override { return m_completionVerified; }
   std::string GetCheckpointResource() const override { return m_addon->ID(); }
   bool CheckpointCancelledWithoutWork() const override { return !m_workStarted; }
   bool RequiresCheckpointCallback() const override { return true; }
   bool RequiresCheckpointCompletionReceipt() const override { return true; }
   bool CheckpointSucceeded(bool success) const override
   {
-    return success && m_completionVerified && m_worker == std::this_thread::get_id() &&
+    (void)success; // Installer business failure and verified durability are separate.
+    return m_completionVerified && m_worker == std::this_thread::get_id() &&
         m_databaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
   }
 #endif
@@ -630,6 +665,10 @@ void CAddonInstaller::PrunePackageCache()
   int64_t limit = static_cast<int64_t>(CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_addonPackageFolderSize) * 1024 * 1024;
   if (size < limit)
     return;
+#if defined(TARGET_ANDROID)
+  bool completed = false;
+  CAddonOperationReceipt completion("addon_package_cache", "package_cache", completed);
+#endif
 
   // Prune packages
   // 1. Remove the largest packages, leaving at least 2 for each add-on
@@ -651,7 +690,12 @@ void CAddonInstaller::PrunePackageCache()
     size -= items[i]->m_dwSize;
     if (!db.RemovePackage(items[i]->GetPath()))
       throw std::runtime_error("addon package metadata prune failed");
+#if defined(TARGET_ANDROID)
+    if (!DeletePackage(items[i++]->GetPath()))
+      throw std::runtime_error("addon package filesystem prune unverified");
+#else
     CFileUtils::DeleteItem(items[i++]);
+#endif
   }
 
   if (size > limit)
@@ -671,9 +715,17 @@ void CAddonInstaller::PrunePackageCache()
       size -= items[i]->m_dwSize;
       if (!db.RemovePackage(items[i]->GetPath()))
         throw std::runtime_error("addon package metadata prune failed");
+#if defined(TARGET_ANDROID)
+      if (!DeletePackage(items[i++]->GetPath()))
+        throw std::runtime_error("addon package filesystem prune unverified");
+#else
       CFileUtils::DeleteItem(items[i++]);
+#endif
     }
   }
+#if defined(TARGET_ANDROID)
+  completed = true;
+#endif
 }
 
 void CAddonInstaller::InstallAddons(const VECADDONS& addons,
@@ -826,26 +878,47 @@ bool CAddonInstallJob::DoWork()
         std::string hashExisting;
         if (db.GetPackageHash(m_addon->ID(), package, hashExisting) && hash.value != hashExisting)
         {
-          db.RemovePackage(package);
+          if (!db.RemovePackage(package))
+          {
+#if defined(TARGET_ANDROID)
+            completion.Unknown();
+#endif
+            return false;
+          }
         }
         if (CFile::Exists(package))
         {
+#if defined(TARGET_ANDROID)
+          if (!DeletePackage(package)) return false;
+#else
           CFile::Delete(package);
+#endif
         }
       }
 
       // zip passed in - download + extract
       if (!CFile::Exists(package))
       {
+#if defined(TARGET_ANDROID)
+        auto* files = InfinityAddonFileReceipt::WriteScope::Current();
+        files->Touch(CSpecialProtocol::TranslatePath(package));
+#endif
         if (!DownloadPackage(path, packagePath))
         {
+#if defined(TARGET_ANDROID)
+          DeletePackage(package); // A failed/partial cleanup remains unsettled.
+#else
           CFile::Delete(package);
+#endif
 
           CLog::Log(LOGERROR, "CAddonInstallJob[{}]: failed to download {}", m_addon->ID(),
                     package);
           ReportInstallError(m_addon->ID(), URIUtils::GetFileName(package));
           return false;
         }
+#if defined(TARGET_ANDROID)
+        if (!files->Committed(CSpecialProtocol::TranslatePath(package), false)) return false;
+#endif
       }
 
       // at this point we have the package - check that it is valid
@@ -855,7 +928,11 @@ bool CAddonInstallJob::DoWork()
         TypedDigest actualHash{hash.type, CUtil::GetFileDigest(package, hash.type)};
         if (hash != actualHash)
         {
+#if defined(TARGET_ANDROID)
+          DeletePackage(package);
+#else
           CFile::Delete(package);
+#endif
 
           CLog::Log(LOGERROR, "CAddonInstallJob[{}]: Hash mismatch after download. Expected {}, was {}",
               m_addon->ID(), hash.value, actualHash.value);
@@ -886,8 +963,18 @@ bool CAddonInstallJob::DoWork()
           !CServiceBroker::GetAddonMgr().LoadAddonDescription(archivedFiles[0]->GetPath(), temp))
       {
         CLog::Log(LOGERROR, "CAddonInstallJob[{}]: invalid package {}", m_addon->ID(), package);
-        db.RemovePackage(package);
+        if (!db.RemovePackage(package))
+        {
+#if defined(TARGET_ANDROID)
+          completion.Unknown();
+#endif
+          return false;
+        }
+#if defined(TARGET_ANDROID)
+        DeletePackage(package);
+#else
         CFile::Delete(package);
+#endif
         ReportInstallError(m_addon->ID(), URIUtils::GetFileName(package));
         return false;
       }
@@ -1347,12 +1434,22 @@ bool CAddonUnInstallJob::DoWork()
   }
 
   if (!ClearFavourites())
+  {
+#if defined(TARGET_ANDROID)
+    completion.Unknown();
+#endif
     return false;
+  }
   if (m_removeData)
   {
+#if defined(TARGET_ANDROID)
+    auto* files = InfinityAddonFileReceipt::WriteScope::Current();
+    files->Touch(CSpecialProtocol::TranslatePath(m_addon->Profile()));
+#endif
     const bool deleted = CFileUtils::DeleteItem(m_addon->Profile());
 #if defined(TARGET_ANDROID)
     const bool absent = InfinityAddonFileReceipt::Removed(CSpecialProtocol::TranslatePath(m_addon->Profile()));
+    files->Deleted(CSpecialProtocol::TranslatePath(m_addon->Profile()));
     if ((!deleted && !absent) || !absent)
       return false;
 #else
