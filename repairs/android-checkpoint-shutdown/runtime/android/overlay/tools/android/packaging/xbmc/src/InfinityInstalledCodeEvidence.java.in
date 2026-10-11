@@ -1,0 +1,123 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Read-only, bounded code identity and numeric timings; no state/credentials. */
+final class InfinityInstalledCodeEvidence {
+  private InfinityInstalledCodeEvidence() {}
+  static JSONObject collect(Context context) throws Exception {
+    JSONObject report = new JSONObject();
+    report.put("schema", 1); report.put("captured_epoch_ms", System.currentTimeMillis());
+    report.put("read_only", true); report.put("proves_shutdown_or_health", false);
+    File storage = context.getExternalFilesDir(null);
+    if (storage == null) storage = context.getFilesDir();
+    File addons = new File(storage, ".kodi/addons");
+    JSONArray identities = new JSONArray(); report.put("addons", identities);
+    for (String id : new String[]{"skin.infinity.diggz", "script.kodihealthcenter",
+        "script.infinity.commandcenter", "service.infinity.compat",
+        "plugin.video.seren", "plugin.video.umbrella", "plugin.video.pov"}) {
+      JSONObject row = new JSONObject(); row.put("requested_id", id); identities.put(row);
+      try {
+        File addon = new File(addons, id).getAbsoluteFile();
+        if (!addon.equals(addon.getCanonicalFile())) throw new java.io.IOException("noncanonical");
+        File marker = checked(addon, "addon.xml");
+        if (!marker.isFile()) { row.put("state", "UNAVAILABLE"); continue; }
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setXIncludeAware(false); factory.setExpandEntityReferences(false);
+        org.w3c.dom.Element element;
+        if (marker.length() > 128 * 1024) throw new java.io.IOException("oversize");
+        try (FileInputStream input = new FileInputStream(marker)) {
+          element = factory.newDocumentBuilder().parse(input).getDocumentElement();
+        }
+        if (!"addon".equals(element.getTagName()) || !id.equals(element.getAttribute("id")))
+          throw new java.io.IOException("identity");
+        String version = element.getAttribute("version");
+        if (!version.matches("[A-Za-z0-9_.+-]{1,80}")) throw new java.io.IOException("version");
+        row.put("id", id); row.put("version", version); row.put("state", "OBSERVED_CODE");
+        JSONObject files = new JSONObject(); row.put("code_sha256", files);
+        for (String file : new String[]{"addon.xml", "default.py", "service.py", "plugin.py",
+            "resume_hub.py", "khc_lifecycle.py", "khc_safe_recovery.py", "runtime_service.py"}) {
+          File source = checked(addon, file);
+          if (source.isFile()) files.put(file, digest(source));
+        }
+      } catch (Exception unavailable) { row.put("state", "UNVERIFIED"); }
+    }
+    return report;
+  }
+  private static File checked(File parent, String name) throws Exception {
+    File file = new File(parent, name).getAbsoluteFile();
+    if (!file.equals(file.getCanonicalFile())) throw new java.io.IOException("noncanonical file");
+    return file;
+  }
+  private static String digest(File file) throws Exception {
+    if (file.length() > 4 * 1024 * 1024) throw new java.io.IOException("oversize code");
+    MessageDigest sha = MessageDigest.getInstance("SHA-256");
+    try (FileInputStream input = new FileInputStream(file)) {
+      byte[] bytes = new byte[8192]; int total = 0;
+      for (int read; (read = input.read(bytes)) != -1;) {
+        total += read;
+        if (total > 4 * 1024 * 1024) throw new java.io.IOException("growing code");
+        sha.update(bytes, 0, read);
+      }
+    }
+    StringBuilder result = new StringBuilder();
+    for (byte value : sha.digest()) result.append(String.format(java.util.Locale.ROOT, "%02x", value & 255));
+    return result.toString();
+  }
+  static String timings(Context context, boolean previous) {
+    try {
+      File storage = context.getExternalFilesDir(null);
+      if (storage == null) return "";
+      File file = new File(storage, ".kodi/temp/" + (previous ? "kodi.old.log" : "kodi.log")).getAbsoluteFile();
+      if (!file.equals(file.getCanonicalFile())) return "";
+      byte[] bytes;
+      try (RandomAccessFile input = new RandomAccessFile(file, "r")) {
+        long length = input.length();
+        long start = Math.max(0, length - 256 * 1024);
+        input.seek(start); bytes = new byte[(int)(length - start)]; input.readFully(bytes);
+      }
+      StringBuilder result = new StringBuilder();
+      int rows = 0;
+      for (String line : new String(bytes, StandardCharsets.UTF_8).split("\n")) {
+        int marker = line.indexOf("INFINITY_RESUME_TIMING ");
+        if (marker < 0 || line.length() > 2048) continue;
+        try {
+          JSONObject raw = new JSONObject(line.substring(marker + "INFINITY_RESUME_TIMING ".length()).trim());
+          JSONObject row = new JSONObject(); row.put("schema", 1);
+          String stage = raw.getString("stage");
+          if (!stage.matches("service_start|saved_state_published|cache_validation|snapshot_load|plugin_start|saved_state_ready|filter_group|directory_items|plugin_complete|card_visible|native_queued|native_start|native_fetch_return|artwork_metadata_ready|skin_directory_bound")) continue;
+          row.put("stage", stage);
+          for (String key : new String[]{"request", "media", "bucket"}) {
+            if (raw.has(key)) {
+              String value = raw.getString(key);
+              if (("request".equals(key) && value.matches("[np][0-9]{1,30}")) ||
+                  ("media".equals(key) && value.matches("tv|movie|all")) ||
+                  ("bucket".equals(key) && value.matches("continue|history|watched|list"))) row.put(key, value);
+            }
+          }
+          for (String key : new String[]{"monotonic_ms", "elapsed_ms", "items", "revision", "cache_hit", "pid"}) {
+            if (raw.has(key)) {
+              double value = raw.getDouble(key);
+              if (!Double.isNaN(value) && !Double.isInfinite(value) && value >= 0) row.put(key, value);
+            }
+          }
+          result.append(row.toString()).append('\n');
+          if (++rows >= 2048) break;
+        } catch (Exception invalid) { /* Invalid/partial observations prove nothing. */ }
+      }
+      return result.toString();
+    } catch (Exception unavailable) { return ""; }
+  }
+}

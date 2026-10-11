@@ -320,6 +320,10 @@ void CJobManager::BeginShutdown()
 #endif
       if (wi.m_callback)
         wi.m_callback->OnJobAbort(wi.m_id, wi.m_job);
+#if defined(TARGET_ANDROID)
+      if (wi.m_job && wi.m_job->CheckpointCancelledWithoutWork())
+        JobCheckpoint::Complete(wi.m_job->m_checkpointRecord, true);
+#endif
       wi.FreeJob();
     }
     m_jobQueue[priority].clear();
@@ -498,7 +502,7 @@ void CJobManager::TrackCheckpointJob(CJob* job, IJobCallback* callback, const ch
     const bool unknown = required && (!InfinityAndroidCheckpoint::IsRequiredOwner(owner) ||
         (queueOwner.empty() && role == CJob::CheckpointResponsibility::Unknown));
     job->m_checkpointRecord = JobCheckpoint::Admit(required, unknown, owner,
-        operation, actualType, phase, job->RequiresCheckpointCompletionReceipt());
+        operation, actualType, phase, job->RequiresCheckpointCompletionReceipt(), job->GetCheckpointResource());
   }
 #else
   (void)job; (void)callback; (void)phase; (void)queueOwner;
@@ -536,6 +540,10 @@ void CJobManager::CancelJob(unsigned int jobID)
     JobQueue::iterator i = find(m_jobQueue[priority].begin(), m_jobQueue[priority].end(), jobID);
     if (i != m_jobQueue[priority].end())
     {
+#if defined(TARGET_ANDROID)
+      if (i->m_job && i->m_job->CheckpointCancelledWithoutWork())
+        JobCheckpoint::Complete(i->m_job->m_checkpointRecord, true);
+#endif
       delete i->m_job;
       m_jobQueue[priority].erase(i);
       return;
@@ -684,7 +692,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     CWorkItem item(*i);
     TrackCheckpointPhase(job, "callback", item.m_id);
     lock.unlock();
-    bool callbackSucceeded=true;
+    bool callbackSucceeded=!item.m_job->RequiresCheckpointCallback() || item.m_callback != nullptr;
     try
     {
       if (item.m_callback)
@@ -708,7 +716,8 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     TrackCheckpointPhase(item.m_job, "destructor", item.m_id);
     if(item.m_job->RequiresCheckpointCompletionReceipt())
       JobCheckpoint::Complete(item.m_job->m_checkpointRecord,
-          callbackSucceeded && item.m_job->CheckpointSucceeded(success));
+          callbackSucceeded && item.m_job->CheckpointSucceeded(success),
+          item.m_job->CheckpointReplacesPriorFailure());
     item.FreeJob();
     lock.lock();
     --m_checkpointCompletingJobs;

@@ -234,6 +234,7 @@ def main():
         temp = Path(temp)
         for rel in ["platform/android/activity/InfinityAndroidCheckpoint.cpp",
                     "platform/android/activity/InfinityAndroidCheckpoint.h",
+                    "platform/android/activity/InfinityShutdownTrace.h",
                     "platform/android/activity/InfinityCheckpointFile.h",
                     "platform/android/activity/InfinityScriptPersistence.h",
                     "dbwrappers/InfinityDatabaseBarrier.h", "utils/JobCheckpoint.h", "utils/Variant.h", "utils/Variant.cpp"]:

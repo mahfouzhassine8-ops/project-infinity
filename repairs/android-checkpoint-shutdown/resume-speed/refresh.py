@@ -21,7 +21,7 @@ def main():
  spec=importlib.util.spec_from_file_location('speed_installed_build',ROOT/'installed/build.py');build=importlib.util.module_from_spec(spec);spec.loader.exec_module(build)
  for name,data in [('InfinityCheckpointAddonInstaller',participant_asset.build()),('InfinityCheckpointController20Installer',build.build('script.infinity.commandcenter'))]:
   p=ROOT/'runtime/android/overlay/tools/android/packaging/xbmc/src'/(name+'.java.in')
-  text,n=re.subn(r'(?<!PREVIOUS_)ASSET_SHA256 = "[0-9a-f]{64}"','ASSET_SHA256 = "'+hashlib.sha256(data).hexdigest()+'"',p.read_text());assert n==1;p.write_text(text)
+  text,n=re.subn(r'(?<![A-Z_])ASSET_SHA256 = "[0-9a-f]{64}"','ASSET_SHA256 = "'+hashlib.sha256(data).hexdigest()+'"',p.read_text());assert n==1;p.write_text(text)
  for group in ('native','android'):
   p=ROOT/'runtime'/group/'manifest.json';m=json.loads(p.read_text())
   for name in m['changed']:m['after'][name]=sha(p.parent/'overlay'/name)

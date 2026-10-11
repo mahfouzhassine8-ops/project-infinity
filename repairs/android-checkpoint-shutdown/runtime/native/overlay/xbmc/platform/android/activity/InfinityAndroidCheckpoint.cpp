@@ -1,5 +1,6 @@
 #include "InfinityAndroidCheckpoint.h"
 #include "InfinityScriptPersistence.h"
+#include "InfinityShutdownTrace.h"
 
 #include "InfinityCheckpointXml.h"
 #include "InfinityPlaybackCheckpoint.h"
@@ -287,11 +288,22 @@ std::string EncodeStatusLocked(const State& s)
     value["job_id"] = job.jobId;
     value["owner"] = job.owner;
     value["operation"] = job.operation;
+    value["resource"] = job.resource;
     value["actual_type"] = job.type;
     value["phase"] = job.phase;
     value["unknown"] = job.unknown;
     value["elapsed_ms"] = job.elapsedMs;
     result["blocking_jobs"].push_back(value);
+  }
+  result["resolved_job_obligations"] = s.jobs.resolvedCount;
+  result["job_recovery_history"] = CVariant(CVariant::VariantTypeArray);
+  for (const auto& prior : s.jobs.resolvedHistory)
+  {
+    CVariant value(CVariant::VariantTypeObject);
+    value["token"] = prior.token; value["owner"] = prior.owner;
+    value["operation"] = prior.operation; value["resource"] = prior.resource;
+    value["phase"] = prior.phase;
+    result["job_recovery_history"].push_back(value);
   }
   result["required_owners"] = CVariant(CVariant::VariantTypeArray);
   result["owners"] = CVariant(CVariant::VariantTypeArray);
@@ -768,6 +780,8 @@ bool Request(const std::string& session, const std::string& owner, int pid)
     }
     s.active.store(true);
   }
+  InfinityShutdownTrace::Begin();
+  InfinityShutdownTrace::Event("milestone", "checkpoint.request");
   // Close script admission under its own lock, then retain unresolved owners.
   // Script completion is not a durable-state acknowledgment (an exception can
   // mark an invoker done while interpreter-owned file buffers still exist).

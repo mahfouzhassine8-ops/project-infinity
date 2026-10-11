@@ -131,9 +131,11 @@ def main():
     parser.add_argument("--android-jar", type=Path, required=True)
     parser.add_argument("--production-asset", type=Path)
     parser.add_argument("--parent-addon", type=Path)
+    parser.add_argument("--parent-field", choices=("before", "baseline"), default="before")
     parser.add_argument("--controller20", action="store_true")
     parser.add_argument("--previous-addon", type=Path,
                         help="Exercise exact green 2103362 -> current code upgrade and rollback")
+    parser.add_argument("--previous-field", choices=("previous", "baseline"), default="previous")
     parser.add_argument("--legacy-installer", type=Path)
     parser.add_argument("--legacy-asset", type=Path)
     args = parser.parse_args()
@@ -153,7 +155,8 @@ def main():
             delta = json.loads((Path(__file__).parent / "runtime/commandcenter/manifest.json").read_text())
             if args.controller20:
                 delta = json.loads((Path(__file__).parent / 'installed/manifest.json').read_text())['script.infinity.commandcenter']
-            assert {name: sha(data) for name, data in parent.items()} == delta["before"], "Wrong original add-on preimages"
+            expected = delta["before"] if args.parent_field == "before" else json.loads((Path(__file__).parent / "system-stability-2103366/GREEN-2103365.json").read_text())["commandcenter20" if args.controller20 else "commandcenter19"]
+            assert {name: sha(data) for name, data in parent.items()} == expected, "Wrong exact add-on preimages"
             OLD = {name: parent[name] for name in FILES if name in parent}
             MARKER = parent["addon.xml"]
             PRESERVED = {name: data for name, data in parent.items() if name not in FILES and name != "addon.xml"}
@@ -179,7 +182,7 @@ def main():
             assert 'ASSET_SHA256 = "' + sha(asset) + '";' in code, "Unmodified production installer hash mismatch"
         else:
             # The synthetic fixture changes only the trusted digest in the test copy.
-            code, count = re.subn(r'(?<!PREVIOUS_)ASSET_SHA256 = "[^"]+";', 'ASSET_SHA256 = "' + sha(asset) + '";', code)
+            code, count = re.subn(r'(?<![A-Z_])ASSET_SHA256 = "[^"]+";', 'ASSET_SHA256 = "' + sha(asset) + '";', code)
             assert count == 1
         (sources / "com/projectinfinity/kodi/InfinityCheckpointAddonInstaller.java").write_text(code)
         classes = work / "classes"
@@ -228,7 +231,7 @@ def main():
             with zipfile.ZipFile(args.production_asset) as archive:
                 plan = json.loads(archive.read('manifest.json'))
             for entry in plan['files']:
-                assert sha(previous[entry['path']]) == entry['previous']
+                assert sha(previous[entry['path']]) == entry[args.previous_field]
             for mode, expected in [('', 0), ('fail', 10), ('crash', 73)]:
                 root = work / ('previous-' + (mode or 'success'))
                 addon = initialize(root, asset)
@@ -302,7 +305,8 @@ def main():
         root = work / "recovery-unknown"
         addon = initialize(root, asset)
         run(root, mode="crash", expected=73)
-        (addon / "common.py").write_bytes(b"new user edit after interrupted install\n")
+        interrupted = json.loads((root / "private/infinity-checkpoint-code-transaction/journal.json").read_text())
+        (addon / interrupted["files"][0]["path"]).write_bytes(b"new user edit after interrupted install\n")
         before = contents(root / "external")
         run(root, expected=10)
         assert contents(root / "external") == before

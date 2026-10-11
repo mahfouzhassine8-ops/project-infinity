@@ -169,6 +169,8 @@ def main():
                     tests / "CheckpointCrashExportTest.java")
     shutil.copyfile(HERE / "runtime-tests/CheckpointLifecycleTest.java",
                     tests / "CheckpointLifecycleTest.java")
+    shutil.copyfile(HERE / "system-stability-2103366/InstalledCodeEvidenceTest.java",
+                    tests / "InstalledCodeEvidenceTest.java")
     with (args.build / "xbmc/build.gradle").open("a") as output:
         output.write('''
 android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "2g"; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }

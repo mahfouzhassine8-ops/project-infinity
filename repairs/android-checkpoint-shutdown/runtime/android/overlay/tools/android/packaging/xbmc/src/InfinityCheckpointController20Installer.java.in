@@ -32,8 +32,9 @@ import java.util.zip.ZipInputStream;
 public final class InfinityCheckpointController20Installer {
   private static final String TAG = "InfinityCheckpointCode";
   private static final String ASSET = "infinity/checkpoint-controller-20.zip";
-  private static final String ASSET_SHA256 = "63dee7a52ebb97952e792ae5e72696bacfe745db3e8baac72c9bf68c15798beb";
+  private static final String ASSET_SHA256 = "b7709d9b52d8c6e5aff224085fb0916e48bce27829d962968f7a9078fceafced";
   private static final String PREVIOUS_ASSET_SHA256 = "6704c5f6d88c2c271726fbb28464b5859b0ec94cd80a0dc528ccd9ae1c5167ee";
+  private static final String BASELINE_ASSET_SHA256 = "63dee7a52ebb97952e792ae5e72696bacfe745db3e8baac72c9bf68c15798beb";
   private static final String ADDON = "script.infinity.commandcenter";
   private static final int FILE_LIMIT = 4 * 1024 * 1024;
   private static final int PAYLOAD_LIMIT = 16 * 1024 * 1024;
@@ -66,6 +67,7 @@ public final class InfinityCheckpointController20Installer {
     String path;
     String before;
     String previous;
+    String baseline;
     String installedBefore;
     String after;
     byte[] data;
@@ -106,7 +108,7 @@ public final class InfinityCheckpointController20Installer {
       File installed = target(addon, change.path);
       String current = installed.exists() ? fileHash(installed) : null;
       if (change.after.equals(current)) continue; // Idempotent retry/already-installed code.
-      if (!(equal(change.before, current) || (change.previous != null && change.previous.equals(current)))) {
+      if (!(equal(change.before, current) || (change.previous != null && change.previous.equals(current)) || (change.baseline != null && change.baseline.equals(current)))) {
         Log.w(TAG, "Installed checkpoint code preimage differs; overlay not applied");
         return false;
       }
@@ -215,6 +217,7 @@ public final class InfinityCheckpointController20Installer {
         throw new IllegalStateException("Unexpected or duplicate manifest path");
       change.before = nullableHash(file, "before");
       change.previous = file.has("previous") ? checkedHash(file.getString("previous")) : null;
+      change.baseline = file.has("baseline") ? checkedHash(file.getString("baseline")) : null;
       if (NEW_FILES.contains(change.path) != (change.before == null))
         throw new IllegalStateException("Unexpected new-file preimage");
       change.after = checkedHash(file.getString("after"));
@@ -238,6 +241,19 @@ public final class InfinityCheckpointController20Installer {
         if (current.previous == null) throw new IllegalStateException("Missing reviewed previous code");
         Change old = new Change();
         old.path = current.path; old.before = current.before; old.after = current.previous;
+        prior.changes.add(old); prior.byPath.put(old.path, old);
+      }
+      payload = prior;
+    }
+    if (BASELINE_ASSET_SHA256.equals(journal.getString("asset_sha256"))) {
+      Payload prior = new Payload();
+      prior.assetHash = BASELINE_ASSET_SHA256;
+      prior.addonXml = payload.addonXml;
+      for (Change current : payload.changes) {
+        if (current.baseline == null) throw new IllegalStateException("Missing reviewed baseline code");
+        Change old = new Change();
+        old.path = current.path; old.before = current.before;
+        old.previous = current.previous; old.after = current.baseline;
         prior.changes.add(old); prior.byPath.put(old.path, old);
       }
       payload = prior;
@@ -289,7 +305,7 @@ public final class InfinityCheckpointController20Installer {
       Change expected = payload.byPath.get(path);
       String original = nullableHash(entry, "before");
       if (expected == null || !seen.add(path) ||
-          !(equal(expected.before, original) || (expected.previous != null && expected.previous.equals(original))) ||
+          !(equal(expected.before, original) || (expected.previous != null && expected.previous.equals(original)) || (expected.baseline != null && expected.baseline.equals(original))) ||
           !expected.after.equals(entry.getString("after")) || entry.getBoolean("existed") != (original != null))
         throw new IllegalStateException("Recovery plan is not the approved overlay");
       File installed = target(addon, path);

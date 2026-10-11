@@ -43,7 +43,7 @@ def _has_tmdb_helper(render=None):
 
 def _target(entry, sources=None, render=None):
     source_memory = render['source_memory'] if render is not None else setting_bool('source_memory_enabled', True)
-    if source_memory:
+    if source_memory and not entry.get('synthetic_next'):
         preference = sources.get(entry.get('key'), {}) if isinstance(sources, dict) else {}
         if not isinstance(preference, dict):
             preference = {}
@@ -56,11 +56,16 @@ def _target(entry, sources=None, render=None):
     media = entry.get('media')
     if tmdb.isdigit() and _has_tmdb_helper(render):
         if media == 'tv':
-            season = str(int(number(entry.get('season'))))
-            episode = str(int(number(entry.get('episode'))))
+            season = hub.episode_number(entry.get('season'))
+            episode = hub.episode_number(entry.get('episode'))
+            if season < 0 or episode < 0:
+                return ''
+            season, episode = str(season), str(episode)
             return ('plugin://plugin.video.themoviedb.helper/?info=play&tmdb_type=tv&tmdb_id=' + tmdb +
                     '&season=' + season + '&episode=' + episode)
         return 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_type=movie&tmdb_id=' + tmdb
+    if entry.get('synthetic_next'):
+        return ''  # No verified resolver: display the existing unavailable action.
     source = str(entry.get('source') or '').strip()
     if stable_route(source) or time.time() - number(entry.get('updated')) < 21600:
         return source
@@ -120,7 +125,7 @@ def _list_item(entry, data, bucket='', list_name='', render=None):
     label = str(entry.get('label') or entry.get('title') or 'Resume Hub')
     rating = int((data.get('ratings', {}).get(key) or {}).get('rating') or entry.get('rating') or 0)
     label2 = ('★ %d/10' % rating) if rating else ''
-    li = xbmcgui.ListItem(label=label, label2=label2, path=target)
+    li = xbmcgui.ListItem(label=label, label2=label2, path=target, offscreen=True)
     watched = key in data.get('watched', {})
     in_progress = key in data.get('items', {}) and number(entry.get('position')) > 0
     info = {
@@ -149,6 +154,8 @@ def _list_item(entry, data, bucket='', list_name='', render=None):
         li.setArt(art)
     li.setProperty('IsPlayable', 'true')
     li.setProperty('Infinity.ResumeHub.Key', key)
+    if render is not None and render.get('request'):
+        li.setProperty('Infinity.ResumeHub.Request', render['request'])
     li.setProperty('Infinity.ResumeHub.Watched', 'true' if watched else 'false')
     li.setProperty('Infinity.ResumeHub.InProgress', 'true' if in_progress else 'false')
     li.setProperty('Infinity.ResumeHub.State', 'in-progress' if in_progress else ('watched' if watched else 'unwatched'))
@@ -198,16 +205,28 @@ def _values_for(data, media, bucket, list_name=''):
 
 
 def listing(media='all', bucket='continue', list_name=''):
-    data = hub.load_view(PROFILE)
+    started = time.monotonic()
+    request = PARAMS.get('infinity_trace', '')
+    if not re.fullmatch(r'[np][0-9]{1,30}', request):
+        request = 'p' + str(time.monotonic_ns())
+    timing = dict(request=request, media=media, bucket=bucket)
+    hub.trace_timing('plugin_start', **timing)
+    data = hub.load_view(PROFILE, timing_context=timing)
+    hub.trace_timing('saved_state_ready', started, revision=int(data.get('revision') or 0), **timing)
+    filtered = time.monotonic()
     values = _values_for(data, media, bucket, list_name)
+    hub.trace_timing('filter_group', filtered, items=len(values), **timing)
     render = {'source_memory': setting_bool('source_memory_enabled', True),
               'tier': xbmcgui.Window(10000).getProperty('Infinity.Artwork.Quality') or 'standard',
-              'installed': {}}
+              'installed': {}, 'request': request}
     xbmcplugin.setContent(HANDLE, 'episodes' if media == 'tv' else ('movies' if media == 'movie' else 'videos'))
+    rendered = time.monotonic()
     for entry in values[:100]:
         target, li = _list_item(entry, data, bucket, list_name, render)
         xbmcplugin.addDirectoryItem(HANDLE, target, li, isFolder=False)
+    hub.trace_timing('directory_items', rendered, items=min(len(values), 100), **timing)
     xbmcplugin.endOfDirectory(HANDLE, succeeded=True, updateListing=False, cacheToDisc=False)
+    hub.trace_timing('plugin_complete', started, items=min(len(values), 100), **timing)
 
 
 def _directory(label, url, label2=''):

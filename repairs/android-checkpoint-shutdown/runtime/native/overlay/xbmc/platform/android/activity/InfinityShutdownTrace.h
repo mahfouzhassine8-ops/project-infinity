@@ -19,7 +19,7 @@
 namespace InfinityShutdownTrace
 {
 constexpr unsigned MAX_EVENTS = 8192;
-constexpr const char* ENGINE_TAG = "infinity-checkpoint-resume-lifecycle-2103364-v1";
+constexpr const char* ENGINE_TAG = "infinity-checkpoint-system-stability-2103366-v1";
 inline char path[1024]{};
 inline std::atomic<bool> configured{false};
 inline std::atomic<bool> begun{false};
@@ -36,7 +36,7 @@ inline bool Critical(const char* phase) noexcept
       std::strncmp(phase,"scripts.",8)==0 || std::strncmp(phase,"services.",9)==0 ||
       std::strncmp(phase,"python.runtime",14)==0 || std::strcmp(phase,"python.exit_frame")==0 ||
       std::strcmp(phase,"python.bytecode_returned")==0 || std::strcmp(phase,"python.child_thread_wait")==0 || std::strncmp(phase,"process.",8)==0 ||
-      std::strncmp(phase,"capture.",8)==0 || std::strncmp(phase,"jobs.",5)==0 || std::strncmp(phase,"directory.",10)==0);
+      std::strncmp(phase,"capture.",8)==0 || std::strncmp(phase,"checkpoint.",11)==0 || std::strncmp(phase,"jobs.",5)==0 || std::strncmp(phase,"directory.",10)==0);
 }
 inline std::atomic<unsigned> count{0};
 inline std::atomic<unsigned long long> ids{0};

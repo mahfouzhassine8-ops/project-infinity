@@ -12,6 +12,7 @@ class CJob;
 
 #include <stddef.h>
 #include <memory>
+#include <string>
 
 struct CJobCheckpointRecord;
 
@@ -123,6 +124,14 @@ public:
   virtual const char* GetCheckpointPersistenceOwner() const { return ""; }
   virtual bool CheckpointSucceeded(bool success) const { return success; }
   virtual bool RequiresCheckpointCompletionReceipt() const { return false; }
+  virtual std::string GetCheckpointResource() const { return {}; }
+  // Opt-in only after a reviewed operation verifies full replacement of the
+  // same resource. General success, age and type name never clear failures.
+  virtual bool CheckpointReplacesPriorFailure() const { return false; }
+  // Only called while the manager owns a queued job that never entered DoWork.
+  // Default refusal preserves unknown and potentially pre-scheduled writes.
+  virtual bool CheckpointCancelledWithoutWork() const { return false; }
+  virtual bool RequiresCheckpointCallback() const { return false; }
   /*!
    \brief Priority levels for jobs, specified by clients when adding jobs to the CJobManager.
    \sa CJobManager

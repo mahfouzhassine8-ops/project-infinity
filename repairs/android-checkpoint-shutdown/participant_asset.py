@@ -26,6 +26,7 @@ def build():
     green = json.loads((HERE / "resume-speed/GREEN-2103362.json").read_text())
     for entry in manifest['files']:
         entry['previous'] = green['commandcenter19'][entry['path']]
+        entry['baseline'] = json.loads((HERE / 'system-stability-2103366/GREEN-2103365.json').read_text())['commandcenter19'][entry['path']]
     entries = {"manifest.json": (json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n").encode()}
     for name in sorted(FILES):
         data = (root / "overlay" / name).read_bytes()

@@ -61,6 +61,7 @@ inline Registry& State()
   static Registry* state = new Registry;
   return *state;
 }
+inline thread_local uint64_t failureSerial{0};
 inline thread_local uint64_t permissionSession{0};
 inline thread_local unsigned int drainDepth{0};
 inline Snapshot ReadLocked(const Registry& state)
@@ -136,8 +137,10 @@ inline bool End(uint64_t session)
   state.session = 0;
   return true;
 }
+inline uint64_t ThreadFailureSerial() { return Detail::failureSerial; }
 inline void RecordFailure(const char* detail)
 {
+  ++Detail::failureSerial;
   auto& state = Detail::State();
   {
     std::lock_guard<std::mutex> lock(state.mutex);

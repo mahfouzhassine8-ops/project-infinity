@@ -10,6 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 import json
+import os
 import re
 import time
 import stat
@@ -29,6 +30,55 @@ BUCKET_LIMITS = {
     'watchlist': 500,
     'collection': 1000,
 }
+
+
+def episode_number(value):
+    """Return an exact nonnegative identity number; zero is not missing."""
+    if isinstance(value, bool):
+        return -1
+    text = str(value).strip() if value is not None else ''
+    if not re.fullmatch(r'[0-9]{1,6}', text):
+        return -1
+    return int(text)
+
+
+def trace_timing(stage, started=None, **fields):
+    """Bounded numeric observations in Kodi's log, never a persistence receipt."""
+    if stage not in ('service_start', 'saved_state_published', 'cache_validation', 'snapshot_load', 'plugin_start', 'saved_state_ready', 'filter_group', 'directory_items', 'plugin_complete', 'card_visible'):
+        return
+    now = time.monotonic()
+    row = {'schema': 1, 'stage': stage, 'pid': os.getpid(), 'monotonic_ms': round(now * 1000, 3)}
+    if started is not None:
+        row['elapsed_ms'] = round(max(0.0, now - started) * 1000, 3)
+    for key, value in fields.items():
+        if ((key == 'request' and re.fullmatch(r'[np][0-9]{1,30}', str(value))) or
+                (key == 'media' and value in ('tv', 'movie', 'all')) or
+                (key == 'bucket' and value in ('continue', 'history', 'watched', 'list'))):
+            row[key] = str(value)
+        elif key in ('items', 'revision', 'cache_hit') and isinstance(value, (int, bool)):
+            row[key] = int(value)
+    try:
+        xbmc.log('INFINITY_RESUME_TIMING ' + json.dumps(row, sort_keys=True, separators=(',', ':')), xbmc.LOGINFO)
+    except Exception:
+        pass  # Observation cannot change saving or list results.
+
+
+_visible_requests = set()
+
+
+def observe_visible_cards():
+    """Observe existing controls; unknown installed layouts remain unmeasured."""
+    if not xbmc.getCondVisibility('Window.IsActive(home)'):
+        return
+    for control in (8830, 8831):
+        if not xbmc.getCondVisibility('Control.IsVisible(%d)' % control):
+            continue
+        request = xbmc.getInfoLabel('Container(%d).ListItem.Property(Infinity.ResumeHub.Request)' % control)
+        if re.fullmatch(r'[np][0-9]{1,30}', request or '') and request not in _visible_requests:
+            if len(_visible_requests) >= 128:
+                _visible_requests.clear()
+            _visible_requests.add(request)
+            trace_timing('card_visible', request=request, media='movie' if control == 8830 else 'tv')
 
 
 def _now() -> int:
@@ -114,18 +164,26 @@ def _view_signature(profile):
     return tuple(signature)
 
 
-def _view_data(profile: Path):
+def _view_data(profile: Path, timing=False, context=None):
     """Internal read-only snapshot; never passed to mutations or checkpoint proof."""
     global _view_cache
     profile = Path(profile).resolve()
+    started = time.monotonic()
+    context = context or {}
     before = _view_signature(profile)
+    if timing:
+        trace_timing('cache_validation', started, **context)
     with _view_lock:
         if before is not None and _view_cache is not None and _view_cache[:2] == (profile, before):
+            if timing:
+                trace_timing('snapshot_load', started, cache_hit=1, **context)
             return _view_cache[2]
         _view_cache = None
     # Never hold a display lock while load() acquires the persistence gate:
     # admitted save() invalidates the cache while it already owns that gate.
     data = load(profile)
+    if timing:
+        trace_timing('snapshot_load', started, cache_hit=0, **context)
     after = _view_signature(profile)
     if before is not None and before == after:
         with _view_lock:
@@ -133,14 +191,14 @@ def _view_data(profile: Path):
     return data
 
 
-def load_view(profile: Path):
+def load_view(profile: Path, timing_context=None):
     """One bounded display snapshot, returned as a private copy.
 
     A cache miss uses load() and its participant digest/owner verification. The
     data file, participant journal and engine identity all invalidate the view,
     including same-sized atomic replacements. Authoritative reads stay fresh.
     """
-    return deepcopy(_view_data(profile))
+    return deepcopy(_view_data(profile, timing=True, context=timing_context))
 
 
 def poll_kodi_sync(profile):
@@ -342,7 +400,7 @@ def progress_shows(data):
                 continue
             show_key = str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
                            value.get('showtitle') or value.get('title') or key).casefold()
-            marker = (priority, int(value.get('season') or -1), int(value.get('episode') or -1),
+            marker = (priority, episode_number(value.get('season')), episode_number(value.get('episode')),
                       int(value.get('updated') or value.get('watched_at') or 0))
             if show_key not in chosen or marker > chosen[show_key][0]:
                 chosen[show_key] = (marker, _entry_copy(value, key))
@@ -365,7 +423,7 @@ def next_episodes(data):
             show_key = str(value.get('tmdb') or value.get('tvdb') or value.get('imdb') or
                            value.get('showtitle') or value.get('title') or key).casefold()
             current = progress.get(show_key)
-            marker = (int(value.get('season') or -1), int(value.get('episode') or -1), int(value.get('updated') or 0))
+            marker = (episode_number(value.get('season')), episode_number(value.get('episode')), int(value.get('updated') or 0))
             if current is None or marker > current[0]:
                 progress[show_key] = (marker, _entry_copy(value, key))
     result = [v[1] for v in progress.values()]
@@ -378,25 +436,27 @@ def next_episodes(data):
                        value.get('showtitle') or value.get('title') or key).casefold()
         if show_key in progress:
             continue
-        season = int(value.get('season') or -1)
-        episode = int(value.get('episode') or -1)
+        season = episode_number(value.get('season'))
+        episode = episode_number(value.get('episode'))
         if season < 0 or episode < 0 or not (value.get('tmdb') or value.get('tvdb')):
             continue
         marker = (season, episode, int(value.get('watched_at') or value.get('updated') or 0))
         if show_key not in watched_latest or marker > watched_latest[show_key][0]:
             watched_latest[show_key] = (marker, _entry_copy(value, key))
     for marker, last in watched_latest.values():
-        candidate = _entry_copy(last)
-        candidate.pop('key', None)
-        candidate['episode'] = marker[1] + 1
-        candidate['position'] = 0.0
-        candidate['percentage'] = 0.0
-        candidate['watched'] = False
-        candidate['synthetic_next'] = True
-        candidate['source'] = ''
-        candidate['updated'] = int(last.get('watched_at') or last.get('updated') or 0)
-        show = str(candidate.get('showtitle') or candidate.get('title') or 'TV Show')
-        candidate['label'] = f"{show} • S{marker[0]:02d}E{marker[1] + 1:02d}"
+        # A show preference is not an episode route. Copy only series identity;
+        # old DB IDs, stream URLs, episode titles/durations/art and watched data
+        # must never be attributed to this locally inferred successor.
+        show = str(last.get('showtitle') or last.get('title') or 'TV Show')
+        candidate = {
+            'media': 'tv', 'showtitle': show, 'title': show,
+            'tmdb': last.get('tmdb', ''), 'tvdb': last.get('tvdb', ''),
+            'season': marker[0], 'episode': marker[1] + 1,
+            'position': 0.0, 'percentage': 0.0, 'watched': False,
+            'synthetic_next': True,
+            'updated': int(last.get('watched_at') or last.get('updated') or 0),
+            'label': f"{show} • S{marker[0]:02d}E{marker[1] + 1:02d}",
+        }
         # Key is intentionally deterministic but distinct from the completed episode.
         import hashlib
         raw = 'tv|' + str(candidate.get('tmdb') or candidate.get('tvdb') or show.casefold()) + f'|{marker[0]}|{marker[1] + 1}'

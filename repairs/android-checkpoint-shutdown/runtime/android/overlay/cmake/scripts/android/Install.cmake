@@ -53,6 +53,7 @@ set(package_files strings.xml
                   src/InfinityStartupTrace.java
                   src/InfinityStartupTiming.java
                   src/InfinityHealthExport.java
+                  src/InfinityInstalledCodeEvidence.java
                   src/InfinityAndroidKeyboard.java
                   src/InfinityResponsiveness.java
                   src/InfinityStartupHandoff.java

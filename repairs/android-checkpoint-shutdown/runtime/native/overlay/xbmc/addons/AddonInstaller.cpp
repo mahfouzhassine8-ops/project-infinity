@@ -7,6 +7,12 @@
  */
 
 #include "AddonInstaller.h"
+#if defined(TARGET_ANDROID)
+#include "addons/InfinityAddonFileReceipt.h"
+#include "dbwrappers/InfinityDatabaseBarrier.h"
+#include "utils/JobCheckpoint.h"
+#include <thread>
+#endif
 
 #include "FileItem.h"
 #include "FilesystemInstaller.h"
@@ -28,6 +34,7 @@
 #include "favourites/FavouritesService.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "filesystem/SpecialProtocol.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h" // for callback
 #include "guilib/LocalizeStrings.h"
@@ -46,6 +53,7 @@
 #include "utils/log.h"
 
 #include <functional>
+#include <stdexcept>
 #include <memory>
 #include <mutex>
 
@@ -60,6 +68,28 @@ using KODI::UTILITY::TypedDigest;
 
 namespace
 {
+#if defined(TARGET_ANDROID)
+// Also covers synchronous/modal and nested dependency jobs that never enter
+// JobManager. Background jobs retain a separate receipt through their callback.
+class CAddonOperationReceipt
+{
+public:
+  CAddonOperationReceipt(const char* operation, const std::string& resource, bool& complete)
+    : m_complete(complete), m_serial(InfinityDatabaseBarrier::ThreadFailureSerial()),
+      m_record(JobCheckpoint::Admit(true, false, "native_databases", operation,
+                                   "CAddonOperationReceipt", "installer_work", true, resource))
+  { m_complete = false; }
+  ~CAddonOperationReceipt()
+  {
+    m_complete = m_complete && InfinityDatabaseBarrier::ThreadFailureSerial() == m_serial;
+    JobCheckpoint::Complete(m_record, m_complete, m_record->operation == "addon_install");
+  }
+private:
+  bool& m_complete;
+  uint64_t m_serial;
+  std::shared_ptr<CJobCheckpointRecord> m_record;
+};
+#endif
 class CAddonInstallJob : public CFileOperationJob
 {
 public:
@@ -68,6 +98,27 @@ public:
                    AutoUpdateJob isAutoUpdate);
 
   bool DoWork() override;
+
+#if defined(TARGET_ANDROID)
+  CheckpointResponsibility GetCheckpointResponsibility(const IJobCallback* callback) const override
+  {
+    return callback == &CAddonInstaller::GetInstance() ? CheckpointResponsibility::Required :
+                                                       CheckpointResponsibility::Unknown;
+  }
+  const char* GetCheckpointPersistenceOwner() const override { return "native_databases"; }
+  const char* GetCheckpointOperation() const override { return "addon_install"; }
+  bool CheckpointReplacesPriorFailure() const override { return m_completionVerified; }
+  std::string GetCheckpointResource() const override { return m_addon->ID(); }
+  bool CheckpointCancelledWithoutWork() const override { return !m_workStarted; }
+  bool RequiresCheckpointCallback() const override { return true; }
+  bool RequiresCheckpointCompletionReceipt() const override { return true; }
+  bool CheckpointSucceeded(bool success) const override
+  {
+    return success && m_completionVerified && m_worker == std::this_thread::get_id() &&
+        m_databaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
+  }
+#endif
+
 
   static constexpr const char* TYPE_DOWNLOAD = "DOWNLOAD";
   static constexpr const char* TYPE_INSTALL = "INSTALL";
@@ -96,6 +147,12 @@ public:
   };
 
 private:
+#if defined(TARGET_ANDROID)
+  bool m_workStarted{false};
+  bool m_completionVerified{false};
+  uint64_t m_databaseFailures{0};
+  std::thread::id m_worker;
+#endif
   void OnPreInstall();
   void OnPostInstall();
   bool Install(const std::string& installFrom,
@@ -131,10 +188,36 @@ public:
   CAddonUnInstallJob(const ADDON::AddonPtr& addon, bool removeData);
 
   bool DoWork() override;
+
+#if defined(TARGET_ANDROID)
+  CheckpointResponsibility GetCheckpointResponsibility(const IJobCallback* callback) const override
+  {
+    return callback == &CAddonInstaller::GetInstance() ? CheckpointResponsibility::Required :
+                                                       CheckpointResponsibility::Unknown;
+  }
+  const char* GetCheckpointPersistenceOwner() const override { return "native_databases"; }
+  const char* GetCheckpointOperation() const override { return "addon_uninstall"; }
+  std::string GetCheckpointResource() const override { return m_addon->ID(); }
+  bool CheckpointCancelledWithoutWork() const override { return !m_workStarted; }
+  bool RequiresCheckpointCallback() const override { return true; }
+  bool RequiresCheckpointCompletionReceipt() const override { return true; }
+  bool CheckpointSucceeded(bool success) const override
+  {
+    return success && m_completionVerified && m_worker == std::this_thread::get_id() &&
+        m_databaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
+  }
+#endif
+
   void SetRecurseOrphaned(RecurseOrphaned recurseOrphaned) { m_recurseOrphaned = recurseOrphaned; };
 
 private:
-  void ClearFavourites();
+#if defined(TARGET_ANDROID)
+  bool m_workStarted{false};
+  bool m_completionVerified{false};
+  uint64_t m_databaseFailures{0};
+  std::thread::id m_worker;
+#endif
+  bool ClearFavourites();
 
   ADDON::AddonPtr m_addon;
   bool m_removeData;
@@ -452,8 +535,7 @@ bool CAddonInstaller::InstallFromZip(const std::string &path)
 
 bool CAddonInstaller::UnInstall(const AddonPtr& addon, bool removeData)
 {
-  CServiceBroker::GetJobManager()->AddJob(new CAddonUnInstallJob(addon, removeData), this);
-  return true;
+  return CServiceBroker::GetJobManager()->AddJob(new CAddonUnInstallJob(addon, removeData), this) != 0;
 }
 
 bool CAddonInstaller::CheckDependencies(const AddonPtr& addon,
@@ -553,7 +635,8 @@ void CAddonInstaller::PrunePackageCache()
   // 1. Remove the largest packages, leaving at least 2 for each add-on
   CFileItemList items;
   CAddonDatabase db;
-  db.Open();
+  if (!db.Open())
+    throw std::runtime_error("addon package database unavailable");
   for (auto it = packs.begin(); it != packs.end(); ++it)
   {
     it->second->Sort(SortByLabel, SortOrderDescending);
@@ -566,7 +649,8 @@ void CAddonInstaller::PrunePackageCache()
   while (size > limit && i < items.Size())
   {
     size -= items[i]->m_dwSize;
-    db.RemovePackage(items[i]->GetPath());
+    if (!db.RemovePackage(items[i]->GetPath()))
+      throw std::runtime_error("addon package metadata prune failed");
     CFileUtils::DeleteItem(items[i++]);
   }
 
@@ -585,7 +669,8 @@ void CAddonInstaller::PrunePackageCache()
     while (size > limit && i < items.Size())
     {
       size -= items[i]->m_dwSize;
-      db.RemovePackage(items[i]->GetPath());
+      if (!db.RemovePackage(items[i]->GetPath()))
+        throw std::runtime_error("addon package metadata prune failed");
       CFileUtils::DeleteItem(items[i++]);
     }
   }
@@ -664,6 +749,12 @@ bool CAddonInstallJob::GetAddon(const std::string& addonID, RepositoryPtr& repo,
 
 bool CAddonInstallJob::DoWork()
 {
+#if defined(TARGET_ANDROID)
+  m_workStarted = true;
+  m_worker = std::this_thread::get_id();
+  m_databaseFailures = InfinityDatabaseBarrier::ThreadFailureSerial();
+  CAddonOperationReceipt completion("addon_install", m_addon->ID(), m_completionVerified);
+#endif
   m_currentType = CAddonInstallJob::TYPE_DOWNLOAD;
 
   SetTitle(StringUtils::Format(g_localizeStrings.Get(24057), m_addon->Name()));
@@ -772,6 +863,10 @@ bool CAddonInstallJob::DoWork()
           return false;
         }
 
+#if defined(TARGET_ANDROID)
+        if (!InfinityAddonFileReceipt::Existing(CSpecialProtocol::TranslatePath(package), false))
+          return false;
+#endif
         if (!db.AddPackage(m_addon->ID(), package, hash.value))
         {
           CLog::Log(LOGERROR, "CAddonInstallJob[{}]: package database update failed",
@@ -865,7 +960,8 @@ bool CAddonInstallJob::DoWork()
     origin = m_repo->ID(); // use repo id as origin
   }
 
-  CServiceBroker::GetAddonMgr().SetAddonOrigin(m_addon->ID(), origin, m_isUpdate);
+  if (!CServiceBroker::GetAddonMgr().SetAddonOrigin(m_addon->ID(), origin, m_isUpdate))
+    return false;
 
   if (m_dependsInstall == DependencyJob::CHOICE_YES)
   {
@@ -900,16 +996,18 @@ bool CAddonInstallJob::DoWork()
         if (m_addon->Version() == latestVersion)
         {
           // unpin the installed addon if it's the latest of its origin
-          CServiceBroker::GetAddonMgr().RemoveUpdateRuleFromList(m_addon->ID(),
-                                                                 AddonUpdateRule::PIN_OLD_VERSION);
+          if (!CServiceBroker::GetAddonMgr().RemoveUpdateRuleFromList(m_addon->ID(),
+                                                                 AddonUpdateRule::PIN_OLD_VERSION))
+            return false;
           CLog::Log(LOGDEBUG, "ADDONS: unpinned Addon: [{}] Origin: [{}] Version: [{}]",
                     m_addon->ID(), m_addon->Origin(), m_addon->Version().asString());
         }
         else
         {
           // pin if it is not the latest
-          CServiceBroker::GetAddonMgr().AddUpdateRuleToList(m_addon->ID(),
-                                                            AddonUpdateRule::PIN_OLD_VERSION);
+          if (!CServiceBroker::GetAddonMgr().AddUpdateRuleToList(m_addon->ID(),
+                                                            AddonUpdateRule::PIN_OLD_VERSION))
+            return false;
           CLog::Log(LOGDEBUG, "ADDONS: pinned Addon: [{}] Origin: [{}] Version: [{}]",
                     m_addon->ID(), m_addon->Origin(), m_addon->Version().asString());
         }
@@ -931,16 +1029,18 @@ bool CAddonInstallJob::DoWork()
         if (m_addon->Version() < latestVersion)
         {
           // pin zip version if it's lesser than latest from repo(s)
-          CServiceBroker::GetAddonMgr().AddUpdateRuleToList(m_addon->ID(),
-                                                            AddonUpdateRule::PIN_ZIP_INSTALL);
+          if (!CServiceBroker::GetAddonMgr().AddUpdateRuleToList(m_addon->ID(),
+                                                            AddonUpdateRule::PIN_ZIP_INSTALL))
+            return false;
           CLog::Log(LOGDEBUG, "ADDONS: pinned zip installed Addon: [{}] Version: [{}]",
                     m_addon->ID(), m_addon->Version().asString());
         }
         else
         {
           // unpin zip version if it's >= the latest from repos
-          CServiceBroker::GetAddonMgr().RemoveUpdateRuleFromList(m_addon->ID(),
-                                                                 AddonUpdateRule::PIN_ZIP_INSTALL);
+          if (!CServiceBroker::GetAddonMgr().RemoveUpdateRuleFromList(m_addon->ID(),
+                                                                 AddonUpdateRule::PIN_ZIP_INSTALL))
+            return false;
           CLog::Log(LOGDEBUG, "ADDONS: unpinned zip installed Addon: [{}] Version: [{}]",
                     m_addon->ID(), m_addon->Version().asString());
         }
@@ -978,6 +1078,9 @@ bool CAddonInstallJob::DoWork()
 
   // and we're done!
   MarkFinished();
+#if defined(TARGET_ANDROID)
+  m_completionVerified = true;
+#endif
   return true;
 }
 
@@ -1220,6 +1323,12 @@ CAddonUnInstallJob::CAddonUnInstallJob(const AddonPtr &addon, bool removeData)
 
 bool CAddonUnInstallJob::DoWork()
 {
+#if defined(TARGET_ANDROID)
+  m_workStarted = true;
+  m_worker = std::this_thread::get_id();
+  m_databaseFailures = InfinityDatabaseBarrier::ThreadFailureSerial();
+  CAddonOperationReceipt completion("addon_uninstall", m_addon->ID(), m_completionVerified);
+#endif
   ADDON::OnPreUnInstall(m_addon);
 
   //Unregister addon with the manager to ensure nothing tries
@@ -1237,10 +1346,19 @@ bool CAddonUnInstallJob::DoWork()
     return false;
   }
 
-  ClearFavourites();
+  if (!ClearFavourites())
+    return false;
   if (m_removeData)
   {
-    CFileUtils::DeleteItem(m_addon->Profile());
+    const bool deleted = CFileUtils::DeleteItem(m_addon->Profile());
+#if defined(TARGET_ANDROID)
+    const bool absent = InfinityAddonFileReceipt::Removed(CSpecialProtocol::TranslatePath(m_addon->Profile()));
+    if ((!deleted && !absent) || !absent)
+      return false;
+#else
+    if (!deleted)
+      return false;
+#endif
   }
 
   AddonPtr addon;
@@ -1259,8 +1377,9 @@ bool CAddonUnInstallJob::DoWork()
   CServiceBroker::GetAddonMgr().OnPostUnInstall(m_addon->ID());
 
   CAddonDatabase database;
-  if (database.Open())
-    database.OnPostUnInstall(m_addon->ID());
+  if (!database.Open())
+    return false;
+  database.OnPostUnInstall(m_addon->ID());
 
   ADDON::OnPostUnInstall(m_addon);
 
@@ -1275,10 +1394,13 @@ bool CAddonUnInstallJob::DoWork()
     }
   }
 
+#if defined(TARGET_ANDROID)
+  m_completionVerified = true;
+#endif
   return true;
 }
 
-void CAddonUnInstallJob::ClearFavourites()
+bool CAddonUnInstallJob::ClearFavourites()
 {
   bool bSave = false;
   CFileItemList items;
@@ -1292,6 +1414,5 @@ void CAddonUnInstallJob::ClearFavourites()
     }
   }
 
-  if (bSave)
-    CServiceBroker::GetFavouritesService().Save(items);
+  return !bSave || CServiceBroker::GetFavouritesService().Save(items);
 }

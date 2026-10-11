@@ -1243,10 +1243,13 @@ class CheckpointMonitor(xbmc.Monitor):
 
 
 def main():
+    startup = time.monotonic()
+    hub.trace_timing('service_start')
     profile = addon_profile()
     profile.mkdir(parents=True, exist_ok=True)
     # Make local saved history available before skin maintenance/health scans.
     _publish_continue_state(profile)
+    hub.trace_timing('saved_state_published', startup)
     if _prop('Infinity.WidgetReloadRevision', '') == '':
         _bump_widget_revision()
     skin_upgrade_status = skin_upgrade.apply_and_reload()
@@ -1300,6 +1303,7 @@ def main():
         if suspended_at is not None:
             stability.started += now - suspended_at
             suspended_at = None
+        hub.observe_visible_cards()
         stability.tick()
         try:
             experience.tick(now)

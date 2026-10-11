@@ -1,0 +1,20 @@
+{
+  "addon_id": "script.kodihealthcenter",
+  "files": {
+    "addon.xml": {
+      "before": "ffd5feb3e06687310378dc96dfe288f10cc4fddec3a305ab9a896cf7147341a3"
+    },
+    "default.py": {
+      "after": "a8c8964426035b36af1b1e10210612b082ae8b2d608e7f8e5e8bb84aac10efc3",
+      "before": "2f2f665a4880e79d8fde4d883d025cff35956f50c16213aed15047dd9feacd29"
+    },
+    "khc_lifecycle.py": {
+      "after": "4b7fbebdf3e80bb8f36e40e3c5c10b5b7e311097dfc0a10045f7c587319df2a8",
+      "before": "14b8084fa14d9dab62c831c42810914276bf38896c468d6de0103e57ba282f02"
+    }
+  },
+  "installed_identity_verified": false,
+  "reference_version": "2.5.18",
+  "requires_exact_preimages_before_use": true,
+  "schema": 1
+}

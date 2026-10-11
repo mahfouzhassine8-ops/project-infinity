@@ -21,6 +21,13 @@ final class InfinityHealthExport {
   static void write(Context context, OutputStream destination, String report) throws Exception {
     try (ZipOutputStream zip = new ZipOutputStream(destination)) {
       put(zip, "report.txt", reportWithNativeShutdownEvidence(context, report).getBytes(StandardCharsets.UTF_8));
+      try {
+        put(zip, "integration/installed-code.json", InfinityInstalledCodeEvidence.collect(context).toString(2).getBytes(StandardCharsets.UTF_8));
+      } catch (Exception unavailable) {
+        put(zip, "integration/installed-code.json", "{\"state\":\"UNAVAILABLE\",\"read_only\":true}".getBytes(StandardCharsets.UTF_8));
+      }
+      put(zip, "resume/timing-current.jsonl", InfinityInstalledCodeEvidence.timings(context, false).getBytes(StandardCharsets.UTF_8));
+      put(zip, "resume/timing-previous.jsonl", InfinityInstalledCodeEvidence.timings(context, true).getBytes(StandardCharsets.UTF_8));
       JSONObject manifest = new JSONObject();
       manifest.put("schema", 1);
       manifest.put("exported_at_ms", System.currentTimeMillis());
@@ -43,7 +50,7 @@ final class InfinityHealthExport {
       manifest.put("checkpoint_completion_semantics", "Matched native persistence acknowledgement, coordinator authorization, and owner lease release. Legacy destructor completion is independent historical evidence.");
       // Diagnostic evidence only: never declare clean exit from a returned
       // scope, elapsed timeout, missing row or process.exit_requested marker.
-      manifest.put("shutdown_trace_engine", "infinity-shutdown-2103334-v1");
+      manifest.put("shutdown_trace_engine", "infinity-checkpoint-system-stability-2103366-v1");
       manifest.put("shutdown_preservation_parent_native_sha256", "6378c986ea534284e599dc60dffa597e6c1b3f308c599d4143e7cfd7af5aae23");
       manifest.put("shutdown_trace_semantics", "Scope returned is not success. Exit requested is not process death. Missing or truncated data is unknown. Compare producer PID and session clocks.");
       attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl", "shutdown/native.jsonl", NATIVE_TRACE_LIMIT);
@@ -112,7 +119,7 @@ final class InfinityHealthExport {
     appendCheckpointEvidence(output, context);
     appendNativeShutdownEvidence(output, context, "Previous / failed native shutdown critical timeline",
         "infinity-shutdown-native.jsonl.critical.previous");
-    appendNativeShutdownEvidence(output, context, "Current native shutdown critical timeline",
+    appendNativeShutdownEvidence(output, context, "Latest native critical timeline — producer identity must match the checkpoint",
         "infinity-shutdown-native.jsonl.critical");
     return output.toString();
   }
@@ -196,13 +203,15 @@ final class InfinityHealthExport {
         persisted=InfinityCheckpointProtocol.safe(saved)&&row.getLong("generation")==saved.getLong("generation")&&
             InfinityCheckpointProtocol.proof(raw).equals(row.getString("native_proof_sha256"));
       }
+      boolean previousCloseComplete=InfinityCheckpointProtocol.confirmedComplete(row,session,owner,pid,false,persisted);
+      output.append("Evidence scope: previous close; current process health is not proved by this receipt.\n");
       output.append("Session: ").append(session).append("\nEngine PID: ").append(pid).append("\nEngine owner: ").append(owner)
           .append("\nCoordinator phase: ").append(row.getString("phase"))
           .append("\nWas all required state persisted? ").append(persisted?"YES — matched explicit native save acknowledgement":"NOT CONFIRMED")
           .append("\nSAFE_TO_TERMINATE issued: ").append(persisted?"yes":"no confirmed acknowledgement")
           .append("\nAndroid termination command requested: ").append(row.optLong("terminate_requested_elapsed_ms",0)>0?"yes":"no")
           .append("\nOne-shot authorization consumed: ").append(row.optBoolean("authorization_consumed",false)?"yes":"no")
-          .append("\nObserved engine death: ").append("COMPLETE".equals(row.optString("phase"))&&persisted&&row.optLong("engine_death_elapsed_ms",0)>0?"yes":"not confirmed")
+          .append("\nObserved engine death: ").append(previousCloseComplete?"yes — ordered stored completion evidence":"not confirmed")
           .append("\nTotal observed duration: ").append(row.optLong("total_duration_ms",0)).append(" ms\n");
       String[] events={"started","safe","terminate_requested","authorization_consumed","engine_death"};
       for(String event:events) output.append(event).append(": epoch_ms=").append(row.optLong(event+"_epoch_ms",0))
@@ -331,13 +340,36 @@ final class InfinityHealthExport {
          java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream()) {
       final int limit = 512 * 1024;
       boolean truncated = copyBounded(input, bytes, limit);
-      output.append(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
+      String evidence=new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+      output.append("Producer attribution: ").append(nativeTraceScope(context,evidence)).append("\n");
+      output.append(evidence);
       if (truncated)
         output.append("\n[critical timeline truncated to ").append(limit).append(" bytes]\n");
     } catch (Exception failure) {
       output.append("[could not read native timeline: ")
           .append(failure.getClass().getSimpleName()).append("]\n");
     }
+  }
+
+  static String nativeTraceScope(Context context,String evidence) {
+    try {
+      JSONObject receipt=InfinityCheckpointProtocol.read(context.getFilesDir());
+      int pid=receipt.getInt("pid");long begin=receipt.getLong("started_epoch_ms");
+      long end=receipt.optLong("engine_death_epoch_ms",0);
+      if(begin<=0)return "UNVERIFIED — checkpoint clock unavailable";
+      int observations=0;
+      for(String line:evidence.split("\n")) {
+        if(line.trim().isEmpty())continue;
+        JSONObject row=new JSONObject(line);
+        if(!row.has("engine"))continue;
+        if(!"infinity-checkpoint-system-stability-2103366-v1".equals(row.getString("engine")) || row.getInt("pid")!=pid)
+          return "HISTORICAL / OTHER PRODUCER — does not establish this checkpoint failure";
+        long epoch=row.optLong("epoch_ns",0)/1000000;
+        if(epoch<begin || (end>0&&epoch>end))return "HISTORICAL / OTHER INTERVAL — does not establish this checkpoint failure";
+        ++observations;
+      }
+      return observations>0?"MATCHED PREVIOUS CHECKPOINT — trace is diagnostic, not a completion receipt":"UNVERIFIED — no complete producer rows";
+    } catch(Exception unknown) {return "UNVERIFIED — producer/session match not established";}
   }
 
   private static void put(ZipOutputStream zip, String name, byte[] bytes) throws Exception {

@@ -1,0 +1,32 @@
+package com.projectinfinity.kodi;
+import static org.junit.Assert.*;
+import android.content.Context;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk=28)
+public final class InstalledCodeEvidenceTest {
+  @Test public void observedCodeDoesNotReadSettingsOrProveHealth() throws Exception {
+    Context context=RuntimeEnvironment.getApplication();
+    File addon=new File(context.getExternalFilesDir(null), ".kodi/addons/script.kodihealthcenter");
+    assertTrue(addon.isDirectory()||addon.mkdirs());
+    Files.write(new File(addon,"addon.xml").toPath(), "<addon id='script.kodihealthcenter' version='2.5.18'/>".getBytes(StandardCharsets.UTF_8));
+    Files.write(new File(addon,"default.py").toPath(), "reviewed code".getBytes(StandardCharsets.UTF_8));
+    Files.write(new File(addon,"settings.xml").toPath(), "PRIVATE AUTHORIZATION".getBytes(StandardCharsets.UTF_8));
+    JSONObject report=InfinityInstalledCodeEvidence.collect(context);
+    JSONObject row=report.getJSONArray("addons").getJSONObject(1);
+    assertEquals("OBSERVED_CODE", row.getString("state"));
+    assertEquals("2.5.18", row.getString("version"));
+    assertEquals(64,row.getJSONObject("code_sha256").getString("default.py").length());
+    assertFalse(report.toString().contains("PRIVATE"));
+    assertFalse(report.getBoolean("proves_shutdown_or_health"));
+  }
+}

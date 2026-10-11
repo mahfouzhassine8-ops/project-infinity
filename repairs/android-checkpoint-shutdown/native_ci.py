@@ -138,6 +138,12 @@ def prepare():
         "--runtime", str(OUT / "installed-addons/script.infinity.commandcenter"))
     run(sys.executable, str(HERE / "installed/test_compat82.py"))
     run(sys.executable, str(HERE / "runtime-tests/test_native_coordinator.py"), "--runtime", "kodi", "--installed-versions")
+    for runtime in (OUT / "commandcenter", OUT / "installed-addons/script.infinity.commandcenter"):
+        run(sys.executable, str(HERE / "system-stability-2103366/test_resume.py"), "--runtime", str(runtime))
+    for name in ("test_installer.py", "test_jobs.py"):
+        run(sys.executable, str(HERE / "system-stability-2103366" / name), "--runtime", "kodi")
+    run(sys.executable, str(HERE / "system-stability-2103366/test_health.py"),
+        "--receipt", str(HERE / "system-stability-2103366/protected-close-fixture.json"))
     manifest = json.loads((HERE / "runtime/native/manifest.json").read_text())
     (OUT / "SOURCE-MANIFEST.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
