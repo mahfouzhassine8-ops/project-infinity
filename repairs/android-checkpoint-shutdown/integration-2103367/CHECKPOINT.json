@@ -11,7 +11,7 @@
       "source_commit": "b00a1850233362c506f239ba0c08bd9c085b3f3d"
     }
   ],
-  "build_run_id": 38133236811,
+  "build_run_id": 38133883015,
   "candidate_apk_produced": false,
   "completed": [
     "Truthful installer business/durability outcomes",
@@ -31,31 +31,37 @@
     "Verified dependency transfer into isolated candidate branch"
   ],
   "implementation_parent": "48dc19c221fc41f88f3d52614beef8a877e426d6",
-  "implementation_source_commit": "b00a1850233362c506f239ba0c08bd9c085b3f3d",
+  "implementation_source_commit": "e16b62c668871860015c15af9e0c020637a0f328",
   "new_workflow_started": true,
   "physically_tested": false,
-  "previous_saved_checkpoint": "39d04e479884bc344461c00eeb22e4e6d97c0695",
+  "previous_saved_checkpoint": "e16b62c668871860015c15af9e0c020637a0f328",
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
-    "build_running": false,
-    "current_blocker": "Native validation and compilation, signed packaging and artifact verification pending.",
-    "last_completed_step": "Successful complete Android compilation, 14 exporter tests, unchanged compiled Android inputs; updated RPC ordering and positive catalogue fixtures pass.",
+    "build_running": true,
+    "current_blocker": "Native persistence gates, native compilation, permanent signing and exact final artifact verification remain pending.",
+    "last_completed_step": "GitHub exact-input Android reuse succeeded in run 38133883015; original complete compilation and all 14 exporter regressions retained from run 38133236811.",
     "local_changes_preserved": true,
-    "next_step": "Reuse successful Android checkpoint; resume corrected native gates and native compiler.",
+    "next_step": "Finish native gates and compilation; package the verified Android shell with the newly compiled native image.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T10:57:58.237449+00:00",
+  "recovery_verified_at": "2026-10-11T11:00:49.924526+00:00",
   "release_locked": false,
   "remaining": [
-    "Full Android and native compilation",
+    "Native gates and full native compilation",
     "Signed APK and exact compiled provenance verification",
     "Physical Fold acceptance and active native PVR inventory"
   ],
   "schema": 1,
-  "state": "native_gate_fixture_corrected_ready_to_resume",
+  "state": "native_validation_running_android_reused",
   "tests": {
     "actual_java_receipt_mirror": {
       "passed": true
+    },
+    "actual_journal_relaunch": {
+      "cycles": 500,
+      "distinct_host_processes": 500,
+      "passed": true,
+      "previous_owner_mismatch": "rejected"
     },
     "android_installed_code_exporter_host": {
       "passed": true
