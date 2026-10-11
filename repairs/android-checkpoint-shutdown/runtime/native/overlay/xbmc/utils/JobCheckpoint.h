@@ -31,6 +31,7 @@ struct CJobCheckpointRecord
   bool operationSucceeded{false};
   bool outcomeReviewed{false};
   bool completionRecorded{false};
+  bool completionCallbackVerified{true};
   std::function<bool()> recoveryProof;
   size_t recoveryBytes{0};
   std::chrono::steady_clock::time_point admitted;
@@ -105,7 +106,8 @@ inline void RecoveryProof(const std::shared_ptr<CJobCheckpointRecord>& job,
 {
   if (!job || !proof) return;
   auto& registry = Get(); std::lock_guard<std::mutex> lock(registry.mutex);
-  if (bytes > 64U * 1024U * 1024U - registry.recoveryBytes) return;
+  if (!job->completionCallbackVerified || job->recoveryProof ||
+      bytes > 64U * 1024U * 1024U - registry.recoveryBytes) return;
   registry.recoveryBytes += bytes; job->recoveryBytes = bytes; job->recoveryProof = std::move(proof);
 }
 // A later operation may retire only the exact outstanding scopes whose saved
@@ -115,7 +117,7 @@ inline void RecoverRestored(const std::string& operation, const std::string& res
                             uint64_t currentToken)
 {
   auto& registry = Get();
-  std::vector<std::shared_ptr<CJobCheckpointRecord>> candidates;
+  std::vector<std::pair<std::shared_ptr<CJobCheckpointRecord>, std::function<bool()>>> candidates;
   auto peer = [&]() {
     for (const auto& weak : registry.jobs) if (auto job = weak.lock())
       if (job->token != currentToken && !job->resolved && !job->completionRecorded &&
@@ -127,15 +129,17 @@ inline void RecoverRestored(const std::string& operation, const std::string& res
     if (peer()) return;
     for (const auto& value : registry.unresolved)
       if (value.second->operation == operation && value.second->resource == resource &&
-          value.second->completionRecorded && value.second->recoveryProof) candidates.push_back(value.second);
+          value.second->completionRecorded && value.second->completionCallbackVerified &&
+          value.second->recoveryProof) candidates.emplace_back(value.second, value.second->recoveryProof);
   }
-  for (const auto& job : candidates)
+  for (const auto& candidate : candidates)
   {
+    const auto& job = candidate.first;
     bool verified = false;
-    try { verified = job->recoveryProof(); } catch (...) { verified = false; }
+    try { verified = candidate.second(); } catch (...) { verified = false; }
     if (!verified) continue;
     std::lock_guard<std::mutex> lock(registry.mutex);
-    if (job->resolved || peer()) continue;
+    if (job->resolved || !job->completionCallbackVerified || peer()) continue;
     job->resolved = true; job->retained = false; job->durability = CJobDurability::VerifiedRestored;
     for (auto i = registry.unresolved.begin(); i != registry.unresolved.end();)
       if (i->second == job) i = registry.unresolved.erase(i); else ++i;
@@ -186,13 +190,20 @@ inline void Phase(const std::shared_ptr<CJobCheckpointRecord>& job, const char* 
   job->phase = phase;
   if (jobId) job->jobId = jobId;
 }
-inline void Complete(const std::shared_ptr<CJobCheckpointRecord>& job, bool success, bool verifiedReplacement=false)
+inline void Complete(const std::shared_ptr<CJobCheckpointRecord>& job, bool success,
+                     bool verifiedReplacement=false, bool callbackSucceeded=true)
 {
   if(!job || job->unknown)return; // Unknown work still requires its own reviewed contract.
   auto& registry=Get();std::lock_guard<std::mutex> lock(registry.mutex);
   if (job->completionRecorded) return;
   if (job->outcomeReviewed && (job->durability == CJobDurability::Unresolved || job->durability == CJobDurability::Pending)) success = false;
   job->completionRecorded = true;
+  job->completionCallbackVerified = callbackSucceeded;
+  if (success || !callbackSucceeded)
+  {
+    registry.recoveryBytes -= job->recoveryBytes;
+    job->recoveryBytes = 0; job->recoveryProof = {};
+  }
   // General installation success cannot prove recovery of a prior operation's
   // staging, package-cache, dependency or database resources.
   (void)verifiedReplacement;

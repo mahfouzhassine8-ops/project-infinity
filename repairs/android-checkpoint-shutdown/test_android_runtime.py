@@ -18,6 +18,7 @@ names = ['InfinityCheckpointProtocol', 'InfinityCloseGuardService', 'InfinityClo
          'InfinityExitCompletion', 'InfinityKodiShutdown', 'InfinityCloseProgress', 'InfinityHealthExport',
          'InfinityCheckpointAddonInstaller', 'InfinityCheckpointController20Installer',
          'InfinityCheckpointCompat82Installer', 'InfinityInstalledCheckpointInstaller']
+names += ['InfinityCheckpointEvidence', 'InfinityInstalledCodeEvidence']
 peers = '''package com.projectinfinity.kodi;
 class Main extends android.app.Activity {
  static Main MainActivity;

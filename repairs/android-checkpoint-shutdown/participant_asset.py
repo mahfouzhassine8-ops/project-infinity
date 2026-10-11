@@ -27,6 +27,7 @@ def build():
     for entry in manifest['files']:
         entry['previous'] = green['commandcenter19'][entry['path']]
         entry['baseline'] = json.loads((HERE / 'system-stability-2103366/GREEN-2103365.json').read_text())['commandcenter19'][entry['path']]
+        entry['rejected'] = json.loads((HERE / 'integration-2103367/GREEN-2103366.json').read_text())['commandcenter19'][entry['path']]
     entries = {"manifest.json": (json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n").encode()}
     for name in sorted(FILES):
         data = (root / "overlay" / name).read_bytes()

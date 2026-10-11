@@ -54,11 +54,11 @@ final class InfinityInstalledCodeEvidence {
         }
         // This independent guard keeps DTD/entity protection on Android XML
         // implementations that reject the Apache-specific feature URI.
-        String source = StandardCharsets.UTF_8.newDecoder()
+        String xmlText = StandardCharsets.UTF_8.newDecoder()
             .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
             .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
             .decode(java.nio.ByteBuffer.wrap(xml)).toString();
-        if (source.indexOf('\0') >= 0 || java.util.regex.Pattern.compile("<!\\s*(DOCTYPE|ENTITY)\\b", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(source).find())
+        if (xmlText.indexOf('\0') >= 0 || java.util.regex.Pattern.compile("<!\\s*(DOCTYPE|ENTITY)\\b", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(xmlText).find())
           throw new java.io.IOException("unsupported declarations");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         feature(factory, "http://apache.org/xml/features/disallow-doctype-decl", true);

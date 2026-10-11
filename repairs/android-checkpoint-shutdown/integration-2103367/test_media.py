@@ -135,6 +135,17 @@ class MediaTests(f['RuntimeTests']):
             verified = dict(entry,show_ids_verified=True,show_tmdb='123')
             self.assertIn('tmdb_id=123&season=1&episode=2',plugin._target(verified))
 
+    def test_unavailable_catalogue_retains_verified_show_without_inventing_next(self):
+        replies = [dict(result=dict(episodedetails=dict(episodeid=42,season=1,episode=2,showtitle='Show',tvshowid=7))),
+                   dict(result=dict(tvshowdetails=dict(tvshowid=7,title='Show',uniqueid={'tmdb':'123'}))),
+                   RuntimeError('local catalogue unavailable')]
+        with mock.patch.object(service,'jsonrpc',side_effect=replies), mock.patch.object(service.xbmc,'getCondVisibility',return_value=True):
+            entry = service._continue_identity(dict(type='episode',id=42,season=1,episode=2,
+                showtitle='Show',title='Episode',uniqueid={'tmdb':'999'},file='plugin://plugin.video.pov/?episode=999'))
+        self.assertEqual(entry['show_tmdb'],'123')
+        self.assertEqual(entry['identity']['scope'],'show_episode')
+        self.assertEqual(hub.next_episodes({'watched':{entry['key']:entry}}),[])
+
 
 if __name__ == '__main__':
     result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(MediaTests))

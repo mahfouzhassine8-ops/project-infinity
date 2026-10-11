@@ -20,7 +20,7 @@ final class InfinityCheckpointEvidence {
       publicRoot = (storage == null ? privateRoot : storage.getCanonicalFile());
       File receipt = new File(privateRoot, InfinityCheckpointProtocol.RECEIPT);
       if (receipt.isFile()) mirror(receipt, InfinityCheckpointProtocol.read(privateRoot));
-    } catch (Exception unavailable) { android.util.Log.w("InfinityEvidence", "Receipt mirror unavailable"); }
+    } catch (Throwable unavailable) { unavailable(); }
   }
   static synchronized void mirror(File source, JSONObject row) {
     try {
@@ -30,7 +30,13 @@ final class InfinityCheckpointEvidence {
       if (bytes.length > 262144) return;
       File destination = new File(publicRoot, InfinityCheckpointProtocol.RECEIPT);
       if (!destination.getAbsoluteFile().equals(destination.getCanonicalFile()) || destination.equals(source)) return;
+      for (String suffix : new String[]{".new", ".bak"}) {
+        File side = new File(publicRoot, InfinityCheckpointProtocol.RECEIPT + suffix);
+        if (!side.getAbsoluteFile().equals(side.getCanonicalFile())) return;
+      }
       AtomicFile output = new AtomicFile(destination);
+      if (destination.isFile() && destination.length() <= 262144 &&
+          Arrays.equals(bytes, output.readFully())) return;
       FileOutputStream stream = null;
       try {
         stream = output.startWrite(); stream.write(bytes); stream.getFD().sync();
@@ -39,6 +45,11 @@ final class InfinityCheckpointEvidence {
         try { android.system.Os.fsync(directory); } finally { android.system.Os.close(directory); }
         if (!Arrays.equals(bytes, output.readFully())) throw new java.io.IOException("mirror readback");
       } catch (Exception failed) { if (stream != null) output.failWrite(stream); throw failed; }
-    } catch (Exception unavailable) { android.util.Log.w("InfinityEvidence", "Receipt mirror unavailable"); }
+    } catch (Throwable unavailable) { unavailable(); }
+  }
+  private static void unavailable() {
+    // Optional evidence publication cannot affect checkpoint authorization.
+    try { android.util.Log.w("InfinityEvidence", "Receipt mirror unavailable"); }
+    catch (Throwable unavailable) { /* Even logging remains subordinate. */ }
   }
 }

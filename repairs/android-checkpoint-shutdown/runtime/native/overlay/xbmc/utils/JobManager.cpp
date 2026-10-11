@@ -720,7 +720,7 @@ void CJobManager::OnJobComplete(bool success, CJob *job)
     if(item.m_job->RequiresCheckpointCompletionReceipt())
       JobCheckpoint::Complete(item.m_job->m_checkpointRecord,
           callbackSucceeded && item.m_job->CheckpointSucceeded(success),
-          item.m_job->CheckpointReplacesPriorFailure());
+          item.m_job->CheckpointReplacesPriorFailure(), callbackSucceeded);
     item.FreeJob();
     lock.lock();
     --m_checkpointCompletingJobs;

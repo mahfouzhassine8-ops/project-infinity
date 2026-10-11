@@ -76,6 +76,37 @@ int main(int argc,char**argv) {
  const auto before=InfinityAddonFileReceipt::Capture((root/"addons/addon-a").string());
  assert(before.valid);
  CFilesystemInstaller installer;installer.m_addonFolder=(root/"addons").string();installer.m_tempFolder=(root/"addons/temp").string();
+ if(mode=="recovery-restored"||mode=="callback-recovery") {
+  const bool callbackFailed=mode=="callback-recovery";
+  auto outer=JobCheckpoint::Admit(true,false,"native_databases","addon_install","installer","queued",true,"addon-a");
+  bool verified=false;mode="restore-move";
+  {JobCheckpoint::WorkBinding binding(outer);CAddonOperationReceipt receipt("addon_install","addon-a",verified);
+   verified=installer.InstallToFilesystem((root/"source").string(),"addon-a");}
+  assert(!verified);JobCheckpoint::Complete(outer,false,false,!callbackFailed);outer.reset();
+  assert(JobCheckpoint::GetSnapshot().required==1);
+  // Simulate an explicit repair of the failed operation's actual preimages.
+  // Recovery classification itself never performs these mutations.
+  fs::rename(root/"addons/temp/stage-2",root/"addons/addon-a");
+  fs::remove_all(root/"addons/temp/stage-1");
+  assert(InfinityAddonFileReceipt::Existing((root/"addons/addon-a").string(),true));
+  assert(InfinityAddonFileReceipt::Directory((root/"addons/temp").string()));
+  assert(InfinityAddonFileReceipt::Directory((root/"addons").string()));
+  {CAddonOperationReceipt receipt("addon_install","addon-b",verified);verified=true;}
+  assert(JobCheckpoint::GetSnapshot().required==1); // unrelated success cannot retire it
+  auto peer=JobCheckpoint::Admit(true,false,"native_databases","addon_install","installer","queued",true,"addon-a");
+  JobCheckpoint::RecoverRestored("addon_install","addon-a",0);
+  assert(JobCheckpoint::GetSnapshot().required==2); // a live writer prevents verification
+  JobCheckpoint::Complete(peer,true);peer.reset();
+  {CAddonOperationReceipt receipt("addon_install","addon-a",verified);verified=true;}
+  assert(JobCheckpoint::GetSnapshot().required==(callbackFailed?1U:0U));
+  if(!callbackFailed) {
+   const auto history=JobCheckpoint::GetSnapshot().resolvedHistory;
+   assert(history.back().phase=="installation_failed_verified_restored");
+   assert(history.back().resource=="addon-a");
+  }
+  std::cout<<"PASS exact production restoration proof, resource/peer/callback guards "<<argv[1]<<"\n";
+  return 0;
+ }
  if(mode=="fsync-restored"||mode=="fsync-unresolved"){failSync=true;onceSync=mode=="fsync-restored";}
  bool business=false,durable=false;
  {
@@ -127,7 +158,7 @@ def main():
         'bool CFilesystemInstaller::InstallToFilesystem(', 'bool CFilesystemInstaller::UnInstallFromFilesystem('))
     modes=('success','dependency-rejected','create','unpack','old-move','new-move','restore-move',
            'cleanup','sql-failed','unknown-resource','fsync-restored','fsync-unresolved',
-           'uninstall-restored','partial-delete')
+           'uninstall-restored','partial-delete','recovery-restored','callback-recovery')
     with tempfile.TemporaryDirectory(prefix='installer-recovery-') as tmp:
         tmp=Path(tmp);(tmp/'test.cpp').write_text(PEERS.replace('// @PRODUCTION@',production))
         subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-DINFINITY_DATABASE_BARRIER_TEST',

@@ -413,6 +413,7 @@ def _continue_show_identity(item_type, dbid, season, episode, show):
         return {}
     if season < 0 or episode < 0:
         return {}
+    result = {}
     try:
         if not xbmc.getCondVisibility('Library.HasContent(TVShows)'):
             return {}
@@ -468,7 +469,9 @@ def _continue_show_identity(item_type, dbid, season, episode, show):
                                                'season': following[0][0], 'episode': following[0][1]}
         return result
     except Exception:
-        return {}
+        # Catalogue availability is independent of the already verified series.
+        # Retain that identity, while withholding any unverified successor.
+        return result
 
 
 def _continue_identity(item):

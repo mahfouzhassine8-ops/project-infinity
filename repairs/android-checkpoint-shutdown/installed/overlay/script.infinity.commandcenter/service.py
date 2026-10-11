@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import time
+import uuid
 import threading
 from functools import wraps
 
@@ -413,6 +414,7 @@ def _continue_show_identity(item_type, dbid, season, episode, show):
         return {}
     if season < 0 or episode < 0:
         return {}
+    result = {}
     try:
         if not xbmc.getCondVisibility('Library.HasContent(TVShows)'):
             return {}
@@ -441,11 +443,36 @@ def _continue_show_identity(item_type, dbid, season, episode, show):
         tmdb, tvdb = (str(unique.get(name) or '').strip() for name in ('tmdb', 'tvdb'))
         if not ((tmdb.isdigit() and int(tmdb) > 0) or (tvdb.isdigit() and int(tvdb) > 0)):
             return {}
-        return {'show_ids_verified': True,
+        result = {'show_ids_verified': True,
                 'show_tmdb': tmdb if tmdb.isdigit() and int(tmdb) > 0 else '',
                 'show_tvdb': tvdb if tvdb.isdigit() and int(tvdb) > 0 else ''}
+        # Only the existing local catalogue can establish a successor. Widget
+        # generation never scrapes providers or guesses E+1 at season boundaries.
+        response = jsonrpc('VideoLibrary.GetEpisodes', {
+            'tvshowid': show_id, 'properties': ['season', 'episode'],
+            'limits': {'start': 0, 'end': 10000}})
+        catalogue = response.get('result', {}).get('episodes')
+        limits = response.get('result', {}).get('limits', {})
+        if ('error' not in response and isinstance(catalogue, list) and
+                type(limits.get('total')) is int and limits['total'] == len(catalogue) and
+                len(catalogue) <= 10000 and result['show_tmdb']):
+            coordinates = {(hub.episode_number(row.get('season')), hub.episode_number(row.get('episode')))
+                           for row in catalogue if isinstance(row, dict)}
+            # Specials have no reliable chronological position among seasons.
+            # An observed special can advance within Season 0, never into S1.
+            coordinates = sorted(value for value in coordinates if value[0] >= 0 and value[1] >= 0
+                                 and ((season == 0 and value[0] == 0) or (season > 0 and value[0] > 0)))
+            if (season, episode) in coordinates:
+                following = [value for value in coordinates if value > (season, episode)]
+                if following:
+                    result['verified_next'] = {'verified': True, 'after': [season, episode],
+                                               'show_tmdb': result['show_tmdb'],
+                                               'season': following[0][0], 'episode': following[0][1]}
+        return result
     except Exception:
-        return {}
+        # Catalogue availability is independent of the already verified series.
+        # Retain that identity, while withholding any unverified successor.
+        return result
 
 
 def _continue_identity(item):
@@ -470,31 +497,38 @@ def _continue_identity(item):
     except Exception:
         dbid = -1
 
-    is_episode = item_type == 'episode' or bool(show) or (season >= 0 and episode >= 0 and item_type != 'movie')
-    if is_episode and (show or title):
+    # Kodi's typed playback item supplies the namespace. A title, show label or
+    # a provider's untyped numeric ID alone cannot authorize local mutation.
+    if item_type == 'episode' and (show or title) and season >= 0 and episode >= 0:
         media = 'tv'
         show_label = show or title
         label = show_label
         if season >= 0 and episode >= 0:
             label = f'{show_label} • S{season:02d}E{episode:02d}'
-        raw = 'tv|' + (tmdb or tvdb or imdb or show_label.lower()) + f'|{season}|{episode}'
-    elif title:
+    elif item_type == 'movie' and title:
         media = 'movie'
         label = title
-        raw = 'movie|' + (tmdb or imdb or title.lower())
     else:
         return None
 
     show_identity = (_continue_show_identity(item_type, dbid, season, episode, show)
                      if media == 'tv' and type(item.get('id')) is int else {})
 
-    import hashlib
-    key = hashlib.sha256(raw.encode('utf-8', errors='replace')).hexdigest()
+    identity = hub.media_identity(media, {'tmdb': tmdb, 'tvdb': tvdb, 'imdb': imdb}, season, episode,
+                                  {'tmdb': show_identity.get('show_tmdb'),
+                                   'tvdb': show_identity.get('show_tvdb')} if show_identity else None)
+    key = hub.identity_key(identity)
+    if not key:
+        return None
+    # Only actual Kodi library IDs may enter the required library sync queue.
+    if type(item.get('id')) is not int or item['id'] <= 0:
+        dbid = -1
     art = item.get('art') if isinstance(item.get('art'), dict) else {}
     poster = str(art.get('poster') or item.get('thumbnail') or xbmc.getInfoLabel('VideoPlayer.Cover') or '')
     fanart = str(art.get('fanart') or xbmc.getInfoLabel('VideoPlayer.Fanart') or '')
     return {
         'key': key,
+        'identity': identity,
         'media': media,
         'label': label,
         'title': title,
@@ -565,6 +599,7 @@ class InfinityPlayer(xbmc.Player):
         self.cw_key = None
         self.cw_pending = False
         self.cw_last_save = 0.0
+        self.cw_occurrence = None
         self.experience = None
         self.shutdown_checkpoint = None
 
@@ -574,6 +609,7 @@ class InfinityPlayer(xbmc.Player):
             return
         self.cw_item = None
         self.cw_key = None
+        self.cw_occurrence = uuid.uuid4().hex
         if (setting_bool('continue_watching_enabled', True) or setting_bool('source_memory_enabled', True)
                 or setting_str('playback_recovery', 'prompt') != 'off'):
             self.cw_pending = True
@@ -639,6 +675,10 @@ class InfinityPlayer(xbmc.Player):
         item = _continue_identity(_continue_player_item(player_id))
         if not item:
             return
+        if not self.cw_occurrence:
+            self.cw_occurrence = uuid.uuid4().hex
+        item['playback_occurrence'] = self.cw_occurrence
+        item['key'] = hub.compatible_key(hub.load_view(self.profile), item)
         self.cw_item = item
         self.cw_key = item.get('key')
         self.cw_pending = False
@@ -701,7 +741,8 @@ class InfinityPlayer(xbmc.Player):
             changed = watched_entry is not None
             if watched_entry:
                 hub.queue_kodi_sync(data, watched_entry, True)
-        elif position >= 30.0 and duration >= 120.0 and percent >= 1.0:
+        elif (position >= 30.0 and duration >= 120.0 and percent >= 1.0 and
+              not hub.occurrence_completed(data, self.cw_key, self.cw_occurrence)):
             entry = dict(self.cw_item)
             entry.update({
                 'position': round(position, 3),

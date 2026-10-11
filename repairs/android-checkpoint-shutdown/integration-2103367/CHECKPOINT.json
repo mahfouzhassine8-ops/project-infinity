@@ -1,0 +1,68 @@
+{
+  "candidate_apk_produced": false,
+  "completed": [
+    "Truthful installer business/durability outcomes",
+    "Resource-specific, exact restoration proof",
+    "Callback completion retained until verified",
+    "CC19/CC20 idempotent media completion and canonical identity protections",
+    "Coordinated compiled source pins and deterministic update payloads",
+    "Exact 2103366 code preimages and installer-journal recovery support"
+  ],
+  "implementation_parent": "48dc19c221fc41f88f3d52614beef8a877e426d6",
+  "new_workflow_started": false,
+  "physically_tested": false,
+  "previous_saved_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536",
+  "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
+  "recovery": {
+    "build_running": false,
+    "current_blocker": "Remaining integration and full native/Android compilation gates; no physical Fold acceptance.",
+    "local_changes_preserved": true,
+    "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
+  },
+  "recovery_verified_at": "2026-10-11T10:00:31.262633+00:00",
+  "release_locked": false,
+  "remaining": [
+    "Full Android and native compilation",
+    "Additional nested/concurrent/large-install fault coverage",
+    "Guarded context-item ingress",
+    "End-to-end first-visible-card timing coverage",
+    "Health installed-identity conditional application and evidence freshness verification",
+    "Candidate/version/signing/package provenance gates",
+    "Physical Fold acceptance and active native PVR inventory"
+  ],
+  "schema": 1,
+  "state": "implementation_checkpoint_not_release",
+  "tests": {
+    "android_installed_code_exporter_host": {
+      "passed": true
+    },
+    "command_center_19_media_and_checkpoint": {
+      "passed": 24
+    },
+    "command_center_20_media_and_checkpoint": {
+      "passed": 24
+    },
+    "complete_production_job_manager_and_cancellation": {
+      "passed": true
+    },
+    "job_checkpoint_registry": {
+      "bounded_invocations": 10000,
+      "cases": 8,
+      "passed": true,
+      "phase_races": 200
+    },
+    "native_script_classifier_cc20": {
+      "mismatched_missing_unknown_sources_refused": true,
+      "passed": true
+    },
+    "production_filesystem_and_matching_restoration_proof": {
+      "passed": 16
+    },
+    "production_installer_work_download_dependency_install_callback_package_cache": {
+      "external_kodi_peers": "fault_injection_stubs",
+      "filesystem": "real_host_files",
+      "passed": 21,
+      "sqlite": "real_host_engine"
+    }
+  }
+}
