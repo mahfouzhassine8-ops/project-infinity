@@ -1,4 +1,11 @@
 {
+  "build_attempts": [
+    {
+      "result": "Android staging refused missing diagnostic-class CMake registration; corrected before compiler execution.",
+      "run_id": 38132974287,
+      "source_commit": "39d04e479884bc344461c00eeb22e4e6d97c0695"
+    }
+  ],
   "candidate_apk_produced": false,
   "completed": [
     "Truthful installer business/durability outcomes",
@@ -20,7 +27,7 @@
   "implementation_parent": "48dc19c221fc41f88f3d52614beef8a877e426d6",
   "new_workflow_started": false,
   "physically_tested": false,
-  "previous_saved_checkpoint": "1331e615abf12612ae33327275655922f37147f2",
+  "previous_saved_checkpoint": "39d04e479884bc344461c00eeb22e4e6d97c0695",
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
     "build_running": false,
@@ -97,6 +104,9 @@
     "recovered_source_integration_contracts": {
       "passed": 4,
       "protected_authority_exceptions": "Only two exact pre-existing diagnostic hooks; no shutdown authorization changes"
+    },
+    "source_integration_gate": {
+      "passed": 18
     }
   },
   "verified_dependencies": {

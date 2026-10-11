@@ -68,10 +68,6 @@ const std::vector<Contract>& Contracts()
       {"script.infinity.commandcenter/addon.xml", "bf10ce19f0e4f67042cd7aacfb6f2c6fa550438a9db4b1e652f2109c4c5010a7"},
       {"script.infinity.commandcenter/context.py", "1be51567f4022bc76dde6360932fa6e598c8cd16138fe60e0a16bbcfb0132320"},
     }},
-
-
-
-
     {"service.infinity.compat/service.py", "service.infinity.compat", "compat", {
       {"service.infinity.compat/service.py", "bacdf368a8ec77d48ddfa34279e64a445d2f9ae048b1a7bec15eca48d86b7c4d"},
       {"service.infinity.compat/compat_runtime.py", "ba14d7b3e0fb9d3b9f557ebf7d59decc014668a69219543a93d66dd0f4aa6a6e"},
@@ -131,10 +127,6 @@ const std::vector<Contract>& Contracts()
       {"script.infinity.commandcenter/view_mode.py", "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71"},
       {"script.infinity.commandcenter/context.py", "1be51567f4022bc76dde6360932fa6e598c8cd16138fe60e0a16bbcfb0132320"},
     }},
-
-
-
-
     {"service.infinity.compat/runtime_service.py", "service.infinity.compat", "compat", {
       {"service.infinity.compat/addon.xml", "6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720"},
       {"service.infinity.compat/checkpoint_runtime.py", "eb07f7cac8e773b5edc770d853618ca12a21c6279224fcfb04e23801c90077be"},

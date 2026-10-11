@@ -36,6 +36,14 @@ class Contracts(android['AndroidCloseHandoffTests'], native['SourceContracts'], 
             self.assertEqual([e.get('library') for e in context[0].findall('./menu/item')], ['context.py', 'context.py'])
             after.remove(context[0]); self.assertEqual(ET.tostring(before), ET.tostring(after))
 
+    def test_complete_android_source_registration(self):
+        import json, re
+        manifest = json.loads((ROOT / 'runtime/android/manifest.json').read_text())
+        prefix = 'tools/android/packaging/xbmc/src/'
+        actual = {p[len(prefix):].removesuffix('.in') for p in manifest['after'] if p.startswith(prefix) and p.endswith('.java.in')}
+        registered = set(re.findall(r'\bsrc/([\w/]+\.java)\b', (ROOT / 'runtime/android/overlay/cmake/scripts/android/Install.cmake').read_text()))
+        self.assertEqual(actual, registered)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

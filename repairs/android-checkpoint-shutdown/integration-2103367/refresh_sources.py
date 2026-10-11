@@ -77,6 +77,7 @@ def main():
             replacement += '\n' + next(iterator)
         return replacement
     source = re.sub(pattern, replace, source, flags=re.S)
+    source = re.sub(r'(    \}\},\n)\n+', r'\1', source)
     path.write_text(source)
     sys.path.insert(0, str(ROOT))
     import participant_asset
