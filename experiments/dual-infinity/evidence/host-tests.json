@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "experiments/dual-infinity",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "output": "test_absolute_parent_and_symlink_escape_are_rejected (test_source_gate.SourceGateTests.test_absolute_parent_and_symlink_escape_are_rejected) ... ok\ntest_compiled_parent_manifests_and_recovered_native_preimages (test_source_gate.SourceGateTests.test_compiled_parent_manifests_and_recovered_native_preimages) ... ok\ntest_no_overwrite_of_source_or_existing_destination (test_source_gate.SourceGateTests.test_no_overwrite_of_source_or_existing_destination) ... ok\ntest_partial_export_reports_missing_input (test_source_gate.SourceGateTests.test_partial_export_reports_missing_input) ... ok\ntest_recovery_selects_exact_export_and_rejects_wrong_variant (test_source_gate.SourceGateTests.test_recovery_selects_exact_export_and_rejects_wrong_variant) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.127s\n\nOK\n",
+  "test_count": 5,
+  "physical_device_pass": false
+}
