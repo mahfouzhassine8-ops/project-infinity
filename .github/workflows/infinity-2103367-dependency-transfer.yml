@@ -22,6 +22,7 @@ jobs:
             android-tools/xbmc-tarballs
             android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
             ~/.ccache
+            ~/.cache/ccache
           key: infinity-checkpoint-3334-deps-${{ runner.os }}-38112176211
           restore-keys: |
             infinity-checkpoint-3334-deps-${{ runner.os }}-38108460557
@@ -32,7 +33,8 @@ jobs:
           python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
           mkdir -p dependency-transfer
           tar -cf dependency-transfer/verified-android-dependencies.tar android-tools/xbmc-depends android-tools/xbmc-tarballs android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
-          tar -cf dependency-transfer/verified-compiler-cache.tar -C "$HOME" .ccache
+          mkdir -p "$HOME/.cache/ccache"
+          tar -cf dependency-transfer/verified-compiler-cache.tar -C "$HOME" .cache/ccache
           cp android-tools/INFINITY-DEPENDENCIES-COMPLETE.json dependency-transfer/
           cd dependency-transfer
           sha256sum *.tar > SHA256SUMS
