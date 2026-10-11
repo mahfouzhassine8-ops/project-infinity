@@ -145,8 +145,8 @@ def package(args):
                 out.writestr(copy.copy(info),old.read(info.filename))
             for info in compiled.infolist():
                 if info.filename=='AndroidManifest.xml' or DEX.fullmatch(info.filename) or info.filename in replacements:out.writestr(copy.copy(info),compiled.read(info.filename))
-    old_manifest=manifest_tree(run(bt/'aapt','dump','xmltree',args.baseline,'AndroidManifest.xml'))
-    new_manifest=manifest_tree(run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml'))
+    old_manifest=manifest_tree(run(bt/'aapt','dump','xmltree',args.baseline,'AndroidManifest.xml',output=args.out/'green-manifest.txt'))
+    new_manifest=manifest_tree(run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'rollback-manifest.txt'))
     for m in (old_manifest,new_manifest):
         for key in ('android:versionCode','android:versionName'):m['attrs'].pop(key,None)
     require(old_manifest==new_manifest,'Rollback manifest drift beyond version')
