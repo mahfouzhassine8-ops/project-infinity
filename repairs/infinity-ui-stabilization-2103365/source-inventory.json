@@ -1,19 +1,22 @@
 {
-  "schema": 1,
+  "schema": 2,
   "branch": "work/infinity-ui-stabilization-2103365",
   "protected_baseline_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "protected_baseline_branch": "work/infinity-android-close-2103365",
   "backend_branch_observed": "work/infinity-system-stability-2103366",
   "backend_head_observed": "48dc19c221fc41f88f3d52614beef8a877e426d6",
-  "scope": "UI source verification only; no skin/native/script/workflow modifications",
-  "gate": "BLOCKED_INSTALLED_UI_SOURCE_UNVERIFIED",
+  "scope": "Approved source verification and preservation records only; no skin/native/backend edits",
+  "gate": "APPROVED_204_SOURCE_VERIFIED_RUNTIME_ACCEPTANCE_PENDING",
   "audit_sha256": "9423bd68689c65398f741dd9a899c7d1d61b4d0f4237ac8eeed3efd04739198b",
   "diagnostic_zip_sha256": "a28e837362f070d269b177a05e5e3ce9d464982ab9620e6a83c05fad3e8ef434",
-  "reference_package": "skin.infinity.diggz-1.0.5.206-Exact-201-Restore.zip",
-  "reference_package_sha256": "c25315925c5839c8278c164c2a3e66e248f2bac4e29231e759290f46c8146eba",
-  "reference_id": "skin.infinity.diggz",
-  "reference_version": "1.0.5.206",
-  "reference_active_profiles": [
+  "approved_package": "skin.infinity.diggz-1.0.5.204-Closing-Status-Polish-RC1.zip",
+  "approved_package_sha256": "4238c9eaf341d921b319fd421bae5c47e3ed51925bed63033a558ae898787b47",
+  "approved_package_library_id": "libfile_1a44a717f4088191aca605a17505a3dc",
+  "approved_package_library_version": "1",
+  "approved_id": "skin.infinity.diggz",
+  "approved_version": "1.0.5.204",
+  "approved_description": "Infinity 1.0.5.204 Closing Status Polish RC1. Built from locked .201. A clear closing acknowledgment in Infinity Power, without a false percentage or missing-font separators. Pair with APK 2103330. Device acceptance pending.",
+  "approved_active_profiles": [
     {
       "width": "1080",
       "height": "2400",
@@ -22,44 +25,42 @@
       "folder": "unified"
     }
   ],
-  "reference_is_installed_proof": false,
-  "installed_code_diagnostic": {
-    "schema": 1,
-    "captured_epoch_ms": 1791697047574,
-    "read_only": true,
-    "proves_shutdown_or_health": false,
-    "addons": [
-      {
-        "requested_id": "skin.infinity.diggz",
-        "state": "UNVERIFIED"
-      },
-      {
-        "requested_id": "script.kodihealthcenter",
-        "state": "UNVERIFIED"
-      },
-      {
-        "requested_id": "script.infinity.commandcenter",
-        "state": "UNVERIFIED"
-      },
-      {
-        "requested_id": "service.infinity.compat",
-        "state": "UNVERIFIED"
-      },
-      {
-        "requested_id": "plugin.video.seren",
-        "state": "UNVERIFIED"
-      },
-      {
-        "requested_id": "plugin.video.umbrella",
-        "state": "UNVERIFIED"
-      },
-      {
-        "requested_id": "plugin.video.pov",
-        "state": "UNVERIFIED"
-      }
-    ]
+  "user_confirmed_installed_version": "1.0.5.204",
+  "installed_screenshot_library_id": "libfile_6041813b32d08191b0c8fee0a4b65cab",
+  "installed_bytes_independently_exported": false,
+  "source_proof": "Recovered .204 metadata matches the user-confirmed screenshot; protected repository builder reproduces the complete ZIP byte for byte.",
+  "source_builder": "repairs/directory-close-2103330/build_skin204.py",
+  "source_builder_sha256": "d3ce07431c7243714dd9ec2e13eba654877f91d0be2f903098bca37f247a4dc6",
+  "protected_parent_package": "skin.infinity.diggz-1.0.5.201-Complete-Settings-Polish-RC1.zip",
+  "protected_parent_sha256": "c07ac8f44078dae2697a90544ba58ba47523eba766f4986edd15c0414ca611e5",
+  "parent_to_approved_delta": [
+    {
+      "path": "addon.xml",
+      "parent_sha256": "545053b8b05b475a4ab27bded0530d5a75ad16654280cc6ed8ad287c77f4c42e",
+      "approved_sha256": "f20fb9f0325586e2c9cf70d2fe0f2fa6d765e772f14dba0983f501685f66cb28"
+    },
+    {
+      "path": "unified/DialogButtonMenu.xml",
+      "parent_sha256": "245676178d6d750537769f83215cd706a536fbc497568ec0a43c4306bb06caad",
+      "approved_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78"
+    }
+  ],
+  "preservation_requirements": [
+    "Use the complete .204 package as the repair base; never substitute .201 or .206.",
+    "Keep unified/DialogButtonMenu.xml byte identical to .204: closing acknowledgment, property transitions, optional motion and original Close/Force Close routes.",
+    "Future version metadata must describe a repair of .204 and retain skin.infinity.diggz and existing dependency/profile contracts.",
+    "Retain every unmodified .204 file byte for byte; explicitly list and review every authorized UI delta.",
+    "Retain the original .204 ZIP as exact current-source rollback, and .201 as protected parent; reset no settings."
+  ],
+  "protected_204_files": {
+    "unified/DialogButtonMenu.xml": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78"
   },
-  "reference_xml_parse": {
+  "diagnostic_reference": {
+    "package": "skin.infinity.diggz-1.0.5.206-Exact-201-Restore.zip",
+    "sha256": "c25315925c5839c8278c164c2a3e66e248f2bac4e29231e759290f46c8146eba",
+    "authorized_baseline": false
+  },
+  "approved_xml_parse": {
     "passed": 185,
     "errors": []
   },
@@ -67,10 +68,10 @@
     {
       "defect": "U01",
       "screen": "Add-on Information",
-      "reference_path": "unified/DialogAddonInfo.xml",
-      "reference_sha256": "22164264b531a8703565ff59ef244abdd097eed1d4cdadba25ecaced6c1b13a5",
+      "source_path": "unified/DialogAddonInfo.xml",
+      "source_sha256": "22164264b531a8703565ff59ef244abdd097eed1d4cdadba25ecaced6c1b13a5",
       "owner": "Kodi native actions; skin presentation",
-      "repair_target": "Viewport bounds, independent description/action scrolling; preserve native IDs and all install actions.",
+      "repair_target": "Viewport bounds and description/action scrolling; preserve native IDs and all install actions.",
       "existing_actions": [
         {
           "id": "201",
@@ -85,16 +86,16 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U02",
       "screen": "Global context menus",
-      "reference_path": "unified/DialogContextMenu.xml",
-      "reference_sha256": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
+      "source_path": "unified/DialogContextMenu.xml",
+      "source_sha256": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
       "owner": "Kodi CGUIDialogContextMenu",
-      "repair_target": "Preserve 996/999/1000; measure padding, panel placement, clipping and 1/2/10/30 action lists.",
+      "repair_target": "Preserve 996/999/1000; measure padding, placement, clipping and 1/2/10/30 action lists.",
       "existing_actions": [
         {
           "id": null,
@@ -105,14 +106,14 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U03",
       "screen": "Provider source menus",
-      "reference_path": "unified/DialogContextMenu.xml",
-      "reference_sha256": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
+      "source_path": "unified/DialogContextMenu.xml",
+      "source_sha256": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
       "owner": "Shared menu probable; installed provider call site unverified",
       "repair_target": "Confirm actual Umbrella owner; preserve source/debrid actions and third-party entries.",
       "existing_actions": [
@@ -125,16 +126,16 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U04",
       "screen": "Playback resume prompt",
-      "reference_path": "unified/DialogContextMenu.xml",
-      "reference_sha256": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
+      "source_path": "unified/DialogContextMenu.xml",
+      "source_sha256": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
       "owner": "Kodi context menu at matched audit call site; installed alternate provider owner unverified",
-      "repair_target": "Repair shared presentation; retain stored resume position and existing options; heading requires verified data.",
+      "repair_target": "Repair shared presentation; retain stored resume position and options; heading requires verified data.",
       "existing_actions": [
         {
           "id": null,
@@ -145,16 +146,16 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U05",
       "screen": "Navigation drawer",
-      "reference_path": "unified/Custom_1198_InfinityNav.xml",
-      "reference_sha256": "25b60eaca60f927ab364b733604fa1a740d5834922dbfb1e7e71fa24428add0b",
+      "source_path": "unified/Custom_1198_InfinityNav.xml",
+      "source_sha256": "25b60eaca60f927ab364b733604fa1a740d5834922dbfb1e7e71fa24428add0b",
       "owner": "Skin window 1198",
-      "repair_target": "Remove only row 1198107; move 1198503 after UI Theme, before Power 1198304; retain other routes and scrolling.",
+      "repair_target": "Remove only row 1198107; move 1198503 after UI Theme, before Power 1198304; preserve routes and scrolling.",
       "existing_actions": [
         {
           "id": "1198999",
@@ -417,14 +418,14 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U06",
       "screen": "System Hub",
-      "reference_path": "unified/Custom_1191_InfinitySystemHub.xml",
-      "reference_sha256": "8ae078e0ca2e6b65a69ef69f18890d00e38971a977efcebdfdcfc966a56c390d",
+      "source_path": "unified/Custom_1191_InfinitySystemHub.xml",
+      "source_sha256": "8ae078e0ca2e6b65a69ef69f18890d00e38971a977efcebdfdcfc966a56c390d",
       "owner": "Skin window 1191",
       "repair_target": "Remove only Power group/control 1191105; preserve remaining actions and main drawer Power.",
       "existing_actions": [
@@ -501,16 +502,16 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U07",
       "screen": "Health Center",
-      "reference_path": "unified/Custom_1188_InfinityHealthCenter.xml",
-      "reference_sha256": "3b584554cc9222347ff69f69e7fd11e54bc35df3de38f6a23c66363253e9ee87",
+      "source_path": "unified/Custom_1188_InfinityHealthCenter.xml",
+      "source_sha256": "3b584554cc9222347ff69f69e7fd11e54bc35df3de38f6a23c66363253e9ee87",
       "owner": "Skin window 1188; script.kodihealthcenter publishes data",
-      "repair_target": "Reflow header/status/cards/scrolling; retain all action IDs; coordinate authoritative status and freshness.",
+      "repair_target": "Reflow header/status/cards/scrolling; retain all action IDs; coordinate authoritative status/freshness.",
       "existing_actions": [
         {
           "id": "1188199",
@@ -633,16 +634,16 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     },
     {
       "defect": "U08",
       "screen": "Movie-list metadata",
-      "reference_path": "unified/MyVideoNav.xml",
-      "reference_sha256": "45052a31d07ee82a569b2d67b4e200b4f914d1351f1b023385a5e1c7a80ae26a",
+      "source_path": "unified/MyVideoNav.xml",
+      "source_sha256": "45052a31d07ee82a569b2d67b4e200b4f914d1351f1b023385a5e1c7a80ae26a",
       "owner": "Installed active view/include remains unverified",
-      "repair_target": "Resolve active view ID and metadata include before any targeted text geometry change.",
+      "repair_target": "Resolve active view ID and metadata include before targeted text geometry changes.",
       "existing_actions": [
         {
           "id": "4400",
@@ -731,8 +732,8 @@
           ]
         }
       ],
-      "installed_source_verified": false,
-      "repair_status": "pending_source_gate"
+      "approved_source_verified": true,
+      "repair_status": "not_patched"
     }
   ],
   "shared_include_consumers": {
@@ -960,22 +961,58 @@
       }
     ]
   },
-  "reference_health_properties": [
+  "approved_health_properties": [
     "KHC.Baseline",
     "KHC.LastScan",
     "KHC.Status",
     "KHC.StatusDetail",
     "KHC.Version"
   ],
+  "installed_code_diagnostic": {
+    "schema": 1,
+    "captured_epoch_ms": 1791697047574,
+    "read_only": true,
+    "proves_shutdown_or_health": false,
+    "addons": [
+      {
+        "requested_id": "skin.infinity.diggz",
+        "state": "UNVERIFIED"
+      },
+      {
+        "requested_id": "script.kodihealthcenter",
+        "state": "UNVERIFIED"
+      },
+      {
+        "requested_id": "script.infinity.commandcenter",
+        "state": "UNVERIFIED"
+      },
+      {
+        "requested_id": "service.infinity.compat",
+        "state": "UNVERIFIED"
+      },
+      {
+        "requested_id": "plugin.video.seren",
+        "state": "UNVERIFIED"
+      },
+      {
+        "requested_id": "plugin.video.umbrella",
+        "state": "UNVERIFIED"
+      },
+      {
+        "requested_id": "plugin.video.pov",
+        "state": "UNVERIFIED"
+      }
+    ]
+  },
   "integration_requirements": [
-    "Exact installed skin export including addon.xml, active XML/includes/fonts/themes/media; reconcile SHA256 before editing.",
-    "Exact installed Health Center source/publication contract; existing labels do not prove freshness or verified healthy state.",
+    "Compare recovered source hashes with a physical Fold export before final device acceptance; screenshot verifies identity/description, not every installed byte.",
+    "Exact installed Health Center publication contract; existing labels alone do not prove freshness or verified healthy state.",
     "Installed Umbrella/other provider menu entry points before attributing custom dialog ownership.",
     "Verified backend watched identity/state/actions before activating new checkmarks or actions.",
-    "Physical Fold runtime control bounds, touch/focus/Back, provider actions, all postures and theme acceptance.",
-    "Comparable timing/memory observations and 60-120 minute device session; no performance claim from source checks."
+    "Physical Fold runtime bounds, touch/focus/Back, provider actions, all postures and theme acceptance.",
+    "Comparable timing/memory observations and 60\u2013120 minute device session; no performance claim from source checks."
   ],
-  "reference_file_hashes": {
+  "approved_file_hashes": {
     "16x9/AddonBrowser.xml": "e4a748e1a68f279eef2f9d24c31d523f6de1df10c019bd4b94bf5bf6adba07a8",
     "16x9/Custom_1188_InfinityHealthCenter.xml": "15766033e851a3b6f1192049bd5dd5bff3bf99bb7a1ad41791ba9c2d841b2ecf",
     "16x9/Custom_1190_InfinityPalette.xml": "97e5213df867c83e6e5deb025e615f74dd3c56ca8b88a9e34e82c72964dabb5f",
@@ -1376,7 +1413,7 @@
     "Infinity-Skin-Lock.json": "da94b6f14227025211f9ffd0c395320796960dd0a4703512142d194d27ff90cf",
     "LICENSE.txt": "fcfb068bfa16cace5fc68ed0453d2d932ac9f8b1cd598a4125fac759f3d45a2c",
     "README.md": "1c7bcd71028b67443bd695d61838ad7f6267afd0584e5f9088a3b4e29a43ee5e",
-    "addon.xml": "0bde574ac5867d3e2ed72203ac4d65db657e42240feaaaf428213dae71438ab3",
+    "addon.xml": "f20fb9f0325586e2c9cf70d2fe0f2fa6d765e772f14dba0983f501685f66cb28",
     "backgrounds/solidcolors/air-force-blue-.jpg": "9364e44807f21ad83a63f44846a21ac6936f45f97c06105fdb4edff0101f4d99",
     "backgrounds/solidcolors/air-force-dark-blue-.jpg": "77610824e2bc86d9cc2176659b49958d134625062eed7d819a92306bda88849b",
     "backgrounds/solidcolors/alabama-crimson.jpg": "3617dbafecbd50de00b879bc36c5bea976bd901d234259a61d96b7fd5a403717",
@@ -3748,7 +3785,7 @@
     "unified/DialogAddonInfo.xml": "22164264b531a8703565ff59ef244abdd097eed1d4cdadba25ecaced6c1b13a5",
     "unified/DialogAddonSettings.xml": "b569f78c21597ce672444faa710948eb33c34757caf6c500b41a47a138c9e3f2",
     "unified/DialogBusy.xml": "d0194cd4c3ae28e3dc340d3e7a13bc7decec915bdcd960d9a8c90f558501211a",
-    "unified/DialogButtonMenu.xml": "245676178d6d750537769f83215cd706a536fbc497568ec0a43c4306bb06caad",
+    "unified/DialogButtonMenu.xml": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
     "unified/DialogColorPicker.xml": "4f46bb46d3eb2439b901d0fcfc8e9409d172f9e1a65366559274b51624bf5a46",
     "unified/DialogConfirm.xml": "e02241b217835a5c25ac2c5ec84ba25704849161b7e66245e6dca559ed3325b9",
     "unified/DialogContextMenu.xml": "f98a04d980b033d7b8bcc25e15eb4373b6057d7301bf66b994e021e33a36720e",
@@ -3919,9 +3956,13 @@
   },
   "rollback": {
     "repository_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
-    "reference_package_available": true,
-    "installed_rollback_package_available": false,
-    "settings_reset_required": false
+    "current_source_package": "skin.infinity.diggz-1.0.5.204-Closing-Status-Polish-RC1.zip",
+    "current_source_sha256": "4238c9eaf341d921b319fd421bae5c47e3ed51925bed63033a558ae898787b47",
+    "protected_parent_package": "skin.infinity.diggz-1.0.5.201-Complete-Settings-Polish-RC1.zip",
+    "protected_parent_sha256": "c07ac8f44078dae2697a90544ba58ba47523eba766f4986edd15c0414ca611e5",
+    "current_source_available": true,
+    "settings_reset_required": false,
+    "automatic_reversion": false
   },
-  "validation_limits": "Reference XML parsing and source ownership only. No actual UI repair, rendered-after evidence, device testing, native compilation, performance measurement, or release acceptance."
+  "validation_limits": "Approved .204 source and .201 parent verified. No UI repairs, after-rendering, physical interaction tests, native build, performance measurements or candidate promotion yet."
 }

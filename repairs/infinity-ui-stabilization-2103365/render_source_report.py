@@ -1,31 +1,59 @@
 #!/usr/bin/env python3
-"""Render the source verification inventory without claiming UI acceptance."""
+"""Render approved source proof without claiming repaired UI/device acceptance."""
 from pathlib import Path
-import json,html,argparse
+import argparse, html, json
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--inventory',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();d=json.loads(a.inventory.read_text());h=html.escape
- rows=''.join('<tr><td>'+h(o['defect'])+'<br><strong>'+h(o['screen'])+'</strong></td><td><code>'+h(o['reference_path'])+'</code><br>'+h(o['owner'])+'</td><td>'+h(o['repair_target'])+'</td><td>Pending installed source verification</td></tr>' for o in d['owners'])
- hashes=''.join('<tr><td><code>'+h(o['reference_path'])+'</code></td><td><code>'+h(o['reference_sha256'])+'</code></td></tr>' for o in d['owners'])
- dependencies=''.join('<li>'+h(s)+'</li>' for s in d['integration_requirements'])
- actions=next(o for o in d['owners'] if o['defect']=='U07')['existing_actions'];actionrows=''.join('<tr><td>'+h(str(x['id']))+'</td><td>'+h(x['label'] or '')+'</td><td><code>'+h('; '.join(x['onclick']))+'</code></td></tr>' for x in actions)
- text='''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Infinity UI — source verification</title><style>body{font:16px/1.55 system-ui,sans-serif;background:#f4f7fa;color:#172b40;margin:0}main{max-width:1120px;margin:32px auto;padding:32px;background:#fff;border-radius:16px}h1{font-size:30px;margin:0 0 10px}h2{font-size:22px;margin-top:34px}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid #dbe4ed;padding:12px;text-align:left;vertical-align:top}th{background:#eff4f9}code{font-size:12px;overflow-wrap:anywhere}aside{padding:18px;border-left:5px solid #d78c24;background:#fff5e5;margin:22px 0}li{margin:10px 0}.small{color:#52667a;font-size:14px}.scroll{overflow:auto}a{color:#0068b5}@media(max-width:700px){main{margin:0;padding:20px;border-radius:0}table{min-width:680px}}</style><main>
-<h1>Infinity UI — source verification</h1><p class="small">Authorized UI workstream • 11 October 2026 • Isolated preparation; implementation pending source gate.</p>
-<aside><strong>Required installed sources are missing.</strong><p>The diagnostic export explicitly reports <code>skin.infinity.diggz: UNVERIFIED</code>. It contains no active skin XML. The audit labels the available 1.0.5.206 package as a reference, and requires an installed source export before layout edits. This report does not claim repaired screens or a validated skin candidate.</p></aside>
-<h2>Completed preparation</h2><p>Recovered the current Astra audit and seven screenshot references, inspected the diagnostic export, created an isolated branch from the exact protected 2103365 repository commit, and mapped the eight reported UI defects. Parsed all 185 active reference XML files successfully and recorded SHA256 for all 2,940 reference package files.</p>
-<p><strong>Branch:</strong> <a href="https://github.com/mahfouzhassine8-ops/project-infinity/tree/'''+h(d['branch'])+'''">'''+h(d['branch'])+'''</a><br><strong>Protected baseline:</strong> <code>'''+h(d['protected_baseline_commit'])+'''</code><br><strong>Backend branch observed:</strong> <code>'''+h(d['backend_branch_observed'])+'''</code><br><strong>Backend head observed:</strong> <code>'''+h(d['backend_head_observed'])+'''</code></p>
-<p>Prepared changes are limited to inventory/report generators and source records. No skin XML, artwork, Android, native C++, Command Center, Resume Hub, provider, Health Center classification, or build workflow was changed. No engine build or merge was initiated.</p>
-<h2>Actual installed source gate</h2><p>Use <strong>Kodi Health Center → Infinity Skin Export</strong>, then provide the generated ZIP. That action is visible in screenshot 18351 and maps to <code>RunScript(script.kodihealthcenter,skin-export)</code> in the reference. Skin code is sufficient; saved settings and userdata are not needed. A downloaded reference with the same version is not proof of the installed files.</p>
-<p>Once the export is available: verify <code>addon.xml</code> and skin ID, resolve the active layout profile, compare exact XML/includes/fonts/themes/media, record the installed rollback, then apply the approved repairs against those bytes. Current reference profile: <code>unified</code>, 1080 × 2400, aspect 9:20, default enabled. Installed profile remains unverified.</p>
-<h2>Ownership and proposed repair inventory</h2><div class="scroll"><table><tr><th>Defect</th><th>Owner / reference source</th><th>Authorized target</th><th>Status</th></tr>'''+rows+'''</table></div>
-<h2>Existing Health Center actions</h2><p>These are extracted from the reference and must be reconciled with the installed source before editing. They record preservation requirements, not interaction test results.</p><div class="scroll"><table><tr><th>Control ID</th><th>Label</th><th>Binding</th></tr>'''+actionrows+'''</table></div>
-<h2>Theme and adaptive dependencies</h2><p>The reference defines existing InfinityLegacy surface, field, text, secondary, disabled, accent, border and scrim variables. Keep their OLED, light, dark and cinema conditions. Shared dialog include consumers are recorded in the source inventory. The existing native in-place reflow recalculates authored geometry using the live parent bounds; fixed dimensions remain fixed. Preserve the existing visible-partial-row touch patch.</p>
-<p>The context-menu reference combines a percentage background height with a fixed 1100-unit auto-height maximum. This is a strong source lead consistent with the screenshot, not a measurement of the Fold's live control bounds. Actual runtime bounds are still required before calling the cause proven or the repair accepted.</p>
-<h2>Backend integration requirements</h2><ul>'''+dependencies+'''</ul><p>Reference Health bindings: <code>'''+h(', '.join(d['reference_health_properties']))+'''</code>. Separate verified/current/historical/resolved/advisory/unknown/running/failed status and current/saved/baseline times must use the coordinating backend's verified publication contract. Do not invent values or assume these six bindings provide those semantics.</p>
-<h2>Exact reference hashes</h2><p>These SHA256 values identify the audit reference only. They must not be described as installed Fold hashes.</p><div class="scroll"><table><tr><th>Reference source</th><th>SHA256</th></tr>'''+hashes+'''</table></div>
-<p><strong>Audit:</strong> <code>'''+h(d['audit_sha256'])+'''</code><br><strong>Diagnostic ZIP:</strong> <code>'''+h(d['diagnostic_zip_sha256'])+'''</code><br><strong>Reference package:</strong> <code>'''+h(d['reference_package_sha256'])+'''</code></p>
-<h2>Verification and rollback limits</h2><p>Reference XML parsing passed. Installed-byte comparison, actual repairs, before/after rendering, touch/focus/scrolling/Back, provider actions, Fold profiles, long-session behavior, comparable performance measurements and final combined acceptance are pending. No improvement in speed, memory, shutdown or document rendering is claimed.</p>
-<p>The repository rollback is the protected commit above. The recovered 1.0.5.206 package is retained as a reference; it is not yet a verified rollback of the installed skin. An installed export is necessary to establish that rollback without resetting settings.</p>
+ parser=argparse.ArgumentParser();parser.add_argument('--inventory',type=Path,required=True);parser.add_argument('--out',type=Path,required=True)
+ args=parser.parse_args();data=json.loads(args.inventory.read_text());h=html.escape
+ def table(headers,rows):
+  head='<tr>'+''.join('<th>'+h(x)+'</th>' for x in headers)+'</tr>'
+  body=''.join('<tr>'+''.join('<td>'+h(str(x))+'</td>' for x in row)+'</tr>' for row in rows)
+  return '<div class="scroll"><table>'+head+body+'</table></div>'
+ owner_table=table(['Defect','Source owner / active file','Repair target','Status'],[
+  [o['defect']+' — '+o['screen'],o['source_path']+' / '+o['owner'],o['repair_target'],'Source verified; repair pending'] for o in data['owners']])
+ delta_table=table(['.201 → .204 file','Protected parent SHA256','Approved .204 SHA256'],[
+  [x['path'],x['parent_sha256'],x['approved_sha256']] for x in data['parent_to_approved_delta']])
+ hash_table=table(['Approved active source','SHA256'],[[o['source_path'],o['source_sha256']] for o in data['owners']])
+ actions=next(o for o in data['owners'] if o['defect']=='U07')['existing_actions']
+ action_table=table(['Control ID','Label','Binding'],[[x['id'],x['label'] or '', '; '.join(x['onclick'])] for x in actions])
+ preservation=''.join('<li>'+h(x)+'</li>' for x in data['preservation_requirements'])
+ dependencies=''.join('<li>'+h(x)+'</li>' for x in data['integration_requirements'])
+ text=f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Infinity UI — approved .204 source verification</title>
+<style>body{{font:16px/1.55 system-ui,sans-serif;background:#f4f7fa;color:#172b40;margin:0}}main{{max-width:1120px;margin:32px auto;padding:32px;background:#fff;border-radius:16px}}h1{{font-size:30px;margin:0 0 10px}}h2{{font-size:22px;margin-top:34px}}table{{border-collapse:collapse;width:100%;font-size:14px}}th,td{{border-bottom:1px solid #dbe4ed;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}}th{{background:#eff4f9}}code{{font-size:12px;overflow-wrap:anywhere}}aside{{padding:18px;border-left:5px solid #2879b8;background:#eef6ff;margin:22px 0}}li{{margin:10px 0}}.small{{color:#52667a;font-size:14px}}.scroll{{overflow:auto}}a{{color:#0068b5}}@media(max-width:700px){{main{{margin:0;padding:20px;border-radius:0}}table{{min-width:680px}}}}</style><main>
+<h1>Infinity UI — approved .204 source verified</h1>
+<p class="small">Authorized isolated UI workstream • 11 October 2026 • Baseline correction; no UI patches or candidate promotion yet.</p>
+<aside><strong>Implementation baseline: Infinity 1.0.5.204 Closing Status Polish RC1.</strong>
+<p>Recovered <code>{h(data['approved_package'])}</code>. Its skin ID, version and description match the user-confirmed installed screenshot. The protected repository's original .204 builder reproduced the complete ZIP byte for byte. Use these exact .204 sources for repairs.</p>
+<p>The .201 archive is the protected locked parent. The .206 audit package remains diagnostic guidance only. Neither replaces the working .204 UI.</p></aside>
+<h2>Exact source identity</h2>
+<p><strong>Skin ID:</strong> <code>{h(data['approved_id'])}</code><br><strong>Version:</strong> {h(data['approved_version'])}<br><strong>Description:</strong> {h(data['approved_description'])}<br><strong>Active profile:</strong> <code>unified</code> — 1080 × 2400, aspect 9:20, default enabled.<br><strong>Approved ZIP SHA256:</strong> <code>{h(data['approved_package_sha256'])}</code><br><strong>Source builder:</strong> <code>{h(data['source_builder'])}</code></p>
+<p>The screenshot establishes installed identity and description. An independent export of every byte currently on the Fold has not been captured; final device comparison and acceptance remain pending. This limitation does not substitute .206 for the approved recovered .204 source.</p>
+<h2>Preservation proof and requirements</h2>
+<p>All {len(data['approved_file_hashes']):,} approved package files have SHA256 records. All {data['approved_xml_parse']['passed']} active XML files parsed successfully. The complete .201 → .204 comparison found exactly two changed files, with all other entries byte identical:</p>
+{delta_table}
+<p>The Power change adds the existing closing acknowledgment, its property transitions and optional motion while retaining the original actions. Its exact .204 hash is protected. No skin XML has been changed during this preparation, so no approved .204 improvement has been overwritten.</p>
+<ul>{preservation}</ul>
+<h2>Workstream isolation</h2>
+<p><strong>UI branch:</strong> <a href="https://github.com/mahfouzhassine8-ops/project-infinity/tree/{h(data['branch'])}">{h(data['branch'])}</a><br><strong>Protected repository baseline:</strong> <code>{h(data['protected_baseline_commit'])}</code><br><strong>Backend branch observed:</strong> <code>{h(data['backend_branch_observed'])}</code><br><strong>Backend head observed:</strong> <code>{h(data['backend_head_observed'])}</code></p>
+<p>Only source inventory/report generators and preparation records changed. Native C++, Android lifecycle, Command Center, Resume Hub, provider internals, Health Center classification and build workflows remain untouched. No engine build, backend-branch update, merge, skin installation or release lock occurred.</p>
+<h2>Ownership and repair inventory</h2>{owner_table}
+<p>The .204 and .206 packages differ only in addon.xml and the Power dialog. The reported dialog/dashboard/navigation files therefore match at source level, but runtime causes, provider ownership and repair acceptance still require their own evidence.</p>
+<h2>Existing Health Center actions</h2>
+<p>These bindings were read from the approved active .204 XML. They are preservation requirements, not interaction test results.</p>{action_table}
+<h2>Theme, adaptive and backend dependencies</h2>
+<p>Keep existing InfinityLegacy surface, field, text, secondary, disabled, accent, border and scrim variables and OLED/light/dark/cinema conditions. The source inventory records shared include consumers. Preserve existing native in-place reflow and visible-partial-row touch repairs.</p>
+<p>The shared context menu mixes a percentage background height and a fixed 1100-unit auto-height maximum. This remains a source lead consistent with screenshots; it is not a measurement of live Fold bounds. Measure runtime geometry before claiming the root cause or acceptance.</p>
+<ul>{dependencies}</ul>
+<p>Existing Health bindings: <code>{h(', '.join(data['approved_health_properties']))}</code>. Use the coordinating backend's verified contract for status classifications, current/saved scan times and baseline times; do not infer those semantics from labels.</p>
+<h2>Exact active-source hashes</h2>{hash_table}
+<p><strong>Audit SHA256:</strong> <code>{h(data['audit_sha256'])}</code><br><strong>Diagnostic ZIP SHA256:</strong> <code>{h(data['diagnostic_zip_sha256'])}</code></p>
+<h2>Rollback and verification limits</h2>
+<p>Exact current-source rollback: <code>{h(data['approved_package'])}</code>, SHA256 above. Protected parent: <code>{h(data['protected_parent_package'])}</code>, SHA256 <code>{h(data['protected_parent_sha256'])}</code>. Both original archives are retained. Do not automatically revert, downgrade or reset settings.</p>
+<p>{h(data['validation_limits'])} Touch, focus, scrolling, Back, provider actions, all Fold/window profiles, themes and the 60–120 minute mixed session remain untested on the physical device. No speed, memory or native stability improvement is claimed.</p>
 </main></html>'''
- a.out.parent.mkdir(parents=True,exist_ok=True);a.out.write_text(text);print(json.dumps({'report':str(a.out),'bytes':a.out.stat().st_size,'status':'pending_installed_export'}))
-if __name__=='__main__':main()
+ args.out.parent.mkdir(parents=True,exist_ok=True);args.out.write_text(text)
+ print(json.dumps({'report':str(args.out),'bytes':args.out.stat().st_size,'status':data['gate']}))
+
+if __name__=='__main__': main()

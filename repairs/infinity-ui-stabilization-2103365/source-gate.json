@@ -1,19 +1,22 @@
 {
-  "schema": 1,
+  "schema": 2,
   "branch": "work/infinity-ui-stabilization-2103365",
   "protected_baseline_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "protected_baseline_branch": "work/infinity-android-close-2103365",
   "backend_branch_observed": "work/infinity-system-stability-2103366",
   "backend_head_observed": "48dc19c221fc41f88f3d52614beef8a877e426d6",
-  "scope": "UI source verification only; no skin/native/script/workflow modifications",
-  "gate": "BLOCKED_INSTALLED_UI_SOURCE_UNVERIFIED",
+  "scope": "Approved source verification and preservation records only; no skin/native/backend edits",
+  "gate": "APPROVED_204_SOURCE_VERIFIED_RUNTIME_ACCEPTANCE_PENDING",
   "audit_sha256": "9423bd68689c65398f741dd9a899c7d1d61b4d0f4237ac8eeed3efd04739198b",
   "diagnostic_zip_sha256": "a28e837362f070d269b177a05e5e3ce9d464982ab9620e6a83c05fad3e8ef434",
-  "reference_package": "skin.infinity.diggz-1.0.5.206-Exact-201-Restore.zip",
-  "reference_package_sha256": "c25315925c5839c8278c164c2a3e66e248f2bac4e29231e759290f46c8146eba",
-  "reference_id": "skin.infinity.diggz",
-  "reference_version": "1.0.5.206",
-  "reference_active_profiles": [
+  "approved_package": "skin.infinity.diggz-1.0.5.204-Closing-Status-Polish-RC1.zip",
+  "approved_package_sha256": "4238c9eaf341d921b319fd421bae5c47e3ed51925bed63033a558ae898787b47",
+  "approved_package_library_id": "libfile_1a44a717f4088191aca605a17505a3dc",
+  "approved_package_library_version": "1",
+  "approved_id": "skin.infinity.diggz",
+  "approved_version": "1.0.5.204",
+  "approved_description": "Infinity 1.0.5.204 Closing Status Polish RC1. Built from locked .201. A clear closing acknowledgment in Infinity Power, without a false percentage or missing-font separators. Pair with APK 2103330. Device acceptance pending.",
+  "approved_active_profiles": [
     {
       "width": "1080",
       "height": "2400",
@@ -22,12 +25,46 @@
       "folder": "unified"
     }
   ],
-  "reference_is_installed_proof": false,
-  "reference_xml_parse": {
+  "user_confirmed_installed_version": "1.0.5.204",
+  "installed_screenshot_library_id": "libfile_6041813b32d08191b0c8fee0a4b65cab",
+  "installed_bytes_independently_exported": false,
+  "source_proof": "Recovered .204 metadata matches the user-confirmed screenshot; protected repository builder reproduces the complete ZIP byte for byte.",
+  "source_builder": "repairs/directory-close-2103330/build_skin204.py",
+  "source_builder_sha256": "d3ce07431c7243714dd9ec2e13eba654877f91d0be2f903098bca37f247a4dc6",
+  "protected_parent_package": "skin.infinity.diggz-1.0.5.201-Complete-Settings-Polish-RC1.zip",
+  "protected_parent_sha256": "c07ac8f44078dae2697a90544ba58ba47523eba766f4986edd15c0414ca611e5",
+  "parent_to_approved_delta": [
+    {
+      "path": "addon.xml",
+      "parent_sha256": "545053b8b05b475a4ab27bded0530d5a75ad16654280cc6ed8ad287c77f4c42e",
+      "approved_sha256": "f20fb9f0325586e2c9cf70d2fe0f2fa6d765e772f14dba0983f501685f66cb28"
+    },
+    {
+      "path": "unified/DialogButtonMenu.xml",
+      "parent_sha256": "245676178d6d750537769f83215cd706a536fbc497568ec0a43c4306bb06caad",
+      "approved_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78"
+    }
+  ],
+  "preservation_requirements": [
+    "Use the complete .204 package as the repair base; never substitute .201 or .206.",
+    "Keep unified/DialogButtonMenu.xml byte identical to .204: closing acknowledgment, property transitions, optional motion and original Close/Force Close routes.",
+    "Future version metadata must describe a repair of .204 and retain skin.infinity.diggz and existing dependency/profile contracts.",
+    "Retain every unmodified .204 file byte for byte; explicitly list and review every authorized UI delta.",
+    "Retain the original .204 ZIP as exact current-source rollback, and .201 as protected parent; reset no settings."
+  ],
+  "protected_204_files": {
+    "unified/DialogButtonMenu.xml": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78"
+  },
+  "diagnostic_reference": {
+    "package": "skin.infinity.diggz-1.0.5.206-Exact-201-Restore.zip",
+    "sha256": "c25315925c5839c8278c164c2a3e66e248f2bac4e29231e759290f46c8146eba",
+    "authorized_baseline": false
+  },
+  "approved_xml_parse": {
     "passed": 185,
     "errors": []
   },
-  "reference_health_properties": [
+  "approved_health_properties": [
     "KHC.Baseline",
     "KHC.LastScan",
     "KHC.Status",
@@ -35,19 +72,22 @@
     "KHC.Version"
   ],
   "integration_requirements": [
-    "Exact installed skin export including addon.xml, active XML/includes/fonts/themes/media; reconcile SHA256 before editing.",
-    "Exact installed Health Center source/publication contract; existing labels do not prove freshness or verified healthy state.",
+    "Compare recovered source hashes with a physical Fold export before final device acceptance; screenshot verifies identity/description, not every installed byte.",
+    "Exact installed Health Center publication contract; existing labels alone do not prove freshness or verified healthy state.",
     "Installed Umbrella/other provider menu entry points before attributing custom dialog ownership.",
     "Verified backend watched identity/state/actions before activating new checkmarks or actions.",
-    "Physical Fold runtime control bounds, touch/focus/Back, provider actions, all postures and theme acceptance.",
-    "Comparable timing/memory observations and 60-120 minute device session; no performance claim from source checks."
+    "Physical Fold runtime bounds, touch/focus/Back, provider actions, all postures and theme acceptance.",
+    "Comparable timing/memory observations and 60\u2013120 minute device session; no performance claim from source checks."
   ],
   "rollback": {
     "repository_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
-    "reference_package_available": true,
-    "installed_rollback_package_available": false,
-    "settings_reset_required": false
+    "current_source_package": "skin.infinity.diggz-1.0.5.204-Closing-Status-Polish-RC1.zip",
+    "current_source_sha256": "4238c9eaf341d921b319fd421bae5c47e3ed51925bed63033a558ae898787b47",
+    "protected_parent_package": "skin.infinity.diggz-1.0.5.201-Complete-Settings-Polish-RC1.zip",
+    "protected_parent_sha256": "c07ac8f44078dae2697a90544ba58ba47523eba766f4986edd15c0414ca611e5",
+    "current_source_available": true,
+    "settings_reset_required": false,
+    "automatic_reversion": false
   },
-  "validation_limits": "Reference XML parsing and source ownership only. No actual UI repair, rendered-after evidence, device testing, native compilation, performance measurement, or release acceptance.",
-  "required_source_export": "Kodi Health Center > Infinity Skin Export: export the installed skin package. Code-only is sufficient; saved settings/userdata are not required. Exact Health/provider code exports may be needed for their contracts."
+  "validation_limits": "Approved .204 source and .201 parent verified. No UI repairs, after-rendering, physical interaction tests, native build, performance measurements or candidate promotion yet."
 }
