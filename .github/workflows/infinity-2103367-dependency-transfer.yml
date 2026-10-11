@@ -1,0 +1,42 @@
+name: Infinity | Transfer verified compiler dependencies for 2103367
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/infinity-system-stability-2103366]
+    paths: ['.github/workflows/infinity-2103367-dependency-transfer.yml']
+permissions: {contents: read}
+jobs:
+  transfer:
+    if: github.ref == 'refs/heads/work/infinity-system-stability-2103366'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
+            ~/.ccache
+          key: infinity-checkpoint-3334-deps-${{ runner.os }}-38112176211
+          restore-keys: |
+            infinity-checkpoint-3334-deps-${{ runner.os }}-38108460557
+            infinity-checkpoint-3334-deps-${{ runner.os }}-
+      - name: Verify completed dependency identity and retain exact tree
+        run: |
+          set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          mkdir -p dependency-transfer
+          tar -cf dependency-transfer/verified-android-dependencies.tar android-tools/xbmc-depends android-tools/xbmc-tarballs android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
+          tar -cf dependency-transfer/verified-compiler-cache.tar -C "$HOME" .ccache
+          cp android-tools/INFINITY-DEPENDENCIES-COMPLETE.json dependency-transfer/
+          cd dependency-transfer
+          sha256sum *.tar > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          path: dependency-transfer/
+          compression-level: 1
+          retention-days: 30
+          if-no-files-found: error
