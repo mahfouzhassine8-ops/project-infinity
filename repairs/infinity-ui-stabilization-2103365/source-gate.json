@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "branch": "work/infinity-ui-stabilization-2103365",
+  "protected_baseline_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
+  "protected_baseline_branch": "work/infinity-android-close-2103365",
+  "backend_branch_observed": "work/infinity-system-stability-2103366",
+  "backend_head_observed": "48dc19c221fc41f88f3d52614beef8a877e426d6",
+  "scope": "UI source verification only; no skin/native/script/workflow modifications",
+  "gate": "BLOCKED_INSTALLED_UI_SOURCE_UNVERIFIED",
+  "audit_sha256": "9423bd68689c65398f741dd9a899c7d1d61b4d0f4237ac8eeed3efd04739198b",
+  "diagnostic_zip_sha256": "a28e837362f070d269b177a05e5e3ce9d464982ab9620e6a83c05fad3e8ef434",
+  "reference_package": "skin.infinity.diggz-1.0.5.206-Exact-201-Restore.zip",
+  "reference_package_sha256": "c25315925c5839c8278c164c2a3e66e248f2bac4e29231e759290f46c8146eba",
+  "reference_id": "skin.infinity.diggz",
+  "reference_version": "1.0.5.206",
+  "reference_active_profiles": [
+    {
+      "width": "1080",
+      "height": "2400",
+      "aspect": "9:20",
+      "default": "true",
+      "folder": "unified"
+    }
+  ],
+  "reference_is_installed_proof": false,
+  "reference_xml_parse": {
+    "passed": 185,
+    "errors": []
+  },
+  "reference_health_properties": [
+    "KHC.Baseline",
+    "KHC.LastScan",
+    "KHC.Status",
+    "KHC.StatusDetail",
+    "KHC.Version"
+  ],
+  "integration_requirements": [
+    "Exact installed skin export including addon.xml, active XML/includes/fonts/themes/media; reconcile SHA256 before editing.",
+    "Exact installed Health Center source/publication contract; existing labels do not prove freshness or verified healthy state.",
+    "Installed Umbrella/other provider menu entry points before attributing custom dialog ownership.",
+    "Verified backend watched identity/state/actions before activating new checkmarks or actions.",
+    "Physical Fold runtime control bounds, touch/focus/Back, provider actions, all postures and theme acceptance.",
+    "Comparable timing/memory observations and 60-120 minute device session; no performance claim from source checks."
+  ],
+  "rollback": {
+    "repository_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
+    "reference_package_available": true,
+    "installed_rollback_package_available": false,
+    "settings_reset_required": false
+  },
+  "validation_limits": "Reference XML parsing and source ownership only. No actual UI repair, rendered-after evidence, device testing, native compilation, performance measurement, or release acceptance.",
+  "required_source_export": "Kodi Health Center > Infinity Skin Export: export the installed skin package. Code-only is sufficient; saved settings/userdata are not required. Exact Health/provider code exports may be needed for their contracts."
+}
