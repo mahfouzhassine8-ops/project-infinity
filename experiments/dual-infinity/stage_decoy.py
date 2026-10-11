@@ -49,7 +49,9 @@ def manifest(text):
     app.set(ANDROID + 'name', NAMESPACE + '.InfinityDecoyApplication')
     app.set(ANDROID + 'label', 'Infinity Experimental')
     app.set(ANDROID + 'allowBackup', 'false')
-    app.set(ANDROID + 'debuggable', 'false')
+    # Keep the parent's release buildTypes authoritative for debuggability.
+    # Hardcoding this in the manifest fails the inherited Android lint gate.
+    app.attrib.pop(ANDROID + 'debuggable', None)
     # The G0 probe uses app-managed data and content grants, not all-files access.
     excluded = {'android.permission.MANAGE_EXTERNAL_STORAGE',
                 'android.permission.WRITE_EXTERNAL_STORAGE',

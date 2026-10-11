@@ -59,6 +59,7 @@ jobs:
           KODI_ANDROID_KEY_PASSWORD: android
           KODI_ANDROID_STORE_PASSWORD: android
         run: |
+          set -euo pipefail
           export KODI_ANDROID_STORE_FILE="$GITHUB_WORKSPACE/compile-only-signing/compile.keystore"
           ./decoy-shell-build/gradlew --no-daemon --console=plain -p decoy-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee decoy-shell-evidence/compile.log
           python3 experiments/dual-infinity/verify_decoy_donor.py --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --donor decoy-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk --build-tools "$ANDROID_HOME/build-tools/34.0.0" --output decoy-shell-evidence
