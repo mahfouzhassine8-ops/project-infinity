@@ -22,7 +22,6 @@ jobs:
             android-tools/xbmc-tarballs
             android-tools/INFINITY-DEPENDENCIES-COMPLETE.json
             ~/.ccache
-            ~/.cache/ccache
           key: infinity-checkpoint-3334-deps-${{ runner.os }}-38112176211
           restore-keys: |
             infinity-checkpoint-3334-deps-${{ runner.os }}-38108460557
