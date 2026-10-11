@@ -5,6 +5,9 @@ on:
     branches: [work/infinity-system-stability-2103366]
     paths: ['.github/workflows/infinity-2103367-dependency-transfer.yml']
 permissions: {contents: read}
+env:
+  NDK_VER: 21.4.7075529
+  DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
 jobs:
   transfer:
     if: github.ref == 'refs/heads/work/infinity-system-stability-2103366'
