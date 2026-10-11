@@ -1,4 +1,19 @@
 {
+  "artifact": {
+    "android_validation_run": 38133236811,
+    "file": "Infinity-2103367-Recovery-Integration-RC1.apk",
+    "native_packaged_sha256": "fbc7cfa8e92d9477ccbe9e1c045d13eb9cda41da9a243ffc51e11daaa6e662f6",
+    "native_source_commit": "e16b62c668871860015c15af9e0c020637a0f328",
+    "native_source_manifest_sha256": "f3fa4fc1bb2335090d13a2dc710c188538025044ee5606647e887a2699f22e79",
+    "native_unstripped_sha256": "9f0872b87c7eaace1c6a259df05b561442aa6d12c5856e7ee1e12cf593066ffd",
+    "native_validation_run": 38133883015,
+    "protected_baseline_sha256": "251851c1a97eac0430632aa7f74cde45d306bbbda1094629dfb26820412baa72",
+    "protected_entries_byte_identical": 4169,
+    "sha256": "271afd764c64b6677fac6a58f3338181e7b7f23a97e77703425acf4485d491bc",
+    "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "size": 159257399,
+    "source_commit": "e16b62c668871860015c15af9e0c020637a0f328"
+  },
   "build_attempts": [
     {
       "result": "Android staging refused missing diagnostic-class CMake registration; corrected before compiler execution.",
@@ -12,7 +27,7 @@
     }
   ],
   "build_run_id": 38133883015,
-  "candidate_apk_produced": false,
+  "candidate_apk_produced": true,
   "completed": [
     "Truthful installer business/durability outcomes",
     "Resource-specific, exact restoration proof",
@@ -37,22 +52,21 @@
   "previous_saved_checkpoint": "e16b62c668871860015c15af9e0c020637a0f328",
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
-    "build_running": true,
-    "current_blocker": "Native compiler, permanent signing and exact final artifact verification are running or pending.",
-    "last_completed_step": "Complete native protected-source and persistence preparation gates passed in run 38133883015. Exact-input Android reuse already succeeded.",
+    "build_running": false,
+    "current_blocker": "Physical Fold acceptance and active native PVR inventory remain unverified; no implementation/build blocker remains.",
+    "last_completed_step": "Run 38133883015 is green: native compilation, exact Android reuse, permanent signing and protected APK verification passed. Downloaded APK and all compilation associations verified.",
     "local_changes_preserved": true,
-    "next_step": "Retain the compiled native image, sign the matched APK, and verify final preservation and provenance.",
+    "next_step": "Deliver the retained signed candidate and evidence; execute the physical acceptance matrix before release lock.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T11:05:11.210088+00:00",
+  "recovery_verified_at": "2026-10-11T11:27:51.992950+00:00",
   "release_locked": false,
   "remaining": [
-    "Native gates and full native compilation",
-    "Signed APK and exact compiled provenance verification",
-    "Physical Fold acceptance and active native PVR inventory"
+    "Physical Fold acceptance, repeated close/reopen and measured visible-card timing",
+    "Exact active native PVR inventory and any required client-specific coverage"
   ],
   "schema": 1,
-  "state": "native_compilation_running_android_reused",
+  "state": "signed_candidate_verified_physical_acceptance_pending",
   "tests": {
     "actual_java_receipt_mirror": {
       "passed": true
@@ -100,6 +114,12 @@
     "context_ingress_20": {
       "passed": 22
     },
+    "full_native_compilation": {
+      "engine_tag": "infinity-checkpoint-recovery-integration-2103367-v1",
+      "passed": true,
+      "run_id": 38133883015,
+      "source_commit": "e16b62c668871860015c15af9e0c020637a0f328"
+    },
     "full_native_preparation": {
       "native_manifest_sha256": "f3fa4fc1bb2335090d13a2dc710c188538025044ee5606647e887a2699f22e79",
       "passed": true,
@@ -126,6 +146,9 @@
       "passed": true,
       "phase_races": 200
     },
+    "local_artifact_transfer_and_compilation_associations": {
+      "passed": true
+    },
     "native_render_presentation_timing": {
       "passed": true
     },
@@ -148,6 +171,14 @@
     "recovered_source_integration_contracts": {
       "passed": 4,
       "protected_authority_exceptions": "Only two exact pre-existing diagnostic hooks; no shutdown authorization changes"
+    },
+    "signed_packaging_and_protected_payload": {
+      "health_center_payload_unchanged": true,
+      "jni_unchanged": true,
+      "passed": true,
+      "protected_entries_byte_identical": 4169,
+      "run_id": 38133883015,
+      "skin_payload_unchanged": true
     },
     "source_integration_gate": {
       "passed": 18
