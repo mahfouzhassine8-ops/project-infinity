@@ -132,6 +132,7 @@ jobs:
             ~/.ccache
           key: infinity-checkpoint-3334-deps-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
+            infinity-checkpoint-3334-deps-${{ runner.os }}-38108460557
             infinity-checkpoint-3334-deps-${{ runner.os }}-38095227571
             infinity-checkpoint-3334-deps-${{ runner.os }}-38086419225
             infinity-checkpoint-3334-deps-${{ runner.os }}-38077503263
@@ -139,7 +140,6 @@ jobs:
             infinity-checkpoint-3334-deps-${{ runner.os }}-37924572074
             infinity-checkpoint-3334-deps-${{ runner.os }}-37912556867
             infinity-checkpoint-3334-deps-${{ runner.os }}-37903323079
-            infinity-checkpoint-3334-deps-${{ runner.os }}-37893896767
             infinity-checkpoint-3334-deps-${{ runner.os }}-
       - name: Reconstruct protected lineage and run source and persistence gates
         run: |
@@ -152,11 +152,11 @@ jobs:
       - name: Compile reviewed native runtime integration
         run: |
           set -euo pipefail
-          if python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies; then
-            python3 repairs/android-checkpoint-shutdown/native_ci.py compile --completed-cache 2>&1 | tee checkpoint-build/compile.log
-          else
-            python3 repairs/android-checkpoint-shutdown/native_ci.py compile 2>&1 | tee checkpoint-build/compile.log
-          fi
+          # The predecessor on this same work branch must publish completed proof.
+          # A missing/mismatched cache stops here instead of duplicating the full
+          # dependency build or accepting an incomplete dependency tree.
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          python3 repairs/android-checkpoint-shutdown/native_ci.py compile --completed-cache 2>&1 | tee checkpoint-build/compile.log
       - name: Preserve dependencies for subsequent work-branch builds
         uses: actions/cache/save@v4
         if: always() && !cancelled()
@@ -283,12 +283,12 @@ jobs:
           set -euo pipefail
           python3 tools/checkpoint-apk/package.py package --source source/shell-kodi --base base/Infinity-2103335-Native-Trace-Bridge-RC1.apk --build shell --out evidence --engine engine
       - name: Verify exact protected 2103365 payload and reviewed integration delta
-        run: python3 tools/checkpoint-apk/verify_2103365.py --baseline installed-baseline/Infinity-2103365-Android-Close-RC1.apk --candidate evidence/Infinity-2103366-System-Stability-RC1.apk --report evidence/GREEN-2103365-SYSTEM-STABILITY.json
+        run: python3 tools/checkpoint-apk/verify_2103365.py --baseline installed-baseline/Infinity-2103365-Android-Close-RC1.apk --candidate evidence/Infinity-2103366-System-Stability-RC2.apk --report evidence/GREEN-2103365-SYSTEM-STABILITY.json
       - uses: actions/upload-artifact@v7
         if: success()
         with:
-          name: Infinity-2103366-System-Stability-RC1-APK
-          path: evidence/Infinity-2103366-System-Stability-RC1.apk
+          name: Infinity-2103366-System-Stability-RC2-APK
+          path: evidence/Infinity-2103366-System-Stability-RC2.apk
           compression-level: 0
           retention-days: 90
           if-no-files-found: error
