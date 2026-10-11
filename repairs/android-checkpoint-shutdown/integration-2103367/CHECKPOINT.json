@@ -4,6 +4,11 @@
       "result": "Android staging refused missing diagnostic-class CMake registration; corrected before compiler execution.",
       "run_id": 38132974287,
       "source_commit": "39d04e479884bc344461c00eeb22e4e6d97c0695"
+    },
+    {
+      "result": "Android compilation and all 14 exporter regressions succeeded. Native stopped before compile on obsolete canonical-identity RPC fixture; fixture corrected. Successful Android artifacts retained for exact-input reuse.",
+      "run_id": 38133236811,
+      "source_commit": "b00a1850233362c506f239ba0c08bd9c085b3f3d"
     }
   ],
   "build_run_id": 38133236811,
@@ -32,14 +37,14 @@
   "previous_saved_checkpoint": "39d04e479884bc344461c00eeb22e4e6d97c0695",
   "protected_commit": "faf41ee1d35fe55140bb1e193089643cc9ac06ee",
   "recovery": {
-    "build_running": true,
-    "current_blocker": "Combined compilation, permanent signing, exact APK/provenance verification and physical Fold acceptance remain pending.",
-    "last_completed_step": "Implementation and 18 source-registration/preservation gates saved at b00a185. Android compilation and protected native preparation are active in run 38133236811.",
+    "build_running": false,
+    "current_blocker": "Native validation and compilation, signed packaging and artifact verification pending.",
+    "last_completed_step": "Successful complete Android compilation, 14 exporter tests, unchanged compiled Android inputs; updated RPC ordering and positive catalogue fixtures pass.",
     "local_changes_preserved": true,
-    "next_step": "Finish combined compiler run and package/verify the signed candidate.",
+    "next_step": "Reuse successful Android checkpoint; resume corrected native gates and native compiler.",
     "prior_remote_checkpoint": "2337f541263b6fd1b2598ed128c76306a940d536"
   },
-  "recovery_verified_at": "2026-10-11T10:42:03.933293+00:00",
+  "recovery_verified_at": "2026-10-11T10:57:58.237449+00:00",
   "release_locked": false,
   "remaining": [
     "Full Android and native compilation",
@@ -47,7 +52,7 @@
     "Physical Fold acceptance and active native PVR inventory"
   ],
   "schema": 1,
-  "state": "combined_compilation_running",
+  "state": "native_gate_fixture_corrected_ready_to_resume",
   "tests": {
     "actual_java_receipt_mirror": {
       "passed": true
@@ -60,11 +65,25 @@
       "passed": true,
       "wire_cases": 19
     },
+    "canonical_rpc_ordering": {
+      "passed": true,
+      "versions": [
+        "0.3.5.19",
+        "0.3.5.20"
+      ]
+    },
     "command_center_19_media_and_checkpoint": {
       "passed": 24
     },
     "command_center_20_media_and_checkpoint": {
       "passed": 24
+    },
+    "complete_android_compilation": {
+      "exporter_tests_passed": 14,
+      "passed": true,
+      "reused_without_recompile": true,
+      "run_id": 38133236811,
+      "source_commit": "b00a1850233362c506f239ba0c08bd9c085b3f3d"
     },
     "complete_production_job_manager_and_cancellation": {
       "passed": true
@@ -77,6 +96,16 @@
     },
     "health_mirror_freshness": {
       "passed": 4
+    },
+    "inherited_resume_preservation": {
+      "passed": 14
+    },
+    "inherited_resume_repair": {
+      "passed_per_version": 25,
+      "versions": [
+        "0.3.5.19",
+        "0.3.5.20"
+      ]
     },
     "job_checkpoint_registry": {
       "bounded_invocations": 10000,

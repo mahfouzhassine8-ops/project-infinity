@@ -38,8 +38,7 @@ def main():
         with sqlite3.connect(database) as connection:
             connection.execute("CREATE TABLE watched (playcount INTEGER NOT NULL)")
             connection.execute("INSERT INTO watched VALUES(1)")
-        entry = {"key": fixture.KEY, "media": "movie", "dbid": 42,
-                 "title": "Movie", "duration": 900.0, "position": 417.125}
+        entry = dict(case.player.cw_item, duration=900.0, position=417.125)
         with fixture.common.persistence_scope():
             data = {"schema": 2, "items": {fixture.KEY: entry}}
             fixture.hub.queue_kodi_sync(data, entry, False)
@@ -66,7 +65,9 @@ def main():
             with sqlite3.connect(database, timeout=2) as connection:
                 count = connection.execute("SELECT playcount FROM watched").fetchone()[0]
             key = "episodedetails" if method.endswith("EpisodeDetails") else "moviedetails"
-            return json.dumps({"result": {key: {"playcount": count}}})
+            field = "episodeid" if key == "episodedetails" else "movieid"
+            return json.dumps({"result": {key: {field: request["params"][field],
+                "uniqueid": {"tmdb": "123"}, "playcount": count}}})
 
         def old_client():
             actual_pid = os.getpid()
@@ -139,7 +140,7 @@ def main():
     case = fixture.RuntimeTests()
     case.setUp()
     try:
-        entry = {"key": fixture.KEY, "media": "movie", "dbid": 42, "title": "Movie"}
+        entry = dict(case.player.cw_item)
         with fixture.common.persistence_scope():
             data = {"schema": 2, "items": {fixture.KEY: entry}}
             fixture.hub.queue_kodi_sync(data, entry, True)
@@ -147,7 +148,8 @@ def main():
         def failed_write(raw):
             method = json.loads(raw)["method"]
             return json.dumps({"result": "OK"} if method.startswith("VideoLibrary.Set") else
-                              {"result": {"moviedetails": {"playcount": 0}}})
+                              {"result": {"moviedetails": {"movieid": 42,
+                                  "uniqueid": {"tmdb": "123"}, "playcount": 0}}})
         fixture.xbmc.executeJSONRPC = failed_write
         assert fixture.hub.flush_kodi_sync(case.profile) is False
         assert fixture.hub.load(case.profile)["pending_kodi_sync"]

@@ -26,6 +26,10 @@ class ResumeRepairTests(f['RuntimeTests']):
                      source='https://private.invalid/expiring', position=897, duration=900,
                      percentage=99, poster='old-episode.jpg', fanart='old-episode-bg.jpg',
                      watched_at=1234, updated=1234)
+        s, e = hub.episode_number(season), hub.episode_number(episode)
+        if s >= 0 and e >= 0:
+            entry['verified_next'] = dict(verified=True, after=[s, e],
+                show_tmdb='123', season=s, episode=e + 1)
         return dict(watched={KEY: entry}, items={}, sources={KEY: {'route': entry['stable_source']}})
 
     def test_next_resolves_new_episode_never_inherits_old_source(self):
@@ -106,14 +110,15 @@ class ResumeRepairTests(f['RuntimeTests']):
                     title='Old episode', uniqueid={'tmdb': '999'}, file='plugin://provider/episode')
         replies = [dict(result=dict(episodedetails=dict(episodeid=42, season=1, episode=2,
                     showtitle='Example', tvshowid=7))),
-                   dict(result=dict(tvshowdetails=dict(tvshowid=7, title='Example', uniqueid={'tmdb':'123', 'tvdb':'456'})))]
+                   dict(result=dict(tvshowdetails=dict(tvshowid=7, title='Example', uniqueid={'tmdb':'123', 'tvdb':'456'}))),
+                   dict(result=dict(episodes=[dict(season=1,episode=2),dict(season=1,episode=3)],limits=dict(total=2)))]
         with mock.patch.object(service, 'jsonrpc', side_effect=replies) as rpc, mock.patch.object(service.xbmc,'getCondVisibility',return_value=True):
             entry = service._continue_identity(item)
         self.assertEqual(entry['tmdb'], '999')  # Old episode/key/source remain unchanged.
         self.assertEqual(entry['show_tmdb'], '123')
         self.assertTrue(entry['show_ids_verified'])
         self.assertEqual([c.args[0] for c in rpc.call_args_list],
-                         ['VideoLibrary.GetEpisodeDetails', 'VideoLibrary.GetTVShowDetails'])
+                         ['VideoLibrary.GetEpisodeDetails', 'VideoLibrary.GetTVShowDetails', 'VideoLibrary.GetEpisodes'])
         data = dict(watched={entry['key']:entry}, items={})
         candidate = hub.next_episodes(data)[0]
         with mock.patch.object(plugin, '_has_addon', return_value=True), mock.patch.object(plugin.xbmc, 'executeJSONRPC', side_effect=AssertionError('RPC during listing')):
@@ -130,7 +135,9 @@ class ResumeRepairTests(f['RuntimeTests']):
         for field in ('show_tmdb', 'show_tvdb', 'show_ids_verified'):
             entry.pop(field)
         original = copy.deepcopy(data)
-        candidate = hub.next_episodes(data)[0]
+        self.assertEqual(hub.next_episodes(data), [])
+        candidate = dict(media='tv', season=1, episode=3, synthetic_next=True,
+                         next_verified=True, tmdb='', show_ids_verified=False)
         with mock.patch.object(plugin, '_has_addon', return_value=True):
             self.assertEqual(plugin._target(candidate), '')
             # A caller carrying an old ID or a forged/mismatched scope fails safely.
@@ -165,7 +172,7 @@ class ResumeRepairTests(f['RuntimeTests']):
                          ('episode',True,1,2,'Example'), ('episode',42,1,2,'Example'), ('episode',42,1,2,''), ('episode',42,-1,2,'Example')):
                 self.assertEqual(service._continue_show_identity(*args),{})
             self.assertNotIn('show_tmdb',service._continue_identity(dict(type='movie',title='Movie',uniqueid={'tmdb':'12'})))
-            self.assertNotIn('show_tmdb',service._continue_identity(dict(type='episode',id=True,showtitle='Example',season=1,episode=2)))
+            self.assertIsNone(service._continue_identity(dict(type='episode',id=True,showtitle='Example',season=1,episode=2)))
         data=self.completed()
         with mock.patch.object(plugin.xbmc,'executeJSONRPC',side_effect=AssertionError('RPC during list')), mock.patch.object(plugin,'_has_addon',return_value=True):
             candidate=hub.next_episodes(data)[0]
