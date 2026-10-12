@@ -209,12 +209,12 @@ bool CGUIDialogFileBrowser::OnMessage(CGUIMessage& message)
           OnMessage(msg);
         }
       }
-      else if (message.GetSenderId() == INFINITY::FILEPREVIEW::PREVIEW_CONTROL)
+      else if (message.GetSenderId() == KODI::FILEPREVIEW::PREVIEW_CONTROL)
       {
         OpenInfinityFilePreview(m_viewControl.GetSelectedItem());
         return true;
       }
-      else if (message.GetSenderId() == INFINITY::FILEPREVIEW::CONFIRM_CONTROL)
+      else if (message.GetSenderId() == KODI::FILEPREVIEW::CONFIRM_CONTROL)
       {
         ConfirmInfinityFilePreview();
         return true;
@@ -350,13 +350,13 @@ bool CGUIDialogFileBrowser::OpenInfinityFilePreview(int iItem)
 {
   const bool valid = iItem >= 0 && iItem < m_vecItems->Size();
   const std::string path = valid ? (*m_vecItems)[iItem]->GetPath() : "";
-  if (!INFINITY::FILEPREVIEW::CanOpen(m_infinityZipInstallContext,
+  if (!KODI::FILEPREVIEW::CanOpen(m_infinityZipInstallContext,
                                     GetProperty("Infinity.FilePreview.OptIn").asString() == "v1",
                                     valid, path))
     return false;
   if (GetProperty("Infinity.FilePreview.Active").asString() == "true")
     return true;
-  if (!CFile::Exists(INFINITY::FILEPREVIEW::SCRIPT))
+  if (!CFile::Exists(KODI::FILEPREVIEW::SCRIPT))
     return false;
 
   const CFileItemPtr item = (*m_vecItems)[iItem];
@@ -382,7 +382,7 @@ bool CGUIDialogFileBrowser::ConfirmInfinityFilePreview()
   const CFileItemPtr item = valid ? (*m_vecItems)[selected] : CFileItemPtr();
   if (GetProperty("Infinity.FilePreview.Nonce").asString() !=
           std::to_string(m_infinityPreviewRequest.nonce) ||
-      !INFINITY::FILEPREVIEW::CanConfirm(
+      !KODI::FILEPREVIEW::CanConfirm(
           m_infinityPreviewRequest, GetProperty("Infinity.FilePreview.AcceptNonce").asString(),
           m_infinityZipInstallContext, GetProperty("Infinity.FilePreview.OptIn").asString() == "v1",
           valid, valid ? item->GetPath() : "", valid && item->m_bIsFolder))
@@ -784,7 +784,7 @@ bool CGUIDialogFileBrowser::ShowAndGetFile(const VECSOURCES &shares, const std::
     browser->m_browsingForFolders = 0;
 
   browser->m_rootDir.SetMask(strMask);
-  browser->m_infinityZipInstallContext = INFINITY::FILEPREVIEW::IsZipInstallContext(
+  browser->m_infinityZipInstallContext = KODI::FILEPREVIEW::IsZipInstallContext(
       mask, heading, g_localizeStrings.Get(24041));
   browser->m_selectedPath = path;
   browser->m_addNetworkShareEnabled = false;

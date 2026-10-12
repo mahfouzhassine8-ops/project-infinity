@@ -12,10 +12,12 @@ NATIVE = HERE / 'native'
 class NativePreviewTests(unittest.TestCase):
     def test_production_admission_and_confirmation(self):
         program = r'''
+#include <cmath>
 #include "xbmc/dialogs/InfinityFilePreviewContracts.h"
 #include <cassert>
-using namespace INFINITY::FILEPREVIEW;
+using namespace KODI::FILEPREVIEW;
 int main() {
+  assert(std::isinf(INFINITY));
   assert(IsZipInstallContext("*.zip", "Install from zip file", "Install from zip file"));
   assert(!IsZipInstallContext("*", "Install from zip file", "Install from zip file"));
   assert(!IsZipInstallContext("*.zip", "Choose image", "Install from zip file"));

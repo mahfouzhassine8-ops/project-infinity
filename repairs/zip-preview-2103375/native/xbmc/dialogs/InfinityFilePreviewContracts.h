@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <string>
 
-namespace INFINITY::FILEPREVIEW
+namespace KODI::FILEPREVIEW
 {
 constexpr int PREVIEW_CONTROL = 9410;
 constexpr int CONFIRM_CONTROL = 9411;
@@ -50,4 +50,4 @@ inline bool CanConfirm(const Request& request, const std::string& acceptedNonce,
          acceptedNonce == std::to_string(request.nonce) && request.path == selectedPath &&
          !request.folder && !selectedFolder && IsZip(selectedPath);
 }
-} // namespace INFINITY::FILEPREVIEW
+} // namespace KODI::FILEPREVIEW

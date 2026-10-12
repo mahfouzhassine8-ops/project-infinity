@@ -90,7 +90,7 @@ protected:
   // Opt-in, scoped to the native Install from ZIP dialog. No archive work on the GUI thread.
   bool m_infinityZipInstallContext{false};
   uint64_t m_infinityPreviewSequence{0};
-  INFINITY::FILEPREVIEW::Request m_infinityPreviewRequest;
+  KODI::FILEPREVIEW::Request m_infinityPreviewRequest;
 
   CPictureThumbLoader m_thumbLoader;
   CGUIViewControl m_viewControl;
