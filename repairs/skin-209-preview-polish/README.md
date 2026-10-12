@@ -6,7 +6,7 @@ Test candidate only. No lock, production promotion, profile migration, add-on de
 
 ## Scope and reproduction
 
-This recipe produces 59 modified and 27 new payload files from the complete, hash-verified 208 package. `parent-files.json` records every parent payload. `change-inventory.json` records every candidate delta hash and retired/guarded route. Derived XML is generated in ignored `delta/`; the three Python modules and master dialog XML are maintained as source here. Every unrelated compressed ZIP entry is retained.
+This recipe produces 49 modified and 27 new payload files from the complete, hash-verified 208 package. `parent-files.json` records every parent payload. `change-inventory.json` records every candidate delta hash and retired/guarded route. Derived XML is generated in ignored `delta/`; the three Python modules and master dialog XML are maintained as source here. Every unrelated compressed ZIP entry is retained.
 
 1. Extract the exact 208 ZIP into an isolated staging directory. Do not use an installed profile export as the parent.
 2. Run `python repairs/skin-209-preview-polish/generate.py --parent <staging>/skin.infinity.diggz`.
@@ -29,7 +29,7 @@ The recording's Channels / Source not found dialog requires investigating the ha
 
 ## Preservation and acceptance
 
-All 2,075 candidate XML documents parse. All 58 modified non-manifest trees are semantically compared after narrowly accounting for the explicit repairs. 2,881 unrelated package entries retain their payload and compressed bytes. Existing fonts, textures, services, playback, Health, Command Center, Resume, shutdown and approved UI are preserved.
+All 2,075 candidate XML documents parse. All 48 modified non-manifest trees are semantically compared after narrowly accounting for the explicit repairs. 2,891 unrelated package entries retain their payload and compressed bytes. Existing fonts, textures, services, playback, Health, Command Center, Resume, shutdown and approved UI are preserved.
 
 The exact manifest selects unified; `resources/infinity-native-responsive-v1.json` is absent. New preview XML is available in all 14 presentation/fallback families. Geometry tests use the native Android 1.03 aspect-mismatch threshold and uniform logical-area adaptation for the active unified browser. They cover 16 window profiles and are source checks, not physical Fold results.
 

@@ -65,7 +65,7 @@ class CandidateTests(unittest.TestCase):
         self.assertEqual(modified, self.inventory['modified'])
         self.assertEqual(sorted(set(self.after)-set(self.before)), self.inventory['added'])
         self.assertFalse(set(self.before)-set(self.after))
-        self.assertEqual(len(modified),59)
+        self.assertEqual(len(modified),49)
         self.assertEqual(len(self.inventory['added']),27)
         for n,digest in self.inventory['delta_sha256'].items():
             self.assertEqual(hashlib.sha256(self.after[n]).hexdigest(),digest,n)

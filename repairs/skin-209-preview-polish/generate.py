@@ -154,13 +154,23 @@ def main():
     args = parser.parse_args()
     root = args.parent
     out = HERE / 'delta'
+    before = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file()}
+    expected = json.loads((HERE / 'parent-files.json').read_text())
+    assert before == expected, 'Wrong/incomplete exact skin 208 source'
+    assert out.resolve() != root.resolve() and root.resolve() not in out.resolve().parents, 'Parent cannot contain derived output'
+    if out.exists():
+        # Only replace a hash-verified previous generated delta, never unknown
+        # files or the protected input. This prevents stale, no-longer-modified
+        # XML from an earlier draft leaking into the next package.
+        previous = json.loads((HERE / 'change-inventory.json').read_text())['delta_sha256']
+        actual = {p.relative_to(out).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in out.rglob('*') if p.is_file() and '__pycache__' not in p.parts}
+        assert actual == previous, 'Unreviewed derived output; refusing to replace it'
+        shutil.rmtree(out)
     for source in (HERE / 'resources' / 'lib').glob('*.py'):
         destination = out / 'resources' / 'lib' / source.name
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, destination)
-    before = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file()}
-    expected = json.loads((HERE / 'parent-files.json').read_text())
-    assert before == expected, 'Wrong/incomplete exact skin 208 source'
     records = []
     changed = {}
     helper = {}
