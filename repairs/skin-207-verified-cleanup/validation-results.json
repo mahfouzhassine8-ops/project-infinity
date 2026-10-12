@@ -1,0 +1,394 @@
+{
+  "candidate": "1.0.5.208",
+  "status": "SOURCE_AND_GEOMETRY_VALIDATED_DEVICE_PENDING",
+  "tests": [
+    {
+      "test": "Exact .204 Power preservation",
+      "result": "PASS",
+      "detail": "Full approved Power XML byte identical"
+    },
+    {
+      "test": "Package isolation",
+      "result": "PASS",
+      "detail": "15 XML deltas versus .204; only desktop.ini removed; all other .207 runtime payloads separately byte-verified"
+    },
+    {
+      "test": "Native IDs and action preservation",
+      "result": "PASS",
+      "detail": "All original native IDs/bindings retained except two explicitly approved redundant rows"
+    },
+    {
+      "test": "Shared include preservation",
+      "result": "PASS",
+      "detail": "Selector and directory native contracts retained; all unrelated includes and theme variables byte-identical"
+    },
+    {
+      "test": "Approved drawer order",
+      "result": "PASS",
+      "detail": "System Hub follows UI Theme; Power ends primary section; existing scroll extras retained"
+    },
+    {
+      "test": "Truthful status/watched defaults",
+      "result": "PASS",
+      "detail": "Unknown fallback; no unconditional healthy green; prepared watched visual has no consumer"
+    },
+    {
+      "test": "Repaired panel theme contrast",
+      "result": "PASS",
+      "detail": "Primary, secondary and warning text meet 4.5:1 against opaque repaired surfaces in dark, light, OLED and cinema palettes; focus/transparency still need runtime verification"
+    },
+    {
+      "test": "Active XML and include/font references",
+      "result": "PASS",
+      "detail": "186 active XML documents parsed; changed include/font references resolve"
+    },
+    {
+      "test": "Responsive modal/native menu geometry",
+      "result": "PASS",
+      "detail": "960 bounds checks across 16 profiles, including 1/2/10/30 actions"
+    },
+    {
+      "test": "Provider/core/cinema metadata separation",
+      "result": "PASS",
+      "detail": "Title and secondary-label rectangles are disjoint in all repaired item/focused rows"
+    },
+    {
+      "test": "Health card separation",
+      "result": "PASS",
+      "detail": "All 13 tool cards preserve action IDs with distinct title, icon and wrapped description regions"
+    }
+  ],
+  "profile_matrix": [
+    {
+      "profile": "cover portrait",
+      "usable_window": [
+        412,
+        915
+      ],
+      "logical_canvas": [
+        1080,
+        2400
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "cover landscape",
+      "usable_window": [
+        915,
+        412
+      ],
+      "logical_canvas": [
+        2400,
+        1080
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "inner portrait",
+      "usable_window": [
+        673,
+        790
+      ],
+      "logical_canvas": [
+        1488,
+        1744
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "inner landscape",
+      "usable_window": [
+        790,
+        673
+      ],
+      "logical_canvas": [
+        1744,
+        1488
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "16:9",
+      "usable_window": [
+        1920,
+        1080
+      ],
+      "logical_canvas": [
+        2144,
+        1208
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "20:9",
+      "usable_window": [
+        2400,
+        1080
+      ],
+      "logical_canvas": [
+        2400,
+        1080
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "portrait 9:16",
+      "usable_window": [
+        1080,
+        1920
+      ],
+      "logical_canvas": [
+        1208,
+        2144
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "split portrait",
+      "usable_window": [
+        340,
+        790
+      ],
+      "logical_canvas": [
+        1080,
+        2400
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "split landscape",
+      "usable_window": [
+        790,
+        340
+      ],
+      "logical_canvas": [
+        2456,
+        1056
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "popup portrait",
+      "usable_window": [
+        320,
+        640
+      ],
+      "logical_canvas": [
+        1080,
+        2400
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "popup landscape",
+      "usable_window": [
+        640,
+        320
+      ],
+      "logical_canvas": [
+        2280,
+        1136
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "narrow popup",
+      "usable_window": [
+        240,
+        800
+      ],
+      "logical_canvas": [
+        880,
+        2936
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "short popup",
+      "usable_window": [
+        800,
+        240
+      ],
+      "logical_canvas": [
+        2936,
+        880
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "square",
+      "usable_window": [
+        600,
+        600
+      ],
+      "logical_canvas": [
+        1608,
+        1608
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "wide stress",
+      "usable_window": [
+        1200,
+        200
+      ],
+      "logical_canvas": [
+        3944,
+        656
+      ],
+      "result": "PASS"
+    },
+    {
+      "profile": "narrow stress",
+      "usable_window": [
+        200,
+        1200
+      ],
+      "logical_canvas": [
+        656,
+        3944
+      ],
+      "result": "PASS"
+    }
+  ],
+  "theme_contrast": [
+    {
+      "theme": "cinema",
+      "foreground": "Text",
+      "surface_text_contrast": 18.35
+    },
+    {
+      "theme": "cinema",
+      "foreground": "Secondary",
+      "surface_text_contrast": 10.56
+    },
+    {
+      "theme": "cinema",
+      "foreground": "Danger",
+      "surface_text_contrast": 10.26
+    },
+    {
+      "theme": "OLED",
+      "foreground": "Text",
+      "surface_text_contrast": 21.0
+    },
+    {
+      "theme": "OLED",
+      "foreground": "Secondary",
+      "surface_text_contrast": 10.21
+    },
+    {
+      "theme": "OLED",
+      "foreground": "Danger",
+      "surface_text_contrast": 8.33
+    },
+    {
+      "theme": "light",
+      "foreground": "Text",
+      "surface_text_contrast": 16.08
+    },
+    {
+      "theme": "light",
+      "foreground": "Secondary",
+      "surface_text_contrast": 6.1
+    },
+    {
+      "theme": "light",
+      "foreground": "Danger",
+      "surface_text_contrast": 6.21
+    },
+    {
+      "theme": "dark",
+      "foreground": "Text",
+      "surface_text_contrast": 17.46
+    },
+    {
+      "theme": "dark",
+      "foreground": "Secondary",
+      "surface_text_contrast": 8.68
+    },
+    {
+      "theme": "dark",
+      "foreground": "Danger",
+      "surface_text_contrast": 7.52
+    }
+  ],
+  "bounds_checks": 960,
+  "unresolved_preexisting_asset_references": [
+    "FloorButtons/FloorBack.png",
+    "FloorButtons/FloorHome.png",
+    "FloorButtons/FloorTrailer.png",
+    "FloorButtons/FloorVolMinus.png",
+    "FloorButtons/FloorVolPlus.png",
+    "android/spinner_48_inner_holo.png",
+    "android/spinner_48_outer_holo.png",
+    "colors/black10.png",
+    "colors/black25.png",
+    "colors/black50.png",
+    "colors/black75.png",
+    "colors/border_frame.png",
+    "colors/white.png",
+    "colors/white25.png",
+    "colors/white50.png",
+    "dialogs/default/bg.png",
+    "flags/rating/0.png",
+    "homewidgets/bg_flat.png",
+    "homewidgets/cases/default/square/cd_back.png",
+    "logos/imdb.png",
+    "logos/metacritic.png",
+    "logos/tmdb.png",
+    "logos/trakt-clearlogo.png",
+    "osd/buttons2/OSDAudioFO.png",
+    "osd/buttons2/OSDAudioNF.png",
+    "osd/buttons2/OSDBookmarksFO.png",
+    "osd/buttons2/OSDBookmarksNF.png",
+    "osd/buttons2/OSDDvdFO.png",
+    "osd/buttons2/OSDDvdNF.png",
+    "osd/buttons2/OSDForwardFO.png",
+    "osd/buttons2/OSDForwardNF.png",
+    "osd/buttons2/OSDInfoFO.png",
+    "osd/buttons2/OSDInfoNF.png",
+    "osd/buttons2/OSDNextTrackFO.png",
+    "osd/buttons2/OSDNextTrackNF.png",
+    "osd/buttons2/OSDPauseFO.png",
+    "osd/buttons2/OSDPauseNF.png",
+    "osd/buttons2/OSDPlayFO.png",
+    "osd/buttons2/OSDPlayNF.png",
+    "osd/buttons2/OSDPrevTrackFO.png",
+    "osd/buttons2/OSDPrevTrackNF.png",
+    "osd/buttons2/OSDRewindFO.png",
+    "osd/buttons2/OSDRewindNF.png",
+    "osd/buttons2/OSDSettingsFO.png",
+    "osd/buttons2/OSDSettingsNF.png",
+    "osd/buttons2/OSDStopFO.png",
+    "osd/buttons2/OSDStopNF.png",
+    "osd/buttons2/OSDVideoFO.png",
+    "osd/buttons2/OSDVideoNF.png",
+    "osd/buttons2/SubFO.png",
+    "osd/buttons2/SubNF.png",
+    "osd/midtexture.png",
+    "osd/midtexture_cache.png",
+    "osd/texturebg.png",
+    "osd/texturebg_cache.png",
+    "overlays/OverlayWatched.png",
+    "overlays/addons/enabled.png",
+    "pvr/PVR-EpgProgressIndicator.png",
+    "pvr/epg-genres/0.png",
+    "pvr/epg-item.png",
+    "pvr/grey_bg.png",
+    "thumbs/diffuse.png",
+    "thumbs/diffuse_music.png",
+    "thumbs/panel_border.png",
+    "thumbs/panel_border3.png",
+    "thumbs/shadow.png",
+    "thumbs/thumb_shadow.png",
+    "thumbs/thumb_shadow_aa.png",
+    "thumbs/thumbnail_focused.png",
+    "views/wall/bottom_shadow.png"
+  ],
+  "physical_device_tested": false,
+  "running_kodi_tested": false,
+  "performance_improvement_claimed": false,
+  "long_session_tested": false
+}

@@ -1,0 +1,23 @@
+--- original-207-validator
++++ cleanup-208-validator
+@@ -40,9 +40,9 @@
+   if not condition:raise AssertionError(msg)
+  require(after['unified/DialogButtonMenu.xml']==before['unified/DialogButtonMenu.xml'],'Protected Power changed')
+  passed('Exact .204 Power preservation','Full approved Power XML byte identical')
+- require(before.keys()<=after.keys(),'Package removed files')
++ require(set(before)-set(after)=={'desktop.ini'},'Removal exceeds the single approved metadata file')
+  require(all(n=='addon.xml' or n.startswith('unified/') and n.endswith('.xml') for n in changed),'Non-UI files changed')
+- passed('Package isolation',f'{len(changed)} XML deltas; no native/scripts/providers/assets/settings changes')
++ passed('Package isolation',f'{len(changed)} XML deltas versus .204; only desktop.ini removed; all other .207 runtime payloads separately byte-verified')
+  removed={'unified/Custom_1198_InfinityNav.xml':{'1198107'},'unified/Custom_1191_InfinitySystemHub.xml':{'1191105'}}
+  unresolved_existing_assets=set()
+  for name in changed:
+@@ -220,7 +220,7 @@
+   ix,iy,iw,ih=bounds(icon,800,156);tx,ty,tw,th=bounds(body,800,156)
+   require(ix+iw<tx and ty>=60 and ty+th<=156,'Health icon/description collision')
+  passed('Health card separation','All 13 tool cards preserve action IDs with distinct title, icon and wrapped description regions')
+- output={'candidate':'1.0.5.207','status':'SOURCE_AND_GEOMETRY_VALIDATED_DEVICE_PENDING','tests':tests,'profile_matrix':matrix,'theme_contrast':contrast,'bounds_checks':checks,'unresolved_preexisting_asset_references':sorted(unresolved_existing_assets),'physical_device_tested':False,'running_kodi_tested':False,'performance_improvement_claimed':False,'long_session_tested':False}
++ output={'candidate':'1.0.5.208','status':'SOURCE_AND_GEOMETRY_VALIDATED_DEVICE_PENDING','tests':tests,'profile_matrix':matrix,'theme_contrast':contrast,'bounds_checks':checks,'unresolved_preexisting_asset_references':sorted(unresolved_existing_assets),'physical_device_tested':False,'running_kodi_tested':False,'performance_improvement_claimed':False,'long_session_tested':False}
+  a.out.write_text(json.dumps(output,indent=2)+'\n');print(json.dumps({'tests_passed':len(tests),'profiles':len(matrix),'bounds_checks':checks,'status':output['status']}))
+ 
+ if __name__=='__main__':main()
