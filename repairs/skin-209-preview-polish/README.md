@@ -23,9 +23,9 @@ Local/special/file ZIP metadata inspection is bounded: 65,557-byte tail, 2 MiB c
 
 ## Retired Live TV boundary
 
-All 61 skin XML launch actions for `script.infinity.live` are removed. Native TVGuide retains its prior fallback role. The dedicated Power-menu group 17/button 1700 is removed with scoped neighbor repairs. Fixed TV provider source-100 presets become the native all-TV-channels directory. All 56 active Sports Live Events widget contents retain their original provider URIs and load only in the Sports section. The optional legacy add-on dependency is removed from this skin; the add-on itself, import-time focus/Multi-View hooks, credentials, favorites, last channel, PVR, EPG, recordings, timeshift and providers are retained.
+All 61 skin XML launch actions for `script.infinity.live` are removed. Native TVGuide retains its prior fallback role. The dedicated Power-menu group 17/button 1700 is removed with scoped neighbor repairs. Existing TV provider source-100 presets and captions remain exact: a source error does not establish retirement. All 56 active Sports Live Events widget contents retain their original provider URIs and load only in the Sports section. The optional legacy add-on dependency is removed from this skin; the add-on itself, import-time focus/Multi-View hooks, credentials, favorites, last channel, PVR, EPG, recordings, timeshift and providers are retained.
 
-The recording's Channels / Source not found dialog supports investigating the hardcoded TV preset. The provider's installed source/version/source store is unavailable, so that precise provider failure cause is an inference. Separately installed add-ons and user-saved shortcuts have not been deleted or certified unreachable.
+The recording's Channels / Source not found dialog requires investigating the hardcoded TV preset and unguarded background contents. The provider's installed source/version/source store is unavailable, so that precise provider failure cause is an inference. Separately installed add-ons and user-saved shortcuts have not been deleted or certified unreachable.
 
 ## Preservation and acceptance
 

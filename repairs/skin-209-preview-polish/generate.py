@@ -12,8 +12,6 @@ from lxml import etree as E
 HERE = Path(__file__).resolve().parent
 PARENT = 'a6d496f6bd576676d060a31b572e3930c7ac6a3625b8eaf5dcdd04433f172408'
 SCRIPT = 'script.infinity.live'
-PVR = 'pvr://channels/tv/*/'
-TV_PATTERN = re.compile(r"plugin://plugin\.video\.playlistbrowser/\?action=channels_by_group&src=100&group=TV(?=&|[\"',)]|$)(?:&reload=(?:\$INFO\[[^\]]+\])*)?(?![a-zA-Z])")
 
 
 def settext(parent, tag, value):
@@ -144,15 +142,9 @@ def retired_routes(tree, relative, records):
                     parent.remove(node)
             E.SubElement(parent, 'onclick').text = 'ActivateWindow(TVGuide)'
             records.append({'file': relative, 'replaced': 'Legacy launcher', 'route': 'Existing native TVGuide'})
-    for node in root.iter():
-        if node.text:
-            before = node.text
-            node.text, count = TV_PATTERN.subn(PVR, before)
-            if count:
-                records.append({'file': relative, 'owner': node.tag, 'retired_tv_preset_routes': count, 'new_path': PVR})
-        if (node.tag == 'property' and node.get('name') == 'widgetName' and node.text == 'Diggz Pick' and
-                node.getparent().findtext("property[@name='section']") == 'tvguide'):
-            node.text = 'Live channels'
+    # A source-not-found dialog does not establish provider-route retirement.
+    # Keep all TV source presets and their captions exact until installed-provider
+    # version/source-store evidence proves a safe change.
     return tree
 
 

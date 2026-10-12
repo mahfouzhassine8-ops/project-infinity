@@ -76,7 +76,13 @@ class CandidateTests(unittest.TestCase):
         for n,d in self.after.items():
             if n.endswith('.xml'):
                 self.assertNotIn(b'RunAddon(script.infinity.live)',d,n)
-                self.assertNotIn(b'plugin://plugin.video.playlistbrowser/?action=channels_by_group&amp;src=100&amp;group=TV',d,n)
+        # Preserve provider TV presets: a missing source is not proof of dead code.
+        prefix = 'plugin://plugin.video.playlistbrowser/?action=channels_by_group&src=100&group=TV'
+        for name,data in self.before.items():
+            if not name.endswith('.xml'):continue
+            original=E.fromstring(data);candidate=self.xml[name]
+            routes=lambda root:[n.text for n in root.iter() if prefix in (n.text or '')]
+            self.assertEqual(routes(original),routes(candidate),name+' provider TV preset changed')
         old = E.fromstring(self.before['addon.xml']); new = self.xml['addon.xml']
         old_imports = {n.get('addon'):dict(n.attrib) for n in old.find('requires')}
         new_imports = {n.get('addon'):dict(n.attrib) for n in new.find('requires')}
@@ -140,7 +146,6 @@ class CandidateTests(unittest.TestCase):
                 text=node.text or ''
                 match=re.fullmatch(r'\$VAR\[(Infinity209SportsPath[a-f0-9]+)\]',text)
                 if match:node.text=variables[match[1]]
-                if node.tag=='property' and node.get('name')=='widgetName' and node.text=='Live channels' and node.getparent().findtext("property[@name='section']")=='tvguide':node.text='Diggz Pick'
             if name.endswith('/FileBrowser.xml'):
                 load=new.find("onload[.='SetProperty(Infinity.FilePreview.OptIn,v1)']")
                 self.assertIsNotNone(load,name);new.remove(load)
@@ -153,16 +158,6 @@ class CandidateTests(unittest.TestCase):
                     for node in root.find('controls').findall('control'):
                         for tag in ('left','width','top','height','bottom'):
                             for item in node.findall(tag):node.remove(item)
-            # TV preset replacement must preserve surrounding actions and reload boundaries.
-            old_nodes=[n for n in old.iter() if isinstance(n.tag,str)]
-            new_nodes=[n for n in new.iter() if isinstance(n.tag,str)]
-            self.assertEqual(len(old_nodes),len(new_nodes),name)
-            for a,b in zip(old_nodes,new_nodes):
-                if a.text != b.text and 'plugin://plugin.video.playlistbrowser/?action=channels_by_group&src=100&group=TV' in (a.text or ''):
-                    prefix='plugin://plugin.video.playlistbrowser/?action=channels_by_group&src=100&group=TV'
-                    expected=re.sub(re.escape(prefix)+r'(?:&reload=(?:\$INFO\[[^\]]+\])*)?', 'pvr://channels/tv/*/',a.text)
-                    self.assertEqual(b.text,expected,name)
-                    b.text=a.text
             self.assertEqual(canonical(old),canonical(new),name+' unrelated semantics changed')
         self.metrics['modified_trees_compared'] = len(self.inventory['modified'])-1
 
