@@ -48,7 +48,6 @@ def stage(args):
  require(sha(args.base)==TRANSPORT, 'Transport signed APK mismatch')
  args.out.mkdir(parents=True,exist_ok=True)
  with tarfile.open(archive) as tar:
-  # Python 3.10 runners may not expose extractall(filter=); reject every unsafe member explicitly.
   for m in tar.getmembers():
    p=Path(m.name)
    require(not p.is_absolute() and '..' not in p.parts and (m.isfile() or m.isdir()), 'Unsafe source archive member')
@@ -58,10 +57,14 @@ def stage(args):
  require(len(before)==264, 'Unexpected complete runtime source count')
  for name,h in COBRA.items(): require(before[RUNTIME+name]==h,'Approved Cobra identity mismatch: '+name)
  source=args.out/'source';shutil.copytree(original,source)
+ corrective=None
  if args.kind=='candidate':
   spec=importlib.util.spec_from_file_location('clean_changes',HERE/'apply.py')
   changes=importlib.util.module_from_spec(spec);spec.loader.exec_module(changes)
   changes.apply(source,args.out)
+  spec=importlib.util.spec_from_file_location('pip_corrective',HERE/'pip_corrective.py')
+  corrective=importlib.util.module_from_spec(spec);spec.loader.exec_module(corrective)
+  corrective.apply(source,args.out)
  after=snapshot(source)
  changed=sorted(n for n in before.keys()|after.keys() if before.get(n)!=after.get(n))
  require(before.keys()==after.keys(),'Source membership changed')
@@ -71,7 +74,6 @@ def stage(args):
  spec=importlib.util.spec_from_file_location('factory',ROOT/'repairs/mobile-regressions-2103304/package_candidate.py')
  factory=importlib.util.module_from_spec(spec);spec.loader.exec_module(factory)
  factory.BASE_APK_SHA256=TRANSPORT
- # Compile-only identity. No candidate version or permanent-signing claim is made.
  factory.VERSION_CODE=2103369;factory.RELEASE='1.0.9-Cancelled-Script-Receipt-RC1'
  factory.prepare(source.resolve(),args.base.resolve(),args.build.resolve(),args.out.resolve())
  tests=args.build/'xbmc/src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True,exist_ok=True)
@@ -88,17 +90,19 @@ def stage(args):
   provenance.append({'suite':name,'original_sha256':sha(original_test),'staged_sha256':sha(target),'minimum_cases':count})
  extra=['CobraCleanBaselineViewsTest'] if args.kind=='baseline' else json.loads((HERE/'test-spec.json').read_text())
  for name in extra: shutil.copy2(HERE/(name+'.java'),tests/(name+'.java'))
+ if corrective is not None:
+  shutil.copy2(HERE/'CobraGroupsTrace.java',tests/'CobraGroupsTrace.java')
+  corrective.prepare_tests(tests)
  resources=args.build/'xbmc/src/test/resources';resources.mkdir(parents=True,exist_ok=True)
  shutil.copy2(ROOT/'repairs/cobra-pro-season-2103317/schedule-fixtures.json',resources)
  if (HERE/'fixtures').exists():shutil.copytree(HERE/'fixtures',resources,dirs_exist_ok=True)
- write(args.out/'TEST-SCOPE.json',{'inherited':provenance,'new_suites':extra,'no_new_skips':True,'device_acceptance':False})
+ write(args.out/'TEST-SCOPE.json',{'inherited':provenance,'new_suites':extra,'new_suite_hashes':{n:sha(tests/(n+'.java')) for n in extra},'no_new_skips':True,'device_acceptance':False})
  with (args.build/'xbmc/build.gradle').open('a') as f:
   f.write('''\nandroid { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "cobra.evidence", rootProject.file("../'''+args.out.name+'''/screenshots").absolutePath; systemProperty "cobra.clean.evidence", rootProject.file("../'''+args.out.name+'''/runtime").absolutePath; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
 configurations { preservationTools }
 dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.14.1'; preservationTools 'org.smali:baksmali:2.5.2' }
 tasks.register('exportPreservationTools') { doLast { rootProject.file('preservation-classpath.txt').text = configurations.preservationTools.asPath } }
 ''')
- # Helper suites provide fixtures but are not additional inherited acceptance suites.
  with (args.build/'xbmc/build.gradle').open('a') as f:
   f.write('\ntasks.withType(Test).configureEach { filter {\n')
   for name in list(INHERITED)+list(extra):f.write(" includeTestsMatching 'com.projectinfinity.kodi."+name+"'\n")
