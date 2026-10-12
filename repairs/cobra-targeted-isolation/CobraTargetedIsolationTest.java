@@ -59,7 +59,7 @@ public class CobraTargetedIsolationTest {
  }
  @Test(timeout=90000) public void savedProCannotExposeFullscreenSportsTabInAnyOtherExperience()throws Exception{
   for(String mode:NON_PRO){r.open(mode,false);savedPro();r.full();openChannels();
-   assertFalse(mode,(Boolean)call(r.a,"cobraProPlayerSportsEnabled"));assertNull(mode,r.tag("cobra_player_tab_SPORTS"));
+   assertNull(mode,r.tag("cobra_player_tab_SPORTS"));assertFalse(mode,(Boolean)call(r.a,"cobraProPlayerSportsEnabled"));
    assertNotNull(r.tag("cobra_player_tab_ALL"));assertNotNull(r.tag("cobra_player_tab_CATEGORIES"));
    assertSame(r.state.proxy,get(r.a,"mPlayer"));assertEquals(1f,r.state.volume,0f);assertNoRetiredScreen();
   }
