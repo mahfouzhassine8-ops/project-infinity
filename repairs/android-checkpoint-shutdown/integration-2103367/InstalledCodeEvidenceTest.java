@@ -35,26 +35,31 @@ public final class InstalledCodeEvidenceTest {
     Context context=RuntimeEnvironment.getApplication();
     File addon=new File(context.getExternalFilesDir(null),".kodi/addons/script.kodihealthcenter");
     assertTrue(addon.isDirectory()||addon.mkdirs());
-    byte[] code="protected 2.5.19 code".getBytes(StandardCharsets.UTF_8);
-    Files.write(new File(addon,"addon.xml").toPath(),"<addon id='script.kodihealthcenter' version='2.5.19'/>".getBytes(StandardCharsets.UTF_8));
-    Files.write(new File(addon,"default.py").toPath(),code);
-    JSONObject row=InfinityInstalledCodeEvidence.collect(context).getJSONArray("addons").getJSONObject(1);
-    assertEquals("PRESERVE_SEPARATE_LOCKED_RELEASE",row.getString("repair_policy"));
-    assertFalse(row.getBoolean("overlay_applied"));
-    assertArrayEquals(code,Files.readAllBytes(new File(addon,"default.py").toPath()));
+    for(String version:new String[]{"2.5.19","2.5.20"}) {
+      byte[] code=("protected "+version+" code").getBytes(StandardCharsets.UTF_8);
+      Files.write(new File(addon,"addon.xml").toPath(),("<addon id='script.kodihealthcenter' version='"+version+"'/>").getBytes(StandardCharsets.UTF_8));
+      Files.write(new File(addon,"default.py").toPath(),code);
+      JSONObject row=InfinityInstalledCodeEvidence.collect(context).getJSONArray("addons").getJSONObject(1);
+      assertEquals("2.5.19".equals(version)?"PRESERVE_SEPARATE_LOCKED_RELEASE":"EXACT_PREIMAGES_REQUIRED",row.getString("repair_policy"));
+      assertFalse(row.getBoolean("overlay_applied"));
+      assertArrayEquals(code,Files.readAllBytes(new File(addon,"default.py").toPath()));
+    }
   }
   @Test public void traceAttributionKeepsMixedHistorySeparate() throws Exception {
     Context context=RuntimeEnvironment.getApplication();
     JSONObject receipt=new JSONObject().put("schema",1).put("pid",19842)
         .put("started_epoch_ms",1000).put("engine_death_epoch_ms",2000);
     Files.write(new File(context.getFilesDir(),InfinityCheckpointProtocol.RECEIPT).toPath(),receipt.toString().getBytes(StandardCharsets.UTF_8));
-    String matched=new JSONObject().put("engine","infinity-checkpoint-installer-close-2103368-v1")
+    String matched=new JSONObject().put("engine","infinity-checkpoint-cancelled-script-2103369-v1")
         .put("pid",19842).put("epoch_ns",1500000000L).toString()+"\n";
-    String old=new JSONObject().put("engine","infinity-checkpoint-installer-close-2103368-v1")
+    String old=new JSONObject().put("engine","infinity-checkpoint-cancelled-script-2103369-v1")
         .put("pid",19842).put("epoch_ns",500000000L).toString()+"\n";
     assertTrue(InfinityHealthExport.nativeTraceScope(context,matched).startsWith("MATCHED PREVIOUS"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,old).startsWith("HISTORICAL"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,old+matched).startsWith("MIXED"));
+    String priorCandidate=matched.replace("infinity-checkpoint-cancelled-script-2103369-v1","infinity-checkpoint-installer-close-2103368-v1");
+    assertTrue(InfinityHealthExport.nativeTraceScope(context,priorCandidate).startsWith("HISTORICAL / OTHER PRODUCER"));
+    assertTrue(InfinityHealthExport.nativeTraceScope(context,priorCandidate+matched).startsWith("MIXED"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,matched+"partial").startsWith("MIXED"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,matched+"{\"pid\":19842}").startsWith("MIXED"));
     assertTrue(InfinityHealthExport.nativeTraceScope(context,"{\"pid\":19842}").startsWith("UNVERIFIED"));
