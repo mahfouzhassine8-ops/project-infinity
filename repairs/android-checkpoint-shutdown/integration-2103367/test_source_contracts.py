@@ -12,10 +12,10 @@ recovery = runpy.run_path(str(ROOT / 'integration-2103367/test_recovery_contract
 class Contracts(android['AndroidCloseHandoffTests'], native['SourceContracts'], recovery['RecoveryContracts']):
     def test_resume_and_identity_preserved(self):
         package = (ROOT.parents[1] / 'tools/checkpoint-apk/package.py').read_text()
-        self.assertIn('VERSION = 2103368', package)
-        self.assertIn('1.0.9-Installer-Close-RC1', package)
+        self.assertIn('VERSION = 2103369', package)
+        self.assertIn('1.0.9-Cancelled-Script-Receipt-RC1', package)
         native_header = (ROOT / 'runtime/native/overlay/xbmc/platform/android/activity/InfinityShutdownTrace.h').read_text()
-        self.assertIn('infinity-checkpoint-installer-close-2103368-v1', native_header)
+        self.assertIn('infinity-checkpoint-cancelled-script-2103369-v1', native_header)
 
     def test_inherited_resume_speed_contracts(self):
         self.test_resume_and_identity_preserved()

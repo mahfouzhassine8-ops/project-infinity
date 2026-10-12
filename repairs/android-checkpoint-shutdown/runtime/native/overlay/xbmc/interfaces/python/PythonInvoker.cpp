@@ -309,6 +309,15 @@ bool CPythonInvoker::execute(const std::string& script, std::vector<std::wstring
   PyObject* module = PyImport_AddModule("__main__");
   PyObject* moduleDict = PyModule_GetDict(module);
 
+#if defined(TARGET_ANDROID)
+  // Attach before the cancellation/file-open gate. Admission already created a
+  // persistence obligation; abort-before-bytecode must still run the checked
+  // observer and interpreter-retirement path. No cancellation-only waiver.
+  // BEGIN INFINITY_PREBYTECODE_OBSERVER
+  m_infinityPersistenceObserver = InfinityPythonPersistence::Start(GetId(), m_threadState->interp);
+  // END INFINITY_PREBYTECODE_OBSERVER
+#endif
+
   // we need to check if we was asked to abort before we had inited
   bool stopping = false;
   {
@@ -336,9 +345,7 @@ bool CPythonInvoker::execute(const std::string& script, std::vector<std::wstring
         PyObject* f = PyUnicode_FromString(realFilename.c_str());
         PyDict_SetItemString(moduleDict, "__file__", f);
 
-#if defined(TARGET_ANDROID)
-        m_infinityPersistenceObserver = InfinityPythonPersistence::Start(GetId(), m_threadState->interp);
-#endif
+
         onPythonModuleInitialization(moduleDict);
 
         Py_DECREF(f);

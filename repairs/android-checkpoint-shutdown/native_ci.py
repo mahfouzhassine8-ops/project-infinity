@@ -67,6 +67,9 @@ def verify_engine_identity(source, binary):
 
 def prepare():
     run(sys.executable, str(HERE / "test_native_engine_identity.py"))
+    run(sys.executable, str(HERE / "cancelled-script-2103369/test_cancelled_receipt.py"),
+        "--runtime", str(HERE / "runtime/native/overlay"),
+        "--report", str(OUT / "cancelled-script-results.json"))
     # This inherited recipe replays all accepted Infinity/Cobra/audio/Fold/
     # provider/player deltas and every intervening source guard. It does not
     # substitute an upstream engine. The complete 9374-file compiled-parent

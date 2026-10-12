@@ -7,9 +7,9 @@ RUNTIME = ROOT / 'repairs/android-checkpoint-shutdown'
 sys.path[:0] = [str(RUNTIME), str(ROOT/'repairs/mobile-regressions-2103304')]
 import android_ci, runtime_delta, participant_asset
 from packaging_checks import DEX, SIGNATURE, dex_contract, manifest_tree, require, resource_ids, run, sha
-VERSION = 2103368
-RELEASE = '1.0.9-Installer-Close-RC1'
-FILE_LABEL = 'Installer-Close-RC1'
+VERSION = 2103369
+RELEASE = '1.0.9-Cancelled-Script-Receipt-RC1'
+FILE_LABEL = 'Cancelled-Script-Receipt-RC1'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 GREEN_SHA = os.environ.get('INFINITY_ENGINE_SOURCE_COMMIT', os.environ.get('GITHUB_SHA', ''))
 PINNED_CRYPTO_NATIVE = {'lib/arm64-v8a/'+x['library']:x['sha256'] for x in json.loads((RUNTIME/'CRYPTO-2103362-AUDIT.json').read_text())['libraries']}
@@ -65,6 +65,11 @@ def stage(args):
         text = path.read_text()
         require('2103335' in text and '1.0.9-Checkpoint-Work-Compile-Only' in text, 'Unexpected donor version preimage')
         path.write_text(text.replace('2103335', str(VERSION)).replace('1.0.9-Checkpoint-Work-Compile-Only', RELEASE))
+    # Host-only instruction comparison against the locked immediate parent.
+    # These tooling dependencies are not packaged in the APK.
+    gradle = args.build / 'xbmc/build.gradle'
+    with gradle.open('a') as output:
+        output.write("\nconfigurations { infinityReceiptPreservation }\ndependencies { infinityReceiptPreservation 'org.smali:baksmali:2.5.2' }\ntasks.register('exportReceiptPreservationTools') { doLast { rootProject.file('receipt-preservation-classpath.txt').text = configurations.infinityReceiptPreservation.asPath } }\n")
 
 def associated_native(args):
     proof = json.loads((args.engine/'ENGINE-PROOF.json').read_text())
