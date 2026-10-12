@@ -29,6 +29,7 @@ INHERITED = {
  'CobraProPausedReturnTest': ('cobra-pro-refinement-2103322',8),
  'CobraSportsLiveFeedTest': ('cobra-sports-live-2103323',16),
 }
+BASELINE_TESTS = {'CobraCleanBaselineViewsTest': 1, 'CobraGroupsBaselineTest': 1}
 
 def sha(path):
  return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -88,7 +89,7 @@ def stage(args):
    require(target.read_text().count(old)==1,'Established baseline exclusion no longer matches')
    target.write_text(target.read_text().replace(old,'/* Pre-existing locked 2103324 exclusion: Sports already uses the Pro tab. */ public void proDrawerSportsOpensSameHubAndSelectionSurvivesRerender()'))
   provenance.append({'suite':name,'original_sha256':sha(original_test),'staged_sha256':sha(target),'minimum_cases':count})
- extra=['CobraCleanBaselineViewsTest'] if args.kind=='baseline' else json.loads((HERE/'test-spec.json').read_text())
+ extra=BASELINE_TESTS if args.kind=='baseline' else json.loads((HERE/'test-spec.json').read_text())
  for name in extra: shutil.copy2(HERE/(name+'.java'),tests/(name+'.java'))
  if corrective is not None:
   shutil.copy2(HERE/'CobraGroupsTrace.java',tests/'CobraGroupsTrace.java')
@@ -110,8 +111,7 @@ tasks.register('exportPreservationTools') { doLast { rootProject.file('preservat
 
 def gates(args):
  expected={n:c for n,(_,c) in INHERITED.items()}
- if args.kind=='baseline':expected['CobraCleanBaselineViewsTest']=1
- else:expected.update(json.loads((HERE/'test-spec.json').read_text()))
+ expected.update(BASELINE_TESTS if args.kind=='baseline' else json.loads((HERE/'test-spec.json').read_text()))
  found={};totals={'tests':0,'failures':0,'errors':0,'skipped':0}
  for p in (args.build/'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
   root=ET.parse(p).getroot();name=root.attrib['name'].rsplit('.',1)[-1]
