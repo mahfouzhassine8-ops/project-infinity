@@ -62,7 +62,12 @@ public class CobraDeliveryVerificationTest {
   @Test(timeout=90000) public void openStatsDropsScoresWhenTheSameGameBecomesStale()throws Exception{
     r.open("sports",false);r.repository();openStats();drain();assertTrue(sheet().contains("Total yards 320"));put(r.game,"feedAvailable",false);
     Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(3));r.measure();assertFalse("Already-open new Stats panel must honor freshness changes",sheet().contains("Total yards 320"));
-    put(r.game,"feedAvailable",true);put(r.game,"feedUpdatedAtMs",System.currentTimeMillis());Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));r.measure();assertTrue("Fresh data can recover without losing the sheet",sheet().contains("Total yards 320"));
+    put(r.game,"feedAvailable",true);put(r.game,"feedUpdatedAtMs",System.currentTimeMillis());Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));r.measure();
+    String trace=" delayed="+call(r.a,"cobraSportsDelayed",r.game)+" sameGame="+(r.game==call(r.a,"cobraSportsGame",get(r.game,"id")))+" sports="+call(get(r.a,"mCobraSix"),"sports")+" sheet="+sheet();
+    View owner=(View)get(r.a,"mCobraActionSheet");Object info=org.robolectric.util.ReflectionHelpers.getField(owner,"mListenerInfo");
+    List listeners=org.robolectric.util.ReflectionHelpers.getField(info,"mOnAttachStateChangeListeners");
+    if(listeners!=null)for(Object listener:listeners)if(listener.getClass().getSimpleName().equals("StatsSession"))trace+=" current="+call(listener,"current")+" closed="+get(listener,"closed")+" summary="+get(listener,"summary")+" age="+(System.currentTimeMillis()-(Long)get(listener,"receivedAt"))+" rendered="+get(listener,"rendered");
+    assertTrue("Fresh data can recover without losing the sheet"+trace,sheet().contains("Total yards 320"));
   }
   @Test(timeout=90000) public void statsFeedMetadataSuppliesVenueLocationSituationAndTeamValuesWithoutInventingMissingData()throws Exception{
     r.window(840,720);r.open("sports",false);
