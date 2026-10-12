@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [work/cobra-clean-restart-20261012]
-    paths: ['.github/workflows/cobra-verified-delivery.yml']
+    paths: ['.github/workflows/cobra-verified-delivery.yml', '.github/cobra-delivery-trigger.txt']
 permissions: {contents: read, actions: read}
 concurrency:
   group: cobra-verified-delivery-${{ github.ref }}
@@ -84,6 +84,27 @@ jobs:
       - name: Require every saved test and unchanged inherited sources
         if: always()
         run: python3 repairs/cobra-clean-restart/delivery_gate.py gates --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --reference saved-reference
+      - name: Verify exact source review before any APK assembly
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        run: python3 repairs/cobra-clean-restart/package_test.py review --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence
+      - name: Assemble Android-only donor after all pre-device tests and review
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        run: ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:assembleRelease
+      - name: Verify payload and protected bytecode, then permanently sign
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/cobra-clean-restart/package_test.py package --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        with:
+          name: Cobra-2103372-Signed-Test-APK
+          path: delivery-evidence/Cobra-2103372-Six-Verified-RC1.apk
+          if-no-files-found: error
+          retention-days: 90
       - name: Preserve exact inputs and failed or passing evidence
         if: always()
         run: |
@@ -98,12 +119,15 @@ jobs:
           path: |
             delivery-evidence/*.json
             delivery-evidence/*.log
+            delivery-evidence/*.txt
+            delivery-evidence/*.sha256
             delivery-evidence/*.patch
             delivery-evidence/*.py
             delivery-evidence/*.java
             delivery-evidence/*.tar.gz
             delivery-evidence/runtime/
             delivery-evidence/screenshots/
+            delivery-evidence/compiler-differences/
             delivery-build/xbmc/build/test-results/testReleaseUnitTest/
             delivery-build/xbmc/build/reports/tests/testReleaseUnitTest/
           if-no-files-found: error
