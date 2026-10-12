@@ -89,7 +89,7 @@ public class CobraCleanRuntimeTest {
     @Implementation protected void stop(){}
   }
   CobraNavigationUiTest f;InfinityLiveActivity a;SharedPreferences prefs;Playback state;Object game;
-  int width=412,height=915;
+  int width=412,height=915;String context="";
   @Before public void before(){f=new CobraNavigationUiTest();f.clock();created.clear();PipPlatform.permitted=true;PipPlatform.inPip=false;PipPlatform.requests=0;TsIo.starts=0;}
   @After public void after()throws Exception{close();}
   void close()throws Exception{if(a!=null){call(a,"closeCobraActionSheet");call(a,"closeCobraPlayerDrawer");call(a,"closePlayer");call(a,"stopCobraPreview");f.clean(a);a=null;}PipPlatform.inPip=false;}
@@ -101,7 +101,7 @@ public class CobraCleanRuntimeTest {
   }
   void measure()throws Exception{f.measure(a,width,height);assertEquals(width,a.getWindow().getDecorView().getWidth());assertEquals(height,a.getWindow().getDecorView().getHeight());}
   @SuppressWarnings("unchecked") void open(String mode,boolean muted)throws Exception{
-    close();a=f.fixture(8);prefs=(SharedPreferences)get(a,"mPrefs");
+    close();context=mode+" muted="+muted+" size="+width+"x"+height;System.out.println("CASE "+context);a=f.fixture(8);prefs=(SharedPreferences)get(a,"mPrefs");
     prefs.edit().putString("guide_view_mode",mode.equals("sports")?"focus":mode).putString("cobra_appearance_mode","dark").putBoolean("cobra_live_rewind_enabled",false).commit();
     List<Object> channels=(List<Object>)get(a,"mChannels");channels.clear();
     for(int i=0;i<8;i++)channels.add(construct("Channel","fixture:"+i,"Channel "+i,i%2==0?"Documentaries":"Entertainment","ch"+i,"","http://127.0.0.1:9/"+i+".m3u8","",Collections.emptyMap()));
@@ -129,17 +129,20 @@ public class CobraCleanRuntimeTest {
   View tag(String value){return decor().findViewWithTag(value);}
   void full()throws Exception{call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel"));measure();assertSame(state.proxy,get(a,"mPlayer"));assertNotNull(get(a,"mPlayerOverlay"));}
   View description(View root,String value){return f.description(root,value);}
-  void click(View v)throws Exception{assertNotNull("Required production control",v);assertTrue("Attached control",v.isAttachedToWindow());assertTrue("Shown control "+v.getContentDescription(),v.isShown());assertTrue(v.performClick());measure();}
+  void click(View v)throws Exception{assertNotNull("Required production control",v);assertTrue("Attached control",v.isAttachedToWindow());assertTrue(context+" shown control "+v.getContentDescription(),v.isShown());assertTrue(v.performClick());measure();}
   Rect rect(View v){Rect r=new Rect();assertTrue(v.getGlobalVisibleRect(r));return r;}
   String text(View v){String s=v instanceof TextView?((TextView)v).getText().toString():"";if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++)s+="\n"+text(((ViewGroup)v).getChildAt(i));return s;}
   View clickableText(View v,String exact){if(v instanceof TextView&&exact.equals(((TextView)v).getText().toString())&&v.isClickable())return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=clickableText(((ViewGroup)v).getChildAt(i),exact);if(found!=null)return found;}return null;}
   View button(View v){if(v instanceof Button)return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=button(((ViewGroup)v).getChildAt(i));if(found!=null)return found;}return null;}
-  void listIndex(ListView list,int position)throws Exception{list.setSelection(position);measure();assertTrue(position>=list.getFirstVisiblePosition()&&position<=list.getLastVisiblePosition());}
+  void listIndex(ListView list,int position)throws Exception{
+    list.setSelectionFromTop(position,0);list.requestLayout();measure();f.frames(12);measure();
+    assertTrue(context+" list="+get(a,"mCobraDrawerFilter")+" target="+position+" first="+list.getFirstVisiblePosition()+" last="+list.getLastVisiblePosition()+" children="+list.getChildCount()+" size="+list.getWidth()+"x"+list.getHeight(),position>=list.getFirstVisiblePosition()&&position<=list.getLastVisiblePosition());
+  }
   void evidence(String name,JSONObject json)throws Exception{
     File dir=new File(System.getProperty("cobra.clean.evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());
     Files.write(new File(dir,name+".json").toPath(),json.toString(2).getBytes(StandardCharsets.UTF_8));
   }
-  void screenshot(String name)throws Exception{File dir=new File(System.getProperty("cobra.clean.evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());Bitmap b=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);decor().draw(new Canvas(b));try(FileOutputStream stream=new FileOutputStream(new File(dir,name+".png"))){assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,stream));}finally{b.recycle();}}
+  void screenshot(String name)throws Exception{File dir=new File(System.getProperty("cobra.clean.evidence"));assertTrue(dir.isDirectory()||dir.mkdirs());Bitmap b=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);decor().draw(new Canvas(b));try(FileOutputStream stream=new FileOutputStream(new File(dir,name+".png"))){assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,stream));}b.recycle();}
   List<String> controls()throws Exception{LinearLayout tools=(LinearLayout)tag("cobra_fullscreen_controls");assertNotNull(tools);List<String> result=new ArrayList<>();for(int i=0;i<tools.getChildCount();i++)result.add(String.valueOf(tools.getChildAt(i).getContentDescription()));return result;}
   void checkControls(String mode)throws Exception{
     boolean pro=mode.equals("focus")||mode.equals("sports"),sports=mode.equals("sports");
@@ -177,7 +180,7 @@ public class CobraCleanRuntimeTest {
   }
   View miniPip()throws Exception{
     if((Boolean)get(a,"mCobraProActive")){CobraProUi.Hero h=(CobraProUi.Hero)get(a,"mCobraProHeroUi");h.revealControls();measure();return h.player[8];}
-    return tag("cobra_preview_pip");
+    View large=tag("cobra_preview_pip");return large!=null&&large.isShown()?large:tag("cobra_preview_pip_small");
   }
   @Test public void miniPipReturnsEveryOriginWithSamePlayerAndBothMuteStates()throws Exception{
     for(String mode:MODES)for(boolean muted:new boolean[]{false,true}){
@@ -201,7 +204,7 @@ public class CobraCleanRuntimeTest {
   }
   @Test public void realChannelsAllFavoritesRecentAndGroupsKeepUserMuteInEveryMode()throws Exception{
     JSONArray cases=new JSONArray();for(String mode:MODES)for(boolean muted:new boolean[]{false,true})for(String category:new String[]{"ALL","FAVORITES","RECENT","CATEGORIES"}){
-      open(mode,muted);full();channels(category);chooseDifferent();Playback next=created.get(created.size()-1);
+      open(mode,muted);context+=" category="+category;System.out.println("CHANNEL CASE "+context);full();channels(category);chooseDifferent();Playback next=created.get(created.size()-1);
       assertEquals(muted,((InfinityLiveActivity.CobraMediaAudioState)call(a,"cobraMediaAudioState",next.proxy)).userMuted);assertEquals(muted?0:1,next.preparedVolume,0);assertEquals(muted?0:1,next.startedVolume,0);
       cases.put(new JSONObject().put("mode",mode).put("muted",muted).put("category",category).put("preparedVolume",next.preparedVolume));
     }evidence("CHANNELS-AUDIO-MATRIX",new JSONObject().put("cases",cases));
@@ -259,13 +262,30 @@ public class CobraCleanRuntimeTest {
   @Test public void headerThemeUpdatesWithoutMovingItsExistingChildren()throws Exception{
     open("focus",false);ViewGroup header=(ViewGroup)get(a,"mCobraModeToolbar");assertEquals(4,header.getChildCount());int[] widths=new int[4];for(int i=0;i<4;i++)widths[i]=header.getChildAt(i).getWidth();
     for(String mode:new String[]{"light","dark","oled","system"}){prefs.edit().putString("cobra_appearance_mode",mode).commit();call(a,"cobraRefreshVisualEffects");measure();assertEquals(4,header.getChildCount());for(int i=0;i<4;i++)assertEquals(widths[i],header.getChildAt(i).getWidth());assertNotNull(header.getBackground());}
-    call(a,"cobraSwitchMode","compact");measure();assertFalse((Boolean)call(get(a,"mCobraSix"),"pro"));assertFalse(header.isAttachedToWindow());
+    call(a,"cobraSwitchMode","compact");measure();assertFalse((Boolean)call(get(a,"mCobraSix"),"pro"));assertSame("The approved shared toolbar is reused",header,get(a,"mCobraModeToolbar"));assertTrue(header.isAttachedToWindow());
+    assertEquals("Compact",((TextView)get(a,"mCobraModeTitle")).getText().toString());
+    assertFalse(get(a,"mCobraModeTitle") instanceof CobraProUi.Ink);
+    assertNull("Pro theme ownership must be released",get(get(a,"mCobraSix"),"themedHeader"));
+    android.graphics.drawable.Drawable compactBackground=header.getBackground();call(get(a,"mCobraSix"),"headerTheme");assertSame(compactBackground,header.getBackground());
   }
   @Test public void actualActivityRecreationDoesNotRestoreProControlsIntoCompact()throws Exception{
     close();RuntimeEnvironment.setQualifiers("w412dp-h915dp-port-mdpi");
     ActivityController<InfinityLiveActivity> controller=Robolectric.buildActivity(InfinityLiveActivity.class).setup().visible();
     InfinityLiveActivity original=controller.get();SharedPreferences saved=(SharedPreferences)get(original,"mPrefs");saved.edit().putString("guide_view_mode","compact").commit();
-    controller.recreate();InfinityLiveActivity restored=controller.get();assertNotSame(original,restored);
-    View root=restored.getWindow().getDecorView();assertTrue(root.isAttachedToWindow());assertNull(root.findViewWithTag("cobra_fullscreen_sports_stats"));assertNull(root.findViewWithTag("cobra_pro_fullscreen_scroll"));assertNull(root.findViewWithTag("cobra_pro_stats_panel"));controller.pause().stop().destroy();
+    call(original,"cobraSwitchMode","compact");
+    // Execute the complete framework callback sequence on a fresh controller. The
+    // reused-controller convenience recreate() has a missing ViewRoot in 4.14.1.
+    // No lifecycle callback is stubbed and no runtime source is changed for this.
+    org.robolectric.util.ReflectionHelpers.setField(original,"mChangingConfigurations",true);
+    android.os.Bundle state=new android.os.Bundle();controller.pause().stop().saveInstanceState(state).destroy();
+    assertTrue(original.isDestroyed());
+    ActivityController<InfinityLiveActivity> fresh=Robolectric.buildActivity(InfinityLiveActivity.class).setup(state);
+    InfinityLiveActivity restored=fresh.get();assertNotSame(original,restored);assertFalse(restored.isDestroyed());
+    assertEquals("compact",((SharedPreferences)get(restored,"mPrefs")).getString("guide_view_mode",""));
+    call(restored,"showCobraPrimaryView");f.measure(restored,412,915);
+    View root=restored.getWindow().getDecorView();assertTrue(root.isAttachedToWindow());
+    assertEquals("compact",get(restored,"mCobraGuideStyle"));assertFalse((Boolean)get(restored,"mCobraProActive"));
+    assertNull(root.findViewWithTag("cobra_fullscreen_sports_stats"));assertNull(root.findViewWithTag("cobra_pro_fullscreen_scroll"));assertNull(root.findViewWithTag("cobra_pro_stats_panel"));
+    evidence("ACTIVITY-RECREATION",new JSONObject().put("oldDestroyed",original.isDestroyed()).put("differentInstance",original!=restored).put("savedStateBytes",state.toString()).put("restoredMode",get(restored,"mCobraGuideStyle")).put("attached",root.isAttachedToWindow()).put("method","explicit pause-stop-save-destroy / create-start-restore-postCreate-resume-visible-topResumed"));fresh.pause().stop().destroy();
   }
 }
