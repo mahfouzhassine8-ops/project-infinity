@@ -42,6 +42,38 @@ def evaluate(node, section='tvshows', submenu='tvshows', ready=True, installed=T
     raise AssertionError('Variable has no fallback')
 
 
+def condition_value(expression, atoms):
+    """Evaluate the shipped bracket/AND/OR expression, with controlled GUI info atoms."""
+    for atom in sorted(atoms, key=len, reverse=True):
+        expression = expression.replace(atom, '1' if atoms[atom] else '0')
+    tokens = list(''.join(expression.split()))
+    assert set(tokens) <= set('01![]+|'), expression
+    position = 0
+    def primary():
+        nonlocal position
+        token = tokens[position]; position += 1
+        if token == '!': return not primary()
+        if token == '[':
+            value = either()
+            assert tokens[position] == ']'; position += 1
+            return value
+        assert token in '01'; return token == '1'
+    def both():
+        nonlocal position
+        value = primary()
+        while position < len(tokens) and tokens[position] == '+':
+            position += 1; right = primary(); value = value and right
+        return value
+    def either():
+        nonlocal position
+        value = both()
+        while position < len(tokens) and tokens[position] == '|':
+            position += 1; right = both(); value = value or right
+        return value
+    result = either(); assert position == len(tokens)
+    return result
+
+
 class CandidateTests(unittest.TestCase):
     def test_exact_package_delta_and_no_removals(self):
         self.assertEqual(hashlib.sha256(self.parent.read_bytes()).hexdigest(), PARENT)
@@ -119,6 +151,14 @@ class CandidateTests(unittest.TestCase):
                         self.assertEqual(len(nodes), 1, name)
                         self.assertFalse(nodes[0].attrib)
                         new.remove(nodes[0])
+                    old_visible = old.find(".//control[@id='8898']/visible")
+                    new_visible = new.find(".//control[@id='8898']/visible")
+                    guard = '!String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)'
+                    recovery = ('[String.IsEqual(Window(Home).Property(Infinity.Playlist.Ready),v1) + '
+                                '[[String.IsEqual(Container(9000).ListItem.Property(section),tvguide) + String.IsEmpty(Window(Home).Property(Infinity.Playlist.TVPath))] | '
+                                '[String.IsEqual(Container(9000).ListItem.Property(section),sports) + String.IsEmpty(Window(Home).Property(Infinity.Playlist.SportsPath))]]]')
+                    self.assertEqual(new_visible.text, old_visible.text.replace(guard, guard + ' | ' + recovery), name)
+                    new_visible.text = old_visible.text
                 if name.endswith('/FileBrowser.xml'):
                     nodes = new.xpath('./onload[text()="SetProperty(Infinity.FilePreview.OptIn,v1)"]')
                     self.assertEqual(len(nodes), 1, name)
@@ -153,6 +193,30 @@ class CandidateTests(unittest.TestCase):
             self.assertEqual(canonical(old), canonical(new), name + ': unrelated semantic change')
         self.assertEqual(checked, 244)
         self.metrics['independently_checked_xml_route_edits'] = checked
+
+    def test_compact_recovery_is_reachable_only_for_missing_tv_or_sports_route(self):
+        homes = [name for name in self.xml if name.endswith('/Home.xml')]
+        self.assertEqual(len(homes), 14)
+        for name in homes:
+            visible = self.xml[name].find(".//control[@id='8898']/visible").text
+            original = E.fromstring(self.before[name]).find(".//control[@id='8898']/visible").text
+            for section, ready, tv, sports, expected in [('tvguide', True, '', '', True),
+                    ('sports', True, '', '', True), ('tvguide', False, '', '', False),
+                    ('movies', True, '', '', False), ('tvshows', True, '', '', False),
+                    ('tvguide', True, 'valid', '', False), ('sports', True, '', 'valid', False)]:
+                atoms = {'String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),compact)': True,
+                         'String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode))': False,
+                         'String.IsEqual(Skin.String(Infinity.HomeView),compact)': True,
+                         'String.IsEqual(Container(9000).ListItem.Property(section),infinity)': section == 'infinity',
+                         'String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)': True,
+                         'String.IsEqual(Window(Home).Property(Infinity.Playlist.Ready),v1)': ready,
+                         'String.IsEqual(Container(9000).ListItem.Property(section),tvguide)': section == 'tvguide',
+                         'String.IsEqual(Container(9000).ListItem.Property(section),sports)': section == 'sports',
+                         'String.IsEmpty(Window(Home).Property(Infinity.Playlist.TVPath))': not tv,
+                         'String.IsEmpty(Window(Home).Property(Infinity.Playlist.SportsPath))': not sports}
+                self.assertFalse(condition_value(original, atoms), 'Parent hides recovery behind the widget-ready gate')
+                self.assertEqual(condition_value(visible, atoms), expected, name + ' ' + section)
+        self.metrics['compact_browse_recovery_controls'] = len(homes)
 
     def test_protected_layouts_resources_and_services_are_exact(self):
         protected = 0

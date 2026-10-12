@@ -14,6 +14,10 @@ PARENT = '544279a735b2e2a4a7d1d77ac94a101dfd112f5f538deca1968f341d0ab6bb08'
 PREFIX = 'skin.infinity.diggz/'
 PROVIDER = 'plugin.video.playlistbrowser'
 PATH = re.compile(r'plugin://plugin\.video\.playlistbrowser/\?action=channels_by_group&src=100&group=(TV|Live\+Events)(&reload=.*)?$')
+PRIMARY_READY = '!String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)'
+RECOVERY = ('[String.IsEqual(Window(Home).Property(Infinity.Playlist.Ready),v1) + '
+            '[[String.IsEqual(Container(9000).ListItem.Property(section),tvguide) + String.IsEmpty(Window(Home).Property(Infinity.Playlist.TVPath))] | '
+            '[String.IsEqual(Container(9000).ListItem.Property(section),sports) + String.IsEmpty(Window(Home).Property(Infinity.Playlist.SportsPath))]]]')
 
 
 def sha(data):
@@ -63,6 +67,11 @@ def generate(parent):
             clear = E.Element('onload'); clear.text = 'ClearProperty(Infinity.Playlist.Ready,Home)'
             run = E.Element('onload'); run.text = 'RunScript(special://skin/resources/lib/infinity_playlist_routes.py)'
             root.insert(0, clear); root.insert(1, run)
+            button = root.find(".//control[@id='8898']")
+            assert button is not None
+            visible = button.find('visible')
+            assert visible is not None and visible.text.count(PRIMARY_READY) == 1
+            visible.text = visible.text.replace(PRIMARY_READY, PRIMARY_READY + ' | ' + RECOVERY)
         if name.endswith('/FileBrowser.xml'):
             nodes = root.xpath('./onload[text()="SetProperty(Infinity.FilePreview.OptIn,v1)"]')
             assert len(nodes) == 1

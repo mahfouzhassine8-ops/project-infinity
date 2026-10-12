@@ -18,6 +18,8 @@ or executing provider code. A valid existing 100 route is preserved. Otherwise, 
 unambiguous provider-defined TV or sports widget alias supplies the current ID. Unknown,
 missing or ambiguous registries retain explicit provider browsing and make no background
 request to a guessed source. TV/Sports widgets are gated to their own sections.
+Compact mode retains its existing View All control when a TV/Sports route needs
+explicit browsing, even while its normal widget-ready gate is false.
 
 There are no provider/profile writes, provider replacements, network fetches, new
 services or edits to playback/PVR/user favorites. The current device's provider version
