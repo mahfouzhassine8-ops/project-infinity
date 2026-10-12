@@ -10,7 +10,7 @@ on:
       - 'repairs/zip-preview-2103375/test_native_preview.py'
       - '.github/workflows/infinity-2103375-file-preview-native.yml'
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-file-preview-native-2103375, cancel-in-progress: false}
+concurrency: {group: infinity-file-preview-native-2103375, cancel-in-progress: true}
 env:
   NDK_VER: 21.4.7075529
 jobs:
