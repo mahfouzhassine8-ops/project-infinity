@@ -2,7 +2,7 @@
 
 Not locked. Not production-promoted. Physical Galaxy Fold acceptance is required.
 
-**RESUMED FOR PRE-DEVICE GATES.** The user authorized continuation from preserved checkpoint `c3d5b03602e6e8edc275203491b572b8e1c26c77`. The original Sports navigation predicate is now retained through an exact-semantics compatibility helper, independently guarded from live Pro presentation. See `BLOCKED-REVIEW.md` for the historical stop and `IMPLEMENTATION-REVIEW.md` for the correction. Thirty-one corrective Android tests and all 167 inherited cases must pass before assembly. The 2103371 identity remains reserved metadata until the signed-package gate succeeds; no physical acceptance or release lock is implied.
+**RESUMED FOR PRE-DEVICE GATES.** The user authorized continuation from preserved checkpoint `c3d5b03602e6e8edc275203491b572b8e1c26c77`. The original Sports navigation predicate is now retained through an exact-semantics compatibility helper, independently guarded from live Pro presentation. See `BLOCKED-REVIEW.md` for the historical stop, `IMPLEMENTATION-REVIEW.md` for the correction and `CI-RESUME-RESULTS.md` for executed results. Thirty-two corrective Android tests and all 167 inherited cases must pass before assembly. Disputed return paths are also executed on untouched approved source, then compared field-for-field with the candidate. The 2103371 identity remains reserved metadata until the signed-package gate succeeds; no physical acceptance or release lock is implied.
 
 ## Foundation and preservation
 

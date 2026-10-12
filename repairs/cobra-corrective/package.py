@@ -114,13 +114,53 @@ def prepare(args):
         shutil.copytree(HERE / 'fixtures', resources, dirs_exist_ok=True)
     write(args.out / 'TEST-SCOPE.json', {'expected_suites': test_spec(), 'inherited_suites': test_changes, 'inherited_test_count': 167, 'new_tests_are_not_physical_acceptance': True})
     gradle = '''
-android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "cobra.evidence", rootProject.file("../corrective-evidence/screenshots").absolutePath; systemProperty "cobra.corrective.evidence", rootProject.file("../corrective-evidence/runtime").absolutePath; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
+android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "cobra.evidence", rootProject.file("../corrective-evidence/screenshots").absolutePath; systemProperty "cobra.corrective.evidence", rootProject.file("../corrective-evidence/runtime").absolutePath; systemProperty "cobra.corrective.routingBaseline", rootProject.file("../corrective-evidence/routing-baseline/ROUTING-REFERENCE.json").absolutePath; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
 configurations { preservationTools }
 dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.14.1'; preservationTools 'org.smali:baksmali:2.5.2' }
 tasks.register('exportPreservationTools') { doLast { rootProject.file('preservation-classpath.txt').text = configurations.preservationTools.asPath } }
 '''
     with (args.build / 'xbmc/build.gradle').open('a') as output:
         output.write(gradle)
+
+
+def baseline_reference(args):
+    """Execute only disputed return paths on untouched source; never assemble an APK."""
+    baseline = args.out / 'baseline-extracted/shell-kodi'
+    require(snapshot(baseline) == BASELINE['transport_runtime_hashes'], 'Routing reference source is not the untouched approved transport')
+    require(sha(args.base.read_bytes()) == CONFIG['transport_apk_sha256'], 'Routing reference APK identity changed')
+    output = args.out / 'routing-baseline'
+    output.mkdir(parents=True, exist_ok=False)
+    build = args.build.with_name(args.build.name + '-routing-baseline')
+    parent.factory.BASE_APK_SHA256 = CONFIG['transport_apk_sha256']
+    parent.factory.VERSION_CODE = 2103369
+    parent.factory.RELEASE = '1.0.9-Cancelled-Script-Receipt-RC1'
+    parent.factory.prepare(baseline.resolve(), args.base.resolve(), build.resolve(), output.resolve())
+    testdir = build / 'xbmc/src/test/java/com/projectinfinity/kodi'
+    testdir.mkdir(parents=True, exist_ok=True)
+    fixtures = ('cobra-navigation-2103157/tests/CobraNavigationUiTest.java',
+                'sports-hub-2103270/SportsHubTest.java',
+                'cobra-pro-refinement-2103322/CobraProHandoffTest.java')
+    for relative in fixtures:
+        shutil.copy2(HERE.parent / relative, testdir / Path(relative).name)
+    test = HERE / 'CobraCorrectiveRoutingReferenceTest.java'
+    shutil.copy2(test, testdir / test.name)
+    gradle = '''
+android { testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "3g"; systemProperty "cobra.evidence", rootProject.file("../corrective-evidence/routing-baseline/screenshots").absolutePath; systemProperty "cobra.corrective.evidence", rootProject.file("../corrective-evidence/routing-baseline").absolutePath; testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" } } } }
+dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.14.1' }
+'''
+    with (build / 'xbmc/build.gradle').open('a') as handle:
+        handle.write(gradle)
+    name = 'com.projectinfinity.kodi.CobraCorrectiveRoutingReferenceTest'
+    subprocess.run([str(build.resolve() / 'gradlew'), '--no-daemon', '--console=plain', '-p', str(build), ':xbmc:testReleaseUnitTest', '--tests', name], check=True)
+    xml = build / ('xbmc/build/test-results/testReleaseUnitTest/TEST-' + name + '.xml')
+    suite = ET.parse(xml).getroot()
+    require(int(suite.attrib['tests']) == 1 and all(int(suite.attrib.get(k, 0)) == 0 for k in ('failures', 'errors', 'skipped')), 'Approved routing reference test failed')
+    reference = output / 'ROUTING-REFERENCE.json'
+    data = json.loads(reference.read_text())
+    require(data.get('schema') == 1 and set(data.get('contexts', {})) == {'stopped_pro_sports', 'return_mobile', 'return_compact', 'return_cards', 'return_grid'}, 'Approved routing reference incomplete')
+    require(snapshot(baseline) == BASELINE['transport_runtime_hashes'], 'Routing reference changed approved source')
+    shutil.copy2(xml, output / xml.name)
+    write(args.out / 'ROUTING-BASELINE-GATE.json', {'result': 'PASS', 'test_count': 1, 'reference_sha256': sha(reference.read_bytes()), 'test_source_sha256': sha(test.read_bytes()), 'source': BASELINE['transport_runtime_hashes'], 'native_recompiled': False, 'apk_assembled': False})
 
 
 def tests(args):
@@ -133,6 +173,12 @@ def tests(args):
 
 def gates(args):
     proof = verify_source(args.out)
+    routing_receipt = json.loads((args.out / 'ROUTING-BASELINE-GATE.json').read_text())
+    reference = args.out / 'routing-baseline/ROUTING-REFERENCE.json'
+    require(routing_receipt['result'] == 'PASS' and routing_receipt['source'] == BASELINE['transport_runtime_hashes'], 'Approved route reference gate absent')
+    require(sha(reference.read_bytes()) == routing_receipt['reference_sha256'], 'Approved route reference changed')
+    require(sha((HERE / 'CobraCorrectiveRoutingReferenceTest.java').read_bytes()) == routing_receipt['test_source_sha256'], 'Candidate and baseline routing tests differ')
+    require(json.loads(reference.read_text()) == json.loads((args.out / 'runtime/ROUTING-REFERENCE.json').read_text()), 'Protected runtime routing differs from untouched approved source')
     expected = test_spec()
     suites = []
     for path in sorted((args.build / 'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml')):
@@ -147,7 +193,7 @@ def gates(args):
     # treated as passing solely because a GitHub job completed.
     require(data.get('result') == 'PASS', 'Runtime scope-isolation gate not passed')
     require(set(data.get('contexts', {})) == {'mobile', 'compact', 'cards', 'grid', 'pro_non_sports', 'pro_sports'}, 'Six-context runtime evidence incomplete')
-    receipt = {'gates': {'A': 'PASS', 'B': 'PASS', 'C': 'PASS', 'D': 'PASS'}, 'source_after': proof['after'], 'test_suites': suites, 'test_total': sum(s['tests'] for s in suites), 'runtime_inventory_sha256': sha(inventory.read_bytes()), 'physical_fold_verified': False}
+    receipt = {'gates': {'A': 'PASS', 'B': 'PASS', 'C': 'PASS', 'D': 'PASS'}, 'source_after': proof['after'], 'test_suites': suites, 'test_total': sum(s['tests'] for s in suites), 'approved_routing_reference_test_count': routing_receipt['test_count'], 'approved_routing_reference_sha256': routing_receipt['reference_sha256'], 'runtime_inventory_sha256': sha(inventory.read_bytes()), 'physical_fold_verified': False}
     write(args.out / 'PRE-DEVICE-GATES.json', receipt)
     return receipt
 
@@ -185,7 +231,7 @@ def package(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('prepare', 'tests', 'gates', 'package'))
+    parser.add_argument('mode', choices=('prepare', 'baseline_reference', 'tests', 'gates', 'package'))
     parser.add_argument('--base', type=Path, default=Path('transport-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk'))
     parser.add_argument('--parent', type=Path, default=Path('transport-evidence/evidence'))
     parser.add_argument('--build', type=Path, default=Path('corrective-build'))

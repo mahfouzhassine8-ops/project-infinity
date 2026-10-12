@@ -367,7 +367,7 @@
        muteIcon=new View(c){final Paint paint=new Paint(3);@Override protected void onDraw(Canvas canvas){icon(canvas,paint,"mute",0,0,getWidth(),light?INK:Color.WHITE);}};muteIcon.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);addView(muteIcon);
        preview=new Action(c,"play","Preview",true,false,actions::preview);preview.primary=true;preview.setTag("cobra_pro_preview");addView(preview);
        unmute=new Action(c,"audio","Unmute",true,false,actions::unmute);unmute.primary=true;unmute.setTag("cobra_pro_unmute");addView(unmute);
-+      previewPip=new Action(c,"pip","PiP",true,false,()->actions.control(8));previewPip.setTag("cobra_pro_preview_pip");addView(previewPip);
++      previewPip=new Action(c,"pip","PiP",true,false,()->actions.control(8));previewPip.stack=true;previewPip.setTag("cobra_pro_preview_pip");addView(previewPip);
        sportsWatch=new Action(c,"play","Watch Live",false,light,actions::sportsWatch);sportsWatch.primary=true;sportsWatch.setTag("cobra_pro_sports_watch");addView(sportsWatch);sportsStats=new Action(c,"stats","Stats",false,light,actions::sportsStats);sportsStats.setTag("cobra_pro_sports_stats");addView(sportsStats);sportsMulti=new Action(c,"groups","Multi-View",false,light,actions::sportsMulti);sportsMulti.setTag("cobra_pro_sports_multiview");addView(sportsMulti);
        left=new Action(c,"left","",true,false,()->actions.step(-1));left.setContentDescription("Previous Pro source");left.setTag("cobra_pro_previous");addView(left);
        right=new Action(c,"right","",true,false,()->actions.step(1));right.setContentDescription("Next Pro source");right.setTag("cobra_pro_next");addView(right);

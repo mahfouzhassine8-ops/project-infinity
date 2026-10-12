@@ -37,6 +37,15 @@ jobs:
           keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
           python3 -m unittest discover -s repairs/cobra-corrective -p 'test_*.py' -v 2>&1 | tee corrective-evidence/host-checks.log
           python3 repairs/cobra-corrective/package.py prepare
+      - name: Approved-source reference for disputed return paths — no APK assembly
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-corrective/package.py baseline_reference 2>&1 | tee corrective-evidence/routing-baseline.log
       - name: Gates C and D — actual UI isolation and exact workflow tests
         env:
           KODI_ANDROID_KEY_ALIAS: androiddebugkey
@@ -83,6 +92,7 @@ jobs:
             !corrective-evidence/android-source/
             corrective-build/xbmc/build/test-results/testReleaseUnitTest/
             corrective-build/xbmc/build/reports/tests/testReleaseUnitTest/
+            corrective-build-routing-baseline/xbmc/build/test-results/testReleaseUnitTest/
           compression-level: 1
           retention-days: 90
           if-no-files-found: error
