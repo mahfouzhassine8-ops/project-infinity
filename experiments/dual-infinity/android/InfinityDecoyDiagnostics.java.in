@@ -181,8 +181,8 @@ final class InfinityDecoyDiagnostics {
         Uri uri = Uri.parse("content://" + AUTHORITY + "/startup.zip");
         Intent send = new Intent(Intent.ACTION_SEND).setType("application/zip")
             .putExtra(Intent.EXTRA_STREAM, uri)
-            .setClipData(ClipData.newRawUri("Infinity startup diagnostics", uri))
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        send.setClipData(ClipData.newRawUri("Infinity startup diagnostics", uri));
         activity.runOnUiThread(() -> {
           if (!activity.isFinishing() && !activity.isDestroyed())
             activity.startActivity(Intent.createChooser(send, "Share startup diagnostics"));

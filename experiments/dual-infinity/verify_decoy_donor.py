@@ -30,7 +30,9 @@ def dex_superclasses(archive):
             offset = u32(u32(60) + 4*i)
             while data[offset] & 128: offset += 1
             offset += 1
-            strings.append(data[offset:data.index(b'\0', offset)].decode('utf-8'))
+            # DEX strings are modified UTF-8 (including C0 80 for NUL).
+            # Class descriptors are ASCII; arbitrary literal strings are not.
+            strings.append(data[offset:data.index(b'\0', offset)].decode('utf-8', errors='replace'))
         types = [strings[u32(u32(68) + 4*i)] for i in range(u32(64))]
         for i in range(u32(96)):
             offset = u32(100) + 32*i
