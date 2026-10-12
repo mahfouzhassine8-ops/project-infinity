@@ -33,7 +33,7 @@ TESTS=[
 EXPECTED={'Cobra2103199TimeshiftRegressionTest':7,'Cobra2103229MultiViewStabilityFillTest':10,
  'CobraProHandoffTest':50,'CobraProSeason317Test':13,'ProTeams312Test':17,'WholeUiAmbientTest':23,
  'CobraProRefinementTest':12,'CobraProControlsRefinementTest':11,'CobraProPausedReturnTest':8,
- 'CobraSportsLiveFeedTest':16,'CobraSixContractsTest':40}
+ 'CobraSportsLiveFeedTest':16,'CobraSixContractsTest':41}
 
 def snapshot(root):return {p.relative_to(root).as_posix():sha(p.read_bytes()) for p in root.rglob('*') if p.is_file()}
 

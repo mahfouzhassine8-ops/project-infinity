@@ -214,7 +214,7 @@
      if(mCobraModeToolbar!=null){View visuals=mCobraModeToolbar.findViewWithTag("cobra_mode_visuals");
        if(visuals!=null)visuals.setSelected(cobraVisualEffectsAllowed()&&(CobraPresentationEffects.ambientMode(mPrefs)!=CobraPresentationEffects.OFF||mPrefs.getBoolean(CobraPresentationEffects.NIGHT,false)));
      }
-@@ -14310,6 +14327,280 @@
+@@ -14310,6 +14327,285 @@
    }
  
  
@@ -441,13 +441,18 @@
 +    cobraStatusText(rows,state.isEmpty()?"Game status unavailable":state,13,text);
 +    if(!game.upcoming())cobraStatusText(rows,cobraSportsScoreLine(game),18,text);
 +    if(!hidden&&!delayed){String progress=summary!=null&&!summary.progress.isEmpty()?summary.progress:game.detail;if(!progress.isEmpty())cobraStatusText(rows,progress,13,text);if(!game.gameClock.isEmpty()&&!progress.contains(game.gameClock))cobraStatusText(rows,"Game clock • "+game.gameClock,12,muted);if(!game.gameSituation.isEmpty())cobraStatusText(rows,game.gameSituation,12,muted);}
-+    if(hidden){cobraStatusText(rows,"Scores and statistics are protected",13,muted);rows.addView(cobraSheetRow("play","Reveal this game","Other games stay protected",false,dark,()->{cobraSportsReveal(game);cobraShowProGameStatus();}));return;}
++    if(hidden){cobraStatusText(rows,"Scores and statistics are protected",13,muted);rows.addView(cobraSheetRow("play","Reveal this game","Other games stay protected",false,dark,()->{cobraSportsReveal(game);cobraShowProGameStatus();}));cobraAddProStatusDetails(rows,game,dark);return;}
 +    cobraStatusText(rows,"Team Stats",16,text);
-+    if(loading){cobraStatusText(rows,"Loading available team statistics…",12,muted);return;}
-+    if(summary==null||summary.observedAtMs<=0||summary.teamStats.isEmpty()||delayed){cobraStatusText(rows,delayed?"Live statistics unavailable while the feed is delayed":"Team statistics unavailable for this game",12,muted);return;}
++    if(loading){cobraStatusText(rows,"Loading available team statistics…",12,muted);cobraAddProStatusDetails(rows,game,dark);return;}
++    if(summary==null||summary.observedAtMs<=0||summary.teamStats.isEmpty()||delayed){cobraStatusText(rows,delayed?"Live statistics unavailable while the feed is delayed":"Team statistics unavailable for this game",12,muted);cobraAddProStatusDetails(rows,game,dark);return;}
 +    Map<String,String> a=game.away==null?null:summary.teamStats.get(game.away.id),h=game.home==null?null:summary.teamStats.get(game.home.id);java.util.LinkedHashSet<String> labels=new java.util.LinkedHashSet<>();if(a!=null)labels.addAll(a.keySet());if(h!=null)labels.addAll(h.keySet());
 +    cobraStatusStatRow(rows,"","AWAY","HOME",text,true);
 +    for(String label:labels)cobraStatusStatRow(rows,label,a==null?"—":a.getOrDefault(label,"—"),h==null?"—":h.getOrDefault(label,"—"),text,false);
++    cobraAddProStatusDetails(rows,game,dark);
++  }
++  private void cobraAddProStatusDetails(LinearLayout rows,CobraSportsGame game,boolean dark){
++    // The expanded mini information keeps the prior statistics/leader presentation reachable.
++    if(mPlayerOverlay==null){LinearLayout detail=cobraSheetRow("stats","Detailed statistics","Open the existing game statistics",false,dark,()->showCobraSportsStats(game));detail.setTag("cobra_pro_status_existing_stats");rows.addView(detail);}
 +  }
 +  private void cobraStatusStatRow(LinearLayout rows,String label,String away,String home,int color,boolean heading){
 +    LinearLayout row=new LinearLayout(this);row.setPadding(dp(6),dp(5),dp(6),dp(5));String[] values={label,away,home};float[] weights={1.8f,1f,1f};
@@ -495,7 +500,7 @@
    // 2103270 — Cobra Sports Hub. Sports intelligence only; existing player/provider/Multi-View owners stay authoritative.
    private static final String COBRA_OWNER_SPORTS="sports";
    private static final String COBRA_SPORTS_FAVORITES="cobra_sports_favorite_teams";
-@@ -14362,6 +14653,7 @@
+@@ -14362,6 +14658,7 @@
      String score="";
    }
    private static final class CobraSportsGame{
@@ -503,7 +508,7 @@
      String leagueLogo="";
      String id="",leagueKey="",leagueLabel="",sport="",league="",name="",shortName="",state="pre",detail="",venue="";
      int period=0;String statusName="";
-@@ -14375,6 +14667,8 @@
+@@ -14375,6 +14672,8 @@
      boolean finalGame(){return completed||"post".equals(state);}
    }
    private static final class CobraSportsSummary{
@@ -512,7 +517,7 @@
      final ArrayList<String> lines=new ArrayList<>();
    }
    private static final class CobraSportsMatch{
-@@ -14457,6 +14751,7 @@
+@@ -14457,6 +14756,7 @@
      @Override public CobraSportsSummary summary(CobraSportsGame game)throws Exception{
        CobraSportsLeagueSpec spec=cobraSportsSpec(game.leagueKey);CobraSportsSummary out=new CobraSportsSummary();if(spec==null)return out;
        JSONObject root=cobraSportsJson(base(spec)+"/summary?event="+URLEncoder.encode(game.id,"UTF-8"));
@@ -520,7 +525,7 @@
        JSONObject box=root.optJSONObject("boxscore");JSONArray teams=box==null?null:box.optJSONArray("teams");
        if(teams!=null)for(int i=0;i<teams.length();i++){JSONObject row=teams.optJSONObject(i);JSONObject team=row==null?null:row.optJSONObject("team");String name=team==null?"Team":team.optString("displayName","Team");out.lines.add(name.toUpperCase(Locale.US));JSONArray stats=row==null?null:row.optJSONArray("statistics");
          if(stats!=null)for(int j=0;j<stats.length()&&j<12;j++){JSONObject stat=stats.optJSONObject(j);if(stat==null)continue;String label=stat.optString("label",stat.optString("name","")),value=stat.optString("displayValue","");if(!label.isEmpty()&&!value.isEmpty())out.lines.add(label+"  •  "+value);}
-@@ -14503,7 +14798,7 @@
+@@ -14503,7 +14803,7 @@
    private static long cobraSportsIso(String value){if(value==null||value.isEmpty())return 0L;String[] patterns={"yyyy-MM-dd'T'HH:mmX","yyyy-MM-dd'T'HH:mm:ssX","yyyy-MM-dd'T'HH:mm:ss.SSSX","yyyy-MM-dd'T'HH:mm:ssXXX"};for(String p:patterns)try{SimpleDateFormat f=new SimpleDateFormat(p,Locale.US);f.setTimeZone(TimeZone.getTimeZone("UTC"));Date d=f.parse(value);if(d!=null)return d.getTime();}catch(Exception ignored){}return 0L;}
    private static CobraSportsTeam cobraSportsParseTeam(CobraSportsLeagueSpec spec,JSONObject team,JSONObject competitor){if(team==null)return null;CobraSportsTeam out=new CobraSportsTeam();out.id=team.optString("id","");if(out.id.isEmpty())return null;out.leagueKey=spec.key;out.key=spec.key+"|"+out.id;out.name=team.optString("displayName",team.optString("name","Team"));out.shortName=team.optString("shortDisplayName",team.optString("name",out.name));out.abbreviation=team.optString("abbreviation","");out.logo=team.optString("logo","");if(competitor!=null){out.score=competitor.optString("score","");JSONArray records=competitor.optJSONArray("records");if(records!=null&&records.length()>0){JSONObject rec=records.optJSONObject(0);if(rec!=null)out.record=rec.optString("summary","");}}return out;}
    private static ArrayList<CobraSportsGame> cobraSportsParseScoreboard(CobraSportsLeagueSpec spec,JSONObject root){ArrayList<CobraSportsGame> out=new ArrayList<>();JSONArray events=root==null?null:root.optJSONArray("events");if(events==null)return out;for(int i=0;i<events.length();i++){JSONObject e=events.optJSONObject(i);if(e==null)continue;JSONArray comps=e.optJSONArray("competitions");JSONObject c=comps!=null&&comps.length()>0?comps.optJSONObject(0):null;if(c==null)continue;CobraSportsGame g=new CobraSportsGame();g.id=e.optString("id","");if(g.id.isEmpty())continue;g.leagueKey=spec.key;g.leagueLabel=spec.label;
@@ -529,7 +534,7 @@
  
    private static void cobraSportsCollectStandings(JSONObject node,ArrayList<String> out,int depth){if(node==null||depth>5)return;String group=node.optString("name",node.optString("abbreviation",""));JSONObject standings=node.optJSONObject("standings");JSONArray entries=standings==null?null:standings.optJSONArray("entries");if(entries!=null&&entries.length()>0){if(!group.isEmpty())out.add(group.toUpperCase(Locale.US));for(int i=0;i<entries.length();i++){JSONObject entry=entries.optJSONObject(i),team=entry==null?null:entry.optJSONObject("team");if(team==null)continue;StringBuilder line=new StringBuilder(team.optString("displayName","Team"));JSONArray stats=entry.optJSONArray("stats");String wins="",losses="",ties="",summary="";if(stats!=null)for(int s=0;s<stats.length();s++){JSONObject st=stats.optJSONObject(s);if(st==null)continue;String name=st.optString("name","");if("wins".equals(name))wins=st.optString("displayValue","");else if("losses".equals(name))losses=st.optString("displayValue","");else if("ties".equals(name))ties=st.optString("displayValue","");else if("overall".equals(name))summary=st.optString("displayValue","");}if(!summary.isEmpty())line.append("  •  ").append(summary);else if(!wins.isEmpty()||!losses.isEmpty()){line.append("  •  ").append(wins).append("-").append(losses);if(!ties.isEmpty()&&!"0".equals(ties))line.append("-").append(ties);}out.add(line.toString());}}
      JSONArray children=node.optJSONArray("children");if(children!=null)for(int i=0;i<children.length();i++)cobraSportsCollectStandings(children.optJSONObject(i),out,depth+1);
-@@ -14652,7 +14947,7 @@
+@@ -14652,7 +14952,7 @@
    private boolean cobraSportsUniqueStrong(List<CobraSportsMatch> matches){if(matches==null||matches.isEmpty()||!matches.get(0).strong())return false;return matches.size()==1||matches.get(0).score-matches.get(1).score>=15;}
    private long mCobraSportsActionSerial;
    private void cobraSportsResolveAsync(CobraSportsGame game,CobraSportsResolverCallback consumer){final long request=++mCobraSportsActionSerial,ticket=mCobraNavigation.current();final String owner=cobraDrawerOwner(),profile=mFeatures.activeProfileId();final ArrayList<CobraSportsChannelInfo> snapshot=cobraSportsChannelSnapshot();toast("Finding available broadcasts…");boolean submitted=submitCobraIo(()->{ArrayList<CobraSportsMatch> matches=cobraSportsResolve(game,snapshot);publishCobraUi(()->{if(request!=mCobraSportsActionSerial||!mCobraNavigation.accepts(ticket)||!owner.equals(cobraDrawerOwner())||!profile.equals(mFeatures.activeProfileId()))return;String top=matches.isEmpty()?"none":matches.get(0).channel.name+" ("+matches.get(0).score+")";mCobraSportsLastResolver=cobraSportsMatchup(game)+" → "+top;consumer.accept(matches);});});if(!submitted&&isCobraAsyncAlive())toast("Broadcast lookup unavailable. Reopen Sports and try again.");}
