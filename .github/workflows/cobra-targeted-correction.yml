@@ -77,7 +77,7 @@ jobs:
           set -e
           test "$code" -ne 0
           python3 repairs/cobra-targeted-isolation/gate.py negative-result "${args[@]}"
-      - name: Run all 193 preserved tests and 12 new regression cases
+      - name: Run all 193 preserved tests and 13 new regression cases
         run: |
           set -euo pipefail
           ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:testReleaseUnitTest :xbmc:exportPreservationTools 2>&1 | tee delivery-evidence/test.log

@@ -1,6 +1,6 @@
 {
   "parent_source_sha256": "484b73bc677090a70667daa6c62e895402d4fed5a2f8dcdbe9a1f4e510d9f861",
-  "source_sha256": "4175c5f1af427094a2093f99ad910e4543d057a80c94546d7dd0acbb6a3255c5",
+  "source_sha256": "1000eaca411f977263436015541b3748cc571f6397f228d7c2d74fea677a04b2",
   "removed_dashboard_methods": [
     "showCobraSportsHub",
     "cobraSportsPrepareHeader",
@@ -165,6 +165,10 @@
     "InfinityLiveActivity::showCobraSportsSoccer()": {
       "before": "969d656f49cddbe40cad04ad548bb6ad60233ea18ca392438ea56f6d1a44435e",
       "after": null
+    },
+    "InfinityLiveActivity::stopCobraPreview()": {
+      "before": "ba395bf4d5c67340f2e56a52e151d454d15f60ad31492134da5e1cbd9d27e7c8",
+      "after": "98f37f1e817a76e5eae626d0f8a12d8c7fc817c2ac09bd1705c9df20fac709ce"
     }
   }
 }

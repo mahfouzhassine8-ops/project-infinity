@@ -114,6 +114,12 @@ public class CobraTargetedIsolationTest {
   call(r.a,"cobraRefreshScoreTicker");TextView ticker=(TextView)get(r.a,"mCobraScoreTicker");assertNotNull(ticker);
   assertTrue(ticker.getText().toString().contains("Q3 6:42"));assertTrue(ticker.getText().toString().contains("Lions"));
  }
+ @Test(timeout=90000) public void leavingProViaNavigationDisposalImmediatelyClearsPlayerScorePresentation()throws Exception{
+  r.open("focus",false);game();r.full();call(r.a,"cobraRefreshScoreTicker");assertNotNull(get(r.a,"mCobraScoreTicker"));
+  Object player=get(r.a,"mPlayer");call(r.a,"stopCobraPreview");
+  assertFalse((Boolean)get(r.a,"mCobraProActive"));assertNull(get(r.a,"mCobraScoreTicker"));assertTrue(((Map)get(r.a,"mCobraScorePending")).isEmpty());
+  assertSame(player,get(r.a,"mPlayer"));assertFalse(r.state.released);
+ }
  @Test(timeout=90000) public void sportsMultiScoresCannotRenderOutsideProAndOrdinaryTilesStayAlive()throws Exception{
   for(String mode:NON_PRO){r.open(mode,false);savedPro();game();multi();
    assertNotNull(get(r.a,"mMultiOverlay"));List tiles=(List)call(get(r.a,"mCobraTiles"),"values");assertEquals(2,tiles.size());

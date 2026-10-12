@@ -97,6 +97,8 @@ def apply(source,out):
          'if(!CobraModeLayout.valid(mCobraGuideStyle))mCobraGuideStyle="mobile";\n    if(!"focus".equals(mCobraGuideStyle))cobraClearProSportsPresentation();')
  replace('mCobraProSportsAdapter=null;mCobraProActive=false;mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;',
          'mCobraProSportsAdapter=null;mCobraProActive=false;mCobraProPlaybackOwned=false;mCobraProHeroBrowsing=false;cobraClearProSportsPresentation();')
+ replace('mCobraProObserved=null;mCobraProListener=null;mCobraProActive=false;mCobraProHeroUi=null;mCobraProOverlay=null;',
+         'mCobraProObserved=null;mCobraProListener=null;mCobraProActive=false;mCobraProHeroUi=null;mCobraProOverlay=null;cobraClearProSportsPresentation();')
  # Fence in-flight sports actions as well as already-visible score presentation.
  replace('private void cobraSportsResolveAsync(CobraSportsGame game,CobraSportsResolverCallback consumer){',
          'private void cobraSportsResolveAsync(CobraSportsGame game,CobraSportsResolverCallback consumer){if(!cobraProPlayerSportsEnabled())return;')

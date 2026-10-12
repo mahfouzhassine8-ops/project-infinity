@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preserve all 193 delivered cases; add 12 regression cases and bounded source review."""
+"""Preserve all 193 delivered cases; add 13 regression cases and bounded source review."""
 import argparse, difflib, hashlib, importlib.util, json, os, shutil, subprocess, sys, tarfile, zipfile
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
@@ -12,7 +12,7 @@ VERSION=2103373
 RELEASE='1.0.9-Cobra-Targeted-Isolation-RC1'
 NAME='Cobra-2103373-Targeted-Isolation-RC1.apk'
 EXTRA='CobraTargetedIsolationTest'
-delivery_gate.EXTRA[EXTRA]=12
+delivery_gate.EXTRA[EXTRA]=13
 delivery_gate.VERSION=VERSION;delivery_gate.RELEASE=RELEASE
 
 def require(ok,message):
@@ -54,7 +54,7 @@ def prepare(args):
    rel=Path(m.name).relative_to('test')
    target=args.build/'xbmc/src/test'/rel
    require(target.is_file() and target.read_bytes()==t.extractfile(m).read(),'Delivered test or fixture altered: '+str(rel))
- write(args.out/'TARGETED-TEST-PROVENANCE.json',{'preserved_2103372_test_tree':True,'new_tests':12,'new_test_sha256':sha(tests/(EXTRA+'.java')),'negative_control_pending':True,'physical_fold_acceptance':False})
+ write(args.out/'TARGETED-TEST-PROVENANCE.json',{'preserved_2103372_test_tree':True,'new_tests':13,'new_test_sha256':sha(tests/(EXTRA+'.java')),'negative_control_pending':True,'physical_fold_acceptance':False})
 
 def review(args):
  require(sha(args.base)==stage.TRANSPORT,'Retained native transport changed')
@@ -71,7 +71,7 @@ def review(args):
  old,new=maps;delta={k:{'before':old.get(k),'after':new.get(k)} for k in sorted(old.keys()|new.keys()) if old.get(k)!=new.get(k)}
  require(delta==approved['members'],'Correction touched an unreviewed named member')
  result=json.loads((args.out/'RUNTIME-RESULTS.json').read_text());counts=result['totals']
- require(result['source_commit']==os.environ['GITHUB_SHA'] and counts['tests']>=205,'Missing current tests')
+ require(result['source_commit']==os.environ['GITHUB_SHA'] and counts['tests']>=206,'Missing current tests')
  require(all(counts[k]==0 for k in ('failures','errors','skipped')),'Required verification failure')
  preserved=json.loads((args.out/'SAVED-TEST-PRESERVATION.json').read_text())
  require(preserved['original_test_names_preserved']==185 and preserved['inherited_sources_unchanged'],'Inherited verification changed')
@@ -103,9 +103,9 @@ def package(args):
  package_test.package(args)
  old=args.out/'Cobra-2103372-Six-Verified-RC1.apk';final=args.out/NAME;old.rename(final)
  absent(final,(args.build/'preservation-classpath.txt').read_text().strip(),args.out)
- receipt=json.loads((args.out/'DELIVERY.json').read_text());receipt.update({'file':NAME,'parent_candidate':2103372,'new_regression_cases':12,'preserved_2103372_cases':193,'retired_dashboard_compiled_absence_verified':True,'locked':False,'production_promoted':False})
+ receipt=json.loads((args.out/'DELIVERY.json').read_text());receipt.update({'file':NAME,'parent_candidate':2103372,'new_regression_cases':13,'preserved_2103372_cases':193,'retired_dashboard_compiled_absence_verified':True,'locked':False,'production_promoted':False})
  write(args.out/'DELIVERY.json',receipt)
- print('PASS signed candidate, retained engine, 205 tests and compiled dashboard absence:',NAME)
+ print('PASS signed candidate, retained engine, 206 tests and compiled dashboard absence:',NAME)
 
 def negative_source(args):
  sys.path.insert(0,str(ROOT/'repairs/mobile-regressions-2103304'))
