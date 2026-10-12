@@ -1,4 +1,8 @@
-# BLOCKED — corrective draft, not a candidate
+# Historical blocked checkpoint — continuation authorized
+
+The user explicitly authorized continuation from commit `c3d5b03602e6e8edc275203491b572b8e1c26c77`. The narrow routing alias below is now implemented at exactly the two documented callers; source-token checks prove no other change within those navigation methods. The new left preview PiP position remains, with new actual hierarchy/geometry/touch tests. All 27 existing new tests and 167 inherited cases are retained; four targeted continuation tests bring the new suite to 31. This source checkpoint is ready for parent compile/runtime gates, not accepted or promoted. Android tests, evidence renders and packaging have not yet run. The historical findings and checkpoint hashes below are preserved unchanged for audit.
+
+## Historical stop record
 
 The earlier source-ready checkpoint is withdrawn. Stop requested by the parent after independent review identified a protected playback/navigation regression. No routing correction has been applied. The source and tests are preserved as an incomplete draft for review, not for compilation, APK assembly, signing, promotion or installation.
 

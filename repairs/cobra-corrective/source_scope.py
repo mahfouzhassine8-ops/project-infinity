@@ -13,6 +13,7 @@ LEX = re.compile(r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\
 
 # (owner class or None, method, authorized item numbers, contract)
 EXISTING_ACTIVITY = [
+ (None,'showCobraPrimaryView',[2,3,4],'Only replace routing predicate call with exact approved-semantics alias; complete remaining method token-identical.'),
  (None,'cobraPreviewPanel',[2],'Append separate phone PiP target; original six callbacks and row untouched.'),
  (None,'buildPlayer',[1],'Only scoped Channels replacement construction inherits existing userMuted and requested volume; same audio/player engine.'),
  ('CobraIconButton','onDraw',[4],'Fullscreen Stats delegates to the exact existing Pro mini stats canvas icon.'),
@@ -26,9 +27,11 @@ EXISTING_ACTIVITY = [
  (None,'cobraConsumeLauncherPipReturn',[2],'Mini button origin handoff before existing launcher/native-return handling.'),
  ('CobraEspnSiteSportsRepository','summary',[4],'Read available metadata/player fields from existing summary response; original lines/leaders preserved.'),
  (None,'showCobraSportsStats',[4],'Existing Stats entry shared by mini/fullscreen, Sports-only enhancement, owner guard, spoilers/unavailable handling.'),
+ (None,'showCobraSportsHub',[3,4],'Only replace routing predicate call with exact approved-semantics alias; complete remaining method token-identical.'),
  (None,'cobraSportsWatch',[1,5],'Only actual Pro Sports fullscreen Channels invocation uses new layer-free chooser; original matching preserved.'),
 ]
 ADDED_ACTIVITY = [
+ ('cobraProSportsRoutingEnabled',[2,3,4],'Exact approved saved-focus predicate for exactly two unchanged navigation consumers; not a live-player/UI gate.'),
  ('cobraCorrectiveSportsContext',[3,4,5],'Actual Pro plus current Sports section or hero pane.'),
  ('cobraChannelsTune',[1],'Capture existing user mute/requested-volume intent, exclude temporary focus/call mute, finally clear scope.'),
  ('cobraButtonPictureInPicture',[2],'Phone-only existing-player promotion and existing PiP API; remember mini origin.'),
@@ -126,6 +129,15 @@ def verify(baseline_root:Path,candidate_root:Path,out:Path)->dict:
     inventory=[]
     for name,normalizer in zip(FILES,(normalize_activity,normalize_ui)):
         before=(baseline_root/PREFIX/name).read_text();after=(candidate_root/PREFIX/name).read_text()
+        if name==FILES[0]:
+            for route in ('showCobraPrimaryView','showCobraSportsHub'):
+                bs,be=method_span(before,route);cs,ce=method_span(after,route)
+                expected=before[bs:be].replace('cobraProPlayerSportsEnabled()','cobraProSportsRoutingEnabled()')
+                assert tokens(expected)==tokens(after[cs:ce]),f'Protected navigation changed beyond predicate alias: {route}'
+            bs,be=method_span(before,'cobraProPlayerSportsEnabled');cs,ce=method_span(after,'cobraProSportsRoutingEnabled')
+            expected=before[bs:be].replace('cobraProPlayerSportsEnabled','cobraProSportsRoutingEnabled')
+            assert tokens(expected)==tokens(after[cs:ce]),'Routing predicate no longer matches exact approved expression'
+            assert len(re.findall(r'\bcobraProSportsRoutingEnabled\s*\(',after))==3,'Routing alias must have exactly two callers'
         left,right=normalizer(before,after)
         assert tokens(left)==tokens(right),f'Java change outside explicit six-item contracts: {name}'
         for owner,method,items,contract in EXISTING_ACTIVITY if name==FILES[0] else EXISTING_UI:

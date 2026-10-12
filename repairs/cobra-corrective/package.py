@@ -174,7 +174,7 @@ def package(args):
     badging = run(bt / 'aapt', 'dump', 'badging', final, output=args.out / 'badging.txt')
     require(f"package: name='{parent.PACKAGE}' versionCode='{CONFIG['version_code']}' versionName='{CONFIG['version_name']}'" in badging, 'Wrong package/version identity')
     parent.verify_payload(args.base, final)
-    report = {**CONFIG, 'source_commit': os.environ['GITHUB_SHA'], 'validation_run': os.environ['GITHUB_RUN_ID'], 'apk_sha256': sha(final.read_bytes()), 'apk_bytes': final.stat().st_size, 'test_total': receipt['test_total'], 'test_suites': receipt['test_suites'], 'gates': {**receipt['gates'], 'E': 'PASS', 'F': 'PENDING_USER_FOLD_TEST'}, 'native_recompiled': False, 'data_reset': False, 'physical_device_verified': False, 'locked': False, 'android_source_changes': ALLOWED, **preserved, 'bytecode_preservation': dex}
+    report = {**CONFIG, 'implementation_state': 'SIGNED_TEST_CANDIDATE', 'android_runtime_tests': 'PASS', 'apk_created': True, 'source_commit': os.environ['GITHUB_SHA'], 'validation_run': os.environ['GITHUB_RUN_ID'], 'apk_sha256': sha(final.read_bytes()), 'apk_bytes': final.stat().st_size, 'test_total': receipt['test_total'], 'test_suites': receipt['test_suites'], 'gates': {**receipt['gates'], 'E': 'PASS', 'F': 'PENDING_USER_FOLD_TEST'}, 'native_recompiled': False, 'data_reset': False, 'physical_device_verified': False, 'locked': False, 'android_source_changes': ALLOWED, **preserved, 'bytecode_preservation': dex}
     write(args.out / 'APK-VERIFICATION.json', report)
     with tarfile.open(args.out / 'compiled-runtime-source.tar.gz', 'w:gz') as archive:
         archive.add(args.out / 'android-source', arcname='shell-kodi')

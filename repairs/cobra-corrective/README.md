@@ -2,7 +2,7 @@
 
 Not locked. Not production-promoted. Physical Galaxy Fold acceptance is required.
 
-**STOPPED AT PRESERVATION REVIEW.** The draft's shared Pro predicate changes a protected Sports return/reopen path. See `BLOCKED-REVIEW.md`. Android runtime gates and APK assembly have not run. The proposed 2103371 identity is reserved metadata, not an existing APK. The build workflow is intentionally not activated in the preserved checkpoint.
+**RESUMED FOR PRE-DEVICE GATES.** The user authorized continuation from preserved checkpoint `c3d5b03602e6e8edc275203491b572b8e1c26c77`. The original Sports navigation predicate is now retained through an exact-semantics compatibility helper, independently guarded from live Pro presentation. See `BLOCKED-REVIEW.md` for the historical stop and `IMPLEMENTATION-REVIEW.md` for the correction. Thirty-one corrective Android tests and all 167 inherited cases must pass before assembly. The 2103371 identity remains reserved metadata until the signed-package gate succeeds; no physical acceptance or release lock is implied.
 
 ## Foundation and preservation
 

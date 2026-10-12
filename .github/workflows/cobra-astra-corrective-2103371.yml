@@ -1,0 +1,88 @@
+name: Cobra | Astra corrective six changes 2103371
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/cobra-astra-corrective-20261012]
+    paths: ['repairs/cobra-corrective/**', '.github/workflows/cobra-astra-corrective-2103371.yml']
+permissions: {contents: read, actions: read}
+concurrency: {group: cobra-astra-corrective-2103371, cancel-in-progress: false}
+jobs:
+  gates-and-test-candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-RC1-APK
+          github-token: ${{ github.token }}
+          path: transport-apk
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-Evidence
+          github-token: ${{ github.token }}
+          path: transport-evidence
+      - name: Gate A and B — clean approved Cobra source and exact scope
+        run: |
+          set -euo pipefail
+          mkdir -p corrective-evidence/runtime "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          python3 -m unittest discover -s repairs/cobra-corrective -p 'test_*.py' -v 2>&1 | tee corrective-evidence/host-checks.log
+          python3 repairs/cobra-corrective/package.py prepare
+      - name: Gates C and D — actual UI isolation and exact workflow tests
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-corrective/package.py tests 2>&1 | tee corrective-evidence/android-tests.log
+          python3 repairs/cobra-corrective/package.py gates
+      - name: Assemble Android donor only after required gates pass
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          test -f corrective-evidence/PRE-DEVICE-GATES.json
+          ./corrective-build/gradlew --no-daemon --console=plain -p corrective-build :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee corrective-evidence/android-assemble.log
+      - name: Gate E — protected transport and permanent signing
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/cobra-corrective/package.py package
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103371-Cobra-Corrective-RC1-APK
+          path: corrective-evidence/Infinity-2103371-Cobra-Corrective-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-2103371-Corrective-Gates-Evidence
+          path: |
+            corrective-evidence/
+            !corrective-evidence/*.apk
+            !corrective-evidence/baseline-extracted/
+            !corrective-evidence/android-source/
+            corrective-build/xbmc/build/test-results/testReleaseUnitTest/
+            corrective-build/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
