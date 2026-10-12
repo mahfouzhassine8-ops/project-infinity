@@ -30,7 +30,7 @@ public class CobraSixUiEvidenceTest {
   a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());a.onConfigurationChanged(config);Object viewRoot=ReflectionHelpers.callInstanceMethod(a.getWindow().getDecorView(),"getViewRootImpl");((ShadowViewRootImpl)Shadow.extract(viewRoot)).callDispatchResized();c.b.f.frames(1);c.b.f.measure(a,w,h);
  }
  void capture(String label,int w,int h)throws Exception{
-  c.b.f.measure(a,w,h);c.b.f.frames(15);View root=a.getWindow().getDecorView();
+  c.b.f.measure(a,w,h);if(get(a,"mPlayerOverlay")!=null)call(a,"showPlayerChromeTemporarily");c.b.f.frames(15);if(get(a,"mPlayerOverlay")!=null){View chrome=(View)get(a,"mPlayerChrome");assertNotNull(chrome);assertEquals("Capture the existing revealed controls, not their intentional auto-hide state",View.VISIBLE,chrome.getVisibility());assertTrue(chrome.getAlpha()>.9f);}View root=a.getWindow().getDecorView();
   assertEquals("Actual window width must match evidence label",w,root.getWidth());assertEquals("Actual window height must match evidence label",h,root.getHeight());
   File folder=new File(System.getProperty("cobra.evidence"),"window-review");folder.mkdirs();Bitmap bitmap=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);root.draw(new Canvas(bitmap));try(FileOutputStream out=new FileOutputStream(new File(folder,label+".png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}bitmap.recycle();
  }
