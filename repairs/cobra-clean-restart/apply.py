@@ -32,7 +32,7 @@ def apply(root,out):
          'private void cobraSportsWatch(CobraSportsGame game){if(mCobraSix.watchFromChannels(game))return;final boolean embedded=')
     edit(a,'cobraPreviewPanel',2,
          '    host.addView(bar,new FrameLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.12",50)),Gravity.BOTTOM));',
-         '    mCobraSix.previewButton(bar);\n    host.addView(bar,new FrameLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.12",50)),Gravity.BOTTOM));')
+         '    mCobraSix.previewButton(bar,host);\n    host.addView(bar,new FrameLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraPreviewPanel.dimensions.12",50)),Gravity.BOTTOM));')
     edit(a,'cobraBuildPlayerChrome',[2,3,4],
          'footer.addView(tools,new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.35",52))))',
          'footer.addView(mCobraSix.controls(tools,Math.max(1,width-footer.getPaddingLeft()-footer.getPaddingRight())),new LinearLayout.LayoutParams(-1,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.35",52))))')
@@ -71,7 +71,10 @@ def apply(root,out):
          'mCobraModeToolbar.addView(cobraIcon("multi","Choose view mode",dark,v->showCobraViewModeMenu()),new LinearLayout.LayoutParams(dp(48),-1));mCobraModeRail.removeAllViews();mCobraModeFooter.removeAllViews();mCobraSix.headerTheme();')
     edit(a,'cobraRefreshVisualEffects',6,
          '    cobraRefreshAmbient();if(mCobraEffects==null)return;',
-         '    cobraRefreshAmbient();mCobraSix.headerTheme();if(mCobraEffects==null)return;')
+         '    mCobraSix.headerTheme();cobraRefreshAmbient();if(mCobraEffects==null)return;')
+    edit(a,'cobraLayoutGuide',2,
+         '    mCobraModeDescription.setVisibility(mCobraModeLayout.details[3]>=190?View.VISIBLE:View.GONE);\n    cobraRefreshModeDetails();\n  }\n',
+         '    mCobraModeDescription.setVisibility(mCobraModeLayout.details[3]>=190?View.VISIBLE:View.GONE);\n    cobraRefreshModeDetails();mCobraSix.smallPreviewPip();\n  }\n')
     fragment=(HERE/'CobraSix.fragment.java').read_text()
     last=sources[a].rfind('}')
     if sources[a][last+1:].strip(): raise RuntimeError('Unexpected activity suffix')
@@ -92,7 +95,7 @@ def apply(root,out):
     edit(u,'Hero constructor',2,
          'String[] glyphs={"pause","favorite","cc","audio","fullscreen","more","stats","groups"},names={"Pause","Favorite","Subtitles","Audio","Fullscreen","More","Stats","Multi-View"};',
          'String[] glyphs={"pause","favorite","cc","audio","fullscreen","more","stats","groups","pip"},names={"Pause","Favorite","Subtitles","Audio","Fullscreen","More","Stats","Multi-View","PiP"};')
-    edit(u,'Hero constructor',2,'new int[]{0,1,2,3,4,6,7,5}','new int[]{0,1,2,3,4,8,6,7,5}')
+    edit(u,'Hero constructor',2,'for(int index:new int[]{0,1,2,3,4,6,7,5})controlStrip.addView', 'for(int index:new int[]{0,1,2,3,4,8,6,7,5})if(index!=8||actions.pipSupported())controlStrip.addView')
     edit(u,'Hero.applyModeVisibility',2,
          'show&&(i<6||sportsMode)?VISIBLE:GONE',
          'show&&(i<6||(i==8?actions.pipSupported():sportsMode))?VISIBLE:GONE')
