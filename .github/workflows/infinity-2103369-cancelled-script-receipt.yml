@@ -9,8 +9,8 @@ on:
       - '.github/workflows/infinity-2103369-cancelled-script-receipt.yml'
       - 'tools/checkpoint-apk/**'
 permissions: {contents: read, actions: read}
-# Separate approved candidate; never cancel or overwrite a locked baseline build.
-concurrency: {group: infinity-cancelled-script-receipt-2103369, cancel-in-progress: false}
+# Cancel superseded builds only within this isolated candidate; locked baseline builds have different groups.
+concurrency: {group: infinity-cancelled-script-receipt-2103369, cancel-in-progress: true}
 env:
   NDK_VER: 21.4.7075529
 jobs:

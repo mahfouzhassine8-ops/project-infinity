@@ -63,10 +63,16 @@ int main(int argc,char** argv) {
     auto* result=PyRun_String(code,Py_file_input,globals,globals);
     if(result)Py_DECREF(result);else PyErr_Clear();
   }
+  if(mode=="missing-file") {
+    // A real _Py_fopen_obj error also reaches onExecute's failure branch.
+    // Preserve that failure; early observation is not successful execution.
+    PyErr_SetString(PyExc_OSError,"script file does not exist");
+    InfinityScriptPersistence::Fail(id,"uncaught_script_failure_before_persistence_receipt");
+  }
   if(mode=="observer-error")PyErr_SetString(PyExc_RuntimeError,"injected finalization failure");
   InfinityPythonPersistence::Finish(context,owner);
   if(PyErr_Occurred())PyErr_Clear();
-  const bool mustBlock=mode=="pending-transaction" || mode=="opaque-writer" || mode=="observer-error";
+  const bool mustBlock=mode=="missing-file" || mode=="pending-transaction" || mode=="opaque-writer" || mode=="observer-error";
   if(mustBlock) {
     assert(!context->finalized || !InfinityScriptPersistence::Failure().empty());
     assert(InfinityScriptPersistence::Pending(id));
@@ -110,6 +116,7 @@ def main():
         assert invoker.index(call)<invoker.index('_Py_fopen_obj(pyRealFilename')
         assert invoker.index('m_threadState = l_threadState')<invoker.index(call)
         assert invoker.index('onInitialization();')<invoker.index(call)
+        assert 'InfinityScriptPersistence::Fail(GetId(), "uncaught_script_failure_before_persistence_receipt");' in invoker
     # Extract exactly the shipped attach statement, preserving the production call.
     early=call if before else ''
     late='' if before else call
