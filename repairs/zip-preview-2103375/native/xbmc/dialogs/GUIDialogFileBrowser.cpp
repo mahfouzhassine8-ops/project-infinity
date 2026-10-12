@@ -369,7 +369,8 @@ bool CGUIDialogFileBrowser::OpenInfinityFilePreview(int iItem)
   ClearProperty("Infinity.FilePreview.AcceptNonce");
   SetProperty("Infinity.FilePreview.Active", "true");
   // Fixed script path; no filename or ZIP metadata is interpolated into a command.
-  if (CBuiltins::GetInstance().Execute("RunScript(special://skin/resources/lib/infinity_file_preview.py)") != 0)
+  if (CBuiltins::GetInstance().Execute("RunScript(special://skin/resources/lib/infinity_file_preview.py," +
+                                      std::to_string(GetID()) + ")") != 0)
     ClearInfinityFilePreview();
   return true;
 }

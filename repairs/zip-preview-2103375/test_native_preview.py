@@ -64,7 +64,8 @@ int main() {
         self.assertIn('GetProperty("Infinity.FilePreview.Nonce").asString()', source)
         self.assertIn('GetProperty("Infinity.FilePreview.AcceptNonce").asString()', source)
         self.assertIn('ClearInfinityFilePreview();\n      ClearProperty("Infinity.FilePreview.NativeVersion")', source)
-        self.assertEqual(source.count('Execute("RunScript(special://skin/resources/lib/infinity_file_preview.py)")'), 1)
+        self.assertEqual(source.count('Execute("RunScript(special://skin/resources/lib/infinity_file_preview.py,"'), 1)
+        self.assertIn('std::to_string(GetID())', source)
         self.assertNotIn('Extract', source.split('// INFINITY_FILE_PREVIEW_V1:', 1)[1].split('void CGUIDialogFileBrowser::ClearFileItems', 1)[0])
 
 
