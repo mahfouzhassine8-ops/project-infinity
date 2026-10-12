@@ -23,9 +23,9 @@ The mini PiP control is a 48dp addition above the existing player controls; the 
 
 ## Verification
 
-The pipeline runs 39 new real Android/Robolectric contracts plus the ten inherited Cobra suites (167 existing checks). Two copied regression files update expectations only for the approved extra buttons and expanded Pro game information sheet; their prior behavioral checks remain. The exact inherited obsolete Pro drawer-destination exclusion remains documented; no new tests are skipped.
+The pipeline runs 40 new real Android/Robolectric contracts plus the ten inherited Cobra suites (167 existing checks). Two copied regression files update expectations only for the approved extra buttons and expanded Pro game information sheet; their prior behavioral checks remain. The exact inherited obsolete Pro drawer-destination exclusion remains documented; no new tests are skipped.
 
-Four host checks exercise negative source preservation and pinned baseline identity. Packaging compares every protected ZIP entry, resources, manifest (except candidate version), permanent signer, JNI declarations, and exact unaffected compiled instructions. Stateless D8 API helper relocation is resolved by exact method bodies, never blanket-exempted.
+Nine host checks exercise negative source preservation, pinned baseline identity and exact DEX encoding/control-flow equivalence. Packaging compares every protected ZIP entry, resources, manifest (except candidate version), permanent signer, JNI declarations, and exact unaffected compiled instructions. Stateless D8 API helper relocation is resolved by exact method bodies, never blanket-exempted.
 
 The repository branch and successful CI artifact are evidence of source/automated acceptance only. They do not establish actual Android PiP, decoder/audio routing, Galaxy Fold appearance or physical acceptance.
 

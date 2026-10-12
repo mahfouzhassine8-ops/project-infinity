@@ -8,6 +8,7 @@ sys.path.insert(0,str(HERE.parent/'mobile-regressions-2103304'))
 from packaging_checks import DEX,SIGNATURE,require,resource_ids,run,sha,verify_manifest_pair,dex_contract
 import package_candidate as factory
 from source_scope import verify
+from dex_encoding import canonical
 IDENTITY=json.loads((HERE/'baseline-identity.json').read_text())
 BASE=IDENTITY['retained_transport_sha256'];CERT=IDENTITY['signer_sha256']
 VERSION=2103370;RELEASE='1.0.9-Cobra-Six-Changes-RC1'
@@ -32,7 +33,7 @@ TESTS=[
 EXPECTED={'Cobra2103199TimeshiftRegressionTest':7,'Cobra2103229MultiViewStabilityFillTest':10,
  'CobraProHandoffTest':50,'CobraProSeason317Test':13,'ProTeams312Test':17,'WholeUiAmbientTest':23,
  'CobraProRefinementTest':12,'CobraProControlsRefinementTest':11,'CobraProPausedReturnTest':8,
- 'CobraSportsLiveFeedTest':16,'CobraSixContractsTest':39}
+ 'CobraSportsLiveFeedTest':16,'CobraSixContractsTest':40}
 
 def snapshot(root):return {p.relative_to(root).as_posix():sha(p.read_bytes()) for p in root.rglob('*') if p.is_file()}
 
@@ -92,6 +93,9 @@ def compare_dex(base,final,build,out):
  bridge.OWNER=r'com/projectinfinity/kodi/(?:[^/]+\$\$ExternalSyntheticApiModelOutline\d+|InfinityExitDiagnostics\$\$ExternalSyntheticBackport2)'
  bridge.HELPER=re.compile(bridge.OWNER+r'\.smali$');bridge.CALL=re.compile(r'L'+bridge.OWNER+r';->m(?:\$\d+)?\([^\s]+')
  left,old_bodies,old_helpers=bridge.resolve(maps[0]);right,new_bodies,new_helpers=bridge.resolve(maps[1])
+ encoding_changed=sorted(n for n in left.keys()|right.keys() if left.get(n)!=right.get(n) and not CHANGED_FAMILY.fullmatch(n))
+ left={n:canonical(text) for n,text in left.items()};right={n:canonical(text) for n,text in right.items()}
+ encoding_only=[n for n in encoding_changed if left.get(n)==right.get(n)]
  changed=sorted(n for n in left.keys()|right.keys() if left.get(n)!=right.get(n))
  unexpected=[n for n in changed if not CHANGED_FAMILY.fullmatch(n)]
  diagnostic=out/'compiler-diffs';diagnostic.mkdir(exist_ok=True)
@@ -100,7 +104,7 @@ def compare_dex(base,final,build,out):
  # JNI signatures must remain exactly unchanged, including untouched native activity owners.
  with zipfile.ZipFile(base) as a,zipfile.ZipFile(final) as b:require(dex_contract(a)[0]==dex_contract(b)[0],'JNI declaration changed')
  report={'changed_dex_classes':changed,'protected_compiled_classes_identical':len(set(left)|set(right))-len(changed),
- 'protected_class_differences':unexpected,'jni_declarations_identical':True,
+ 'protected_class_differences':unexpected,'encoding_only_protected_classes':encoding_only,'jni_declarations_identical':True,
  'helper_bodies_before':len(old_bodies),'helper_bodies_after':len(new_bodies),
  'helper_containers_before':sorted(old_helpers),'helper_containers_after':sorted(new_helpers),
  'method':'Exact opcodes/registers/signatures after recursively resolving stateless API helper relocation; source line metadata excluded. Source token gate independently preserves every unapproved method.'}

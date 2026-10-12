@@ -45,6 +45,7 @@ jobs:
           keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
           python3 repairs/cobra-six-2103370/package.py prepare --source source3369/shell-kodi --base baseline-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build build3370 --out evidence3370
           python3 repairs/cobra-six-2103370/test_source_scope.py
+          python3 repairs/cobra-six-2103370/test_dex_encoding.py
       - name: Compile source and run new contracts plus retained Cobra regressions
         env:
           KODI_ANDROID_KEY_ALIAS: androiddebugkey
