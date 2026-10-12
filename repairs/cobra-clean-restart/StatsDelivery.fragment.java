@@ -45,7 +45,7 @@
       if(!fullscreen){team(rows,game.away,"Away");team(rows,game.home,"Home");return;}
       TextView match=cobraText(cobraSportsMatchup(game),Color.WHITE,21);match.setTypeface(Typeface.DEFAULT_BOLD);rows.addView(match,new LinearLayout.LayoutParams(-1,-2));
       TextView league=cobraText(game.leagueLabel,0xff9fbcca,12);league.setPadding(0,dp(4),0,dp(10));rows.addView(league,new LinearLayout.LayoutParams(-1,-2));
-      LinearLayout pair=new LinearLayout(InfinityLiveActivity.this);pair.setGravity(Gravity.TOP);CobraSportsTeam[] teams={game.away,game.home};String[] sides={"AWAY TEAM","HOME TEAM"};
+      LinearLayout pair=new LinearLayout(InfinityLiveActivity.this);pair.setGravity(Gravity.TOP);CobraSportsTeam[] teams={game.away,game.home};String[] sides={"Away team","Home team"};
       for(int i=0;i<2;i++){
         CobraSportsTeam team=teams[i];LinearLayout card=new LinearLayout(InfinityLiveActivity.this);card.setOrientation(LinearLayout.VERTICAL);card.setPadding(dp(8),dp(8),dp(8),dp(8));card.setBackground(cobraPanelSurface(0x2216222b,10,0x554ebad1));
         TextView side=cobraText(sides[i],0xff9fc6d6,11);card.addView(side,new LinearLayout.LayoutParams(-1,-2));LinearLayout mark=new LinearLayout(InfinityLiveActivity.this);mark.setGravity(Gravity.CENTER_VERTICAL);
