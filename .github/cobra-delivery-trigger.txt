@@ -1,5 +1,5 @@
-Cobra delivery verification pass 4.
-Continue from the saved implementation; all 185 original cases remain required.
-Additional checks use the actual Robolectric app clock and rendered Pro-header glyph pixels.
-Only authorized Stats metadata/freshness and Pro-header compatibility runtime corrections are included.
-No packaging before all tests and exact-source review pass.
+Cobra test delivery pass 5.
+Engineering source/visual verification: run 38223428232, all 193 cases passed.
+Revalidate the exact reviewed source and all 185 original tests before assembly.
+Require protected decoded bytecode, manifest, resources/assets/native payload and permanent signer equality.
+Build Cobra 2103372 for user testing only. Do not install, lock, promote or rebuild native code.
