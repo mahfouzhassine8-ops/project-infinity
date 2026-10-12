@@ -1,0 +1,86 @@
+name: Cobra | Six authorized changes 2103370 test candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/cobra-six-2103370]
+    paths: ['repairs/cobra-six-2103370/**', '.github/workflows/cobra-six-2103370.yml']
+permissions: {contents: read, actions: read}
+concurrency: {group: cobra-six-2103370, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+  INFINITY_BASE_SOURCE_COMMIT: 9abf7c84fbd8224958bc8465c983429bc5976074
+jobs:
+  cobra-only-candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0', log-accepted-android-sdk-licenses: false}
+      - uses: actions/cache@v4
+        with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-Linux-21.4.7075529-v1}
+      - name: Restore verified Android toolchain only
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38188883754
+          name: Infinity-Checkpoint-Work-Android-Validation
+          github-token: ${{ github.token }}
+          path: baseline-source
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-RC1-APK
+          github-token: ${{ github.token }}
+          path: baseline-apk
+      - name: Verify source identity and six-change preservation scope
+        run: |
+          set -euo pipefail
+          mkdir -p source3369 evidence3370 "$HOME/.android"
+          tar --no-same-owner -xzf baseline-source/checkpoint-android/runtime-shell-source.tar.gz -C source3369
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          python3 repairs/cobra-six-2103370/package.py prepare --source source3369/shell-kodi --base baseline-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build build3370 --out evidence3370
+          python3 repairs/cobra-six-2103370/test_source_scope.py
+      - name: Compile source and run new contracts plus retained Cobra regressions
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          ./build3370/gradlew --no-daemon --console=plain -p build3370 :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.CobraSixContractsTest --tests com.projectinfinity.kodi.CobraSportsLiveFeedTest --tests com.projectinfinity.kodi.CobraProRefinementTest --tests com.projectinfinity.kodi.CobraProControlsRefinementTest --tests com.projectinfinity.kodi.CobraProPausedReturnTest --tests com.projectinfinity.kodi.CobraProHandoffTest --tests com.projectinfinity.kodi.CobraProSeason317Test --tests com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest --tests com.projectinfinity.kodi.ProTeams312Test --tests com.projectinfinity.kodi.WholeUiAmbientTest --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee evidence3370/android-build.log
+      - name: Preserve every non-Cobra payload and sign test candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-six-2103370/package.py package --source source3369/shell-kodi --base baseline-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build build3370 --out evidence3370
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103370-Cobra-Six-Changes-RC1-APK
+          path: evidence3370/Infinity-2103370-Cobra-Six-Changes-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-2103370-Verification
+          path: |
+            evidence3370/
+            !evidence3370/*.apk
+            !evidence3370/android-source/**
+            build3370/xbmc/build/test-results/testReleaseUnitTest/
+            build3370/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
