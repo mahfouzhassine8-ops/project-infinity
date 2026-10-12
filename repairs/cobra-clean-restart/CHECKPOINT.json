@@ -1,26 +1,45 @@
 {
-  "status": "STOPPED_PRESERVATION_GATE",
-  "runtime_source_commit": "daa8c1b19d02c84b86696fc82cb8cb0a0ac30563",
+  "status": "PIP_CORRECTION_185_TESTS_PASSED_PACKAGE_GATES_PENDING",
+  "continued_from": "aca973f21642c30148367baaf7ed0e0f83f079f8",
+  "runtime_source_commit": "e82f9a677532554c0d020f5c08d3f29ebe89296c",
   "branch": "work/cobra-clean-restart-20261012",
-  "latest_candidate_run": 38213877859,
-  "artifact_id": 11730895129,
-  "artifact_zip_sha256": "65f558241cd95d8424b5481c9ae90016cc4109fa49733e37089f23d79718bf5c",
-  "tests": {"executed": 185, "passed": 172, "failed": 13, "errors": 0, "skipped": 0},
-  "new_tests": {"executed": 18, "passed": 17, "failed": 1},
-  "inherited_tests": {"executed": 167, "passed": 155, "failed": 12},
-  "baseline_reference": {"run": 38209729246, "executed": 168, "passed": 168},
-  "preservation_stop": "New unsupported-PiP Action remains in Hero.player without LayoutParams. The existing layout loop dereferences null. Twelve inherited cases fail at that shared cause, including the TV fallback test.",
-  "separate_unverified_workflow": "Mobile fullscreen Channels > Groups > Documentaries adapter has channels but zero rendered ListView children. Full mode/category audio matrix did not complete. Production versus fixture cause is not established.",
-  "runtime_source_sha256": {
-    "InfinityLiveActivity.java.in": "0abbb320d58c9eb37a024c1da48be4301cf2cd22b51a789e6a9e4279c7d8545c",
-    "CobraProUi.java.in": "9efbd2802cc28d09162b0166399b4e3ed10ba94e909e54f4dbc5ade8b935aad1"
+  "latest_candidate_run": 38217628815,
+  "artifact_id": 11732706403,
+  "artifact_zip_sha256": "238eb08304d32a44d630b96d87862628716f422951b94be4b8141ba499f41e08",
+  "tests": {"executed": 185, "passed": 185, "failed": 0, "errors": 0, "skipped": 0},
+  "new_tests": {"executed": 18, "passed": 18, "failed": 0},
+  "inherited_tests": {"executed": 167, "passed": 167, "failed": 0},
+  "previous_185_test_names_preserved": true,
+  "inherited_source_provenance_unchanged": true,
+  "baseline_reference": {
+    "run": 38217628897,
+    "artifact_id": 11733405955,
+    "artifact_zip_sha256": "c1baafa3ac8a0d6781fa609a59aee31903f0f82666573611ef78953b2a5c095c",
+    "executed": 169,
+    "passed": 169,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
   },
+  "pip_crash": "RESOLVED: initialize LayoutParams on only new Hero.player[8]; all 12 formerly affected inherited cases pass.",
+  "groups_diagnosis": "TEST_HELPER: unchanged-source comparison renders 0 rows with historical manual layout and all 4 rows with ordinary framework traversal. Groups runtime is unchanged; actual 48-combination channel/mute matrix now passes.",
+  "channels_audio_matrix_cases": 48,
+  "runtime_changes_since_saved_implementation": [
+    {"file": "CobraProUi.java.in", "method": "Hero constructor", "requirement": 2, "purpose": "New unsupported PiP action LayoutParams initialization"},
+    {"file": "InfinityLiveActivity.java.in", "method": "CobraSix.miniPip", "requirement": 2, "purpose": "Selective locked/already-PiP and preview-session key checks"}
+  ],
+  "runtime_source_sha256": {
+    "InfinityLiveActivity.java.in": "77482b135aff60a4c0c6953bb92b1949c32e447528434df659aa869892ab4c1c",
+    "CobraProUi.java.in": "a096e19cb594752274ded0ea18a40a48f9e5ee55ad5e7f6caf474236d56372cb"
+  },
+  "runtime_identical_to_first_corrective_run": 38216862555,
   "other_runtime_files_byte_identical": 262,
-  "changed_named_members": {"total": 69, "methods_and_constructors": 50, "fields": 19, "added": 46},
-  "changed_member_inventory_sha256": "a3178819428e9516800f71dcad9084bebc07cccdb03c171075832d1c21259932",
   "approved_cobra_source": "9f621f34e3ded845e1c3e9c2a49d98158b6e31b3",
   "retained_transport_source": "9abf7c84fbd8224958bc8465c983429bc5976074",
-  "rejected_2103370_imported": false,
+  "rejected_2103370_used_as_parent": false,
+  "selective_pip_reference": "47d9e563a6052e6ac5d90f784ad526346d93d9cf",
+  "selective_pip_reuse": "Mini-player lock/already-in-PiP and matching-preview-session guards only; no rejected menus or broad audio/tuning policies copied.",
+  "groups_runtime_modified": false,
   "candidate_version_assigned": false,
   "apk_assembled": false,
   "permanent_candidate_signed": false,
@@ -28,12 +47,18 @@
   "physical_fold_verified": false,
   "locked": false,
   "production_promoted": false,
-  "remaining_gates": [
-    "Correct only the new unsupported PiP control in a separately authorized continuation",
-    "Establish and validate actual Groups rendering",
-    "Complete all-mode/category audio and remaining runtime/visual coverage",
-    "Finish exact scope and protected-bytecode review",
-    "Only then package and verify payload/signature",
-    "Obtain physical Fold acceptance before any lock or promotion"
+  "results_document": "PIP-CORRECTIVE-RESULTS.md",
+  "historical_stop_document": "STOP-RECORD.md",
+  "evidence_verification_sha256": "950a4bbbb9aac612471c54439743a409491defa822c3d943b84ccc9ae225beca",
+  "history": [
+    {"run": 38213877859, "passed": 172, "executed": 185, "failed": 13},
+    {"run": 38216862555, "passed": 184, "executed": 185, "failed": 1},
+    {"run": 38217628815, "passed": 185, "executed": 185, "failed": 0}
+  ],
+  "remaining_delivery_gates": [
+    "Complete remaining broader six-change visual/mockup/ambient and Sports-data/freshness coverage without conflating it with the 185-case corrective gate",
+    "Final exact scope and protected compiled-bytecode review",
+    "Package and verify preserved payload, candidate identity and permanent signature only after all pre-device requirements pass",
+    "Physical Fold acceptance before any release lock or production promotion"
   ]
 }
