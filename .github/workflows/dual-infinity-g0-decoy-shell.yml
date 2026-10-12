@@ -5,10 +5,7 @@ on:
     paths:
       - 'experiments/dual-infinity/android/**'
       - 'experiments/dual-infinity/stage_decoy.py'
-      - 'experiments/dual-infinity/verify_decoy_donor.py'
-      - 'experiments/dual-infinity/package_bootstrap.py'
       - 'experiments/dual-infinity/test_decoy_stage.py'
-      - '.github/workflows/dual-infinity-g0-decoy-shell.yml'
 permissions: {contents: read, actions: read}
 concurrency: {group: dual-infinity-g0-decoy-shell, cancel-in-progress: false}
 jobs:

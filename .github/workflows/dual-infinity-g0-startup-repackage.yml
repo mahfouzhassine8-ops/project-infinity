@@ -1,0 +1,86 @@
+name: Dual Infinity | G0 verified startup repackage
+on:
+  push:
+    branches: [experiment/dual-infinity-2103368-g0]
+    paths:
+      - 'experiments/dual-infinity/dex_preservation.py'
+      - 'experiments/dual-infinity/test_dex_preservation.py'
+      - 'experiments/dual-infinity/verify_decoy_donor.py'
+      - 'experiments/dual-infinity/package_bootstrap.py'
+      - '.github/workflows/dual-infinity-g0-startup-repackage.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: dual-infinity-g0-verified-startup-repackage, cancel-in-progress: false}
+jobs:
+  verify-and-package-saved-shell:
+    if: github.ref == 'refs/heads/experiment/dual-infinity-2103368-g0'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools build-tools;34.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Refuse reuse if compiled Android inputs changed
+        run: |
+          set -euo pipefail
+          changed=$(git diff --name-only 7ef8ddc6102fd84b6771f4a2807c4a035a747ffd HEAD -- experiments/dual-infinity/android experiments/dual-infinity/stage_decoy.py)
+          test -z "$changed"
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38137092930
+          name: Infinity-2103368-Installer-Close-RC1-APK
+          github-token: ${{ github.token }}
+          path: protected-apk
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38187425665
+          name: Dual-Infinity-G0-Compile-Only-Donor-Internal
+          github-token: ${{ github.token }}
+          path: compiled-shell
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38187425665
+          name: Dual-Infinity-G0-Decoy-Shell-Compilation-Evidence
+          github-token: ${{ github.token }}
+          path: prior-evidence
+      - name: Verify saved donor, executed tests and equivalent generated callbacks
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          python3 -m unittest discover -s experiments/dual-infinity -p 'test_*.py' -v
+          python3 experiments/dual-infinity/verify_decoy_donor.py --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --donor compiled-shell/xbmc-release.apk --build-tools "$ANDROID_HOME/build-tools/34.0.0" --output repaired-probe --test-results prior-evidence/decoy-shell-build/xbmc/build/test-results/testReleaseUnitTest --compiled-source 7ef8ddc6102fd84b6771f4a2807c4a035a747ffd --compiled-run 38187425665
+      - name: Sign verified shell with unchanged parent native engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 experiments/dual-infinity/package_bootstrap.py --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --donor compiled-shell/xbmc-release.apk --probe-evidence repaired-probe --build-tools "$ANDROID_HOME/build-tools/34.0.0" --output bootstrap-evidence
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Dual-Infinity-G0-Signed-Bootstrap-APK
+          path: bootstrap-evidence/Infinity-Dual-Test-G0-Bootstrap-2-Startup-Repair.apk
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Dual-Infinity-G0-Startup-Repair-Delivery-Evidence
+          path: |
+            bootstrap-evidence/BOOTSTRAP-DELIVERY.json
+            bootstrap-evidence/final-manifest.txt
+            bootstrap-evidence/*ids.txt
+            bootstrap-evidence/*.sha256
+            bootstrap-evidence/*.signing.txt
+            repaired-probe/
+            prior-evidence/decoy-shell-build/xbmc/build/test-results/testReleaseUnitTest/
+          retention-days: 90
+          if-no-files-found: warn

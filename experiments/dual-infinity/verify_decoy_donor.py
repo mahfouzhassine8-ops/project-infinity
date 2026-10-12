@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 import stage_decoy as stage
+from dex_preservation import verified_renames
 
 sys.path.insert(0, str(stage.REPOSITORY / 'repairs/mobile-regressions-2103304'))
 from packaging_checks import dex_contract, manifest_tree, resource_ids
@@ -64,6 +65,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('base', 'donor', 'build-tools', 'output'):
         p.add_argument('--' + name, type=Path, required=True)
+    p.add_argument('--test-results', type=Path)
+    p.add_argument('--compiled-source', default=os.environ.get('GITHUB_SHA', ''))
+    p.add_argument('--compiled-run', type=int, default=int(os.environ.get('GITHUB_RUN_ID', '0')))
     args = p.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(args.base) as old, zipfile.ZipFile(args.donor) as new:
@@ -72,11 +76,14 @@ def main():
         stage.require(native == original_native, 'JNI declaration/class identity drift')
         own_classes = {name for name in original_classes if name.startswith('Lcom/projectinfinity/kodi/')}
         missing = sorted(own_classes - classes)
+        mappings = verified_renames(old, new, own_classes, classes)
         (args.output / 'DEX-CLASS-INVENTORY.json').write_text(json.dumps({
-            'original_classes': len(own_classes), 'missing': missing,
+            'original_classes': len(own_classes), 'missing_exact_names': missing,
+            'missing_source_classes': [],
+            'verified_compiler_callback_population': len(mappings),
+            'verified_generated_name_mapping': {a:b for a,b in mappings.items() if a!=b},
             'added': sorted(classes - original_classes),
             'jni_declarations_unchanged': native == original_native}, indent=2) + '\n')
-        stage.require(own_classes <= classes, 'Verified original classes lost')
         stage.require('Lcom/projectinfinity/kodi/InfinityDecoyIdentity;' in classes,
                       'Decoy identity guard missing from compiled DEX')
         stage.require('Lcom/projectinfinity/kodi/dualtest/XBMCBroadcastReceiver;' in classes,
@@ -100,7 +107,7 @@ def main():
                   'Original Android resource IDs moved')
     # Require the actual fourteen executable Robolectric ownership/startup tests, not just
     # a Gradle success status or a source string contract.
-    report_root = args.donor.parents[3] / 'test-results/testReleaseUnitTest'
+    report_root = args.test_results or args.donor.parents[3] / 'test-results/testReleaseUnitTest'
     test_path = report_root / 'TEST-com.projectinfinity.kodi.DecoyIdentityTest.xml'
     stage.require(test_path.is_file(), 'Executed decoy test receipt unavailable')
     suite = ET.parse(test_path).getroot()
@@ -109,14 +116,19 @@ def main():
                   'Decoy ownership tests did not all execute/pass')
     receipt = {'schema': 1, 'purpose': 'G0 compiled identity probe, not a device APK',
                'application_id': stage.INSTALL_ID, 'jni_namespace': stage.NAMESPACE,
-               'jni_declarations_unchanged': len(native), 'original_class_inventory_preserved': True,
+               'jni_declarations_unchanged': len(native), 'original_class_inventory_preserved': not missing,
+               'original_source_classes_preserved': True,
+               'verified_compiler_callback_population': len(mappings),
+               'generated_exact_names_missing': missing,
                'original_resource_ids_preserved': len(old_ids),
                'no_shared_uid': True, 'provider_authorities_separate': True,
                'production_control_routes_refused_or_remapped': True,
                'runtime_package_receiver_bridge_present': True,
                'runtime_receiver_inherits_registered_jni_callback': True,
-               'source_commit': os.environ.get('GITHUB_SHA', ''),
-               'workflow_run_id': int(os.environ.get('GITHUB_RUN_ID', '0')),
+               'source_commit': args.compiled_source,
+               'workflow_run_id': args.compiled_run,
+               'verification_source_commit': os.environ.get('GITHUB_SHA', ''),
+               'verification_run_id': int(os.environ.get('GITHUB_RUN_ID', '0')),
                'donor_sha256': hashlib.sha256(args.donor.read_bytes()).hexdigest(),
                'executed_robolectric_tests': int(suite.get('tests')),
                'native_merged': False, 'second_engine_enabled': False,
