@@ -116,12 +116,12 @@ public class CobraTargetedIsolationTest {
  }
  @Test(timeout=90000) public void sportsMultiScoresCannotRenderOutsideProAndOrdinaryTilesStayAlive()throws Exception{
   for(String mode:NON_PRO){r.open(mode,false);savedPro();game();multi();
-   assertNotNull(get(r.a,"mMultiOverlay"));Map tiles=(Map)get(r.a,"mCobraTiles");assertEquals(2,tiles.size());
-   for(Object tile:tiles.values()){assertNull(((FrameLayout)get(tile,"view")).findViewWithTag("cobra_sports_multi_overlay"));assertNotNull(get(tile,"player"));}
+   assertNotNull(get(r.a,"mMultiOverlay"));List tiles=(List)call(get(r.a,"mCobraTiles"),"values");assertEquals(2,tiles.size());
+   for(Object tile:tiles){assertNull("Sports Multi-View label must be absent",((FrameLayout)get(tile,"view")).findViewWithTag("cobra_sports_multi_overlay"));assertNotNull(get(tile,"player"));}
   }
  }
  @Test(timeout=90000) public void activeProMultiScoresDisappearOnExitAndReturnWithoutReplacingTiles()throws Exception{
-  r.open("focus",false);game();multi();Map tiles=(Map)get(r.a,"mCobraTiles");Object tile=tiles.get(get(r.channel(0),"id"));
+  r.open("focus",false);game();multi();Object tile=call(get(r.a,"mCobraTiles"),"get",get(r.channel(0),"id"));
   FrameLayout view=(FrameLayout)get(tile,"view");Object player=get(tile,"player");assertNotNull(view.findViewWithTag("cobra_sports_multi_overlay"));
   put(r.a,"mCobraGuideStyle","mobile");call(r.a,"cobraClearProSportsPresentation");assertNull(view.findViewWithTag("cobra_sports_multi_overlay"));assertSame(player,get(tile,"player"));
   put(r.a,"mCobraGuideStyle","focus");call(r.a,"cobraSportsRefreshMultiOverlays");assertNotNull(view.findViewWithTag("cobra_sports_multi_overlay"));assertSame(player,get(tile,"player"));

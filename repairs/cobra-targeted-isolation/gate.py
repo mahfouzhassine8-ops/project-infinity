@@ -124,6 +124,11 @@ def negative_result(args):
  root=ET.parse(path).getroot();cases=root.findall('testcase')
  failures={c.attrib['name'].removesuffix('()') for c in cases if c.find('failure') is not None}
  require(len(cases)==4 and failures==required,'New tests did not independently reproduce all four parent failures')
+ for c in cases:
+  failure=c.find('failure');require(failure is not None and 'AssertionError' in failure.attrib.get('type',''),'Negative control failed at a fixture boundary rather than reproducing the regression')
+  message=failure.attrib.get('message','')
+  if c.attrib['name'].startswith('retiredDashboard'):require(any(n in message for n in changes.RETIRED),'Dashboard absence assertion was not reached')
+  else:require('expected null' in message.lower(),'Actual forbidden UI presence was not observed: '+message)
  shutil.copy2(path,args.out/'NEGATIVE-CONTROL.xml')
  write(args.out/'NEGATIVE-CONTROL.json',{'source':2103372,'four_identified_failures_reproduced':sorted(failures),'failure_count':4,'tests_modified':False})
  sys.path.insert(0,str(ROOT/'repairs/mobile-regressions-2103304'))
