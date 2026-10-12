@@ -64,8 +64,22 @@ def apply(source, out):
 def prepare_tests(tests):
     path = tests / 'CobraCleanRuntimeTest.java'
     text = path.read_text()
-    old = '    assertTrue(context+" list="+get(a,"mCobraDrawerFilter")'
-    if text.count(old) != 1:
-        raise RuntimeError('Groups trace test preimage mismatch')
-    text = text.replace(old, '    if(list.getChildCount()==0)CobraGroupsTrace.record(context,list);\n' + old, 1)
+    edits = [
+        ('    assertTrue(context+" list="+get(a,"mCobraDrawerFilter")',
+         '    if(list.getChildCount()==0)CobraGroupsTrace.record(context,list);\n    assertTrue(context+" list="+get(a,"mCobraDrawerFilter")'),
+        ('void measure()throws Exception{f.measure(a,width,height);',
+         'void measure()throws Exception{f.frames(12);'),
+        ('open(mode,muted);PipPlatform.requests=0;Object origin=get(a,"mCobraGuideStyle");click(miniPip());',
+         '''open(mode,muted);PipPlatform.requests=0;Object origin=get(a,"mCobraGuideStyle");
+      String currentKey=(String)get(a,"mCobraPreviewSessionKey");
+      put(a,"mCobraPreviewSessionKey","stale-session");call(get(a,"mCobraSix"),"miniPip");
+      assertSame(state.proxy,get(a,"mCobraPreviewPlayer"));assertNull(get(a,"mPlayerOverlay"));assertEquals(0,PipPlatform.requests);
+      put(a,"mCobraPreviewSessionKey",currentKey);put(a,"mCobraPlayerLocked",true);call(get(a,"mCobraSix"),"miniPip");
+      assertSame(state.proxy,get(a,"mCobraPreviewPlayer"));assertNull(get(a,"mPlayerOverlay"));assertEquals(0,PipPlatform.requests);
+      put(a,"mCobraPlayerLocked",false);click(miniPip());'''),
+    ]
+    for old, new in edits:
+        if text.count(old) != 1:
+            raise RuntimeError('Corrective test preimage mismatch: ' + old[:100])
+        text = text.replace(old, new, 1)
     path.write_text(text)
