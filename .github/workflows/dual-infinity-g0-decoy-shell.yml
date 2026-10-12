@@ -6,6 +6,7 @@ on:
       - 'experiments/dual-infinity/android/**'
       - 'experiments/dual-infinity/stage_decoy.py'
       - 'experiments/dual-infinity/verify_decoy_donor.py'
+      - 'experiments/dual-infinity/package_bootstrap.py'
       - 'experiments/dual-infinity/test_decoy_stage.py'
       - '.github/workflows/dual-infinity-g0-decoy-shell.yml'
 permissions: {contents: read, actions: read}
@@ -63,6 +64,34 @@ jobs:
           export KODI_ANDROID_STORE_FILE="$GITHUB_WORKSPACE/compile-only-signing/compile.keystore"
           ./decoy-shell-build/gradlew --no-daemon --console=plain -p decoy-shell-build :xbmc:testReleaseUnitTest :xbmc:assembleRelease 2>&1 | tee decoy-shell-evidence/compile.log
           python3 experiments/dual-infinity/verify_decoy_donor.py --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --donor decoy-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk --build-tools "$ANDROID_HOME/build-tools/34.0.0" --output decoy-shell-evidence
+      - name: Package coordinated startup repair using unchanged parent engine
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 experiments/dual-infinity/package_bootstrap.py --base protected-apk/Infinity-2103368-Installer-Close-RC1.apk --donor decoy-shell-build/xbmc/build/outputs/apk/release/xbmc-release.apk --probe-evidence decoy-shell-evidence --build-tools "$ANDROID_HOME/build-tools/34.0.0" --output bootstrap-evidence
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Dual-Infinity-G0-Signed-Bootstrap-APK
+          path: bootstrap-evidence/Infinity-Dual-Test-G0-Bootstrap-2-Startup-Repair.apk
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Dual-Infinity-G0-Bootstrap-Delivery-Evidence
+          path: |
+            bootstrap-evidence/BOOTSTRAP-DELIVERY.json
+            bootstrap-evidence/final-manifest.txt
+            bootstrap-evidence/*ids.txt
+            bootstrap-evidence/*.sha256
+            bootstrap-evidence/*.signing.txt
+          retention-days: 90
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v7
         if: always()
         with:

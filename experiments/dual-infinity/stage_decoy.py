@@ -22,6 +22,8 @@ HERE = Path(__file__).resolve().parent
 REPOSITORY = HERE.parents[1]
 NAMESPACE = 'com.projectinfinity.kodi'
 INSTALL_ID = 'com.projectinfinity.kodi.dualtest'
+VERSION_CODE = 2
+VERSION_NAME = '0.1.1-G0-Startup-Repair'
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android', ANDROID[1:-1])
 
@@ -42,8 +44,8 @@ def manifest(text):
     # AGP 8 owns namespace/applicationId through Gradle, not a source-manifest
     # package attribute. Component classes below are explicitly qualified.
     root.attrib.pop('package', None)
-    root.set(ANDROID + 'versionCode', '1')
-    root.set(ANDROID + 'versionName', '0.1.0-G0-Identity-Probe')
+    root.set(ANDROID + 'versionCode', str(VERSION_CODE))
+    root.set(ANDROID + 'versionName', VERSION_NAME)
     app = root.find('application')
     require(app is not None, 'Missing application')
     app.set(ANDROID + 'name', NAMESPACE + '.InfinityDecoyApplication')
@@ -91,6 +93,10 @@ def manifest(text):
     intent = ET.SubElement(launcher, 'intent-filter')
     ET.SubElement(intent, 'action', {ANDROID + 'name': 'android.intent.action.MAIN'})
     ET.SubElement(intent, 'category', {ANDROID + 'name': 'android.intent.category.LAUNCHER'})
+    ET.SubElement(app, 'provider', {
+        ANDROID + 'name': NAMESPACE + '.InfinityDecoyDiagnosticsProvider',
+        ANDROID + 'authorities': INSTALL_ID + '.startup-diagnostics',
+        ANDROID + 'exported': 'false', ANDROID + 'grantUriPermissions': 'true'})
     return ET.tostring(root, encoding='unicode')
 
 
@@ -122,6 +128,12 @@ def validate_manifest(text, compiled=False):
             require(component.get(ANDROID + 'process') == ':kodi', 'Primary native process moved')
             mains.append(component)
     require(len(mains) == 1, 'G0 probe must declare exactly one native engine')
+    export = next((x for x in app.findall('provider') if
+                   x.get(ANDROID + 'name') == NAMESPACE + '.InfinityDecoyDiagnosticsProvider'), None)
+    require(export is not None and export.get(ANDROID + 'exported') == 'false' and
+            export.get(ANDROID + 'grantUriPermissions') == 'true' and
+            export.get(ANDROID + 'authorities') == INSTALL_ID + '.startup-diagnostics',
+            'Diagnostic provider must be private and explicitly grantable')
     forbidden = {'android.permission.MANAGE_EXTERNAL_STORAGE',
                  'android.permission.WRITE_EXTERNAL_STORAGE', 'android.permission.RECEIVE_BOOT_COMPLETED'}
     require(not any(p.get(ANDROID + 'name') in forbidden for p in root.findall('uses-permission')),
@@ -195,16 +207,16 @@ def main():
     (args.build / 'gradlew').chmod(0o755)
     app = args.build / 'xbmc'; app.mkdir()
     values = {'APP_PACKAGE': NAMESPACE, 'APP_NAME': 'Kodi', 'APP_NAME_LC': 'kodi',
-              'APP_VERSION': '0.1.0-G0-Identity-Probe', 'APP_VERSION_CODE_ANDROID': '1',
+              'APP_VERSION': VERSION_NAME, 'APP_VERSION_CODE_ANDROID': str(VERSION_CODE),
               'TARGET_MINSDK': '21', 'TARGET_SDK': '35', 'NDKROOT': str(sdk / 'ndk/unused')}
     manifest_text = manifest(configured(packaging / 'xbmc/AndroidManifest.xml.in', values))
     validate_manifest(manifest_text)
     (app / 'AndroidManifest.xml').write_text(manifest_text)
     gradle = configured(packaging / 'xbmc/build.gradle.in', values)
     gradle = once(gradle, 'applicationId "' + NAMESPACE + '"', 'applicationId "' + INSTALL_ID + '"')
-    gradle = once(gradle, 'versionCode 2103302', 'versionCode 1')
+    gradle = once(gradle, 'versionCode 2103302', 'versionCode ' + str(VERSION_CODE))
     gradle = once(gradle, 'versionName "1.0.9-Chooser-Weather-Snapshot-RC1"',
-                  'versionName "0.1.0-G0-Identity-Probe"')
+                  'versionName "' + VERSION_NAME + '"')
     gradle += '''
 android { buildFeatures { buildConfig true }
   testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = "2g" } }
@@ -229,8 +241,15 @@ dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.
         if transformed != original:
             delta[name] = {'before': hashlib.sha256(original.encode()).hexdigest(),
                            'transformed_template': hashlib.sha256(transformed.encode()).hexdigest()}
-    for origin in (HERE / 'android').glob('*.java.in'):
-        (namespace_root / origin.name[:-3]).write_text(origin.read_text())
+    for origin in (HERE / 'android').rglob('*.java.in'):
+        content = origin.read_text()
+        declaration = re.search(r'^package ([A-Za-z0-9_.]+);', content, re.M)
+        require(declaration is not None, 'Experimental Java namespace missing')
+        package = declaration.group(1)
+        require(package in (NAMESPACE, INSTALL_ID), 'Unreviewed experimental Java namespace')
+        target = app / 'java' / package.replace('.', '/') / origin.name[:-3]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content)
     shutil.copytree(packaging / 'xbmc/res', app / 'res')
     for name, folder in (('strings.xml', 'values'), ('colors.xml', 'values'), ('searchable.xml', 'xml')):
         target = app / 'res' / folder / name

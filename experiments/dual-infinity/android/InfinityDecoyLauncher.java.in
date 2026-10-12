@@ -11,13 +11,23 @@ public final class InfinityDecoyLauncher extends android.app.Activity {
     int padding = (int)(24 * getResources().getDisplayMetrics().density);
     column.setPadding(padding, padding, padding, padding);
     android.widget.TextView text = new android.widget.TextView(this);
-    text.setText("Infinity experimental setup\n\nSeparate saved data. Two-window tests are not enabled yet.");
+    text.setText("Infinity Experimental\n\nIf Infinity closes during startup, share startup diagnostics below.");
     column.addView(text);
     android.widget.Button open = new android.widget.Button(this);
-    open.setText("Open Infinity test window");
-    open.setOnClickListener(view -> startActivity(new android.content.Intent(this,
-        InfinityKodiEntryActivity.class).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)));
+    open.setText("Open Infinity");
+    open.setOnClickListener(view -> openInfinity());
     column.addView(open);
+    android.widget.Button diagnostics = new android.widget.Button(this);
+    diagnostics.setText("Share startup diagnostics");
+    diagnostics.setOnClickListener(view -> InfinityDecoyDiagnostics.share(this));
+    column.addView(diagnostics);
     setContentView(column);
+    // The launcher icon opens the native UI directly. This screen is retained
+    // only as a recovery/export route if the separate Kodi process returns.
+    if (state == null) openInfinity();
+  }
+  private void openInfinity() {
+    startActivity(new android.content.Intent(this, InfinityKodiEntryActivity.class)
+        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
   }
 }

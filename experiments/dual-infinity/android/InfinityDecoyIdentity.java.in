@@ -19,6 +19,18 @@ public final class InfinityDecoyIdentity {
   public static final String INSTALL_ID = "com.projectinfinity.kodi.dualtest";
   public static final String JNI_NAMESPACE = "com.projectinfinity.kodi";
   public static final String RPC_PORT = "18080";
+  public static Class<? extends android.content.BroadcastReceiver> nativeReceiver(Context context) throws IOException {
+    requireDecoy(context);
+    try {
+      Class<?> receiver = context.getClassLoader().loadClass(context.getPackageName() + ".XBMCBroadcastReceiver");
+      if (receiver.getSuperclass() != XBMCBroadcastReceiver.class)
+        throw new IOException("Cached-engine receiver does not inherit the registered callback");
+      receiver.getConstructor();
+      return receiver.asSubclass(android.content.BroadcastReceiver.class);
+    } catch (ReflectiveOperationException | ClassCastException unavailable) {
+      throw new IOException("Cached-engine receiver class unavailable", unavailable);
+    }
+  }
   private static final Set<String> SELF_COMPONENTS = new HashSet<>(Arrays.asList(
       JNI_NAMESPACE + ".Main", JNI_NAMESPACE + ".Splash",
       JNI_NAMESPACE + ".InfinityKodiEntryActivity",
@@ -72,6 +84,7 @@ public final class InfinityDecoyIdentity {
     System.setProperty("xbmc.home", home.getAbsolutePath());
     System.setProperty("xbmc.temp", temp.getAbsolutePath());
     System.setProperty("xbmc.jsonPort", RPC_PORT);
+    nativeReceiver(context);
     if (android.os.Build.VERSION.SDK_INT < 28 ||
         !(INSTALL_ID + ":kodi").equals(android.app.Application.getProcessName())) return;
     File profile = directory(data, ".kodi/userdata");

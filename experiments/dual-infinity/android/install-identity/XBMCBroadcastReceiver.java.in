@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package com.projectinfinity.kodi.dualtest;
+
+/** The cached engine constructs getPackageName()+".XBMCBroadcastReceiver".
+ * Inherit the original Java callback so RegisterNatives continues to bind
+ * com.projectinfinity.kodi.XBMCBroadcastReceiver._onReceive exactly once.
+ * Do not redeclare that native method under the installation namespace.
+ */
+public final class XBMCBroadcastReceiver extends com.projectinfinity.kodi.XBMCBroadcastReceiver {
+  public XBMCBroadcastReceiver() { super(); }
+}

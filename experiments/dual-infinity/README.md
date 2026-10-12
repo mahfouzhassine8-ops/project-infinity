@@ -1,8 +1,46 @@
 # Dual Infinity — G0 bootstrap implementation checkpoint
 
-Status: **SIGNED G0 BOOTSTRAP READY. DEVICE ACCEPTANCE PENDING.**
+Status: **FIRST G0 BOOTSTRAP FAILED ON THE FOLD. STARTUP REPAIR IN PROGRESS.**
 This APK has **one** engine. Two-process startup, independent shutdown, dual
 playback and audible handover are not implemented or accepted yet.
+
+## Physical failure and scoped repair
+
+The user's `18411.mp4` recording shows bootstrap 1 returning from its splash to
+the test launcher, followed by Android's app-bug crash dialog. No Kodi main UI
+is visible. G0 native bootstrap has **failed**, rather than passed or merely
+remaining unobserved. The recording hash and limitations are preserved in
+`evidence/G0-DEVICE-FAILURE-18411.json`.
+
+Exact parent `XBMCApp.cpp` constructs its dynamic broadcast receiver using
+`getPackageName()+".XBMCBroadcastReceiver"`. Pinned libandroidjni commit
+`7c1f1b326c14e0cf4d646b63a2ac448d7a8debe0` loads that Java class in its
+constructor. Bootstrap 1 retained only the original class namespace, so this
+experimental-installation class is missing. This is a concrete startup defect;
+without a phone crash stack its attribution as the recorded crash's sole cause
+remains unproven.
+
+Bootstrap 2 adds a final receiver subclass under the experimental installation
+namespace. It inherits the original registered native callback without adding
+another native declaration or changing the cached engine. Pre-start class
+resolution, executed reflection tests and DEX superclass verification check
+both halves of that contract. The original static JNI methods remain unchanged.
+
+The launcher opens Infinity directly and retains a recovery screen with **Share
+startup diagnostics**. Its bounded ZIP contains only selected experimental
+startup records, Java crash evidence and Android's own exit traces when exposed.
+The export provider is private, accepts only one fixed read-only URI, and requires
+an explicit read grant. It reads no production or add-on userdata. The Java fatal
+handler records evidence and delegates to Android's existing handler.
+
+The Android shell compiles/tests/packages in one coordinated branch-scoped run;
+the protected parent engine is reused. The older standalone packaging workflow
+is now manual and requires a verified repaired shell run instead of silently
+using the first donor. There is no new native build or phone install here.
+
+This repair is an update to **Infinity Experimental** only, versionCode 2,
+`0.1.1-G0-Startup-Repair`. It remains a one-engine bootstrap. A successful build
+cannot clear the failed physical bootstrap; a new phone observation is required.
 
 ## Exact source recovered
 
@@ -84,7 +122,7 @@ package. Daily userdata/settings/providers/skin are not copied. Packaged skin
 and add-on bytes are inherited unchanged from 2103368; the user's installed .207
 skin and other installed content remain untouched.
 
-## Required phone check before further gates
+## Original bootstrap 1 phone instructions (now failed; retained history)
 
 1. Install only the named experimental APK. Android should show a new app named
    **Infinity Experimental**, package `com.projectinfinity.kodi.dualtest`.
@@ -115,16 +153,16 @@ path isolation, saves, or shutdown and were not run on the phone here.
 
 | Gate | State |
 |---|---|
-| G0 | Exact source and installation probe built/verified; physical native bootstrap pending |
+| G0 | Exact source recovered; first installation probe built but native bootstrap failed on the phone; repair underway |
 | G1 | Not started: no secondary activity/engine, two PID/task/surface or writer trace evidence |
 | G2 | Not started: no per-slot 17-owner close proof |
 | G3–G6 | Not started: no dual video/audio/Fold/provider/performance measurements |
 | G7 | Not reached: final two-window package absent |
 
-After the physical bootstrap passes, continue the authorized Option B work:
+After the repaired physical bootstrap passes, continue the authorized Option B work:
 two fixed private process components, pre-start writable roots, registry and
 task ownership; then physical G1 evidence before independent shutdown or
-simultaneous video. No work or build continues after this device-gated delivery.
+simultaneous video. Stop at physical G0 evidence after delivering the repair.
 
 ## Rollback and preservation
 

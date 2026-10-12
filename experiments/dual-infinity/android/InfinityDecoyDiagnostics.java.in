@@ -1,0 +1,198 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package com.projectinfinity.kodi;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ApplicationExitInfo;
+import android.content.ClipData;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.util.AtomicFile;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Small, app-owned startup export. Never reads production or add-on userdata. */
+final class InfinityDecoyDiagnostics {
+  static final String AUTHORITY = InfinityDecoyIdentity.INSTALL_ID + ".startup-diagnostics";
+  static final String JAVA_CRASH = "infinity-experimental-java-crash.txt";
+  private static final AtomicBoolean exporting = new AtomicBoolean();
+  private static final int FILE_LIMIT = 64 * 1024;
+
+  static final class BoundedOutput extends FilterOutputStream {
+    private int remaining;
+    BoundedOutput(OutputStream output, int limit) { super(output); remaining = limit; }
+    @Override public void write(int value) throws IOException {
+      if (remaining > 0) { out.write(value); remaining--; }
+    }
+    @Override public void write(byte[] data, int offset, int count) throws IOException {
+      int allowed = Math.min(count, remaining);
+      if (allowed > 0) { out.write(data, offset, allowed); remaining -= allowed; }
+    }
+  }
+
+  static void installJavaCrashRecorder(Context context) {
+    InfinityDecoyIdentity.requireDecoy(context);
+    final File target = new File(context.getFilesDir(), JAVA_CRASH);
+    final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+    if (previous == null) return;
+    Thread.setDefaultUncaughtExceptionHandler((thread, failure) -> {
+      try {
+        if (!target.getCanonicalFile().equals(target.getAbsoluteFile())) throw new IOException("Linked crash record refused");
+        for (String suffix : new String[]{".new", ".bak"}) {
+          File companion = new File(target.getPath() + suffix);
+          if (!companion.getCanonicalFile().equals(companion.getAbsoluteFile())) throw new IOException("Linked atomic record refused");
+        }
+        AtomicFile record = new AtomicFile(target);
+        FileOutputStream output = record.startWrite();
+        try {
+          PrintWriter text = new PrintWriter(new OutputStreamWriter(
+              new BoundedOutput(output, FILE_LIMIT), StandardCharsets.UTF_8));
+          text.println("Package: " + InfinityDecoyIdentity.INSTALL_ID);
+          text.println("PID: " + android.os.Process.myPid());
+          text.println("Timestamp: " + System.currentTimeMillis());
+          failure.printStackTrace(text); text.flush();
+          if (text.checkError()) throw new IOException("Crash record incomplete");
+          output.getFD().sync(); record.finishWrite(output);
+        } catch (IOException | RuntimeException unavailable) { record.failWrite(output); }
+      } catch (IOException | RuntimeException ignored) { }
+      finally { previous.uncaughtException(thread, failure); }
+    });
+  }
+
+  static File archive(Context context) throws IOException {
+    InfinityDecoyIdentity.requireDecoy(context);
+    File cache = context.getCacheDir().getCanonicalFile();
+    File folder = new File(cache, "experimental-startup-export");
+    File result = new File(folder, "Infinity-Experimental-Startup.zip");
+    if (!folder.getCanonicalFile().equals(folder) || !result.getCanonicalFile().equals(result))
+      throw new IOException("Linked diagnostic export refused");
+    for (String suffix : new String[]{".new", ".bak"}) {
+      File companion = new File(result.getPath() + suffix);
+      if (!companion.getCanonicalFile().equals(companion)) throw new IOException("Linked atomic export refused");
+    }
+    if (!folder.isDirectory() && !folder.mkdirs()) throw new IOException("Export storage unavailable");
+    return result;
+  }
+
+  private static void text(ZipOutputStream zip, String name, String value) throws IOException {
+    zip.putNextEntry(new ZipEntry(name));
+    byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+    zip.write(bytes, 0, Math.min(bytes.length, FILE_LIMIT)); zip.closeEntry();
+  }
+
+  private static void include(ZipOutputStream zip, File root, String name, String entry) throws IOException {
+    File owner = root.getCanonicalFile();
+    if (!owner.equals(root.getAbsoluteFile())) return;
+    File source = new File(owner, name);
+    if (!source.getCanonicalFile().equals(source) || !source.isFile()) return;
+    zip.putNextEntry(new ZipEntry(entry));
+    try (InputStream input = new FileInputStream(source)) {
+      byte[] buffer = new byte[8192]; int remaining = FILE_LIMIT, count;
+      while (remaining > 0 && (count = input.read(buffer, 0, Math.min(buffer.length, remaining))) != -1) {
+        zip.write(buffer, 0, count); remaining -= count;
+      }
+    }
+    zip.closeEntry();
+  }
+
+  static File collect(Context context) throws Exception {
+    InfinityDecoyIdentity.requireDecoy(context);
+    File output = archive(context);
+    AtomicFile atomic = new AtomicFile(output);
+    FileOutputStream stream = atomic.startWrite();
+    try {
+      // finish(), not close(), keeps AtomicFile's stream open for its sync/commit.
+      ZipOutputStream zip = new ZipOutputStream(stream);
+      JSONObject identity = new JSONObject();
+      identity.put("package", context.getPackageName());
+      identity.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName);
+      identity.put("api", Build.VERSION.SDK_INT);
+      identity.put("engine_slots", 1);
+      identity.put("device_acceptance", "NOT_ESTABLISHED_BY_EXPORT");
+      text(zip, "experimental-identity.json", identity.toString(2));
+      File files = context.getFilesDir().getCanonicalFile();
+      for (String name : new String[] { JAVA_CRASH, "infinity-startup-trace.txt", "infinity-startup-trace.previous.txt" })
+        include(zip, files, name, name);
+      File nativeFolder = new File(files, "infinity-native-diagnostics");
+      for (String name : new String[] {"native-crash-last.txt", "lifecycle-breadcrumbs.jsonl", "lifecycle-breadcrumbs.previous.jsonl"})
+        include(zip, nativeFolder, name, "native/" + name);
+      if (Build.VERSION.SDK_INT >= 30) Api30.exits(context, zip);
+      else text(zip, "android-exits.json", "{\"status\":\"unsupported_api\"}");
+      zip.finish(); zip.flush(); stream.getFD().sync(); atomic.finishWrite(stream);
+      return output;
+    } catch (Exception failed) { atomic.failWrite(stream); throw failed; }
+  }
+
+  private static final class Api30 {
+    static void exits(Context context, ZipOutputStream zip) throws Exception {
+      JSONArray rows = new JSONArray(); int traces = 0;
+      ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+      if (manager != null) for (ApplicationExitInfo exit : manager.getHistoricalProcessExitReasons(context.getPackageName(), 0, 12)) {
+        String process = exit.getProcessName();
+        if (process == null || !(process.equals(InfinityDecoyIdentity.INSTALL_ID) ||
+            process.startsWith(InfinityDecoyIdentity.INSTALL_ID + ":"))) continue;
+        JSONObject row = new JSONObject();
+        row.put("process", process); row.put("pid", exit.getPid());
+        row.put("timestamp_ms", exit.getTimestamp()); row.put("reason", exit.getReason());
+        row.put("status", exit.getStatus());
+        String description = exit.getDescription();
+        row.put("description", description == null ? "" : description.substring(0, Math.min(4096, description.length())));
+        byte[] summary = exit.getProcessStateSummary();
+        if (summary != null && summary.length <= 128)
+          row.put("state_summary", new String(summary, StandardCharsets.UTF_8));
+        boolean eligible = exit.getReason() == ApplicationExitInfo.REASON_ANR ||
+            (Build.VERSION.SDK_INT >= 31 && (exit.getReason() == ApplicationExitInfo.REASON_CRASH_NATIVE ||
+             exit.getReason() == ApplicationExitInfo.REASON_SIGNALED));
+        row.put("trace_available", false);
+        if (eligible && traces < 2) {
+          try (InputStream input = exit.getTraceInputStream()) {
+            if (input != null) {
+              String name = "android-exit-" + exit.getTimestamp() + "-" + exit.getPid() + ".trace";
+              zip.putNextEntry(new ZipEntry(name));
+              byte[] buffer = new byte[8192]; int remaining = 2 * 1024 * 1024, count;
+              while (remaining > 0 && (count = input.read(buffer, 0, Math.min(buffer.length, remaining))) != -1) {
+                zip.write(buffer, 0, count); remaining -= count;
+              }
+              zip.closeEntry(); traces++;
+              row.put("trace_available", true); row.put("trace", name);
+            }
+          } catch (IOException | RuntimeException unavailable) { row.put("trace_error", unavailable.getClass().getSimpleName()); }
+        }
+        rows.put(row);
+      }
+      JSONObject report = new JSONObject(); report.put("records", rows);
+      report.put("absence_is_not_a_pass", true); text(zip, "android-exits.json", report.toString(2));
+    }
+  }
+
+  static void share(Activity activity) {
+    InfinityDecoyIdentity.requireDecoy(activity);
+    if (!exporting.compareAndSet(false, true)) return;
+    new Thread(() -> {
+      try {
+        collect(activity.getApplicationContext());
+        Uri uri = Uri.parse("content://" + AUTHORITY + "/startup.zip");
+        Intent send = new Intent(Intent.ACTION_SEND).setType("application/zip")
+            .putExtra(Intent.EXTRA_STREAM, uri)
+            .setClipData(ClipData.newRawUri("Infinity startup diagnostics", uri))
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        activity.runOnUiThread(() -> {
+          if (!activity.isFinishing() && !activity.isDestroyed())
+            activity.startActivity(Intent.createChooser(send, "Share startup diagnostics"));
+        });
+      } catch (Exception unavailable) {
+        activity.runOnUiThread(() -> android.widget.Toast.makeText(activity,
+            "Startup diagnostics could not be exported", android.widget.Toast.LENGTH_LONG).show());
+      } finally { exporting.set(false); }
+    }, "InfinityStartupExport").start();
+  }
+
+  private InfinityDecoyDiagnostics() { }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "gate": "G0",
+  "first_bootstrap_version_code": 1,
+  "apk_sha256": "8a66210e43122e3d79175e331d2868a7a2dfd104e81b19f90ebac2b43137b92d",
+  "application_id": "com.projectinfinity.kodi.dualtest",
+  "recording_file": "18411.mp4",
+  "recording_sha256": "999fe2df5cfd247da8219ce855f1c415fc0483e3a9b438eb35e6cdfc73d25dd3",
+  "recording_duration_seconds": 15.462792,
+  "physical_result": "FAILED_STARTUP",
+  "observed": [
+    "Experimental launcher opens",
+    "Opening the test window shows a startup/splash frame",
+    "The test window returns to the launcher",
+    "Android reports Infinity Experimental closed because the app has a bug",
+    "No native Kodi main UI visible"
+  ],
+  "source_defect": {
+    "parent_XBMCApp_cpp_sha256": "126fee30678e70c0444b0bcb7c0d586b57c99e9ced723010e034f70148504a9d",
+    "native_constructor": "CJNIBroadcastReceiver(CJNIContext::getPackageName() + \".XBMCBroadcastReceiver\")",
+    "runtime_expected_java_class": "com.projectinfinity.kodi.dualtest.XBMCBroadcastReceiver",
+    "bootstrap_1_class_present": false,
+    "libandroidjni_commit": "7c1f1b326c14e0cf4d646b63a2ac448d7a8debe0",
+    "libandroidjni_receiver_git_blob": "25c60dcab62b7c6dcb54c8b6c6fbfb0b577809cb",
+    "phone_stack_trace_available": false,
+    "causal_attribution": "Concrete missing-class defect; phone crash cause not established without stack/exit trace"
+  },
+  "gate_g1_passed": false,
+  "dual_engine_feature_implemented": false,
+  "production_changes": false
+}

@@ -4,6 +4,7 @@ package com.projectinfinity.kodi;
 public final class InfinityDecoyApplication extends android.app.Application {
   @Override protected void attachBaseContext(android.content.Context context) {
     super.attachBaseContext(context);
+    InfinityDecoyDiagnostics.installJavaCrashRecorder(context);
     try { InfinityDecoyIdentity.configure(context); }
     catch (java.io.IOException unavailable) {
       throw new IllegalStateException("Decoy ownership setup failed before native startup", unavailable);

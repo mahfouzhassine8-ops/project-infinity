@@ -61,9 +61,13 @@ def main():
     probe = json.loads((args.probe_evidence / 'COMPILED-DECOY-PROBE.json').read_text())
     stage.require(probe['application_id'] == stage.INSTALL_ID and
                   probe['jni_namespace'] == stage.NAMESPACE and
-                  probe['executed_robolectric_tests'] >= 6 and probe['no_shared_uid'] and
+                  probe['executed_robolectric_tests'] >= 14 and probe['no_shared_uid'] and
                   probe['provider_authorities_separate'] and not probe['native_merged'],
                   'Verified shell prerequisite missing')
+    stage.require(probe['donor_sha256'] == sha(args.donor.read_bytes()) and
+                  probe['runtime_receiver_inherits_registered_jni_callback'] and
+                  len(probe['source_commit']) == 40 and probe['workflow_run_id'] > 0,
+                  'Compiled receiver bridge or exact donor provenance missing')
     source = json.loads((stage.HERE / 'evidence/G0-SOURCE-COMPLETE.json').read_text())
     stage.require(source['native_source_passed'] and source['native_verified_files'] == 9390,
                   'Exact native-source prerequisite unavailable')
@@ -74,7 +78,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     unsigned = args.output / 'bootstrap-unsigned.apk'
     merge(args.base, args.donor, unsigned)
-    final = args.output / 'Infinity-Dual-Test-G0-Bootstrap-1.apk'
+    final = args.output / 'Infinity-Dual-Test-G0-Bootstrap-2-Startup-Repair.apk'
     subprocess.run(['bash', str(stage.REPOSITORY / 'scripts/sign-infinity71.sh'),
                     str(unsigned), str(final)], check=True)
     signing = subprocess.check_output([str(args.build_tools / 'apksigner'), 'verify',
@@ -96,11 +100,14 @@ def main():
         stage.require(not new.testzip(), 'Final APK CRC failure')
     receipt = {'schema': 1, 'purpose': 'G0 one-engine bootstrap, not Dual Infinity acceptance',
                'file': final.name, 'sha256': sha(final.read_bytes()), 'size_bytes': final.stat().st_size,
-               'application_id': stage.INSTALL_ID, 'version_code': 1,
-               'version_name': '0.1.0-G0-Identity-Probe', 'jni_namespace': stage.NAMESPACE,
+               'application_id': stage.INSTALL_ID, 'version_code': stage.VERSION_CODE,
+               'version_name': stage.VERSION_NAME, 'jni_namespace': stage.NAMESPACE,
                'source_commit': os.environ['GITHUB_SHA'],
-               'shell_compilation_commit': '5372dcdd8e5c29b065f92a189120eb76091ca766',
-               'shell_compilation_run': 38184539423,
+               'shell_compilation_commit': probe['source_commit'],
+               'shell_compilation_run': probe['workflow_run_id'],
+               'donor_sha256': probe['donor_sha256'],
+               'runtime_receiver_bridge_verified': True,
+               'first_bootstrap_device_result': 'FAILED_STARTUP_IN_18411_MP4',
                'native_compilation_commit': parent_identity['compiled_parent_commit'],
                'native_compilation_run': 38137092930, 'native_sha256': ENGINE_SHA,
                'native_recompiled': False, 'native_payload_unchanged': True,

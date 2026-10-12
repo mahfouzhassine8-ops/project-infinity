@@ -1,10 +1,11 @@
 name: Dual Infinity | G0 signed bootstrap, one engine only
 on:
-  push:
-    branches: [experiment/dual-infinity-2103368-g0]
-    paths:
-      - 'experiments/dual-infinity/package_bootstrap.py'
-      - '.github/workflows/dual-infinity-g0-bootstrap.yml'
+  workflow_dispatch:
+    inputs:
+      shell_run:
+        description: 'Successful repaired shell run with exact donor provenance and 14 executed tests'
+        required: true
+        type: string
 permissions: {contents: read, actions: read}
 concurrency: {group: dual-infinity-g0-bootstrap-package, cancel-in-progress: false}
 jobs:
@@ -31,14 +32,14 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           repository: mahfouzhassine8-ops/project-infinity
-          run-id: 38184539423
+          run-id: ${{ inputs.shell_run }}
           name: Dual-Infinity-G0-Compile-Only-Donor-Internal
           github-token: ${{ github.token }}
           path: compiled-shell
       - uses: actions/download-artifact@v8
         with:
           repository: mahfouzhassine8-ops/project-infinity
-          run-id: 38184539423
+          run-id: ${{ inputs.shell_run }}
           name: Dual-Infinity-G0-Decoy-Shell-Compilation-Evidence
           github-token: ${{ github.token }}
           path: probe-evidence
@@ -55,7 +56,7 @@ jobs:
         if: success()
         with:
           name: Dual-Infinity-G0-Signed-Bootstrap-APK
-          path: bootstrap-evidence/Infinity-Dual-Test-G0-Bootstrap-1.apk
+          path: bootstrap-evidence/Infinity-Dual-Test-G0-Bootstrap-2-Startup-Repair.apk
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
