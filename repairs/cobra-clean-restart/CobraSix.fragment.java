@@ -30,11 +30,10 @@
     }
     void headerTheme() {
       if(!pro() || mCobraModeToolbar==null) {
-        if(themedHeader!=null)themedHeader.setBackground(originalHeader);
+        // The original non-Pro restyler owns that toolbar after a mode change.
         themedHeader=null;originalHeader=null;headerStamp=Integer.MIN_VALUE;return;
       }
       if(themedHeader!=mCobraModeToolbar) {
-        if(themedHeader!=null)themedHeader.setBackground(originalHeader);
         themedHeader=mCobraModeToolbar;originalHeader=themedHeader.getBackground();headerStamp=Integer.MIN_VALUE;
       }
       int ink=cobraModeColor("text"),muted=cobraModeColor("muted");
@@ -120,12 +119,41 @@
       clearMiniPip();
       if (current) closeFullscreenToCobraView();
     }
-    void previewButton(LinearLayout bar) {
+    void previewButton(LinearLayout bar, FrameLayout host) {
       if (!phone()) return;
       CobraIconButton pip = cobraIcon("pip", "Picture-in-Picture", true, v -> miniPip());
       pip.setTag("cobra_preview_pip");
       // Append; the six existing callback positions and their order are unchanged.
       bar.addView(pip, new LinearLayout.LayoutParams(0, dp(48), 1));
+      CobraIconButton small = cobraIcon("pip", "Picture-in-Picture", true, v -> miniPip());
+      small.setTag("cobra_preview_pip_small");small.setVisibility(View.GONE);
+      host.addView(small,new FrameLayout.LayoutParams(dp(48),dp(48),Gravity.BOTTOM|Gravity.LEFT));
+      host.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->smallPreviewPip());
+      View label=host.findViewWithTag("cobra_preview_label");if(label!=null)label.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->smallPreviewPip());
+    }
+    void smallPreviewPip() {
+      if(mCobraPreviewHost==null)return;
+      View small=mCobraPreviewHost.findViewWithTag("cobra_preview_pip_small");
+      View bar=mCobraPreviewHost.findViewWithTag("cobra_preview_controls");
+      if(small==null || bar==null)return;
+      if(!phone() || pro() || bar.getVisibility()==View.VISIBLE){small.setVisibility(View.GONE);return;}
+      int w=mCobraPreviewHost.getWidth(),h=mCobraPreviewHost.getHeight(),gap=dp(2);
+      View status=mCobraPreviewHost.findViewWithTag("cobra_preview_label");
+      android.graphics.Rect blocked=new android.graphics.Rect();
+      if(status!=null && status.getAlpha()>0f && status.getVisibility()==View.VISIBLE){
+        blocked.set(0,0,status.getWidth(),status.getHeight());mCobraPreviewHost.offsetDescendantRectToMyCoords(status,blocked);
+      }
+      for(int size:new int[]{48,40,32}){
+        int side=dp(size);
+        for(int y:new int[]{h-side-gap,gap,blocked.bottom+gap})for(int x:new int[]{gap,w-side-gap,(w-side)/2}){
+          android.graphics.Rect box=new android.graphics.Rect(x,y,x+side,y+side);
+          if(x<gap || y<gap || box.right>w-gap || box.bottom>h-gap || android.graphics.Rect.intersects(box,blocked))continue;
+          FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(side,side,Gravity.TOP|Gravity.LEFT);lp.leftMargin=x;lp.topMargin=y;
+          small.setLayoutParams(lp);small.setVisibility(View.VISIBLE);return;
+        }
+      }
+      // Fail the geometry gate rather than conceal an approved label or control.
+      small.setVisibility(View.GONE);
     }
 
     // Changes 3/4: decorate only the newly built fullscreen controls for the current mode.
