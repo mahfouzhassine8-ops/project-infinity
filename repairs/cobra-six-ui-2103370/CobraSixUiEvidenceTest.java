@@ -10,6 +10,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 import org.robolectric.shadows.ShadowDisplayManager;
+import org.robolectric.shadows.ShadowViewRootImpl;
+import org.robolectric.shadow.api.Shadow;
+import org.robolectric.util.ReflectionHelpers;
 import static org.junit.Assert.*;
 import static com.projectinfinity.kodi.CobraNavigationUiTest.*;
 /** Actual simulated window bounds, existing configuration lifecycle, real production controls. */
@@ -24,7 +27,7 @@ public class CobraSixUiEvidenceTest {
   String q="w"+w+"dp-h"+h+"dp-"+(w>h?"land":"port")+"-mdpi";
   ShadowDisplayManager.changeDisplay(0,q);RuntimeEnvironment.setQualifiers(q);
   Configuration config=new Configuration(a.getResources().getConfiguration());config.screenWidthDp=w;config.screenHeightDp=h;config.orientation=w>h?Configuration.ORIENTATION_LANDSCAPE:Configuration.ORIENTATION_PORTRAIT;
-  a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());a.onConfigurationChanged(config);c.b.f.measure(a,w,h);
+  a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());a.onConfigurationChanged(config);Object viewRoot=ReflectionHelpers.callInstanceMethod(a.getWindow().getDecorView(),"getViewRootImpl");((ShadowViewRootImpl)Shadow.extract(viewRoot)).callDispatchResized();c.b.f.frames(1);c.b.f.measure(a,w,h);
  }
  void capture(String label,int w,int h)throws Exception{
   c.b.f.measure(a,w,h);c.b.f.frames(15);View root=a.getWindow().getDecorView();
