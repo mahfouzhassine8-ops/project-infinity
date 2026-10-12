@@ -141,8 +141,8 @@ bool CGUIDialogFileBrowser::OnMessage(CGUIMessage& message)
   case GUI_MSG_WINDOW_DEINIT:
     {
       ClearInfinityFilePreview();
-      ClearProperty("Infinity.FilePreview.NativeVersion");
-      ClearProperty("Infinity.FilePreview.OptIn");
+      SetProperty("Infinity.FilePreview.NativeVersion", "");
+      SetProperty("Infinity.FilePreview.OptIn", "");
       if (m_thumbLoader.IsLoading())
         m_thumbLoader.StopThread();
       CGUIDialog::OnMessage(message);
@@ -374,7 +374,7 @@ bool CGUIDialogFileBrowser::OpenInfinityFilePreview(int iItem)
   SetProperty("Infinity.FilePreview.Folder", item->m_bIsFolder ? "true" : "false");
   SetProperty("Infinity.FilePreview.Size", std::to_string(item->m_dwSize));
   SetProperty("Infinity.FilePreview.Nonce", std::to_string(m_infinityPreviewRequest.nonce));
-  ClearProperty("Infinity.FilePreview.AcceptNonce");
+  SetProperty("Infinity.FilePreview.AcceptNonce", "");
   SetProperty("Infinity.FilePreview.Active", "true");
   // Fixed script path; no filename or ZIP metadata is interpolated into a command.
   if (CBuiltins::GetInstance().Execute("RunScript(special://skin/resources/lib/infinity_file_preview.py," +
@@ -407,7 +407,7 @@ void CGUIDialogFileBrowser::ClearInfinityFilePreview()
 {
   m_infinityPreviewRequest = {};
   for (const char* property : {"Path", "Label", "Folder", "Size", "Nonce", "AcceptNonce", "Active"})
-    ClearProperty(std::string("Infinity.FilePreview.") + property);
+    SetProperty(std::string("Infinity.FilePreview.") + property, "");
 }
 
 void CGUIDialogFileBrowser::ClearFileItems()

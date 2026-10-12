@@ -10,6 +10,105 @@ NATIVE = HERE / 'native'
 
 
 class NativePreviewTests(unittest.TestCase):
+    def test_production_bridge_methods_and_property_lifecycle(self):
+        source = (NATIVE / 'xbmc/dialogs/GUIDialogFileBrowser.cpp').read_text()
+        methods = source.split('bool CGUIDialogFileBrowser::OpenInfinityFilePreview', 1)[1]
+        methods = 'bool CGUIDialogFileBrowser::OpenInfinityFilePreview' + methods.split('void CGUIDialogFileBrowser::ClearFileItems()', 1)[0]
+        prefix = r'''
+#include <cmath>
+#include <cassert>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+#include "xbmc/dialogs/InfinityFilePreviewContracts.h"
+struct Variant { std::string value; std::string asString() const { return value; } };
+struct CFileItem {
+  std::string path, label; bool m_bIsFolder{false}; long long m_dwSize{123};
+  const std::string& GetPath() const { return path; }
+  const std::string& GetLabel() const { return label; }
+};
+using CFileItemPtr = std::shared_ptr<CFileItem>;
+struct CFileItemList {
+  std::vector<CFileItemPtr> items;
+  int Size() const { return static_cast<int>(items.size()); }
+  CFileItemPtr operator[](int index) const { return items.at(index); }
+};
+struct View { int selected{0}; int GetSelectedItem() const { return selected; } };
+struct CFile { static inline bool exists{true}; static bool Exists(const char*) { return exists; } };
+struct CBuiltins {
+  static inline std::vector<std::string> commands;
+  static CBuiltins& GetInstance() { static CBuiltins value; return value; }
+  int Execute(const std::string& command) { commands.push_back(command); return 0; }
+};
+class CGUIDialogFileBrowser {
+public:
+  bool m_infinityZipInstallContext{true};
+  uint64_t m_infinityPreviewSequence{0};
+  KODI::FILEPREVIEW::Request m_infinityPreviewRequest;
+  CFileItemList list; CFileItemList* m_vecItems{&list}; View m_viewControl;
+  std::map<std::string, std::string> properties; int clicks{0};
+  // This deliberately exposes Kodi's actual property API, without a ClearProperty method.
+  void SetProperty(const std::string& key, const std::string& value) { properties[key] = value; }
+  Variant GetProperty(const std::string& key) const {
+    auto value = properties.find(key); return {value == properties.end() ? "" : value->second};
+  }
+  int GetID() const { return 10126 + (1 << 16); }
+  void OnClick(int index) { assert(index == m_viewControl.selected); ++clicks; }
+  bool OpenInfinityFilePreview(int);
+  bool ConfirmInfinityFilePreview();
+  void ClearInfinityFilePreview();
+};
+'''
+        suffix = r'''
+int main() {
+  CGUIDialogFileBrowser browser;
+  auto first = std::make_shared<CFileItem>(); first->path = "/Download/one),RunScript(evil).ZIP"; first->label = "one";
+  auto second = std::make_shared<CFileItem>(); second->path = "/Download/second.zip"; second->label = "two";
+  browser.list.items = {first, second};
+  assert(!browser.OpenInfinityFilePreview(0));
+  assert(CBuiltins::commands.empty());
+  browser.SetProperty("Infinity.FilePreview.OptIn", "v1");
+  assert(browser.OpenInfinityFilePreview(0));
+  assert(CBuiltins::commands.size() == 1);
+  assert(CBuiltins::commands.back() == "RunScript(special://skin/resources/lib/infinity_file_preview.py,75662)");
+  assert(browser.GetProperty("Infinity.FilePreview.Path").asString() == first->path);
+  auto ticket = browser.GetProperty("Infinity.FilePreview.Nonce").asString();
+  assert(browser.OpenInfinityFilePreview(0));
+  assert(CBuiltins::commands.size() == 1);
+  assert(!browser.ConfirmInfinityFilePreview());
+  assert(browser.clicks == 0);
+  assert(browser.GetProperty("Infinity.FilePreview.Active").asString().empty());
+  assert(browser.OpenInfinityFilePreview(0));
+  ticket = browser.GetProperty("Infinity.FilePreview.Nonce").asString();
+  browser.SetProperty("Infinity.FilePreview.AcceptNonce", ticket);
+  browser.m_viewControl.selected = 1;
+  assert(!browser.ConfirmInfinityFilePreview());
+  assert(browser.clicks == 0);
+  browser.m_viewControl.selected = 0;
+  assert(browser.OpenInfinityFilePreview(0));
+  ticket = browser.GetProperty("Infinity.FilePreview.Nonce").asString();
+  browser.SetProperty("Infinity.FilePreview.AcceptNonce", ticket);
+  assert(browser.ConfirmInfinityFilePreview());
+  assert(browser.clicks == 1);
+  browser.SetProperty("Infinity.FilePreview.AcceptNonce", ticket);
+  assert(!browser.ConfirmInfinityFilePreview());
+  assert(browser.clicks == 1);
+  assert(!browser.OpenInfinityFilePreview(-1));
+  assert(!browser.OpenInfinityFilePreview(2));
+  CFile::exists = false;
+  assert(!browser.OpenInfinityFilePreview(0));
+}
+'''
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(directory)
+            source = directory / 'bridge.cpp'
+            source.write_text(prefix + methods + suffix)
+            binary = directory / 'bridge'
+            subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pedantic',
+                            '-I', str(NATIVE), str(source), '-o', str(binary)], check=True)
+            subprocess.run([str(binary)], check=True)
+
     def test_production_admission_and_confirmation(self):
         program = r'''
 #include <cmath>
@@ -73,7 +172,7 @@ int main() {
         self.assertIn('OnClick(selected);', source)
         self.assertIn('GetProperty("Infinity.FilePreview.Nonce").asString()', source)
         self.assertIn('GetProperty("Infinity.FilePreview.AcceptNonce").asString()', source)
-        self.assertIn('ClearInfinityFilePreview();\n      ClearProperty("Infinity.FilePreview.NativeVersion")', source)
+        self.assertIn('ClearInfinityFilePreview();\n      SetProperty("Infinity.FilePreview.NativeVersion", "")', source)
         self.assertEqual(source.count('Execute("RunScript(special://skin/resources/lib/infinity_file_preview.py,"'), 1)
         self.assertIn('std::to_string(GetID())', source)
         self.assertNotIn('Extract', source.split('// INFINITY_FILE_PREVIEW_V1:', 1)[1].split('void CGUIDialogFileBrowser::ClearFileItems', 1)[0])
