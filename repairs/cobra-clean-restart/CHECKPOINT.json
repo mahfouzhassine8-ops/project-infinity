@@ -1,0 +1,39 @@
+{
+  "status": "STOPPED_PRESERVATION_GATE",
+  "runtime_source_commit": "daa8c1b19d02c84b86696fc82cb8cb0a0ac30563",
+  "branch": "work/cobra-clean-restart-20261012",
+  "latest_candidate_run": 38213877859,
+  "artifact_id": 11730895129,
+  "artifact_zip_sha256": "65f558241cd95d8424b5481c9ae90016cc4109fa49733e37089f23d79718bf5c",
+  "tests": {"executed": 185, "passed": 172, "failed": 13, "errors": 0, "skipped": 0},
+  "new_tests": {"executed": 18, "passed": 17, "failed": 1},
+  "inherited_tests": {"executed": 167, "passed": 155, "failed": 12},
+  "baseline_reference": {"run": 38209729246, "executed": 168, "passed": 168},
+  "preservation_stop": "New unsupported-PiP Action remains in Hero.player without LayoutParams. The existing layout loop dereferences null. Twelve inherited cases fail at that shared cause, including the TV fallback test.",
+  "separate_unverified_workflow": "Mobile fullscreen Channels > Groups > Documentaries adapter has channels but zero rendered ListView children. Full mode/category audio matrix did not complete. Production versus fixture cause is not established.",
+  "runtime_source_sha256": {
+    "InfinityLiveActivity.java.in": "0abbb320d58c9eb37a024c1da48be4301cf2cd22b51a789e6a9e4279c7d8545c",
+    "CobraProUi.java.in": "9efbd2802cc28d09162b0166399b4e3ed10ba94e909e54f4dbc5ade8b935aad1"
+  },
+  "other_runtime_files_byte_identical": 262,
+  "changed_named_members": {"total": 69, "methods_and_constructors": 50, "fields": 19, "added": 46},
+  "changed_member_inventory_sha256": "a3178819428e9516800f71dcad9084bebc07cccdb03c171075832d1c21259932",
+  "approved_cobra_source": "9f621f34e3ded845e1c3e9c2a49d98158b6e31b3",
+  "retained_transport_source": "9abf7c84fbd8224958bc8465c983429bc5976074",
+  "rejected_2103370_imported": false,
+  "candidate_version_assigned": false,
+  "apk_assembled": false,
+  "permanent_candidate_signed": false,
+  "native_rebuilt": false,
+  "physical_fold_verified": false,
+  "locked": false,
+  "production_promoted": false,
+  "remaining_gates": [
+    "Correct only the new unsupported PiP control in a separately authorized continuation",
+    "Establish and validate actual Groups rendering",
+    "Complete all-mode/category audio and remaining runtime/visual coverage",
+    "Finish exact scope and protected-bytecode review",
+    "Only then package and verify payload/signature",
+    "Obtain physical Fold acceptance before any lock or promotion"
+  ]
+}
