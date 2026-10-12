@@ -18,6 +18,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'repairs/mobile-regressions-2103304'))
 from packaging_checks import manifest_tree, resource_ids, run
+from package_candidate import elf_identity
 
 PARENT = '160adfccc775f83c640354778e54f6f33164084413401f9c348ebe9ea41fb3e4'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
@@ -59,6 +60,20 @@ def package(args):
     for name in ('INFINITY_KEYSTORE_B64', 'INFINITY_STORE_PASSWORD', 'INFINITY_KEY_PASSWORD', 'INFINITY_KEY_ALIAS'):
         assert os.environ.get(name), 'Missing mandatory permanent signing setting: ' + name
     bt = Path(os.environ['ANDROID_HOME']) / 'build-tools/34.0.0'
+    # Use the existing release packaging strip recipe. Full compile evidence
+    # retains the unstripped engine; it must not inflate the installable APK.
+    unstripped = engine
+    identity = elf_identity(unstripped, args.out / 'unstripped-elf-identity.txt')
+    engine = args.out / 'libkodi.so'
+    shutil.copyfile(unstripped, engine)
+    strip = Path(os.environ['ANDROID_HOME']) / 'ndk' / os.environ.get('NDK_VER', '21.4.7075529') / 'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip'
+    run(strip, '--strip-unneeded', engine)
+    stripped_identity = elf_identity(engine, args.out / 'packaged-elf-identity.txt')
+    assert identity[0] == stripped_identity[0]
+    assert identity[0] != 'build-id' or identity == stripped_identity
+    for token in (b'Infinity.FilePreview.AcceptNonce', b'special://skin/resources/lib/infinity_file_preview.py',
+                  b'/InfinityAndroidKeyboard', b'_infinityHeartbeat'):
+        assert token in engine.read_bytes(), 'Required compiled native identity lost during strip'
     with zipfile.ZipFile(args.parent) as parent:
         assert parent.testzip() is None and len(parent.namelist()) == len(set(parent.namelist()))
         before_manifest = parent.read('AndroidManifest.xml')
@@ -125,6 +140,9 @@ def package(args):
                'parent_version': 2103374, 'parent_sha256': PARENT, 'parent_bytes': args.parent.stat().st_size,
                'version_code': CODE, 'version_name': NAME, 'package': 'com.projectinfinity.kodi',
                'source_commit': os.environ['GITHUB_SHA'], 'native_source_commit': proof['source_commit'],
+               'native_binary': {'unstripped_sha256': proof['native_sha256'], 'unstripped_bytes': unstripped.stat().st_size,
+                                 'packaged_sha256': sha(engine.read_bytes()), 'packaged_bytes': engine.stat().st_size,
+                                 'strip_recipe': 'NDK 21.4.7075529 llvm-strip --strip-unneeded (unchanged release recipe)'},
                'run_id': int(os.environ['GITHUB_RUN_ID']), 'permanent_signer_sha256': SIGNER,
                'tests': tests['totals'], 'all_dex_byte_identical': dex, 'protected_payload_entries': len(protected),
                'all_46_other_native_libraries_byte_identical': True, 'native_libraries': native,
