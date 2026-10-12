@@ -1,6 +1,6 @@
 # Independent corrective implementation review
 
-Status: source ready for Android runtime gates; not an APK acceptance, promotion, or physical-device claim.
+Status: STOPPED at the preservation gate after run 38206152159; no APK assembly, signing, promotion or physical-device claim. The new preview PiP target overlaps original Unmute at the real 280x280 test size. Recreation and Groups remain unverified. See `BLOCKED-REVIEW.md` and `CI-RESUME-RESULTS.md`; the earlier review below is retained as execution history, not current acceptance.
 
 ## First runtime gate and test-only follow-up
 

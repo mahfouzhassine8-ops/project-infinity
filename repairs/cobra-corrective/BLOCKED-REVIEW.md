@@ -1,3 +1,19 @@
+# Latest preservation stop — 2026-10-12, run 38206152159
+
+Implementation checkpoint: `0c18474b13650f17740869c1156a2d885e7c713e`, branch `work/cobra-astra-corrective-20261012`.
+
+The corrected-size preview PiP test passed at 412x915, 915x412, 720x840 and 840x720, then failed its non-overlap assertion at 280x280. Exact window dimensions were asserted before geometry. The original Unmute and status geometry has not been changed, and must not be moved to hide this failure. App/source changes are stopped under the user's hard preservation gate; only this stop record and blocked metadata are being saved. A narrowly scoped new-PiP placement remedy requires direction before proceeding.
+
+Read-only geometry trace: after the test's horizontal system insets, original stage padding and original Pro inset, the Hero is 232dp wide. New PiP occupies x=12..60dp; the original centered 124dp Unmute occupies x=54..178dp on the same 48dp row. Their intersection is 6x48dp. The status control starts at x=156dp and is not this intersection. Moving PiP a few pixels left alone is not proven safe because the original left navigation target must also remain unobstructed. Any future correction must place only the new target in genuinely free space and verify every original touch region; the existing controls may not be moved without additional scope authorization.
+
+The same run passed all 167 inherited cases, the untouched-source routing reference, its candidate comparison, the actual rewind-proxy audio test, strengthened mini/fullscreen PiP return hierarchy checks and the four-row broadcast chooser at all five real sizes. It still failed actual Activity recreation (Robolectric's recreated ViewRoot is absent) and the Groups workflow (no different visible channel found in the fixture's first group). Neither unresolved result is called a pass or assumed to be an app defect.
+
+Candidate total: 196 passed / 199 executed / 3 failed / 0 skipped. Baseline/source gates passed; functional/isolation completion is blocked. APK assembly and permanent signing were skipped. No candidate was installed, locked or promoted. Protected 2103324 Cobra and 2103369 native transport references remain unchanged, and rejected 2103370 is not an implementation parent.
+
+Evidence artifact: `11727880760`, ZIP SHA-256 `89e4658620ba35a81cd83495308885990154cc1e936153a3e7a3d2c90f4b7fb2`. Downloaded ZIP integrity passed. Run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38206152159
+
+The earlier stop, continuation and hashes below are retained as history, not current acceptance statements.
+
 # Historical blocked checkpoint — continuation authorized
 
 The user explicitly authorized continuation from commit `c3d5b03602e6e8edc275203491b572b8e1c26c77`. The narrow routing alias below is now implemented at exactly the two documented callers; source-token checks prove no other change within those navigation methods. The new left preview PiP position remains, with new actual hierarchy/geometry/touch tests. All 27 existing new tests and 167 inherited cases are retained; four targeted continuation tests bring the new suite to 31. This source checkpoint is ready for parent compile/runtime gates, not accepted or promoted. Android tests, evidence renders and packaging have not yet run. The historical findings and checkpoint hashes below are preserved unchanged for audit.

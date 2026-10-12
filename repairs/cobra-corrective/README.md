@@ -2,7 +2,7 @@
 
 Not locked. Not production-promoted. Physical Galaxy Fold acceptance is required.
 
-**RESUMED FOR PRE-DEVICE GATES.** The user authorized continuation from preserved checkpoint `c3d5b03602e6e8edc275203491b572b8e1c26c77`. The original Sports navigation predicate is now retained through an exact-semantics compatibility helper, independently guarded from live Pro presentation. See `BLOCKED-REVIEW.md` for the historical stop, `IMPLEMENTATION-REVIEW.md` for the correction and `CI-RESUME-RESULTS.md` for executed results. Thirty-two corrective Android tests and all 167 inherited cases must pass before assembly. Disputed return paths are also executed on untouched approved source, then compared field-for-field with the candidate. The 2103371 identity remains reserved metadata until the signed-package gate succeeds; no physical acceptance or release lock is implied.
+**STOPPED AT PRESERVATION GATE.** Continuation from saved checkpoint `c3d5b03602e6e8edc275203491b572b8e1c26c77` reached runtime validation on commit `0c18474b13650f17740869c1156a2d885e7c713e`. Run `38206152159` passed 196/199 cases, including all 167 inherited cases and the approved-source routing comparison. Correctly sized tests exposed overlap between the new preview PiP target and an original control at 280x280. Recreation and the Groups workflow also remain unresolved. No APK was assembled or signed. Candidate metadata now blocks `prepare`; no gate or test is waived. See `BLOCKED-REVIEW.md` and `CI-RESUME-RESULTS.md`. All source and failed-run evidence are preserved. The 2103371 identity remains reserved only; no installation, promotion, physical acceptance or release lock is authorized.
 
 ## Foundation and preservation
 

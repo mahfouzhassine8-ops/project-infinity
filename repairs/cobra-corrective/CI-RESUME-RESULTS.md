@@ -53,3 +53,23 @@ Further visual review invalidated this run's claimed five-size geometry coverage
 Evidence artifact `11727530866`, SHA-256 `9236113afaa59a80c2641c102a1ac6f8bfae233aafc6217d81e746d7af364d2b`. Its downloaded ZIP passed CRC checks.
 
 Run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38205532514
+
+## Run 38206152159 — preservation stop, no APK
+
+Source/test commit: `0c18474b13650f17740869c1156a2d885e7c713e`.
+
+Gates A/B and the untouched-source reference passed. Candidate tests: 196/199 passed, three failed, none skipped. All 167 inherited cases passed. The corrected channel-identity test now genuinely replaces the player, and its synchronous local-rewind mute test passed. Both strengthened PiP-return hierarchy cases passed across the six contexts and both mute states. The full Channels matrix remains incomplete because Groups still fails.
+
+The corrected five-size broadcast chooser test passed, including four complete >=48dp rows at 280x280 with system-bar insets, vertical scrolling and fewer-than-four cases. All 20 size/count screenshots were produced. Preview PiP PNGs now match their dimensions at 412x915, 915x412, 720x840 and 840x720. The fifth iteration, 280x280, fails a non-overlap assertion before screenshot capture. The test failure must not be masked by the previous run's invalid size evidence.
+
+Remaining failures:
+
+1. New muted-preview PiP target overlaps an existing control at 280x280. This triggers the user's preservation stop; no runtime repair is silently applied.
+2. Actual Activity recreation still encounters the absent recreated ViewRoot inside Robolectric `windowFocusChanged`. Standard lifecycle/shadow normalization did not resolve it; no success is inferred from source checks.
+3. Groups selection still finds no different visible channel in the selected fixture group. Its runtime workflow is not verified.
+
+No production/runtime source changed between this and the prior two runs. Assembly/signing were skipped. Metadata is now `BLOCKED_PRESERVATION_GATE`, so packaging preparation fails explicitly until a separately authorized continuation clears the stop. No failed assertion or case was removed.
+
+Evidence artifact `11727880760`, SHA-256 `89e4658620ba35a81cd83495308885990154cc1e936153a3e7a3d2c90f4b7fb2`; downloaded ZIP CRC checks passed.
+
+Run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38206152159
