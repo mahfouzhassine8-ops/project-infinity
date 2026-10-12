@@ -1,64 +1,98 @@
 {
-  "status": "PIP_CORRECTION_185_TESTS_PASSED_PACKAGE_GATES_PENDING",
-  "continued_from": "aca973f21642c30148367baaf7ed0e0f83f079f8",
-  "runtime_source_commit": "e82f9a677532554c0d020f5c08d3f29ebe89296c",
+  "status": "SIGNED_TEST_APK_DELIVERED_PHYSICAL_ACCEPTANCE_PENDING",
+  "continued_from": "4583f403521dbcc7f4d9734d9f750b9dd64b3824",
+  "implementation_restarted": false,
   "branch": "work/cobra-clean-restart-20261012",
-  "latest_candidate_run": 38217628815,
-  "artifact_id": 11732706403,
-  "artifact_zip_sha256": "238eb08304d32a44d630b96d87862628716f422951b94be4b8141ba499f41e08",
-  "tests": {"executed": 185, "passed": 185, "failed": 0, "errors": 0, "skipped": 0},
-  "new_tests": {"executed": 18, "passed": 18, "failed": 0},
+  "runtime_source_commit": "89de52c34d9077adf643f2e6430a2eff67a460a5",
+  "latest_candidate_run": 38225099698,
+  "latest_job": 114730548134,
+  "tests": {"executed": 193, "passed": 193, "failed": 0, "errors": 0, "skipped": 0},
   "inherited_tests": {"executed": 167, "passed": 167, "failed": 0},
+  "existing_corrective_tests": {"executed": 18, "passed": 18, "failed": 0},
+  "supplemental_delivery_tests": {"executed": 8, "passed": 8, "failed": 0},
   "previous_185_test_names_preserved": true,
   "inherited_source_provenance_unchanged": true,
-  "baseline_reference": {
-    "run": 38217628897,
-    "artifact_id": 11733405955,
-    "artifact_zip_sha256": "c1baafa3ac8a0d6781fa609a59aee31903f0f82666573611ef78953b2a5c095c",
-    "executed": 169,
-    "passed": 169,
-    "failed": 0,
-    "errors": 0,
-    "skipped": 0
-  },
-  "pip_crash": "RESOLVED: initialize LayoutParams on only new Hero.player[8]; all 12 formerly affected inherited cases pass.",
-  "groups_diagnosis": "TEST_HELPER: unchanged-source comparison renders 0 rows with historical manual layout and all 4 rows with ordinary framework traversal. Groups runtime is unchanged; actual 48-combination channel/mute matrix now passes.",
   "channels_audio_matrix_cases": 48,
-  "runtime_changes_since_saved_implementation": [
-    {"file": "CobraProUi.java.in", "method": "Hero constructor", "requirement": 2, "purpose": "New unsupported PiP action LayoutParams initialization"},
-    {"file": "InfinityLiveActivity.java.in", "method": "CobraSix.miniPip", "requirement": 2, "purpose": "Selective locked/already-PiP and preview-session key checks"}
-  ],
-  "runtime_source_sha256": {
-    "InfinityLiveActivity.java.in": "77482b135aff60a4c0c6953bb92b1949c32e447528434df659aa869892ab4c1c",
-    "CobraProUi.java.in": "a096e19cb594752274ded0ea18a40a48f9e5ee55ad5e7f6caf474236d56372cb"
+  "apk": {
+    "file": "Cobra-2103372-Six-Verified-RC1.apk",
+    "package": "com.projectinfinity.kodi",
+    "version_code": 2103372,
+    "version_name": "1.0.9-Cobra-Six-Verified-RC1",
+    "bytes": 159257399,
+    "sha256": "266085eab9bf881494c26dd34f6e97f3ce62f8d6b4cd8fc851e920f92bea4d92",
+    "permanent_signer_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "signature_schemes_verified": ["v1", "v2", "v3"],
+    "artifact_id": 11736396460,
+    "artifact_zip_sha256": "812743b12b9e3af900ff0020e2583725c9e2d79a127ca1be57e79538eff81869",
+    "debuggable": false,
+    "zip_alignment_verified": true
   },
-  "runtime_identical_to_first_corrective_run": 38216862555,
-  "other_runtime_files_byte_identical": 262,
-  "approved_cobra_source": "9f621f34e3ded845e1c3e9c2a49d98158b6e31b3",
-  "retained_transport_source": "9abf7c84fbd8224958bc8465c983429bc5976074",
+  "evidence": {
+    "artifact_id": 11736536292,
+    "artifact_zip_sha256": "82188dba3f3d2d7cb268055e4d08c998be8639fc5f2920526e3fe8c13546d39c",
+    "receipt_sha256": "a8ea4723e90dd73d73fcbea65706986da46dc78e48fab1298ec1b83973fd39b1",
+    "changed_member_inventory_sha256": "81ffb47d2971ddb781e3216c2d95b0169e7baf9c8c4fd5ae6a10d12604c27b6b",
+    "independent_download_verification_sha256": "4e017d13d96eed5022b317afcadabbf542c760b9d3f24515276099b57668b9c0"
+  },
+  "source_preservation": {
+    "approved_cobra_source": "9f621f34e3ded845e1c3e9c2a49d98158b6e31b3",
+    "approval_lock": "25497c4dfd6be8d83f32580495b16afb6eaed736",
+    "retained_transport_source": "9abf7c84fbd8224958bc8465c983429bc5976074",
+    "runtime_source_sha256": {
+      "InfinityLiveActivity.java.in": "484b73bc677090a70667daa6c62e895402d4fed5a2f8dcdbe9a1f4e510d9f861",
+      "CobraProUi.java.in": "a096e19cb594752274ded0ea18a40a48f9e5ee55ad5e7f6caf474236d56372cb"
+    },
+    "other_runtime_files_byte_identical": 262,
+    "original_named_members_checked": 3131,
+    "changed_named_member_records": 100,
+    "added_named_member_records": 76,
+    "modified_named_member_records": 24,
+    "removed_original_named_members": 0,
+    "all_changes_mapped_to_six_requirements": true
+  },
+  "package_preservation": {
+    "protected_entries_byte_identical": 4172,
+    "native_libraries_byte_identical": 47,
+    "native_engine_sha256": "5d42d0d8ef6a90a5678fd7a24cc4e3b01e2375c213c590a92c178d7a34cc1113",
+    "protected_decoded_classes": 7978,
+    "unexpected_decoded_differences": [],
+    "manifest_preserved_except_version": true,
+    "resources_and_assets_byte_identical": true,
+    "jni_contracts_preserved": true,
+    "normalization": "Exact stateless D8 helper bodies, encoding-only string width, and proven unreachable payload alignment nops; no executable/data/branch/exception differences waived."
+  },
+  "runtime_corrections_this_continuation": [
+    {"requirement": 4, "purpose": "Supported Stats metadata, original detail/leader retention, live spoiler/freshness protection and approved panel organization"},
+    {"requirement": 6, "purpose": "Contrast of existing Pro-header icons in active themes; no placement/glyph/callback change"}
+  ],
+  "pip_crash": "RESOLVED previously; all affected inherited cases remain passing.",
+  "groups_diagnosis": "TEST_HELPER previously proved with unchanged-source comparison; framework traversal and 48-case actual selection matrix remain passing. No Groups runtime edit.",
+  "groups_runtime_modified": false,
   "rejected_2103370_used_as_parent": false,
   "selective_pip_reference": "47d9e563a6052e6ac5d90f784ad526346d93d9cf",
-  "selective_pip_reuse": "Mini-player lock/already-in-PiP and matching-preview-session guards only; no rejected menus or broad audio/tuning policies copied.",
-  "groups_runtime_modified": false,
-  "candidate_version_assigned": false,
-  "apk_assembled": false,
-  "permanent_candidate_signed": false,
+  "selective_pip_reuse": "Previously authorized mini-entry lock/already-in-PiP and matching-session guards only. No prohibited menus or broad audio policies imported.",
+  "original_cobra_apk_sha256": "5af58f2e700e636cdc798cbde0acc89e8091153cfcf1e17c792375fe285dd8c3",
+  "transport_apk_sha256": "83128afbd2595dbf4053ded40ee1d22ae0d1c7b798f62dd9f077bd4d729261f4",
+  "apk_assembled": true,
+  "permanent_candidate_signed": true,
   "native_rebuilt": false,
+  "installed": false,
   "physical_fold_verified": false,
   "locked": false,
   "production_promoted": false,
-  "results_document": "PIP-CORRECTIVE-RESULTS.md",
-  "historical_stop_document": "STOP-RECORD.md",
-  "evidence_verification_sha256": "950a4bbbb9aac612471c54439743a409491defa822c3d943b84ccc9ae225beca",
+  "results_document": "DELIVERY-2103372.md",
+  "historical_documents": ["STOP-RECORD.md", "PIP-CORRECTIVE-RESULTS.md", "BASELINE-CHECKPOINT.md"],
   "history": [
     {"run": 38213877859, "passed": 172, "executed": 185, "failed": 13},
     {"run": 38216862555, "passed": 184, "executed": 185, "failed": 1},
-    {"run": 38217628815, "passed": 185, "executed": 185, "failed": 0}
+    {"run": 38217628815, "passed": 185, "executed": 185, "failed": 0},
+    {"run": 38223428232, "passed": 193, "executed": 193, "failed": 0, "packaged": false},
+    {"run": 38224181197, "passed": 193, "executed": 193, "failed": 0, "package_status": "stopped before signing on two proven compiler alignment nops; host comparator corrected, runtime unchanged"},
+    {"run": 38225099698, "passed": 193, "executed": 193, "failed": 0, "package_status": "signed and verified test APK"}
   ],
-  "remaining_delivery_gates": [
-    "Complete remaining broader six-change visual/mockup/ambient and Sports-data/freshness coverage without conflating it with the 185-case corrective gate",
-    "Final exact scope and protected compiled-bytecode review",
-    "Package and verify preserved payload, candidate identity and permanent signature only after all pre-device requirements pass",
-    "Physical Fold acceptance before any release lock or production promotion"
+  "remaining_acceptance": [
+    "Physical Fold installation and six-mode user workflow checks in DELIVERY-2103372.md",
+    "Actual decoder, audio-focus/calls, Samsung PiP/fold/multi-window and live-provider availability checks",
+    "Explicit user approval before any release lock, promotion or baseline replacement"
   ]
 }
