@@ -1,8 +1,34 @@
 # Dual Infinity — G0 bootstrap implementation checkpoint
 
-Status: **FIRST G0 BOOTSTRAP FAILED ON THE FOLD. STARTUP REPAIR IN PROGRESS.**
+Status: **SIGNED STARTUP REPAIR READY. DEVICE ACCEPTANCE PENDING.**
 This APK has **one** engine. Two-process startup, independent shutdown, dual
 playback and audible handover are not implemented or accepted yet.
+
+## Bootstrap 2 — exact delivery
+
+- File: `Infinity-Dual-Test-G0-Bootstrap-2-Startup-Repair.apk`.
+- Package: `com.projectinfinity.kodi.dualtest`; label **Infinity Experimental**.
+- Version: `0.1.1-G0-Startup-Repair`, versionCode `2`.
+- APK SHA-256: `ae5c95d1b7de3c5d1da5793c36615263f8b61cb93e5b38c183bdb83a8eea85fc`.
+- Signer remains `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`.
+- Compiled shell source: `7ef8ddc6102fd84b6771f4a2807c4a035a747ffd`, run `38187425665`.
+- Verification/packaging source: `7d6da0250c3fc3bfb8f2bc22dec7509a9c6450dd`, successful run `38188088077`.
+- The parent native source/run/hash remain unchanged; no engine rebuild.
+- Exact receipts, generated-class mappings and local download rechecks are in `evidence/G0-BOOTSTRAP2-*` and `evidence/G0-STARTUP-REPAIR-LOCAL-RECHECK.json`.
+
+The shell run passed compilation and all 14 Android tests, then stopped on two
+missing compiler-generated exact names. The entire affected population of 56
+callbacks is now matched one-to-one by fields, interfaces, flags, instructions
+and referenced targets. The compiled shell and executed test outputs were
+reused. No source class or native declaration is missing; exact generated names
+and their verified mappings remain explicitly recorded. Unknown instructions,
+exception handlers, annotation changes or different callbacks are rejected.
+
+Phone check: update **Infinity Experimental** only, open it, and confirm the
+Kodi main UI renders. The icon now opens the startup path directly. If it fails,
+use **Share startup diagnostics** on the recovery screen and send the ZIP.
+Then return to Android Home. Do not treat a splash, compilation or this
+one-engine package as a two-window or independent-Close pass.
 
 ## Physical failure and scoped repair
 
@@ -33,8 +59,8 @@ The export provider is private, accepts only one fixed read-only URI, and requir
 an explicit read grant. It reads no production or add-on userdata. The Java fatal
 handler records evidence and delegates to Android's existing handler.
 
-The Android shell compiles/tests/packages in one coordinated branch-scoped run;
-the protected parent engine is reused. The older standalone packaging workflow
+The Android shell compilation and verified repackage use branch-scoped runs;
+the protected parent engine and successful shell outputs are reused. The older standalone packaging workflow
 is now manual and requires a verified repaired shell run instead of silently
 using the first donor. There is no new native build or phone install here.
 
@@ -89,10 +115,10 @@ and Fold behavior still require the physical phone.
 |---|---|
 | Exact native source | 9,390 / 9,390 |
 | Exact Android export | 264 / 264 |
-| Host source/recovery/identity tests | 12 pass |
-| Executable Robolectric ownership tests | 6 pass |
+| Host source/recovery/identity/preservation tests | 15 pass |
+| Executable Robolectric ownership/startup tests | 14 pass |
 | Original JNI declarations | 77 unchanged |
-| Original Java class inventory | No missing classes |
+| Original Java source classes | Present; all 56 affected generated callback bodies verified despite suffix reassignment |
 | Original Android resource IDs | 186 preserved |
 | Cached native and protected APK payload | 4,106 protected entries unchanged |
 | APK signature/alignment/package/CRC | Passed in packaging; ZIP and native hashes rechecked locally |
@@ -105,7 +131,7 @@ inventory. The original SDK baseline was restored. Final verified shell run:
 Full inventories and executed test receipts are retained. Compilation is not a
 native-runtime or two-window acceptance result.
 
-## Signed G0 package
+## Historical bootstrap 1 package — failed on the Fold
 
 - File: `Infinity-Dual-Test-G0-Bootstrap-1.apk`.
 - Version: `0.1.0-G0-Identity-Probe`, versionCode `1`.
@@ -153,7 +179,7 @@ path isolation, saves, or shutdown and were not run on the phone here.
 
 | Gate | State |
 |---|---|
-| G0 | Exact source recovered; first installation probe built but native bootstrap failed on the phone; repair underway |
+| G0 | Exact source recovered; bootstrap 1 failed on the phone; signed startup repair ready; repaired phone startup pending |
 | G1 | Not started: no secondary activity/engine, two PID/task/surface or writer trace evidence |
 | G2 | Not started: no per-slot 17-owner close proof |
 | G3–G6 | Not started: no dual video/audio/Fold/provider/performance measurements |
@@ -168,7 +194,7 @@ simultaneous video. Stop at physical G0 evidence after delivering the repair.
 
 No phone action was performed here. Production 2103368/2103365, approved skin,
 Command Center, Health Center and Cobra source/installation remain unchanged.
-Only `experiments/dual-infinity/` and three new, branch-scoped workflows differ.
+Only `experiments/dual-infinity/` and four new, branch-scoped workflows differ.
 
 To abandon the test on the phone, leave daily Infinity installed and remove
 only **Infinity Experimental** if desired. Removing a test app deletes its fresh
