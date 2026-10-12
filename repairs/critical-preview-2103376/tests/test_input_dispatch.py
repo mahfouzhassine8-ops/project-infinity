@@ -46,7 +46,7 @@ def run(kodi, report):
     select = select[:select.index('  else if')] + '  return EVENT_RESULT_UNHANDLED;\n}'
     fixture = (HERE / 'dispatch_fixture.cpp.in').read_text()
     tests = ['builtin_hold', 'scroll_selection', 'instance_optin', 'repeat_and_confirm',
-             'preserve_other_input', 'source_editing', 'no_skin_contract']
+             'preserve_other_input', 'source_editing', 'no_skin_contract', 'empty_list_space']
     results = []
     with tempfile.TemporaryDirectory(prefix='infinity-376-dispatch-') as directory:
         directory = Path(directory)

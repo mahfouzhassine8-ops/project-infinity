@@ -65,13 +65,16 @@ struct CBuiltins {
 struct CGUIDialog {
   virtual ~CGUIDialog()=default;
   CGUIBaseContainer container; int focused{CONTROL_LIST};
+  bool m_closing{false};
+  bool IsActive() const { return !m_closing; }
   virtual bool OnAction(const CAction& a) {
     if(a.GetID()==ACTION_MOUSE_MOVE || a.GetID()==ACTION_MOUSE_RIGHT_CLICK) {
-      bool inside=a.x>=0 && a.x<100 && a.y>=0 && a.y<3;
+      bool inside=a.x>=0 && a.x<100 && a.y>=0 && a.y<10;
       focused=inside ? CONTROL_LIST : 0;
       if(!inside) return false;
       if(a.GetID()==ACTION_MOUSE_MOVE) { if(!container.m_waitForScrollEnd) container.SelectItemFromPoint({a.x,a.y}); return true; }
-      return container.OnMouseEvent({a.x,a.y},{a.GetID()})==EVENT_RESULT_HANDLED;
+      if(container.OnMouseEvent({a.x,a.y},{a.GetID()})==EVENT_RESULT_HANDLED) return true;
+      m_closing=true; return true; // CGUIWindow::OnMouseEvent right-click Back fallback.
     }
     return false;
   }
@@ -209,5 +212,9 @@ int main(int argc,char** argv) {
 #if !TEST_PARENT
     assert(b.GetProperty("Infinity.FilePreview.OptIn").asString().empty());
 #endif
+  } else if(test=="empty_list_space") {
+    input.translator.mapped=ACTION_MOUSE_RIGHT_CLICK; event.touch.y=7;
+    input.OnEvent(event);
+    assert(b.m_closing && CBuiltins::commands.empty() && b.installs==0);
   } else { assert(false); }
 }

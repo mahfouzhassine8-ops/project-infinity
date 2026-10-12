@@ -152,7 +152,11 @@ bool CGUIDialogFileBrowser::OnInfinityZipLongPress(float x, float y)
   CGUIDialog::OnAction(CAction(ACTION_MOUSE_RIGHT_CLICK, 0, x, y, 0, 0));
   CLog::Log(LOGINFO, "Infinity ZIP preview: raw hold owner={} selected={}",
             GetID(), m_viewControl.GetSelectedItem());
-  return OpenInfinityFilePreview(m_viewControl.GetSelectedItem());
+  // A right-click on empty list space can close the picker through Kodi's
+  // normal Back path. Do not launch or fall through into another modal then.
+  if (!m_closing && IsActive())
+    OpenInfinityFilePreview(m_viewControl.GetSelectedItem());
+  return true;
 }
 
 bool CGUIDialogFileBrowser::OnMessage(CGUIMessage& message)
