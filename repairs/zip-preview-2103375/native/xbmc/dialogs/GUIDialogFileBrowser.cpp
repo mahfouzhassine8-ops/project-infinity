@@ -112,7 +112,7 @@ bool CGUIDialogFileBrowser::OnAction(const CAction &action)
       return OnPopupMenu(iItem);
     }
 
-    return OpenInfinityFilePreview(iItem);
+    return m_viewControl.HasControl(GetFocusedControlID()) && OpenInfinityFilePreview(iItem);
   }
 
   // Existing root/source context actions above keep their original authority.
