@@ -43,6 +43,11 @@ int main() {
   }
   Request incompatible{4, "/storage/not-an-addon.apk", false};
   assert(!CanConfirm(incompatible, "4", true, true, true, incompatible.path, false));
+  assert(ShouldPrimePointer(true, true, true, false));
+  assert(!ShouldPrimePointer(false, true, true, false));
+  assert(!ShouldPrimePointer(true, false, true, false));
+  assert(!ShouldPrimePointer(true, true, false, false));
+  assert(!ShouldPrimePointer(true, true, true, true));
   assert(PREVIEW_CONTROL == 9410 && CONFIRM_CONTROL == 9411);
 }
 '''
@@ -60,6 +65,9 @@ int main() {
         action = source.split('bool CGUIDialogFileBrowser::OnAction', 1)[1].split('bool CGUIDialogFileBrowser::OnBack', 1)[0]
         self.assertLess(action.index('return OnPopupMenu(iItem);'), action.index('OpenInfinityFilePreview'))
         self.assertIn('m_viewControl.HasControl(GetFocusedControlID())', action)
+        self.assertLess(action.index('ACTION_MOUSE_MOVE'), action.index('return OnPopupMenu(iItem);'))
+        self.assertIn('action.GetAmount(0)', action)
+        self.assertIn('action.GetAmount(1)', action)
         self.assertIn('iAction == ACTION_MOUSE_RIGHT_CLICK', source)
         self.assertIn('else if (message.GetSenderId() == CONTROL_OK)', source)
         self.assertIn('OnClick(selected);', source)

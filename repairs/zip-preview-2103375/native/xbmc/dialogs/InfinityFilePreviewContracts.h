@@ -33,6 +33,11 @@ inline bool CanOpen(bool installContext, bool optedIn, bool validSelection,
   return installContext && optedIn && validSelection && !path.empty() && path.size() <= 8192;
 }
 
+inline bool ShouldPrimePointer(bool rightClick, bool installContext, bool optedIn, bool pending)
+{
+  return rightClick && installContext && optedIn && !pending;
+}
+
 inline bool IsZip(const std::string& path)
 {
   const auto length = path.size();

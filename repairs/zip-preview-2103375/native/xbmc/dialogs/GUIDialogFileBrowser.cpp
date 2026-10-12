@@ -80,6 +80,14 @@ CGUIDialogFileBrowser::~CGUIDialogFileBrowser()
 
 bool CGUIDialogFileBrowser::OnAction(const CAction &action)
 {
+  // Match Kodi's tap preselection without generating a select/install action.
+  // The normal container right-click can now dispatch on the first pressed row.
+  if (KODI::FILEPREVIEW::ShouldPrimePointer(
+          action.GetID() == ACTION_MOUSE_RIGHT_CLICK, m_infinityZipInstallContext,
+          GetProperty("Infinity.FilePreview.OptIn").asString() == "v1",
+          GetProperty("Infinity.FilePreview.Active").asString() == "true"))
+    CGUIDialog::OnAction(CAction(ACTION_MOUSE_MOVE, 0, action.GetAmount(0),
+                                action.GetAmount(1), 0, 0));
   if (action.GetID() == ACTION_PARENT_DIR)
   {
     GoParentFolder();
