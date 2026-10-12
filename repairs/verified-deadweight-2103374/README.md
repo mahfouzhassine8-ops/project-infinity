@@ -10,8 +10,9 @@ surviving named members in the activity must remain identical. Native libraries,
 APK resources/assets, services, installer payloads and user data are preserved.
 The original 206 tests/fixtures remain unchanged; one compiled-removal case is added.
 
-The build checks every decoded class, allowing only these eight removals and the
-two generated BuildConfig version literals. Debug source line numbers can shift;
+The build checks every decoded class, allowing only these eight removals.
+The exact parent has no BuildConfig class; its continued absence is required.
+The version change is limited to manifest metadata. Debug source line numbers can shift;
 executable code, registers, branches, catches and string values remain checked.
 Existing narrow D8 helper/encoding normalization is reused unchanged.
 

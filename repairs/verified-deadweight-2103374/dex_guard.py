@@ -1,4 +1,4 @@
-"""Compare every decoded class; allow only eight removals and BuildConfig identity.
+"""Compare every decoded class; allow only eight reviewed method removals.
 
 Source line numbers are debug metadata and shift after deleting definitions.
 All executable instructions, registers, literals, call targets and catches remain
@@ -48,8 +48,10 @@ def compare(base, candidate, classpath, out):
                         subprocess.run(['java','-cp',classpath,'org.jf.baksmali.Main','disassemble',
                                         '--sequential-labels',str(dex),'-o',str(root/'smali')], check=True)
             raw = {p.relative_to(root/'smali').as_posix():p.read_text() for p in (root/'smali').rglob('*.smali')}
-            if activity not in raw or buildconfig not in raw:
-                raise RuntimeError('Expected runtime classes missing')
+            if activity not in raw:
+                raise RuntimeError('Expected activity missing')
+            if buildconfig in raw:
+                raise RuntimeError('Unexpected BuildConfig: exact locked APK has no such class')
             found = {m[1] for m in method.finditer(raw[activity]) if m[1] in removed}
             if found != (removed if label == 'parent' else set()):
                 raise RuntimeError('Compiled removal inventory mismatch: '+repr(found))
@@ -59,17 +61,6 @@ def compare(base, candidate, classpath, out):
                 matches = [(name,token) for name,text in raw.items() for token in retired
                            if re.search(r'(?<![A-Za-z0-9_])'+re.escape(token)+r'(?![A-Za-z0-9_])', text)]
                 if matches: raise RuntimeError('Retired dashboard token returned: '+repr(matches))
-            # Only these two literal fields may differ in the generated identity class.
-            identity = raw[buildconfig]
-            expected_code = 2103373 if label == 'parent' else 2103374
-            expected_name = '1.0.9-Cobra-Targeted-Isolation-RC1' if label == 'parent' else '1.0.9-Verified-Deadweight-RC1'
-            code_pattern = r'(?m)^(\.field public static final VERSION_CODE:I = )'+hex(expected_code)+r'$'
-            name_pattern = r'(?m)^(\.field public static final VERSION_NAME:Ljava/lang/String; = )"'+re.escape(expected_name)+r'"$'
-            identity, n = re.subn(code_pattern, r'\g<1>APPROVED_VERSION', identity)
-            if n != 1: raise RuntimeError('Unexpected BuildConfig versionCode')
-            identity, n = re.subn(name_pattern, r'\g<1>"APPROVED_NAME"', identity)
-            if n != 1: raise RuntimeError('Unexpected BuildConfig versionName')
-            raw[buildconfig] = identity
             normalized = {n:old_guard.normalize(re.sub(r'(?m)^\s*\.line \d+\s*$', '', t))+'\n' for n,t in raw.items()}
             resolved, bodies, helpers = bridge.resolve(normalized)
             maps.append(resolved)
@@ -82,7 +73,7 @@ def compare(base, candidate, classpath, out):
                 old.get(n,'').splitlines(True),new.get(n,'').splitlines(True),'parent/'+n,'candidate/'+n)))
         report = {'protected_classes_checked':len(old.keys()|new.keys()),'unexpected_differences':changed,
                   'removed_methods':sorted(removed),'retired_dashboard_absent':True,
-                  'buildconfig_delta':'Only versionCode/versionName literals',
+                  'buildconfig_absent_in_both':True,
                   'source_debug_line_numbers_ignored':True,'helper_proofs':helper_proofs,
                   'decoded_protected_instructions_identical':not changed}
         (out/'DEX-PRESERVATION.json').write_text(json.dumps(report,indent=2)+'\n')
