@@ -31,3 +31,25 @@ Gates A/B passed. The new approved-source reference phase failed to compile beca
 Evidence artifact `11726967151`, SHA-256 `345bbf8b2520b3129c9d3d916ce0b3fc301aaa1e50e077301b4ed6ff7e987af8`.
 
 Run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38205359098
+
+## Run 38205532514 — three runtime checks remain blocked, no APK
+
+Source commit: `08547352ebc1ed3f24b4902a2a360e15eeb8e454`.
+
+Gates A/B and the untouched-source routing reference passed. The candidate executed 199 tests: 196 passed, three failed, none skipped. All 167 inherited cases and the candidate-versus-approved routing comparison passed. Assembly and signing were skipped.
+
+Unresolved failures (not waived):
+
+- Initial local-rewind construction test expected its controlled player but observed null at line 128.
+- Actual Activity recreation encountered a Robolectric `ActivityController.windowFocusChanged` null precondition during `recreate` at line 94.
+- The Channels filter matrix did not locate another selectable channel in the Groups fixture at line 97.
+
+The attached six-context fullscreen inventory passed, as did the real broadcast chooser callbacks, four-row sizing/vertical scrolling, mini/fullscreen PiP session checks, preview PiP five-size geometry and touch checks, Stats data/visibility, and theme tests. Additional explicit post-PiP/recreation hierarchy and different-channel identity assertions remain pending execution; these must not be inferred from inventory or session assertions alone.
+
+The rendered portrait Stats panel, broadcast chooser and 412x915 preview PiP were inspected. Stats is visibly presented (not just found in the hierarchy); the chooser has more than four complete visible choices; the new PiP label fits without moving the original Unmute or status controls. Screenshot evidence is automated rendering, not device acceptance or live provider verification.
+
+Further visual review invalidated this run's claimed five-size geometry coverage: window qualifiers were changed after each Activity was created, so four preview PNG dimensions lagged their requested size by one iteration. The next test-only follow-up creates each Activity after setting qualifiers and asserts both measured and laid-out decor dimensions before accepting geometry or screenshots. The passing geometry test names above are raw run results, not accepted size evidence. No size case is removed.
+
+Evidence artifact `11727530866`, SHA-256 `9236113afaa59a80c2641c102a1ac6f8bfae233aafc6217d81e746d7af364d2b`. Its downloaded ZIP passed CRC checks.
+
+Run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38205532514
