@@ -21,3 +21,13 @@ Touch callback dispatch, chooser scrolling, Activity recreation attachment and s
 The next workflow includes one focused reference suite compiled from the untouched 264-file approved transport source. It captures five exact return-path states. The identical test then runs on the candidate, and the gate independently compares every recorded field, source hashes and test identity. This phase does not assemble an APK or rebuild native code. The candidate retains the existing 31 tests, adds that one comparison test, and retains all 167 inherited cases.
 
 Only an actual passing rerun can clear the gates. This record does not claim that the next run passed or that a signed candidate exists.
+
+## Run 38205359098 — fixture compilation failed, no APK
+
+Source commit: `17329e48f0a63a6050b8c8bad5433236b1040e47`.
+
+Gates A/B passed. The new approved-source reference phase failed to compile because its reused Handoff fixture references `CobraProSeason317Test`, which the isolated reference project had not staged. No reference or candidate runtime test executed in this run, and assembly/signing were skipped. The staging list now includes that unchanged dependency; no production code or assertion changes are involved.
+
+Evidence artifact `11726967151`, SHA-256 `345bbf8b2520b3129c9d3d916ce0b3fc301aaa1e50e077301b4ed6ff7e987af8`.
+
+Run: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38205359098

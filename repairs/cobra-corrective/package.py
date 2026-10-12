@@ -139,7 +139,8 @@ def baseline_reference(args):
     testdir.mkdir(parents=True, exist_ok=True)
     fixtures = ('cobra-navigation-2103157/tests/CobraNavigationUiTest.java',
                 'sports-hub-2103270/SportsHubTest.java',
-                'cobra-pro-refinement-2103322/CobraProHandoffTest.java')
+                'cobra-pro-refinement-2103322/CobraProHandoffTest.java',
+                'cobra-pro-season-2103317/CobraProSeason317Test.java')
     for relative in fixtures:
         shutil.copy2(HERE.parent / relative, testdir / Path(relative).name)
     test = HERE / 'CobraCorrectiveRoutingReferenceTest.java'
