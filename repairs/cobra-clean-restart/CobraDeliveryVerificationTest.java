@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.widget.HorizontalScrollView;
 import android.widget.ListView;
@@ -40,13 +41,25 @@ import static com.projectinfinity.kodi.CobraNavigationUiTest.*;
 @LooperMode(LooperMode.Mode.PAUSED)
 public class CobraDeliveryVerificationTest {
   CobraCleanRuntimeTest r;
-  @Before public void setup(){r=new CobraCleanRuntimeTest();r.before();}
+  @Before public void setup(){SystemClock.setCurrentTimeMillis(1800000L);r=new CobraCleanRuntimeTest();r.before();}
   @After public void cleanup()throws Exception{r.after();}
+  // Robolectric 4.14.1 ShadowSystem uses uptimeMillis for instrumented System.currentTimeMillis in PAUSED mode.
+  // The uninstrumented JUnit class's System.currentTimeMillis is the host wall clock; never mix those receipt domains.
+  long receiptClock(){return org.robolectric.shadows.ShadowSystem.currentTimeMillis();}
   void drain()throws Exception{((CobraNavigationUiTest.PendingIo)get(r.a,"mIo")).drain();r.f.frames(3);r.measure();}
   void motion(View target,long down,int action,float x,float y){MotionEvent e=MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,x,y,0);try{target.dispatchTouchEvent(e);}finally{e.recycle();}}
   void openStats()throws Exception{r.full();r.click(r.tag("cobra_fullscreen_sports_stats"));}
   String sheet()throws Exception{return r.text((View)get(r.a,"mCobraActionSheet"));}
-
+  void headerContrast()throws Exception{
+    ViewGroup header=(ViewGroup)get(r.a,"mCobraModeToolbar");int expected=(Integer)call(r.a,"cobraModeColor","text"),checked=0;
+    for(int i=0;i<header.getChildCount();i++){
+      View icon=header.getChildAt(i);if(!icon.getClass().getSimpleName().equals("CobraIconButton"))continue;
+      assertEquals("Existing Pro header icon ink must follow its active palette",expected,get(icon,"ink"));
+      Bitmap bitmap=Bitmap.createBitmap(icon.getWidth(),icon.getHeight(),Bitmap.Config.ARGB_8888);
+      try{call(icon,"onDraw",new Canvas(bitmap));int pixels=0;for(int y=0;y<bitmap.getHeight();y++)for(int x=0;x<bitmap.getWidth();x++)if(bitmap.getPixel(x,y)==expected)pixels++;assertTrue("Existing header glyph must render in contrasting ink",pixels>=5);}finally{bitmap.recycle();}checked++;
+    }
+    assertEquals(3,checked);
+  }
   @Test(timeout=90000) public void horizontalGestureKeepsChromeUntilReleaseAndScrollsUsingRealTouch()throws Exception{
     r.window(280,280);r.open("sports",false);r.full();HorizontalScrollView scroll=(HorizontalScrollView)r.tag("cobra_pro_fullscreen_scroll");
     View chrome=(View)get(r.a,"mPlayerChrome");call(r.a,"showPlayerChromeTemporarily");long start=SystemClock.uptimeMillis();float y=scroll.getHeight()/2f;
@@ -56,18 +69,16 @@ public class CobraDeliveryVerificationTest {
     assertTrue("Gesture, not scrollTo(), must move the rail",scroll.getScrollX()>0);assertEquals(Arrays.asList("Channels","Display","Multi-View","PiP","Stats","More"),r.controls());
   }
   @Test(timeout=90000) public void delayedSportsFeedDoesNotPresentDetailedNumbersAsCurrent()throws Exception{
-    r.open("sports",false);r.repository();put(r.game,"feedUpdatedAtMs",System.currentTimeMillis()-600000L);openStats();drain();String text=sheet();
+    r.open("sports",false);r.repository();put(r.game,"feedUpdatedAtMs",receiptClock()-600000L);assertTrue((Long)get(r.game,"feedUpdatedAtMs")>0L);assertTrue((Boolean)call(r.a,"cobraSportsDelayed",r.game));openStats();drain();String text=sheet();
     assertTrue(text.contains("delayed")||text.contains("Delayed"));assertFalse("Delayed feed must not expose unqualified current yardage",text.contains("Total yards 320"));assertFalse("Delayed feed must not expose unqualified current player leaders",text.contains("Passing 240"));assertTrue(text.contains("Ford Field"));
   }
   @Test(timeout=90000) public void openStatsDropsScoresWhenTheSameGameBecomesStale()throws Exception{
     r.open("sports",false);r.repository();openStats();drain();assertTrue(sheet().contains("Total yards 320"));put(r.game,"feedAvailable",false);
     Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(3));r.measure();assertFalse("Already-open new Stats panel must honor freshness changes",sheet().contains("Total yards 320"));
-    put(r.game,"feedAvailable",true);put(r.game,"feedUpdatedAtMs",System.currentTimeMillis());Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));r.measure();
-    String trace=" delayed="+call(r.a,"cobraSportsDelayed",r.game)+" sameGame="+(r.game==call(r.a,"cobraSportsGame",get(r.game,"id")))+" sports="+call(get(r.a,"mCobraSix"),"sports")+" sheet="+sheet();
-    View owner=(View)get(r.a,"mCobraActionSheet");Object info=org.robolectric.util.ReflectionHelpers.getField(owner,"mListenerInfo");
-    List listeners=org.robolectric.util.ReflectionHelpers.getField(info,"mOnAttachStateChangeListeners");
-    if(listeners!=null)for(Object listener:listeners)if(listener.getClass().getSimpleName().equals("StatsSession"))trace+=" current="+call(listener,"current")+" closed="+get(listener,"closed")+" summary="+get(listener,"summary")+" age="+(System.currentTimeMillis()-(Long)get(listener,"receivedAt"))+" rendered="+get(listener,"rendered");
-    assertTrue("Fresh data can recover without losing the sheet"+trace,sheet().contains("Total yards 320"));
+    put(r.game,"feedAvailable",true);put(r.game,"feedUpdatedAtMs",receiptClock());assertFalse("Recovered fixture timestamp must be fresh in the app's clock domain",(Boolean)call(r.a,"cobraSportsDelayed",r.game));
+    Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));r.measure();assertFalse((Boolean)call(r.a,"cobraSportsDelayed",r.game));
+    assertTrue("Fresh data can recover without losing the sheet: "+sheet(),sheet().contains("Total yards 320"));
+    r.evidence("STATS-FRESHNESS-RECOVERY",new JSONObject().put("clock","Robolectric ShadowSystem / PAUSED").put("freshToDelayedToFresh",true).put("runtimeClockChanged",false));
   }
   @Test(timeout=90000) public void statsFeedMetadataSuppliesVenueLocationSituationAndTeamValuesWithoutInventingMissingData()throws Exception{
     r.window(840,720);r.open("sports",false);
@@ -99,6 +110,7 @@ public class CobraDeliveryVerificationTest {
     for(String mode:CobraCleanRuntimeTest.MODES){r.open(mode,false);put(r.a,"mCobraEffects",new CobraPresentationEffects(r.a));Object session=get(r.a,"mCobraPreviewPlayer");
       for(String appearance:new String[]{"light","dark","oled","system"})for(String ambient:new String[]{"off","subtle","immersive"}){
         r.prefs.edit().putString("cobra_appearance_mode",appearance).putString(CobraPresentationEffects.AMBIENT,ambient).commit();call(r.a,"cobraRefreshVisualEffects");r.measure();assertSame(session,get(r.a,"mCobraPreviewPlayer"));assertEquals(appearance,r.prefs.getString("cobra_appearance_mode",""));
+        if(mode.equals("focus")||mode.equals("sports"))headerContrast();
         if(ambient.equals("off"))r.screenshot("delivery-theme-"+mode+"-"+appearance);
       }
       r.full();r.checkControls(mode);r.screenshot("delivery-fullscreen-"+mode);assertFalse(r.state.released);
