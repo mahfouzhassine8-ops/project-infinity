@@ -1,5 +1,6 @@
-Cobra test delivery pass 5.
-Engineering source/visual verification: run 38223428232, all 193 cases passed.
-Revalidate the exact reviewed source and all 185 original tests before assembly.
-Require protected decoded bytecode, manifest, resources/assets/native payload and permanent signer equality.
-Build Cobra 2103372 for user testing only. Do not install, lock, promote or rebuild native code.
+Cobra test delivery pass 6.
+Application source remains byte-identical to reviewed 193-pass run 38223428232.
+Run 38224181197 passed all runtime and exact-source gates and assembled the Android donor.
+Its only protected-library differences were unexecuted array-payload alignment nops after terminal returns.
+The comparator now recognizes baksmali sequential array labels with the same terminal/no-incoming-target proof and negative mutation tests.
+Rerun all 193 contracts, compare all protected code/payload, permanently sign the test APK. No native rebuild or production promotion.
