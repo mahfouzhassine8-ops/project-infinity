@@ -1,0 +1,54 @@
+name: Infinity | 2103377 isolated hard-stop feasibility
+on:
+  push:
+    branches: [experiment/infinity-2103377-hardstop-feasibility]
+    paths:
+      - 'repairs/hardstop-feasibility-2103377/**'
+      - '.github/workflows/infinity-2103377-hardstop-feasibility.yml'
+permissions: {contents: read}
+concurrency: {group: infinity-2103377-hardstop-feasibility, cancel-in-progress: false}
+jobs:
+  posix-and-persistence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Verify experiment is isolated from actual 2103377 implementation
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          base='40a5ac471c4bf67aaeb6acaf0ec6612097e06b53'
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          changed=set(subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines())
+          allowed={
+            '.github/workflows/infinity-2103377-hardstop-feasibility.yml',
+            'repairs/hardstop-feasibility-2103377/native_worker.cpp',
+            'repairs/hardstop-feasibility-2103377/app_state_child.py',
+            'repairs/hardstop-feasibility-2103377/verify.py'
+          }
+          assert changed==allowed,('Unexpected production delta',sorted(changed^allowed))
+          print('PASS: experiment does not edit actual Kodi runtime, APK, signing, skins, or locked source.')
+          PY
+      - name: Run isolated POSIX fatal-signal and real SQLite save tests
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          python3 repairs/hardstop-feasibility-2103377/verify.py --out hardstop-evidence
+      - name: Preserve exact test source and evidence
+        if: always()
+        run: |
+          mkdir -p hardstop-evidence
+          git rev-parse HEAD > hardstop-evidence/COMMIT.txt
+          printf '%s\n' 'HOST-ONLY FEASIBILITY. NO KODI ENGINE REPAIR, NO APK, NO SIGNING, NO ANDROID DEVICE EVIDENCE. ORIGINAL 2103377 SOURCE AND LOCKED PAIR UNCHANGED.' > hardstop-evidence/SCOPE.txt
+          sha256sum repairs/hardstop-feasibility-2103377/*.py repairs/hardstop-feasibility-2103377/*.cpp > hardstop-evidence/SOURCE-SHA256.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-Hardstop-Feasibility-Evidence
+          path: |
+            hardstop-evidence/*.json
+            hardstop-evidence/*.txt
+          if-no-files-found: error
+          retention-days: 90
