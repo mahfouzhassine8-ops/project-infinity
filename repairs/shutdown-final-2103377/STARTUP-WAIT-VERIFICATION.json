@@ -1,0 +1,373 @@
+{
+  "abort_waits_reproduced": 8,
+  "actual_function_scenarios": 20,
+  "addons": {
+    "plugin.video.pov": {
+      "changed_source_refused": true,
+      "input_sha256": "afcef67ec3552bf1aea81fa40825801dd8726f6ac9ec3c940fded868add215ce",
+      "output_sha256": "47cb09ca3737e7678f9ec8db6ba736f8389978ea67232a25c6b8c0da65b80038",
+      "playlist_browser_refused": true,
+      "post_abort_initialization_prevented": true,
+      "scenarios": {
+        "abort_during": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 10,
+              "waits": 5
+            }
+          ]
+        },
+        "abort_start": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 0,
+              "waits": 0
+            }
+          ]
+        },
+        "ready": {
+          "approved": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ]
+        },
+        "ready_later": {
+          "approved": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ]
+        },
+        "timeout": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ]
+        }
+      },
+      "unknown_addon_refused": true
+    },
+    "plugin.video.redlight": {
+      "changed_source_refused": true,
+      "input_sha256": "fbb605fa8d891f73d511b4da85e01bf87abd55e8188267a5d7996a0a8c75a1d8",
+      "output_sha256": "a9d71fa22b49cac603317ec8c7aec8f582aa9f50a1b7a7cfec964e2fa25a1d03",
+      "playlist_browser_refused": true,
+      "post_abort_initialization_prevented": false,
+      "scenarios": {
+        "abort_during": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 10,
+              "waits": 5
+            }
+          ]
+        },
+        "abort_start": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 0,
+              "waits": 0
+            }
+          ]
+        },
+        "ready": {
+          "approved": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ]
+        },
+        "ready_later": {
+          "approved": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ]
+        },
+        "timeout": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ]
+        }
+      },
+      "unknown_addon_refused": true
+    },
+    "plugin.video.thecrew": {
+      "changed_source_refused": true,
+      "input_sha256": "dd19417bfef7c5918efa59e671e6b17812dd019970ae6a21fcd8ad5185b7a238",
+      "output_sha256": "dc197c58d6a96a1ce737773e43462c9e30326e367e91d6b89aaf0c9749316ed0",
+      "playlist_browser_refused": true,
+      "post_abort_initialization_prevented": true,
+      "scenarios": {
+        "abort_during": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 10,
+              "waits": 5
+            }
+          ]
+        },
+        "abort_start": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 0,
+              "waits": 0
+            }
+          ]
+        },
+        "ready": {
+          "approved": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ]
+        },
+        "ready_later": {
+          "approved": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ]
+        },
+        "timeout": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ]
+        }
+      },
+      "unknown_addon_refused": true
+    },
+    "plugin.video.themoviedb.helper": {
+      "changed_source_refused": true,
+      "input_sha256": "b7d4398ed66a748a87bd0658529c046f03b72a740ce820205815a243dac3c1c9",
+      "output_sha256": "1756884d6ecb4f63362bee811275bee59b7d759172501bef47f8f798b122d373",
+      "playlist_browser_refused": true,
+      "post_abort_initialization_prevented": true,
+      "scenarios": {
+        "abort_during": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 10,
+              "waits": 5
+            }
+          ]
+        },
+        "abort_start": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 0,
+              "waits": 0
+            }
+          ]
+        },
+        "ready": {
+          "approved": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 2,
+              "waits": 0
+            }
+          ]
+        },
+        "ready_later": {
+          "approved": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ],
+          "corrected": [
+            true,
+            {
+              "reads": 8,
+              "waits": 3
+            }
+          ]
+        },
+        "timeout": {
+          "approved": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ],
+          "corrected": [
+            false,
+            {
+              "reads": 240,
+              "waits": 120
+            }
+          ]
+        }
+      },
+      "unknown_addon_refused": true
+    }
+  },
+  "compiled_header_sha256": "1508939817c6af8a6abd350ba0662a9c026b8afd554b3a53fdc9bbfc4a520c49",
+  "complete_shutdown_proven": false,
+  "host_only": true,
+  "known_caller_guards": 3,
+  "passed": true,
+  "scope": "Compiled exact-loaded-byte transformer, actual archived read-only wait functions and corrected caller bodies; current executed bytes must match before any application.",
+  "source_guard_rejections": 12
+}
