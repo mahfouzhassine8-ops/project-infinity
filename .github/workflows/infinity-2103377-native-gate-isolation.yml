@@ -1,0 +1,107 @@
+name: Infinity | 2103377 native persistence barrier 12 cases
+on:
+  push:
+    branches: [experiment/infinity-2103377-hardstop-feasibility]
+    paths:
+      - '.github/workflows/infinity-2103377-native-gate-isolation.yml'
+permissions: {contents: read}
+jobs:
+  native-barrier-host-tests:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - name: Verify production APK and source unchanged
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          base='40a5ac471c4bf67aaeb6acaf0ec6612097e06b53'
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          changed=set(subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines())
+          allowed={
+           '.github/workflows/infinity-2103377-hardstop-feasibility.yml',
+           '.github/workflows/infinity-2103377-shutdown-comparison.yml',
+           '.github/workflows/infinity-2103377-native-gate-isolation.yml',
+           'repairs/hardstop-feasibility-2103377/native_worker.cpp',
+           'repairs/hardstop-feasibility-2103377/app_state_child.py',
+           'repairs/hardstop-feasibility-2103377/verify.py',
+           'repairs/shutdown-comparison-2103377/compare.py',
+          }
+          assert changed <= allowed, sorted(changed-allowed)
+          print('PASS: no production changes')
+          PY
+      - name: Compile original barrier code; independently execute each scenario
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          mkdir -p barrier-results
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, re, subprocess, time, os
+          root=Path('repairs/android-checkpoint-shutdown/native')
+          src=(root/'test_barrier.cpp').read_text()
+          header=root/'InfinityPersistenceBarrier.h'
+          cases=[
+          'required_manifest_and_authoritative_clean',
+          'active_writer_blocks_and_checkpoint_capability',
+          'late_checkpoint_write_invalidates_commit',
+          'drained_late_write_still_invalidates_generation',
+          'failed_and_abandoned_commit_stay_fenced',
+          'deadline_is_failure_never_permission_to_kill',
+          'retry_rejects_old_commit_and_authority',
+          'retry_preserves_old_active_writer',
+          'mutation_admission_races_quiesce',
+          'foreign_barrier_authority_is_rejected',
+          'safe_can_be_revoked_before_termination',
+          'expired_safe_cannot_authorize_termination',
+          ]
+          got=re.findall(r'^static void ([a-z_]+)\(\)\s*\{',src,re.M)
+          assert got==cases,(got,cases)
+          anchor='\nint main()\n{\n'
+          assert src.count(anchor)==1
+          prefix=src.split(anchor,1)[0]
+          dispatch='\n#include <string>\nint main(int argc, char** argv) {\n if(argc!=2) return 3;\n std::string test(argv[1]);\n'
+          for case in cases:
+              dispatch+=f' if (test=="{case}") {{ {case}(); return 0; }}\n'
+          dispatch+=' return 4;\n}\n'
+          out=Path('barrier-results')
+          cpp=out/'independent_case_runner.cpp'
+          cpp.write_text(prefix+dispatch)
+          binary=out/'independent_case_runner'
+          cmd=['g++','-std=c++17','-O2','-pthread','-Wall','-Wextra','-Werror','-I',str(root),str(cpp),'-o',str(binary)]
+          compiled=subprocess.run(cmd,text=True,capture_output=True,timeout=90)
+          assert compiled.returncode==0,compiled.stderr
+          results=[]
+          for case in cases:
+              start=time.monotonic()
+              try:
+                  p=subprocess.run([str(binary),case],text=True,capture_output=True,timeout=20)
+                  status='PASS' if p.returncode==0 else 'FAIL'
+                  details={'exit_code':p.returncode,'stdout':p.stdout[-1000:],'stderr':p.stderr[-1000:]}
+              except subprocess.TimeoutExpired:
+                  status='TIMEOUT';details={'exit_code':None,'stdout':'','stderr':'timeout 20s'}
+              duration=round(time.monotonic()-start,4)
+              print(status,case,round(duration,3),'seconds',flush=True)
+              results.append({'case':case,'status':status,'seconds':duration,**details})
+          report={
+           'scope':'12 individual host-native C++ persistence-barrier scenarios, not full Kodi checkpoint integration or physical device',
+           'original_header_sha256':hashlib.sha256(header.read_bytes()).hexdigest(),
+           'original_tests_sha256':hashlib.sha256((root/'test_barrier.cpp').read_bytes()).hexdigest(),
+           'test_cases':len(cases),'passed':sum(x['status']=='PASS' for x in results),
+           'source_commit':os.environ['GITHUB_SHA'],
+           'production_changed':False,'signed_apk_built':False,
+           'results':results,
+          }
+          (out/'BARRIER-CASE-RESULTS.json').write_text(json.dumps(report,indent=2)+'\n')
+          (out/'BARRIER-CASE-RESULTS.txt').write_text(''.join(x['status']+' '+x['case']+' '+str(x['seconds'])+'s\n' for x in results))
+          assert report['passed']==12,f"{report['passed']} of 12 passed"
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103377-Native-Barrier-12-Individual-Results
+          path: |
+            barrier-results/BARRIER-CASE-RESULTS.json
+            barrier-results/BARRIER-CASE-RESULTS.txt
+          retention-days: 30
