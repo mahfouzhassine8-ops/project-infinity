@@ -84,8 +84,10 @@ inline bool TryExecute(FILE* file, const std::string& script, const std::string&
                        PyObject* globals)
 {
   if (!Find(addon)) return false;
-  fpos_t position;
-  if (::fgetpos(file, &position) != 0) return false;
+  // ftell/fseek are available in the pinned API 21 Bionic configuration;
+  // fgetpos/fsetpos are not declared there with its large-file build flags.
+  const long position = ::ftell(file);
+  if (position < 0) return false;
   std::string source;
   char buffer[4096];
   while (source.size() <= 65536)
@@ -96,7 +98,7 @@ inline bool TryExecute(FILE* file, const std::string& script, const std::string&
   }
   const bool readError = ::ferror(file) != 0;
   ::clearerr(file);
-  if (::fsetpos(file, &position) != 0)
+  if (::fseek(file, position, SEEK_SET) != 0)
   {
     // This stream cannot safely resume the original loader. Report a real
     // Python failure; never execute a partially consumed script or waive data.
