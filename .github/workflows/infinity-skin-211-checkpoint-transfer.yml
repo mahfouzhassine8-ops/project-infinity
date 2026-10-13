@@ -1,0 +1,42 @@
+name: Infinity | Compact preview checkpoint verification inputs
+on:
+  push:
+    branches: [work/infinity-compact-preview-skin-211]
+    paths: ['.github/workflows/infinity-skin-211-checkpoint-transfer.yml']
+permissions: {contents: read}
+concurrency:
+  group: infinity-compact-preview-checkpoint-transfer
+  cancel-in-progress: false
+jobs:
+  source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: 081771fe0dadff4890c110daf631a5759ba28f8e
+          path: skin
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          ref: 808b4acc4d1a6aa1cbc8bc4a1848de88b81103e6
+          path: native
+          persist-credentials: false
+      - name: Archive pinned source only; do not compile or alter runtime
+        run: |
+          set -euo pipefail
+          mkdir checkpoint-transfer
+          test "$(git -C skin rev-parse HEAD)" = 081771fe0dadff4890c110daf631a5759ba28f8e
+          test "$(git -C native rev-parse HEAD)" = 808b4acc4d1a6aa1cbc8bc4a1848de88b81103e6
+          git -C skin archive --format=tar.gz HEAD > checkpoint-transfer/skin211-source.tar.gz
+          git -C native archive --format=tar.gz HEAD > checkpoint-transfer/native376-source.tar.gz
+          git -C skin ls-tree -r HEAD > checkpoint-transfer/skin211-git-tree.txt
+          git -C native ls-tree -r HEAD > checkpoint-transfer/native376-git-tree.txt
+          cd checkpoint-transfer
+          sha256sum *.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Compact-Preview-Exact-Source-Checkpoints
+          path: checkpoint-transfer/
+          if-no-files-found: error
+          retention-days: 90
