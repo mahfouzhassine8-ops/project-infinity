@@ -1,0 +1,37 @@
+name: Infinity | 2103377 Close Recents source guards
+on:
+  push:
+    branches: [work/infinity-2103377-close-recents-preservation]
+    paths:
+      - 'repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in'
+      - 'repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/InfinityCloseNativeLease.java.in'
+      - 'repairs/shutdown-recents-2103377/**'
+      - '.github/workflows/infinity-2103377-close-recents-source.yml'
+permissions: {contents: read}
+concurrency:
+  group: infinity-2103377-close-recents-static
+  cancel-in-progress: false
+jobs:
+  source-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact source parent and bounded Recents behavior
+        run: |
+          set -euo pipefail
+          mkdir -p close-recents-evidence
+          python3 -m unittest discover -s repairs/shutdown-recents-2103377 -p 'test_*.py' -v 2>&1 | tee close-recents-evidence/test.log
+          git diff --name-status 808b4acc4d1a6aa1cbc8bc4a1848de88b81103e6 HEAD > close-recents-evidence/changed-source.txt
+          sha256sum repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/InfinityClose{GuardService,NativeLease}.java.in > close-recents-evidence/source-sha256.txt
+          printf '%s\n' 'STATIC SOURCE CONTRACT ONLY; no Java/Android compilation, no signed APK, no Fold acceptance.' > close-recents-evidence/validation-scope.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-Recents-Static-Verification
+          path: close-recents-evidence/
+          if-no-files-found: warn
+          retention-days: 90
