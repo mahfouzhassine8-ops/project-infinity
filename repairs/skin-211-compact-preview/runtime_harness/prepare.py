@@ -96,7 +96,13 @@ def prepare(args):
 <setting id="services.upnpserver">false</setting>
 <setting id="services.upnprenderer">false</setting>
 <setting id="locale.language">resource.language.en_gb</setting>
-<setting id="eventlog.enabled">false</setting></settings>''')
+<setting id="eventlog.enabled">false</setting>
+<!-- Kodi21.3 requires a resolutions element; without it the entire GUI settings
+     file is rejected and Kodi silently switches to Estuary, preventing this
+     isolated Infinity renderer probe from ever starting. -->
+<resolutions />
+<viewstates />
+</settings>''')
     (userdata / 'advancedsettings.xml').write_text('<advancedsettings><loglevel hide="true">1</loglevel><splash>false</splash></advancedsettings>')
     config = {'theme': args.theme, 'width': args.width, 'height': args.height,
               'dp_width': args.dp_width, 'dp_height': args.dp_height,
