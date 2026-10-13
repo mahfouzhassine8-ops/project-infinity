@@ -1,5 +1,6 @@
 """Additional observation hooks for all four requested capabilities."""
 import re
+import trace_retention
 
 ACTIVITY='xbmc/platform/android/activity/'
 INCLUDE='#if defined(TARGET_ANDROID)\n#include "platform/android/activity/InfinityVfsOpenTrace.h"\n#endif\n'
@@ -140,7 +141,7 @@ inline void Begin() noexcept''')
     if(m_record)m_record->id.store(0,std::memory_order_release);
     if(parentId==m_id) parentId=m_parent;''')
     s=once(s,'  long long m_start{0};','  NativeScopeRecord* m_record{nullptr};\n  long long m_tid{0};\n  long long m_start{0};')
-    return s
+    return trace_retention.apply(s)
 
 def extend(name,s):
     if name=='xbmc/filesystem/File.cpp':
@@ -298,6 +299,22 @@ Backend Identify(const XFILE::IFile* file) noexcept
 #endif''')
         return s
     if name=='xbmc/interfaces/generic/ScriptInvocationManager.cpp':
+        s=once(s,'void CScriptInvocationManager::PumpAndroidCheckpointRetirement(bool force)\n{',"""void CScriptInvocationManager::PumpAndroidCheckpointRetirement(bool force)
+{
+#if defined(TARGET_ANDROID)
+  // No inspected operation currently has approval to discard uncertain state.
+  // Unknown writers already receive Monitor/legacy cooperative notifications.
+  // Their native leases and retirement/durability obligations remain intact;
+  // do not inject asynchronous SystemExit simply because they are slow.
+  if (InfinityAndroidCheckpoint::IsActive())
+  {
+    static std::atomic<bool> infinityProtectedReported{false};
+    if (!infinityProtectedReported.exchange(true))
+      InfinityShutdownTrace::Event("milestone","scripts.unknown_writers_protected",
+        -1,0,0,0,nullptr,"cooperative_only_no_abandonment_authorized");
+    return;
+  }
+#endif""")
         return once(s,'retired?"durability_receipt_taken":"no_durability_receipt",true);',
           'retired?"durability_receipt_taken":"no_durability_receipt");')
     raise ValueError(name)

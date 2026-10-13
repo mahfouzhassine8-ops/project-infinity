@@ -41,6 +41,10 @@ def prepare(args):
                     str(saved.SOURCE/'xbmc/platform/android/activity'),'--out',str(OUT/'vfs-trace-tests')],check=True)
     subprocess.run([sys.executable,str(HERE/'tests/verify_source.py'),'--root',str(saved.SOURCE),
                     '--out',str(OUT/'vfs-source-tests')],check=True)
+    subprocess.run([sys.executable,str(HERE/'tests/verify_overflow.py'),'--include',
+                    str(saved.SOURCE/'xbmc/platform/android/activity'),'--out',str(OUT/'overflow-tests')],check=True)
+    subprocess.run([sys.executable,str(HERE/'tests/test_recovery_probe.py')],check=True)
+    subprocess.run([sys.executable,str(HERE/'tests/test_unknown_writer_policy.py')],check=True)
     rollback=json.loads((HERE/'TARGETED-ROLLBACK.json').read_text())
     for name,digest in rollback['source_files'].items():
         assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest,name
@@ -63,6 +67,7 @@ def compile_engine():
                   b'backend_cancel_callback_observed',b'vfs.python.interpreter_retired',b'vfs.checkpoint.result',
                   b'vfs.python.children_retired',b'subject_execution_id',b'cancellation_support']:
         assert token in binary,token
+    assert b'capture.lane_limit' in binary and b'vfs.shutdown_operation_return' in binary
     p=OUT/'ENGINE-PROOF.json';proof=json.loads(p.read_text())
     proof.update(purpose='Independent additive shutdown-wide observation; actual shutdown correction unresolved',
                  vfs_trace_header_sha256=hashlib.sha256((HERE/'InfinityVfsOpenTrace.h').read_bytes()).hexdigest(),

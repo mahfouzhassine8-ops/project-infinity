@@ -97,7 +97,7 @@ constexpr unsigned CAPACITY=128;
 constexpr auto INITIALIZING=std::numeric_limits<unsigned long long>::max();
 struct Record
 {
-  std::atomic<unsigned long long> id{0},parent{0},cancelForId{0},cancelData{0},generation{0};
+  std::atomic<unsigned long long> id{0},parent{0},cancelForId{0},cancelData{0},generation{0},shutdownForId{0};
   std::atomic<long long> invoker{-1},start{0},stageStart{0},end{0},tid{0};
   std::atomic<unsigned> state{0},kind{0},verified{0},stageRevision{0};
   std::atomic<std::uintptr_t> file{0};
@@ -320,7 +320,7 @@ public:
       entry.tid.store(static_cast<long long>(::syscall(SYS_gettid)));entry.generation.store(checkpointGeneration.load());
       entry.state.store(Pack(Backend::Unknown,Stage::Enter,scheme));
       entry.kind.store(static_cast<unsigned>(kind));entry.verified.store(0);entry.stageRevision.store(0);
-      entry.cancelForId.store(0);entry.cancelData.store(0);entry.file.store(0);
+      entry.cancelForId.store(0);entry.cancelData.store(0);entry.file.store(0);entry.shutdownForId.store(0);
       entry.id.store(id,std::memory_order_release);current=record;
       Emit(Read(entry),"vfs.open.start","observed");return;
     }
@@ -338,6 +338,13 @@ public:
     // Keep the last executing stage rather than replacing it by "returned".
     Emit(s,"vfs.open.return",returned?result:
       (std::uncaught_exceptions()>exceptions?"exception_unwound":"unclassified"));
+    if(s.id && record->shutdownForId.load()==s.id)
+      Emit(s,"vfs.shutdown_operation_return",returned?result:
+        (std::uncaught_exceptions()>exceptions?"exception_unwound":"unclassified"));
+    if(s.end-s.start>=1000000 || s.cancelCalls || s.cancelBits ||
+       std::uncaught_exceptions()>exceptions)
+      Emit(s,"vfs.blocking_operation_return",returned?result:
+        (std::uncaught_exceptions()>exceptions?"exception_unwound":"unclassified"));
     Remember(s);record->id.store(0,std::memory_order_release);current=previous;
   }
   Open(const Open&)=delete;Open& operator=(const Open&)=delete;
@@ -397,13 +404,19 @@ inline void TransferResult(int code) noexcept
   char outcome[32]{};const auto ignored=std::snprintf(outcome,sizeof(outcome),"curl_result_code_%d",code);
   (void)ignored;Emit(Read(*current),"vfs.backend.transfer_result",outcome);
 }
+inline void TagShutdown(Record& r,unsigned long long id) noexcept
+{
+  auto previous=r.shutdownForId.load();
+  for(unsigned attempt=0;attempt<3 && previous<id;++attempt)
+    if(r.shutdownForId.compare_exchange_weak(previous,id))return;
+}
 inline void Request(long long id,const char* outcome) noexcept
 {
   InfinityShutdownTrace::PreserveErrno keep;
   if(!FindSubject(id))return;
   bool active=false;
   for(auto& r:operations)
-  {const auto s=Read(r);if(s.id && s.invoker==id){active=true;Emit(s,"vfs.shutdown.request",outcome);}}
+  {const auto s=Read(r);if(s.id && s.invoker==id){active=true;TagShutdown(r,s.id);Emit(s,"vfs.shutdown.request",outcome);}}
   if(!active)SubjectEvent(id,"vfs.shutdown.request","no_active_operation_observed");
 }
 inline void ObserveCancellation(Record& r,unsigned long long id) noexcept
@@ -507,6 +520,7 @@ inline void CheckpointBegin(unsigned long long generation) noexcept
   {
     auto s=Read(r);if(!s.id)continue;
     r.generation.store(generation);s=Read(r);
+    TagShutdown(r,s.id);
     Emit(s,"vfs.checkpoint.active_operation","snapshot_at_request");
     Emit(s,"vfs.shutdown.request","checkpoint_request_not_backend_cancel");
   }
@@ -558,6 +572,8 @@ inline void FlushCheckpoint() noexcept
   const auto result=pendingCheckpointResult.exchange(0,std::memory_order_acq_rel);
   if(result)
   {
+    InfinityShutdownTrace::NativeScopeSnapshots();
+    InfinityShutdownTrace::FastScopeSummary();
     const bool safe=(result&3)==1;Snapshot s;s.generation=result>>2;
     Emit(s,"vfs.checkpoint.result",safe?"SAFE_TO_TERMINATE":"CHECKPOINT_FAILED");
     for(auto& r:operations)

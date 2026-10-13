@@ -88,3 +88,38 @@ original workflow nor signs/installs a replacement APK. Integration into the
 existing 2103377 branch follows successful preservation, native compatibility
 and regression checks. The final repair remains dependent on physical evidence.
 No promotion or lock is performed.
+
+## 075108 Fold evidence and overflow repair
+
+The main stream reached 8192 rows after 2.910618801 seconds. The existing
+Health Center exporter copied only the first 2 MiB of the critical file, ending
+at 2.153600624 seconds. The checkpoint remained failed at 25.087 seconds.
+Eight pending services remain UNKNOWN; no specific optional abandonment has
+been approved. Actual installed dependency/write behavior is still required.
+
+The additional retention fix uses six separate byte reservations for checkpoint,
+cancellation, interpreter retirement, initial ownership, native returns and
+legacy evidence. Their sum is 1.75 MiB, below the unchanged 2 MiB export cap;
+small bounded loss markers fit in the remaining space. Fast SQLite/database
+telemetry is aggregated; actual database operations and save barriers are
+unchanged. Operations sampled during shutdown retain their return in the
+retirement lane. Limits remain explicitly incomplete evidence.
+
+All original 18 host scenarios remain unchanged and passing. Three added flood
+scenarios verify late callbacks, failed checkpoint/owner receipts, interpreter
+retirement, active native SQL scopes and independent lane exhaustion. Four
+recovery-collector tests verify late-file recovery, privacy and link refusal.
+Full Kodi compilation is a separate gate. This is an evidence repair, not
+a verified shutdown correction or approval to abandon unknown data.
+
+The one-shot recovery add-on reads the two existing allowlisted native critical
+files and installed source hashes/filtered ASTs of the eight pending services.
+It does not require another Close test. If admission/access is blocked, preserve
+the current session and report the failure; do not force shutdown to run it.
+
+During an active checkpoint, the automatic escalation launcher returns before
+launching Stop(true) for unverified writers. Cooperative Monitor/legacy
+notifications and durable retirement remain required. No writer is declared
+disposable. The legacy stop implementation and every save/termination gate
+remain available; no successful save is synthesized. This implements the
+explicit protection policy and does not establish that the Fold closes promptly.

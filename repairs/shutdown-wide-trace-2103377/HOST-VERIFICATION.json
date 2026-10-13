@@ -12,119 +12,119 @@
     "cases": [
       {
         "case": "preclose",
-        "events": 4,
+        "events": 5,
         "passed": true,
-        "trace_sha256": "68a55678a21b011d6009997684dddd3a54bf8848454f4ebe678f5c9ace72e055"
+        "trace_sha256": "416ba1e83c1e6c8c4d73a5da3af25fc2e64398ac56f70b487b5eb44a5deae842"
       },
       {
         "case": "cancel",
-        "events": 7,
+        "events": 9,
         "passed": true,
-        "trace_sha256": "3314f02bf6f99378cbd772ed95295fc097d2e2f07ad066a40155c0a6abc33cd1"
+        "trace_sha256": "a5c9a1aab5fed63ea41a5ec0ad06d8362210d98d18db547f11d849ce9650b82d"
       },
       {
         "case": "nested",
-        "events": 8,
+        "events": 9,
         "passed": true,
-        "trace_sha256": "46c610db2bcc07201beaf8d0df3ebb6e5efe6ba4df56849eba3be02d2d8695f2"
+        "trace_sha256": "92d5496d1fce61e541d0206fae9161a90a9f1d08bd2b46e5c4b014d08cfcf302"
       },
       {
         "case": "inactive",
         "events": 0,
         "passed": true,
-        "trace_sha256": "ba5ac01c3fcd2c6da54115c54b37ba9b518d67c2e290b4f1c26f03bb472d8196"
+        "trace_sha256": "0eda2acdc1a571bdfe9b0305783ca0b93bcd5d825d0927f70254138917d1aa45"
       },
       {
         "case": "exception",
-        "events": 4,
+        "events": 5,
         "passed": true,
-        "trace_sha256": "392054b1aa9a96b6967dc3f459ee761f75d115784b704c7f6fac30407cb95de3"
+        "trace_sha256": "82ce0a39afad187ec93b6e46e7ab84aeb4835730b8ef176a1901a512f0141864"
       },
       {
         "case": "capacity",
-        "events": 257,
+        "events": 261,
         "passed": true,
-        "trace_sha256": "f445cfd06ce6d0a29a0363d97d236d18fa4f020a6ff78dfa4dc68634a492348c"
+        "trace_sha256": "e6d6f3ec3139a86fdb106b3d4f1d45f508c0c62ddf3bc5c0bb859269b4ff72f5"
       },
       {
         "case": "reuse",
-        "events": 8,
+        "events": 10,
         "passed": true,
-        "trace_sha256": "503e10ffcf8fb774076d40a3eed6c3c7eb8e8575f0cb33a76ada753ff52f99e3"
+        "trace_sha256": "62b727368bb8de4cf23b0fd8f1b839204e5f133552112b0da5f883138acea22b"
       },
       {
         "case": "curl_result",
         "events": 5,
         "passed": true,
-        "trace_sha256": "4bec7793d2e2691bc5026ba0a135058827b5c770d6978d437b177e9b95300faa"
+        "trace_sha256": "e2600dc3553021979491faf691fa0b8cbaea52a4105ac4615fef297fa98f4a87"
       },
       {
         "case": "stale_cancel",
         "events": 0,
         "passed": true,
-        "trace_sha256": "4280879178550f1e669ee21eef5d05559b7cb0111e6ad51f43200e5032b98edc"
+        "trace_sha256": "fbb4264e02c5034a976e9169b4da6e3a098380f92069cfe7c5d26d791a60b3b0"
       },
       {
         "case": "stress",
-        "events": 602,
+        "events": 672,
         "passed": true,
-        "trace_sha256": "b7f4bc8955af78dbdbe589da6d7412f2866bed8fa9e3ae917d80e558bb2f75af"
+        "trace_sha256": "1c1e2d3a693c6357715605cf617541eca2b4b0ae55eb4abf00196d8ea51a5256"
       },
       {
         "case": "multiple_children",
-        "events": 29,
+        "events": 32,
         "passed": true,
-        "trace_sha256": "09e2370f973d4854b2751d2861e813af210f5d8fbd3505ee5c2bc220e6386c0a"
+        "trace_sha256": "136343d5df3938879f9279b59eb76ec5ee4538c0c03235ecf4c8d496e293ca95"
       },
       {
         "case": "callback_after_return",
-        "events": 10,
+        "events": 12,
         "passed": true,
-        "trace_sha256": "afa317e68192c374865e5d9fd1b2ff16e0a1375563f678ae0725d9a48b95bafa"
+        "trace_sha256": "b3a22e6a165ae15ad52d83af36c485cb9c6ebd3366d89e1c0bca6a01f679751c"
       },
       {
         "case": "native_preclose",
-        "events": 8,
+        "events": 9,
         "passed": true,
-        "trace_sha256": "c34110cc82252bef06849a88dd5d82e267414d79bb674a1da5a673b69b7ba577"
+        "trace_sha256": "93ed0a6a30185155f38da68298bd0340539356cc82c9fec7e744536a9533cbb4"
       },
       {
         "case": "cache_worker",
-        "events": 8,
+        "events": 9,
         "passed": true,
-        "trace_sha256": "23877cc5ca22d9ac44092aafd9b21cc1d7e088ed7a059ff1942052ac8d94561c"
+        "trace_sha256": "57ee4defba11a899fcb2d2a1d3e5b9186b33be63430b9bee2bb4c5f0ef4a5086"
       },
       {
         "case": "support_unknown",
         "events": 6,
         "passed": true,
-        "trace_sha256": "3bd7875204537ae245294f207a5383dd52844646cae79d26ba9478b3880ba515"
+        "trace_sha256": "f76c87bc04fb4b4e35c70438d7bd696ed996d63fbea436d083989f8649940913"
       },
       {
         "case": "history_gap",
         "events": 4,
         "passed": true,
-        "trace_sha256": "98adb17f07b6a95eccbf817d9142dfc407d669bbe89e84c3017c8577d891f277"
+        "trace_sha256": "7ce124954ddc21cf9b096b0006415a94076725c19365bfa37ec4b19da7bbd5f9"
       },
       {
         "case": "limits",
         "events": 4097,
         "passed": true,
-        "trace_sha256": "f03fb7854a1b24695563d2827825ded266f9e4ac31fa2719a4f80d0832787004"
+        "trace_sha256": "199c83d127190986de68dc5a7c9fe0b276f7b09d45c289f9cbaf7a3a86444c84"
       },
       {
         "case": "native_scope_preclose",
-        "events": 4,
+        "events": 5,
         "passed": true,
-        "trace_sha256": "d236d8269b456e4cd995a1dcdf3e1ce86224fbc9397b2d9de0b8d6c38f41e0fb"
+        "trace_sha256": "4cc213326827e1c6f82a5985c722c881d081ef102e41fd4ffa8c181a46f6857d"
       }
     ],
     "count": 18,
-    "logger_header_sha256": "826a4bf6d1cba5ab5c0fed57ea0fc0e6fb8da9cd91a8d18379e67e8117d006cb",
+    "logger_header_sha256": "7cc0ebafe0ef12af7abbef59e370dd085db6f1709b29e130f04a37206ffb76f5",
     "passed": true,
     "scope": "Exact observation headers with real concurrent host threads and append-only evidence; no Kodi backend execution or Galaxy Fold proof.",
     "shutdown_corrected": false,
-    "trace_header_sha256": "b6d15e7142cb2c86133e4f86a680c69edccd1347c03076780a8fc46c44302b16"
+    "trace_header_sha256": "db06d7d7c87865d7686e677e4e9bca5762674afaf4146f796a1f425de5e4b7c1"
   },
   "locked": false,
   "merged": false,
@@ -133,8 +133,38 @@
   "original_branch_untouched": true,
   "original_native_run": 38378882508,
   "original_source": "837b9824c2114aceb3f533a2c7ead1c264db76b2",
+  "overflow_regressions": {
+    "cases": [
+      {
+        "case": "late_after_noise",
+        "critical_bytes": 146558,
+        "passed": true,
+        "trace_sha256": "0742be60ef08161a73e1195e7820e337aa119cb3fc6297f94a79531b5dd23b47"
+      },
+      {
+        "case": "lanes_independent",
+        "critical_bytes": 1835200,
+        "passed": true,
+        "trace_sha256": "3aff073c9264b8cdffd674a4d2c90a05240b1f42ce41e1d413fcbff49275b486"
+      },
+      {
+        "case": "native_slow_after_noise",
+        "critical_bytes": 3800,
+        "passed": true,
+        "trace_sha256": "f69bde0ffd9c94ec79b934dd66dfba92b4f78dcc62b4014a7a077705c101a3a6"
+      }
+    ],
+    "count": 3,
+    "existing_export_cap_bytes": 2097152,
+    "host_evidence_only": true,
+    "passed": true,
+    "shutdown_repaired": false,
+    "shutdown_timeouts_changed": false
+  },
   "phase": "Additive expansion from preserved targeted diagnostic",
+  "previous_host_verification_sha256": "3f6809e6ddd8afae32b213fa6e28b9931618c348ab9e721afed72c9eb314f2b4",
   "promoted": false,
+  "recovery_probe_tests": 4,
   "saved_274_exact_hashes_preserved": true,
   "saved_274_files": {
     "repairs/shutdown-recents-2103377/lifecycle/InfinityNativeActivityEntry.h": "0a60dccc271f5d2a80e9f6aebaf60278e6e33c86379d5d0228ea710abb3da69e",
@@ -160,15 +190,26 @@
     "unchanged_native_deadline_seconds": 25
   },
   "source_files": {
-    "repairs/shutdown-wide-trace-2103377/InfinityVfsOpenTrace.h": "b6d15e7142cb2c86133e4f86a680c69edccd1347c03076780a8fc46c44302b16",
-    "repairs/shutdown-wide-trace-2103377/README.md": "a46867e762ec09fdb60815716a00d5496366c36ef2d999e917bf5d902bc2dec4",
+    "repairs/shutdown-wide-trace-2103377/InfinityVfsOpenTrace.h": "db06d7d7c87865d7686e677e4e9bca5762674afaf4146f796a1f425de5e4b7c1",
+    "repairs/shutdown-wide-trace-2103377/README.md": "5727a149c05ab2d3330938ad3eb9b70c9ce393f7f35dea0ba23e4e803fae2a6a",
     "repairs/shutdown-wide-trace-2103377/TARGETED-ROLLBACK.json": "4fd4f24d4e635b278c15a40c42c491dea478506c3325d7cf1900a6563d278d79",
     "repairs/shutdown-wide-trace-2103377/apply_trace.py": "cde0801e67627b2ee1db41fa60ed10272bb10521728c20640232fe0c48fea153",
-    "repairs/shutdown-wide-trace-2103377/extend_trace.py": "afb57c8e65a3babe61cbcc15fe9f99b662680bf29006bf986d7f57cde7b6d524",
-    "repairs/shutdown-wide-trace-2103377/native_ci.py": "2fc34ebf8797d7bc5a66b5e239d1f67070c577d741d7b68a8abecab676dfc92b",
+    "repairs/shutdown-wide-trace-2103377/extend_trace.py": "078d39f23b03e44407509d3d4bae4b225afe4cb9b518fa47dea3c95708f0c26b",
+    "repairs/shutdown-wide-trace-2103377/native_ci.py": "f43b9530404881711882f33c94bd267e67ab52c57b7d9a705cc91333ac5b0068",
     "repairs/shutdown-wide-trace-2103377/package_diagnostic.py": "d42000edb60bdda235ee20d0ea5fc692c4526f4bf6ea9d72372b3bbd05ff2016",
+    "repairs/shutdown-wide-trace-2103377/recovery-probe/addon.xml": "7ef2d600677b431cef5ea0eac16f7c48dabe54c41c3b56acc29032022dc2629b",
+    "repairs/shutdown-wide-trace-2103377/recovery-probe/collector.py": "e3fa3f03ed6428d058f81796dd885a7edc0dc50974a5c134770e73bb8e5baa11",
+    "repairs/shutdown-wide-trace-2103377/recovery-probe/main.py": "5d1b5481c3cd4da4a69237804454773d8b365053306d17dfc0a71241cbbd7567",
+    "repairs/shutdown-wide-trace-2103377/recovery-probe/probe.py": "8cbdc07e1849a3e0d2d5b53594dd070a9fc0eb505f9825e75e22cab5ec0d6564",
+    "repairs/shutdown-wide-trace-2103377/recovery-probe/vocabulary.json": "27934ec1655908cf95d7329532bf982c2215d016727a0b431cf7d75289b1c802",
+    "repairs/shutdown-wide-trace-2103377/tests/overflow_harness.cpp": "90b78e90993b23cf7315930ebd05dbfbafb8397859c5527a07ba22fece7dfa03",
+    "repairs/shutdown-wide-trace-2103377/tests/test_recovery_probe.py": "adaad249f0448e78d926ae73c64d521e840f6502d04e68f52d55e0f33e3400e9",
+    "repairs/shutdown-wide-trace-2103377/tests/test_unknown_writer_policy.py": "effc901ef0050326a3d76c118f60f98cf34e33f532ca34168ce3728b7d309686",
     "repairs/shutdown-wide-trace-2103377/tests/trace_harness.cpp": "a73c857ad2d80b9edd805eb7d89385c7212957e05026a1a07ac322a7c4f15812",
+    "repairs/shutdown-wide-trace-2103377/tests/verify_overflow.py": "13cc2c6c586b134de7fb0eec6fc78dee0a6bac809a28ea27ca4460fc0b5dc84f",
     "repairs/shutdown-wide-trace-2103377/tests/verify_source.py": "1d9f0fc9c7281aca73fe4b65c602ca74d6cfb1c338c8738a90086c4e982f740c",
-    "repairs/shutdown-wide-trace-2103377/tests/verify_trace.py": "9aa2d76c10bf98c438c6bda8922b8daa7109e6e5c1d7abb7d1a0397734a3bf5e"
-  }
+    "repairs/shutdown-wide-trace-2103377/tests/verify_trace.py": "9aa2d76c10bf98c438c6bda8922b8daa7109e6e5c1d7abb7d1a0397734a3bf5e",
+    "repairs/shutdown-wide-trace-2103377/trace_retention.py": "3a3395810683114482877d9ec2fd2f85ad58bd90db5f424d403761a080b1d01f"
+  },
+  "unknown_writer_policy_source_test": true
 }
