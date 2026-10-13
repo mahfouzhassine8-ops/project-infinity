@@ -36,12 +36,66 @@ def run_case(root, label, theme, width, height, dpw, dph, overlay):
     command = ['dbus-run-session', '--', 'xvfb-run', '-a', '-s',
                f'-screen 0 {width}x{height}x24 -nolisten tcp +extension GLX +render -noreset',
                'kodi', '--standalone', '--fullscreen', '--windowing=x11']
+    # First-start Kodi disables newly discovered non-system add-ons. Bootstrap
+    # only this disposable profile, then enable the test skin offline before
+    # measuring the real dialog. No candidate file or user profile is changed.
+    import sqlite3
+    import signal
+    import xml.etree.ElementTree as ET
+    boot_started = time.monotonic()
+    with (output / 'bootstrap-process.log').open('w') as bootlog:
+        boot = subprocess.Popen(command, env=env, stdout=bootlog, stderr=subprocess.STDOUT, start_new_session=True)
+        database = None
+        while time.monotonic() - boot_started < 25:
+            for file in (profile / 'userdata/Database').glob('Addons*.db'):
+                try:
+                    with sqlite3.connect(file, timeout=1) as db:
+                        row = db.execute('SELECT enabled FROM installed WHERE addonID=?', ('skin.infinity.diggz',)).fetchone()
+                        if row is not None:
+                            database = file
+                            break
+                except sqlite3.DatabaseError:
+                    pass
+            if database is not None or boot.poll() is not None:
+                break
+            time.sleep(0.2)
+        time.sleep(2)
+        if boot.poll() is None:
+            os.killpg(boot.pid, signal.SIGTERM)
+            try:
+                boot.wait(timeout=8)
+            except subprocess.TimeoutExpired:
+                os.killpg(boot.pid, signal.SIGKILL); boot.wait()
+    if database is None:
+        raise RuntimeError('Disposable Kodi bootstrap did not register the skin')
+    for source in (profile / 'temp/kodi.log', profile / 'kodi.log'):
+        if source.exists():
+            shutil.copyfile(source, output / 'bootstrap-kodi.log')
+    with sqlite3.connect(database) as db:
+        previous = db.execute('SELECT enabled FROM installed WHERE addonID=?', ('skin.infinity.diggz',)).fetchone()
+        db.execute('UPDATE installed SET enabled=1 WHERE addonID=?', ('skin.infinity.diggz',))
+        enabled = db.execute('SELECT enabled FROM installed WHERE addonID=?', ('skin.infinity.diggz',)).fetchone()
+        assert enabled == (1,)
+    settings = profile / 'userdata/guisettings.xml'
+    settings_root = ET.parse(settings).getroot()
+    setting = settings_root.find("setting[@id='lookandfeel.skin']")
+    if setting is None:
+        setting = ET.SubElement(settings_root, 'setting', {'id': 'lookandfeel.skin'})
+    setting.text = 'skin.infinity.diggz'
+    if settings_root.find('resolutions') is None:
+        ET.SubElement(settings_root, 'resolutions')
+    ET.ElementTree(settings_root).write(settings, encoding='UTF-8', xml_declaration=True)
+    (output / 'bootstrap-receipt.json').write_text(json.dumps({
+        'test_only': True, 'database': database.name, 'previous_enabled': previous,
+        'enabled_after': enabled, 'changed_addon': 'skin.infinity.diggz',
+        'reason': 'Fresh-profile untrusted add-on admission; exact preview payload not modified.',
+        'user_profile_touched': False}, indent=2))
     started = time.monotonic()
     with (output / 'process.log').open('w') as log:
         process = subprocess.Popen(command, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
         timed_out = False
         try:
-            process.wait(timeout=100)
+            process.wait(timeout=60)
         except subprocess.TimeoutExpired:
             timed_out = True
             import signal
@@ -90,7 +144,10 @@ if __name__ == '__main__':
     if args.overlay:
         assert (args.overlay / 'unified/InfinityFilePreview.xml').is_file()
         for name, theme, width, height, dpw, dph in (CASES[:3] if args.quick else CASES):
-            results.append(run_case(root, 'after-211-' + name, theme, width, height, dpw, dph, args.overlay))
+            result = run_case(root, 'after-211-' + name, theme, width, height, dpw, dph, args.overlay)
+            results.append(result)
+            if not result['passed']:
+                break  # Retain failing evidence; do not repeat identical startup failure eight times.
     (root / 'renderer-results.json').write_text(json.dumps({'renderer': version.strip(), 'results': results,
           'physical_device_verified': False, 'native_android_dispatch_verified': False}, indent=2) + '\n')
     # Parent is an observational negative control; candidate must fully initialize
