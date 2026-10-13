@@ -151,18 +151,38 @@ public final class InfinityCloseGuardService extends Service {
       InfinityKodiShutdown.Snapshot observed = InfinityKodiShutdown.read(getFilesDir(),
           (pid,owner)->InfinityKodiShutdown.ownerAlive(getFilesDir(),pid,owner),
           InfinityKodiShutdown.Snapshot.empty());
-      if (observed.pid > 0 && (observed.pid != completed.pid || !completed.owner.equals(observed.owner)))
+      if (observed.pid <= 0)
+        return "closed_owner_state_unavailable";
+      if (observed.pid != completed.pid || !completed.owner.equals(observed.owner))
         return "replacement_engine_observed";
+      if (observed.alive || !InfinityKodiShutdown.ownerRetired(getFilesDir(),completed.pid,completed.owner))
+        return "closing_owner_not_retired";
       ActivityManager manager=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
       if(manager==null)return "activity_manager_unavailable";
       for(ActivityManager.AppTask task:manager.getAppTasks()) {
         ActivityManager.RecentTaskInfo info=task.getTaskInfo();
-        if(info==null || info.taskId!=completed.taskId)continue;
-        ComponentName root=info.baseActivity;
+        if(info==null)continue;
+        // taskId was added in API 29; persistentId identifies even a stopped
+        // task on API 21-28. baseActivity was added in API 23.
+        if(Build.VERSION.SDK_INT>=29 ? info.taskId!=completed.taskId : info.persistentId!=completed.taskId)continue;
+        ComponentName root=Build.VERSION.SDK_INT>=23 ? info.baseActivity : null;
         if(root==null && info.baseIntent!=null)root=info.baseIntent.getComponent();
         if(root==null || !getPackageName().equals(root.getPackageName()) ||
             !Main.class.getName().equals(root.getClassName()))
           return "task_root_mismatch";
+        // Task-manager IPC may yield while a new owner is published. Check
+        // again after lookup, never treating absent evidence as a dead owner.
+        // This is a second observation, NOT an atomic OS compare-and-remove.
+        InfinityKodiShutdown.Snapshot latest=InfinityKodiShutdown.read(getFilesDir(),
+            (pid,owner)->InfinityKodiShutdown.ownerAlive(getFilesDir(),pid,owner),
+            InfinityKodiShutdown.Snapshot.empty());
+        if(latest.pid<=0)return "closed_owner_state_unavailable";
+        if(latest.pid!=completed.pid || !completed.owner.equals(latest.owner))
+          return "replacement_engine_observed";
+        if(latest.alive || !InfinityKodiShutdown.ownerRetired(getFilesDir(),completed.pid,completed.owner))
+          return "closing_owner_not_retired";
+        if(ended || revoked || session!=completed || !checkpointSaved || !consumed || !"COMPLETE".equals(phase))
+          return "completion_authority_changed";
         task.finishAndRemoveTask();
         return "removed_confirmed_closed_main_task";
       }

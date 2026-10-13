@@ -10,7 +10,7 @@ PREFIX = Path("repairs/android-checkpoint-shutdown/runtime/android/overlay/tools
 PIN = "808b4acc4d1a6aa1cbc8bc4a1848de88b81103e6"
 FILES = {
     "InfinityCloseNativeLease.java.in": ("2db2bcb9a94bb42c594e691cda7deb38b2dbf9afd4c90160a173c7c832cfeec2", "21965ee188ff7b3d28ec223be7a794eb9251067ecaa567bc93ba450c87df71c6"),
-    "InfinityCloseGuardService.java.in": ("4c42e3be884e6cea27ddee9c094ca379f408367e9c5d6bfb788a8ccd4fec5050", "7cf5bee785b3ef02568ad86351123337a8fb7b1b193532601bf4a9f19c011ddb"),
+    "InfinityCloseGuardService.java.in": ("4c42e3be884e6cea27ddee9c094ca379f408367e9c5d6bfb788a8ccd4fec5050", "790209e1d00f106e8f054fcdaf3dc92f28acc59199ffa42eb6bb6aaca28b79a0"),
 }
 
 def digest(text):
@@ -75,6 +75,22 @@ class Contracts(unittest.TestCase):
         original_sources={p for p in changed if p.startswith('repairs/android-checkpoint-shutdown/runtime/') }
         self.assertEqual(original_sources,{str(PREFIX / name) for name in FILES})
         self.assertFalse(any(p.startswith("addons/") or p.startswith("repairs/skin-211") or "playlistbrowser" in p.lower() for p in changed))
+
+    def test_observation_and_android_api_failure_paths_are_guarded(self):
+        task=span(self.guard,'private String retireConfirmedClosedKodiTask','static Intent homeIntent()')
+        for required in ('observed.pid <= 0', 'observed.alive', 'latest.pid<=0', 'latest.alive',
+                         'Build.VERSION.SDK_INT>=29', 'info.persistentId!=completed.taskId',
+                         'Build.VERSION.SDK_INT>=23', 'completion_authority_changed'):
+            self.assertIn(required,task)
+        self.assertEqual(task.count('InfinityKodiShutdown.read('),2)
+        self.assertEqual(task.count('InfinityKodiShutdown.ownerRetired('),2)
+        self.assertLess(task.index('task.getTaskInfo()'),task.index('Snapshot latest='))
+        self.assertLess(task.index('Snapshot latest='),task.index('task.finishAndRemoveTask()'))
+
+    def test_saved_coordinator_outside_task_retirement_is_byte_preserved(self):
+        saved=subprocess.check_output(['git','show','c727f3964419ec0010b6bf0e9e620c5605980d44:'+(PREFIX/'InfinityCloseGuardService.java.in').as_posix()],cwd=ROOT,text=True)
+        start,end='private String retireConfirmedClosedKodiTask','static Intent homeIntent()'
+        self.assertEqual(self.guard.replace(span(self.guard,start,end),''),saved.replace(span(saved,start,end),''))
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
