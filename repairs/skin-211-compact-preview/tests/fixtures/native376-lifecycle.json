@@ -1,0 +1,75 @@
+{
+  "provenance": {
+    "apk_packaging_commit": "808b4acc4d1a6aa1cbc8bc4a1848de88b81103e6",
+    "native_compile_commit": "4754a12ec684592030ba52994997ed76d3629364",
+    "skin210_commit": "843ea76648a5efc10a611d67b24c96f710953277",
+    "kodi_upstream_commit": "a3a448d26b8d560a65655dab2cd122994dc4e146",
+    "note": "Exact source method excerpts; no native modification or Android build. Patched GUIWindow/WindowManager recovered from protected compile lineage."
+  },
+  "method_provenance": [
+    {
+      "file": "xbmc/dialogs/GUIDialogFileBrowser.cpp",
+      "signature": "bool CGUIDialogFileBrowser::ShowAndGetFile(const VECSOURCES",
+      "source": "bool CGUIDialogFileBrowser::ShowAndGetFile(const VECSOURCES &shares, const std::string &mask, const std::string &heading, std::string &path, bool useThumbs /* = false */, bool useFileDirectories /* = false */)\n{\n  CGUIDialogFileBrowser *browser = new CGUIDialogFileBrowser();\n  if (!browser)\n    return false;\n  CServiceBroker::GetGUI()->GetWindowManager().AddUniqueInstance(browser);\n\n  browser->m_useFileDirectories = useFileDirectories;\n\n  browser->m_browsingForImages = useThumbs;\n  browser->SetHeading(heading);\n  browser->SetSources(shares);\n  std::string strMask = mask;\n  if (mask == \"/\")\n    browser->m_browsingForFolders=1;\n  else\n  if (mask == \"/w\")\n  {\n    browser->m_browsingForFolders=2;\n    strMask = \"/\";\n  }\n  else\n    browser->m_browsingForFolders = 0;\n\n  browser->m_rootDir.SetMask(strMask);\n  browser->m_infinityZipInstallContext = KODI::FILEPREVIEW::IsZipInstallContext(\n      mask, heading, g_localizeStrings.Get(24041));\n  browser->m_selectedPath = path;\n  browser->m_addNetworkShareEnabled = false;\n  browser->Open();\n  bool confirmed(browser->IsConfirmed());\n  if (confirmed)\n    path = browser->m_selectedPath;\n  CServiceBroker::GetGUI()->GetWindowManager().Remove(browser->GetID());\n  delete browser;\n  return confirmed;\n}",
+      "method_sha256": "afb56b047c1462a3111448b4b6b0ee6e07e48380a9f008bcdd6ed0739959d10a"
+    },
+    {
+      "file": "xbmc/dialogs/GUIDialogFileBrowser.cpp",
+      "signature": "void CGUIDialogFileBrowser::SetHeading",
+      "source": "void CGUIDialogFileBrowser::SetHeading(const std::string &heading)\n{\n  Initialize();\n  SET_CONTROL_LABEL(CONTROL_HEADING_LABEL, heading);\n}",
+      "method_sha256": "295188daa8d01292388f73e86cece91e144410f87f93d5e52f91c05c6d745147"
+    },
+    {
+      "file": "xbmc/dialogs/GUIDialogFileBrowser.cpp",
+      "signature": "void CGUIDialogFileBrowser::OnWindowLoaded",
+      "source": "void CGUIDialogFileBrowser::OnWindowLoaded()\n{\n  CGUIDialog::OnWindowLoaded();\n  m_viewControl.Reset();\n  m_viewControl.SetParentWindow(GetID());\n  m_viewControl.AddView(GetControl(CONTROL_LIST));\n  m_viewControl.AddView(GetControl(CONTROL_THUMBS));\n  // Control 9410 is the skin's explicit preview contract. Set the opt-in on\n  // this object, avoiding GUIBuiltins' masked active-window lookup.\n  SetProperty(\"Infinity.FilePreview.OptIn\",\n              m_infinityZipInstallContext && GetControl(KODI::FILEPREVIEW::PREVIEW_CONTROL)\n                  ? \"v1\" : \"\");\n}",
+      "method_sha256": "65381fb027f9a97f7e353fd1831949039f069b1ea5af569a0eff445ff129f5cc"
+    },
+    {
+      "file": "xbmc/dialogs/GUIDialogFileBrowser.cpp",
+      "signature": "void CGUIDialogFileBrowser::ClearInfinityFilePreview",
+      "source": "void CGUIDialogFileBrowser::ClearInfinityFilePreview()\n{\n  m_infinityPreviewRequest = {};\n  for (const char* property : {\"Path\", \"Label\", \"Folder\", \"Size\", \"Nonce\", \"AcceptNonce\", \"Active\"})\n    SetProperty(std::string(\"Infinity.FilePreview.\") + property, \"\");\n}",
+      "method_sha256": "094b57bb3c4dd8367774da729a3232d67e7f09e8c19ebf63927cefcd48dbf51f"
+    },
+    {
+      "file": "xbmc/guilib/GUIWindow.cpp",
+      "signature": "bool CGUIWindow::Initialize()",
+      "source": "bool CGUIWindow::Initialize()\n{\n  if (!CServiceBroker::GetGUI()->GetWindowManager().Initialized())\n    return false;\n  if (!NeedLoad())\n    return true;\n  if (CServiceBroker::GetAppMessenger()->IsProcessThread())\n    AllocResources(false);\n  else\n  {\n    // if not app thread, send gui msg via app messenger\n    // and wait for results, so windowLoaded flag would be updated\n    CGUIMessage msg(GUI_MSG_WINDOW_LOAD, 0, 0);\n    CServiceBroker::GetAppMessenger()->SendGUIMessage(msg, GetID(), true);\n  }\n  return m_windowLoaded;\n}",
+      "method_sha256": "50e4e0fabb7e4d1e68a743a7bd46f7fd8656d4a98af77c6c3020a3a01f6fa4cc"
+    },
+    {
+      "file": "xbmc/guilib/GUIWindowManager.cpp",
+      "signature": "int CGUIWindowManager::GetActiveWindowOrDialog() const",
+      "source": "int CGUIWindowManager::GetActiveWindowOrDialog() const\n{\n  // if there is a dialog active get the dialog id instead\n  int iWin = GetTopmostModalDialog() & WINDOW_ID_MASK;\n  if (iWin != WINDOW_INVALID)\n    return iWin;\n\n  // get the currently active window\n  return GetActiveWindow() & WINDOW_ID_MASK;\n}",
+      "method_sha256": "662b53b2c4a6c019b76e0859a03715f44adb018d51a807505f3569e116d65754"
+    },
+    {
+      "file": "xbmc/interfaces/builtins/GUIBuiltins.cpp",
+      "signature": "static int SetProperty(",
+      "source": "static int SetProperty(const std::vector<std::string>& params)\n{\n  CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(params.size() > 2 ? CWindowTranslator::TranslateWindow(params[2]) : CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());\n  if (window)\n    window->SetProperty(params[0],params[1]);\n\n  return 0;\n}",
+      "method_sha256": "24205a69a694b7c783b68c66a055ad6c59b92630fe4162e677d6b83339524b3b"
+    },
+    {
+      "file": "xbmc/dialogs/GUIDialogFileBrowser.cpp",
+      "case": "GUI_MSG_WINDOW_INIT",
+      "source": "{\n      ClearInfinityFilePreview();\n      SetProperty(\"Infinity.FilePreview.NativeVersion\", m_infinityZipInstallContext ? \"v1\" : \"\");\n      SetProperty(\"Infinity.FilePreview.RouteRevision\", \"2103376\");\n      m_bConfirmed = false;\n      m_bFlip = false;\n      bool bIsDir = false;\n      // this code allows two different selection modes for directories\n      // end the path with a slash to start inside the directory\n      if (URIUtils::HasSlashAtEnd(m_selectedPath))\n      {\n        bIsDir = true;\n        bool bFool;\n        int iSource = CUtil::GetMatchingSource(m_selectedPath,m_shares,bFool);\n        bFool = true;\n        if (iSource > -1 && iSource < (int)m_shares.size())\n        {\n          if (URIUtils::PathEquals(m_shares[iSource].strPath, m_selectedPath))\n            bFool = false;\n        }\n\n        if (bFool && !CDirectory::Exists(m_selectedPath))\n          m_selectedPath.clear();\n      }\n      else\n      {\n        if (!CFile::Exists(m_selectedPath) && !CDirectory::Exists(m_selectedPath))\n            m_selectedPath.clear();\n      }\n\n      // find the parent folder if we are a file browser (don't do this for folders)\n      m_Directory->SetPath(m_selectedPath);\n      if (!m_browsingForFolders && !bIsDir)\n        m_Directory->SetPath(URIUtils::GetParentPath(m_selectedPath));\n      Update(m_Directory->GetPath());\n      m_viewControl.SetSelectedItem(m_selectedPath);\n      return CGUIDialog::OnMessage(message);\n    }",
+      "method_sha256": "9ee1eb2cbe94e40ba0199837d301940b2334152d7ec5ffe7f7356cfe19b720ff"
+    }
+  ],
+  "header_default": "bool m_infinityZipInstallContext{false};",
+  "load_method": "bool CGUIWindow::Load(const std::string& strFileName, bool bContainsPath)\n{\n  if (m_windowLoaded || !g_SkinInfo)\n    return true;      // no point loading if it's already there\n\n#ifdef _DEBUG\n  const auto start = std::chrono::steady_clock::now();\n#endif\n\n  const char* strLoadType;\n  switch (m_loadType)\n  {\n  case LOAD_ON_GUI_INIT:\n    strLoadType = \"LOAD_ON_GUI_INIT\";\n    break;\n  case KEEP_IN_MEMORY:\n    strLoadType = \"KEEP_IN_MEMORY\";\n    break;\n  case LOAD_EVERY_TIME:\n  default:\n    strLoadType = \"LOAD_EVERY_TIME\";\n    break;\n  }\n  CLog::Log(LOGINFO, \"Loading skin file: {}, load type: {}\", strFileName, strLoadType);\n\n  // Find appropriate skin folder + resolution to load from\n  std::string strPath;\n  std::string strLowerPath;\n  if (bContainsPath)\n    strPath = strFileName;\n  else\n  {\n    // FIXME: strLowerPath needs to eventually go since resToUse can get incorrectly overridden\n    std::string strFileNameLower = strFileName;\n    StringUtils::ToLower(strFileNameLower);\n    strLowerPath =  g_SkinInfo->GetSkinPath(strFileNameLower, &m_coordsRes);\n    strPath = g_SkinInfo->GetSkinPath(strFileName, &m_coordsRes);\n  }\n\n  bool ret = LoadXML(strPath, strLowerPath);\n  if (ret)\n  {\n    m_windowLoaded = true;\n    InfinityPublishResponsiveProperties(strPath);\n    OnWindowLoaded();\n\n#ifdef _DEBUG\n    const auto end = std::chrono::steady_clock::now();\n    const std::chrono::duration<double, std::milli> duration = end - start;\n    CLog::Log(LOGDEBUG, \"Skin file {} loaded in {:.2f} ms\", strPath, duration.count());\n#endif\n  }\n\n  return ret;\n}",
+  "contract_header": "/*\n * Copyright (C) 2026 Infinity contributors\n * SPDX-License-Identifier: GPL-2.0-or-later\n */\n#pragma once\n\n#include <cstdint>\n#include <string>\n\nnamespace KODI::FILEPREVIEW\n{\nconstexpr int PREVIEW_CONTROL = 9410;\nconstexpr int CONFIRM_CONTROL = 9411;\nconstexpr const char* SCRIPT = \"special://skin/resources/lib/infinity_file_preview.py\";\n\nstruct Request\n{\n  uint64_t nonce{0};\n  std::string path;\n  bool folder{false};\n};\n\ninline bool IsZipInstallContext(const std::string& mask,\n                               const std::string& heading,\n                               const std::string& installHeading)\n{\n  return mask == \"*.zip\" && !heading.empty() && heading == installHeading;\n}\n\ninline bool CanOpen(bool installContext, bool optedIn, bool validSelection,\n                    const std::string& path)\n{\n  return installContext && optedIn && validSelection && !path.empty() && path.size() <= 8192;\n}\n\ninline bool ShouldPrimePointer(bool rightClick, bool installContext, bool optedIn, bool pending)\n{\n  return rightClick && installContext && optedIn && !pending;\n}\n\ninline bool IsZip(const std::string& path)\n{\n  const auto length = path.size();\n  return length >= 4 && path[length - 4] == '.' &&\n         (path[length - 3] == 'z' || path[length - 3] == 'Z') &&\n         (path[length - 2] == 'i' || path[length - 2] == 'I') &&\n         (path[length - 1] == 'p' || path[length - 1] == 'P');\n}\n\ninline bool CanConfirm(const Request& request, const std::string& acceptedNonce,\n                       bool installContext, bool optedIn, bool validSelection,\n                       const std::string& selectedPath, bool selectedFolder)\n{\n  return CanOpen(installContext, optedIn, validSelection, selectedPath) && request.nonce != 0 &&\n         acceptedNonce == std::to_string(request.nonce) && request.path == selectedPath &&\n         !request.folder && !selectedFolder && IsZip(selectedPath);\n}\n} // namespace KODI::FILEPREVIEW\n",
+  "contract_sha256": "064edd09925d1c1204f99f25da2738ff9a9b75a670d25897cf95d25b8298cb2e",
+  "skin210_onload": {
+    "text": "SetProperty(Infinity.FilePreview.OptIn,v1)",
+    "condition": "!String.IsEqual(Window.Property(Infinity.FilePreview.RouteRevision),2103376)",
+    "file": "unified/FileBrowser.xml",
+    "sha256": "c13c30a7b242ef01c0acdc896da3c6c8ef4930350afcb84101eb65a6ab1c7698"
+  },
+  "source_hashes": {
+    "xbmc/dialogs/GUIDialogFileBrowser.cpp": "eabd8a8e3dd1671b4b84b2e4faabc791589bea396e32df712354ae74746454fe",
+    "xbmc/guilib/GUIWindow.cpp": "320da88dba43f15b1d056f54606e8a5a36d174b5e846c5a80b3fb366635e5321",
+    "xbmc/guilib/GUIWindowManager.cpp": "0745a3ac86faf2f5b0af77daa1a36af41574873c3b2396e95effb0443cf78871",
+    "xbmc/interfaces/builtins/GUIBuiltins.cpp": "5f761fc193373b41ef01fe4b1c5a50e218020441c45fbc17392fa9538f5406cb"
+  }
+}

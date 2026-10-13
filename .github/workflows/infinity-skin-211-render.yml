@@ -1,0 +1,54 @@
+name: Infinity | Skin 211 actual Kodi renderer
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/infinity-compact-preview-skin-211]
+    paths:
+      - '.github/workflows/infinity-skin-211-render.yml'
+      - 'repairs/skin-211-compact-preview/**'
+permissions:
+  contents: read
+concurrency:
+  group: infinity-skin-211-render-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  kodi-renderer:
+    runs-on: ubuntu-24.04
+    container: ubuntu:26.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - name: Install prebuilt matching Kodi and software renderer
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git python3 kodi xvfb xauth dbus-x11 mesa-utils libgl1-mesa-dri librsvg2-2
+          dpkg-query -W kodi kodi-bin xvfb libgl1-mesa-dri > /tmp/infinity-render-binary-packages.txt
+          kodi --version | tee /tmp/infinity-render-kodi-version.txt
+          kodi --version | grep -q '21.3'
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Build exact preview source copies for desktop runtime
+        run: |
+          mkdir -p render-evidence
+          cp /tmp/infinity-render-binary-packages.txt render-evidence/binary-packages.txt
+          cp /tmp/infinity-render-kodi-version.txt render-evidence/kodi-version.txt
+          python3 repairs/skin-211-compact-preview/runtime_harness/build_overlay.py --out render-input/delta
+      - name: Capture before and after in actual Kodi21.3
+        run: |
+          python3 repairs/skin-211-compact-preview/runtime_harness/run.py --out render-evidence --overlay render-input/delta
+      - name: Preserve actual PNGs and complete renderer evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Skin211-Actual-Kodi21.3-Renderer
+          path: |
+            render-evidence/
+            render-input/render-overlay-sha256.json
+          if-no-files-found: error
+          retention-days: 90
