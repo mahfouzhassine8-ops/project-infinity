@@ -53,12 +53,18 @@ def package(args):
     proof=json.loads((native/'ENGINE-PROOF.json').read_text())
     tests=json.loads((android/'ANDROID-VERIFICATION.json').read_text())
     preservation=json.loads((native/'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json').read_text())
-    require(proof['source_commit']==os.environ['GITHUB_SHA'],'Native source commit mismatch')
+    native_commit=os.environ.get('INFINITY_NATIVE_SOURCE_COMMIT',os.environ['GITHUB_SHA'])
+    require(proof['source_commit']==native_commit,'Native source commit mismatch')
+    if native_commit!=os.environ['GITHUB_SHA']:
+        subprocess.run(['git','merge-base','--is-ancestor',native_commit,os.environ['GITHUB_SHA']],check=True)
+        delta=set(subprocess.check_output(['git','diff','--name-only',native_commit,os.environ['GITHUB_SHA']],text=True).splitlines())
+        allowed={'repairs/shutdown-final-2103377/package.py','.github/workflows/infinity-2103377-final-shutdown-package.yml'}
+        require(delta<=allowed,'Verified native/Java source changed before packaging')
     reuse_path=android/'ANDROID-REUSE-PROOF.json'
     if tests['source_commit']!=os.environ['GITHUB_SHA']:
         require(reuse_path.is_file(),'Earlier tested Java has no exact current source-replay proof')
         reuse=json.loads(reuse_path.read_text())
-        require(reuse['source_commit']==os.environ['GITHUB_SHA'] and reuse['tested_source_commit']==tests['source_commit']
+        require(reuse['source_commit'] in (os.environ['GITHUB_SHA'],native_commit) and reuse['tested_source_commit']==tests['source_commit']
                 and reuse['runtime_source_byte_identical'] and reuse['fresh_test_results_preserved']
                 and reuse['donor_sha256']==sha(args.donor.read_bytes()),'Java/native pairing proof failed')
     require(proof['complete_native_engine_compiled'] and proof['final_shutdown_corrections_compiled'],
@@ -85,10 +91,13 @@ def package(args):
     bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
     with zipfile.ZipFile(args.parent) as z:
         old_engine=args.out/'parent-libkodi.so';old_engine.write_bytes(z.read(factory.ENGINE))
-    before_exports=exports(run('readelf','--dyn-syms','--wide',old_engine))
-    after_exports=exports(run('readelf','--dyn-syms','--wide',packaged))
+    before_exports=exports(run('readelf','--dyn-syms','--wide',old_engine,
+                               output=args.out/'parent-dynamic-symbols.txt'))
+    after_exports=exports(run('readelf','--dyn-syms','--wide',packaged,
+                              output=args.out/'candidate-dynamic-symbols.txt'))
     require(not before_exports-after_exports and 'InfinityNativeActivity_onCreate' in after_exports,'Native export contract failed')
-    needed=lambda file:sorted(re.findall(r'\(NEEDED\).*?\[(.*?)\]',run('readelf','-d','-W',file)))
+    needed=lambda file:sorted(re.findall(r'\(NEEDED\).*?\[(.*?)\]',run('readelf','-d','-W',file,
+                              output=args.out/(file.stem+'-dependencies.txt'))))
     require(needed(old_engine)==needed(packaged),'Native companion dependency contract changed')
     factory.BASE_APK_SHA256=PARENT_SHA
     factory.BASE_ENGINE_SHA256=sha(old_engine.read_bytes())
@@ -110,7 +119,7 @@ def package(args):
     require("package: name='com.projectinfinity.kodi' versionCode='2103377'" in badging,'Package/version changed')
     require("application-label:'Infinity'" in badging and 'application-debuggable' not in badging,'Branding/debug mode changed')
     preserved=factory.verify_bytes(args.parent,final,packaged)
-    report=dict(schema=1,source_commit=os.environ['GITHUB_SHA'],file=final.name,
+    report=dict(schema=1,source_commit=os.environ['GITHUB_SHA'],native_source_commit=native_commit,file=final.name,
                 apk_sha256=sha(final.read_bytes()),bytes=final.stat().st_size,
                 parent_sha256=PARENT_SHA,unstripped_native_sha256=proof['native_sha256'],
                 packaged_native_sha256=sha(packaged.read_bytes()),signer_certificate_sha256=SIGNER,
