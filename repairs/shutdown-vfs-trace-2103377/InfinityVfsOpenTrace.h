@@ -246,18 +246,30 @@ inline void Request(long long id,const char* outcome) noexcept
     if(s.id && s.invoker==id) {active=true;Emit(s,"vfs.shutdown.request",outcome);}
   }
   if(!active)
-    Emit(Read(subject->last),"vfs.shutdown.request","no_active_open_observed");
+  {
+    const auto last=Read(subject->last);
+    if(last.invoker==id) Emit(last,"vfs.shutdown.request","no_active_open_observed");
+  }
+}
+inline void ObserveCancellation(Record& r,unsigned long long id) noexcept
+{
+  // IDs only increase. A delayed callback from an older lease cannot overwrite
+  // cancellation evidence already observed for a newer operation.
+  auto prior=r.cancelForId.load();
+  for(unsigned attempt=0;attempt<3 && prior<id;++attempt)
+    if(r.cancelForId.compare_exchange_weak(prior,id)) return;
 }
 inline void BackendCancellation(const void* file,const char* outcome,bool entered=false) noexcept
 {
   InfinityShutdownTrace::PreserveErrno keep;
+  if(!file) return;
   for(auto& r:operations)
   {
     auto s=Read(r);
     if(s.id && s.file==reinterpret_cast<std::uintptr_t>(file))
     {
       const auto observedId=s.id;
-      if(entered)r.cancelForId.store(observedId);
+      if(entered)ObserveCancellation(r,observedId);
       s=Read(r);
       if(s.id==observedId && s.file==reinterpret_cast<std::uintptr_t>(file))
         Emit(s,"vfs.backend.cancellation",outcome);
@@ -269,8 +281,14 @@ inline void Milestone(long long id,const char* phase,const char* outcome,bool re
   InfinityShutdownTrace::PreserveErrno keep;
   if(auto* s=FindSubject(id))
   {
-    Emit(Read(s->last),phase,outcome);
-    if(release) {s->last.id.store(0);s->invoker.store(-1,std::memory_order_release);}
+    const auto last=Read(s->last);
+    if(last.invoker==id) Emit(last,phase,outcome);
+    if(release)
+    {
+      long long expected=id;
+      if(s->invoker.compare_exchange_strong(expected,-2))
+      {s->last.id.store(0);s->invoker.store(-1,std::memory_order_release);}
+    }
   }
 }
 static_assert(std::atomic<unsigned long long>::is_always_lock_free &&

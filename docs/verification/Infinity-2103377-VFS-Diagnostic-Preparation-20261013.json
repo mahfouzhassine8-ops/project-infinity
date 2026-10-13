@@ -226,6 +226,7 @@
       "sha256": "c58957f3e2eec7c405d286ec02826e5af27bff26f3cb34d57d2643028f549e33"
     }
   ],
+  "diagnostic_correlation_refinement": "Bounded cancellation-ID compare/exchange prevents delayed observations from overwriting a newer operation; subject snapshots must match the intended invoker and release uses an intermediate reserved state.",
   "diagnostic_is_final_repair": false,
   "diagnostic_payload_scope": "Locked 2103376 Java/Dex, assets, resources and other native libraries remain byte-identical. Accepted lifecycle candidate is preserved separately for eventual final repair. Native-only observation build.",
   "native_diagnostic_changes": {
@@ -235,7 +236,7 @@
     "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "5a2ed7e23402b660c7f0f44efa59be792269b1cc60658a846710d4a29e325dd2",
     "xbmc/interfaces/python/PythonInvoker.cpp": "6be77b88a1767f2387969e3692779dcc7e6100a4fee3b5c089d778888ab1d904",
     "xbmc/platform/android/activity/InfinityShutdownTrace.h": "7f5fa1808b9054c002cdabbf68044c5d4b7403a9329297e86b6d96109e94f974",
-    "xbmc/platform/android/activity/InfinityVfsOpenTrace.h": "b0ce7e61db5a947b545eb3be7e12939f89956239066e3a024351adf3961da3e8"
+    "xbmc/platform/android/activity/InfinityVfsOpenTrace.h": "ebede61127f1176dd65ae2912308613ad55d563b50613530be7d6d31cdc1faa3"
   },
   "next_device_evidence": [
     "Generated Infinity-Playlist-Probe ZIP from the existing one-shot add-on, with actual installed code hashes.",
@@ -252,62 +253,68 @@
         "case": "preclose",
         "events": 4,
         "passed": true,
-        "trace_sha256": "01ce3c1adb86b4d7f40dd9e5c76abc276364ec19139047b07f765ad4ef22e223"
+        "trace_sha256": "d9c9dc2cd63d888b6d035b125052f84d534689334b6c982882a1080876a42e96"
       },
       {
         "case": "cancel",
         "events": 7,
         "passed": true,
-        "trace_sha256": "d370184ff990ffa0b5f7ddee06449b5f6aecbb498721a8fe6a3379454d764748"
+        "trace_sha256": "bc2e54f63897e8c2bbaa3f53848aa60062c332d360de4448bbd594ef4916ea04"
       },
       {
         "case": "nested",
         "events": 8,
         "passed": true,
-        "trace_sha256": "95e21606d71b976d5d8b0054c1b4ec5a6c262b4e9bffee4162862f760c67fc4c"
+        "trace_sha256": "6220ff9af2d81adce514563c72b7e91f6858d6fe8839be6c48c9dbf7741d48dc"
       },
       {
         "case": "inactive",
         "events": 0,
         "passed": true,
-        "trace_sha256": "53a52b3e1feef171865ec4022057ca33b39d5aa5ca2730b4a92a2b1a5e719049"
+        "trace_sha256": "721a6e7f69172a8e2dc8ca5afb49f7ad4f9f87657690fa05e1e7fc2568337dc5"
       },
       {
         "case": "exception",
         "events": 4,
         "passed": true,
-        "trace_sha256": "eda93aa5fa48851ed14cb6c8b50c3319cebb273870327ba0c21da3d50274d724"
+        "trace_sha256": "0daa03e611176c0af92db30427bde145d00097da651cfedab3a2e127a6f2773a"
       },
       {
         "case": "capacity",
         "events": 33,
         "passed": true,
-        "trace_sha256": "3b4d05cb0859fedb0be2cc125ecebbb54a8fa41edd022800d81d707d2bf9866d"
+        "trace_sha256": "6fa9271723bc0b7ee84200a6cc21ca33d947b2c5e4403a95d1849112a8869ba7"
       },
       {
         "case": "reuse",
         "events": 6,
         "passed": true,
-        "trace_sha256": "e60effa116f7b7420f97b7e73828e34d1aa95bf308a5e93b32efb71f45b4105d"
+        "trace_sha256": "aa0857de58f0e997c504e47be42777056119182fc8a1cfb5d7c1e1082407417b"
       },
       {
         "case": "curl_result",
         "events": 4,
         "passed": true,
-        "trace_sha256": "5a1c28edf16d05af451febbe1ce75c34462dfb891d1109b6115a78963b47b3a7"
+        "trace_sha256": "fe93b243728551d874654efc9585a5cade3da7c0fa1c540b2276896ed8be3eb4"
+      },
+      {
+        "case": "stale_cancel",
+        "events": 0,
+        "passed": true,
+        "trace_sha256": "98be37877d54f772e51819aa1571670c5c90c925c082a59ec8ad185d3acfe9f8"
       },
       {
         "case": "stress",
         "events": 501,
         "passed": true,
-        "trace_sha256": "507b9473790e9c7177888b3f6b5d9d9b31b36ac9f69c9e4c05d1fd4eff954e64"
+        "trace_sha256": "375dc0b2688fcbcd1462c1d3b52d0d58b91cd81d42d6b031ce5307f038cbb7bb"
       }
     ],
-    "count": 9,
+    "count": 10,
     "logger_header_sha256": "7f5fa1808b9054c002cdabbf68044c5d4b7403a9329297e86b6d96109e94f974",
     "passed": true,
     "scope": "Exact observation headers with real concurrent host threads and append-only evidence; no Kodi backend execution or Galaxy Fold proof.",
     "shutdown_corrected": false,
-    "trace_header_sha256": "b0ce7e61db5a947b545eb3be7e12939f89956239066e3a024351adf3961da3e8"
+    "trace_header_sha256": "ebede61127f1176dd65ae2912308613ad55d563b50613530be7d6d31cdc1faa3"
   }
 }

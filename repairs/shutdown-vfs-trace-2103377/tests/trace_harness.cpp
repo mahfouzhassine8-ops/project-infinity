@@ -77,6 +77,16 @@ int main(int argc,char**argv)
     T::Begin();V::Invoker invoker(5,true);V::Open operation(V::Scheme::Https);
     V::Select(V::Backend::Curl);V::Mark(V::Stage::CurlPerform);V::TransferResult(28);operation.Returned(false);
   }
+  else if(which=="stale_cancel")
+  {
+    T::Begin();V::Record record;
+    record.id.store(100);V::ObserveCancellation(record,100);
+    V::ObserveCancellation(record,99);if(V::Read(record).cancelCalls!=1)return 8;
+    record.id.store(101);record.cancelForId.store(0);
+    V::ObserveCancellation(record,100);if(V::Read(record).cancelCalls!=0)return 9;
+    V::ObserveCancellation(record,101);V::ObserveCancellation(record,100);
+    if(V::Read(record).cancelCalls!=1 || record.cancelForId.load()!=101)return 10;
+  }
   else if(which=="stress")
   {
     T::Begin();std::atomic<bool> done{false};

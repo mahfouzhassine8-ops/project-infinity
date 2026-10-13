@@ -14,7 +14,7 @@ def verify(include,out):
     subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-pthread',
                     '-I',str(include),str(HERE/'trace_harness.cpp'),'-o',str(executable)],check=True)
     cases=[]
-    for case in ['preclose','cancel','nested','inactive','exception','capacity','reuse','curl_result','stress']:
+    for case in ['preclose','cancel','nested','inactive','exception','capacity','reuse','curl_result','stale_cancel','stress']:
         folder=out/case
         run=subprocess.run([str(executable),case,str(folder)],capture_output=True,text=True,timeout=15)
         assert run.returncode==0,(case,run.stdout,run.stderr)
@@ -50,6 +50,7 @@ def verify(include,out):
             assert [e['curl_cancel_callback_observed'] for e in returned]==[1,0]
             assert returned[0]['operation_id']!=returned[1]['operation_id']
         elif case=='curl_result':assert any(e['outcome']=='curl_result_code_28' for e in events)
+        elif case=='stale_cancel':assert not events
         elif case=='stress':
             operations={e['operation_id']:e['operation_start_monotonic_ns'] for e in events if 'operation_id' in e}
             assert len(operations)==100

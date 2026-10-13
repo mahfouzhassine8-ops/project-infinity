@@ -6,7 +6,7 @@ on:
       - 'repairs/shutdown-vfs-trace-2103377/**'
       - '.github/workflows/infinity-2103377-vfs-diagnostic.yml'
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103377-vfs-diagnostic, cancel-in-progress: false}
+concurrency: {group: infinity-2103377-vfs-diagnostic, cancel-in-progress: true}
 env:
   NDK_VER: 21.4.7075529
 jobs:
