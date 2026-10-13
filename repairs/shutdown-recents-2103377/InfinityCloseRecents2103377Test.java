@@ -70,6 +70,12 @@ public class InfinityCloseRecents2103377Test {
     taskState = Shadow.extract(task);
     Shadow.<ShadowActivityManager>extract(manager).setAppTasks(Collections.singletonList(task));
     state(PID, owner);
+    InfinityKodiShutdown.Snapshot initial = InfinityKodiShutdown.read(service.getFilesDir(),
+        (pid, token) -> InfinityKodiShutdown.ownerAlive(service.getFilesDir(), pid, token),
+        InfinityKodiShutdown.Snapshot.empty());
+    assertEquals("Test fixture must reach the production state reader", PID, initial.pid);
+    assertEquals(owner, initial.owner);
+    assertFalse(initial.alive);
   }
 
   @After public void releaseWorker() {
@@ -94,7 +100,7 @@ public class InfinityCloseRecents2103377Test {
     row.put("schema", 2); row.put("pid", pid); row.put("owner", token);
     row.put("launch", ""); row.put("began", 1); row.put("close_at", 2);
     row.put("phase", "ENGINE_TERMINATING"); row.put("live", false); row.put("error", "");
-    Files.write(new File(service.getFilesDir(), "kodi-process-state.json").toPath(), row.toString().getBytes(StandardCharsets.UTF_8));
+    Files.write(new File(service.getFilesDir(), InfinityKodiShutdown.STATE).toPath(), row.toString().getBytes(StandardCharsets.UTF_8));
   }
 
   private String retire(InfinityCloseGuardService.Session target) throws Exception {
@@ -155,10 +161,10 @@ public class InfinityCloseRecents2103377Test {
   @Test public void replacementPidUntouched() throws Exception { state(PID + 1, UUID.randomUUID().toString()); untouched(); }
   @Test public void recycledPidNewOwnerUntouched() throws Exception { state(PID, UUID.randomUUID().toString()); untouched(); }
   @Test public void missingOwnerStateCannotAuthorizeRemoval() throws Exception {
-    Files.delete(new File(service.getFilesDir(), "kodi-process-state.json").toPath()); untouched();
+    Files.delete(new File(service.getFilesDir(), InfinityKodiShutdown.STATE).toPath()); untouched();
   }
   @Test public void unreadableOwnerStateCannotAuthorizeRemoval() throws Exception {
-    Files.write(new File(service.getFilesDir(), "kodi-process-state.json").toPath(), new byte[]{'!'}); untouched();
+    Files.write(new File(service.getFilesDir(), InfinityKodiShutdown.STATE).toPath(), new byte[]{'!'}); untouched();
   }
   @Test public void stillHeldOwnerCannotAuthorizeRemoval() throws Exception {
     try (RandomAccessFile file = new RandomAccessFile(InfinityKodiShutdown.leasePath(service.getFilesDir(), owner), "rw");
