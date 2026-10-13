@@ -28,16 +28,17 @@ public final class InfinityCloseGuardService extends Service {
   private long generation;
   private volatile long safeEpoch,safeElapsed,terminateEpoch,terminateElapsed,consumedEpoch,consumedElapsed,deathEpoch,deathElapsed;
   static final class Session {
-    final String ticket,owner;final int pid;final long started,epoch;
-    Session(String ticket,String owner,int pid,long started){this.ticket=ticket;this.owner=owner;this.pid=pid;this.started=started;this.epoch=System.currentTimeMillis();}
+    final String ticket,owner;final int pid,taskId;final long started,epoch;
+    Session(String ticket,String owner,int pid,long started,int taskId){this.ticket=ticket;this.owner=owner;this.pid=pid;this.started=started;this.epoch=System.currentTimeMillis();this.taskId=taskId;}
     static Session from(Intent intent,long now){
       if(intent==null)return null;
       String ticket=intent.getStringExtra(InfinityCloseNativeLease.TICKET),owner=intent.getStringExtra(InfinityCloseNativeLease.TOKEN);
       int pid=intent.getIntExtra(InfinityCloseNativeLease.PID,-1);long start=intent.getLongExtra(InfinityCloseNativeLease.START,-1);
+      int taskId=intent.getIntExtra(InfinityCloseNativeLease.TASK_ID,-1);
       if(!InfinityCheckpointProtocol.uuid(ticket)||!InfinityCheckpointProtocol.uuid(owner)||pid<=0||start<0||now<start||now-start>10000)return null;
-      return new Session(ticket,owner,pid,start);
+      return new Session(ticket,owner,pid,start,taskId);
     }
-    boolean same(Session other){return other!=null&&pid==other.pid&&ticket.equals(other.ticket)&&owner.equals(other.owner)&&started==other.started;}
+    boolean same(Session other){return other!=null&&pid==other.pid&&ticket.equals(other.ticket)&&owner.equals(other.owner)&&started==other.started&&taskId==other.taskId;}
     Bundle bundle(){Bundle b=new Bundle();b.putString(InfinityCloseNativeLease.TICKET,ticket);b.putString(InfinityCloseNativeLease.TOKEN,owner);b.putInt(InfinityCloseNativeLease.PID,pid);return b;}
   }
   private boolean inTime(){long now=SystemClock.elapsedRealtime();return session!=null&&now>=session.started&&now-session.started<InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS;}
@@ -134,6 +135,42 @@ public final class InfinityCloseGuardService extends Service {
     }catch(RuntimeException denied){fail("coordinator_start_"+denied.getClass().getSimpleName());}
     return START_NOT_STICKY;
   }
+  /** Retire ONLY the engine's own stale task, and ONLY after durable COMPLETE.
+   * The original close receipt and a confirmed, consumed engine death are required
+   * by checkOwner() before this method can run. Unknown/mismatched tasks fail open
+   * to diagnostic evidence, NEVER to broad Recents removal.
+   * No action occurs on Home/background, failed checkpoint, or Force Close.
+   */
+  private String retireConfirmedClosedKodiTask(Session completed) {
+    if (!"COMPLETE".equals(phase) || !checkpointSaved || !consumed || revoked ||
+        session != completed || completed.taskId < 0)
+      return "not_authorized_or_task_id_unavailable";
+    try {
+      // Guard against deleting the task of a replacement engine that may have
+      // booted after the old owner died and before this completion callback.
+      InfinityKodiShutdown.Snapshot observed = InfinityKodiShutdown.read(getFilesDir(),
+          (pid,owner)->InfinityKodiShutdown.ownerAlive(getFilesDir(),pid,owner),
+          InfinityKodiShutdown.Snapshot.empty());
+      if (observed.pid > 0 && (observed.pid != completed.pid || !completed.owner.equals(observed.owner)))
+        return "replacement_engine_observed";
+      ActivityManager manager=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
+      if(manager==null)return "activity_manager_unavailable";
+      for(ActivityManager.AppTask task:manager.getAppTasks()) {
+        ActivityManager.RecentTaskInfo info=task.getTaskInfo();
+        if(info==null || info.taskId!=completed.taskId)continue;
+        ComponentName root=info.baseActivity;
+        if(root==null && info.baseIntent!=null)root=info.baseIntent.getComponent();
+        if(root==null || !getPackageName().equals(root.getPackageName()) ||
+            !Main.class.getName().equals(root.getClassName()))
+          return "task_root_mismatch";
+        task.finishAndRemoveTask();
+        return "removed_confirmed_closed_main_task";
+      }
+      return "closed_task_already_absent";
+    } catch(Exception unavailable) {
+      return "closed_task_retirement_unavailable_"+unavailable.getClass().getSimpleName();
+    }
+  }
   static Intent homeIntent(){
     return new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -168,7 +205,7 @@ public final class InfinityCloseGuardService extends Service {
   }
   private JSONObject receipt(String state,String detail){
     JSONObject row=new JSONObject();try{
-      row.put("schema",1);row.put("session",session.ticket);row.put("owner",session.owner);row.put("pid",session.pid);
+      row.put("schema",1);row.put("session",session.ticket);row.put("owner",session.owner);row.put("pid",session.pid);row.put("close_task_id",session.taskId);
       row.put("started_elapsed_ms",session.started);row.put("started_epoch_ms",session.epoch);
       row.put("updated_epoch_ms",System.currentTimeMillis());row.put("updated_elapsed_ms",SystemClock.elapsedRealtime());
       row.put("phase",state);row.put("error",detail);row.put("generation",generation);
@@ -243,6 +280,11 @@ public final class InfinityCloseGuardService extends Service {
               if(ended||session!=target)return;
               phase="COMPLETE";error="";
               evidence("engine.owner_lease_released","COMPLETE","");
+              // A completed, securely authorized close must not leave a stale
+              // singleInstance Main as a direct Recents relaunch into Kodi.
+              // This touches only the closing task ID after durable COMPLETE,
+              // never another task or a still-live/failed-close engine.
+              evidence("recents.closed_task_retirement","COMPLETE",retireConfirmedClosedKodiTask(target));
               // Old :kodi process is verified dead; only now leave for Home.
               try{startActivity(homeIntent());}
               catch(RuntimeException unavailable){
