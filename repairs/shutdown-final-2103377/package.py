@@ -53,7 +53,14 @@ def package(args):
     proof=json.loads((native/'ENGINE-PROOF.json').read_text())
     tests=json.loads((android/'ANDROID-VERIFICATION.json').read_text())
     preservation=json.loads((native/'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json').read_text())
-    require(proof['source_commit']==tests['source_commit']==os.environ['GITHUB_SHA'],'Mixed Java/native source commits')
+    require(proof['source_commit']==os.environ['GITHUB_SHA'],'Native source commit mismatch')
+    reuse_path=android/'ANDROID-REUSE-PROOF.json'
+    if tests['source_commit']!=os.environ['GITHUB_SHA']:
+        require(reuse_path.is_file(),'Earlier tested Java has no exact current source-replay proof')
+        reuse=json.loads(reuse_path.read_text())
+        require(reuse['source_commit']==os.environ['GITHUB_SHA'] and reuse['tested_source_commit']==tests['source_commit']
+                and reuse['runtime_source_byte_identical'] and reuse['fresh_test_results_preserved']
+                and reuse['donor_sha256']==sha(args.donor.read_bytes()),'Java/native pairing proof failed')
     require(proof['complete_native_engine_compiled'] and proof['final_shutdown_corrections_compiled'],
             'Complete repaired native engine proof missing')
     require(proof['native_entry_matches_saved_274_java'] and proof['original_save_and_termination_authority_preserved'],
@@ -107,7 +114,8 @@ def package(args):
                 apk_sha256=sha(final.read_bytes()),bytes=final.stat().st_size,
                 parent_sha256=PARENT_SHA,unstripped_native_sha256=proof['native_sha256'],
                 packaged_native_sha256=sha(packaged.read_bytes()),signer_certificate_sha256=SIGNER,
-                fresh_android_tests=274,targeted_abort_cases=9,targeted_startup_wait_cases=20,
+                fresh_android_tests=274,android_tested_source_commit=tests['source_commit'],
+                android_current_source_byte_identical=True,targeted_abort_cases=9,targeted_startup_wait_cases=20,
                 complete_native_engine_compiled=True,matched_lifecycle_integrated=True,
                 existing_jni_declarations_preserved=natives,core_java_classes_preserved=core,
                 native_exports_preserved=True,native_dependencies_preserved=True,

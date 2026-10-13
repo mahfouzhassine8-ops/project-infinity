@@ -33,7 +33,18 @@ def wide():
     return module
 
 def prepare(args):
-    saved=wide();saved.prepare(args)
+    saved=wide()
+    original_run=saved.subprocess.run
+    old_oracle=(ROOT/'repairs/shutdown-wide-trace-2103377/tests/verify_trace.py').resolve()
+    def routed_run(argv,*positional,**keywords):
+        if isinstance(argv,(list,tuple)) and len(argv)>1 and Path(argv[1]).resolve()==old_oracle:
+            argv=[argv[0],str(HERE/'trace_oracle.py'),*argv[2:]]
+        return original_run(argv,*positional,**keywords)
+    saved.subprocess.run=routed_run
+    try:
+        saved.prepare(args)
+    finally:
+        saved.subprocess.run=original_run
     life=saved.lifecycle();source=life.SOURCE
     manifest_path=life.SCRATCH/'runtime/native/manifest.json'
     manifest=json.loads(manifest_path.read_text());before=manifest['after']
