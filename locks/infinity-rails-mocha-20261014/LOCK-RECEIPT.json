@@ -1,0 +1,62 @@
+{
+  "lock_id": "Infinity-Rails-Mocha-RC02-20261014",
+  "status": "USER_APPROVED_LOCK",
+  "user_approval": "2026-10-14, user explicitly said 'Lock it love' after supplying on-device screenshots",
+  "source_parent_branch": "work/infinity-rails-hold-2103379-hit-test-rc2",
+  "source_parent_commit": "f04989eb2a8d2d3bc5e54f12c32b3266a3dc0e99",
+  "observed_device_success": [
+    "Infinity Mocha Rail Options menu displays in dark OLED, with AutoWidget artwork/title and Open, Move/Reorder, Remove, Settings, Cancel",
+    "TV Show Addons rail displays user-added Cumination alongside History Channel Free and Xumo TV"
+  ],
+  "installed_software_candidates": [
+    {
+      "component": "Infinity APK",
+      "filename": "Infinity-2103377-Rails-Hold-Native-RC2-TEST.apk",
+      "version_code": 2103377,
+      "version_name": "1.0.9-Rails-Hold-Correction-RC02",
+      "sha256": "17e2458552b7dbb8f14dad307015eafc2497a5ec6ddc4f7bb1707d975f37b906",
+      "origin_run": 38629545799
+    },
+    {
+      "component": "Infinity Skin",
+      "filename": "skin.infinity.diggz-1.0.5.222-Mocha-Rails-RECOVERED-RC2-TEST.zip",
+      "addon_id": "skin.infinity.diggz",
+      "version": "1.0.5.222",
+      "sha256": "db494e0b479859190c041494ff68e0c0e38d6b0f482dc65840a0a7fc0227da03"
+    },
+    {
+      "component": "Rails Helper",
+      "filename": "script.infinity.rails-0.2.5-Mocha-Rails-RECOVERED-RC2-TEST.zip",
+      "addon_id": "script.infinity.rails",
+      "version": "0.2.5",
+      "sha256": "4e921d3148862eeeec9507e4c7be857419908452ae003ab6e9d9409a2dfc85c0"
+    },
+    {
+      "component": "Recovery source",
+      "filename": "Infinity-Mocha-Recovered-Source-and-Verification.zip",
+      "sha256": "c95533d00197e0c5981c2d77ab0c3630f376bd395ca62e32978d3943158a2d63"
+    }
+  ],
+  "provenance": {
+    "signed_apk_ci": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38629545799",
+    "native_engine_ci": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38627975135",
+    "permanent_signer_cert_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "android_package_id": "com.projectinfinity.kodi"
+  },
+  "preservation": {
+    "protected_skin_215": "486aa86c8f8dcda31d80c6d058f4b96154dcb2b3f1a18cfa464c65e280ec7e70",
+    "prior_skin_221": "58bd3862493c6967865f82cd6d0555b450e8557d0f80f136306cf587efb9d4b3",
+    "original_signed_apk": "44bc7753bbaf474403c628052dd7bed31d77148b29c33f76e36d129e98edce90",
+    "skin_original_files_unchanged": 3009,
+    "skin_existing_files_changed": 1,
+    "skin_new_files": 22,
+    "skin_deleted_files": 0
+  },
+  "limitations": [
+    "User acceptance evidenced visually; independent device tests of Remove, Reorder, persistent settings, all four view modes, and extended ANR/shutdown are not established",
+    "Do not treat a green GitHub build alone as physical Fold acceptance for every feature"
+  ],
+  "policy": "Preserve this lock untouched; no .211 downgrade, native modification, user data deletion or replacement without approval. New work goes on a new candidate branch.",
+  "archived_assets_destination": "ChatGPT Library /Infinity Locks/Rails Mocha 2026-10-14/",
+  "lock_scope": "Pins exact package bytes and accepted current user experience; not a claim that untested actions passed"
+}
