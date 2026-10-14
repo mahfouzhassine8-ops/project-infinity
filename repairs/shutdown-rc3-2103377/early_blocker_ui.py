@@ -33,7 +33,8 @@ def apply(root):
         '  private volatile String phase="IDLE",error="";',
         '''  private volatile String phase="IDLE",error="";
   private volatile boolean rc3RecoveryOffered=false;
-  private static final long RC3_RECOVERY_GRACE_MS=2500L;''',
+  private String rc4LastMessage="";
+  private static final long RC3_RECOVERY_GRACE_MS=6500L;''',
         "guard state")
     guard=once(guard,
         '      ui.post(poll);ui.postDelayed(this::deadline,',
@@ -51,31 +52,57 @@ def apply(root):
   // Offer the existing recovery dialog through the notification's explicit
   // chooser tap. No lifecycle/Recents/termination authority changes.
   private void offerRC3Recovery(){
+    // A 2.5s snapshot names healthy writers before their ordinary drain.
+    // This advisory is not permission to bypass a required save receipt.
     if(ended||consumed||revoked||session==null||!inTime()||
        "COMPLETE".equals(phase)||"SAFE_TO_TERMINATE".equals(phase)||
        "ENGINE_TERMINATING".equals(phase)||"CHECKPOINT_FAILED".equals(phase))return;
-    String label="background work";
+    java.util.LinkedHashSet<String> names=new java.util.LinkedHashSet<>();
+    int pendingCount=0;
     try{
       JSONObject status=new JSONObject(lastNativeJson);
       JSONObject scripts=status.optJSONObject("script_persistence");
       org.json.JSONArray pending=scripts!=null?scripts.optJSONArray("pending_writers"):null;
-      if(pending!=null&&pending.length()>0){
-        String name=pending.optString(0,"");
-        if(name.startsWith("plugin.video.playlistbrowser:"))label="Playlist Browser";
-        else if(name.startsWith("plugin.video.umbrella:"))label="Umbrella";
-        else if(name.startsWith("repository.zeus768:"))label="Zeus768";
-        else if(name.startsWith("script.trakt:"))label="Trakt";
-        else if(name.startsWith("unidentified:infinity_continuity"))label="Infinity Continuity";
-        else label="an add-on service";
+      if(pending!=null){
+        for(int i=0;i<pending.length();i++){
+          String name=pending.optString(i,"");
+          if(name.isEmpty())continue;
+          pendingCount++;
+          if(name.startsWith("plugin.video.playlistbrowser:"))names.add("Playlist Browser");
+          else if(name.startsWith("plugin.video.umbrella:"))names.add("Umbrella");
+          else if(name.startsWith("repository.zeus768:"))names.add("Zeus768");
+          else if(name.startsWith("script.trakt:"))names.add("Trakt");
+          else if(name.startsWith("unidentified:infinity_continuity"))names.add("Infinity Continuity");
+          else names.add("another add-on");
+        }
       }
-    }catch(Exception unavailable){/* Native evidence may still be arriving. */}
+    }catch(Exception unavailable){/* Recheck next poll; never invent a pending owner. */}
+    String noticeText;
+    if(pendingCount==0){
+      noticeText="Still closing: verifying saved data. Tap for options";
+    }else{
+      StringBuilder label=new StringBuilder();
+      int visible=0;
+      for(String name:names){
+        if(visible==2)break;
+        if(visible!=0)label.append(", ");
+        label.append(name);
+        visible++;
+      }
+      if(names.size()>2)label.append(" +").append(names.size()-2).append(" more");
+      noticeText="Still closing: "+label+" ("+pendingCount+" pending). Tap for options";
+    }
     rc3RecoveryOffered=true;
-    String noticeText="Still saving: "+label+". Tap for options";
     InfinityCloseProgress.display=new InfinityCloseProgress.Display(
         session.pid,session.owner,session.started,phase,noticeText,false);
     try{((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(NOTICE,notice(noticeText));}
     catch(RuntimeException unavailable){}
-    evidence("rc3.grace_elapsed_wait_or_force_choice",phase,label);
+    if(!noticeText.equals(rc4LastMessage)){
+      rc4LastMessage=noticeText;
+      evidence("rc4.pending_service_notice_refresh",phase,noticeText);
+    }
+    // Keep the named blocker current as services retire. No termination action.
+    ui.postDelayed(this::offerRC3Recovery,1000L);
   }
   private void deadline(){''',
         "non-killing recovery offer")
@@ -86,7 +113,7 @@ def apply(root):
         '''  private void showInfinityClosingRecovery(){showInfinityClosingRecovery(false);}
   private boolean infinityRC3RecoveryEligible(InfinityKodiShutdown.Snapshot owner){
     return owner.pending()&&owner.closeAt>0&&
-        System.currentTimeMillis()-owner.closeAt>=2500L;
+        System.currentTimeMillis()-owner.closeAt>=6500L;
   }
   private void showInfinityClosingRecovery(boolean afterGraceNotice){
     InfinityKodiShutdown.Snapshot owner=InfinityKodiShutdown.state();
@@ -122,7 +149,7 @@ def apply(root):
        "no_force_exit_without_explicit_user":True,
        "no_native_checkpoint_authority_change":True,
        "no_recents_navigation_changes":True,
-       "recovery_grace_ms":2500,
+       "recovery_grace_ms":6500,
        "ui_kind":"Existing chooser recovery dialog surfaced from notification tap",
        "no_claim_of_automatic_dialog_from_background_service":True}
 
