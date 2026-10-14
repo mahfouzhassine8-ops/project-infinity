@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window type="dialog">
+  <defaultcontrol always="true">200</defaultcontrol>
+  <depth>DepthDialog+</depth>
+  <animation effect="fade" start="0" end="100" time="180" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="140" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+  <controls>
+    <control type="group" id="1">
+      <visible>String.IsEqual(Window.Property(Rails.LayoutReady),true)</visible>
+      <control type="image" id="2">
+        <left>0</left>
+        <top>0</top>
+        <width>760</width>
+        <height>680</height>
+        <texture border="24" colordiffuse="$VAR[InfinityRailsSurface]">infinity_glass/surface.png</texture>
+        <bordertexture border="24" colordiffuse="$VAR[InfinityRailsBorder]">infinity_glass/rim.png</bordertexture>
+        <bordersize>2</bordersize>
+      </control>
+      <control type="image" id="5">
+        <left>28</left>
+        <top>54</top>
+        <width>72</width>
+        <height>72</height>
+        <texture />
+        <aspectratio>keep</aspectratio>
+      </control>
+      <control type="label" id="6">
+        <left>120</left>
+        <top>24</top>
+        <width>530</width>
+        <height>52</height>
+        <font>InfinityBodyBold</font>
+        <label>$INFO[Window.Property(Rails.Title)]</label>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+      </control>
+      <control type="label" id="7">
+        <left>120</left>
+        <top>78</top>
+        <width>530</width>
+        <height>52</height>
+        <font>InfinitySmall</font>
+        <label>$INFO[Window.Property(Rails.Subtitle)]</label>
+        <textcolor>$VAR[InfinityRailsSecondary]</textcolor>
+        <aligny>center</aligny>
+        <scroll>true</scroll>
+      </control>
+      <control type="button" id="9">
+        <left>674</left>
+        <top>24</top>
+        <width>64</width>
+        <height>64</height>
+        <label />
+        <texturefocus colordiffuse="$VAR[InfinityRailsAccent]">infinity_legacy/close_focus.png</texturefocus>
+        <texturenofocus colordiffuse="$VAR[InfinityRailsText]">infinity_legacy/close.png</texturenofocus>
+        <onleft>200</onleft>
+        <onright>200</onright>
+        <onup>200</onup>
+        <ondown>200</ondown>
+      </control>
+      <control type="button" id="200">
+        <left>24</left>
+        <top>160</top>
+        <width>712</width>
+        <height>96</height>
+        <label />
+        <font>InfinityBody</font>
+        <align>left</align>
+        <aligny>center</aligny>
+        <textoffsetx>24</textoffsetx>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <scroll>true</scroll>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onup>9</onup>
+        <ondown>201</ondown>
+        <onleft>9</onleft>
+        <onright>9</onright>
+      </control>
+      <control type="button" id="201">
+        <left>24</left>
+        <top>260</top>
+        <width>712</width>
+        <height>96</height>
+        <label />
+        <font>InfinityBody</font>
+        <align>left</align>
+        <aligny>center</aligny>
+        <textoffsetx>24</textoffsetx>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <scroll>true</scroll>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onup>200</onup>
+        <ondown>202</ondown>
+        <onleft>9</onleft>
+        <onright>9</onright>
+      </control>
+      <control type="button" id="202">
+        <left>24</left>
+        <top>360</top>
+        <width>712</width>
+        <height>96</height>
+        <label />
+        <font>InfinityBody</font>
+        <align>left</align>
+        <aligny>center</aligny>
+        <textoffsetx>24</textoffsetx>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <scroll>true</scroll>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onup>201</onup>
+        <ondown>203</ondown>
+        <onleft>9</onleft>
+        <onright>9</onright>
+      </control>
+      <control type="button" id="203">
+        <left>24</left>
+        <top>460</top>
+        <width>712</width>
+        <height>96</height>
+        <label />
+        <font>InfinityBody</font>
+        <align>left</align>
+        <aligny>center</aligny>
+        <textoffsetx>24</textoffsetx>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <scroll>true</scroll>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onup>202</onup>
+        <ondown>204</ondown>
+        <onleft>9</onleft>
+        <onright>9</onright>
+      </control>
+      <control type="button" id="204">
+        <left>24</left>
+        <top>560</top>
+        <width>712</width>
+        <height>96</height>
+        <label />
+        <font>InfinityBody</font>
+        <align>left</align>
+        <aligny>center</aligny>
+        <textoffsetx>24</textoffsetx>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <scroll>true</scroll>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onup>203</onup>
+        <ondown>9</ondown>
+        <onleft>9</onleft>
+        <onright>9</onright>
+      </control>
+      <control type="button" id="210">
+        <left>24</left>
+        <top>660</top>
+        <width>180</width>
+        <height>88</height>
+        <label>Previous</label>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <onup>200</onup>
+        <ondown>9</ondown>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onleft>9</onleft>
+        <onright>211</onright>
+      </control>
+      <control type="button" id="211">
+        <left>556</left>
+        <top>660</top>
+        <width>180</width>
+        <height>88</height>
+        <label>Next</label>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityRailsText]</textcolor>
+        <focusedcolor>$VAR[InfinityRailsText]</focusedcolor>
+        <disabledcolor>$VAR[InfinityRailsSecondary]</disabledcolor>
+        <onup>200</onup>
+        <ondown>9</ondown>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityRailsAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityRailsField]">infinity_glass/field.png</texturenofocus>
+        <onleft>210</onleft>
+        <onright>9</onright>
+      </control>
+      <control type="label" id="212">
+        <left>208</left>
+        <top>660</top>
+        <width>344</width>
+        <height>88</height>
+        <label />
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityRailsSecondary]</textcolor>
+        <align>center</align>
+        <aligny>center</aligny>
+      </control>
+    </control>
+  </controls>
+</window>

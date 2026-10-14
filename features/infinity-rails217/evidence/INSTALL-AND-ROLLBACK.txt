@@ -1,0 +1,54 @@
+INFINITY CUSTOM RAILS RC3 — TEST CANDIDATE, NOT LOCKED
+
+INSTALL IN THIS ORDER
+1. Infinity > Install from ZIP: script.infinity.rails-0.1.2-RC3-TEST.zip.
+   This upgrades the existing script.infinity.rails helper in place.
+   Do not uninstall the old helper. Do not run a Program add-on patch tool.
+2. Install from ZIP: skin.infinity.diggz-1.0.5.217-Custom-Rails-RC3-TEST.zip.
+   This is a complete normal skin ZIP, with the same skin ID.
+3. Allow Kodi to finish installing; reload the skin if requested.
+4. Keep the APK currently installed. No APK update is part of this candidate.
+
+The Rails helper is a declared required dependency at version 0.1.2.
+It is not published in an available repository for automatic resolution.
+Install the provided helper first or Kodi may refuse the skin dependency.
+Other pre-existing .215 dependencies remain unchanged.
+
+USE
+Movies/TV Shows > All Add-ons > long press an installed video add-on >
+Add to Infinity Rails > Movie Add-ons / TV Show Add-ons / Both Rails.
+On a rail card, a normal tap launches it. Long press requests Rails Options.
+Removal affects only that rail shortcut. The add-on remains installed.
+Built-in cards have no removal option. Move / Reorder chooses a destination.
+Menus page in very short windows; Back or X always dismisses.
+A fold/resize safely dismisses the menu without changing saved data.
+
+DATA
+Existing helper profile and rails.json schema 1 are retained unchanged.
+Movie and TV placements are independent. No user databases are migrated.
+A missing/disabled custom add-on is hidden while its preference is retained.
+
+ROLLBACK
+Use the exact original .215 ZIP:
+skin.infinity.diggz-1.0.5.215-CommandCenter-Settings-Readability-RC1-TEST.zip
+SHA-256: 486aa86c8f8dcda31d80c6d058f4b96154dcb2b3f1a18cfa464c65e280ec7e70
+
+First back up your Kodi profile using your existing backup process.
+Install the .215 ZIP over the same skin ID without uninstalling the skin.
+Kodi may ask you to approve the older version; approve the version change.
+If Install from ZIP refuses a lower version, use the skin add-on's Versions
+screen to select the local .215 package when listed. Do not clear add-on data
+or force a resource patch as a workaround.
+Keep the helper and its profile; .215 does not expose custom Rails, but the
+saved selections remain available when .217 is installed again.
+Do not select an unavailable/newer automatic skin update during this test.
+
+Rollback content and same-ID metadata are verified on the host. Actual Kodi
+installation/downgrade behavior must still be verified on the device.
+
+DEVICE ACCEPTANCE REQUIRED
+Verify single tap versus long press, horizontal swipes, all four modes, all
+three themes, remove/re-add/reorder, Back/X/Cancel, restart and normal Close,
+fold/unfold, split/floating windows, and existing Command Center labels.
+Report any black popup, lost focus, unwanted launch, flicker, missing card,
+shutdown delay, or installation problem. The candidate is NOT LOCKED.

@@ -1,0 +1,104 @@
+INFINITY CUSTOM RAILS RC3 — SOURCE AND TEST NOTES
+
+Authoritative input is the exact full .215 package, SHA-256
+486aa86c8f8dcda31d80c6d058f4b96154dcb2b3f1a18cfa464c65e280ec7e70.
+Repository provenance record: 85b1305ef7a220dd23aaeb40c7d38150b8da4a92.
+Recovered Rails provenance record: faae58d7594b8be1e423e119ddd1e1c9839767fd.
+Reconciled helper input is .0.1.1 RC2, including its usable root navigation.
+Skin .211 was not used. Installed .216 customizations use the same helper
+profile, same rails.json and unchanged schema/store implementation.
+
+BLACK POPUP — WHAT IS KNOWN
+The Rails listing calls Kodi's native context menu on long press. Its former
+buttons are Move, Remove and Manage. The standard select dialogs are called
+only after choosing an action. The screenshot is consistent with a native
+context panel. Official Kodi Omega source clones button 1000 into grouplist
+996, adjusts background 999 from the grouplist height, and positions the
+popup using the background's dimensions. Infinity .215 unified XML nests
+that template and auto-height list in percentage-sized groups, making native
+button sizing/background anchoring dependent on that nested geometry.
+This is a confirmed source-level integration hazard. The exact on-device
+failure path (geometry versus theme/resource fallback) cannot be conclusively
+proved from a screenshot without a device render/log capture.
+
+RC3 replaces the Rails presentation path, while preserving unrelated native
+context controls. Home focus hooks record only the rail container. The native
+context window's onload routes only a selected Rails item to the helper;
+the helper captures its section/key, closes the native popup and opens the
+owned DialogInfinityRails.xml. Only native long-press/context events reach
+that route; focus, startup, taps and swipes do not open it. Actual native
+onload-to-Python handoff must still be verified on the Fold.
+
+CHANGE SCOPE
+41 original skin files changed: 14 Home.xml, 10 existing Includes.xml,
+14 DialogContextMenu.xml and 3 release metadata files.
+32 new skin files: 14 Rails includes, 14 owned dialogs, 4 missing profile
+Includes.xml files carried forward from RC2. No original files deleted.
+2,937 of the 2,978 original files remain byte-identical. All original Python,
+Command Center/settings dialogs, Resume Hub, shutdown/player code, fonts,
+artwork and original shortcut sources remain byte-identical.
+See preservation.json for the exact path list and skin-file-sha256.json for
+all shipped file fingerprints.
+
+Helper runtime changed to .0.1.2. Its installer.py and skin216 patch payload
+are removed from the shipped helper. menu.py and menu_geometry.py own the
+modal. store.py and catalog.py remain unchanged. Helper context registration
+and plugin/script entry points remain; no new service/dependency was added
+other than the skin's explicit requirement on this existing helper.
+
+ALL FOUR MODES
+Normal 9200, Compact 8820, Two-Pane 8720 and Cinema 19600 share the same
+stored rails. Their original item/focus layouts, dimensions, navigation,
+scrolling and artwork controls are preserved. Cinema retains its original
+More Menus presentation and menu entries. This is host XML/integration
+verification, not a claim that all modes were rendered on the Fold.
+
+THEMES / GEOMETRY
+New Rails-only color variables read the current SystemTheme/native theme,
+with OLED priority. No snapshot color cache or forced skin reload is used.
+Opening/closing fades are 180/140 ms and honor OptionalMotionAllowed=false.
+Geometry uses native published APP-WINDOW dp bounds and actual Kodi window
+coordinates, matching the existing approved compact-preview transform.
+Very short windows page actions; tiny windows scale the entire card uniformly.
+Without native dp facts, geometry uses an explicitly approximate fallback.
+A 200 ms bounds check exists only while this foreground modal is open. It
+closes the menu on resize, an incomplete native bounds publication, or abort.
+It never refreshes artwork/widgets and ends on dismissal. No background
+service, startup worker, ongoing add-on polling or network call exists.
+
+PERFORMANCE / LIMITATIONS
+Only the affected rail receives a revision change. No full-home refresh,
+skin reload, player command, or notification loop runs on add/remove/move.
+Duplicate adds do not issue another refresh. Existing native scrolling is
+retained. Kodi's list provider preserves the selected path, or the nearest
+remaining index on removal, as its update code specifies. No new bespoke
+neighbor-card animation is implemented: smoothness/focus/flicker depend on
+the native provider and must be assessed on the device.
+
+The host benchmark measured atomic state operations only. It does not measure
+Fold GPU frame pacing, actual menu/input latency, artwork decoding, process
+RSS, or long-session Kodi stability. See host-performance.json. Simulated
+open/close cycles verify observer teardown, not device memory behavior.
+
+TESTS
+The recovered original 182-test suite passed unchanged against historical
+source before RC3 edits. The RC3 suite reuses applicable storage/runtime
+coverage and adds package, preservation, modal, routing and geometry tests.
+Do not add both suite counts as unique new coverage. Final RC3 count and
+results are in verification.json and rc3-tests.log. Python 3.11 grammar is
+checked; actual host runtime is Python 3.12. No native or Android rebuild
+was performed. No live Kodi, physical Fold or shutdown test was performed.
+
+REPRODUCE
+The source/evidence archive contains work/addons, work/tools, work/tests,
+helper-before (exact RC2 delta inputs for the builder), unchanged historical
+source/tests, reports and host illustrations. Supply the original .215 ZIP
+at baseline/skin.infinity.diggz-1.0.5.215-CommandCenter-Settings-Readability-RC1-TEST.zip.
+Run python3 work/tools/build_rc3.py and python3 -m unittest discover -s work/tests -v.
+The archive excludes full baseline fonts/binaries; obtain them only from the
+verified original .215 ZIP. Build output is a complete normal skin ZIP.
+
+ACCEPTANCE
+This is a reviewable TEST candidate, not a production lock or a declaration
+that the physical black-popup regression is fixed. Install helper first,
+then skin, test the actual interaction and rendering, and retain .215 rollback.
