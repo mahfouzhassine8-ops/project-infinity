@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "lock_status": "USER_APPROVED_LOCKED_BASELINE",
+  "approved_date": "2026-10-14",
+  "designation": "Infinity Kodi Mobile — 2103377 RC5 Final Shutdown Repair",
+  "android": {
+    "package_id": "com.projectinfinity.kodi",
+    "version_code": 2103377,
+    "version_name": "1.0.9-RC5-Optional-Shutdown-Test",
+    "apk_filename": "Infinity-2103377-RC5-Optional-Shutdown-Signed-Test.apk",
+    "sha256": "44bc7753bbaf474403c628052dd7bed31d77148b29c33f76e36d129e98edce90",
+    "file_size_bytes": 159400759,
+    "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "signing_verified_v1_v2_v3": true,
+    "note": "The filename and internal versionName retain TEST because this exact physical-tested, permanently signed APK is locked byte-for-byte. Never silently rebuild or rename inside the package."
+  },
+  "skin": {
+    "id": "skin.infinity.diggz",
+    "version": "1.0.5.211",
+    "status": "LOCKED_UNCHANGED",
+    "skin_update_required": false
+  },
+  "source": {
+    "repository": "mahfouzhassine8-ops/project-infinity",
+    "baseline_signed_package_commit": "eafaab0d21c1cb20646b08dfe28fea7f769d56e9",
+    "native_engine_commit": "645b0e8b15c45d4c170a8b664073a87cb848b831",
+    "android_274_test_commit": "5a1a427cb5bdcc248b0e2a7887f9d6682ca53877",
+    "locked_branch": "locked/infinity-2103377-rc5",
+    "release_tag": "infinity-2103377-rc5-locked",
+    "original_parent_locked_apk_rollback": 2103376,
+    "original_parent_locked_skin_rollback": "1.0.5.211",
+    "source_mutation_to_original_parent": false
+  },
+  "ci": {
+    "native_full_engine": {
+      "run_id": 38517386755,
+      "result": "SUCCESS"
+    },
+    "android_regressions": {
+      "run_id": 38514680851,
+      "result": "SUCCESS",
+      "passed": 274,
+      "total": 274
+    },
+    "cxx_targeted": {
+      "run_id": 38517351538,
+      "result": "SUCCESS",
+      "passed": 17,
+      "total": 17
+    },
+    "signing_and_preservation": {
+      "run_id": 38520156095,
+      "result": "SUCCESS",
+      "artifact_id": 11873162682,
+      "receipts_artifact_id": 11873247508
+    },
+    "exact_apk_verified_by_sha256": true
+  },
+  "device_acceptance": {
+    "device_class": "Samsung Galaxy Fold Android 64-bit",
+    "authorized_by_user": true,
+    "fast_close": "PASS_USER_REPORTED",
+    "full_load_close_attempts": 2,
+    "full_load_shutdown": "PASS",
+    "traces_both_safe_to_terminate": true,
+    "traces_both_engine_lease_released": true,
+    "traces_both_android_recents_cleanup": true,
+    "durations_ms_approx": [
+      3480,
+      3332
+    ],
+    "latest_native_required_save_owners": 17,
+    "latest_native_completed_save_owners": 17,
+    "latest_native_blocker_count": 0,
+    "latest_native_active_writers": 0,
+    "latest_native_pending_jobs": 0,
+    "latest_native_phase": "SAFE_TO_TERMINATE",
+    "latest_android_phase": "COMPLETE",
+    "latest_android_error": "",
+    "diagnostic_archive": "Infinity-Diagnostics-20261014-021322.zip",
+    "diagnostic_archive_sha256": "031ec66c56c8ada994e259f99eb81e777fc0a08573a58e5c40241fb5199f41f5",
+    "diagnostic_archive_user_private_not_published": true,
+    "limitation": "The most recent native receipt enumerates 17/17 required completed owners; previous shutdown independently records SAFE_TO_TERMINATE and clean Android completion. Separate detailed UI restoration inspection was not recorded."
+  },
+  "approved_behavior": [
+    "Fast Close and Full-Load Normal Close preserve graceful snapshot saves and safe termination",
+    "Resume Hub local-first progress and Continue Playing remain primary, independent of Trakt",
+    "Trakt stays installed, usable and updateable; optional cloud/stop-only script not required Infinity local-save owner",
+    "Infinity Continuity remains active while running; diagnostic-only monitoring stops on Close without stalling required saves",
+    "All 17 mandatory native save owners and real database/write durability checks preserved",
+    "RC3 Curl cancellation, early Python stop, early local save, RC4 dynamic shutdown notice retained",
+    "No other approved app functionality, skin, provider, favourites, playback, Recents or Choose Experience modifications"
+  ],
+  "future_candidate_policy": {
+    "source_of_truth": "Use this signed APK hash + source commit + locked skin as the new baseline for all upcoming candidates",
+    "preserve_exact_artifact": true,
+    "do_not_promote_without_user_approval": true,
+    "preserve_old_2103376_rollback": true,
+    "no_unrequested_shutdown_redesign": true,
+    "release_status": "LOCKED"
+  }
+}
