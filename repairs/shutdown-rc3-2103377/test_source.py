@@ -115,7 +115,7 @@ public:
 };
 '''
         harness.write_text(header+openPrefix+"  return true;\n}\n"+writePrefix+
-          "  return true;\n}\n"+"int CReadState::FillBuffer(){\n"+fillBlock+
+          "  (void)url; (void)bOverWrite; return true;\n}\n"+"int CReadState::FillBuffer(){\n"+fillBlock+
           "\n  return 1;\n}\n"+
           '''
 int main() {
