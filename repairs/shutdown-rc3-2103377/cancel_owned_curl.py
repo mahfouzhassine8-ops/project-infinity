@@ -128,19 +128,19 @@ def apply(root, *, include_invoker=True):
       return FILLBUFFER_NO_DATA;'''
     curl=once(curl,marker,replacement,"Curl buffered read cancellation check")
     if include_invoker:
-            python=once(python,'#include "PythonInvoker.h"\n',
+        python=once(python,'#include "PythonInvoker.h"\n',
             '#include "PythonInvoker.h"\n#if defined(TARGET_ANDROID)\n'
             '#include "filesystem/InfinityCloseNetworkGate.h"\n#endif\n',
             "Python invoker include")
         python=once(python,'  m_sourceFile = script;\n',
             '''  m_sourceFile = script;
-    #if defined(TARGET_ANDROID)
-      // Exactly bind this executing Python service's add-on ID for native HTTP
-      // reads. No AST inspection, tracer dependency or global network ban.
-      InfinityCloseNetworkGate::ScopedOwner infinityNetworkOwner(
-          m_addon ? m_addon->ID() : std::string{});
-    #endif
-    ''',
+#if defined(TARGET_ANDROID)
+  // Bind the executing Python service's addon to synchronous Curl reads.
+  // No AST inspection, diagnostic-tracer dependence or global network ban.
+  InfinityCloseNetworkGate::ScopedOwner infinityNetworkOwner(
+      m_addon ? m_addon->ID() : std::string{});
+#endif
+''',
             "Python interpreter worker identity binding")
     outputs={CURL:curl.encode(),CURL_H:curl_header.encode(),HEADER:HEADER_SOURCE.encode()}
     if include_invoker: outputs[INVOKER]=python.encode()
