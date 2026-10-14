@@ -16,13 +16,15 @@ jobs:
         with: {persist-credentials: false}
       - run: |
           sudo apt-get update -qq
-          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core
+          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core pulseaudio
           python3 repairs/rails-hold-2103378/setup_kodi_smoke.py
       - name: Exercise callback, real dialog and normal plugin launch
         run: |
           set -euo pipefail
           Xvfb :99 -screen 0 1280x720x24 > /tmp/rails-xvfb.log 2>&1 &
           export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=rails_ci
           kodi --standalone > /tmp/rails-kodi-console.log 2>&1 &
           for attempt in $(seq 1 60); do
             window=$(xdotool search --name '^Kodi' 2>/dev/null | head -1 || true)
@@ -42,6 +44,9 @@ jobs:
         run: |
           mkdir -p smoke-evidence
           for file in "$HOME/.kodi/userdata/rail-smoke-result.json" "$HOME/.kodi/userdata/rail-options.png" "$HOME/.kodi/temp/kodi.log" /tmp/rails-kodi-console.log /tmp/rails-xvfb.log; do
+            if [ -f "$file" ]; then cp "$file" smoke-evidence/; fi
+          done
+          for file in "$HOME"/kodi_crashlog*.log; do
             if [ -f "$file" ]; then cp "$file" smoke-evidence/; fi
           done
       - uses: actions/upload-artifact@v7

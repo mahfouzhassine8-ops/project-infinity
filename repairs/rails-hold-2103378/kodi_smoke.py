@@ -42,8 +42,7 @@ try:
         if dialog==9999:break
         labels={}
         for cid in [1,2,3,9,10,11]:
-            try:labels[str(cid)]=xbmcgui.Window(dialog).getControl(cid).getLabel()
-            except (RuntimeError,AttributeError):pass
+            labels[str(cid)]=xbmc.getInfoLabel('Control.GetLabel('+str(cid)+')')
         checks['startup_dialogs'].append({'id':dialog,'labels':labels})
         assert dialog==10100,checks['startup_dialogs']
         xbmc.executebuiltin('SendClick(10100,10)')
@@ -56,14 +55,12 @@ try:
     for dismiss in ['Back','Select']:
         xbmc.executebuiltin(command)
         wait(lambda:xbmcgui.getCurrentWindowDialogId()==12000)
-        window=xbmcgui.Window(12000)
         labels=[]
         for cid in [3,6]:
-            try:
-                control=window.getControl(cid)
-                labels=[control.getListItem(i).getLabel() for i in range(control.size())]
-                if labels:break
-            except (RuntimeError,AttributeError):pass
+            count=xbmc.getInfoLabel('Container('+str(cid)+').NumItems')
+            if count.isdigit() and int(count)>0:
+                labels=[xbmc.getInfoLabel('Container('+str(cid)+').ListItemAbsolute('+str(i)+').Label') for i in range(int(count))]
+                break
         assert labels[:3]==['Open Add-on','Move / Reorder','Remove from Rail'],labels
         checks['actual_dialog_populated']=labels
         xbmc.sleep(400)
