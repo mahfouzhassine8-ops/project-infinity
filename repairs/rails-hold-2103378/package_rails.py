@@ -14,7 +14,7 @@ import zipfile
 
 ROOT=Path(__file__).resolve().parents[2]
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
-NATIVE_COMMIT='fc3d6ebbb1bbef43bf01273004608e1c40358a3c'
+NATIVE_COMMIT='99b3dd0c98b9991138163f4042b7f41825d1a23a'
 ENGINE='lib/arm64-v8a/libkodi.so'
 SIGNATURE=re.compile(r'^META-INF/(?:MANIFEST.MF|[^/]+\.(?:SF|RSA|DSA|EC))$',re.I)
 
