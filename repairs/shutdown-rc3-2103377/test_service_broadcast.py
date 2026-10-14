@@ -34,6 +34,7 @@ def run(root):
 #include <vector>
 using CCriticalSection=std::mutex;
 struct FakeInvoker {
+  int GetId() const {return 1;} // Trace-only fake ID, never permissions.
   unsigned nonblockingStops{0};
   bool Stop(bool wait) {
     assert(!wait);
@@ -59,6 +60,11 @@ struct FakePython {
 struct CServiceBroker {
   static FakePython& GetXBPython(){static FakePython handler;return handler;}
 };
+// Production source has observation-only VFS requests; mock the tracer,
+// not the actual invoker selection or native AbortNotification logic.
+namespace InfinityVfsOpenTrace {
+inline void Request(int,const char*) {}
+}
 std::string VerifiedCheckpointContract(
   const std::string&, const CLanguageInvokerThreadPtr&,
   const std::string& admittedContract){return admittedContract;}
