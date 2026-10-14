@@ -10,6 +10,8 @@ import shutil
 import subprocess
 import sys
 import cooperative_abort
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'shutdown-drain-2103377'))
+import prune_optional_jobs
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -69,8 +71,11 @@ def prepare(args):
     shutil.copyfile(HERE/Path(HEADER).name,source/HEADER)
     after=dict(before);after.update(latch['after'])
     after[INVOKER]=digest((source/INVOKER).read_bytes());after[HEADER]=digest((source/HEADER).read_bytes())
+    rc2=prune_optional_jobs.apply(source)
+    after.update(rc2['after'])
     changed=sorted(name for name in before if before[name]!=after[name])
-    assert changed==sorted([*cooperative_abort.PINS,INVOKER])
+    assert changed==sorted([*cooperative_abort.PINS,INVOKER,*rc2['changed']])
+    write(OUT/'RC2-OPTIONAL-QUEUE-PRUNE.json',rc2)
     manifest.update(after=after,changed=sorted(set(manifest['changed'])|set(changed)),
                     added=sorted(set(manifest['added'])|{HEADER}))
     write(manifest_path,manifest)
@@ -86,7 +91,9 @@ def prepare(args):
         'known_wait_source_hashes':{k:v['input_sha256'] for k,v in host['addons'].items()},
         'unknown_sources_retain_existing_behavior_and_writer_obligations':True,
         'in_process_threads_forcibly_killed':False,'shutdown_timeouts_changed':False,
-        'playlist_browser_unchanged':True,'device_verified':False})
+        'playlist_browser_unchanged':True,'device_verified':False,
+        'rc2_optional_queue_prune':rc2,
+        'source_provenance':'rc2 exact three-file queue/pruning diff atop verified 2103377'})
     shutil.copyfile(HERE/'STARTUP-WAIT-VERIFICATION.json',OUT/'STARTUP-WAIT-VERIFICATION.json')
 
 def compile_engine():
@@ -97,6 +104,9 @@ def compile_engine():
                   b'infinityPrepareNativeTask',b'capture.lane_limit',b'vfs.shutdown_operation_return']:
         assert token in binary,token
     proof=json.loads((OUT/'ENGINE-PROOF.json').read_text())
+    assert b'jobs.optional_queued_pruned' in binary
+    rc2=json.loads((OUT/'RC2-OPTIONAL-QUEUE-PRUNE.json').read_text())
+    assert rc2['only_verified_optional_no_callback_queued']
     proof.update(purpose='Targeted cooperative shutdown repair test candidate',
                  final_shutdown_corrections_compiled=True,
                  checkpoint_monitor_abort_latched=True,
@@ -107,6 +117,7 @@ def compile_engine():
                  native_entry_matches_saved_274_java=True,
                  in_process_threads_forcibly_killed=False,
                  shutdown_timeout_changed=False,
+                 rc2_optional_queued_prune_compiled=True,
                  physical_shutdown_verified=False,
                  apk_packaged_or_signed=False,locked=False,device_accepted=False)
     write(OUT/'ENGINE-PROOF.json',proof)
