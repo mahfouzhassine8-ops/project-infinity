@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "title": "Infinity 2103377 Shutdown Drain RC2 — preserved green native + Android + signed candidate",
+  "branch": "work/infinity-2103377-shutdown-drain-rc2",
+  "package_source_commit": "c097af98e294510989abc190cfd941d072efbc21",
+  "native": {
+    "source_commit": "633b8d9444527eb8df5dbbf291c787fd03766b2d",
+    "run": 38488207608,
+    "job_conclusion": "success",
+    "engine_compiled": true,
+    "rc2_native_host_tests": {
+      "passed": 9,
+      "total": 9
+    },
+    "evidence_artifact": 11861637196,
+    "native_artifact": 11861885662
+  },
+  "android": {
+    "original_274_case_run": 38415112606,
+    "source_verification_run": 38489062045,
+    "artifact": 11861410337,
+    "original_unit_test_source_commit": "73da8981e7bd8c4e060a0dd7c095c29a88f0d47d",
+    "reused_unchanged_test_cases": {
+      "passed": 274,
+      "total": 274
+    },
+    "source_hashes_verified_again": true,
+    "note": "Independent verification reuses exact passed 274 cases; no repeated test execution claimed"
+  },
+  "packaging": {
+    "run": 38491674436,
+    "conclusion": "success",
+    "artifact_id": 11862162275,
+    "artifact_name": "Infinity-2103377-Drain-RC2-Signed-Test-APK",
+    "receipt_artifact_id": 11861852759,
+    "apk": "Infinity-2103377-Shutdown-Drain-RC2.apk",
+    "apk_sha256": "64d31442c0c78296d57a5d330b0f3545dbea9fee47430ab7bcc2d5085a83fe32",
+    "apk_bytes": 159449911,
+    "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "apk_package": "com.projectinfinity.kodi",
+    "version_code": 2103377,
+    "parent_apk_sha256": "8e8e139929592daedb63e0e41040258d655f132fd025b236de7dee1e88b47649",
+    "native_dependencies_preserved": true,
+    "other_native_libraries_preserved": 46,
+    "asset_files_preserved": 4044,
+    "existing_jni_declarations_preserved": 77,
+    "core_java_classes_preserved": 110
+  },
+  "resolved_blocker": "Packaging originally looked for renamed Android artifact under run 38415112606. Fixed by fetching exact successful native artifact from 38488207608 and Android artifact from 38489062045 and replaying Android source identity. No new complete native engine build.",
+  "implementation_scope": "Cancel only proven nonpersistent never-started queued jobs (no callback/receipt); still no automatic abandonment of required or unknown services",
+  "outstanding": "Physical Fold 2103377 shutdown not verified; five Python services in latest 17:36 capture may still block: Playlist Browser, Umbrella, Zeus768, Trakt and Infinity Continuity. Pending essential user-data ownership and safe cancellation are not yet fully resolved.",
+  "protections": {
+    "locked_apk": 2103376,
+    "locked_skin": "1.0.5.211",
+    "locked_baselines_changed": false,
+    "playlist_browser_changed": false,
+    "require_user_physical_acceptance_before_lock": true,
+    "rc2_locked": false
+  }
+}
