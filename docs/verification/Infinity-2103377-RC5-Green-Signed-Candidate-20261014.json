@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "subject": "Infinity 2103377 RC5 optional Trakt/Continuity native shutdown — signed physical test candidate",
+  "status": "all required CI/package tests green; physical Fold shutdown not yet verified; unlocked",
+  "protection": {
+    "locked_apk": 2103376,
+    "locked_skin": "1.0.5.211",
+    "android_package": "com.projectinfinity.kodi",
+    "locked_baselines_modified": false
+  },
+  "proof": {
+    "native": {
+      "run_id": 38517386755,
+      "conclusion": "success",
+      "source_commit": "645b0e8b15c45d4c170a8b664073a87cb848b831",
+      "complete_engine_compiled": true
+    },
+    "android": {
+      "run_id": 38514680851,
+      "conclusion": "success",
+      "source_commit": "5a1a427cb5bdcc248b0e2a7887f9d6682ca53877",
+      "tests_passed": 274,
+      "tests_total": 274
+    },
+    "native_host": {
+      "run_id": 38517351538,
+      "conclusion": "success",
+      "tests_passed": 17,
+      "tests_total": 17
+    },
+    "signing": {
+      "run_id": 38520156095,
+      "conclusion": "success",
+      "source_commit": "eafaab0d21c1cb20646b08dfe28fea7f769d56e9",
+      "artifact_id": 11873162682,
+      "receipts_artifact_id": 11873247508,
+      "apk_file": "Infinity-2103377-RC5-Optional-Shutdown-Signed-Test.apk",
+      "apk_bytes": 159400759,
+      "apk_sha256": "44bc7753bbaf474403c628052dd7bed31d77148b29c33f76e36d129e98edce90",
+      "permanent_signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "signature_v2_v3_verified": true,
+      "alignment_verified": true,
+      "asset_files_preserved": 4044,
+      "other_native_libraries_preserved": 46,
+      "android_resources_preserved": true,
+      "core_java_classes_preserved": 110
+    }
+  },
+  "change_scope": [
+    "Trakt remains installed, enabled as user chooses, usable and updateable; exact addon-owned default entry gets stop-only policy on Close, not required Infinity save owner",
+    "Skin Continuity 1.0.5.211 hash-pinned diagnostic script gets stop-only policy on Close; runtime UI reflow coordination unchanged",
+    "RC3 early Python stop, Curl cancellation, early provisional local save and RC4 dynamic 6.5-second recovery notification preserved",
+    "17 required native owners and final save authorization remain intact",
+    "No Trakt source modifications, no separate skin update, no provider/Resume Hub redesign"
+  ],
+  "acceptance": {
+    "ready_for_physical_install_test": true,
+    "quick_close_rc5_verified": false,
+    "full_loaded_fold_shutdown_verified": false,
+    "all_17_final_receipts_verified": false,
+    "resume_hub_reopen_state_verified": false,
+    "locked": false,
+    "production_promoted": false
+  },
+  "required_on_device_tests": [
+    "Update install without clearing app data, keep locked skin 1.0.5.211",
+    "Quick Close soon after startup — preserve RC3 fast behavior",
+    "Fully load all services, create Resume Hub progress, use Normal Close and verify Infinity exits",
+    "Reopen and verify Resume Hub resume position, watched blue marks, favourites, providers, settings, optional Trakt manual access",
+    "If any stall or data inconsistency: export Infinity diagnostics ZIP and do not lock"
+  ]
+}
