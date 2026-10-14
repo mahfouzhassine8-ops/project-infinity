@@ -1,0 +1,114 @@
+name: Infinity | 2103377 RC5 user-approved locked release archive
+on:
+  push:
+    branches: [locked/infinity-2103377-rc5]
+    paths:
+      - '.github/workflows/infinity-2103377-rc5-locked-release.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: infinity-2103377-rc5-locked-release-archive
+  cancel-in-progress: false
+jobs:
+  archive-locked-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      TAG: infinity-2103377-rc5-locked
+      SOURCE_SHA: eafaab0d21c1cb20646b08dfe28fea7f769d56e9
+      APK: Infinity-2103377-RC5-Optional-Shutdown-Signed-Test.apk
+      APK_SHA: 44bc7753bbaf474403c628052dd7bed31d77148b29c33f76e36d129e98edce90
+      SIGNER: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38520156095
+          name: Infinity-2103377-RC5-Optional-Shutdown-Signed-Test-APK
+          github-token: '${{ github.token }}'
+          path: release-apk
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38520156095
+          name: Infinity-2103377-RC5-Optional-Shutdown-Package-Receipts
+          github-token: '${{ github.token }}'
+          path: proof
+      - name: Verify exact signed physical-tested APK, version, pinned parent, and 274 + 17 passing sources
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os,zipfile
+          apk=Path('release-apk')/os.environ['APK']
+          proof=json.loads(Path('proof/FINAL-APK-VERIFICATION.json').read_text())
+          lock=json.loads(Path('docs/locks/Infinity-2103377-RC5-Locked-20261014.json').read_text())
+          expected=os.environ['APK_SHA']
+          assert apk.is_file() and hashlib.sha256(apk.read_bytes()).hexdigest()==expected
+          assert apk.stat().st_size==159400759
+          assert proof['apk_sha256']==expected and proof['native_source_commit']=='645b0e8b15c45d4c170a8b664073a87cb848b831'
+          assert proof['android_source_commit']=='5a1a427cb5bdcc248b0e2a7887f9d6682ca53877'
+          assert proof['source_commit']==os.environ['SOURCE_SHA'] and proof['signer_certificate_sha256']==os.environ['SIGNER']
+          assert proof['fresh_android_tests']==274 and proof['rc5_optional_host_tests']==17
+          assert proof['complete_native_engine_compiled'] and proof['rc5_trakt_cloud_entry_stop_only'] and proof['rc5_continuity_diagnostic_stop_only']
+          assert proof['rc5_nonoptional_writers_still_required'] and not proof['unknown_writes_abandoned']
+          assert proof['locked_skin']=='1.0.5.211' and lock['lock_status']=='USER_APPROVED_LOCKED_BASELINE'
+          assert lock['android']['sha256']==expected and lock['source']['baseline_signed_package_commit']==os.environ['SOURCE_SHA']
+          print('PASS: SHA-256 and source hashes, Trakt/Continuity stop-only, full engine, 274 Android, 17 native host checks, protected skin')
+          PY
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs -v "release-apk/$APK" > release-signature.txt
+          grep -Fq "$SIGNER" release-signature.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "release-apk/$APK" > release-badging.txt
+          grep -Fq "package: name='com.projectinfinity.kodi' versionCode='2103377' versionName='1.0.9-RC5-Optional-Shutdown-Test'" release-badging.txt
+          printf '%s  %s\n' "$APK_SHA" "$APK" > SHA256SUMS.txt
+      - name: Publish the exact user-approved signed APK as an archival GitHub Release
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Locked release already exists; will verify tag and asset without overwriting.'
+          else
+            gh release create "$TAG" \
+              "release-apk/$APK" \
+              "proof/FINAL-APK-VERIFICATION.json" \
+              "SHA256SUMS.txt" \
+              "release-signature.txt" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$SOURCE_SHA" \
+              --title 'Infinity 2103377 RC5 — LOCKED Mobile Baseline' \
+              --notes-file docs/locks/Infinity-2103377-RC5-Release-Notes.md \
+              --latest
+          fi
+      - name: Verify archived tag targets the exact signed source and release APK hash
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          set -euo pipefail
+          gitref="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq '.object.sha')"
+          test "$gitref" = "$SOURCE_SHA"
+          mkdir -p published
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK" --dir published
+          echo "$APK_SHA  published/$APK" | sha256sum --check
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,isPrerelease,url \
+            > locked-release-verification.json
+          echo 'PASS: GitHub Release tag and downloadable APK match the exact user-approved locked binary'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-RC5-Locked-Archive-Verification
+          path: |
+            SHA256SUMS.txt
+            release-signature.txt
+            release-badging.txt
+            locked-release-verification.json
+          if-no-files-found: warn
+          retention-days: 90
