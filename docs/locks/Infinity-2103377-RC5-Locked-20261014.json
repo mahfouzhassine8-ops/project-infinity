@@ -26,10 +26,13 @@
     "native_engine_commit": "645b0e8b15c45d4c170a8b664073a87cb848b831",
     "android_274_test_commit": "5a1a427cb5bdcc248b0e2a7887f9d6682ca53877",
     "locked_branch": "locked/infinity-2103377-rc5",
-    "release_tag": "infinity-2103377-rc5-locked",
+    "release_tag": "infinity-2103377-rc5-locked (reserved, not published)",
     "original_parent_locked_apk_rollback": 2103376,
     "original_parent_locked_skin_rollback": "1.0.5.211",
-    "source_mutation_to_original_parent": false
+    "source_mutation_to_original_parent": false,
+    "baseline_branch": "baseline/infinity-2103377-rc5",
+    "official_github_release_published": false,
+    "official_github_release_failure": "GitHub Actions integration received HTTP 403 on release creation; does not affect user-approved lock, signed APK, or baseline branch"
   },
   "ci": {
     "native_full_engine": {
@@ -98,5 +101,13 @@
     "preserve_old_2103376_rollback": true,
     "no_unrequested_shutdown_redesign": true,
     "release_status": "LOCKED"
+  },
+  "archive": {
+    "verified_apk_artifact": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38520156095/artifacts/11873162682",
+    "github_artifact_retention_days": 90,
+    "downloadable_locked_bundle": "Infinity-2103377-RC5-LOCKED-BASE.zip",
+    "locked_bundle_sha256": "134a51f5fd09098529e39ad0f3274329d86abb4a59901a26611f4185d6c2fbdb",
+    "locked_bundle_exact_signed_apk_sha256": "44bc7753bbaf474403c628052dd7bed31d77148b29c33f76e36d129e98edce90",
+    "note": "APK copy and proof manifest verified; bundle is available through the user conversation download. No new APK build or signing."
   }
 }
