@@ -55,10 +55,24 @@ def package(args):
     preservation=json.loads((native/'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json').read_text())
     native_commit=os.environ.get('INFINITY_NATIVE_SOURCE_COMMIT',os.environ['GITHUB_SHA'])
     require(proof['source_commit']==native_commit,'Native source commit mismatch')
+    # Independent green native build and preserved 274-test Java donor are
+    # immutable; packaging-only replay may change the workflow commit, never
+    # the compiled runtime inputs or the original source/test provenance.
+    rc2_receipt=json.loads((ROOT/'repairs/shutdown-drain-2103377/RC2-GREEN-SAVED.json').read_text())
+    require(native_commit==rc2_receipt['native']['source_commit'] and
+            rc2_receipt['native']['full_engine_compiled'] and
+            rc2_receipt['native']['extra_rc2_host_checks']==9 and
+            rc2_receipt['android']['pass_count']==274,
+            'RC2 green source/artifact provenance changed')
     if native_commit!=os.environ['GITHUB_SHA']:
         subprocess.run(['git','merge-base','--is-ancestor',native_commit,os.environ['GITHUB_SHA']],check=True)
         delta=set(subprocess.check_output(['git','diff','--name-only',native_commit,os.environ['GITHUB_SHA']],text=True).splitlines())
-        allowed={'repairs/shutdown-final-2103377/package.py','.github/workflows/infinity-2103377-final-shutdown-package.yml'}
+        allowed={
+            'repairs/shutdown-final-2103377/package.py',
+            '.github/workflows/infinity-2103377-drain-rc2-android-preservation.yml',
+            '.github/workflows/infinity-2103377-drain-rc2-green-package.yml',
+            'repairs/shutdown-drain-2103377/RC2-GREEN-SAVED.json',
+        }
         require(delta<=allowed,'Verified native/Java source changed before packaging')
     reuse_path=android/'ANDROID-REUSE-PROOF.json'
     if tests['source_commit']!=os.environ['GITHUB_SHA']:
@@ -90,7 +104,7 @@ def package(args):
             not rc2['checkpoint_save_or_termination_authority_changed'],
             'RC2 optional job safety contract missing')
     native_cases=json.loads((native/'RC2-PRUNE-HOST-TESTS.json').read_text())
-    require(native_cases['tests'] >= 8 and native_cases['tests']==native_cases['passed'],
+    require(native_cases['tests']==9 and native_cases['tests']==native_cases['passed'],
             'RC2 native test cases missing')
     args.out.mkdir(parents=True,exist_ok=True)
     engine=native/'libkodi.so'
@@ -140,6 +154,9 @@ def package(args):
                 native_exports_preserved=True,native_dependencies_preserved=True,
                 locked_skin='1.0.5.211',playlist_browser_changed=False,
                 rc2_optional_pruning=True,rc2_host_tests=native_cases['passed'],
+                rc2_saved_native_run=rc2_receipt['native']['run_id'],
+                rc2_saved_android_run=rc2_receipt['android']['run_id'],
+                rc2_reused_matched_artifacts=True,
                 unknown_writes_abandoned=False,physical_shutdown_verified=False,
                 device_accepted=False,locked=False,**preserved)
     (args.out/'FINAL-APK-VERIFICATION.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
