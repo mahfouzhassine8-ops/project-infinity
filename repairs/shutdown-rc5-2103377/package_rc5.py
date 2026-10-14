@@ -17,7 +17,7 @@ sys.path.insert(0,str(ROOT/'repairs/mobile-regressions-2103304'))
 import package_candidate as factory
 from packaging_checks import require,sha,run,resource_ids,manifest_tree
 PARENT_SHA='8e8e139929592daedb63e0e41040258d655f132fd025b236de7dee1e88b47649'
-NATIVE_PIN='1348b3ff478b7132a50c7298293050f50779080a'
+NATIVE_PIN='6ad2c46d566b92739a665353221e0098718a71e2'
 JAVA_PIN='5a1a427cb5bdcc248b0e2a7887f9d6682ca53877'
 SIGNER='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 
