@@ -21,3 +21,12 @@ This policy **does not guarantee** that an interrupted Trakt HTTP/scrobble opera
 - RC5 native workflow: `38514584184` initially stopped in a **new source assertion** (it expected three identical legacy guards; there are exactly two). Fixed only the assertion, not the native behavioral patch; corrected CI run `38515015273`.
 - Fresh RC5 Android workflow: `38514680851`; all 274 Android tests passed, APK donor packaging still required a final green verification receipt as of initial report.
 - Complete native compilation, signed RC5 APK, and **full-loaded Fold** Close → exit → reopen with **17/17 owner receipts** must be confirmed separately. Green CI is not physical proof. No RC5 lock/promote authorized by test results alone.
+
+## Updated verification checkpoints
+
+- **Android:** `38514680851` — full 274/274 JUnit regression tests and unsigned donor package verification green. Android displayed versionName explicitly identifies RC5.
+- **C++ host tests:** `38516169727` — **17/17** source/preservation cases green. Both the actual `ClassifyScript` body and the real `BeginAndroidCheckpoint` stop broadcast compiled and executed with controlled peers; valid Trakt ID/path and pinned Continuity accepted, spoofed paths rejected, Command Center/compat protected.
+- Native compiled-engine run `38516229281` is the subsequent full rebuild using those host-verified test sources; host results cannot substitute for its engine SHA or for phone exit/relaunch testing.
+- Rejected intermediate native runs `38514584184`, `38515015273` stopped on overly strict test-harness source-string assertions before compiling RC5. The fixes changed only those checks; the two native behavior patches and all approved save-owner code were unchanged. Final native result was not yet available when this section was recorded.
+
+The 17/17 host case count is **not** the 17 mandatory native owners. Only a fully loaded device capture can prove the latter.
