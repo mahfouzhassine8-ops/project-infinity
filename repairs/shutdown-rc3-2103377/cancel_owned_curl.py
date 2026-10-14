@@ -65,16 +65,16 @@ def once(text,old,new,desc):
     if count!=1: raise RuntimeError("Unmatched RC3 source anchor: "+desc+" count="+str(count))
     return text.replace(old,new,1)
 
-def apply(root):
+def apply(root, *, include_invoker=True):
     root=Path(root)
-    inputs={p:(root/p).read_bytes() for p in PIN}
-    if any(hash_bytes(inputs[p])!=PIN[p] for p in PIN):
+    inputs={p:(root/p).read_bytes() for p in PIN if include_invoker or p!=INVOKER}
+    if any(hash_bytes(inputs[p])!=PIN[p] for p in inputs):
         raise RuntimeError("RC3 requires exact green RC2 Python and Curl source hashes")
     header=root/HEADER
     if header.exists():raise RuntimeError("RC3 network owner header already exists")
     curl=inputs[CURL].decode()
     curl_header=inputs[CURL_H].decode()
-    python=inputs[INVOKER].decode()
+    python=inputs[INVOKER].decode() if include_invoker else None
     curl=once(curl, '#include "CurlFile.h"\n',
         '#include "CurlFile.h"\n#if defined(TARGET_ANDROID)\n'
         '#include "InfinityCloseNetworkGate.h"\n#endif\n',
@@ -127,28 +127,31 @@ def apply(root):
     if (m_cancelled)
       return FILLBUFFER_NO_DATA;'''
     curl=once(curl,marker,replacement,"Curl buffered read cancellation check")
-    python=once(python,'#include "PythonInvoker.h"\n',
-        '#include "PythonInvoker.h"\n#if defined(TARGET_ANDROID)\n'
-        '#include "filesystem/InfinityCloseNetworkGate.h"\n#endif\n',
-        "Python invoker include")
-    python=once(python,'  m_sourceFile = script;\n',
-        '''  m_sourceFile = script;
-#if defined(TARGET_ANDROID)
-  // Exactly bind this executing Python service's add-on ID for native HTTP
-  // reads. No AST inspection, tracer dependency or global network ban.
-  InfinityCloseNetworkGate::ScopedOwner infinityNetworkOwner(
-      m_addon ? m_addon->ID() : std::string{});
-#endif
-''',
-        "Python interpreter worker identity binding")
-    outputs={CURL:curl.encode(),CURL_H:curl_header.encode(),INVOKER:python.encode(),HEADER:HEADER_SOURCE.encode()}
+    if include_invoker:
+            python=once(python,'#include "PythonInvoker.h"\n',
+            '#include "PythonInvoker.h"\n#if defined(TARGET_ANDROID)\n'
+            '#include "filesystem/InfinityCloseNetworkGate.h"\n#endif\n',
+            "Python invoker include")
+        python=once(python,'  m_sourceFile = script;\n',
+            '''  m_sourceFile = script;
+    #if defined(TARGET_ANDROID)
+      // Exactly bind this executing Python service's add-on ID for native HTTP
+      // reads. No AST inspection, tracer dependency or global network ban.
+      InfinityCloseNetworkGate::ScopedOwner infinityNetworkOwner(
+          m_addon ? m_addon->ID() : std::string{});
+    #endif
+    ''',
+            "Python interpreter worker identity binding")
+    outputs={CURL:curl.encode(),CURL_H:curl_header.encode(),HEADER:HEADER_SOURCE.encode()}
+    if include_invoker: outputs[INVOKER]=python.encode()
     for p,data in outputs.items():
         target=root/p
         target.parent.mkdir(parents=True,exist_ok=True)
         target.write_bytes(data)
     return {
       "before":PIN,"after":{p:hash_bytes(v) for p,v in outputs.items()},
-      "changed":sorted(PIN),"added":[HEADER],
+      "changed":sorted(p for p in PIN if include_invoker or p!=INVOKER),"added":[HEADER],
+      "full_python_invoker_bound":include_invoker,
       "scope":"Targeted HTTP(S) native Curl read only for verified Playlist Browser owner when native Close active; OpenForWrite unaffected",
       "ordinary_running_unchanged":True,
       "unverified_addon_writes_abandoned":False,
