@@ -104,3 +104,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser()
     for name in ['native','parent','receipts','smoke','out']:p.add_argument('--'+name,type=Path,required=True)
     package(p.parse_args())
+
+# RC02 native is gated on run 38627196228 and the preserved real Kodi smoke.
