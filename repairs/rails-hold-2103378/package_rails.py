@@ -36,7 +36,9 @@ def package(args):
     assert parent_receipt['source_commit']=='eafaab0d21c1cb20646b08dfe28fea7f769d56e9'
     assert parent_receipt['signer_certificate_sha256']==CERT
     assert parent_receipt['fresh_android_tests']==274
-    smoke=load(args.smoke/'rail-smoke-result.json')
+    smoke_files=list(args.smoke.rglob('rail-smoke-result.json'))
+    assert len(smoke_files)==1,smoke_files
+    smoke=load(smoke_files[0])
     assert smoke['passed'] and smoke['back_dismisses_and_clears_guard'] and smoke['open_action_runs_real_plugin']
     args.out.mkdir(parents=True,exist_ok=True)
     ndk=Path(os.environ['ANDROID_HOME'])/'ndk'/os.environ['NDK_VER']/'toolchains/llvm/prebuilt/linux-x86_64/bin'
