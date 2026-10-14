@@ -1,0 +1,47 @@
+{
+  "lock_id": "Infinity-Skin-1.0.5.223-Addon-Browser-Polish-20261014",
+  "status": "USER_APPROVED_LOCK",
+  "user_approval": "2026-10-14: explicit 'Lock' after candidate delivery",
+  "scope": "Skin-only Add-on Browser, Recently Updated, Select ZIP and related installer/browser presentation",
+  "skin_id": "skin.infinity.diggz",
+  "version": "1.0.5.223",
+  "exact_package": {
+    "filename": "skin.infinity.diggz-1.0.5.223-Addon-Browser-Polish-RC1-TEST.zip",
+    "sha256": "557003afc83a2661fec6ccef921979e264ff28e93595fb633340c618ab69bd56"
+  },
+  "source_verification": {
+    "filename": "Infinity-Addon-Browser-223-Source-and-Verification.zip",
+    "sha256": "04cfe776ded94625c20bd788f05711c2bb4e5c52deec56604d5cad800cb08a0d",
+    "original_candidate_branch": "work/infinity-skin223-addon-browser-polish",
+    "original_candidate_commit": "46a7a64a5be8ead27b4d0aa562fe316f39154a42"
+  },
+  "parent": {
+    "version": "1.0.5.222",
+    "filename": "skin.infinity.diggz-1.0.5.222-Mocha-Rails-RECOVERED-RC2-TEST.zip",
+    "sha256": "db494e0b479859190c041494ff68e0c0e38d6b0f482dc65840a0a7fc0227da03",
+    "protected_previous_lock_branch": "locked/infinity-rails-mocha-20261014",
+    "protected_previous_lock_commit": "35b210fe191c1fb3361e91b7e405f5532f73236c"
+  },
+  "companion_locked_versions": {
+    "apk_version_code": 2103377,
+    "apk_version_name": "1.0.9-Rails-Hold-Correction-RC02",
+    "apk_sha256": "17e2458552b7dbb8f14dad307015eafc2497a5ec6ddc4f7bb1707d975f37b906",
+    "rails_helper_version": "0.2.5",
+    "rails_helper_sha256": "4e921d3148862eeeec9507e4c7be857419908452ae003ab6e9d9409a2dfc85c0"
+  },
+  "verification": {
+    "host_tests_passed": 30,
+    "host_tests_failed": 0,
+    "package_zip_crc": "pass",
+    "skin_addon_id_and_version": "verified",
+    "unchanged_original_skin_files": 2989,
+    "changed_original_skin_files": 43,
+    "new_skin_files": 23,
+    "deleted_original_skin_files": 0,
+    "apk_changed": false,
+    "helper_changed": false
+  },
+  "physical_acceptance": "Explicit user approval to lock; no specific post-install device screenshot or full interaction test supplied for 1.0.5.223. Do not claim every picker and browser action has passed.",
+  "artifacts_location": "ChatGPT Library /Infinity Locks/Addon Browser Polish 1.0.5.223/",
+  "preservation_policy": "Keep this candidate checkpoint immutable. Future work must build forward from exact 1.0.5.223 package. Preserve prior .222 Mocha, .215 corrections, APK 2103377 and helper 0.2.5. Never revert to .211. No data clearing. User authorization required for further repairs."
+}
