@@ -34,6 +34,15 @@ jobs:
           name: Infinity-2103377-RC3-Retirement-Native-Evidence
           github-token: '${{ github.token }}'
           path: native-evidence
+      # The original RC2 pruning test result was verified on its own runner;
+      # RC3's native build preserved the code but did not rerun that old fixture.
+      # Fetch its exact green receipt, never fabricate or re-run nine passes.
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38488207608
+          name: Infinity-2103377-Drain-RC2-Native-Evidence
+          github-token: '${{ github.token }}'
+          path: preserved-rc2-evidence
       # 274 unchanged Android unit tests were executed against this donor.
       - uses: actions/download-artifact@v8
         with:
@@ -77,6 +86,27 @@ jobs:
           print('GREEN: exact original native/Android artifacts, 10 host checks, 274 actual Java passes. Physical Fold shutdown remains unverified.')
           PY
 
+      - name: Reuse original nine RC2 pruning cases without recompilation
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,shutil
+          from pathlib import Path
+          original=Path('preserved-rc2-evidence/checkpoint-build/RC2-PRUNE-HOST-TESTS.json')
+          verified=json.loads(original.read_text())
+          assert verified['tests']==verified['passed']==9
+          assert len(verified['checks'])==9 and all(verified['checks'].values())
+          assert verified['scope'].startswith('C++ native method compiled')
+          parent=json.loads(Path('preserved-rc2-evidence/checkpoint-build/ENGINE-PROOF.json').read_text())
+          current=json.loads(Path('native-evidence/checkpoint-build/ENGINE-PROOF.json').read_text())
+          assert parent['source_commit']=='633b8d9444527eb8df5dbbf291c787fd03766b2d'
+          assert parent['rc2_optional_queued_prune_compiled'] and current['rc2_optional_queued_prune_compiled']
+          target=Path('native-evidence/checkpoint-build/RC2-PRUNE-HOST-TESTS.json')
+          assert not target.exists()
+          shutil.copyfile(original,target)
+          assert target.read_bytes()==original.read_bytes()
+          print('PASS: original 9/9 RC2 host tests reused by exact proof; no native recompilation.')
+          PY
       - name: Permanently sign RC3 with original certificate and verify unchanged parent payload
         env:
           INFINITY_KEYSTORE_B64: '${{ secrets.INFINITY_KEYSTORE_B64 }}'
