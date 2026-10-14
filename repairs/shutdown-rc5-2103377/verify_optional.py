@@ -66,7 +66,7 @@ def check(root):
     assert m.count("VerifiedCheckpointContract(")>=6
     cases["new_contracts_do_not_enter_foreign_writer_ledger"]=True
 
-    assert "if (!s.writers.empty())return false;" in persistence
+    assert "if(!s.writers.empty())return false;" in persistence
     assert "if(!found->second.observed)return;" in persistence
     assert "inline bool PollCommit()" in persistence
     assert "script_file_sync_or_identity_failed" in persistence
