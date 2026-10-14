@@ -81,7 +81,7 @@ def verify(root,out):
     assert patch_native.METHOD in text
     input_text=(root/'xbmc/input/InputManager.cpp').read_text()
     assert patch_native.DISPATCH in input_text
-    assert input_text.index('INFINITY_RAIL_HOLD_V1') < input_text.index('m_touchTranslator->TranslateTouchAction',input_text.index('case XBMC_TOUCH:'))
+    assert input_text.index('INFINITY_RAIL_HOLD_V2') < input_text.index('m_touchTranslator->TranslateTouchAction',input_text.index('case XBMC_TOUCH:'))
     with tempfile.TemporaryDirectory() as tmp:
         tmp=Path(tmp);cpp=tmp/'test.cpp';binary=tmp/'test'
         cpp.write_text(HARNESS+patch_native.METHOD+CASES)
