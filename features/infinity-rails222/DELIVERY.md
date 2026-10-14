@@ -15,11 +15,11 @@
 
 ## New Mocha design package (delivered as chat artifacts)
 - Skin `skin.infinity.diggz-1.0.5.222-Mocha-Rails-RC2-TEST.zip`
-  SHA256: `07c915bf498957e7da8bd9040ce87665b8352b3e6c79758c8a854c39ef462846`
+  SHA256: `f44ba08b3838b3dd56bc04403b8a7c470e881c001d03f5c4d378a3a2b81f35d1`
 - Helper `script.infinity.rails-0.2.5-Mocha-Rails-RC2-TEST.zip`
   SHA256: `5219ca62141c4b570765c405dbac5f5f026da7ccd56c2c9bd3ac96329f31403b`
 - Source archive: `Infinity-Rails-Mocha-RC2-Source-and-Verification.zip`
-  supplied in this conversation for audit/build continuation (contains only new XML, icons, helper changes, tests, source and approved screenshot; no standalone fonts).
+  SHA256 `2a2d1178af5f8b20321aae909f28fb67a1af5cc6133846d3f68d41962753e4a8`; supplied in this conversation for audit/build continuation (contains only new XML, icons, helper changes, tests, source and approved screenshot; no standalone fonts).
 
 **UI contract:** The exact user-approved `Infinity_Rail_Options_Mockup.png` is the visual target. Popup is anchored conceptually to the selected Movie/TV Show rail card, with a pearl glass panel, cyan-blue outline and highlighted Move, add-on artwork/name, red shortcut-only Remove, Settings where supported, Cancel/X, blue accents, responsive Light/Dark/OLED. Menu appears only upon intentional rail long-press; single tap launches and swipe scrolls. WindowXMLDialog fallback is disabled when .222 XML is unavailable; Kodi's own readable Dialog.select remains fallback.
 
