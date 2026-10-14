@@ -26,6 +26,7 @@ def apply(build,folder):
     before=dict(proof["after"])
     for p,sha in early_blocker_ui.PINS.items():
         assert before.get(p)==sha,("Unapproved RC3 Android source",p)
+    original_templates={p:(source/p).read_text() for p in early_blocker_ui.PINS}
     result=early_blocker_ui.apply(source)
     for path,expected in result["after"].items():
         assert digest(source/path)==expected
@@ -38,10 +39,15 @@ def apply(build,folder):
             template=template.replace("@"+marker+"@",value)
         target=build/"xbmc/java/com/projectinfinity/kodi"/Path(path).name.removesuffix(".in")
         assert target.exists(),target
-        original=(folder/"green-source/source"/path)
-        # Initial Java build contains approved 274 source, not a different app.
-        prior=(folder/"source"/path).read_text()
-        assert digest(target)==digest(target) # hash is checked below after staging
+        expected_original=original_templates[path]
+        for marker,value in {
+          "APP_PACKAGE":"com.projectinfinity.kodi",
+          "APP_NAME":"Kodi",
+          "APP_NAME_LC":"kodi"
+        }.items():
+            expected_original=expected_original.replace("@"+marker+"@",value)
+        # Require exact reviewed original Java before introducing RC3 delta.
+        assert target.read_text()==expected_original,("RC3 Java donor mismatch",path)
         target.write_text(template)
         assert target.read_text()==template
     new=dict(before)
