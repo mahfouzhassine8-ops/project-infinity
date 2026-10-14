@@ -60,7 +60,7 @@ def apply(build,folder):
     proof["rc3_recovery_apk_unsigned"]=True
     proof_path.write_text(json.dumps(proof,indent=2,sort_keys=True)+"\n")
     (folder/"RC3-ANDROID-DELTA.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
-    print("PASS RC3 Android source staging: two guarded Java templates, all 274 test sources unchanged")
+    print("PASS RC4 Android source staging: guarded notice correction; all 274 test sources unchanged")
 
 def verify(build,folder):
     build=Path(build);folder=Path(folder)
@@ -72,7 +72,7 @@ def verify(build,folder):
     assert status["runtime_source_matches_candidate"]
     assert status["compiled_java_inputs_match_candidate"]
     assert result["no_force_exit_without_explicit_user"]
-    assert result["recovery_grace_ms"]==2500
+    assert result["recovery_grace_ms"]==6500
     assert result["no_recents_navigation_changes"]
     donor=folder/"donor.apk"
     assert donor.is_file() and donor.stat().st_size>1000000
@@ -81,12 +81,13 @@ def verify(build,folder):
       "verified_unmodified_274_cases":274,"tests_freshly_executed":True,
       "rc3_two_java_templates_only":True,
       "targeted_recovery_notice":True,
-      "grace_ms":2500,"no_automatic_force_close":True,
+      "rc4_live_pending_writers":True,
+      "grace_ms":6500,"no_automatic_force_close":True,
       "donor_sha256":digest(donor),
       "source_hashes":result["after"],
       "physical_shutdown_verified":False,"locked":False}
     (folder/"RC3-ANDROID-VERIFICATION.json").write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
-    print("PASS RC3 Android: all 274 tests, matching compiled Java, unchanged test membership, donor APK produced")
+    print("PASS RC4 Android: all 274 tests, matching compiled Java, unchanged test membership, donor APK produced")
 
 if __name__=="__main__":
     cli=argparse.ArgumentParser()
