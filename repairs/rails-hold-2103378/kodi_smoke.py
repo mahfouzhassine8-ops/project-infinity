@@ -36,7 +36,18 @@ try:
     Store(profile).add('plugin.video.infinityrailfixture',['tvshows'],{'movies':[],'tvshows':[]})
     # Close only disposable first-run welcome dialogs. No skin switch is needed:
     # setup installed the fixture Home into this runner's stock Estuary skin.
-    xbmc.executebuiltin('Dialog.Close(all,true)')
+    checks['startup_dialogs']=[]
+    for attempt in range(6):
+        dialog=xbmcgui.getCurrentWindowDialogId()
+        if dialog==9999:break
+        labels={}
+        for cid in [1,2,3,9,10,11]:
+            try:labels[str(cid)]=xbmcgui.Window(dialog).getControl(cid).getLabel()
+            except (RuntimeError,AttributeError):pass
+        checks['startup_dialogs'].append({'id':dialog,'labels':labels})
+        assert dialog==10100,checks['startup_dialogs']
+        xbmc.executebuiltin('SendClick(10100,10)')
+        xbmc.sleep(500)
     xbmc.executebuiltin('ActivateWindow(Home)')
     xbmc.sleep(500)
     wait(lambda:xbmcgui.getCurrentWindowDialogId()==9999)
