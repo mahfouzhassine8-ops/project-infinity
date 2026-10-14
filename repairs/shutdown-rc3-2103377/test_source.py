@@ -24,6 +24,7 @@ def imported(name):
 
 def check(root):
     early=imported("early_local_snapshot")
+    stop=imported("early_retirement")
     curlfix=imported("cancel_owned_curl")
     cases={}
     with tempfile.TemporaryDirectory(prefix="infinity-rc3-host-") as scratch:
@@ -32,6 +33,7 @@ def check(root):
             early.SOURCE,
             curlfix.CURL,
             curlfix.CURL_H,
+            stop.SCRIPT_MANAGER,
         ]:
             original=Path(root)/source
             assert original.is_file(),original
@@ -39,6 +41,7 @@ def check(root):
             target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(original,target)
         er=early.apply(tmp)
+        sr=stop.apply(tmp,er["after"])
         cr=curlfix.apply(tmp,include_invoker=False)
         assert er['early_snapshot_confers_durability_receipt'] is False
         assert cr['required_saves_waived'] is False
@@ -58,12 +61,29 @@ def check(root):
         assert changed.index('Operation("favourites");') > changed.index('Operation("python_services");')
         assert 'earlyLocalSnapshotAttempted=false;' in changed
         cases['early_save_before_python_with_final_barrier_retained']=True
+        request=changed[changed.index('bool Request('):changed.index('std::string Status(')]
+        assert request.count('BeginAndroidCheckpoint();')==1
+        assert request.index('BeginShutdown();')<request.index('AndroidCheckpointUnresolvedWriters();')<request.index('BeginAndroidCheckpoint();')
+        assert request.index('BeginAndroidCheckpoint();')<request.index('s.requestReady = true;')
+        assert changed.count('BeginAndroidCheckpoint();')==1
+        assert sr['first_stop_before_playback_checkpoint'] and not sr['required_writer_retirement_waived']
+        cases['early_python_abort_latched_before_playback_and_writer_proof_untouched']=True
+        manager=(tmp/stop.SCRIPT_MANAGER).read_text()
+        assert 'if (m_androidCheckpointRetirementArmed)' in manager
+        assert manager.count('CServiceBroker::GetXBPython().NotifyScriptAborting(thread.get());')==1
+        assert manager.count('invoker->Stop(false);')==1
+        assert 'contract.rfind("nonpersistent:"' in manager
+        cases['same_monitor_and_legacy_abort_paths_idempotent']=True
         nativeCurl=(tmp/curlfix.CURL).read_text()
         assert nativeCurl.count('m_state->m_infinityHttpRead = false;')==1
         assert nativeCurl.count('m_state->m_infinityHttpRead = url.GetProtocol()')==1
         assert nativeCurl.count('m_cancelled = true;')>=1
         assert nativeCurl.count('rc3.playlist_read_cancelled_in_poll')==1
         assert nativeCurl.count('rc3.playlist_read_rejected_at_open')==1
+        assert nativeCurl.count('return FILLBUFFER_FAIL; // I/O failure is not successful EOF.')==1
+        assert nativeCurl.count('multi_poll(m_multiHandle, 200, &ready)')==1
+        assert nativeCurl.count('if (m_state->m_infinityCheckpointCancelledRead)')==1
+        cases['curl_io_failure_instead_of_eof_and_existing_200ms_poll']=True
         cases['http_read_only_write_api_excluded']=True
         # Extract inserted operational C++ statements exactly, rather than
         # writing a competing hand-coded model with weaker behavior.
@@ -102,10 +122,12 @@ struct CURL {
 };
 struct CReadState {
   bool m_infinityHttpRead=false;
+  bool m_infinityCheckpointCancelledRead=false;
   bool m_cancelled=false;
   int FillBuffer();
 };
 constexpr int FILLBUFFER_NO_DATA=0;
+constexpr int FILLBUFFER_FAIL=2;
 class CCurlFile {
 public:
   CReadState m_value;
@@ -143,8 +165,9 @@ int main() {
     assert(file.OpenForWrite(CURL{"http"},true));
     assert(!file.m_state->m_infinityHttpRead);
     file.m_state->m_infinityHttpRead=true;
-    assert(file.m_state->FillBuffer()==0);
+    assert(file.m_state->FillBuffer()==2); // Real I/O failure, not EOF.
     assert(file.m_state->m_cancelled);
+    assert(file.m_state->m_infinityCheckpointCancelledRead);
   }
   // Nested identity must return to prior owner.
   {InfinityCloseNetworkGate::ScopedOwner context("script.trakt");
