@@ -63,7 +63,7 @@ jobs:
           # This is a hash-identical archive, not a rebuild: verify the original
           # signer/badging reports produced by green run 38520156095. Requiring
           # a fresh SDK install to archive already-tested bytes is unnecessary.
-          cp "proof/$APK.signing.txt" release-signature.txt
+          cp "proof/${APK%.apk}.signing.txt" release-signature.txt
           cp proof/badging.txt release-badging.txt
           grep -Fq "$SIGNER" release-signature.txt
           grep -Fq "Verified using v2 scheme (APK Signature Scheme v2): true" release-signature.txt
