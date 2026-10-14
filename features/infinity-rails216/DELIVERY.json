@@ -1,0 +1,80 @@
+{
+  "feature": "Infinity Custom Add-on Rails",
+  "status": "RC1 host-tested candidate; physical-device acceptance pending; NOT LOCKED",
+  "baseline_skin": "1.0.5.215",
+  "candidate_skin": "1.0.5.216",
+  "baseline_record_commit": "85b1305ef7a220dd23aaeb40c7d38150b8da4a92",
+  "baseline_filename": "skin.infinity.diggz-1.0.5.215-CommandCenter-Settings-Readability-RC1-TEST.zip",
+  "baseline_sha256": "486aa86c8f8dcda31d80c6d058f4b96154dcb2b3f1a18cfa464c65e280ec7e70",
+  "baseline_211_permitted": false,
+  "helper_id": "script.infinity.rails",
+  "helper_version": "0.1.0",
+  "package_filename": "script.infinity.rails-0.1.0-Skin216-RC1-TEST.zip",
+  "package_bytes": 398248,
+  "package_sha256": "fca0179355ccc0a899ea8dfd9d79ef17799e1cc8d4fc7cda89adc303509cd602",
+  "delivery_type": "single Kodi Program/context/plugin helper ZIP with explicit-consent XML/metadata skin delta; no full skin binary/font repackaging",
+  "installation": [
+    "Install the helper ZIP in Infinity.",
+    "Open My add-ons > Program add-ons > Infinity Add-on Rails > Run.",
+    "Select Apply skin update: .215 to .216 and approve the confirmation.",
+    "Wait for SKIN .216 UPDATED AND VERIFIED, then press OK to reload the skin."
+  ],
+  "install_alone_applies_skin": false,
+  "rollback": "Program add-ons > Infinity Add-on Rails > Run > Restore .215 skin (keep rail choices). Restores the exact backed-up changed .215 files, not .211. Refuses unknown/newer current files.",
+  "features": [
+    "Native Kodi add-on context item Add to Infinity Rails",
+    "Movie Add-ons, TV Show Add-ons, or Both rails",
+    "Shared profile-local customizations across all four modes",
+    "Custom card removal without changing the installed add-on",
+    "Move/reorder before built-in or custom cards, or at the end",
+    "Actual installed add-on identity, name, icon and enabled/video eligibility",
+    "Duplicate prevention, unavailable add-on preference retention",
+    "Atomic fsync persistence, bounded lock and abort handling",
+    "No background service, polling, networking or startup hook"
+  ],
+  "view_modes": {
+    "normal": "existing add-on rail",
+    "compact": "existing add-on rail",
+    "twopane": "existing add-on rail",
+    "cinema": "existing Menu > More menus horizontal shortcut row; all original menu actions retained"
+  },
+  "tests": {
+    "total": 182,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "scope": "host tests: actual extracted .215 skin delta application/full-file rollback, XML preservation and simulated Kodi API integration",
+    "storage_catalog_installer": 78,
+    "simulated_kodi_runtime": 19,
+    "skin_preservation": 85,
+    "python_3_11_grammar": "passed",
+    "packaged_helper_matches_tested_source": true
+  },
+  "preservation": {
+    "original_skin_files": 2978,
+    "changed_existing_files": 27,
+    "byte_identical_original_files": 2951,
+    "new_skin_xml_files": 18,
+    "deleted_original_files": 0,
+    "profiles": 14,
+    "existing_shortcut_sources_preserved": true,
+    "existing_skin_python_and_shutdown_sources_preserved": true,
+    "command_center_and_settings_dialogs_preserved": true
+  },
+  "apk_changed": false,
+  "command_center_resource_repair_changed": false,
+  "physical_device_verified": false,
+  "live_kodi_verified": false,
+  "github_actions_run": null,
+  "production_locked": false,
+  "source_delivery": {
+    "filename": "Infinity-Skin216-Rails-Source-and-Verification.zip",
+    "bytes": 534515,
+    "sha256": "8c4410637b5307774ac4e4ecd24a3230f216b04763afc13d7c13a4babe9df6a7",
+    "location": "delivered conversation artifact; retrieve this exact named file from the user's Library for continuation",
+    "contents": "plain helper source, XML delta payload, builder, all 182 tests, baseline file fingerprints, final test log, installation/rollback instructions and verification receipts",
+    "contains_baseline_zip_fonts_or_user_data": false,
+    "repository_scope_of_this_commit": "provenance/delivery receipt only; implementation source is in the supplied source artifact, not in this commit"
+  },
+  "resume_instructions": "Use the exact source artifact and exact .215 baseline hashes above. Never reconstruct from .211. Extract the source artifact, place the baseline ZIP under baseline/, run python3 work/tools/build_delta.py baseline/skin.infinity.diggz-1.0.5.215-CommandCenter-Settings-Readability-RC1-TEST.zip then python3 -m unittest discover -s work/tests -v. Do not claim host tests establish live Fold behavior. Do not lock without explicit user approval."
+}
