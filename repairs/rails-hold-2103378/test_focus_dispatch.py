@@ -103,3 +103,5 @@ def verify(root,out):
 if __name__=='__main__':
     import sys
     verify(sys.argv[1],sys.argv[2])
+
+# CI gate: verify first hold with Home focus on a non-rail button.
