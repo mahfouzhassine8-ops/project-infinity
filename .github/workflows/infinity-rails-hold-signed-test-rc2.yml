@@ -98,7 +98,7 @@ jobs:
           python3 repairs/rails-hold-2103378/package_rails.py \
             --parent parent-apk/Infinity-2103377-RC5-Optional-Shutdown-Signed-Test.apk \
             --receipts parent-receipts --native native-evidence --smoke real-kodi --out rails-delivery
-          cp repairs/rails-hold-2103378/README.md rails-delivery/INSTALL-AND-ROLLBACK.md
+          cp features/infinity-rails222/INSTALL-AND-ROLLBACK.md rails-delivery/INSTALL-AND-ROLLBACK.md
       - uses: actions/upload-artifact@v7
         if: success()
         with:
