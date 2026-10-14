@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.infinity.rails" version="0.2.3" name="Infinity Add-on Rails" provider-name="Infinity">
+<addon id="script.infinity.rails" version="0.2.4" name="Infinity Add-on Rails" provider-name="Infinity">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.python.script" library="default.py"><provides>executable</provides></extension>
   <extension point="xbmc.python.pluginsource" library="plugin.py"><provides>executable</provides></extension>
@@ -13,7 +13,7 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Customize Infinity Movie and TV Show Add-on Rails.</summary>
-    <description lang="en_GB">Infinity Rails directory input routing RC5 TEST. On-demand rail shortcuts, context actions and profile-local saved ordering. Install the full Infinity 1.0.5.218 skin ZIP after this helper. No skin patching, startup hook, service or native changes. Device acceptance pending.</description>
+    <description lang="en_GB">Infinity Rails hold test. Receives an exact native hit-tested shortcut identity and opens Rail Options. Requires the separately authorized Rails hold test APK for first-hold routing. On-demand only; existing saved rail preferences are preserved. Physical Fold acceptance pending.</description>
     <platform>android linux osx</platform>
     <license>GPL-2.0-or-later</license>
     <assets><icon>resources/icon.png</icon></assets>

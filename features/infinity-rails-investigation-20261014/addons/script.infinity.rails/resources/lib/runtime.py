@@ -266,6 +266,38 @@ def manage(section):
             card_action(actions[choice][1], section, row['key'])
 
 
+def options(section, token, expected_addon):
+    """Native hit-test receipt: resolve the immutable key, never current selection."""
+    xbmc, xa, gui, vfs, root, profile, monitor = setup()
+    if monitor.abortRequested() or not need_candidate(xa, gui):
+        return
+    if (gui.getCurrentWindowId() != 10000 or
+            gui.getCurrentWindowDialogId() != 9999 or
+            xbmc.getInfoLabel('Container(9000).ListItem.Property(section)') != section):
+        return
+    row = selected_card(section, token)
+    if row['addon_id'] != expected_addon:
+        raise RailError('The held shortcut changed. Hold the card again.')
+    home = gui.Window(10000)
+    active = 'Infinity.Rails.OptionsActive'
+    if home.getProperty(active) == 'true':
+        return
+    home.setProperty(active, 'true')
+    try:
+        xbmc.log('Infinity Rails options: section='+section+' key='+token+
+                 ' addon='+expected_addon, xbmc.LOGINFO)
+        actions = [('Open Add-on', 'open'), ('Move / Reorder', 'move')]
+        if row['custom']:
+            actions.append(('Remove from Rail', 'remove'))
+        if has_settings(row['addon_id'], xa, vfs):
+            actions.append(('Add-on Settings', 'settings'))
+        choice = select('INFINITY — RAIL OPTIONS', [a[0] for a in actions]+['Cancel'], row['label'])
+        if choice is not None and 0 <= choice < len(actions):
+            card_action(actions[choice][1], section, token)
+    finally:
+        home.clearProperty(active)
+
+
 def inspect_rails():
     """Read-only snapshot with explicit current-window eligibility."""
     from .input_status import collect
@@ -341,6 +373,7 @@ def plugin(argv=None):
             li.setProperty('Addon.ID', row['addon_id'])
             li.setProperty('Addon.Name', row['label'])
             li.setProperty('Infinity.Rails.Item','true')
+            li.setProperty('Infinity.Rails.HoldVersion','1')
             li.setProperty('Infinity.Rails.Section',section)
             li.setProperty('Infinity.Rails.Key',row['key'])
             li.setProperty('IsPlayable','false')
@@ -389,6 +422,8 @@ def main(args=None):
             section = args[1] if len(args)>1 else ''
             if action == 'manage' and section in SECTIONS:
                 manage(section)
+            elif action == 'options' and section in SECTIONS and len(args)==4:
+                options(section, args[2], args[3])
             elif action in ('open','settings','move','remove') and len(args)==3:
                 card_action(action,section,args[2])
             else:
