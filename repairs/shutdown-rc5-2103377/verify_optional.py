@@ -163,7 +163,7 @@ int main() {
 #include <string>
 #include <vector>
 using CCriticalSection=std::mutex;
-struct Invoker {unsigned calls=0;bool Stop(bool wait){assert(!wait);++calls;return true;}};
+struct Invoker {int GetId() const {return 1;} unsigned calls=0;bool Stop(bool wait){assert(!wait);++calls;return true;}};
 struct Thread {
   unsigned notifications=0,releases=0;
   std::shared_ptr<Invoker> inv=std::make_shared<Invoker>();
@@ -174,6 +174,8 @@ using CLanguageInvokerThreadPtr=std::shared_ptr<Thread>;
 struct Record {std::string script;CLanguageInvokerThreadPtr thread;bool done;std::string checkpointContract;};
 struct Python {void NotifyScriptAborting(Thread* thread){++thread->notifications;}};
 struct CServiceBroker {static Python& GetXBPython(){static Python p;return p;}};
+// Observe the existing RC3 VFS notification without changing runtime behavior.
+namespace InfinityVfsOpenTrace { inline void Request(int,const char*) {} }
 std::string VerifiedCheckpointContract(const std::string&,
     const CLanguageInvokerThreadPtr&,const std::string& value){return value;}
 struct CScriptInvocationManager {
