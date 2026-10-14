@@ -4,7 +4,9 @@ on:
     branches: [work/infinity-rails-hold-2103378]
     paths:
       - '.github/workflows/infinity-2103378-rails-native.yml'
-      - 'repairs/rails-hold-2103378/**'
+      - 'repairs/rails-hold-2103378/native_ci.py'
+      - 'repairs/rails-hold-2103378/patch_native.py'
+      - 'repairs/rails-hold-2103378/test_native.py'
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-2103378-rails-native, cancel-in-progress: false}
 env:
