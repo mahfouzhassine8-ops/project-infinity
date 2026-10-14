@@ -54,7 +54,7 @@ def check(root):
     assert "python_services" in required and "trakt" not in required and "continuity" not in required
     cases["seventeen_native_required_owners_preserved"]=True
 
-    assert m.count('if (checkpointContract.empty())')>=3
+    assert m.count('if (checkpointContract.empty())')==2
     assert m.count("InfinityScriptPersistence::Admit(")==2
     assert 'contract.rfind("stop-only:", 0) == 0' in m
     assert "if (m_androidCheckpointRetirementArmed)" in m
