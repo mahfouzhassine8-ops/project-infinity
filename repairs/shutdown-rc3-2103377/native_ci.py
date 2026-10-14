@@ -16,6 +16,7 @@ HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
 sys.path.insert(0,str(HERE))
 import early_local_snapshot
+import early_retirement
 import cancel_owned_curl
 
 def import_rc2():
@@ -53,10 +54,14 @@ def prepare(args):
     final_save_stage=part(original_checkpoint,"    if (s.stage == 5)\n","    if (s.stage == 6)\n")
     final_seal_stage=part(original_checkpoint,"    if (s.stage == 6)\n","}\n} // namespace InfinityAndroidCheckpoint")
     er=early_local_snapshot.apply(src)
+    # Retire generic Python services immediately after native Close Request;
+    # the existing resident Command Center/compat participants remain active.
+    retirement=early_retirement.apply(src,er["after"])
     cr=cancel_owned_curl.apply(src)
     after=dict(old);after.update({early_local_snapshot.SOURCE:er["after"]})
+    after.update(retirement["after"])
     after.update(cr["after"])
-    changed=sorted(set(manifest["changed"])|set(er["changed"])|set(cr["changed"]))
+    changed=sorted(set(manifest["changed"])|set(er["changed"])|set(retirement["changed"])|set(cr["changed"]))
     added=sorted(set(manifest["added"])|set(cr["added"]))
     manifest.update(after=after,changed=changed,added=added)
     save(manifest_path,manifest)
@@ -83,6 +88,8 @@ def prepare(args):
         "final_required_save_and_database_seal_stages_byte_identical":True,
         "provisional_early_save_only":True,
         "rc3_native_http_read_only_owner_gate":True,
+        "rc3_python_abort_at_close_request":True,
+        "rc3_monitor_sleep_source_verification_pending":True,
         "unknown_writes_abandoned":False,
         "playlist_browser_addon_files_modified":False,
         "Trakt_provider_sources_modified":False,
@@ -91,6 +98,7 @@ def prepare(args):
     save(ROOT/"checkpoint-build/FINAL-SHUTDOWN-SOURCE-PRESERVATION.json",checkpoint_proof)
     save(ROOT/"checkpoint-build/RC3-EARLY-LOCAL-SNAPSHOT-DELTA.json",er)
     save(ROOT/"checkpoint-build/RC3-CURL-OWNER-CANCEL-DELTA.json",cr)
+    save(ROOT/"checkpoint-build/RC3-EARLY-PYTHON-ABORT-DELTA.json",retirement)
     print("RC3 staged: early provisional local saves, owner-specific HTTP read cancellation, 17 required final owners unchanged.")
 
 def compile_engine():
@@ -102,6 +110,7 @@ def compile_engine():
         b"rc3.early_local_snapshot",
         b"rc3.playlist_read_rejected_at_open",
         b"rc3.playlist_read_cancelled_in_poll",
+        b"rc3.python_abort_requested_at_close",
         b"plugin.video.playlistbrowser",
         b"jobs.optional_queued_pruned",
     ]:
@@ -110,11 +119,16 @@ def compile_engine():
     er=read(build/"RC3-EARLY-LOCAL-SNAPSHOT-DELTA.json")
     cr=read(build/"RC3-CURL-OWNER-CANCEL-DELTA.json")
     assert proof["complete_native_engine_compiled"] and er["final_owner_save_pass_retained"]
+    ret=read(build/"RC3-EARLY-PYTHON-ABORT-DELTA.json")
+    assert ret["first_stop_before_playback_checkpoint"]
+    assert not ret["required_writer_retirement_waived"]
     assert cr["required_saves_waived"] is False
     proof.update(
         purpose="RC3 targeted native HTTP cancellation and provisional early local saves",
         rc3_early_local_snapshot_compiled=True,
         rc3_owner_specific_http_read_cancellation_compiled=True,
+        rc3_python_stop_at_native_request_compiled=True,
+        rc3_curl_cancel_semantic_error_compiled=True,
         rc3_final_save_authority_unchanged=True,
         rc3_native_stop_grace_policy_unchanged=True,
         unknown_writers_abandoned=False,
@@ -123,7 +137,7 @@ def compile_engine():
         device_accepted=False,
         locked=False)
     save(build/"ENGINE-PROOF.json",proof)
-    print("PASS: RC3 complete native Kodi engine compiled; physical Fold shutdown still needs device verification.")
+    print("PASS: RC3 native Curl I/O failure and early Python abort compiled. Five-service Fold retirement remains unverified.")
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
