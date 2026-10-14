@@ -79,6 +79,15 @@ def prepare(args):
       "purpose":"Source lineage and unrelated runtime preservation"})
     print("RC5 STAGED: optional Trakt/cloud-owned and pinned Continuity diagnostics stop-only; 17 final receipts unchanged.")
 
+def verify_source():
+    import verify_optional
+    output=ROOT/"checkpoint-build/RC5-OPTIONAL-HOST-TESTS.json"
+    result=verify_optional.check(source_root())
+    save(output,result)
+    assert result["passed"]==result["total"] and result["total"]>=12
+    print("PASS RC5 host: "+str(result["passed"])+"/"+str(result["total"])+
+          " compiled native method and preservation tests; physical Fold unverified.")
+
 def compile_engine():
     previous=rc3()
     previous.compile_engine()
@@ -119,9 +128,10 @@ def compile_engine():
 
 if __name__=="__main__":
     cli=argparse.ArgumentParser()
-    cli.add_argument("mode",choices=("prepare","compile"))
+    cli.add_argument("mode",choices=("prepare","verify","compile"))
     for item in ("locked","previous","parent-proof"):
         cli.add_argument("--"+item,type=Path)
     opts=cli.parse_args()
     if opts.mode=="prepare":prepare(opts)
+    elif opts.mode=="verify":verify_source()
     else:compile_engine()
