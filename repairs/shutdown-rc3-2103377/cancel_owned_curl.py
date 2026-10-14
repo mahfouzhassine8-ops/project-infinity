@@ -10,10 +10,12 @@ import json
 from pathlib import Path
 
 CURL="xbmc/filesystem/CurlFile.cpp"
+CURL_H="xbmc/filesystem/CurlFile.h"
 INVOKER="xbmc/interfaces/python/PythonInvoker.cpp"
 HEADER="xbmc/filesystem/InfinityCloseNetworkGate.h"
 PIN={
  CURL:"176f7931fa3dcfd16aa8adb689c00d6b32764616b0587ab6eb21b832d11c0233",
+ CURL_H:"ed6dfa11db0568379096c75f8a6c1293de2744c92a8e3621dfeff3fa303fda8c",
  INVOKER:"7a1453fe755e4362ce8ee429ff8fc15787119ae47bd4be2e81de4e710749e54b",
 }
 HEADER_SOURCE=r'''/* SPDX-License-Identifier: GPL-2.0-or-later */
@@ -71,6 +73,7 @@ def apply(root):
     header=root/HEADER
     if header.exists():raise RuntimeError("RC3 network owner header already exists")
     curl=inputs[CURL].decode()
+    curl_header=inputs[CURL_H].decode()
     python=inputs[INVOKER].decode()
     curl=once(curl, '#include "CurlFile.h"\n',
         '#include "CurlFile.h"\n#if defined(TARGET_ANDROID)\n'
@@ -78,17 +81,32 @@ def apply(root):
         "CurlFile include")
     # CCurlFile::Open is a read-only IFile::Open, not OpenForWrite. Check before
     # m_opened=true and before Curl allocates a socket.
+    curl_header=once(curl_header, "          bool m_cancelled;\n",
+        "          bool m_cancelled;\n#if defined(TARGET_ANDROID)\n"
+        "          bool m_infinityHttpRead{false}; // HTTP-only read, never write\n#endif\n",
+        "Curl CReadState HTTP-only marker")
     curl=once(curl, 'bool CCurlFile::Open(const CURL& url)\n{',
         '''bool CCurlFile::Open(const CURL& url)
 {
 #if defined(TARGET_ANDROID)
-  if (InfinityCloseNetworkGate::CancelPlaylistBrowserRead())
+  m_state->m_infinityHttpRead = url.GetProtocol() == "http" ||
+                               url.GetProtocol() == "https";
+  if (m_state->m_infinityHttpRead &&
+      InfinityCloseNetworkGate::CancelPlaylistBrowserRead())
   {
     InfinityShutdownTrace::Event("milestone", "rc3.playlist_read_rejected_at_open");
     return false;
   }
 #endif''',
-        "CCurlFile read-only Open early admission")
+        "CCurlFile HTTP read-only Open early admission")
+    curl=once(curl, 'bool CCurlFile::OpenForWrite(const CURL& url, bool bOverWrite)\n{',
+        '''bool CCurlFile::OpenForWrite(const CURL& url, bool bOverWrite)
+{
+#if defined(TARGET_ANDROID)
+  m_state->m_infinityHttpRead = false; // Never cancel Curl writes.
+#endif''',
+        "Curl OpenForWrite excluded")
+
     # A native HTTP request already inside Curl may be stuck in multi_poll().
     # CReadState::FillBuffer() resumes at a bounded poll boundary. Self-cancel
     # there on the SAME Python/native thread: no unsafe cross-thread pointer.
@@ -99,7 +117,7 @@ def apply(root):
     if (m_cancelled)
       return FILLBUFFER_NO_DATA;'''
     replacement='''#if defined(TARGET_ANDROID)
-    if (!m_cancelled && InfinityCloseNetworkGate::CancelPlaylistBrowserRead())
+    if (!m_cancelled && m_infinityHttpRead && InfinityCloseNetworkGate::CancelPlaylistBrowserRead())
     {
       m_cancelled = true;
       InfinityShutdownTrace::Event("milestone", "rc3.playlist_read_cancelled_in_poll");
@@ -123,7 +141,7 @@ def apply(root):
 #endif
 ''',
         "Python interpreter worker identity binding")
-    outputs={CURL:curl.encode(),INVOKER:python.encode(),HEADER:HEADER_SOURCE.encode()}
+    outputs={CURL:curl.encode(),CURL_H:curl_header.encode(),INVOKER:python.encode(),HEADER:HEADER_SOURCE.encode()}
     for p,data in outputs.items():
         target=root/p
         target.parent.mkdir(parents=True,exist_ok=True)
@@ -131,7 +149,7 @@ def apply(root):
     return {
       "before":PIN,"after":{p:hash_bytes(v) for p,v in outputs.items()},
       "changed":sorted(PIN),"added":[HEADER],
-      "scope":"Targeted read-only native Curl for verified Playlist Browser owner when native Close active",
+      "scope":"Targeted HTTP(S) native Curl read only for verified Playlist Browser owner when native Close active; OpenForWrite unaffected",
       "ordinary_running_unchanged":True,
       "unverified_addon_writes_abandoned":False,
       "required_saves_waived":False,
