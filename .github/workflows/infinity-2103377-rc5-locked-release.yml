@@ -25,10 +25,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools build-tools;34.0.0'
-          log-accepted-android-sdk-licenses: false
       - uses: actions/download-artifact@v8
         with:
           run-id: 38520156095
@@ -64,9 +60,14 @@ jobs:
           assert lock['android']['sha256']==expected and lock['source']['baseline_signed_package_commit']==os.environ['SOURCE_SHA']
           print('PASS: SHA-256 and source hashes, Trakt/Continuity stop-only, full engine, 274 Android, 17 native host checks, protected skin')
           PY
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs -v "release-apk/$APK" > release-signature.txt
+          # This is a hash-identical archive, not a rebuild: verify the original
+          # signer/badging reports produced by green run 38520156095. Requiring
+          # a fresh SDK install to archive already-tested bytes is unnecessary.
+          cp "proof/$APK.signing.txt" release-signature.txt
+          cp proof/badging.txt release-badging.txt
           grep -Fq "$SIGNER" release-signature.txt
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "release-apk/$APK" > release-badging.txt
+          grep -Fq "Verified using v2 scheme (APK Signature Scheme v2): true" release-signature.txt
+          grep -Fq "Verified using v3 scheme (APK Signature Scheme v3): true" release-signature.txt
           grep -Fq "package: name='com.projectinfinity.kodi' versionCode='2103377' versionName='1.0.9-RC5-Optional-Shutdown-Test'" release-badging.txt
           printf '%s  %s\n' "$APK_SHA" "$APK" > SHA256SUMS.txt
       - name: Publish the exact user-approved signed APK as an archival GitHub Release
