@@ -1,0 +1,15 @@
+{
+  "scope": "500 host filesystem add/move/remove cycles and geometry computations; not Kodi frame pacing",
+  "cycles": 500,
+  "cycle_ms_p50": 3.34095900052489,
+  "cycle_ms_p95": 5.5734399993525585,
+  "cycle_ms_max": 10.200626999903761,
+  "python_traced_bytes_mid": 20382,
+  "python_traced_bytes_end": 28423,
+  "python_traced_peak_bytes": 396854,
+  "allocation_scope": "includes retained benchmark timing samples and bookkeeping; not a Kodi leak test",
+  "device_fps_measured": false,
+  "native_menu_open_latency_measured": false,
+  "frame_pacing_measured": false,
+  "android_shutdown_measured": false
+}

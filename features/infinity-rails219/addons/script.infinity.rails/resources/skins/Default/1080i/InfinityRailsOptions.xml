@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window type="dialog">
+  <defaultcontrol always="true">6</defaultcontrol>
+  <controls>
+    <include content="InfinityRailsShape192Rows1" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x1)" />
+    <include content="InfinityRailsShape192Rows2" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x2)" />
+    <include content="InfinityRailsShape192Rows3" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x3)" />
+    <include content="InfinityRailsShape192Rows4" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x4)" />
+    <include content="InfinityRailsShape192Rows5" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x5)" />
+    <include content="InfinityRailsShape192Rows6" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x6)" />
+    <include content="InfinityRailsShape192Rows7" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x7)" />
+    <include content="InfinityRailsShape192Rows8" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),192x8)" />
+    <include content="InfinityRailsShape320Rows1" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x1)" />
+    <include content="InfinityRailsShape320Rows2" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x2)" />
+    <include content="InfinityRailsShape320Rows3" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x3)" />
+    <include content="InfinityRailsShape320Rows4" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x4)" />
+    <include content="InfinityRailsShape320Rows5" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x5)" />
+    <include content="InfinityRailsShape320Rows6" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x6)" />
+    <include content="InfinityRailsShape320Rows7" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x7)" />
+    <include content="InfinityRailsShape320Rows8" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),320x8)" />
+    <include content="InfinityRailsShape480Rows1" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x1)" />
+    <include content="InfinityRailsShape480Rows2" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x2)" />
+    <include content="InfinityRailsShape480Rows3" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x3)" />
+    <include content="InfinityRailsShape480Rows4" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x4)" />
+    <include content="InfinityRailsShape480Rows5" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x5)" />
+    <include content="InfinityRailsShape480Rows6" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x6)" />
+    <include content="InfinityRailsShape480Rows7" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x7)" />
+    <include content="InfinityRailsShape480Rows8" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),480x8)" />
+    <include content="InfinityRailsShape720Rows1" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x1)" />
+    <include content="InfinityRailsShape720Rows2" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x2)" />
+    <include content="InfinityRailsShape720Rows3" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x3)" />
+    <include content="InfinityRailsShape720Rows4" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x4)" />
+    <include content="InfinityRailsShape720Rows5" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x5)" />
+    <include content="InfinityRailsShape720Rows6" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x6)" />
+    <include content="InfinityRailsShape720Rows7" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x7)" />
+    <include content="InfinityRailsShape720Rows8" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),720x8)" />
+    <include content="InfinityRailsShape900Rows1" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x1)" />
+    <include content="InfinityRailsShape900Rows2" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x2)" />
+    <include content="InfinityRailsShape900Rows3" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x3)" />
+    <include content="InfinityRailsShape900Rows4" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x4)" />
+    <include content="InfinityRailsShape900Rows5" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x5)" />
+    <include content="InfinityRailsShape900Rows6" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x6)" />
+    <include content="InfinityRailsShape900Rows7" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x7)" />
+    <include content="InfinityRailsShape900Rows8" condition="String.IsEqual(Window(Home).Property(Infinity.Rails.DialogShape),900x8)" />
+  </controls>
+  <animation effect="fade" start="0" end="100" time="190" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="140" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+</window>

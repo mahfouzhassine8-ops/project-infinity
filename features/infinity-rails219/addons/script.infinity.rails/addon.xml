@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.rails" version="0.2.1" name="Infinity Add-on Rails" provider-name="Infinity">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.python.script" library="default.py"><provides>executable</provides></extension>
+  <extension point="xbmc.python.pluginsource" library="plugin.py"><provides>executable</provides></extension>
+  <extension point="kodi.context.item">
+    <menu id="kodi.core.main">
+      <item library="context_add.py">
+        <label>32000</label>
+        <visible>!String.IsEmpty(ListItem.Property(Addon.ID)) + !String.IsEqual(ListItem.Property(Addon.ID),script.infinity.rails) + !String.IsEqual(ListItem.Property(Addon.IsInstalled),false) + !String.IsEqual(ListItem.Property(Infinity.Rails.Item),true)</visible>
+      </item>
+    </menu>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Customize Infinity Movie and TV Show Add-on Rails.</summary>
+    <description lang="en_GB">Custom Rails RC3 TEST companion for the complete Infinity 1.0.5.219 skin update. Preserves RC2 local choices. No resource patcher, startup hook, background service, network, APK or Command Center changes.</description>
+    <platform>android linux osx</platform>
+    <license>GPL-2.0-or-later</license>
+    <assets><icon>resources/icon.png</icon></assets>
+  </extension>
+</addon>
