@@ -1,0 +1,155 @@
+INFINITY RAILS — EVIDENCE CHECKPOINT, 2026-10-14
+Status: DEVICE ROOT CAUSE NOT YET CONFIRMED. No new installable candidate.
+
+WHAT IS CONFIRMED
+
+The 13:22:54 Android export inventories skin.infinity.diggz 1.0.5.221.
+Its installed addon.xml SHA-256 matches the recovered RC5 skin exactly:
+f961f47eacde225871b292efe72446f3252a3fac6e2f4c7785a7a7d6d36bf546.
+This verifies that manifest, not every installed skin file. The same export
+identifies APK 2103377, 1.0.9-RC5-Optional-Shutdown-Test. It does not inventory
+script.infinity.rails. The supplied earlier Kodi log records helper 0.2.2 and
+skin .220; it predates RC5. The supplied status screenshots are consistent with
+the RC5 inspector, but do not independently identify its installed version.
+
+The inspector has a confirmed diagnostic defect. runtime.py:inspect_rails
+obtains Home focus with Window(10000) but reads Container(...) information
+labels in the current window context. It never checks current window/dialog
+or control visibility. Running it through Program Add-ons can therefore show
+zero focus, unknown item counts and no dynamic identity without proving a
+rail-loading failure. Unset Home properties also do not establish failure.
+The screenshots contain those values but no active-window identity.
+
+INPUT PATH AND CONFIRMED CONDITIONAL BLOCKER
+
+AndroidTouch.cpp:onTouchEvent -> GenericTouchInputHandler::HandleTouchInput
+-> hold timer OnTimeout -> GenericTouchActionHandler::OnLongPress
+-> ACTION_TOUCH_LONGPRESS -> InputManager.cpp:XBMC_TOUCH
+-> window-specific touch translator -> ordinarily ACTION_MOUSE_RIGHT_CLICK
+-> CGUIBaseContainer::OnMouseEvent -> OnClick -> OnContextMenu
+-> list provider -> CDirectoryProvider::OnContextMenu -> CONTEXTMENU::ShowFor
+-> selected contextmenuaction -> RunScript(script.infinity.rails,action,section,key)
+-> runtime.main -> card_action -> selected_card -> requested operation.
+
+In the repository GUIBaseContainer.cpp, lines 803–817, OnMouseEvent remembers
+the selected index, selects the hit-tested item, then calls OnClick only if a
+right-click did NOT change that index. It returns HANDLED even when it skips
+OnClick. Under that condition the first hold cannot reach any helper callback.
+Four compiled checks using the unchanged production click branch reproduce
+that behavior, a second-click callback, normal left click, and an outside hit.
+Hit testing and surrounding event dispatch are adapters. This is a confirmed
+code-path behavior, NOT proof that this device incident followed that path.
+Touch-down also requests focus, and surrounding gesture/focus processing
+matters. Do not label the native gate the sole confirmed physical root cause.
+
+The default upstream 21.3-Omega touchscreen map uses RightClick. However, the
+device log explicitly loads masterprofile/profile gen.xml, nomousemove.xml,
+and super_favourites_menu.xml after system keymaps. Their contents were not
+included. The effective Home long-press/right-click mapping remains unknown.
+Replacing it speculatively risks affecting unrelated gestures or targeting
+the previously selected card. No keymap was changed.
+
+RAIL PROVIDERS AND MANAGEMENT IDENTITY
+
+Recovered RC5 Home controls: Normal 9200, Compact 8820, Two-Pane 8720,
+Cinema dynamic 19601 and legacy 19600. The first three retain both static
+fallback and dynamic content providers; RC5 changes fallback visibility.
+Cinema 19601 has only the dynamic provider. Its 19600 legacy visibility is
+mutually exclusive for Movie/TV sections with the helper enabled.
+InfinityRailsContent points to plugin://script.infinity.rails/?section=movies
+or tvshows, plus revision. These are package facts, not a live directory read.
+
+runtime.plugin assigns Addon.ID, Infinity.Rails.Item/Section/Key and context
+actions containing the section and exact row key. The RunScript callback
+routes to card_action. Move/reorder and shortcut-only removal are implemented
+in the existing Store; no uninstall action is introduced. CMultiProvider
+routes using the item pointer to its originating provider, so merely having
+two providers is not itself proof of incorrect context dispatch. There is no
+supplied current-device receipt proving the failed hold reached card_action.
+
+BLANK POPUP AND ANR
+
+CONTEXTMENU::ShowFor builds buttons from list-item context properties before
+CGUIDialogContextMenu::Show. Directly opening the context dialog can bypass
+that construction. The supplied log shows DialogContextMenu.xml loading, but
+does not record which action opened it or how many buttons it had. RC5 uses
+template 1000 and grouplist 996. Neither that contract nor a popup screenshot
+proves the item dispatch worked. Do not treat this as an appearance-only bug.
+
+The Android export records an actual 10,000 ms MotionEvent dispatch timeout
+at 13:22:40 for the Kodi process. The captured Java main-thread stack passes
+through ART/DisplayEventReceiver/Looper; it does not identify a Rails callback
+or establish that the rail hold caused the stall. The stall could impede
+input delivery, but causality is unproved. No shutdown/native change made.
+
+WHY THE PREVIOUS GREEN CHECKS WERE INSUFFICIENT
+
+RC5's 194 reported host checks covered package/layout/helper/storage contracts.
+They did not inject an Android hold through the installed keymaps and Kodi
+controls. RC5's own installation notes explicitly retained the native
+first-right-click limitation. The old inspector test supplied synthetic focus
+and empty labels without modeling the active window. It could not distinguish
+inactive Home from unloaded rails. The recovered archive also contains an
+obsolete failed test log using runtime.choose; that is not a passing run.
+
+CORRECTION COMPLETED — SOURCE ONLY
+
+Added input_status.py and replaced inspect_rails with a read-only report that:
+  * identifies installed skin/helper versions and paths;
+  * records current window and dialog before opening its own text viewer;
+  * declines Home container queries outside Home or under a modal dialog;
+  * distinguishes hidden controls, unavailable data, unconfirmed empty lists,
+    explicit helper failure and actually observed dynamic items;
+  * records visible control, directory, selected key/add-on and exposed actions;
+  * inventories relevant raw Home/global keymap entries with file hashes,
+    explicitly avoiding a false claim to resolve the effective mapping.
+No service, timer, polling, user-data write, skin patch, APK change, version
+bump or installable ZIP was created. This source is NOT installed on the phone.
+
+VERIFICATION AND PRESERVATION
+
+93 Python checks passed: 13 new diagnostic cases, 21 recovered runtime cases
+(the obsolete inspector test was updated to require inactive-window handling),
+and 59 recovered storage/catalog checks. Four C++ conditional-dispatch checks
+passed. These do not constitute physical Fold acceptance or a fixed gesture.
+Both recovered RC5 package hashes match their saved verification manifest.
+All skin files and APK remain unchanged. Helper production source changes
+are limited to runtime.py's inspector and the new input_status.py module.
+Store, catalog, defaults, menus and saved-preference schema are unchanged.
+No new claim of .215-to-.221 full preservation is made; the previous evidence
+already disclosed pre-existing protected-manifest mismatches.
+
+NEXT EVIDENCE REQUIRED BEFORE A REPAIR CANDIDATE
+
+1. Confirm the installed Rails helper version in My Add-ons.
+2. With Kodi debug logging enabled, reproduce one failed hold in the actual
+   Movie/TV rail; record the local time, mode and card. Immediately try one
+   further hold on the same card and record whether it opens the menu.
+3. Export fresh Kodi diagnostics from that session (the Android-only export
+   does not contain the current Kodi rail/dispatch log).
+4. Include the three loaded profile keymap XML files, or their read-only
+   mapping inventory. Never delete or replace them for this investigation.
+
+If those receipts establish the native selection gate as the blocker,
+describe a narrowly scoped native repair and obtain separate authorization
+before altering APK 2103377. If they establish keymap/provider misrouting,
+apply only the demonstrated skin/helper correction. No build is promoted.
+
+ROLLBACK
+
+No installation or device changes occurred in this investigation, so nothing
+on the phone requires rollback. Keep .221/.2.3 and protected .215 packages.
+Do not uninstall the helper or clear its data. Source-only diagnostic changes
+are isolated in a new investigation branch; the original RC5 branch is intact.
+
+SOURCE PROVENANCE
+
+Repository RC5 head: b1e48c06c301428b6e3f985e4e694fd03a4df0ae
+work/infinity-skin221-rails-input-rc5
+Repository native snapshots:
+repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/guilib/GUIBaseContainer.cpp
+repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/guilib/listproviders/DirectoryProvider.cpp
+repairs/critical-preview-2103376/native/xbmc/input/InputManager.cpp
+repairs/window-input-2103295/AndroidTouch.cpp
+Additional upstream reference files: xbmc/xbmc tag 21.3-Omega.
+These references are not a byte verification of installed libkodi.so.
