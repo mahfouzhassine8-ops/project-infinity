@@ -28,7 +28,7 @@ That *does* confirm the raw launch behind the native `unidentified` tag. Contrar
 
 ### Isolated Continuity candidate (not yet a shutdown fix)
 
-Local packaged test candidate: **`skin.infinity.diggz-1.0.5.212-RC4-Continuity-Retirement-TEST.zip`**, SHA256 **0440a062162992562f1dfe1bc55aeb8dbe0a54c088bbeb3eff54c6d77f4c2bdc**.
+Local packaged test candidate: **`skin.infinity.diggz-1.0.5.212-RC4-Continuity-Retirement-TEST.zip`**, SHA256 **7f26593ff5f1c2bd8d9efa1a0fe3ef0f7b3d400ec165e373a143d71efe2c67d4**.
 Built directly from locked skin .211 ZIP; preserves byte-identical content in **2,976 of 2,978 ZIP entries**. Only `addon.xml` version/description and `resources/lib/infinity_continuity.py` changed. No UI/layout/theme/asset changes. It adds cooperative abort gates around the two read-only metadata RPCs and a final dirty trace flush/retry, without pretending to interrupt an RPC already blocked. Six **local mocked Python checks passed**: normal behavior, abort before metadata, abort between RPCs, no duplicate lock owner, trace preservation, and retry-on-error. Device exit time and 17-owner save acceptance remain unverified.
 
 This candidate is NOT proven to make Infinity Continuity retire in 200ms and must not replace the locked skin without deliberate physical testing and approval.
