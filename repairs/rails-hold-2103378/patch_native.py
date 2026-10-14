@@ -58,8 +58,9 @@ bool CGUIBaseContainer::OnInfinityRailLongPress(float x, float y)
 '''
 
 DISPATCH = '''
-      // INFINITY_RAIL_HOLD_V1: preserve raw coordinates before a global add-on
-      // keymap can replace this hold with a coordinate-free RunScript action.
+      // INFINITY_RAIL_HOLD_V2: use actual touch coordinates to locate an
+      // eligible rail, regardless of the control focused before this hold.
+      // Preserve all non-rail/keymap/gesture input behavior.
       if (newEvent.touch.action == ACTION_TOUCH_LONGPRESS && newEvent.touch.pointers == 1)
       {
         auto& windows = CServiceBroker::GetGUI()->GetWindowManager();
@@ -69,9 +70,24 @@ DISPATCH = '''
                 "skin.infinity.diggz")
         {
           auto* home = windows.GetWindow(WINDOW_HOME);
-          auto* rail = home ? dynamic_cast<CGUIBaseContainer*>(home->GetFocusedControl()) : nullptr;
-          if (rail && rail->OnInfinityRailLongPress(newEvent.touch.x, newEvent.touch.y))
-            break;
+          if (home)
+          {
+            bool handled = false;
+            // Bounded scan of the four existing rails. The rail method checks
+            // processed/visible/enabled ancestors, gesture state, transformed
+            // hit coordinates and signed add-on identity before consuming.
+            for (const int railID : {9200, 8820, 8720, 19601})
+            {
+              auto* rail = dynamic_cast<CGUIBaseContainer*>(home->GetControl(railID));
+              if (rail && rail->OnInfinityRailLongPress(newEvent.touch.x, newEvent.touch.y))
+              {
+                handled = true;
+                break;
+              }
+            }
+            if (handled)
+              break;
+          }
         }
       }
 '''
