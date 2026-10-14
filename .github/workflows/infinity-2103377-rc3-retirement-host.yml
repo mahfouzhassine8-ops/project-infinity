@@ -26,6 +26,8 @@ jobs:
           mkdir -p rc3-host-evidence
           python3 repairs/shutdown-rc3-2103377/test_source.py \
              --source rc2-captured-source --output rc3-host-evidence/RC3-HOST-SOURCE-VERIFICATION.json
+          python3 repairs/shutdown-rc3-2103377/test_service_broadcast.py \
+             --root rc2-captured-source --out rc3-host-evidence/RC3-FIVE-SERVICE-NOTIFICATION-TEST.json
       - name: Preserve original source and isolated test receipts
         if: always()
         run: |
