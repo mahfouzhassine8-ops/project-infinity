@@ -1,8 +1,8 @@
 name: Infinity | 2103377 RC5 early C++ optional policy tests
 on:
   push:
-    branches: [work/infinity-2103377-rc5-optional-python-retirement]
-    paths: ['.github/workflows/infinity-2103377-rc5-early-host.yml']
+    branches: [work/infinity-2103377-rc5-host-debug]
+    paths: ['.github/workflows/infinity-2103377-rc5-early-host.yml', 'repairs/shutdown-rc5-2103377/verify_optional.py']
 permissions: {contents: read}
 concurrency: {group: infinity-2103377-rc5-early-host, cancel-in-progress: false}
 jobs:
