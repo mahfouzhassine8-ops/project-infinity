@@ -4,7 +4,7 @@
 
 This APK is an isolated Android-native correction for the previously identified Home rail long-press routing defect. It **does not** include or install a skin or helper. Its counterpart test packages must be installed separately and retained for rollback:
 
-- Full skin: `skin.infinity.diggz-1.0.5.222-Mocha-Rails-RC2-TEST.zip` (SHA256 `49903b1daefd5e7ff076e1524dc42e532bac3757e9f13a40f2e406c6276ee0e6`)
+- Full skin: `skin.infinity.diggz-1.0.5.222-Mocha-Rails-RC2-TEST.zip` (SHA256 `cfecda1c8f0442f368fea361760b15e7c9d7487e2f362093baedddf0e757fc17`)
 - Helper: `script.infinity.rails-0.2.5-Mocha-Rails-RC2-TEST.zip` (SHA256 `5219ca62141c4b570765c405dbac5f5f026da7ccd56c2c9bd3ac96329f31403b`)
 - Native APK: `Infinity-2103377-Rails-Hold-Native-RC2-TEST.apk`, signed only after native and Kodi gates, same Android versionCode 2103377.
 
