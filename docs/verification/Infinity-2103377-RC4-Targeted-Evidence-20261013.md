@@ -42,3 +42,23 @@ Corrective action, after installed-version/source verification: place the servic
 ## Acceptance gate
 
 The complete RC4 requirement remains: fully loaded Close drains both final writers, yields **17/17** real owner receipts, database seal and valid `SAFE_TO_TERMINATE` authorization, exits the Infinity process safely, and reopens with watched/resume state, settings, Trakt, favourites, skin and providers intact. No production lock yet.
+
+## Oct 14: installed Trakt source found and repaired locally (experimental)
+
+A user-owned archive `Infinity-Installed-Addon-Code-20261008-071505.zip` contains **Trakt 3.9.0** code with a customized `AM Lite` wait located at the *import time* of `resources/lib/service.py`. This code loops for up to **120 seconds** using `xbmc.sleep(1000)`, without a Kodi abort check. The same source contains a non-time-bounded `syncThread.join()` during shutdown. Both are real source-level shutdown impediments. The 74.2-second physical retirement interval does NOT distinguish which one executed in that session. The Oct 8 archive is not proof that the exact source was still installed on Oct 13.
+
+A **manually invoked, version-and-hash-guarded Kodi program add-on test repair**, `script.infinity.trakt.rc4patch-0.1.0-TEST.zip`, was assembled locally. It does not automatically patch on installation: it offers Apply/Restore via a confirmation dialog, and acts only on installed `script.trakt` version `3.9.0` when the two source hashes match the Oct 8 observed copies. Original files are backed up with verified hashes, replaced atomically, and the test repair can restore those originals. No Trakt user settings, API tokens, databases, watched-state data, or skin files are included or changed. It is **not a replacement `script.trakt` package**.
+
+- service.py source SHA-256: `867f7ad8a4013c5052efdcf0a23c29c48a63ddaff0298bb46650c1eb026f6f7d` → `bc00a34bf028a6ad97b75ee811eaa63883e36481c0adf37aeb52e7f8c0d4e5a5`
+- sync.py source SHA-256: `6dfb162ed42740fe1553a585ac9609ade481b907e726d9b179060c1ecf65e2c9` → `14f9fcd7d2d7ded40cb27b3f8f6cc348454fd56da79173a72d41b72a85979249`
+- Patch: move Account Manager wait out of module import; register `traktMonitor` before startup waits; use `waitForAbort(1)` to stop immediately when Close arrives; retain 120-second fallback and 180-second freshness check during normal operation; use abort-aware existing startup delay. On active library sync, request cancellation for *new* optional sync stages via its existing `IsCanceled()` checks. **Keep blocking `syncThread.join()`** so actual in-flight state writes are not discarded.
+- Targeted host verification: **27/27** real-source-AST mocked Trakt tests, **17/17** temporary-file patcher apply/restore/fault-recovery tests. No physical Fold test, no proof of cancelling an in-flight 90-second HTTP read or write, no permitted termination bypass.
+- Preserve Trakt 3.9.0 add-on resources/assets and all user settings. The Oct 8 code snapshot is incomplete as a standalone installable Trakt ZIP, so it was **not** released as a replacement add-on. Only the reversible, preimage-pinned repair add-on is suitable for testing when the installed code matches.
+
+Separately, the locked **skin 1.0.5.211** code was reviewed. `unified/Home.xml` launches `infinity_continuity.py` via raw `RunScript`. That script already used `xbmc.Monitor().waitForAbort(.1/.5)`; the experimental **skin 1.0.5.212** only adds abort checks surrounding optional screensaver JSON-RPC reads and a final dirty-trace flush. Isolated host tests **6/6 passed**. An already-blocked JSON-RPC call cannot be interrupted by that skin patch.
+
+## Test build activity
+
+- RC4 Android 6.5-second/dynamic recovery UI: **274/274** passed, run `38508366685`.
+- Signed APK integration workflow: `38512236135` (look up its conclusion; it was queued at writing). The native engine donor remains RC3 run `38498786704`; the Java donor is run `38508366685`. Signed APK is not an add-on auto-installer and does not silently modify Trakt or skin.
+- Locked APK **2103376**, locked skin **1.0.5.211**, and approved rollback files remain unchanged. The RC4 skin/Trakt/Android candidates are not production locked. Physical test must verify full-load Close and **17/17** final receipts, clean process exit and progress intact upon reopen.
