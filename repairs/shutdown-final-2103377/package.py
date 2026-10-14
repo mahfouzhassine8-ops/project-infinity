@@ -82,6 +82,16 @@ def package(args):
     require(latch['passed'] and latch['corrected_cases']==9 and waits['passed'] and waits['actual_function_scenarios']==20,
             'Targeted shutdown regressions missing')
     require(not proof['unknown_writers_abandoned'] and not proof['shutdown_timeout_changed'],'Unknown work or deadline safety changed')
+    require(proof.get('rc2_optional_queued_prune_compiled') is True,
+            'RC2 pruning must be present in the fully compiled native engine')
+    rc2=json.loads((native/'RC2-OPTIONAL-QUEUE-PRUNE.json').read_text())
+    require(rc2['only_verified_optional_no_callback_queued'] and
+            not rc2['required_or_unknown_jobs_abandoned'] and
+            not rc2['checkpoint_save_or_termination_authority_changed'],
+            'RC2 optional job safety contract missing')
+    native_cases=json.loads((native/'RC2-PRUNE-HOST-TESTS.json').read_text())
+    require(native_cases['tests'] >= 8 and native_cases['tests']==native_cases['passed'],
+            'RC2 native test cases missing')
     args.out.mkdir(parents=True,exist_ok=True)
     engine=native/'libkodi.so'
     require(sha(engine.read_bytes())==proof['native_sha256'],'Native bytes differ from full-build proof')
@@ -109,7 +119,7 @@ def package(args):
     old_manifest=run(bt/'aapt','dump','xmltree',args.parent,'AndroidManifest.xml',output=args.out/'base-manifest.txt')
     new_manifest=run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'candidate-manifest.txt')
     verify_manifest(old_manifest,new_manifest)
-    final=args.out/'Infinity-2103377-Final-Shutdown-RC1.apk'
+    final=args.out/'Infinity-2103377-Shutdown-Drain-RC2.apk'
     run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
     cert=run(bt/'apksigner','verify','--verbose','--print-certs',final,output=args.out/'signing-verification.txt')
     require(SIGNER in cert.lower(),'Permanent signing identity changed')
@@ -129,11 +139,12 @@ def package(args):
                 existing_jni_declarations_preserved=natives,core_java_classes_preserved=core,
                 native_exports_preserved=True,native_dependencies_preserved=True,
                 locked_skin='1.0.5.211',playlist_browser_changed=False,
+                rc2_optional_pruning=True,rc2_host_tests=native_cases['passed'],
                 unknown_writes_abandoned=False,physical_shutdown_verified=False,
                 device_accepted=False,locked=False,**preserved)
     (args.out/'FINAL-APK-VERIFICATION.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
     for path in (unsigned,packaged,old_engine):path.unlink()
-    print('PASS: permanently signed 2103377 test APK, 274 fresh Android tests, complete native engine, original payload preserved. Physical acceptance pending.')
+    print('PASS: RC2 optional job pruning compiled, permanently signed test APK, protected native/Android payload preserved. Fully loaded device shutdown still unverified.')
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
