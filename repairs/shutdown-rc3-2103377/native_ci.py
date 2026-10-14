@@ -76,6 +76,42 @@ def prepare(args):
         pass # foundation verifies the entire reconstructed map, not just touched files
     foundation=life.load_parent_driver().previous().foundation()
     foundation.runtime_delta.verify(src,after)
+    # Verify the real matched Kodi interpreter APIs rather than transplanting
+    # Gemini's hypothetical m_stopEvent into CPythonInvoker (which has none).
+    # Monitor waits on abortEvent; legacy xbmc.sleep voluntarily processes
+    # pending calls every <=100ms, but never promises that arbitrary C I/O
+    # unblocks or every third-party add-on retires within 2 seconds.
+    monitor=(src/"xbmc/interfaces/legacy/Monitor.cpp").read_text()
+    sleep=(src/"xbmc/interfaces/legacy/ModuleXbmc.cpp").read_text()
+    py=(src/"xbmc/interfaces/python/PythonInvoker.cpp").read_text()
+    manager=(src/"xbmc/interfaces/generic/ScriptInvocationManager.cpp").read_text()
+    xbp=(src/"xbmc/interfaces/python/XBPython.cpp").read_text()
+    assert "abortEvent.Set();" in monitor
+    assert "abortEvent.Wait(timeout)" in monitor
+    assert "MakePendingCalls();" in sleep
+    assert "nextSleep > 100" in sleep
+    assert "m_stop = true;" in py
+    assert 'if (!abort && InfinityAndroidCheckpoint::IsActive())' in py
+    assert "m_checkpointAbortedInvokerIds.insert(invokerId)" in xbp
+    assert 'CServiceBroker::GetXBPython().NotifyScriptAborting(thread.get());' in manager
+    save(ROOT/"checkpoint-build/RC3-SLEEP-AND-FIVE-SERVICE-GATE.json",{
+      "source_commit":os.environ["GITHUB_SHA"],
+      "native_monitor_abort_event_exists":True,
+      "native_monitor_wait_interruptible":True,
+      "xbmc_sleep_calls_pending_every_100ms":True,
+      "legacy_abort_flag_set":True,
+      "late_monitor_latch_preserved":True,
+      "protected_command_center_compat_selection_preserved":True,
+      "installed_third_party_service_source_available":False,
+      "five_service_retirement_measured_on_fold":False,
+      "no_runtime_ast_or_source_replacement":True,
+      "no_unknown_writer_waiver":True,
+      "module_sha256":{k:digest((src/k).read_bytes()) for k in (
+        "xbmc/interfaces/legacy/Monitor.cpp",
+        "xbmc/interfaces/legacy/ModuleXbmc.cpp",
+        "xbmc/interfaces/python/PythonInvoker.cpp",
+        "xbmc/interfaces/generic/ScriptInvocationManager.cpp",
+        "xbmc/interfaces/python/XBPython.cpp")}})
     checkpoint_proof=read(ROOT/"checkpoint-build/FINAL-SHUTDOWN-SOURCE-PRESERVATION.json")
     checkpoint_proof.update({
         "source_commit":os.environ["GITHUB_SHA"],
@@ -120,6 +156,8 @@ def compile_engine():
     cr=read(build/"RC3-CURL-OWNER-CANCEL-DELTA.json")
     assert proof["complete_native_engine_compiled"] and er["final_owner_save_pass_retained"]
     ret=read(build/"RC3-EARLY-PYTHON-ABORT-DELTA.json")
+    sleep_proof=read(build/"RC3-SLEEP-AND-FIVE-SERVICE-GATE.json")
+    assert sleep_proof["native_monitor_wait_interruptible"] and sleep_proof["xbmc_sleep_calls_pending_every_100ms"]
     assert ret["first_stop_before_playback_checkpoint"]
     assert not ret["required_writer_retirement_waived"]
     assert cr["required_saves_waived"] is False
@@ -129,6 +167,8 @@ def compile_engine():
         rc3_owner_specific_http_read_cancellation_compiled=True,
         rc3_python_stop_at_native_request_compiled=True,
         rc3_curl_cancel_semantic_error_compiled=True,
+        rc3_sleep_and_monitor_original_implementation_verified=True,
+        rc3_five_service_physical_retirement_proven=False,
         rc3_final_save_authority_unchanged=True,
         rc3_native_stop_grace_policy_unchanged=True,
         unknown_writers_abandoned=False,
