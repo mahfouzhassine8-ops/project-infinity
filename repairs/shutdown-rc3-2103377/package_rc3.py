@@ -17,7 +17,7 @@ sys.path.insert(0,str(ROOT/'repairs/mobile-regressions-2103304'))
 import package_candidate as factory
 from packaging_checks import require,sha,run,resource_ids,manifest_tree
 PARENT_SHA='8e8e139929592daedb63e0e41040258d655f132fd025b236de7dee1e88b47649'
-NATIVE_PIN='1b06a38215edc70a3f2b156722983fee34a64cf3'
+NATIVE_PIN='0c5c5ae8715fdf94b779ce9e8ce1df93067b79fa'
 JAVA_PIN='a23373fcbb9e91ce24ab1525d98c11a9580d76cb'
 SIGNER='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 
@@ -60,6 +60,9 @@ def package(args):
     require(proof['complete_native_engine_compiled'] and
             proof.get('rc3_early_local_snapshot_compiled') is True and
             proof.get('rc3_owner_specific_http_read_cancellation_compiled') is True and
+            proof.get('rc3_python_stop_at_native_request_compiled') is True and
+            proof.get('rc3_curl_cancel_semantic_error_compiled') is True and
+            proof.get('rc3_sleep_and_monitor_original_implementation_verified') is True and
             proof.get('rc3_final_save_authority_unchanged') is True,
             'RC3 native engine/owner gate was not compiled')
     require(preservation.get('final_termination_authorization_byte_identical') is True and
@@ -85,7 +88,7 @@ def package(args):
     require(latch['passed'] and latch['corrected_cases']==9 and waits['passed'] and
             waits['actual_function_scenarios']==20,'Original 2103377 fixes regressed')
     native_cases=json.loads((native/'RC3-HOST-VERIFICATION.json').read_text())
-    require(native_cases['passed']==native_cases['total']==7,'RC3 exact Curl tests not green')
+    require(native_cases['passed']==native_cases['total']==10,'RC3 immediate abort and Curl failure host tests not green')
     java_cases=json.loads((android/'RC3-ANDROID-VERIFICATION.json').read_text())
     require(java_cases['verified_unmodified_274_cases']==274 and
             java_cases['tests_freshly_executed'] and
@@ -95,6 +98,14 @@ def package(args):
             java_cases['donor_sha256']==sha(args.donor.read_bytes()),
             'RC3 new recovery UI, tests or donor were not verified')
     gate=json.loads((native/'RC3-CURL-OWNER-CANCEL-DELTA.json').read_text())
+    retirement=json.loads((native/'RC3-EARLY-PYTHON-ABORT-DELTA.json').read_text())
+    sleep_audit=json.loads((native/'RC3-SLEEP-AND-FIVE-SERVICE-GATE.json').read_text())
+    require(retirement['first_stop_before_playback_checkpoint'] and
+            retirement['idempotent_reentry'] and
+            not retirement['required_writer_retirement_waived'] and
+            not sleep_audit['five_service_retirement_measured_on_fold'] and
+            sleep_audit['native_monitor_wait_interruptible'],
+            'Native Request stop timing, monitor wake or physical-proof boundary invalid')
     require(gate['required_saves_waived'] is False and
             gate['unverified_addon_writes_abandoned'] is False and
             gate['ordinary_running_unchanged'] is True,
@@ -103,13 +114,28 @@ def package(args):
             'RC3 bypasses unknown writers or changes timeout')
     subprocess.run(['git','merge-base','--is-ancestor',NATIVE_PIN,os.environ['GITHUB_SHA']],check=True)
     subprocess.run(['git','merge-base','--is-ancestor',JAVA_PIN,os.environ['GITHUB_SHA']],check=True)
-    changed=set(subprocess.check_output(['git','diff','--name-only',JAVA_PIN,os.environ['GITHUB_SHA']],text=True).splitlines())
+    # Native follow-up was intentionally authored after the 274-test Java
+    # build; require its original Android production sources unchanged.
+    java_delta=set(subprocess.check_output(
+        ['git','diff','--name-only',JAVA_PIN,os.environ['GITHUB_SHA']],text=True).splitlines())
+    java_protected={
+       'repairs/shutdown-rc3-2103377/early_blocker_ui.py',
+       'repairs/shutdown-rc3-2103377/android_stage.py',
+       '.github/workflows/infinity-2103377-rc3-android.yml',
+    }
+    require(not (java_delta & java_protected) and
+            not any(path.startswith('repairs/android-checkpoint-shutdown/runtime/android/')
+                    for path in java_delta),
+            'Approved 274-tested Java sources changed after verification')
+    # The native owner/saver inputs may not change after the green native SHA.
+    native_delta=set(subprocess.check_output(
+        ['git','diff','--name-only',NATIVE_PIN,os.environ['GITHUB_SHA']],text=True).splitlines())
     allowed={
        'repairs/shutdown-rc3-2103377/package_rc3.py',
-       '.github/workflows/infinity-2103377-rc3-package.yml',
-       'docs/verification/Infinity-2103377-RC3-Preserved-Signed-Test.json'
+       '.github/workflows/infinity-2103377-rc3-retirement-green-package.yml',
+       'docs/verification/Infinity-2103377-RC3-Retirement-Signed-Candidate.json',
     }
-    require(changed<=allowed,'Changed RC3 Java or native source after verification')
+    require(native_delta<=allowed,'Native source changed after verified RC3 follow-up build')
     require(sha((native/'libkodi.so').read_bytes())==proof['native_sha256'],
             'RC3 compiled native artifact hash does not match build proof')
     args.out.mkdir(parents=True,exist_ok=True)
@@ -139,7 +165,7 @@ def package(args):
     old_manifest=run(bt/'aapt','dump','xmltree',args.parent,'AndroidManifest.xml',output=args.out/'base-manifest.txt')
     new_manifest=run(bt/'aapt','dump','xmltree',unsigned,'AndroidManifest.xml',output=args.out/'candidate-manifest.txt')
     verify_manifest(old_manifest,new_manifest)
-    final=args.out/'Infinity-2103377-RC3-Curl-Early-Save.apk'
+    final=args.out/'Infinity-2103377-RC3-Early-Python-Retirement.apk'
     run('bash',ROOT/'scripts/sign-infinity71.sh',unsigned,final)
     cert=run(bt/'apksigner','verify','--verbose','--print-certs',final,output=args.out/'signing-verification.txt')
     require(SIGNER in cert.lower(),'Permanent signing identity changed')
@@ -150,7 +176,9 @@ def package(args):
     require("application-label:'Infinity'" in badging and 'application-debuggable' not in badging,'Branding/debug mode changed')
     preserved=factory.verify_bytes(args.parent,final,packaged)
     report=dict(schema=1,source_commit=os.environ['GITHUB_SHA'],native_source_commit=NATIVE_PIN,
-                android_source_commit=JAVA_PIN,rc3_host_tests=7,rc3_grace_ms=2500,
+                android_source_commit=JAVA_PIN,rc3_host_tests=10,rc3_grace_ms=2500,
+                rc3_python_abort_at_request=True,rc3_cancelled_curl_uses_io_failure=True,
+                rc3_five_services_physically_confirmed=False,
                 rc3_curl_read_cancel_compiled=True,rc3_early_provisional_saves=True,
                 rc3_automated_quit_when_unverified_writer_pending=False,file=final.name,
                 apk_sha256=sha(final.read_bytes()),bytes=final.stat().st_size,
@@ -163,13 +191,13 @@ def package(args):
                 native_exports_preserved=True,native_dependencies_preserved=True,
                 locked_skin='1.0.5.211',playlist_browser_changed=False,
                 rc2_optional_pruning=True,rc2_host_tests=rc2_cases['passed'],
-                rc3_native_compiled_at_run=38494857673,
+                rc3_native_compiled_at_run=38498786704,
                 rc3_android_compiled_at_run=38495506871,
                 unknown_writes_abandoned=False,physical_shutdown_verified=False,
                 device_accepted=False,locked=False,**preserved)
     (args.out/'FINAL-APK-VERIFICATION.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
     for path in (unsigned,packaged,old_engine):path.unlink()
-    print('PASS RC3: permanently signed guarded early-save/Curl candidate, fresh 274 Android tests, full native engine, original locked payload protected. Physical shutdown NOT verified.')
+    print('PASS RC3 FOLLOW-UP: signed test candidate with early Python abort, Curl I/O cancellation, 10 host checks, 274 preserved Android tests; Fold five-service retirement NOT verified.')
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
