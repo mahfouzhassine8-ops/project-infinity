@@ -1,0 +1,46 @@
+{
+  "feature": "Infinity Rails native context-menu restore",
+  "status": "RC4 host tested, Fold acceptance pending, NOT LOCKED",
+  "installed_experimental_source": "1.0.5.218",
+  "protected_foundation": "1.0.5.215",
+  "candidate_skin": "1.0.5.220",
+  "companion_helper": "0.2.2",
+  "architecture": "Restore 14 native DialogContextMenu.xml from known-good .215 in complete 218-based skin; switch helper chooser to Kodi Dialog().select; retain all other .218 rail implementation",
+  "source_git_sha": "5ad0ce81a0686455a47986073ce587969f9c7207",
+  "parent_skin_sha256": "271c323f049696cbb7f539be75a662f8ae8ab23f322c4ccd731d3e65cec96a5f",
+  "skin_candidate_sha256": "4595d5294cf9858897e1d100e2b8604527c5ef944e84a1b40dc50d5748b5ff1f",
+  "helper_candidate_sha256": "1fe48026cfdc5b9611664281764695a67d19d7b5ad4b973ed3d4da825c2c3080",
+  "skin_package": "skin.infinity.diggz-1.0.5.220-Rails-Context-Repair-RC4-TEST.zip",
+  "helper_package": "script.infinity.rails-0.2.2-Rails-Context-Repair-RC4-TEST.zip",
+  "integrity": {
+    "tests_passed": 35,
+    "failures": 0,
+    "XML_parsed": 2107,
+    "native_context_menus_byte_identical_to_215": 14,
+    "existing_skin_files_unchanged": 2993,
+    "changed_skin_files": 17,
+    "helper_changed_files": 2,
+    "preserved_all_home_and_rail_includes": true
+  },
+  "limitations": [
+    "Host-level checks only; no physical Fold test",
+    "Real first-press touch long-hold behavior unverified",
+    "Native UI render/frame pacing unverified",
+    "No GitHub Actions run triggered"
+  ],
+  "preservation": [
+    "existing .218 custom card/Home behavior",
+    "skin .215 corrections",
+    "Command Center resources",
+    "Kodi APK",
+    "existing rail stored preferences",
+    "other addon settings"
+  ],
+  "install": [
+    "Upgrade helper to 0.2.2 ZIP via Kodi Install from ZIP; do not uninstall",
+    "Install complete skin 1.0.5.220 ZIP from Kodi Install from ZIP; allow skin reload",
+    "Test Add-ons Browser context menu; rail card long press, first and repeat; Add/Move/Remove and all view modes",
+    "Do not lock until physical tests pass"
+  ],
+  "source_receipt": "Builder and host tests supplied in separate local source-evidence archive. Binaries are not uploaded to GitHub by this documentation commit."
+}
