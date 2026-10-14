@@ -47,6 +47,8 @@ def prepare(args):
     save(ROOT/'checkpoint-build/RAILS-NATIVE-DELTA.json',delta)
     import test_native
     test_native.verify(root,ROOT/'checkpoint-build')
+    import test_focus_dispatch
+    test_focus_dispatch.verify(root,ROOT/'checkpoint-build')
 
 def compile_engine():
     parent=previous();parent.verify_source();parent.compile_engine()
