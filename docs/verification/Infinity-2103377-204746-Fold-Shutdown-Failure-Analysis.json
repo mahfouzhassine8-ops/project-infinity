@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "purpose": "Grounded physical diagnostic of normal Close after package update; RC2 identity cannot be proven from export versionName alone",
+  "capture": "Infinity-Diagnostics-20261013-204746.zip",
+  "captured_local": "2026-10-13T20:47:48-04:00",
+  "observations": {
+    "installed_package": "com.projectinfinity.kodi",
+    "version_name_reported": "1.0.9-Final-Shutdown-RC1",
+    "version_code_reported": 2103377,
+    "rc2_packaging_has_same_version_name": true,
+    "recent_android_package_update_local": "2026-10-13T20:46:42-04:00",
+    "process_started_local": "2026-10-13T20:46:47-04:00",
+    "close_requested_local": "2026-10-13T20:46:57-04:00",
+    "close_requested_approximately_seconds_after_process_launch": 9.16,
+    "native_check_failed_at_elapsed_seconds": 25.003,
+    "coordinator_failure_elapsed_seconds": 25.129,
+    "checkpoint_phase": "CHECKPOINT_FAILED",
+    "checkpoint_error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "blocking_operation": "python_services",
+    "pending_python_writers": [
+      "plugin.video.playlistbrowser:service.py",
+      "plugin.video.umbrella:service.py",
+      "repository.zeus768:service.py",
+      "script.trakt:default.py",
+      "unidentified:infinity_continuity.py"
+    ],
+    "blocking_background_jobs_at_deadline": 0,
+    "nonpersistent_background_jobs_at_deadline": 0,
+    "active_native_writes_at_deadline": 0,
+    "owners_committed_or_clean": [
+      "playback",
+      "command_center",
+      "compat",
+      "pvr"
+    ],
+    "owners_not_yet_finalized": [
+      "native_admission",
+      "python_services",
+      "background_jobs",
+      "kodi_settings",
+      "profiles",
+      "skin_settings",
+      "addon_settings",
+      "favourites",
+      "peripherals",
+      "audio_policy",
+      "deferred_dialog_state",
+      "xml_files",
+      "native_databases"
+    ],
+    "playlist_browser_http_vfs_operation": {
+      "type": "CFile.Open",
+      "scheme": "http",
+      "backend": "curl",
+      "operation_start_seconds_after_close": 3.616,
+      "cooperative_shutdown_notification_seconds_after_close": 9.109,
+      "operation_at_checkpoint": "curl_multi_poll",
+      "pending_duration_at_checkpoint_seconds": 21.386,
+      "returned_seconds_after_close": 33.618,
+      "operation_total_duration_seconds": 30.001,
+      "backend_cancel_callback_observed": 0,
+      "cancellation_outcome_bits": 0,
+      "note": "The add-on's HTTP read operation remained pending through checkpoint failure and returned false after Curl's own wait; the trace does not prove its later local write obligation is disposable."
+    },
+    "native_log_export_truncated": true,
+    "critical_trace_export_truncated": false,
+    "crashing_or_data_loss_confirmed": false,
+    "normal_exit_confirmed": false
+  },
+  "previous_173635_test": {
+    "elapsed_failure_seconds": 25.137,
+    "pending_writer_count": 5,
+    "same_pending_writers": true,
+    "blocking_background_jobs": 0
+  },
+  "conclusions": [
+    "The exact five Python writers persist as the barrier; RC2's optional queued job pruning does not resolve this capture.",
+    "The 274 preserved Android cases and native compiler pass remain valid; this Fold test fails the end-to-end Close acceptance gate.",
+    "Native RC2 identity is not verifiable from this export alone because the signed RC2 APK retained the RC1 versionName; the package update immediately prior is consistent with an install, not byte-level proof.",
+    "Do not classify non-retired Python/add-on writers as disposable or force terminate while essential writes are unverified.",
+    "Next implementation must address interruptible read-only networking and save-owner ordering, with actual local-first receipts for unfinished required third-party work."
+  ],
+  "scope": "Read-only analysis only; no changes to installed add-ons, native engine, locked APK 2103376 or locked skin 1.0.5.211"
+}
