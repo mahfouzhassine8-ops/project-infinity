@@ -132,6 +132,8 @@ def package(args):
         ['git','diff','--name-only',NATIVE_PIN,os.environ['GITHUB_SHA']],text=True).splitlines())
     allowed={
        'repairs/shutdown-rc3-2103377/package_rc3.py',
+       'repairs/shutdown-rc3-2103377/test_service_broadcast.py',
+       '.github/workflows/infinity-2103377-rc3-retirement-host.yml',
        '.github/workflows/infinity-2103377-rc3-retirement-green-package.yml',
        'docs/verification/Infinity-2103377-RC3-Retirement-Signed-Candidate.json',
     }
