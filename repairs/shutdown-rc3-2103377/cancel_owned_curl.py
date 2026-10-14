@@ -85,10 +85,16 @@ def apply(root, *, include_invoker=True):
         "          bool m_cancelled;\n#if defined(TARGET_ANDROID)\n"
         "          bool m_infinityHttpRead{false}; // HTTP-only read, never write\n#endif\n",
         "Curl CReadState HTTP-only marker")
+    curl_header=once(curl_header,
+       "          bool m_infinityHttpRead{false}; // HTTP-only read, never write\n",
+       "          bool m_infinityHttpRead{false}; // HTTP-only read, never write\n"
+       "          bool m_infinityCheckpointCancelledRead{false}; // I/O error, not EOF\n",
+       "Curl checkpoint-cancel error flag")
     curl=once(curl, 'bool CCurlFile::Open(const CURL& url)\n{',
         '''bool CCurlFile::Open(const CURL& url)
 {
 #if defined(TARGET_ANDROID)
+  m_state->m_infinityCheckpointCancelledRead = false;
   m_state->m_infinityHttpRead = url.GetProtocol() == "http" ||
                                url.GetProtocol() == "https";
   if (m_state->m_infinityHttpRead &&
@@ -104,6 +110,7 @@ def apply(root, *, include_invoker=True):
 {
 #if defined(TARGET_ANDROID)
   m_state->m_infinityHttpRead = false; // Never cancel Curl writes.
+  m_state->m_infinityCheckpointCancelledRead = false;
 #endif''',
         "Curl OpenForWrite excluded")
 
@@ -119,14 +126,42 @@ def apply(root, *, include_invoker=True):
     replacement='''#if defined(TARGET_ANDROID)
     if (!m_cancelled && m_infinityHttpRead && InfinityCloseNetworkGate::CancelPlaylistBrowserRead())
     {
+      m_infinityCheckpointCancelledRead = true;
       m_cancelled = true;
       InfinityShutdownTrace::Event("milestone", "rc3.playlist_read_cancelled_in_poll");
     }
     if (m_cancelled) InfinityVfsOpenTrace::CancelFlagSeen();
 #endif
+#if defined(TARGET_ANDROID)
+    if (m_cancelled && m_infinityCheckpointCancelledRead)
+      return FILLBUFFER_FAIL; // I/O failure is not successful EOF.
+#endif
     if (m_cancelled)
       return FILLBUFFER_NO_DATA;'''
     curl=once(curl,marker,replacement,"Curl buffered read cancellation check")
+    # Connect() can read HTTP status after FillBuffer returns failure.
+    # Cancelled reads must never become successful HTTP 200 empty bodies.
+    curl=once(curl, '  m_httpresponse = m_state->Connect(m_bufferSize);',
+        '''  m_httpresponse = m_state->Connect(m_bufferSize);
+#if defined(TARGET_ANDROID)
+  if (m_state->m_infinityCheckpointCancelledRead)
+    return false;
+#endif''', "HTTP Connect must fail after RC3 cancellation")
+    # The real pinned Android Curl source already limits multi_poll to 200ms.
+    # Do not touch Curl handles from another thread or add unneeded callbacks.
+    assert curl.count('multi_poll(m_multiHandle, 200, &ready)') == 1
+    curl=once(curl, '''void CCurlFile::Reset()
+{
+  m_state->m_cancelled = false;
+}''',
+        '''void CCurlFile::Reset()
+{
+  m_state->m_cancelled = false;
+#if defined(TARGET_ANDROID)
+  m_state->m_infinityCheckpointCancelledRead = false;
+#endif
+}''', "reset RC3 cancellation on Curl state reuse")
+
     if include_invoker:
         python=once(python,'#include "PythonInvoker.h"\n',
             '#include "PythonInvoker.h"\n#if defined(TARGET_ANDROID)\n'
