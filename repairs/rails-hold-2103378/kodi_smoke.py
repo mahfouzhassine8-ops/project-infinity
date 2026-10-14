@@ -34,16 +34,11 @@ try:
     from lib import runtime
     profile=Path(xbmcvfs.translatePath(addon.getAddonInfo('profile')))
     Store(profile).add('plugin.video.infinityrailfixture',['tvshows'],{'movies':[],'tvshows':[]})
+    # Close only disposable first-run welcome dialogs. No skin switch is needed:
+    # setup installed the fixture Home into this runner's stock Estuary skin.
+    xbmc.executebuiltin('Dialog.Close(all,true)')
     xbmc.executebuiltin('ActivateWindow(Home)')
-    # Isolated fixture skin uses Kodi's real Home static nav control and stock dialog.
-    reply=json.loads(xbmc.executeJSONRPC(json.dumps({'jsonrpc':'2.0','id':1,'method':'Settings.SetSettingValue',
-        'params':{'setting':'lookandfeel.skin','value':'skin.infinity.diggz'}})))
-    assert 'error' not in reply,reply
-    xbmc.sleep(2000)
-    # Skin confirmation is part of Kodi's real switching behavior.
-    if xbmcgui.getCurrentWindowDialogId()!=9999:
-        xbmc.executebuiltin('SendClick(11)')
-        xbmc.sleep(1000)
+    xbmc.sleep(500)
     wait(lambda:xbmcgui.getCurrentWindowDialogId()==9999)
     wait(lambda:xbmc.getInfoLabel('Container(9000).ListItem.Property(section)')=='tvshows')
     command='RunScript(script.infinity.rails,options,tvshows,c:plugin.video.infinityrailfixture,plugin.video.infinityrailfixture)'

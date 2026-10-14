@@ -1,6 +1,7 @@
 """Prepare a disposable GitHub runner Kodi profile, with no production user data."""
 from pathlib import Path
 import shutil
+import subprocess
 import xml.etree.ElementTree as ET
 
 root=Path(__file__).resolve().parents[2]
@@ -25,3 +26,7 @@ res=manifest.find("extension[@point='xbmc.gui.skin']/res").get('folder')
 keys=profile/'keymaps';keys.mkdir(exist_ok=True)
 (keys/'rail-smoke.xml').write_text('<keymap><global><keyboard><f12>RunScript('+str(Path(__file__).with_name('kodi_smoke.py'))+')</f12></keyboard></global></keymap>')
 (profile/'advancedsettings.xml').write_text('<advancedsettings><loglevel>1</loglevel></advancedsettings>')
+# Use the stock active skin's real dialog without interactive skin-switch prompts.
+# This is confined to the disposable runner's fixture Home; no production skin
+# or delivered package is patched by this test setup.
+subprocess.run(['sudo','cp',str(skin/res/'Home.xml'),'/usr/share/kodi/addons/skin.estuary/'+res+'/Home.xml'],check=True)
