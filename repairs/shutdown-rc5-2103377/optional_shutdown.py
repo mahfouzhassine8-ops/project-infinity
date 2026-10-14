@@ -89,7 +89,7 @@ def apply(source: Path):
         "cooperative_stop_only")
     # Contract admission is checked before the existing 'empty()' ledger/admit
     # checks; we neither change their logic nor silently return a fake receipt.
-    assert m.count('if (checkpointContract.empty())') >= 3
+    assert m.count('if (checkpointContract.empty())') == inputs[MANAGER].decode().count('if (checkpointContract.empty())') == 2
     assert m.count('InfinityScriptPersistence::Admit(') == inputs[MANAGER].decode().count('InfinityScriptPersistence::Admit(')
     assert m.count('AndroidCheckpointForeignScripts()') == 1
     assert m.count('NotifyScriptAborting(thread.get());') == 1
