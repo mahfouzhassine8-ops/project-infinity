@@ -60,6 +60,8 @@ try:
             except (RuntimeError,AttributeError):pass
         assert labels[:3]==['Open Add-on','Move / Reorder','Remove from Rail'],labels
         checks['actual_dialog_populated']=labels
+        xbmc.sleep(400)
+        xbmc.executebuiltin('TakeScreenshot(special://profile/rail-options.png)')
         xbmc.executebuiltin('Action('+dismiss+')')
         wait(lambda:xbmcgui.getCurrentWindowDialogId()!=12000)
         if dismiss=='Back':

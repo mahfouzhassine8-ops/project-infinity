@@ -16,7 +16,7 @@ jobs:
         with: {persist-credentials: false}
       - run: |
           sudo apt-get update -qq
-          sudo apt-get install -y kodi xvfb xdotool
+          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core
           python3 repairs/rails-hold-2103378/setup_kodi_smoke.py
       - name: Exercise callback, real dialog and normal plugin launch
         run: |
@@ -30,19 +30,23 @@ jobs:
             sleep 1
           done
           sleep 10
-          xdotool key F12
+          xdotool windowfocus --sync "$window"
+          xdotool key --window "$window" F12
           for attempt in $(seq 1 120); do
             if [ -f "$HOME/.kodi/userdata/rail-smoke-result.json" ]; then break; fi
             sleep 1
           done
           python3 -c 'import json,pathlib; p=pathlib.Path.home()/".kodi/userdata/rail-smoke-result.json"; r=json.loads(p.read_text()); print(json.dumps(r,indent=2)); assert r["passed"]'
+      - name: Collect isolated Kodi receipts
+        if: always()
+        run: |
+          mkdir -p smoke-evidence
+          for file in "$HOME/.kodi/userdata/rail-smoke-result.json" "$HOME/.kodi/userdata/rail-options.png" "$HOME/.kodi/temp/kodi.log" /tmp/rails-kodi-console.log /tmp/rails-xvfb.log; do
+            if [ -f "$file" ]; then cp "$file" smoke-evidence/; fi
+          done
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: Infinity-Rails-Real-Kodi-Smoke
-          path: |
-            ~/.kodi/userdata/rail-smoke-result.json
-            ~/.kodi/temp/kodi.log
-            /tmp/rails-kodi-console.log
-            /tmp/rails-xvfb.log
+          path: smoke-evidence/
           retention-days: 30
