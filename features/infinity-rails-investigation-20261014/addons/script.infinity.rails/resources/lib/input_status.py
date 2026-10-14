@@ -71,7 +71,8 @@ def collect(xbmc, xa, gui, vfs):
     report.update(window=active_window, dialog=active_dialog)
     # Info labels without an explicit window evaluate in current context. Sample
     # only with Home active and no modal dialog; otherwise empty is not evidence.
-    home_active = active_window == 10000 and active_dialog in (0, -1)
+    # Kodi Omega returns WINDOW_INVALID (9999) when there is no modal dialog.
+    home_active = active_window == 10000 and active_dialog in (0, -1, 9999)
     report['sampling'] = 'HOME_ACTIVE' if home_active else 'HOME_INACTIVE_NOT_SAMPLED'
     home = gui.Window(10000)
     report['sections'] = {

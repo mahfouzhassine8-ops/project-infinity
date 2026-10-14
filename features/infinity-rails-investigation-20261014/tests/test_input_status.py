@@ -65,6 +65,11 @@ class InputStatusTests(unittest.TestCase):
         self.assertEqual(result['controls'][0]['properties']['Addon.ID'], 'plugin.video.test')
         self.assertEqual(result['controls'][0]['state'], 'DYNAMIC_ITEM_OBSERVED')
         self.assertFalse(any('8820' in q for q in queried))
+    def test_actual_kodi_no_modal_sentinel(self):
+        result, queried = self.capture(10000, 9999)
+        self.assertEqual(result['sampling'], 'HOME_ACTIVE')
+        self.assertEqual(result['focus'], 9200)
+        self.assertTrue(queried)
     def test_keymaps_reports_override_without_modification(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'gen.xml'
