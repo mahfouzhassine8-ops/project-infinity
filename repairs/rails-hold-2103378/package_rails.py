@@ -14,7 +14,7 @@ import zipfile
 
 ROOT=Path(__file__).resolve().parents[2]
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
-NATIVE_COMMIT='8483c5d1aff144781a62e81ba19a239156838cf1'
+NATIVE_COMMIT='fc3d6ebbb1bbef43bf01273004608e1c40358a3c'
 ENGINE='lib/arm64-v8a/libkodi.so'
 SIGNATURE=re.compile(r'^META-INF/(?:MANIFEST.MF|[^/]+\.(?:SF|RSA|DSA|EC))$',re.I)
 
@@ -52,7 +52,7 @@ def package(args):
     # original APK for rollback, without uninstalling or deleting user data.
     mod.PARENT_CODE=mod.CODE=2103377
     mod.PARENT_NAME='1.0.9-RC5-Optional-Shutdown-Test'
-    mod.NAME='1.0.9-Rails-Hold-Correction-RC01'
+    mod.NAME='1.0.9-Rails-Hold-Correction-RC02'
     unsigned=args.out/'rails-unsigned.apk'
     with zipfile.ZipFile(args.parent) as src, zipfile.ZipFile(unsigned,'w') as dst:
         assert len(src.namelist())==len(set(src.namelist()))
@@ -69,7 +69,7 @@ def package(args):
     assert not exports(parent_engine)-exports(engine)
     needed=lambda p:sorted(re.findall(r'\(NEEDED\).*?\[(.*?)\]',run('readelf','-d','-W',p)))
     assert needed(parent_engine)==needed(engine)
-    final=args.out/'Infinity-2103377-Rails-Hold-Native-RC1-TEST.apk'
+    final=args.out/'Infinity-2103377-Rails-Hold-Native-RC2-TEST.apk'
     subprocess.run(['bash',str(ROOT/'scripts/sign-infinity71.sh'),str(unsigned),str(final)],check=True)
     cert=run(bt/'apksigner','verify','--verbose','--print-certs',final)
     assert CERT in cert.lower()
