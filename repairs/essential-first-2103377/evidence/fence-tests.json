@@ -1,0 +1,93 @@
+{
+  "scope": "unintegrated host fence prototype; raw native-seal negative controls",
+  "prototype_sha256": "f07c3141782afc61a9a12a2c1136ec2bb32b3cf8cc8c04d05893b4de0dd05aff",
+  "results": [
+    {
+      "case": "native-barrier-raw-sqlite-gap",
+      "exit_code": 0,
+      "output": "REPRODUCED: real Python SQLite transaction commits after native seal\n"
+    },
+    {
+      "case": "unwired-runtime-refused",
+      "exit_code": 0,
+      "output": "PASS unwired-runtime-refused\n"
+    },
+    {
+      "case": "blocked-optional",
+      "exit_code": 0,
+      "output": "PASS blocked-optional\n"
+    },
+    {
+      "case": "optional-failure",
+      "exit_code": 0,
+      "output": "PASS optional-failure\n"
+    },
+    {
+      "case": "shared-writer",
+      "exit_code": 0,
+      "output": "PASS shared-writer\n"
+    },
+    {
+      "case": "shared-failure",
+      "exit_code": 0,
+      "output": "PASS shared-failure\n"
+    },
+    {
+      "case": "retired-shared",
+      "exit_code": 0,
+      "output": "PASS retired-shared\n"
+    },
+    {
+      "case": "reuse-shared",
+      "exit_code": 0,
+      "output": "PASS reuse-shared\n"
+    },
+    {
+      "case": "opaque",
+      "exit_code": 0,
+      "output": "PASS opaque\n"
+    },
+    {
+      "case": "observer-missing",
+      "exit_code": 0,
+      "output": "PASS observer-missing\n"
+    },
+    {
+      "case": "symlink",
+      "exit_code": 0,
+      "output": "PASS symlink\n"
+    },
+    {
+      "case": "hardlink",
+      "exit_code": 0,
+      "output": "PASS hardlink\n"
+    },
+    {
+      "case": "cache-overlap",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "case": "late-admission",
+      "exit_code": 0,
+      "output": "PASS late-admission\n"
+    },
+    {
+      "case": "concurrent-admission",
+      "exit_code": 0,
+      "output": "PASS concurrent-admission\n"
+    },
+    {
+      "case": "native-barrier-raw-file-gap",
+      "exit_code": 0,
+      "output": "REPRODUCED: already-open raw file changes after native seal\n"
+    }
+  ],
+  "all_expected_observations": true,
+  "production_integrated": false,
+  "protected_write_hook_coverage_verified": false,
+  "android_process_death_verified": false,
+  "reopening_verified": false,
+  "native_arm64_compiled": false,
+  "candidate_deliverable": false
+}

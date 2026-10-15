@@ -1,0 +1,31 @@
+{
+  "status": "BLOCKED_ON_PRODUCTION_WRITE_FENCE_COVERAGE",
+  "production_runtime_changed": false,
+  "experiment_enabled": false,
+  "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
+  "locked_coordinator_sha256": "13b492e2fd4b1885fa2127ebf1ea8bd2ed31fd3cbf35ebe82d3a3044383fa04b",
+  "branch": "work/infinity-2103377-essential-first-shutdown-only",
+  "host": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "native_evidence_archive_sha256": "c42594545ac416fe407267ed382871d7d8004721f923def80d4878305db09930",
+  "full_arm64_compiled": false,
+  "android_validator_updated": false,
+  "permanently_signed_candidate": false,
+  "actual_android_death_verified": false,
+  "android_reopen_verified": false,
+  "fold_accepted": false,
+  "locked": false,
+  "sha256": {
+    "InfinityEssentialScriptFence.h": "f07c3141782afc61a9a12a2c1136ec2bb32b3cf8cc8c04d05893b4de0dd05aff",
+    "README.md": "5d20296d3f88bf72cc2f936aaf3e001938720130d79aab93bbb7921a064f6f7f",
+    "evidence/coordinator-tests.json": "3689ed977cb28ceac14758d735d59c72d9daacd4553b2086d56887cf64bf9c9e",
+    "evidence/fence-tests.json": "8433fc255982a5713283a8996ef883c2d480093637bf4c447e13e470d3056b6b",
+    "evidence/observer-attach-negative-control.json": "2b1dd3cab1cf35d327acf4ef2bcd5950aec2c5c229626b2ac5ec1479c5c3b3ae",
+    "reconstruct_coordinator.py": "f8225cc8b429dfa1fc62fcd4e91768425c0a2d6851d80f81c4f777968ab65e2c",
+    "run_coordinator_tests.py": "263cb17b8a8b3b01a5a7f28924383d79d2bb6de0113364c480190991d1f8457b",
+    "run_fence_tests.py": "75debe036b53b308043daa14ce7bfd3e884a14a66fbdf0134c4dbaafb7674ced",
+    "stage_experiment.py": "a2499af333f3e8666619f920d043000670d34f66680b2de5ad01704ef6971560",
+    "test_fence.cpp": "150dcc3dd01fcca792366b3569370d0818169d1f04408d1cb42ef622d4959fcd",
+    "test_observer_attach.py": "3540b9003ac63de4e7bfc2782cbca19ecbf940cb355f8ed4cc87c40e671b0d58"
+  }
+}
