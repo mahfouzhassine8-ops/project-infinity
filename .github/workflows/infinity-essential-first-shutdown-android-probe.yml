@@ -1,0 +1,169 @@
+name: Infinity 2103377 | Internal essential-first Android process probe (no APK delivery)
+
+on:
+  push:
+    branches: [work/infinity-2103377-essential-first-shutdown-only]
+    paths:
+      - '.github/workflows/infinity-essential-first-shutdown-android-probe.yml'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_probe_package.py'
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103377-essential-android-runtime-probe, cancel-in-progress: true}
+
+jobs:
+  internal-android-probe:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 100
+    env:
+      NDK_VER: 21.4.7075529
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Verify exact green native and permanently signed locked parent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          pinned={
+              38814309116:"f8be4d05e474ca425074d7e1bb5d49f624015d37",
+              38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
+          }
+          for run,commit in pinned.items():
+              req=urllib.request.Request("https://api.github.com/repos/"+os.environ["GITHUB_REPOSITORY"]+
+                  "/actions/runs/"+str(run),headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                  "Accept":"application/vnd.github+json"})
+              deadline=time.monotonic()+3600
+              while True:
+                  with urllib.request.urlopen(req,timeout=40) as response: data=json.load(response)
+                  assert data["head_sha"]==commit,run
+                  if data["status"]=="completed":
+                      assert data["conclusion"]=="success",run
+                      break
+                  assert time.monotonic()<deadline,"Pinned full native build did not finish"
+                  print("Waiting for pinned full ARM64 build",run,flush=True)
+                  time.sleep(20)
+              print("Exact green pinned run:",run,commit,flush=True)
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38733189236
+          name: Infinity-2103377-Rails-Handoff-RC1-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: locked-rails
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38814309116
+          name: Infinity-2103377-Essential-First-Native-Evidence
+          github-token: ${{ github.token }}
+          path: native-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38415112606
+          name: Infinity-2103377-Final-Shutdown-Android
+          github-token: ${{ github.token }}
+          path: verified-android
+      - name: Verify locked APK and complete 274-case Android source
+        run: |
+          set -euo pipefail
+          echo 'de8ce3f122db7bb8b2b3681e7c6ce9caf67cf38888b17ef1f82ff7759fa8a3db  locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk' | sha256sum -c
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path("verified-android")
+          status=json.loads((root/"ANDROID-VERIFICATION.json").read_text())
+          proof=json.loads((root/"SOURCE-PRESERVATION.json").read_text())
+          assert status["source_commit"] == proof["source_commit"] == "73da8981e7bd8c4e060a0dd7c095c29a88f0d47d"
+          assert status["totals"] == {"tests":274,"failures":0,"errors":0,"skipped":0}
+          assert status["runtime_source_matches_candidate"] and status["compiled_java_inputs_match_candidate"]
+          checked=0
+          for rel,sha in proof["after"].items():
+              p=root/"source"/rel
+              if not p.is_file():
+                  assert p.name in (".gitkeep",".gitignore"), rel
+                  continue
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == sha,rel
+              checked+=1
+          assert checked >= 250
+          for name in ("InfinityCheckpointProtocol","InfinityCloseGuardService"):
+              assert (root/"source"/"tools/android/packaging/xbmc/src"/(name+".java.in")).is_file()
+          print("PASS: complete 274-test Java source reproduced, checked SHA hashes",checked,flush=True)
+          PY
+      - name: Stage Java donor with only two updated shutdown classes
+        run: |
+          set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_probe_package.py java \
+            --parent locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk \
+            --source verified-android/source --gradle-dir android-gradle --out android-donor-evidence
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/infinity-donor-temporary.keystore" \
+            -storepass android -keypass android -alias androiddebugkey -keyalg RSA \
+            -keysize 2048 -validity 1 -dname "CN=Temporary Java Donor" >/dev/null 2>&1
+      - name: Compile matched Android validator and existing guard service
+        env:
+          KODI_ANDROID_STORE_FILE: ${{ runner.temp }}/infinity-donor-temporary.keystore
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_KEY_PASSWORD: android
+        run: |
+          set -euo pipefail
+          cd android-gradle
+          ./gradlew --no-daemon --console=plain :xbmc:assembleRelease \
+            2>&1 | tee ../android-donor-evidence/GRADLE-ANDROID-RELEASE.log
+          test -s xbmc/build/outputs/apk/release/xbmc-release.apk
+      - name: Sign internal matched native/Android probe with protected permanent certificate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p essential-fold-test
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_probe_package.py package \
+            --parent locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk \
+            --donor android-gradle/xbmc/build/outputs/apk/release/xbmc-release.apk \
+            --native native-evidence --android android-donor-evidence \
+            --out essential-fold-test \
+            2>&1 | tee essential-fold-test/PACKAGING-VERIFICATION.log
+      - name: Enable disposable emulator acceleration
+        run: |
+          sudo chmod 666 /dev/kvm
+      - name: Observe real ARM64 engine close and preserved-data reopening
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py --apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --out android-process-evidence
+      - name: Retain evidence only; never publish the internal APK
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Android-Process-Evidence
+          path: |
+            android-process-evidence/
+            essential-fold-test/*.json
+            essential-fold-test/*.txt
+            essential-fold-test/*.log
+            android-donor-evidence/*.json
+            android-donor-evidence/*.log
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
