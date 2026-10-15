@@ -1,0 +1,61 @@
+{
+  "lock_id": "Infinity-2103377-Rails-Handoff-RC1-20261015",
+  "status": "USER_APPROVED_LOCK",
+  "approved_at": "2026-10-15",
+  "user_approval": "User explicitly: 'your recent APK, you can lock it. It works. We will start that as our base.'",
+  "locked_component": "Infinity Android APK",
+  "locked_apk": {
+    "original_artifact_file": "Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk",
+    "package_id": "com.projectinfinity.kodi",
+    "version_code": 2103377,
+    "version_name": "1.0.9-Rails-Handoff-Correct-RC01",
+    "size_bytes": 159572791,
+    "sha256": "de8ce3f122db7bb8b2b3681e7c6ce9caf67cf38888b17ef1f82ff7759fa8a3db",
+    "permanent_signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "verified_apk_signature_schemes": [
+      "v2",
+      "v3"
+    ]
+  },
+  "provenance": {
+    "source_packaging_commit": "62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
+    "matched_native_source_commit": "78826902c0a55a24b488b5b7fc69b378cebc6df8",
+    "successful_native_workflow_run": 38732470818,
+    "successful_signed_apk_workflow_run": 38733189236,
+    "signed_workflow_artifact_id": 11974575677,
+    "download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/38733189236/artifacts/11974575677",
+    "locked_rails_hold_rc02_parent_sha256": "17e2458552b7dbb8f14dad307015eafc2497a5ec6ddc4f7bb1707d975f37b906",
+    "changed_apk_entries": [
+      "AndroidManifest.xml",
+      "lib/arm64-v8a/libkodi.so"
+    ]
+  },
+  "preserved_unchanged": {
+    "skin": "skin.infinity.diggz 1.0.5.223 (protected user lock)",
+    "rails_helper": "0.2.6 observed installed during test; 0.2.5 locked source predecessor; neither changed by this APK",
+    "mocha_rails_menu": true,
+    "shutdown_python_retirement_rc1": true,
+    "all_17_existing_checkpoint_owners": true,
+    "providers_playback_resume_hub_data_settings": true
+  },
+  "device_acceptance": {
+    "user_reports_rails_fix_works": true,
+    "accepted_for_new_development_baseline": true,
+    "independent_post_install_diagnostics_of_exact_rails_handoff_apk": "not provided in this approval turn; no claim of blanket system validation",
+    "extended_session_safe_shutdown": "UNRESOLVED — separate targeted repair"
+  },
+  "immutable_baseline_rules": [
+    "Never overwrite or mutate the signed locked APK, signer, package, or recorded SHA256.",
+    "All new work branches from this lock branch/source and produces separate test candidates.",
+    "No skin, Rails, Mocha, helper, provider Python, playback, Resume Hub, database schema, input/gesture, or unrelated runtime code changes permitted in shutdown-only continuation.",
+    "No uninstall, reset, or clearing user data.",
+    "Future process-level exit must protect independently verified essential writes and disclose any intentionally abandoned optional third-party work accurately.",
+    "No promotion or new final lock without explicit user physical approval."
+  ],
+  "preserved_prior_locks": [
+    "Infinity Rails Hold RC02",
+    "Infinity Skin 1.0.5.223",
+    "Infinity Rails helper 0.2.5"
+  ],
+  "archive_destination": "ChatGPT Library /Infinity Locks/Rails Handoff 2026-10-15/"
+}
