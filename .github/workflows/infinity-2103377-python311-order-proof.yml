@@ -1,0 +1,46 @@
+name: Infinity 2103377 | Isolated CPython 3.11 Shutdown Ordering Proof
+
+on:
+  push:
+    branches:
+      - experiment/infinity-2103377-python311-shutdown-ordering-test-20261015
+    paths:
+      - 'experiments/shutdown-ordering-python311/**'
+      - '.github/workflows/infinity-2103377-python311-order-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host-proof-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout isolated experiment branch
+        uses: actions/checkout@v4
+      - name: Select CPython 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          check-latest: false
+      - name: Verify actual Python and compile host-only C++ probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          python --version
+          python3.11-config --includes --embed --ldflags
+          cd experiments/shutdown-ordering-python311
+          g++ -std=c++17 -O2 -Wall -Wextra proof.cpp -o proof $(python3.11-config --includes --embed --ldflags)
+      - name: Execute isolated CPython shutdown test suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/shutdown-ordering-python311/run_proof.py
+      - name: Save host observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: infinity-2103377-python311-host-only-proof
+          path: experiments/shutdown-ordering-python311/proof-output/result.json
+          if-no-files-found: warn
