@@ -32,33 +32,6 @@ jobs:
           path: /usr/local/lib/android/sdk/ndk/21.4.7075529
           key: infinity-pinned-ndk-linux-21.4.7075529-v1
       - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
-      - name: Verify exact green native and permanently signed locked parent
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json,os,time,urllib.request
-          pinned={
-              38814309116:"f8be4d05e474ca425074d7e1bb5d49f624015d37",
-              38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
-          }
-          for run,commit in pinned.items():
-              req=urllib.request.Request("https://api.github.com/repos/"+os.environ["GITHUB_REPOSITORY"]+
-                  "/actions/runs/"+str(run),headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
-                  "Accept":"application/vnd.github+json"})
-              deadline=time.monotonic()+3600
-              while True:
-                  with urllib.request.urlopen(req,timeout=40) as response: data=json.load(response)
-                  assert data["head_sha"]==commit,run
-                  if data["status"]=="completed":
-                      assert data["conclusion"]=="success",run
-                      break
-                  assert time.monotonic()<deadline,"Pinned full native build did not finish"
-                  print("Waiting for pinned full ARM64 build",run,flush=True)
-                  time.sleep(20)
-              print("Exact green pinned run:",run,commit,flush=True)
-          PY
       - uses: actions/download-artifact@v8
         with:
           run-id: 38733189236
@@ -67,14 +40,8 @@ jobs:
           path: locked-rails
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38814309116
-          name: Infinity-2103377-Essential-First-Native-Evidence
-          github-token: ${{ github.token }}
-          path: native-evidence
-      - uses: actions/download-artifact@v8
-        with:
-          run-id: 38415112606
-          name: Infinity-2103377-Final-Shutdown-Android
+          run-id: 38514680851
+          name: Infinity-2103377-RC5-Android-274-Verified
           github-token: ${{ github.token }}
           path: verified-android
       - name: Verify locked APK and complete 274-case Android source
@@ -87,7 +54,7 @@ jobs:
           root=Path("verified-android")
           status=json.loads((root/"ANDROID-VERIFICATION.json").read_text())
           proof=json.loads((root/"SOURCE-PRESERVATION.json").read_text())
-          assert status["source_commit"] == proof["source_commit"] == "73da8981e7bd8c4e060a0dd7c095c29a88f0d47d"
+          assert status["source_commit"] == proof["source_commit"] == "5a1a427cb5bdcc248b0e2a7887f9d6682ca53877"
           assert status["totals"] == {"tests":274,"failures":0,"errors":0,"skipped":0}
           assert status["runtime_source_matches_candidate"] and status["compiled_java_inputs_match_candidate"]
           checked=0
@@ -124,6 +91,45 @@ jobs:
           ./gradlew --no-daemon --console=plain :xbmc:assembleRelease :xbmc:exportPreservationTools \
             2>&1 | tee ../android-donor-evidence/GRADLE-ANDROID-RELEASE.log
           test -s xbmc/build/outputs/apk/release/xbmc-release.apk
+      - name: Prove locked non-shutdown Java instructions are preserved
+        run: |
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_probe_package.py verify-java \
+            --parent locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk \
+            --donor android-gradle/xbmc/build/outputs/apk/release/xbmc-release.apk \
+            --gradle-dir android-gradle --out essential-fold-test
+      - name: Verify exact green native and permanently signed locked parent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          pinned={
+              38819025107:"3acc3a9e5bcb1b0a698cab0ed971866886df8cf4",
+              38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
+          }
+          for run,commit in pinned.items():
+              req=urllib.request.Request("https://api.github.com/repos/"+os.environ["GITHUB_REPOSITORY"]+
+                  "/actions/runs/"+str(run),headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                  "Accept":"application/vnd.github+json"})
+              deadline=time.monotonic()+3600
+              while True:
+                  with urllib.request.urlopen(req,timeout=40) as response: data=json.load(response)
+                  assert data["head_sha"]==commit,run
+                  if data["status"]=="completed":
+                      assert data["conclusion"]=="success",run
+                      break
+                  assert time.monotonic()<deadline,"Pinned full native build did not finish"
+                  print("Waiting for pinned full ARM64 build",run,flush=True)
+                  time.sleep(20)
+              print("Exact green pinned run:",run,commit,flush=True)
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38819025107
+          name: Infinity-2103377-Essential-First-Native-Evidence
+          github-token: ${{ github.token }}
+          path: native-evidence
       - name: Sign internal matched native/Android probe with protected permanent certificate
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}

@@ -15,10 +15,10 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[3]
 SOURCE=ROOT/'repairs/essential-first-2103377/package_signed_fold_test.py'
-NATIVE='f8be4d05e474ca425074d7e1bb5d49f624015d37'
+NATIVE='3acc3a9e5bcb1b0a698cab0ed971866886df8cf4'
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('mode',choices=('java','package'))
+    p=argparse.ArgumentParser();p.add_argument('mode',choices=('java','verify-java','package'))
     for name in ('parent','source','gradle-dir','donor','native','android','out'):
         p.add_argument('--'+name,type=Path,required=name in ('parent','out'))
     args=p.parse_args()
@@ -32,11 +32,20 @@ def main():
     assert len(factory.NEW_NAME)==len(factory.OLD_NAME)
     if args.mode=='java':
         assert args.source and args.gradle_dir
+        baseline=args.source/'tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in'
+        candidate=ROOT/'repairs/essential-first-2103377/runtime/android/tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in'
+        expected=candidate.read_text()
+        # The only guard delta is truthful essential-first diagnostic fields.
+        # Preserve the locked entry/removal lease and advisory notice exactly.
+        for field in ('exit_policy','process_death_confirmed','exit_kind','optional_data_recovery_guaranteed'):
+            expected,count=re.subn(r'(?m)^      row\.put\("'+field+r'"[^\n]*\n','',expected)
+            assert count==1,field
+        assert expected==baseline.read_text(),'Guard no longer preserves the exact approved Android source'
         factory.prepared_java(args)
         with (args.gradle_dir/'xbmc/build.gradle').open('a') as stream:
             stream.write("\nconfigurations { preservationTools }\ndependencies { preservationTools 'org.smali:baksmali:2.5.2' }\ntasks.register('exportPreservationTools') { doLast { rootProject.file('preservation-classpath.txt').text = configurations.preservationTools.asPath } }\n")
     else:
-        assert args.native and args.donor and args.android and args.gradle_dir
+        assert args.donor and args.gradle_dir
         args.out.mkdir(parents=True,exist_ok=True)
         # Source/class inventories alone cannot establish that unrelated Java
         # behaviour survived rebuilding an older complete donor source export.
@@ -48,6 +57,8 @@ def main():
         normalize=guard.normalize
         guard.normalize=lambda text: normalize(re.sub(r'(?m)^\s*\.line \d+\s*$', '', text))
         guard.compare(args.parent,args.donor,(args.gradle_dir/'preservation-classpath.txt').read_text(),args.out)
+        if args.mode=='verify-java': return
+        assert args.native and args.android
         factory.signed_package(args)
         old=args.out/'Infinity-2103377-Essential-First-Signed-Fold-TEST1.apk'
         final=args.out/'Infinity-2103377-Essential-First-Internal-Probe.apk'
@@ -55,7 +66,7 @@ def main():
         receipt=args.out/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json'
         row=json.loads(receipt.read_text())
         row.update(status='INTERNAL ANDROID RUNTIME PROBE; NOT FOR DELIVERY; NOT LOCKED',file=final.name,
-                   native_host_cases=34,apk_deliverable=False,physical_device_acceptance_required=True)
+                   native_host_cases=36,apk_deliverable=False,physical_device_acceptance_required=True)
         # These legacy TEST1 limitations predate this exact native build.
         # Replace them with explicit current verification boundaries.
         row.pop('known_fail_closed_native_encoder_route',None)
