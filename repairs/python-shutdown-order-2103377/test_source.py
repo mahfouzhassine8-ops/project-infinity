@@ -2,16 +2,19 @@
 """Fail-closed source contracts for the exact native Close ordering correction."""
 from __future__ import annotations
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import shutil
-import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import patch_native as fix
+# Never occupy the generic 'patch_native' module name: the Rails and Stability
+# parent build drivers each import their own module under that legacy name.
+_spec = importlib.util.spec_from_file_location("infinity_shutdown_order_patch_contract", HERE / "patch_native.py")
+fix = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(fix)
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
