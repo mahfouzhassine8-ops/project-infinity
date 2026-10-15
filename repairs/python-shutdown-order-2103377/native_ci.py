@@ -15,15 +15,18 @@ import sys
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-sys.path.insert(0, str(HERE))
-import patch_native
-import test_source
 
 def module(path: Path, name: str):
     spec = importlib.util.spec_from_file_location(name, path)
     result = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(result)
     return result
+
+# Preserve the Rails driver's 'import patch_native' resolution. Importing our
+# fix under the same generic name causes the upstream 3-file Rails patch to be
+# accidentally replaced at runtime. Unique module identities are essential.
+patch_native = module(HERE / 'patch_native.py', 'infinity_shutdown_order_native_patch')
+test_source = module(HERE / 'test_source.py', 'infinity_shutdown_order_native_tests')
 
 def stable():
     return module(ROOT/"repairs/stability-probe-2103377/native_ci.py", "stability_native_parent")
