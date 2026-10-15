@@ -124,20 +124,23 @@ def apply(root: Path, expected_python_sha: str | None = None) -> dict:
     )
     p = replace_once(
         p,
-        '''  m_stop = true;
-
-  if (!IsRunning() && !m_threadState)''',
-        '''  m_stop = true;
+        'bool CPythonInvoker::stop(bool abort)\n{',
+        '''bool CPythonInvoker::stop(bool abort)
+{
 #if defined(TARGET_ANDROID)
-  if (m_infinityThreadingShutdownStarted)
   {
-    // CThread::StopThread(true) will still join the real invoker; do not
-    // inject SystemExit into legitimate threading callbacks or cleanup writes.
-    return true;
+    // This exact branch already holds the GIL for registered cleanup. Prevent
+    // concurrent Stop(true) escalation from injecting SystemExit into
+    // callbacks or re-entering the invoker while finalization is in progress.
+    // Use m_critical, which also protects flag mutation in the C++ wait loop.
+    std::unique_lock<CCriticalSection> finalizerGuard(m_critical);
+    if (m_infinityThreadingShutdownStarted)
+    {
+      m_stop = true;
+      return true; // The owning CLanguageInvokerThread still joins normally.
+    }
   }
-#endif
-
-  if (!IsRunning() && !m_threadState)''',
+#endif''',
         "no_async_during_final_cleanup",
     )
     p = replace_once(
