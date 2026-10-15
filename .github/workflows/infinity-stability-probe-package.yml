@@ -40,6 +40,15 @@ jobs:
           subprocess.run(['git','diff','--exit-code','cd289c913f26f7dc350d0b5a9b7e1cfeb1976526','--','repairs/stability-probe-2103377/InfinityPythonWaitProbe.h','repairs/stability-probe-2103377/InfinityProbeExport.h','repairs/stability-probe-2103377/InfinityStabilityProbe.h','repairs/stability-probe-2103377/patch_native.py','repairs/stability-probe-2103377/native_ci.py','repairs/stability-probe-2103377/RC02-HASHES.json','repairs/stability-probe-2103377/run_tests.py','repairs/stability-probe-2103377/test_probe.cpp','repairs/stability-probe-2103377/test_python.cpp','repairs/stability-probe-2103377/test_probe_export.cpp','repairs/stability-probe-2103377/blocked_wait_check.cpp'],check=True)
           subprocess.run(['git','diff','--exit-code','9ed8c1cc1229eece336a7a20f64bc817187d6914','--','repairs/stability-probe-2103377/helper'],check=True)
           PY
+      - name: Run preserved and failure-specific helper tests
+        run: |
+          set -euo pipefail
+          mkdir -p stability-delivery
+          python3 -m unittest discover -s features/infinity-rails-investigation-20261014/tests -p 'test_*.py' -v > stability-delivery/preserved-helper-tests.txt 2>&1 || { cat stability-delivery/preserved-helper-tests.txt; exit 1; }
+          python3 -m unittest discover -s repairs/stability-probe-2103377 -p 'test_helper.py' -v > stability-delivery/stability-helper-tests.txt 2>&1 || { cat stability-delivery/stability-helper-tests.txt; exit 1; }
+          python3 repairs/stability-probe-2103377/candidate_regressions.py \
+            --tests-root features/infinity-rails-investigation-20261014 \
+            --helper repairs/stability-probe-2103377/helper --out stability-delivery
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
@@ -69,15 +78,6 @@ jobs:
           name: Infinity-Stability-Real-Kodi-Smoke
           github-token: ${{ github.token }}
           path: real-kodi
-      - name: Run preserved and failure-specific helper tests
-        run: |
-          set -euo pipefail
-          mkdir -p stability-delivery
-          python3 -m unittest discover -s features/infinity-rails-investigation-20261014/tests -p 'test_*.py' -v > stability-delivery/preserved-helper-tests.txt 2>&1
-          python3 -m unittest discover -s repairs/stability-probe-2103377 -p 'test_helper.py' -v > stability-delivery/stability-helper-tests.txt 2>&1
-          python3 repairs/stability-probe-2103377/candidate_regressions.py \
-            --tests-root features/infinity-rails-investigation-20261014 \
-            --helper repairs/stability-probe-2103377/helper --out stability-delivery
       - name: Preserve locked payload and sign diagnostic derivative
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -96,3 +96,14 @@ jobs:
           retention-days: 90
           compression-level: 1
           if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Stability-Package-Gates
+          path: |
+            stability-delivery/**/*.txt
+            stability-delivery/**/*.json
+            stability-delivery/*.txt
+            stability-delivery/*.json
+          retention-days: 90
+          if-no-files-found: warn
