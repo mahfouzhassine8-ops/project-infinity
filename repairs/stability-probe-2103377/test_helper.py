@@ -56,8 +56,12 @@ class PreservationTests(unittest.TestCase):
             if p.is_file() and '__pycache__' not in str(p):
                 name=str(p.relative_to(HERE/'helper'))
                 if name not in allowed:self.assertEqual(hashlib.sha256(p.read_bytes()).hexdigest(),manifest['files'][name],name)
-        methods={n.name:hashlib.sha256(ast.dump(n,include_attributes=False).encode()).hexdigest()
-            for n in ast.parse((HERE/'helper/resources/lib/runtime.py').read_text()).body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
-        for name,value in manifest['unchanged_runtime_methods'].items():self.assertEqual(methods[name],value,name)
+        source=(HERE/'helper/resources/lib/runtime.py').read_bytes()
+        lines=source.splitlines(keepends=True)
+        # ast.dump is not stable across Python versions (3.12 adds type_params).
+        # Hash the exact approved method source, including its comments instead.
+        methods={n.name:hashlib.sha256(b''.join(lines[n.lineno-1:n.end_lineno])).hexdigest()
+            for n in ast.parse(source.decode('utf-8')).body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
+        for name,value in manifest['unchanged_runtime_source_sha256'].items():self.assertEqual(methods[name],value,name)
 
 if __name__=='__main__':unittest.main()
