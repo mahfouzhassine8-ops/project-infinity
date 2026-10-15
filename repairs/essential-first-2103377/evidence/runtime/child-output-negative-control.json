@@ -1,0 +1,194 @@
+{
+  "scope": "production native Python observer and C entry hooks, pinned CPython 3.11",
+  "results": [
+    {
+      "case": "cached-write",
+      "exit_code": 0,
+      "stdout": "PASS cached-write; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-pwrite",
+      "exit_code": 0,
+      "stdout": "PASS cached-pwrite; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-writev",
+      "exit_code": 0,
+      "stdout": "PASS cached-writev; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "raw",
+      "exit_code": 0,
+      "stdout": "PASS raw; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "raw-fd-spoof",
+      "exit_code": 0,
+      "stdout": "PASS raw-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "buffer-fd-spoof",
+      "exit_code": 0,
+      "stdout": "PASS buffer-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-raw-open",
+      "exit_code": 0,
+      "stdout": "PASS late-raw-open; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-cached-open",
+      "exit_code": 0,
+      "stdout": "PASS late-cached-open; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-rename",
+      "exit_code": 0,
+      "stdout": "PASS cached-rename; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-remove",
+      "exit_code": 0,
+      "stdout": "PASS cached-remove; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-chmod",
+      "exit_code": 0,
+      "stdout": "PASS late-chmod; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-mmap",
+      "exit_code": 0,
+      "stdout": "PASS late-mmap; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-ctypes",
+      "exit_code": 0,
+      "stdout": "PASS late-ctypes; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "buffer-drain",
+      "exit_code": 0,
+      "stdout": "PASS buffer-drain; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "layered",
+      "exit_code": 0,
+      "stdout": "PASS layered; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-buffer",
+      "exit_code": 0,
+      "stdout": "PASS cached-buffer; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "optional-blocked",
+      "exit_code": 0,
+      "stdout": "PASS optional-blocked; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "sqlite-attach",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-attach; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "descriptor-race",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-race; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "rename-race",
+      "exit_code": 0,
+      "stdout": "PASS rename-race; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "sqlite-renamed",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-renamed; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "sqlite-row-factory",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-row-factory; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "file-lock",
+      "exit_code": 0,
+      "stdout": "PASS file-lock; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "pathlike",
+      "exit_code": 0,
+      "stdout": "PASS pathlike; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "memory-buffer",
+      "exit_code": 0,
+      "stdout": "PASS memory-buffer; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "observer-denials",
+      "exit_code": 0,
+      "stdout": "PASS observer-denials; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "unknown-descriptor",
+      "exit_code": 0,
+      "stdout": "PASS unresolved actual descriptor conversion fails closed\n",
+      "stderr": ""
+    },
+    {
+      "case": "uname-combined-flags",
+      "exit_code": 0,
+      "stdout": "PASS uname-combined-flags; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "unverified-child-output",
+      "exit_code": 0,
+      "stdout": "PASS unverified child output remains an essential blocker\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-file-pending",
+      "exit_code": -6,
+      "stdout": "Real child changed protected bytes; seal=1; authorized=1\n",
+      "stderr": "test: /tmp/essential-native-h6ie57jz/test.cpp:182: int main(int, char**): Assertion `!sealed && !authorized' failed.\n"
+    },
+    {
+      "case": "child-pipe-pending",
+      "exit_code": 0,
+      "stdout": "PASS actual pending child output classification\n",
+      "stderr": ""
+    }
+  ],
+  "all_passed": false,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

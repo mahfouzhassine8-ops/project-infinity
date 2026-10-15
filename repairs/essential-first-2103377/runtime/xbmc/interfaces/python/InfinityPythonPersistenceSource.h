@@ -604,13 +604,10 @@ class Observer:
                             (observer.host_probe or not any(name.startswith(('LD_', 'DYLD_')) for name in os.environ)) and
                             kwargs.get('executable') in (None, command[0]))
                 if readonly:
-                    for name, fallback in (('stdout', 1), ('stderr', 2)):
-                        output = kwargs.get(name)
-                        if isinstance(output, File): observer.touch(output.fileno(), 'write')
-                        elif output is None: observer.touch(fallback, 'write')
-                        elif output not in (subprocess.PIPE, subprocess.STDOUT, subprocess.DEVNULL):
-                            observer.error('unobserved_diagnostic_child_output',
-                                           'stream=%s;type=%s' % (name, type(output).__name__))
+                    # Native fork_exec leases the actual converted descriptors
+                    # through child death. Python object types cannot prove the
+                    # output destination or bound its lifetime. Unsupported
+                    # posix_spawn file actions remain an explicit native blocker.
                     observer.touch(None, 'readonly-child-begin')
                     observer.child_scope.readonly = True
                 try:

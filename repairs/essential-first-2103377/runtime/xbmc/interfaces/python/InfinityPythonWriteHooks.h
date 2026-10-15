@@ -22,7 +22,7 @@ enum Kind
   OS_CLOSE, OS_CLOSERANGE, OS_DUP, OS_DUP2, FILE_FLOCK, IO_OPEN, EXTENSION_CREATE, PIL_DESCRIPTOR_WRITE, PIL_PATH_WRITE,
   RAW_WRITE, RAW_TRUNCATE, RAW_CLOSE,
   BUFFER_WRITE, BUFFER_TRUNCATE, BUFFER_FLUSH, BUFFER_CLOSE,
-  TEXT_WRITE, TEXT_TRUNCATE, TEXT_FLUSH, TEXT_CLOSE, COUNT
+  TEXT_WRITE, TEXT_TRUNCATE, TEXT_FLUSH, TEXT_CLOSE, FORK_EXEC, COUNT
 };
 struct Spec
 {
@@ -345,12 +345,71 @@ template<Kind kind> PyObject* Keywords(PyObject* self, PyObject* tuple, PyObject
   Call call(kind, self, {values.data(), count, nullptr, keywords}); if (!call) return nullptr;
   return call.Finish(reinterpret_cast<PyCFunctionWithKeywords>(reinterpret_cast<void(*)(void)>(Specs()[kind].original.ml_meth))(self, tuple, keywords));
 }
+inline PyObject* ForkExec(PyObject* self, PyObject* tuple)
+{
+  auto* context = Context();
+  const int writer = context ? context->id : -1;
+  if (!context || !context->readonlyChildren[PyThreadState_Get()])
+  {
+    Ledger::Fail(writer, "unobserved_native_child_process");
+    if (Ledger::RejectOpaqueMutation("native_child_process"))
+    { InfinityPythonPersistence::AdmissionDenied(context,"Unverified child process during checkpoint"); return nullptr; }
+  }
+  std::vector<uint64_t> operations;
+  // Pinned CPython 3.11 fork_exec ABI: c2pwrite and errwrite are the actual
+  // converted stdout/stderr descriptors, after any provider fileno() calls.
+  for (const auto& item : {std::make_pair(9,1), std::make_pair(11,2)})
+  {
+    int descriptor = -1;
+    if (PyTuple_Check(tuple) && PyTuple_GET_SIZE(tuple) == 23)
+    {
+      auto* value = PyTuple_GET_ITEM(tuple,item.first);
+      if (PyLong_Check(value))
+      {
+        const long fd = PyLong_AsLong(value);
+        if (!PyErr_Occurred() && fd >= -1 && fd <= INT_MAX)
+          descriptor = fd < 0 ? item.second : static_cast<int>(fd);
+        else PyErr_Clear();
+      }
+    }
+    const auto path = descriptor < 0 ? std::string{} : Ledger::DescriptorPath(descriptor);
+    const auto token = Ledger::BeginProtectedOperation(writer,
+        path.empty() ? std::vector<std::string>{} : std::vector<std::string>{path},
+        "native_child_output_preparing",false,false,descriptor);
+    if (!token)
+    {
+      for (const auto active : operations) Ledger::EndProtectedOperation(active);
+      InfinityPythonPersistence::AdmissionDenied(context,"Child output crosses protected write barrier");
+      return nullptr;
+    }
+    operations.push_back(token);
+  }
+  auto* result = Specs()[FORK_EXEC].original.ml_meth(self,tuple);
+  if (result && PyLong_Check(result))
+  {
+    const long pid = PyLong_AsLong(result);
+    if (!PyErr_Occurred() && pid > 0 && pid <= INT_MAX)
+    {
+      for (const auto active : operations) Ledger::BindProtectedChild(active,static_cast<int>(pid));
+      return result;
+    }
+    PyErr_Clear();
+    Ledger::ProtectionFailure("native_child_pid_unconfirmed");
+  }
+  for (const auto active : operations) Ledger::EndProtectedOperation(active);
+  return result;
+}
 template<Kind kind> bool Prepare(PyMethodDef* method)
 {
   auto& spec = Specs()[kind];
   if (spec.installed) return method == &spec.replacement ||
       (method->ml_meth == spec.original.ml_meth && method->ml_flags == spec.original.ml_flags);
   spec.original = spec.replacement = *method;
+  if constexpr (kind == FORK_EXEC)
+  {
+    if (method->ml_flags != METH_VARARGS) return false;
+    spec.replacement.ml_meth = ForkExec; spec.installed = true; return true;
+  }
   switch (method->ml_flags)
   {
     case METH_FASTCALL: spec.replacement.ml_meth = _PyCFunction_CAST(Fast<kind>); break;
@@ -471,7 +530,8 @@ inline bool Install()
   auto* io = PyImport_ImportModule("_io");
   auto* imports = PyImport_ImportModule("_imp");
   auto* locks = PyImport_ImportModule("fcntl");
-  if (!posix || !io || !imports || !locks) { Py_XDECREF(posix); Py_XDECREF(io); Py_XDECREF(imports); Py_XDECREF(locks); return false; }
+  auto* children = PyImport_ImportModule("_posixsubprocess");
+  if (!posix || !io || !imports || !locks || !children) { Py_XDECREF(posix); Py_XDECREF(io); Py_XDECREF(imports); Py_XDECREF(locks); Py_XDECREF(children); return false; }
   bool ok = RememberIOTypes(io) && DescriptorReader(io, "FileIO", 0) && DescriptorReader(io, "BufferedWriter", 1) &&
       DescriptorReader(io, "TextIOWrapper", 2) &&
       Function<EXTENSION_CREATE>(imports,"create_dynamic") &&
@@ -485,6 +545,7 @@ inline bool Install()
       Function<OS_MKFIFO>(posix,"mkfifo",true) && Function<OS_MKNOD>(posix,"mknod",true) &&
       Function<OS_FALLOCATE>(posix,"posix_fallocate",true) && Function<OS_SPLICE>(posix,"splice",true) &&
       Function<FILE_FLOCK>(locks,"flock") &&
+      Function<FORK_EXEC>(children,"fork_exec") &&
       Function<OS_CLOSE>(posix, "close") && Function<OS_DUP>(posix, "dup") && Function<OS_DUP2>(posix, "dup2") &&
       Function<OS_CLOSERANGE>(posix,"closerange") &&
       Function<OS_RMDIR>(posix, "rmdir") && Function<IO_OPEN>(io, "open") &&
@@ -502,7 +563,7 @@ inline bool Install()
       Method<TEXT_TRUNCATE>(io, "TextIOWrapper", "truncate") &&
       Method<TEXT_FLUSH>(io, "TextIOWrapper", "flush") &&
       Method<TEXT_CLOSE>(io, "TextIOWrapper", "close") && Initializer(io);
-  Py_DECREF(posix); Py_DECREF(io); Py_DECREF(imports); Py_DECREF(locks);
+  Py_DECREF(posix); Py_DECREF(io); Py_DECREF(imports); Py_DECREF(locks); Py_DECREF(children);
   if (!ok) Ledger::ProtectionFailure("native_cpython_write_hooks_not_installed");
   return ok;
 }

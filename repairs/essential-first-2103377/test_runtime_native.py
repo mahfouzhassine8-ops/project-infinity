@@ -19,6 +19,24 @@ CODE = r'''
 #include <cstdlib>
 #include <condition_variable>
 #include <sys/syscall.h>
+#include <sys/wait.h>
+#include <poll.h>
+#include <signal.h>
+// Test-only fork stop: the real child keeps its inherited output descriptor
+// while the actual barrier is tested. No production test hooks or tracing.
+static bool traceNextFork = false;
+static int childSignalPipe[2] = {-1,-1};
+extern "C" pid_t fork() {
+  static auto realFork = reinterpret_cast<pid_t(*)()>(dlsym(RTLD_NEXT,"fork"));
+  assert(realFork);
+  const pid_t child = realFork();
+  if (child == 0 && traceNextFork) {
+    const pid_t pid = getpid();
+    if (syscall(SYS_write,childSignalPipe[1],&pid,sizeof(pid)) != sizeof(pid)) std::_Exit(92);
+    kill(pid,SIGSTOP);
+  }
+  return child;
+}
 // Test-only delay at the real libc write boundary. Production code has no
 // waiting thread, timeout or test hook. The protected entry point remains live
 // while another Python thread changes the descriptor or namespace.
@@ -85,7 +103,26 @@ int main(int argc, char** argv) {
   else if (mode == "raw") run("f=old_raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else run("fd=os.open(shared, os.O_CREAT|os.O_RDWR, 0o600); os.write(fd,b'essential')\n");
   if (mode == "uname-combined-flags") run("import subprocess\nassert subprocess.check_output(['uname','-rs']).strip()\n");
-  if (mode == "unverified-child-output") run("import subprocess\nassert subprocess.call(['uname','-rs'],stdout=fd)==0\n");
+  if (mode == "child-numeric-output") run("import subprocess\nassert subprocess.call(['uname','-rs'],stdout=fd)==0\nbaseline=old_open(shared,'rb').read(); assert baseline!=b'essential'\n");
+  if (mode == "unverified-posix-spawn") run("pid=os.posix_spawn('/usr/bin/uname',['uname','-rs'],os.environ,file_actions=[(os.POSIX_SPAWN_DUP2,fd,1)]); assert os.waitpid(pid,0)[1]==0\n");
+  pid_t tracedChild = -1;
+  if (mode == "child-file-pending" || mode == "child-cache-pending" || mode == "child-pipe-pending") {
+    assert(pipe(childSignalPipe)==0);
+    traceNextFork = true;
+    run("import subprocess,threading\nsubprocess._USE_VFORK=False; subprocess._USE_POSIX_SPAWN=False\n");
+    if (mode == "child-file-pending") run("output=open(shared,'ab')\n");
+    else if (mode == "child-cache-pending") run("output=open(private,'ab')\n");
+    else run("output=subprocess.PIPE\n");
+    run("children=[]\ndef launch_child():\n child=subprocess.Popen(['uname','-rs'],stdout=output); children.append(child); child.communicate(timeout=5)\nt=threading.Thread(target=launch_child); t.start()\n");
+    auto* state = PyEval_SaveThread();
+    struct pollfd ready{childSignalPipe[0],POLLIN,0};
+    assert(poll(&ready,1,5000)==1);
+    assert(read(childSignalPipe[0],&tracedChild,sizeof(tracedChild))==sizeof(tracedChild));
+    int status = 0;
+    assert(waitpid(tracedChild,&status,WUNTRACED)==tracedChild && WIFSTOPPED(status));
+    PyEval_RestoreThread(state);
+    traceNextFork = false;
+  }
   if (mode.rfind("pillow-",0)==0) {
     run("import importlib.util\n"
         "spec=importlib.util.spec_from_file_location('PIL._imaging',os.environ['KODI_ANDROID_LIBS']+'/lib_imaging.so')\n"
@@ -148,14 +185,33 @@ int main(int argc, char** argv) {
   }
   if (mode == "sqlite-renamed") run("try: c.execute('INSERT INTO history VALUES(999)')\nexcept sqlite3.DatabaseError: pass\nelse: raise AssertionError('renamed SQLite handle retained optional authorization')\n");
   assert(InfinityScriptPersistence::CloseParticipantWrites(23));
-  if (mode == "unverified-child-output") {
+  if (tracedChild > 0) {
+    const bool sealed = InfinityScriptPersistence::SealEssentialWrites(23);
+    const bool authorized = InfinityScriptPersistence::EssentialWritesAuthorized(23);
+    assert(kill(tracedChild,SIGCONT)==0);
+    run("t.join(5); assert not t.is_alive(); assert children[0].returncode==0\n");
+    if (mode == "child-file-pending") {
+      run("assert old_open(shared,'rb').read()!=b'essential'\n");
+      std::cout << "Real child changed protected bytes; seal=" << sealed << "; authorized=" << authorized << '\n' << std::flush;
+      assert(!sealed && !authorized);
+      assert(InfinityScriptPersistence::SealEssentialWrites(23));
+      assert(InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    } else {
+      assert(sealed && authorized);
+      run("assert old_open(shared,'rb').read()==b'essential'\n");
+      if (mode == "child-cache-pending") run("assert old_open(private,'rb').read()\n");
+    }
+    std::cout << "PASS actual pending child output classification\n" << std::flush;
+    std::_Exit(0);
+  }
+  if (mode == "unverified-posix-spawn") {
     const auto proof = InfinityScriptPersistence::EssentialWrites();
     assert(std::any_of(proof.blockers.begin(),proof.blockers.end(),[](const auto& why) {
-      return why.find("unobserved_diagnostic_child_output") != std::string::npos;
+      return why.find("unobserved_posix_spawn_output") != std::string::npos;
     }));
     assert(!InfinityScriptPersistence::SealEssentialWrites(23));
     assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
-    std::cout << "PASS unverified child output remains an essential blocker\n" << std::flush;
+    std::cout << "PASS unobserved posix_spawn file actions remain an essential blocker\n" << std::flush;
     std::_Exit(0);
   }
   if (mode == "unknown-descriptor") {
@@ -204,7 +260,8 @@ int main(int argc, char** argv) {
   if (mode == "optional-blocked") run("assert t.is_alive() and not e.is_set()\n");
   // Denied operations are diagnostic; no essential bytes were changed.
   assert(InfinityScriptPersistence::EssentialWritesAuthorized(23));
-  if (mode != "optional-blocked" && mode != "sqlite-attach" && mode != "descriptor-race" && mode != "rename-race" && mode.rfind("pillow-",0)!=0) run("assert old_open(shared,'rb').read()==b'essential'\n");
+  if (mode == "child-numeric-output") run("assert old_open(shared,'rb').read()==baseline\n");
+  else if (mode != "optional-blocked" && mode != "sqlite-attach" && mode != "descriptor-race" && mode != "rename-race" && mode.rfind("pillow-",0)!=0) run("assert old_open(shared,'rb').read()==b'essential'\n");
   std::cout << "PASS " << mode << "; actual CPython " << PY_VERSION << "; no interpreter retirement required\n" << std::flush;
   std::_Exit(0); // Whole HOST process only. This is not Android death evidence.
 }
@@ -245,7 +302,8 @@ def main():
         cases=['cached-write','cached-pwrite','cached-writev','raw','raw-fd-spoof','buffer-fd-spoof','late-raw-open','late-cached-open',
                'cached-rename','cached-remove','late-chmod','late-mmap','late-ctypes','buffer-drain','layered','cached-buffer','optional-blocked','sqlite-attach',
                'descriptor-race','rename-race','sqlite-renamed','sqlite-row-factory','file-lock',
-               'pathlike','memory-buffer','observer-denials','unknown-descriptor','uname-combined-flags','unverified-child-output']
+               'pathlike','memory-buffer','observer-denials','unknown-descriptor','uname-combined-flags','child-numeric-output',
+               'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

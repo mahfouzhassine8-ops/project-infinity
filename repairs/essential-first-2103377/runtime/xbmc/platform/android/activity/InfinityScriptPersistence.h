@@ -58,6 +58,9 @@ struct WriteProtection
   std::vector<std::string> profiles, caches;
   std::set<int> participants;
   std::map<uint64_t, ProtectedResource> operations;
+  // Existing operation leases transferred to a real forked child. The start
+  // identity prevents PID reuse from being mistaken for that child's life.
+  std::map<uint64_t, std::pair<int, uint64_t>> childOperations;
   std::map<std::string, ProtectedResource> buffers, transactions;
   std::map<int, std::set<std::string>> writerPaths;
   std::set<std::string> paths;

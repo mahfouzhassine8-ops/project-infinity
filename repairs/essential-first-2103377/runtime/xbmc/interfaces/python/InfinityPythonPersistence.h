@@ -512,9 +512,10 @@ inline int Audit(const char* event,PyObject* args,void*)
                                       ChildProcessEvidence(at(0),at(1)));
   }
   else if(std::strcmp(event,"os.posix_spawn")==0) {
-    if(!context->readonlyChildren[thread] || count<2 || !ReadonlyCommand(at(0),at(1)))
-      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
-                                      ChildProcessEvidence(at(0),at(1)));
+    // Unlike fork_exec, posix_spawn's file actions have no installed native
+    // output lease adapter. Do not infer safe destinations from its command.
+    InfinityScriptPersistence::Fail(context->id,"unobserved_posix_spawn_output",
+                                    ChildProcessEvidence(at(0),at(1)));
   }
   else if(std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
           std::strcmp(event,"ctypes.dlsym/handle")==0)

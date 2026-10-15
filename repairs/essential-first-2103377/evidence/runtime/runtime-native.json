@@ -170,9 +170,33 @@
       "stderr": ""
     },
     {
-      "case": "unverified-child-output",
+      "case": "child-numeric-output",
       "exit_code": 0,
-      "stdout": "PASS unverified child output remains an essential blocker\n",
+      "stdout": "PASS child-numeric-output; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "unverified-posix-spawn",
+      "exit_code": 0,
+      "stdout": "PASS unobserved posix_spawn file actions remain an essential blocker\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-file-pending",
+      "exit_code": 0,
+      "stdout": "Real child changed protected bytes; seal=0; authorized=0\nPASS actual pending child output classification\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-cache-pending",
+      "exit_code": 0,
+      "stdout": "PASS actual pending child output classification\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-pipe-pending",
+      "exit_code": 0,
+      "stdout": "PASS actual pending child output classification\n",
       "stderr": ""
     },
     {

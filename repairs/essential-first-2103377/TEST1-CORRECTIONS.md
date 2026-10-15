@@ -62,24 +62,35 @@ ARM64 image or claim on-device ambient regression acceptance.
 
 ## Verification boundary
 
-Evidence in `evidence/runtime/` covers 36 production CPython cases, 8 SQLite
+Evidence in `evidence/runtime/` covers 40 production CPython cases, 8 SQLite
 cases, 13 coordinator cases and compiled native/Android receipt agreement.
 The indefinitely waiting optional Python worker is still alive when host
 authorization succeeds. Essential failures remain denied. No extra optional
 wait, watchdog, interpreter destruction or fabricated receipt was introduced.
 
-The full ARM64 build passed at `f8be4d05`, run `38814309116`. The additional
-exact read-only `uname -rs` contract now passes actual CPython/native checks;
-redirected unverified child output remains blocked. Both the Python and native
-audit validators use the same exact command contract. A new full build is
-required for that correction.
+The full ARM64 build passed at `3acc3a9e`, run `38819025107`, including
+the exact read-only `uname -rs` contract. Actual Android packaging passed
+permanent signing and decoded instruction preservation against the locked APK
+in run `38819866749`. The unchanged first-party fixtures were unreadable due
+to root-adbd-assigned SELinux labels; no Close was attempted. The test now
+restores platform labels on the backing path and records the actual add-on
+inventory before querying individual approved participants. Enforcement stays
+on, and no app startup code changes.
 
-The Android donor preservation gate caught an older Splash implementation.
-Packaging stopped before signing. The existing RC5 source export is the
-approved foundation: its guard retains the process-entry/removal lease and
-existing advisory notification. The essential-first guard now differs from
-that exact approved source only by four truthful evidence fields. The next
-package must pass decoded instruction preservation for all other classes.
+A further actual-child test found that a permitted read-only command could
+retain protected stdout and write after sealing. The retained negative-control
+result reports `seal=1; authorized=1` followed by changed protected bytes.
+Native `_posixsubprocess.fork_exec` now captures converted stdout/stderr file
+descriptors and transfers their existing operation leases to the real child
+PID/start identity. Existing barrier observation releases them only on actual
+child death. There is no watchdog, waiting thread, join, or new timeout.
+Protected output prevents sealing until complete; pipe/private-cache output
+does not become an essential obligation. Numeric output descriptors are
+verified through the same native entry. Unsupported `posix_spawn` file actions
+remain explicit fail-closed evidence. Forty actual CPython cases, the eight
+SQLite cases and thirteen coordinator cases pass. This new correction still
+requires a full ARM64 build. Host child-lifetime tests do not prove Android
+whole-package termination.
 
 Remaining safety evidence: the TEST1 export lacks call-site details sufficient
 to establish that every reported Seren/Continuity failure is resolved; real

@@ -3,6 +3,8 @@
 #include "InfinityScriptPersistence.h"
 #include <cstdint>
 #include <cstdlib>
+#include <signal.h>
+#include <sstream>
 
 // Enforcement and durability for the existing native-owned persistence ledger.
 // No process termination, Python finalization, join or escalation occurs here.
@@ -190,6 +192,72 @@ inline void EndProtectedOperation(uint64_t token)
   if (!token || s.protection.operations.erase(token) != 1)
     ProtectionFailureLocked(s.protection, "protected_operation_ownership_mismatch");
 }
+enum class ChildState { LIVE, DEAD, UNKNOWN };
+inline ChildState ProtectedChildState(int pid, uint64_t& identity)
+{
+  if (pid <= 0) return ChildState::UNKNOWN;
+  const auto path = "/proc/" + std::to_string(pid) + "/stat";
+  const int fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC);
+  if (fd < 0)
+    return ::kill(pid, 0) < 0 && errno == ESRCH ? ChildState::DEAD : ChildState::UNKNOWN;
+  char bytes[4096]{};
+  const auto count = ::read(fd, bytes, sizeof(bytes)-1);
+  ::close(fd);
+  if (count <= 0) return ChildState::UNKNOWN;
+  const std::string stat(bytes, static_cast<size_t>(count));
+  const auto end = stat.rfind(')');
+  if (end == std::string::npos) return ChildState::UNKNOWN;
+  std::istringstream fields(stat.substr(end+1));
+  std::string field;
+  char state = 0;
+  uint64_t started = 0;
+  for (unsigned index = 3; index <= 22; ++index)
+  {
+    if (!(fields >> field)) return ChildState::UNKNOWN;
+    if (index == 3 && field.size() == 1) state = field[0];
+    if (index == 22)
+    {
+      if (field.empty() || field.find_first_not_of("0123456789") != std::string::npos)
+        return ChildState::UNKNOWN;
+      errno = 0; started = std::strtoull(field.c_str(), nullptr, 10);
+      if (errno || !started) return ChildState::UNKNOWN;
+    }
+  }
+  if (identity && identity != started) return ChildState::DEAD;
+  identity = started;
+  if (state == 'Z' || state == 'X') return ChildState::DEAD;
+  return state ? ChildState::LIVE : ChildState::UNKNOWN;
+}
+inline void RefreshProtectedChildrenLocked(State& s);
+inline void BindProtectedChild(uint64_t token, int pid)
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  RefreshProtectedChildrenLocked(s);
+  auto& p = s.protection;
+  const auto resource = p.operations.find(token);
+  if (resource == p.operations.end() || pid <= 0)
+  { ProtectionFailureLocked(p, "native_child_output_ownership_unconfirmed"); return; }
+  // fork has copied the descriptor table. Parent closes/dup2 must no longer
+  // retarget a child's operation; earlier invalidations remain conservative.
+  resource->second.descriptor = -1;
+  resource->second.operation = "native_child_output:pid=" + std::to_string(pid);
+  uint64_t identity = 0;
+  if (ProtectedChildState(pid, identity) == ChildState::DEAD)
+    p.operations.erase(resource);
+  else p.childOperations.emplace(token, std::make_pair(pid, identity));
+}
+inline void RefreshProtectedChildrenLocked(State& s)
+{
+  // Observation inside the existing barrier only: no worker, watchdog, join,
+  // waitpid reaping, timeout extension, or optional-retirement dependency.
+  auto& p = s.protection;
+  for (auto child = p.childOperations.begin(); child != p.childOperations.end();)
+  {
+    if (ProtectedChildState(child->second.first, child->second.second) == ChildState::DEAD)
+    { p.operations.erase(child->first); child = p.childOperations.erase(child); }
+    else ++child;
+  }
+}
 inline void RecordProtectedResult(uint64_t token, const std::string& path)
 {
   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
@@ -316,8 +384,9 @@ struct EssentialWriteProof
   bool durable{false};
   std::vector<std::string> blockers;
 };
-inline EssentialWriteProof EssentialWritesLocked(const State& s)
+inline EssentialWriteProof EssentialWritesLocked(State& s)
 {
+  RefreshProtectedChildrenLocked(s);
   const auto& p = s.protection;
   EssentialWriteProof proof{p.generation, p.denied, p.phase, p.durable, p.failures};
   for (const auto& writer : s.writers)
@@ -357,6 +426,7 @@ inline EssentialWriteProof EssentialWrites()
 inline size_t ActiveProtectedResources()
 {
   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  RefreshProtectedChildrenLocked(s);
   size_t count = 0;
   for (const auto* resources : {&s.protection.buffers, &s.protection.transactions})
     for (const auto& entry : *resources) if (ProtectedLocked(s.protection,entry.second)) ++count;

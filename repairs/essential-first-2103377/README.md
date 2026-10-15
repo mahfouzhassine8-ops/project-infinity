@@ -8,16 +8,22 @@ persistence ledger, native coordinator and database barrier. The prototype
 `InfinityEssentialScriptFence.h` remains unwired and its coverage flag remains
 false. No third-party add-on or protected feature source is edited.
 
-The complete ARM64 build of `f8be4d05` passed in run `38814309116`, including
-actual production runtime tests. The additional exact `uname -rs` contract
-correction requires another full build. The first internal Android probe
-reached Kodi but lacked installed first-party participants, so no Close was
-attempted. The second probe stopped before signing because its old Java donor
-would change locked Splash behaviour. The approved RC5 source must be reused,
-with the instruction preservation gate retained. See `PRODUCTION-STATUS.json`
-and `TEST1-CORRECTIONS.md`. No internal APK has been delivered.
+The full ARM64 build of `3acc3a9e` passed in run `38819025107`.
+The internal Android probe passed permanent signing and unrelated Java
+instruction preservation against the locked APK. Its copied first-party test
+files had incorrect SELinux labels, so Kodi could not discover Command Center;
+Close was not attempted. The fixture correction is saved at `7df06906`.
 
-Current host verification: 36 actual CPython 3.11.7 runtime cases, 8 actual
+A real child-output regression subsequently exposed a protected-file write
+capability surviving the old barrier. Production `fork_exec` now transfers
+actual output descriptor leases to the existing ledger until OS-confirmed
+child death. The protected-file, optional-cache/pipe and numeric-descriptor
+cases pass. Unsupported `posix_spawn` file actions remain explicit blockers.
+The new native correction still requires a full ARM64 build and Android run.
+See `PRODUCTION-STATUS.json` and `TEST1-CORRECTIONS.md`. No internal APK has
+been delivered, and whole-package death remains unverified.
+
+Current host verification: 40 actual CPython 3.11.7 runtime cases, 8 actual
 SQLite VFS cases, 13 production coordinator cases, and the compiled Android
 protocol/guard authorization suite. First-party Command Center and compatibility
 Python callbacks run unchanged through the production observer; their Kodi RPC

@@ -4,16 +4,16 @@
   "implementation": "existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 36,
+    "native_cpython_3117_runtime": 40,
     "coordinator_with_real_barrier": 13
   },
   "first_party_python_callbacks": "unchanged locked Command Center and compatibility callbacks executed through production observer; Kodi RPC peers remain test adapters",
   "full_arm64_compile": {
-    "previous_commit": "f8be4d05e474ca425074d7e1bb5d49f624015d37",
-    "previous_run": 38814309116,
+    "previous_commit": "3acc3a9e5bcb1b0a698cab0ed971866886df8cf4",
+    "previous_run": 38819025107,
     "previous_result": "success",
-    "previous_unstripped_native_sha256": "0925e498a4228bdf115da1b81bc110fd0350237d2de829d842a4003aab81c40a",
-    "current_corrections": "pending new full build for exact uname -rs contract and preserved Android guard"
+    "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
+    "current_corrections": "pending new full build for child-output operation leases"
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
   "android_process_death_verified": false,
@@ -26,8 +26,8 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Complete a new ARM64 build for the additional verified uname contract correction.",
-    "Compile from approved RC5 Android source and prove all unrelated decoded Java instructions match the locked APK before signing.",
+    "Complete full ARM64 build for the real child-output protection correction.",
+    "Run emulator with platform-restored fixture labels and actual Kodi add-on inventory; corrected test is saved at 7df06906.",
     "Run real Android essential callbacks, verified saves, engine and guard-process death and preserved-data reopening. stopSelf alone is not process-death evidence.",
     "TEST1 does not include call-site exception details sufficient to prove all Seren/Continuity/IAGL warnings resolved on the Fold; actual failed or unknown protected writes remain blockers.",
     "Physical Fold acceptance remains required. No deliverable APK is verified."
@@ -43,6 +43,21 @@
     {
       "run": 38817895763,
       "outcome": "Packaging refused before signing: protected Splash bytecode differs from locked parent. Replace old donor source with exact approved RC5 Android source and repeat instruction gate."
+    },
+    {
+      "run": 38819866749,
+      "native_commit": "3acc3a9e5bcb1b0a698cab0ed971866886df8cf4",
+      "permanently_signed_internal_apk": true,
+      "apk_delivered": false,
+      "unrelated_java_instruction_preservation": "passed against locked APK",
+      "outcome": "Before Close: root-pushed fixture SELinux storage_file labels prevented app access; Command Center missing from Kodi; GetAddonDetails returned Invalid params. No Android death/reopen evidence."
     }
-  ]
+  ],
+  "child_output_correction": {
+    "negative_control": "Real stopped child holding protected stdout changed bytes after old barrier authorized exit (seal=1, authorized=1).",
+    "production_fix": "Native CPython fork_exec transfers actual stdout/stderr descriptor leases into existing ledger until OS-confirmed child death, with PID/start identity.",
+    "verification": "Protected child blocks sealing and later drains; optional cache/pipe children do not block; numeric descriptors verified; unsupported posix_spawn file actions remain explicit blockers.",
+    "no_watchdog_or_join": true,
+    "whole_package_child_process_termination": "Not established by host lease tests; Android app-UID process absence remains required."
+  }
 }
