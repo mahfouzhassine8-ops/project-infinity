@@ -162,7 +162,7 @@ def apply(root: Path, expected_python_sha: str | None = None) -> dict:
         '''    for (PyThreadState* old = nullptr; m_threadState != nullptr;)
     {
 #if defined(TARGET_ANDROID)
-      if (InfinityAndroidCheckpoint::IsActive() && m_stop &&
+      if (m_infinityPersistenceObserver && InfinityAndroidCheckpoint::IsActive() && m_stop &&
           !m_infinityThreadingShutdownStarted)
       {
         m_infinityThreadingShutdownStarted = true;
@@ -195,7 +195,8 @@ def apply(root: Path, expected_python_sha: str | None = None) -> dict:
     }
 
 #if defined(TARGET_ANDROID)
-    if (InfinityAndroidCheckpoint::IsActive() && !m_infinityThreadingShutdownStarted)
+    if (m_infinityPersistenceObserver && InfinityAndroidCheckpoint::IsActive() &&
+        !m_infinityThreadingShutdownStarted)
     {
       m_infinityThreadingShutdownStarted = true;
       lock.unlock();
