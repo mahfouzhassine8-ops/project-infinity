@@ -5,6 +5,10 @@ on:
     paths:
       - '.github/workflows/infinity-stability-probe-package.yml'
       - 'repairs/stability-probe-2103377/package.py'
+      - 'repairs/stability-probe-2103377/test_helper.py'
+      - 'repairs/stability-probe-2103377/HELPER-025-HASHES.json'
+      - 'repairs/stability-probe-2103377/candidate_regressions.py'
+      - 'repairs/stability-probe-2103377/INSTALL-AND-CAPTURE.txt'
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-stability-probe-package, cancel-in-progress: false}
 env:
