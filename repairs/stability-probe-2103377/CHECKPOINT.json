@@ -1,0 +1,60 @@
+{
+  "head": "7980f0ac42c1c431c2d1027018fbef1f0626a101",
+  "tree": "3cd787cb65bd20fe9c81ce64f8f40a24769f90bb",
+  "baseline": "3cc1e1d5e0d5a21db9d19dd6882bd1c647603488",
+  "baselineFilesPreserved": true,
+  "branch": "work/infinity-stability-probe-20261014",
+  "native_head": "d57e21a45cda79da866aef0ba8094139b3cd8161",
+  "native_run": 38666437940,
+  "smoke_run": 38664802285,
+  "source_preserved": true,
+  "probe_host_passed": true,
+  "real_kodi_smoke_passed": true,
+  "root_cause_fixed": false,
+  "physical_fold_accepted": false,
+  "package_head": "7980f0ac42c1c431c2d1027018fbef1f0626a101",
+  "package_run": 38666495767,
+  "blocked_wait_host_passed": true,
+  "previous_native_run": 38665475318,
+  "previous_failure": "CPython 3.10 frameobject.h include missing; corrected",
+  "implementation_authorized": true,
+  "authorization": "User Proceed; continued after network interruptions",
+  "current_native_job": 116199357054,
+  "scope": "Bounded observational diagnostic candidate; behavioral repair awaits physical evidence",
+  "native_compile_passed": false,
+  "signed_apk_ready": false,
+  "locked": false,
+  "protected": {
+    "apk": "2103377 Rails Hold RC02",
+    "apk_sha256": "17e2458552b7dbb8f14dad307015eafc2497a5ec6ddc4f7bb1707d975f37b906",
+    "skin": "1.0.5.223",
+    "rails_helper": "0.2.5",
+    "skin_foundation": "1.0.5.215"
+  },
+  "candidate_helper": "0.2.6",
+  "required_save_gates_waived": false,
+  "confirmed": {
+    "shutdown_blocker": "Umbrella service.py interpreter remains active before the generic Python durability barrier",
+    "working_vs_failing_quarantine_confound": true,
+    "cfile_close_duration_us": 32,
+    "gui_input_waits_for_graphics_lock": true,
+    "resume_provider_queue_ms": 16700,
+    "resume_provider_execution_ms": 320
+  },
+  "unresolved": [
+    "Exact Umbrella blocking operation and durable-write status",
+    "GUI lock owner and blocking operation during the stall",
+    "Direct Rails stage timings and effective control visibility"
+  ],
+  "tests": {
+    "preserved_helper_tests_passed": 101,
+    "diagnostic_helper_tests_passed": 5,
+    "real_host_mutex_checks_passed": true,
+    "real_host_cpython_checks_passed": true,
+    "real_blocked_wait_capture_passed": true,
+    "real_kodi_smoke_passed": true,
+    "native_android_compile_pending": true,
+    "physical_fold_acceptance": false
+  },
+  "resume": "Inspect native run 38666437940 and package run 38666495767. Do not restart source comparisons. Do not promote or lock. Deliver diagnostic package only after compile/preservation/signing gates pass."
+}
