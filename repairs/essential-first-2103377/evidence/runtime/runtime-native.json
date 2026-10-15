@@ -26,6 +26,18 @@
       "stderr": ""
     },
     {
+      "case": "raw-fd-spoof",
+      "exit_code": 0,
+      "stdout": "PASS raw-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "buffer-fd-spoof",
+      "exit_code": 0,
+      "stdout": "PASS buffer-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
       "case": "late-raw-open",
       "exit_code": 0,
       "stdout": "PASS late-raw-open; actual CPython 3.11.7; no interpreter retirement required\n",
@@ -95,6 +107,102 @@
       "case": "sqlite-attach",
       "exit_code": 0,
       "stdout": "PASS sqlite-attach; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "descriptor-race",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-race; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "rename-race",
+      "exit_code": 0,
+      "stdout": "PASS rename-race; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "sqlite-renamed",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-renamed; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "sqlite-row-factory",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-row-factory; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "file-lock",
+      "exit_code": 0,
+      "stdout": "PASS file-lock; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "pathlike",
+      "exit_code": 0,
+      "stdout": "PASS pathlike; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "memory-buffer",
+      "exit_code": 0,
+      "stdout": "PASS memory-buffer; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "observer-denials",
+      "exit_code": 0,
+      "stdout": "PASS observer-denials; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "unknown-descriptor",
+      "exit_code": 0,
+      "stdout": "PASS unresolved actual descriptor conversion fails closed\n",
+      "stderr": ""
+    },
+    {
+      "case": "pillow-fd",
+      "exit_code": 0,
+      "stdout": "PASS pillow-fd; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "pillow-ppm",
+      "exit_code": 0,
+      "stdout": "PASS pillow-ppm; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "command-center-save",
+      "exit_code": 0,
+      "stdout": "PASS command-center-save; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "command-center-failure",
+      "exit_code": 0,
+      "stdout": "PASS actual first-party failed save never authorizes termination\n",
+      "stderr": ""
+    },
+    {
+      "case": "compat-save",
+      "exit_code": 0,
+      "stdout": "PASS compat-save; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "compat-failure",
+      "exit_code": 0,
+      "stdout": "PASS actual compatibility failure cannot authorize termination\n",
+      "stderr": ""
+    },
+    {
+      "case": "ambient-contract",
+      "exit_code": 0,
+      "stdout": "PASS ambient-contract; actual CPython 3.11.7; no interpreter retirement required\n",
       "stderr": ""
     }
   ],

@@ -56,6 +56,15 @@ inline bool Draining(File* f)
 inline int Close(sqlite3_file* file)
 {
   auto* f = F(file);
+  std::unique_ptr<Ledger::ProtectedOperation> guard;
+  if ((f->flags & SQLITE_OPEN_DELETEONCLOSE) && f->path)
+  {
+    // Some Unix builds defer the unlink until xClose. Keep that mutation
+    // inside the same barrier even when the handle predates Close.
+    guard.reset(new Ledger::ProtectedOperation(Ledger::CurrentWriteOwner(), {Path(f)},
+        "sqlite.vfs.delete_on_close", SavePermission(), Draining(f)));
+    if (!*guard) return SQLITE_READONLY;
+  }
   const auto result = f->real->pMethods->xClose(f->real);
   if (result == SQLITE_OK)
   {

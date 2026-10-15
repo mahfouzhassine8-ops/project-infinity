@@ -85,7 +85,12 @@ def child(library, case):
             assert lib.seal(), lib.blockers()
             # Optional transaction may remain unfinished through authorization.
             assert lib.authorized() and conn.in_transaction
-            conn.commit()  # Test cleanup; not a shutdown requirement.
+            try:
+                conn.commit()
+                raise AssertionError('new optional persistence crossed the final process-exit seal')
+            except sqlite3.DatabaseError:
+                pass
+            assert lib.authorized(), lib.blockers()
         elif case in ('late-write', 'late-write-wal', 'uri-vfs'):
             assert lib.ready(), lib.blockers()
             assert lib.seal(), lib.blockers()
@@ -102,7 +107,7 @@ def child(library, case):
             assert conn.in_transaction
             assert not lib.ready(), 'native barrier ignored Python/ATTACH transaction'
             assert not lib.seal(), 'seal accepted active protected transaction'
-            assert b'pending_protected_sqlite_transaction' in lib.blockers()
+            assert b'pending_protected_sqlite_write_transaction' in lib.blockers(), lib.blockers()
             try: conn.commit()
             except sqlite3.DatabaseError:
                 print(lib.denials(), file=sys.stderr)

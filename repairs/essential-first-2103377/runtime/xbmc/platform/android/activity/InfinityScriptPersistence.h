@@ -46,6 +46,7 @@ struct ProtectedResource
   std::vector<std::string> paths;
   std::string operation;
   std::thread::id thread{std::this_thread::get_id()};
+  int descriptor{-1};
 };
 struct WriteProtection
 {
@@ -60,6 +61,7 @@ struct WriteProtection
   std::map<std::string, ProtectedResource> buffers, transactions;
   std::map<int, std::set<std::string>> writerPaths;
   std::set<std::string> paths;
+  std::set<std::pair<std::string, std::string>> aliases;
   std::vector<std::string> failures;
   std::vector<std::string> denials;
   uint64_t denied{0};
@@ -96,6 +98,7 @@ inline bool AdvisoryFailureReason(const std::string& reason)
          reason=="sqlite_write_failed" ||
          reason=="sqlite_script_failed" ||
          reason=="sqlite_commit_failed" ||
+         reason=="protected_write_rejected_before_mutation" ||
          reason=="unraisable_python_cleanup_or_write_failure";
 }
 inline void AddBlockerLocked(State& s,int id,const std::string& writer,

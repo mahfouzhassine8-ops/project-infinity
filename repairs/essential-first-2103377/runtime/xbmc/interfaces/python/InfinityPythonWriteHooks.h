@@ -9,6 +9,7 @@
 #include <array>
 #include <cstring>
 #include <vector>
+#include <sys/file.h>
 
 namespace InfinityPythonWriteHooks
 {
@@ -17,7 +18,8 @@ enum Kind
 {
   OS_WRITE, OS_WRITEV, OS_PWRITE, OS_PWRITEV, OS_FTRUNCATE, OS_TRUNCATE,
   OS_SENDFILE, OS_COPY, OS_OPEN, OS_RENAME, OS_REPLACE, OS_UNLINK, OS_REMOVE,
-  OS_MKDIR, OS_RMDIR, IO_OPEN,
+  OS_MKDIR, OS_RMDIR, OS_MKFIFO, OS_MKNOD, OS_FALLOCATE, OS_SPLICE,
+  OS_CLOSE, OS_CLOSERANGE, OS_DUP, OS_DUP2, FILE_FLOCK, IO_OPEN, EXTENSION_CREATE, PIL_DESCRIPTOR_WRITE, PIL_PATH_WRITE,
   RAW_WRITE, RAW_TRUNCATE, RAW_CLOSE,
   BUFFER_WRITE, BUFFER_TRUNCATE, BUFFER_FLUSH, BUFFER_CLOSE,
   TEXT_WRITE, TEXT_TRUNCATE, TEXT_FLUSH, TEXT_CLOSE, COUNT
@@ -30,6 +32,83 @@ struct Spec
 };
 inline std::array<Spec, COUNT>& Specs()
 { static auto* specs = new std::array<Spec, COUNT>; return *specs; }
+inline bool ProtectNativeModule(PyObject* module);
+inline InfinityPythonPersistence::Context* Context();
+inline std::array<PyCFunction, 3>& DescriptorReaders()
+{ static std::array<PyCFunction, 3> readers{}; return readers; }
+inline std::array<PyTypeObject*, 6>& IOTypes()
+{ static std::array<PyTypeObject*, 6> types{}; return types; }
+inline bool RememberIOTypes(PyObject* io)
+{
+  const char* names[]{"FileIO","BufferedWriter","BufferedRandom","BufferedReader","TextIOWrapper","BytesIO"};
+  for (unsigned i = 0; i < 6; ++i)
+  {
+    auto* object = PyObject_GetAttrString(io,names[i]);
+    if (!object || !PyType_Check(object)) { Py_XDECREF(object); return false; }
+    auto* type = reinterpret_cast<PyTypeObject*>(object);
+    if (!IOTypes()[i]) IOTypes()[i] = type; // Retain the actual pinned native type.
+    else { Py_DECREF(object); if (IOTypes()[i] != type) return false; }
+  }
+  return true;
+}
+inline PyObject* NativeField(PyObject* object, PyTypeObject* type, const char* name)
+{
+  auto* descriptor = PyObject_GetAttrString(reinterpret_cast<PyObject*>(type),name);
+  if (!descriptor) return nullptr;
+  PyObject* result = nullptr;
+  if ((Py_IS_TYPE(descriptor,&PyGetSetDescr_Type) || Py_IS_TYPE(descriptor,&PyMemberDescr_Type)) &&
+      Py_TYPE(descriptor)->tp_descr_get)
+    result = Py_TYPE(descriptor)->tp_descr_get(descriptor,object,reinterpret_cast<PyObject*>(Py_TYPE(object)));
+  Py_DECREF(descriptor); return result;
+}
+inline PyObject* ActualDescriptor(PyObject* object, unsigned depth = 0)
+{
+  if (depth > 4) return nullptr;
+  if (Py_IS_TYPE(object,IOTypes()[5])) return PyUnicode_FromString(":nonpersistent:");
+  if (PyObject_TypeCheck(object,IOTypes()[0]))
+  {
+    if (depth)
+    {
+      auto* actual = PyObject_GetAttrString(reinterpret_cast<PyObject*>(Py_TYPE(object)),"write");
+      auto* builtin = PyObject_GetAttrString(reinterpret_cast<PyObject*>(IOTypes()[0]),"write");
+      auto* context = Context();
+      bool direct = actual && builtin && (actual == builtin ||
+          (context && reinterpret_cast<PyObject*>(Py_TYPE(object)) == context->rawType && actual == context->rawWrite));
+      Py_XDECREF(actual); Py_XDECREF(builtin);
+      direct = direct && Py_TYPE(object)->tp_getattro == IOTypes()[0]->tp_getattro;
+      if (direct && Py_TYPE(object)->tp_dictoffset)
+      {
+        auto* dictionary = PyObject_GenericGetDict(object,nullptr);
+        direct = dictionary && !PyDict_GetItemString(dictionary,"write");
+        Py_XDECREF(dictionary);
+      }
+      if (!direct) return nullptr; // An arbitrary Python raw writer has unknown effects.
+    }
+    return DescriptorReaders()[0](object,nullptr);
+  }
+  for (unsigned i = 1; i <= 4; ++i)
+    if (PyObject_TypeCheck(object,IOTypes()[i]))
+    {
+      auto* next = NativeField(object,IOTypes()[i],i == 4 ? "buffer" : "raw");
+      if (!next) return nullptr;
+      auto* result = ActualDescriptor(next,depth+1);
+      Py_DECREF(next); return result;
+    }
+  return nullptr;
+}
+inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index)
+{
+  auto* type = PyObject_GetAttrString(io, typeName);
+  auto* member = type ? PyObject_GetAttrString(type, "fileno") : nullptr;
+  bool ok = member && Py_IS_TYPE(member, &PyMethodDescr_Type);
+  if (ok)
+  {
+    auto* method = reinterpret_cast<PyMethodDescrObject*>(member)->d_method;
+    ok = method->ml_flags == METH_NOARGS;
+    if (ok) DescriptorReaders()[index] = method->ml_meth;
+  }
+  Py_XDECREF(member); Py_XDECREF(type); return ok;
+}
 inline InfinityPythonPersistence::Context* Context()
 {
   auto* thread = PyThreadState_Get();
@@ -63,6 +142,9 @@ inline std::string Target(PyObject* object, PyObject* directory = nullptr)
     if (PyErr_Occurred()) { PyErr_Clear(); return {}; }
     return Ledger::DescriptorPath(static_cast<int>(fd));
   }
+  // Do not call an arbitrary __fspath__ twice. The actual converted target is
+  // supplied by the native audit event inside this operation's live lease.
+  if (!PyUnicode_Check(object) && !PyBytes_Check(object)) return {};
   return InfinityPythonPersistence::PathAt(object, directory);
 }
 inline bool WritesOpen(Kind kind, const Arguments& args)
@@ -91,14 +173,18 @@ public:
   Call(Kind kind, PyObject* self, const Arguments& args) : m_kind(kind), m_context(Context())
   {
     if (!WritesOpen(kind, args)) { m_allowed = true; return; }
-    if (kind >= RAW_WRITE)
+    if (kind == EXTENSION_CREATE)
+      m_paths.clear(); // Covers the complete native import and hook installation.
+    else if (kind >= RAW_WRITE)
     {
       // The native descriptor lives on the built-in object, including buffers
       // created by cached _io.open. Keep any pre-existing exception intact.
       PyObject *type = nullptr, *value = nullptr, *trace = nullptr;
       PyErr_Fetch(&type, &value, &trace);
-      auto* descriptor = PyObject_CallMethod(self, "fileno", nullptr);
-      if (descriptor) { m_paths.push_back(Target(descriptor)); Py_DECREF(descriptor); }
+      // Invoke the actual built-in descriptor reader. A subclass's fileno()
+      // override must not classify a protected FileIO handle as private cache.
+      auto* descriptor = ActualDescriptor(self);
+      if (descriptor) { m_paths.push_back(Target(descriptor)); if (PyLong_Check(descriptor)) m_descriptor = static_cast<int>(PyLong_AsLong(descriptor)); Py_DECREF(descriptor); }
       else
       {
         PyErr_Clear();
@@ -115,16 +201,53 @@ public:
     else if (kind == OS_RENAME || kind == OS_REPLACE)
       m_paths = {Target(args.At(0, "src"), args.At(-1, "src_dir_fd")),
                  Target(args.At(1, "dst"), args.At(-1, "dst_dir_fd"))};
-    else if (kind == OS_COPY) m_paths = {Target(args.At(1, "dst"))};
-    else if (kind == OS_SENDFILE) m_paths = {Target(args.At(0, "out_fd"))};
-    else m_paths = {Target(args.At(0, kind == IO_OPEN ? "file" : "path"), args.At(-1, "dir_fd"))};
+    else if (kind == OS_DUP2)
+    {
+      auto destination = Target(args.At(1, "fd2"));
+      // dup2 may legally allocate a currently unused descriptor number.
+      if (destination.empty() && args.At(1,"fd2") && PyLong_Check(args.At(1,"fd2"))) destination = ":nonpersistent:";
+      m_paths = {Target(args.At(0, "fd")), destination};
+    }
+    else
+    {
+      auto* target = args.At(kind == OS_COPY || kind == OS_SPLICE ? 1 : 0,
+          kind == IO_OPEN ? "file" : kind == OS_COPY || kind == OS_SPLICE ? "dst" : kind == OS_SENDFILE ? "out_fd" : "path");
+      m_paths = {Target(target, args.At(-1, "dir_fd"))};
+      if (target && PyLong_Check(target)) m_descriptor = static_cast<int>(PyLong_AsLong(target));
+    }
     const int writer = m_context ? m_context->id : -1;
-    m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name);
+    // Unbuffered close changes descriptor identity, not file contents. Do not
+    // invent dirty files merely because a read-only module file was closed.
+    if (kind == OS_CLOSE || kind == OS_CLOSERANGE || kind == RAW_CLOSE) m_paths = {":nonpersistent:"};
+    if (kind == FILE_FLOCK)
+    {
+      auto* value = args.At(1,"operation");
+      if (value && PyLong_Check(value)) m_lockOperation = static_cast<int>(PyLong_AsLong(value));
+      if (m_lockOperation & LOCK_UN) m_paths = {":nonpersistent:"};
+    }
+    if (std::find(m_paths.begin(), m_paths.end(), "") != m_paths.end()) m_paths.clear();
+    m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);
     m_allowed = m_token != 0;
-    if (!m_allowed) { PyErr_SetString(PyExc_PermissionError, "Infinity protected write admission is closed"); return; }
+    if (!m_allowed) { InfinityPythonPersistence::AdmissionDenied(m_context, "Infinity protected write admission is closed"); return; }
     m_previousOwner = Ledger::protectedWriteOwner;
     Ledger::protectedWriteOwner = writer;
+    m_previousToken = Ledger::protectedWriteToken;
+    Ledger::protectedWriteToken = m_token;
     if (m_context) ++m_context->nativeProtectionDepth[PyThreadState_Get()];
+    if (m_context && kind == EXTENSION_CREATE) ++m_context->nativeExtensionDepth[PyThreadState_Get()];
+    if (kind == OS_CLOSE || kind == RAW_CLOSE) Ledger::InvalidateDescriptor(m_descriptor, m_token);
+    if (kind == OS_CLOSERANGE)
+    {
+      auto* first = args.At(0,"fd_low"); auto* last = args.At(1,"fd_high");
+      if (first && last && PyLong_Check(first) && PyLong_Check(last))
+        Ledger::InvalidateDescriptorRange(static_cast<int>(PyLong_AsLong(first)),static_cast<int>(PyLong_AsLong(last)));
+      else Ledger::InvalidateDescriptorRange(0,INT_MAX);
+    }
+    if (kind == OS_DUP2)
+    {
+      auto* target = args.At(1,"fd2");
+      if (target && PyLong_Check(target)) Ledger::InvalidateDescriptor(static_cast<int>(PyLong_AsLong(target)));
+    }
     if (kind == BUFFER_WRITE || kind == BUFFER_TRUNCATE || kind == TEXT_WRITE || kind == TEXT_TRUNCATE)
       Ledger::SetProtectedBuffer(writer, m_key, m_paths, true);
   }
@@ -132,12 +255,47 @@ public:
   {
     if (!m_token) return;
     if (m_context) --m_context->nativeProtectionDepth[PyThreadState_Get()];
+    if (m_context && m_kind == EXTENSION_CREATE) --m_context->nativeExtensionDepth[PyThreadState_Get()];
     Ledger::protectedWriteOwner = m_previousOwner;
+    Ledger::protectedWriteToken = m_previousToken;
     Ledger::EndProtectedOperation(m_token);
   }
   explicit operator bool() const { return m_allowed; }
   PyObject* Finish(PyObject* result)
   {
+    if (m_token && m_kind == IO_OPEN && m_paths.empty() && result)
+    {
+      // _io.open may delegate its converted argument to FileIO's nested
+      // initializer. Resolve the returned native handle while the enclosing
+      // unknown-target lease still prevents sealing. Do not call __fspath__
+      // again or trust an overridable Python fileno().
+      auto* descriptor = ActualDescriptor(result);
+      if (descriptor)
+      { Ledger::RecordProtectedResult(m_token,Target(descriptor)); Py_DECREF(descriptor); }
+      else
+      { PyErr_Clear(); Ledger::ProtectionFailure("completed_native_write_target_unconfirmed"); }
+    }
+    // PathLike arguments may be resolved by a native audit event. Calls such
+    // as write(custom_index_object, ...) have no converted-target audit event;
+    // never drop that uncertainty merely because the operation returned.
+    if (m_token && m_kind != EXTENSION_CREATE && m_paths.empty())
+      Ledger::RequireProtectedIdentity(m_token);
+    if (result && m_kind == FILE_FLOCK)
+    {
+      if (m_descriptor < 0 || m_paths.empty())
+        Ledger::ProtectionFailure("unresolved_native_file_lock_identity");
+      else Ledger::SetProtectedTransaction("flock:"+std::to_string(m_descriptor), m_paths.front(),
+          (m_lockOperation & LOCK_EX) && !(m_lockOperation & LOCK_UN), "file_lock_transaction");
+    }
+    if (result && (m_kind == OS_RENAME || m_kind == OS_REPLACE || m_kind == OS_DUP2) && m_paths.size() == 2)
+      Ledger::RememberAlias(m_paths[0], m_paths[1]);
+    if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))
+    {
+      Ledger::ProtectionFailure("bundled_native_encoder_write_adapter_missing");
+      Py_DECREF(result);
+      if (!PyErr_Occurred()) PyErr_SetString(PyExc_RuntimeError,"Infinity native encoder protection installation failed");
+      return nullptr;
+    }
     if (result && m_token && (m_kind == BUFFER_FLUSH || m_kind == BUFFER_CLOSE ||
                               m_kind == TEXT_FLUSH || m_kind == TEXT_CLOSE))
       Ledger::SetProtectedBuffer(m_context ? m_context->id : -1, m_key, m_paths, false);
@@ -147,8 +305,11 @@ private:
   Kind m_kind;
   InfinityPythonPersistence::Context* m_context;
   uint64_t m_token{0};
+  uint64_t m_previousToken{0};
   bool m_allowed{false};
   int m_previousOwner{-1};
+  int m_descriptor{-1};
+  int m_lockOperation{0};
   std::vector<std::string> m_paths;
   std::string m_key;
 };
@@ -234,9 +395,49 @@ template<Kind kind> bool Method(PyObject* module, const char* typeName, const ch
   }
   Py_DECREF(object); return ok;
 }
+template<Kind kind> bool NativeTypeMethod(PyObject* object, const char* name)
+{
+  auto* type = Py_TYPE(object);
+  auto* member = PyDict_GetItemString(type->tp_dict, name);
+  if (!member || !Py_IS_TYPE(member, &PyMethodDescr_Type)) return false;
+  auto* descriptor = reinterpret_cast<PyMethodDescrObject*>(member);
+  if (!Prepare<kind>(descriptor->d_method)) return false;
+  descriptor->d_method = &Specs()[kind].replacement;
+  PyType_Modified(type); return true;
+}
+inline bool ProtectNativeModule(PyObject* module)
+{
+  if (!PyModule_Check(module)) return true;
+  const auto* name = PyModule_GetName(module);
+  if (!name) return false;
+  if (std::strcmp(name,"PIL._imaging") && std::strcmp(name,"_imaging")) return true;
+  // Match the locked dependency's ABI and disabled native TIFF/JPEG2000 paths.
+  auto* dictionary = PyModule_GetDict(module);
+  auto* version = PyDict_GetItemString(dictionary,"PILLOW_VERSION");
+  if (!version || !PyUnicode_Check(version) || PyUnicode_CompareWithASCIIString(version,"8.4.0") ||
+      PyDict_GetItemString(dictionary,"libtiff_encoder") || PyDict_GetItemString(dictionary,"jpeg2k_encoder"))
+    return false;
+  auto* encoder = PyObject_CallMethod(module,"raw_encoder","ss","RGB","RGB");
+  if (!encoder) return false;
+  const bool encoded = NativeTypeMethod<PIL_DESCRIPTOR_WRITE>(encoder,"encode_to_file");
+  Py_DECREF(encoder);
+  if (!encoded) return false;
+  auto* image = PyObject_CallMethod(module,"new","s(ii)","RGB",1,1);
+  if (!image) return false;
+  const bool saved = NativeTypeMethod<PIL_PATH_WRITE>(image,"save_ppm");
+  Py_DECREF(image); return saved;
+}
 inline initproc& RawInitializer() { static initproc original = nullptr; return original; }
 inline int RawInitialize(PyObject* self, PyObject* tuple, PyObject* dictionary)
 {
+  // Reinitializing an existing FileIO closes its old fd without calling close.
+  // Invalidate any concurrent operation using that descriptor before reuse.
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  auto* old = DescriptorReaders()[0](self,nullptr);
+  if (old) { Ledger::InvalidateDescriptor(static_cast<int>(PyLong_AsLong(old))); Py_DECREF(old); }
+  else PyErr_Clear(); // The native constructor is also called on new/closed objects.
+  PyErr_Restore(errorType,errorValue,errorTrace);
   std::vector<PyObject*> values;
   for (Py_ssize_t i = 0; i < PyTuple_GET_SIZE(tuple); ++i) values.push_back(PyTuple_GET_ITEM(tuple, i));
   Call call(IO_OPEN, self, {values.data(), static_cast<Py_ssize_t>(values.size()), nullptr, dictionary});
@@ -268,14 +469,24 @@ inline bool Install()
 {
   auto* posix = PyImport_ImportModule("posix");
   auto* io = PyImport_ImportModule("_io");
-  if (!posix || !io) { Py_XDECREF(posix); Py_XDECREF(io); return false; }
-  bool ok = Function<OS_WRITE>(posix, "write") && Function<OS_OPEN>(posix, "open") &&
+  auto* imports = PyImport_ImportModule("_imp");
+  auto* locks = PyImport_ImportModule("fcntl");
+  if (!posix || !io || !imports || !locks) { Py_XDECREF(posix); Py_XDECREF(io); Py_XDECREF(imports); Py_XDECREF(locks); return false; }
+  bool ok = RememberIOTypes(io) && DescriptorReader(io, "FileIO", 0) && DescriptorReader(io, "BufferedWriter", 1) &&
+      DescriptorReader(io, "TextIOWrapper", 2) &&
+      Function<EXTENSION_CREATE>(imports,"create_dynamic") &&
+      Function<OS_WRITE>(posix, "write") && Function<OS_OPEN>(posix, "open") &&
       Function<OS_WRITEV>(posix, "writev", true) && Function<OS_PWRITE>(posix, "pwrite", true) &&
       Function<OS_PWRITEV>(posix, "pwritev", true) && Function<OS_FTRUNCATE>(posix, "ftruncate") &&
       Function<OS_TRUNCATE>(posix, "truncate") && Function<OS_SENDFILE>(posix, "sendfile", true) &&
       Function<OS_COPY>(posix, "copy_file_range", true) && Function<OS_RENAME>(posix, "rename") &&
       Function<OS_REPLACE>(posix, "replace") && Function<OS_UNLINK>(posix, "unlink") &&
       Function<OS_REMOVE>(posix, "remove") && Function<OS_MKDIR>(posix, "mkdir") &&
+      Function<OS_MKFIFO>(posix,"mkfifo",true) && Function<OS_MKNOD>(posix,"mknod",true) &&
+      Function<OS_FALLOCATE>(posix,"posix_fallocate",true) && Function<OS_SPLICE>(posix,"splice",true) &&
+      Function<FILE_FLOCK>(locks,"flock") &&
+      Function<OS_CLOSE>(posix, "close") && Function<OS_DUP>(posix, "dup") && Function<OS_DUP2>(posix, "dup2") &&
+      Function<OS_CLOSERANGE>(posix,"closerange") &&
       Function<OS_RMDIR>(posix, "rmdir") && Function<IO_OPEN>(io, "open") &&
       Method<RAW_WRITE>(io, "FileIO", "write") && Method<RAW_TRUNCATE>(io, "FileIO", "truncate") &&
       Method<RAW_CLOSE>(io, "FileIO", "close") &&
@@ -291,7 +502,7 @@ inline bool Install()
       Method<TEXT_TRUNCATE>(io, "TextIOWrapper", "truncate") &&
       Method<TEXT_FLUSH>(io, "TextIOWrapper", "flush") &&
       Method<TEXT_CLOSE>(io, "TextIOWrapper", "close") && Initializer(io);
-  Py_DECREF(posix); Py_DECREF(io);
+  Py_DECREF(posix); Py_DECREF(io); Py_DECREF(imports); Py_DECREF(locks);
   if (!ok) Ledger::ProtectionFailure("native_cpython_write_hooks_not_installed");
   return ok;
 }

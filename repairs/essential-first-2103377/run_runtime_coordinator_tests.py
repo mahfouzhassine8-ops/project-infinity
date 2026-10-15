@@ -24,7 +24,7 @@ PINS = {
 }
 CASES = ["optional-blocked", "optional-failed", "settings-failed", "profiles-failed",
          "first-party-missing", "first-party-failed", "compat-failed", "protected-writer",
-         "native-transaction", "lease-lost", "deadline", "unobserved-writer"]
+         "native-transaction", "lease-lost", "deadline", "unobserved-writer", "protection-warning"]
 MAIN = r'''
 int main(int argc, char** argv) {
   assert(argc == 3);
@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
   InfinityScriptPersistence::Observed(42);
   InfinityScriptPersistence::Touch(42, optionalPath);
   if (mode == "unobserved-writer") InfinityScriptPersistence::Admit(43, "unobserved:service.py");
+  if (mode == "protection-warning") InfinityScriptPersistence::ProtectionFailure("test1_unresolved_protected_write_warning");
   if (mode == "optional-failed") InfinityScriptPersistence::Fail(42, "buffer_flush_failed");
   uint64_t pendingWrite = 0;
   if (mode == "protected-writer") {
@@ -70,11 +71,21 @@ int main(int argc, char** argv) {
     InfinityDatabaseBarrier::SetTransaction(&transactionOwner, false);
     Pump(app);
   }
-  if (mode == "protected-writer" || mode == "unobserved-writer") {
+  if (mode == "protected-writer") {
     assert(Get().phase == "PERSISTING");
     assert(!InfinityScriptPersistence::EssentialWrites().blockers.empty());
     assert(!AuthorizeTermination(SESSION, OWNER, getpid()));
     if (pendingWrite) InfinityScriptPersistence::EndProtectedOperation(pendingWrite);
+    return 0;
+  }
+  if (mode == "protection-warning" || mode == "unobserved-writer") {
+    assert(Get().owners["kodi_settings"].complete);
+    assert(Get().owners["profiles"].complete);
+    assert(Get().owners["favourites"].complete);
+    assert(Get().phase == "CHECKPOINT_FAILED");
+    assert(!Get().owners["native_admission"].complete);
+    assert(!InfinityScriptPersistence::EssentialWrites().blockers.empty());
+    assert(!AuthorizeTermination(SESSION, OWNER, getpid()));
     return 0;
   }
   if (mode == "first-party-failed" || mode == "compat-failed" ||

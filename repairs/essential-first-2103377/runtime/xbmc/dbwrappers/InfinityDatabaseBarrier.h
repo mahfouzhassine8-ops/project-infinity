@@ -76,7 +76,10 @@ inline Snapshot ReadLocked(const Registry& state)
   snapshot.failures = state.failures;
   snapshot.rejectedWrites = state.rejectedWrites;
   snapshot.sealed = state.sealed;
-  snapshot.protectedResourceBlockers = InfinityScriptPersistence::EssentialWrites().blockers.size();
+  // Save-stage admission waits for actual protected mutations/transactions,
+  // not historical warnings. Final SealEssentialWrites/authorization still
+  // require the complete independent durability proof with zero blockers.
+  snapshot.protectedResourceBlockers = InfinityScriptPersistence::ActiveProtectedResources();
   snapshot.queuedOwners = state.abandonedOwners;
   for (const auto& entry : state.owners)
   {

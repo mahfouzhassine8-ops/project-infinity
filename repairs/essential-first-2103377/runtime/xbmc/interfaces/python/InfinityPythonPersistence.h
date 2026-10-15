@@ -14,6 +14,7 @@
 #include <mutex>
 #include <string>
 
+namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); }
 namespace InfinityPythonPersistence
 {
 struct Context
@@ -22,6 +23,9 @@ struct Context
   PyObject* globals{nullptr};
   PyObject* observer{nullptr};
   PyObject* connectionType{nullptr};
+  PyObject* rawType{nullptr};
+  PyObject* rawWrite{nullptr};
+  PyObject* admissionError{nullptr};
   bool retiring{false};
   bool finalized{false};
   bool preservePending{false};
@@ -31,9 +35,12 @@ struct Context
   std::map<PyThreadState*,std::string> sqliteTargets;
   std::map<uint64_t, int> protectedOperations;
   std::map<PyThreadState*, unsigned> nativeProtectionDepth;
+  std::map<PyThreadState*, unsigned> nativeExtensionDepth;
 };
 inline std::map<PyInterpreterState*,Context*>& Contexts()
 {static auto* contexts=new std::map<PyInterpreterState*,Context*>;return *contexts;}
+inline void AdmissionDenied(Context* context,const char* message)
+{ PyErr_SetString(context && context->admissionError ? context->admissionError : PyExc_PermissionError,message); }
 inline std::string Path(PyObject* value)
 {
   if(PyLong_Check(value)) {
@@ -364,6 +371,34 @@ inline int Audit(const char* event,PyObject* args,void*)
   auto* context=found->second;
   const auto count=PyTuple_Check(args)?PyTuple_GET_SIZE(args):0;
   const auto at=[&](Py_ssize_t n){return n<count?PyTuple_GET_ITEM(args,n):Py_None;};
+  std::vector<std::string> actualTargets;
+  if(std::strcmp(event,"open")==0 && count>=3 && PyLong_Check(at(2)))
+  {
+    const auto flags=PyLong_AsLong(at(2));
+    if(flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))
+      actualTargets.push_back(PyLong_Check(at(0)) ?
+          InfinityScriptPersistence::DescriptorPath(static_cast<int>(PyLong_AsLong(at(0)))) : Path(at(0)));
+  }
+  else if(std::strcmp(event,"os.rename")==0 && count>=2)
+    actualTargets={PathAt(at(0),at(2)),PathAt(at(1),at(3))};
+  else if(std::strcmp(event,"os.remove")==0 || std::strcmp(event,"os.rmdir")==0)
+    actualTargets={PathAt(at(0),at(1))};
+  else if(std::strcmp(event,"os.mkdir")==0) actualTargets={PathAt(at(0),at(2))};
+  else if(std::strcmp(event,"os.truncate")==0)
+    actualTargets={PyLong_Check(at(0)) ?
+        InfinityScriptPersistence::DescriptorPath(static_cast<int>(PyLong_AsLong(at(0)))) : Path(at(0))};
+  if(!actualTargets.empty())
+  {
+    const auto token=InfinityScriptPersistence::protectedWriteToken;
+    if((token && !InfinityScriptPersistence::ProtectActualTargets(token,actualTargets)) ||
+       (!token && InfinityScriptPersistence::RejectOpaqueMutation("unleased_native_write")))
+    { AdmissionDenied(context,"Infinity protected native write target is sealed"); return -1; }
+    if(std::strcmp(event,"os.rename")==0 && actualTargets.size()==2)
+      InfinityScriptPersistence::RememberAlias(actualTargets[0],actualTargets[1]);
+  }
+  const bool descriptorControl = std::strcmp(event,"fcntl.fcntl")==0 ||
+      std::strcmp(event,"fcntl.ioctl")==0 ||
+      std::strcmp(event,"fcntl.lockf")==0 || std::strcmp(event,"os.chdir")==0;
   const bool opaque = std::strcmp(event,"os.chmod")==0 || std::strcmp(event,"os.chown")==0 ||
       std::strcmp(event,"os.utime")==0 || std::strcmp(event,"os.setxattr")==0 ||
       std::strcmp(event,"os.removexattr")==0 || std::strcmp(event,"os.link")==0 ||
@@ -373,12 +408,14 @@ inline int Audit(const char* event,PyObject* args,void*)
       std::strcmp(event,"os.posix_spawn")==0 || std::strcmp(event,"os.exec")==0 ||
       std::strcmp(event,"os.forkpty")==0 || std::strcmp(event,"subprocess.Popen")==0 ||
       std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
-      std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0;
+      std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0 || descriptorControl;
   if (opaque && InfinityScriptPersistence::RejectOpaqueMutation(event))
   {
-    PyErr_Format(PyExc_PermissionError, "Infinity shutdown closed native mutation admission: %s", event);
+    AdmissionDenied(context, "Infinity shutdown closed native mutation admission");
     return -1; // Audit rejection occurs BEFORE the original operation.
   }
+  if(descriptorControl)
+    InfinityScriptPersistence::Fail(context->id,"unclassified_descriptor_or_working_directory_mutation",event);
   if(std::strcmp(event,"open")==0 && count>=3) {
     const auto flags=PyLong_Check(at(2))?PyLong_AsLong(at(2)):0;
     if((flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))!=0) {
@@ -431,15 +468,14 @@ inline int Audit(const char* event,PyObject* args,void*)
     const bool external = filename.size()>=3 && filename.compare(filename.size()-3,3,".so")==0 &&
                           filename.find("/lib-dynload/")==std::string::npos;
     if (external && InfinityScriptPersistence::RejectOpaqueMutation("import_native_extension"))
-    { PyErr_SetString(PyExc_PermissionError,"Infinity shutdown closed native extension admission"); return -1; }
+    { AdmissionDenied(context,"Infinity shutdown closed native extension admission"); return -1; }
     if(module && (std::strcmp(module,"_dbm")==0 || std::strcmp(module,"_gdbm")==0))
       InfinityScriptPersistence::Fail(context->id,"unobserved_dbm_persistence_backend");
-    // The locked Pillow image is trusted code, but its native encoder can
-    // write a previously supplied descriptor without calling Python's write
-    // methods. The legacy import allowlist is not a write-barrier proof.
-    // Retain this observed capability as a blocker until that actual encoder
-    // path has an independently tested lease adapter; normal imports still run.
-    if(ApprovedBundledPythonExtension(module,filename))
+    // An import allowlist alone cannot cover a native encoder's descriptor
+    // writes. Its actual C type methods must be interposed before the native
+    // loader returns the module to Python. A loader bypass remains a blocker.
+    if(ApprovedBundledPythonExtension(module,filename) &&
+       (!module || std::strcmp(module,"PIL._imaging")!=0 || !context->nativeExtensionDepth[thread]))
       InfinityScriptPersistence::Fail(context->id,"bundled_native_encoder_write_adapter_missing",
                                       NativeExtensionEvidence(module,filename));
     if(filename.size()>=3 && filename.compare(filename.size()-3,3,".so")==0 &&
@@ -550,6 +586,14 @@ inline PyObject* Protect(PyObject* self, PyObject* args)
     context->protectedOperations.erase(found);
     Py_RETURN_NONE;
   }
+  if (operation == "clean")
+  {
+    // The enclosing operation still owns its pre-close lease. Successful
+    // close has already invalidated fileno(); retiring the buffer needs only
+    // its original identity, never a second lookup of the closed handle.
+    InfinityScriptPersistence::SetProtectedBuffer(context->id, std::to_string(key), {}, false);
+    Py_RETURN_NONE;
+  }
   PyObject* sequence = PySequence_Fast(targets, "write targets must be a sequence");
   if (!sequence) return nullptr;
   std::vector<std::string> paths;
@@ -563,18 +607,29 @@ inline PyObject* Protect(PyObject* self, PyObject* args)
       if (PyErr_Occurred()) { Py_DECREF(sequence); return nullptr; }
       path = InfinityScriptPersistence::DescriptorPath(static_cast<int>(fd));
     }
-    else path = Path(item);
+    else if (PyUnicode_Check(item) || PyBytes_Check(item) || PyObject_HasAttrString(item,"__fspath__")) path = Path(item);
+    else
+    {
+      auto* descriptor = InfinityPythonWriteHooks::ActualDescriptor(item,0);
+      if (descriptor)
+      {
+        path = PyLong_Check(descriptor) ?
+            InfinityScriptPersistence::DescriptorPath(static_cast<int>(PyLong_AsLong(descriptor))) : Path(descriptor);
+        Py_DECREF(descriptor);
+      }
+      else if (PyErr_Occurred()) { Py_DECREF(sequence); return nullptr; }
+    }
     paths.push_back(path);
   }
   Py_DECREF(sequence);
-  if (operation == "dirty" || operation == "clean")
+  if (operation == "dirty")
   {
-    InfinityScriptPersistence::SetProtectedBuffer(context->id, std::to_string(key), paths, operation == "dirty");
+    InfinityScriptPersistence::SetProtectedBuffer(context->id, std::to_string(key), paths, true);
     Py_RETURN_NONE;
   }
   const auto token = InfinityScriptPersistence::BeginProtectedOperation(context->id, paths, operation);
   if (!token)
-  { PyErr_SetString(PyExc_PermissionError, "Infinity protected write admission is closed"); return nullptr; }
+  { AdmissionDenied(context, "Infinity protected write admission is closed"); return nullptr; }
   context->protectedOperations.emplace(token, InfinityScriptPersistence::protectedWriteOwner);
   InfinityScriptPersistence::protectedWriteOwner = context->id;
   return PyLong_FromUnsignedLongLong(token);
@@ -596,6 +651,9 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   const auto existing=Contexts().find(interpreter);
   if(existing!=Contexts().end())return existing->second; // Reusable interpreter keeps all admitted writes.
   auto* context=new Context;context->id=id;Contexts()[interpreter]=context;
+  context->admissionError=PyErr_NewException("_infinity_native_persistence_observer.WriteAdmissionClosed",PyExc_PermissionError,nullptr);
+  if(!context->admissionError)
+  { InfinityScriptPersistence::Fail(id,"native_python_admission_exception_unavailable"); return context; }
   if (!InfinityPythonWriteHooks::Install())
   { InfinityScriptPersistence::Fail(id, "native_python_write_protection_unavailable"); return context; }
   context->globals=PyDict_New();
@@ -620,10 +678,14 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   hostProbe=Py_True;
 #endif
   if(klass && !PyErr_Occurred() && vfs)
-    context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,nullptr);
+    context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,context->admissionError,nullptr);
   Py_XDECREF(vfs);Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(protection);Py_XDECREF(capsule);
-  if(context->observer)context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
-  if(!context->observer || !context->connectionType || PyErr_Occurred())
+  if(context->observer) {
+    context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
+    context->rawType=PyObject_GetAttrString(context->observer,"raw_type");
+    if(context->rawType)context->rawWrite=PyObject_GetAttrString(context->rawType,"write");
+  }
+  if(!context->observer || !context->connectionType || !context->rawType || !context->rawWrite || PyErr_Occurred())
     InfinityScriptPersistence::Fail(id,"checked_python_observer_initialization_failed");
   else InfinityScriptPersistence::Observed(id);
   return context;
@@ -659,6 +721,8 @@ inline void Finish(Context* context,PyThreadState* owner,bool checkpointEscalate
   if(context->preservePending)return;
   context->retiring=true;
   Py_CLEAR(context->observer);Py_CLEAR(context->connectionType);Py_CLEAR(context->globals);
+  Py_CLEAR(context->rawWrite);Py_CLEAR(context->rawType);
+  Py_CLEAR(context->admissionError);
 }
 inline void End(Context* context,PyInterpreterState* interpreter)
 {

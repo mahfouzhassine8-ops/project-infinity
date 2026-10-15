@@ -1,24 +1,33 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "existing native script persistence ledger plus subordinate CPython and SQLite VFS adapters",
+  "implementation": "existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 16,
-    "coordinator_with_real_barrier": 12
+    "native_cpython_3117_runtime": 34,
+    "coordinator_with_real_barrier": 13
   },
-  "real_kodi_first_party_callbacks_executed": false,
-  "full_arm64_compile": "pending",
-  "android_receipt_validation": "source updated; test pending",
+  "first_party_python_callbacks": "unchanged locked Command Center and compatibility callbacks executed through production observer; Kodi RPC peers remain test adapters",
+  "full_arm64_compile": {
+    "previous_commit": "56fca5a4423a72e2e68e4f3f12e9ebe6076b17da",
+    "previous_run": 38799103180,
+    "previous_result": "success",
+    "current_corrections": "pending"
+  },
+  "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
   "android_process_death_verified": false,
   "reopen_on_android_verified": false,
   "apk_deliverable": false,
   "release_signed": false,
   "locked": false,
+  "test1": {
+    "observed_outcome": "CHECKPOINT_FAILED at native_databases; later essential owners did not complete; no authorization consumed; no process death confirmed",
+    "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
+  },
   "unresolved": [
-    "Bundled Pillow native encoder descriptor writes need an actual bounded write adapter. Observed imports now retain bundled_native_encoder_write_adapter_missing and prevent authorization.",
-    "Concurrent descriptor replacement and other native filesystem paths require complete coverage proof.",
-    "Android validator compilation, first-party callback integration, full ARM64 build and permanent signing not yet complete.",
-    "Actual Android process death, data-preserving reopen and physical Fold acceptance not performed."
+    "Run full ARM64 build for these current corrections; previous green build predates them.",
+    "TEST1 lacks call-site exception details needed to prove all recorded Seren/Continuity/IAGL failures resolved on-device; unknown or actual failed protected writes remain blockers.",
+    "Obtain actual Android engine and guard-process death evidence, data-preserving reopening and physical Fold acceptance. stopSelf alone does not establish that the guard process is gone.",
+    "Permanent signing and delivery remain gated on the applicable production safety checks; no TEST2 APK verified by this source checkpoint."
   ]
 }

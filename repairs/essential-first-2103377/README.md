@@ -1,11 +1,25 @@
-# Essential-first shutdown — disabled implementation checkpoint
+# Essential-first shutdown — production repair in progress
 
-**Status: NOT COMPLETE. NOT AN APK CANDIDATE. NOT LOCKED.**
+**Status: current source is integrated and host-verified; not a verified APK candidate; not locked.**
 
-The user-authorized implementation is blocked on proving the essential-write
-fence with optional Python workers alive. No active runtime overlay, workflow,
-third-party add-on, installed APK, skin, Rails component, or locked branch has
-been changed by this checkpoint. These new files are an isolated experiment.
+Continue on `work/infinity-2103377-essential-first-shutdown-only` from the saved
+`5a62f829` checkpoint. The production path now uses the existing script
+persistence ledger, native coordinator and database barrier. The prototype
+`InfinityEssentialScriptFence.h` remains unwired and its coverage flag remains
+false. No third-party add-on or protected feature source is edited.
+
+The complete ARM64 build of `56fca5a` passed in run `38799103180`. TEST1 was
+packaged from that earlier source. The current correction separates essential
+save admission from strict final authorization and adds actual write-path
+coverage; it requires a new full build. See `PRODUCTION-STATUS.json` and
+`TEST1-CORRECTIONS.md` for current evidence and remaining delivery blockers.
+
+Current host verification: 34 actual CPython 3.11.7 runtime cases, 8 actual
+SQLite VFS cases, 13 production coordinator cases, and the compiled Android
+protocol/guard authorization suite. First-party Command Center and compatibility
+Python callbacks run unchanged through the production observer; their Kodi RPC
+peers remain host adapters. Actual Android process death and reopening have
+not been established. No passing host test is presented as Fold acceptance.
 
 ## Exact foundation
 
@@ -43,7 +57,7 @@ These findings do not establish that the locked application incorrectly
 authorized a real close: its original all-interpreter retirement gate remains
 active. They establish why removing that gate without replacement is unsafe.
 
-## Experimental implementation
+## Historical checkpoint at 5a62f829 (retained negative controls)
 
 `stage_experiment.py` accepts only the exact locked coordinator hash. In a
 scratch source subset it changes stage 4 and final native authorization to
@@ -88,26 +102,18 @@ save callback, Android process death, data-preserving Android reopen, complete
 ARM64 build, permanent signing, or Fold acceptance was verified in this work.
 The prior 274-test suite was not rerun and is not claimed as newly passing.
 
-## Necessary continuation within the authorized shutdown scope
+## Current production path
 
-1. Implement a native resource fence covering already-open Python descriptors,
-   buffered writes, SQLite primary/ATTACH/URI and transaction paths, and native
-   VFS/namespace mutations. Audit registration alone is not enforcement.
-   Cover any excluded/stop-only interpreter that can still touch shared data.
-2. Permit existing first-party callbacks and required database jobs to finish;
-   then prevent post-verification protected mutation through process death.
-   Keep ambiguous or shared-data operations essential. Preserve optional
-   failure diagnostics without claiming their data is recoverable.
-3. Update native and active Android validators together with an exact versioned
-   essential-owner contract. Retain the full 17-owner diagnostic inventory and
-   existing owner-lease death confirmation protocol. Verify the guard service
-   distinguishes essential-verified process exit from all-owner graceful exit.
-4. Reconstruct the full locked source, apply only the shutdown delta, run real
-   callback/failure/concurrency and native/Java agreement tests, compile ARM64,
-   and sign only after all applicable gates pass. Preserve the signed rollback.
-5. Obtain actual Android death and reopening evidence, then Fold acceptance
-   for quick close and ordinary mixed use, app switching, screensaver, progress
-   persistence and Rails regressions. No arbitrary viewing-duration gate.
+`apply_runtime.py` verifies exact locked preimages before patching only shutdown
+sequencing, native POSIX writes and directories, SQLite registration and the
+existing Python observer. Every unrelated locked source hash stays in the
+preservation manifest. `native_ci.py` reuses the complete original compiler.
 
-No additional permission is required to continue this already-authorized scope.
-Final promotion/lock still requires the user's explicit approval.
+`runtime/` is the active overlay for this work branch. The earlier prototype
+and its historical evidence above are retained for reproducibility; they do
+not grant production authorization. The active Android validators use the
+same essential-first policy, 17 diagnostic rows and 16 mandatory essential
+owners as native code. Native SAFE is never represented as process-death proof.
+
+Final promotion or lock requires explicit user approval. Continuing the repair,
+verification and safe test packaging is already authorized.

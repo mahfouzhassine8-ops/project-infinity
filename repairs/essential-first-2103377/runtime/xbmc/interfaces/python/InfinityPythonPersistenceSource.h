@@ -16,6 +16,7 @@ import _io
 import os
 import shutil
 import sqlite3
+import sys
 # Marker is embedded into libkodi.so and checked by the native build gate.
 DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
 try:
@@ -42,7 +43,10 @@ def protected_method(name, dirty=False, clean=False):
                 targets = (handle._infinity_path,)
             else:
                 raw = handle._infinity_handle if isinstance(handle, File) else handle
-                targets = (raw.fileno(),)
+                # Let the native adapter inspect the actual I/O object. A
+                # subclass's fileno() or an in-memory buffer is not a reliable
+                # persistent descriptor identity.
+                targets = (raw,)
             with observer.operation(name, targets):
                 if dirty: observer.buffer(handle, targets, True)
                 result = original(handle, *args, **kwargs)
@@ -53,7 +57,7 @@ def protected_method(name, dirty=False, clean=False):
 
 
 class Observer:
-    def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None):
+    def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None):
         self.fail = fail
         self.touch = touch
         self.lock = threading.RLock()
@@ -68,6 +72,7 @@ class Observer:
         self.retired = False
         self.vfs = vfs
         self.protect = protect
+        self.closed_error = closed_error
         self.install()
 
     @contextmanager
@@ -91,6 +96,13 @@ class Observer:
         return os.path.join(os.readlink('/proc/self/fd/'+str(directory)), os.fsdecode(path))
 
     def error(self, operation, detail=''):
+        # Native admission rejected the call BEFORE it could mutate anything.
+        # Keep the denial diagnostic and propagate the original exception;
+        # existing dirty buffers/transactions and failed essential receipts
+        # retain their independent blockers.
+        if self.closed_error is not None and isinstance(sys.exception(), self.closed_error):
+            self.fail('protected_write_rejected_before_mutation', operation)
+            return
         if detail:
             self.fail(operation, detail)
         else:
@@ -195,6 +207,7 @@ class Observer:
                     raise
         for method in ('write', 'truncate', 'flush', 'close'):
             setattr(RawFile, method, protected_method('raw.'+method)(getattr(RawFile, method)))
+        self.raw_type = RawFile
         self.patch(_io, 'FileIO', RawFile)
         self.patch(io, 'FileIO', RawFile)
         for name in ('BufferedWriter', 'BufferedRandom', 'TextIOWrapper'):
@@ -294,6 +307,9 @@ class Observer:
                 # Actual attached filenames, including bound ATTACH parameters.
                 # The native VFS enforces BEFORE I/O; this updates diagnostics.
                 cursor = original_connection.cursor(self, original_cursor)
+                # A provider's row factory is for its own queries, not this
+                # internal filename inventory. Do not alter the connection.
+                cursor.row_factory = None
                 try:
                     for _, _, path in original_cursor.execute(cursor, 'PRAGMA database_list'):
                         if path: observer.touch(path, 'sqlite')
@@ -498,7 +514,7 @@ class Observer:
         import ctypes
         native = importlib.import_module('_ctypes')
         original = native.dlopen
-        names = ('libCryptodome_Cipher__Salsa20.so', 'libCryptodome_Cipher__chacha20.so', 'libCryptodome_Cipher__raw_aes.so', 'libCryptodome_Cipher__raw_cbc.so', 'libCryptodome_Cipher__raw_cfb.so', 'libCryptodome_Cipher__raw_ctr.so', 'libCryptodome_Cipher__raw_ecb.so', 'libCryptodome_Cipher__raw_ocb.so', 'libCryptodome_Cipher__raw_ofb.so', 'libCryptodome_Hash__BLAKE2s.so', 'libCryptodome_Hash__MD5.so', 'libCryptodome_Hash__SHA1.so', 'libCryptodome_Hash__SHA256.so', 'libCryptodome_Hash__ghash_portable.so', 'libCryptodome_Hash__poly1305.so', 'libCryptodome_Protocol__scrypt.so', 'libCryptodome_Util__cpuid_c.so', 'libCryptodome_Util__strxor.so')
+        names = ('libinfinityambient.so', 'libCryptodome_Cipher__Salsa20.so', 'libCryptodome_Cipher__chacha20.so', 'libCryptodome_Cipher__raw_aes.so', 'libCryptodome_Cipher__raw_cbc.so', 'libCryptodome_Cipher__raw_cfb.so', 'libCryptodome_Cipher__raw_ctr.so', 'libCryptodome_Cipher__raw_ecb.so', 'libCryptodome_Cipher__raw_ocb.so', 'libCryptodome_Cipher__raw_ofb.so', 'libCryptodome_Hash__BLAKE2s.so', 'libCryptodome_Hash__MD5.so', 'libCryptodome_Hash__SHA1.so', 'libCryptodome_Hash__SHA256.so', 'libCryptodome_Hash__ghash_portable.so', 'libCryptodome_Hash__poly1305.so', 'libCryptodome_Protocol__scrypt.so', 'libCryptodome_Util__cpuid_c.so', 'libCryptodome_Util__strxor.so')
         def loaded(name, *args, **kwargs):
             root = os.environ.get('KODI_ANDROID_LIBS', '')
             if name in names and root.startswith('/'):

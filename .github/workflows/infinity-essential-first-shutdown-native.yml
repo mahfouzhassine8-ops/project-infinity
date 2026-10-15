@@ -20,6 +20,34 @@ jobs:
         with: {fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38732470818
+          name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence
+          github-token: ${{ github.token }}
+          path: host-locked-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38733189236
+          name: Infinity-2103377-Rails-Handoff-RC1-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: host-locked-apk
+      - name: Prepare exact Pillow source and locked ambient image
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://mirrors.kodi.tv/build-deps/sources/Pillow-8.4.0.tar.gz -o Pillow-8.4.0.tar.gz
+          echo 'a726a4246cf1f26a5024b57c5d5fa0e98789262799860ed554ec028e2698f2c0  Pillow-8.4.0.tar.gz' | sha256sum -c
+          tar -xf Pillow-8.4.0.tar.gz
+          (cd Pillow-8.4.0 && python3 setup.py build_ext --disable-jpeg --disable-zlib --disable-freetype --disable-raqm --disable-jpeg2000 --disable-webp --disable-imagequant --disable-tiff --disable-webpmux --disable-xcb --disable-lcms)
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          apk=Path('host-locked-apk/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk')
+          assert hashlib.sha256(apk.read_bytes()).hexdigest() == 'de8ce3f122db7bb8b2b3681e7c6ce9caf67cf38888b17ef1f82ff7759fa8a3db'
+          with zipfile.ZipFile(apk) as z: data=z.read('lib/arm64-v8a/libinfinityambient.so')
+          assert hashlib.sha256(data).hexdigest() == 'a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684'
+          Path('host-locked-evidence/libinfinityambient.so').write_bytes(data)
+          PY
       - name: Exercise actual native Python and SQLite write protection
         run: |
           set -euo pipefail
@@ -28,6 +56,10 @@ jobs:
           mkdir -p shutdown-rc1-host
           python3 repairs/essential-first-2103377/test_runtime_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
+            --pillow-library Pillow-8.4.0/build/lib.linux-x86_64-cpython-311/PIL/_imaging.cpython-311-x86_64-linux-gnu.so \
+            --command-center-runtime host-locked-evidence/installed-addons/script.infinity.commandcenter \
+            --compat-runtime host-locked-evidence/installed-addons/service.infinity.compat/checkpoint_runtime.py \
+            --ambient-library host-locked-evidence/libinfinityambient.so \
             --out shutdown-rc1-host/runtime-native.json
           /usr/bin/python3 repairs/essential-first-2103377/test_runtime_sqlite.py \
             --sqlite-include /usr/include --out shutdown-rc1-host/runtime-sqlite.json
@@ -154,6 +186,14 @@ jobs:
           set -euo pipefail
           python3 repairs/essential-first-2103377/run_runtime_coordinator_tests.py \
             --variant-source kodi/xbmc --out checkpoint-build/runtime-coordinator.json
+      - name: Verify compiled Android authorization against production native receipt
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/robolectric/android-all/15-robolectric-12650502/android-all-15-robolectric-12650502.jar -o android-all.jar
+          echo '5f1719d3b1de6e8cf0f0928d8757349c11a3dc798fe37bc06bc291e11a75c3d3324e1206adcc23b7b7df64d6d70b190d1835a243a8891bc2b9d4be6fcb4d1553  android-all.jar' | sha512sum -c
+          python3 repairs/essential-first-2103377/test_android_authorization.py \
+            --android-jar android-all.jar --native-receipt checkpoint-build/runtime-native-safe-fixture.json \
+            --out checkpoint-build/runtime-android.json
       - name: Compile complete native Kodi engine
         run: |
           set -euo pipefail

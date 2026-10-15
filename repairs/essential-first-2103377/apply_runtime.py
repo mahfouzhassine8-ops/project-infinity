@@ -14,11 +14,13 @@ CHECKPOINT = stage_experiment.CHECKPOINT
 MANAGER = 'xbmc/interfaces/generic/ScriptInvocationManager.cpp'
 SQLITE = 'xbmc/dbwrappers/sqlitedataset.cpp'
 POSIX = 'xbmc/platform/posix/filesystem/PosixFile.cpp'
+DIRECTORY = 'xbmc/platform/posix/filesystem/PosixDirectory.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
     SQLITE: '18206a86843f11bea447ebbe1ecca474bf3ae62aef9bd204e37c671515111920',
     POSIX: '0a880f1de9c1cb9d7c1cd0c99fc1ae0334c87ddb77faa50b81af8d80d7ef3baa',
+    DIRECTORY: '68e638f060868bca397dd5a8e1f85232a70df31f92692460b0e741a63205094a',
 }
 once = stage_experiment.once
 
@@ -31,7 +33,7 @@ def checkpoint(text):
     text = text.replace('InfinityEssentialScriptFence::Authorized(', 'InfinityScriptPersistence::EssentialWritesAuthorized(')
     text = text.replace('essential.sealed', '(essential.phase == 3)')
     text = text.replace('static_cast<uint64_t>(essential.optionalUnfinished)',
-                        'static_cast<uint64_t>(InfinityScriptPersistence::Snapshot().active)')
+                        'static_cast<uint64_t>(InfinityScriptPersistence::OptionalUnfinishedWriters())')
     start = text.index('bool AuthorizeTermination(')
     authorization = text[start:]
     authorization = once(authorization, '    if (!Matches(s, session, owner, pid))',
@@ -104,11 +106,11 @@ def posix(text):
 #include "platform/android/activity/InfinityProtectedWrites.h"
 #include "platform/android/activity/InfinityAndroidCheckpoint.h"
 #endif''')
-    def guard(paths, operation, failure):
+    def guard(paths, operation, failure, descriptor='-1'):
         return '''#if defined(TARGET_ANDROID)
   InfinityScriptPersistence::ProtectedOperation infinityWrite(
       InfinityScriptPersistence::CurrentWriteOwner(), {''' + paths + '''}, "''' + operation + '''",
-      InfinityAndroidCheckpoint::IsPersistingOnThisThread());
+      InfinityAndroidCheckpoint::IsPersistingOnThisThread(), false, ''' + descriptor + ''');
   if (!infinityWrite) return ''' + failure + ''';
 #endif
 '''
@@ -116,17 +118,44 @@ def posix(text):
                 guard('filename', 'posix.open_write', 'false') + '  m_fd = open(filename.c_str(), O_RDWR')
     for method, signature in [('Write', 'ssize_t CPosixFile::Write(const void* lpBuf, size_t uiBufSize)'),
                               ('Truncate', 'int CPosixFile::Truncate(int64_t size)')]:
-        text = once(text, signature+'\n{', signature+'\n{\n'+guard(
-            'InfinityScriptPersistence::DescriptorPath(m_fd)', 'posix.'+method.lower(), '-1'))
+        opening = signature+'\n{\n  if (m_fd < 0)\n    return -1;\n'
+        text = once(text, opening, opening+'\n'+guard(
+            'InfinityScriptPersistence::DescriptorPath(m_fd)', 'posix.'+method.lower(), '-1', 'm_fd'))
     text = once(text, '  if (unlink(filename.c_str()) == 0)', guard('filename', 'posix.unlink', 'false')+'  if (unlink(filename.c_str()) == 0)')
-    text = once(text, '  if (rename(name.c_str(), newName.c_str()) == 0)', guard('name, newName', 'posix.rename', 'false')+'  if (rename(name.c_str(), newName.c_str()) == 0)')
+    text = once(text, '  if (rename(name.c_str(), newName.c_str()) == 0)\n    return true;', guard('name, newName', 'posix.rename', 'false')+'''  if (rename(name.c_str(), newName.c_str()) == 0)
+  {
+#if defined(TARGET_ANDROID)
+    InfinityScriptPersistence::RememberAlias(name, newName);
+#endif
+    return true;
+  }''')
+    return text
+
+def directory(text):
+    text = once(text, '#include "PosixDirectory.h"', '''#include "PosixDirectory.h"
+#if defined(TARGET_ANDROID)
+#include "platform/android/activity/InfinityProtectedWrites.h"
+#include "platform/android/activity/InfinityAndroidCheckpoint.h"
+#endif''')
+    def guard(path, operation):
+        return '''#if defined(TARGET_ANDROID)
+  InfinityScriptPersistence::ProtectedOperation infinityDirectoryWrite(
+      InfinityScriptPersistence::CurrentWriteOwner(), {''' + path + '''}, "''' + operation + '''",
+      InfinityAndroidCheckpoint::IsPersistingOnThisThread());
+  if (!infinityDirectoryWrite) return false;
+#endif
+'''
+    text = once(text, '  if (mkdir(path.c_str(), 0755) != 0)', guard('path', 'posix.mkdir')+'  if (mkdir(path.c_str(), 0755) != 0)')
+    text = once(text, '  if (rmdir(url.Get().c_str()) == 0)', guard('url.Get()', 'posix.rmdir')+'  if (rmdir(url.Get().c_str()) == 0)')
+    start = text.index('bool CPosixDirectory::RemoveRecursive(')
+    text = text[:start] + once(text[start:], '  DIR *dir = opendir(root.c_str());', guard('root', 'posix.remove_recursive')+'  DIR *dir = opendir(root.c_str());')
     return text
 
 def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)

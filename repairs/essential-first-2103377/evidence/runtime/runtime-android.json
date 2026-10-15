@@ -1,0 +1,9 @@
+{
+  "scope": "actual Android shutdown classes compiled; wire and UUID lease tests on host",
+  "exit_code": 0,
+  "stdout": "PASS 19 actual Android wire/proof checks\nPASS 9 essential-first authorization and truthful optional receipt checks\nPASS actual runtime authorization gate identity/deadline/replay and100 consume/revoke races\nPASS actual chooser receipt reader: identity, hash, live owner, authoritative completion and legacy isolation\nPASS actual UUID lease durability and retirement: file/directory failures retain unconfirmed live lock, checked same-token retry, separate-process death and PID reuse\nPASS actual native EncodeStatus -> Android strict receipt parser\nPASS runtime route, explicit native authorization, failure detail export, and no-restart binding checks\n",
+  "stderr": "/tmp/infinity-runtime-java-j5vyes9m/com/projectinfinity/kodi/InfinityCloseGuardService.java:167: warning: [deprecation] persistentId in RecentTaskInfo has been deprecated\n        if(Build.VERSION.SDK_INT>=29 ? info.taskId!=completed.taskId : info.persistentId!=completed.taskId)continue;\n                                                                           ^\n/tmp/infinity-runtime-java-j5vyes9m/com/projectinfinity/kodi/InfinityCloseGuardService.java:201: warning: [deprecation] Builder(Context) in Builder has been deprecated\n    Notification.Builder builder=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL):new Notification.Builder(this);\n                                                                                                  ^\n/tmp/infinity-runtime-java-j5vyes9m/com/projectinfinity/kodi/InfinityCloseGuardService.java:351: warning: [deprecation] stopForeground(boolean) in Service has been deprecated\n    stopForeground(true);stopSelf();\n    ^\n3 warnings\n",
+  "passed": true,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

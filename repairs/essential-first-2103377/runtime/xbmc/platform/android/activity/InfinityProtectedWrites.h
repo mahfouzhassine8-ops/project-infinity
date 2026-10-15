@@ -9,6 +9,7 @@
 namespace InfinityScriptPersistence
 {
 inline thread_local int protectedWriteOwner{-1};
+inline thread_local uint64_t protectedWriteToken{0};
 inline int CurrentWriteOwner() { return protectedWriteOwner; }
 inline bool Within(const std::string& path, const std::string& root)
 { return !root.empty() && (path == root || path.rfind(root + "/", 0) == 0); }
@@ -36,7 +37,7 @@ inline std::string ProtectedCanonical(const std::string& input)
   return {};
 }
 
-inline bool OptionalPathLocked(const WriteProtection& p, const std::string& raw)
+inline bool OptionalBasePathLocked(const WriteProtection& p, const std::string& raw)
 {
   if (raw == ":nonpersistent:") return true;
   const auto path = ProtectedCanonical(raw);
@@ -58,6 +59,24 @@ inline bool OptionalPathLocked(const WriteProtection& p, const std::string& raw)
     return true;
   }
   return false;
+}
+inline bool OptionalPathLocked(const WriteProtection& p, const std::string& raw)
+{
+  if (!OptionalBasePathLocked(p, raw)) return false;
+  std::set<std::string> visited;
+  std::vector<std::string> pending{raw};
+  while (!pending.empty())
+  {
+    const auto path = pending.back(); pending.pop_back();
+    if (!visited.insert(path).second) continue;
+    if (visited.size() > 4096 || !OptionalBasePathLocked(p, path)) return false;
+    for (const auto& pair : p.aliases)
+    {
+      if (Within(path, pair.first)) pending.push_back(pair.second + path.substr(pair.first.size()));
+      if (Within(path, pair.second)) pending.push_back(pair.first + path.substr(pair.second.size()));
+    }
+  }
+  return true;
 }
 inline bool ProtectedLocked(const WriteProtection& p, const ProtectedResource& resource)
 {
@@ -88,14 +107,41 @@ inline bool RejectOpaqueMutation(const std::string& operation)
   if (s.protection.denials.size() < 128) s.protection.denials.push_back(operation);
   return true;
 }
+inline void InvalidateDescriptor(int descriptor, uint64_t except = 0)
+{
+  if (descriptor < 0) return;
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  // A lease resolved before dup2/close cannot keep its old optional identity.
+  // It becomes an essential uncertainty until the actual operation returns.
+  for (auto& item : s.protection.operations)
+    if (item.first != except && item.second.descriptor == descriptor) item.second.paths.clear();
+}
+inline void InvalidateDescriptorRange(int first, int last)
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  for (auto& item : s.protection.operations)
+    if (item.second.descriptor >= first && item.second.descriptor < last) item.second.paths.clear();
+}
+inline void RememberAlias(const std::string& from, const std::string& to)
+{
+  if (from == ":nonpersistent:" || to == ":nonpersistent:") return;
+  const auto source = Absolute(from), target = Absolute(to);
+  if (source.empty() || target.empty() || source == target) return;
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
+  if (p.aliases.size() >= 65536)
+  { ProtectionFailureLocked(p,"protected_namespace_alias_inventory_exhausted"); return; }
+  p.aliases.emplace(source, target);
+  p.paths.insert(source); p.paths.insert(target);
+}
 
 inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>& paths,
                                        const std::string& operation, bool nativeSave = false,
-                                       bool existingTransaction = false)
+                                       bool existingTransaction = false, int descriptor = -1)
 {
   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
   auto& p = s.protection;
   ProtectedResource resource{id, paths, operation};
+  resource.descriptor = descriptor;
   bool bufferDrain = false;
   const bool flushing = operation == "flush" || operation == "close" ||
       (operation.size() >= 6 && operation.compare(operation.size()-6, 6, ".flush") == 0) ||
@@ -107,7 +153,9 @@ inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>& 
         item.second.paths == paths && (item.second.operation == "flush" || item.second.operation == "close" ||
         item.second.operation.find(".flush") != std::string::npos || item.second.operation.find(".close") != std::string::npos))
       bufferDrain = true;
-  if (p.phase && ProtectedLocked(p, resource))
+  const bool persistent = paths.empty() || std::any_of(paths.begin(), paths.end(),
+      [](const std::string& path) { return path != ":nonpersistent:"; });
+  if (p.phase && (ProtectedLocked(p, resource) || (p.phase == 3 && persistent)))
   {
     const bool permitted = p.phase < 3 &&
         (existingTransaction || bufferDrain || nativeSave ||
@@ -142,12 +190,54 @@ inline void EndProtectedOperation(uint64_t token)
   if (!token || s.protection.operations.erase(token) != 1)
     ProtectionFailureLocked(s.protection, "protected_operation_ownership_mismatch");
 }
+inline void RecordProtectedResult(uint64_t token, const std::string& path)
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  const auto found = s.protection.operations.find(token);
+  if (found == s.protection.operations.end() || path.empty())
+  { ProtectionFailureLocked(s.protection, "completed_native_write_target_unconfirmed"); return; }
+  found->second.paths.push_back(path);
+  if (path != ":nonpersistent:")
+  {
+    s.protection.paths.insert(path);
+    s.protection.writerPaths[found->second.writer].insert(path);
+  }
+}
+inline void RequireProtectedIdentity(uint64_t token)
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  const auto found = s.protection.operations.find(token);
+  if (found == s.protection.operations.end() || found->second.paths.empty())
+    ProtectionFailureLocked(s.protection, "completed_native_write_target_unconfirmed");
+}
+inline bool ProtectActualTargets(uint64_t owner, const std::vector<std::string>& paths)
+{
+  int writer = -1;
+  {
+    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+    const auto found = s.protection.operations.find(owner);
+    if (found == s.protection.operations.end()) return false;
+    writer = found->second.writer;
+  }
+  // The audit event supplies CPython's converted arguments, immediately before
+  // the syscall. Keep this child lease live until its identities are attached
+  // to the original operation, so a changing PathLike cannot hide the target.
+  const auto child = BeginProtectedOperation(writer, paths, "converted_native_write_target");
+  if (!child) return false;
+  {
+    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+    auto& resource = s.protection.operations.at(owner);
+    resource.paths.insert(resource.paths.end(), paths.begin(), paths.end());
+  }
+  EndProtectedOperation(child);
+  return true;
+}
 class ProtectedOperation
 {
 public:
   ProtectedOperation(int writer, const std::vector<std::string>& paths, const char* operation,
-                     bool nativeSave = false, bool existingTransaction = false)
-    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction)) {}
+                     bool nativeSave = false, bool existingTransaction = false, int descriptor = -1)
+    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor)) {}
   ~ProtectedOperation() { if (m_token) EndProtectedOperation(m_token); }
   explicit operator bool() const { return m_token != 0; }
   ProtectedOperation(const ProtectedOperation&) = delete;
@@ -177,12 +267,13 @@ inline void SetProtectedBuffer(int writer, const std::string& key,
   if (p.buffers.size() >= 65536) { ProtectionFailureLocked(p, "protected_buffer_inventory_exhausted"); return; }
   p.buffers[identity] = {writer, paths, "buffered_write"};
 }
-inline void SetProtectedTransaction(const std::string& key, const std::string& path, bool active)
+inline void SetProtectedTransaction(const std::string& key, const std::string& path, bool active,
+                                    const char* operation = "sqlite_write_transaction")
 {
   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
   if (!active) { p.transactions.erase(key); return; }
   if (p.transactions.size() >= 65536) { ProtectionFailureLocked(p, "protected_transaction_inventory_exhausted"); return; }
-  p.transactions[key] = {-1, {path}, "sqlite_write_transaction"};
+  p.transactions[key] = {-1, {path}, operation};
 }
 inline bool HasProtectedTransaction(const std::string& path)
 {
@@ -257,11 +348,30 @@ inline EssentialWriteProof EssentialWritesLocked(const State& s)
   for (const auto& entry : p.buffers)
     if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("unflushed_protected_buffer:" + entry.first);
   for (const auto& entry : p.transactions)
-    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("pending_protected_sqlite_transaction:" + entry.first);
+    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("pending_protected_" + entry.second.operation + ":" + entry.first);
   return proof;
 }
 inline EssentialWriteProof EssentialWrites()
 { auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); return EssentialWritesLocked(s); }
+
+inline size_t ActiveProtectedResources()
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  size_t count = 0;
+  for (const auto* resources : {&s.protection.buffers, &s.protection.transactions})
+    for (const auto& entry : *resources) if (ProtectedLocked(s.protection,entry.second)) ++count;
+  for (const auto& entry : s.protection.operations)
+    if (ProtectedLocked(s.protection,entry.second)) ++count;
+  return count;
+}
+
+inline size_t OptionalUnfinishedWriters()
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  size_t count = 0;
+  for (const auto& writer : s.writers) if (!s.protection.participants.count(writer.first)) ++count;
+  return count;
+}
 
 inline bool SyncProtectedPath(const std::string& path)
 {
