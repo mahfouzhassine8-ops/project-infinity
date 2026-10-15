@@ -24,6 +24,7 @@ PROFILE = '/sdcard/Android/data/'+PACKAGE+'/files/.kodi/userdata'
 CONTROL = PROFILE+'/addon_data/script.infinity.commandcenter/.android-checkpoint'
 FAVOURITE = 'Infinity essential shutdown probe'
 FIRST_PARTY = {'script.infinity.commandcenter':'0.3.5.20', 'service.infinity.compat':'0.8.2'}
+APP_UID = None
 
 def rpc(method, params=None):
     request={'jsonrpc':'2.0','id':1,'method':method}
@@ -79,10 +80,13 @@ def read_json(path):
 
 def processes():
     found=[]
-    for line in shell('ps','-A','-o','PID,NAME').splitlines()[1:]:
+    assert APP_UID is not None, 'Installed package UID must be known'
+    for line in shell('ps','-A','-o','PID,UID,NAME').splitlines()[1:]:
         fields=line.split()
-        if len(fields)==2 and (fields[1]==PACKAGE or fields[1].startswith(PACKAGE+':')):
-            found.append({'pid':int(fields[0]),'name':fields[1]})
+        # Child executables can change NAME. Include every process with the
+        # app's actual Linux UID, not only names containing the package.
+        if len(fields)==3 and fields[1]==APP_UID:
+            found.append({'pid':int(fields[0]),'uid':int(fields[1]),'name':fields[2]})
     return found
 
 def wait_ready(previous_owner=None):
@@ -92,15 +96,18 @@ def wait_ready(previous_owner=None):
         native=read_json(CONTROL+'/engine.json')
         compat=read_json(CONTROL+'/compat-active.json')
         participant=read_json(CONTROL+'/participant.json')
+        active=read_json(CONTROL+'/active.json')
         if (owner.get('phase')=='RUNNING' and owner.get('owner')!=previous_owner and
             native.get('owner')==owner.get('owner') and native.get('pid')==owner.get('pid') and
-            compat.get('owner')==owner.get('owner') and participant and
+            compat.get('owner')==active.get('owner')==owner.get('owner') and
+            compat.get('pid')==active.get('pid')==owner.get('pid') and participant and
             any(p['pid']==owner.get('pid') and p['name']==PACKAGE+':kodi' for p in processes())):
             return owner
         time.sleep(1)
     raise RuntimeError('Actual Kodi engine and first-party startup handshakes did not become ready')
 
 def main():
+    global APP_UID
     p=argparse.ArgumentParser();p.add_argument('--apk',type=Path,required=True)
     p.add_argument('--installed-addons',type=Path,required=True)
     p.add_argument('--out',type=Path,required=True);args=p.parse_args();args.out.mkdir(parents=True,exist_ok=True)
@@ -125,6 +132,7 @@ def main():
         shell('appops','set',PACKAGE,'MANAGE_EXTERNAL_STORAGE','allow',check=False)
         shell('mkdir','-p',PRIVATE+'/shared_prefs',PROFILE)
         uid=shell('stat','-c','%u',PRIVATE).strip();assert uid.isdigit()
+        APP_UID=uid;report['package_uid']=int(uid)
         preference=args.out/'test-preference.xml'
         preference.write_text('<map><string name="default">infinity</string></map>\n')
         adb('push',preference,PRIVATE+'/shared_prefs/infinity_experience.xml')
@@ -183,6 +191,7 @@ def main():
             time.sleep(.2)
         report['remaining_package_processes']=processes()
         report['whole_package_death_verified']=not report['remaining_package_processes']
+        (args.out/'services-after-close.txt').write_text(shell('dumpsys','activity','services',PACKAGE))
         adb('pull',PROFILE+'/Database',args.out/'Database')
         databases=list((args.out/'Database').glob('*.db'))
         assert databases,'No real Kodi databases available for integrity verification'
@@ -212,6 +221,7 @@ def main():
                             (PRIVATE+'/files/infinity-kodi-process.json','owner.json'),
                             (CONTROL+'/engine.json','engine.json'),
                             (CONTROL+'/compat-active.json','compat-active.json'),
+                            (CONTROL+'/active.json','command-center-active.json'),
                             (CONTROL+'/participant.json','participant.json'),
                             (PROFILE+'/../temp/kodi.log','kodi.log')]:
             adb('pull',source,args.out/name,check=False)
