@@ -38,7 +38,7 @@ inline std::atomic<uintptr_t> graphics{0}, imageBase{0};
 inline std::atomic<long> guiThread{0};
 inline std::atomic<int64_t> until{0}, closeAt{0}, lastSample{0};
 inline std::atomic<unsigned> samples{0}, written{0}, overflow{0};
-inline std::atomic<bool> configured{false};
+inline std::atomic<bool> configurationClaimed{false}, configured{false};
 inline std::atomic<bool> manualSnapshot{false};
 struct RenderEvent {std::atomic<int> control{0};std::atomic<int64_t> at{0};std::atomic<unsigned> items{0};};
 inline std::array<RenderEvent,32> renderHistory;
@@ -128,11 +128,12 @@ inline void Arm(int seconds=300) { closeAt.store(0);until.store(Now()+seconds*10
 inline void CloseRequested() { Arm(35);closeAt.store(Now()); }
 inline void Configure(const std::string& path,uintptr_t base=0)
 {
-  bool expected=false;if(!configured.compare_exchange_strong(expected,true))return;
+  bool expected=false;if(!configurationClaimed.compare_exchange_strong(expected,true))return;
   if(path.empty() || path.size()>=output.size())return;
   // Only this test probe's own previous log is rotated; no profile/settings file.
   ::rename(path.c_str(),(path+".previous").c_str());
   std::snprintf(output.data(),output.size(),"%s",path.c_str());imageBase.store(base);
+  configured.store(true); // Publish the completed path before the watchdog reads it.
 }
 template<size_t N> inline void Store(std::array<std::atomic<char>,N>& dst,const char* text)
 {
