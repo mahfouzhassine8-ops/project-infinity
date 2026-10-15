@@ -30,7 +30,8 @@ jobs:
                       38666437940:'d57e21a45cda79da866aef0ba8094139b3cd8161',
                       38666495767:'7980f0ac42c1c431c2d1027018fbef1f0626a101',
                       38668123039:'c7e1135852ae7dc434871452af7e75aeb8505982',
-                      38668356091:'f29889fbf6a27e459b39b5a712558cca68b9caab'}
+                      38668356091:'f29889fbf6a27e459b39b5a712558cca68b9caab',
+                      38670595331:'f0b11ca559c3b368e5fc530020f64ef72f2bb711'}
           for run in runs:
               accidental=run['head_sha']==target and run['name'] not in kept
               obsolete=superseded.get(run['id'])==run['head_sha']

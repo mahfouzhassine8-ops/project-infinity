@@ -23,7 +23,7 @@ jobs:
           python3 - <<'PY'
           import json,os,time,urllib.request,subprocess
           required={38670490722:'cd289c913f26f7dc350d0b5a9b7e1cfeb1976526',
-                    38664802285:'fa944f7e4453c521df8170530a27ad925a2115b1'}
+                    38671803165:'9ed8c1cc1229eece336a7a20f64bc817187d6914'}
           deadline=time.monotonic()+5*3600
           while required:
               for run,sha in list(required.items()):
@@ -38,7 +38,7 @@ jobs:
               assert time.monotonic()<deadline,'Verification pending; no candidate packaged'
               time.sleep(30)
           subprocess.run(['git','diff','--exit-code','cd289c913f26f7dc350d0b5a9b7e1cfeb1976526','--','repairs/stability-probe-2103377/InfinityPythonWaitProbe.h','repairs/stability-probe-2103377/InfinityProbeExport.h','repairs/stability-probe-2103377/InfinityStabilityProbe.h','repairs/stability-probe-2103377/patch_native.py','repairs/stability-probe-2103377/native_ci.py','repairs/stability-probe-2103377/RC02-HASHES.json','repairs/stability-probe-2103377/run_tests.py','repairs/stability-probe-2103377/test_probe.cpp','repairs/stability-probe-2103377/test_python.cpp','repairs/stability-probe-2103377/test_probe_export.cpp','repairs/stability-probe-2103377/blocked_wait_check.cpp'],check=True)
-          subprocess.run(['git','diff','--exit-code','fa944f7e4453c521df8170530a27ad925a2115b1','--','repairs/stability-probe-2103377/helper'],check=True)
+          subprocess.run(['git','diff','--exit-code','9ed8c1cc1229eece336a7a20f64bc817187d6914','--','repairs/stability-probe-2103377/helper'],check=True)
           PY
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
@@ -65,7 +65,7 @@ jobs:
           path: parent-apk
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38664802285
+          run-id: 38671803165
           name: Infinity-Stability-Real-Kodi-Smoke
           github-token: ${{ github.token }}
           path: real-kodi
