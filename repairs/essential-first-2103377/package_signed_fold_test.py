@@ -60,6 +60,26 @@ def prepared_java(args):
     require(not args.gradle_dir.exists(), 'Refusing to reuse stale Gradle donor')
     require(not args.out.exists(), 'Refusing to reuse stale Android donor evidence')
     args.out.mkdir(parents=True)
+    # This is the 274-test Android *source*, not the native reconstruction.
+    # Verify the published source manifest before touching its Gradle files.
+    proof_file = args.source.parent / 'SOURCE-PRESERVATION.json'
+    tests_file = args.source.parent / 'ANDROID-VERIFICATION.json'
+    require(proof_file.is_file() and tests_file.is_file(),
+            'Missing verified complete Android source manifest and 274-test receipt')
+    source_proof = load(proof_file)
+    tested = load(tests_file)
+    require(tested.get('totals') == {'tests':274, 'failures':0, 'errors':0, 'skipped':0}
+            and tested.get('compiled_java_inputs_match_candidate') is True
+            and tested.get('runtime_source_matches_candidate') is True,
+            'Reconstructed Android Java source not backed by 274 passing tests')
+    missing = []
+    for rel, required_hash in source_proof['after'].items():
+        path = args.source / rel
+        if path.exists():
+            require(digest(path) == required_hash, 'Verified Android source mismatch: '+rel)
+        elif path.name not in ('.gitkeep', '.gitignore'):
+            missing.append(rel)
+    require(not missing, 'Verified Android source incomplete: '+str(missing[:10]))
     factory.VERSION_CODE = 2103377
     factory.RELEASE = NEW_NAME
     factory.BASE_APK_SHA256 = LOCKED_APK_SHA
@@ -77,8 +97,9 @@ def prepared_java(args):
     gradle_after = re.sub(code_pattern, r'\g<1>2103302', gradle_before)
     gradle_after = re.sub(name_pattern,
                           r'\g<1>"1.0.9-Chooser-Weather-Snapshot-RC1"', gradle_after)
-    require(gradle_after != gradle_before, 'Unexpected donor Gradle source identity')
-    gradle_template.write_text(gradle_after)
+    # A verified 274-test Android source already has this pinned identity.
+    if gradle_after != gradle_before:
+        gradle_template.write_text(gradle_after)
     ids = factory.prepare(args.source.resolve(), args.parent.resolve(),
                           args.gradle_dir.resolve(), args.out.resolve())
     updated = {}
