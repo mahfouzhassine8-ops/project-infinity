@@ -1,10 +1,7 @@
 """Explicit capture/export only; never runs a service or changes save policy."""
-import hashlib
 import json
 import re
 import time
-import zipfile
-from pathlib import Path
 
 
 class RailTrace:
@@ -23,6 +20,9 @@ class RailTrace:
 
 def collect(xa, vfs, destination):
     """Only reviewed code/evidence files. Never add provider settings or credentials."""
+    import hashlib
+    import zipfile
+    from pathlib import Path
     files={};manifest={'schema':1,'diagnostic_only':True,'physical_acceptance':False,'installed':{},'unavailable':[]}
     def read(label,path,limit=1024*1024):
         try:
@@ -61,6 +61,7 @@ def collect(xa, vfs, destination):
 
 
 def menu(xbmc, xa, gui, vfs, profile, monitor):
+    from pathlib import Path
     home=gui.Window(10000)
     ready=home.getProperty('Infinity.Stability.ProbeVersion')=='1'
     options=['Arm five-minute stability capture','Export current/previous evidence','Cancel']
