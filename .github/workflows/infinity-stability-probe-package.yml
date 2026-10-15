@@ -75,6 +75,9 @@ jobs:
           mkdir -p stability-delivery
           python3 -m unittest discover -s features/infinity-rails-investigation-20261014/tests -p 'test_*.py' -v > stability-delivery/preserved-helper-tests.txt 2>&1
           python3 -m unittest discover -s repairs/stability-probe-2103377 -p 'test_helper.py' -v > stability-delivery/stability-helper-tests.txt 2>&1
+          python3 repairs/stability-probe-2103377/candidate_regressions.py \
+            --tests-root features/infinity-rails-investigation-20261014 \
+            --helper repairs/stability-probe-2103377/helper --out stability-delivery
       - name: Preserve locked payload and sign diagnostic derivative
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}

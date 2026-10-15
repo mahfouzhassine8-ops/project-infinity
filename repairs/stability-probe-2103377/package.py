@@ -22,6 +22,8 @@ def package(args):
     smokes=list(args.smoke.rglob('rail-smoke-result.json'));assert len(smokes)==1
     smoke=json.loads(smokes[0].read_text());assert smoke['passed'] and smoke['open_action_runs_real_plugin'] and smoke['back_dismisses_and_clears_guard']
     args.out.mkdir(parents=True,exist_ok=True)
+    candidate_tests=json.loads((args.out/'CANDIDATE-HELPER-REGRESSIONS.json').read_text())
+    assert candidate_tests['passed'] and candidate_tests['tests']==101 and candidate_tests['original_test_sources_identical']
     ndk=Path(os.environ['ANDROID_HOME'])/'ndk'/os.environ['NDK_VER']/'toolchains/llvm/prebuilt/linux-x86_64/bin'
     bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
     engine=args.out/'candidate-libkodi.so';shutil.copyfile(native/'libkodi.so',engine)
@@ -65,7 +67,8 @@ def package(args):
         helper_filename=helper_zip.name,helper_sha256=sha(helper_zip.read_bytes()),signer_sha256=CERT,changed_payload=changed,
         dex_resources_assets_other_libraries_identical=True,skin_223_changed=False,save_gate_waivers=False,version_code=2103377,version_name=mod.NAME,
         observational_candidate=True,root_cause_fixed=False,physical_fold_accepted=False,locked=False,real_kodi_smoke=smoke,
-        native_full_build=True,preserved_android_tests=274,fresh_android_tests=0,physical_capture_required=True)
+        native_full_build=True,preserved_android_tests=274,fresh_android_tests=0,physical_capture_required=True,
+        candidate_helper_test_results=candidate_tests)
     (args.out/'STABILITY-APK-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
     (args.out/'signing-verification.txt').write_text(cert)
     (args.out/'SHA256SUMS').write_text(result['apk_sha256']+'  '+final.name+'\n'+result['helper_sha256']+'  '+helper_zip.name+'\n')
