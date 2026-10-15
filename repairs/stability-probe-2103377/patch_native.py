@@ -60,10 +60,10 @@ def apply(root):
     if(!probeStarted){InfinityStabilityProbe::Arm(90);probeStarted=true;
       if(home)home->SetProperty("Infinity.Stability.ProbeVersion","1");}
     if(home && home->GetProperty("Infinity.Stability.ProbeArm").asString()=="true") {
-      home->ClearProperty("Infinity.Stability.ProbeArm");InfinityStabilityProbe::Arm(300);
+      home->SetProperty("Infinity.Stability.ProbeArm","");InfinityStabilityProbe::Arm(300);
     }
     if(home && home->GetProperty("Infinity.Stability.ProbeSnapshot").asString()=="true") {
-      home->ClearProperty("Infinity.Stability.ProbeSnapshot");InfinityStabilityProbe::manualSnapshot.store(true);
+      home->SetProperty("Infinity.Stability.ProbeSnapshot","");InfinityStabilityProbe::manualSnapshot.store(true);
     }
     InfinityHealth::Publish({1, now, GetActiveWindow()''')
     change('xbmc/guilib/GUIWindowManager.cpp',manager)
