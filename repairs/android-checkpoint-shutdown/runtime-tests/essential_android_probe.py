@@ -44,7 +44,7 @@ def rpc(method, params=None):
                     if 'error' in response: raise RuntimeError('Kodi JSON-RPC '+method+': '+json.dumps(response['error']))
                     return response['result']
 
-def enable_first_party():
+def enable_first_party(out):
     adb('forward','tcp:19090','tcp:9090')
     deadline=time.monotonic()+180;last_error=None
     while time.monotonic()<deadline:
@@ -54,8 +54,12 @@ def enable_first_party():
         except (OSError,RuntimeError,AssertionError) as error:
             last_error=str(error);time.sleep(1)
     else: raise RuntimeError('Actual Kodi JSON-RPC not ready: '+str(last_error))
+    inventory=rpc('Addons.GetAddons',{'properties':['version','enabled']})
+    (out/'actual-addon-inventory.json').write_text(json.dumps(inventory,indent=2)+'\n')
+    installed={row['addonid']:row for row in inventory.get('addons',[])}
     results={}
     for name,version in FIRST_PARTY.items():
+        assert name in installed,'Actual Kodi did not discover approved fixture: '+name
         details=rpc('Addons.GetAddonDetails',{'addonid':name,'properties':['version','enabled']})['addon']
         assert details['version']==version,(name,details)
         if not details['enabled']:
@@ -157,10 +161,22 @@ def main():
         shell('mkdir','-p',PROFILE+'/../addons')
         for name in FIRST_PARTY: adb('push',fixture/name,PROFILE+'/../addons/'+name)
         shutil.rmtree(fixture)
+        # Root adbd labels /sdcard pushes as storage_file, which a normal app
+        # cannot read through Android's direct app-data mount. Restore platform
+        # labels using the actual backing path, without changing SELinux policy
+        # or enforcement. This is restricted to the new disposable fixture.
+        backing='/data/media/0/Android/data/'+PACKAGE
+        shell('test','-d',backing)
+        shell('chown','-R',uid+':'+uid,backing)
+        shell('restorecon','-RF',backing)
+        shell('restorecon','-RF',PRIVATE+'/shared_prefs')
+        report['selinux_enforcement']=shell('getenforce').strip()
+        assert report['selinux_enforcement']=='Enforcing'
+        (args.out/'fixture-labels.txt').write_text(shell('ls','-lZR',backing,PRIVATE+'/shared_prefs'))
         adb('logcat','-c')
         # Use the unchanged launcher route and an ordinary saved preference.
         report['launch']=shell('am','start','-W','-n',PACKAGE+'/.Splash')
-        report['actual_first_party_enabled']=enable_first_party();save()
+        report['actual_first_party_enabled']=enable_first_party(args.out);save()
         owner=wait_ready();report['old_owner']=owner;report['before_close_processes']=processes();save()
         baseline=ET.fromstring(shell('cat',PROFILE+'/favourites.xml'))
         assert any(item.get('name')==FAVOURITE for item in baseline),'Startup did not retain seeded test favourite; close not attempted'
