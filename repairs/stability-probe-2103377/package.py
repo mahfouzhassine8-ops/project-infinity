@@ -4,7 +4,7 @@ import argparse,hashlib,importlib.util,json,os,re,shutil,subprocess,zipfile
 ROOT=Path(__file__).resolve().parents[2]
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 PARENT='17e2458552b7dbb8f14dad307015eafc2497a5ec6ddc4f7bb1707d975f37b906'
-NATIVE='cdc43c13e70306637f0f12718e92c92c563e1bb8'
+NATIVE='d57e21a45cda79da866aef0ba8094139b3cd8161'
 ENGINE='lib/arm64-v8a/libkodi.so'
 SIGNATURE=re.compile(r'^META-INF/(?:MANIFEST.MF|[^/]+\.(?:SF|RSA|DSA|EC))$',re.I)
 sha=lambda b:hashlib.sha256(b).hexdigest()
