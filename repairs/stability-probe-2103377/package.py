@@ -30,7 +30,7 @@ def package(args):
     run(ndk/'llvm-strip','--strip-unneeded',engine)
     module=ROOT/'repairs/critical-preview-2103376/manifest_patch.py'
     spec=importlib.util.spec_from_file_location('stability_manifest',module);mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
-    mod.PARENT_CODE=mod.CODE=2103377;mod.PARENT_NAME='1.0.9-Rails-Hold-Correction-RC02';mod.NAME='1.0.9-Stability-Evidence-RC01'
+    mod.PARENT_CODE=mod.CODE=2103377;mod.PARENT_NAME='1.0.9-Rails-Hold-Correction-RC02';mod.NAME='1.0.9-Stability-Evidence-RC1-OBS'
     unsigned=args.out/'stability-unsigned.apk';parent_engine=args.out/'parent-libkodi.so'
     with zipfile.ZipFile(args.parent) as src,zipfile.ZipFile(unsigned,'w') as dst:
         assert len(src.namelist())==len(set(src.namelist()));parent_engine.write_bytes(src.read(ENGINE))
