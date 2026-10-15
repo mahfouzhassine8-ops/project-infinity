@@ -150,8 +150,7 @@ def apply(root: Path, expected_python_sha: str | None = None) -> dict:
     // This fixes the ordering deadlock where executor workers need
     // threading._shutdown() to receive their queue exit sentinels.
     for (PyThreadState* old = nullptr; m_threadState != nullptr;)
-'''.rstrip() + '''
-''',
+'''.rstrip(),
         "pre_child_join_loop_comment",
     )
     # The loop's very first operation is our final-close-only protocol.
