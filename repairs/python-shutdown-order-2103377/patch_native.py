@@ -25,7 +25,7 @@ SOURCE_FUNCTION = r'''
 // Invoked ONLY on a native checkpoint's final interpreter retirement path.
 // The GIL is already owned by this invoker thread. Never acquire it again.
 // threading._shutdown() is CPython's real ordered callback protocol; unlike
-// manually draining _threading_atexits, it retains callback error semantics.
+// manually clearing private callback lists, it retains callback error semantics.
 // A callback blocked in C can still block: fail the native checkpoint honestly,
 // rather than hiding the interpreter or forcing thread-state destruction.
 static bool InfinityRunRegisteredThreadShutdown(int id, const char* addon)
