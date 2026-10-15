@@ -3,7 +3,9 @@ from pathlib import Path
 import argparse,hashlib,importlib.util,json,os,sys
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 sys.path.insert(0,str(HERE))
-import patch_native,run_tests
+import run_tests
+spec=importlib.util.spec_from_file_location('stability_probe_patch',HERE/'patch_native.py')
+probe_patch=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe_patch)
 def parent():
     p=ROOT/'repairs/rails-hold-2103378/native_ci.py';sys.path.insert(0,str(p.parent))
     spec=importlib.util.spec_from_file_location('locked_rails_native',p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
@@ -14,7 +16,7 @@ def prepare(args):
     native_manifest=p.previous().rc3().import_rc2().wide().lifecycle().SCRATCH/'runtime/native/manifest.json'
     manifest=json.loads(native_manifest.read_text())
     before={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'xbmc').rglob('*') if f.is_file()}
-    delta=patch_native.apply(root)
+    delta=probe_patch.apply(root)
     after={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'xbmc').rglob('*') if f.is_file()}
     changed=sorted(k for k in before.keys()|after.keys() if before.get(k)!=after.get(k));assert changed==delta['changed']
     manifest['after'].update(delta['after']);manifest['changed']=sorted(set(manifest['changed'])|set(changed));save(native_manifest,manifest)

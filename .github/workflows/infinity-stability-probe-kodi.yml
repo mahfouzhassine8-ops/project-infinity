@@ -16,7 +16,8 @@ jobs:
       - run: |
           sudo apt-get update -qq
           sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core pulseaudio
-          cp -a repairs/stability-probe-2103377/helper/. features/infinity-rails-investigation-20261014/addons/script.infinity.rails/\n          python3 repairs/rails-hold-2103378/setup_kodi_smoke.py
+          cp -a repairs/stability-probe-2103377/helper/. features/infinity-rails-investigation-20261014/addons/script.infinity.rails/
+          python3 repairs/rails-hold-2103378/setup_kodi_smoke.py
       - name: Exercise callback, real dialog and normal plugin launch
         run: |
           set -euo pipefail

@@ -1,6 +1,0 @@
-unselected right-click consumed without callback: PASS
-second right-click on selected card calls callback: PASS
-single tap selects and dispatches: PASS
-outside hit area does not dispatch: PASS
-
-{"source_sha256": "41045411d66fd9f9d584f9956482568a0c705f66af0a4d612bdbbd698cc83507", "cases": 4, "physical_device_verified": false, "limitations": "Hit testing, coordinate transforms and surrounding dispatch are adapters; this reproduces a conditional code path, not the observed device incident."}
