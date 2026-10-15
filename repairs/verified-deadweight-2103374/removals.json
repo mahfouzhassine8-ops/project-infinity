@@ -1,0 +1,72 @@
+{
+  "parent_apk_sha256": "76d333b0bfaf55d205e2dd25660c29ee15baf79157a2f941594c2db5bffaa388",
+  "parent_commit": "c632fcf95f7c5bf3c96706e59023866c383323de",
+  "runtime_archive_sha256": "62dcb53ec22c41e36bd0b3e8bfa8f377e268f70b0522c5d6b4f32b7e35891998",
+  "test_archive_sha256": "4835cbd407ce7748073af492a15c29276f570c946546facf06ada6812cb59198",
+  "source_path": "tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in",
+  "before_sha256": "1000eaca411f977263436015541b3748cc571f6397f228d7c2d74fea677a04b2",
+  "after_sha256": "5418d519161557bbb59de09f7461c77070e2aaa4c1d77d9fab436adafdb22a0e",
+  "methods": [
+    {
+      "name": "showLiveHome",
+      "source_line": 2182,
+      "text": "  private void showLiveHome() {\n    showChannelBrowser(\"COBRA \u2022 LIVE TV\", false, false, false);\n  }\n",
+      "sha256": "a32abdedd1b630fc1d1f8093a81c999330d9858d1c61944ce08cd35698b4c6c6"
+    },
+    {
+      "name": "showRecents",
+      "source_line": 2786,
+      "text": "  private void showRecents() {\n    showChannelBrowser(\"COBRA \u2022 RECENTS\", true, false, true);\n  }\n",
+      "sha256": "7a29436b6a91a2ddc96021edf83354f8054f7849557d403876e8a5aa5d503c2f"
+    },
+    {
+      "name": "cobraGuideViewLabel",
+      "source_line": 3525,
+      "text": "  private String cobraGuideViewLabel() {\n    String mode = cobraGuideViewMode();\n    if (\"compact\".equals(mode)) return \"COMPACT\";\n    if (\"cards\".equals(mode)) return \"CARDS\";\n    if (\"focus\".equals(mode)) return \"PRO\";\n    return \"TV GRID\";\n  }\n",
+      "sha256": "741f55d502527644956a0cbe341e760788f6fc9bc8dcaf18b0621f4bd71c09fb"
+    },
+    {
+      "name": "cobraPlayerNow",
+      "source_line": 3676,
+      "text": "  private String cobraPlayerNow(Channel channel) {\n    ProgramPair pair = channel == null ? null : programFor(channel);\n    if (pair != null && pair.now != null && !pair.now.isEmpty()) return pair.now;\n    return channel == null ? \"Live TV\" : channel.group;\n  }\n",
+      "sha256": "82d060bb6396ce25da6d18f0366c5687e035cb48c8bc4f2f5185f919506f7dad"
+    },
+    {
+      "name": "cobraPlayerNext",
+      "source_line": 3682,
+      "text": "  private String cobraPlayerNext(Channel channel) {\n    ProgramPair pair = channel == null ? null : programFor(channel);\n    if (pair != null && pair.next != null && !pair.next.isEmpty()) return \"NEXT  \u2022  \" + pair.next;\n    return providerBadge(channel);\n  }\n",
+      "sha256": "7adde1643b4bc0a4f49f0a51dd746ca8c737a6a29d353edc6afeb4f513886cd7"
+    },
+    {
+      "name": "closePlayerSettingsDrawer",
+      "source_line": 3717,
+      "text": "  private boolean closePlayerSettingsDrawer() {return \"player-settings\".equals(mCobraSheetKind)&&closeCobraActionSheet();}\n",
+      "sha256": "d8674fe6ba7aeb4d221f799d801415e1946b29f6390a2c57974a4f0769541060"
+    },
+    {
+      "name": "cycleAspectMode",
+      "source_line": 6501,
+      "text": "  private void cycleAspectMode() { showCobraAspectPicker(); }\n",
+      "sha256": "ae23e9b9342f70d41d126d5aae38a657be6ffccdde1585cff3b9085584a2380a"
+    },
+    {
+      "name": "cobraSportsScore",
+      "source_line": 14559,
+      "text": "  private String cobraSportsScore(CobraSportsTeam team){if(team==null)return \"\";if(cobraSportsHideScores())return \"\u2014\";return team.score==null||team.score.isEmpty()?\"\u2014\":team.score;}\n",
+      "sha256": "9d763ea8fd1dd415efe198f850a6fcc4d146d19965178ce2e6bc31c75bcadfb9"
+    }
+  ],
+  "authorization": "Uploaded Full-System Verified Dead-Weight Removal handoff; Category A only; isolated candidate; no promotion",
+  "candidate_version": 2103374,
+  "production_promotion": false,
+  "removed_members": {
+    "InfinityLiveActivity::closePlayerSettingsDrawer()": "68acabcdad026461a92e07c009885c017d83e3ca9ad8e583fa39f425a6bad4a8",
+    "InfinityLiveActivity::cobraGuideViewLabel()": "269889bdd8f3f528ab9c5f84a181e7a3c89023cabd229d2516501d2f5a4a4aaf",
+    "InfinityLiveActivity::cobraPlayerNext(Channel)": "635055971a9328d144f9929e9441945948bff95b42a02e75e2ba10c0e488c5b8",
+    "InfinityLiveActivity::cobraPlayerNow(Channel)": "3c85ed10b7bd62c1a3d9dfd92ff1be3e4612c76aa6b454ccd1cddbe0bd6f73f3",
+    "InfinityLiveActivity::cobraSportsScore(CobraSportsTeam)": "7f4635cedc915ccf8ce271c003ef6a19adad109fcbf433cb30a5fcc444bd4770",
+    "InfinityLiveActivity::cycleAspectMode()": "63dcf2e40b17b60199ab9b146da8f627ac52a4a016d7f69cd41d9cdfe5241e39",
+    "InfinityLiveActivity::showLiveHome()": "f6fdff7071cd329f7cc2f2877591dce3b57897910fc406723bc1f4e6c9cfabdf",
+    "InfinityLiveActivity::showRecents()": "4ae6217a99b28db6a12284c77cdfa6352679b4502f488c2da1d8645baa1a2d0d"
+  }
+}

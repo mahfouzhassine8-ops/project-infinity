@@ -1,0 +1,134 @@
+name: Cobra | Verified test delivery
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/cobra-clean-restart-20261012]
+    paths: ['.github/workflows/cobra-verified-delivery.yml', '.github/cobra-delivery-trigger.txt']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-verified-delivery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/work/cobra-clean-restart-20261012'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Verify existing pinned toolchain
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-Evidence
+          github-token: ${{ github.token }}
+          path: parent-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-RC1-APK
+          github-token: ${{ github.token }}
+          path: base-apk
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38217628815
+          name: Cobra-Clean-Six-Candidate-Evidence
+          github-token: ${{ github.token }}
+          path: saved-reference
+      - name: Stage saved source and supplemental verification
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android" delivery-evidence
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          fi
+          python3 repairs/cobra-clean-restart/delivery_gate.py prepare --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --reference saved-reference
+      - name: Observe existing public summary schema without altering application or fixtures
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request
+          from pathlib import Path
+          root='https://site.api.espn.com/apis/site/v2/sports/football/nfl/'
+          def read(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
+              with urllib.request.urlopen(req,timeout=12) as r:return json.load(r)
+          try:
+              board=read(root+'scoreboard');event=next(x['id'] for x in board.get('events',[]) if x.get('id'))
+              data=read(root+'summary?event='+event)
+              observation={'source':root+'summary?event='+event,'header':data.get('header'),'gameInfo':data.get('gameInfo'),'situation':data.get('situation'),'boxscore':{'teams':data.get('boxscore',{}).get('teams',[])}}
+              Path('delivery-evidence/public-summary-observation.json').write_text(json.dumps(observation,indent=2))
+          except Exception as e:
+              Path('delivery-evidence/public-summary-observation.json').write_text(json.dumps({'observed':False,'error':type(e).__name__+': '+str(e),'tests_depend_on_live_feed':False}))
+          PY
+      - name: Run all 185 saved cases and additional delivery contracts
+        run: |
+          set -euo pipefail
+          ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:testReleaseUnitTest :xbmc:exportPreservationTools 2>&1 | tee delivery-evidence/test.log
+      - name: Require every saved test and unchanged inherited sources
+        if: always()
+        run: python3 repairs/cobra-clean-restart/delivery_gate.py gates --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --reference saved-reference
+      - name: Verify exact source review before any APK assembly
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        run: python3 repairs/cobra-clean-restart/package_test.py review --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence
+      - name: Assemble Android-only donor after all pre-device tests and review
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        run: ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:assembleRelease
+      - name: Verify payload and protected bytecode, then permanently sign
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/cobra-clean-restart/package_test.py package --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('repairs/cobra-clean-restart/DELIVERY-APPROVAL.json') != ''
+        with:
+          name: Cobra-2103372-Signed-Test-APK
+          path: delivery-evidence/Cobra-2103372-Six-Verified-RC1.apk
+          if-no-files-found: error
+          retention-days: 90
+      - name: Preserve exact inputs and failed or passing evidence
+        if: always()
+        run: |
+          mkdir -p delivery-evidence
+          if [ -d delivery-evidence/source ]; then tar -czf delivery-evidence/runtime-source.tar.gz -C delivery-evidence source; fi
+          if [ -d delivery-build/xbmc/src/test ]; then tar -czf delivery-evidence/test-source.tar.gz -C delivery-build/xbmc/src test; fi
+          cp repairs/cobra-clean-restart/*.py repairs/cobra-clean-restart/*.fragment.java delivery-evidence/
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-Verified-Delivery-Evidence
+          path: |
+            delivery-evidence/*.json
+            delivery-evidence/*.log
+            delivery-evidence/*.txt
+            delivery-evidence/*.sha256
+            delivery-evidence/*.patch
+            delivery-evidence/*.py
+            delivery-evidence/*.java
+            delivery-evidence/*.tar.gz
+            delivery-evidence/runtime/
+            delivery-evidence/screenshots/
+            delivery-evidence/compiler-differences/
+            delivery-build/xbmc/build/test-results/testReleaseUnitTest/
+            delivery-build/xbmc/build/reports/tests/testReleaseUnitTest/
+          if-no-files-found: error
+          retention-days: 90

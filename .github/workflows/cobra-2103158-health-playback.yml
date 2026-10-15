@@ -1,0 +1,163 @@
+name: Infinity | Cobra 2103158 Health Playback Polish
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103158-health-playback-polish-rc1]
+    paths:
+      - '.github/workflows/cobra-2103158-health-playback.yml'
+      - 'repairs/cobra-health-2103158/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103158-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Check out immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out locked 2103155 recipe
+        uses: actions/checkout@v5
+        with:
+          ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32
+          path: refinement-delta
+          persist-credentials: false
+      - name: Check out 2103156 diagnostics recipe
+        uses: actions/checkout@v5
+        with:
+          ref: b3bcb619b08205dcfc1451424b2d41e05fd37633
+          path: audit-delta
+          persist-credentials: false
+      - name: Check out exact locked 2103157 baseline
+        uses: actions/checkout@v5
+        with:
+          ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98
+          path: view-delta
+          persist-credentials: false
+      - name: Check out isolated health playback presentation delta
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: health-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
+          github-token: ${{ github.token }}
+          path: rollback2103153
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
+          run-id: 35188339917
+          github-token: ${{ github.token }}
+          path: baseline155
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156
+          run-id: 35192605567
+          github-token: ${{ github.token }}
+          path: baseline156
+      - name: Download exact locked 2103157 APK and UI
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157
+          run-id: 35200244871
+          github-token: ${{ github.token }}
+          path: baseline157
+      - name: Reproduce locked 2103157 and preserve complete rollback
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 health-delta/repairs/cobra-health-2103158/ci.py reconstruct
+      - name: Test production recovery and channel preference policies
+        run: |
+          set -euo pipefail
+          python3 health-delta/repairs/cobra-health-2103158/tests/run.py --baseline rollback158/2103157-activity.java.in --out audit158/host
+      - name: Apply scoped delta and rerun final EPG and layout algorithms
+        run: |
+          set -euo pipefail
+          python3 health-delta/repairs/cobra-health-2103158/apply.py --source kodi --receipt audit158/patch.json
+          SRC=kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          cmp "$SRC" audit158/host/InfinityLiveActivity.java.in
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_tests.py --source "$SRC" --out audit158/epg-host
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_short.py --source "$SRC" --host audit158/epg-host --out audit158/epg-short
+          python3 refinement-delta/repairs/cobra-epg-rc1/tests/run_inherited.py --source "$SRC" --repository refinement-delta --mode-harness audit158/parent-host/modes/CobraModesHarness.java --out audit158/inherited
+          python3 health-delta/repairs/cobra-health-2103158/ci.py promote
+      - name: Compile sign and verify Android shell with exact locked native payload
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test ! -e signed158
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir health-build --out signed158
+          python3 health-delta/repairs/cobra-health-2103158/ci.py verify
+      - name: Render Android UI and verify drawer preferences recovery adapters and navigation
+        run: |
+          set -euo pipefail
+          python3 health-delta/repairs/cobra-health-2103158/tests/android.py --build health-build --out audit158/android
+          python3 health-delta/repairs/cobra-health-2103158/ci.py deliver
+      - name: Upload verified signed candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-Health-Playback-RC1-2103158
+          path: signed158/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve health playback and UI evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103158-Health-Playback-Evidence
+          path: |
+            audit158/
+            engine/background-resume-source.json
+            engine/native-before.patch
+            engine/native-after-2103158.patch
+            signed158/*.json
+            signed158/*.txt
+            health-delta/repairs/cobra-health-2103158/
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Preserve complete locked 2103157 rollback
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103157-Complete-Rollback-For-2103158
+          path: rollback158/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90

@@ -1,0 +1,22 @@
+{
+  "before": {
+    "cmake/scripts/android/Install.cmake": "dd7f323febcfa91c46a989fe4cc4697e20a9a8c2baaab3b002e872372dfe9c49",
+    "tools/android/packaging/xbmc/AndroidManifest.xml.in": "92d3822186d7226086f96cc21600a9c0fd1d84603df94499198d5e0504b72442",
+    "tools/android/packaging/xbmc/src/InfinityExitCompletion.java.in": "c44fa1691d27fe6af1c9138fdaa320340eadfcab802ea5cc778002df62f4293a",
+    "tools/android/packaging/xbmc/src/InfinityHealthExport.java.in": "e0694eca5a80a71e8f58fb351efb084adfb702ceafeabbcc3537b7ff77a3d5ce",
+    "tools/android/packaging/xbmc/src/InfinityKodiShutdown.java.in": "1609781804cbce60a83230193f651d15d8321965ec87b9cbdb30dcd389031f70"
+  },
+  "after": {
+    "cmake/scripts/android/Install.cmake": "83fca96aad58e8930b42402946d278dac060020af30cb91ad8f6adcfcb760959",
+    "tools/android/packaging/xbmc/AndroidManifest.xml.in": "7c5fff48d9af020ca0c631b80ce92536cc0dd0b80f625d18d3feb326e8fe363f",
+    "tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in": "7d72aeda0d4a43fa7f7256e0511928395eb9207554f94f65632ee521cbf2175b",
+    "tools/android/packaging/xbmc/src/InfinityCloseNativeLease.java.in": "bef066904d75d2bdb8bc058dde48d5a3a40e346fe0100960abc110a5969bf9c4",
+    "tools/android/packaging/xbmc/src/InfinityExitCompletion.java.in": "bec865f7efd623666ffe7b932b69a611b069782c55818fae8d576afd93fa5968",
+    "tools/android/packaging/xbmc/src/InfinityHealthExport.java.in": "95f0268e1ae248597f9efefc07a4e8af137abcedf9e1e101825f4052f6970eee",
+    "tools/android/packaging/xbmc/src/InfinityKodiShutdown.java.in": "81a357f5d9ecf6e6583cacf8cc0113da5097a627d58a0bef8700ae2c4f839548"
+  },
+  "added": [
+    "tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in",
+    "tools/android/packaging/xbmc/src/InfinityCloseNativeLease.java.in"
+  ]
+}

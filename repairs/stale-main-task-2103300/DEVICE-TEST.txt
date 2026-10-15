@@ -1,0 +1,21 @@
+INFINITY 2103300 — PHYSICAL RELAUNCH CHECKLIST
+
+Do not lock automatically. Start with the exact sequence that produced the
+2103299 crash. Keep video recording and Health diagnostics enabled.
+
+1. Install 2103300 as an update over 2103299. Do not uninstall or clear data.
+2. Launch Infinity, enter Kodi, use normal Close, then tap the launcher icon.
+   Confirm the chooser appears, choose Infinity, and verify Kodi becomes usable.
+3. Repeat the normal Close/relaunch path five times.
+4. Repeat Force Close/relaunch five times, including one immediate relaunch.
+5. Open Infinity, press Android Home, then return from Home. Confirm the same
+   live session returns without Kodi reinitializing.
+6. Background several apps long enough for Android to recreate the task, then
+   return and verify that a fresh Main launch is usable.
+7. Repeat on Fold cover and inner displays; fold/unfold with chooser visible.
+8. Repeat in full-screen and freeform/split-window modes.
+9. Confirm chooser stars move; cards, weather/control cluster and touch bounds
+   stay fixed; 2103295 touch handling and 2103291 in-place reflow remain correct.
+10. Check playback, PiP/background playback, Resume Hub, and Cobra.
+11. Export Health Center diagnostics. Any native crash or black startup screen
+    is a failure. Kodi Health is supplemental; a clean result is not a physical pass.

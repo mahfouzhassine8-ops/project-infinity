@@ -1,0 +1,79 @@
+name: ♾️ Trace Exact Video Lock Hook
+
+on:
+  push:
+    paths:
+      - '.github/workflows/diagnose-video-lock-exact.yml'
+  workflow_dispatch:
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+
+      - name: Download Infinity Stable 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9978114291/zip -o /tmp/stable2.zip
+          mkdir -p /tmp/stable2
+          unzip -q /tmp/stable2.zip -d /tmp/stable2
+          APK=$(find /tmp/stable2 -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          java -jar /tmp/apktool.jar d -f "$APK" -o /tmp/decoded
+
+      - name: Capture exact player and touch files
+        run: |
+          set -euo pipefail
+          OUT=/tmp/Infinity-Exact-Video-Lock-Hook.txt
+          {
+            echo '=== VideoFullScreen.xml ==='
+            cat /tmp/decoded/assets/addons/skin.estuary/xml/VideoFullScreen.xml || true
+            echo
+            echo '=== VideoOSD.xml ==='
+            cat /tmp/decoded/assets/addons/skin.estuary/xml/VideoOSD.xml || true
+            echo
+            echo '=== PlayerControls.xml ==='
+            cat /tmp/decoded/assets/addons/skin.estuary/xml/PlayerControls.xml || true
+            echo
+            echo '=== touchscreen.xml candidates ==='
+            find /tmp/decoded/assets -type f -iname '*touch*.xml' -print
+            for f in $(find /tmp/decoded/assets -type f -iname '*touch*.xml'); do
+              echo
+              echo "=== $f ==="
+              cat "$f"
+            done
+            echo
+            echo '=== Existing noop / SetProperty / ClearProperty / close patterns in Estuary ==='
+            grep -RIna --include='*.xml' -E 'SetProperty\(|ClearProperty\(|noop|NoOp|Close\(|Dialog.Close|SetFocus\(' /tmp/decoded/assets/addons/skin.estuary/xml 2>/dev/null | head -3000 || true
+            echo
+            echo '=== Fullscreen / VideoOSD actions in touchscreen and mouse keymaps ==='
+            grep -RIna --include='*.xml' -E '<FullscreenVideo>|<VideoFullScreen>|<VideoOSD>|<touch|<tap|<longpress|<swipe|<leftclick|<rightclick|OSD|FullScreen|Pause|Play|Seek|Step' /tmp/decoded/assets/system/keymaps 2>/dev/null | head -5000 || true
+          } > "$OUT"
+          sed -n '1,900p' "$OUT"
+
+      - name: Upload exact hook report
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Exact-Video-Lock-Hook
+          path: /tmp/Infinity-Exact-Video-Lock-Hook.txt
+          retention-days: 30

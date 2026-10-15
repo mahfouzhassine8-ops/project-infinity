@@ -1,0 +1,78 @@
+name: Infinity | 2103303 matched APK packaging
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103303-e2e-repair]
+    paths:
+      - 'repairs/e2e-mobile-2103303/package_candidate.py'
+      - '.github/workflows/infinity-2103303-package-only.yml'
+permissions: {contents: read, actions: read}
+
+jobs:
+  android-source:
+    uses: ./.github/workflows/infinity-2103303-source-validation.yml
+
+  matched-apk:
+    needs: android-source
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      INFINITY_NATIVE_SOURCE_COMMIT: e53622015a301810685e685c18a70bb0ab240f75
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103303-Native-Validation-NO-APK
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37168724565
+          github-token: ${{ github.token }}
+          path: validated-native
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103303-First-Repair-Source-Validation-NO-APK
+          path: validated-android
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103302-Chooser-Weather-Snapshot-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37146313126
+          github-token: ${{ github.token }}
+          path: baseline3302
+      - name: Package from matched native proof
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p verified-source candidate "$HOME/.android"
+          tar --no-same-owner -xzf validated-android/repaired-shell-source.tar.gz -C verified-source
+          keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/e2e-mobile-2103303/package_candidate.py \
+            --source verified-source/shell-kodi \
+            --source-proof validated-android/ANDROID-SOURCE-PROOF.json \
+            --source-receipt validated-android/repair-changes.json \
+            --base-apk baseline3302/candidate/Infinity-2103302-1.0.9-Chooser-Weather-Snapshot-RC1.apk \
+            --engine validated-native/engine3303 --build-dir release-build3303 --out candidate \
+            2>&1 | tee package.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103303-E2E-Mobile-Repair-RC1-Candidate-NOT-DEVICE-ACCEPTED
+          path: candidate/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103303-Packaging-Log
+          path: package.log
+          retention-days: 90
+          if-no-files-found: warn

@@ -1,0 +1,94 @@
+name: Infinity | 2103228 Preservation Pre-Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103228-preservation-audit-rc1]
+    paths: ['.github/workflows/infinity-2103228-preservation-preaudit.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103228-preaudit-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  preserve:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103227-Cobra-Device-Live-Fold-MultiView-TEST-CANDIDATE
+          run-id: 35806492482
+          github-token: ${{ github.token }}
+          path: rollback/accepted-apk
+      - name: Freeze exact baseline source and APK before changes
+        run: |
+          set -euo pipefail
+          echo '136ed5b2682fd9c13d54458194a3ac67f3b23b416229cc01c08093ee0f355cb9  rollback/accepted-apk/Infinity-1.0.9-Cobra-Device-Live-Fold-MultiView-RC1.apk' | sha256sum -c -
+          git merge-base --is-ancestor 50fb6ed71243c61d6a5267e8477467989006087a HEAD
+          git archive --format=tar.gz -o rollback/locked-2103227-repository.tar.gz 50fb6ed71243c61d6a5267e8477467989006087a
+          printf '%s\n' 'Protected baseline: 2103227' 'Commit: 50fb6ed71243c61d6a5267e8477467989006087a' 'Restore source by extracting locked-2103227-repository.tar.gz into a NEW empty directory.' 'The exact accepted APK is in accepted-apk/. Its data is NOT included: back up app settings, providers and Kodi userdata on the device before any test install.' 'A newer Android versionCode can prevent in-place APK downgrade. Do not uninstall or clear app data to bypass this without a verified device-data backup. Use a supported downgrade/restore procedure or retain 2103227 on the test device.' > rollback/RESTORE.txt
+          (cd rollback && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103227-Exact-Rollback-Before-2103228
+          path: rollback/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+      - name: Reconstruct unchanged 2103227 using its own recorded pipeline
+        run: |
+          set -euo pipefail
+          python3 -m pip install 'PyYAML==6.0.2'
+          python3 - <<'PY'
+          import subprocess, yaml
+          from pathlib import Path
+          doc=yaml.safe_load(Path('.github/workflows/infinity-2103227-device-live-fold-multiview.yml').read_text())
+          selected=['Reconstruct exact locked 2103225','Replay audited 2103226 Fold Fit Fill','Apply and audit 2103227 device corrections']
+          steps=doc['jobs']['audit-build']['steps']
+          for name in selected:
+              matches=[s for s in steps if s.get('name')==name]
+              assert len(matches)==1,name
+              subprocess.run(['bash','-euo','pipefail','-c',matches[0]['run']],check=True)
+          PY
+          echo 'd99ee556d5324e8f4467dde7a2fdf5ad7b9e29cbed6a44d3112a2e42199617c0  shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in' | sha256sum -c -
+      - name: Archive exact audit inputs, receipts and baseline source
+        run: |
+          set -euo pipefail
+          mkdir -p preaudit228
+          cp rollback/locked-2103227-repository.tar.gz preaudit228/
+          tar -czf preaudit228/locked-2103227-reconstructed-shell.tar.gz shell-kodi engine scripts/infinity_background_resume.py scripts/package_background_resume.py
+          cp engine/background-resume-source.json preaudit228/
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          r=Path('shell-kodi')
+          out={str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(r.rglob('*')) if p.is_file()}
+          Path('preaudit228/reconstructed-source-sha256.json').write_text(json.dumps(out,indent=2)+'\n')
+          print('Preserved files:',len(out))
+          PY
+          (cd preaudit228 && sha256sum *.tar.gz *.json > SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103228-Exact-PreAudit-Inputs
+          path: preaudit228/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

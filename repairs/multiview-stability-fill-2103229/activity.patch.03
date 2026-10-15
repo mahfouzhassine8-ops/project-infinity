@@ -1,0 +1,50 @@
+me();
++    if(mBackgroundStopped||mInPictureInPicture||mCobraMultiFullscreenActive||mCobraTiles.isEmpty())return;
++    long now=android.os.SystemClock.elapsedRealtime(),wall=System.currentTimeMillis();
+     for(CobraVideoTile tile:mCobraTiles.values()) {
+       ExoPlayer player=tile.player;String state="";CobraPlayerBinding binding=mCobraPlayerBindings.get(player);
+       if(player==null)state="Stream unavailable";
+       else {
++        int playbackState=player.getPlaybackState();
++        if(playbackState!=tile.lastPlaybackState){tile.lastPlaybackState=playbackState;tile.stateChanged=now;tile.stableSince=0L;}
+         androidx.media3.exoplayer.DecoderCounters counters=player.getVideoDecoderCounters();
+-        if(counters!=null){counters.ensureUpdated();int frames=counters.renderedOutputBufferCount;if(frames!=tile.frames){tile.frames=frames;tile.changed=now;}}
+-        if(binding!=null&&!binding.error.isEmpty())state=binding.error.contains("DECOD")?"Decoder unavailable • hold for details":"Stream error • hold for details";
++        if(counters!=null){
++          counters.ensureUpdated();int frames=counters.renderedOutputBufferCount;
++          if(frames!=tile.frames){
++            tile.frames=frames;tile.changed=now;tile.recovering=false;
++            if(playbackState==Player.STATE_READY&&player.getPlayWhenReady()){
++              if(tile.stableSince==0L)tile.stableSince=now;
++              else if(tile.autoRecoveries>0&&now-tile.stableSince>=CobraMultiRecoveryPolicy.STABLE_RESET_MS){
++                tile.autoRecoveries=0;tile.lastRecoveryAt=0L;tile.stableSince=now;
++                InfinityCobraDiagnostics.record(this,"multiview","recovery-budget-reset","channel_hash="+InfinityCobraFeatureRuntime.hashId(tile.channel.id)+"; stable_ms="+CobraMultiRecoveryPolicy.STABLE_RESET_MS);
++              }
++            }
++          }
++        }
++        if(tile.recovering&&now-tile.lastRecoveryAt>=CobraMultiRecoveryPolicy.VERIFY_MS)tile.recovering=false;
++        long errorAge=binding==null||binding.vitals.lastErrorAt<=0L?0L:Math.max(0L,wall-binding.vitals.lastErrorAt);
++        boolean hasError=binding!=null&&!binding.error.isEmpty();
++        boolean fallbackInFlight=hasError&&binding.fallback&&!tile.recovering;
++        String reason=binding==null?"":CobraMultiRecoveryPolicy.reason(binding.vitals.live,player.getPlayWhenReady(),
++            player.getPlaybackSuppressionReason(),playbackState,hasError,Math.max(0L,now-tile.stateChanged),errorAge,fallbackInFlight);
++        if(!reason.isEmpty()&&!tile.recovering&&cobraRecoverMultiTileSession(tile,binding,reason,now))state="Reconnecting this screen…";
++        else if(tile.recovering)state="Reconnecting this screen…";
++        else if(hasError)state=binding.error.contains("DECOD")?"Decoder unavailable • hold for details":"Stream error • hold for details";
+         else if(!player.getPlayWhenReady()){state="Paused • hold to retry";tile.changed=now;}
+         else if(player.getPlaybackSuppressionReason()!=Player.PLAYBACK_SUPPRESSION_REASON_NONE)state="Playback suppressed • hold for details";
+-        else if(player.getPlaybackState()==Player.STATE_BUFFERING&&now-tile.changed>12000)state="Waiting for media • hold for details";
+-        else if(player.getPlaybackState()==Player.STATE_READY&&player.getVideoSize().width>0&&now-tile.changed>15000)state="Video stalled • hold to retry";
+-        else if(player.getPlaybackState()==Player.STATE_ENDED)state="Stream ended • hold to retry";
++        else if(playbackState==Player.STATE_IDLE&&now-tile.stateChanged>CobraMultiRecoveryPolicy.IDLE_GRACE_MS)state="Stream idle • hold to retry";
++        else if(playbackState==Player.STATE_BUFFERING&&now-tile.stateChanged>CobraMultiRecoveryPolicy.BUFFER_STALL_MS)state="Waiting for media • hold for details";
++        else if(playbackState==Player.STATE_READY&&player.getVideoSize().width>0&&now-tile.changed>15000)state="Video stalled • hold to retry";
++        else if(playbackState==Player.STATE_ENDED)state=binding!=null&&binding.liveEndedRecovering?"Reconnecting this screen…":"Stream ended • hold to retry";
++        if(!state.equals(tile.lastState)||(!state.isEmpty()&&now-tile.lastReport>30000)){
++          String diag="state="+playbackState+"; requested="+player.getPlayWhenReady()+"; playing="+player.isPlaying()+"; suppression="+player.getPlaybackSuppressionReason()+"; buffered_ms="+Math.max(0L,player.getTotalBufferedDuration())+"; frames="+tile.frames+"; surface="+(tile.texture.isAvailable()?"available":"unavailable")+"; auto_recoveries="+tile.autoRecoveries+"; error="+(binding==null?"":binding.error);
++          InfinityCobraDiagnostics.record(this,"multiview","tile-state","channel_hash="+InfinityCobraFeatureRuntime.hashId(tile.channel.id)+"; "+diag);
++        }
+       }
+       tile.warning.setText(state);tile.warning.setVisibility(state.isEmpty()?View.GONE:View.VISIBLE);
+       if(!state.equals(tile.lastState)||(!state.isEmpty()&&now-tile.lastReport>30000)){

@@ -1,0 +1,34 @@
+name: Infinity | skin 196 drawer source contracts (NO APK / NO SKIN ZIP)
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103303-194-responsive-regressions]
+    paths:
+      - 'repairs/skin-followup-1.0.5.196/**'
+      - '.github/workflows/infinity-skin196-drawer-validation.yml'
+permissions: {contents: read}
+concurrency:
+  group: infinity-skin196-drawer-validation
+  cancel-in-progress: false
+jobs:
+  drawer-source-contracts:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: python -m pip install 'lxml==5.4.0'
+      - name: Check exact 195 fixtures and guarded drawer delta
+        run: |
+          set -euo pipefail
+          mkdir -p evidence196
+          python repairs/skin-followup-1.0.5.196/test_delta.py 2>&1 | tee evidence196/drawer-source-contracts.log
+          cp repairs/skin-followup-1.0.5.196/README.md repairs/skin-followup-1.0.5.196/package-proof.json repairs/skin-followup-1.0.5.196/skin-195-drawer.patch evidence196/
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-skin196-drawer-source-contracts-NO-APK-NO-SKIN-ZIP
+          path: evidence196/
+          if-no-files-found: error
+          retention-days: 90

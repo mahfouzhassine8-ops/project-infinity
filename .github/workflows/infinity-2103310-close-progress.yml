@@ -1,0 +1,89 @@
+name: Infinity | 2103310 filling close progress
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103310-close-progress]
+    paths: ['repairs/close-progress-2103310/**', '.github/workflows/infinity-2103310-close-progress.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103310-close-progress
+  cancel-in-progress: false
+jobs:
+  candidate-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - name: Download the exact 3309 source and matching build proof
+        uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37386248633
+          name: Infinity-2103309-Close-Ring-Verification
+          github-token: ${{ github.token }}
+          path: parent3309
+      - name: Download the exact 2103309 APK
+        uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37386248633
+          name: Infinity-2103309-Close-Ring-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3309
+      - name: Verify inherited source and stage the ring
+        run: |
+          set -euo pipefail
+          mkdir -p source3310 evidence3310 "$HOME/.android"
+          tar --no-same-owner -xzf parent3309/repaired-shell-source.tar.gz -C source3310
+          python3 repairs/close-progress-2103310/apply.py --source source3310/shell-kodi --out evidence3310
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/close-progress-2103310/build.py prepare --source source3310/shell-kodi --base base3309/Infinity-2103309-Close-Ring-RC1.apk --base-proof parent3309/APK-VERIFICATION.json --build build3310 --out evidence3310
+      - name: Compile and test production close state and chooser views
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3310
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3310/android-build.log
+      - name: Verify protected payload and bytecode then permanently sign
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/close-progress-2103310/build.py package --source source3310/shell-kodi --base base3309/Infinity-2103309-Close-Ring-RC1.apk --base-proof parent3309/APK-VERIFICATION.json --build build3310 --out evidence3310 2>&1 | tee evidence3310/package.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103310-Close-Progress-RC1-APK
+          path: evidence3310/*.apk
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
+      - name: Export test results and exact Android source
+        if: always()
+        run: |
+          mkdir -p evidence3310
+          cp repairs/close-progress-2103310/README.md evidence3310/
+          if test -d build3310/xbmc/build/test-results; then cp -a build3310/xbmc/build/test-results evidence3310/; fi
+          if test -d build3310/xbmc/build/reports/tests; then cp -a build3310/xbmc/build/reports/tests evidence3310/test-reports; fi
+          if test -d source3310/shell-kodi; then tar -czf evidence3310/repaired-shell-source.tar.gz -C source3310 shell-kodi; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103310-Close-Progress-Verification
+          path: |
+            evidence3310/
+            !evidence3310/*.apk
+          retention-days: 90
+          if-no-files-found: error

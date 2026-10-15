@@ -1,0 +1,149 @@
+name: Infinity | 2103275 Cobra Immersive Edge Ambient RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103275-immersive-edge-ambient-rc1]
+    paths: ['.github/workflows/infinity-2103275-immersive-edge-ambient.yml', 'repairs/immersive-edge-ambient-2103275/**']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: immersive-edge-ambient-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  android-immersive-edge-ambient-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103274-Sports-Hub-Soccer-RC1-TEST-CANDIDATE
+          run-id: 36775670821
+          github-token: ${{ github.token }}
+          path: parent274
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103274-Sports-Hub-Soccer-RC1-Evidence
+          run-id: 36775670821
+          github-token: ${{ github.token }}
+          path: source274
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103271-Sports-Data-RC1-Evidence
+          run-id: 36759239156
+          github-token: ${{ github.token }}
+          path: source271
+      - name: Verify exact locked 2103274 rollback and reconstruct source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          apk=Path('parent274/Infinity-2103274-Sports-Hub-Soccer-RC1.apk')
+          src=Path('source274/reconstructed-2103274-shell.tar.gz')
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='c07f9f8872d7be892a3e0877ec129a893cbe2c106e3af33ca69b2e300b594e12'
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=='731ecb78a3d105b625d3c8a14745042ad38b6a7c61a9cac765ada2508549158a'
+          with zipfile.ZipFile(apk) as z:
+            Path('engine').mkdir(exist_ok=True)
+            Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          tar --no-same-owner -xzf source274/reconstructed-2103274-shell.tar.gz
+          mkdir -p rollback274/engine rollback274/scripts audit275
+          cp -a shell-kodi rollback274/
+          cp engine/background-resume-source.json rollback274/engine/
+          cp scripts/package_background_resume.py scripts/infinity_background_resume.py rollback274/scripts/
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          expected={
+            'shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in':'ab7bf1619090df8aa8fb5cff77a3e16ad1b503d1e45b26736fb959000c65915c',
+            'shell-kodi/tools/android/packaging/xbmc/src/CobraVisualRenderer.java.in':'6d6d2a7d48a49bcd6fc646374339914e761c8cc73dfbf68acf3c892088dc5df0',
+            'shell-kodi/tools/android/packaging/xbmc/src/CobraProUi.java.in':'2ef9662b7cf2cb6b52ba686d6b04b37da9098a893393630ff5bc0720ef66d945'}
+          for p,h in expected.items():assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,(p,h)
+          print('PASS: exact locked 2103274 source reconstructed.')
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Apply bounded Cobra Immersive edge projection
+        run: |
+          set -euo pipefail
+          python3 repairs/immersive-edge-ambient-2103275/apply.py --root . --out audit275
+          python3 repairs/immersive-edge-ambient-2103275/verify_source.py --baseline rollback274 --root . --out audit275
+      - name: Compile and permanently sign one forward APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent274/Infinity-2103274-Sports-Hub-Soccer-RC1.apk --build-dir build275 --out signed275 2>&1 | tee audit275/android-build.log
+      - name: Stage immersive ambient tests and locked regressions
+        run: |
+          set -euo pipefail
+          rm -rf source267 source265
+          mkdir -p source267 source265
+          cp -a source271/staged-tests source267/staged-tests
+          cp -a source271/screenshots source265/screenshots
+          python3 repairs/immersive-edge-ambient-2103275/stage_tests.py --build build275 --evidence audit275/screenshots --inherited
+          cd build275
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest             --tests '*ImmersiveEdgeAmbientTest' --tests '*SportsHubSoccerVisibilityTest' --tests '*ProSportsIntegrationTest'             --tests '*SportsDataRepairTest' --tests '*SportsHubTest' --tests '*ProVisualTest' --tests '*ProActionsTest'             --tests '*ResponsiveWindowTest' --tests '*Cobra2103268ProductAuditTest'             --tests '*Cobra2103201ScrubberTest' --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103201MenuPolishTest'             --tests '*Cobra2103202LifecycleTest' --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest'             --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest'             --tests '*Cobra2103229MultiViewStabilityFillTest' --tests '*GlassChooserTest' --tests '*GlassOptionsTest'             --tests '*GlassHealthFinishTest' --tests '*RecoveryFixedTest' --tests '*PhoneGlassTest' --tests '*AmbientGlassTest'             --tests '*Cobra2103267PlayingDotRestoreTest'             2>&1 | tee ../audit275/android-product-tests.log
+      - name: Candidate acceptance and protected-payload gate
+        run: |
+          set -euo pipefail
+          python3 repairs/immersive-edge-ambient-2103275/verify_source.py --baseline rollback274 --root . --out audit275
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib,xml.etree.ElementTree as E
+          files=list(Path('build275/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==26,len(files)
+          counts={}
+          for f in files:
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
+          assert counts['com.projectinfinity.kodi.ImmersiveEdgeAmbientTest']==5,counts
+          assert counts['com.projectinfinity.kodi.SportsHubSoccerVisibilityTest']==4,counts
+          assert counts['com.projectinfinity.kodi.ProSportsIntegrationTest']==8,counts
+          assert counts['com.projectinfinity.kodi.SportsDataRepairTest']==4 and counts['com.projectinfinity.kodi.SportsHubTest']==6,counts
+          assert counts['com.projectinfinity.kodi.ProVisualTest']==17 and counts['com.projectinfinity.kodi.ProActionsTest']==5,counts
+          assert sum(counts.values())==238,counts
+          locked=Path('source274/screenshots/protected');current=Path('audit275/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected locked render changed: '+name
+          report=json.loads(Path('signed275/background-resume-apk-audit.json').read_text());report.update(test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=len(names),cobra_immersive_edge_ambient=True,immersive_sample_width=144,immersive_frame_interval_ms=83,immersive_ray_steps=48,immersive_directional_edges=True,immersive_all_view_modes=True,immersive_fullscreen_suspended=True,immersive_pip_suspended=True,immersive_background_suspended=True,off_preserved=True,subtle_preserved=True,x_ambient_mit_attribution=True,pro_sports_preserved=True,sports_hub_soccer_preserved=True,sports_repository_preserved=True,sports_channel_resolver_preserved=True,manual_multiview_preserved=True,physical_device_verified=False,update_over_install_device_verified=False,candidate_locked=False,status='AUTOMATED COBRA IMMERSIVE EDGE AMBIENT TEST CANDIDATE — PASS; physical-device visual/playback acceptance required')
+          Path('signed275/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          apk=Path('signed275/Infinity-2103275-Immersive-Edge-Ambient-RC1.apk');Path('signed275/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Preserve implementation tests and rollback manifest
+        if: always()
+        run: |
+          mkdir -p audit275/repair-source
+          cp -r repairs/immersive-edge-ambient-2103275/* audit275/repair-source/
+          cp -r build275/xbmc/build/test-results audit275/candidate-test-results || true
+          cp -r build275/xbmc/src/test audit275/staged-tests || true
+          tar -czf audit275/reconstructed-2103275-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          cp repairs/immersive-edge-ambient-2103275/ACCEPTANCE.md audit275/
+          cp repairs/immersive-edge-ambient-2103275/DEVICE-TEST.md audit275/
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103275-Immersive-Edge-Ambient-RC1-TEST-CANDIDATE
+          path: signed275/
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103275-Immersive-Edge-Ambient-RC1-Evidence
+          path: audit275/
+          retention-days: 90

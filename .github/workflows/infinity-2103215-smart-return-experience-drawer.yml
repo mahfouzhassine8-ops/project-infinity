@@ -1,0 +1,144 @@
+name: Infinity | 2103215 Smart Return Experience + Settings Drawer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103215-smart-return-experience-drawer-rc1]
+    paths:
+      - '.github/workflows/infinity-2103215-smart-return-experience-drawer.yml'
+      - 'repairs/smart-return-experience-drawer-2103215/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103215-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  NDK_VER: 21.4.7075529
+  RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+
+jobs:
+  package-and-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout scoped 2103215 successor
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Download exact successful 2103208 presentation parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 Python 3.11 GIL native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Reconstruct exact 2103209 shell without native rebuild
+        run: |
+          set -euo pipefail
+          mkdir -p audit215 engine
+          cp native209/pythoninvoker-threadstate-v2-source.json engine/pythoninvoker-threadstate-v2-source.json
+          cp native209/pythoninvoker-threadstate-v2-source.stage1.json engine/pythoninvoker-threadstate-v2-source.stage1.json
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell shell-kodi \
+            --out audit215/native-base
+
+      - name: Recreate exact successful 2103210 through locked 2103214 source
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-media-library-health-2103210/apply.py --shell shell-kodi
+          python3 repairs/cobra-library-health-2103211/apply.py --shell shell-kodi
+          python3 repairs/health-media-trim-2103212/apply.py --shell shell-kodi
+          python3 repairs/live-blue-ambient-settings-return-2103213/apply.py --shell shell-kodi
+          python3 repairs/media-details-final-2103214/apply.py --shell shell-kodi
+          grep -F '"version_code": 2103214' engine/background-resume-source.json
+          grep -F '"live_tv_blue_ambient_unchanged": true' engine/background-resume-source.json
+          grep -F '"final_media_refinement": true' engine/background-resume-source.json
+
+      - name: Apply Smart Return Experience placement and Settings drawer correction
+        run: |
+          set -euo pipefail
+          python3 repairs/smart-return-experience-drawer-2103215/apply.py --shell shell-kodi
+          grep -F 'Smart Return  •  ' shell-kodi/tools/android/packaging/xbmc/src/Splash.java.in
+          grep -F 'cobra_settings_drawer_header' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          ! grep -F 'cobra_settings_return' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          ! grep -F 'Button smartReturn=action("SMART RETURN' shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+          grep -F 'getBoolean(ENABLED,true)' shell-kodi/tools/android/packaging/xbmc/src/CobraSmartReturn.java.in
+
+      - name: Create intermediate Android build keystore
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          test -s "$HOME/.android/debug.keystore"
+
+      - name: Build Android shell sign and verify 2103215
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit215/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build215 \
+            --out signed215
+          python3 repairs/smart-return-experience-drawer-2103215/verify.py \
+            --final signed215/Infinity-1.0.9-Cobra-Smart-Return-Experience-Drawer-RC1.apk \
+            --audit signed215/background-resume-apk-audit.json \
+            --base audit215/native-base/Infinity-2103208-Python311-GIL-Patched-Base.apk
+
+      - name: Publish 2103215 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103215-Smart-Return-Experience-Settings-Drawer-TEST-CANDIDATE
+          path: signed215/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve 2103215 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103215-Smart-Return-Experience-Settings-Drawer-Evidence
+          path: |
+            audit215/
+            engine/background-resume-source.json
+            repairs/smart-return-experience-drawer-2103215/
+            signed215/*.json
+            signed215/*.txt
+          if-no-files-found: warn
+          retention-days: 90

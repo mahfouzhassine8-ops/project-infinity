@@ -1,0 +1,78 @@
+name: Infinity | 2103377 Android compilation and preservation verification
+on:
+  push:
+    branches: [work/infinity-2103377-close-recents-preservation]
+    paths:
+      - 'repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in'
+      - 'repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/InfinityCloseNativeLease.java.in'
+      - 'repairs/shutdown-recents-2103377/**'
+      - '.github/workflows/infinity-2103377-android-verification.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103377-android-verification, cancel-in-progress: false}
+jobs:
+  compile-and-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38323908660
+          name: Cobra-2103376-Critical-Preview-Package-Evidence
+          github-token: ${{ github.token }}
+          path: parent-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38323908660
+          name: Cobra-2103376-Critical-Preview-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: parent-apk
+      - name: Stage exact compiled parent, saved Recents changes and unchanged approved tests
+        id: stage
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          fi
+          python3 repairs/shutdown-recents-2103377/verify_android.py prepare --parent parent-evidence --apk parent-apk/Cobra-2103376-Critical-Preview-RC1.apk --build recents-build --out recents-evidence
+      - name: Compile Android sources and run 207 unchanged regressions plus targeted Recents tests
+        run: |
+          set -euo pipefail
+          ./recents-build/gradlew --no-daemon --console=plain -p recents-build :xbmc:testReleaseUnitTest 2>&1 | tee recents-evidence/test.log
+      - name: Verify test identity, counts and source preservation even after failure
+        if: ${{ always() && steps.stage.outcome == 'success' }}
+        run: python3 repairs/shutdown-recents-2103377/verify_android.py review --parent parent-evidence --apk parent-apk/Cobra-2103376-Critical-Preview-RC1.apk --build recents-build --out recents-evidence
+      - name: Preserve evidence without packaging or signing
+        if: always()
+        run: |
+          mkdir -p recents-evidence
+          printf '%s\n' 'ANDROID JAVA COMPILATION / HOST ROBOLECTRIC TESTS ONLY. NO NATIVE BUILD, APK, SIGNING, INSTALLATION OR PHYSICAL FOLD ACCEPTANCE. PLAYLIST BROWSER EVIDENCE GATE REMAINS OPEN.' > recents-evidence/SCOPE.txt
+          git rev-parse HEAD > recents-evidence/COMMIT.txt
+          git diff --name-status 808b4acc4d1a6aa1cbc8bc4a1848de88b81103e6 HEAD > recents-evidence/CHANGED-SOURCE.txt
+          if [ -d recents-evidence/source ]; then tar -czf recents-evidence/tested-runtime-source.tar.gz -C recents-evidence source; fi
+          if [ -d recents-build/xbmc/src/test ]; then tar -czf recents-evidence/tested-tests.tar.gz -C recents-build/xbmc/src test; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-Android-Verification
+          path: |
+            recents-evidence/*.json
+            recents-evidence/*.txt
+            recents-evidence/*.log
+            recents-evidence/*.tar.gz
+            recents-build/xbmc/build/test-results/testReleaseUnitTest/
+          if-no-files-found: error
+          retention-days: 90

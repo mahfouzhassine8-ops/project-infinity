@@ -1,0 +1,280 @@
+name: Infinity | 3308 close-reopen native and protected APK candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103308-close-reopen]
+    paths:
+      - 'repairs/close-reopen-2103308/**'
+      - '.github/workflows/infinity-2103308-close-reopen.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103308-close-reopen
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+      - uses: actions/cache/restore@v4
+        id: native-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-close-3308-arm64-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-provider-3306-arm64-${{ runner.os }}-
+            infinity-repair-3304-arm64-${{ runner.os }}-
+            infinity-e2e-3303-arm64-${{ runner.os }}-
+            infinity-deep-audio-21.3-arm64-${{ runner.os }}-
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Source preflight before expensive native build
+        run: |
+          set -euo pipefail
+          python3 repairs/close-reopen-2103308/test_package.py -v
+          python3 -m py_compile \
+            repairs/window-input-2103295/window_input.py \
+            repairs/window-input-2103295/test_window_input.py \
+            repairs/text-reflow-2103294/text_reflow.py \
+            repairs/text-reflow-2103294/test_text_reflow.py \
+            repairs/window-input-2103295/package_apk.py \
+            repairs/inplace-reflow-2103291/inplace_reflow.py \
+            repairs/inplace-reflow-2103291/test_contract.py \
+            repairs/inplace-reflow-2103291/prepare_base.py \
+            repairs/inplace-reflow-2103291/android_package_delta.py
+          bash scripts/infinity_live_app_ci_1.sh
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          mkdir -p engine audit3295
+          python3 scripts/infinity_python_invoker_hardening_v2.py apply --source kodi --receipt engine/pythoninvoker-threadstate-v2-source.json
+          python3 scripts/infinity_python_invoker_hardening_v2.py verify --source kodi
+          python3 scripts/infinity_python_invoker_hardening_v3.py apply --source kodi --receipt engine/pythoninvoker-runtime-v3-source.json
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 repairs/native-fd-2103285/apply.py --source kodi --receipt engine/native-fd-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py apply --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/native_layout.py verify --source kodi --receipt engine/native-responsive-source.json
+          python3 repairs/native-responsive-2103290/test_contract.py --source kodi
+          python3 repairs/inplace-reflow-2103291/inplace_reflow.py apply --source kodi --receipt engine/inplace-reflow-source.json
+          python3 repairs/inplace-reflow-2103291/inplace_reflow.py verify --source kodi --receipt engine/inplace-reflow-source.json
+          python3 repairs/inplace-reflow-2103291/test_contract.py --source kodi
+          python3 repairs/fold-unification-2103293/container_reflow.py apply --source kodi --receipt engine/container-reflow-source.json
+          python3 repairs/fold-unification-2103293/container_reflow.py verify --source kodi --receipt engine/container-reflow-source.json
+          python3 repairs/fold-unification-2103293/test_container_reflow.py --source kodi
+          python3 repairs/text-reflow-2103294/text_reflow.py apply --source kodi --receipt engine/text-reflow-source.json
+          python3 repairs/text-reflow-2103294/text_reflow.py verify --source kodi --receipt engine/text-reflow-source.json
+          python3 repairs/text-reflow-2103294/test_text_reflow.py --source kodi | tee audit3295/text-cache-tests.txt
+          cp engine/text-reflow-source.json engine/TEXT-REFLOW-BYTE-MANIFEST.json audit3295/
+          # Complete the inherited 3294 render-hardening baseline before protecting
+          # its hashes. This is the same parent transform formerly run in CI stage 2.
+          python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json
+          python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
+          python3 repairs/window-input-2103295/window_input.py apply --source kodi --receipt engine/window-input-source.json
+          python3 repairs/window-input-2103295/window_input.py verify --source kodi --receipt engine/window-input-source.json
+          python3 repairs/window-input-2103295/test_window_input.py --source kodi | tee audit3295/window-input-tests.txt
+          cp engine/window-input-source.json engine/WINDOW-INPUT-BYTE-MANIFEST.json audit3295/
+          git -C kodi diff --check -- \
+            xbmc/addons/Skin.h xbmc/addons/Skin.cpp \
+            xbmc/guilib/GUIFontManager.cpp xbmc/guilib/GUIControl.h xbmc/guilib/GUIControl.cpp \
+            xbmc/guilib/GUIControlGroup.h xbmc/guilib/GUIControlGroup.cpp \
+            xbmc/guilib/GUIControlFactory.cpp xbmc/guilib/GUIWindow.h xbmc/guilib/GUIWindow.cpp \
+            xbmc/guilib/GUIListLabel.h xbmc/guilib/GUIListLabel.cpp \
+            xbmc/guilib/GUITextBox.h xbmc/guilib/GUITextBox.cpp \
+            xbmc/platform/android/activity/AndroidTouch.h xbmc/platform/android/activity/AndroidTouch.cpp \
+            xbmc/platform/android/activity/JNIMainActivity.cpp
+          sha256sum kodi/xbmc/interfaces/python/PythonInvoker.cpp kodi/xbmc/interfaces/python/PythonInvoker.h > audit3295/python-protected.txt
+          cp engine/inplace-reflow-source.json engine/container-reflow-source.json audit3295/
+
+      - name: Restore exact locked PNG timestamp bytes before parent receipts
+        run: |
+          set -euo pipefail
+          python3 repairs/provider-windows-2103306/test_restore_assets.py
+          python3 repairs/provider-windows-2103306/restore_assets.py --source kodi --evidence engine3306/asset-preservation
+
+      - name: Apply declared controls IME and evidence delta
+        run: |
+          set -euo pipefail
+          python3 repairs/e2e-mobile-2103303/native_candidate.py apply --source kodi --receipt engine3303/source-manifest.json
+          ASAN_OPTIONS=detect_leaks=0 python3 repairs/e2e-mobile-2103303/test_native_controls.py --base kodi --candidate kodi
+          python3 repairs/e2e-mobile-2103303/native_candidate.py verify --source kodi --receipt engine3303/source-manifest.json
+          python3 - <<'PYCODE'
+          import json,subprocess
+          changed=json.load(open('engine3303/source-manifest.json'))['changed']
+          subprocess.run(['git','-C','kodi','diff','--check','--',*changed],check=True)
+          PYCODE
+
+      - name: Apply bounded row-touch delta after the complete 303 preimage
+        run: |
+          set -euo pipefail
+          python3 repairs/mobile-regressions-2103304/test_scroll_hit.py --source kodi
+          python3 repairs/mobile-regressions-2103304/ci_delta.py native --source kodi --parent-proof engine3303/source-manifest.json --receipt engine3304/source-manifest.json
+          python3 repairs/mobile-regressions-2103304/ci_delta.py verify --source kodi --receipt engine3304/source-manifest.json
+          git -C kodi diff --check -- xbmc/guilib/GUIControlGroupList.cpp
+
+      - name: Validate and apply provider-owned coordinate boundary
+        run: |
+          set -euo pipefail
+          python3 repairs/provider-windows-2103306/test_native.py --source kodi 2>&1 | tee engine3304/provider-host-tests.log
+          python3 repairs/provider-windows-2103306/native_patch.py apply --source kodi --parent-proof engine3304/source-manifest.json --receipt engine3306/source-manifest.json
+          python3 repairs/provider-windows-2103306/native_patch.py verify --source kodi --receipt engine3306/source-manifest.json
+          git -C kodi diff --check -- xbmc/addons/Skin.h xbmc/addons/Skin.cpp xbmc/interfaces/legacy/WindowXML.cpp
+
+      - uses: actions/cache/restore@v4
+        id: depends-build-cache
+        with:
+          path: kodi/tools/depends
+          key: infinity-provider-3306-depends-build-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-provider-3306-depends-build-${{ runner.os }}-
+            infinity-repair-3304-depends-build-${{ runner.os }}-
+            infinity-e2e-3303-depends-build-${{ runner.os }}-
+
+      - name: Test and apply captured shutdown-owner delta
+        run: |
+          set -euo pipefail
+          python3 repairs/close-reopen-2103308/test_native.py --source kodi | tee engine3306/close-host-tests.log
+          python3 repairs/close-reopen-2103308/native_patch.py apply --source kodi --parent-proof engine3306/source-manifest.json --receipt engine3308/source-manifest.json
+          git -C kodi diff --check -- xbmc/application/Application.cpp xbmc/application/Application.h xbmc/platform/android/activity/XBMCApp.cpp xbmc/platform/android/activity/XBMCApp.h
+
+      - name: Compile full ARM64 library with exact inherited engine recipe
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          stage=Path('scripts/infinity_live_app_ci_2.sh').read_text()
+          inherited='python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json'
+          assert stage.count(inherited)==1
+          stage=stage.replace(inherited,'python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi',1)
+          marker='make -C "$BUILD_DIR" apk -j"$(nproc)"'
+          assert stage.count(marker)==1
+          stage=stage[:stage.index(marker)]
+          Path('engine3303/build-native.sh').write_text(stage)
+          PYCODE
+          bash engine3303/build-native.sh 2>&1 | tee engine3308/native-build.log
+          python3 repairs/close-reopen-2103308/native_patch.py verify --source kodi --receipt engine3308/source-manifest.json
+          python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi
+          python3 scripts/infinity_python_invoker_hardening_v3.py verify --source kodi
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import hashlib,json,os,shutil
+          candidates=list(Path(os.environ['BUILD_DIR']).rglob('libkodi.so'))
+          assert len(candidates)==1,candidates
+          p=candidates[0];shutil.copy2(p,'engine3308/libkodi.so')
+          report={'source_commit':os.environ['GITHUB_SHA'],'native_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
+            'baseline_kodi_commit':'a3a448d26b8d560a65655dab2cd122994dc4e146','skin_id':'skin.infinity.diggz',
+            'installable_apk':False,'physical_device_verified':False,'historical_crash_owner_proven':False,
+            'candidate':2103308,'locked_apk_parent':2103307,'locked_skin_parent':'1.0.5.201',
+            'provider_python_changed':False,'back_freeze_resolved':False,'shutdown_changed':True,
+            'deferred_movie_video_framing_changed':False}
+          Path('engine3308/ENGINE-PROOF.json').write_text(json.dumps(report,indent=2)+'\n')
+          PYCODE
+          readelf -h -n -W engine3308/libkodi.so > engine3308/elf-identity.txt
+          sha256sum engine3308/libkodi.so > engine3308/SHA256SUMS.txt
+
+      - uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+      - uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: kodi/tools/depends
+          key: ${{ steps.depends-build-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-3308-Close-Reopen-Native-Validation
+          path: |
+            engine3303/
+            engine3304/
+            engine3306/
+            engine3308/
+            audit3295/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
+
+  candidate-apk:
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-3308-Close-Reopen-Native-Validation
+          path: native3308
+      - name: Download exact protected 3307 Android source
+        uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37296166633
+          name: Cobra-Pro-2103307-Verification
+          github-token: ${{ github.token }}
+          path: parent3307
+      - name: Download exact protected 3307 APK
+        uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37296166633
+          name: Infinity-2103307-Cobra-Pro-Sports-RC1-APK-NOT-DEVICE-ACCEPTED
+          github-token: ${{ github.token }}
+          path: base3307
+      - name: Guard all Android and Cobra source and compile manifest donor
+        run: |
+          set -euo pipefail
+          mkdir -p verified3307 evidence3308 "$HOME/.android"
+          tar --no-same-owner -xzf parent3307/repaired-shell-source.tar.gz -C verified3307
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/close-reopen-2103308/package_candidate.py prepare --source verified3307/shell-kodi --proof parent3307/SOURCE-PRESERVATION.json --base base3307/Infinity-2103307-Cobra-Pro-Sports-RC1.apk --engine native3308/engine3308 --build build3308 --out evidence3308
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey KODI_ANDROID_KEY_PASSWORD=android KODI_ANDROID_STORE_PASSWORD=android
+          cd build3308
+          ./gradlew --no-daemon --console=plain :xbmc:assembleRelease 2>&1 | tee ../evidence3308/android-build.log
+      - name: Replace only native engine and versioned manifest and permanently sign
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/close-reopen-2103308/package_candidate.py package --source verified3307/shell-kodi --proof parent3307/SOURCE-PRESERVATION.json --base base3307/Infinity-2103307-Cobra-Pro-Sports-RC1.apk --engine native3308/engine3308 --build build3308 --out evidence3308 2>&1 | tee evidence3308/package.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103308-Close-Reopen-RC1-APK-NOT-DEVICE-ACCEPTED
+          path: evidence3308/*.apk
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-3308-Close-Reopen-Packaging-Verification
+          path: |
+            evidence3308/
+            !evidence3308/*.apk
+          retention-days: 90
+          if-no-files-found: warn

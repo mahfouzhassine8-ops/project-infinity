@@ -1,0 +1,54 @@
+name: Infinity | 2103377 RC5 early C++ optional policy tests
+on:
+  push:
+    branches: [work/infinity-2103377-rc5-optional-python-retirement]
+    paths: ['.github/workflows/infinity-2103377-rc5-early-host.yml']
+permissions: {contents: read}
+concurrency: {group: infinity-2103377-rc5-early-host, cancel-in-progress: false}
+jobs:
+  optional-contract:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Stage original reviewed native files and exact RC3 idempotent abort
+        run: |
+          set -euo pipefail
+          mkdir -p rc5-fixture rc5-host-evidence
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          root=Path('repairs/android-checkpoint-shutdown/runtime/native/overlay')
+          dest=Path('rc5-fixture')
+          files=(
+           'xbmc/interfaces/generic/ScriptInvocationManager.cpp',
+           'xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp',
+           'xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp',
+           'xbmc/platform/android/activity/InfinityScriptPersistence.h',
+          )
+          for name in files:
+              path=dest/name;path.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copy2(root/name,path)
+          manager=dest/files[0]
+          source=manager.read_text()
+          before='    m_shutdownRequested = true;\n    m_androidCheckpointRetirementStarted = std::chrono::steady_clock::now();'
+          after='    m_shutdownRequested = true;\n    if (m_androidCheckpointRetirementArmed)\n      return;\n    m_androidCheckpointRetirementStarted = std::chrono::steady_clock::now();'
+          assert source.count(before)==1
+          manager.write_text(source.replace(before,after,1))
+          print('Reused exact original native overlay with only the RC3 duplicate-stop guard')
+          PY
+          python3 repairs/shutdown-rc5-2103377/optional_shutdown.py \
+            --source rc5-fixture --receipt rc5-host-evidence/RC5-OPTIONAL-PATCH.json
+      - name: Compile and execute actual C++ classifier plus cooperative stop
+        run: |
+          set -euo pipefail
+          python3 repairs/shutdown-rc5-2103377/verify_optional.py \
+            --source rc5-fixture --output rc5-host-evidence/RC5-OPTIONAL-HOST-TESTS.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-RC5-Compiled-Host-Checks
+          path: rc5-host-evidence/
+          retention-days: 90
+          if-no-files-found: warn

@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window>
+  <defaultcontrol always="true">50</defaultcontrol>
+  <views>50</views>
+  <onload>SetProperty(Window.HasSettings,True,Home)</onload>
+  <onload>ClearProperty(MediaMenu,Home)</onload>
+  <onunload>ClearProperty(MediaMenu,Home)</onunload>
+  <onunload>ClearProperty(Window.HasSettings,Home)</onunload>
+  <controls>
+    <control type="image">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityPaletteBackground]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="image">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <texture colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
+      <height>104</height>
+    </control>
+    <control type="image">
+      <left>2.5%</left>
+      <width>10.37037%</width>
+      <aspectratio>keep</aspectratio>
+      <texture>infinity_polish/infinity_mark.png</texture>
+      <top>22</top>
+      <height>60</height>
+    </control>
+    <control type="label">
+      <left>14.3519%</left>
+      <width>47.963124%</width>
+      <font>InfinityBodyBold</font>
+      <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label>ADD-ON BROWSER</label>
+      <top>10</top>
+      <height>48</height>
+    </control>
+    <control type="label">
+      <left>14.3519%</left>
+      <width>55%</width>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label>Kodi behavior • Infinity presentation</label>
+      <top>58</top>
+      <height>32</height>
+    </control>
+    <control type="button" id="9096">
+      <left>83.6111%</left>
+      <width>13.888887%</width>
+      <label>BACK</label>
+      <onclick>PreviousMenu</onclick>
+      <texturefocus border="16">infinity_ui/focus_trim.png</texturefocus>
+      <texturenofocus border="16" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">$VAR[InfinityNavTexture]</texturenofocus>
+      <font>InfinitySmall</font>
+      <align>center</align>
+      <aligny>center</aligny>
+      <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+      <focusedcolor>FFFFFFFF</focusedcolor>
+      <ondown>50</ondown>
+      <onleft>50</onleft>
+      <top>24</top>
+      <height>60</height>
+    </control>
+    <control type="image">
+      <texture border="24" colordiffuse="$VAR[InfinityPaletteSurface]">infinity_ui/contract_white.png</texture>
+      <left>2.5%</left>
+      <right>2.5%</right>
+      <top>116</top>
+      <bottom>70</bottom>
+    </control>
+    <control type="label">
+      <left>4.7222%</left>
+      <width>90.5556%</width>
+      <font>InfinityBodyBold</font>
+      <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label>$INFO[Container.FolderName]</label>
+      <top>124</top>
+      <height>42</height>
+    </control>
+    <control type="label">
+      <left>4.7222%</left>
+      <width>90.5556%</width>
+      <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label>Select “Install from zip file” here to enter Kodi’s native file picker.</label>
+      <top>170</top>
+      <height>42</height>
+      <font>InfinityTiny</font>
+    </control>
+    <control type="panel" id="50">
+      <left>4.1667%</left>
+      <width>91.6667%</width>
+      <onup>50</onup>
+      <ondown>50</ondown>
+      <onleft>50</onleft>
+      <onright>50</onright>
+      <scrolltime>160</scrolltime>
+      <viewtype label="536">icon</viewtype>
+      <itemlayout width="auto" height="156" aspectratio="2.5">
+        <control type="image">
+          <left>1.4141%</left>
+          <top>3.6842%</top>
+          <width>97.1717%</width>
+          <height>92.6316%</height>
+          <texture border="18" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">$VAR[InfinityCardTexture]</texture>
+        </control>
+        <control type="image">
+          <left>4.4444%</left>
+          <top>31.0526%</top>
+          <width>14.545455%</width>
+          <height>37.894737%</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultAddon.png">$INFO[ListItem.Icon]</texture>
+        </control>
+        <control type="textbox">
+          <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+          <label>$INFO[ListItem.Label]</label>
+          <left>22%</left>
+          <right>6%</right>
+          <top>12</top>
+          <bottom>12</bottom>
+          <font>InfinitySmall</font>
+          <autoscroll>false</autoscroll>
+        </control>
+      </itemlayout>
+      <focusedlayout width="auto" height="156" aspectratio="2.5">
+        <control type="image">
+          <left>1.4141%</left>
+          <top>3.6842%</top>
+          <width>97.1717%</width>
+          <height>92.6316%</height>
+          <texture border="18">infinity_ui/focus_trim.png</texture>
+        </control>
+        <control type="image">
+          <left>4.4444%</left>
+          <top>31.0526%</top>
+          <width>14.545455%</width>
+          <height>37.894737%</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultAddon.png">$INFO[ListItem.Icon]</texture>
+        </control>
+        <control type="textbox">
+          <textcolor>FFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Label]</label>
+          <left>22%</left>
+          <right>6%</right>
+          <top>12</top>
+          <bottom>12</bottom>
+          <font>InfinityBodyBold</font>
+          <autoscroll>false</autoscroll>
+        </control>
+      </focusedlayout>
+      <top>228</top>
+      <bottom>80</bottom>
+    </control>
+    <control type="label">
+      <left>4.7222%</left>
+      <width>90.5556%</width>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+      <align>right</align>
+      <aligny>center</aligny>
+      <label>INSTALL ZIP • REPOSITORIES • UPDATES • DEPENDENCIES</label>
+      <bottom>22</bottom>
+      <height>36</height>
+      <scroll>false</scroll>
+    </control>
+  </controls>
+</window>

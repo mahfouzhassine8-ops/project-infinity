@@ -1,0 +1,131 @@
+name: Infinity | 2103271 Cobra Sports Data RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103271-sports-data-rc1]
+    paths: ['.github/workflows/infinity-2103271-sports-data.yml', 'repairs/sports-data-2103271/**']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: sports-data-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  android-sports-data-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103270-Sports-Hub-RC1-TEST-CANDIDATE
+          run-id: 36755538846
+          github-token: ${{ github.token }}
+          path: parent270
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103270-Sports-Hub-RC1-Evidence
+          run-id: 36755538846
+          github-token: ${{ github.token }}
+          path: source270
+      - name: Verify exact 2103270 parent and preserve rollback
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          apk=Path('parent270/Infinity-2103270-Sports-Hub-RC1.apk')
+          src=Path('source270/reconstructed-2103270-shell.tar.gz')
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='54223cd2dcc6ebbf1b0ddddc88114ca9c95541084077a7ea03dba7c6f7ac2259'
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=='258f8eb8b046f9ac5311e4afb94824421f357d2767bd172a7d91baa98dd9de8b'
+          with zipfile.ZipFile(apk) as z:
+            Path('engine').mkdir(exist_ok=True)
+            Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          tar --no-same-owner -xzf source270/reconstructed-2103270-shell.tar.gz
+          mkdir -p rollback270/engine rollback270/scripts audit271
+          cp -a shell-kodi rollback270/
+          cp engine/background-resume-source.json rollback270/engine/
+          cp scripts/package_background_resume.py scripts/infinity_background_resume.py rollback270/scripts/
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Apply bounded Sports data repair
+        run: |
+          set -euo pipefail
+          python3 repairs/sports-data-2103271/apply.py --root . --out audit271
+          python3 repairs/sports-data-2103271/verify_source.py --baseline rollback270 --root . --out audit271
+      - name: Compile and permanently sign one forward APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk parent270/Infinity-2103270-Sports-Hub-RC1.apk --build-dir build271 --out signed271 2>&1 | tee audit271/android-build.log
+      - name: Stage Sports data tests and inherited regressions
+        run: |
+          set -euo pipefail
+          rm -rf source267 source265
+          mkdir -p source267 source265
+          cp -a source270/staged-tests source267/staged-tests
+          cp -a source270/screenshots source265/screenshots
+          python3 repairs/sports-data-2103271/stage_tests.py --build build271 --evidence audit271/screenshots --inherited
+          cd build271
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest             --tests '*SportsDataRepairTest' --tests '*SportsHubTest' --tests '*ResponsiveWindowTest' --tests '*Cobra2103268ProductAuditTest'             --tests '*Cobra2103201ScrubberTest' --tests '*Cobra2103201SubtitleTest' --tests '*Cobra2103201MenuPolishTest'             --tests '*Cobra2103202LifecycleTest' --tests '*Cobra2103203PipControlsTest' --tests '*Cobra2103206MediaCallsTest'             --tests '*Cobra2103207CallIntegrationTest' --tests '*Cobra2103207AudioStateTest' --tests '*Cobra2103203SubtitleClarityTest'             --tests '*Cobra2103229MultiViewStabilityFillTest' --tests '*GlassChooserTest' --tests '*GlassOptionsTest'             --tests '*GlassHealthFinishTest' --tests '*RecoveryFixedTest' --tests '*ProVisualTest' --tests '*ProActionsTest'             --tests '*PhoneGlassTest' --tests '*AmbientGlassTest' --tests '*Cobra2103267PlayingDotRestoreTest'             2>&1 | tee ../audit271/android-product-tests.log
+      - name: Candidate acceptance and protected-payload gate
+        run: |
+          set -euo pipefail
+          python3 repairs/sports-data-2103271/verify_source.py --baseline rollback270 --root . --out audit271
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib,xml.etree.ElementTree as E
+          files=list(Path('build271/xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'));assert len(files)==23,len(files)
+          counts={}
+          for f in files:
+            t=E.parse(f).getroot();assert all(int(t.attrib.get(k,0))==0 for k in ['failures','errors','skipped']),(f,t.attrib);counts[t.attrib['name']]=int(t.attrib['tests'])
+          assert counts['com.projectinfinity.kodi.SportsDataRepairTest']==4,counts
+          assert counts['com.projectinfinity.kodi.SportsHubTest']==6,counts
+          assert counts['com.projectinfinity.kodi.Cobra2103268ProductAuditTest']==15 and counts['com.projectinfinity.kodi.ResponsiveWindowTest']==8,counts
+          assert sum(counts.values())==221,counts
+          locked=Path('source270/screenshots/protected');current=Path('audit271/screenshots/protected');names=sorted(p.name for p in locked.glob('*.png'));assert len(names)==20,len(names)
+          for name in names:assert (locked/name).read_bytes()==(current/name).read_bytes(),'Protected render changed: '+name
+          report=json.loads(Path('signed271/background-resume-apk-audit.json').read_text());report.update(test_methods=counts,automated_tests_passed=sum(counts.values()),protected_render_equality=len(names),sports_hub=True,sports_data_single_day_queries=True,sports_data_host_fallback=True,sports_data_device_retest_required=True,physical_device_verified=False,candidate_locked=False,status='AUTOMATED SPORTS DATA TEST CANDIDATE — PASS; physical-device acceptance required')
+          Path('signed271/CANDIDATE-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
+          apk=Path('signed271/Infinity-2103271-Sports-Data-RC1.apk');Path('signed271/SHA256SUMS.txt').write_text(hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Preserve implementation tests renders and rollback manifest
+        if: always()
+        run: |
+          mkdir -p audit271/repair-source
+          cp -r repairs/sports-data-2103271/* audit271/repair-source/
+          cp -r build271/xbmc/build/test-results audit271/candidate-test-results || true
+          cp -r build271/xbmc/src/test audit271/staged-tests || true
+          tar -czf audit271/reconstructed-2103271-shell.tar.gz shell-kodi engine/background-resume-source.json scripts/package_background_resume.py scripts/infinity_background_resume.py
+          cp repairs/sports-data-2103271/ACCEPTANCE.md audit271/
+          cp repairs/sports-data-2103271/DEVICE-TEST.md audit271/
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103271-Sports-Data-RC1-TEST-CANDIDATE
+          path: signed271/
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103271-Sports-Data-RC1-Evidence
+          path: audit271/
+          retention-days: 90

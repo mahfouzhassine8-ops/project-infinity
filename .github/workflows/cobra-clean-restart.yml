@@ -1,0 +1,78 @@
+name: Cobra | Clean restart runtime gates
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/cobra-clean-restart-20261012]
+    paths:
+      - 'repairs/cobra-clean-restart/**'
+      - '.github/workflows/cobra-clean-restart.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-clean-restart-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  baseline-reference:
+    if: github.ref == 'refs/heads/work/cobra-clean-restart-20261012'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Verify pinned Android toolchain
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-Evidence
+          github-token: ${{ github.token }}
+          path: parent-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-RC1-APK
+          github-token: ${{ github.token }}
+          path: base-apk
+      - name: Stage unchanged Cobra reference and inherited tests
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          fi
+          python3 repairs/cobra-clean-restart/stage.py stage --kind baseline --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build baseline-build --out baseline-evidence
+      - name: Execute actual reference views and inherited regression cases
+        run: |
+          set -euo pipefail
+          ./baseline-build/gradlew --no-daemon --console=plain -p baseline-build :xbmc:testReleaseUnitTest :xbmc:exportPreservationTools 2>&1 | tee baseline-evidence/test.log
+      - name: Verify reference results without packaging
+        if: always()
+        run: python3 repairs/cobra-clean-restart/stage.py gates --kind baseline --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build baseline-build --out baseline-evidence
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-Clean-Restart-Baseline-Evidence
+          path: |
+            baseline-evidence/*.json
+            baseline-evidence/*.log
+            baseline-evidence/runtime/
+            baseline-evidence/screenshots/
+            baseline-build/xbmc/build/test-results/testReleaseUnitTest/
+            baseline-build/xbmc/build/reports/tests/testReleaseUnitTest/
+          if-no-files-found: error
+          retention-days: 90

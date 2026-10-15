@@ -1,0 +1,154 @@
+name: Infinity | 2103284 Kodi ambient Surface repair
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103284-ambient-surface-repair]
+    paths: ['repairs/infinity-ambient-surface-2103284/**', '.github/workflows/infinity-ambient-surface-2103284.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-ambient-surface-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  build-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103282-Native-Ambient-Evidence
+          run-id: 36829442559
+          github-token: ${{ github.token }}
+          path: evidence282
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103282-Native-Ambient-Candidate
+          run-id: 36829442559
+          github-token: ${{ github.token }}
+          path: locked282
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-Evidence
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: evidence279
+      - name: Verify locked parent and exact tested repair source
+        run: |
+          set -euo pipefail
+          mkdir -p audit284
+          git branch rollback-2103282 ec28a8574ecf8d7fccb3713133661c1e8c2246cb
+          git bundle create audit284/locked-2103282-rollback.bundle rollback-2103282
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,tarfile,zipfile,shutil
+          archive=Path('evidence282/reconstructed-2103282-shell.tar.gz');apk=Path('locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()=='ff05418c070cac72516510815b268869857c7834739bb6d7df0d7a74cc3b3fcc'
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()=='2de48f4a269df9196e341c1083608a436fdce1e2d63d17fbb2b80d9c525f63bf'
+          with tarfile.open(archive) as t:t.extractall('.',filter='data')
+          shutil.copytree('shell-kodi','rollback282/shell-kodi')
+          with zipfile.ZipFile(apk) as z:Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+          python3 repairs/infinity-ambient-surface-2103284/unpack.py
+          python3 repairs/infinity-ambient-surface-2103284/apply.py
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Build ARM64 bridge and run native and observer tests
+        run: |
+          set -euo pipefail
+          python3 -m pip install pillow
+          here=repairs/infinity-ambient-surface-2103284
+          c++ -std=c++17 -Wall -Wextra -O2 -fPIC -shared "$here/ambient.cpp" "$here/surface_frames.cpp" -lz -pthread -o engine/libinfinityambient-host.so
+          AMBIENT_TEST_EVIDENCE=audit284/native python3 "$here/test_native.py" -v 2>&1 | tee audit284/native-tests.txt
+          python3 "$here/test_surface.py" -v 2>&1 | tee audit284/surface-tests.txt
+          python3 "$here/test_observer.py" -v 2>&1 | tee audit284/observer-tests.txt
+          "$ANDROID_HOME/ndk/$NDK_VER/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++" -std=c++17 -O2 -fPIC -shared -static-libstdc++ -Wl,--no-undefined -Wl,-z,max-page-size=16384 "$here/ambient.cpp" "$here/surface_frames.cpp" -lz -o engine/libinfinityambient.so
+          readelf -h -l -d -Ws engine/libinfinityambient.so > audit284/native-elf.txt
+      - name: Compile Android and permanently sign forward APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 scripts/package_background_resume.py --source shell-kodi --base-apk locked282/Infinity-2103282-Infinity-Native-Ambient-RC1.apk --build-dir build284 --out candidate284
+          python3 repairs/infinity-ambient-surface-2103284/stage.py runtime
+          (cd build284 && ./gradlew --no-daemon --console=plain :xbmc:assembleReleaseAndroidTest)
+          mkdir -p instrumentation
+          testapk=$(find build284/xbmc/build/outputs/apk/androidTest -name '*.apk' | head -1)
+          bash scripts/sign-infinity71.sh "$testapk" instrumentation/Cobra-preservation-tests.apk
+      - name: Run inherited Cobra and new Surface lifecycle suites
+        run: |
+          python3 repairs/infinity-ambient-surface-2103284/stage.py unit
+          python3 - <<'PY'
+          import subprocess,json
+          from pathlib import Path
+          classes=json.loads(Path('audit284/test-classes.json').read_text())
+          args=['./gradlew','--no-daemon','--console=plain',':xbmc:testReleaseUnitTest']
+          for name in classes:args+=['--tests',name]
+          subprocess.run(args,cwd='build284',check=True)
+          PY
+      - name: Enforce exact Cobra source and rendered preservation
+        run: python3 repairs/infinity-ambient-surface-2103284/verify_android.py
+      - uses: actions/upload-artifact@v7
+        with: {name: Infinity-2103284-Ambient-Surface-Candidate, path: candidate284/, retention-days: 90}
+      - uses: actions/upload-artifact@v7
+        with: {name: Infinity-2103284-Preservation-Instrumentation, path: instrumentation/, retention-days: 90}
+      - name: Archive exact source and regression evidence
+        if: always()
+        run: |
+          mkdir -p audit284
+          cp -r build284/xbmc/build/test-results audit284/test-results || true
+          tar -czf audit284/reconstructed-2103284-shell.tar.gz shell-kodi engine/background-resume-source.json engine/libinfinityambient.so scripts/package_background_resume.py scripts/infinity_background_resume.py repairs/infinity-ambient-surface-2103284 repairs/infinity-native-ambient-2103282
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Infinity-2103284-Ambient-Surface-Evidence, path: audit284/, retention-days: 90}
+  runtime:
+    needs: build-test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: {name: Infinity-2103284-Ambient-Surface-Candidate, path: candidate284}
+      - uses: actions/download-artifact@v8
+        with: {name: Infinity-2103284-Preservation-Instrumentation, path: instrumentation}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103282-Native-Ambient-Candidate
+          run-id: 36829442559
+          github-token: ${{ github.token }}
+          path: locked282
+      - name: Start deterministic regression provider
+        run: |
+          sudo chmod 666 /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 repairs/infinity-ambient-surface-2103284/unpack.py
+          python3 repairs/remaining-audit-2103281/media.py
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
+          python3 repairs/infinity-ambient-surface-2103284/stage.py runner
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash runtime284.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: {name: Infinity-2103284-Cobra-Update-Runtime-Evidence, path: remaining-runtime/, retention-days: 90}

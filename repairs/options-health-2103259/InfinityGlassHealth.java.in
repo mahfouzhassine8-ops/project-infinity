@@ -1,0 +1,208 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+/** Visual container only. Splash supplies the exact existing Health copy and actions.
+ * No diagnostic collection, export, permission, media, network or preference writes.
+ * One rounded opaque-backed surface is shared with the two options panels.
+ */
+final class InfinityGlassHealth extends Dialog {
+  static final int ROW_ID=0x00f025a0, CLOSE_ID=0x00f025ae, REPORT_ID=0x00f025af;
+  final Activity owner;
+  final String heading,subtitle;
+  final InfinityGlassOptions.Appearance appearance;
+  final SharedPreferences preferences;
+  String[][] entries;
+  Runnable[] actions;
+  String report;
+  HealthPanel panel;
+  boolean light,subscribed,dispatching;
+  private int lastWidth,lastHeight;
+  private ViewTreeObserver observed;
+  private final ViewTreeObserver.OnGlobalLayoutListener resize=this::fitWindow;
+  private final Runnable refresh=this::refreshPresentation;
+  private final SharedPreferences.OnSharedPreferenceChangeListener listener=(p,key)->{
+    if(key==null||"cobra_appearance_mode".equals(key)||"cobra_system_dark_variant".equals(key))queueRefresh();
+  };
+  InfinityGlassHealth(Activity owner,String heading,String subtitle,InfinityGlassOptions.Appearance appearance){
+    super(owner,android.R.style.Theme_Material_Dialog_Alert);
+    this.owner=owner;this.heading=heading;this.subtitle=subtitle;this.appearance=appearance;
+    preferences=owner.getSharedPreferences("infinity_cobra_live",Context.MODE_PRIVATE);
+    setOwnerActivity(owner);requestWindowFeature(Window.FEATURE_NO_TITLE);setTitle(heading);
+    setCancelable(true);setCanceledOnTouchOutside(true);
+    Window window=getWindow();
+    if(window!=null){
+      window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+      window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);window.setGravity(Gravity.CENTER);
+      window.getDecorView().setTag("experience_glass_health_dialog");
+    }
+  }
+  void menu(String[][] rows,Runnable[] handlers){
+    if(rows==null||handlers==null||rows.length!=4||handlers.length!=4)throw new IllegalArgumentException("Health menu contract");
+    entries=new String[rows.length][];
+    for(int i=0;i<rows.length;i++){
+      if(rows[i]==null||rows[i].length!=3||handlers[i]==null)throw new IllegalArgumentException("Health row contract");
+      entries[i]=rows[i].clone();
+    }
+    actions=handlers.clone();report=null;rebuild();
+  }
+  void report(String body){
+    if(body==null)throw new IllegalArgumentException("Health text required");
+    entries=null;actions=null;report=body;rebuild();
+  }
+  private void pick(int index){
+    if(!isShowing()||dispatching||actions==null||index<0||index>=actions.length)return;
+    dispatching=true;
+    try{actions[index].run();}finally{dispatching=false;}
+    // Original callbacks own dismissal. Copy stays open and remains repeatable.
+  }
+  private void rebuild(){
+    light=appearance.light();panel=new HealthPanel(owner,light,heading,subtitle,entries,report,this::pick,this::dismiss,this::queueRefresh);
+    setContentView(panel);if(getWindow()!=null)getWindow().setDimAmount(light?.24f:.43f);
+  }
+  private void queueRefresh(){if(panel!=null){panel.removeCallbacks(refresh);panel.post(refresh);}}
+  private void refreshPresentation(){
+    if(!isShowing()||panel==null)return;
+    if(light!=appearance.light()){
+      int id=panel.findFocus()==null?View.NO_ID:panel.findFocus().getId();int y=panel.scroll.getScrollY();
+      rebuild();fitWindow();if(id!=View.NO_ID){View v=panel.findViewById(id);if(v!=null)v.requestFocus();}
+      panel.scroll.post(()->panel.scroll.scrollTo(0,y));
+    }else fitWindow();
+  }
+  @Override protected void onStart(){
+    if(panel==null)throw new IllegalStateException("Health content not set");
+    super.onStart();
+    if(!subscribed){preferences.registerOnSharedPreferenceChangeListener(listener);subscribed=true;}
+    observed=owner.getWindow().getDecorView().getViewTreeObserver();observed.addOnGlobalLayoutListener(resize);
+    fitWindow();queueRefresh();
+  }
+  @Override protected void onStop(){
+    if(subscribed){preferences.unregisterOnSharedPreferenceChangeListener(listener);subscribed=false;}
+    if(observed!=null&&observed.isAlive())observed.removeOnGlobalLayoutListener(resize);
+    observed=null;if(panel!=null)panel.removeCallbacks(refresh);super.onStop();
+  }
+  private void fitWindow(){
+    Window w=getWindow();if(w==null||panel==null)return;
+    View decor=owner.getWindow().getDecorView();Rect rect=new Rect();decor.getWindowVisibleDisplayFrame(rect);
+    int width=rect.width(),height=rect.height();
+    if(width<=0)width=decor.getWidth();if(height<=0)height=decor.getHeight();
+    if(width<=0)width=owner.getResources().getDisplayMetrics().widthPixels;
+    if(height<=0)height=owner.getResources().getDisplayMetrics().heightPixels;
+    int target=Math.max(1,Math.min(width-panel.dp(24),panel.dp(460)));
+    int cap=Math.max(1,height-panel.dp(24));
+    if(lastWidth!=target||lastHeight!=cap||panel.maxHeight!=cap){
+      lastWidth=target;lastHeight=cap;panel.maxHeight=cap;panel.requestLayout();w.setLayout(target,WindowManager.LayoutParams.WRAP_CONTENT);
+    }
+  }
+
+  /** Header and Close remain fixed. Only the menu/report body scrolls in a short window. */
+  static final class HealthPanel extends ViewGroup {
+    final boolean light;
+    final InfinityGlassOptions.Palette palette;
+    final LinearLayout header,footer,rows;
+    final ScrollView scroll;
+    final TextView close,output;
+    final View divider;
+    final Runnable changed;
+    int maxHeight=Integer.MAX_VALUE;
+    HealthPanel(Context c,boolean light,String heading,String subtitle,String[][] entries,String report,
+                InfinityGlassOptions.Pick pick,Runnable dismiss,Runnable changed){
+      super(c);this.light=light;this.changed=changed;palette=new InfinityGlassOptions.Palette(light,false);
+      setTag("experience_glass_health_panel");setBackground(new InfinityGlassOptions.GlassSurface(c,palette));
+      setClipToOutline(true);setClipChildren(true);setClipToPadding(true);
+      header=new LinearLayout(c);header.setGravity(Gravity.CENTER_VERTICAL);
+      LinearLayout.LayoutParams logo=new LinearLayout.LayoutParams(dp(48),dp(48));logo.rightMargin=dp(12);
+      header.addView(new InfinityGlassOptions.BrandMark(c,false),logo);
+      LinearLayout copy=new LinearLayout(c);copy.setOrientation(LinearLayout.VERTICAL);
+      TextView title=InfinityGlassOptions.text(c,heading,22,palette.ink,true);
+      if(Build.VERSION.SDK_INT>=28)title.setAccessibilityHeading(true);
+      copy.addView(title,new LinearLayout.LayoutParams(-1,-2));
+      TextView sub=InfinityGlassOptions.text(c,subtitle,10,muted(),false);sub.setLetterSpacing(.10f);
+      LinearLayout.LayoutParams subLp=new LinearLayout.LayoutParams(-1,-2);subLp.topMargin=dp(5);copy.addView(sub,subLp);
+      header.addView(copy,new LinearLayout.LayoutParams(0,-2,1));addView(header);
+      divider=new View(c);divider.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+          new int[]{palette.accent&0xffffff,(palette.accent&0xffffff)|0x70000000,palette.accent&0xffffff}));addView(divider);
+      rows=new LinearLayout(c);rows.setOrientation(LinearLayout.VERTICAL);
+      if(entries!=null){
+        for(int i=0;i<entries.length;i++){
+          final int index=i;LinearLayout row=healthRow(c,entries[i]);row.setId(ROW_ID+i);
+          row.setOnClickListener(v->pick.at(index));row.setNextFocusUpId(i==0?CLOSE_ID:ROW_ID+i-1);
+          row.setNextFocusDownId(i==entries.length-1?CLOSE_ID:ROW_ID+i+1);
+          LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.bottomMargin=i==entries.length-1?0:dp(8);rows.addView(row,lp);
+        }
+        output=null;
+      }else{
+        output=InfinityGlassOptions.text(c,report,12,palette.ink,false);output.setId(REPORT_ID);
+        output.setTypeface(Typeface.create("monospace",Typeface.NORMAL));output.setTextIsSelectable(true);
+        output.setPadding(dp(14),dp(12),dp(14),dp(12));
+        output.setBackground(InfinityGlassOptions.rowSurface(palette,dp(18)));
+        rows.addView(output,new LinearLayout.LayoutParams(-1,-2));
+      }
+      scroll=new ScrollView(c);scroll.setVerticalScrollBarEnabled(false);scroll.setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
+      scroll.addView(rows,new ScrollView.LayoutParams(-1,-2));addView(scroll);
+      footer=new LinearLayout(c);footer.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+      close=InfinityGlassOptions.text(c,"Close",14,palette.accent,false);close.setId(CLOSE_ID);close.setGravity(Gravity.CENTER);
+      close.setMinHeight(dp(48));close.setPadding(dp(26),dp(10),dp(26),dp(10));close.setFocusable(true);close.setClickable(true);
+      close.setBackground(InfinityGlassOptions.rowSurface(palette,dp(24)));close.setOnClickListener(v->dismiss.run());
+      if(entries!=null){close.setNextFocusUpId(ROW_ID+entries.length-1);close.setNextFocusDownId(ROW_ID);}
+      footer.addView(close,new LinearLayout.LayoutParams(-2,-2));addView(footer);
+    }
+    int dp(float n){return Math.round(n*getResources().getDisplayMetrics().density);}
+    int muted(){return light?0xff52667a:0xffb7c6d7;}
+    private LinearLayout healthRow(Context c,String[] entry){
+      LinearLayout row=new LinearLayout(c){
+        @Override public void onInitializeAccessibilityNodeInfo(android.view.accessibility.AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+      };
+      row.setGravity(Gravity.CENTER_VERTICAL);row.setMinimumHeight(dp(76));row.setPadding(dp(12),dp(12),dp(14),dp(12));
+      row.setFocusable(true);row.setClickable(true);row.setContentDescription(entry[1]+". "+entry[2]);
+      row.setBackground(InfinityGlassOptions.rowSurface(palette,dp(18)));
+      TextView glyph=InfinityGlassOptions.text(c,entry[0],21,palette.accent,false);glyph.setGravity(Gravity.CENTER);
+      GradientDrawable chip=new GradientDrawable();chip.setCornerRadius(dp(11));chip.setColor((palette.accent&0xffffff)|0x16000000);glyph.setBackground(chip);
+      glyph.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+      LinearLayout.LayoutParams glp=new LinearLayout.LayoutParams(dp(34),dp(34));glp.rightMargin=dp(12);row.addView(glyph,glp);
+      LinearLayout copy=new LinearLayout(c);copy.setOrientation(LinearLayout.VERTICAL);copy.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+      TextView title=InfinityGlassOptions.text(c,entry[1],15,palette.ink,false);title.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));copy.addView(title,new LinearLayout.LayoutParams(-1,-2));
+      TextView detail=InfinityGlassOptions.text(c,entry[2],12,muted(),false);
+      LinearLayout.LayoutParams detailLp=new LinearLayout.LayoutParams(-1,-2);detailLp.topMargin=dp(5);copy.addView(detail,detailLp);
+      row.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
+      TextView arrow=InfinityGlassOptions.text(c,"›",24,palette.accent,false);arrow.setGravity(Gravity.CENTER);arrow.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+      LinearLayout.LayoutParams end=new LinearLayout.LayoutParams(dp(16),dp(28));end.leftMargin=dp(8);row.addView(arrow,end);return row;
+    }
+    @Override protected void onConfigurationChanged(Configuration c){super.onConfigurationChanged(c);post(changed);}
+    @Override protected void onMeasure(int ws,int hs){
+      int w=MeasureSpec.getSize(ws);if(w<=0)w=dp(360);
+      int cap=maxHeight;if(MeasureSpec.getMode(hs)!=MeasureSpec.UNSPECIFIED)cap=Math.min(cap,MeasureSpec.getSize(hs));
+      int pad=dp(24),gap=dp(12),inner=Math.max(1,w-pad*2);
+      int width=MeasureSpec.makeMeasureSpec(inner,MeasureSpec.EXACTLY),free=MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED);
+      header.measure(width,free);footer.measure(width,free);divider.measure(width,MeasureSpec.makeMeasureSpec(Math.max(1,dp(1)),MeasureSpec.EXACTLY));
+      int reserved=pad*2+header.getMeasuredHeight()+footer.getMeasuredHeight()+gap*3+divider.getMeasuredHeight();
+      int remaining=Math.max(1,cap==Integer.MAX_VALUE?dp(1200):cap-reserved);
+      scroll.measure(width,MeasureSpec.makeMeasureSpec(remaining,MeasureSpec.AT_MOST));setMeasuredDimension(w,Math.min(cap,reserved+scroll.getMeasuredHeight()));
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+      int p=dp(24),g=dp(12),right=getWidth()-p,y=p;
+      header.layout(p,y,right,y+header.getMeasuredHeight());y+=header.getMeasuredHeight()+g;
+      divider.layout(p,y,right,y+divider.getMeasuredHeight());y+=divider.getMeasuredHeight()+g;
+      scroll.layout(p,y,right,y+scroll.getMeasuredHeight());footer.layout(p,getHeight()-p-footer.getMeasuredHeight(),right,getHeight()-p);
+    }
+  }
+}

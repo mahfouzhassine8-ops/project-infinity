@@ -1,0 +1,82 @@
+name: Infinity Cobra | Full Feature Candidate 2 Fast Preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-full-feature-candidate-2]
+    paths:
+      - '.github/workflows/infinity-cobra-full-feature-preflight.yml'
+      - 'scripts/infinity_1_0_9_cobra_full*.py'
+      - 'scripts/infinity_1_0_9_cobra_device_parity.py'
+      - 'scripts/package_cobra_theme.py'
+      - 'patches/infinity-cobra-v2/**'
+      - 'patches/infinity-cobra/InfinityLiveActivity.java.in'
+      - 'addons/script.infinity.cobra.theme/**'
+      - 'tests/cobra_full/**'
+      - 'docs/cobra-candidate-2-feature-contract.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infinity-cobra-c2-fast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Compile Candidate 2 transforms
+        run: |
+          python -m py_compile \
+            scripts/infinity_1_0_9_cobra_full.py \
+            scripts/infinity_1_0_9_cobra_full_fixups.py \
+            scripts/infinity_1_0_9_cobra_full_runner.py \
+            scripts/infinity_1_0_9_cobra_device_parity.py \
+            scripts/infinity_1_0_9_cobra_legit.py \
+            scripts/package_cobra_theme.py
+
+      - name: Full feature transformation tests
+        run: python -m unittest discover -s tests/cobra_full -v
+
+      - name: Package fast theme update
+        run: python scripts/package_cobra_theme.py --output candidate/Infinity-Cobra-Theme-1.1.0.zip
+
+      - name: Syntax-gate transformed Cobra Java
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          import infinity_1_0_9_cobra_full_runner as runner
+          src=Path('patches/infinity-cobra/InfinityLiveActivity.java.in').read_text()
+          out=runner.transform_for_fast_test(src).replace('@APP_PACKAGE@','com.projectinfinity.kodi')
+          Path('/tmp/InfinityLiveActivity.java').write_text(out)
+          for name in ('InfinityCobraFeatureRuntime','InfinityCobraRecordingService','InfinityCobraReminderReceiver','InfinityCobraBootReceiver','InfinityCobraDeviceBridge'):
+              raw=Path(f'patches/infinity-cobra-v2/{name}.java.in').read_text().replace('@APP_PACKAGE@','com.projectinfinity.kodi')
+              Path(f'/tmp/{name}.java').write_text(raw)
+          PY
+          set +e
+          javac -Xmaxerrs 2000 -proc:none /tmp/InfinityLiveActivity.java /tmp/InfinityCobra*.java 2>/tmp/cobra-c2-javac.txt
+          set -e
+          if grep -E -i '; expected|illegal start|unclosed|not a statement|reached end of file while parsing|illegal escape character|class, interface, enum, or record expected' /tmp/cobra-c2-javac.txt; then
+            cat /tmp/cobra-c2-javac.txt
+            exit 1
+          fi
+          echo 'PASS: Java parser found no syntax/escape failures; Android/Media3 symbols resolve in APK Gradle compile'
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-Theme-1.1.0-Fast-Preview
+          path: |
+            candidate/Infinity-Cobra-Theme-1.1.0.zip
+            candidate/Infinity-Cobra-Theme-1.1.0.zip.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

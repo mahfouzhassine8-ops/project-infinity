@@ -1,0 +1,85 @@
+name: Infinity 1.0.3 Reference UI
+run-name: 'Infinity 1.0.3 | approved OLED/light reference UI | golden engine'
+
+on:
+  push:
+    branches: [infinity-android-first]
+    paths:
+      - 'scripts/infinity_1_0_3_reference_ui.py'
+      - '.github/workflows/infinity-1.0.3-reference-ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  reference-ui:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+
+      - name: Require permanent Infinity signing identity
+        shell: bash
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing secret: $name" >&2; exit 2; fi
+          done
+
+      - name: Download frozen RC3 #2 Golden Master unsigned candidate
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-RC3-Unsigned-Candidate
+          path: golden
+          run-id: 34316336433
+          github-token: ${{ github.token }}
+
+      - name: Install visual tooling
+        run: python3 -m pip install --disable-pip-version-check pillow
+
+      - name: Apply approved reference UI only
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 scripts/infinity_1_0_3_reference_ui.py \
+            golden/Infinity-Android-First-unsigned.apk \
+            out/Infinity-1.0.3-ReferenceUI-unsigned.apk \
+            out/reference-ui.json
+
+      - name: Permanently sign and verify update
+        shell: bash
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          bash scripts/sign-infinity71.sh out/Infinity-1.0.3-ReferenceUI-unsigned.apk out/Infinity-1.0.3-ReferenceUI.apk
+          grep -q 'Signing mode: stable-secret' out/Infinity-1.0.3-ReferenceUI.signing.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.3-ReferenceUI-Candidate
+          path: out/
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error

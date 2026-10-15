@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.support" name="Infinity Support Exporter" version="0.1.0" provider-name="Project Infinity">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.python.script" library="default.py"><provides>executable</provides></extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Export the active skin XML and optional local crash evidence.</summary>
+    <description lang="en_GB">Read-only investigation helper. Does not change the skin, player, accounts or settings, and does not upload anything. Exported files require your review before sharing.</description>
+    <platform>all</platform><license>GPL-2.0-or-later</license>
+  </extension>
+</addon>

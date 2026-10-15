@@ -1,0 +1,115 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.zip.*;
+
+/** Pure-Java, bounded, redacted archive writer. Never reads a directory recursively. */
+final class CobraDiagnosticArchive {
+  static final int FILE_LIMIT = 512 * 1024;
+  static final int TOTAL_LIMIT = 4 * 1024 * 1024;
+  private static final Pattern URL = Pattern.compile("(?i)[a-z][a-z0-9+.-]*://[^\\s\\\"'<>]+|(?i)www\\.[^\\s\\\"'<>]+");
+  private static final Pattern ENCODED_URL = Pattern.compile("(?i)[a-z][a-z0-9+.-]*%3a(?:%2f){2}[^\\s\\\"'<>]+");
+  private static final Pattern HEADER = Pattern.compile("(?im)^([^\\r\\n]*?\\b(?:authorization|proxy-authorization|cookie|set-cookie)\\s*[:=]).*$");
+  private static final Pattern SECRET = Pattern.compile("(?i)((?:\"|')?(?:username|user|password|passwd|pass|access_token|refresh_token|token|api[_-]?key|secret|authorization|cookie|signature|auth|session[_-]?id)(?:\"|')?\\s*[:=]\\s*)(?:\"(?:\\\\[^\\r\\n]|[^\"\\\\\\r\\n])*\"|'(?:\\\\[^\\r\\n]|[^'\\\\\\r\\n])*'|[^\\s,;&}]+)");
+  private static final Pattern BEARER = Pattern.compile("(?i)\\b(?:Bearer|Basic)\\s+[a-z0-9_+/=.-]+");
+  private CobraDiagnosticArchive() {}
+
+  static String redact(String value, Collection<String> secrets) {
+    if (value == null) return "";
+    // Input is bounded BEFORE regex processing, and never exported as raw bytes.
+    if (value.length() > TOTAL_LIMIT) return "[omitted: oversized text]";
+    String out = value.replace("\\/", "/");
+    out = ENCODED_URL.matcher(out).replaceAll("[redacted-uri]");
+    out = URL.matcher(out).replaceAll("[redacted-uri]");
+    out = HEADER.matcher(out).replaceAll("$1 [redacted]");
+    out = SECRET.matcher(out).replaceAll("$1\"[redacted]\"");
+    out = BEARER.matcher(out).replaceAll("[redacted-auth]");
+    if (secrets != null) {
+      ArrayList<String> ordered = new ArrayList<>(secrets);
+      ordered.removeAll(Collections.singleton(null));
+      Collections.sort(ordered, (a,b) -> Integer.compare(b.length(),a.length()));
+      for (String secret : ordered) {
+        if (secret.isEmpty()) continue;
+        out = out.replace(secret, "[redacted]");
+        try {
+          String encoded = java.net.URLEncoder.encode(secret, "UTF-8");
+          out = out.replace(encoded, "[redacted]").replace(encoded.replace("+", "%20"), "[redacted]");
+        } catch (UnsupportedEncodingException impossible) { throw new IllegalStateException(impossible); }
+      }
+    }
+    return out.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]", "?");
+  }
+
+  static String readTail(File file, int limit) throws IOException {
+    if (limit < 1 || limit > FILE_LIMIT) throw new IOException("Invalid diagnostic read bound");
+    if (!file.isFile()) return "[unavailable: file missing]";
+    try (RandomAccessFile in = new RandomAccessFile(file, "r")) {
+      long size = in.length(), start = Math.max(0, size-limit);
+      in.seek(start); byte[] bytes = new byte[(int)(size-start)]; in.readFully(bytes);
+      // A binary tombstone can contain credentials/memory: never pretend it is redacted text.
+      for (byte b : bytes) if (b == 0) return "[omitted: binary trace requires a safe decoder]";
+      String text = new String(bytes, StandardCharsets.UTF_8);
+      if (start > 0) {
+        int line = text.indexOf('\n');
+        text = line < 0 ? "[partial line omitted]" : text.substring(line+1);
+        text = "[truncated: most recent complete lines only]\n" + text;
+      }
+      return text;
+    }
+  }
+
+  static void atomicWrite(File target, byte[] data) throws IOException {
+    if (data.length > TOTAL_LIMIT) throw new IOException("Diagnostic write exceeds bound");
+    File parent = target.getCanonicalFile().getParentFile();
+    if (parent == null || (!parent.isDirectory() && !parent.mkdirs())) throw new IOException("Diagnostic directory unavailable");
+    File temp = File.createTempFile("cobra-write-", ".tmp", parent);
+    try {
+      try (FileOutputStream out = new FileOutputStream(temp)) { out.write(data); out.getFD().sync(); }
+      // Never delete the last good file before its replacement is ready.
+      if (!temp.renameTo(target)) throw new IOException("Atomic diagnostic replace failed");
+    } finally { temp.delete(); }
+  }
+
+  static void writeZip(File target, Map<String,String> entries, Collection<String> secrets) throws IOException {
+    if (entries.isEmpty() || entries.size() > 24) throw new IOException("Unexpected diagnostic entry count");
+    File parent = target.getCanonicalFile().getParentFile();
+    if (parent == null || (!parent.isDirectory() && !parent.mkdirs())) throw new IOException("Export cache unavailable");
+    File temp = File.createTempFile("cobra-zip-", ".tmp", parent);
+    try {
+      int total = 0;
+      try (ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(temp)))) {
+        for (Map.Entry<String,String> entry : new TreeMap<>(entries).entrySet()) {
+          String name = entry.getKey();
+          if (!name.matches("[a-zA-Z0-9][a-zA-Z0-9._/-]{0,100}") || name.contains("..") || name.endsWith("/"))
+            throw new IOException("Unsafe diagnostic entry name");
+          String text = redact(entry.getValue(), secrets);
+          byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+          if (bytes.length > FILE_LIMIT + 8192) bytes = "[omitted: entry exceeds export limit]".getBytes(StandardCharsets.UTF_8);
+          total += bytes.length;
+          if (total > TOTAL_LIMIT) throw new IOException("Diagnostic bundle exceeds bound");
+          zip.putNextEntry(new ZipEntry(name));zip.write(bytes);zip.closeEntry();
+        }
+      }
+      // Read all members back, including CRC validation, before accepting the staged ZIP.
+      try (ZipInputStream verify = new ZipInputStream(new FileInputStream(temp))) {
+        int count=0;byte[] buffer=new byte[8192];
+        while (verify.getNextEntry()!=null) { while(verify.read(buffer)!=-1) {} verify.closeEntry();count++; }
+        if(count!=entries.size())throw new IOException("Incomplete diagnostic ZIP");
+      }
+      if (!temp.renameTo(target)) throw new IOException("Cannot finalize diagnostic ZIP");
+    } finally { temp.delete(); }
+  }
+
+  static long copy(InputStream in, OutputStream out) throws IOException {
+    long count=0;byte[] buffer=new byte[8192];int n;
+    while ((n=in.read(buffer))!=-1) {
+      if (n==0 || count+n>TOTAL_LIMIT+65536)throw new IOException("Export stream exceeded bound or stalled");
+      out.write(buffer,0,n);count+=n;
+    }
+    out.flush();return count;
+  }
+}

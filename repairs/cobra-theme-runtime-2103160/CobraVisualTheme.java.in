@@ -1,0 +1,210 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.util.AtomicFile;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+/** Data-only visual package. No executable payload, URLs, view actions, or player access. */
+public final class CobraVisualTheme {
+  public static final int RUNTIME=2, BUILD=2103160;
+  static final String PREFIX="script.infinity.cobra.theme/", MANIFEST="resources/visual-theme.json";
+  static final long MAX_ZIP=64L*1024*1024, MAX_TOTAL=64L*1024*1024, MAX_FILE=12L*1024*1024;
+  static final int MAX_FILES=256, MAX_JSON=512*1024, MAX_IMAGES=96;
+  static final Object STORE_LOCK=new Object();
+  final JSONObject data;
+  final File directory;
+  final String id;
+  final Map<String,Bitmap> bitmaps;
+  final long decodedBytes;
+  final Map<String,android.graphics.Typeface> fonts;
+  private CobraVisualTheme(JSONObject json,File dir,Map<String,Bitmap> images,long decoded)throws IOException{
+    data=json;directory=dir;id=json.optString("id","builtin");bitmaps=Collections.unmodifiableMap(images);decodedBytes=decoded;
+    Map<String,android.graphics.Typeface> loaded=new HashMap<>();JSONObject inventory=json.optJSONObject("assets");
+    if(inventory!=null&&dir!=null){Iterator<String> it=inventory.keys();try{while(it.hasNext()){String key=it.next();JSONObject item=inventory.getJSONObject(key);if("font".equals(item.optString("kind","image")))loaded.put(key,android.graphics.Typeface.createFromFile(inside(dir,item.getString("path"))));}}catch(Exception|OutOfMemoryError e){throw new IOException("Theme font could not be loaded",e);}}
+    fonts=Collections.unmodifiableMap(loaded);
+  }
+  static CobraVisualTheme builtin(){try{return new CobraVisualTheme(new JSONObject(),null,new HashMap<>(),0);}catch(IOException impossible){throw new IllegalStateException(impossible);}}
+  static boolean safeName(String s){
+    if(s==null||s.length()==0||s.length()>200||s.startsWith("/")||s.indexOf('\\')>=0||s.indexOf(':')>=0||s.indexOf('\0')>=0)return false;
+    for(String part:s.split("/",-1))if(part.isEmpty()||part.equals(".")||part.equals(".."))return false;
+    return s.matches("[A-Za-z0-9_. /-]+");
+  }
+  static File inside(File parent,String name)throws IOException{
+    if(!safeName(name))throw new IOException("Unsafe theme path");
+    File file=new File(parent,name);String root=parent.getCanonicalPath()+File.separator;
+    if(!file.getCanonicalPath().startsWith(root))throw new IOException("Theme path escapes its directory");
+    return file;
+  }
+  static String hash(byte[] bytes)throws IOException{
+    try{byte[] raw=MessageDigest.getInstance("SHA-256").digest(bytes);StringBuilder out=new StringBuilder();for(byte b:raw)out.append(String.format(Locale.ROOT,"%02x",b&255));return out.toString();}
+    catch(java.security.NoSuchAlgorithmException failure){throw new IOException("SHA-256 unavailable",failure);}
+  }
+  static byte[] read(InputStream in,long maximum)throws IOException{
+    ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int n;long total=0;
+    while((n=in.read(buf))!=-1){if(n==0)throw new IOException("Theme stream stalled");total+=n;if(total>maximum)throw new IOException("Theme size limit exceeded");out.write(buf,0,n);}return out.toByteArray();
+  }
+  static byte[] readFile(File f,long maximum)throws IOException{try(InputStream in=new FileInputStream(f)){return read(in,maximum);}}
+  static final class LimitedInput extends FilterInputStream {
+    long remaining;LimitedInput(InputStream in,long maximum){super(in);remaining=maximum;}
+    private void used(int n)throws IOException{if(n>0&&(remaining-=n)<0)throw new IOException("Compressed theme too large");}
+    public int read()throws IOException{int b=in.read();if(b>=0)used(1);return b;}
+    public int read(byte[] b,int o,int l)throws IOException{int n=in.read(b,o,l);used(n);return n;}
+  }
+  static Map<String,byte[]> unpack(InputStream input)throws Exception{
+    if(input==null)throw new IOException("Could not open theme ZIP");
+    Map<String,byte[]> files=new LinkedHashMap<>();Set<String> names=new HashSet<>();long total=0;int count=0;
+    try(ZipInputStream zip=new ZipInputStream(new LimitedInput(input,MAX_ZIP))){ZipEntry entry;
+      while((entry=zip.getNextEntry())!=null){if(++count>MAX_FILES)throw new IOException("Too many ZIP entries");String name=entry.getName();
+        if(entry.isDirectory()){if(!name.endsWith("/")||!safeName(name.substring(0,name.length()-1)))throw new IOException("Unsafe directory");continue;}
+        if(!safeName(name)||!names.add(name.toLowerCase(Locale.ROOT)))throw new IOException("Unsafe or duplicate ZIP entry");
+        if(!name.startsWith(PREFIX))throw new IOException("Unexpected ZIP root");String rel=name.substring(PREFIX.length());
+        byte[] data=read(zip,Math.min(MAX_FILE,MAX_TOTAL-total));total+=data.length;files.put(rel,data);
+      }
+    }
+    return files;
+  }
+  static void keys(JSONObject object,String... allowed)throws Exception{
+    Set<String> names=new HashSet<>(Arrays.asList(allowed));Iterator<String> it=object.keys();while(it.hasNext()){String key=it.next();if(!names.contains(key))throw new IOException("Unsupported theme field: "+key);}
+  }
+  static boolean finite(double d){return !Double.isNaN(d)&&!Double.isInfinite(d);}
+  static void validateNumber(Object value,double min,double max)throws Exception{
+    if(!(value instanceof Number)||!finite(((Number)value).doubleValue())||((Number)value).doubleValue()<min||((Number)value).doubleValue()>max)throw new IOException("Theme numeric value outside supported limits");
+  }
+  static void validateColor(Object value)throws Exception{if(!(value instanceof String)||!((String)value).matches("#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?"))throw new IOException("Invalid theme color");}
+  static void validateStyle(JSONObject style,Map<String,String> assets)throws Exception{
+    keys(style,"fill","fill_end","stroke","stroke_width_dp","radius_dp","image","image_fit","text","text_size_sp","font_family","font_asset","font_style","letter_spacing","padding_dp","min_height_dp","elevation_dp","focus","pressed","selected","width_dp","height_dp","margin_dp","margin_left_dp","margin_top_dp","margin_right_dp","margin_bottom_dp","padding_left_dp","padding_top_dp","padding_right_dp","padding_bottom_dp","weight","orientation","gravity","max_lines","alpha");
+    for(String c:new String[]{"fill","fill_end","stroke","text","focus","pressed","selected"})if(style.has(c))validateColor(style.get(c));
+    for(String n:new String[]{"stroke_width_dp","radius_dp","padding_dp","elevation_dp"})if(style.has(n))validateNumber(style.get(n),0,n.equals("radius_dp")?128:n.equals("padding_dp")?64:24);
+    if(style.has("min_height_dp"))validateNumber(style.get("min_height_dp"),48,200);
+    if(style.has("text_size_sp"))validateNumber(style.get("text_size_sp"),10,64);
+    if(style.has("letter_spacing"))validateNumber(style.get("letter_spacing"),-.02,.25);
+    if(style.has("font_style"))validateNumber(style.get("font_style"),0,3);
+    for(String dimension:new String[]{"width_dp","height_dp"})if(style.has(dimension)){validateNumber(style.get(dimension),-2,2048);double n=style.getDouble(dimension);if(n<0&&n!=-1&&n!=-2)throw new IOException("Invalid size sentinel");}
+    for(String dimension:new String[]{"margin_dp","margin_left_dp","margin_top_dp","margin_right_dp","margin_bottom_dp","padding_left_dp","padding_top_dp","padding_right_dp","padding_bottom_dp"})if(style.has(dimension))validateNumber(style.get(dimension),0,128);
+    if(style.has("weight"))validateNumber(style.get("weight"),0,12);
+    if(style.has("alpha"))validateNumber(style.get("alpha"),0,1);
+    if(style.has("max_lines"))validateNumber(style.get("max_lines"),1,8);
+    if(style.has("orientation")&&!Arrays.asList("horizontal","vertical").contains(style.getString("orientation")))throw new IOException("Invalid orientation");
+    if(style.has("gravity")&&!Arrays.asList("left","right","top","bottom","center").contains(style.getString("gravity")))throw new IOException("Invalid gravity");
+    if(style.has("font_family")&&!Arrays.asList("sans-serif","sans-serif-light","sans-serif-medium","sans-serif-condensed","serif","monospace","cursive","sans-serif-smallcaps").contains(style.getString("font_family")))throw new IOException("Unsupported system font family");
+    if(style.has("font_asset")&&!"font".equals(assets.get(style.getString("font_asset"))))throw new IOException("Unknown font asset");
+    if(style.has("image")&&!"image".equals(assets.get(style.getString("image"))))throw new IOException("Unknown image slot");
+    if(style.has("image_fit")&&!Arrays.asList("contain","cover","stretch").contains(style.getString("image_fit")))throw new IOException("Unknown image fit");
+  }
+  static void validateLayer(JSONObject layer,Map<String,String> assets)throws Exception{
+    keys(layer,"colors","dimensions","numbers","copy","styles","images","scenes","guide_layouts");
+    for(String group:new String[]{"colors","dimensions","numbers","copy","styles","images","scenes","guide_layouts"}){
+      JSONObject values=layer.optJSONObject(group);if(values==null){if(layer.has(group))throw new IOException("Theme group must be an object");continue;}
+      if(values.length()>4096)throw new IOException("Too many theme tokens");
+      Iterator<String> it=values.keys();while(it.hasNext()){
+        String key=it.next();if(!CobraVisualCatalog.allows(group,key))throw new IOException("Unknown visual slot: "+group+"/"+key);if(!key.matches("[A-Za-z0-9_.:/-]{1,180}"))throw new IOException("Invalid token key");Object value=values.get(key);
+        if(group.equals("colors"))validateColor(value);
+        else if(group.equals("dimensions"))validateNumber(value,0,2048);
+        else if(group.equals("numbers"))validateNumber(value,0,1000);
+        else if(group.equals("copy")){if(!(value instanceof String)||((String)value).length()>240||((String)value).indexOf('\0')>=0)throw new IOException("Invalid presentation label");
+          if(key.startsWith("chooser.label.")){
+            String text=((String)value).trim(),label=key.substring(14);int maximum=label.equals("brand")?28:label.equals("brand_tagline")||label.equals("personalization")?40:label.equals("infinity_title")||label.equals("cobra_title")?24:label.endsWith("subtitle")?72:label.equals("footer_brand")?56:48;
+            if(text.isEmpty()||text.length()>maximum||text.indexOf('\n')>=0||text.indexOf('\r')>=0)throw new IOException("Invalid chooser label");
+            if(label.equals("initials")&&!text.toUpperCase(Locale.ROOT).matches("[A-Z]{1,3}"))throw new IOException("Initials must contain 1 to 3 letters");
+            String lower=text.toLowerCase(Locale.ROOT);if(label.endsWith("subtitle")&&(lower.contains("live tv")||lower.contains("2-in-1")||lower.contains("2 in 1")))throw new IOException("Unsupported legacy chooser subtitle");
+          }
+}
+        else if(group.equals("images")){if(!(value instanceof String)||!"image".equals(assets.get(value)))throw new IOException("Unknown image mapping");}
+        else if(group.equals("guide_layouts")){if(!(value instanceof JSONObject))throw new IOException("Guide layout must be an object");CobraVisualGeometry.validateGuide((JSONObject)value);}
+        else if(group.equals("scenes")){if(!(value instanceof JSONObject))throw new IOException("Scene must be an object");CobraVisualScene.validate((JSONObject)value,assets);}
+        else {if(!(value instanceof JSONObject))throw new IOException("Style must be an object");validateStyle((JSONObject)value,assets);}
+      }
+    }
+  }
+  static JSONObject validate(Map<String,byte[]> files)throws Exception{
+    byte[] manifest=files.get(MANIFEST);if(manifest==null||manifest.length==0||manifest.length>MAX_JSON)throw new IOException("Missing visual-theme.json");
+    JSONObject root=new JSONObject(new String(manifest,StandardCharsets.UTF_8));
+    keys(root,"schema","scope","minimum_runtime","minimum_build","id","name","assets","base","variants");
+    if(root.getInt("schema")!=2||!"cobra-presentation".equals(root.getString("scope"))||root.getInt("minimum_runtime")!=RUNTIME||root.getInt("minimum_build")>BUILD)throw new IOException("This visual theme requires a different runtime");
+    if(!root.getString("id").matches("[a-z0-9][a-z0-9.-]{0,63}")||root.getString("name").isEmpty()||root.getString("name").length()>100)throw new IOException("Invalid theme identity");
+    JSONObject inventory=root.getJSONObject("assets");if(inventory.length()>MAX_IMAGES)throw new IOException("Too many theme images");Set<String> used=new HashSet<>();used.add(MANIFEST);Map<String,String> ids=new HashMap<>();Iterator<String> it=inventory.keys();int fontCount=0;long fontBytes=0;
+    while(it.hasNext()){
+      String id=it.next();if(!id.matches("[a-zA-Z0-9_.-]{1,100}"))throw new IOException("Invalid image slot");JSONObject entry=inventory.getJSONObject(id);keys(entry,"path","sha256","kind");String path=entry.getString("path");
+      String kind=entry.optString("kind","image");boolean font="font".equals(kind);ids.put(id,kind);
+      if(!font&&!"image".equals(kind))throw new IOException("Unsupported asset kind");
+      if(!path.startsWith("resources/assets/")||!safeName(path)||!path.matches(font?".*\\.(ttf|otf)":".*\\.(png|webp|jpg|jpeg)"))throw new IOException("Only local supported image/font assets are allowed");
+      byte[] payload=files.get(path);if(payload==null||!hash(payload).equals(entry.getString("sha256")))throw new IOException("Theme image integrity check failed");used.add(path);
+      if(font){if(++fontCount>8||(fontBytes+=payload.length)>8L*1024*1024)throw new IOException("Font budget exceeded");if(payload.length<12||payload.length>2*1024*1024||!((payload[0]==0&&payload[1]==1&&payload[2]==0&&payload[3]==0)||(payload[0]=='O'&&payload[1]=='T'&&payload[2]=='T'&&payload[3]=='O')))throw new IOException("Invalid font header or size");continue;}
+      BitmapFactory.Options bounds=new BitmapFactory.Options();bounds.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(payload,0,payload.length,bounds);
+      if(bounds.outWidth<=0||bounds.outHeight<=0||bounds.outWidth>8192||bounds.outHeight>8192||(long)bounds.outWidth*bounds.outHeight>16777216L)throw new IOException("Invalid or oversized image dimensions");
+    }
+    if(!used.equals(files.keySet()))throw new IOException("Unlisted or executable files are forbidden in a visual theme");
+    validateLayer(root.getJSONObject("base"),ids);JSONObject variants=root.optJSONObject("variants");
+    if(variants!=null){keys(variants,"light","dark","oled","cover","portrait","landscape","tablet","tv");Iterator<String> names=variants.keys();while(names.hasNext())validateLayer(variants.getJSONObject(names.next()),ids);}
+    return root;
+  }
+  static Map<String,Bitmap> decode(JSONObject root,Map<String,byte[]> files)throws Exception{
+    Map<String,Bitmap> result=new HashMap<>();long budget=0;JSONObject inventory=root.getJSONObject("assets");Iterator<String> keys=inventory.keys();
+    // Decode only on the package/background worker, never in an onDraw callback.
+    try{while(keys.hasNext()){
+      String id=keys.next();if("font".equals(inventory.getJSONObject(id).optString("kind","image")))continue;byte[] bytes=files.get(inventory.getJSONObject(id).getString("path"));BitmapFactory.Options o=new BitmapFactory.Options();o.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(bytes,0,bytes.length,o);o.inSampleSize=1;
+      while((long)(o.outWidth/o.inSampleSize)*(o.outHeight/o.inSampleSize)>4194304L)o.inSampleSize*=2;
+      o.inJustDecodeBounds=false;o.inPreferredConfig=Bitmap.Config.ARGB_8888;Bitmap b=BitmapFactory.decodeByteArray(bytes,0,bytes.length,o);if(b==null)throw new IOException("Image decode failed");budget+=b.getAllocationByteCount();
+      if(budget>48L*1024*1024){b.recycle();throw new IOException("Theme decoded image budget exceeds 48 MiB");}result.put(id,b);
+    }}catch(Exception|OutOfMemoryError error){for(Bitmap b:result.values())b.recycle();throw new IOException("Theme images cannot be safely decoded",error);}return result;
+  }
+  static File store(Context c){return new File(c.getFilesDir(),"cobra-visual-themes-v2");}
+  static AtomicFile pointer(Context c){return new AtomicFile(new File(store(c),"active.json"));}
+  static JSONObject readPointer(Context c){synchronized(STORE_LOCK){try{return new JSONObject(new String(pointer(c).readFully(),StandardCharsets.UTF_8));}catch(Exception none){return new JSONObject();}}}
+  static void writePointer(Context c,JSONObject p)throws Exception{
+    AtomicFile file=pointer(c);FileOutputStream stream=null;
+    try{stream=file.startWrite();stream.write(p.toString().getBytes(StandardCharsets.UTF_8));file.finishWrite(stream);}catch(Exception e){if(stream!=null)file.failWrite(stream);throw e;}
+  }
+  static Map<String,byte[]> filesAt(File directory)throws Exception{
+    Map<String,byte[]> files=new LinkedHashMap<>();byte[] raw=readFile(inside(directory,MANIFEST),MAX_JSON);files.put(MANIFEST,raw);JSONObject root=new JSONObject(new String(raw,StandardCharsets.UTF_8));JSONObject assets=root.getJSONObject("assets");long total=raw.length;
+    if(assets.length()>MAX_IMAGES)throw new IOException("Too many images");Iterator<String> it=assets.keys();while(it.hasNext()){
+      String path=assets.getJSONObject(it.next()).getString("path");if(files.containsKey(path))continue;byte[] data=readFile(inside(directory,path),Math.min(MAX_FILE,MAX_TOTAL-total));total+=data.length;files.put(path,data);
+    }return files;
+  }
+  static CobraVisualTheme load(Context c)throws Exception{
+    try{return loadChecked(c);}catch(OutOfMemoryError pressure){throw new IOException("Insufficient memory to load visual theme",pressure);}
+  }
+  static CobraVisualTheme loadChecked(Context c)throws Exception{synchronized(STORE_LOCK){
+    JSONObject p=readPointer(c);String generation=p.optString("active","");if(generation.isEmpty())return builtin();if(!generation.matches("[0-9a-f]{64}"))throw new IOException("Invalid active theme pointer");
+    File dir=inside(store(c),generation);Map<String,byte[]> files=filesAt(dir);if(!hash(files.get(MANIFEST)).equals(generation))throw new IOException("Theme manifest integrity mismatch");JSONObject root=validate(files);Map<String,Bitmap> decoded=decode(root,files);long size=0;for(Bitmap b:decoded.values())size+=b.getAllocationByteCount();try{return new CobraVisualTheme(root,dir,decoded,size);}catch(Exception|OutOfMemoryError e){for(Bitmap b:decoded.values())b.recycle();throw new IOException("Theme could not be loaded",e);}
+  }}
+  static CobraVisualTheme install(Context c,InputStream input)throws Exception{
+    try{return installChecked(c,input);}catch(OutOfMemoryError pressure){throw new IOException("Insufficient memory for visual theme; prior snapshot retained",pressure);}
+  }
+  static CobraVisualTheme installChecked(Context c,InputStream input)throws Exception{synchronized(STORE_LOCK){
+    Map<String,byte[]> files=unpack(input);JSONObject root=validate(files);Map<String,Bitmap> images=decode(root,files);String generation=hash(files.get(MANIFEST));File home=store(c);
+    if(!home.isDirectory()&&!home.mkdirs())throw new IOException("Theme storage unavailable");File target=inside(home,generation);boolean existed=target.exists();boolean committed=false;File stage=new File(home,"stage-"+UUID.randomUUID());long bytes=0;
+    try{
+      if(!stage.mkdir())throw new IOException("Cannot stage theme");for(Map.Entry<String,byte[]> entry:files.entrySet()){File file=inside(stage,entry.getKey());if(!file.getParentFile().isDirectory()&&!file.getParentFile().mkdirs())throw new IOException("Cannot stage assets");try(FileOutputStream out=new FileOutputStream(file)){out.write(entry.getValue());out.getFD().sync();}}
+      // Reusing a generation is allowed only if its already stored bytes still validate.
+      if(target.exists()){JSONObject stored=validate(filesAt(target));if(!hash(readFile(inside(target,MANIFEST),MAX_JSON)).equals(generation))throw new IOException("Stored generation corrupt");}
+      else if(!stage.renameTo(target))throw new IOException("Cannot commit theme generation");
+      for(Bitmap b:images.values())bytes+=b.getAllocationByteCount();CobraVisualTheme ready=new CobraVisualTheme(root,target,images,bytes);
+      JSONObject old=readPointer(c),next=new JSONObject();String active=old.optString("active","");next.put("active",generation);next.put("previous",generation.equals(active)?old.optString("previous",""):active);writePointer(c,next);committed=true;
+      File[] children=home.listFiles();if(children!=null)for(File child:children)if(child.getName().matches("[0-9a-f]{64}")&&!child.getName().equals(generation)&&!child.getName().equals(next.optString("previous","")))deleteTree(child);
+      return ready;
+    }catch(Exception|OutOfMemoryError e){for(Bitmap b:images.values())b.recycle();if(!existed&&!committed)deleteTree(target);throw new IOException("Theme could not be installed",e);}finally{deleteTree(stage);}
+  }}
+  static void reset(Context c)throws Exception{synchronized(STORE_LOCK){JSONObject old=readPointer(c),p=new JSONObject();p.put("active","");p.put("previous",old.optString("active",""));if(!store(c).isDirectory())store(c).mkdirs();writePointer(c,p);}}
+  static CobraVisualTheme rollback(Context c)throws Exception{synchronized(STORE_LOCK){JSONObject old=readPointer(c),next=new JSONObject();String previous=old.optString("previous","");
+    if(!previous.isEmpty()){File dir=inside(store(c),previous);Map<String,byte[]> files=filesAt(dir);validate(files);if(!hash(files.get(MANIFEST)).equals(previous))throw new IOException("Previous theme corrupt");}
+    next.put("active",previous);next.put("previous",old.optString("active",""));writePointer(c,next);try{return load(c);}catch(Exception e){writePointer(c,old);throw e;}
+  }}
+  static void deleteTree(File root){if(root==null||!root.exists())return;File[] children=root.listFiles();if(children!=null)for(File child:children)deleteTree(child);root.delete();}
+  Object value(String group,String key,String palette,String layout){
+    Object value=null;JSONObject base=data.optJSONObject("base");if(base!=null){JSONObject g=base.optJSONObject(group);if(g!=null)value=g.opt(key);}
+    JSONObject variants=data.optJSONObject("variants");if(variants!=null)for(String mode:new String[]{layout,palette}){JSONObject v=variants.optJSONObject(mode);if(v!=null){JSONObject g=v.optJSONObject(group);if(g!=null&&g.has(key))value=g.opt(key);}}
+    return value;
+  }
+}

@@ -1,0 +1,193 @@
+name: Infinity | 2103377 drain RC2 complete engine and 274 preserved tests
+on:
+  push:
+    branches: [work/infinity-2103377-shutdown-drain-rc2]
+    paths:
+      - 'repairs/shutdown-final-2103377/**'
+      - 'repairs/shutdown-drain-2103377/**'
+      - '.github/workflows/infinity-2103377-drain-rc2.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103377-drain-rc2, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38246713743
+          name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: locked-parent
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38270097041
+          name: Cobra-2103375-File-Preview-Native-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: previous-candidate
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38321848412
+          name: Cobra-2103376-Critical-Preview-Native-Evidence
+          github-token: ${{ github.token }}
+          path: locked-native-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38323908660
+          name: Cobra-2103376-Critical-Preview-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: protected-2103376-apk
+      - name: Restore verified compiler dependencies
+        run: |
+          set -euo pipefail
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev
+      - name: Compile and test real optional-pruning C++ method against controlled native peers
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-build
+          python3 repairs/shutdown-drain-2103377/test_prune.py checkpoint-build/RC2-PRUNE-HOST-TESTS.json
+      - name: Preserve exact green inputs and stage targeted shutdown corrections
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-build
+          python3 repairs/shutdown-final-2103377/native_ci.py prepare --locked locked-parent/Cobra-2103374-Verified-Deadweight-RC1.apk --previous previous-candidate/Cobra-2103375-File-Preview-Native-RC1.apk --parent-proof locked-native-evidence 2>&1 | tee checkpoint-build/prepare-vfs-trace.log
+      - name: Compile complete matched native Kodi engine
+        run: |
+          set -euo pipefail
+          python3 repairs/shutdown-final-2103377/native_ci.py compile 2>&1 | tee checkpoint-build/compile-vfs-trace.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103377-Drain-RC2-Native
+          path: checkpoint-build/libkodi.so
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
+      - name: Preserve native correction receipts and exact resume point
+        if: always()
+        run: |
+          mkdir -p checkpoint-build vfs-diagnostic-package
+          git rev-parse HEAD > checkpoint-build/VFS-TRACE-COMMIT.txt
+          printf '%s\n' 'TARGETED COOPERATIVE SHUTDOWN REPAIR TEST CANDIDATE. EXACT SOURCE GUARDS; UNKNOWN WRITES PROTECTED. ORIGINAL APK/SKIN LOCKS UNCHANGED. MATCHED LIFECYCLE PAIRING REQUIRED. PHYSICAL ACCEPTANCE PENDING.' > checkpoint-build/VFS-TRACE-SCOPE.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-Drain-RC2-Native-Evidence
+          path: |
+            checkpoint-build/
+            vfs-diagnostic-package/*.json
+            vfs-diagnostic-package/*.txt
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
+
+  android-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38415112606
+          name: Infinity-2103377-Drain-RC2-Android
+          github-token: ${{ github.token }}
+          path: final-android
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38351703759
+          name: Infinity-2103377-Android-Verification
+          github-token: ${{ github.token }}
+          path: green-234
+      - name: Preserve all 274 fresh passes and verify complete current Java byte identity
+        run: python3 repairs/shutdown-final-2103377/reuse_android.py --folder final-android --green green-234
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Drain-RC2-Android
+          path: final-android/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
+  signed-test-apk:
+    needs: [native-engine, android-verification]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with: {name: Infinity-2103377-Drain-RC2-Native-Evidence, path: native-evidence}
+      - uses: actions/download-artifact@v8
+        with: {name: Infinity-2103377-Drain-RC2-Android, path: android-evidence}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38323908660
+          name: Cobra-2103376-Critical-Preview-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: parent-apk
+      - name: Permanently sign matched corrections and verify protected payload
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/shutdown-final-2103377/package.py --parent parent-apk/Cobra-2103376-Critical-Preview-RC1.apk --donor android-evidence/donor.apk --native native-evidence --android android-evidence --out final-shutdown-apk
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103377-Drain-RC2-Signed-Test-APK
+          path: final-shutdown-apk/Infinity-2103377-Shutdown-Drain-RC2.apk
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-Drain-RC2-Package-Receipts
+          path: |
+            final-shutdown-apk/*.json
+            final-shutdown-apk/*.txt
+            final-shutdown-apk/*.sha256
+          retention-days: 90
+          if-no-files-found: error

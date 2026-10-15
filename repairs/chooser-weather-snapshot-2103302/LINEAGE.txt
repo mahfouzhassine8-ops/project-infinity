@@ -1,0 +1,10 @@
+Direct parent: Infinity 2103301 Weather Native Isolation RC1
+APK SHA256: f95f844463acfde03e0865cb64d0eed55583fda1b752a573db5d19c83e876c42
+Source commit: 1591beee377948ed812fb25ac7576b016aab8a3c
+Successful build: 37143916577
+User reports startup now works; remaining defect is weather only in Choose Your Experience.
+2103302 retains native isolation, removes the web-service dependency, and provides
+an atomic read-only snapshot of existing Kodi weather. No new provider/network API.
+All packaged assets and resources remain byte-identical, including skin and native engine.
+The small producer is embedded in Java and installed into disposable cache; existing
+runtime cache add-on manifest receives one optional producer registration.

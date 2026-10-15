@@ -1,0 +1,174 @@
+{
+  "parent_source_sha256": "484b73bc677090a70667daa6c62e895402d4fed5a2f8dcdbe9a1f4e510d9f861",
+  "source_sha256": "1000eaca411f977263436015541b3748cc571f6397f228d7c2d74fea677a04b2",
+  "removed_dashboard_methods": [
+    "showCobraSportsHub",
+    "cobraSportsPrepareHeader",
+    "cobraSportsRenderCurrent",
+    "cobraSportsRenderHub",
+    "cobraSportsAddSection",
+    "cobraSportsAddSoccerSection",
+    "showCobraSportsSoccer",
+    "cobraSportsAddLeagueSection",
+    "cobraSportsGameCard",
+    "cobraSportsTeamMark",
+    "showCobraSportsGame",
+    "cobraSportsAddTeamRow",
+    "showCobraSportsLeague"
+  ],
+  "findings": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "physical_acceptance": false,
+  "purpose": "TEST_CANDIDATE_ONLY",
+  "production_promotion": false,
+  "members": {
+    "InfinityLiveActivity::cobraClearProSportsPresentation()": {
+      "before": null,
+      "after": "abb3d27dba445cac75812289f6bee16837a2d7c97b1197f517590ab056f5d544"
+    },
+    "InfinityLiveActivity::cobraConsumeSportsReminder()": {
+      "before": "9abace94be3bb7bbcce99120f267b2973054296a857700e664514c82c006c960",
+      "after": "aa4965c9d27eb368f4998fc63aab8cdc8e52604deebafc0b1c435b139c39a7ee"
+    },
+    "InfinityLiveActivity::cobraDrawerOwner()": {
+      "before": "f5827bf4777e1950ab588efe785497674468d4176675653ab3aa56c7161f3707",
+      "after": "52cdc38c9f0707fad1cf4c59da9908eb0d9b493791c9fe1ddd2b2a58cc1c084c"
+    },
+    "InfinityLiveActivity::cobraExitProMode()": {
+      "before": "f044396dc10f9b8263201b2c5c294f01055901600232fa76c12aa29e83fb9614",
+      "after": "99955ab8d9f3915b1b48139e7b7847b603385e92f36d037caf34796ccf950902"
+    },
+    "InfinityLiveActivity::cobraHandleDrawerOwnedBack()": {
+      "before": "856e33845c85bf7a82078ac5be45521904faab12b81dcc8b1d6a686ba4bf5ce2",
+      "after": "938532f18b75a8036bd9822840e4276c062c15399725bdc9e9e9e79ac8fb0982"
+    },
+    "InfinityLiveActivity::cobraLaunchMultiSportsChannel(Channel,CobraSportsGame)": {
+      "before": "5b0bcf7fd6aa2e87ca16623367530a93e5b490c7046f7f55184fa0f497d2f647",
+      "after": "e503e3d0527d2b3a7475508eecaccc28f09dd5a28bd17a8585d404b11b0b1289"
+    },
+    "InfinityLiveActivity::cobraOpenProSportsSection()": {
+      "before": null,
+      "after": "adad4c18fea939683efeb56abb32d86004b383c5b6e1a5b8de31e3e3f6d453c7"
+    },
+    "InfinityLiveActivity::cobraProPlayerSportsEnabled()": {
+      "before": "e80dee59728ae7c5227c8f5bab3af98f31f1389544c649325caf51a69ff0b663",
+      "after": "4d4c780337cc6413184dff2c679a425ed374b95f998631c591f368419d2dadd7"
+    },
+    "InfinityLiveActivity::cobraRefreshScoreTicker()": {
+      "before": "f9e456f37caf9285d2163821e639e5c68e2dda72f4e7acfc4ec1227d35fbe36a",
+      "after": "d4a77c389d0781432e22231c6c2596919c52190885aad785e242c9ca9148d1b4"
+    },
+    "InfinityLiveActivity::cobraReturnFromSettings()": {
+      "before": "78cff7dcdaaaa7df585f9d331af25e840952ac1df7cb1679cf29885171f8b5fd",
+      "after": "98e521d15cc08738014725047308f57923e78b8a24d17ebf10d747f445f3d765"
+    },
+    "InfinityLiveActivity::cobraSelectDrawerOwner(String)": {
+      "before": "0d573c2d1fc5901407c7c9f30b2dfaca1069c51f4d89166ee786402122e77c4e",
+      "after": "2e1c845442aa453c0d89f8cb3449f5e32643b0528e71db79db3b498278696c68"
+    },
+    "InfinityLiveActivity::cobraShowGuideShell()": {
+      "before": "08b7cc1d2dd0e5a3617bb6afabe4ba058cc67201b0394ea8d34892bddc471edb",
+      "after": "df9e040bc40bdaf1da92559df60cc3466c9a96b22cd08313fb1be80f867f0737"
+    },
+    "InfinityLiveActivity::cobraSportsAddLeagueSection(LinearLayout,CobraSportsLeagueSpec,List<CobraSportsGame>)": {
+      "before": "d8a1ebe5e0bf51b35d4c5b7578243afcc4e22b847a9fc77b7fb30efc0c201a55",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsAddSection(LinearLayout,String,List<CobraSportsGame>,int)": {
+      "before": "6c9541b77db1e7c6458f53f1e733b3680896e7415b9d1b3b23e4e7f6718eabf0",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsAddSoccerSection(LinearLayout,List<CobraSportsGame>)": {
+      "before": "158e7a32babfee1a1c19eec971a2fb3eb5be9ecdb0db65969d11a44c29b83cd9",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsAddTeamRow(LinearLayout,CobraSportsTeam,String)": {
+      "before": "6db4570f434feaa2d9ffbc1be5a75c122bbc54d7baaf23ec3b922dfcf91c1ba8",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsGameCard(CobraSportsGame)": {
+      "before": "fe459949ae8be3750f1fca6bd3f8d9681bab15933623d1392d0d921fdd58e5ee",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsLaunchSmartMulti(LinkedHashMap<String, CobraSportsGame>,List<CobraSportsChannelInfo>)": {
+      "before": "777a8da5c0b2c02f30709c6c402f0d3c45b272e5cf8aa64c37a3ccb792b926fc",
+      "after": "f12c77fad2689c5628fabea0565cb436723192621282a3103d06c2d85b273408"
+    },
+    "InfinityLiveActivity::cobraSportsOpenSmartMultiView(String,String)": {
+      "before": "e0a5553a787f49639b1e6bae3faa7948bd3674d34e87e97b26ae438c15e66008",
+      "after": "3529fb69f872a2497b7859d6d61315d6594a1a95812367b5a0a8564b6fdd71a4"
+    },
+    "InfinityLiveActivity::cobraSportsPrepareHeader()": {
+      "before": "800a266af7d57d7198ee2c5f8e4902ba6c3c6de8a196e14437d95505f7088ef3",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsPresentationChanged()": {
+      "before": "e0ad4d222bff4506d26a14d355ce0d1775e293a796dfd52ec1d027777632f5d9",
+      "after": "c4bad5c9f4d16bb06d671dd3ad73eef1ab37f66b14ab21c717893d06374b7df2"
+    },
+    "InfinityLiveActivity::cobraSportsRefresh(boolean)": {
+      "before": "eed6606dd1be9c078ad8013c0460e5899e1f072a6ce2a1f46e080ef0449f0bae",
+      "after": "9e92d69a06e7eeb8a114f54ac0f0aa9ac6c764f71dce9098f05de79d3c93ad69"
+    },
+    "InfinityLiveActivity::cobraSportsRefreshMultiOverlays()": {
+      "before": "07d3c698d62993587a2ce355ab74b8b17d6464f7c46fb9f99a737c495dcd27e7",
+      "after": "8993b9b5c7756605828e29e50ef0a29b68f5e31fd97221813a5778046fc63c26"
+    },
+    "InfinityLiveActivity::cobraSportsRenderCurrent()": {
+      "before": "04cab2facd9da1ae1310dee6f7bc06cc8c11e8482939711575690726850e866f",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsRenderHub()": {
+      "before": "f2bbe9306fec8c5751c2e6b5278fb64c2f3abe64e9ac9a27f056257df528abfa",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsResolveAsync(CobraSportsGame,CobraSportsResolverCallback)": {
+      "before": "c38c085bf8c3188f72b7d0496f647dcac15732b917f49060d2204ec06aab342a",
+      "after": "18c799c2bab484f646f2bc869344339f3fe576e096967f02ddbb0ef5691c2a73"
+    },
+    "InfinityLiveActivity::cobraSportsTeamMark(CobraSportsTeam)": {
+      "before": "9aa0a7582729ecca20cb55804890568d7e261d02bcccf652fd0e1f0186842313",
+      "after": null
+    },
+    "InfinityLiveActivity::cobraSportsToggleFavorite(CobraSportsTeam)": {
+      "before": "fca833c566f85b79d2e0b3004cbc87495d514e6cf79a7c7bbca38c57b599ff35",
+      "after": "ea0446e004e5fc17916c825e854eceb6180f2efa3a2a84ff260c049afa520a60"
+    },
+    "InfinityLiveActivity::cobraSportsVisible()": {
+      "before": "3135fadda9fbaebb73ffcf27e8c15befd10f404a8692dfeb1319342af45016b4",
+      "after": "57614dfa1a5051d47ae5018c6c5c85fb3c6cafeb3be7195c7a7e003ef7a4c8fc"
+    },
+    "InfinityLiveActivity::cobraSurfaceMatchesDrawerOwner()": {
+      "before": "b448c82dc2209dc5dbdfd4c50a672a66889f4e94067b5ea93f66d77129284cb4",
+      "after": "973e52b8b0092ab9398ad346dce6b13cbccda1d89d7d6c84cce7d157704eb64d"
+    },
+    "InfinityLiveActivity::showCobraPrimaryView()": {
+      "before": "4bd50538078f191e971952abd6c673b06f1d23635c6697aaeefd873713935d47",
+      "after": "5b12f659d5b1ce3b27a858b10e69592234e3f4152173a7a4e9b970ed6a32b151"
+    },
+    "InfinityLiveActivity::showCobraSportsGame(String)": {
+      "before": "58ec0a155e96642697efe314b005684bb1b31fbba8dafdfc1b12f8c3ec42b86e",
+      "after": null
+    },
+    "InfinityLiveActivity::showCobraSportsHub()": {
+      "before": "74f87b36911937ac689a19dbbe6c0858426b8bfef1dbce225f7db7b405c80285",
+      "after": null
+    },
+    "InfinityLiveActivity::showCobraSportsLeague(String)": {
+      "before": "43170432e2831c3df0bc19ab1642927bf4c35f9dbe9ee9a643679c38b814f12d",
+      "after": null
+    },
+    "InfinityLiveActivity::showCobraSportsSoccer()": {
+      "before": "969d656f49cddbe40cad04ad548bb6ad60233ea18ca392438ea56f6d1a44435e",
+      "after": null
+    },
+    "InfinityLiveActivity::stopCobraPreview()": {
+      "before": "ba395bf4d5c67340f2e56a52e151d454d15f60ad31492134da5e1cbd9d27e7c8",
+      "after": "98f37f1e817a76e5eae626d0f8a12d8c7fc817c2ac09bd1705c9df20fac709ce"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "purpose": "Preserve existing independent green RC2 native and Android verification; reuse exact artifacts without rebuilding",
+  "branch": "work/infinity-2103377-shutdown-drain-rc2",
+  "original_signed_2103377_shasum": "01d30b9be4cf05323aac5c45f1266396a0c80be059d099f3d32852d15e90180b",
+  "base_source_commit": "40a5ac471c4bf67aaeb6acaf0ec6612097e06b53",
+  "protected_apk": 2103376,
+  "protected_skin": "1.0.5.211",
+  "native": {
+    "source_commit": "633b8d9444527eb8df5dbbf291c787fd03766b2d",
+    "run_id": 38488207608,
+    "job": "native-engine",
+    "status": "success",
+    "evidence_artifact_id": 11861637196,
+    "evidence_artifact_name": "Infinity-2103377-Drain-RC2-Native-Evidence",
+    "evidence_zip_sha256": "2e5e7a0155281bed03bac7034c2540d7b2218887f0bba9f8255e07b634224423",
+    "binary_artifact_id": 11861885662,
+    "binary_artifact_name": "Infinity-2103377-Drain-RC2-Native",
+    "binary_zip_sha256": "0e083b2174bc9684c789ee9fef1a6b94deb1a273286d2d6625cc2e1a7fbe92e9",
+    "full_engine_compiled": true,
+    "extra_rc2_host_checks": 9,
+    "scope": "Only verified nonpersistent, never-started no-callback jobs pruned; Python writer/barrier unchanged"
+  },
+  "android": {
+    "verification_source_commit": "7588c3b9d44c43f860c2594d9e874a0ff0cb7e07",
+    "run_id": 38489062045,
+    "job": "android-source-replay",
+    "status": "success",
+    "artifact_id": 11861410337,
+    "artifact_name": "Infinity-2103377-Drain-RC2-Android-Preserved-274",
+    "zip_sha256": "ed348131e0b4ba7dd4c70d9de831593ee3bdf2b420ca2c3072cf204359ca0cb3",
+    "original_274_unit_tests_run_id": 38415112606,
+    "original_tested_source_sha": "73da8981e7bd8c4e060a0dd7c095c29a88f0d47d",
+    "pass_count": 274,
+    "tests_reused_exactly": true,
+    "no_claim_of_second_274_execution": true
+  },
+  "failure_to_fix": {
+    "run_id": 38488207608,
+    "job": "android-verification",
+    "reason": "Artifact download requested 'Infinity-2103377-Drain-RC2-Android' in old run 38415112606; actual saved original artifact named 'Infinity-2103377-Final-Shutdown-Android'",
+    "signed_test_apk_job": "skipped",
+    "remedy": "Pin successfully verified artifacts from native run 38488207608 and Android run 38489062045 in packaging-only workflow; no native recompilation"
+  },
+  "restrictions": {
+    "no_change_to_locked_apk": true,
+    "no_change_to_skin": true,
+    "no_userdata_mutation": true,
+    "no_false_shutdown_claim": true,
+    "full_loaded_fold_shutdown_fix_unproven": true,
+    "do_not_lock_without_device_acceptance": true
+  }
+}

@@ -1,0 +1,31 @@
+name: Export local APK tools
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/export-local-apk-tools.yml'
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Install Android build tools and apktool
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'build-tools;35.0.0' >/dev/null
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+          mkdir -p /tmp/apk-tools
+          cp /tmp/apktool.jar /tmp/apk-tools/
+          cp -a "$ANDROID_HOME/build-tools/35.0.0" /tmp/apk-tools/build-tools-35.0.0
+      - uses: actions/upload-artifact@v7
+        with:
+          name: local-apk-tools
+          path: /tmp/apk-tools
+          retention-days: 1

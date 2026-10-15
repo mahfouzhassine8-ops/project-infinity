@@ -1,0 +1,100 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
+import android.os.Build;
+import android.util.Log;
+
+/** Focus lifecycle adapter. Reuses Kodi's existing listener; no second player/session. */
+final class InfinityAudioFocusHook
+{
+  private final AudioManager manager;
+  private AudioManager.OnAudioFocusChangeListener listener;
+  private Object request; // Keep API-26 types inside the guarded helper on API 21-25.
+  private int content = AudioAttributes.CONTENT_TYPE_UNKNOWN;
+  private boolean requested;
+
+  InfinityAudioFocusHook(Context context)
+  {
+    manager = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+  }
+
+  synchronized boolean acquire(int requestedContent, AudioManager.OnAudioFocusChangeListener next)
+  {
+    if (manager == null || next == null) return false;
+    int safeContent = requestedContent >= AudioAttributes.CONTENT_TYPE_SPEECH &&
+        requestedContent <= AudioAttributes.CONTENT_TYPE_SONIFICATION
+        ? requestedContent : AudioAttributes.CONTENT_TYPE_MUSIC;
+    try
+    {
+      if (requested && (content != safeContent || listener != next) && !release()) return false;
+      content = safeContent;
+      listener = next;
+      int result;
+      if (Build.VERSION.SDK_INT >= 26)
+      {
+        if (request == null) request = Api26.create(content, listener);
+        result = Api26.acquire(manager, request);
+      }
+      else
+        result = manager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC,
+            AudioManager.AUDIOFOCUS_GAIN);
+      requested = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED ||
+          (Build.VERSION.SDK_INT >= 26 && result == AudioManager.AUDIOFOCUS_REQUEST_DELAYED);
+      if (!requested) request = null;
+      Log.i("InfinityAudioPolicy", "focus usage=MEDIA content=" + content + " result=" + result);
+      return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+    catch (RuntimeException error)
+    {
+      Log.w("InfinityAudioPolicy", "focus request failed", error);
+      return false;
+    }
+  }
+
+  synchronized boolean release()
+  {
+    try
+    {
+      if (manager == null || !requested) return true;
+      // Abandon the SAME object, not a rebuilt lookalike. Keep it on failure
+      // so a later Stop can retry instead of orphaning an outstanding request.
+      int result = Build.VERSION.SDK_INT >= 26 && request != null
+          ? Api26.abandon(manager, request) : manager.abandonAudioFocus(listener);
+      if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) return false;
+      requested = false;
+      request = null;
+      listener = null;
+      content = AudioAttributes.CONTENT_TYPE_UNKNOWN;
+      return true;
+    }
+    catch (RuntimeException error)
+    {
+      Log.w("InfinityAudioPolicy", "focus release failed", error);
+      return false;
+    }
+  }
+
+  private static final class Api26
+  {
+    static Object create(int content, AudioManager.OnAudioFocusChangeListener listener)
+    {
+      return new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+          .setAudioAttributes(new AudioAttributes.Builder()
+              .setUsage(AudioAttributes.USAGE_MEDIA).setContentType(content).build())
+          .setAcceptsDelayedFocusGain(true).setWillPauseWhenDucked(true)
+          .setOnAudioFocusChangeListener(listener).build();
+    }
+    static int acquire(AudioManager manager, Object request)
+    {
+      return manager.requestAudioFocus((AudioFocusRequest) request);
+    }
+    static int abandon(AudioManager manager, Object request)
+    {
+      return manager.abandonAudioFocusRequest((AudioFocusRequest) request);
+    }
+  }
+}

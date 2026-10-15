@@ -1,0 +1,93 @@
+name: Cobra | Locked 2103279 additional runtime audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-cobra-2103280-audit-followup]
+    paths: ['repairs/audit-followup-2103280/**', '.github/workflows/cobra-audit-followup-2103280.yml']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-followup-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+  KODI_ANDROID_KEY_ALIAS: androiddebugkey
+  KODI_ANDROID_KEY_PASSWORD: android
+  KODI_ANDROID_STORE_PASSWORD: android
+jobs:
+  additional-audit:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-Evidence
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: evidence279
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103279-End-to-End-Repair-RC1-TEST-CANDIDATE
+          run-id: 36810766190
+          github-token: ${{ github.token }}
+          path: locked279
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103278-Watch-Ambient-RC1-TEST-CANDIDATE
+          run-id: 36794611568
+          github-token: ${{ github.token }}
+          path: parent278
+      - name: Recover exact locked source and verify APK without rebuilding it
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,tarfile
+          archive=Path('evidence279/reconstructed-2103279-shell.tar.gz')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()=='42ee8ce49a8fbff520f310c4e12ac9c052fa1fc9ed60ebd6d1b1bdec6e3129d0'
+          assert hashlib.sha256(Path('locked279/Infinity-2103279-End-to-End-Repair-RC1.apk').read_bytes()).hexdigest()=='cf7aedadded921e5ddc023ba08161638d8f6207dd7002f3258daf178073679cd'
+          with tarfile.open(archive) as t:t.extractall('.',filter='data')
+          PY
+          sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          echo "KODI_ANDROID_STORE_FILE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+      - name: Compile only additional instrumentation against locked source
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/audit-followup-2103280/stage.py
+          (cd build-followup && ./gradlew --no-daemon --console=plain :xbmc:assembleReleaseAndroidTest)
+          mkdir -p instrumentation
+          testapk=$(find build-followup/xbmc/build/outputs/apk/androidTest -name '*.apk' | head -1)
+          bash scripts/sign-infinity71.sh "$testapk" instrumentation/Cobra-audit-followup-tests.apk
+      - name: Generate additional media fixtures
+        run: |
+          sudo chmod 666 /dev/kvm
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python3 repairs/audit-followup-2103280/media.py
+          python3 repairs/end-to-end-2103279/runtime_server.py > runtime-http.log 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash repairs/audit-followup-2103280/runtime.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-2103279-Additional-Audit-Evidence
+          path: |
+            followup-runtime/
+            compile-evidence/
+          retention-days: 90

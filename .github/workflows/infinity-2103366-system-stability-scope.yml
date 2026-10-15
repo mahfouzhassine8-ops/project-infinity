@@ -1,0 +1,23 @@
+name: Infinity | Verified-series source contracts 2103366
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/infinity-system-stability-scope-2103366]
+    paths:
+      - 'repairs/android-checkpoint-shutdown/**'
+      - '.github/workflows/infinity-2103366-system-stability-scope.yml'
+      - 'tools/checkpoint-apk/**'
+permissions: {contents: read}
+# Native compilation stays on its existing work branch: sibling branches cannot
+# restore each other's caches. This supplementary source gate does not build an APK.
+concurrency: {group: infinity-system-stability-scope-2103366, cancel-in-progress: true}
+jobs:
+  source-contracts:
+    if: github.ref == 'refs/heads/work/infinity-system-stability-scope-2103366'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Verify protected source contracts
+        run: python3 repairs/android-checkpoint-shutdown/system-stability-2103366/test_source_contracts.py

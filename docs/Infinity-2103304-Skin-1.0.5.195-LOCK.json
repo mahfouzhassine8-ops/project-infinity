@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-04T06:54:03-04:00",
+  "user_instruction": "Loc for now love. But there are some flaws",
+  "status": "user_locked_checkpoint_with_known_flaws",
+  "current_checkpoint": {
+    "package_id": "com.projectinfinity.kodi",
+    "apk_version_code": 2103304,
+    "apk_file": "Infinity-2103304-1.0.9-Responsive-Repair-RC1.apk",
+    "apk_bytes": 157848007,
+    "apk_sha256": "81884f5591d0912b031c6cc8dd6e8c6e198a84ddd95d03a878624fbb1e0425fa",
+    "skin_id": "skin.infinity.diggz",
+    "skin_version": "1.0.5.195",
+    "skin_file": "skin.infinity.diggz-1.0.5.195-Responsive-Repair-RC1.zip",
+    "skin_bytes": 58590391,
+    "skin_sha256": "c5290ee4352ba8b0b60af9222b4e7b032c40c2d1ccef4d1a4387699f9a5c83f9",
+    "apk_source_commit": "dc102b4b13b2931a1eec9d9476a2038d1a4d5d2d",
+    "skin_packaging_commit": "ada0ab2ca9e56a9ac2e08e84cb0d959775f39265",
+    "apk_workflow_run": 37194819014
+  },
+  "previous_rollback_preserved": {
+    "apk_version_code": 2103303,
+    "skin_version": "1.0.5.194",
+    "snapshot_file": "Infinity-2103303-Skin194-Before-Repair-20261004.tar",
+    "snapshot_sha256": "a5803fb27c3a985ca2e2008b40541dba990037d2d8d66436bb6071150a8a2f59"
+  },
+  "hard_caution": [
+    "Preserve these exact packages as the current user-locked checkpoint; do not overwrite or silently replace them.",
+    "Future corrections must use separately versioned candidates and retain this checkpoint for rollback.",
+    "This lock does not declare the repair brief complete or the physical-device validation matrix passed.",
+    "The user reports remaining flaws; capture and address the specific reports without assuming their cause.",
+    "Preserve permanent signing, native lineage, weather snapshots, providers, playback, Resume Hub and the existing Infinity assets.",
+    "Do not modify the deferred movie-video vertical framing issue."
+  ],
+  "validation_limits": {
+    "skin_source_contract_tests_passed": 8,
+    "skin_package_bytes_verified": true,
+    "full_physical_device_acceptance": false,
+    "full_repair_brief_complete": false,
+    "native_crash_resolution_proven": false,
+    "umbrella_source_window_sizing_and_back_freeze_resolved": false
+  },
+  "changes_made_for_lock": "Lock record only. No APK, skin package, application code or native engine changes."
+}

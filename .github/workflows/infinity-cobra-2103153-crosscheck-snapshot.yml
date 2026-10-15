@@ -1,0 +1,26 @@
+name: Infinity | Cobra 2103153 Crosscheck Snapshot
+on:
+  push:
+    branches: [infinity-cobra-2103153-guide-player-refinement]
+    paths: ['.github/workflows/infinity-cobra-2103153-crosscheck-snapshot.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: a9ddbf3cff4ac78b6a705491a33e88df3fdd0047
+          persist-credentials: false
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103153-Integrated-Crosscheck
+          path: |
+            patches/cobra-2103153/
+            scripts/infinity_cobra_2103153_refinement.py
+            tests/
+            .github/workflows/
+          if-no-files-found: error
+          retention-days: 30

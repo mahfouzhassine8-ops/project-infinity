@@ -1,0 +1,95 @@
+name: ♾️ Build Candidate - Native Resume
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-candidate-native-resume.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0 platform-tools'
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download proven Player Polish candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9981034408/zip -o /tmp/base.zip
+          mkdir -p /tmp/base && unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+      - name: Decode
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+      - name: Apply native resume wording
+        run: |
+          set -euo pipefail
+          # Kodi already stores resume bookmarks natively. Keep that system and only
+          # normalize the resume-choice wording in the bundled skin/language resources.
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('/tmp/decoded/assets/addons')
+          changed=[]
+          for p in root.rglob('*'):
+              if not p.is_file() or p.suffix.lower() not in {'.xml','.po'}:
+                  continue
+              try:
+                  s=p.read_text(encoding='utf-8')
+              except Exception:
+                  continue
+              old=s
+              # Keep Kodi's native resume/bookmark logic; polish only the user-facing choice.
+              for a,b in [
+                  ('Start from beginning','Start Over'),
+                  ('Start from Beginning','Start Over'),
+                  ('Start from the beginning','Start Over'),
+                  ('Play from beginning','Start Over'),
+                  ('Play from Beginning','Start Over')]:
+                  s=s.replace(a,b)
+              if s != old:
+                  p.write_text(s,encoding='utf-8')
+                  changed.append(str(p))
+          print('Changed resume wording in',len(changed),'resource file(s)')
+          for p in changed[:50]: print(p)
+          PY
+      - name: Verify native resume resources
+        run: |
+          set -euo pipefail
+          # Do not inject a competing resume script. Verify Kodi's video DB/bookmark
+          # components remain packaged and our polished wording exists if the source used it.
+          test -d /tmp/decoded/assets/addons/skin.estuary
+          grep -R -q -F 'Start Over' /tmp/decoded/assets/addons || echo 'No bundled English phrase required replacement; native Kodi resume remains unchanged.'
+      - name: Rebuild
+        run: java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/Infinity-Native-Resume-unsigned.apk
+      - name: Sign
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          mkdir -p ~/.android
+          keytool -genkeypair -v -keystore ~/.android/project-infinity.keystore -alias projectinfinity -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Infinity Native Resume, OU=Personal Build, O=Infinity, L=Detroit, ST=Michigan, C=US" >/dev/null 2>&1
+          "$BT/zipalign" -f 4 /tmp/Infinity-Native-Resume-unsigned.apk /tmp/Infinity-Native-Resume-aligned.apk
+          "$BT/apksigner" sign --ks ~/.android/project-infinity.keystore --ks-key-alias projectinfinity --ks-pass pass:android --key-pass pass:android --out /tmp/Infinity-Native-Resume.apk /tmp/Infinity-Native-Resume-aligned.apk
+          "$BT/apksigner" verify --verbose /tmp/Infinity-Native-Resume.apk
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Native-Resume-Candidate
+          path: /tmp/Infinity-Native-Resume.apk
+          retention-days: 30

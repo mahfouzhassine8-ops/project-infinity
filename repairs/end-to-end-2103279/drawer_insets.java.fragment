@@ -1,0 +1,29 @@
+  private void cobraInsetPlayerDrawer(android.view.WindowInsets insets) {
+    FrameLayout panel=mCobraPlayerDrawer;
+    if(panel==null||panel.getChildCount()==0||panel.getWidth()<=0||panel.getHeight()<=0)return;
+    int left=0,top=0,right=0,bottom=0;
+    if(insets!=null){
+      if(Build.VERSION.SDK_INT>=30){
+        android.graphics.Insets visible=insets.getInsets(android.view.WindowInsets.Type.systemBars()|android.view.WindowInsets.Type.displayCutout());
+        // Transient navigation buttons can cover content while immersive bars
+        // are logically hidden. Reserve their real window inset in the drawer.
+        android.graphics.Insets nav=insets.getInsetsIgnoringVisibility(android.view.WindowInsets.Type.navigationBars());
+        left=Math.max(visible.left,nav.left);top=Math.max(visible.top,nav.top);
+        right=Math.max(visible.right,nav.right);bottom=Math.max(visible.bottom,nav.bottom);
+      }else{
+        left=Math.max(insets.getSystemWindowInsetLeft(),insets.getStableInsetLeft());top=insets.getSystemWindowInsetTop();
+        right=Math.max(insets.getSystemWindowInsetRight(),insets.getStableInsetRight());bottom=Math.max(insets.getSystemWindowInsetBottom(),insets.getStableInsetBottom());
+        if(Build.VERSION.SDK_INT>=28&&insets.getDisplayCutout()!=null){android.view.DisplayCutout cut=insets.getDisplayCutout();left=Math.max(left,cut.getSafeInsetLeft());top=Math.max(top,cut.getSafeInsetTop());right=Math.max(right,cut.getSafeInsetRight());bottom=Math.max(bottom,cut.getSafeInsetBottom());}
+      }
+    }
+    View decor=getWindow().getDecorView();int[] p=new int[2],d=new int[2];panel.getLocationInWindow(p);decor.getLocationInWindow(d);
+    p[0]-=Math.round(panel.getTranslationX());p[1]-=Math.round(panel.getTranslationY());
+    left=dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.2",10))+Math.max(0,d[0]+left-p[0]);
+    top=dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.3",8))+Math.max(0,d[1]+top-p[1]);
+    right=dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.4",10))+Math.max(0,p[0]+panel.getWidth()-(d[0]+decor.getWidth()-right));
+    bottom=dp(vtheme().dimension("cobra.showCobraPlayerDrawer.dimensions.5",14))+Math.max(0,p[1]+panel.getHeight()-(d[1]+decor.getHeight()-bottom));
+    View content=panel.getChildAt(0);
+    if(content.getPaddingLeft()!=left||content.getPaddingTop()!=top||content.getPaddingRight()!=right||content.getPaddingBottom()!=bottom)
+      content.setPadding(left,top,right,bottom);
+  }
+

@@ -1,0 +1,1 @@
+"""Infinity rails implementation package."""

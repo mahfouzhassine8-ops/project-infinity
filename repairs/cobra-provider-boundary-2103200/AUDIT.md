@@ -1,0 +1,11 @@
+# Cobra 2103200 — provider boundary completion
+
+This forward-version candidate retains the verified 2103199 audit repairs and adds a two-file Java repair to the inherited exported file-provider boundary. No native engine, UI control, playback policy, timeshift architecture, asset or resource change is intended.
+
+The file provider must reject arbitrary external paths before native-backed file access. Only resources explicitly published by the existing search, recommendation and TV-card paths are authorized for external reads. Generic internal URI construction does not publish a resource, and directory queries remain within the application UID. Existing URI syntax is preserved; migration reads trusted private cached media and the application's own active recommendation backgrounds. The search term is JSON-escaped before existing fixed Kodi requests are assembled.
+
+Exact previous source hashes, permanent signer, payload integrity and all 293 inherited Android/Robolectric cases are required by CI. Dedicated provider tests exercise authorization, restart, migration, failed persistence, malformed inputs, concurrency and resource cleanup. Completed counts and evidence are emitted with the final candidate; this source note is not itself a test result.
+
+Pre-upgrade search artwork cached solely by an external search application has no trusted issuance record inside Cobra. If absent from the private TV cache and own active notifications, that old URI is rejected until a fresh search republishes the resource. This one-time cache limitation remains explicit; arbitrary old-format URIs are never accepted as proof of publication. Published-resource authorization preserves the existing public-media contract and does not claim to isolate malicious in-process addons or revoke media already published.
+
+Physical acceptance remains blocked by device access. No local Android tools/USB endpoint, device-control tool or configured physical-device CI exists in this session. Source, host and Robolectric results do not certify actual Binder consumers, retained-data updates, Fold, hardware decoding, real streams, PiP, SystemUI or long sessions. Use DEVICE-TEST.md and retain TEST CANDIDATE status until those observations exist.

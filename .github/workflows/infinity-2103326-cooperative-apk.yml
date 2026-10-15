@@ -1,0 +1,141 @@
+name: Infinity | 2103326 cooperative close APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-cooperative-close-2103326]
+    paths:
+      - 'repairs/cooperative-close-2103326/android.patch'
+      - 'repairs/cooperative-close-2103326/android-delta.json'
+      - 'repairs/cooperative-close-2103326/native-delta.json'
+      - 'repairs/cooperative-close-2103326/apply.py'
+      - 'repairs/cooperative-close-2103326/package.py'
+      - 'repairs/cooperative-close-2103326/test_source.py'
+      - 'repairs/cooperative-close-2103326/*.java*'
+      - '.github/workflows/infinity-2103326-cooperative-apk.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103326-cooperative-apk, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+  INFINITY_NATIVE_SOURCE_COMMIT: 6aed7f82ae4810233af9dcbfca6b6ed28725b2ad
+jobs:
+  repair-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0 ndk;21.4.7075529'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37611365517
+          name: Infinity-2103325-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent3325
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37611365517
+          name: Infinity-2103325-Shutdown-Diagnostics-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3325
+      - name: Reject unrelated source or manifest changes before building
+        run: |
+          set -euo pipefail
+          mkdir -p evidence3326
+          python3 -m py_compile repairs/cooperative-close-2103326/*.py
+          python3 - <<'PY'
+          import tarfile
+          with tarfile.open('parent3325/repaired-shell-source.tar.gz') as archive:
+              archive.extractall('host-parent',filter='data')
+          PY
+          python3 repairs/cooperative-close-2103326/test_source.py --source host-parent/shell-kodi --proof parent3325/SOURCE-PRESERVATION.json --manifest parent3325/candidate-manifest.txt 2>&1 | tee evidence3326/source-tests.log
+      - name: Require the exact repaired native build with no older-engine fallback
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/${{ github.repository }}/actions/runs/37620440517 --jq .head_sha)" = "$INFINITY_NATIVE_SOURCE_COMMIT"
+          gh run watch 37620440517 --repo '${{ github.repository }}' --exit-status --interval 30
+          gh api repos/${{ github.repository }}/actions/runs/37620440517 > evidence3326/native-run.json
+          python3 - <<'PY'
+          import json,os
+          run=json.load(open('evidence3326/native-run.json'))
+          assert run['conclusion']=='success' and run['head_sha']==os.environ['INFINITY_NATIVE_SOURCE_COMMIT']
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37620440517
+          name: Infinity-2103326-Cooperative-Native-Validation
+          github-token: ${{ github.token }}
+          path: native3326
+      - name: Prepare registered Android sources and bind the actual native identity
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/cooperative-close-2103326/package.py prepare --base base3325/Infinity-2103325-Shutdown-Diagnostics-RC1.apk --build build3326 --out evidence3326 --engine native3326
+      - name: Compile and test cooperative close, exporter and all inherited regressions
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3326
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest --tests com.projectinfinity.kodi.CobraSportsLiveFeedTest --tests com.projectinfinity.kodi.KodiOwnerLeaseTest --tests com.projectinfinity.kodi.KodiProcessStatusTest --tests com.projectinfinity.kodi.CloseProgress316Test --tests com.projectinfinity.kodi.CobraCloseIsolation316Test --tests com.projectinfinity.kodi.AndroidTaskRemoval315Test --tests com.projectinfinity.kodi.CobraProRefinementTest --tests com.projectinfinity.kodi.CobraProControlsRefinementTest --tests com.projectinfinity.kodi.CobraProPausedReturnTest --tests com.projectinfinity.kodi.CobraProHandoffTest --tests com.projectinfinity.kodi.CobraProSeason317Test --tests com.projectinfinity.kodi.Cobra2103199TimeshiftRegressionTest --tests com.projectinfinity.kodi.ProTeams312Test --tests com.projectinfinity.kodi.WholeUiAmbientTest --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest --tests com.projectinfinity.kodi.CooperativeClose326Test --tests com.projectinfinity.kodi.ShutdownDiagnostics326ExportTest :xbmc:assembleRelease :xbmc:exportPreservationTools 2>&1 | tee ../evidence3326/android-build.log
+      - name: Verify DEX, protected payload, two-service manifest scope and permanent signer
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/cooperative-close-2103326/package.py package --base base3325/Infinity-2103325-Shutdown-Diagnostics-RC1.apk --build build3326 --out evidence3326 --engine native3326
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103326-Cooperative-Close-RC1-APK
+          path: evidence3326/Infinity-2103326-Cooperative-Close-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare compact delivery evidence without private device logs
+        if: success()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          apk=Path('evidence3326/Infinity-2103326-Cooperative-Close-RC1.apk')
+          data=apk.read_bytes();compact=Path('compact3326');compact.mkdir()
+          (compact/'DELIVERY.json').write_text(json.dumps({'file':apk.name,'size':len(data),'sha256':hashlib.sha256(data).hexdigest(),'physical_device_verified':False,'locked':False},indent=2)+'\n')
+          for f in Path('evidence3326').iterdir():
+              if f.is_file() and f.suffix not in ('.apk','.so') and f.stat().st_size<24*1024*1024:shutil.copy2(f,compact/f.name)
+          shutil.copy2('repairs/cooperative-close-2103326/README.md',compact/'README.md')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103326-Delivery-Evidence
+          path: compact3326/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103326-Verification
+          path: |
+            evidence3326/
+            !evidence3326/*.apk
+            !evidence3326/*.so
+            build3326/xbmc/build/test-results/testReleaseUnitTest/
+            build3326/xbmc/build/reports/tests/testReleaseUnitTest/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn

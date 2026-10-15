@@ -1,0 +1,11 @@
+diff --git a/tests/Cobra2103208PresentationUiTest.java b/tests/Cobra2103208PresentationUiTest.java
+--- a/tests/Cobra2103208PresentationUiTest.java
++++ b/tests/Cobra2103208PresentationUiTest.java
+@@ -31,6 +31,7 @@ public class Cobra2103208PresentationUiTest {
+   InfinityLiveActivity a;
+   SharedPreferences prefs;
+   @Before public void before()throws Exception{
++    Cobra2103208BrandingTest.installApprovedArtwork();
+     f=new Cobra2103199DisplayRegressionTest();f.before();a=f.a;prefs=f.prefs;
+     prefs.edit().putString(CobraPresentationEffects.AMBIENT,"off").putBoolean(CobraPresentationEffects.NIGHT,false).commit();
+     call("cobraOpenLiveTv");measure(412,915);

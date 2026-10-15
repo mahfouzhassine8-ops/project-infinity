@@ -1,0 +1,169 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Read-only, bounded code identity and numeric timings; no state/credentials. */
+final class InfinityInstalledCodeEvidence {
+  private InfinityInstalledCodeEvidence() {}
+  static JSONObject collect(Context context) throws Exception {
+    JSONObject report = new JSONObject();
+    report.put("schema", 1); report.put("captured_epoch_ms", System.currentTimeMillis());
+    report.put("read_only", true); report.put("proves_shutdown_or_health", false);
+    File storage = context.getExternalFilesDir(null);
+    if (storage == null) storage = context.getFilesDir();
+    // Android may expose a platform path alias. Resolve that trusted root once;
+    // add-on children and code files must still be contained and unlinked.
+    File addons = new File(storage.getCanonicalFile(), ".kodi/addons");
+    if (!addons.isDirectory()) {
+      File internal = new File(context.getFilesDir().getCanonicalFile(), ".kodi/addons");
+      if (internal.isDirectory()) addons = internal;
+    }
+    JSONArray identities = new JSONArray(); report.put("addons", identities);
+    for (String id : new String[]{"skin.infinity.diggz", "script.kodihealthcenter",
+        "script.infinity.commandcenter", "service.infinity.compat",
+        "plugin.video.seren", "plugin.video.umbrella", "plugin.video.pov"}) {
+      JSONObject row = new JSONObject(); row.put("requested_id", id); identities.put(row);
+      String reason = "PATH_UNVERIFIED";
+      try {
+        File addon = new File(addons, id).getAbsoluteFile();
+        if (!addon.equals(addon.getCanonicalFile())) throw new java.io.IOException("noncanonical");
+        File marker = checked(addon, "addon.xml");
+        if (!marker.isFile()) { row.put("state", "UNAVAILABLE"); row.put("reason", "CODE_MARKER_ABSENT"); continue; }
+        reason = "XML_UNVERIFIED";
+        if (marker.length() > 128 * 1024) throw new java.io.IOException("oversize");
+        byte[] xml;
+        try (FileInputStream input = new FileInputStream(marker)) {
+          ByteArrayOutputStream output = new ByteArrayOutputStream(); byte[] buffer = new byte[8192];
+          for (int count; (count = input.read(buffer)) != -1;) {
+            if (output.size() + count > 128 * 1024) throw new java.io.IOException("growing marker");
+            output.write(buffer, 0, count);
+          }
+          xml = output.toByteArray();
+        }
+        // This independent guard keeps DTD/entity protection on Android XML
+        // implementations that reject the Apache-specific feature URI.
+        String xmlText = StandardCharsets.UTF_8.newDecoder()
+            .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+            .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+            .decode(java.nio.ByteBuffer.wrap(xml)).toString();
+        if (xmlText.indexOf('\0') >= 0 || java.util.regex.Pattern.compile("<!\\s*(DOCTYPE|ENTITY)\\b", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(xmlText).find())
+          throw new java.io.IOException("unsupported declarations");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        feature(factory, "http://apache.org/xml/features/disallow-doctype-decl", true);
+        feature(factory, "http://xml.org/sax/features/external-general-entities", false);
+        feature(factory, "http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setNamespaceAware(false); factory.setValidating(false);
+        try { factory.setXIncludeAware(false); } catch (UnsupportedOperationException unavailable) { /* No namespace/XInclude processing. */ }
+        factory.setExpandEntityReferences(false);
+        org.w3c.dom.Element element;
+        try (ByteArrayInputStream input = new ByteArrayInputStream(xml)) {
+          javax.xml.parsers.DocumentBuilder parser = factory.newDocumentBuilder();
+          parser.setEntityResolver((publicId, systemId) -> { throw new org.xml.sax.SAXException("External entity prohibited"); });
+          parser.setErrorHandler(new org.xml.sax.helpers.DefaultHandler() {
+            @Override public void error(org.xml.sax.SAXParseException error) throws org.xml.sax.SAXException { throw error; }
+            @Override public void fatalError(org.xml.sax.SAXParseException error) throws org.xml.sax.SAXException { throw error; }
+          });
+          element = parser.parse(input).getDocumentElement();
+        }
+        reason = "ADDON_IDENTITY_MISMATCH";
+        if (!"addon".equals(element.getTagName()) || !id.equals(element.getAttribute("id")))
+          throw new java.io.IOException("identity");
+        String version = element.getAttribute("version");
+        if (!version.matches("[A-Za-z0-9_.+-]{1,80}")) throw new java.io.IOException("version");
+        row.put("id", id); row.put("version", version); row.put("state", "OBSERVED_CODE");
+        reason = "CODE_READ_UNVERIFIED";
+        JSONObject files = new JSONObject(); row.put("code_sha256", files);
+        for (String file : new String[]{"addon.xml", "default.py", "service.py", "plugin.py", "context.py",
+            "resume_hub.py", "khc_lifecycle.py", "khc_safe_recovery.py", "runtime_service.py"}) {
+          File source = checked(addon, file);
+          if (source.isFile()) files.put(file, digest(source));
+        }
+        if ("script.kodihealthcenter".equals(id)) {
+          row.put("repair_policy", "2.5.19".equals(version) ? "PRESERVE_SEPARATE_LOCKED_RELEASE" : "EXACT_PREIMAGES_REQUIRED");
+          row.put("overlay_applied", false);
+        }
+      } catch (Exception unavailable) { row.put("state", "UNVERIFIED"); row.put("reason", reason); }
+    }
+    return report;
+  }
+  private static void feature(DocumentBuilderFactory factory, String name, boolean value) {
+    try { factory.setFeature(name, value); }
+    catch (ParserConfigurationException unsupported) { /* The bounded DTD/entity guard remains mandatory. */ }
+  }
+  private static File checked(File parent, String name) throws Exception {
+    File file = new File(parent, name).getAbsoluteFile();
+    if (!file.equals(file.getCanonicalFile())) throw new java.io.IOException("noncanonical file");
+    return file;
+  }
+  private static String digest(File file) throws Exception {
+    if (file.length() > 4 * 1024 * 1024) throw new java.io.IOException("oversize code");
+    MessageDigest sha = MessageDigest.getInstance("SHA-256");
+    try (FileInputStream input = new FileInputStream(file)) {
+      byte[] bytes = new byte[8192]; int total = 0;
+      for (int read; (read = input.read(bytes)) != -1;) {
+        total += read;
+        if (total > 4 * 1024 * 1024) throw new java.io.IOException("growing code");
+        sha.update(bytes, 0, read);
+      }
+    }
+    StringBuilder result = new StringBuilder();
+    for (byte value : sha.digest()) result.append(String.format(java.util.Locale.ROOT, "%02x", value & 255));
+    return result.toString();
+  }
+  static String timings(Context context, boolean previous) {
+    try {
+      File storage = context.getExternalFilesDir(null);
+      if (storage == null) return "";
+      File file = new File(storage, ".kodi/temp/" + (previous ? "kodi.old.log" : "kodi.log")).getAbsoluteFile();
+      if (!file.equals(file.getCanonicalFile())) return "";
+      byte[] bytes;
+      try (RandomAccessFile input = new RandomAccessFile(file, "r")) {
+        long length = input.length();
+        long start = Math.max(0, length - 256 * 1024);
+        input.seek(start); bytes = new byte[(int)(length - start)]; input.readFully(bytes);
+      }
+      StringBuilder result = new StringBuilder();
+      int rows = 0;
+      for (String line : new String(bytes, StandardCharsets.UTF_8).split("\n")) {
+        int marker = line.indexOf("INFINITY_RESUME_TIMING ");
+        if (marker < 0 || line.length() > 2048) continue;
+        try {
+          JSONObject raw = new JSONObject(line.substring(marker + "INFINITY_RESUME_TIMING ".length()).trim());
+          JSONObject row = new JSONObject(); row.put("schema", 1);
+          String stage = raw.getString("stage");
+          if (!stage.matches("service_start|saved_state_published|cache_validation|snapshot_load|plugin_start|saved_state_ready|filter_group|directory_items|plugin_complete|card_visible|native_constructed|native_queued|native_start|native_fetch_return|artwork_metadata_ready|skin_directory_bound|native_cancelled|native_job_retired|card_layout_ready|card_art_ready|first_layout_presented|first_card_presented")) continue;
+          row.put("stage", stage);
+          for (String key : new String[]{"request", "media", "bucket"}) {
+            if (raw.has(key)) {
+              String value = raw.getString(key);
+              if (("request".equals(key) && value.matches("[np][0-9]{1,30}")) ||
+                  ("media".equals(key) && value.matches("tv|movie|all")) ||
+                  ("bucket".equals(key) && value.matches("continue|history|watched|list"))) row.put(key, value);
+            }
+          }
+          for (String key : new String[]{"monotonic_ms", "elapsed_ms", "items", "revision", "cache_hit", "pid", "queued", "active", "window", "control", "art_ready", "art_fallback"}) {
+            if (raw.has(key)) {
+              double value = raw.getDouble(key);
+              if (!Double.isNaN(value) && !Double.isInfinite(value) && value >= 0) row.put(key, value);
+            }
+          }
+          result.append(row.toString()).append('\n');
+          if (++rows >= 2048) break;
+        } catch (Exception invalid) { /* Invalid/partial observations prove nothing. */ }
+      }
+      return result.toString();
+    } catch (Exception unavailable) { return ""; }
+  }
+}

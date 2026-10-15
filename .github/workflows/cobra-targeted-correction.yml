@@ -1,0 +1,137 @@
+name: Cobra | Targeted Pro isolation correction
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/cobra-targeted-isolation-2103373]
+    paths: ['.github/workflows/cobra-targeted-correction.yml', 'repairs/cobra-targeted-isolation/**']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: cobra-targeted-isolation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/work/cobra-targeted-isolation-2103373'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+      KODI_ANDROID_KEY_ALIAS: androiddebugkey
+      KODI_ANDROID_KEY_PASSWORD: android
+      KODI_ANDROID_STORE_PASSWORD: android
+      KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Verify existing pinned toolchain
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-Evidence
+          github-token: ${{ github.token }}
+          path: parent-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38188883754
+          name: Infinity-2103369-Cancelled-Script-Receipt-RC1-APK
+          github-token: ${{ github.token }}
+          path: base-apk
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38217628815
+          name: Cobra-Clean-Six-Candidate-Evidence
+          github-token: ${{ github.token }}
+          path: saved-reference
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38225099698
+          name: Cobra-Verified-Delivery-Evidence
+          github-token: ${{ github.token }}
+          path: parent-2103372-evidence
+      - name: Stage exact 2103372 and four authorized corrections
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android" delivery-evidence
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Compile Only,O=Android,C=US'
+          fi
+          python3 repairs/cobra-targeted-isolation/gate.py prepare --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --reference saved-reference --current-reference parent-2103372-evidence
+      - name: Prove all four regression tests fail on unchanged 2103372
+        run: |
+          set -euo pipefail
+          args=(--evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --reference saved-reference --current-reference parent-2103372-evidence)
+          python3 repairs/cobra-targeted-isolation/gate.py negative-source "${args[@]}"
+          set +e
+          ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:testReleaseUnitTest --tests '*savedProCannotExposeFullscreenSportsTabInAnyOtherExperience' --tests '*retiredDashboardMethodsAndCallbacksAreAbsentFromCompiledActivity' --tests '*savedProCannotCreatePlayerTickerOrClockInOtherExperiences' --tests '*sportsMultiScoresCannotRenderOutsideProAndOrdinaryTilesStayAlive' 2>&1 | tee delivery-evidence/negative-control.log
+          code=${PIPESTATUS[0]}
+          set -e
+          test "$code" -ne 0
+          python3 repairs/cobra-targeted-isolation/gate.py negative-result "${args[@]}"
+      - name: Run all 193 preserved tests and 13 new regression cases
+        run: |
+          set -euo pipefail
+          ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:testReleaseUnitTest :xbmc:exportPreservationTools 2>&1 | tee delivery-evidence/test.log
+      - name: Require every saved test and unchanged inherited sources
+        if: always()
+        run: python3 repairs/cobra-targeted-isolation/gate.py gates --evidence parent-evidence --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --reference saved-reference --current-reference parent-2103372-evidence
+      - name: Verify exact source review before any APK assembly
+        if: success() && hashFiles('repairs/cobra-targeted-isolation/APPROVAL.json') != ''
+        run: python3 repairs/cobra-targeted-isolation/gate.py review --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --evidence parent-evidence --reference saved-reference --current-reference parent-2103372-evidence
+      - name: Assemble Android-only donor after all pre-device tests and review
+        if: success() && hashFiles('repairs/cobra-targeted-isolation/APPROVAL.json') != ''
+        run: ./delivery-build/gradlew --no-daemon --console=plain -p delivery-build :xbmc:assembleRelease
+      - name: Verify payload and protected bytecode, then permanently sign
+        if: success() && hashFiles('repairs/cobra-targeted-isolation/APPROVAL.json') != ''
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/cobra-targeted-isolation/gate.py package --base base-apk/Infinity-2103369-Cancelled-Script-Receipt-RC1.apk --build delivery-build --out delivery-evidence --evidence parent-evidence --reference saved-reference --current-reference parent-2103372-evidence
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('repairs/cobra-targeted-isolation/APPROVAL.json') != ''
+        with:
+          name: Cobra-2103373-Targeted-Isolation-Signed-Test-APK
+          path: delivery-evidence/Cobra-2103373-Targeted-Isolation-RC1.apk
+          if-no-files-found: error
+          retention-days: 90
+      - name: Preserve exact inputs and failed or passing evidence
+        if: always()
+        run: |
+          mkdir -p delivery-evidence
+          if [ -d delivery-evidence/source ]; then tar -czf delivery-evidence/runtime-source.tar.gz -C delivery-evidence source; fi
+          if [ -d delivery-build/xbmc/src/test ]; then tar -czf delivery-evidence/test-source.tar.gz -C delivery-build/xbmc/src test; fi
+          cp repairs/cobra-targeted-isolation/*.py repairs/cobra-targeted-isolation/*.java repairs/cobra-targeted-isolation/*.json delivery-evidence/
+          cp repairs/cobra-clean-restart/*.py repairs/cobra-clean-restart/*.fragment.java delivery-evidence/
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-2103373-Targeted-Isolation-Evidence
+          path: |
+            delivery-evidence/*.xml
+            delivery-evidence/*.json
+            delivery-evidence/*.log
+            delivery-evidence/*.txt
+            delivery-evidence/*.sha256
+            delivery-evidence/*.patch
+            delivery-evidence/*.py
+            delivery-evidence/*.java
+            delivery-evidence/*.tar.gz
+            delivery-evidence/runtime/
+            delivery-evidence/screenshots/
+            delivery-evidence/compiler-differences/
+            delivery-build/xbmc/build/test-results/testReleaseUnitTest/
+            delivery-build/xbmc/build/reports/tests/testReleaseUnitTest/
+          if-no-files-found: error
+          retention-days: 90
+

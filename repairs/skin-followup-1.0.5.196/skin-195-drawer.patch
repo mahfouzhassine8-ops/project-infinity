@@ -1,0 +1,46 @@
+--- a/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
++++ b/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
+@@ -459,7 +459,7 @@
+         <control type="group">
+           <width>100%</width>
+           <height>80</height>
+-          <control type="button" id="1198305">
++          <control type="button" id="1198310">
+             <align>left</align>
+             <onclick>Dialog.Close(1198)</onclick>
+             <onclick>ActivateWindow(InterfaceSettings)</onclick>
+@@ -482,7 +482,7 @@
+             <top>0</top>
+             <width>100%</width>
+             <height>80</height>
+-            <visible>Control.HasFocus(1198305)</visible>
++            <visible>Control.HasFocus(1198310)</visible>
+             <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+           </control>
+           <control type="image">
+@@ -1429,9 +1429,9 @@
+           <height>110</height>
+         </control>
+       </control>
+-      <height max="1120">88%</height>
+-      <animation effect="zoom" start="11.47,10.89" end="100,100" center="0,0" time="210" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+-      <animation effect="zoom" start="100,100" end="11.47,10.89" center="0,0" time="165" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
++      <height max="1050">88%</height>
++      <animation effect="zoom" start="11.47,11.62" end="100,100" center="0,0" time="210" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
++      <animation effect="zoom" start="100,100" end="11.47,11.62" center="0,0" time="165" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+     </control>
+   </controls>
+   <onunload condition="Window.IsActive(home)">SetFocus(9000)</onunload>
+--- a/skin.infinity.diggz/unified/Home.xml
++++ b/skin.infinity.diggz/unified/Home.xml
+@@ -8599,8 +8599,8 @@
+         <aligny>center</aligny>
+         <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+         <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-        <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-        <texturenofocus border="20" colordiffuse="00000000">infinity_polish/field.png</texturenofocus>
++        <texturefocus border="20" colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/focus_rim.png</texturefocus>
++        <texturenofocus>infinity_reference/slider_transparent.png</texturenofocus>
+         <ondown>9000</ondown>
+         <onright>9000</onright>
+         <left>0</left>

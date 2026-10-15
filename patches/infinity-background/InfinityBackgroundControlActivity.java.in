@@ -1,0 +1,52 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.Toast;
+
+/**
+ * Tiny Infinity-owned bridge for the skin's Normal / Extended background controls.
+ * It owns no playback/native behavior; it only delegates to the already-audited
+ * InfinityExtendedBackgroundService and immediately returns to Kodi.
+ */
+public final class InfinityBackgroundControlActivity extends Activity {
+  public static final String ACTION_NORMAL =
+      "com.projectinfinity.kodi.action.BACKGROUND_MODE_NORMAL";
+  public static final String ACTION_EXTENDED =
+      "com.projectinfinity.kodi.action.BACKGROUND_MODE_EXTENDED";
+
+  @Override
+  protected void onCreate(Bundle state) {
+    super.onCreate(state);
+    String action = getIntent() != null ? getIntent().getAction() : null;
+
+    if (ACTION_NORMAL.equals(action)) {
+      InfinityExtendedBackgroundService.setEnabled(this, false);
+      Toast.makeText(this, "Infinity background mode • Normal", Toast.LENGTH_SHORT).show();
+      finish();
+      return;
+    }
+
+    if (ACTION_EXTENDED.equals(action)) {
+      if (!InfinityExtendedBackgroundService.notificationsAllowed(this)) {
+        Toast.makeText(this,
+            "Allow Infinity notifications, then choose Extended again",
+            Toast.LENGTH_LONG).show();
+        InfinityExtendedBackgroundService.openNotificationSettings(this);
+        finish();
+        return;
+      }
+      boolean accepted = InfinityExtendedBackgroundService.setEnabled(this, true);
+      Toast.makeText(this,
+          accepted
+              ? "Infinity background mode • Extended requested"
+              : "Android refused Extended background mode",
+          Toast.LENGTH_SHORT).show();
+      finish();
+      return;
+    }
+
+    Toast.makeText(this, "Unknown Infinity background mode request", Toast.LENGTH_SHORT).show();
+    finish();
+  }
+}

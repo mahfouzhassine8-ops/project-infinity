@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "basis": "byte-identical parent3335 embedded source plus reviewed compat-only checkpoint integration",
+  "scripts": [
+    {
+      "path": "service.infinity.compat/service.py",
+      "classification": "participant",
+      "owner": "infinity-compat",
+      "sha256": "bacdf368a8ec77d48ddfa34279e64a445d2f9ae048b1a7bec15eca48d86b7c4d",
+      "dependencies": [
+        {
+          "path": "service.infinity.compat/compat_runtime.py",
+          "sha256": "ba14d7b3e0fb9d3b9f557ebf7d59decc014668a69219543a93d66dd0f4aa6a6e"
+        },
+        {
+          "path": "service.infinity.compat/checkpoint_runtime.py",
+          "sha256": "82785f254ac6ec1746b22a092a949e8209701be2d06bd26252ffc05479e249fd"
+        }
+      ]
+    },
+    {
+      "path": "service.infinity.compat/layout_service.py",
+      "classification": "nonpersistent",
+      "owner": "layout-properties",
+      "sha256": "1f1da17d8d9f2fbbdc8b2c3bbe9ee00b078939fe2589a34029374156f06319cb",
+      "dependencies": []
+    },
+    {
+      "path": "service.infinity.compat/theme_contract.py",
+      "classification": "reconstructible-cache",
+      "owner": "theme-revision",
+      "sha256": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735",
+      "dependencies": []
+    },
+    {
+      "path": "service.infinity.refresh/service.py",
+      "classification": "reconstructible-cache",
+      "owner": "refresh-policy",
+      "sha256": "e3dbabd16fb1fbc1825c5bca73b5d142e75d9d2b4465bfb1b49d439c518daac3",
+      "dependencies": []
+    },
+    {
+      "path": "script.infinity.audiopolicy/default.py",
+      "classification": "unsupported-active-writer",
+      "owner": "audio-policy",
+      "sha256": "a463f9e40b6c64aa61f1e20875e5a32dab394aaaf10637b07583bb62573766aa",
+      "dependencies": []
+    }
+  ]
+}

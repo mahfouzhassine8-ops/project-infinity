@@ -1,0 +1,231 @@
+name: Infinity | 2103261 Pro Mode Focus Only RC1
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-2103261-pro-mode-focus-only-rc1]
+    paths:
+      - '.github/workflows/infinity-2103261-pro-mode.yml'
+      - 'repairs/pro-mode-2103261/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-pro-mode-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NDK_VER: 21.4.7075529
+
+jobs:
+  pro-focus-verification:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+
+      - name: Download exact locked 2103260 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103260-Recovery-Fixed-Chooser-RC1-TEST-CANDIDATE
+          run-id: 36306734110
+          github-token: ${{ github.token }}
+          path: parent260
+
+      - name: Download exact locked 2103260 source and Recovery tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103260-Recovery-Fixed-Chooser-RC1-Evidence
+          run-id: 36306734110
+          github-token: ${{ github.token }}
+          path: source260
+
+      - name: Download prior Health tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103259-Options-Health-Glass-Finish-RC1-Evidence
+          run-id: 36305461854
+          github-token: ${{ github.token }}
+          path: source259
+
+      - name: Download prior settings tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103258-Glass-Settings-Light-Dark-RC1-Evidence
+          run-id: 36304211423
+          github-token: ${{ github.token }}
+          path: source258
+
+      - name: Download prior chooser tests
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103257-Glass-Chooser-Light-Dark-RC1-Evidence
+          run-id: 36302398518
+          github-token: ${{ github.token }}
+          path: source257
+
+      - name: Verify exact locked parent and recover source
+        run: |
+          set -euo pipefail
+          test "$(sha256sum source260/reconstructed-2103260-shell.tar.gz | cut -d' ' -f1)" = '1bd4c7184ed5f8e22d250906db1003d2c50d0f5d1e98eedc0700670a32c06c95'
+          test "$(sha256sum parent260/Infinity-2103260-Recovery-Fixed-Chooser-RC1.apk | cut -d' ' -f1)" = '294838bdccf6672884b792886b3e306b12cf1c7ef1609b37dc31bb1b50c14da3'
+          tar -xzf source260/reconstructed-2103260-shell.tar.gz
+          mkdir -p audit261
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit261/InfinityLiveActivity-before.java.in
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('parent260/Infinity-2103260-Recovery-Fixed-Chooser-RC1.apk') as z:
+              assert z.testzip() is None and len(z.namelist()) == len(set(z.namelist()))
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest() == 'c7976ce0adb45b9264f2092a27111be4e05bde4220be2b26b1ea0e2cc74f1e2d'
+              Path('engine/libinfinitycrash.so').write_bytes(z.read('lib/arm64-v8a/libinfinitycrash.so'))
+          PY
+
+      - name: Apply Focus-only Pro patch and enforce scope
+        run: |
+          set -euo pipefail
+          python3 repairs/pro-mode-2103261/apply.py --root . --evidence audit261
+          python3 repairs/pro-mode-2103261/scope_gate.py             --before audit261/InfinityLiveActivity-before.java.in             --after shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in             --out audit261/pro-scope-gate.json
+
+      - name: Prepare unchanged Android toolchain
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' "ndk;$NDK_VER" >/dev/null
+
+      - name: Compile Android interface only and permanently sign candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore"               -storepass android -keypass android -alias androiddebugkey -keyalg RSA               -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          python3 scripts/package_background_resume.py             --source shell-kodi             --base-apk parent260/Infinity-2103260-Recovery-Fixed-Chooser-RC1.apk             --build-dir build261             --out signed261 2>&1 | tee audit261/android-build.log
+
+      - name: Re-run all 28 locked UI regression tests
+        run: |
+          set -euo pipefail
+          python3 repairs/pro-mode-2103261/stage_tests.py             --build-dir build261             --source257 source257             --source258 source258             --source259 source259             --source260 source260             --evidence audit261/screenshots
+          export KODI_ANDROID_KEY_ALIAS=androiddebugkey
+          export KODI_ANDROID_KEY_PASSWORD=android
+          export KODI_ANDROID_STORE_PASSWORD=android
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build261
+          ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest             --tests com.projectinfinity.kodi.GlassChooserTest             --tests com.projectinfinity.kodi.GlassOptionsTest             --tests com.projectinfinity.kodi.GlassHealthFinishTest             --tests com.projectinfinity.kodi.RecoveryFixedTest             2>&1 | tee ../audit261/android-view-tests.log
+
+      - name: Gate publication on preservation and regressions
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,xml.etree.ElementTree as ET
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from package_background_resume import verify_bytes
+
+          parent=Path('parent260/Infinity-2103260-Recovery-Fixed-Chooser-RC1.apk')
+          apk=Path('signed261/Infinity-2103261-Pro-Mode-Focus-Only-RC1.apk')
+          kept=verify_bytes(parent,apk)
+
+          total=0
+          for name,count in [
+              ('GlassChooserTest',6),
+              ('GlassOptionsTest',7),
+              ('GlassHealthFinishTest',7),
+              ('RecoveryFixedTest',8)]:
+              path=Path('build261/xbmc/build/test-results/testReleaseUnitTest/TEST-com.projectinfinity.kodi.'+name+'.xml')
+              t=ET.parse(path).getroot()
+              assert int(t.attrib['tests'])==count,(name,t.attrib)
+              assert all(int(t.attrib.get(k,0))==0 for k in ('failures','errors','skipped')),(name,t.attrib)
+              total+=count
+          assert total==28
+
+          current=Path('audit261/screenshots')
+          locked=Path('source260/screenshots')
+          locked_names=sorted(p.name for p in locked.glob('*.png'))
+          assert len(locked_names)==20,locked_names
+          for name in locked_names:
+              assert (current/name).read_bytes()==(locked/name).read_bytes(),'Protected visual changed: '+name
+
+          source=json.loads(Path('audit261/source-verification.json').read_text())
+          scope=json.loads(Path('audit261/pro-scope-gate.json').read_text())
+          assert source['runtime_source_delta']==[
+              'tools/android/packaging/xbmc/build.gradle.in',
+              'tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in']
+          assert source['all_other_shell_files_byte_identical']==229
+          assert source['focus_internal_key_preserved']
+          assert source['focus_public_name_is_pro']
+          assert source['new_player_owner_added'] is False
+          assert source['existing_preview_player_reused']
+          assert source['existing_fullscreen_handoff_reused']
+          assert source['pro_slot_cap']==6
+          assert scope['focus_lower_renderer_byte_identical_after_entry_hook']
+          assert scope['new_exoplayer_sites']==0
+          assert scope['build_player_sites_unchanged']
+          assert scope['internal_focus_key_preserved']
+          assert scope['pro_slot_cap']==6
+          assert scope['source_swipe_inside_preview_host']
+          assert scope['fullscreen_path_unchanged']
+          assert len(scope['protected_methods_byte_identical'])==15
+
+          result=json.loads(Path('signed261/background-resume-apk-audit.json').read_text())
+          result.update(kept)
+          result.update(
+              source_verification=source,
+              pro_scope_gate=scope,
+              android_regression_test_methods=28,
+              locked_reference_renders_byte_identical=20,
+              focus_pro_scope_gate=True,
+              protected_method_bodies_unchanged=15,
+              new_player_owner=False,
+              existing_preview_player_reused=True,
+              existing_fullscreen_handoff_reused=True,
+              physical_device_verified=False,
+              live_stream_session_continuity_device_verified=False,
+              visual_approval_pending=True,
+              stable_lock=False,
+              startup_sound_integrated=False,
+              historical_startup_hang_fixed=False)
+          Path('signed261/CANDIDATE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          Path('signed261/SHA256SUMS.txt').write_text(
+              hashlib.sha256(apk.read_bytes()).hexdigest()+'  '+apk.name+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+
+      - name: Preserve exact source and evidence
+        if: always()
+        run: |
+          mkdir -p audit261
+          cp -r repairs/pro-mode-2103261 audit261/repair-source
+          if [ -d build261/xbmc/build/test-results ]; then cp -r build261/xbmc/build/test-results audit261/; fi
+          if [ -d build261/xbmc/build/reports/tests ]; then cp -r build261/xbmc/build/reports/tests audit261/test-reports; fi
+          if [ -d shell-kodi ] && [ -f engine/background-resume-source.json ]; then
+            tar -czf audit261/reconstructed-2103261-shell.tar.gz               shell-kodi engine/background-resume-source.json               scripts/package_background_resume.py scripts/infinity_background_resume.py
+          fi
+
+      - name: Publish signed PHONE TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103261-Pro-Mode-Focus-Only-RC1-TEST-CANDIDATE
+          path: signed261/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish Pro scope and regression evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103261-Pro-Mode-Focus-Only-RC1-Evidence
+          path: audit261/
+          if-no-files-found: error
+          retention-days: 90

@@ -1,0 +1,63 @@
+name: Infinity | 2103300 Direct Download Parts
+on:
+  workflow_dispatch:
+  push:
+    branches: [candidate-infinity-2103300-stale-main-task-relaunch]
+    paths:
+      - '.github/workflows/infinity-2103300-direct-download.yml'
+permissions: {contents: read, actions: read}
+jobs:
+  split-candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103300-Clean-Task-Relaunch-RC1-Candidate-and-Evidence
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37123017872
+          github-token: ${{ github.token }}
+          path: evidence3300
+      - name: Split the signed APK into downloadable parts
+        run: |
+          set -euo pipefail
+          mkdir -p chunks
+          candidate='evidence3300/candidate/Infinity-2103300-1.0.9-Clean-Task-Relaunch-RC1.apk'
+          test -f "$candidate"
+          sha256sum "$candidate" | tee chunks/Infinity-2103300-Candidate.sha256
+          split -b 12000000 -d -a 3 "$candidate" chunks/Infinity-2103300-Candidate.part-
+          test "$(find chunks -maxdepth 1 -name 'Infinity-2103300-Candidate.part-*' | wc -l)" -le 10
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-000') != '' }}
+        with: {name: Infinity-2103300-APK-Part-000, path: chunks/Infinity-2103300-Candidate.part-000, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-001') != '' }}
+        with: {name: Infinity-2103300-APK-Part-001, path: chunks/Infinity-2103300-Candidate.part-001, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-002') != '' }}
+        with: {name: Infinity-2103300-APK-Part-002, path: chunks/Infinity-2103300-Candidate.part-002, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-003') != '' }}
+        with: {name: Infinity-2103300-APK-Part-003, path: chunks/Infinity-2103300-Candidate.part-003, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-004') != '' }}
+        with: {name: Infinity-2103300-APK-Part-004, path: chunks/Infinity-2103300-Candidate.part-004, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-005') != '' }}
+        with: {name: Infinity-2103300-APK-Part-005, path: chunks/Infinity-2103300-Candidate.part-005, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-006') != '' }}
+        with: {name: Infinity-2103300-APK-Part-006, path: chunks/Infinity-2103300-Candidate.part-006, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-007') != '' }}
+        with: {name: Infinity-2103300-APK-Part-007, path: chunks/Infinity-2103300-Candidate.part-007, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-008') != '' }}
+        with: {name: Infinity-2103300-APK-Part-008, path: chunks/Infinity-2103300-Candidate.part-008, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.part-009') != '' }}
+        with: {name: Infinity-2103300-APK-Part-009, path: chunks/Infinity-2103300-Candidate.part-009, retention-days: 30}
+      - uses: actions/upload-artifact@v7
+        if: ${{ hashFiles('chunks/Infinity-2103300-Candidate.sha256') != '' }}
+        with: {name: Infinity-2103300-APK-SHA256, path: chunks/Infinity-2103300-Candidate.sha256, retention-days: 30}

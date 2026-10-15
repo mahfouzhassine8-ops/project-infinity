@@ -1,0 +1,86 @@
+name: Infinity | File Preview Native 2103375
+on:
+  push:
+    branches: [work/infinity-zip-preview-native-2103375]
+    paths:
+      - 'repairs/zip-preview-2103375/native/**'
+      - 'repairs/zip-preview-2103375/native_candidate.py'
+      - 'repairs/zip-preview-2103375/native-delta.json'
+      - 'repairs/zip-preview-2103375/native-parent-unmapped.json'
+      - 'repairs/zip-preview-2103375/test_native_preview.py'
+      - '.github/workflows/infinity-2103375-file-preview-native.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-file-preview-native-2103375, cancel-in-progress: true}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  native-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}'}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - name: Restore pinned toolchain
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 38246713743
+          name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: locked-parent
+      - name: Verify and restore exact compiler dependencies
+        run: |
+          set -euo pipefail
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev
+      - name: Reconstruct every protected source and run all inherited preservation suites
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-build
+          python3 repairs/zip-preview-2103375/native_candidate.py prepare --parent locked-parent/Cobra-2103374-Verified-Deadweight-RC1.apk 2>&1 | tee checkpoint-build/prepare-preview.log
+      - name: Compile exact File Browser preview delta
+        run: |
+          set -euo pipefail
+          python3 repairs/zip-preview-2103375/native_candidate.py compile 2>&1 | tee checkpoint-build/compile-preview.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Cobra-2103375-Zip-Preview-Native-Internal
+          path: checkpoint-build/libkodi.so
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Cobra-2103375-Zip-Preview-Native-Evidence
+          path: |
+            checkpoint-build/
+            !checkpoint-build/libkodi.so
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error

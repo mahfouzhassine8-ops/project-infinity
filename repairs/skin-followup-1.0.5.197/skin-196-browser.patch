@@ -1,0 +1,51 @@
+--- a/skin.infinity.diggz/unified/AddonBrowser.xml
++++ b/skin.infinity.diggz/unified/AddonBrowser.xml
+@@ -56,13 +56,13 @@
+       <width>13.888887%</width>
+       <label>BACK</label>
+       <onclick>PreviousMenu</onclick>
+-      <texturefocus border="16">infinity_ui/focus_trim.png</texturefocus>
++      <texturefocus border="16">infinity_polish/focus_rim.png</texturefocus>
+       <texturenofocus border="16" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">$VAR[InfinityNavTexture]</texturenofocus>
+       <font>InfinitySmall</font>
+       <align>center</align>
+       <aligny>center</aligny>
+       <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+-      <focusedcolor>FFFFFFFF</focusedcolor>
++      <focusedcolor>$VAR[InfinityDiggzPrimaryText]</focusedcolor>
+       <ondown>50</ondown>
+       <onleft>50</onleft>
+       <top>24</top>
+@@ -139,7 +139,7 @@
+           <top>3.6842%</top>
+           <width>97.1717%</width>
+           <height>92.6316%</height>
+-          <texture border="18">infinity_ui/focus_trim.png</texture>
++          <texture border="18" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">$VAR[InfinityCardTexture]</texture>
+         </control>
+         <control type="image">
+           <left>4.4444%</left>
+@@ -150,14 +150,21 @@
+           <texture fallback="DefaultAddon.png">$INFO[ListItem.Icon]</texture>
+         </control>
+         <control type="textbox">
+-          <textcolor>FFFFFFFF</textcolor>
++          <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+           <label>$INFO[ListItem.Label]</label>
+           <left>22%</left>
+           <right>6%</right>
+           <top>12</top>
+           <bottom>12</bottom>
+-          <font>InfinityBodyBold</font>
++          <font>InfinitySmall</font>
+           <autoscroll>false</autoscroll>
++        </control>
++        <control type="image">
++          <left>1.4141%</left>
++          <top>3.6842%</top>
++          <width>97.1717%</width>
++          <height>92.6316%</height>
++          <texture border="18">infinity_polish/focus_rim.png</texture>
+         </control>
+       </focusedlayout>
+       <top>228</top>

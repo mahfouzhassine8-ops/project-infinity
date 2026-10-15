@@ -1,0 +1,648 @@
+{
+  "baseline_commit": "759813fae0ac9528e021a2e16708db02f124db85",
+  "diagnostic_zip_sha256": "29cbee3023e6faed8a42858b3c9ff556db10d54449b2007d2a4c7e4dcc184c53",
+  "duration_ms": 9420,
+  "native_jobs": [
+    {
+      "actual_type": "10CLambdaJobIZN5ADDON9CAddonMgr14UpdateLastUsedERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEEE3$_6E",
+      "elapsed_ms": 99088,
+      "job_id": 345,
+      "operation": "unclassified_native_job",
+      "owner": "",
+      "phase": "completed_without_owner_receipt",
+      "token": 345,
+      "unknown": true
+    },
+    {
+      "actual_type": "16CTextureCacheJob",
+      "elapsed_ms": 98820,
+      "job_id": 348,
+      "operation": "cacheimage",
+      "owner": "",
+      "phase": "completed_without_owner_receipt",
+      "token": 348,
+      "unknown": true
+    }
+  ],
+  "owners": [
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9280,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 0,
+      "owner": "native_admission",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 7
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 5743,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "python_writer:unobserved_diagnostic_child_output",
+      "generation": 0,
+      "owner": "python_services",
+      "required_writes_finished": false,
+      "result": "FAILED",
+      "start_elapsed_ms": 3544
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 87,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "unknown_native_job_persistence_contract;10CLambdaJobIZN5ADDON9CAddonMgr14UpdateLastUsedERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEEE3$_6E;16CTextureCacheJob",
+      "generation": 0,
+      "owner": "background_jobs",
+      "required_writes_finished": false,
+      "result": "FAILED",
+      "start_elapsed_ms": 9200
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": false,
+      "dirty_before": true,
+      "dirty_remaining": false,
+      "durable_generation": 0,
+      "duration_ms": 0,
+      "elapsed_ms": 23,
+      "end_elapsed_ms": 23,
+      "error": "",
+      "generation": 0,
+      "owner": "playback",
+      "required_writes_finished": true,
+      "result": "COMMITTED",
+      "start_elapsed_ms": 23
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": false,
+      "dirty_before": true,
+      "dirty_remaining": false,
+      "durable_generation": 0,
+      "duration_ms": 9182,
+      "elapsed_ms": 9190,
+      "end_elapsed_ms": 9190,
+      "error": "",
+      "generation": 0,
+      "owner": "command_center",
+      "required_writes_finished": true,
+      "result": "COMMITTED",
+      "start_elapsed_ms": 8
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": false,
+      "dirty_before": true,
+      "dirty_remaining": false,
+      "durable_generation": 0,
+      "duration_ms": 9172,
+      "elapsed_ms": 9190,
+      "end_elapsed_ms": 9190,
+      "error": "",
+      "generation": 0,
+      "owner": "compat",
+      "required_writes_finished": true,
+      "result": "COMMITTED",
+      "start_elapsed_ms": 18
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9287,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 1861697,
+      "owner": "kodi_settings",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9287,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 25,
+      "owner": "profiles",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9287,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 2004,
+      "owner": "skin_settings",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9287,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 54514,
+      "owner": "addon_settings",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9288,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 1,
+      "owner": "favourites",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9288,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 74,
+      "owner": "peripherals",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9288,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 0,
+      "owner": "audio_policy",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9288,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 132,
+      "owner": "deferred_dialog_state",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9288,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 149,
+      "owner": "xml_files",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": true,
+      "dirty_before": false,
+      "dirty_remaining": true,
+      "durable_generation": 0,
+      "duration_ms": 9288,
+      "elapsed_ms": 0,
+      "end_elapsed_ms": 0,
+      "error": "",
+      "generation": 0,
+      "owner": "native_databases",
+      "required_writes_finished": false,
+      "result": "PENDING",
+      "start_elapsed_ms": 0
+    },
+    {
+      "checkpoint_generation": 1,
+      "dirty": false,
+      "dirty_before": false,
+      "dirty_remaining": false,
+      "durable_generation": 0,
+      "duration_ms": 8,
+      "elapsed_ms": 8,
+      "end_elapsed_ms": 8,
+      "error": "",
+      "generation": 0,
+      "owner": "pvr",
+      "required_writes_finished": true,
+      "result": "ALREADY_DURABLE",
+      "start_elapsed_ms": 0
+    }
+  ],
+  "phase": "CHECKPOINT_FAILED",
+  "python_observations": [
+    {
+      "blocking": false,
+      "count": 1,
+      "detail": "",
+      "reason": "uncaught_script_failure_before_persistence_receipt",
+      "writer": "script.cu.lrclyrics:default.py",
+      "writer_id": 20
+    },
+    {
+      "blocking": false,
+      "count": 26,
+      "detail": "",
+      "reason": "sqlite_write_failed",
+      "writer": "plugin.video.tmdbmovies:service.py",
+      "writer_id": 12
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 71
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 75
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 81
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 86
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 96
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "",
+      "reason": "unobserved_diagnostic_child_output",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "sqlite_write_failed",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_ecb.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_cbc.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_cfb.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_ofb.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_ctr.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Util__strxor.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Hash__BLAKE2s.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Hash__SHA1.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Hash__SHA256.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Hash__MD5.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__Salsa20.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Protocol__scrypt.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Util__cpuid_c.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Hash__ghash_portable.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlsym;symbol=ghash_portable",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlsym;symbol=ghash_expand_portable",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlsym;symbol=ghash_destroy_portable",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlsym;symbol=have_clmul",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_ocb.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__raw_aes.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlsym;symbol=have_aes_ni",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Cipher__chacha20.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "event=ctypes.dlopen;target=libCryptodome_Hash__poly1305.so",
+      "reason": "external_or_opaque_writer_requires_explicit_participant",
+      "writer": "plugin.video.thecrew:service.py",
+      "writer_id": 8
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 115
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 126
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 134
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 143
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 145
+    },
+    {
+      "blocking": false,
+      "count": 2,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "slyguy.pluto.tv.provider:default.py",
+      "writer_id": 149
+    },
+    {
+      "blocking": false,
+      "count": 1,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "script.trakt:default.py",
+      "writer_id": 27
+    },
+    {
+      "blocking": false,
+      "count": 3,
+      "detail": "",
+      "reason": "unraisable_python_cleanup_or_write_failure",
+      "writer": "script.extendedinfo:service.py",
+      "writer_id": 21
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "path=/data/data/com.projectinfinity.kodi/files/infinity-chooser-weather/snapshot.json.pending",
+      "reason": "script_file_identity_or_type_unconfirmed",
+      "writer": "python_services",
+      "writer_id": -1
+    },
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "path=/dev/null",
+      "reason": "script_file_identity_or_type_unconfirmed",
+      "writer": "python_services",
+      "writer_id": -1
+    }
+  ]
+}

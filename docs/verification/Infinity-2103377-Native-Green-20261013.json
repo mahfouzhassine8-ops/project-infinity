@@ -1,0 +1,106 @@
+{
+  "accepted_android_checkpoint": "12220187e6de5819651f7429bfdec43fcbaf3591",
+  "accepted_android_tests": {
+    "errors": 0,
+    "failures": 0,
+    "rerun_in_native_only_job": false,
+    "skipped": 0,
+    "tests": 274
+  },
+  "added": [
+    "xbmc/platform/android/activity/InfinityNativeActivityEntry.h"
+  ],
+  "added_global_exports": [
+    "InfinityNativeActivity_onCreate"
+  ],
+  "apk_packaged_or_signed": false,
+  "architecture": "ELF64 AArch64",
+  "artifact_receipts": [
+    {
+      "id": 11798492859,
+      "name": "Infinity-2103377-Lifecycle-Native-Internal",
+      "sha256": "ad9d41fbf2731a5e9951886f8d18d8531b02466ccd09bc83ba8a065e94eadd9f"
+    },
+    {
+      "id": 11798457885,
+      "name": "Infinity-2103377-Lifecycle-Native-Evidence",
+      "sha256": "ae5efdc2a132dd2c8023aa1fbd67b887ca0248611c2896ac9bb5229cfb28f52f"
+    }
+  ],
+  "candidate_global_exports": 71170,
+  "changed": [
+    "xbmc/platform/android/activity/android_main.cpp"
+  ],
+  "evidence_sha256": {
+    "ENGINE-PROOF.json": "5d7eda4b2ccc9c6c01b51f3b8ea651e07fc07cb9ff4749bc70a540034c251759",
+    "LIFECYCLE-NATIVE-PRESERVATION.json": "1a0febb4eaed4765734cd2d72bb22c246245f8754940ae0d73d7ae04dfdb7001",
+    "SOURCE-MANIFEST.json": "ecf337babbae90f6267ec52dbcbb838dbea5cd946e7cb6b024a5b0d9f6a707d6",
+    "compile-lifecycle.log": "7c14379d3b07d0cd76cb61f72ad2f31f585e9acd2aa81a21c720aa96c1d878dc",
+    "lifecycle-dynamic-symbols.txt": "edf7cca089609d661a44033f9ac910111cc9f380b2c8aaef42f974e28df28f79",
+    "prepare-lifecycle.log": "55b7911e7e0eb9ae0cf6092adfa58767a01e2e7d753e880cb90ec2ae30751176"
+  },
+  "full_native_engine_compiled": true,
+  "java_native_pairing": {
+    "compiled_callback_verified": true,
+    "compiled_main_sha256": "7b9dac432642cc2f75d77892c70e9aee67c2d82c9be4e8742d1512b8f5a97693",
+    "java_callback": "public boolean infinityPrepareNativeTask()",
+    "jni_descriptor": "()Z",
+    "merged_manifest_sha256": "dcc4385cd24c51c2d473afdec378d1d96ebb3e2ca6d74179eb549b804f2db0de",
+    "merged_metadata_verified": true,
+    "native_entry_metadata": "InfinityNativeActivity_onCreate",
+    "scope": "Static inspection of existing accepted Java build; no Android loading or new test execution claimed."
+  },
+  "lifecycle_source_provenance": "Saved candidate implementation remains preserved in the existing lifecycle checkpoint archive and local working tree; accepted 274-test receipt pins its 11 file hashes. This native-only job commits and compiles the unchanged matching wrapper. It does not claim the entire Java candidate was published to GitHub.",
+  "locked": false,
+  "matches_saved_274_wrapper": true,
+  "native_bytes": 620761592,
+  "native_dependencies": [
+    "libEGL.so",
+    "libGLESv2.so",
+    "libandroid.so",
+    "libc++_shared.so",
+    "libc.so",
+    "libdl.so",
+    "libjnigraphics.so",
+    "liblog.so",
+    "libm.so",
+    "libmediandk.so",
+    "libshairplay.so"
+  ],
+  "native_dependencies_unchanged": true,
+  "native_sha256": "010789ef8a58be6d5a509f200e18767edc1272923fe3ce605a7f1f9e12998f7f",
+  "native_source_commit": "62feb314b8812a64ec80e862fbc16a92e90683df",
+  "parent_global_exports": 71169,
+  "parent_native_inputs": 9391,
+  "parent_package_identity": {
+    "apk_sha256": "8e8e139929592daedb63e0e41040258d655f132fd025b236de7dee1e88b47649",
+    "candidate_apk_created": false,
+    "package": "com.projectinfinity.kodi",
+    "parent_zip_entries": 4178,
+    "permanent_signer_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "protected_parent_version": 2103376,
+    "purpose": "Pinned input for subsequent native ABI and final package preservation gates",
+    "signing_key_accessed": false,
+    "signing_schemes": {
+      "v1": true,
+      "v2": true,
+      "v3": true
+    }
+  },
+  "physical_device_verified": false,
+  "protected_skin": "1.0.5.211",
+  "remaining_gates": [
+    "Inspect requested Galaxy Fold Infinity-Playlist-Probe ZIP; identify and correct the actual blocking native operation using correlated evidence.",
+    "After correction, rerun required Android/native/persistence tests and preservation gates.",
+    "Complete integrated APK packaging and verify original permanent signer, package identity and all protected payloads.",
+    "Physical-device acceptance before any promotion or locking."
+  ],
+  "removed_global_exports": [],
+  "required_entry_exports_verified": true,
+  "run_id": 38367761382,
+  "schema": 1,
+  "scope": "Full native compilation and static ELF/preservation inspection, not Android loading or device runtime proof.",
+  "shutdown_corrected": false,
+  "shutdown_evidence_checkpoint": "608d693a0b3666eb002b655bd7c371d6b9c97674",
+  "unchanged_parent_native_inputs": 9390
+}

@@ -1,0 +1,154 @@
+name: Infinity | 2103315 Android task close over locked 3312
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103315-android-task-close]
+    paths:
+      - 'repairs/android-task-close-2103315/**'
+      - '.github/workflows/infinity-2103315-android-task-close.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103315-android-task-close
+  cancel-in-progress: false
+jobs:
+  candidate-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37397392525
+          name: Infinity-2103312-Cobra-Pro-Teams-Verification
+          github-token: ${{ github.token }}
+          path: parent3312
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37397392525
+          name: Infinity-2103312-Cobra-Pro-Teams-RC1-APK
+          github-token: ${{ github.token }}
+          path: base3312
+      - name: Verify locked source and stage Android task-removal delta
+        run: |
+          set -euo pipefail
+          mkdir -p verified3312 evidence3315 "$HOME/.android"
+          tar --no-same-owner -xzf parent3312/repaired-shell-source.tar.gz -C verified3312
+          python3 repairs/android-task-close-2103315/test_contract.py \
+            --source verified3312/shell-kodi \
+            --proof parent3312/SOURCE-PRESERVATION.json \
+            --work contract3315
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -keypass android -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname 'CN=Android Debug,O=Android,C=US'
+          python3 repairs/android-task-close-2103315/package_candidate.py prepare \
+            --source verified3312/shell-kodi \
+            --proof parent3312/SOURCE-PRESERVATION.json \
+            --base base3312/Infinity-2103312-Cobra-Pro-Teams-RC1.apk \
+            --build build3315 --out evidence3315
+      - name: Compile and test Android close coordinator
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+        run: |
+          set -euo pipefail
+          export KODI_ANDROID_STORE_FILE="$HOME/.android/debug.keystore"
+          cd build3315
+          ./gradlew --no-daemon --console=plain \
+            :xbmc:testReleaseUnitTest \
+            --tests com.projectinfinity.kodi.AndroidTaskRemoval315Test \
+            :xbmc:assembleRelease :xbmc:exportPreservationTools \
+            2>&1 | tee ../evidence3315/android-build.log
+      - name: Verify payload and permanently sign the install-over candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/android-task-close-2103315/package_candidate.py package \
+            --source verified3312/shell-kodi \
+            --proof parent3312/SOURCE-PRESERVATION.json \
+            --base base3312/Infinity-2103312-Cobra-Pro-Teams-RC1.apk \
+            --build build3315 --out evidence3315
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103315-Android-Task-Close-RC1-APK
+          path: evidence3315/Infinity-2103315-Android-Task-Close-RC1.apk
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare verified delivery parts
+        if: success()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          apk=Path('evidence3315/Infinity-2103315-Android-Task-Close-RC1.apk')
+          data=apk.read_bytes(); parts=Path('delivery3315');parts.mkdir()
+          manifest={'file':apk.name,'size':len(data),'sha256':hashlib.sha256(data).hexdigest(),'parts':[]}
+          for i,start in enumerate(range(0,len(data),24*1024*1024)):
+              piece=data[start:start+24*1024*1024];name=f'part{i:02d}'
+              (parts/name).write_bytes(piece)
+              manifest['parts'].append({'file':name,'size':len(piece),'sha256':hashlib.sha256(piece).hexdigest()})
+          assert len(manifest['parts'])<=8
+          compact=Path('compact3315');compact.mkdir()
+          (compact/'DELIVERY.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          for f in Path('evidence3315').iterdir():
+              if f.is_file() and f.suffix not in ('.apk','.so') and f.stat().st_size<24*1024*1024:
+                  shutil.copy2(f,compact/f.name)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103315-Delivery-Evidence
+          path: compact3315/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part00') != ''
+        with: {name: Infinity-2103315-Delivery-Part00, path: delivery3315/part00, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part01') != ''
+        with: {name: Infinity-2103315-Delivery-Part01, path: delivery3315/part01, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part02') != ''
+        with: {name: Infinity-2103315-Delivery-Part02, path: delivery3315/part02, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part03') != ''
+        with: {name: Infinity-2103315-Delivery-Part03, path: delivery3315/part03, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part04') != ''
+        with: {name: Infinity-2103315-Delivery-Part04, path: delivery3315/part04, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part05') != ''
+        with: {name: Infinity-2103315-Delivery-Part05, path: delivery3315/part05, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part06') != ''
+        with: {name: Infinity-2103315-Delivery-Part06, path: delivery3315/part06, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: success() && hashFiles('delivery3315/part07') != ''
+        with: {name: Infinity-2103315-Delivery-Part07, path: delivery3315/part07, compression-level: 0, retention-days: 90, if-no-files-found: error}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103315-Verification
+          path: |
+            evidence3315/
+            !evidence3315/*.apk
+            contract3315/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: warn
+

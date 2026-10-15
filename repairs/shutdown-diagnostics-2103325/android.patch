@@ -1,0 +1,163 @@
+--- a/tools/android/packaging/xbmc/src/InfinityExitCompletion.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityExitCompletion.java.in
+@@ -8,9 +8,9 @@
+ import java.util.concurrent.Executors;
+ 
+ /** Explicit power commands only. Normal close NEVER escalates to a timed kill.
+- * Pause/stop Android while Kodi still accepts lifecycle messages, THEN request
+- * Kodi's existing graceful Application.Quit. Native destruction keeps ownership
+- * of persistence and process completion. Force is a separate user command.
++ * Normal close removes the Android task; NativeActivity destruction owns native
++ * cleanup. The older stopped-then-Quit path remains for its existing callers.
++ * Diagnostic events do not change either route. Force is a separate user command.
+  */
+ final class InfinityExitCompletion {
+   static final String NORMAL = "@APP_PACKAGE@.action.CLOSE_KODI";
+@@ -148,18 +148,71 @@
+       write(app, "exit.force.userRequested");
+     } finally { terminator.run(); }
+   }
++  // Capture at the producer, before publishing lifecycle state or queuing I/O.
++  // These values are evidence only: never use them to complete/kill an owner.
++  private static final java.util.concurrent.atomic.AtomicLong eventSequence =
++      new java.util.concurrent.atomic.AtomicLong();
++  private static final String eventProcess = java.util.UUID.randomUUID().toString();
++  static final class Event {
++    final String phase, thread, process;
++    final long epochMs, elapsedNs, sequence;
++    final int pid, tid;
++    private Event(String phase) {
++      this.epochMs = System.currentTimeMillis();
++      this.elapsedNs = SystemClock.elapsedRealtimeNanos();
++      this.pid = android.os.Process.myPid();
++      this.tid = android.os.Process.myTid();
++      this.thread = token(Thread.currentThread().getName());
++      this.process = eventProcess;
++      this.sequence = eventSequence.incrementAndGet();
++      this.phase = phase;
++    }
++    static Event capture(String phase) { return new Event(phase); }
++    private static String token(String value) {
++      StringBuilder clean = new StringBuilder();
++      for (int i = 0; i < value.length() && i < 64; i++) {
++        char c = value.charAt(i);
++        clean.append((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
++            (c >= '0' && c <= '9') || c == '_' || c == '-' || c == '.' ? c : '_');
++      }
++      return clean.length() == 0 ? "unnamed" : clean.toString();
++    }
++  }
+   static void record(Context context, String phase) {
++    final Event event = Event.capture(phase);
+     InfinityKodiShutdown.publish(context,null);
+-    final Context app = context.getApplicationContext(); RECORDS.execute(() -> write(app, phase));
+-  }
+-  private static synchronized void write(Context app, String phase) {
+-    InfinityStartupTrace.mainEvent(phase);
++    final Context app = context.getApplicationContext();
++    RECORDS.execute(() -> write(app, event));
++  }
++  // Additional measurement boundaries must not publish or mutate ownership.
++  static void trace(Context context, String phase) {
++    try {
++      final Event event = Event.capture(phase);
++      final Context app = context.getApplicationContext();
++      RECORDS.execute(() -> write(app, event));
++    } catch (RuntimeException | LinkageError unavailable) {
++      // Best effort only. Do not prevent legitimate teardown if evidence fails.
++    }
++  }
++  private static void write(Context app, String phase) {
++    write(app, Event.capture(phase));
++  }
++  private static synchronized void write(Context app, Event event) {
++    final long writerStartedNs = SystemClock.elapsedRealtimeNanos();
++    InfinityStartupTrace.mainEvent(event.phase);
+     android.content.SharedPreferences prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+     String[] lines = prefs.getString("history", "").split("\n"); StringBuilder next = new StringBuilder();
+     for (int i = Math.max(0, lines.length - 23); i < lines.length; i++)
+       if (!lines[i].isEmpty()) next.append(lines[i]).append('\n');
+-    next.append(System.currentTimeMillis()).append(" elapsed=").append(SystemClock.elapsedRealtime())
+-        .append(" pid=").append(android.os.Process.myPid()).append(' ').append(phase).append('\n');
++    // Preserve the existing prefix; append versioned provenance for new readers.
++    next.append(event.epochMs).append(" elapsed=").append(event.elapsedNs / 1000000L)
++        .append(" pid=").append(event.pid).append(' ').append(event.phase)
++        .append(" event_v=2 elapsed_ns=").append(event.elapsedNs)
++        .append(" tid=").append(event.tid).append(" thread=").append(event.thread)
++        .append(" process=").append(event.process).append(" seq=").append(event.sequence)
++        .append(" writer_started_ns=").append(writerStartedNs)
++        .append(" dispatch_lag_ns=").append(Math.max(0L, writerStartedNs - event.elapsedNs))
++        .append('\n');
+     prefs.edit().putString("history", next.toString()).commit();
+     android.util.AtomicFile file=new android.util.AtomicFile(new java.io.File(app.getFilesDir(),"infinity-close-history.txt"));
+     java.io.FileOutputStream output=null;
+--- a/tools/android/packaging/xbmc/src/InfinityHealthExport.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityHealthExport.java.in
+@@ -31,6 +31,13 @@
+       manifest.put("diagnostic_files", diagnostics);
+       attach(context, zip, diagnostics, "infinity-kodi-process.json", "kodi-process-state.json", 8192);
+       attach(context, zip, diagnostics, "infinity-native-cleanup.json", "native-cleanup.json", 4096);
++      // Diagnostic evidence only: never declare clean exit from a returned
++      // scope, elapsed timeout, missing row or process.exit_requested marker.
++      manifest.put("shutdown_trace_engine", "infinity-shutdown-2103325-v1");
++      manifest.put("shutdown_trace_semantics", "Scope returned is not success. Exit requested is not process death. Missing or truncated data is unknown. Compare producer PID and session clocks.");
++      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl", "shutdown/native.jsonl", TRACE_LIMIT);
++      attachShutdown(context, zip, diagnostics, "infinity-shutdown-native.jsonl.previous", "shutdown/native.previous.jsonl", TRACE_LIMIT);
++      attachShutdown(context, zip, diagnostics, "infinity-close-history.txt", "shutdown/java-close-history.txt", 65536);
+       JSONArray records = new JSONArray();
+       manifest.put("records", records);
+       if (Build.VERSION.SDK_INT >= 30) Api30.collect(context, zip, records);
+@@ -50,6 +57,33 @@
+     row.put("available", true);
+     zip.putNextEntry(new ZipEntry(name));
+     try (java.io.InputStream bytes = input) { row.put("truncated", copyBounded(bytes, zip, limit)); }
++    zip.closeEntry();
++  }
++
++  // These are fixed, app-private diagnostic filenames, not an arbitrary file
++  // collector. No settings, credentials, provider databases or media are read.
++  private static void attachShutdown(Context context, ZipOutputStream zip, JSONArray diagnostics,
++      String sourceName, String name, int limit) throws Exception {
++    JSONObject row = new JSONObject();
++    row.put("path", name); row.put("limit_bytes", limit); row.put("available", false);
++    row.put("snapshot_only", true); diagnostics.put(row);
++    java.io.File source = new java.io.File(context.getFilesDir(), sourceName);
++    java.io.InputStream input;
++    try {
++      if (!source.isFile()) { row.put("status", "not_present"); return; }
++      // Reject symlinks and unexpected locations; retain original diagnostic files.
++      if (!source.getCanonicalFile().equals(new java.io.File(context.getFilesDir().getCanonicalFile(), sourceName))) {
++        row.put("status", "noncanonical_path_rejected"); return;
++      }
++      input = new java.io.FileInputStream(source);
++    } catch (java.io.IOException | SecurityException unavailable) {
++      row.put("status", "not_readable"); return;
++    }
++    row.put("available", true); row.put("status", "snapshot_collected_not_diagnosed");
++    zip.putNextEntry(new ZipEntry(name));
++    try (java.io.InputStream bytes = input) {
++      row.put("truncated", copyBounded(bytes, zip, limit));
++    }
+     zip.closeEntry();
+   }
+ 
+--- a/tools/android/packaging/xbmc/src/Main.java.in
++++ b/tools/android/packaging/xbmc/src/Main.java.in
+@@ -413,6 +413,7 @@
+   @Override
+   public void onDestroy()
+   {
++    InfinityExitCompletion.trace(this, "exit.androidDestroy.enter");
+     InfinityAndroidKeyboard.cancelOwner(this);
+     InfinityStartupTrace.mainEvent("main.destroy");
+     if (mInfinityResponsiveness != null) mInfinityResponsiveness.close();
+@@ -445,7 +446,9 @@
+     if (mSettingsContentObserver != null)
+       getApplicationContext().getContentResolver().unregisterContentObserver(mSettingsContentObserver);
+     try {
++      InfinityExitCompletion.trace(this, "exit.nativeActivityDestroy.enter");
+       super.onDestroy();
++      InfinityExitCompletion.trace(this, "exit.nativeActivityDestroy.returned");
+       mInfinityExitPlan.completed();
+       InfinityExitCompletion.record(this, "exit.afterNativeDestroy.returned");
+     }

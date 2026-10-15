@@ -1,0 +1,217 @@
+name: Infinity | Cobra 2103153 Audited Guide Player
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103153-guide-player-refinement]
+    paths:
+      - '.github/workflows/infinity-cobra-2103153-audited-build.yml'
+      - 'scripts/infinity_cobra_2103153_refinement.py'
+      - 'patches/cobra-2103153/**'
+      - 'tests/cobra_2103153/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103153-audited-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-update:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Check out immutable 2103152 baseline
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out exact candidate delta separately
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: refinement-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Fetch exact native engine donor
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Fetch protected user rollback APK
+        uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - name: Verify both exact APK baselines
+        run: |
+          mkdir -p background-rollback background-candidate engine preflight ui-package
+          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
+          echo '8ef45e9c54a79e2295e295ce1fcdd3430322a0049c7ff5227804c15aed6b4c57  background-rollback/Infinity-Run40-Exact-Base.apk' | sha256sum -c -
+          echo 'ff54c3f0c54fa73184319592c63be75df3e216121417789de8fcf250d93b92df  rollback2103152/background-candidate/Infinity-1.0.9-Cobra-Player-Reboot-Lock.apk' | sha256sum -c -
+      - name: Reconstruct exact protected RC3 and 2103152 presentation
+        run: |
+          bash scripts/infinity_live_app_ci_1.sh
+          mkdir -p engine/background-preimage/tools/android/packaging engine/background-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/background-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/background-preimage/cmake/scripts/android/
+          git -C kodi diff --binary -- xbmc > engine/native-before.patch
+          python3 scripts/infinity_background_resume.py --source kodi --receipt engine/background-resume-source.json
+          python3 scripts/infinity_background_control_bridge.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
+          mkdir -p engine/lifecycle-preimage/tools/android/packaging engine/lifecycle-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/lifecycle-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/lifecycle-preimage/cmake/scripts/android/
+          python3 scripts/infinity_cobra_async_lifecycle.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
+          python3 tests/infinity_background/test_async_lifecycle.py --before engine/lifecycle-preimage/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --after kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out preflight/lifecycle-races
+          base="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${RUNTIME_COMMIT}"
+          for f in infinity_1_0_9_cobra_approved_ui.py infinity_1_0_9_cobra_zip_ui_runtime.py infinity_1_0_9_cobra_zip_ui_runtime_matcher_fix.py apply_cobra_approved_ui.py; do
+            curl -fsSL "$base/scripts/$f" -o "scripts/$f"
+          done
+          python3 scripts/apply_cobra_approved_ui.py --source kodi
+          python3 scripts/infinity_cobra_ui_frontend_matcher_fix.py --source kodi
+          python3 scripts/infinity_cobra_player_presentation_fix_v2.py --source kodi
+          python3 scripts/infinity_cobra_mobile_tv_guide_views.py --source kodi
+          python3 scripts/infinity_cobra_task_exit.py --source kodi
+          python3 scripts/infinity_cobra_mobile_modernization.py --source kodi
+          python3 scripts/infinity_cobra_appearance_modes.py --source kodi
+          python3 scripts/infinity_cobra_post_2103148_polish_v2.py --source kodi
+          python3 scripts/infinity_cobra_2103150_iron_polish_v2.py --source kodi
+          python3 scripts/infinity_cobra_2103151_player_multiview_polish.py --source kodi
+          python3 scripts/infinity_cobra_2103152_player_reboot_lock.py --source kodi
+          python3 scripts/infinity_experience_chooser_simplify.py --source kodi
+          echo '3a41d3c81a15e79cc4cfa1803675225824e915e6d42e002802aff68fe43ad666  kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in' | sha256sum -c -
+          cp kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in preflight/2103152-exact-java-rollback.java.in
+          git -C kodi diff --binary -- xbmc > engine/native-after-2103152.patch
+          cmp engine/native-before.patch engine/native-after-2103152.patch
+      - name: Apply integrated refinement and execute final production algorithms
+        run: |
+          cp -a refinement-delta/patches/cobra-2103153 patches/
+          cp refinement-delta/scripts/infinity_cobra_2103153_refinement.py scripts/
+          cp -a refinement-delta/tests/cobra_2103153 tests/
+          python3 -m py_compile scripts/infinity_cobra_2103153_refinement.py tests/cobra_2103153/test_refinement.py
+          python3 scripts/infinity_cobra_2103153_refinement.py --source kodi --receipt preflight/2103153-refinement.json
+          python3 tests/cobra_2103153/test_refinement.py --before preflight/2103152-exact-java-rollback.java.in --after kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out preflight/refinement-tests
+          cp kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in preflight/2103153-final.java.in
+          git -C kodi diff --binary -- xbmc > engine/native-after-refinement.patch
+          cmp engine/native-before.patch engine/native-after-refinement.patch
+      - name: Promote Android shell version and create matching UI contract
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,xml.etree.ElementTree as ET
+          from pathlib import Path
+          RELEASE='1.0.9-Cobra-Guide-Player-Refinement'
+          VERSION=2103153
+          gradle=Path('kodi/tools/android/packaging/xbmc/build.gradle.in')
+          text=gradle.read_text()
+          assert text.count('versionCode 2103138')==1
+          assert text.count('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"')==1
+          text=text.replace('versionCode 2103138',f'versionCode {VERSION}',1).replace('versionName "1.0.9-Infinity-Lifecycle-Repair-RC3"',f'versionName "{RELEASE}"',1)
+          gradle.write_text(text)
+          receipt=Path('engine/background-resume-source.json');row=json.loads(receipt.read_text())
+          for rel in ('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in','tools/android/packaging/xbmc/src/Splash.java.in','tools/android/packaging/xbmc/build.gradle.in'):
+              if rel in row.get('files',{}):row['files'][rel]['after']=hashlib.sha256((Path('kodi')/rel).read_bytes()).hexdigest()
+          row.update(version_code=VERSION,version_name=RELEASE,locked_parent=2103152,cobra_ui_runtime=3,native_engine_unchanged=True,device_playback_verified=False)
+          receipt.write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
+          constants=Path('scripts/infinity_background_resume.py');c=constants.read_text()
+          assert c.count('VERSION_CODE = 2103138')==1
+          assert c.count("RELEASE = '1.0.9-Infinity-Lifecycle-Repair-RC3'")==1
+          constants.write_text(c.replace('VERSION_CODE = 2103138',f'VERSION_CODE = {VERSION}',1).replace("RELEASE = '1.0.9-Infinity-Lifecycle-Repair-RC3'",f"RELEASE = '{RELEASE}'",1))
+          pack=Path('scripts/package_background_resume.py');p=pack.read_text();old='Infinity-1.0.9-Infinity-Lifecycle-Repair-RC3';assert old in p;pack.write_text(p.replace(old,'Infinity-'+RELEASE))
+          root=Path('addons/script.infinity.cobra.theme');ui=json.loads((root/'resources/cobra-ui.json').read_text())
+          ui['version']='1.3.8';ui['runtime']['minimum_build']=VERSION
+          ui['performance']['preview_navigation']='persistent_player_texture_and_shell'
+          ui['views']['tv_guide'].update(hierarchical_navigation=True,duration_based_program_cells=True,epg_status_visible=True,persistent_preview=True)
+          ui['player'].update(chrome='responsive_vector_video_first',channel_drawer=True,themed_sheets=True,settings_duplicate_guide_removed=True,settings_duplicate_multiview_removed=True)
+          ui['multiview'].update(retained_player_and_texture_identity=True,orientation_reflow_without_reconnect=True,per_tile_diagnostics=True)
+          (root/'resources/cobra-ui.json').write_text(json.dumps(ui,indent=2)+'\n')
+          addon=ET.parse(root/'addon.xml');addon.getroot().set('version','1.3.8');addon.write(root/'addon.xml',encoding='utf-8',xml_declaration=True)
+          Path('preflight/rollback-pointer.json').write_text(json.dumps({'build':2103152,'commit':'cce2de3042cca22b531fa8ed9e13659c19dab8a4','run':35169846333,'artifact':10476745051,'apk_sha256':'ff54c3f0c54fa73184319592c63be75df3e216121417789de8fcf250d93b92df','device_userdata_backed_up':False},indent=2)+'\n')
+          PY
+      - name: Compile Android shell only, sign and verify original native bytes
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir refinement-build --out background-candidate
+          APK=background-candidate/Infinity-1.0.9-Cobra-Guide-Player-Refinement.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > background-candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103153' versionName='1.0.9-Cobra-Guide-Player-Refinement'" background-candidate/badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > background-candidate/signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          apk=Path('background-candidate/Infinity-1.0.9-Cobra-Guide-Player-Refinement.apk')
+          with zipfile.ZipFile(apk) as out:
+              for baseline in ('background-rollback/Infinity-Run40-Exact-Base.apk','rollback2103152/background-candidate/Infinity-1.0.9-Cobra-Player-Reboot-Lock.apk'):
+                  with zipfile.ZipFile(baseline) as old:
+                      libs=[n for n in old.namelist() if n.startswith('lib/') and not n.endswith('/')];assert libs
+                      assert set(libs)=={n for n in out.namelist() if n.startswith('lib/') and not n.endswith('/')}
+                      for name in libs:assert hashlib.sha256(old.read(name)).digest()==hashlib.sha256(out.read(name)).digest(),name
+              dex=b''.join(out.read(n) for n in out.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              for token in (b'cobra_persistent_guide_shell',b'cobra_player_channel_drawer',b'Unlock controls',b'Guide HTTP ',b'Playback details'):
+                  assert token in dex,token
+          print('PASS: same signer, version 2103153, native libraries identical to BOTH run40 and locked 2103152')
+          PY
+          sha256sum "$APK" | tee background-candidate/Infinity-1.0.9-Cobra-Guide-Player-Refinement.sha256
+      - name: Package matching UI and acceptance notes
+        run: |
+          cp -a addons/script.infinity.cobra.theme ui-package/
+          (cd ui-package && zip -q -9 -r Infinity-Cobra-UI-1.3.8.zip script.infinity.cobra.theme)
+          cat > background-candidate/READ-ME.txt <<'TXT'
+          Cobra 2103153 - Guide / Player Refinement (candidate, not locked)
+          Install Infinity-1.0.9-Cobra-Guide-Player-Refinement.apk as an Android app update.
+          The matching UI 1.3.8 ZIP is a Cobra UI package, not a substitute for the APK.
+          Protected rollback: 2103152, run 35169846333, artifact 10476745051.
+          Do not uninstall or clear app data to downgrade without a separate device-data backup.
+          Host regression tests and Android compilation do not prove real provider/device playback.
+          Acceptance: guide categories/back without reconnect; Now/Next on a known supported EPG;
+          first tap preview/second fullscreen; player channel drawer; lock/Back/unlock; PiP;
+          2 -> 3 -> 4 feeds, changing audio, removing tiles, portrait/landscape/Fold transitions.
+          For a stalled tile: hold -> Playback details. Check provider connection and decoder limits.
+          No third-party TiviMate code or graphical assets are included.
+          TXT
+      - name: Upload installable candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          path: |
+            background-candidate/
+            ui-package/Infinity-Cobra-UI-1.3.8.zip
+            preflight/2103153-refinement.json
+            preflight/refinement-tests/results.json
+            preflight/refinement-tests/results.txt
+            preflight/rollback-pointer.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve source and regression evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103153-Audited-Evidence
+          path: |
+            preflight/
+            engine/background-resume-source.json
+            engine/native-before.patch
+            engine/native-after-refinement.patch
+            patches/cobra-2103153/
+            scripts/infinity_cobra_2103153_refinement.py
+            tests/cobra_2103153/
+          if-no-files-found: warn
+          retention-days: 90

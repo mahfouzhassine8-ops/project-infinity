@@ -1,0 +1,27 @@
+name: Infinity | 2103326 source snapshot
+on:
+  push:
+    branches: [repair/infinity-cooperative-close-2103326]
+    paths: ['.github/workflows/infinity-2103326-source-snapshot.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - name: Archive immutable source and earlier cooperative patch without merging it
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot
+          git archive --format=tar.gz 235da39bec78577a7aea511225bbacacf6564f62 > snapshot/parent325-repository.tar.gz
+          git archive --format=tar.gz 5183a91b5ea49819d8beef706a80720bad1879bd repairs/shutdown-2103313 .github/workflows/infinity-2103313-shutdown.yml > snapshot/earlier-cooperative-review.tar.gz
+          sha256sum snapshot/*.tar.gz > snapshot/SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103326-Source-Snapshot
+          path: snapshot/
+          retention-days: 90
+          if-no-files-found: error

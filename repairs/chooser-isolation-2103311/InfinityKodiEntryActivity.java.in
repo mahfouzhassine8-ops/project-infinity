@@ -1,0 +1,34 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+/** Process-local preparation and ownership check before entering NativeActivity. */
+public final class InfinityKodiEntryActivity extends android.app.Activity {
+  private InfinityStartupPreparation.Ticket preparation;
+  private InfinityStartupHandoff frame;
+  private boolean dispatched;
+  private void enter(){
+    if(dispatched||isFinishing()||isDestroyed())return;
+    if(Main.MainActivity!=null && Main.infinityLiveActivity()==null){InfinityKodiShutdown.publish(this,null);finish();return;}
+    android.content.Intent target=InfinityStartupHandoff.mainIntent(this,getIntent(),Main.infinityLiveActivity()!=null);
+    dispatched=true;startActivity(target);finish();
+  }
+  @Override public void onCreate(android.os.Bundle state){
+    super.onCreate(state);setContentView(R.layout.activity_splash);
+    String token=getIntent().getStringExtra(InfinityKodiShutdown.TOKEN);
+    if(Main.MainActivity!=null && Main.infinityLiveActivity()==null){InfinityKodiShutdown.publish(this,null);finish();return;}
+    if(Main.infinityLiveActivity()!=null){enter();return;}
+    InfinityKodiShutdown.boot(this,token);
+    frame=new InfinityStartupHandoff(this,findViewById(android.R.id.content));
+    frame.enqueue(()->{
+      InfinityStartupTrace trace=new InfinityStartupTrace(this);
+      preparation=InfinityStartupPreparation.shared().subscribe(this,trace,result->{
+        if(isFinishing()||isDestroyed())return;
+        if(result.error!=null){InfinityKodiShutdown.failed(this,token,result.error);finish();return;}
+        enter();
+      });
+    });
+  }
+  @Override protected void onResume(){super.onResume();if(frame!=null)frame.resume();}
+  @Override protected void onPause(){if(frame!=null)frame.pause();super.onPause();}
+  @Override protected void onDestroy(){if(frame!=null)frame.close();if(preparation!=null)preparation.close();super.onDestroy();}
+}

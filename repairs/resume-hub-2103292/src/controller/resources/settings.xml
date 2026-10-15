@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings version="1">
+  <section id="script.infinity.commandcenter">
+    <category id="general" label="Infinity Experience">
+      <group id="1">
+        <setting id="motion_mode" type="string" label="Motion Mode"><level>0</level><default>full</default><constraints><options><option label="Full">full</option><option label="Reduced">reduced</option><option label="Off">off</option></options></constraints><control type="list" format="string"/></setting>
+        <setting id="runtime_badges" type="boolean" label="Show Runtime Status Badges"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="guardian_enabled" type="boolean" label="Crash Recovery Suggestions"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="playback_memory_enabled" type="boolean" label="Per-title Audio and Subtitle Memory"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="continue_watching_enabled" type="boolean" label="Infinity Resume Hub / Continue Watching"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="suspect_window_minutes" type="integer" label="Crash Correlation Window (minutes)"><level>1</level><default>30</default><constraints><minimum>5</minimum><maximum>180</maximum></constraints><control type="spinner" format="integer"/></setting>
+        <setting id="max_restore_points" type="integer" label="Restore Points to Keep"><level>1</level><default>5</default><constraints><minimum>2</minimum><maximum>10</maximum></constraints><control type="spinner" format="integer"/></setting>
+        <setting id="auto_ui_self_heal" type="boolean" label="Automatic Critical UI Self-Heal"><level>0</level><default>true</default><control type="toggle"/></setting>
+        <setting id="watchdog_safe_mode" type="boolean" label="Automatic Safe Mode After Repeated Incomplete Starts"><level>0</level><default>true</default><control type="toggle"/></setting>
+      </group>
+
+      <group id="2">
+        <setting id="ambient_home" type="string" label="Infinity Ambient Home"><level>0</level><default>subtle</default><constraints><options><option label="Off">off</option><option label="Subtle">subtle</option><option label="Immersive">immersive</option></options></constraints><control type="list" format="string"/></setting>
+        <setting id="playback_recovery" type="string" label="Playback Recovery"><level>0</level><default>prompt</default><constraints><options><option label="Manual retry from Command Palette">prompt</option><option label="One automatic retry after a playback error">auto</option><option label="Off">off</option></options></constraints><control type="list" format="string"/></setting>
+        <setting id="highlight_preload_enabled" type="boolean" label="Preload adjacent artwork"><level>1</level><default>true</default><control type="toggle"/></setting>
+        <setting id="source_memory_enabled" type="boolean" label="Remember successful title sources"><level>1</level><default>true</default><control type="toggle"/></setting>
+        <setting id="session_restore_enabled" type="boolean" label="Restore last browsing session"><level>0</level><default>true</default><control type="toggle"/></setting>
+      </group>
+</category>
+  </section>
+</settings>

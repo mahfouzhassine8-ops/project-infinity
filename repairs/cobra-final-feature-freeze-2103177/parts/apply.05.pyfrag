@@ -1,0 +1,70 @@
+    int current=cobraTimeshiftSeconds();for(int value:new int[]{60,120,180}){final int seconds=value;rows.addView(cobraSheetRow("health","Local rewind buffer • "+value+" sec",current==value?"Selected":"Stored in Android cache and automatically bounded",false,dark,()->{mPrefs.edit().putInt(COBRA_TIMESHIFT_SECONDS,seconds).apply();if(mCobraTimeshiftSession!=null&&mPlaying!=null)startSinglePlayer(mPlaying.primaryUrl);showCobraLiveRewindPicker();}));}
+    cobraInfoText(rows,"Smart reserve: Cobra starts eligible local-buffer playback behind the live edge so brief provider/network stalls can be absorbed. This can reduce or hide short stalls, but it cannot overcome an outage longer than the available reserve.");
+  }'''
+    text=replace_member(text,'showCobraLiveRewindPicker',rewind_new)
+
+    # Provider catch-up must not coexist with the local provider ingest connection.
+    provider=member(text,'cobraStartProviderCatchup')
+    provider=once(provider,'    if(!cobraLiveRewindEnabled()||mPlayer==null||channel==null||program==null)return;','    if(!cobraLiveRewindEnabled()||mPlayer==null||channel==null||program==null)return;\n    if(mCobraTimeshiftSession!=null)cobraStopLocalTimeshift("provider-catchup");','provider catchup one connection')
+    text=replace_member(text,'cobraStartProviderCatchup',provider)
+
+    go=member(text,'cobraGoLive')
+    go=once(go,
+'''    if(mCobraProviderCatchupActive){
+      CobraPlayerBinding binding=mCobraPlayerBindings.get(mPlayer);if(binding!=null)binding.fallback=false;
+      try{
+        mCobraProviderCatchupActive=false;mCobraLiveRewindChannel=null;
+        mPlayer.setMediaItem(mediaItem(mPlaying.primaryUrl));mPlayer.prepare();startCobraPlayer(mPlayer);
+      }catch(RuntimeException failure){toast("Could not return to live broadcast");}
+    }else if(cobraLiveWindowSeekable()){''',
+'''    if(mCobraProviderCatchupActive){
+      CobraPlayerBinding binding=mCobraPlayerBindings.get(mPlayer);if(binding!=null)binding.fallback=false;
+      mCobraProviderCatchupActive=false;mCobraLiveRewindChannel=null;
+      if(cobraShouldUseLocalTimeshift(mPlaying,mPlaying.primaryUrl)){startSinglePlayer(mPlaying.primaryUrl);return;}
+      try{mPlayer.setMediaItem(mediaItem(mPlaying.primaryUrl));mPlayer.prepare();startCobraPlayer(mPlayer);}
+      catch(RuntimeException failure){toast("Could not return to live broadcast");}
+    }else if(cobraLiveWindowSeekable()){''','go live local buffer restore')
+    text=replace_member(text,'cobraGoLive',go)
+
+    # Preview/multiview promotion starts the local fallback only when the user enabled rewind.
+    promote=member(text,'promoteCobraPreviewToFullscreen')
+    promote=once(promote,'    if(mPlayer!=null&&mPlaying!=null&&channel.id.equals(mPlaying.id))return;','    if(mPlayer!=null&&mPlaying!=null&&channel.id.equals(mPlaying.id))return;\n    if(cobraShouldUseLocalTimeshift(channel,channel.primaryUrl)){stopCobraPreviewPlayerOnly();playChannel(channel);return;}\n    cobraRememberChannelTransition(channel);','preview local-timeshift promotion')
+    text=replace_member(text,'promoteCobraPreviewToFullscreen',promote)
+
+    multi=member(text,'multiToSingle')
+    multi=once(multi,'    ExoPlayer session=tile.player;Channel channel=tile.channel;tile.player=null;','    ExoPlayer session=tile.player;Channel channel=tile.channel;tile.player=null;\n    cobraRememberChannelTransition(channel);','multiview last-channel transition')
+    multi=once(multi,'    mPlaying=channel;mPlayingIndex=mChannels.indexOf(channel);openPlayerOverlay(channel);mPlayer=session;','    mPlaying=channel;mPlayingIndex=mChannels.indexOf(channel);openPlayerOverlay(channel);\n    if(cobraShouldUseLocalTimeshift(channel,channel.primaryUrl)){cobraDisposePlayer(session);mPlayer=null;startSinglePlayer(channel.primaryUrl);return;}\n    mPlayer=session;','multiview local-timeshift promotion')
+    text=replace_member(text,'multiToSingle',multi)
+
+    # If a local-buffer session is transferred to preview, let it live; when preview itself stops, tear it down.
+    stopprev=member(text,'stopCobraPreviewPlayerOnly')
+    stopprev=once(stopprev,'    mCobraPreviewGeneration++;cobraDisposePlayer(previous);','    mCobraPreviewGeneration++;cobraDisposePlayer(previous);\n    if(previous!=null&&previous==mCobraTimeshiftPlayer)cobraStopLocalTimeshift("preview-stop");','preview timeshift cleanup')
+    text=replace_member(text,'stopCobraPreviewPlayerOnly',stopprev)
+
+    # Player close owns local timeshift cleanup and refresh ownership restoration.
+    close=member(text,'closePlayer')
+    close=once(close,'    releaseSinglePlayer();','    releaseSinglePlayer();cobraStopLocalTimeshift("player-close");', 'player close timeshift')
+    close=once(close,'    mMain.post(this::cobraApplySystemBarsForSurface);','    mMain.post(this::cobraApplySystemBarsForSurface);cobraApplyDisplayPerformance("player-close");')
+    text=replace_member(text,'closePlayer',close)
+
+    # Player-open and multi-view yield UI refresh control to video cadence.
+    openp=member(text,'openPlayerOverlay')
+    openp=once(openp,'    cobraBuildPlayerChrome();mPlayerOverlay.post(()->{cobraBuildPlayerChrome();cobraLayoutPlayerPanels();});scheduleChromeHide();','    cobraBuildPlayerChrome();mPlayerOverlay.post(()->{cobraBuildPlayerChrome();cobraLayoutPlayerPanels();});scheduleChromeHide();cobraApplyDisplayPerformance("player-open");')
+    text=replace_member(text,'openPlayerOverlay',openp)
+    openm=member(text,'openMultiView')
+    # Anchor at established device bridge callback to avoid changing setup order.
+    if 'mDeviceBridge.onPlaybackChanged("multiview-start")' in openm:
+        openm=once(openm,'    if(mDeviceBridge!=null)mDeviceBridge.onPlaybackChanged("multiview-start");','    if(mDeviceBridge!=null)mDeviceBridge.onPlaybackChanged("multiview-start");\n    cobraApplyDisplayPerformance("multiview-open");')
+        text=replace_member(text,'openMultiView',openm)
+    relm=member(text,'releaseMulti')
+    if 'mDeviceBridge.onPlaybackChanged("multiview-close")' in relm:
+        relm=once(relm,'    if(mDeviceBridge!=null)mDeviceBridge.onPlaybackChanged("multiview-close");','    if(mDeviceBridge!=null)mDeviceBridge.onPlaybackChanged("multiview-close");\n    cobraApplyDisplayPerformance("multiview-close");')
+        text=replace_member(text,'releaseMulti',relm)
+
+    # Last-channel button + timeshift scrubber in the already-approved player chrome.
+    chrome=member(text,'cobraBuildPlayerChrome')
+    chrome=once(chrome,
+'''    TextView title=cobraText(mPlaying==null?"Cobra Live":mPlaying.name,vtheme().color("cobra.cobraBuildPlayerChrome.colors.4",Color.WHITE),15);title.setTag("cobra_player_channel_title");title.setTypeface(vtheme().font("cobra.cobraBuildPlayerChrome.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));title.setSingleLine(true);title.setPadding(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.7",8)),0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.8",8)),0);header.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.9",48)),1));
+    header.addView(cobraIcon(mPlaying!=null&&mFavorites.contains(mPlaying.id)?"favorite_on":"favorite","Favorite",true,v->{if(mPlaying!=null){toggleFavorite(mPlaying);((CobraIconButton)v).icon(mFavorites.contains(mPlaying.id)?"favorite_on":"favorite");}}),new LinearLayout.LayoutParams(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.10",48)),dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.11",48))));''',
+'''    TextView title=cobraText(mPlaying==null?"Cobra Live":mPlaying.name,vtheme().color("cobra.cobraBuildPlayerChrome.colors.4",Color.WHITE),15);title.setTag("cobra_player_channel_title");title.setTypeface(vtheme().font("cobra.cobraBuildPlayerChrome.styles.1",Typeface.create("sans-serif-medium",Typeface.NORMAL)));title.setSingleLine(true);title.setPadding(dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.7",8)),0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.8",8)),0);header.addView(title,new LinearLayout.LayoutParams(0,dp(vtheme().dimension("cobra.cobraBuildPlayerChrome.dimensions.9",48)),1));
+    mCobraLastChannelButton=cobraIcon("recent","Last channel",true,v->cobraTuneLastChannel());mCobraLastChannelButton.setTag("cobra_last_channel");cobraUpdateLastChannelButton();header.addView(mCobraLastChannelButton,new LinearLayout.LayoutParams(dp(46),dp(46)));

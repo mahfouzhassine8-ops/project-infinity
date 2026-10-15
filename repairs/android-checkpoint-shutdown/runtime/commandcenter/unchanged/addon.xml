@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.commandcenter" name="Infinity Command Center" version="0.3.5.19" provider-name="Project Infinity">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="default.py"/>
+  <extension point="xbmc.python.pluginsource" library="plugin.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py" start="startup"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Infinity runtime-aware Command Center, stability guard and diagnostics hub.</summary>
+    <description lang="en_GB">Infinity Resume Hub 2 extends the existing local progress store with watched history, Watched/Unwatched, Watchlist, Collection, ratings, custom lists, Infinity Movies and Infinity TV routes, plus the existing Experience features. Trakt remains optional. Extends the existing progress, audio/subtitle memory, guardian and display controllers. Native Cobra and Kodi playback ownership are preserved.</description>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+      <assets><icon>resources/icon.png</icon></assets>
+  </extension>
+</addon>

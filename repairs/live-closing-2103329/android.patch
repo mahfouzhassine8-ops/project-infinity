@@ -1,0 +1,392 @@
+--- a/cmake/scripts/android/Install.cmake
++++ b/cmake/scripts/android/Install.cmake
+@@ -40,6 +40,8 @@
+                                  src/InfinityCloseGuardService.java
+                                  src/InfinityCloseNativeLease.java
+                   src/InfinityPowerControlActivity.java
++                  src/InfinityCloseProgress.java
++                  src/InfinityClosingActivity.java
+                   src/InfinityPowerMenuRoutes.java
+                   src/InfinityKodiShutdown.java
+                   src/InfinityKodiEntryActivity.java
+--- a/tools/android/packaging/xbmc/AndroidManifest.xml.in
++++ b/tools/android/packaging/xbmc/AndroidManifest.xml.in
+@@ -163,6 +163,12 @@
+         <activity android:name=".InfinityPowerControlActivity" android:process=":kodi"
+             android:exported="false" android:excludeFromRecents="true"
+             android:noHistory="true" android:theme="@android:style/Theme.NoDisplay" />
++        <activity android:name=".InfinityClosingActivity"
++            android:exported="false" android:excludeFromRecents="true"
++            android:noHistory="true" android:launchMode="singleTop"
++            android:resizeableActivity="true" android:taskAffinity="@APP_PACKAGE@.closing"
++            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize|density|fontScale|uiMode"
++            android:theme="@android:style/Theme.Material.Light.Dialog.NoActionBar" />
+         <service android:name=".InfinityCloseGuardService"
+             android:exported="false" android:stopWithTask="false"
+             android:foregroundServiceType="shortService" />
+--- a/tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityCloseGuardService.java.in
+@@ -24,6 +24,8 @@
+   private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityCloseGuard");t.setDaemon(true);return t;});
+   private boolean binding,ended;
+   private Session session;
++  private InfinityCloseProgress.Reader progress;
++  private String lastPresentation="";
+   static final class Session {
+     final String ticket,owner;final int pid;final long started;
+     Session(String ticket,String owner,int pid,long started){this.ticket=ticket;this.owner=owner;this.pid=pid;this.started=started;}
+@@ -74,6 +76,9 @@
+     }
+     if(next==null){stopSelf(startId);return START_NOT_STICKY;}
+     session=next;
++    progress=new InfinityCloseProgress.Reader(getFilesDir(),next.pid,next.started);
++    InfinityCloseProgress.display=new InfinityCloseProgress.Display(next.pid,next.owner,next.started,
++        "preparing","Preparing shutdown",false);
+     try {
+       NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+       if(Build.VERSION.SDK_INT>=26){
+@@ -84,17 +89,10 @@
+         channel.enableLights(false);
+         manager.createNotificationChannel(channel);
+       }
+-      Intent open=new Intent(this,Splash.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+-      int pending=PendingIntent.FLAG_UPDATE_CURRENT|(Build.VERSION.SDK_INT>=23?PendingIntent.FLAG_IMMUTABLE:0);
+-      Notification.Builder builder=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL):new Notification.Builder(this);
+-      if(Build.VERSION.SDK_INT<26)builder.setPriority(Notification.PRIORITY_HIGH);
+-      Notification notice=builder.setSmallIcon(R.drawable.notif_icon).setContentTitle("Closing Infinity…")
+-          .setContentText("Saving state and finishing cleanup")
+-          .setSubText("Saving • Services • Scripts • Cleanup")
+-          .setProgress(0,0,true).setOngoing(true).setOnlyAlertOnce(true)
+-          .setCategory(Notification.CATEGORY_PROGRESS).setVisibility(Notification.VISIBILITY_PUBLIC)
+-          .setColor(0xFF39BEE8)
+-          .setContentIntent(PendingIntent.getActivity(this,NOTICE,open,pending)).build();
++      Notification notice=notice("Preparing shutdown");
++      if(Build.VERSION.SDK_INT>=24&&!manager.areNotificationsEnabled())evidence("ui.notifications_disabled");
++      if(Build.VERSION.SDK_INT>=26&&manager.getNotificationChannel(CHANNEL).getImportance()==NotificationManager.IMPORTANCE_NONE)
++        evidence("ui.channel_disabled");
+       if(Build.VERSION.SDK_INT>=34)startForeground(NOTICE,notice,ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE);
+       else if(Build.VERSION.SDK_INT>=29)startForeground(NOTICE,notice,0);
+       else startForeground(NOTICE,notice);
+@@ -106,15 +104,43 @@
+     }catch(RuntimeException denied){end("guard.unavailable_"+denied.getClass().getSimpleName());}
+     return START_NOT_STICKY;
+   }
++  private Notification notice(String message){
++    Intent open=InfinityClosingActivity.intent(this,session.pid,session.owner,session.started);
++    int pending=PendingIntent.FLAG_UPDATE_CURRENT|(Build.VERSION.SDK_INT>=23?PendingIntent.FLAG_IMMUTABLE:0);
++    Notification.Builder builder=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL):new Notification.Builder(this);
++    if(Build.VERSION.SDK_INT<26)builder.setPriority(Notification.PRIORITY_HIGH);
++    // Do not let Android's normal foreground-service display deferral hide a short close.
++    if(Build.VERSION.SDK_INT>=31)builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
++    return builder.setSmallIcon(R.drawable.notif_icon).setContentTitle("Closing Infinity...")
++        .setContentText(message).setSubText("Live shutdown status")
++        .setProgress(0,0,true).setOngoing(true).setOnlyAlertOnce(true)
++        .setUsesChronometer(true).setShowWhen(true)
++        .setWhen(System.currentTimeMillis()-Math.max(0,SystemClock.elapsedRealtime()-session.started))
++        .setCategory(Notification.CATEGORY_PROGRESS).setVisibility(Notification.VISIBILITY_PUBLIC)
++        .setColor(0xFF39BEE8)
++        .setContentIntent(PendingIntent.getActivity(this,NOTICE,open,pending)).build();
++  }
+   private final Runnable poll=new Runnable(){public void run(){
+     if(ended||session==null)return;
+     final Session target=session;
+     worker.execute(()->{
+       Boolean alive=null;
+       try{alive=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}catch(IOException unknown){}
++      try{progress.read(SystemClock.elapsedRealtimeNanos());}catch(RuntimeException unavailable){}
++      final InfinityCloseProgress.Phase phase=progress.current();
++      final String note=progress.note();
+       final Boolean result=alive;
+       ui.post(()->{
+         if(ended||session!=target)return;
++        InfinityCloseProgress.display=new InfinityCloseProgress.Display(target.pid,target.owner,target.started,
++            phase.name,progress.limited?"Last reported: "+phase.text:phase.text,false);
++        String presentation=phase.name+"|"+phase.text+"|"+note;
++        if(!presentation.equals(lastPresentation)){
++          lastPresentation=presentation;
++          try{((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(NOTICE,notice(phase.text));}
++          catch(RuntimeException denied){evidence("ui.notification_update_unavailable");}
++          evidence("ui.stage."+phase.name);
++        }
+         if(Boolean.FALSE.equals(result)){end("guard.owner_lease_released_not_a_clean_exit_verdict");return;}
+         ui.postDelayed(poll,500);
+       });
+@@ -136,6 +162,8 @@
+   }
+   private void end(String reason){
+     if(ended)return;ended=true;
++    if(session!=null)InfinityCloseProgress.display=new InfinityCloseProgress.Display(session.pid,session.owner,
++        session.started,"unconfirmed","Checking shutdown completion",true);
+     evidence(reason);ui.removeCallbacksAndMessages(null);
+     if(binding){binding=false;try{unbindService(connection);}catch(RuntimeException ignored){}}
+     // Stop only our temporary lease service, not the app, playback or databases.
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/InfinityCloseProgress.java.in
+@@ -0,0 +1,126 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++package @APP_PACKAGE@;
++
++import java.io.*;
++import java.nio.charset.StandardCharsets;
++import java.util.*;
++import org.json.JSONObject;
++
++/** Read-only presentation of the existing 2103327 trace. Never owns shutdown,
++ * advances by a timer, calls Kodi, or treats a returned span as a clean exit. */
++final class InfinityCloseProgress {
++  static final String ENGINE="infinity-shutdown-2103327-v1";
++  static final String FILE="infinity-shutdown-native.jsonl.critical";
++  static final int MAX_LINE=8192, MAX_READ=128*1024, MAX_SPANS=1024;
++  static volatile Display display;
++  static final class Display {
++    final int pid; final String owner,stage,message; final long started; final boolean ended;
++    Display(int p,String o,long s,String st,String m,boolean e){pid=p;owner=o;started=s;stage=st;message=m;ended=e;}
++    boolean matches(int p,String o){return p==pid&&owner.equals(o);}
++  }
++  static final class Phase {
++    final String name,text; final int importance;
++    Phase(String n,String t,int i){name=n;text=t;importance=i;}
++  }
++  static Phase phase(String name) {
++    if(name.equals("pre.save_settings")||name.equals("pre.save_skin")||
++       name.equals("stop.save_settings")||name.equals("stop.save_skin"))
++      return new Phase("saving","Saving settings and session state",4);
++    if(name.equals("stop.close_player")||name.equals("cleanup.stop_playing"))
++      return new Phase("playback","Stopping playback",4);
++    if(name.equals("pre.stop_services")||name.equals("stop.services")||name.startsWith("services.stop"))
++      return new Phase("services","Stopping add-on services",3);
++    if(name.startsWith("scripts.")||name.startsWith("python.runtime")||
++       name.equals("pre.stop_scripts")||name.equals("stop.scripts")||name.equals("cleanup.scripts_uninitialize"))
++      return new Phase("scripts","Finishing scripts",4);
++    if(name.equals("stop.cancel_jobs")||name.equals("pre.begin_job_shutdown"))
++      return new Phase("jobs","Finishing background work",4);
++    if(name.equals("stop.audio_engine"))return new Phase("audio","Releasing audio",4);
++    if(name.equals("stop.network")||name.equals("stop.vfs_disconnect"))
++      return new Phase("network","Closing connections",4);
++    if(name.startsWith("cleanup.")||name.equals("application.cleanup")||name.equals("application.stop"))
++      return new Phase("cleanup","Cleaning up application resources",1);
++    if(name.equals("android.environment_teardown")||name.equals("android.native_destroy"))
++      return new Phase("closing","Finishing native cleanup",2);
++    if(name.equals("application.pre_destroy"))return new Phase("preparing","Preparing shutdown",0);
++    return null;
++  }
++  static final class Span {
++    final long at,seq;final Phase phase;
++    Span(long a,long s,Phase p){at=a;seq=s;phase=p;}
++  }
++  static final class Reader {
++    final int pid; final long earliestNs; final File file;
++    long offset,session=-1,lastBoot=-1; boolean exitRequested,limited,invalid;
++    String header="",status="Waiting for live shutdown status";
++    final LinkedHashMap<Long,Span> active=new LinkedHashMap<>();
++    final ByteArrayOutputStream partial=new ByteArrayOutputStream();
++    final HashSet<Long> seen=new HashSet<>(),finished=new HashSet<>();
++    boolean dropLine;
++    Reader(File directory,int pid,long startedMs){this.file=new File(directory,FILE);this.pid=pid;earliestNs=startedMs*1000000L;}
++    void read(long nowNs) {
++      try(RandomAccessFile input=new RandomAccessFile(file,"r")) {
++        // Reopen each poll so rotation cannot leave us following an old inode.
++        String first=readHeader(input);
++        if(!first.equals(header)||input.length()<offset){reset();header=first;}
++        if(first.isEmpty())return;
++        input.seek(offset);
++        byte[] bytes=new byte[MAX_READ];int count=input.read(bytes);
++        if(count<=0)return;
++        offset+=count;
++        for(int i=0;i<count;i++){
++          int b=bytes[i]&255;
++          if(b==10){
++            if(!dropLine&&partial.size()>0) accept(new String(partial.toByteArray(),StandardCharsets.UTF_8),nowNs);
++            partial.reset();dropLine=false;
++          }else if(!dropLine){
++            if(partial.size()>=MAX_LINE){partial.reset();dropLine=true;invalid=true;}
++            else partial.write(b);
++          }
++        }
++      }catch(IOException|SecurityException unavailable){status="Live status temporarily unavailable";}
++    }
++    private static String readHeader(RandomAccessFile in)throws IOException{
++      ByteArrayOutputStream line=new ByteArrayOutputStream();int b;
++      while(line.size()<=MAX_LINE&&(b=in.read())>=0){if(b==10)return new String(line.toByteArray(),StandardCharsets.UTF_8);line.write(b);}
++      return ""; // a partial first line is not yet an event
++    }
++    private void reset(){offset=0;session=-1;lastBoot=-1;exitRequested=false;limited=false;invalid=false;active.clear();seen.clear();finished.clear();partial.reset();dropLine=false;}
++    void accept(String line,long nowNs){
++      try{
++        JSONObject row=new JSONObject(line);
++        if(row.optInt("schema",-1)!=1||row.optInt("pid",-1)!=pid)return;
++        String kind=row.optString("kind"),name=row.optString("phase");
++        long origin=row.optLong("session_start_ns",-1),at=row.optLong("boot_ns",-1),seq=row.optLong("seq",-1);
++        if(origin<earliestNs||origin>nowNs+1000000000L||at<origin||at>nowNs+1000000000L||seq<0)return;
++        if(name.equals("capture.begin")&&kind.equals("milestone")&&ENGINE.equals(row.optString("engine"))&&seq==0){
++          if(session<0){session=origin;status="Preparing shutdown";}else if(session!=origin)return;
++        }
++        if(session!=origin)return;
++        if(name.equals("capture.event_limit")){limited=true;return;}
++        if(!ENGINE.equals(row.optString("engine")))return;
++        if(seen.size()>=2048){limited=true;return;}
++        if(!seen.add(seq))return;
++        lastBoot=Math.max(lastBoot,at);status="Live shutdown status";
++        if(kind.equals("milestone")&&name.equals("process.exit_requested")){exitRequested=true;return;}
++        long span=row.optLong("span_id",0);
++        if(kind.equals("end")){active.remove(span);if(span>0)finished.add(span);return;}
++        Phase p=phase(name);
++        if(kind.equals("begin")&&span>0&&p!=null&&!finished.contains(span)){
++          if(active.size()>=MAX_SPANS){limited=true;return;}
++          active.put(span,new Span(at,seq,p));
++        }
++      }catch(Exception malformed){invalid=true;}
++    }
++    Phase current(){
++      if(exitRequested)return new Phase("closing","Waiting for Kodi to exit",2);
++      Span best=null;
++      for(Span s:active.values()) if(best==null||s.phase.importance>best.phase.importance||
++          (s.phase.importance==best.phase.importance&&(s.at>best.at||(s.at==best.at&&s.seq>best.seq))))best=s;
++      if(best!=null)return best.phase;
++      return new Phase("waiting",session<0?status:"Finishing shutdown",0);
++    }
++    String note(){return limited?"Last recorded stage - trace limit reached":invalid?"Partial trace - showing available status":status;}
++  }
++  private InfinityCloseProgress(){}
++}
+--- /dev/null
++++ b/tools/android/packaging/xbmc/src/InfinityClosingActivity.java.in
+@@ -0,0 +1,120 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++package @APP_PACKAGE@;
++
++import android.app.Activity;
++import android.content.*;
++import android.content.res.*;
++import android.graphics.*;
++import android.graphics.drawable.*;
++import android.os.*;
++import android.view.*;
++import android.widget.*;
++
++/** Small, non-modal-to-shutdown Android presentation in the DEFAULT process.
++ * No Kodi calls, service starts, stop requests, native loading or completion writes.
++ * Back only hides the card; actual shutdown and its independent notification continue. */
++public final class InfinityClosingActivity extends Activity {
++  private static final String START="ui_close_started";
++  private final Handler ui=new Handler(Looper.getMainLooper());
++  private int pid;private String owner;private long started;
++  private TextView stage,elapsed,hint;
++  private ProgressBar progress;
++  private InfinityKodiShutdown.Watch watch;
++  private boolean observedOwner;
++  static Intent intent(Context context,int pid,String owner,long started){
++    return new Intent(context,InfinityClosingActivity.class)
++        .putExtra(InfinityKodiShutdown.PID,pid).putExtra(InfinityKodiShutdown.OWNER,owner)
++        .putExtra(START,started)
++        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_NO_ANIMATION);
++  }
++  static boolean valid(Intent intent,long now){
++    if(intent==null)return false;
++    String token=intent.getStringExtra(InfinityKodiShutdown.OWNER);
++    long at=intent.getLongExtra(START,-1);
++    return intent.getIntExtra(InfinityKodiShutdown.PID,-1)>0&&token!=null&&
++        token.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")&&
++        at>=0&&now>=at&&now-at<=InfinityCloseGuardService.MAX_PROTECTION_MS;
++  }
++  @Override protected void onCreate(Bundle saved){
++    super.onCreate(saved);
++    if(!valid(getIntent(),SystemClock.elapsedRealtime())){finish();return;}
++    pid=getIntent().getIntExtra(InfinityKodiShutdown.PID,-1);
++    owner=getIntent().getStringExtra(InfinityKodiShutdown.OWNER);
++    started=getIntent().getLongExtra(START,-1);
++    setFinishOnTouchOutside(false);
++    render();
++    watch=new InfinityKodiShutdown.Watch(this,state->{
++      if(state.pid==pid&&owner.equals(state.owner)){
++        observedOwner=true;
++        // This is only UI dismissal. Existing owner/receipt code decides clean vs unclean.
++        if(!state.alive)finish();
++      }else if(observedOwner&&state.pid>0){finish();}
++    });
++    ui.post(tick);
++  }
++  private int dp(float n){return Math.round(n*getResources().getDisplayMetrics().density);}
++  private TextView label(String text,int size,int color,boolean bold){
++    TextView v=new TextView(this);v.setText(text);v.setTextSize(size);v.setTextColor(color);
++    v.setTypeface(Typeface.create(bold?"sans-serif-medium":"sans-serif",Typeface.NORMAL));
++    v.setIncludeFontPadding(false);return v;
++  }
++  private void render(){
++    boolean dark=(getResources().getConfiguration().uiMode&Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES;
++    int ink=dark?0xFFF3F7FF:0xFF102A43,muted=dark?0xFFBECFE0:0xFF455E73;
++    int accent=dark?0xFF47C9EE:0xFF087DA4;
++    LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);
++    body.setPadding(dp(20),dp(18),dp(20),dp(18));
++    GradientDrawable glass=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
++        dark?new int[]{0xFA142334,0xFA081321}:new int[]{0xFAF7FBFF,0xFAE7F3FC});
++    glass.setCornerRadius(dp(20));glass.setStroke(dp(1),dark?0xFF285B78:0xFF9DCDE5);
++    body.setBackground(glass);body.setElevation(dp(8));
++    LinearLayout title=new LinearLayout(this);title.setGravity(Gravity.CENTER_VERTICAL);
++    TextView mark=label("\u221e",34,accent,false);
++    title.addView(mark,new LinearLayout.LayoutParams(dp(46),dp(38)));
++    TextView heading=label("CLOSING INFINITY...",18,ink,true);
++    title.addView(heading,new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,1));
++    body.addView(title);
++    stage=label("Preparing shutdown",17,ink,true);stage.setPadding(0,dp(16),0,dp(7));
++    stage.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);body.addView(stage);
++    hint=label("Please wait while your session closes safely.",13,muted,false);
++    body.addView(hint);
++    progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
++    boolean animate=Build.VERSION.SDK_INT<26||android.animation.ValueAnimator.areAnimatorsEnabled();
++    progress.setIndeterminate(animate);progress.setIndeterminateTintList(ColorStateList.valueOf(accent));
++    if(!animate)progress.setVisibility(View.GONE);
++    LinearLayout.LayoutParams bar=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,dp(8));
++    bar.topMargin=dp(15);bar.bottomMargin=dp(12);body.addView(progress,bar);
++    elapsed=label("Live shutdown status",12,muted,false);body.addView(elapsed);
++    ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.addView(body);
++    setContentView(scroll);
++    Window window=getWindow();window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
++    window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
++    window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
++    WindowManager.LayoutParams params=window.getAttributes();
++    params.gravity=Gravity.BOTTOM|Gravity.END;params.x=dp(12);params.y=dp(20);
++    params.width=Math.max(1,Math.min(dp(420),getResources().getDisplayMetrics().widthPixels-dp(24)));
++    body.measure(View.MeasureSpec.makeMeasureSpec(params.width,View.MeasureSpec.EXACTLY),
++        View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));
++    params.height=Math.max(1,Math.min(body.getMeasuredHeight(),getResources().getDisplayMetrics().heightPixels-dp(40)));
++    params.windowAnimations=0;window.setAttributes(params);
++  }
++  private final Runnable tick=new Runnable(){public void run(){
++    if(isFinishing()||isDestroyed())return;
++    long seconds=Math.max(0,(SystemClock.elapsedRealtime()-started)/1000);
++    InfinityCloseProgress.Display state=InfinityCloseProgress.display;
++    if(state!=null&&state.matches(pid,owner)){
++      String message=state.ended?"Waiting for shutdown confirmation":state.message;
++      if(!message.contentEquals(stage.getText()))stage.setText(message);
++      if(state.ended)hint.setText("If this persists, open Health Center from the chooser.");
++    }else if(seconds>=10){
++      stage.setText("Waiting for live shutdown status");
++      hint.setText("No completion has been confirmed. Back hides this card.");
++    }
++    String clock="Live shutdown status  |  "+seconds+" s elapsed";
++    if(!clock.contentEquals(elapsed.getText()))elapsed.setText(clock);
++    // Only elapsed time changes here. No timer changes the reported native stage.
++    ui.postDelayed(this,250);
++  }};
++  @Override public void onConfigurationChanged(Configuration config){super.onConfigurationChanged(config);render();}
++  @Override protected void onDestroy(){ui.removeCallbacksAndMessages(null);if(watch!=null)watch.close();super.onDestroy();}
++}
+--- a/tools/android/packaging/xbmc/src/InfinityPowerControlActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityPowerControlActivity.java.in
+@@ -9,7 +9,14 @@
+       String action = getIntent() == null ? null : getIntent().getAction();
+       Main owner = Main.MainActivity;
+       if (InfinityExitCompletion.NORMAL.equals(action)) {
+-        if (!InfinityExitCompletion.requestNormal(owner))
++        long started=android.os.SystemClock.elapsedRealtime();
++        boolean accepted=InfinityExitCompletion.requestNormal(owner);
++        if(accepted){
++          // Presentation only: never delay quit or place it behind the UI card.
++          try{startActivity(InfinityClosingActivity.intent(this,android.os.Process.myPid(),
++              InfinityKodiShutdown.localOwnerToken(),started));}catch(RuntimeException unavailable){}
++        }
++        if (!accepted)
+           android.widget.Toast.makeText(this, "Infinity could not begin a normal close. Nothing was force-stopped.", android.widget.Toast.LENGTH_LONG).show();
+       } else if (InfinityExitCompletion.FORCE.equals(action)) {
+         if(InfinityKodiShutdown.expected(getIntent()) && (!getIntent().hasExtra(InfinityKodiShutdown.OWNER) ||

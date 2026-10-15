@@ -1,0 +1,93 @@
+
+  // 2103270 — Cobra Sports Hub. Sports intelligence only; existing player/provider/Multi-View owners stay authoritative.
+  private static final String COBRA_OWNER_SPORTS="sports";
+  private static final String COBRA_SPORTS_FAVORITES="cobra_sports_favorite_teams";
+  private static final String COBRA_SPORTS_LEAGUES="cobra_sports_enabled_leagues";
+  private static final String COBRA_SPORTS_HIDE_SCORES="cobra_sports_hide_scores";
+  private static final String COBRA_SPORTS_MULTI_OVERLAY="cobra_sports_multiview_overlay";
+  private static final long COBRA_SPORTS_LIVE_REFRESH_MS=45000L;
+  private static final long COBRA_SPORTS_IDLE_REFRESH_MS=5L*60L*1000L;
+  private static final long COBRA_SPORTS_STALE_MS=2L*60L*1000L;
+  private final ArrayList<CobraSportsGame> mCobraSportsGames=new ArrayList<>();
+  private final Map<String,CobraSportsTeam> mCobraSportsTeams=new LinkedHashMap<>();
+  private final Map<String,CobraSportsGame> mCobraSportsMultiAssignments=new LinkedHashMap<>();
+  private final LinkedHashMap<String,android.graphics.Bitmap> mCobraSportsLogos=new LinkedHashMap<String,android.graphics.Bitmap>(48,.75f,true){
+    @Override protected boolean removeEldestEntry(Map.Entry<String,android.graphics.Bitmap> eldest){return size()>48;}
+  };
+  private long mCobraSportsLastRefresh=0L;
+  private boolean mCobraSportsLoading=false;
+  private String mCobraSportsLastError="";
+  private String mCobraSportsLastResolver="No game resolved yet";
+  private final CobraSportsRepository mCobraSportsRepository=new CobraEspnSiteSportsRepository();
+  private final Runnable mCobraSportsTick=new Runnable(){@Override public void run(){
+    if(!cobraSportsVisible())return;cobraSportsRefresh(false);
+  }};
+
+  private static final class CobraSportsLeagueSpec{
+    final String key,sport,league,label;
+    CobraSportsLeagueSpec(String key,String sport,String league,String label){this.key=key;this.sport=sport;this.league=league;this.label=label;}
+  }
+  private static final CobraSportsLeagueSpec[] COBRA_SPORTS_SPECS={
+    new CobraSportsLeagueSpec("nfl","football","nfl","NFL"),
+    new CobraSportsLeagueSpec("nba","basketball","nba","NBA"),
+    new CobraSportsLeagueSpec("mlb","baseball","mlb","MLB"),
+    new CobraSportsLeagueSpec("nhl","hockey","nhl","NHL"),
+    new CobraSportsLeagueSpec("ncaaf","football","college-football","NCAA Football"),
+    new CobraSportsLeagueSpec("ncaam","basketball","mens-college-basketball","NCAA Basketball"),
+    new CobraSportsLeagueSpec("wnba","basketball","wnba","WNBA"),
+    new CobraSportsLeagueSpec("epl","soccer","eng.1","Premier League"),
+    new CobraSportsLeagueSpec("ucl","soccer","uefa.champions","Champions League"),
+    new CobraSportsLeagueSpec("mls","soccer","usa.1","MLS")
+  };
+
+  private static final class CobraSportsTeam{
+    String id="",key="",leagueKey="",name="",shortName="",abbreviation="",logo="",record="";
+    String score="";
+  }
+  private static final class CobraSportsGame{
+    String id="",leagueKey="",leagueLabel="",sport="",league="",name="",shortName="",state="pre",detail="",venue="";
+    long startMs=0L;boolean completed=false;
+    CobraSportsTeam home,away;
+    final ArrayList<String> broadcasts=new ArrayList<>();
+    boolean live(){return "in".equals(state);}
+    boolean upcoming(){return "pre".equals(state);}
+    boolean finalGame(){return completed||"post".equals(state);}
+  }
+  private static final class CobraSportsSummary{
+    final ArrayList<String> lines=new ArrayList<>();
+  }
+  private static final class CobraSportsMatch{
+    Channel channel;GuideProgram program;int score;String evidence="";
+    boolean strong(){return score>=70;}
+  }
+  private interface CobraSportsResolverCallback{void accept(ArrayList<CobraSportsMatch> matches);}
+  private static final class CobraSportsChannelInfo{
+    final Channel channel;final String text;final ArrayList<GuideProgram> programs;
+    CobraSportsChannelInfo(Channel channel,String text,ArrayList<GuideProgram> programs){this.channel=channel;this.text=text;this.programs=programs;}
+  }
+
+  private interface CobraSportsRepository{
+    ArrayList<CobraSportsGame> scoreboard(CobraSportsLeagueSpec spec,long from,long to)throws Exception;
+    ArrayList<CobraSportsTeam> teams(CobraSportsLeagueSpec spec)throws Exception;
+    CobraSportsSummary summary(CobraSportsGame game)throws Exception;
+    ArrayList<String> standings(CobraSportsLeagueSpec spec)throws Exception;
+    String label();
+  }
+
+  /** Replaceable provider boundary. The UI/channel resolver never depends on provider-specific JSON. */
+  private final class CobraEspnSiteSportsRepository implements CobraSportsRepository{
+    private String base(CobraSportsLeagueSpec spec){return "https://site.api.espn.com/apis/site/v2/sports/"+spec.sport+"/"+spec.league;}
+    @Override public String label(){return "ESPN site feed";}
+    @Override public ArrayList<CobraSportsGame> scoreboard(CobraSportsLeagueSpec spec,long from,long to)throws Exception{
+      SimpleDateFormat f=new SimpleDateFormat("yyyyMMdd",Locale.US);String dates=f.format(new Date(from))+"-"+f.format(new Date(to));
+      String url=base(spec)+"/scoreboard?limit=100&dates="+dates;
+      if("ncaaf".equals(spec.key))url+="&groups=80"; // FBS, not ESPN's default ranked-team subset.
+      JSONObject root=cobraSportsJson(url);
+      return cobraSportsParseScoreboard(spec,root);
+    }
+    @Override public ArrayList<CobraSportsTeam> teams(CobraSportsLeagueSpec spec)throws Exception{
+      JSONObject root=cobraSportsJson(base(spec)+"/teams?limit=1000");ArrayList<CobraSportsTeam> out=new ArrayList<>();
+      JSONArray sports=root.optJSONArray("sports");if(sports==null)return out;
+      for(int s=0;s<sports.length();s++){JSONObject sport=sports.optJSONObject(s);JSONArray leagues=sport==null?null:sport.optJSONArray("leagues");if(leagues==null)continue;
+        for(int l=0;l<leagues.length();l++){JSONObject league=leagues.optJSONObject(l);JSONArray teams=league==null?null:league.optJSONArray("teams");if(teams==null)continue;
+          for(int i=0;i<teams.length();i++){JSONObject wrap=teams.optJSONObject(i),team=wrap==null?null:wrap.optJSONObject("team");CobraSportsTeam parsed=cobraSportsParseTeam(spec,team,null);if(parsed!=null)out.add(parse

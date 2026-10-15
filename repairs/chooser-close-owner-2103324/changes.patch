@@ -1,0 +1,129 @@
+--- a/tools/android/packaging/xbmc/src/InfinityKodiShutdown.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityKodiShutdown.java.in
+@@ -9,6 +9,8 @@
+ import android.util.AtomicFile;
+ import java.io.*;
+ import java.nio.charset.StandardCharsets;
++import java.nio.channels.FileLock;
++import java.nio.channels.OverlappingFileLockException;
+ import java.util.UUID;
+ import java.util.concurrent.*;
+ import org.json.JSONObject;
+@@ -19,6 +21,10 @@
+   static final String STATE="infinity-kodi-process.json";
+   private static final String processToken=UUID.randomUUID().toString();
+   private static final long processEpoch=System.currentTimeMillis();
++  // An instance owns this lease until its process exits, including native cleanup.
++  // PID existence, wall time and persisted phase are not proof of that ownership.
++  private static RandomAccessFile processLeaseFile;
++  private static FileLock processLease;
+   private static final ExecutorService writes=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"InfinityKodiStatus");t.setDaemon(true);return t;});
+   private static final ScheduledExecutorService reads=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"InfinityChooserStatus");t.setDaemon(true);return t;});
+   private static volatile Snapshot cached=Snapshot.empty();
+@@ -26,7 +32,7 @@
+   private static String launchToken="";
+   private static long closeEpoch;
+   interface Listener { void changed(Snapshot state); }
+-  interface Life { boolean alive(int pid); }
++  interface Life { boolean alive(int pid,String owner)throws IOException; }
+   static final class Snapshot {
+     final int pid;final String owner,launch,error;final long began,closeAt;
+     final InfinityExitCompletion.Plan.Phase phase;
+@@ -59,7 +65,8 @@
+     final File file=new File(context.getFilesDir(),STATE);
+     final JSONObject row=new JSONObject();
+     try{
+-      row.put("schema",1);row.put("pid",android.os.Process.myPid());row.put("owner",processToken);row.put("launch",launchToken);
++      retainProcessLease(context.getFilesDir());
++      row.put("schema",2);row.put("pid",android.os.Process.myPid());row.put("owner",processToken);row.put("launch",launchToken);
+       row.put("began",processEpoch);row.put("close_at",closeEpoch);row.put("phase",phase.name());row.put("live",live);row.put("error",error);
+     }catch(Exception impossible){return;}
+     final byte[] bytes=row.toString().getBytes(StandardCharsets.UTF_8);
+@@ -72,20 +79,49 @@
+       (request.getIntExtra(PID,-1)==android.os.Process.myPid()&&processToken.equals(request.getStringExtra(OWNER)));}
+   static Intent force(Context context,Snapshot state){return new Intent(context,InfinityPowerControlActivity.class)
+       .setAction(InfinityExitCompletion.FORCE).putExtra(PID,state.pid).putExtra(OWNER,state.owner);}
+-  static boolean alive(int pid){
++  static File leasePath(File directory,String owner)throws IOException{
++    if(owner==null || !owner.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
++      throw new IOException("Invalid Kodi owner");
++    return new File(directory,"infinity-kodi-owner-"+owner+".lock");
++  }
++  private static synchronized void retainProcessLease(File directory)throws IOException{
++    if(processLease!=null && processLease.isValid())return;
++    RandomAccessFile opened=new RandomAccessFile(leasePath(directory,processToken),"rw");
++    try{
++      FileLock acquired=opened.getChannel().tryLock();
++      if(acquired==null)throw new IOException("Kodi owner lease unavailable");
++      processLeaseFile=opened;processLease=acquired;
++    }catch(IOException | RuntimeException failed){opened.close();throw failed;}
++  }
++  static boolean ownerAlive(File directory,int pid,String owner)throws IOException{
+     if(pid<=0)return false;
+-    try{android.system.Os.kill(pid,0);return true;}
+-    catch(android.system.ErrnoException e){return e.errno!=android.system.OsConstants.ESRCH;}
++    // Do not open/close a second descriptor for our own lease: on some systems
++    // closing any descriptor for a locked inode releases this process's lock.
++    if(processToken.equals(owner))return pid==android.os.Process.myPid() && processLease!=null && processLease.isValid();
++    File path=leasePath(directory,owner);if(!path.isFile())return false;
++    try(RandomAccessFile probe=new RandomAccessFile(path,"rw")){
++      try(FileLock free=probe.getChannel().tryLock()){
++        return free==null;
++      }catch(OverlappingFileLockException held){return true;}
++    }
++  }
++  static Snapshot recheck(Life life,Snapshot previous)throws IOException{
++    if(previous.pid<=0)return Snapshot.empty();
++    boolean alive=life.alive(previous.pid,previous.owner);
++    return new Snapshot(previous.pid,previous.owner,previous.launch,previous.error,previous.began,previous.closeAt,
++        previous.phase,alive,alive&&previous.live,previous.complete&&!alive);
+   }
+   static Snapshot read(File directory,Life life,Snapshot previous)throws Exception{
+-    File path=new File(directory,STATE);if(!path.exists())return previous;
++    File path=new File(directory,STATE);if(!path.exists())return recheck(life,previous);
+     byte[] bytes=new AtomicFile(path).readFully();if(bytes.length>8192)throw new IOException("Status too large");
+     JSONObject row=new JSONObject(new String(bytes,StandardCharsets.UTF_8));
+-    if(row.getInt("schema")!=1)throw new IOException("Status schema");
++    int schema=row.getInt("schema");if(schema!=1 && schema!=2)throw new IOException("Status schema");
+     int pid=row.getInt("pid");String owner=row.getString("owner"),launch=row.optString("launch"),error=row.optString("error");
+     long began=row.getLong("began"),closeAt=row.getLong("close_at");
+     InfinityExitCompletion.Plan.Phase phase=InfinityExitCompletion.Plan.Phase.valueOf(row.getString("phase"));
+-    boolean alive=life.alive(pid),complete=false;
++    // Schema 1 is preserved as historical evidence. It contains no instance
++    // lease, so a recycled PID can never promote it into a current owner.
++    boolean alive=schema==2 && life.alive(pid,owner),complete=false;
+     if(phase==InfinityExitCompletion.Plan.Phase.COMPLETE)phase=InfinityExitCompletion.Plan.Phase.DESTROYING;
+     if(!alive && closeAt>0 && phase!=InfinityExitCompletion.Plan.Phase.FORCED){
+       File receipt=new File(directory,"infinity-native-cleanup.json");
+@@ -106,10 +142,11 @@
+     private volatile boolean closed;private ScheduledFuture<?> task;
+     Watch(Context context,Listener listener){
+       final File directory=context.getApplicationContext().getFilesDir();final Handler ui=new Handler(Looper.getMainLooper());
++      final Life life=(pid,owner)->ownerAlive(directory,pid,owner);
+       task=reads.scheduleWithFixedDelay(()->{
+         if(closed)return;Snapshot next;
+-        try{next=read(directory,InfinityKodiShutdown::alive,cached);}
+-        catch(Exception unavailable){next=cached;}
++        try{next=read(directory,life,cached);}
++        catch(Exception unavailable){try{next=recheck(life,cached);}catch(IOException unknown){next=cached;}}
+         final Snapshot delivered=next;
+         ui.post(()->{if(!closed){cached=delivered;initialized=true;listener.changed(delivered);}});
+       },0,250,TimeUnit.MILLISECONDS);
+--- a/tools/android/packaging/xbmc/src/Splash.java.in
++++ b/tools/android/packaging/xbmc/src/Splash.java.in
+@@ -415,8 +415,13 @@
+     if (isFinishing() || isDestroyed() || mInfinityLaunchQueued) return;
+     if (infinityLaunchPreferredCobra()) return;
+     if (InfinityKodiShutdown.pending()) {
+-      mInfinityStartupTrace.event("handoff.waitClosingOwner");
+-      showInfinityClosingRecovery();
++      Intent request=getIntent();
++      boolean wantsInfinity=!mInfinityChooserVisible &&
++          ((request!=null && request.getAction()!=null && !Intent.ACTION_MAIN.equals(request.getAction())) ||
++          "infinity".equals(getSharedPreferences(INFINITY_EXPERIENCE_PREFS,MODE_PRIVATE)
++              .getString(INFINITY_EXPERIENCE_DEFAULT,"")));
++      mInfinityStartupTrace.event(wantsInfinity?"handoff.waitClosingOwner":"chooser.pendingKodiOwner");
++      if(wantsInfinity)showInfinityClosingRecovery();
+       showInfinityExperienceChooser(); return;
+     }
+     if (InfinityKodiShutdown.live()) {

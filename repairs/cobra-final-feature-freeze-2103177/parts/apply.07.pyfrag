@@ -1,0 +1,34 @@
+    # Append helper runtime as one isolated block.
+    pos=text.rfind('\n}')
+    if pos<0: raise RuntimeError('Activity terminator missing')
+    text=text[:pos]+'\n'+HELPERS.rstrip()+'\n'+text[pos:]
+
+    for n,h in guards.items():
+        if sha(member(text,n))!=h: raise RuntimeError('Protected contract changed: '+n)
+
+    required=[
+      'DISPLAY & PERFORMANCE  •  ','preferredDisplayModeId','getSupportedModes()','cobra_performance_proof_overlay',
+      'CobraLocalTimeshiftSession','/live.m3u8','EXT-X-MEDIA-SEQUENCE','EXT-X-START:TIME-OFFSET=-6.0',
+      'cobra_live_timeshift_seek','cobra_last_channel','KEYCODE_LAST_CHANNEL','rebuffer_events','network_transport',
+      'DefaultLoadControl control=multi?','buffer_observed_no_restart','EXPERIENCE & DISPLAY','HEALTH & DIAGNOSTICS'
+    ]
+    for token in required:
+        if token not in text: raise RuntimeError('2103177 contract missing: '+token)
+    watchdog=text[text.index('private final Runnable mStallWatchdog'):text.index('private final Runnable mAutoRefresh')]
+    if 'mPlayer.prepare()' in watchdog or 'mPlayer.play()' in watchdog: raise RuntimeError('watchdog still restarts player')
+    if 'new DefaultLoadControl();' not in member(text,'buildPlayer'): raise RuntimeError('single-view Media3 default buffer not restored')
+    if 'mPlayer.setMediaItem(mediaItem(session.playlistUrl()))' not in text: raise RuntimeError('local timeshift player is not loopback-only')
+
+    after=text.encode();path.write_bytes(after);out.mkdir(parents=True,exist_ok=True);(out/'source-before').mkdir(exist_ok=True);(out/'source-before'/path.name).write_bytes(before_b)
+    report={
+      'base_build':BASE_BUILD,'base_commit':BASE_COMMIT,'files':{str(REL):{'before':sha(before_b),'after':sha(after)}},
+      'display_modes':['auto','60','90','120','max'],'active_hz_proof':True,'ui_fps_overlay':True,'video_refresh_independent':True,
+      'local_timeshift':True,'local_timeshift_windows_seconds':[60,120,180],'smart_reserve_seconds':6,'single_provider_ingest_when_local_timeshift':True,
+      'normal_single_load_control':'Media3 default','stall_watchdog_reprepare':False,'network_diagnostics':True,'last_channel':True,'polish_settings_sections':True,
+      'native_changed':False,'theme_zip_changed':False,'physical_device_verified':False
+    }
+    (out/'patch.json').write_text(json.dumps(report,indent=2)+'\n')
+    print('PASS: 2103177 final feature-freeze delta applied')
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--receipt',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();apply(a.source,a.receipt,a.out)

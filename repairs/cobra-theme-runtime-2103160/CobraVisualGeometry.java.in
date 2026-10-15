@@ -1,0 +1,60 @@
+package @APP_PACKAGE@;
+import android.view.*;
+import android.widget.*;
+import org.json.*;
+import java.io.IOException;
+import java.util.*;
+
+/** Bounded geometry for existing views. No new routes, player objects, or reparenting. */
+public final class CobraVisualGeometry {
+  static final String[] REGIONS={"toolbar","rail","directory","video","details","browser","footer"};
+  static void validateGuide(JSONObject layout)throws Exception{
+    CobraVisualTheme.keys(layout,"regions","columns","channel_width_dp");
+    JSONObject regions=layout.getJSONObject("regions");CobraVisualTheme.keys(regions,REGIONS);
+    if(regions.length()!=REGIONS.length)throw new IOException("A guide layout must declare all seven regions");
+    for(String key:REGIONS){JSONArray a=regions.getJSONArray(key);if(a.length()!=4)throw new IOException("Region needs x/y/width/height fractions");for(int i=0;i<4;i++)CobraVisualTheme.validateNumber(a.get(i),0,1);if(a.getDouble(0)+a.getDouble(2)>1.000001||a.getDouble(1)+a.getDouble(3)>1.000001)throw new IOException("Region outside viewport");}
+    if(layout.has("columns"))CobraVisualTheme.validateNumber(layout.get("columns"),1,6);
+    if(layout.has("channel_width_dp"))CobraVisualTheme.validateNumber(layout.get("channel_width_dp"),64,360);
+  }
+  static boolean guide(JSONObject data,int[][] boxes,int width,int height,float fontScale){
+    if(data==null||boxes.length!=7)return false;
+    try{
+      int[][] next=new int[7][4];JSONObject regions=data.getJSONObject("regions");
+      for(int i=0;i<7;i++){JSONArray a=regions.getJSONArray(REGIONS[i]);for(int j=0;j<4;j++)next[i][j]=(int)Math.round(a.getDouble(j)*(j%2==0?width:height));}
+      for(int i:new int[]{0,3,5})if(next[i][2]<Math.min(96,width)||next[i][3]<Math.round(44*Math.max(1,Math.min(fontScale,2))))return false;
+      for(int i=0;i<7;i++)if(next[i][2]>0&&next[i][3]>0){int[] a=next[i];if(a[0]+a[2]>width||a[1]+a[3]>height)return false;for(int j=0;j<i;j++){int[] b=next[j];if(b[2]>0&&b[3]>0&&a[0]<b[0]+b[2]&&a[0]+a[2]>b[0]&&a[1]<b[1]+b[3]&&a[1]+a[3]>b[1])return false;}}
+      for(int i=0;i<7;i++)System.arraycopy(next[i],0,boxes[i],0,4);return true;
+    }catch(Exception invalid){return false;}
+  }
+  static ViewGroup.LayoutParams copy(ViewGroup.LayoutParams p){
+    if(p==null)return null;
+    if(p.getClass()==LinearLayout.LayoutParams.class)return new LinearLayout.LayoutParams((LinearLayout.LayoutParams)p);
+    if(p.getClass()==FrameLayout.LayoutParams.class)return new FrameLayout.LayoutParams((FrameLayout.LayoutParams)p);
+    if(p.getClass()==RelativeLayout.LayoutParams.class)return new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams)p);
+    if(p.getClass()==ViewGroup.MarginLayoutParams.class)return new ViewGroup.MarginLayoutParams((ViewGroup.MarginLayoutParams)p);
+    if(p.getClass()==ViewGroup.LayoutParams.class)return new ViewGroup.LayoutParams(p);
+    return null; // Never downcast or replace custom ListView/GridView/table layout contracts.
+  }
+  static final class Original {
+    final ViewGroup.LayoutParams params;
+    final int orientation,gravity,maxLines;final float alpha;
+    Original(View v){params=copy(v.getLayoutParams());orientation=v instanceof LinearLayout?((LinearLayout)v).getOrientation():-1;gravity=v instanceof TextView?((TextView)v).getGravity():v instanceof LinearLayout?((LinearLayout)v).getGravity():-1;maxLines=v instanceof TextView?((TextView)v).getMaxLines():-1;alpha=v.getAlpha();}
+    void restore(View v){if(params!=null&&v.getLayoutParams()!=null&&params.getClass()==v.getLayoutParams().getClass())v.setLayoutParams(copy(params));if(v instanceof LinearLayout){((LinearLayout)v).setOrientation(orientation);((LinearLayout)v).setGravity(gravity);}if(v instanceof TextView){((TextView)v).setGravity(gravity);((TextView)v).setMaxLines(maxLines);}v.setAlpha(alpha);}
+  }
+  static int gravity(String value){switch(value){case "left":return Gravity.LEFT|Gravity.CENTER_VERTICAL;case "right":return Gravity.RIGHT|Gravity.CENTER_VERTICAL;case "top":return Gravity.TOP|Gravity.CENTER_HORIZONTAL;case "bottom":return Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;default:return Gravity.CENTER;}}
+  static boolean changesParams(JSONObject s){for(String key:new String[]{"width_dp","height_dp","margin_dp","margin_left_dp","margin_top_dp","margin_right_dp","margin_bottom_dp","weight"})if(s.has(key))return true;return false;}
+  static void apply(View view,JSONObject s,CobraVisualRenderer r){
+    if(s.has("alpha"))view.setAlpha(Math.max(view.isClickable()||view.isFocusable()?.25f:0,(float)s.optDouble("alpha",1)));
+    if(s.has("orientation")&&view instanceof LinearLayout)((LinearLayout)view).setOrientation("horizontal".equals(s.optString("orientation"))?LinearLayout.HORIZONTAL:LinearLayout.VERTICAL);
+    if(s.has("gravity")){int g=gravity(s.optString("gravity"));if(view instanceof TextView)((TextView)view).setGravity(g);else if(view instanceof LinearLayout)((LinearLayout)view).setGravity(g);}
+    if(s.has("max_lines")&&view instanceof TextView)((TextView)view).setMaxLines(s.optInt("max_lines",2));
+    int[] padding={view.getPaddingLeft(),view.getPaddingTop(),view.getPaddingRight(),view.getPaddingBottom()};String[] sides={"left","top","right","bottom"};
+    boolean changed=false;for(int i=0;i<4;i++)if(s.has("padding_"+sides[i]+"_dp")){padding[i]=r.px((float)s.optDouble("padding_"+sides[i]+"_dp"));changed=true;}if(changed)view.setPadding(padding[0],padding[1],padding[2],padding[3]);
+    if(!changesParams(s))return;ViewGroup.LayoutParams p=copy(view.getLayoutParams());if(p==null)return;
+    if(s.has("width_dp")){int n=s.optInt("width_dp");p.width=n<0?n:r.px(view.isClickable()&&n>0?Math.max(44,n):n);}
+    if(s.has("height_dp")){int n=s.optInt("height_dp");p.height=n<0?n:r.px(view.isClickable()&&n>0?Math.max(44,n):n);}
+    if(p instanceof ViewGroup.MarginLayoutParams){ViewGroup.MarginLayoutParams m=(ViewGroup.MarginLayoutParams)p;if(s.has("margin_dp")){int n=r.px((float)s.optDouble("margin_dp"));m.setMargins(n,n,n,n);}if(s.has("margin_left_dp"))m.leftMargin=r.px((float)s.optDouble("margin_left_dp"));if(s.has("margin_top_dp"))m.topMargin=r.px((float)s.optDouble("margin_top_dp"));if(s.has("margin_right_dp"))m.rightMargin=r.px((float)s.optDouble("margin_right_dp"));if(s.has("margin_bottom_dp"))m.bottomMargin=r.px((float)s.optDouble("margin_bottom_dp"));}
+    if(p instanceof LinearLayout.LayoutParams&&s.has("weight"))((LinearLayout.LayoutParams)p).weight=(float)s.optDouble("weight");
+    view.setLayoutParams(p);
+  }
+}

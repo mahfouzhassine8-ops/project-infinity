@@ -1,0 +1,117 @@
+INFINITY — BLACK RAIL POPUP FOLLOW-UP
+Diagnostic checkpoint, not a repair candidate. APK 2103377 and skin .221 unchanged.
+
+CONFIRMED DEVICE FAILURE
+
+The already supplied Kodi log contains SIX Super Favourites initialization
+failures at 12:17:49, 12:17:53, 12:18:27, 12:18:29, 12:38:58 and 12:39:02
+on October 14. Each identifies:
+
+  Script owner: plugin.program.super.favourites / capture.py
+  XML: resources/skins/Default/720p/script-super-favourites-contextmenu.xml
+  Python window instance: 13000 or 13001 (these IDs are allocated dynamically)
+  Failing file: plugin.program.super.favourites/menus.py:76
+  Failing call: self.getControl(5000).setPosition(self.getControl(5000).getX(), newY)
+  Exception: TypeError: 'float' object cannot be interpreted as an integer
+
+I missed this decisive exception in the first investigation. The earlier
+general discussion of an unidentified popup was incomplete for these recorded
+events. The current 13:53 screenshot is visually consistent with this popup,
+but its exact window instance has not yet been captured. Do not reuse 13001
+as a fixed window ID in a repair.
+
+The published Super Favourites menu code calculates newY = 360 - (height/2).
+Under Python 3 this produces a float. It changes the black background/list
+heights before setPosition, then populates the list AFTER that failing call.
+The exception explains an opened, resized, empty black panel. The published
+XML uses a 342-wide background and legacy close button, consistent with the
+screenshot. The current installed source must still be captured before editing;
+the fetched upstream master reference is not a verified copy of installed 2.0.10.
+
+ROUTING IS A SECOND PART OF THE FAILURE
+
+The device log shows super_favourites_menu.xml loaded. The published file maps
+global touch longpress and mouse rightclick to the Super Favourites
+captureLauncher.py script, rather than Kodi's default RightClick path.
+The recorded execution of capture.py establishes that Super Favourites did
+run. The exact currently installed mapping and any overriding Home-specific
+mapping are not yet available. A new capture must correlate these with .221.
+
+RC3/RC4/RC5 changed Rails menus, directory providers and fallback visibility.
+Those changes cannot fix an exception inside Super Favourites' separate
+provider-owned menu, nor a keymap that redirects the gesture before the Rails
+context callback. Fixing just the integer conversion would make a different
+menu visible; it would not by itself implement the requested Rail Options.
+
+The previously reproduced native selection gate remains relevant AFTER
+restoring RightClick, but it does not explain these Python popup exceptions.
+No native or APK change is authorized or performed. Native work must be
+separately justified and approved if a remaining first-hold limitation is proven.
+
+RED LIGHT / ANR
+
+The screenshot shows a Red Light Trakt authorization notification. Existing
+logs also show Red Light background services and Trakt refresh failures. That
+notification is not proof that the hold launched Red Light. The new capture
+records selected add-on identity and the surrounding Kodi log for correlation.
+The older 10-second input timeout remains a separate observed failure; no
+evidence presently connects it causally to the Super Favourites TypeError.
+
+ONE-SHOT CAPTURE TOOL
+
+Install script.infinity.railcapture-0.1.0-DIAGNOSTIC.zip through Install from ZIP.
+This is a separate Program add-on, NOT a skin/helper replacement or repair.
+
+1. If available, enable Kodi debug logging before the capture. The tool does
+   not change that setting; restore your previous setting afterward.
+2. Open Program add-ons > Infinity Rail Hold Capture > Run.
+3. Choose Capture one rail hold. Confirm the instructions. It opens Home in
+   the existing view mode. Hold the affected TV rail card ONCE.
+4. Leave the popup visible for two seconds, then dismiss it normally. The tool
+   saves after observing a window transition, or after a 30-second observation
+   window. A blocked Kodi API call can delay completion during a UI stall.
+5. Run Infinity Rail Hold Capture again, choose Export latest capture, and
+   select a writable folder such as your configured Downloads source.
+6. Attach the resulting Infinity-Rail-Hold-YYYYMMDD-HHMMSS.zip here.
+
+The ZIP contains current skin/helper/Super Favourites versions, relevant
+installed source, system/profile input keymaps, Home/card/popup transitions,
+and up to the last 1 MiB of kodi.log. It intentionally does not collect add-on
+settings, rail preferences, databases or authentication stores. Logs/keymaps
+can contain private paths or commands; nothing is uploaded automatically.
+
+No skin/add-on/keymap is patched. No service is installed. Observation occurs
+only when explicitly started and records state changes at 100 ms intervals
+within that short capture. It does not issue clicks, close the black popup,
+change playback or alter view/theme preferences. Export is user-selected.
+Removing the standalone capture add-on afterward has no effect on Rails.
+
+VERIFICATION
+
+Preserved the previous 93 Python checks and four conditional native-source
+checks as historical evidence. The previous inspector source assumed no-modal
+IDs 0/-1. Checking Kodi's actual ModuleXbmcgui.cpp -> GUIWindowManager.cpp ->
+WindowIDs.h exposed the real Omega sentinel, WINDOW_INVALID=9999. Corrected
+that source and added the missing regression case: 14 inspector tests pass.
+Eight new collector tests pass for real sentinel handling, dialog identity,
+inactive-window sampling, timeout/abort, ZIP fidelity and read-only collection.
+Device-exceptions.json records six actual Kodi exceptions; these are runtime
+evidence, separate from host tests. No live Kodi executable or connected Fold
+is available in this workspace. The collector has not been physically accepted.
+
+No complete skin repair ZIP or Rails helper replacement has been created.
+The exact current input-to-popup path is the remaining blocker to a verified
+repair candidate. Existing .221/.2.3 packages, .215 foundation and user data
+remain untouched. Do not downgrade, uninstall Rails, or clear its settings.
+
+REFERENCES
+
+Device: Kodi_Diagnostics_20261014T164907Z-ccc584e3.zip,
+export-time/kodi.current.tail.log, including lines 4207–4237.
+New screenshot: 18710.jpg.
+Upstream reference (not installed-byte identity):
+https://github.com/jmooremcc/plugin.program.super.favourites/blob/master/menus.py
+https://github.com/jmooremcc/plugin.program.super.favourites/blob/master/resources/keymaps/super_favourites_menu.xml
+https://github.com/jmooremcc/plugin.program.super.favourites/blob/master/resources/skins/Default/720p/script-super-favourites-contextmenu.xml
+Kodi no-dialog contract: xbmc/xbmc tag 21.3-Omega, ModuleXbmcgui.cpp,
+GUIWindowManager.cpp and WindowIDs.h.

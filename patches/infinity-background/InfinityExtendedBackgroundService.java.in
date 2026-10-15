@@ -1,0 +1,241 @@
+package @APP_PACKAGE@;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
+import android.os.IBinder;
+import android.util.Log;
+
+/**
+ * Opt-in session continuity, shared by the Kodi and Cobra activities.
+ * No native/render/player calls, wake locks, timers, boot receiver, or hidden work.
+ * Android remains free to reclaim or force-stop this process.
+ */
+public final class InfinityExtendedBackgroundService extends Service {
+  private static final String TAG = "InfinityBackground";
+  private static final String PREFS = "infinity_runtime";
+  private static final String KEY_ENABLED = "extended_background";
+  private static final String CHANNEL_ID = "infinity_extended_background";
+  private static final int NOTIFICATION_ID = 10932;
+  private static final int REQUEST_OPEN = 10933;
+  private static final int REQUEST_DISABLE = 10934;
+  private static final String ACTION_DISABLE =
+      "com.projectinfinity.kodi.action.DISABLE_EXTENDED_BACKGROUND";
+  // Actual process-local state, never inferred from the persisted user preference.
+  private static volatile boolean sRunning;
+
+  private static SharedPreferences preferences(Context context) {
+    return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+  }
+
+  public static boolean isEnabled(Context context) {
+    return preferences(context).getBoolean(KEY_ENABLED, false);
+  }
+
+  public static boolean isRunning() {
+    return sRunning;
+  }
+
+  public static boolean notificationsAllowed(Context context) {
+    try {
+      return notificationsAllowedChecked(context);
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Notification state unavailable: " + error.getClass().getSimpleName());
+      return false;
+    }
+  }
+
+  private static boolean notificationsAllowedChecked(Context context) {
+    if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(
+        Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+      return false;
+    }
+    NotificationManager manager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    if (manager == null) return false;
+    if (Build.VERSION.SDK_INT >= 24 && !manager.areNotificationsEnabled()) return false;
+    if (Build.VERSION.SDK_INT >= 26) {
+      NotificationChannel channel = manager.getNotificationChannel(CHANNEL_ID);
+      if (channel != null && channel.getImportance() == NotificationManager.IMPORTANCE_NONE) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static void openNotificationSettings(Activity activity) {
+    try {
+      Intent intent;
+      if (Build.VERSION.SDK_INT >= 26) {
+        intent = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.getPackageName());
+      } else {
+        intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            android.net.Uri.parse("package:" + activity.getPackageName()));
+      }
+      activity.startActivity(intent);
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Notification settings unavailable: " + error.getClass().getSimpleName());
+    }
+  }
+
+  /** Called by an explicit settings click. Success means requested, not yet running. */
+  public static boolean setEnabled(Activity activity, boolean enabled) {
+    if (!enabled) {
+      preferences(activity).edit().putBoolean(KEY_ENABLED, false).apply();
+      stopForExit(activity);
+      return true;
+    }
+    if (activity.isFinishing() || activity.isDestroyed() || !notificationsAllowed(activity)) {
+      return false;
+    }
+    preferences(activity).edit().putBoolean(KEY_ENABLED, true).apply();
+    if (start(activity)) return true;
+    preferences(activity).edit().putBoolean(KEY_ENABLED, false).apply();
+    return false;
+  }
+
+  /** Only call after super.onResume(), never from onPause/onStop or a boot receiver. */
+  public static void sync(Activity activity) {
+    if (activity.isFinishing() || activity.isDestroyed()) return;
+    if (!isEnabled(activity)) return;
+    if (!notificationsAllowed(activity)) {
+      stopForExit(activity);
+      return;
+    }
+    if (!sRunning) start(activity);
+  }
+
+  private static boolean start(Context context) {
+    try {
+      Intent intent = new Intent(context, InfinityExtendedBackgroundService.class);
+      if (Build.VERSION.SDK_INT >= 26) {
+        return context.startForegroundService(intent) != null;
+      }
+      return context.startService(intent) != null;
+    } catch (RuntimeException error) {
+      // Includes SecurityException and ForegroundServiceStartNotAllowedException.
+      // A lifecycle race or an OS restriction must not take Kodi/Cobra down.
+      Log.w(TAG, "Background start refused: " + error.getClass().getSimpleName());
+      return false;
+    }
+  }
+
+  /** Explicit close/task removal stops this session but keeps the user's preference. */
+  public static void stopForExit(Context context) {
+    try {
+      context.stopService(new Intent(context, InfinityExtendedBackgroundService.class));
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Background stop refused: " + error.getClass().getSimpleName());
+    }
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    if (intent != null && ACTION_DISABLE.equals(intent.getAction())) {
+      preferences(this).edit().putBoolean(KEY_ENABLED, false).apply();
+      endSession();
+      return START_NOT_STICKY;
+    }
+    if (!isEnabled(this) || !notificationsAllowed(this)) {
+      endSession();
+      return START_NOT_STICKY;
+    }
+    try {
+      ensureChannel();
+      Notification notification = buildNotification();
+      if (Build.VERSION.SDK_INT >= 34) {
+        startForeground(NOTIFICATION_ID, notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+      } else {
+        startForeground(NOTIFICATION_ID, notification);
+      }
+      sRunning = true;
+      return START_STICKY;
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Foreground promotion refused: " + error.getClass().getSimpleName());
+      endSession();
+      return START_NOT_STICKY;
+    }
+  }
+
+  private void ensureChannel() {
+    if (Build.VERSION.SDK_INT < 26) return;
+    NotificationManager manager =
+        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    if (manager == null) throw new IllegalStateException("Notification manager unavailable");
+    if (manager.getNotificationChannel(CHANNEL_ID) != null) return;
+    NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+        "Infinity extended background", NotificationManager.IMPORTANCE_LOW);
+    channel.setDescription("User-enabled session continuity. Turn off here or in Cobra Settings.");
+    channel.setShowBadge(false);
+    manager.createNotificationChannel(channel);
+  }
+
+  private Notification buildNotification() {
+    Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
+    if (launch == null) {
+      launch = new Intent(this, Splash.class)
+          .setAction(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+    }
+    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    int pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= 23) pendingFlags |= PendingIntent.FLAG_IMMUTABLE;
+    PendingIntent open = PendingIntent.getActivity(this, REQUEST_OPEN, launch, pendingFlags);
+    PendingIntent disable = PendingIntent.getService(this, REQUEST_DISABLE,
+        new Intent(this, InfinityExtendedBackgroundService.class).setAction(ACTION_DISABLE),
+        pendingFlags);
+    Notification.Builder builder = Build.VERSION.SDK_INT >= 26
+        ? new Notification.Builder(this, CHANNEL_ID) : new Notification.Builder(this);
+    builder.setSmallIcon(android.R.drawable.stat_notify_sync_noanim)
+        .setContentTitle("Infinity • Extended Background Mode")
+        .setContentText("Session continuity enabled. Android may still stop Infinity.")
+        .setContentIntent(open)
+        .setCategory(Notification.CATEGORY_SERVICE)
+        .setOngoing(true).setOnlyAlertOnce(true).setShowWhen(false)
+        .addAction(new Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,
+            "Turn off", disable).build());
+    if (Build.VERSION.SDK_INT >= 31) {
+      builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+    }
+    return builder.build();
+  }
+
+  private void endSession() {
+    sRunning = false;
+    try {
+      stopForeground(true);
+    } catch (RuntimeException error) {
+      Log.w(TAG, "Foreground cleanup refused: " + error.getClass().getSimpleName());
+    }
+    stopSelf();
+  }
+
+  @Override
+  public void onTaskRemoved(Intent rootIntent) {
+    // Swiping away the task is an explicit exit, not an invitation to resurrect it.
+    endSession();
+    super.onTaskRemoved(rootIntent);
+  }
+
+  @Override
+  public void onDestroy() {
+    sRunning = false;
+    super.onDestroy();
+  }
+
+  @Override
+  public IBinder onBind(Intent intent) {
+    return null;
+  }
+}

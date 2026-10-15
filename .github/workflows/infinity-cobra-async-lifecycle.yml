@@ -1,0 +1,133 @@
+name: Infinity | Lifecycle Repair RC3
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-rc3-cobra-async-lifecycle-fix]
+    paths:
+      - '.github/workflows/infinity-cobra-async-lifecycle.yml'
+      - 'scripts/infinity_cobra_async_lifecycle.py'
+      - 'scripts/verify_infinity_lifecycle_repair.py'
+      - 'tests/infinity_background/test_async_lifecycle.py'
+      - 'docs/infinity-lifecycle-repair-rc3.md'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-lifecycle-repair-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-update:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      NDK_VER: 21.4.7075529
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Preserve exact source snapshots
+        run: |
+          mkdir -p background-rollback background-candidate
+          git archive --format=zip --output=background-rollback/base-source.zip 2674c05e605afbf19a2fe54bdab1a552e76ec394
+          git archive --format=zip --output=background-rollback/postponed-source.zip 7abb31b47756f2faf4e8688e515f8cb52a40565f
+          git archive --format=zip --output=background-candidate/candidate-source.zip "$GITHUB_SHA"
+          git archive --format=zip --output=background-rollback/RC2-source.zip 90d4efd2796828795f5e6d4e436d8cd4e43a6a6b
+          sha256sum background-rollback/*zip > background-rollback/source-sha256.txt
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - name: Verify and preserve exact signed engine baseline
+        run: |
+          cp run40/candidate/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2.apk background-rollback/Infinity-Run40-Exact-Base.apk
+          echo '8ef45e9c54a79e2295e295ce1fcdd3430322a0049c7ff5227804c15aed6b4c57  background-rollback/Infinity-Run40-Exact-Base.apk' | sha256sum -c -
+          cp run40/candidate/live-app-shell-engine.json background-rollback/
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Background-Control-RC2
+          run-id: 35067545383
+          github-token: ${{ github.token }}
+          path: rc2
+      - name: Preserve exact installed RC2 rollback and verify identity
+        run: |
+          cp rc2/background-candidate/Infinity-1.0.9-Infinity-Background-Control-RC2.apk background-rollback/Infinity-RC2-Exact-Base.apk
+          echo 'd709c9dbf7224a9cfe4198cffb3adf523449fdc34af8c373f1c4463cdb494930  background-rollback/Infinity-RC2-Exact-Base.apk' | sha256sum -c -
+      - name: Reconstruct and validate accepted source — no native rebuild
+        run: bash scripts/infinity_live_app_ci_1.sh
+      - name: Apply background runtime and Infinity control bridge
+        run: |
+          mkdir -p engine/background-preimage/tools/android/packaging engine/background-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/background-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/background-preimage/cmake/scripts/android/
+          git -C kodi diff --binary -- xbmc > engine/native-before.patch
+          python3 scripts/infinity_background_resume.py --source kodi --receipt engine/background-resume-source.json
+          python3 scripts/infinity_background_control_bridge.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
+          python3 tests/infinity_background/test_preservation.py --before engine/background-preimage --after kodi
+          git -C kodi diff --binary -- xbmc > engine/native-after.patch
+          cmp engine/native-before.patch engine/native-after.patch
+      - name: Background service, Infinity bridge and player behavior tests
+        run: |
+          python3 tests/infinity_background/test_background.py --source kodi --out preflight/background --android-jar "$ANDROID_HOME/platforms/android-35/android.jar"
+          python3 tests/infinity_background/test_infinity_control.py --source kodi --out preflight/background-control
+          python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/background-rotation
+      - name: Preserve reconstructed RC2 source and apply isolated lifecycle repair
+        run: |
+          mkdir -p engine/lifecycle-preimage/tools/android/packaging engine/lifecycle-preimage/cmake/scripts/android
+          cp -a kodi/tools/android/packaging/xbmc engine/lifecycle-preimage/tools/android/packaging/
+          cp kodi/cmake/scripts/android/Install.cmake engine/lifecycle-preimage/cmake/scripts/android/
+          zip -q -r background-rollback/RC2-reconstructed-android-source.zip engine/lifecycle-preimage
+          python3 scripts/infinity_cobra_async_lifecycle.py --source kodi --receipt engine/background-resume-source.json --packager scripts/package_background_resume.py
+          python3 scripts/verify_infinity_lifecycle_repair.py source --before engine/lifecycle-preimage --after kodi --out background-candidate/lifecycle-source-preservation.json
+          git -C kodi diff --binary -- xbmc > engine/native-after-lifecycle.patch
+          cmp engine/native-before.patch engine/native-after-lifecycle.patch
+      - name: Reproduce RC2 crash and verify RC3 races plus existing behavior
+        run: |
+          python3 tests/infinity_background/test_async_lifecycle.py --before engine/lifecycle-preimage/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --after kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in --out preflight/lifecycle-races
+          python3 tests/infinity_background/test_background.py --source kodi --out preflight/background-final --android-jar "$ANDROID_HOME/platforms/android-35/android.jar"
+          python3 tests/infinity_background/test_infinity_control.py --source kodi --out preflight/background-control-final
+          python3 tests/infinity_rotation/test_lifecycle.py --source kodi --out preflight/rotation-final
+      - name: Compile Android shell, retain exact engine, permanently sign and verify
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir background-android-build --out background-candidate
+      - name: Additional final APK preservation check against installed RC2
+        run: |
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump xmltree background-rollback/Infinity-RC2-Exact-Base.apk AndroidManifest.xml > background-candidate/rc2-manifest.txt
+          python3 scripts/verify_infinity_lifecycle_repair.py apk --base background-rollback/Infinity-RC2-Exact-Base.apk --candidate background-candidate/Infinity-1.0.9-Infinity-Lifecycle-Repair-RC3.apk --base-manifest background-candidate/rc2-manifest.txt --manifest background-candidate/manifest.txt --out background-candidate/lifecycle-final-apk-preservation.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Lifecycle-Repair-RC3
+          path: |
+            background-candidate/
+            engine/background-resume-source.json
+            preflight/background/
+            preflight/background-control/
+            preflight/background-rotation/
+            preflight/lifecycle-races/
+            preflight/background-final/
+            preflight/background-control-final/
+            preflight/rotation-final/
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Lifecycle-Repair-RC3-Exact-Rollback
+          path: background-rollback/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

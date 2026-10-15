@@ -1,0 +1,35 @@
+INFINITY 2103298 — UNLOCKED PHYSICAL FOLD TEST
+
+Direct locked parent: 2103297; parent known issue: ~26.5s logo-to-chooser delay.
+Do not clear data or uninstall. Install as a signed update over 2103297.
+Expect one-time background bundled-asset cache preparation after the APK update.
+Chooser must appear without waiting for that preparation. Selecting Infinity
+before preparation ends queues one selection; actual Main must await readiness.
+
+Record elapsed time from tapping Infinity to chooser AND selecting Infinity to
+usable Kodi. A visible frame alone is not proof Kodi is ready. Aim for normal
+warm relaunch under 2 seconds to chooser; any repeatable >=5s delay fails.
+
+1. Active Infinity -> Android Home -> return: same valid session, no duplicate Main.
+2. Explicit Exit Infinity -> Home -> launcher -> chooser -> Infinity usable.
+3. Repeat #2 at least 10 times; record worst delay and export Health report.
+4. Background with other apps >=15 minutes -> return. Separately test OS recreation
+   if available; a long interval does not by itself prove process recreation.
+5. Repeat on cover and inner display, full-screen, split and freeform.
+6. Fold/unfold while chooser visible and while startup/cache work pending.
+7. Home while preparation pending; return. No launch behind another app, duplicate
+   prep/launch, stuck spinner or old-Activity callback after recreation.
+8. Verify 2103295 window-local touch, 2103291 in-place Fold reflow, stable chooser
+   cards/logos/text/gears/live data/light-dark geometry, visibly moving stars.
+9. Playback, active-player ownership, PiP/background playback, Resume Hub watched
+   and continue state, Command Center, providers/accounts and Cobra unchanged.
+10. Health Center -> Export diagnostic report. New Android startup/relaunch timing
+    should show properties/cache/first-frame/handoff milestones, with UI/worker
+    labels. Capture after every bad delay even without a crash. Timings begin at
+    Splash.onCreate; launcher/process scheduling time is not measured internally.
+
+Missing custom data storage must report unavailable storage, NOT reset the profile.
+Reconnect/unlock that storage then Exit/relaunch. No handset/model-specific logic.
+Kodi Health is supplemental, not a substitute for these lifecycle tests.
+Do not lock automatically. Lock only after explicit user approval of motion,
+relaunch speed/reliability and preservation of touch/Fold/layout/playback/Hub/Cobra.

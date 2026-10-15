@@ -1,0 +1,73 @@
+name: Diagnose Main PiP v3
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/diagnose-main-v3.yml'
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download Stable 2 v12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip -o /tmp/base.zip
+          mkdir -p /tmp/base
+          unzip -q /tmp/base.zip -d /tmp/base
+          APK=$(find /tmp/base -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/base.apk
+      - name: Decode
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+      - name: Inspect Main activity
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          root=Path('/tmp/decoded')
+          man=(root/'AndroidManifest.xml').read_text(errors='ignore')
+          print('=== MAIN MANIFEST TAG ===')
+          mm=re.search(r'<activity\b[^>]*android:name="com\.projectinfinity\.kodi\.Main"[^>]*>',man)
+          print(mm.group(0) if mm else 'MAIN TAG NOT FOUND')
+          p=root/'smali/com/projectinfinity/kodi/Main.smali'
+          if not p.exists():
+              hits=[x for d in root.glob('smali*') for x in d.rglob('Main.smali') if 'projectinfinity/kodi' in str(x)]
+              if not hits: raise SystemExit('Main.smali not found')
+              p=hits[0]
+          print('MAIN_SMALI='+str(p))
+          t=p.read_text(errors='ignore')
+          print('=== HEADER ===')
+          print('\n'.join(t.splitlines()[:60]))
+          print('=== LIFECYCLE / PLAYBACK METHODS ===')
+          wanted=['onCreate','onStart','onResume','onPause','onStop','onDestroy','onUserLeaveHint','onPictureInPictureModeChanged','onConfigurationChanged','onWindowFocusChanged','onNewIntent']
+          for name in wanted:
+              ms=list(re.finditer(r'^\.method[^\n]*\b'+re.escape(name)+r'\(',t,re.M))
+              print(f'{name}: {len(ms)}')
+              for m in ms[:1]:
+                  e=t.find('.end method',m.start())
+                  print(t[m.start():(e+11 if e!=-1 else m.start()+3000)][:4500])
+          print('=== PIP / PLAYER REFERENCES ===')
+          for line in t.splitlines():
+              low=line.lower()
+              if 'pictureinpicture' in low or 'player' in low or 'playback' in low or 'nativeactivity' in low:
+                  print(line)
+          PY

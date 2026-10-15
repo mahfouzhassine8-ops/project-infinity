@@ -1,0 +1,144 @@
+name: Infinity | Cobra 2103154 Adaptive Views
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103154-adaptive-view-identities]
+    paths:
+      - '.github/workflows/infinity-cobra-2103154-adaptive-views.yml'
+      - 'scripts/cobra_2103154_ci.py'
+      - 'scripts/infinity_cobra_2103154_modes.py'
+      - 'patches/cobra-2103154/**'
+      - 'tests/cobra_2103154/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103154-adaptive-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android-update:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Check out original reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out candidate delta separately
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: refinement-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
+          github-token: ${{ github.token }}
+          path: rollback2103153
+      - name: Reconstruct immutable 2103153 and preserve complete source APK rollback
+        run: |
+          python3 -m pip install pyyaml
+          python3 refinement-delta/scripts/cobra_2103154_ci.py reconstruct
+      - name: Apply five independent renderers and execute production regression tests
+        run: python3 refinement-delta/scripts/cobra_2103154_ci.py apply
+      - name: Promote Android shell and matching UI 1.3.9
+        run: python3 refinement-delta/scripts/cobra_2103154_ci.py promote
+      - name: Compile shell only and verify release signer and all native bytes
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir adaptive-views-build --out background-candidate
+          APK=background-candidate/Infinity-1.0.9-Cobra-Adaptive-View-Identities.apk
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > background-candidate/badging.txt
+          grep -q "versionCode='2103154' versionName='1.0.9-Cobra-Adaptive-View-Identities'" background-candidate/badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > background-candidate/signing.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' background-candidate/signing.txt
+          python3 refinement-delta/scripts/cobra_2103154_ci.py verify
+          sha256sum "$APK" > background-candidate/Infinity-1.0.9-Cobra-Adaptive-View-Identities.sha256
+      - name: Render actual Android layouts and test 12000-channel virtualization and surface identity
+        run: python3 tests/cobra_2103154/run_android_views.py --build adaptive-views-build --out preflight/android-layouts
+      - name: Package matching UI and honest acceptance notes
+        run: |
+          cp -a addons/script.infinity.cobra.theme ui-package/
+          (cd ui-package && zip -q -9 -r Infinity-Cobra-UI-1.3.9.zip script.infinity.cobra.theme)
+          cat > background-candidate/READ-ME.txt <<'TXT'
+          Cobra 2103154 - Adaptive View Identities. Candidate, NOT locked.
+          Install the APK as an app update. Matching Cobra UI: 1.3.9.
+          Protected baseline: 2103153, run 35176733529, artifact 10478399925.
+          Mobile: touch dashboard. TV Grid: broadcast timeline. Compact: dense channel table.
+          Cards: channel wall. Focus: large theatre with channel/upcoming queue.
+          All five modes remain in the main drawer and illustrated mode picker.
+          Timeline: tap a live channel for preview; tap the playing channel again for fullscreen.
+          Swipe a timeline row to browse time. Hold a programme for its schedule actions.
+          The player/channel drawer, Multi-View, EPG data, and player lock remain from 2103153.
+          Native-rendered test screenshots use generated guide fixtures, NOT provider playback.
+          Test on your phone: mode switches, portrait/landscape/Fold, touch/D-pad, light/dark,
+          category/back without reconnect, preview/fullscreen, player lock and 2-4 Multi-View.
+          The build does not claim that provider EPG coverage or multi-decoder playback is verified.
+          No TiviMate code or visual assets are included. No native Kodi rebuild was performed.
+          TXT
+      - name: Upload installable candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Cobra-Adaptive-View-Identities-2103154
+          path: |
+            background-candidate/
+            ui-package/Infinity-Cobra-UI-1.3.9.zip
+            preflight/apk-verification.json
+            preflight/2103154-refinement.json
+            preflight/mode-regressions/results.json
+            preflight/inherited-regressions/results.json
+            preflight/rollback-pointer.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve source and native layout evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103154-Layout-Evidence
+          path: |
+            preflight/
+            patches/cobra-2103154/
+            engine/background-resume-source.json
+            engine/native-before.patch
+            engine/native-after-2103154.patch
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Preserve exact pre-change rollback package
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103153-Complete-Rollback
+          path: rollback-package/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90

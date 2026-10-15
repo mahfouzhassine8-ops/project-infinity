@@ -1,0 +1,75 @@
+name: Infinity | 3306 guarded provider-native package (NOT DEVICE ACCEPTED)
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/2103303-194-responsive-regressions]
+    paths:
+      - 'repairs/provider-windows-2103306/PACKAGING_REQUEST'
+      - '.github/workflows/infinity-2103306-provider-package.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103306-provider-package
+  cancel-in-progress: false
+env:
+  NATIVE_RUN: '37245035885'
+  NATIVE_COMMIT: ce69872c27138b712dca9bf231c5c8a225cf1402
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+      - name: Require success from the exact pinned native run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 repairs/provider-windows-2103306/wait_native.py --run "$NATIVE_RUN" --commit "$NATIVE_COMMIT"
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0 ndk;21.4.7075529'
+      - name: Fetch exact locked 3305 package for hash-authenticated reuse
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103305-Power-Route-RC1-APK-NOT-DEVICE-ACCEPTED
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37232671642
+          github-token: ${{ github.token }}
+          path: baseline3305
+      - name: Fetch the successful 3306 engine and preservation receipts
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-3306-Provider-Native-Validation-NO-APK
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: ${{ env.NATIVE_RUN }}
+          github-token: ${{ github.token }}
+          path: native3306
+      - name: Test package contracts and build the permanent-signed candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/provider-windows-2103306/test_wait_native.py
+          python3 repairs/provider-windows-2103306/test_package_native.py
+          python3 repairs/provider-windows-2103306/package_native.py \
+            --base-apk baseline3305/Infinity-2103305-1.0.9-Power-Route-RC1.apk \
+            --engine native3306/engine3306 --native-source-commit "$NATIVE_COMMIT" \
+            --out candidate3306 2>&1 | tee package3306.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103306-Provider-Coordinates-RC1-APK-NOT-DEVICE-ACCEPTED
+          path: candidate3306/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103306-Package-Log
+          path: package3306.log
+          retention-days: 90
+          if-no-files-found: warn

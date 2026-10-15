@@ -1,0 +1,181 @@
+name: Cobra | 2103160 Visual Theme Runtime v2 Candidate
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103160-visual-theme-runtime-v2-rc1]
+    paths:
+      - '.github/workflows/cobra-theme-runtime-2103160.yml'
+      - 'repairs/cobra-theme-runtime-2103160/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cobra-2103160-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit-and-package:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+      RUNTIME_COMMIT: b42760a25a27d23baa5db5770824cb8d32ec2290
+    steps:
+      - name: Immutable reconstruction stack
+        uses: actions/checkout@v5
+        with:
+          ref: cce2de3042cca22b531fa8ed9e13659c19dab8a4
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Locked 2103155 recipe
+        uses: actions/checkout@v5
+        with:
+          ref: 4d1ed032df7e13fd27cc2170fc5e028f5059ec32
+          path: refinement-delta
+          persist-credentials: false
+      - name: 2103156 diagnostics recipe
+        uses: actions/checkout@v5
+        with:
+          ref: b3bcb619b08205dcfc1451424b2d41e05fd37633
+          path: audit-delta
+          persist-credentials: false
+      - name: Locked 2103157 recipe
+        uses: actions/checkout@v5
+        with:
+          ref: 7d95f8dd1696e340bde82cb73ce4e04a0bc2ac98
+          path: view-delta
+          persist-credentials: false
+      - name: Locked 2103158 health recipe
+        uses: actions/checkout@v5
+        with:
+          ref: fd2af59bab2edcaea6be9e5046720715e25e64e0
+          path: health-delta
+          persist-credentials: false
+      - name: Read locked 2103159 without editing it
+        uses: actions/checkout@v5
+        with:
+          ref: 257a49d742890acf0c7d3e0220bded5a8aa80c57
+          path: experience-delta
+          persist-credentials: false
+      - name: Isolated runtime v2 source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: theme-delta
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.9-Cobra-Full-Feature-Candidate-2
+          run-id: 35044752997
+          github-token: ${{ github.token }}
+          path: run40
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Player-Reboot-Lock-2103152
+          run-id: 35169846333
+          github-token: ${{ github.token }}
+          path: rollback2103152
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Guide-Player-Refinement-2103153-Audited
+          run-id: 35176733529
+          github-token: ${{ github.token }}
+          path: rollback2103153
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Adaptive-Views-EPG-Repair-RC1-2103155
+          run-id: 35188339917
+          github-token: ${{ github.token }}
+          path: baseline155
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Diagnostics-Audit-RC1-2103156
+          run-id: 35192605567
+          github-token: ${{ github.token }}
+          path: baseline156
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-TV-Navigation-Appearance-RC1-2103157
+          run-id: 35200244871
+          github-token: ${{ github.token }}
+          path: baseline157
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Cobra-Health-Playback-RC1-2103158
+          run-id: 35206405387
+          github-token: ${{ github.token }}
+          path: baseline158
+      - uses: actions/download-artifact@v5
+        with:
+          name: Cobra-2103158-Health-Playback-Evidence
+          run-id: 35206405387
+          github-token: ${{ github.token }}
+          path: evidence158
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-Experience-Zip-Bridge-RC1-2103159
+          run-id: 35278026159
+          github-token: ${{ github.token }}
+          path: baseline159
+      - name: Reconstruct exact 2103159 and preserve complete rollback
+        run: |
+          set -euo pipefail
+          python3 -m pip install pyyaml
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py reconstruct
+      - name: Apply isolated runtime source and execute safety and inherited EPG checks
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py apply
+      - name: Compile Android only, sign and verify protected payloads
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test ! -e signed160
+          python3 scripts/package_background_resume.py --source kodi --base-apk background-rollback/Infinity-Run40-Exact-Base.apk --build-dir visual-build --out signed160
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py verify
+      - name: Execute inherited Android and new visual-runtime tests; no skipped acceptance
+        run: |
+          set -euo pipefail
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/tests/android.py --build visual-build --out audit160/android
+          python3 theme-delta/repairs/cobra-theme-runtime-2103160/ci.py deliver
+      - name: Upload signed TEST CANDIDATE only after all automated gates
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103160-Visual-Theme-Runtime-v2-TEST-CANDIDATE
+          path: signed160/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Preserve reports even on failure; no unaccepted APK
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Cobra-2103160-Visual-Runtime-Evidence
+          path: |
+            audit160/
+            audit159/
+            engine/background-resume-source.json
+            signed160/*.txt
+            signed160/*.json
+            theme-delta/repairs/cobra-theme-runtime-2103160/
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Preserve exact 2103159 rollback even if the new candidate fails
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103159-Exact-Rollback-Before-2103160
+          path: rollback160/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 90

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "candidate_locked": false,
+  "source_commit": "85126e37c322067718b6309e11246697b29ccd2e",
+  "source_lock": "ad18f93633ecc3ec74d121acf50bda873cd33cd0",
+  "build_run": 36823023157,
+  "build_job": 110242492248,
+  "runtime_job": 110244131340,
+  "runtime_status": "passed",
+  "apk": "Infinity-2103281-Remaining-Audit-RC1.apk",
+  "apk_sha256": "4c119343d623be5c15233e7b1ed7fa82e3d1f92c3a5ec56f7d3f85b0707cbfe5",
+  "apk_bytes": 93536543,
+  "signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "regression_tests": 522,
+  "protected_renders_byte_identical": 20,
+  "native_files_byte_identical": 46,
+  "asset_files_byte_identical": 4039,
+  "android_resources_byte_identical": true,
+  "baseline_additional_runtime_passed": 12,
+  "baseline_additional_runtime_total": 14,
+  "baseline_additional_runtime_run": 36822167443,
+  "physical_device_verified": false,
+  "authenticated_providers_verified": false,
+  "full_brief_complete": false,
+  "runtime_scenarios_passed": 3,
+  "runtime_scenarios_total": 3,
+  "update_from_2103280": "passed",
+  "candidate_artifact": 11144128927,
+  "runtime_artifact": 11144740658,
+  "runtime_artifact_sha256": "56764bf80b92c4435d1677e86a2b734e75a00dac053c044d82413d3831961edf",
+  "runtime_crash_anr_markers_found": false,
+  "runtime_scenarios": [
+    {
+      "passed": true,
+      "pss_kb": 90228,
+      "java_heap_bytes": 15368088,
+      "native_heap_bytes": 22161664,
+      "name": "Sports Watch Live and Smart Multi-View resolve fixture broadcasts into real playback",
+      "elapsed_ms": 8700
+    },
+    {
+      "passed": true,
+      "pss_kb": 82393,
+      "java_heap_bytes": 10333992,
+      "native_heap_bytes": 20419744,
+      "name": "Late Sports Watch result cannot open playback after drawer navigation",
+      "elapsed_ms": 3412
+    },
+    {
+      "passed": true,
+      "pss_kb": 87245,
+      "java_heap_bytes": 14166936,
+      "native_heap_bytes": 22313712,
+      "name": "Late Smart Sports Multi-View result cannot replace a newer drawer destination",
+      "elapsed_ms": 2771
+    }
+  ]
+}

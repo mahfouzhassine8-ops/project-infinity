@@ -1,0 +1,299 @@
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.content.res.ColorStateList;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import java.util.ArrayList;
+
+/** Trusted built-in chooser presentation. No startup, player, JNI or data-store ownership.
+ * Art is eight small text-free material plates, not a flattened interactive screenshot.
+ * All labels, marks, focus, hit areas and controls are independently laid out native Views.
+ */
+final class InfinityGlassChooser extends FrameLayout {
+  interface Actions {
+    void enter(String experience);
+    void settings(String experience);
+    void themes();
+    String appearance();
+    void appearanceChanged();
+  }
+  static final int ENTER_INFINITY=0x00f02571, ENTER_COBRA=0x00f02572;
+  static final int SETTINGS_INFINITY=0x00f02573, SETTINGS_COBRA=0x00f02574;
+  static final int PILL_INFINITY=0x00f02575, PILL_COBRA=0x00f02576;
+  private final Actions actions;
+  private final String mode;
+  final boolean light;
+  private final SharedPreferences preferences;
+  final ScrollView content;
+  final Stage stage;
+  private boolean subscribed, refreshQueued;
+  private final Runnable refresh = new Runnable() {
+    @Override public void run() {
+      refreshQueued=false;
+      if (isAttachedToWindow() && !mode.equals(actions.appearance())) actions.appearanceChanged();
+    }
+  };
+  private final SharedPreferences.OnSharedPreferenceChangeListener listener = (prefs,key) -> {
+    if (key==null || "cobra_appearance_mode".equals(key) || "cobra_system_dark_variant".equals(key)) requestThemeCheck();
+  };
+  static int background(boolean light) {return light?0xffeef1f5:0xff041326;}
+  InfinityGlassChooser(Context context, Actions actions) {
+    super(context);
+    this.actions=actions;
+    mode=actions.appearance(); light="light".equals(mode);
+    preferences=context.getSharedPreferences("infinity_cobra_live",Context.MODE_PRIVATE);
+    setBackgroundColor(background(light));
+    setTag("infinity_glass_chooser_2103257");
+    stage=new Stage(context,light,actions);
+    content=new ScrollView(context) {
+      @Override protected void onMeasure(int w,int h) {
+        stage.viewportHint=Math.max(0,MeasureSpec.getSize(h)-getPaddingTop()-getPaddingBottom());
+        super.onMeasure(w,h);
+      }
+    };
+    content.setFillViewport(true);content.setClipToPadding(true);
+    content.setVerticalScrollBarEnabled(false);content.setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
+    content.addView(stage,new ScrollView.LayoutParams(-1,-2));
+    addView(content,new FrameLayout.LayoutParams(-1,-1));
+  }
+  private void requestThemeCheck() {
+    if (!refreshQueued) {refreshQueued=true;post(refresh);}
+  }
+  @Override protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    if (!subscribed) {preferences.registerOnSharedPreferenceChangeListener(listener);subscribed=true;}
+    requestThemeCheck();
+  }
+  @Override protected void onDetachedFromWindow() {
+    if(subscribed){preferences.unregisterOnSharedPreferenceChangeListener(listener);subscribed=false;}
+    removeCallbacks(refresh);refreshQueued=false;super.onDetachedFromWindow();
+  }
+  @Override protected void onConfigurationChanged(Configuration config) {
+    super.onConfigurationChanged(config);requestThemeCheck();requestLayout();
+  }
+  void focusEntry(){stage.infinity.requestFocus();}
+
+  private static final class Box {
+    final View view; final float x,y,w,h; final boolean minimumTouch;
+    Box(View v,float x,float y,float w,float h,boolean touch){view=v;this.x=x;this.y=y;this.w=w;this.h=h;minimumTouch=touch;}
+  }
+  static final class Stage extends ViewGroup {
+    final boolean light; final Actions actions;
+    final ArrayList<Box> boxes=new ArrayList<>();
+    final float referenceWidth,referenceHeight;
+    final Material backdrop;
+    final Card infinity,cobra;
+    float scale,left;int viewportHint;
+    Stage(Context c, boolean light, Actions actions) {
+      super(c);this.light=light;this.actions=actions;
+      referenceWidth=light?840:941; referenceHeight=light?1873:1672;
+      setClipChildren(false);setClipToPadding(false);
+      setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+      backdrop=new Material(c,light?"light_background":"dark_background",true,light);
+      addView(backdrop);
+      int ink=light?0xff081c34:0xfff7f6f2;
+      int muted=light?0xff47617f:0xffb7c2d3;
+      add(new Mark(c,false),light?341:391,light?95:82,light?156:153,light?61:62,false);
+      label("INFINITY",light?239:280,light?176:161,light?362:382,59,45,true,ink,.15f);
+      label("ONE PLATFORM. YOUR WAY.",light?206:263,light?225:214,light?432:422,27,19,false,ink,.17f);
+      add(new Material(c,light?"light_orb":"dark_orb",false,light),light?679:679,light?39:32,light?120:192,light?111:135,false);
+      label("HM",light?710:730,light?73:69,light?63:91,51,43,true,light?ink:0xffffe4a4,0);
+      label(light?"BUILT\nDIFFERENT\nFOR A HIGHER\nEXPERIENCE":"BUILT DIFFERENT\nFOR A HIGHER",
+          light?678:680,light?165:174,light?123:199,light?83:49,light?12:15,false,muted,.13f);
+      label("CHOOSE YOUR EXPERIENCE",light?59:77,light?330:296,light?722:789,72,light?48:57,true,ink,-.015f);
+      if(light)label("ENTERTAINMENT WITHOUT LIMITS",181,404,478,29,16,false,muted,.23f);
+      infinity=new Card(c,light,false,actions);cobra=new Card(c,light,true,actions);
+      add(infinity,light?29:58,light?474:438,light?385:400,light?670:581,false);
+      add(cobra,light?425:482,light?474:438,light?385:403,light?670:581,false);
+      label("INFINITY LIVES IN HOW YOU EXPERIENCE IT",light?173:182,light?1283:1135,light?504:578,30,16,false,light?ink:muted,.13f);
+      label("ANY SCREEN · YOUR PREFERENCES · ALWAYS WITH YOU",light?109:162,light?1200:1166,light?623:617,29,light?14:15,false,muted,.14f);
+      if(light)label("MOVIES  •  SHOWS  •  LIVE TV  •  AND MORE",171,1734,500,29,13,false,muted,.24f);
+      // Existing theme management remains available from the non-card background.
+      setOnLongClickListener(v->{actions.themes();return true;});
+      infinity.setNextFocusRightId(ENTER_COBRA);cobra.setNextFocusLeftId(ENTER_INFINITY);
+      infinity.setNextFocusUpId(SETTINGS_INFINITY);cobra.setNextFocusUpId(SETTINGS_COBRA);
+    }
+    private void label(String text,float x,float y,float w,float h,float size,boolean serif,int color,float tracking) {
+      Label t=new Label(getContext(),text,size,serif,color,tracking);add(t,x,y,w,h,false);
+    }
+    private void add(View v,float x,float y,float w,float h,boolean touch){boxes.add(new Box(v,x,y,w,h,touch));addView(v);}
+    @Override protected void onMeasure(int ws,int hs) {
+      int w=MeasureSpec.getSize(ws); if(w<=0)w=getResources().getDisplayMetrics().widthPixels;
+      int available=MeasureSpec.getSize(hs);
+      // ScrollView's first pass is UNSPECIFIED. Prefer its real window, not physical display.
+      View parent=getParent() instanceof View?(View)getParent():null;
+      int viewport=Math.max(viewportHint,parent==null?available:Math.max(available,parent.getMeasuredHeight()-parent.getPaddingTop()-parent.getPaddingBottom()));
+      float density=getResources().getDisplayMetrics().density;
+      float designWidth=Math.min(w,600*density);
+      if(viewport>0 && w>viewport)designWidth=Math.min(designWidth,Math.max(320*density,viewport*.82f));
+      scale=Math.max(.1f,designWidth/referenceWidth);left=(w-designWidth)/2;
+      int natural=(int)Math.ceil(referenceHeight*scale);
+      int height=Math.max(natural,MeasureSpec.getMode(hs)==MeasureSpec.EXACTLY?available:0);
+      setMeasuredDimension(w,height);
+      backdrop.measure(MeasureSpec.makeMeasureSpec((int)designWidth,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY));
+      for(Box b:boxes){
+        int bw=Math.max(1,Math.round(b.w*scale)),bh=Math.max(1,Math.round(b.h*scale));
+        if(b.view instanceof Label)((Label)b.view).scale=scale;
+        if(b.view instanceof Card)((Card)b.view).scale=scale;
+        b.view.measure(MeasureSpec.makeMeasureSpec(bw,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(bh,MeasureSpec.EXACTLY));
+      }
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b) {
+      backdrop.layout(Math.round(left),0,Math.round(left+referenceWidth*scale),getMeasuredHeight());
+      for(Box box:boxes){int x=Math.round(left+box.x*scale),y=Math.round(box.y*scale);box.view.layout(x,y,x+box.view.getMeasuredWidth(),y+box.view.getMeasuredHeight());}
+    }
+  }
+
+  /** Pixel positions follow each golden master; text remains selectable by accessibility. */
+  static final class Label extends TextView {
+    final float designSize;float scale=1;
+    Label(Context c,String text,float size,boolean serif,int color,float tracking){
+      super(c);designSize=size;setText(text);setTextColor(color);setGravity(Gravity.CENTER);
+      setTypeface(Typeface.create(serif?"serif":"sans-serif-light",Typeface.NORMAL));
+      setLetterSpacing(tracking);setIncludeFontPadding(false);setPadding(0,0,0,0);
+      setLineSpacing(0,1.10f);setMaxLines(text.split("\\n",-1).length);
+      setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
+    }
+    @Override protected void onMeasure(int ws,int hs){
+      float size=designSize*scale;
+      // Respect font scaling without allowing a large accessibility setting to hide a control.
+      size*=Math.min(1.20f,getResources().getConfiguration().fontScale);
+      int width=MeasureSpec.getSize(ws),height=MeasureSpec.getSize(hs);
+      setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+      String[] lines=getText().toString().split("\\n",-1);
+      for(int i=0;i<16;i++){
+        float widest=0;for(String line:lines)widest=Math.max(widest,getPaint().measureText(line));
+        if(widest<=width*.98f && getPaint().getFontSpacing()*lines.length<=height*1.15f)break;
+        size*=.955f;setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+      }
+      super.onMeasure(ws,hs);
+    }
+  }
+
+  static final class Card extends ViewGroup {
+    final boolean light,cobra;final Actions actions;final ArrayList<Box> parts=new ArrayList<>();
+    final Material material; final Gear gear;final Label pill;
+    float scale=1;final float rw,rh; final Paint ring=new Paint(Paint.ANTI_ALIAS_FLAG);final RectF outline=new RectF();
+    Card(Context c,boolean light,boolean cobra,Actions actions){
+      super(c);this.light=light;this.cobra=cobra;this.actions=actions;rw=light?385:(cobra?403:400);rh=light?670:581;
+      setId(cobra?ENTER_COBRA:ENTER_INFINITY);setTag(cobra?"experience-enter-cobra":"experience-enter-infinity");
+      setContentDescription(cobra?"Cobra. Control your experience. Open Cobra.":"Infinity. Beyond entertainment. Open Infinity.");
+      setFocusable(true);setClickable(true);setWillNotDraw(false);setClipChildren(false);
+      setOnClickListener(v->actions.enter(cobra?"live":"infinity"));
+      setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+      material=new Material(c,(light?"light_":"dark_")+(cobra?"cyan":"gold"),false,light);addView(material);
+      int ink=light?0xff071c36:0xfff5f4f1;
+      gear=new Gear(c,light,cobra);gear.setId(cobra?SETTINGS_COBRA:SETTINGS_INFINITY);
+      gear.setTag(cobra?"experience-settings-cobra":"experience-settings-infinity");
+      gear.setContentDescription(cobra?"Cobra settings and recovery":"Infinity settings and Health Center");
+      gear.setOnClickListener(v->actions.settings(cobra?"live":"infinity"));
+      part(gear,light?245:258,light?30:31,light?112:115,112,true);
+      part(new Mark(c,cobra),light?(cobra?49:68):(cobra?60:78),light?(cobra?151:178):(cobra?147:179),light?(cobra?279:246):(cobra?281:249),light?(cobra?159:148):(cobra?165:130),false);
+      label(cobra?"COBRA":"INFINITY",20,light?328:320,rw-40,66,light?45:49,true,ink,.04f);
+      label(cobra?"CONTROL YOUR\nEXPERIENCE":"BEYOND\nENTERTAINMENT",30,light?423:409,rw-60,57,light?21:22,false,ink,.08f);
+      if(light){
+        pill=new Label(c,cobra?"ENTER COBRA  ›":"ENTER INFINITY  ›",19,false,ink,.055f);
+        pill.setId(cobra?PILL_COBRA:PILL_INFINITY);pill.setTag(cobra?"experience-pill-cobra":"experience-pill-infinity");
+        pill.setFocusable(true);pill.setClickable(true);pill.setContentDescription(cobra?"Enter Cobra":"Enter Infinity");
+        pill.setBackground(pillSurface(cobra));pill.setOnClickListener(v->actions.enter(cobra?"live":"infinity"));
+        part(pill,36,550,rw-72,78,true);pill.setNextFocusUpId(gear.getId());
+      }else pill=null;
+      gear.setNextFocusDownId(light?pill.getId():getId());
+      gear.setNextFocusLeftId(cobra?SETTINGS_INFINITY:SETTINGS_COBRA);
+      gear.setNextFocusRightId(cobra?SETTINGS_INFINITY:SETTINGS_COBRA);
+      ring.setStyle(Paint.Style.STROKE);ring.setColor(cobra?(light?0xff087797:0xff83e5ff):(light?0xff896018:0xffffdc86));
+    }
+    private Drawable pillSurface(boolean cobra){
+      GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xfaffffff,cobra?0xcbb5ebf6:0xcbeedcb2,0xeaffffff});
+      shape.setCornerRadius(100);shape.setStroke(2,0xfaffffff);
+      return new RippleDrawable(ColorStateList.valueOf(cobra?0x400098cc:0x408c621c),shape,null);
+    }
+    private void label(String text,float x,float y,float w,float h,float size,boolean serif,int color,float tracking){part(new Label(getContext(),text,size,serif,color,tracking),x,y,w,h,false);}
+    private void part(View v,float x,float y,float w,float h,boolean touch){parts.add(new Box(v,x,y,w,h,touch));addView(v);}
+    @Override protected void onMeasure(int ws,int hs){
+      int w=MeasureSpec.getSize(ws),h=MeasureSpec.getSize(hs);setMeasuredDimension(w,h);scale=w/rw;
+      material.measure(MeasureSpec.makeMeasureSpec(w,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(h,MeasureSpec.EXACTLY));
+      int min=Math.round(48*getResources().getDisplayMetrics().density);
+      for(Box b:parts){
+        int bw=Math.round(b.w*scale),bh=Math.round(b.h*scale);
+        if(b.minimumTouch){bw=Math.min(w,Math.max(min,bw));bh=Math.min(h,Math.max(min,bh));}
+        if(b.view instanceof Label)((Label)b.view).scale=scale;
+        b.view.measure(MeasureSpec.makeMeasureSpec(Math.max(1,bw),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Math.max(1,bh),MeasureSpec.EXACTLY));
+      }
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+      material.layout(0,0,getWidth(),getHeight());
+      for(Box p:parts){int w=p.view.getMeasuredWidth(),h=p.view.getMeasuredHeight();
+        int x=Math.round((p.x+p.w/2)*scale-w/2),y=Math.round((p.y+p.h/2)*scale-h/2);
+        x=Math.max(0,Math.min(getWidth()-w,x));y=Math.max(0,Math.min(getHeight()-h,y));p.view.layout(x,y,x+w,y+h);
+      }
+      outline.set(5*scale,5*scale,getWidth()-5*scale,getHeight()-5*scale);ring.setStrokeWidth(Math.max(2,4*scale));
+    }
+    @Override protected void dispatchDraw(Canvas c){super.dispatchDraw(c);if(isFocused()||isPressed())c.drawRoundRect(outline,48*scale,48*scale,ring);}
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+  }
+
+  /** The source-derived finish is decorative. It never owns text, focus or action callbacks. */
+  private static final class Material extends View {
+    private final Bitmap bitmap;private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    private final Rect src=new Rect();private final RectF dst=new RectF();private final boolean background,light;
+    Material(Context c,String key,boolean background,boolean light){super(c);this.background=background;this.light=light;bitmap=InfinityGlassArt.decode(key);if(bitmap==null)throw new IllegalStateException("Missing glass material "+key);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    @Override protected void onDraw(Canvas canvas){
+      super.onDraw(canvas);
+      if(!background){dst.set(0,0,getWidth(),getHeight());canvas.drawBitmap(bitmap,null,dst,paint);return;}
+      float referenceW=light?840:941,referenceH=light?1873:1672;
+      float scale=getWidth()/referenceW;float fixed=(light?1340:1205)*scale;
+      // Preserve card/header registration; extend only the quiet orbital floor for tall windows.
+      int seam=Math.round(bitmap.getHeight()*(light?1340f/1873f:1205f/1672f));
+      src.set(0,0,bitmap.getWidth(),seam);dst.set(0,0,getWidth(),fixed);canvas.drawBitmap(bitmap,src,dst,paint);
+      src.set(0,seam,bitmap.getWidth(),bitmap.getHeight());dst.set(0,fixed,getWidth(),getHeight());canvas.drawBitmap(bitmap,src,dst,paint);
+    }
+  }
+  static final class Gear extends View {
+    final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);final RectF frame=new RectF();final Path cog=new Path();final boolean light,cobra;
+    Gear(Context c,boolean light,boolean cobra){super(c);this.light=light;this.cobra=cobra;setFocusable(true);setClickable(true);}
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){
+      super.onSizeChanged(w,h,ow,oh);float s=Math.min(w,h),cx=w/2f,cy=h/2f;
+      frame.set(cx-s*.42f,cy-s*.42f,cx+s*.42f,cy+s*.42f);cog.reset();
+      for(int i=0;i<40;i++){double angle=i*Math.PI/20-Math.PI/2;float rad=s*((i%5==1||i%5==2)? .150f:.123f);
+        float x=cx+(float)Math.cos(angle)*rad,y=cy+(float)Math.sin(angle)*rad;if(i==0)cog.moveTo(x,y);else cog.lineTo(x,y);}
+      cog.close();
+    }
+    @Override protected void onDraw(Canvas c){
+      float s=Math.min(getWidth(),getHeight());p.setStyle(Paint.Style.FILL);p.setColor(light?0x80ffffff:0x9012253c);c.drawRoundRect(frame,s*(light?.42f:.27f),s*(light?.42f:.27f),p);
+      p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1,s*.018f));p.setColor(light?0xfffaffff:(cobra?0xff69bff5:0xffc6b795));c.drawRoundRect(frame,s*(light?.42f:.27f),s*(light?.42f:.27f),p);
+      if(isPressed()||isFocused()){p.setStrokeWidth(Math.max(2,s*.035f));p.setColor(cobra?0xff159acc:0xffbc9438);c.drawRoundRect(frame,s*.27f,s*.27f,p);}
+      p.setColor(light?0xff082339:0xffe1ebf3);p.setStrokeWidth(Math.max(1.5f,s*.027f));c.drawPath(cog,p);c.drawCircle(getWidth()/2f,getHeight()/2f,s*.049f,p);
+    }
+    @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
+    @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
+  }
+  private static final class Mark extends View {
+    final boolean cobra;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);final RectF bounds=new RectF();final Path loop=new Path();
+    Mark(Context c,boolean cobra){super(c);this.cobra=cobra;if(cobra)CobraEmblem.prepare(c);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    @Override protected void onSizeChanged(int w,int h,int ow,int oh){
+      super.onSizeChanged(w,h,ow,oh);bounds.set(0,0,w,h);loop.reset();
+      if(cobra)return;
+      loop.moveTo(w*.50f,h*.50f);loop.cubicTo(w*.31f,h*.15f,w*.07f,h*.00f,w*.07f,h*.50f);
+      loop.cubicTo(w*.07f,h*1.00f,w*.31f,h*.85f,w*.50f,h*.50f);loop.cubicTo(w*.69f,h*.15f,w*.93f,0,w*.93f,h*.50f);
+      loop.cubicTo(w*.93f,h,w*.69f,h*.85f,w*.50f,h*.50f);
+      p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(w*.061f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);
+      p.setShader(new LinearGradient(0,0,w,h,new int[]{0xffb68a29,0xffffecae,0xffb78027,0xffffe8a0,0xffbd902d},null,Shader.TileMode.CLAMP));
+    }
+    @Override protected void onDraw(Canvas c){if(cobra)CobraEmblem.draw(c,bounds,Color.WHITE,255);else c.drawPath(loop,p);}
+  }
+}

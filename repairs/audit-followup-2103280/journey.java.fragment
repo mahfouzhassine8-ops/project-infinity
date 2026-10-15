@@ -1,0 +1,97 @@
+ void launch(boolean seed)throws Exception{
+  Context ctx=ins.getTargetContext();out=new File(ctx.getExternalFilesDir(null),"audit-followup");out.mkdirs();
+  if(seed){
+   JSONObject source=new JSONObject().put("id","audit").put("type","m3u").put("name","Generated audit provider").put("playlist_url","http://10.0.2.2:8765/audit.m3u").put("epg_url","");
+   ctx.getSharedPreferences("infinity_cobra_live",0).edit().clear().putString("sources_json",new JSONArray().put(source).toString()).putString("active_source","audit").putBoolean("cobra_live_rewind_enabled",false).putString("cobra_appearance_mode","dark").putString("cobra_ambient_mode","immersive").commit();
+  }
+  long began=SystemClock.elapsedRealtime();a=(InfinityLiveActivity)ins.startActivitySync(new Intent(ctx,InfinityLiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));startupMs=SystemClock.elapsedRealtime()-began;
+  await("provider loaded",()->((List<?>)get(a,"mChannels")).size()>=5,20000);
+ }
+ void tag(String name)throws Exception{runUi(()->{View v=a.getWindow().getDecorView().findViewWithTag(name);assertNotNull(name,v);assertTrue(name+" callback",v.performClick());});ins.waitForIdleSync();}
+ View textView(View root,String label){if(root instanceof TextView&&label.contentEquals(((TextView)root).getText()))return root;if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){View v=textView(((ViewGroup)root).getChildAt(i),label);if(v!=null)return v;}return null;}
+ void tapText(String label)throws Exception{
+  Rect b=ui(()->{for(View root:android.view.inspector.WindowInspector.getGlobalWindowViews()){View v=textView(root,label);Rect r=new Rect();if(v!=null&&v.getGlobalVisibleRect(r))return r;}return null;});assertNotNull("Visible touch target: "+label,b);
+  long t=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent e=MotionEvent.obtain(t,SystemClock.uptimeMillis(),action,b.exactCenterX(),b.exactCenterY(),0);try{ins.sendPointerSync(e);}finally{e.recycle();}}ins.waitForIdleSync();
+ }
+ void toGuide()throws Exception{runUi(()->{call(a,"closeCobraActionSheet");if(get(a,"mMultiOverlay")!=null)call(a,"releaseMulti");if(get(a,"mPlayerOverlay")!=null)call(a,"closeFullscreenToCobraView");call(a,"cobraSelectDrawerOwner","TV");call(a,"showCobraPrimaryView");});}
+ void watch(String name)throws Exception{toGuide();start(name);runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));await("Watch playing",()->get(a,"mPlayer")!=null&&((ExoPlayer)get(a,"mPlayer")).isPlaying(),10000);}
+ boolean recordingServiceRunning(){ActivityManager m=(ActivityManager)a.getSystemService(Context.ACTIVITY_SERVICE);for(ActivityManager.RunningServiceInfo s:m.getRunningServices(100))if(s.service.getClassName().equals("com.projectinfinity.kodi.InfinityCobraRecordingService"))return true;return false;}
+ File recorded(String prefix)throws Exception{Object features=get(a,"mFeatures");JSONArray recordings=(JSONArray)call(features,"recordings");for(int i=0;i<recordings.length();i++){JSONObject item=recordings.getJSONObject(i);if(item.getString("name").contains(prefix))return new File(item.getString("path"));}return null;}
+ void selectTrack(int type,String language)throws Exception{
+  runUi(()->call(a,"showTrackChooser"));ExoPlayer p=ui(()->(ExoPlayer)get(a,"mPlayer"));
+  String selected=ui(()->{int group=0;for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups()){for(int i=0;i<g.length;i++)if(g.getType()==type&&language.equals(g.getTrackFormat(i).language)&&g.isTrackSupported(i))return "cobra-track:"+group+":"+i;group++;}return null;});assertNotNull("Available language "+language,selected);tag(selected);
+  await("selected "+language,()->{for(androidx.media3.common.Tracks.Group g:p.getCurrentTracks().getGroups())if(g.getType()==type)for(int i=0;i<g.length;i++)if(g.isTrackSelected(i)&&language.equals(g.getTrackFormat(i).language))return true;return false;},8000);
+ }
+ @Test public void additionalRuntimeJourney()throws Exception{
+  launch(true);
+  check("Multi-View real PiP return retains channels audio owner and paused state",()->{
+   for(int count=2;count<=4;count++){
+    watch("Wide");ArrayList<Object> chosen=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd"})chosen.add(channel(n));final int c=count;
+    runUi(()->call(a,"openMultiView",new ArrayList<>(chosen.subList(0,c))));
+    await("multi decoders ready",()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");if(ps==null||ps.length!=c)return false;for(ExoPlayer p:ps)if(p==null||!p.isPlaying()||p.getVideoSize().width==0)return false;return true;},20000);
+    ExoPlayer owner=ui(()->((ExoPlayer[])get(a,"mMultiPlayers"))[c-1]);runUi(()->{((ExoPlayer[])get(a,"mMultiPlayers"))[0].pause();call(a,"setMultiAudio",c-1);call(a,"enterCobraPictureInPicture");});
+    await("framework PiP",a::isInPictureInPictureMode,8000);assertSame(owner,ui(()->get(a,"mPlayer")));screenshot("multi-"+c+"-pip");
+    android.media.session.MediaSession session=ui(()->(android.media.session.MediaSession)get(a,"mCobraPipMediaSession"));assertNotNull("PiP transport session",session);
+    android.media.session.MediaController controller=new android.media.session.MediaController(a,session.getSessionToken());controller.getTransportControls().pause();await("PiP pause transport",()->!owner.getPlayWhenReady(),5000);controller.getTransportControls().play();await("PiP play transport",owner::isPlaying,5000);
+    foreground();await("restored multi playback",()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");if(ps==null||ps.length!=c)return false;for(int i=1;i<c;i++)if(!ps[i].isPlaying()||ps[i].getVideoSize().width==0)return false;return true;},20000);
+    ExoPlayer[] restored=ui(()->(ExoPlayer[])get(a,"mMultiPlayers"));assertSame("Audio owner decoder survives",owner,restored[c-1]);assertFalse("Paused pane stays paused",ui(restored[0]::getPlayWhenReady));assertEquals(c-1,ui(()->((Number)get(a,"mAudioTile")).intValue()).intValue());
+    Object[] actual=ui(()->(Object[])get(a,"mMultiChannels"));for(int i=0;i<c;i++)assertEquals(get(chosen.get(i),"id"),get(actual[i],"id"));screenshot("multi-"+c+"-pip-return");
+   }toGuide();
+  });
+  check("Recording start stop saved bytes local decode and Smart Return",()->{
+   watch("Rewind");ExoPlayer same=ui(()->(ExoPlayer)get(a,"mPlayer"));runUi(()->call(a,"toggleRecording",get(a,"mPlaying")));SystemClock.sleep(300);tapText("Until I stop it");
+   await("DVR wrote data",()->{File f=recorded("Rewind");return f!=null&&f.length()>65536;},15000);assertSame(same,ui(()->get(a,"mPlayer")));assertTrue(ui(same::isPlaying));SystemClock.sleep(3500);
+   runUi(()->call(a,"toggleRecording",get(a,"mPlaying")));await("DVR service stopped",()->!recordingServiceRunning(),8000);File f=recorded("Rewind");assertNotNull(f);long bytes=f.length();SystemClock.sleep(1200);assertEquals(bytes,f.length());
+   runUi(()->{call(a,"closeFullscreenToCobraView");call(a,"cobraSelectDrawerOwner","RECORDINGS");call(a,"showCobraPrimaryView");call(a,"playLocalPath",f.getAbsolutePath(),f.getName());});
+   await("saved recording actually decodes",()->{ExoPlayer p=(ExoPlayer)get(a,"mPlayer");return p!=null&&p.isPlaying()&&p.getVideoSize().width>0;},12000);screenshot("recorded-playback");runUi(()->call(a,"closeFullscreenToCobraView"));assertEquals("recordings",ui(()->call(a,"cobraDrawerOwner")));
+  });
+  check("Finished recording clears active UI and permits next recording",()->{
+   watch("Finite");runUi(()->call(a,"toggleRecording",get(a,"mPlaying")));SystemClock.sleep(300);tapText("Until I stop it");
+   await("finite recording saved",()->{File f=recorded("Finite");return f!=null&&f.length()>65536;},12000);await("finite recording finished",()->!recordingServiceRunning(),12000);
+   runUi(()->call(a,"showPlayerSettingsDrawer"));SystemClock.sleep(300);assertEquals("Completed service must not leave a stale active recording", "",ui(()->get(a,"mRecordingSession")));screenshot("recording-finished-menu");
+  });
+  check("Subtitle languages off state sizes and audio selection survive PiP fullscreen",()->{
+   watch("Wide");ExoPlayer same=ui(()->(ExoPlayer)get(a,"mPlayer"));selectTrack(androidx.media3.common.C.TRACK_TYPE_TEXT,"es");selectTrack(androidx.media3.common.C.TRACK_TYPE_AUDIO,"es");
+   runUi(()->call(a,"cobraShowSubtitleSize"));tag("cobra-subtitle-size:150");assertEquals(150,ui(()->((Number)call(a,"cobraSubtitleSize")).intValue()).intValue());
+   runUi(()->call(a,"cobraShowSubtitleAdaptation"));tag("cobra-subtitle-adaptation:true");runUi(()->call(a,"closeCobraActionSheet"));
+   runUi(()->call(a,"enterCobraPictureInPicture"));await("caption PiP",a::isInPictureInPictureMode,8000);foreground();assertSame(same,ui(()->get(a,"mPlayer")));
+   runUi(()->call(a,"showTrackChooser"));tag("cobra-track-off");await("CC actually disabled",()->same.getTrackSelectionParameters().disabledTrackTypes.contains(androidx.media3.common.C.TRACK_TYPE_TEXT),4000);
+   runUi(()->{call(a,"closeCobraActionSheet");call(a,"closeFullscreenToCobraView");});assertSame(same,player());assertFalse(ui(()->(Boolean)call(a,"cobraCaptionsRequested",same)));
+   runUi(()->call(a,"promoteCobraPreviewToFullscreen",get(a,"mGuidePreviewChannel")));assertTrue(ui(()->same.getTrackSelectionParameters().disabledTrackTypes.contains(androidx.media3.common.C.TRACK_TYPE_TEXT)));screenshot("cc-off-after-return");
+  });
+  check("Real Android audio focus interruption preserves decoder and user mute",()->{
+   watch("Wide");ExoPlayer same=ui(()->(ExoPlayer)get(a,"mPlayer"));runUi(()->call(a,"cobraUserUnmute",same));
+   android.media.AudioManager audio=(android.media.AudioManager)a.getSystemService(Context.AUDIO_SERVICE);
+   android.media.AudioFocusRequest other=new android.media.AudioFocusRequest.Builder(android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(new android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_VOICE_COMMUNICATION).build()).setOnAudioFocusChangeListener(value->{}).build();
+   try{assertEquals(android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED,audio.requestAudioFocus(other));await("focus loss mutes app",()->same.getVolume()==0f,5000);assertTrue("Video continues through focus loss",ui(same::getPlayWhenReady));assertSame(same,ui(()->get(a,"mPlayer")));}finally{audio.abandonAudioFocusRequest(other);}
+   await("focus return restores audio",()->same.getVolume()>0f,5000);runUi(()->call(a,"cobraToggleMediaMute",same));assertEquals(0f,ui(same::getVolume),.001f);
+   try{audio.requestAudioFocus(other);SystemClock.sleep(400);}finally{audio.abandonAudioFocusRequest(other);}SystemClock.sleep(500);assertEquals("User mute survives focus cycle",0f,ui(same::getVolume),.001f);
+  });
+  check("Player sheets fit visible window in Light Dark OLED",()->{
+   watch("Wide");for(String theme:new String[]{"light","dark","oled"}){
+    runUi(()->{((SharedPreferences)get(a,"mPrefs")).edit().putString("cobra_appearance_mode",theme).commit();call(a,"cobraApplyAppearanceSettings");});
+    for(String menu:new String[]{"Channels","Display","More"}){runUi(()->call(a,"showPlayerChromeTemporarily"));press(menu);SystemClock.sleep(500);if(menu.equals("Channels"))assertDrawerSafe();else runUi(()->{View sheet=(View)get(a,"mCobraSheetPanel");Rect r=new Rect();assertNotNull(sheet);assertTrue(sheet.getGlobalVisibleRect(r));assertTrue(r.height()>40);assertTrue(r.width()>40);});screenshot(theme+"-"+menu);runUi(()->{call(a,"closeCobraActionSheet");call(a,"closeCobraPlayerDrawer");});}
+   }
+  });
+  check("Four decoder sustained playback and release observations",()->{
+   watch("Wide");ArrayList<Object> chosen=new ArrayList<>();for(String n:new String[]{"Wide","Classic","Portrait","Odd"})chosen.add(channel(n));runUi(()->call(a,"openMultiView",chosen));
+   await("four active decoders",()->{ExoPlayer[] ps=(ExoPlayer[])get(a,"mMultiPlayers");if(ps==null||ps.length!=4)return false;for(ExoPlayer p:ps)if(!p.isPlaying())return false;return true;},20000);
+   runUi(()->{for(ExoPlayer p:(ExoPlayer[])get(a,"mMultiPlayers"))p.setRepeatMode(Player.REPEAT_MODE_ALL);});JSONArray memory=new JSONArray();
+   for(int n=0;n<36;n++){SystemClock.sleep(5000);Debug.MemoryInfo info=new Debug.MemoryInfo();Debug.getMemoryInfo(info);memory.put(new JSONObject().put("seconds",(n+1)*5).put("pss_kb",info.getTotalPss()));assertEquals(4,ui(()->((Map<?,?>)get(a,"mCobraPlayerBindings")).size()).intValue());runUi(()->{for(ExoPlayer p:(ExoPlayer[])get(a,"mMultiPlayers")){assertNull(p.getPlayerError());assertTrue(p.getPlayWhenReady());assertTrue(p.getVideoSize().width>0);}});}
+   try(FileWriter w=new FileWriter(new File(out,"three-minute-four-player-pss.json"))){w.write(memory.toString(2));}screenshot("four-stream-soak");toGuide();start("Wide");assertEquals(1,ui(()->((Map<?,?>)get(a,"mCobraPlayerBindings")).size()).intValue());
+  });
+  check("Settings changed through callbacks persist before process restart",()->{
+   toGuide();runUi(()->call(a,"showCobraAppearancePicker"));tag("cobra-appearance:light");runUi(()->call(a,"cobraShowAmbientMode"));tag("cobra-ambient:subtle");
+   runUi(()->call(a,"showCobraFilePickerPicker"));tag("cobra-file-picker:system");runUi(()->call(a,"showCobraMiniBackgroundPicker"));tag("cobra-mini-background:on");
+   runUi(()->{call(a,"cobraSelectDrawerOwner","MOVIES");call(a,"showCobraPrimaryView");});SystemClock.sleep(800);
+   assertEquals("light",ui(()->call(a,"cobraStoredAppearanceMode")));assertEquals("system",ui(()->call(a,"cobraFilePickerMode")));assertTrue(ui(()->(Boolean)call(a,"cobraMiniBackgroundEnabled")));screenshot("settings-before-restart");
+  });
+  saveResults();runUi(()->a.finish());assertTrue(errors.toString(),errors.isEmpty());
+ }
+ @Test public void settingsAfterProcessRestart()throws Exception{
+  launch(false);check("Settings and owner survive actual force-stop process restart",()->{
+   assertEquals("light",ui(()->call(a,"cobraStoredAppearanceMode")));assertEquals("system",ui(()->call(a,"cobraFilePickerMode")));assertTrue(ui(()->(Boolean)call(a,"cobraMiniBackgroundEnabled")));
+   assertEquals("subtle",ui(()->((SharedPreferences)get(a,"mPrefs")).getString("cobra_ambient_mode","")));assertEquals(150,ui(()->((Number)call(a,"cobraSubtitleSize")).intValue()).intValue());assertEquals("movies",ui(()->call(a,"cobraDrawerOwner")));screenshot("settings-after-process-restart");
+  });saveResults();runUi(()->a.finish());assertTrue(errors.toString(),errors.isEmpty());
+ }
+}

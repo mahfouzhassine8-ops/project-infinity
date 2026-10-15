@@ -1,0 +1,77 @@
+name: Infinity | 303-194 repair source validation (NO APK)
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    branches: [repair/2103303-194-responsive-regressions]
+    paths:
+      - 'repairs/mobile-regressions-2103304/**'
+      - '.github/workflows/infinity-2103304-source-validation.yml'
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-2103304-source-validation-${{ github.workflow }}
+  cancel-in-progress: true
+jobs:
+  android-source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools platforms;android-35 build-tools;34.0.0'}
+      - name: Fetch exact successful 303 source export
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103303-First-Repair-Source-Validation-NO-APK
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37170612805
+          github-token: ${{ github.token }}
+          path: parent3303
+      - name: Verify locked source and apply only the two UI helper edits
+        run: |
+          set -euo pipefail
+          echo '5f6f7d7b9b34f2ea96911ee65974b364ceb3c52dfb652740ab6d3fd8ce744a57  parent3303/repaired-shell-source.tar.gz' | sha256sum -c -
+          echo '68ff83d48698617fd2e99b4be6cacc7d58da503d937ed3c521dbeb8939c9bac5  parent3303/ANDROID-SOURCE-PROOF.json' | sha256sum -c -
+          mkdir -p forward3304 evidence3304
+          tar --no-same-owner -xzf parent3303/repaired-shell-source.tar.gz -C forward3304
+          python3 repairs/mobile-regressions-2103304/ci_delta.py android --source forward3304/shell-kodi --parent-proof parent3303/ANDROID-SOURCE-PROOF.json --receipt evidence3304/source-delta.json
+          python3 repairs/mobile-regressions-2103304/prepare_diagnostics.py --root forward3304 --build chooser-build3304 --evidence evidence3304
+      - name: Compile complete Android shell and run inherited and grouped-options tests
+        working-directory: chooser-build3304
+        run: |
+          set -euo pipefail
+          python3 ../repairs/chooser-weather-snapshot-2103302/test_weather_snapshot.py 2>&1 | tee ../evidence3304/producer-tests.log
+          ./gradlew --no-daemon --console=plain :xbmc:compileDebugJavaWithJavac :xbmc:testDebugUnitTest 2>&1 | tee ../evidence3304/android-tests.log
+      - name: Verify unchanged weather isolation and protected source
+        run: |
+          set -euo pipefail
+          python3 repairs/chooser-weather-snapshot-2103302/audit_weather.py --root forward3304 --classes chooser-build3304/xbmc/build/intermediates/javac --out evidence3304
+          python3 repairs/mobile-regressions-2103304/ci_delta.py verify --source forward3304/shell-kodi --receipt evidence3304/source-delta.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os
+          p=Path('evidence3304/source-delta.json')
+          data=json.loads(p.read_text())
+          proof={'schema':1,'source_commit':os.environ['GITHUB_SHA'],
+                 'weather_isolation_audit_passed':True,'files':data['after'],
+                 'installable_apk':False,'physical_device_verified':False}
+          Path('evidence3304/ANDROID-SOURCE-PROOF.json').write_text(json.dumps(proof,indent=2)+'\n')
+          PY
+      - name: Gather results without claiming device acceptance
+        if: always()
+        run: |
+          mkdir -p evidence3304
+          cp repairs/mobile-regressions-2103304/README.md evidence3304/
+          if test -d chooser-build3304/xbmc/build/test-results; then cp -a chooser-build3304/xbmc/build/test-results evidence3304/; fi
+          if test -d chooser-build3304/xbmc/build/reports/tests; then cp -a chooser-build3304/xbmc/build/reports/tests evidence3304/test-reports; fi
+          if test -d chooser-build3304/xbmc/build/glass-evidence; then cp -a chooser-build3304/xbmc/build/glass-evidence evidence3304/; fi
+          if test -d forward3304/shell-kodi; then tar -czf evidence3304/repaired-shell-source.tar.gz -C forward3304 shell-kodi; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-303-194-Repair-Android-Validation-NO-APK
+          path: evidence3304/
+          if-no-files-found: error
+          retention-days: 90

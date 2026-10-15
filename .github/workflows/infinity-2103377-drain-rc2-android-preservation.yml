@@ -1,0 +1,36 @@
+name: Infinity | 2103377 drain RC2 preserve 274 Android cases
+on:
+  push:
+    branches: [work/infinity-2103377-shutdown-drain-rc2]
+    paths:
+      - '.github/workflows/infinity-2103377-drain-rc2-android-preservation.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103377-drain-rc2-android-only, cancel-in-progress: false}
+jobs:
+  android-source-replay:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38415112606
+          name: Infinity-2103377-Final-Shutdown-Android
+          github-token: ${{ github.token }}
+          path: final-android
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38351703759
+          name: Infinity-2103377-Android-Verification
+          github-token: ${{ github.token }}
+          path: green-234
+      - name: Verify all 274 saved Java cases against exact current runtime source
+        run: python3 repairs/shutdown-final-2103377/reuse_android.py --folder final-android --green green-234
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103377-Drain-RC2-Android-Preserved-274
+          path: final-android/
+          retention-days: 90
+          if-no-files-found: error

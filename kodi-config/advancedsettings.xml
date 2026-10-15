@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  advancedsettings.xml
+  Baked into the APK at build time — applies to all users on first launch.
+
+  Full reference: https://kodi.wiki/view/Advancedsettings.xml
+  Edit this file in GitHub, then trigger a new build.
+-->
+<advancedsettings>
+
+  <!-- Log level: 0=quiet, 1=normal, 2=debug -->
+  <loglevel>0</loglevel>
+
+  <!-- Increase buffer for smoother network streaming -->
+  <cache>
+    <buffermode>1</buffermode>           <!-- 0=buffer all, 1=buffer true internet streams -->
+    <memorysize>139460608</memorysize>   <!-- 133 MB buffer -->
+    <readfactor>4</readfactor>           <!-- Read ahead multiplier -->
+  </cache>
+
+  <!-- Video player tweaks -->
+  <videoplayer>
+    <adjustrefreshrate>2</adjustrefreshrate>  <!-- Always match refresh rate to content -->
+    <synctype>1</synctype>
+  </videoplayer>
+
+  <!-- Skip unwanted video extensions -->
+  <videoextensions>
+    <remove>.nfo</remove>
+    <remove>.jpg</remove>
+  </videoextensions>
+
+</advancedsettings>

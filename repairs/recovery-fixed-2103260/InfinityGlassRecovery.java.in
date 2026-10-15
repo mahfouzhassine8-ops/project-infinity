@@ -1,0 +1,182 @@
+package @APP_PACKAGE@;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.view.*;
+import android.widget.*;
+
+/** Recovery presentation only. Splash retains the exact labels, confirmation and actions. */
+final class InfinityGlassRecovery extends Dialog {
+  static final int ROW_ID=0x00f025b0, CLOSE_ID=0x00f025ba, RESTORE_ID=0x00f025bb;
+  static final class Builder {
+    final Activity owner;
+    final InfinityGlassOptions.Appearance appearance;
+    final CobraVisualRenderer.DialogBuilder fallback;
+    final boolean allowed;
+    String heading="",message,positive,negative="Close";
+    String[] labels;
+    DialogInterface.OnClickListener itemAction,positiveAction,negativeAction;
+    Builder(Activity owner,InfinityGlassOptions.Appearance appearance,CobraVisualRenderer.DialogBuilder fallback,boolean allowed){
+      this.owner=owner;this.appearance=appearance;this.fallback=fallback;this.allowed=allowed;
+    }
+    Builder setTitle(String value){heading=value;if(fallback!=null)fallback.setTitle(value);return this;}
+    Builder setItems(String[] value,DialogInterface.OnClickListener action){labels=value.clone();itemAction=action;if(fallback!=null)fallback.setItems(value,action);return this;}
+    Builder setMessage(String value){message=value;if(fallback!=null)fallback.setMessage(value);return this;}
+    Builder setPositiveButton(String label,DialogInterface.OnClickListener action){positive=label;positiveAction=action;if(fallback!=null)fallback.setPositiveButton(label,action);return this;}
+    Builder setNegativeButton(String label,DialogInterface.OnClickListener action){negative=label;negativeAction=action;if(fallback!=null)fallback.setNegativeButton(label,action);return this;}
+    Dialog show(){
+      InfinityGlassRecovery dialog=null;
+      if(allowed)try{dialog=new InfinityGlassRecovery(this);dialog.show();return dialog;}
+      catch(RuntimeException failure){
+        if(dialog!=null&&dialog.isShowing())dialog.dismiss();
+        android.util.Log.e("InfinityChooser","Recovery presentation unavailable; using original recovery dialog",failure);
+      }
+      if(fallback==null)throw new IllegalStateException("Recovery fallback unavailable");
+      return fallback.show();
+    }
+  }
+  final Builder spec;
+  final SharedPreferences preferences;
+  Panel panel;
+  boolean light,subscribed,delivered;
+  private int lastWidth,lastHeight;
+  private ViewTreeObserver observed;
+  private final ViewTreeObserver.OnGlobalLayoutListener resize=this::fitWindow;
+  private final Runnable refresh=this::refreshPresentation;
+  private final SharedPreferences.OnSharedPreferenceChangeListener listener=(p,key)->{
+    if(key==null||"cobra_appearance_mode".equals(key)||"cobra_system_dark_variant".equals(key))queueRefresh();
+  };
+  private InfinityGlassRecovery(Builder spec){
+    super(spec.owner,android.R.style.Theme_Material_Dialog_Alert);this.spec=spec;
+    if((spec.labels==null)==(spec.message==null))throw new IllegalArgumentException("Exactly one recovery content type required");
+    if(spec.labels!=null&&(spec.labels.length!=2||spec.itemAction==null))throw new IllegalArgumentException("Recovery menu contract");
+    preferences=spec.owner.getSharedPreferences("infinity_cobra_live",Context.MODE_PRIVATE);
+    setOwnerActivity(spec.owner);requestWindowFeature(Window.FEATURE_NO_TITLE);setTitle(spec.heading);
+    setCancelable(true);setCanceledOnTouchOutside(true);rebuild();
+    getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);getWindow().setGravity(Gravity.CENTER);
+    getWindow().getDecorView().setTag("experience_glass_recovery_dialog");
+  }
+  private void deliver(DialogInterface.OnClickListener action,int index){
+    if(delivered||!isShowing())return;
+    delivered=true;dismiss();if(action!=null)action.onClick(this,index);
+  }
+  private void rebuild(){
+    light=spec.appearance.light();panel=new Panel(spec.owner,light,spec,
+      i->deliver(spec.itemAction,i),()->deliver(spec.negativeAction,DialogInterface.BUTTON_NEGATIVE),
+      ()->deliver(spec.positiveAction,DialogInterface.BUTTON_POSITIVE),this::queueRefresh);
+    setContentView(panel);if(getWindow()!=null)getWindow().setDimAmount(light?.24f:.43f);
+  }
+  private void queueRefresh(){if(panel!=null){panel.removeCallbacks(refresh);panel.post(refresh);}}
+  private void refreshPresentation(){
+    if(!isShowing())return;
+    if(light!=spec.appearance.light()){
+      int id=panel.findFocus()==null?View.NO_ID:panel.findFocus().getId(),y=panel.scroll.getScrollY();
+      rebuild();fitWindow();final Panel current=panel;
+      current.post(()->{if(panel!=current||!isShowing())return;current.scroll.scrollTo(0,y);View v=current.findViewById(id);if(v!=null)v.requestFocus();});
+    }else fitWindow();
+  }
+  @Override protected void onStart(){
+    super.onStart();if(!subscribed){preferences.registerOnSharedPreferenceChangeListener(listener);subscribed=true;}
+    observed=spec.owner.getWindow().getDecorView().getViewTreeObserver();observed.addOnGlobalLayoutListener(resize);
+    fitWindow();queueRefresh();
+  }
+  @Override protected void onStop(){
+    if(subscribed){preferences.unregisterOnSharedPreferenceChangeListener(listener);subscribed=false;}
+    if(observed!=null&&observed.isAlive())observed.removeOnGlobalLayoutListener(resize);
+    observed=null;if(panel!=null)panel.removeCallbacks(refresh);super.onStop();
+  }
+  private void fitWindow(){
+    View decor=spec.owner.getWindow().getDecorView();Rect visible=new Rect();decor.getWindowVisibleDisplayFrame(visible);
+    int width=visible.width(),height=visible.height();
+    if(width<=0)width=decor.getWidth();if(height<=0)height=decor.getHeight();
+    if(width<=0)width=getContext().getResources().getDisplayMetrics().widthPixels;
+    if(height<=0)height=getContext().getResources().getDisplayMetrics().heightPixels;
+    int target=Math.max(1,Math.min(width-panel.dp(24),panel.dp(460))),cap=Math.max(1,height-panel.dp(24));
+    if(lastWidth!=target||lastHeight!=cap||panel.maxHeight!=cap){
+      lastWidth=target;lastHeight=cap;panel.maxHeight=cap;panel.requestLayout();getWindow().setLayout(target,WindowManager.LayoutParams.WRAP_CONTENT);
+    }
+  }
+  /** Same continuous glass surface as locked Options/Health. Only a short dialog body scrolls. */
+  static final class Panel extends ViewGroup {
+    final boolean light;
+    final InfinityGlassOptions.Palette palette;
+    final LinearLayout header,rows,footer;
+    final ScrollView scroll;
+    final TextView title,close,restore,description;
+    final View divider;
+    final Runnable changed;
+    int maxHeight=Integer.MAX_VALUE,pad,gap;
+    Panel(Context c,boolean light,Builder spec,InfinityGlassOptions.Pick pick,Runnable cancel,Runnable positive,Runnable changed){
+      super(c);this.light=light;this.changed=changed;palette=new InfinityGlassOptions.Palette(light,true);
+      setTag("experience_glass_recovery_panel");setBackground(new InfinityGlassOptions.GlassSurface(c,palette));
+      setClipChildren(true);setClipToOutline(true);setClipToPadding(true);
+      header=new LinearLayout(c);header.setGravity(Gravity.CENTER_VERTICAL);
+      LinearLayout.LayoutParams logo=new LinearLayout.LayoutParams(dp(48),dp(48));logo.rightMargin=dp(12);
+      header.addView(new InfinityGlassOptions.BrandMark(c,true),logo);
+      title=InfinityGlassOptions.text(c,spec.heading,22,palette.ink,true);
+      if(Build.VERSION.SDK_INT>=28)title.setAccessibilityHeading(true);
+      header.addView(title,new LinearLayout.LayoutParams(0,-2,1));addView(header);
+      divider=new View(c);divider.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+          new int[]{palette.accent&0xffffff,(palette.accent&0xffffff)|0x70000000,palette.accent&0xffffff}));addView(divider);
+      rows=new LinearLayout(c);rows.setOrientation(LinearLayout.VERTICAL);
+      if(spec.labels!=null){
+        for(int i=0;i<spec.labels.length;i++){
+          final int index=i;View row=new InfinityGlassOptions.OptionRow(c,spec.labels[i],i==0?4:2,palette);row.setId(ROW_ID+i);
+          row.setOnClickListener(v->pick.at(index));row.setNextFocusUpId(i==0?CLOSE_ID:ROW_ID+i-1);
+          row.setNextFocusDownId(i+1==spec.labels.length?CLOSE_ID:ROW_ID+i+1);
+          LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.bottomMargin=i+1==spec.labels.length?0:dp(8);rows.addView(row,lp);
+        }
+        description=null;
+      }else{
+        description=InfinityGlassOptions.text(c,spec.message,16,palette.ink,false);description.setPadding(dp(12),dp(12),dp(12),dp(12));
+        description.setBackground(InfinityGlassOptions.rowSurface(palette,dp(18)));rows.addView(description,new LinearLayout.LayoutParams(-1,-2));
+      }
+      scroll=new ScrollView(c);scroll.setVerticalScrollBarEnabled(false);scroll.setOverScrollMode(OVER_SCROLL_NEVER);
+      scroll.addView(rows,new ScrollView.LayoutParams(-1,-2));addView(scroll);
+      footer=new LinearLayout(c);footer.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+      close=button(c,spec.negative,CLOSE_ID,cancel);
+      if(spec.positive!=null){
+        restore=button(c,spec.positive,RESTORE_ID,positive);
+        LinearLayout.LayoutParams negativeLp=new LinearLayout.LayoutParams(0,-2,1);negativeLp.rightMargin=dp(10);
+        footer.addView(close,negativeLp);footer.addView(restore,new LinearLayout.LayoutParams(0,-2,1));
+        close.setNextFocusRightId(RESTORE_ID);restore.setNextFocusLeftId(CLOSE_ID);
+      }else{
+        restore=null;footer.addView(close,new LinearLayout.LayoutParams(-2,-2));
+        close.setNextFocusUpId(ROW_ID+spec.labels.length-1);close.setNextFocusDownId(ROW_ID);
+      }
+      addView(footer);
+    }
+    int dp(float n){return Math.round(n*getResources().getDisplayMetrics().density);}
+    TextView button(Context c,String label,int id,Runnable action){
+      TextView t=InfinityGlassOptions.text(c,label,14,palette.accent,false);t.setId(id);t.setGravity(Gravity.CENTER);
+      t.setMinHeight(dp(48));t.setMinWidth(dp(88));t.setPadding(dp(20),dp(10),dp(20),dp(10));t.setFocusable(true);t.setClickable(true);
+      t.setBackground(InfinityGlassOptions.rowSurface(palette,dp(24)));t.setOnClickListener(v->action.run());return t;
+    }
+    @Override protected void onConfigurationChanged(Configuration c){super.onConfigurationChanged(c);post(changed);}
+    @Override protected void onMeasure(int ws,int hs){
+      int w=Math.max(1,MeasureSpec.getSize(ws)),cap=maxHeight;
+      if(MeasureSpec.getMode(hs)!=MeasureSpec.UNSPECIFIED)cap=Math.min(cap,MeasureSpec.getSize(hs));
+      pad=cap<dp(320)?dp(12):dp(24);gap=cap<dp(320)?dp(8):dp(12);
+      int width=MeasureSpec.makeMeasureSpec(Math.max(1,w-pad*2),MeasureSpec.EXACTLY),free=MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED);
+      header.measure(width,free);footer.measure(width,free);divider.measure(width,MeasureSpec.makeMeasureSpec(Math.max(1,dp(1)),MeasureSpec.EXACTLY));
+      int reserved=pad*2+header.getMeasuredHeight()+footer.getMeasuredHeight()+gap*3+divider.getMeasuredHeight();
+      int remaining=Math.max(1,cap==Integer.MAX_VALUE?dp(1200):cap-reserved);
+      scroll.measure(width,MeasureSpec.makeMeasureSpec(remaining,MeasureSpec.AT_MOST));setMeasuredDimension(w,Math.min(cap,reserved+scroll.getMeasuredHeight()));
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+      int right=getWidth()-pad,y=pad;header.layout(pad,y,right,y+header.getMeasuredHeight());y+=header.getMeasuredHeight()+gap;
+      divider.layout(pad,y,right,y+divider.getMeasuredHeight());y+=divider.getMeasuredHeight()+gap;
+      scroll.layout(pad,y,right,y+scroll.getMeasuredHeight());footer.layout(pad,getHeight()-pad-footer.getMeasuredHeight(),right,getHeight()-pad);
+    }
+  }
+}

@@ -1,0 +1,109 @@
+name: Infinity | 2103334 script exit message-gate repair
+on:
+  workflow_dispatch:
+  push:
+    branches: [repair/infinity-python-exit-2103334]
+    paths:
+      - 'repairs/python-exit-2103334/native_repair.py'
+      - 'repairs/python-exit-2103334/native-delta.json'
+      - 'repairs/python-exit-2103334/native_ci.py'
+      - 'repairs/python-exit-2103334/InfinityPythonExitEvidence.h'
+      - 'repairs/python-exit-2103334/test_*'
+      - '.github/workflows/infinity-2103334-native-python.yml'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103334-native, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  host-tests:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.11.7'}
+      - uses: actions/download-artifact@v8
+        with:
+          repository: mahfouzhassine8-ops/project-infinity
+          run-id: 37722882671
+          name: Infinity-2103334-Exact-Source-Review
+          github-token: ${{ github.token }}
+          path: parent-review
+      - name: Reproduce orphaned message wait and test frame evidence on real Python
+        run: |
+          set -euo pipefail
+          mkdir -p native-parent host3334
+          tar -xzf parent-review/native-review.tar.gz -C native-parent
+          grep -q '^VERSION=3.11.7$' native-parent/tools/depends/target/python3/PYTHON3-VERSION
+          python repairs/python-exit-2103334/test_abort.py --source native-parent --expect-python 3.11.7 --out host3334/python 2>&1 | tee host3334/python-test.log
+          python repairs/python-exit-2103334/test_messenger.py --source native-parent --out host3334/messenger 2>&1 | tee host3334/messenger-test.log
+          python repairs/python-exit-2103334/test_preservation.py --source native-parent | tee host3334/preservation.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103334-Host-Tests
+          path: host3334/
+          retention-days: 90
+          if-no-files-found: error
+  native-engine:
+    needs: host-tests
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools, log-accepted-android-sdk-licenses: false}
+      - uses: actions/cache/restore@v4
+        id: native-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-python-exit-3334-arm64-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-directory-3330-arm64-${{ runner.os }}-
+            infinity-jobmanager-3327-arm64-${{ runner.os }}-
+            infinity-cooperative-3326-arm64-${{ runner.os }}-
+      - name: Reconstruct 3330 and validate exact source delta
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev
+          mkdir -p engine3334
+          python3 repairs/python-exit-2103334/native_ci.py prepare 2>&1 | tee engine3334/source-tests.log
+      - uses: actions/cache/restore@v4
+        with:
+          path: kodi/tools/depends
+          key: infinity-python-exit-3334-depends-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            infinity-directory-3330-depends-${{ runner.os }}-
+            infinity-jobmanager-3327-depends-${{ runner.os }}-
+            infinity-cooperative-3326-depends-${{ runner.os }}-
+      - name: Compile ARM64 and verify all protected source files
+        run: |
+          set -euo pipefail
+          python3 repairs/python-exit-2103334/native_ci.py compile 2>&1 | tee engine3334/native-build.log
+      - uses: actions/cache/save@v4
+        if: always() && !cancelled()
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103334-Python-Exit-Native-Validation
+          path: engine3334/
+          compression-level: 1
+          retention-days: 90
+          if-no-files-found: error

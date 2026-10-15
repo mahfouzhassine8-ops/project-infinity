@@ -1,0 +1,21 @@
+2103301 Weather Native Isolation RC1 — UNLOCKED physical validation
+
+Install as an update over 2103300. Preserve app data and all configured providers.
+This candidate removes every chooser weather JNI call. Native libraries, chooser
+motion/layout, packaged skin, assets, resources and exit policy stay byte identical.
+
+1. Open chooser and launch Kodi five times, including after removing the task.
+2. Use normal Close Kodi, return Home, and reopen five times.
+3. Use explicit Force Close Kodi, return Home, and reopen twice.
+4. Verify the Kodi screen becomes usable and playback works. Java startup markers
+   alone do not prove Kodi rendered or became usable. No timed normal-close kill.
+5. Verify moving chooser stars, cover/inner Fold layouts and touch bounds.
+6. Weather: with Kodi's existing plain HTTP web service enabled, let the configured
+   weather provider supply a valid reading, then close Kodi and check last-known
+   chooser weather. Disabled/HTTPS-only service, unavailable provider, authorization
+   failure or no recent cache may still show Weather unavailable. The candidate
+   does not enable services, request location, change providers or use external APIs.
+7. If a crash persists, Health Center export should identify 2103301. Existing exit
+   history contains older crashes; correlate PID and timestamp with the new run.
+
+Do not lock until the Samsung Android 17 device passes these checks.

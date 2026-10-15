@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "validated_source_commit": "671b3a91d2d32aeeb727d68b4ece98135ae16c74",
+  "production_fix_commit": "e2efe503ec1369e66180710583a206014251309b",
+  "validation_run": 37221584705,
+  "validation_artifact_id": 11310551059,
+  "artifact_sha256": "56c99d8eb92d3dde467a3ecf0a35f5c4b59563142fbeea3c648d5654b734ce32",
+  "artifact_expires_at": "2027-01-02T17:43:16Z",
+  "android_source_compiled": true,
+  "android_robolectric_tests": 104,
+  "test_failures": 0,
+  "test_errors": 0,
+  "test_skipped": 0,
+  "host_preservation_checks": 33,
+  "weather_producer_tests": 10,
+  "compiled_weather_isolation_passed": true,
+  "source_files_verified_by_archive_readback": 250,
+  "source_files_changed": ["tools/android/packaging/xbmc/src/InfinityPowerMenuRoutes.java.in"],
+  "other_source_files_byte_identical": 249,
+  "locked_apk_version_code": 2103304,
+  "locked_skin_id": "skin.infinity.diggz",
+  "locked_skin_version": "1.0.5.195",
+  "locked_packages_changed": false,
+  "native_changed": false,
+  "skin_changed": false,
+  "shutdown_policy_changed": false,
+  "deferred_movie_video_framing_changed": false,
+  "installable_apk_produced": false,
+  "installable_skin_produced": false,
+  "native_shutdown_hang_resolved": false,
+  "physical_device_verified": false,
+  "first_validation_failure": {
+    "run": 37221440557,
+    "cause": "New test class called Files.readString, unavailable in Android SDK stubs; production source compiled.",
+    "correction": "Use the inherited UTF-8 Files.readAllBytes pattern; every assertion retained.",
+    "production_source_changed_for_test_correction": false
+  },
+  "remaining_blockers": [
+    "The repository does not contain addons/skin.infinity.diggz; complete 194 and earlier 190 archive downloads repeatedly returned HTTP 502.",
+    "The specific user-confirmed successful normal-Close APK was not established from available history.",
+    "Current device shutdown/freeze diagnostics are required to establish native hang ownership."
+  ],
+  "remaining_work": [
+    "Drawer geometry, touch focus and theme polish",
+    "Provider-owned source/resolver sizing and Back handling",
+    "Idle takeover ownership, touch behavior and resource lifecycle",
+    "Native shutdown/relaunch investigation",
+    "Signed packaging and physical validation matrix"
+  ]
+}

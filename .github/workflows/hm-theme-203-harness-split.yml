@@ -1,0 +1,39 @@
+name: HM Theme Audit | Split existing offline harness
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-hm-theme-203-audit-harness]
+    paths: ['.github/workflows/hm-theme-203-harness-split.yml']
+permissions:
+  actions: read
+  contents: read
+jobs:
+  split-only:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: HM-203-Exact-2103160-Offline-Android-Harness
+          run-id: 35295029210
+          github-token: ${{ github.token }}
+          path: imported
+      - name: Separate SDK blobs without modifying test code
+        run: |
+          set -euo pipefail
+          mv imported/sdk offline-sdk
+          du -sh imported offline-sdk
+      - uses: actions/upload-artifact@v7
+        with:
+          name: HM-203-Offline-Harness-Core
+          path: imported/
+          compression-level: 1
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        with:
+          name: HM-203-Offline-Harness-SDK
+          path: offline-sdk/
+          compression-level: 1
+          if-no-files-found: error
+          retention-days: 14

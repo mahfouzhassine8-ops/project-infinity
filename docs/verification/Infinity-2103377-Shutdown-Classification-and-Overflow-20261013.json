@@ -1,0 +1,209 @@
+{
+  "capture_file": "Infinity-Diagnostics-20261013-075108.zip",
+  "capture_sha256": "240989d26820396b386e6246448d9c7002e1fd087a08e010f5670107ef2c0ea8",
+  "checkpoint_phase": "CHECKPOINT_FAILED",
+  "checkpoint_saved": false,
+  "classification_reason": "Tail evidence is missing and exact installed source/dependencies of the pending services have not been verified. Slow add-ons and network categories are not disposable-work proof.",
+  "critical_export_bytes": 2097152,
+  "critical_export_cut_after_seconds": 2.153600624,
+  "duration_ms": 25087,
+  "essential_or_unknown_abandonments_authorized": false,
+  "essential_policy": [
+    "Resume Hub",
+    "watched progress",
+    "favourites",
+    "settings",
+    "profiles",
+    "databases",
+    "other required persistent user state"
+  ],
+  "locked": false,
+  "main_trace_filled_after_seconds": 2.910618801,
+  "observational_overflow_fix": {
+    "addon_functionality_changed": false,
+    "critical_capacity_bytes": 1835008,
+    "existing_export_cap_bytes": 2097152,
+    "separate_reserved_lanes": 6,
+    "short_sql_scopes_aggregated_only_in_telemetry": true,
+    "shutdown_timeout_changed": false
+  },
+  "promoted": false,
+  "repair_apk_gate": "BLOCKED: classification/dependencies and effective cancellation are unverified",
+  "safe_recovery_required": "Retain failed receipts and engine ownership; do not authorize termination or claim successful saving. Recovery/retry changes require verified writer, native lease and save-barrier coordination.",
+  "schema": 1,
+  "shutdown_repaired": false,
+  "source_checkpoint": "2460cf741addb17487f2e64d21633b41161dc684",
+  "sqlite_max_duration_ms": 0.251562,
+  "sqlite_median_duration_ms": 0.006979,
+  "sqlite_scope_returns_in_main_trace": 1416,
+  "unknown_pending_operations": [
+    "plugin.video.playlistbrowser:service.py",
+    "plugin.video.redlight:service.py",
+    "plugin.video.seren:service.py",
+    "plugin.video.tmdb.bingie.helper:service.py",
+    "plugin.video.tmdbmovies:service.py",
+    "plugin.video.youtube:service.py",
+    "plugin.video.youtubek:service.py",
+    "repository.zeus768:service.py"
+  ],
+  "unknown_writer_policy_implemented": "Checkpoint-active automatic asynchronous SystemExit escalation disabled; cooperative notifications, native leases, retirement obligations and failed-save handling retained.",
+  "verification": {
+    "full_native_compilation": "pending",
+    "new_android_run_claimed": false,
+    "new_flood_scenarios": {
+      "cases": [
+        {
+          "case": "late_after_noise",
+          "critical_bytes": 146558,
+          "passed": true,
+          "trace_sha256": "0742be60ef08161a73e1195e7820e337aa119cb3fc6297f94a79531b5dd23b47"
+        },
+        {
+          "case": "lanes_independent",
+          "critical_bytes": 1835200,
+          "passed": true,
+          "trace_sha256": "3aff073c9264b8cdffd674a4d2c90a05240b1f42ce41e1d413fcbff49275b486"
+        },
+        {
+          "case": "native_slow_after_noise",
+          "critical_bytes": 3800,
+          "passed": true,
+          "trace_sha256": "f69bde0ffd9c94ec79b934dd66dfba92b4f78dcc62b4014a7a077705c101a3a6"
+        }
+      ],
+      "count": 3,
+      "existing_export_cap_bytes": 2097152,
+      "host_evidence_only": true,
+      "passed": true,
+      "shutdown_repaired": false,
+      "shutdown_timeouts_changed": false
+    },
+    "preserved_host_scenarios": {
+      "capabilities": {
+        "backend_identity": true,
+        "cancellation_observation": true,
+        "operation_timing": true,
+        "retirement_checkpoint_correlation": true
+      },
+      "cases": [
+        {
+          "case": "preclose",
+          "events": 5,
+          "passed": true,
+          "trace_sha256": "416ba1e83c1e6c8c4d73a5da3af25fc2e64398ac56f70b487b5eb44a5deae842"
+        },
+        {
+          "case": "cancel",
+          "events": 9,
+          "passed": true,
+          "trace_sha256": "a5c9a1aab5fed63ea41a5ec0ad06d8362210d98d18db547f11d849ce9650b82d"
+        },
+        {
+          "case": "nested",
+          "events": 9,
+          "passed": true,
+          "trace_sha256": "92d5496d1fce61e541d0206fae9161a90a9f1d08bd2b46e5c4b014d08cfcf302"
+        },
+        {
+          "case": "inactive",
+          "events": 0,
+          "passed": true,
+          "trace_sha256": "0eda2acdc1a571bdfe9b0305783ca0b93bcd5d825d0927f70254138917d1aa45"
+        },
+        {
+          "case": "exception",
+          "events": 5,
+          "passed": true,
+          "trace_sha256": "82ce0a39afad187ec93b6e46e7ab84aeb4835730b8ef176a1901a512f0141864"
+        },
+        {
+          "case": "capacity",
+          "events": 261,
+          "passed": true,
+          "trace_sha256": "e6d6f3ec3139a86fdb106b3d4f1d45f508c0c62ddf3bc5c0bb859269b4ff72f5"
+        },
+        {
+          "case": "reuse",
+          "events": 10,
+          "passed": true,
+          "trace_sha256": "62b727368bb8de4cf23b0fd8f1b839204e5f133552112b0da5f883138acea22b"
+        },
+        {
+          "case": "curl_result",
+          "events": 5,
+          "passed": true,
+          "trace_sha256": "e2600dc3553021979491faf691fa0b8cbaea52a4105ac4615fef297fa98f4a87"
+        },
+        {
+          "case": "stale_cancel",
+          "events": 0,
+          "passed": true,
+          "trace_sha256": "fbb4264e02c5034a976e9169b4da6e3a098380f92069cfe7c5d26d791a60b3b0"
+        },
+        {
+          "case": "stress",
+          "events": 672,
+          "passed": true,
+          "trace_sha256": "1c1e2d3a693c6357715605cf617541eca2b4b0ae55eb4abf00196d8ea51a5256"
+        },
+        {
+          "case": "multiple_children",
+          "events": 32,
+          "passed": true,
+          "trace_sha256": "136343d5df3938879f9279b59eb76ec5ee4538c0c03235ecf4c8d496e293ca95"
+        },
+        {
+          "case": "callback_after_return",
+          "events": 12,
+          "passed": true,
+          "trace_sha256": "b3a22e6a165ae15ad52d83af36c485cb9c6ebd3366d89e1c0bca6a01f679751c"
+        },
+        {
+          "case": "native_preclose",
+          "events": 9,
+          "passed": true,
+          "trace_sha256": "93ed0a6a30185155f38da68298bd0340539356cc82c9fec7e744536a9533cbb4"
+        },
+        {
+          "case": "cache_worker",
+          "events": 9,
+          "passed": true,
+          "trace_sha256": "57ee4defba11a899fcb2d2a1d3e5b9186b33be63430b9bee2bb4c5f0ef4a5086"
+        },
+        {
+          "case": "support_unknown",
+          "events": 6,
+          "passed": true,
+          "trace_sha256": "f76c87bc04fb4b4e35c70438d7bd696ed996d63fbea436d083989f8649940913"
+        },
+        {
+          "case": "history_gap",
+          "events": 4,
+          "passed": true,
+          "trace_sha256": "7ce124954ddc21cf9b096b0006415a94076725c19365bfa37ec4b19da7bbd5f9"
+        },
+        {
+          "case": "limits",
+          "events": 4097,
+          "passed": true,
+          "trace_sha256": "199c83d127190986de68dc5a7c9fe0b276f7b09d45c289f9cbaf7a3a86444c84"
+        },
+        {
+          "case": "native_scope_preclose",
+          "events": 5,
+          "passed": true,
+          "trace_sha256": "4cc213326827e1c6f82a5985c722c881d081ef102e41fd4ffa8c181a46f6857d"
+        }
+      ],
+      "count": 18,
+      "logger_header_sha256": "7cc0ebafe0ef12af7abbef59e370dd085db6f1709b29e130f04a37206ffb76f5",
+      "passed": true,
+      "scope": "Exact observation headers with real concurrent host threads and append-only evidence; no Kodi backend execution or Galaxy Fold proof.",
+      "shutdown_corrected": false,
+      "trace_header_sha256": "db06d7d7c87865d7686e677e4e9bca5762674afaf4146f796a1f425de5e4b7c1"
+    },
+    "recovery_probe_host_tests": 4,
+    "unknown_writer_policy_source_test": true
+  },
+  "verified_nonessential_abandonments": []
+}

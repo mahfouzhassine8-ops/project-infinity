@@ -1,0 +1,233 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.app.*;
+import android.content.*;
+import android.content.pm.PackageInfo;
+import android.net.Uri;
+import android.os.*;
+import android.provider.DocumentsContract;
+import android.widget.Toast;
+import org.json.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
+/** App-private diagnostics plus explicit, user-selected export. No player or native ownership. */
+final class InfinityCobraDiagnostics {
+  private static final AtomicBoolean STARTED=new AtomicBoolean(), EXPORTING=new AtomicBoolean();
+  private static final AtomicInteger DROPPED=new AtomicInteger();
+  private static final Object FILE_LOCK=new Object();
+  private static final ThreadPoolExecutor EVENTS=new ThreadPoolExecutor(1,1,30,TimeUnit.SECONDS,
+      new ArrayBlockingQueue<Runnable>(32), runnable->{Thread t=new Thread(runnable,"CobraDiagnostics");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
+  private static volatile String lifecycle="not_observed";
+  private static volatile List<String> knownSecrets=Collections.emptyList();
+  private InfinityCobraDiagnostics() {}
+
+  static void setSecrets(Collection<String> secrets) {
+    ArrayList<String> copy=new ArrayList<>();
+    for(String s:secrets)if(s!=null&&!s.isEmpty()&&s.length()<=4096&&copy.size()<256)copy.add(s);
+    knownSecrets=Collections.unmodifiableList(copy);
+  }
+  static String redact(String text) {return CobraDiagnosticArchive.redact(text,knownSecrets);}
+  static String state() {return lifecycle;}
+  static int droppedEvents() {return DROPPED.get();}
+  static boolean exporting() {return EXPORTING.get();}
+  static void addIdentity(Context app,JSONObject root) {
+    try {
+      PackageInfo p=app.getPackageManager().getPackageInfo(app.getPackageName(),0);
+      root.put("cobra_version",p.versionName==null?"unavailable":p.versionName);
+      root.put("version_code",p.versionCode);root.put("package",app.getPackageName());
+      root.put("android_api",Build.VERSION.SDK_INT);root.put("diagnostics_schema",1);
+    } catch(Exception failure) {try {root.put("cobra_version","unavailable");root.put("identity_error",failure.getClass().getSimpleName());}catch(JSONException ignored){}}
+  }
+  static void start(Context context) {
+    Context app=context.getApplicationContext();
+    if(!(app instanceof Application)||!STARTED.compareAndSet(false,true))return;
+    try {
+    EVENTS.allowCoreThreadTimeOut(true);
+    ((Application)app).registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks(){
+      private void mark(Activity a,String event){if(a instanceof InfinityLiveActivity){lifecycle=event;record(a,"lifecycle",event,"");}}
+      public void onActivityCreated(Activity a,Bundle b){mark(a,"created");}
+      public void onActivityStarted(Activity a){mark(a,"started");}
+      public void onActivityResumed(Activity a){mark(a,"resumed");}
+      public void onActivityPaused(Activity a){mark(a,"paused");}
+      public void onActivityStopped(Activity a){mark(a,"stopped");}
+      public void onActivityDestroyed(Activity a){mark(a,"destroyed");}
+      public void onActivitySaveInstanceState(Activity a,Bundle b){}
+    });
+    lifecycle="created";record(app,"lifecycle","created","");
+    } catch(RuntimeException unavailable) {STARTED.set(false);DROPPED.incrementAndGet();}
+    // Deliberately preserve the app's uncaught-exception and native signal handlers.
+  }
+  private static File folder(Context app) {return new File(app.getFilesDir(),"health/cobra-diagnostics");}
+  private static void enqueue(Runnable task) {
+    try {EVENTS.execute(task);}catch(RuntimeException rejected){DROPPED.incrementAndGet();}
+  }
+  static void record(Context context,String category,String event,String detail) {
+    if(context==null)return;
+    final Context app=context.getApplicationContext();
+    try {
+      JSONObject row=new JSONObject();row.put("timestamp_ms",System.currentTimeMillis());
+      row.put("category",category);row.put("event",event);row.put("detail",redact(detail));
+      addIdentity(app,row);
+      final String json=row.toString();
+      if(json.length()>32768){DROPPED.incrementAndGet();return;}
+      enqueue(()->{
+        synchronized(FILE_LOCK){
+          try {
+            File dir=folder(app);File events=new File(dir,"events.jsonl");
+            String prior=events.isFile()?CobraDiagnosticArchive.readTail(events,64*1024):"";
+            ArrayList<String> rows=new ArrayList<>();
+            for(String line:prior.split("\n"))if(line.startsWith("{"))rows.add(line);
+            while(rows.size()>=47)rows.remove(0);
+            rows.add(json);StringBuilder all=new StringBuilder();for(String line:rows)all.append(line).append('\n');
+            CobraDiagnosticArchive.atomicWrite(events,all.toString().getBytes(StandardCharsets.UTF_8));
+            if("error".equals(category))CobraDiagnosticArchive.atomicWrite(new File(dir,"last-error.json"),json.getBytes(StandardCharsets.UTF_8));
+          }catch(Exception failure){DROPPED.incrementAndGet();}
+        }
+      });
+    }catch(Exception failure){DROPPED.incrementAndGet();}
+  }
+  static void failure(Context context,String operation,Throwable failure) {
+    if(failure==null)return;
+    // Bounded stack/cause chain; no unbounded printStackTrace or raw payload attachments.
+    StringBuilder detail=new StringBuilder();Throwable cursor=failure;
+    for(int cause=0;cursor!=null&&cause<4;cause++,cursor=cursor.getCause()) {
+      detail.append(cursor.getClass().getName()).append(": ");
+      String message=cursor.getMessage();
+      // Avoid severing a credential in an oversized message: omit it whole, do not substring raw text.
+      detail.append(message!=null&&message.length()<=4096?message:"[message absent or oversized]").append('\n');
+      StackTraceElement[] frames=cursor.getStackTrace();
+      for(int i=0;i<Math.min(frames.length,32);i++)detail.append("  at ").append(frames[i]).append('\n');
+    }
+    record(context,"error",operation,detail.toString());
+  }
+  static void saveHealth(Context context,String json,String error) {
+    final Context app=context.getApplicationContext();
+    if(error!=null&&!error.isEmpty())record(app,"error","runtime",error);
+    enqueue(()->{synchronized(FILE_LOCK){try{CobraDiagnosticArchive.atomicWrite(new File(app.getFilesDir(),"health/cobra-health.json"),json.getBytes(StandardCharsets.UTF_8));}catch(Exception failure){DROPPED.incrementAndGet();}}});
+  }
+
+  static Intent createDocumentIntent() {
+    java.text.SimpleDateFormat format=new java.text.SimpleDateFormat("yyyyMMdd-HHmmss",Locale.US);format.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+      .setType("application/zip").putExtra(Intent.EXTRA_TITLE,"Cobra-Diagnostics-"+format.format(new Date())+"-UTC.zip")
+      .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+  }
+
+  static void export(Context context,Uri destination,String snapshot) {
+    final Context app=context.getApplicationContext();
+    if(destination==null||!"content".equals(destination.getScheme())){notify(app,"Export failed: no valid document destination.");return;}
+    if(!EXPORTING.compareAndSet(false,true)){notify(app,"A diagnostics ZIP is already being saved.");return;}
+    final List<String> secrets=new ArrayList<>(knownSecrets);
+    try {
+      Thread worker=new Thread(()->{
+        File zip=null;
+        try {
+          android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+          // Flush queued diagnostic writes off the UI thread, with a strict wait bound.
+          boolean eventsFlushed=false;
+          try {EVENTS.submit(()->{}).get(3,TimeUnit.SECONDS);eventsFlushed=true;}catch(Exception ignored){}
+          Map<String,String> entries=new LinkedHashMap<>();
+          entries.put("README.txt","Cobra Crash & Diagnostics export\nUser-selected destination; no automatic upload.\n"
+            +"Snapshot is captured when Save is requested; previous-snapshot has its own timestamp.\n"
+            +"A blank last error does NOT establish no crash. Java/native crash and ANR exit history is limited by Android.\n"
+            +"Raw native protobuf tombstones, credentials, playlists, account/settings databases and recordings are NOT exported.\n"
+            +"Text is redacted; review before sharing. Missing/omitted/truncated evidence is reported explicitly.\n"
+            +"These files diagnose failures; they do not certify playback or fix a crash automatically.\n");
+          entries.put("snapshot.txt",snapshot==null?"[unavailable: capture was interrupted]":snapshot);
+          synchronized(FILE_LOCK){
+            addFile(entries,"previous-snapshot.txt",app.getFilesDir(),"health/cobra-health.json",128*1024);
+            addFile(entries,"recent-events.txt",app.getFilesDir(),"health/cobra-diagnostics/events.jsonl",128*1024);
+            addFile(entries,"last-error.txt",app.getFilesDir(),"health/cobra-diagnostics/last-error.json",64*1024);
+          }
+          File external=app.getExternalFilesDir(null);
+          if(external!=null){
+            addFile(entries,"kodi.log.txt",external,".kodi/temp/kodi.log",CobraDiagnosticArchive.FILE_LIMIT);
+            addFile(entries,"kodi.old.log.txt",external,".kodi/temp/kodi.old.log",CobraDiagnosticArchive.FILE_LIMIT);
+            addFile(entries,"infinity-exit-cache.txt",external,".kodi/temp/infinity-native-diagnostics/android-exit-info.json",128*1024);
+          }else entries.put("kodi-logs-status.txt","[unavailable: app-specific external storage not mounted]");
+          addFile(entries,"infinity-exit-internal-cache.txt",app.getFilesDir(),"infinity-native-diagnostics/android-exit-info.json",128*1024);
+          entries.put("android-exits.txt",exits(app,entries));
+          JSONObject manifest=new JSONObject();addIdentity(app,manifest);
+          manifest.put("event_queue_flushed",eventsFlushed);manifest.put("exported_at_ms",System.currentTimeMillis());manifest.put("diagnostic_events_dropped",DROPPED.get());
+          manifest.put("native_trace_policy","raw protobuf omitted; private memory cannot be safely regex-redacted");
+          manifest.put("live_provider_test",false);manifest.put("entry_count_before_manifest",entries.size());
+          entries.put("manifest.txt",manifest.toString(2));
+          File cache=new File(app.getCacheDir(),"cobra-diagnostic-export");
+          if(!cache.isDirectory()&&!cache.mkdirs())throw new IOException("Export cache unavailable");
+          // Remove only this exporter's abandoned temporary files, never user logs/exports/data.
+          File[] old=cache.listFiles();if(old!=null)for(File f:old)if(f.isFile()&&f.getName().startsWith("cobra-")&&System.currentTimeMillis()-f.lastModified()>86400000L)f.delete();
+          zip=File.createTempFile("cobra-export-",".zip",cache);
+          CobraDiagnosticArchive.writeZip(zip,entries,secrets);
+          try(InputStream in=new FileInputStream(zip);OutputStream out=app.getContentResolver().openOutputStream(destination,"w")){
+            if(out==null)throw new IOException("Document provider returned no output stream");
+            if(CobraDiagnosticArchive.copy(in,out)!=zip.length())throw new IOException("Incomplete destination write");
+          }
+          record(app,"export","saved","");notify(app,"Cobra diagnostics ZIP saved to your chosen location.");
+        }catch(Exception failure){
+          boolean removed=false;
+          try {removed=DocumentsContract.deleteDocument(app.getContentResolver(),destination);}catch(Exception ignored){}
+          failure(app,"diagnostic-export",failure);
+          notify(app,"Export failed ("+failure.getClass().getSimpleName()+"). "+(removed?"Incomplete document removed.":"An incomplete document may remain; delete it and retry."));
+        }finally{if(zip!=null)zip.delete();EXPORTING.set(false);}
+      },"CobraDiagnosticExport");worker.setDaemon(true);worker.start();
+    }catch(RuntimeException failure){EXPORTING.set(false);notify(app,"Export could not start. Please retry.");}
+  }
+  private static void notify(Context app,String message){new Handler(Looper.getMainLooper()).post(()->Toast.makeText(app,message,Toast.LENGTH_LONG).show());}
+  private static void addFile(Map<String,String> entries,String name,File root,String relative,int limit){
+    try{
+      // Android may alias its app storage root. Resolve that trusted root once,
+      // but never follow a log-name or descendant symlink to unrelated private files.
+      File file=new File(root.getCanonicalFile(),relative);
+      if(!file.getCanonicalFile().equals(file.getAbsoluteFile()))entries.put(name,"[omitted: noncanonical diagnostic path]");
+      else entries.put(name,CobraDiagnosticArchive.readTail(file,limit));
+    }catch(Exception failure){entries.put(name,"[unavailable: "+failure.getClass().getSimpleName()+"]");}
+  }
+  private static String exits(Context app,Map<String,String> entries){
+    JSONObject result=new JSONObject();
+    try{
+      result.put("query_package",app.getPackageName());result.put("collected_at_ms",System.currentTimeMillis());
+      result.put("absence_does_not_exclude_crash",true);
+      result.put("attribution","Infinity app-process exits; not proof Cobra alone caused an exit");
+      if(Build.VERSION.SDK_INT<30){result.put("status","unavailable_before_android_11");return result.toString(2);}
+      Api30.collect(app,result,entries);return result.toString(2);
+    }catch(Exception failure){return "[Android exit history unavailable: "+failure.getClass().getSimpleName()+"]";}
+  }
+  private static final class Api30 {
+    static void collect(Context app,JSONObject result,Map<String,String> entries)throws Exception{
+      ActivityManager manager=(ActivityManager)app.getSystemService(Context.ACTIVITY_SERVICE);
+      if(manager==null){result.put("status","activity_manager_unavailable");return;}
+      List<ApplicationExitInfo> history=manager.getHistoricalProcessExitReasons(app.getPackageName(),0,8);
+      JSONArray records=new JSONArray();int traceCount=0;
+      if(history!=null)for(ApplicationExitInfo exit:history){
+        if(records.length()>=8)break;
+        JSONObject row=new JSONObject();row.put("timestamp_ms",exit.getTimestamp());row.put("reason",exit.getReason());
+        row.put("pid",exit.getPid());row.put("status_or_signal",exit.getStatus());row.put("pss_kb",exit.getPss());row.put("rss_kb",exit.getRss());
+        row.put("crash_or_anr",exit.getReason()==4||exit.getReason()==5||exit.getReason()==6);
+        row.put("trace_status",exit.getReason()==5?"native_binary_omitted_for_privacy":"not_provided");
+        if(exit.getReason()==ApplicationExitInfo.REASON_ANR&&traceCount<2){
+          try(InputStream in=exit.getTraceInputStream()){
+            if(in!=null){
+              ByteArrayOutputStream buffer=new ByteArrayOutputStream();byte[] block=new byte[8192];int n;
+              while(buffer.size()<256*1024&&(n=in.read(block,0,Math.min(block.length,256*1024-buffer.size())))!=-1){if(n==0)throw new IOException("Trace stalled");buffer.write(block,0,n);}
+              boolean truncated=buffer.size()==256*1024&&in.read()!=-1;
+              byte[] bytes=buffer.toByteArray();boolean binary=false;for(byte b:bytes)if(b==0){binary=true;break;}
+              if(binary)row.put("trace_status","binary_omitted_for_privacy");
+              else{
+                String text=new String(bytes,StandardCharsets.UTF_8);
+                if(truncated){int end=text.lastIndexOf('\n');text=(end<0?"":text.substring(0,end+1))+"[truncated: incomplete final line omitted]\n";}
+                String name="android-anr-"+(++traceCount)+".txt";entries.put(name,text);row.put("trace_file",name);row.put("trace_status",truncated?"text_truncated":"text_included");
+              }
+            }
+          }catch(Exception failure){row.put("trace_status","unavailable_"+failure.getClass().getSimpleName());}
+        }
+        records.put(row);
+      }
+      result.put("status",records.length()==0?"no_retained_exit_records":"collected");result.put("records",records);
+    }
+  }
+}

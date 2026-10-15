@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "cycles": 500,
+  "distinct_processes": 500,
+  "elapsed_s": 27.296,
+  "state": {
+    "cycles": 500,
+    "playcount": 4,
+    "position": 417.125
+  },
+  "foreign_previous_owner": "rejected",
+  "runtime_source": "/workspace/scratch/a86210039ee8/runtime-commandcenter",
+  "source_sha256": {
+    "checkpoint_runtime.py": "d69c4da55c53fe9759e2797c28aaacea28596096d2ad98bebe6f173c66441c73",
+    "persistence_participant.py": "7658db0f21c20853f272f61832e720df02b2b4b9ebaeba83ca1c7ba8758e1b9b"
+  },
+  "command": "python repairs/android-checkpoint-shutdown/runtime-tests/test_runtime_relaunch.py --runtime /workspace/scratch/a86210039ee8/runtime-commandcenter --cycles 500",
+  "scope": "Actual CC journal; harness supplies startup registration and prior-owner death proof",
+  "physical_device_acceptance": false,
+  "android_jni_startup_verified": false
+}

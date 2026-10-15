@@ -1,0 +1,70 @@
+    list.addView(refresh, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(allSources, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(profiles, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(health, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(exportDiagnostics, new LinearLayout.LayoutParams(-1, dp(64)));
+    list.addView(customEpg, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(subscriptionStatus, new LinearLayout.LayoutParams(-1, dp(86)));''',
+'''    list.addView(cobraSettingsSection("EXPERIENCE & DISPLAY"), new LinearLayout.LayoutParams(-1, dp(38)));
+    list.addView(chooser, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(theme, new LinearLayout.LayoutParams(-1, dp(58)));
+    list.addView(appearance, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(displayPerformance, new LinearLayout.LayoutParams(-1, dp(58)));
+    list.addView(cobraSettingsSection("PLAYBACK"), new LinearLayout.LayoutParams(-1, dp(38)));
+    list.addView(backgroundMode, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(miniBackground, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(liveRewind, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(cobraSettingsSection("SYSTEM & SOURCES"), new LinearLayout.LayoutParams(-1, dp(38)));
+    list.addView(filePicker, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(uiState, new LinearLayout.LayoutParams(-1, dp(44)));
+    list.addView(refresh, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(allSources, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(profiles, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(cobraSettingsSection("HEALTH & DIAGNOSTICS"), new LinearLayout.LayoutParams(-1, dp(38)));
+    list.addView(health, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(exportDiagnostics, new LinearLayout.LayoutParams(-1, dp(64)));
+    list.addView(customEpg, new LinearLayout.LayoutParams(-1, dp(56)));
+    list.addView(subscriptionStatus, new LinearLayout.LayoutParams(-1, dp(86)));''','settings polish grouping')
+    text=replace_member(text,'showSettings',settings)
+
+    text=replace_member(text,'startSinglePlayer',NEW_START_SINGLE)
+    text=replace_member(text,'buildPlayer',NEW_BUILD_PLAYER)
+
+    # The old 12-second watchdog must never restart a healthy player. It becomes observation-only.
+    old_watch='''  private final Runnable mStallWatchdog = new Runnable() {
+    @Override public void run() {
+      if ((mBackgroundStopped && !isCobraInPictureInPicture())
+          || mPlayer == null || !mPlayer.getPlayWhenReady()) {
+        mBufferingSince = 0L; return;
+      }
+      if (mPlayer.getPlaybackState() == Player.STATE_BUFFERING) {
+        if (mBufferingSince == 0L) mBufferingSince = System.currentTimeMillis();
+        if (System.currentTimeMillis() - mBufferingSince >= 12000L) {
+          if(!cobraPermitBufferRetry(mPlayer)){mBufferingSince=0L;return;}
+          mPlaybackRetryCount++;
+          try { mPlayer.prepare(); mPlayer.play(); } catch (Exception ignored) {}
+          mBufferingSince = System.currentTimeMillis();
+        }
+        mMain.postDelayed(this, 4000L);
+      } else { mBufferingSince = 0L; }
+    }
+  };'''
+    new_watch='''  private final Runnable mStallWatchdog = new Runnable() {
+    @Override public void run() {
+      if ((mBackgroundStopped && !isCobraInPictureInPicture()) || mPlayer == null || !mPlayer.getPlayWhenReady()) {mBufferingSince=0L;return;}
+      if (mPlayer.getPlaybackState()==Player.STATE_BUFFERING) {
+        if(mBufferingSince==0L)mBufferingSince=System.currentTimeMillis();
+        if(System.currentTimeMillis()-mBufferingSince>=12000L){CobraPlayerBinding b=mCobraPlayerBindings.get(mPlayer);if(b!=null){b.vitals.longStalls++;b.vitals.lastRecovery="buffer_observed_no_restart";}mBufferingSince=System.currentTimeMillis();}
+        mMain.postDelayed(this,4000L);
+      } else mBufferingSince=0L;
+    }
+  };'''
+    text=once(text,old_watch,new_watch,'watchdog no restart')
+
+    # Rewind settings now expose the local-buffer window while retaining the existing provider capability switch.
+    rewind=member(text,'showCobraLiveRewindPicker')
+    rewind_new=r'''  private void showCobraLiveRewindPicker(){
+    LinearLayout rows=cobraOpenSheet("Live TV Rewind","Provider/native rewind is used when available. MPEG-TS channels can fall back to Cobra's on-device rolling buffer without opening a second provider playback session.","live-rewind");
+    boolean dark=cobraSheetIsDark();
+    rows.addView(cobraSheetRow("close","Off",cobraLiveRewindEnabled()?null:"Selected",false,dark,()->{if(mCobraProviderCatchupActive)cobraGoLive();mPrefs.edit().putBoolean(COBRA_LIVE_REWIND_ENABLED,false).apply();cobraStopLocalTimeshift("rewind-off");cobraUpdateLiveRewindControls();closeCobraActionSheet();toast("Live TV rewind • Off");showSettings();}));
+    rows.addView(cobraSheetRow("recent","On",cobraLiveRewindEnabled()?"Selected":"Provider/native rewind + local TS fallback",false,dark,()->{mPrefs.edit().putBoolean(COBRA_LIVE_REWIND_ENABLED,true).apply();cobraUpdateLiveRewindControls();closeCobraActionSheet();toast("Live TV rewind • On");showSettings();}));

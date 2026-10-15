@@ -1,0 +1,194 @@
+name: Infinity | 2103229 Multi-View Stability Fill
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-cobra-2103229-multiview-stability-fill-rc1]
+    paths:
+      - '.github/workflows/infinity-2103229-multiview-stability-fill.yml'
+      - 'repairs/multiview-stability-fill-2103229/**'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-2103229-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  audit-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+
+      - uses: android-actions/setup-android@v4
+        with: {packages: platform-tools}
+
+      - name: Download exact 2103228 preservation pre-audit inputs
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103228-Exact-PreAudit-Inputs
+          run-id: 35814815870
+          github-token: ${{ github.token }}
+          path: preaudit228
+
+      - name: Download exact locked 2103227 APK
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103227-Cobra-Device-Live-Fold-MultiView-TEST-CANDIDATE
+          run-id: 35806492482
+          github-token: ${{ github.token }}
+          path: parent227
+
+      - name: Download exact 2103208 source parent
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103208-Integration-Polish-TEST-CANDIDATE-Replica-1-Attempt-1
+          run-id: 35676573761
+          github-token: ${{ github.token }}
+          path: baseline208
+
+      - name: Download preserved 2103209 native engine
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103209-Python311-GIL-Native-Engine
+          run-id: 35693288744
+          github-token: ${{ github.token }}
+          path: native209
+
+      - name: Prepare protected base APK then restore exact locked 2103227 source
+        run: |
+          set -euo pipefail
+          test "$(sha256sum parent227/Infinity-1.0.9-Cobra-Device-Live-Fold-MultiView-RC1.apk | cut -d' ' -f1)" = "136ed5b2682fd9c13d54458194a3ac67f3b23b416229cc01c08093ee0f355cb9"
+          mkdir -p audit229
+          python3 repairs/python311-gil-2103209/ci.py prepare \
+            --base-dir baseline208 \
+            --native-apk native209/Infinity-1.0.9-Cobra-Full-Feature-Candidate-2-Engine-Base.apk \
+            --shell base-shell \
+            --out audit229/base
+          rm -rf base-shell
+          tar -xzf preaudit228/locked-2103227-reconstructed-shell.tar.gz
+          test "$(sha256sum shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in | cut -d' ' -f1)" = "d99ee556d5324e8f4467dde7a2fdf5ad7b9e29cbed6a44d3112a2e42199617c0"
+          grep -F '"version_code": 2103227' engine/background-resume-source.json
+          grep -F '"version_name": "1.0.9-Cobra-Device-Live-Fold-MultiView-RC1"' engine/background-resume-source.json
+
+      - name: Apply and source-audit 2103229 Multi-View delta
+        run: |
+          set -euo pipefail
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit229/InfinityLiveActivity-2103227-before.java.in
+          python3 repairs/multiview-stability-fill-2103229/apply.py --shell shell-kodi
+          cp shell-kodi/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in audit229/InfinityLiveActivity-2103229-after.java.in
+          python3 repairs/multiview-stability-fill-2103229/source_audit.py \
+            --source shell-kodi \
+            --scope audit229/scope.json \
+            --out audit229
+          grep -F '"version_code": 2103229' engine/background-resume-source.json
+          grep -F '"multiview_stability_fill_audited": true' engine/background-resume-source.json
+          grep -F '"multiview_same_player_auto_recovery": true' engine/background-resume-source.json
+          grep -F '"multiview_layout_fill_screen": true' engine/background-resume-source.json
+
+      - name: Build and sign exact 2103229 candidate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -alias androiddebugkey -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          python3 scripts/package_background_resume.py \
+            --source shell-kodi \
+            --base-apk audit229/base/Infinity-2103208-Python311-GIL-Patched-Base.apk \
+            --build-dir build229 \
+            --out signed229
+          cp repairs/multiview-stability-fill-2103229/DEVICE-TEST.md signed229/DEVICE-TEST.md
+
+      - name: Run Multi-View Android regression tests
+        env:
+          KODI_ANDROID_KEY_ALIAS: androiddebugkey
+          KODI_ANDROID_KEY_PASSWORD: android
+          KODI_ANDROID_STORE_PASSWORD: android
+          KODI_ANDROID_STORE_FILE: /home/runner/.android/debug.keystore
+        run: |
+          set -euo pipefail
+          TESTDIR=build229/xbmc/src/test/java/com/projectinfinity/kodi
+          mkdir -p "$TESTDIR"
+          cp repairs/device-live-fold-multiview-2103227/tests/Cobra2103227DeviceLiveFoldMultiViewTest.java "$TESTDIR/"
+          cp repairs/multiview-stability-fill-2103229/tests/Cobra2103229MultiViewStabilityFillTest.java "$TESTDIR/"
+          cat >> build229/xbmc/build.gradle <<'GRADLE'
+          android.testOptions.unitTests.includeAndroidResources = true
+          android.testOptions.unitTests.all {
+            maxHeapSize = "3g"
+            maxParallelForks = 1
+            testLogging { events "started", "passed", "failed", "skipped"; exceptionFormat = "full" }
+          }
+          dependencies {
+            testImplementation 'junit:junit:4.13.2'
+            testImplementation 'org.robolectric:robolectric:4.14.1'
+          }
+          GRADLE
+          (
+            cd build229
+            ./gradlew --no-daemon --console=plain :xbmc:testReleaseUnitTest \
+              --tests com.projectinfinity.kodi.Cobra2103227DeviceLiveFoldMultiViewTest \
+              --tests com.projectinfinity.kodi.Cobra2103229MultiViewStabilityFillTest \
+              --stacktrace
+          )
+
+      - name: Verify final APK against exact locked 2103227
+        run: |
+          set -euo pipefail
+          python3 repairs/multiview-stability-fill-2103229/verify.py \
+            --apk signed229/Infinity-1.0.9-Cobra-MultiView-Stability-Fill-RC1.apk \
+            --parent227 parent227/Infinity-1.0.9-Cobra-Device-Live-Fold-MultiView-RC1.apk \
+            --audit signed229/background-resume-apk-audit.json \
+            --scope audit229/scope.json \
+            --source-audit audit229/source-audit.json
+
+      - name: Publish 2103229 TEST CANDIDATE
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103229-Cobra-MultiView-Stability-Fill-TEST-CANDIDATE
+          path: signed229/
+          compression-level: 0
+          retention-days: 90
+
+      - name: Preserve complete 2103229 audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103229-Cobra-MultiView-Stability-Fill-Evidence
+          path: |
+            audit229/
+            engine/background-resume-source.json
+            repairs/multiview-stability-fill-2103229/
+            signed229/*.json
+            signed229/*.txt
+            build229/xbmc/build/reports/tests/testReleaseUnitTest/
+            build229/xbmc/build/test-results/testReleaseUnitTest/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Preserve exact 2103227 rollback before 2103229
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103227-Exact-Rollback-Before-2103229
+          path: |
+            parent227/
+            preaudit228/locked-2103227-repository.tar.gz
+            preaudit228/SHA256SUMS
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90

@@ -1,0 +1,10 @@
+name: Infinity | Cobra EPG Repair RC1 Package Trigger
+on:
+  push:
+    branches: [infinity-cobra-epg-repair-rc1]
+    paths: ['TRIGGER_EPG_REPAIR_PACKAGE_2103155.txt']
+jobs:
+  trigger-note:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo 'Packaging workflow is available via workflow_dispatch; trigger marker recorded.'

@@ -1,0 +1,320 @@
+{
+  "accepted_candidate_source_hashes": {
+    "repairs/shutdown-recents-2103377/lifecycle/InfinityNativeActivityEntry.h": "0a60dccc271f5d2a80e9f6aebaf60278e6e33c86379d5d0228ea710abb3da69e",
+    "repairs/shutdown-recents-2103377/lifecycle/InfinityNativeTaskEntry.java.in": "0637adebd46ffc13e56e3a3f37bd6214f872ab622f713b4c47735d5abe86e986",
+    "repairs/shutdown-recents-2103377/lifecycle/InfinityTaskLifecycleGate.java.in": "c0a93bc60a730df76a7cd5dd9d8ddff508bef83441cfaaf31084e3e7ac1d255f",
+    "repairs/shutdown-recents-2103377/lifecycle/README.md": "57a979c3a9f26281517c31fb599b4a7b75ba6efc9480a5de70d876a55d004ab2",
+    "repairs/shutdown-recents-2103377/lifecycle/apply_candidate.py": "79ceeb681eae644c386370f389b157424b026815a9e0a33f706e32299de28d0d",
+    "repairs/shutdown-recents-2103377/lifecycle/tests/InfinityCloseLifecycle2103377Test.java": "c987acbd621af88a94b376ec914d66c61f1d218dcc5676a63f076b17d2a63cfc",
+    "repairs/shutdown-recents-2103377/lifecycle/tests/saved_recents_harness.py": "e30366a06c6c51b4f5b2525393afacf90e4d48c66add6b413aac7a8c3d610fff",
+    "repairs/shutdown-recents-2103377/lifecycle/tests/test_candidate_method.py": "b7b0bf5e82001c672bfcbeb398b221ad5a2dd063fd677d27831d7e97466f93ac",
+    "repairs/shutdown-recents-2103377/lifecycle/tests/test_native_entry.py": "37bb6f388fb3dc96447250c76ce7a8399e9a72bcf5c1918aa8b228b3c68202c0",
+    "repairs/shutdown-recents-2103377/lifecycle/tests/test_process_gate.py": "6c2f7868254e23d2e8f2555628c6ecacea9b4c508a4e2c01bb038b30e9a098d5",
+    "repairs/shutdown-recents-2103377/lifecycle/verify_android.py": "2cc87a874a54dc3a5fb45e10abc1c826df67aef07307b65c567478cb1fc50c9b"
+  },
+  "all_11_candidate_files_match_accepted_hashes": true,
+  "captures": [
+    {
+      "duration_ms": 25083,
+      "file": "Infinity-Diagnostics-20261013-045028.zip",
+      "installed_playlist_source_hashes_present": false,
+      "label": "quick",
+      "native_vfs_backend_identity_present": false,
+      "pending_services": [
+        "script.artistslideshow:default.py",
+        "plugin.video.otaku:service.py",
+        "plugin.video.playlistbrowser:service.py",
+        "plugin.video.redlight:service.py",
+        "plugin.video.seren:service.py",
+        "plugin.video.themoviedb.helper:service.py",
+        "plugin.video.tmdb.bingie.helper:service.py",
+        "plugin.video.tmdbmovies:service.py"
+      ],
+      "phase": "CHECKPOINT_FAILED",
+      "playlist_events": [
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "started",
+          "phase": "scripts.checkpoint_escalation_start",
+          "seconds_since_session_start": 15.34369015
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "snapshot_not_liveness",
+          "phase": "scripts.target_before_stop",
+          "seconds_since_session_start": 15.343940515
+        },
+        {
+          "duration_ns": 0,
+          "frame": "_string__362_vfs_file",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 20.393805304
+        },
+        {
+          "duration_ns": 0,
+          "frame": "_string__660___call__",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 20.393829783
+        },
+        {
+          "duration_ns": 0,
+          "frame": "main.py_136_read_text",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 20.393861606
+        },
+        {
+          "duration_ns": 0,
+          "frame": "service.py_28_refresh_playlist",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 20.3938902
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "snapshot_not_liveness",
+          "phase": "scripts.target_before_join",
+          "seconds_since_session_start": 20.393957961
+        },
+        {
+          "duration_ns": 0,
+          "kind": "begin",
+          "outcome": "observed",
+          "phase": "invoker_thread.join",
+          "seconds_since_session_start": 20.393978065
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "observed",
+          "phase": "python.bytecode_returned",
+          "seconds_since_session_start": 38.143842745
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "durable_retirement",
+          "phase": "scripts.checkpoint_escalated_retired",
+          "seconds_since_session_start": 38.174349256
+        },
+        {
+          "duration_ns": 17781078275,
+          "kind": "end",
+          "outcome": "scope_returned",
+          "phase": "invoker_thread.join",
+          "seconds_since_session_start": 38.175056235
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "stop_returned",
+          "phase": "scripts.checkpoint_escalation_end",
+          "seconds_since_session_start": 38.175071027
+        }
+      ],
+      "sha256": "e0e189005877cdbe489503052ea212aabb4a2248a0cbaefecb8d8e59c4cd5958"
+    },
+    {
+      "duration_ms": 25218,
+      "file": "Infinity-Diagnostics-20261013-050031.zip",
+      "installed_playlist_source_hashes_present": false,
+      "label": "loaded",
+      "native_vfs_backend_identity_present": false,
+      "pending_services": [
+        "plugin.video.playlistbrowser:service.py"
+      ],
+      "phase": "CHECKPOINT_FAILED",
+      "playlist_events": [
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "started",
+          "phase": "scripts.checkpoint_escalation_start",
+          "seconds_since_session_start": 3.07709578
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "snapshot_not_liveness",
+          "phase": "scripts.target_before_stop",
+          "seconds_since_session_start": 3.077396717
+        },
+        {
+          "duration_ns": 0,
+          "frame": "_string__362_vfs_file",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 8.078227236
+        },
+        {
+          "duration_ns": 0,
+          "frame": "_string__660___call__",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 8.078254945
+        },
+        {
+          "duration_ns": 0,
+          "frame": "main.py_205__vfs_try",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 8.078272705
+        },
+        {
+          "duration_ns": 0,
+          "frame": "main.py_219_read_text",
+          "kind": "milestone",
+          "outcome": "frame_observed",
+          "phase": "python.exit_frame",
+          "seconds_since_session_start": 8.078303018
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "snapshot_not_liveness",
+          "phase": "scripts.target_before_join",
+          "seconds_since_session_start": 8.078359736
+        },
+        {
+          "duration_ns": 0,
+          "kind": "begin",
+          "outcome": "observed",
+          "phase": "invoker_thread.join",
+          "seconds_since_session_start": 8.078377028
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "observed",
+          "phase": "python.bytecode_returned",
+          "seconds_since_session_start": 35.370229309
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "durable_retirement",
+          "phase": "scripts.checkpoint_escalated_retired",
+          "seconds_since_session_start": 35.404669101
+        },
+        {
+          "duration_ns": 27326612750,
+          "kind": "end",
+          "outcome": "scope_returned",
+          "phase": "invoker_thread.join",
+          "seconds_since_session_start": 35.404989622
+        },
+        {
+          "duration_ns": 0,
+          "kind": "milestone",
+          "outcome": "stop_returned",
+          "phase": "scripts.checkpoint_escalation_end",
+          "seconds_since_session_start": 35.405003215
+        }
+      ],
+      "sha256": "c58957f3e2eec7c405d286ec02826e5af27bff26f3cb34d57d2643028f549e33"
+    }
+  ],
+  "diagnostic_correlation_refinement": "Bounded cancellation-ID compare/exchange prevents delayed observations from overwriting a newer operation; subject snapshots must match the intended invoker and release uses an intermediate reserved state.",
+  "diagnostic_is_final_repair": false,
+  "diagnostic_payload_scope": "Locked 2103376 Java/Dex, assets, resources and other native libraries remain byte-identical. Accepted lifecycle candidate is preserved separately for eventual final repair. Native-only observation build.",
+  "native_diagnostic_changes": {
+    "xbmc/filesystem/CurlFile.cpp": "575c0e580f2b522bbe374413e08545e7968fcb762cf81c760152c08ff8775898",
+    "xbmc/filesystem/File.cpp": "22daa7b3624252d26cd7fb6d1d000de930d5e997dc3b79b08d62b04c06f5301f",
+    "xbmc/filesystem/FileFactory.cpp": "daafe5507a8104d4d727d92ab5c084069c67b78b4774752e9e05baa3635832d9",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "5a2ed7e23402b660c7f0f44efa59be792269b1cc60658a846710d4a29e325dd2",
+    "xbmc/interfaces/python/PythonInvoker.cpp": "6be77b88a1767f2387969e3692779dcc7e6100a4fee3b5c089d778888ab1d904",
+    "xbmc/platform/android/activity/InfinityShutdownTrace.h": "7f5fa1808b9054c002cdabbf68044c5d4b7403a9329297e86b6d96109e94f974",
+    "xbmc/platform/android/activity/InfinityVfsOpenTrace.h": "ebede61127f1176dd65ae2912308613ad55d563b50613530be7d6d31cdc1faa3"
+  },
+  "next_device_evidence": [
+    "Generated Infinity-Playlist-Probe ZIP from the existing one-shot add-on, with actual installed code hashes.",
+    "Health Center diagnostic export after fully-loaded Close on the separately labeled native diagnostic APK."
+  ],
+  "parent_checkpoint": "567d70a13f9e12bceed9a4d8350591efc9d2b655",
+  "privacy": "Added trace emits fixed protocol/backend/stage names, integer operation/invoker IDs and times, boolean/exception return, receipt outcomes and numeric Curl result. No paths, URLs, query strings, headers, credentials, playlists, locals or exception text.",
+  "schema": 1,
+  "scope": "Focused comparison of two existing physical captures plus observation-only VFS implementation; no backend cause inferred.",
+  "shutdown_corrected": false,
+  "trace_component_verification": {
+    "cases": [
+      {
+        "case": "preclose",
+        "events": 4,
+        "passed": true,
+        "trace_sha256": "d9c9dc2cd63d888b6d035b125052f84d534689334b6c982882a1080876a42e96"
+      },
+      {
+        "case": "cancel",
+        "events": 7,
+        "passed": true,
+        "trace_sha256": "bc2e54f63897e8c2bbaa3f53848aa60062c332d360de4448bbd594ef4916ea04"
+      },
+      {
+        "case": "nested",
+        "events": 8,
+        "passed": true,
+        "trace_sha256": "6220ff9af2d81adce514563c72b7e91f6858d6fe8839be6c48c9dbf7741d48dc"
+      },
+      {
+        "case": "inactive",
+        "events": 0,
+        "passed": true,
+        "trace_sha256": "721a6e7f69172a8e2dc8ca5afb49f7ad4f9f87657690fa05e1e7fc2568337dc5"
+      },
+      {
+        "case": "exception",
+        "events": 4,
+        "passed": true,
+        "trace_sha256": "0daa03e611176c0af92db30427bde145d00097da651cfedab3a2e127a6f2773a"
+      },
+      {
+        "case": "capacity",
+        "events": 33,
+        "passed": true,
+        "trace_sha256": "6fa9271723bc0b7ee84200a6cc21ca33d947b2c5e4403a95d1849112a8869ba7"
+      },
+      {
+        "case": "reuse",
+        "events": 6,
+        "passed": true,
+        "trace_sha256": "aa0857de58f0e997c504e47be42777056119182fc8a1cfb5d7c1e1082407417b"
+      },
+      {
+        "case": "curl_result",
+        "events": 4,
+        "passed": true,
+        "trace_sha256": "fe93b243728551d874654efc9585a5cade3da7c0fa1c540b2276896ed8be3eb4"
+      },
+      {
+        "case": "stale_cancel",
+        "events": 0,
+        "passed": true,
+        "trace_sha256": "98be37877d54f772e51819aa1571670c5c90c925c082a59ec8ad185d3acfe9f8"
+      },
+      {
+        "case": "stress",
+        "events": 501,
+        "passed": true,
+        "trace_sha256": "375dc0b2688fcbcd1462c1d3b52d0d58b91cd81d42d6b031ce5307f038cbb7bb"
+      }
+    ],
+    "count": 10,
+    "logger_header_sha256": "7f5fa1808b9054c002cdabbf68044c5d4b7403a9329297e86b6d96109e94f974",
+    "passed": true,
+    "scope": "Exact observation headers with real concurrent host threads and append-only evidence; no Kodi backend execution or Galaxy Fold proof.",
+    "shutdown_corrected": false,
+    "trace_header_sha256": "ebede61127f1176dd65ae2912308613ad55d563b50613530be7d6d31cdc1faa3"
+  }
+}

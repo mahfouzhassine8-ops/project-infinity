@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import argparse,hashlib,json,re
+
+REL=Path('tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in')
+BASE_BUILD=2103176
+BASE_COMMIT='9c26e7aaa92c6c2bbe83a284c3377c6ca61d2224'
+EXPECTED_ACTIVITY='ace1af468acd170a90da48c3cf529c5e13ba11dcb2e5c354dbb115497288385e'
+
+def sha(v): return hashlib.sha256(v if isinstance(v,bytes) else v.encode()).hexdigest()
+def once(s,a,b,label="anchor"):
+    c=s.count(a)
+    if c!=1: raise RuntimeError(f'{label}: expected one anchor, got {c}')
+    return s.replace(a,b,1)
+
+def matches(text,name,kind='method'):
+    if kind=='method':
+        return list(re.finditer(r'^[ \t]{2,}(?:(?:@Override(?:[ \t]*\n[ \t]+|[ \t]+))?)(?:public|private|protected) [^\n;=(){}]*\b'+re.escape(name)+r'\s*\(',text,re.M))
+    return list(re.finditer(r'^[ \t]{2,}(?:(?:private|public|protected|static|final)\s+)*class\s+'+re.escape(name)+r'\b',text,re.M))
+def span(text,name,kind='method'):
+    ms=matches(text,name,kind)
+    if len(ms)!=1: raise RuntimeError(f'{kind} cardinality {name}={len(ms)}')
+    start=ms[0].start(); i=text.index('{',ms[0].end()); d=0; q=None; esc=line=block=False
+    while i<len(text):
+        c=text[i]; n=text[i+1] if i+1<len(text) else ''
+        if line:
+            if c=='\n': line=False
+        elif block:
+            if c=='*' and n=='/': block=False; i+=1
+        elif q:
+            if esc: esc=False
+            elif c=='\\': esc=True
+            elif c==q: q=None
+        elif c=='/' and n=='/': line=True; i+=1
+        elif c=='/' and n=='*': block=True; i+=1
+        elif c in ('"',"'"): q=c
+        elif c=='{': d+=1
+        elif c=='}':
+            d-=1
+            if d==0: return start,i+1
+        i+=1
+    raise RuntimeError('unclosed '+name)
+def member(text,name,kind='method'):
+    a,b=span(text,name,kind); return text[a:b]
+def replace_member(text,name,new,kind='method'):
+    a,b=span(text,name,kind); return text[:a]+new.rstrip()+'\n'+text[b:]
+
+HELPERS=r'''
+  // ---- 2103177 final feature-freeze runtime ----
+  private static final String COBRA_REFRESH_MODE="cobra_refresh_mode";
+  private static final String COBRA_PERFORMANCE_OVERLAY="cobra_performance_overlay";
+  private static final String COBRA_TIMESHIFT_SECONDS="cobra_timeshift_seconds";
+  private static final String COBRA_LAST_CURRENT="cobra_last_channel_current";
+  private static final String COBRA_LAST_PREVIOUS="cobra_last_channel_previous";
+  private CobraLocalTimeshiftSession mCobraTimeshiftSession;
+  private ExoPlayer mCobraTimeshiftPlayer;
+  private int mCobraTimeshiftGeneration=0;
+  private android.widget.SeekBar mCobraTimeshiftSeek;
+  private boolean mCobraTimeshiftDragging=false;
+  private CobraIconButton mCobraLastChannelButton;
+  private TextView mCobraPerformanceOverlayView;
+  private float mCobraUiFps=0f,mCobraRequestedHz=0f,mCobraActiveHz=0f,mCobraMaxHz=0f;
+  private String mCobraRefreshStatus="SYSTEM";
+  private boolean mCobraPerformanceFrameActive=false;
+  private long mCobraFpsWindowNs=0L;private int mCobraFpsFrames=0;
+
+  static final class CobraRefreshPolicy {
+    static float choose(String mode,float[] supported,boolean saver,boolean thermal){
+      if(supported==null||supported.length==0)return 0f;
+      float max=0f,min=Float.MAX_VALUE;for(float hz:supported)if(hz>0){max=Math.max(max,hz);min=Math.min(min,hz);}

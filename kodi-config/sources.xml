@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  sources.xml
+  Pre-configure media sources AND File Manager URL sources so they appear on first launch.
+
+  Edit this file directly in GitHub (click the pencil icon), then trigger a new build.
+  Full reference: https://kodi.wiki/view/Sources.xml
+
+  ──────────────────────────────────────────────────────────────────────────
+  FILE MANAGER SOURCES  (<files> section at the bottom)
+  These appear in System > File Manager and are used to add repo URLs,
+  network shares, or any browsable path — exactly like "Add file source" in the UI.
+
+  SUPPORTED URL FORMATS:
+    http://example.com/repo/          Plain HTTP directory / addon repo
+    https://example.com/repo/         HTTPS repo
+    smb://192.168.1.100/sharename/    Windows/Samba network share
+    ftp://user:pass@host/path/        FTP server
+    nfs://192.168.1.100/export/path/  NFS share
+    special://home/                   Kodi's own profile directory
+
+  TO ADD AN ENTRY: copy one of the <source> blocks, uncomment it,
+  and replace the name/path values. Then commit and trigger a build.
+  ──────────────────────────────────────────────────────────────────────────
+-->
+<sources>
+
+  <programs>
+    <default pathversion="1"></default>
+  </programs>
+
+  <!-- ── VIDEO SOURCES ─────────────────────────────────────────────────── -->
+  <video>
+    <default pathversion="1"></default>
+    <!-- Uncomment and edit to add video sources:
+
+    <source>
+      <name>Movies (NAS)</name>
+      <path pathversion="1">smb://192.168.1.100/Movies/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+
+    <source>
+      <name>TV Shows (NAS)</name>
+      <path pathversion="1">smb://192.168.1.100/TVShows/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+
+    -->
+  </video>
+
+  <!-- ── MUSIC SOURCES ─────────────────────────────────────────────────── -->
+  <music>
+    <default pathversion="1"></default>
+    <!-- Uncomment and edit:
+
+    <source>
+      <name>My Music</name>
+      <path pathversion="1">smb://192.168.1.100/Music/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+
+    -->
+  </music>
+
+  <pictures>
+    <default pathversion="1"></default>
+  </pictures>
+
+  <!-- ── FILE MANAGER SOURCES ──────────────────────────────────────────────
+       These appear under System > File Manager exactly as shown in the
+       "Add file source" dialog. Add repo URLs, SMB shares, FTP paths, etc.
+       ──────────────────────────────────────────────────────────────────── -->
+  <files>
+    <default pathversion="1"></default>
+
+    <!-- ══ ADDON REPOSITORY URLS ══════════════════════════════════════════
+         Add the URL of any addon repo zip or repo folder here so it shows
+         up in File Manager ready to install from.
+         Examples shown below — uncomment the ones you want.           -->
+
+    <!-- Kodi official Piers repo mirror (Kodi 22 prerelease)
+    <source>
+      <name>Kodi Piers Repo</name>
+      <path pathversion="1">https://mirrors.kodi.tv/addons/piers/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+    -->
+
+    <!-- Generic HTTP addon repo — replace URL and name
+    <source>
+      <name>My Addon Repo</name>
+      <path pathversion="1">https://example.com/kodi-repo/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+    -->
+
+    <!-- ══ NETWORK / SMB SHARES ═══════════════════════════════════════════ -->
+
+    <!-- Windows / Samba share (no auth)
+    <source>
+      <name>NAS Shared Folder</name>
+      <path pathversion="1">smb://192.168.1.100/shared/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+    -->
+
+    <!-- Windows / Samba share (with username + password)
+    <source>
+      <name>NAS Private</name>
+      <path pathversion="1">smb://username:password@192.168.1.100/private/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+    -->
+
+    <!-- ══ FTP SOURCES ════════════════════════════════════════════════════ -->
+
+    <!-- FTP server
+    <source>
+      <name>My FTP Server</name>
+      <path pathversion="1">ftp://username:password@ftp.example.com/path/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+    -->
+
+    <!-- ══ NFS SHARES ═════════════════════════════════════════════════════ -->
+
+    <!-- NFS mount (Linux/NAS)
+    <source>
+      <name>NAS NFS</name>
+      <path pathversion="1">nfs://192.168.1.100/mnt/data/</path>
+      <allowsharing>true</allowsharing>
+    </source>
+    -->
+
+  </files>
+
+</sources>

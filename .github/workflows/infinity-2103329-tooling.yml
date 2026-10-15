@@ -1,0 +1,17 @@
+name: Infinity | 2103329 tooling snapshot
+on:
+  push:
+    branches: [repair/infinity-live-closing-2103329]
+    paths: ['.github/workflows/infinity-2103329-tooling.yml']
+permissions: {contents: read}
+jobs:
+  snapshot:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: tar -czf tooling329.tar.gz repairs scripts .github
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103329-Tooling-Snapshot
+          path: tooling329.tar.gz
+          retention-days: 30

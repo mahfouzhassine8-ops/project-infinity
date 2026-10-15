@@ -1,0 +1,343 @@
+package @APP_PACKAGE@.content;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.net.Uri;
+import android.os.Binder;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
+import android.os.Process;
+import android.service.notification.StatusBarNotification;
+import android.util.Log;
+
+import @APP_PACKAGE@.XBMCFile;
+import @APP_PACKAGE@.XBMCJsonRPC;
+import @APP_PACKAGE@.channels.model.Subscription;
+import @APP_PACKAGE@.channels.model.XBMCDatabase;
+import @APP_PACKAGE@.model.File;
+import @APP_PACKAGE@.model.Media;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class XBMCFileContentProvider extends XBMCContentProvider
+{
+  private static final String TAG = "@APP_NAME@";
+  public static final String AUTHORITY = AUTHORITY_ROOT + ".file";
+  private static final String PUBLIC_RESOURCES_PREFS = "cobra_published_media_v1";
+  private static final Object RESOURCE_LOCK = new Object();
+  private static Context resourceContext;
+  private static SharedPreferences resourcePreferences;
+  private static Set<String> publishedResources;
+  private static boolean legacyResourcesLoaded;
+  private XBMCJsonRPC mJsonRPC = null;
+
+  /** Builds an internal URI without publishing or granting its target. */
+  public static Uri buildUri(String surl)
+  {
+    if (surl == null || surl.isEmpty())
+      return null;
+    return new Uri.Builder().scheme("content").authority(AUTHORITY).fragment(surl).build();
+  }
+
+  /** Called only where Cobra publishes a resource to search, recommendations or TV cards. */
+  public static Uri buildPublishedUri(String surl)
+  {
+    Uri uri = buildUri(surl);
+    if (uri == null)
+      return null;
+    if (!validResourcePath(surl))
+      throw new IllegalArgumentException("Invalid media resource");
+    synchronized (RESOURCE_LOCK)
+    {
+      ensureResourceStore();
+      publishResource(surl);
+    }
+    return uri;
+  }
+
+  private static String resourceKey(String path)
+  {
+    try
+    {
+      byte[] digest = MessageDigest.getInstance("SHA-256").digest(path.getBytes(StandardCharsets.UTF_8));
+      StringBuilder key = new StringBuilder(64);
+      for (byte value : digest)
+        key.append(Character.forDigit((value >>> 4) & 15, 16)).append(Character.forDigit(value & 15, 16));
+      return key.toString();
+    }
+    catch (java.security.NoSuchAlgorithmException e)
+    {
+      throw new IllegalStateException("Media authorization unavailable");
+    }
+  }
+
+  private static void ensureResourceStore()
+  {
+    if (publishedResources != null)
+      return;
+    if (resourceContext == null)
+      throw new IllegalStateException("Media provider not initialized");
+    SharedPreferences preferences = resourceContext.getSharedPreferences(PUBLIC_RESOURCES_PREFS, Context.MODE_PRIVATE);
+    Set<String> loaded = new HashSet<>();
+    for (Map.Entry<String, ?> entry : preferences.getAll().entrySet())
+      if (entry.getKey().matches("[0-9a-f]{64}") && Boolean.TRUE.equals(entry.getValue()))
+        loaded.add(entry.getKey());
+    resourcePreferences = preferences;
+    publishedResources = loaded;
+  }
+
+  private static void publishResource(String path)
+  {
+    String key = resourceKey(path);
+    if (publishedResources.contains(key))
+      return;
+    Set<String> proposed = new HashSet<>(publishedResources);
+    proposed.add(key);
+    commitResources(proposed);
+  }
+
+  private static void commitResources(Set<String> proposed)
+  {
+    if (publishedResources.containsAll(proposed))
+      return;
+    // commit() can change SharedPreferences memory even when disk persistence fails.
+    // Only this separate committed set authorizes reads in the current process.
+    SharedPreferences.Editor editor = resourcePreferences.edit().clear();
+    for (String committed : proposed)
+      editor.putBoolean(committed, true);
+    if (!editor.commit())
+      throw new IllegalStateException("Media authorization could not be saved");
+    publishedResources = proposed;
+  }
+
+  private static String publishedPath(Uri uri)
+  {
+    if (uri == null || !"content".equals(uri.getScheme()) || !AUTHORITY.equals(uri.getAuthority())
+        || (uri.getEncodedPath() != null && !uri.getEncodedPath().isEmpty()) || uri.getEncodedQuery() != null)
+      return null;
+    String path = uri.getFragment();
+    return validResourcePath(path) ? path : null;
+  }
+
+  private static boolean validResourcePath(String path)
+  {
+    if (path == null || path.isEmpty())
+      return false;
+    for (int i = 0; i < path.length(); ++i)
+    {
+      char value = path.charAt(i);
+      if (value == 0 || Character.isLowSurrogate(value))
+        return false;
+      if (Character.isHighSurrogate(value))
+      {
+        if (++i >= path.length() || !Character.isLowSurrogate(path.charAt(i)))
+          return false;
+      }
+    }
+    return true;
+  }
+
+  private static void recoverPublishedUri(Set<String> recovered, String value)
+  {
+    if (value == null)
+      return;
+    String path = publishedPath(Uri.parse(value));
+    if (path != null)
+      recovered.add(resourceKey(path));
+  }
+
+  private static void loadLegacyResources()
+  {
+    if (legacyResourcesLoaded)
+      return;
+    // One bounded migration attempt per process; malformed cache/failed services
+    // cannot make every rejected external read rescan the complete media cache.
+    legacyResourcesLoaded = true;
+    Set<String> recovered = new HashSet<>(publishedResources);
+    // This private database contains resources Cobra already published to TV cards.
+    // Never recover authorization from a caller's URI or an unowned external row.
+    try
+    {
+      for (Subscription subscription : XBMCDatabase.getSubscriptions(resourceContext))
+      {
+        if (subscription == null)
+          continue;
+        try
+        {
+          for (Media media : XBMCDatabase.getMedias(resourceContext, subscription.getChannelId()))
+          {
+            if (media == null)
+              continue;
+            recoverPublishedUri(recovered, media.getCardImageUrl());
+            recoverPublishedUri(recovered, media.getBackgroundImageUrl());
+            recoverPublishedUri(recovered, media.getVideoUrl());
+          }
+        }
+        catch (RuntimeException e) { Log.w(TAG, "Previously published channel media could not be recovered"); }
+      }
+    }
+    catch (RuntimeException e) { Log.w(TAG, "Previously published media cache could not be recovered"); }
+    if (Build.VERSION.SDK_INT >= 23)
+    {
+      long token = Binder.clearCallingIdentity();
+      try
+      {
+        NotificationManager manager = (NotificationManager) resourceContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null)
+          for (StatusBarNotification item : manager.getActiveNotifications())
+          {
+            if (!resourceContext.getPackageName().equals(item.getPackageName()))
+              continue;
+            Notification notification = item.getNotification();
+            if (notification != null && notification.extras != null)
+              recoverPublishedUri(recovered, notification.extras.getString("android.backgroundImageUri"));
+          }
+      }
+      catch (RuntimeException e) { Log.w(TAG, "Previously published recommendation media could not be recovered"); }
+      finally
+      {
+        Binder.restoreCallingIdentity(token);
+      }
+    }
+    // A single transaction covers all recovered resources, avoiding one complete
+    // preferences rewrite per artwork URL during the first external request.
+    commitResources(recovered);
+  }
+
+  private static String authorizeOpen(Uri uri, String mode)
+  {
+    // Capture the real caller before any migration performs an app-owned Binder call.
+    boolean sameUid = Binder.getCallingUid() == Process.myUid();
+    String path = publishedPath(uri);
+    if (!"r".equals(mode) || path == null)
+      throw new SecurityException("Invalid media read request");
+    if (sameUid)
+      return path;
+    synchronized (RESOURCE_LOCK)
+    {
+      ensureResourceStore();
+      String key = resourceKey(path);
+      if (publishedResources.contains(key))
+        return path;
+      try
+      {
+        loadLegacyResources();
+      }
+      catch (RuntimeException e)
+      {
+        // A corrupt cache or failed migration never authorizes the requested path.
+        Log.w(TAG, "Previously published media could not be recovered");
+      }
+      if (!publishedResources.contains(key))
+        throw new SecurityException("Media resource has not been published");
+    }
+    return path;
+  }
+
+  @Override
+  public boolean onCreate()
+  {
+    synchronized (RESOURCE_LOCK)
+    {
+      Context context = getContext();
+      resourceContext = context.getApplicationContext() == null ? context : context.getApplicationContext();
+    }
+    mJsonRPC = new XBMCJsonRPC();
+    return true;
+  }
+
+  @Override public int delete(Uri uri, String selection, String[] args) { return 0; }
+  @Override public String getType(Uri uri) { return "vnd.android.cursor.dir/xbmc_file"; }
+  @Override public Uri insert(Uri uri, ContentValues values) { return null; }
+  @Override public int update(Uri uri, ContentValues values, String selection, String[] args) { return 0; }
+
+  @Override
+  public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
+  {
+    if (Binder.getCallingUid() != Process.myUid())
+      throw new SecurityException("Media directory queries are private");
+    String xbmcURL = publishedPath(uri);
+    if (xbmcURL == null)
+      throw new IllegalArgumentException("Invalid media directory request");
+    List<File> files = mJsonRPC.getFiles(xbmcURL);
+    if (files.isEmpty())
+      return null;
+    MatrixCursor cursor = new MatrixCursor(new String[] { File.NAME, File.CATEGORY, File.URI, File.ID, File.MEDIATYPE });
+    for (File file : files)
+      cursor.addRow(new Object[] { file.getName(), file.getCategory(), file.getUri(), file.getId(), file.getMediatype() });
+    return cursor;
+  }
+
+  @Override
+  public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException
+  {
+    String path = authorizeOpen(uri, mode);
+    ParcelFileDescriptor[] pipe = null;
+    try
+    {
+      pipe = ParcelFileDescriptor.createPipe();
+      new TransferThread(path, new ParcelFileDescriptor.AutoCloseOutputStream(pipe[1])).start();
+      return pipe[0];
+    }
+    catch (IOException | RuntimeException e)
+    {
+      if (pipe != null)
+        for (ParcelFileDescriptor descriptor : pipe)
+          try { descriptor.close(); } catch (IOException ignored) {}
+      throw new FileNotFoundException("Could not open media pipe");
+    }
+  }
+
+  static class TransferThread extends Thread
+  {
+    private final String path;
+    private final OutputStream out;
+
+    TransferThread(String path, OutputStream out)
+    {
+      this.path = path;
+      this.out = out;
+    }
+
+    @Override
+    public void run()
+    {
+      XBMCFile in = null;
+      try
+      {
+        in = new XBMCFile();
+        if (!in.Open(path))
+          return;
+        while (!in.Eof())
+        {
+          byte[] buffer = in.Read();
+          out.write(buffer, 0, buffer.length);
+        }
+        out.flush();
+      }
+      catch (Exception | LinkageError e)
+      {
+        Log.w(TAG, "Published media transfer failed");
+      }
+      finally
+      {
+        if (in != null)
+          try { in.Close(); } catch (Exception | LinkageError ignored) {}
+        try { out.close(); } catch (IOException | RuntimeException ignored) {}
+      }
+    }
+  }
+}

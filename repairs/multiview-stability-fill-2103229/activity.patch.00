@@ -1,0 +1,78 @@
+--- a/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
++++ b/tools/android/packaging/xbmc/src/InfinityLiveActivity.java.in
+@@ -283,6 +283,7 @@
+   private long mCobraPaletteSourceStamp = Long.MIN_VALUE;
+   private JSONObject mCobraPaletteCache;
+   private static final String COBRA_ASPECT_MODE = "cobra_player_aspect_mode";
++  private static final String COBRA_MULTI_LAYOUT_FILL = "cobra_multiview_layout_fill_screen";
+   private static final String COBRA_SUBSCRIPTION_PREFIX = "cobra_subscription|";
+   private String mCobraInternalScreen = "root";
+   private String mCobraShellAppearance = "";
+@@ -3996,6 +3997,7 @@
+     if(mCobraTiles.keys().size()<4){rows.addView(cobraSheetRow("add","Add screen",null,false,true,()->{mCobraMultiReplaceIndex=-1;showCobraMultiPicker(true);}));rows.addView(cobraSheetRow("search","Search and add",null,false,true,()->cobraShowMultiSearchAdd()));}
+     ExoPlayer tilePlayer=tile.player;rows.addView(cobraSheetRow(tilePlayer!=null&&tilePlayer.getPlayWhenReady()?"pause":"play",tilePlayer!=null&&tilePlayer.getPlayWhenReady()?"Pause":"Resume","Only this screen",false,true,()->cobraToggleMultiTilePause(key)));
+     rows.addView(cobraSheetRow("multi",key.equals(mCobraMultiEnlargedKey)?"Restore grid":"Enlarge screen",key.equals(mCobraMultiEnlargedKey)?"Return to equal Multi-View":"Keep the other screens visible",false,true,()->cobraToggleMultiEnlarge(key)));
++    rows.addView(cobraSheetRow("aspect","Multi-View layout",cobraMultiFillScreen()?"Fill Screen":"Fit",false,true,()->cobraShowMultiLayoutChooser()));
+     rows.addView(cobraSheetRow("fullscreen","Full screen","Return to Multi-View without rebuilding players",false,true,()->cobraPromoteMultiTileFullscreen(key)));
+     rows.addView(cobraSheetRow("recent","Retry this screen","Other videos will keep playing",false,true,()->cobraRetryMultiTile(key)));
+     rows.addView(cobraSheetRow("source","Playback details","State, decoder and connection diagnostics",false,true,()->cobraShowMultiDiagnostics(key)));
+@@ -4017,6 +4019,130 @@
+       }
+       int x=width*rank/smallCount,right=width*(rank+1)/smallCount;
+       return new int[]{x,largeH,right-x,stripH};
++    }
++
++    // Fill Screen is geometry-only. It allocates every safe pixel to an active tile;
++    // video proportionality/crop is handled separately by cobraFitBinding().
++    static int[] rect(int index,int count,int width,int height,int enlarged,boolean fillScreen){
++      if(!fillScreen)return rect(index,count,width,height,enlarged);
++      if(count<1||count>4||index<0||index>=count||width<=0||height<=0)return new int[]{0,0,0,0};
++      if(count==1)return new int[]{0,0,width,height};
++      final boolean portrait=height>width;
++      if(enlarged>=0&&enlarged<count){
++        int rank=index<enlarged?index:index-1,small=count-1;
++        if(portrait){
++          int largeH=Math.max(1,Math.min(height-1,Math.round(height*.68f)));
++          if(index==enlarged)return new int[]{0,0,width,largeH};
++          int x=width*rank/small,right=width*(rank+1)/small;
++          return new int[]{x,largeH,right-x,height-largeH};
++        }
++        int largeW=Math.max(1,Math.min(width-1,Math.round(width*.72f)));
++        if(index==enlarged)return new int[]{0,0,largeW,height};
++        int y=height*rank/small,bottom=height*(rank+1)/small;
++        return new int[]{largeW,y,width-largeW,bottom-y};
++      }
++      if(count==2){
++        if(portrait){int y=height*index/2,bottom=height*(index+1)/2;return new int[]{0,y,width,bottom-y};}
++        int x=width*index/2,right=width*(index+1)/2;return new int[]{x,0,right-x,height};
++      }
++      if(count==3){
++        if(portrait){
++          int largeH=Math.max(1,Math.min(height-1,Math.round(height*.60f)));
++          if(index==0)return new int[]{0,0,width,largeH};
++          int rank=index-1,x=width*rank/2,right=width*(rank+1)/2;
++          return new int[]{x,largeH,right-x,height-largeH};
++        }
++        int largeW=Math.max(1,Math.min(width-1,Math.round(width*.60f)));
++        if(index==0)return new int[]{0,0,largeW,height};
++        int rank=index-1,y=height*rank/2,bottom=height*(rank+1)/2;
++        return new int[]{largeW,y,width-largeW,bottom-y};
++      }
++      int col=index%2,row=index/2,x=width*col/2,y=height*row/2;
++      int right=width*(col+1)/2,bottom=height*(row+1)/2;
++      return new int[]{x,y,right-x,bottom-y};
++    }
++  }
++
++  static final class CobraMultiRecoveryPolicy {
++    static final int MAX_AUTOMATIC_REPREPARES=2;
++    static final long ERROR_GRACE_MS=3000L;
++    static final long FALLBACK_GRACE_MS=8000L;
++    static final long IDLE_GRACE_MS=6000L;
++    static final long BUFFER_STALL_MS=18000L;
++    static final long VERIFY_MS=9000L;
++    static final long RECOVERY_COOLDOWN_MS=20000L;
++    static final long STABLE_RESET_MS=60000L;
++
++    static boolean canAttempt(int attempts,long lastAttempt,long now){
++      return attempts<MAX_AUTOMATIC_REPREPARES&&(lastAttempt<=0L||now-lastAttempt>=RECOVERY_COOLDOWN

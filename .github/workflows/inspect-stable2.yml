@@ -1,0 +1,51 @@
+name: Inspect Stable 2 Android Side
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/inspect-stable2.yml'
+      - 'scripts/inspect-stable2.py'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends unzip curl
+          curl -fsSL -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar
+      - name: Download exact Stable 2 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -L \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/9987128748/zip" \
+            -o /tmp/stable2.zip
+          mkdir -p /tmp/stable2
+          unzip -q /tmp/stable2.zip -d /tmp/stable2
+          APK=$(find /tmp/stable2 -name '*.apk' -type f | head -1)
+          test -n "$APK"
+          cp "$APK" /tmp/stable2.apk
+      - name: Decode exact Stable 2
+        run: java -jar /tmp/apktool.jar d -f /tmp/stable2.apk -o /tmp/decoded
+      - name: Inspect full Android side
+        run: python3 scripts/inspect-stable2.py
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Stable2-Android-Forensic-Report
+          path: /tmp/stable2-report.txt
+          retention-days: 30
