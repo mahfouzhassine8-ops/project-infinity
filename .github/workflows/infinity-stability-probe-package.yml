@@ -1,0 +1,95 @@
+name: Infinity | Stability evidence signed diagnostic APK
+on:
+  push:
+    branches: [work/infinity-stability-probe-20261014]
+    paths:
+      - '.github/workflows/infinity-stability-probe-package.yml'
+      - 'repairs/stability-probe-2103377/package.py'
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-stability-probe-package, cancel-in-progress: false}
+env:
+  NDK_VER: 21.4.7075529
+jobs:
+  signed-diagnostic:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Require exact green native and real Kodi runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json,os,time,urllib.request,subprocess
+          required={38665055598:'02aa09336c87c765aa06ac3f962b1f8b3b78542d',
+                    38664802285:'fa944f7e4453c521df8170530a27ad925a2115b1'}
+          deadline=time.monotonic()+5*3600
+          while required:
+              for run,sha in list(required.items()):
+                  req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+str(run),headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+                  with urllib.request.urlopen(req,timeout=30) as reply:r=json.load(reply)
+                  assert r['head_sha']==sha,(run,'source changed')
+                  if r['status']=='completed':
+                      assert r['conclusion']=='success',(run,r['conclusion'])
+                      del required[run]
+                      print('Verified green run',run,sha,flush=True)
+              if not required:break
+              assert time.monotonic()<deadline,'Verification pending; no candidate packaged'
+              time.sleep(30)
+          subprocess.run(['git','diff','--exit-code','02aa09336c87c765aa06ac3f962b1f8b3b78542d','--','repairs/stability-probe-2103377/InfinityPythonWaitProbe.h','repairs/stability-probe-2103377/InfinityStabilityProbe.h','repairs/stability-probe-2103377/patch_native.py','repairs/stability-probe-2103377/native_ci.py','repairs/stability-probe-2103377/RC02-HASHES.json','repairs/stability-probe-2103377/run_tests.py','repairs/stability-probe-2103377/test_probe.cpp','repairs/stability-probe-2103377/test_python.cpp'],check=True)
+          subprocess.run(['git','diff','--exit-code','fa944f7e4453c521df8170530a27ad925a2115b1','--','repairs/stability-probe-2103377/helper'],check=True)
+          PY
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-${{ runner.os }}-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38665055598
+          name: Infinity-Stability-Probe-Native-Evidence
+          github-token: ${{ github.token }}
+          path: native-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38629545799
+          name: Infinity-Rails-Hold-RC02-Signed-APK
+          github-token: ${{ github.token }}
+          path: parent-apk
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38664802285
+          name: Infinity-Stability-Real-Kodi-Smoke
+          github-token: ${{ github.token }}
+          path: real-kodi
+      - name: Run preserved and failure-specific helper tests
+        run: |
+          set -euo pipefail
+          mkdir -p stability-delivery
+          python3 -m unittest discover -s features/infinity-rails-investigation-20261014/tests -p 'test_*.py' -v > stability-delivery/preserved-helper-tests.txt 2>&1
+          python3 -m unittest discover -s repairs/stability-probe-2103377 -p 'test_helper.py' -v > stability-delivery/stability-helper-tests.txt 2>&1
+      - name: Preserve locked payload and sign diagnostic derivative
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/stability-probe-2103377/package.py \
+            --parent parent-apk/Infinity-2103377-Rails-Hold-Native-RC2-TEST.apk \
+            --native native-evidence --smoke real-kodi --out stability-delivery
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-Stability-Evidence-RC1-Signed-Test
+          path: stability-delivery/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
