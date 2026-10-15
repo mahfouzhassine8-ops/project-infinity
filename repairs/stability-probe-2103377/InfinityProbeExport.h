@@ -47,9 +47,10 @@ inline void Mirror(const std::string& latest) noexcept
     if(!replayed) {
       // Replay pre-close stalls when the existing shutdown recorder opens.
       // This avoids requiring a new Python invocation after admission is sealed.
+      std::string bytes(512*1024,'\0');
       const int source=::open(InfinityStabilityProbe::output.data(),O_RDONLY|O_CLOEXEC);
       if(source>=0) {
-        std::string bytes(512*1024,'\0');const auto n=::read(source,bytes.data(),bytes.size());::close(source);
+        const auto n=::read(source,bytes.data(),bytes.size());::close(source);
         if(n>0) {
           bytes.resize(n);size_t start=0;
           while(start<bytes.size()) {
