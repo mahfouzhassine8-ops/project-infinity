@@ -21,9 +21,19 @@ def module(path,name):
 
 parent=module(ROOT/"repairs/python-shutdown-order-2103377/native_ci.py","infinity_rc1_parent_driver")
 patch=module(HERE/"patch_native.py","infinity_rails_handoff_patch")
-# The host harness imports patch_native by name, so its directory takes precedence.
-sys.path.insert(0,str(HERE))
-tests=module(HERE/"test_native.py","infinity_rails_handoff_test")
+# Legacy Rails RC02 tests also import a generic module named patch_native.
+# Never preload our test under that name before parent.prepare(): it would
+# shadow the original source-pinned Rails driver and invalidate preservation.
+def rails_tests():
+    old=sys.modules.get("patch_native")
+    sys.modules["patch_native"]=patch
+    try:
+        return module(HERE/"test_native.py","infinity_rails_handoff_test")
+    finally:
+        if old is None:
+            sys.modules.pop("patch_native",None)
+        else:
+            sys.modules["patch_native"]=old
 
 def load(path):
     return json.loads(Path(path).read_text())
@@ -60,7 +70,7 @@ def prepare(args):
     delta["source_commit"]=os.environ.get("GITHUB_SHA","local")
     delta["candidate_scope"]="one DirectoryProvider.cpp, no other runtime files"
     save(base/"RAILS-HANDOFF-SOURCE-DELTA.json",delta)
-    tests.verify(source,base/"RAILS-HANDOFF-HOST.json")
+    rails_tests().verify(source,base/"RAILS-HANDOFF-HOST.json")
     print("PASS staged RC1 shutdown + one targeted Rails directory callback/priority correction",flush=True)
 
 def compile_engine():
