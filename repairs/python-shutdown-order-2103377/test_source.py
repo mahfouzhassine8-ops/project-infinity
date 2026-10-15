@@ -20,7 +20,7 @@ def verify(root: Path | None = None, output: Path | None = None) -> dict:
     if root is None:
         # Use the real version-controlled native overlay as the fixture, not
         # independently rewritten C++ snippets; rebuilds will test staged code.
-        original = ROOT / "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc"
+        original = ROOT / "repairs/android-checkpoint-shutdown/runtime/native/overlay"
         holder = tempfile.TemporaryDirectory(prefix="infinity-shutdown-order-test-")
         root = Path(holder.name)
         for file in (fix.PYTHON, fix.HEADER, *fix.UNCHANGED_GATES):
