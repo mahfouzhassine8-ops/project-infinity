@@ -22,7 +22,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import json,os,time,urllib.request,subprocess
-          required={38666437940:'d57e21a45cda79da866aef0ba8094139b3cd8161',
+          required={38668286702:'f8daa2240b06cfe2becc173da1c741c35b84507d',
                     38664802285:'fa944f7e4453c521df8170530a27ad925a2115b1'}
           deadline=time.monotonic()+5*3600
           while required:
@@ -37,7 +37,7 @@ jobs:
               if not required:break
               assert time.monotonic()<deadline,'Verification pending; no candidate packaged'
               time.sleep(30)
-          subprocess.run(['git','diff','--exit-code','d57e21a45cda79da866aef0ba8094139b3cd8161','--','repairs/stability-probe-2103377/InfinityPythonWaitProbe.h','repairs/stability-probe-2103377/InfinityStabilityProbe.h','repairs/stability-probe-2103377/patch_native.py','repairs/stability-probe-2103377/native_ci.py','repairs/stability-probe-2103377/RC02-HASHES.json','repairs/stability-probe-2103377/run_tests.py','repairs/stability-probe-2103377/test_probe.cpp','repairs/stability-probe-2103377/test_python.cpp','repairs/stability-probe-2103377/blocked_wait_check.cpp'],check=True)
+          subprocess.run(['git','diff','--exit-code','f8daa2240b06cfe2becc173da1c741c35b84507d','--','repairs/stability-probe-2103377/InfinityPythonWaitProbe.h','repairs/stability-probe-2103377/InfinityProbeExport.h','repairs/stability-probe-2103377/InfinityStabilityProbe.h','repairs/stability-probe-2103377/patch_native.py','repairs/stability-probe-2103377/native_ci.py','repairs/stability-probe-2103377/RC02-HASHES.json','repairs/stability-probe-2103377/run_tests.py','repairs/stability-probe-2103377/test_probe.cpp','repairs/stability-probe-2103377/test_python.cpp','repairs/stability-probe-2103377/test_probe_export.cpp','repairs/stability-probe-2103377/blocked_wait_check.cpp'],check=True)
           subprocess.run(['git','diff','--exit-code','fa944f7e4453c521df8170530a27ad925a2115b1','--','repairs/stability-probe-2103377/helper'],check=True)
           PY
       - uses: actions/setup-java@v6
@@ -53,7 +53,7 @@ jobs:
       - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38666437940
+          run-id: 38668286702
           name: Infinity-Stability-Probe-Native-Evidence
           github-token: ${{ github.token }}
           path: native-evidence

@@ -4,7 +4,7 @@ import argparse,hashlib,importlib.util,json,os,re,shutil,subprocess,zipfile
 ROOT=Path(__file__).resolve().parents[2]
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 PARENT='17e2458552b7dbb8f14dad307015eafc2497a5ec6ddc4f7bb1707d975f37b906'
-NATIVE='d57e21a45cda79da866aef0ba8094139b3cd8161'
+NATIVE='f8daa2240b06cfe2becc173da1c741c35b84507d'
 ENGINE='lib/arm64-v8a/libkodi.so'
 SIGNATURE=re.compile(r'^META-INF/(?:MANIFEST.MF|[^/]+\.(?:SF|RSA|DSA|EC))$',re.I)
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -15,7 +15,8 @@ def package(args):
     assert proof['stability_probe_source_commit']==NATIVE and delta['source_commit']==NATIVE
     assert proof['complete_native_engine_compiled'] and proof['observations_only'] and not proof['root_cause_fixed']
     assert delta['exact_delta_verified'] and not delta['required_save_gates_changed']
-    assert json.loads((native/'stability-probe-host/PROBE-HOST-RESULT.json').read_text())['passed']
+    host=json.loads((native/'stability-probe-host/PROBE-HOST-RESULT.json').read_text())
+    assert host['passed'] and host['export_after_admission_sealed'] and host['six_shutdown_evidence_budgets_preserved']
     assert sha((native/'libkodi.so').read_bytes())==proof['native_sha256']
     assert sha(args.parent.read_bytes())==PARENT
     smokes=list(args.smoke.rglob('rail-smoke-result.json'));assert len(smokes)==1

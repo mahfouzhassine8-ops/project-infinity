@@ -23,14 +23,20 @@ ONE TARGETED CAPTURE
    then Arm five-minute stability capture. Return to Home.
 2. Visit Movies, then TV Shows. Allow each rail and Continue Watching panel to
    appear. Try normal scrolling and the previously troublesome action once.
-3. With providers fully loaded, request Normal Close once. If it reports that
-   saving is blocked, do not repeatedly force termination. Export when available;
-   an unfinished checkpoint must retain its normal protections.
-4. Reopen normally if Close succeeds. Open the helper's Stability Evidence menu
-   and select Export current/previous evidence. Choose a writable folder.
-5. Send the generated Infinity-Stability-YYYYMMDD-HHMMSS.zip and the normal
-   chooser Export Diagnostics ZIP from the same attempt. State whether the app
-   had just opened or was fully loaded, which action stalled, and approximate time.
+3. Before Close, open the helper's Stability Evidence menu and select Export
+   current/previous evidence. Keep that ZIP; it records the actual installed
+   Umbrella code and the pre-close loading/render evidence.
+4. With providers fully loaded, request Normal Close once. If it reports that
+   saving is blocked, keep its normal protections. Do not force termination.
+5. Use the existing Choose Your Experience Export Diagnostics action after the
+   attempt, including when Close fails. Native probe rows are mirrored into
+   shutdown/critical.jsonl under their own bounded allowance, without using
+   Python. A sealed Python-admission barrier cannot prevent this export.
+6. Send the pre-close Infinity-Stability-YYYYMMDD-HHMMSS.zip and the normal
+   chooser diagnostics ZIP from that attempt. State whether the app had just
+   opened or was fully loaded, which action stalled, and approximate time.
+   If Close succeeds, reopen normally. The helper can export its current and
+   previous native logs again, but this is not required to recover a failed Close.
 
 The native capture uses the existing responsiveness watchdog, with no new
 service or polling thread. Lock bookkeeping is bounded. Captures stop after
@@ -44,6 +50,9 @@ Exports contain native lock owners/waiters, operation locations, observed render
 transitions, Rails/Resume timing rows, installed code hashes and selected public
 Umbrella code, plus existing checkpoint receipts. Missing evidence is reported
 as unavailable. Native probe logs retain the current and previous process only.
+The native export mirror has its own 120 KiB allowance within the existing
+export cap. It does not consume any approved shutdown evidence lane. An explicit
+stability.export_incomplete row reports missing or capped mirror evidence.
 Those probe-owned logs rotate; user settings, rail preferences and databases do
 not. Keep exported captures if you need a longer history.
 
