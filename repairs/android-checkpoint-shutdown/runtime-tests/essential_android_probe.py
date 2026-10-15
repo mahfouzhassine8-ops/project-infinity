@@ -182,7 +182,9 @@ def main():
         assert any(item.get('name')==FAVOURITE for item in baseline),'Startup did not retain seeded test favourite; close not attempted'
         # Same private bridge and action used by Power -> Close. Root exists
         # only for test access; native PID/UUID/generation/receipt checks run.
-        report['close_request']=shell('am','start','-W','-n',PACKAGE+'/.InfinityPowerControlActivity',
+        # This bridge finishes immediately and may hand off without drawing a
+        # frame. am -W waits for activity presentation, not a shutdown receipt.
+        report['close_request']=shell('am','start','-n',PACKAGE+'/.InfinityPowerControlActivity',
                                       '-a',PACKAGE+'.action.CLOSE_KODI')
         receipt={};deadline=time.monotonic()+35
         while time.monotonic()<deadline:

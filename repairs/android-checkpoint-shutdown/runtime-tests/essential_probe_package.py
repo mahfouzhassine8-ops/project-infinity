@@ -15,7 +15,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[3]
 SOURCE=ROOT/'repairs/essential-first-2103377/package_signed_fold_test.py'
-NATIVE='3acc3a9e5bcb1b0a698cab0ed971866886df8cf4'
+NATIVE='61a53e0fe11569953ea2f392503ae6629e7e8dd9'
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('mode',choices=('java','verify-java','package'))
@@ -66,7 +66,7 @@ def main():
         receipt=args.out/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json'
         row=json.loads(receipt.read_text())
         row.update(status='INTERNAL ANDROID RUNTIME PROBE; NOT FOR DELIVERY; NOT LOCKED',file=final.name,
-                   native_host_cases=36,apk_deliverable=False,physical_device_acceptance_required=True)
+                   native_host_cases=42,apk_deliverable=False,physical_device_acceptance_required=True)
         # These legacy TEST1 limitations predate this exact native build.
         # Replace them with explicit current verification boundaries.
         row.pop('known_fail_closed_native_encoder_route',None)
