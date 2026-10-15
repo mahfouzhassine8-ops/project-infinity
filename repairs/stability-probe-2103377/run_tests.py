@@ -19,7 +19,11 @@ def verify(source=None,out=None):
         ns={'once':lambda s,a,b:s.replace(a,b,1),'inc':'#if defined(TARGET_ANDROID)\n#include "threads/InfinityStabilityProbe.h"\n#endif\n'}
         exec(compile(ast.Module(body=[fn],type_ignores=[]),'<production-lock-patch>','exec'),ns)
         (p/'Lockables.h').write_text(ns['locks'](text))
-        for name in ['InfinityStabilityProbe.h','InfinityPythonWaitProbe.h']:shutil.copyfile(HERE/name,p/name)
+        for name in ['InfinityStabilityProbe.h','InfinityPythonWaitProbe.h','InfinityProbeExport.h']:shutil.copyfile(HERE/name,p/name)
+        trace=source/'xbmc/platform/android/activity/InfinityShutdownTrace.h';trace.parent.mkdir(parents=True)
+        raw=(HERE/'fixture/xbmc/platform/android/activity/InfinityShutdownTrace.h').read_bytes()
+        assert hashlib.sha256(raw).hexdigest()=='7cc0ebafe0ef12af7abbef59e370dd085db6f1709b29e130f04a37206ffb76f5'
+        trace.write_bytes(raw)
     include=Path(source)/'xbmc'
     cxx=os.environ.get('CXX','g++')
     common=[cxx,'-std=c++17','-O1','-pthread','-DTARGET_ANDROID','-I'+str(include)]
@@ -37,13 +41,18 @@ def verify(source=None,out=None):
     b=run([str(out/'python-test'),str(out/'python-snapshot.jsonl')])
     run(common+includes+[str(HERE/'blocked_wait_check.cpp'),'-o',str(out/'blocked-wait-check')]+links)
     c=run([str(out/'blocked-wait-check'),str(out/'blocked-wait-snapshot.jsonl')])
+    run(common+[str(HERE/'test_probe_export.cpp'),'-o',str(out/'export-test')])
+    d=run([str(out/'export-test'),str(out/'native-export')])
+    export_rows=[json.loads(l) for l in (out/'native-export/infinity-shutdown-native.jsonl.critical').read_text().splitlines()]
+    assert sum(r.get('kind')=='stability_probe' for r in export_rows)==3
+    assert any(r.get('phase')=='stability.export_incomplete' for r in export_rows)
     rows=[json.loads(l) for l in (out/'mutex-snapshot.jsonl').read_text().splitlines()]
     blocked=next(r for r in rows if r['reason']=='controlled_contention')
     owner=next(r for r in blocked['locks'] if r['operation']=='owner_operation')
     assert any(t['waiting_slot']==owner['slot'] and t['tid']!=owner['owner_tid'] for t in blocked['threads'])
-    receipt={'passed':True,'real_os_mutex_owner_waiter':True,'real_host_cpython_parent_child':True,'real_blocked_python_waits':True,'android_runtime_tested':False,'observational_candidate_not_a_fix':True}
+    receipt={'passed':True,'real_os_mutex_owner_waiter':True,'real_host_cpython_parent_child':True,'real_blocked_python_waits':True,'export_after_admission_sealed':True,'six_shutdown_evidence_budgets_preserved':True,'android_runtime_tested':False,'observational_candidate_not_a_fix':True}
     (out/'PROBE-HOST-RESULT.json').write_text(json.dumps(receipt,indent=2)+'\n')
-    (out/'PROBE-HOST-RESULT.txt').write_text(a+b+c)
-    print(a+b+c);return receipt
+    (out/'PROBE-HOST-RESULT.txt').write_text(a+b+c+d)
+    print(a+b+c+d);return receipt
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path);p.add_argument('--out',type=Path);args=p.parse_args();verify(args.source,args.out)

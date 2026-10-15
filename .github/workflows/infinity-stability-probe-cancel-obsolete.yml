@@ -26,7 +26,9 @@ jobs:
           with urllib.request.urlopen(req,timeout=30) as response:runs=json.load(response)['workflow_runs']
           kept={'Infinity | Stability ownership probe native test','Infinity | Stability helper real Kodi smoke'}
           superseded={38665055598:'02aa09336c87c765aa06ac3f962b1f8b3b78542d',
-                      38665389502:'6d71b30bc5e965007164080987f9ca480d5d34aa'}
+                      38665389502:'6d71b30bc5e965007164080987f9ca480d5d34aa',
+                      38666437940:'d57e21a45cda79da866aef0ba8094139b3cd8161',
+                      38666495767:'7980f0ac42c1c431c2d1027018fbef1f0626a101'}
           for run in runs:
               accidental=run['head_sha']==target and run['name'] not in kept
               obsolete=superseded.get(run['id'])==run['head_sha']

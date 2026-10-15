@@ -14,7 +14,7 @@ def apply(root):
         p=root/name;raw=p.read_bytes()
         if sha(raw)!=pins[name]:raise RuntimeError('RC02 source mismatch '+name+': '+sha(raw))
         before[name]=sha(raw);data=fn(raw.decode()).encode();p.write_bytes(data);after[name]=sha(data)
-    for name in ['InfinityStabilityProbe.h','InfinityPythonWaitProbe.h']:
+    for name in ['InfinityStabilityProbe.h','InfinityPythonWaitProbe.h','InfinityProbeExport.h']:
         target='xbmc/threads/'+name;p=root/target
         if p.exists():raise RuntimeError('Refuse duplicate probe '+target)
         data=(HERE/name).read_bytes();p.write_bytes(data);after[target]=sha(data)
@@ -80,11 +80,14 @@ def apply(root):
         return once(s,'void CGUIBaseContainer::Render()\n{','void CGUIBaseContainer::Render()\n{\n#if defined(TARGET_ANDROID)\n  InfinityStabilityProbe::Rendered(GetID(),m_items.size());\n#endif')
     change('xbmc/guilib/GUIBaseContainer.cpp',container)
     def python(s):
-        s=once(s,'#include "PythonInvoker.h"','#include "PythonInvoker.h"\n#if defined(TARGET_ANDROID)\n#include "threads/InfinityPythonWaitProbe.h"\n#include "utils/URIUtils.h"\n#include <dlfcn.h>\n#endif')
+        s=once(s,'#include "PythonInvoker.h"','#include "PythonInvoker.h"\n#if defined(TARGET_ANDROID)\n#include "threads/InfinityPythonWaitProbe.h"\n#include "threads/InfinityProbeExport.h"\n#include "utils/URIUtils.h"\n#include <dlfcn.h>\n#endif')
         s=once(s,'        executeScript(fp, realFilename, moduleDict);','''#if defined(TARGET_ANDROID)
         InfinityPythonWaitProbe::Context* waitProbe=nullptr;
         Dl_info identity{};dladdr(reinterpret_cast<void*>(&InfinityStabilityProbe::Configure),&identity);
-        InfinityStabilityProbe::Configure(CSpecialProtocol::TranslatePath("special://temp/infinity-stability-probe.jsonl"),reinterpret_cast<uintptr_t>(identity.dli_fbase));
+        try {
+          InfinityStabilityProbe::Configure(CSpecialProtocol::TranslatePath("special://temp/infinity-stability-probe.jsonl"),reinterpret_cast<uintptr_t>(identity.dli_fbase));
+          InfinityProbeExport::Install();
+        }catch(...){/* Evidence must not prevent an add-on from running. */}
         if(m_addon && m_addon->ID()=="plugin.video.umbrella" && URIUtils::GetFileName(realFilename)=="service.py") {
           waitProbe=InfinityPythonWaitProbe::Start(GetId());
         }

@@ -57,6 +57,8 @@ inline void Rendered(int control,unsigned items)
   previous[index]=now;counts[index]=items;
 }
 inline std::array<char,1024> output{};
+using ExportSink=void(*)(const std::string&) noexcept;
+inline std::atomic<ExportSink> exportSink{nullptr};
 inline thread_local int directorySlot=-1;
 inline thread_local const char* directoryOperation=nullptr;
 
@@ -157,8 +159,9 @@ inline void Python(int invoker,const char* operation,const char* location,int64_
     t->pythonSequence.fetch_add(1);
   }
 }
-inline void Snapshot(const char* reason)
+inline void Snapshot(const char* reason) noexcept
 {
+  try {
   if(!configured.load() || !output[0] || samples.fetch_add(1)>=8)return;
   const auto now=Now();
   std::string row="{\"schema\":1,\"kind\":\"stability_probe\",\"reason\":"+Quote(reason)+
@@ -200,6 +203,8 @@ inline void Snapshot(const char* reason)
   const auto before=written.fetch_add(row.size());if(before+row.size()>512*1024)return;
   const int fd=::open(output.data(),O_WRONLY|O_CREAT|O_APPEND|O_CLOEXEC,0600);
   if(fd>=0){const auto ignored=::write(fd,row.data(),row.size());(void)ignored;::close(fd);}
+  if(auto sink=exportSink.load())sink(row);
+  }catch(...){++overflow;}
 }
 inline void Observe(int64_t heartbeat)
 {
