@@ -211,7 +211,7 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
     if(!flagText && PyErr_Occurred())PyErr_Clear();
     Py_XDECREF(flagObject);
     return flag=="-a" || flag=="-m" || flag=="-s" || flag=="-r" ||
-           flag=="-v" || flag=="-n" || flag=="-p" || flag=="-i" || flag=="-o";
+           flag=="-v" || flag=="-n" || flag=="-p" || flag=="-i" || flag=="-o" || flag=="-rs";
   }
 
   if(executableName=="/system/bin/ip") {

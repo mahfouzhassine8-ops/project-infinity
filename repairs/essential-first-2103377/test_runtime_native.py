@@ -84,6 +84,8 @@ int main(int argc, char** argv) {
   else if (mode == "raw-fd-spoof") run("cachefd=os.open(private,os.O_CREAT|os.O_RDWR,0o600)\nclass Raw(old_raw):\n def fileno(self): return cachefd\nf=Raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else if (mode == "raw") run("f=old_raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else run("fd=os.open(shared, os.O_CREAT|os.O_RDWR, 0o600); os.write(fd,b'essential')\n");
+  if (mode == "uname-combined-flags") run("import subprocess\nassert subprocess.check_output(['uname','-rs']).strip()\n");
+  if (mode == "unverified-child-output") run("import subprocess\nassert subprocess.call(['uname','-rs'],stdout=fd)==0\n");
   if (mode.rfind("pillow-",0)==0) {
     run("import importlib.util\n"
         "spec=importlib.util.spec_from_file_location('PIL._imaging',os.environ['KODI_ANDROID_LIBS']+'/lib_imaging.so')\n"
@@ -146,6 +148,16 @@ int main(int argc, char** argv) {
   }
   if (mode == "sqlite-renamed") run("try: c.execute('INSERT INTO history VALUES(999)')\nexcept sqlite3.DatabaseError: pass\nelse: raise AssertionError('renamed SQLite handle retained optional authorization')\n");
   assert(InfinityScriptPersistence::CloseParticipantWrites(23));
+  if (mode == "unverified-child-output") {
+    const auto proof = InfinityScriptPersistence::EssentialWrites();
+    assert(std::any_of(proof.blockers.begin(),proof.blockers.end(),[](const auto& why) {
+      return why.find("unobserved_diagnostic_child_output") != std::string::npos;
+    }));
+    assert(!InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    std::cout << "PASS unverified child output remains an essential blocker\n" << std::flush;
+    std::_Exit(0);
+  }
   if (mode == "unknown-descriptor") {
     const auto proof = InfinityScriptPersistence::EssentialWrites();
     assert(std::find(proof.blockers.begin(),proof.blockers.end(),"completed_native_write_target_unconfirmed") != proof.blockers.end());
@@ -233,7 +245,7 @@ def main():
         cases=['cached-write','cached-pwrite','cached-writev','raw','raw-fd-spoof','buffer-fd-spoof','late-raw-open','late-cached-open',
                'cached-rename','cached-remove','late-chmod','late-mmap','late-ctypes','buffer-drain','layered','cached-buffer','optional-blocked','sqlite-attach',
                'descriptor-race','rename-race','sqlite-renamed','sqlite-row-factory','file-lock',
-               'pathlike','memory-buffer','observer-denials','unknown-descriptor']
+               'pathlike','memory-buffer','observer-denials','unknown-descriptor','uname-combined-flags','unverified-child-output']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

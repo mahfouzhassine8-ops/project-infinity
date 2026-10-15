@@ -8,13 +8,16 @@ persistence ledger, native coordinator and database barrier. The prototype
 `InfinityEssentialScriptFence.h` remains unwired and its coverage flag remains
 false. No third-party add-on or protected feature source is edited.
 
-The complete ARM64 build of `56fca5a` passed in run `38799103180`. TEST1 was
-packaged from that earlier source. The current correction separates essential
-save admission from strict final authorization and adds actual write-path
-coverage; it requires a new full build. See `PRODUCTION-STATUS.json` and
-`TEST1-CORRECTIONS.md` for current evidence and remaining delivery blockers.
+The complete ARM64 build of `f8be4d05` passed in run `38814309116`, including
+actual production runtime tests. The additional exact `uname -rs` contract
+correction requires another full build. The first internal Android probe
+reached Kodi but lacked installed first-party participants, so no Close was
+attempted. The second probe stopped before signing because its old Java donor
+would change locked Splash behaviour. The approved RC5 source must be reused,
+with the instruction preservation gate retained. See `PRODUCTION-STATUS.json`
+and `TEST1-CORRECTIONS.md`. No internal APK has been delivered.
 
-Current host verification: 34 actual CPython 3.11.7 runtime cases, 8 actual
+Current host verification: 36 actual CPython 3.11.7 runtime cases, 8 actual
 SQLite VFS cases, 13 production coordinator cases, and the compiled Android
 protocol/guard authorization suite. First-party Command Center and compatibility
 Python callbacks run unchanged through the production observer; their Kodi RPC

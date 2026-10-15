@@ -164,6 +164,18 @@
       "stderr": ""
     },
     {
+      "case": "uname-combined-flags",
+      "exit_code": 0,
+      "stdout": "PASS uname-combined-flags; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "unverified-child-output",
+      "exit_code": 0,
+      "stdout": "PASS unverified child output remains an essential blocker\n",
+      "stderr": ""
+    },
+    {
       "case": "pillow-fd",
       "exit_code": 0,
       "stdout": "PASS pillow-fd; actual CPython 3.11.7; no interpreter retirement required\n",

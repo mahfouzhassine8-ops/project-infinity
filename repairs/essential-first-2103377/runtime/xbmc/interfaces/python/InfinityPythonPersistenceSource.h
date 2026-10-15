@@ -552,7 +552,8 @@ class Observer:
 
             # Common add-ons probe kernel/ABI identity with uname. This is
             # display-only when restricted to the immutable system binary and
-            # a single information flag.
+            # a single information argument. distro uses the combined -rs
+            # argument; both flags only print kernel identity.
             if 1 <= len(command) <= 2 and command[0] in ('uname', '/system/bin/uname'):
                 resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
                 host_uname = observer.host_probe and resolved in ('/bin/uname', '/usr/bin/uname')
@@ -561,7 +562,7 @@ class Observer:
                 if len(command) == 1:
                     return True
                 return isinstance(command[1], str) and command[1] in (
-                    '-a', '-m', '-s', '-r', '-v', '-n', '-p', '-i', '-o')
+                    '-a', '-m', '-s', '-r', '-v', '-n', '-p', '-i', '-o', '-rs')
 
             # SlyGuy probes Android network state with read-only system tools.
             # Keep this allowlist intentionally narrow: "ip" receives exactly

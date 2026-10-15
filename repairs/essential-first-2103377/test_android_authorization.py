@@ -26,6 +26,8 @@ def main():
     p.add_argument('--out', type=Path, required=True)
     args = p.parse_args()
     source = (ROOT/'repairs/android-checkpoint-shutdown/test_android_runtime.py').read_text()
+    source = once(source, "names += ['InfinityCheckpointEvidence', 'InfinityInstalledCodeEvidence']",
+                         "names += ['InfinityCheckpointEvidence', 'InfinityInstalledCodeEvidence', 'InfinityTaskLifecycleGate']")
     source = once(source, '  row.put("required_owners",names);row.put("owners",owners);', '''  row.put("required_owners",names);row.put("owners",owners);
   row.put("exit_policy","essential_first_process_exit_v1");
   row.put("essential_write_generation",7).put("essential_writes_sealed",true).put("essential_writes_durable",true);
@@ -55,6 +57,8 @@ def main():
         work = Path(temporary)
         base = ROOT/'repairs/android-checkpoint-shutdown/runtime/android/overlay'
         shutil.copytree(base, work/'runtime')
+        gate = ROOT/'repairs/shutdown-recents-2103377/lifecycle/InfinityTaskLifecycleGate.java.in'
+        shutil.copyfile(gate, work/'runtime/tools/android/packaging/xbmc/src'/gate.name)
         # This unchanged peer predates the overlay. Reconstruct its published
         # source and require the original Android manifest's exact postimage.
         name = 'tools/android/packaging/xbmc/src/InfinityCloseProgress.java.in'

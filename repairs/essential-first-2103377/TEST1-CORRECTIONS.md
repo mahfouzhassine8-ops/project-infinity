@@ -62,15 +62,24 @@ ARM64 image or claim on-device ambient regression acceptance.
 
 ## Verification boundary
 
-Evidence in `evidence/runtime/` covers 34 production CPython cases, 8 SQLite
+Evidence in `evidence/runtime/` covers 36 production CPython cases, 8 SQLite
 cases, 13 coordinator cases and compiled native/Android receipt agreement.
 The indefinitely waiting optional Python worker is still alive when host
 authorization succeeds. Essential failures remain denied. No extra optional
 wait, watchdog, interpreter destruction or fabricated receipt was introduced.
 
-The old complete ARM64 build passed at `56fca5a`, run `38799103180`.
-It is not evidence that these newer corrections compile. The updated workflow
-repeats the actual native/Python tests and full build using locked preimages.
+The full ARM64 build passed at `f8be4d05`, run `38814309116`. The additional
+exact read-only `uname -rs` contract now passes actual CPython/native checks;
+redirected unverified child output remains blocked. Both the Python and native
+audit validators use the same exact command contract. A new full build is
+required for that correction.
+
+The Android donor preservation gate caught an older Splash implementation.
+Packaging stopped before signing. The existing RC5 source export is the
+approved foundation: its guard retains the process-entry/removal lease and
+existing advisory notification. The essential-first guard now differs from
+that exact approved source only by four truthful evidence fields. The next
+package must pass decoded instruction preservation for all other classes.
 
 Remaining safety evidence: the TEST1 export lacks call-site details sufficient
 to establish that every reported Seren/Continuity failure is resolved; real

@@ -4,15 +4,16 @@
   "implementation": "existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 34,
+    "native_cpython_3117_runtime": 36,
     "coordinator_with_real_barrier": 13
   },
   "first_party_python_callbacks": "unchanged locked Command Center and compatibility callbacks executed through production observer; Kodi RPC peers remain test adapters",
   "full_arm64_compile": {
-    "previous_commit": "56fca5a4423a72e2e68e4f3f12e9ebe6076b17da",
-    "previous_run": 38799103180,
+    "previous_commit": "f8be4d05e474ca425074d7e1bb5d49f624015d37",
+    "previous_run": 38814309116,
     "previous_result": "success",
-    "current_corrections": "pending"
+    "previous_unstripped_native_sha256": "0925e498a4228bdf115da1b81bc110fd0350237d2de829d842a4003aab81c40a",
+    "current_corrections": "pending new full build for exact uname -rs contract and preserved Android guard"
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
   "android_process_death_verified": false,
@@ -25,9 +26,23 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Run full ARM64 build for these current corrections; previous green build predates them.",
-    "TEST1 lacks call-site exception details needed to prove all recorded Seren/Continuity/IAGL failures resolved on-device; unknown or actual failed protected writes remain blockers.",
-    "Obtain actual Android engine and guard-process death evidence, data-preserving reopening and physical Fold acceptance. stopSelf alone does not establish that the guard process is gone.",
-    "Permanent signing and delivery remain gated on the applicable production safety checks; no TEST2 APK verified by this source checkpoint."
+    "Complete a new ARM64 build for the additional verified uname contract correction.",
+    "Compile from approved RC5 Android source and prove all unrelated decoded Java instructions match the locked APK before signing.",
+    "Run real Android essential callbacks, verified saves, engine and guard-process death and preserved-data reopening. stopSelf alone is not process-death evidence.",
+    "TEST1 does not include call-site exception details sufficient to prove all Seren/Continuity/IAGL warnings resolved on the Fold; actual failed or unknown protected writes remain blockers.",
+    "Physical Fold acceptance remains required. No deliverable APK is verified."
+  ],
+  "internal_android_probes": [
+    {
+      "run": 38815716152,
+      "native_commit": "f8be4d05e474ca425074d7e1bb5d49f624015d37",
+      "permanently_signed_internal_apk": true,
+      "apk_delivered": false,
+      "outcome": "Fresh emulator missing installed Command Center; Close not attempted."
+    },
+    {
+      "run": 38817895763,
+      "outcome": "Packaging refused before signing: protected Splash bytecode differs from locked parent. Replace old donor source with exact approved RC5 Android source and repeat instruction gate."
+    }
   ]
 }
