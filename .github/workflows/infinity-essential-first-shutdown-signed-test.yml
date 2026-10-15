@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103377-essential-signed-fold-test, cancel-in-progress: false}
+concurrency: {group: infinity-2103377-essential-signed-fold-test, cancel-in-progress: true}
 
 jobs:
   matched-signed-fold-test:
