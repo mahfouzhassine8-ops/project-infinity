@@ -14,12 +14,9 @@ concurrency: {group: infinity-2103377-essential-signed-fold-test, cancel-in-prog
 jobs:
   matched-signed-fold-test:
     runs-on: ubuntu-22.04
-    timeout-minutes: 240
+    timeout-minutes: 100
     env:
       NDK_VER: 21.4.7075529
-      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
-      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
-      BUILD_DIR: ${{ github.workspace }}/kodi-build
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
@@ -34,7 +31,7 @@ jobs:
           path: /usr/local/lib/android/sdk/ndk/21.4.7075529
           key: infinity-pinned-ndk-linux-21.4.7075529-v1
       - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
-      - name: Verify exact green native run and locked Rails parent
+      - name: Verify exact green native and permanently signed locked parent
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -44,7 +41,6 @@ jobs:
           pinned={
               38799103180:"56fca5a4423a72e2e68e4f3f12e9ebe6076b17da",
               38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
-              38732470818:"78826902c0a55a24b488b5b7fc69b378cebc6df8",
           }
           for run,commit in pinned.items():
               req=urllib.request.Request("https://api.github.com/repos/"+os.environ["GITHUB_REPOSITORY"]+
@@ -68,72 +64,46 @@ jobs:
           path: native-evidence
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38132105717
-          name: Infinity-2103367-Verified-Compiler-Dependencies
+          run-id: 38415112606
+          name: Infinity-2103377-Final-Shutdown-Android
           github-token: ${{ github.token }}
-          path: dependency-transfer
-      - uses: actions/download-artifact@v8
-        with:
-          run-id: 38246713743
-          name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK
-          github-token: ${{ github.token }}
-          path: locked-parent
-      - uses: actions/download-artifact@v8
-        with:
-          run-id: 38270097041
-          name: Cobra-2103375-File-Preview-Native-Signed-Test-APK
-          github-token: ${{ github.token }}
-          path: previous-candidate
-      - uses: actions/download-artifact@v8
-        with:
-          run-id: 38321848412
-          name: Cobra-2103376-Critical-Preview-Native-Evidence
-          github-token: ${{ github.token }}
-          path: locked-native-evidence
-      - uses: actions/download-artifact@v8
-        with:
-          run-id: 38493645998
-          name: Infinity-2103377-RC3-Exact-Native-Curl-Source
-          github-token: ${{ github.token }}
-          path: rc2-captured-source
-      - uses: actions/download-artifact@v8
-        with:
-          run-id: 38732470818
-          name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence
-          github-token: ${{ github.token }}
-          path: rails-locked-evidence
-      - name: Pin exact protected APK bytes and source evidence
+          path: verified-android
+      - name: Verify locked APK and complete 274-case Android source
         run: |
           set -euo pipefail
           echo 'de8ce3f122db7bb8b2b3681e7c6ce9caf67cf38888b17ef1f82ff7759fa8a3db  locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk' | sha256sum -c
-          (cd dependency-transfer && sha256sum -c SHA256SUMS)
-          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
-          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
-          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
-          sudo apt-get update -qq
-          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev
-      - name: Reconstruct exact green Rails/native source without recompiling native engine
-        run: |
-          set -euo pipefail
-          mkdir -p checkpoint-build
-          python3 repairs/shutdown-rc3-2103377/test_source.py \
-            --source rc2-captured-source --output checkpoint-build/RC3-HOST-VERIFICATION.json
-          python3 repairs/essential-first-2103377/native_ci.py prepare \
-            --locked locked-parent/Cobra-2103374-Verified-Deadweight-RC1.apk \
-            --previous previous-candidate/Cobra-2103375-File-Preview-Native-RC1.apk \
-            --parent-proof locked-native-evidence \
-            --rails-proof rails-locked-evidence \
-            2>&1 | tee checkpoint-build/ESSENTIAL-SOURCE-REPLAY.log
-      - name: Stage Android-only build with two changed shutdown Java classes
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path("verified-android")
+          status=json.loads((root/"ANDROID-VERIFICATION.json").read_text())
+          proof=json.loads((root/"SOURCE-PRESERVATION.json").read_text())
+          assert status["source_commit"] == proof["source_commit"] == "73da8981e7bd8c4e060a0dd7c095c29a88f0d47d"
+          assert status["totals"] == {"tests":274,"failures":0,"errors":0,"skipped":0}
+          assert status["runtime_source_matches_candidate"] and status["compiled_java_inputs_match_candidate"]
+          checked=0
+          for rel,sha in proof["after"].items():
+              p=root/"source"/rel
+              if not p.is_file():
+                  assert p.name in (".gitkeep",".gitignore"), rel
+                  continue
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == sha,rel
+              checked+=1
+          assert checked >= 250
+          for name in ("InfinityCheckpointProtocol","InfinityCloseGuardService"):
+              assert (root/"source"/"tools/android/packaging/xbmc/src"/(name+".java.in")).is_file()
+          print("PASS: complete 274-test Java source reproduced, checked SHA hashes",checked,flush=True)
+          PY
+      - name: Stage Java donor with only two updated shutdown classes
         run: |
           set -euo pipefail
           python3 repairs/essential-first-2103377/package_signed_fold_test.py java \
             --parent locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk \
-            --source kodi --gradle-dir android-gradle --out android-donor-evidence
+            --source verified-android/source --gradle-dir android-gradle --out android-donor-evidence
           keytool -genkeypair -v -keystore "$RUNNER_TEMP/infinity-donor-temporary.keystore" \
             -storepass android -keypass android -alias androiddebugkey -keyalg RSA \
             -keysize 2048 -validity 1 -dname "CN=Temporary Java Donor" >/dev/null 2>&1
-      - name: Compile the actual Android validator and guard service
+      - name: Compile matched Android validator and existing guard service
         env:
           KODI_ANDROID_STORE_FILE: ${{ runner.temp }}/infinity-donor-temporary.keystore
           KODI_ANDROID_KEY_ALIAS: androiddebugkey
@@ -145,7 +115,7 @@ jobs:
           ./gradlew --no-daemon --console=plain :xbmc:assembleRelease \
             2>&1 | tee ../android-donor-evidence/GRADLE-ANDROID-RELEASE.log
           test -s xbmc/build/outputs/apk/release/xbmc-release.apk
-      - name: Merge only matched ARM64, Android DEX and same-length manifest version
+      - name: Sign exact matched native/Android APK with protected permanent certificate
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
           INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
@@ -157,11 +127,10 @@ jobs:
           python3 repairs/essential-first-2103377/package_signed_fold_test.py package \
             --parent locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk \
             --donor android-gradle/xbmc/build/outputs/apk/release/xbmc-release.apk \
-            --native native-evidence \
-            --android android-donor-evidence \
+            --native native-evidence --android android-donor-evidence \
             --out essential-fold-test \
             2>&1 | tee essential-fold-test/PACKAGING-VERIFICATION.log
-      - name: Upload separately signed physical TEST only
+      - name: Upload separately signed TEST APK and verification receipts
         if: success()
         uses: actions/upload-artifact@v7
         with:
@@ -170,7 +139,7 @@ jobs:
           retention-days: 90
           compression-level: 1
           if-no-files-found: error
-      - name: Preserve packaging or Android build failure evidence
+      - name: Preserve Android build or signing failure evidence
         if: failure()
         uses: actions/upload-artifact@v7
         with:
@@ -181,6 +150,5 @@ jobs:
             essential-fold-test/*.log
             android-donor-evidence/*.json
             android-donor-evidence/*.log
-            checkpoint-build/ESSENTIAL-SOURCE-REPLAY.log
           retention-days: 30
           if-no-files-found: warn
