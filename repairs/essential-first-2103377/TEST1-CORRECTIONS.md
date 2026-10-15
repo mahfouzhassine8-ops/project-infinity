@@ -62,8 +62,9 @@ ARM64 image or claim on-device ambient regression acceptance.
 
 ## Verification boundary
 
-Evidence in `evidence/runtime/` covers 40 production CPython cases, 8 SQLite
-cases, 13 coordinator cases and compiled native/Android receipt agreement.
+Evidence in `evidence/runtime/` covers 42 production CPython cases, 8 SQLite
+cases, 15 coordinator cases, 13 full JobManager cases, 24 installer cases and
+compiled native/Android receipt agreement.
 The indefinitely waiting optional Python worker is still alive when host
 authorization succeeds. Essential failures remain denied. No extra optional
 wait, watchdog, interpreter destruction or fabricated receipt was introduced.
@@ -99,3 +100,35 @@ Fold acceptance are unverified. The guard's `stopSelf()` is not evidence that
 its containing process died. Unknown writes remain fail-closed. No new APK is
 declared safe or locked by these host results. Optional unfinished private
 writes can lose data or be corrupted; recovery is not assumed.
+
+## Actual Android probe after restoring platform fixture labels
+
+Run `38824020906` used the unchanged signed internal APK from the verified
+`3acc3a9e` native source. Both approved add-ons were discovered and enabled,
+SELinux remained Enforcing, and actual Close completed both first-party
+callbacks. The native 25-second deadline was not changed. It failed at
+`background_jobs`, with a repository callback still mandatory and a synchronous
+`metadata.album.universal` install beginning after Close. This is a distinct
+blocker from TEST1's historical-warning database-stage dependency.
+
+Repository completion is now diagnostic, with unfinished job identity retained
+in `optional_unfinished_jobs`. Its actual file and SQLite write leases remain
+mandatory. The existing `CheckpointWriteGuard("jobs")` now covers synchronous
+`CAddonInstallJob::DoWork`; rejected work has zero file/database mutations and
+its original receipt proves unchanged state. Already-admitted installations
+retain their original required receipts. Actual installer and SQLite failure
+cases still fail closed. No add-on files or startup policy changed.
+
+The probe also exposed `lsb_release` fallback execution as unknown child work.
+The generic runtime contract now proves absence across every executable PATH
+candidate on actual read-only OS mounts. Existing, relative, writable, unknown,
+and unsupported executable paths retain their original blockers. Native output
+leases still cover stdout/stderr. No exception is swallowed or retrospectively
+converted into a save receipt. Host positive and negative cases use actual
+exec failures on read-only kernel and writable cache paths.
+
+The test-only Close intent no longer requests Android's first-frame wait:
+this bridge activity finishes without presenting a frame. Receipt, identity,
+25-second native deadline, actual process absence and reopen assertions remain.
+The old test's 90-second `am -W` timeout did not negate its captured native
+failure receipt. No process termination or successful reopen is claimed.

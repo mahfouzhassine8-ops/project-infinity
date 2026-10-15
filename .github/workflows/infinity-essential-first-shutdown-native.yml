@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103377-essential-first-shutdown-native, cancel-in-progress: true}
+concurrency: {group: infinity-2103377-essential-first-shutdown-native, cancel-in-progress: false}
 
 jobs:
   host-proof:
@@ -181,6 +181,13 @@ jobs:
             --parent-proof locked-native-evidence \
             --rails-proof rails-locked-evidence \
             2>&1 | tee checkpoint-build/RAILS-HANDOFF-SOURCE-PREPARATION.log
+      - name: Verify production job and synchronous installer admission
+        run: |
+          set -euo pipefail
+          python3 repairs/essential-first-2103377/test_runtime_jobs.py --runtime kodi \
+            2>&1 | tee checkpoint-build/runtime-jobs.log
+          python3 repairs/essential-first-2103377/test_runtime_installer.py --runtime kodi \
+            2>&1 | tee checkpoint-build/runtime-installer.log
       - name: Verify production coordinator with the actual persistence barrier
         run: |
           set -euo pipefail

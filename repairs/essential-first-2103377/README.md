@@ -10,21 +10,32 @@ false. No third-party add-on or protected feature source is edited.
 
 The full ARM64 build of `3acc3a9e` passed in run `38819025107`.
 The internal Android probe passed permanent signing and unrelated Java
-instruction preservation against the locked APK. Its copied first-party test
-files had incorrect SELinux labels, so Kodi could not discover Command Center;
-Close was not attempted. The fixture correction is saved at `7df06906`.
+instruction preservation against the locked APK. The fixture correction saved
+at `7df06906` restored platform SELinux labels without disabling enforcement.
+Probe `38824020906` discovered both unchanged participants and executed actual
+Close. Both first-party callbacks completed. Native admission then correctly
+refused exit with incomplete repository/installer work and child-command
+coverage warnings. This is failure evidence, not process-death acceptance.
 
 A real child-output regression subsequently exposed a protected-file write
 capability surviving the old barrier. Production `fork_exec` now transfers
 actual output descriptor leases to the existing ledger until OS-confirmed
 child death. The protected-file, optional-cache/pipe and numeric-descriptor
 cases pass. Unsupported `posix_spawn` file actions remain explicit blockers.
-The new native correction still requires a full ARM64 build and Android run.
+The child-output build is running at `38824257676`. The next correction makes
+repository completion diagnostic while retaining its real write leases, and
+uses the existing admission guard for synchronous dependency installations.
+Actual job-manager and installer bodies verify that late installs do not
+mutate data and already-admitted installs retain their required receipts.
+Absent command execution is accepted only when every executable candidate is
+absent on an actual read-only system mount; writable/unknown paths stay blocked.
+These corrections still require a full ARM64 build and Android run.
 See `PRODUCTION-STATUS.json` and `TEST1-CORRECTIONS.md`. No internal APK has
 been delivered, and whole-package death remains unverified.
 
-Current host verification: 40 actual CPython 3.11.7 runtime cases, 8 actual
-SQLite VFS cases, 13 production coordinator cases, and the compiled Android
+Current host verification: 42 actual CPython 3.11.7 runtime cases, 8 actual
+SQLite VFS cases, 15 production coordinator cases, 13 production JobManager
+cases, 24 production installer cases, and the compiled Android
 protocol/guard authorization suite. First-party Command Center and compatibility
 Python callbacks run unchanged through the production observer; their Kodi RPC
 peers remain host adapters. Actual Android process death and reopening have

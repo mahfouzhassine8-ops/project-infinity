@@ -13,6 +13,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <sys/statvfs.h>
 
 namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); }
 namespace InfinityPythonPersistence
@@ -166,6 +167,50 @@ inline void TouchResolved(Context* context,const std::string& value,bool present
   if(ApprovedNonPersistentPythonBytecodeCachePath(value,directory))return;
   InfinityScriptPersistence::Touch(context->id,value,present,directory);
 }
+inline bool MissingImmutableExecutablePath(const std::string& path)
+{
+  if (path.empty() || path.find('\0') != std::string::npos || path.find("/../") != std::string::npos ||
+      path.find("/./") != std::string::npos || path.find("//") != std::string::npos) return false;
+  bool systemPath = false;
+  for (const auto* root : {"/system/", "/system_ext/", "/apex/", "/vendor/", "/odm/", "/product/"})
+    if (path.rfind(root,0) == 0) systemPath = true;
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  // Real read-only/noexec kernel filesystem for the absent-executable test.
+  if (path.rfind("/sys/",0) == 0) systemPath = true;
+#endif
+  if (!systemPath) return false;
+  struct stat st{};
+  if (::lstat(path.c_str(),&st) == 0 || errno != ENOENT) return false;
+  auto parent = path.substr(0,path.rfind('/'));
+  while (!parent.empty())
+  {
+    if (::stat(parent.c_str(),&st) == 0)
+    {
+      struct statvfs fs{};
+      return S_ISDIR(st.st_mode) && ::statvfs(parent.c_str(),&fs) == 0 && (fs.f_flag & ST_RDONLY);
+    }
+    if (errno != ENOENT) return false;
+    parent.resize(parent.rfind('/'));
+  }
+  return false;
+}
+inline bool MissingImmutableExecutable(const std::string& executable)
+{
+  if (executable.empty() || executable.find('\0') != std::string::npos) return false;
+  if (executable.front() == '/') return MissingImmutableExecutablePath(executable);
+  if (executable.find('/') != std::string::npos || executable == "." || executable == "..") return false;
+  const char* environment = std::getenv("PATH");
+  if (!environment || !*environment) return false;
+  std::string paths(environment); size_t start = 0;
+  while (true)
+  {
+    const auto end = paths.find(':',start);
+    const auto directory = paths.substr(start,end == std::string::npos ? end : end-start);
+    if (!MissingImmutableExecutablePath(directory+"/"+executable)) return false;
+    if (end == std::string::npos) return true;
+    start = end+1;
+  }
+}
 inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
 {
   if(!PyUnicode_Check(executable) || (!PyList_Check(command) && !PyTuple_Check(command)))return false;
@@ -174,6 +219,17 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
   if(!executableText){PyErr_Clear();return false;}
   const std::string executableRaw(executableText);
   const auto executableName=executableRaw=="getprop" ? executableRaw : Path(executable);
+
+  // A missing immutable system executable cannot run external writer code.
+  // Every PATH candidate must be absent on an actual read-only system mount;
+  // writable, relative, unknown or existing candidates remain fail-closed.
+  if (count > 0 && MissingImmutableExecutable(executableRaw))
+  {
+    auto* first = PySequence_GetItem(command,0);
+    const bool same = first && PyUnicode_Check(first) && PyObject_RichCompareBool(first,executable,Py_EQ) == 1;
+    Py_XDECREF(first); if (PyErr_Occurred()) PyErr_Clear();
+    if (same) return true;
+  }
 
   if(executableName=="getprop" || executableName=="/system/bin/getprop") {
     if(count<1 || count>2)return false;

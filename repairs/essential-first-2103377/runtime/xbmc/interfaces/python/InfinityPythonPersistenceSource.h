@@ -16,6 +16,7 @@ import _io
 import os
 import shutil
 import sqlite3
+import stat
 import sys
 # Marker is embedded into libkodi.so and checked by the native build gate.
 DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
@@ -527,10 +528,43 @@ class Observer:
         observer = self
         original_popen = subprocess.Popen
 
+        def immutable_missing_path(path):
+            roots = ('/system/', '/system_ext/', '/apex/', '/vendor/', '/odm/', '/product/')
+            if observer.host_probe: roots += ('/sys/',)
+            if (not path.startswith(roots) or '\x00' in path or '/../' in path or
+                    '/./' in path or '//' in path): return False
+            try:
+                os.lstat(path)
+                return False
+            except FileNotFoundError:
+                pass
+            except OSError:
+                return False
+            parent = os.path.dirname(path)
+            while parent and parent != '/':
+                try:
+                    metadata = os.stat(parent)
+                    return stat.S_ISDIR(metadata.st_mode) and bool(os.statvfs(parent).f_flag & os.ST_RDONLY)
+                except FileNotFoundError:
+                    parent = os.path.dirname(parent)
+                except OSError:
+                    return False
+            return False
+
+        def immutable_missing_command(command):
+            if not command or not isinstance(command[0], str) or not command[0]: return False
+            executable = command[0]
+            if executable.startswith('/'): return immutable_missing_path(executable)
+            if '/' in executable or executable in ('.', '..'): return False
+            path = os.environ.get('PATH', '')
+            return bool(path) and all(immutable_missing_path(directory+'/'+executable)
+                                      for directory in path.split(':'))
+
         def readonly_command(command):
             if not isinstance(command, (list, tuple)):
                 return False
             command = list(command)
+            if immutable_missing_command(command): return True
             logcat = ['/system/bin/logcat', '--uid='+str(os.getuid()), '-b', 'crash', '-d', '-t', '200', '-v', 'threadtime']
             if command == logcat:
                 return True

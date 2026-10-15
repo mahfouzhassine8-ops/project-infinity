@@ -1,0 +1,32 @@
+{
+  "scope": "actual production installer code; external Kodi peers are adapters",
+  "cases_passed": [
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem success",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem resolve",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem dependency",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem dependency-committed",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem database-open",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem download",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem download-cleanup",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem hash",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem database-write",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem archive",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem cancel",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem unpack",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem move",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem backup-cleanup",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem unload",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem reload",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem origin-write",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem callback",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem package-prune",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem package-prune-db",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem package-prune-file",
+    "PASS actual installer admission rejects mutation late-install",
+    "PASS actual installer admission rejects mutation sealed-install",
+    "PASS production DoWork/dependencies/download/install SQLite/filesystem admitted-before-close"
+  ],
+  "case_count": 24,
+  "all_passed": true,
+  "android_process_death_verified": false
+}

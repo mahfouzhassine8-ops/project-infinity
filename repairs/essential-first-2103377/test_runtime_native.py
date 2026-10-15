@@ -103,6 +103,11 @@ int main(int argc, char** argv) {
   else if (mode == "raw") run("f=old_raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else run("fd=os.open(shared, os.O_CREAT|os.O_RDWR, 0o600); os.write(fd,b'essential')\n");
   if (mode == "uname-combined-flags") run("import subprocess\nassert subprocess.check_output(['uname','-rs']).strip()\n");
+  if (mode == "missing-immutable-command" || mode == "missing-writable-command") {
+    if (mode == "missing-immutable-command") run("command='/sys/kernel/infinity_missing_shutdown_probe'; assert os.statvfs('/sys').f_flag & os.ST_RDONLY\n");
+    else run("command=root+'/cache/infinity_missing_shutdown_probe'\n");
+    run("import subprocess\ntry: subprocess.check_output([command,'-a'])\nexcept FileNotFoundError: pass\nelse: raise AssertionError('missing command unexpectedly executed')\n");
+  }
   if (mode == "child-numeric-output") run("import subprocess\nassert subprocess.call(['uname','-rs'],stdout=fd)==0\nbaseline=old_open(shared,'rb').read(); assert baseline!=b'essential'\n");
   if (mode == "unverified-posix-spawn") run("pid=os.posix_spawn('/usr/bin/uname',['uname','-rs'],os.environ,file_actions=[(os.POSIX_SPAWN_DUP2,fd,1)]); assert os.waitpid(pid,0)[1]==0\n");
   pid_t tracedChild = -1;
@@ -214,6 +219,13 @@ int main(int argc, char** argv) {
     std::cout << "PASS unobserved posix_spawn file actions remain an essential blocker\n" << std::flush;
     std::_Exit(0);
   }
+  if (mode == "missing-writable-command") {
+    assert(!InfinityScriptPersistence::EssentialWrites().blockers.empty());
+    assert(!InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    std::cout << "PASS missing executable on writable path remains unverified\n" << std::flush;
+    std::_Exit(0);
+  }
   if (mode == "unknown-descriptor") {
     const auto proof = InfinityScriptPersistence::EssentialWrites();
     assert(std::find(proof.blockers.begin(),proof.blockers.end(),"completed_native_write_target_unconfirmed") != proof.blockers.end());
@@ -304,6 +316,7 @@ def main():
                'descriptor-race','rename-race','sqlite-renamed','sqlite-row-factory','file-lock',
                'pathlike','memory-buffer','observer-denials','unknown-descriptor','uname-combined-flags','child-numeric-output',
                'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
+        cases+=['missing-immutable-command','missing-writable-command']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

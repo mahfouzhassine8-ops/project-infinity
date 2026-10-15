@@ -24,7 +24,8 @@ PINS = {
 }
 CASES = ["optional-blocked", "optional-failed", "settings-failed", "profiles-failed",
          "first-party-missing", "first-party-failed", "compat-failed", "protected-writer",
-         "native-transaction", "lease-lost", "deadline", "unobserved-writer", "protection-warning"]
+         "native-transaction", "lease-lost", "deadline", "unobserved-writer", "protection-warning",
+         "optional-repository", "repository-transaction"]
 MAIN = r'''
 int main(int argc, char** argv) {
   assert(argc == 3);
@@ -40,6 +41,10 @@ int main(int argc, char** argv) {
   if (mode == "unobserved-writer") InfinityScriptPersistence::Admit(43, "unobserved:service.py");
   if (mode == "protection-warning") InfinityScriptPersistence::ProtectionFailure("test1_unresolved_protected_write_warning");
   if (mode == "optional-failed") InfinityScriptPersistence::Fail(42, "buffer_flush_failed");
+  std::shared_ptr<CJobCheckpointRecord> repository;
+  if (mode == "optional-repository" || mode == "repository-transaction")
+    repository = JobCheckpoint::Admit(false, false, "native_databases", "repository_update",
+        "CRepositoryUpdateJob", "callback", false, "test-repository");
   uint64_t pendingWrite = 0;
   if (mode == "protected-writer") {
     const auto path = Test::root + "/favourites.xml";
@@ -62,9 +67,10 @@ int main(int argc, char** argv) {
   if (mode == "settings-failed") Test::settingsOk = false;
   if (mode == "profiles-failed") Test::profilesOk = false;
   int transactionOwner = 0;
-  if (mode == "native-transaction") InfinityDatabaseBarrier::SetTransaction(&transactionOwner, true);
+  if (mode == "native-transaction" || mode == "repository-transaction")
+    InfinityDatabaseBarrier::SetTransaction(&transactionOwner, true);
   Pump(app);
-  if (mode == "native-transaction") {
+  if (mode == "native-transaction" || mode == "repository-transaction") {
     assert(Get().phase == "PERSISTING");
     assert(!Get().owners["kodi_settings"].complete);
     assert(!AuthorizeTermination(SESSION, OWNER, getpid()));
@@ -104,6 +110,11 @@ int main(int argc, char** argv) {
   CVariant row; assert(CJSONVariantParser::Parse(safe, row));
   assert(row["owners"].size() == 17);
   assert(row["essential_owners"].size() == 16);
+  if (repository) {
+    assert(row["optional_unfinished_jobs"].size() == 1);
+    assert(row["optional_unfinished_jobs"][0]["operation"].asString() == "repository_update");
+    assert(!repository->resolved);
+  }
   assert(!row["process_death_confirmed"].asBoolean());
   assert(!AuthorizeTermination(SESSION, "wrong-owner-00000000", getpid()));
   if (mode == "lease-lost") Test::ownLease = false;
@@ -145,6 +156,10 @@ def main():
             assert hashlib.sha256(data).hexdigest() == digest, rel
             dst = src / rel; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes(data)
         stubs = old.STUBS.replace("class CJobManager {public:", "class CJobManager {public:void PruneCheckpointOptionalQueuedJobs(){};")
+        start = stubs.index(' static JobCheckpoint::Snapshot AndroidCheckpointSnapshot()')
+        end = stubs.index('class CSettings ', start)
+        stubs = stubs[:start] + ''' static JobCheckpoint::Snapshot AndroidCheckpointSnapshot(){return JobCheckpoint::GetSnapshot();}};
+''' + stubs[end:]
         stubs = stubs.replace(' const std::string prefix="special://profile";',
             ' if(p=="special://masterprofile"){return Test::root;} if(p=="special://temp"){return Test::root+"/temp";} const std::string prefix="special://profile";')
         (src / "stubs.h").write_text(stubs)

@@ -15,12 +15,16 @@ MANAGER = 'xbmc/interfaces/generic/ScriptInvocationManager.cpp'
 SQLITE = 'xbmc/dbwrappers/sqlitedataset.cpp'
 POSIX = 'xbmc/platform/posix/filesystem/PosixFile.cpp'
 DIRECTORY = 'xbmc/platform/posix/filesystem/PosixDirectory.cpp'
+JOBS = 'xbmc/utils/JobManager.cpp'
+INSTALLER = 'xbmc/addons/AddonInstaller.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
     SQLITE: '18206a86843f11bea447ebbe1ecca474bf3ae62aef9bd204e37c671515111920',
     POSIX: '0a880f1de9c1cb9d7c1cd0c99fc1ae0334c87ddb77faa50b81af8d80d7ef3baa',
     DIRECTORY: '68e638f060868bca397dd5a8e1f85232a70df31f92692460b0e741a63205094a',
+    JOBS: '8315f6ad8c794d5a96bcb544b0e53eee585faec121e15806edd163f97f4b8d3c',
+    INSTALLER: 'a9e21a3b0c9da59b33376d15b53ac7ba8886613c15b59878496cb31833502b9b',
 }
 once = stage_experiment.once
 
@@ -72,8 +76,37 @@ def checkpoint(text):
       Complete("native_admission", false);
 
       bool databaseBlocked=false;''')
+    start = text.index('  result["blocking_jobs"] = CVariant(CVariant::VariantTypeArray);')
+    end = text.index('  result["resolved_job_obligations"]', start)
+    optional = text[start:end].replace('blocking_jobs', 'optional_unfinished_jobs').replace(
+        's.jobs.blockers', 's.jobs.optionalUnfinished')
+    text = text[:end] + optional + text[end:]
     assert 'InfinityEssentialScriptFence' not in text
     return text
+
+def jobs(text):
+    return once(text, '''      if (actualType.find("CRepositoryUpdateJob") != std::string::npos)
+      {
+        role = CJob::CheckpointResponsibility::Required;''', '''      if (actualType.find("CRepositoryUpdateJob") != std::string::npos)
+      {
+        // Repository metadata/network completion is optional. Actual native
+        // SQLite transactions and file operations retain independent leases;
+        // nested installation scopes remain required and admission-controlled.
+        role = CJob::CheckpointResponsibility::NonPersistent;''')
+
+def installer(text):
+    text = once(text, '#include "AddonInstaller.h"', '''#include "AddonInstaller.h"
+#if defined(TARGET_ANDROID)
+#include "platform/android/activity/InfinityAndroidCheckpoint.h"
+#endif''')
+    return once(text, '''  CAddonOperationReceipt completion("addon_install", m_addon->ID(), m_completionVerified);
+#endif''', '''  CAddonOperationReceipt completion("addon_install", m_addon->ID(), m_completionVerified);
+  // Also covers synchronous dependency installs from repository callbacks.
+  // Empty existing file/database scopes prove unchanged state on rejection.
+  // An already-admitted install keeps its original required durability receipt.
+  InfinityAndroidCheckpoint::CheckpointWriteGuard admission("jobs");
+  if (!admission) return false;
+#endif''')
 
 def manager(text):
     text = once(text, '#include "platform/android/activity/InfinityScriptPersistence.h"',
@@ -155,7 +188,7 @@ def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)
