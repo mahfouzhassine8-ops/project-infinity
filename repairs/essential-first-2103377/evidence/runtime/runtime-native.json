@@ -1,0 +1,104 @@
+{
+  "scope": "production native Python observer and C entry hooks, pinned CPython 3.11",
+  "results": [
+    {
+      "case": "cached-write",
+      "exit_code": 0,
+      "stdout": "PASS cached-write; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-pwrite",
+      "exit_code": 0,
+      "stdout": "PASS cached-pwrite; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-writev",
+      "exit_code": 0,
+      "stdout": "PASS cached-writev; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "raw",
+      "exit_code": 0,
+      "stdout": "PASS raw; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-raw-open",
+      "exit_code": 0,
+      "stdout": "PASS late-raw-open; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-cached-open",
+      "exit_code": 0,
+      "stdout": "PASS late-cached-open; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-rename",
+      "exit_code": 0,
+      "stdout": "PASS cached-rename; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-remove",
+      "exit_code": 0,
+      "stdout": "PASS cached-remove; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-chmod",
+      "exit_code": 0,
+      "stdout": "PASS late-chmod; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-mmap",
+      "exit_code": 0,
+      "stdout": "PASS late-mmap; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-ctypes",
+      "exit_code": 0,
+      "stdout": "PASS late-ctypes; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "buffer-drain",
+      "exit_code": 0,
+      "stdout": "PASS buffer-drain; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "layered",
+      "exit_code": 0,
+      "stdout": "PASS layered; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "cached-buffer",
+      "exit_code": 0,
+      "stdout": "PASS cached-buffer; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "optional-blocked",
+      "exit_code": 0,
+      "stdout": "PASS optional-blocked; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "sqlite-attach",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-attach; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    }
+  ],
+  "all_passed": true,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

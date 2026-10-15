@@ -1,0 +1,24 @@
+{
+  "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
+  "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
+  "implementation": "existing native script persistence ledger plus subordinate CPython and SQLite VFS adapters",
+  "completed_host_cases": {
+    "sqlite_runtime": 8,
+    "native_cpython_3117_runtime": 16,
+    "coordinator_with_real_barrier": 12
+  },
+  "real_kodi_first_party_callbacks_executed": false,
+  "full_arm64_compile": "pending",
+  "android_receipt_validation": "source updated; test pending",
+  "android_process_death_verified": false,
+  "reopen_on_android_verified": false,
+  "apk_deliverable": false,
+  "release_signed": false,
+  "locked": false,
+  "unresolved": [
+    "Bundled Pillow native encoder descriptor writes need an actual bounded write adapter. Observed imports now retain bundled_native_encoder_write_adapter_missing and prevent authorization.",
+    "Concurrent descriptor replacement and other native filesystem paths require complete coverage proof.",
+    "Android validator compilation, first-party callback integration, full ARM64 build and permanent signing not yet complete.",
+    "Actual Android process death, data-preserving reopen and physical Fold acceptance not performed."
+  ]
+}

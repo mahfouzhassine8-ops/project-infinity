@@ -1,0 +1,177 @@
+name: Infinity 2103377 | Essential-first shutdown production native verification
+
+on:
+  push:
+    branches: [work/infinity-2103377-essential-first-shutdown-only]
+    paths:
+      - '.github/workflows/infinity-essential-first-shutdown-native.yml'
+      - 'repairs/essential-first-2103377/**'
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103377-essential-first-shutdown-native, cancel-in-progress: true}
+
+jobs:
+  host-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Exercise actual native Python and SQLite write protection
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libsqlite3-dev libssl-dev
+          mkdir -p shutdown-rc1-host
+          python3 repairs/essential-first-2103377/test_runtime_native.py \
+            --python-prefix "$pythonLocation" --sqlite-include /usr/include \
+            --out shutdown-rc1-host/runtime-native.json
+          /usr/bin/python3 repairs/essential-first-2103377/test_runtime_sqlite.py \
+            --sqlite-include /usr/include --out shutdown-rc1-host/runtime-sqlite.json
+      - name: Check two-file source patch and all protected gates
+        run: |
+          set -euo pipefail
+          python3 repairs/python-shutdown-order-2103377/test_source.py --out shutdown-rc1-host/source-contracts.json
+      - uses: actions/checkout@v4
+        with:
+          ref: b2e42e3119a526ab950b8e52c4762494380ba903
+          path: original-python311-proof
+          persist-credentials: false
+      - name: Verify original eight CPython 3.11 host observations
+        run: |
+          set -euo pipefail
+          python3.11 --version
+          pushd original-python311-proof/experiments/shutdown-ordering-python311
+          g++ -std=c++17 -O2 -Wall -Wextra proof.cpp -o proof $(python3.11-config --includes --embed --ldflags)
+          popd
+          python3.11 original-python311-proof/experiments/shutdown-ordering-python311/run_proof.py \
+            | tee shutdown-rc1-host/CPYTHON311-EIGHT-CASES.log
+      - name: Verify extracted native Rails callback and URL scope
+        run: |
+          set -euo pipefail
+          python3 repairs/rails-handoff-2103377/test_native.py \
+            --out rails-handoff-host/RAILS-HANDOFF-HOST.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103377-Essential-First-Runtime-Host
+          path: |
+            rails-handoff-host/
+            shutdown-rc1-host/
+            original-python311-proof/experiments/shutdown-ordering-python311/proof-output/result.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  native-engine:
+    needs: host-proof
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38246713743
+          name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: locked-parent
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38270097041
+          name: Cobra-2103375-File-Preview-Native-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: previous-candidate
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38321848412
+          name: Cobra-2103376-Critical-Preview-Native-Evidence
+          github-token: ${{ github.token }}
+          path: locked-native-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38493645998
+          name: Infinity-2103377-RC3-Exact-Native-Curl-Source
+          github-token: ${{ github.token }}
+          path: rc2-captured-source
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38732470818
+          name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence
+          github-token: ${{ github.token }}
+          path: rails-locked-evidence
+      - name: Restore exact verified compiler dependencies
+        run: |
+          set -euo pipefail
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev
+      - name: Preserve original Curl and local-save source
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-build
+          python3 repairs/shutdown-rc3-2103377/test_source.py \
+            --source rc2-captured-source \
+            --output checkpoint-build/RC3-HOST-VERIFICATION.json
+      - name: Reconstruct Rails RC02 and stage retirement repair
+        run: |
+          set -euo pipefail
+          python3 repairs/essential-first-2103377/native_ci.py prepare \
+            --locked locked-parent/Cobra-2103374-Verified-Deadweight-RC1.apk \
+            --previous previous-candidate/Cobra-2103375-File-Preview-Native-RC1.apk \
+            --parent-proof locked-native-evidence \
+            --rails-proof rails-locked-evidence \
+            2>&1 | tee checkpoint-build/RAILS-HANDOFF-SOURCE-PREPARATION.log
+      - name: Verify production coordinator with the actual persistence barrier
+        run: |
+          set -euo pipefail
+          python3 repairs/essential-first-2103377/run_runtime_coordinator_tests.py \
+            --variant-source kodi/xbmc --out checkpoint-build/runtime-coordinator.json
+      - name: Compile complete native Kodi engine
+        run: |
+          set -euo pipefail
+          python3 repairs/essential-first-2103377/native_ci.py compile \
+            2>&1 | tee checkpoint-build/RAILS-HANDOFF-NATIVE-COMPILE.log
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103377-Essential-First-Native-Engine
+          path: checkpoint-build/libkodi.so
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103377-Essential-First-Native-Evidence
+          path: checkpoint-build/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: error
