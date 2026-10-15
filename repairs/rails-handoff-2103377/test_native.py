@@ -144,6 +144,13 @@ def host(root: Path, out: Path):
         target.parent.mkdir(parents=True,exist_ok=True)
         parent=Path(root)/"repairs/android-checkpoint-shutdown/runtime/native/overlay"/patch_native.SOURCE
         shutil.copyfile(parent,target)
+        # The source patch deliberately hashes all shutdown/persistence gates.
+        # The host fixture mirrors those files, without modifying them.
+        overlay = Path(root)/"repairs/android-checkpoint-shutdown/runtime/native/overlay"
+        for protected in patch_native.PROTECTED:
+            dst = Path(name)/protected
+            dst.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(overlay/protected,dst)
         patch_native.apply(Path(name))
         verify(Path(name),out)
 
