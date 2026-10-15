@@ -15,7 +15,10 @@ inline bool Interesting(const char* n)
   if(!n)return false;
   for(const char* value:{"connect","connect_ex","recv","recv_into","send","sendall","read","write",
       "do_handshake","wait","join","waitForAbort","getInfoLabel","getCondVisibility","executeJSONRPC",
-      "execute","executemany","commit","rollback","close","getProperty","setProperty"})
+      "execute","executemany","commit","rollback","close","getProperty","setProperty",
+      "acquire","acquire_lock","sleep","poll","select","getaddrinfo","gethostbyname",
+      "open","fsync","fdatasync","getSetting","setSetting","getAddonInfo",
+      "getBool","setBool","getInt","setInt","getString","setString"})
     if(std::strcmp(n,value)==0)return true;
   return false;
 }

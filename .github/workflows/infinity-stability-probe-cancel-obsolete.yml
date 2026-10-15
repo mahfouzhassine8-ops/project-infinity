@@ -1,0 +1,36 @@
+name: Infinity | Cancel accidental diagnostic-branch legacy runs
+on:
+  push:
+    branches: [work/infinity-stability-probe-20261014]
+    paths: ['.github/workflows/infinity-stability-probe-cancel-obsolete.yml']
+permissions: {contents: read, actions: write}
+jobs:
+  cancel-only-our-accidental-runs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Cancel only legacy workflows triggered by our restoration commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,urllib.request
+          repo=os.environ['REPO']
+          assert repo=='mahfouzhassine8-ops/project-infinity'
+          target='fa944f7e4453c521df8170530a27ad925a2115b1'
+          branch='work/infinity-stability-probe-20261014'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          base='https://api.github.com/repos/'+repo
+          req=urllib.request.Request(base+'/actions/runs?branch='+branch+'&per_page=100',headers=headers)
+          with urllib.request.urlopen(req,timeout=30) as response:runs=json.load(response)['workflow_runs']
+          kept={'Infinity | Stability ownership probe native test','Infinity | Stability helper real Kodi smoke'}
+          for run in runs:
+              if run['head_sha']!=target or run['head_branch']!=branch or run['name'] in kept or run['status']=='completed':continue
+              req=urllib.request.Request(base+'/actions/runs/'+str(run['id'])+'/cancel',headers=headers,data=b'',method='POST')
+              try:
+                  with urllib.request.urlopen(req,timeout=30) as response:assert response.status==202
+                  print('Cancelled own accidental legacy run',run['id'],run['name'])
+              except urllib.error.HTTPError as exc:
+                  if exc.code!=409:raise
+          PY
