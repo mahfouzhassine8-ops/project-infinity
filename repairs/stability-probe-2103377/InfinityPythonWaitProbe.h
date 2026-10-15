@@ -1,5 +1,6 @@
 #pragma once
 #include "Python.h"
+#include "frameobject.h"
 #include "threads/InfinityStabilityProbe.h"
 #include <cstring>
 

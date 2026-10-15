@@ -9,11 +9,22 @@ int main(int argc,char** argv)
   assert(argc==2);Py_Initialize();InfinityStabilityProbe::Configure(argv[1]);
   auto* context=InfinityPythonWaitProbe::Start(99);assert(context);
   std::thread observer([]{
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    bool blocked=false;
+    for(unsigned attempt=0;attempt<1000;++attempt) {
+      bool sleeping=false,waiting=false;
+      for(auto& t:InfinityStabilityProbe::threads) {
+        if(!t.tid.load() || t.invoker.load()!=99)continue;
+        const auto op=InfinityStabilityProbe::Load(t.operation);
+        sleeping|=op=="sleep";waiting|=op=="acquire";
+      }
+      if(sleeping && waiting){blocked=true;break;}
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+    assert(blocked);
     InfinityStabilityProbe::Snapshot("real_python_blocked_wait");
   });
   assert(PyRun_SimpleString("import threading,time\n"
-    "t=threading.Thread(target=lambda: time.sleep(0.5))\n"
+    "t=threading.Thread(target=lambda: time.sleep(2))\n"
     "t.start()\nt.join()\n")==0);
   observer.join();
   InfinityPythonWaitProbe::BodyReturned();InfinityPythonWaitProbe::Retired(99);

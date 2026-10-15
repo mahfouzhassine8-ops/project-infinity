@@ -35,13 +35,15 @@ def verify(source=None,out=None):
                 if real.is_file():links[index]=str(real);links+=['-Wl,-rpath,'+str(directory)];break
     run(common+includes+[str(HERE/'test_python.cpp'),'-o',str(out/'python-test')]+links)
     b=run([str(out/'python-test'),str(out/'python-snapshot.jsonl')])
+    run(common+includes+[str(HERE/'blocked_wait_check.cpp'),'-o',str(out/'blocked-wait-check')]+links)
+    c=run([str(out/'blocked-wait-check'),str(out/'blocked-wait-snapshot.jsonl')])
     rows=[json.loads(l) for l in (out/'mutex-snapshot.jsonl').read_text().splitlines()]
     blocked=next(r for r in rows if r['reason']=='controlled_contention')
     owner=next(r for r in blocked['locks'] if r['operation']=='owner_operation')
     assert any(t['waiting_slot']==owner['slot'] and t['tid']!=owner['owner_tid'] for t in blocked['threads'])
-    receipt={'passed':True,'real_os_mutex_owner_waiter':True,'real_host_cpython_parent_child':True,'android_runtime_tested':False,'observational_candidate_not_a_fix':True}
+    receipt={'passed':True,'real_os_mutex_owner_waiter':True,'real_host_cpython_parent_child':True,'real_blocked_python_waits':True,'android_runtime_tested':False,'observational_candidate_not_a_fix':True}
     (out/'PROBE-HOST-RESULT.json').write_text(json.dumps(receipt,indent=2)+'\n')
-    (out/'PROBE-HOST-RESULT.txt').write_text(a+b)
-    print(a+b);return receipt
+    (out/'PROBE-HOST-RESULT.txt').write_text(a+b+c)
+    print(a+b+c);return receipt
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path);p.add_argument('--out',type=Path);args=p.parse_args();verify(args.source,args.out)
