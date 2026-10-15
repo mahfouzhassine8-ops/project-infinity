@@ -6,10 +6,13 @@ Only fresh emulator test data is seeded. Failure evidence never authorizes APK
 delivery. Engine death and whole-package death are reported independently.
 """
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
 import shlex
+import shutil
+import socket
 import sqlite3
 import subprocess
 import time
@@ -20,6 +23,45 @@ PRIVATE = '/data/user/0/'+PACKAGE
 PROFILE = '/sdcard/Android/data/'+PACKAGE+'/files/.kodi/userdata'
 CONTROL = PROFILE+'/addon_data/script.infinity.commandcenter/.android-checkpoint'
 FAVOURITE = 'Infinity essential shutdown probe'
+FIRST_PARTY = {'script.infinity.commandcenter':'0.3.5.20', 'service.infinity.compat':'0.8.2'}
+
+def rpc(method, params=None):
+    request={'jsonrpc':'2.0','id':1,'method':method}
+    if params is not None: request['params']=params
+    with socket.create_connection(('127.0.0.1',19090),timeout=10) as connection:
+        connection.sendall(json.dumps(request).encode())
+        pending='';decoder=json.JSONDecoder()
+        while True:
+            data=connection.recv(65536)
+            if not data: raise RuntimeError('Kodi JSON-RPC closed without response: '+method)
+            pending+=data.decode()
+            while pending.strip():
+                try: response,end=decoder.raw_decode(pending.lstrip())
+                except ValueError: break
+                pending=pending.lstrip()[end:]
+                if response.get('id')==1:
+                    if 'error' in response: raise RuntimeError('Kodi JSON-RPC '+method+': '+json.dumps(response['error']))
+                    return response['result']
+
+def enable_first_party():
+    adb('forward','tcp:19090','tcp:9090')
+    deadline=time.monotonic()+180;last_error=None
+    while time.monotonic()<deadline:
+        try:
+            assert rpc('JSONRPC.Ping')=='pong'
+            break
+        except (OSError,RuntimeError,AssertionError) as error:
+            last_error=str(error);time.sleep(1)
+    else: raise RuntimeError('Actual Kodi JSON-RPC not ready: '+str(last_error))
+    results={}
+    for name,version in FIRST_PARTY.items():
+        details=rpc('Addons.GetAddonDetails',{'addonid':name,'properties':['version','enabled']})['addon']
+        assert details['version']==version,(name,details)
+        if not details['enabled']:
+            assert rpc('Addons.SetAddonEnabled',{'addonid':name,'enabled':True})=='OK'
+        results[name]=rpc('Addons.GetAddonDetails',{'addonid':name,'properties':['version','enabled']})['addon']
+        assert results[name]['enabled'],name
+    return results
 
 def adb(*args, check=True, binary=False):
     result = subprocess.run(['adb',*map(str,args)],capture_output=True,text=not binary,timeout=90)
@@ -60,6 +102,7 @@ def wait_ready(previous_owner=None):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--apk',type=Path,required=True)
+    p.add_argument('--installed-addons',type=Path,required=True)
     p.add_argument('--out',type=Path,required=True);args=p.parse_args();args.out.mkdir(parents=True,exist_ok=True)
     report={'scope':'real signed ARM64 APK on disposable Android emulator; not physical Fold acceptance',
             'passed':False,'android_engine_death_verified':False,'whole_package_death_verified':False,
@@ -67,6 +110,7 @@ def main():
             'physical_fold_accepted':False,'apk_delivery_authorized':False}
     def save(): (args.out/'ANDROID-PROCESS-PROBE.json').write_text(json.dumps(report,indent=2)+'\n')
     try:
+        report['apk_sha256']=hashlib.sha256(args.apk.read_bytes()).hexdigest()
         adb('root');adb('wait-for-device')
         # Refuse to touch an existing installation or any physical device.
         assert shell('getprop','ro.kernel.qemu').strip()=='1','Disposable emulator required'
@@ -88,9 +132,27 @@ def main():
         favourite=args.out/'test-favourites.xml'
         favourite.write_text('<favourites><favourite name="'+FAVOURITE+'">ActivateWindow(Home)</favourite></favourites>\n')
         adb('push',favourite,PROFILE+'/favourites.xml')
+        # A fresh APK has no installed Command Center. Use the exact approved
+        # installed add-ons from the locked native evidence, not substitute
+        # handlers. The combined hash is checked independently against RC1.
+        fixture=args.out/'first-party-fixture';fixture.mkdir()
+        manifest={}
+        for name in FIRST_PARTY:
+            source=args.installed_addons/name
+            assert source.is_dir(),source
+            shutil.copytree(source,fixture/name,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+            for path in sorted((fixture/name).rglob('*')):
+                if path.is_file(): manifest[path.relative_to(fixture).as_posix()]=hashlib.sha256(path.read_bytes()).hexdigest()
+        digest=hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        assert digest=='eb61ddf66a01f434978c9ea070131311360ad76c536dd704355738db9179c1a5',digest
+        report['unchanged_locked_first_party_manifest']=manifest
+        shell('mkdir','-p',PROFILE+'/../addons')
+        for name in FIRST_PARTY: adb('push',fixture/name,PROFILE+'/../addons/'+name)
+        shutil.rmtree(fixture)
         adb('logcat','-c')
         # Use the unchanged launcher route and an ordinary saved preference.
         report['launch']=shell('am','start','-W','-n',PACKAGE+'/.Splash')
+        report['actual_first_party_enabled']=enable_first_party();save()
         owner=wait_ready();report['old_owner']=owner;report['before_close_processes']=processes();save()
         baseline=ET.fromstring(shell('cat',PROFILE+'/favourites.xml'))
         assert any(item.get('name')==FAVOURITE for item in baseline),'Startup did not retain seeded test favourite; close not attempted'
@@ -147,6 +209,10 @@ def main():
             except Exception as error: (args.out/(name+'.error')).write_text(str(error))
         for source,name in [(PRIVATE+'/files/infinity-checkpoint-close.json','coordinator-receipt.json'),
                             (PRIVATE+'/files/infinity-android-checkpoint.jsonl','android-checkpoint.jsonl'),
+                            (PRIVATE+'/files/infinity-kodi-process.json','owner.json'),
+                            (CONTROL+'/engine.json','engine.json'),
+                            (CONTROL+'/compat-active.json','compat-active.json'),
+                            (CONTROL+'/participant.json','participant.json'),
                             (PROFILE+'/../temp/kodi.log','kodi.log')]:
             adb('pull',source,args.out/name,check=False)
         try: (args.out/'screen.png').write_bytes(adb('exec-out','screencap','-p',binary=True))

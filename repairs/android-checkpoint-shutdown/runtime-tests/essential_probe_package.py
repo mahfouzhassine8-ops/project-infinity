@@ -9,6 +9,7 @@ import argparse
 import importlib.util
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -32,9 +33,21 @@ def main():
     if args.mode=='java':
         assert args.source and args.gradle_dir
         factory.prepared_java(args)
+        with (args.gradle_dir/'xbmc/build.gradle').open('a') as stream:
+            stream.write("\nconfigurations { preservationTools }\ndependencies { preservationTools 'org.smali:baksmali:2.5.2' }\ntasks.register('exportPreservationTools') { doLast { rootProject.file('preservation-classpath.txt').text = configurations.preservationTools.asPath } }\n")
     else:
-        assert args.native and args.donor and args.android
+        assert args.native and args.donor and args.android and args.gradle_dir
         args.out.mkdir(parents=True,exist_ok=True)
+        # Source/class inventories alone cannot establish that unrelated Java
+        # behaviour survived rebuilding an older complete donor source export.
+        # Reuse the repository's decoded-instruction preservation gate with
+        # only the two authorized shutdown class families exempted.
+        spec=importlib.util.spec_from_file_location('essential_dex_guard',ROOT/'repairs/cobra-clean-restart/bytecode_guard.py')
+        guard=importlib.util.module_from_spec(spec);spec.loader.exec_module(guard)
+        guard.ALLOWED=re.compile(r'com/projectinfinity/kodi/(?:InfinityCheckpointProtocol|InfinityCloseGuardService)(?:\$[^/]*)?\.smali$')
+        normalize=guard.normalize
+        guard.normalize=lambda text: normalize(re.sub(r'(?m)^\s*\.line \d+\s*$', '', text))
+        guard.compare(args.parent,args.donor,(args.gradle_dir/'preservation-classpath.txt').read_text(),args.out)
         factory.signed_package(args)
         old=args.out/'Infinity-2103377-Essential-First-Signed-Fold-TEST1.apk'
         final=args.out/'Infinity-2103377-Essential-First-Internal-Probe.apk'
