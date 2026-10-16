@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Failure controls for the bounded infrastructure-only ZIP retry."""
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -138,6 +139,39 @@ class EmulatorPreparationTest(unittest.TestCase):
         self.assertEqual(self.waits, [])
         self.assertFalse(self.report()["passed"])
         self.assertIn("SDK licenses missing", (self.out / "sdkmanager-attempt-1.log").read_text())
+
+    def test_exact_ci_missing_libpulse_is_identified_and_not_retried(self):
+        error = ("/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/qemu-system-x86_64: "
+                 "error while loading shared libraries: libpulse.so.0: cannot open shared object file: "
+                 "No such file or directory\n")
+        with self.assertRaisesRegex(RuntimeError, r"exit 127.*libpulse\.so\.0"):
+            self.run_results([(0, "installed"), (127, error)])
+        self.assertEqual(self.waits, [])
+        self.assertEqual(len(self.calls), 2)
+        report = self.report()
+        self.assertFalse(report["passed"])
+        self.assertEqual(report["version_command"]["exit_code"], 127)
+        self.assertEqual(report["version_command"]["output"], error)
+
+    def test_ci_runtime_dependency_is_installed_before_each_preflight(self):
+        workflow = (Path(__file__).resolve().parents[3] / ".github/workflows/"
+                    "infinity-essential-first-java-process-verification.yml").read_text()
+        for job in ("fresh-production-shutdown", "upgrade-early-shutdown", "upgrade-loaded-shutdown"):
+            section = re.split(r"\n  \S", workflow.split("\n  " + job + ":\n", 1)[1], maxsplit=1)[0]
+            self.assertLess(section.index("apt-get install -y libpulse0"),
+                            section.index("prepare_android_emulator.py --out"))
+
+    def test_loader_dependency_evidence_cannot_replace_actual_version(self):
+        qemu = self.sdk / "emulator/qemu/linux-x86_64/qemu-system-x86_64"
+        qemu.parent.mkdir(parents=True)
+        qemu.write_text("controlled dependency target")
+        dependencies = "libpulse.so.0 => not found\nlibother.so.1 => not found\nlibc.so.6 => /lib/libc.so.6 (0x1234)\n"
+        with self.assertRaisesRegex(RuntimeError, "exit 127"):
+            self.run_results([(0, "installed"), (0, dependencies), (127, "loader failure")])
+        report = self.report()
+        self.assertEqual(report["loader_dependencies"]["missing"], ["libpulse.so.0", "libother.so.1"])
+        self.assertFalse(report["passed"])
+        self.assertEqual(self.calls[1], ["ldd", str(qemu)])
 
 
 if __name__ == "__main__":

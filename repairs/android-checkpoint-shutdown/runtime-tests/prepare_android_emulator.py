@@ -4,6 +4,8 @@
 The pinned runner installs ``emulator`` before any ``emulator-build`` override:
 https://github.com/ReactiveCircus/android-emulator-runner/blob/a421e43855164a8197daf9d8d40fe71c6996bb0d/src/sdk-installer.ts
 SDK package/channel/SDK-root options: https://developer.android.com/tools/sdkmanager
+Linux runtime dependencies (libpulse0):
+https://android.googlesource.com/platform/external/adt-infra/+/refs/heads/emu-master-dev/emu-image/external/emu_templates.py
 
 This prepares disposable CI infrastructure. It never retries an application test,
 changes app data, deletes SDK directories, or treats a failed install as success.
@@ -63,7 +65,26 @@ def prepare(sdk_root, out, *, run=run_command, pause=time.sleep):
         executable = sdk_root / "emulator/emulator"
         if not executable.is_file() or not os.access(executable, os.X_OK):
             raise RuntimeError("Installed emulator executable is missing or not executable")
+        qemu = sdk_root / "emulator/qemu/linux-x86_64/qemu-system-x86_64"
+        if qemu.is_file():
+            # Keep all unresolved direct dependencies if executable verification fails.
+            # This diagnostic cannot replace the successful version command below.
+            dependency_log = out / "emulator-loader-dependencies.log"
+            try:
+                dependency_code, dependencies = run(["ldd", str(qemu)], dependency_log)
+                report["loader_dependencies"] = {
+                    "exit_code": dependency_code, "log": dependency_log.name,
+                    "missing": re.findall(r"(?m)^\s*(\S+)\s+=>\s+not found\s*$", dependencies),
+                }
+            except OSError as error:
+                report["loader_dependencies"] = {"diagnostic_error": str(error)}
         code, version = run([str(executable), "-version"], out / "emulator-version.log")
+        report["emulator_revision"] = revision.group(1)
+        report["version_command"] = {"exit_code": code, "output": version,
+                                     "log": "emulator-version.log"}
+        if code != 0:
+            raise RuntimeError("Emulator version command failed (exit %d): %s" %
+                               (code, version.strip()))
         reported = re.search(r"Android emulator version ([0-9]+(?:\.[0-9]+)+)", version)
 
         def version_parts(value):
@@ -72,9 +93,10 @@ def prepare(sdk_root, out, *, run=run_command, pause=time.sleep):
                 parts.pop()
             return parts
 
-        if (code != 0 or reported is None or
+        if (reported is None or
                 version_parts(revision.group(1)) != version_parts(reported.group(1))):
-            raise RuntimeError("Installed emulator did not report its recorded package revision")
+            raise RuntimeError("Installed emulator did not report package revision %s: %s" %
+                               (revision.group(1), version.strip()))
         report.update(passed=True, emulator_revision=revision.group(1),
                       executable_revision=reported.group(1))
         return report

@@ -264,6 +264,11 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
           path: .
+      - name: Install emulator runtime library before executable verification
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
       - name: Prepare verified emulator with bounded invalid-ZIP retry
         run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup-evidence
       - name: Enable disposable emulator acceleration
@@ -317,6 +322,11 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
           path: .
+      - name: Install emulator runtime library before executable verification
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
       - name: Prepare verified emulator with bounded invalid-ZIP retry
         run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup-evidence
       - name: Enable disposable emulator acceleration
@@ -376,6 +386,11 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
           path: .
+      - name: Install emulator runtime library before executable verification
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
       - name: Prepare verified emulator with bounded invalid-ZIP retry
         run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup-evidence
       - name: Enable disposable emulator acceleration
