@@ -4,7 +4,7 @@
   "implementation": "existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 47,
+    "native_cpython_3117_runtime": 48,
     "coordinator_with_real_barrier": 15,
     "full_production_job_manager": 13,
     "production_installer_filesystem_sqlite": 24
@@ -76,11 +76,12 @@
   "child_output_correction": {
     "negative_control": "Real stopped child holding protected stdout changed bytes after old barrier authorized exit (seal=1, authorized=1).",
     "production_fix": "Native CPython fork_exec transfers actual stdout/stderr descriptor leases into existing ledger until OS-confirmed child death, with PID/start identity.",
-    "verification": "47 actual CPython cases pass, including nested child, pending exec-error output, ordinary locale environment, untrusted writable PATH candidate and late direct entry. Android and whole-package acceptance remain required.",
+    "verification": "48 actual CPython cases pass, including nested child, pending exec-error output, ordinary locale environment, untrusted writable PATH candidate and late direct entry. Android and whole-package acceptance remain required.",
     "no_watchdog_or_join": true,
     "whole_package_child_process_termination": "Not established by host lease tests; Android app-UID process absence remains required.",
     "native_command_negative_control": "Real nested native child changed protected bytes after old seal=1, authorized=1; this invalidates release of that build.",
-    "production_command_fix": "Validate actual fork_exec argv, every executable candidate, environment, inherited descriptors, cwd and preexec options at the C entry; lease stdout/stderr/exec-error writes; reject new child admission before mutation during Close."
+    "production_command_fix": "Validate actual fork_exec argv, every executable candidate, environment, inherited descriptors, cwd and preexec options at the C entry; lease stdout/stderr/exec-error writes; reject new child admission before mutation during Close.",
+    "native_preparation_race": "Existing protected-operation lease spans native launch validation through PID/output binding. Actual concurrent-fork test refuses sealing while preparation is in flight, then succeeds after the operation completes."
   },
   "ci_fixture_correction": {
     "failed_run": 38826715807,

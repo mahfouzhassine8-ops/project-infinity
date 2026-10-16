@@ -37,7 +37,7 @@ These latest corrections still require a full ARM64 build and Android run.
 See `PRODUCTION-STATUS.json` and `TEST1-CORRECTIONS.md`. No internal APK has
 been delivered, and whole-package death remains unverified.
 
-Current host verification: 47 actual CPython 3.11.7 runtime cases, 8 actual
+Current host verification: 48 actual CPython 3.11.7 runtime cases, 8 actual
 SQLite VFS cases, 15 production coordinator cases, 13 production JobManager
 cases, 24 production installer cases, and the compiled Android
 protocol/guard authorization suite. First-party Command Center and compatibility

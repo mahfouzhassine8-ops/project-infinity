@@ -62,7 +62,7 @@ ARM64 image or claim on-device ambient regression acceptance.
 
 ## Verification boundary
 
-Evidence in `evidence/runtime/` covers 47 production CPython cases, 8 SQLite
+Evidence in `evidence/runtime/` covers 48 production CPython cases, 8 SQLite
 cases, 15 coordinator cases, 13 full JobManager cases, 24 installer cases and
 compiled native/Android receipt agreement.
 The indefinitely waiting optional Python worker is still alive when host
@@ -153,7 +153,7 @@ diagnostic denial, consistent with the existing Popen audit gate.
 The native exec-error output descriptor is also leased until actual child
 exit. A real stopped child that will write its exec failure into a protected
 file prevents sealing, then drains after OS-confirmed death. These cases and
-all existing native cases pass (47 total). The earlier full ARM64 child-output
+all existing native cases pass (48 total). The earlier full ARM64 child-output
 build `38824257676` passed, but neither it nor the pending admission build is
 a deliverable for this newly reproduced protection gap. A fresh build and
 actual Android verification of the final native source remain mandatory.
@@ -163,3 +163,8 @@ because a native protection was disabled. CI now uses a real read-only bind
 mount in a private namespace, executes tests as the original unprivileged
 runner and retains the real `statvfs` assertion. Host checks passed in run
 `38827466985`. No coverage flag or fabricated receipt was introduced.
+
+Native launch preparation also holds the existing operation ledger until its
+PID/output leases are bound. A real concurrent fork pause verifies that Close
+cannot seal in this handoff gap. The test pauses only its host libc boundary;
+production has no waiting thread, join, timer or coverage switch.

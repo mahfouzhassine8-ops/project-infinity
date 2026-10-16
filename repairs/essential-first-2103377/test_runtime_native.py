@@ -26,7 +26,19 @@ CODE = r'''
 // while the actual barrier is tested. No production test hooks or tracing.
 static bool traceNextFork = false;
 static int childSignalPipe[2] = {-1,-1};
+static std::mutex preparationMutex;
+static std::condition_variable preparationChanged;
+static bool tracePreparation=false,preparationEntered=false,preparationReleased=false;
 extern "C" pid_t fork() {
+  {
+    std::unique_lock<std::mutex> lock(preparationMutex);
+    if(tracePreparation) {
+      tracePreparation=false;preparationEntered=true;preparationChanged.notify_all();
+      auto* python=PyEval_SaveThread(); // test-only pause must not starve the controller thread
+      preparationChanged.wait(lock,[]{return preparationReleased;});
+      lock.unlock();PyEval_RestoreThread(python);
+    }
+  }
   static auto realFork = reinterpret_cast<pid_t(*)()>(dlsym(RTLD_NEXT,"fork"));
   assert(realFork);
   const pid_t child = realFork();
@@ -209,6 +221,27 @@ baseline=old_open(shared,'rb').read()
     else run("os.rename(private,shared)\n");
   }
   if (mode == "sqlite-renamed") run("c=sqlite3.connect(private+'.db'); c.execute('CREATE TABLE history(value)'); c.execute('INSERT INTO history VALUES(321)'); c.commit(); os.rename(private+'.db',shared+'.db')\n");
+  if (mode == "child-preparation-race") {
+    tracePreparation=true;
+    run("import subprocess,threading\nsubprocess._USE_VFORK=False; subprocess._USE_POSIX_SPAWN=False\nresults=[]\ndef launch(): results.append(subprocess.check_output(['uname','-rs']))\nt=threading.Thread(target=launch);t.start()\n");
+    auto* state=PyEval_SaveThread();
+    { std::unique_lock<std::mutex> lock(preparationMutex);
+      assert(preparationChanged.wait_for(lock,std::chrono::seconds(5),[]{return preparationEntered;})); }
+    assert(InfinityScriptPersistence::BeginWriteProtection(23,{root+"/profile"},{root+"/cache"}));
+    assert(InfinityScriptPersistence::CloseParticipantWrites(23));
+    const auto proof=InfinityScriptPersistence::EssentialWrites();
+    assert(std::find(proof.blockers.begin(),proof.blockers.end(),
+        "active_protected_operation:native_child_contract_preparation")!=proof.blockers.end());
+    assert(!InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    { std::lock_guard<std::mutex> lock(preparationMutex);preparationReleased=true; }
+    preparationChanged.notify_all();PyEval_RestoreThread(state);
+    run("t.join(5);assert not t.is_alive() and results[0].strip()\n");
+    assert(InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    std::cout<<"PASS actual native fork preparation cannot race the essential seal\n"<<std::flush;
+    std::_Exit(0);
+  }
   assert(InfinityScriptPersistence::BeginWriteProtection(23, {root+"/profile"}, {root+"/cache"}));
   if (mode == "compat-save") run("assert checkpoint.poll() and checkpoint.parked\nresponse=json.loads((control/'compat-response.json').read_text()); assert response['status']=='PARTICIPANT_COMPLETE' and not response['global_safe_to_terminate']\n");
   if (mode == "compat-failure") {
@@ -374,7 +407,7 @@ def main():
                'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
         cases+=['missing-immutable-command','missing-writable-command','nested-native-child',
                 'child-locale-environment','child-writable-search','child-error-channel-pending',
-                'late-native-child']
+                'late-native-child','child-preparation-race']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

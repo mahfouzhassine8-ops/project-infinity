@@ -351,6 +351,12 @@ inline PyObject* ForkExec(PyObject* self, PyObject* tuple)
   const int writer = context ? context->id : -1;
   if (Ledger::RejectOpaqueMutation("native_child_process"))
   { InfinityPythonPersistence::AdmissionDenied(context,"Child admission is closed during checkpoint"); return nullptr; }
+  // Hold the existing ledger while validating and converting a child launch.
+  // A concurrent Close cannot seal between admission and binding its actual
+  // child output leases, even when command validation itself has not finished.
+  Ledger::ProtectedOperation preparing(writer,{},"native_child_contract_preparation");
+  if (!preparing)
+  { InfinityPythonPersistence::AdmissionDenied(context,"Child preparation crosses protected write barrier"); return nullptr; }
   std::string detail="readonly_child_scope_absent";
   if (!context || !context->readonlyChildren[PyThreadState_Get()] ||
       !InfinityPythonPersistence::ReadonlyForkExec(tuple,detail))

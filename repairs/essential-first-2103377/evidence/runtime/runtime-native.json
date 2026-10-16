@@ -242,6 +242,12 @@
       "stderr": ""
     },
     {
+      "case": "child-preparation-race",
+      "exit_code": 0,
+      "stdout": "PASS actual native fork preparation cannot race the essential seal\n",
+      "stderr": ""
+    },
+    {
       "case": "pillow-fd",
       "exit_code": 0,
       "stdout": "PASS pillow-fd; actual CPython 3.11.7; no interpreter retirement required\n",
