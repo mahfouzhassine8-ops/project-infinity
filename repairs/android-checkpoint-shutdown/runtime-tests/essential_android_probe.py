@@ -110,6 +110,29 @@ def wait_ready(previous_owner=None):
         time.sleep(1)
     raise RuntimeError('Actual Kodi engine and first-party startup handshakes did not become ready')
 
+def system_executable_evidence(owner, out):
+    """Read-only context for native executable-proof failures, never a waiver.
+
+    Shell permissions differ from the app's SELinux domain. Record that scope
+    explicitly and retain the actual engine mount table without interpreting
+    root's access as proof that an app-side operation was safe.
+    """
+    commands = [('shell_identity', ('id',)),
+                ('engine_mounts', ('cat', '/proc/'+str(owner['pid'])+'/mountinfo'))]
+    for path in ('/vendor/bin/uname', '/vendor/bin', '/vendor',
+                 '/system/bin/uname', '/system/bin', '/system', '/'):
+        commands += [('stat:'+path, ('ls', '-ldZ', path)),
+                     ('canonical:'+path, ('readlink', '-f', path))]
+    results = {}
+    for name, command in commands:
+        result = subprocess.run(['adb', 'shell', shlex.join(command)],
+                                capture_output=True, text=True, timeout=90)
+        results[name] = {'exit_code':result.returncode,
+                         'stdout':result.stdout, 'stderr':result.stderr}
+    (out/'readonly-system-paths.json').write_text(json.dumps({
+        'scope':'read-only shell observations and actual engine mount table; not authorization evidence',
+        'engine_pid':owner['pid'], 'results':results}, indent=2)+'\n')
+
 def main():
     global APP_UID
     p=argparse.ArgumentParser();p.add_argument('--apk',type=Path,required=True)
@@ -178,6 +201,7 @@ def main():
         report['launch']=shell('am','start','-W','-n',PACKAGE+'/.Splash')
         report['actual_first_party_enabled']=enable_first_party(args.out);save()
         owner=wait_ready();report['old_owner']=owner;report['before_close_processes']=processes();save()
+        system_executable_evidence(owner, args.out)
         baseline=ET.fromstring(shell('cat',PROFILE+'/favourites.xml'))
         assert any(item.get('name')==FAVOURITE for item in baseline),'Startup did not retain seeded test favourite; close not attempted'
         # Same private bridge and action used by Power -> Close. Root exists
