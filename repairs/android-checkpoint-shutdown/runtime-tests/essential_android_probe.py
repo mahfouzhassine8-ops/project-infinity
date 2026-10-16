@@ -225,6 +225,7 @@ def main():
             time.sleep(.25)
         report['readonly_virtual_file_observation']=observation;save()
         assert observation.get('pid')==owner['pid'] and observation.get('addon')==READONLY_FIXTURE
+        assert observation.get('flags_source')=='proc_fdinfo' and observation.get('fdinfo_inode')==observation.get('inode')
         assert observation.get('flags',-1)&3==0 and observation.get('writable') is False
         assert observation.get('descriptor_target')=='/proc/'+str(owner['pid'])+'/maps'
         assert observation.get('regular_file') is True and observation.get('inode',0)>0

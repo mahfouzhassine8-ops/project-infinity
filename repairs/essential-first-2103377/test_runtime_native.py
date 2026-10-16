@@ -316,6 +316,35 @@ baseline=old_open(shared,'rb').read()
     assert(::dup2(read,target)==target);assert(::close(read)==0);
     run("try: pending.flush()\nexcept OSError: pass\nelse: raise AssertionError('retargeted writable buffer pretended to save')\n");
   }
+  if (mode == "readonly-maps-fixture" || mode == "readonly-maps-fixture-getfl") {
+    // Only Kodi metadata APIs are supplied by this host harness. The exact
+    // Android fixture, native observer, kernel descriptors and saves are real.
+    run(R"fixture(
+import sys, types, json
+addon = types.ModuleType('xbmcaddon')
+class FixtureAddon:
+ def getAddonInfo(self, key):
+  if key == 'id': return 'script.infinity.readonlymaps.test'
+  if key == 'profile': return root+'/profile/readonlymaps'
+  raise AssertionError(key)
+addon.Addon = FixtureAddon
+vfs = types.ModuleType('xbmcvfs'); vfs.translatePath = lambda path: path
+sys.modules['xbmcaddon'] = addon; sys.modules['xbmcvfs'] = vfs
+fixture_path = os.environ['INFINITY_READONLY_MAPS_FIXTURE']
+with old_open(fixture_path, encoding='utf-8') as source: fixture_source = source.read()
+exec(compile(fixture_source, fixture_path, 'exec'), {})
+with old_open(root+'/profile/readonlymaps/observed-readonly-maps.json') as saved:
+ observation = json.load(saved)
+assert observation['flags_source'] == 'proc_fdinfo' and observation['flags'] & os.O_ACCMODE == os.O_RDONLY
+assert observation['fdinfo_inode'] == observation['inode'] and observation['inode'] > 0
+assert observation['descriptor_target'] == '/proc/'+os.readlink('/proc/self')+'/maps'
+assert observation['regular_file'] and observation['writable'] is False
+assert observation['read_succeeded'] and observation['read_flush_close_completed']
+assert observation['proc_mount_types'] == ['proc']
+)fixture");
+    if (mode == "readonly-maps-fixture-getfl")
+      run("import fcntl\nwith old_open('/proc/self/maps') as diagnostic: fcntl.fcntl(diagnostic.fileno(),fcntl.F_GETFL)\n");
+  }
   assert(InfinityScriptPersistence::BeginWriteProtection(23, {root+"/profile"}, {root+"/cache"}));
   if (mode == "compat-save") run("assert checkpoint.poll() and checkpoint.parked\nresponse=json.loads((control/'compat-response.json').read_text()); assert response['status']=='PARTICIPANT_COMPLETE' and not response['global_safe_to_terminate']\n");
   if (mode == "compat-failure") {
@@ -333,6 +362,16 @@ baseline=old_open(shared,'rb').read()
   }
   if (mode == "sqlite-renamed") run("try: c.execute('INSERT INTO history VALUES(999)')\nexcept sqlite3.DatabaseError: pass\nelse: raise AssertionError('renamed SQLite handle retained optional authorization')\n");
   assert(InfinityScriptPersistence::CloseParticipantWrites(23));
+  if (mode == "readonly-maps-fixture-getfl") {
+    assert(!InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    const auto proof = InfinityScriptPersistence::EssentialWrites();
+    assert(std::find(proof.blockers.begin(),proof.blockers.end(),
+        "unverified_protected_writer:test.provider:service.py:unclassified_descriptor_or_working_directory_mutation") != proof.blockers.end());
+    for (const auto& why : proof.blockers) std::cout << why << std::endl;
+    std::cout << "PASS fixture F_GETFL negative control retains descriptor guard" << std::endl;
+    std::_Exit(0);
+  }
   if(mode=="readonly-proc-user-sync-failure" || mode=="writable-proc-real-write" ||
      mode=="readonly-proc-override" || mode=="writable-reader-retarget") {
     assert(!InfinityScriptPersistence::SealEssentialWrites(23));
@@ -497,6 +536,7 @@ def main():
     parser.add_argument('--ambient-library',type=Path)
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--case',action='append',help='Run selected named cases locally; CI defaults to every case')
+    parser.add_argument('--readonly-maps-fixture',type=Path,help='Also exercise the exact disposable Android fixture and its descriptor-control negative control')
     args=parser.parse_args()
     runtime=HERE/'runtime'
     observer=(runtime/'observer.py').read_text()
@@ -530,6 +570,9 @@ def main():
         cases+=['readonly-proc-close','readonly-proc-flush','readonly-proc-late','readonly-regular-input',
                 'readonly-proc-user-sync-failure','writable-proc-real-write','readonly-proc-override',
                 'readonly-proc-writable-retarget','writable-reader-retarget']
+        if args.readonly_maps_fixture:
+            env['INFINITY_READONLY_MAPS_FIXTURE']=str(args.readonly_maps_fixture.resolve())
+            cases+=['readonly-maps-fixture','readonly-maps-fixture-getfl']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

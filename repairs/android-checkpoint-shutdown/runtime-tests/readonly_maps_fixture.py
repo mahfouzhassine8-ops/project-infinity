@@ -3,7 +3,6 @@
 Exercise the exact ordinary Python read/flush/close that failed on TEST2.
 All receipts below are observations, never checkpoint/termination authority.
 """
-import fcntl
 import json
 import os
 import stat
@@ -14,7 +13,14 @@ result = {"addon": xbmcaddon.Addon().getAddonInfo("id"), "pid": os.getpid()}
 with open('/proc/self/maps', encoding='utf-8') as maps:
     descriptor = maps.fileno()
     identity = os.fstat(descriptor)
-    result.update(descriptor=descriptor, flags=fcntl.fcntl(descriptor, fcntl.F_GETFL),
+    # Observe kernel flags without issuing a descriptor-control audit event.
+    # The production guard deliberately treats unclassified fcntl calls as
+    # unknown effects; diagnostic instrumentation must not add one itself.
+    with open('/proc/self/fdinfo/' + str(descriptor), encoding='utf-8') as info:
+        fields = dict(line.rstrip().split(':', 1) for line in info if ':' in line)
+    assert int(fields['ino']) == identity.st_ino
+    result.update(descriptor=descriptor, flags=int(fields['flags'], 8),
+                  flags_source='proc_fdinfo', fdinfo_inode=int(fields['ino']),
                   mode=maps.mode, writable=maps.writable(),
                   descriptor_target=os.readlink('/proc/self/fd/' + str(descriptor)),
                   device=identity.st_dev, inode=identity.st_ino, stat_mode=identity.st_mode,

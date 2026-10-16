@@ -1,0 +1,56 @@
+{
+  "scope": "production native Python observer and C entry hooks, pinned CPython 3.11",
+  "results": [
+    {
+      "case": "readonly-proc-close",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=217224 mode=33060 filesystem=9fa0\nPASS readonly-proc-close; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "readonly-proc-flush",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=217234 mode=33060 filesystem=9fa0\nPASS readonly-proc-flush; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "readonly-proc-user-sync-failure",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=209775 mode=33060 filesystem=9fa0\nprotected_durability_failed:/tmp/essential-native-di15bcj7/readonly-proc-user-sync-failure/profile/state\nPASS genuine/unknown write durability still fails closed: readonly-proc-user-sync-failure\n",
+      "stderr": ""
+    },
+    {
+      "case": "writable-proc-real-write",
+      "exit_code": 0,
+      "stdout": "protected_durability_failed:/proc/58811/comm\nPASS genuine/unknown write durability still fails closed: writable-proc-real-write\n",
+      "stderr": ""
+    },
+    {
+      "case": "readonly-proc-override",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=209785 mode=33060 filesystem=9fa0\nprotected_durability_failed:/proc/58812/maps\nPASS genuine/unknown write durability still fails closed: readonly-proc-override\n",
+      "stderr": ""
+    },
+    {
+      "case": "writable-reader-retarget",
+      "exit_code": 0,
+      "stdout": "unflushed_protected_buffer:1:native-buffer:139747327089008\nunflushed_protected_buffer:1:native-buffer:139747329063424\nPASS genuine/unknown write durability still fails closed: writable-reader-retarget\n",
+      "stderr": ""
+    },
+    {
+      "case": "readonly-maps-fixture",
+      "exit_code": 0,
+      "stdout": "PASS readonly-maps-fixture; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "readonly-maps-fixture-getfl",
+      "exit_code": 0,
+      "stdout": "unverified_protected_writer:test.provider:service.py:unclassified_descriptor_or_working_directory_mutation\nPASS fixture F_GETFL negative control retains descriptor guard\n",
+      "stderr": ""
+    }
+  ],
+  "all_passed": true,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}
