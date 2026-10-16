@@ -89,3 +89,7 @@ It waits for genuine current-process core initialization while requiring
 unready services and actual pending native observers. The existing cold
 stress remains recorded as failed. No engine changes, repeated green tests,
 new signer, APK promotion or final lock are part of this comparison.
+
+Isolated comparison **38963791371** is running from `ccf1a103`; its workflow
+checks the 21 new host controls and saved input identities before starting the
+AVD. It cannot build or promote an APK. Its outcome is pending.

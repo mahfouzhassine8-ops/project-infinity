@@ -1658,7 +1658,7 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T20:36:09.505955+00:00",
+    "as_of_utc": "2026-10-16T20:39:55.061822+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
     "native_run_id": 38957212563,
@@ -1762,7 +1762,12 @@
       "fresh_loaded_rerun_required": false,
       "scope": "separate optional core-initialized comparison with actual pending-observer proof; original cold stress retained as failed",
       "evidence": "../android-checkpoint-shutdown/runtime-tests/evidence/rc05-startup-phase-comparison.json",
-      "status": "preparing isolated CI comparison"
+      "status": "in_progress",
+      "run_id": 38963791371,
+      "source_commit": "ccf1a10351526dc2e7fd3c7304147c974b3245db",
+      "new_phase_controls": 21,
+      "new_phase_controls_result": "passed locally; repeated in isolated CI before AVD",
+      "main_acceptance_and_promotion_gates_unchanged": true
     }
   },
   "repair_checkpoint_history": [
