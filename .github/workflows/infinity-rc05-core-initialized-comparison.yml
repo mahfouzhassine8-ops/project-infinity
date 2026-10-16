@@ -1,0 +1,169 @@
+name: Infinity 2103377 | RC05 core-initialized Close comparison
+# Diagnostic lifecycle comparison only. The original cold-start failure remains
+# recorded in run38957547396; this workflow cannot promote or lock an APK.
+on:
+  push:
+    branches: [work/infinity-2103377-essential-first-shutdown-only]
+    paths: ['.github/workflows/infinity-rc05-core-initialized-comparison.yml']
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: 'infinity-2103377-rc05-core-comparison-${{ github.sha }}', cancel-in-progress: true}
+
+jobs:
+  rc05-core-initialized-close:
+    name: Same signed RC05 bytes, core initialized, services still loading
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Verify lifecycle comparison controls
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_phase_boundary.py
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Verify the exact saved native, producer job and input artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,urllib.request
+          from pathlib import Path
+          root=Path('comparison-input-evidence');root.mkdir()
+          def fetch(path):
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+path,
+                  headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=40) as response:return json.load(response)
+          native=fetch('/actions/runs/38957212563')
+          assert native['head_sha']=='92b5be7892a3a70f6a8daad2e235f77a9feaa7b8'
+          assert native['status']=='completed' and native['conclusion']=='success'
+          producer=fetch('/actions/runs/38957547396')
+          assert producer['head_sha']=='2f28cdf753cf7824aa8816f7fb3de43fd817137a'
+          # That complete run failed its original cold Close. Reuse only the
+          # individually successful 308-test/signing producer and its exact APK.
+          jobs=fetch('/actions/runs/38957547396/jobs?per_page=100&filter=all')['jobs']
+          saved=next(job for job in jobs if job['id']==117164106023)
+          assert saved['status']=='completed' and saved['conclusion']=='success'
+          artifact=fetch('/actions/artifacts/12072118437')
+          assert artifact['name']=='Infinity-2103377-Essential-First-Internal-Acceptance-Inputs'
+          assert artifact['workflow_run']['id']==38957547396 and not artifact['expired']
+          assert artifact['workflow_run']['head_sha']==producer['head_sha']
+          assert artifact['digest']=='sha256:4c68a2191ff65eb3f544c6a4a8081168df70aee929cbcb91bc05f3bfcb6aa888'
+          identity=dict(native_run=38957212563,native_source=native['head_sha'],
+              reused_producer_run=38957547396,reused_producer_job=saved['id'],
+              android_source=producer['head_sha'],input_artifact=artifact['id'],input_artifact_digest=artifact['digest'],
+              original_cold_failure_preserved=True,comparison_only=True,apk_promotion_authorized=False)
+          (root/'REUSED-INPUT-IDENTITY.json').write_text(json.dumps(identity,indent=2)+'\n')
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38957547396
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          github-token: ${{ github.token }}
+          path: .
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Verify reused APK, embedded engine, signer and all 308 saved results before AVD
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,re,subprocess,zipfile
+          from pathlib import Path
+          root=Path('essential-fold-test')
+          candidate=root/'Infinity-2103377-Essential-First-Internal-Probe.apk'
+          baseline=Path('accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk')
+          expected='5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb'
+          signer='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
+          assert sha(candidate)==expected
+          assert sha(baseline)=='4ec1e3b2cabb595d228bc07bae2c6b3073c5af12822c8e40b1ec505b00865bf8'
+          proof=json.loads((root/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').read_text())
+          assert proof['apk_sha256']==expected and proof['file']==candidate.name
+          assert proof['native_source_commit']=='92b5be7892a3a70f6a8daad2e235f77a9feaa7b8'
+          assert proof['android_source_commit']=='2f28cdf753cf7824aa8816f7fb3de43fd817137a'
+          assert proof['same_permanent_signer']==signer
+          assert proof['package']=='com.projectinfinity.kodi' and proof['version_code']==2103377
+          assert proof['version_name']=='1.0.9-Essential-First-TEST4-RC05'
+          assert proof['apk_deliverable'] is False and proof['final_lock_authorized'] is False
+          assert proof['java_regressions_verified'] and proof['java_producer_adapters_verified']
+          assert proof['signed_test2_baseline_preserved'] and proof['signed_test3_baseline_preserved']
+          with zipfile.ZipFile(candidate) as archive:
+              engine=hashlib.sha256(archive.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+              assert engine==proof['native_packaged_sha256']=='718954b49399f2790b84c1ae649eb7dee1a14c50463aee7b53186444fb402187'
+          regression=json.loads((root/'JAVA-REGRESSION-VERIFICATION.json').read_text())
+          for key,count in (('original_274',274),('new_save_cases',26),('completion_race_cases',8)):
+              assert regression[key]==dict(tests=count,failures=0,errors=0,skipped=0)
+          assert regression['original_test_sources_unchanged'] is True
+          bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
+          for label,apk in (('candidate',candidate),('baseline',baseline)):
+              cert=subprocess.check_output([str(bt/'apksigner'),'verify','--verbose','--print-certs',str(apk)],text=True,stderr=subprocess.STDOUT)
+              assert signer in cert.lower()
+              for scheme in (2,3):assert re.search(r'Verified using v'+str(scheme)+r' scheme[^\n]+true',cert)
+              Path('comparison-input-evidence',label+'-certificate.txt').write_text(cert)
+          badging=subprocess.check_output([str(bt/'aapt'),'dump','badging',str(candidate)],text=True)
+          assert "package: name='com.projectinfinity.kodi' versionCode='2103377'" in badging
+          assert proof['version_name'] in badging
+          result=dict(apk_sha256=expected,embedded_engine_sha256=engine,permanent_signer=signer,
+              saved_308_results_verified=True,apk_rebuilt=False,native_rebuilt=False,comparison_only=True)
+          Path('comparison-input-evidence/REUSED-APK-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n')
+          PY
+      - name: Install emulator runtime library before executable verification
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+      - name: Prepare verified emulator with bounded invalid-ZIP retry
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out comparison-emulator-setup-evidence
+      - name: Enable disposable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - name: Compare core-initialized Close with the recorded cold-start failure
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-rc05-core-initialized
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --scenario early --early-boundary core-initialized --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out observer-upgrade-core-initialized-evidence
+      - name: Verify comparison identity without promoting APK bytes
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('observer-upgrade-core-initialized-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
+          assert report['scenario']=='early' and report['early_boundary']=='core-initialized'
+          assert report['candidate_apk_sha256']=='5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb'
+          assert report['passed'] is True
+          PY
+      - name: Retain isolated comparison outcome even on setup or Close failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-RC05-Core-Initialized-Comparison-Evidence
+          path: observer-upgrade-core-initialized-evidence/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
+      - name: Retain separate reused-input and emulator setup proof
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-RC05-Core-Initialized-Comparison-Input-Setup-Evidence
+          path: |
+            comparison-input-evidence/
+            comparison-emulator-setup-evidence/
+          retention-days: 90
+          if-no-files-found: warn
