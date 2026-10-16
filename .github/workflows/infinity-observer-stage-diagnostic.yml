@@ -1,0 +1,327 @@
+name: Infinity 2103377 | INTERNAL observer-stage diagnostic
+# Isolated native-only diagnostic. No existing factory, acceptance or promotion
+# path is changed. It cannot produce an approved Fold test candidate or lock.
+on:
+  push:
+    branches: [work/infinity-2103377-essential-first-shutdown-only]
+    paths: ['.github/workflows/infinity-observer-stage-diagnostic.yml']
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: 'infinity-2103377-internal-observer-stage-${{ github.sha }}', cancel-in-progress: true}
+
+jobs:
+  await-native-live-stage:
+    name: Wait only for the exact full native workflow; no APK work before success
+    runs-on: ubuntu-22.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Await exact 38967896318 native completion for at most one hour
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,sys,time,urllib.request
+          from pathlib import Path
+          sys.path.insert(0,'repairs/android-checkpoint-shutdown/runtime-tests')
+          import package_observer_stage_diagnostic as pins
+          pins.pinned_native()
+          if (pins.NATIVE_RUN,pins.NATIVE_SOURCE)!=(38967896318,'e78c769d99b626b47292fb2bcac0d09661735fc6'):
+              raise RuntimeError('Workflow/packager native pins differ')
+          root=Path('await-native-evidence');root.mkdir()
+          deadline=time.monotonic()+3600
+          state=dict(native_run=pins.NATIVE_RUN,native_source=pins.NATIVE_SOURCE,
+              apk_downloaded=False,apk_assembled=False,apk_signed=False,polls=0,full_native_workflow_green=False)
+          try:
+              while True:
+                  remaining=deadline-time.monotonic()
+                  if remaining<=0:raise RuntimeError('Pinned full native workflow did not complete within one hour')
+                  request=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+
+                      '/actions/runs/'+str(pins.NATIVE_RUN),headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                      'Accept':'application/vnd.github+json'})
+                  with urllib.request.urlopen(request,timeout=min(30,remaining)) as response:run=json.load(response)
+                  state.update(polls=state['polls']+1,status=run['status'],conclusion=run['conclusion'],head_sha=run['head_sha'])
+                  if run['head_sha']!=pins.NATIVE_SOURCE:raise RuntimeError('Pinned native source mismatch')
+                  if run['status']=='completed':
+                      if run['conclusion']!='success':raise RuntimeError('Pinned complete native workflow failed: '+str(run['conclusion']))
+                      state['full_native_workflow_green']=True
+                      print('Exact full native workflow passed; isolated packaging may now begin.',flush=True)
+                      break
+                  remaining=deadline-time.monotonic()
+                  if remaining<=0:raise RuntimeError('Pinned full native workflow did not complete within one hour')
+                  print('Waiting for exact native workflow',pins.NATIVE_RUN,pins.NATIVE_SOURCE,run['status'],flush=True)
+                  time.sleep(min(30,remaining))
+          except Exception as error:
+              state['error']=str(error)
+              raise
+          finally:
+              (root/'EXACT-NATIVE-WAIT.json').write_text(json.dumps(state,indent=2)+'\n')
+          PY
+      - name: Retain exact wait outcome without APK inputs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Native-Wait
+          path: await-native-evidence/
+          retention-days: 90
+          if-no-files-found: warn
+
+  internal-diagnostic-input:
+    name: Reuse RC05 Java bytes and saved 308 proof; replace only diagnostic engine
+    needs: await-native-live-stage
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      NDK_VER: 21.4.7075529
+    outputs:
+      artifact-id: ${{ steps.internal-input.outputs.artifact-id }}
+      artifact-digest: ${{ steps.internal-input.outputs.artifact-digest }}
+      apk-sha256: ${{ steps.identity.outputs.apk_sha256 }}
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Verify exact full-green native run and individually successful RC05 producer before download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,sys,urllib.request
+          from pathlib import Path
+          sys.path.insert(0,'repairs/android-checkpoint-shutdown/runtime-tests')
+          import package_observer_stage_diagnostic as pins
+          pins.pinned_native()
+          if (pins.NATIVE_RUN,pins.NATIVE_SOURCE)!=(38967896318,'e78c769d99b626b47292fb2bcac0d09661735fc6'):
+              raise RuntimeError('Workflow/packager native pins differ')
+          root=Path('internal-diagnostic-input-evidence');root.mkdir()
+          def fetch(path):
+              request=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+path,
+                  headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(request,timeout=40) as response:return json.load(response)
+          native=fetch('/actions/runs/'+str(pins.NATIVE_RUN))
+          if native['head_sha']!=pins.NATIVE_SOURCE or native['status']!='completed' or native['conclusion']!='success':
+              raise RuntimeError('Pinned COMPLETE native workflow must be green before downloading or signing')
+          producer=fetch('/actions/runs/38957547396')
+          if producer['head_sha']!=pins.RC05_SOURCE:raise RuntimeError('RC05 producer source mismatch')
+          jobs=fetch('/actions/runs/38957547396/jobs?per_page=100&filter=all')['jobs']
+          saved=next(job for job in jobs if job['id']==117164106023)
+          if saved['status']!='completed' or saved['conclusion']!='success':raise RuntimeError('Saved 308/signing job not green')
+          artifact=fetch('/actions/artifacts/12072118437')
+          if not (artifact['name']=='Infinity-2103377-Essential-First-Internal-Acceptance-Inputs' and
+                  artifact['workflow_run']['id']==38957547396 and not artifact['expired'] and
+                  artifact['workflow_run']['head_sha']==pins.RC05_SOURCE and
+                  artifact['digest']=='sha256:4c68a2191ff65eb3f544c6a4a8081168df70aee929cbcb91bc05f3bfcb6aa888'):
+              raise RuntimeError('Exact saved RC05 input artifact mismatch')
+          native_artifacts=fetch('/actions/runs/'+str(pins.NATIVE_RUN)+'/artifacts?per_page=100')['artifacts']
+          matching=[item for item in native_artifacts if item['name']=='Infinity-2103377-Essential-First-Native-Evidence']
+          if len(matching)!=1 or matching[0]['expired'] or not matching[0].get('digest','').startswith('sha256:'):
+              raise RuntimeError('Pinned native evidence artifact absent, ambiguous or expired')
+          identity=dict(native_run=pins.NATIVE_RUN,native_source=pins.NATIVE_SOURCE,native_full_workflow_green=True,
+              native_artifact_id=matching[0]['id'],native_artifact_digest=matching[0]['digest'],
+              reused_rc05_run=38957547396,reused_rc05_job=saved['id'],reused_rc05_source=pins.RC05_SOURCE,
+              rc05_input_artifact_id=12072118437,rc05_input_artifact_digest=artifact['digest'],
+              original_cold_and_core_failure_preserved=True,internal_diagnostic_only=True,
+              apk_promotion_authorized=False,final_lock_authorized=False)
+          (root/'PINNED-INTERNAL-DIAGNOSTIC-INPUTS.json').write_text(json.dumps(identity,indent=2)+'\n')
+          PY
+      - name: Run isolated diagnostic packaging mutation controls
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/test_package_observer_stage_diagnostic.py
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38957547396
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          github-token: ${{ github.token }}
+          path: rc05-inputs
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38967896318
+          name: Infinity-2103377-Essential-First-Native-Evidence
+          github-token: ${{ github.token }}
+          path: live-stage-native-evidence
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Permanently sign INTERNAL diagnostic with all RC05 non-engine bytes preserved
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/package_observer_stage_diagnostic.py package \
+            --rc05-inputs rc05-inputs --native live-stage-native-evidence --out internal-observer-stage-diagnostic
+      - name: Recheck signed internal payload and expose immutable APK identity
+        id: identity
+        run: |
+          set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/package_observer_stage_diagnostic.py verify \
+            --rc05-inputs rc05-inputs --out internal-observer-stage-diagnostic
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          proof=json.loads(Path('internal-observer-stage-diagnostic/INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-PRESERVATION.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('apk_sha256='+proof['apk_sha256']+'\n')
+          PY
+      - name: Retain immutable INTERNAL diagnostic input; no Fold promotion
+        id: internal-input
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          path: |
+            internal-observer-stage-diagnostic/
+            rc05-inputs/native-evidence/installed-addons/
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
+      - name: Preserve input/setup evidence independently on every outcome
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Packaging-Evidence
+          path: |
+            internal-diagnostic-input-evidence/
+            internal-observer-stage-diagnostic/*.json
+            internal-observer-stage-diagnostic/*.txt
+          retention-days: 90
+          if-no-files-found: warn
+
+  internal-core-phase-comparison:
+    name: INTERNAL native-stage diagnostic, TEST3 upgrade plus 37 loaded services
+    needs: internal-diagnostic-input
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Verify unchanged phase-boundary controls
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_phase_boundary.py
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          path: .
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38957547396
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          github-token: ${{ github.token }}
+          path: rc05-recheck
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Verify signed diagnostic and exact preserved Java payload before AVD
+        env:
+          EXPECTED_APK_SHA256: ${{ needs.internal-diagnostic-input.outputs.apk-sha256 }}
+          EXPECTED_ARTIFACT_ID: ${{ needs.internal-diagnostic-input.outputs.artifact-id }}
+          EXPECTED_ARTIFACT_DIGEST: ${{ needs.internal-diagnostic-input.outputs.artifact-digest }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/package_observer_stage_diagnostic.py verify \
+            --rc05-inputs rc05-recheck --out internal-observer-stage-diagnostic
+          python3 - <<'PY'
+          import hashlib,json,os,re,subprocess,urllib.request
+          from pathlib import Path
+          root=Path('internal-diagnostic-comparison-input-evidence');root.mkdir()
+          proof=json.loads(Path('internal-observer-stage-diagnostic/INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-PRESERVATION.json').read_text())
+          if proof['apk_sha256']!=os.environ['EXPECTED_APK_SHA256']:raise RuntimeError('Producer APK identity changed')
+          request=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+
+              '/actions/artifacts/'+os.environ['EXPECTED_ARTIFACT_ID'],headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+              'Accept':'application/vnd.github+json'})
+          with urllib.request.urlopen(request,timeout=40) as response:artifact=json.load(response)
+          if not (artifact['workflow_run']['id']==int(os.environ['GITHUB_RUN_ID']) and
+                  artifact['workflow_run']['head_sha']==os.environ['GITHUB_SHA'] and not artifact['expired'] and
+                  artifact['name']=='Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs' and
+                  artifact['digest']=='sha256:'+os.environ['EXPECTED_ARTIFACT_DIGEST'].removeprefix('sha256:')):
+              raise RuntimeError('Internal input artifact identity mismatch')
+          baseline=Path('accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk')
+          if hashlib.sha256(baseline.read_bytes()).hexdigest()!='4ec1e3b2cabb595d228bc07bae2c6b3073c5af12822c8e40b1ec505b00865bf8':
+              raise RuntimeError('TEST3 baseline digest mismatch')
+          bt=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
+          cert=subprocess.check_output([str(bt/'apksigner'),'verify','--verbose','--print-certs',str(baseline)],text=True,stderr=subprocess.STDOUT)
+          if 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' not in cert.lower():raise RuntimeError('TEST3 signer mismatch')
+          for scheme in (2,3):
+              if not re.search(r'Verified using v'+str(scheme)+r' scheme[^\n]+true',cert):raise RuntimeError('TEST3 signing scheme missing')
+          (root/'TEST3-certificate.txt').write_text(cert)
+          (root/'INTERNAL-COMPARISON-INPUTS.json').write_text(json.dumps(dict(apk_sha256=proof['apk_sha256'],
+              embedded_engine_sha256=proof['native_packaged_sha256'],artifact_id=artifact['id'],artifact_digest=artifact['digest'],
+              saved_308_proof_reused=True,all_non_engine_payload_byte_identical=True,internal_diagnostic_only=True,
+              apk_promotion_authorized=False,final_lock_authorized=False),indent=2)+'\n')
+          PY
+      - name: Install emulator runtime library before executable verification
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+      - name: Prepare verified emulator with bounded invalid-ZIP retry
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out internal-diagnostic-emulator-setup-evidence
+      - name: Enable disposable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - name: Capture precise observer initialization under real early Close
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-internal-observer-stage
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --scenario early --early-boundary core-initialized --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk internal-observer-stage-diagnostic/Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC.apk --installed-addons rc05-inputs/native-evidence/installed-addons --out internal-observer-stage-comparison-evidence
+      - name: Verify comparison uses the exact internally signed APK; never promote
+        env:
+          EXPECTED_APK_SHA256: ${{ needs.internal-diagnostic-input.outputs.apk-sha256 }}
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads(Path('internal-observer-stage-comparison-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
+          if report['scenario']!='early' or report['early_boundary']!='core-initialized':raise RuntimeError('Wrong phase comparison')
+          if report['candidate_apk_sha256']!=os.environ['EXPECTED_APK_SHA256']:raise RuntimeError('Comparison APK digest mismatch')
+          if report['passed'] is not True:raise RuntimeError('Internal comparison did not pass')
+          PY
+      - name: Preserve runtime outcome and complete failure diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Comparison-Evidence
+          path: internal-observer-stage-comparison-evidence/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
+      - name: Preserve independent input and emulator setup evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Comparison-Setup
+          path: |
+            internal-diagnostic-comparison-input-evidence/
+            internal-diagnostic-emulator-setup-evidence/
+          retention-days: 90
+          if-no-files-found: warn
