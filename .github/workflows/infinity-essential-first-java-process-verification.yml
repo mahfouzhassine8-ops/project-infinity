@@ -39,7 +39,7 @@ jobs:
           python3 repairs/essential-first-2103377/test_runtime_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
             --readonly-maps-fixture repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py \
-            --case readonly-maps-fixture --case readonly-maps-fixture-getfl \
+            --case readonly-maps-fixture --case readonly-maps-fixture-getfl --case readonly-maps-fixture-noino \
             --case readonly-proc-close --case readonly-proc-flush \
             --case readonly-proc-user-sync-failure --case writable-proc-real-write \
             --case readonly-proc-override --case writable-reader-retarget \
