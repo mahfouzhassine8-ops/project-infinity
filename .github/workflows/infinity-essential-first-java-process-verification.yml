@@ -196,7 +196,7 @@ jobs:
       - name: Enable disposable emulator acceleration
         run: |
           sudo chmod 666 /dev/kvm
-      - name: Observe real ARM64 engine close and preserved-data reopening
+      - name: Verify corrected TEST4 production Close and preserved-data reopening
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
