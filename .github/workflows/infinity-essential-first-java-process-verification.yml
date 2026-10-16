@@ -89,7 +89,7 @@ jobs:
           python3 repairs/essential-first-2103377/java_save_package.py java \
             --parent locked-rails/Infinity-2103377-Rails-Handoff-RC1-Signed-Test.apk \
             --source verified-android/source --gradle-dir android-gradle --out android-donor-evidence \
-            --parser javaparser-core.jar --green green-234
+            --parser javaparser-core.jar --green green-234/recents-evidence
           keytool -genkeypair -v -keystore "$RUNNER_TEMP/infinity-donor-temporary.keystore" \
             -storepass android -keypass android -alias androiddebugkey -keyalg RSA \
             -keysize 2048 -validity 1 -dname "CN=Temporary Java Donor" >/dev/null 2>&1
