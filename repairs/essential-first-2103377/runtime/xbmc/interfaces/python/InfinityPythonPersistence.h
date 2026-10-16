@@ -1,6 +1,7 @@
 #pragma once
 // Python.h is included by the invoker before this header.
 #include "InfinityPythonPersistenceSource.h"
+#include "InfinityReadonlyPlatformCommand.h"
 #include "platform/android/activity/InfinityScriptPersistence.h"
 #include "platform/android/activity/InfinityProtectedWrites.h"
 #include "dbwrappers/InfinitySQLiteVFS.h"
@@ -252,7 +253,8 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
     return true;
   }
 
-  bool unameExecutable=executableRaw=="uname" || executableName=="/system/bin/uname";
+  bool unameExecutable=executableRaw=="uname" || executableName=="/system/bin/uname" ||
+      InfinityReadonlyPlatformCommand::VendorUname(executableName.c_str());
 #if defined(INFINITY_SCRIPT_OBSERVER_HOST)
   unameExecutable = unameExecutable || executableName=="/usr/bin/uname" || executableName=="/bin/uname";
 #endif

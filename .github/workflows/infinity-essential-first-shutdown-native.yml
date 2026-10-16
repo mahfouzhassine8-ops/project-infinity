@@ -54,6 +54,9 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y libsqlite3-dev libssl-dev
           mkdir -p shutdown-rc1-host
+          sudo unshare --mount --propagation private python3 \
+            repairs/essential-first-2103377/test_vendor_uname.py \
+            --out shutdown-rc1-host/vendor-uname-identity.json
           # GitHub's VM mounts /sys writable. Give this host-only test a real
           # read-only bind mount in a private namespace, then drop back to the
           # original runner UID. The production statvfs proof is never mocked.
