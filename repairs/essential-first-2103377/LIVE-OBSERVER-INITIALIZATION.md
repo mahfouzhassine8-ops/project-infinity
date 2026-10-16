@@ -74,3 +74,8 @@ observer wait is still unresolved; no candidate is promoted or locked.
 The failed emulator log used `skin.estuary`, with 37 controlled services. It is
 a lifecycle/observer control, not a clone of the Fold's Diggz ecosystem and
 `skin.infinity.diggz` 1.0.5.223 configuration.
+
+Packaging correction `ecef6e98` is saved. Retry **38973572640**, workflow source
+`de0560d5`, is in progress and reuses native **38967896318 / e78c769d**.
+Only CI work remains at this handoff; there is no background assistant monitoring.
+The user may monitor this queued run. No shutdown success or Fold-ready claim.

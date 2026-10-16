@@ -1658,7 +1658,7 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T22:03:51.614772+00:00",
+    "as_of_utc": "2026-10-16T22:05:40.723192+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
     "native_run_id": 38967896318,
@@ -1799,7 +1799,7 @@
       "local_result": "all passed",
       "independent_review": "approved for diagnostic build; not shutdown acceptance",
       "native_run_id": 38967896318,
-      "android_run_id": 38968517075,
+      "android_run_id": 38973572640,
       "apk_deliverable": false,
       "native_source_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
       "native_host_result": "success: full host workflow",
@@ -1808,18 +1808,19 @@
       "packaging_mutation_controls": 30,
       "packaging_mutation_controls_result": "all 30 passed normally and Python -O under pinned 3.11.7",
       "production_acceptance_and_promotion_gates_unchanged": true,
-      "android_source_commit": "79458c621ea6c7ff5d8c4a56e0dd8a3983e9dfe8",
-      "pipeline_status": "38968517075 failed before signing/AVD on host cache timestamps; targeted inventory correction locally verified; workflow retry next",
+      "android_source_commit": "de0560d599d4100d4e1b58b41cf5a4d5f7be508e",
+      "pipeline_status": "38973572640 in progress: retry only internal packaging and Android capture using unchanged green native 38967896318",
       "apk_assembled": false,
       "apk_signed": false,
-      "android_runtime_result": "skipped: packaging failed before Android launch",
+      "android_runtime_result": "pending in retry; prior 38968517075 never launched Android",
       "native_complete_workflow_result": "success",
       "packaging_failure_evidence": "repairs/android-checkpoint-shutdown/runtime-tests/evidence/live-stage-packaging-38968517075.json",
       "packaging_failure_run": 38968517075,
       "packaging_failure_job": 117209874374,
       "real_artifact_preflight": "passed: saved APK/308 proof, full native proof and live markers, exact staged headers, 22 unchanged installed files, unchanged exports/JNI/NEEDED; no local signing",
       "rebuild_native_required": false,
-      "java_tests_rerun_required": false
+      "java_tests_rerun_required": false,
+      "packaging_correction_commit": "ecef6e9871c5aea9ca1f665b65a7dbe8137a60af"
     }
   },
   "repair_checkpoint_history": [
