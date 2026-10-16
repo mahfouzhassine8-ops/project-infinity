@@ -26,13 +26,14 @@ public class InfinityJavaPersistence2103377Test {
   private CountDownLatch release;
   private static ExecutorService preferences(){return ReflectionHelpers.getStaticField(InfinityJavaPersistence.class,"preferences");}
   @Before public void setup()throws Exception{
+    HostFilesystemShadow.failDirectorySync=false;HostFilesystemShadow.directorySyncs=0;
     preferences().submit(()->{}).get(10,TimeUnit.SECONDS);
     Map<?,?> active=ReflectionHelpers.getStaticField(InfinityJavaWriteBarrier.class,"active");active.clear();
     Map<?,?> failures=ReflectionHelpers.getStaticField(InfinityJavaWriteBarrier.class,"failures");failures.clear();
     InfinityJavaWriteBarrier.userEntry();
     app=RuntimeEnvironment.getApplication();ticket=UUID.randomUUID().toString();InfinityJavaPersistence.initialize(app);
   }
-  @After public void cleanup()throws Exception{if(release!=null)release.countDown();preferences().submit(()->{}).get(10,TimeUnit.SECONDS);}
+  @After public void cleanup()throws Exception{HostFilesystemShadow.failDirectorySync=false;if(release!=null)release.countDown();preferences().submit(()->{}).get(10,TimeUnit.SECONDS);}
   private File file(String name){return new File(app.getFilesDir(),name);}
   private void begin(){assertTrue(InfinityJavaWriteBarrier.begin(ticket));}
   private String seal(){return InfinityJavaWriteBarrier.sealIfReady(ticket);}
@@ -49,6 +50,13 @@ public class InfinityJavaPersistence2103377Test {
     stream.write("accepted user data".getBytes(StandardCharsets.UTF_8));assertEquals(0,target.length());
     begin();assertEquals("",seal());assertTrue(InfinityJavaWriteBarrier.pending().contains("buffered.txt"));
     stream.close();assertFalse(InfinityJavaWriteBarrier.pending(),seal().isEmpty());assertEquals("accepted user data",text(target));
+    assertTrue("Actual host directory sync was not reached",HostFilesystemShadow.directorySyncs>0);
+  }
+  @Test public void actualDirectorySyncFailureCannotProduceASuccessfulSeal()throws Exception{
+    File target=file("directory-sync-failure");OutputStream stream=new InfinityJavaPersistence.Output(target);stream.write(65);
+    begin();HostFilesystemShadow.failDirectorySync=true;
+    try{stream.close();fail("Directory fsync failure was hidden");}catch(IOException expected){}
+    assertEquals("A",text(target));assertEquals("",seal());assertTrue(InfinityJavaWriteBarrier.pending().startsWith("java_save_failed:"));
   }
   @Test public void acceptedQueueReservesSaveBeforeFirstFileOpen()throws Exception{
     List<Runnable> queue=new ArrayList<>();File target=file("queued.txt");

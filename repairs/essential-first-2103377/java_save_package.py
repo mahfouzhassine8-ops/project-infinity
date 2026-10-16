@@ -76,6 +76,10 @@ def stage_tests(args):
     shutil.copyfile(extra,tests/'java/com/projectinfinity/kodi'/extra.name)
     expected['java/com/projectinfinity/kodi/'+extra.name]=sha(extra)
     shutil.copyfile(HERE/'tests'/(TEST+'.java'),tests/'java/com/projectinfinity/kodi'/(TEST+'.java'))
+    shutil.copyfile(HERE/'tests'/'HostFilesystemShadow.java',tests/'java/com/projectinfinity/kodi/HostFilesystemShadow.java')
+    properties=tests/'resources/robolectric.properties'
+    assert not properties.exists(),'Preserve existing test configuration'
+    properties.write_text('shadows=com.projectinfinity.kodi.HostFilesystemShadow\n')
     names=set(json.loads((args.source.parent/'ANDROID-VERIFICATION.json').read_text())['suites'])
     names.add('com.projectinfinity.kodi.'+TEST)
     save(args.out/'JAVA-UNCHANGED-TEST-SOURCES.json',expected)
@@ -84,6 +88,7 @@ def stage_tests(args):
         f.write('''
 android { testOptions { unitTests.includeAndroidResources = true; unitTests.all {
  maxHeapSize = "3g";
+ jvmArgs '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED';
  systemProperty "cobra.evidence", rootProject.file("../android-donor-evidence/screenshots").absolutePath;
  systemProperty "cobra.clean.evidence", rootProject.file("../android-donor-evidence/runtime").absolutePath;
  testLogging { events "passed", "failed", "skipped"; exceptionFormat "full" }
@@ -98,6 +103,9 @@ def verify_tests(args):
     expected=json.loads((args.android/'JAVA-UNCHANGED-TEST-SOURCES.json').read_text())
     testroot=args.gradle_dir/'xbmc/src/test'
     for rel,digest in expected.items():assert sha(testroot/rel)==digest,rel
+    for name in (TEST+'.java','HostFilesystemShadow.java'):
+        assert sha(testroot/'java/com/projectinfinity/kodi'/name)==sha(HERE/'tests'/name),name
+    assert (testroot/'resources/robolectric.properties').read_text()=='shadows=com.projectinfinity.kodi.HostFilesystemShadow\n'
     suites={}
     for path in (args.gradle_dir/'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
         xml=ET.parse(path).getroot();name=xml.get('name');assert name not in suites
@@ -107,9 +115,10 @@ def verify_tests(args):
     totals={key:sum(row[key] for row in original.values()) for key in ('tests','failures','errors','skipped')}
     assert totals==dict(tests=274,failures=0,errors=0,skipped=0),totals
     new=suites['com.projectinfinity.kodi.'+TEST]
-    assert new['tests']>=12 and not any(new[k] for k in ('failures','errors','skipped')),new
+    assert new==dict(tests=20,failures=0,errors=0,skipped=0),new
     save(args.out/'JAVA-REGRESSION-VERIFICATION.json',dict(original_274=totals,new_save_cases=new,suites=suites,
-        original_test_sources_unchanged=True,physical_fold_verified=False))
+        original_test_sources_unchanged=True,host_directory_sync='real host FileChannel.force; test-only OS adapter',
+        host_os_adapter_sha256=sha(HERE/'tests'/'HostFilesystemShadow.java'),physical_fold_verified=False))
 
 def verify_sources(args):
     proof=json.loads((args.android/'JAVA-PRODUCER-TRANSFORMATIONS.json').read_text())
