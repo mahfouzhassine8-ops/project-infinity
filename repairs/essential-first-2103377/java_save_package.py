@@ -19,7 +19,7 @@ import zipfile
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
-NATIVE='66bdcd715bc95354eec672caf1a74038bbd98f44'
+NATIVE='77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61'
 TEST2_SHA='172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807'
 PARSER_SHA='3e3e0c65d57d12797dbead3df1ebb28e7583737d0cd1f2a898dba6febd50ab88'
 EXTRA=('InfinityCloseNativeLease','InfinityJavaWriteBarrier','InfinityJavaPersistence')

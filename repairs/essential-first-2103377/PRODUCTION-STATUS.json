@@ -17,7 +17,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "Read-only-input native commit 66bdcd715bc95354eec672caf1a74038bbd98f44 passed full ARM64 build and all native host gates in 38859304335. Reused unchanged after correcting only the disposable diagnostic fixture.",
+    "current_corrections": "Read-only-input build 38859304335 passed. Repository continuation source 77a6fc13 now requires full native run 38867886900 and complete matched Android acceptance; no new pass inferred.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -70,6 +70,14 @@
       "native_cpython_cases": 61,
       "native_unstripped_sha256": "68a5d90c78c22fac4f6d5b31267bd11938e5aa989d12185c635b5f5e04802331",
       "native_packaged_sha256": "d594666547a0e536d9d76c545d8ce121379180d121dc3ec58073652ac7a6bcae"
+    },
+    "repository_continuation_run": {
+      "run": 38867886900,
+      "commit": "77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61",
+      "status": "in_progress",
+      "result": null,
+      "local_production_repository_cases": 12,
+      "local_production_coordinator_cases": 18
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
@@ -487,8 +495,8 @@
   "latest_physical_blocker": "native_admission: protected_durability_failed:/proc/15237/maps",
   "android_verification_scope": "Internal disposable emulator only. Latest TEST3 run confirms corrected read-only input and native durable seal, but complete shutdown fails at database owner; no physical acceptance.",
   "test3_plan": {
-    "native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
-    "native_run": 38859304335,
+    "native_commit": "77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61",
+    "native_run": 38867886900,
     "all_308_tests_preserved": true,
     "permanent_signer_unchanged": true,
     "test2_baseline_sha256": "172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807",
@@ -557,9 +565,11 @@
       "evidence/runtime/repository-continuation-local.json",
       "evidence/runtime/repository-coordinator-local.json"
     ],
-    "full_native_build": "Required for new source; pending launch",
+    "full_native_build": "In progress; full compile and every native check required before matched Android packaging",
     "matched_android_acceptance": "Required after green full native build",
     "physical_acceptance": false,
-    "locked": false
+    "locked": false,
+    "native_source_commit": "77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61",
+    "full_native_run": 38867886900
   }
 }
