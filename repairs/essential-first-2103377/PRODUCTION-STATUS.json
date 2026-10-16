@@ -1658,7 +1658,7 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T21:12:54.768428+00:00",
+    "as_of_utc": "2026-10-16T21:17:44.553124+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
     "native_run_id": 38957212563,
@@ -1795,9 +1795,16 @@
       "source_contracts": 16,
       "local_result": "all passed",
       "independent_review": "approved for diagnostic build; not shutdown acceptance",
-      "native_run_id": null,
+      "native_run_id": 38967896318,
       "android_run_id": null,
-      "apk_deliverable": false
+      "apk_deliverable": false,
+      "native_source_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
+      "native_host_result": "success: full host workflow",
+      "full_arm64_build": "in_progress",
+      "android_diagnostic_preparation": "reviewed native-only internal packaging; reuses exact RC05 non-engine payload and saved 308 results; gated on complete native success",
+      "packaging_mutation_controls": 21,
+      "packaging_mutation_controls_result": "passed normally and Python -O",
+      "production_acceptance_and_promotion_gates_unchanged": true
     }
   },
   "repair_checkpoint_history": [

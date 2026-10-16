@@ -44,3 +44,10 @@ cases, five preserved Close-race cases, eight progress cases, eleven actual nati
 write controls and sixteen strict source contracts. A blocked real durability
 write still refuses sealing and authorization. Independent review approved only
 a diagnostic build. Required compiled binary markers now include the live bridge.
+
+Diagnostic source `e78c769d99b626b47292fb2bcac0d09661735fc6` is saved. Native
+workflow **38967896318** passed its complete host job and is rebuilding ARM64.
+The isolated Android diagnostic will reuse saved RC05 Java/manifest/assets and
+308-test proof, replace only `libkodi.so`, and re-sign with the existing identity.
+It is gated on full native success and has 21 passing payload/signing controls.
+It cannot promote a Fold APK or change the existing acceptance gates.
