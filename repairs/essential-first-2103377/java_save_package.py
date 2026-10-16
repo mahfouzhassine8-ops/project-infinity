@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
-NATIVE='a543811a0b3b54ad6a0b1cdd2940a5e7d33aba83'
+NATIVE='d69e4d267d4a7f8051fdc1ae8996e856ef51063c'
 PARSER_SHA='3e3e0c65d57d12797dbead3df1ebb28e7583737d0cd1f2a898dba6febd50ab88'
 EXTRA=('InfinityCloseNativeLease','InfinityJavaWriteBarrier','InfinityJavaPersistence')
 TEST='InfinityJavaPersistence2103377Test'
@@ -156,5 +156,16 @@ def main():
                    java_regressions_verified=True,java_producer_adapters_verified=True,apk_deliverable=False)
         row.pop('known_fail_closed_native_encoder_route',None);row.pop('unverified_other_native_descriptor_aliases',None)
         save(receipt,row);(args.out/'SHA256SUMS').write_text(row['apk_sha256']+'  '+final.name+'\n')
+        (args.out/'TEST-LIMITATIONS.md').write_text(
+            '# Infinity Essential-First shutdown TEST2\n\n'
+            'This internal APK uses the established permanent signing identity. '
+            'The full native and Java save checks must pass before packaging. '
+            'Actual Android engine death, whole-package death and saved-data reopening '
+            'must pass before this APK can be offered for physical Fold testing. '
+            'Physical Fold acceptance is still required. This APK is not locked.\n\n'
+            'Essential write failures continue to refuse shutdown. Existing APK '
+            'assets, resources and non-engine native libraries remain byte-identical. '
+            'Update in place with the same signing identity; never uninstall or '
+            'clear application data for this test.\n')
 
 if __name__=='__main__':main()
