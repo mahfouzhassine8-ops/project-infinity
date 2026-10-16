@@ -1,7 +1,7 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Approved Essential-First architecture,308 regressions,permanent signing and all prior protections retained. Full native38899217848/402dfe75 passed. Android38899820197 passed308 and fresh production save/Close/death/reopen plus loaded37-service TEST3 baseline, then failed its pre-launch post-install process-name assertion. Actual rejected PID/name was not retained. Verification-only observation correction73de91ca preserves strict post-Close UID death and records complete boundary evidence; matched Android38938908138 is running. No physical Fold approval or final lock.",
+  "implementation": "Approved Essential-First architecture and all prior corrections retained. Native38899217848/402dfe75 is green. Latest Android38938908138 passed308,fresh Close/reopen,21boundarycontrols,37-service TEST3 Close and exact retained-upgrade hashes; actual early candidate Close failed25.182s with41admitted/0observed/noexception. Core initialization completed; write admission never started. Exact native pre-observer wait remains unproven. Independent fresh/early/loaded jobs38944119153/8d9ec872 prevent earlyfailure from hiding loaded outcome; failedClose captures emulator-only native backtraces. No physical Fold approval or final lock.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
     "native_cpython_3117_runtime": 61,
@@ -114,10 +114,11 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Android38899820197 failed before candidate launch at the upgrade-only process-name assertion; no rejected PID/name snapshot was saved. Receiver PID8284 was observed starting, but that alone does not prove it was the rejected process or establish the name mismatch cause.",
-    "Full native38899217848 and all308 Android regressions passed. Fresh corrected RC03 completed real save,authorization,both Java seals,whole-UID death,seven-database integrity and saved-data reopen in12891ms. Loaded signedTEST3 baseline completed37-service Close in5585ms. Preserve these passes.",
-    "Android38938908138/73de91ca now repeats the mandatory fresh and retained-data early/loaded Close gates using exact native402dfe75, with21 boundary controls and evidence retained even when the process assertion fails. No engine/Java or25s deadline changes.",
-    "Configured Diggz/custom Infinity skin physical Fold acceptance remains unverified. No physical data changes,APK promotion or final lock."
+    "Latest38938908138 reached actual candidate early Close after verified upgrade hashes. Core initialized successfully but41Python writers remained unobserved,withzero initialization errors or trackedpaths. Native admission stayed pending until25.182s; all16essentialowners remained unconfirmed. No termination authorization orprocessdeath.",
+    "Exact wait before observed proof is notyetknown. Upstream handlerProcess only removesfinishedscripts; no evidencedGUI/message handoff was found inPythonbootstrap. Do not implement a guessed messagepump fix orblindlyexempt any writer.",
+    "Independent verification38944119153 at8d9ec872 runs fresh,early-upgrade andloaded-upgrade in separateAVDs onone identicalsigned matchednative402dfe75APK. Each retains its ownfailureevidence; allthree mustpass beforeFold candidate promotion.",
+    "Targeted per-writer native initialization progress is being added beforeinterpreter/Kodimodule/observer/SQLiteVFS/hook installation without changingwrites,saves,Observed or25-second deadline. Full native rebuild and subsequent matchedAndroid checks remain required.",
+    "Syntheticservices donotestablish actualDiggz/customInfinityskin physicalFold equivalence. No physicaldevice changes,fullbackup requirement,APKlock orFoldacceptance."
   ],
   "internal_android_probes": [
     {
@@ -1044,164 +1045,234 @@
     "matched_android_plan": "Retain all 308 tests, exact signed TEST2 and TEST3 Java/payload comparisons, original fresh production Close, then disposable TEST3->TEST4 in-place upgrade with 37 synthetic services, verified pre-upgrade backup hashes, early and loaded Close, both Java seals, whole-UID death, integrity and reopen."
   },
   "latest_verification_attempt": {
-    "android_run": 38899820197,
-    "source_commit": "8dfca753648e447d749f78d200a8384164bf9a80",
+    "android_run": 38938908138,
+    "source_commit": "73de91ca5430952348897c21a54709cd63dd4500",
     "native_run": 38899217848,
     "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
-    "native_full_result": "success",
-    "evidence_artifact": 12046144477,
-    "evidence_zip_sha256": "bd24ed969acbbf3f14e905a82190c0a0b20685a73a93668101e784b1fa1e37d1",
+    "artifact": 12062921983,
+    "artifact_zip_sha256": "4071751ec2e354c24a3c64458c72acea74b7ee815eb3e5808b121e5ea81005d5",
     "all_308_passed": true,
-    "original_boundary_controls_passed": 14,
-    "fresh_test4": {
-      "passed": true,
-      "apk_sha256": "909bc1460db8c6166e8d92e6dea4f2668a925a35fd1903da22478f0d90350315",
-      "whole_package_death_verified": true,
-      "reopen_verified": true,
-      "databases": [
-        "Addons33.db",
-        "TV46.db",
-        "Textures13.db",
-        "ViewModes6.db",
-        "MyMusic83.db",
-        "Epg16.db",
-        "MyVideos131.db"
+    "boundary_controls_passed": 21,
+    "scenario_controls_passed": 0,
+    "fresh_production_close_passed": true,
+    "fresh_duration_ms": 10936,
+    "fresh_apk_sha256": "909bc1460db8c6166e8d92e6dea4f2668a925a35fd1903da22478f0d90350315",
+    "upgrade_bytes_preserved": true,
+    "verified_backup_files": 46,
+    "receiver_before": {
+      "processes": [
+        {
+          "pid": 7869,
+          "uid": 10167,
+          "name": "com.projectinfinity.kodi"
+        }
       ],
-      "duration_ms": 12891
+      "scope": "after explicit APK upgrade, before engine launch; not a new shutdown/death proof",
+      "passed": true,
+      "previous_close_session": "d0f5f225-a395-45d4-8109-35c9ce11bbb1",
+      "receiver_starts": [
+        "10-16 17:35:42.065   501   544 I ActivityManager: Start proc 7869:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
+      ],
+      "native_maps_absent": [
+        7869
+      ],
+      "naturally_finished_receivers": [],
+      "process_samples": [
+        [
+          {
+            "pid": 7869,
+            "uid": 10167,
+            "name": "com.projectinfinity.kodi"
+          }
+        ]
+      ],
+      "process_details": []
     },
-    "baseline_37_ready_count": 37,
-    "baseline_loaded_close": {
-      "passed": true,
-      "whole_package_death_verified": true,
-      "both_java_seals_verified": true,
-      "remaining_processes": [],
-      "receipt": {
-        "session": "7190bf03-ad09-40a5-b4cd-967d29fc7d35",
-        "owner": "8e4a31d0-9ea9-4aeb-8d1f-aca197167b4a",
-        "pid": 7375,
-        "phase": "COMPLETE",
-        "total_duration_ms": 5585,
-        "checkpoint_saved": true,
-        "authorization_consumed": true,
-        "process_death_confirmed": true,
-        "engine_java_save_seal": "7a193ac8-c2b4-40e5-8b61-51df09507148",
-        "coordinator_java_save_seal": "b1a4cff9-0dc2-4ab8-a7b1-f0286b1a8509"
-      },
-      "essential_owners": [
-        "native_admission",
-        "background_jobs",
-        "playback",
-        "command_center",
-        "compat",
-        "kodi_settings",
-        "profiles",
-        "skin_settings",
-        "addon_settings",
-        "favourites",
-        "peripherals",
-        "audio_policy",
-        "deferred_dialog_state",
-        "xml_files",
-        "native_databases",
-        "pvr"
+    "receiver_after": {
+      "processes": [
+        {
+          "pid": 7869,
+          "uid": 10167,
+          "name": "com.projectinfinity.kodi"
+        }
       ],
-      "essential_results": [
+      "scope": "after explicit APK upgrade, before engine launch; not a new shutdown/death proof",
+      "passed": true,
+      "previous_close_session": "d0f5f225-a395-45d4-8109-35c9ce11bbb1",
+      "receiver_starts": [
+        "10-16 17:35:42.065   501   544 I ActivityManager: Start proc 7869:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
+      ],
+      "native_maps_absent": [
+        7869
+      ],
+      "naturally_finished_receivers": [],
+      "process_samples": [
+        [
+          {
+            "pid": 7869,
+            "uid": 10167,
+            "name": "com.projectinfinity.kodi"
+          }
+        ]
+      ],
+      "process_details": []
+    },
+    "baseline_loaded_close_passed": true,
+    "baseline_loaded_duration_ms": 4461,
+    "early_ready_count": 0,
+    "candidate_early_close": {
+      "receipt": {
+        "phase": "CHECKPOINT_FAILED",
+        "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+        "pid": 8160,
+        "owner": "2ca6f9a5-4513-47db-85a3-96694f4b3e88",
+        "started_epoch_ms": 1792172149158,
+        "updated_epoch_ms": 1792172174265,
+        "total_duration_ms": 25182,
+        "checkpoint_saved": false,
+        "authorization_consumed": false,
+        "process_death_confirmed": false
+      },
+      "native": {
+        "application_core_initialized": true,
+        "application_startup_in_progress": false,
+        "write_admission_started": false,
+        "pending_detail": "python_persistence_observer_initialization",
+        "essential_write_generation": 0,
+        "essential_writes_sealed": false,
+        "essential_writes_durable": false,
+        "script_persistence": {
+          "active_writers": 41,
+          "advisory_count": 0,
+          "advisory_retired_writers": 0,
+          "blocker_overflow": false,
+          "blockers": [],
+          "blocking_count": 0,
+          "blocking_overflow": false,
+          "durable": false,
+          "error": "",
+          "failed_settled_writers": 0,
+          "failure_detail": "",
+          "failure_writer": "",
+          "failure_writer_id": -1,
+          "observed_writers": 0,
+          "pending_writers": [
+            "script.infinity.commandcenter:service.py",
+            "service.infinity.chooser.weather.snapshot:weather_snapshot.py",
+            "service.infinity.compat:runtime_service.py",
+            "service.observerprobe.writer01:service.py",
+            "service.observerprobe.writer02:service.py",
+            "service.observerprobe.writer03:service.py",
+            "service.observerprobe.writer04:service.py",
+            "service.observerprobe.writer05:service.py"
+          ],
+          "retired_writers": 0,
+          "sync_finished": false,
+          "sync_started": false,
+          "tracked_paths": 0
+        }
+      },
+      "essential_owner_results": [
         {
           "owner": "native_admission",
-          "result": "ALREADY_DURABLE",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "background_jobs",
-          "result": "ALREADY_DURABLE",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "playback",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "command_center",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "compat",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "kodi_settings",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "profiles",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "skin_settings",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "addon_settings",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "favourites",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "peripherals",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "audio_policy",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "deferred_dialog_state",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "xml_files",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "native_databases",
-          "result": "COMMITTED",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         },
         {
           "owner": "pvr",
-          "result": "ALREADY_DURABLE",
-          "required_writes_finished": true
+          "result": "FAILED",
+          "required_writes_finished": false,
+          "start_elapsed_ms": 0
         }
       ]
     },
-    "verified_backup_files": 46,
-    "upgrade_install": "Performing Streamed Install\nSuccess\n",
-    "observed_receiver_pid": 8284,
-    "android_origin_log": [
-      "10-16 12:55:28.099   497  1078 I ActivityManager: Process com.projectinfinity.kodi:kodi (pid 7375) has died: fg  TOP ",
-      "10-16 12:55:28.372   497  1078 I ActivityManager: Process com.projectinfinity.kodi (pid 7340) has died: fg  SVC ",
-      "10-16 12:55:31.239   497   540 I ActivityManager: Start proc 8284:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
-    ],
-    "failure": "AssertionError: Unexpected package process before candidate launch",
-    "failure_stage": "first post-install process boundary, before byte comparison and candidate engine launch",
-    "rejected_process_snapshot_retained": false,
-    "rejected_pid_name_and_underlying_cause": "Not captured by original assertion; do not infer that it was PID8284 or a transient name from the receiver start alone",
-    "candidate_early_close_reached": false,
     "candidate_loaded_close_reached": false,
+    "exact_pre_observer_wait_instruction": "Not recorded by prior runtime; no exception reported. Need native stack/progress evidence before changing behavior.",
     "physical_fold_accepted": false,
     "locked": false
   },
@@ -1251,12 +1322,12 @@
     "source_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
     "native_run": 38899217848,
     "native_status": "completed_success",
-    "matched_android_status": "in_progress",
+    "matched_android_status": "completed_failure",
     "candidate_version": "1.0.9-Essential-First-TEST4-RC03",
     "matched_android_run": 38938908138,
     "matched_android_commit": "73de91ca5430952348897c21a54709cd63dd4500",
-    "all_308_current_run_result": null,
-    "full_shutdown_current_run_result": null,
+    "all_308_current_run_result": "success",
+    "full_shutdown_current_run_result": "early_observer_initialization_deadline_failure",
     "apk_ready": false
   },
   "verification_attempt_history": [
@@ -1321,6 +1392,168 @@
       "physical_fold_accepted": false,
       "apk_delivered": false,
       "locked": false
+    },
+    {
+      "android_run": 38899820197,
+      "source_commit": "8dfca753648e447d749f78d200a8384164bf9a80",
+      "native_run": 38899217848,
+      "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+      "native_full_result": "success",
+      "evidence_artifact": 12046144477,
+      "evidence_zip_sha256": "bd24ed969acbbf3f14e905a82190c0a0b20685a73a93668101e784b1fa1e37d1",
+      "all_308_passed": true,
+      "original_boundary_controls_passed": 14,
+      "fresh_test4": {
+        "passed": true,
+        "apk_sha256": "909bc1460db8c6166e8d92e6dea4f2668a925a35fd1903da22478f0d90350315",
+        "whole_package_death_verified": true,
+        "reopen_verified": true,
+        "databases": [
+          "Addons33.db",
+          "TV46.db",
+          "Textures13.db",
+          "ViewModes6.db",
+          "MyMusic83.db",
+          "Epg16.db",
+          "MyVideos131.db"
+        ],
+        "duration_ms": 12891
+      },
+      "baseline_37_ready_count": 37,
+      "baseline_loaded_close": {
+        "passed": true,
+        "whole_package_death_verified": true,
+        "both_java_seals_verified": true,
+        "remaining_processes": [],
+        "receipt": {
+          "session": "7190bf03-ad09-40a5-b4cd-967d29fc7d35",
+          "owner": "8e4a31d0-9ea9-4aeb-8d1f-aca197167b4a",
+          "pid": 7375,
+          "phase": "COMPLETE",
+          "total_duration_ms": 5585,
+          "checkpoint_saved": true,
+          "authorization_consumed": true,
+          "process_death_confirmed": true,
+          "engine_java_save_seal": "7a193ac8-c2b4-40e5-8b61-51df09507148",
+          "coordinator_java_save_seal": "b1a4cff9-0dc2-4ab8-a7b1-f0286b1a8509"
+        },
+        "essential_owners": [
+          "native_admission",
+          "background_jobs",
+          "playback",
+          "command_center",
+          "compat",
+          "kodi_settings",
+          "profiles",
+          "skin_settings",
+          "addon_settings",
+          "favourites",
+          "peripherals",
+          "audio_policy",
+          "deferred_dialog_state",
+          "xml_files",
+          "native_databases",
+          "pvr"
+        ],
+        "essential_results": [
+          {
+            "owner": "native_admission",
+            "result": "ALREADY_DURABLE",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "background_jobs",
+            "result": "ALREADY_DURABLE",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "playback",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "command_center",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "compat",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "kodi_settings",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "profiles",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "skin_settings",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "addon_settings",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "favourites",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "peripherals",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "audio_policy",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "deferred_dialog_state",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "xml_files",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "native_databases",
+            "result": "COMMITTED",
+            "required_writes_finished": true
+          },
+          {
+            "owner": "pvr",
+            "result": "ALREADY_DURABLE",
+            "required_writes_finished": true
+          }
+        ]
+      },
+      "verified_backup_files": 46,
+      "upgrade_install": "Performing Streamed Install\nSuccess\n",
+      "observed_receiver_pid": 8284,
+      "android_origin_log": [
+        "10-16 12:55:28.099   497  1078 I ActivityManager: Process com.projectinfinity.kodi:kodi (pid 7375) has died: fg  TOP ",
+        "10-16 12:55:28.372   497  1078 I ActivityManager: Process com.projectinfinity.kodi (pid 7340) has died: fg  SVC ",
+        "10-16 12:55:31.239   497   540 I ActivityManager: Start proc 8284:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
+      ],
+      "failure": "AssertionError: Unexpected package process before candidate launch",
+      "failure_stage": "first post-install process boundary, before byte comparison and candidate engine launch",
+      "rejected_process_snapshot_retained": false,
+      "rejected_pid_name_and_underlying_cause": "Not captured by original assertion; do not infer that it was PID8284 or a transient name from the receiver start alone",
+      "candidate_early_close_reached": false,
+      "candidate_loaded_close_reached": false,
+      "physical_fold_accepted": false,
+      "locked": false
     }
   ],
   "upgrade_process_observation_correction": {
@@ -1338,6 +1571,52 @@
     "actual_rejected_process_identity_unknown": true,
     "android_run": 38938908138,
     "android_status": "in_progress",
+    "physical_fold_accepted": false,
+    "locked": false
+  },
+  "independent_acceptance": {
+    "source_commit": "8d9ec872a96ee7dc72e80889dd3af9f3efedad3a",
+    "android_run": 38944119153,
+    "status": "in_progress",
+    "cases": [
+      "fresh",
+      "upgrade-early",
+      "upgrade-loaded"
+    ],
+    "separate_disposable_avds": true,
+    "identical_signed_apk_required": true,
+    "host_boundary_controls": 21,
+    "host_scenario_controls": 8,
+    "host_failed_engine_identity_controls": 5,
+    "all_cases_required_for_fold_candidate": true,
+    "original_25s_deadline_unchanged": true,
+    "native_run": 38899217848,
+    "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+    "native_behavior_changed": false,
+    "physical_fold_accepted": false,
+    "locked": false
+  },
+  "native_initialization_progress": {
+    "status": "host_verified_full_native_rebuild_pending",
+    "purpose": "Identify exact native wait before observer receipt; no speculative bootstrap/write-guard change",
+    "new_native_progress_controls": 8,
+    "new_status_size_controls": 6,
+    "preserved_coordinator_controls": 34,
+    "preserved_local_write_controls": 36,
+    "preserved_initialization_controls": 11,
+    "preserved_observer_race_controls": 5,
+    "all_host_controls_passed": true,
+    "pre_sqlite_vfs_stage_recorded": true,
+    "per_writer_identity_tid_elapsed_recorded": true,
+    "current_rows_prioritized_over_optional_history": true,
+    "auxiliary_max_rows": 64,
+    "auxiliary_max_bytes": 24576,
+    "status_no_margin_preserves_original_bytes": true,
+    "safety_writer_inventory_unchanged": true,
+    "original_exceptions_preserved": true,
+    "all_308_sources_unchanged": true,
+    "native_rebuild_required": true,
+    "matched_android_required": true,
     "physical_fold_accepted": false,
     "locked": false
   }

@@ -95,6 +95,9 @@ jobs:
           python3 repairs/essential-first-2103377/test_observer_close_race_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
             --out shutdown-rc1-host/observer-close-race.json
+          python3 repairs/essential-first-2103377/test_initialization_progress_native.py \
+            --python-prefix "$pythonLocation" --sqlite-include /usr/include \
+            --out shutdown-rc1-host/initialization-progress-native.json
       - name: Check two-file source patch and all protected gates
         run: |
           set -euo pipefail
@@ -234,6 +237,8 @@ jobs:
           set -euo pipefail
           python3 repairs/essential-first-2103377/run_runtime_coordinator_tests.py \
             --variant-source kodi/xbmc --out checkpoint-build/runtime-coordinator.json
+          python3 repairs/essential-first-2103377/test_initialization_progress_status.py \
+            --variant-source kodi/xbmc --out checkpoint-build/initialization-progress-status.json
       - name: Verify compiled Android authorization against production native receipt
         run: |
           set -euo pipefail

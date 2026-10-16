@@ -21,6 +21,7 @@ ADDON = 'xbmc/addons/Addon.cpp'
 REPOSITORY = 'xbmc/addons/RepositoryUpdater.cpp'
 ENGINE_ENTRY = 'xbmc/platform/xbmc.cpp'
 APPLICATION = 'xbmc/application/Application.cpp'
+PYTHON_INVOKER = 'xbmc/interfaces/python/PythonInvoker.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
@@ -33,6 +34,7 @@ PINS = {
     REPOSITORY: '92e44c82995060552f71b675bdc03c9bb08b63430d2d83b59fcdb78ea7d5c0f2',
     ENGINE_ENTRY: '2ca7a10d3c2bb19d79a35f2faecd8b2f01a428fc31aae9fe63f568cd878ac362',
     APPLICATION: '3f064f1a6dd941d78c1a58383b29fce8c0c553ed5cb030e319c9955c4ae4be06',
+    PYTHON_INVOKER: '1ad5a73740a622c42ad1ed5a9ed40bf1d903513a7540e7a745c266f5b62b5a7e',
 }
 once = stage_experiment.once
 
@@ -93,7 +95,84 @@ def checkpoint(text):
     return startup_checkpoint(text)
 
 
+def initialization_diagnostics(text):
+    anchor = '  std::string encoded;\n  if (!CJSONVariantWriter::Write(result, encoded, true))\n    return "{\\\"schema\\\":1,\\\"phase\\\":\\\"CHECKPOINT_FAILED\\\",\\\"error\\\":\\\"status_encoding_failed\\\"}";'
+    return once(text, anchor, '''  // Bound only new diagnostic bytes, after measuring the complete original
+  // status. The unchanged Java parser accepts 64 KiB; preserve every existing
+  // safety field and leave 1 KiB for diagnostic metadata/array separators.
+  std::string beforeInitializationProgress;
+  const bool originalStatusEncoded = CJSONVariantWriter::Write(result, beforeInitializationProgress, true);
+  // If auxiliary metadata has no margin, return the exact original bytes.
+  // A full safety inventory must never become an oversized status because
+  // optional progress counters were appended to a zero-byte budget.
+  if (originalStatusEncoded && beforeInitializationProgress.size() >= 64512)
+    return beforeInitializationProgress;
+  const std::size_t initializationProgressBudget = originalStatusEncoded && beforeInitializationProgress.size() < 64512
+      ? std::min<std::size_t>(24576, 64512 - beforeInitializationProgress.size()) : 0;
+  std::size_t initializationProgressBytes = 0;
+  bool initializationProgressTruncated = false;
+  std::vector<CVariant> initializationRows;
+  std::vector<const InfinityScriptPersistence::Evidence::Initialization*> initializationSources;
+  std::vector<std::size_t> initializationSizes;
+  // First include current identity/stage for every diagnostic row that fits.
+  // Optional history cannot displace a later writer's current-stage evidence.
+  for (const auto& progress : scripts.initialization)
+  {
+    CVariant row(CVariant::VariantTypeObject);
+    row["writer_id"] = progress.writerId;
+    row["writer"] = progress.writer;
+    row["pid"] = progress.pid;
+    row["native_tid"] = progress.current.nativeTid;
+    row["interpreter_identity"] = progress.current.interpreterIdentity;
+    row["observed"] = progress.observed;
+    row["stage"] = progress.current.stage;
+    row["elapsed_ms"] = progress.elapsedMs;
+    row["stage_elapsed_ms"] = progress.stageElapsedMs;
+    row["steps_total"] = static_cast<uint64_t>(progress.steps.size());
+    row["steps_overflow"] = progress.stepsOverflow;
+    row["steps"] = CVariant(CVariant::VariantTypeArray);
+    std::string progressJson;
+    if (initializationRows.size() >= 64 || !CJSONVariantWriter::Write(row, progressJson, true) ||
+        progressJson.size() + initializationProgressBytes > initializationProgressBudget)
+    { initializationProgressTruncated = true; continue; }
+    initializationProgressBytes += progressJson.size();
+    initializationRows.push_back(row);
+    initializationSources.push_back(&progress);
+    initializationSizes.push_back(progressJson.size());
+  }
+  for (std::size_t rowIndex = 0; rowIndex < initializationRows.size(); ++rowIndex)
+  {
+    CVariant enriched = initializationRows[rowIndex];
+    const auto& progress = *initializationSources[rowIndex];
+    const auto firstStep = progress.steps.size() > 4 ? progress.steps.size() - 4 : 0;
+    for (auto stepIndex = firstStep; stepIndex < progress.steps.size(); ++stepIndex)
+    {
+      const auto& step = progress.steps[stepIndex];
+      CVariant entry(CVariant::VariantTypeObject);
+      entry["stage"] = step.stage;
+      entry["elapsed_ms"] = step.elapsedMs;
+      enriched["steps"].push_back(entry);
+    }
+    std::string progressJson;
+    if (CJSONVariantWriter::Write(enriched, progressJson, true) &&
+        progressJson.size() + initializationProgressBytes - initializationSizes[rowIndex] <= initializationProgressBudget)
+    {
+      initializationProgressBytes += progressJson.size() - initializationSizes[rowIndex];
+      initializationRows[rowIndex] = enriched;
+    }
+  }
+  scriptEvidence["initialization_progress_contract"] = "native_python_initialization_progress_v1";
+  scriptEvidence["initialization_progress"] = CVariant(CVariant::VariantTypeArray);
+  for (const auto& row : initializationRows)scriptEvidence["initialization_progress"].push_back(row);
+  scriptEvidence["initialization_progress_total_writers"] = static_cast<uint64_t>(scripts.initialization.size());
+  scriptEvidence["initialization_progress_reported_writers"] = static_cast<uint64_t>(initializationRows.size());
+  scriptEvidence["initialization_progress_truncated"] = initializationProgressTruncated;
+  result["script_persistence"] = scriptEvidence;
+''' + anchor)
+
+
 def startup_checkpoint(text):
+    text = initialization_diagnostics(text)
     text = once(text, '  bool requestReady{false};', '''  bool requestReady{false};
   bool startupInProgress{false};
   bool startupCoreComplete{false};
@@ -250,6 +329,41 @@ def application(text):
     // Existing Python owners can finish''', '''  if (InfinityAndroidCheckpoint::IsWriteAdmissionActive())
   {
     // Existing Python owners can finish''')
+
+
+def python_invoker(text):
+    # Record native progress before acquiring the GIL or entering a Python
+    # observer. No caller is delayed, cancelled, newly admitted or marked saved.
+    def mark(stage, identity='0', indent='  '):
+        return ('#if defined(TARGET_ANDROID)\n'+indent+
+                'InfinityScriptPersistence::InitializationProgress(GetId(), "'+stage+'", '+identity+');\n'
+                '#endif\n')
+    start = text.index('bool CPythonInvoker::Execute(')
+    end = text.index('bool CPythonInvoker::execute(', start)
+    method = text[start:end]
+    method = once(method, '  if (script.empty())', mark('native.execute.enter')+'  if (script.empty())')
+    method = once(method, '  if (!CFileUtils::Exists(script))', mark('native.execute.file_exists')+'  if (!CFileUtils::Exists(script))')
+    method = once(method, '  if (!onExecutionInitialized())', mark('native.handler.initialize')+'  if (!onExecutionInitialized())')
+    method = once(method, '  return ILanguageInvoker::Execute(script, arguments);', mark('native.handler.initialized')+'  return ILanguageInvoker::Execute(script, arguments);')
+    text = text[:start]+method+text[end:]
+    text = once(text, '      PyThreadState* owner = CServiceBroker::GetXBPython().GetMainThreadState();',
+                mark('native.interpreter.main_state', indent='      ')+'      PyThreadState* owner = CServiceBroker::GetXBPython().GetMainThreadState();')
+    text = once(text, '      m_mainThreadState = PyThreadState_New(owner->interp);',
+                mark('native.interpreter.thread_state', indent='      ')+'      m_mainThreadState = PyThreadState_New(owner->interp);')
+    text = once(text, '      PyEval_RestoreThread(m_mainThreadState);\n      m_invokerOwnsGil = true;\n      l_threadState = Py_NewInterpreter();',
+                mark('native.interpreter.acquire_gil', indent='      ')+'''      PyEval_RestoreThread(m_mainThreadState);
+      m_invokerOwnsGil = true;
+'''+mark('native.interpreter.create', indent='      ')+'      l_threadState = Py_NewInterpreter();')
+    text = once(text, '      if (l_threadState != nullptr)\n      {\n        PyEval_ReleaseThread(l_threadState);',
+                '      if (l_threadState != nullptr)\n      {\n'+mark('native.interpreter.created', 'reinterpret_cast<uintptr_t>(l_threadState->interp)', '        ')+'        PyEval_ReleaseThread(l_threadState);')
+    text = once(text, '  // get the GIL\n  PyEval_RestoreThread(l_threadState);',
+                '  // get the GIL\n'+mark('native.interpreter.restore_gil', 'reinterpret_cast<uintptr_t>(l_threadState->interp)')+'  PyEval_RestoreThread(l_threadState);')
+    text = once(text, '    onInitialization();\n    setState(InvokerStateInitialized);',
+                mark('native.kodi_module.initialize', 'reinterpret_cast<uintptr_t>(l_threadState->interp)', '    ')+'''    onInitialization();
+'''+mark('native.kodi_module.initialized', 'reinterpret_cast<uintptr_t>(l_threadState->interp)', '    ')+'    setState(InvokerStateInitialized);')
+    text = once(text, '  m_infinityPersistenceObserver = InfinityPythonPersistence::Start(GetId(), m_threadState->interp);',
+                mark('native.observer.before_start', 'reinterpret_cast<uintptr_t>(m_threadState->interp)')+'  m_infinityPersistenceObserver = InfinityPythonPersistence::Start(GetId(), m_threadState->interp);')
+    return text
 
 def jobs(text):
     text = once(text, '  if (InfinityAndroidCheckpoint::IsActive() && !checkpointPreviouslyAccepted &&',
@@ -480,7 +594,7 @@ def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository), (ENGINE_ENTRY, engine_entry), (APPLICATION, application)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository), (ENGINE_ENTRY, engine_entry), (APPLICATION, application), (PYTHON_INVOKER, python_invoker)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)

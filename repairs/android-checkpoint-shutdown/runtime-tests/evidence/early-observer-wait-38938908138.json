@@ -1,0 +1,232 @@
+{
+  "android_run": 38938908138,
+  "source_commit": "73de91ca5430952348897c21a54709cd63dd4500",
+  "native_run": 38899217848,
+  "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+  "artifact": 12062921983,
+  "artifact_zip_sha256": "4071751ec2e354c24a3c64458c72acea74b7ee815eb3e5808b121e5ea81005d5",
+  "all_308_passed": true,
+  "boundary_controls_passed": 21,
+  "scenario_controls_passed": 0,
+  "fresh_production_close_passed": true,
+  "fresh_duration_ms": 10936,
+  "fresh_apk_sha256": "909bc1460db8c6166e8d92e6dea4f2668a925a35fd1903da22478f0d90350315",
+  "upgrade_bytes_preserved": true,
+  "verified_backup_files": 46,
+  "receiver_before": {
+    "processes": [
+      {
+        "pid": 7869,
+        "uid": 10167,
+        "name": "com.projectinfinity.kodi"
+      }
+    ],
+    "scope": "after explicit APK upgrade, before engine launch; not a new shutdown/death proof",
+    "passed": true,
+    "previous_close_session": "d0f5f225-a395-45d4-8109-35c9ce11bbb1",
+    "receiver_starts": [
+      "10-16 17:35:42.065   501   544 I ActivityManager: Start proc 7869:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
+    ],
+    "native_maps_absent": [
+      7869
+    ],
+    "naturally_finished_receivers": [],
+    "process_samples": [
+      [
+        {
+          "pid": 7869,
+          "uid": 10167,
+          "name": "com.projectinfinity.kodi"
+        }
+      ]
+    ],
+    "process_details": []
+  },
+  "receiver_after": {
+    "processes": [
+      {
+        "pid": 7869,
+        "uid": 10167,
+        "name": "com.projectinfinity.kodi"
+      }
+    ],
+    "scope": "after explicit APK upgrade, before engine launch; not a new shutdown/death proof",
+    "passed": true,
+    "previous_close_session": "d0f5f225-a395-45d4-8109-35c9ce11bbb1",
+    "receiver_starts": [
+      "10-16 17:35:42.065   501   544 I ActivityManager: Start proc 7869:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
+    ],
+    "native_maps_absent": [
+      7869
+    ],
+    "naturally_finished_receivers": [],
+    "process_samples": [
+      [
+        {
+          "pid": 7869,
+          "uid": 10167,
+          "name": "com.projectinfinity.kodi"
+        }
+      ]
+    ],
+    "process_details": []
+  },
+  "baseline_loaded_close_passed": true,
+  "baseline_loaded_duration_ms": 4461,
+  "early_ready_count": 0,
+  "candidate_early_close": {
+    "receipt": {
+      "phase": "CHECKPOINT_FAILED",
+      "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+      "pid": 8160,
+      "owner": "2ca6f9a5-4513-47db-85a3-96694f4b3e88",
+      "started_epoch_ms": 1792172149158,
+      "updated_epoch_ms": 1792172174265,
+      "total_duration_ms": 25182,
+      "checkpoint_saved": false,
+      "authorization_consumed": false,
+      "process_death_confirmed": false
+    },
+    "native": {
+      "application_core_initialized": true,
+      "application_startup_in_progress": false,
+      "write_admission_started": false,
+      "pending_detail": "python_persistence_observer_initialization",
+      "essential_write_generation": 0,
+      "essential_writes_sealed": false,
+      "essential_writes_durable": false,
+      "script_persistence": {
+        "active_writers": 41,
+        "advisory_count": 0,
+        "advisory_retired_writers": 0,
+        "blocker_overflow": false,
+        "blockers": [],
+        "blocking_count": 0,
+        "blocking_overflow": false,
+        "durable": false,
+        "error": "",
+        "failed_settled_writers": 0,
+        "failure_detail": "",
+        "failure_writer": "",
+        "failure_writer_id": -1,
+        "observed_writers": 0,
+        "pending_writers": [
+          "script.infinity.commandcenter:service.py",
+          "service.infinity.chooser.weather.snapshot:weather_snapshot.py",
+          "service.infinity.compat:runtime_service.py",
+          "service.observerprobe.writer01:service.py",
+          "service.observerprobe.writer02:service.py",
+          "service.observerprobe.writer03:service.py",
+          "service.observerprobe.writer04:service.py",
+          "service.observerprobe.writer05:service.py"
+        ],
+        "retired_writers": 0,
+        "sync_finished": false,
+        "sync_started": false,
+        "tracked_paths": 0
+      }
+    },
+    "essential_owner_results": [
+      {
+        "owner": "native_admission",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "background_jobs",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "playback",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "command_center",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "compat",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "kodi_settings",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "profiles",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "skin_settings",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "addon_settings",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "favourites",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "peripherals",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "audio_policy",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "deferred_dialog_state",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "xml_files",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "native_databases",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      },
+      {
+        "owner": "pvr",
+        "result": "FAILED",
+        "required_writes_finished": false,
+        "start_elapsed_ms": 0
+      }
+    ]
+  },
+  "candidate_loaded_close_reached": false,
+  "exact_pre_observer_wait_instruction": "Not recorded by prior runtime; no exception reported. Need native stack/progress evidence before changing behavior.",
+  "physical_fold_accepted": false,
+  "locked": false
+}

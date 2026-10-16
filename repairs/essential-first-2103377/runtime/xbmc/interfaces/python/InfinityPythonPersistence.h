@@ -29,6 +29,7 @@ struct Context
   PyObject* rawWrite{nullptr};
   PyObject* admissionError{nullptr};
   std::string initializationStage;
+  uint64_t interpreterIdentity{0};
   bool retiring{false};
   bool finalized{false};
   bool preservePending{false};
@@ -42,6 +43,11 @@ struct Context
 };
 inline std::map<PyInterpreterState*,Context*>& Contexts()
 {static auto* contexts=new std::map<PyInterpreterState*,Context*>;return *contexts;}
+inline void InitializationStage(Context* context,const char* stage)
+{
+  context->initializationStage=stage;
+  InfinityScriptPersistence::InitializationProgress(context->id,stage,context->interpreterIdentity);
+}
 inline void InitializationFailed(int id,const std::string& reason,const std::string& stage,
                                  PyObject* globals=nullptr)
 {
@@ -49,6 +55,7 @@ inline void InitializationFailed(int id,const std::string& reason,const std::str
   // replace it. No Python modules are imported to format this receipt, and the
   // original exception (including its traceback) remains pending for Kodi.
   const int nativeError=errno;
+  InfinityScriptPersistence::InitializationProgress(id,("failed:"+stage).c_str());
   PyObject *type=nullptr,*value=nullptr,*trace=nullptr;
   PyErr_Fetch(&type,&value,&trace);
   auto* thread=PyThreadState_Get();
@@ -846,13 +853,19 @@ namespace InfinityPythonPersistence
 {
 inline Context* Start(int id,PyInterpreterState* interpreter)
 {
+  // This first stamp is deliberately before Pending/SQLite/GIL-dependent
+  // observer setup, so a native wait cannot look like an unspecified failure.
+  InfinityScriptPersistence::InitializationProgress(id,"native.observer.entry",
+      reinterpret_cast<uintptr_t>(interpreter));
   if(!InfinityScriptPersistence::Pending(id))return nullptr;
   if(PyErr_Occurred() && Contexts().find(interpreter)==Contexts().end()) {
     InitializationFailed(id,"checked_python_observer_initialization_failed","native.entry.pending_exception");
     return nullptr;
   }
+  InfinityScriptPersistence::InitializationProgress(id,"native.sqlite_vfs.install");
   if (!InfinitySQLiteVFS::Install())
   { InitializationFailed(id,"protected_sqlite_vfs_installation_failed","native.sqlite_vfs.install");return nullptr; }
+  InfinityScriptPersistence::InitializationProgress(id,"native.audit.install");
   static bool installed=false;
   if(!installed) {
     if(PySys_AddAuditHook(Audit,nullptr)!=0){InitializationFailed(id,"native_python_audit_hook_unavailable","native.audit.install");return nullptr;}
@@ -860,33 +873,35 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   }
   const auto existing=Contexts().find(interpreter);
   if(existing!=Contexts().end())return existing->second; // Reusable interpreter keeps all admitted writes.
-  auto* context=new Context;context->id=id;Contexts()[interpreter]=context;
+  auto* context=new Context;context->id=id;
+  context->interpreterIdentity=reinterpret_cast<uintptr_t>(interpreter);
+  Contexts()[interpreter]=context;
   const auto failed=[&](const char* reason="checked_python_observer_initialization_failed") {
     InitializationFailed(id,reason,context->initializationStage,context->globals);
     return context;
   };
-  context->initializationStage="native.admission_exception";
+  InitializationStage(context,"native.admission_exception");
   context->admissionError=PyErr_NewException("_infinity_native_persistence_observer.WriteAdmissionClosed",PyExc_PermissionError,nullptr);
   if(!context->admissionError)
     return failed("native_python_admission_exception_unavailable");
-  context->initializationStage="native.hooks.install";
+  InitializationStage(context,"native.hooks.install");
   if (!InfinityPythonWriteHooks::Install())
     return failed("native_python_write_protection_unavailable");
-  context->initializationStage="python.globals";
+  InitializationStage(context,"python.globals");
   context->globals=PyDict_New();
   if(!context->globals)return failed();
   PyObject* name=PyUnicode_FromString("_infinity_native_persistence_observer");
   if(!name)return failed();
   const int named=PyDict_SetItemString(context->globals,"__name__",name);Py_DECREF(name);
   if(named!=0)return failed();
-  context->initializationStage="python.source";
+  InitializationStage(context,"python.source");
   PyObject* result=PyRun_String(INFINITY_PYTHON_PERSISTENCE_SOURCE,Py_file_input,context->globals,context->globals);
   if(!result)return failed();
   Py_DECREF(result);
   static PyMethodDef errorMethod={"record_failure",Error,METH_VARARGS,nullptr};
   static PyMethodDef mutationMethod={"record_mutation",Mutation,METH_VARARGS,nullptr};
   static PyMethodDef protectionMethod={"protect_mutation",Protect,METH_VARARGS,nullptr};
-  context->initializationStage="native.callbacks";
+  InitializationStage(context,"native.callbacks");
   PyObject* capsule=PyCapsule_New(context,"Infinity.Persistence.Observer",nullptr);
   PyObject* error=capsule?PyCFunction_NewEx(&errorMethod,capsule,nullptr):nullptr;
   PyObject* mutation=error?PyCFunction_NewEx(&mutationMethod,capsule,nullptr):nullptr;
@@ -897,7 +912,7 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
     Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(capsule);
     return context;
   }
-  context->initializationStage="python.import.xbmcvfs";
+  InitializationStage(context,"python.import.xbmcvfs");
   vfs=PyImport_ImportModule("xbmcvfs");
 #if defined(INFINITY_SCRIPT_OBSERVER_HOST)
   if(!vfs){PyErr_Clear();vfs=Py_None;Py_INCREF(vfs);}
@@ -910,25 +925,25 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   hostProbe=Py_True;
 #endif
   if(klass && !PyErr_Occurred() && vfs) {
-    context->initializationStage="python.observer.construct";
+    InitializationStage(context,"python.observer.construct");
     context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,context->admissionError,nullptr);
   }
   if(!initializationFailed && (!context->observer || PyErr_Occurred())) {
-    if(!klass)context->initializationStage="python.observer.class";
+    if(!klass)InitializationStage(context,"python.observer.class");
     failed();initializationFailed=true;
   }
   Py_XDECREF(vfs);Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(protection);Py_XDECREF(capsule);
   if(initializationFailed)return context;
-  context->initializationStage="python.observer.connection_type";
+  InitializationStage(context,"python.observer.connection_type");
   context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
   if(!context->connectionType || PyErr_Occurred())return failed();
-  context->initializationStage="python.observer.raw_type";
+  InitializationStage(context,"python.observer.raw_type");
   context->rawType=PyObject_GetAttrString(context->observer,"raw_type");
   if(!context->rawType || PyErr_Occurred())return failed();
-  context->initializationStage="python.observer.raw_write";
+  InitializationStage(context,"python.observer.raw_write");
   context->rawWrite=PyObject_GetAttrString(context->rawType,"write");
   if(!context->rawWrite || PyErr_Occurred())return failed();
-  context->initializationStage="complete";
+  InitializationStage(context,"complete");
   InfinityScriptPersistence::Observed(id);
   return context;
 }

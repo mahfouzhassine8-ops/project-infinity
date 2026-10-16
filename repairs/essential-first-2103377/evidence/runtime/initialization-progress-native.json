@@ -1,0 +1,43 @@
+{
+  "scope": "native progress ledger, actual CPython Execute method with explicit Kodi peers, real observer initialization in CPython3.11.7",
+  "source_sha256": "8f86218be8134e4dfe32cac40b98d209abcb2e9ee1ae32db72973105d3d71fba",
+  "staged_invoker_tested": false,
+  "results": [
+    {
+      "case": "execute-empty",
+      "passed": true
+    },
+    {
+      "case": "execute-file-failed",
+      "passed": true
+    },
+    {
+      "case": "execute-handler-failed",
+      "passed": true
+    },
+    {
+      "case": "execute-success",
+      "passed": true
+    },
+    {
+      "case": "pending-37",
+      "passed": true
+    },
+    {
+      "case": "bounded-failure",
+      "passed": true
+    },
+    {
+      "case": "observer-success",
+      "passed": true
+    },
+    {
+      "case": "observer-failed",
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "android_shutdown_verified": false,
+  "physical_fold_verified": false,
+  "save_or_termination_authority_changed": false
+}

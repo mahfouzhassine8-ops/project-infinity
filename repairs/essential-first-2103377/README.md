@@ -1,8 +1,8 @@
 # Essential-first shutdown — production repair in progress
 
-**Current status: Full native `38899217848` / `402dfe75` passed. Android `38899820197` passed all 308 regressions and fresh production Close/death/reopen, then failed an upgrade-only process-name assertion before the candidate engine launched. Exact rejected PID/name was not retained. Verification-only correction `73de91ca` passes 21 host controls and retains boundary evidence on failure; Android `38938908138` is running against the same green engine. No Fold promotion or lock.**
+**Current status: Full native `38899217848` remains green. Android `38938908138` passed 308 regressions, fresh Close/reopen, receiver proof and exact retained upgrade hashes, then actual early Close failed in 25.182s with 41 admitted/zero observed Python writers and no captured exception. Core initialization succeeded; native write admission never started. Independent fresh/early/loaded Android cases are running in `38944119153` (`8d9ec872`) on separate AVDs with the same signed APK. No Fold promotion or lock.**
 
-See [TEST4-RC03-UPGRADE-OBSERVATION.md](TEST4-RC03-UPGRADE-OBSERVATION.md) for the current failure and explicit remaining uncertainty.
+See [TEST4-OBSERVER-WAIT.md](TEST4-OBSERVER-WAIT.md) for the current native wait and independent acceptance coverage. The [previous process-name assertion](TEST4-RC03-UPGRADE-OBSERVATION.md) is resolved in the latest attempt.
 The prior [early-startup correction](EARLY-STARTUP-ADMISSION.md) now has a green full native build; retained-data early/loaded Android acceptance is still required.
 
 See [TEST4-UPGRADE-RECEIVER.md](TEST4-UPGRADE-RECEIVER.md) for the resolved

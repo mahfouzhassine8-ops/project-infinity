@@ -1,0 +1,46 @@
+{
+  "scope": "production coordinator and persistence barrier; unchanged Kodi peers are adapters",
+  "cases": [
+    {
+      "case": "startup-progress-41",
+      "exit_code": 0,
+      "error": "",
+      "observation": "writers=41 reported=41 native_status_bytes=28406; no authorization\n"
+    },
+    {
+      "case": "startup-progress-64",
+      "exit_code": 0,
+      "error": "",
+      "observation": "writers=64 reported=64 native_status_bytes=34301; no authorization\n"
+    },
+    {
+      "case": "startup-progress-65",
+      "exit_code": 0,
+      "error": "",
+      "observation": "writers=65 reported=64 native_status_bytes=34330; no authorization\n"
+    },
+    {
+      "case": "startup-progress-512",
+      "exit_code": 0,
+      "error": "",
+      "observation": "writers=512 reported=64 native_status_bytes=48073; no authorization\n"
+    },
+    {
+      "case": "startup-progress-little-space",
+      "exit_code": 0,
+      "error": "",
+      "observation": "writers=65 reported=26 native_status_bytes=64593; no authorization\n"
+    },
+    {
+      "case": "startup-progress-no-margin",
+      "exit_code": 0,
+      "error": "",
+      "observation": "writers=65 native_status_bytes=65500; exact original bytes retained; no authorization\n"
+    }
+  ],
+  "all_passed": true,
+  "actual_kodi_save_callbacks_executed": false,
+  "simulated_hook_coverage_flag": false,
+  "android_process_death_verified": false,
+  "candidate_deliverable": false
+}

@@ -3,25 +3,42 @@
 // proofs. Finishing an unknown script is NEVER itself a persistence receipt.
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
 #include <climits>
+#include <cstdint>
 #include <fcntl.h>
 #include <map>
 #include <mutex>
 #include <set>
 #include <string>
 #include <sys/stat.h>
+#if defined(__linux__)
+#include <sys/syscall.h>
+#endif
 #include <thread>
 #include <unistd.h>
 #include <vector>
 
 namespace InfinityScriptPersistence
 {
+struct InitializationStep
+{
+  std::string stage;
+  int64_t nativeTid{-1};
+  uint64_t interpreterIdentity{0};
+  uint64_t elapsedMs{0};
+};
 struct Writer
 {
   std::map<std::string, unsigned> admissions;
   bool observed{false};
   bool blockingFailure{false};
   std::string failure;
+  std::chrono::steady_clock::time_point admittedAt{std::chrono::steady_clock::now()};
+  std::chrono::steady_clock::time_point initializationUpdatedAt{admittedAt};
+  InitializationStep initialization;
+  std::vector<InitializationStep> initializationSteps;
+  bool initializationStepsOverflow{false};
 };
 struct Blocker
 {
@@ -134,6 +151,31 @@ inline void Admit(int id, const std::string& name)
   }
   s.retiredInvokers.erase(id); // Reusing an ID starts a new retirement obligation.
   ++s.writers[id].admissions[name]; ++s.totals[name].first;
+}
+// Read-only progress evidence. It never admits a writer, marks one Observed,
+// clears an exception/blocker, or supplies any durability/termination proof.
+// Only this ledger mutex is acquired; no GIL, GUI, invoker or checkpoint lock.
+inline bool InitializationProgress(int id, const char* stage, uint64_t interpreterIdentity=0)
+{
+  const int savedErrno=errno;
+  int64_t tid=-1;
+#if defined(__linux__)
+  tid=static_cast<int64_t>(::syscall(SYS_gettid));
+#endif
+  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
+  const auto found=s.writers.find(id);
+  if(found==s.writers.end()) {errno=savedErrno;return false;}
+  const auto now=std::chrono::steady_clock::now();
+  auto& writer=found->second;
+  InitializationStep step{std::string(stage?stage:"<null>").substr(0,128),tid,
+      interpreterIdentity?interpreterIdentity:writer.initialization.interpreterIdentity,
+      static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now-writer.admittedAt).count())};
+  writer.initialization=step;
+  writer.initializationUpdatedAt=now;
+  if(writer.initializationSteps.size()<32)writer.initializationSteps.push_back(step);
+  else writer.initializationStepsOverflow=true;
+  errno=savedErrno;
+  return true;
 }
 inline bool Pending(int id)
 {
@@ -292,6 +334,16 @@ inline std::string Failure()
 {auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.failure;}
 struct Evidence
 {
+  struct Initialization
+  {
+    int writerId{-1};
+    std::string writer;
+    int pid{-1};
+    bool observed{false},stepsOverflow{false};
+    uint64_t elapsedMs{0},stageElapsedMs{0};
+    InitializationStep current;
+    std::vector<InitializationStep> steps;
+  };
   std::size_t active{0}, observed{0}, retired{0}, failedSettled{0}, advisoryRetired{0}, paths{0};
   std::size_t blockingCount{0}, advisoryCount{0};
   bool syncStarted{false}, syncFinished{false}, durable{false}, blockerOverflow{false}, blockingOverflow{false};
@@ -301,6 +353,7 @@ struct Evidence
   std::string failureDetail;
   std::vector<std::string> pending;
   std::vector<Blocker> blockers;
+  std::vector<Initialization> initialization;
 };
 inline Evidence Snapshot()
 {
@@ -317,6 +370,19 @@ inline Evidence Snapshot()
   result.durable=s.committed && s.failure.empty() && result.blockingCount==0 && !result.blockingOverflow;
   for(const auto& item:s.writers) {
     if(item.second.observed)++result.observed;
+    const auto now=std::chrono::steady_clock::now();
+    const auto& writer=item.second;
+    Evidence::Initialization progress;
+    progress.writerId=item.first;
+    if(!writer.admissions.empty())progress.writer=writer.admissions.begin()->first.substr(0,512);
+    progress.pid=static_cast<int>(::getpid());progress.observed=writer.observed;
+    progress.current=writer.initialization;
+    if(progress.current.stage.empty())progress.current.stage="native.admitted_not_entered";
+    progress.elapsedMs=static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now-writer.admittedAt).count());
+    progress.stageElapsedMs=static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now-writer.initializationUpdatedAt).count());
+    progress.steps=writer.initializationSteps;
+    progress.stepsOverflow=writer.initializationStepsOverflow;
+    result.initialization.push_back(std::move(progress));
     for(const auto& admission:item.second.admissions)
       if(result.pending.size()<8)result.pending.push_back(admission.first);
   }

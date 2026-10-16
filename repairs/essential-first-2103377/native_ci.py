@@ -67,7 +67,8 @@ def compile_engine():
                   b'sqlite.vfs.write', b'Infinity protected write admission is closed',
                   b'Infinity Rails hold: control=', b'Infinity rails: stale job discarded',
                   b'python.runtime.threading_shutdown.complete', b'python_persistence_observer_initialization',
-                  b'application_startup_initialization_failed'):
+                  b'application_startup_initialization_failed',
+                  b'native_python_initialization_progress_v1', b'native.observer.entry'):
         assert token in binary, token
     assert hashlib.sha256(binary).hexdigest() == proof['native_sha256']
     proof.update(purpose='Essential-first shutdown production integration; not an accepted APK',
