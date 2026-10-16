@@ -1,0 +1,64 @@
+{
+  "scope": "production native VFS and ledger with real Python SQLite",
+  "cases": [
+    {
+      "case": "pending",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-5_snfr39\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "pending-wal",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"pending-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-ltf8d780\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "attach",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"attach\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-ixnk091p\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "attach-wal",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"attach-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-d3iq_gmh\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "optional-pending",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"optional-pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-0ufd0kb0\", \"expected\": []}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "late-write",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"late-write\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-0da0x9ky\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "late-write-wal",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"late-write-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-z63g_1zp\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    },
+    {
+      "case": "uri-vfs",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"uri-vfs\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-17u2ehb_\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "essential_rows_verified_after_host_process_death": true
+    }
+  ],
+  "all_passed": true,
+  "android_verified": false,
+  "apk_deliverable": false
+}

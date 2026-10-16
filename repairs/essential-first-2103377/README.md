@@ -1,6 +1,18 @@
 # Essential-first shutdown — production repair in progress
 
-**Status: shutdown-only native/Python corrections continue; an actual Java write-boundary gap blocks APK delivery; not locked.**
+**Current status: native 38867886900 and all 308 Android tests/complete internal shutdown 38868115575 passed. Physical TEST3 failed shared Python observer initialization; exact Fold exception still required. Not locked.**
+
+Continue from `9e9ef198`, preserving the permanently signed TEST3 baseline.
+Current evidence, initialization-error capture, and the required comparison
+with the user's Diggz add-ons, custom `skin.infinity.diggz` and retained Fold
+state are in [TEST3-OBSERVER-INVESTIGATION.md](TEST3-OBSERVER-INVESTIGATION.md)
+and `PRODUCTION-STATUS.json`. Fresh and synthetic-load passes are controls;
+they do not establish configured physical Fold acceptance.
+
+## Historical repair evidence
+
+The dated investigations below are retained as history. Their old failures
+and pending verification statements do not supersede the current results above.
 
 Continue on `work/infinity-2103377-essential-first-shutdown-only` from the
 latest saved source recorded in `PRODUCTION-STATUS.json`. The `5a62f829`

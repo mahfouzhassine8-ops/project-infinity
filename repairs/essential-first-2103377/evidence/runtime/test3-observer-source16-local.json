@@ -1,0 +1,24 @@
+{
+  "checks": {
+    "late_finalizer_fallback_before_persistence_finish": true,
+    "native_close_guard_and_explicit_stop": true,
+    "native_failure_receipt_on_callback_error": true,
+    "native_persistence_observer_unchanged": true,
+    "no_early_module_dictionary_clear": true,
+    "no_false_retirement": true,
+    "no_new_async_thread_interrupt": true,
+    "no_private_callback_list_mutation": true,
+    "no_py_end_interpreter_bypass": true,
+    "only_two_native_paths_changed": true,
+    "registered_callback_protocol_used": true,
+    "required_save_gates_untouched": true,
+    "shutdown_requires_observer": true,
+    "state_guard_in_header": true,
+    "stop_escalation_shield": true,
+    "threading_callback_before_cpp_child_join": true
+  },
+  "count": 16,
+  "native_runtime_modified_on_installed_device": false,
+  "scope": "source checks only; no native compilation or physical-device result",
+  "status": "source_contracts_passed"
+}

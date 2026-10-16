@@ -1,0 +1,338 @@
+{
+  "scope": "production observer initialization in pinned CPython 3.11.7 with host Kodi VFS adapter",
+  "results": [
+    {
+      "case": "fresh",
+      "exit_code": 0,
+      "retained_fixture_sha256": {},
+      "active": 1,
+      "observed": 1,
+      "blocking_count": 0,
+      "fail_closed": false,
+      "stage": "complete",
+      "original_exception": "",
+      "blockers": []
+    },
+    {
+      "case": "loaded-37",
+      "exit_code": 0,
+      "retained_fixture_sha256": {},
+      "active": 37,
+      "observed": 37,
+      "blocking_count": 0,
+      "fail_closed": false,
+      "stage": "complete",
+      "original_exception": "",
+      "blockers": []
+    },
+    {
+      "case": "concurrent-37",
+      "exit_code": 0,
+      "retained_fixture_sha256": {},
+      "active": 37,
+      "observed": 37,
+      "blocking_count": 0,
+      "fail_closed": false,
+      "stage": "complete",
+      "original_exception": "",
+      "blockers": []
+    },
+    {
+      "case": "pending-entry-exception",
+      "exit_code": 0,
+      "retained_fixture_sha256": {},
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "native.entry.pending_exception",
+      "original_exception": "RuntimeError",
+      "blockers": [
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=native.entry.pending_exception; exception=RuntimeError; message=entry-state-sentinel; native_errno=0; at=<string>:1:<module>"
+        }
+      ]
+    },
+    {
+      "case": "retained-module-shadow-37",
+      "exit_code": 0,
+      "retained_fixture_sha256": {
+        "sqlite3.py": "41fa908aabcd34c9e06ef63d31ff9341037f2ec107643a2e03acaab7f6368556"
+      },
+      "active": 37,
+      "observed": 0,
+      "blocking_count": 37,
+      "fail_closed": true,
+      "stage": "python.source",
+      "original_exception": "RuntimeError",
+      "blockers": [
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        },
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=retained-addon-sqlite-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/retained-module-shadow-37/retained-addon/lib/sqlite3.py:1:<module>; at=<string>:23:<module>"
+        }
+      ]
+    },
+    {
+      "case": "deep-import-trace",
+      "exit_code": 0,
+      "retained_fixture_sha256": {
+        "sqlite3.py": "daef2bc699a22b58241273ff4cb81950af25e3ee04871e390fc2a662f0fa8d3e",
+        "fixture_origin.py": "bcefbbb1f2de9ec8b4cdef6377935bfb3408c32dcf04e8b8273acb7ec2eb107b"
+      },
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "python.source",
+      "original_exception": "RuntimeError",
+      "blockers": [
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=RuntimeError; message=deep-trace-origin; native_errno=0; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/fixture_origin.py:1:<module>; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:3:wrapped; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:2:wrapped; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:2:wrapped; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:2:wrapped; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:2:wrapped; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:2:wrapped; at=/tmp/infinity-init-265_u8uo/deep-import-trace/retained-addon/lib/sqlite3.py:2:wrapped"
+        }
+      ]
+    },
+    {
+      "case": "constructor-ctypes",
+      "exit_code": 0,
+      "retained_fixture_sha256": {
+        "ctypes.py": "602aa5320200314bca8fd0328fc6ed2c000e35e85c20136ce4664cbe68a774e7"
+      },
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "python.observer.construct",
+      "original_exception": "RuntimeError",
+      "blockers": [
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=RuntimeError; message=retained-addon-ctypes-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/constructor-ctypes/retained-addon/lib/ctypes.py:1:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        }
+      ]
+    },
+    {
+      "case": "native-import",
+      "exit_code": 0,
+      "retained_fixture_sha256": {
+        "fcntl.py": "57be94a098c65a9ec7cd2f2792a10e6fc992d7653d6eb43b254a2a9a1cc7a19f"
+      },
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "native.import.fcntl",
+      "original_exception": "ImportError",
+      "blockers": [
+        {
+          "reason": "native_python_write_protection_unavailable",
+          "detail": "stage=native.import.fcntl; exception=ImportError; message=retained-addon-fcntl-sentinel; native_errno=0; at=/tmp/infinity-init-265_u8uo/native-import/retained-addon/lib/fcntl.py:1:<module>"
+        }
+      ]
+    },
+    {
+      "case": "native-descriptor-reader",
+      "exit_code": 0,
+      "retained_fixture_sha256": {},
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "native.descriptor_reader.FileIO.writable",
+      "original_exception": "",
+      "blockers": [
+        {
+          "reason": "native_python_write_protection_unavailable",
+          "detail": "stage=native.descriptor_reader.FileIO.writable; exception=<none>; native_errno=0"
+        }
+      ]
+    },
+    {
+      "case": "vfs-missing-file",
+      "exit_code": 0,
+      "retained_fixture_sha256": {},
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "python.observer.construct",
+      "original_exception": "AttributeError",
+      "blockers": [
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.install.xbmcvfs; exception=AttributeError; message=module 'xbmcvfs' has no attribute 'File'; native_errno=0; at=<string>:497:install; at=<string>:96:__init__"
+        }
+      ]
+    },
+    {
+      "case": "exception-format-failure",
+      "exit_code": 0,
+      "retained_fixture_sha256": {
+        "sqlite3.py": "bf77bc4ec94d270e952b15dad28dd1349d597d6db1ab86bfd24b227051ad9825"
+      },
+      "active": 1,
+      "observed": 0,
+      "blocking_count": 1,
+      "fail_closed": true,
+      "stage": "python.source",
+      "original_exception": "OriginalFailure",
+      "blockers": [
+        {
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; python_stage=python.import.sqlite3; exception=OriginalFailure; message=<unprintable>; native_errno=0; at=/tmp/infinity-init-265_u8uo/exception-format-failure/retained-addon/lib/sqlite3.py:3:<module>; at=<string>:23:<module>"
+        }
+      ]
+    }
+  ],
+  "all_passed": true,
+  "physical_fold_reproduced": false,
+  "actual_diggz_ecosystem_tested": false,
+  "verified_fold_userdata_tested": false,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

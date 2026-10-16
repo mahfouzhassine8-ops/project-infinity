@@ -28,6 +28,7 @@ struct Context
   PyObject* rawType{nullptr};
   PyObject* rawWrite{nullptr};
   PyObject* admissionError{nullptr};
+  std::string initializationStage;
   bool retiring{false};
   bool finalized{false};
   bool preservePending{false};
@@ -41,6 +42,58 @@ struct Context
 };
 inline std::map<PyInterpreterState*,Context*>& Contexts()
 {static auto* contexts=new std::map<PyInterpreterState*,Context*>;return *contexts;}
+inline void InitializationFailed(int id,const std::string& reason,const std::string& stage,
+                                 PyObject* globals=nullptr)
+{
+  // Capture the FIRST error before another import or attribute lookup can
+  // replace it. No Python modules are imported to format this receipt, and the
+  // original exception (including its traceback) remains pending for Kodi.
+  const int nativeError=errno;
+  PyObject *type=nullptr,*value=nullptr,*trace=nullptr;
+  PyErr_Fetch(&type,&value,&trace);
+  std::string detail="stage="+stage;
+  const auto appendText=[&](PyObject* text,std::size_t limit=768) {
+    if(text && PyUnicode_Check(text)) {
+      const char* bytes=PyUnicode_AsUTF8(text);
+      if(bytes)detail.append(bytes, std::min<std::size_t>(std::strlen(bytes),limit));
+    }
+    PyErr_Clear();
+  };
+  if(globals && (stage=="python.source" || stage=="python.observer.construct")) {
+    auto* step=PyDict_GetItemString(globals,"_INFINITY_INITIALIZATION_STAGE");
+    if(step && PyUnicode_Check(step)) { detail+="; python_stage=";appendText(step); }
+  }
+  detail+="; exception=";
+  detail+=type && PyType_Check(type) ? reinterpret_cast<PyTypeObject*>(type)->tp_name : "<none>";
+  if(value) {
+    detail+="; message=";
+    auto* message=PyObject_Str(value);
+    if(message)appendText(message);else {detail+="<unprintable>";PyErr_Clear();}
+    Py_XDECREF(message);
+  }
+  detail+="; native_errno="+std::to_string(nativeError);
+  std::vector<PyTracebackObject*> frames;
+  for(auto* frame=reinterpret_cast<PyTracebackObject*>(trace);frame;frame=frame->tb_next) {
+    if(frames.size()==8)frames.erase(frames.begin());
+    frames.push_back(frame);
+  }
+  // Put the originating frame first, so a long import chain cannot truncate
+  // the actual failing file out of the bounded ledger detail.
+  for(auto item=frames.rbegin();item!=frames.rend() && detail.size()<1700;++item) {
+    auto* frame=*item;
+    auto* code=PyFrame_GetCode(frame->tb_frame);
+    if(code) {
+      detail+="; at=";appendText(code->co_filename,320);
+      const int line=frame->tb_lineno>=0?frame->tb_lineno:PyCode_Addr2Line(code,frame->tb_lasti);
+      detail+=":"+std::to_string(line)+":";appendText(code->co_name,128);
+      Py_DECREF(code);
+    }
+  }
+  InfinityScriptPersistence::Fail(id,reason,detail);
+  PyErr_Clear();
+  PyErr_Restore(type,value,trace);
+  errno=nativeError;
+}
 inline void AdmissionDenied(Context* context,const char* message)
 { PyErr_SetString(context && context->admissionError ? context->admissionError : PyExc_PermissionError,message); }
 inline std::string Path(PyObject* value)
@@ -784,53 +837,89 @@ namespace InfinityPythonPersistence
 inline Context* Start(int id,PyInterpreterState* interpreter)
 {
   if(!InfinityScriptPersistence::Pending(id))return nullptr;
+  if(PyErr_Occurred() && Contexts().find(interpreter)==Contexts().end()) {
+    InitializationFailed(id,"checked_python_observer_initialization_failed","native.entry.pending_exception");
+    return nullptr;
+  }
   if (!InfinitySQLiteVFS::Install())
-  { InfinityScriptPersistence::Fail(id, "protected_sqlite_vfs_installation_failed"); return nullptr; }
+  { InitializationFailed(id,"protected_sqlite_vfs_installation_failed","native.sqlite_vfs.install");return nullptr; }
   static bool installed=false;
   if(!installed) {
-    if(PySys_AddAuditHook(Audit,nullptr)!=0){InfinityScriptPersistence::Fail(id,"native_python_audit_hook_unavailable");return nullptr;}
+    if(PySys_AddAuditHook(Audit,nullptr)!=0){InitializationFailed(id,"native_python_audit_hook_unavailable","native.audit.install");return nullptr;}
     installed=true;
   }
   const auto existing=Contexts().find(interpreter);
   if(existing!=Contexts().end())return existing->second; // Reusable interpreter keeps all admitted writes.
   auto* context=new Context;context->id=id;Contexts()[interpreter]=context;
+  const auto failed=[&](const char* reason="checked_python_observer_initialization_failed") {
+    InitializationFailed(id,reason,context->initializationStage,context->globals);
+    return context;
+  };
+  context->initializationStage="native.admission_exception";
   context->admissionError=PyErr_NewException("_infinity_native_persistence_observer.WriteAdmissionClosed",PyExc_PermissionError,nullptr);
   if(!context->admissionError)
-  { InfinityScriptPersistence::Fail(id,"native_python_admission_exception_unavailable"); return context; }
+    return failed("native_python_admission_exception_unavailable");
+  context->initializationStage="native.hooks.install";
   if (!InfinityPythonWriteHooks::Install())
-  { InfinityScriptPersistence::Fail(id, "native_python_write_protection_unavailable"); return context; }
+    return failed("native_python_write_protection_unavailable");
+  context->initializationStage="python.globals";
   context->globals=PyDict_New();
+  if(!context->globals)return failed();
   PyObject* name=PyUnicode_FromString("_infinity_native_persistence_observer");
-  PyDict_SetItemString(context->globals,"__name__",name);Py_DECREF(name);
+  if(!name)return failed();
+  const int named=PyDict_SetItemString(context->globals,"__name__",name);Py_DECREF(name);
+  if(named!=0)return failed();
+  context->initializationStage="python.source";
   PyObject* result=PyRun_String(INFINITY_PYTHON_PERSISTENCE_SOURCE,Py_file_input,context->globals,context->globals);
-  if(result)Py_DECREF(result);
+  if(!result)return failed();
+  Py_DECREF(result);
   static PyMethodDef errorMethod={"record_failure",Error,METH_VARARGS,nullptr};
   static PyMethodDef mutationMethod={"record_mutation",Mutation,METH_VARARGS,nullptr};
   static PyMethodDef protectionMethod={"protect_mutation",Protect,METH_VARARGS,nullptr};
+  context->initializationStage="native.callbacks";
   PyObject* capsule=PyCapsule_New(context,"Infinity.Persistence.Observer",nullptr);
-  PyObject* error=PyCFunction_NewEx(&errorMethod,capsule,nullptr);
-  PyObject* mutation=PyCFunction_NewEx(&mutationMethod,capsule,nullptr);
-  PyObject* protection=PyCFunction_NewEx(&protectionMethod,capsule,nullptr);
-  PyObject* vfs=PyImport_ImportModule("xbmcvfs");
+  PyObject* error=capsule?PyCFunction_NewEx(&errorMethod,capsule,nullptr):nullptr;
+  PyObject* mutation=error?PyCFunction_NewEx(&mutationMethod,capsule,nullptr):nullptr;
+  PyObject* protection=mutation?PyCFunction_NewEx(&protectionMethod,capsule,nullptr):nullptr;
+  PyObject* vfs=nullptr;
+  if(!protection) {
+    failed();
+    Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(capsule);
+    return context;
+  }
+  context->initializationStage="python.import.xbmcvfs";
+  vfs=PyImport_ImportModule("xbmcvfs");
 #if defined(INFINITY_SCRIPT_OBSERVER_HOST)
   if(!vfs){PyErr_Clear();vfs=Py_None;Py_INCREF(vfs);}
 #endif
-  PyObject* klass=PyDict_GetItemString(context->globals,"Observer");
+  bool initializationFailed=false;
+  if(!vfs || PyErr_Occurred()) { failed();initializationFailed=true; }
+  PyObject* klass=initializationFailed?nullptr:PyDict_GetItemString(context->globals,"Observer");
   PyObject* hostProbe=Py_False;
 #if defined(INFINITY_SCRIPT_OBSERVER_HOST)
   hostProbe=Py_True;
 #endif
-  if(klass && !PyErr_Occurred() && vfs)
+  if(klass && !PyErr_Occurred() && vfs) {
+    context->initializationStage="python.observer.construct";
     context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,context->admissionError,nullptr);
-  Py_XDECREF(vfs);Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(protection);Py_XDECREF(capsule);
-  if(context->observer) {
-    context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
-    context->rawType=PyObject_GetAttrString(context->observer,"raw_type");
-    if(context->rawType)context->rawWrite=PyObject_GetAttrString(context->rawType,"write");
   }
-  if(!context->observer || !context->connectionType || !context->rawType || !context->rawWrite || PyErr_Occurred())
-    InfinityScriptPersistence::Fail(id,"checked_python_observer_initialization_failed");
-  else InfinityScriptPersistence::Observed(id);
+  if(!initializationFailed && (!context->observer || PyErr_Occurred())) {
+    if(!klass)context->initializationStage="python.observer.class";
+    failed();initializationFailed=true;
+  }
+  Py_XDECREF(vfs);Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(protection);Py_XDECREF(capsule);
+  if(initializationFailed)return context;
+  context->initializationStage="python.observer.connection_type";
+  context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
+  if(!context->connectionType || PyErr_Occurred())return failed();
+  context->initializationStage="python.observer.raw_type";
+  context->rawType=PyObject_GetAttrString(context->observer,"raw_type");
+  if(!context->rawType || PyErr_Occurred())return failed();
+  context->initializationStage="python.observer.raw_write";
+  context->rawWrite=PyObject_GetAttrString(context->rawType,"write");
+  if(!context->rawWrite || PyErr_Occurred())return failed();
+  context->initializationStage="complete";
+  InfinityScriptPersistence::Observed(id);
   return context;
 }
 inline void Finish(Context* context,PyThreadState* owner,bool checkpointEscalated=false)

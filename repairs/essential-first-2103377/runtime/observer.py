@@ -7,14 +7,23 @@ records swallowed write failures and closes tracked buffers before interpreter
 teardown. Native admission, thread retirement and filesystem durability are
 separate required proofs.
 """
+_INFINITY_INITIALIZATION_STAGE = 'python.import.builtins'
 import builtins
+_INFINITY_INITIALIZATION_STAGE = 'python.import.importlib'
 import importlib
+_INFINITY_INITIALIZATION_STAGE = 'python.import.io'
 import io
+_INFINITY_INITIALIZATION_STAGE = 'python.import._io'
 import _io
+_INFINITY_INITIALIZATION_STAGE = 'python.import.os'
 import os
+_INFINITY_INITIALIZATION_STAGE = 'python.import.shutil'
 import shutil
+_INFINITY_INITIALIZATION_STAGE = 'python.import.sqlite3'
 import sqlite3
+_INFINITY_INITIALIZATION_STAGE = 'python.import.stat'
 import stat
+_INFINITY_INITIALIZATION_STAGE = 'python.import.sys'
 import sys
 # Marker is embedded into libkodi.so and checked by the native build gate.
 DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
@@ -22,14 +31,21 @@ DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
 # acquire their own destination leases inside the production native VFS.
 NONPERSISTENT_TARGET = '\0'
 try:
+    _INFINITY_INITIALIZATION_STAGE = 'python.import.subprocess'
     import subprocess
 except ImportError:
     subprocess = None
+_INFINITY_INITIALIZATION_STAGE = 'python.import.threading'
 import threading
+_INFINITY_INITIALIZATION_STAGE = 'python.import.types'
 import types
+_INFINITY_INITIALIZATION_STAGE = 'python.import.weakref'
 import weakref
+_INFINITY_INITIALIZATION_STAGE = 'python.import.contextlib'
 from contextlib import contextmanager
+_INFINITY_INITIALIZATION_STAGE = 'python.import.urllib.parse'
 from urllib.parse import unquote, urlsplit, parse_qs
+_INFINITY_INITIALIZATION_STAGE = 'python.define_observer'
 
 
 def protected_method(name, dirty=False, clean=False):
@@ -60,6 +76,8 @@ def protected_method(name, dirty=False, clean=False):
 
 class Observer:
     def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None):
+        global _INFINITY_INITIALIZATION_STAGE
+        _INFINITY_INITIALIZATION_STAGE = 'python.observer.state'
         self.fail = fail
         self.touch = touch
         self.lock = threading.RLock()
@@ -154,12 +172,15 @@ class Observer:
         return proxy
 
     def install(self):
+        global _INFINITY_INITIALIZATION_STAGE
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.open'
         for module in (builtins, io, _io):
             original = module.open
             def opened(path, mode='r', *args, _original=original, **kwargs):
                 return self.file(_original, path, mode, *args, **kwargs)
             self.patch(module, 'open', opened)
         observer = self
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.raw_io'
         original_raw = _io.FileIO
         class RawFile(original_raw):
             _infinity_depth = 0
@@ -213,6 +234,7 @@ class Observer:
         self.patch(_io, 'FileIO', RawFile)
         self.patch(io, 'FileIO', RawFile)
         for name in ('BufferedWriter', 'BufferedRandom', 'TextIOWrapper'):
+            _INFINITY_INITIALIZATION_STAGE = 'python.install.'+name
             base = getattr(_io, name)
             class CheckedBuffer(base):
                 _infinity_depth = 2 if name == 'TextIOWrapper' else 1
@@ -255,8 +277,11 @@ class Observer:
                             getattr(CheckedBuffer, method)))
             self.patch(_io, name, CheckedBuffer)
             self.patch(io, name, CheckedBuffer)
+        _INFINITY_INITIALIZATION_STAGE = 'python.import._sqlite3'
         native_sqlite = importlib.import_module('_sqlite3')
+        _INFINITY_INITIALIZATION_STAGE = 'python.import.sqlite3.dbapi2'
         dbapi2 = importlib.import_module('sqlite3.dbapi2')
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.sqlite3'
         original_connection = native_sqlite.Connection
         original_cursor = native_sqlite.Cursor
 
@@ -408,6 +433,7 @@ class Observer:
         self.patch(dbapi2, 'connect', dbapi_connect)
         self.patch(native_sqlite, 'Connection', Connection)
         self.patch(native_sqlite, 'connect', native_connect)
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.os'
         native_os = importlib.import_module(os.name)
         for name in ('write', 'writev', 'pwrite', 'pwritev', 'ftruncate', 'sendfile', 'copy_file_range'):
             if not hasattr(os, name): continue
@@ -461,10 +487,13 @@ class Observer:
                     if _name == 'open': self.touch(args[0], 'checked-open-end')
             self.patch(os, name, namespace_op)
             if hasattr(native_os, name): self.patch(native_os, name, namespace_op)
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.crypto'
         self.install_crypto_loads()
         if subprocess is not None:
+            _INFINITY_INITIALIZATION_STAGE = 'python.install.children'
             self.install_children()
         if self.vfs is not None:
+            _INFINITY_INITIALIZATION_STAGE = 'python.install.xbmcvfs'
             original = self.vfs.File
             def vfs_file(path, mode=None, _original=original):
                 if mode is None or not str(mode).startswith('w'):
@@ -509,12 +538,17 @@ class Observer:
                         observer.error('vfs_'+_name+'_exception')
                         raise
                 self.patch(self.vfs, name, vfs_op)
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.complete'
 
     def install_crypto_loads(self):
+        global _INFINITY_INITIALIZATION_STAGE
         # Resolve only the reviewed bundled crypto names to the APK library
         # root before dlopen. Native audit independently verifies exact bytes.
+        _INFINITY_INITIALIZATION_STAGE = 'python.import.ctypes'
         import ctypes
+        _INFINITY_INITIALIZATION_STAGE = 'python.import._ctypes'
         native = importlib.import_module('_ctypes')
+        _INFINITY_INITIALIZATION_STAGE = 'python.install.crypto_dlopen'
         original = native.dlopen
         names = ('libinfinityambient.so', 'libCryptodome_Cipher__Salsa20.so', 'libCryptodome_Cipher__chacha20.so', 'libCryptodome_Cipher__raw_aes.so', 'libCryptodome_Cipher__raw_cbc.so', 'libCryptodome_Cipher__raw_cfb.so', 'libCryptodome_Cipher__raw_ctr.so', 'libCryptodome_Cipher__raw_ecb.so', 'libCryptodome_Cipher__raw_ocb.so', 'libCryptodome_Cipher__raw_ofb.so', 'libCryptodome_Hash__BLAKE2s.so', 'libCryptodome_Hash__MD5.so', 'libCryptodome_Hash__SHA1.so', 'libCryptodome_Hash__SHA256.so', 'libCryptodome_Hash__ghash_portable.so', 'libCryptodome_Hash__poly1305.so', 'libCryptodome_Protocol__scrypt.so', 'libCryptodome_Util__cpuid_c.so', 'libCryptodome_Util__strxor.so')
         def loaded(name, *args, **kwargs):

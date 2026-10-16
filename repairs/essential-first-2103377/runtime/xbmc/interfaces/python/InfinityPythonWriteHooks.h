@@ -34,6 +34,8 @@ inline std::array<Spec, COUNT>& Specs()
 { static auto* specs = new std::array<Spec, COUNT>; return *specs; }
 inline bool ProtectNativeModule(PyObject* module);
 inline InfinityPythonPersistence::Context* Context();
+inline void InstallationStage(const std::string& stage)
+{ if(auto* context=Context())context->initializationStage=stage; }
 inline std::array<PyCFunction, 4>& DescriptorReaders()
 { static std::array<PyCFunction, 4> readers{}; return readers; }
 inline std::array<PyTypeObject*, 6>& IOTypes()
@@ -43,6 +45,7 @@ inline bool RememberIOTypes(PyObject* io)
   const char* names[]{"FileIO","BufferedWriter","BufferedRandom","BufferedReader","TextIOWrapper","BytesIO"};
   for (unsigned i = 0; i < 6; ++i)
   {
+    InstallationStage(std::string("native.io_type.")+names[i]);
     auto* object = PyObject_GetAttrString(io,names[i]);
     if (!object || !PyType_Check(object)) { Py_XDECREF(object); return false; }
     auto* type = reinterpret_cast<PyTypeObject*>(object);
@@ -99,6 +102,7 @@ inline PyObject* ActualDescriptor(PyObject* object, unsigned depth = 0)
 inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,
                              const char* methodName = "fileno")
 {
+  InstallationStage(std::string("native.descriptor_reader.")+typeName+"."+methodName);
   auto* type = PyObject_GetAttrString(io, typeName);
   auto* member = type ? PyObject_GetAttrString(type, methodName) : nullptr;
   bool ok = member && Py_IS_TYPE(member, &PyMethodDescr_Type);
@@ -486,6 +490,9 @@ template<Kind kind> bool Prepare(PyMethodDef* method)
 }
 template<Kind kind> bool Function(PyObject* module, const char* name, bool optional = false)
 {
+  const char* moduleName=PyModule_GetName(module);
+  if(!moduleName)return false;
+  InstallationStage(std::string("native.function.")+moduleName+"."+name);
   PyObject* object = PyObject_GetAttrString(module, name);
   if (!object)
   {
@@ -503,6 +510,7 @@ template<Kind kind> bool Function(PyObject* module, const char* name, bool optio
 }
 template<Kind kind> bool Method(PyObject* module, const char* typeName, const char* name)
 {
+  InstallationStage(std::string("native.method.")+typeName+"."+name);
   PyObject* object = PyObject_GetAttrString(module, typeName);
   if (!object) return false;
   auto* type = reinterpret_cast<PyTypeObject*>(object);
@@ -568,6 +576,7 @@ inline int RawInitialize(PyObject* self, PyObject* tuple, PyObject* dictionary)
 }
 inline bool Initializer(PyObject* io)
 {
+  InstallationStage("native.initializer.FileIO.__init__");
   auto* object = PyObject_GetAttrString(io, "FileIO");
   if (!object) return false;
   auto* type = reinterpret_cast<PyTypeObject*>(object);
@@ -589,11 +598,15 @@ inline bool Initializer(PyObject* io)
 }
 inline bool Install()
 {
+  InstallationStage("native.import.posix");
   auto* posix = PyImport_ImportModule("posix");
-  auto* io = PyImport_ImportModule("_io");
-  auto* imports = PyImport_ImportModule("_imp");
-  auto* locks = PyImport_ImportModule("fcntl");
-  auto* children = PyImport_ImportModule("_posixsubprocess");
+  PyObject *io=nullptr,*imports=nullptr,*locks=nullptr,*children=nullptr;
+  // Stop at the original failed import; a later import must not overwrite its
+  // exception or make the failure stage point at an unrelated dependency.
+  if(posix) { InstallationStage("native.import._io");io=PyImport_ImportModule("_io"); }
+  if(io) { InstallationStage("native.import._imp");imports=PyImport_ImportModule("_imp"); }
+  if(imports) { InstallationStage("native.import.fcntl");locks=PyImport_ImportModule("fcntl"); }
+  if(locks) { InstallationStage("native.import._posixsubprocess");children=PyImport_ImportModule("_posixsubprocess"); }
   if (!posix || !io || !imports || !locks || !children) { Py_XDECREF(posix); Py_XDECREF(io); Py_XDECREF(imports); Py_XDECREF(locks); Py_XDECREF(children); return false; }
   bool ok = RememberIOTypes(io) && DescriptorReader(io, "FileIO", 0) && DescriptorReader(io, "BufferedWriter", 1) &&
       DescriptorReader(io, "TextIOWrapper", 2) && DescriptorReader(io, "FileIO", 3, "writable") &&
