@@ -1,0 +1,11 @@
+{
+  "baseline_commit": "82aac05bf8fdddf011b01aa4e4e1249b8971d7f7",
+  "scope": "actual CPython native fork_exec reentry inside a descriptor callback; real child changes protected bytes after old barrier authorizes",
+  "result": {
+    "case": "nested-native-child",
+    "exit_code": -6,
+    "stdout": "Nested native child changed protected bytes; seal=1; authorized=1\n",
+    "stderr": "test: /tmp/essential-native-ozkwfwvs/test.cpp:231: int main(int, char**): Assertion `!sealed && !authorized' failed.\n"
+  },
+  "safe_to_release": false
+}

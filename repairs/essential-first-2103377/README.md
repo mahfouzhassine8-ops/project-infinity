@@ -22,18 +22,22 @@ capability surviving the old barrier. Production `fork_exec` now transfers
 actual output descriptor leases to the existing ledger until OS-confirmed
 child death. The protected-file, optional-cache/pipe and numeric-descriptor
 cases pass. Unsupported `posix_spawn` file actions remain explicit blockers.
-The child-output build is running at `38824257676`. The next correction makes
+The child-output build passed at `38824257676`. The next correction makes
 repository completion diagnostic while retaining its real write leases, and
 uses the existing admission guard for synchronous dependency installations.
 Actual job-manager and installer bodies verify that late installs do not
 mutate data and already-admitted installs retain their required receipts.
 Absent command execution is accepted only when every executable candidate is
 absent on an actual read-only system mount; writable/unknown paths stay blocked.
-These corrections still require a full ARM64 build and Android run.
+The native admission build is running at `38827466985`. A subsequent real child
+regression exposed low-level command reentry outside the validated Popen
+command. The C entry now verifies actual commands, environment and inherited
+descriptors, and leases the exec-error channel as well as stdout/stderr.
+These latest corrections still require a full ARM64 build and Android run.
 See `PRODUCTION-STATUS.json` and `TEST1-CORRECTIONS.md`. No internal APK has
 been delivered, and whole-package death remains unverified.
 
-Current host verification: 42 actual CPython 3.11.7 runtime cases, 8 actual
+Current host verification: 47 actual CPython 3.11.7 runtime cases, 8 actual
 SQLite VFS cases, 15 production coordinator cases, 13 production JobManager
 cases, 24 production installer cases, and the compiled Android
 protocol/guard authorization suite. First-party Command Center and compatibility

@@ -4,7 +4,7 @@
   "implementation": "existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 42,
+    "native_cpython_3117_runtime": 47,
     "coordinator_with_real_barrier": 15,
     "full_production_job_manager": 13,
     "production_installer_filesystem_sqlite": 24
@@ -15,8 +15,11 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "pending full build for repository completion diagnostics, synchronous installer admission and immutable-missing executable proof",
-    "child_output_build_run": 38824257676
+    "current_corrections": "pending full build for actual native fork command/environment/inherited-descriptor validation and exec-error output lease",
+    "child_output_build_run": 38824257676,
+    "child_output_build_result": "success",
+    "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
+    "admission_build_run": 38827466985
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
   "android_process_death_verified": false,
@@ -64,13 +67,25 @@
       "outcome": "CHECKPOINT_FAILED at background_jobs: required repository callback plus synchronous dependency installer; two unverified child-command warnings. No authorization or process-death/reopen success.",
       "evidence_artifact": 12015110471,
       "evidence_zip_sha256": "84b75d2c6e1c97cf6e536c3ff3690a4b98bb1ad9842768343c623637dbcd1105"
+    },
+    {
+      "run": 38826846657,
+      "outcome": "Matched Java compiled and preservation checked; packaging stopped because pinned native host test failed its real read-only mount prerequisite. No test was bypassed and no APK was signed in this run."
     }
   ],
   "child_output_correction": {
     "negative_control": "Real stopped child holding protected stdout changed bytes after old barrier authorized exit (seal=1, authorized=1).",
     "production_fix": "Native CPython fork_exec transfers actual stdout/stderr descriptor leases into existing ledger until OS-confirmed child death, with PID/start identity.",
-    "verification": "Protected child blocks sealing and later drains; optional cache/pipe children do not block; numeric descriptors verified; unsupported posix_spawn file actions remain explicit blockers.",
+    "verification": "47 actual CPython cases pass, including nested child, pending exec-error output, ordinary locale environment, untrusted writable PATH candidate and late direct entry. Android and whole-package acceptance remain required.",
     "no_watchdog_or_join": true,
-    "whole_package_child_process_termination": "Not established by host lease tests; Android app-UID process absence remains required."
+    "whole_package_child_process_termination": "Not established by host lease tests; Android app-UID process absence remains required.",
+    "native_command_negative_control": "Real nested native child changed protected bytes after old seal=1, authorized=1; this invalidates release of that build.",
+    "production_command_fix": "Validate actual fork_exec argv, every executable candidate, environment, inherited descriptors, cwd and preexec options at the C entry; lease stdout/stderr/exec-error writes; reject new child admission before mutation during Close."
+  },
+  "ci_fixture_correction": {
+    "failed_run": 38826715807,
+    "cause": "GitHub /sys was writable; immutable-executable regression correctly refused its read-only precondition.",
+    "correction": "Real read-only bind mount inside an isolated private namespace, dropping back to original runner UID. Production proof is unchanged.",
+    "passed_host_run": 38827466985
   }
 }

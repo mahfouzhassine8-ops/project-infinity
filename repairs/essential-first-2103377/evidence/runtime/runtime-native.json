@@ -208,7 +208,37 @@
     {
       "case": "missing-writable-command",
       "exit_code": 0,
-      "stdout": "PASS missing executable on writable path remains unverified\n",
+      "stdout": "PASS missing executable/search candidate on writable path remains unverified\n",
+      "stderr": ""
+    },
+    {
+      "case": "nested-native-child",
+      "exit_code": 0,
+      "stdout": "Nested native child changed protected bytes; seal=0; authorized=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-locale-environment",
+      "exit_code": 0,
+      "stdout": "PASS child-locale-environment; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-writable-search",
+      "exit_code": 0,
+      "stdout": "PASS missing executable/search candidate on writable path remains unverified\n",
+      "stderr": ""
+    },
+    {
+      "case": "child-error-channel-pending",
+      "exit_code": 0,
+      "stdout": "Real child changed protected bytes; seal=0; authorized=0\nPASS actual pending child output classification\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-native-child",
+      "exit_code": 0,
+      "stdout": "PASS late-native-child; actual CPython 3.11.7; no interpreter retirement required\n",
       "stderr": ""
     },
     {

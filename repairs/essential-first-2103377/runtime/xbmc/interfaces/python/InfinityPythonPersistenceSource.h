@@ -661,8 +661,9 @@ class Observer:
         if native_process is not None:
             fork_exec = native_process.fork_exec
             def checked_fork_exec(*args, **kwargs):
-                if not getattr(observer.child_scope, 'readonly', False):
-                    observer.error('unobserved_native_child_process')
+                # The actual C entry validates converted argv/executables,
+                # environment and descriptor ownership, including cached calls.
+                # It also denies new children before mutation during Close.
                 return fork_exec(*args, **kwargs)
             self.patch(native_process, 'fork_exec', checked_fork_exec)
             if hasattr(subprocess, '_fork_exec'):

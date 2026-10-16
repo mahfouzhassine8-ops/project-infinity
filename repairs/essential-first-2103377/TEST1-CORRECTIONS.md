@@ -62,7 +62,7 @@ ARM64 image or claim on-device ambient regression acceptance.
 
 ## Verification boundary
 
-Evidence in `evidence/runtime/` covers 42 production CPython cases, 8 SQLite
+Evidence in `evidence/runtime/` covers 47 production CPython cases, 8 SQLite
 cases, 15 coordinator cases, 13 full JobManager cases, 24 installer cases and
 compiled native/Android receipt agreement.
 The indefinitely waiting optional Python worker is still alive when host
@@ -132,3 +132,34 @@ this bridge activity finishes without presenting a frame. Receipt, identity,
 25-second native deadline, actual process absence and reopen assertions remain.
 The old test's 90-second `am -W` timeout did not negate its captured native
 failure receipt. No process termination or successful reopen is claimed.
+
+## Native child entry and error-channel verification
+
+A second actual-child negative control called native `fork_exec` from a
+`fileno` callback while a read-only Popen scope was active. The old hook
+inherited the scope's trust without verifying the actual executable. A real
+shell child changed protected bytes after `seal=1; authorized=1`. This failed
+result is retained in `evidence/runtime/native-child-command-negative-control.json`.
+
+The C entry now validates actual argv, every executable candidate, environment,
+inherited descriptors, cwd and preexec options before granting the read-only
+contract. Writable or unknown PATH candidates remain explicit blockers even
+when a later candidate happens to execute successfully. Exact ordinary locale
+environments still work. No third-party source or normal subprocess result is
+rewritten. Pre-Close unverified execution retains a blocking failure receipt;
+new native child admission during Close raises before spawning and remains a
+diagnostic denial, consistent with the existing Popen audit gate.
+
+The native exec-error output descriptor is also leased until actual child
+exit. A real stopped child that will write its exec failure into a protected
+file prevents sealing, then drains after OS-confirmed death. These cases and
+all existing native cases pass (47 total). The earlier full ARM64 child-output
+build `38824257676` passed, but neither it nor the pending admission build is
+a deliverable for this newly reproduced protection gap. A fresh build and
+actual Android verification of the final native source remain mandatory.
+
+The first admission CI run failed because its `/sys` mount was writable, not
+because a native protection was disabled. CI now uses a real read-only bind
+mount in a private namespace, executes tests as the original unprivileged
+runner and retains the real `statvfs` assertion. Host checks passed in run
+`38827466985`. No coverage flag or fabricated receipt was introduced.

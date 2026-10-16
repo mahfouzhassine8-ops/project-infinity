@@ -35,6 +35,7 @@ extern "C" pid_t fork() {
     if (syscall(SYS_write,childSignalPipe[1],&pid,sizeof(pid)) != sizeof(pid)) std::_Exit(92);
     kill(pid,SIGSTOP);
   }
+  if (child > 0 && traceNextFork) traceNextFork = false;
   return child;
 }
 // Test-only delay at the real libc write boundary. Production code has no
@@ -103,6 +104,9 @@ int main(int argc, char** argv) {
   else if (mode == "raw") run("f=old_raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else run("fd=os.open(shared, os.O_CREAT|os.O_RDWR, 0o600); os.write(fd,b'essential')\n");
   if (mode == "uname-combined-flags") run("import subprocess\nassert subprocess.check_output(['uname','-rs']).strip()\n");
+  if (mode == "late-native-child") run("import _posixsubprocess\nerror_read,error_write=os.pipe()\n");
+  if (mode == "child-locale-environment") run("import subprocess\nassert subprocess.check_output(['uname','-rs'],env=dict(os.environ,LC_ALL='C')).strip()\n");
+  if (mode == "child-writable-search") run("import subprocess\nos.environ['PATH']=root+'/cache:'+os.environ['PATH']\nassert subprocess.check_output(['uname','-rs']).strip()\n");
   if (mode == "missing-immutable-command" || mode == "missing-writable-command") {
     if (mode == "missing-immutable-command") run("command='/sys/kernel/infinity_missing_shutdown_probe'; assert os.statvfs('/sys').f_flag & os.ST_RDONLY\n");
     else run("command=root+'/cache/infinity_missing_shutdown_probe'\n");
@@ -110,15 +114,47 @@ int main(int argc, char** argv) {
   }
   if (mode == "child-numeric-output") run("import subprocess\nassert subprocess.call(['uname','-rs'],stdout=fd)==0\nbaseline=old_open(shared,'rb').read(); assert baseline!=b'essential'\n");
   if (mode == "unverified-posix-spawn") run("pid=os.posix_spawn('/usr/bin/uname',['uname','-rs'],os.environ,file_actions=[(os.POSIX_SPAWN_DUP2,fd,1)]); assert os.waitpid(pid,0)[1]==0\n");
+  if (mode == "nested-native-child") run(R"nested(
+import subprocess,_posixsubprocess
+trigger_read,trigger_write=os.pipe()
+error_read,error_write=os.pipe()
+children=[]
+class Output:
+ def fileno(self):
+  children.append(_posixsubprocess.fork_exec(
+   ['/bin/sh','-c','read trigger; printf changed > "$1"','probe',shared],
+   (b'/bin/sh',),True,(error_write,),None,None,
+   trigger_read,trigger_write,-1,-1,-1,-1,error_read,error_write,
+   True,False,-1,None,None,None,-1,None,False))
+  return fd
+assert subprocess.call(['uname','-rs'],stdout=Output())==0
+baseline=old_open(shared,'rb').read()
+)nested");
   pid_t tracedChild = -1;
-  if (mode == "child-file-pending" || mode == "child-cache-pending" || mode == "child-pipe-pending") {
+  if (mode == "child-file-pending" || mode == "child-cache-pending" || mode == "child-pipe-pending" ||
+      mode == "child-error-channel-pending") {
     assert(pipe(childSignalPipe)==0);
     traceNextFork = true;
     run("import subprocess,threading\nsubprocess._USE_VFORK=False; subprocess._USE_POSIX_SPAWN=False\n");
-    if (mode == "child-file-pending") run("output=open(shared,'ab')\n");
-    else if (mode == "child-cache-pending") run("output=open(private,'ab')\n");
-    else run("output=subprocess.PIPE\n");
-    run("children=[]\ndef launch_child():\n child=subprocess.Popen(['uname','-rs'],stdout=output); children.append(child); child.communicate(timeout=5)\nt=threading.Thread(target=launch_child); t.start()\n");
+    if (mode == "child-error-channel-pending") run(R"errorchannel(
+import _posixsubprocess
+children=[]
+class Output:
+ def fileno(self):
+  children.append(_posixsubprocess.fork_exec(
+   ['/sys/kernel/infinity_missing_shutdown_probe'],
+   (b'/sys/kernel/infinity_missing_shutdown_probe',),True,(fd,),None,None,
+   -1,-1,-1,-1,-1,-1,-1,fd,True,False,-1,None,None,None,-1,None,False))
+  return fd
+assert subprocess.call(['uname','-rs'],stdout=Output())==0
+baseline=old_open(shared,'rb').read()
+)errorchannel");
+    else {
+      if (mode == "child-file-pending") run("output=open(shared,'ab')\n");
+      else if (mode == "child-cache-pending") run("output=open(private,'ab')\n");
+      else run("output=subprocess.PIPE\n");
+      run("children=[]\ndef launch_child():\n child=subprocess.Popen(['uname','-rs'],stdout=output); children.append(child); child.communicate(timeout=5)\nt=threading.Thread(target=launch_child); t.start()\n");
+    }
     auto* state = PyEval_SaveThread();
     struct pollfd ready{childSignalPipe[0],POLLIN,0};
     assert(poll(&ready,1,5000)==1);
@@ -194,8 +230,10 @@ int main(int argc, char** argv) {
     const bool sealed = InfinityScriptPersistence::SealEssentialWrites(23);
     const bool authorized = InfinityScriptPersistence::EssentialWritesAuthorized(23);
     assert(kill(tracedChild,SIGCONT)==0);
-    run("t.join(5); assert not t.is_alive(); assert children[0].returncode==0\n");
-    if (mode == "child-file-pending") {
+    if (mode == "child-error-channel-pending")
+      run("assert os.waitpid(children[0],0)[0]==children[0]\nassert old_open(shared,'rb').read()!=baseline\n");
+    else run("t.join(5); assert not t.is_alive(); assert children[0].returncode==0\n");
+    if (mode == "child-file-pending" || mode == "child-error-channel-pending") {
       run("assert old_open(shared,'rb').read()!=b'essential'\n");
       std::cout << "Real child changed protected bytes; seal=" << sealed << "; authorized=" << authorized << '\n' << std::flush;
       assert(!sealed && !authorized);
@@ -219,11 +257,20 @@ int main(int argc, char** argv) {
     std::cout << "PASS unobserved posix_spawn file actions remain an essential blocker\n" << std::flush;
     std::_Exit(0);
   }
-  if (mode == "missing-writable-command") {
+  if (mode == "nested-native-child") {
+    const bool sealed=InfinityScriptPersistence::SealEssentialWrites(23);
+    const bool authorized=InfinityScriptPersistence::EssentialWritesAuthorized(23);
+    run("os.write(trigger_write,b'go\\n'); assert os.waitpid(children[0],0)[1]==0\nassert old_open(shared,'rb').read()==b'changed'\n");
+    std::cout << "Nested native child changed protected bytes; seal=" << sealed << "; authorized=" << authorized << '\n' << std::flush;
+    assert(!sealed && !authorized);
+    assert(!InfinityScriptPersistence::EssentialWrites().blockers.empty());
+    std::_Exit(0);
+  }
+  if (mode == "missing-writable-command" || mode == "child-writable-search") {
     assert(!InfinityScriptPersistence::EssentialWrites().blockers.empty());
     assert(!InfinityScriptPersistence::SealEssentialWrites(23));
     assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
-    std::cout << "PASS missing executable on writable path remains unverified\n" << std::flush;
+    std::cout << "PASS missing executable/search candidate on writable path remains unverified\n" << std::flush;
     std::_Exit(0);
   }
   if (mode == "unknown-descriptor") {
@@ -253,6 +300,15 @@ int main(int argc, char** argv) {
   assert(InfinityScriptPersistence::SealEssentialWrites(23));
   assert(InfinityScriptPersistence::EssentialWritesAuthorized(23));
   if (mode == "observer-denials") run("from pathlib import Path\nfor operation in (lambda: os.open(shared,os.O_WRONLY|os.O_TRUNC),lambda: open(shared,'w'),lambda: os.mkdir(root+'/profile/late'),lambda: Path(shared).write_text('BAD')):\n try: operation()\n except PermissionError: pass\n else: raise AssertionError('observer admitted a sealed mutation')\n");
+  if (mode == "late-native-child") run(R"latechild(
+try:
+ _posixsubprocess.fork_exec(['/bin/sh','-c','printf BAD > "$1"','probe',shared],
+  (b'/bin/sh',),True,(error_write,),None,None,-1,-1,-1,-1,-1,-1,error_read,error_write,
+  True,False,-1,None,None,None,-1,None,False)
+except PermissionError: pass
+else: raise AssertionError('late native child was admitted')
+assert old_open(shared,'rb').read()==b'essential'
+)latechild");
   if (mode == "memory-buffer") run("memory.write('still RAM'); memory.flush()\n");
   if (mode == "late-chmod") run("try: os.chmod(shared,0o777)\nexcept PermissionError: pass\nelse: raise AssertionError('metadata mutation crossed seal')\n");
   if (mode == "pillow-fd") run("enc=core.raw_encoder('RGB','RGB'); enc.setimage(im)\ntry: enc.encode_to_file(fd)\nexcept PermissionError: pass\nelse: raise AssertionError('native encoder descriptor write crossed seal')\nassert old_open(shared,'rb').read()==baseline\n");
@@ -307,7 +363,7 @@ def main():
         subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-pthread',
                         *['-I'+str(p) for p in includes],str(source),'-L'+str(library),
                         '-lpython3.11','-l:libsqlite3.so.0','-ldl','-lm','-lcrypto','-Wl,--export-dynamic','-o',str(binary)],check=True)
-        env=dict(os.environ,LD_LIBRARY_PATH=str(library),
+        env=dict(os.environ,PATH='/usr/bin:/bin',LD_LIBRARY_PATH=str(library),
                  PYTHONHOME=str(prefix),PYTHONPATH=str(prefix/'lib/python3.11')+':'+str(prefix/'lib/python3.11/lib-dynload'),
                  PYTHONDONTWRITEBYTECODE='1')
         results=[]
@@ -316,7 +372,9 @@ def main():
                'descriptor-race','rename-race','sqlite-renamed','sqlite-row-factory','file-lock',
                'pathlike','memory-buffer','observer-denials','unknown-descriptor','uname-combined-flags','child-numeric-output',
                'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
-        cases+=['missing-immutable-command','missing-writable-command']
+        cases+=['missing-immutable-command','missing-writable-command','nested-native-child',
+                'child-locale-environment','child-writable-search','child-error-channel-pending',
+                'late-native-child']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

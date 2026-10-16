@@ -349,16 +349,19 @@ inline PyObject* ForkExec(PyObject* self, PyObject* tuple)
 {
   auto* context = Context();
   const int writer = context ? context->id : -1;
-  if (!context || !context->readonlyChildren[PyThreadState_Get()])
+  if (Ledger::RejectOpaqueMutation("native_child_process"))
+  { InfinityPythonPersistence::AdmissionDenied(context,"Child admission is closed during checkpoint"); return nullptr; }
+  std::string detail="readonly_child_scope_absent";
+  if (!context || !context->readonlyChildren[PyThreadState_Get()] ||
+      !InfinityPythonPersistence::ReadonlyForkExec(tuple,detail))
   {
-    Ledger::Fail(writer, "unobserved_native_child_process");
-    if (Ledger::RejectOpaqueMutation("native_child_process"))
-    { InfinityPythonPersistence::AdmissionDenied(context,"Unverified child process during checkpoint"); return nullptr; }
+    Ledger::Fail(writer, "unobserved_native_child_process",detail);
   }
   std::vector<uint64_t> operations;
-  // Pinned CPython 3.11 fork_exec ABI: c2pwrite and errwrite are the actual
-  // converted stdout/stderr descriptors, after any provider fileno() calls.
-  for (const auto& item : {std::make_pair(9,1), std::make_pair(11,2)})
+  // Pinned CPython 3.11 fork_exec ABI: actual stdout, stderr and exec-error
+  // descriptors, after provider fileno callbacks. The error channel also
+  // writes in the child when exec fails and cannot be assumed to be a pipe.
+  for (const auto& item : {std::make_pair(9,1), std::make_pair(11,2), std::make_pair(13,-1)})
   {
     int descriptor = -1;
     if (PyTuple_Check(tuple) && PyTuple_GET_SIZE(tuple) == 23)

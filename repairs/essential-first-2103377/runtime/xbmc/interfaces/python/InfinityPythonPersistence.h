@@ -252,7 +252,11 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
     return true;
   }
 
-  if(executableRaw=="uname" || executableName=="/system/bin/uname") {
+  bool unameExecutable=executableRaw=="uname" || executableName=="/system/bin/uname";
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  unameExecutable = unameExecutable || executableName=="/usr/bin/uname" || executableName=="/bin/uname";
+#endif
+  if(unameExecutable) {
     if(count<1 || count>2)return false;
     PyObject* first=PySequence_GetItem(command,0);
     const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
@@ -318,6 +322,86 @@ inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
     Py_XDECREF(item);if(!matches)return false;
   }
   return true;
+}
+
+inline bool ReadonlyForkEnvironment(PyObject* environment)
+{
+  std::map<std::string,std::string> expected;
+  for (auto** entry=::environ; entry && *entry; ++entry)
+  {
+    const std::string item(*entry); const auto equal=item.find('=');
+    if (equal==std::string::npos) return false;
+    const auto key=item.substr(0,equal);
+#if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
+    if (key.rfind("LD_",0)==0 || key.rfind("DYLD_",0)==0) return false;
+#endif
+    expected[key]=item.substr(equal+1);
+  }
+  if (environment==Py_None) return true;
+  if (!PyList_CheckExact(environment) && !PyTuple_CheckExact(environment)) return false;
+  std::map<std::string,std::string> actual;
+  for (Py_ssize_t i=0;i<PySequence_Fast_GET_SIZE(environment);++i)
+  {
+    auto* value=PySequence_Fast_GET_ITEM(environment,i);
+    if (!PyBytes_CheckExact(value)) return false;
+    const std::string item(PyBytes_AS_STRING(value),PyBytes_GET_SIZE(value));
+    const auto equal=item.find('=');
+    if (equal==std::string::npos || item.find('\0')!=std::string::npos ||
+        !actual.emplace(item.substr(0,equal),item.substr(equal+1)).second) return false;
+  }
+  if (actual==expected) return true;
+  expected["LC_ALL"]="C";
+  return actual==expected;
+}
+
+inline bool ReadonlyForkExec(PyObject* tuple,std::string& detail)
+{
+  // Validate the actual pinned CPython ABI, not a surrounding Python scope.
+  // Cached direct entry, fileno callbacks and PATH/environment changes must
+  // not inherit permission to run a different child or an arbitrary preexec.
+  detail="native_fork_abi";
+  if (!PyTuple_CheckExact(tuple) || PyTuple_GET_SIZE(tuple)!=23) return false;
+  auto at=[&](Py_ssize_t i){return PyTuple_GET_ITEM(tuple,i);};
+  detail="native_child_options_or_environment";
+  if (at(2)!=Py_True || at(4)!=Py_None || at(17)!=Py_None || at(18)!=Py_None ||
+      at(19)!=Py_None || at(21)!=Py_None || !ReadonlyForkEnvironment(at(5))) return false;
+  for (const int i : {6,7,8,9,10,11,12,13,14,15,16,20,22})
+    if (!PyLong_CheckExact(at(i)) && !PyBool_Check(at(i))) return false;
+  detail="native_child_inherited_descriptors";
+  if (!PyTuple_CheckExact(at(3)) || PyTuple_GET_SIZE(at(3))!=1 ||
+      !PyLong_CheckExact(PyTuple_GET_ITEM(at(3),0)) ||
+      PyObject_RichCompareBool(PyTuple_GET_ITEM(at(3),0),at(13),Py_EQ)!=1) return false;
+  detail="native_child_argument_types";
+  if ((!PyList_CheckExact(at(0)) && !PyTuple_CheckExact(at(0))) ||
+      !PyTuple_CheckExact(at(1)) || PyTuple_GET_SIZE(at(1))==0) return false;
+  const auto count=PySequence_Fast_GET_SIZE(at(0));
+  auto* command=PyTuple_New(count); if (!command) return false;
+  bool safe=true;
+  for (Py_ssize_t i=0;i<count;++i)
+  {
+    auto* original=PySequence_Fast_GET_ITEM(at(0),i); PyObject* value=nullptr;
+    if (PyUnicode_CheckExact(original)) {value=original;Py_INCREF(value);}
+    else if (PyBytes_CheckExact(original))
+      value=PyUnicode_DecodeFSDefaultAndSize(PyBytes_AS_STRING(original),PyBytes_GET_SIZE(original));
+    if (!value) {safe=false;break;}
+    PyTuple_SET_ITEM(command,i,value);
+  }
+  for (Py_ssize_t i=0;safe && i<PyTuple_GET_SIZE(at(1));++i)
+  {
+    auto* original=PyTuple_GET_ITEM(at(1),i);
+    if (!PyBytes_CheckExact(original)) {safe=false;break;}
+    const std::string path(PyBytes_AS_STRING(original),PyBytes_GET_SIZE(original));
+    detail="native_child_executable="+path.substr(0,256);
+    if (path.empty() || path.front()!='/' || path.find('\0')!=std::string::npos)
+    {safe=false;break;}
+    auto* executable=PyUnicode_DecodeFSDefaultAndSize(path.data(),path.size());
+    safe=executable && (MissingImmutableExecutablePath(path) || ReadonlyCommand(executable,command));
+    Py_XDECREF(executable);
+  }
+  Py_DECREF(command);
+  if (PyErr_Occurred()) {PyErr_Clear();return false;}
+  if (safe) detail.clear();
+  return safe;
 }
 
 inline std::string ChildProcessEvidence(PyObject* executable,PyObject* command)
