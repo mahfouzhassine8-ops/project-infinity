@@ -51,3 +51,11 @@ The isolated Android diagnostic will reuse saved RC05 Java/manifest/assets and
 308-test proof, replace only `libkodi.so`, and re-sign with the existing identity.
 It is gated on full native success and has 21 passing payload/signing controls.
 It cannot promote a Fold APK or change the existing acceptance gates.
+
+Isolated internal diagnostic **38968517075**, source `79458c62`, is now queued
+and waiting for full native success. Packaging/signing/AVD work cannot start
+before that gate. This stage changes no application imports or write policy;
+the exact cause of the Android initialization delay remains unproven.
+The failed emulator log used `skin.estuary`, with 37 controlled services. It is
+a lifecycle/observer control, not a clone of the Fold's Diggz ecosystem and
+`skin.infinity.diggz` 1.0.5.223 configuration.
