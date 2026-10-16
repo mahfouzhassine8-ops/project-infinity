@@ -1,6 +1,6 @@
 # Essential-first shutdown — production repair in progress
 
-**Current status: Android 38892686819 passed all 308 tests, fresh Close/reopen, 37-service baseline Close and exact upgrade byte preservation. Actual early candidate Close then interrupted core keyboard-layout loading before any Python writer registered. A native admission-ordering correction passes 34 coordinator/startup cases, 15 job cases, 12 repository controls and five observer race controls locally. Native correction `402dfe75` is rebuilding in run `38899217848`; host proof passed. Matched TEST4 RC03 Android verification is being staged. Full ARM64 and Android acceptance remain required. Not locked.**
+**Current status: Android 38892686819 passed all 308 tests, fresh Close/reopen, 37-service baseline Close and exact upgrade byte preservation. Actual early candidate Close then interrupted core keyboard-layout loading before any Python writer registered. A native admission-ordering correction passes 34 coordinator/startup cases, 15 job cases, 12 repository controls and five observer race controls locally. Native correction `402dfe75` is rebuilding in run `38899217848`; host proof passed. Matched TEST4 RC03 Android run `38899820197` is running at `8dfca753`. Full ARM64 and Android acceptance remain required. Not locked.**
 
 See [EARLY-STARTUP-ADMISSION.md](EARLY-STARTUP-ADMISSION.md) for the current
 failure and correction. Native 38887113826 remains the previous green build;
