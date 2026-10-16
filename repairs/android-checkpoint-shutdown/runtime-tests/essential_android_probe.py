@@ -224,10 +224,13 @@ def main():
             if observation.get('pid')==owner['pid'] and observation.get('read_flush_close_completed') is True:break
             time.sleep(.25)
         report['readonly_virtual_file_observation']=observation;save()
-        assert observation.get('pid')==owner['pid'] and observation.get('addon')==READONLY_FIXTURE
-        assert observation.get('flags_source')=='proc_fdinfo' and observation.get('fdinfo_inode')==observation.get('inode')
+        assert observation.get('pid')==owner['pid'] and observation.get('addon')==READONLY_FIXTURE, 'Read-only fixture did not return a matching completed receipt; inspect kodi.log: '+str(observation)
+        assert observation.get('flags_source')=='proc_fdinfo', 'Missing kernel descriptor flags'
+        assert observation.get('fd_identity_before')==observation.get('fd_identity_after')==[observation.get('device'),observation.get('inode'),observation.get('stat_mode')], 'Descriptor identity changed during flag observation'
+        if observation.get('fdinfo_inode') is not None:
+            assert observation['fdinfo_inode']==observation['inode'], 'fdinfo inode disagrees with fstat'
         assert observation.get('flags',-1)&3==0 and observation.get('writable') is False
-        assert observation.get('descriptor_target')=='/proc/'+str(owner['pid'])+'/maps'
+        assert observation.get('descriptor_target')==observation.get('descriptor_target_after')=='/proc/'+str(owner['pid'])+'/maps', 'Descriptor target changed during flag observation'
         assert observation.get('regular_file') is True and observation.get('inode',0)>0
         assert observation.get('proc_mount_types')==['proc']
         assert observation.get('read_succeeded') is True and observation.get('read_flush_close_completed') is True

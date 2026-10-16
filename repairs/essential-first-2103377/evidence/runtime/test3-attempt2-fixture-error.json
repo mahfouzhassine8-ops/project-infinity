@@ -1,0 +1,20 @@
+{
+  "run": 38863124379,
+  "artifact": 12029528722,
+  "artifact_zip_sha256": "ac583567a8f8e9630d30b8fddcf9130bf9c364ac93408dc454f6e6a3577e3a19",
+  "error": "KeyError: ino",
+  "close_attempted": false,
+  "native_production_changed": false,
+  "kodi_trace": [
+    "2026-10-16 06:55:33.836 T:5917    error <general>: EXCEPTION Thrown (PythonToCppException) : -->Python callback/script returned the following error<--",
+    "                                                    - NOTE: IGNORING THIS CAN LEAD TO MEMORY LEAKS!",
+    "                                                   Error Type: <class 'KeyError'>",
+    "                                                   Error Contents: 'ino'",
+    "                                                   Traceback (most recent call last):",
+    "                                                     File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.infinity.readonlymaps.test/default.py\", line 23, in <module>",
+    "                                                       flags_source='proc_fdinfo', fdinfo_inode=int(fields['ino']),",
+    "                                                                                                    ~~~~~~^^^^^^^",
+    "                                                   KeyError: 'ino'",
+    "                                                   -->End of Python script error report<--"
+  ]
+}

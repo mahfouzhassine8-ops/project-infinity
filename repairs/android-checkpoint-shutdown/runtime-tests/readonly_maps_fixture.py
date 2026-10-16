@@ -13,16 +13,23 @@ result = {"addon": xbmcaddon.Addon().getAddonInfo("id"), "pid": os.getpid()}
 with open('/proc/self/maps', encoding='utf-8') as maps:
     descriptor = maps.fileno()
     identity = os.fstat(descriptor)
+    target = os.readlink('/proc/self/fd/' + str(descriptor))
     # Observe kernel flags without issuing a descriptor-control audit event.
     # The production guard deliberately treats unclassified fcntl calls as
     # unknown effects; diagnostic instrumentation must not add one itself.
     with open('/proc/self/fdinfo/' + str(descriptor), encoding='utf-8') as info:
-        fields = dict(line.rstrip().split(':', 1) for line in info if ':' in line)
-    assert int(fields['ino']) == identity.st_ino
+        fdinfo = info.read()
+    fields = dict(line.rstrip().split(':', 1) for line in fdinfo.splitlines() if ':' in line)
+    info_inode = fields.get('ino')
+    after = os.fstat(descriptor)
     result.update(descriptor=descriptor, flags=int(fields['flags'], 8),
-                  flags_source='proc_fdinfo', fdinfo_inode=int(fields['ino']),
+                  flags_source='proc_fdinfo', fdinfo_inode=int(info_inode) if info_inode is not None else None,
+                  fdinfo=fdinfo,
+                  fd_identity_before=[identity.st_dev, identity.st_ino, identity.st_mode],
+                  fd_identity_after=[after.st_dev, after.st_ino, after.st_mode],
                   mode=maps.mode, writable=maps.writable(),
-                  descriptor_target=os.readlink('/proc/self/fd/' + str(descriptor)),
+                  descriptor_target=target,
+                  descriptor_target_after=os.readlink('/proc/self/fd/' + str(descriptor)),
                   device=identity.st_dev, inode=identity.st_ino, stat_mode=identity.st_mode,
                   regular_file=stat.S_ISREG(identity.st_mode), read_succeeded=bool(maps.readline()))
     maps.flush()

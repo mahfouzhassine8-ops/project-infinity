@@ -316,9 +316,10 @@ baseline=old_open(shared,'rb').read()
     assert(::dup2(read,target)==target);assert(::close(read)==0);
     run("try: pending.flush()\nexcept OSError: pass\nelse: raise AssertionError('retargeted writable buffer pretended to save')\n");
   }
-  if (mode == "readonly-maps-fixture" || mode == "readonly-maps-fixture-getfl") {
+  if (mode == "readonly-maps-fixture" || mode == "readonly-maps-fixture-getfl" || mode == "readonly-maps-fixture-noino") {
     // Only Kodi metadata APIs are supplied by this host harness. The exact
     // Android fixture, native observer, kernel descriptors and saves are real.
+    run(mode == "readonly-maps-fixture-noino" ? "omit_fdinfo_ino=True\n" : "omit_fdinfo_ino=False\n");
     run(R"fixture(
 import sys, types, json
 addon = types.ModuleType('xbmcaddon')
@@ -332,12 +333,22 @@ vfs = types.ModuleType('xbmcvfs'); vfs.translatePath = lambda path: path
 sys.modules['xbmcaddon'] = addon; sys.modules['xbmcvfs'] = vfs
 fixture_path = os.environ['INFINITY_READONLY_MAPS_FIXTURE']
 with old_open(fixture_path, encoding='utf-8') as source: fixture_source = source.read()
+if omit_fdinfo_ino:
+ # Reproduce the Android kernel's missing optional field after reading real
+ # fdinfo. Keep actual flags, native descriptors and fstat observations intact.
+ marker = "    info_inode = fields.get('ino')"
+ assert fixture_source.count(marker) == 1
+ fixture_source = fixture_source.replace(marker, "    fields.pop('ino', None)\n"+marker)
 exec(compile(fixture_source, fixture_path, 'exec'), {})
 with old_open(root+'/profile/readonlymaps/observed-readonly-maps.json') as saved:
  observation = json.load(saved)
 assert observation['flags_source'] == 'proc_fdinfo' and observation['flags'] & os.O_ACCMODE == os.O_RDONLY
-assert observation['fdinfo_inode'] == observation['inode'] and observation['inode'] > 0
+assert observation['inode'] > 0
+assert observation['fd_identity_before'] == observation['fd_identity_after'] == [observation['device'], observation['inode'], observation['stat_mode']]
+if omit_fdinfo_ino: assert observation['fdinfo_inode'] is None
+if observation['fdinfo_inode'] is not None: assert observation['fdinfo_inode'] == observation['inode']
 assert observation['descriptor_target'] == '/proc/'+os.readlink('/proc/self')+'/maps'
+assert observation['descriptor_target_after'] == observation['descriptor_target']
 assert observation['regular_file'] and observation['writable'] is False
 assert observation['read_succeeded'] and observation['read_flush_close_completed']
 assert observation['proc_mount_types'] == ['proc']
@@ -572,7 +583,7 @@ def main():
                 'readonly-proc-writable-retarget','writable-reader-retarget']
         if args.readonly_maps_fixture:
             env['INFINITY_READONLY_MAPS_FIXTURE']=str(args.readonly_maps_fixture.resolve())
-            cases+=['readonly-maps-fixture','readonly-maps-fixture-getfl']
+            cases+=['readonly-maps-fixture','readonly-maps-fixture-getfl','readonly-maps-fixture-noino']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)
