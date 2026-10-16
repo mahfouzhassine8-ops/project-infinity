@@ -19,6 +19,9 @@ void Pump(CApplication& application);
 bool IsActive();
 // Pending early Close retains identity/deadline without rejecting core startup.
 bool IsWriteAdmissionActive();
+// A verified startup save participant may start only inside this accepted
+// early-Close/core-initialization window. This grants no writer/save proof.
+bool IsStartupParticipantAdmissionOpen();
 bool IsRequiredOwner(const std::string& owner);
 bool IsPersistingOnThisThread();
 bool IsAcceptedPlaybackWorkOnThisThread();

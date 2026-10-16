@@ -98,6 +98,8 @@ jobs:
           python3 repairs/essential-first-2103377/test_initialization_progress_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
             --out shutdown-rc1-host/initialization-progress-native.json
+          python3 repairs/essential-first-2103377/test_startup_invoker_admission.py \
+            --out shutdown-rc1-host/startup-invoker-admission.json
       - name: Check two-file source patch and all protected gates
         run: |
           set -euo pipefail
@@ -239,6 +241,9 @@ jobs:
             --variant-source kodi/xbmc --out checkpoint-build/runtime-coordinator.json
           python3 repairs/essential-first-2103377/test_initialization_progress_status.py \
             --variant-source kodi/xbmc --out checkpoint-build/initialization-progress-status.json
+          python3 repairs/essential-first-2103377/test_startup_invoker_admission.py \
+            --runtime kodi --installed-addons checkpoint-build/installed-addons \
+            --out checkpoint-build/startup-invoker-admission.json
       - name: Verify compiled Android authorization against production native receipt
         run: |
           set -euo pipefail

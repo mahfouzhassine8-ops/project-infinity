@@ -156,6 +156,8 @@ int main(int argc, char** argv) {
       assert(Get().startupInProgress && !IsWriteAdmissionActive());
     }
     assert(IsActive() && !IsWriteAdmissionActive());
+    assert(IsStartupParticipantAdmissionOpen());
+    assert(Test::scriptStartupCutoffs == 1);
     assert(Get().phase == "CHECKPOINT_REQUESTED" && !Get().requestReady);
     assert(!InfinityScriptPersistence::WriteProtectionActive());
     assert(Test::scriptShutdowns == 0);
@@ -169,6 +171,7 @@ int main(int argc, char** argv) {
     if (mode == "startup-failed") {
       startup.reset();
       assert(Get().phase == "CHECKPOINT_FAILED");
+      assert(!IsStartupParticipantAdmissionOpen());
       assert(Get().error.find("application_startup_initialization_failed") != std::string::npos);
       assert(!AuthorizeTermination(SESSION, OWNER, getpid()));
       return 0;
@@ -177,6 +180,7 @@ int main(int argc, char** argv) {
       Get().expires = Clock::now();
       Status(SESSION, OWNER, getpid());
       assert(Get().phase == "CHECKPOINT_FAILED");
+      assert(!IsStartupParticipantAdmissionOpen());
       startup->Complete();
       assert(!IsWriteAdmissionActive() && !AuthorizeTermination(SESSION, OWNER, getpid()));
       return 0;
@@ -200,6 +204,7 @@ int main(int argc, char** argv) {
       InfinityScriptPersistence::Admit(43,"startup.pending:service.py");
     startup->Complete();
     assert(Get().startupCoreComplete && !Get().startupInProgress);
+    assert(!IsStartupParticipantAdmissionOpen());
     // Kodi's public IsInitialized also waits for the optional GUI_UI_READY
     // startup-animation message. Successful Create/CreateGUI/Initialize is
     // genuine core readiness; all original essential saves are still required.
@@ -338,8 +343,8 @@ def main():
             assert hashlib.sha256(data).hexdigest() == digest, rel
             dst = src / rel; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes(data)
         stubs = old.STUBS.replace("class CJobManager {public:", "class CJobManager {public:void PruneCheckpointOptionalQueuedJobs(){};")
-        stubs = stubs.replace('namespace Test {', 'namespace Test {\ninline unsigned scriptShutdowns=0;')
-        stubs = stubs.replace('void BeginShutdown(){};', 'void BeginShutdown(){++Test::scriptShutdowns;};')
+        stubs = stubs.replace('namespace Test {', 'namespace Test {\ninline unsigned scriptShutdowns=0,scriptStartupCutoffs=0;')
+        stubs = stubs.replace('void BeginShutdown(){};', 'void BeginShutdown(){++Test::scriptShutdowns;};void BeginCheckpointStartupAdmission(){++Test::scriptStartupCutoffs;};')
         stubs = stubs.replace('bool IsInitialized()const', 'bool Create();bool CreateGUI();bool Initialize();int Run();bool Stop(int);void Cleanup();void Process();bool IsInitialized()const')
         start = stubs.index(' static JobCheckpoint::Snapshot AndroidCheckpointSnapshot()')
         end = stubs.index('class CSettings ', start)

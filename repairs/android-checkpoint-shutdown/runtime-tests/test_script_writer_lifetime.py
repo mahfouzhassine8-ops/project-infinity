@@ -38,7 +38,7 @@ using CCriticalSection=std::recursive_mutex;
 namespace ADDON {struct Addon {std::string ID()const{return "addon";}};using AddonPtr=std::shared_ptr<Addon>;}
 inline std::atomic<int> checkpointStops{0};
 inline std::atomic<int> forcedStops{0};
-struct Invoker{bool Stop(bool abort){if(abort)++forcedStops;else ++checkpointStops;return true;}};using LanguageInvokerPtr=std::shared_ptr<Invoker>;
+struct Invoker{int id=-1;int GetId()const{return id;}bool Stop(bool abort){if(abort)++forcedStops;else ++checkpointStops;return true;}};using LanguageInvokerPtr=std::shared_ptr<Invoker>;
 class CScriptInvocationManager;
 struct CLanguageInvokerThread{
  LanguageInvokerPtr inv;ADDON::AddonPtr addon;int id=-1;
@@ -68,6 +68,7 @@ inline void Event(const char*, const char*, long long = -1, unsigned long long =
 }
 namespace InfinityAndroidCheckpoint {
  inline bool active=false;inline int failures=0;inline std::string lastFailure;
+ bool IsStartupParticipantAdmissionOpen(){return false;}
  std::string ClassifyScript(const std::string&s,const std::string&){return s=="known.py"?"known":s=="ambient.py"?"nonpersistent:ambient-glass":std::string{};}
  bool IsActive(){return active;}void RecordFailure(const char*,const char* detail){++failures;lastFailure=detail;}
 }
@@ -83,6 +84,8 @@ class CScriptInvocationManager {public:
  LanguageInvokerThreadMap m_scripts;std::map<std::string,int>m_scriptPaths;
  std::map<int,Handler*>m_invocationHandlers;CLanguageInvokerThreadPtr m_lastInvokerThread;
  int m_lastPluginHandle=-1,m_nextId=0;mutable CCriticalSection m_critSection;bool m_shutdownRequested=false;
+ bool m_checkpointStartupAdmissionClosed=false;
+ bool CanAdmitCheckpointStartupLocked(const std::string&,const ADDON::AddonPtr&,bool,const LanguageInvokerPtr& = LanguageInvokerPtr())const{return false;}
  std::chrono::steady_clock::time_point m_androidCheckpointRetirementStarted{};
  bool m_androidCheckpointRetirementArmed=false;
  std::set<int>m_androidCheckpointEscalatedIds;

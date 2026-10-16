@@ -12,6 +12,7 @@ import stage_experiment
 HERE = Path(__file__).resolve().parent
 CHECKPOINT = stage_experiment.CHECKPOINT
 MANAGER = 'xbmc/interfaces/generic/ScriptInvocationManager.cpp'
+MANAGER_HEADER = 'xbmc/interfaces/generic/ScriptInvocationManager.h'
 SQLITE = 'xbmc/dbwrappers/sqlitedataset.cpp'
 POSIX = 'xbmc/platform/posix/filesystem/PosixFile.cpp'
 DIRECTORY = 'xbmc/platform/posix/filesystem/PosixDirectory.cpp'
@@ -25,6 +26,7 @@ PYTHON_INVOKER = 'xbmc/interfaces/python/PythonInvoker.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
+    MANAGER_HEADER: '975c64f0321acb33dc4b0efe7fcdf2270c82550c6e08d82a512ba79498f8396f',
     SQLITE: '18206a86843f11bea447ebbe1ecca474bf3ae62aef9bd204e37c671515111920',
     POSIX: '0a880f1de9c1cb9d7c1cd0c99fc1ae0334c87ddb77faa50b81af8d80d7ef3baa',
     DIRECTORY: '68e638f060868bca397dd5a8e1f85232a70df31f92692460b0e741a63205094a',
@@ -190,6 +192,14 @@ bool IsWriteAdmissionActive()
 {
   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
   return s.active.load() && s.writeAdmissionStarted;
+}
+bool IsStartupParticipantAdmissionOpen()
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  CheckDeadlineLocked(s);
+  return s.active.load() && s.startupInProgress && !s.writeAdmissionStarted &&
+      !s.sealed && !s.lifecycleTeardown && s.startupError.empty() &&
+      s.phase == "CHECKPOINT_REQUESTED";
 }''')
     text = once(text, '  m_admitted = !s.active.load() ||', '''  const bool acceptedStartup = s.startupInProgress && !s.writeAdmissionStarted &&
       !s.sealed && s.phase == "CHECKPOINT_REQUESTED" &&
@@ -209,6 +219,10 @@ bool IsWriteAdmissionActive()
     request = request[:admission_start] + '''  InfinityShutdownTrace::Begin();
   InfinityVfsOpenTrace::CheckpointBegin(infinityDiagnosticGeneration);
   InfinityShutdownTrace::Event("milestone", "checkpoint.request");
+  // Serialize refusal of new background interpreters now. Core startup keeps
+  // its native directory/job reads; only verified missing save participants
+  // may be admitted while that core initialization is still in progress.
+  CScriptInvocationManager::GetInstance().BeginCheckpointStartupAdmission();
   return ActivateWriteAdmission(infinityDiagnosticGeneration);
 }
 
@@ -512,7 +526,128 @@ def manager(text):
 ''' + pad + '''  InfinityScriptPersistence::RegisterParticipant(invokerThread->GetId());'''
     text, count = re.subn(pattern, replace, text)
     assert count == 2, count
-    return text
+    return startup_manager(text)
+
+
+def manager_header(text):
+    text = once(text, '  void BeginShutdown();', '''  void BeginShutdown();
+  // Close new background admission without aborting existing owners or
+  // blocking the hash-verified save participants required by early Close.
+  void BeginCheckpointStartupAdmission();''')
+    text = once(text, '  bool m_shutdownRequested{false}; // guarded by m_critSection', '''  bool m_shutdownRequested{false}; // guarded by m_critSection
+  bool m_checkpointStartupAdmissionClosed{false}; // guarded by m_critSection''')
+    return once(text, '  LanguageInvokerThread getInvokerThread(int scriptId) const;', '''  LanguageInvokerThread getInvokerThread(int scriptId) const;
+  bool CanAdmitCheckpointStartupLocked(const std::string& script,
+      const ADDON::AddonPtr& addon, bool reuseable,
+      const LanguageInvokerPtr& suppliedInvoker = LanguageInvokerPtr()) const;
+  LanguageInvokerPtr GetLanguageInvokerForAdmission(const std::string& script,
+      const ADDON::AddonPtr& addon, bool reuseable);''')
+
+
+def startup_manager(text):
+    text = once(text, 'void CScriptInvocationManager::BeginShutdown()\n{', '''void CScriptInvocationManager::BeginCheckpointStartupAdmission()
+{
+  std::unique_lock<CCriticalSection> lock(m_critSection);
+  m_checkpointStartupAdmissionClosed = true;
+  InfinityShutdownTrace::Event("milestone", "scripts.checkpoint_new_background_admission_closed");
+}
+
+bool CScriptInvocationManager::CanAdmitCheckpointStartupLocked(
+    const std::string& script, const ADDON::AddonPtr& addon, bool reuseable,
+    const LanguageInvokerPtr& suppliedInvoker) const
+{
+#if defined(TARGET_ANDROID)
+  if (reuseable || !addon || !InfinityAndroidCheckpoint::IsStartupParticipantAdmissionOpen())
+    return false;
+  // Reuse the existing full path/source SHA contract. Add-on IDs, filenames,
+  // clients and cache/nonpersistent classifications alone never permit start.
+  const auto contract = InfinityAndroidCheckpoint::ClassifyScript(script, addon->ID());
+  if (contract != "command_center" && contract != "compat") return false;
+  if (suppliedInvoker && (suppliedInvoker->GetId() >= 0 ||
+      (m_lastInvokerThread && m_lastInvokerThread->GetInvoker() == suppliedInvoker)))
+    return false;
+  for (const auto& entry : m_scripts)
+    if ((suppliedInvoker && entry.second.thread->GetInvoker() == suppliedInvoker) ||
+        (!entry.second.done && entry.second.checkpointContract == contract))
+      return false; // Never create a second canonical save resident.
+  return true;
+#else
+  (void)script; (void)addon; (void)reuseable; (void)suppliedInvoker;
+  return false;
+#endif
+}
+
+void CScriptInvocationManager::BeginShutdown()
+{''')
+    start = text.index('int CScriptInvocationManager::GetReusablePluginHandle(')
+    end = text.index('LanguageInvokerPtr CScriptInvocationManager::GetLanguageInvoker(', start)
+    method = once(text[start:end], '  if (m_lastInvokerThread)', '''  if (m_shutdownRequested || m_checkpointStartupAdmissionClosed)
+    return -1; // Do not Reset/Release a retained owner for a new client request.
+  if (m_lastInvokerThread)''')
+    text = text[:start]+method+text[end:]
+    start = text.index('LanguageInvokerPtr CScriptInvocationManager::GetLanguageInvoker(')
+    end = text.index('int CScriptInvocationManager::ExecuteAsync(', start)
+    method = text[start:end]
+    method = once(method, '''LanguageInvokerPtr CScriptInvocationManager::GetLanguageInvoker(const std::string& script)
+{''', '''LanguageInvokerPtr CScriptInvocationManager::GetLanguageInvoker(const std::string& script)
+{
+  return GetLanguageInvokerForAdmission(script, ADDON::AddonPtr(), false);
+}
+
+LanguageInvokerPtr CScriptInvocationManager::GetLanguageInvokerForAdmission(
+    const std::string& script, const ADDON::AddonPtr& addon, bool reuseable)
+{''')
+    method = once(method, '''  if (m_shutdownRequested)
+    return LanguageInvokerPtr();''', '''  if (m_shutdownRequested || (m_checkpointStartupAdmissionClosed &&
+      !CanAdmitCheckpointStartupLocked(script, addon, reuseable)))
+    return LanguageInvokerPtr();''')
+    method = once(method, '  if (m_lastInvokerThread)', '''  // A refused new request must not Reset/Release an already-admitted owner.
+  // Verified essential startup gets a fresh invoker, never a reused client.
+  if (!m_checkpointStartupAdmissionClosed && m_lastInvokerThread)''')
+    text = text[:start]+method+text[end:]
+    # Both convenience entry points carry the real add-on identity to the
+    # pre-construction gate. Direct supplied-invoker calls meet the same gate
+    # again under the dispatch/admission lock below.
+    start = text.index('int CScriptInvocationManager::ExecuteAsync(')
+    end = text.index('int CScriptInvocationManager::ExecuteAsync(', start+1)
+    method = once(text[start:end], '  LanguageInvokerPtr invoker = GetLanguageInvoker(script);',
+                  '  LanguageInvokerPtr invoker = GetLanguageInvokerForAdmission(script, addon, reuseable);')
+    text = text[:start]+method+text[end:]
+    start = text.index('int CScriptInvocationManager::ExecuteSync(')
+    end = text.index('int CScriptInvocationManager::ExecuteSync(', start+1)
+    method = once(text[start:end], '  LanguageInvokerPtr invoker = GetLanguageInvoker(script);',
+                  '  LanguageInvokerPtr invoker = GetLanguageInvokerForAdmission(script, addon, false);')
+    text = text[:start]+method+text[end:]
+    start = text.index('int CScriptInvocationManager::ExecuteAsync(\n    const std::string& script,\n    const LanguageInvokerPtr&')
+    end = text.index('int CScriptInvocationManager::ExecuteSync(', start)
+    method = text[start:end]
+    admission_check = '''  if (m_shutdownRequested || (m_checkpointStartupAdmissionClosed &&
+      !CanAdmitCheckpointStartupLocked(script, addon, reuseable, languageInvoker)))
+    return -1;'''
+    method = once(method, '''  if (script.empty() || languageInvoker == NULL)
+    return -1;''', '''  if (script.empty() || languageInvoker == NULL)
+    return -1;
+  {
+    // Refused direct requests do not touch quarantine/probation, file checks,
+    // retained invoker state or writer admission. Recheck at dispatch below.
+    std::unique_lock<CCriticalSection> admissionCheck(m_critSection);
+'''+admission_check+'''
+  }''')
+    quarantine = '''#if defined(TARGET_ANDROID)
+  if (addon && InfinityAddonQuarantine::ShouldSuppress(addon->ID(), script))
+  {
+    CLog::Log(LOGINFO, "Infinity quarantine: suppressing failing background service {}", addon->ID());
+    return -1;
+  }
+#endif
+'''
+    method = once(method, quarantine, '')
+    method = once(method, '''  if (m_shutdownRequested)
+    return -1;''', admission_check+'''
+  // A probation retry is consumed only inside the same serialized decision
+  // that admits/dispatches this invocation. Freeze cannot intervene between.
+'''+quarantine)
+    return text[:start]+method+text[end:]
 
 def sqlite(text):
     text = once(text, '#include "InfinityDatabaseBarrier.h"',
@@ -594,7 +729,7 @@ def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository), (ENGINE_ENTRY, engine_entry), (APPLICATION, application), (PYTHON_INVOKER, python_invoker)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (MANAGER_HEADER, manager_header), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository), (ENGINE_ENTRY, engine_entry), (APPLICATION, application), (PYTHON_INVOKER, python_invoker)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)
