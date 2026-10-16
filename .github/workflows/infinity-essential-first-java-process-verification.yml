@@ -7,6 +7,7 @@ on:
       - '.github/workflows/infinity-essential-first-java-process-verification.yml'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py'
       - 'repairs/essential-first-2103377/test_runtime_native.py'
       - 'repairs/essential-first-2103377/java_save_package.py'
       - 'repairs/essential-first-2103377/InstrumentJavaWrites.java'
@@ -137,7 +138,7 @@ jobs:
           python3 - <<'PY'
           import json,os,time,urllib.request
           pinned={
-              38867886900:"77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61",
+              38881674542:"e9224dada88a6369c38813b11450106101782339",
               38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
           }
           for run,commit in pinned.items():
@@ -158,7 +159,7 @@ jobs:
           PY
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38867886900
+          run-id: 38881674542
           name: Infinity-2103377-Essential-First-Native-Evidence
           github-token: ${{ github.token }}
           path: native-evidence
@@ -168,6 +169,12 @@ jobs:
           name: Infinity-2103377-Essential-First-Signed-Fold-TEST2
           github-token: ${{ github.token }}
           path: accepted-test2
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
       - name: Sign internal matched native/Android probe with protected permanent certificate
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -182,6 +189,7 @@ jobs:
             --donor android-gradle/xbmc/build/outputs/apk/release/xbmc-release.apk \
             --native native-evidence --android android-donor-evidence \
             --accepted-test2 accepted-test2/Infinity-2103377-Essential-First-Signed-Fold-TEST2.apk \
+            --accepted-test3 accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk \
             --gradle-dir android-gradle \
             --out essential-fold-test \
             2>&1 | tee essential-fold-test/PACKAGING-VERIFICATION.log
@@ -195,9 +203,21 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_2
+          avd-name: infinity-fresh
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py --apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out android-process-evidence --require-java-save-proof
+      - name: Verify TEST3 in-place upgrade with 37 services, early Close and loaded Close
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-upgrade
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out observer-upgrade-evidence
       - name: Prepare the exact tested bytes for physical Fold review
         run: |
           python3 - <<'PY'
@@ -206,11 +226,16 @@ jobs:
           report=json.loads(Path('android-process-evidence/ANDROID-PROCESS-PROBE.json').read_text())
           required=('passed','android_engine_death_verified','whole_package_death_verified','reopen_verified','favourites_preserved','both_java_process_save_proofs_verified','readonly_virtual_file_read_close_verified')
           assert all(report.get(key) is True for key in required), report.get('failure')
+          upgrade=json.loads(Path('observer-upgrade-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
+          assert all(upgrade.get(key) is True for key in ('passed','upgrade_bytes_preserved','saved_data_reopen_verified')),upgrade.get('failure')
+          assert upgrade['early_ready_count']<37
+          assert len(upgrade['candidate_ready_services'])==len(upgrade['reopen_ready_services'])==37
+          assert all(upgrade[name]['passed'] and upgrade[name]['both_java_seals_verified'] and upgrade[name]['whole_package_death_verified'] for name in ('candidate_early_close','candidate_loaded_close'))
           source=Path('essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk')
           digest=hashlib.sha256(source.read_bytes()).hexdigest()
           assert digest==report['apk_sha256']
-          root=Path('fold-test3');root.mkdir()
-          target=root/'Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk'
+          root=Path('fold-test4');root.mkdir()
+          target=root/'Infinity-2103377-Essential-First-Signed-Fold-TEST4.apk'
           shutil.copyfile(source,target)
           proof=json.loads(Path('essential-fold-test/ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').read_text())
           assert proof['apk_sha256']==digest
@@ -218,19 +243,22 @@ jobs:
               apk_deliverable=True,verified_android_process_exit=True,verified_first_party_callback_on_device=True,
               internal_whole_package_death_verified=True,internal_saved_data_reopen_verified=True,
               verified_fold_reopen=False,physical_fold_accepted=False,final_lock_authorized=False,
-              native_run_id=38867886900,android_run_id=int(os.environ['GITHUB_RUN_ID']),
+              native_run_id=38881674542,android_run_id=int(os.environ['GITHUB_RUN_ID']),
+              internal_startup_close_verified=True,internal_loaded_close_verified=True,
+              retained_upgrade_data_verified=True,synthetic_service_count=37,actual_diggz_ecosystem_tested=False,
               readonly_virtual_file_read_close_verified=True)
           (root/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').write_text(json.dumps(proof,indent=2)+'\n')
           (root/'SHA256SUMS').write_text(digest+'  '+target.name+'\n')
-          for name in ('CERT-VERIFICATION.txt','JAVA-REGRESSION-VERIFICATION.json','TEST-LIMITATIONS.md','TEST2-BASELINE-PRESERVATION.json'):
+          for name in ('CERT-VERIFICATION.txt','JAVA-REGRESSION-VERIFICATION.json','TEST-LIMITATIONS.md','TEST2-BASELINE-PRESERVATION.json','TEST3-BASELINE-PRESERVATION.json'):
               shutil.copyfile(Path('essential-fold-test')/name,root/name)
           shutil.copyfile('android-process-evidence/ANDROID-PROCESS-PROBE.json',root/'INTERNAL-ANDROID-PROCESS-PROBE.json')
+          shutil.copyfile('observer-upgrade-evidence/OBSERVER-UPGRADE-PROBE.json',root/'INTERNAL-OBSERVER-UPGRADE-PROBE.json')
           PY
       - name: Retain signed physical-test candidate only after every gate passes
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
-          path: fold-test3/
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST4
+          path: fold-test4/
           retention-days: 90
           compression-level: 0
           if-no-files-found: error
@@ -242,11 +270,13 @@ jobs:
           path: |
             readonly-fixture-host/
             android-process-evidence/
+            observer-upgrade-evidence/
             essential-fold-test/*.json
             essential-fold-test/*.txt
             essential-fold-test/*.log
             essential-fold-test/compiler-differences/
             essential-fold-test/test2-preservation/
+            essential-fold-test/test3-preservation/
             android-donor-evidence/*.json
             android-donor-evidence/*.log
             android-gradle/xbmc/build/test-results/

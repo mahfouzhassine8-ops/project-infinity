@@ -19,8 +19,9 @@ import zipfile
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
-NATIVE='77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61'
+NATIVE='e9224dada88a6369c38813b11450106101782339'
 TEST2_SHA='172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807'
+TEST3_SHA='4ec1e3b2cabb595d228bc07bae2c6b3073c5af12822c8e40b1ec505b00865bf8'
 PARSER_SHA='3e3e0c65d57d12797dbead3df1ebb28e7583737d0cd1f2a898dba6febd50ab88'
 EXTRA=('InfinityCloseNativeLease','InfinityJavaWriteBarrier','InfinityJavaPersistence')
 TEST='InfinityJavaPersistence2103377Test'
@@ -142,9 +143,10 @@ def main():
     for name in ('parent','source','gradle-dir','donor','native','android','out','parser','green'):
         p.add_argument('--'+name,type=Path,required=name in ('parent','gradle-dir','out'))
     p.add_argument('--accepted-test2',type=Path)
+    p.add_argument('--accepted-test3',type=Path)
     args=p.parse_args();native_scope()
     factory=module('java_save_signed_factory',HERE/'package_signed_fold_test.py')
-    factory.PINNED_NATIVE_COMMIT=NATIVE;factory.NEW_NAME='1.0.9-Essential-First-TEST3-RC01'
+    factory.PINNED_NATIVE_COMMIT=NATIVE;factory.NEW_NAME='1.0.9-Essential-First-TEST4-RC01'
     if args.mode=='java':
         factory.prepared_java(args)
         root=args.gradle_dir/'xbmc/java'
@@ -189,14 +191,25 @@ def main():
             all_other_apk_payload_identical=True,all_runtime_java_instructions_preserved=java_baseline['decoded_protected_instructions_identical'],
             version_metadata_only_java_exception='BuildConfig',baseline_not_modified=True)
         save(args.out/'TEST2-BASELINE-PRESERVATION.json',test2_proof)
+        assert args.accepted_test3 and sha(args.accepted_test3)==TEST3_SHA,'Signed TEST3 baseline mismatch'
+        baseline3=args.out/'test3-preservation';baseline3.mkdir()
+        java_test3=guard.compare(args.accepted_test3,final,(args.gradle_dir/'preservation-classpath.txt').read_text(),baseline3)
+        original3=payload(args.accepted_test3)
+        assert set(original3)==set(candidate),'TEST3 APK entry inventory changed'
+        changed3=sorted(name for name in original3 if original3[name]!=candidate[name])
+        assert all(name in ('AndroidManifest.xml','lib/arm64-v8a/libkodi.so') or re.fullmatch(r'classes\d*\.dex',name) for name in changed3),changed3
+        save(args.out/'TEST3-BASELINE-PRESERVATION.json',dict(test3_apk_sha256=TEST3_SHA,changed_entries=changed3,
+            all_other_apk_payload_identical=True,all_runtime_java_instructions_preserved=java_test3['decoded_protected_instructions_identical'],
+            version_metadata_only_java_exception='BuildConfig',baseline_not_modified=True))
         receipt=args.out/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json';row=json.loads(receipt.read_text())
         row.update(status='INTERNAL JAVA/NATIVE SHUTDOWN PROBE; NOT LOCKED',file=final.name,
                    java_regressions_verified=True,java_producer_adapters_verified=True,apk_deliverable=False,
-                   signed_test2_baseline_preserved=True,signed_test2_apk_sha256=TEST2_SHA)
+                   signed_test2_baseline_preserved=True,signed_test2_apk_sha256=TEST2_SHA,
+                   signed_test3_baseline_preserved=True,signed_test3_apk_sha256=TEST3_SHA)
         row.pop('known_fail_closed_native_encoder_route',None);row.pop('unverified_other_native_descriptor_aliases',None)
         save(receipt,row);(args.out/'SHA256SUMS').write_text(row['apk_sha256']+'  '+final.name+'\n')
         (args.out/'TEST-LIMITATIONS.md').write_text(
-            '# Infinity Essential-First shutdown TEST3\n\n'
+            '# Infinity Essential-First shutdown TEST4\n\n'
             'This internal APK uses the established permanent signing identity. '
             'The full native and Java save checks must pass before packaging. '
             'Actual Android engine death, whole-package death and saved-data reopening '
@@ -206,5 +219,10 @@ def main():
             'assets, resources and non-engine native libraries remain byte-identical. '
             'Update in place with the same signing identity; never uninstall or '
             'clear application data for this test.\n')
+        with (args.out/'TEST-LIMITATIONS.md').open('a') as limits:
+            limits.write('\nThe corrected native guard was reproduced with 37 concurrent CPython observers. '
+                'Internal fresh and retained-upgrade checks use approved first-party add-ons and 37 synthetic services, '
+                'not a copy of the full Diggz/custom Infinity skin installation. '
+                'Physical Fold review of that actual installation remains required. No full backup is required for this targeted correction.\n')
 
 if __name__=='__main__':main()
