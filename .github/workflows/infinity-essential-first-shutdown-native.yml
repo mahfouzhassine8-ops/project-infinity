@@ -86,7 +86,7 @@ jobs:
             --out shutdown-rc1-host/runtime-native.json
           /usr/bin/python3 repairs/essential-first-2103377/test_runtime_sqlite.py \
             --sqlite-include /usr/include --out shutdown-rc1-host/runtime-sqlite.json
-      - name: Capture observer initialization failures and preserve fail-closed admission
+      - name: Verify Fold startup Close race, observer identities and fail-closed admission
         run: |
           set -euo pipefail
           python3 repairs/essential-first-2103377/test_observer_initialization_native.py \
