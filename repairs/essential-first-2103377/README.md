@@ -2,11 +2,23 @@
 
 **Status: shutdown-only native/Python corrections continue; an actual Java write-boundary gap blocks APK delivery; not locked.**
 
-Continue on `work/infinity-2103377-essential-first-shutdown-only` from the saved
-`5a62f829` checkpoint. The production path now uses the existing script
-persistence ledger, native coordinator and database barrier. The prototype
+Continue on `work/infinity-2103377-essential-first-shutdown-only` from the
+latest saved source recorded in `PRODUCTION-STATUS.json`. The `5a62f829`
+prototype below is historical evidence, not a restart point. The production
+path uses the existing script persistence ledger, native coordinator and
+database barrier. The prototype
 `InfinityEssentialScriptFence.h` remains unwired and its coverage flag remains
 false. No third-party add-on or protected feature source is edited.
+
+Latest production correction: `04f9fb1b` (51 native CPython cases, 8 SQLite
+cases, 15 coordinator cases). Full ARM64 run `38836846099` passed.
+Latest Android run `38837555854` reached 13 of 16 essential receipts and
+failed at unverified `/vendor/bin/uname` after 3.4 seconds.
+Add-on owner serialization and null-device durability fixes worked. No process
+death or successful reopen is claimed. That internal APK was permanently signed from the exact green native build.
+The vendor candidate resolves to `toybox_vendor` on a read-only mount; its
+command contract remains unverified. All failure assertions were retained. Current source and proof
+status are in `PRODUCTION-STATUS.json`; `CHECKPOINT.json` is historical.
 
 The full ARM64 build of `3acc3a9e` passed in run `38819025107`.
 The internal Android probe passed permanent signing and unrelated Java
@@ -157,3 +169,11 @@ compilation remains required for this change. Owner/device build 38831553869
 passed; Android probe 38831677450 is being retried after an emulator archive
 download failure before app execution. The Java buffered-write gap remains a
 release blocker regardless of the process probe result.
+
+
+Final verified checkpoint for this repair increment: native `04f9fb1b` passed
+full ARM64 build `38836846099`; internal Android run `38837555854` signed the
+matched APK but failed Close on the vendor executable proof. Its evidence is
+in `android-probe9-result.json`. The Java post-seal write counterexample still
+reproduces on the same production headers. Whole-package death and data-safe
+reopening remain unverified. No APK has been delivered, promoted or locked.

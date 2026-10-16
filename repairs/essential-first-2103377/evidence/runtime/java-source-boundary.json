@@ -1,0 +1,40 @@
+{
+  "source_commit": "5a1a427cb5bdcc248b0e2a7887f9d6682ca53877",
+  "source_artifact": 11871545549,
+  "scope": "Selected exact approved Android sources establishing required Java save/process coverage; not a complete writable-path inventory",
+  "source_sha256": {
+    "src/Main.java.in": "1e538733891c506fd95b5c78f8b935333119124504527d8b3a916c3796a6c33e",
+    "src/Splash.java.in": "c837f6f7a4f440dd03c882157ca65fdac7bc569bc26ae481c6d607fc2c893d77",
+    "src/InfinityCobraFeatureRuntime.java.in": "7a07cef5fac3c82ee44cde3fd0310178baa40e59a54a150cc3ff116566819751",
+    "src/InfinityCobraRecordingService.java.in": "6c5e680dcb8c2b8a0e775db2eb37077b73ba93521558a6e198bc72dc9ee93567",
+    "src/InfinityLiveActivity.java.in": "5418d519161557bbb59de09f7461c77070e2aaa4c1d77d9fab436adafdb22a0e",
+    "src/CobraSportsReminderJob.java.in": "89ac526756ba5133d8d3668244d0bb6a9926c3b3f26756edb97b4f8710679f71",
+    "src/InfinityCloseNativeLease.java.in": "21965ee188ff7b3d28ec223be7a794eb9251067ecaa567bc93ba450c87df71c6",
+    "src/InfinityCheckpointProtocol.java.in": "5f0c455b9d940dc5eac631a5cba026fc7adcb0d4ba43242128aa5341d93025c0",
+    "AndroidManifest.xml.in": "b890896b89fa011639b70d2ef4c261214e6be40882595febefd6d4fdf85d8026"
+  },
+  "confirmed_counterexample": "java-buffer-boundary-negative-control.json",
+  "essential_preferences": [
+    "infinity_cobra_features_v2:profiles",
+    "infinity_cobra_features_v2:active_profile",
+    "Main:INFINITY_ROTATION_PREFS"
+  ],
+  "existing_durable_primitive": "InfinityCheckpointProtocol.atomic: actual file sync, atomic replacement, directory sync and readback; checkpoint receipts only, not a general Java writer seal",
+  "process_boundary": {
+    "kodi": [
+      "Main",
+      "InfinityCloseNativeLease",
+      "InfinityExtendedBackgroundService"
+    ],
+    "default": [
+      "Splash",
+      "InfinityLiveActivity",
+      "InfinityCloseGuardService",
+      "InfinityCobraRecordingService",
+      "CobraSportsReminderJob"
+    ]
+  },
+  "unproven": "Actual Java write admission, old handles/buffers and queued preferences in both processes must join existing essential authorization; stopping guard service alone does not prove default process death.",
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

@@ -254,3 +254,72 @@ probe `38831677450` attempt 1 compiled and permanently signed the preserved
 internal APK but failed before emulator boot because the downloaded emulator
 archive was invalid. Attempt 2 retries the same verified input. Attempt 1
 provides no app shutdown or reopen result.
+
+
+## Android attempt 8/2: confirmed fixes and remaining native refusal
+
+Run `38831677450`, attempt 2, executed the actual signed app on the disposable
+Android emulator. Close failed after **5,877 ms**. All 17 diagnostic owner rows
+are retained, with 13 of 16 essential rows completed. Add-on settings now
+commit through their real owner serializer, and `/dev/null` is no longer a
+durability blocker. The native database and deferred-state rows remain pending
+because final native admission refuses `unobserved_native_child_process`,
+specifically `native_child_executable=/vendor/bin/uname`, from versioncheck.
+The associated script exception is advisory; the unverified write capability
+is the blocking item. Optional repository completion remains diagnostic.
+
+Neither native nor Android authorization was consumed. Both observed package
+processes remained alive. No successful termination, reopen or 17/17 save is
+claimed. The selected exact outcomes and artifact checksum are retained in
+`evidence/runtime/android-probe8-result.json`.
+
+The next internal run `38837555854` pins native build `38836846099` at
+`04f9fb1b` and records read-only executable-path and actual engine mount-table
+observations. Shell/root visibility is explicitly not treated as proof of
+app-side access or executable safety. All save, death and reopen assertions
+remain intact. Do not increase the Close deadline or waive the child warning.
+
+The Java integration requirement is also concrete: the exact approved source
+uses asynchronous preference writes for Cobra profiles/selection and Main
+rotation settings, and actual buffered streams in Android-owned services.
+`java-source-boundary.json` pins those sources. The existing
+`InfinityCheckpointProtocol.atomic` already checks file sync, replacement,
+directory sync and readback for checkpoint receipts; it does not guard those
+Java producers. Join their admission, old handles and pending saves to the
+existing checkpoint in both processes, then keep them sealed through final
+termination. Killing the default process without those proofs is unsafe.
+
+
+## Completed final verification of this increment
+
+Native `04f9fb1b` passed complete ARM64 build **38836846099**, including all
+51 CPython, 8 SQLite, 15 coordinator, job/installer/XML owner and compiled
+Android authorization gates. Native SHA-256 is
+`569d38d49c9804dfae6bfc3b2e5ebf86ab28dc31b0990913e947cd9c1626043f`.
+Comparing the exact locked and candidate final source manifests shows only the
+17 declared shutdown paths differ; every other locked hash is unchanged.
+
+Run **38837555854** compiled the matched Java, passed unrelated instruction and
+payload preservation, and permanently signed the internal APK. Actual Android
+Close failed after **3,374 ms**, with 13/16 essential rows complete and all 17
+diagnostic rows retained. The actual engine mount table shows `/vendor` is
+read-only. Root's filesystem observation shows `/vendor/bin/uname` exists as
+a symlink to `toybox_vendor`; `/system/bin/uname` points to the separate
+`toybox`. The current native gate rejects the vendor candidate because it is
+not absent and its command variant is outside the verified readonly contract.
+This explains the refusal; it does not prove a safe exemption. No third-party
+add-on was changed, no warning was waived, and no timeout was increased.
+
+The same current headers still reproduce the actual Java buffered-write
+counterexample. Both process writer boundaries must join the existing
+checkpoint before whole-package termination can be considered safe. The
+current engine kill path and guard service stop are also not proof of all
+app UID processes disappearing. The Android attempt never reached successful
+authorization, so no post-success guard survival or reopen outcome is claimed.
+
+Internal APK SHA-256:
+`2c1bc47fc15254648a5b4386e6e0e767ff986f1a39f4a2a899d734731cf2bb6e`.
+Its report explicitly marks it non-deliverable. No Fold APK was released,
+promoted or locked. Resolve the actual Java writer boundary and native vendor
+command contract, then verify whole-package death and preserved-data reopening
+before producing a physical-test candidate. Keep the locked RC1 rollback.

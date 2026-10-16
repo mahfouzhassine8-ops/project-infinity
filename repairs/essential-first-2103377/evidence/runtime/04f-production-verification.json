@@ -1,0 +1,32 @@
+{
+  "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
+  "native_source_commit": "04f9fb1b60d63a4579253cb2e58113b273dadfcc",
+  "native_build_run": 38836846099,
+  "manifest_comparison": "locked and candidate FINAL-SHUTDOWN-SOURCE-PRESERVATION.after, not earlier intermediate source manifests",
+  "locked_source_entries": 9398,
+  "candidate_source_entries": 9401,
+  "changed_paths": [
+    "xbmc/addons/Addon.cpp",
+    "xbmc/addons/AddonInstaller.cpp",
+    "xbmc/dbwrappers/InfinityDatabaseBarrier.h",
+    "xbmc/dbwrappers/InfinitySQLiteVFS.h",
+    "xbmc/dbwrappers/sqlitedataset.cpp",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp",
+    "xbmc/interfaces/python/InfinityPythonCryptoContract.h",
+    "xbmc/interfaces/python/InfinityPythonPersistence.h",
+    "xbmc/interfaces/python/InfinityPythonPersistenceSource.h",
+    "xbmc/interfaces/python/InfinityPythonWriteHooks.h",
+    "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp",
+    "xbmc/platform/android/activity/InfinityProtectedWrites.h",
+    "xbmc/platform/android/activity/InfinityScriptPersistence.h",
+    "xbmc/platform/posix/filesystem/PosixDirectory.cpp",
+    "xbmc/platform/posix/filesystem/PosixFile.cpp",
+    "xbmc/utils/JobCheckpoint.h",
+    "xbmc/utils/JobManager.cpp"
+  ],
+  "all_other_locked_source_hashes_identical": true,
+  "native_sha256": "569d38d49c9804dfae6bfc3b2e5ebf86ab28dc31b0990913e947cd9c1626043f",
+  "full_arm64_compile_verified_by": "ENGINE-PROOF.json and completed Actions run 38836846099; source manifest itself predates compilation",
+  "locked_apk_sha256": "de8ce3f122db7bb8b2b3681e7c6ce9caf67cf38888b17ef1f82ff7759fa8a3db",
+  "apk_deliverable": false
+}

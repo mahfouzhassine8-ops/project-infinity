@@ -1,0 +1,208 @@
+{
+  "run": 38831677450,
+  "attempt": 2,
+  "native_commit": "1ce173676356705897302e001aab57baf0eb664c",
+  "evidence_artifact": 12019796304,
+  "evidence_zip_sha256": "dbb308faab8e7bf42ad64198a7aa5e6d2d5de747b1a8e204e4ca9f5f7f06bfc6",
+  "apk_sha256": "8a63cfc3bd1e7d2897fcd3cfaabdd5c134fd2e8320bf41e3a685f46e63d3f092",
+  "phase": "CHECKPOINT_FAILED",
+  "duration_ms": 5877,
+  "blocking_operation": "native_databases",
+  "blockers": [
+    {
+      "count": 1,
+      "detail": "unverified_protected_writer:service.xbmc.versioncheck:runner.py:unobserved_native_child_process",
+      "fatal": true,
+      "owner": "native_admission"
+    }
+  ],
+  "essential_write_blockers": [
+    "unverified_protected_writer:service.xbmc.versioncheck:runner.py:unobserved_native_child_process"
+  ],
+  "script_blockers": [
+    {
+      "blocking": true,
+      "count": 1,
+      "detail": "native_child_executable=/vendor/bin/uname",
+      "reason": "unobserved_native_child_process",
+      "writer": "service.xbmc.versioncheck:runner.py",
+      "writer_id": 1
+    },
+    {
+      "blocking": false,
+      "count": 1,
+      "detail": "",
+      "reason": "uncaught_script_failure_before_persistence_receipt",
+      "writer": "service.xbmc.versioncheck:runner.py",
+      "writer_id": 1
+    }
+  ],
+  "optional_unfinished_jobs": [
+    {
+      "actual_type": "N5ADDON20CRepositoryUpdateJobE",
+      "elapsed_ms": 35795,
+      "failure_detail": "",
+      "job_id": 18,
+      "operation": "repository_update",
+      "owner": "native_databases",
+      "phase": "callback",
+      "resource": "",
+      "token": 18,
+      "unknown": false
+    }
+  ],
+  "owners": [
+    {
+      "owner": "native_admission",
+      "essential": true,
+      "result": "FAILED",
+      "error": "unverified_protected_writer:service.xbmc.versioncheck:runner.py:unobserved_native_child_process",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "python_services",
+      "essential": false,
+      "result": "FAILED",
+      "error": "python_writer:unobserved_native_child_process",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "background_jobs",
+      "essential": true,
+      "result": "ALREADY_DURABLE",
+      "error": "",
+      "end_elapsed_ms": 4954
+    },
+    {
+      "owner": "playback",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 2226
+    },
+    {
+      "owner": "command_center",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4356
+    },
+    {
+      "owner": "compat",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4364
+    },
+    {
+      "owner": "kodi_settings",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4949
+    },
+    {
+      "owner": "profiles",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4953
+    },
+    {
+      "owner": "skin_settings",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4787
+    },
+    {
+      "owner": "addon_settings",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4813
+    },
+    {
+      "owner": "favourites",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4814
+    },
+    {
+      "owner": "peripherals",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4822
+    },
+    {
+      "owner": "audio_policy",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4831
+    },
+    {
+      "owner": "deferred_dialog_state",
+      "essential": true,
+      "result": "PENDING",
+      "error": "",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "xml_files",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4953
+    },
+    {
+      "owner": "native_databases",
+      "essential": true,
+      "result": "PENDING",
+      "error": "",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "pvr",
+      "essential": true,
+      "result": "ALREADY_DURABLE",
+      "error": "",
+      "end_elapsed_ms": 1965
+    }
+  ],
+  "active_native_writers": 0,
+  "required_jobs": 0,
+  "observed_package_processes": [
+    {
+      "pid": 5293,
+      "uid": 10167,
+      "name": "com.projectinfinity.kodi"
+    },
+    {
+      "pid": 5387,
+      "uid": 10167,
+      "name": "com.projectinfinity.kodi:kodi"
+    }
+  ],
+  "actual_first_party_enabled": {
+    "script.infinity.commandcenter": {
+      "addonid": "script.infinity.commandcenter",
+      "enabled": true,
+      "type": "xbmc.python.script",
+      "version": "0.3.5.20"
+    },
+    "service.infinity.compat": {
+      "addonid": "service.infinity.compat",
+      "enabled": true,
+      "type": "xbmc.service",
+      "version": "0.8.2"
+    }
+  },
+  "engine_death_verified": false,
+  "whole_package_death_verified": false,
+  "reopen_verified": false,
+  "apk_deliverable": false,
+  "scope": "real signed ARM64 APK on disposable Android emulator; not physical Fold acceptance"
+}
