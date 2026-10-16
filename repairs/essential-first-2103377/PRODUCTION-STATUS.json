@@ -1658,7 +1658,7 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T22:27:54.881524+00:00",
+    "as_of_utc": "2026-10-16T22:30:49.931735+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
     "native_run_id": 38967896318,
@@ -1824,8 +1824,8 @@
       "apk_sha256": "284465f25e1551ed1b167fdb1db129d483b8dc8e3a12ec746fae396b3e68852c"
     },
     "deferred_command_resolver": {
-      "source_commit": "pending commit",
-      "native_run_id": null,
+      "source_commit": "f5e3d9434d8a8c0918d1f4cc6758cf3704eb873c",
+      "native_run_id": 38975950035,
       "android_run_id": null,
       "production_changes": [
         "observer.py eager import and four command lookups",
@@ -1858,7 +1858,22 @@
       "android_timing_verified": false,
       "physical_fold_accepted": false,
       "apk_deliverable": false,
-      "final_lock_authorized": false
+      "final_lock_authorized": false,
+      "native_host_job": 117225316491,
+      "native_host_result": "success: complete required host suite",
+      "native_engine_job": 117225830503,
+      "full_arm64_build": "in_progress",
+      "android_cases": [
+        "fresh",
+        "cold",
+        "core-initialized",
+        "loaded"
+      ],
+      "android_case_dispatch_controls": 12,
+      "android_case_dispatch_result": "passed normally and -O",
+      "android_packaging_controls": 30,
+      "android_packaging_result": "passed",
+      "android_verification": "preparing four independent original probes, all reuse unchanged saved RC05 Java/308 proof; exact full native success required first"
     }
   },
   "repair_checkpoint_history": [

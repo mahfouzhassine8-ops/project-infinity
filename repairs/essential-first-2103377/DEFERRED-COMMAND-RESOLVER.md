@@ -42,3 +42,11 @@ Exact Android artifact identities and all 41 interpreter stages are recorded in
 `evidence/observer-shutil-stage-38973572640.json`. Disposable synthetic services
 and the emulator's Estuary skin are not the Fold's full Diggz ecosystem and
 custom Infinity skin 1.0.5.223. The physical installation remains untouched.
+
+Correction source **f5e3d943** is saved. Native workflow **38975950035** has
+passed its complete mandatory host suite (job 117225316491); full ARM64 build
+117225830503 is in progress. The internal workflow will require that exact
+complete success, preserve RC05 Java/308 proof, and run the four original probes
+in independent AVDs with fail-fast disabled: fresh, cold, core-initialized and
+loaded. Twelve dispatch/identity/failure controls pass normally and under -O.
+The original probes and their save/death/integrity/reopen assertions are unchanged.
