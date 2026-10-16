@@ -122,6 +122,22 @@ int main(int argc, char** argv) {
   if (mode == "late-native-child") run("import _posixsubprocess\nerror_read,error_write=os.pipe()\n");
   if (mode == "child-locale-environment") run("import subprocess\nassert subprocess.check_output(['uname','-rs'],env=dict(os.environ,LC_ALL='C')).strip()\n");
   if (mode == "child-writable-search") run("import subprocess\nos.environ['PATH']=root+'/cache:'+os.environ['PATH']\nassert subprocess.check_output(['uname','-rs']).strip()\n");
+  if (mode == "child-unreachable-vendor") run(R"vendor(
+import subprocess
+os.environ['PATH']='/usr/bin:/bin:/vendor/bin'
+assert os.statvfs('/usr/bin').f_flag & os.ST_RDONLY
+assert os.statvfs('/vendor/bin').f_flag & os.ST_RDONLY
+try: os.stat('/vendor/bin/uname')
+except PermissionError: pass
+else: raise AssertionError('Denied vendor fallback fixture is not actually inaccessible')
+captured=[]
+actual_fork=subprocess._fork_exec
+def capture_fork(*args):
+ captured.append(args[1]); return actual_fork(*args)
+subprocess._fork_exec=capture_fork
+assert subprocess.check_output(['uname','-rs']).strip()
+assert captured==[(b'/usr/bin/uname',)], captured
+)vendor");
   if (mode == "missing-immutable-command" || mode == "missing-writable-command") {
     if (mode == "missing-immutable-command") run("command='/sys/kernel/infinity_missing_shutdown_probe'; assert os.statvfs('/sys').f_flag & os.ST_RDONLY\n");
     else run("command=root+'/cache/infinity_missing_shutdown_probe'\n");
@@ -432,7 +448,8 @@ def main():
                'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
         cases+=['missing-immutable-command','missing-writable-command','nested-native-child',
                 'child-locale-environment','child-writable-search','child-error-channel-pending',
-                'late-native-child','child-preparation-race','null-device-path','unknown-device-path','marker-filename']
+                'late-native-child','child-preparation-race','null-device-path','unknown-device-path','marker-filename',
+                'child-unreachable-vendor']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

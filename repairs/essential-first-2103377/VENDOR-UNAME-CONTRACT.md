@@ -33,3 +33,28 @@ mount namespace. Its host executable is a topology fixture, not an assertion
 about the Android binary. Existing CPython tests and an actual Android rerun
 are required. The independent Java pending-write blocker remains unresolved;
 this correction alone does not authorize delivering an APK.
+
+## Newer Android result and correction
+
+Full native run `38842156316` passed at `a543811a`; actual Android run
+`38843193133` at `a3ec8e0c` still failed. The app's SELinux context cannot
+stat `/vendor/bin/toybox_vendor` (`avc: denied { getattr }`). Root-shell
+observations were not sufficient proof for the app process. Essential native
+admission remained failed, with native databases and deferred dialog state
+pending; the package did not terminate or reopen.
+
+The observer now supplies the exact already-selected system executable to
+CPython only for an existing approved information command, with every PATH
+directory root-owned, non-writable, and on an actual read-only mount. Arguments
+and `Popen.args` are preserved. Native validation of the selected executable,
+arguments, environment, actual output descriptors and child lifetime remains
+mandatory. An inaccessible later candidate is no longer part of the executed
+candidate list; it is not granted an exception or treated as saved. Writable
+search paths and unknown child commands retain the existing refusal.
+
+A new native-host regression executes real `uname -rs` under an unprivileged
+UID while a later vendor symlink is actually inaccessible, and checks the
+exact candidate tuple received by the production native hook. This revision
+requires a fresh full native build and actual Android process test. Java
+producer admission is checkpointed separately, pending full 274-case
+regression plus new save-ownership tests. No physical Fold success is claimed.

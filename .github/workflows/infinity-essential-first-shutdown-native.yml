@@ -64,6 +64,16 @@ jobs:
             set -euo pipefail
             mount --bind /sys /sys
             mount -o remount,bind,ro /sys
+            mount --bind /usr/bin /usr/bin
+            mount -o remount,bind,ro /usr/bin
+            vendor_fixture=$(mktemp -d /tmp/infinity-readonly-vendor.XXXXXX)
+            chmod 755 "$vendor_fixture"
+            mkdir -p "$vendor_fixture/bin/blocked" /vendor
+            cp /usr/bin/uname "$vendor_fixture/bin/blocked/uname"
+            chmod 000 "$vendor_fixture/bin/blocked"
+            ln -s blocked/uname "$vendor_fixture/bin/uname"
+            mount --bind "$vendor_fixture" /vendor
+            mount -o remount,bind,ro /vendor
             exec setpriv --reuid="$1" --regid="$2" --init-groups \
               env LD_LIBRARY_PATH="$3" "$4" "${@:5}"
           ' infinity-readonly-host "$(id -u)" "$(id -g)" "${LD_LIBRARY_PATH:-}" \

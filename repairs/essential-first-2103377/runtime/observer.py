@@ -629,6 +629,28 @@ class Observer:
             expected['LC_ALL'] = 'C'
             return env == expected
 
+        def immutable_search_directory(directory):
+            # Resolve a known information command once only when the original
+            # search path cannot be changed by an application writer. Checking
+            # directory mounts does not require inspecting SELinux-protected
+            # vendor applets which are later, unused PATH fallback candidates.
+            if not directory or not directory.startswith('/') or '\x00' in directory:
+                return False
+            if any(part in ('.', '..') for part in directory.split('/')):
+                return False
+            parent = directory
+            while parent:
+                try:
+                    metadata = os.stat(parent)
+                    return (stat.S_ISDIR(metadata.st_mode) and metadata.st_uid == 0 and
+                            not metadata.st_mode & 0o022 and
+                            bool(os.statvfs(parent).f_flag & os.ST_RDONLY))
+                except FileNotFoundError:
+                    parent = os.path.dirname(parent)
+                except OSError:
+                    return False
+            return False
+
         class Popen(original_popen):
             def __init__(child, command, *args, **kwargs):
                 observer.check_live()
@@ -639,6 +661,22 @@ class Observer:
                             (observer.host_probe or not any(name.startswith(('LD_', 'DYLD_')) for name in os.environ)) and
                             kwargs.get('executable') in (None, command[0]))
                 if readonly:
+                    if not command[0].startswith('/'):
+                        resolved = shutil.which(command[0])
+                        approved = resolved in ('/system/bin/uname', '/system/bin/getprop',
+                                                '/system/bin/ip', '/system/bin/ifconfig')
+                        if observer.host_probe and resolved in ('/bin/uname', '/usr/bin/uname'):
+                            approved = True
+                        search = os.environ.get('PATH', '')
+                        if approved and search and all(immutable_search_directory(directory)
+                                                       for directory in search.split(':')):
+                            # Preserve argv and Popen.args. CPython receives the
+                            # already selected OS executable, so an inaccessible
+                            # later vendor candidate is never executed or exempted.
+                            # The native hook still validates the actual executable,
+                            # argv, environment and inherited output descriptors.
+                            kwargs = dict(kwargs)
+                            kwargs['executable'] = resolved
                     # Native fork_exec leases the actual converted descriptors
                     # through child death. Python object types cannot prove the
                     # output destination or bound its lifetime. Unsupported
