@@ -138,7 +138,7 @@ jobs:
           python3 - <<'PY'
           import json,os,time,urllib.request
           pinned={
-              38881674542:"e9224dada88a6369c38813b11450106101782339",
+              38887113826:"f2c663fac800a03104f349cea98853a22c033922",
               38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
           }
           for run,commit in pinned.items():
@@ -159,7 +159,7 @@ jobs:
           PY
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38881674542
+          run-id: 38887113826
           name: Infinity-2103377-Essential-First-Native-Evidence
           github-token: ${{ github.token }}
           path: native-evidence
@@ -230,6 +230,8 @@ jobs:
           assert all(upgrade.get(key) is True for key in ('passed','upgrade_bytes_preserved','saved_data_reopen_verified')),upgrade.get('failure')
           assert upgrade['early_ready_count']<37
           assert len(upgrade['candidate_ready_services'])==len(upgrade['reopen_ready_services'])==37
+          assert upgrade['candidate_directory_creation']['mkdirs_succeeded'] is True
+          assert upgrade['candidate_directory_creation']['essential_settings_written'] is True
           assert all(upgrade[name]['passed'] and upgrade[name]['both_java_seals_verified'] and upgrade[name]['whole_package_death_verified'] for name in ('candidate_early_close','candidate_loaded_close'))
           source=Path('essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk')
           digest=hashlib.sha256(source.read_bytes()).hexdigest()
@@ -243,8 +245,9 @@ jobs:
               apk_deliverable=True,verified_android_process_exit=True,verified_first_party_callback_on_device=True,
               internal_whole_package_death_verified=True,internal_saved_data_reopen_verified=True,
               verified_fold_reopen=False,physical_fold_accepted=False,final_lock_authorized=False,
-              native_run_id=38881674542,android_run_id=int(os.environ['GITHUB_RUN_ID']),
+              native_run_id=38887113826,android_run_id=int(os.environ['GITHUB_RUN_ID']),
               internal_startup_close_verified=True,internal_loaded_close_verified=True,
+              internal_missing_directory_creation_verified=True,
               retained_upgrade_data_verified=True,synthetic_service_count=37,actual_diggz_ecosystem_tested=False,
               readonly_virtual_file_read_close_verified=True)
           (root/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').write_text(json.dumps(proof,indent=2)+'\n')

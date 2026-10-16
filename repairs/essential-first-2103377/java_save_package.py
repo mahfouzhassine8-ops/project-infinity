@@ -19,7 +19,7 @@ import zipfile
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
-NATIVE='e9224dada88a6369c38813b11450106101782339'
+NATIVE='f2c663fac800a03104f349cea98853a22c033922'
 TEST2_SHA='172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807'
 TEST3_SHA='4ec1e3b2cabb595d228bc07bae2c6b3073c5af12822c8e40b1ec505b00865bf8'
 PARSER_SHA='3e3e0c65d57d12797dbead3df1ebb28e7583737d0cd1f2a898dba6febd50ab88'
@@ -146,7 +146,7 @@ def main():
     p.add_argument('--accepted-test3',type=Path)
     args=p.parse_args();native_scope()
     factory=module('java_save_signed_factory',HERE/'package_signed_fold_test.py')
-    factory.PINNED_NATIVE_COMMIT=NATIVE;factory.NEW_NAME='1.0.9-Essential-First-TEST4-RC01'
+    factory.PINNED_NATIVE_COMMIT=NATIVE;factory.NEW_NAME='1.0.9-Essential-First-TEST4-RC02'
     if args.mode=='java':
         factory.prepared_java(args)
         root=args.gradle_dir/'xbmc/java'

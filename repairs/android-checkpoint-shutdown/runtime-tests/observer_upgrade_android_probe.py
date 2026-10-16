@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import shutil
 import sqlite3
+import tempfile
 import time
 import xml.etree.ElementTree as ET
 
@@ -22,6 +23,9 @@ spec.loader.exec_module(probe)
 TEST3_SHA = '4ec1e3b2cabb595d228bc07bae2c6b3073c5af12822c8e40b1ec505b00865bf8'
 IDS = ['service.observerprobe.writer'+str(i).zfill(2) for i in range(1, 38)]
 DATA = probe.PROFILE+'/addon_data/'
+DIRECTORY_FIXTURE = 'script.infinity.directoryprobe.test'
+DIRECTORY_SETTINGS = '<settings><setting id="retained-proof">native-mkdirs</setting></settings>\n'
+DIRECTORY_RESULT = DATA+DIRECTORY_FIXTURE+'/observation.json'
 SERVICE = '''import json, os, xbmc, xbmcaddon, xbmcvfs
 addon = xbmcaddon.Addon()
 identity = addon.getAddonInfo('id')
@@ -37,6 +41,20 @@ with open(os.path.join(root, 'ready.json'), 'w') as saved:
  json.dump(dict(addon=identity, pid=os.getpid(), observer_initialized=True), saved)
 monitor = xbmc.Monitor()
 while not monitor.abortRequested(): monitor.waitForAbort(0.25)
+'''
+DIRECTORY_SCRIPT = '''import json, os, xbmcaddon, xbmcvfs
+addon = xbmcaddon.Addon()
+root = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
+assert not os.path.exists(root), 'Directory creation control must start missing'
+assert xbmcvfs.mkdirs(root) is True
+assert os.path.isdir(root)
+state = os.path.join(root, 'settings.xml')
+with open(state, 'w') as saved:
+ saved.write('<settings><setting id="retained-proof">native-mkdirs</setting></settings>\\n')
+ info = os.fstat(saved.fileno())
+ descriptor = dict(target=os.readlink('/proc/self/fd/'+str(saved.fileno())), device=info.st_dev, inode=info.st_ino, mode=info.st_mode)
+with open(os.path.join(root, 'observation.json'), 'w') as saved:
+ json.dump(dict(addon=addon.getAddonInfo('id'), pid=os.getpid(), destination=root, mkdirs_succeeded=True, essential_settings_written=True, settings_descriptor=descriptor), saved)
 '''
 
 
@@ -118,7 +136,7 @@ def close(owner, output):
     return report
 
 
-def verify_saved_state(output):
+def verify_saved_state(output, require_directory=False):
     output.mkdir(parents=True, exist_ok=True)
     assert not probe.processes(), 'Verify backup only after real whole-UID death'
     favourites = probe.shell('cat', probe.PROFILE+'/favourites.xml')
@@ -134,15 +152,27 @@ def verify_saved_state(output):
     probe.adb('pull', probe.PROFILE+'/Database', output/'Database')
     databases = sorted((output/'Database').glob('*.db'))
     assert len(databases) >= 7
-    for path in databases:
-        with sqlite3.connect(path.resolve().as_uri()+'?mode=ro', uri=True) as conn:
-            assert conn.execute('PRAGMA integrity_check').fetchone() == ('ok',), path.name
-    return {p.relative_to(output).as_posix():sha(p) for p in output.rglob('*') if p.is_file()}
+    if require_directory:
+        assert probe.shell('cat', DATA+DIRECTORY_FIXTURE+'/settings.xml') == DIRECTORY_SETTINGS
+        (output/'directory-settings.xml').write_text(DIRECTORY_SETTINGS)
+    hashes = {p.relative_to(output).as_posix():sha(p) for p in output.rglob('*') if p.is_file()}
+    # SQLite may update a WAL shared-memory sidecar even for a read-only
+    # connection. Inspect a second copy so the verified backup stays exact.
+    with tempfile.TemporaryDirectory(prefix='infinity-upgrade-integrity-') as tmp:
+        inspection = Path(tmp)/'Database'
+        shutil.copytree(output/'Database', inspection)
+        for original in databases:
+            path = inspection/original.name
+            with sqlite3.connect(path.resolve().as_uri()+'?mode=ro', uri=True) as conn:
+                assert conn.execute('PRAGMA integrity_check').fetchone() == ('ok',), path.name
+    assert hashes == {p.relative_to(output).as_posix():sha(p) for p in output.rglob('*') if p.is_file()}, 'Backup inspection modified original bytes'
+    return hashes
 
 
 def install_fixtures(output):
     assert not probe.processes(), 'Fixture installation requires verified stopped disposable app'
     fixture = output/'service-fixtures'; fixture.mkdir()
+    state = output/'seeded-service-state'; state.mkdir()
     hashes = {}
     for identity in IDS:
         root = fixture/identity; root.mkdir()
@@ -150,6 +180,17 @@ def install_fixtures(output):
         (root/'service.py').write_text(SERVICE)
         for path in root.iterdir(): hashes[path.relative_to(fixture).as_posix()] = sha(path)
         probe.adb('push', root, probe.PROFILE+'/../addons/'+identity)
+        # This comparison models an installation with existing user data.
+        # Seed each essential setting while the disposable baseline is dead;
+        # retain the independent candidate mkdirs regression below.
+        saved = state/identity; saved.mkdir()
+        (saved/'settings.xml').write_text('<settings><setting id="retained-proof">'+identity+'</setting></settings>\n')
+        probe.adb('push', saved, DATA+identity)
+    directory = fixture/DIRECTORY_FIXTURE; directory.mkdir()
+    (directory/'addon.xml').write_text('<addon id="'+DIRECTORY_FIXTURE+'" name="Missing directory durability control" version="1.0.0" provider-name="Infinity internal test"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable actual mkdirs and essential settings regression</summary><description lang="en_GB">Not a Diggz provider</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
+    (directory/'default.py').write_text(DIRECTORY_SCRIPT)
+    for path in directory.iterdir(): hashes[path.relative_to(fixture).as_posix()] = sha(path)
+    probe.adb('push', directory, probe.PROFILE+'/../addons/'+DIRECTORY_FIXTURE)
     backing = '/data/media/0/Android/data/'+probe.PACKAGE
     probe.shell('chown', '-R', probe.APP_UID+':'+probe.APP_UID, backing)
     probe.shell('restorecon', '-RF', backing)
@@ -164,6 +205,22 @@ def enable_fixtures():
         assert identity in installed, identity
         if not installed[identity]['enabled']:
             assert probe.rpc('Addons.SetAddonEnabled', {'addonid':identity, 'enabled':True}) == 'OK'
+
+
+def create_missing_directory(owner):
+    details = probe.rpc('Addons.GetAddonDetails', {'addonid':DIRECTORY_FIXTURE, 'properties':['enabled']})['addon']
+    if not details['enabled']:
+        assert probe.rpc('Addons.SetAddonEnabled', {'addonid':DIRECTORY_FIXTURE, 'enabled':True}) == 'OK'
+    assert probe.rpc('Addons.ExecuteAddon', {'addonid':DIRECTORY_FIXTURE, 'wait':True}) == 'OK'
+    deadline = time.monotonic()+30
+    while time.monotonic() < deadline:
+        observation = probe.read_json(DIRECTORY_RESULT)
+        if observation.get('pid') == owner['pid'] and observation.get('addon') == DIRECTORY_FIXTURE:
+            assert observation.get('mkdirs_succeeded') is True and observation.get('essential_settings_written') is True
+            assert probe.shell('cat', DATA+DIRECTORY_FIXTURE+'/settings.xml') == DIRECTORY_SETTINGS
+            return observation
+        time.sleep(.25)
+    raise RuntimeError('Production missing-directory/essential-settings control did not complete')
 
 
 def main():
@@ -214,12 +271,15 @@ def main():
         probe.enable_first_party(args.out)
         loaded_owner = probe.wait_ready(early_owner['owner'])
         report['candidate_ready_services'] = wait_services(loaded_owner)
+        report['candidate_directory_creation'] = create_missing_directory(loaded_owner)
+        save()
         report['candidate_loaded_close'] = close(loaded_owner, args.out/'candidate-loaded-close')
-        verify_saved_state(args.out/'after-loaded-close')
+        verify_saved_state(args.out/'after-loaded-close', require_directory=True)
         report['reopen'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
         probe.enable_first_party(args.out)
         reopened = probe.wait_ready(loaded_owner['owner'])
         report['reopen_ready_services'] = wait_services(reopened)
+        assert probe.shell('cat', DATA+DIRECTORY_FIXTURE+'/settings.xml') == DIRECTORY_SETTINGS
         report['saved_data_reopen_verified'] = True
         report['passed'] = True
     except Exception as error:
