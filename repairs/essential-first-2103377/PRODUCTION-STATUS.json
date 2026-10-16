@@ -1,10 +1,10 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters; Android Java write boundary remains unintegrated.",
+  "implementation": "Existing Essential-First native ledger and coordinator retained; Java producer admission and independent durable seals now gate both app processes. Whole-package termination implementation awaits actual Android verification.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 51,
+    "native_cpython_3117_runtime": 52,
     "coordinator_with_real_barrier": 15,
     "full_production_job_manager": 13,
     "production_installer_filesystem_sqlite": 24,
@@ -16,7 +16,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "Full ARM64 compilation and preservation passed; permanently signed internal Android probe failed native vendor uname authorization. Java write-boundary counterexample remains unresolved.",
+    "current_corrections": "Selected immutable system command resolution passed all 52 native CPython cases. Full ARM64 build 38846154259 is in progress; no process success inferred.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -40,7 +40,21 @@
     "marker_evidence_artifact": 12020228476,
     "marker_evidence_zip_sha256": "fe1104c84950af9131c8f0492f9fdfcf0d83bffd42823ff1155c140402d83ec6",
     "marker_native_sha256": "569d38d49c9804dfae6bfc3b2e5ebf86ab28dc31b0990913e947cd9c1626043f",
-    "marker_source_manifest_sha256": "d5332c9b063c462d52865a1e0bb27f9d6dc02fc398023342d43576c166c87c9b"
+    "marker_source_manifest_sha256": "d5332c9b063c462d52865a1e0bb27f9d6dc02fc398023342d43576c166c87c9b",
+    "vendor_identity_run": {
+      "run": 38842156316,
+      "commit": "a543811a0b3b54ad6a0b1cdd2940a5e7d33aba83",
+      "result": "success",
+      "actual_android_success": false
+    },
+    "selected_command_run": {
+      "run": 38846154259,
+      "commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
+      "status": "in_progress",
+      "host_result": "success",
+      "host_artifact": 12023815051,
+      "host_artifact_sha256": "fcc16ba4658721081f3172468e5df20bda618c755f1079d5d5533b6e0e3f1b47"
+    }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
   "android_process_death_verified": false,
@@ -53,11 +67,10 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Actual Java buffered writes can change native-sealed essential data without revoking native authorization. Join real Java admission, old/buffered handles, pending preference commits and durability to the existing checkpoint in both app processes.",
-    "Android native executable validation refuses existing /vendor/bin/uname -> toybox_vendor, although the vendor mount is read-only. Verify the actual vendor command identity/arguments/environment/output contract before changing this native check; do not waive by add-on name or assume immutable means harmless.",
-    "Whole-package termination is unverified. Existing code explicitly kills the engine, while guard end stops services only. Complete this path only after Java/native durability is verified, and test app UID process absence, owned restart sources and preserved-data reopening.",
-    "Physical TEST1 lacks call-site evidence proving every Seren/Continuity/IAGL warning resolved on the Fold. Unknown protected writes must remain blockers.",
-    "No safe Fold APK or physical acceptance exists. Locked RC1 remains unchanged; no promotion or final lock."
+    "Run 38847277623 must finish the actual add-on-loaded Android Close, verify both Java seals, all 16 essential native owners, engine and whole-package process death, integrity checks and preserved-data reopening. Its 274+20 Java tests and unrelated-bytecode gate already passed.",
+    "Native run 38846154259 must finish its complete ARM64 build; 52 CPython, SQLite, read-only vendor fixture and original host checks already passed.",
+    "Latest completed production Close (38843193133) failed at app-side SELinux denial for unused vendor uname fallback. The source correction has passed its real inaccessible-fallback host regression; no Android success is inferred before the new actual process run.",
+    "Physical Fold approval remains required. No emulator or host pass establishes physical acceptance; no APK lock is authorized."
   ],
   "internal_android_probes": [
     {
@@ -135,6 +148,19 @@
       "evidence_zip_sha256": "a90db29181a3f13e9002d5c918007d8bb2446dec51e2a979f5a649ca85178482",
       "outcome": "Actual Close failed after 3374ms on existing vendor uname candidate outside native readonly command contract. 13/16 essential rows completed; 17 diagnostic rows retained. Neither process death nor reopening succeeded.",
       "report": "evidence/runtime/android-probe9-result.json"
+    },
+    {
+      "run": 38843193133,
+      "source_commit": "a3ec8e0c3f6c4bbc2d69c11f4cebdf284a56acfd",
+      "native_commit": "a543811a0b3b54ad6a0b1cdd2940a5e7d33aba83",
+      "native_run": 38842156316,
+      "permanently_signed_internal_apk": true,
+      "apk_delivered": false,
+      "apk_sha256": "f345519e766bd50bc8ab173c9dc5b1b1680406d5782bd256b53b66ca585e1c19",
+      "evidence_artifact": 12022314801,
+      "evidence_zip_sha256": "0524d6fcaf6a30d2729003e1c15a49af46c3211730f82386ac4b49dfae5f406f",
+      "outcome": "Actual Close failed after 5031ms. App SELinux denied getattr of unused vendor toybox fallback; 13/16 essential rows completed. Native databases and deferred dialog state remained pending. No process death or reopen.",
+      "report": "evidence/runtime/android-probe10-result.json"
     }
   ],
   "child_output_correction": {
@@ -162,10 +188,21 @@
     "negative_control": "evidence/runtime/java-buffer-boundary-negative-control.json",
     "runtime": "actual host JVM, real filesystem, unmodified production native ledger; not Android process evidence",
     "observed": "Native authorized before Java buffer flush; protected file changed; native authorization remained true.",
-    "current_android_source": "Approved RC5 Java source still uses ordinary FileOutputStream and asynchronous SharedPreferences.apply outside the native/Python ledger.",
+    "current_android_source": "Actual producer call sites now use tracked outputs, atomic files, preferences and accepted save work; existing coordinator requires independent Java seals in both processes, in addition to native authorization.",
     "required": "Add verified Java write admission and durable save participants to existing native/Android authorization; cover old handles and queued preference writes in both app processes; preserve owner/PID/generation and fail closed. No competing coordinator, default-true coverage flag or unconditional process kill.",
     "source_evidence": "evidence/runtime/java-source-boundary.json",
-    "existing_primitive": "Reuse InfinityCheckpointProtocol.atomic (file sync, atomic replace, directory sync and readback); it currently covers receipts only, not Java producer admission or pending preferences."
+    "existing_primitive": "Reuse InfinityCheckpointProtocol.atomic (file sync, atomic replace, directory sync and readback); it currently covers receipts only, not Java producer admission or pending preferences.",
+    "host_verification": {
+      "run": 38847277623,
+      "commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
+      "original_tests": 274,
+      "new_save_tests": 20,
+      "all_tests_passed": true,
+      "unrelated_decoded_instructions_preserved": true,
+      "source_edits_reconstructed": true,
+      "host_os_adapter": "test-only actual host file descriptors, metadata and FileChannel.force, including sync-failure refusal",
+      "actual_android_verification": "awaiting exact full ARM64 build"
+    }
   },
   "marker_boundary": {
     "negative_control": "evidence/runtime/marker-boundary-negative-control.json",
@@ -175,24 +212,37 @@
     "apk_deliverable": false
   },
   "requested_resume_commit": "a457989f",
-  "latest_production_commit": "04f9fb1b60d63a4579253cb2e58113b273dadfcc",
+  "latest_production_commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
   "whole_package_termination_boundary": {
-    "source_observation": "Engine lease explicitly kills :kodi after authorization. Default-process guard end stops services/foreground state; it does not explicitly terminate its own process.",
+    "source_observation": "Existing guard now exits its own process only after Java/native save confirmation, old engine death and entry/removal ownership checks; independent Android UID-process absence is still required.",
     "runtime_scope": "Current Android attempts fail before authorization. No post-success default-process survival result is claimed.",
     "required": "After verified Java and native essentials, complete Android process/service termination and cancel owned restart sources as part of the existing coordinator; verify all app UID processes absent and preserved-data reopening.",
     "verified": false
   },
   "internal_permanent_signing_verified": true,
-  "latest_internal_apk_sha256": "2c1bc47fc15254648a5b4386e6e0e767ff986f1a39f4a2a899d734731cf2bb6e",
+  "latest_internal_apk_sha256": "f345519e766bd50bc8ab173c9dc5b1b1680406d5782bd256b53b66ca585e1c19",
   "latest_internal_apk_delivered": false,
   "latest_android_probe": {
-    "run": 38837555854,
-    "native_run": 38836846099,
-    "source_commit": "13f7ae28da3d9d58da85cc25500ecfb1a4ce6fb4",
-    "status": "completed failure at native vendor executable proof after real Close; no successful process death or reopen",
-    "additional_evidence": "read-only engine mount table and executable path observations; root access never authorizes an app-side operation",
-    "apk_delivery_blocked_even_if_probe_passes": "Java write boundary counterexample remains unresolved",
-    "evidence_artifact": 12020785853
+    "run": 38847277623,
+    "source_commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
+    "native_run": 38846154259,
+    "status": "Java 274+20 and decoded-preservation gates passed; awaiting pinned full ARM64 build before actual Android test",
+    "physical_fold_accepted": false,
+    "apk_delivery_authorized": false
   },
-  "latest_preservation": "evidence/runtime/04f-production-verification.json: exact locked final source manifest compared; only 17 declared shutdown paths differ; all other locked source hashes identical. APK unrelated instructions/resources/payload preservation passed."
+  "latest_preservation": "evidence/runtime/04f-production-verification.json: exact locked final source manifest compared; only 17 declared shutdown paths differ; all other locked source hashes identical. APK unrelated instructions/resources/payload preservation passed.",
+  "latest_android_source_commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
+  "latest_completed_production_probe": {
+    "run": 38843193133,
+    "source_commit": "a3ec8e0c3f6c4bbc2d69c11f4cebdf284a56acfd",
+    "native_commit": "a543811a0b3b54ad6a0b1cdd2940a5e7d33aba83",
+    "native_run": 38842156316,
+    "permanently_signed_internal_apk": true,
+    "apk_delivered": false,
+    "apk_sha256": "f345519e766bd50bc8ab173c9dc5b1b1680406d5782bd256b53b66ca585e1c19",
+    "evidence_artifact": 12022314801,
+    "evidence_zip_sha256": "0524d6fcaf6a30d2729003e1c15a49af46c3211730f82386ac4b49dfae5f406f",
+    "outcome": "Actual Close failed after 5031ms. App SELinux denied getattr of unused vendor toybox fallback; 13/16 essential rows completed. Native databases and deferred dialog state remained pending. No process death or reopen.",
+    "report": "evidence/runtime/android-probe10-result.json"
+  }
 }

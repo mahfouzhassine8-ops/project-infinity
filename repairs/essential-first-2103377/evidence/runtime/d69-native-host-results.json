@@ -1,0 +1,320 @@
+{
+  "all_passed": true,
+  "android_process_death_verified": false,
+  "apk_deliverable": false,
+  "results": [
+    {
+      "case": "cached-write",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS cached-write; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "cached-pwrite",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS cached-pwrite; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "cached-writev",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS cached-writev; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "raw",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS raw; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "raw-fd-spoof",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS raw-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "buffer-fd-spoof",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS buffer-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "late-raw-open",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS late-raw-open; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "late-cached-open",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS late-cached-open; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "cached-rename",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS cached-rename; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "cached-remove",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS cached-remove; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "late-chmod",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS late-chmod; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "late-mmap",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS late-mmap; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "late-ctypes",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS late-ctypes; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "buffer-drain",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS buffer-drain; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "layered",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS layered; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "cached-buffer",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS cached-buffer; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "optional-blocked",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS optional-blocked; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "sqlite-attach",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS sqlite-attach; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "descriptor-race",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS descriptor-race; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "rename-race",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS rename-race; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "sqlite-renamed",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS sqlite-renamed; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "sqlite-row-factory",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS sqlite-row-factory; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "file-lock",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS file-lock; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "pathlike",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS pathlike; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "memory-buffer",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS memory-buffer; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "observer-denials",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS observer-denials; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "unknown-descriptor",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS unresolved actual descriptor conversion fails closed\n"
+    },
+    {
+      "case": "uname-combined-flags",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS uname-combined-flags; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "child-numeric-output",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS child-numeric-output; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "unverified-posix-spawn",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS unobserved posix_spawn file actions remain an essential blocker\n"
+    },
+    {
+      "case": "child-file-pending",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "Real child changed protected bytes; seal=0; authorized=0\nPASS actual pending child output classification\n"
+    },
+    {
+      "case": "child-cache-pending",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS actual pending child output classification\n"
+    },
+    {
+      "case": "child-pipe-pending",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS actual pending child output classification\n"
+    },
+    {
+      "case": "missing-immutable-command",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS missing-immutable-command; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "missing-writable-command",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS missing executable/search candidate on writable path remains unverified\n"
+    },
+    {
+      "case": "nested-native-child",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "Nested native child changed protected bytes; seal=0; authorized=0\n"
+    },
+    {
+      "case": "child-locale-environment",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS child-locale-environment; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "child-writable-search",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS missing executable/search candidate on writable path remains unverified\n"
+    },
+    {
+      "case": "child-error-channel-pending",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "Real child changed protected bytes; seal=0; authorized=0\nPASS actual pending child output classification\n"
+    },
+    {
+      "case": "late-native-child",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS late-native-child; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "child-preparation-race",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS actual native fork preparation cannot race the essential seal\n"
+    },
+    {
+      "case": "null-device-path",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS null-device-path; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "unknown-device-path",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS unknown device remains a specific durability blocker\n"
+    },
+    {
+      "case": "marker-filename",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS marker-filename; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "child-unreachable-vendor",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS child-unreachable-vendor; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "pillow-fd",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS pillow-fd; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "pillow-ppm",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS pillow-ppm; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "command-center-save",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS command-center-save; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "command-center-failure",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS actual first-party failed save never authorizes termination\n"
+    },
+    {
+      "case": "compat-save",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS compat-save; actual CPython 3.11.7; no interpreter retirement required\n"
+    },
+    {
+      "case": "compat-failure",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS actual compatibility failure cannot authorize termination\n"
+    },
+    {
+      "case": "ambient-contract",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "PASS ambient-contract; actual CPython 3.11.7; no interpreter retirement required\n"
+    }
+  ],
+  "scope": "production native Python observer and C entry hooks, pinned CPython 3.11"
+}
