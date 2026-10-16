@@ -1658,7 +1658,7 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T22:30:49.931735+00:00",
+    "as_of_utc": "2026-10-16T22:32:04.350749+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
     "native_run_id": 38967896318,
@@ -1826,7 +1826,7 @@
     "deferred_command_resolver": {
       "source_commit": "f5e3d9434d8a8c0918d1f4cc6758cf3704eb873c",
       "native_run_id": 38975950035,
-      "android_run_id": null,
+      "android_run_id": 38976250598,
       "production_changes": [
         "observer.py eager import and four command lookups",
         "matching generated observer source header"
@@ -1873,7 +1873,11 @@
       "android_case_dispatch_result": "passed normally and -O",
       "android_packaging_controls": 30,
       "android_packaging_result": "passed",
-      "android_verification": "preparing four independent original probes, all reuse unchanged saved RC05 Java/308 proof; exact full native success required first"
+      "android_verification": "38976250598 queued and awaiting exact full native 38975950035/f5e3d943 success, then one signed internal APK and four independent original shutdown probes",
+      "android_source_commit": "94b03c209cec394c9733236a4a345fd658c6d430",
+      "apk_assembled": false,
+      "apk_signed": false,
+      "monitoring_handoff": "Only CI execution remains for this verification cycle; user may monitor queued runs; no background assistant monitoring"
     }
   },
   "repair_checkpoint_history": [

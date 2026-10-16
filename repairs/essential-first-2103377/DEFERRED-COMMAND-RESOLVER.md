@@ -50,3 +50,9 @@ complete success, preserve RC05 Java/308 proof, and run the four original probes
 in independent AVDs with fail-fast disabled: fresh, cold, core-initialized and
 loaded. Twelve dispatch/identity/failure controls pass normally and under -O.
 The original probes and their save/death/integrity/reopen assertions are unchanged.
+
+Four-case verification **38976250598 / 94b03c20** is queued and waits for the
+exact complete native **38975950035 / f5e3d943** success before packaging/signing.
+Each case preserves its own evidence and failures do not cancel other cases.
+Only CI execution remains at this handoff; the user can monitor those queued runs.
+There is no background assistant monitoring and no corrected Fold APK delivery.
