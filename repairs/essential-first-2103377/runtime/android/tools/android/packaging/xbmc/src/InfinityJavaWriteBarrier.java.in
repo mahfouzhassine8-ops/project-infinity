@@ -1,0 +1,121 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.UUID;
+
+/** Java producer admission used by the existing Normal Close coordinator.
+ * No timer, process kill, independent shutdown coordinator or default-ready flag.
+ */
+public final class InfinityJavaWriteBarrier {
+  private static final Object LOCK=new Object();
+  private static final ThreadLocal<ArrayList<Scope>> SCOPES=ThreadLocal.withInitial(ArrayList::new);
+  private static final Map<Long,String> active=new LinkedHashMap<>();
+  private static final Map<String,String> failures=new LinkedHashMap<>();
+  private static long next;
+  private static String session="",seal="";
+  private static boolean closing;
+  private InfinityJavaWriteBarrier() {}
+
+  public static final class Closing extends IllegalStateException {
+    Closing(String owner){super("Infinity Close has stopped new writes: "+owner);}
+  }
+  public static final class Scope implements AutoCloseable {
+    private final long token;
+    private final String name;
+    private final Thread owner=Thread.currentThread();
+    private boolean closed,admitted;
+    private Scope(long token,String name){this.token=token;this.name=name;}
+    @Override public void close(){
+      synchronized(LOCK){
+        if(closed)return;
+        if(owner!=Thread.currentThread())throw new IllegalStateException("Java save scope changed thread");
+        closed=true;active.remove(token);SCOPES.get().remove(this);
+      }
+    }
+  }
+  public static final class Resource {
+    private final long token;
+    private final String owner;
+    private boolean finished;
+    private Resource(long token,String owner){this.token=token;this.owner=owner;}
+    public Scope continueOnThread(){
+      synchronized(LOCK){
+        if(finished||!active.containsKey(token))throw new IllegalStateException("Java save task already ended");
+        Scope scope=new Scope(++next,owner);scope.admitted=true;
+        active.put(scope.token,scope.name);SCOPES.get().add(scope);return scope;
+      }
+    }
+    public void failed(String error){synchronized(LOCK){failureLocked(owner,error);}}
+    public void finish(String error){
+      synchronized(LOCK){
+        if(finished)return;
+        finished=true;
+        if(error!=null&&!error.isEmpty())failureLocked(owner,error);
+        active.remove(token);
+      }
+    }
+  }
+  private static void failureLocked(String owner,String error){
+    if(failures.size()<128)failures.put(owner,error);
+    seal="";
+  }
+  private static void admit(String owner){
+    boolean continuing=false;
+    for(Scope scope:SCOPES.get())if(scope.admitted)continuing=true;
+    if(closing && !continuing){
+      // A caller sees a real exception. Retain the rejected essential write
+      // in the existing close proof; never manufacture a successful save.
+      failureLocked(owner,"write_attempted_after_close_admission");
+      throw new Closing(owner);
+    }
+    for(Scope scope:SCOPES.get())if(!scope.admitted){scope.admitted=true;active.put(scope.token,scope.name);}
+  }
+  public static Scope enter(String owner){
+    synchronized(LOCK){Scope scope=new Scope(++next,owner);SCOPES.get().add(scope);return scope;}
+  }
+  public static Resource resource(String owner){
+    synchronized(LOCK){admit(owner);long id=++next;active.put(id,owner);return new Resource(id,owner);}
+  }
+  public static void failure(String owner,String reason){synchronized(LOCK){failureLocked(owner,reason);}}
+  public static boolean begin(String ticket){
+    synchronized(LOCK){
+      if(ticket==null||ticket.isEmpty())return false;
+      if(closing)return session.equals(ticket);
+      session=ticket;seal="";closing=true;return true;
+    }
+  }
+  public static String sealIfReady(String ticket){
+    synchronized(LOCK){
+      if(!closing||!session.equals(ticket)||!active.isEmpty()||!failures.isEmpty())return "";
+      if(seal.isEmpty())seal=UUID.randomUUID().toString();
+      return seal;
+    }
+  }
+  public static boolean authorized(String ticket,String proof){
+    synchronized(LOCK){return valid(ticket,proof);}
+  }
+  private static boolean valid(String ticket,String proof){
+    return closing&&session.equals(ticket)&&proof!=null&&!proof.isEmpty()&&seal.equals(proof)&&active.isEmpty()&&failures.isEmpty();
+  }
+  public static boolean whileAuthorized(String ticket,String proof,Runnable action){
+    synchronized(LOCK){if(!valid(ticket,proof))return false;action.run();return true;}
+  }
+  public static void cancel(String ticket){
+    synchronized(LOCK){if(!session.equals(ticket))return;closing=false;session="";seal="";}
+  }
+  public static void userEntry(){
+    synchronized(LOCK){closing=false;session="";seal="";}
+  }
+  public static boolean closing(){synchronized(LOCK){return closing;}}
+  public static String pending(){
+    synchronized(LOCK){
+      if(!failures.isEmpty())return "java_save_failed:"+failures.entrySet().iterator().next();
+      if(!active.isEmpty())return "java_save_pending:"+active.values().iterator().next()+";count="+active.size();
+      return "";
+    }
+  }
+  public static int pendingCount(){synchronized(LOCK){return active.size();}}
+}

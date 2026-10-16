@@ -28,6 +28,7 @@ public final class InfinityCloseGuardService extends Service {
   private InfinityCheckpointProtocol.AuthorizationGate gate;
   private Messenger engine;
   private String safeJson="",safeProof="",lastNativeJson="";
+  private String javaProof="",engineJavaProof="",engineJavaPending="";
   private long generation;
   private volatile long safeEpoch,safeElapsed,terminateEpoch,terminateElapsed,consumedEpoch,consumedElapsed,deathEpoch,deathElapsed;
   static final class Session {
@@ -59,6 +60,7 @@ public final class InfinityCloseGuardService extends Service {
         if(code==InfinityCheckpointProtocol.CONSUME&&Binder.getCallingUid()==android.os.Process.myUid()&&Binder.getCallingPid()==pid&&session!=null&&
             session.ticket.equals(ticket)&&session.owner.equals(owner)&&session.pid==pid&&!ended&&!revoked&&!consumed&&
             checkpointSaved&&"ENGINE_TERMINATING".equals(phase)&&gate!=null&&
+            InfinityJavaWriteBarrier.authorized(ticket,javaProof)&&!engineJavaProof.isEmpty()&&
             gate.consume(ticket,owner,pid,requestedGeneration,proof,SystemClock.elapsedRealtime())){
           consumed=true;consumedEpoch=System.currentTimeMillis();consumedElapsed=SystemClock.elapsedRealtime();accepted=true;
         }
@@ -79,6 +81,8 @@ public final class InfinityCloseGuardService extends Service {
     try{
       JSONObject row=InfinityCheckpointProtocol.status(raw,session.ticket,session.owner,session.pid);
       lastNativeJson=raw;
+      engineJavaProof=message.getData().getString(InfinityCloseNativeLease.JAVA_PROOF,"");
+      engineJavaPending=message.getData().getString(InfinityCloseNativeLease.JAVA_PENDING,"");
       String reported=row.getString("phase");
       if("CHECKPOINT_FAILED".equals(reported)){fail(row.optString("error","native_checkpoint_failed"));return true;}
       if(InfinityCheckpointProtocol.safe(row)){acceptSafe(raw,row);return true;}
@@ -116,6 +120,8 @@ public final class InfinityCloseGuardService extends Service {
     if(session!=null){if(!session.same(next))evidence("ignored_stale_start",phase,"");return START_NOT_STICKY;}
     if(next==null){stopSelf(startId);return START_NOT_STICKY;}
     session=next;
+    InfinityJavaPersistence.initialize(this);
+    if(!InfinityJavaWriteBarrier.begin(next.ticket)){fail("coordinator_java_admission_rejected");return START_NOT_STICKY;}
     gate=new InfinityCheckpointProtocol.AuthorizationGate(next.ticket,next.owner,next.pid,next.started,next.started+InfinityCheckpointProtocol.CHECKPOINT_TIMEOUT_MS);
     worker.execute(()->{try{File current=new File(getFilesDir(),InfinityCheckpointProtocol.EVIDENCE),previous=new File(getFilesDir(),InfinityCheckpointProtocol.EVIDENCE+".previous");
       if(current.isFile()){if(previous.isFile())previous.delete();current.renameTo(previous);}}catch(RuntimeException ignored){}});
@@ -240,6 +246,10 @@ public final class InfinityCloseGuardService extends Service {
       row.put("process_death_confirmed","COMPLETE".equals(state)&&checkpointSaved&&consumed&&deathElapsed>0);
       row.put("exit_kind",safeJson.isEmpty()?"essential_first_process_exit_requested":"essential_verified_process_exit");
       row.put("optional_data_recovery_guaranteed",false);
+      row.put("engine_java_save_seal",engineJavaProof);row.put("coordinator_java_save_seal",javaProof);
+      row.put("engine_java_pending",engineJavaPending);row.put("coordinator_java_pending",InfinityJavaWriteBarrier.pending());
+      // A process cannot attest to its own death. The external probe must observe both PIDs gone.
+      row.put("whole_package_death_confirmed",false);
       row.put("checkpoint_saved",checkpointSaved);row.put("authorization_consumed",consumed);
       row.put("safe_epoch_ms",safeEpoch);row.put("safe_elapsed_ms",safeElapsed);
       row.put("terminate_requested_epoch_ms",terminateEpoch);row.put("terminate_requested_elapsed_ms",terminateElapsed);
@@ -252,6 +262,18 @@ public final class InfinityCloseGuardService extends Service {
   }
   private void acceptSafe(String raw,JSONObject nativeReceipt)throws Exception{
     if(checkpointSaved||"SAFE_TO_TERMINATE".equals(phase)||"ENGINE_TERMINATING".equals(phase))return;
+    if(!inTime()){deadline();return;}
+    if(engineJavaProof.isEmpty()){
+      if(engineJavaPending.startsWith("java_save_failed:"))fail("engine_"+engineJavaPending);
+      return;
+    }
+    javaProof=InfinityJavaWriteBarrier.sealIfReady(session.ticket);
+    if(javaProof.isEmpty()){
+      String pending=InfinityJavaWriteBarrier.pending();
+      if(pending.startsWith("java_save_failed:")){fail("coordinator_"+pending);return;}
+      ui.postDelayed(()->{if(!ended&&!revoked)try{acceptSafe(raw,nativeReceipt);}catch(Exception invalid){fail("java_confirmation_unavailable");}},150);
+      return;
+    }
     safeJson=raw;safeProof=InfinityCheckpointProtocol.proof(raw);generation=nativeReceipt.getLong("generation");
     safeEpoch=System.currentTimeMillis();safeElapsed=SystemClock.elapsedRealtime();
     phase="SAFE_TO_TERMINATE";
@@ -271,10 +293,12 @@ public final class InfinityCloseGuardService extends Service {
           catch(IOException unavailable){ui.post(()->fail("termination_receipt_commit_failed"));return;}
           ui.post(()->{
             if(ended||revoked||!inTime()){deadline();return;}
+            if(!InfinityJavaWriteBarrier.authorized(session.ticket,javaProof)){fail("coordinator_java_barrier_changed");return;}
             if(!gate.arm(generation,safeProof,SystemClock.elapsedRealtime())){fail("termination_authority_arm_rejected");return;}
             try{
               Message command=Message.obtain(null,InfinityCheckpointProtocol.TERMINATE);Bundle data=session.bundle();
               data.putLong(InfinityCheckpointProtocol.GENERATION,generation);data.putString(InfinityCheckpointProtocol.PROOF,safeProof);
+              data.putString(InfinityCloseNativeLease.JAVA_PROOF,engineJavaProof);
               command.setData(data);command.replyTo=replies;engine.send(command);
             }catch(RemoteException unavailable){fail("termination_command_transport_failed");}
           });
@@ -292,6 +316,7 @@ public final class InfinityCloseGuardService extends Service {
         if(checkpointSaved&&consumed&&!revoked&&"ENGINE_TERMINATING".equals(phase)){
           if(completing)return; // Exactly one confirmed completion/handoff.
           completing=true;
+          if(!InfinityJavaWriteBarrier.authorized(target.ticket,javaProof)){fail("coordinator_java_save_unverified_after_engine_death");return;}
           deathEpoch=System.currentTimeMillis();deathElapsed=SystemClock.elapsedRealtime();
           final JSONObject done=receipt("COMPLETE","");
           try{
@@ -321,7 +346,7 @@ public final class InfinityCloseGuardService extends Service {
               catch(RuntimeException unavailable){
                 evidence("navigation.home_after_death_unavailable","COMPLETE",unavailable.getClass().getSimpleName());
               }
-              finally{end();}
+              finally{end();finishCoordinatorProcess(target);}
             });
           });
         }else if(!completing)fail("engine_ended_without_consumed_termination_authorization");
@@ -412,6 +437,27 @@ public final class InfinityCloseGuardService extends Service {
     if(binding){binding=false;try{unbindService(connection);}catch(RuntimeException ignored){}}
     try{stopService(new Intent(this,InfinityCloseNativeLease.class));}catch(RuntimeException ignored){}
     stopForeground(true);stopSelf();
+    if(session!=null&&!"COMPLETE".equals(phase))InfinityJavaWriteBarrier.cancel(session.ticket);
+  }
+  private void finishCoordinatorProcess(Session completed){
+    // Retain the entry/removal lease until default-process termination. A new
+    // explicit launch invalidates the Java seal and owns its normal entry path.
+    try(InfinityTaskLifecycleGate.Removal removal=InfinityTaskLifecycleGate.beginRemoval(getFilesDir())){
+      if(removal==null)return;
+      InfinityKodiShutdown.Snapshot observed=InfinityKodiShutdown.read(getFilesDir(),
+          (pid,owner)->InfinityKodiShutdown.ownerAlive(getFilesDir(),pid,owner),InfinityKodiShutdown.Snapshot.empty());
+      if(observed.pid!=completed.pid||!completed.owner.equals(observed.owner)||observed.alive||
+          !InfinityKodiShutdown.ownerRetired(getFilesDir(),completed.pid,completed.owner))return;
+      InfinityJavaWriteBarrier.whileAuthorized(completed.ticket,javaProof,()->{
+        try{
+          JSONObject finalReceipt=receipt("COMPLETE","");
+          finalReceipt.put("coordinator_termination_authorized",true);
+          finalReceipt.put("coordinator_pid",android.os.Process.myPid());
+          InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),finalReceipt);
+          android.os.Process.killProcess(android.os.Process.myPid());
+        }catch(Exception unavailable){android.util.Log.e("InfinityClose","Coordinator exit retained: durable final evidence unavailable",unavailable);}
+      });
+    }catch(Exception unavailable){android.util.Log.e("InfinityClose","Coordinator exit retained: replacement entry or save could not be verified",unavailable);}
   }
   @Override public IBinder onBind(Intent intent){return null;}
   @Override public void onTimeout(int startId){deadline();end();}

@@ -137,6 +137,7 @@ def main():
     global APP_UID
     p=argparse.ArgumentParser();p.add_argument('--apk',type=Path,required=True)
     p.add_argument('--installed-addons',type=Path,required=True)
+    p.add_argument('--require-java-save-proof',action='store_true')
     p.add_argument('--out',type=Path,required=True);args=p.parse_args();args.out.mkdir(parents=True,exist_ok=True)
     report={'scope':'real signed ARM64 APK on disposable Android emulator; not physical Fold acceptance',
             'passed':False,'android_engine_death_verified':False,'whole_package_death_verified':False,
@@ -233,6 +234,13 @@ def main():
             time.sleep(.2)
         report['remaining_package_processes']=processes()
         report['whole_package_death_verified']=not report['remaining_package_processes']
+        if args.require_java_save_proof:
+            final_receipt=read_json(PRIVATE+'/files/infinity-checkpoint-close.json')
+            assert final_receipt.get('session')==receipt.get('session') and final_receipt.get('phase')=='COMPLETE'
+            assert final_receipt.get('coordinator_termination_authorized') is True
+            assert all(re.fullmatch(r'[0-9a-f-]{36}',final_receipt.get(key,'')) for key in ('engine_java_save_seal','coordinator_java_save_seal'))
+            assert not final_receipt.get('engine_java_pending') and not final_receipt.get('coordinator_java_pending')
+            report['close_receipt']=final_receipt;report['both_java_process_save_proofs_verified']=True
         (args.out/'services-after-close.txt').write_text(shell('dumpsys','activity','services',PACKAGE))
         adb('pull',PROFILE+'/Database',args.out/'Database')
         databases=list((args.out/'Database').glob('*.db'))

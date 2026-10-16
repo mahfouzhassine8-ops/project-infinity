@@ -1,0 +1,342 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+package @APP_PACKAGE@;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.system.Os;
+import android.system.OsConstants;
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.concurrent.*;
+import org.xmlpull.v1.XmlPullParser;
+
+/** Actual Java write adapters. These are installed in the compiled producer
+ * call sites from process startup, so old handles and queued applies count.
+ */
+public final class InfinityJavaPersistence {
+  private static final ExecutorService preferences=Executors.newSingleThreadExecutor(r->{
+    Thread t=new Thread(r,"InfinityPreferenceDurability");t.setDaemon(true);return t;});
+  private static final Set<String> caches=Collections.synchronizedSet(new HashSet<>());
+  private static final Map<String,Preferences> preferenceWrappers=new HashMap<>();
+  private InfinityJavaPersistence() {}
+
+  public static void initialize(Context context){
+    try{File cache=context.getApplicationContext().getCacheDir();
+      if(cache!=null)caches.add(cache.getCanonicalPath());
+    }catch(IOException unavailable){/* Unknown paths remain essential. */}
+  }
+  public static void userEntry(Context context){initialize(context);InfinityJavaWriteBarrier.userEntry();}
+  /** Reserve accepted persistence work before it enters a queue. */
+  public static void execute(Executor executor,Runnable task,String owner){
+    Work work=new Work(task,owner);
+    try{executor.execute(work);}catch(RuntimeException rejected){work.cancel("java_task_submission_failed");throw rejected;}
+  }
+  public static Runnable task(Runnable task,String owner){return new Work(task,owner);}
+  private static final class Work implements Runnable {
+    final Runnable task;final InfinityJavaWriteBarrier.Resource lease;
+    boolean started,finished;
+    Work(Runnable task,String owner){this.task=task;lease=InfinityJavaWriteBarrier.resource("queued:"+owner);}
+    synchronized void cancel(String reason){if(!started&&!finished){finished=true;lease.finish(reason);}}
+    public void run(){
+      synchronized(this){if(finished)return;started=true;}
+      try(InfinityJavaWriteBarrier.Scope scope=lease.continueOnThread()){task.run();}
+      catch(RuntimeException|Error failed){lease.failed("accepted_save_task_failed:"+failed.getClass().getSimpleName());throw failed;}
+      finally{synchronized(this){finished=true;}lease.finish(null);}
+    }
+  }
+  public static Future<?> submit(ExecutorService executor,Runnable task,String owner){
+    Work work=new Work(task,owner);
+    FutureTask<Void> future=new FutureTask<Void>(work,null){
+      @Override public boolean cancel(boolean interrupt){
+        boolean canceled=super.cancel(interrupt);
+        if(canceled){
+          String reason=InfinityJavaWriteBarrier.closing()?"accepted_save_task_canceled_during_close":null;
+          if(reason!=null)work.lease.failed(reason);work.cancel(reason);
+        }
+        return canceled;
+      }
+    };
+    try{executor.execute(future);return future;}
+    catch(RuntimeException rejected){work.cancel("java_task_submission_failed");throw rejected;}
+  }
+  public static List<Runnable> shutdownNow(ExecutorService executor){
+    List<Runnable> pending=executor.shutdownNow(),original=new ArrayList<>();
+    for(Runnable task:pending){
+      if(task instanceof Work){Work work=(Work)task;work.cancel(InfinityJavaWriteBarrier.closing()?"accepted_save_task_canceled_during_close":null);original.add(work.task);}
+      else {if(task instanceof Future<?>)((Future<?>)task).cancel(false);original.add(task);}
+    }
+    return original;
+  }
+  public static boolean delete(File file){return mutate(file,null,"delete");}
+  public static boolean rename(File file,File target){return mutate(file,target,"rename");}
+  public static boolean mkdir(File file){return mutate(file,null,"mkdir");}
+  public static boolean mkdirs(File file){return mutate(file,null,"mkdirs");}
+  public static boolean createNewFile(File file)throws IOException{
+    InfinityJavaWriteBarrier.Resource lease=acquire(file,"create_file");String failure=null;
+    try{boolean created=file.createNewFile();if(created&&lease!=null){
+      try(FileOutputStream out=new FileOutputStream(file,true)){out.getFD().sync();}
+      syncDirectory(file.getAbsoluteFile().getParentFile());
+    }return created;}
+    catch(IOException|RuntimeException error){failure="create_file_failed";throw error;}
+    finally{if(lease!=null)lease.finish(failure);}
+  }
+  public static boolean setLastModified(File file,long time){
+    InfinityJavaWriteBarrier.Resource lease=acquire(file,"file_timestamp");String failure=null;
+    try{boolean changed=file.setLastModified(time);if(changed&&lease!=null)syncFile(file);return changed;}
+    catch(IOException error){failure="file_timestamp_sync_failed";throw new IllegalStateException(error);}
+    catch(RuntimeException error){failure="file_timestamp_failed";throw error;}
+    finally{if(lease!=null)lease.finish(failure);}
+  }
+  public static void renameOs(String from,String to)throws android.system.ErrnoException{
+    File file=new File(from),target=new File(to);
+    InfinityJavaWriteBarrier.Resource first=acquire(file,"rename"),second=null;String failure=null;
+    try{second=acquire(target,"rename");Os.rename(from,to);
+      if(first!=null)syncDirectory(file.getAbsoluteFile().getParentFile());
+      if(second!=null)syncDirectory(target.getAbsoluteFile().getParentFile());
+    }catch(IOException error){failure="rename_directory_sync_failed";throw new IllegalStateException(error);}
+    catch(android.system.ErrnoException|RuntimeException error){failure="rename_failed";throw error;}
+    finally{if(first!=null)first.finish(failure);if(second!=null)second.finish(failure);}
+  }
+  private static boolean mutate(File file,File target,String operation){
+    InfinityJavaWriteBarrier.Resource first=acquire(file,operation),second=null;
+    String failure=null;
+    try{
+      if(target!=null)second=acquire(target,operation);
+      boolean existed=file.exists();
+      List<File> missingParents=new ArrayList<>();
+      if(first!=null&&operation.equals("mkdirs")){
+        for(File parent=file.getAbsoluteFile();parent!=null&&!parent.exists();parent=parent.getParentFile())missingParents.add(parent);
+      }
+      boolean result=operation.equals("delete")?file.delete():operation.equals("rename")?file.renameTo(target):
+          operation.equals("mkdir")?file.mkdir():file.mkdirs();
+      if(result){
+        if(first!=null)syncDirectory(file.getAbsoluteFile().getParentFile());
+        if(second!=null)syncDirectory(target.getAbsoluteFile().getParentFile());
+        for(File parent:missingParents)syncDirectory(parent.getParentFile());
+      }else if(existed&&(operation.equals("rename")||operation.equals("delete")))failure=operation+"_failed";
+      else if(!existed&&(operation.equals("mkdir")||operation.equals("mkdirs")))failure=operation+"_failed";
+      return result;
+    }catch(IOException error){failure="namespace_directory_sync_failed";throw new IllegalStateException(error);}
+    catch(RuntimeException error){failure="namespace_"+error.getClass().getSimpleName();throw error;}
+    finally{if(first!=null)first.finish(failure);if(second!=null)second.finish(failure);}
+  }
+  private static boolean optional(File path){
+    try{
+      File actual=path.getCanonicalFile();String name=actual.getPath();
+      if(path.exists()&&Os.lstat(path.getAbsolutePath()).st_nlink!=1)return false;
+      synchronized(caches){for(String root:caches)if(name.startsWith(root+File.separator))return true;}
+    }catch(Exception unknown){}
+    return false;
+  }
+  private static InfinityJavaWriteBarrier.Resource acquire(File file,String operation){
+    return optional(file)?null:InfinityJavaWriteBarrier.resource(operation+":"+file.getName());
+  }
+  private static void syncDirectory(File directory)throws IOException{
+    if(directory==null)throw new IOException("Java save directory unavailable");
+    FileDescriptor fd=null;
+    try{fd=Os.open(directory.getAbsolutePath(),OsConstants.O_RDONLY,0);
+      if(!OsConstants.S_ISDIR(Os.fstat(fd).st_mode))throw new IOException("Java save parent is not a directory");
+      Os.fsync(fd);
+    }catch(android.system.ErrnoException error){throw new IOException("Java directory sync failed",error);}
+    finally{if(fd!=null)try{Os.close(fd);}catch(android.system.ErrnoException error){throw new IOException("Java directory close failed",error);}}
+  }
+  private static void syncFile(File file)throws IOException{
+    FileDescriptor fd=null;
+    try{fd=Os.open(file.getAbsolutePath(),OsConstants.O_RDONLY,0);Os.fsync(fd);}
+    catch(android.system.ErrnoException error){throw new IOException("Java file sync failed",error);}
+    finally{if(fd!=null)try{Os.close(fd);}catch(android.system.ErrnoException error){throw new IOException(error);}}
+  }
+  private static byte[] digest(File file)throws IOException{
+    try{MessageDigest hash=MessageDigest.getInstance("SHA-256");byte[] block=new byte[32768];
+      try(InputStream input=new FileInputStream(file)){int count;while((count=input.read(block))!=-1)hash.update(block,0,count);}
+      return hash.digest();
+    }catch(java.security.NoSuchAlgorithmException impossible){throw new IOException(impossible);}
+  }
+  private static final class Open {
+    final File file;final FileOutputStream raw;final FileDescriptor fd;
+    final InfinityJavaWriteBarrier.Resource lease;
+    Open(File file,boolean append)throws FileNotFoundException{
+      this.file=file;lease=acquire(file,"file_output");FileOutputStream opened=null;
+      try{opened=new FileOutputStream(file,append);fd=opened.getFD();raw=opened;}
+      catch(IOException|RuntimeException failure){
+        if(opened!=null)try{opened.close();}catch(IOException ignored){}
+        if(lease!=null)lease.finish("file_open_"+failure.getClass().getSimpleName());
+        if(failure instanceof FileNotFoundException)throw (FileNotFoundException)failure;
+        FileNotFoundException error=new FileNotFoundException("Java output could not open");error.initCause(failure);throw error;
+      }
+    }
+  }
+  public static final class Output extends FileOutputStream {
+    private final Open opened;
+    private boolean closed;
+    public Output(File file)throws FileNotFoundException{this(file,false);}
+    public Output(String path)throws FileNotFoundException{this(new File(path),false);}
+    public Output(String path,boolean append)throws FileNotFoundException{this(new File(path),append);}
+    public Output(File file,boolean append)throws FileNotFoundException{this(new Open(file,append));}
+    private Output(Open value){super(value.fd);opened=value;}
+    @Override public void write(int value)throws IOException{
+      try{super.write(value);}catch(IOException error){if(opened.lease!=null)opened.lease.failed("file_write_failed");throw error;}
+    }
+    @Override public void write(byte[] value)throws IOException{write(value,0,value.length);}
+    @Override public void write(byte[] value,int offset,int length)throws IOException{
+      try{super.write(value,offset,length);}catch(IOException error){if(opened.lease!=null)opened.lease.failed("file_write_failed");throw error;}
+    }
+    @Override public synchronized void close()throws IOException{
+      if(closed)return;closed=true;String failure=null;IOException thrown=null;
+      try{if(opened.lease!=null)getFD().sync();}
+      catch(IOException error){failure="file_sync_failed";thrown=error;}
+      try{super.close();opened.raw.close();if(opened.lease!=null)syncDirectory(opened.file.getAbsoluteFile().getParentFile());}
+      catch(IOException error){failure="file_close_or_directory_sync_failed";if(thrown==null)thrown=error;else thrown.addSuppressed(error);}
+      finally{if(opened.lease!=null)opened.lease.finish(failure);}
+      if(thrown!=null)throw thrown;
+    }
+  }
+  private static final class AtomicWrite {
+    final InfinityJavaWriteBarrier.Resource lease;
+    AtomicWrite(InfinityJavaWriteBarrier.Resource lease){this.lease=lease;}
+  }
+  public static final class Atomic {
+    private final android.util.AtomicFile actual;
+    private final File base;
+    private final Map<FileOutputStream,AtomicWrite> writes=new IdentityHashMap<>();
+    public Atomic(File file){base=file;actual=new android.util.AtomicFile(file);}
+    public File getBaseFile(){return base;}
+    public FileInputStream openRead()throws FileNotFoundException{return actual.openRead();}
+    public byte[] readFully()throws IOException{return actual.readFully();}
+    public synchronized FileOutputStream startWrite()throws IOException{
+      InfinityJavaWriteBarrier.Resource lease=acquire(base,"atomic_file");
+      try{FileOutputStream stream=actual.startWrite();writes.put(stream,new AtomicWrite(lease));return stream;}
+      catch(IOException|RuntimeException error){if(lease!=null)lease.finish("atomic_start_failed");throw error;}
+    }
+    public synchronized void finishWrite(FileOutputStream stream){
+      AtomicWrite write=writes.remove(stream);
+      if(write==null)throw new IllegalStateException("Unknown Java atomic writer");
+      String failure=null;
+      try{
+        stream.getFD().sync();
+        File staged=new File(base.getPath()+".new");if(!staged.isFile())staged=base;
+        byte[] expected=digest(staged);
+        actual.finishWrite(stream);
+        if(!MessageDigest.isEqual(expected,digest(base)))throw new IOException("Java atomic readback mismatch");
+        if(write.lease!=null)syncDirectory(base.getAbsoluteFile().getParentFile());
+      }catch(IOException|RuntimeException error){
+        failure="atomic_commit_"+error.getClass().getSimpleName();
+        throw new IllegalStateException("Java save did not commit",error);
+      }finally{if(write.lease!=null)write.lease.finish(failure);}
+    }
+    public synchronized void failWrite(FileOutputStream stream){
+      AtomicWrite write=writes.remove(stream);actual.failWrite(stream);
+      if(write!=null&&write.lease!=null)write.lease.finish("atomic_save_rolled_back");
+    }
+    public void delete(){
+      InfinityJavaWriteBarrier.Resource lease=acquire(base,"atomic_delete");String failure=null;
+      try{actual.delete();if(base.exists()||new File(base+".new").exists()||new File(base+".bak").exists())throw new IOException("Atomic deletion incomplete");
+        if(lease!=null)syncDirectory(base.getAbsoluteFile().getParentFile());
+      }catch(IOException|RuntimeException error){failure="atomic_delete_failed";throw new IllegalStateException(error);}
+      finally{if(lease!=null)lease.finish(failure);}
+    }
+  }
+
+  public static SharedPreferences preferences(Context context,String name,int mode){
+    // This exact store contains only the reproducible Kodi weather snapshot.
+    // It never contains experience choices, profiles, recordings or user settings.
+    if("infinity_chooser_weather".equals(name))return context.getSharedPreferences(name,mode);
+    initialize(context);File directory=new File(context.getApplicationInfo().dataDir,"shared_prefs");
+    String key=directory.getAbsolutePath()+"/"+name;
+    synchronized(preferenceWrappers){
+      Preferences existing=preferenceWrappers.get(key);if(existing!=null)return existing;
+      Preferences value=new Preferences(context.getSharedPreferences(name,mode),name,directory);
+      preferenceWrappers.put(key,value);return value;
+    }
+  }
+  private static final class Preferences implements SharedPreferences {
+    final SharedPreferences actual;final String name;final File directory;
+    final Map<OnSharedPreferenceChangeListener,OnSharedPreferenceChangeListener> listeners=new HashMap<>();
+    Preferences(SharedPreferences actual,String name,File directory){this.actual=actual;this.name=name;this.directory=directory;}
+    public Map<String,?> getAll(){return actual.getAll();}
+    public String getString(String key,String value){return actual.getString(key,value);}
+    public Set<String> getStringSet(String key,Set<String> value){return actual.getStringSet(key,value);}
+    public int getInt(String key,int value){return actual.getInt(key,value);}
+    public long getLong(String key,long value){return actual.getLong(key,value);}
+    public float getFloat(String key,float value){return actual.getFloat(key,value);}
+    public boolean getBoolean(String key,boolean value){return actual.getBoolean(key,value);}
+    public boolean contains(String key){return actual.contains(key);}
+    public synchronized void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener){
+      if(listeners.containsKey(listener))return;
+      OnSharedPreferenceChangeListener wrapped=(unused,key)->listener.onSharedPreferenceChanged(this,key);
+      listeners.put(listener,wrapped);actual.registerOnSharedPreferenceChangeListener(wrapped);
+    }
+    public synchronized void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener){
+      OnSharedPreferenceChangeListener wrapped=listeners.remove(listener);if(wrapped!=null)actual.unregisterOnSharedPreferenceChangeListener(wrapped);
+    }
+    public Editor edit(){return new Edit(this,actual.edit());}
+  }
+  private static Map<String,Object> readPreferences(File file)throws Exception{
+    Map<String,Object> values=new HashMap<>();
+    try(InputStream input=new FileInputStream(file)){
+      XmlPullParser xml=android.util.Xml.newPullParser();xml.setInput(input,"UTF-8");
+      if(xml.nextTag()!=XmlPullParser.START_TAG||!"map".equals(xml.getName()))throw new IOException("Invalid preferences map");
+      while(xml.nextTag()==XmlPullParser.START_TAG){
+        String tag=xml.getName(),name=xml.getAttributeValue(null,"name"),raw=xml.getAttributeValue(null,"value");Object value;
+        if(name==null||values.containsKey(name))throw new IOException("Invalid preference key");
+        if("string".equals(tag))value=xml.nextText();
+        else if("set".equals(tag)){
+          Set<String> set=new HashSet<>();
+          while(xml.nextTag()==XmlPullParser.START_TAG){if(!"string".equals(xml.getName()))throw new IOException("Invalid preference set");set.add(xml.nextText());}
+          if(!"set".equals(xml.getName()))throw new IOException("Unclosed preference set");value=set;
+        }else{
+          if("boolean".equals(tag)){if(!"true".equals(raw)&&!"false".equals(raw))throw new IOException("Invalid preference boolean");value=Boolean.valueOf(raw);}
+          else if("int".equals(tag))value=Integer.valueOf(raw);
+          else if("long".equals(tag))value=Long.valueOf(raw);
+          else if("float".equals(tag))value=Float.valueOf(raw);
+          else throw new IOException("Unknown preference value");
+          if(xml.nextTag()!=XmlPullParser.END_TAG||!tag.equals(xml.getName()))throw new IOException("Invalid preference ending");
+        }
+        values.put(name,value);
+      }
+      if(!"map".equals(xml.getName()))throw new IOException("Unclosed preferences map");
+    }
+    return values;
+  }
+  private static final class Edit implements SharedPreferences.Editor {
+    final Preferences prefs;final SharedPreferences.Editor actual;
+    Edit(Preferences prefs,SharedPreferences.Editor actual){this.prefs=prefs;this.actual=actual;}
+    public SharedPreferences.Editor putString(String k,String v){actual.putString(k,v);return this;}
+    public SharedPreferences.Editor putStringSet(String k,Set<String> v){actual.putStringSet(k,v);return this;}
+    public SharedPreferences.Editor putInt(String k,int v){actual.putInt(k,v);return this;}
+    public SharedPreferences.Editor putLong(String k,long v){actual.putLong(k,v);return this;}
+    public SharedPreferences.Editor putFloat(String k,float v){actual.putFloat(k,v);return this;}
+    public SharedPreferences.Editor putBoolean(String k,boolean v){actual.putBoolean(k,v);return this;}
+    public SharedPreferences.Editor remove(String k){actual.remove(k);return this;}
+    public SharedPreferences.Editor clear(){actual.clear();return this;}
+    private String durable(boolean committed){
+      if(!committed)return "preference_commit_returned_false";
+      try{File file=new File(prefs.directory,prefs.name+".xml");
+        if(!file.isFile())return "preference_file_missing";
+        syncFile(file);
+        if(!prefs.actual.getAll().equals(readPreferences(file)))return "preference_readback_mismatch";
+        syncDirectory(prefs.directory);return null;
+      }catch(Exception error){return "preference_sync_"+error.getClass().getSimpleName();}
+    }
+    public boolean commit(){
+      InfinityJavaWriteBarrier.Resource lease=InfinityJavaWriteBarrier.resource("preferences:"+prefs.name);
+      String failure="preference_commit_interrupted";
+      try{synchronized(prefs){failure=durable(actual.commit());return failure==null;}}
+      finally{lease.finish(failure);}
+    }
+    public void apply(){
+      final InfinityJavaWriteBarrier.Resource lease=InfinityJavaWriteBarrier.resource("preferences:"+prefs.name);
+      try{
+        // Preserve Android apply's immediate in-memory update and callbacks.
+        // A subsequent synchronous commit waits for preceding apply writes.
+        synchronized(prefs){actual.apply();}
+        preferences.execute(()->{String failure="preference_drain_interrupted";
+          try{synchronized(prefs){failure=durable(prefs.actual.edit().commit());}}
+          finally{lease.finish(failure);}
+        });
+      }catch(RuntimeException error){lease.finish("preference_apply_failed");throw error;}
+    }
+  }
+}

@@ -27,7 +27,7 @@ def main():
     args = p.parse_args()
     source = (ROOT/'repairs/android-checkpoint-shutdown/test_android_runtime.py').read_text()
     source = once(source, "names += ['InfinityCheckpointEvidence', 'InfinityInstalledCodeEvidence']",
-                         "names += ['InfinityCheckpointEvidence', 'InfinityInstalledCodeEvidence', 'InfinityTaskLifecycleGate']")
+                         "names += ['InfinityCheckpointEvidence', 'InfinityInstalledCodeEvidence', 'InfinityTaskLifecycleGate', 'InfinityJavaWriteBarrier', 'InfinityJavaPersistence']")
     source = once(source, '  row.put("required_owners",names);row.put("owners",owners);', '''  row.put("required_owners",names);row.put("owners",owners);
   row.put("exit_policy","essential_first_process_exit_v1");
   row.put("essential_write_generation",7).put("essential_writes_sealed",true).put("essential_writes_durable",true);
