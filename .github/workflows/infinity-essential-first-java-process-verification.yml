@@ -6,6 +6,8 @@ on:
     branches: [work/infinity-2103377-essential-first-shutdown-only]
     paths:
       - '.github/workflows/infinity-essential-first-java-process-verification.yml'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_boundaries.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/evidence/upgrade-receiver-38887412457.json'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py'
@@ -35,6 +37,7 @@ jobs:
       - name: Verify exact read-only Android fixture and retained failure controls
         run: |
           set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_boundaries.py
           sudo apt-get update -qq
           sudo apt-get install -y libsqlite3-dev libssl-dev
           mkdir -p readonly-fixture-host
@@ -233,6 +236,8 @@ jobs:
           assert len(upgrade['candidate_ready_services'])==len(upgrade['reopen_ready_services'])==37
           assert upgrade['candidate_directory_creation']['mkdirs_succeeded'] is True
           assert upgrade['candidate_directory_creation']['essential_settings_written'] is True
+          assert upgrade['upgrade_receiver_before_comparison']['passed'] is True
+          assert upgrade['upgrade_receiver_after_comparison']['passed'] is True
           assert all(upgrade[name]['passed'] and upgrade[name]['both_java_seals_verified'] and upgrade[name]['whole_package_death_verified'] for name in ('candidate_early_close','candidate_loaded_close'))
           source=Path('essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk')
           digest=hashlib.sha256(source.read_bytes()).hexdigest()

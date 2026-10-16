@@ -136,9 +136,52 @@ def close(owner, output):
     return report
 
 
-def verify_saved_state(output, require_directory=False):
+def saved_state_boundary(previous_close=None):
+    """Close requires zero UID processes; install -r is a separate event.
+
+    Android explicitly starts our preserved MY_PACKAGE_REPLACED receiver after
+    an upgrade. Only that identified new Java process can coexist with the
+    post-install byte comparison. This never grants a Close/death receipt.
+    """
+    live = probe.processes()
+    proof = dict(processes=live, scope='after Close: whole UID absent', passed=False)
+    if previous_close is None:
+        assert not live, 'Verify backup only after real whole-UID death'
+    else:
+        assert previous_close.get('passed') is True
+        assert previous_close.get('whole_package_death_verified') is True
+        assert previous_close.get('both_java_seals_verified') is True
+        baseline = previous_close['receipt']
+        final = probe.read_json(probe.PRIVATE+'/files/infinity-checkpoint-close.json')
+        assert final.get('phase') == baseline.get('phase') == 'COMPLETE'
+        assert final.get('session') == baseline.get('session')
+        assert final.get('owner') == baseline.get('owner') and final.get('pid') == baseline.get('pid')
+        assert final.get('checkpoint_saved') and final.get('authorization_consumed') and final.get('process_death_confirmed')
+        proof.update(scope='after explicit APK upgrade, before engine launch; not a new shutdown/death proof',
+                     previous_close_session=baseline['session'], receiver_starts=[], native_maps_absent=[], naturally_finished_receivers=[])
+        logs = probe.adb('logcat', '-d', '-v', 'threadtime', check=False)
+        for process in live:
+            assert process['name'] == probe.PACKAGE, 'Unexpected package process before candidate launch'
+            assert process['pid'] != baseline['pid'], 'Closed engine PID is still alive'
+            needle = 'Start proc '+str(process['pid'])+':'+probe.PACKAGE+'/'
+            component = 'for broadcast {'+probe.PACKAGE+'/'+probe.PACKAGE+'.InfinityCobraBootReceiver}'
+            matches = [line for line in logs.splitlines() if needle in line and component in line]
+            assert matches, 'New Java process has no observed package-update receiver origin'
+            maps = probe.shell('cat', '/proc/'+str(process['pid'])+'/maps', check=False)
+            if not maps.strip() and not any(row['pid'] == process['pid'] for row in probe.processes()):
+                proof['naturally_finished_receivers'].append(process['pid'])
+                continue
+            assert maps.strip(), 'Cannot establish new receiver process image identity'
+            assert 'libkodi.so' not in maps and 'libpython3.' not in maps, 'Native engine loaded before candidate launch'
+            proof['receiver_starts'].extend(matches)
+            proof['native_maps_absent'].append(process['pid'])
+    proof['passed'] = True
+    return proof
+
+
+def verify_saved_state(output, require_directory=False, previous_close=None):
     output.mkdir(parents=True, exist_ok=True)
-    assert not probe.processes(), 'Verify backup only after real whole-UID death'
+    saved_state_boundary(previous_close)
     favourites = probe.shell('cat', probe.PROFILE+'/favourites.xml')
     assert any(row.get('name') == probe.FAVOURITE for row in ET.fromstring(favourites))
     (output/'favourites.xml').write_text(favourites)
@@ -166,6 +209,7 @@ def verify_saved_state(output, require_directory=False):
             with sqlite3.connect(path.resolve().as_uri()+'?mode=ro', uri=True) as conn:
                 assert conn.execute('PRAGMA integrity_check').fetchone() == ('ok',), path.name
     assert hashes == {p.relative_to(output).as_posix():sha(p) for p in output.rglob('*') if p.is_file()}, 'Backup inspection modified original bytes'
+    saved_state_boundary(previous_close)
     return hashes
 
 
@@ -256,8 +300,10 @@ def main():
         report['upgrade_install'] = probe.adb('install', '-r', '--no-incremental', args.candidate_apk)
         assert 'Success' in report['upgrade_install']
         assert probe.shell('stat', '-c', '%u', probe.PRIVATE).strip() == probe.APP_UID
-        after = verify_saved_state(args.out/'after-install-before-launch')
+        report['upgrade_receiver_before_comparison'] = saved_state_boundary(report['baseline_loaded_close']); save()
+        after = verify_saved_state(args.out/'after-install-before-launch', previous_close=report['baseline_loaded_close'])
         assert before == after, 'APK upgrade changed saved fixture/database/preference bytes'
+        report['upgrade_receiver_after_comparison'] = saved_state_boundary(report['baseline_loaded_close'])
         report['upgrade_bytes_preserved'] = True; save()
         started = time.monotonic()
         report['candidate_early_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')

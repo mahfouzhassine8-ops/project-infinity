@@ -1,6 +1,9 @@
 # Essential-first shutdown — production repair in progress
 
-**Current status: corrected native 38881674542 passed, including the complete engine. Android 38882588772 passed all 308 tests and fresh TEST4 Close/death/integrity/reopen, then failed on the old signed TEST3 baseline before upgrade: existing ancestor mkdir attempts registered /storage for durability. Seven targeted directory controls prove a narrow correction; rebuilt native and repeated Android acceptance remain required. Not locked.**
+**Current status: native 38887113826 passed, including all seven directory regressions and the complete engine. Android 38887412457 passed all 308 tests, fresh TEST4 Close/death/reopen and the populated 37-service TEST3 baseline Close. Its upgrade comparison stopped after install -r launched the preserved package-update receiver. Fourteen targeted test-boundary checks pass; the Android retry reuses the green native build. Candidate early/loaded upgrade acceptance remains required. Not locked.**
+
+See [TEST4-UPGRADE-RECEIVER.md](TEST4-UPGRADE-RECEIVER.md) for the latest
+failure, precise process identities, and the verification-only correction.
 
 See [TEST4-DIRECTORY-FAILURE.md](TEST4-DIRECTORY-FAILURE.md). The observer
 PyDLL(None) correction and every previously passing protection are retained.
