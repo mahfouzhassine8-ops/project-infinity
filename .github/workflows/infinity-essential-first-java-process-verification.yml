@@ -93,7 +93,7 @@ jobs:
           keytool -genkeypair -v -keystore "$RUNNER_TEMP/infinity-donor-temporary.keystore" \
             -storepass android -keypass android -alias androiddebugkey -keyalg RSA \
             -keysize 2048 -validity 1 -dname "CN=Temporary Java Donor" >/dev/null 2>&1
-      - name: Compile complete Android source and run 274 preserved plus 19 new save tests
+      - name: Compile complete Android source and run 274 preserved plus 20 new save tests
         env:
           KODI_ANDROID_STORE_FILE: ${{ runner.temp }}/infinity-donor-temporary.keystore
           KODI_ANDROID_KEY_ALIAS: androiddebugkey
