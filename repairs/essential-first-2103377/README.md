@@ -1,6 +1,6 @@
 # Essential-first shutdown — production repair in progress
 
-**Status: current source is integrated and host-verified; not a verified APK candidate; not locked.**
+**Status: native/Python corrections are integrated; an actual Java write-boundary gap blocks APK delivery; not locked.**
 
 Continue on `work/infinity-2103377-essential-first-shutdown-only` from the saved
 `5a62f829` checkpoint. The production path now uses the existing script

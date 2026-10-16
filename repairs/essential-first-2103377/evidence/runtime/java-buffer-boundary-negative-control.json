@@ -1,0 +1,16 @@
+{
+  "scope": "production native ledger in actual host JVM with real buffered file writes; not Android process evidence",
+  "negative_control_reproduced": true,
+  "observation": {
+    "native_authorized_before_java_flush": true,
+    "actual_protected_bytes_changed": true,
+    "native_authorized_after_java_flush": true
+  },
+  "production_header_sha256": {
+    "InfinityProtectedWrites.h": "6c9f18b9d2cc340e46d8672ac9d9d4c831d2fa785b1db8bc682e6a41cd7d55b6",
+    "InfinityScriptPersistence.h": "7f1aa2f52657df346ae3dcf32ae27f7c5caea4d26ab6cd5fb371256a60062347"
+  },
+  "android_process_death_verified": false,
+  "apk_deliverable": false,
+  "required_correction": "Join actual Android Java write admission, buffered output and preference durability to the existing checkpoint before whole-package exit."
+}

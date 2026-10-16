@@ -196,3 +196,34 @@ Real cached/buffered/raw/os/subprocess DEVNULL paths pass; `/dev/zero` remains
 an exact durability blocker. All 50 CPython cases pass locally. These changes
 must pass complete ARM64 compilation and the real Android death/reopen probe
 before any physical-test candidate can be delivered.
+
+## Unresolved Java write boundary — delivery remains blocked
+
+`test_java_buffer_boundary.py` loads the actual production native ledger into
+a host JVM. A native write creates and fsyncs a protected file. An ordinary
+Java `BufferedOutputStream`, opened before Close, holds pending bytes. The
+native barrier then reports sealed/durable/authorized. Flushing the real Java
+buffer changes the file, and the same native authorization remains true. The
+observed result is retained in `java-buffer-boundary-negative-control.json`.
+This is an actual host filesystem counterexample, not Android process-death
+acceptance and not a passing protection test.
+
+The approved Android source still contains direct Java output streams and
+asynchronous preference writes outside these native/Python adapters, including
+`Main`, `Splash`, `InfinityCobraFeatureRuntime` and Android background services.
+The guard and engine are separate Android processes. Merely killing the guard
+or setting a coverage flag would not verify or preserve these pending writes.
+
+Required correction: connect actual Java writer admission, pre-opened/buffered
+output and checked preference durability to the existing checkpoint and its
+PID/owner/generation authorization in both processes. Failures must remain
+blocking. Only after those proofs may whole-package termination proceed, with
+actual process absence and preserved-data reopening evidence. This is a
+remaining production integration requirement, not permission to change GUI,
+providers, playback, startup behavior, the locked foundation or add-on files.
+
+The source-pinned ARM64 child-command build `38829673603` passed (native hash
+`666cc53ff6d50c1598b06480f450cfe15fd6fe1965517e8886895bd6c6109fe0`).
+The owner/device correction is building at `38831553869`; its Android probe
+`38831677450` is internal evidence only. Even a passing process test cannot
+waive the independently reproduced Java protection gap. No APK is released.
