@@ -101,6 +101,12 @@
       "host_proof_result": "success",
       "full_engine_result": "success",
       "result": "success"
+    },
+    "initialization_progress_run": {
+      "run": 38945424322,
+      "commit": "eaa6ff3f283fea149cede0423488c4e7989a5090",
+      "status": "in_progress",
+      "result": null
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
@@ -1594,10 +1600,11 @@
     "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
     "native_behavior_changed": false,
     "physical_fold_accepted": false,
-    "locked": false
+    "locked": false,
+    "superseded_by_new_run": false
   },
   "native_initialization_progress": {
-    "status": "host_verified_full_native_rebuild_pending",
+    "status": "host_verified_native_rebuild_in_progress",
     "purpose": "Identify exact native wait before observer receipt; no speculative bootstrap/write-guard change",
     "new_native_progress_controls": 8,
     "new_status_size_controls": 6,
@@ -1617,6 +1624,23 @@
     "all_308_sources_unchanged": true,
     "native_rebuild_required": true,
     "matched_android_required": true,
+    "physical_fold_accepted": false,
+    "locked": false,
+    "source_commit": "eaa6ff3f283fea149cede0423488c4e7989a5090",
+    "native_run": 38945424322,
+    "native_status": "in_progress",
+    "candidate_version": "1.0.9-Essential-First-TEST4-RC04",
+    "matched_android_status": "being_staged"
+  },
+  "matched_progress_acceptance": {
+    "native_run": 38945424322,
+    "native_commit": "eaa6ff3f283fea149cede0423488c4e7989a5090",
+    "status": "being_staged",
+    "candidate_version": "1.0.9-Essential-First-TEST4-RC04",
+    "separate_disposable_avds": true,
+    "same_apk_for_all_cases": true,
+    "all308_and_complete_native_success_required_before_packaging": true,
+    "original_independent_run_continues": 38944119153,
     "physical_fold_accepted": false,
     "locked": false
   }

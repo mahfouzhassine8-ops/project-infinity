@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-2103377-essential-java-process-verification, cancel-in-progress: true}
+concurrency: {group: 'infinity-2103377-essential-java-process-verification-${{ github.sha }}', cancel-in-progress: true}
 
 jobs:
   java-and-production-shutdown:
@@ -148,7 +148,7 @@ jobs:
           python3 - <<'PY'
           import json,os,time,urllib.request
           pinned={
-              38899217848:"402dfe75d5f314512bee5e502fe238ea7a0940d5",
+              38945424322:"eaa6ff3f283fea149cede0423488c4e7989a5090",
               38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
           }
           for run,commit in pinned.items():
@@ -169,7 +169,7 @@ jobs:
           PY
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38899217848
+          run-id: 38945424322
           name: Infinity-2103377-Essential-First-Native-Evidence
           github-token: ${{ github.token }}
           path: native-evidence
@@ -445,7 +445,7 @@ jobs:
               apk_deliverable=True,verified_android_process_exit=True,verified_first_party_callback_on_device=True,
               internal_whole_package_death_verified=True,internal_saved_data_reopen_verified=True,
               verified_fold_reopen=False,physical_fold_accepted=False,final_lock_authorized=False,
-              native_run_id=38899217848,android_run_id=int(os.environ['GITHUB_RUN_ID']),
+              native_run_id=38945424322,android_run_id=int(os.environ['GITHUB_RUN_ID']),
               internal_startup_close_verified=True,internal_loaded_close_verified=True,
               independent_upgrade_avds_verified=True,upgrade_scenarios=['early','loaded'],
               internal_missing_directory_creation_verified=True,
