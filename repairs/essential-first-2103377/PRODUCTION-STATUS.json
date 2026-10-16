@@ -501,7 +501,7 @@
     },
     "actual_android_verification": "Passed complete internal shutdown 38868115575. Historical native_databases failure from 38864889379 resolved by repository continuation correction."
   },
-  "latest_physical_blocker": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+  "latest_physical_blocker": "native_admission checkpoint timeout caused by shared observer setup rejection; exact ctypes.dlopen(None) guard failure shown by five physical tracebacks and 37-interpreter reproduction.",
   "android_verification_scope": "TEST3 passed the disposable internal emulator checks. Physical Fold TEST3 failed separately with 37/37 unobserved writers; the configured Diggz ecosystem, custom Infinity skin and retained Fold user data have not been reproduced internally.",
   "test3_plan": {
     "native_commit": "77a6fc131adedbf0447389a5ff4fdf9cb0e5ca61",
@@ -953,7 +953,7 @@
     "locked": false
   },
   "observer_initialization_investigation": {
-    "exact_physical_root_cause_established": false,
+    "exact_physical_root_cause_established": true,
     "physical_generic_receipt_has_exception": false,
     "native_hook_failure_marker_present": false,
     "stage_capture_change": "Preserve first PyErr/traceback and errno at failure; record exact native installation or Python import/constructor stage in existing blocking receipt; stop after first failure. No save barrier or protected-write classification change.",
@@ -964,13 +964,16 @@
     "source_contracts_passed": 16,
     "remaining_native_host_cases": "Full 61 retained in CI including private-mount vendor fixture, exact Pillow and ambient bytes.",
     "native_rebuild_required": true,
-    "native_rebuild_status": "pending",
+    "native_rebuild_status": "a6178df6 full native run 38876390312 passed; subsequent evidence-supported classification fix requires a new build",
     "report": "evidence/runtime/test3-observer-initialization-local.json",
-    "actual_fold_correction_selected": false,
+    "actual_fold_correction_selected": true,
     "apk_ready": false,
     "locked": false,
     "baseline_negative_control": "Same deliberate retained sqlite3 import failure under unchanged 9e9ef198 production headers gives 37 active, 0 observed, 37 generic blockers and empty detail; host adapter scope only, not identification of the physical exception.",
-    "baseline_negative_control_report": "evidence/runtime/test3-observer-baseline-negative-control.json"
+    "baseline_negative_control_report": "evidence/runtime/test3-observer-baseline-negative-control.json",
+    "native_rebuild_run": 38876390312,
+    "native_rebuild_result": "success",
+    "root_cause_scope": "Exact shared guard failure proven for five explicit Fold tracebacks and reproduced for all 37 controlled interpreters. Individual attribution of every physical writer still requires repeat diagnostic."
   },
   "installation_state_comparison": {
     "required_environment": "Modified Infinity APK and engine + Diggz add-ons/providers/background services + skin.infinity.diggz 1.0.5.223 + retained Fold databases/settings/profiles/add-on state.",
@@ -987,6 +990,28 @@
     "host_retained_module_control": "Deliberately shadowed sqlite3 dependency reproduces 37 active / 0 observed. All refuse authorization and retained fixture hashes are unchanged. This does not establish a shadowing defect on the Fold.",
     "physical_fold_touched": false,
     "uninstall_or_clear_data": false,
-    "clean_install_recommended": false
+    "clean_install_recommended": false,
+    "full_backup_prerequisite": false,
+    "next_evidence": "Compact collector identified the native guard ordering defect; full backup is not needed for this targeted correction. Repeat ordinary shutdown diagnostic plus small log excerpts after internal acceptance; request targeted files only if new trace requires them.",
+    "host_early_vs_loaded_close": "Real dlopen(None) boundary reproduction now passes both early and completed initialization with 37 interpreters after correction; actual complete Diggz environment still requires physical review."
+  },
+  "observer_close_race_correction": {
+    "evidence": "evidence/runtime/fold-observer-091504-observation.json",
+    "baseline_native_commit": "a6178df64b782fbbc28abe2af218e59fee66fca5",
+    "baseline_native_run": 38876390312,
+    "baseline_native_result": "success",
+    "root_cause": "Audit checks ctypes.dlopen as opaque during Close before applying its existing ApprovedNativeLookup dlopen(None) non-mutating process-handle classification. Observer.install_crypto_loads imports ctypes, which evaluates pythonapi = PyDLL(None), so early Close rejects the observer itself.",
+    "correction": "Classify only exact ctypes.dlopen audit event with exactly one Py_None argument before opaque admission. No image load, symbol lookup, function call or persistent write is exempted.",
+    "negative_control": "37 interpreters held at actual dlopen(None) while real BeginWriteProtection runs: observed 0, 37 matching original exceptions, no seal or authorization. Delayed Close: observed 37 and authorized.",
+    "corrected_cases": 4,
+    "all_corrected_cases_passed": true,
+    "initialization_identity_cases": 11,
+    "all_identity_cases_passed": true,
+    "local_existing_native_cases": 57,
+    "existing_native_gate_count": 61,
+    "full_native_required": true,
+    "matched_android_required": true,
+    "physical_fold_accepted": false,
+    "locked": false
   }
 }

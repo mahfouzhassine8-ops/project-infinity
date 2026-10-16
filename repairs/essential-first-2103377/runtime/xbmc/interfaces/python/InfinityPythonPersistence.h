@@ -51,7 +51,11 @@ inline void InitializationFailed(int id,const std::string& reason,const std::str
   const int nativeError=errno;
   PyObject *type=nullptr,*value=nullptr,*trace=nullptr;
   PyErr_Fetch(&type,&value,&trace);
-  std::string detail="stage="+stage;
+  auto* thread=PyThreadState_Get();
+  const auto interpreterId=thread?PyInterpreterState_GetID(thread->interp):-1;
+  PyErr_Clear(); // Preserve the original error even if identity inspection fails.
+  std::string detail="stage="+stage+"; invoker_id="+std::to_string(id)+
+      "; interpreter_id="+std::to_string(interpreterId);
   const auto appendText=[&](PyObject* text,std::size_t limit=768) {
     if(text && PyUnicode_Check(text)) {
       const char* bytes=PyUnicode_AsUTF8(text);
@@ -594,6 +598,12 @@ inline int Audit(const char* event,PyObject* args,void*)
   const bool descriptorControl = std::strcmp(event,"fcntl.fcntl")==0 ||
       std::strcmp(event,"fcntl.ioctl")==0 ||
       std::strcmp(event,"fcntl.lockf")==0 || std::strcmp(event,"os.chdir")==0;
+  // ctypes imports pythonapi via PyDLL(None). This references the already
+  // running process and loads no image or persistent writer. Apply the exact
+  // existing ApprovedNativeLookup classification BEFORE opaque admission;
+  // otherwise Close can prevent its own persistence observers initializing.
+  // Library loads, symbol lookup and function execution keep their own gates.
+  if(std::strcmp(event,"ctypes.dlopen")==0 && count==1 && at(0)==Py_None)return 0;
   const bool opaque = std::strcmp(event,"os.chmod")==0 || std::strcmp(event,"os.chown")==0 ||
       std::strcmp(event,"os.utime")==0 || std::strcmp(event,"os.setxattr")==0 ||
       std::strcmp(event,"os.removexattr")==0 || std::strcmp(event,"os.link")==0 ||

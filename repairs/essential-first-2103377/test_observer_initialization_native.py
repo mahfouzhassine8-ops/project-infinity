@@ -113,7 +113,8 @@ int main(int argc,char** argv) {
   for(const auto& item:proof.blockers) {
     if(!first)report<<',';
     first=false;
-    report<<"{\"reason\":"<<json(item.reason)<<",\"detail\":"<<json(item.detail)<<'}';
+    report<<"{\"writer_id\":"<<item.writerId<<",\"writer\":"<<json(item.writer)
+          <<",\"reason\":"<<json(item.reason)<<",\"detail\":"<<json(item.detail)<<'}';
   }
   report<<"]}\n";
   const auto bytes=report.str();
@@ -178,6 +179,16 @@ def main():
                 assert fixture[2] in detail and 'exception='+fixture[3] in detail and fixture[4] in detail, (name, detail)
                 assert ':-1:' not in detail, detail
                 assert result['fail_closed']
+                failed = [b for b in result['blockers'] if b['detail'].startswith('stage=')]
+                assert len(failed) == result['active'], (name, failed)
+                interpreters = set()
+                for blocker in failed:
+                    fields = dict(item.split('=', 1) for item in blocker['detail'].split('; ') if '=' in item)
+                    assert int(fields['invoker_id']) == blocker['writer_id']
+                    assert blocker['writer'] == 'fixture.loaded.'+str(blocker['writer_id'])+':service.py'
+                    identity = int(fields['interpreter_id'])
+                    assert identity >= 0 and identity not in interpreters
+                    interpreters.add(identity)
                 if fixture[0]:
                     assert ':<module>' in detail and fixture[0] in detail, detail
                     for filename, digest in hashes.items():

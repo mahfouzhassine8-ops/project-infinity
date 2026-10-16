@@ -1,0 +1,89 @@
+{
+  "collector": "Infinity-Observer-Evidence-20261016-091504.zip",
+  "sha256": "96f51b789338964303697c399945345ab9a0442278bd45afa2edfd8208f10a50",
+  "bytes": 88425,
+  "scope": "Read-only physical Fold log excerpts and manifest inventory; not a backup",
+  "installed_skin": "skin.infinity.diggz 1.0.5.223",
+  "correct_manifest_sha256": "917de56a4c31d97b74ae62d0b1a87ba6129dd95d99cdb4accae550e88a00585e",
+  "collector_summary_skin_179": "Duplicate manifests from old repair add-ons selected by collector; actual active manifest .223 matches prior installed-code diagnostic. No skin rollback established.",
+  "kodi_started_local": "2026-10-16T04:10:10.013-04:00",
+  "close_started_local": "2026-10-16T04:10:15.907-04:00",
+  "first_initialization_exception_local": "2026-10-16T04:10:16.700-04:00",
+  "checkpoint_failed_local": "2026-10-16T04:10:41.045-04:00",
+  "startup_to_close_ms": 5894,
+  "close_to_first_exception_ms": 793,
+  "explicit_traceback_count": 5,
+  "tracebacks": [
+    {
+      "timestamp": "2026-10-16 04:10:16.700",
+      "thread_id": 13309,
+      "exception": "_infinity_native_persistence_observer.WriteAdmissionClosed",
+      "message": "Infinity shutdown closed native mutation admission",
+      "traceback": [
+        "Observer.__init__:78",
+        "Observer.install:464",
+        "Observer.install_crypto_loads:516",
+        "ctypes.__init__:<module>:466:pythonapi = PyDLL(None)",
+        "ctypes.__init__:__init__:376:self._handle = _dlopen(self._name, mode)"
+      ]
+    },
+    {
+      "timestamp": "2026-10-16 04:10:17.883",
+      "thread_id": 13354,
+      "exception": "_infinity_native_persistence_observer.WriteAdmissionClosed",
+      "message": "Infinity shutdown closed native mutation admission",
+      "traceback": [
+        "Observer.__init__:78",
+        "Observer.install:464",
+        "Observer.install_crypto_loads:516",
+        "ctypes.__init__:<module>:466:pythonapi = PyDLL(None)",
+        "ctypes.__init__:__init__:376:self._handle = _dlopen(self._name, mode)"
+      ]
+    },
+    {
+      "timestamp": "2026-10-16 04:10:17.901",
+      "thread_id": 13365,
+      "exception": "_infinity_native_persistence_observer.WriteAdmissionClosed",
+      "message": "Infinity shutdown closed native mutation admission",
+      "traceback": [
+        "Observer.__init__:78",
+        "Observer.install:464",
+        "Observer.install_crypto_loads:516",
+        "ctypes.__init__:<module>:466:pythonapi = PyDLL(None)",
+        "ctypes.__init__:__init__:376:self._handle = _dlopen(self._name, mode)"
+      ]
+    },
+    {
+      "timestamp": "2026-10-16 04:10:17.979",
+      "thread_id": 13363,
+      "exception": "_infinity_native_persistence_observer.WriteAdmissionClosed",
+      "message": "Infinity shutdown closed native mutation admission",
+      "traceback": [
+        "Observer.__init__:78",
+        "Observer.install:464",
+        "Observer.install_crypto_loads:516",
+        "ctypes.__init__:<module>:466:pythonapi = PyDLL(None)",
+        "ctypes.__init__:__init__:376:self._handle = _dlopen(self._name, mode)"
+      ]
+    },
+    {
+      "timestamp": "2026-10-16 04:10:18.004",
+      "thread_id": 13306,
+      "exception": "_infinity_native_persistence_observer.WriteAdmissionClosed",
+      "message": "Infinity shutdown closed native mutation admission",
+      "traceback": [
+        "Observer.__init__:78",
+        "Observer.install:464",
+        "Observer.install_crypto_loads:516",
+        "ctypes.__init__:<module>:466:pythonapi = PyDLL(None)",
+        "ctypes.__init__:__init__:376:self._handle = _dlopen(self._name, mode)"
+      ]
+    }
+  ],
+  "physical_all_37_exact_exception_proven": false,
+  "identity_limit": "Five explicit thread tracebacks have no service/invoker mapping. Duplicate suppression is not proof of each suppressed exception. Prior checkpoint separately records all 37 generic initialization failures.",
+  "addons33_warning": "Present at both starts; not in this traceback and not established as the observer failure cause. No database change made.",
+  "full_backup_required_for_this_correction": false,
+  "physical_fold_touched": false,
+  "physical_shutdown_passed": false
+}

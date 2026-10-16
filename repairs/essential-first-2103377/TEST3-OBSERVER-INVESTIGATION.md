@@ -1,5 +1,11 @@
 # TEST3 physical observer initialization investigation
 
+**Update:** compact Fold logs establish the `PyDLL(None)` guard-ordering
+failure. See [FOLD-OBSERVER-CLOSE-RACE.md](FOLD-OBSERVER-CLOSE-RACE.md) for
+the traceback, early/loaded Close reproduction and correction. Native diagnostic
+run 38876390312 passed. A full backup is no longer a prerequisite; the original
+missing-evidence findings below are historical.
+
 Continuation baseline: `9e9ef198ef0a68f13644621724b0762e1150438b` on
 `work/infinity-2103377-essential-first-shutdown-only`. No reset, rollback,
 shutdown redesign, timeout extension, add-on exemption, signing change, or
@@ -109,9 +115,9 @@ or the user's data. Skin match alone is not a configured-installation match.
 | Upgrade APK over verified copy of existing Fold state | Not executed; verified current Fold backup unavailable |
 | Host 37-interpreter count/concurrency controls | Pass; does not establish the configured APK will pass |
 
-The required next inputs are a verified read-only copy of the existing Fold
-installation state (including add-on code/configuration, skin settings,
-profiles and databases) and its startup `kodi.log`/Python exception. Comparison
+An exact installation-state comparison would require verified Fold state.
+That is no longer a prerequisite: compact logs supplied the actual traceback.
+Any later installation-state comparison
 must occur in disposable installations with backup hashes, database integrity,
 enabled service/version inventory, module origins, observer counts, owner
 receipts, both Java seals, whole-UID death and preserved-data reopening
@@ -120,5 +126,5 @@ defect to retained state.
 
 The physical Fold has not been accessed, uninstalled, cleared, or altered.
 No new APK is ready for promotion, and no physical approval or final lock
-has been inferred. The actual shared failure must be traced before selecting
-a behavioral correction and completing matched native/Android acceptance.
+has been inferred. The targeted correction requires matched native/Android
+acceptance and subsequent physical review.

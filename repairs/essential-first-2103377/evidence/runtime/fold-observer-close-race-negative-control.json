@@ -1,0 +1,292 @@
+{
+  "scope": "Production observer and real Close barrier, pinned CPython 3.11.7, deterministic interleaving at actual ctypes.dlopen(None)",
+  "unchanged_guard_negative_control": true,
+  "results": [
+    {
+      "case": "early-close-1",
+      "active": 1,
+      "observed": 0,
+      "paused_at_actual_dlopen_none": 1,
+      "blocking_count": 1,
+      "essential_sealed": false,
+      "authorized": false,
+      "exception": "Infinity shutdown closed native mutation admission",
+      "blockers": [
+        {
+          "writer_id": 1,
+          "writer": "fold.race.fixture.1:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=0; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        }
+      ]
+    },
+    {
+      "case": "early-close-37",
+      "active": 37,
+      "observed": 0,
+      "paused_at_actual_dlopen_none": 37,
+      "blocking_count": 37,
+      "essential_sealed": false,
+      "authorized": false,
+      "exception": "Infinity shutdown closed native mutation admission",
+      "blockers": [
+        {
+          "writer_id": 15,
+          "writer": "fold.race.fixture.15:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 4,
+          "writer": "fold.race.fixture.4:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 31,
+          "writer": "fold.race.fixture.31:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 3,
+          "writer": "fold.race.fixture.3:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 32,
+          "writer": "fold.race.fixture.32:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 7,
+          "writer": "fold.race.fixture.7:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 34,
+          "writer": "fold.race.fixture.34:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 20,
+          "writer": "fold.race.fixture.20:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 21,
+          "writer": "fold.race.fixture.21:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 24,
+          "writer": "fold.race.fixture.24:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 26,
+          "writer": "fold.race.fixture.26:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 27,
+          "writer": "fold.race.fixture.27:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 12,
+          "writer": "fold.race.fixture.12:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 35,
+          "writer": "fold.race.fixture.35:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 5,
+          "writer": "fold.race.fixture.5:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 8,
+          "writer": "fold.race.fixture.8:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 28,
+          "writer": "fold.race.fixture.28:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 17,
+          "writer": "fold.race.fixture.17:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 1,
+          "writer": "fold.race.fixture.1:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 23,
+          "writer": "fold.race.fixture.23:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 11,
+          "writer": "fold.race.fixture.11:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 9,
+          "writer": "fold.race.fixture.9:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 10,
+          "writer": "fold.race.fixture.10:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 37,
+          "writer": "fold.race.fixture.37:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 16,
+          "writer": "fold.race.fixture.16:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=0; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 2,
+          "writer": "fold.race.fixture.2:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 6,
+          "writer": "fold.race.fixture.6:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 25,
+          "writer": "fold.race.fixture.25:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 36,
+          "writer": "fold.race.fixture.36:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 22,
+          "writer": "fold.race.fixture.22:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 29,
+          "writer": "fold.race.fixture.29:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 14,
+          "writer": "fold.race.fixture.14:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 19,
+          "writer": "fold.race.fixture.19:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 33,
+          "writer": "fold.race.fixture.33:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 18,
+          "writer": "fold.race.fixture.18:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 30,
+          "writer": "fold.race.fixture.30:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=0; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        },
+        {
+          "writer_id": 13,
+          "writer": "fold.race.fixture.13:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        }
+      ]
+    },
+    {
+      "case": "loaded-close-37",
+      "active": 37,
+      "observed": 37,
+      "paused_at_actual_dlopen_none": 37,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "early-native-guards",
+      "active": 1,
+      "observed": 0,
+      "paused_at_actual_dlopen_none": 1,
+      "blocking_count": 1,
+      "essential_sealed": false,
+      "authorized": false,
+      "exception": "Infinity shutdown closed native mutation admission",
+      "blockers": [
+        {
+          "writer_id": 1,
+          "writer": "fold.race.fixture.1:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.observer.construct; python_stage=python.import.ctypes; exception=WriteAdmissionClosed; message=Infinity shutdown closed native mutation admission; native_errno=0; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:376:__init__; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/ctypes/__init__.py:466:<module>; at=<string>:548:install_crypto_loads; at=<string>:491:install; at=<string>:96:__init__"
+        }
+      ]
+    }
+  ],
+  "all_passed": true,
+  "physical_fold_verified": false,
+  "actual_diggz_services_executed": false,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

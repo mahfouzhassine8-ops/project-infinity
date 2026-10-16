@@ -1,6 +1,6 @@
 # Essential-first shutdown — production repair in progress
 
-**Current status: native 38867886900 and all 308 Android tests/complete internal shutdown 38868115575 passed. Physical TEST3 failed shared Python observer initialization; exact Fold exception still required. Not locked.**
+**Current status: diagnostic native 38876390312 passed. Compact Fold logs and a 37-interpreter reproduction identify the observer's PyDLL(None) Close race; targeted guard-ordering correction awaits matched native/Android acceptance. All 308 tests preserved. Not locked.**
 
 Continue from `9e9ef198`, preserving the permanently signed TEST3 baseline.
 Current evidence, initialization-error capture, and the required comparison
@@ -8,6 +8,10 @@ with the user's Diggz add-ons, custom `skin.infinity.diggz` and retained Fold
 state are in [TEST3-OBSERVER-INVESTIGATION.md](TEST3-OBSERVER-INVESTIGATION.md)
 and `PRODUCTION-STATUS.json`. Fresh and synthetic-load passes are controls;
 they do not establish configured physical Fold acceptance.
+
+The physical traceback and correction are recorded in
+[FOLD-OBSERVER-CLOSE-RACE.md](FOLD-OBSERVER-CLOSE-RACE.md). The compact logs
+are sufficient for this correction; a full backup is not a prerequisite.
 
 ## Historical repair evidence
 

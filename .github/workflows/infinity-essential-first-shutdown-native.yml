@@ -92,6 +92,9 @@ jobs:
           python3 repairs/essential-first-2103377/test_observer_initialization_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
             --out shutdown-rc1-host/observer-initialization.json
+          python3 repairs/essential-first-2103377/test_observer_close_race_native.py \
+            --python-prefix "$pythonLocation" --sqlite-include /usr/include \
+            --out shutdown-rc1-host/observer-close-race.json
       - name: Check two-file source patch and all protected gates
         run: |
           set -euo pipefail

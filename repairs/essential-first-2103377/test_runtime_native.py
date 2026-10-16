@@ -515,7 +515,7 @@ assert old_open(shared,'rb').read()==b'essential'
   if (mode == "pillow-ppm") run("try: im.save_ppm(shared)\nexcept PermissionError: pass\nelse: raise AssertionError('native encoder fopen crossed seal')\nassert old_open(shared,'rb').read()==baseline\n");
   if (mode == "descriptor-race" || mode == "rename-race") run("try: old_write(cachefd,b'BAD')\nexcept PermissionError: pass\nelse: raise AssertionError('retargeted descriptor wrote after seal')\nassert old_open(shared,'rb').read()==baseline\n");
   if (mode == "late-mmap") run("try: mmap.mmap(fd,9)\nexcept PermissionError: pass\nelse: raise AssertionError('writable mapping crossed seal')\n");
-  if (mode == "late-ctypes") run("try: ctypes.CDLL(None)\nexcept PermissionError: pass\nelse: raise AssertionError('opaque native capability crossed seal')\n");
+  if (mode == "late-ctypes") run("process=ctypes.CDLL(None)\nfor capability in (lambda: process.open, lambda: ctypes.CDLL('libc.so.6')):\n try: capability()\n except PermissionError: pass\n else: raise AssertionError('unproven native writer or library crossed seal')\n");
   if (mode == "cached-write") run("try: old_write(fd,b'BAD')\nexcept PermissionError: pass\nelse: raise AssertionError('cached os.write escaped')\n");
   if (mode == "cached-pwrite") run("try: old_pwrite(fd,b'BAD',0)\nexcept PermissionError: pass\nelse: raise AssertionError('cached pwrite escaped')\n");
   if (mode == "cached-writev") run("try: old_writev(fd,[b'BAD'])\nexcept PermissionError: pass\nelse: raise AssertionError('cached writev escaped')\n");

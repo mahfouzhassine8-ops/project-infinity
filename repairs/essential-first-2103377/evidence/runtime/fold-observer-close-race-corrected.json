@@ -1,0 +1,62 @@
+{
+  "scope": "Production observer and real Close barrier, pinned CPython 3.11.7, deterministic interleaving at actual ctypes.dlopen(None)",
+  "unchanged_guard_negative_control": false,
+  "results": [
+    {
+      "case": "early-close-1",
+      "active": 1,
+      "observed": 1,
+      "paused_at_actual_dlopen_none": 1,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "early-close-37",
+      "active": 37,
+      "observed": 37,
+      "paused_at_actual_dlopen_none": 37,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "loaded-close-37",
+      "active": 37,
+      "observed": 37,
+      "paused_at_actual_dlopen_none": 37,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "early-native-guards",
+      "active": 1,
+      "observed": 1,
+      "paused_at_actual_dlopen_none": 1,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": [
+        {
+          "writer_id": 1,
+          "writer": "fold.race.fixture.1:service.py",
+          "reason": "protected_write_rejected_before_mutation",
+          "detail": "file_open_for_write_failed"
+        }
+      ]
+    }
+  ],
+  "all_passed": true,
+  "physical_fold_verified": false,
+  "actual_diggz_services_executed": false,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}
