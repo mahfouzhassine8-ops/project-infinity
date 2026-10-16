@@ -16,7 +16,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "Selected immutable system command resolution passed all 52 native CPython cases. Full ARM64 build 38846154259 is in progress; no process success inferred.",
+    "current_corrections": "Exact selected-command native build 38846154259 completed successfully, including 52 CPython cases and complete ARM64 engine. Reused unchanged for the Java correction.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -50,10 +50,14 @@
     "selected_command_run": {
       "run": 38846154259,
       "commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
-      "status": "in_progress",
+      "status": "completed",
       "host_result": "success",
       "host_artifact": 12023815051,
-      "host_artifact_sha256": "fcc16ba4658721081f3172468e5df20bda618c755f1079d5d5533b6e0e3f1b47"
+      "host_artifact_sha256": "fcc16ba4658721081f3172468e5df20bda618c755f1079d5d5533b6e0e3f1b47",
+      "result": "success",
+      "native_job_result": "success",
+      "native_unstripped_sha256": "caafbb6ffaa437a2a76b63b01285f03662e950e42edcdc050ae2eb5e943e3912",
+      "native_packaged_sha256": "877676d377b2b6207a4de214d7b490bd48ab392c375c09e0d7b8ea37f255665e"
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
@@ -67,10 +71,10 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Run 38847277623 must finish the actual add-on-loaded Android Close, verify both Java seals, all 16 essential native owners, engine and whole-package process death, integrity checks and preserved-data reopening. Its 274+20 Java tests and unrelated-bytecode gate already passed.",
-    "Native run 38846154259 must finish its complete ARM64 build; 52 CPython, SQLite, read-only vendor fixture and original host checks already passed.",
-    "Latest completed production Close (38843193133) failed at app-side SELinux denial for unused vendor uname fallback. The source correction has passed its real inaccessible-fallback host regression; no Android success is inferred before the new actual process run.",
-    "Physical Fold approval remains required. No emulator or host pass establishes physical acceptance; no APK lock is authorized."
+    "Corrected diagnostic classification and six added regressions await complete Java and actual Android verification. The original 274 tests and earlier 20 save tests remain preserved.",
+    "Latest actual Close run 38847277623 stopped on diagnostic route-audit formatting; refresh runtime diagnostics were also rejected after admission closed. Corrections retain exact readback for essential preferences and protection of route files/backups and refresh policy.",
+    "All 16 essential native owners, both Java seals, engine/whole-UID process death, integrity checks and preserved-data reopening must still pass together.",
+    "Physical Fold approval remains required. No host or emulator pass establishes physical acceptance; no APK lock is authorized."
   ],
   "internal_android_probes": [
     {
@@ -161,6 +165,19 @@
       "evidence_zip_sha256": "0524d6fcaf6a30d2729003e1c15a49af46c3211730f82386ac4b49dfae5f406f",
       "outcome": "Actual Close failed after 5031ms. App SELinux denied getattr of unused vendor toybox fallback; 13/16 essential rows completed. Native databases and deferred dialog state remained pending. No process death or reopen.",
       "report": "evidence/runtime/android-probe10-result.json"
+    },
+    {
+      "run": 38847277623,
+      "source_commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
+      "native_commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
+      "native_run": 38846154259,
+      "permanently_signed_internal_apk": true,
+      "apk_delivered": false,
+      "apk_sha256": "883b483cd225cc9991481eb93be47fd7aadefebdb520bb4c5e83b08790b7983e",
+      "evidence_artifact": 12024087728,
+      "evidence_zip_sha256": "62c3e448ad2a2528685ff69d52b96348fff312064f2fce6bc38a160f768995f6",
+      "outcome": "Actual Close failed after 4344ms: both Java owners retained preferences:infinity_power_routes=preference_readback_mismatch. Logcat also proves a later runtime.properties diagnostic write was rejected by Java admission. Native vendor blocker is absent; native save still pending when Java failure canceled Close. No process death or reopening.",
+      "report": "evidence/runtime/android-probe11-result.json"
     }
   ],
   "child_output_correction": {
@@ -201,7 +218,7 @@
       "unrelated_decoded_instructions_preserved": true,
       "source_edits_reconstructed": true,
       "host_os_adapter": "test-only actual host file descriptors, metadata and FileChannel.force, including sync-failure refusal",
-      "actual_android_verification": "awaiting exact full ARM64 build"
+      "actual_android_verification": "Failed during actual Close at diagnostic route-audit readback; all 274 original + 20 save cases passed before the actual test."
     }
   },
   "marker_boundary": {
@@ -220,29 +237,46 @@
     "verified": false
   },
   "internal_permanent_signing_verified": true,
-  "latest_internal_apk_sha256": "f345519e766bd50bc8ab173c9dc5b1b1680406d5782bd256b53b66ca585e1c19",
+  "latest_internal_apk_sha256": "883b483cd225cc9991481eb93be47fd7aadefebdb520bb4c5e83b08790b7983e",
   "latest_internal_apk_delivered": false,
   "latest_android_probe": {
     "run": 38847277623,
     "source_commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
+    "native_commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
     "native_run": 38846154259,
-    "status": "Java 274+20 and decoded-preservation gates passed; awaiting pinned full ARM64 build before actual Android test",
+    "permanently_signed_internal_apk": true,
+    "apk_delivered": false,
+    "apk_sha256": "883b483cd225cc9991481eb93be47fd7aadefebdb520bb4c5e83b08790b7983e",
+    "evidence_artifact": 12024087728,
+    "evidence_zip_sha256": "62c3e448ad2a2528685ff69d52b96348fff312064f2fce6bc38a160f768995f6",
+    "outcome": "Actual Close failed after 4344ms: both Java owners retained preferences:infinity_power_routes=preference_readback_mismatch. Logcat also proves a later runtime.properties diagnostic write was rejected by Java admission. Native vendor blocker is absent; native save still pending when Java failure canceled Close. No process death or reopening.",
+    "report": "evidence/runtime/android-probe11-result.json",
+    "status": "completed_failure",
     "physical_fold_accepted": false,
     "apk_delivery_authorized": false
   },
   "latest_preservation": "evidence/runtime/04f-production-verification.json: exact locked final source manifest compared; only 17 declared shutdown paths differ; all other locked source hashes identical. APK unrelated instructions/resources/payload preservation passed.",
   "latest_android_source_commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
   "latest_completed_production_probe": {
-    "run": 38843193133,
-    "source_commit": "a3ec8e0c3f6c4bbc2d69c11f4cebdf284a56acfd",
-    "native_commit": "a543811a0b3b54ad6a0b1cdd2940a5e7d33aba83",
-    "native_run": 38842156316,
+    "run": 38847277623,
+    "source_commit": "c5242dd0749f2d0313a6422f8aacc68b1052a889",
+    "native_commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
+    "native_run": 38846154259,
     "permanently_signed_internal_apk": true,
     "apk_delivered": false,
-    "apk_sha256": "f345519e766bd50bc8ab173c9dc5b1b1680406d5782bd256b53b66ca585e1c19",
-    "evidence_artifact": 12022314801,
-    "evidence_zip_sha256": "0524d6fcaf6a30d2729003e1c15a49af46c3211730f82386ac4b49dfae5f406f",
-    "outcome": "Actual Close failed after 5031ms. App SELinux denied getattr of unused vendor toybox fallback; 13/16 essential rows completed. Native databases and deferred dialog state remained pending. No process death or reopen.",
-    "report": "evidence/runtime/android-probe10-result.json"
+    "apk_sha256": "883b483cd225cc9991481eb93be47fd7aadefebdb520bb4c5e83b08790b7983e",
+    "evidence_artifact": 12024087728,
+    "evidence_zip_sha256": "62c3e448ad2a2528685ff69d52b96348fff312064f2fce6bc38a160f768995f6",
+    "outcome": "Actual Close failed after 4344ms: both Java owners retained preferences:infinity_power_routes=preference_readback_mismatch. Logcat also proves a later runtime.properties diagnostic write was rejected by Java admission. Native vendor blocker is absent; native save still pending when Java failure canceled Close. No process death or reopening.",
+    "report": "evidence/runtime/android-probe11-result.json"
+  },
+  "java_diagnostic_correction": {
+    "cause": "Android 11 FastXmlSerializer inserts four indentation spaces after a newline-terminated route audit string; reproduced using the actual Android 11 serializer and unchanged production XML reader.",
+    "route_audit_scope": "Only synchronous non-null string edits to key audit in infinity_power_routes when no other key exists. Mixed edits, unknown keys, removal, clear and all async applies remain essential. Original platform commit result is returned.",
+    "refresh_scope": "Only the exact runtime.properties observation under the actual internal/external app roots; canonical destination and hardlink checks required. Adjacent policy.properties remains essential.",
+    "new_regression_cases": 6,
+    "expected_total_tests": 300,
+    "host_compile": "Both production helpers and all 26 Java save tests compiled against Android 11 API and pinned Robolectric 4.14.1. Execution of the 300-test regression suite is pending CI.",
+    "actual_android_status": "pending_new_run"
   }
 }

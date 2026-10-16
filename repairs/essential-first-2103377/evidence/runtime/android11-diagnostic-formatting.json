@@ -1,0 +1,15 @@
+{
+  "android_all_artifact": "org.robolectric:android-all:11-robolectric-6757853",
+  "android_all_sha256": "62f577ca49f62f0da5d6a2a839d80ef377054b9ccd14811035593bf351295b31",
+  "source": "https://github.com/aosp-mirror/platform_frameworks_base/blob/android-11.0.0_r1/core/java/com/android/internal/util/FastXmlSerializer.java",
+  "runtime": "Actual Android 11 FastXmlSerializer and KXmlParser on the host JVM, plus actual unchanged InfinityJavaPersistence.readPreferences; not Android process acceptance",
+  "input_string_length": 81,
+  "decoded_string_length": 85,
+  "extra_suffix": "    ",
+  "mismatch_reproduced": true,
+  "production_strict_reader_detected_mismatch": true,
+  "api_30_compile_passed": true,
+  "physical_fold_verified": false,
+  "all_26_test_sources_compiled": true,
+  "regression_execution": "pending CI, not inferred from compilation"
+}

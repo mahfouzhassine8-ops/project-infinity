@@ -19,12 +19,20 @@ public final class InfinityJavaPersistence {
   private static final ExecutorService preferences=Executors.newSingleThreadExecutor(r->{
     Thread t=new Thread(r,"InfinityPreferenceDurability");t.setDaemon(true);return t;});
   private static final Set<String> caches=Collections.synchronizedSet(new HashSet<>());
+  private static final Map<String,String> diagnosticFiles=Collections.synchronizedMap(new HashMap<>());
   private static final Map<String,Preferences> preferenceWrappers=new HashMap<>();
   private InfinityJavaPersistence() {}
 
   public static void initialize(Context context){
     try{File cache=context.getApplicationContext().getCacheDir();
       if(cache!=null)caches.add(cache.getCanonicalPath());
+      // Display observations only. The adjacent policy.properties is user
+      // configuration and must remain essential. Resolve the trusted root,
+      // but never follow an alias within the diagnostic destination itself.
+      for(File home:new File[]{context.getExternalFilesDir(null),context.getFilesDir()})if(home!=null){
+        String relative=".kodi/userdata/addon_data/service.infinity.refresh/runtime.properties";
+        diagnosticFiles.put(new File(home,relative).getAbsolutePath(),new File(home.getCanonicalFile(),relative).getPath());
+      }
     }catch(IOException unavailable){/* Unknown paths remain essential. */}
   }
   public static void userEntry(Context context){initialize(context);InfinityJavaWriteBarrier.userEntry();}
@@ -126,6 +134,7 @@ public final class InfinityJavaPersistence {
     try{
       File actual=path.getCanonicalFile();String name=actual.getPath();
       if(path.exists()&&Os.lstat(path.getAbsolutePath()).st_nlink!=1)return false;
+      if(name.equals(diagnosticFiles.get(path.getAbsolutePath())))return true;
       synchronized(caches){for(String root:caches)if(name.startsWith(root+File.separator))return true;}
     }catch(Exception unknown){}
     return false;
@@ -302,15 +311,21 @@ public final class InfinityJavaPersistence {
   }
   private static final class Edit implements SharedPreferences.Editor {
     final Preferences prefs;final SharedPreferences.Editor actual;
+    private boolean auditOnly=true,auditWritten;
     Edit(Preferences prefs,SharedPreferences.Editor actual){this.prefs=prefs;this.actual=actual;}
-    public SharedPreferences.Editor putString(String k,String v){actual.putString(k,v);return this;}
-    public SharedPreferences.Editor putStringSet(String k,Set<String> v){actual.putStringSet(k,v);return this;}
-    public SharedPreferences.Editor putInt(String k,int v){actual.putInt(k,v);return this;}
-    public SharedPreferences.Editor putLong(String k,long v){actual.putLong(k,v);return this;}
-    public SharedPreferences.Editor putFloat(String k,float v){actual.putFloat(k,v);return this;}
-    public SharedPreferences.Editor putBoolean(String k,boolean v){actual.putBoolean(k,v);return this;}
-    public SharedPreferences.Editor remove(String k){actual.remove(k);return this;}
-    public SharedPreferences.Editor clear(){actual.clear();return this;}
+    public SharedPreferences.Editor putString(String k,String v){auditOnly&="audit".equals(k)&&v!=null;auditWritten=true;actual.putString(k,v);return this;}
+    public SharedPreferences.Editor putStringSet(String k,Set<String> v){auditOnly=false;actual.putStringSet(k,v);return this;}
+    public SharedPreferences.Editor putInt(String k,int v){auditOnly=false;actual.putInt(k,v);return this;}
+    public SharedPreferences.Editor putLong(String k,long v){auditOnly=false;actual.putLong(k,v);return this;}
+    public SharedPreferences.Editor putFloat(String k,float v){auditOnly=false;actual.putFloat(k,v);return this;}
+    public SharedPreferences.Editor putBoolean(String k,boolean v){auditOnly=false;actual.putBoolean(k,v);return this;}
+    public SharedPreferences.Editor remove(String k){auditOnly=false;actual.remove(k);return this;}
+    public SharedPreferences.Editor clear(){auditOnly=false;actual.clear();return this;}
+    private boolean diagnosticRouteAudit(){
+      if(!"infinity_power_routes".equals(prefs.name)||!auditOnly||!auditWritten)return false;
+      Map<String,?> existing=prefs.actual.getAll();
+      return existing.isEmpty()||(existing.size()==1&&existing.get("audit") instanceof String);
+    }
     private String durable(boolean committed){
       if(!committed)return "preference_commit_returned_false";
       try{File file=new File(prefs.directory,prefs.name+".xml");
@@ -321,10 +336,18 @@ public final class InfinityJavaPersistence {
       }catch(Exception error){return "preference_sync_"+error.getClass().getSimpleName();}
     }
     public boolean commit(){
-      InfinityJavaWriteBarrier.Resource lease=InfinityJavaWriteBarrier.resource("preferences:"+prefs.name);
-      String failure="preference_commit_interrupted";
-      try{synchronized(prefs){failure=durable(actual.commit());return failure==null;}}
-      finally{lease.finish(failure);}
+      synchronized(prefs){
+        // This one synchronous report describes the already verified route
+        // files; it contains no settings or backup bytes. Android 11 adds
+        // indentation after its trailing newline. Keep Android's actual
+        // commit result, without making diagnostic formatting a save owner.
+        // Mixed/unknown keys, removals and all apply writes stay essential.
+        if(diagnosticRouteAudit())return actual.commit();
+        InfinityJavaWriteBarrier.Resource lease=InfinityJavaWriteBarrier.resource("preferences:"+prefs.name);
+        String failure="preference_commit_interrupted";
+        try{failure=durable(actual.commit());return failure==null;}
+        finally{lease.finish(failure);}
+      }
     }
     public void apply(){
       final InfinityJavaWriteBarrier.Resource lease=InfinityJavaWriteBarrier.resource("preferences:"+prefs.name);

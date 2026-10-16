@@ -267,6 +267,9 @@ def main():
             try: (args.out/name).write_text(adb(*command,check=False))
             except Exception as error: (args.out/(name+'.error')).write_text(str(error))
         for source,name in [(PRIVATE+'/files/infinity-checkpoint-close.json','coordinator-receipt.json'),
+                            (PRIVATE+'/shared_prefs/infinity_power_routes.xml','power-route-audit.xml'),
+                            (PROFILE+'/addon_data/service.infinity.refresh/runtime.properties','refresh-runtime.properties'),
+                            (PROFILE+'/addon_data/service.infinity.refresh/policy.properties','refresh-policy.properties'),
                             (PRIVATE+'/files/infinity-android-checkpoint.jsonl','android-checkpoint.jsonl'),
                             (PRIVATE+'/files/infinity-kodi-process.json','owner.json'),
                             (CONTROL+'/engine.json','engine.json'),

@@ -115,7 +115,7 @@ def verify_tests(args):
     totals={key:sum(row[key] for row in original.values()) for key in ('tests','failures','errors','skipped')}
     assert totals==dict(tests=274,failures=0,errors=0,skipped=0),totals
     new=suites['com.projectinfinity.kodi.'+TEST]
-    assert new==dict(tests=20,failures=0,errors=0,skipped=0),new
+    assert new==dict(tests=26,failures=0,errors=0,skipped=0),new
     save(args.out/'JAVA-REGRESSION-VERIFICATION.json',dict(original_274=totals,new_save_cases=new,suites=suites,
         original_test_sources_unchanged=True,host_directory_sync='real host FileChannel.force; test-only OS adapter',
         host_os_adapter_sha256=sha(HERE/'tests'/'HostFilesystemShadow.java'),physical_fold_verified=False))

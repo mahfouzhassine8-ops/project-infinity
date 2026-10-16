@@ -111,6 +111,52 @@ public class InfinityJavaPersistence2103377Test {
       .putLong("l",Long.MAX_VALUE).putFloat("f",1.25f).putStringSet("set",new HashSet<>(Arrays.asList("alpha","beta"))).commit());
     begin();assertFalse(InfinityJavaWriteBarrier.pending(),seal().isEmpty());
   }
+  @Test @Config(sdk=30) public void android11RouteAuditFormattingCannotBlockOrReleaseActualRouteWrites()throws Exception{
+    File target=file("power-route-original.xml");OutputStream output=new InfinityJavaPersistence.Output(target);
+    output.write("saved original".getBytes(StandardCharsets.UTF_8));begin();
+    SharedPreferences prefs=InfinityJavaPersistence.preferences(app,"infinity_power_routes",0);
+    String audit="Validated profiles: 1; commands updated: 0; rejected profiles: 0.\n";
+    assertTrue(prefs.edit().putString("audit",audit).commit());assertEquals(audit,prefs.getString("audit",""));
+    File xml=new File(app.getApplicationInfo().dataDir,"shared_prefs/infinity_power_routes.xml");
+    Map<?,?> disk=ReflectionHelpers.callStaticMethod(InfinityJavaPersistence.class,"readPreferences",ReflectionHelpers.ClassParameter.from(File.class,xml));
+    assertEquals("Reproduce actual Android 11 serializer indentation",audit+"    ",disk.get("audit"));
+    assertEquals("Diagnostic commit cannot release a pending original file", "",seal());
+    output.close();assertFalse(InfinityJavaWriteBarrier.pending(),seal().isEmpty());assertEquals("saved original",text(target));
+  }
+  @Test @Config(sdk=30) public void essentialPreferenceReadbackMismatchStillRefusesSuccessfulSave()throws Exception{
+    SharedPreferences prefs=InfinityJavaPersistence.preferences(app,"essential_multiline",0);
+    assertFalse(prefs.edit().putString("notes","Keep exact user whitespace\n").commit());
+    begin();assertEquals("",seal());assertTrue(InfinityJavaWriteBarrier.pending().contains("preference_readback_mismatch"));
+  }
+  @Test public void mixedRouteAuditAndUserSettingCannotUseTheDiagnosticException(){
+    SharedPreferences prefs=InfinityJavaPersistence.preferences(app,"infinity_power_routes",0);begin();String proof=seal();
+    try{prefs.edit().putString("audit","report\n").putString("user_setting","must save").commit();fail("Mixed write bypassed admission");}
+    catch(InfinityJavaWriteBarrier.Closing expected){}
+    assertFalse(prefs.contains("user_setting"));assertFalse(InfinityJavaWriteBarrier.authorized(ticket,proof));
+  }
+  @Test public void existingUnknownRoutePreferenceKeepsItsWholeStoreProtected(){
+    SharedPreferences prefs=InfinityJavaPersistence.preferences(app,"infinity_power_routes",0);
+    assertTrue(prefs.edit().putString("user_setting","preserved").commit());begin();
+    try{prefs.edit().putString("audit","report\n").commit();fail("Unknown existing data bypassed admission");}
+    catch(InfinityJavaWriteBarrier.Closing expected){}
+    assertEquals("preserved",prefs.getString("user_setting",""));assertFalse(prefs.contains("audit"));assertEquals("",seal());
+  }
+  @Test public void refreshObservationCanFinishAfterCloseWhileItsPolicyStaysProtected()throws Exception{
+    File directory=new File(app.getExternalFilesDir(null),".kodi/userdata/addon_data/service.infinity.refresh");assertTrue(directory.mkdirs()||directory.isDirectory());
+    File observation=new File(directory,"runtime.properties"),policy=new File(directory,"policy.properties");old(policy,"mode=professional");
+    begin();String proof=seal();
+    try(OutputStream output=new InfinityJavaPersistence.Output(observation)){output.write("granted=true".getBytes(StandardCharsets.UTF_8));}
+    assertEquals("granted=true",text(observation));assertTrue(InfinityJavaWriteBarrier.authorized(ticket,proof));
+    try{new InfinityJavaPersistence.Output(policy);fail("User refresh policy bypassed admission");}catch(InfinityJavaWriteBarrier.Closing expected){}
+    assertEquals("mode=professional",text(policy));assertFalse(InfinityJavaWriteBarrier.authorized(ticket,proof));
+  }
+  @Test public void refreshDiagnosticHardlinkCannotTruncateProtectedUserData()throws Exception{
+    File directory=new File(app.getFilesDir(),".kodi/userdata/addon_data/service.infinity.refresh");assertTrue(directory.mkdirs()||directory.isDirectory());
+    File protectedFile=file("protected-profile"),observation=new File(directory,"runtime.properties");old(protectedFile,"preserved");
+    Files.createLink(observation.toPath(),protectedFile.toPath());begin();
+    try{new InfinityJavaPersistence.Output(observation);fail("Linked user data classified as diagnostic");}catch(InfinityJavaWriteBarrier.Closing expected){}
+    assertEquals("preserved",text(protectedFile));assertEquals("",seal());
+  }
   @Test public void preferenceListenerReceivesProtectedObject()throws Exception{
     SharedPreferences prefs=InfinityJavaPersistence.preferences(app,"essential_listener",0);AtomicBoolean wrapped=new AtomicBoolean();
     SharedPreferences.OnSharedPreferenceChangeListener callback=(value,key)->wrapped.set(value==prefs);
