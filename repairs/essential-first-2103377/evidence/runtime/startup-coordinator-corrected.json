@@ -1,0 +1,214 @@
+{
+  "scope": "production coordinator and persistence barrier; unchanged Kodi peers are adapters",
+  "cases": [
+    {
+      "case": "optional-blocked",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "optional-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "settings-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "profiles-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "first-party-missing",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "first-party-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "compat-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "protected-writer",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "native-transaction",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "lease-lost",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "deadline",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "unobserved-writer",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "protection-warning",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "optional-repository",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "repository-transaction",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "repository-local-race",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "repository-local-failure",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "repository-late-local",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-admission-negative",
+      "exit_code": 0,
+      "error": "",
+      "observation": "original early Close rejects required startup directory; no authorization\n"
+    },
+    {
+      "case": "startup-early-close",
+      "exit_code": 0,
+      "error": "",
+      "observation": "{\"active_native_writers\":0,\"admission_sealed\":true,\"application_core_initialized\":true,\"application_startup_in_progress\":false,\"blocker_count\":0,\"blocker_inventory_contract\":\"full_blocker_inventory_v1\",\"blocker_overflow\":false,\"blockers\":[],\"blocking_jobs\":[],\"blocking_operation\":\"\",\"elapsed_ms\":1,\"error\":\"\",\"essential_owners\":[\"native_admission\",\"background_jobs\",\"playback\",\"command_center\",\"compat\",\"kodi_settings\",\"profiles\",\"skin_settings\",\"addon_settings\",\"favourites\",\"peripherals\",\"audio_policy\",\"deferred_dialog_state\",\"xml_files\",\"native_databases\",\"pvr\"],\"essential_write_blockers\":[],\"essential_write_generation\":1,\"essential_writes_durable\":true,\"essential_writes_sealed\":true,\"exit_kind\":\"essential_verified_process_exit\",\"exit_policy\":\"essential_first_process_exit_v1\",\"generation\":1,\"inventory_complete\":true,\"job_recovery_history\":[],\"nonpersistent_jobs\":0,\"optional_data_recovery_guaranteed\":false,\"optional_unfinished_jobs\":[],\"optional_unfinished_writers\":1,\"owner\":\"22222222-2222-4222-8222-222222222222\",\"owners\":[{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"native_admission\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":true,\"dirty_before\":false,\"dirty_remaining\":true,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":false,\"generation\":0,\"owner\":\"python_services\",\"required_writes_finished\":false,\"result\":\"PENDING\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"background_jobs\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"playback\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"command_center\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"compat\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"kodi_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"profiles\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"skin_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"addon_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"favourites\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"peripherals\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"audio_policy\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"deferred_dialog_state\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"xml_files\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"native_databases\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"pvr\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":0}],\"pending_detail\":\"\",\"phase\":\"SAFE_TO_TERMINATE\",\"pid\":32,\"process_death_confirmed\":false,\"python_retirement_contract\":\"python_retirement_batch_v1\",\"required_jobs\":0,\"required_owners\":[\"native_admission\",\"python_services\",\"background_jobs\",\"playback\",\"command_center\",\"compat\",\"kodi_settings\",\"profiles\",\"skin_settings\",\"addon_settings\",\"favourites\",\"peripherals\",\"audio_policy\",\"deferred_dialog_state\",\"xml_files\",\"native_databases\",\"pvr\"],\"resolved_job_obligations\":0,\"safe_to_terminate_utc_ms\":1792152522416,\"schema\":1,\"script_persistence\":{\"active_writers\":1,\"advisory_count\":0,\"advisory_retired_writers\":0,\"blocker_overflow\":false,\"blockers\":[],\"blocking_count\":0,\"blocking_overflow\":false,\"durable\":false,\"error\":\"\",\"failed_settled_writers\":0,\"failure_detail\":\"\",\"failure_writer\":\"\",\"failure_writer_id\":-1,\"observed_writers\":1,\"pending_writers\":[\"plugin.video.optional:service.py\"],\"retired_writers\":0,\"sync_finished\":false,\"sync_started\":false,\"tracked_paths\":1},\"session\":\"11111111-1111-4111-8111-111111111111\",\"unknown_job_owners\":0,\"write_admission_started\":true}\n"
+    },
+    {
+      "case": "startup-write-pending",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-write-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-deadline",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-first-party-missing",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-without-close",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-late-scope",
+      "exit_code": 0,
+      "error": "",
+      "observation": "{\"active_native_writers\":0,\"admission_sealed\":true,\"application_core_initialized\":true,\"application_startup_in_progress\":false,\"blocker_count\":0,\"blocker_inventory_contract\":\"full_blocker_inventory_v1\",\"blocker_overflow\":false,\"blockers\":[],\"blocking_jobs\":[],\"blocking_operation\":\"\",\"elapsed_ms\":1,\"error\":\"\",\"essential_owners\":[\"native_admission\",\"background_jobs\",\"playback\",\"command_center\",\"compat\",\"kodi_settings\",\"profiles\",\"skin_settings\",\"addon_settings\",\"favourites\",\"peripherals\",\"audio_policy\",\"deferred_dialog_state\",\"xml_files\",\"native_databases\",\"pvr\"],\"essential_write_blockers\":[],\"essential_write_generation\":1,\"essential_writes_durable\":true,\"essential_writes_sealed\":true,\"exit_kind\":\"essential_verified_process_exit\",\"exit_policy\":\"essential_first_process_exit_v1\",\"generation\":1,\"inventory_complete\":true,\"job_recovery_history\":[],\"nonpersistent_jobs\":0,\"optional_data_recovery_guaranteed\":false,\"optional_unfinished_jobs\":[],\"optional_unfinished_writers\":1,\"owner\":\"22222222-2222-4222-8222-222222222222\",\"owners\":[{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"native_admission\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":true,\"dirty_before\":false,\"dirty_remaining\":true,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":false,\"generation\":0,\"owner\":\"python_services\",\"required_writes_finished\":false,\"result\":\"PENDING\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"background_jobs\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"playback\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"command_center\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"compat\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"kodi_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"profiles\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"skin_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"addon_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"favourites\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"peripherals\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"audio_policy\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"deferred_dialog_state\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"xml_files\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"native_databases\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"pvr\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":0}],\"pending_detail\":\"\",\"phase\":\"SAFE_TO_TERMINATE\",\"pid\":39,\"process_death_confirmed\":false,\"python_retirement_contract\":\"python_retirement_batch_v1\",\"required_jobs\":0,\"required_owners\":[\"native_admission\",\"python_services\",\"background_jobs\",\"playback\",\"command_center\",\"compat\",\"kodi_settings\",\"profiles\",\"skin_settings\",\"addon_settings\",\"favourites\",\"peripherals\",\"audio_policy\",\"deferred_dialog_state\",\"xml_files\",\"native_databases\",\"pvr\"],\"resolved_job_obligations\":0,\"safe_to_terminate_utc_ms\":1792152522445,\"schema\":1,\"script_persistence\":{\"active_writers\":1,\"advisory_count\":0,\"advisory_retired_writers\":0,\"blocker_overflow\":false,\"blockers\":[],\"blocking_count\":0,\"blocking_overflow\":false,\"durable\":false,\"error\":\"\",\"failed_settled_writers\":0,\"failure_detail\":\"\",\"failure_writer\":\"\",\"failure_writer_id\":-1,\"observed_writers\":1,\"pending_writers\":[\"plugin.video.optional:service.py\"],\"retired_writers\":0,\"sync_finished\":false,\"sync_started\":false,\"tracked_paths\":1},\"session\":\"11111111-1111-4111-8111-111111111111\",\"unknown_job_owners\":0,\"write_admission_started\":true}\n"
+    },
+    {
+      "case": "entry-early-close",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "entry-create-failure",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "entry-gui-failure",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "entry-initialize-failure",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "entry-without-close",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    },
+    {
+      "case": "startup-observer-pending",
+      "exit_code": 0,
+      "error": "",
+      "observation": "{\"active_native_writers\":0,\"admission_sealed\":true,\"application_core_initialized\":true,\"application_startup_in_progress\":false,\"blocker_count\":0,\"blocker_inventory_contract\":\"full_blocker_inventory_v1\",\"blocker_overflow\":false,\"blockers\":[],\"blocking_jobs\":[],\"blocking_operation\":\"\",\"elapsed_ms\":1,\"error\":\"\",\"essential_owners\":[\"native_admission\",\"background_jobs\",\"playback\",\"command_center\",\"compat\",\"kodi_settings\",\"profiles\",\"skin_settings\",\"addon_settings\",\"favourites\",\"peripherals\",\"audio_policy\",\"deferred_dialog_state\",\"xml_files\",\"native_databases\",\"pvr\"],\"essential_write_blockers\":[],\"essential_write_generation\":1,\"essential_writes_durable\":true,\"essential_writes_sealed\":true,\"exit_kind\":\"essential_verified_process_exit\",\"exit_policy\":\"essential_first_process_exit_v1\",\"generation\":1,\"inventory_complete\":true,\"job_recovery_history\":[],\"nonpersistent_jobs\":0,\"optional_data_recovery_guaranteed\":false,\"optional_unfinished_jobs\":[],\"optional_unfinished_writers\":2,\"owner\":\"22222222-2222-4222-8222-222222222222\",\"owners\":[{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"native_admission\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":true,\"dirty_before\":false,\"dirty_remaining\":true,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":false,\"generation\":0,\"owner\":\"python_services\",\"required_writes_finished\":false,\"result\":\"PENDING\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"background_jobs\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"playback\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"command_center\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"compat\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"kodi_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"profiles\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"skin_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"addon_settings\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"favourites\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"peripherals\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"audio_policy\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"deferred_dialog_state\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":1,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"xml_files\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":0},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":true,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":1,\"end_elapsed_ms\":1,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"native_databases\",\"required_writes_finished\":true,\"result\":\"COMMITTED\",\"start_elapsed_ms\":1},{\"checkpoint_generation\":1,\"dirty\":false,\"dirty_before\":false,\"dirty_remaining\":false,\"durable_generation\":0,\"duration_ms\":0,\"elapsed_ms\":0,\"end_elapsed_ms\":0,\"error\":\"\",\"essential\":true,\"generation\":0,\"owner\":\"pvr\",\"required_writes_finished\":true,\"result\":\"ALREADY_DURABLE\",\"start_elapsed_ms\":0}],\"pending_detail\":\"\",\"phase\":\"SAFE_TO_TERMINATE\",\"pid\":45,\"process_death_confirmed\":false,\"python_retirement_contract\":\"python_retirement_batch_v1\",\"required_jobs\":0,\"required_owners\":[\"native_admission\",\"python_services\",\"background_jobs\",\"playback\",\"command_center\",\"compat\",\"kodi_settings\",\"profiles\",\"skin_settings\",\"addon_settings\",\"favourites\",\"peripherals\",\"audio_policy\",\"deferred_dialog_state\",\"xml_files\",\"native_databases\",\"pvr\"],\"resolved_job_obligations\":0,\"safe_to_terminate_utc_ms\":1792152522467,\"schema\":1,\"script_persistence\":{\"active_writers\":2,\"advisory_count\":0,\"advisory_retired_writers\":0,\"blocker_overflow\":false,\"blockers\":[],\"blocking_count\":0,\"blocking_overflow\":false,\"durable\":false,\"error\":\"\",\"failed_settled_writers\":0,\"failure_detail\":\"\",\"failure_writer\":\"\",\"failure_writer_id\":-1,\"observed_writers\":2,\"pending_writers\":[\"plugin.video.optional:service.py\",\"startup.pending:service.py\"],\"retired_writers\":0,\"sync_finished\":false,\"sync_started\":false,\"tracked_paths\":1},\"session\":\"11111111-1111-4111-8111-111111111111\",\"unknown_job_owners\":0,\"write_admission_started\":true}\n"
+    },
+    {
+      "case": "startup-observer-failed",
+      "exit_code": 0,
+      "error": "",
+      "observation": ""
+    }
+  ],
+  "all_passed": true,
+  "actual_kodi_save_callbacks_executed": false,
+  "simulated_hook_coverage_flag": false,
+  "android_process_death_verified": false,
+  "candidate_deliverable": false
+}

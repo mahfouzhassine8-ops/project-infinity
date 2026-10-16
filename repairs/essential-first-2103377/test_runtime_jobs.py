@@ -44,6 +44,16 @@ class OptionalCallback:public IJobCallback {public:bool called=false;
  }};
 int main(int argc,char**argv)''')
         harness=harness.replace(' Callback callback;ThrowingCallback throwing;',r'''
+ if(mode=="startup-job-admission" || mode=="startup-job-failure") {
+  InfinityAndroidCheckpoint::active=true;InfinityAndroidCheckpoint::startupPending=true;
+  const auto id=manager->AddJob(new RequiredJob(mode!="startup-job-failure"),nullptr);assert(id);
+  assert(CJobManager::AndroidCheckpointSnapshot().required==1);
+  CJobWorker worker(manager);worker.Process();
+  assert(InfinityAndroidCheckpoint::failures==(mode=="startup-job-failure"?1:0));
+  InfinityAndroidCheckpoint::startupPending=false;
+  assert(manager->AddJob(new MemoryJob,nullptr)==0);
+  return 0;
+ }
  if(mode=="repository-pending" || mode=="repository-callback" || mode=="repository-refused") {
   OptionalCallback observer;
   const auto id=manager->AddJob(new CRepositoryUpdateJob,&observer);assert(id);
@@ -59,13 +69,19 @@ int main(int argc,char**argv)''')
         for name in ['Job.h','JobManager.h','JobManager.cpp','JobCheckpoint.h']:
             target=folder/'utils'/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source/'utils'/name,target)
         for name,content in old.STUBS.items():
+            if name == 'platform/android/activity/InfinityAndroidCheckpoint.h':
+                # Existing cases model an initialized engine. Pending startup
+                # uses the real coordinator in run_runtime_coordinator_tests.
+                content = content.replace('inline bool IsActive(){return active;}',
+                    'inline bool startupPending=false;inline bool IsActive(){return active;}inline bool IsWriteAdmissionActive(){return active&&!startupPending;}')
+                content = content.replace('admitted(!active)', 'admitted(!active||startupPending)')
             target=folder/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(content)
         (folder/'test.cpp').write_text(harness)
         subprocess.run(['g++','-std=c++17','-DTARGET_ANDROID','-Wall','-Wextra','-Werror','-Wno-unused-parameter','-pthread','-I',str(folder),str(folder/'utils/JobManager.cpp'),str(folder/'test.cpp'),'-o',str(folder/'test')],check=True)
-        cases=['memory','failure','callback','unknown','queue','receipt','receipt-failure','preclose-failure','callback-failure','receipt-canceled','repository-pending','repository-callback','repository-refused']
+        cases=['memory','failure','callback','unknown','queue','receipt','receipt-failure','preclose-failure','callback-failure','receipt-canceled','repository-pending','repository-callback','repository-refused','startup-job-admission','startup-job-failure']
         for case in cases:
             subprocess.run([str(folder/'test'),case],check=True,timeout=10)
             print('PASS',case)
-        print('PASS 13 full production JobManager cases; required callbacks/receipts retained; optional repository completion is diagnostic')
+        print('PASS 15 full production JobManager cases; original 13 retained, required startup admission and failure accounting verified')
 
 if __name__=='__main__':main()

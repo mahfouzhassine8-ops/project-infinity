@@ -1,0 +1,301 @@
+{
+  "scope": "Production observer and real Close barrier, pinned CPython 3.11.7, deterministic interleaving at actual ctypes.dlopen(None)",
+  "unchanged_guard_negative_control": false,
+  "results": [
+    {
+      "case": "early-close-1",
+      "expected_refusal_control": false,
+      "active": 1,
+      "observed": 1,
+      "paused_at_actual_dlopen_none": 1,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "early-close-37",
+      "expected_refusal_control": false,
+      "active": 37,
+      "observed": 37,
+      "paused_at_actual_dlopen_none": 37,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "loaded-close-37",
+      "expected_refusal_control": false,
+      "active": 37,
+      "observed": 37,
+      "paused_at_actual_dlopen_none": 37,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": []
+    },
+    {
+      "case": "early-native-guards",
+      "expected_refusal_control": false,
+      "active": 1,
+      "observed": 1,
+      "paused_at_actual_dlopen_none": 1,
+      "blocking_count": 0,
+      "essential_sealed": true,
+      "authorized": true,
+      "exception": "",
+      "blockers": [
+        {
+          "writer_id": 1,
+          "writer": "fold.race.fixture.1:service.py",
+          "reason": "protected_write_rejected_before_mutation",
+          "detail": "file_open_for_write_failed"
+        }
+      ]
+    },
+    {
+      "case": "closed-before-start-37",
+      "expected_refusal_control": true,
+      "active": 37,
+      "observed": 0,
+      "paused_at_actual_dlopen_none": 0,
+      "blocking_count": 37,
+      "essential_sealed": false,
+      "authorized": false,
+      "exception": "Infinity protected write admission is closed",
+      "blockers": [
+        {
+          "writer_id": 3,
+          "writer": "fold.race.fixture.3:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=3; interpreter_id=18; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 23,
+          "writer": "fold.race.fixture.23:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=23; interpreter_id=17; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 1,
+          "writer": "fold.race.fixture.1:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=1; interpreter_id=1; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=30; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 10,
+          "writer": "fold.race.fixture.10:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=10; interpreter_id=3; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 11,
+          "writer": "fold.race.fixture.11:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=11; interpreter_id=6; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=30; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 12,
+          "writer": "fold.race.fixture.12:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=12; interpreter_id=7; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 37,
+          "writer": "fold.race.fixture.37:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=37; interpreter_id=36; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 17,
+          "writer": "fold.race.fixture.17:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=17; interpreter_id=4; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=30; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 8,
+          "writer": "fold.race.fixture.8:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=8; interpreter_id=19; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 19,
+          "writer": "fold.race.fixture.19:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=19; interpreter_id=16; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 18,
+          "writer": "fold.race.fixture.18:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=18; interpreter_id=15; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 22,
+          "writer": "fold.race.fixture.22:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=22; interpreter_id=21; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 16,
+          "writer": "fold.race.fixture.16:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=16; interpreter_id=14; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 14,
+          "writer": "fold.race.fixture.14:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=14; interpreter_id=13; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 5,
+          "writer": "fold.race.fixture.5:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=5; interpreter_id=25; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 32,
+          "writer": "fold.race.fixture.32:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=32; interpreter_id=32; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 35,
+          "writer": "fold.race.fixture.35:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=35; interpreter_id=34; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 24,
+          "writer": "fold.race.fixture.24:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=24; interpreter_id=27; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 30,
+          "writer": "fold.race.fixture.30:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=30; interpreter_id=35; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=30; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 7,
+          "writer": "fold.race.fixture.7:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=7; interpreter_id=2; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 26,
+          "writer": "fold.race.fixture.26:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=26; interpreter_id=22; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 21,
+          "writer": "fold.race.fixture.21:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=21; interpreter_id=10; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=30; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 31,
+          "writer": "fold.race.fixture.31:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=31; interpreter_id=28; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 25,
+          "writer": "fold.race.fixture.25:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=25; interpreter_id=23; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 36,
+          "writer": "fold.race.fixture.36:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=36; interpreter_id=12; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 29,
+          "writer": "fold.race.fixture.29:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=29; interpreter_id=29; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 20,
+          "writer": "fold.race.fixture.20:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=20; interpreter_id=20; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 28,
+          "writer": "fold.race.fixture.28:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=28; interpreter_id=11; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 4,
+          "writer": "fold.race.fixture.4:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=4; interpreter_id=24; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 33,
+          "writer": "fold.race.fixture.33:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=33; interpreter_id=30; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 15,
+          "writer": "fold.race.fixture.15:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=15; interpreter_id=9; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 2,
+          "writer": "fold.race.fixture.2:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=2; interpreter_id=5; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 27,
+          "writer": "fold.race.fixture.27:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=27; interpreter_id=26; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 34,
+          "writer": "fold.race.fixture.34:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=34; interpreter_id=33; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 6,
+          "writer": "fold.race.fixture.6:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=6; interpreter_id=37; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 9,
+          "writer": "fold.race.fixture.9:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=9; interpreter_id=31; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        },
+        {
+          "writer_id": 13,
+          "writer": "fold.race.fixture.13:service.py",
+          "reason": "checked_python_observer_initialization_failed",
+          "detail": "stage=python.source; invoker_id=13; interpreter_id=8; python_stage=python.import.shutil; exception=WriteAdmissionClosed; message=Infinity protected write admission is closed; native_errno=11; at=/workspace/scratch/bda2e1a14e6f/python3117/lib/python3.11/shutil.py:15:<module>; at=<string>:21:<module>"
+        }
+      ]
+    }
+  ],
+  "all_passed": true,
+  "physical_fold_verified": false,
+  "actual_diggz_services_executed": false,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

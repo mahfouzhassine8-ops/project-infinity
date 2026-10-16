@@ -39,6 +39,7 @@ int errors=0, opens=0, writes=0, fetches=0, finished=0, scheduled=0, published=0
 namespace InfinityAndroidCheckpoint {
 struct Owner {unsigned generation=0;bool dirty=false,complete=false;};
 struct State {std::mutex mutex;std::atomic<bool> active{false};bool sealed=false;
+ bool startupInProgress=false,writeAdmissionStarted=true;
  std::string phase="RUNNING";unsigned activeWrites=0;std::map<std::string,Owner> owners;};
 inline State& Get(){static State s;return s;}
 thread_local unsigned acceptedPlaybackDepth=0,permissionDepth=0;

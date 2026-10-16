@@ -1,0 +1,62 @@
+{
+  "run": 38892686819,
+  "source_commit": "7caf6186932a001c90d914738ca4e2f98b0e3260",
+  "native_run": 38887113826,
+  "native_commit": "f2c663fac800a03104f349cea98853a22c033922",
+  "evidence_artifact": 12042654417,
+  "evidence_zip_sha256": "e7be1e8d21d5ca46f61381d4a03f2b7161e994ee4de00de4c6f05f80b7444b4c",
+  "all_308_passed": true,
+  "receiver_controls_passed": 14,
+  "fresh_test4": {
+    "passed": true,
+    "apk_sha256": "fc8a2792c6159eeb3d86dae2dddf72d0b8435a9fb846e56c3b00bf471e2e1205",
+    "whole_package_death_verified": true,
+    "both_java_process_save_proofs_verified": true,
+    "reopen_verified": true,
+    "favourites_preserved": true
+  },
+  "baseline_37_close_passed": true,
+  "upgrade_bytes_preserved": true,
+  "candidate_early_close": {
+    "ready_service_count": 0,
+    "started_epoch_ms": 1792150381760,
+    "updated_epoch_ms": 1792150406880,
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "total_duration_ms": 25198,
+    "pid": 8533,
+    "owner": "c161aa40-ea6c-4a30-9741-0e6175eaff49",
+    "authorization_consumed": false,
+    "script_persistence": {
+      "active_writers": 0,
+      "advisory_count": 0,
+      "advisory_retired_writers": 0,
+      "blocker_overflow": false,
+      "blockers": [],
+      "blocking_count": 0,
+      "blocking_overflow": false,
+      "durable": false,
+      "error": "",
+      "failed_settled_writers": 0,
+      "failure_detail": "",
+      "failure_writer": "",
+      "failure_writer_id": -1,
+      "observed_writers": 0,
+      "pending_writers": [],
+      "retired_writers": 0,
+      "sync_finished": false,
+      "sync_started": false,
+      "tracked_paths": 0
+    },
+    "essential_writes_sealed": false,
+    "essential_writes_durable": false
+  },
+  "startup_log_lines": [
+    "2026-10-16 11:33:00.926 T:8619     info <general>: Starting Kodi (21.3 (21.3.0) Git:20251031-a3a448d-dirty). Platform: Android ARM 64-bit",
+    "2026-10-16 11:33:02.754 T:8619  warning <general>: CKeyboardLayoutManager: no keyboard layouts found in special://xbmc/system/keyboardlayouts",
+    "2026-10-16 11:33:02.755 T:8619  critical <general>: CApplication::Create: Unable to load keyboard layouts"
+  ],
+  "physical_fold_accepted": false,
+  "apk_delivered": false,
+  "locked": false
+}

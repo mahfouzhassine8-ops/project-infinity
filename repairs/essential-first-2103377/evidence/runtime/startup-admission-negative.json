@@ -1,0 +1,16 @@
+{
+  "scope": "production coordinator and persistence barrier; unchanged Kodi peers are adapters",
+  "cases": [
+    {
+      "case": "startup-admission-negative",
+      "exit_code": 0,
+      "error": "",
+      "observation": "original early Close rejects required startup directory; no authorization\n"
+    }
+  ],
+  "all_passed": true,
+  "actual_kodi_save_callbacks_executed": false,
+  "simulated_hook_coverage_flag": false,
+  "android_process_death_verified": false,
+  "candidate_deliverable": false
+}

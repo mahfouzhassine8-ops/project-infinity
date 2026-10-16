@@ -1,0 +1,80 @@
+{
+  "scope": "Actual repository methods, production native admission and real SQLite VFS; Kodi network/UI and coordinator state container are peers",
+  "results": [
+    {
+      "case": "normal-work",
+      "exit_code": 0,
+      "stdout": "PASS normal-work opens=1 writes=1 fetches=1 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "normal-callback",
+      "exit_code": 0,
+      "stdout": "PASS normal-callback opens=2 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "quiesce-work",
+      "exit_code": 0,
+      "stdout": "PASS quiesce-work opens=0 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "quiesce-callback",
+      "exit_code": 0,
+      "stdout": "PASS quiesce-callback opens=0 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "persisting-callback",
+      "exit_code": 0,
+      "stdout": "PASS persisting-callback opens=0 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "sealed-callback",
+      "exit_code": 0,
+      "stdout": "PASS sealed-callback opens=0 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "late-schedule",
+      "exit_code": 0,
+      "stdout": "PASS late-schedule opens=0 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "network-close",
+      "exit_code": 0,
+      "stdout": "PASS network-close opens=1 writes=0 fetches=1 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "close-after-admission",
+      "exit_code": 0,
+      "stdout": "PASS close-after-admission opens=1 writes=0 fetches=0 failures=0\n",
+      "stderr": ""
+    },
+    {
+      "case": "real-read-failure",
+      "exit_code": 0,
+      "stdout": "PASS real-read-failure opens=1 writes=0 fetches=0 failures=2\n",
+      "stderr": ""
+    },
+    {
+      "case": "real-write-failure",
+      "exit_code": 0,
+      "stdout": "PASS real-write-failure opens=1 writes=1 fetches=1 failures=1\n",
+      "stderr": ""
+    },
+    {
+      "case": "baseline-after-seal",
+      "exit_code": 0,
+      "stdout": "PASS baseline-after-seal opens=2 writes=0 fetches=0 failures=4\n",
+      "stderr": ""
+    }
+  ],
+  "all_passed": true,
+  "android_process_death_verified": false,
+  "apk_deliverable": false
+}

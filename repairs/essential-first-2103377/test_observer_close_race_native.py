@@ -61,9 +61,10 @@ int main(int argc,char** argv) {
   assert(argc==5);
   const std::string mode=argv[1],root=argv[2],output=argv[3];
   const bool expectedUnfixed=std::string(argv[4])=="unfixed";
+  const bool beforeStart=mode=="closed-before-start-37";
   const bool early=mode!="loaded-close-37";
-  const unsigned count=mode=="early-close-37" || !early?37:1;
-  const bool expectedFailure=early && expectedUnfixed;
+  const unsigned count=beforeStart || mode=="early-close-37" || !early?37:1;
+  const bool expectedFailure=beforeStart || (early && expectedUnfixed);
   Py_Initialize();auto* main=PyThreadState_Get();
   // Registered before production Audit so Close can begin at the exact real
   // ctypes/PyDLL(None) boundary shown in the physical Fold traceback.
@@ -74,6 +75,12 @@ int main(int argc,char** argv) {
   for(unsigned i=0;i<count;++i) {
     bootstrap.push_back(PyThreadState_New(main->interp));
     InfinityScriptPersistence::Admit(static_cast<int>(i+1),"fold.race.fixture."+std::to_string(i+1)+":service.py");
+  }
+  if(beforeStart) {
+    // Counterexample: closing mutation admission before the native coordinator
+    // has observed installation can reject required stdlib native imports.
+    assert(InfinityScriptPersistence::BeginWriteProtection(23,{root+"/profile"},{root+"/cache"}));
+    gate.released=true;
   }
   auto* saved=PyEval_SaveThread();
   for(unsigned i=0;i<count;++i)workers.emplace_back([&,i] {
@@ -89,7 +96,7 @@ int main(int argc,char** argv) {
       PyObject *type=nullptr,*value=nullptr,*trace=nullptr;PyErr_Fetch(&type,&value,&trace);
       auto* text=PyObject_Str(value);assert(text);
       exceptions[i]=PyUnicode_AsUTF8(text);Py_DECREF(text);
-      assert(exceptions[i]=="Infinity shutdown closed native mutation admission");
+      assert(exceptions[i]==(beforeStart?"Infinity protected write admission is closed":"Infinity shutdown closed native mutation admission"));
       PyErr_Restore(type,value,trace);PyErr_Clear();
     } else {
       assert(context->observer && context->rawWrite && !PyErr_Occurred());
@@ -107,7 +114,7 @@ assert not __import__('os').path.exists(fixture_root+'/profile/late-write')
     }
     PyEval_ReleaseThread(owner);
   });
-  {
+  if(!beforeStart) {
     std::unique_lock<std::mutex> lock(gate.mutex);
     assert(gate.changed.wait_for(lock,std::chrono::seconds(30),[&]{return gate.arrivals.size()==count;}));
     if(early)assert(InfinityScriptPersistence::BeginWriteProtection(23,{root+"/profile"},{root+"/cache"}));
@@ -125,8 +132,11 @@ assert not __import__('os').path.exists(fixture_root+'/profile/late-write')
   assert(sealed==!expectedFailure && authorized==!expectedFailure);
   if(expectedFailure)for(const auto& item:proof.blockers) {
     assert(item.reason=="checked_python_observer_initialization_failed");
-    assert(item.detail.find("python_stage=python.import.ctypes")!=std::string::npos);
-    assert(item.detail.find("ctypes/__init__.py:376:__init__")!=std::string::npos);
+    if(beforeStart)assert(item.detail.find("exception=WriteAdmissionClosed")!=std::string::npos);
+    else {
+      assert(item.detail.find("python_stage=python.import.ctypes")!=std::string::npos);
+      assert(item.detail.find("ctypes/__init__.py:376:__init__")!=std::string::npos);
+    }
   }
   std::ostringstream report;
   report<<"{\"active\":"<<proof.active<<",\"observed\":"<<proof.observed
@@ -166,14 +176,14 @@ def main():
         includes = [runtime, runtime/'interfaces/python', ROOT/'repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc', prefix/'include/python3.11', args.sqlite_include]
         subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-pthread', *['-I'+str(p) for p in includes], str(source), '-L'+str(prefix/'lib'), '-lpython3.11', '-l:libsqlite3.so.0', '-ldl', '-lm', '-lcrypto', '-Wl,--export-dynamic', '-o', str(binary)], check=True)
         env = dict(os.environ, PYTHONHOME=str(prefix), LD_LIBRARY_PATH=str(prefix/'lib'), PYTHONDONTWRITEBYTECODE='1')
-        for case in ['early-close-1', 'early-close-37', 'loaded-close-37', 'early-native-guards']:
+        for case in ['early-close-1', 'early-close-37', 'loaded-close-37', 'early-native-guards', 'closed-before-start-37']:
             root = folder/case
             (root/'profile').mkdir(parents=True); (root/'cache').mkdir()
             output = root/'result.json'
             completed = subprocess.run([str(binary), case, str(root), str(output), 'unfixed' if args.expect_unfixed else 'fixed'], env=env, capture_output=True, text=True, timeout=60)
             assert completed.returncode == 0, (case, completed.returncode, completed.stderr)
             result = json.loads(output.read_text())
-            results.append(dict(case=case, **result))
+            results.append(dict(case=case, expected_refusal_control=case=='closed-before-start-37', **result))
             print(case, 'PASS', result['active'], result['observed'], result['authorized'], flush=True)
     report = dict(scope='Production observer and real Close barrier, pinned CPython 3.11.7, deterministic interleaving at actual ctypes.dlopen(None)', unchanged_guard_negative_control=args.expect_unfixed, results=results, all_passed=True, physical_fold_verified=False, actual_diggz_services_executed=False, android_process_death_verified=False, apk_deliverable=False)
     args.out.parent.mkdir(parents=True, exist_ok=True)

@@ -19,6 +19,8 @@ JOBS = 'xbmc/utils/JobManager.cpp'
 INSTALLER = 'xbmc/addons/AddonInstaller.cpp'
 ADDON = 'xbmc/addons/Addon.cpp'
 REPOSITORY = 'xbmc/addons/RepositoryUpdater.cpp'
+ENGINE_ENTRY = 'xbmc/platform/xbmc.cpp'
+APPLICATION = 'xbmc/application/Application.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
@@ -29,6 +31,8 @@ PINS = {
     INSTALLER: 'a9e21a3b0c9da59b33376d15b53ac7ba8886613c15b59878496cb31833502b9b',
     ADDON: 'bb6339e695d36f72639668acfafdd8422fb5f2c15dcb864749c9521203655fbc',
     REPOSITORY: '92e44c82995060552f71b675bdc03c9bb08b63430d2d83b59fcdb78ea7d5c0f2',
+    ENGINE_ENTRY: '2ca7a10d3c2bb19d79a35f2faecd8b2f01a428fc31aae9fe63f568cd878ac362',
+    APPLICATION: '3f064f1a6dd941d78c1a58383b29fce8c0c553ed5cb030e319c9955c4ae4be06',
 }
 once = stage_experiment.once
 
@@ -86,9 +90,170 @@ def checkpoint(text):
         's.jobs.blockers', 's.jobs.optionalUnfinished')
     text = text[:end] + optional + text[end:]
     assert 'InfinityEssentialScriptFence' not in text
-    return text
+    return startup_checkpoint(text)
+
+
+def startup_checkpoint(text):
+    text = once(text, '  bool requestReady{false};', '''  bool requestReady{false};
+  bool startupInProgress{false};
+  bool startupCoreComplete{false};
+  bool writeAdmissionStarted{false};
+  bool preparingWriteAdmission{false};''')
+    text = once(text, '    if (!s.ownerRegistered || s.active.load() || s.lifecycleTeardown || s.ownerPublishing)',
+                '    if (!s.ownerRegistered || (s.active.load() && (!s.startupInProgress || s.writeAdmissionStarted)) || s.lifecycleTeardown || s.ownerPublishing)')
+    text = once(text, '  result["schema"] = 1;\n  result["exit_policy"]', '''  result["schema"] = 1;
+  result["application_startup_in_progress"] = s.startupInProgress;
+  result["application_core_initialized"] = s.startupCoreComplete;
+  result["write_admission_started"] = s.writeAdmissionStarted;
+  result["exit_policy"]''')
+    text = once(text, 'bool IsActive() { return Get().active.load(); }', '''bool IsActive() { return Get().active.load(); }
+bool IsWriteAdmissionActive()
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  return s.active.load() && s.writeAdmissionStarted;
+}''')
+    text = once(text, '  m_admitted = !s.active.load() ||', '''  const bool acceptedStartup = s.startupInProgress && !s.writeAdmissionStarted &&
+      !s.sealed && s.phase == "CHECKPOINT_REQUESTED" &&
+      (owner == "jobs" || owner == "directory-work");
+  m_admitted = acceptedStartup || !s.active.load() ||''')
+    start = text.index('bool Request(')
+    end = text.index('std::string Status(', start)
+    request = text[start:end]
+    admission_start = request.index('  if (!InfinityScriptPersistence::BeginWriteProtection(')
+    admission = request[admission_start:request.rindex('  return true;')]
+    # Identity/deadline/trace begin at the user's request, not at activation.
+    for line in ('  InfinityShutdownTrace::Begin();\n',
+                 '  InfinityVfsOpenTrace::CheckpointBegin(infinityDiagnosticGeneration);\n',
+                 '  InfinityShutdownTrace::Event("milestone", "checkpoint.request");\n'):
+        admission = once(admission, line, '')
+    admission = once(admission, '  CScriptInvocationManager::GetInstance().BeginShutdown();\n', '')
+    request = request[:admission_start] + '''  InfinityShutdownTrace::Begin();
+  InfinityVfsOpenTrace::CheckpointBegin(infinityDiagnosticGeneration);
+  InfinityShutdownTrace::Event("milestone", "checkpoint.request");
+  return ActivateWriteAdmission(infinityDiagnosticGeneration);
+}
+
+'''
+    request = once(request, '    s.phase = "QUIESCE";', '''    s.phase = s.startupInProgress ? "CHECKPOINT_REQUESTED" : "QUIESCE";
+    s.writeAdmissionStarted = false;
+    s.requestReady = false;''')
+    request = once(request, '    s.safeStatus.clear();s.blocking="native_admission";s.pendingDetail.clear();', '''    s.safeStatus.clear();s.blocking="native_admission";
+    s.pendingDetail = s.startupInProgress ? "application_startup_initialization" : "";''')
+    request = once(request, '    if (s.lifecycleTeardown || !s.ownerRegistered || !s.ownerPublished || s.ownerPublishing ||',
+                   '    if (s.lifecycleTeardown || !s.startupError.empty() || !s.ownerRegistered || !s.ownerPublished || s.ownerPublishing ||')
+    text = once(text, '      if (!application.IsInitialized())',
+                '      if (!application.IsInitialized() && !s.startupCoreComplete)')
+    activation = '''bool ActivateWriteAdmission(uint64_t infinityDiagnosticGeneration)
+{
+  auto& s = Get();
+  {
+    std::lock_guard<std::mutex> lock(s.mutex);
+    CheckDeadlineLocked(s);
+    if (!s.active.load()) return true;
+    if (s.generation != infinityDiagnosticGeneration || s.phase == "CHECKPOINT_FAILED") return false;
+    if (s.startupInProgress) return true; // Accepted request; original deadline keeps running.
+    if (s.writeAdmissionStarted || s.preparingWriteAdmission) return true;
+    s.preparingWriteAdmission = true;
+  }
+  // Freeze only new invoker admission first. Already admitted observers must
+  // install before mutation rejection, or a normal zlib/ctypes import can be
+  // rejected by the very write hooks it is trying to install. Observed() is
+  // recorded before add-on bytecode; this never waits for optional service work.
+  CScriptInvocationManager::GetInstance().BeginShutdown();
+  const auto observers = InfinityScriptPersistence::Snapshot();
+  {
+    std::lock_guard<std::mutex> lock(s.mutex);
+    s.preparingWriteAdmission = false;
+    CheckDeadlineLocked(s); // Initialization never resets or extends expiry.
+    if (s.phase == "CHECKPOINT_FAILED") return false;
+    if (observers.observed != observers.active)
+    {
+      s.phase = "CHECKPOINT_REQUESTED";
+      s.pendingDetail = "python_persistence_observer_initialization";
+      if (observers.blockingCount != 0 || observers.blockingOverflow)
+      {
+        FailLocked(s, "native_admission", "python_persistence_observer_initialization_failed");
+        return false;
+      }
+      return true;
+    }
+    s.writeAdmissionStarted = true;
+    s.phase = "QUIESCE";
+    s.pendingDetail.clear();
+  }
+''' + admission + '''  return true;
+}
+
+ApplicationStartupScope::ApplicationStartupScope()
+{
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  // Only the one engine entry before Create/Initialize establishes this scope.
+  if (!s.active.load() && !s.startupInProgress)
+  { s.startupInProgress = true; m_started = true; }
+}
+ApplicationStartupScope::~ApplicationStartupScope()
+{
+  if (!m_started || m_completed) return;
+  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+  s.startupInProgress = false;
+  s.startupError = "application_startup_initialization_failed";
+  if (s.active.load()) FailLocked(s, "native_admission", s.startupError);
+}
+void ApplicationStartupScope::Complete()
+{
+  if (!m_started || m_completed) return;
+  m_completed = true;
+  uint64_t generation = 0;
+  {
+    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+    s.startupCoreComplete = true;
+    s.startupInProgress = false;
+    generation = s.generation;
+  }
+  ActivateWriteAdmission(generation);
+}
+
+'''
+    text = text[:start] + activation + request + text[end:]
+    return once(text, '''void Pump(CApplication& application)
+{''', '''void Pump(CApplication& application)
+{
+  uint64_t pendingGeneration = 0;
+  {
+    auto& s = Get();
+    std::lock_guard<std::mutex> lock(s.mutex);
+    if (s.active.load() && !s.requestReady) pendingGeneration = s.generation;
+  }
+  if (pendingGeneration) ActivateWriteAdmission(pendingGeneration);''')
+
+
+def engine_entry(text):
+    text = once(text, '#include "platform/android/activity/XBMCApp.h"',
+                '#include "platform/android/activity/XBMCApp.h"\n#include "platform/android/activity/InfinityAndroidCheckpoint.h"')
+    text = once(text, '  int status = -1;', '''  int status = -1;
+#if defined(TARGET_ANDROID)
+  InfinityAndroidCheckpoint::ApplicationStartupScope infinityStartup;
+#endif''')
+    return once(text, '  status = g_application.Run();', '''#if defined(TARGET_ANDROID)
+  // Core creation and initialization have succeeded; keep the original Close
+  // deadline and activate its existing admission/save sequence now.
+  infinityStartup.Complete();
+#endif
+  status = g_application.Run();''')
+
+
+def application(text):
+    anchor = 'void CApplication::FrameMove(bool processEvents, bool processGUI)'
+    start = text.index(anchor)
+    return text[:start] + once(text[start:], '''  if (InfinityAndroidCheckpoint::IsActive())
+  {
+    // Existing Python owners can finish''', '''  if (InfinityAndroidCheckpoint::IsWriteAdmissionActive())
+  {
+    // Existing Python owners can finish''')
 
 def jobs(text):
+    text = once(text, '  if (InfinityAndroidCheckpoint::IsActive() && !checkpointPreviouslyAccepted &&',
+                '  if (InfinityAndroidCheckpoint::IsWriteAdmissionActive() && !checkpointPreviouslyAccepted &&')
     return once(text, '''      if (actualType.find("CRepositoryUpdateJob") != std::string::npos)
       {
         role = CJob::CheckpointResponsibility::Required;''', '''      if (actualType.find("CRepositoryUpdateJob") != std::string::npos)
@@ -315,7 +480,7 @@ def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository), (ENGINE_ENTRY, engine_entry), (APPLICATION, application)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)

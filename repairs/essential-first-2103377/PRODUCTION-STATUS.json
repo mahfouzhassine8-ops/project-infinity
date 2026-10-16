@@ -17,7 +17,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "Native38887113826 atf2c663fa passed including full engine, preserved observer correction and seven directory controls. Current increment changes only verification of the post-install receiver; no native rebuild required.",
+    "current_corrections": "Previous green native38887113826/f2c663fa preserved. New early-startup/admission sequencing requires complete new ARM64 build and matched Android; no new candidate accepted.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -106,11 +106,11 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Latest Android38887412457 passed all308 regressions and complete fresh TEST4RC02 Close/death/integrity/reopen. Its37-service signed TEST3 baseline also closed completely and produced a verified46-file backup.",
-    "After explicit APK install-r, Android started a new Java InfinityCobraBootReceiver process8053. The comparison mistakenly required zero UID processes at this distinct upgrade event and stopped before candidate engine launch. This is the current verification blocker, not a new native save failure.",
-    "Fourteen targeted verification-boundary controls pass; normal Close still requires whole-UID death. Repeat matched Android early/loaded upgrade Close, exact saved-byte comparisons, actual mkdirs essential-write test, both Java seals, integrity and reopening.",
-    "Native38887113826/f2c663fa succeeded including7 directory controls and full ARM64 engine; reuse it without changing native code.",
-    "Full physical Diggz/custom Infinity skin acceptance remains unverified. Deliver candidate only after all internal gates; no final lock without physical Fold approval."
+    "Latest Android38892686819 passed308 regressions,14 receiver controls,fresh shutdown/reopen,37-service baseline Close and exact upgrade data hashes. Actual early candidate Close interrupted core keyboard-layout reading before any Python writer existed, then expired in25198ms without authorization.",
+    "Required startup directory reads were rejected by directory-work admission before Create completed. A real37-interpreter control also proves that closing mutation admission before observer installation rejects a required zlib import.",
+    "Corrected native sequencing retains original request identity/deadline, permits accepted core startup, uses actual successful Create/CreateGUI/Initialize proof, closes new invokers then waits only for already-admitted native observer installation before applying existing write admission and saves. Failed core startup, missing/failed observers and genuine write errors remain blockers.",
+    "Local34 coordinator/startup cases,15 JobManager cases,12 repository controls,5 observer controls and16 source contracts pass. Full ARM64 rebuild,installer/save/authorization gates and matched308 Android early/loaded acceptance remain required.",
+    "No new Fold APK promotion or final lock. Configured physical Fold approval remains required; no physical data was modified."
   ],
   "internal_android_probes": [
     {
@@ -1037,40 +1037,66 @@
     "matched_android_plan": "Retain all 308 tests, exact signed TEST2 and TEST3 Java/payload comparisons, original fresh production Close, then disposable TEST3->TEST4 in-place upgrade with 37 synthetic services, verified pre-upgrade backup hashes, early and loaded Close, both Java seals, whole-UID death, integrity and reopen."
   },
   "latest_verification_attempt": {
+    "run": 38892686819,
+    "source_commit": "7caf6186932a001c90d914738ca4e2f98b0e3260",
     "native_run": 38887113826,
     "native_commit": "f2c663fac800a03104f349cea98853a22c033922",
-    "native_status": "success",
-    "native_directory_cases_passed": 7,
-    "android_run": 38887412457,
-    "android_commit": "412c6341d70af35b5b2cc43b8b8a0806349383de",
-    "evidence_artifact": 12041269355,
-    "evidence_zip_sha256": "3a6ccc3f4b36c7af8ca720991c3c3c55750bdca6527be9da490c0a3f107143b9",
+    "evidence_artifact": 12042654417,
+    "evidence_zip_sha256": "e7be1e8d21d5ca46f61381d4a03f2b7161e994ee4de00de4c6f05f80b7444b4c",
     "all_308_passed": true,
+    "receiver_controls_passed": 14,
     "fresh_test4": {
       "passed": true,
       "apk_sha256": "fc8a2792c6159eeb3d86dae2dddf72d0b8435a9fb846e56c3b00bf471e2e1205",
       "whole_package_death_verified": true,
       "both_java_process_save_proofs_verified": true,
-      "favourites_preserved": true,
-      "reopen_verified": true
+      "reopen_verified": true,
+      "favourites_preserved": true
     },
-    "baseline_ready_services": 37,
-    "verified_backup_files": 46,
-    "upgrade_install": "Performing Streamed Install\nSuccess\n",
-    "failure": "AssertionError: Verify backup only after real whole-UID death",
-    "receiver_pid": 8053,
-    "receiver_process_name": "com.projectinfinity.kodi",
-    "receiver_origin": "10-16 11:05:07.340   497   537 I ActivityManager: Start proc 8053:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}",
-    "apk_delivered": false,
+    "baseline_37_close_passed": true,
+    "upgrade_bytes_preserved": true,
+    "candidate_early_close": {
+      "ready_service_count": 0,
+      "started_epoch_ms": 1792150381760,
+      "updated_epoch_ms": 1792150406880,
+      "phase": "CHECKPOINT_FAILED",
+      "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+      "total_duration_ms": 25198,
+      "pid": 8533,
+      "owner": "c161aa40-ea6c-4a30-9741-0e6175eaff49",
+      "authorization_consumed": false,
+      "script_persistence": {
+        "active_writers": 0,
+        "advisory_count": 0,
+        "advisory_retired_writers": 0,
+        "blocker_overflow": false,
+        "blockers": [],
+        "blocking_count": 0,
+        "blocking_overflow": false,
+        "durable": false,
+        "error": "",
+        "failed_settled_writers": 0,
+        "failure_detail": "",
+        "failure_writer": "",
+        "failure_writer_id": -1,
+        "observed_writers": 0,
+        "pending_writers": [],
+        "retired_writers": 0,
+        "sync_finished": false,
+        "sync_started": false,
+        "tracked_paths": 0
+      },
+      "essential_writes_sealed": false,
+      "essential_writes_durable": false
+    },
+    "startup_log_lines": [
+      "2026-10-16 11:33:00.926 T:8619     info <general>: Starting Kodi (21.3 (21.3.0) Git:20251031-a3a448d-dirty). Platform: Android ARM 64-bit",
+      "2026-10-16 11:33:02.754 T:8619  warning <general>: CKeyboardLayoutManager: no keyboard layouts found in special://xbmc/system/keyboardlayouts",
+      "2026-10-16 11:33:02.755 T:8619  critical <general>: CApplication::Create: Unable to load keyboard layouts"
+    ],
     "physical_fold_accepted": false,
-    "locked": false,
-    "baseline_loaded_close": {
-      "passed": true,
-      "duration_ms": 4877,
-      "both_java_seals_verified": true,
-      "whole_package_death_verified": true,
-      "ready_service_count": 37
-    }
+    "apk_delivered": false,
+    "locked": false
   },
   "existing_directory_correction": {
     "root_cause": "xbmcvfs.mkdirs -> CreateDirectoryEx -> existing ancestor CPosixDirectory::Create -> checked posix.mkdir -> mkdir EEXIST -> attempted path retained -> seal unnecessarily syncs /storage",
@@ -1094,6 +1120,24 @@
     "post_close_whole_uid_death_still_required": true,
     "post_install_known_receiver_requires_observed_origin_and_no_native_engine": true,
     "exact_saved_bytes_still_required": true,
+    "matched_android_required": true,
+    "physical_fold_accepted": false,
+    "locked": false
+  },
+  "early_startup_admission_correction": {
+    "report": "EARLY-STARTUP-ADMISSION.md",
+    "core_proof": "Actual XBMC_Run scope completes only after Create/CreateGUI/Initialize success; does not fake optional GUI_UI_READY flag",
+    "observer_requirement": "Freeze new invokers, observe every already-admitted observer installation before BeginWriteProtection; never wait optional add-on completion",
+    "coordinator_cases": 34,
+    "original_coordinator_cases_retained": 18,
+    "job_cases": 15,
+    "original_job_cases_retained": 13,
+    "observer_controls": 5,
+    "expected_before_start_refusal_control": true,
+    "repository_controls": 12,
+    "original_deadline_unchanged": true,
+    "genuine_core_save_observer_failures_still_block": true,
+    "native_rebuild_required": true,
     "matched_android_required": true,
     "physical_fold_accepted": false,
     "locked": false
