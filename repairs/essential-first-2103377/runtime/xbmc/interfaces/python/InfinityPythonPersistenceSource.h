@@ -32,9 +32,6 @@ import _io
 _INFINITY_INITIALIZATION_STAGE = 'python.import.os'
 _infinity_report_initialization_stage()
 import os
-_INFINITY_INITIALIZATION_STAGE = 'python.import.shutil'
-_infinity_report_initialization_stage()
-import shutil
 _INFINITY_INITIALIZATION_STAGE = 'python.import.sqlite3'
 _infinity_report_initialization_stage()
 import sqlite3
@@ -72,6 +69,15 @@ _infinity_report_initialization_stage()
 from urllib.parse import unquote, urlsplit, parse_qs
 _INFINITY_INITIALIZATION_STAGE = 'python.define_observer'
 _infinity_report_initialization_stage()
+
+
+def _which(command):
+    # Observer installation does not resolve or launch child commands. Import
+    # the original resolver only when a command actually needs PATH lookup,
+    # before any child is allowed to start. Keep shutil.which semantics and all
+    # Python/native child checks; an import/lookup error propagates unchanged.
+    import shutil
+    return shutil.which(command)
 
 
 def protected_method(name, dirty=False, clean=False):
@@ -650,7 +656,7 @@ class Observer:
             # mutate persistent state. Resolve PATH-based spelling to the
             # immutable system binary before allowing it.
             if 1 <= len(command) <= 2 and command[0] in ('getprop', '/system/bin/getprop'):
-                resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+                resolved = command[0] if command[0].startswith('/') else _which(command[0])
                 if resolved != '/system/bin/getprop':
                     return False
                 if len(command) == 2:
@@ -665,7 +671,7 @@ class Observer:
             # a single information argument. distro uses the combined -rs
             # argument; both flags only print kernel identity.
             if 1 <= len(command) <= 2 and command[0] in ('uname', '/system/bin/uname'):
-                resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+                resolved = command[0] if command[0].startswith('/') else _which(command[0])
                 host_uname = observer.host_probe and resolved in ('/bin/uname', '/usr/bin/uname')
                 if resolved != '/system/bin/uname' and not host_uname:
                     return False
@@ -681,7 +687,7 @@ class Observer:
             # arguments and remain fail-closed.
             if not command or not isinstance(command[0], str):
                 return False
-            resolved = command[0] if command[0].startswith('/') else shutil.which(command[0])
+            resolved = command[0] if command[0].startswith('/') else _which(command[0])
             if resolved == '/system/bin/ip':
                 return (len(command) == 2 and isinstance(command[1], str) and
                         command[1] in ('addr', 'address', 'link', 'route', 'neigh', 'rule'))
@@ -737,7 +743,7 @@ class Observer:
                             kwargs.get('executable') in (None, command[0]))
                 if readonly:
                     if not command[0].startswith('/'):
-                        resolved = shutil.which(command[0])
+                        resolved = _which(command[0])
                         approved = resolved in ('/system/bin/uname', '/system/bin/getprop',
                                                 '/system/bin/ip', '/system/bin/ifconfig')
                         if observer.host_probe and resolved in ('/bin/uname', '/usr/bin/uname'):

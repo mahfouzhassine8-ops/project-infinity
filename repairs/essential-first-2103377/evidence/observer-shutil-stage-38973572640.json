@@ -1,0 +1,1412 @@
+{
+  "run_id": 38973572640,
+  "workflow_source": "de0560d599d4100d4e1b58b41cf5a4d5f7be508e",
+  "native_source": "e78c769d99b626b47292fb2bcac0d09661735fc6",
+  "native_run": 38967896318,
+  "native_result": "success",
+  "packaging_job": 117217607587,
+  "packaging_result": "success",
+  "android_job": 117218186580,
+  "android_result": "failure",
+  "artifact_id": 12078856174,
+  "artifact_sha256": "09148da4bb8fbcd6b43f60316281d36e05bd7af4982e555b4256162199ee1c85",
+  "apk_sha256": "284465f25e1551ed1b167fdb1db129d483b8dc8e3a12ec746fae396b3e68852c",
+  "permanent_signer": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "saved_308_results_reused": true,
+  "all_rc05_non_engine_apk_bytes_preserved": true,
+  "upgrade_bytes_preserved": true,
+  "core_boundary": {
+    "boundary": "core-initialized",
+    "owner": "105c513a-5494-4a32-97c4-0969b85df2d2",
+    "pid": 8491,
+    "owner_began_epoch_ms": 1792188923980,
+    "observed_monotonic": 601.715545196,
+    "stale_log_rejected": true,
+    "current_native_thread_verified": true,
+    "device_utc_offset": "+0000",
+    "before_log_sha256": "19c5f9b976b0377b884ae9c3476b1c558a585c502190939afafe1941a5ae0d60",
+    "before_log_sample_bytes": 67353,
+    "log_sample_limit": 262144,
+    "starting_kodi_epoch_ms": 1792188926400,
+    "starting_kodi_log_time": "2026-10-16 22:15:26.400",
+    "core_initialized_epoch_ms": 1792188943984,
+    "core_initialized_log_time": "2026-10-16 22:15:43.984",
+    "application_running_epoch_ms": 1792188943988,
+    "application_running_log_time": "2026-10-16 22:15:43.988",
+    "main_native_tid": 8575,
+    "log_sha256": "34fdc1fe1956df8562ad48be58f91e121eecd1f25c181b94eeb016cb2d0dcbeb",
+    "log_sample_bytes": 33059
+  },
+  "close_started_epoch_ms": 1792188948235,
+  "native_elapsed_ms": 25279,
+  "coordinator_elapsed_ms": 25870,
+  "active_writers": 41,
+  "observed_writers": 0,
+  "initialization_stage_counts": {
+    "python.import.shutil": 38,
+    "python.import.importlib": 2,
+    "python.source.compile": 1
+  },
+  "initialization_progress": [
+    {
+      "elapsed_ms": 30185,
+      "interpreter_identity": 137918969626688,
+      "native_tid": 9593,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 14478,
+      "steps": [
+        {
+          "elapsed_ms": 15706,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 15706,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 15706,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 15707,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "script.infinity.commandcenter:service.py",
+      "writer_id": 0
+    },
+    {
+      "elapsed_ms": 30149,
+      "interpreter_identity": 137920298389568,
+      "native_tid": 9595,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 5102,
+      "steps": [
+        {
+          "elapsed_ms": 25047,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 25047,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 25047,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 25047,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.infinity.chooser.weather.snapshot:weather_snapshot.py",
+      "writer_id": 1
+    },
+    {
+      "elapsed_ms": 30118,
+      "interpreter_identity": 137918969151552,
+      "native_tid": 9596,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 7026,
+      "steps": [
+        {
+          "elapsed_ms": 23092,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 23092,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 23092,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 23092,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.infinity.compat:runtime_service.py",
+      "writer_id": 2
+    },
+    {
+      "elapsed_ms": 30054,
+      "interpreter_identity": 137950376431680,
+      "native_tid": 9599,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 4198,
+      "steps": [
+        {
+          "elapsed_ms": 25855,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 25855,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 25855,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 25855,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer01:service.py",
+      "writer_id": 3
+    },
+    {
+      "elapsed_ms": 30051,
+      "interpreter_identity": 137918968201280,
+      "native_tid": 9600,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 3296,
+      "steps": [
+        {
+          "elapsed_ms": 26755,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 26755,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 26755,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 26755,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer02:service.py",
+      "writer_id": 4
+    },
+    {
+      "elapsed_ms": 30043,
+      "interpreter_identity": 137918966894656,
+      "native_tid": 9603,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 7746,
+      "steps": [
+        {
+          "elapsed_ms": 22296,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 22296,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 22297,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 22297,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer03:service.py",
+      "writer_id": 5
+    },
+    {
+      "elapsed_ms": 30033,
+      "interpreter_identity": 137918968676416,
+      "native_tid": 9604,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 8131,
+      "steps": [
+        {
+          "elapsed_ms": 21901,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 21901,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 21901,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 21902,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer04:service.py",
+      "writer_id": 6
+    },
+    {
+      "elapsed_ms": 30030,
+      "interpreter_identity": 137918967488576,
+      "native_tid": 9605,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.importlib",
+      "stage_elapsed_ms": 1230,
+      "steps": [
+        {
+          "elapsed_ms": 28535,
+          "stage": "python.source.compile"
+        },
+        {
+          "elapsed_ms": 28799,
+          "stage": "python.source.execute"
+        },
+        {
+          "elapsed_ms": 28799,
+          "stage": "python.import.builtins"
+        },
+        {
+          "elapsed_ms": 28800,
+          "stage": "python.import.importlib"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 24,
+      "writer": "service.observerprobe.writer05:service.py",
+      "writer_id": 7
+    },
+    {
+      "elapsed_ms": 30027,
+      "interpreter_identity": 137918966419520,
+      "native_tid": 9607,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 10992,
+      "steps": [
+        {
+          "elapsed_ms": 19033,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 19034,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 19034,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 19034,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer06:service.py",
+      "writer_id": 8
+    },
+    {
+      "elapsed_ms": 30013,
+      "interpreter_identity": 137918967251008,
+      "native_tid": 9609,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 5834,
+      "steps": [
+        {
+          "elapsed_ms": 24178,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 24178,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 24178,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 24178,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer07:service.py",
+      "writer_id": 9
+    },
+    {
+      "elapsed_ms": 30005,
+      "interpreter_identity": 137918967369792,
+      "native_tid": 9610,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 17790,
+      "steps": [
+        {
+          "elapsed_ms": 12214,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 12215,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 12215,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 12215,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer08:service.py",
+      "writer_id": 10
+    },
+    {
+      "elapsed_ms": 29996,
+      "interpreter_identity": 137918967726144,
+      "native_tid": 9611,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 7797,
+      "steps": [
+        {
+          "elapsed_ms": 22198,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 22198,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 22198,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 22198,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer09:service.py",
+      "writer_id": 11
+    },
+    {
+      "elapsed_ms": 29989,
+      "interpreter_identity": 137918968438848,
+      "native_tid": 9612,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 3734,
+      "steps": [
+        {
+          "elapsed_ms": 26254,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 26255,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 26255,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 26255,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer10:service.py",
+      "writer_id": 12
+    },
+    {
+      "elapsed_ms": 29985,
+      "interpreter_identity": 137918968557632,
+      "native_tid": 9613,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 13282,
+      "steps": [
+        {
+          "elapsed_ms": 16702,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 16702,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 16702,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 16702,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer11:service.py",
+      "writer_id": 13
+    },
+    {
+      "elapsed_ms": 29972,
+      "interpreter_identity": 137918966181952,
+      "native_tid": 9615,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 14146,
+      "steps": [
+        {
+          "elapsed_ms": 15826,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 15826,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 15826,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 15826,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer12:service.py",
+      "writer_id": 14
+    },
+    {
+      "elapsed_ms": 29965,
+      "interpreter_identity": 137918969032768,
+      "native_tid": 9617,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 8536,
+      "steps": [
+        {
+          "elapsed_ms": 21428,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 21428,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 21428,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 21428,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer13:service.py",
+      "writer_id": 15
+    },
+    {
+      "elapsed_ms": 29956,
+      "interpreter_identity": 137918965825600,
+      "native_tid": 9618,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 13698,
+      "steps": [
+        {
+          "elapsed_ms": 16258,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 16258,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 16258,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 16258,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer14:service.py",
+      "writer_id": 16
+    },
+    {
+      "elapsed_ms": 29945,
+      "interpreter_identity": 137918965469248,
+      "native_tid": 9619,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.source.compile",
+      "stage_elapsed_ms": 244,
+      "steps": [
+        {
+          "elapsed_ms": 29024,
+          "stage": "native.hooks.install"
+        },
+        {
+          "elapsed_ms": 29700,
+          "stage": "python.globals"
+        },
+        {
+          "elapsed_ms": 29700,
+          "stage": "python.source"
+        },
+        {
+          "elapsed_ms": 29700,
+          "stage": "python.source.compile"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 21,
+      "writer": "service.observerprobe.writer15:service.py",
+      "writer_id": 17
+    },
+    {
+      "elapsed_ms": 29938,
+      "interpreter_identity": 137918967132224,
+      "native_tid": 9620,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.importlib",
+      "stage_elapsed_ms": 2055,
+      "steps": [
+        {
+          "elapsed_ms": 27617,
+          "stage": "python.source.compile"
+        },
+        {
+          "elapsed_ms": 27882,
+          "stage": "python.source.execute"
+        },
+        {
+          "elapsed_ms": 27882,
+          "stage": "python.import.builtins"
+        },
+        {
+          "elapsed_ms": 27882,
+          "stage": "python.import.importlib"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 24,
+      "writer": "service.observerprobe.writer16:service.py",
+      "writer_id": 18
+    },
+    {
+      "elapsed_ms": 29923,
+      "interpreter_identity": 137918969745472,
+      "native_tid": 9621,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 7470,
+      "steps": [
+        {
+          "elapsed_ms": 22452,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 22452,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 22452,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 22452,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer17:service.py",
+      "writer_id": 19
+    },
+    {
+      "elapsed_ms": 29907,
+      "interpreter_identity": 137920297857088,
+      "native_tid": 9622,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 9163,
+      "steps": [
+        {
+          "elapsed_ms": 20743,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 20743,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 20743,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 20743,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer18:service.py",
+      "writer_id": 20
+    },
+    {
+      "elapsed_ms": 29897,
+      "interpreter_identity": 137920297988160,
+      "native_tid": 9623,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 16079,
+      "steps": [
+        {
+          "elapsed_ms": 13818,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 13818,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 13818,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 13818,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer19:service.py",
+      "writer_id": 21
+    },
+    {
+      "elapsed_ms": 29890,
+      "interpreter_identity": 137918965706816,
+      "native_tid": 9624,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 10919,
+      "steps": [
+        {
+          "elapsed_ms": 18970,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 18970,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 18970,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 18970,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer20:service.py",
+      "writer_id": 22
+    },
+    {
+      "elapsed_ms": 29883,
+      "interpreter_identity": 137918968795200,
+      "native_tid": 9625,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 2574,
+      "steps": [
+        {
+          "elapsed_ms": 27308,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 27308,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 27308,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 27308,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer21:service.py",
+      "writer_id": 23
+    },
+    {
+      "elapsed_ms": 29874,
+      "interpreter_identity": 137918968082496,
+      "native_tid": 9626,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 7073,
+      "steps": [
+        {
+          "elapsed_ms": 22800,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 22800,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 22800,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 22800,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer22:service.py",
+      "writer_id": 24
+    },
+    {
+      "elapsed_ms": 29865,
+      "interpreter_identity": 137918966538304,
+      "native_tid": 9627,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 14129,
+      "steps": [
+        {
+          "elapsed_ms": 15735,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 15735,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 15735,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 15735,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer23:service.py",
+      "writer_id": 25
+    },
+    {
+      "elapsed_ms": 29857,
+      "interpreter_identity": 137918967844928,
+      "native_tid": 9628,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 6245,
+      "steps": [
+        {
+          "elapsed_ms": 23611,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 23611,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 23611,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 23611,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer24:service.py",
+      "writer_id": 26
+    },
+    {
+      "elapsed_ms": 29845,
+      "interpreter_identity": 137918969507904,
+      "native_tid": 9629,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 8227,
+      "steps": [
+        {
+          "elapsed_ms": 21618,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 21618,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 21618,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 21618,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer25:service.py",
+      "writer_id": 27
+    },
+    {
+      "elapsed_ms": 29833,
+      "interpreter_identity": 137918965944384,
+      "native_tid": 9630,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 2957,
+      "steps": [
+        {
+          "elapsed_ms": 26876,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 26876,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 26876,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 26876,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer26:service.py",
+      "writer_id": 28
+    },
+    {
+      "elapsed_ms": 29824,
+      "interpreter_identity": 137918966657088,
+      "native_tid": 9631,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 17372,
+      "steps": [
+        {
+          "elapsed_ms": 12452,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 12452,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 12452,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 12452,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer27:service.py",
+      "writer_id": 29
+    },
+    {
+      "elapsed_ms": 29813,
+      "interpreter_identity": 137918966063168,
+      "native_tid": 9632,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 10162,
+      "steps": [
+        {
+          "elapsed_ms": 19650,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 19651,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 19651,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 19651,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer28:service.py",
+      "writer_id": 30
+    },
+    {
+      "elapsed_ms": 29806,
+      "interpreter_identity": 137918967607360,
+      "native_tid": 9633,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 1579,
+      "steps": [
+        {
+          "elapsed_ms": 28225,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 28226,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 28226,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 28226,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer29:service.py",
+      "writer_id": 31
+    },
+    {
+      "elapsed_ms": 29793,
+      "interpreter_identity": 137918967013440,
+      "native_tid": 9634,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 14015,
+      "steps": [
+        {
+          "elapsed_ms": 15778,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 15778,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 15778,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 15778,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer30:service.py",
+      "writer_id": 32
+    },
+    {
+      "elapsed_ms": 29781,
+      "interpreter_identity": 137918969270336,
+      "native_tid": 9635,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 10165,
+      "steps": [
+        {
+          "elapsed_ms": 19616,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 19616,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 19616,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 19616,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer31:service.py",
+      "writer_id": 33
+    },
+    {
+      "elapsed_ms": 29773,
+      "interpreter_identity": 137918965588032,
+      "native_tid": 9637,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 3320,
+      "steps": [
+        {
+          "elapsed_ms": 26453,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 26453,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 26453,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 26453,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer32:service.py",
+      "writer_id": 34
+    },
+    {
+      "elapsed_ms": 29765,
+      "interpreter_identity": 137918966300736,
+      "native_tid": 9638,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 16069,
+      "steps": [
+        {
+          "elapsed_ms": 13696,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 13696,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 13696,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 13696,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer33:service.py",
+      "writer_id": 35
+    },
+    {
+      "elapsed_ms": 29757,
+      "interpreter_identity": 137918968913984,
+      "native_tid": 9640,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 9538,
+      "steps": [
+        {
+          "elapsed_ms": 20218,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 20218,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 20218,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 20219,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer34:service.py",
+      "writer_id": 36
+    },
+    {
+      "elapsed_ms": 29750,
+      "interpreter_identity": 137918966775872,
+      "native_tid": 9641,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 17776,
+      "steps": [
+        {
+          "elapsed_ms": 11973,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 11973,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 11973,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 11973,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer35:service.py",
+      "writer_id": 37
+    },
+    {
+      "elapsed_ms": 29741,
+      "interpreter_identity": 137918969389120,
+      "native_tid": 9642,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 9458,
+      "steps": [
+        {
+          "elapsed_ms": 20282,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 20282,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 20282,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 20282,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer36:service.py",
+      "writer_id": 38
+    },
+    {
+      "elapsed_ms": 29729,
+      "interpreter_identity": 137918967963712,
+      "native_tid": 9643,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 10943,
+      "steps": [
+        {
+          "elapsed_ms": 18786,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 18786,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 18786,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 18786,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.observerprobe.writer37:service.py",
+      "writer_id": 39
+    },
+    {
+      "elapsed_ms": 29723,
+      "interpreter_identity": 137918968320064,
+      "native_tid": 9644,
+      "observed": false,
+      "pid": 8491,
+      "stage": "python.import.shutil",
+      "stage_elapsed_ms": 1021,
+      "steps": [
+        {
+          "elapsed_ms": 28702,
+          "stage": "python.import.io"
+        },
+        {
+          "elapsed_ms": 28702,
+          "stage": "python.import._io"
+        },
+        {
+          "elapsed_ms": 28702,
+          "stage": "python.import.os"
+        },
+        {
+          "elapsed_ms": 28702,
+          "stage": "python.import.shutil"
+        }
+      ],
+      "steps_overflow": false,
+      "steps_total": 28,
+      "writer": "service.xbmc.versioncheck:runner.py",
+      "writer_id": 40
+    }
+  ],
+  "blocking_count": 0,
+  "recorded_python_exception": false,
+  "write_admission_started": false,
+  "essential_owners_started": 0,
+  "essential_owners_completed": 0,
+  "essential_writes_sealed": false,
+  "essential_writes_durable": false,
+  "authorization_consumed": false,
+  "remaining_processes": [
+    {
+      "pid": 8169,
+      "uid": 10167,
+      "name": "com.projectinfinity.kodi"
+    },
+    {
+      "pid": 8491,
+      "uid": 10167,
+      "name": "com.projectinfinity.kodi:kodi"
+    }
+  ],
+  "actual_diggz_ecosystem_tested": false,
+  "physical_fold_accepted": false,
+  "root_cause_scope": "Confirmed unnecessary eager shutil dependency dominates the deadline snapshot (38/41); inner shutil dependency wait and Android timing benefit of deferral are not yet established.",
+  "targeted_correction": "Load original shutil.which only when a child command needs PATH resolution; preserve all child/write guards and original errors.",
+  "host_regression": {
+    "scope": "Controlled dependency reproduction in real CPython3.11 subinterpreters; not Android timing or Fold acceptance",
+    "previous_production_source": "e78c769d99b626b47292fb2bcac0d09661735fc6",
+    "results": [
+      {
+        "case": "legacy-dependency-41",
+        "passed": true,
+        "active": 41,
+        "observed": 0,
+        "resolver_import_attempts": 41,
+        "blocking_count": 41,
+        "termination_authorized": false
+      },
+      {
+        "case": "deferred-41",
+        "passed": true,
+        "active": 41,
+        "observed": 41,
+        "resolver_import_attempts": 0,
+        "blocking_count": 0,
+        "termination_authorized": false
+      },
+      {
+        "case": "lookup-success",
+        "passed": true,
+        "active": 1,
+        "observed": 1,
+        "resolver_import_attempts": 1,
+        "blocking_count": 0,
+        "termination_authorized": false
+      },
+      {
+        "case": "lookup-failure-before-child",
+        "passed": true,
+        "active": 1,
+        "observed": 1,
+        "resolver_import_attempts": 1,
+        "blocking_count": 0,
+        "termination_authorized": false
+      },
+      {
+        "case": "real-buffer-flush-failure",
+        "passed": true,
+        "active": 1,
+        "observed": 1,
+        "resolver_import_attempts": 0,
+        "blocking_count": 1,
+        "termination_authorized": false
+      }
+    ],
+    "all_passed": true,
+    "android_timing_verified": false,
+    "physical_fold_accepted": false,
+    "apk_deliverable": false
+  },
+  "local_preserved_checks": {
+    "initialization": 11,
+    "close_race": 5,
+    "live_stages": 7,
+    "progress": 8,
+    "real_write_and_child_guards": 16,
+    "strict_source_contracts": 16
+  },
+  "apk_deliverable": false,
+  "final_lock_authorized": false
+}

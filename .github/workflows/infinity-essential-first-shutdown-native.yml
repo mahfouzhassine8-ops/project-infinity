@@ -101,6 +101,9 @@ jobs:
           python3 repairs/essential-first-2103377/test_live_initialization_stage_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
             --out shutdown-rc1-host/live-initialization-stage-native.json
+          python3 repairs/essential-first-2103377/test_deferred_command_resolver_native.py \
+            --python-prefix "$pythonLocation" --sqlite-include /usr/include \
+            --out shutdown-rc1-host/deferred-command-resolver-native.json
           python3 repairs/essential-first-2103377/test_startup_invoker_admission.py \
             --out shutdown-rc1-host/startup-invoker-admission.json
       - name: Check two-file source patch and all protected gates

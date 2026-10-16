@@ -96,8 +96,8 @@ int main(int argc,char** argv) {
   Contexts().erase(main->interp);
  } else {
   const bool failure=mode=="source-original-failure";
-  const unsigned count=mode=="paused-shutil-37"?37:1;
-  gate.module=mode=="paused-ctypes"?"ctypes":"shutil";
+  const unsigned count=mode=="paused-sqlite3-37"?37:1;
+  gate.module=mode=="paused-ctypes"?"ctypes":"sqlite3";
   if(!failure)assert(PySys_AddAuditHook(pauseImport,nullptr)==0);
   std::vector<PyThreadState*> bootstrap;std::vector<std::thread> workers;
   for(unsigned i=0;i<count;++i) {
@@ -184,7 +184,7 @@ def main():
                         *['-I'+str(p) for p in includes], str(cpp), '-L'+str(prefix/'lib'), '-lpython3.11',
                         '-l:libsqlite3.so.0', '-ldl', '-lm', '-lcrypto', '-Wl,--export-dynamic', '-o', str(binary)], check=True)
         env = dict(os.environ, PYTHONHOME=str(prefix), LD_LIBRARY_PATH=str(prefix/'lib'), PYTHONDONTWRITEBYTECODE='1')
-        for mode in ('paused-shutil', 'paused-ctypes', 'paused-shutil-37', 'source-original-failure',
+        for mode in ('paused-sqlite3', 'paused-ctypes', 'paused-sqlite3-37', 'source-original-failure',
                      'callback-original-error', 'audit-compile-exec'):
             case = folder/mode;case.mkdir();(case/'profile').mkdir();(case/'cache').mkdir()
             if mode == 'source-original-failure':

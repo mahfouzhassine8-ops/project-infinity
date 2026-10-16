@@ -1,5 +1,13 @@
 # Essential-first shutdown — production repair in progress
 
+**Latest 38973572640:** packaging/signing and exact RC05 Java/308 preservation
+passed; Android failed at the actual checkpoint. The live trace shows 38/41
+observers importing shutil, 2 importing importlib, and 1 compiling. The targeted
+[deferred command resolver correction](DEFERRED-COMMAND-RESOLVER.md) passes its
+host controls and preserves real-write failures. Full native/Android verification
+is pending; no Fold candidate is accepted or locked. Earlier statuses below are
+retained history and do not supersede this result.
+
 **Current status: Full native `38957212563` / `92b5be78`, all 308 regressions, permanent signing/baseline preservation, fresh Close (13.319s), and 37-service loaded upgrade Close (5.017s) remain PASSED. Cold-start Close failed with 2/2 observers and an incomplete Command Center PREPARE. The new phase-matched comparison `38963791371` also FAILED: Close began 5.849s after core Run, but all 41 admitted observers were still inside `PyRun_String` at expiry; none reached saving. Native hooks installed and no Python exception was recorded. Successful loaded initialization itself took about 43s under ARM translation, so neither a deadlock nor a particular import cause is proven. The next narrow checkpoint publishes existing Python initialization stages live; no timeout, admission, durability or feature changes. APK promotion remains blocked; physical approval and final lock false.**
 
 Latest: diagnostic native **38967896318 / e78c769d PASSED**. Internal diagnostic
