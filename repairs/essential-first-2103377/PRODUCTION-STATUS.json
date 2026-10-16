@@ -1,7 +1,7 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Approved Essential-First architecture and all prior corrections retained. Exact RC04 retry38945702659 captured all41 writers admitted about16 seconds after early Close, leaving about9 seconds; differing stages and no recorded exception. Reviewed92b5be78 freezes new background invokers at accepted Request, allows only missing path/source-verified required residents during core startup, and preserves all already-admitted observers, real writes, deadlines, seals and termination gates. Native38957212563 host proof passed; fullARM64 build and matchedRC05 Android38957547396 acceptance remain in progress. Isolated emulator setup38957342018 passed. No physical Fold approval, APK promotion or final lock.",
+  "implementation": "Approved Essential-First architecture preserved. Full native38957212563/92b5be78 passed. Exact signedRC05APK5103a01d passed308,permanent signing/baseline preservation,fresh13.319s andloaded37-service5.017s shutdown with16essentialowners,bothJavaseals,zeroUIDprocesses,sevenDBintegrityandretaineddatareopen. Onlypre-corecoldstressClosefailed25.227s; both2/2observersinitialized, genuineCommandCenterPREPAREproofpendingwith<1secondbudget. ActualFoldcorecompleted4.909sBEFOREClose,unlikecoldtest13.392sAFTERrequest. Reuseexactbinaryforseparatephase-matchedpending-observercomparison; noengineor308/fresh/loadedrerun. Coldfailureandpromotionblockremain; noFoldacceptanceorlock.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
     "native_cpython_3117_runtime": 61,
@@ -1658,16 +1658,16 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T19:50:34.550341+00:00",
+    "as_of_utc": "2026-10-16T20:36:09.505955+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
     "native_run_id": 38957212563,
     "native_host_proof": "passed",
-    "full_arm64_build": "in_progress",
-    "last_completed_green_native_run_id": 38945424322,
+    "full_arm64_build": "success",
+    "last_completed_green_native_run_id": 38957212563,
     "android_run_id": 38957547396,
     "android_candidate_version": "1.0.9-Essential-First-TEST4-RC05",
-    "android_acceptance": "in_progress; packaging requires exact full green native run",
+    "android_acceptance": "overall failure: only pre-core cold-start Close failed; producer/fresh/loaded passed",
     "sdk_setup_control": {
       "run_id": 38957342018,
       "result": "success",
@@ -1677,34 +1677,33 @@
       "build": 16428233
     },
     "last_completed_android_attempt": {
-      "run_id": 38955510522,
+      "run_id": 38957547396,
       "regressions_308": "passed",
       "signing_and_preservation": "passed",
-      "runtime_result": "not_run",
-      "failure": "CI executable version preflight exit127: libpulse.so.0 missing",
-      "correction": "libpulse0 prerequisite; actual launcher subsequently passed isolated control"
+      "fresh_shutdown": "passed: 13.319s",
+      "loaded_upgrade_shutdown": "passed: 5.017s; 37 controlled services",
+      "early_cold_shutdown": "failed: 25.227s; Command Center PREPARE incomplete",
+      "promotion": "skipped"
     },
     "actual_early_failure": {
-      "run_id": 38945702659,
-      "attempt": 2,
-      "job_id": 117154485478,
-      "artifact_id": 12070806322,
-      "evidence": "evidence/test4-late-python-admission-38945702659.json",
-      "stage_counts": {
-        "native.interpreter.create": 31,
-        "native.kodi_module.initialize": 5,
-        "python.source": 4,
-        "native.hooks.install": 1
-      },
-      "python_observed": 0,
-      "reported_python_blocking_failures": 0,
-      "diagnostic_inventory_complete": true,
-      "native_request_to_earliest_reported_admission_ms": 16005
+      "run_id": 38957547396,
+      "job_id": 117172981808,
+      "artifact_id": 12072846329,
+      "duration_ms": 25227,
+      "core_initialization_after_request_ms": 13392,
+      "active_python_writers": 2,
+      "observed_python_writers": 2,
+      "python_blocking_failures": 0,
+      "write_admission_started": true,
+      "playback_committed_elapsed_ms": 24127,
+      "pending_receipt": "command_center PLAYBACK_CHECKPOINTED after PREPARE",
+      "file_lock_path_proven": false,
+      "passed": false
     },
     "loaded_fixture_correction": {
       "proved_failure": "assert-elided xbmcvfs.mkdirs under PYTHONOPTIMIZE=1 caused settings open ENOENT; newline/readback assert defects also corrected",
       "controls": 12,
-      "result": "host_passed; actual corrected loaded Android shutdown pending"
+      "result": "12 controls passed; corrected loaded Android shutdown passed in 5.017s with actual write/readback and all 37 services reopening"
     },
     "new_native_controls": {
       "manager_and_source_identity": 15,
@@ -1739,10 +1738,121 @@
     "physical_fold_accepted": false,
     "final_lock_authorized": false,
     "remaining": [
-      "Complete exact full ARM64 build",
-      "Pass308 and all three matched independent Android save/seal/whole-UID-death/integrity/reopen cases",
-      "Verify exact signed candidate bytes and permanent certificate",
-      "Physical Fold test and explicit approval before final lock"
-    ]
-  }
+      "Run phase-matched early-startup comparison against the exact already-signed RC05 APK",
+      "Resolve and report current cold-start timeout without waiving any genuine essential-write failure",
+      "Full configured physical Fold test/approval remains required before final lock"
+    ],
+    "apk_sha256": "5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb",
+    "permanent_signing_and_baseline_preservation": "passed",
+    "fresh_close_ms": 13319,
+    "loaded_37_close_ms": 5017,
+    "positive_runtime_proofs": {
+      "essential_owners": 16,
+      "both_java_seals": true,
+      "external_whole_uid_death": true,
+      "seven_database_integrity": true,
+      "loaded_reopen_services": 37,
+      "retained_upgrade_hashes": 46
+    },
+    "phase_comparison": {
+      "fold_core_initialization_before_request_ms": 4909,
+      "same_apk_reused": true,
+      "native_rebuild_required": false,
+      "regression_308_rerun_required": false,
+      "fresh_loaded_rerun_required": false,
+      "scope": "separate optional core-initialized comparison with actual pending-observer proof; original cold stress retained as failed",
+      "evidence": "../android-checkpoint-shutdown/runtime-tests/evidence/rc05-startup-phase-comparison.json",
+      "status": "preparing isolated CI comparison"
+    }
+  },
+  "repair_checkpoint_history": [
+    {
+      "as_of_utc": "2026-10-16T19:50:34.550341+00:00",
+      "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
+      "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
+      "native_run_id": 38957212563,
+      "native_host_proof": "passed",
+      "full_arm64_build": "in_progress",
+      "last_completed_green_native_run_id": 38945424322,
+      "android_run_id": 38957547396,
+      "android_candidate_version": "1.0.9-Essential-First-TEST4-RC05",
+      "android_acceptance": "in_progress; packaging requires exact full green native run",
+      "sdk_setup_control": {
+        "run_id": 38957342018,
+        "result": "success",
+        "controls": 18,
+        "version_command_exit_code": 0,
+        "emulator_revision": "37.2.12.0",
+        "build": 16428233
+      },
+      "last_completed_android_attempt": {
+        "run_id": 38955510522,
+        "regressions_308": "passed",
+        "signing_and_preservation": "passed",
+        "runtime_result": "not_run",
+        "failure": "CI executable version preflight exit127: libpulse.so.0 missing",
+        "correction": "libpulse0 prerequisite; actual launcher subsequently passed isolated control"
+      },
+      "actual_early_failure": {
+        "run_id": 38945702659,
+        "attempt": 2,
+        "job_id": 117154485478,
+        "artifact_id": 12070806322,
+        "evidence": "evidence/test4-late-python-admission-38945702659.json",
+        "stage_counts": {
+          "native.interpreter.create": 31,
+          "native.kodi_module.initialize": 5,
+          "python.source": 4,
+          "native.hooks.install": 1
+        },
+        "python_observed": 0,
+        "reported_python_blocking_failures": 0,
+        "diagnostic_inventory_complete": true,
+        "native_request_to_earliest_reported_admission_ms": 16005
+      },
+      "loaded_fixture_correction": {
+        "proved_failure": "assert-elided xbmcvfs.mkdirs under PYTHONOPTIMIZE=1 caused settings open ENOENT; newline/readback assert defects also corrected",
+        "controls": 12,
+        "result": "host_passed; actual corrected loaded Android shutdown pending"
+      },
+      "new_native_controls": {
+        "manager_and_source_identity": 15,
+        "coordinator": 34,
+        "serialization": 6,
+        "observer_initialization": 11,
+        "observer_close_race": 5,
+        "native_progress": 8,
+        "existing_lifetime_escalation_quarantine": "passed",
+        "result": "all passed locally; full native host workflow passed"
+      },
+      "preserved": {
+        "signed_test3_commit": "9e9ef198ef0a68f13644621724b0762e1150438b",
+        "android_regressions": 308,
+        "essential_architecture": true,
+        "native_java_sqlite_lifecycle_corrections": true,
+        "deadline_ms": 25000,
+        "all_existing_writer_obligations": true,
+        "required_essential_owners": 16,
+        "both_java_seals_required": true,
+        "whole_package_death_required": true,
+        "integrity_and_saved_data_reopen_required": true
+      },
+      "installation_scope": {
+        "physical_fold_data_touched": false,
+        "full_backup_required": false,
+        "internal_load": "37 controlled Python services plus unchanged Infinity APK/skin/first-party services and verified retained test data",
+        "actual_diggz_ecosystem_cloned": false,
+        "configured_fold_approval_required": true
+      },
+      "apk_deliverable": false,
+      "physical_fold_accepted": false,
+      "final_lock_authorized": false,
+      "remaining": [
+        "Complete exact full ARM64 build",
+        "Pass308 and all three matched independent Android save/seal/whole-UID-death/integrity/reopen cases",
+        "Verify exact signed candidate bytes and permanent certificate",
+        "Physical Fold test and explicit approval before final lock"
+      ]
+    }
+  ]
 }

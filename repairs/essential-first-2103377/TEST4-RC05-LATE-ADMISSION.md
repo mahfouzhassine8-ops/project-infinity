@@ -54,11 +54,12 @@ termination authorization are unchanged.
   lifetime/escalation/quarantine control pass. Eleven observer initialization,
   five Close-race and eight progress cases also pass, including 37-interpreter
   initialization and fail-closed controls.
-- Native **38957212563** passed host proof; its full ARM64 build is in progress.
-- Matched RC05 Android **38957547396** waits for that exact native success, then
-  requires fresh production Close and separate retained-upgrade early/loaded
-  shutdown cases. All 308 regressions, both Java seals, essential receipts,
-  whole-package death, database integrity and saved-data reopening remain gates.
+- Native **38957212563** passed host proof and the full ARM64 build.
+- Matched RC05 Android **38957547396** passed all 308 regressions, signing and
+  baseline preservation, fresh Close (13.319s) and 37-service loaded-upgrade Close
+  (5.017s). Each passed all 16 essential owners, both Java seals, external
+  whole-UID death, seven database integrity checks and saved-data reopening.
+  Only pre-core cold-start Close failed, after 25.227s; promotion was skipped.
 - The optimized-Python fixture ENOENT was corrected and has 12 passing controls.
   The SDK loader prerequisite now passes actual isolated setup **38957342018**
   and 18 controls. Earlier setup failures are not Android shutdown outcomes.
@@ -66,3 +67,25 @@ termination authorization are unchanged.
 Internal load uses controlled services and verified retained test state; it is
 not a clone of the Fold's full Diggz ecosystem. No RC05 APK is deliverable until
 all internal gates pass. Physical Fold acceptance and final lock remain false.
+
+## Latest failure and the physical startup boundary
+
+The RC05 cold case now admits only two required residents and observes both
+correctly. Native write admission starts, both ACTIVE checks pass and playback
+commits at 24.127 seconds. Command Center's PREPARE confirmation is incomplete
+at expiry. In-flight buffers and `flock:129` are recorded, but their exact file
+identity was not captured; they are not proof of a durability error or deadlock.
+
+Read-only comparison with the actual Fold files shows `initialize done` at
+04:10:10.998 local and Close at 04:10:15.907: core initialization finished
+4.909 seconds before the Fold request. The RC05 emulator case requested Close
+13.392 seconds before core completion. These are different startup phases.
+Evidence is preserved in
+`../android-checkpoint-shutdown/runtime-tests/evidence/rc05-startup-phase-comparison.json`.
+
+A separate optional comparison reuses the exact signed APK with SHA256
+`5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb`.
+It waits for genuine current-process core initialization while requiring
+unready services and actual pending native observers. The existing cold
+stress remains recorded as failed. No engine changes, repeated green tests,
+new signer, APK promotion or final lock are part of this comparison.

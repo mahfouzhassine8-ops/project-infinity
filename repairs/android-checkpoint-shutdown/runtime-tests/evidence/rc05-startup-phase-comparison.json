@@ -1,0 +1,51 @@
+{
+  "scope": "Read-only phase comparison; existing cold-start failure remains failed; no APK or engine changes",
+  "fold": {
+    "log_file": "Infinity-Observer-Evidence-20261016-091504.zip",
+    "log_zip_sha256": "96f51b789338964303697c399945345ab9a0442278bd45afa2edfd8208f10a50",
+    "diagnostic_file": "Infinity-Diagnostics-20261016-041100.zip",
+    "diagnostic_zip_sha256": "f981984e093dac92177e0bf5263c86ac690ac85ec50cbe640f284911f98f3bf5",
+    "timezone": "America/Detroit",
+    "kodi_started_local": "2026-10-16T04:10:10.013-04:00",
+    "core_initialized_local": "2026-10-16T04:10:10.998-04:00",
+    "close_started_epoch_ms": 1792138215907,
+    "core_initialization_before_close_ms": 4909,
+    "application_run_started_local": "2026-10-16T04:10:10.998-04:00",
+    "application_run_marker_same_main_thread": true
+  },
+  "rc05_cold_stress": {
+    "run_id": 38957547396,
+    "job_id": 117172981808,
+    "artifact_id": 12072846329,
+    "artifact_sha256": "437e2ef1cfe17242f2fa02c7e09aeceedd49d826a6ce2ba84fe782871f0baaf7",
+    "close_started_utc": "2026-10-16T20:14:34.518Z",
+    "core_initialized_utc": "2026-10-16T20:14:47.910Z",
+    "close_before_core_initialization_ms": 13392,
+    "duration_ms": 25227,
+    "active_python_writers": 2,
+    "observed_python_writers": 2,
+    "python_blocking_failures": 0,
+    "write_admission_started": true,
+    "playback_committed_elapsed_ms": 24127,
+    "incomplete_receipt": "command_center PLAYBACK_CHECKPOINTED after PREPARE",
+    "exact_flock_path_proven": false,
+    "result": "FAILED; unchanged"
+  },
+  "passed_same_apk": {
+    "sha256": "5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb",
+    "native_run_id": 38957212563,
+    "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
+    "regressions": 308,
+    "fresh_close_ms": 13319,
+    "loaded_37_close_ms": 5017,
+    "essential_owners_each": 16,
+    "both_java_seals": true,
+    "external_whole_uid_death": true,
+    "databases_integrity_each": 7,
+    "loaded_reopen_services": 37,
+    "retained_upgrade_file_hashes": 46
+  },
+  "next_comparison": "Reuse exact RC05 signed APK/native from existing accepted internal inputs; test early Close after true current core initialization while observers are still pending. Retain cold result separately. No engine/308/fresh/loaded rerun or promotion.",
+  "physical_fold_accepted": false,
+  "final_lock_authorized": false
+}

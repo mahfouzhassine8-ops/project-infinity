@@ -5,6 +5,7 @@ Uses the production launcher, Power Close, first-party add-ons and native
 observers. Extra service fixtures are synthetic, not the user's Diggz build.
 """
 import argparse
+import datetime
 import hashlib
 import importlib.util
 import json
@@ -27,6 +28,9 @@ DATA = probe.PROFILE+'/addon_data/'
 DIRECTORY_FIXTURE = 'script.infinity.directoryprobe.test'
 DIRECTORY_SETTINGS = '<settings><setting id="retained-proof">native-mkdirs</setting></settings>\n'
 DIRECTORY_RESULT = DATA+DIRECTORY_FIXTURE+'/observation.json'
+CORE_LOG_LIMIT = 262144
+NATIVE_ADMISSION_SAMPLE_LIMIT = 16
+OBSERVER_TIMING_MARGIN_MS = 250
 # Kodi may compile add-ons with optimization enabled. Every fixture operation
 # and retained-data check must execute independently of Python assert removal.
 SERVICE = r'''import json, os, xbmc, xbmcaddon, xbmcvfs
@@ -96,6 +100,142 @@ def wait_owner(previous):
     raise RuntimeError('New native process owner did not appear')
 
 
+def core_boundary_baseline():
+    """Read-only pre-launch identity for the optional phase comparison."""
+    offset = probe.shell('date', '+%z').strip()
+    if not re.fullmatch(r'[+-](?:0\d|1\d|2[0-3])[0-5]\d', offset):
+        raise RuntimeError('Device UTC offset unavailable for current-startup log verification')
+    text = probe.shell('head', '-c', str(CORE_LOG_LIMIT), probe.PROFILE+'/../temp/kodi.log', check=False)
+    return dict(device_utc_offset=offset, before_log_sha256=hashlib.sha256(text.encode()).hexdigest(),
+                before_log_sample_bytes=len(text.encode()), log_sample_limit=CORE_LOG_LIMIT)
+
+
+def core_initialization_marker(text, owner, baseline):
+    """Reject the retained process's log even if it contains initialize done."""
+    digest = hashlib.sha256(text.encode()).hexdigest()
+    if digest == baseline['before_log_sha256'] or type(owner.get('began')) is not int or owner['began'] <= 0:
+        return None
+    offset = baseline['device_utc_offset']
+    def epoch(value):
+        return round(datetime.datetime.strptime(value+offset, '%Y-%m-%d %H:%M:%S.%f%z').timestamp()*1000)
+    lines = re.findall(r'^\ufeff?(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3}) T:(\d+)\s+[^\n]*?: (.*)$', text, re.MULTILINE)
+    starts = [(epoch(stamp), int(tid), stamp) for stamp, tid, message in lines
+              if message.startswith('Starting Kodi (') and epoch(stamp) >= owner['began']]
+    if len(starts) != 1:
+        return None
+    started, thread, started_text = starts[0]
+    initialized = [(epoch(stamp), stamp) for stamp, tid, message in lines
+                   if message == 'initialize done' and int(tid) == thread and epoch(stamp) >= started]
+    if len(initialized) != 1:
+        return None
+    finished, finished_text = initialized[0]
+    running = [(epoch(stamp), stamp) for stamp, tid, message in lines
+               if message == 'Running the application...' and int(tid) == thread and epoch(stamp) >= finished]
+    if len(running) != 1:
+        return None
+    running_epoch, running_text = running[0]
+    return dict(starting_kodi_epoch_ms=started, starting_kodi_log_time=started_text,
+                core_initialized_epoch_ms=finished, core_initialized_log_time=finished_text,
+                application_running_epoch_ms=running_epoch, application_running_log_time=running_text,
+                main_native_tid=thread, log_sha256=digest, log_sample_bytes=len(text.encode()))
+
+
+def wait_core_initialized(owner, baseline):
+    """Wait before Close; this neither starts nor extends a shutdown deadline."""
+    def verify_owner():
+        current = probe.read_json(probe.PRIVATE+'/files/infinity-kodi-process.json')
+        native = probe.read_json(probe.CONTROL+'/engine.json')
+        if (current.get('owner') != owner['owner'] or current.get('pid') != owner['pid'] or
+                current.get('phase') != 'RUNNING' or native.get('owner') != owner['owner'] or
+                native.get('pid') != owner['pid']):
+            raise RuntimeError('Current native owner changed before the core-initialized boundary')
+    deadline = time.monotonic()+180
+    while time.monotonic() < deadline:
+        verify_owner()
+        text = probe.shell('head', '-c', str(CORE_LOG_LIMIT), probe.PROFILE+'/../temp/kodi.log', check=False)
+        marker = core_initialization_marker(text, owner, baseline)
+        verify_owner()
+        if marker:
+            task = probe.shell('cat', '/proc/'+str(owner['pid'])+'/task/'+str(marker['main_native_tid'])+'/status', check=False)
+            if (re.search(r'^Tgid:\s*'+str(owner['pid'])+r'\s*$', task, re.MULTILINE) is None or
+                    re.search(r'^Pid:\s*'+str(marker['main_native_tid'])+r'\s*$', task, re.MULTILINE) is None):
+                raise RuntimeError('Current startup log thread is not owned by the candidate native process')
+            verify_owner()
+            return dict(boundary='core-initialized', owner=owner['owner'], pid=owner['pid'],
+                        owner_began_epoch_ms=owner['began'], observed_monotonic=time.monotonic(),
+                        stale_log_rejected=True, current_native_thread_verified=True, **baseline, **marker)
+        time.sleep(.1)
+    raise RuntimeError('Current native startup did not reach initialize done and Running the application')
+
+
+def observe_native_admission(report, receipt, owner):
+    """Bound auxiliary evidence; the existing save/termination checks stay mandatory."""
+    if receipt.get('owner') != owner['owner'] or receipt.get('pid') != owner['pid']:
+        return
+    native = receipt.get('last_native_status') or receipt.get('native_receipt') or {}
+    if (native.get('owner') != owner['owner'] or native.get('pid') != owner['pid'] or
+            not isinstance(receipt.get('session'), str) or not receipt['session'] or
+            native.get('session') != receipt['session']):
+        return
+    scripts = native.get('script_persistence') or {}
+    active, observed = scripts.get('active_writers'), scripts.get('observed_writers')
+    if any(type(value) is not int or value < 0 for value in (active, observed)):
+        return
+    elapsed = native.get('elapsed_ms')
+    sample = dict(native_phase=str(native.get('phase', ''))[:80],
+                  elapsed_ms=elapsed if type(elapsed) is int and elapsed >= 0 else None,
+                  application_core_initialized=native.get('application_core_initialized'),
+                  application_startup_in_progress=native.get('application_startup_in_progress'),
+                  write_admission_started=native.get('write_admission_started'),
+                  active_writers=active, observed_writers=observed,
+                  pending_detail=str(native.get('pending_detail', ''))[:240])
+    samples = report.setdefault('native_admission_samples', [])
+    report['native_admission_samples_seen'] = report.get('native_admission_samples_seen', 0)+1
+    if len(samples) < NATIVE_ADMISSION_SAMPLE_LIMIT and (not samples or samples[-1] != sample):
+        samples.append(sample)
+    report['native_admission_samples_truncated'] = report['native_admission_samples_seen'] > NATIVE_ADMISSION_SAMPLE_LIMIT
+    if (sample['native_phase'] == 'CHECKPOINT_REQUESTED' and
+            sample['application_core_initialized'] is True and sample['write_admission_started'] is False and
+            active > observed and not report.get('pending_observer_window_verified')):
+        report['pending_observer_window_verified'] = True
+        report['pending_observer_window_evidence'] = dict(sample, proof_kind='observed_native_pending_phase')
+    if report.get('pending_observer_window_verified'):
+        return
+    # EncodeStatusLocked samples native elapsed before InitializationProgress
+    # snapshots the same std::chrono::steady_clock durations. The Java receipt
+    # is captured after that native response, with its Close clock started
+    # before native Request. Bound that complete response/capture interval so
+    # scheduling lag cannot make a post-Request writer appear pre-Request.
+    duration = receipt.get('total_duration_ms')
+    if (type(elapsed) is not int or elapsed < 0 or type(duration) is not int or
+            duration < elapsed or duration-elapsed > OBSERVER_TIMING_MARGIN_MS or
+            sample['application_core_initialized'] is not True):
+        return
+    progress = scripts.get('initialization_progress')
+    if not isinstance(progress, list) or len(progress) > 64:
+        return
+    for row in progress:
+        if not isinstance(row, dict) or row.get('observed') is not True or row.get('stage') != 'complete':
+            continue
+        age, stage_age, writer = row.get('elapsed_ms'), row.get('stage_elapsed_ms'), row.get('writer_id')
+        if (any(type(value) is not int or value < 0 for value in (age, stage_age, writer)) or
+                row.get('pid') != owner['pid'] or stage_age > age or
+                age-elapsed < OBSERVER_TIMING_MARGIN_MS or
+                # Both clocks are integer milliseconds: retain 2ms for flooring.
+                duration-age+2 > 0 or elapsed-stage_age-2 < OBSERVER_TIMING_MARGIN_MS):
+            continue
+        report['pending_observer_window_verified'] = True
+        report['pending_observer_window_evidence'] = dict(sample,
+            proof_kind='retrospective_native_monotonic_timing_inference',
+            uncertainty_margin_ms=OBSERVER_TIMING_MARGIN_MS,
+            coordinator_capture_lag_upper_bound_ms=duration-elapsed,
+            writer_id=writer, writer=str(row.get('writer', ''))[:512],
+            writer_elapsed_ms=age, stage_elapsed_ms=stage_age,
+            registration_lead_ms=age-elapsed, registration_after_request_upper_bound_ms=duration-age+2,
+            completion_after_request_lower_bound_ms=elapsed-stage_age-2)
+        return
+
+
 def ready_services(pid):
     # One shell read avoids delaying early Close with 37 separate adb calls.
     paths = ' '.join(DATA+identity+'/ready.json' for identity in IDS)
@@ -152,9 +292,11 @@ def capture_failed_close(owner, output):
     return evidence
 
 
-def close(owner, output):
+def close(owner, output, *, collect_native_admission=False):
     output.mkdir(parents=True, exist_ok=True)
     report = {'owner':owner, 'passed':False}
+    if collect_native_admission:
+        report.update(native_admission_samples=[], pending_observer_window_verified=False)
     def save(): (output/'close.json').write_text(json.dumps(report, indent=2)+'\n')
     try:
         report['ready_at_close'] = ready_services(owner['pid'])
@@ -164,6 +306,8 @@ def close(owner, output):
         receipt = {}
         while time.monotonic() < deadline:
             receipt = probe.read_json(probe.PRIVATE+'/files/infinity-checkpoint-close.json')
+            if collect_native_admission:
+                observe_native_admission(report, receipt, owner)
             if receipt.get('owner') == owner['owner'] and receipt.get('phase') in ('COMPLETE', 'CHECKPOINT_FAILED'): break
             time.sleep(.25)
         report['receipt'] = receipt; save()
@@ -362,21 +506,34 @@ def create_missing_directory(owner):
 
 
 
-def run_candidate_scenario(scenario, previous_owner, output, report, save):
+def run_candidate_scenario(scenario, previous_owner, output, report, save, *, early_boundary='owner'):
     """Exercise one independently seeded upgrade, or the retained combined mode.
 
     Callers supply a fresh disposable AVD for each acceptance scenario. A failed
     early Close is never converted into cleanup or a loaded success.
     """
     assert scenario in ('early', 'loaded', 'combined')
+    assert early_boundary in ('owner', 'core-initialized')
+    assert scenario != 'loaded' or early_boundary == 'owner', 'Core boundary requires an early comparison'
+    report['early_boundary'] = early_boundary
     if scenario in ('early', 'combined'):
+        baseline = core_boundary_baseline() if early_boundary == 'core-initialized' else None
         started = time.monotonic()
         report['candidate_early_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
         early_owner = wait_owner(previous_owner['owner'])
-        report['candidate_early_close'] = close(early_owner, output/'candidate-early-close')
+        if early_boundary == 'core-initialized':
+            report['candidate_early_boundary_gate'] = wait_core_initialized(early_owner, baseline)
+            save()
+            report['candidate_early_close'] = close(early_owner, output/'candidate-early-close',
+                                                    collect_native_admission=True)
+        else:
+            report['candidate_early_close'] = close(early_owner, output/'candidate-early-close')
         report['candidate_launch_to_close_seconds'] = report['candidate_early_close']['requested_monotonic']-started
         report['early_ready_count'] = len(report['candidate_early_close']['ready_at_close'])
         assert report['early_ready_count'] < len(IDS), 'Early timing control missed startup; do not label loaded Close an early test'
+        if early_boundary == 'core-initialized':
+            assert report['candidate_early_close'].get('pending_observer_window_verified') is True, \
+                'Core-initialized comparison missed native pending-observer window; timing control invalid'
         verify_saved_state(output/'after-early-close')
         previous_owner = early_owner
         save()
@@ -411,8 +568,13 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--scenario', choices=('early', 'loaded', 'combined'), default='combined',
                         help='Use separate disposable AVDs for early and loaded acceptance; combined retains the original probe')
-    args = parser.parse_args(); args.out.mkdir(parents=True, exist_ok=True)
-    report = dict(scope='Disposable real Android in-place upgrade with 37 synthetic services and approved first-party add-ons; not full Diggz/Fold clone', scenario=args.scenario, passed=False, physical_fold_accepted=False, full_fold_backup_used=False, actual_diggz_ecosystem_tested=False)
+    parser.add_argument('--early-boundary', choices=('owner', 'core-initialized'), default='owner',
+                        help='Optional diagnostic comparison; owner preserves the original cold-start case')
+    args = parser.parse_args()
+    if args.scenario == 'loaded' and args.early_boundary != 'owner':
+        parser.error('--early-boundary core-initialized requires --scenario early or combined')
+    args.out.mkdir(parents=True, exist_ok=True)
+    report = dict(scope='Disposable real Android in-place upgrade with 37 synthetic services and approved first-party add-ons; not full Diggz/Fold clone', scenario=args.scenario, early_boundary=args.early_boundary, passed=False, physical_fold_accepted=False, full_fold_backup_used=False, actual_diggz_ecosystem_tested=False)
     def save(): (args.out/'OBSERVER-UPGRADE-PROBE.json').write_text(json.dumps(report, indent=2)+'\n')
     try:
         report['baseline_apk_sha256'] = sha(args.baseline_apk)
@@ -445,7 +607,7 @@ def main():
         assert before == after, 'APK upgrade changed saved fixture/database/preference bytes'
         report['upgrade_receiver_after_comparison'] = saved_state_boundary(report['baseline_loaded_close'], evidence_path=args.out/'update-receiver-after-comparison.json')
         report['upgrade_bytes_preserved'] = True; save()
-        run_candidate_scenario(args.scenario, owner, args.out, report, save)
+        run_candidate_scenario(args.scenario, owner, args.out, report, save, early_boundary=args.early_boundary)
         report['passed'] = True
     except Exception as error:
         report['failure'] = type(error).__name__+': '+str(error)
