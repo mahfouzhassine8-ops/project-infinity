@@ -1,8 +1,8 @@
-name: Infinity 2103377 | INTERNAL observer-stage diagnostic
+name: Infinity 2103377 | INTERNAL shutdown verification
 # Isolated native-only diagnostic. No existing factory, acceptance or promotion
 # path is changed. It cannot produce an approved Fold test candidate or lock.
-# Retry the packaging inventory only: reuse green native 38967896318 and RC05's
-# saved 308 proof. Host cache timestamps never enter the existing Android fixture.
+# Verify the deferred command resolver after full native success. Reuse RC05's
+# saved Java/308 proof; run four original probes in independent disposable AVDs.
 on:
   push:
     branches: [work/infinity-2103377-essential-first-shutdown-only]
@@ -22,7 +22,7 @@ jobs:
         with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
-      - name: Await exact 38967896318 native completion for at most one hour
+      - name: Await exact 38975950035 native completion for at most one hour
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -33,7 +33,7 @@ jobs:
           sys.path.insert(0,'repairs/android-checkpoint-shutdown/runtime-tests')
           import package_observer_stage_diagnostic as pins
           pins.pinned_native()
-          if (pins.NATIVE_RUN,pins.NATIVE_SOURCE)!=(38967896318,'e78c769d99b626b47292fb2bcac0d09661735fc6'):
+          if (pins.NATIVE_RUN,pins.NATIVE_SOURCE)!=(38975950035,'f5e3d9434d8a8c0918d1f4cc6758cf3704eb873c'):
               raise RuntimeError('Workflow/packager native pins differ')
           root=Path('await-native-evidence');root.mkdir()
           deadline=time.monotonic()+3600
@@ -100,7 +100,7 @@ jobs:
           sys.path.insert(0,'repairs/android-checkpoint-shutdown/runtime-tests')
           import package_observer_stage_diagnostic as pins
           pins.pinned_native()
-          if (pins.NATIVE_RUN,pins.NATIVE_SOURCE)!=(38967896318,'e78c769d99b626b47292fb2bcac0d09661735fc6'):
+          if (pins.NATIVE_RUN,pins.NATIVE_SOURCE)!=(38975950035,'f5e3d9434d8a8c0918d1f4cc6758cf3704eb873c'):
               raise RuntimeError('Workflow/packager native pins differ')
           root=Path('internal-diagnostic-input-evidence');root.mkdir()
           def fetch(path):
@@ -143,7 +143,7 @@ jobs:
           path: rc05-inputs
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38967896318
+          run-id: 38975950035
           name: Infinity-2103377-Essential-First-Native-Evidence
           github-token: ${{ github.token }}
           path: live-stage-native-evidence
@@ -217,8 +217,12 @@ jobs:
           if-no-files-found: warn
 
   internal-core-phase-comparison:
-    name: INTERNAL native-stage diagnostic, TEST3 upgrade plus 37 loaded services
+    name: INTERNAL shutdown - ${{ matrix.case }}
     needs: internal-diagnostic-input
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [fresh, cold, core-initialized, loaded]
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     steps:
@@ -228,8 +232,11 @@ jobs:
         with: {distribution: temurin, java-version: '17'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
-      - name: Verify unchanged phase-boundary controls
-        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_phase_boundary.py
+      - name: Verify original phase boundaries and four-case dispatch
+        run: |
+          set -euo pipefail
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_phase_boundary.py
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_internal_observer_stage_case.py
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools build-tools;34.0.0'
@@ -298,7 +305,7 @@ jobs:
         run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out internal-diagnostic-emulator-setup-evidence
       - name: Enable disposable emulator acceleration
         run: sudo chmod 666 /dev/kvm
-      - name: Capture precise observer initialization under real early Close
+      - name: Verify full shutdown and retain live observer stages
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
           api-level: 30
@@ -308,24 +315,27 @@ jobs:
           avd-name: infinity-internal-observer-stage
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --scenario early --early-boundary core-initialized --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk internal-observer-stage-diagnostic/Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC.apk --installed-addons rc05-inputs/native-evidence/installed-addons --out internal-observer-stage-comparison-evidence
-      - name: Verify comparison uses the exact internally signed APK; never promote
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py --case ${{ matrix.case }} --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --apk internal-observer-stage-diagnostic/Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC.apk --installed-addons rc05-inputs/native-evidence/installed-addons --out internal-observer-stage-comparison-evidence --expected-sha256 ${{ needs.internal-diagnostic-input.outputs.apk-sha256 }}
+      - name: Verify case uses the exact internally signed APK; never promote
         env:
           EXPECTED_APK_SHA256: ${{ needs.internal-diagnostic-input.outputs.apk-sha256 }}
+          INTERNAL_SHUTDOWN_CASE: ${{ matrix.case }}
         run: |
           python3 - <<'PY'
-          import json,os
+          import json,os,sys
           from pathlib import Path
-          report=json.loads(Path('internal-observer-stage-comparison-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
-          if report['scenario']!='early' or report['early_boundary']!='core-initialized':raise RuntimeError('Wrong phase comparison')
-          if report['candidate_apk_sha256']!=os.environ['EXPECTED_APK_SHA256']:raise RuntimeError('Comparison APK digest mismatch')
-          if report['passed'] is not True:raise RuntimeError('Internal comparison did not pass')
+          sys.path.insert(0,'repairs/android-checkpoint-shutdown/runtime-tests')
+          import run_internal_observer_stage_case as checks
+          out=Path('internal-observer-stage-comparison-evidence')
+          proof=checks.verify_report(os.environ['INTERNAL_SHUTDOWN_CASE'],out,os.environ['EXPECTED_APK_SHA256'])
+          if json.loads((out/'INTERNAL-CASE-IDENTITY.json').read_text())!=proof:
+              raise RuntimeError('Independent internal case identity recheck failed')
           PY
       - name: Preserve runtime outcome and complete failure diagnostics
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Comparison-Evidence
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Comparison-Evidence-${{ matrix.case }}
           path: internal-observer-stage-comparison-evidence/
           retention-days: 90
           compression-level: 1
@@ -334,7 +344,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Comparison-Setup
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Comparison-Setup-${{ matrix.case }}
           path: |
             internal-diagnostic-comparison-input-evidence/
             internal-diagnostic-emulator-setup-evidence/
