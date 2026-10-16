@@ -1,7 +1,7 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Approved Essential-First architecture and all prior corrections retained. Latest Android38892686819 passed308 regressions and fresh/loaded-baseline controls but actual early Close interrupted core startup before Python writers registered. Corrected core/observer admission ordering saved at402dfe75; native38899217848 host proof passed, full ARM64 and matched Android acceptance pending. Physical TEST3 remains failed; no new Fold approval or lock.",
+  "implementation": "Approved Essential-First architecture,308 regressions,permanent signing and all prior protections retained. Full native38899217848/402dfe75 passed. Android38899820197 passed308 and fresh production save/Close/death/reopen plus loaded37-service TEST3 baseline, then failed its pre-launch post-install process-name assertion. Actual rejected PID/name was not retained. Verification-only observation correction73de91ca preserves strict post-Close UID death and records complete boundary evidence; matched Android38938908138 is running. No physical Fold approval or final lock.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
     "native_cpython_3117_runtime": 61,
@@ -17,7 +17,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "Native38899217848/402dfe75 host proof passed; complete rebuilt ARM64 and matched Android acceptance pending. Previous green38887113826/f2c663fa and its corrections are preserved. No new candidate accepted.",
+    "current_corrections": "Native38899217848/402dfe75 completed successfully including full ARM64 compile and production safety gates. No production native/Java changes since. Reuse exact build for Android38938908138.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -97,9 +97,10 @@
     "early_startup_admission_run": {
       "run": 38899217848,
       "commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
-      "status": "in_progress",
+      "status": "completed",
       "host_proof_result": "success",
-      "full_engine_result": null
+      "full_engine_result": "success",
+      "result": "success"
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
@@ -113,11 +114,10 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Latest Android38892686819 passed308 regressions,14 receiver controls,fresh shutdown/reopen,37-service baseline Close and exact upgrade data hashes. Actual early candidate Close interrupted core keyboard-layout reading before any Python writer existed, then expired in25198ms without authorization.",
-    "Required startup directory reads were rejected by directory-work admission before Create completed. A real37-interpreter control also proves that closing mutation admission before observer installation rejects a required zlib import.",
-    "Corrected native sequencing retains original request identity/deadline, permits accepted core startup, uses actual successful Create/CreateGUI/Initialize proof, closes new invokers then waits only for already-admitted native observer installation before applying existing write admission and saves. Failed core startup, missing/failed observers and genuine write errors remain blockers.",
-    "Local34 coordinator/startup cases,15 JobManager cases,12 repository controls,5 observer controls and16 source contracts pass. Full ARM64 rebuild,installer/save/authorization gates and matched308 Android early/loaded acceptance remain required.",
-    "No new Fold APK promotion or final lock. Configured physical Fold approval remains required; no physical data was modified."
+    "Android38899820197 failed before candidate launch at the upgrade-only process-name assertion; no rejected PID/name snapshot was saved. Receiver PID8284 was observed starting, but that alone does not prove it was the rejected process or establish the name mismatch cause.",
+    "Full native38899217848 and all308 Android regressions passed. Fresh corrected RC03 completed real save,authorization,both Java seals,whole-UID death,seven-database integrity and saved-data reopen in12891ms. Loaded signedTEST3 baseline completed37-service Close in5585ms. Preserve these passes.",
+    "Android38938908138/73de91ca now repeats the mandatory fresh and retained-data early/loaded Close gates using exact native402dfe75, with21 boundary controls and evidence retained even when the process assertion fails. No engine/Java or25s deadline changes.",
+    "Configured Diggz/custom Infinity skin physical Fold acceptance remains unverified. No physical data changes,APK promotion or final lock."
   ],
   "internal_android_probes": [
     {
@@ -1044,65 +1044,165 @@
     "matched_android_plan": "Retain all 308 tests, exact signed TEST2 and TEST3 Java/payload comparisons, original fresh production Close, then disposable TEST3->TEST4 in-place upgrade with 37 synthetic services, verified pre-upgrade backup hashes, early and loaded Close, both Java seals, whole-UID death, integrity and reopen."
   },
   "latest_verification_attempt": {
-    "run": 38892686819,
-    "source_commit": "7caf6186932a001c90d914738ca4e2f98b0e3260",
-    "native_run": 38887113826,
-    "native_commit": "f2c663fac800a03104f349cea98853a22c033922",
-    "evidence_artifact": 12042654417,
-    "evidence_zip_sha256": "e7be1e8d21d5ca46f61381d4a03f2b7161e994ee4de00de4c6f05f80b7444b4c",
+    "android_run": 38899820197,
+    "source_commit": "8dfca753648e447d749f78d200a8384164bf9a80",
+    "native_run": 38899217848,
+    "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+    "native_full_result": "success",
+    "evidence_artifact": 12046144477,
+    "evidence_zip_sha256": "bd24ed969acbbf3f14e905a82190c0a0b20685a73a93668101e784b1fa1e37d1",
     "all_308_passed": true,
-    "receiver_controls_passed": 14,
+    "original_boundary_controls_passed": 14,
     "fresh_test4": {
       "passed": true,
-      "apk_sha256": "fc8a2792c6159eeb3d86dae2dddf72d0b8435a9fb846e56c3b00bf471e2e1205",
+      "apk_sha256": "909bc1460db8c6166e8d92e6dea4f2668a925a35fd1903da22478f0d90350315",
       "whole_package_death_verified": true,
-      "both_java_process_save_proofs_verified": true,
       "reopen_verified": true,
-      "favourites_preserved": true
+      "databases": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "duration_ms": 12891
     },
-    "baseline_37_close_passed": true,
-    "upgrade_bytes_preserved": true,
-    "candidate_early_close": {
-      "ready_service_count": 0,
-      "started_epoch_ms": 1792150381760,
-      "updated_epoch_ms": 1792150406880,
-      "phase": "CHECKPOINT_FAILED",
-      "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
-      "total_duration_ms": 25198,
-      "pid": 8533,
-      "owner": "c161aa40-ea6c-4a30-9741-0e6175eaff49",
-      "authorization_consumed": false,
-      "script_persistence": {
-        "active_writers": 0,
-        "advisory_count": 0,
-        "advisory_retired_writers": 0,
-        "blocker_overflow": false,
-        "blockers": [],
-        "blocking_count": 0,
-        "blocking_overflow": false,
-        "durable": false,
-        "error": "",
-        "failed_settled_writers": 0,
-        "failure_detail": "",
-        "failure_writer": "",
-        "failure_writer_id": -1,
-        "observed_writers": 0,
-        "pending_writers": [],
-        "retired_writers": 0,
-        "sync_finished": false,
-        "sync_started": false,
-        "tracked_paths": 0
+    "baseline_37_ready_count": 37,
+    "baseline_loaded_close": {
+      "passed": true,
+      "whole_package_death_verified": true,
+      "both_java_seals_verified": true,
+      "remaining_processes": [],
+      "receipt": {
+        "session": "7190bf03-ad09-40a5-b4cd-967d29fc7d35",
+        "owner": "8e4a31d0-9ea9-4aeb-8d1f-aca197167b4a",
+        "pid": 7375,
+        "phase": "COMPLETE",
+        "total_duration_ms": 5585,
+        "checkpoint_saved": true,
+        "authorization_consumed": true,
+        "process_death_confirmed": true,
+        "engine_java_save_seal": "7a193ac8-c2b4-40e5-8b61-51df09507148",
+        "coordinator_java_save_seal": "b1a4cff9-0dc2-4ab8-a7b1-f0286b1a8509"
       },
-      "essential_writes_sealed": false,
-      "essential_writes_durable": false
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "essential_results": [
+        {
+          "owner": "native_admission",
+          "result": "ALREADY_DURABLE",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "background_jobs",
+          "result": "ALREADY_DURABLE",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "playback",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "command_center",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "compat",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "kodi_settings",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "profiles",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "skin_settings",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "addon_settings",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "favourites",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "peripherals",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "audio_policy",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "deferred_dialog_state",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "xml_files",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "native_databases",
+          "result": "COMMITTED",
+          "required_writes_finished": true
+        },
+        {
+          "owner": "pvr",
+          "result": "ALREADY_DURABLE",
+          "required_writes_finished": true
+        }
+      ]
     },
-    "startup_log_lines": [
-      "2026-10-16 11:33:00.926 T:8619     info <general>: Starting Kodi (21.3 (21.3.0) Git:20251031-a3a448d-dirty). Platform: Android ARM 64-bit",
-      "2026-10-16 11:33:02.754 T:8619  warning <general>: CKeyboardLayoutManager: no keyboard layouts found in special://xbmc/system/keyboardlayouts",
-      "2026-10-16 11:33:02.755 T:8619  critical <general>: CApplication::Create: Unable to load keyboard layouts"
+    "verified_backup_files": 46,
+    "upgrade_install": "Performing Streamed Install\nSuccess\n",
+    "observed_receiver_pid": 8284,
+    "android_origin_log": [
+      "10-16 12:55:28.099   497  1078 I ActivityManager: Process com.projectinfinity.kodi:kodi (pid 7375) has died: fg  TOP ",
+      "10-16 12:55:28.372   497  1078 I ActivityManager: Process com.projectinfinity.kodi (pid 7340) has died: fg  SVC ",
+      "10-16 12:55:31.239   497   540 I ActivityManager: Start proc 8284:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
     ],
+    "failure": "AssertionError: Unexpected package process before candidate launch",
+    "failure_stage": "first post-install process boundary, before byte comparison and candidate engine launch",
+    "rejected_process_snapshot_retained": false,
+    "rejected_pid_name_and_underlying_cause": "Not captured by original assertion; do not infer that it was PID8284 or a transient name from the receiver start alone",
+    "candidate_early_close_reached": false,
+    "candidate_loaded_close_reached": false,
     "physical_fold_accepted": false,
-    "apk_delivered": false,
     "locked": false
   },
   "existing_directory_correction": {
@@ -1144,19 +1244,101 @@
     "repository_controls": 12,
     "original_deadline_unchanged": true,
     "genuine_core_save_observer_failures_still_block": true,
-    "native_rebuild_required": true,
+    "native_rebuild_required": false,
     "matched_android_required": true,
     "physical_fold_accepted": false,
     "locked": false,
     "source_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
     "native_run": 38899217848,
-    "native_status": "in_progress_host_proof_success",
+    "native_status": "completed_success",
     "matched_android_status": "in_progress",
     "candidate_version": "1.0.9-Essential-First-TEST4-RC03",
-    "matched_android_run": 38899820197,
-    "matched_android_commit": "8dfca753648e447d749f78d200a8384164bf9a80",
+    "matched_android_run": 38938908138,
+    "matched_android_commit": "73de91ca5430952348897c21a54709cd63dd4500",
     "all_308_current_run_result": null,
     "full_shutdown_current_run_result": null,
     "apk_ready": false
+  },
+  "verification_attempt_history": [
+    {
+      "run": 38892686819,
+      "source_commit": "7caf6186932a001c90d914738ca4e2f98b0e3260",
+      "native_run": 38887113826,
+      "native_commit": "f2c663fac800a03104f349cea98853a22c033922",
+      "evidence_artifact": 12042654417,
+      "evidence_zip_sha256": "e7be1e8d21d5ca46f61381d4a03f2b7161e994ee4de00de4c6f05f80b7444b4c",
+      "all_308_passed": true,
+      "receiver_controls_passed": 14,
+      "fresh_test4": {
+        "passed": true,
+        "apk_sha256": "fc8a2792c6159eeb3d86dae2dddf72d0b8435a9fb846e56c3b00bf471e2e1205",
+        "whole_package_death_verified": true,
+        "both_java_process_save_proofs_verified": true,
+        "reopen_verified": true,
+        "favourites_preserved": true
+      },
+      "baseline_37_close_passed": true,
+      "upgrade_bytes_preserved": true,
+      "candidate_early_close": {
+        "ready_service_count": 0,
+        "started_epoch_ms": 1792150381760,
+        "updated_epoch_ms": 1792150406880,
+        "phase": "CHECKPOINT_FAILED",
+        "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+        "total_duration_ms": 25198,
+        "pid": 8533,
+        "owner": "c161aa40-ea6c-4a30-9741-0e6175eaff49",
+        "authorization_consumed": false,
+        "script_persistence": {
+          "active_writers": 0,
+          "advisory_count": 0,
+          "advisory_retired_writers": 0,
+          "blocker_overflow": false,
+          "blockers": [],
+          "blocking_count": 0,
+          "blocking_overflow": false,
+          "durable": false,
+          "error": "",
+          "failed_settled_writers": 0,
+          "failure_detail": "",
+          "failure_writer": "",
+          "failure_writer_id": -1,
+          "observed_writers": 0,
+          "pending_writers": [],
+          "retired_writers": 0,
+          "sync_finished": false,
+          "sync_started": false,
+          "tracked_paths": 0
+        },
+        "essential_writes_sealed": false,
+        "essential_writes_durable": false
+      },
+      "startup_log_lines": [
+        "2026-10-16 11:33:00.926 T:8619     info <general>: Starting Kodi (21.3 (21.3.0) Git:20251031-a3a448d-dirty). Platform: Android ARM 64-bit",
+        "2026-10-16 11:33:02.754 T:8619  warning <general>: CKeyboardLayoutManager: no keyboard layouts found in special://xbmc/system/keyboardlayouts",
+        "2026-10-16 11:33:02.755 T:8619  critical <general>: CApplication::Create: Unable to load keyboard layouts"
+      ],
+      "physical_fold_accepted": false,
+      "apk_delivered": false,
+      "locked": false
+    }
+  ],
+  "upgrade_process_observation_correction": {
+    "source_commit": "73de91ca5430952348897c21a54709cd63dd4500",
+    "report": "TEST4-RC03-UPGRADE-OBSERVATION.md",
+    "host_controls": 21,
+    "original_controls_retained": 14,
+    "host_result": "success",
+    "native_java_and_apk_version_changed": false,
+    "strict_close_whole_uid_death_preserved": true,
+    "unknown_processes_and_native_images_still_rejected": true,
+    "original_shutdown_deadline_unchanged": true,
+    "process_identity_diagnostics_saved_on_failure": true,
+    "exact_saved_bytes_still_required": true,
+    "actual_rejected_process_identity_unknown": true,
+    "android_run": 38938908138,
+    "android_status": "in_progress",
+    "physical_fold_accepted": false,
+    "locked": false
   }
 }

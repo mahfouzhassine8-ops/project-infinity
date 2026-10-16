@@ -1,0 +1,162 @@
+{
+  "android_run": 38899820197,
+  "source_commit": "8dfca753648e447d749f78d200a8384164bf9a80",
+  "native_run": 38899217848,
+  "native_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+  "native_full_result": "success",
+  "evidence_artifact": 12046144477,
+  "evidence_zip_sha256": "bd24ed969acbbf3f14e905a82190c0a0b20685a73a93668101e784b1fa1e37d1",
+  "all_308_passed": true,
+  "original_boundary_controls_passed": 14,
+  "fresh_test4": {
+    "passed": true,
+    "apk_sha256": "909bc1460db8c6166e8d92e6dea4f2668a925a35fd1903da22478f0d90350315",
+    "whole_package_death_verified": true,
+    "reopen_verified": true,
+    "databases": [
+      "Addons33.db",
+      "TV46.db",
+      "Textures13.db",
+      "ViewModes6.db",
+      "MyMusic83.db",
+      "Epg16.db",
+      "MyVideos131.db"
+    ],
+    "duration_ms": 12891
+  },
+  "baseline_37_ready_count": 37,
+  "baseline_loaded_close": {
+    "passed": true,
+    "whole_package_death_verified": true,
+    "both_java_seals_verified": true,
+    "remaining_processes": [],
+    "receipt": {
+      "session": "7190bf03-ad09-40a5-b4cd-967d29fc7d35",
+      "owner": "8e4a31d0-9ea9-4aeb-8d1f-aca197167b4a",
+      "pid": 7375,
+      "phase": "COMPLETE",
+      "total_duration_ms": 5585,
+      "checkpoint_saved": true,
+      "authorization_consumed": true,
+      "process_death_confirmed": true,
+      "engine_java_save_seal": "7a193ac8-c2b4-40e5-8b61-51df09507148",
+      "coordinator_java_save_seal": "b1a4cff9-0dc2-4ab8-a7b1-f0286b1a8509"
+    },
+    "essential_owners": [
+      "native_admission",
+      "background_jobs",
+      "playback",
+      "command_center",
+      "compat",
+      "kodi_settings",
+      "profiles",
+      "skin_settings",
+      "addon_settings",
+      "favourites",
+      "peripherals",
+      "audio_policy",
+      "deferred_dialog_state",
+      "xml_files",
+      "native_databases",
+      "pvr"
+    ],
+    "essential_results": [
+      {
+        "owner": "native_admission",
+        "result": "ALREADY_DURABLE",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "background_jobs",
+        "result": "ALREADY_DURABLE",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "playback",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "command_center",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "compat",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "kodi_settings",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "profiles",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "skin_settings",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "addon_settings",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "favourites",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "peripherals",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "audio_policy",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "deferred_dialog_state",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "xml_files",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "native_databases",
+        "result": "COMMITTED",
+        "required_writes_finished": true
+      },
+      {
+        "owner": "pvr",
+        "result": "ALREADY_DURABLE",
+        "required_writes_finished": true
+      }
+    ]
+  },
+  "verified_backup_files": 46,
+  "upgrade_install": "Performing Streamed Install\nSuccess\n",
+  "observed_receiver_pid": 8284,
+  "android_origin_log": [
+    "10-16 12:55:28.099   497  1078 I ActivityManager: Process com.projectinfinity.kodi:kodi (pid 7375) has died: fg  TOP ",
+    "10-16 12:55:28.372   497  1078 I ActivityManager: Process com.projectinfinity.kodi (pid 7340) has died: fg  SVC ",
+    "10-16 12:55:31.239   497   540 I ActivityManager: Start proc 8284:com.projectinfinity.kodi/u0a167 for broadcast {com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityCobraBootReceiver}"
+  ],
+  "failure": "AssertionError: Unexpected package process before candidate launch",
+  "failure_stage": "first post-install process boundary, before byte comparison and candidate engine launch",
+  "rejected_process_snapshot_retained": false,
+  "rejected_pid_name_and_underlying_cause": "Not captured by original assertion; do not infer that it was PID8284 or a transient name from the receiver start alone",
+  "candidate_early_close_reached": false,
+  "candidate_loaded_close_reached": false,
+  "physical_fold_accepted": false,
+  "locked": false
+}
