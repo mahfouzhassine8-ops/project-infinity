@@ -27,35 +27,55 @@ DATA = probe.PROFILE+'/addon_data/'
 DIRECTORY_FIXTURE = 'script.infinity.directoryprobe.test'
 DIRECTORY_SETTINGS = '<settings><setting id="retained-proof">native-mkdirs</setting></settings>\n'
 DIRECTORY_RESULT = DATA+DIRECTORY_FIXTURE+'/observation.json'
-SERVICE = '''import json, os, xbmc, xbmcaddon, xbmcvfs
+# Kodi may compile add-ons with optimization enabled. Every fixture operation
+# and retained-data check must execute independently of Python assert removal.
+SERVICE = r'''import json, os, xbmc, xbmcaddon, xbmcvfs
 addon = xbmcaddon.Addon()
 identity = addon.getAddonInfo('id')
 root = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
-if not os.path.isdir(root): xbmcvfs.mkdirs(root)
-expected = '<settings><setting id="retained-proof">'+identity+'</setting></settings>\\n'
+if not os.path.isdir(root):
+ created = xbmcvfs.mkdirs(root)
+ if created is not True or not os.path.isdir(root):
+  raise RuntimeError('Service fixture profile directory was not created')
+expected = '<settings><setting id="retained-proof">'+identity+'</setting></settings>\n'
 state = os.path.join(root, 'settings.xml')
 if not os.path.exists(state):
  with open(state, 'w') as saved: saved.write(expected)
 else:
- with open(state) as saved: assert saved.read() == expected, 'Retained service state changed'
+ with open(state) as saved: retained = saved.read()
+ if retained != expected: raise RuntimeError('Retained service state changed')
 with open(os.path.join(root, 'ready.json'), 'w') as saved:
- json.dump(dict(addon=identity, pid=os.getpid(), observer_initialized=True), saved)
+ json.dump(dict(addon=identity, pid=os.getpid(), observer_initialized=True, retained_settings_verified=True), saved)
 monitor = xbmc.Monitor()
 while not monitor.abortRequested(): monitor.waitForAbort(0.25)
 '''
-DIRECTORY_SCRIPT = '''import json, os, xbmcaddon, xbmcvfs
-addon = xbmcaddon.Addon()
-root = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
-assert not os.path.exists(root), 'Directory creation control must start missing'
-assert xbmcvfs.mkdirs(root) is True
-assert os.path.isdir(root)
-state = os.path.join(root, 'settings.xml')
-with open(state, 'w') as saved:
- saved.write('<settings><setting id="retained-proof">native-mkdirs</setting></settings>\\n')
- info = os.fstat(saved.fileno())
- descriptor = dict(target=os.readlink('/proc/self/fd/'+str(saved.fileno())), device=info.st_dev, inode=info.st_ino, mode=info.st_mode)
-with open(os.path.join(root, 'observation.json'), 'w') as saved:
- json.dump(dict(addon=addon.getAddonInfo('id'), pid=os.getpid(), destination=root, mkdirs_succeeded=True, essential_settings_written=True, settings_descriptor=descriptor), saved)
+DIRECTORY_SCRIPT = r'''import json, os, sys, traceback, xbmc, xbmcaddon, xbmcvfs
+stage = 'addon.identity'
+try:
+ addon = xbmcaddon.Addon()
+ root = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
+ stage = 'directory.missing'
+ if os.path.exists(root): raise RuntimeError('Directory creation control must start missing')
+ stage = 'directory.mkdirs'
+ created = xbmcvfs.mkdirs(root)
+ if created is not True: raise RuntimeError('xbmcvfs.mkdirs did not confirm creation')
+ if not os.path.isdir(root): raise RuntimeError('Created profile is not a directory')
+ state = os.path.join(root, 'settings.xml')
+ stage = 'settings.open.w'
+ with open(state, 'w') as saved:
+  stage = 'settings.write'
+  saved.write('<settings><setting id="retained-proof">native-mkdirs</setting></settings>\n')
+  info = os.fstat(saved.fileno())
+  with open('/proc/self/fdinfo/'+str(saved.fileno())) as fdinfo: descriptor_info = fdinfo.read()
+  flags = int(next(line.split(':', 1)[1].strip() for line in descriptor_info.splitlines() if line.startswith('flags:')), 8)
+  if flags & os.O_ACCMODE != os.O_WRONLY: raise RuntimeError('Settings descriptor is not writable as requested')
+  descriptor = dict(target=os.readlink('/proc/self/fd/'+str(saved.fileno())), device=info.st_dev, inode=info.st_ino, mode=info.st_mode, status_flags=flags, access_mode=flags & os.O_ACCMODE, requested_mode='w', requested_flags=os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
+ stage = 'observation.write'
+ with open(os.path.join(root, 'observation.json'), 'w') as saved:
+  json.dump(dict(addon=addon.getAddonInfo('id'), pid=os.getpid(), destination=root, mkdirs_succeeded=True, essential_settings_written=True, settings_descriptor=descriptor, python_optimization=sys.flags.optimize), saved)
+except Exception:
+ xbmc.log('Infinity directory control stage='+stage+'\n'+traceback.format_exc(), xbmc.LOGERROR)
+ raise
 '''
 
 
@@ -84,7 +104,7 @@ def ready_services(pid):
     for line in text.splitlines():
         try: item = json.loads(line)
         except ValueError: continue
-        if item.get('pid') == pid and item.get('addon') in IDS and item.get('observer_initialized') is True:
+        if item.get('pid') == pid and item.get('addon') in IDS and item.get('observer_initialized') is True and item.get('retained_settings_verified') is True:
             result[item['addon']] = item
     return result
 
@@ -331,6 +351,10 @@ def create_missing_directory(owner):
         observation = probe.read_json(DIRECTORY_RESULT)
         if observation.get('pid') == owner['pid'] and observation.get('addon') == DIRECTORY_FIXTURE:
             assert observation.get('mkdirs_succeeded') is True and observation.get('essential_settings_written') is True
+            descriptor = observation['settings_descriptor']
+            assert descriptor['requested_mode'] == 'w' and descriptor['access_mode'] == 1
+            assert isinstance(descriptor['status_flags'], int) and descriptor['status_flags'] & 3 == 1
+            assert descriptor['inode'] > 0 and descriptor['device'] >= 0 and descriptor['target']
             assert probe.shell('cat', DATA+DIRECTORY_FIXTURE+'/settings.xml') == DIRECTORY_SETTINGS
             return observation
         time.sleep(.25)

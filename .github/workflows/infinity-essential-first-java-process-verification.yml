@@ -10,6 +10,10 @@ on:
       - '.github/workflows/infinity-essential-first-java-process-verification.yml'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_boundaries.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_scenarios.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_fixtures.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/test_failed_close_evidence.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/test_prepare_android_emulator.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/evidence/upgrade-receiver-38887412457.json'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py'
@@ -43,7 +47,9 @@ jobs:
           set -euo pipefail
           python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_boundaries.py
           python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_scenarios.py
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_fixtures.py
           python3 repairs/android-checkpoint-shutdown/runtime-tests/test_failed_close_evidence.py
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_prepare_android_emulator.py
           sudo apt-get update -qq
           sudo apt-get install -y libsqlite3-dev libssl-dev
           mkdir -p readonly-fixture-host
@@ -258,10 +264,12 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
           path: .
+      - name: Prepare verified emulator with bounded invalid-ZIP retry
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup-evidence
       - name: Enable disposable emulator acceleration
         run: sudo chmod 666 /dev/kvm
       - name: Fresh production Close, save receipts, UID death and reopen
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # exact runner used by the retained RC04 evidence
         with:
           api-level: 30
           arch: x86_64
@@ -279,6 +287,14 @@ jobs:
           path: android-process-evidence/
           retention-days: 90
           compression-level: 1
+          if-no-files-found: warn
+      - name: Retain emulator preparation attempts even before AVD creation
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Fresh-Emulator-Setup-Evidence
+          path: emulator-setup-evidence/
+          retention-days: 90
           if-no-files-found: warn
 
   upgrade-early-shutdown:
@@ -301,6 +317,8 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
           path: .
+      - name: Prepare verified emulator with bounded invalid-ZIP retry
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup-evidence
       - name: Enable disposable emulator acceleration
         run: sudo chmod 666 /dev/kvm
       - uses: actions/download-artifact@v8
@@ -310,7 +328,7 @@ jobs:
           github-token: ${{ github.token }}
           path: accepted-test3
       - name: Independent TEST3 upgrade, early Close, UID death and reopen
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # exact runner used by the retained RC04 evidence
         with:
           api-level: 30
           arch: x86_64
@@ -328,6 +346,14 @@ jobs:
           path: observer-upgrade-early-evidence/
           retention-days: 90
           compression-level: 1
+          if-no-files-found: warn
+      - name: Retain emulator preparation attempts even before AVD creation
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Upgrade-Early-Emulator-Setup-Evidence
+          path: emulator-setup-evidence/
+          retention-days: 90
           if-no-files-found: warn
 
   upgrade-loaded-shutdown:
@@ -350,6 +376,8 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
           path: .
+      - name: Prepare verified emulator with bounded invalid-ZIP retry
+        run: python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup-evidence
       - name: Enable disposable emulator acceleration
         run: sudo chmod 666 /dev/kvm
       - uses: actions/download-artifact@v8
@@ -359,7 +387,7 @@ jobs:
           github-token: ${{ github.token }}
           path: accepted-test3
       - name: Independent TEST3 upgrade, 37 loaded services, Close and reopen
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # exact runner used by the retained RC04 evidence
         with:
           api-level: 30
           arch: x86_64
@@ -377,6 +405,14 @@ jobs:
           path: observer-upgrade-loaded-evidence/
           retention-days: 90
           compression-level: 1
+          if-no-files-found: warn
+      - name: Retain emulator preparation attempts even before AVD creation
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Upgrade-Loaded-Emulator-Setup-Evidence
+          path: emulator-setup-evidence/
+          retention-days: 90
           if-no-files-found: warn
 
   promote-fold-review-only:
