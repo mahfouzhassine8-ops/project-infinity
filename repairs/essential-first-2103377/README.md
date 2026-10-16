@@ -1,18 +1,19 @@
 # Essential-first shutdown — production repair in progress
 
-**Current status: Android 38892686819 passed all 308 tests, fresh Close/reopen, 37-service baseline Close and exact upgrade byte preservation. Actual early candidate Close then interrupted core keyboard-layout loading before any Python writer registered. A native admission-ordering correction passes 34 coordinator/startup cases, 15 job cases, 12 repository controls and five observer race controls locally. Full rebuilt ARM64 and matched Android acceptance remain required. Not locked.**
+**Current status: Android 38892686819 passed all 308 tests, fresh Close/reopen, 37-service baseline Close and exact upgrade byte preservation. Actual early candidate Close then interrupted core keyboard-layout loading before any Python writer registered. A native admission-ordering correction passes 34 coordinator/startup cases, 15 job cases, 12 repository controls and five observer race controls locally. Native correction `402dfe75` is rebuilding in run `38899217848`; host proof passed. Matched TEST4 RC03 Android verification is being staged. Full ARM64 and Android acceptance remain required. Not locked.**
 
 See [EARLY-STARTUP-ADMISSION.md](EARLY-STARTUP-ADMISSION.md) for the current
 failure and correction. Native 38887113826 remains the previous green build;
 its passing directory/observer corrections and all 308 tests are preserved.
 
-See [TEST4-UPGRADE-RECEIVER.md](TEST4-UPGRADE-RECEIVER.md) for the latest
-failure, precise process identities, and the verification-only correction.
+See [TEST4-UPGRADE-RECEIVER.md](TEST4-UPGRADE-RECEIVER.md) for the resolved
+receiver-verification failure, precise process identities and correction.
 
 See [TEST4-DIRECTORY-FAILURE.md](TEST4-DIRECTORY-FAILURE.md). The observer
 PyDLL(None) correction and every previously passing protection are retained.
 
-Continue from `9e9ef198`, preserving the permanently signed TEST3 baseline.
+The permanently signed TEST3 baseline `9e9ef198` remains preserved; resume
+only from the latest branch commit.
 Current evidence, initialization-error capture, and the required comparison
 with the user's Diggz add-ons, custom `skin.infinity.diggz` and retained Fold
 state are in [TEST3-OBSERVER-INVESTIGATION.md](TEST3-OBSERVER-INVESTIGATION.md)

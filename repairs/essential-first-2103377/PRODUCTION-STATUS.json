@@ -1,7 +1,7 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Approved Essential-First architecture and TEST3 corrections retained. Native 38867886900 and matched Android 38868115575 passed. Physical TEST3 failed shared Python observer initialization; exact underlying Fold exception remains unavailable. Current changes capture original initialization-stage errors without granting authorization.",
+  "implementation": "Approved Essential-First architecture and all prior corrections retained. Latest Android38892686819 passed308 regressions and fresh/loaded-baseline controls but actual early Close interrupted core startup before Python writers registered. Corrected core/observer admission ordering saved at402dfe75; native38899217848 host proof passed, full ARM64 and matched Android acceptance pending. Physical TEST3 remains failed; no new Fold approval or lock.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
     "native_cpython_3117_runtime": 61,
@@ -17,7 +17,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "Previous green native38887113826/f2c663fa preserved. New early-startup/admission sequencing requires complete new ARM64 build and matched Android; no new candidate accepted.",
+    "current_corrections": "Native38899217848/402dfe75 host proof passed; complete rebuilt ARM64 and matched Android acceptance pending. Previous green38887113826/f2c663fa and its corrections are preserved. No new candidate accepted.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -93,6 +93,13 @@
       "status": "completed",
       "result": "success",
       "directory_cases": 7
+    },
+    "early_startup_admission_run": {
+      "run": 38899217848,
+      "commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+      "status": "in_progress",
+      "host_proof_result": "success",
+      "full_engine_result": null
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
@@ -1140,6 +1147,11 @@
     "native_rebuild_required": true,
     "matched_android_required": true,
     "physical_fold_accepted": false,
-    "locked": false
+    "locked": false,
+    "source_commit": "402dfe75d5f314512bee5e502fe238ea7a0940d5",
+    "native_run": 38899217848,
+    "native_status": "in_progress_host_proof_success",
+    "matched_android_status": "being_staged",
+    "candidate_version": "1.0.9-Essential-First-TEST4-RC03"
   }
 }
