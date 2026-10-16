@@ -1,5 +1,5 @@
 name: Infinity 2103377 | Java save regression and complete Android shutdown
-# TEST4 RC03 requires rebuilt startup/observer ordering and all retained upgrade proof.
+# TEST4 RC04 requires exact native initialization progress and all three independent shutdown cases.
 # Explicit install-r receiver observation never substitutes for post-Close whole-UID death.
 # Fresh, early-upgrade and fully-loaded upgrade run in independent disposable AVD jobs.
 
