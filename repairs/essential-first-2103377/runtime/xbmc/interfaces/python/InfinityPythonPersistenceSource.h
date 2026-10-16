@@ -9,23 +9,40 @@ records swallowed write failures and closes tracked buffers before interpreter
 teardown. Native admission, thread retirement and filesystem durability are
 separate required proofs.
 """
+def _infinity_report_initialization_stage():
+    # Standalone observer users have no native callback. Keep the original
+    # stage variable as the source of failure evidence in either environment.
+    report = globals().get('_INFINITY_NATIVE_INITIALIZATION_STAGE')
+    if report is not None:
+        report(_INFINITY_INITIALIZATION_STAGE)
+
+
 _INFINITY_INITIALIZATION_STAGE = 'python.import.builtins'
+_infinity_report_initialization_stage()
 import builtins
 _INFINITY_INITIALIZATION_STAGE = 'python.import.importlib'
+_infinity_report_initialization_stage()
 import importlib
 _INFINITY_INITIALIZATION_STAGE = 'python.import.io'
+_infinity_report_initialization_stage()
 import io
 _INFINITY_INITIALIZATION_STAGE = 'python.import._io'
+_infinity_report_initialization_stage()
 import _io
 _INFINITY_INITIALIZATION_STAGE = 'python.import.os'
+_infinity_report_initialization_stage()
 import os
 _INFINITY_INITIALIZATION_STAGE = 'python.import.shutil'
+_infinity_report_initialization_stage()
 import shutil
 _INFINITY_INITIALIZATION_STAGE = 'python.import.sqlite3'
+_infinity_report_initialization_stage()
 import sqlite3
 _INFINITY_INITIALIZATION_STAGE = 'python.import.stat'
+_infinity_report_initialization_stage()
 import stat
 _INFINITY_INITIALIZATION_STAGE = 'python.import.sys'
+_infinity_report_initialization_stage()
 import sys
 # Marker is embedded into libkodi.so and checked by the native build gate.
 DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
@@ -34,20 +51,27 @@ DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
 NONPERSISTENT_TARGET = '\0'
 try:
     _INFINITY_INITIALIZATION_STAGE = 'python.import.subprocess'
+    _infinity_report_initialization_stage()
     import subprocess
 except ImportError:
     subprocess = None
 _INFINITY_INITIALIZATION_STAGE = 'python.import.threading'
+_infinity_report_initialization_stage()
 import threading
 _INFINITY_INITIALIZATION_STAGE = 'python.import.types'
+_infinity_report_initialization_stage()
 import types
 _INFINITY_INITIALIZATION_STAGE = 'python.import.weakref'
+_infinity_report_initialization_stage()
 import weakref
 _INFINITY_INITIALIZATION_STAGE = 'python.import.contextlib'
+_infinity_report_initialization_stage()
 from contextlib import contextmanager
 _INFINITY_INITIALIZATION_STAGE = 'python.import.urllib.parse'
+_infinity_report_initialization_stage()
 from urllib.parse import unquote, urlsplit, parse_qs
 _INFINITY_INITIALIZATION_STAGE = 'python.define_observer'
+_infinity_report_initialization_stage()
 
 
 def protected_method(name, dirty=False, clean=False):
@@ -80,6 +104,7 @@ class Observer:
     def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None):
         global _INFINITY_INITIALIZATION_STAGE
         _INFINITY_INITIALIZATION_STAGE = 'python.observer.state'
+        _infinity_report_initialization_stage()
         self.fail = fail
         self.touch = touch
         self.lock = threading.RLock()
@@ -176,6 +201,7 @@ class Observer:
     def install(self):
         global _INFINITY_INITIALIZATION_STAGE
         _INFINITY_INITIALIZATION_STAGE = 'python.install.open'
+        _infinity_report_initialization_stage()
         for module in (builtins, io, _io):
             original = module.open
             def opened(path, mode='r', *args, _original=original, **kwargs):
@@ -183,6 +209,7 @@ class Observer:
             self.patch(module, 'open', opened)
         observer = self
         _INFINITY_INITIALIZATION_STAGE = 'python.install.raw_io'
+        _infinity_report_initialization_stage()
         original_raw = _io.FileIO
         class RawFile(original_raw):
             _infinity_depth = 0
@@ -237,6 +264,7 @@ class Observer:
         self.patch(io, 'FileIO', RawFile)
         for name in ('BufferedWriter', 'BufferedRandom', 'TextIOWrapper'):
             _INFINITY_INITIALIZATION_STAGE = 'python.install.'+name
+            _infinity_report_initialization_stage()
             base = getattr(_io, name)
             class CheckedBuffer(base):
                 _infinity_depth = 2 if name == 'TextIOWrapper' else 1
@@ -280,10 +308,13 @@ class Observer:
             self.patch(_io, name, CheckedBuffer)
             self.patch(io, name, CheckedBuffer)
         _INFINITY_INITIALIZATION_STAGE = 'python.import._sqlite3'
+        _infinity_report_initialization_stage()
         native_sqlite = importlib.import_module('_sqlite3')
         _INFINITY_INITIALIZATION_STAGE = 'python.import.sqlite3.dbapi2'
+        _infinity_report_initialization_stage()
         dbapi2 = importlib.import_module('sqlite3.dbapi2')
         _INFINITY_INITIALIZATION_STAGE = 'python.install.sqlite3'
+        _infinity_report_initialization_stage()
         original_connection = native_sqlite.Connection
         original_cursor = native_sqlite.Cursor
 
@@ -436,6 +467,7 @@ class Observer:
         self.patch(native_sqlite, 'Connection', Connection)
         self.patch(native_sqlite, 'connect', native_connect)
         _INFINITY_INITIALIZATION_STAGE = 'python.install.os'
+        _infinity_report_initialization_stage()
         native_os = importlib.import_module(os.name)
         for name in ('write', 'writev', 'pwrite', 'pwritev', 'ftruncate', 'sendfile', 'copy_file_range'):
             if not hasattr(os, name): continue
@@ -490,12 +522,15 @@ class Observer:
             self.patch(os, name, namespace_op)
             if hasattr(native_os, name): self.patch(native_os, name, namespace_op)
         _INFINITY_INITIALIZATION_STAGE = 'python.install.crypto'
+        _infinity_report_initialization_stage()
         self.install_crypto_loads()
         if subprocess is not None:
             _INFINITY_INITIALIZATION_STAGE = 'python.install.children'
+            _infinity_report_initialization_stage()
             self.install_children()
         if self.vfs is not None:
             _INFINITY_INITIALIZATION_STAGE = 'python.install.xbmcvfs'
+            _infinity_report_initialization_stage()
             original = self.vfs.File
             def vfs_file(path, mode=None, _original=original):
                 if mode is None or not str(mode).startswith('w'):
@@ -541,16 +576,20 @@ class Observer:
                         raise
                 self.patch(self.vfs, name, vfs_op)
         _INFINITY_INITIALIZATION_STAGE = 'python.install.complete'
+        _infinity_report_initialization_stage()
 
     def install_crypto_loads(self):
         global _INFINITY_INITIALIZATION_STAGE
         # Resolve only the reviewed bundled crypto names to the APK library
         # root before dlopen. Native audit independently verifies exact bytes.
         _INFINITY_INITIALIZATION_STAGE = 'python.import.ctypes'
+        _infinity_report_initialization_stage()
         import ctypes
         _INFINITY_INITIALIZATION_STAGE = 'python.import._ctypes'
+        _infinity_report_initialization_stage()
         native = importlib.import_module('_ctypes')
         _INFINITY_INITIALIZATION_STAGE = 'python.install.crypto_dlopen'
+        _infinity_report_initialization_stage()
         original = native.dlopen
         names = ('libinfinityambient.so', 'libCryptodome_Cipher__Salsa20.so', 'libCryptodome_Cipher__chacha20.so', 'libCryptodome_Cipher__raw_aes.so', 'libCryptodome_Cipher__raw_cbc.so', 'libCryptodome_Cipher__raw_cfb.so', 'libCryptodome_Cipher__raw_ctr.so', 'libCryptodome_Cipher__raw_ecb.so', 'libCryptodome_Cipher__raw_ocb.so', 'libCryptodome_Cipher__raw_ofb.so', 'libCryptodome_Hash__BLAKE2s.so', 'libCryptodome_Hash__MD5.so', 'libCryptodome_Hash__SHA1.so', 'libCryptodome_Hash__SHA256.so', 'libCryptodome_Hash__ghash_portable.so', 'libCryptodome_Hash__poly1305.so', 'libCryptodome_Protocol__scrypt.so', 'libCryptodome_Util__cpuid_c.so', 'libCryptodome_Util__strxor.so')
         def loaded(name, *args, **kwargs):

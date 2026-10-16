@@ -1,0 +1,365 @@
+{
+  "scope": "Exact saved RC05 APK on disposable Android x86_64 emulator with ARM64 translation; not physical Fold acceptance",
+  "run_id": 38963791371,
+  "job_id": 117185119024,
+  "source_commit": "ccf1a10351526dc2e7fd3c7304147c974b3245db",
+  "artifact_id": 12073594350,
+  "artifact_sha256": "df077bd91e29c9e5fe73c1c8d3c27d5d020aa13023476860059296c2e08cb63b",
+  "apk_sha256": "5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb",
+  "result": "FAILED",
+  "core_gate": {
+    "boundary": "core-initialized",
+    "owner": "850e8fe2-5629-43fb-bcb7-5b3a20976839",
+    "pid": 7854,
+    "owner_began_epoch_ms": 1792183699661,
+    "observed_monotonic": 1312.495697532,
+    "stale_log_rejected": true,
+    "current_native_thread_verified": true,
+    "device_utc_offset": "+0000",
+    "before_log_sha256": "7b8efff47574c4edfd2f064f63a4bbda84248b5934a2ed1e4ad5f5c7547bf8f5",
+    "before_log_sample_bytes": 67125,
+    "log_sample_limit": 262144,
+    "starting_kodi_epoch_ms": 1792183701807,
+    "starting_kodi_log_time": "2026-10-16 20:48:21.807",
+    "core_initialized_epoch_ms": 1792183718065,
+    "core_initialized_log_time": "2026-10-16 20:48:38.065",
+    "application_running_epoch_ms": 1792183718070,
+    "application_running_log_time": "2026-10-16 20:48:38.070",
+    "main_native_tid": 7930,
+    "log_sha256": "2bc14cc08c8ef0576c19ce8d8609378f783342aa87a6f9e74446f7fef47c66fd",
+    "log_sample_bytes": 33511
+  },
+  "close_started_epoch_ms": 1792183723919,
+  "close_after_core_run_ms": 5849,
+  "coordinator_duration_ms": 25811,
+  "native_duration_ms": 25294,
+  "checkpoint_saved": false,
+  "authorization_consumed": false,
+  "essential_writes_sealed": false,
+  "essential_writes_durable": false,
+  "write_admission_started": false,
+  "active_writers": 41,
+  "observed_writers": 0,
+  "tracked_paths": 0,
+  "blocking_count": 0,
+  "pending_detail": "python_persistence_observer_initialization",
+  "initialization_stage_counts": {
+    "python.source": 41
+  },
+  "writer_age_ms": [
+    31381,
+    31987
+  ],
+  "source_stage_age_ms": [
+    10221,
+    25015
+  ],
+  "essential_owner_results": {
+    "native_admission": "FAILED",
+    "background_jobs": "FAILED",
+    "playback": "FAILED",
+    "command_center": "FAILED",
+    "compat": "FAILED",
+    "kodi_settings": "FAILED",
+    "profiles": "FAILED",
+    "skin_settings": "FAILED",
+    "addon_settings": "FAILED",
+    "favourites": "FAILED",
+    "peripherals": "FAILED",
+    "audio_policy": "FAILED",
+    "deferred_dialog_state": "FAILED",
+    "xml_files": "FAILED",
+    "native_databases": "FAILED",
+    "pvr": "FAILED"
+  },
+  "passed_same_apk_loaded_control": {
+    "run_id": 38957547396,
+    "shutdown_ms": 5017,
+    "command_center_observer_install_ms": 42496,
+    "compat_observer_install_ms": 43218,
+    "interpretation": "Observer installation also takes longer than 25s in the successful loaded control before Close. This does not prove a deadlock or a particular import cause."
+  },
+  "host_timing": {
+    "scope": "Scratch-only pinned CPython3.11.7 host,37 concurrent real subinterpreters,twoCPU affinity; not Android/Fold proof",
+    "allowed_cpus": [
+      0,
+      1
+    ],
+    "python_version": "Python 3.11.7",
+    "original_header_sha256": "1328dd926b56be887d4ae6a25b1cb9dde124822033db5dfd9bbdaf341214c6a1",
+    "diagnostic_header_sha256": "95bea2d193fcfc6d0df9b974c411da214370e66f17e668a5d341e22f4b0bb9ea",
+    "production_source_sha256": "5b6e4d6d1453ada097f4b6338b09394f045638fc5785d231e491d27bc43ffb56"
+  },
+  "host_timing_results": [
+    {
+      "active": 37,
+      "observed": 37,
+      "blocking_count": 0,
+      "fail_closed": false,
+      "stage": "complete",
+      "original_exception": "",
+      "mode": "concurrent-37",
+      "wall_seconds": 1.6047481590030657,
+      "duration_summary": {
+        "compile_ms": {
+          "min": 7.071000000000026,
+          "max": 10.064000000000021,
+          "mean": 7.751729729729727
+        },
+        "evaluate_ms": {
+          "min": 841.652,
+          "max": 1186.8809999999999,
+          "mean": 1029.4023783783784
+        },
+        "observer_ms": {
+          "min": 947.2700000000001,
+          "max": 1339.125,
+          "mean": 1182.631972972973
+        },
+        "interpreter_ms": {
+          "min": 164.9976,
+          "max": 598.5264,
+          "mean": 289.51475
+        }
+      },
+      "import_wall_intervals": {
+        "python.import.shutil": {
+          "min": 319.30100000000004,
+          "max": 657.324,
+          "mean": 486.53862162162164
+        },
+        "python.import.subprocess": {
+          "min": 141.1300000000001,
+          "max": 408.1199999999999,
+          "mean": 242.9398108108108
+        },
+        "python.import.sqlite3": {
+          "min": 52.49699999999996,
+          "max": 259.1600000000001,
+          "mean": 138.84656756756758
+        },
+        "python.import.importlib": {
+          "min": 18.347999999999956,
+          "max": 183.98200000000003,
+          "mean": 89.16835135135135
+        },
+        "python.import.ctypes": {
+          "min": 1.4199999999998454,
+          "max": 180.80999999999995,
+          "mean": 68.80405405405403
+        },
+        "python.import.urllib.parse": {
+          "min": 5.369999999999891,
+          "max": 136.03999999999996,
+          "mean": 56.37621621621622
+        },
+        "python.import.weakref": {
+          "min": 0.37000000000011823,
+          "max": 73.13999999999987,
+          "mean": 15.418108108108102
+        },
+        "python.import._ctypes": {
+          "min": 0.0,
+          "max": 0.07999999999992724,
+          "mean": 0.008918918918916953
+        },
+        "python.import._sqlite3": {
+          "min": 0.0,
+          "max": 0.010000000000218279,
+          "mean": 0.006756756756762902
+        },
+        "python.import.builtins": {
+          "min": 0.004000000000019099,
+          "max": 0.03400000000004866,
+          "mean": 0.006405405405403727
+        },
+        "python.import.sys": {
+          "min": 0.0,
+          "max": 0.029999999999972715,
+          "mean": 0.0059459459459559015
+        },
+        "python.import.contextlib": {
+          "min": 0.0,
+          "max": 0.010000000000218279,
+          "mean": 0.005135135135142755
+        },
+        "python.import.sqlite3.dbapi2": {
+          "min": 0.0,
+          "max": 0.01999999999998181,
+          "mean": 0.0037837837837864877
+        },
+        "python.import.io": {
+          "min": 0.0020000000000095497,
+          "max": 0.0049999999999954525,
+          "mean": 0.003486486486489307
+        },
+        "python.import.stat": {
+          "min": 0.0,
+          "max": 0.010000000000218279,
+          "mean": 0.0030270270270322626
+        },
+        "python.import.threading": {
+          "min": 0.0,
+          "max": 0.049999999999954525,
+          "mean": 0.002972972972970269
+        },
+        "python.import.os": {
+          "min": 0.0009999999999763531,
+          "max": 0.0030000000000427463,
+          "mean": 0.002135135135135344
+        },
+        "python.import.types": {
+          "min": 0.0,
+          "max": 0.009999999999990905,
+          "mean": 0.0018918918918901712
+        },
+        "python.import._io": {
+          "min": 0.0,
+          "max": 0.0030000000000427463,
+          "mean": 0.0017297297297218578
+        }
+      }
+    },
+    {
+      "active": 37,
+      "observed": 37,
+      "blocking_count": 0,
+      "fail_closed": false,
+      "stage": "complete",
+      "original_exception": "",
+      "mode": "close-deferred-37",
+      "wall_seconds": 1.6172444520016143,
+      "duration_summary": {
+        "compile_ms": {
+          "min": 7.2859999999999445,
+          "max": 12.107999999999947,
+          "mean": 8.664837837837842
+        },
+        "evaluate_ms": {
+          "min": 856.201,
+          "max": 1247.6689999999999,
+          "mean": 1033.239
+        },
+        "observer_ms": {
+          "min": 1043.1009999999999,
+          "max": 1342.207,
+          "mean": 1191.0777837837836
+        },
+        "interpreter_ms": {
+          "min": 148.8667,
+          "max": 465.2193,
+          "mean": 280.6439089189189
+        }
+      },
+      "import_wall_intervals": {
+        "python.import.shutil": {
+          "min": 313.039,
+          "max": 668.316,
+          "mean": 494.04686486486486
+        },
+        "python.import.subprocess": {
+          "min": 122.47999999999979,
+          "max": 330.2199999999999,
+          "mean": 230.66562162162163
+        },
+        "python.import.sqlite3": {
+          "min": 50.69200000000001,
+          "max": 202.66999999999985,
+          "mean": 121.0560810810811
+        },
+        "python.import.importlib": {
+          "min": 17.241000000000042,
+          "max": 210.76099999999997,
+          "mean": 96.6552972972973
+        },
+        "python.import.ctypes": {
+          "min": 6.769999999999982,
+          "max": 149.01999999999998,
+          "mean": 69.90756756756757
+        },
+        "python.import.urllib.parse": {
+          "min": 15.419999999999845,
+          "max": 119.71000000000004,
+          "mean": 66.68945945945947
+        },
+        "python.import.weakref": {
+          "min": 0.36999999999989086,
+          "max": 60.97999999999979,
+          "mean": 24.005135135135138
+        },
+        "python.import._ctypes": {
+          "min": 0.0,
+          "max": 0.03999999999996362,
+          "mean": 0.009729729729727027
+        },
+        "python.import._sqlite3": {
+          "min": 0.0,
+          "max": 0.010000000000218279,
+          "mean": 0.00756756756756683
+        },
+        "python.import.builtins": {
+          "min": 0.003999999999962256,
+          "max": 0.012000000000000455,
+          "mean": 0.006378378378370427
+        },
+        "python.import.contextlib": {
+          "min": 0.0,
+          "max": 0.009999999999990905,
+          "mean": 0.0045945945945904156
+        },
+        "python.import.stat": {
+          "min": 0.0,
+          "max": 0.009999999999990905,
+          "mean": 0.004432432432429015
+        },
+        "python.import.sys": {
+          "min": 0.0,
+          "max": 0.009999999999990905,
+          "mean": 0.0035945945945925544
+        },
+        "python.import.io": {
+          "min": 0.0019999999999527063,
+          "max": 0.005999999999971806,
+          "mean": 0.0033513513513473816
+        },
+        "python.import.threading": {
+          "min": 0.0,
+          "max": 0.010000000000218279,
+          "mean": 0.0029729729729764142
+        },
+        "python.import.os": {
+          "min": 0.0009999999999763531,
+          "max": 0.0030000000000427463,
+          "mean": 0.0021081081081151015
+        },
+        "python.import.types": {
+          "min": 0.0,
+          "max": 0.009999999999990905,
+          "mean": 0.0018918918918901712
+        },
+        "python.import.sqlite3.dbapi2": {
+          "min": 0.0,
+          "max": 0.009999999999990905,
+          "mean": 0.0018918918918901712
+        },
+        "python.import._io": {
+          "min": 0.0,
+          "max": 0.0029999999999290594,
+          "mean": 0.0014864864864897434
+        }
+      }
+    }
+  ],
+  "root_cause_proven": false,
+  "remaining_evidence_gap": "Existing python.source covers PyRun_String compilation and all top-level imports. Existing Python stage globals are only copied on an exception; none was raised at deadline. Publish those same stages live before changing behavior.",
+  "prior_passes_preserved": {
+    "native_run": 38957212563,
+    "regressions": 308,
+    "fresh_close_ms": 13319,
+    "loaded_37_close_ms": 5017
+  },
+  "physical_fold_data_touched": false,
+  "apk_deliverable": false,
+  "physical_fold_accepted": false,
+  "final_lock_authorized": false
+}

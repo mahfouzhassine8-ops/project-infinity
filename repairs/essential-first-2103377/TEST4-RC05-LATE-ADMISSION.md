@@ -90,6 +90,16 @@ unready services and actual pending native observers. The existing cold
 stress remains recorded as failed. No engine changes, repeated green tests,
 new signer, APK promotion or final lock are part of this comparison.
 
-Isolated comparison **38963791371** is running from `ccf1a103`; its workflow
-checks the 21 new host controls and saved input identities before starting the
-AVD. It cannot build or promote an APK. Its outcome is pending.
+Isolated comparison **38963791371** from `ccf1a103` passed its 21 host controls,
+exact saved input verification, permanent certificate verification and emulator
+setup, then FAILED actual Close. It began 5.849s after core Run, with all 41
+writers admitted before Close, but none completed the observer's `PyRun_String`
+source phase by expiry. No Python exception was recorded, write admission never
+started, and no essential participant reached saving. This is distinct from the
+cold case above. The comparison cannot build or promote an APK.
+
+The successful loaded control took about 43s for required observer initialization
+before Close under ARM translation. The current evidence therefore does not
+establish a deadlock or a particular failing import. See
+[LIVE-OBSERVER-INITIALIZATION.md](LIVE-OBSERVER-INITIALIZATION.md) for the narrow
+remaining diagnostic gap; the earlier passing results and failure remain intact.

@@ -48,6 +48,35 @@ inline void InitializationStage(Context* context,const char* stage)
   context->initializationStage=stage;
   InfinityScriptPersistence::InitializationProgress(context->id,stage,context->interpreterIdentity);
 }
+inline void ReportInitializationStage(Context* context,const char* stage) noexcept
+{
+  // Auxiliary progress must not change Python errors, errno, write ownership,
+  // observer admission or the outcome of the operation being diagnosed.
+  const int nativeError=errno;
+  try { InitializationStage(context,stage); } catch(...) { /* Diagnostic only. */ }
+  errno=nativeError;
+}
+inline PyObject* ReportPythonInitializationStage(PyObject* capsule,PyObject* value)
+{
+  const int nativeError=errno;
+  if(PyCapsule_IsValid(capsule,"Infinity.Persistence.Observer") &&
+      PyUnicode_CheckExact(value) && PyUnicode_IS_COMPACT_ASCII(value))
+  {
+    auto* context=static_cast<Context*>(PyCapsule_GetPointer(capsule,"Infinity.Persistence.Observer"));
+    auto* thread=PyThreadState_Get();
+    const auto found=Contexts().find(thread->interp);
+    const auto length=PyUnicode_GET_LENGTH(value);
+    const char* stage=reinterpret_cast<const char*>(PyUnicode_1BYTE_DATA(value));
+    bool valid=length>7 && length<128 && std::strncmp(stage,"python.",7)==0;
+    for(Py_ssize_t i=0;valid && i<length;++i)
+      valid=(stage[i]>='a' && stage[i]<='z') || (stage[i]>='A' && stage[i]<='Z') ||
+          (stage[i]>='0' && stage[i]<='9') || stage[i]=='.' || stage[i]=='_';
+    if(valid && found!=Contexts().end() && found->second==context)
+      ReportInitializationStage(context,stage);
+  }
+  errno=nativeError;
+  Py_RETURN_NONE;
+}
 inline void InitializationFailed(int id,const std::string& reason,const std::string& stage,
                                  PyObject* globals=nullptr)
 {
@@ -70,7 +99,7 @@ inline void InitializationFailed(int id,const std::string& reason,const std::str
     }
     PyErr_Clear();
   };
-  if(globals && (stage=="python.source" || stage=="python.observer.construct")) {
+  if(globals) {
     auto* step=PyDict_GetItemString(globals,"_INFINITY_INITIALIZATION_STAGE");
     if(step && PyUnicode_Check(step)) { detail+="; python_stage=";appendText(step); }
   }
@@ -575,6 +604,14 @@ inline int Audit(const char* event,PyObject* args,void*)
   auto* thread=PyThreadState_Get();if(!thread)return 0;
   const auto found=Contexts().find(thread->interp);if(found==Contexts().end())return 0;
   auto* context=found->second;
+  // Observe the outer PyRun_String compile/execute boundary without replacing
+  // its implementation. Subsequent import audits cannot overwrite a Python
+  // helper's more precise live import/install stage.
+  if(std::strcmp(event,"compile")==0 && context->initializationStage=="python.source")
+    ReportInitializationStage(context,"python.source.compile");
+  else if(std::strcmp(event,"exec")==0 && (context->initializationStage=="python.source" ||
+      context->initializationStage=="python.source.compile"))
+    ReportInitializationStage(context,"python.source.execute");
   const auto count=PyTuple_Check(args)?PyTuple_GET_SIZE(args):0;
   const auto at=[&](Py_ssize_t n){return n<count?PyTuple_GET_ITEM(args,n):Py_None;};
   std::vector<std::string> actualTargets;
@@ -894,16 +931,21 @@ inline Context* Start(int id,PyInterpreterState* interpreter)
   if(!name)return failed();
   const int named=PyDict_SetItemString(context->globals,"__name__",name);Py_DECREF(name);
   if(named!=0)return failed();
+  static PyMethodDef progressMethod={"report_initialization_stage",ReportPythonInitializationStage,METH_O,nullptr};
+  PyObject* capsule=PyCapsule_New(context,"Infinity.Persistence.Observer",nullptr);
+  PyObject* progress=capsule?PyCFunction_NewEx(&progressMethod,capsule,nullptr):nullptr;
+  if(!progress || PyDict_SetItemString(context->globals,"_INFINITY_NATIVE_INITIALIZATION_STAGE",progress)!=0)
+  { Py_XDECREF(progress);Py_XDECREF(capsule);return failed(); }
+  Py_DECREF(progress);
   InitializationStage(context,"python.source");
   PyObject* result=PyRun_String(INFINITY_PYTHON_PERSISTENCE_SOURCE,Py_file_input,context->globals,context->globals);
-  if(!result)return failed();
+  if(!result) { Py_DECREF(capsule);return failed(); }
   Py_DECREF(result);
   static PyMethodDef errorMethod={"record_failure",Error,METH_VARARGS,nullptr};
   static PyMethodDef mutationMethod={"record_mutation",Mutation,METH_VARARGS,nullptr};
   static PyMethodDef protectionMethod={"protect_mutation",Protect,METH_VARARGS,nullptr};
   InitializationStage(context,"native.callbacks");
-  PyObject* capsule=PyCapsule_New(context,"Infinity.Persistence.Observer",nullptr);
-  PyObject* error=capsule?PyCFunction_NewEx(&errorMethod,capsule,nullptr):nullptr;
+  PyObject* error=PyCFunction_NewEx(&errorMethod,capsule,nullptr);
   PyObject* mutation=error?PyCFunction_NewEx(&mutationMethod,capsule,nullptr):nullptr;
   PyObject* protection=mutation?PyCFunction_NewEx(&protectionMethod,capsule,nullptr):nullptr;
   PyObject* vfs=nullptr;

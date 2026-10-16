@@ -69,6 +69,7 @@ def compile_engine():
                   b'python.runtime.threading_shutdown.complete', b'python_persistence_observer_initialization',
                   b'application_startup_initialization_failed',
                   b'native_python_initialization_progress_v1', b'native.observer.entry',
+                  b'python.source.compile', b'_INFINITY_NATIVE_INITIALIZATION_STAGE',
                   b'scripts.checkpoint_new_background_admission_closed'):
         assert token in binary, token
     assert hashlib.sha256(binary).hexdigest() == proof['native_sha256']

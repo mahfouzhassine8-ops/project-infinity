@@ -1,7 +1,7 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Approved Essential-First architecture preserved. Full native38957212563/92b5be78 passed. Exact signedRC05APK5103a01d passed308,permanent signing/baseline preservation,fresh13.319s andloaded37-service5.017s shutdown with16essentialowners,bothJavaseals,zeroUIDprocesses,sevenDBintegrityandretaineddatareopen. Onlypre-corecoldstressClosefailed25.227s; both2/2observersinitialized, genuineCommandCenterPREPAREproofpendingwith<1secondbudget. ActualFoldcorecompleted4.909sBEFOREClose,unlikecoldtest13.392sAFTERrequest. Reuseexactbinaryforseparatephase-matchedpending-observercomparison; noengineor308/fresh/loadedrerun. Coldfailureandpromotionblockremain; noFoldacceptanceorlock.",
+  "implementation": "RC05 preserved green native build 38957212563, 308 regressions, fresh 13.319s and loaded37 5.017s. Cold-start failure reached PREPARE with2/2 observers. Phase-matched comparison38963791371 failed with41/0 at PyRun_String and no save stage. Exact live Python initialization progress is the next narrow diagnostic checkpoint; actual import cause unproven. No admission, durability, timeout or feature changes and no promotion/lock.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
     "native_cpython_3117_runtime": 61,
@@ -1658,7 +1658,7 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T20:39:55.061822+00:00",
+    "as_of_utc": "2026-10-16T21:12:54.768428+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
     "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
     "native_run_id": 38957212563,
@@ -1738,8 +1738,8 @@
     "physical_fold_accepted": false,
     "final_lock_authorized": false,
     "remaining": [
-      "Run phase-matched early-startup comparison against the exact already-signed RC05 APK",
-      "Resolve and report current cold-start timeout without waiving any genuine essential-write failure",
+      "Publish exact live Python import/installation stage during initialization; capture actual Android wait before choosing a behavior correction",
+      "Preserve prior 308/native/fresh/loaded passes; reproduce and resolve phase-matched and cold-start failures without weakening save protection",
       "Full configured physical Fold test/approval remains required before final lock"
     ],
     "apk_sha256": "5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb",
@@ -1761,13 +1761,43 @@
       "regression_308_rerun_required": false,
       "fresh_loaded_rerun_required": false,
       "scope": "separate optional core-initialized comparison with actual pending-observer proof; original cold stress retained as failed",
-      "evidence": "../android-checkpoint-shutdown/runtime-tests/evidence/rc05-startup-phase-comparison.json",
-      "status": "in_progress",
+      "evidence": "evidence/rc05-core-initialized-38963791371.json",
+      "status": "completed",
       "run_id": 38963791371,
       "source_commit": "ccf1a10351526dc2e7fd3c7304147c974b3245db",
       "new_phase_controls": 21,
       "new_phase_controls_result": "passed locally; repeated in isolated CI before AVD",
-      "main_acceptance_and_promotion_gates_unchanged": true
+      "main_acceptance_and_promotion_gates_unchanged": true,
+      "result": "failure",
+      "native_duration_ms": 25294,
+      "coordinator_duration_ms": 25811,
+      "core_initialized_before_request_ms": 5849,
+      "active_writers": 41,
+      "observed_writers": 0,
+      "python_stage": "python.source",
+      "python_exceptions_recorded": 0,
+      "write_admission_started": false,
+      "artifact_id": 12073594350
+    },
+    "latest_failure": "Phase-matched early Close: 41 admitted writers remain inside PyRun_String source loading, no observer completed and no save participant started before 25s. Exact compile/import wait remains unproven.",
+    "next_targeted_change": "Live progress for existing Python observer initialization stages, plus outer source compile/execute stamps; diagnostics only, no admission/save/timeout changes.",
+    "live_stage_diagnostic": {
+      "purpose": "Identify actual Android compile/import wait before choosing a behavior correction",
+      "behavior_changes": false,
+      "py_run_string_unchanged": true,
+      "all_imports_unchanged": true,
+      "admission_durability_timeout_unchanged": true,
+      "new_native_controls": 7,
+      "preserved_initialization_controls": 11,
+      "preserved_close_race_controls": 5,
+      "preserved_progress_controls": 8,
+      "real_write_guard_controls": 11,
+      "source_contracts": 16,
+      "local_result": "all passed",
+      "independent_review": "approved for diagnostic build; not shutdown acceptance",
+      "native_run_id": null,
+      "android_run_id": null,
+      "apk_deliverable": false
     }
   },
   "repair_checkpoint_history": [
@@ -1858,6 +1888,129 @@
         "Verify exact signed candidate bytes and permanent certificate",
         "Physical Fold test and explicit approval before final lock"
       ]
+    },
+    {
+      "as_of_utc": "2026-10-16T20:39:55.061822+00:00",
+      "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
+      "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
+      "native_run_id": 38957212563,
+      "native_host_proof": "passed",
+      "full_arm64_build": "success",
+      "last_completed_green_native_run_id": 38957212563,
+      "android_run_id": 38957547396,
+      "android_candidate_version": "1.0.9-Essential-First-TEST4-RC05",
+      "android_acceptance": "overall failure: only pre-core cold-start Close failed; producer/fresh/loaded passed",
+      "sdk_setup_control": {
+        "run_id": 38957342018,
+        "result": "success",
+        "controls": 18,
+        "version_command_exit_code": 0,
+        "emulator_revision": "37.2.12.0",
+        "build": 16428233
+      },
+      "last_completed_android_attempt": {
+        "run_id": 38957547396,
+        "regressions_308": "passed",
+        "signing_and_preservation": "passed",
+        "fresh_shutdown": "passed: 13.319s",
+        "loaded_upgrade_shutdown": "passed: 5.017s; 37 controlled services",
+        "early_cold_shutdown": "failed: 25.227s; Command Center PREPARE incomplete",
+        "promotion": "skipped"
+      },
+      "actual_early_failure": {
+        "run_id": 38957547396,
+        "job_id": 117172981808,
+        "artifact_id": 12072846329,
+        "duration_ms": 25227,
+        "core_initialization_after_request_ms": 13392,
+        "active_python_writers": 2,
+        "observed_python_writers": 2,
+        "python_blocking_failures": 0,
+        "write_admission_started": true,
+        "playback_committed_elapsed_ms": 24127,
+        "pending_receipt": "command_center PLAYBACK_CHECKPOINTED after PREPARE",
+        "file_lock_path_proven": false,
+        "passed": false
+      },
+      "loaded_fixture_correction": {
+        "proved_failure": "assert-elided xbmcvfs.mkdirs under PYTHONOPTIMIZE=1 caused settings open ENOENT; newline/readback assert defects also corrected",
+        "controls": 12,
+        "result": "12 controls passed; corrected loaded Android shutdown passed in 5.017s with actual write/readback and all 37 services reopening"
+      },
+      "new_native_controls": {
+        "manager_and_source_identity": 15,
+        "coordinator": 34,
+        "serialization": 6,
+        "observer_initialization": 11,
+        "observer_close_race": 5,
+        "native_progress": 8,
+        "existing_lifetime_escalation_quarantine": "passed",
+        "result": "all passed locally; full native host workflow passed"
+      },
+      "preserved": {
+        "signed_test3_commit": "9e9ef198ef0a68f13644621724b0762e1150438b",
+        "android_regressions": 308,
+        "essential_architecture": true,
+        "native_java_sqlite_lifecycle_corrections": true,
+        "deadline_ms": 25000,
+        "all_existing_writer_obligations": true,
+        "required_essential_owners": 16,
+        "both_java_seals_required": true,
+        "whole_package_death_required": true,
+        "integrity_and_saved_data_reopen_required": true
+      },
+      "installation_scope": {
+        "physical_fold_data_touched": false,
+        "full_backup_required": false,
+        "internal_load": "37 controlled Python services plus unchanged Infinity APK/skin/first-party services and verified retained test data",
+        "actual_diggz_ecosystem_cloned": false,
+        "configured_fold_approval_required": true
+      },
+      "apk_deliverable": false,
+      "physical_fold_accepted": false,
+      "final_lock_authorized": false,
+      "remaining": [
+        "Run phase-matched early-startup comparison against the exact already-signed RC05 APK",
+        "Resolve and report current cold-start timeout without waiving any genuine essential-write failure",
+        "Full configured physical Fold test/approval remains required before final lock"
+      ],
+      "apk_sha256": "5103a01db85129e9e2f3a9c8f08dc97c7e2433e6491ee0011bfe7e6713f96cfb",
+      "permanent_signing_and_baseline_preservation": "passed",
+      "fresh_close_ms": 13319,
+      "loaded_37_close_ms": 5017,
+      "positive_runtime_proofs": {
+        "essential_owners": 16,
+        "both_java_seals": true,
+        "external_whole_uid_death": true,
+        "seven_database_integrity": true,
+        "loaded_reopen_services": 37,
+        "retained_upgrade_hashes": 46
+      },
+      "phase_comparison": {
+        "fold_core_initialization_before_request_ms": 4909,
+        "same_apk_reused": true,
+        "native_rebuild_required": false,
+        "regression_308_rerun_required": false,
+        "fresh_loaded_rerun_required": false,
+        "scope": "separate optional core-initialized comparison with actual pending-observer proof; original cold stress retained as failed",
+        "evidence": "evidence/rc05-core-initialized-38963791371.json",
+        "status": "completed",
+        "run_id": 38963791371,
+        "source_commit": "ccf1a10351526dc2e7fd3c7304147c974b3245db",
+        "new_phase_controls": 21,
+        "new_phase_controls_result": "passed locally; repeated in isolated CI before AVD",
+        "main_acceptance_and_promotion_gates_unchanged": true,
+        "result": "failure",
+        "native_duration_ms": 25294,
+        "coordinator_duration_ms": 25811,
+        "core_initialized_before_request_ms": 5849,
+        "active_writers": 41,
+        "observed_writers": 0,
+        "python_stage": "python.source",
+        "python_exceptions_recorded": 0,
+        "write_admission_started": false,
+        "artifact_id": 12073594350
+      }
     }
   ]
 }

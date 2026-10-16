@@ -35,7 +35,7 @@ static int pauseAtProcessHandle(const char* event,PyObject* args,void*) {
   const auto found=InfinityPythonPersistence::Contexts().find(PyThreadState_Get()->interp);
   if(found==InfinityPythonPersistence::Contexts().end())return 0;
   auto* context=found->second;
-  if(context->initializationStage!="python.observer.construct")return 0;
+  if(context->initializationStage!="python.import.ctypes")return 0;
   std::unique_lock<std::mutex> lock(gate.mutex);
   if(!gate.arrivals.insert(context->id).second)return 0;
   gate.changed.notify_all();

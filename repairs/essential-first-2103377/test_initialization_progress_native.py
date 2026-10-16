@@ -122,7 +122,8 @@ int main(int argc,char**argv) {
       assert(stages.count(expected)==1);
     if(bad) {
       assert(proof.observed==0 && proof.blockingCount>0 && PyErr_Occurred());
-      assert(row.current.stage=="failed:python.observer.construct");
+      assert(row.current.stage=="failed:python.install.xbmcvfs");
+      assert(proof.failureDetail.find("stage=python.install.xbmcvfs")!=std::string::npos);
       assert(proof.failureDetail.find("exception=AttributeError")!=std::string::npos);
       PyObject *type=nullptr,*value=nullptr,*trace=nullptr;PyErr_Fetch(&type,&value,&trace);
       assert(type==PyExc_AttributeError && value && trace);PyErr_Restore(type,value,trace);
