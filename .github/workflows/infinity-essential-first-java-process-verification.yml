@@ -1,5 +1,5 @@
 name: Infinity 2103377 | Java save regression and complete Android shutdown
-# TEST4 RC04 requires exact native initialization progress and all three independent shutdown cases.
+# TEST4 RC05 requires the exact native startup admission cutoff and all three independent shutdown cases.
 # Explicit install-r receiver observation never substitutes for post-Close whole-UID death.
 # Fresh, early-upgrade and fully-loaded upgrade run in independent disposable AVD jobs.
 
@@ -154,7 +154,7 @@ jobs:
           python3 - <<'PY'
           import json,os,time,urllib.request
           pinned={
-              38945424322:"eaa6ff3f283fea149cede0423488c4e7989a5090",
+              38957212563:"92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
               38733189236:"62ba1eccef24b209a1d32fb9bef39b5928ac4f4a",
           }
           for run,commit in pinned.items():
@@ -175,7 +175,7 @@ jobs:
           PY
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38945424322
+          run-id: 38957212563
           name: Infinity-2103377-Essential-First-Native-Evidence
           github-token: ${{ github.token }}
           path: native-evidence
@@ -496,7 +496,7 @@ jobs:
               apk_deliverable=True,verified_android_process_exit=True,verified_first_party_callback_on_device=True,
               internal_whole_package_death_verified=True,internal_saved_data_reopen_verified=True,
               verified_fold_reopen=False,physical_fold_accepted=False,final_lock_authorized=False,
-              native_run_id=38945424322,android_run_id=int(os.environ['GITHUB_RUN_ID']),
+              native_run_id=38957212563,android_run_id=int(os.environ['GITHUB_RUN_ID']),
               internal_startup_close_verified=True,internal_loaded_close_verified=True,
               independent_upgrade_avds_verified=True,upgrade_scenarios=['early','loaded'],
               internal_missing_directory_creation_verified=True,
