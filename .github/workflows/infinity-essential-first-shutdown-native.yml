@@ -216,6 +216,9 @@ jobs:
       - name: Verify production job and synchronous installer admission
         run: |
           set -euo pipefail
+          python3 repairs/essential-first-2103377/test_runtime_directory.py --runtime kodi \
+            --out checkpoint-build/runtime-directory.json \
+            2>&1 | tee checkpoint-build/runtime-directory.log
           python3 repairs/essential-first-2103377/test_runtime_jobs.py --runtime kodi \
             2>&1 | tee checkpoint-build/runtime-jobs.log
           python3 repairs/essential-first-2103377/test_runtime_repository.py --runtime kodi \

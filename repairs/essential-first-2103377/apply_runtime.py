@@ -290,7 +290,22 @@ def directory(text):
   if (!infinityDirectoryWrite) return false;
 #endif
 '''
-    text = once(text, '  if (mkdir(path.c_str(), 0755) != 0)', guard('path', 'posix.mkdir')+'  if (mkdir(path.c_str(), 0755) != 0)')
+    text = once(text, '  if (mkdir(path.c_str(), 0755) != 0)', '''#if defined(TARGET_ANDROID)
+  // CreateDirectoryEx visits existing ancestors while building an add-on
+  // profile. Query an existing directory without attempting a mutation or
+  // inventing a new durability obligation for that ancestor. Preserve this
+  // overload's false/EEXIST result; Create(CURL) still confirms Exists(url).
+  // Missing/unknown destinations keep the original checked mkdir below.
+  // An earlier real creation remains independently recorded in the ledger.
+  struct stat infinityExistingDirectory{};
+  if (::stat(path.c_str(), &infinityExistingDirectory) == 0 &&
+      S_ISDIR(infinityExistingDirectory.st_mode))
+  {
+    errno = EEXIST;
+    return false;
+  }
+#endif
+''' + guard('path', 'posix.mkdir')+'  if (mkdir(path.c_str(), 0755) != 0)')
     text = once(text, '  if (rmdir(url.Get().c_str()) == 0)', guard('url.Get()', 'posix.rmdir')+'  if (rmdir(url.Get().c_str()) == 0)')
     start = text.index('bool CPosixDirectory::RemoveRecursive(')
     text = text[:start] + once(text[start:], '  DIR *dir = opendir(root.c_str());', guard('root', 'posix.remove_recursive')+'  DIR *dir = opendir(root.c_str());')

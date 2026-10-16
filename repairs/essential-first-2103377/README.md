@@ -1,6 +1,9 @@
 # Essential-first shutdown — production repair in progress
 
-**Current status: diagnostic native 38876390312 passed. Compact Fold logs and a 37-interpreter reproduction identify the observer's PyDLL(None) Close race; targeted guard-ordering correction awaits matched native/Android acceptance. All 308 tests preserved. Not locked.**
+**Current status: corrected native 38881674542 passed, including the complete engine. Android 38882588772 passed all 308 tests and fresh TEST4 Close/death/integrity/reopen, then failed on the old signed TEST3 baseline before upgrade: existing ancestor mkdir attempts registered /storage for durability. Seven targeted directory controls prove a narrow correction; rebuilt native and repeated Android acceptance remain required. Not locked.**
+
+See [TEST4-DIRECTORY-FAILURE.md](TEST4-DIRECTORY-FAILURE.md). The observer
+PyDLL(None) correction and every previously passing protection are retained.
 
 Continue from `9e9ef198`, preserving the permanently signed TEST3 baseline.
 Current evidence, initialization-error capture, and the required comparison

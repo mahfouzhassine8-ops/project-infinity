@@ -1,0 +1,52 @@
+{
+  "scope": "actual patched CPosixDirectory::Create and production write ledger; host filesystem",
+  "expected_unfixed": true,
+  "production_function_sha256": "2b34838a277b52c5ab3dd59dbe64b388e59b8490d71b7dbe53215663db03a54c",
+  "results": [
+    {
+      "case": "existing-unwritten",
+      "exit_code": 0,
+      "stdout": "case=existing-unwritten; mkdir_calls=1; mkdir_errno=17; sealed=0; authorized=0\nprotected_durability_failed:/proc\n",
+      "stderr": ""
+    },
+    {
+      "case": "created-durable",
+      "exit_code": 0,
+      "stdout": "case=created-durable; mkdir_calls=1; mkdir_errno=0; sealed=1; authorized=1\n",
+      "stderr": ""
+    },
+    {
+      "case": "created-fsync-failure",
+      "exit_code": 0,
+      "stdout": "case=created-fsync-failure; mkdir_calls=1; mkdir_errno=0; sealed=0; authorized=0\nprotected_durability_failed:/tmp/infinity-native-directory-bhjgsgjx/created-fsync-failure/profile/created\n",
+      "stderr": ""
+    },
+    {
+      "case": "parent-fsync-failure",
+      "exit_code": 0,
+      "stdout": "case=parent-fsync-failure; mkdir_calls=1; mkdir_errno=0; sealed=0; authorized=0\nprotected_durability_failed:/tmp/infinity-native-directory-bhjgsgjx/parent-fsync-failure/profile/created\n",
+      "stderr": ""
+    },
+    {
+      "case": "created-then-existing",
+      "exit_code": 0,
+      "stdout": "case=created-then-existing; mkdir_calls=2; mkdir_errno=17; sealed=0; authorized=0\nprotected_durability_failed:/tmp/infinity-native-directory-bhjgsgjx/created-then-existing/profile/created\n",
+      "stderr": ""
+    },
+    {
+      "case": "failed-real-create",
+      "exit_code": 0,
+      "stdout": "case=failed-real-create; mkdir_calls=3; mkdir_errno=17; sealed=0; authorized=0\nprotected_durability_failed:/proc/self\n",
+      "stderr": ""
+    },
+    {
+      "case": "sealed-create",
+      "exit_code": 0,
+      "stdout": "case=sealed-create; mkdir_calls=0; mkdir_errno=0; sealed=1; authorized=1\n",
+      "stderr": ""
+    }
+  ],
+  "all_passed": true,
+  "android_process_death_verified": false,
+  "physical_fold_accepted": false
+}
