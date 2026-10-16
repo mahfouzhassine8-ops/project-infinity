@@ -15,10 +15,12 @@ import shutil
 import subprocess
 import tarfile
 import xml.etree.ElementTree as ET
+import zipfile
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
-NATIVE='d69e4d267d4a7f8051fdc1ae8996e856ef51063c'
+NATIVE='66bdcd715bc95354eec672caf1a74038bbd98f44'
+TEST2_SHA='172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807'
 PARSER_SHA='3e3e0c65d57d12797dbead3df1ebb28e7583737d0cd1f2a898dba6febd50ab88'
 EXTRA=('InfinityCloseNativeLease','InfinityJavaWriteBarrier','InfinityJavaPersistence')
 TEST='InfinityJavaPersistence2103377Test'
@@ -139,9 +141,10 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('mode',choices=('java','verify-java','package'))
     for name in ('parent','source','gradle-dir','donor','native','android','out','parser','green'):
         p.add_argument('--'+name,type=Path,required=name in ('parent','gradle-dir','out'))
+    p.add_argument('--accepted-test2',type=Path)
     args=p.parse_args();native_scope()
     factory=module('java_save_signed_factory',HERE/'package_signed_fold_test.py')
-    factory.PINNED_NATIVE_COMMIT=NATIVE;factory.NEW_NAME='1.0.9-Essential-First-TEST2-RC01'
+    factory.PINNED_NATIVE_COMMIT=NATIVE;factory.NEW_NAME='1.0.9-Essential-First-TEST3-RC01'
     if args.mode=='java':
         factory.prepared_java(args)
         root=args.gradle_dir/'xbmc/java'
@@ -168,13 +171,32 @@ def main():
         factory.signed_package(args)
         old=args.out/'Infinity-2103377-Essential-First-Signed-Fold-TEST1.apk'
         final=args.out/'Infinity-2103377-Essential-First-Internal-Probe.apk';old.rename(final)
+        assert args.accepted_test2 and sha(args.accepted_test2)==TEST2_SHA,'Signed TEST2 baseline mismatch'
+        baseline=args.out/'test2-preservation';baseline.mkdir()
+        # Every runtime class, including all previously changed producers and
+        # shutdown classes, must still match TEST2. Only version metadata moves.
+        guard.ALLOWED=re.compile(r'com/projectinfinity/kodi/BuildConfig\.smali$')
+        java_baseline=guard.compare(args.accepted_test2,final,(args.gradle_dir/'preservation-classpath.txt').read_text(),baseline)
+        def payload(path):
+            with zipfile.ZipFile(path) as archive:
+                return {name:hashlib.sha256(archive.read(name)).hexdigest() for name in archive.namelist()
+                    if not re.fullmatch(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))',name)}
+        original,candidate=payload(args.accepted_test2),payload(final)
+        assert set(original)==set(candidate),'TEST2 APK entry inventory changed'
+        changed=sorted(name for name in original if original[name]!=candidate[name])
+        assert all(name in ('AndroidManifest.xml','lib/arm64-v8a/libkodi.so') or re.fullmatch(r'classes\d*\.dex',name) for name in changed),changed
+        test2_proof=dict(test2_apk_sha256=TEST2_SHA,changed_entries=changed,
+            all_other_apk_payload_identical=True,all_runtime_java_instructions_preserved=java_baseline['decoded_protected_instructions_identical'],
+            version_metadata_only_java_exception='BuildConfig',baseline_not_modified=True)
+        save(args.out/'TEST2-BASELINE-PRESERVATION.json',test2_proof)
         receipt=args.out/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json';row=json.loads(receipt.read_text())
         row.update(status='INTERNAL JAVA/NATIVE SHUTDOWN PROBE; NOT LOCKED',file=final.name,
-                   java_regressions_verified=True,java_producer_adapters_verified=True,apk_deliverable=False)
+                   java_regressions_verified=True,java_producer_adapters_verified=True,apk_deliverable=False,
+                   signed_test2_baseline_preserved=True,signed_test2_apk_sha256=TEST2_SHA)
         row.pop('known_fail_closed_native_encoder_route',None);row.pop('unverified_other_native_descriptor_aliases',None)
         save(receipt,row);(args.out/'SHA256SUMS').write_text(row['apk_sha256']+'  '+final.name+'\n')
         (args.out/'TEST-LIMITATIONS.md').write_text(
-            '# Infinity Essential-First shutdown TEST2\n\n'
+            '# Infinity Essential-First shutdown TEST3\n\n'
             'This internal APK uses the established permanent signing identity. '
             'The full native and Java save checks must pass before packaging. '
             'Actual Android engine death, whole-package death and saved-data reopening '

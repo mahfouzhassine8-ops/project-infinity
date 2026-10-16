@@ -1,10 +1,10 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Existing Essential-First native ledger and coordinator retained; Java producer admission and independent durable seals now gate both app processes. Whole-package termination implementation awaits actual Android verification.",
+  "implementation": "Existing Essential-First ledger/coordinator and TEST2 Java seals retained. TEST2 passed actual internal whole-UID shutdown/reopen; physical read-only maps input classification corrected in native Call and under full verification.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 52,
+    "native_cpython_3117_runtime": 61,
     "coordinator_with_real_barrier": 15,
     "full_production_job_manager": 13,
     "production_installer_filesystem_sqlite": 24,
@@ -357,9 +357,25 @@
     "local_targeted_and_existing_controls_passed": 13,
     "local_python": "3.11.7",
     "cpython_archive_sha256": "97808fb72198e27b9b4f167da973ea4fb4338ce14909a83aa9f83a370f998235",
-    "full_native_verification": "pending",
-    "all_308_android_regressions": "preserved; new matched Android run pending"
+    "full_native_verification": "Full ARM64 engine compile in progress; no whole-build success inferred",
+    "all_308_android_regressions": "preserved; new matched Android run pending",
+    "full_native_host_run": 38859304335,
+    "full_native_host_result": "61/61 passed with pinned CPython 3.11.7; original 52 unchanged plus 9 new cases",
+    "full_native_host_artifact": 12028049177,
+    "full_native_host_zip_sha256": "d92de634443b56e4d560e8cb63b53674d5a9263736745eda016a5dc95e132ddc",
+    "matched_android_plan": "Preserve all 308 cases; run an actual disposable test add-on through Kodi to read/flush/close /proc/self/maps under the real observer, then require save/whole-UID death/integrity/reopen."
   },
   "latest_physical_blocker": "native_admission: protected_durability_failed:/proc/15237/maps",
-  "android_verification_scope": "Internal disposable emulator only; physical TEST2 failed as separately recorded."
+  "android_verification_scope": "Internal disposable emulator only; physical TEST2 failed as separately recorded.",
+  "test3_plan": {
+    "native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
+    "native_run": 38859304335,
+    "all_308_tests_preserved": true,
+    "permanent_signer_unchanged": true,
+    "test2_baseline_sha256": "172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807",
+    "runtime_java_instructions_must_match_test2": true,
+    "non_engine_apk_payload_must_match_test2": true,
+    "physical_acceptance": false,
+    "lock": false
+  }
 }

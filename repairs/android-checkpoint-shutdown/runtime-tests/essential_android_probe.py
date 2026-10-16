@@ -24,6 +24,8 @@ PROFILE = '/sdcard/Android/data/'+PACKAGE+'/files/.kodi/userdata'
 CONTROL = PROFILE+'/addon_data/script.infinity.commandcenter/.android-checkpoint'
 FAVOURITE = 'Infinity essential shutdown probe'
 FIRST_PARTY = {'script.infinity.commandcenter':'0.3.5.20', 'service.infinity.compat':'0.8.2'}
+READONLY_FIXTURE = 'script.infinity.readonlymaps.test'
+READONLY_RESULT = PROFILE+'/addon_data/'+READONLY_FIXTURE+'/observed-readonly-maps.json'
 APP_UID = None
 
 def rpc(method, params=None):
@@ -184,6 +186,15 @@ def main():
         report['unchanged_locked_first_party_manifest']=manifest
         shell('mkdir','-p',PROFILE+'/../addons')
         for name in FIRST_PARTY: adb('push',fixture/name,PROFILE+'/../addons/'+name)
+        # Exercise TEST2's physical failure inside the real protected Python
+        # interpreter. This extra script exists only in this disposable data
+        # tree; the signed APK and approved first-party sources are unchanged.
+        readonly=fixture/READONLY_FIXTURE;readonly.mkdir()
+        (readonly/'addon.xml').write_text('<addon id="'+READONLY_FIXTURE+'" name="Readonly maps regression" version="1.0.0" provider-name="Infinity internal test"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable read-only input regression</summary><description lang="en_GB">Internal emulator test fixture</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
+        script=Path(__file__).with_name('readonly_maps_fixture.py')
+        shutil.copyfile(script,readonly/'default.py')
+        report['readonly_maps_fixture_sha256']=hashlib.sha256(script.read_bytes()).hexdigest()
+        adb('push',readonly,PROFILE+'/../addons/'+READONLY_FIXTURE)
         shutil.rmtree(fixture)
         # Root adbd labels /sdcard pushes as storage_file, which a normal app
         # cannot read through Android's direct app-data mount. Restore platform
@@ -202,6 +213,24 @@ def main():
         report['launch']=shell('am','start','-W','-n',PACKAGE+'/.Splash')
         report['actual_first_party_enabled']=enable_first_party(args.out);save()
         owner=wait_ready();report['old_owner']=owner;report['before_close_processes']=processes();save()
+        details=rpc('Addons.GetAddonDetails',{'addonid':READONLY_FIXTURE,'properties':['enabled']})['addon']
+        if not details['enabled']:
+            assert rpc('Addons.SetAddonEnabled',{'addonid':READONLY_FIXTURE,'enabled':True})=='OK'
+        assert rpc('Addons.ExecuteAddon',{'addonid':READONLY_FIXTURE,'wait':True})=='OK'
+        # The RPC acknowledgement does not prove interpreter completion.
+        deadline=time.monotonic()+30;observation={}
+        while time.monotonic()<deadline:
+            observation=read_json(READONLY_RESULT)
+            if observation.get('pid')==owner['pid'] and observation.get('read_flush_close_completed') is True:break
+            time.sleep(.25)
+        report['readonly_virtual_file_observation']=observation;save()
+        assert observation.get('pid')==owner['pid'] and observation.get('addon')==READONLY_FIXTURE
+        assert observation.get('flags',-1)&3==0 and observation.get('writable') is False
+        assert observation.get('descriptor_target')=='/proc/'+str(owner['pid'])+'/maps'
+        assert observation.get('regular_file') is True and observation.get('inode',0)>0
+        assert observation.get('proc_mount_types')==['proc']
+        assert observation.get('read_succeeded') is True and observation.get('read_flush_close_completed') is True
+        report['readonly_virtual_file_read_close_verified']=True;save()
         system_executable_evidence(owner, args.out)
         baseline=ET.fromstring(shell('cat',PROFILE+'/favourites.xml'))
         assert any(item.get('name')==FAVOURITE for item in baseline),'Startup did not retain seeded test favourite; close not attempted'
@@ -267,6 +296,7 @@ def main():
             try: (args.out/name).write_text(adb(*command,check=False))
             except Exception as error: (args.out/(name+'.error')).write_text(str(error))
         for source,name in [(PRIVATE+'/files/infinity-checkpoint-close.json','coordinator-receipt.json'),
+                            (READONLY_RESULT,'observed-readonly-maps.json'),
                             (PRIVATE+'/shared_prefs/infinity_power_routes.xml','power-route-audit.xml'),
                             (PROFILE+'/addon_data/service.infinity.refresh/runtime.properties','refresh-runtime.properties'),
                             (PROFILE+'/addon_data/service.infinity.refresh/policy.properties','refresh-policy.properties'),
