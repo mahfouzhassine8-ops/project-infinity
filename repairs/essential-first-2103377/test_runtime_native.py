@@ -22,6 +22,19 @@ CODE = r'''
 #include <sys/wait.h>
 #include <poll.h>
 #include <signal.h>
+#include <sys/vfs.h>
+// Test-only real fsync fault for an inventoried user-data destination.
+static std::string syncFailurePath;
+extern "C" int fsync(int fd) {
+  if (!syncFailurePath.empty()) {
+    char path[PATH_MAX]{};
+    const auto descriptor="/proc/self/fd/"+std::to_string(fd);
+    const auto length=::readlink(descriptor.c_str(),path,sizeof(path)-1);
+    if(length>0 && std::string(path,static_cast<size_t>(length))==syncFailurePath)
+    { errno=EIO;return -1; }
+  }
+  return static_cast<int>(syscall(SYS_fsync,fd));
+}
 // Test-only fork stop: the real child keeps its inherited output descriptor
 // while the actual barrier is tested. No production test hooks or tracing.
 static bool traceNextFork = false;
@@ -73,6 +86,10 @@ static void run(const char* code) {
 int main(int argc, char** argv) {
   assert(argc == 3);
   const std::string mode = argv[1], root = argv[2];
+  if(mode=="readonly-regular-input") {
+    const int input=::open((root+"/profile/read-input").c_str(),O_CREAT|O_WRONLY,0600);assert(input>=0);
+    assert(::write(input,"input",5)==5);assert(::close(input)==0);
+  }
   if (mode == "marker-filename") assert(::chdir((root+"/profile").c_str())==0);
   Py_Initialize(); auto* owner = Py_NewInterpreter(); assert(owner);
   auto* globals = PyModule_GetDict(PyImport_AddModule("__main__"));
@@ -262,6 +279,43 @@ baseline=old_open(shared,'rb').read()
     std::_Exit(0);
   }
   if (mode == "marker-filename") run("with old_open(':nonpersistent:','w') as marker: marker.write('verified')\n");
+  const bool readonlyCase=mode.rfind("readonly-proc-",0)==0 || mode=="readonly-regular-input";
+  if(readonlyCase && mode!="readonly-proc-late") {
+    run(mode=="readonly-regular-input" ?
+        "reader=old_open(root+'/profile/read-input',encoding='utf-8'); assert reader.read()=='input'\n" :
+        "reader=old_open('/proc/self/maps',encoding='utf-8'); assert reader.readline()\n");
+    auto* reader=PyDict_GetItemString(globals,"reader");
+    auto* number=PyObject_CallMethod(reader,"fileno",nullptr);assert(number);
+    const int descriptor=PyLong_AsLong(number);Py_DECREF(number);
+    struct stat identity{};struct statfs filesystem{};
+    assert(::fstat(descriptor,&identity)==0 && ::fstatfs(descriptor,&filesystem)==0);
+    assert((::fcntl(descriptor,F_GETFL)&O_ACCMODE)==O_RDONLY);
+    std::cout<<"Actual reader fd="<<descriptor<<" flags="<<::fcntl(descriptor,F_GETFL)
+      <<" dev="<<identity.st_dev<<" ino="<<identity.st_ino<<" mode="<<identity.st_mode
+      <<" filesystem="<<std::hex<<filesystem.f_type<<std::dec<<std::endl;
+    if(mode!="readonly-regular-input") {
+      assert(filesystem.f_type==0x9fa0);errno=0;assert(::fsync(descriptor)==-1 && errno==EINVAL);
+    }
+    if(mode=="readonly-proc-override")
+      run("reader.buffer.raw.close=lambda: old_write(fd,b'callback')\nreader.close()\n");
+    else if(mode!="readonly-proc-writable-retarget")
+      run(mode=="readonly-proc-flush" ? "reader.flush()\n" : "reader.close()\n");
+    if(mode!="readonly-proc-override") {
+      auto& state=InfinityScriptPersistence::Get();std::lock_guard<std::mutex> lock(state.mutex);
+      assert(!state.protection.paths.count(InfinityScriptPersistence::ProtectedCanonical("/proc/self/maps")));
+      if(mode=="readonly-regular-input")assert(!state.protection.paths.count(root+"/profile/read-input"));
+    }
+    if(mode=="readonly-proc-user-sync-failure")syncFailurePath=root+"/profile/state";
+  }
+  if(mode=="writable-proc-real-write")
+    run("with old_open('/proc/self/comm','w') as output: output.write('infinity-proof')\n");
+  if(mode=="writable-reader-retarget") {
+    run("pending=old_open(shared,'w'); pending.write('accepted user write'); pending_fd=pending.buffer.raw.fileno()\n");
+    const int read=::open("/proc/self/maps",O_RDONLY|O_CLOEXEC);assert(read>=0);
+    const int target=PyLong_AsLong(PyDict_GetItemString(globals,"pending_fd"));
+    assert(::dup2(read,target)==target);assert(::close(read)==0);
+    run("try: pending.flush()\nexcept OSError: pass\nelse: raise AssertionError('retargeted writable buffer pretended to save')\n");
+  }
   assert(InfinityScriptPersistence::BeginWriteProtection(23, {root+"/profile"}, {root+"/cache"}));
   if (mode == "compat-save") run("assert checkpoint.poll() and checkpoint.parked\nresponse=json.loads((control/'compat-response.json').read_text()); assert response['status']=='PARTICIPANT_COMPLETE' and not response['global_safe_to_terminate']\n");
   if (mode == "compat-failure") {
@@ -279,6 +333,19 @@ baseline=old_open(shared,'rb').read()
   }
   if (mode == "sqlite-renamed") run("try: c.execute('INSERT INTO history VALUES(999)')\nexcept sqlite3.DatabaseError: pass\nelse: raise AssertionError('renamed SQLite handle retained optional authorization')\n");
   assert(InfinityScriptPersistence::CloseParticipantWrites(23));
+  if(mode=="readonly-proc-user-sync-failure" || mode=="writable-proc-real-write" ||
+     mode=="readonly-proc-override" || mode=="writable-reader-retarget") {
+    assert(!InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    const auto proof=InfinityScriptPersistence::EssentialWrites();assert(!proof.blockers.empty());
+    for(const auto& why:proof.blockers)std::cout<<why<<std::endl;
+    if(mode=="readonly-proc-user-sync-failure")
+      assert(std::find(proof.blockers.begin(),proof.blockers.end(),"protected_durability_failed:"+root+"/profile/state")!=proof.blockers.end());
+    if(mode=="writable-proc-real-write")
+      assert(std::find(proof.blockers.begin(),proof.blockers.end(),"protected_durability_failed:"+
+          InfinityScriptPersistence::ProtectedCanonical("/proc/self/comm"))!=proof.blockers.end());
+    std::cout<<"PASS genuine/unknown write durability still fails closed: "<<mode<<std::endl;std::_Exit(0);
+  }
   if (tracedChild > 0) {
     const bool sealed = InfinityScriptPersistence::SealEssentialWrites(23);
     const bool authorized = InfinityScriptPersistence::EssentialWritesAuthorized(23);
@@ -361,6 +428,15 @@ baseline=old_open(shared,'rb').read()
   assert(before.blockers.empty());
   assert(InfinityScriptPersistence::SealEssentialWrites(23));
   assert(InfinityScriptPersistence::EssentialWritesAuthorized(23));
+  if(mode=="readonly-proc-late")
+    run("with old_open('/proc/self/maps',encoding='utf-8') as reader: assert reader.readline(); reader.flush()\n");
+  if(mode=="readonly-proc-flush")run("reader.flush(); reader.close()\n");
+  if(mode=="readonly-proc-writable-retarget") {
+    auto* reader=PyDict_GetItemString(globals,"reader");auto* number=PyObject_CallMethod(reader,"fileno",nullptr);assert(number);
+    const int descriptor=PyLong_AsLong(number);Py_DECREF(number);
+    const int writable=PyLong_AsLong(PyDict_GetItemString(globals,"fd"));assert(::dup2(writable,descriptor)==descriptor);
+    run("try: reader.flush()\nexcept PermissionError: pass\nelse: raise AssertionError('writable descriptor received a read-only exemption')\n");
+  }
   if (mode == "marker-filename") run(R"marker(
 for operation in (lambda: old_open(':nonpersistent:','w'),
                   lambda: old_raw(':nonpersistent:','w'),
@@ -420,6 +496,7 @@ def main():
     parser.add_argument('--compat-runtime',type=Path)
     parser.add_argument('--ambient-library',type=Path)
     parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--case',action='append',help='Run selected named cases locally; CI defaults to every case')
     args=parser.parse_args()
     runtime=HERE/'runtime'
     observer=(runtime/'observer.py').read_text()
@@ -450,6 +527,9 @@ def main():
                 'child-locale-environment','child-writable-search','child-error-channel-pending',
                 'late-native-child','child-preparation-race','null-device-path','unknown-device-path','marker-filename',
                 'child-unreachable-vendor']
+        cases+=['readonly-proc-close','readonly-proc-flush','readonly-proc-late','readonly-regular-input',
+                'readonly-proc-user-sync-failure','writable-proc-real-write','readonly-proc-override',
+                'readonly-proc-writable-retarget','writable-reader-retarget']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)
@@ -470,6 +550,9 @@ def main():
             (native/'libinfinityambient.so').write_bytes(data)
             env['KODI_ANDROID_LIBS']=str(native)
             cases+=['ambient-contract']
+        if args.case:
+            assert set(args.case)<=set(cases),'Unknown native regression case'
+            cases=[case for case in cases if case in args.case]
         for case in cases:
             directory=folder/case; (directory/'profile').mkdir(parents=True); (directory/'cache').mkdir()
             if case == 'ambient-contract':

@@ -61,8 +61,8 @@
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
-  "android_process_death_verified": false,
-  "reopen_on_android_verified": false,
+  "android_process_death_verified": true,
+  "reopen_on_android_verified": true,
   "apk_deliverable": false,
   "release_signed": false,
   "locked": false,
@@ -71,10 +71,10 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Corrected null-binding/completion ordering and eight targeted race tests await the full 308-test Android workflow.",
-    "The latest actual run saved every required owner and both app processes exited, but a transient failed receipt stopped independent whole-UID absence and reopening verification. The probe remains strict; it will not ignore that failure.",
-    "Full actual shutdown sequence must pass with essential saves, optional-service independence, stable completion, whole-UID absence, database integrity and preserved-data reopening together.",
-    "Physical Fold approval remains required. No host or emulator pass establishes physical acceptance; no APK lock is authorized."
+    "Physical TEST2 failed at read-only maps input admitted as a persistent destination. The targeted source correction and nine real-CPython regressions pass locally; full native build and all original native cases must pass.",
+    "Matched Android verification must retain all 308 tests and confirm the read-only virtual-file path, all 16 native owners, both Java seals, whole-UID death, database integrity and saved-data reopening.",
+    "Prepare TEST3 with the established permanent signer only after internal acceptance; preserve signed TEST2 and every passing correction.",
+    "Physical Fold approval remains required. No emulator result is physical acceptance and no final lock is authorized."
   ],
   "internal_android_probes": [
     {
@@ -224,15 +224,16 @@
     "source_evidence": "evidence/runtime/java-source-boundary.json",
     "existing_primitive": "Reuse InfinityCheckpointProtocol.atomic (file sync, atomic replace, directory sync and readback); it currently covers receipts only, not Java producer admission or pending preferences.",
     "host_verification": {
-      "run": 38852110196,
-      "commit": "203678afd90a0e0eaf53925e5e45f687f93899b1",
+      "run": 38854391733,
+      "commit": "237dafd270e1ffcebeab1bbc0451b192c9016e28",
       "original_tests": 274,
       "new_save_tests": 26,
       "all_tests_passed": true,
       "unrelated_decoded_instructions_preserved": true,
       "source_edits_reconstructed": true,
       "host_os_adapter": "test-only actual host file descriptors, metadata and FileChannel.force, including sync-failure refusal",
-      "actual_android_verification": "Both Java seals and all 16 essential native owners passed; failure moved to Android connection callback/completion race after authorized engine death."
+      "actual_android_verification": "All save, UID-death, database and reopening gates passed internally. Later physical Fold failure is native read-only input classification, not a Java save failure.",
+      "completion_tests": 8
     }
   },
   "marker_boundary": {
@@ -254,37 +255,38 @@
   "latest_internal_apk_sha256": "e6c5075131f82466485bbb58e0df0bc84bc6bb5e6c4b77783c183d03fad2f85f",
   "latest_internal_apk_delivered": false,
   "latest_android_probe": {
-    "run": 38852110196,
-    "source_commit": "203678afd90a0e0eaf53925e5e45f687f93899b1",
+    "run": 38854391733,
+    "source_commit": "237dafd270e1ffcebeab1bbc0451b192c9016e28",
     "native_commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
     "native_run": 38846154259,
-    "permanently_signed_internal_apk": true,
-    "apk_delivered": false,
-    "apk_sha256": "e6c5075131f82466485bbb58e0df0bc84bc6bb5e6c4b77783c183d03fad2f85f",
-    "evidence_artifact": 12025373537,
-    "evidence_zip_sha256": "ff7a25dd19fae95ce9135fd4932d16fcc622996c9e98aa8657653c319aee69e9",
-    "outcome": "All 300 host tests and preservation gates passed. Actual Close completed all 16 native essential saves, obtained both Java seals and consumed authorization. Android records engine PID 5610 and coordinator PID 5374 exiting. A null-binding callback briefly wrote CHECKPOINT_FAILED(engine_endpoint_refused) during completion IO; probe stopped before final COMPLETE and reopening. Final receipt confirms authorized coordinator exit; whole-UID absence/reopen were not reached by the independent probe.",
-    "report": "evidence/runtime/android-probe12-result.json",
-    "final_receipt": "evidence/runtime/android-probe12-final-receipt.json",
-    "status": "completed_failure_at_post_save_completion_race",
+    "status": "completed_success",
+    "host_tests": 308,
+    "android_engine_death_verified": true,
+    "whole_package_death_verified": true,
+    "reopen_verified": true,
+    "favourites_preserved": true,
+    "both_java_process_save_proofs_verified": true,
     "physical_fold_accepted": false,
-    "apk_delivery_authorized": false
+    "apk_sha256": "172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807",
+    "report": "evidence/runtime/test2-accepted-internal-probe.json"
   },
   "latest_preservation": "evidence/runtime/04f-production-verification.json: exact locked final source manifest compared; only 17 declared shutdown paths differ; all other locked source hashes identical. APK unrelated instructions/resources/payload preservation passed.",
-  "latest_android_source_commit": "203678afd90a0e0eaf53925e5e45f687f93899b1",
+  "latest_android_source_commit": "237dafd270e1ffcebeab1bbc0451b192c9016e28",
   "latest_completed_production_probe": {
-    "run": 38852110196,
-    "source_commit": "203678afd90a0e0eaf53925e5e45f687f93899b1",
+    "run": 38854391733,
+    "source_commit": "237dafd270e1ffcebeab1bbc0451b192c9016e28",
     "native_commit": "d69e4d267d4a7f8051fdc1ae8996e856ef51063c",
     "native_run": 38846154259,
-    "permanently_signed_internal_apk": true,
-    "apk_delivered": false,
-    "apk_sha256": "e6c5075131f82466485bbb58e0df0bc84bc6bb5e6c4b77783c183d03fad2f85f",
-    "evidence_artifact": 12025373537,
-    "evidence_zip_sha256": "ff7a25dd19fae95ce9135fd4932d16fcc622996c9e98aa8657653c319aee69e9",
-    "outcome": "All 300 host tests and preservation gates passed. Actual Close completed all 16 native essential saves, obtained both Java seals and consumed authorization. Android records engine PID 5610 and coordinator PID 5374 exiting. A null-binding callback briefly wrote CHECKPOINT_FAILED(engine_endpoint_refused) during completion IO; probe stopped before final COMPLETE and reopening. Final receipt confirms authorized coordinator exit; whole-UID absence/reopen were not reached by the independent probe.",
-    "report": "evidence/runtime/android-probe12-result.json",
-    "final_receipt": "evidence/runtime/android-probe12-final-receipt.json"
+    "status": "completed_success",
+    "host_tests": 308,
+    "android_engine_death_verified": true,
+    "whole_package_death_verified": true,
+    "reopen_verified": true,
+    "favourites_preserved": true,
+    "both_java_process_save_proofs_verified": true,
+    "physical_fold_accepted": false,
+    "apk_sha256": "172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807",
+    "report": "evidence/runtime/test2-accepted-internal-probe.json"
   },
   "java_diagnostic_correction": {
     "cause": "Android 11 FastXmlSerializer inserts four indentation spaces after a newline-terminated route audit string; reproduced using the actual Android 11 serializer and unchanged production XML reader.",
@@ -293,7 +295,7 @@
     "new_regression_cases": 6,
     "expected_total_tests": 300,
     "host_compile": "Both production helpers and all 26 Java save tests compiled against Android 11 API and pinned Robolectric 4.14.1. Execution of the 300-test regression suite is pending CI.",
-    "actual_android_status": "Verified resolved by run 38852110196: both Java seals valid with no pending save or diagnostic mismatch."
+    "actual_android_status": "Verified resolved in green run 38854391733; both Java seals and all save tests passed."
   },
   "completion_callback_correction": {
     "evidence": "evidence/runtime/completion-callback-race.json",
@@ -302,6 +304,62 @@
     "expected_total_tests": 308,
     "local_compile": "Actual coordinator and eight regression sources compiled",
     "wire_verification": "Existing 19 wire, 9 essential-policy, 100 consume/revoke race, UUID durability and actual native receipt checks passed",
-    "actual_android_status": "pending corrected run"
-  }
+    "actual_android_status": "Verified resolved in green run 38854391733; all eight completion regressions and actual shutdown/reopen passed."
+  },
+  "signed_test2_baseline": {
+    "commit": "237dafd270e1ffcebeab1bbc0451b192c9016e28",
+    "run": 38854391733,
+    "result": "success",
+    "original_tests": 274,
+    "save_tests": 26,
+    "completion_tests": 8,
+    "all_308_tests_passed": true,
+    "apk_sha256": "172b1b4458cbe014c0f4ad242282e6dd97bf78d11cc8462db5badbf13f8fc807",
+    "permanent_signer": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "apk_artifact": 12027042351,
+    "evidence_artifact": 12026234779,
+    "evidence_zip_sha256": "d479a8c89628865b9955d462d2538ca5c050e7da65ab90ca9017bc8622368c8d",
+    "internal_engine_death": true,
+    "internal_whole_uid_death": true,
+    "internal_saved_data_reopen": true,
+    "internal_integrity_databases": [
+      "Addons33.db",
+      "TV46.db",
+      "Textures13.db",
+      "ViewModes6.db",
+      "MyMusic83.db",
+      "Epg16.db",
+      "MyVideos131.db"
+    ],
+    "physical_fold_result": "failed; never approved or locked",
+    "report": "evidence/runtime/test2-accepted-internal-probe.json"
+  },
+  "physical_fold_test2": {
+    "diagnostic": "Infinity-Diagnostics-20261016-014425.zip",
+    "diagnostic_sha256": "f407af750a943ef0396922858930c42d81c9ab67e6ea0203cdda0fb9570022ed",
+    "device": "samsung SM-F976U1 Android 17 / API 37",
+    "pid": 15237,
+    "session": "b3bda756-2b68-4621-94e2-4bf6d113a4dc",
+    "duration_ms": 2410,
+    "error": "native_admission: protected_durability_failed:/proc/15237/maps",
+    "essential_saved": 13,
+    "essential_total": 16,
+    "authorization_consumed": false,
+    "process_death": false,
+    "report": "evidence/runtime/fold-test2-014425-receipt.json"
+  },
+  "readonly_input_correction": {
+    "native_registration": "Cached/built-in _io.TextIOWrapper.close enters native Call(TEXT_CLOSE), resolves the actual FileIO descriptor, and calls BeginProtectedOperation with operation close and its input path. Nested native flush independently registers the same path.",
+    "reproduction": "Actual CPython 3.11.7: O_RDONLY (F_GETFL access bits 0), fstat regular inode, fstatfs PROC_SUPER_MAGIC 0x9fa0, fsync returns EINVAL; untouched old policy then fails protected_durability_failed:/proc/<pid>/maps.",
+    "physical_attribution_limit": "The ZIP does not contain original fd flags/identity or originating add-on for the historical registration. Native ambient library discovery contains the exact read-only maps idiom, but its authorship of this physical access is not asserted.",
+    "correction": "Only exact native TextIOWrapper -> BufferedReader -> FileIO chains, no instance callbacks, real FileIO C writable flag false, current descriptor O_RDONLY and stable fstat/flags, no outstanding native dirty buffer. Mark only that flush/close operation nonpersistent; BeginProtectedOperation, SyncProtectedPath and SealEssentialWrites retain genuine-write rules.",
+    "new_cases": 9,
+    "local_targeted_and_existing_controls_passed": 13,
+    "local_python": "3.11.7",
+    "cpython_archive_sha256": "97808fb72198e27b9b4f167da973ea4fb4338ce14909a83aa9f83a370f998235",
+    "full_native_verification": "pending",
+    "all_308_android_regressions": "preserved; new matched Android run pending"
+  },
+  "latest_physical_blocker": "native_admission: protected_durability_failed:/proc/15237/maps",
+  "android_verification_scope": "Internal disposable emulator only; physical TEST2 failed as separately recorded."
 }

@@ -34,8 +34,8 @@ inline std::array<Spec, COUNT>& Specs()
 { static auto* specs = new std::array<Spec, COUNT>; return *specs; }
 inline bool ProtectNativeModule(PyObject* module);
 inline InfinityPythonPersistence::Context* Context();
-inline std::array<PyCFunction, 3>& DescriptorReaders()
-{ static std::array<PyCFunction, 3> readers{}; return readers; }
+inline std::array<PyCFunction, 4>& DescriptorReaders()
+{ static std::array<PyCFunction, 4> readers{}; return readers; }
 inline std::array<PyTypeObject*, 6>& IOTypes()
 { static std::array<PyTypeObject*, 6> types{}; return types; }
 inline bool RememberIOTypes(PyObject* io)
@@ -96,10 +96,11 @@ inline PyObject* ActualDescriptor(PyObject* object, unsigned depth = 0)
     }
   return nullptr;
 }
-inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index)
+inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,
+                             const char* methodName = "fileno")
 {
   auto* type = PyObject_GetAttrString(io, typeName);
-  auto* member = type ? PyObject_GetAttrString(type, "fileno") : nullptr;
+  auto* member = type ? PyObject_GetAttrString(type, methodName) : nullptr;
   bool ok = member && Py_IS_TYPE(member, &PyMethodDescr_Type);
   if (ok)
   {
@@ -108,6 +109,43 @@ inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index)
     if (ok) DescriptorReaders()[index] = method->ml_meth;
   }
   Py_XDECREF(member); Py_XDECREF(type); return ok;
+}
+inline PyObject* KnownReadOnlyRaw(PyObject* object, unsigned depth = 0)
+{
+  if (depth > 3 || !(Py_IS_TYPE(object,IOTypes()[0]) ||
+                    Py_IS_TYPE(object,IOTypes()[3]) || Py_IS_TYPE(object,IOTypes()[4])))
+    return nullptr; // Subclasses and arbitrary flush/close callbacks remain protected.
+  if (Py_TYPE(object)->tp_dictoffset)
+  {
+    auto* dictionary = PyObject_GenericGetDict(object,nullptr);
+    if (!dictionary) return nullptr;
+    bool overridden = false;
+    for (const auto* name : {"write","flush","close","writable","fileno","raw","buffer"})
+      if (PyDict_GetItemString(dictionary,name)) overridden = true;
+    Py_DECREF(dictionary);
+    if (overridden) return nullptr;
+  }
+  if (Py_IS_TYPE(object,IOTypes()[0])) { Py_INCREF(object); return object; }
+  auto* next = NativeField(object,Py_IS_TYPE(object,IOTypes()[4]) ? IOTypes()[4] : IOTypes()[3],
+                           Py_IS_TYPE(object,IOTypes()[4]) ? "buffer" : "raw");
+  if (!next) return nullptr;
+  auto* raw = KnownReadOnlyRaw(next,depth+1); Py_DECREF(next); return raw;
+}
+inline bool KnownReadOnlyText(PyObject* object, int descriptor)
+{
+  if (descriptor < 0 || !Py_IS_TYPE(object,IOTypes()[4])) return false;
+  struct stat before{}, after{};
+  const int flags = ::fcntl(descriptor,F_GETFL);
+  if (flags < 0 || (flags & O_ACCMODE) != O_RDONLY ||
+      ::fstat(descriptor,&before) != 0 || !S_ISREG(before.st_mode)) return false;
+  auto* raw = KnownReadOnlyRaw(object);
+  if (!raw) return false;
+  auto* fd = DescriptorReaders()[0](raw,nullptr);
+  auto* writable = DescriptorReaders()[3](raw,nullptr); // Actual FileIO C field, never Python .writable().
+  const bool same = fd && PyLong_Check(fd) && PyLong_AsLong(fd) == descriptor && writable == Py_False &&
+      ::fstat(descriptor,&after) == 0 && before.st_dev == after.st_dev && before.st_ino == after.st_ino &&
+      before.st_mode == after.st_mode && ::fcntl(descriptor,F_GETFL) == flags;
+  Py_XDECREF(fd); Py_XDECREF(writable); Py_DECREF(raw); return same;
 }
 inline InfinityPythonPersistence::Context* Context()
 {
@@ -184,7 +222,23 @@ public:
       // Invoke the actual built-in descriptor reader. A subclass's fileno()
       // override must not classify a protected FileIO handle as private cache.
       auto* descriptor = ActualDescriptor(self);
-      if (descriptor) { m_paths.push_back(Target(descriptor)); if (PyLong_Check(descriptor)) m_descriptor = static_cast<int>(PyLong_AsLong(descriptor)); Py_DECREF(descriptor); }
+      if (descriptor)
+      {
+        m_paths.push_back(Target(descriptor));
+        if (PyLong_Check(descriptor)) m_descriptor = static_cast<int>(PyLong_AsLong(descriptor));
+        Py_DECREF(descriptor);
+        // A known read-only native text reader has no buffered writes. Its
+        // flush/close input is not a persistent destination. This grants no
+        // path/filesystem exception to writes or unknown native callbacks.
+        if ((kind == TEXT_FLUSH || kind == TEXT_CLOSE) && KnownReadOnlyText(self,m_descriptor))
+        {
+          const auto key = std::to_string(m_context ? m_context->id : -1) + ":native-buffer:" +
+              std::to_string(reinterpret_cast<uintptr_t>(self));
+          auto& state = Ledger::Get(); std::lock_guard<std::mutex> lock(state.mutex);
+          if (!state.protection.buffers.count(key)) m_paths = {Ledger::NonPersistentTarget()};
+        }
+        PyErr_Clear();
+      }
       else
       {
         PyErr_Clear();
@@ -542,7 +596,7 @@ inline bool Install()
   auto* children = PyImport_ImportModule("_posixsubprocess");
   if (!posix || !io || !imports || !locks || !children) { Py_XDECREF(posix); Py_XDECREF(io); Py_XDECREF(imports); Py_XDECREF(locks); Py_XDECREF(children); return false; }
   bool ok = RememberIOTypes(io) && DescriptorReader(io, "FileIO", 0) && DescriptorReader(io, "BufferedWriter", 1) &&
-      DescriptorReader(io, "TextIOWrapper", 2) &&
+      DescriptorReader(io, "TextIOWrapper", 2) && DescriptorReader(io, "FileIO", 3, "writable") &&
       Function<EXTENSION_CREATE>(imports,"create_dynamic") &&
       Function<OS_WRITE>(posix, "write") && Function<OS_OPEN>(posix, "open") &&
       Function<OS_WRITEV>(posix, "writev", true) && Function<OS_PWRITE>(posix, "pwrite", true) &&

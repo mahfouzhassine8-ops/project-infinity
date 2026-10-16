@@ -1,0 +1,14 @@
+[
+  {
+    "case": "proc-close",
+    "exit_code": 0,
+    "stdout": "READ fd=4 flags=32768 access=0 dev=30 ino=207182 mode=33060 fs=9fa0\nsealed=0 authorized=0\nprotected_durability_failed:/proc/57538/maps\n",
+    "stderr": "REGISTER writer=1 operation=close fd=4 path=/proc/57538/maps\nREGISTER writer=1 operation=flush fd=4 path=/proc/57538/maps\n"
+  },
+  {
+    "case": "proc-flush",
+    "exit_code": 0,
+    "stdout": "READ fd=4 flags=32768 access=0 dev=30 ino=205193 mode=33060 fs=9fa0\nsealed=0 authorized=0\nprotected_durability_failed:/proc/57540/maps\n",
+    "stderr": "REGISTER writer=1 operation=flush fd=4 path=/proc/57540/maps\n"
+  }
+]
