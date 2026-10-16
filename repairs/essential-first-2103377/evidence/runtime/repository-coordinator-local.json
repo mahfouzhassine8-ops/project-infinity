@@ -1,0 +1,100 @@
+{
+  "scope": "production coordinator and persistence barrier; unchanged Kodi peers are adapters",
+  "cases": [
+    {
+      "case": "optional-blocked",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "optional-failed",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "settings-failed",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "profiles-failed",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "first-party-missing",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "first-party-failed",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "compat-failed",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "protected-writer",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "native-transaction",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "lease-lost",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "deadline",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "unobserved-writer",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "protection-warning",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "optional-repository",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "repository-transaction",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "repository-local-race",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "repository-local-failure",
+      "exit_code": 0,
+      "error": ""
+    },
+    {
+      "case": "repository-late-local",
+      "exit_code": 0,
+      "error": ""
+    }
+  ],
+  "all_passed": true,
+  "actual_kodi_save_callbacks_executed": false,
+  "simulated_hook_coverage_flag": false,
+  "android_process_death_verified": false,
+  "candidate_deliverable": false
+}

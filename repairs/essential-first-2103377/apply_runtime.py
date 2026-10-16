@@ -18,6 +18,7 @@ DIRECTORY = 'xbmc/platform/posix/filesystem/PosixDirectory.cpp'
 JOBS = 'xbmc/utils/JobManager.cpp'
 INSTALLER = 'xbmc/addons/AddonInstaller.cpp'
 ADDON = 'xbmc/addons/Addon.cpp'
+REPOSITORY = 'xbmc/addons/RepositoryUpdater.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
@@ -27,6 +28,7 @@ PINS = {
     JOBS: '8315f6ad8c794d5a96bcb544b0e53eee585faec121e15806edd163f97f4b8d3c',
     INSTALLER: 'a9e21a3b0c9da59b33376d15b53ac7ba8886613c15b59878496cb31833502b9b',
     ADDON: 'bb6339e695d36f72639668acfafdd8422fb5f2c15dcb864749c9521203655fbc',
+    REPOSITORY: '92e44c82995060552f71b675bdc03c9bb08b63430d2d83b59fcdb78ea7d5c0f2',
 }
 once = stage_experiment.once
 
@@ -95,6 +97,70 @@ def jobs(text):
         // SQLite transactions and file operations retain independent leases;
         // nested installation scopes remain required and admission-controlled.
         role = CJob::CheckpointResponsibility::NonPersistent;''')
+
+def repository(text):
+    text = once(text, '#include "RepositoryUpdater.h"', '''#include "RepositoryUpdater.h"
+#if defined(TARGET_ANDROID)
+#include "platform/android/activity/InfinityAndroidCheckpoint.h"
+#endif''')
+    # Keep the network fetch outside every save/admission lease. Only local
+    # metadata operations can be admitted, and their real DB/VFS proof remains
+    # mandatory. A rejected new continuation reports failure, never saved data.
+    text = once(text, '''  CAddonDatabase database;
+  database.Open();
+
+  std::string oldChecksum;''', '''  CAddonDatabase database;
+  std::string oldChecksum;
+  {
+#if defined(TARGET_ANDROID)
+    InfinityAndroidCheckpoint::CheckpointWriteGuard metadataRead("optional-cache-work");
+    if (!metadataRead) { MarkFinished(); return false; }
+#endif
+  database.Open();''')
+    text = once(text, '''    oldChecksum = "";
+
+  std::string newChecksum;''', '''    oldChecksum = "";
+  }
+
+  std::string newChecksum;''')
+    text = once(text, '''  database.SetRepoUpdateData(''', '''#if defined(TARGET_ANDROID)
+  InfinityAndroidCheckpoint::CheckpointWriteGuard metadataWrite("optional-cache-work");
+  if (!metadataWrite) { MarkFinished(); return false; }
+#endif
+  database.SetRepoUpdateData(''')
+    # Always retire the job and signal waiters before refusing new discovery,
+    # notifications, installs or timer scheduling. Existing installations keep
+    # their independent required receipts and cannot be waived by this return.
+    text = once(text, '''    m_doneEvent.Set();
+
+    VECADDONS updates''', '''    m_doneEvent.Set();
+    {
+#if defined(TARGET_ANDROID)
+    InfinityAndroidCheckpoint::CheckpointWriteGuard continuation("optional-cache-work");
+    if (!continuation) return;
+#endif
+
+    VECADDONS updates''')
+    text = once(text, '''    ScheduleUpdate(UpdateScheduleType::Regular);
+
+    m_events.Publish(RepositoryUpdated{});''', '''    } // Local metadata work ends before optional timer waiting.
+    ScheduleUpdate(UpdateScheduleType::Regular);
+#if defined(TARGET_ANDROID)
+    InfinityAndroidCheckpoint::CheckpointWriteGuard publication("optional-cache-work");
+    if (!publication) return;
+#endif
+
+    m_events.Publish(RepositoryUpdated{});''')
+    text = once(text, '''  m_timer.Stop(true);
+
+  if (CAddonSystemSettings''', '''  m_timer.Stop(true);
+#if defined(TARGET_ANDROID)
+  InfinityAndroidCheckpoint::CheckpointWriteGuard schedule("optional-cache-work");
+  if (!schedule) return;
+#endif
+
+  if (CAddonSystemSettings''')
+    return text
 
 def addon(text):
     # A skin owns its values in CSkinInfo, not the placeholder CAddonSettings.
@@ -234,7 +300,7 @@ def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon), (REPOSITORY, repository)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)

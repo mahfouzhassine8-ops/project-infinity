@@ -1,14 +1,15 @@
 {
   "starting_commit": "5a62f829b54391e93ce755098bacbf6a8a0e5104",
   "locked_commit": "7d3aca64b34d00520908cf4afd531a4687124525",
-  "implementation": "Existing Essential-First ledger/coordinator, TEST2 Java seals and every passing correction retained. Read-only native correction fully built; next internal acceptance corrects diagnostic-only fcntl contamination without production changes.",
+  "implementation": "Approved Essential-First ledger/coordinator and every passing TEST2 correction retained. Read-only input now passes actual Android; targeted repository continuation admission correction awaits new native and Android acceptance.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
     "native_cpython_3117_runtime": 61,
-    "coordinator_with_real_barrier": 15,
+    "coordinator_with_real_barrier": 18,
     "full_production_job_manager": 13,
     "production_installer_filesystem_sqlite": 24,
-    "production_xml_owner_ledger": "original file/durability/owner tests plus exact live-owner serializer, failure, stale tree and lifetime regressions"
+    "production_xml_owner_ledger": "original file/durability/owner tests plus exact live-owner serializer, failure, stale tree and lifetime regressions",
+    "production_repository_continuations": 12
   },
   "first_party_python_callbacks": "unchanged locked Command Center and compatibility callbacks executed through production observer; Kodi RPC peers remain test adapters",
   "full_arm64_compile": {
@@ -82,10 +83,10 @@
     "separation_regression": "historical warnings allow essential save callbacks but still deny final authorization; active protected resources still block save admission"
   },
   "unresolved": [
-    "Physical TEST2 maps failure is corrected in native source 66bdcd71; all 61 native CPython cases and full ARM64 build passed in 38859304335. New physical acceptance remains unverified.",
-    "Latest Android run 38863124379 passed all 308 tests, eight fixture/control cases, signing and TEST2 preservation, then failed before Close at missing optional fdinfo ino. The fixture correction passes nine local actual-native cases and 16 source contracts.",
-    "Complete matched Android acceptance must confirm read-only input handling, all 16 essential owners, both Java seals, whole-UID death, database integrity and saved-data reopening before releasing signed TEST3.",
-    "Physical Fold approval remains required. No emulator result is physical acceptance and no final lock is authorized."
+    "Latest actual Close 38864889379 passed native admission and read-only regression, then failed native_databases: sqlite.connect after 4667ms. Fourteen of sixteen essential owners completed; deferred dialog also remained unconfirmed. No authorization or process death.",
+    "Repository local-continuation admission correction passes 12 real-SQLite/production-source cases and 18 real-coordinator cases locally. Full native rebuild and matched Android acceptance are required.",
+    "Retain all 308 Android cases, TEST2 Java/payload preservation, essential saves, both Java seals, whole-UID absence, integrity and saved-data reopening before preparing signed TEST3.",
+    "Physical Fold approval remains required; no final lock."
   ],
   "internal_android_probes": [
     {
@@ -227,6 +228,31 @@
       "evidence_artifact": 12029415615,
       "evidence_zip_sha256": "ec647436d4046e6047b9b8088b45d4c7419a2d537c784c60ae4649e7efb81b6f",
       "report": "evidence/runtime/test3-attempt1-android-probe.json"
+    },
+    {
+      "run": 38863124379,
+      "source_commit": "ff851e9533fcf120d294fdd91ab6aac84fe89ec1",
+      "native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
+      "native_run": 38859304335,
+      "status": "completed_failure_before_close",
+      "host_tests": 308,
+      "all_308_passed": true,
+      "native_fixture_controls": 8,
+      "all_native_fixture_controls_passed": true,
+      "test2_preservation_passed": true,
+      "permanent_signing_passed": true,
+      "close_attempted": false,
+      "android_engine_death_verified": false,
+      "whole_package_death_verified": false,
+      "reopen_verified": false,
+      "physical_fold_accepted": false,
+      "apk_delivered": false,
+      "apk_sha256": "f0d320c31cb99819aafe8c6bc6dac814908577da39c8891878b0190d9311189f",
+      "error": "Disposable read-only fixture KeyError: ino; no completed fixture observation, Close not attempted",
+      "evidence_artifact": 12029528722,
+      "evidence_zip_sha256": "ac583567a8f8e9630d30b8fddcf9130bf9c364ac93408dc454f6e6a3577e3a19",
+      "report": "evidence/runtime/test3-attempt2-android-probe.json",
+      "fixture_error": "evidence/runtime/test3-attempt2-fixture-error.json"
     }
   ],
   "child_output_correction": {
@@ -290,56 +316,80 @@
   "latest_internal_apk_sha256": "f0d320c31cb99819aafe8c6bc6dac814908577da39c8891878b0190d9311189f",
   "latest_internal_apk_delivered": false,
   "latest_android_probe": {
-    "run": 38863124379,
-    "source_commit": "ff851e9533fcf120d294fdd91ab6aac84fe89ec1",
+    "run": 38864889379,
+    "source_commit": "0e3393d8d551bfb8034eb449bf356876c9575b5d",
     "native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
     "native_run": 38859304335,
-    "status": "completed_failure_before_close",
+    "status": "completed_failure",
     "host_tests": 308,
     "all_308_passed": true,
-    "native_fixture_controls": 8,
+    "native_fixture_controls": 9,
     "all_native_fixture_controls_passed": true,
     "test2_preservation_passed": true,
     "permanent_signing_passed": true,
-    "close_attempted": false,
+    "close_attempted": true,
     "android_engine_death_verified": false,
     "whole_package_death_verified": false,
     "reopen_verified": false,
     "physical_fold_accepted": false,
     "apk_delivered": false,
     "apk_sha256": "f0d320c31cb99819aafe8c6bc6dac814908577da39c8891878b0190d9311189f",
-    "error": "Disposable read-only fixture KeyError: ino; no completed fixture observation, Close not attempted",
-    "evidence_artifact": 12029528722,
-    "evidence_zip_sha256": "ac583567a8f8e9630d30b8fddcf9130bf9c364ac93408dc454f6e6a3577e3a19",
-    "report": "evidence/runtime/test3-attempt2-android-probe.json",
-    "fixture_error": "evidence/runtime/test3-attempt2-fixture-error.json"
+    "readonly_virtual_file_read_close_verified": true,
+    "essential_writes_sealed": true,
+    "essential_writes_durable": true,
+    "essential_write_blockers": [],
+    "native_admission_completed": true,
+    "essential_saved": 14,
+    "essential_total": 16,
+    "duration_ms": 4667,
+    "error": "native_databases: sqlite.connect",
+    "failed_owners": [
+      "native_databases",
+      "deferred_dialog_state"
+    ],
+    "authorization_consumed": false,
+    "evidence_artifact": 12031007385,
+    "evidence_zip_sha256": "937a291c931608d357d6493be6a2f301c823326423de8c7d35389fd1898199f4",
+    "report": "evidence/runtime/test3-attempt3-android-probe.json"
   },
   "latest_preservation": "Run 38863124379: all 308 tests and original source hashes passed. Direct signed TEST2 comparison preserved all runtime Java instructions and every payload entry except AndroidManifest.xml version metadata and the corrected libkodi.so; baseline unchanged. See evidence/runtime/test3-attempt2-test2-preservation.json.",
-  "latest_android_source_commit": "ff851e9533fcf120d294fdd91ab6aac84fe89ec1",
+  "latest_android_source_commit": "0e3393d8d551bfb8034eb449bf356876c9575b5d",
   "latest_completed_production_probe": {
-    "run": 38863124379,
-    "source_commit": "ff851e9533fcf120d294fdd91ab6aac84fe89ec1",
+    "run": 38864889379,
+    "source_commit": "0e3393d8d551bfb8034eb449bf356876c9575b5d",
     "native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
     "native_run": 38859304335,
-    "status": "completed_failure_before_close",
+    "status": "completed_failure",
     "host_tests": 308,
     "all_308_passed": true,
-    "native_fixture_controls": 8,
+    "native_fixture_controls": 9,
     "all_native_fixture_controls_passed": true,
     "test2_preservation_passed": true,
     "permanent_signing_passed": true,
-    "close_attempted": false,
+    "close_attempted": true,
     "android_engine_death_verified": false,
     "whole_package_death_verified": false,
     "reopen_verified": false,
     "physical_fold_accepted": false,
     "apk_delivered": false,
     "apk_sha256": "f0d320c31cb99819aafe8c6bc6dac814908577da39c8891878b0190d9311189f",
-    "error": "Disposable read-only fixture KeyError: ino; no completed fixture observation, Close not attempted",
-    "evidence_artifact": 12029528722,
-    "evidence_zip_sha256": "ac583567a8f8e9630d30b8fddcf9130bf9c364ac93408dc454f6e6a3577e3a19",
-    "report": "evidence/runtime/test3-attempt2-android-probe.json",
-    "fixture_error": "evidence/runtime/test3-attempt2-fixture-error.json"
+    "readonly_virtual_file_read_close_verified": true,
+    "essential_writes_sealed": true,
+    "essential_writes_durable": true,
+    "essential_write_blockers": [],
+    "native_admission_completed": true,
+    "essential_saved": 14,
+    "essential_total": 16,
+    "duration_ms": 4667,
+    "error": "native_databases: sqlite.connect",
+    "failed_owners": [
+      "native_databases",
+      "deferred_dialog_state"
+    ],
+    "authorization_consumed": false,
+    "evidence_artifact": 12031007385,
+    "evidence_zip_sha256": "937a291c931608d357d6493be6a2f301c823326423de8c7d35389fd1898199f4",
+    "report": "evidence/runtime/test3-attempt3-android-probe.json"
   },
   "java_diagnostic_correction": {
     "cause": "Android 11 FastXmlSerializer inserts four indentation spaces after a newline-terminated route audit string; reproduced using the actual Android 11 serializer and unchanged production XML reader.",
@@ -431,10 +481,11 @@
       "filesystem_mount_type": "proc",
       "read_flush_close_completed": true,
       "report": "evidence/runtime/test3-attempt1-android-probe.json"
-    }
+    },
+    "actual_android_verification": "Run 38864889379 passed read/flush/close of real /proc/5596/maps and fdinfo with no ino field. Native admission completed; essential write proof sealed/durable, zero blockers. Overall Close failed later at native database owner."
   },
   "latest_physical_blocker": "native_admission: protected_durability_failed:/proc/15237/maps",
-  "android_verification_scope": "Latest TEST3 acceptance failed in diagnostic setup before Close was attempted. TEST2 internal success and physical failure remain separately preserved; no physical acceptance or lock.",
+  "android_verification_scope": "Internal disposable emulator only. Latest TEST3 run confirms corrected read-only input and native durable seal, but complete shutdown fails at database owner; no physical acceptance.",
   "test3_plan": {
     "native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
     "native_run": 38859304335,
@@ -482,6 +533,33 @@
     "unchanged_green_native_commit": "66bdcd715bc95354eec672caf1a74038bbd98f44",
     "unchanged_green_native_run": 38859304335,
     "native_rebuild_required": false,
-    "final_lock": false
+    "final_lock": false,
+    "actual_android_verification": "Resolved in 38864889379; all nine fixture/control cases and actual emulator metadata validation passed, including missing ino and stable real fstat/target identity."
+  },
+  "repository_continuation_correction": {
+    "failed_run": 38864889379,
+    "observed": "Repository-update job remained in callback; same worker logged GetRepoUpdateData failure after final protected-write seal. Two sqlite.connect and two database.connect failures plus no-connection query blocked the database owner; deferred dialog completion depends on that owner.",
+    "preimage": "xbmc/addons/RepositoryUpdater.cpp",
+    "preimage_sha256": "92e44c82995060552f71b675bdc03c9bb08b63430d2d83b59fcdb78ea7d5c0f2",
+    "lineage": "Exact 9402-file green native manifest from 38859304335 checked; official source bytes match that pinned preimage.",
+    "correction": "Use existing CheckpointWriteGuard(optional-cache-work) for local repository reads, post-fetch metadata writes, callback discovery/install scheduling, timer scheduling and event publication. Always remove completed job and signal waiters first. New optional continuation is refused during Close; admitted local work drains before sealing.",
+    "network_or_timer_wait_lease": false,
+    "database_barrier_changed": false,
+    "sqlite_vfs_changed": false,
+    "protected_write_durability_changed": false,
+    "genuine_failure_policy": "Keep original native DB/VFS/transaction failure records and required install receipts. No error downgrading, readonly fallback, blanket repository exemption or successful-save fabrication.",
+    "local_repository_cases": 12,
+    "local_production_coordinator_cases": 18,
+    "existing_full_job_manager_cases": 13,
+    "source_contracts": 16,
+    "negative_control": "Exact original repository callback on a real sealed SQLite VFS attempts database opens and records failures. Patched late callback completes job cleanup with zero opens. Real read/write errors remain visible and preserve initial bytes.",
+    "reports": [
+      "evidence/runtime/repository-continuation-local.json",
+      "evidence/runtime/repository-coordinator-local.json"
+    ],
+    "full_native_build": "Required for new source; pending launch",
+    "matched_android_acceptance": "Required after green full native build",
+    "physical_acceptance": false,
+    "locked": false
   }
 }

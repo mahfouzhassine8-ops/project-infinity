@@ -25,7 +25,8 @@ PINS = {
 CASES = ["optional-blocked", "optional-failed", "settings-failed", "profiles-failed",
          "first-party-missing", "first-party-failed", "compat-failed", "protected-writer",
          "native-transaction", "lease-lost", "deadline", "unobserved-writer", "protection-warning",
-         "optional-repository", "repository-transaction"]
+         "optional-repository", "repository-transaction", "repository-local-race",
+         "repository-local-failure", "repository-late-local"]
 MAIN = r'''
 int main(int argc, char** argv) {
   assert(argc == 3);
@@ -54,7 +55,20 @@ int main(int argc, char** argv) {
   }
   assert(RegisterStartupOwner(OWNER, getpid(), Test::root));
   assert(PublishStartupOwner());
+  std::unique_ptr<CheckpointWriteGuard> localRepository;
+  if (mode == "repository-local-race" || mode == "repository-local-failure") {
+    localRepository = std::make_unique<CheckpointWriteGuard>("optional-cache-work");
+    assert(*localRepository);
+  }
   assert(Request(SESSION, OWNER, getpid()));
+  if (localRepository) {
+    Pump(app); active(); Pump(app);
+    assert(Get().phase == "QUIESCE" && Test::freezes == 0);
+    assert(!AuthorizeTermination(SESSION, OWNER, getpid()));
+    if (mode == "repository-local-failure")
+      RecordFailure("native_databases", "genuine_admitted_repository_write_failed");
+    localRepository.reset();
+  }
   if (mode == "first-party-missing") {
     Pump(app); active(); Pump(app); Pump(app);
     assert(!Get().owners["command_center"].complete);
@@ -96,11 +110,15 @@ int main(int argc, char** argv) {
   }
   if (mode == "first-party-failed" || mode == "compat-failed" ||
       mode == "settings-failed" || mode == "profiles-failed" ||
-      mode == "protected-writer" || mode == "unobserved-writer") {
+      mode == "protected-writer" || mode == "unobserved-writer" || mode == "repository-local-failure") {
     assert(Get().phase == "CHECKPOINT_FAILED");
     assert(!AuthorizeTermination(SESSION, OWNER, getpid())); return 0;
   }
   assert(Get().phase == "SAFE_TO_TERMINATE");
+  if (mode == "repository-late-local") {
+    CheckpointWriteGuard refused("optional-cache-work");
+    assert(!refused && Get().phase == "SAFE_TO_TERMINATE");
+  }
   assert(Get().owners["kodi_settings"].complete);
   assert(Get().owners["profiles"].complete);
   assert(Get().owners["native_databases"].complete);

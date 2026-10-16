@@ -209,6 +209,9 @@ jobs:
           set -euo pipefail
           python3 repairs/essential-first-2103377/test_runtime_jobs.py --runtime kodi \
             2>&1 | tee checkpoint-build/runtime-jobs.log
+          python3 repairs/essential-first-2103377/test_runtime_repository.py --runtime kodi \
+            --out checkpoint-build/runtime-repository.json \
+            2>&1 | tee checkpoint-build/runtime-repository.log
           python3 repairs/essential-first-2103377/test_runtime_installer.py --runtime kodi \
             2>&1 | tee checkpoint-build/runtime-installer.log
           INFINITY_RUNTIME_NATIVE="$GITHUB_WORKSPACE/kodi" \
