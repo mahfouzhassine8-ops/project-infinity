@@ -89,3 +89,13 @@ No add-on, Infinity skin or physical Fold data is changed. Synthetic services
 remain a control rather than the full Diggz/custom-skin installation. Exact
 native wait identification, corrected runtime acceptance and physical Fold
 approval remain outstanding. No Fold APK promotion or final lock.
+
+## Saved monitoring checkpoint
+
+- Native progress source `eaa6ff3f`, full build `38945424322`: host proof passed; engine build running.
+- Independent existing-engine Android `38944119153`: 308/signing and fresh case passed; early/loaded pending.
+- Exact matched RC04 source `bb251ed4`, Android `38945702659`: running; full native success is mandatory before packaging.
+- Both independent Android runs remain active under separate concurrency groups. No case is cancelled by a later push.
+
+Implementation and acceptance setup are saved. Exact native wait identification,
+all required runtime outcomes and physical Fold approval remain outstanding.

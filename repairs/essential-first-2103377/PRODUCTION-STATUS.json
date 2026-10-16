@@ -106,7 +106,8 @@
       "run": 38945424322,
       "commit": "eaa6ff3f283fea149cede0423488c4e7989a5090",
       "status": "in_progress",
-      "result": null
+      "result": null,
+      "host_proof_result": "success"
     }
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
@@ -1583,7 +1584,7 @@
   "independent_acceptance": {
     "source_commit": "8d9ec872a96ee7dc72e80889dd3af9f3efedad3a",
     "android_run": 38944119153,
-    "status": "in_progress",
+    "status": "in_progress_fresh_passed",
     "cases": [
       "fresh",
       "upgrade-early",
@@ -1601,7 +1602,14 @@
     "native_behavior_changed": false,
     "physical_fold_accepted": false,
     "locked": false,
-    "superseded_by_new_run": false
+    "superseded_by_new_run": false,
+    "build_308_and_signing_result": "success",
+    "fresh_result": "success",
+    "upgrade_early_result": null,
+    "upgrade_loaded_result": null,
+    "fresh_job": 117121512520,
+    "upgrade_early_job": 117121512494,
+    "upgrade_loaded_job": 117121512466
   },
   "native_initialization_progress": {
     "status": "host_verified_native_rebuild_in_progress",
@@ -1628,20 +1636,25 @@
     "locked": false,
     "source_commit": "eaa6ff3f283fea149cede0423488c4e7989a5090",
     "native_run": 38945424322,
-    "native_status": "in_progress",
+    "native_status": "in_progress_host_proof_success",
     "candidate_version": "1.0.9-Essential-First-TEST4-RC04",
-    "matched_android_status": "being_staged"
+    "matched_android_status": "in_progress",
+    "matched_android_run": 38945702659,
+    "matched_android_commit": "bb251ed41e9b368fc8c20151d5d3b5d0f9d57ad6"
   },
   "matched_progress_acceptance": {
     "native_run": 38945424322,
     "native_commit": "eaa6ff3f283fea149cede0423488c4e7989a5090",
-    "status": "being_staged",
+    "status": "in_progress",
     "candidate_version": "1.0.9-Essential-First-TEST4-RC04",
     "separate_disposable_avds": true,
     "same_apk_for_all_cases": true,
     "all308_and_complete_native_success_required_before_packaging": true,
     "original_independent_run_continues": 38944119153,
     "physical_fold_accepted": false,
-    "locked": false
+    "locked": false,
+    "android_run": 38945702659,
+    "source_commit": "bb251ed41e9b368fc8c20151d5d3b5d0f9d57ad6",
+    "native_host_proof_result": "success"
   }
 }
