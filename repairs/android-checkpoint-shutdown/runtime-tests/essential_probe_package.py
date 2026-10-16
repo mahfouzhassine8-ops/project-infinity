@@ -15,7 +15,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[3]
 SOURCE=ROOT/'repairs/essential-first-2103377/package_signed_fold_test.py'
-NATIVE='61a53e0fe11569953ea2f392503ae6629e7e8dd9'
+NATIVE='82aac05bf8fdddf011b01aa4e4e1249b8971d7f7'
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('mode',choices=('java','verify-java','package'))
