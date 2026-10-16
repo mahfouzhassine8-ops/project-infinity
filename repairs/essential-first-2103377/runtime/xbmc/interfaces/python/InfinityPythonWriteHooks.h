@@ -64,7 +64,7 @@ inline PyObject* NativeField(PyObject* object, PyTypeObject* type, const char* n
 inline PyObject* ActualDescriptor(PyObject* object, unsigned depth = 0)
 {
   if (depth > 4) return nullptr;
-  if (Py_IS_TYPE(object,IOTypes()[5])) return PyUnicode_FromString(":nonpersistent:");
+  if (Py_IS_TYPE(object,IOTypes()[5])) return PyUnicode_FromStringAndSize(Ledger::NonPersistentTarget().data(), 1);
   if (PyObject_TypeCheck(object,IOTypes()[0]))
   {
     if (depth)
@@ -205,7 +205,7 @@ public:
     {
       auto destination = Target(args.At(1, "fd2"));
       // dup2 may legally allocate a currently unused descriptor number.
-      if (destination.empty() && args.At(1,"fd2") && PyLong_Check(args.At(1,"fd2"))) destination = ":nonpersistent:";
+      if (destination.empty() && args.At(1,"fd2") && PyLong_Check(args.At(1,"fd2"))) destination = Ledger::NonPersistentTarget();
       m_paths = {Target(args.At(0, "fd")), destination};
     }
     else
@@ -218,12 +218,12 @@ public:
     const int writer = m_context ? m_context->id : -1;
     // Unbuffered close changes descriptor identity, not file contents. Do not
     // invent dirty files merely because a read-only module file was closed.
-    if (kind == OS_CLOSE || kind == OS_CLOSERANGE || kind == RAW_CLOSE) m_paths = {":nonpersistent:"};
+    if (kind == OS_CLOSE || kind == OS_CLOSERANGE || kind == RAW_CLOSE) m_paths = {Ledger::NonPersistentTarget()};
     if (kind == FILE_FLOCK)
     {
       auto* value = args.At(1,"operation");
       if (value && PyLong_Check(value)) m_lockOperation = static_cast<int>(PyLong_AsLong(value));
-      if (m_lockOperation & LOCK_UN) m_paths = {":nonpersistent:"};
+      if (m_lockOperation & LOCK_UN) m_paths = {Ledger::NonPersistentTarget()};
     }
     if (std::find(m_paths.begin(), m_paths.end(), "") != m_paths.end()) m_paths.clear();
     m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);

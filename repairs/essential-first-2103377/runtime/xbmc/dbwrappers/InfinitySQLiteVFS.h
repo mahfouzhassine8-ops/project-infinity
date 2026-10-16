@@ -40,7 +40,7 @@ inline bool SavePermission()
   return false;
 #endif
 }
-inline std::string Path(File* f) { return f->path ? f->path : ":nonpersistent:"; }
+inline std::string Path(File* f) { return f->path ? f->path : InfinityScriptPersistence::NonPersistentTarget(); }
 inline std::string DatabasePath(File* f)
 {
   auto path = Path(f);

@@ -227,3 +227,30 @@ The source-pinned ARM64 child-command build `38829673603` passed (native hash
 The owner/device correction is building at `38831553869`; its Android probe
 `38831677450` is internal evidence only. Even a passing process test cannot
 waive the independently reproduced Java protection gap. No APK is released.
+
+
+## Real filename collision in the nonpersistent marker
+
+A cached native Python open of a real file named `:nonpersistent:` truncated
+verified contents after sealing, and native authorization remained true.
+The final buffer close could raise PermissionError after the truncation;
+independent byte inspection prevents mistaking that late exception for safety.
+The actual failed result is retained in `marker-boundary-negative-control.json`.
+
+The existing ledger now represents nonpersistent targets with one NUL byte,
+which cannot name a POSIX file. All producers agree: actual descriptor and
+memory-buffer inspection, anonymous SQLite VFS files and observer operation
+scopes. Real SQLite file writes still acquire actual destination leases.
+No optional owner becomes mandatory and no successful save receipt is invented.
+
+The reused CPython suite now has 51 passing cases. The new case saves the same
+filename normally before Close and checks six post-seal mutation entrypoints
+against actual unchanged bytes. Existing memory-buffer and real SQLite cases
+remain required. Fresh full ARM64 compilation is required for this change.
+The independent Java buffer counterexample still blocks any APK delivery.
+
+The owner/device native build `38831553869` completed successfully. Android
+probe `38831677450` attempt 1 compiled and permanently signed the preserved
+internal APK but failed before emulator boot because the downloaded emulator
+archive was invalid. Attempt 2 retries the same verified input. Attempt 1
+provides no app shutdown or reopen result.

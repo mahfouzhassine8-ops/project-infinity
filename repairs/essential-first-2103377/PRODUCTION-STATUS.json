@@ -4,7 +4,7 @@
   "implementation": "Existing native script persistence ledger plus subordinate CPython, POSIX and SQLite VFS adapters; Android Java write boundary remains unintegrated.",
   "completed_host_cases": {
     "sqlite_runtime": 8,
-    "native_cpython_3117_runtime": 50,
+    "native_cpython_3117_runtime": 51,
     "coordinator_with_real_barrier": 15,
     "full_production_job_manager": 13,
     "production_installer_filesystem_sqlite": 24,
@@ -16,7 +16,7 @@
     "previous_run": 38819025107,
     "previous_result": "success",
     "previous_unstripped_native_sha256": "6d08f2e2fc6fe74f4a74020c4c9232b49e6b8777886edc9bfb67b6a00a012d1b",
-    "current_corrections": "pending complete build for existing virtual settings serializer routing and verified actual null-device durability classification",
+    "current_corrections": "Marker filename collision correction passed local production runtime cases; fresh full ARM64 compilation required.",
     "child_output_build_run": 38824257676,
     "child_output_build_result": "success",
     "child_output_native_sha256": "002e736f6c484148cc99f49b6c5ba552180c2d014badc52513ddf650d1d27b6a",
@@ -30,7 +30,10 @@
     "child_command_evidence_zip_sha256": "bdc8a86f14cc18dc899df0599af2721041743419e0a89b4c61ddbc04d121a728",
     "owner_device_build_run": 38831553869,
     "owner_device_build_commit": "1ce173676356705897302e001aab57baf0eb664c",
-    "owner_device_build_status": "in_progress"
+    "owner_device_build_status": "success",
+    "owner_device_native_sha256": "af36aadf547644ab13556c546c5fae02357d7d2da64559491055b9a8cf246661",
+    "owner_device_evidence_artifact": 12019605493,
+    "owner_device_evidence_zip_sha256": "01fcc6c810b2182ae66e8ca4c05a69d7a7f75cce647882eac0182430bd38f066"
   },
   "android_receipt_validation": "compiled actual protocol/guard; native emitted receipt, identity, durability, failure, replay and race tests passed on host",
   "android_process_death_verified": false,
@@ -93,6 +96,17 @@
       "outcome": "First-party callbacks, Kodi/profile/skin/favourites saves reached in 5.5 seconds; correctly failed generic skin placeholder serialization and /dev/null durability. No authorization/death/reopen success.",
       "evidence_artifact": 12016788395,
       "evidence_zip_sha256": "a1ec9dc3414f9abf50ad0c1d971f54d601dd6d54f8b1419accc031b0b3537e64"
+    },
+    {
+      "run": 38831677450,
+      "attempt": 1,
+      "native_commit": "1ce173676356705897302e001aab57baf0eb664c",
+      "permanently_signed_internal_apk": true,
+      "apk_delivered": false,
+      "apk_sha256": "8a63cfc3bd1e7d2897fcd3cfaabdd5c134fd2e8320bf41e3a685f46e63d3f092",
+      "evidence_artifact": 12019231754,
+      "evidence_zip_sha256": "cf1fbc51821f6fc9ab74550afaa5ffc42483c3fc64217e731168d6ead182f317",
+      "outcome": "Emulator SDK download was not a ZIP archive. App test never started; no Close/death/reopen evidence."
     }
   ],
   "child_output_correction": {
@@ -114,7 +128,7 @@
   "android_save_corrections": {
     "owner_serializer": "Checkpoint registry invokes the existing virtual owner serializer only for that exact current settings instance; retained/reloaded old trees keep their own serializer. Real serialization failure remains blocking. No skin source changes.",
     "null_device": "Only exact /dev/null Linux character device 1:3, matched by open/fstat identity, bypasses file fsync. Unknown device remains a specific durability failure.",
-    "verification": "50 CPython cases and existing production XML/owner ledger regressions passed locally; full native build and real Android probe pending."
+    "verification": "Full ARM64 owner/device build 38831553869 passed; Android retry is executing. New marker correction has 51 local CPython passes."
   },
   "java_boundary": {
     "negative_control": "evidence/runtime/java-buffer-boundary-negative-control.json",
@@ -127,7 +141,14 @@
     "run": 38831677450,
     "native_run": 38831553869,
     "source_commit": "44029774ccee73de1929509c5d186c76741ac8b5",
-    "status": "waiting for exact native build; internal evidence only",
+    "status": "Attempt 1 signed and preserved payload but Android SDK returned Archive is not a ZIP archive before emulator boot. Attempt 2 reruns same exact native APK; app result pending.",
     "apk_delivery_blocked_even_if_probe_passes": "Java write boundary negative control remains unresolved."
+  },
+  "marker_boundary": {
+    "negative_control": "evidence/runtime/marker-boundary-negative-control.json",
+    "observed": "Cached open truncated real protected :nonpersistent: file after native authorization; authorization remained true.",
+    "correction": "Use a NUL target that cannot be a real POSIX filename for actual nonpersistent descriptors, memory buffers and anonymous SQLite paths; preserve real VFS destination leases.",
+    "verification": "Real pre-Close normal file save and six post-seal mutation entrypoints tested; memory buffers and SQLite tests retained.",
+    "apk_deliverable": false
   }
 }

@@ -1,0 +1,16 @@
+{
+  "scope": "actual production CPython C entry hooks; relative filename matches internal marker",
+  "exit_code": 0,
+  "stdout": "actual_protected_bytes_changed=true; native_authorized_after=1\n",
+  "stderr": "",
+  "actual_file": "",
+  "apk_deliverable": false,
+  "source_commit": "1ce173676356705897302e001aab57baf0eb664c",
+  "negative_control_reproduced": true,
+  "initial_protected_contents": "verified",
+  "actual_protected_bytes_changed": true,
+  "native_authorized_after": true,
+  "android_process_death_verified": false,
+  "method": "Reuse actual production CPython host harness; establish cwd before interpreter setup, seed absolute protected file before Close, call cached open on relative :nonpersistent: after seal. A PermissionError during open/close does not undo observed truncation; inspect actual bytes independently.",
+  "correction": "Internal nonpersistent target is one NUL byte, which cannot name a real POSIX file. Keep all actual path leases and final seal checks."
+}

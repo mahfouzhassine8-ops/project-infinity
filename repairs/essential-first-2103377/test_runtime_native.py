@@ -73,6 +73,7 @@ static void run(const char* code) {
 int main(int argc, char** argv) {
   assert(argc == 3);
   const std::string mode = argv[1], root = argv[2];
+  if (mode == "marker-filename") assert(::chdir((root+"/profile").c_str())==0);
   Py_Initialize(); auto* owner = Py_NewInterpreter(); assert(owner);
   auto* globals = PyModule_GetDict(PyImport_AddModule("__main__"));
   auto* path = PyUnicode_FromString(root.c_str()); PyDict_SetItemString(globals, "root", path); Py_DECREF(path);
@@ -244,6 +245,7 @@ baseline=old_open(shared,'rb').read()
     std::cout<<"PASS actual native fork preparation cannot race the essential seal\n"<<std::flush;
     std::_Exit(0);
   }
+  if (mode == "marker-filename") run("with old_open(':nonpersistent:','w') as marker: marker.write('verified')\n");
   assert(InfinityScriptPersistence::BeginWriteProtection(23, {root+"/profile"}, {root+"/cache"}));
   if (mode == "compat-save") run("assert checkpoint.poll() and checkpoint.parked\nresponse=json.loads((control/'compat-response.json').read_text()); assert response['status']=='PARTICIPANT_COMPLETE' and not response['global_safe_to_terminate']\n");
   if (mode == "compat-failure") {
@@ -343,6 +345,18 @@ baseline=old_open(shared,'rb').read()
   assert(before.blockers.empty());
   assert(InfinityScriptPersistence::SealEssentialWrites(23));
   assert(InfinityScriptPersistence::EssentialWritesAuthorized(23));
+  if (mode == "marker-filename") run(R"marker(
+for operation in (lambda: old_open(':nonpersistent:','w'),
+                  lambda: old_raw(':nonpersistent:','w'),
+                  lambda: os.open(':nonpersistent:',os.O_WRONLY|os.O_TRUNC),
+                  lambda: os.truncate(':nonpersistent:',0),
+                  lambda: old_rename(':nonpersistent:',':nonpersistent:'),
+                  lambda: old_remove(':nonpersistent:')):
+ try: operation()
+ except PermissionError: pass
+ else: raise AssertionError('real filename was confused with an internal marker')
+ assert old_open(root+'/profile/:nonpersistent:','rb').read()==b'verified'
+)marker");
   if (mode == "observer-denials") run("from pathlib import Path\nfor operation in (lambda: os.open(shared,os.O_WRONLY|os.O_TRUNC),lambda: open(shared,'w'),lambda: os.mkdir(root+'/profile/late'),lambda: Path(shared).write_text('BAD')):\n try: operation()\n except PermissionError: pass\n else: raise AssertionError('observer admitted a sealed mutation')\n");
   if (mode == "late-native-child") run(R"latechild(
 try:
@@ -399,8 +413,8 @@ def main():
     with tempfile.TemporaryDirectory(prefix='essential-native-') as folder:
         folder=Path(folder); source=folder/'test.cpp'; binary=folder/'test'
         source.write_text(CODE)
-        prefix=args.python_prefix or args.python_source.parent/'python3117'
-        library=prefix/'lib' if args.python_prefix else args.python_source
+        prefix=(args.python_prefix or args.python_source.parent/'python3117').resolve()
+        library=(prefix/'lib' if args.python_prefix else args.python_source).resolve()
         python_includes=[prefix/'include/python3.11'] if args.python_prefix else [args.python_source/'Include',args.python_source]
         includes=[runtime/'xbmc', runtime/'xbmc/interfaces/python', base, base/'interfaces/python',
                   *python_includes,args.sqlite_include]
@@ -418,7 +432,7 @@ def main():
                'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
         cases+=['missing-immutable-command','missing-writable-command','nested-native-child',
                 'child-locale-environment','child-writable-search','child-error-channel-pending',
-                'late-native-child','child-preparation-race','null-device-path','unknown-device-path']
+                'late-native-child','child-preparation-race','null-device-path','unknown-device-path','marker-filename']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

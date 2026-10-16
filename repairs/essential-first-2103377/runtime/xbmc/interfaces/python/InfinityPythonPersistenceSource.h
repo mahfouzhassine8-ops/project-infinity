@@ -20,6 +20,9 @@ import stat
 import sys
 # Marker is embedded into libkodi.so and checked by the native build gate.
 DIRECT_SQLITE_CONNECT_OBSERVED = 'direct_sqlite_connect_observed'
+# Cannot collide with any real filesystem name; actual SQLite writes still
+# acquire their own destination leases inside the production native VFS.
+NONPERSISTENT_TARGET = '\0'
 try:
     import subprocess
 except ImportError:
@@ -262,7 +265,7 @@ class Observer:
         class Cursor(original_cursor):
             def execute(self, sql, *args, **kwargs):
                 try:
-                    with observer.operation('sqlite.execute', (':nonpersistent:',)):
+                    with observer.operation('sqlite.execute', (NONPERSISTENT_TARGET,)):
                         result = super().execute(sql, *args, **kwargs)
                         self.connection._infinity_inventory()
                         return result
@@ -271,7 +274,7 @@ class Observer:
                     raise
             def executemany(self, sql, *args, **kwargs):
                 try:
-                    with observer.operation('sqlite.executemany', (':nonpersistent:',)):
+                    with observer.operation('sqlite.executemany', (NONPERSISTENT_TARGET,)):
                         result = super().executemany(sql, *args, **kwargs)
                         self.connection._infinity_inventory()
                         return result
@@ -280,7 +283,7 @@ class Observer:
                     raise
             def executescript(self, sql):
                 try:
-                    with observer.operation('sqlite.executescript', (':nonpersistent:',)):
+                    with observer.operation('sqlite.executescript', (NONPERSISTENT_TARGET,)):
                         result = super().executescript(sql)
                         self.connection._infinity_inventory()
                         return result
@@ -290,7 +293,7 @@ class Observer:
 
         class Connection(original_connection):
             def __init__(self, database, *args, **kwargs):
-                with observer.operation('sqlite.open', (':nonpersistent:',)):
+                with observer.operation('sqlite.open', (NONPERSISTENT_TARGET,)):
                     super().__init__(database, *args, **kwargs)
                 self._infinity_closed = False
                 observer.connections.add(self)
@@ -332,7 +335,7 @@ class Observer:
             def commit(self):
                 observer.check_live()
                 try:
-                    with observer.operation('sqlite.commit', (':nonpersistent:',)):
+                    with observer.operation('sqlite.commit', (NONPERSISTENT_TARGET,)):
                         return super().commit()
                 except Exception as error:
                     observer.sqlite_error('sqlite_commit_failed', error, 'COMMIT')

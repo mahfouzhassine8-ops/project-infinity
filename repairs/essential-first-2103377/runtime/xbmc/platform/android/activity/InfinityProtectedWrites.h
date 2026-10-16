@@ -14,6 +14,10 @@ namespace InfinityScriptPersistence
 inline thread_local int protectedWriteOwner{-1};
 inline thread_local uint64_t protectedWriteToken{0};
 inline int CurrentWriteOwner() { return protectedWriteOwner; }
+// A NUL cannot name a POSIX file. A printable marker can: treating that
+// filename as nonpersistent lets open(O_TRUNC) change it after sealing.
+inline const std::string& NonPersistentTarget()
+{ static const std::string target(1, '\0'); return target; }
 inline bool Within(const std::string& path, const std::string& root)
 { return !root.empty() && (path == root || path.rfind(root + "/", 0) == 0); }
 
@@ -42,7 +46,7 @@ inline std::string ProtectedCanonical(const std::string& input)
 
 inline bool OptionalBasePathLocked(const WriteProtection& p, const std::string& raw)
 {
-  if (raw == ":nonpersistent:") return true;
+  if (raw == NonPersistentTarget()) return true;
   const auto path = ProtectedCanonical(raw);
   if (path.empty()) return false;
   for (const auto& cache : p.caches) if (Within(path, cache)) return true;
@@ -127,7 +131,7 @@ inline void InvalidateDescriptorRange(int first, int last)
 }
 inline void RememberAlias(const std::string& from, const std::string& to)
 {
-  if (from == ":nonpersistent:" || to == ":nonpersistent:") return;
+  if (from == NonPersistentTarget() || to == NonPersistentTarget()) return;
   const auto source = Absolute(from), target = Absolute(to);
   if (source.empty() || target.empty() || source == target) return;
   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
@@ -157,7 +161,7 @@ inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>& 
         item.second.operation.find(".flush") != std::string::npos || item.second.operation.find(".close") != std::string::npos))
       bufferDrain = true;
   const bool persistent = paths.empty() || std::any_of(paths.begin(), paths.end(),
-      [](const std::string& path) { return path != ":nonpersistent:"; });
+      [](const std::string& path) { return path != NonPersistentTarget(); });
   if (p.phase && (ProtectedLocked(p, resource) || (p.phase == 3 && persistent)))
   {
     const bool permitted = p.phase < 3 &&
@@ -180,7 +184,7 @@ inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>& 
   p.operations.emplace(token, resource);
   for (const auto& path : paths)
   {
-    if (path == ":nonpersistent:") continue;
+    if (path == NonPersistentTarget()) continue;
     const auto absolute = Absolute(path);
     if (absolute.empty()) ProtectionFailureLocked(p, "protected_path_identity_unconfirmed:" + operation);
     else { p.paths.insert(absolute); p.writerPaths[id].insert(absolute); }
@@ -266,7 +270,7 @@ inline void RecordProtectedResult(uint64_t token, const std::string& path)
   if (found == s.protection.operations.end() || path.empty())
   { ProtectionFailureLocked(s.protection, "completed_native_write_target_unconfirmed"); return; }
   found->second.paths.push_back(path);
-  if (path != ":nonpersistent:")
+  if (path != NonPersistentTarget())
   {
     s.protection.paths.insert(path);
     s.protection.writerPaths[found->second.writer].insert(path);
@@ -319,8 +323,8 @@ inline std::string DescriptorPath(int fd)
 {
   struct stat st{};
   if (::fstat(fd, &st) != 0) return {};
-  if (!S_ISREG(st.st_mode) && !S_ISDIR(st.st_mode)) return ":nonpersistent:";
-  if (!st.st_nlink) return ":nonpersistent:";
+  if (!S_ISREG(st.st_mode) && !S_ISDIR(st.st_mode)) return NonPersistentTarget();
+  if (!st.st_nlink) return NonPersistentTarget();
   char target[PATH_MAX]{};
   const auto name = "/proc/self/fd/" + std::to_string(fd);
   const auto size = ::readlink(name.c_str(), target, sizeof(target) - 1);

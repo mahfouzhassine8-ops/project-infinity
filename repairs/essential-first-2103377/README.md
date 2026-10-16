@@ -1,6 +1,6 @@
 # Essential-first shutdown — production repair in progress
 
-**Status: native/Python corrections are integrated; an actual Java write-boundary gap blocks APK delivery; not locked.**
+**Status: shutdown-only native/Python corrections continue; an actual Java write-boundary gap blocks APK delivery; not locked.**
 
 Continue on `work/infinity-2103377-essential-first-shutdown-only` from the saved
 `5a62f829` checkpoint. The production path now uses the existing script
@@ -148,3 +148,12 @@ owners as native code. Native SAFE is never represented as process-death proof.
 
 Final promotion or lock requires explicit user approval. Continuing the repair,
 verification and safe test packaging is already authorized.
+
+
+Latest marker correction retains a real negative control for a filename that
+collided with the old nonpersistent string. The existing ledger now uses a
+non-filename NUL target, and all 51 actual CPython cases pass. Full native
+compilation remains required for this change. Owner/device build 38831553869
+passed; Android probe 38831677450 is being retried after an emulator archive
+download failure before app execution. The Java buffered-write gap remains a
+release blocker regardless of the process probe result.
