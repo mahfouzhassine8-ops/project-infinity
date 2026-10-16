@@ -1,6 +1,8 @@
 name: Infinity 2103377 | INTERNAL observer-stage diagnostic
 # Isolated native-only diagnostic. No existing factory, acceptance or promotion
 # path is changed. It cannot produce an approved Fold test candidate or lock.
+# Retry the packaging inventory only: reuse green native 38967896318 and RC05's
+# saved 308 proof. Host cache timestamps never enter the existing Android fixture.
 on:
   push:
     branches: [work/infinity-2103377-essential-first-shutdown-only]
@@ -131,7 +133,7 @@ jobs:
               apk_promotion_authorized=False,final_lock_authorized=False)
           (root/'PINNED-INTERNAL-DIAGNOSTIC-INPUTS.json').write_text(json.dumps(identity,indent=2)+'\n')
           PY
-      - name: Run isolated diagnostic packaging mutation controls
+      - name: Run all 30 diagnostic packaging and fixture preservation controls
         run: python3 repairs/android-checkpoint-shutdown/runtime-tests/test_package_observer_stage_diagnostic.py
       - uses: actions/download-artifact@v8
         with:
@@ -145,6 +147,19 @@ jobs:
           name: Infinity-2103377-Essential-First-Native-Evidence
           github-token: ${{ github.token }}
           path: live-stage-native-evidence
+      - name: Verify actual saved APK, native proof and installed source inventory before SDK setup
+        run: |
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'repairs/android-checkpoint-shutdown/runtime-tests')
+          import package_observer_stage_diagnostic as checks
+          inputs = Path('rc05-inputs')
+          checks.verify_rc05(inputs)
+          checks.verify_native(Path('live-stage-native-evidence'), inputs,
+              Path('internal-diagnostic-input-evidence/FIRST-PARTY-FIXTURE-PRESERVATION.json'))
+          print('PASS: saved APK/308 proof, pinned green engine and actual installed sources verified.')
+          PY
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v4
