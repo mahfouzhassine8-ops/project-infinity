@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import shutil
 import sqlite3
+import subprocess
 import tempfile
 import time
 import xml.etree.ElementTree as ET
@@ -97,6 +98,40 @@ def wait_services(owner):
     raise RuntimeError('Not all 37 production observers reached their service entry points')
 
 
+def capture_failed_close(owner, output):
+    """Read-only evidence after a refused Close on a verified disposable AVD.
+
+    Never retries Close, clears application data or converts the refusal into
+    acceptance. debuggerd requests a backtrace; it does not terminate the app.
+    """
+    evidence = dict(scope='after failed Close; diagnostics only, not an extended shutdown deadline',
+                    captured=False, processes=probe.processes())
+    if probe.shell('getprop', 'ro.kernel.qemu', check=False).strip() != '1':
+        evidence['skipped'] = 'Native stack capture requires the disposable emulator'
+        return evidence
+    current = probe.read_json(probe.PRIVATE+'/files/infinity-kodi-process.json')
+    pid = int(owner['pid'])
+    if (current.get('owner') != owner['owner'] or current.get('pid') != pid or
+            not any(row['pid'] == pid and str(row['uid']) == probe.APP_UID for row in evidence['processes'])):
+        evidence['skipped'] = 'Failed engine identity is no longer live'
+        return evidence
+    evidence['ready_before_stack'] = ready_services(pid)
+    (output/'failed-engine-maps.txt').write_text(probe.shell('cat', '/proc/'+str(pid)+'/maps', check=False))
+    command = 'for t in /proc/'+str(pid)+'/task/*; do echo "$t"; cat "$t/comm" "$t/wchan" "$t/stat" 2>/dev/null; echo; done'
+    (output/'failed-engine-threads.txt').write_text(probe.adb('shell', command, check=False))
+    try:
+        result = subprocess.run(['adb', 'shell', 'debuggerd', '-b', str(pid)],
+                                capture_output=True, text=True, timeout=15)
+        (output/'failed-engine-backtrace.txt').write_text(result.stdout+'\nSTDERR:\n'+result.stderr)
+        evidence['debuggerd_returncode'] = result.returncode
+    except subprocess.TimeoutExpired as error:
+        (output/'failed-engine-backtrace.txt').write_text(str(error))
+        evidence['debuggerd_timed_out'] = True
+    evidence['ready_after_stack'] = ready_services(pid)
+    evidence['captured'] = True
+    return evidence
+
+
 def close(owner, output):
     output.mkdir(parents=True, exist_ok=True)
     report = {'owner':owner, 'passed':False}
@@ -131,6 +166,11 @@ def close(owner, output):
         report['receipt'] = final
         report.update(passed=True, whole_package_death_verified=True, both_java_seals_verified=True)
     finally:
+        if not report['passed']:
+            try:
+                report['failure_evidence'] = capture_failed_close(owner, output)
+            except Exception as error:
+                report['failure_evidence_error'] = type(error).__name__+': '+str(error)
         save()
         probe.adb('pull', probe.PROFILE+'/../temp/kodi.log', output/'kodi.log', check=False)
     return report
@@ -297,17 +337,63 @@ def create_missing_directory(owner):
     raise RuntimeError('Production missing-directory/essential-settings control did not complete')
 
 
+
+def run_candidate_scenario(scenario, previous_owner, output, report, save):
+    """Exercise one independently seeded upgrade, or the retained combined mode.
+
+    Callers supply a fresh disposable AVD for each acceptance scenario. A failed
+    early Close is never converted into cleanup or a loaded success.
+    """
+    assert scenario in ('early', 'loaded', 'combined')
+    if scenario in ('early', 'combined'):
+        started = time.monotonic()
+        report['candidate_early_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
+        early_owner = wait_owner(previous_owner['owner'])
+        report['candidate_early_close'] = close(early_owner, output/'candidate-early-close')
+        report['candidate_launch_to_close_seconds'] = report['candidate_early_close']['requested_monotonic']-started
+        report['early_ready_count'] = len(report['candidate_early_close']['ready_at_close'])
+        assert report['early_ready_count'] < len(IDS), 'Early timing control missed startup; do not label loaded Close an early test'
+        verify_saved_state(output/'after-early-close')
+        previous_owner = early_owner
+        save()
+    if scenario in ('loaded', 'combined'):
+        report['candidate_loaded_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
+        probe.enable_first_party(output)
+        loaded_owner = probe.wait_ready(previous_owner['owner'])
+        report['candidate_ready_services'] = wait_services(loaded_owner)
+        report['candidate_directory_creation'] = create_missing_directory(loaded_owner)
+        save()
+        report['candidate_loaded_close'] = close(loaded_owner, output/'candidate-loaded-close')
+        verify_saved_state(output/'after-loaded-close', require_directory=True)
+        previous_owner = loaded_owner
+        save()
+    report['reopen'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
+    probe.enable_first_party(output)
+    reopened = probe.wait_ready(previous_owner['owner'])
+    report['reopen_ready_services'] = wait_services(reopened)
+    if scenario in ('loaded', 'combined'):
+        assert probe.shell('cat', DATA+DIRECTORY_FIXTURE+'/settings.xml') == DIRECTORY_SETTINGS
+    for identity in IDS:
+        assert probe.shell('cat', DATA+identity+'/settings.xml') == '<settings><setting id="retained-proof">'+identity+'</setting></settings>\n'
+    report['saved_data_reopen_verified'] = True
+    save()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--baseline-apk', type=Path, required=True)
     parser.add_argument('--candidate-apk', type=Path, required=True)
     parser.add_argument('--installed-addons', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--scenario', choices=('early', 'loaded', 'combined'), default='combined',
+                        help='Use separate disposable AVDs for early and loaded acceptance; combined retains the original probe')
     args = parser.parse_args(); args.out.mkdir(parents=True, exist_ok=True)
-    report = dict(scope='Disposable real Android in-place upgrade with 37 synthetic services and approved first-party add-ons; not full Diggz/Fold clone', passed=False, physical_fold_accepted=False, full_fold_backup_used=False, actual_diggz_ecosystem_tested=False)
+    report = dict(scope='Disposable real Android in-place upgrade with 37 synthetic services and approved first-party add-ons; not full Diggz/Fold clone', scenario=args.scenario, passed=False, physical_fold_accepted=False, full_fold_backup_used=False, actual_diggz_ecosystem_tested=False)
     def save(): (args.out/'OBSERVER-UPGRADE-PROBE.json').write_text(json.dumps(report, indent=2)+'\n')
     try:
-        assert sha(args.baseline_apk) == TEST3_SHA
+        report['baseline_apk_sha256'] = sha(args.baseline_apk)
+        report['candidate_apk_sha256'] = sha(args.candidate_apk)
+        assert report['baseline_apk_sha256'] == TEST3_SHA
         # Existing probe refuses physical devices/existing installations and
         # requires its original full save/death/integrity/reopen checks.
         import sys
@@ -335,28 +421,7 @@ def main():
         assert before == after, 'APK upgrade changed saved fixture/database/preference bytes'
         report['upgrade_receiver_after_comparison'] = saved_state_boundary(report['baseline_loaded_close'], evidence_path=args.out/'update-receiver-after-comparison.json')
         report['upgrade_bytes_preserved'] = True; save()
-        started = time.monotonic()
-        report['candidate_early_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
-        early_owner = wait_owner(owner['owner'])
-        report['candidate_early_close'] = close(early_owner, args.out/'candidate-early-close')
-        report['candidate_launch_to_close_seconds'] = report['candidate_early_close']['requested_monotonic']-started
-        report['early_ready_count'] = len(report['candidate_early_close']['ready_at_close'])
-        assert report['early_ready_count'] < len(IDS), 'Early timing control missed startup; do not label loaded Close an early test'
-        verify_saved_state(args.out/'after-early-close')
-        report['candidate_loaded_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
-        probe.enable_first_party(args.out)
-        loaded_owner = probe.wait_ready(early_owner['owner'])
-        report['candidate_ready_services'] = wait_services(loaded_owner)
-        report['candidate_directory_creation'] = create_missing_directory(loaded_owner)
-        save()
-        report['candidate_loaded_close'] = close(loaded_owner, args.out/'candidate-loaded-close')
-        verify_saved_state(args.out/'after-loaded-close', require_directory=True)
-        report['reopen'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')
-        probe.enable_first_party(args.out)
-        reopened = probe.wait_ready(loaded_owner['owner'])
-        report['reopen_ready_services'] = wait_services(reopened)
-        assert probe.shell('cat', DATA+DIRECTORY_FIXTURE+'/settings.xml') == DIRECTORY_SETTINGS
-        report['saved_data_reopen_verified'] = True
+        run_candidate_scenario(args.scenario, owner, args.out, report, save)
         report['passed'] = True
     except Exception as error:
         report['failure'] = type(error).__name__+': '+str(error)

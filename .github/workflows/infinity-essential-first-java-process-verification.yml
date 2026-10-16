@@ -1,6 +1,7 @@
 name: Infinity 2103377 | Java save regression and complete Android shutdown
 # TEST4 RC03 requires rebuilt startup/observer ordering and all retained upgrade proof.
 # Explicit install-r receiver observation never substitutes for post-Close whole-UID death.
+# Fresh, early-upgrade and fully-loaded upgrade run in independent disposable AVD jobs.
 
 on:
   push:
@@ -8,6 +9,7 @@ on:
     paths:
       - '.github/workflows/infinity-essential-first-java-process-verification.yml'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_boundaries.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_scenarios.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/evidence/upgrade-receiver-38887412457.json'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py'
@@ -24,6 +26,7 @@ concurrency: {group: infinity-2103377-essential-java-process-verification, cance
 
 jobs:
   java-and-production-shutdown:
+    name: Build once, preserve all 308 tests and permanently sign internal input
     runs-on: ubuntu-22.04
     timeout-minutes: 100
     env:
@@ -39,6 +42,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_boundaries.py
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_observer_upgrade_scenarios.py
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/test_failed_close_evidence.py
           sudo apt-get update -qq
           sudo apt-get install -y libsqlite3-dev libssl-dev
           mkdir -p readonly-fixture-host
@@ -198,89 +203,25 @@ jobs:
             --gradle-dir android-gradle \
             --out essential-fold-test \
             2>&1 | tee essential-fold-test/PACKAGING-VERIFICATION.log
-      - name: Enable disposable emulator acceleration
-        run: |
-          sudo chmod 666 /dev/kvm
-      - name: Verify corrected TEST4 production Close and preserved-data reopening
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          arch: x86_64
-          target: google_apis
-          profile: pixel_2
-          avd-name: infinity-fresh
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py --apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out android-process-evidence --require-java-save-proof
-      - name: Verify TEST3 in-place upgrade with 37 services, early Close and loaded Close
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          arch: x86_64
-          target: google_apis
-          profile: pixel_2
-          avd-name: infinity-upgrade
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out observer-upgrade-evidence
-      - name: Prepare the exact tested bytes for physical Fold review
-        run: |
-          python3 - <<'PY'
-          import hashlib,json,os,shutil
-          from pathlib import Path
-          report=json.loads(Path('android-process-evidence/ANDROID-PROCESS-PROBE.json').read_text())
-          required=('passed','android_engine_death_verified','whole_package_death_verified','reopen_verified','favourites_preserved','both_java_process_save_proofs_verified','readonly_virtual_file_read_close_verified')
-          assert all(report.get(key) is True for key in required), report.get('failure')
-          upgrade=json.loads(Path('observer-upgrade-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
-          assert all(upgrade.get(key) is True for key in ('passed','upgrade_bytes_preserved','saved_data_reopen_verified')),upgrade.get('failure')
-          assert upgrade['early_ready_count']<37
-          assert len(upgrade['candidate_ready_services'])==len(upgrade['reopen_ready_services'])==37
-          assert upgrade['candidate_directory_creation']['mkdirs_succeeded'] is True
-          assert upgrade['candidate_directory_creation']['essential_settings_written'] is True
-          assert upgrade['upgrade_receiver_before_comparison']['passed'] is True
-          assert upgrade['upgrade_receiver_after_comparison']['passed'] is True
-          assert all(upgrade[name]['passed'] and upgrade[name]['both_java_seals_verified'] and upgrade[name]['whole_package_death_verified'] for name in ('candidate_early_close','candidate_loaded_close'))
-          source=Path('essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk')
-          digest=hashlib.sha256(source.read_bytes()).hexdigest()
-          assert digest==report['apk_sha256']
-          root=Path('fold-test4');root.mkdir()
-          target=root/'Infinity-2103377-Essential-First-Signed-Fold-TEST4.apk'
-          shutil.copyfile(source,target)
-          proof=json.loads(Path('essential-fold-test/ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').read_text())
-          assert proof['apk_sha256']==digest
-          proof.update(status='HOST AND INTERNAL ANDROID PASSED; PHYSICAL FOLD REVIEW REQUIRED',file=target.name,
-              apk_deliverable=True,verified_android_process_exit=True,verified_first_party_callback_on_device=True,
-              internal_whole_package_death_verified=True,internal_saved_data_reopen_verified=True,
-              verified_fold_reopen=False,physical_fold_accepted=False,final_lock_authorized=False,
-              native_run_id=38899217848,android_run_id=int(os.environ['GITHUB_RUN_ID']),
-              internal_startup_close_verified=True,internal_loaded_close_verified=True,
-              internal_missing_directory_creation_verified=True,
-              retained_upgrade_data_verified=True,synthetic_service_count=37,actual_diggz_ecosystem_tested=False,
-              readonly_virtual_file_read_close_verified=True)
-          (root/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').write_text(json.dumps(proof,indent=2)+'\n')
-          (root/'SHA256SUMS').write_text(digest+'  '+target.name+'\n')
-          for name in ('CERT-VERIFICATION.txt','JAVA-REGRESSION-VERIFICATION.json','TEST-LIMITATIONS.md','TEST2-BASELINE-PRESERVATION.json','TEST3-BASELINE-PRESERVATION.json'):
-              shutil.copyfile(Path('essential-fold-test')/name,root/name)
-          shutil.copyfile('android-process-evidence/ANDROID-PROCESS-PROBE.json',root/'INTERNAL-ANDROID-PROCESS-PROBE.json')
-          shutil.copyfile('observer-upgrade-evidence/OBSERVER-UPGRADE-PROBE.json',root/'INTERNAL-OBSERVER-UPGRADE-PROBE.json')
-          PY
-      - name: Retain signed physical-test candidate only after every gate passes
+      - name: Retain identical internal acceptance inputs for independent Android jobs
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-2103377-Essential-First-Signed-Fold-TEST4
-          path: fold-test4/
-          retention-days: 90
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          path: |
+            essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk
+            essential-fold-test/*.json
+            essential-fold-test/*.txt
+            native-evidence/installed-addons/
+          retention-days: 30
           compression-level: 0
           if-no-files-found: error
-      - name: Retain regression and actual process evidence
+      - name: Retain complete Java, signing and preservation evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: Infinity-2103377-Essential-First-Java-Process-Evidence
           path: |
             readonly-fixture-host/
-            android-process-evidence/
-            observer-upgrade-evidence/
             essential-fold-test/*.json
             essential-fold-test/*.txt
             essential-fold-test/*.log
@@ -296,3 +237,233 @@ jobs:
           retention-days: 90
           compression-level: 1
           if-no-files-found: warn
+
+  fresh-production-shutdown:
+    name: Fresh production Close, save receipts, UID death and reopen
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    needs: java-and-production-shutdown
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          path: .
+      - name: Enable disposable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - name: Fresh production Close, save receipts, UID death and reopen
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-fresh
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py --apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out android-process-evidence --require-java-save-proof
+      - name: Retain independent actual Android outcome and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Fresh-Android-Process-Evidence
+          path: android-process-evidence/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
+
+  upgrade-early-shutdown:
+    name: Independent TEST3 upgrade, early Close, UID death and reopen
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    needs: java-and-production-shutdown
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          path: .
+      - name: Enable disposable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Independent TEST3 upgrade, early Close, UID death and reopen
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-upgrade-early
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --scenario early --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out observer-upgrade-early-evidence
+      - name: Retain independent actual Android outcome and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Upgrade-Early-Evidence
+          path: observer-upgrade-early-evidence/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
+
+  upgrade-loaded-shutdown:
+    name: Independent TEST3 upgrade, 37 loaded services, Close and reopen
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    needs: java-and-production-shutdown
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          path: .
+      - name: Enable disposable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Independent TEST3 upgrade, 37 loaded services, Close and reopen
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-upgrade-loaded
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py --scenario loaded --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --candidate-apk essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk --installed-addons native-evidence/installed-addons --out observer-upgrade-loaded-evidence
+      - name: Retain independent actual Android outcome and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Upgrade-Loaded-Evidence
+          path: observer-upgrade-loaded-evidence/
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
+
+  promote-fold-review-only:
+    name: Require fresh, early and loaded acceptance before Fold review
+    needs: [java-and-production-shutdown, fresh-production-shutdown, upgrade-early-shutdown, upgrade-loaded-shutdown]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Internal-Acceptance-Inputs
+          path: .
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Fresh-Android-Process-Evidence
+          path: android-process-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Upgrade-Early-Evidence
+          path: observer-upgrade-early-evidence
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103377-Essential-First-Upgrade-Loaded-Evidence
+          path: observer-upgrade-loaded-evidence
+      - name: Prepare the exact tested bytes for physical Fold review
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          report=json.loads(Path('android-process-evidence/ANDROID-PROCESS-PROBE.json').read_text())
+          required=('passed','android_engine_death_verified','whole_package_death_verified','reopen_verified','favourites_preserved','both_java_process_save_proofs_verified','readonly_virtual_file_read_close_verified')
+          assert all(report.get(key) is True for key in required), report.get('failure')
+          early=json.loads(Path('observer-upgrade-early-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
+          loaded=json.loads(Path('observer-upgrade-loaded-evidence/OBSERVER-UPGRADE-PROBE.json').read_text())
+          for scenario,upgrade in (('early',early),('loaded',loaded)):
+              assert upgrade['scenario']==scenario
+              assert upgrade['candidate_apk_sha256']==report['apk_sha256']
+              assert all(upgrade.get(key) is True for key in ('passed','upgrade_bytes_preserved','saved_data_reopen_verified')),upgrade.get('failure')
+              assert len(upgrade['reopen_ready_services'])==37
+              assert upgrade['upgrade_receiver_before_comparison']['passed'] is True
+              assert upgrade['upgrade_receiver_after_comparison']['passed'] is True
+              close=upgrade['candidate_'+scenario+'_close']
+              assert close['passed'] and close['both_java_seals_verified'] and close['whole_package_death_verified']
+              native=close['receipt']['native_receipt']
+              assert native['essential_writes_sealed'] and native['essential_writes_durable'] and not native['essential_write_blockers']
+              essential=[row for row in native['owners'] if row['essential']]
+              assert len(essential)==16 and {row['owner'] for row in essential}==set(native['essential_owners'])
+              assert all(row['required_writes_finished'] and not row['dirty_remaining'] and row['result'] in ('COMMITTED','ALREADY_DURABLE') for row in essential)
+          assert early['early_ready_count']<37
+          assert len(loaded['candidate_ready_services'])==37
+          assert loaded['candidate_directory_creation']['mkdirs_succeeded'] is True
+          assert loaded['candidate_directory_creation']['essential_settings_written'] is True
+          source=Path('essential-fold-test/Infinity-2103377-Essential-First-Internal-Probe.apk')
+          digest=hashlib.sha256(source.read_bytes()).hexdigest()
+          assert digest==report['apk_sha256']
+          root=Path('fold-test4');root.mkdir()
+          target=root/'Infinity-2103377-Essential-First-Signed-Fold-TEST4.apk'
+          shutil.copyfile(source,target)
+          proof=json.loads(Path('essential-fold-test/ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').read_text())
+          assert proof['apk_sha256']==digest
+          proof.update(status='HOST AND INTERNAL ANDROID PASSED; PHYSICAL FOLD REVIEW REQUIRED',file=target.name,
+              apk_deliverable=True,verified_android_process_exit=True,verified_first_party_callback_on_device=True,
+              internal_whole_package_death_verified=True,internal_saved_data_reopen_verified=True,
+              verified_fold_reopen=False,physical_fold_accepted=False,final_lock_authorized=False,
+              native_run_id=38899217848,android_run_id=int(os.environ['GITHUB_RUN_ID']),
+              internal_startup_close_verified=True,internal_loaded_close_verified=True,
+              independent_upgrade_avds_verified=True,upgrade_scenarios=['early','loaded'],
+              internal_missing_directory_creation_verified=True,
+              retained_upgrade_data_verified=True,synthetic_service_count=37,actual_diggz_ecosystem_tested=False,
+              readonly_virtual_file_read_close_verified=True)
+          (root/'ESSENTIAL-FIRST-SIGNED-TEST-PRESERVATION.json').write_text(json.dumps(proof,indent=2)+'\n')
+          (root/'SHA256SUMS').write_text(digest+'  '+target.name+'\n')
+          for name in ('CERT-VERIFICATION.txt','JAVA-REGRESSION-VERIFICATION.json','TEST-LIMITATIONS.md','TEST2-BASELINE-PRESERVATION.json','TEST3-BASELINE-PRESERVATION.json'):
+              shutil.copyfile(Path('essential-fold-test')/name,root/name)
+          shutil.copyfile('android-process-evidence/ANDROID-PROCESS-PROBE.json',root/'INTERNAL-ANDROID-PROCESS-PROBE.json')
+          shutil.copyfile('observer-upgrade-early-evidence/OBSERVER-UPGRADE-PROBE.json',root/'INTERNAL-OBSERVER-UPGRADE-EARLY-PROBE.json')
+          shutil.copyfile('observer-upgrade-loaded-evidence/OBSERVER-UPGRADE-PROBE.json',root/'INTERNAL-OBSERVER-UPGRADE-LOADED-PROBE.json')
+          PY
+      - name: Retain signed physical-test candidate only after every gate passes
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST4
+          path: fold-test4/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
