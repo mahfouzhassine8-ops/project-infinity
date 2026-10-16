@@ -54,7 +54,17 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y libsqlite3-dev libssl-dev
           mkdir -p shutdown-rc1-host
-          python3 repairs/essential-first-2103377/test_runtime_native.py \
+          # GitHub's VM mounts /sys writable. Give this host-only test a real
+          # read-only bind mount in a private namespace, then drop back to the
+          # original runner UID. The production statvfs proof is never mocked.
+          sudo unshare --mount --propagation private bash -c '
+            set -euo pipefail
+            mount --bind /sys /sys
+            mount -o remount,bind,ro /sys
+            exec setpriv --reuid="$1" --regid="$2" --init-groups \
+              env LD_LIBRARY_PATH="$3" "$4" "${@:5}"
+          ' infinity-readonly-host "$(id -u)" "$(id -g)" "${LD_LIBRARY_PATH:-}" \
+            "$pythonLocation/bin/python3" repairs/essential-first-2103377/test_runtime_native.py \
             --python-prefix "$pythonLocation" --sqlite-include /usr/include \
             --pillow-library Pillow-8.4.0/build/lib.linux-x86_64-cpython-311/PIL/_imaging.cpython-311-x86_64-linux-gnu.so \
             --command-center-runtime host-locked-evidence/installed-addons/script.infinity.commandcenter \
