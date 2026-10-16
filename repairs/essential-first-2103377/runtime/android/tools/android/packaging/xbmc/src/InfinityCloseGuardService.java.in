@@ -94,12 +94,12 @@ public final class InfinityCloseGuardService extends Service {
   }));
   private final ServiceConnection connection=new ServiceConnection(){
     @Override public void onServiceConnected(ComponentName name,IBinder binder){
-      if(ended||session==null)return;
+      if(ended||session==null||checkpointSaved||consumed||completing)return;
       engine=new Messenger(binder);final Session target=session;
       worker.execute(()->{
         boolean alive=false;try{alive=InfinityKodiShutdown.ownerAlive(getFilesDir(),target.pid,target.owner);}catch(IOException unknown){}
         final boolean held=alive;ui.post(()->{
-          if(ended||session!=target)return;
+          if(ended||session!=target||checkpointSaved||consumed||completing)return;
           if(!held){fail("engine_owner_lease_not_held");return;}
           try{
             transition("CHECKPOINT_REQUESTED","");
@@ -111,7 +111,14 @@ public final class InfinityCloseGuardService extends Service {
     }
     @Override public void onServiceDisconnected(ComponentName name){checkOwner();}
     @Override public void onBindingDied(ComponentName name){checkOwner();}
-    @Override public void onNullBinding(ComponentName name){fail("engine_endpoint_refused");}
+    @Override public void onNullBinding(ComponentName name){
+      if(ended||session==null)return;
+      // Android may deliver a null endpoint when the authorized engine dies.
+      // Binding state is not process-lifetime evidence: use the same UUID
+      // owner lease as disconnect/death callbacks, including during receipt IO.
+      if(checkpointSaved&&consumed&&!revoked&&"ENGINE_TERMINATING".equals(phase))checkOwner();
+      else fail("engine_endpoint_refused");
+    }
   };
   @Override public int onStartCommand(Intent intent,int flags,int startId){
     InfinityCheckpointEvidence.register(this);
@@ -324,6 +331,7 @@ public final class InfinityCloseGuardService extends Service {
               fail("incomplete_termination_authorization_evidence");return;
             }
           }catch(Exception unverified){fail("invalid_completion_evidence");return;}
+          releaseEngineBinding();
           // Persist COMPLETE before returning Home. Failure retains recovery
           // without claiming a successful exit or clearing saved evidence.
           worker.execute(()->{
@@ -333,8 +341,16 @@ public final class InfinityCloseGuardService extends Service {
               ui.post(()->fail("completion_receipt_commit_failed"));return;
             }
             ui.post(()->{
-              if(ended||session!=target)return;
-              phase="COMPLETE";error="";
+              // A genuine failure or explicit revocation during durable IO
+              // must never be overwritten by this older completion callback.
+              synchronized(authorityLock){
+                if(ended||session!=target||revoked||!completing||!checkpointSaved||!consumed||
+                    !"ENGINE_TERMINATING".equals(phase))return;
+                if(!InfinityJavaWriteBarrier.authorized(target.ticket,javaProof)){
+                  fail("coordinator_java_barrier_changed_during_completion");return;
+                }
+                phase="COMPLETE";error="";
+              }
               evidence("engine.owner_lease_released","COMPLETE","");
               // A completed, securely authorized close must not leave a stale
               // singleInstance Main as a direct Recents relaunch into Kodi.
@@ -434,10 +450,13 @@ public final class InfinityCloseGuardService extends Service {
   private void end(){
     synchronized(authorityLock){if(ended)return;ended=true;revoked=true;if(gate!=null)gate.revoke();}
     ui.removeCallbacksAndMessages(null);
-    if(binding){binding=false;try{unbindService(connection);}catch(RuntimeException ignored){}}
+    releaseEngineBinding();
     try{stopService(new Intent(this,InfinityCloseNativeLease.class));}catch(RuntimeException ignored){}
     stopForeground(true);stopSelf();
     if(session!=null&&!"COMPLETE".equals(phase))InfinityJavaWriteBarrier.cancel(session.ticket);
+  }
+  private void releaseEngineBinding(){
+    if(binding){binding=false;try{unbindService(connection);}catch(RuntimeException ignored){}}
   }
   private void finishCoordinatorProcess(Session completed){
     // Retain the entry/removal lease until default-process termination. A new

@@ -1,0 +1,151 @@
+{
+  "run": 38852110196,
+  "source_commit": "203678afd90a0e0eaf53925e5e45f687f93899b1",
+  "host_tests": 300,
+  "host_result": "passed",
+  "native_essential_owners": {
+    "native_admission": "ALREADY_DURABLE",
+    "background_jobs": "ALREADY_DURABLE",
+    "playback": "COMMITTED",
+    "command_center": "COMMITTED",
+    "compat": "COMMITTED",
+    "kodi_settings": "COMMITTED",
+    "profiles": "COMMITTED",
+    "skin_settings": "COMMITTED",
+    "addon_settings": "COMMITTED",
+    "favourites": "COMMITTED",
+    "peripherals": "COMMITTED",
+    "audio_policy": "COMMITTED",
+    "deferred_dialog_state": "COMMITTED",
+    "xml_files": "COMMITTED",
+    "native_databases": "COMMITTED",
+    "pvr": "ALREADY_DURABLE"
+  },
+  "both_java_seals_verified": true,
+  "optional_python_retirement": "PENDING; correctly not required for essential authorization",
+  "engine_exit_ms": 5833,
+  "initial_probe_phase": "CHECKPOINT_FAILED",
+  "initial_probe_error": "engine_endpoint_refused",
+  "final_receipt_phase": "COMPLETE",
+  "coordinator_termination_authorized": true,
+  "android_process_death_log": [
+    "10-16 04:53:35.377   505  2375 I ActivityManager: Process com.projectinfinity.kodi:kodi (pid 5610) has died: fg  TOP ",
+    "10-16 04:53:35.599   505  2513 I ActivityManager: Process com.projectinfinity.kodi (pid 5374) has died: fg  SVC "
+  ],
+  "events": [
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "phase.QUIESCE",
+      "phase": "QUIESCE",
+      "detail": "",
+      "epoch_ms": 1792126409819,
+      "elapsed_ns": 172336719025
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "navigation.deferred_until_confirmed_death",
+      "phase": "QUIESCE",
+      "detail": "",
+      "epoch_ms": 1792126409825,
+      "elapsed_ns": 172343219158
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "phase.CHECKPOINT_REQUESTED",
+      "phase": "CHECKPOINT_REQUESTED",
+      "detail": "",
+      "epoch_ms": 1792126409954,
+      "elapsed_ns": 172472332671
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "phase.QUIESCE",
+      "phase": "QUIESCE",
+      "detail": "",
+      "epoch_ms": 1792126411734,
+      "elapsed_ns": 174251882616
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "phase.PERSISTING",
+      "phase": "PERSISTING",
+      "detail": "",
+      "epoch_ms": 1792126414678,
+      "elapsed_ns": 177195569149
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "checkpoint.safe_to_terminate",
+      "phase": "SAFE_TO_TERMINATE",
+      "detail": "",
+      "epoch_ms": 1792126415291,
+      "elapsed_ns": 177809298163
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "authorization.consumed",
+      "phase": "ENGINE_TERMINATING",
+      "detail": "",
+      "epoch_ms": 1792126415306,
+      "elapsed_ns": 177824075705
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "checkpoint.failed",
+      "phase": "CHECKPOINT_FAILED",
+      "detail": "engine_endpoint_refused",
+      "epoch_ms": 1792126415419,
+      "elapsed_ns": 177937379640
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "engine.owner_lease_released",
+      "phase": "COMPLETE",
+      "detail": "",
+      "epoch_ms": 1792126415439,
+      "elapsed_ns": 177957424645
+    },
+    {
+      "schema": 1,
+      "session": "43a54b19-af07-4dd9-8771-44875c527328",
+      "owner": "21c94db5-bce8-417d-8927-11e06a3ef345",
+      "pid": 5610,
+      "event": "recents.closed_task_retirement",
+      "phase": "COMPLETE",
+      "detail": "not_authorized_or_task_id_unavailable",
+      "epoch_ms": 1792126415439,
+      "elapsed_ns": 177957436818
+    }
+  ],
+  "complete_probe_passed": false,
+  "reopen_verified": false,
+  "physical_fold_accepted": false,
+  "correction": "Route post-authorization null binding through UUID owner-death verification; detach the verified dead endpoint before completion IO; recheck authority and Java seal before publishing COMPLETE so an older callback cannot replace a genuine failure."
+}

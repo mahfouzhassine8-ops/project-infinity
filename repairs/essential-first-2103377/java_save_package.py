@@ -22,6 +22,8 @@ NATIVE='d69e4d267d4a7f8051fdc1ae8996e856ef51063c'
 PARSER_SHA='3e3e0c65d57d12797dbead3df1ebb28e7583737d0cd1f2a898dba6febd50ab88'
 EXTRA=('InfinityCloseNativeLease','InfinityJavaWriteBarrier','InfinityJavaPersistence')
 TEST='InfinityJavaPersistence2103377Test'
+COMPLETION_TEST='InfinityCloseCompletion2103377Test'
+COMPLETION_FIXTURE='essential-first-native-safe-38852110196.json'
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def save(path,value):Path(path).write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
@@ -76,12 +78,15 @@ def stage_tests(args):
     shutil.copyfile(extra,tests/'java/com/projectinfinity/kodi'/extra.name)
     expected['java/com/projectinfinity/kodi/'+extra.name]=sha(extra)
     shutil.copyfile(HERE/'tests'/(TEST+'.java'),tests/'java/com/projectinfinity/kodi'/(TEST+'.java'))
+    shutil.copyfile(HERE/'tests'/(COMPLETION_TEST+'.java'),tests/'java/com/projectinfinity/kodi'/(COMPLETION_TEST+'.java'))
     shutil.copyfile(HERE/'tests'/'HostFilesystemShadow.java',tests/'java/com/projectinfinity/kodi/HostFilesystemShadow.java')
     properties=tests/'resources/robolectric.properties'
     assert not properties.exists(),'Preserve existing test configuration'
     properties.write_text('shadows=com.projectinfinity.kodi.HostFilesystemShadow\n')
+    shutil.copyfile(HERE/'tests'/COMPLETION_FIXTURE,tests/'resources'/COMPLETION_FIXTURE)
     names=set(json.loads((args.source.parent/'ANDROID-VERIFICATION.json').read_text())['suites'])
     names.add('com.projectinfinity.kodi.'+TEST)
+    names.add('com.projectinfinity.kodi.'+COMPLETION_TEST)
     save(args.out/'JAVA-UNCHANGED-TEST-SOURCES.json',expected)
     save(args.out/'JAVA-EXPECTED-SUITES.json',sorted(names))
     with (args.gradle_dir/'xbmc/build.gradle').open('a') as f:
@@ -103,20 +108,23 @@ def verify_tests(args):
     expected=json.loads((args.android/'JAVA-UNCHANGED-TEST-SOURCES.json').read_text())
     testroot=args.gradle_dir/'xbmc/src/test'
     for rel,digest in expected.items():assert sha(testroot/rel)==digest,rel
-    for name in (TEST+'.java','HostFilesystemShadow.java'):
+    for name in (TEST+'.java',COMPLETION_TEST+'.java','HostFilesystemShadow.java'):
         assert sha(testroot/'java/com/projectinfinity/kodi'/name)==sha(HERE/'tests'/name),name
     assert (testroot/'resources/robolectric.properties').read_text()=='shadows=com.projectinfinity.kodi.HostFilesystemShadow\n'
+    assert sha(testroot/'resources'/COMPLETION_FIXTURE)==sha(HERE/'tests'/COMPLETION_FIXTURE)
     suites={}
     for path in (args.gradle_dir/'xbmc/build/test-results/testReleaseUnitTest').glob('TEST-*.xml'):
         xml=ET.parse(path).getroot();name=xml.get('name');assert name not in suites
         suites[name]={key:int(xml.get(key,'0')) for key in ('tests','failures','errors','skipped')}
     assert set(suites)==set(json.loads((args.android/'JAVA-EXPECTED-SUITES.json').read_text())),suites
-    original={k:v for k,v in suites.items() if k!='com.projectinfinity.kodi.'+TEST}
+    original={k:v for k,v in suites.items() if k not in ('com.projectinfinity.kodi.'+TEST,'com.projectinfinity.kodi.'+COMPLETION_TEST)}
     totals={key:sum(row[key] for row in original.values()) for key in ('tests','failures','errors','skipped')}
     assert totals==dict(tests=274,failures=0,errors=0,skipped=0),totals
     new=suites['com.projectinfinity.kodi.'+TEST]
     assert new==dict(tests=26,failures=0,errors=0,skipped=0),new
-    save(args.out/'JAVA-REGRESSION-VERIFICATION.json',dict(original_274=totals,new_save_cases=new,suites=suites,
+    completion=suites['com.projectinfinity.kodi.'+COMPLETION_TEST]
+    assert completion==dict(tests=8,failures=0,errors=0,skipped=0),completion
+    save(args.out/'JAVA-REGRESSION-VERIFICATION.json',dict(original_274=totals,new_save_cases=new,completion_race_cases=completion,suites=suites,
         original_test_sources_unchanged=True,host_directory_sync='real host FileChannel.force; test-only OS adapter',
         host_os_adapter_sha256=sha(HERE/'tests'/'HostFilesystemShadow.java'),physical_fold_verified=False))
 
