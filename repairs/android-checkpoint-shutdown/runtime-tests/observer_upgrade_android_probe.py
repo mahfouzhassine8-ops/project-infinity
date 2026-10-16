@@ -136,7 +136,7 @@ def close(owner, output):
     return report
 
 
-def saved_state_boundary(previous_close=None):
+def saved_state_boundary(previous_close=None, *, evidence_path=None):
     """Close requires zero UID processes; install -r is a separate event.
 
     Android explicitly starts our preserved MY_PACKAGE_REPLACED receiver after
@@ -145,6 +145,17 @@ def saved_state_boundary(previous_close=None):
     """
     live = probe.processes()
     proof = dict(processes=live, scope='after Close: whole UID absent', passed=False)
+    try:
+        return _saved_state_boundary(previous_close, live, proof)
+    except Exception as error:
+        proof['failure'] = type(error).__name__+': '+str(error)
+        raise
+    finally:
+        if evidence_path is not None:
+            evidence_path.write_text(json.dumps(proof, indent=2)+'\n')
+
+
+def _saved_state_boundary(previous_close, live, proof):
     if previous_close is None:
         assert not live, 'Verify backup only after real whole-UID death'
     else:
@@ -158,30 +169,49 @@ def saved_state_boundary(previous_close=None):
         assert final.get('owner') == baseline.get('owner') and final.get('pid') == baseline.get('pid')
         assert final.get('checkpoint_saved') and final.get('authorization_consumed') and final.get('process_death_confirmed')
         proof.update(scope='after explicit APK upgrade, before engine launch; not a new shutdown/death proof',
-                     previous_close_session=baseline['session'], receiver_starts=[], native_maps_absent=[], naturally_finished_receivers=[])
+                     previous_close_session=baseline['session'], receiver_starts=[], native_maps_absent=[], naturally_finished_receivers=[], process_samples=[], process_details=[])
         logs = probe.adb('logcat', '-d', '-v', 'threadtime', check=False)
-        for process in live:
-            assert process['name'] == probe.PACKAGE, 'Unexpected package process before candidate launch'
-            assert process['pid'] != baseline['pid'], 'Closed engine PID is still alive'
-            needle = 'Start proc '+str(process['pid'])+':'+probe.PACKAGE+'/'
-            component = 'for broadcast {'+probe.PACKAGE+'/'+probe.PACKAGE+'.InfinityCobraBootReceiver}'
-            matches = [line for line in logs.splitlines() if needle in line and component in line]
-            assert matches, 'New Java process has no observed package-update receiver origin'
-            maps = probe.shell('cat', '/proc/'+str(process['pid'])+'/maps', check=False)
-            if not maps.strip() and not any(row['pid'] == process['pid'] for row in probe.processes()):
-                proof['naturally_finished_receivers'].append(process['pid'])
-                continue
-            assert maps.strip(), 'Cannot establish new receiver process image identity'
-            assert 'libkodi.so' not in maps and 'libpython3.' not in maps, 'Native engine loaded before candidate launch'
-            proof['receiver_starts'].extend(matches)
-            proof['native_maps_absent'].append(process['pid'])
+        # install -r returns while Android is starting its receiver. Re-observe
+        # an ambiguous ps name only after proving that exact PID's broadcast
+        # origin and excluding native engines. This is outside the Close clock.
+        deadline = time.monotonic()+3
+        while True:
+            proof['process_samples'].append(live)
+            ambiguous = []
+            for process in live:
+                pid = process['pid']
+                assert pid != baseline['pid'], 'Closed engine PID is still alive'
+                if process['name'] != probe.PACKAGE:
+                    proof['process_details'].append(dict(process=process,
+                        cmdline=probe.shell('cat', '/proc/'+str(pid)+'/cmdline', check=False),
+                        status=probe.shell('cat', '/proc/'+str(pid)+'/status', check=False)))
+                assert process['name'] != probe.PACKAGE+':kodi', 'Unexpected package process before candidate launch: '+json.dumps(process)
+                needle = 'Start proc '+str(pid)+':'+probe.PACKAGE+'/'
+                component = 'for broadcast {'+probe.PACKAGE+'/'+probe.PACKAGE+'.InfinityCobraBootReceiver}'
+                matches = [line for line in logs.splitlines() if needle in line and component in line]
+                assert matches, 'New Java process has no observed package-update receiver origin: '+json.dumps(process)
+                maps = probe.shell('cat', '/proc/'+str(pid)+'/maps', check=False)
+                if not maps.strip() and not any(row['pid'] == pid for row in probe.processes()):
+                    proof['naturally_finished_receivers'].append(pid)
+                    continue
+                assert maps.strip(), 'Cannot establish new receiver process image identity: '+json.dumps(process)
+                assert 'libkodi.so' not in maps and 'libpython3.' not in maps, 'Native engine loaded before candidate launch: '+json.dumps(process)
+                for match in matches:
+                    if match not in proof['receiver_starts']: proof['receiver_starts'].append(match)
+                if pid not in proof['native_maps_absent']: proof['native_maps_absent'].append(pid)
+                if process['name'] != probe.PACKAGE: ambiguous.append(process)
+            if not ambiguous:
+                break
+            assert time.monotonic() < deadline, 'Unexpected package process before candidate launch: '+json.dumps(ambiguous)
+            time.sleep(.1)
+            live = probe.processes()
     proof['passed'] = True
     return proof
 
 
 def verify_saved_state(output, require_directory=False, previous_close=None):
     output.mkdir(parents=True, exist_ok=True)
-    saved_state_boundary(previous_close)
+    saved_state_boundary(previous_close, evidence_path=output.parent/(output.name+'-boundary-before.json'))
     favourites = probe.shell('cat', probe.PROFILE+'/favourites.xml')
     assert any(row.get('name') == probe.FAVOURITE for row in ET.fromstring(favourites))
     (output/'favourites.xml').write_text(favourites)
@@ -209,7 +239,7 @@ def verify_saved_state(output, require_directory=False, previous_close=None):
             with sqlite3.connect(path.resolve().as_uri()+'?mode=ro', uri=True) as conn:
                 assert conn.execute('PRAGMA integrity_check').fetchone() == ('ok',), path.name
     assert hashes == {p.relative_to(output).as_posix():sha(p) for p in output.rglob('*') if p.is_file()}, 'Backup inspection modified original bytes'
-    saved_state_boundary(previous_close)
+    saved_state_boundary(previous_close, evidence_path=output.parent/(output.name+'-boundary-after.json'))
     return hashes
 
 
@@ -300,10 +330,10 @@ def main():
         report['upgrade_install'] = probe.adb('install', '-r', '--no-incremental', args.candidate_apk)
         assert 'Success' in report['upgrade_install']
         assert probe.shell('stat', '-c', '%u', probe.PRIVATE).strip() == probe.APP_UID
-        report['upgrade_receiver_before_comparison'] = saved_state_boundary(report['baseline_loaded_close']); save()
+        report['upgrade_receiver_before_comparison'] = saved_state_boundary(report['baseline_loaded_close'], evidence_path=args.out/'update-receiver-before-comparison.json'); save()
         after = verify_saved_state(args.out/'after-install-before-launch', previous_close=report['baseline_loaded_close'])
         assert before == after, 'APK upgrade changed saved fixture/database/preference bytes'
-        report['upgrade_receiver_after_comparison'] = saved_state_boundary(report['baseline_loaded_close'])
+        report['upgrade_receiver_after_comparison'] = saved_state_boundary(report['baseline_loaded_close'], evidence_path=args.out/'update-receiver-after-comparison.json')
         report['upgrade_bytes_preserved'] = True; save()
         started = time.monotonic()
         report['candidate_early_launch'] = probe.shell('am', 'start', '-n', probe.PACKAGE+'/.Splash')

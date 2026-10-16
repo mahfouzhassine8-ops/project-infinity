@@ -8,6 +8,7 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -90,6 +91,64 @@ class UpgradeBoundaryTest(unittest.TestCase):
         with patch.object(upgrade.probe, 'processes', side_effect=[self.live, []]):
             result = self.accept()
         self.assertEqual(result['naturally_finished_receivers'], [EVIDENCE['receiver_pid']])
+
+    def test_verified_receiver_with_transient_name_must_be_reobserved(self):
+        initial = [dict(self.live[0], name='zygote64')]
+        with patch.object(upgrade.probe, 'processes', side_effect=[initial, self.live]), patch.object(upgrade.time, 'sleep') as pause:
+            result = self.accept()
+        self.assertTrue(result['passed'])
+        self.assertEqual(result['process_samples'], [initial, self.live])
+        self.assertEqual(result['process_details'][0]['process'], initial[0])
+        pause.assert_called_once_with(.1)
+
+    def test_unknown_process_is_never_waited_away(self):
+        self.live[0]['name'] = 'zygote64'
+        self.live[0]['pid'] += 1
+        with patch.object(upgrade.time, 'sleep') as pause:
+            with self.assertRaisesRegex(AssertionError, 'receiver origin'):
+                self.accept()
+        pause.assert_not_called()
+
+    def test_persistent_ambiguous_receiver_name_still_fails(self):
+        self.live[0]['name'] = 'unidentified'
+        with patch.object(upgrade.time, 'monotonic', side_effect=[0, 4]):
+            with self.assertRaisesRegex(AssertionError, 'Unexpected package process.*unidentified'):
+                self.accept()
+
+    def test_transient_name_does_not_exempt_native_engine_image(self):
+        self.live[0]['name'] = 'zygote64'
+        self.maps += '/data/app/package/lib/arm64/libkodi.so\n'
+        with self.assertRaisesRegex(AssertionError, 'Native engine loaded'):
+            self.accept()
+
+    def test_reobservation_still_rejects_new_engine_process(self):
+        initial = [dict(self.live[0], name='zygote64')]
+        later = self.live+[dict(pid=9000, uid=10167, name=upgrade.probe.PACKAGE+':kodi')]
+        with patch.object(upgrade.probe, 'processes', side_effect=[initial, later]), patch.object(upgrade.time, 'sleep'):
+            with self.assertRaisesRegex(AssertionError, 'Unexpected package process'):
+                self.accept()
+
+    def test_close_still_rejects_transient_receiver_name_without_retry(self):
+        self.live[0]['name'] = 'zygote64'
+        with patch.object(upgrade.time, 'sleep') as pause:
+            with self.assertRaisesRegex(AssertionError, 'whole-UID death'):
+                upgrade.saved_state_boundary()
+        pause.assert_not_called()
+
+    def test_failed_boundary_retains_actual_process_identity(self):
+        self.live[0]['name'] = 'actual-unknown-name'
+        self.live[0]['pid'] += 1
+        with tempfile.TemporaryDirectory() as directory:
+            evidence = Path(directory)/'boundary.json'
+            with self.assertRaisesRegex(AssertionError, 'receiver origin'):
+                upgrade.saved_state_boundary(self.completed, evidence_path=evidence)
+            result = json.loads(evidence.read_text())
+        self.assertFalse(result['passed'])
+        self.assertEqual(result['processes'], self.live)
+        self.assertEqual(result['process_details'][0]['process'], self.live[0])
+        self.assertIn('cmdline', result['process_details'][0])
+        self.assertIn('status', result['process_details'][0])
+        self.assertIn('actual-unknown-name', result['failure'])
 
     def test_missing_original_save_confirmation_refused(self):
         self.receipt['checkpoint_saved'] = False
