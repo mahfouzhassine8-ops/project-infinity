@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/infinity-essential-first-java-process-verification.yml'
       - 'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
+      - 'repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py'
+      - 'repairs/essential-first-2103377/test_runtime_native.py'
       - 'repairs/essential-first-2103377/java_save_package.py'
       - 'repairs/essential-first-2103377/InstrumentJavaWrites.java'
       - 'repairs/essential-first-2103377/tests/**'
@@ -26,6 +28,22 @@ jobs:
         with: {fetch-depth: 0, ref: '${{ github.sha }}', persist-credentials: false}
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Verify exact read-only Android fixture and retained failure controls
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libsqlite3-dev libssl-dev
+          mkdir -p readonly-fixture-host
+          python3 repairs/essential-first-2103377/test_runtime_native.py \
+            --python-prefix "$pythonLocation" --sqlite-include /usr/include \
+            --readonly-maps-fixture repairs/android-checkpoint-shutdown/runtime-tests/readonly_maps_fixture.py \
+            --case readonly-maps-fixture --case readonly-maps-fixture-getfl \
+            --case readonly-proc-close --case readonly-proc-flush \
+            --case readonly-proc-user-sync-failure --case writable-proc-real-write \
+            --case readonly-proc-override --case writable-reader-retarget \
+            --out readonly-fixture-host/verification.json
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools build-tools;34.0.0'
@@ -222,6 +240,7 @@ jobs:
         with:
           name: Infinity-2103377-Essential-First-Java-Process-Evidence
           path: |
+            readonly-fixture-host/
             android-process-evidence/
             essential-fold-test/*.json
             essential-fold-test/*.txt
