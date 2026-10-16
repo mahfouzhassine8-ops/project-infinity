@@ -4,6 +4,8 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import py_compile
+import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -84,6 +86,13 @@ class PayloadBoundary(unittest.TestCase):
     def test_non_signature_meta_inf_is_protected(self):
         with self.assertRaisesRegex(RuntimeError, 'Unexpected APK payload mutation'):
             PACK.payload_identity(self.parent, self.candidate({'META-INF/services/retained-provider': b'changed provider'}))
+
+    def test_cache_inside_actual_apk_remains_byte_protected(self):
+        name = 'assets/addons/service.diggz/__pycache__/service.cpython-311.pyc'
+        self.entries[name] = b'original packaged cache'
+        self.parent = self.write('parent.apk', self.entries)
+        with self.assertRaisesRegex(RuntimeError, 'Unexpected APK payload mutation'):
+            PACK.payload_identity(self.parent, self.candidate({name: b'changed packaged cache'}))
 
     def test_added_entry_fails(self):
         with self.assertRaisesRegex(RuntimeError, 'entry-name set changed'):
@@ -209,6 +218,97 @@ class PayloadBoundary(unittest.TestCase):
                 patch.object(PACK, 'tool_output', side_effect=self.android_output(self.certificate([PACK.SIGNER, 'f' * 64]))):
             with self.assertRaisesRegex(RuntimeError, 'Wrong or multiple permanent signers'):
                 PACK.verify_android(self.parent, self.root, 'multiple-cert')
+
+
+class FixtureBoundary(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.inputs = self.root / 'inputs'
+        self.native = self.root / 'native'
+        self.old = self.inputs / 'native-evidence/installed-addons'
+        self.new = self.native / 'installed-addons'
+        for root in (self.old, self.new):
+            addon = root / 'service.infinity.control'
+            addon.mkdir(parents=True)
+            (addon / 'service.py').write_text('value = 1\n')
+            (addon / 'addon.xml').write_text('<addon/>')
+        self.evidence = self.root / 'inventory.json'
+
+    def verify(self):
+        return PACK.verify_first_party_sources(self.native, self.inputs, self.evidence)
+
+    def test_actual_timestamp_only_host_cache_difference_is_not_an_installed_mutation(self):
+        source = self.old / 'service.infinity.control/service.py'
+        cache = Path(py_compile.compile(str(source), doraise=True))
+        before = cache.read_bytes()
+        stamp = int(source.stat().st_mtime) + 5361
+        os.utime(source, (stamp, stamp))
+        py_compile.compile(str(source), doraise=True)
+        after = cache.read_bytes()
+        self.assertNotEqual(before[8:12], after[8:12])
+        self.assertEqual(before[16:], after[16:])
+        cache.write_bytes(before)
+        new_cache = self.new / cache.relative_to(self.old)
+        new_cache.parent.mkdir()
+        new_cache.write_bytes(after)
+        proof = self.verify()
+        self.assertTrue(proof['installed_sources_identical'])
+        self.assertEqual(len(proof['saved_rc05']['installed']), 2)
+        self.assertNotEqual(proof['saved_rc05']['excluded_host_caches'],
+                            proof['diagnostic_native']['excluded_host_caches'])
+        self.assertEqual(PACK.load(self.evidence), proof)
+
+    def test_inventory_matches_existing_copytree_policy_exactly(self):
+        for name in ('__pycache__/nested/data', 'service.infinity.control/cache.pyc',
+                     'cache.pyc/nested/module.py', 'service.infinity.control/__pycache__.txt',
+                     'service.infinity.control/keep.pyo', 'service.infinity.control/keep.PYC'):
+            file = self.old / name
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text(name)
+        target = self.root / 'actual-fixture'
+        shutil.copytree(self.old, target, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+        self.assertEqual(PACK.fixture_inventory(self.old)['installed'], PACK.tree_hashes(target))
+
+    def test_real_source_change_fails_and_records_exact_path(self):
+        (self.new / 'service.infinity.control/service.py').write_text('value = 2\n')
+        with self.assertRaisesRegex(RuntimeError, 'sources differ.*service.py'):
+            self.verify()
+        proof = PACK.load(self.evidence)
+        self.assertFalse(proof['installed_sources_identical'])
+        self.assertEqual(proof['changed'], ['service.infinity.control/service.py'])
+
+    def test_manifest_change_fails(self):
+        (self.new / 'service.infinity.control/addon.xml').write_text('<addon disabled="true"/>')
+        with self.assertRaisesRegex(RuntimeError, 'sources differ.*addon.xml'):
+            self.verify()
+
+    def test_removed_source_fails(self):
+        (self.new / 'service.infinity.control/service.py').unlink()
+        with self.assertRaisesRegex(RuntimeError, 'sources differ.*service.py'):
+            self.verify()
+
+    def test_added_source_fails(self):
+        (self.new / 'service.infinity.control/extra.py').write_text('unexpected = True\n')
+        with self.assertRaisesRegex(RuntimeError, 'sources differ.*extra.py'):
+            self.verify()
+
+    def test_cache_lookalike_and_other_bytecode_are_not_exempt(self):
+        for name in ('__pycache__.txt', 'service.pyc.bak', 'service.pyo', 'service.PYC'):
+            with self.subTest(name=name):
+                file = self.new / 'service.infinity.control' / name
+                file.write_text('unexpected')
+                with self.assertRaisesRegex(RuntimeError, 'sources differ'):
+                    self.verify()
+                file.unlink()
+
+    def test_only_caches_cannot_satisfy_nonempty_source_inventory(self):
+        root = self.root / 'cache-only'
+        root.mkdir()
+        (root / 'service.pyc').write_bytes(b'cache')
+        with self.assertRaisesRegex(RuntimeError, 'Empty installed first-party source inventory'):
+            PACK.fixture_inventory(root)
 
 
 if __name__ == '__main__':

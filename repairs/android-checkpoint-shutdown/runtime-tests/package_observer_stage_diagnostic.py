@@ -182,7 +182,39 @@ def tree_hashes(root):
     return result
 
 
-def verify_native(native, inputs):
+def fixture_inventory(root):
+    """Match essential_android_probe's existing copytree cache exclusions.
+
+    These host caches never enter the disposable Android fixture. APK payload
+    bytes, including any caches inside the APK, remain protected independently.
+    """
+    all_files = tree_hashes(root)
+    excluded = {name: digest for name, digest in all_files.items()
+                if any(part == '__pycache__' or part.endswith('.pyc')
+                       for part in Path(name).parts)}
+    installed = {name: digest for name, digest in all_files.items() if name not in excluded}
+    require(installed, 'Empty installed first-party source inventory after fixture exclusions')
+    return dict(installed=installed, excluded_host_caches=excluded)
+
+
+def verify_first_party_sources(native, inputs, evidence_path=None):
+    before = fixture_inventory(inputs / 'native-evidence/installed-addons')
+    after = fixture_inventory(native / 'installed-addons')
+    old, new = before['installed'], after['installed']
+    result = dict(fixture_copy_exclusions=['__pycache__', '*.pyc'],
+                  saved_rc05=before, diagnostic_native=after,
+                  added=sorted(new.keys() - old.keys()), removed=sorted(old.keys() - new.keys()),
+                  changed=sorted(name for name in old.keys() & new.keys() if old[name] != new[name]),
+                  installed_sources_identical=old == new)
+    if evidence_path is not None:
+        save(evidence_path, result)
+    require(result['installed_sources_identical'],
+            'Native installed first-party sources differ from saved RC05: ' +
+            json.dumps({key: result[key] for key in ('added', 'removed', 'changed')}, sort_keys=True))
+    return result
+
+
+def verify_native(native, inputs, evidence_path=None):
     pinned_native()
     proof = load(native / 'ENGINE-PROOF.json')
     require(proof['source_commit'] == NATIVE_SOURCE and proof['complete_native_engine_compiled'] is True and
@@ -211,9 +243,8 @@ def verify_native(native, inputs):
         digest = hashlib.sha256(pinned).hexdigest()
         require(delta['after'].get(rel) == digest, 'Staged live-stage header hash mismatch: ' + rel)
         staged[rel] = digest
-    require(tree_hashes(native / 'installed-addons') == tree_hashes(inputs / 'native-evidence/installed-addons'),
-            'Native installed first-party sources differ from the saved RC05 fixture input')
-    return proof, staged
+    inventory = verify_first_party_sources(native, inputs, evidence_path)
+    return proof, staged, inventory
 
 
 def package(args):
@@ -222,7 +253,8 @@ def package(args):
     args.out.mkdir(parents=True)
     parent = verify_rc05(args.rc05_inputs)
     verify_android(parent, args.out, 'saved-rc05')
-    proof, staged = verify_native(args.native, args.rc05_inputs)
+    proof, staged, inventory = verify_native(args.native, args.rc05_inputs,
+        args.out / 'FIRST-PARTY-FIXTURE-PRESERVATION.json')
     for key in ('INFINITY_KEYSTORE_B64', 'INFINITY_STORE_PASSWORD', 'INFINITY_KEY_PASSWORD', 'INFINITY_KEY_ALIAS'):
         require(bool(os.environ.get(key)), 'Permanent signing configuration missing: ' + key)
     require(os.environ.get('NDK_VER') == NDK_VERSION, 'Wrong strip toolchain version')
@@ -259,6 +291,7 @@ def package(args):
                    saved_308_results_verified=True, java_payload_byte_identical=True,
                    java_rebuilt=False, java_tests_rerun=False, native_run=NATIVE_RUN, native_source=NATIVE_SOURCE,
                    native_unstripped_sha256=proof['native_sha256'], native_staged_header_sha256=staged,
+                   first_party_fixture_preservation=inventory,
                    native_source_manifest_sha256=proof['source_manifest_sha256'],
                    native_exports_removed=[], native_exports_added=sorted(after-before), native_needed=needed(engine),
                    native_jni_exports_unchanged=True, permanent_signer=SIGNER, ndk_version=NDK_VERSION,
@@ -295,6 +328,12 @@ def verify(args):
     require(load(args.out / 'REUSED-RC05-JAVA-REGRESSION-VERIFICATION.json') ==
             load(args.rc05_inputs / 'essential-fold-test/JAVA-REGRESSION-VERIFICATION.json'),
             'Copied saved Java proof changed')
+    inventory = load(args.out / 'FIRST-PARTY-FIXTURE-PRESERVATION.json')
+    require(report['first_party_fixture_preservation'] == inventory and
+            inventory['saved_rc05'] == fixture_inventory(args.rc05_inputs / 'native-evidence/installed-addons') and
+            inventory['installed_sources_identical'] is True and
+            inventory['diagnostic_native']['installed'] == inventory['saved_rc05']['installed'],
+            'First-party fixture preservation proof changed')
     verify_android(parent, args.out, 'saved-rc05-recheck')
     verify_android(signed, args.out, 'internal-observer-stage-recheck')
     print('PASS: exact internally signed diagnostic payload independently rechecked; no promotion authority.')

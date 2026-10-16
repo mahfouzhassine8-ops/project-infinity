@@ -1658,13 +1658,13 @@
     "native_host_proof_result": "success"
   },
   "current_repair_checkpoint": {
-    "as_of_utc": "2026-10-16T21:19:32.593128+00:00",
+    "as_of_utc": "2026-10-16T22:03:51.614772+00:00",
     "code_commit": "2f28cdf753cf7824aa8816f7fb3de43fd817137a",
-    "native_commit": "92b5be7892a3a70f6a8daad2e235f77a9feaa7b8",
-    "native_run_id": 38957212563,
+    "native_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
+    "native_run_id": 38967896318,
     "native_host_proof": "passed",
     "full_arm64_build": "success",
-    "last_completed_green_native_run_id": 38957212563,
+    "last_completed_green_native_run_id": 38967896318,
     "android_run_id": 38957547396,
     "android_candidate_version": "1.0.9-Essential-First-TEST4-RC05",
     "android_acceptance": "overall failure: only pre-core cold-start Close failed; producer/fresh/loaded passed",
@@ -1741,7 +1741,7 @@
     "physical_fold_accepted": false,
     "final_lock_authorized": false,
     "remaining": [
-      "Publish exact live Python import/installation stage during initialization; capture actual Android wait before choosing a behavior correction",
+      "Run corrected internal diagnostic packaging and phase-matched Android observer-stage capture using already green native 38967896318",
       "Preserve prior 308/native/fresh/loaded passes; reproduce and resolve phase-matched and cold-start failures without weakening save protection",
       "Full configured physical Fold test/approval remains required before final lock"
     ],
@@ -1782,8 +1782,8 @@
       "write_admission_started": false,
       "artifact_id": 12073594350
     },
-    "latest_failure": "Phase-matched early Close: 41 admitted writers remain inside PyRun_String source loading, no observer completed and no save participant started before 25s. Exact compile/import wait remains unproven.",
-    "next_targeted_change": "Live progress for existing Python observer initialization stages, plus outer source compile/execute stamps; diagnostics only, no admission/save/timeout changes.",
+    "latest_failure": "38968517075: diagnostic packaging stopped before signing/Android because it compared host bytecode timestamp headers excluded from the actual fixture. All 22 installed source/configuration files match; 11 cache bodies match and only timestamp bytes differ. Production observer delay remains unresolved.",
+    "next_targeted_change": "Correct diagnostic inventory to match existing Android fixture; reuse exact green native 38967896318 and saved RC05 Java/308 proof. Capture live Android import/initialization stages before a behavior fix.",
     "live_stage_diagnostic": {
       "purpose": "Identify actual Android compile/import wait before choosing a behavior correction",
       "behavior_changes": false,
@@ -1803,16 +1803,23 @@
       "apk_deliverable": false,
       "native_source_commit": "e78c769d99b626b47292fb2bcac0d09661735fc6",
       "native_host_result": "success: full host workflow",
-      "full_arm64_build": "in_progress",
+      "full_arm64_build": "success",
       "android_diagnostic_preparation": "reviewed native-only internal packaging; reuses exact RC05 non-engine payload and saved 308 results; gated on complete native success",
-      "packaging_mutation_controls": 21,
-      "packaging_mutation_controls_result": "passed normally and Python -O",
+      "packaging_mutation_controls": 30,
+      "packaging_mutation_controls_result": "all 30 passed normally and Python -O under pinned 3.11.7",
       "production_acceptance_and_promotion_gates_unchanged": true,
       "android_source_commit": "79458c621ea6c7ff5d8c4a56e0dd8a3983e9dfe8",
-      "pipeline_status": "waiting for exact full native success before any diagnostic APK download/signing/AVD work",
+      "pipeline_status": "38968517075 failed before signing/AVD on host cache timestamps; targeted inventory correction locally verified; workflow retry next",
       "apk_assembled": false,
       "apk_signed": false,
-      "android_runtime_result": "pending"
+      "android_runtime_result": "skipped: packaging failed before Android launch",
+      "native_complete_workflow_result": "success",
+      "packaging_failure_evidence": "repairs/android-checkpoint-shutdown/runtime-tests/evidence/live-stage-packaging-38968517075.json",
+      "packaging_failure_run": 38968517075,
+      "packaging_failure_job": 117209874374,
+      "real_artifact_preflight": "passed: saved APK/308 proof, full native proof and live markers, exact staged headers, 22 unchanged installed files, unchanged exports/JNI/NEEDED; no local signing",
+      "rebuild_native_required": false,
+      "java_tests_rerun_required": false
     }
   },
   "repair_checkpoint_history": [

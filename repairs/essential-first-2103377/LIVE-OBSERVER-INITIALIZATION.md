@@ -45,17 +45,32 @@ write controls and sixteen strict source contracts. A blocked real durability
 write still refuses sealing and authorization. Independent review approved only
 a diagnostic build. Required compiled binary markers now include the live bridge.
 
-Diagnostic source `e78c769d99b626b47292fb2bcac0d09661735fc6` is saved. Native
-workflow **38967896318** passed its complete host job and is rebuilding ARM64.
-The isolated Android diagnostic will reuse saved RC05 Java/manifest/assets and
-308-test proof, replace only `libkodi.so`, and re-sign with the existing identity.
-It is gated on full native success and has 21 passing payload/signing controls.
-It cannot promote a Fold APK or change the existing acceptance gates.
+Diagnostic source `e78c769d99b626b47292fb2bcac0d09661735fc6` completed full
+native workflow **38967896318** successfully, including host guards and ARM64.
+The isolated Android diagnostic **38968517075** passed that exact native gate
+and its 21 packaging controls, then stopped before signing or Android launch.
 
-Isolated internal diagnostic **38968517075**, source `79458c62`, is now queued
-and waiting for full native success. Packaging/signing/AVD work cannot start
-before that gate. This stage changes no application imports or write policy;
-the exact cause of the Android initialization delay remains unproven.
+The packager compared all host-side installed-addon artifact files. Actual
+artifact comparison proves all 22 source/configuration files are byte-identical;
+11 generated CPython 3.10 caches differ only at timestamp-header bytes 8–11.
+Their bytecode bodies are identical. The existing Android fixture already
+excludes `__pycache__` and `*.pyc`. This is a packaging inventory error, not new
+Android runtime evidence. Exact artifact digests and per-cache evidence are in
+`../android-checkpoint-shutdown/runtime-tests/evidence/live-stage-packaging-38968517075.json`.
+
+The correction compares the same files that the existing fixture installs and
+records the excluded cache hashes separately. Every installed source/configuration
+file still must match; the APK entry names and every non-engine payload byte,
+including any cache inside the APK, retain their independent exact-byte check.
+All 21 original packaging controls plus nine targeted controls pass normally and
+under Python 3.11.7 `-O`. Real downloaded artifacts also pass source, native proof,
+compiled marker, export/JNI and dependency verification. No local signing occurred.
+
+Retry only isolated packaging/diagnostics using the already green native engine
+and exact saved RC05 Java/manifest/assets plus the 308-test proof. No native or
+Java rebuild is required by this packaging-only correction. The actual Android
+observer wait is still unresolved; no candidate is promoted or locked.
+
 The failed emulator log used `skin.estuary`, with 37 controlled services. It is
 a lifecycle/observer control, not a clone of the Fold's Diggz ecosystem and
 `skin.infinity.diggz` 1.0.5.223 configuration.
