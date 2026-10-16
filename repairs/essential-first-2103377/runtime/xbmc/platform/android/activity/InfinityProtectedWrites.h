@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <signal.h>
 #include <sstream>
+#include <sys/sysmacros.h>
 
 // Enforcement and durability for the existing native-owned persistence ledger.
 // No process termination, Python finalization, join or escalation occurs here.
@@ -448,6 +449,20 @@ inline bool SyncProtectedPath(const std::string& path)
   struct stat st{};
   if (::lstat(path.c_str(), &st) == 0)
   {
+    // A real Linux null device has no durable bytes. Opening it for output
+    // still records the operation; only this exact checked device is exempt
+    // from file fsync. A regular file, symlink or other device is not a waiver.
+    if (path == "/dev/null" && S_ISCHR(st.st_mode) &&
+        major(st.st_rdev) == 1 && minor(st.st_rdev) == 3)
+    {
+      const int fd = ::open(path.c_str(), O_WRONLY | O_CLOEXEC | O_NOFOLLOW);
+      if (fd < 0) return false;
+      struct stat actual{};
+      const bool matched = ::fstat(fd, &actual) == 0 && S_ISCHR(actual.st_mode) &&
+          actual.st_rdev == st.st_rdev && actual.st_dev == st.st_dev && actual.st_ino == st.st_ino;
+      const int closed = ::close(fd);
+      return matched && closed == 0;
+    }
     if ((!S_ISREG(st.st_mode) && !S_ISDIR(st.st_mode)) || S_ISLNK(st.st_mode)) return false;
     const int fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW |
                                      (S_ISDIR(st.st_mode) ? O_DIRECTORY : 0));

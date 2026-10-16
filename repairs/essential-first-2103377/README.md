@@ -29,7 +29,7 @@ Actual job-manager and installer bodies verify that late installs do not
 mutate data and already-admitted installs retain their required receipts.
 Absent command execution is accepted only when every executable candidate is
 absent on an actual read-only system mount; writable/unknown paths stay blocked.
-The native admission build is running at `38827466985`. A subsequent real child
+The native admission build passed at `38827466985`. A subsequent real child
 regression exposed low-level command reentry outside the validated Popen
 command. The C entry now verifies actual commands, environment and inherited
 descriptors, and leases the exec-error channel as well as stdout/stderr.
@@ -37,7 +37,14 @@ These latest corrections still require a full ARM64 build and Android run.
 See `PRODUCTION-STATUS.json` and `TEST1-CORRECTIONS.md`. No internal APK has
 been delivered, and whole-package death remains unverified.
 
-Current host verification: 48 actual CPython 3.11.7 runtime cases, 8 actual
+Android probe `38827602302` subsequently passed the former database admission
+stall and reached Kodi, profile, skin and favourite saves. It refused exit in
+5.5 seconds because the generic settings ledger serialized a skin placeholder
+instead of its existing virtual owner, and because `/dev/null` was treated as
+a durable file. The targeted registry/device corrections pass local regression
+tests. They still require a full ARM64 build and actual Android acceptance.
+
+Current host verification: 50 actual CPython 3.11.7 runtime cases, 8 actual
 SQLite VFS cases, 15 production coordinator cases, 13 production JobManager
 cases, 24 production installer cases, and the compiled Android
 protocol/guard authorization suite. First-party Command Center and compatibility

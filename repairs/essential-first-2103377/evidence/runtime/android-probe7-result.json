@@ -1,0 +1,168 @@
+{
+  "run": 38827602302,
+  "native_commit": "82aac05bf8fdddf011b01aa4e4e1249b8971d7f7",
+  "evidence_artifact": 12016788395,
+  "evidence_zip_sha256": "a1ec9dc3414f9abf50ad0c1d971f54d601dd6d54f8b1419accc031b0b3537e64",
+  "apk_sha256": "afcf5bd5b9ff4c29d9fead273f34b3e636b086cf4ecc696a7f8cf497b5078160",
+  "phase": "CHECKPOINT_FAILED",
+  "duration_ms": 5512,
+  "blockers": [
+    {
+      "count": 1,
+      "detail": "loaded_owner_not_serializable;path=special://profile/addon_data/skin.estuary/settings.xml",
+      "fatal": false,
+      "owner": "addon_settings"
+    },
+    {
+      "count": 1,
+      "detail": "loaded_addon_settings_save_failed",
+      "fatal": false,
+      "owner": "addon_settings"
+    },
+    {
+      "count": 1,
+      "detail": "protected_durability_failed:/dev/null",
+      "fatal": true,
+      "owner": "native_admission"
+    }
+  ],
+  "optional_unfinished_jobs": [
+    {
+      "actual_type": "N5ADDON20CRepositoryUpdateJobE",
+      "elapsed_ms": 37470,
+      "failure_detail": "",
+      "job_id": 18,
+      "operation": "repository_update",
+      "owner": "native_databases",
+      "phase": "callback",
+      "resource": "",
+      "token": 18,
+      "unknown": false
+    }
+  ],
+  "owners": [
+    {
+      "owner": "native_admission",
+      "essential": true,
+      "result": "FAILED",
+      "error": "protected_durability_failed:/dev/null",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "python_services",
+      "essential": false,
+      "result": "PENDING",
+      "error": "",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "background_jobs",
+      "essential": true,
+      "result": "ALREADY_DURABLE",
+      "error": "",
+      "end_elapsed_ms": 4502
+    },
+    {
+      "owner": "playback",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 2496
+    },
+    {
+      "owner": "command_center",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4028
+    },
+    {
+      "owner": "compat",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4035
+    },
+    {
+      "owner": "kodi_settings",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4497
+    },
+    {
+      "owner": "profiles",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4501
+    },
+    {
+      "owner": "skin_settings",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4376
+    },
+    {
+      "owner": "addon_settings",
+      "essential": true,
+      "result": "FAILED",
+      "error": "loaded_owner_not_serializable;path=special://profile/addon_data/skin.estuary/settings.xml",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "favourites",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4387
+    },
+    {
+      "owner": "peripherals",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4391
+    },
+    {
+      "owner": "audio_policy",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4393
+    },
+    {
+      "owner": "deferred_dialog_state",
+      "essential": true,
+      "result": "PENDING",
+      "error": "",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "xml_files",
+      "essential": true,
+      "result": "COMMITTED",
+      "error": "",
+      "end_elapsed_ms": 4502
+    },
+    {
+      "owner": "native_databases",
+      "essential": true,
+      "result": "PENDING",
+      "error": "",
+      "end_elapsed_ms": 0
+    },
+    {
+      "owner": "pvr",
+      "essential": true,
+      "result": "ALREADY_DURABLE",
+      "error": "",
+      "end_elapsed_ms": 2216
+    }
+  ],
+  "android_engine_death_verified": false,
+  "whole_package_death_verified": false,
+  "reopen_verified": false,
+  "apk_deliverable": false
+}

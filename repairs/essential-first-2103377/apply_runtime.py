@@ -17,6 +17,7 @@ POSIX = 'xbmc/platform/posix/filesystem/PosixFile.cpp'
 DIRECTORY = 'xbmc/platform/posix/filesystem/PosixDirectory.cpp'
 JOBS = 'xbmc/utils/JobManager.cpp'
 INSTALLER = 'xbmc/addons/AddonInstaller.cpp'
+ADDON = 'xbmc/addons/Addon.cpp'
 PINS = {
     CHECKPOINT: stage_experiment.PIN,
     MANAGER: 'b3ff61b946ed767e3c586caa74fab0ae1c35b404ecef4b46839270d84f57f16e',
@@ -25,6 +26,7 @@ PINS = {
     DIRECTORY: '68e638f060868bca397dd5a8e1f85232a70df31f92692460b0e741a63205094a',
     JOBS: '8315f6ad8c794d5a96bcb544b0e53eee585faec121e15806edd163f97f4b8d3c',
     INSTALLER: 'a9e21a3b0c9da59b33376d15b53ac7ba8886613c15b59878496cb31833502b9b',
+    ADDON: 'bb6339e695d36f72639668acfafdd8422fb5f2c15dcb864749c9521203655fbc',
 }
 once = stage_experiment.once
 
@@ -93,6 +95,50 @@ def jobs(text):
         // SQLite transactions and file operations retain independent leases;
         // nested installation scopes remain required and admission-controlled.
         role = CJob::CheckpointResponsibility::NonPersistent;''')
+
+def addon(text):
+    # A skin owns its values in CSkinInfo, not the placeholder CAddonSettings.
+    # Keep the existing owner inventory and call its existing virtual serializer.
+    # An expired ordinary owner can still have a retained dirty settings tree;
+    # its original checked serialization remains the fallback.
+    text = once(text, '#include <cstdint>', '#include <cstdint>\n#include <functional>')
+    text = once(text, 'struct CheckpointAddonTree\n{', '''using CheckpointAddonSerializer = std::function<bool(
+    const std::shared_ptr<ADDON::CAddonSettings>&, CXBMCTinyXML&)>;
+struct CheckpointAddonTree
+{''')
+    text = once(text, '  std::uint64_t committedGeneration{0};', '''  std::uint64_t committedGeneration{0};
+  CheckpointAddonSerializer serialize;''')
+    text = once(text, '''void TrackCreatedAddonTree(const std::shared_ptr<ADDON::CAddonSettings>& settings,
+                          const std::string& path)''', '''void TrackCreatedAddonTree(const std::shared_ptr<ADDON::CAddonSettings>& settings,
+                          const std::string& path, CheckpointAddonSerializer serialize = {})''')
+    text = once(text, '''  g_checkpointAddonTrees.push_back({settings, {}, settings->GetSettingsManager(), path, {}, false});''', '''  g_checkpointAddonTrees.push_back(
+      {settings, {}, settings->GetSettingsManager(), path, {}, false, 0, std::move(serialize)});''')
+    text = once(text, '''  if (!settings || !settings->IsLoaded())
+    return;
+  CXBMCTinyXML doc;''', '''  if (!settings || !settings->IsLoaded())
+    return;
+  CheckpointAddonSerializer serialize;
+  {
+    std::lock_guard<std::mutex> lock(g_checkpointAddonMutex);
+    for (const auto& entry : g_checkpointAddonTrees)
+      if (entry.settings.lock() == settings) { serialize = entry.serialize; break; }
+  }
+  CXBMCTinyXML doc;''')
+    text = once(text, '''  if (!settings->Save(doc) || !CheckpointAddonBytes(doc, bytes))''', '''  if (!(serialize ? serialize(settings, doc) : settings->Save(doc)) ||
+      !CheckpointAddonBytes(doc, bytes))''')
+    text = once(text, '''      {settings, {}, settings->GetSettingsManager(), path, std::move(bytes), true});''', '''      {settings, {}, settings->GetSettingsManager(), path, std::move(bytes), true, 0, {}});''')
+    text = once(text, '''    if (!settings->Save(doc) ||
+        !CheckpointAddonBytes(doc, bytes))''', '''    if (!(entry.serialize ? entry.serialize(settings, doc) : settings->Save(doc)) ||
+        !CheckpointAddonBytes(doc, bytes))''')
+    text = once(text, '''    TrackCreatedAddonTree(data.m_addonSettings, data.m_userSettingsPath);''', '''    const std::weak_ptr<CAddon> checkpointOwner =
+        std::dynamic_pointer_cast<CAddon>(enable_shared_from_this::shared_from_this());
+    TrackCreatedAddonTree(data.m_addonSettings, data.m_userSettingsPath,
+        [checkpointOwner, id](const std::shared_ptr<CAddonSettings>& settings, CXBMCTinyXML& doc) {
+          const auto owner = checkpointOwner.lock();
+          return owner && owner->FindInstanceSettings(id) == settings ?
+              owner->SettingsToXML(doc, id) : settings->Save(doc);
+        });''')
+    return text
 
 def installer(text):
     text = once(text, '#include "AddonInstaller.h"', '''#include "AddonInstaller.h"
@@ -188,7 +234,7 @@ def apply(root, locked_manifest):
     root = Path(root)
     expected = json.loads(Path(locked_manifest).read_text())['after']
     replacements = {}
-    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer)]:
+    for name, transform in [(CHECKPOINT, checkpoint), (MANAGER, manager), (SQLITE, sqlite), (POSIX, posix), (DIRECTORY, directory), (JOBS, jobs), (INSTALLER, installer), (ADDON, addon)]:
         old = (root/name).read_bytes()
         actual = hashlib.sha256(old).hexdigest()
         assert actual == PINS[name] == expected[name], (name, actual)

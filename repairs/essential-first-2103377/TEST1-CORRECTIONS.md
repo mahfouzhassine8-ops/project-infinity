@@ -168,3 +168,31 @@ Native launch preparation also holds the existing operation ledger until its
 PID/output leases are bound. A real concurrent fork pause verifies that Close
 cannot seal in this handoff gap. The test pauses only its host libc boundary;
 production has no waiting thread, join, timer or coverage switch.
+
+## Actual Android save-stage findings and targeted correction
+
+Run `38827602302` (native `82aac05b`) passed the former database admission and
+required-job stall. Optional repository callback identity remained diagnostic.
+Actual Kodi, profiles, skin, favourites, playback and both unchanged first-party
+participants received completion receipts. Exit was correctly refused after
+5.5 seconds with `loaded_owner_not_serializable` for `skin.estuary` and
+`protected_durability_failed:/dev/null`. No authorization was consumed and
+neither engine death nor reopening was established. The artifact and exact
+owner outcomes are retained in `evidence/runtime/android-probe7-result.json`.
+
+The settings ledger called `CAddonSettings::Save` on the skin's uninitialized
+placeholder, although `CSkinInfo::SettingsToXML` owns and serializes the actual
+values. The ledger now retains a weak owner serializer and invokes the existing
+virtual method for the exact current instance. Stale or retained old trees
+still serialize their own values; serialization failures and conflicts stay
+blocking. No skin code, settings behavior or normal save callback is changed.
+The original real-file owner tests are reused with the extracted production
+callback, including failure, stale-instance and lifetime cases.
+
+The null-device path was recorded by real writable opens. Final durability now
+recognizes only actual Linux `/dev/null` character device 1:3 with matching
+open/fstat inode/device identity. Unknown device destinations remain failures.
+Real cached/buffered/raw/os/subprocess DEVNULL paths pass; `/dev/zero` remains
+an exact durability blocker. All 50 CPython cases pass locally. These changes
+must pass complete ARM64 compilation and the real Android death/reopen probe
+before any physical-test candidate can be delivered.

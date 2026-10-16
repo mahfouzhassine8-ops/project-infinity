@@ -115,6 +115,8 @@ int main(int argc, char** argv) {
   else if (mode == "raw-fd-spoof") run("cachefd=os.open(private,os.O_CREAT|os.O_RDWR,0o600)\nclass Raw(old_raw):\n def fileno(self): return cachefd\nf=Raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else if (mode == "raw") run("f=old_raw(shared,'w'); old_raw_write(f,b'essential')\n");
   else run("fd=os.open(shared, os.O_CREAT|os.O_RDWR, 0o600); os.write(fd,b'essential')\n");
+  if (mode == "null-device-path") run("with old_open('/dev/null','w') as sink: sink.write('discarded')\nwith old_raw('/dev/null','w') as sink: old_raw_write(sink,b'discarded')\nnullfd=os.open('/dev/null',os.O_WRONLY); old_write(nullfd,b'discarded'); os.close(nullfd)\nimport subprocess\nassert subprocess.check_output(['uname','-rs'],stderr=subprocess.DEVNULL).strip()\n");
+  if (mode == "unknown-device-path") run("device=os.open('/dev/zero',os.O_WRONLY); old_write(device,b'discarded'); os.close(device)\n");
   if (mode == "uname-combined-flags") run("import subprocess\nassert subprocess.check_output(['uname','-rs']).strip()\n");
   if (mode == "late-native-child") run("import _posixsubprocess\nerror_read,error_write=os.pipe()\n");
   if (mode == "child-locale-environment") run("import subprocess\nassert subprocess.check_output(['uname','-rs'],env=dict(os.environ,LC_ALL='C')).strip()\n");
@@ -314,6 +316,15 @@ baseline=old_open(shared,'rb').read()
     std::cout << "PASS unresolved actual descriptor conversion fails closed\n" << std::flush;
     std::_Exit(0);
   }
+  if (mode == "unknown-device-path") {
+    assert(!InfinityScriptPersistence::SealEssentialWrites(23));
+    assert(!InfinityScriptPersistence::EssentialWritesAuthorized(23));
+    const auto proof=InfinityScriptPersistence::EssentialWrites();
+    assert(std::find(proof.blockers.begin(),proof.blockers.end(),
+        "protected_durability_failed:/dev/zero")!=proof.blockers.end());
+    std::cout << "PASS unknown device remains a specific durability blocker\n" << std::flush;
+    std::_Exit(0);
+  }
   if (mode == "file-lock") {
     assert(!InfinityScriptPersistence::SealEssentialWrites(23));
     run("fcntl.flock(fd,fcntl.LOCK_UN)\n");
@@ -407,7 +418,7 @@ def main():
                'unverified-posix-spawn','child-file-pending','child-cache-pending','child-pipe-pending']
         cases+=['missing-immutable-command','missing-writable-command','nested-native-child',
                 'child-locale-environment','child-writable-search','child-error-channel-pending',
-                'late-native-child','child-preparation-race']
+                'late-native-child','child-preparation-race','null-device-path','unknown-device-path']
         if args.pillow_library:
             native=folder/'native';native.mkdir();(native/'lib_imaging.so').write_bytes(args.pillow_library.read_bytes())
             env['KODI_ANDROID_LIBS']=str(native)

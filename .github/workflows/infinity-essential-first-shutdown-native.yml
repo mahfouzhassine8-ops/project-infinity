@@ -198,6 +198,9 @@ jobs:
             2>&1 | tee checkpoint-build/runtime-jobs.log
           python3 repairs/essential-first-2103377/test_runtime_installer.py --runtime kodi \
             2>&1 | tee checkpoint-build/runtime-installer.log
+          INFINITY_RUNTIME_NATIVE="$GITHUB_WORKSPACE/kodi" \
+            python3 repairs/essential-first-2103377/test_runtime_file_saves.py \
+            2>&1 | tee checkpoint-build/runtime-file-saves.log
       - name: Verify production coordinator with the actual persistence barrier
         run: |
           set -euo pipefail
