@@ -34,6 +34,15 @@ def main(args):
         uid = probe.shell('stat', '-c', '%u', probe.PRIVATE).strip(); assert uid.isdigit(); probe.APP_UID = uid
         prefs = args.out / 'test-preference.xml'; prefs.write_text('<map><string name="default">infinity</string></map>\n')
         probe.adb('push', prefs, probe.PRIVATE + '/shared_prefs/infinity_experience.xml')
+        # This is an offline helper/index fixture, not an add-on update test.
+        # Prevent unrequested repository installs from changing its inputs.
+        # The separate four original shutdown probes retain their settings.
+        settings = args.out / 'offline-fixture-guisettings.xml'
+        settings.write_text('<settings version="2"><setting id="general.addonupdates">2</setting></settings>\n')
+        probe.shell('mkdir', '-p', probe.PROFILE)
+        probe.adb('push', settings, probe.PROFILE + '/guisettings.xml')
+        report['fixture_automatic_addon_updates'] = False
+        report['addon_update_shutdown_verified'] = False
         fixture = args.out / 'first-party-fixture'; fixture.mkdir()
         manifest = {}
         for addon_id in probe.FIRST_PARTY:
@@ -57,6 +66,7 @@ def main(args):
         probe.adb('logcat', '-c'); probe.shell('am', 'start', '-W', '-n', probe.PACKAGE + '/.Splash')
         report['first_party'] = probe.enable_first_party(args.out)
         report['owner'] = probe.wait_ready()
+        assert probe.rpc('Settings.GetSettingValue', dict(setting='general.addonupdates')) == {'value': 2}, 'Offline fixture update policy was not loaded'
         assert probe.rpc('Addons.SetAddonEnabled', dict(addonid=ADDON, enabled=True)) == 'OK'
         assert probe.rpc('Addons.ExecuteAddon', dict(addonid=ADDON, wait=False)) == 'OK'
         deadline = time.monotonic() + 120
