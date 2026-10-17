@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.watchedbridge" name="Infinity Watched and Lists" version="1.0.0" provider-name="Project Infinity">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.python.script" library="default.py"/>
+  <extension point="xbmc.service" library="service.py" start="startup"/>
+  <extension point="kodi.context.item"><menu id="kodi.core.main"><item library="context.py">
+    <label>Infinity: Watched and Lists</label>
+    <visible>[String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,episode)] + [!String.IsEmpty(ListItem.UniqueID(tmdb)) | !String.IsEmpty(ListItem.UniqueID(tvdb)) | !String.IsEmpty(ListItem.UniqueID(imdb))]</visible>
+  </item></menu></extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Local watched badges and existing Watchlist/Collection controls.</summary>
+    <description lang="en_GB">Read-only cached watched presentation. Explicit menu actions use the verified installed Command Center writer and existing progress store. Unknown controller code refuses writes. No provider database, account, Trakt or settings changes. Experimental; physical Fold acceptance pending.</description>
+    <platform>all</platform><license>GPL-2.0-or-later</license>
+  </extension>
+</addon>
