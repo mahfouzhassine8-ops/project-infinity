@@ -24,6 +24,9 @@ def module(path, name):
     return result
 
 
+# Its unchanged production patch imports sibling stage_experiment, just as
+# when the original driver is invoked directly from its own directory.
+sys.path.insert(0, str(ROOT / "repairs/essential-first-2103377"))
 parent = module(ROOT / "repairs/essential-first-2103377/native_ci.py", "fold_test4_parent")
 
 
