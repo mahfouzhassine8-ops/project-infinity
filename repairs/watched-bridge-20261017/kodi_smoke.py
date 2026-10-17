@@ -34,13 +34,16 @@ def change_skin(addon_id):
     def request():
         try:
             require(rpc("Settings.SetSettingValue", dict(setting="lookandfeel.skin", value=addon_id)) is True, "Skin setting was refused")
-            xbmc.executebuiltin("ReloadSkin")
+            xbmc.executebuiltin("ReloadSkin()", True)
         except Exception: errors.append(traceback.format_exc())
+    if xbmcgui.getCurrentWindowDialogId() == 10100:
+        xbmc.executebuiltin("SendClick(10100,11)", True)
+        xbmc.sleep(500)
     thread = threading.Thread(target=request); thread.start()
     monitor = xbmc.Monitor()
     for attempt in range(120):
         if xbmcgui.getCurrentWindowDialogId() == 10100:
-            xbmc.executebuiltin("SendClick(11)")
+            xbmc.executebuiltin("SendClick(10100,11)")
         if xbmc.getSkinDir() == addon_id and not thread.is_alive() and xbmcgui.getCurrentWindowDialogId() != 10100:
             try:
                 xbmcgui.Window(10000).getControl(50)
@@ -51,6 +54,7 @@ def change_skin(addon_id):
     thread.join(timeout=2)
     require(not thread.is_alive() and not errors and xbmc.getSkinDir() == addon_id, "Fixture skin did not activate: " + str(errors))
     xbmcgui.Window(10000).getControl(50)  # Setting text alone is not a loaded fixture.
+    xbmc.executebuiltin("ActivateWindow(Home)", True)
     xbmc.sleep(800)
 
 
@@ -129,5 +133,7 @@ try:
                   rendered_images=images, row_predicate_checks=checks, source_projection=source)
 except Exception:
     result["failure"] = traceback.format_exc()
+    result["failure_window"] = dict(window=xbmcgui.getCurrentWindowId(), dialog=xbmcgui.getCurrentWindowDialogId(), skin=xbmc.getSkinDir())
+    xbmc.executebuiltin("TakeScreenshot(" + str(capture / "failure.png") + ",sync)", True)
 finally:
     output.write_text(json.dumps(result, indent=2) + "\n")

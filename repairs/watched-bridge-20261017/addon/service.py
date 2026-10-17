@@ -54,7 +54,7 @@ def run():
                     value = snapshot(data, profile, verified)
                     if home.getProperty(PROPERTY) != value:
                         home.setProperty(PROPERTY, value)
-                        xbmc.executebuiltin("InfinityResumeHubUpdate")
+                        xbmc.executebuiltin("InfinityResumeHubUpdate()")
                     signature = current
                     status(home, "Local watched badges ready")
             except (OSError, ValueError, RuntimeError, AttributeError):
@@ -62,7 +62,7 @@ def run():
                 value = snapshot({"schema": 2}, xbmcvfs.translatePath("special://profile/"))
                 if home.getProperty(PROPERTY) != value:
                     home.setProperty(PROPERTY, value)
-                    xbmc.executebuiltin("InfinityResumeHubUpdate")
+                    xbmc.executebuiltin("InfinityResumeHubUpdate()")
                 signature = None
                 status(home, "Local watched state unavailable; existing provider badges remain")
         else:

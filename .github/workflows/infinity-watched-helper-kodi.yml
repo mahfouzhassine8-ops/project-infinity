@@ -7,6 +7,7 @@ on:
       - 'repairs/watched-bridge-20261017/addon/**'
       - 'repairs/watched-bridge-20261017/test_state.py'
       - 'repairs/watched-bridge-20261017/test_actions.py'
+      - 'repairs/watched-bridge-20261017/test_contracts.py'
       - 'repairs/watched-bridge-20261017/setup_kodi_smoke.py'
       - 'repairs/watched-bridge-20261017/kodi_smoke.py'
       - 'repairs/watched-bridge-20261017/fixtures/**'
@@ -22,6 +23,7 @@ jobs:
       - name: Verify identity negatives and exact installed writer paths
         run: |
           python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_state.py -v
+          python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_contracts.py -v
           python3 - <<'PY'
           import importlib.util,pathlib
           p=pathlib.Path('repairs/android-checkpoint-shutdown/installed/build.py')
