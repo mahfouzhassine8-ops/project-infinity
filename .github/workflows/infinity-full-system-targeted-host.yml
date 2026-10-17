@@ -1,0 +1,25 @@
+name: Infinity | Full-System Targeted Host Regressions
+on:
+  push:
+    branches: [work/infinity-full-repair-20261017-gpt6]
+    paths:
+      - 'repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityProtectedWrites.h'
+      - 'repairs/full-system-20261017/**'
+      - '.github/workflows/infinity-full-system-targeted-host.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  protected-writes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Compile real native durability implementation, fail closed for essential files
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -pthread -Wall -Wextra -Werror \
+            -Irepairs/essential-first-2103377/runtime/xbmc/platform/android/activity \
+            repairs/full-system-20261017/test_installer_stage_durability.cpp \
+            -o /tmp/infinity-stage-durability-test
+          /tmp/infinity-stage-durability-test

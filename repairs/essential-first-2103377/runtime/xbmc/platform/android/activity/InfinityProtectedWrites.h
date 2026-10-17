@@ -448,7 +448,101 @@ inline size_t OptionalUnfinishedWriters()
   return count;
 }
 
-inline bool SyncProtectedPath(const std::string& path)
+// A completed/rolled-back add-on installation can remove the entire UUID
+// staging tree before final Close. The original proof fsyncs its *immediate*
+// parent, which fails ENOENT if the installer removed that UUID parent too.
+// Only resolve that specific case; do NOT allow a missing database/profile or
+// arbitrary add-on path to inherit a missing-ancestor waiver.
+inline bool InstallerStageRoot(const std::string& path,
+                               const std::vector<std::string>& profiles,
+                               std::string& stageRoot)
+{
+  for (const auto& profile : profiles)
+  {
+    const std::string marker = "/.kodi/userdata";
+    const auto markerAt = profile.find(marker);
+    if (markerAt == std::string::npos) continue;
+    if (profile.size() > markerAt + marker.size() &&
+        profile[markerAt + marker.size()] != '/') continue;
+    const auto root = profile.substr(0, markerAt) + "/.kodi/addons/temp";
+    if (!Within(path, root) || path.size() <= root.size() + 1) continue;
+    const auto tail = path.substr(root.size() + 1);
+    // The native Kodi installer uses a UUID-named scratch directory.
+    // Do not classify arbitrary "addons/temp" or active named add-ons.
+    if (tail.size() <= 37 || tail[36] != '/') continue;
+    bool validUuid = true;
+    for (size_t i = 0; i < 36; ++i)
+    {
+      const char c = tail[i];
+      const bool hyphen = i == 8 || i == 13 || i == 18 || i == 23;
+      const bool hex = (c >= '0' && c <= '9') ||
+                       (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+      if ((hyphen && c != '-') || (!hyphen && !hex))
+        { validUuid = false; break; }
+    }
+    if (!validUuid) continue;
+    const auto remaining = tail.substr(37);
+    if (remaining.empty()) continue;
+    bool validComponents = true;
+    size_t at = 0;
+    while (at < remaining.size())
+    {
+      const auto slash = remaining.find('/', at);
+      const auto part = remaining.substr(at, slash == std::string::npos ?
+                                             std::string::npos : slash - at);
+      if (part.empty() || part == "." || part == "..")
+        { validComponents = false; break; }
+      if (slash == std::string::npos) break;
+      at = slash + 1;
+    }
+    if (!validComponents || remaining.back() == '/') continue;
+    stageRoot = root;
+    return true;
+  }
+  return false;
+}
+
+// There is nothing left to fsync at the vanished staging leaf. Prove the
+// namespace deletion by fsync of the first surviving directory, without
+// crossing above the trusted installer staging root. Existing files, link
+// attacks, permission errors and all essential data paths remain fail-closed.
+inline bool SyncRemovedInstallerStage(const std::string& missingParent,
+                                      const std::string& path,
+                                      const std::vector<std::string>& profiles)
+{
+  std::string stageRoot;
+  if (!InstallerStageRoot(path, profiles, stageRoot)) return false;
+  std::string current = missingParent;
+  for (unsigned depth = 0; depth < 256; ++depth)
+  {
+    if (!Within(current, stageRoot)) return false;
+    struct stat observed{};
+    if (::lstat(current.c_str(), &observed) == 0)
+    {
+      if (!S_ISDIR(observed.st_mode) || S_ISLNK(observed.st_mode)) return false;
+      const int fd = ::open(current.c_str(),
+                            O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+      if (fd < 0) return false;
+      struct stat verified{};
+      const bool sameDirectory = ::fstat(fd, &verified) == 0 &&
+          S_ISDIR(verified.st_mode) &&
+          observed.st_dev == verified.st_dev && observed.st_ino == verified.st_ino;
+      int rc = -1;
+      if (sameDirectory)
+        do { rc = ::fsync(fd); } while (rc < 0 && errno == EINTR);
+      const int closed = ::close(fd);
+      return sameDirectory && rc == 0 && closed == 0;
+    }
+    if (errno != ENOENT || current == stageRoot) return false;
+    const auto slash = current.rfind('/');
+    if (slash == std::string::npos || slash == 0) return false;
+    current.resize(slash);
+  }
+  return false;
+}
+
+inline bool SyncProtectedPath(const std::string& path,
+                              const std::vector<std::string>& profiles)
 {
   struct stat st{};
   if (::lstat(path.c_str(), &st) == 0)
@@ -480,27 +574,34 @@ inline bool SyncProtectedPath(const std::string& path)
   if (slash == std::string::npos) return false;
   const auto parent = slash ? path.substr(0, slash) : "/";
   const int fd = ::open(parent.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
-  if (fd < 0) return false;
+  if (fd < 0)
+  {
+    // A vanished UUID staging parent is not a vanished essential database.
+    // Fsync its surviving staging ancestor only when the installer path
+    // exactly matches a verified profile-bound UUID scratch hierarchy.
+    return errno == ENOENT && SyncRemovedInstallerStage(parent, path, profiles);
+  }
   int rc; do { rc = ::fsync(fd); } while (rc < 0 && errno == EINTR);
   const int closed = ::close(fd);
   return rc == 0 && closed == 0;
 }
 inline bool SealEssentialWrites(uint64_t generation)
 {
-  std::vector<std::string> paths;
+  std::vector<std::string> paths, profiles;
   auto& s = Get();
   {
     std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
     if (p.generation != generation || p.phase != 2 || !EssentialWritesLocked(s).blockers.empty()) return false;
     // Close permission atomically with the zero-in-flight test, BEFORE fsync.
     p.phase = 3;
+    profiles = p.profiles; // Already canonical, captured under the admission mutex.
     for (const auto& path : p.paths)
       if (!OptionalPathLocked(p, path)) paths.push_back(path);
   }
   for (const auto& path : paths)
   {
     const auto canonical = ProtectedCanonical(path);
-    if (canonical.empty() || !SyncProtectedPath(canonical))
+    if (canonical.empty() || !SyncProtectedPath(canonical, profiles))
     { ProtectionFailure("protected_durability_failed:" + path); return false; }
   }
   std::lock_guard<std::mutex> lock(s.mutex);
