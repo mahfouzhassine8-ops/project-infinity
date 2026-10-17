@@ -16,6 +16,7 @@ import subprocess
 
 EXPECTED_TEXT_SHA256 = "eb95501280431e17ff4b2b74e52fb98e3fc59b776ba0a20a1ed97534a14ed298"
 EXPECTED_TEXT_SIZE = 47118804
+PACKAGED_TEXT_RVA = 0x143c000
 LOCKED_APK_SHA256 = "bcdcbed5aeaed0bf30e6e590d9ceda7c0177d780b12e98773fa9503beb793286"
 NATIVE_COMMIT = "f5e3d9434d8a8c0918d1f4cc6758cf3704eb873c"
 PCS = (
@@ -71,11 +72,15 @@ def main() -> None:
         raise ValueError("No addr2line tool available")
     results = []
     for pc in PCS:
+        # Stripping can change ELF section/file layout. Align identical code
+        # sections explicitly rather than assuming matching virtual addresses.
+        symbol_pc = pc + text[3] - PACKAGED_TEXT_RVA
         lookup = subprocess.check_output(
-            [tool, "-a", "-C", "-f", "-i", "-e", str(args.library), hex(pc), hex(pc - 4)],
+            [tool, "-a", "-C", "-f", "-i", "-e", str(args.library), hex(symbol_pc), hex(symbol_pc - 4)],
             text=True,
         )
-        results.append({"pc": hex(pc), "return_callsite": hex(pc - 4), "lookup": lookup})
+        results.append({"pc": hex(pc), "symbol_pc": hex(symbol_pc),
+                        "return_callsite": hex(symbol_pc - 4), "lookup": lookup})
     report = {
         "schema": 1,
         "scope": "READ_ONLY_EXACT_TEST4_SYMBOLIZATION",
@@ -85,6 +90,9 @@ def main() -> None:
         "native_library_sha256": hashlib.sha256(data).hexdigest(),
         "locked_text_sha256": digest,
         "locked_text_size": text[5],
+        "packaged_text_rva": hex(PACKAGED_TEXT_RVA),
+        "symbol_text_rva": hex(text[3]),
+        "symbol_text_file_offset": hex(text[4]),
         "has_full_symbols": ".symtab" in sections,
         "has_debug_info": ".debug_info" in sections,
         "addresses": results,
