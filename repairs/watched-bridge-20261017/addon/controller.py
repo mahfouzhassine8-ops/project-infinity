@@ -82,6 +82,9 @@ def apply(modules, profile, entry, action):
                     saved.get("source") != entry.get("source")):
                 return False  # Old scope cannot be rebound by ID coincidence alone.
         admitted = dict(saved or entry, key=key)
+        provider_episode = identity["kind"] == "episode" and provider(entry)
+        if provider_episode:
+            admitted["dbid"] = -1
         changed = None
         if action == "mark-watched":
             data, changed = hub.mark_watched_data(data, key, admitted, completed=False)
@@ -91,6 +94,9 @@ def apply(modules, profile, entry, action):
         elif action == "mark-unwatched":
             data, changed = hub.mark_unwatched_data(data, key)
             changed = changed or admitted
+            if provider_episode:
+                # Older saved selections may predate the producer-scope proof.
+                changed = dict(changed, dbid=-1)
             # Derived presentation state lives in the existing checkpointed
             # file as an additive foreign key, not a new unregistered database.
             overrides[key] = dict(changed, watched=False, updated=hub._now())

@@ -45,6 +45,38 @@ class Selected:
 
 
 class ActionTests(fixtures["RuntimeTests"]):
+    def test_provider_series_id_coincidence_never_mutates_native_episode(self):
+        proof = contracts.CATALOG["plugin.video.umbrella"]["proof"]
+        with mock.patch.object(Selected, "getDbId", return_value=7):
+            # The unchanged controller can accept the numeric coincidence;
+            # the scoped bridge must remove its library write authority.
+            self.assertEqual(cc_context.selected_entry(Selected(kind="episode"))["dbid"], 7)
+            entry = bridge_context.selected(modules, Selected(kind="episode"), verify_provider=lambda name: proof)
+        self.assertEqual(entry["dbid"], -1)
+        movie = self.selected()
+        lists = {movie["key"]: movie}
+        common.atomic_json(self.profile / hub.CONTINUE_FILE,
+                           dict(schema=2, foreign={"keep": [1, 2, 3]}, watchlist=lists, collection=lists,
+                                items={entry["key"]: dict(entry, position=20, duration=100)}))
+        with mock.patch.object(hub.xbmc, "executeJSONRPC", wraps=hub.xbmc.executeJSONRPC) as rpc:
+            self.assertTrue(controller.apply(modules, self.profile, entry, "mark-watched"))
+            data = hub.load(self.profile)
+            self.assertEqual(data["watched"][entry["key"]]["dbid"], -1)
+            self.assertFalse(data.get("pending_kodi_sync"))
+            # An already saved unsafe DB ID must also be stripped on removal.
+            data["watched"][entry["key"]]["dbid"] = 7
+            common.atomic_json(self.profile / hub.CONTINUE_FILE, data)
+            self.assertTrue(controller.apply(modules, self.profile, entry, "mark-unwatched"))
+            self.assertFalse(any(json.loads(call.args[0])["method"] == "VideoLibrary.SetEpisodeDetails"
+                                 for call in rpc.call_args_list))
+        data = hub.load(self.profile)
+        self.assertEqual(data[OVERRIDES][entry["key"]]["dbid"], -1)
+        self.assertFalse(data.get("pending_kodi_sync"))
+        self.assertEqual(data["items"], {})
+        self.assertEqual(data["foreign"], {"keep": [1, 2, 3]})
+        self.assertEqual(data["watchlist"], lists)
+        self.assertEqual(data["collection"], lists)
+
     def test_episode_scope_attestation_preserves_old_key_and_data(self):
         selected = Selected(kind="episode")
         proof = contracts.CATALOG["plugin.video.umbrella"]["proof"]

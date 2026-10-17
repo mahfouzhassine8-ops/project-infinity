@@ -49,6 +49,9 @@ def selected(modules, item, verify_provider=None):
             if not contracts.reviewed(addon_id, proof):
                 return None
             entry[contracts.ENTRY_PROOF] = proof
+            # These producers put series IDs in generic episode fields. A
+            # coincident native episode ID cannot authorize library mutation.
+            entry["dbid"] = -1
         if not contracts.canonical(entry, identity(entry), entry.get(contracts.ENTRY_PROOF)):
             return None
     return entry
