@@ -1,0 +1,82 @@
+name: Infinity | Phase D existing signed APK renderer
+on:
+  push:
+    branches: [work/infinity-phase-d-skin-225]
+    paths: ['repairs/skin-phase-d-225/**', '.github/workflows/infinity-skin-phase-d-android.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  renderer:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix: {version: [before, after]}
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Experimental-APK-and-Rollback
+          github-token: ${{ github.token }}
+          path: fold-delivery
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - name: Materialize exact source and latest tested corrections
+        run: |
+          python3 - <<'PY'
+          import zipfile,pathlib,hashlib,json,shutil
+          root=pathlib.Path('phase-d-fixture')
+          archive=pathlib.Path('repairs/skin-phase-d-225/fixtures/production-skin-renderer.zip')
+          archive.write_bytes(b''.join(p.read_bytes() for p in sorted(archive.with_name('renderer-parts').glob('part-*'))))
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()=='d9bcd6d70c1a259cabf4a907acb3b9628e8c214ef93eb10356fa73985cfd0291'
+          with zipfile.ZipFile(archive) as z:z.extractall(root)
+          for name,digest in json.loads((root/'SOURCE-IDENTITY.json').read_text()).items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name
+          shutil.copytree(root/'before',root/'selected')
+          if '${{ matrix.version }}'=='after':
+            shutil.copytree(root/'after-overlay',root/'selected',dirs_exist_ok=True)
+            shutil.copytree(archive.parent/'corrections',root/'selected',dirs_exist_ok=True)
+          PY
+      - name: Prepare disposable Android runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out phase-d-emulator
+          sudo chmod 666 /dev/kvm
+      - name: Render through unchanged signed TEST3 ARM64 engine
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-phase-d
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/skin-phase-d-225/android_renderer.py --apk fold-delivery/Infinity-2103382-Watched-Touch-TEST3.apk --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons --skin phase-d-fixture/selected --version '${{ matrix.version }}' --out phase-d-android
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-PhaseD-Android-${{ matrix.version }}
+          path: |
+            phase-d-android/ANDROID-RENDERER.json
+            phase-d-android/*/phase-d-results/
+            phase-d-android/last-progress/
+            phase-d-android/kodi.log
+            phase-d-android/logcat.txt
+            phase-d-android/actual-addon-inventory.json
+            phase-d-emulator/
+          retention-days: 90

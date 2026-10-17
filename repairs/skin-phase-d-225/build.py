@@ -121,10 +121,17 @@ def patch(data,name):
         close=e.control('5199');e.geometry(close,why,right='24',top='24',width='96',height='96')
         for k in ('onup','ondown','onleft','onright'):e.set(close,k,'5101',why)
         for i,id in enumerate(['5101','5102','5103']):
-            c=e.control(id);top=230+i*168;e.geometry(c,why,left='32',right='32',top=str(top),height='144');e.set(c,'textoffsety','-20',why)
+            c=e.control(id);top=230+i*168
+            # The global button default supplies width=450 if width is omitted.
+            # Give each row an inset group and an explicit full-width button.
+            idx=children.index(c);row_end=e.spans[children[idx+2]][3]
+            row_start=e.spans[c][0]
+            e.replace(row_start,row_start,'<control type="group"><left>32</left><right>32</right><top>0</top><height>100%</height>\n',why)
+            e.replace(row_end,row_end,'\n</control>',why)
+            e.geometry(c,why,left='0',width='100%',top=str(top),height='144');e.set(c,'textoffsety','-20',why)
             e.set(c,'onleft','5199',why);e.set(c,'onright','5199',why)
-            idx=children.index(c);e.geometry(children[idx+1],why,left='56',top=str(top+46),width='34',height='34')
-            e.geometry(children[idx+2],why,left='118',right='40',top=str(top+92),height='32')
+            e.geometry(children[idx+1],why,left='24',top=str(top+46),width='34',height='34')
+            e.geometry(children[idx+2],why,left='86',right='8',top=str(top+92),height='32')
     if file=='Custom_1196_InfinityPlaybackSpeed.xml':
         why='D09: prevent speed dialog heading/value/action overlap on landscape; enlarge and connect the close target'
         controls=root.find('controls');children=list(controls);start=e.spans[children[1]][0];end=e.spans[children[-1]][3]
@@ -178,6 +185,16 @@ def build(parent,work,output):
             if rel=='addon.xml':
                 new=data.replace(b'version="1.0.5.224"',b'version="1.0.5.225"',1)
                 new=re.sub(rb'<description lang="en_GB">.*?</description>',b'<description lang="en_GB">Infinity .225 experimental Phase D: forward from exact .224. Coordinated motion policy, asynchronous artwork, adaptive dialog and Settings geometry, and focus/touch corrections. Existing watched/recovery, ZIP preview, Rails, playback, Cobra and shutdown retained. Physical Galaxy Fold acceptance pending.</description>',new,flags=re.S);reasons=['D00: forward experimental version and accurate candidate description']
+            if rel=='resources/lib/infinity_native_ambient.py':
+                # Reuse the complete existing repair, not a new unrecognized script digest.
+                # Both .224 and this exact repaired source are accepted by the current APK.
+                import sys
+                sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'e2e-mobile-2103303'))
+                from ambient_lifecycle import repair
+                assert sha(data)=='3e33144282d81aa727466f530fd3d37deaee8357c5973c0c7b932bbcc3db1f5f'
+                new=repair(data.decode('utf-8')).encode('utf-8')
+                assert sha(new)=='de30a5114302a303638c589342024b348d3070c5aa76ba4a360d2506dd4402f7'
+                reasons=['D11: restore existing APK-approved Ambient lifecycle repair: release hidden textures, idempotent close, resize rebinding, bounded optional sampling']
             p=work/rel;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(new)
             if new!=data:changes[name]=new;inventory.append(dict(file=rel,before_sha256=sha(data),after_sha256=sha(new),reasons=reasons))
         # Update the candidate integrity manifest, never the historical lock receipt.

@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1195" type="dialog">
+  <defaultcontrol always="true">5101</defaultcontrol>
+  <include>InfinityLegacy_dialogeffect</include>
+  <controls>
+    <control type="image">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="C8000000">infinity_reference/white.png</texture>
+    </control>
+    <control type="group"><centerleft>50%</centerleft><centertop>50%</centertop><width>76%</width><height>800</height>
+<control type="image">
+      <left>0</left>
+      <top>0</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture border="24" colordiffuse="$VAR[InfinityLegacySurface]">infinity_glass/surface.png</texture>
+    </control>
+    <control type="image">
+      <description>Infinity glass specular rim</description>
+      <left>0</left>
+      <top>0</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture border="24" colordiffuse="$VAR[InfinityGlassSpecular]">infinity_glass/rim.png</texture>
+    </control>
+    <control type="image">
+      <left>32</left>
+      <top>34</top>
+      <width>60</width>
+      <height>60</height>
+      <texture colordiffuse="$VAR[InfinityReferenceText]">infinity_reference/audio.png</texture>
+    </control>
+    <control type="label"><right>128</right>
+      <left>112</left>
+      <top>24</top>
+      
+      <height>64</height>
+      <font>InfinityBody</font>
+      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+      <label>Audio &amp; Subtitles</label>
+    </control>
+    <control type="label"><right>32</right>
+      <left>112</left>
+      <top>100</top>
+      
+      <height>40</height>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+      <label>Playback language and accessibility</label>
+    </control>
+    <control type="button" id="5199"><ondown>5101</ondown><onleft>5101</onleft><onright>5101</onright><onup>5101</onup><right>24</right>
+      
+      <top>24</top>
+      <width>96</width>
+      <height>96</height>
+      <label>×</label>
+      <font>InfinityBody</font>
+      <align>center</align>
+      <aligny>center</aligny>
+      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+      <onclick>Action(Back)</onclick>
+      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+    </control>
+    <control type="group"><left>32</left><right>32</right><top>0</top><height>100%</height>
+<control type="button" id="5101"><onleft>5199</onleft><onright>5199</onright><textoffsety>-20</textoffsety>
+      <onup>5103</onup>
+      <ondown>5102</ondown>
+      <left>0</left>
+      <top>230</top>
+      <width>100%</width>
+      <height>144</height>
+      <label>Audio settings</label>
+      <font>InfinitySmall</font>
+      <textoffsetx>86</textoffsetx>
+      <aligny>center</aligny>
+      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+      <onclick>ActivateWindow(OSDAudioSettings)</onclick>
+      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+    </control>
+    <control type="image">
+      <left>24</left>
+      <top>276</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="$VAR[InfinityReferenceText]">infinity_reference/audio.png</texture>
+    </control>
+    <control type="label"><right>8</right>
+      <left>86</left>
+      <top>322</top>
+      
+      <height>32</height>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+      <label>Configure audio stream and sync</label>
+    </control>
+</control>
+    <control type="group"><left>32</left><right>32</right><top>0</top><height>100%</height>
+<control type="button" id="5102"><onleft>5199</onleft><onright>5199</onright><textoffsety>-20</textoffsety>
+      <onup>5101</onup>
+      <ondown>5103</ondown>
+      <left>0</left>
+      <top>398</top>
+      <width>100%</width>
+      <height>144</height>
+      <label>Subtitle settings</label>
+      <font>InfinitySmall</font>
+      <textoffsetx>86</textoffsetx>
+      <aligny>center</aligny>
+      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+      <onclick>ActivateWindow(OSDSubtitleSettings)</onclick>
+      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+    </control>
+    <control type="image">
+      <left>24</left>
+      <top>444</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="$VAR[InfinityReferenceText]">infinity_reference/subtitles.png</texture>
+    </control>
+    <control type="label"><right>8</right>
+      <left>86</left>
+      <top>490</top>
+      
+      <height>32</height>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+      <label>Language, timing and subtitle track</label>
+    </control>
+</control>
+    <control type="group"><left>32</left><right>32</right><top>0</top><height>100%</height>
+<control type="button" id="5103"><onleft>5199</onleft><onright>5199</onright><textoffsety>-20</textoffsety>
+      <onup>5102</onup>
+      <ondown>5101</ondown>
+      <left>0</left>
+      <top>566</top>
+      <width>100%</width>
+      <height>144</height>
+      <label>Download subtitles</label>
+      <font>InfinitySmall</font>
+      <textoffsetx>86</textoffsetx>
+      <aligny>center</aligny>
+      <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+      <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+      <textcolor>$VAR[InfinityLegacyText]</textcolor>
+      <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+      <onclick>ActivateWindow(10153)</onclick>
+      <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+    </control>
+    <control type="image">
+      <left>24</left>
+      <top>612</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="$VAR[InfinityReferenceText]">infinity_reference/subtitles.png</texture>
+    </control>
+    <control type="label"><right>8</right>
+      <left>86</left>
+      <top>658</top>
+      
+      <height>32</height>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+      <label>Search available subtitle services</label>
+    </control>
+</control>
+</control>
+  </controls>
+  <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+</window>

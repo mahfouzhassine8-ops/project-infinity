@@ -32,7 +32,9 @@ jobs:
           with zipfile.ZipFile(archive) as z:z.extractall(root)
           for name,digest in json.loads((root/'SOURCE-IDENTITY.json').read_text()).items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name
           shutil.copytree(root/'before',root/'selected')
-          if '${{ matrix.version }}'=='after':shutil.copytree(root/'after-overlay',root/'selected',dirs_exist_ok=True)
+          if '${{ matrix.version }}'=='after':
+            shutil.copytree(root/'after-overlay',root/'selected',dirs_exist_ok=True)
+            shutil.copytree(archive.parent/'corrections',root/'selected',dirs_exist_ok=True)
           PY
           case '${{ matrix.viewport }}' in
             cover) dimensions='--width 1080 --height 2400';;

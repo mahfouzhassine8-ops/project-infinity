@@ -23,7 +23,7 @@ def capture(name,ids=()):
 def close():
  xbmc.executebuiltin('Dialog.Close(all,true)',True);xbmc.executebuiltin('ActivateWindow(home)',True);xbmc.sleep(150)
 try:
- assert xbmc.getSkinDir()=='skin.infinity.phased',xbmc.getSkinDir()
+ assert xbmc.getSkinDir()==config.get('skin_id','skin.infinity.phased'),xbmc.getSkinDir()
  home=xbmcgui.Window(10000)
  for key,value in {'Infinity.OptionalMotionAllowed':'false','Infinity.MotionModeEffective':'off','Infinity.BootStage':'ready','Infinity.SystemTheme':'dark','Infinity.NativeSystemTheme':'dark','Infinity.BrowseTitle':'All Add-ons','Infinity.BrowseSubtitle':'Installed and available add-ons','Infinity.HealthOrb.State':'ready'}.items():home.setProperty(key,value)
  xbmc.executebuiltin('Skin.SetString(Infinity.VisualMode,normal)',True)
@@ -32,7 +32,7 @@ try:
   home.setProperty('Infinity.SystemTheme',theme);home.setProperty('Infinity.NativeSystemTheme',theme)
   for screen,action,ids in [
    ('home','home',(9000,)),('browse','1193',(10,12,50)),('settings','settings',(9000,)),
-   ('settings-category','settingsplayer',(3,5,60,20)),('command','1194',(1194888,1194101)),
+   ('settings-category','playersettings',(3,5,60,20)),('command','1194',(1194888,1194101)),
    ('health','1188',(1188000,1188199)),('system','1191',(1191888,1191199)),
    ('navigation','1198',(1198899,1198999)),('audio','1195',(5101,5102,5103,5199)),
    ('speed','1196',(5201,5202,5203,5299)),('display','1197',(5390,5301,263)),
@@ -40,6 +40,7 @@ try:
    # A modal ActivateWindow with wait=True blocks this test script until it closes.
    # Queue the normal GUI action so the harness can inspect and dismiss the dialog.
    close();xbmc.executebuiltin('ActivateWindow('+action+')');capture(theme.lower()+'-'+screen,ids)
+   if screen=='settings-category':assert xbmcgui.getCurrentWindowId()!=10000,'PlayerSettings route did not open'
    (output/'progress.json').write_text(json.dumps(report,indent=2))
   close()
   worker=threading.Thread(target=lambda:xbmcgui.Dialog().select('Choose Your Experience / Resume Hub',['Infinity Home','Cobra','Resume Hub','Watchlist','Collection']))
@@ -57,4 +58,5 @@ try:
  report.update(passed=True,cycles=cycles,kodi_version=xbmc.getInfoLabel('System.BuildVersion'))
 except Exception:report['failure']=traceback.format_exc()
 finally:
- (output/'result.json').write_text(json.dumps(report,indent=2)+'\n');xbmc.executebuiltin('Quit()')
+ (output/'result.json').write_text(json.dumps(report,indent=2)+'\n')
+ if not config.get('android'):xbmc.executebuiltin('Quit()')
