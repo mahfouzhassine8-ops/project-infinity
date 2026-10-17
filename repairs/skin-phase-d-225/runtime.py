@@ -32,12 +32,15 @@ try:
   home.setProperty('Infinity.SystemTheme',theme);home.setProperty('Infinity.NativeSystemTheme',theme)
   for screen,action,ids in [
    ('home','home',(9000,)),('browse','1193',(10,12,50)),('settings','settings',(9000,)),
-   ('settings-category','videossettings',(3,5,60,20)),('command','1194',(1194888,1194101)),
+   ('settings-category','settingsplayer',(3,5,60,20)),('command','1194',(1194888,1194101)),
    ('health','1188',(1188000,1188199)),('system','1191',(1191888,1191199)),
    ('navigation','1198',(1198899,1198999)),('audio','1195',(5101,5102,5103,5199)),
    ('speed','1196',(5201,5202,5203,5299)),('display','1197',(5390,5301,263)),
    ('palette','1190',(119000,119001,119002)),('addons','addonbrowser',(50,9096))]:
-   close();xbmc.executebuiltin('ActivateWindow('+action+')',True);capture(theme.lower()+'-'+screen,ids)
+   # A modal ActivateWindow with wait=True blocks this test script until it closes.
+   # Queue the normal GUI action so the harness can inspect and dismiss the dialog.
+   close();xbmc.executebuiltin('ActivateWindow('+action+')');capture(theme.lower()+'-'+screen,ids)
+   (output/'progress.json').write_text(json.dumps(report,indent=2))
   close()
   worker=threading.Thread(target=lambda:xbmcgui.Dialog().select('Choose Your Experience / Resume Hub',['Infinity Home','Cobra','Resume Hub','Watchlist','Collection']))
   worker.start();xbmc.sleep(350);capture(theme.lower()+'-select',(3,));xbmc.executebuiltin('Action(Back)',True);worker.join(3)
@@ -46,7 +49,7 @@ try:
  cycles=[]
  for i in range(12):
   for id,control in [(1195,5101),(1196,5202),(1194,1194101),(1188,1188101),(1198,1198101)]:
-   close();xbmc.executebuiltin('ActivateWindow('+str(id)+')',True);xbmc.sleep(50)
+   close();xbmc.executebuiltin('ActivateWindow('+str(id)+')');xbmc.sleep(350)
    d=xbmcgui.getCurrentWindowDialogId();assert d==id+10000,(id,d)
    xbmc.executebuiltin('SetFocus('+str(control)+')',True);xbmc.executebuiltin('Action(Back)',True);xbmc.sleep(75)
    after=xbmcgui.getCurrentWindowDialogId();assert after in (0,9999),(id,after)
