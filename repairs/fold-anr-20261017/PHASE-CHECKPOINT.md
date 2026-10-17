@@ -1,5 +1,11 @@
 # Infinity consolidated project — Phase 0 / ANR evidence checkpoint
 
+**Continuation:** The physical capture subsequently confirmed the reciprocal
+graphics/directory owner cycle. Current implementation, builds and all five
+workstream gates are tracked in `../fold-deadlock-20261017/PROGRAM.md` and this
+directory's updated `CHECKPOINT.json`. The text below retains the original
+pre-capture evidence checkpoint and must not be mistaken for current status.
+
 All five workstreams remain one program: watched/Resume Hub/Watchlist, add-on
 touch/recovery, native Android background/ANR, full skin polish, and integrated
 acceptance. The real Fold ANR remains the first implementation priority.

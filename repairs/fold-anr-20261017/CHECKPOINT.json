@@ -6,8 +6,8 @@
   "protected_apk_lock_commit": "9dea86a7bf1896993e33ab885aa678a25eddaa0f",
   "protected_skin_lock_commit": "3cc1e1d5e0d5a21db9d19dd6882bd1c647603488",
   "phase_0": "VERIFIED",
-  "phase_c": "WAITING_FOR_SAME_ATTEMPT_PHYSICAL_LOCK_OWNER_AND_ANDROID_ANR_CAPTURE",
-  "phases_a_b_d_e": "PENDING; SCOPE RETAINED",
+  "phase_c": "PHYSICAL_LOCK_CYCLE_CONFIRMED; TARGETED_CALLBACK_RETIREMENT_AUTHORED; HOST_MUTEX_REGRESSION_PASS; FULL_NATIVE_COMPILE_IN_PROGRESS",
+  "phases_a_b_d_e": "ALL RETAINED IN repairs/fold-deadlock-20261017/PROGRAM.md; current interface/source audits recorded; implementation and physical gates remain open",
   "candidate": {
     "file": "Infinity-Fold-Freeze-Capture-1.0.0-TEST.zip",
     "sha256": "d99f5e701a5fe2f0dbac0a8eac8f4af29b8c7cb35d0dd3bd76c9889b9d67e174",
@@ -38,5 +38,22 @@
     "merged": false,
     "promoted": false
   },
-  "resume": "Use the private same-attempt native owner snapshots plus Android diagnostic trace to identify the lock dependency before selecting a behavioral native correction. Continue all five workstreams from the protected baselines; do not restart, downgrade or treat host results as Fold acceptance."
+  "resume": "Continue the full five-workstream project. Finish and deliver the evidence-based native experimental candidate and same-code TEST4 rollback first; preserve all remaining phases and physical gates. No locks or promotion without physical Fold approval.",
+  "updated_at_utc": "2026-10-17",
+  "physical_capture": {
+    "zip_sha256": "00db8e84a68cbd2c48dfa004d9098593ab35a81e1a2bf975752d25fc073b98e9",
+    "valid_owner_snapshots": 5,
+    "repeated_cycle": "GUI holds graphics and waits directory; OnJobComplete worker holds directory and waits graphics",
+    "official_same_attempt_android_anr_trace_available": false
+  },
+  "continuation": {
+    "program": "repairs/fold-deadlock-20261017/PROGRAM.md",
+    "remaining_interfaces": "repairs/fold-deadlock-20261017/REMAINING-INTERFACES-AUDIT.md",
+    "native_source_commit": "0c9b933c7916cce7d5e0f47a195751827fc41c28",
+    "native_run": 38995006086,
+    "packaging_source_commit": "471db97a224dfbe817530331e26ee6f76704fa14",
+    "packaging_run": 38995281570,
+    "android_run": 38995620631,
+    "experimental_version_code": 2103380
+  }
 }

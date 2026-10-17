@@ -9,7 +9,7 @@ replace the consolidated handoff or authorize a final lock.
 | 1. Native Android stability | Physical reciprocal graphics/directory ownership confirmed. Exact symbols identify GUIWindowManager::Process and DirectoryProvider::OnJobComplete. Callback retirement correction authored; OS-mutex baseline/candidate regression passes. Full matched native build and permanent-signer experimental packaging submitted. | Native build/signing, unchanged Android shutdown probes, then physical background-return/screensaver/playback/PiP/Close matrix. |
 | 2. Watched / Resume Hub / Watchlist | Existing .20 identity, progress, manual actions, Watchlist and Collection code reviewed. Approved blue badge reference retained. Existing stores and native/provider actions remain protected. | Add compatible provider-list presentation and scoped identity adapters; automatic/manual/never-played/cross-provider/negative-identity tests; preserve schemas, foreign keys and persistence participant. No duplicate Waiting to Watch category. |
 | 3. Add-on touch and recovery | Capture reports Rails .026. Saved .026 ZIP hash and all corresponding source files verified. Custom 1193/50 geometry identified across six responsive sources. Home rails and native input corrections retained. | Establish failing custom-grid touch path before changing dispatch; repeated left/right/edge and scroll tests; visible disabled-add-on management and Otaku enable/reappearance with intact settings. |
-| 4. Infinity skin refinement | Exact .223 remains immutable. Complete XML/window/profile inventory is being recorded before edits. Themes, overlays, player boundaries, ZIP preview and navigation retained. | Screen-by-screen defect matrix, targeted fixes and comparisons across Light/Dark/OLED and all Fold layouts. Broad animation work remains gated on native stability. |
+| 4. Infinity skin refinement | Exact .223 remains immutable: 3,055 extracted files match the locked ZIP. All 2,135 XML files parse, with 14 UI profile trees inventoried. Themes, overlays, player boundaries, ZIP preview and navigation retained. | Screen-by-screen defect matrix, targeted fixes and comparisons across Light/Dark/OLED and all Fold layouts. Broad animation work remains gated on native stability. |
 | 5. Integrated verification | Coordinated candidate/rollback identities and signing/payload checks authored. All four original Android shutdown cases retained, including known red cold/core cases. | Combined APK/skin/helper runtime tests; physical 5/20/45/90-minute matrix, persistence, providers and regressions; explicit user approval before locking. |
 
 ## Immutable inputs
@@ -67,3 +67,8 @@ commits and verification gates. No protected ref, original APK/skin, provider,
 profile, settings, database or credentials may be replaced by development tools.
 Final locking and promotion require the user's physical Galaxy Fold validation
 and explicit approval.
+
+Implementation authorization remains active for all five workstreams. The
+native-first and installed-version gates require evidence, not another general
+Proceed request. Completing this first experimental candidate does not close
+the watched, touch, skin or integrated workstreams.
