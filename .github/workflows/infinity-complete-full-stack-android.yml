@@ -87,6 +87,13 @@ jobs:
           echo "$INFINITY_ASSET_SHA  $bundle" | sha256sum -c
           mkdir -p full-input
           unzip -q "$bundle" -d full-input
+      - name: Obtain real pinned Omega skin dependencies (NOT stock Kodi)
+        run: |
+          set -euo pipefail
+          mkdir -p full-input/additional-addons
+          python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py \
+            --additional full-input/additional-addons \
+            --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
       - name: Verify full original skin, Rails helper and ALL skin dependencies
         shell: bash
         run: |
@@ -124,6 +131,7 @@ jobs:
           name: Infinity-Full-Stack-Android-Evidence-${{ matrix.build }}
           path: |
             full-stack/FULL-STACK-INPUTS.json
+            full-stack/OMEGA-SKIN-DEPENDENCIES.json
             full-stack/SIGNED-APPLICATION-IDENTITY.json
             full-stack/android/
             full-stack-emulator/
