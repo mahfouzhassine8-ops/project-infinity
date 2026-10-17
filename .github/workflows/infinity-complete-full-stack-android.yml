@@ -1,10 +1,13 @@
 name: Infinity | COMPLETE APK Skin Rails Android
 on:
+  push:
+    branches: [work/infinity-full-repair-20261017-gpt6]
+    paths: ['repairs/full-system-20261017/CI-ASSETS-READY.marker']
   workflow_dispatch:
     inputs:
       assets_run:
-        description: "Actions run containing Infinity-Full-Stack-CI-Inputs-225"
-        required: true
+        description: "Optional prior run with exact full-stack ZIP (blank uses draft release)"
+        required: false
         type: string
 permissions: {contents: read, actions: read}
 env:
@@ -22,6 +25,7 @@ jobs:
     needs: validate-code
     runs-on: ubuntu-22.04
     timeout-minutes: 55
+    permissions: {contents: write, actions: read}
     strategy:
       fail-fast: false
       matrix:
@@ -55,11 +59,23 @@ jobs:
           github-token: ${{ github.token }}
           path: test4-inputs
       - uses: actions/download-artifact@v8
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.assets_run != '' }}
         with:
           run-id: ${{ inputs.assets_run }}
           name: Infinity-Full-Stack-CI-Inputs-225
           github-token: ${{ github.token }}
           path: full-stack-transfer
+      - name: Read exact ZIP from unpublished Infinity CI draft release
+        if: ${{ github.event_name == 'push' || inputs.assets_run == '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-stack-transfer
+          gh release download infinity-ci-assets-20261017 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'Infinity-Full-Stack-CI-Inputs-225.zip' \
+            --dir full-stack-transfer
       - name: Verify signed Infinity and immutable complete source packages
         shell: bash
         run: |
