@@ -20,6 +20,7 @@ jobs:
           test -s repairs/skin-phase-d-225/test_skin.py
           test -s repairs/e2e-mobile-2103303/ambient_lifecycle.py
           test -s repairs/e2e-mobile-2103303/native_controls.py
+          test -s repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp
           git rev-parse HEAD > SOURCE-COMMIT.txt
       - uses: actions/upload-artifact@v7
         with:
@@ -30,4 +31,5 @@ jobs:
             repairs/skin-phase-d-225/test_skin.py
             repairs/e2e-mobile-2103303/ambient_lifecycle.py
             repairs/e2e-mobile-2103303/native_controls.py
+            repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp
           retention-days: 7
