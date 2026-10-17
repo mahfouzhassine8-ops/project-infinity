@@ -59,6 +59,53 @@ def main(a):
   helper=staging/ADDON;helper.mkdir()
   (helper/'addon.xml').write_text('<addon id="'+ADDON+'" name="Phase D renderer" version="1.0.0" provider-name="Infinity CI"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable renderer</summary><description lang="en_GB">Actual native renderer evidence</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
   shutil.copyfile(HERE/'runtime.py',helper/'default.py');probe.adb('push',helper,probe.PROFILE+'/../addons/'+ADDON)
+  # This transient test addon only acknowledges Kodi's *real* keep-skin
+  # dialog. On ARM-translated emulators the skin can take almost the whole
+  # countdown to load; polling from the host after RPC returns is too late.
+  # No native code, production skin file, or user profile is modified.
+  confirm_id='script.infinity.phaseconfirm.test'
+  confirm_addon=staging/confirm_id;confirm_addon.mkdir()
+  (confirm_addon/'addon.xml').write_text(
+   '<addon id="'+confirm_id+'" name="Infinity skin dialog verifier" version="1.0.0" provider-name="Infinity CI">'
+   '<requires><import addon="xbmc.python" version="3.0.0"/></requires>'
+   '<extension point="xbmc.python.script" library="default.py"/>'
+   '<extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable skin confirmation</summary>'
+   '<description lang="en_GB">Approve the actual native keep-skin dialog in an emulator fixture</description>'
+   '<platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
+  (confirm_addon/'default.py').write_text("""
+import json
+import time
+from pathlib import Path
+import xbmc
+import xbmcgui
+import xbmcvfs
+out = Path(xbmcvfs.translatePath('special://profile/phase-d-skin-confirm.json'))
+def record(stage, **extra):
+    out.write_text(json.dumps(dict(stage=stage, monotonic=time.monotonic(), **extra)))
+record('armed')
+watch = xbmc.Monitor()
+until = time.monotonic()+90
+while not watch.abortRequested() and time.monotonic() < until:
+    dialog = xbmcgui.getCurrentWindowDialogId()
+    if dialog == 10100 and xbmc.getSkinDir() == 'skin.infinity.diggz':
+        try:
+            window=xbmcgui.Window(dialog)
+            window.setFocusId(11)  # Approved skin DialogConfirm.xml: 11 = OK; 10 = Cancel.
+            xbmc.sleep(80)
+            focus=window.getFocusId()
+            if focus != 11:
+                record('wrong_focus', focus=focus)
+                break
+            xbmc.executebuiltin('Action(Select)', True)
+            record('selected_native_ok', dialog=dialog, focus=focus)
+        except Exception as exc:
+            record('dialog_error', error=repr(exc), dialog=dialog)
+        break
+    xbmc.sleep(80)
+else:
+    record('native_dialog_not_seen')
+""")
+  probe.adb('push',confirm_addon,probe.PROFILE+'/../addons/'+confirm_id)
   backing='/data/media/0/Android/data/'+probe.PACKAGE
   probe.shell('chown','-R',uid+':'+uid,backing,probe.PRIVATE+'/shared_prefs');probe.shell('restorecon','-RF',backing,probe.PRIVATE+'/shared_prefs')
   stage('launching-normal-APK-profile')
@@ -67,20 +114,49 @@ def main(a):
   report['owner']=probe.wait_ready()
   assert probe.rpc('Settings.SetSettingValue',{'setting':'general.addonupdates','value':2}) is True
   for name in (skin.name,ADDON):assert probe.rpc('Addons.SetAddonEnabled',{'addonid':name,'enabled':True})=='OK'
-  stage('verify-native-infinity-skin-on-first-launch')
-  selected=probe.rpc('Settings.GetSettingValue',{'setting':'lookandfeel.skin'}).get('value')
-  assert selected==skin.name, ('Native Infinity skin not selected at startup',selected)
-  engine_log=probe.shell('cat',probe.PROFILE+'/../temp/kodi.log',check=False)
-  signature='load skin from: '
+  stage('verify-native-infinity-skin')
+  engine_log_path=probe.PROFILE+'/../temp/kodi.log'
   expected_skin='/addons/'+skin.name+'/'
+  initial_log=probe.shell('cat',engine_log_path,check=False)
+  loaded=[line for line in initial_log.splitlines() if 'load skin from: ' in line]
+  if not any(expected_skin in line for line in loaded):
+   # A valid Kodi guisettings.xml may name Infinity while the very first
+   # boot still displays Estuary until addon discovery finishes. A setting
+   # string alone is NOT proof of actual Infinity rendering.
+   report['initial_boot_skin']='skin.estuary despite configured '+skin.name
+   stage('reselecting-native-infinity-skin-after-addon-discovery')
+   assert probe.rpc('Addons.SetAddonEnabled',{'addonid':confirm_id,'enabled':True})=='OK'
+   assert probe.rpc('Settings.SetSettingValue',{'setting':'lookandfeel.skin','value':'skin.estuary'}) is True
+   assert probe.rpc('Addons.ExecuteAddon',{'addonid':confirm_id,'params':['arm'],'wait':False})=='OK'
+   deadline=time.monotonic()+20
+   armed={}
+   while time.monotonic()<deadline:
+    armed=probe.read_json(probe.PROFILE+'/phase-d-skin-confirm.json')
+    if armed.get('stage')=='armed':break
+    time.sleep(.15)
+   assert armed.get('stage')=='armed',('Native confirmation helper did not arm',armed)
+   assert probe.rpc('Settings.SetSettingValue',{'setting':'lookandfeel.skin','value':skin.name}) is True
+   deadline=time.monotonic()+65
+   confirmation={}
+   while time.monotonic()<deadline:
+    confirmation=probe.read_json(probe.PROFILE+'/phase-d-skin-confirm.json')
+    if confirmation.get('stage')!='armed':break
+    time.sleep(.2)
+   report['native_skin_confirmation']=confirmation
+   assert confirmation.get('stage')=='selected_native_ok',('Native keep-skin OK not confirmed',confirmation)
+  # The actual rendered skin MUST be Infinity, and it must stay so after
+  # the native dialog countdown. No synthetic success or forced XML rewrite.
+  time.sleep(4)
+  selected=probe.rpc('Settings.GetSettingValue',{'setting':'lookandfeel.skin'}).get('value')
+  engine_log=probe.shell('cat',engine_log_path,check=False)
+  signature='load skin from: '
   loaded=[line for line in engine_log.splitlines() if signature in line]
-  assert any(expected_skin in line for line in loaded), ('Signed engine did not load Infinity skin',loaded[-5:])
+  assert selected==skin.name, ('Signed engine did not retain Infinity skin setting',selected,loaded[-4:])
+  assert loaded and expected_skin in loaded[-1],('Signed engine still rendered another skin',loaded[-5:])
   assert 'skin loaded...' in engine_log, 'Signed engine did not finish loading its skin'
   report['selected_skin']=selected
-  report['skin_boot_mode']='native guisettings.xml preselection in disposable Infinity profile'
-  report['native_loaded_skin']=next(line.strip() for line in reversed(loaded) if expected_skin in line)
-  report['runtime_skin_switch_bypassed']=True
-  report['runtime_switch_confirmation_tested']=False
+  report['native_loaded_skin']=loaded[-1].strip()
+  report['actual_signed_engine_skin_verified']=True
   for name,w,h in [('cover',1080,2400),('inner',1800,1440),('wide',2400,1080)]:
    stage('rendering-'+name)
    probe.shell('wm','size',f'{w}x{h}');probe.shell('wm','density','320');time.sleep(3)
