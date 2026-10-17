@@ -1,0 +1,108 @@
+name: Infinity | COMPLETE APK Skin Rails Android
+on:
+  workflow_dispatch:
+    inputs:
+      assets_run:
+        description: "Actions run containing Infinity-Full-Stack-CI-Inputs-225"
+        required: true
+        type: string
+permissions: {contents: read, actions: read}
+env:
+  INFINITY_APK: signed/Infinity-2103382-Watched-Touch-TEST3.apk
+  INFINITY_APK_SHA: '6e28bfea7cdb5e497ee21601a714e738db7a57edc3c5c0d29a9c19d461031854'
+  INFINITY_ASSET_SHA: '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+jobs:
+  validate-code:
+    name: Source rejection tests - NOT runtime acceptance
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_assets.py' -v
+  test-full-app:
+    name: Actual signed Infinity full-stack Android emulator
+    needs: validate-code
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Experimental-APK-and-Rollback
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ inputs.assets_run }}
+          name: Infinity-Full-Stack-CI-Inputs-225
+          github-token: ${{ github.token }}
+          path: full-stack-transfer
+      - name: Verify signed Infinity and immutable complete source packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$INFINITY_APK_SHA  $INFINITY_APK" | sha256sum -c
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk --apk "$INFINITY_APK" --expected-sha "$INFINITY_APK_SHA" --version-code 2103382 --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" --out full-stack/SIGNED-APPLICATION-IDENTITY.json
+          bundle=full-stack-transfer/Infinity-Full-Stack-CI-Inputs-225.zip
+          test -s "$bundle"
+          echo "$INFINITY_ASSET_SHA  $bundle" | sha256sum -c
+          mkdir -p full-input
+          unzip -q "$bundle" -d full-input
+      - name: Verify full original skin, Rails helper and ALL skin dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p full-input/additional-addons
+          python3 repairs/full-system-20261017/infinity_full_stack_assets.py --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip --first-party test4-inputs/rc05-inputs/native-evidence/installed-addons --additional full-input/additional-addons --work full-stack --include-helpers
+      - name: Prepare disposable Android only
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out full-stack-emulator
+          sudo chmod 666 /dev/kvm
+      - name: Run real Infinity APK with unmodified FULL skin and Rails
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-complete
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            python3 repairs/full-system-20261017/infinity_full_stack_android.py
+            --apk "$INFINITY_APK" --expected-sha "$INFINITY_APK_SHA"
+            --addons full-stack/addons --input-proof full-stack/FULL-STACK-INPUTS.json
+            --out full-stack/android
+      - name: Verify native full-stack proof but deny final lock
+        run: |
+          python3 -c 'import json; r=json.load(open("full-stack/android/FULL-STACK-ANDROID.json")); assert r["passed"] and r["exact_full_stack_boot_passed"] and r["selected_skin"]=="skin.infinity.diggz"; assert r["enabled_production_components"]["script.infinity.rails"]=="0.2.6"; assert r["enabled_production_components"]["script.infinity.commandcenter"]=="0.3.5.20"; assert not r["full_release_accepted"] and not r["physical_fold_accepted"]'
+      - name: Preserve complete evidence and failures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Full-Stack-Android-Evidence
+          path: |
+            full-stack/FULL-STACK-INPUTS.json
+            full-stack/SIGNED-APPLICATION-IDENTITY.json
+            full-stack/android/
+            full-stack-emulator/
+          retention-days: 90
+          if-no-files-found: warn
