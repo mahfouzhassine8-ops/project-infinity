@@ -1,0 +1,736 @@
+<?xml version='1.0' encoding='utf-8'?>
+<includes>
+  <include name="InfinityPluginDirectoryCompact">
+    <control type="group">
+      <visible>Control.IsVisible(50) + !Window.IsActive(addoninformation)</visible>
+      <include>ViewAnimation</include>
+      <centerleft>50%</centerleft>
+      <width>100%</width>
+      <top>10</top>
+      <control type="group">
+        <left>64</left>
+        <top>-34</top>
+        <control type="image">
+          <left>16</left>
+          <top>170</top>
+          <width>1714</width>
+          <height>62</height>
+          <texture border="18" colordiffuse="$VAR[InfinityDirectoryRowSurface]">infinity_ui/contract_white.png</texture>
+          <bordersize>1</bordersize>
+          <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityReferenceSeparator]">infinity_ui/frame_soft.png</bordertexture>
+        </control>
+        <control type="image">
+          <left>34</left>
+          <top>185</top>
+          <width>32</width>
+          <height>32</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/folder.png</texture>
+        </control>
+        <control type="label">
+          <left>82</left>
+          <top>176</top>
+          <width>1200</width>
+          <height>46</height>
+          <font>InfinityBodyBold</font>
+          <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+          <label>$INFO[Container.FolderName]</label>
+          <scroll>false</scroll>
+        </control>
+        <control type="image">
+          <left>1520</left>
+          <top>184</top>
+          <width>34</width>
+          <height>34</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/grid.png</texture>
+        </control>
+        <control type="image">
+          <left>1580</left>
+          <top>184</top>
+          <width>34</width>
+          <height>34</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/menu.png</texture>
+        </control>
+        <control type="image">
+          <left>1640</left>
+          <top>184</top>
+          <width>34</width>
+          <height>34</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/display.png</texture>
+        </control>
+        <control type="list" id="50">
+          <left>16</left>
+          <top>248</top>
+          <width>1748</width>
+          <height>760</height>
+          <onleft>SetProperty(MediaMenu,True,Home)</onleft>
+          <onleft>SetFocus(9050)</onleft>
+          <onright>95060</onright>
+          <onup>50</onup>
+          <ondown>50</ondown>
+          <viewtype label="535">list</viewtype>
+          <pagecontrol>95060</pagecontrol>
+          <scrolltime tween="quadratic" easing="out">145</scrolltime>
+          <visible>True</visible>
+          <itemlayout height="70" width="1714">
+            <control type="image">
+              <left>0</left>
+              <top>2</top>
+              <width>1714</width>
+              <height>64</height>
+              <texture border="18" colordiffuse="$VAR[InfinityDirectoryRowSurface]">infinity_ui/contract_white.png</texture>
+              <bordersize>1</bordersize>
+              <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityReferenceSeparator]">infinity_ui/frame_soft.png</bordertexture>
+            </control>
+            <control type="image">
+              <left>12</left>
+              <top>10</top>
+              <width>50</width>
+              <height>50</height>
+              <texture border="14" colordiffuse="$VAR[InfinityDirectoryIconSurface]">infinity_ui/contract_white.png</texture>
+              <bordersize>1</bordersize>
+              <bordertexture border="14" infill="false" colordiffuse="$VAR[InfinityReferenceSeparator]">infinity_ui/frame_soft.png</bordertexture>
+            </control>
+            <control type="group">
+              <left>20</left>
+              <top>18</top>
+              <width>34</width>
+              <height>34</height>
+              <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+                <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="group">
+              <left>20</left>
+              <top>18</top>
+              <width>34</width>
+              <height>34</height>
+              <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/addons.png</texture>
+                <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="label">
+              <left>84</left>
+              <top>6</top>
+              <width>1520</width>
+              <height>34</height>
+              <font>InfinityBody</font>
+              <textcolor>$VAR[InfinityWatched224Title]</textcolor>
+              <label>$INFO[ListItem.Label]</label>
+              <scroll>false</scroll>
+              <animation effect="slide" start="0,0" end="0,11" time="0" condition="String.IsEmpty(ListItem.Label2)">Conditional</animation>
+            </control>
+            <control type="label">
+              <left>84</left>
+              <top>37</top>
+              <width>1520</width>
+              <height>24</height>
+              <font>InfinitySmall</font>
+              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+              <label>$INFO[ListItem.Label2]</label>
+              <visible>!String.IsEmpty(ListItem.Label2)</visible>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>23</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/next.png</texture>
+              <visible>ListItem.IsFolder</visible>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>23</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/play.png</texture>
+              <visible>!ListItem.IsFolder</visible>
+            </control>
+          </itemlayout>
+          <focusedlayout height="70" width="1714">
+            <control type="image">
+              <left>0</left>
+              <top>2</top>
+              <width>1714</width>
+              <height>64</height>
+              <texture border="18" colordiffuse="$VAR[InfinityDirectoryRowSurface]">infinity_ui/contract_white.png</texture>
+            </control>
+            <control type="image">
+              <left>0</left>
+              <top>2</top>
+              <width>1714</width>
+              <height>64</height>
+              <texture border="18" colordiffuse="$VAR[InfinityDirectoryFocusWash]">infinity_ui/contract_white.png</texture>
+              <bordersize>2</bordersize>
+              <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
+              <visible>Control.HasFocus(50)</visible>
+              <include>VisibleFadeAnimation</include>
+            </control>
+            <control type="image">
+              <left>12</left>
+              <top>10</top>
+              <width>50</width>
+              <height>50</height>
+              <texture border="14" colordiffuse="$VAR[InfinityDirectoryIconSurface]">infinity_ui/contract_white.png</texture>
+              <bordersize>1</bordersize>
+              <bordertexture border="14" infill="false" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
+            </control>
+            <control type="group">
+              <left>20</left>
+              <top>18</top>
+              <width>34</width>
+              <height>34</height>
+              <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+                <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="group">
+              <left>20</left>
+              <top>18</top>
+              <width>34</width>
+              <height>34</height>
+              <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/addons.png</texture>
+                <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="label">
+              <left>84</left>
+              <top>6</top>
+              <width>1520</width>
+              <height>34</height>
+              <font>InfinityBody</font>
+              <label>$INFO[ListItem.Label]</label>
+              <scroll>false</scroll>
+              <animation effect="slide" start="0,0" end="0,11" time="0" condition="String.IsEmpty(ListItem.Label2)">Conditional</animation>
+              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+            </control>
+            <control type="label">
+              <left>84</left>
+              <top>37</top>
+              <width>1520</width>
+              <height>24</height>
+              <font>InfinitySmall</font>
+              <label>$INFO[ListItem.Label2]</label>
+              <visible>!String.IsEmpty(ListItem.Label2)</visible>
+              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>23</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/next.png</texture>
+              <visible>ListItem.IsFolder</visible>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>23</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/play.png</texture>
+              <visible>!ListItem.IsFolder</visible>
+            </control>
+          </focusedlayout>
+        </control>
+        <control type="scrollbar" id="95060">
+          <left>1778</left>
+          <top>248</top>
+          <width>8</width>
+          <height>760</height>
+          <onup>95060</onup>
+          <ondown>95060</ondown>
+          <onleft>50</onleft>
+          <onright>50</onright>
+          <texturesliderbackground colordiffuse="$VAR[InfinityReferenceSeparator]">colors/white25.png</texturesliderbackground>
+          <texturesliderbar colordiffuse="$VAR[InfinityDiggzSecondaryText]">colors/white25.png</texturesliderbar>
+          <texturesliderbarfocus colordiffuse="$VAR[InfinityPaletteAccent]">colors/white.png</texturesliderbarfocus>
+          <showonepage>false</showonepage>
+        </control>
+      </control>
+    </control>
+  </include>
+  <include name="InfinityPluginDirectoryRegular">
+    <control type="group">
+      <visible>Control.IsVisible(50) + !Window.IsActive(addoninformation)</visible>
+      <include>ViewAnimation</include>
+      <centerleft>50%</centerleft>
+      <width>100%</width>
+      <top>10</top>
+      <control type="group">
+        <left>64</left>
+        <top>-34</top>
+        <control type="image">
+          <left>16</left>
+          <top>170</top>
+          <width>1714</width>
+          <height>62</height>
+          <texture border="18" colordiffuse="$VAR[InfinityDirectoryRowSurface]">infinity_ui/contract_white.png</texture>
+          <bordersize>1</bordersize>
+          <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityReferenceSeparator]">infinity_ui/frame_soft.png</bordertexture>
+        </control>
+        <control type="image">
+          <left>34</left>
+          <top>185</top>
+          <width>32</width>
+          <height>32</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/folder.png</texture>
+        </control>
+        <control type="label">
+          <left>82</left>
+          <top>176</top>
+          <width>1200</width>
+          <height>46</height>
+          <font>InfinityBodyBold</font>
+          <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+          <label>$INFO[Container.FolderName]</label>
+          <scroll>false</scroll>
+        </control>
+        <control type="image">
+          <left>1520</left>
+          <top>184</top>
+          <width>34</width>
+          <height>34</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/grid.png</texture>
+        </control>
+        <control type="image">
+          <left>1580</left>
+          <top>184</top>
+          <width>34</width>
+          <height>34</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/menu.png</texture>
+        </control>
+        <control type="image">
+          <left>1640</left>
+          <top>184</top>
+          <width>34</width>
+          <height>34</height>
+          <aspectratio>keep</aspectratio>
+          <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/display.png</texture>
+        </control>
+        <control type="list" id="50">
+          <left>16</left>
+          <top>242</top>
+          <width>1748</width>
+          <height>770</height>
+          <onleft>SetProperty(MediaMenu,True,Home)</onleft>
+          <onleft>SetFocus(9050)</onleft>
+          <onright>95060</onright>
+          <onup>50</onup>
+          <ondown>50</ondown>
+          <viewtype label="535">list</viewtype>
+          <pagecontrol>95060</pagecontrol>
+          <scrolltime tween="quadratic" easing="out">145</scrolltime>
+          <visible>True</visible>
+          <itemlayout height="88" width="1714">
+            <control type="image">
+              <left>0</left>
+              <top>2</top>
+              <width>1714</width>
+              <height>82</height>
+              <texture border="18" colordiffuse="$VAR[InfinityDirectoryRowSurface]">infinity_ui/contract_white.png</texture>
+              <bordersize>1</bordersize>
+              <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityReferenceSeparator]">infinity_ui/frame_soft.png</bordertexture>
+            </control>
+            <control type="image">
+              <left>12</left>
+              <top>13</top>
+              <width>62</width>
+              <height>62</height>
+              <texture border="14" colordiffuse="$VAR[InfinityDirectoryIconSurface]">infinity_ui/contract_white.png</texture>
+              <bordersize>1</bordersize>
+              <bordertexture border="14" infill="false" colordiffuse="$VAR[InfinityReferenceSeparator]">infinity_ui/frame_soft.png</bordertexture>
+            </control>
+            <control type="group">
+              <left>22</left>
+              <top>23</top>
+              <width>42</width>
+              <height>42</height>
+              <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+                <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="group">
+              <left>22</left>
+              <top>23</top>
+              <width>42</width>
+              <height>42</height>
+              <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/addons.png</texture>
+                <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="label">
+              <left>96</left>
+              <top>9</top>
+              <width>1508</width>
+              <height>40</height>
+              <font>InfinityBodyBold</font>
+              <textcolor>$VAR[InfinityWatched224Title]</textcolor>
+              <label>$INFO[ListItem.Label]</label>
+              <scroll>false</scroll>
+              <animation effect="slide" start="0,0" end="0,15" time="0" condition="String.IsEmpty(ListItem.Label2)">Conditional</animation>
+            </control>
+            <control type="label">
+              <left>96</left>
+              <top>46</top>
+              <width>1508</width>
+              <height>24</height>
+              <font>InfinitySmall</font>
+              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+              <label>$INFO[ListItem.Label2]</label>
+              <visible>!String.IsEmpty(ListItem.Label2)</visible>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>32</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/next.png</texture>
+              <visible>ListItem.IsFolder</visible>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>32</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityDiggzSecondaryText]">infinity_ui/icons/play.png</texture>
+              <visible>!ListItem.IsFolder</visible>
+            </control>
+          </itemlayout>
+          <focusedlayout height="88" width="1714">
+            <control type="image">
+              <left>0</left>
+              <top>2</top>
+              <width>1714</width>
+              <height>82</height>
+              <texture border="18" colordiffuse="$VAR[InfinityDirectoryRowSurface]">infinity_ui/contract_white.png</texture>
+            </control>
+            <control type="image">
+              <left>0</left>
+              <top>2</top>
+              <width>1714</width>
+              <height>82</height>
+              <texture border="18" colordiffuse="$VAR[InfinityDirectoryFocusWash]">infinity_ui/contract_white.png</texture>
+              <bordersize>2</bordersize>
+              <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
+              <visible>Control.HasFocus(50)</visible>
+              <include>VisibleFadeAnimation</include>
+            </control>
+            <control type="image">
+              <left>12</left>
+              <top>13</top>
+              <width>62</width>
+              <height>62</height>
+              <texture border="14" colordiffuse="$VAR[InfinityDirectoryIconSurface]">infinity_ui/contract_white.png</texture>
+              <bordersize>1</bordersize>
+              <bordertexture border="14" infill="false" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
+            </control>
+            <control type="group">
+              <left>22</left>
+              <top>23</top>
+              <width>42</width>
+              <height>42</height>
+              <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+                <visible>!String.IsEmpty(ListItem.Icon) + !String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="group">
+              <left>22</left>
+              <top>23</top>
+              <width>42</width>
+              <height>42</height>
+              <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+              <control type="image">
+                <aspectratio>keep</aspectratio>
+                <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/addons.png</texture>
+                <visible>String.IsEmpty(ListItem.Icon) | String.StartsWith(ListItem.Icon,Default)</visible>
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+              </control>
+              <include content="InfinityWatched224Badge">
+                <param name="size" value="24" />
+              </include>
+            </control>
+            <control type="label">
+              <left>96</left>
+              <top>9</top>
+              <width>1508</width>
+              <height>40</height>
+              <font>InfinityBodyBold</font>
+              <label>$INFO[ListItem.Label]</label>
+              <scroll>false</scroll>
+              <animation effect="slide" start="0,0" end="0,15" time="0" condition="String.IsEmpty(ListItem.Label2)">Conditional</animation>
+              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+            </control>
+            <control type="label">
+              <left>96</left>
+              <top>46</top>
+              <width>1508</width>
+              <height>24</height>
+              <font>InfinitySmall</font>
+              <label>$INFO[ListItem.Label2]</label>
+              <visible>!String.IsEmpty(ListItem.Label2)</visible>
+              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>32</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/next.png</texture>
+              <visible>ListItem.IsFolder</visible>
+            </control>
+            <control type="image">
+              <left>1658</left>
+              <top>32</top>
+              <width>24</width>
+              <height>24</height>
+              <aspectratio>keep</aspectratio>
+              <texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/icons/play.png</texture>
+              <visible>!ListItem.IsFolder</visible>
+            </control>
+          </focusedlayout>
+        </control>
+        <control type="scrollbar" id="95060">
+          <left>1778</left>
+          <top>242</top>
+          <width>8</width>
+          <height>770</height>
+          <onup>95060</onup>
+          <ondown>95060</ondown>
+          <onleft>50</onleft>
+          <onright>50</onright>
+          <texturesliderbackground colordiffuse="$VAR[InfinityReferenceSeparator]">colors/white25.png</texturesliderbackground>
+          <texturesliderbar colordiffuse="$VAR[InfinityDiggzSecondaryText]">colors/white25.png</texturesliderbar>
+          <texturesliderbarfocus colordiffuse="$VAR[InfinityPaletteAccent]">colors/white.png</texturesliderbarfocus>
+          <showonepage>false</showonepage>
+        </control>
+      </control>
+    </control>
+  </include>
+  <include name="InfinityWatched224Badge">
+    <param name="size" default="24" />
+    <param name="right" default="-12" />
+    <param name="top" default="-8" />
+    <definition>
+      <control type="image">
+        <right>$PARAM[right]</right>
+        <top>$PARAM[top]</top>
+        <width>$PARAM[size]</width>
+        <height>$PARAM[size]</height>
+        <aspectratio>keep</aspectratio>
+        <texture>infinity_watched/badge.png</texture>
+        <visible>[String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,episode)] + [String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true) | [!String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),false) + [Integer.IsGreater(ListItem.PlayCount,0) | String.IsEqual(ListItem.Overlay,OverlayWatched.png)]]]</visible>
+      </control>
+    </definition>
+  </include>
+  <include name="ViewAnimation">
+    <animation effect="fade" time="360">Visible</animation>
+    <animation effect="fade" time="0">Hidden</animation>
+  </include>
+  <include name="VisibleFadeAnimation">
+    <animation effect="fade" time="250">Visible</animation>
+    <animation effect="fade" time="250">Hidden</animation>
+  </include>
+  <variable name="InfinityDiggzPrimaryText">
+    <value>$VAR[InfinityPaletteTextPrimary]</value>
+  </variable>
+  <variable name="InfinityDiggzSecondaryText">
+    <value>$VAR[InfinityPaletteTextSecondary]</value>
+  </variable>
+  <variable name="InfinityDirectoryFocusWash">
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">3800B8FF</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">22108FF0</value>
+    <value>3A00B8FF</value>
+  </variable>
+  <variable name="InfinityDirectoryIconSurface">
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FF080808</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FFE8EFF6</value>
+    <value>FF101D2A</value>
+  </variable>
+  <variable name="InfinityDirectoryRowSurface">
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">F4000000</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FFF3F7FB</value>
+    <value>F40A121D</value>
+  </variable>
+  <variable name="InfinityLegacyBase">
+    <value condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema)">FF000000</value>
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FF000000</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FFF7FAFD</value>
+    <value>FF03070C</value>
+  </variable>
+  <variable name="InfinityPaletteAccent">
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FF108FF0</value>
+    <value>FF00B8FF</value>
+  </variable>
+  <variable name="InfinityPaletteTextPrimary">
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FF0C2036</value>
+    <value>FFFFFFFF</value>
+  </variable>
+  <variable name="InfinityPaletteTextSecondary">
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FF4A6178</value>
+    <value>FFD2E2EE</value>
+  </variable>
+  <variable name="InfinityPolishIcon0">
+    <value condition="String.IsEqual(ListItem.Icon,DefaultFolder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFolder.png)">infinity_system/folder.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultFile.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFile.png) | String.IsEqual(ListItem.Icon,DefaultAddonsZip.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsZip.png) | String.IsEqual(ListItem.Icon,DefaultAddonNone.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonNone.png)">infinity_system/file.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultHardDisk.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultHardDisk.png) | String.IsEqual(ListItem.Icon,DefaultRemovableDisk.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRemovableDisk.png)">infinity_system/drive.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultNetwork.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultNetwork.png) | String.IsEqual(ListItem.Icon,DefaultAddonVfs.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVfs.png) | String.IsEqual(ListItem.Icon,DefaultAddonRepository.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonRepository.png) | String.IsEqual(ListItem.Icon,DefaultAddonsRepo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsRepo.png)">infinity_system/network.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultPicture.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultPicture.png) | String.IsEqual(ListItem.Icon,DefaultAddonImages.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonImages.png) | String.IsEqual(ListItem.Icon,DefaultAddonPicture.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonPicture.png) | String.IsEqual(ListItem.Icon,DefaultAddonImageDecoder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonImageDecoder.png)">infinity_system/picture.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultUser.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultUser.png) | String.IsEqual(ListItem.Icon,DefaultActor.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultActor.png) | String.IsEqual(ListItem.Icon,DefaultDirector.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDirector.png) | String.IsEqual(ListItem.Icon,DefaultArtist.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultArtist.png) | String.IsEqual(ListItem.Icon,DefaultMusicArtists.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicArtists.png)">infinity_system/profile.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddSource.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddSource.png)">infinity_system/source.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultGameAddons.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultGameAddons.png) | String.IsEqual(ListItem.Icon,DefaultAddonGame.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonGame.png)">infinity_system/game.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultCDDA.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultCDDA.png) | String.IsEqual(ListItem.Icon,DefaultDVDEmpty.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDVDEmpty.png) | String.IsEqual(ListItem.Icon,DefaultDVDFull.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDVDFull.png) | String.IsEqual(ListItem.Icon,DefaultDVDRom.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDVDRom.png) | String.IsEqual(ListItem.Icon,DefaultVCD.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVCD.png)">infinity_system/disc.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonWeather.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonWeather.png)">infinity_system/weather.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultIconError.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultIconError.png)">infinity_system/error.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultIconWarning.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultIconWarning.png)">infinity_system/warning.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultIconInfo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultIconInfo.png) | String.IsEqual(ListItem.Icon,DefaultAddonInfoLibrary.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonInfoLibrary.png) | String.IsEqual(ListItem.Icon,DefaultAddonInfoProvider.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonInfoProvider.png)">infinity_ui/icons/info.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultFolderBack.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFolderBack.png)">infinity_ui/icons/back.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddon.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddon.png) | String.IsEqual(ListItem.Icon,DefaultAddonsInstalled.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsInstalled.png) | String.IsEqual(ListItem.Icon,DefaultAddonProgram.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonProgram.png) | String.IsEqual(ListItem.Icon,DefaultProgram.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultProgram.png) | String.IsEqual(ListItem.Icon,DefaultScript.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultScript.png) | String.IsEqual(ListItem.Icon,DefaultAddonHelper.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonHelper.png) | String.IsEqual(ListItem.Icon,DefaultAddonService.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonService.png)">infinity_ui/icons/addons.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultMovies.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMovies.png) | String.IsEqual(ListItem.Icon,DefaultMovieTitle.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMovieTitle.png) | String.IsEqual(ListItem.Icon,DefaultVideo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVideo.png) | String.IsEqual(ListItem.Icon,DefaultVideoCover.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVideoCover.png) | String.IsEqual(ListItem.Icon,DefaultAddonVideo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVideo.png) | String.IsEqual(ListItem.Icon,DefaultAddonMovieInfo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonMovieInfo.png) | String.IsEqual(ListItem.Icon,DefaultRecentlyAddedMovies.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRecentlyAddedMovies.png)">infinity_ui/icons/movie.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultTVShows.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultTVShows.png) | String.IsEqual(ListItem.Icon,DefaultTVShowTitle.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultTVShowTitle.png) | String.IsEqual(ListItem.Icon,DefaultAddonTvInfo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonTvInfo.png) | String.IsEqual(ListItem.Icon,DefaultAddonPVRClient.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonPVRClient.png) | String.IsEqual(ListItem.Icon,DefaultRecentlyAddedEpisodes.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRecentlyAddedEpisodes.png) | String.IsEqual(ListItem.Icon,DefaultInProgressShows.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultInProgressShows.png)">infinity_ui/icons/tv.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAudio.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAudio.png) | String.IsEqual(ListItem.Icon,DefaultAlbumCover.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAlbumCover.png) | String.IsEqual(ListItem.Icon,DefaultAddonMusic.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonMusic.png) | String.IsEqual(ListItem.Icon,DefaultMusicAlbums.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicAlbums.png) | String.IsEqual(ListItem.Icon,DefaultMusicSongs.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicSongs.png) | String.IsEqual(ListItem.Icon,DefaultMusicVideos.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicVideos.png) | String.IsEqual(ListItem.Icon,DefaultAddonLyrics.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonLyrics.png) | String.IsEqual(ListItem.Icon,DefaultAddonAudioDecoder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonAudioDecoder.png) | String.IsEqual(ListItem.Icon,DefaultAddonAudioEncoder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonAudioEncoder.png)">infinity_ui/icons/music.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultPlaylist.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultPlaylist.png) | String.IsEqual(ListItem.Icon,DefaultMusicPlaylists.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicPlaylists.png) | String.IsEqual(ListItem.Icon,DefaultVideoPlaylists.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVideoPlaylists.png)">infinity_ui/icons/playlist.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonSubtitles.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonSubtitles.png)">infinity_ui/icons/subtitles.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonsSearch.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsSearch.png)">infinity_ui/icons/search.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonsRecentlyUpdated.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsRecentlyUpdated.png) | String.IsEqual(ListItem.Icon,DefaultAddonsUpdates.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsUpdates.png)">infinity_polish/refresh.png</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonSkin.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonSkin.png) | String.IsEqual(ListItem.Icon,DefaultAddonLookAndFeel.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonLookAndFeel.png) | String.IsEqual(ListItem.Icon,DefaultAddonScreensaver.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonScreensaver.png) | String.IsEqual(ListItem.Icon,DefaultAddonVisualization.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVisualization.png) | String.IsEqual(ListItem.Icon,DefaultAddonWebSkin.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonWebSkin.png)">infinity_ui/icons/settings.png</value>
+    <value>$INFO[ListItem.Icon]</value>
+  </variable>
+  <variable name="InfinityPolishIcon0Tint">
+    <value condition="String.IsEqual(ListItem.Icon,DefaultFolder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFolder.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultFile.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFile.png) | String.IsEqual(ListItem.Icon,DefaultAddonsZip.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsZip.png) | String.IsEqual(ListItem.Icon,DefaultAddonNone.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonNone.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultHardDisk.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultHardDisk.png) | String.IsEqual(ListItem.Icon,DefaultRemovableDisk.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRemovableDisk.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultNetwork.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultNetwork.png) | String.IsEqual(ListItem.Icon,DefaultAddonVfs.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVfs.png) | String.IsEqual(ListItem.Icon,DefaultAddonRepository.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonRepository.png) | String.IsEqual(ListItem.Icon,DefaultAddonsRepo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsRepo.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultPicture.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultPicture.png) | String.IsEqual(ListItem.Icon,DefaultAddonImages.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonImages.png) | String.IsEqual(ListItem.Icon,DefaultAddonPicture.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonPicture.png) | String.IsEqual(ListItem.Icon,DefaultAddonImageDecoder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonImageDecoder.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultUser.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultUser.png) | String.IsEqual(ListItem.Icon,DefaultActor.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultActor.png) | String.IsEqual(ListItem.Icon,DefaultDirector.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDirector.png) | String.IsEqual(ListItem.Icon,DefaultArtist.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultArtist.png) | String.IsEqual(ListItem.Icon,DefaultMusicArtists.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicArtists.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddSource.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddSource.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultGameAddons.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultGameAddons.png) | String.IsEqual(ListItem.Icon,DefaultAddonGame.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonGame.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultCDDA.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultCDDA.png) | String.IsEqual(ListItem.Icon,DefaultDVDEmpty.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDVDEmpty.png) | String.IsEqual(ListItem.Icon,DefaultDVDFull.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDVDFull.png) | String.IsEqual(ListItem.Icon,DefaultDVDRom.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultDVDRom.png) | String.IsEqual(ListItem.Icon,DefaultVCD.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVCD.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonWeather.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonWeather.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultIconError.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultIconError.png)">$VAR[InfinityLegacyDanger]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultIconWarning.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultIconWarning.png)">$VAR[InfinityPolishWarning]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultIconInfo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultIconInfo.png) | String.IsEqual(ListItem.Icon,DefaultAddonInfoLibrary.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonInfoLibrary.png) | String.IsEqual(ListItem.Icon,DefaultAddonInfoProvider.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonInfoProvider.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultFolderBack.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFolderBack.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddon.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddon.png) | String.IsEqual(ListItem.Icon,DefaultAddonsInstalled.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsInstalled.png) | String.IsEqual(ListItem.Icon,DefaultAddonProgram.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonProgram.png) | String.IsEqual(ListItem.Icon,DefaultProgram.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultProgram.png) | String.IsEqual(ListItem.Icon,DefaultScript.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultScript.png) | String.IsEqual(ListItem.Icon,DefaultAddonHelper.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonHelper.png) | String.IsEqual(ListItem.Icon,DefaultAddonService.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonService.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultMovies.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMovies.png) | String.IsEqual(ListItem.Icon,DefaultMovieTitle.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMovieTitle.png) | String.IsEqual(ListItem.Icon,DefaultVideo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVideo.png) | String.IsEqual(ListItem.Icon,DefaultVideoCover.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVideoCover.png) | String.IsEqual(ListItem.Icon,DefaultAddonVideo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVideo.png) | String.IsEqual(ListItem.Icon,DefaultAddonMovieInfo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonMovieInfo.png) | String.IsEqual(ListItem.Icon,DefaultRecentlyAddedMovies.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRecentlyAddedMovies.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultTVShows.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultTVShows.png) | String.IsEqual(ListItem.Icon,DefaultTVShowTitle.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultTVShowTitle.png) | String.IsEqual(ListItem.Icon,DefaultAddonTvInfo.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonTvInfo.png) | String.IsEqual(ListItem.Icon,DefaultAddonPVRClient.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonPVRClient.png) | String.IsEqual(ListItem.Icon,DefaultRecentlyAddedEpisodes.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRecentlyAddedEpisodes.png) | String.IsEqual(ListItem.Icon,DefaultInProgressShows.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultInProgressShows.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAudio.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAudio.png) | String.IsEqual(ListItem.Icon,DefaultAlbumCover.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAlbumCover.png) | String.IsEqual(ListItem.Icon,DefaultAddonMusic.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonMusic.png) | String.IsEqual(ListItem.Icon,DefaultMusicAlbums.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicAlbums.png) | String.IsEqual(ListItem.Icon,DefaultMusicSongs.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicSongs.png) | String.IsEqual(ListItem.Icon,DefaultMusicVideos.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicVideos.png) | String.IsEqual(ListItem.Icon,DefaultAddonLyrics.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonLyrics.png) | String.IsEqual(ListItem.Icon,DefaultAddonAudioDecoder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonAudioDecoder.png) | String.IsEqual(ListItem.Icon,DefaultAddonAudioEncoder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonAudioEncoder.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultPlaylist.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultPlaylist.png) | String.IsEqual(ListItem.Icon,DefaultMusicPlaylists.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultMusicPlaylists.png) | String.IsEqual(ListItem.Icon,DefaultVideoPlaylists.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultVideoPlaylists.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonSubtitles.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonSubtitles.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonsSearch.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsSearch.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonsRecentlyUpdated.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsRecentlyUpdated.png) | String.IsEqual(ListItem.Icon,DefaultAddonsUpdates.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsUpdates.png)">$VAR[InfinityLegacyAccent]</value>
+    <value condition="String.IsEqual(ListItem.Icon,DefaultAddonSkin.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonSkin.png) | String.IsEqual(ListItem.Icon,DefaultAddonLookAndFeel.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonLookAndFeel.png) | String.IsEqual(ListItem.Icon,DefaultAddonScreensaver.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonScreensaver.png) | String.IsEqual(ListItem.Icon,DefaultAddonVisualization.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVisualization.png) | String.IsEqual(ListItem.Icon,DefaultAddonWebSkin.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonWebSkin.png)">$VAR[InfinityLegacyAccent]</value>
+    <value>FFFFFFFF</value>
+  </variable>
+  <variable name="InfinityLegacyAccent">
+    <value condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema)">FFD8BA88</value>
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FF24A8FF</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FF006DCB</value>
+    <value>FF24A8FF</value>
+  </variable>
+  <variable name="InfinityLegacyDanger">
+    <value condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema)">FFFF9A8E</value>
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FFFF7B73</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FFBA261D</value>
+    <value>FFFF7B73</value>
+  </variable>
+  <variable name="InfinityPolishWarning">
+    <value condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema)">FFD8BA88</value>
+    <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FFF7C66F</value>
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">FF8A4E00</value>
+    <value>FFF2BC68</value>
+  </variable>
+  <variable name="InfinityReferenceSeparator">
+    <value condition="[String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)]]">4862798B</value>
+    <value>486E8596</value>
+  </variable>
+  <variable name="InfinityWatched224Title">
+    <value condition="[String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,episode)] + [String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true) | [!String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),false) + [Integer.IsGreater(ListItem.PlayCount,0) | String.IsEqual(ListItem.Overlay,OverlayWatched.png)]]]">$VAR[InfinityDiggzSecondaryText]</value>
+    <value>$VAR[InfinityDiggzPrimaryText]</value>
+  </variable>
+</includes>

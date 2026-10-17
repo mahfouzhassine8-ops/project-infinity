@@ -180,6 +180,15 @@ def build(parent_zip, work, output):
                 scope = after.find("include[@name='" + name + "']")
                 if scope is not None:
                     badges += add_badges(scope, 24, {"$VAR[InfinityPolishIcon0]", "infinity_ui/icons/addons.png"})
+                    # Older wide-profile focused rows inherited white text.
+                    # Their Light focus wash needs the existing theme palette.
+                    for layout in scope.iter("focusedlayout"):
+                        for label in layout.findall(".//control[@type='label']"):
+                            if label.find("textcolor") is None:
+                                if label.findtext("label") == "$INFO[ListItem.Label]":
+                                    put(label, "textcolor", "$VAR[InfinityDiggzPrimaryText]")
+                                elif label.findtext("label") == "$INFO[ListItem.Label2]":
+                                    put(label, "textcolor", "$VAR[InfinityDiggzSecondaryText]")
                     modified = True
         elif path.name == "Includes_InfinityHomeUnified.xml":
             for include in after.findall("include"):

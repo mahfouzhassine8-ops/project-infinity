@@ -12,7 +12,7 @@ SIGNING = '6f585cb5e02fd1c93dfb548dd758a5e4dad7b764'
 CERT = 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 BASE_APK = 'bcdcbed5aeaed0bf30e6e590d9ceda7c0177d780b12e98773fa9503beb793286'
 BASE_SKIN = '557003afc83a2661fec6ccef921979e264ff28e93595fb633340c618ab69bd56'
-SKIN = '247c6418a214dd4a354186187f3a8da01fd96b87653ef9af1fc99507d830d286'
+SKIN = 'e23d5d08c7737f317c2d55ae3f27e8746a019afd02dc20f6fbc73dc48c0c994e'
 RECOVERY = 'dba95ad2a74bc220aeb2d6b045ef303ec2b83ec819ae72a09f3d470c9acf4ae8'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 REPO = 'https://github.com/mahfouzhassine8-ops/project-infinity'
@@ -71,6 +71,7 @@ def build(delivery, evidence, baseline_skin, handoff, out):
     assert native_row['apk_sha256'] == candidate['sha256'] and native_row['passed'] is True
     assert native_row['native_row_result']['passed'] and len(native_row['native_row_result']['tests']) == 14
     assert native_row['native_row_result']['helper_pipeline_verified']
+    assert native_row['native_row_result']['derived_index_recovery_without_data_write']
     assert native_row['integrated_close']['passed'] and native_row['helper_state_retained_after_safe_close_reopen']
     renderer = {}
     for version in ('before', 'after'):

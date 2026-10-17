@@ -24,6 +24,7 @@ def run():
     signature = None
     verified = {}
     next_check = 0
+    next_publish = 0
     while not monitor.abortRequested():
         if xbmc.getInfoLabel("Window(Home).Property(Infinity.ResumeHub.BridgeVersion)") == "1":
             try:
@@ -47,14 +48,18 @@ def run():
                 file = Path(xbmcvfs.translatePath(addon.getAddonInfo("profile"))) / "continue-watching.json"
                 stat = file.stat()
                 current = (str(profile), stat.st_mtime_ns, stat.st_size, stat.st_ino)
-                if current != signature or not home.getProperty(PROPERTY):
+                refresh_due = time.monotonic() >= next_publish
+                if current != signature or not home.getProperty(PROPERTY) or refresh_due:
                     if stat.st_size > 8 * 1024 * 1024:
                         raise ValueError("Progress file exceeds presentation read limit")
                     data = json.loads(file.read_text(encoding="utf-8"))
                     value = snapshot(data, profile, verified)
-                    if home.getProperty(PROPERTY) != value:
+                    changed = home.getProperty(PROPERTY) != value
+                    if changed:
                         home.setProperty(PROPERTY, value)
+                    if changed or refresh_due:
                         xbmc.executebuiltin("InfinityResumeHubUpdate()")
+                        next_publish = time.monotonic() + 30.0
                     signature = current
                     names = ["Umbrella" if name.endswith("umbrella") else "POV" for name in sorted(verified)]
                     status(home, "Local badges ready; episode adapters: " + ", ".join(names) if names else

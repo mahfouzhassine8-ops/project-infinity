@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "baseline_zip_sha256": "557003afc83a2661fec6ccef921979e264ff28e93595fb633340c618ab69bd56",
+  "profile": "16x9",
+  "scope": "Extracted production provider-row controls, source palette variables, default fonts and assets in a disposable Kodi test skin; not full-skin or Fold acceptance",
+  "native_index_verified_by_this_fixture": false,
+  "watched_condition": "[String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,episode)] + [String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true) | [!String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),false) + [Integer.IsGreater(ListItem.PlayCount,0) | String.IsEqual(ListItem.Overlay,OverlayWatched.png)]]]",
+  "sources": {
+    "before": {
+      "View_50_List.xml": "23b50be9025388241eaadf5ce293358f736504466bbf566a8284cf61e609e2ff",
+      "Font.xml": "1882e90832234c8e2adb2480c7dfb5fb5e7eff597d6c08ac9456081836c7731c",
+      "definitions": 19,
+      "assets": 31,
+      "fixture_sha256": "444dae7725e6760dbec28828f02d60814838fdab75f70c82c52d38ce523d67a9"
+    },
+    "after": {
+      "View_50_List.xml": "51ea2bece03782b63363ac911337d60a5dded32d87e19c697d0c131529072539",
+      "Font.xml": "1882e90832234c8e2adb2480c7dfb5fb5e7eff597d6c08ac9456081836c7731c",
+      "definitions": 21,
+      "assets": 32,
+      "fixture_sha256": "4f0aadd44ff3fe3a1f222768e329c18e5dff5c40f9f53601d25824f9d4ada46a"
+    }
+  }
+}

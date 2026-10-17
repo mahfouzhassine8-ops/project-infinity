@@ -100,8 +100,8 @@ class NativeRows(xbmcgui.WindowXMLDialog):
                 require(controller.apply(modules, cc_profile, selected, action), 'Existing checkpointed writer refused ' + action)
             control.reset(); control.addItem(row()); control.selectItem(0); self.setFocusId(50)
             monitor = xbmc.Monitor()
-            def await_state(expected):
-                for attempt in range(60):
+            def await_state(expected, attempts=60):
+                for attempt in range(attempts):
                     value = xbmc.getInfoLabel('Container(50).ListItem.Property(Infinity.ResumeHub.Watched)')
                     if value == expected: return
                     monitor.waitForAbort(.1)
@@ -109,6 +109,15 @@ class NativeRows(xbmcgui.WindowXMLDialog):
             await_state('true')
             require(controller.apply(modules, cc_profile, selected, 'mark-unwatched'), 'Unwatched writer action failed')
             await_state('false')
+            stored = (cc_profile / 'continue-watching.json').read_bytes()
+            payload = home.getProperty(PROP)
+            invalid = json.loads(payload); invalid['profile'] += '-cleared-profile-control'
+            home.setProperty(PROP, json.dumps(invalid))
+            xbmc.executebuiltin('InfinityResumeHubUpdate()', True)
+            home.setProperty(PROP, payload)
+            await_state('false', attempts=400)
+            require((cc_profile / 'continue-watching.json').read_bytes() == stored, 'Read-only republishing changed saved progress')
+            result['derived_index_recovery_without_data_write'] = True
             result['helper_pipeline_verified'] = True
             result['helper_pipeline_key'] = selected['key']
             result['passed'] = True

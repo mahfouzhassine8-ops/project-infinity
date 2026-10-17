@@ -22,6 +22,10 @@ fixture = profile / "watched-render-fixture"
 with zipfile.ZipFile(HERE / "fixtures/skin-row-projection.zip") as archive:
     assert archive.testzip() is None
     archive.extractall(fixture)
+overlay = HERE / "fixtures/after-InfinityFixture.xml"
+if overlay.is_file():
+    shutil.copyfile(overlay, fixture / "after/InfinityFixture.xml")
+    shutil.copyfile(HERE / "fixtures/SOURCE-IDENTITY.json", fixture / "SOURCE-IDENTITY.json")
 estuary = Path("/usr/share/kodi/addons/skin.estuary")
 if not estuary.is_dir():
     raise RuntimeError("Native Estuary fixture base unavailable")
