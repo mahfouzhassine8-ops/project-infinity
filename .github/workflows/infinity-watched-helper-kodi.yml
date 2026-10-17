@@ -68,7 +68,7 @@ jobs:
             if ! kill -0 "$kodi_wrapper" 2>/dev/null; then break; fi
             sleep 1
           done
-          if kill -0 "$kodi_wrapper" 2>/dev/null; then echo 'Bootstrap did not quit normally'; exit 1; fi
+          if kill -0 "$kodi_wrapper" 2>/dev/null; then cat "$HOME/.kodi/userdata/watched-bootstrap-result.json" || true; echo 'Bootstrap did not quit normally'; exit 1; fi
           python3 - <<'PY'
           import json,pathlib,xml.etree.ElementTree as ET
           profile=pathlib.Path.home()/'.kodi/userdata'
@@ -91,7 +91,7 @@ jobs:
         if: always()
         run: |
           mkdir -p watched-evidence
-          for file in "$HOME/.kodi/userdata/watched-runtime-result.json" "$HOME/.kodi/temp/kodi.log" /tmp/watched-kodi.log /tmp/watched-xvfb.log; do
+          for file in "$HOME/.kodi/userdata/watched-runtime-result.json" "$HOME/.kodi/userdata/watched-bootstrap-result.json" "$HOME/.kodi/userdata/guisettings.xml" "$HOME/.kodi/temp/kodi.log" /tmp/watched-kodi.log /tmp/watched-xvfb.log; do
             if [ -f "$file" ]; then cp "$file" watched-evidence/; fi
           done
           if [ -d "$HOME/.kodi/userdata/watched-render-evidence" ]; then cp -R "$HOME/.kodi/userdata/watched-render-evidence" watched-evidence/; fi

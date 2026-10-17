@@ -127,7 +127,7 @@ def build(parent_zip, work, output):
     tints = set()
     sources = []
     for path in root.rglob("*.xml"):
-        if path.name.startswith("View_") or path.name == "Includes_CinemaBrowse.xml":
+        if path.name.startswith("View_") or path.name in ("Includes_CinemaBrowse.xml", "Includes_InfinityLegacy.xml"):
             tree = ET.parse(path).getroot()
             for image in tree.findall(".//control[@type='image']"):
                 texture = image.find("texture")
@@ -190,7 +190,7 @@ def build(parent_zip, work, output):
             if variable is not None:
                 negative = ET.Element("value", condition=FALSE); negative.text = "false"
                 variable.insert(0, negative); modified = True
-        if path.name.startswith("View_") or path.name == "Includes_CinemaBrowse.xml":
+        if path.name.startswith("View_") or path.name in ("Includes_CinemaBrowse.xml", "Includes_InfinityLegacy.xml"):
             for image in after.findall(".//control[@type='image']"):
                 texture = image.find("texture")
                 if texture is not None and texture.text in OVERLAYS:
@@ -203,7 +203,7 @@ def build(parent_zip, work, output):
                     if path.name == "Includes_CinemaBrowse.xml" and image.findtext("visible") == "!ListItem.IsFolder":
                         image.find("visible").text = "!ListItem.IsFolder | [" + WATCHED + "]"
                         modified = True
-            if path.name == "Includes_CinemaBrowse.xml":
+            if path.name in ("Includes_CinemaBrowse.xml", "Includes_InfinityLegacy.xml"):
                 for label in after.findall(".//control[@type='label']"):
                     if label.findtext("label") == "›" and label.findtext("visible") == "ListItem.IsFolder":
                         label.find("visible").text = "ListItem.IsFolder + ![" + WATCHED + "]"; modified = True

@@ -8,11 +8,16 @@ import xbmcvfs
 profile = Path(xbmcvfs.translatePath('special://profile/'))
 result = dict(passed=False)
 try:
+    result['stage'] = 'begin'
+    (profile / 'watched-bootstrap-result.json').write_text(json.dumps(result))
     for name in ('script.infinity.commandcenter', 'skin.infinity.rowverify.before', 'skin.infinity.rowverify.after'):
+        result['stage'] = 'enable:' + name
+        (profile / 'watched-bootstrap-result.json').write_text(json.dumps(result))
         response = json.loads(xbmc.executeJSONRPC(json.dumps(dict(jsonrpc='2.0', id=1,
             method='Addons.SetAddonEnabled', params=dict(addonid=name, enabled=True)))))
         if response.get('result') != 'OK': raise RuntimeError(str(response))
     result['passed'] = True
+    result['stage'] = 'normal-quit-request'
 except Exception:
     result['failure'] = traceback.format_exc()
 finally:

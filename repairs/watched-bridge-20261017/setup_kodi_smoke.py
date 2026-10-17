@@ -60,3 +60,5 @@ root = ET.Element("keymap"); keyboard = ET.SubElement(ET.SubElement(root, "globa
 ET.SubElement(keyboard, "f11").text = "RunScript(" + str(HERE / "bootstrap_kodi_smoke.py") + ")"
 ET.SubElement(keyboard, "f12").text = "RunScript(" + str(HERE / "kodi_smoke.py") + ")"
 ET.ElementTree(root).write(keymaps / "watched-verification.xml", encoding="unicode")
+
+(profile / "advancedsettings.xml").write_text('<advancedsettings><loglevel hide="true">1</loglevel></advancedsettings>')
