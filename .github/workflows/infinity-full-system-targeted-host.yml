@@ -23,6 +23,8 @@ jobs:
             repairs/full-system-20261017/test_installer_stage_durability.cpp \
             -o /tmp/infinity-stage-durability-test
           /tmp/infinity-stage-durability-test
+      - name: Verify FULL skin/Rails package rejection and no Kodi substitution
+        run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_assets.py' -v
       - name: Verify strict Rotate restoration source and invariants
         run: |
           python3 repairs/full-system-20261017/test_player_rotate_source.py
