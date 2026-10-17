@@ -28,40 +28,6 @@ def rpc(method, params):
     return value.get("result")
 
 
-def change_skin(addon_id):
-    xbmc.executebuiltin("Dialog.Close(all,true)", True)
-    rpc("Addons.SetAddonEnabled", dict(addonid=addon_id, enabled=True))
-    require(rpc("Addons.GetAddonDetails", dict(addonid=addon_id, properties=["enabled"]))["addon"]["enabled"] is True, "Fixture skin remains disabled")
-    errors = []
-    def request():
-        try:
-            require(rpc("Settings.SetSettingValue", dict(setting="lookandfeel.skin", value=addon_id)) is True, "Skin setting was refused")
-            xbmc.executebuiltin("ReloadSkin()", True)
-        except Exception: errors.append(traceback.format_exc())
-    if xbmcgui.getCurrentWindowDialogId() == 10100:
-        xbmc.executebuiltin("SendClick(10100,11)", True)
-        xbmc.sleep(500)
-    thread = threading.Thread(target=request); thread.start()
-    monitor = xbmc.Monitor()
-    for attempt in range(120):
-        if xbmcgui.getCurrentWindowDialogId() == 10100:
-            xbmc.executebuiltin("SendClick(10100,11)", True)
-        elif xbmcgui.getCurrentWindowDialogId() == 10140:
-            xbmc.executebuiltin("Dialog.Close(addonsettings,true)", True)
-        if xbmc.getSkinDir() == addon_id and not thread.is_alive() and xbmcgui.getCurrentWindowDialogId() != 10100:
-            try:
-                xbmcgui.Window(10000).getControl(50)
-                break
-            except RuntimeError:
-                pass
-        monitor.waitForAbort(0.25)
-    thread.join(timeout=2)
-    require(not thread.is_alive() and not errors and xbmc.getSkinDir() == addon_id, "Fixture skin did not activate: " + str(errors))
-    xbmcgui.Window(10000).getControl(50)  # Setting text alone is not a loaded fixture.
-    xbmc.executebuiltin("ActivateWindow(Home)", True)
-    xbmc.sleep(800)
-
-
 def row(label, watched=None, playcount=0, icon="DefaultVideo.png", kind="movie"):
     item = xbmcgui.ListItem(label=label, label2="Offline UI fixture", path="plugin://plugin.video.infinityfixture/?id=123")
     item.setInfo("video", dict(mediatype=kind, title=label, playcount=playcount, season=1, episode=2))
@@ -102,8 +68,12 @@ try:
     source = json.loads((profile / "watched-render-fixture/SOURCE-IDENTITY.json").read_text())
     images = []
     checks = []
-    for version in ("before", "after"):
-        change_skin("skin.infinity.rowverify." + version)
+    version = (profile / "watched-verification-version.txt").read_text().strip()
+    require(version in ("before", "after"), "Unknown source fixture")
+    for version in (version,):
+        require(xbmc.getSkinDir() == "skin.infinity.rowverify." + version, "Startup did not select the requested fixture skin")
+        xbmc.executebuiltin("Dialog.Close(all,true)", True)
+        xbmcgui.Window(10000).getControl(50)
         for theme in ("light", "dark", "OLED"):
             home = xbmcgui.Window(10000)
             home.setProperty("Infinity.SystemTheme", theme)
@@ -141,3 +111,4 @@ except Exception:
     xbmc.executebuiltin("TakeScreenshot(" + str(capture / "failure.png") + ",sync)", True)
 finally:
     output.write_text(json.dumps(result, indent=2) + "\n")
+    xbmc.executebuiltin("Quit()")

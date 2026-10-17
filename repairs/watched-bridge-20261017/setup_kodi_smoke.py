@@ -57,5 +57,6 @@ for version in ("before", "after"):
 </controls></window>''')
 keymaps = profile / "keymaps"; keymaps.mkdir(exist_ok=True)
 root = ET.Element("keymap"); keyboard = ET.SubElement(ET.SubElement(root, "global"), "keyboard")
+ET.SubElement(keyboard, "f11").text = "RunScript(" + str(HERE / "bootstrap_kodi_smoke.py") + ")"
 ET.SubElement(keyboard, "f12").text = "RunScript(" + str(HERE / "kodi_smoke.py") + ")"
 ET.ElementTree(root).write(keymaps / "watched-verification.xml", encoding="unicode")

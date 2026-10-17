@@ -10,6 +10,7 @@ on:
       - 'repairs/watched-bridge-20261017/test_contracts.py'
       - 'repairs/watched-bridge-20261017/setup_kodi_smoke.py'
       - 'repairs/watched-bridge-20261017/kodi_smoke.py'
+      - 'repairs/watched-bridge-20261017/bootstrap_kodi_smoke.py'
       - 'repairs/watched-bridge-20261017/fixtures/**'
   workflow_dispatch:
 permissions: {contents: read}
@@ -17,6 +18,10 @@ jobs:
   watched:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [before, after]
     steps:
       - uses: actions/checkout@v7
         with: {persist-credentials: false}
@@ -44,14 +49,38 @@ jobs:
           export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1
           pulseaudio --start --exit-idle-time=-1
           pactl load-module module-null-sink sink_name=watched_ci
-          kodi --standalone > /tmp/watched-kodi.log 2>&1 &
-          for attempt in $(seq 1 60); do
-            window=$(xdotool search --name '^Kodi' 2>/dev/null | head -1 || true)
-            if [ -n "$window" ]; then break; fi
+          function launch_fixture() {
+            kodi --standalone > /tmp/watched-kodi.log 2>&1 &
+            kodi_wrapper=$!
+            window=""
+            for attempt in $(seq 1 60); do
+              window=$(xdotool search --name '^Kodi' 2>/dev/null | head -1 || true)
+              if [ -n "$window" ]; then break; fi
+              sleep 1
+            done
+            test -n "$window"
+            sleep 10
+            xdotool windowfocus --sync "$window"
+          }
+          launch_fixture
+          xdotool key --window "$window" F11
+          for attempt in $(seq 1 90); do
+            if ! kill -0 "$kodi_wrapper" 2>/dev/null; then break; fi
             sleep 1
           done
-          sleep 10
-          xdotool windowfocus --sync "$window"
+          if kill -0 "$kodi_wrapper" 2>/dev/null; then echo 'Bootstrap did not quit normally'; exit 1; fi
+          python3 - <<'PY'
+          import json,pathlib,xml.etree.ElementTree as ET
+          profile=pathlib.Path.home()/'.kodi/userdata'
+          r=json.loads((profile/'watched-bootstrap-result.json').read_text());assert r['passed'],r
+          path=profile/'guisettings.xml';tree=ET.parse(path);root=tree.getroot()
+          node=root.find("setting[@id='lookandfeel.skin']")
+          if node is None:node=ET.SubElement(root,'setting',id='lookandfeel.skin')
+          node.attrib.pop('default',None);node.text='skin.infinity.rowverify.${{ matrix.version }}'
+          tree.write(path,encoding='utf-8',xml_declaration=True)
+          (profile/'watched-verification-version.txt').write_text('${{ matrix.version }}')
+          PY
+          launch_fixture
           xdotool key --window "$window" F12
           for attempt in $(seq 1 240); do
             if [ -f "$HOME/.kodi/userdata/watched-runtime-result.json" ]; then break; fi
@@ -69,7 +98,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-Watched-Helper-Real-Kodi-and-Renderer
+          name: Infinity-Watched-Helper-Real-Kodi-and-Renderer-${{ matrix.version }}
           path: watched-evidence/
           retention-days: 90
           if-no-files-found: error
