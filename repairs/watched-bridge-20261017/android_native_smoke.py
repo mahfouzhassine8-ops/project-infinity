@@ -39,14 +39,14 @@ def main(args):
         uid = probe.shell('stat', '-c', '%u', probe.PRIVATE).strip(); assert uid.isdigit(); probe.APP_UID = uid
         prefs = args.out / 'test-preference.xml'; prefs.write_text('<map><string name="default">infinity</string></map>\n')
         probe.adb('push', prefs, probe.PRIVATE + '/shared_prefs/infinity_experience.xml')
-        # This is an offline helper/index fixture, not an add-on update test.
-        # Prevent unrequested repository installs from changing its inputs.
-        # The separate four original shutdown probes retain their settings.
-        settings = args.out / 'offline-fixture-guisettings.xml'
-        settings.write_text('<settings version="2"><setting id="general.addonupdates">2</setting></settings>\n')
-        probe.shell('mkdir', '-p', probe.PROFILE)
-        probe.adb('push', settings, probe.PROFILE + '/guisettings.xml')
-        report['fixture_automatic_addon_updates'] = False
+        # Keep the APK's normal first-launch profile creation. Restrict only
+        # this disposable app UID's external traffic; loopback JSON-RPC stays
+        # available. The original four probes retain their network/settings.
+        for command, loopback in (('iptables', '127.0.0.0/8'), ('ip6tables', '::1/128')):
+            rule = ['OUTPUT', '-m', 'owner', '--uid-owner', uid, '!', '-d', loopback, '-j', 'REJECT']
+            probe.shell(command, '--wait', '5', '-I', *rule)
+            probe.shell(command, '--wait', '5', '-C', *rule)
+        report['fixture_network_isolated'] = True
         report['addon_update_shutdown_verified'] = False
         fixture = args.out / 'first-party-fixture'; fixture.mkdir()
         manifest = {}
@@ -75,7 +75,9 @@ def main(args):
         report['first_party'] = probe.enable_first_party(args.out)
         report['owner'] = probe.wait_ready()
         stage('runtime-ready')
+        assert probe.rpc('Settings.SetSettingValue', dict(setting='general.addonupdates', value=2)) is True
         assert probe.rpc('Settings.GetSettingValue', dict(setting='general.addonupdates')) == {'value': 2}, 'Offline fixture update policy was not loaded'
+        report['fixture_automatic_addon_updates'] = False
         assert probe.rpc('Addons.SetAddonEnabled', dict(addonid=ADDON, enabled=True)) == 'OK'
         assert probe.rpc('Addons.ExecuteAddon', dict(addonid=ADDON, wait=False)) == 'OK'
         deadline = time.monotonic() + 120
