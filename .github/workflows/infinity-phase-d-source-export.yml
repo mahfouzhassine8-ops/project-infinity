@@ -19,6 +19,7 @@ jobs:
           test -s repairs/skin-phase-d-225/build.py
           test -s repairs/skin-phase-d-225/test_skin.py
           test -s repairs/e2e-mobile-2103303/ambient_lifecycle.py
+          test -s repairs/e2e-mobile-2103303/native_controls.py
           git rev-parse HEAD > SOURCE-COMMIT.txt
       - uses: actions/upload-artifact@v7
         with:
@@ -28,4 +29,5 @@ jobs:
             repairs/skin-phase-d-225/build.py
             repairs/skin-phase-d-225/test_skin.py
             repairs/e2e-mobile-2103303/ambient_lifecycle.py
+            repairs/e2e-mobile-2103303/native_controls.py
           retention-days: 7
