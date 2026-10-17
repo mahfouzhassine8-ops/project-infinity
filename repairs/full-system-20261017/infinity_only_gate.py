@@ -112,7 +112,8 @@ def main():
     phase.add_argument("--report", type=Path, required=True)
     phase.add_argument("--expected-sha", required=True)
     phase.add_argument("--case", choices=CASES, required=True)
-    parser.add_argument("--out", type=Path)
+    apk.add_argument("--out", type=Path)
+    phase.add_argument("--out", type=Path)
     args = parser.parse_args()
     result = (check_apk(args.apk, args.expected_sha, args.version_code, args.aapt, args.apksigner)
               if args.mode == "apk"
