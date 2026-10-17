@@ -81,7 +81,7 @@ def main(a):
      progress=probe.read_json(probe.PROFILE+'/phase-d-results/progress.json')
      observation={'viewport':name,'seconds_remaining':round(deadline-time.monotonic()),
                   'progress_screens':len(progress.get('screens',[])) if isinstance(progress,dict) else None,
-                  'current_window':probe.rpc('GUI.GetProperties',{'properties':['currentwindow']}) if probe.rpc else None}
+                  'current_window':'not queried during possible GUI deadlock'}
      (a.out/'last-renderer-observation.json').write_text(json.dumps(observation,indent=2))
      print('Renderer progress:',json.dumps(observation),flush=True)
     time.sleep(1)
