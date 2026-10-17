@@ -195,25 +195,42 @@ else:
    report['fixture_config_permissions']=config_stat
    probe.shell('rm','-rf',probe.PROFILE+'/phase-d-results') # Disposable test output only.
    assert probe.rpc('Addons.ExecuteAddon',{'addonid':ADDON,'params':['run'],'wait':False})=='OK'
-   deadline=time.monotonic()+300
+   # Real signed ARM64 Infinity translates on an x86 emulator. Forty-two
+   # screenshots plus sixty dialog/focus cycles can legitimately take more
+   # than five minutes. Give progressing work a bounded 8-minute window;
+   # independently reject a GUI that makes no progress for 100 seconds.
+   deadline=time.monotonic()+480
    last_observation=0
+   last_marker=None
+   last_advance=time.monotonic()
+   observation={}
    while time.monotonic()<deadline:
     r=probe.read_json(probe.PROFILE+'/phase-d-results/result.json')
     if r:break
-    # Fail with a concrete reason rather than waiting five minutes if Kodi
-    # rejected the test addon or the skin reverted to stock Estuary.
-    if time.monotonic()-last_observation>=15:
-     last_observation=time.monotonic()
+    if time.monotonic()-last_observation>=12:
+     now=time.monotonic()
+     last_observation=now
      progress=probe.read_json(probe.PROFILE+'/phase-d-results/progress.json')
-     observation={'viewport':name,'seconds_remaining':round(deadline-time.monotonic()),
+     live=probe.read_json(probe.PROFILE+'/phase-d-results/phase-state.json')
+     marker=(live.get('phase'),live.get('screens'),live.get('cycle'))
+     if marker!=(None,None,None) and marker!=last_marker:
+      last_marker=marker
+      last_advance=now
+     observation={'viewport':name,'seconds_remaining':round(deadline-now),
                   'progress_screens':len(progress.get('screens',[])) if isinstance(progress,dict) else None,
+                  'live_phase':live.get('phase'),'live_cycle':live.get('cycle'),
+                  'seconds_without_progress':round(now-last_advance),
                   'current_window':'not queried during possible GUI deadlock'}
+     report['last_renderer_observation']=observation
      (a.out/'last-renderer-observation.json').write_text(json.dumps(observation,indent=2))
      print('Renderer progress:',json.dumps(observation),flush=True)
+     if now-last_advance>100:
+      probe.adb('pull',probe.PROFILE+'/phase-d-results',a.out/('timeout-progress-'+name),check=False)
+      raise RuntimeError('Real Infinity GUI stopped advancing: '+json.dumps(observation))
     time.sleep(1)
    else:
-    probe.adb('pull',probe.PROFILE+'/phase-d-results',a.out/'timeout-progress-'+name,check=False)
-    raise RuntimeError('Renderer timed out: '+name+'; retained progress and last-renderer-observation.json')
+    probe.adb('pull',probe.PROFILE+'/phase-d-results',a.out/('timeout-progress-'+name),check=False)
+    raise RuntimeError('Renderer timed out after 480 seconds: '+name+'; '+json.dumps(observation))
    target=a.out/name;target.mkdir();probe.adb('pull',probe.PROFILE+'/phase-d-results',target)
    report['viewports'].append({'name':name,'result':r});assert r.get('passed'),r.get('failure')
   report['passed']=True;stage('actual-native-renderer-completed')
