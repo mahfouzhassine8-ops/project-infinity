@@ -32,7 +32,9 @@ def change_skin(addon_id):
     rpc("Addons.SetAddonEnabled", dict(addonid=addon_id, enabled=True))
     errors = []
     def request():
-        try: rpc("Settings.SetSettingValue", dict(setting="lookandfeel.skin", value=addon_id))
+        try:
+            require(rpc("Settings.SetSettingValue", dict(setting="lookandfeel.skin", value=addon_id)) is True, "Skin setting was refused")
+            xbmc.executebuiltin("ReloadSkin")
         except Exception: errors.append(traceback.format_exc())
     thread = threading.Thread(target=request); thread.start()
     monitor = xbmc.Monitor()
@@ -40,10 +42,15 @@ def change_skin(addon_id):
         if xbmcgui.getCurrentWindowDialogId() == 10100:
             xbmc.executebuiltin("SendClick(11)")
         if xbmc.getSkinDir() == addon_id and not thread.is_alive() and xbmcgui.getCurrentWindowDialogId() != 10100:
-            break
+            try:
+                xbmcgui.Window(10000).getControl(50)
+                break
+            except RuntimeError:
+                pass
         monitor.waitForAbort(0.25)
     thread.join(timeout=2)
     require(not thread.is_alive() and not errors and xbmc.getSkinDir() == addon_id, "Fixture skin did not activate: " + str(errors))
+    xbmcgui.Window(10000).getControl(50)  # Setting text alone is not a loaded fixture.
     xbmc.sleep(800)
 
 
