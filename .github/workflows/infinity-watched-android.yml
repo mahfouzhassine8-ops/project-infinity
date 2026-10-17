@@ -1,0 +1,128 @@
+name: Infinity | Watched and touch Android preservation
+on:
+  push:
+    branches: [work/infinity-consolidated-anr-first-20261017]
+    paths: ['.github/workflows/infinity-watched-android.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-watched-android, cancel-in-progress: false}
+jobs:
+  signed-evidence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    outputs:
+      apk-sha: ${{ steps.identity.outputs.apk_sha }}
+    steps:
+      - name: Wait for the exact signed candidate producer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYCHECK'
+          import json,os,time,urllib.request
+          deadline=time.monotonic()+6*3600
+          while time.monotonic()<deadline:
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/39004584047',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=40) as response:r=json.load(response)
+              assert r['head_sha']=='6f585cb5e02fd1c93dfb548dd758a5e4dad7b764','Packaging source changed'
+              if r['status']=='completed':
+                  assert r['conclusion']=='success','Signed candidate producer failed: '+str(r['conclusion'])
+                  break
+              time.sleep(20)
+          else:raise RuntimeError('Signed candidate did not complete within six hours')
+          PYCHECK
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Packaging-Evidence
+          github-token: ${{ github.token }}
+          path: signed-proof
+      - id: identity
+        run: |
+          python3 - <<'PYCHECK'
+          import json,os
+          from pathlib import Path
+          r=json.loads(Path('signed-proof/WATCHED-TOUCH-APK-PRESERVATION.json').read_text())
+          assert r['packaging_source_commit']=='6f585cb5e02fd1c93dfb548dd758a5e4dad7b764'
+          assert r['native_source_commit']=='093323fbc0ae87cbe2fa2a21abab0c357fdaf754'
+          a=next(x for x in r['artifacts'] if not x['rollback'])
+          assert a['signer_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('apk_sha='+a['sha256']+'\n')
+          PYCHECK
+  android-preservation:
+    name: Android preserved shutdown - ${{ matrix.case }}
+    needs: signed-evidence
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [fresh, cold, core-initialized, loaded]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Experimental-APK-and-Rollback
+          github-token: ${{ github.token }}
+          path: fold-delivery
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Verify immutable candidate and unchanged original probes
+        env:
+          EXPECTED_APK_SHA256: ${{ needs.signed-evidence.outputs.apk-sha }}
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          r=json.loads(Path('fold-delivery/WATCHED-TOUCH-APK-PRESERVATION.json').read_text())
+          a=next(a for a in r['artifacts'] if not a['rollback'])
+          assert a['sha256']==os.environ['EXPECTED_APK_SHA256']
+          assert hashlib.sha256((Path('fold-delivery')/a['file']).read_bytes()).hexdigest()==a['sha256']
+          paths=['repairs/android-checkpoint-shutdown/runtime-tests/'+n for n in ['run_internal_observer_stage_case.py','essential_android_probe.py','observer_upgrade_android_probe.py']]
+          subprocess.run(['git','diff','--exit-code','9dea86a7bf1896993e33ab885aa678a25eddaa0f','--']+paths,check=True)
+          PY
+      - name: Prepare the original disposable Android runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out fold-emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Execute unchanged original phase probe with the signed candidate
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-fold-deadlock-test
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py --case ${{ matrix.case }} --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --apk fold-delivery/Infinity-2103382-Watched-Touch-TEST3.apk --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons --out fold-android-evidence --expected-sha256 ${{ needs.signed-evidence.outputs.apk-sha }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Watched-Touch-Android-${{ matrix.case }}
+          path: |
+            fold-android-evidence/
+            fold-emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
