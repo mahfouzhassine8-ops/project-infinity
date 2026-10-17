@@ -1,0 +1,145 @@
+name: Infinity | Signed APK Only - Android Evidence
+on:
+  push:
+    branches: [work/infinity-full-repair-20261017-gpt6]
+    paths:
+      - 'repairs/full-system-20261017/**'
+      - '.github/workflows/infinity-only-signed-apk.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-only-signed-apk
+  cancel-in-progress: false
+env:
+  # This is the SHA of the exact signed 2103382 TEST3 artifact, not a hash
+  # taken from the untrusted file being tested. Change only with new signed proof.
+  INFINITY_EXPECTED_SHA: '6e28bfea7cdb5e497ee21601a714e738db7a57edc3c5c0d29a9c19d461031854'
+  INFINITY_APK: signed/Infinity-2103382-Watched-Touch-TEST3.apk
+jobs:
+  contract-regressions:
+    name: Infinity-only contract (NOT APK acceptance)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Reject stock Kodi, unsigned or false-positive receipts
+        run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_only_gate.py' -v
+
+  exact-signed-infinity:
+    name: Verify actual permanent-signed Infinity APK and ARM64 engine
+    needs: contract-regressions
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Experimental-APK-and-Rollback
+          github-token: ${{ github.token }}
+          path: signed
+      - name: Prove APK SHA, package, signer, version, native ELF
+        run: |
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk "$INFINITY_APK" \
+            --expected-sha "$INFINITY_EXPECTED_SHA" \
+            --version-code 2103382 \
+            --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" \
+            --out infinity-proof/SIGNED-APPLICATION-IDENTITY.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Only-Signed-Identity
+          path: infinity-proof/
+          retention-days: 90
+          if-no-files-found: warn
+
+  original-infinity-android:
+    name: Signed Infinity Android - ${{ matrix.case }}
+    needs: exact-signed-infinity
+    runs-on: ubuntu-22.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [fresh, cold, core-initialized, loaded]
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Experimental-APK-and-Rollback
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Reverify identical APK and unmodified original Android probes
+        run: |
+          sha256sum "$INFINITY_APK"
+          echo "$INFINITY_EXPECTED_SHA  $INFINITY_APK" | sha256sum -c
+          git diff --exit-code 9dea86a7bf1896993e33ab885aa678a25eddaa0f -- \
+            repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py
+      - name: Prepare clean disposable ARM64-capable Android emulator
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out infinity-emulator
+          sudo chmod 666 /dev/kvm
+      - name: Execute actual signed Infinity APK - unchanged original process checks
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-real-app
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py --case ${{ matrix.case }} --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk --apk "$INFINITY_APK" --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons --out infinity-android --expected-sha256 "$INFINITY_EXPECTED_SHA"
+      - name: Reject host-only receipts; verify actual unchanged Android phase
+        run: |
+          python3 repairs/full-system-20261017/infinity_only_gate.py phase \
+            --report infinity-android/INTERNAL-CASE-IDENTITY.json \
+            --expected-sha "$INFINITY_EXPECTED_SHA" \
+            --case ${{ matrix.case }} \
+            --out infinity-android/INFINITY-ONLY-VERDICT.json
+      - name: Always retain failure evidence; never synthesize success
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Only-Android-${{ matrix.case }}
+          path: |
+            infinity-android/
+            infinity-emulator/
+          retention-days: 90
+          if-no-files-found: warn
+
+# This workflow is an ACTUAL Infinity APK test gate, not a final release lock.
+# Phase D, Resume Hub actual seek, add-on long-press, and physical Fold approval
+# have their own unresolved gates. A green host or stock Kodi test cannot waive them.
