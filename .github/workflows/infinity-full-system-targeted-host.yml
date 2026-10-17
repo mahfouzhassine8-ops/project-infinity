@@ -23,3 +23,7 @@ jobs:
             repairs/full-system-20261017/test_installer_stage_durability.cpp \
             -o /tmp/infinity-stage-durability-test
           /tmp/infinity-stage-durability-test
+      - name: Verify strict Rotate restoration source and invariants
+        run: |
+          python3 repairs/full-system-20261017/test_player_rotate_source.py
+          python3 -m py_compile repairs/full-system-20261017/player_rotate_226.py
