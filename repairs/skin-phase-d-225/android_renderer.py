@@ -54,7 +54,7 @@ def main(a):
   # Seed only the disposable fixture's own normal Kodi setting. This is not
   # a production APK/skin change or a forced success receipt.
   skin_settings=a.out/'fixture-startup-guisettings.xml'
-  skin_settings.write_text('<settings version="2"><setting id="lookandfeel.skin">'+skin.name+'</setting></settings>\\n'.replace('\\\\n','\\n'))
+  skin_settings.write_text('<settings version="2"><setting id="lookandfeel.skin">'+skin.name+'</setting></settings>')
   probe.adb('push',skin_settings,probe.PROFILE+'/guisettings.xml')
   helper=staging/ADDON;helper.mkdir()
   (helper/'addon.xml').write_text('<addon id="'+ADDON+'" name="Phase D renderer" version="1.0.0" provider-name="Infinity CI"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable renderer</summary><description lang="en_GB">Actual native renderer evidence</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
