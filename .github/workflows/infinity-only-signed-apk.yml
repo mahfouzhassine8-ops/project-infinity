@@ -3,7 +3,8 @@ on:
   push:
     branches: [work/infinity-full-repair-20261017-gpt6]
     paths:
-      - 'repairs/full-system-20261017/**'
+      - 'repairs/full-system-20261017/infinity_only_gate.py'
+      - 'repairs/full-system-20261017/test_infinity_only_gate.py'
       - '.github/workflows/infinity-only-signed-apk.yml'
   workflow_dispatch:
 permissions: {contents: read, actions: read}
