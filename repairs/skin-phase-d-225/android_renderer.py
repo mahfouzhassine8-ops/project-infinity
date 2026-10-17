@@ -60,15 +60,44 @@ def main(a):
   assert probe.rpc('Settings.SetSettingValue',{'setting':'general.addonupdates','value':2}) is True
   for name in (skin.name,ADDON):assert probe.rpc('Addons.SetAddonEnabled',{'addonid':name,'enabled':True})=='OK'
   assert probe.rpc('Settings.SetSettingValue',{'setting':'lookandfeel.skin','value':skin.name}) is True
-  time.sleep(4)
-  # Public RPC acknowledges Kodi's normal keep-skin dialog if one is shown.
-  window=probe.rpc('GUI.GetProperties',{'properties':['currentwindow']}).get('currentwindow',{})
-  if window.get('id')==10100:probe.rpc('Input.ExecuteAction',{'action':'select'})
+  # Kodi's skin confirmation is modal: GUI.GetProperties(currentwindow) reports
+  # the underlying Home window, not DialogConfirm (10100). Wait for the actual
+  # dialog in the unchanged signed APK log and accept its focused Yes control.
+  # Never rewrite skin settings directly or suppress the confirmation.
+  stage('confirming-selected-infinity-skin')
+  kodi_log=probe.PROFILE+'/../temp/kodi.log'
+  confirm_seen=False
+  for _ in range(35):
+   recent=probe.shell('tail','-n','180',kodi_log,check=False)
+   if 'Loading skin file: DialogConfirm.xml' in recent and 'skin.infinity.diggz' in recent:
+    confirm_seen=True
+    break
+   time.sleep(1)
+  if confirm_seen:
+   assert probe.rpc('Input.ExecuteAction',{'action':'select'})=='OK', 'Native skin confirmation not acknowledged'
+  else:
+   report['skin_confirmation']='No confirmation dialog observed; verifying persistent native setting'
+  time.sleep(3)
+  selected=probe.rpc('Settings.GetSettingValue',{'setting':'lookandfeel.skin'}).get('value')
+  assert selected==skin.name, ('Native skin did not remain selected',selected)
+  report['selected_skin']=selected
+  report['skin_confirmation_observed']=confirm_seen
   for name,w,h in [('cover',1080,2400),('inner',1800,1440),('wide',2400,1080)]:
    stage('rendering-'+name)
    probe.shell('wm','size',f'{w}x{h}');probe.shell('wm','density','320');time.sleep(3)
    config=a.out/'phase-d-config.json';config.write_text(json.dumps({'version':a.version,'width':w,'height':h,'android':True,'skin_id':skin.name}))
    probe.adb('push',config,probe.PROFILE+'/phase-d-config.json')
+   # adb runs as root on this disposable emulator. A pushed file can remain
+   # root-owned and mode 0600, making the actual Infinity Python addon fail
+   # with PermissionError before it writes a renderer result. Fix only the
+   # temporary fixture file, never the installed APK or production skin.
+   raw_config='/data/media/0/Android/data/'+probe.PACKAGE+'/files/.kodi/userdata/phase-d-config.json'
+   probe.shell('chown',uid+':'+uid,raw_config)
+   probe.shell('chmod','644',raw_config)
+   probe.shell('restorecon','-F',raw_config,check=False)
+   config_stat=probe.shell('stat','-c','%u:%a',raw_config).strip()
+   assert config_stat.split(':')[0]==uid, ('Renderer config owner mismatch',config_stat,uid)
+   report['fixture_config_permissions']=config_stat
    probe.shell('rm','-rf',probe.PROFILE+'/phase-d-results') # Disposable test output only.
    assert probe.rpc('Addons.ExecuteAddon',{'addonid':ADDON,'params':['run'],'wait':False})=='OK'
    deadline=time.monotonic()+300
@@ -76,6 +105,8 @@ def main(a):
    while time.monotonic()<deadline:
     r=probe.read_json(probe.PROFILE+'/phase-d-results/result.json')
     if r:break
+    # Fail with a concrete reason rather than waiting five minutes if Kodi
+    # rejected the test addon or the skin reverted to stock Estuary.
     if time.monotonic()-last_observation>=15:
      last_observation=time.monotonic()
      progress=probe.read_json(probe.PROFILE+'/phase-d-results/progress.json')
