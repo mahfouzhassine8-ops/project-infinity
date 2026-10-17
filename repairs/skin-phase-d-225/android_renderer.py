@@ -4,7 +4,7 @@ Only the fixture skin's dependency list is shortened for offline rendering.
 The production skin ID, viewport declaration, XML, scripts, and assets remain exact.
 This does not certify third-party providers, Samsung input, PiP, or shutdown.
 """
-import argparse,hashlib,importlib.util,json,shutil,time,traceback
+import argparse,hashlib,importlib.util,json,shutil,time,traceback,subprocess
 from pathlib import Path
 import xml.etree.ElementTree as E
 
@@ -21,7 +21,22 @@ def main(a):
   report['apk_sha256']=hashlib.sha256(a.apk.read_bytes()).hexdigest()
   assert report['apk_sha256']=='6e28bfea7cdb5e497ee21601a714e738db7a57edc3c5c0d29a9c19d461031854'
   stage('installing-existing-signed-TEST3')
-  probe.adb('root');probe.adb('wait-for-device')
+  # Android Emulator restarts adbd when "adb root" is requested. During
+  # that expected restart the CLI can return "connection closed" even
+  # though the device comes back correctly. Retry only this bootstrap
+  # handshake and insist on an actual root UID; never waive render checks.
+  bootstrap_errors=[]
+  for attempt in range(1,7):
+   try:
+    probe.adb('root',check=False)
+    probe.adb('wait-for-device')
+    if probe.shell('id','-u').strip()=='0':break
+    bootstrap_errors.append('attempt '+str(attempt)+': shell uid was not root')
+   except (RuntimeError,subprocess.TimeoutExpired) as error:
+    bootstrap_errors.append('attempt '+str(attempt)+': '+str(error)[-300:])
+   time.sleep(1.2)
+  else:raise RuntimeError('Disposable emulator adbd never became root: '+repr(bootstrap_errors))
+  report['adb_root_attempts']=attempt
   assert probe.shell('getprop','ro.kernel.qemu').strip()=='1'
   assert probe.PACKAGE not in probe.shell('pm','list','packages',probe.PACKAGE)
   assert 'arm64-v8a' in probe.shell('getprop','ro.product.cpu.abilist')
