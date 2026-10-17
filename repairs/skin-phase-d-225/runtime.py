@@ -4,7 +4,11 @@ from pathlib import Path
 import xbmc,xbmcgui,xbmcvfs
 profile=Path(xbmcvfs.translatePath('special://profile/'));config=json.loads((profile/'phase-d-config.json').read_text())
 output=profile/'phase-d-results';output.mkdir(exist_ok=True)
-report=dict(config=config,passed=False,physical_fold=False,renderer='stock Kodi with exact production unified XML; manifest projects the existing Android logical viewport; companion services unavailable',screens=[])
+report=dict(config=config,passed=False,physical_fold=False,renderer=('signed Infinity TEST3 native Android engine with selected skin.infinity.diggz' if config.get('android') else 'Linux stock Kodi fixture with projected Infinity skin XML'),screens=[])
+def checkpoint(phase, **details):
+ report['phase']=phase
+ payload=dict(phase=phase,monotonic=time.monotonic(),screens=len(report['screens']),**details)
+ (output/'phase-state.json').write_text(json.dumps(payload))
 if sys.argv[-1]=='bootstrap':
  response=json.loads(xbmc.executeJSONRPC(json.dumps(dict(jsonrpc='2.0',id=1,method='Addons.SetAddonEnabled',params=dict(addonid='skin.infinity.phased',enabled=True)))))
  (profile/'phase-d-bootstrap.json').write_text(json.dumps(response));xbmc.executebuiltin('Quit()');raise SystemExit
@@ -39,22 +43,38 @@ try:
    ('palette','1190',(119000,119001,119002)),('addons','addonbrowser',(50,9096))]:
    # A modal ActivateWindow with wait=True blocks this test script until it closes.
    # Queue the normal GUI action so the harness can inspect and dismiss the dialog.
+   checkpoint('screen:'+theme.lower()+'-'+screen+':start')
    close();xbmc.executebuiltin('ActivateWindow('+action+')');capture(theme.lower()+'-'+screen,ids)
+   checkpoint('screen:'+theme.lower()+'-'+screen+':captured')
    if screen=='settings-category':assert xbmcgui.getCurrentWindowId()!=10000,'PlayerSettings route did not open'
    (output/'progress.json').write_text(json.dumps(report,indent=2))
+  checkpoint('select:'+theme.lower()+':begin')
   close()
   worker=threading.Thread(target=lambda:xbmcgui.Dialog().select('Choose Your Experience / Resume Hub',['Infinity Home','Cobra','Resume Hub','Watchlist','Collection']))
-  worker.start();xbmc.sleep(350);capture(theme.lower()+'-select',(3,));xbmc.executebuiltin('Action(Back)',True);worker.join(3)
+  worker.start();xbmc.sleep(350);capture(theme.lower()+'-select',(3,))
+  checkpoint('select:'+theme.lower()+':captured')
+  xbmc.executebuiltin('Action(Back)',True)
+  checkpoint('select:'+theme.lower()+':back-returned')
+  worker.join(3)
   assert not worker.is_alive(),'Select dialog retained a test worker'
+  checkpoint('select:'+theme.lower()+':closed')
  # Repeated real custom dialog lifecycle with focus/Back: no service or install actions.
  cycles=[]
  for i in range(12):
   for id,control in [(1195,5101),(1196,5202),(1194,1194101),(1188,1188101),(1198,1198101)]:
+   label='cycle:'+str(i)+':'+str(id)
+   checkpoint(label+':begin',cycle=len(cycles))
    close();xbmc.executebuiltin('ActivateWindow('+str(id)+')');xbmc.sleep(350)
    d=xbmcgui.getCurrentWindowDialogId();assert d==id+10000,(id,d)
-   xbmc.executebuiltin('SetFocus('+str(control)+')',True);xbmc.executebuiltin('Action(Back)',True);xbmc.sleep(75)
+   checkpoint(label+':opened',cycle=len(cycles),dialog=d)
+   xbmc.executebuiltin('SetFocus('+str(control)+')',True)
+   checkpoint(label+':focused',cycle=len(cycles),control=control)
+   xbmc.executebuiltin('Action(Back)',True);xbmc.sleep(75)
+   checkpoint(label+':back-returned',cycle=len(cycles))
    after=xbmcgui.getCurrentWindowDialogId();assert after in (0,9999),(id,after)
    cycles.append(dict(window=id,opened=d,closed=after))
+   checkpoint(label+':closed',cycle=len(cycles))
+ checkpoint('complete',cycles=len(cycles))
  report.update(passed=True,cycles=cycles,kodi_version=xbmc.getInfoLabel('System.BuildVersion'))
 except Exception:report['failure']=traceback.format_exc()
 finally:
