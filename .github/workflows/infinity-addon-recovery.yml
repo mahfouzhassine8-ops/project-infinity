@@ -1,0 +1,60 @@
+name: Infinity | Add-on recovery host and real Kodi verification
+on:
+  push:
+    branches: [work/infinity-consolidated-anr-first-20261017]
+    paths:
+      - '.github/workflows/infinity-addon-recovery.yml'
+      - 'repairs/addon-recovery-20261017/**'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Verify native-only enable and failure handling
+        run: |
+          python3 -m unittest discover -s repairs/addon-recovery-20261017 -p 'test_*.py' -v
+          python3 repairs/addon-recovery-20261017/build.py --output recovery-evidence/script.infinity.addonrecovery-1.0.0-TEST.zip
+      - name: Prepare disposable real Kodi profile
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core pulseaudio
+          python3 repairs/addon-recovery-20261017/setup_kodi_smoke.py
+      - name: Verify disabled to enabled and Video Sources reappearance
+        run: |
+          set -euo pipefail
+          Xvfb :99 -screen 0 1280x720x24 > /tmp/recovery-xvfb.log 2>&1 &
+          export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=recovery_ci
+          kodi --standalone > /tmp/recovery-kodi.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            window=$(xdotool search --name '^Kodi' 2>/dev/null | head -1 || true)
+            if [ -n "$window" ]; then break; fi
+            sleep 1
+          done
+          sleep 10
+          xdotool windowfocus --sync "$window"
+          xdotool key --window "$window" F12
+          for attempt in $(seq 1 120); do
+            if [ -f "$HOME/.kodi/userdata/recovery-smoke-result.json" ]; then break; fi
+            sleep 1
+          done
+          python3 -c 'import json,pathlib; r=json.loads((pathlib.Path.home()/".kodi/userdata/recovery-smoke-result.json").read_text()); print(json.dumps(r,indent=2)); assert r["passed"]'
+      - name: Retain exact runtime result and logs
+        if: always()
+        run: |
+          mkdir -p recovery-evidence
+          for file in "$HOME/.kodi/userdata/recovery-smoke-result.json" "$HOME/.kodi/temp/kodi.log" /tmp/recovery-kodi.log /tmp/recovery-xvfb.log; do
+            if [ -f "$file" ]; then cp "$file" recovery-evidence/; fi
+          done
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Add-on-Recovery-Verification
+          path: recovery-evidence/
+          retention-days: 90
+          if-no-files-found: error

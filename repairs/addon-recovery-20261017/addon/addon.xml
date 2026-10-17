@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.addonrecovery" name="Infinity Add-on Recovery" version="1.0.0" provider-name="Project Infinity">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.python.script" library="default.py"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Find and enable installed disabled add-ons without resetting their data.</summary>
+    <description lang="en_GB">Manual recovery, including Otaku, through Kodi's own add-on manager API. No service, reinstall, provider edits or settings/database deletion. Custom rail visibility remains managed by Infinity Add-on Rails. Experimental; physical Fold verification pending.</description>
+    <platform>all</platform><license>GPL-2.0-or-later</license>
+  </extension>
+</addon>

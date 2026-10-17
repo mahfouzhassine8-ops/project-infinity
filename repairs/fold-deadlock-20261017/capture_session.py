@@ -79,7 +79,7 @@ def installed(addons_root, enabled=None):
                 value = enabled(addon_id)
                 if type(value) is bool:
                     row["enabled"] = value
-            except (ValueError, RuntimeError, TypeError, KeyError):
+            except (ValueError, RuntimeError, TypeError, KeyError, AttributeError):
                 pass
         result[addon_id] = row
     return result
