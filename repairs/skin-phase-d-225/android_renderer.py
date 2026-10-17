@@ -72,11 +72,22 @@ def main(a):
    probe.shell('rm','-rf',probe.PROFILE+'/phase-d-results') # Disposable test output only.
    assert probe.rpc('Addons.ExecuteAddon',{'addonid':ADDON,'params':['run'],'wait':False})=='OK'
    deadline=time.monotonic()+300
+   last_observation=0
    while time.monotonic()<deadline:
     r=probe.read_json(probe.PROFILE+'/phase-d-results/result.json')
     if r:break
+    if time.monotonic()-last_observation>=15:
+     last_observation=time.monotonic()
+     progress=probe.read_json(probe.PROFILE+'/phase-d-results/progress.json')
+     observation={'viewport':name,'seconds_remaining':round(deadline-time.monotonic()),
+                  'progress_screens':len(progress.get('screens',[])) if isinstance(progress,dict) else None,
+                  'current_window':probe.rpc('GUI.GetProperties',{'properties':['currentwindow']}) if probe.rpc else None}
+     (a.out/'last-renderer-observation.json').write_text(json.dumps(observation,indent=2))
+     print('Renderer progress:',json.dumps(observation),flush=True)
     time.sleep(1)
-   else:raise RuntimeError('Renderer timed out: '+name)
+   else:
+    probe.adb('pull',probe.PROFILE+'/phase-d-results',a.out/'timeout-progress-'+name,check=False)
+    raise RuntimeError('Renderer timed out: '+name+'; retained progress and last-renderer-observation.json')
    target=a.out/name;target.mkdir();probe.adb('pull',probe.PROFILE+'/phase-d-results',target)
    report['viewports'].append({'name':name,'result':r});assert r.get('passed'),r.get('failure')
   report['passed']=True;stage('actual-native-renderer-completed')
