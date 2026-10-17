@@ -1,7 +1,7 @@
 name: Infinity | Phase D existing signed APK renderer
 on:
   push:
-    branches: [work/infinity-phase-d-skin-225]
+    branches: [work/infinity-phase-d-225-renderer-diagnostics-20261017]
     paths: ['repairs/skin-phase-d-225/**', '.github/workflows/infinity-skin-phase-d-android.yml']
   workflow_dispatch:
 permissions: {contents: read, actions: read}
@@ -75,6 +75,8 @@ jobs:
             phase-d-android/ANDROID-RENDERER.json
             phase-d-android/*/phase-d-results/
             phase-d-android/last-progress/
+            phase-d-android/last-renderer-observation.json
+            phase-d-android/timeout-progress-*/
             phase-d-android/kodi.log
             phase-d-android/logcat.txt
             phase-d-android/actual-addon-inventory.json
