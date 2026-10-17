@@ -240,13 +240,18 @@ def run(args):
         report["selected_skin"] = selected
         report["production_dependency_manifest_untouched"] = True
         report["exact_full_stack_boot_passed"] = True
+        # Screenshot collection is part of the evidence gate; never emit
+        # "passed" before the original Android GUI capture finishes.
+        screenshot = probe.adb("exec-out", "screencap", "-p", binary=True)
+        require(screenshot.startswith(b"\x89PNG\r\n\x1a\n"),
+                "Actual Infinity screenshot missing or not PNG")
+        (out / "infinity-real-screen.png").write_bytes(screenshot)
         report["passed"] = True
         publish("complete-Infinity-APK-and-full-skin-in-engine")
-        # Real screenshot retained for examination; no stock Kodi screenshots
-        # can serve as Infinity evidence.
-        (out / "infinity-real-screen.png").write_bytes(probe.adb("exec-out", "screencap", "-p", binary=True))
         return report
     except Exception:
+        report["passed"] = False
+        report["exact_full_stack_boot_passed"] = False
         report["failure"] = traceback.format_exc()
         publish("failed")
         raise
