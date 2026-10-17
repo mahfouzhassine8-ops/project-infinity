@@ -45,7 +45,7 @@ jobs:
       - name: Verify actual Kodi ingress, durable menu actions and production row rendering
         run: |
           set -euo pipefail
-          Xvfb :99 -screen 0 1920x1080x24 > /tmp/watched-xvfb.log 2>&1 &
+          Xvfb :99 -screen 0 1920x1080x24 -extension RANDR > /tmp/watched-xvfb.log 2>&1 &
           export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1
           pulseaudio --start --exit-idle-time=-1
           pactl load-module module-null-sink sink_name=watched_ci

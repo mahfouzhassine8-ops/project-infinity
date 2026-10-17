@@ -7,7 +7,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 from bridge_state import OVERRIDES
-from bridge_state import identity as presentation_raw
+from bridge_state import identity as presentation_raw, same
 from provider_contracts import PROOFS, ENTRY_PROOF, provider, canonical, presentation
 
 
@@ -43,7 +43,8 @@ def apply(modules, profile, entry, action):
     if not identity or entry.get("key") != hub.identity_key(identity):
         return False
     raw = presentation_raw(entry)
-    if not canonical(entry, raw, entry.get(ENTRY_PROOF)):
+    query = canonical(entry, raw, entry.get(ENTRY_PROOF))
+    if not query:
         return False
     with common.persistence_scope():
         source = Path(profile) / hub.CONTINUE_FILE
@@ -73,8 +74,11 @@ def apply(modules, profile, entry, action):
         saved = hub.find_entry(data, key)
         if saved and not hub.same_identity(hub.entry_identity(saved), identity):
             return False
+        saved_canonical = presentation(saved, presentation_raw(saved), proofs.get(key)) if saved else None
         if saved and identity["kind"] == "episode" and provider(entry):
-            if (not presentation(saved, presentation_raw(saved), proofs.get(key)) and
+            if saved_canonical and not same(saved_canonical, query):
+                return False
+            if (not saved_canonical and
                     saved.get("source") != entry.get("source")):
                 return False  # Old scope cannot be rebound by ID coincidence alone.
         admitted = dict(saved or entry, key=key)
@@ -101,9 +105,12 @@ def apply(modules, profile, entry, action):
         if identity["kind"] == "episode" and provider(entry):
             # Keep the existing controller key, routes and identities intact.
             # This attests only a currently selected, code-verified producer row.
-            if provider(admitted) != provider(entry):
+            if saved_canonical:
+                pass  # Keep the verified original producer/route proof across add-ons.
+            elif provider(admitted) != provider(entry):
                 raise UnsupportedController("This saved episode uses a different producer; its identity was left unchanged.")
-            proofs[key] = dict(provider=provider(entry), proof=entry[ENTRY_PROOF], identity=presentation_raw(admitted))
+            else:
+                proofs[key] = dict(provider=provider(entry), proof=entry[ENTRY_PROOF], identity=presentation_raw(admitted))
             active = set(overrides)
             for bucket in ("items", "watched", "watchlist", "collection"):
                 active.update(data.get(bucket, {}))

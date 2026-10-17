@@ -74,6 +74,21 @@ class ActionTests(fixtures["RuntimeTests"]):
         self.assertFalse(controller.apply(modules, self.profile, entry, "mark-unwatched"))
         self.assertEqual((self.profile / hub.CONTINUE_FILE).read_bytes(), original)
 
+    def test_verified_episode_actions_share_state_across_providers_without_route_rewrite(self):
+        first = bridge_context.selected(modules, Selected(kind="episode"), verify_provider=lambda name: contracts.CATALOG[name]["proof"])
+        second = bridge_context.selected(modules, Selected(kind="episode", path="plugin://plugin.video.pov/?mode=play_media&item=123"), verify_provider=lambda name: contracts.CATALOG[name]["proof"])
+        self.assertTrue(controller.apply(modules, self.profile, first, "mark-watched"))
+        original = hub.load(self.profile)
+        proof = copy.deepcopy(original[contracts.PROOFS])
+        self.assertTrue(controller.apply(modules, self.profile, second, "mark-unwatched"))
+        data = hub.load(self.profile)
+        self.assertEqual(data[contracts.PROOFS], proof)
+        self.assertEqual(data[OVERRIDES][first["key"]]["source"], first["source"])
+        query = dict(identity(second), scope="show_episode")
+        self.assertEqual(lookup(records(data), query), "false")
+        self.assertTrue(controller.apply(modules, self.profile, second, "mark-watched"))
+        self.assertEqual(lookup(records(hub.load(self.profile)), query), "true")
+
     def selected(self):
         return cc_context.selected_entry(Selected())
 

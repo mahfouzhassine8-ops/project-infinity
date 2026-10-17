@@ -87,6 +87,7 @@ try:
                      ("Watchlist only; no watched badge", None, 0, False), ("Watched episode; missing art", True, 0, True)]
             for label, watched, count, expected in cases:
                 item = row(label, watched, count, kind="episode" if "episode" in label else "movie")
+                if "Partially" in label: item.getVideoInfoTag().setResumePoint(90, 300)
                 if "Watchlist" in label: item.setProperty("Infinity.ResumeHub.Watchlist", "true")
                 control.addItem(item)
             home.setFocusId(50)
@@ -94,6 +95,8 @@ try:
                 control.selectItem(index); xbmc.sleep(80)
                 observed = xbmc.getCondVisibility(source["watched_condition"])
                 require(observed == case[3], "Actual row predicate mismatch: " + case[0])
+                if "Partially" in case[0]:
+                    require(xbmc.getCondVisibility("ListItem.IsResumable"), "Partial fixture lost its actual resume point")
                 checks.append(dict(version=version, theme=theme, label=case[0], expected_watched=case[3], observed=observed))
             control.selectItem(1); xbmc.sleep(600)
             target = capture / (version + "-" + theme.lower() + ".png")
