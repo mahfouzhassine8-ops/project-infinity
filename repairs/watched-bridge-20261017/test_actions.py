@@ -45,6 +45,22 @@ class Selected:
 
 
 class ActionTests(fixtures["RuntimeTests"]):
+    def test_new_action_preserves_older_queue_without_driving_its_library_write(self):
+        legacy = cc_context.selected_entry(Selected(kind="episode"))
+        legacy["dbid"] = 7
+        queued = dict(operation="a" * 32, entry=legacy, watched=True)
+        file = self.profile / hub.CONTINUE_FILE
+        common.atomic_json(file, dict(schema=2, foreign={"retain": [1, 2]},
+                                     pending_kodi_sync={"episode:7": queued}))
+        original = file.read_bytes()
+        entry = self.selected()
+        with mock.patch.object(hub.xbmc, "executeJSONRPC", wraps=hub.xbmc.executeJSONRPC) as rpc:
+            with self.assertRaises(controller.UnsupportedController):
+                controller.apply(modules, self.profile, entry, "toggle-watchlist")
+            rpc.assert_not_called()
+        self.assertEqual(file.read_bytes(), original)
+        self.assertEqual(hub.load(self.profile)["pending_kodi_sync"]["episode:7"], queued)
+
     def test_provider_series_id_coincidence_never_mutates_native_episode(self):
         proof = contracts.CATALOG["plugin.video.umbrella"]["proof"]
         with mock.patch.object(Selected, "getDbId", return_value=7):
@@ -57,7 +73,7 @@ class ActionTests(fixtures["RuntimeTests"]):
         lists = {movie["key"]: movie}
         common.atomic_json(self.profile / hub.CONTINUE_FILE,
                            dict(schema=2, foreign={"keep": [1, 2, 3]}, watchlist=lists, collection=lists,
-                                items={entry["key"]: dict(entry, position=20, duration=100)}))
+                                items={entry["key"]: dict(entry, dbid=7, position=20, duration=100)}))
         with mock.patch.object(hub.xbmc, "executeJSONRPC", wraps=hub.xbmc.executeJSONRPC) as rpc:
             self.assertTrue(controller.apply(modules, self.profile, entry, "mark-watched"))
             data = hub.load(self.profile)

@@ -58,6 +58,11 @@ def apply(modules, profile, entry, action):
             if not isinstance(original, dict) or type(original.get("schema")) is not int or original["schema"] not in (1, 2):
                 raise UnsupportedController("The progress schema is not compatible; no migration or reset was performed.")
         data = hub.load(profile)
+        if data.get("pending_kodi_sync"):
+            # Do not make a new action drive an older operation whose selected
+            # row/proof was not admitted by this bridge. Keep its durable queue
+            # for the existing controller owner; never discard or acknowledge it.
+            raise UnsupportedController("An earlier library update is still pending in Command Center. Its queue and saved data were left unchanged; let the existing controller finish or review that update before trying another menu action.")
         proofs = data.get(PROOFS, {})
         if not isinstance(proofs, dict):
             raise UnsupportedController("The episode identity proof field is not compatible; no state was changed.")
@@ -126,6 +131,8 @@ def apply(modules, profile, entry, action):
             data[PROOFS] = proofs
         data[OVERRIDES] = overrides
         hub.save(profile, data, hub.publish_home)
-    # Retain the controller's durable native-library queue and owner checks.
-    hub.flush_kodi_sync(profile)
+        # The existing lease is reentrant. Keep the new write and its existing
+        # checked library flush in one lease so another invocation cannot add
+        # an older/unrelated operation between admission and synchronization.
+        hub.flush_kodi_sync(profile)
     return True
