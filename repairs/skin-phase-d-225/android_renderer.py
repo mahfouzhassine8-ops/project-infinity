@@ -104,15 +104,20 @@ while not watch.abortRequested() and time.monotonic() < until:
     dialog = xbmcgui.getCurrentWindowDialogId()
     if dialog == 10100 and xbmc.getSkinDir() == 'skin.infinity.diggz':
         try:
+            # The Python Window wrapper can report focus 0 for a native modal
+            # even while the actual dialog is active. Route user-like actions
+            # to the active Kodi GUI instead; then prove the skin stayed loaded.
+            # Approved Infinity DialogConfirm.xml: 9000 = button group,
+            # 11 = OK (left button), 10 = Cancel (right button).
             window=xbmcgui.Window(dialog)
-            window.setFocusId(11)  # Approved skin DialogConfirm.xml: 11 = OK; 10 = Cancel.
-            xbmc.sleep(80)
-            focus=window.getFocusId()
-            if focus != 11:
-                record('wrong_focus', focus=focus)
-                break
+            focus_before=window.getFocusId()
+            xbmc.executebuiltin('SetFocus(9000)', True)
+            xbmc.executebuiltin('SetFocus(11)', True)
+            xbmc.sleep(70)
+            focus_after=window.getFocusId()
             xbmc.executebuiltin('Action(Select)', True)
-            record('selected_native_ok', dialog=dialog, focus=focus)
+            record('submitted_native_ok', dialog=dialog,
+                   observed_focus_before=focus_before, observed_focus_after=focus_after)
         except Exception as exc:
             record('dialog_error', error=repr(exc), dialog=dialog)
         break
@@ -158,7 +163,7 @@ else:
     if confirmation.get('stage')!='armed':break
     time.sleep(.2)
    report['native_skin_confirmation']=confirmation
-   assert confirmation.get('stage')=='selected_native_ok',('Native keep-skin OK not confirmed',confirmation)
+   assert confirmation.get('stage')=='submitted_native_ok',('Native keep-skin OK was not submitted',confirmation)
   # The actual rendered skin MUST be Infinity, and it must stay so after
   # the native dialog countdown. No synthetic success or forced XML rewrite.
   time.sleep(4)
