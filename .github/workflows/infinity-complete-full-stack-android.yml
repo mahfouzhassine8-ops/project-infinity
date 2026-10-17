@@ -65,17 +65,38 @@ jobs:
           name: Infinity-Full-Stack-CI-Inputs-225
           github-token: ${{ github.token }}
           path: full-stack-transfer
-      - name: Read exact ZIP from unpublished Infinity CI draft release
+      - name: Read exact binary from authenticated unpublished Infinity draft release
         if: ${{ github.event_name == 'push' || inputs.assets_run == '' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p full-stack-transfer
-          gh release download infinity-ci-assets-20261017 \
-            --repo "$GITHUB_REPOSITORY" \
-            --pattern 'Infinity-Full-Stack-CI-Inputs-225.zip' \
-            --dir full-stack-transfer
+          # Draft releases may not resolve via public tag/release-download endpoints.
+          # Use the immutable, authenticated release ID and asset ID instead.
+          gh api "repos/$GITHUB_REPOSITORY/releases/416125865" > /tmp/infinity-release-metadata.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/infinity-release-metadata.json').read_text())
+          assert data['draft'] is True, 'Not the unpublished Infinity test release'
+          assert data['tag_name']=='infinity-ci-assets-20261017'
+          assert data['target_commitish']=='work/infinity-full-repair-20261017-gpt6'
+          assets=[a for a in data.get('assets',[]) if a.get('id')==651868759]
+          assert len(assets)==1, 'Exact draft ZIP asset missing'
+          item=assets[0]
+          assert item['name']=='Infinity-Full-Stack-CI-Inputs-225.zip'
+          assert item['size']==59543129 and item['state']=='uploaded'
+          assert item.get('digest')=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          print('Verified authenticated Infinity draft, target, original asset and pinned hash.')
+          PY
+          curl --fail --location --silent --show-error --retry 2 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/octet-stream' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759" \
+            -o full-stack-transfer/Infinity-Full-Stack-CI-Inputs-225.zip
+          echo "$INFINITY_ASSET_SHA  full-stack-transfer/Infinity-Full-Stack-CI-Inputs-225.zip" | sha256sum -c
       - name: Verify signed Infinity and immutable complete source packages
         shell: bash
         run: |
