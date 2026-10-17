@@ -24,7 +24,7 @@ def fixture():
           <control type="image"><texture colordiffuse="$VAR[InfinityGlassFocus]">osd_modern/osdrepeatone.png</texture><visible>Playlist.IsRepeatOne</visible></control>
           <control type="image"><texture>osd_modern/osdrepeatall.png</texture></control>
         </control>
-        <control type="group"><control type="button" id="262"><onleft>265</onleft></control></control>
+        <control type="group">\n          <control type="button" id="262"><onleft>265</onleft></control></control>
       </controls></window>''').encode()
 
 class RotateSource(unittest.TestCase):
