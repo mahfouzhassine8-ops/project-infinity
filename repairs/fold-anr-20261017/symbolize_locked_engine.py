@@ -61,6 +61,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--library", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--probe-rva", action="append", type=lambda value: int(value, 0), default=[],
+                        help="Recorder site minus dladdr base; already an ELF RVA, unlike ANR file PCs")
     args = parser.parse_args()
     data = args.library.read_bytes()
     sections = elf_sections(data)
@@ -108,6 +110,12 @@ def main() -> None:
         "root_cause_proven": False,
         "runtime_changed": False,
     }
+    report["probe_addresses"] = [
+        {"elf_rva": hex(pc), "interpretation": "Recorder ELF RVA; no file-offset adjustment",
+         "lookup": subprocess.check_output(
+             [tool, "-a", "-C", "-f", "-i", "-e", str(args.library), hex(pc), hex(pc - 4)],
+             text=True)} for pc in args.probe_rva
+    ]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))

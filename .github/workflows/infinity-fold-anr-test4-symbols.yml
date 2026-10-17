@@ -24,7 +24,8 @@ jobs:
       - name: Resolve PCs after exact locked APK code-section check
         run: |
           python3 repairs/fold-anr-20261017/symbolize_locked_engine.py \
-            --library locked-native/libkodi.so --output evidence/TEST4-SYMBOLS.json
+            --library locked-native/libkodi.so --output evidence/TEST4-SYMBOLS.json \
+            --probe-rva 0x1b2231c --probe-rva 0x1a53410
       - uses: actions/upload-artifact@v7
         if: always()
         with:
