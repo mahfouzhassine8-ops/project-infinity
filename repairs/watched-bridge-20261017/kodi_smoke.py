@@ -29,7 +29,9 @@ def rpc(method, params):
 
 
 def change_skin(addon_id):
+    xbmc.executebuiltin("Dialog.Close(all,true)", True)
     rpc("Addons.SetAddonEnabled", dict(addonid=addon_id, enabled=True))
+    require(rpc("Addons.GetAddonDetails", dict(addonid=addon_id, properties=["enabled"]))["addon"]["enabled"] is True, "Fixture skin remains disabled")
     errors = []
     def request():
         try:
@@ -43,7 +45,9 @@ def change_skin(addon_id):
     monitor = xbmc.Monitor()
     for attempt in range(120):
         if xbmcgui.getCurrentWindowDialogId() == 10100:
-            xbmc.executebuiltin("SendClick(10100,11)")
+            xbmc.executebuiltin("SendClick(10100,11)", True)
+        elif xbmcgui.getCurrentWindowDialogId() == 10140:
+            xbmc.executebuiltin("Dialog.Close(addonsettings,true)", True)
         if xbmc.getSkinDir() == addon_id and not thread.is_alive() and xbmcgui.getCurrentWindowDialogId() != 10100:
             try:
                 xbmcgui.Window(10000).getControl(50)

@@ -56,7 +56,9 @@ def run():
                         home.setProperty(PROPERTY, value)
                         xbmc.executebuiltin("InfinityResumeHubUpdate()")
                     signature = current
-                    status(home, "Local watched badges ready")
+                    names = ["Umbrella" if name.endswith("umbrella") else "POV" for name in sorted(verified)]
+                    status(home, "Local badges ready; episode adapters: " + ", ".join(names) if names else
+                           "Local movie badges ready; no verified episode add-on adapter")
             except (OSError, ValueError, RuntimeError, AttributeError):
                 # Withhold stale derived state; never repair or rewrite the source.
                 value = snapshot({"schema": 2}, xbmcvfs.translatePath("special://profile/"))

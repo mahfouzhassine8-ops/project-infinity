@@ -61,7 +61,7 @@ def main():
         modules = controller.load(xbmcvfs.translatePath(addon.getAddonInfo("path")))
         entry = selected(modules, getattr(sys, "listitem", None))
         if not entry:
-            dialog.ok("Metadata unavailable", "This row does not provide a verified movie or episode identity. Episodes need reliable season and episode metadata. No watched or list state was changed.")
+            dialog.ok("Metadata unavailable", "This row lacks a verified movie or episode identity, or this add-on's episode numbering is not yet supported. No watched or list state was changed.")
             return
         profile = Path(xbmcvfs.translatePath(addon.getAddonInfo("profile")))
         hub = modules["resume_hub"]

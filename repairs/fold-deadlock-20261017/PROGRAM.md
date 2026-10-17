@@ -6,11 +6,11 @@ replace the consolidated handoff or authorize a final lock.
 
 | Workstream | Current concrete work | Remaining acceptance gate |
 |---|---|---|
-| 1. Native Android stability | Physical reciprocal graphics/directory ownership confirmed. Exact symbols identify GUIWindowManager::Process and DirectoryProvider::OnJobComplete. Callback retirement correction authored; OS-mutex baseline/candidate regression passes. Full matched native build and permanent-signer experimental packaging passed. APK 2103380 TEST1 and same-code TEST4 rollback are signed. | Physical background-return/screensaver/playback/PiP/Close matrix. Android fresh/loaded/cold passed; core-initialized Close still fails its protected owner-proof deadline. |
-| 2. Watched / Resume Hub / Watchlist | Existing .20 identity, progress, manual actions, Watchlist and Collection code reviewed. Approved blue badge reference retained. Existing stores and native/provider actions remain protected. | Add compatible provider-list presentation and scoped identity adapters; automatic/manual/never-played/cross-provider/negative-identity tests; preserve schemas, foreign keys and persistence participant. No duplicate Waiting to Watch category. |
-| 3. Add-on touch and recovery | Capture reports Rails .026. Saved .026 ZIP hash and all corresponding source files verified. Custom 1193/50 exists in 13 source variants. Home rails and native input corrections retained. Manual recovery helper 1.0.0 passes ten host checks and real Linux Kodi enable/reappearance/settings-retention checks on two disposable video fixtures. | Actual Otaku and Fold acceptance; discoverable in-skin recovery route; establish the custom-grid touch path before changing dispatch; repeated left/right/edge and scroll tests. |
-| 4. Infinity skin refinement | Exact .223 remains immutable: 3,055 extracted files match the locked ZIP. All 2,135 XML files parse, with 14 UI profile trees inventoried. Themes, overlays, player boundaries, ZIP preview and navigation retained. | Screen-by-screen defect matrix, targeted fixes and comparisons across Light/Dark/OLED and all Fold layouts. Broad animation work remains gated on native stability. |
-| 5. Integrated verification | Coordinated candidate/rollback identities and signing/payload checks authored. All four original Android shutdown cases executed unchanged: fresh, loaded and cold passed; core-initialized failed with the known owner-proof deadline class. Overall Android run remains red. | Combined APK/skin/helper runtime tests; physical 5/20/45/90-minute matrix, persistence, providers and regressions; explicit user approval before locking. |
+| 1. Native Android stability | Exact physical OnJobComplete cycle corrected and baseline/candidate mutex regression passes. Complete TEST1 and first combined watched/touch native builds and permanent-signer packaging pass. Callback retirement remains byte-identical in the expanded build. Scoped-identity TEST3 rebuild is running from 093323fbc0ae87cbe2fa2a21abab0c357fdaf754. | Original Android fresh/loaded/cold passed on TEST1; core-initialized Close remains red. All four original cases are scheduled unchanged against TEST3. Physical background return, screensaver, playback, PiP and shutdown remain open. |
+| 2. Watched / Resume Hub / Watchlist | Read-only native immutable row index, guarded helper and existing CC .20 writer integration implemented. Blue presentation supports explicit Unwatched over native playcount. Watchlist/Collection never seed Continue. 13 state, 23 actual CC runtime/action, 2 installed-producer guard checks pass; 22 native identity cases and concurrent publication pass. | Real Kodi menu/render gate is being debugged; actual Android native-row gate is staged. Current installed provider versions need hash checks. Historical unproven episode scopes are withheld until explicit verified replay; unknown anime numbering and provider-native actions without callbacks remain limited. |
+| 3. Add-on touch and recovery | Custom 1193/50 long-press now preselects the hit row before the original single right-click dispatch. The production branch test reproduces baseline first-hold failure and candidate first-hold success, plus transforms/edges/scroll/visibility negatives. Original Home rail method remains exact. Recovery 1.0.0 previously passed real Kodi enable/reappearance/settings-retention tests. New skin has a native Manage add-ons route. | Physical long-press, Movie/TV rails and actual Otaku enable/recovery. Capture reports Rails .026; no newer phone inventory exists in this environment. No provider or Rails replacement has been made. |
+| 4. Infinity skin refinement | Full forward .224 candidate built from exact .223: 2926 original files unchanged, 129 changed, 16 added, none removed; all 2149 XML parse. Approved blue checks and theme-aware watched text added without changing existing actions, control IDs, animations or scroll times. Protected Home/native browser/FileBrowser/ZIP preview/player boundaries stay byte-identical. | Actual production 16x9 row projection is being verified in Light/Dark/OLED. Full-skin all-screen and Fold cover/unfolded acceptance remain open. Broad animation changes remain gated. |
+| 5. Integrated verification | Scoped TEST3 native producer 39004549623, permanent-signer producer 39004584047, original Android preservation run 39004611791 and separate actual Android row fixture are coordinated. Matching observational capture 1.0.2 and same-code TEST4 rollback are staged. | Await build/runtime results, then bind exact APK/skin/helper identities into one package. Physical 5/20/45/90-minute, playback/PiP/session/screensaver/Close/persistence/provider/theme matrix and explicit user locking approval remain required. |
 
 ## Immutable inputs
 
@@ -45,10 +45,15 @@ declared before the directory guard. Reverse destruction order releases the
 directory guard before retiring old GUI items, including exception paths.
 Stale-rail rejection, job identity, update-state transitions and failed-job
 semantics are retained. No force-unlock, timeouts, save waivers or lifecycle
-restarts are added. The full native source comparison must allow exactly this
-one callback file to change from TEST4.
+restarts are added. The isolated TEST1 native source comparison allows exactly this one callback
+file to change from TEST4. The expanded watched/touch candidate separately
+enumerates six changed and two added native files; all other native sources,
+the corrected callback, original Home rail hold, and shutdown/admission gates
+remain byte-identical to the completed repair stage.
 
-The new candidate uses versionCode 2103380. A separately signed compatibility
+The first native candidate uses versionCode 2103380. The scoped watched/touch
+candidate uses 2103382 TEST3; the superseded first combined build used 2103381
+TEST2 and is not the delivery candidate. A separately signed compatibility
 rollback uses that same code and restores TEST4's functional payload, avoiding
 Android downgrade installation. The exact locked 2103377 APK remains unchanged.
 
@@ -68,26 +73,45 @@ profile, settings, database or credentials may be replaced by development tools.
 Final locking and promotion require the user's physical Galaxy Fold validation
 and explicit approval.
 
-## First native verification package
+## Continuation identities and limits
 
-The current phase-gate delivery is APK 2103380 TEST1, its exact-engine capture
-helper 1.0.1, a same-code TEST4 compatibility rollback and the independently
-verified manual add-on recovery helper 1.0.0. It is not the completed integrated
-five-workstream feature release. Skin .223 and installed Rails/Command Center
-are left in place. There is no new skin ZIP or universal provider-badge update
-at this gate.
+The first native verification bundle remains preserved as historical TEST1
+proof. Work has continued into watched, touch and skin code; this project is
+still the complete five-workstream project.
 
-Recovery source: `2d5df339c0a32b678df80852b94e878b1752a8e7`.
-Real Kodi verification: run `38998654474`, job `117296699964`, passed.
-The disposable runner used Kodi 20.5; it was not the user's customized Kodi
-21.3/Fold installation. Actual Otaku was not disabled or enabled by that test.
-Recovery ZIP SHA-256: `dba95ad2a74bc220aeb2d6b045ef303ec2b83ec819ae72a09f3d470c9acf4ae8`.
+- First combined native success: run 39002607563, source c4f0e315f4595b9f7cb3446ed5ad04a6f490b07b.
+- First combined permanent-signer success: run 39003451792, source a4d9b1272691b1ba9734dcabe6d85c16e95c2e18. Superseded by the episode-scope correction.
+- Scoped native TEST3 producer: run 39004549623, source 093323fbc0ae87cbe2fa2a21abab0c357fdaf754; result pending at this checkpoint.
+- Scoped TEST3 signer: run 39004584047, source 6f585cb5e02fd1c93dfb548dd758a5e4dad7b764; result pending.
+- Original four Android cases: run 39004611791; no probe changes or skips.
+- Skin .224 full ZIP SHA-256: 6fda649c4da579b52724f26ce4e5d7c5bc36d97003400f1aec6f47e8cb42633c.
+- Recovery .1.0.0 source: 2d5df339c0a32b678df80852b94e878b1752a8e7.
+- Recovery real Kodi success: 38998654474 / 117296699964, two harmless video fixtures, not actual Otaku/Fold.
+- Recovery ZIP SHA-256: dba95ad2a74bc220aeb2d6b045ef303ec2b83ec819ae72a09f3d470c9acf4ae8.
 
-Fresh device code identities and physical return-test exports are the next
-required evidence. They are not a request for another general implementation
-authorization. Preserve this entire ledger when continuing after that gate.
+POV 6.10.06 and Umbrella 6.7.92 public episode producers were traced: their
+generic tmdb/tvdb/imdb fields identify shows, plus season/episode coordinates.
+The helper requires reviewed installed version AND exact producer source hashes
+before applying that scope. These public versions are not a phone inventory.
+Unknown versions, Otaku absolute numbering, untyped rows, mismatched namespaces
+and historical episode rows without a verified producer attestation are not
+silently mapped. Explicit verified actions retain the existing controller key,
+route and identity and add a bounded presentation proof within the same
+checkpointed progress file. Read-only background presentation never rewrites
+that file, providers, settings or databases.
 
-Implementation authorization remains active for all five workstreams. The
-native-first and installed-version gates require evidence, not another general
-Proceed request. Completing this first experimental candidate does not close
-the watched, touch, skin or integrated workstreams.
+The Linux renderer fixture extracts actual 16x9 provider-row XML, exact source
+font files, recursively required palette/includes and artwork. It is not the
+full skin or a Fold validation. Failures in fixture activation remain visible
+until a real run passes. Actual Android native index testing is a separate gate;
+Linux stock Kodi cannot certify a newly compiled Android native implementation.
+
+The helper refuses manual writes unless all 13 installed CC .20 preimages
+match. It never installs or downgrades Command Center or Rails. Existing provider
+native watched/Trakt controls and data remain intact; callbacks without a
+supported adapter are a declared compatibility limit, not an assumed sync pass.
+
+Fresh physical inventory and return-test exports are evidence gates, not a
+request for another general implementation authorization. No user device is
+connected to this environment. Nothing is merged, promoted, locked or marked
+physically accepted. Keep all five rows in the ledger across continuations.
