@@ -1,0 +1,88 @@
+name: Infinity | Fold deadlock permanently signed experimental APK
+on:
+  push:
+    branches: [work/infinity-consolidated-anr-first-20261017]
+    paths:
+      - '.github/workflows/infinity-fold-deadlock-package.yml'
+      - 'repairs/fold-deadlock-20261017/package_apk.py'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-fold-deadlock-package, cancel-in-progress: false}
+jobs:
+  signed-candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Require the exact complete native workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import importlib.util,json,os,time,urllib.request
+          from pathlib import Path
+          p=Path('repairs/fold-deadlock-20261017/package_apk.py')
+          s=importlib.util.spec_from_file_location('candidate',p);m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+          deadline=time.monotonic()+6*3600
+          while time.monotonic()<deadline:
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+str(m.NATIVE_RUN),headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=40) as response:r=json.load(response)
+              assert r['head_sha']==m.NATIVE_SOURCE,'Native source identity changed'
+              if r['status']=='completed':
+                  assert r['conclusion']=='success','Full native workflow failed: '+str(r['conclusion'])
+                  print('PASS exact native workflow',m.NATIVE_RUN,m.NATIVE_SOURCE);break
+              time.sleep(20)
+          else:raise RuntimeError('Native build did not complete within six hours')
+          PY
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38995006086
+          name: Infinity-Fold-Deadlock-Native-Evidence
+          github-token: ${{ github.token }}
+          path: corrected-native
+      - name: Permanently sign candidate and same-code TEST4 rollback
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/fold-deadlock-20261017/package_apk.py \
+            --parent test4-inputs/internal-observer-stage-diagnostic/Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC.apk \
+            --native corrected-native --out fold-delivery
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-Fold-Deadlock-Experimental-APK-and-Rollback
+          path: fold-delivery/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Fold-Deadlock-Packaging-Evidence
+          path: |
+            fold-delivery/*.json
+            fold-delivery/*.txt
+            fold-delivery/SHA256SUMS
+          retention-days: 90
+          if-no-files-found: warn
