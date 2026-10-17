@@ -52,6 +52,8 @@ jobs:
             shutil.copytree(root/'after-overlay',root/'selected',dirs_exist_ok=True)
             shutil.copytree(archive.parent/'corrections',root/'selected',dirs_exist_ok=True)
           PY
+      - name: Unit-test blank-screen rejection and image decoding
+        run: python3 -m unittest discover -s repairs/skin-phase-d-225 -p 'test_visual_gate.py' -v
       - name: Prepare disposable Android runtime
         run: |
           sudo apt-get update -qq
@@ -76,6 +78,7 @@ jobs:
           path: |
             phase-d-android/ANDROID-RENDERER.json
             phase-d-android/*/phase-d-results/
+            phase-d-android/*/VISUAL-GATE.json
             phase-d-android/last-progress/
             phase-d-android/last-renderer-observation.json
             phase-d-android/timeout-progress-*/

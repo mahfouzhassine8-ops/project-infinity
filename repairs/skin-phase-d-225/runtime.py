@@ -1,6 +1,8 @@
 """Real Kodi skin screenshots, bounded GUI loops and control geometry receipts."""
 import json,sys,time,traceback,threading
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from visual_gate import inspect_png
 import xbmc,xbmcgui,xbmcvfs
 profile=Path(xbmcvfs.translatePath('special://profile/'));config=json.loads((profile/'phase-d-config.json').read_text())
 output=profile/'phase-d-results';output.mkdir(exist_ok=True)
@@ -21,8 +23,21 @@ def capture(name,ids=()):
   try:
    c=window.getControl(id);result['controls'].append(dict(id=id,position=c.getPosition(),width=c.getWidth(),height=c.getHeight()))
   except Exception as ex:result['controls'].append(dict(id=id,error=str(ex)))
- path=output/(name+'.png');xbmc.executebuiltin(f'TakeScreenshot({path},sync)',True)
- result['screenshot']=path.name;result['screenshot_present']=path.exists();report['screens'].append(result)
+ attempts=[]
+ for attempt in (1,2,3):
+  path=output/(name+('' if attempt==1 else '-retry'+str(attempt))+'.png')
+  xbmc.executebuiltin(f'TakeScreenshot({path},sync)',True)
+  try: metric=inspect_png(path)
+  except Exception as exc: metric=dict(visibly_nonblank=False,error=repr(exc))
+  attempts.append(dict(attempt=attempt,screenshot=path.name,**metric))
+  if metric['visibly_nonblank']:break
+  if attempt<3:xbmc.sleep(attempt*700)
+ result['screenshot']=path.name
+ result['screenshot_present']=path.exists()
+ result['visual_attempts']=attempts
+ report['screens'].append(result)
+ if not attempts[-1]['visibly_nonblank']:
+  raise RuntimeError('Native screenshot remained visually blank after three bounded sync captures: '+name+' '+repr(attempts))
 
 def close():
  xbmc.executebuiltin('Dialog.Close(all,true)',True);xbmc.executebuiltin('ActivateWindow(home)',True);xbmc.sleep(150)

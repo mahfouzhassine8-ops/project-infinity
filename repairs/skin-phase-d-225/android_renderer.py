@@ -73,7 +73,9 @@ def main(a):
   probe.adb('push',skin_settings,probe.PROFILE+'/guisettings.xml')
   helper=staging/ADDON;helper.mkdir()
   (helper/'addon.xml').write_text('<addon id="'+ADDON+'" name="Phase D renderer" version="1.0.0" provider-name="Infinity CI"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable renderer</summary><description lang="en_GB">Actual native renderer evidence</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
-  shutil.copyfile(HERE/'runtime.py',helper/'default.py');probe.adb('push',helper,probe.PROFILE+'/../addons/'+ADDON)
+  shutil.copyfile(HERE/'runtime.py',helper/'default.py')
+  shutil.copyfile(HERE/'visual_gate.py',helper/'visual_gate.py')
+  probe.adb('push',helper,probe.PROFILE+'/../addons/'+ADDON)
   # This transient test addon only acknowledges Kodi's *real* keep-skin
   # dialog. On ARM-translated emulators the skin can take almost the whole
   # countdown to load; polling from the host after RPC returns is too late.
@@ -245,7 +247,12 @@ else:
     probe.adb('pull',probe.PROFILE+'/phase-d-results',a.out/('timeout-progress-'+name),check=False)
     raise RuntimeError('Renderer timed out after 960 seconds: '+name+'; '+json.dumps(observation))
    target=a.out/name;target.mkdir();probe.adb('pull',probe.PROFILE+'/phase-d-results',target)
-   report['viewports'].append({'name':name,'result':r});assert r.get('passed'),r.get('failure')
+   from visual_gate import inspect_session
+   visual=inspect_session(target/'phase-d-results',r)
+   (target/'VISUAL-GATE.json').write_text(json.dumps(visual,indent=2)+'\n')
+   report['viewports'].append({'name':name,'result':r,'visual_gate':visual})
+   assert r.get('passed'),r.get('failure')
+   assert visual['visual_evidence_passed'],('Visual evidence rejected; no blank screen counts as success',visual['failures'])
   report['passed']=True;stage('actual-native-renderer-completed')
  except Exception:
   report['failure']=traceback.format_exc();raise
