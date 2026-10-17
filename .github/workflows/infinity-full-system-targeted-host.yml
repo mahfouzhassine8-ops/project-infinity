@@ -26,7 +26,9 @@ jobs:
       - name: Verify FULL skin/Rails package rejection and no Kodi substitution
         run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_assets.py' -v
       - name: Syntax-compile exact full-stack setup and real-APK emulator runner
-        run: python3 -m py_compile repairs/full-system-20261017/infinity_full_stack_assets.py repairs/full-system-20261017/infinity_full_stack_android.py
+        run: python3 -m py_compile repairs/full-system-20261017/infinity_full_stack_assets.py repairs/full-system-20261017/infinity_full_stack_android.py repairs/full-system-20261017/infinity_full_stack_close.py
+      - name: Verify real Infinity Essential-First Close receipts reject generic Kodi and incomplete saves
+        run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_close.py' -v
       - name: Verify strict Rotate restoration source and invariants
         run: |
           python3 repairs/full-system-20261017/test_player_rotate_source.py
