@@ -1,0 +1,30 @@
+name: Infinity | Fold capture helper Linux host verification
+on:
+  push:
+    branches: [work/infinity-consolidated-anr-first-20261017]
+    paths:
+      - '.github/workflows/infinity-fold-capture-helper.yml'
+      - 'repairs/fold-anr-20261017/helper/**'
+      - 'repairs/fold-anr-20261017/test_capture.py'
+      - 'repairs/fold-anr-20261017/build_capture.py'
+permissions: {contents: read}
+jobs:
+  host-only:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - name: Run helper and original native recorder host controls
+        run: python3 repairs/fold-anr-20261017/test_capture.py
+      - name: Package standalone experimental helper
+        run: |
+          python3 repairs/fold-anr-20261017/build_capture.py \
+            --output candidate/Infinity-Fold-Freeze-Capture-1.0.0-TEST.zip \
+            --receipt candidate/PACKAGE-RECEIPT.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Fold-Freeze-Capture-1.0.0-Host-Verified
+          path: candidate/
+          retention-days: 90
+          if-no-files-found: error

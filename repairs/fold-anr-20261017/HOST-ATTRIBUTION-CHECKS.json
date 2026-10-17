@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "scope": "Exact TEST4 artifact attribution only; no runtime fix claim",
+  "locked_library_sha256": "2f1597ecc4f8a0ee09f24e399aa738b96a876c7760eaec0ee0ad1a18bafd6929",
+  "verified_aarch64_calls": [
+    {
+      "trace_file_pc": "0x14adfb8",
+      "elf_rva": "0x14b0fb8",
+      "branch_target_rva": "0x14b1048"
+    },
+    {
+      "trace_file_pc": "0x1bb59a8",
+      "elf_rva": "0x1bb89a8",
+      "branch_target_rva": "0x14b0f9c"
+    },
+    {
+      "trace_file_pc": "0x168e190",
+      "elf_rva": "0x1691190",
+      "branch_target_rva": "0x14b0f9c"
+    },
+    {
+      "trace_file_pc": "0x167cba8",
+      "elf_rva": "0x167fba8",
+      "branch_target_rva": "0x165bd04"
+    },
+    {
+      "trace_file_pc": "0x23c9434",
+      "elf_rva": "0x23cc434",
+      "branch_target_rva": "0x23e4b94"
+    }
+  ],
+  "changed_text_negative_control_rejected": true,
+  "android_runtime_tested": false,
+  "physical_fold_verified": false
+}
