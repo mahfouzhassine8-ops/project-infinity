@@ -1,0 +1,31 @@
+name: Infinity | Phase D source bundle for offline package verification
+on:
+  push:
+    branches: [work/infinity-phase-d-225-renderer-diagnostics-20261017]
+    paths: ['.github/workflows/infinity-phase-d-source-export.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Verify exact packaging inputs
+        run: |
+          test -s repairs/skin-phase-d-225/build.py
+          test -s repairs/skin-phase-d-225/test_skin.py
+          test -s repairs/e2e-mobile-2103303/ambient_lifecycle.py
+          git rev-parse HEAD > SOURCE-COMMIT.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-PhaseD-225-Exact-Source
+          path: |
+            SOURCE-COMMIT.txt
+            repairs/skin-phase-d-225/build.py
+            repairs/skin-phase-d-225/test_skin.py
+            repairs/e2e-mobile-2103303/ambient_lifecycle.py
+          retention-days: 7
