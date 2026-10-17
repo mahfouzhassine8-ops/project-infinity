@@ -2,10 +2,10 @@
   "schema": 1,
   "program": "Infinity consolidated watched/touch/background-ANR/skin-polish",
   "branch": "work/infinity-consolidated-anr-first-20261017",
-  "implementation_source_commit": "28191e49458712480353ed8694151eea70822943",
+  "implementation_source_commit": "2d5df339c0a32b678df80852b94e878b1752a8e7",
   "protected_apk_lock_commit": "9dea86a7bf1896993e33ab885aa678a25eddaa0f",
   "protected_skin_lock_commit": "3cc1e1d5e0d5a21db9d19dd6882bd1c647603488",
-  "phase_0": "VERIFIED",
+  "phase_0": "LOCKED_BASELINES_VERIFIED; FRESH_DEVICE_COMMAND_CENTER_CODE_INVENTORY_PENDING",
   "phase_c": "TARGETED_NATIVE_CORRECTION_BUILT_AND_PERMANENTLY_SIGNED; PHYSICAL_FOLD_MATRIX_PENDING",
   "phases_a_b_d_e": "ALL RETAINED IN repairs/fold-deadlock-20261017/PROGRAM.md; current interface/source audits recorded; implementation and physical gates remain open",
   "candidate": {
@@ -20,8 +20,6 @@
     "locked": false
   },
   "verification": {
-    "corrected_symbol_run": 38991071668,
-    "corrected_symbol_job": 117273384811,
     "host_ci_run": 38991834552,
     "host_ci_job": 117275700833,
     "host_tests_passed": 10,
@@ -41,7 +39,16 @@
     "android_overall": "FAIL",
     "new_helper_host_tests_passed": 10,
     "new_helper_native_abi_verified": true,
-    "physical_capture_recovered": true
+    "physical_capture_recovered": true,
+    "historical_anr_symbol_run": 38991071668,
+    "historical_anr_symbol_job": 117273384811,
+    "physical_lock_capture_symbol_run": 38994600709,
+    "physical_lock_capture_symbol_job": 117284252555,
+    "android_runtime_kind": "API 30 x86_64 emulator with ARM64 native translation and controlled fixture; not physical Fold/Diggz",
+    "recovery_host_tests_passed": 10,
+    "recovery_real_kodi_api": "PASS; Kodi 20.5 Linux; two disposable video fixtures",
+    "recovery_actual_otaku_tested": false,
+    "recovery_physical_fold_verified": false
   },
   "preservation": {
     "original_locked_apk_modified": false,
@@ -73,7 +80,9 @@
     "packaging_source_commit": "b0f9ded4f469f80576344751a1c3b559fec6f370",
     "packaging_run": 38997149880,
     "android_run": 38997255083,
-    "experimental_version_code": 2103380
+    "experimental_version_code": 2103380,
+    "recovery_source_commit": "2d5df339c0a32b678df80852b94e878b1752a8e7",
+    "recovery_run": 38998654474
   },
   "capture_helper_baseline": {
     "file": "Infinity-Fold-Freeze-Capture-1.0.0-TEST.zip",
@@ -92,5 +101,14 @@
     "locked_refs_changed": false,
     "merged": false,
     "promoted": false
-  }
+  },
+  "recovery_helper": {
+    "file": "script.infinity.addonrecovery-1.0.0-TEST.zip",
+    "sha256": "dba95ad2a74bc220aeb2d6b045ef303ec2b83ec819ae72a09f3d470c9acf4ae8",
+    "version": "1.0.0",
+    "background_service": false,
+    "mutations": "Kodi Addons.SetAddonEnabled(...,true) for one explicitly selected disabled installation only",
+    "actual_otaku_tested": false
+  },
+  "delivery_scope": "FIRST_NATIVE_VERIFICATION_GATE; ALL_FIVE_WORKSTREAMS_RETAINED; NOT_COMPLETE_FEATURE_RELEASE"
 }
