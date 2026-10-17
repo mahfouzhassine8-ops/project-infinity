@@ -19,8 +19,13 @@ def main(args):
     args.out.mkdir(parents=True, exist_ok=True)
     report = dict(passed=False, scope='Actual signed ARM64 candidate on disposable API30 emulator',
                   physical_fold_verified=False, apk_sha256=hashlib.sha256(args.apk.read_bytes()).hexdigest())
+    def stage(name):
+        report['stage'] = name
+        (args.out / 'ANDROID-WATCHED-NATIVE-PROBE.json').write_text(json.dumps(report, indent=2) + '\n')
+        print('Native helper integration: ' + name, flush=True)
     try:
         assert report['apk_sha256'] == args.expected_sha256
+        stage('installing-exact-signed-apk')
         probe.adb('root'); probe.adb('wait-for-device')
         assert probe.shell('getprop', 'ro.kernel.qemu').strip() == '1', 'Disposable emulator required'
         assert probe.PACKAGE not in probe.shell('pm', 'list', 'packages', probe.PACKAGE), 'Fresh emulator required'
@@ -58,14 +63,18 @@ def main(args):
         probe.adb('push', extra, probe.PROFILE + '/../addons/' + ADDON)
         helper = fixture / 'script.infinity.watchedbridge'
         shutil.copytree(HERE / 'addon', helper, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+        staged_helper = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                         for p in helper.iterdir() if p.suffix in ('.py', '.json', '.xml')}
         probe.adb('push', helper, probe.PROFILE + '/../addons/' + helper.name)
         backing = '/data/media/0/Android/data/' + probe.PACKAGE
         probe.shell('chown', '-R', uid + ':' + uid, backing, probe.PRIVATE + '/shared_prefs')
         probe.shell('restorecon', '-RF', backing, probe.PRIVATE + '/shared_prefs')
         assert probe.shell('getenforce').strip() == 'Enforcing'
+        stage('launching-preserved-runtime')
         probe.adb('logcat', '-c'); probe.shell('am', 'start', '-W', '-n', probe.PACKAGE + '/.Splash')
         report['first_party'] = probe.enable_first_party(args.out)
         report['owner'] = probe.wait_ready()
+        stage('runtime-ready')
         assert probe.rpc('Settings.GetSettingValue', dict(setting='general.addonupdates')) == {'value': 2}, 'Offline fixture update policy was not loaded'
         assert probe.rpc('Addons.SetAddonEnabled', dict(addonid=ADDON, enabled=True)) == 'OK'
         assert probe.rpc('Addons.ExecuteAddon', dict(addonid=ADDON, wait=False)) == 'OK'
@@ -79,11 +88,14 @@ def main(args):
         assert result.get('passed') is True, result.get('failure')
         assert len(result.get('tests', [])) == 14, 'All native index cases are required'
         assert result.get('helper_pipeline_verified') is True, 'Existing writer -> read-only publisher -> native row pipeline required'
+        assert result.get('helper_source_sha256') == staged_helper, 'Actual helper code differs from the staged producer'
+        stage('native-and-helper-pipeline-passed')
         spec = importlib.util.spec_from_file_location('preserved_loaded_close', HERE.parent / 'android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py')
         close_probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(close_probe)
         close_probe.probe = probe
         report['integrated_close'] = close_probe.close(report['owner'], args.out / 'integrated-close')
         assert report['integrated_close']['passed'], 'Integrated helper Close failed'
+        stage('strict-close-passed')
         probe.shell('am', 'start', '-W', '-n', probe.PACKAGE + '/.Splash')
         report['reopened_owner'] = probe.wait_ready(report['owner']['owner'])
         retained = probe.read_json(probe.PROFILE + '/addon_data/script.infinity.commandcenter/continue-watching.json')
@@ -93,6 +105,10 @@ def main(args):
         assert key not in retained.get('items', {}) and key not in retained.get('watched', {})
         report['helper_state_retained_after_safe_close_reopen'] = True
         report['passed'] = True
+        stage('close-reopen-persistence-passed')
+    except Exception as error:
+        report['failure'] = type(error).__name__ + ': ' + str(error)
+        raise
     finally:
         (args.out / 'ANDROID-WATCHED-NATIVE-PROBE.json').write_text(json.dumps(report, indent=2) + '\n')
         (args.out / 'kodi.log').write_text(probe.shell('cat', probe.PROFILE + '/../temp/kodi.log', check=False))

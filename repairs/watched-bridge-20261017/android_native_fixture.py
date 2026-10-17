@@ -88,7 +88,10 @@ class NativeRows(xbmcgui.WindowXMLDialog):
             response = json.loads(xbmc.executeJSONRPC(json.dumps(dict(jsonrpc='2.0', id=1, method='Addons.SetAddonEnabled', params=dict(addonid='script.infinity.watchedbridge', enabled=True)))))
             require(response.get('result') == 'OK', 'Read-only watched helper enable failed')
             helper = xbmcaddon.Addon('script.infinity.watchedbridge')
-            sys.path.insert(0, xbmcvfs.translatePath(helper.getAddonInfo('path')))
+            helper_root = Path(xbmcvfs.translatePath(helper.getAddonInfo('path')))
+            result['helper_source_sha256'] = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                                              for p in helper_root.iterdir() if p.suffix in ('.py', '.json', '.xml')}
+            sys.path.insert(0, str(helper_root))
             import controller
             cc = xbmcaddon.Addon('script.infinity.commandcenter')
             modules = controller.load(xbmcvfs.translatePath(cc.getAddonInfo('path')))

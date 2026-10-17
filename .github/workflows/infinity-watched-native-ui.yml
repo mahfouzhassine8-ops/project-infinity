@@ -2,10 +2,10 @@ name: Infinity | Watched native Android row integration
 on:
   push:
     branches: [work/infinity-consolidated-anr-first-20261017]
-    paths: ['.github/workflows/infinity-watched-native-ui.yml', 'repairs/watched-bridge-20261017/android_native_*.py']
+    paths: ['.github/workflows/infinity-watched-native-ui.yml', 'repairs/watched-bridge-20261017/android_native_*.py', 'repairs/watched-bridge-20261017/addon/**']
   workflow_dispatch:
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-watched-native-ui, cancel-in-progress: true}
+concurrency: {group: infinity-watched-native-ui, cancel-in-progress: false}
 jobs:
   signed-evidence:
     runs-on: ubuntu-22.04
