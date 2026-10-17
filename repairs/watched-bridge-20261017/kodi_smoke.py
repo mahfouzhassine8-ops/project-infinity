@@ -28,6 +28,20 @@ def rpc(method, params):
     return value.get("result")
 
 
+def await_selected_home(label):
+    # New-user add-on confirmation dialogs must not supply the ListItem
+    # context for a production Home-row predicate. Wait for the selected row,
+    # rather than retrying or weakening the watched predicate itself.
+    monitor = xbmc.Monitor()
+    for attempt in range(100):
+        if (xbmcgui.getCurrentWindowId() == 10000 and
+                xbmcgui.getCurrentWindowDialogId() in (0, 9999) and
+                xbmc.getInfoLabel('ListItem.Label') == label):
+            return
+        monitor.waitForAbort(.05)
+    raise RuntimeError('Production Home-row context unavailable: ' + label)
+
+
 def row(label, watched=None, playcount=0, icon="DefaultVideo.png", kind="movie"):
     item = xbmcgui.ListItem(label=label, label2="Offline UI fixture", path="plugin://plugin.video.infinityfixture/?id=123")
     item.setInfo("video", dict(mediatype=kind, title=label, playcount=playcount, season=1, episode=2))
@@ -92,7 +106,8 @@ try:
                 control.addItem(item)
             home.setFocusId(50)
             for index, case in enumerate(cases):
-                control.selectItem(index); xbmc.sleep(80)
+                home.setFocusId(50); control.selectItem(index); xbmc.sleep(80)
+                await_selected_home(case[0])
                 observed = xbmc.getCondVisibility(source["watched_condition"])
                 require(observed == case[3], "Actual row predicate mismatch: " + case[0])
                 if "Partially" in case[0]:
