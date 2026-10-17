@@ -87,6 +87,9 @@ def run(args):
     out.mkdir(parents=True, exist_ok=True)
     report = {
         "passed": False, "product": "Infinity",
+        "test_variant": args.test_variant,
+        "test4_reference_only": args.test_variant == "test4-reference",
+        "test3_current_candidate": args.test_variant == "test3-current",
         "apk_sha256": None, "skin_version": "1.0.5.225",
         "fixture_manifest_rewritten": False, "stock_kodi_apk_used": False,
         "physical_fold_accepted": False, "full_release_accepted": False,
@@ -278,5 +281,6 @@ if __name__ == "__main__":
     p.add_argument("--expected-sha", required=True)
     p.add_argument("--addons", type=Path, required=True)
     p.add_argument("--input-proof", type=Path, required=True)
+    p.add_argument("--test-variant", choices=("test4-reference", "test3-current"), required=True)
     p.add_argument("--out", type=Path, required=True)
     run(p.parse_args())
