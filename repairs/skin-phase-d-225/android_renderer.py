@@ -96,7 +96,9 @@ import xbmcgui
 import xbmcvfs
 out = Path(xbmcvfs.translatePath('special://profile/phase-d-skin-confirm.json'))
 def record(stage, **extra):
-    out.write_text(json.dumps(dict(stage=stage, monotonic=time.monotonic(), **extra)))
+    tmp=out.with_suffix('.json.tmp')
+    tmp.write_text(json.dumps(dict(stage=stage, monotonic=time.monotonic(), **extra)))
+    tmp.replace(out)
 record('armed')
 watch = xbmc.Monitor()
 until = time.monotonic()+90
@@ -159,8 +161,12 @@ else:
    deadline=time.monotonic()+65
    confirmation={}
    while time.monotonic()<deadline:
-    confirmation=probe.read_json(probe.PROFILE+'/phase-d-skin-confirm.json')
-    if confirmation.get('stage')!='armed':break
+    state=probe.read_json(probe.PROFILE+'/phase-d-skin-confirm.json')
+    # A partially read/missing JSON receipt is not a negative result.
+    # The helper publishes atomically; wait for an explicit terminal state.
+    if state.get('stage') in ('submitted_native_ok','dialog_error','native_dialog_not_seen'):
+     confirmation=state
+     break
     time.sleep(.2)
    report['native_skin_confirmation']=confirmation
    assert confirmation.get('stage')=='submitted_native_ok',('Native keep-skin OK was not submitted',confirmation)
