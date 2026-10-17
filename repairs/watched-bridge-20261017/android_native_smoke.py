@@ -47,6 +47,9 @@ def main(args):
         shutil.copyfile(HERE / 'android_native_fixture.py', extra / 'default.py')
         (xml / 'NativeWatchedFixture.xml').write_text('<window><defaultcontrol>50</defaultcontrol><controls><control type="list" id="50"><left>50</left><top>50</top><width>900</width><height>800</height><itemlayout height="80" width="900"><control type="label"><width>850</width><height>70</height><font>font13</font><label>$INFO[ListItem.Label]</label></control></itemlayout><focusedlayout height="80" width="900"><control type="label"><width>850</width><height>70</height><font>font13</font><label>$INFO[ListItem.Label]</label></control></focusedlayout></control></controls></window>')
         probe.adb('push', extra, probe.PROFILE + '/../addons/' + ADDON)
+        helper = fixture / 'script.infinity.watchedbridge'
+        shutil.copytree(HERE / 'addon', helper, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+        probe.adb('push', helper, probe.PROFILE + '/../addons/' + helper.name)
         backing = '/data/media/0/Android/data/' + probe.PACKAGE
         probe.shell('chown', '-R', uid + ':' + uid, backing, probe.PRIVATE + '/shared_prefs')
         probe.shell('restorecon', '-RF', backing, probe.PRIVATE + '/shared_prefs')
@@ -65,6 +68,20 @@ def main(args):
         report['native_row_result'] = result
         assert result.get('passed') is True, result.get('failure')
         assert len(result.get('tests', [])) == 14, 'All native index cases are required'
+        assert result.get('helper_pipeline_verified') is True, 'Existing writer -> read-only publisher -> native row pipeline required'
+        spec = importlib.util.spec_from_file_location('preserved_loaded_close', HERE.parent / 'android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py')
+        close_probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(close_probe)
+        close_probe.probe = probe
+        report['integrated_close'] = close_probe.close(report['owner'], args.out / 'integrated-close')
+        assert report['integrated_close']['passed'], 'Integrated helper Close failed'
+        probe.shell('am', 'start', '-W', '-n', probe.PACKAGE + '/.Splash')
+        report['reopened_owner'] = probe.wait_ready(report['owner']['owner'])
+        retained = probe.read_json(probe.PROFILE + '/addon_data/script.infinity.commandcenter/continue-watching.json')
+        key = result['helper_pipeline_key']
+        assert key in retained.get('watchlist', {}) and key in retained.get('collection', {})
+        assert retained.get('infinity_watched_overrides', {}).get(key, {}).get('watched') is False
+        assert key not in retained.get('items', {}) and key not in retained.get('watched', {})
+        report['helper_state_retained_after_safe_close_reopen'] = True
         report['passed'] = True
     finally:
         (args.out / 'ANDROID-WATCHED-NATIVE-PROBE.json').write_text(json.dumps(report, indent=2) + '\n')

@@ -5,7 +5,7 @@ on:
     paths: ['.github/workflows/infinity-watched-native-ui.yml', 'repairs/watched-bridge-20261017/android_native_*.py']
   workflow_dispatch:
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-watched-native-ui, cancel-in-progress: false}
+concurrency: {group: infinity-watched-native-ui, cancel-in-progress: true}
 jobs:
   signed-evidence:
     runs-on: ubuntu-22.04

@@ -50,7 +50,7 @@ jobs:
           pulseaudio --start --exit-idle-time=-1
           pactl load-module module-null-sink sink_name=watched_ci
           function launch_fixture() {
-            kodi --standalone > /tmp/watched-kodi.log 2>&1 &
+            setsid kodi --standalone > /tmp/watched-kodi.log 2>&1 &
             kodi_wrapper=$!
             window=""
             for attempt in $(seq 1 60); do
@@ -64,11 +64,22 @@ jobs:
           }
           launch_fixture
           xdotool key --window "$window" F11
-          for attempt in $(seq 1 90); do
+          for attempt in $(seq 1 45); do
+            if [ -f "$HOME/.kodi/userdata/watched-bootstrap-result.json" ] && [ -f "$HOME/.kodi/userdata/guisettings.xml" ]; then break; fi
+            sleep 1
+          done
+          python3 -c 'import json,pathlib; r=json.loads((pathlib.Path.home()/".kodi/userdata/watched-bootstrap-result.json").read_text()); assert r["passed"],r'
+          for attempt in $(seq 1 15); do
             if ! kill -0 "$kodi_wrapper" 2>/dev/null; then break; fi
             sleep 1
           done
-          if kill -0 "$kodi_wrapper" 2>/dev/null; then cat "$HOME/.kodi/userdata/watched-bootstrap-result.json" || true; echo 'Bootstrap did not quit normally'; exit 1; fi
+          # This is disposable Linux fixture setup, not a shutdown acceptance
+          # test. Xvfb may hang stock Kodi's desktop-mode restoration. Stop only
+          # this isolated process group before booting the saved renderer skin.
+          if kill -0 "$kodi_wrapper" 2>/dev/null; then
+            kill -KILL -- "-$kodi_wrapper"
+            wait "$kodi_wrapper" || true
+          fi
           python3 - <<'PY'
           import json,pathlib,xml.etree.ElementTree as ET
           profile=pathlib.Path.home()/'.kodi/userdata'

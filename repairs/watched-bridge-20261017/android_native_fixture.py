@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import traceback
 import threading
+import sys
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -81,6 +82,35 @@ class NativeRows(xbmcgui.WindowXMLDialog):
             check('wrong profile clears derived index', row(), '')
             publish([dict(identity=movie, watched=True), dict(identity=movie, watched=False)])
             check('conflicting records withheld', row(), '')
+            # The integration stage enables the actual read-only helper service
+            # only after deterministic raw-index cases finish. No row property
+            # is set; both states must travel through CC's existing writer.
+            response = json.loads(xbmc.executeJSONRPC(json.dumps(dict(jsonrpc='2.0', id=1, method='Addons.SetAddonEnabled', params=dict(addonid='script.infinity.watchedbridge', enabled=True)))))
+            require(response.get('result') == 'OK', 'Read-only watched helper enable failed')
+            helper = xbmcaddon.Addon('script.infinity.watchedbridge')
+            sys.path.insert(0, xbmcvfs.translatePath(helper.getAddonInfo('path')))
+            import controller
+            cc = xbmcaddon.Addon('script.infinity.commandcenter')
+            modules = controller.load(xbmcvfs.translatePath(cc.getAddonInfo('path')))
+            cc_profile = Path(xbmcvfs.translatePath(cc.getAddonInfo('profile')))
+            item = row()
+            selected = modules['context'].selected_entry(item)
+            require(selected is not None, 'Actual typed Kodi selection unavailable')
+            for action in ('toggle-watchlist', 'toggle-collection', 'mark-watched'):
+                require(controller.apply(modules, cc_profile, selected, action), 'Existing checkpointed writer refused ' + action)
+            control.reset(); control.addItem(row()); control.selectItem(0); self.setFocusId(50)
+            monitor = xbmc.Monitor()
+            def await_state(expected):
+                for attempt in range(60):
+                    value = xbmc.getInfoLabel('Container(50).ListItem.Property(Infinity.ResumeHub.Watched)')
+                    if value == expected: return
+                    monitor.waitForAbort(.1)
+                raise RuntimeError('Read-only helper did not publish native state ' + expected)
+            await_state('true')
+            require(controller.apply(modules, cc_profile, selected, 'mark-unwatched'), 'Unwatched writer action failed')
+            await_state('false')
+            result['helper_pipeline_verified'] = True
+            result['helper_pipeline_key'] = selected['key']
             result['passed'] = True
             result['kodi_version'] = xbmc.getInfoLabel('System.BuildVersion')
         except Exception:
