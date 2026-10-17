@@ -14,6 +14,8 @@ BASE_APK = 'bcdcbed5aeaed0bf30e6e590d9ceda7c0177d780b12e98773fa9503beb793286'
 BASE_SKIN = '557003afc83a2661fec6ccef921979e264ff28e93595fb633340c618ab69bd56'
 SKIN = 'e23d5d08c7737f317c2d55ae3f27e8746a019afd02dc20f6fbc73dc48c0c994e'
 RECOVERY = 'dba95ad2a74bc220aeb2d6b045ef303ec2b83ec819ae72a09f3d470c9acf4ae8'
+WATCHED_HELPER = 'c889693c2572456d0c6a176f5b8425ab0f854678fcd78e76391430f78d37e731'
+CAPTURE = '7711cbfeb10e7651fcdfd505922f282086e2384a6ffb45ee7cebe90769ee8b5b'
 ENGINE = 'lib/arm64-v8a/libkodi.so'
 REPO = 'https://github.com/mahfouzhassine8-ops/project-infinity'
 
@@ -73,12 +75,16 @@ def build(delivery, evidence, baseline_skin, handoff, out):
     assert native_row['native_row_result']['helper_pipeline_verified']
     assert native_row['native_row_result']['derived_index_recovery_without_data_write']
     assert native_row['integrated_close']['passed'] and native_row['helper_state_retained_after_safe_close_reopen']
+    assert native_row['fixture_automatic_addon_updates'] is False
+    assert native_row['fixture_network_isolated'] is True
+    assert native_row['addon_update_shutdown_verified'] is False
     renderer = {}
     for version in ('before', 'after'):
         result = load(evidence / ('renderer-' + version) / 'watched-runtime-result.json')
         assert result['passed'] and result['real_kodi_api'] and not result['physical_fold_verified']
         assert result['actual_installed_controller_preimages_verified'] == 13
         assert len(result['rendered_images']) == 3 and len(result['row_predicate_checks']) == 21
+        assert sha(evidence / ('renderer-' + version) / 'script.infinity.watchedbridge-1.0.0-TEST.zip') == WATCHED_HELPER
         renderer[version] = result
     skin = load(delivery / 'SKIN224-PRESERVATION.json')
     assert skin['sha256'] == SKIN and sha(delivery / skin['file']) == SKIN
@@ -91,10 +97,16 @@ def build(delivery, evidence, baseline_skin, handoff, out):
         with zipfile.ZipFile(path) as archive:
             assert archive.testzip() is None
             if 'foldcapture' in name:
+                assert sha(path) == CAPTURE
                 identity = json.loads(archive.read('script.infinity.foldcapture/PACKAGE-IDENTITY.json'))
                 assert identity['candidate_apk_sha256'] == candidate['sha256']
                 assert identity['native_sha256'] == candidate['native_packaged_sha256']
             if 'addonrecovery' in name: assert sha(path) == RECOVERY
+            if 'watchedbridge' in name:
+                assert sha(path) == WATCHED_HELPER
+                expected_helper = {Path(name).name: hashlib.sha256(archive.read(name)).hexdigest()
+                                   for name in archive.namelist()}
+                assert native_row['native_row_result']['helper_source_sha256'] == expected_helper
         files[name] = path
     recovered = load(evidence / 'recovery/recovery-smoke-result.json')
     assert recovered['passed'] and recovered['retained_settings_byte_identical']
@@ -112,7 +124,8 @@ def build(delivery, evidence, baseline_skin, handoff, out):
         native_source_commit=NATIVE, signing_source_commit=SIGNING, candidate_apk=candidate,
         android_preservation=dict(tests_modified=False, skips_added=False, cases=android,
             overall='PASS' if all(v['passed'] for v in android.values()) else 'FAIL'),
-        native_row_gate='PASS; actual signed ARM64 APK on disposable emulator, 14 cases',
+        native_row_gate='PASS; actual signed ARM64 APK on disposable emulator, 14 cases plus real helper pipeline, index recovery and strict Close/reopen; automatic add-on updates disabled in this offline fixture only',
+        automatic_addon_update_close_gate='FAIL in prior online fixture: protected_durability_failed for an add-on staging LICENSE.txt during automatic scraper updates; retained as an unresolved native shutdown issue',
         linux_renderer_gate='PASS; actual production 16x9 controls, fonts and assets, three themes per version',
         debug_text_sha256=hashlib.sha256(raw_text).hexdigest(), debug_text_bytes=len(raw_text),
         workstreams=[
@@ -130,8 +143,20 @@ def build(delivery, evidence, baseline_skin, handoff, out):
         additional_checks={name:None for name in ('PiP','background playback','session without autoplay','rotation','split/pop-up','screen off','Home/Recents','network changes','immediate navigation','Essential-First Close/reopen','persistence','provider and rail regressions','Light/Dark/OLED')}))
     files['WATCHED-TOUCH-APK-PRESERVATION.json'] = delivery / 'WATCHED-TOUCH-APK-PRESERVATION.json'
     files['SKIN224-PRESERVATION.json'] = delivery / 'SKIN224-PRESERVATION.json'
-    for p in out.glob('*.json'): files[p.name] = p
+    for name in ('FIVE-WORKSTREAM-STATUS.json', 'PHYSICAL-FOLD-TEST-MATRIX.json'):
+        files[name] = out / name
+    notes = delivery / 'INFINITY-2103382-TEST3-STATUS.md'
+    assert notes.is_file(), 'Self-contained installation, rollback and five-workstream status are required'
+    files[notes.name] = notes
+    provenance = evidence / 'VERIFICATION-PROVENANCE.json'
+    assert provenance.is_file(), 'Exact passing and failing run identities are required'
+    files['verification/VERIFICATION-PROVENANCE.json'] = provenance
     files['rollback/' + baseline_skin.name] = baseline_skin
+    rollback_capture = delivery / 'rollback/Infinity-Fold-Freeze-Capture-1.0.0-TEST.zip'
+    assert sha(rollback_capture) == 'd99f5e701a5fe2f0dbac0a8eac8f4af29b8c7cb35d0dd3bd76c9889b9d67e174'
+    files['rollback/' + rollback_capture.name] = rollback_capture
+    assert sha(handoff) == '15a127d16f4d609a68e141982d1cce6d22507b261b22c6f26dcec8089a6154c9'
+    with zipfile.ZipFile(handoff) as archive: assert archive.testzip() is None
     files['references/' + handoff.name] = handoff
     # Retain concise gate results and real screenshots. Full matched native ELF
     # and verbose runtime logs are delivered as separate debug evidence.
@@ -143,6 +168,12 @@ def build(delivery, evidence, baseline_skin, handoff, out):
         root = evidence / ('android-' + case)
         for path in sorted(root.glob('*.json')):
             files['verification/android-' + case + '/' + path.name] = path
+        for path in sorted(root.rglob('close.json')):
+            files['verification/android-' + case + '/' + path.relative_to(root).as_posix()] = path
+    failed = evidence / 'native-ui-failed/fold-android-evidence'
+    assert (failed / 'integrated-close/close.json').is_file()
+    for name in ('ANDROID-WATCHED-NATIVE-PROBE.json', 'integrated-close/close.json', 'kodi.log'):
+        files['verification/history/native-helper-online-update/' + name] = failed / name
     manifest = {name:dict(sha256=sha(path), bytes=path.stat().st_size) for name,path in files.items()}
     save(out / 'PACKAGE-IDENTITY.json', dict(schema=1, files=manifest, locked=False, native_source=NATIVE, signing_source=SIGNING))
     files['PACKAGE-IDENTITY.json'] = out / 'PACKAGE-IDENTITY.json'
