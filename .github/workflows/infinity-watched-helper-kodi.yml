@@ -1,0 +1,73 @@
+name: Infinity | Watched helper and production row renderer
+on:
+  push:
+    branches: [work/infinity-consolidated-anr-first-20261017]
+    paths:
+      - '.github/workflows/infinity-watched-helper-kodi.yml'
+      - 'repairs/watched-bridge-20261017/addon/**'
+      - 'repairs/watched-bridge-20261017/test_state.py'
+      - 'repairs/watched-bridge-20261017/test_actions.py'
+      - 'repairs/watched-bridge-20261017/setup_kodi_smoke.py'
+      - 'repairs/watched-bridge-20261017/kodi_smoke.py'
+      - 'repairs/watched-bridge-20261017/fixtures/**'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  watched:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Verify identity negatives and exact installed writer paths
+        run: |
+          python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_state.py -v
+          python3 - <<'PY'
+          import importlib.util,pathlib
+          p=pathlib.Path('repairs/android-checkpoint-shutdown/installed/build.py')
+          s=importlib.util.spec_from_file_location('cc_stage',p);m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+          m.materialize(pathlib.Path('watched-host-runtime'))
+          PY
+          python3 repairs/watched-bridge-20261017/test_actions.py --runtime watched-host-runtime/script.infinity.commandcenter
+          python3 repairs/watched-bridge-20261017/build.py --output watched-evidence/script.infinity.watchedbridge-1.0.0-TEST.zip
+      - name: Prepare disposable Kodi renderer profile
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core pulseaudio
+          python3 repairs/watched-bridge-20261017/setup_kodi_smoke.py
+      - name: Verify actual Kodi ingress, durable menu actions and production row rendering
+        run: |
+          set -euo pipefail
+          Xvfb :99 -screen 0 1920x1080x24 > /tmp/watched-xvfb.log 2>&1 &
+          export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=watched_ci
+          kodi --standalone > /tmp/watched-kodi.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            window=$(xdotool search --name '^Kodi' 2>/dev/null | head -1 || true)
+            if [ -n "$window" ]; then break; fi
+            sleep 1
+          done
+          sleep 10
+          xdotool windowfocus --sync "$window"
+          xdotool key --window "$window" F12
+          for attempt in $(seq 1 240); do
+            if [ -f "$HOME/.kodi/userdata/watched-runtime-result.json" ]; then break; fi
+            sleep 1
+          done
+          python3 -c 'import json,pathlib; r=json.loads((pathlib.Path.home()/".kodi/userdata/watched-runtime-result.json").read_text()); print(json.dumps(r,indent=2)); assert r["passed"]'
+      - name: Retain exact renderer result, screenshots and logs
+        if: always()
+        run: |
+          mkdir -p watched-evidence
+          for file in "$HOME/.kodi/userdata/watched-runtime-result.json" "$HOME/.kodi/temp/kodi.log" /tmp/watched-kodi.log /tmp/watched-xvfb.log; do
+            if [ -f "$file" ]; then cp "$file" watched-evidence/; fi
+          done
+          if [ -d "$HOME/.kodi/userdata/watched-render-evidence" ]; then cp -R "$HOME/.kodi/userdata/watched-render-evidence" watched-evidence/; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Watched-Helper-Real-Kodi-and-Renderer
+          path: watched-evidence/
+          retention-days: 90
+          if-no-files-found: error
