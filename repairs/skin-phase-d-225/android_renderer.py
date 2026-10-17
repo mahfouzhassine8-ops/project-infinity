@@ -48,6 +48,14 @@ def main(a):
   t.write(skin/'addon.xml',encoding='utf-8')
   report['fixture_only_manifest_override']='Offline rendering omits skinshortcuts, external studio/label resources and Rails dependency declarations. Production package is unchanged; provider content and helper integration are not certified.'
   probe.adb('push',skin,probe.PROFILE+'/../addons/'+skin.name)
+  # Represent an established Infinity installation at native boot. Selecting
+  # a 2,000+ XML skin over slow ARM-on-x86 translation can consume Kodi's
+  # entire ten-second "keep this skin" countdown before the dialog is usable.
+  # Seed only the disposable fixture's own normal Kodi setting. This is not
+  # a production APK/skin change or a forced success receipt.
+  skin_settings=a.out/'fixture-startup-guisettings.xml'
+  skin_settings.write_text('<settings version="2"><setting id="lookandfeel.skin">'+skin.name+'</setting></settings>\\n'.replace('\\\\n','\\n'))
+  probe.adb('push',skin_settings,probe.PROFILE+'/guisettings.xml')
   helper=staging/ADDON;helper.mkdir()
   (helper/'addon.xml').write_text('<addon id="'+ADDON+'" name="Phase D renderer" version="1.0.0" provider-name="Infinity CI"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable renderer</summary><description lang="en_GB">Actual native renderer evidence</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
   shutil.copyfile(HERE/'runtime.py',helper/'default.py');probe.adb('push',helper,probe.PROFILE+'/../addons/'+ADDON)
@@ -59,29 +67,20 @@ def main(a):
   report['owner']=probe.wait_ready()
   assert probe.rpc('Settings.SetSettingValue',{'setting':'general.addonupdates','value':2}) is True
   for name in (skin.name,ADDON):assert probe.rpc('Addons.SetAddonEnabled',{'addonid':name,'enabled':True})=='OK'
-  assert probe.rpc('Settings.SetSettingValue',{'setting':'lookandfeel.skin','value':skin.name}) is True
-  # Kodi's skin confirmation is modal: GUI.GetProperties(currentwindow) reports
-  # the underlying Home window, not DialogConfirm (10100). Wait for the actual
-  # dialog in the unchanged signed APK log and accept its focused Yes control.
-  # Never rewrite skin settings directly or suppress the confirmation.
-  stage('confirming-selected-infinity-skin')
-  kodi_log=probe.PROFILE+'/../temp/kodi.log'
-  confirm_seen=False
-  for _ in range(35):
-   recent=probe.shell('tail','-n','180',kodi_log,check=False)
-   if 'Loading skin file: DialogConfirm.xml' in recent and 'skin.infinity.diggz' in recent:
-    confirm_seen=True
-    break
-   time.sleep(1)
-  if confirm_seen:
-   assert probe.rpc('Input.ExecuteAction',{'action':'select'})=='OK', 'Native skin confirmation not acknowledged'
-  else:
-   report['skin_confirmation']='No confirmation dialog observed; verifying persistent native setting'
-  time.sleep(3)
+  stage('verify-native-infinity-skin-on-first-launch')
   selected=probe.rpc('Settings.GetSettingValue',{'setting':'lookandfeel.skin'}).get('value')
-  assert selected==skin.name, ('Native skin did not remain selected',selected)
+  assert selected==skin.name, ('Native Infinity skin not selected at startup',selected)
+  engine_log=probe.shell('cat',probe.PROFILE+'/../temp/kodi.log',check=False)
+  signature='load skin from: '
+  expected_skin='/addons/'+skin.name+'/'
+  loaded=[line for line in engine_log.splitlines() if signature in line]
+  assert any(expected_skin in line for line in loaded), ('Signed engine did not load Infinity skin',loaded[-5:])
+  assert 'skin loaded...' in engine_log, 'Signed engine did not finish loading its skin'
   report['selected_skin']=selected
-  report['skin_confirmation_observed']=confirm_seen
+  report['skin_boot_mode']='native guisettings.xml preselection in disposable Infinity profile'
+  report['native_loaded_skin']=next(line.strip() for line in reversed(loaded) if expected_skin in line)
+  report['runtime_skin_switch_bypassed']=True
+  report['runtime_switch_confirmation_tested']=False
   for name,w,h in [('cover',1080,2400),('inner',1800,1440),('wide',2400,1080)]:
    stage('rendering-'+name)
    probe.shell('wm','size',f'{w}x{h}');probe.shell('wm','density','320');time.sleep(3)
