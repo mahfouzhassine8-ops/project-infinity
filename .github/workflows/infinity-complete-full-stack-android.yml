@@ -8,8 +8,6 @@ on:
         type: string
 permissions: {contents: read, actions: read}
 env:
-  INFINITY_APK: signed/Infinity-2103382-Watched-Touch-TEST3.apk
-  INFINITY_APK_SHA: '6e28bfea7cdb5e497ee21601a714e738db7a57edc3c5c0d29a9c19d461031854'
   INFINITY_ASSET_SHA: '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
 jobs:
   validate-code:
@@ -20,10 +18,19 @@ jobs:
         with: {persist-credentials: false}
       - run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_assets.py' -v
   test-full-app:
-    name: Actual signed Infinity full-stack Android emulator
+    name: Infinity full-stack loaded Close - ${{ matrix.build }}
     needs: validate-code
     runs-on: ubuntu-22.04
     timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [test4-reference, test3-current]
+    env:
+      INFINITY_APK: ${{ matrix.build == 'test4-reference' && 'test4-inputs/internal-observer-stage-diagnostic/Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC.apk' || 'signed/Infinity-2103382-Watched-Touch-TEST3.apk' }}
+      INFINITY_APK_SHA: ${{ matrix.build == 'test4-reference' && 'bcdcbed5aeaed0bf30e6e590d9ceda7c0177d780b12e98773fa9503beb793286' || '6e28bfea7cdb5e497ee21601a714e738db7a57edc3c5c0d29a9c19d461031854' }}
+      INFINITY_VERSION_CODE: ${{ matrix.build == 'test4-reference' && '2103377' || '2103382' }}
+      INFINITY_BUILD_ROLE: ${{ matrix.build }}
     steps:
       - uses: actions/checkout@v7
         with: {persist-credentials: false, fetch-depth: 0}
@@ -58,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "$INFINITY_APK_SHA  $INFINITY_APK" | sha256sum -c
-          python3 repairs/full-system-20261017/infinity_only_gate.py apk --apk "$INFINITY_APK" --expected-sha "$INFINITY_APK_SHA" --version-code 2103382 --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" --out full-stack/SIGNED-APPLICATION-IDENTITY.json
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk --apk "$INFINITY_APK" --expected-sha "$INFINITY_APK_SHA" --version-code "$INFINITY_VERSION_CODE" --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" --out full-stack/SIGNED-APPLICATION-IDENTITY.json
           bundle=full-stack-transfer/Infinity-Full-Stack-CI-Inputs-225.zip
           test -s "$bundle"
           echo "$INFINITY_ASSET_SHA  $bundle" | sha256sum -c
@@ -90,15 +97,15 @@ jobs:
             python3 repairs/full-system-20261017/infinity_full_stack_android.py
             --apk "$INFINITY_APK" --expected-sha "$INFINITY_APK_SHA"
             --addons full-stack/addons --input-proof full-stack/FULL-STACK-INPUTS.json
-            --out full-stack/android
+            --test-variant "$INFINITY_BUILD_ROLE" --out full-stack/android
       - name: Verify native full-stack proof but deny final lock
         run: |
-          python3 -c 'import json; r=json.load(open("full-stack/android/FULL-STACK-ANDROID.json")); assert r["passed"] and r["exact_full_stack_boot_passed"] and r["selected_skin"]=="skin.infinity.diggz"; assert r["enabled_production_components"]["script.infinity.rails"]=="0.2.6"; assert r["enabled_production_components"]["script.infinity.commandcenter"]=="0.3.5.20"; assert not r["full_release_accepted"] and not r["physical_fold_accepted"]'
+          python3 -c 'import json; r=json.load(open("full-stack/android/FULL-STACK-ANDROID.json")); assert r["passed"] and r["exact_full_stack_boot_passed"] and r["selected_skin"]=="skin.infinity.diggz"; assert r["enabled_production_components"]["script.infinity.rails"]=="0.2.6"; assert r["enabled_production_components"]["script.infinity.commandcenter"]=="0.3.5.20"; assert r["close_certified"] and r["reopen_succeeded"] and r["whole_package_death_verified"]; assert not r["full_release_accepted"] and not r["physical_fold_accepted"]'
       - name: Preserve complete evidence and failures
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Infinity-Full-Stack-Android-Evidence
+          name: Infinity-Full-Stack-Android-Evidence-${{ matrix.build }}
           path: |
             full-stack/FULL-STACK-INPUTS.json
             full-stack/SIGNED-APPLICATION-IDENTITY.json
