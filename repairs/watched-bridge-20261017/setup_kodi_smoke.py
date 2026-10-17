@@ -28,10 +28,9 @@ if not estuary.is_dir():
 for version in ("before", "after"):
     addon_id = "skin.infinity.rowverify." + version
     root = addons / addon_id
-    # Ubuntu's Estuary package can contain dangling font symlinks. The actual
-    # source Roboto fonts below replace the two used row faces; keep all other
-    # native skin files without following broken distro symlinks.
-    shutil.copytree(estuary, root, dirs_exist_ok=True, symlinks=True)
+    # Dereference valid distro links so relocating the test skin preserves its
+    # fonts. The production row faces below are always the exact source files.
+    shutil.copytree(estuary, root, dirs_exist_ok=True, ignore_dangling_symlinks=True)
     tree = ET.parse(root / "addon.xml")
     manifest = tree.getroot(); manifest.set("id", addon_id); manifest.set("name", "Infinity Row Verification " + version)
     manifest.set("version", "1.0.0")

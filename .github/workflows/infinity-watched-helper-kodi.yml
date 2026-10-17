@@ -33,7 +33,7 @@ jobs:
       - name: Prepare disposable Kodi renderer profile
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core pulseaudio
+          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core fonts-roboto-unhinted pulseaudio
           python3 repairs/watched-bridge-20261017/setup_kodi_smoke.py
       - name: Verify actual Kodi ingress, durable menu actions and production row rendering
         run: |
