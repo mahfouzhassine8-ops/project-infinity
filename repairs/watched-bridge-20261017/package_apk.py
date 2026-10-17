@@ -21,10 +21,10 @@ ENGINE = "lib/arm64-v8a/libkodi.so"
 PARENT_SHA = "bcdcbed5aeaed0bf30e6e590d9ceda7c0177d780b12e98773fa9503beb793286"
 PARENT_ENGINE_SHA = "2f1597ecc4f8a0ee09f24e399aa738b96a876c7760eaec0ee0ad1a18bafd6929"
 CERT = "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
-NATIVE_RUN = 39002607563
-NATIVE_SOURCE = "c4f0e315f4595b9f7cb3446ed5ad04a6f490b07b"
-CODE = 2103381
-NAME = "1.0.9-Watched-Touch-Bridge-TEST2"
+NATIVE_RUN = 39004549623
+NATIVE_SOURCE = "093323fbc0ae87cbe2fa2a21abab0c357fdaf754"
+CODE = 2103382
+NAME = "1.0.9-Watched-Touch-Bridge-TEST3"
 OLD_NAME = "1.0.9-Essential-First-TEST4-RC05"
 SIGNATURE = re.compile(r"META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))", re.I)
 
@@ -100,7 +100,7 @@ def package(parent, native, out):
         assert needed(parent_engine) == needed(engine), "Native dependency set changed"
         for rollback in (False, True):
             filename = (f"Infinity-{CODE}-TEST4-Compatibility-Rollback.apk" if rollback else
-                        f"Infinity-{CODE}-Watched-Touch-TEST2.apk")
+                        f"Infinity-{CODE}-Watched-Touch-TEST3.apk")
             unsigned = out / ("unsigned-" + filename)
             manifest.NAME = OLD_NAME if rollback else NAME
             patched, edits = manifest.patch(old.read("AndroidManifest.xml"))
