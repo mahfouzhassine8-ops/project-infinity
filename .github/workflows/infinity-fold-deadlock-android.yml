@@ -21,9 +21,9 @@ jobs:
           import json,os,time,urllib.request
           deadline=time.monotonic()+6*3600
           while time.monotonic()<deadline:
-              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/38995281570',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/38997149880',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
               with urllib.request.urlopen(req,timeout=40) as response:r=json.load(response)
-              assert r['head_sha']=='471db97a224dfbe817530331e26ee6f76704fa14','Packaging source changed'
+              assert r['head_sha']=='b0f9ded4f469f80576344751a1c3b559fec6f370','Packaging source changed'
               if r['status']=='completed':
                   assert r['conclusion']=='success','Signed candidate producer failed: '+str(r['conclusion'])
                   break
@@ -32,7 +32,7 @@ jobs:
           PYCHECK
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38995281570
+          run-id: 38997149880
           name: Infinity-Fold-Deadlock-Packaging-Evidence
           github-token: ${{ github.token }}
           path: signed-proof
@@ -42,7 +42,7 @@ jobs:
           import json,os
           from pathlib import Path
           r=json.loads(Path('signed-proof/FOLD-DEADLOCK-APK-PRESERVATION.json').read_text())
-          assert r['packaging_source_commit']=='471db97a224dfbe817530331e26ee6f76704fa14'
+          assert r['packaging_source_commit']=='b0f9ded4f469f80576344751a1c3b559fec6f370'
           assert r['native_source_commit']=='0c9b933c7916cce7d5e0f47a195751827fc41c28'
           a=next(x for x in r['artifacts'] if not x['rollback'])
           assert a['signer_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
@@ -70,7 +70,7 @@ jobs:
           log-accepted-android-sdk-licenses: false
       - uses: actions/download-artifact@v8
         with:
-          run-id: 38995281570
+          run-id: 38997149880
           name: Infinity-Fold-Deadlock-Experimental-APK-and-Rollback
           github-token: ${{ github.token }}
           path: fold-delivery
