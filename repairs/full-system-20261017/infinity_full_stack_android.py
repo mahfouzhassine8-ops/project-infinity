@@ -13,6 +13,7 @@ import shutil
 import time
 import traceback
 import xml.etree.ElementTree as ET
+import infinity_full_stack_close as real_close
 
 HERE = Path(__file__).resolve().parent
 probe_path = HERE.parent / "android-checkpoint-shutdown/runtime-tests/essential_android_probe.py"
@@ -246,12 +247,16 @@ def run(args):
         require(screenshot.startswith(b"\x89PNG\r\n\x1a\n"),
                 "Actual Infinity screenshot missing or not PNG")
         (out / "infinity-real-screen.png").write_bytes(screenshot)
+        publish("request-native-Infinity-Power-Close-after-actual-skin-loading")
+        real_close.loaded_close(probe, report["native_owner"], out, report)
+        require(report.get("close_certified") is True and
+                report.get("reopen_succeeded") is True,
+                "Native Infinity loaded Close and reopen proof incomplete")
         report["passed"] = True
-        publish("complete-Infinity-APK-and-full-skin-in-engine")
+        publish("complete-Infinity-full-stack-loaded-Close-and-reopen")
         return report
     except Exception:
         report["passed"] = False
-        report["exact_full_stack_boot_passed"] = False
         report["failure"] = traceback.format_exc()
         publish("failed")
         raise
