@@ -1,0 +1,98 @@
+name: Infinity | Phase D full skin renderer
+on:
+  push:
+    branches: [work/infinity-phase-d-skin-225-complete]
+    paths: ['repairs/skin-phase-d-225/**', '.github/workflows/infinity-skin-phase-d.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  renderer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [before, after]
+        viewport: [cover, inner, wide]
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Install disposable renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y kodi xvfb xdotool fonts-dejavu-core fonts-roboto-unhinted pulseaudio
+      - name: Materialize exact source fixture
+        run: |
+          python3 - <<'PY'
+          import zipfile,pathlib,hashlib,json,shutil
+          root=pathlib.Path('phase-d-fixture')
+          import io
+          parts=pathlib.Path('repairs/skin-phase-d-225/fixtures/renderer-parts')
+          payload=b''.join(p.read_bytes() for p in sorted(parts.glob('part-*')))
+          assert hashlib.sha256(payload).hexdigest()=='d9bcd6d70c1a259cabf4a907acb3b9628e8c214ef93eb10356fa73985cfd0291'
+          with zipfile.ZipFile(io.BytesIO(payload)) as z:z.extractall(root)
+          for name,digest in json.loads((root/'SOURCE-IDENTITY.json').read_text()).items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name
+          shutil.copytree(root/'before',root/'selected')
+          if '${{ matrix.version }}'=='after':shutil.copytree(root/'after-overlay',root/'selected',dirs_exist_ok=True)
+          PY
+          case '${{ matrix.viewport }}' in
+            cover) dimensions='--width 1080 --height 2400';;
+            inner) dimensions='--width 1800 --height 1440';;
+            wide) dimensions='--width 2400 --height 1080';;
+          esac
+          python3 repairs/skin-phase-d-225/prepare_runtime.py --skin phase-d-fixture/selected --version '${{ matrix.version }}' $dimensions
+      - name: Actual Kodi rendering and dialog lifecycle
+        run: |
+          set -euo pipefail
+          Xvfb :99 -screen 0 1600x1400x24 -extension RANDR > /tmp/phase-d-xvfb.log 2>&1 &
+          export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=phase_d
+          function launch() {
+            setsid kodi --standalone > /tmp/phase-d-kodi.log 2>&1 &
+            wrapper=$!
+            for attempt in $(seq 1 60); do
+              window=$(xdotool search --name '^Kodi' 2>/dev/null | head -1 || true)
+              if [ -n "$window" ]; then break; fi
+              sleep 1
+            done
+            test -n "$window"
+            sleep 8
+            xdotool windowfocus --sync "$window"
+          }
+          launch
+          xdotool key --window "$window" F11
+          for attempt in $(seq 1 45); do
+            if [ -f "$HOME/.kodi/userdata/phase-d-bootstrap.json" ] && [ -f "$HOME/.kodi/userdata/guisettings.xml" ]; then break; fi
+            sleep 1
+          done
+          python3 -c 'import json,pathlib; assert json.loads((pathlib.Path.home()/".kodi/userdata/phase-d-bootstrap.json").read_text()).get("result")=="OK"'
+          # Disposable Linux fixture setup only; no Infinity shutdown acceptance is inferred.
+          if kill -0 "$wrapper" 2>/dev/null; then kill -KILL -- "-$wrapper"; wait "$wrapper" || true; fi
+          case '${{ matrix.viewport }}' in
+            cover) dimensions='--width 1080 --height 2400';;
+            inner) dimensions='--width 1800 --height 1440';;
+            wide) dimensions='--width 2400 --height 1080';;
+          esac
+          python3 repairs/skin-phase-d-225/prepare_runtime.py --skin phase-d-fixture/selected --version '${{ matrix.version }}' $dimensions
+          launch
+          xdotool windowsize "$window" $(python3 -c 'import json,pathlib; c=json.loads((pathlib.Path.home()/".kodi/userdata/phase-d-config.json").read_text());print(c["width"]//2,c["height"]//2)')
+          xdotool key --window "$window" F12
+          for attempt in $(seq 1 300); do
+            if [ -f "$HOME/.kodi/userdata/phase-d-results/result.json" ]; then break; fi
+            sleep 1
+          done
+          python3 -c 'import json,pathlib; r=json.loads((pathlib.Path.home()/".kodi/userdata/phase-d-results/result.json").read_text()); print(json.dumps(r,indent=2)); assert r["passed"]'
+      - name: Retain all actual evidence
+        if: always()
+        run: |
+          mkdir -p phase-d-evidence
+          cp -r "$HOME/.kodi/userdata/phase-d-results" phase-d-evidence/ || true
+          cp "$HOME/.kodi/temp/kodi.log" /tmp/phase-d-kodi.log /tmp/phase-d-xvfb.log phase-d-evidence/ || true
+          cp phase-d-fixture/SOURCE-IDENTITY.json phase-d-evidence/ || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-PhaseD-${{ matrix.version }}-${{ matrix.viewport }}
+          path: phase-d-evidence/
+          retention-days: 90
