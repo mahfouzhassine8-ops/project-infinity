@@ -88,7 +88,8 @@ inline bool Same(const Identity& left, const Identity& right)
 class Index
 {
 public:
-  explicit Index(std::vector<Record> records) : m_records(std::move(records))
+  explicit Index(std::vector<Record> records, std::map<std::string, std::string> providers)
+    : m_records(std::move(records)), m_providers(std::move(providers))
   {
     for (size_t index = 0; index < m_records.size(); ++index)
       for (const auto& alias : Aliases(m_records[index].identity))
@@ -120,8 +121,26 @@ public:
     return state ? "true" : "false";
   }
 
+  std::string LookupItem(Identity query, const std::string& provider, bool nativeLibrary) const
+  {
+    if (query.kind == "episode")
+    {
+      if (!provider.empty())
+      {
+        const auto found = m_providers.find(provider);
+        if (found == m_providers.end())
+          return {}; // Generic provider IDs do not establish episode/show scope.
+        query.scope = found->second;
+      }
+      else if (!nativeLibrary)
+        return {};
+    }
+    return Lookup(query);
+  }
+
 private:
   const std::vector<Record> m_records;
+  const std::map<std::string, std::string> m_providers;
   std::unordered_map<std::string, std::set<size_t>> m_aliases;
 };
 
@@ -131,12 +150,17 @@ inline std::shared_ptr<const Index>& Published()
   return value;
 }
 
-inline bool Publish(std::vector<Record> records)
+inline bool Publish(std::vector<Record> records, std::map<std::string, std::string> providers = {})
 {
-  if (records.size() > 1200 ||
+  if (records.size() > 1200 || providers.size() > 32 ||
       std::any_of(records.begin(), records.end(), [](const Record& row) { return !Valid(row.identity); }))
     return false;
-  std::shared_ptr<const Index> replacement = std::make_shared<Index>(std::move(records));
+  for (const auto& [name, scope] : providers)
+    if (name.size() > 128 || name.compare(0, 13, "plugin.video.") != 0 ||
+        name.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789._-") != std::string::npos ||
+        (scope != "episode" && scope != "show_episode"))
+      return false;
+  std::shared_ptr<const Index> replacement = std::make_shared<Index>(std::move(records), std::move(providers));
   std::atomic_store_explicit(&Published(), std::move(replacement), std::memory_order_release);
   return true;
 }
@@ -150,5 +174,11 @@ inline std::string Lookup(const Identity& identity)
 {
   const auto view = std::atomic_load_explicit(&Published(), std::memory_order_acquire);
   return view ? view->Lookup(identity) : std::string{};
+}
+
+inline std::string LookupItem(Identity identity, const std::string& provider, bool nativeLibrary)
+{
+  const auto view = std::atomic_load_explicit(&Published(), std::memory_order_acquire);
+  return view ? view->LookupItem(std::move(identity), provider, nativeLibrary) : std::string{};
 }
 } // namespace InfinityWatched

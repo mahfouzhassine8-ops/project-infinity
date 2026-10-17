@@ -64,6 +64,7 @@ result = dict(passed=False, real_kodi_api=True, native_index_verified=False,
               real_provider_addons_tested=False, physical_fold_verified=False,
               renderer_scope="Extracted production 16x9 provider-row controls with actual source fonts/palette/assets; native index and full skin require separate Android/Fold gates")
 try:
+    rpc("Addons.SetAddonEnabled", dict(addonid="script.infinity.commandcenter", enabled=True))
     addon = xbmcaddon.Addon("script.infinity.commandcenter")
     modules = controller.load(xbmcvfs.translatePath(addon.getAddonInfo("path")))
     hub, common = modules["resume_hub"], modules["common"]

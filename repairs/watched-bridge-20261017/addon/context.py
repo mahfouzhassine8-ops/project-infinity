@@ -10,6 +10,7 @@ import xbmcvfs
 
 import controller
 from bridge_state import identity, lookup, records
+import provider_contracts as contracts
 
 FOLDER_PROVIDERS = frozenset(("plugin.video.umbrella", "plugin.video.pov", "plugin.video.otaku", "plugin.video.watchnixtoons2"))
 
@@ -23,7 +24,7 @@ class TitleView:
         return getattr(self.item, name)
 
 
-def selected(modules, item):
+def selected(modules, item, verify_provider=None):
     if item is None:
         return None
     candidate = item
@@ -33,7 +34,24 @@ def selected(modules, item):
         if urlsplit(item.getPath()).netloc not in FOLDER_PROVIDERS:
             return None
         candidate = TitleView(item)
-    return modules["context"].selected_entry(candidate)
+    entry = modules["context"].selected_entry(candidate)
+    if entry and entry.get("media") == "tv":
+        addon_id = contracts.provider(entry)
+        if addon_id:
+            if verify_provider is None:
+                def verify_provider(name):
+                    try:
+                        addon = xbmcaddon.Addon(name)
+                        return contracts.verify(name, xbmcvfs.translatePath(addon.getAddonInfo("path")))
+                    except RuntimeError:
+                        return None
+            proof = verify_provider(addon_id)
+            if not contracts.reviewed(addon_id, proof):
+                return None
+            entry[contracts.ENTRY_PROOF] = proof
+        if not contracts.canonical(entry, identity(entry), entry.get(contracts.ENTRY_PROOF)):
+            return None
+    return entry
 
 
 def main():
@@ -49,7 +67,7 @@ def main():
         hub = modules["resume_hub"]
         data = hub.load_view(profile)
         key = hub.compatible_key(data, entry)
-        local_state = lookup(records(data), identity(entry))
+        local_state = lookup(records(data), contracts.canonical(entry, identity(entry), entry.get(contracts.ENTRY_PROOF)))
         tag = getattr(sys, "listitem").getVideoInfoTag()
         native_watched = getattr(tag, "getPlayCount", lambda: 0)() > 0
         watched = local_state == "true" or (native_watched and local_state != "false")

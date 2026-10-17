@@ -2,6 +2,7 @@
 import hashlib
 import json
 import re
+from provider_contracts import PROOFS, presentation, CATALOG
 
 OVERRIDES = "infinity_watched_overrides"
 MAX_RECORDS = 1200
@@ -68,10 +69,13 @@ def records(data):
         raise ValueError("Watched state has an unsupported shape")
     if len(watched) > 600 or len(overrides) > 600:
         raise ValueError("Watched state exceeds the reviewed presentation limit")
+    proofs = data.get(PROOFS, {})
+    if not isinstance(proofs, dict) or len(proofs) > 1200:
+        raise ValueError("Episode identity proof field is unsupported")
     positive = []
     by_alias = {}
     for key, entry in sorted(watched.items()):
-        value = identity(entry) if KEY.fullmatch(str(key)) else None
+        value = presentation(entry, identity(entry), proofs.get(key)) if KEY.fullmatch(str(key)) else None
         if value:
             index = len(positive)
             positive.append(dict(identity=value, watched=True))
@@ -79,7 +83,7 @@ def records(data):
                 by_alias.setdefault(alias, set()).add(index)
     result = list(positive)
     for key, entry in sorted(overrides.items()):
-        value = identity(entry) if KEY.fullmatch(str(key)) else None
+        value = presentation(entry, identity(entry), proofs.get(key)) if KEY.fullmatch(str(key)) else None
         if not value:
             continue
         candidates = set().union(*(by_alias.get(alias, set()) for alias in aliases(value)))
@@ -90,11 +94,13 @@ def records(data):
     return result
 
 
-def snapshot(data, profile):
+def snapshot(data, profile, providers=None):
     rows = records(data)
-    canonical = json.dumps(rows, separators=(",", ":"), sort_keys=True)
+    contracts = {name: CATALOG[name]["scope"] for name, proof in (providers or {}).items()
+                 if name in CATALOG and CATALOG[name]["proof"] == proof}
+    canonical = json.dumps(dict(records=rows, providers=contracts), separators=(",", ":"), sort_keys=True)
     payload = dict(schema=1, profile=str(profile).rstrip("/\\"),
-                   revision=hashlib.sha256(canonical.encode()).hexdigest(), records=rows)
+                   revision=hashlib.sha256(canonical.encode()).hexdigest(), records=rows, providers=contracts)
     result = json.dumps(payload, separators=(",", ":"), sort_keys=True)
     if len(result.encode("utf-8")) > MAX_BYTES or len(rows) > MAX_RECORDS:
         raise ValueError("Watched snapshot exceeds its native limit")

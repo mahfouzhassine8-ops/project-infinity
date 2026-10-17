@@ -17,6 +17,7 @@ args = parser.parse_args()
 sys.path.insert(0, str(HERE / "addon"))
 import controller
 from bridge_state import OVERRIDES, records, identity, lookup
+import provider_contracts as contracts
 sys.argv = [sys.argv[0], "--runtime", args.runtime]
 fixtures = runpy.run_path(str(HERE.parent / "android-checkpoint-shutdown/runtime-tests/test_runtime_checkpoint.py"), run_name="fixtures")
 hub, common = fixtures["hub"], fixtures["common"]
@@ -44,6 +45,35 @@ class Selected:
 
 
 class ActionTests(fixtures["RuntimeTests"]):
+    def test_episode_scope_attestation_preserves_old_key_and_data(self):
+        selected = Selected(kind="episode")
+        proof = contracts.CATALOG["plugin.video.umbrella"]["proof"]
+        entry = bridge_context.selected(modules, selected, verify_provider=lambda name: proof)
+        self.assertIsNotNone(entry)
+        key = entry["key"]
+        common.atomic_json(self.profile / hub.CONTINUE_FILE, dict(schema=2, foreign="retained", items={key: dict(entry, position=30, duration=100)}))
+        self.assertTrue(controller.apply(modules, self.profile, entry, "mark-watched"))
+        data = hub.load(self.profile)
+        self.assertEqual(data["foreign"], "retained"); self.assertIn(key, data["watched"])
+        self.assertEqual(data["watched"][key]["identity"]["scope"], "episode")
+        query = dict(identity(entry), scope="show_episode")
+        self.assertEqual(lookup(records(data), query), "true")
+        self.assertEqual(lookup(records(data), identity(entry)), "")
+        self.assertTrue(controller.apply(modules, self.profile, entry, "mark-unwatched"))
+        self.assertEqual(lookup(records(hub.load(self.profile)), query), "false")
+
+    def test_unknown_episode_producer_cannot_write_or_rebind_existing_route(self):
+        self.assertIsNone(bridge_context.selected(modules, Selected(kind="episode"), verify_provider=lambda name: None))
+        raw = cc_context.selected_entry(Selected(kind="episode"))
+        self.assertFalse(controller.apply(modules, self.profile, raw, "mark-watched"))
+        proof = contracts.CATALOG["plugin.video.umbrella"]["proof"]
+        entry = bridge_context.selected(modules, Selected(kind="episode"), verify_provider=lambda name: proof)
+        old = dict(entry, source="plugin://plugin.video.umbrella/?different=unverified-history")
+        common.atomic_json(self.profile / hub.CONTINUE_FILE, dict(schema=2, watched={entry["key"]: old}))
+        original = (self.profile / hub.CONTINUE_FILE).read_bytes()
+        self.assertFalse(controller.apply(modules, self.profile, entry, "mark-unwatched"))
+        self.assertEqual((self.profile / hub.CONTINUE_FILE).read_bytes(), original)
+
     def selected(self):
         return cc_context.selected_entry(Selected())
 

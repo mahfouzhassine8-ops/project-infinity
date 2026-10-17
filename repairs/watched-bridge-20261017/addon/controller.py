@@ -7,6 +7,8 @@ import sys
 import xml.etree.ElementTree as ET
 
 from bridge_state import OVERRIDES
+from bridge_state import identity as presentation_raw
+from provider_contracts import PROOFS, ENTRY_PROOF, provider, canonical, presentation
 
 
 class UnsupportedController(RuntimeError):
@@ -40,6 +42,9 @@ def apply(modules, profile, entry, action):
     identity = hub.entry_identity(entry)
     if not identity or entry.get("key") != hub.identity_key(identity):
         return False
+    raw = presentation_raw(entry)
+    if not canonical(entry, raw, entry.get(ENTRY_PROOF)):
+        return False
     with common.persistence_scope():
         source = Path(profile) / hub.CONTINUE_FILE
         if source.exists():
@@ -52,6 +57,9 @@ def apply(modules, profile, entry, action):
             if not isinstance(original, dict) or type(original.get("schema")) is not int or original["schema"] not in (1, 2):
                 raise UnsupportedController("The progress schema is not compatible; no migration or reset was performed.")
         data = hub.load(profile)
+        proofs = data.get(PROOFS, {})
+        if not isinstance(proofs, dict):
+            raise UnsupportedController("The episode identity proof field is not compatible; no state was changed.")
         overrides = data.get(OVERRIDES, {})
         if not isinstance(overrides, dict):
             raise UnsupportedController("The local watched override field is not compatible; its contents were left unchanged.")
@@ -65,6 +73,10 @@ def apply(modules, profile, entry, action):
         saved = hub.find_entry(data, key)
         if saved and not hub.same_identity(hub.entry_identity(saved), identity):
             return False
+        if saved and identity["kind"] == "episode" and provider(entry):
+            if (not presentation(saved, presentation_raw(saved), proofs.get(key)) and
+                    saved.get("source") != entry.get("source")):
+                return False  # Old scope cannot be rebound by ID coincidence alone.
         admitted = dict(saved or entry, key=key)
         changed = None
         if action == "mark-watched":
@@ -86,6 +98,19 @@ def apply(modules, profile, entry, action):
             data, _, changed = hub._toggle_bucket(data, key, "collection", admitted)
         if changed is None:
             return False
+        if identity["kind"] == "episode" and provider(entry):
+            # Keep the existing controller key, routes and identities intact.
+            # This attests only a currently selected, code-verified producer row.
+            if provider(admitted) != provider(entry):
+                raise UnsupportedController("This saved episode uses a different producer; its identity was left unchanged.")
+            proofs[key] = dict(provider=provider(entry), proof=entry[ENTRY_PROOF], identity=presentation_raw(admitted))
+            active = set(overrides)
+            for bucket in ("items", "watched", "watchlist", "collection"):
+                active.update(data.get(bucket, {}))
+            proofs = {name: value for name, value in proofs.items() if name in active}
+            if len(proofs) > 1200:
+                raise UnsupportedController("The episode identity proof limit was reached; no state was saved.")
+            data[PROOFS] = proofs
         data[OVERRIDES] = overrides
         hub.save(profile, data, hub.publish_home)
     # Retain the controller's durable native-library queue and owner checks.

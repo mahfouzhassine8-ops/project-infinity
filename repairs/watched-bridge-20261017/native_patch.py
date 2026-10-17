@@ -29,7 +29,7 @@ static int InfinityResumeHubUpdate(const std::vector<std::string>& params)
       !value["schema"].isInteger() || value["schema"].asInteger() != 1 ||
       !value["profile"].isString() || !value["revision"].isString() ||
       value["revision"].asString().size() != 64 || !value["records"].isArray() ||
-      value["records"].size() > 1200)
+      value["records"].size() > 1200 || !value["providers"].isObject() || value["providers"].size() > 32)
     return fail();
   std::string profile = CSpecialProtocol::TranslatePath("special://profile/");
   while (!profile.empty() && (profile.back() == '/' || profile.back() == '\\'))
@@ -68,7 +68,14 @@ static int InfinityResumeHubUpdate(const std::vector<std::string>& params)
     }
     records.emplace_back(std::move(record));
   }
-  if (!InfinityWatched::Publish(std::move(records)))
+  std::map<std::string, std::string> providers;
+  for (auto it = value["providers"].begin_map(); it != value["providers"].end_map(); ++it)
+  {
+    if (!it->second.isString())
+      return fail();
+    providers[it->first] = it->second.asString();
+  }
+  if (!InfinityWatched::Publish(std::move(records), std::move(providers)))
     return fail();
   CServiceBroker::GetGUI()->GetInfoManager().ResetCache();
   return 0;

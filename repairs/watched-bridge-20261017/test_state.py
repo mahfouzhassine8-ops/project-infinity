@@ -6,6 +6,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).parent / "addon"))
 import bridge_state as state
+import provider_contracts as contracts
 
 
 def entry(kind="movie", names=None, scope=None, season=1, episode=2):
@@ -13,11 +14,33 @@ def entry(kind="movie", names=None, scope=None, season=1, episode=2):
     result = dict(media="movie" if kind == "movie" else "tv", identity=value)
     if kind == "episode":
         value.update(season=season, episode=episode)
-        result.update(season=season, episode=episode)
+        result.update(season=season, episode=episode, source="videodb://episodes/1", dbid=1)
     return result
 
 
 class SnapshotTests(unittest.TestCase):
+    def test_provider_show_ids_need_matching_selected_row_attestation(self):
+        value = entry("episode"); value.update(source="plugin://plugin.video.pov/?mode=play_media", dbid=-1)
+        key = "a" * 64
+        data = dict(schema=2, watched={key: value})
+        self.assertEqual(state.records(data), [])
+        raw = state.identity(value)
+        proof = dict(identity=raw, provider="plugin.video.pov", proof=contracts.CATALOG["plugin.video.pov"]["proof"])
+        data[contracts.PROOFS] = {key: proof}
+        show = dict(raw, scope="show_episode")
+        self.assertEqual(state.lookup(state.records(data), show), "true")
+        self.assertEqual(state.lookup(state.records(data), raw), "")
+        for change in (dict(proof, proof="unreviewed"), dict(proof, provider="plugin.video.otaku"),
+                       dict(proof, identity=dict(raw, episode=102))):
+            data[contracts.PROOFS] = {key: change}
+            self.assertEqual(state.records(data), [])
+
+    def test_snapshot_exposes_only_current_verified_provider_scopes(self):
+        proof = contracts.CATALOG["plugin.video.pov"]["proof"]
+        value = json.loads(state.snapshot(dict(schema=2), "/profile", {"plugin.video.pov": proof, "plugin.video.otaku": "unknown"}))
+        self.assertEqual(value["providers"], {"plugin.video.pov": "show_episode"})
+        self.assertNotIn(proof, json.dumps(value))
+
     def test_cross_provider_movie_aliases_and_namespace_negatives(self):
         rows = state.records(dict(schema=2, watched={"a" * 64: entry()}))
         self.assertEqual(state.lookup(rows, state.identity(entry(names={"imdb": "tt00123"}))), "true")

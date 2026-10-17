@@ -2,6 +2,7 @@
 #pragma once
 #include "InfinityWatchedIndex.h"
 #include "FileItem.h"
+#include "URL.h"
 #include "utils/StringUtils.h"
 #include "video/VideoInfoTag.h"
 
@@ -31,24 +32,9 @@ inline std::string ItemState(const CFileItem& item)
     if (ValidID(name, value))
       query.ids[name] = std::move(value);
   }
-  const auto episodeState = Lookup(query);
-  if (query.kind != "episode")
-    return episodeState;
-  Identity showQuery = query;
-  showQuery.scope = "show_episode";
-  showQuery.ids.clear();
-  // Only explicitly namespaced series identifiers can enter series scope.
-  // Generic episode IDs are never silently reinterpreted as a show's IDs.
-  for (const std::string name : {"tmdb", "tvdb", "imdb"})
-  {
-    std::string value = tag->GetUniqueID(name + "show");
-    StringUtils::Trim(value);
-    if (ValidID(name, value))
-      showQuery.ids[name] = std::move(value);
-  }
-  const auto showState = Lookup(showQuery);
-  if (!episodeState.empty() && !showState.empty() && episodeState != showState)
-    return {};
-  return !episodeState.empty() ? episodeState : showState;
+  const CURL route(item.GetPath());
+  const std::string provider = route.GetProtocol() == "plugin" ? route.GetHostName() : "";
+  const bool nativeLibrary = route.GetProtocol() == "videodb" && tag->m_iDbId > 0;
+  return LookupItem(std::move(query), provider, nativeLibrary);
 }
 } // namespace InfinityWatched

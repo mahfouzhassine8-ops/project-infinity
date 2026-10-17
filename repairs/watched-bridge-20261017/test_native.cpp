@@ -25,6 +25,14 @@ int main()
   require(Lookup(otherNamespace).empty(), "equal numeric foreign namespace is unknown");
   require(Lookup(episode) == "true" && Lookup(special) == "true", "season/episode and zero special");
   require(Lookup(show).empty(), "show and episode scopes never conflate");
+  require(LookupItem(episode, "plugin.video.unknown", false).empty(), "unknown plugin episode contract withheld");
+  require(LookupItem(episode, "", false).empty(), "unverified local episode withheld");
+  require(LookupItem(episode, "", true) == "true", "checked native episode IDs retain item scope");
+  require(Publish({{show, true}}, {{"plugin.video.pov", "show_episode"}, {"plugin.video.umbrella", "show_episode"}}), "publish verified producer scopes");
+  require(LookupItem(episode, "plugin.video.pov", false) == "true" && LookupItem(episode, "plugin.video.umbrella", false) == "true", "cross-provider series plus season episode");
+  require(LookupItem(episode, "", true).empty() && LookupItem(episode, "plugin.video.otaku", false).empty(), "same numeric episode and unknown anime never alias series");
+  require(!Publish({}, {{"plugin.video.pov", "absolute"}}), "unknown numbering scope rejected");
+  require(Publish({{movie, true}, {episode, true}, {special, true}}), "restore typed records");
   Identity absolute = episode; absolute.episode = 102;
   require(Lookup(absolute).empty(), "absolute anime number not guessed");
   Identity conflict = movie; conflict.ids["imdb"] = "tt00999";
@@ -55,5 +63,5 @@ int main()
   });
   writer.join(); reader.join();
   require(!failed, "concurrent immutable publication and lookup");
-  std::cout << "{\"passed\":true,\"typed_identity_cases\":14,\"concurrent_publications\":5000,\"concurrent_lookups\":15000,\"physical_fold_verified\":false}\n";
+  std::cout << "{\"passed\":true,\"typed_identity_cases\":22,\"concurrent_publications\":5000,\"concurrent_lookups\":15000,\"physical_fold_verified\":false}\n";
 }
