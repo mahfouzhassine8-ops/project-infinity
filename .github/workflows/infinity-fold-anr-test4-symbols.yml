@@ -1,0 +1,34 @@
+name: Infinity | Locked TEST4 Fold ANR symbol attribution
+on:
+  push:
+    branches: [work/infinity-consolidated-anr-first-20261017]
+    paths:
+      - '.github/workflows/infinity-fold-anr-test4-symbols.yml'
+      - 'repairs/fold-anr-20261017/symbolize_locked_engine.py'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-fold-anr-test4-symbols, cancel-in-progress: false}
+jobs:
+  exact-symbols:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38975950035
+          name: Infinity-2103377-Essential-First-Native-Engine
+          github-token: ${{ github.token }}
+          path: locked-native
+      - name: Resolve PCs after exact locked APK code-section check
+        run: |
+          python3 repairs/fold-anr-20261017/symbolize_locked_engine.py \
+            --library locked-native/libkodi.so --output evidence/TEST4-SYMBOLS.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-TEST4-Fold-ANR-Exact-Symbols
+          path: evidence/TEST4-SYMBOLS.json
+          retention-days: 90
+          if-no-files-found: error
