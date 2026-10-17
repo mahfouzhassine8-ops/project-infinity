@@ -11,7 +11,9 @@ jobs:
     timeout-minutes: 35
     strategy:
       fail-fast: false
-      matrix: {version: [before, after]}
+      matrix:
+        version: [before, after]
+        viewport: [cover, inner, wide]
     steps:
       - uses: actions/checkout@v7
         with: {persist-credentials: false}
@@ -66,11 +68,11 @@ jobs:
           avd-name: infinity-phase-d
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/skin-phase-d-225/android_renderer.py --apk fold-delivery/Infinity-2103382-Watched-Touch-TEST3.apk --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons --skin phase-d-fixture/selected --version '${{ matrix.version }}' --out phase-d-android
+          script: python3 repairs/skin-phase-d-225/android_renderer.py --apk fold-delivery/Infinity-2103382-Watched-Touch-TEST3.apk --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons --skin phase-d-fixture/selected --version '${{ matrix.version }}' --viewport '${{ matrix.viewport }}' --out phase-d-android
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: Infinity-PhaseD-Android-${{ matrix.version }}
+          name: Infinity-PhaseD-Android-${{ matrix.version }}-${{ matrix.viewport }}
           path: |
             phase-d-android/ANDROID-RENDERER.json
             phase-d-android/*/phase-d-results/

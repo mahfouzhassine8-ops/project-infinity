@@ -183,7 +183,14 @@ else:
   report['selected_skin']=selected
   report['native_loaded_skin']=loaded[-1].strip()
   report['actual_signed_engine_skin_verified']=True
-  for name,w,h in [('cover',1080,2400),('inner',1800,1440),('wide',2400,1080)]:
+  # Exactly one independently timed viewport per emulator job. Full 42-image
+  # theme coverage and all 60 focus/Back cycles remain mandatory on EACH.
+  # In the old combined run a progressing GUI exhausted a shared per-screen
+  # deadline before the remaining viewports were ever reached.
+  viewport_sizes={'cover':(1080,2400),'inner':(1800,1440),'wide':(2400,1080)}
+  assert a.viewport in viewport_sizes
+  report['viewport_requested']=a.viewport
+  for name,w,h in [(a.viewport,*viewport_sizes[a.viewport])]:
    stage('rendering-'+name)
    probe.shell('wm','size',f'{w}x{h}');probe.shell('wm','density','320');time.sleep(3)
    config=a.out/'phase-d-config.json';config.write_text(json.dumps({'version':a.version,'width':w,'height':h,'android':True,'skin_id':skin.name}))
@@ -201,11 +208,11 @@ else:
    report['fixture_config_permissions']=config_stat
    probe.shell('rm','-rf',probe.PROFILE+'/phase-d-results') # Disposable test output only.
    assert probe.rpc('Addons.ExecuteAddon',{'addonid':ADDON,'params':['run'],'wait':False})=='OK'
-   # Real signed ARM64 Infinity translates on an x86 emulator. Forty-two
-   # screenshots plus sixty dialog/focus cycles can legitimately take more
-   # than five minutes. Give progressing work a bounded 8-minute window;
-   # independently reject a GUI that makes no progress for 100 seconds.
-   deadline=time.monotonic()+480
+   # Each independently launched emulator executes the full 42-screen +
+   # 60-dialog suite for one Fold viewport. ARM64-on-x86 translation varies
+   # widely in speed. Give real progress 16 minutes, while separately failing
+   # if the GUI makes no progress for 100 seconds. No checks are skipped.
+   deadline=time.monotonic()+960
    last_observation=0
    last_marker=None
    last_advance=time.monotonic()
@@ -236,7 +243,7 @@ else:
     time.sleep(1)
    else:
     probe.adb('pull',probe.PROFILE+'/phase-d-results',a.out/('timeout-progress-'+name),check=False)
-    raise RuntimeError('Renderer timed out after 480 seconds: '+name+'; '+json.dumps(observation))
+    raise RuntimeError('Renderer timed out after 960 seconds: '+name+'; '+json.dumps(observation))
    target=a.out/name;target.mkdir();probe.adb('pull',probe.PROFILE+'/phase-d-results',target)
    report['viewports'].append({'name':name,'result':r});assert r.get('passed'),r.get('failure')
   report['passed']=True;stage('actual-native-renderer-completed')
@@ -251,4 +258,6 @@ else:
 if __name__=='__main__':
  p=argparse.ArgumentParser()
  for n in ('apk','installed-addons','skin','out'):p.add_argument('--'+n,type=Path,required=True)
- p.add_argument('--version',required=True);main(p.parse_args())
+ p.add_argument('--version',required=True)
+ p.add_argument('--viewport',required=True,choices=('cover','inner','wide'))
+ main(p.parse_args())
