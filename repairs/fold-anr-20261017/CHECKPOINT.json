@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "program": "Infinity consolidated watched/touch/background-ANR/skin-polish",
+  "branch": "work/infinity-consolidated-anr-first-20261017",
+  "implementation_source_commit": "28191e49458712480353ed8694151eea70822943",
+  "protected_apk_lock_commit": "9dea86a7bf1896993e33ab885aa678a25eddaa0f",
+  "protected_skin_lock_commit": "3cc1e1d5e0d5a21db9d19dd6882bd1c647603488",
+  "phase_0": "VERIFIED",
+  "phase_c": "WAITING_FOR_SAME_ATTEMPT_PHYSICAL_LOCK_OWNER_AND_ANDROID_ANR_CAPTURE",
+  "phases_a_b_d_e": "PENDING; SCOPE RETAINED",
+  "candidate": {
+    "file": "Infinity-Fold-Freeze-Capture-1.0.0-TEST.zip",
+    "sha256": "d99f5e701a5fe2f0dbac0a8eac8f4af29b8c7cb35d0dd3bd76c9889b9d67e174",
+    "addon_id": "script.infinity.foldcapture",
+    "is_fix": false,
+    "is_apk": false
+  },
+  "verification": {
+    "corrected_symbol_run": 38991071668,
+    "corrected_symbol_job": 117273384811,
+    "host_ci_run": 38991834552,
+    "host_ci_job": 117275700833,
+    "host_tests_passed": 10,
+    "ci_tests_passed": 10,
+    "ci_and_delivered_package_sha256_identical": true,
+    "code_callsite_checks": 5,
+    "wrong_native_negative_control_passed": true,
+    "physical_fold_helper_tested": false
+  },
+  "preservation": {
+    "existing_repo_files_changed": 0,
+    "existing_repo_files_removed": 0,
+    "apk_rebuilt": false,
+    "skin_modified": false,
+    "rails_helper_modified": false,
+    "user_data_touched": false,
+    "locked_refs_changed": false,
+    "merged": false,
+    "promoted": false
+  },
+  "resume": "Use the private same-attempt native owner snapshots plus Android diagnostic trace to identify the lock dependency before selecting a behavioral native correction. Continue all five workstreams from the protected baselines; do not restart, downgrade or treat host results as Fold acceptance."
+}
