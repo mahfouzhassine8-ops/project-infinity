@@ -33,7 +33,7 @@ def validate_receipt(receipt, owner):
         "phase": "COMPLETE", "checkpoint_saved": True, "essential_writes_durable": True,
         "engine_process_death_receipt": True, "shutdown_policy": receipt["exit_policy"],
         "owner": owner["owner"], "pid": owner["pid"],
-        "whole_package_death_verified": False, "reopened_with_data": False,
+        "whole_package_death_verified": False, "reopened_skin_preserved": False,
     }
 
 
@@ -88,7 +88,7 @@ def loaded_close(probe, owner, out, report):
                          {"setting": "lookandfeel.skin"}).get("value")
     require(selected == "skin.infinity.diggz",
             "reopened Infinity lost its production skin")
-    report["close_proof"]["reopened_with_data"] = True
+    report["close_proof"]["reopened_skin_preserved"] = True
     report["reopen_succeeded"] = True
     report["reopen_skin"] = selected
     # Actual database persistence and content-level Resume seek are separate
