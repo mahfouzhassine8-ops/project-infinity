@@ -67,6 +67,7 @@ def package(parent,native,dest):
     maps=data(native/"FINAL-SHUTDOWN-SOURCE-PRESERVATION.json")
     locked=data(native/"LOCKED-TEST4-SOURCE-PRESERVATION.json")
     proof=data(native/"ENGINE-PROOF.json")
+    verified_reuse=data(native/"INFINITY-2103384-REUSED-BINARY-PROOF.json")
     require(set(delta["changed"])==set(REVIEWED) and delta["before"]==REVIEWED and
             all(maps["after"].get(k)==delta["after"].get(k) for k in REVIEWED),
             "Unreviewed four-file native write correction")
@@ -84,16 +85,27 @@ def package(parent,native,dest):
             maps.get("essential_first_coordinator_unchanged") is True,
             "TEST4 locked shutdown coordinator or original source changed")
     for tag in ("complete_native_engine_compiled","fold_callback_retirement_compiled",
-                "watched_presentation_bridge_compiled","browse_touch_preselection_compiled",
-                "independent_close_installer_durability_compiled",
-                "verified_optional_vfs_error_lease_scope_compiled",
-                "opaque_vfs_and_essential_write_errors_still_block"):
-        require(proof.get(tag) is True,"Native build did not prove "+tag)
+                "watched_presentation_bridge_compiled","browse_touch_preselection_compiled"):
+        require(proof.get(tag) is True,"Previously executed native compiler did not prove "+tag)
+    # The original producer linked libkodi.so but FAILED on a stale one-file
+    # 2103383 post-compile assertion. Never forge a green original run; require
+    # independent verification of the EXACT native bytes and complete source map.
+    require(verified_reuse.get("original_native_run")==39088898437 and
+            verified_reuse.get("original_run_conclusion")=="failure" and
+            verified_reuse.get("compile_and_link_finished") is True and
+            verified_reuse.get("compiled_native_artifact_reused_without_rebuild") is True and
+            verified_reuse.get("native_source_commit")==NATIVE_COMMIT and
+            verified_reuse.get("compiled_engine_sha256")==proof.get("native_sha256") and
+            verified_reuse.get("original_run_failure")=="stale post-link 2103383 single-header SHA assertion",
+            "Linked native artifact was not independently reverified")
+    require(verified_reuse.get("reviewed_native_changes")==delta["after"],
+            "Independently audited four-file changes differ from native source")
     require(proof.get("shutdown_policy")=="essential_first_process_exit_v1" and
             proof.get("source_commit")==delta.get("source_provenance")==NATIVE_COMMIT,
             "Native engine source is not the exact approved 2103384 source")
-    require(proof.get("locked") is False and proof.get("physical_fold_verified") is False,
-            "Build claims physical acceptance before Fold testing")
+    require(proof.get("locked") is False and proof.get("physical_device_verified") is False and
+            verified_reuse.get("physical_fold_verified") is False,
+            "Native proof falsely claims physical Fold acceptance")
     engine=native/"libkodi.so"
     require(engine.is_file() and engine.stat().st_size>100_000_000 and
             sha(engine.read_bytes())==proof["native_sha256"],
@@ -166,7 +178,9 @@ def package(parent,native,dest):
     compiled.unlink()
     receipt=dict(status="EXPERIMENTAL, REQUIRES PHYSICAL FOLD ACCEPTANCE",
                  actual_app_package=PACKAGE,prior_signed_2103383_sha256=PARENT_SHA,
-                 reused_native_run=39088360171,
+                 reused_native_run=39088898437,
+                 original_native_workflow_conclusion="failure",
+                 recovered_linker_proof_independently_verified=True,
                  native_source_commit=NATIVE_COMMIT,
                  signing_workflow_commit=os.environ.get("GITHUB_SHA"),
                  verified_essential_first_shutdown_preserved=True,
