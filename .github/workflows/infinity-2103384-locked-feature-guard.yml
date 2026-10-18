@@ -1,0 +1,78 @@
+name: Infinity 2103384 | LOCKED shutdown protection on feature work (SOURCE ONLY)
+
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+  workflow_dispatch:
+
+permissions: {contents: read}
+concurrency: {group: infinity-2103384-feature-shutdown-contract, cancel-in-progress: false}
+
+jobs:
+  original-2103384-shutdown-unchanged:
+    name: Preserve exact locked engine and all essential-save protections
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Refuse changes to user-approved shutdown baseline and protected runtime inputs
+        run: |
+          set -euo pipefail
+          BASE=5389b4572cd32037fedf0e7d88b7f79abb120952
+          git cat-file -e "$BASE^{commit}"
+          git diff --exit-code "$BASE" HEAD -- \
+            repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json \
+            repairs/full-system-20261017/write_error_scope_patch.py \
+            repairs/full-system-20261017/optional_writer_provenance_patch.py \
+            repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h \
+            repairs/full-system-20261017/shutdown_native_ci.py \
+            repairs/full-system-20261017/shutdown_native_overlay.py \
+            repairs/full-system-20261017/write_error_native_ci.py \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityAndroidCheckpoint.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityProtectedWrites.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityScriptPersistence.h \
+            repairs/essential-first-2103377/runtime/xbmc/interfaces/python/InfinityPythonPersistence.h \
+            repairs/essential-first-2103377/runtime/xbmc/interfaces/python/InfinityPythonPersistenceSource.h
+      - name: Verify 2103384 signed APK and real-device approval remain accurately locked
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          lock=json.loads(Path("repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json").read_text())
+          product=lock["product"]
+          assert lock["status"]=="LOCKED — USER APPROVED ON PHYSICAL FOLD FOR SHUTDOWN"
+          assert product["version_code"]==2103384
+          assert product["android_package"]=="com.projectinfinity.kodi"
+          assert product["sha256"]=="b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af"
+          assert product["embedded_native_sha256"]=="f47c6f3473a45438a533ecfa57dd196bac6d794227b16c4fb7888636e8f4408d"
+          assert product["signing_certificate_sha256"]=="d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+          native=lock["acceptance"]["physical_fold"]
+          assert native["receipt_phase"]=="COMPLETE" and native["essential_writes_durable"]
+          assert native["essential_write_blockers"]==[]
+          assert native["checkpoint_saved"] and native["authorization_consumed"]
+          assert native["engine_process_death_confirmed"] and native["whole_package_death_confirmed"] is False
+          assert lock["acceptance"]["loaded_android"]["full_user_diggz_installation_reproduced"] is False
+          assert lock["constraints"]["every_feature_candidate_requires_physical_fold_close_reopen_and_user_lock_approval"]
+          print("PASS exact 2103384 user-locked shutdown baseline; this is SOURCE-ONLY, not candidate APK acceptance.")
+          PY
+      - name: Require real native file-writing integrity and optional/essential boundaries
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -pthread -Wall -Wextra -Werror \
+            -Irepairs/essential-first-2103377/runtime/xbmc/platform/android/activity \
+            repairs/full-system-20261017/test_installer_stage_durability.cpp \
+            -o /tmp/infinity-2103384-stage-durability
+          /tmp/infinity-2103384-stage-durability
+          python3 repairs/full-system-20261017/test_write_error_scope.py
+          python3 repairs/full-system-20261017/test_optional_writer_provenance.py
+          python3 -m unittest discover -s repairs/full-system-20261017 -p test_shutdown_source_lineage.py -v
+      - name: Preserve real Android shutdown receipt validation behavior
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/full-system-20261017 -p test_infinity_only_gate.py -v
+          python3 -m unittest discover -s repairs/full-system-20261017 -p test_infinity_full_stack_close.py -v
+          python3 -m py_compile \
+            repairs/full-system-20261017/infinity_full_stack_android.py \
+            repairs/full-system-20261017/infinity_full_stack_close.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py
