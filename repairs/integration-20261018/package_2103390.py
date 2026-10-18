@@ -149,15 +149,8 @@ def original_dependency_sources(folder: Path, proof: Path):
     return contents, inventory
 
 
-def verify_native_parent(parent: Path, locked: Path, signed_proof: Path, expected_native_sha: str):
-    require(digest(locked) == gate.LOCKED_APK_SHA256,
-            "Locked user-approved 2103384 SHA mismatch")
-    report = json.loads(signed_proof.read_text())
-    require(report.get("parent_sha256") == gate.LOCKED_APK_SHA256
-            and report.get("signer_sha256") == gate.SIGNER_SHA256
-            and report.get("only_input_native_delta") is True
-            and report.get("source_commit") == expected_native_sha,
-            "Native parent is not the reviewed new #3 correction from locked 2103384")
+def verify_signed_native_artifact(report: dict, parent: Path):
+    """Pin the original signed filename and verify copied/renamed staged bytes."""
     released = [a for a in report.get("artifacts", [])
                 if a.get("native_restored_2103384") is False]
     # The producer publishes one original signed APK name. The workflow stages
@@ -169,6 +162,19 @@ def verify_native_parent(parent: Path, locked: Path, signed_proof: Path, expecte
             and released[0]["changed_unsigned_payload"] == ["AndroidManifest.xml",
                                                                "lib/arm64-v8a/libkodi.so"],
             "Signed native parent lineage or file inventory mismatch")
+    return released[0]
+
+
+def verify_native_parent(parent: Path, locked: Path, signed_proof: Path, expected_native_sha: str):
+    require(digest(locked) == gate.LOCKED_APK_SHA256,
+            "Locked user-approved 2103384 SHA mismatch")
+    report = json.loads(signed_proof.read_text())
+    require(report.get("parent_sha256") == gate.LOCKED_APK_SHA256
+            and report.get("signer_sha256") == gate.SIGNER_SHA256
+            and report.get("only_input_native_delta") is True
+            and report.get("source_commit") == expected_native_sha,
+            "Native parent is not the reviewed new #3 correction from locked 2103384")
+    verify_signed_native_artifact(report, parent)
     with zipfile.ZipFile(locked) as old, zipfile.ZipFile(parent) as source:
         require(old.testzip() is None and source.testzip() is None, "Bad locked/native APK")
         a = {n:old.read(n) for n in old.namelist() if not SIGNATURE.fullmatch(n)}
