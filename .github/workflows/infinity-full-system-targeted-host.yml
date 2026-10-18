@@ -1,11 +1,9 @@
-name: Infinity | Full-System Targeted Host Regressions
+name: Infinity | Essential-First Save Protection - SOURCE ONLY (not APK acceptance)
 on:
+  # Every feature commit on the active repair branch gets a shutdown contract
+  # check; no stock Kodi result or local-source green is promoted to a release.
   push:
     branches: [work/infinity-full-repair-20261017-gpt6]
-    paths:
-      - 'repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityProtectedWrites.h'
-      - 'repairs/full-system-20261017/**'
-      - '.github/workflows/infinity-full-system-targeted-host.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
