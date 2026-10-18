@@ -44,7 +44,11 @@ def choose(title, rows):
             # A percentage-sized image also retains its loaded height when
             # the group is resized through Python. Match its actual surface
             # to the card so short menus do not leave a tall blank panel.
-            self.getControl(101).setHeight(card.getHeight())
+            surface = self.getControl(101)
+            # CGUIBorderedImage exposes the inset image rectangle; the XML
+            # border is drawn outside it. Preserve both border insets when
+            # sizing the image, just as Kodi does for its initial width.
+            surface.setHeight(card.getHeight() - 2 * surface.getPosition()[1])
             card.setPosition(*position(backdrop.getWidth(), backdrop.getHeight(),
                                        card.getWidth(), card.getHeight(), anchor))
             control = self.getControl(50)

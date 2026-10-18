@@ -62,7 +62,8 @@ def exercise(probe, out, report):
         vw,vh=state['viewport'];left,top=card['position']
         require(left>=0 and top>=0 and left+card['width']<=vw and top+card['height']<=vh,
                 'popup card is clipped by the active window')
-        require(surface['height']==card['height'] and surface['width']==card['width'],
+        require(surface['height']+2*surface['position'][1]==card['height'] and
+                surface['width']+2*surface['position'][0]==card['width'],
                 'popup visible surface extends beyond compact card')
         require(listing['position'][1]+listing['height'] <= card['height'],
                 'popup native hit rectangle extends outside compact card')
