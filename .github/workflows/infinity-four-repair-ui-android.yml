@@ -12,8 +12,8 @@ jobs:
     timeout-minutes: 180
     permissions: {contents: write, actions: read}
     env:
-      PRODUCER_RUN: '39102798231'
-      PRODUCER_SHA: '9fd37f1a8ff62a9a21a690405fdfc3f592183d2e'
+      PRODUCER_RUN: '39104666328'
+      PRODUCER_SHA: '7ca98da5a3751a5b69a2f3a70500d118d3893e7f'
       UI_PACKAGE_RUN: '39103248553'
     steps:
       - uses: actions/checkout@v7
