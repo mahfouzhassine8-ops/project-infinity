@@ -31,6 +31,8 @@ jobs:
           assert "'durable_close_verified': False" in p
           assert "'can_override_native_protection': False" in p
           assert "'fold_accepted': False" in p
+          import sys
+          sys.path.insert(0, 'repairs/four-repair-20261018')
           from translated_descriptor_evidence import assess
           assert assess({}, {})['durable_close_verified'] is False
           PY
