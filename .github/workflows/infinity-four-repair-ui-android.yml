@@ -15,7 +15,7 @@ jobs:
       PRODUCER_RUN: '39106462774'
       PRODUCER_SHA: '229bb4613e827eefe0bfd16bea836d164bf80520'
       NATIVE_SOURCE_SHA: '7ca98da5a3751a5b69a2f3a70500d118d3893e7f'
-      UI_PACKAGE_RUN: '39113828441'
+      UI_PACKAGE_RUN: '39114438060'
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0, persist-credentials: false}
@@ -94,8 +94,8 @@ jobs:
           assert hashlib.sha256((Path('signed')/a['file']).read_bytes()).hexdigest()==a['sha256']
           with open(os.environ['GITHUB_ENV'],'a') as f:f.write('APK_SHA='+a['sha256']+'\n')
           PY
-          echo '959e13b9a8f334f7a6ce9e235a29b23f29957e2601d6ceb54f09ecab5081d7c9  ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip' | sha256sum -c
-          echo '06cc89c16b569b5867eb7171a895103ad86734a9b4755c20b6968f19c670e49f  ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip' | sha256sum -c
+          echo 'cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699  ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip' | sha256sum -c
+          echo '792154bc91f3a2839dec29b6c560c854105913df6d78a79d39cb253207f947d7  ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip' | sha256sum -c
           mkdir -p full-input/additional-addons
           python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
           python3 repairs/four-repair-20261018/prepare_ui_android.py --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip --first-party first-party-input/rc05-inputs/native-evidence/installed-addons --additional full-input/additional-addons --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip --out full-stack
