@@ -100,7 +100,8 @@ jobs:
         with:
           # Generic Android17 platform test only; Samsung One UI and physical
           # Fold acceptance remain separate. Never rebuild or substitute APK.
-          api-level: ${{ matrix.api }}
+          # Exact published SDK package ID from the retained catalog receipt.
+          api-level: '37.0'
           arch: x86_64
           target: google_apis
           profile: pixel_2

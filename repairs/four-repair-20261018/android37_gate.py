@@ -10,7 +10,9 @@ import json
 from pathlib import Path
 import subprocess
 
-IMAGE = 'system-images;android-37;google_apis;x86_64'
+# Observed SDK catalog in run 39124478854 publishes decimal platform IDs.
+# This is the stable Android17 major release, not a fallback to another API.
+IMAGE = 'system-images;android-37.0;google_apis;x86_64'
 
 
 def check(sdk_root, out):
