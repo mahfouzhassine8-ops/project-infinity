@@ -2,7 +2,7 @@
 
 This is an optional read-only diagnostics helper for a Mac connected by USB to the Samsung Fold running One UI 9.0 / Android 17. It captures logs while you use Infinity normally. You **do not need to reproduce the Stop sequence** or deliberately cause a crash.
 
-The tool does not modify Infinity, install an APK or add-on, clear logs, force-stop a process, change a setting, request root, or upload diagnostics. It watches the `com.projectinfinity.kodi:kodi` process, records its observed PID, and saves Android process-exit, crash-buffer and available DropBox/tombstone information if that PID disappears for two consecutive checks. A missing PID is **not automatically a crash**; Android may reclaim background processes. Each capture remains explicitly unclassified until its exit record is reviewed. ADB disconnection never counts as a crash.
+The tool does not modify Infinity, install an APK or add-on, clear logs, force-stop a process, change a setting, request root, or upload diagnostics. It watches the `com.projectinfinity.kodi:kodi` process, records its observed PID, and saves Android process-exit, crash-buffer and available DropBox/tombstone information if that PID disappears for two consecutive checks **or is immediately replaced by a different PID**. A missing PID is **not automatically a crash**; Android may reclaim background processes. Each capture remains explicitly unclassified until its exit record is reviewed. ADB disconnection never counts as a crash.
 
 ## Optional Mac setup
 
