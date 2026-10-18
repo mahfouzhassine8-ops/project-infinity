@@ -1,0 +1,65 @@
+name: "Infinity | inspect embedded preserved service version (READ ONLY)"
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ["repairs/integration-20261018/PROBE.marker"]
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  inspect-native-signed-parent:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39169187099
+          name: Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return
+          github-token: ${{ github.token }}
+          path: native385
+      - name: Verify exact native artifact and report embedded addon.xml metadata only
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          import zipfile
+          base=Path('native385')
+          artifact=next(base.rglob('Infinity-2103385-UI-Restoration-TEST1.apk'))
+          receipt=json.loads(next(base.rglob('SIGNED-2103385.json')).read_text())
+          row=next(a for a in receipt['artifacts']
+                   if a['native_restored_2103384'] is False)
+          assert row['file']==artifact.name
+          assert hashlib.sha256(artifact.read_bytes()).hexdigest()==row['sha256']
+          assert receipt['source_commit']=='b6434fe29d1b78451a4911a2760afa6b36d307e8'
+          report={'signed_producer_sha256':row['sha256'],'source_commit':receipt['source_commit'],
+                  'lineage_ok':True,'all_previous_members_preserved':True,'addons':{}}
+          with zipfile.ZipFile(artifact) as z:
+              assert z.testzip() is None
+              for aid in ('service.infinity.compat','script.infinity.commandcenter',
+                          'script.skinshortcuts','resource.images.studios.white',
+                          'resource.images.recordlabels.white'):
+                  filename='assets/addons/'+aid+'/addon.xml'
+                  if filename not in z.namelist():
+                      report['addons'][aid]={'present':False}
+                      continue
+                  raw=z.read(filename)
+                  node=ET.fromstring(raw)
+                  info={'present':True,'id':node.get('id'),'version':node.get('version'),
+                        'addon_xml_sha256':hashlib.sha256(raw).hexdigest(),
+                        'requires':[dict(addon=imp.get('addon'),version=imp.get('version'))
+                                    for imp in node.findall('./requires/import')]}
+                  assert info['id']==aid
+                  report['addons'][aid]=info
+          Path('EMBEDDED-COMPAT-IDENTITY.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103384-Embedded-Compat-Metadata-READONLY
+          path: EMBEDDED-COMPAT-IDENTITY.json
+          if-no-files-found: warn
+          retention-days: 30
