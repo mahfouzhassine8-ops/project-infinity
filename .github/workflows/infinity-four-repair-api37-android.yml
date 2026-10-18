@@ -107,6 +107,9 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_2
+          # Run39124662432 booted17/API37 but PackageInstaller rejected even
+          # session creation: Requested internal only, but not enough space.
+          disk-size: 8G
           avd-name: infinity-four-repair-api37
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none

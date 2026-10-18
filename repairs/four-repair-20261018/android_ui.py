@@ -157,6 +157,15 @@ def run(args):
         if args.expected_release:
             require(report['android_platform']['release'].split('.')[0] == args.expected_release,
                     'Booted Android release does not match the requested test target')
+        if args.expected_api == '37':
+            storage = probe.shell('df', '-k', '/data')
+            (out / 'emulator-data-space-before-install.txt').write_text(storage)
+            fields = storage.strip().splitlines()[-1].split()
+            require(len(fields) >= 6 and fields[3].isdigit(),
+                    'Cannot establish available API37 emulator data space')
+            report['emulator_data_free_kib_before_install'] = int(fields[3])
+            require(int(fields[3]) >= 2 * 1024 * 1024,
+                    'API37 disposable emulator needs at least2GiB free before staging full Infinity')
         require("Success" in probe.adb("install", "--no-incremental", args.apk),
                 "Actual signed Infinity APK did not install")
         # Match the original approved fresh-Android probe's first-launch setup.
