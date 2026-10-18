@@ -28,6 +28,10 @@ def exercise(probe, out, report):
         png = probe.adb('exec-out', 'screencap', '-p', binary=True)
         require(png.startswith(b'\x89PNG\r\n\x1a\n'), 'No actual Android screenshot')
         (out / (name + '.png')).write_bytes(png)
+        # Retain OS input ownership before/after gestures, not only at failure.
+        # This distinguishes app selection changes from nav_input_consumer.
+        (out / (name + '-windows.txt')).write_text(probe.shell('dumpsys', 'window'))
+        (out / (name + '-input.txt')).write_text(probe.shell('dumpsys', 'input'))
         row = dict(name=name, state=state or observe(), physical_size=struct.unpack('>II', png[16:24]))
         records.append(row); save()
         print('INFINITY UI OBSERVATION:', name, flush=True)
@@ -93,8 +97,20 @@ def exercise(probe, out, report):
         probe.rpc('Input.Back'); time.sleep(.6)
     def browse():
         observe('browse')
-        return wait_for(lambda s: s['window'] == 11193 and
-            int(s['labels'].get('Container(50).NumItems') or 0) >= 12, 'complete Video Sources grid')
+        def ready(state):
+            # DirectoryProvider can publish between the observer's control and
+            # label reads. API 35 evidence showed an empty earlier vector with
+            # NumItems=13 later in the SAME snapshot. Require both views to be
+            # populated and agree; never proceed with vacuous all([]) checks.
+            grid = state.get('controls', {}).get('50', {})
+            items = grid.get('items', [])
+            count = int(state['labels'].get('Container(50).NumItems') or 0)
+            return (state['window'] == 11193 and state['dialog'] in (0, 9999) and
+                    state.get('focus') == 50 and count >= 12 and
+                    grid.get('size') == count == len(items) and
+                    all(row.get('kind') == 'addon' and row.get('token') for row in items) and
+                    token(state) in {row['token'] for row in items})
+        return wait_for(ready, 'consistent complete Video Sources grid')
     def provider_ready(state, addon):
         # Window activation precedes the asynchronous directory load. Back
         # while dialog 10138 is active cancels that load and is a different
@@ -195,7 +211,7 @@ def exercise(probe, out, report):
     # below, after these actions, rather than delaying feedback on new paths.
     probe.shell('wm', 'size', '1800x1440'); probe.shell('wm', 'density', '320'); time.sleep(3)
     observe('theme', 'OLED')
-    state=browse(); grid=state['controls']['50']
+    state=browse(); capture('actions-grid-before-tap', state); grid=state['controls']['50']
     item_height=grid['height']*.21809829; item_width=item_height*.668085106
     columns=int(grid['width']//item_width)
     index=next(i for i,r in enumerate(grid['items']) if r.get('token','').startswith('plugin.video.infinityuitest'))

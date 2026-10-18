@@ -1,3 +1,1 @@
-Exercise unchanged package 39114438060 on Android 15/API 35 with every first-tap assertion retained.
-Run 39118989328 proved Android 11's nav_input_consumer swallowed the first post-playback/resize tap; dismissal itself preserved the held tile. Retain that API 30 compatibility failure.
-Do not add a priming tap, change product flags or waive a check. Record platform, window and input evidence; retain both Stop paths, full grid matrix and original Close/reopen.
+2026-10-18: require a consistent native grid snapshot and capture API30 window/input ownership around actual gestures; same signed APK and packages, unchanged action and dismissal assertions.
