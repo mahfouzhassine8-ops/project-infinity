@@ -18,6 +18,12 @@ jobs:
           name: Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return
           github-token: ${{ github.token }}
           path: native385
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39168353557
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: skin227
       - name: Verify exact native artifact and report embedded addon.xml metadata only
         run: |
           set -euo pipefail
@@ -53,6 +59,25 @@ jobs:
                                     for imp in node.findall('./requires/import')]}
                   assert info['id']==aid
                   report['addons'][aid]=info
+          # The reviewed .228 patch only changes skin version and 13 OSD
+          # image colors; its dependency imports are inherited from .227.
+          skin=next(Path('skin227').rglob('skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip'))
+          assert hashlib.sha256(skin.read_bytes()).hexdigest()==(
+              'cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699')
+          with zipfile.ZipFile(skin) as z:
+              assert z.testzip() is None
+              xml=ET.fromstring(z.read('skin.infinity.diggz/addon.xml'))
+              assert xml.get('id')=='skin.infinity.diggz' and xml.get('version')=='1.0.5.227'
+              needs={row.get('addon'):row.get('version')
+                     for row in xml.findall('./requires/import')}
+          report['reviewed_skin_227_requires']=needs
+          version=report['addons']['service.infinity.compat']['version']
+          required=needs.get('service.infinity.compat')
+          def nums(x): return tuple(int(v) for v in x.split('.'))
+          report['original_compat_meets_skin_declared_minimum']=(
+              required is None or nums(version)>=nums(required))
+          report['skin_228_inherits_requirements_from_227']=True
+          report['original_compat_versioncode_unmodified']=version
           Path('EMBEDDED-COMPAT-IDENTITY.json').write_text(json.dumps(report,indent=2)+'\n')
           print(json.dumps(report,indent=2))
           PY
