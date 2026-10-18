@@ -129,6 +129,29 @@ def exercise(probe, out, report):
             back(); restored = observe()
             require(token(restored) == token(scrolled), 'scrolled popup dismissed to wrong item')
 
+    # Exercise actual view-local hiding and restoration without disabling.
+    selected = token(restored)
+    require(selected.startswith('plugin.video.infinityuitest'), 'mutation requires a harmless fixture')
+    probe.rpc('Input.ContextMenu')
+    menu = wait_for(popup, 'fixture context through native D-pad route')
+    invoke(menu, 'Add to Favourites')
+    wait_for(lambda s:not popup(s), 'favourite action completed')
+    favourites = probe.rpc('Favourites.GetFavourites', dict(properties=['windowparameter']))
+    require(any(f.get('windowparameter') == 'plugin://'+selected+'/' for f in favourites['favourites']),
+            'favourite destination not saved')
+    probe.rpc('Input.ContextMenu'); menu=wait_for(popup,'hide menu')
+    invoke(menu,'Hide from This View')
+    wait_for(lambda s:not popup(s) and all(r.get('token') != selected for r in s['controls']['50'].get('items',[])),
+             'hidden tile removed only from grid')
+    require(probe.rpc('Addons.GetAddonDetails',dict(addonid=selected,properties=['enabled']))['addon']['enabled'],
+            'Hide disabled the add-on')
+    observe('restore'); restore=wait_for(popup,'hidden tile recovery')
+    label=restore['controls']['50']['items'][0]['label']
+    invoke(restore,label)
+    wait_for(lambda s:not popup(s) and any(r.get('token') == selected for r in s['controls']['50'].get('items',[])),
+             'hidden tile restored')
+    capture('hidden-fixture-restored')
+
     # Resume Home items retain their original movie and episode identity.
     for media, section, ident in (('movie', 'movies', 8830), ('tv','tvshows',8831)):
         observe('home', section)
@@ -163,6 +186,20 @@ def exercise(probe, out, report):
         else:raise RuntimeError('Native video fixture did not start')
         player=next(p['playerid'] for p in players if p.get('type')=='video')
         time.sleep(2)
+        if path == 'A':
+            repeat = probe.rpc('Player.GetProperties',dict(playerid=player,properties=['repeat']))['repeat']
+            osd=observe('osd'); original=osd['rotation']
+            rotated=observe('rotate')
+            require(rotated['rotation'] != original,'Rotate did not change its actual state')
+            capture('rotate-first-state',rotated)
+            returned=observe('rotate')
+            require(returned['rotation'] == original,'Rotate did not restore Follow Device state')
+            require(probe.rpc('Player.GetProperties',dict(playerid=player,properties=['repeat']))['repeat']==repeat,
+                    'Rotate changed Repeat')
+            capture('rotate-returned-state',returned)
+            drawer=observe('drawer')
+            require('error' in drawer['controls']['280'],'Display Mode still exists in Playback')
+            capture('playback-without-display-mode',drawer)
         probe.rpc('Player.Stop', dict(playerid=player)); time.sleep(2)
         choices=observe(); require(choices['window']==10025, 'Stop did not restore movie choices')
         if path=='B':

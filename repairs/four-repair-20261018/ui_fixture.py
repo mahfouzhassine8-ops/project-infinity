@@ -53,6 +53,9 @@ try:
     elif operation == 'rotate':
         xbmc.executebuiltin('SetFocus(263)', True)
         xbmc.executebuiltin('Action(Select)', True)
+    elif operation == 'drawer':
+        xbmc.executebuiltin('Skin.SetBool(Infinity.PlayerDrawerOpen)', True)
+        xbmc.executebuiltin('SetFocus(270)', True)
     elif operation == 'restore':
         xbmc.executebuiltin('RunScript(script.infinity.uirepair,restore)')
     elif operation == 'choices':
@@ -69,7 +72,7 @@ try:
         rotation=xbmc.getCondVisibility('Skin.HasSetting(Infinity.PlayerRotationUnlocked)'),
         controls={}, labels={}, popup=owner.getProperty('Infinity.UI.Popup'),
         title=owner.getProperty('Infinity.UI.Title'))
-    for ident in (2, 50, 100, 263, 8830, 8831, 39799, 40001):
+    for ident in (2, 50, 100, 263, 280, 8830, 8831, 39799, 40001):
         try:
             control = owner.getControl(ident)
             row = dict(position=control.getPosition(), width=control.getWidth(), height=control.getHeight(),
