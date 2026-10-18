@@ -14,6 +14,7 @@ jobs:
     env:
       PRODUCER_RUN: '39106462774'
       PRODUCER_SHA: '229bb4613e827eefe0bfd16bea836d164bf80520'
+      NATIVE_SOURCE_SHA: '7ca98da5a3751a5b69a2f3a70500d118d3893e7f'
       UI_PACKAGE_RUN: '39104811532'
     steps:
       - uses: actions/checkout@v7
@@ -87,7 +88,8 @@ jobs:
           import json,hashlib,os
           from pathlib import Path
           r=json.load(open('signed/SIGNED-2103385.json'))
-          assert r['source_commit']==os.environ['PRODUCER_SHA']
+          assert r['source_commit']==os.environ['NATIVE_SOURCE_SHA']
+          assert r['packaging_source_commit']==os.environ['PRODUCER_SHA']
           a=next(a for a in r['artifacts'] if not a['native_restored_2103384'])
           assert hashlib.sha256((Path('signed')/a['file']).read_bytes()).hexdigest()==a['sha256']
           with open(os.environ['GITHUB_ENV'],'a') as f:f.write('APK_SHA='+a['sha256']+'\n')
