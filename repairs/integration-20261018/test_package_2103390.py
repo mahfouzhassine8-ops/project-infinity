@@ -98,6 +98,48 @@ class ExactNineAssemblerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Signed native parent lineage"):
                 bundle.verify_signed_native_artifact({"artifacts": [approved, approved]}, staged)
 
+    def test_original_compat_service_bytes_always_win_over_staged_source(self):
+        # Native parent already bundles compatibility metadata that differs
+        # from the first-party staging archive. Preserve its exact bytes.
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "original.apk"
+            prefix = "assets/addons/service.infinity.compat/"
+            original_manifest = b'<addon id="service.infinity.compat" version="0.8.2"><extension point="xbmc.service"/></addon>'
+            with zipfile.ZipFile(path, "w") as z:
+                z.writestr(prefix + "addon.xml", original_manifest)
+                z.writestr(prefix + "runner.py", b"# original signed byte payload")
+            staged = {
+                prefix + "addon.xml": b'<addon id="service.infinity.compat" version="0.8.2"/>',
+                prefix + "runner.py": b"# external old bytes (NOT approved)",
+                prefix + "unlisted.py": b"# must not be added to existing service",
+                "assets/addons/script.skinshortcuts/addon.xml":
+                    b'<addon id="script.skinshortcuts" version="2.0.3"/>',
+            }
+            with zipfile.ZipFile(path) as z:
+                selected, preserved = bundle.preserve_original_embedded_dependencies(z, staged)
+            self.assertNotIn(prefix + "addon.xml", selected)
+            self.assertNotIn(prefix + "runner.py", selected)
+            self.assertNotIn(prefix + "unlisted.py", selected)
+            self.assertIn("service.infinity.compat", preserved)
+            self.assertEqual(preserved["service.infinity.compat"]["version"], "0.8.2")
+            self.assertEqual(set(selected),
+                {"assets/addons/script.skinshortcuts/addon.xml"})
+            with zipfile.ZipFile(path) as z:
+                self.assertEqual(z.read(prefix + "addon.xml"), original_manifest)
+                self.assertEqual(z.read(prefix + "runner.py"),
+                                 b"# original signed byte payload")
+
+    def test_bogus_original_compat_service_version_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "bad-existing.apk"
+            with zipfile.ZipFile(path, "w") as z:
+                z.writestr("assets/addons/service.infinity.compat/addon.xml",
+                           '<addon id="service.infinity.compat" version="0.0.0"/>')
+            with zipfile.ZipFile(path) as z:
+                with self.assertRaisesRegex(ValueError,
+                                             "Existing protected dependency ID/version"):
+                    bundle.preserve_original_embedded_dependencies(z, {})
+
     def test_wrong_locked_parent_hash_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
