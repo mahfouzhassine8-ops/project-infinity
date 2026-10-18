@@ -25,6 +25,8 @@ class ContractTests(unittest.TestCase):
             "lib/arm64-v8a/libinfinitycrash.so": b"unchanged original crash recorder",
             "lib/arm64-v8a/libunchanged.so": b"untouched native library",
             "assets/addons/service.infinity.compat/runtime_service.py": b"original compatibility code",
+            "assets/addons/service.infinity.compat/addon.xml":
+                b'<addon id="service.infinity.compat" version="0.7.2"/>',
             "assets/addons/service.xbmc.versioncheck/runner.py": b"original versioncheck code",
             "assets/addons/script.infinity.addonrecovery/default.py": b"preexisting user-visible code",
             "assets/cobra/preserved.bin": b"Cobra original byte data",
@@ -41,8 +43,12 @@ class ContractTests(unittest.TestCase):
         for aid, version in gate.DEPENDENCIES.items():
             if aid not in {entry.text for entry in root.findall("addon")}:
                 ET.SubElement(root, "addon").text = aid
-            after["assets/addons/" + aid + "/addon.xml"] = (
-                '<addon id="' + aid + '" version="' + (version or '1.0.0') + '"/>').encode()
+            # A signed original embedded service is authoritative over the
+            # non-authoritative first-party staging copy.
+            key = "assets/addons/" + aid + "/addon.xml"
+            if key not in after:
+                after[key] = (
+                    '<addon id="' + aid + '" version="' + (version or '1.0.0') + '"/>').encode()
         after[gate.MANIFEST] = ET.tostring(root)
         after.update(candidate_change)
         after.update(add)
@@ -79,6 +85,18 @@ class ContractTests(unittest.TestCase):
     def test_rejects_deletion_of_existing_compatibility_or_other_member(self):
         self.check_bad(drop="assets/addons/service.infinity.compat/runtime_service.py")
         self.check_bad(drop="assets/cobra/preserved.bin")
+
+    def test_locked_compat_version_and_bytes_are_authoritative(self):
+        context, old, candidate = self.setup_fixture()
+        try:
+            self.assertEqual(gate.check_apks(old, candidate)["unchanged_dependency_identities"]
+                             ["service.infinity.compat"], None)
+        finally:
+            context.cleanup()
+        self.check_bad({"assets/addons/service.infinity.compat/addon.xml":
+                        b'<addon id="service.infinity.compat" version="0.8.2"/>'})
+        self.check_bad(add={"assets/addons/service.infinity.compat/unlisted.py": b"foreign"})
+        self.check_bad(drop="assets/addons/service.infinity.compat/addon.xml")
 
     def test_rejects_mutation_to_cobra_diagnostics_or_native_shutdown_libraries(self):
         self.check_bad({"assets/cobra/preserved.bin": b"modified"})
