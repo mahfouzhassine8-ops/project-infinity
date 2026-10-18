@@ -61,6 +61,14 @@ jobs:
                                     for imp in node.findall('./requires/import')]}
                   assert info['id']==aid
                   report['addons'][aid]=info
+              system=ET.fromstring(z.read('assets/system/addon-manifest.xml'))
+              registered=[item.text for item in system.findall('addon')]
+              report['original_compat_registered_in_system_manifest']=(
+                  'service.infinity.compat' in registered)
+              report['original_commandcenter_registered_in_system_manifest']=(
+                  'script.infinity.commandcenter' in registered)
+              report['original_system_manifest_sha256']=hashlib.sha256(
+                  z.read('assets/system/addon-manifest.xml')).hexdigest()
           # The reviewed .228 patch only changes skin version and 13 OSD
           # image colors; its dependency imports are inherited from .227.
           skin=next(Path('skin227').rglob('skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip'))
