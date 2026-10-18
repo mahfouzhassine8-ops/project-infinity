@@ -30,7 +30,7 @@ class ContractTests(unittest.TestCase):
             "assets/addons/service.xbmc.versioncheck/runner.py": b"original versioncheck code",
             "assets/addons/script.infinity.addonrecovery/default.py": b"preexisting user-visible code",
             "assets/cobra/preserved.bin": b"Cobra original byte data",
-            gate.MANIFEST: b"<addons><addon>service.infinity.compat</addon></addons>\n",
+            gate.MANIFEST: b"<addons></addons>\n",
         }
         after = dict(old)
         after["AndroidManifest.xml"] = b"new version metadata only"
@@ -41,7 +41,8 @@ class ContractTests(unittest.TestCase):
             after["assets/addons/" + aid + "/addon.xml"] = (
                 '<addon id="' + aid + '" version="' + version + '"/>').encode()
         for aid, version in gate.DEPENDENCIES.items():
-            if aid not in {entry.text for entry in root.findall("addon")}:
+            if (aid not in gate.PRESERVED_REGISTRATION_IDS and
+                    aid not in {entry.text for entry in root.findall("addon")}):
                 ET.SubElement(root, "addon").text = aid
             # A signed original embedded service is authoritative over the
             # non-authoritative first-party staging copy.
@@ -76,6 +77,9 @@ class ContractTests(unittest.TestCase):
             result = gate.check_apks(old, candidate)
             self.assertTrue(result["original_native_crash_recorder_preserved"])
             self.assertTrue(result["versioncheck_unchanged"])
+            with zipfile.ZipFile(candidate) as z:
+                self.assertNotIn("service.infinity.compat",
+                    gate.manifest_members(z.read(gate.MANIFEST)))
             self.assertEqual(result["new_or_updated_addons"], gate.VERSIONS)
             self.assertFalse(result["original_crash_fixed"])
             self.assertEqual(result["removed_files"], [])
