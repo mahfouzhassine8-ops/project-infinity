@@ -1,0 +1,41 @@
+name: Infinity | Native ARM64 Android17 feasibility ONLY (no APK)
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['.github/workflows/infinity-api37-direct-arm64-preflight.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  arm64-host-capability:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 4
+    steps:
+      - name: Check native ARM64 runner, KVM and system RAM without installing or launching Android
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, platform
+          from pathlib import Path
+          machine=platform.machine()
+          memory_kib=0
+          for line in Path('/proc/meminfo').read_text().splitlines():
+              if line.startswith('MemTotal:'):
+                  memory_kib=int(line.split()[1]);break
+          kvm=Path('/dev/kvm')
+          result={
+             'scope':'preflight only; no APK, emulator launch, installation or acceptance',
+             'machine':machine,'ram_gib':round(memory_kib/1024/1024,2),
+             'kvm_exists':kvm.exists(),'kvm_readwrite':os.access('/dev/kvm',os.R_OK|os.W_OK),
+             'native_arm64_runner':machine in ('aarch64','arm64'),
+             'ram_meets_16gib_android17_guidance':memory_kib >= 16*1024*1024,
+             'android_test_passed':False,'physical_fold_verified':False}
+          result['candidate_for_direct_arm64_avd']=bool(
+              result['native_arm64_runner'] and result['kvm_readwrite'] and
+              result['ram_meets_16gib_android17_guidance'])
+          print(json.dumps(result,indent=2))
+          summary=os.environ.get('GITHUB_STEP_SUMMARY')
+          if summary:
+              Path(summary).write_text('### Native ARM64 Android 17 feasibility — no APK test\n\n'
+                                       + '\n'.join('- '+key+': '+str(val) for key,val in result.items())+'\n')
+          PY
