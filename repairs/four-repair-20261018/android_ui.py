@@ -437,7 +437,7 @@ def run(args):
                         'Disposable bundle probe not available')
             require(probe.rpc('Addons.ExecuteAddon',
                             {'addonid': bundle_probe.PROBE_ID,
-                             'params': [report['native_owner']['owner'], json.dumps(sorted(bundle_ids))],
+                             'params': [report['native_owner']['owner']],
                              'wait': False}) == 'OK', 'Could not observe actual Kodi-selected bundle')
             deadline = time.monotonic() + 70
             observed = {}
