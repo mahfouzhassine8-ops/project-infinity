@@ -13,7 +13,7 @@ concurrency: {group: infinity-2103384-fast-sign-only, cancel-in-progress: false}
 jobs:
   sign-previously-built-engine:
     runs-on: ubuntu-22.04
-    timeout-minutes: 110
+    timeout-minutes: 50
     env:
       NDK_VER: 21.4.7075529
       NATIVE_RUN: 39088898437
@@ -22,33 +22,28 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0, persist-credentials: false}
-      - name: Wait for and require the exact FULL native 2103384 build (never rebuild)
+      - name: Verify the original native run FAILED only after full ARM64 link
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json,os,time,urllib.request
-          api='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+          import json,os,urllib.request
+          url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
           headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
-          def get(suffix):
-              with urllib.request.urlopen(urllib.request.Request(api+suffix,headers=headers),timeout=45) as response:
-                  return json.load(response)
-          deadline=time.monotonic()+5400
-          while time.monotonic()<deadline:
-              run=get('/actions/runs/'+os.environ['NATIVE_RUN'])
-              assert run['head_sha']==os.environ['NATIVE_SOURCE'], 'Native source SHA does not match approved branch snapshot'
-              if run['status']=='completed':
-                  assert run['conclusion']=='success', 'Native build failed: '+str(run['conclusion'])
-                  jobs=get('/actions/runs/'+os.environ['NATIVE_RUN']+'/jobs?per_page=100')['jobs']
-                  matched=[j for j in jobs if j['name']=='native-engine']
-                  assert len(matched)==1 and matched[0]['conclusion']=='success', 'Native engine not compiled successfully'
-                  print('PASS exact native compiled build reused:',run['id'],run['head_sha'],flush=True)
-                  break
-              print('Waiting only for existing ARM64 producer; no native compilation in this job',flush=True)
-              time.sleep(45)
-          else:
-              raise RuntimeError('Previously started native build did not complete; no APK signed')
+          def get(path):
+              with urllib.request.urlopen(urllib.request.Request(url+path,headers=headers),timeout=45) as reply: return json.load(reply)
+          run=get('/actions/runs/'+os.environ['NATIVE_RUN'])
+          assert run['head_sha']==os.environ['NATIVE_SOURCE'], 'Source commit differs from verified native compilation'
+          assert run['status']=='completed' and run['conclusion']=='failure', 'Original red result must NOT be replaced'
+          jobs=get('/actions/runs/'+os.environ['NATIVE_RUN']+'/jobs?per_page=100')['jobs']
+          host=[x for x in jobs if x['name']=='host-proof']
+          native=[x for x in jobs if x['name']=='native-engine']
+          assert len(host)==1 and host[0]['conclusion']=='success', 'Host native regression proof missing'
+          assert len(native)==1 and native[0]['conclusion']=='failure', 'Native job result changed'
+          failed=[x['name'] for x in native[0]['steps'] if x['conclusion']=='failure']
+          assert failed==['Compile complete native Kodi engine'], 'Not the known post-link failure stage: '+repr(failed)
+          print('Reusing failed-run saved binary only if independent full-source and ELF proofs succeed.',flush=True)
           PY
       - uses: actions/setup-java@v6
         with: {distribution: temurin, java-version: '17'}
@@ -74,6 +69,13 @@ jobs:
           name: Infinity-2103384-Write-Integrity-Native-Evidence
           github-token: ${{ github.token }}
           path: proven-native-2103384
+      - name: Independently verify the complete linked engine, exact sources and recorded RED result
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/full-system-20261017/verify_2103384_compiled_reuse.py repairs/full-system-20261017/package_2103384_vfs.py
+          python3 repairs/full-system-20261017/verify_2103384_compiled_reuse.py \
+            --native proven-native-2103384 \
+            --out proven-native-2103384/INFINITY-2103384-REUSED-BINARY-PROOF.json
       - name: Permanently sign SAME Infinity APK; exact signed 2103383 parent + validated native only
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -107,5 +109,104 @@ jobs:
           path: |
             fold-delivery-2103384/INFINITY-2103384-SIGNED-EXPERIMENTAL.json
             fold-delivery-2103384/SHA256SUMS
+          retention-days: 90
+          if-no-files-found: warn
+
+  signed-2103384-emulator:
+    name: Real signed Infinity 2103384 Android ${{ matrix.case }}
+    needs: sign-previously-built-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [fresh, loaded]
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Infinity-2103384-FAST-SIGNED-Experimental-APK-and-Return
+          path: signed-2103384
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Require real newly signed 2103384 APK, same signer and ELF
+        run: |
+          set -euo pipefail
+          apk=signed-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+          expected=$(awk '$2=="Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk" { print $1 }' signed-2103384/SHA256SUMS)
+          test $(grep -c "Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk" signed-2103384/SHA256SUMS) -eq 1
+          echo "$expected  $apk" | sha256sum -c
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk "$apk" --expected-sha "$expected" --version-code 2103384 \
+            --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" \
+            --out emulator-2103384/SIGNED-APPLICATION-IDENTITY.json
+          git diff --exit-code 9dea86a7bf1896993e33ab885aa678a25eddaa0f -- \
+            repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py
+      - name: Prepare clean Android emulator; do not install any stock Kodi
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-preparation
+          sudo chmod 666 /dev/kvm
+      - name: Install, launch, actually Close and verify real signed Infinity 2103384
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-2103384-actual-apk
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            bash -c '
+            apk=signed-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk;
+            expected=$(awk "$2==\"Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk\" {print $1}" signed-2103384/SHA256SUMS);
+            python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py
+            --case ${{ matrix.case }}
+            --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk
+            --apk "$apk"
+            --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons
+            --out emulator-2103384
+            --expected-sha256 "$expected"'
+      - name: Require real Android pass receipt, not a host-only or substituted result
+        run: |
+          set -euo pipefail
+          apk=signed-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+          expected=$(sha256sum "$apk" | cut -d" " -f1)
+          python3 repairs/full-system-20261017/infinity_only_gate.py phase \
+            --report emulator-2103384/INTERNAL-CASE-IDENTITY.json \
+            --expected-sha "$expected" --case ${{ matrix.case }} \
+            --out emulator-2103384/VERIFIED-ANDROID-VERDICT.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103384-Actual-APK-Android-${{ matrix.case }}
+          path: |
+            emulator-2103384/
+            emulator-preparation/
           retention-days: 90
           if-no-files-found: warn
