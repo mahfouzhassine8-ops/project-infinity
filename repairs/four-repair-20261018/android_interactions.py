@@ -56,6 +56,10 @@ def exercise(probe, out, report):
     def token(state, ident=50):
         return state['labels'].get('Container(' + str(ident) + ').ListItem.Property(Infinity.UI.Token)', '')
     def popup(state): return state.get('popup') == '1'
+    def menu_ready(state):
+        # onInit publishes Popup before adding rows. Its final SetFocusId(50)
+        # follows every addItem, so wait for that actual completion boundary.
+        return popup(state) and state.get('focus') == 50
     def rowpoint(state, label):
         card, listing = state['controls']['100'], state['controls']['50']
         surface = state['controls']['101']
@@ -106,88 +110,104 @@ def exercise(probe, out, report):
     probe.adb('push', movie, probe.PROFILE + '/' + movie.name)
     probe.shell('chmod', '644', probe.PROFILE + '/' + movie.name)
     observe('seed')
-    for viewport, size in (('cover', '1080x2400'), ('inner', '1800x1440')):
-        probe.shell('wm', 'size', size); probe.shell('wm', 'density', '320'); time.sleep(3)
-        for theme in ('light', 'dark', 'OLED'):
-            observe('theme', theme)
-            state = browse()
-            capture(viewport + '-' + theme.lower() + '-grid-before-tap',state)
-            grid = state['controls']['50']
-            require(all(item.get('kind')=='addon' and item.get('token')
-                        for item in grid.get('items',[])), 'grid contains raw or duplicate non-opt-in provider items')
-            require(grid.get('width', 0) > 0 and grid.get('height', 0) > 0, 'grid geometry unavailable')
-            item_height = grid['height'] * .21809829
-            item_width = item_height * .668085106
-            columns = int(grid['width'] // item_width)
-            require(columns >= 2, 'both grid columns unavailable')
-            for side, col in (('left', 0), ('right', columns - 1)):
-                xy = (grid['position'][0] + (col + .5) * item_width,
-                      grid['position'][1] + item_height * .5)
-                # First tap must only select, including the initially focused item.
-                tap(state, xy)
-                first = observe()
-                require(first['window'] == 11193 and not popup(first), 'first tap launched or opened popup')
-                selected = token(first)
-                require(bool(selected), 'tapped tile identity missing')
-                tap(first, xy, hold=True)
-                menu = wait_for(popup, 'item-specific add-on menu')
-                require(menu['title'].startswith('Add-on Options — '), 'wrong popup')
-                labels = [x['label'] for x in menu['controls']['50']['items']]
-                required = ['Open','Add-on Information','Add-on Settings','Add to Favourites',
-                            'Add to Infinity Rails','Hide from This View','More / Manage Add-on']
-                mandatory = ['Open','Add-on Information','Add to Favourites']
-                if not selected.startswith(('script.infinity.', 'service.infinity.', 'skin.infinity.')):
-                    mandatory += ['Hide from This View','More / Manage Add-on']
-                require(labels == [x for x in required if x in labels] and all(x in labels for x in mandatory),
-                        'menu ordering/capabilities wrong for '+selected+': '+repr(labels))
-                capture(viewport + '-' + theme.lower() + '-' + side + '-menu', menu)
-                tap(menu, rowpoint(menu, 'Open'))
-                require(popup(observe()), 'Selecting Open did not keep the popup open')
-                back()
-                restored = observe()
-                require(restored['window'] == 11193 and token(restored) == selected and
-                        restored['labels'].get('Container(50).CurrentPage') == first['labels'].get('Container(50).CurrentPage'),
-                        'dismissal changed selection or scroll')
-                # The original first tap is still armed after harmless dismissal.
-                tap(restored, xy)
-                opened = wait_for(lambda s: provider_ready(s, selected),
-                                  'second-tap completed correct add-on listing')
-                capture(viewport + '-' + theme.lower() + '-' + side + '-opened', opened)
-                back(); state = wait_for(lambda s: s['window'] == 11193, 'return to exact grid')
-            # Scroll through the real native panel; hold must follow the new item.
-            x, y = point(state, grid['position'][0] + grid['width'] * .75, grid['position'][1] + grid['height'] * .8)
-            endx, endy = point(state, grid['position'][0] + grid['width'] * .75, grid['position'][1] + grid['height'] * .3)
-            probe.shell('input','swipe',x,y,endx,endy,500); time.sleep(1)
-            xy = (grid['position'][0] + (columns - .5) * item_width, grid['position'][1] + item_height * .5)
-            tap(state, xy); scrolled = observe(); tap(scrolled, xy, hold=True)
-            menu = wait_for(popup, 'scrolled item menu'); capture(viewport+'-'+theme.lower()+'-scrolled', menu)
-            back(); restored = observe()
-            require(token(restored) == token(scrolled), 'scrolled popup dismissed to wrong item')
+    def grid_matrix():
+        for viewport, size in (('cover', '1080x2400'), ('inner', '1800x1440')):
+            probe.shell('wm', 'size', size); probe.shell('wm', 'density', '320'); time.sleep(3)
+            for theme in ('light', 'dark', 'OLED'):
+                observe('theme', theme)
+                state = browse()
+                capture(viewport + '-' + theme.lower() + '-grid-before-tap',state)
+                grid = state['controls']['50']
+                require(all(item.get('kind')=='addon' and item.get('token')
+                            for item in grid.get('items',[])), 'grid contains raw or duplicate non-opt-in provider items')
+                require(grid.get('width', 0) > 0 and grid.get('height', 0) > 0, 'grid geometry unavailable')
+                item_height = grid['height'] * .21809829
+                item_width = item_height * .668085106
+                columns = int(grid['width'] // item_width)
+                require(columns >= 2, 'both grid columns unavailable')
+                for side, col in (('left', 0), ('right', columns - 1)):
+                    xy = (grid['position'][0] + (col + .5) * item_width,
+                          grid['position'][1] + item_height * .5)
+                    # First tap must only select, including the initially focused item.
+                    tap(state, xy)
+                    first = observe()
+                    require(first['window'] == 11193 and not popup(first), 'first tap launched or opened popup')
+                    selected = token(first)
+                    require(bool(selected), 'tapped tile identity missing')
+                    tap(first, xy, hold=True)
+                    menu = wait_for(menu_ready, 'item-specific add-on menu')
+                    require(menu['title'].startswith('Add-on Options — '), 'wrong popup')
+                    labels = [x['label'] for x in menu['controls']['50']['items']]
+                    required = ['Open','Add-on Information','Add-on Settings','Add to Favourites',
+                                'Add to Infinity Rails','Hide from This View','More / Manage Add-on']
+                    mandatory = ['Open','Add-on Information','Add to Favourites']
+                    if not selected.startswith(('script.infinity.', 'service.infinity.', 'skin.infinity.')):
+                        mandatory += ['Hide from This View','More / Manage Add-on']
+                    require(labels == [x for x in required if x in labels] and all(x in labels for x in mandatory),
+                            'menu ordering/capabilities wrong for '+selected+': '+repr(labels))
+                    capture(viewport + '-' + theme.lower() + '-' + side + '-menu', menu)
+                    tap(menu, rowpoint(menu, 'Open'))
+                    require(popup(observe()), 'Selecting Open did not keep the popup open')
+                    back()
+                    restored = observe()
+                    require(restored['window'] == 11193 and token(restored) == selected and
+                            restored['labels'].get('Container(50).CurrentPage') == first['labels'].get('Container(50).CurrentPage'),
+                            'dismissal changed selection or scroll')
+                    # The original first tap is still armed after harmless dismissal.
+                    tap(restored, xy)
+                    opened = wait_for(lambda s: provider_ready(s, selected),
+                                      'second-tap completed correct add-on listing')
+                    capture(viewport + '-' + theme.lower() + '-' + side + '-opened', opened)
+                    back(); state = wait_for(lambda s: s['window'] == 11193, 'return to exact grid')
+                # Scroll through the real native panel; hold must follow the new item.
+                x, y = point(state, grid['position'][0] + grid['width'] * .75, grid['position'][1] + grid['height'] * .8)
+                endx, endy = point(state, grid['position'][0] + grid['width'] * .75, grid['position'][1] + grid['height'] * .3)
+                probe.shell('input','swipe',x,y,endx,endy,500); time.sleep(1)
+                xy = (grid['position'][0] + (columns - .5) * item_width, grid['position'][1] + item_height * .5)
+                tap(state, xy); scrolled = observe(); tap(scrolled, xy, hold=True)
+                menu = wait_for(menu_ready, 'scrolled item menu'); capture(viewport+'-'+theme.lower()+'-scrolled', menu)
+                back(); restored = observe()
+                require(token(restored) == token(scrolled), 'scrolled popup dismissed to wrong item')
+
+    # Run the remaining state/Home/Stop gates first. The exact prior package
+    # already passed the full grid matrix; retain and rerun that entire matrix
+    # below, after these actions, rather than delaying feedback on new paths.
+    probe.shell('wm', 'size', '1800x1440'); probe.shell('wm', 'density', '320'); time.sleep(3)
+    observe('theme', 'OLED')
+    state=browse(); grid=state['controls']['50']
+    item_height=grid['height']*.21809829; item_width=item_height*.668085106
+    columns=int(grid['width']//item_width)
+    index=next(i for i,r in enumerate(grid['items']) if r.get('token','').startswith('plugin.video.infinityuitest'))
+    xy=(grid['position'][0]+(index%columns+.5)*item_width,
+        grid['position'][1]+(index//columns+.5)*item_height)
+    tap(state,xy); restored=observe()
+    require(restored['window']==11193 and not popup(restored), 'fixture first tap launched')
+    capture('actions-fixture-selected',restored)
 
     # Exercise actual view-local hiding and restoration without disabling.
     selected = token(restored)
     require(selected.startswith('plugin.video.infinityuitest'), 'mutation requires a harmless fixture')
     probe.rpc('Input.ContextMenu')
-    menu = wait_for(popup, 'fixture context through native D-pad route')
+    menu = wait_for(menu_ready, 'fixture context through native D-pad route')
     invoke(menu, 'Add to Favourites')
     wait_for(lambda s:not popup(s) and s['dialog'] in (0,9999), 'favourite action completed without an error dialog')
     favourites = probe.rpc('Favourites.GetFavourites', dict(properties=['windowparameter']))
     require(any(f.get('windowparameter') == 'plugin://'+selected+'/' for f in (favourites.get('favourites') or [])),
             'favourite destination not saved')
     report['ui_expected_favourite'] = 'plugin://'+selected+'/'
-    probe.rpc('Input.ContextMenu'); menu=wait_for(popup,'hide menu')
+    probe.rpc('Input.ContextMenu'); menu=wait_for(menu_ready,'hide menu')
     invoke(menu,'Hide from This View')
     hidden_state=wait_for(lambda s:not popup(s) and all(r.get('token') != selected for r in s['controls']['50'].get('items',[])),
              'hidden tile removed only from grid')
     require(probe.rpc('Addons.GetAddonDetails',dict(addonid=selected,properties=['enabled']))['addon']['enabled'],
             'Hide disabled the add-on')
-    restore_button(hidden_state); restore=wait_for(popup,'hidden tile recovery through visible control')
+    restore_button(hidden_state); restore=wait_for(menu_ready,'hidden tile recovery through visible control')
     card=restore['controls']['100']
     tap(restore,(card['position'][0]+card['width']/2,card['position'][1]+card['height']+40))
     dismissed=wait_for(lambda s:not popup(s),'outside dismissal of compact restore menu')
     require(all(r.get('token') != selected for r in dismissed['controls']['50'].get('items',[])),
             'outside dismissal activated Restore')
-    restore_button(dismissed); restore=wait_for(popup,'reopened hidden tile recovery through visible control')
+    restore_button(dismissed); restore=wait_for(menu_ready,'reopened hidden tile recovery through visible control')
     label=restore['controls']['50']['items'][0]['label']
     invoke(restore,label)
     wait_for(lambda s:not popup(s) and any(r.get('token') == selected for r in s['controls']['50'].get('items',[])),
@@ -205,7 +225,7 @@ def exercise(probe, out, report):
         xy = (group['position'][0] + rail['position'][0] + rail['height'] * .561219512 * .4,
               group['position'][1] + rail['position'][1] + rail['height'] * .4)
         tap(home, xy, hold=True)
-        menu = wait_for(popup, 'original Resume context for ' + media)
+        menu = wait_for(menu_ready, 'original Resume context for ' + media)
         labels = [x['label'] for x in menu['controls']['50']['items']]
         require(labels == ['Mark Watched','Reset Progress','Add to Watchlist','Add to Collection','Rate',
                            'Add to Custom List','Remove from Continue Playing'], 'Resume actions not original item menu')
@@ -223,7 +243,7 @@ def exercise(probe, out, report):
         key=token(home,ident)
         require(len(key)==64,'Continue identity unavailable')
         tap(observe(),xy,hold=True)
-        menu=wait_for(popup,'Watchlist mutation for '+media)
+        menu=wait_for(menu_ready,'Watchlist mutation for '+media)
         invoke(menu,'Add to Watchlist')
         data_path=probe.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'
         wait_for(lambda s:not popup(s) and key in probe.read_json(data_path).get('watchlist',{}),
@@ -268,6 +288,7 @@ def exercise(probe, out, report):
         require(probe.rpc('JSONRPC.Ping')=='pong', 'engine unavailable after Stop path '+path)
         require(any(p['pid']==report['native_owner']['pid'] for p in probe.processes()), 'native process changed after Stop')
         capture('stop-path-'+path)
+    grid_matrix()
     report['ui_emulator_smoke_passed'] = True
     (out/'UI-INTERACTIONS.json').write_text(json.dumps(dict(records=records, passed=True,
         physical_fold_verified=False, crash_fixed=False, actual_signed_apk_sha256=report['apk_sha256']),indent=2))
