@@ -23,7 +23,8 @@ jobs:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0, persist-credentials: false}
       - name: Wait for and require the exact FULL native 2103384 build (never rebuild)
-        env: {GH_TOKEN: ${{ github.token }}}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
