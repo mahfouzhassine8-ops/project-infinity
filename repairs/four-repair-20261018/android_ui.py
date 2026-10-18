@@ -140,6 +140,13 @@ def run(args):
                 "Emulator cannot run actual ARM64 Infinity engine")
         require("Success" in probe.adb("install", "--no-incremental", args.apk),
                 "Actual signed Infinity APK did not install")
+        # Match the original approved fresh-Android probe's first-launch setup.
+        # The qemu/no-existing-install guards above must precede every grant.
+        probe.shell("input", "keyevent", "82")
+        for permission in ("android.permission.READ_EXTERNAL_STORAGE",
+                           "android.permission.WRITE_EXTERNAL_STORAGE"):
+            probe.shell("pm", "grant", PARENT, permission, check=False)
+        probe.shell("appops", "set", PARENT, "MANAGE_EXTERNAL_STORAGE", "allow", check=False)
 
         report["installed_package"] = PARENT
         uid = probe.shell("stat", "-c", "%u", probe.PRIVATE).strip()
@@ -288,11 +295,20 @@ def run(args):
         for name, run in (
             ("kodi.log", lambda: probe.shell("cat", probe.PROFILE + "/../temp/kodi.log", check=False)),
             ("logcat.txt", lambda: probe.adb("logcat", "-d")),
+            ("activities.txt", lambda: probe.shell("dumpsys", "activity", "activities", check=False)),
+            ("processes.txt", lambda: probe.shell("ps", "-A", check=False)),
+            ("exit-info.txt", lambda: probe.shell("dumpsys", "activity", "exit-info", PARENT, check=False)),
+            ("native-crash-dropbox.txt", lambda: probe.shell("dumpsys", "dropbox", "--print", "data_app_native_crash", check=False)),
         ):
             try:
                 (out / name).write_text(run())
             except Exception:
                 pass
+        try:
+            (out / "final-screen.png").write_bytes(probe.adb("exec-out", "screencap", "-p", binary=True))
+            probe.adb("pull", "/data/tombstones", out / "emulator-tombstones", check=False)
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
