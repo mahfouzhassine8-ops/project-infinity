@@ -150,6 +150,7 @@ def exercise(probe, out, report):
                     require(first['window'] == 11193 and not popup(first), 'first tap launched or opened popup')
                     selected = token(first)
                     require(bool(selected), 'tapped tile identity missing')
+                    capture(viewport + '-' + theme.lower() + '-' + side + '-first-tap', first)
                     tap(first, xy, hold=True)
                     menu = wait_for(menu_ready, 'item-specific add-on menu')
                     require(menu['title'].startswith('Add-on Options — '), 'wrong popup')
@@ -166,9 +167,13 @@ def exercise(probe, out, report):
                     require(popup(observe()), 'Selecting Open did not keep the popup open')
                     back()
                     restored = observe()
+                    capture(viewport + '-' + theme.lower() + '-' + side + '-dismissed', restored)
                     require(restored['window'] == 11193 and token(restored) == selected and
                             restored['labels'].get('Container(50).CurrentPage') == first['labels'].get('Container(50).CurrentPage'),
-                            'dismissal changed selection or scroll')
+                            'dismissal changed selection or scroll: ' + json.dumps(dict(
+                                expected_token=selected, actual_token=token(restored),
+                                expected_page=first['labels'].get('Container(50).CurrentPage'),
+                                actual_page=restored['labels'].get('Container(50).CurrentPage'))))
                     # The original first tap is still armed after harmless dismissal.
                     tap(restored, xy)
                     opened = wait_for(lambda s: provider_ready(s, selected),
