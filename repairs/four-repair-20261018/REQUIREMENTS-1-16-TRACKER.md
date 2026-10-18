@@ -1,6 +1,6 @@
 # Infinity — binding 1–16 completion tracker
 
-**Status:** OPEN. **Current step:** #3 at the user's explicit direction. **#1 and #2:** verification deferred, both unchecked. **Fully completed:** 0/16.
+**Status:** IMPLEMENTATION TRACKER. **Current step:** #1 targeted repair complete; await instruction for next item. **Individual implementations complete:** 1/16. **Final all-in-one APK and Fold acceptance:** NOT DONE.
 **Repository:** `mahfouzhassine8-ops/project-infinity`.
 **Development branch:** `work/infinity-post-2103384-feature-restoration`.
 **Protected user-approved APK:** 2103384, SHA-256 `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`.
@@ -14,15 +14,15 @@
 - No unrelated changes, regressions, silently removed APK files, feature deletions, compatibility downgrades, redesigns, rollback, uninstall, data clear, or false success.
 - Test change scope against exact protected versions **before** claiming an item complete. Preserve signed/native identities and produce exact source and artifact checksums.
 - Green host checks and generic emulator checks are limited evidence; do not claim Fold acceptance without physical testing. A failed Close or missing crash cause remains failed/open.
-- An item gets `[x]` **only when all its explicit functional, preservation, and required acceptance gates pass**. Partial work stays `[ ]`; write progress separately. After checking an item, report “#N COMPLETE” and show the updated list.
+- An item gets `[x]` once **its individual implementation and targeted regression/preservation checks pass**. This does NOT certify the integrated APK or physical Fold: those must pass the strict final #16/binding audit before release. A failure during final acceptance reopens the affected item; no shortcuts.
 - Complete **one numbered step at a time**, in order, **except when the user explicitly directs advancing with an earlier step still unchecked**. This does not waive or check off that earlier step; it must be completed before release. Stop and ask approval for any shared-component conflict rather than touching Cobra.
 - Only after **all 16** checkmarks and the full binding audit may the approved work be packaged into **one** permanently signed install-over APK. Signing, testing, and user final lock are separate gates. User must approve final lock.
 
 ## Live checklist
 
-- [ ] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **DEFERRED BY USER to proceed to #2; source evidence saved, physical Fold acceptance outstanding, NOT COMPLETE.**
+- [x] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **INDIVIDUAL IMPLEMENTATION COMPLETE:** Work Rotate handler reused, 13 alternate layout cyan corrections made in skin 1.0.5.228; all 14 layouts checked; exact approved binary delta proved; final Fold/integrated APK acceptance PENDING.
 - [ ] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **DEFERRED BY USER to proceed to #3; prior host/emulator evidence saved, physical acceptance and successful Close/reopen outstanding; NOT COMPLETE.**
-- [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus — **IN PROGRESS: existing Work native gesture path, selected-add-on identity and exact Android 17 evidence; physical Fold pending.**
+- [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus — **DEFERRED when user returned to #1; previously gathered evidence retained; unchecked.**
 - [ ] **4.** Exact approved context menu order and relevant actions; Hide is reversible and never Disable
 - [ ] **5.** Universal blue watched indicators, Resume Hub and Watchlist/Collection correctness; durable identity
 - [ ] **6.** Home Movie/TV rails long-press, touch parity and correct options with no black ghost popup
@@ -126,3 +126,19 @@
 4. Full final signed one-APK install-over, data persistence and required guarded shutdown are separate later steps and cannot be falsely presumed passed.
 
 **#3 result:** **Source and controlled Android17 UI behavior verified; physical/integrated release acceptance OPEN. #3 remains UNCHECKED.** No new APK/native/skin/helper code or test workflow was modified or built for #3. Changes in this step are restricted to this tracker record.
+
+
+## #1 ACTUAL TARGETED CORRECTION — 2026-10-18 (implementation checkmark)
+
+**Defect found beyond the previous Work review:** Work's 1.0.5.227 unified VideoOSD already showed white FFFFFFFF / cyan FF00D9FF, but thirteen alternate OSD layouts still used theme-dependent $VAR[InfinityPaletteFocus] for the *rotation-enabled* state. This does not meet the fixed cyan requirement across all existing layouts.
+
+**Fix implemented, not merely audited:** \`item1_rotate_cyan_228.py\` builds a fail-closed, forward-only **1.0.5.228 #1 isolated staging skin** from the exact already-implemented Work 1.0.5.227 ZIP (SHA-256 \`cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699\`). Changes exactly **13 alternate VideoOSD.xml image color attributes**, plus required \`addon.xml\` version and protected manifest. It does not rewrite the unified OSD, player handler, Playback menu, other skin controls, Command Center, Rails, Kodi native engine, or the Cobra add-on.
+
+**Reproducible corrected output:** \`skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip\`, SHA-256 \`39f8f041376748fbe209868a33ef51e1cfd59082ee6ebb8ad095e6f85336bdef\`. The ZIP preserves all **3,072 existing members** in the exact order; **3,057 members are byte-identical** to the protected .227 parent. There are **no deletions**, **no Cobra-named file changes**, and the Home Continue Playing/Video Sources integration files remain byte-identical.
+
+**Independent local evidence:** \`test_item1_rotate_cyan_228.py\` passed 3 targeted positive/negative unit tests, checked the real ZIP member-by-member, validated all **14** OSD layouts show correct white/cyan rotation states, required approved Android rotation actions, no Repeat in the Rotate slot, and no redundant Playback \`Display Mode\`. A second complete deterministic build produced the same SHA-256. The original signed **2103384** \`classes.dex\` contains both Android rotation actions; 2103384 and the earlier 2103386 native engines are not byte-identical because of previously approved input changes; **#1 did not modify either**. Three preexisting Cobra APK files are byte-identical in those two references.
+
+**Scope:** only the named Rotate color defect and necessary metadata, plus the already-approved Work Rotate/Display Mode correction reused unchanged. The deliberately separate Repeat command under \`PlayerControls.xml\` remains untouched. Original Work Android17 run [39126569633](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39126569633) witnessed actual rotation toggle/reset; its overall Essential-First Close FAILED and remains red.
+
+**Final release gates still required:** integrate this exact hash-pinned skin change into the single final APK later, test actual native rotation, Light/Dark/OLED, folded/unfolded, player controls, Cobra runtime, PiP/background, preserved user data, protected Close/reopen and Fold acceptance. No APK was produced or device changed for #1. No final lock authorized.
+
