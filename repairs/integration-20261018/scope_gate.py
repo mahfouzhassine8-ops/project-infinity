@@ -41,6 +41,9 @@ DEPENDENCIES = {
     "resource.images.recordlabels.white": None,
 }
 PRESERVED_COMPAT_VERSION = "0.7.2"
+# The signed 2103384 addon-manifest does NOT register this embedded service.
+# Registration, not just file bytes/version, must remain unchanged.
+PRESERVED_REGISTRATION_IDS = {"service.infinity.compat"}
 MANIFEST = "assets/system/addon-manifest.xml"
 ENGINE = "lib/arm64-v8a/libkodi.so"
 CRASH = "lib/arm64-v8a/libinfinitycrash.so"
@@ -142,8 +145,11 @@ def check_apks(previous: Path, candidate: Path):
     after_ids = manifest_members(new[MANIFEST])
     require(after_ids - prior_ids <= set(VERSIONS) | set(DEPENDENCIES) and
             prior_ids <= after_ids, "Unapproved new or removed bundled addon")
-    require(set(VERSIONS) | set(DEPENDENCIES) <= after_ids,
+    require((set(VERSIONS) | (set(DEPENDENCIES) - PRESERVED_REGISTRATION_IDS)) <= after_ids,
             "Required updated addon or approved existing dependency not registered")
+    require(all((aid in prior_ids) == (aid in after_ids)
+                for aid in PRESERVED_REGISTRATION_IDS),
+            "Original embedded Compatibility registration changed")
 
     for aid, expected in VERSIONS.items():
         xmlpath = ADDON_BASE + aid + "/addon.xml"
