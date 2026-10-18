@@ -20,6 +20,14 @@ permanent-signed APK as an in-place update, then the helper ZIP, then the full
 skin ZIP. Preserve Command Center 0.3.5.20 and Rails 0.2.6. The helper checks the
 original controller source hashes and refuses writes if they differ.
 
+The separate `Infinity-2103385-2103384-Compatibility-Return.apk` contains the
+locked 2103384 native engine at the same experimental version code, so returning
+does not require uninstalling. It is a signed recovery candidate, not a newly
+locked baseline; its own Android installation/Close qualification is separate.
+Before using it, return the skin to .226 (or the retained .225) through the
+normal installer and complete Essential-First Close. Keep the helper installed
+but unused. Never try to solve an installation problem by clearing data.
+
 Record the APK SHA-256 from `SIGNED-2103385.json` and the installed skin/helper
 versions. An APK from a different run is a different candidate. Android tests
 use disposable emulator profiles only; the user's installed environment is
