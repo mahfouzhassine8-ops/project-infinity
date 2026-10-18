@@ -29,6 +29,15 @@ VERSIONS = {
     "script.infinity.watchedbridge": "1.0.1",
 }
 ADDON_BASE = "assets/addons/"
+# Existing approved, hash-pinned requirements of the .225-derived Infinity skin;
+# these are not new features. Existing parent bytes must never be overwritten.
+DEPENDENCIES = {
+    "script.infinity.commandcenter": "0.3.5.20",
+    "service.infinity.compat": "0.8.2",
+    "script.skinshortcuts": None,
+    "resource.images.studios.white": None,
+    "resource.images.recordlabels.white": None,
+}
 MANIFEST = "assets/system/addon-manifest.xml"
 ENGINE = "lib/arm64-v8a/libkodi.so"
 CRASH = "lib/arm64-v8a/libinfinitycrash.so"
@@ -113,10 +122,13 @@ def check_apks(previous: Path, candidate: Path):
 
     allowed_files = {"AndroidManifest.xml", MANIFEST, ENGINE}
     allowed_prefix = tuple(ADDON_BASE + aid + "/" for aid in VERSIONS)
+    static_prefix = tuple(ADDON_BASE + aid + "/" for aid in DEPENDENCIES)
     additions = set(new) - set(old)
     changed = {name for name in old if old[name] != new[name]}
     extra = [name for name in additions | changed
-             if name not in allowed_files and not name.startswith(allowed_prefix)]
+             if name not in allowed_files and
+             not name.startswith(allowed_prefix) and
+             not (name in additions and name.startswith(static_prefix))]
     require(not extra, "Unapproved APK payload changed/added: " + repr(sorted(extra)[:15]))
     require(all(name not in additions for name in old),
             "Unapproved duplicate input")
@@ -125,9 +137,10 @@ def check_apks(previous: Path, candidate: Path):
 
     prior_ids = manifest_members(old[MANIFEST])
     after_ids = manifest_members(new[MANIFEST])
-    require(after_ids - prior_ids <= set(VERSIONS) and prior_ids <= after_ids,
-            "Unapproved new or removed bundled addon")
-    require(set(VERSIONS) <= after_ids, "Required updated addons not registered")
+    require(after_ids - prior_ids <= set(VERSIONS) | set(DEPENDENCIES) and
+            prior_ids <= after_ids, "Unapproved new or removed bundled addon")
+    require(set(VERSIONS) | set(DEPENDENCIES) <= after_ids,
+            "Required updated addon or approved existing dependency not registered")
 
     for aid, expected in VERSIONS.items():
         xmlpath = ADDON_BASE + aid + "/addon.xml"
@@ -136,10 +149,20 @@ def check_apks(previous: Path, candidate: Path):
         require(info.attrib.get("id") == aid and info.attrib.get("version") == expected,
                 "Wrong updated component ID/version: " + aid)
 
+    for aid, expected in DEPENDENCIES.items():
+        path = ADDON_BASE + aid + "/addon.xml"
+        require(path in new, "Approved production dependency missing: " + aid)
+        row = ET.fromstring(new[path])
+        require(row.attrib.get("id") == aid and
+                (expected is None or row.attrib.get("version") == expected),
+                "Production dependency identity/version mismatch: " + aid)
+        prefix = ADDON_BASE + aid + "/"
+        require(all(old[name] == new[name] for name in old if name.startswith(prefix)),
+                "Existing production dependency was overwritten: " + aid)
+
     # Never silently add recovery from skipped #7, or alter the versioncheck
     # service or other #11 files, preexisting Cobra or any locked shutdown code.
-    for aid in ("script.infinity.addonrecovery", "service.xbmc.versioncheck",
-                "service.infinity.compat"):
+    for aid in ("script.infinity.addonrecovery", "service.xbmc.versioncheck"):
         prefix = ADDON_BASE + aid + "/"
         before = {name:body for name,body in old.items() if name.startswith(prefix)}
         after = {name:body for name,body in new.items() if name.startswith(prefix)}
@@ -156,6 +179,7 @@ def check_apks(previous: Path, candidate: Path):
         "source_parent_sha256": sha(previous.read_bytes()),
         "candidate_sha256": sha(candidate.read_bytes()),
         "new_or_updated_addons": VERSIONS,
+        "unchanged_dependency_identities": DEPENDENCIES,
         "scope": list(REPAIR_NUMBERS),
         "added_files": sorted(additions),
         "changed_files": sorted(changed),
