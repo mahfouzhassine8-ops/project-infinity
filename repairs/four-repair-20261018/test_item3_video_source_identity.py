@@ -129,15 +129,14 @@ def main():
     original = subprocess.check_output([
         'git','cat-file','blob',PREIMAGE_BLOB], cwd=HERE.parents[1]).decode()
     current = SOURCE.read_text()
-    assert original.count('  if (item->GetProperty("Infinity.UI.Version")') == 1
+    assert '  if (item->GetProperty("Infinity.UI.Version")' in literal(original, 'METHOD')
     assert current.count(GUARD) == 1
     assert current.replace(GUARD, '', 1) == original, (
         'Out-of-scope shared input modification or protected preimage mismatch')
     assert literal(current, 'DISPATCH') == literal(original, 'DISPATCH')
     assert literal(current, 'INFO') == literal(original, 'INFO')
     assert literal(current, 'FILES') == literal(original, 'FILES')
-    assert 'GetParentID() == WINDOW_HOME + 1193 && GetID() == 50' in GUARD.join(
-        literal(current,'METHOD').split(GUARD))
+    assert 'const bool browse = GetParentID() == WINDOW_HOME + 1193 && GetID() == 50;' in literal(current, 'METHOD')
     ordinary = __import__('test_native')
     compile_run(ordinary.HARNESS + literal(original,'METHOD'), OLD_CASE)
     compile_run(ordinary.HARNESS + literal(current,'METHOD'), NEW_CASE)
