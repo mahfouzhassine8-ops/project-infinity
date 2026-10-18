@@ -89,4 +89,77 @@ class ResumeTests(fixtures['RuntimeTests']):
         with self.assertRaises(Exception): access.mutate(plugin, key, entry, 'toggle-watchlist')
         self.assertEqual(hub.load(self.profile)['items'][key]['identity'], entry['identity'])
 
+
+    def test_stale_watchlist_menu_cannot_reverse_external_add(self):
+        for media in ('movie', 'tv'):
+            with self.subTest(media=media):
+                entry = self.seed(media); key = entry['key']; path = self.profile / hub.CONTINUE_FILE
+                _, rows = access.context_rows(plugin, key)
+                label = next(label for label, op in rows if op == 'toggle-watchlist')
+                self.assertEqual(label, 'Add to Watchlist')
+                data = hub.load(self.profile)
+                data, added, changed_entry = hub.toggle_watchlist_data(data, key)
+                self.assertTrue(added); self.assertIsNotNone(changed_entry)
+                common.atomic_json(path, data); saved = path.read_bytes()
+                self.assertFalse(access.mutate(plugin, key, entry, 'toggle-watchlist', expected_label=label))
+                self.assertEqual(path.read_bytes(), saved)
+                self.assertIn(key, self.restart_read()['watchlist'])
+
+    def test_stale_collection_menu_cannot_reverse_external_add(self):
+        entry = self.seed(); key = entry['key']; path = self.profile / hub.CONTINUE_FILE
+        _, rows = access.context_rows(plugin, key)
+        label = next(label for label, op in rows if op == 'toggle-collection')
+        data = hub.load(self.profile)
+        data, added, changed_entry = hub.toggle_collection_data(data, key)
+        self.assertTrue(added); self.assertIsNotNone(changed_entry)
+        common.atomic_json(path, data); saved = path.read_bytes()
+        self.assertFalse(access.mutate(plugin, key, entry, 'toggle-collection', expected_label=label))
+        self.assertEqual(path.read_bytes(), saved)
+        self.assertIn(key, self.restart_read()['collection'])
+
+    def test_stale_rating_menu_cannot_overwrite_new_rating(self):
+        entry = self.seed(); key = entry['key']; path = self.profile / hub.CONTINUE_FILE
+        _, rows = access.context_rows(plugin, key)
+        label = next(label for label, op in rows if op == 'rate')
+        self.assertEqual(label, 'Rate')
+        data = hub.load(self.profile)
+        data, _ = hub.set_rating_data(data, key, 8)
+        common.atomic_json(path, data); saved = path.read_bytes()
+        self.assertFalse(access.mutate(plugin, key, entry, 'rate', choice=1, expected_label=label))
+        self.assertEqual(path.read_bytes(), saved)
+        self.assertEqual(self.restart_read()['ratings'][key]['rating'], 8)
+
+    def test_new_playback_clock_blocks_destructive_menu_actions(self):
+        for op in ('mark-watched', 'reset-progress', 'remove-resume'):
+            with self.subTest(op=op):
+                entry = self.seed(); key = entry['key']; path = self.profile / hub.CONTINUE_FILE
+                _, rows = access.context_rows(plugin, key)
+                label = next(label for label, action in rows if action == op)
+                data = hub.load(self.profile); data['items'][key]['position'] = 444
+                common.atomic_json(path, data); saved = path.read_bytes()
+                self.assertFalse(access.mutate(plugin, key, entry, op, expected_label=label))
+                self.assertEqual(path.read_bytes(), saved)
+                self.assertEqual(self.restart_read()['items'][key]['position'], 444)
+
+    def test_completed_item_leaving_continue_cannot_mutate_history(self):
+        entry = self.seed(); key = entry['key']; path = self.profile / hub.CONTINUE_FILE
+        _, rows = access.context_rows(plugin, key)
+        label = next(label for label, op in rows if op == 'toggle-watchlist')
+        data = hub.load(self.profile)
+        data, updated = hub.mark_watched_data(data, key, entry, completed=False)
+        self.assertIsNotNone(updated)
+        common.atomic_json(path, data); saved = path.read_bytes()
+        self.assertEqual(access.context_rows(plugin, key), (None, []))
+        self.assertFalse(access.mutate(plugin, key, entry, 'toggle-watchlist', expected_label=label))
+        self.assertEqual(path.read_bytes(), saved)
+
+    def test_current_menu_intent_saves_using_original_cc_writer(self):
+        entry = self.seed(); key = entry['key']
+        _, rows = access.context_rows(plugin, key)
+        label = next(label for label, op in rows if op == 'toggle-watchlist')
+        self.assertTrue(access.mutate(plugin, key, entry, 'toggle-watchlist', expected_label=label))
+        data = self.restart_read()
+        self.assertIn(key, data['watchlist'])
+        self.assertEqual(data['foreign'], {'retain': 7})
+
 if __name__ == '__main__': unittest.main(verbosity=2)

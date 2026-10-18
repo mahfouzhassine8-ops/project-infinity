@@ -165,10 +165,16 @@ def resume_menu(key):
         name = xbmcgui.Dialog().input('Add to custom list').strip()[:80]
         if not name:
             return
-    if mutate(plugin, key, entry, op, choice, name):
+    expected_label = next((label for label, action in rows if action == op), None)
+    if expected_label is None:
+        raise RuntimeError('The selected Continue Playing action changed. No data was modified.')
+    if mutate(plugin, key, entry, op, choice, name, expected_label=expected_label):
         # Original publish_home updates the existing rail revision. No forced
         # Home navigation or Container.Refresh on an unrelated provider window.
         xbmcgui.Dialog().notification('Infinity Resume Hub', 'Saved', time=1800)
+    else:
+        xbmcgui.Dialog().notification('Infinity Resume Hub',
+                                     'Item changed. Open its menu again.', time=3500)
 
 def main(args):
     home = xbmcgui.Window(10000)

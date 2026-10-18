@@ -32,29 +32,39 @@ def load():
         sys.argv = before
     return plugin
 
-def context_rows(plugin, key):
+def _context_rows_data(plugin, key, data, entry):
+    """Evaluate the original Command Center menu for a current Continue item.
+
+    Never mutate an item that completed or disappeared during the popup.
+    """
     from urllib.parse import parse_qs, urlparse
-    hub = plugin.hub
-    if not hub.KEY_RE.fullmatch(key):
-        return None, []
-    data = hub.load_view(plugin.PROFILE)
-    entry = hub.find_entry(data, key)
-    if not entry or not hub.entry_identity(entry) or entry.get('synthetic_next'):
-        return None, []
-    result = []
+    items = data.get('items')
+    if not isinstance(items, dict) or key not in items:
+        return []
+    if not entry or not plugin.hub.entry_identity(entry) or entry.get('synthetic_next'):
+        return []
+    rows = []
     for label, command in plugin._context(entry, data, 'continue'):
         if not command.startswith('RunPlugin(plugin://script.infinity.commandcenter/?') or not command.endswith(')'):
             raise RuntimeError('Unexpected Command Center context action.')
         params = parse_qs(urlparse(command[len('RunPlugin('):-1]).query)
         op = params.get('op', [''])[0]
-        if params.get('key') != [key]:
+        if params.get('key') != [key] or not op:
             raise RuntimeError('The menu item identity changed.')
-        if op == 'reset-progress' and key not in data.get('items', {}):
-            continue
-        result.append((label, op))
-    return entry, result
+        rows.append((label, op))
+    return rows
 
-def mutate(plugin, key, original, op, choice=None, name=''):
+
+def context_rows(plugin, key):
+    hub = plugin.hub
+    if not hub.KEY_RE.fullmatch(key):
+        return None, []
+    data = hub.load_view(plugin.PROFILE)
+    entry = hub.find_entry(data, key)
+    rows = _context_rows_data(plugin, key, data, entry)
+    return (entry, rows) if rows else (None, [])
+
+def mutate(plugin, key, original, op, choice=None, name='', expected_label=None):
     """Keep the original writer gate, mutation functions, queue and home publisher."""
     hub = plugin.hub
     with plugin.persistence_scope():
@@ -62,6 +72,17 @@ def mutate(plugin, key, original, op, choice=None, name=''):
         current = hub.find_entry(data, key)
         if not current or not hub.same_identity(hub.entry_identity(original), hub.entry_identity(current)):
             return False
+        if expected_label is not None:
+            # Check the actual action seen by the user, under the existing
+            # protected CC writer scope. 'Add' must not become 'Remove' while
+            # a background writer updates membership, rating, or playback.
+            if not isinstance(expected_label, str) or (expected_label, op) not in \
+                    _context_rows_data(plugin, key, data, current):
+                return False
+            if op in ('mark-watched', 'mark-unwatched', 'reset-progress', 'remove-resume'):
+                for field in ('position', 'playback_occurrence'):
+                    if original.get(field) != current.get(field):
+                        return False
         overrides = data.get('infinity_watched_overrides', {})
         if not isinstance(overrides, dict):
             raise RuntimeError('The watched bridge state is unsupported; no changes were made.')

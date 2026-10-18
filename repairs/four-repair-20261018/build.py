@@ -175,7 +175,7 @@ def build(parent, out, coordinated=False):
                   untouched_members_byte_identical=True, physical_fold_verified=False, crash_fixed=False)
     (out / ('BUILD-' + version + '.json')).write_text(json.dumps(report, indent=2) + '\n')
     if coordinated:
-        helper = out / 'script.infinity.uirepair-0.1.0-TEST.zip'
+        helper = out / 'script.infinity.uirepair-0.1.1-TEST.zip'
         with zipfile.ZipFile(helper, 'w', zipfile.ZIP_DEFLATED) as z:
             for p in sorted((HERE / 'addon').rglob('*')):
                 if p.is_file() and '__pycache__' not in p.parts:
