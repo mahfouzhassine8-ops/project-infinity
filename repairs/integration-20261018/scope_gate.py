@@ -163,7 +163,12 @@ def check_apks(previous: Path, candidate: Path):
             require(path in old and row.attrib.get("version") == PRESERVED_COMPAT_VERSION,
                     "Original locked Compatibility 0.7.2 ID/version must be preserved")
         prefix = ADDON_BASE + aid + "/"
-        require(all(old[name] == new[name] for name in old if name.startswith(prefix)),
+        original_members = {name for name in old if name.startswith(prefix)}
+        candidate_members = {name for name in new if name.startswith(prefix)}
+        if original_members:
+            require(original_members == candidate_members,
+                    "Existing protected dependency acquired unapproved new files: " + aid)
+        require(all(old[name] == new[name] for name in original_members),
                 "Existing production dependency was overwritten: " + aid)
 
     # Never silently add recovery from skipped #7, or alter the versioncheck
