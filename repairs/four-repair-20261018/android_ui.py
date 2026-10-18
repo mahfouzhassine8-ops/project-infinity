@@ -160,7 +160,8 @@ def run(args):
         # Make the native application discover the real skin on the FIRST boot.
         guisettings = out / "guisettings.xml"
         guisettings.write_text('<settings version="2"><setting id="lookandfeel.skin">'
-                               + FULL_SKIN + '</setting></settings>')
+                               + FULL_SKIN + '</setting>'
+                               '<setting id="general.addonupdates">2</setting></settings>')
         probe.adb("push", guisettings, probe.PROFILE + "/guisettings.xml")
 
         extras = out / "confirmation-source"
@@ -185,9 +186,12 @@ def run(args):
         probe.shell("am", "start", "-W", "-n", PARENT + "/.Splash")
         report["first_party"] = probe.enable_first_party(out)
         report["native_owner"] = probe.wait_ready()
-        require(probe.rpc("Settings.SetSettingValue",
-                          {"setting": "general.addonupdates", "value": 2}) is True,
-                "Could not disable automatic external updates in disposable test")
+        # Seed disposable-only update policy before first startup. A synchronous
+        # settings write while first-party services bootstrap can exceed the
+        # original probe's ten-second RPC deadline; retain that failed run.
+        require(probe.rpc("Settings.GetSettingValue",
+                          {"setting": "general.addonupdates"}).get("value") == 2,
+                "Automatic external updates were not disabled in disposable test")
 
         publish("discover-all-production-infinity-components")
         result = probe.rpc("Addons.GetAddons", {"properties": ["version", "enabled"]})
