@@ -185,7 +185,7 @@ def package(parent,native,out):
                  user_data_untouched=True,
                  native_and_signing_provenance_verified=True,
                  physical_shutdown_verified=False,
-                 25_second_startup_close_resolved=False,
+                 startup_25_second_close_resolved=False,
                  final_lock_authorized=False,artifacts=artifacts)
     (out/"INFINITY-2103384-SIGNING-RECEIPT.json").write_text(
         json.dumps(receipt,indent=2)+"\n")
