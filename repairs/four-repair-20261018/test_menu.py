@@ -34,6 +34,27 @@ class MenuTests(unittest.TestCase):
             self.runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(self.runtime)
         self.runtime.rpc=mock.Mock(side_effect=lambda *a:self.rpc_calls.append(a))
 
+    def test_rails_026_027_only_and_disabled_rails_is_hidden(self):
+        # #6 integration may not silently remove #4's Add to Infinity Rails.
+        state={'enabled':True,'version':'0.2.6'}
+        with mock.patch.object(self.xbmc,'getCondVisibility',side_effect=lambda _condition:state['enabled']):
+            with mock.patch.object(self.runtime.xbmcaddon,'Addon') as addon:
+                addon.return_value.getAddonInfo.side_effect=lambda field: state['version'] if field=='version' else ''
+                for version in ('0.2.6','0.2.7','0.2.5','0.2.8','0.3.0',''):
+                    state['version']=version
+                    expected=version in ('0.2.6','0.2.7')
+                    with self.subTest(version=version):
+                        self.assertEqual(self.runtime.rails_supported(),expected)
+                        labels=[name for name,_ in addon_rows(True,self.runtime.rails_supported())]
+                        self.assertEqual('Add to Infinity Rails' in labels,expected)
+                state['enabled']=False
+                state['version']='0.2.7'
+                self.assertFalse(self.runtime.rails_supported())
+                self.assertNotIn('Add to Infinity Rails',
+                                 [name for name,_ in addon_rows(True,self.runtime.rails_supported())])
+        self.assertEqual(self.calls,[])
+        self.assertEqual(self.rpc_calls,[])
+
     def test_precise_order_and_capabilities(self):
         self.assertEqual([s for s,_ in addon_rows(True,True)], ['Open','Add-on Information','Add-on Settings','Add to Favourites','Add to Infinity Rails','Hide from This View','More / Manage Add-on'])
         self.assertEqual([s for s,_ in addon_rows(False,False)], ['Open','Add-on Information','Add to Favourites','Hide from This View','More / Manage Add-on'])
