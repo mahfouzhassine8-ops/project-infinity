@@ -104,3 +104,37 @@ One UI9.0/Fold physical testing remains separate. No final lock.
 The October18 physical abnormal exit139 remains a separate open investigation.
 This controlled Close rejection is not a native crash backtrace and does not
 establish the cause of that exit. Private physical diagnostics remain private.
+
+## Targeted run result: blocked before Android
+
+Correction/source commit: `05788ec42bde21f93287a23ea97e5232d198f78c`.
+Targeted run [39128510997](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39128510997)
+failed in all three cases before emulator installation/start:
+
+| Case | Job | Result |
+| --- | --- | --- |
+| locked384 |117678634767|draft input retrieval HTTP403|
+| original386 |117678634886|draft input retrieval HTTP403|
+| android-guard386 |117678634872|draft input retrieval HTTP403|
+
+All three logs show effective `GITHUB_TOKEN` **Contents:read**, despite the
+job's requested Contents:write. Reading existing unpublished release416125865
+returned `Resource not accessible by integration (HTTP403)` before its exact
+asset651868759 could be downloaded. The earlier full API37 run had effective
+Contents:write and could read this same asset. No permission policy was changed,
+draft release published, credential substituted, or test input replaced.
+
+The APK identity/source comparison, eight service/package host tests, five
+collector tests and six existing evidence tests passed before that boundary.
+The unchanged seven Close-validator tests also pass locally (26 focused host
+and guard tests total). Locked-source protection run39128510888 passed. None
+of these results is an API37 shutdown pass.
+
+Unblock by granting this workflow the existing authorized draft-input access,
+or providing the identical approved `Infinity-Full-Stack-CI-Inputs-225.zip` as
+an Actions artifact it can read. Preserve the original input SHA256
+`852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834`.
+Do not blindly rerun unchanged jobs. No equivalent API37 Close receipt or
+app-UID path evidence was produced by these three jobs; the precise native
+read-only predicate remains unobserved. The correction remains experimental
+and is not qualified for physical installation or final lock.
