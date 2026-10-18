@@ -2,7 +2,7 @@ name: Infinity | Verified UI native artifact | permanent signing and Android gat
 on:
   push:
     branches: [work/infinity-post-2103384-feature-restoration]
-    paths: ['.github/workflows/infinity-four-repair-sign-verified.yml', 'repairs/four-repair-20261018/SIGN.marker']
+    paths: ['repairs/four-repair-20261018/SIGN.marker']
   workflow_dispatch:
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-four-repair-sign-verified, cancel-in-progress: true}
@@ -190,7 +190,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: >-
-            python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py
+            python3 repairs/four-repair-20261018/run_locked_android_case.py
             --case ${{ matrix.case }}
             --baseline-apk approved-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
             --apk verified-candidate/Infinity-Candidate.apk

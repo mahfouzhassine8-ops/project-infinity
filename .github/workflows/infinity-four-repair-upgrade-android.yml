@@ -1,0 +1,144 @@
+name: Infinity | Exact signed 2103385 upgrade from locked 2103384 | Android
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['.github/workflows/infinity-four-repair-upgrade-android.yml', 'repairs/four-repair-20261018/run_locked_android_case.py']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-four-repair-upgrade-android, cancel-in-progress: true}
+jobs:
+  signed-android:
+    name: Actual signed feature APK ${{ matrix.case }} vs LOCKED 2103384
+    runs-on: ubuntu-22.04
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [loaded]
+    env:
+      INFINITY_CANDIDATE_SHA: f0cda703ae43c3e41c952411c5d71622c9473cb6db92d17355cf21cf135e9240
+      INFINITY_NEW_CODE: '2103385'
+      INFINITY_CANDIDATE_FILE: 'Infinity-2103385-UI-Restoration-TEST1.apk'
+      INFINITY_LOCKED_APK_SHA: b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Download EXACT approved signed 2103384 APK from locked source
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 39091057069
+          name: Infinity-2103384-FAST-SIGNED-Experimental-APK-and-Return
+          github-token: ${{ github.token }}
+          path: approved-2103384
+      - name: Download only the exact candidate signed APK artifact named in this invocation
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 39106462774
+          name: Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return
+          github-token: ${{ github.token }}
+          path: candidate-input
+      - name: Download known unchanged test service fixtures; do not substitute stock Kodi
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - name: Verify locked base, candidate identity, signer, higher version, and fixed original native Close tests
+        run: |
+          set -euo pipefail
+          git diff --exit-code 5389b4572cd32037fedf0e7d88b7f79abb120952 HEAD -- \
+            repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json \
+            repairs/full-system-20261017/write_error_scope_patch.py \
+            repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h \
+            repairs/full-system-20261017/shutdown_native_ci.py \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityAndroidCheckpoint.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityScriptPersistence.h
+          python3 - <<'PY'
+          import hashlib, os, re, shutil
+          from pathlib import Path
+          locked=Path('approved-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk')
+          fixed='b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af'
+          assert locked.is_file() and hashlib.sha256(locked.read_bytes()).hexdigest()==fixed
+          expected=os.environ['INFINITY_CANDIDATE_SHA']
+          filename=os.environ['INFINITY_CANDIDATE_FILE']
+          code=os.environ['INFINITY_NEW_CODE']
+          assert re.fullmatch('[a-f0-9]{64}',expected)
+          assert re.fullmatch('[A-Za-z0-9][A-Za-z0-9_.-]*\.apk',filename)
+          assert code.isdecimal() and int(code)>2103384
+          matches=list(Path('candidate-input').rglob(filename))
+          assert len(matches)==1 and matches[0].is_file(), 'Not exactly one signed Infinity candidate file'
+          actual=hashlib.sha256(matches[0].read_bytes()).hexdigest()
+          assert actual==expected and actual!=fixed,'Cannot test mismatched or locked APK as new feature'
+          Path('verified-candidate').mkdir(exist_ok=True)
+          shutil.copyfile(matches[0],'verified-candidate/Infinity-Candidate.apk')
+          print('PASS actual new signed candidate preimage: version',code,'sha256',actual,flush=True)
+          PY
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk verified-candidate/Infinity-Candidate.apk \
+            --expected-sha "$INFINITY_CANDIDATE_SHA" \
+            --version-code "$INFINITY_NEW_CODE" \
+            --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" \
+            --out feature-android/CANDIDATE-SIGNED-IDENTITY.json
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk approved-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk \
+            --expected-sha "$INFINITY_LOCKED_APK_SHA" --version-code 2103384 \
+            --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" \
+            --out feature-android/LOCKED-SIGNED-IDENTITY.json
+          git diff --exit-code 9dea86a7bf1896993e33ab885aa678a25eddaa0f -- \
+            repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py
+      - name: Prepare disposable Android emulator; actual Infinity APK required
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Fresh or upgraded Infinity startup, REAL Essential-First Close and reopen
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-post-2103384-feature
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            python3 repairs/four-repair-20261018/run_locked_android_case.py
+            --case ${{ matrix.case }}
+            --baseline-apk approved-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+            --apk verified-candidate/Infinity-Candidate.apk
+            --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons
+            --out feature-android
+            --expected-sha256 "$INFINITY_CANDIDATE_SHA"
+      - name: Green ONLY if actual newly signed Infinity real Android receipt passed
+        run: |
+          set -euo pipefail
+          python3 repairs/full-system-20261017/infinity_only_gate.py phase \
+            --report feature-android/INTERNAL-CASE-IDENTITY.json \
+            --expected-sha "$INFINITY_CANDIDATE_SHA" \
+            --case ${{ matrix.case }} \
+            --out feature-android/REAL-ANDROID-VERDICT.json
+      - name: Preserve real Android evidence including failures; never imply physical Fold lock
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-Post-2103384-Candidate-Android-${{ matrix.case }}
+          path: |
+            feature-android/
+            emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
