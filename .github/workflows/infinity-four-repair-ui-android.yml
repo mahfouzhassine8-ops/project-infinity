@@ -1,0 +1,133 @@
+name: Infinity | Full candidate UI gestures and both Stop paths | Android
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['repairs/four-repair-20261018/UI-ANDROID.marker']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-four-repair-ui-android, cancel-in-progress: true}
+jobs:
+  actual-ui:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    permissions: {contents: write, actions: read}
+    env:
+      PRODUCER_RUN: '39102096896'
+      PRODUCER_SHA: '73e8d51a1f7425929011f6ab9d854c86b3a8120b'
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Require exact native source and wait for actual permanent-signed artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git diff --exit-code "$PRODUCER_SHA" HEAD -- repairs/four-repair-20261018/native_patch.py repairs/four-repair-20261018/native_ci.py repairs/four-repair-20261018/package_apk.py
+          python3 - <<'PY'
+          import json,os,subprocess,time
+          repo=os.environ['GITHUB_REPOSITORY'];run=os.environ['PRODUCER_RUN']
+          for attempt in range(180):
+              data=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run}/artifacts']))
+              if any(a['name']=='Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return' and not a['expired'] for a in data['artifacts']):break
+              state=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run}']))
+              assert state['head_sha']==os.environ['PRODUCER_SHA']
+              if state['status']=='completed':raise RuntimeError('Producer ended without signed APK: '+str(state['conclusion']))
+              print('Waiting for exact signed producer artifact',attempt,flush=True);time.sleep(30)
+          else:raise RuntimeError('Exact signed artifact not produced within 90 minutes')
+          PY
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ env.PRODUCER_RUN }}
+          name: Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: first-party-input
+      - name: Retrieve unchanged original complete skin and Rails
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/ui-release.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/ui-release.json'))
+          assert r['draft'] is True and r['tag_name']=='infinity-ci-assets-20261017'
+          a=next(a for a in r['assets'] if a['id']==651868759)
+          assert a['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          PY
+          curl --fail --location --silent --show-error --retry 2 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+      - name: Verify signer and stage exact full candidate, dependencies and disposable fixtures
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,os
+          from pathlib import Path
+          r=json.load(open('signed/SIGNED-2103385.json'))
+          assert r['source_commit']==os.environ['PRODUCER_SHA']
+          a=next(a for a in r['artifacts'] if not a['native_restored_2103384'])
+          assert hashlib.sha256((Path('signed')/a['file']).read_bytes()).hexdigest()==a['sha256']
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('APK_SHA='+a['sha256']+'\n')
+          PY
+          python3 repairs/four-repair-20261018/build.py --parent full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --out ui-candidate --coordinated
+          mkdir -p full-input/additional-addons
+          python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
+          python3 repairs/four-repair-20261018/prepare_ui_android.py --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip --first-party first-party-input/rc05-inputs/native-evidence/installed-addons --additional full-input/additional-addons --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip --out full-stack
+      - name: Prepare isolated emulator and public test media
+        run: |
+          set -euo pipefail
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk --apk signed/Infinity-2103385-UI-Restoration-TEST1.apk --expected-sha "$APK_SHA" --version-code 2103385 --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" --out full-stack/SIGNED-IDENTITY.json
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0 ffmpeg
+          ffmpeg -v error -f lavfi -i testsrc2=size=640x360:rate=24 -f lavfi -i sine=frequency=440:sample_rate=48000 -t 120 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -y infinity-ui-fixture.mp4
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Real candidate taps, holds, themes, Stop choices, Stop Home, Essential-First Close and reopen
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-four-repair-ui
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            python3 repairs/four-repair-20261018/android_ui.py
+            --apk signed/Infinity-2103385-UI-Restoration-TEST1.apk --expected-sha "$APK_SHA"
+            --addons full-stack/addons --input-proof full-stack/FULL-STACK-INPUTS.json
+            --test-variant ui-restoration --out full-stack/android
+      - name: Require actual UI and unchanged Close receipts
+        run: |
+          python3 - <<'PY'
+          import json
+          r=json.load(open('full-stack/android/FULL-STACK-ANDROID.json'))
+          assert r['passed'] and r['ui_emulator_smoke_passed'] and r['close_certified'] and r['reopen_succeeded']
+          assert r['skin_version']=='1.0.5.227' and not r['physical_fold_accepted'] and not r['crash_fixed']
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103385-Full-UI-Android-Evidence
+          path: |
+            full-stack/android/
+            full-stack/*.json
+            emulator-setup/
+            ui-candidate/BUILD-1.0.5.227.json
+          if-no-files-found: warn
+          retention-days: 90
