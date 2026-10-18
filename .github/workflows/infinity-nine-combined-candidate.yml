@@ -11,6 +11,10 @@ jobs:
     name: Strict source/payload gates before any Android/Fold approval
     runs-on: ubuntu-22.04
     timeout-minutes: 110
+    # Reading immutable source from a GitHub DRAFT release requires contents:write.
+    # A read-only GITHUB_TOKEN yielded HTTP 403 in run 39170118673 at asset 651868759.
+    # Scope this permission to this one packaging job; do not change release assets.
+    permissions: {contents: write, actions: read}
     steps:
       - uses: actions/checkout@v7
         with: {fetch-depth: 0, persist-credentials: false}
