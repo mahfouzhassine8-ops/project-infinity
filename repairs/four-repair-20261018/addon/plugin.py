@@ -4,7 +4,7 @@ from urllib.parse import parse_qs
 import xbmc
 import xbmcgui
 import xbmcplugin
-from runtime import addons, hidden
+from runtime import addons, hidden, destination
 
 def optin(item, kind, token):
     item.setProperty('Infinity.UI.Version', '1')
@@ -21,13 +21,16 @@ def main():
             for row in addons():
                 aid = row['addonid']
                 if hidden(aid): continue
-                path = 'plugin://' + aid + '/'
+                route = destination(aid)
+                if not route: continue
+                kind, target = route
+                path = target if kind == 'plugin' else 'script://' + aid
                 item = xbmcgui.ListItem(row.get('name', aid), path=path, offscreen=True)
                 item.setArt(dict(thumb=row.get('thumbnail', ''), icon=row.get('thumbnail', '')))
                 item.setProperty('Addon.ID', aid)
                 item.setProperty('Addon.IsInstalled', 'true')
                 optin(item, 'addon', aid)
-                xbmcplugin.addDirectoryItem(handle, path, item, isFolder=True)
+                xbmcplugin.addDirectoryItem(handle, path, item, isFolder=(kind == 'plugin'))
         elif action == 'continue':
             from controller_access import load
             plugin = load()

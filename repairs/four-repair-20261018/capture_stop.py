@@ -76,12 +76,12 @@ def main():
         print('Capture is running. Start a video in Infinity normally.')
         input('While the video is playing, press Enter here immediately BEFORE you press Stop: ')
         mark('before-stop')
-        input('Press Stop on the Fold. When movie choices return, press Enter here: ')
-        mark('choices-returned')
-        if args.path == 'B':
+        outcome = input('Press Stop. When choices return press Enter; if the app exits first, type exit and Enter: ').strip().casefold()
+        mark('exit-before-choices' if outcome == 'exit' else 'choices-returned')
+        if args.path == 'B' and outcome != 'exit':
             input('Now use Back/Home on the Fold. Press Enter here when Home appears or the app exits: ')
             mark('after-back-home')
-        else:
+        elif outcome != 'exit':
             print('Remain on movie choices; do not navigate Home for path A.')
         input('Wait for the failure (or at least 30 seconds). Press Enter to finish this capture: ')
         mark('reproduction-ended'); snapshot('after')

@@ -94,16 +94,18 @@ def exercise(probe, out, report):
                 first = observe()
                 require(first['window'] == 11193 and not popup(first), 'first tap launched or opened popup')
                 selected = token(first)
-                require(selected.startswith('plugin.video.'), 'tapped tile identity missing')
+                require(bool(selected), 'tapped tile identity missing')
                 tap(first, xy, hold=True)
                 menu = wait_for(popup, 'item-specific add-on menu')
                 require(menu['title'].startswith('Add-on Options — '), 'wrong popup')
                 labels = [x['label'] for x in menu['controls']['50']['items']]
                 required = ['Open','Add-on Information','Add-on Settings','Add to Favourites',
                             'Add to Infinity Rails','Hide from This View','More / Manage Add-on']
-                require(labels == [x for x in required if x in labels] and
-                        all(x in labels for x in ('Open','Add-on Information','Add to Favourites',
-                            'Hide from This View','More / Manage Add-on')), 'menu ordering/capabilities wrong')
+                mandatory = ['Open','Add-on Information','Add to Favourites']
+                if not selected.startswith(('script.infinity.', 'service.infinity.', 'skin.infinity.')):
+                    mandatory += ['Hide from This View','More / Manage Add-on']
+                require(labels == [x for x in required if x in labels] and all(x in labels for x in mandatory),
+                        'menu ordering/capabilities wrong')
                 capture(viewport + '-' + theme.lower() + '-' + side + '-menu', menu)
                 tap(menu, rowpoint(menu, 'Open'))
                 require(popup(observe()), 'Open activated when merely selected')

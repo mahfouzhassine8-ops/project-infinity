@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import types
+import tempfile
 import unittest
 from unittest import mock
 
@@ -21,7 +22,7 @@ class MenuTests(unittest.TestCase):
         self.xbmc=types.SimpleNamespace(executebuiltin=builtin,getCondVisibility=lambda s:s[16:-1] in self.settings,
             getInfoLabel=lambda s:'plugin.video.fixture')
         modules={'xbmc':self.xbmc,'xbmcgui':types.SimpleNamespace(Window=lambda *a:window,Dialog=lambda:self.dialog),
-                 'xbmcaddon':types.SimpleNamespace(Addon=mock.Mock()),'xbmcvfs':types.SimpleNamespace(exists=lambda p:True),
+                 'xbmcaddon':types.SimpleNamespace(Addon=mock.Mock()),'xbmcvfs':types.SimpleNamespace(exists=lambda p:True,translatePath=str),
                  'popup':types.SimpleNamespace(choose=mock.Mock(return_value=None))}
         with mock.patch.dict(sys.modules,modules):
             spec=importlib.util.spec_from_file_location('ui_runtime_test',HERE/'addon/runtime.py')
@@ -62,9 +63,28 @@ class MenuTests(unittest.TestCase):
         self.runtime.addon_menu('plugin.video.fixture')
         self.assertEqual(self.calls,[]);self.assertEqual(self.rpc_calls,[])
 
-    def test_rejects_command_injection_and_nonvideo_ids(self):
-        for value in ('plugin.video.good),Quit(', 'script.infinity.commandcenter','../plugin.video.x',''):
+    def test_rejects_command_injection_and_unsafe_ids(self):
+        for value in ('plugin.video.good),Quit(', '../plugin.video.x','',None):
             self.assertFalse(valid_id(value))
             with self.assertRaises(ValueError):hidden_setting(value)
+
+    def test_video_capability_preserves_nonstandard_ids_script_and_multicontent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            self.runtime.xbmcaddon.Addon.return_value.getAddonInfo.return_value=temp
+            manifest=Path(temp)/'addon.xml'
+            aid='plugin.program.video-capable'
+            manifest.write_text('<addon id="'+aid+'"><extension point="xbmc.python.pluginsource"><provides>video audio</provides></extension></addon>')
+            self.assertEqual(self.runtime.destination(aid),('plugin','plugin://'+aid+'/?content_type=video'))
+            aid='script.video-capable'
+            manifest.write_text('<addon id="'+aid+'"><extension point="xbmc.python.script"><provides>video</provides></extension></addon>')
+            self.assertEqual(self.runtime.destination(aid),('script',aid))
+            manifest.write_text('<addon id="'+aid+'"><extension point="xbmc.python.script"><provides>executable</provides></extension></addon>')
+            self.assertIsNone(self.runtime.destination(aid))
+
+    def test_first_party_recovery_cannot_be_hidden_or_disabled(self):
+        self.assertNotIn(('Hide from This View','hide'),addon_rows(True,True,manageable=False))
+        with self.assertRaises(ValueError):self.runtime.set_hidden('script.infinity.commandcenter',True)
+        self.runtime.manage('script.infinity.commandcenter',{'name':'Command Center'})
+        self.assertEqual(self.calls,[]);self.assertEqual(self.rpc_calls,[])
 
 if __name__=='__main__':unittest.main()

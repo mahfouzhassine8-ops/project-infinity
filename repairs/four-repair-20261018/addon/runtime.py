@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import time
+import xml.etree.ElementTree as ET
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -19,14 +20,40 @@ def rpc(method, params):
 
 def addons():
     values = rpc('Addons.GetAddons', dict(type='xbmc.addon.video', enabled=True, properties=['name', 'thumbnail', 'path']))
-    return [r for r in values.get('addons', []) if valid_id(r.get('addonid', ''))]
+    # Video capability is authoritative; an ID prefix is not a media type.
+    return [r for r in values.get('addons', []) if valid_id(r.get('addonid', '')) and r['addonid'] != ID]
+
+def destination(aid):
+    if not valid_id(aid) or aid == ID:
+        return None
+    addon = xbmcaddon.Addon(aid)
+    root = Path(xbmcvfs.translatePath(addon.getAddonInfo('path')))
+    with (root / 'addon.xml').open('rb') as stream:
+        raw = stream.read(131073)
+    if len(raw) > 131072 or b'<!DOCTYPE' in raw or b'<!ENTITY' in raw:
+        return None
+    manifest = ET.fromstring(raw)
+    if manifest.get('id') != aid:
+        return None
+    script = None
+    for extension in manifest.findall('extension'):
+        provides = (extension.findtext('provides') or '').split()
+        if 'video' not in provides: continue
+        if extension.get('point') == 'xbmc.python.pluginsource':
+            return ('plugin', 'plugin://' + aid + ('/?content_type=video' if len(provides) > 1 else '/'))
+        if extension.get('point') == 'xbmc.python.script':
+            script = ('script', aid)
+    return script
+
+def manageable(aid):
+    return not aid.startswith(('script.infinity.', 'service.infinity.', 'skin.infinity.'))
 
 def addon_info(aid):
     if not valid_id(aid):
         raise ValueError('Not an installed video source')
     values = rpc('Addons.GetAddonDetails', dict(addonid=aid, properties=['name', 'thumbnail', 'path', 'enabled']))
     row = values.get('addon', {})
-    if row.get('addonid') != aid or not row.get('enabled'):
+    if row.get('addonid') != aid or not row.get('enabled') or not destination(aid):
         raise RuntimeError('This video source is unavailable. Its data was kept.')
     return row
 
@@ -39,6 +66,8 @@ def refresh_grid():
     xbmcgui.Window(10000).setProperty('Infinity.UI.GridRevision', str(time.monotonic_ns()))
 
 def set_hidden(aid, value):
+    if value and not manageable(aid):
+        raise ValueError('This Infinity navigation entry must remain available.')
     command = 'Skin.SetBool' if value else 'Skin.Reset'
     xbmc.executebuiltin(command + '(' + hidden_setting(aid) + ')', True)
     if hidden(aid) != value:
@@ -56,9 +85,13 @@ def rails_supported():
 
 def open_addon(aid):
     addon_info(aid)
-    xbmc.executebuiltin('ActivateWindow(Videos,plugin://' + aid + '/,return)')
+    kind, target = destination(aid)
+    xbmc.executebuiltin('RunScript(' + aid + ')' if kind == 'script' else
+                       'ActivateWindow(Videos,' + target + ',return)')
 
 def manage(aid, row):
+    if not manageable(aid):
+        return
     result = choose('More / Manage Add-on — ' + row.get('name', aid), [('Disable Add-on', 'disable')])
     if result != 'disable':
         return
@@ -74,7 +107,7 @@ def manage(aid, row):
 def addon_menu(aid):
     row = addon_info(aid)
     action = choose('Add-on Options — ' + row.get('name', aid),
-                    addon_rows(settings_available(aid), rails_supported()))
+                    addon_rows(settings_available(aid), rails_supported(), manageable=manageable(aid)))
     if action is None:
         return
     addon_info(aid)
@@ -88,13 +121,13 @@ def addon_menu(aid):
         if settings_available(aid):
             xbmcaddon.Addon(aid).openSettings()
     elif action == 'favourite':
-        path = 'plugin://' + aid + '/'
-        existing = rpc('Favourites.GetFavourites', dict(properties=['window', 'windowparameter']))
-        if any(f.get('windowparameter') == path for f in existing.get('favourites', [])):
+        kind, path = destination(aid)
+        existing = rpc('Favourites.GetFavourites', dict(properties=['window', 'windowparameter', 'path']))
+        if any(f.get('windowparameter') == path or f.get('path') == path for f in existing.get('favourites', [])):
             xbmcgui.Dialog().notification('Infinity', 'This add-on is already in Favourites.')
             return
-        rpc('Favourites.AddFavourite', dict(title=row.get('name', aid), type='window',
-             window='videos', windowparameter=path, thumbnail=row.get('thumbnail', '')))
+        target = dict(type='script', path=path) if kind == 'script' else dict(type='window', window='videos', windowparameter=path)
+        rpc('Favourites.AddFavourite', dict(title=row.get('name', aid), thumbnail=row.get('thumbnail', ''), **target))
     elif action == 'rails' and rails_supported():
         xbmc.executebuiltin('RunScript(script.infinity.rails,add,' + aid + ')')
     elif action == 'hide':

@@ -1,0 +1,56 @@
+name: Infinity | Current full UI packages and helper tests
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths:
+      - 'repairs/four-repair-20261018/addon/**'
+      - 'repairs/four-repair-20261018/build.py'
+      - 'repairs/four-repair-20261018/test_menu.py'
+      - 'repairs/four-repair-20261018/InfinityItemOptions.xml'
+      - '.github/workflows/infinity-four-repair-packages.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-four-repair-packages, cancel-in-progress: true}
+jobs:
+  packages:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions: {contents: write, actions: read}
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Verify existing controller state owner and contextual capabilities
+        run: |
+          python3 repairs/four-repair-20261018/test_resume.py
+          python3 -m unittest discover -s repairs/four-repair-20261018 -p test_menu.py -v
+      - name: Read hash-pinned original full skin from existing unpublished CI asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/ui-release.json
+          python3 - <<'CHECK'
+          import json
+          r=json.load(open('/tmp/ui-release.json'))
+          assert r['draft'] is True and r['tag_name']=='infinity-ci-assets-20261017'
+          a=next(a for a in r['assets'] if a['id']==651868759)
+          assert a['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          CHECK
+          curl --fail --location --silent --show-error --retry 2 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+      - name: Build new experimental skins and helper, preserving all unrelated bytes
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/build.py --parent full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --out ui-delivery
+          python3 repairs/four-repair-20261018/build.py --parent full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --out ui-delivery --coordinated
+          python3 repairs/four-repair-20261018/test_skin.py --parent full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --candidate ui-delivery/skin.infinity.diggz-1.0.5.226-Rotate-Playback-TEST.zip
+          python3 repairs/four-repair-20261018/test_skin.py --parent full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --candidate ui-delivery/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          path: ui-delivery/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
