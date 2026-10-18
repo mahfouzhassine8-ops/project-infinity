@@ -81,7 +81,7 @@ def settings_available(aid):
 def rails_supported():
     if not xbmc.getCondVisibility('System.AddonIsEnabled(script.infinity.rails)'):
         return False
-    return xbmcaddon.Addon('script.infinity.rails').getAddonInfo('version') == '0.2.6'
+    return xbmcaddon.Addon('script.infinity.rails').getAddonInfo('version') in ('0.2.6', '0.2.7')
 
 def open_addon(aid):
     addon_info(aid)
