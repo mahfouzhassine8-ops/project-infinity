@@ -256,7 +256,12 @@ def exercise(probe, out, report):
     for path in ('A', 'B'):
         observe('choices')
         wait_for(lambda s:provider_ready(s,'plugin.video.infinityuitest0'), 'completed provider movie choices')
-        probe.rpc('Player.Open', dict(item=dict(file=probe.PROFILE+'/'+movie.name)))
+        selected_choice=observe('focus-choice')
+        require(selected_choice['labels'].get('Container(50).ListItem.Label')=='Infinity UI public movie',
+                'provider choice did not receive native focus')
+        # Use the actual provider item and setResolvedUrl path, not a raw
+        # host-side /sdcard alias passed to Player.Open.
+        probe.rpc('Input.Select')
         deadline = time.monotonic()+35
         while time.monotonic()<deadline:
             players=probe.rpc('Player.GetActivePlayers')
@@ -279,8 +284,10 @@ def exercise(probe, out, report):
             drawer=observe('drawer')
             require('error' in drawer['controls']['280'],'Display Mode still exists in Playback')
             capture('playback-without-display-mode',drawer)
-        probe.rpc('Player.Stop', dict(playerid=player)); time.sleep(2)
-        choices=observe(); require(choices['window']==10025, 'Stop did not restore movie choices')
+        probe.rpc('Player.Stop', dict(playerid=player))
+        choices=wait_for(lambda s:s['window']==10025 and s['dialog'] in (0,9999) and
+                        not any(p.get('type')=='video' for p in probe.rpc('Player.GetActivePlayers')),
+                        'completed Stop and restored movie choices')
         if path=='B':
             observe('home','movies')
             require(observe()['window']==10000, 'Stop then Home did not return Home')

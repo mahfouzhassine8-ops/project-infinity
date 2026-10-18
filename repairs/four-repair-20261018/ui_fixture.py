@@ -61,6 +61,17 @@ try:
         xbmc.executebuiltin('RunScript(script.infinity.uirepair,restore)')
     elif operation == 'choices':
         xbmc.executebuiltin('ActivateWindow(Videos,plugin://plugin.video.infinityuitest0/,return)')
+    elif operation == 'focus-choice':
+        if xbmcgui.getCurrentWindowId() != 10025:
+            raise RuntimeError('Fixture choices are not active')
+        if not xbmcvfs.exists('special://profile/infinity-ui-fixture.mp4'):
+            raise RuntimeError('Generated fixture is not visible through the application profile VFS')
+        count = int(xbmc.getInfoLabel('Container(50).NumAllItems') or 0)
+        matches = [i for i in range(count) if
+                   xbmc.getInfoLabel('Container(50).ListItemAbsolute(%d).Label' % i) == 'Infinity UI public movie']
+        if len(matches) != 1:
+            raise RuntimeError('Public fixture choice is missing or ambiguous')
+        xbmc.executebuiltin('SetFocus(50,%d,absolute)' % matches[0], True)
     elif operation != 'state':
         raise ValueError(operation)
     xbmc.sleep(350)
@@ -105,6 +116,8 @@ try:
     result['viewport_source'] = 'active-window-GetCoordsRes'
     result['display_mode'] = [xbmc.getInfoLabel('System.ScreenWidth'),
                               xbmc.getInfoLabel('System.ScreenHeight')]
+    result['sample'] = dict(path=xbmcvfs.translatePath('special://profile/infinity-ui-fixture.mp4'),
+                           exists=xbmcvfs.exists('special://profile/infinity-ui-fixture.mp4'))
     for ident in (50, 8830, 8831):
         for suffix in ('ListItem.Property(Infinity.UI.Token)', 'ListItem.Label', 'NumItems', 'Position', 'CurrentPage'):
             key = 'Container(' + str(ident) + ').' + suffix
