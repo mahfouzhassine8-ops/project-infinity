@@ -45,6 +45,21 @@
 - Require direct Android 17 gameplay tests and Fold orientation/fold/unfold evidence before the final #1 checkmark. Generic emulator is not the user's One UI firmware.
 - No candidate build or signed APK promotion at this stage. The rest of the list remains unchecked.
 
+## #1 source/package verification — 2026-10-18 (NOT a full checkmark)
+
+**Verified without changing APKs or the skin payload:**
+- Read the actual GitHub implementation in `repairs/full-system-20261017/player_rotate_226.py` and `repairs/four-repair-20261018/build.py`, plus exact host test `test_skin.py`.
+- Read two existing hash-pinned full skin artifacts from the *previously completed* UI producer: 1.0.5.226 SHA-256 `48a889cf3181d181da81431d56562fd1165d6ab6cb32da0142190948d728b6c9`; 1.0.5.227 SHA-256 `cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699`. Both match their producer receipt.
+- All **14** `VideoOSD.xml` XML payloads are byte-for-byte identical across .226 and .227; `Display Mode` entry absent from each. Unified control `263` uses `PLAYER_ROTATION_UNLOCKED` and `PLAYER_ROTATION_FOLLOW_DEVICE` with approved white/cyan visible states; the Rotate slot does not invoke Repeat.
+- The exact two skin archives contain 3,071 and 3,072 members respectively: **no old member deleted**, one newly added `unified/InfinityItemOptions.xml`. From .226 to .227, only `addon.xml`, the protected metadata, and three approved UI/helper integration XML members change; **no Cobra-named file in that delta**.
+- Saved Work Android17 UI evidence for signed 2103386: `UI-INTERACTIONS.json` has 89 successful interactions, including `rotate-first-state` (rotation true, focus 263), `rotate-returned-state` (rotation false, focus 263), and `playback-without-display-mode`. See [API37 Work full UI run 39126569633](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39126569633). **This entire run FAILED at Essential-First Close** and therefore is not a release success.
+- The two saved skin builds and these preexisting Work/host artifacts were **inspected read-only**. These checks do not constitute a new build, physical Fold result, or a Cobra functional proof.
+
+**Remaining before #1 can be marked [x]:**
+- Actual physical Galaxy Fold: rotate action affects orientation, white/cyan state matches requested modes, fold/unfold/portrait/landscape survive, and repeat no longer occupies Rotate slot.
+- Confirm playback Video Settings/aspect/zoom, audio, subtitles, PiP/background and Stop remain functional on Fold; no Cobra regression. Do not alter Cobra.
+- Keep #1 **unchecked** until the required physical acceptance can be recorded without exposing personal diagnostics.
+
 ## Current factual context (not a completed-item claim)
 
 - Work's skin `1.0.5.227` implements the approved Rotate/Playback layout and has source and emulator evidence; that **does not** establish physical Fold parity.
