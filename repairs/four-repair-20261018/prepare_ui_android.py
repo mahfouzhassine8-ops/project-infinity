@@ -51,6 +51,9 @@ else:
 ''')
     proof_path = a.out / 'FULL-STACK-INPUTS.json'
     proof = json.loads(proof_path.read_text())
+    if getattr(a, 'versioncheck', None):
+        import versioncheck_android
+        proof['versioncheck_candidate'] = versioncheck_android.stage(a.versioncheck, stage)
     proof['ui_candidate'] = dict(skin_version='1.0.5.227',
         skin_sha256=hashlib.sha256(a.candidate.read_bytes()).hexdigest(),
         helper_sha256=hashlib.sha256(a.helper.read_bytes()).hexdigest(),
@@ -62,4 +65,6 @@ if __name__ == '__main__':
     p=argparse.ArgumentParser()
     for name in ('skin','rails','first-party','additional','candidate','helper','out'):
         p.add_argument('--'+name, type=Path, required=True)
+    p.add_argument('--versioncheck', type=Path,
+                   help='Explicit separately versioned Android add-on candidate; no APK changes')
     prepare(p.parse_args())

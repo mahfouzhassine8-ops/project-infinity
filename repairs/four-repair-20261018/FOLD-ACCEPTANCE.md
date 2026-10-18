@@ -19,6 +19,15 @@ that result remains a failure, not a pass or a diagnosed physical crash.
 
 ## Candidate choices and installation
 
+**Current API37 gate is blocked:** run39126569633 passed the interface/Stop
+matrix but failed Essential-First Close on an unverified Version Check child
+attempt. Do not install the coordinated candidate on the Fold based on that
+run. The separately versioned Android Version Check correction is undergoing
+targeted locked384/original386/corrected386 comparison; it is not yet accepted.
+See `VERSIONCHECK-API37-CLOSE.md`. No APK rebuild or protection bypass is part
+of that correction. Installing an add-on cannot erase an existing session's
+failed writer receipt.
+
 Before the APK update, finish playback and use the existing normal
 **Essential-First Close**. Wait for its successful completion before starting
 Android's installer. Do not use force-stop as a substitute for that Close.

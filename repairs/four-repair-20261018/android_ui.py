@@ -205,6 +205,10 @@ def run(args):
         extras = out / "confirmation-source"
         extras.mkdir()
         confirmation = stage_confirmation(extras)
+        versioncheck_diagnostic = None
+        if getattr(args, 'versioncheck_shutdown_only', False):
+            import versioncheck_shutdown_probe as versioncheck_probe
+            versioncheck_diagnostic = versioncheck_probe.stage_diagnostic(extras)
         # No addon.xml modifications, substitutions, dependency deletion or
         # fabricated plugin sources. Every required addon comes from full-stack
         # input proof and is installed with its own unmodified ID.
@@ -215,6 +219,9 @@ def run(args):
             require(manifest.get("id") == addon.name, "Addon path ID mismatch")
             probe.adb("push", addon, probe.PROFILE + "/../addons/" + addon.name)
         probe.adb("push", confirmation, probe.PROFILE + "/../addons/" + CONFIRM)
+        if versioncheck_diagnostic is not None:
+            probe.adb("push", versioncheck_diagnostic,
+                      probe.PROFILE + "/../addons/" + versioncheck_probe.DIAGNOSTIC)
         backing = "/data/media/0/Android/data/" + PARENT
         probe.shell("chown", "-R", uid + ":" + uid, backing,
                     probe.PRIVATE + "/shared_prefs")
@@ -307,29 +314,40 @@ def run(args):
         require(screenshot.startswith(b"\x89PNG\r\n\x1a\n"),
                 "Actual Infinity screenshot missing or not PNG")
         (out / "infinity-real-screen.png").write_bytes(screenshot)
-        publish("actual-ui-and-post-stop-input")
-        from android_interactions import exercise
-        exercise(probe, out, report)
+        if getattr(args, 'versioncheck_shutdown_only', False):
+            publish("targeted-versioncheck-shutdown-evidence")
+            import versioncheck_shutdown_probe as versioncheck_probe
+            versioncheck_probe.before_close(probe, out, report, args)
+        else:
+            publish("actual-ui-and-post-stop-input")
+            from android_interactions import exercise
+            exercise(probe, out, report)
         publish("request-native-Infinity-Power-Close-after-actual-skin-loading")
         real_close.loaded_close(probe, report["native_owner"], out, report)
         require(report.get("close_certified") is True and
                 report.get("reopen_succeeded") is True,
                 "Native Infinity loaded Close and reopen proof incomplete")
-        saved=probe.read_json(probe.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
-        require(len(report['ui_expected_watchlist'])==2 and
-                all(key in saved.get('watchlist',{}) for key in report['ui_expected_watchlist']),
-                'Movie/episode Watchlist state was lost on actual Close/reopen')
-        favourites=probe.rpc('Favourites.GetFavourites',{'properties':['windowparameter']})
-        require(any(f.get('windowparameter')==report['ui_expected_favourite']
-                    for f in (favourites.get('favourites') or [])),
-                'Add-on favourite was lost on actual Close/reopen')
-        report['ui_mutations_survived_actual_restart']=True
+        if getattr(args, 'versioncheck_shutdown_only', False):
+            versioncheck_probe.after_close(probe, out, report, args)
+        else:
+            saved=probe.read_json(probe.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
+            require(len(report['ui_expected_watchlist'])==2 and
+                    all(key in saved.get('watchlist',{}) for key in report['ui_expected_watchlist']),
+                    'Movie/episode Watchlist state was lost on actual Close/reopen')
+            favourites=probe.rpc('Favourites.GetFavourites',{'properties':['windowparameter']})
+            require(any(f.get('windowparameter')==report['ui_expected_favourite']
+                        for f in (favourites.get('favourites') or [])),
+                    'Add-on favourite was lost on actual Close/reopen')
+            report['ui_mutations_survived_actual_restart']=True
         report["passed"] = True
         publish("complete-Infinity-full-stack-loaded-Close-and-reopen")
         return report
     except Exception:
         report["passed"] = False
         report["failure"] = traceback.format_exc()
+        if getattr(args, 'versioncheck_shutdown_only', False):
+            import versioncheck_shutdown_probe as versioncheck_probe
+            versioncheck_probe.capture_failure(probe, out, report)
         publish("failed")
         raise
     finally:
@@ -364,5 +382,9 @@ if __name__ == "__main__":
     p.add_argument("--test-variant", choices=("ui-restoration",), required=True)
     p.add_argument("--expected-api", help="Require the actual booted API; no fallback")
     p.add_argument("--expected-release", help="Require the actual Android major release")
+    p.add_argument("--versioncheck-shutdown-only", action="store_true",
+                   help="Targeted equivalent Version Check Close comparison; does not certify UI matrix")
+    p.add_argument("--versioncheck-expected-version")
+    p.add_argument("--versioncheck-expected-service-sha")
     p.add_argument("--out", type=Path, required=True)
     run(p.parse_args())
