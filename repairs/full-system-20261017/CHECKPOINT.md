@@ -1,3 +1,19 @@
+## NEW CURRENT BASELINE — USER LOCKED 2103384 (2026-10-17)
+
+**This section supersedes the historical 2103377/2103382/2103383 installed-state notes below.** The older checkpoint is retained only as audit history; it must NOT be used as the source baseline for future feature implementation.
+
+- **CURRENT LOCKED APK:** `Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk`, versionCode **2103384**, package `com.projectinfinity.kodi`, SHA-256 `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`. User approved after actual physical Fold Close.
+- **SOURCE LOCK:** `locked-infinity-apk-2103384-user-passed-20261017`, exact lock-manifest commit `5389b4572cd32037fedf0e7d88b7f79abb120952`, detailed `repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json`.
+- **NEW FUTURE FEATURE WORK BRANCH:** `work/infinity-post-2103384-feature-restoration`. Fork from the LOCK, not from earlier 2103377/2103382/2103383; preserve complete five-workstream scope. See `repairs/full-system-20261017/POST-2103384-FEATURE-RESTORATION.md` on that branch.
+- **PROTECTION:** locked source/manifest cannot be silently changed; feature-branch source tests run on every commit. Every NEW signed APK must pass real Android **fresh + loaded/upgrade** Close/reopen tests, then the user's physical Fold and explicit lock approval. Do not mistake source-only green for a signed APK test.
+- **EVIDENCE:** original signed APK Android fresh/loaded test run `39091870631` GREEN; real Fold normal Close receipt `COMPLETE`, 6627 ms, 16 essential owners, zero essential write blockers, checkpoint_saved and authorization_consumed, engine process death. Whole-package death not separately confirmed by the Fold receipt. Historical The Crew exact exception was not reproduced in this successful run; keep it in negative regression coverage.
+- **BACKUP:** a private copy of the exact signed APK exists in the user's ChatGPT Library at `/Infinity/Locked Baselines/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk`. Never upload private Fold diagnostics or account/add-on data to this public GitHub repository.
+- **SKIN IS SEPARATE:** installed 1.0.5.225 was observed; locked skin remains 1.0.5.223 until separately approved. Preserve installed state; never uninstall, reset settings, or clear data.
+
+**Stop:** Do not create an experimental new APK or rework shutdown merely to restore UI/features. No further features are implemented by this lock handoff.
+
+---
+
 # Infinity — consolidated repair checkpoint (2026-10-17)
 
 **User authorization:** Proceed with the previously approved full five-workstream repair. This checkpoint is an experimental working branch, **not** a new APK, accepted skin lock, or physical-device acceptance.
