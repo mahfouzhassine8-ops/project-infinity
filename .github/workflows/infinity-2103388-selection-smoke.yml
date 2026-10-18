@@ -1,0 +1,108 @@
+name: Infinity 2103388 | Verify bundled addon activation on Android17
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: [repairs/four-repair-20261018/VERIFY-INTEGRATED-APK.marker]
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  android37-selection:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 65
+    permissions: {contents: write, actions: read}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - run: |
+          python3 -m py_compile repairs/four-repair-20261018/android_ui.py repairs/four-repair-20261018/bundle_selection_probe.py
+          python3 repairs/four-repair-20261018/test_android_evidence.py
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - run: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39139344754
+          name: Infinity-2103388-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: signed388
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: first-party-input
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39114438060
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: ui-candidate
+      - name: Verify signed identity and retrieve exact original skin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input full-stack
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk signed388/Infinity-2103388-All-In-One-TEST4.apk \
+            --expected-sha 500b9e6824f45d0d34e871aa1d480f2fc21642b67b9bb21b34c5422a5179009b \
+            --version-code 2103388 --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" --out full-stack/APK-IDENTITY.json
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > full-input/release.json
+          curl --fail --location --silent --show-error -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/octet-stream' \
+            https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+      - name: Reconstruct original full skin and test fixture inventory
+        run: |
+          mkdir -p full-input/additional-addons retained-source
+          python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py \
+            --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
+          python3 repairs/four-repair-20261018/prepare_ui_android.py \
+            --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip \
+            --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip \
+            --first-party first-party-input/rc05-inputs/native-evidence/installed-addons \
+            --additional full-input/additional-addons \
+            --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip \
+            --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip --out full-stack
+          unzip -q full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip -d retained-source
+      - name: Prepare disposable API37 emulator
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Test exact Kodi-selected skin/helper with retained older files
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            python3 repairs/four-repair-20261018/android_ui.py
+            --apk signed388/Infinity-2103388-All-In-One-TEST4.apk
+            --expected-sha 500b9e6824f45d0d34e871aa1d480f2fc21642b67b9bb21b34c5422a5179009b
+            --addons full-stack/addons --input-proof full-stack/FULL-STACK-INPUTS.json
+            --test-variant ui-restoration --expected-api 37 --expected-release 17
+            --all-in-one-bundle-smoke --bundle-proof signed388/SIGNED-2103388.json
+            --retained-old-skin retained-source/skin.infinity.diggz
+            --out full-stack/android
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103388-API37-Bundle-Selection-Evidence
+          path: full-stack/android/
+          retention-days: 90
