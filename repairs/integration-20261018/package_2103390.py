@@ -160,7 +160,11 @@ def verify_native_parent(parent: Path, locked: Path, signed_proof: Path, expecte
             "Native parent is not the reviewed new #3 correction from locked 2103384")
     released = [a for a in report.get("artifacts", [])
                 if a.get("native_restored_2103384") is False]
-    require(len(released) == 1 and released[0]["file"] == parent.name
+    # The producer publishes one original signed APK name. The workflow stages
+    # its same verified bytes as inputs/native.apk; staging aliases are not
+    # cryptographic identities. Pin the PUBLISHED name and hash the STAGED bytes.
+    require(len(released) == 1 and
+            released[0]["file"] == "Infinity-2103385-UI-Restoration-TEST1.apk"
             and released[0]["sha256"] == digest(parent)
             and released[0]["changed_unsigned_payload"] == ["AndroidManifest.xml",
                                                                "lib/arm64-v8a/libkodi.so"],
