@@ -1,0 +1,119 @@
+name: Infinity 2103384 | ACTUAL signed APK emulator shutdown only
+
+on:
+  push:
+    branches: [work/infinity-full-repair-20261017-gpt6]
+    paths:
+      - '.github/workflows/infinity-2103384-actual-emulator-only.yml'
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103384-actual-emulator-only, cancel-in-progress: false}
+
+env:
+  # Hard pinned to signed real Infinity APK from run 39091057069.
+  INFINITY_APK_SHA: b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af
+  INFINITY_APK: signed/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+
+jobs:
+  real-2103384-android:
+    name: Real signed Infinity 2103384 Android ${{ matrix.case }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [fresh, loaded]
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Download actual, previously signed 2103384 from passing packaging step
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 39091057069
+          name: Infinity-2103384-FAST-SIGNED-Experimental-APK-and-Return
+          github-token: ${{ github.token }}
+          path: signed
+      - name: Download exact verified Infinity baseline addon/probe fixtures
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: test4-inputs
+      - name: Download exact signed original Android upgrade baseline
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 38868115575
+          name: Infinity-2103377-Essential-First-Signed-Fold-TEST3
+          github-token: ${{ github.token }}
+          path: accepted-test3
+      - name: Pin actual 2103384 APK, permanent signature, package, ARM64 engine
+        run: |
+          set -euo pipefail
+          echo "$INFINITY_APK_SHA  $INFINITY_APK" | sha256sum -c
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk "$INFINITY_APK" \
+            --expected-sha "$INFINITY_APK_SHA" \
+            --version-code 2103384 \
+            --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" \
+            --out actual-android-2103384/SIGNED-APPLICATION-IDENTITY.json
+          git diff --exit-code 9dea86a7bf1896993e33ab885aa678a25eddaa0f -- \
+            repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py \
+            repairs/android-checkpoint-shutdown/runtime-tests/observer_upgrade_android_probe.py
+      - name: Prepare disposable Android emulator without stock Kodi
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Install actual signed 2103384 and execute genuine native Close checks
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          avd-name: infinity-2103384-apk-only
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          # The action executes script with /usr/bin/sh, not Bash. Use a plain
+          # Python command without pipefail or nested quoting. Exact APK SHA is
+          # exported at job scope and was verified before emulator startup.
+          script: >-
+            python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py
+            --case ${{ matrix.case }}
+            --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk
+            --apk signed/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+            --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons
+            --out actual-android-2103384
+            --expected-sha256 b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af
+      - name: Require actual Android process/Close receipt, never host-only green
+        run: |
+          set -euo pipefail
+          python3 repairs/full-system-20261017/infinity_only_gate.py phase \
+            --report actual-android-2103384/INTERNAL-CASE-IDENTITY.json \
+            --expected-sha "$INFINITY_APK_SHA" \
+            --case ${{ matrix.case }} \
+            --out actual-android-2103384/VERIFIED-ANDROID-VERDICT.json
+      - name: Preserve actual Android failure evidence and diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103384-APK-ONLY-Android-${{ matrix.case }}
+          path: |
+            actual-android-2103384/
+            emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
