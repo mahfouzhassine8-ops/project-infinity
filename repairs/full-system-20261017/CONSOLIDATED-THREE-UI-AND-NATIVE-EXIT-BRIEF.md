@@ -62,10 +62,15 @@ AutoWidget/Super Favourites only when supported in advanced options; Resume Hub 
 
 **Root cause: UNKNOWN**. The fourth item is an evidence-backed crash regression/forensics request, not an authorized speculative fix.
 
-**Required missing input:** Ask user what exact gesture/screen/action immediately preceded the crash, and whether they were playing video, returning from background, invoking a popup, or doing something else. Do not guess based on the nearby UI restoration work.
+**New physical-device trigger testimony (user follow-up, October 18):** The user was **playing a video**, then **pressed Stop**. Infinity **returned to the movie choices/selection screen**. The user cannot recall whether they subsequently navigated back to **Home** before the crash, or whether the process crashed while on/just after the movie choices screen. This is the strongest available interaction clue, but **does not establish that Stop itself directly caused the native exit**, nor does it exclude a later navigation/lifecycle callback. Do not invent missing gestures, timing, or a native backtrace.
+
+**Reproduction split (preserve both plausible paths):**
+- **Path A — Stop → movie choices → exit:** play a representative video with normal existing providers; invoke the actual player **Stop** control; verify return to movie choices, then watch for crash/abnormal exit without further navigation.
+- **Path B — Stop → movie choices → Back/Home → exit:** repeat the same session and Stop transition, then navigate back to **Home** as the user may have done; correlate the exact event with the process death.
+- Include the preceding player teardown, resume-progress write, provider/list refresh, GUI window activation, and Android native lifecycle transitions in trace correlation. **Do not presuppose which subsystem failed.** Capture crashes during both paths and maintain normal playback, safe stop, Resume Hub data, and Essential-First Close.
 
 **Next technical investigation, once trigger is known:**
-1. Reproduce only the reported action on exact signed **2103384** with existing user data preserved. Collect crash-time **native tombstone / Android bugreport or `logcat -b crash`**, ideally preserving PID, signal, backtrace and relevant build IDs. An explicit `adb bugreport` can help if developer access is available; do not require uninstall or data wiping.
+1. Reproduce the **two observed/plausible post-playback sequences (Path A and Path B above)** on exact signed **2103384** with existing user data preserved. Collect crash-time **native tombstone / Android bugreport or `logcat -b crash`**, ideally preserving PID, signal, backtrace and relevant build IDs. An explicit `adb bugreport` can help if developer access is available; do not require uninstall or data wiping.
 2. Compare the crash timestamp with Kodi native player/GUI, Java Android lifecycle, add-on callbacks, rendering, Fold orientation, background return and native engine build IDs. An RSS reading alone is NOT proof of OOM.
 3. Trace the **faulting native stack** and reproduce before choosing a correction; isolate skin/helper vs Java/native boundary. Avoid removing add-ons or disabling protected services as a guess.
 4. Fix the smallest proven component in a new experimental candidate. If skin/helper-only, no native recompilation; if native defect confirmed, rebuild **from 2103384** with exactly reviewed changes and permanently sign an update; never replace locked baseline.
