@@ -28,6 +28,18 @@ def digests():
     return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in root.rglob('*') if p.is_file() and '.git' not in p.relative_to(root).parts}
 
+def verify_post_build(actual, expected):
+    # The unchanged production compiler runs tools/depends/bootstrap and
+    # configure in the source directory. Their generated build products are
+    # additions, not reviewed source inputs. Never waive a missing or changed
+    # reviewed input; record the complete generated inventory separately.
+    changed = sorted(name for name, digest in expected.items() if actual.get(name) != digest)
+    generated = {name: actual[name] for name in sorted(actual.keys() - expected.keys())}
+    save(OUT / 'POST-BUILD-SOURCE-INVENTORY.json', dict(actual=actual,
+        reviewed_file_count=len(expected), changed_or_missing_reviewed=changed,
+        build_generated_additions=generated))
+    assert not changed, 'Reviewed source changed during compilation: ' + repr(changed)
+
 def prepare(args):
     parent.prepare(args)
     before = digests()
@@ -63,7 +75,7 @@ def compile_engine():
     # preimage that 2103384 intentionally superseded; this full final map
     # replaces that stale comparison, without changing any protected wrapper.
     parent.parent.parent.compile_engine()
-    assert digests() == expected
+    verify_post_build(digests(), expected)
     proof = json.loads((OUT / 'ENGINE-PROOF.json').read_text())
     assert proof['source_commit'] == delta['source_commit'] == os.environ['GITHUB_SHA']
     assert proof['complete_native_engine_compiled'] and proof['fold_callback_retirement_compiled']

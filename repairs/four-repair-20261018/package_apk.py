@@ -33,6 +33,10 @@ def package(parent, native, dest):
     locked=json.loads((native/'LOCKED-2103384-SOURCE-MAP.json').read_text())
     final=json.loads((native/'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json').read_text())['after']
     assert len(locked)==9404 and final==dict(locked,**delta['after'])
+    post=json.loads((native/'POST-BUILD-SOURCE-INVENTORY.json').read_text())
+    assert post['reviewed_file_count']==9404 and post['changed_or_missing_reviewed']==[]
+    assert all(post['actual'].get(name)==digest for name,digest in final.items())
+    assert post['build_generated_additions']=={name:digest for name,digest in post['actual'].items() if name not in final}
     assert set(delta['changed'])=={'xbmc/input/InputManager.cpp','xbmc/guilib/GUIBaseContainer.cpp','xbmc/guilib/GUIBaseContainer.h'}
     assert delta['before']=={p:locked[p] for p in delta['changed']}
     assert proof['source_commit']==delta['source_commit']==os.environ['GITHUB_SHA']

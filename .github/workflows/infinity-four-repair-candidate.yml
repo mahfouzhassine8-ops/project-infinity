@@ -25,6 +25,7 @@ jobs:
           python3 repairs/four-repair-20261018/test_native.py
           python3 repairs/four-repair-20261018/test_resume.py
           python3 -m unittest discover -s repairs/four-repair-20261018 -p test_menu.py -v
+          python3 repairs/four-repair-20261018/test_source_inventory.py
       - name: Real essential-write header checks (no fake Close acceptance)
         run: |
           set -euo pipefail
