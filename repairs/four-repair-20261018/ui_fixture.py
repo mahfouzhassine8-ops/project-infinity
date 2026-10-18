@@ -25,8 +25,9 @@ try:
         xbmc.executebuiltin('ActivateWindow(home)', True)
         xbmc.executebuiltin('Skin.SetString(Infinity.VisualMode,normal)', True)
         menu = home.getControl(9000)
-        for index in range(menu.size()):
-            if menu.getListItem(index).getProperty('section') == sys.argv[2]:
+        count = int(xbmc.getInfoLabel('Container(9000).NumItems') or 0)
+        for index in range(count):
+            if xbmc.getInfoLabel('Container(9000).ListItemAbsolute(%d).Property(section)' % index) == sys.argv[2]:
                 menu.selectItem(index)
                 break
         else: raise RuntimeError('Requested Home section is absent')
