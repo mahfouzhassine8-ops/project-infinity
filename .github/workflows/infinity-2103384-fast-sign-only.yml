@@ -1,0 +1,110 @@
+name: Infinity | FAST SIGN-ONLY 2103384 preserved VFS shutdown
+
+on:
+  push:
+    branches: [work/infinity-full-repair-20261017-gpt6]
+    paths:
+      - '.github/workflows/infinity-2103384-fast-sign-only.yml'
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103384-fast-sign-only, cancel-in-progress: false}
+
+jobs:
+  sign-previously-built-engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 110
+    env:
+      NDK_VER: 21.4.7075529
+      NATIVE_RUN: 39088898437
+      NATIVE_SOURCE: 3795b1b03731cba567e091913299c1888805373c
+      PARENT_SIGNED_RUN: 39085676150
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Wait for and require the exact FULL native 2103384 build (never rebuild)
+        env: {GH_TOKEN: ${{ github.token }}}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          api='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          def get(suffix):
+              with urllib.request.urlopen(urllib.request.Request(api+suffix,headers=headers),timeout=45) as response:
+                  return json.load(response)
+          deadline=time.monotonic()+5400
+          while time.monotonic()<deadline:
+              run=get('/actions/runs/'+os.environ['NATIVE_RUN'])
+              assert run['head_sha']==os.environ['NATIVE_SOURCE'], 'Native source SHA does not match approved branch snapshot'
+              if run['status']=='completed':
+                  assert run['conclusion']=='success', 'Native build failed: '+str(run['conclusion'])
+                  jobs=get('/actions/runs/'+os.environ['NATIVE_RUN']+'/jobs?per_page=100')['jobs']
+                  matched=[j for j in jobs if j['name']=='native-engine']
+                  assert len(matched)==1 and matched[0]['conclusion']=='success', 'Native engine not compiled successfully'
+                  print('PASS exact native compiled build reused:',run['id'],run['head_sha'],flush=True)
+                  break
+              print('Waiting only for existing ARM64 producer; no native compilation in this job',flush=True)
+              time.sleep(45)
+          else:
+              raise RuntimeError('Previously started native build did not complete; no APK signed')
+          PY
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - name: Restore existing Android signing/strip tooling, no native engine rebuild
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39085676150
+          name: Infinity-2103383-FAST-SIGNED-Experimental-APK-and-Return
+          github-token: ${{ github.token }}
+          path: signed-2103383
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39088898437
+          name: Infinity-2103384-Write-Integrity-Native-Evidence
+          github-token: ${{ github.token }}
+          path: proven-native-2103384
+      - name: Permanently sign SAME Infinity APK; exact signed 2103383 parent + validated native only
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/full-system-20261017/package_2103384_vfs.py
+          python3 repairs/full-system-20261017/package_2103384_vfs.py \
+            --parent signed-2103383/Infinity-2103383-Close-Durability-TEST1.apk \
+            --native proven-native-2103384 \
+            --out fold-delivery-2103384
+          (cd fold-delivery-2103384 && sha256sum -c SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-2103384-FAST-SIGNED-Experimental-APK-and-Return
+          path: |
+            fold-delivery-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+            fold-delivery-2103384/Infinity-2103384-2103383-Compatibility-Return.apk
+            fold-delivery-2103384/INFINITY-2103384-SIGNED-EXPERIMENTAL.json
+            fold-delivery-2103384/SHA256SUMS
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103384-FAST-SIGN-Verification-Receipts
+          path: |
+            fold-delivery-2103384/INFINITY-2103384-SIGNED-EXPERIMENTAL.json
+            fold-delivery-2103384/SHA256SUMS
+          retention-days: 90
+          if-no-files-found: warn
