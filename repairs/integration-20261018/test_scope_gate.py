@@ -38,6 +38,11 @@ class ContractTests(unittest.TestCase):
             ET.SubElement(root, "addon").text = aid
             after["assets/addons/" + aid + "/addon.xml"] = (
                 '<addon id="' + aid + '" version="' + version + '"/>').encode()
+        for aid, version in gate.DEPENDENCIES.items():
+            if aid not in {entry.text for entry in root.findall("addon")}:
+                ET.SubElement(root, "addon").text = aid
+            after["assets/addons/" + aid + "/addon.xml"] = (
+                '<addon id="' + aid + '" version="' + (version or '1.0.0') + '"/>').encode()
         after[gate.MANIFEST] = ET.tostring(root)
         after.update(candidate_change)
         after.update(add)
