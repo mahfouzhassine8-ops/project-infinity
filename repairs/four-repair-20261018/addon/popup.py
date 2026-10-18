@@ -41,6 +41,10 @@ def choose(title, rows):
             # Use the live native viewport, not Android display dimensions or
             # cached portrait pixels. Reopening after a fold remeasures it.
             card.setHeight(min(690, 118 + 78 * len(rows)))
+            # A percentage-sized image also retains its loaded height when
+            # the group is resized through Python. Match its actual surface
+            # to the card so short menus do not leave a tall blank panel.
+            self.getControl(101).setHeight(card.getHeight())
             card.setPosition(*position(backdrop.getWidth(), backdrop.getHeight(),
                                        card.getWidth(), card.getHeight(), anchor))
             control = self.getControl(50)

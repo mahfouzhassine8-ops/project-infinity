@@ -73,7 +73,7 @@ try:
         rotation=xbmc.getCondVisibility('Skin.HasSetting(Infinity.PlayerRotationUnlocked)'),
         controls={}, labels={}, popup=owner.getProperty('Infinity.UI.Popup'),
         title=owner.getProperty('Infinity.UI.Title'))
-    for ident in (2, 13, 50, 100, 263, 280, 8830, 8831, 39799, 40001):
+    for ident in (2, 13, 50, 100, 101, 263, 280, 8830, 8831, 39799, 40001):
         try:
             control = owner.getControl(ident)
             row = dict(position=control.getPosition(), width=control.getWidth(), height=control.getHeight(),

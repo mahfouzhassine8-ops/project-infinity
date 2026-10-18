@@ -58,6 +58,9 @@ def exercise(probe, out, report):
     def popup(state): return state.get('popup') == '1'
     def rowpoint(state, label):
         card, listing = state['controls']['100'], state['controls']['50']
+        surface = state['controls']['101']
+        require(surface['height']==card['height'] and surface['width']==card['width'],
+                'popup visible surface extends beyond compact card')
         require(listing['position'][1]+listing['height'] <= card['height'],
                 'popup native hit rectangle extends outside compact card')
         labels = [x['label'] for x in listing['items']]
