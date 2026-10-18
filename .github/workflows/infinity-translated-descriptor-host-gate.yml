@@ -9,6 +9,8 @@ on:
       - 'repairs/four-repair-20261018/versioncheck_shutdown_probe.py'
       - 'repairs/four-repair-20261018/fold_passive_crash_watch.py'
       - 'repairs/four-repair-20261018/test_fold_passive_crash_watch.py'
+      - 'repairs/four-repair-20261018/bundle_selection_probe.py'
+      - 'repairs/four-repair-20261018/test_bundle_selection_probe.py'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -26,6 +28,7 @@ jobs:
           python3 -m unittest -v test_translated_descriptor_evidence.py
           python3 -m unittest -v test_versioncheck_shutdown_probe.py
           python3 -m unittest -v test_fold_passive_crash_watch.py
+          python3 -m unittest -v test_bundle_selection_probe.py
       - name: Confirm assessment has no runtime native or durability changes
         run: |
           python3 - <<'PY'
