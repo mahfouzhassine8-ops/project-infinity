@@ -7,7 +7,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 from bridge_state import OVERRIDES
-from bridge_state import identity as presentation_raw, same
+from bridge_state import identity as presentation_raw, same, records as presentation_records, lookup as presentation_lookup
 from provider_contracts import PROOFS, ENTRY_PROOF, provider, canonical, presentation
 
 
@@ -37,7 +37,7 @@ def load(root):
     return modules
 
 
-def apply(modules, profile, entry, action):
+def apply(modules, profile, entry, action, intent=None):
     hub, common = modules["resume_hub"], modules["common"]
     identity = hub.entry_identity(entry)
     if not identity or entry.get("key") != hub.identity_key(identity):
@@ -79,6 +79,34 @@ def apply(modules, profile, entry, action):
         saved = hub.find_entry(data, key)
         if saved and not hub.same_identity(hub.entry_identity(saved), identity):
             return False
+        if intent is not None:
+            # An existing local movie/episode menu can remain open while another
+            # writer marks the item or changes a list. Recheck ONLY the selected
+            # operation under the same Command Center persistence scope.
+            # Do not rewrite provider databases, queued sync, or unrelated items.
+            if (not isinstance(intent, dict) or intent.get("key") != key or
+                    type(intent.get("watchlist")) is not bool or
+                    type(intent.get("collection")) is not bool or
+                    type(intent.get("displayed_watched")) is not bool or
+                    intent.get("local_watched") not in ("", "true", "false")):
+                return False
+            if action == "toggle-watchlist":
+                if (key in data.get("watchlist", {})) != intent["watchlist"]:
+                    return False  # stale Add cannot silently become Remove
+            elif action == "toggle-collection":
+                if (key in data.get("collection", {})) != intent["collection"]:
+                    return False
+            elif action in ("mark-watched", "mark-unwatched"):
+                # A native-library PlayCount may not yet be mirrored to local
+                # state, so compare the same typed LOCAL observation shown in
+                # the dialog, not an unverified new provider read.
+                current_local = presentation_lookup(presentation_records(data), query)
+                if current_local != intent["local_watched"]:
+                    return False
+                if (action == "mark-watched") == intent["displayed_watched"]:
+                    return False  # selected action never matched visible state
+            else:
+                return False
         saved_canonical = presentation(saved, presentation_raw(saved), proofs.get(key)) if saved else None
         if saved and identity["kind"] == "episode" and provider(entry):
             if saved_canonical and not same(saved_canonical, query):

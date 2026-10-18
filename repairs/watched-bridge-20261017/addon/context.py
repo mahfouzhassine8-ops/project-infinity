@@ -57,6 +57,18 @@ def selected(modules, item, verify_provider=None):
     return entry
 
 
+def menu_intent(data, key, local_state, displayed_watched):
+    """Capture the exact intent shown by the existing provider context menu.
+
+    This is a read-only snapshot; the controller checks relevant state again
+    inside the original Command Center writer lease before any mutation.
+    """
+    return dict(key=key, local_watched=local_state,
+                displayed_watched=bool(displayed_watched),
+                watchlist=key in data["watchlist"],
+                collection=key in data["collection"])
+
+
 def main():
     dialog = xbmcgui.Dialog()
     try:
@@ -74,6 +86,7 @@ def main():
         tag = getattr(sys, "listitem").getVideoInfoTag()
         native_watched = getattr(tag, "getPlayCount", lambda: 0)() > 0
         watched = local_state == "true" or (native_watched and local_state != "false")
+        intent = menu_intent(data, key, local_state, watched)
         rows = [("Mark Unwatched" if watched else "Mark Watched", "mark-unwatched" if watched else "mark-watched"),
                 ("Remove from Watchlist" if key in data["watchlist"] else "Add to Watchlist", "toggle-watchlist"),
                 ("Remove from Collection" if key in data["collection"] else "Add to Collection", "toggle-collection"),
@@ -85,7 +98,7 @@ def main():
         if action == "view":
             modules["context"].view_hub()
         else:
-            if controller.apply(modules, profile, entry, action):
+            if controller.apply(modules, profile, entry, action, intent=intent):
                 xbmc.executebuiltin("Container.Refresh")
             else:
                 dialog.ok("No change applied", "This title's local state was unchanged. Its identity may need a compatibility check; no unrelated record was modified.")

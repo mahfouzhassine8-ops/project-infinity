@@ -12,7 +12,7 @@ HERE = Path(__file__).resolve().parent
 def build(output):
     source = HERE / "addon"
     manifest = ET.parse(source / "addon.xml").getroot()
-    assert manifest.get("id") == "script.infinity.watchedbridge" and manifest.get("version") == "1.0.0"
+    assert manifest.get("id") == "script.infinity.watchedbridge" and manifest.get("version") == "1.0.1"
     assert manifest.find("./extension[@point='xbmc.service']").get("library") == "service.py"
     expected = json.loads((HERE.parent / "android-checkpoint-shutdown/installed/manifest.json").read_text())["script.infinity.commandcenter"]["after"]
     assert json.loads((source / "CONTROLLER-PREIMAGES.json").read_text()) == expected

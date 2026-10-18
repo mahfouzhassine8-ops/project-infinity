@@ -1,0 +1,67 @@
+name: "Infinity #5 | Watched, Resume and Watchlist targeted correction (HOST ONLY)"
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths:
+      - 'repairs/watched-bridge-20261017/addon/**'
+      - 'repairs/watched-bridge-20261017/test_actions.py'
+      - 'repairs/watched-bridge-20261017/test_state.py'
+      - 'repairs/watched-bridge-20261017/test_contracts.py'
+      - 'repairs/watched-bridge-20261017/build.py'
+      - '.github/workflows/infinity-item5-watched-menu.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  watched-menu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Verify original watched alias/identity and provider contracts
+        run: |
+          python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_state.py -v
+          python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_contracts.py -v
+      - name: Assemble original Command Center without edits
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib
+          p=pathlib.Path('repairs/android-checkpoint-shutdown/installed/build.py')
+          s=importlib.util.spec_from_file_location('cc_stage',p)
+          m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+          m.materialize(pathlib.Path('item5-host-runtime'))
+          PY
+      - name: Test real original CC persistence writer and stale watched/list menu actions
+        run: python3 repairs/watched-bridge-20261017/test_actions.py --runtime item5-host-runtime/script.infinity.commandcenter
+      - name: Produce only exact Watched Bridge add-on (not APK), preserve original files
+        run: |
+          python3 repairs/watched-bridge-20261017/build.py --output item5-output/script.infinity.watchedbridge-1.0.1-TEST.zip
+          python3 - <<'PY'
+          import hashlib,subprocess,zipfile,xml.etree.ElementTree as ET
+          from pathlib import Path
+          source=Path('repairs/watched-bridge-20261017/addon')
+          old='3dec3461723ae5dd0ce2c667d591217998653871'
+          changed=[]
+          for f in sorted(source.iterdir()):
+              if f.suffix not in ('.py','.json','.xml'):continue
+              before=subprocess.check_output(['git','show',old+':'+str(f)])
+              if before!=f.read_bytes():changed.append(f.name)
+          assert sorted(changed)==['addon.xml','context.py','controller.py'],changed
+          with zipfile.ZipFile('item5-output/script.infinity.watchedbridge-1.0.1-TEST.zip') as z:
+              names=z.namelist()
+              assert z.testzip() is None and len(names)==len(set(names))
+              assert len(names)==len([p for p in source.iterdir() if p.suffix in ('.py','.json','.xml')])
+              for f in source.iterdir():
+                  if f.suffix in ('.py','.json','.xml'):
+                      assert z.read('script.infinity.watchedbridge/'+f.name)==f.read_bytes()
+              root=ET.fromstring(z.read('script.infinity.watchedbridge/addon.xml'))
+              assert root.get('version')=='1.0.1' and root.get('id')=='script.infinity.watchedbridge'
+          print('ITEM5 PRESERVATION PASS',len(names),'files, changed',changed)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-Item5-Watched-Bridge-1.0.1-Host-Verified
+          path: item5-output/
+          retention-days: 90
+          compression-level: 0

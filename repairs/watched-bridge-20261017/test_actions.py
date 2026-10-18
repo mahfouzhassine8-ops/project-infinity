@@ -203,5 +203,121 @@ class ActionTests(fixtures["RuntimeTests"]):
             self.assertEqual(file.read_text(), raw)
 
 
+
+    def intent(self, entry, displayed_watched=False):
+        """Snapshot exactly what the existing popup displays to the user."""
+        data = hub.load_view(self.profile)
+        key = hub.compatible_key(data, entry)
+        query = contracts.canonical(entry, identity(entry),
+                                    entry.get(contracts.ENTRY_PROOF))
+        local = lookup(records(data), query)
+        return bridge_context.menu_intent(data, key, local, displayed_watched)
+
+    def test_stale_watchlist_add_does_not_reverse_external_update_movie_and_episode(self):
+        cases = (self.selected(),
+                 bridge_context.selected(modules, Selected(kind="episode"),
+                     verify_provider=lambda name: contracts.CATALOG[name]["proof"]))
+        for entry in cases:
+            with self.subTest(kind=entry["media"]):
+                path = self.profile / hub.CONTINUE_FILE
+                common.atomic_json(path, dict(schema=2, foreign={"keep": True}))
+                intent = self.intent(entry)
+                self.assertFalse(intent["watchlist"])
+                # A different (existing) CC owner updates the list while
+                # the still-open provider popup displays "Add to Watchlist".
+                self.assertTrue(controller.apply(modules, self.profile, entry, "toggle-watchlist"))
+                before = path.read_bytes()
+                with mock.patch.object(hub.xbmc, "executeJSONRPC", wraps=hub.xbmc.executeJSONRPC) as rpc:
+                    self.assertFalse(controller.apply(modules, self.profile, entry, "toggle-watchlist", intent=intent))
+                    rpc.assert_not_called()
+                self.assertEqual(path.read_bytes(), before)
+                self.assertIn(entry["key"], hub.load(self.profile)["watchlist"])
+                self.assertEqual(hub.load(self.profile)["foreign"], {"keep": True})
+
+    def test_stale_collection_add_does_not_reverse_external_update(self):
+        entry = self.selected()
+        intent = self.intent(entry)
+        path = self.profile / hub.CONTINUE_FILE
+        self.assertTrue(controller.apply(modules, self.profile, entry, "toggle-collection"))
+        previous = path.read_bytes()
+        self.assertFalse(controller.apply(modules, self.profile, entry, "toggle-collection", intent=intent))
+        self.assertEqual(path.read_bytes(), previous)
+        self.assertIn(entry["key"], hub.load(self.profile)["collection"])
+
+    def test_stale_mark_watched_and_unwatched_never_reverse_another_writer(self):
+        entry = self.selected()
+        path = self.profile / hub.CONTINUE_FILE
+        initial = self.intent(entry, displayed_watched=False)
+        self.assertTrue(controller.apply(modules, self.profile, entry, "mark-watched"))
+        saved = path.read_bytes()
+        self.assertFalse(controller.apply(modules, self.profile, entry, "mark-watched", intent=initial))
+        self.assertEqual(path.read_bytes(), saved)
+        self.assertIn(entry["key"], hub.load(self.profile)["watched"])
+        # Now the popup displays Mark Unwatched, while an external writer
+        # marks it unwatched before the user confirms their older selection.
+        second = self.intent(entry, displayed_watched=True)
+        self.assertEqual(second["local_watched"], "true")
+        self.assertTrue(controller.apply(modules, self.profile, entry, "mark-unwatched"))
+        saved = path.read_bytes()
+        self.assertFalse(controller.apply(modules, self.profile, entry, "mark-unwatched", intent=second))
+        self.assertEqual(path.read_bytes(), saved)
+        self.assertEqual(lookup(records(hub.load(self.profile)), identity(entry)), "false")
+
+    def test_checked_provider_menu_intents_save_and_reopen_from_same_progress_file(self):
+        cases = (self.selected(),
+                 bridge_context.selected(modules, Selected(kind="episode"),
+                     verify_provider=lambda name: contracts.CATALOG[name]["proof"]))
+        for entry in cases:
+            with self.subTest(kind=entry["media"]):
+                common.atomic_json(self.profile / hub.CONTINUE_FILE,
+                                   dict(schema=2, foreign={"preserved": 7}))
+                intent = self.intent(entry)
+                self.assertTrue(controller.apply(modules, self.profile, entry,
+                                                 "toggle-watchlist", intent=intent))
+                fixtures["runtime"]._stores.clear()
+                hub._view_cache = None
+                fresh = hub.load(self.profile)
+                self.assertIn(entry["key"], fresh["watchlist"])
+                self.assertEqual(fresh["foreign"], {"preserved": 7})
+                self.assertEqual(fresh["items"], {})  # Watchlist is NOT progress
+                self.assertEqual(fresh["watched"], {})  # Watchlist is NOT watched
+                self.assertEqual(records(fresh), [])
+
+    def test_bad_or_mismatched_popup_intent_cannot_write(self):
+        entry = self.selected(); path = self.profile / hub.CONTINUE_FILE
+        common.atomic_json(path, dict(schema=2, foreign={"keep": 12}))
+        intent = self.intent(entry)
+        for override in ({"key": "0"*64}, {"watchlist": "false"},
+                         {"displayed_watched": "false"}, {"local_watched": "arbitrary"}):
+            modified = dict(intent, **override)
+            prior = path.read_bytes()
+            self.assertFalse(controller.apply(modules, self.profile, entry,
+                                              "toggle-watchlist", intent=modified))
+            self.assertEqual(path.read_bytes(), prior)
+        self.assertEqual(hub.load(self.profile)["foreign"], {"keep": 12})
+
+    def test_context_popup_uses_checked_intent_not_old_toggle(self):
+        entry = self.selected()
+        from types import SimpleNamespace
+        selected = Selected()
+        dialog = mock.Mock()
+        def choice(title, labels):
+            self.assertIn("Add to Watchlist", labels)
+            # An asynchronous user/provider/CC update while popup is open.
+            self.assertTrue(controller.apply(modules, self.profile, entry, "toggle-watchlist"))
+            return labels.index("Add to Watchlist")
+        dialog.select.side_effect = choice
+        addon = SimpleNamespace(getAddonInfo=lambda k: str(self.profile)
+                               if k == "profile" else str(args.runtime))
+        with mock.patch.object(bridge_context.controller, "load", return_value=modules), \
+             mock.patch.object(bridge_context.xbmcaddon, "Addon", return_value=addon), \
+             mock.patch.object(bridge_context.xbmcvfs, "translatePath", side_effect=str), \
+             mock.patch.object(bridge_context.xbmcgui, "Dialog", return_value=dialog), \
+             mock.patch.object(bridge_context.sys, "listitem", selected, create=True):
+            bridge_context.main()
+        self.assertIn(entry["key"], hub.load(self.profile)["watchlist"])
+        dialog.ok.assert_called_once()
+        # No second toggle via stale popup, no unsolicited container refresh.
+
 if __name__ == "__main__":
     unittest.main(verbosity=2, argv=[sys.argv[0]])
