@@ -1,0 +1,84 @@
+"""Host-only positive/negative contracts for nine-item assembler; no APK signing."""
+import importlib.util
+from pathlib import Path
+import tempfile
+import unittest
+import zipfile
+
+ROOT = Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location("nine_bundle", ROOT / "package_2103390.py")
+bundle = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(bundle)
+
+
+class ExactNineAssemblerTests(unittest.TestCase):
+    def test_identity_and_selected_components(self):
+        self.assertEqual(bundle.CODE, 2103390)
+        self.assertEqual(len(bundle.BASE_NAME), len(bundle.NAME))
+        self.assertEqual(set(bundle.DISTRIBUTION), set(bundle.gate.VERSIONS))
+        self.assertNotIn("script.infinity.addonrecovery", bundle.DISTRIBUTION)
+        self.assertNotIn("service.xbmc.versioncheck", bundle.DISTRIBUTION)
+        self.assertEqual(bundle.gate.REPAIR_NUMBERS, (1, 2, 3, 4, 5, 6, 9, 10, 12))
+
+    def test_manifest_uses_exact_existing_dependencies(self):
+        original = b'<addons>\n  <addon>service.infinity.compat</addon>\n</addons>\n'
+        updated = bundle.revised_manifest(original)
+        before = bundle.gate.manifest_members(original)
+        after = bundle.gate.manifest_members(updated)
+        self.assertEqual(after - before, set(bundle.gate.VERSIONS) |
+                         (set(bundle.gate.DEPENDENCIES) - before))
+        self.assertNotIn("script.infinity.addonrecovery", after)
+        self.assertNotIn("service.xbmc.versioncheck", after)
+        self.assertEqual(bundle.revised_manifest(updated), updated)
+
+    def sample(self, root, addon, version, member=None):
+        archive = root / (addon + ".zip")
+        with zipfile.ZipFile(archive, "w") as z:
+            z.writestr(addon + "/addon.xml",
+                       '<addon id="' + addon + '" version="' + version + '"/>')
+            z.writestr(member or addon + "/default.py", "pass")
+        return archive
+
+    def test_version_and_traversal_fail_closed(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            addon = "script.infinity.rails"
+            archive = self.sample(root, addon, "0.2.7")
+            data, digest = bundle.unzip_component(archive, addon)
+            self.assertEqual(digest, bundle.digest(archive))
+            self.assertIn("assets/addons/" + addon + "/default.py", data)
+            archive = self.sample(root, addon, "0.2.6")
+            with self.assertRaisesRegex(ValueError, "Wrong approved add-on"):
+                bundle.unzip_component(archive, addon)
+            archive = self.sample(root, addon, "0.2.7", addon + "/../foreign.py")
+            with self.assertRaisesRegex(ValueError, "Unsafe ZIP member"):
+                bundle.unzip_component(archive, addon)
+
+    def test_uihelper_content_is_original_source_plus_one_approved_xml(self):
+        src = bundle.ROOT / "repairs/four-repair-20261018"
+        files = {"assets/addons/script.infinity.uirepair/" +
+                 p.relative_to(src / "addon").as_posix(): p.read_bytes()
+                 for p in (src / "addon").rglob("*")
+                 if p.is_file() and "__pycache__" not in p.parts}
+        files["assets/addons/script.infinity.uirepair/resources/skins/Default/1080i/InfinityItemOptions.xml"] = (
+            src / "InfinityItemOptions.xml").read_bytes()
+        self.assertTrue(bundle.helper_source_identity(files))
+        altered = dict(files)
+        key = "assets/addons/script.infinity.uirepair/runtime.py"
+        altered[key] += b"\n# unreviewed source change"
+        with self.assertRaisesRegex(ValueError, "archive does not contain"):
+            bundle.helper_source_identity(altered)
+
+    def test_wrong_locked_parent_hash_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "old.apk").write_bytes(b"not signed")
+            (root / "locked.apk").write_bytes(b"wrong")
+            (root / "proof.json").write_text("{}")
+            with self.assertRaisesRegex(ValueError, "Locked user-approved"):
+                bundle.verify_native_parent(root / "old.apk", root / "locked.apk",
+                                            root / "proof.json", "0"*40)
+
+
+if __name__ == "__main__":
+    unittest.main()
