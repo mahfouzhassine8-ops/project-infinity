@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import zipfile
 from xml.etree import ElementTree as ET
 
@@ -40,9 +41,28 @@ def check(parent,candidate):
             assert before.read(prefix+name)==after.read(prefix+name),name
         version=ET.fromstring(after.read(prefix+'addon.xml')).get('version')
         if version == '1.0.5.227':
+            popup=after.read(prefix+'unified/InfinityItemOptions.xml').decode()
+            references=set(re.findall(r'\$VAR\[([^\],]+)',popup))
+            definitions=set()
+            pending=[prefix+'unified/Includes.xml'];seen=set()
+            while pending:
+                name=pending.pop()
+                if name in seen:continue
+                seen.add(name)
+                includes=ET.fromstring(after.read(name))
+                definitions.update(v.get('name') for v in includes.iter('variable'))
+                pending.extend(prefix+'unified/'+v.get('file') for v in includes.iter('include') if v.get('file'))
+            assert references <= definitions, 'Undefined popup theme variables: '+repr(sorted(references-definitions))
             original=ET.fromstring(before.read(prefix+'unified/Custom_1193_InfinityBrowse.xml'))
             browse=ET.fromstring(after.read(prefix+'unified/Custom_1193_InfinityBrowse.xml'))
             old_grid=original.find('.//control[@id="50"]'); grid=browse.find('.//control[@id="50"]')
+            content=grid.findall('content')
+            assert len(content)==1 and content[0].get('condition') is None, 'Kodi merges sibling directory providers and ignores content conditions'
+            assert content[0].text=='$VAR[InfinityUIVideoSourcesPath]'
+            paths=ET.fromstring(after.read(prefix+'unified/Includes_InfinityUIRepair.xml')).find("variable[@name='InfinityUIVideoSourcesPath']")
+            assert paths is not None and len(paths.findall('value'))==2
+            assert paths.findall('value')[0].text.startswith('plugin://script.infinity.uirepair/?action=sources&rev=')
+            assert paths.findall('value')[1].text==old_grid.findtext('content')
             for key in ('left','top','width','bottom','itemlayout','focusedlayout'):
                 assert ET.tostring(grid.find(key))==ET.tostring(old_grid.find(key)),key
             navigation=grid.findall('ondown')

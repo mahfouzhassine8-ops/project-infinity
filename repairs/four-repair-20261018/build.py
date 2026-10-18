@@ -13,6 +13,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PARENT_SHA = '8ca8fc72ce24ae88d558d06485345ec37a2cd491ebea5805e169d84acf8ed235'
 SKIN = 'skin.infinity.diggz/'
+BROWSE_CONDITION = '[String.IsEqual(Window(Home).Property(Infinity.BrowsePath),addons://sources/video) | String.IsEqual(Window(Home).Property(Infinity.BrowsePath),addons://sources/video/)] + System.AddonIsEnabled(script.infinity.uirepair)'
 
 def module(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -58,10 +59,11 @@ def browse_patch(data):
     grid = e.control('50')
     content = grid.find('content')
     assert content.text == '$INFO[Window(Home).Property(Infinity.BrowsePath)]'
-    condition = '[String.IsEqual(Window(Home).Property(Infinity.BrowsePath),addons://sources/video) | String.IsEqual(Window(Home).Property(Infinity.BrowsePath),addons://sources/video/)] + System.AddonIsEnabled(script.infinity.uirepair)'
-    e.attr(content, 'condition', '![' + condition + ']', 'retain all other browse routes')
-    a, b, c, d = e.spans[content]
-    e.replace(d, d, '\n<content target="videos" condition="' + condition + '">plugin://script.infinity.uirepair/?action=sources&amp;rev=$INFO[Window(Home).Property(Infinity.UI.GridRevision)]</content>', 'Video Sources only')
+    condition = BROWSE_CONDITION
+    # Kodi CDirectoryProvider ignores a content condition attribute and
+    # CMultiProvider concatenates sibling providers. Resolve ONE URL through
+    # the linked skin variable, otherwise raw/opt-in tiles appear together.
+    e.set(grid, 'content', '$VAR[InfinityUIVideoSourcesPath]', 'single conditional directory provider')
     # An explicit action uses the selected installed ID; original D-pad opens
     # directly. The new native tap path decides selection versus activation.
     start, opening, _, _ = e.spans[grid]
@@ -89,6 +91,17 @@ def browse_patch(data):
     e.replace(end, end, '<ondown condition="' + condition + '">13</ondown>', 'reachable Video Sources recovery control')
     # The original 70-unit bottom inset already clears the 56+8 recovery
     # button. Keep the exact tile geometry for every other Browse destination.
+    return e.done()
+
+def browse_path_patch(data):
+    e = Edit(data)
+    assert e.root.find("variable[@name='InfinityUIVideoSourcesPath']") is None
+    _, _, closing, _ = e.spans[e.root]
+    e.replace(closing, closing, '''  <variable name="InfinityUIVideoSourcesPath">
+    <value condition="''' + BROWSE_CONDITION + '''">plugin://script.infinity.uirepair/?action=sources&amp;rev=$INFO[Window(Home).Property(Infinity.UI.GridRevision)]</value>
+    <value>$INFO[Window(Home).Property(Infinity.BrowsePath)]</value>
+  </variable>
+''', 'Video Sources projection with original fallback for all other destinations')
     return e.done()
 
 def continue_patch(data):
@@ -129,6 +142,8 @@ def build(parent, out, coordinated=False):
                 if name == SKIN + 'unified/Custom_1193_InfinityBrowse.xml': updated = browse_patch(updated)
             if coordinated and name == SKIN + 'unified/Includes_InfinityHomeUnified.xml':
                 updated = continue_patch(updated)
+            if coordinated and name == SKIN + 'unified/Includes_InfinityUIRepair.xml':
+                updated = browse_path_patch(updated)
             if updated != raw: changes[name] = updated
         assert SKIN + 'unified/VideoOSD.xml' in removed
         addon = src.read(SKIN + 'addon.xml').replace(b'version="1.0.5.225"', ('version="' + version + '"').encode(), 1)

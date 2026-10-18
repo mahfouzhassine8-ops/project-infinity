@@ -19,6 +19,7 @@ def exercise(probe, out, report):
         while time.monotonic() < deadline:
             row = probe.read_json(probe.PROFILE + '/infinity-ui-observation.json')
             if row.get('request') == nonce:
+                (out / 'last-ui-observation.json').write_text(json.dumps(row,indent=2))
                 require(not row.get('error'), row.get('error', ''))
                 return row
             time.sleep(.2)
@@ -80,7 +81,10 @@ def exercise(probe, out, report):
         for theme in ('light', 'dark', 'OLED'):
             observe('theme', theme)
             state = browse()
+            capture(viewport + '-' + theme.lower() + '-grid-before-tap',state)
             grid = state['controls']['50']
+            require(all(item.get('kind')=='addon' and item.get('token')
+                        for item in grid.get('items',[])), 'grid contains raw or duplicate non-opt-in provider items')
             require(grid.get('width', 0) > 0 and grid.get('height', 0) > 0, 'grid geometry unavailable')
             item_height = grid['height'] * .21809829
             item_width = item_height * .668085106
