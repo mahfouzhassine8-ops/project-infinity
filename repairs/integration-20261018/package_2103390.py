@@ -78,7 +78,8 @@ def unzip_component(archive: Path, addon: str, known_sha=None):
         for info in z.infolist():
             name = info.filename
             parts = PurePosixPath(name).parts
-            require(parts and parts[0] == addon and len(parts) >= 2 and
+            require(parts and parts[0] == addon and
+                    (len(parts) >= 2 or (info.is_dir() and len(parts) == 1)) and
                     not name.startswith("/") and ".." not in parts and
                     "\\" not in name and not stat.S_ISLNK((info.external_attr >> 16) & 0xffff),
                     "Unsafe ZIP member: " + name)
