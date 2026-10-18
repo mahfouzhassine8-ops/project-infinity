@@ -7,6 +7,8 @@ on:
       - 'repairs/four-repair-20261018/translated_descriptor_evidence.py'
       - 'repairs/four-repair-20261018/test_translated_descriptor_evidence.py'
       - 'repairs/four-repair-20261018/versioncheck_shutdown_probe.py'
+      - 'repairs/four-repair-20261018/fold_passive_crash_watch.py'
+      - 'repairs/four-repair-20261018/test_fold_passive_crash_watch.py'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -23,6 +25,7 @@ jobs:
         run: |
           python3 -m unittest -v test_translated_descriptor_evidence.py
           python3 -m unittest -v test_versioncheck_shutdown_probe.py
+          python3 -m unittest -v test_fold_passive_crash_watch.py
       - name: Confirm assessment has no runtime native or durability changes
         run: |
           python3 - <<'PY'
