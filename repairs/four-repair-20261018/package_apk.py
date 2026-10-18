@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import zipfile
@@ -24,7 +25,17 @@ def load(path, name):
 old = load(ROOT/'repairs/full-system-20261017/package_2103384_vfs.py', 'ui_signer_utilities')
 sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
-def package(parent, native, dest):
+def package(parent, native, dest, native_source_commit=None):
+    source_commit=native_source_commit or os.environ['GITHUB_SHA']
+    assert re.fullmatch('[a-f0-9]{40}',source_commit), 'Native source identity must be an exact commit'
+    if native_source_commit:
+        # Reusing a successful native job must not silently accept new native
+        # patches. Packaging has its own separately recorded source commit.
+        subprocess.run(['git','diff','--exit-code',source_commit,'HEAD','--',
+            'scripts','features','repairs',':!repairs/four-repair-20261018'],check=True)
+        subprocess.run(['git','diff','--exit-code',source_commit,'HEAD','--',
+            'repairs/four-repair-20261018/native_patch.py',
+            'repairs/four-repair-20261018/native_ci.py'],check=True)
     assert len(NAME) == len(PARENT_NAME) and sha(parent) == PARENT_SHA
     for key in ('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS'):
         assert os.environ.get(key), 'Permanent signing secret unavailable: ' + key
@@ -39,7 +50,7 @@ def package(parent, native, dest):
     assert post['build_generated_additions']=={name:digest for name,digest in post['actual'].items() if name not in final}
     assert set(delta['changed'])=={'xbmc/input/InputManager.cpp','xbmc/guilib/GUIBaseContainer.cpp','xbmc/guilib/GUIBaseContainer.h'}
     assert delta['before']=={p:locked[p] for p in delta['changed']}
-    assert proof['source_commit']==delta['source_commit']==os.environ['GITHUB_SHA']
+    assert proof['source_commit']==delta['source_commit']==source_commit
     assert proof['ui_input_contract_compiled'] and proof['complete_native_engine_compiled']
     assert proof['shutdown_policy']=='essential_first_process_exit_v1' and not proof['crash_fixed']
     assert sha(native/'libkodi.so')==proof['native_sha256']
@@ -82,11 +93,13 @@ def package(parent, native, dest):
             unsigned.unlink()
         original.unlink();compiled.unlink()
     (dest/'SHA256SUMS').write_text(''.join(r['sha256']+'  '+r['file']+'\n' for r in reports))
-    (dest/'SIGNED-2103385.json').write_text(json.dumps(dict(source_commit=os.environ['GITHUB_SHA'],
+    (dest/'SIGNED-2103385.json').write_text(json.dumps(dict(source_commit=source_commit,
+        packaging_source_commit=os.environ['GITHUB_SHA'],
         parent_sha256=PARENT_SHA,artifacts=reports,signer_sha256=old.CERT,
         only_input_native_delta=True,crash_fixed=False,android_verified=False,physical_fold_verified=False,locked=False),indent=2)+'\n')
 
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for name in ('parent','native','out'):p.add_argument('--'+name,type=Path,required=True)
-    a=p.parse_args();package(a.parent,a.native,a.out)
+    p.add_argument('--native-source-commit')
+    a=p.parse_args();package(a.parent,a.native,a.out,a.native_source_commit)

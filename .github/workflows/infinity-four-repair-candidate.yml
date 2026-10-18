@@ -4,7 +4,6 @@ on:
   push:
     branches: [work/infinity-post-2103384-feature-restoration]
     paths:
-      - '.github/workflows/infinity-four-repair-candidate.yml'
       - 'repairs/four-repair-20261018/NATIVE-BUILD.marker'
   workflow_dispatch:
 
@@ -351,6 +350,7 @@ jobs:
   sign:
     needs: [native-engine, skin]
     runs-on: ubuntu-22.04
+    env: {NDK_VER: 21.4.7075529}
     timeout-minutes: 40
     outputs:
       sha: ${{ steps.identity.outputs.sha }}
