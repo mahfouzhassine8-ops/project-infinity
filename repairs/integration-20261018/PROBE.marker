@@ -3,3 +3,5 @@ Read-only verification of original signed 2103385 parent embedded Compatibility 
 SKIN-MINIMUM-CHECK 2026-10-18: original signed compatibility is id service.infinity.compat version0.7.2 (native run39173070729); staged but NOT authoritative copy is 0.8.2. Compare actual approved skin 1.0.5.227 minimum version; #1 skin1.0.5.228 changes only OSD/skin version so retains same requirements. Do not rewrite parent or waive required version.
 
 PINNED SKIN PROBE RETRY 2026-10-18: use exact parent skin .227 artifact from run39114438060 digest cc07... rather than later recreated nondeterministic .227 ZIP in run39168353557. All source bytes remain unchanged; metadata analysis only. No APK changes.
+
+SIGNED PARENT COMPAT REGISTRATION CHECK: verified run39173321929: signed 2103385 inherited original compat v0.7.2 and exact .227 (therefore .228) skin declares NO service.infinity.compat version minimum; 0.7.2 is therefore the protected target. Read only the prior system addon manifest registration status to avoid accidentally activating an unregistered existing service. No APK or service modifications.
