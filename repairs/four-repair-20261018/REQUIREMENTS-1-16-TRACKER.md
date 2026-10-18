@@ -76,3 +76,21 @@
 - Demand source hashes, menu selection behavior, correct movie/episode identity, guarded mutations, restart persistence, and preservation of current progress/unrelated items.
 - Existing `controller_access.py`, `addon/runtime.py`, `addon/plugin.py`, `native_patch.py`, `test_resume.py`, saved Android17 `android_interactions.py` evidence and original protected Command Center are the starting evidence; **no complete result or Fold proof claimed**.
 - Need passing targeted tests and physical device before #2 can be checked; any need to modify shared code triggers Cobra impact review and fail-closed approval, not unrelated changes.
+
+## #2 verified existing implementation — 2026-10-18 (NOT a checkmark)
+
+**Read-only proof, no production file or Cobra edits:**
+
+1. The unchanged pinned Work helper `script.infinity.uirepair` version `0.1.0` delegates to the original `script.infinity.commandcenter` v`0.3.5.20` menu, persistence scope and saved-state writer. It does not introduce a background service, secondary progress database or new provider route.
+2. Independently compared **all 13** Command Center file SHA-256 preimages in the helper against the already-signed 2103388 APK bundle. **13/13 match**. This proves internal bundle identity, **not** the user's live installed add-on hashes or approval of 2103388.
+3. Independently diffed exact hash-pinned skin 1.0.5.226 vs 1.0.5.227 `unified/Includes_InfinityHomeUnified.xml`. The *only* difference in that file is one conditional helper directory value for Movies and one for TV, both retaining the original Command Center fallback with the original `Infinity.ContinueWatchingRevision` query. No unrelated Home visual control changes in this file.
+4. [Work host package run 39114438060](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39114438060) completed successfully. The exact source job log has **16 ResumeTests PASSED**, including movie and episode mutations and reload from saved data; rejection of closed write admission, identity mismatch and stale progress; and **8 contextual menu tests PASSED**. This is host evidence, not Fold evidence.
+5. Independently inspected the actual [Android17 signed 2103386 UI evidence artifact from run 39126569633](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39126569633): `UI-INTERACTIONS.json` reports 89 successful UI records. Both `continue-movie-context` and `continue-tv-context` displayed the original seven top-level rows; both `continue-*-watchlist-saved` observations returned to Home with the correct control focus. **The overall CI run then FAILED Essential-First Close**, so post-restart durability is **not certified** by that Android run.
+6. Native source/host harness explicitly sends the Home 8830/8831 long-press to the opt-in Resume context; ordinary taps fall through to the original Resume/Play action, and popup selection never invokes the row on the first tap. This is source/controlled-Android evidence only, not proof on the Fold.
+
+**Remaining #2 blockers:**
+- Actual Fold long-press on a saved movie and episode, normal tap Resume/Play unaffected, correct focused card and same scroll position after dismissal. Verify all applicable menu actions, including removing a rating and removing an entry, on harmless user-approved test content.
+- Confirm **current installed** Command Center preimages before any helper installation; runtime must fail safely rather than overwrite/downgrade a differently configured controller. The bundled signed 2103388 is independently rejected for unrelated Compatibility-service preservation violations and MUST NOT be used as #2 Fold test delivery.
+- Require actual approved single-APK upgrade, normal Essential-First Close/reopen and untouched unrelated progress, watched history, Watchlist and Collection. No physical-device connection or permitted integrated qualified candidate is available yet.
+
+**#2 verdict:** source and controlled emulator functionality substantially verified; **unchecked** due to physical and full persistent-install acceptance still missing. No reproduction, guesswork, source edits or APK builds started for #2.
