@@ -10,6 +10,16 @@
 
 **Exact target:** Restore original Rotate button and actual Android orientation policy in the same slot: **Follow Device (white)** versus **Infinity-controlled (cyan)**, correct icon and state. Remove `PlayerControl(Repeat)` from this slot, without altering neighboring controls or player/PiP/background playback.
 
+**Additional explicit user correction — REMOVE `Display Mode` from Playback menu:** New physical Fold screenshot shows the **Playback** popup during active video; its options include **Video Settings**, **Player Settings**, then **Display Mode** immediately above **Playback Info**. User confirms they found rotation through **Display Mode** and asks that **Display Mode be removed from the Playback menu**. This is part of **Repair #1**, not a separate fifth repair.
+
+**Required final interface (bite-for-bite):**
+1. Remove the standalone **Display Mode** row from the **Playback** popup altogether; it must not remain as a redundant rotation shortcut or a renamed duplicate.
+2. Restore the actual **Rotate** action to the previously approved **player OSD Rotate slot** (currently miswired to Repeat), using **Follow Device (white)** and **Infinity-controlled (cyan)** with correct functionality, not merely an icon swap. Do not put Repeat in the slot again; retain Repeat elsewhere only if independently intended and already approved.
+3. Verify the **Display Mode** handler before removal: if it exposes additional independent video/aspect/zoom controls, preserve those appropriate controls in the existing **Video Settings** experience rather than silently deleting unrelated features. Do not replace the Playback menu with an unrelated redesign or change the other rows/order.
+4. Test both Fold orientations, fold/unfold, fullscreen, safe Stop → movie choices and optional return to Home, plus pop-up dismissal and player return. Verify orientation behavior and absence of the redundant row on device, with no effects on video color, aspect settings, PiP, background playback, player teardown, resume state or Essential-First Close.
+
+**Evidence privacy:** Screenshot shows the Playback menu at approximately **12:54 AM**, close in time to the **00:55:31** abnormal exit, but it does **not** prove the menu or rotation command caused the crash. Do not publish the user's screenshot, content title, or watch history.
+
 **Reuse:** The reviewed experimental `repairs/full-system-20261017/player_rotate_226.py` candidate already targets skin 1.0.5.226; review installed source and reuse/correct this rather than independently recreating it. Source tests alone are not physical Fold acceptance.
 
 ## 2 — Home Continue Watching/Continue Playing press-and-hold
@@ -74,7 +84,7 @@ AutoWidget/Super Favourites only when supported in advanced options; Resume Hub 
 2. Compare the crash timestamp with Kodi native player/GUI, Java Android lifecycle, add-on callbacks, rendering, Fold orientation, background return and native engine build IDs. An RSS reading alone is NOT proof of OOM.
 3. Trace the **faulting native stack** and reproduce before choosing a correction; isolate skin/helper vs Java/native boundary. Avoid removing add-ons or disabling protected services as a guess.
 4. Fix the smallest proven component in a new experimental candidate. If skin/helper-only, no native recompilation; if native defect confirmed, rebuild **from 2103384** with exactly reviewed changes and permanently sign an update; never replace locked baseline.
-5. Confirm absence of this crash under its exact reproducible trigger and no regression in OSD Rotate, Continue Playing item menu, Video Sources selection, player/PiP/background/fold, saved data, and normal Close.
+5. Confirm absence of this crash under its exact reproducible trigger and no regression in OSD Rotate, removal of Playback → Display Mode, preservation of independent video settings, Continue Playing item menu, Video Sources selection, player/PiP/background/fold, saved data, and normal Close.
 6. If native APK changes: the exact new signed APK must pass Android fresh + loaded/upgrade native Close/reopen and physical Fold normal Close/reopen, with zero essential write blockers; user must explicitly approve promotion. A passing test does not establish every crash vector eliminated.
 
 ## Promotion / preservation requirements
