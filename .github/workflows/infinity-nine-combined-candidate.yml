@@ -4,7 +4,9 @@ on:
     branches: [work/infinity-post-2103384-feature-restoration]
     paths: ["repairs/integration-20261018/BUILD.marker"]
   workflow_dispatch:
-permissions: {contents: read, actions: read}
+# Private draft release 416125865 requires contents:write for its source-only ZIP.
+# This matches the already passing pinned-skin build workflow. Nothing is published.
+permissions: {contents: write, actions: read}
 concurrency: {group: infinity-exact-nine-experimental-packaging, cancel-in-progress: false}
 jobs:
   exact-nine-source-and-signed-candidate:
