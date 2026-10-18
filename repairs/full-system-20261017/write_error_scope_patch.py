@@ -52,7 +52,7 @@ struct Namespace''')
 {''')
     text=once(text,'''    blocker.reason==safeReason && blocker.detail==safeDetail && blocker.blocking==blocking) {''','''    blocker.reason==safeReason && blocker.detail==safeDetail && blocker.blocking==blocking &&
     blocker.verifiedWriteTarget==verifiedWriteTarget) {''')
-    text=once(text,'''  s.blockers.push_back({id,safeWriter,reason,safeDetail,1,blocking});''','''  s.blockers.push_back({id,safeWriter,reason,safeDetail,1,blocking,verifiedWriteTarget});''')
+    text=once(text,'''  s.blockers.push_back({id,safeWriter,safeReason,safeDetail,1,blocking});''','''  s.blockers.push_back({id,safeWriter,reason,safeDetail,1,blocking,verifiedWriteTarget});''')
     text=once(text,'''inline void Fail(int id, const std::string& reason, const std::string& detail={})
 {''','''inline void Fail(int id, const std::string& reason, const std::string& detail={},
                  const std::string& verifiedWriteTarget={})
