@@ -80,10 +80,18 @@ the raw unstripped compiler artifact is separately identified by `fcd206cd...`.
 
 ## Required result, not a source-level claim
 
-The correction is experimental until the new signed APK passes the same full
-API 30 UI/Stop/Close/reopen assertions and API 35 regression, plus the unchanged
-fresh and existing-data-upgrade Essential-First probes. Each workflow retains
-failures. Physical Galaxy Fold acceptance remains required.
+The exact signed candidate's API 30 UI/Stop/Close/reopen and unchanged fresh and
+existing-data-upgrade Essential-First probes passed in run39121637251 (individual
+jobs; the initial API35 job in that run failed). Android17/API37 and the physical
+Samsung Fold on One UI9.0 are now the primary acceptance targets.
+
+At the user's October18 08:24EDT direction, API35 has no automatic triggers and
+is preserved only as the dedicated manual compatibility workflow. Run39125992273
+had already ended before the requested stop action reached GitHub: its UI matrix
+completed, but Close failed with checkpoint_deadline_exceeded and incomplete
+owner proof. Retain that unresolved compatibility finding; do not count it as
+a pass or weaken Essential-First deadlines/proofs. No API35 rerun is scheduled.
+The required API37 Close/reopen check and physical Fold acceptance remain.
 
 The separately reported physical post-Stop status-139 exit has no established
 crash-time native stack. This Android input correction is not a crash fix.

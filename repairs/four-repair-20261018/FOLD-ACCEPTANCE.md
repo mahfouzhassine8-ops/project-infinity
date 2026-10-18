@@ -11,6 +11,12 @@ are supplementary compatibility checks. The API37 workflow uses a published
 generic Android17 image and verifies its runtime SDK/release; it does not emulate
 Samsung One UI, the Fold's hardware decoder, sensors or physical hinge.
 
+Per the user's October18 continuation, Android15/API35 is **manual-only** for
+optional later compatibility checks. It is not automatically scheduled and does
+not replace or delay the primary API37/Fold work. Preserve its existing results,
+including run39125992273's failed Essential-First Close owner-proof deadline;
+that result remains a failure, not a pass or a diagnosed physical crash.
+
 ## Candidate choices and installation
 
 Before the APK update, finish playback and use the existing normal
