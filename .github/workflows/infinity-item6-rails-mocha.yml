@@ -1,0 +1,93 @@
+name: "Infinity #6 | Rails Mocha popup path (HOST ONLY)"
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths:
+      - 'repairs/item6-rails-20261018/**'
+      - '.github/workflows/infinity-item6-rails-mocha.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-item6-rails-mocha-20261018, cancel-in-progress: false}
+jobs:
+  isolated-rails-mocha:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - name: Read exact original Rails 0.2.6 ZIP from authenticated pinned input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/item6-release.json
+          python3 - <<'CHECK'
+          import json
+          r=json.load(open('/tmp/item6-release.json'))
+          assert r['draft'] is True and r['tag_name']=='infinity-ci-assets-20261017'
+          a=next(x for x in r['assets'] if x['id']==651868759)
+          assert a['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          CHECK
+          curl --fail --location --silent --show-error --retry 2 \
+            -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
+            https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 \
+            -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+          echo '5e4ff64592d6f8660d17db1077ed85a368c02f4eb14442760797b1d133c08179  full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip' | sha256sum -c
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39114438060
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: approved-work-skin
+      - name: Rebuild the exact approved #1 skin from Work's immutable .227
+        run: |
+          set -euo pipefail
+          echo 'cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699  approved-work-skin/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip' | sha256sum -c
+          python3 repairs/four-repair-20261018/item1_rotate_cyan_228.py \
+            --parent approved-work-skin/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip \
+            --out item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip
+          echo '39f8f041376748fbe209868a33ef51e1cfd59082ee6ebb8ad095e6f85336bdef  item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip' | sha256sum -c
+      - name: Build Rails Mocha path fix and preserve every original member
+        run: |
+          python3 repairs/item6-rails-20261018/build.py \
+            --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip \
+            --skin item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip \
+            --out item6-output/script.infinity.rails-0.2.7-Mocha-Options-TEST.zip
+      - name: Reproduce old XML error and test original Movie/TV Rails hold options
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          with zipfile.ZipFile('full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip') as z:
+              assert z.testzip() is None and len(z.namelist())==14
+              z.extractall('item6-fixture')
+          layout=Path('item6-approved-skin/unified/InfinityRailsOptions.xml')
+          layout.parent.mkdir(parents=True)
+          with zipfile.ZipFile('item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip') as z:
+              layout.write_bytes(z.read('skin.infinity.diggz/unified/InfinityRailsOptions.xml'))
+          PY
+          python3 repairs/item6-rails-20261018/test_mocha.py \
+            --extracted-original-helper item6-fixture/script.infinity.rails \
+            --extracted-skin item6-approved-skin
+          python3 repairs/item6-rails-20261018/test_runtime_options.py \
+            --extracted-original-helper item6-fixture/script.infinity.rails
+      - name: Preserve #4 exact Rails 0.2.6 version requirement as an OPEN dependency
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path('repairs/four-repair-20261018/addon/runtime.py').read_text()
+          assert "return xbmcaddon.Addon('script.infinity.rails').getAddonInfo('version') == '0.2.6'" in text
+          print('NOTE: Rails 0.2.7 would require a separate approved #4 version compatibility adjustment. No #4, native, Cobra or skin source has changed. DO NOT PROMOTE.')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: Infinity-Item6-Rails-027-Source-Candidate-NOT-INSTALL-APPROVED
+          path: item6-output/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
