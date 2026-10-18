@@ -1,0 +1,170 @@
+name: Infinity | API37 2103387 bundled Version Check startup ONLY
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['repairs/four-repair-20261018/VERIFY-2103387-API37.marker']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103387-api37-selection, cancel-in-progress: false}
+
+jobs:
+  bundled-service-only:
+    name: Fresh Android17 service selection on exact signed 2103387
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    permissions: {contents: write, actions: read}
+    env:
+      APK_SHA: c517d02e09fa0bfcca38a24a387b78b0d06e86ae1892207b2558792bd3ea2b97
+      SERVICE_SHA: 6eb8ed9dd5d4712aacb44d55c3e006b1da5198c6bee076315579927c437bcfc1
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Pin actual API37 image and tools, without substituting an older Android
+        run: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39136763823
+          name: Infinity-2103387-Permanent-Signed-EXPERIMENTAL-UNQUALIFIED
+          github-token: ${{ github.token }}
+          path: signed387
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: first-party-input
+      - name: Verify exact signed 2103387 and protected native identity
+        run: |
+          set -euo pipefail
+          mkdir -p full-stack
+          git diff --exit-code 5389b4572cd32037fedf0e7d88b7f79abb120952 HEAD -- \
+            repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json \
+            repairs/full-system-20261017/write_error_scope_patch.py \
+            repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityAndroidCheckpoint.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityScriptPersistence.h
+          python3 repairs/full-system-20261017/infinity_only_gate.py apk \
+            --apk signed387/Infinity-2103387-UI-Restoration-TEST3.apk \
+            --expected-sha "$APK_SHA" --version-code 2103387 \
+            --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/34.0.0/apksigner" \
+            --out full-stack/CANDIDATE-SIGNED-IDENTITY.json
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          p=Path('signed387/Infinity-2103387-UI-Restoration-TEST3.apk')
+          r=json.loads(Path('signed387/SIGNED-2103387.json').read_text())
+          assert r['sha256']==hashlib.sha256(p.read_bytes()).hexdigest()
+          assert r['version_code']==2103387 and r['permanently_signed']
+          assert r['native_engine_unchanged'] and r['classes_dex_unchanged']
+          assert not r['automatic_existing_addon_upgrade_proven']
+          with zipfile.ZipFile(p) as z:
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()==r['native_engine_sha256']
+          PY
+      - name: Retrieve exact unchanged original production skin and Rails
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/ui-release.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/ui-release.json'))
+          assert r['draft'] is True and r['tag_name']=='infinity-ci-assets-20261017'
+          asset=next(a for a in r['assets'] if a['id']==651868759)
+          assert asset['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          PY
+          curl --fail --location --silent --show-error --retry 2 \
+            -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
+            https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 \
+            -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39114438060
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: ui-candidate
+      - name: Stage original UI add-ons WITHOUT a Version Check override
+        run: |
+          set -euo pipefail
+          echo 'cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699  ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip' | sha256sum -c
+          echo '792154bc91f3a2839dec29b6c560c854105913df6d78a79d39cb253207f947d7  ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip' | sha256sum -c
+          mkdir -p full-input/additional-addons
+          python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py \
+            --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
+          python3 repairs/four-repair-20261018/prepare_ui_android.py \
+            --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip \
+            --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip \
+            --first-party first-party-input/rc05-inputs/native-evidence/installed-addons \
+            --additional full-input/additional-addons \
+            --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip \
+            --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip --out full-stack
+          test ! -d full-stack/addons/service.xbmc.versioncheck
+      - name: Prepare disposable generic API37 emulator (NOT Samsung firmware)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Observe real bundled service startup; NO Close certification
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            python3 repairs/four-repair-20261018/android_ui.py
+            --apk signed387/Infinity-2103387-UI-Restoration-TEST3.apk
+            --expected-sha "$APK_SHA"
+            --addons full-stack/addons --input-proof full-stack/FULL-STACK-INPUTS.json
+            --test-variant ui-restoration --expected-api 37 --expected-release 17
+            --versioncheck-selection-only --versioncheck-expected-version 0.5.28+infinity.1
+            --versioncheck-expected-service-sha "$SERVICE_SHA"
+            --out full-stack/android
+      - name: Green only if genuine service selection is proven; never pass Close
+        run: |
+          python3 - <<'PY'
+          import json
+          r=json.load(open('full-stack/android/FULL-STACK-ANDROID.json'))
+          assert r['apk_sha256']=='c517d02e09fa0bfcca38a24a387b78b0d06e86ae1892207b2558792bd3ea2b97'
+          assert r['android_platform']['sdk']=='37' and r['android_platform']['release'].split('.')[0]=='17'
+          assert r['bundled_service_source_selected'] is True
+          assert r['versioncheck_shutdown']['addon']['version']=='0.5.28+infinity.1'
+          assert r['versioncheck_shutdown']['app_paths']['service_sha256']=='6eb8ed9dd5d4712aacb44d55c3e006b1da5198c6bee076315579927c437bcfc1'
+          assert r['versioncheck_shutdown']['natural_execution_log']['ready']
+          assert r['versioncheck_selection_only'] is True and not r['real_close_executed']
+          assert r['passed'] is False and not r['close_certified']
+          assert r['physical_fold_accepted'] is False and r['crash_fixed'] is False
+          assert r['samsung_one_ui_emulated'] is False
+          print('PASS narrow, fresh, generic API37 bundled Version Check selection; Close/reopen and Fold remain unqualified')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103387-Android17-Bundled-Service-Selection-ONLY
+          path: |
+            full-stack/android/
+            full-stack/*.json
+            emulator-setup/
+            api37-support/
+          retention-days: 60
+          if-no-files-found: warn
