@@ -23,6 +23,8 @@ jobs:
           /tmp/infinity-stage-durability-test
       - name: Guard exact TEST4 source against future independent shutdown overlay leaks
         run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_shutdown_source_lineage.py' -v
+      - name: Check THE CREW and all optional / protected write error boundaries (native C++ plus 11 negative controls)
+        run: python3 repairs/full-system-20261017/test_write_error_scope.py
       - name: Verify FULL skin/Rails package rejection and no Kodi substitution
         run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_assets.py' -v
       - name: Syntax-compile exact full-stack setup and real-APK emulator runner
