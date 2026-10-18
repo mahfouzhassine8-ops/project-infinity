@@ -102,3 +102,27 @@
 - Audit existing native `OnInfinityUiTouch` and `OnInfinityUiContextMenu` and opt-in scope, existing custom `Custom_1193_InfinityBrowse.xml`, `script.infinity.uirepair` directory projection, and tested Android gestures. D-pad, unrelated Kodi input, Cobra, and all shared services are **untouchable** except where explicitly approved with proof of no impact.
 - #4's menu actions and Hide/Disable semantics remain a separate numbered workstream, not authorization to change #4 while verifying #3.
 - No source/native/skin/APK implementation changes or builds authorized by this tracker update. Missing physical Galaxy Fold testing cannot be reclassified as a passing result.
+
+## #3 verified existing Video Sources touch implementation — 2026-10-18 (NOT a checkmark)
+
+**Scope unchanged:** Only `All Add-ons → Video Sources` tile gesture/focus behavior. Do not modify Cobra, Command Center, player/OSD, shared Compatibility service, native shutdown, or other numbered repairs.
+
+**Inspected existing production sources and historical runtime data:**
+
+- `repairs/four-repair-20261018/native_patch.py`: `OnInfinityUiTouch` uses the exact custom Browse window `WINDOW_HOME + 1193` / container `50` and requires a verified opt-in item token. First touch only selects; second on the same focused tile invokes one original activation; selected hold routes through `OnInfinityUiContextMenu`. A different tile cannot immediately launch. `DISPATCH` also requires skin ID `skin.infinity.diggz`, one-finger tap/hold and a valid native window. D-pad and unrelated windows retain their original paths. These are source-scope protections; **Cobra physical behavior is not asserted tested**.
+- `build.py` and `test_skin.py`: the active custom Browse XML directs Video Sources to the opt-in helper via an isolated conditional URL with the original non-Video-Sources provider as fallback. Original grid geometry and right/left layouts are preserved in source checks. The helper emits actual installed add-on IDs, not generic context targets.
+- `test_native.py` contains compiled C++ method cases for left/right initial tap, second tap, hold on changed tile, scroll offsets, coordinate transforms, nonselected item, invalid token and nonopt-in fallthrough; no stock Kodi/Cobra rewrite.
+- [Previously signed 2103386 native CI run 39121637251](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39121637251) signed the real candidate and passed exact protected native-source, fresh and loaded Android cases; this was before later API37 full application Close failure. This does NOT certify the complete candidate.
+- Independently reopened the **actual saved** `UI-INTERACTIONS.json` produced by [Android17 run 39126569633](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39126569633) for signed 2103386. It has 89 recorded UI observations with `passed=true`, `physical_fold_verified=false`.
+- **18 of 18 historical runtime trace comparisons matched**: 2 emulated display sizes (1080×2400 cover and 1800×1440 inner) × 3 themes (Light/Dark/OLED) × (left, right, scrolled). For each, menu state opened and dismissal restored the exact selected token and page; menu was anchored to a selected item, never an independent unrelated tile. **12/12 left/right opened-provider folder paths** matched the exact add-on IDs selected by first tap. Both right-side and left-side real item activation observations were recorded.
+- Every one of the six emulated display/theme cases exercised a scrolled tile hold; selection and current page were still retained on dismissal. These are synthetic emulator sizes, **not** a physical hinge/fold test.
+- Historical full Android17 workflow **FAILED Essential-First Close** with a Version Check writer-ownership blocker, despite the separate UI evidence `passed=true`. Its overall failure remains red; no Close or final-release approval inferred.
+
+**Still required before #3 gets `[x]`:**
+
+1. **Physical Galaxy Fold Android17/One UI9** with live Diggz profile: left and right first tap select; same second tap launches; hold on selected tile opens correct popup without directly launching; tapping different tile only selects, across scrolling, fold/unfold/rotation.
+2. Normal Back/outside dismissal preserves selection and scroll, UI does not trap focus, no black ghost popup, no shortcut suddenly executes.
+3. Actual installed Cobra and unrelated input/playback behavior prove unaltered; **no Cobra edits allowed**. Shared native input path is reviewed only, not newly changed here.
+4. Full final signed one-APK install-over, data persistence and required guarded shutdown are separate later steps and cannot be falsely presumed passed.
+
+**#3 result:** **Source and controlled Android17 UI behavior verified; physical/integrated release acceptance OPEN. #3 remains UNCHECKED.** No new APK/native/skin/helper code or test workflow was modified or built for #3. Changes in this step are restricted to this tracker record.
