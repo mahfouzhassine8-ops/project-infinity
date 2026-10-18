@@ -1,6 +1,6 @@
 # Infinity — binding 1–16 completion tracker
 
-**Status:** IMPLEMENTATION TRACKER. **Current step:** #1 targeted repair complete; await instruction for next item. **Individual implementations complete:** 1/16. **Final all-in-one APK and Fold acceptance:** NOT DONE.
+**Status:** IMPLEMENTATION TRACKER. **Current step:** #2 targeted repair complete; await instruction for #3. **Individual implementations complete:** 2/16. **Final all-in-one APK and Fold acceptance:** NOT DONE.
 **Repository:** `mahfouzhassine8-ops/project-infinity`.
 **Development branch:** `work/infinity-post-2103384-feature-restoration`.
 **Protected user-approved APK:** 2103384, SHA-256 `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`.
@@ -21,7 +21,7 @@
 ## Live checklist
 
 - [x] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **INDIVIDUAL IMPLEMENTATION COMPLETE:** Work Rotate handler reused, 13 alternate layout cyan corrections made in skin 1.0.5.228; all 14 layouts checked; exact approved binary delta proved; final Fold/integrated APK acceptance PENDING.
-- [ ] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **DEFERRED BY USER to proceed to #3; prior host/emulator evidence saved, physical acceptance and successful Close/reopen outstanding; NOT COMPLETE.**
+- [x] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **INDIVIDUAL IMPLEMENTATION COMPLETE:** Work's original Home movie/episode actions preserved; helper 0.1.1 fixes a reproducible stale-action data integrity bug; targeted original-writer/host/source/package tests green; final integrated APK + Fold acceptance PENDING.
 - [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus — **DEFERRED when user returned to #1; previously gathered evidence retained; unchecked.**
 - [ ] **4.** Exact approved context menu order and relevant actions; Hide is reversible and never Disable
 - [ ] **5.** Universal blue watched indicators, Resume Hub and Watchlist/Collection correctness; durable identity
@@ -142,3 +142,19 @@
 
 **Final release gates still required:** integrate this exact hash-pinned skin change into the single final APK later, test actual native rotation, Light/Dark/OLED, folded/unfolded, player controls, Cobra runtime, PiP/background, preserved user data, protected Close/reopen and Fold acceptance. No APK was produced or device changed for #1. No final lock authorized.
 
+
+## #2 ACTUAL TARGETED FIX — IMPLEMENTATION COMPLETE (GitHub 2026-10-18)
+
+**Reproduced defect:** Original Work helper 0.1.0, when a long-press menu read `Add to Watchlist`, would call the unguarded toggle even if a concurrent background writer had already added the same item, unexpectedly **removing** it. The pre-fix executable reproduction confirmed `concurrent_add_still_present=false` and `unintended_remove=true`.
+
+**Actual correction:** same-ID `script.infinity.uirepair` **0.1.1** committed at [fcaf1505ddcc8f3c3a24f49c7d4824ec3c3e71bd](https://github.com/mahfouzhassine8-ops/project-infinity/commit/fcaf1505ddcc8f3c3a24f49c7d4824ec3c3e71bd). It rechecks the exact selected original Command Center context-menu label/operation under the **same protected writer scope**. When the menu becomes stale or its item is no longer a current Continue Playing entry, it **does not mutate anything** and offers the user a brief retry message. Mark Watched, Reset Progress, and Remove from Continue reject a changed playback clock/occurrence; ordinary Resume/Play taps and original Command Center data/save owners remain unchanged.
+
+**Exact production scope:** GitHub commit changed only five files: `addon/controller_access.py`, `addon/runtime.py`, `addon/addon.xml` (version only), `build.py` (helper output name only), `test_resume.py` (six real CC writer regression tests). No player engine, skin, Cobra, Compatibility service, Rails, watched bridge, profile, provider, essential-shutdown code, or other files changed. [1-parent GitHub scope comparison](https://github.com/mahfouzhassine8-ops/project-infinity/compare/8286c0a9e57511830a4293e5a88ccfd37f1673be...fcaf1505ddcc8f3c3a24f49c7d4824ec3c3e71bd).
+
+**Exact reproducible GitHub build:** [run39153079012](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39153079012) **GREEN**; **22/22 original CC Resume/durability tests** (16 inherited/previous + 6 specific guards), **8/8 Add-on menu tests**, authenticated package and skin asset checks. Signed 2103384 baseline [guard39153079053](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39153079053) **GREEN** (source/host safeguard, not new Fold proof).
+
+**Exact CI-created helper** from Actions artifact ID **12145394887**, internal ZIP `script.infinity.uirepair-0.1.1-TEST.zip`, SHA-256 **`07fa26f3eb8136c97263f9e67575fd804a8afba76b31bac970c1c590b095a06c`**. Compared member-by-member against Work's original 0.1.0 ZIP SHA-256 `792154bc91f3a2839dec29b6c560c854105913df6d78a79d39cb253207f947d7`: **9/9 original members retained; exactly three #2-related files changed; six identical; no deleted/added members**. Original CC source hash manifest, Video Sources plugin, favourites/rails menu model, popup layout and input unchanged. Independently executed 13 focused state/menu tests **all PASS** on this exact Github-built ZIP (including watched/episode identity, rating removal, stale Watchlist/Collection/rating, new playback clocks, removed item, protected writer denial, no unintended writes). The local prototype package SHA differs from the CI-built source; the *authoritative* #2 artifact is the exact CI-created SHA above.
+
+**#1 preservation:** GitHub #2 code did not edit the pinned #1 corrected skin 1.0.5.228, native playback/OSD, or its source. #2 staged helper is for eventual approved integrated APK only; not a separate required user installation.
+
+**Final acceptance still pending:** A complete signed upgrade containing #1 and #2 plus all other fixes, preserving installed Diggz/user data, stable Cobra runtime, Android17/Fold long-press, current provider state, full Essential-First Close and restart. This is an **individual implementation** checkmark, not a release/physical Fold pass, and no final APK is claimed.
