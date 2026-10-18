@@ -1,0 +1,169 @@
+name: Infinity | ALL-IN-ONE 2103388 | Verified UI, dependencies and signing
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['repairs/four-repair-20261018/BUILD-2103388-ALL-IN-ONE.marker']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103388-all-in-one, cancel-in-progress: false}
+jobs:
+  package:
+    name: Verified full Infinity APK and permanent signing (NO LOCK)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions: {contents: write, actions: read}
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39136763823
+          name: Infinity-2103387-Permanent-Signed-EXPERIMENTAL-UNQUALIFIED
+          github-token: ${{ github.token }}
+          path: signed387
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: first-party-input
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39114438060
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: ui-candidate
+      - name: Verify previously signed parent, CI inputs and locked shutdown foundation
+        run: |
+          set -euo pipefail
+          git diff --exit-code 5389b4572cd32037fedf0e7d88b7f79abb120952 HEAD -- \
+            repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json \
+            repairs/full-system-20261017/write_error_scope_patch.py \
+            repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h \
+            repairs/full-system-20261017/shutdown_native_ci.py \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityAndroidCheckpoint.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityScriptPersistence.h
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          p=Path('signed387/Infinity-2103387-UI-Restoration-TEST3.apk')
+          r=json.loads(Path('signed387/SIGNED-2103387.json').read_text())
+          assert r['sha256']=='c517d02e09fa0bfcca38a24a387b78b0d06e86ae1892207b2558792bd3ea2b97'
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==r['sha256']
+          assert r['permanently_signed'] and r['native_engine_unchanged']
+          assert not r['shutdown_verified'] and not r['crash_fixed']
+          for file, sha in (
+            ('ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip',
+             'cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699'),
+            ('ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip',
+             '792154bc91f3a2839dec29b6c560c854105913df6d78a79d39cb253207f947d7')):
+            assert hashlib.sha256(Path(file).read_bytes()).hexdigest()==sha
+          print('PINNED parent, approved UI packages and locked native foundation VERIFIED')
+          PY
+      - name: Retrieve exact complete original .225 skin, Rails and official dependencies
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/ui-release.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/ui-release.json'))
+          assert r['draft'] is True and r['tag_name']=='infinity-ci-assets-20261017'
+          a=next(x for x in r['assets'] if x['id']==651868759)
+          assert a['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          PY
+          curl --fail --location --silent --show-error --retry 2 \
+            -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
+            https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 \
+            -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+      - name: Stage complete protected first-party and exact .227 skin/Item Options
+        run: |
+          set -euo pipefail
+          mkdir -p full-input/additional-addons
+          python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py \
+            --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
+          python3 repairs/four-repair-20261018/prepare_ui_android.py \
+            --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip \
+            --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip \
+            --first-party first-party-input/rc05-inputs/native-evidence/installed-addons \
+            --additional full-input/additional-addons \
+            --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip \
+            --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip \
+            --out full-stack
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          proof=json.loads(Path('full-stack/FULL-STACK-INPUTS.json').read_text())
+          assert proof['full_production_skin_dependencies_satisfied']
+          assert proof['ui_candidate']['skin_version']=='1.0.5.227'
+          for addon in ('skin.infinity.diggz','script.infinity.uirepair',
+                        'script.infinity.commandcenter','script.infinity.rails',
+                        'service.infinity.compat','script.infinity.watchedbridge',
+                        'script.infinity.addonrecovery','script.skinshortcuts',
+                        'resource.images.studios.white','resource.images.recordlabels.white'):
+            assert (Path('full-stack/addons')/addon/'addon.xml').is_file(), addon
+          PY
+      - name: Build and permanently sign one APK with all approved components
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/package_2103388_all_in_one.py \
+            --parent signed387/Infinity-2103387-UI-Restoration-TEST3.apk \
+            --addons full-stack/addons \
+            --proof full-stack/FULL-STACK-INPUTS.json \
+            --out signed388 --sign
+      - name: Reject partial all-in-one build and premature release claims
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, zipfile, xml.etree.ElementTree as ET
+          from pathlib import Path
+          p=Path('signed388/Infinity-2103388-All-In-One-TEST4.apk')
+          r=json.loads(Path('signed388/SIGNED-2103388.json').read_text())
+          assert r['version_code']==2103388 and r['signed_permanently']
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==r['sha256']
+          assert r['release_signer_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert r['component_count']==10 and r['native_engine_unchanged'] and r['java_bytecode_unchanged']
+          assert r['existing_install_upgrade_activation_proven'] is False
+          assert r['essential_first_close_verified'] is False
+          assert r['original_crash_fixed'] is False
+          assert r['physical_fold_accepted'] is False
+          assert r['user_final_lock_approved'] is False
+          with zipfile.ZipFile(p) as z:
+              ids=set(n.split('/')[2] for n in z.namelist() if n.startswith('assets/addons/') and n.count('/')>2)
+              assert set(r['component_inventory']).issubset(ids), set(r['component_inventory'])-ids
+              for addon, data in r['component_inventory'].items():
+                  info=ET.fromstring(z.read('assets/addons/'+addon+'/addon.xml'))
+                  assert info.get('id')==addon and info.get('version')==data['version']
+          print('PASS: signed complete all-in-one APK payload. Still requires actual upgrade/runtime verification.')
+          PY
+      - name: Save integrated signed APK and exact inventories, no separate install required
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-2103388-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          path: |
+            signed388/Infinity-2103388-All-In-One-TEST4.apk
+            signed388/SIGNED-2103388.json
+            signed388/Infinity-2103388-All-In-One-TEST4.signing.txt
+            signed388/Infinity-2103388-All-In-One-TEST4.sha256
+            full-stack/FULL-STACK-INPUTS.json
+          if-no-files-found: warn
+          retention-days: 90
+          compression-level: 0
