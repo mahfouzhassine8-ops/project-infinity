@@ -1,0 +1,107 @@
+name: Infinity | FAST SIGN-ONLY 2103383 (reuse passed native)
+
+on:
+  push:
+    branches: [work/infinity-full-repair-20261017-gpt6]
+    paths:
+      - '.github/workflows/infinity-shutdown-2103383-sign-only.yml'
+  workflow_dispatch:
+
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-shutdown-2103383-sign-only, cancel-in-progress: false}
+
+jobs:
+  sign-existing-native:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      NATIVE_RUN: 39083031276
+      ORIGINAL_SIGNED_TEST3_RUN: 39004584047
+      NATIVE_COMMIT: 3e5e5e4f8d65464153243de9179dd24fb090d05e
+    steps:
+      - name: Checkout packaging correction only - no native compilation
+        uses: actions/checkout@v7
+        with: {fetch-depth: 1, persist-credentials: false}
+      - name: Verify reused native-engine job actually passed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request
+          root = 'https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+          headers = {'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          def api(path):
+              with urllib.request.urlopen(urllib.request.Request(root+path,headers=headers),timeout=45) as response:
+                  return json.load(response)
+          run = api('/actions/runs/'+os.environ['NATIVE_RUN'])
+          assert run['head_sha'] == os.environ['NATIVE_COMMIT'], 'Native run differs from verified source'
+          jobs = api('/actions/runs/'+os.environ['NATIVE_RUN']+'/jobs?per_page=100')['jobs']
+          native = [job for job in jobs if job['name'] == 'native-engine']
+          assert len(native) == 1 and native[0]['conclusion'] == 'success', 'Previously compiled native job is not green'
+          assert run['conclusion'] == 'failure', 'The original integrated run failure must remain visible'
+          print('REUSE passed native-engine job from run',run['id'],'without recompiling it.')
+          PY
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - name: Restore existing NDK tools (not an engine compile)
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Download untouched, permanently signed 2103382 TEST3
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 39004584047
+          name: Infinity-Watched-Touch-Experimental-APK-and-Rollback
+          github-token: ${{ github.token }}
+          path: original-signed-test3
+      - name: Download previously PASSED full native-engine proof, not a rebuild
+        uses: actions/download-artifact@v8
+        with:
+          run-id: 39083031276
+          name: Infinity-Independent-Close-Native-Evidence
+          github-token: ${{ github.token }}
+          path: corrected-independent-native
+      - name: Verify original, reuse exact compiled native engine, permanently sign APK 2103383
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/full-system-20261017/package_shutdown_candidate.py
+          python3 repairs/full-system-20261017/package_shutdown_candidate.py \
+            --parent original-signed-test3/Infinity-2103382-Watched-Touch-TEST3.apk \
+            --native corrected-independent-native \
+            --out infinity-2103383-delivery
+          (cd infinity-2103383-delivery && sha256sum -c SHA256SUMS)
+      - name: Publish ONLY genuinely verified signed APKs and their receipts
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103383-FAST-SIGNED-Experimental-APK-and-Return
+          path: |
+            infinity-2103383-delivery/Infinity-2103383-Close-Durability-TEST1.apk
+            infinity-2103383-delivery/Infinity-2103383-TEST3-Compatibility-Return.apk
+            infinity-2103383-delivery/INFINITY-2103383-SIGNED-EXPERIMENTAL.json
+            infinity-2103383-delivery/SHA256SUMS
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - name: Save packaging evidence even if an actual check fails
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103383-FAST-SIGN-Receipts
+          path: |
+            infinity-2103383-delivery/*.json
+            infinity-2103383-delivery/SHA256SUMS
+          retention-days: 90
+          if-no-files-found: warn
