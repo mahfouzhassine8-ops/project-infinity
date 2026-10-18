@@ -1,6 +1,6 @@
 # Infinity — binding 1–16 completion tracker
 
-**Status:** OPEN. **Current step:** #1. **Fully completed:** 0/16.
+**Status:** OPEN. **Current step:** #2 at the user's explicit direction. **#1:** verification deferred, still unchecked. **Fully completed:** 0/16.
 **Repository:** `mahfouzhassine8-ops/project-infinity`.
 **Development branch:** `work/infinity-post-2103384-feature-restoration`.
 **Protected user-approved APK:** 2103384, SHA-256 `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`.
@@ -15,13 +15,13 @@
 - Test change scope against exact protected versions **before** claiming an item complete. Preserve signed/native identities and produce exact source and artifact checksums.
 - Green host checks and generic emulator checks are limited evidence; do not claim Fold acceptance without physical testing. A failed Close or missing crash cause remains failed/open.
 - An item gets `[x]` **only when all its explicit functional, preservation, and required acceptance gates pass**. Partial work stays `[ ]`; write progress separately. After checking an item, report “#N COMPLETE” and show the updated list.
-- Complete **one numbered step at a time**, in order; do not begin the next until the current item's required gates are resolved. Stop and ask approval for any shared-component conflict rather than touching Cobra.
+- Complete **one numbered step at a time**, in order, **except when the user explicitly directs advancing with an earlier step still unchecked**. This does not waive or check off that earlier step; it must be completed before release. Stop and ask approval for any shared-component conflict rather than touching Cobra.
 - Only after **all 16** checkmarks and the full binding audit may the approved work be packaged into **one** permanently signed install-over APK. Signing, testing, and user final lock are separate gates. User must approve final lock.
 
 ## Live checklist
 
-- [ ] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **IN PROGRESS: existing .226/.227 Work Rotate patch under preservation verification; not Fold-certified.**
-- [ ] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression
+- [ ] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **DEFERRED BY USER to proceed to #2; source evidence saved, physical Fold acceptance outstanding, NOT COMPLETE.**
+- [ ] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **IN PROGRESS: review existing Work integration, exact Command Center original actions, untouched writers, restart persistence, Android 17 and physical Fold gaps.**
 - [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus
 - [ ] **4.** Exact approved context menu order and relevant actions; Hide is reversible and never Disable
 - [ ] **5.** Universal blue watched indicators, Resume Hub and Watchlist/Collection correctness; durable identity
@@ -67,3 +67,12 @@
 - Original native crash, Essential-First Close and complete single-APK install-over remain **OPEN**. Source-only 2103389 is not a verified signed build.
 
 **Updating rule:** Add dated source/CI/device receipts under the relevant numbered item when evidence passes; keep remaining checkboxes unchecked. Do not turn a risk, assumption, or source-only assertion into a checkmark.
+
+## #2 investigation start — 2026-10-18 (NOT a checkmark)
+
+- User explicitly instructed **Move on to number two**. #1 remains open, with its Fold acceptance deferred; it is not treated as passing.
+- **Narrow scope only:** Home Continue Playing movie/episode card holds open the original item-specific menu, without replacing ordinary Resume/Play tap, bypassing the existing Command Center writer or changing unrelated add-ons/rails/Cobra.
+- Menu actions: Mark Watched/Unwatched, Reset Progress, Watchlist/Collection add/remove, Rate/Change/Remove Rating where original supports it, Custom List, and Remove from Continue Playing.
+- Demand source hashes, menu selection behavior, correct movie/episode identity, guarded mutations, restart persistence, and preservation of current progress/unrelated items.
+- Existing `controller_access.py`, `addon/runtime.py`, `addon/plugin.py`, `native_patch.py`, `test_resume.py`, saved Android17 `android_interactions.py` evidence and original protected Command Center are the starting evidence; **no complete result or Fold proof claimed**.
+- Need passing targeted tests and physical device before #2 can be checked; any need to modify shared code triggers Cobra impact review and fail-closed approval, not unrelated changes.
