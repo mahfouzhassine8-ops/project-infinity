@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-four-repair-candidate, cancel-in-progress: false}
+concurrency: {group: infinity-four-repair-candidate, cancel-in-progress: true}
 
 jobs:
   host-proof:

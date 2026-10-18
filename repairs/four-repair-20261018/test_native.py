@@ -20,7 +20,7 @@ constexpr int WINDOW_HOME=10000,ACTION_SELECT_ITEM=7,TMSG_EXECUTE_BUILT_IN=1;
 struct CPoint {float x,y; CPoint(float a,float b):x(a),y(b){} CPoint operator-(CPoint o)const{return {x-o.x,y-o.y};}};
 struct Value {std::string v; std::string asString()const{return v;}};
 struct Item {std::map<std::string,Value> p; Value GetProperty(const char* k)const{auto it=p.find(k);return it==p.end()?Value{}:it->second;}};
-struct Window:Item {};
+struct Window:Item {void SetProperty(const char* k,std::string v){p[k]={v};}};
 struct WM {std::map<int,Window> windows;Window* GetWindow(int id){return &windows[id];}};
 struct GUI {WM wm;WM& GetWindowManager(){return wm;}};
 struct Messenger {std::vector<std::string> calls;void PostMsg(int,int,int,void*,std::string s){calls.push_back(s);}};

@@ -47,7 +47,14 @@ bool CGUIBaseContainer::OnInfinityUiTouch(float x, float y, bool hold)
   {
     m_infinityUiTapKey = token;
     if (!popup)
+    {
+      // Coordinates are in the actual skin viewport after its cached inverse
+      // transform, including the current Fold layout and container scroll.
+      window->SetProperty("Infinity.UI.Anchor.X", std::to_string(point.x));
+      window->SetProperty("Infinity.UI.Anchor.Y", std::to_string(point.y));
+      window->SetProperty("Infinity.UI.Anchor.Token", token);
       OnInfinityUiContextMenu();
+    }
     return true;
   }
   // ACTION_TOUCH_TAP is intercepted BEFORE Kodi synthesizes MouseMove. Merely
@@ -179,8 +186,12 @@ def apply(root):
                      'bool CGUIBaseContainer::OnContextMenu()\n{\n  if (OnInfinityUiContextMenu())\n    return true;')
             s = once(s, '  else if (event.m_id == ACTION_GESTURE_BEGIN)\n  {',
                      '  else if (event.m_id == ACTION_GESTURE_BEGIN)\n  {\n    m_infinityUiTapKey.clear();')
-            s = once(s, 'void CGUIBaseContainer::CalculateLayout()\n{',
-                     'void CGUIBaseContainer::CalculateLayout()\n{\n  m_infinityUiTapKey.clear();')
+            # A focus change invalidates the control too. Do not erase the
+            # first tap on that ordinary no-op layout update. Clear only once
+            # CalculateLayout has established a genuine size/template change.
+            s = once(s, '  // ensure that the scroll offset is a multiple of our size\n',
+                     '  m_infinityUiTapKey.clear();\n'
+                     '  // ensure that the scroll offset is a multiple of our size\n')
             s = once(s, 'void CGUIBaseContainer::Reset()\n{',
                      'void CGUIBaseContainer::Reset()\n{\n  m_infinityUiTapKey.clear();')
         path.write_text(s)
