@@ -1,0 +1,36 @@
+name: Infinity | Fail-closed translated descriptor evidence (HOST ONLY)
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths:
+      - '.github/workflows/infinity-translated-descriptor-host-gate.yml'
+      - 'repairs/four-repair-20261018/translated_descriptor_evidence.py'
+      - 'repairs/four-repair-20261018/test_translated_descriptor_evidence.py'
+      - 'repairs/four-repair-20261018/versioncheck_shutdown_probe.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source-only-evidence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Check translated descriptor fail-closed negative controls
+        working-directory: repairs/four-repair-20261018
+        run: |
+          python3 -m unittest -v test_translated_descriptor_evidence.py
+          python3 -m unittest -v test_versioncheck_shutdown_probe.py
+      - name: Confirm assessment has no runtime native or durability changes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('repairs/four-repair-20261018/translated_descriptor_evidence.py').read_text()
+          assert "'durable_close_verified': False" in p
+          assert "'can_override_native_protection': False" in p
+          assert "'fold_accepted': False" in p
+          from translated_descriptor_evidence import assess
+          assert assess({}, {})['durable_close_verified'] is False
+          PY
