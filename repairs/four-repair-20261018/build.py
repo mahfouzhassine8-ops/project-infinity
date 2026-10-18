@@ -70,8 +70,10 @@ def browse_patch(data):
     # in the approved per-add-on menu and can never itself be hidden.
     footer = next(c for c in e.root.findall('./controls/control') if c.get('type') == 'label' and
                   c.findtext('label') == 'INFINITY BROWSE • PICK UP WHERE YOU LEFT OFF')
-    a, _, _, d = e.spans[footer]
-    e.replace(a, d, '''<control type="button" id="13">
+    assert footer.find('visible') is None
+    e.set(footer, 'visible', '![' + condition + ']', 'preserve original footer for other browse views')
+    _, _, _, d = e.spans[footer]
+    e.replace(d, d, '''<control type="button" id="13">
       <left>10.1852%</left><bottom>8</bottom><width>87.4074%</width><height>56</height>
       <label>Restore Hidden Video Sources</label><font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacySecondary]</textcolor><focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
@@ -80,8 +82,13 @@ def browse_patch(data):
       <onclick>RunScript(script.infinity.uirepair,restore)</onclick><onup>50</onup><onleft>12</onleft><onright>50</onright>
       <visible>''' + condition + '''</visible>
     </control>''', 'reversible hide recovery')
-    e.set(grid, 'ondown', '13', 'reachable recovery control')
-    e.set(grid, 'bottom', '80', 'reserve touch space for reversible hide recovery')
+    down = grid.find('ondown')
+    assert down.text == '50'
+    e.attr(down, 'condition', '![' + condition + ']', 'preserve original navigation outside Video Sources')
+    _, _, _, end = e.spans[down]
+    e.replace(end, end, '<ondown condition="' + condition + '">13</ondown>', 'reachable Video Sources recovery control')
+    # The original 70-unit bottom inset already clears the 56+8 recovery
+    # button. Keep the exact tile geometry for every other Browse destination.
     return e.done()
 
 def continue_patch(data):

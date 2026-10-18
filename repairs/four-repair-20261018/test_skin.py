@@ -38,6 +38,20 @@ def check(parent,candidate):
         for name in ('unified/PlayerControls.xml','unified/Custom_1197_InfinityDisplayMode.xml',
                      'unified/DialogContextMenu.xml','unified/FileBrowser.xml'):
             assert before.read(prefix+name)==after.read(prefix+name),name
+        version=ET.fromstring(after.read(prefix+'addon.xml')).get('version')
+        if version == '1.0.5.227':
+            original=ET.fromstring(before.read(prefix+'unified/Custom_1193_InfinityBrowse.xml'))
+            browse=ET.fromstring(after.read(prefix+'unified/Custom_1193_InfinityBrowse.xml'))
+            old_grid=original.find('.//control[@id="50"]'); grid=browse.find('.//control[@id="50"]')
+            for key in ('left','top','width','bottom','itemlayout','focusedlayout'):
+                assert ET.tostring(grid.find(key))==ET.tostring(old_grid.find(key)),key
+            navigation=grid.findall('ondown')
+            assert len(navigation)==2 and [x.text for x in navigation]==['50','13']
+            assert navigation[0].get('condition')=='!['+navigation[1].get('condition')+']'
+            label='INFINITY BROWSE • PICK UP WHERE YOU LEFT OFF'
+            footer=next(c for c in browse.findall('./controls/control') if c.findtext('label')==label)
+            assert footer.findtext('visible')==navigation[0].get('condition')
+            assert browse.find('.//control[@id="13"]/visible').text==navigation[1].get('condition')
         assert after.testzip() is None
     result=dict(passed=True,artifact=Path(candidate).name,sha256=hashlib.sha256(Path(candidate).read_bytes()).hexdigest(),
                 original_rotation_actions=True,white_cyan_states=True,other_playback_actions_preserved=True,
