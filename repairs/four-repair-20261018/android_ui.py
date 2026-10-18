@@ -201,6 +201,13 @@ def run(args):
                                + FULL_SKIN + '</setting>'
                                '<setting id="general.addonupdates">2</setting></settings>')
         probe.adb("push", guisettings, probe.PROFILE + "/guisettings.xml")
+        if getattr(args, 'versioncheck_shutdown_only', False):
+            # All three isolated comparison arms need natural service startup
+            # evidence. Healthy Python retirement need not emit a warning.
+            advanced = out / 'advancedsettings.xml'
+            advanced.write_text('<advancedsettings><loglevel hide="true">1</loglevel></advancedsettings>')
+            probe.adb('push', advanced, probe.PROFILE + '/advancedsettings.xml')
+            report['targeted_debug_file_logging'] = True
 
         extras = out / "confirmation-source"
         extras.mkdir()

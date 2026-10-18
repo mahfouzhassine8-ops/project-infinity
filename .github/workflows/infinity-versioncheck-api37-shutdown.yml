@@ -15,7 +15,9 @@ jobs:
         variant: [locked384, original386, android-guard386]
     runs-on: ubuntu-22.04
     timeout-minutes: 70
-    permissions: {contents: read, actions: read}
+    # Draft release416125865 needs the same repository-scoped access as the
+    # existing API37 job. Keep the overall workflow default read-only.
+    permissions: {contents: write, actions: read}
     env:
       APK_SHA: '342587d9079f7e51b61ef525c04ae9b62adb6d128791164acbd99ec691fbac87'
       PRODUCER_SHA: '91c25df66833add852b69e580ce0f0021eb27a94'

@@ -80,6 +80,23 @@ def require(condition, message):
         raise RuntimeError('Version Check shutdown comparison: ' + message)
 
 
+def startup_evidence(log, observation):
+    """Use existing native/service debug messages, never demand a cleanup error."""
+    runner = observation['addon_path'].rstrip('/') + '/resources/lib/runner.py'
+    lines = log.splitlines()
+    invoked = [line for line in lines if 'CPythonInvoker(' in line and runner in line
+               and any(marker in line for marker in ('start processing', 'the source file to load is',
+                                                     'script successfully run', 'failure in script'))]
+    message = ('Version Check: Disabled' if observation['settings']['versioncheck_enable'] == 'false'
+               else 'Version Check: Version ' + observation['addon_version'] + ' started')
+    service = [line for line in lines if message in line]
+    # A failed original import is a valid negative control, not a healthy-service
+    # pass. The corrected arm must reach the original run()/enabled-setting path.
+    corrected = observation['addon_version'] == '0.5.28+infinity.1'
+    return {'native_invocation': invoked, 'service_run': service,
+            'ready': bool(invoked) and (bool(service) if corrected else True)}
+
+
 def stage_diagnostic(staging):
     folder = Path(staging) / DIAGNOSTIC
     folder.mkdir()
@@ -169,15 +186,17 @@ def before_close(probe, out, report, args):
             'running addon source differs from exact comparison input')
     # Natural startup execution, not a synthetic second Version Check invocation.
     deadline = time.monotonic() + 45
-    seen = []
+    seen = {}
     while time.monotonic() < deadline:
         log = probe.shell('cat', probe.PROFILE + '/../temp/kodi.log', check=False)
-        seen = [line for line in log.splitlines() if ADDON in line and 'runner.py' in line]
-        if seen:
+        seen = startup_evidence(log, observation)
+        if seen['ready']:
             break
         time.sleep(.5)
-    (Path(out) / 'versioncheck-startup-log.txt').write_text('\n'.join(seen) + '\n')
-    require(seen, 'Version Check natural startup execution not observed; no Close result can qualify it')
+    _save(out, 'VERSIONCHECK-NATURAL-STARTUP.json', seen)
+    (Path(out) / 'versioncheck-startup-log.txt').write_text(
+        '\n'.join(seen.get('native_invocation', []) + seen.get('service_run', [])) + '\n')
+    require(seen.get('ready'), 'Version Check natural startup execution not observed; no Close result can qualify it')
     require(_same_live_owner(probe, owner), 'engine changed during read-only evidence collection')
     require(probe.rpc('Favourites.AddFavourite',
                      {'title': FAVOURITE, 'type': 'window', 'window': 'videos',

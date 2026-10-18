@@ -12,6 +12,27 @@ import versioncheck_shutdown_probe as target
 
 
 class TargetedEvidenceTest(unittest.TestCase):
+    def test_healthy_corrected_service_needs_actual_runner_and_original_run_message(self):
+        observation = {'addon_path': '/addons/service.xbmc.versioncheck',
+                       'addon_version': '0.5.28+infinity.1',
+                       'settings': {'versioncheck_enable': 'true'}}
+        native = 'debug: CPythonInvoker(1, /addons/service.xbmc.versioncheck/resources/lib/runner.py): start processing'
+        service = 'debug: Version Check: Version 0.5.28+infinity.1 started'
+        self.assertTrue(target.startup_evidence(native + '\n' + service, observation)['ready'])
+        for text in (native, service, native.replace('/addons/', '/wrong/'),
+                     native + '\n' + service.replace('0.5.28+infinity.1', '0.5.27+matrix.1')):
+            self.assertFalse(target.startup_evidence(text, observation)['ready'])
+        observation['settings']['versioncheck_enable'] = 'false'
+        self.assertTrue(target.startup_evidence(native + '\ndebug: Version Check: Disabled', observation)['ready'])
+
+    def test_original_failed_import_is_observed_without_qualifying_close(self):
+        observation = {'addon_path': '/apk/assets/addons/service.xbmc.versioncheck',
+                       'addon_version': '0.5.27+matrix.1',
+                       'settings': {'versioncheck_enable': 'true'}}
+        native = 'debug: CPythonInvoker(1, /apk/assets/addons/service.xbmc.versioncheck/resources/lib/runner.py): failure in script'
+        self.assertTrue(target.startup_evidence(native, observation)['ready'])
+        self.assertFalse(target.startup_evidence('CAddonMgr::FindAddons: service.xbmc.versioncheck v0.5.27+matrix.1 installed', observation)['ready'])
+
     def setUp(self):
         self.owner = {'owner': 'old', 'pid': 123}
         self.current = dict(self.owner)

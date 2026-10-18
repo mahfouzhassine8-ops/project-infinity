@@ -117,8 +117,11 @@ failed in all three cases before emulator installation/start:
 | original386 |117678634886|draft input retrieval HTTP403|
 | android-guard386 |117678634872|draft input retrieval HTTP403|
 
-All three logs show effective `GITHUB_TOKEN` **Contents:read**, despite the
-job's requested Contents:write. Reading existing unpublished release416125865
+All three logs show effective `GITHUB_TOKEN` **Contents:read**. Rechecking the
+exact committed workflow in05788ec4 confirms that its job also requested
+Contents:read. The earlier report incorrectly said it requested write; this
+was a workflow configuration mistake, not evidence of GitHub overriding a
+write request. Reading existing unpublished release416125865
 returned `Resource not accessible by integration (HTTP403)` before its exact
 asset651868759 could be downloaded. The earlier full API37 run had effective
 Contents:write and could read this same asset. No permission policy was changed,
@@ -130,11 +133,21 @@ The unchanged seven Close-validator tests also pass locally (26 focused host
 and guard tests total). Locked-source protection run39128510888 passed. None
 of these results is an API37 shutdown pass.
 
-Unblock by granting this workflow the existing authorized draft-input access,
-or providing the identical approved `Infinity-Full-Stack-CI-Inputs-225.zip` as
-an Actions artifact it can read. Preserve the original input SHA256
+The correction sets only the targeted job to the same Contents:write access
+already used by the existing API37 workflow. The workflow-level default stays
+read-only. No repository-wide policy, credential, release visibility or input
+changes are needed. Preserve the original input SHA256
 `852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834`.
 Do not blindly rerun unchanged jobs. No equivalent API37 Close receipt or
 app-UID path evidence was produced by these three jobs; the precise native
 read-only predicate remains unobserved. The correction remains experimental
 and is not qualified for physical installation or final lock.
+
+Before relaunching the comparison, the observation gate was also corrected:
+all three disposable arms now enable debug file logging before startup. The
+probe requires the exact native runner path/invocation; the corrected arm must
+also reach the service's existing exact-version `started` or configured
+`Disabled` message. A healthy service need not produce a cleanup warning or
+exception. The two new host tests reject inventory-only, wrong-path,
+wrong-version and missing run evidence. No addon package or Close assertion
+changes accompany this collection correction.
