@@ -64,6 +64,26 @@ def current_pid(adb, serial):
     return None, 'not_running'
 
 
+def observe_transition(previous, missing, pid, state):
+    """Return (active_pid, missing_samples, event, departed_pid).
+
+    PID replacement can happen faster than a polling interval. Retain the
+    previous PID for exit-info collection even if a new engine is already live.
+    Neither disappearance nor replacement alone proves a native crash.
+    """
+    if state == 'observed':
+        if previous is None:
+            return pid, 0, 'engine_observed', None
+        if pid != previous:
+            return pid, 0, 'engine_pid_replaced', previous
+        return previous, 0, None, None
+    if state == 'not_running' and previous is not None:
+        if missing + 1 >= 2:
+            return None, 0, 'engine_no_longer_observed', previous
+        return previous, missing + 1, None, None
+    return previous, 0 if state == 'adb_unavailable' else missing, None, None
+
+
 class RingLog:
     """Retain the newest four 16-MiB logcat segments without unbounded growth."""
     def __init__(self, folder, segment_bytes=16*1024*1024, max_files=4):
@@ -170,21 +190,15 @@ def main():
     try:
         while time.monotonic() < end:
             pid, state = current_pid(adb, serial)
-            if state == 'observed':
-                if pid != previously_running:
-                    events.append({'time_utc': now(), 'event': 'engine_observed', 'pid': pid})
-                previously_running = pid
-                missing = 0
-            elif state == 'not_running' and previously_running:
-                missing += 1
-                if missing >= 2:
-                    events.append({'time_utc': now(), 'event': 'engine_no_longer_observed',
-                                   'prior_pid': previously_running, 'cause': 'unknown'})
-                    capture_exit(adb, serial, folder, previously_running, len(events))
-                    previously_running = None
-                    missing = 0
-            elif state == 'adb_unavailable':
-                missing = 0  # Never claim a crash when only ADB dropped.
+            previously_running, missing, event, departed = observe_transition(
+                previously_running, missing, pid, state)
+            if event:
+                record = {'time_utc': now(), 'event': event, 'cause': 'unknown'}
+                if previously_running is not None: record['pid'] = previously_running
+                if departed is not None: record['prior_pid'] = departed
+                events.append(record)
+            if departed is not None:
+                capture_exit(adb, serial, folder, departed, len(events))
             (folder / 'TIMELINE.json').write_text(json.dumps(events, indent=2))
             time.sleep(3)
     except KeyboardInterrupt:
