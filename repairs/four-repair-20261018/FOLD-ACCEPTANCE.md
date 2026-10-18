@@ -16,23 +16,22 @@ locked APK 2103384. Install the ZIP through Kodi's existing add-on installer as
 an update to `skin.infinity.diggz`; retain the existing settings. Verify the
 installed version is 1.0.5.226. It does not restore the two new context menus.
 
-**Coordinated candidate — skin 1.0.5.227 + Item Options 0.1.0 + APK 2103385.**
+**Coordinated candidate — skin 1.0.5.227 + Item Options 0.1.0 + APK 2103386.**
 The new touch behavior requires the matching input engine. Do not treat this
 combination as ready until its **exact signed APK** passes the fresh/loaded
-Android Close/reopen gate. A skin ZIP build alone is insufficient. Install the
+Android Close/reopen gate and the full UI/Stop matrix. APK 2103386 retains the
+2103385 input engine and adds only the API 30 system-bar compatibility repair.
+A skin ZIP build alone is insufficient. Install the
 permanent-signed APK as an in-place update, then the helper ZIP, then the full
 skin ZIP. Preserve Command Center 0.3.5.20 and Rails 0.2.6. The helper checks the
 original controller source hashes and refuses writes if they differ.
 
-The separate `Infinity-2103385-2103384-Compatibility-Return.apk` contains the
-locked 2103384 native engine at the same experimental version code, so returning
-does not require uninstalling. It is a signed recovery candidate, not a newly
-locked baseline; its own Android installation/Close qualification is separate.
-Before using it, return the skin to .226 (or the retained .225) through the
-normal installer and complete Essential-First Close. Keep the helper installed
-but unused. Never try to solve an installation problem by clearing data.
+The older `Infinity-2103385-2103384-Compatibility-Return.apk` is retained for
+2103385 only. Its lower version code is not an in-place return from 2103386.
+Do not attempt a downgrade or uninstall. A same-or-higher-version compatibility
+return must be separately built, signed and qualified before using it.
 
-Record the APK SHA-256 from `SIGNED-2103385.json` and the installed skin/helper
+Record the APK SHA-256 from `SIGNED-2103386.json` and the installed skin/helper
 versions. An APK from a different run is a different candidate. Android tests
 use disposable emulator profiles only; the user's installed environment is
 never a clean-state test target.
