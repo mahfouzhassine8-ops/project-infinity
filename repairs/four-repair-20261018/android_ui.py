@@ -266,6 +266,15 @@ def run(args):
         require(report.get("close_certified") is True and
                 report.get("reopen_succeeded") is True,
                 "Native Infinity loaded Close and reopen proof incomplete")
+        saved=probe.read_json(probe.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
+        require(len(report['ui_expected_watchlist'])==2 and
+                all(key in saved.get('watchlist',{}) for key in report['ui_expected_watchlist']),
+                'Movie/episode Watchlist state was lost on actual Close/reopen')
+        favourites=probe.rpc('Favourites.GetFavourites',{'properties':['windowparameter']})
+        require(any(f.get('windowparameter')==report['ui_expected_favourite']
+                    for f in favourites.get('favourites',[])),
+                'Add-on favourite was lost on actual Close/reopen')
+        report['ui_mutations_survived_actual_restart']=True
         report["passed"] = True
         publish("complete-Infinity-full-stack-loaded-Close-and-reopen")
         return report

@@ -139,6 +139,7 @@ def exercise(probe, out, report):
     favourites = probe.rpc('Favourites.GetFavourites', dict(properties=['windowparameter']))
     require(any(f.get('windowparameter') == 'plugin://'+selected+'/' for f in favourites['favourites']),
             'favourite destination not saved')
+    report['ui_expected_favourite'] = 'plugin://'+selected+'/'
     probe.rpc('Input.ContextMenu'); menu=wait_for(popup,'hide menu')
     invoke(menu,'Hide from This View')
     wait_for(lambda s:not popup(s) and all(r.get('token') != selected for r in s['controls']['50'].get('items',[])),
@@ -153,6 +154,7 @@ def exercise(probe, out, report):
     capture('hidden-fixture-restored')
 
     # Resume Home items retain their original movie and episode identity.
+    report['ui_expected_watchlist'] = []
     for media, section, ident in (('movie', 'movies', 8830), ('tv','tvshows',8831)):
         observe('home', section)
         home = wait_for(lambda s: s['window'] == 10000 and
@@ -171,6 +173,18 @@ def exercise(probe, out, report):
         require(popup(observe()), 'Mark Watched ran on focus')
         back()
         require(observe()['window'] == 10000, 'Resume dismissal left Home')
+        # Cross the real helper -> original controller writer boundary, then
+        # verify the same movie/episode memberships after actual process restart.
+        key=token(home,ident)
+        require(len(key)==64,'Continue identity unavailable')
+        tap(observe(),xy,hold=True)
+        menu=wait_for(popup,'Watchlist mutation for '+media)
+        invoke(menu,'Add to Watchlist')
+        data_path=probe.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'
+        wait_for(lambda s:not popup(s) and key in probe.read_json(data_path).get('watchlist',{}),
+                 'original controller durable Watchlist mutation')
+        report['ui_expected_watchlist'].append(key)
+        capture('continue-'+media+'-watchlist-saved')
 
     # Exercise the exact player teardown and both navigation paths with public
     # local media. This cannot diagnose or rule out the physical Fold failure.
