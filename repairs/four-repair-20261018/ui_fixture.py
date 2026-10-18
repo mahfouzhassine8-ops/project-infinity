@@ -97,11 +97,12 @@ try:
             result['controls'][str(ident)] = row
         except Exception as exc:
             result['controls'][str(ident)] = dict(error=str(exc))
-    try:
-        viewport = home.getControl(39799)
-        result['viewport'] = [viewport.getWidth(), viewport.getHeight()]
-    except Exception:
-        result['viewport'] = [int(xbmc.getInfoLabel('System.ScreenWidth')), int(xbmc.getInfoLabel('System.ScreenHeight'))]
+    # Inactive Home controls retain their last processed size after a fold.
+    # Input coordinates must use the live native display, like the active
+    # Browse panel and the popup's 100% backdrop, not cached Home geometry.
+    result['viewport'] = [int(xbmc.getInfoLabel('System.ScreenWidth')),
+                          int(xbmc.getInfoLabel('System.ScreenHeight'))]
+    result['viewport_source'] = 'live-native-System.ScreenWidth/ScreenHeight'
     for ident in (50, 8830, 8831):
         for suffix in ('ListItem.Property(Infinity.UI.Token)', 'ListItem.Label', 'NumItems', 'Position', 'CurrentPage'):
             key = 'Container(' + str(ident) + ').' + suffix

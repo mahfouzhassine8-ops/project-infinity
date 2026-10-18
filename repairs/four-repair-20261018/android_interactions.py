@@ -43,6 +43,10 @@ def exercise(probe, out, report):
         png = probe.adb('exec-out', 'screencap', '-p', binary=True)
         width, height = struct.unpack('>II', png[16:24])
         vw, vh = state['viewport']
+        if popup(state):
+            backdrop=state['controls']['2']
+            require([backdrop['width'],backdrop['height']]==[vw,vh],
+                    'observer viewport differs from the actual popup backdrop')
         return round(x * width / vw), round(y * height / vh)
     def tap(state, xy, hold=False):
         x, y = point(state, *xy)
@@ -131,7 +135,7 @@ def exercise(probe, out, report):
                         'menu ordering/capabilities wrong for '+selected+': '+repr(labels))
                 capture(viewport + '-' + theme.lower() + '-' + side + '-menu', menu)
                 tap(menu, rowpoint(menu, 'Open'))
-                require(popup(observe()), 'Open activated when merely selected')
+                require(popup(observe()), 'Selecting Open did not keep the popup open')
                 back()
                 restored = observe()
                 require(restored['window'] == 11193 and token(restored) == selected and
