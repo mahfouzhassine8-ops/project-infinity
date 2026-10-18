@@ -104,6 +104,7 @@ try:
         for suffix in ('ListItem.Property(Infinity.UI.Token)', 'ListItem.Label', 'NumItems', 'Position', 'CurrentPage'):
             key = 'Container(' + str(ident) + ').' + suffix
             result['labels'][key] = xbmc.getInfoLabel(key)
+    result['labels']['Container.FolderPath'] = xbmc.getInfoLabel('Container.FolderPath')
 except Exception:
     result['error'] = traceback.format_exc()
 result['request'] = sys.argv[-1]

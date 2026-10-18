@@ -29,7 +29,9 @@ def exercise(probe, out, report):
         require(png.startswith(b'\x89PNG\r\n\x1a\n'), 'No actual Android screenshot')
         (out / (name + '.png')).write_bytes(png)
         row = dict(name=name, state=state or observe(), physical_size=struct.unpack('>II', png[16:24]))
-        records.append(row); save(); return row
+        records.append(row); save()
+        print('INFINITY UI OBSERVATION:', name, flush=True)
+        return row
     def wait_for(predicate, label, seconds=30):
         end = time.monotonic() + seconds
         while time.monotonic() < end:
@@ -71,6 +73,14 @@ def exercise(probe, out, report):
         observe('browse')
         return wait_for(lambda s: s['window'] == 11193 and
             int(s['labels'].get('Container(50).NumItems') or 0) >= 12, 'complete Video Sources grid')
+    def provider_ready(state, addon):
+        # Window activation precedes the asynchronous directory load. Back
+        # while dialog 10138 is active cancels that load and is a different
+        # operation from returning from the successfully opened add-on.
+        return (state['window'] == 10025 and state['dialog'] in (0, 9999) and
+                state['labels'].get('Container.FolderPath', '').startswith('plugin://' + addon + '/') and
+                any(row.get('label') == 'Infinity UI public movie'
+                    for row in state['controls'].get('50', {}).get('items', [])))
 
     # This is an isolated emulator media fixture, never user playback content.
     movie = Path('infinity-ui-fixture.mp4')
@@ -122,7 +132,8 @@ def exercise(probe, out, report):
                         'dismissal changed selection or scroll')
                 # The original first tap is still armed after harmless dismissal.
                 tap(restored, xy)
-                opened = wait_for(lambda s: s['window'] == 10025, 'second-tap add-on open')
+                opened = wait_for(lambda s: provider_ready(s, selected),
+                                  'second-tap completed correct add-on listing')
                 capture(viewport + '-' + theme.lower() + '-' + side + '-opened', opened)
                 back(); state = wait_for(lambda s: s['window'] == 11193, 'return to exact grid')
             # Scroll through the real native panel; hold must follow the new item.
@@ -202,7 +213,7 @@ def exercise(probe, out, report):
     # local media. This cannot diagnose or rule out the physical Fold failure.
     for path in ('A', 'B'):
         observe('choices')
-        wait_for(lambda s:s['window']==10025, 'provider movie choices')
+        wait_for(lambda s:provider_ready(s,'plugin.video.infinityuitest0'), 'completed provider movie choices')
         probe.rpc('Player.Open', dict(item=dict(file=probe.PROFILE+'/'+movie.name)))
         deadline = time.monotonic()+35
         while time.monotonic()<deadline:
