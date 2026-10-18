@@ -443,8 +443,8 @@ def run(args):
             observed = {}
             while time.monotonic() < deadline:
                 observed = probe.read_json(probe.PROFILE + '/infinity-all-in-one-selected.json')
-                if observed.get('owner') == report['native_owner']['owner'] and
-                        observed.get('pid') == report['native_owner']['pid']:
+                if (observed.get('owner') == report['native_owner']['owner'] and
+                        observed.get('pid') == report['native_owner']['pid']):
                     break
                 time.sleep(.25)
             (out / 'ALL-IN-ONE-SELECTED.json').write_text(json.dumps(observed, indent=2) + '\n')
