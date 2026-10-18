@@ -34,6 +34,16 @@ class WatchSafetyTests(unittest.TestCase):
         with patch.object(watch.subprocess, 'run', side_effect=disconnected):
             self.assertEqual(watch.current_pid('adb','phone'), (None,'adb_unavailable'))
 
+    def test_fast_pid_replacement_preserves_old_process_for_exit_evidence(self):
+        self.assertEqual(watch.observe_transition(123, 0, 456, 'observed'),
+                         (456, 0, 'engine_pid_replaced', 123))
+        self.assertEqual(watch.observe_transition(123, 0, None, 'not_running'),
+                         (123, 1, None, None))
+        self.assertEqual(watch.observe_transition(123, 1, None, 'not_running'),
+                         (None, 0, 'engine_no_longer_observed', 123))
+        self.assertEqual(watch.observe_transition(123, 1, None, 'adb_unavailable'),
+                         (123, 0, None, None))
+
     def test_snapshot_is_nonauthoritative_and_preserves_failures(self):
         with tempfile.TemporaryDirectory() as tmp:
             with patch.object(watch, 'command', return_value={'returncode':1,'stdout':'','stderr':'denied'}):
