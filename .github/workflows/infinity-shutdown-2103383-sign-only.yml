@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
+      NDK_VER: 21.4.7075529
       NATIVE_RUN: 39083031276
       ORIGINAL_SIGNED_TEST3_RUN: 39004584047
       NATIVE_COMMIT: 3e5e5e4f8d65464153243de9179dd24fb090d05e
