@@ -25,6 +25,11 @@ jobs:
         run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_shutdown_source_lineage.py' -v
       - name: Check THE CREW and all optional / protected write error boundaries (native C++ plus 11 negative controls)
         run: python3 repairs/full-system-20261017/test_write_error_scope.py
+      - name: Compile real Infinity optional-writer error attribution and essential fail-closed cases
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/full-system-20261017/optional_writer_provenance_patch.py repairs/full-system-20261017/test_optional_writer_provenance.py
+          python3 repairs/full-system-20261017/test_optional_writer_provenance.py
       - name: Verify FULL skin/Rails package rejection and no Kodi substitution
         run: python3 -m unittest discover -s repairs/full-system-20261017 -p 'test_infinity_full_stack_assets.py' -v
       - name: Syntax-compile exact full-stack setup and real-APK emulator runner
