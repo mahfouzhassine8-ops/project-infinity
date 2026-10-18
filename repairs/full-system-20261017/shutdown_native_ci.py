@@ -34,7 +34,7 @@ overlay = module(HERE / "shutdown_native_overlay.py", "independent_close_overlay
 
 def prepare(args):
     parent.prepare(args)
-    ancestor = parent.parent.parent.parent
+    ancestor = parent.parent.parent.parent.parent
     source_manifest = ancestor.native_manifest(ancestor.stable())
     proof = overlay.apply(ROOT / "kodi", OUT, source_manifest)
     assert proof["changed"] == ["xbmc/platform/android/activity/InfinityProtectedWrites.h"]
