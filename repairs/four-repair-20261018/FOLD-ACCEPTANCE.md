@@ -117,6 +117,19 @@ For a left tile and a right tile, including tiles after scrolling:
 
 ## 4. Exit/lifecycle paths — crash remains unresolved
 
+**Optional passive capture instead of deliberate reproduction:** The checked-in
+`fold_passive_crash_watch.py` runs on the user's Mac with authorized ADB,
+observes the existing Kodi engine process while the user uses Infinity normally,
+retains a bounded rolling crash/main/system logcat, and collects historical
+exit-info and available tombstone/DropBox records if that process disappears.
+It never force-stops Infinity, clears logs or data, installs anything, or
+uploads private reports. A missing PID alone is not called a crash.
+See `FOLD-PASSIVE-CRASH-WATCH.md`. The observer and its host safety checks
+are not substitutes for a native fatal stack, a durability receipt, or
+physical Fold acceptance.
+
+
+
 Run each path separately, ideally first on the retained 2103384 + .226 skin and
 then on a qualified coordinated candidate. Use the same privately recorded
 source and playback settings for comparison.
