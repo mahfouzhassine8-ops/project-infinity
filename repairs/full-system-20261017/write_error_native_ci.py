@@ -31,7 +31,7 @@ def prepare(args):
     # Parent reconstructs exact locked TEST4, preserves full TEST3 delta and
     # applies only the verified 2103383 missing-installer-stage correction.
     parent.prepare(args)
-    ancestor=parent.parent.parent.parent.parent
+    ancestor=parent.parent.parent.parent.parent.parent
     manifest=ancestor.native_manifest(ancestor.stable())
     proof=scope.apply(ROOT/"kodi",OUT,manifest)
     assert len(proof["changed"])==4
