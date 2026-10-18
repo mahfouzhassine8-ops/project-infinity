@@ -31,7 +31,7 @@ def prepare(args):
     # Parent reconstructs exact locked TEST4, preserves full TEST3 delta and
     # applies only the verified 2103383 missing-installer-stage correction.
     parent.prepare(args)
-    ancestor=parent.parent.parent.parent.parent.parent
+    ancestor=parent.parent.parent.parent.parent
     manifest=ancestor.native_manifest(ancestor.stable())
     proof=scope.apply(ROOT/"kodi",OUT,manifest)
     assert len(proof["changed"])==4
@@ -51,7 +51,7 @@ def compile_engine():
         raise RuntimeError("Previously approved TEST3/2103383 native engine proof incomplete")
     if original.get("shutdown_policy")!="essential_first_process_exit_v1":
         raise RuntimeError("Original Essential-First policy replaced")
-    if original.get("source_commit") != changed.get("source_provenance") != os.environ.get("GITHUB_SHA"):
+    if not (original.get("source_commit") == changed.get("source_provenance") == os.environ.get("GITHUB_SHA")):
         raise RuntimeError("Native source identity not established")
     for path,digest in changed["after"].items():
         actual=hashlib.sha256((ROOT/"kodi"/path).read_bytes()).hexdigest()
