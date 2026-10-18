@@ -2,6 +2,7 @@
 #include "InfinityProtectedWrites.h"
 #include <cassert>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -52,6 +53,56 @@ int main()
   // If even the trusted scratch root is absent, fail: no durable anchor.
   fs::remove(scratch);
   assert(!SyncProtectedPath(staged.string(), profiles));
+
+  // "Independent shutdown" must mean existing essential saves are retained,
+  // future optional producers cannot open new protected writes, and a dirty
+  // transaction/buffer NEVER becomes a manufactured save receipt.
+  const auto dbdir = profile / "Database";
+  fs::create_directories(dbdir);
+  const auto database = dbdir / "ResumeHub.db";
+  {
+    std::ofstream stored(database);
+    stored << "original-data-preserved";
+  }
+  constexpr uint64_t closeGeneration = 2103383;
+  assert(InfinityScriptPersistence::BeginWriteProtection(closeGeneration, profiles, {}));
+  InfinityScriptPersistence::RegisterParticipant(41);
+  // Only the verified canonical participant may begin an essential save after
+  // Close requests admission freeze. Unknown new addon writes are refused.
+  const auto unauthorized = InfinityScriptPersistence::BeginProtectedOperation(
+      500, {database.string()}, "new_optional_provider_write");
+  assert(unauthorized == 0);
+  const auto essential = InfinityScriptPersistence::BeginProtectedOperation(
+      41, {database.string()}, "existing_essential_save");
+  assert(essential != 0);
+  assert(InfinityScriptPersistence::CloseParticipantWrites(closeGeneration));
+  assert(!InfinityScriptPersistence::SealEssentialWrites(closeGeneration));
+  InfinityScriptPersistence::EndProtectedOperation(essential);
+
+  // A real uncommitted database transaction must keep authorization blocked,
+  // even if optional interpreter retirement has already finished.
+  InfinityScriptPersistence::SetProtectedTransaction(
+      "resume-txn", database.string(), true);
+  assert(!InfinityScriptPersistence::SealEssentialWrites(closeGeneration));
+  InfinityScriptPersistence::SetProtectedTransaction(
+      "resume-txn", database.string(), false);
+  InfinityScriptPersistence::SetProtectedBuffer(
+      41, "resume-buffer", {database.string()}, true);
+  assert(!InfinityScriptPersistence::SealEssentialWrites(closeGeneration));
+  InfinityScriptPersistence::SetProtectedBuffer(
+      41, "resume-buffer", {database.string()}, false);
+
+  assert(InfinityScriptPersistence::SealEssentialWrites(closeGeneration));
+  assert(InfinityScriptPersistence::EssentialWritesAuthorized(closeGeneration));
+  assert(!InfinityScriptPersistence::BeginProtectedOperation(
+      41, {database.string()}, "post_seal_essential_write"));
+  assert(InfinityScriptPersistence::EssentialWritesAuthorized(closeGeneration));
+  assert(fs::exists(database));
+  std::ifstream saved(database);
+  std::string persisted;
+  std::getline(saved, persisted);
+  assert(persisted == "original-data-preserved");
+
   fs::remove_all(root);
-  std::cout << "PASS: removed installer UUID stage sync and essential-protection negatives\n";
+  std::cout << "PASS: installer UUID stage durability and independent Essential-First admission/transaction/seal negatives\n";
 }
