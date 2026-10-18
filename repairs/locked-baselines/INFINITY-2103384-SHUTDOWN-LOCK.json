@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "status": "LOCKED — USER APPROVED ON PHYSICAL FOLD FOR SHUTDOWN",
+  "approval": {
+    "date_local": "2026-10-17",
+    "user_authorized": true,
+    "scope": "APK native shutdown baseline only",
+    "final_lock_scope": "shutdown baseline; NOT comprehensive feature completion"
+  },
+  "product": {
+    "name": "Infinity",
+    "android_package": "com.projectinfinity.kodi",
+    "version_code": 2103384,
+    "android_abi": "arm64-v8a",
+    "signed_filename": "Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk",
+    "sha256": "b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af",
+    "bytes": 160113463,
+    "embedded_native_engine": "lib/arm64-v8a/libkodi.so",
+    "embedded_native_sha256": "f47c6f3473a45438a533ecfa57dd196bac6d794227b16c4fb7888636e8f4408d",
+    "signing_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "only_payload_changes_from_2103383": [
+      "AndroidManifest.xml",
+      "lib/arm64-v8a/libkodi.so"
+    ],
+    "original_data_preservation": true
+  },
+  "provenance": {
+    "tested_branch_source_snapshot": "6b274a4300fd9b912cbc34105e3be95ecb01c78d",
+    "native_compilation_source": "3795b1b03731cba567e091913299c1888805373c",
+    "native_compilation_run": 39088898437,
+    "native_compilation_result": "linked successfully; workflow RED on stale post-link provenance comparison; independent ELF+full-source verification later passed; original red not rewritten",
+    "recovered_binary_verified_sha256": "803552debcb883a46778e7c84bf25fa8dbd51e90d5c5025f8145dbf66560d405",
+    "signed_apk_workflow_run": 39091057069,
+    "signed_apk_artifact_id": 12122957255,
+    "signed_apk_artifact_name": "Infinity-2103384-FAST-SIGNED-Experimental-APK-and-Return",
+    "signed_apk_job": "sign-previously-built-engine — SUCCESS",
+    "signed_apk_workflow_conclusion": "failure (later Android shell harness failure; signing succeeded)",
+    "android_real_apk_run": 39091870631,
+    "android_real_apk_overall_conclusion": "success",
+    "android_real_apk_scenarios": {
+      "fresh": "success",
+      "loaded": "success"
+    }
+  },
+  "acceptance": {
+    "actual_signed_apk_emulator_sha256": "b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af",
+    "fresh_android": {
+      "passed": true,
+      "shutdown_phase": "COMPLETE",
+      "checkpoint_saved": true,
+      "reopen_verified": true,
+      "favourites_preserved": true,
+      "whole_package_death_verified": true,
+      "diagnostics_artifact_id": 12122694795
+    },
+    "loaded_android": {
+      "passed": true,
+      "scenario": "in-place upgrade, loaded with 37 synthetic services",
+      "saved_data_reopen_verified": true,
+      "full_user_diggz_installation_reproduced": false,
+      "physical_fold_reproduced": false,
+      "diagnostics_artifact_id": 12123013440
+    },
+    "physical_fold": {
+      "user_approved_lock": true,
+      "private_diagnostics_filename": "Infinity-Diagnostics-20261017-233816.zip",
+      "private_diagnostics_sha256": "533a00c3070121f24ce0e781b48e51a5f44c7d0b697512896b9af00a6c78703d",
+      "physical_apk_code_association": "User identified testing 2103384; coordinator receipt itself does not include embedded APK hash or versionCode",
+      "receipt_phase": "COMPLETE",
+      "total_duration_ms": 6627,
+      "essential_save_owners": 16,
+      "essential_writes_sealed": true,
+      "essential_writes_durable": true,
+      "essential_write_blockers": [],
+      "checkpoint_saved": true,
+      "authorization_consumed": true,
+      "engine_process_death_confirmed": true,
+      "whole_package_death_confirmed": false,
+      "receipt_error": "",
+      "optional_unfinished_writers": 4,
+      "original_crews_vfs_exception_reproduced": false,
+      "user_content_reopen_validation": "No independent post-reopen content-level evidence in provided shutdown ZIP"
+    }
+  },
+  "components": {
+    "protected_locked_apk_only": true,
+    "observed_installed_skin_id": "skin.infinity.diggz",
+    "observed_installed_skin_version": "1.0.5.225",
+    "observed_skin_not_promoted_to_separate_locked_baseline": true,
+    "existing_locked_skin_version": "1.0.5.223",
+    "protected_rails_helper": "0.2.6",
+    "preserve_existing_diggz_and_addons": true,
+    "preserve_existing_cobra": true
+  },
+  "constraints": {
+    "no_clean_install": true,
+    "no_uninstall": true,
+    "no_clear_data": true,
+    "no_swap_to_stock_kodi": true,
+    "use_2103384_native_as_parent_of_future_feature_work": true,
+    "never_modify_locked_branch": true,
+    "every_new_signed_apk_must_install_as_in_place_update_with_same_signer": true,
+    "native_shutdown_coordinator_and_write_protection_frozen_until_explicit_review": true,
+    "never_relax_essential_writes_durable_proof": true,
+    "every_feature_candidate_requires_exact_signed_apk_android_fresh_loaded_close_reopen": true,
+    "every_feature_candidate_requires_physical_fold_close_reopen_and_user_lock_approval": true,
+    "failure_means_do_not_replace_this_locked_reference": true
+  },
+  "known_limits": [
+    "Current authorized scope is shutdown stability, not all missing/retired UI, sports, controls, watched/Resume/Watchlist, add-on touch/recovery or full skin refinement.",
+    "Previously captured exact The Crew VFS failure has not been recreated on this new binary.",
+    "No physical-Fold whole-package process-death or full content-level reopen proof is established by this receipt.",
+    "GitHub Actions APK artifact currently has retention limits; SHA/source+tool receipts are pinned here, but a durable binary backup should also be retained separately."
+  ]
+}
