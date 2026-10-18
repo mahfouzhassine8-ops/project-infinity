@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import re
 import struct
+import subprocess
 import time
 import xml.etree.ElementTree as ET
 
@@ -26,16 +27,47 @@ def exercise(probe, out, report):
                 return row
             time.sleep(.2)
         raise RuntimeError('UI observer did not complete')
+    def diagnostic_dump(name, service):
+        # API35 run 39122376332 exited on one dumpsys input read, although
+        # its immediately subsequent final dump succeeded. Keep failed stdout
+        # (the original adb helper keeps only stderr) and retry this read once.
+        # Never retry a gesture or waive a required application assertion.
+        for attempt in (1, 2):
+            started = time.monotonic()
+            try:
+                result = subprocess.run(['adb', 'shell', 'dumpsys', '-t', '30', service],
+                                        capture_output=True, text=True, timeout=40)
+                stdout, stderr, code = result.stdout, result.stderr, result.returncode
+            except subprocess.TimeoutExpired as exc:
+                def decoded(value):
+                    return value.decode(errors='replace') if isinstance(value, bytes) else value or ''
+                stdout, stderr, code = decoded(exc.stdout), decoded(exc.stderr), None
+            stem = name + '-' + service + '-attempt-' + str(attempt)
+            (out / (stem + '-stdout.txt')).write_text(stdout)
+            (out / (stem + '-stderr.txt')).write_text(stderr)
+            valid = (code == 0 and 'DUMP TIMEOUT' not in stdout and
+                     ('Input Dispatcher State:' in stdout if service == 'input'
+                      else 'WINDOW MANAGER' in stdout))
+            report.setdefault('diagnostic_reads', []).append(dict(
+                name=name, service=service, attempt=attempt, returncode=code,
+                seconds=round(time.monotonic()-started, 3), complete=valid))
+            if valid:
+                return stdout
+            print('INFINITY diagnostic read incomplete:', stem, 'returncode', code, flush=True)
+        require(False, 'required ' + service + ' dump unavailable after two recorded read attempts')
+
     def capture(name, state=None):
         png = probe.adb('exec-out', 'screencap', '-p', binary=True)
         require(png.startswith(b'\x89PNG\r\n\x1a\n'), 'No actual Android screenshot')
         (out / (name + '.png')).write_bytes(png)
-        # Retain OS input ownership before/after gestures, not only at failure.
-        # This distinguishes app selection changes from nav_input_consumer.
-        (out / (name + '-windows.txt')).write_text(probe.shell('dumpsys', 'window'))
-        (out / (name + '-input.txt')).write_text(probe.shell('dumpsys', 'input'))
+        # Save the observed app state before secondary OS diagnostics so a
+        # diagnostic collection failure cannot discard that gesture's result.
         row = dict(name=name, state=state or observe(), physical_size=struct.unpack('>II', png[16:24]))
         records.append(row); save()
+        # Retain OS input ownership before/after gestures, not only at failure.
+        # This distinguishes app selection changes from nav_input_consumer.
+        (out / (name + '-windows.txt')).write_text(diagnostic_dump(name, 'window'))
+        (out / (name + '-input.txt')).write_text(diagnostic_dump(name, 'input'))
         print('INFINITY UI OBSERVATION:', name, flush=True)
         return row
     def wait_for(predicate, label, seconds=30):
@@ -245,10 +277,16 @@ def exercise(probe, out, report):
                 endx, endy = point(state, grid['position'][0] + grid['width'] * .75, grid['position'][1] + grid['height'] * .3)
                 probe.shell('input','swipe',x,y,endx,endy,500); time.sleep(1)
                 xy = (grid['position'][0] + (columns - .5) * item_width, grid['position'][1] + item_height * .5)
-                tap(state, xy); scrolled = observe(); tap(scrolled, xy, hold=True)
+                tap(state, xy); scrolled = observe()
+                capture(viewport+'-'+theme.lower()+'-scrolled-selected', scrolled)
+                tap(scrolled, xy, hold=True)
                 menu = wait_for(menu_ready, 'scrolled item menu'); capture(viewport+'-'+theme.lower()+'-scrolled', menu)
                 back(); restored = observe()
                 require(token(restored) == token(scrolled), 'scrolled popup dismissed to wrong item')
+                capture(viewport+'-'+theme.lower()+'-scrolled-dismissed', restored)
+                require(restored['labels'].get('Container(50).CurrentPage') ==
+                        scrolled['labels'].get('Container(50).CurrentPage'),
+                        'scrolled popup dismissal changed page')
 
     # Run the remaining state/Home/Stop gates first. The exact prior package
     # already passed the full grid matrix; retain and rerun that entire matrix
