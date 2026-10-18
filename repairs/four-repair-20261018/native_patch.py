@@ -35,6 +35,19 @@ bool CGUIBaseContainer::OnInfinityUiTouch(float x, float y, bool hold)
   const std::string token = item->GetProperty("Infinity.UI.Token").asString();
   const bool safe = !token.empty() && token.size() <= 200 &&
       token.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.-") == std::string::npos;
+  // INFINITY_VIDEO_SOURCES_IDENTITY_V1: Video Sources projection only.
+  // Kodi's selected item and its separately supplied Addon.ID must agree.
+  // Otherwise the ordinary Kodi fallback could launch a different add-on on
+  // the second tap. Consume the malformed opt-in touch without launching;
+  // do not change unmarked tiles, other windows, or Cobra input handling.
+  if (browse && item->GetProperty("Infinity.UI.Version").asString() == "1" &&
+      kind == "addon" &&
+      (!safe || token != item->GetProperty("Addon.ID").asString()))
+  {
+    SelectItem(previous);
+    m_infinityUiTapKey.clear();
+    return true;
+  }
   if (item->GetProperty("Infinity.UI.Version").asString() != "1" || !safe ||
       (resume && kind != "resume") || (browse && kind != "addon") || (popup && kind != "action"))
   {

@@ -1,0 +1,24 @@
+name: Infinity | #3 Video Sources exact touch identity (HOST ONLY)
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths:
+      - 'repairs/four-repair-20261018/native_patch.py'
+      - 'repairs/four-repair-20261018/test_native.py'
+      - 'repairs/four-repair-20261018/test_item3_video_source_identity.py'
+      - '.github/workflows/infinity-item3-video-source-input.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  targeted-browse-input:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Compile unchanged normal Video Sources, Resume and popup gesture cases
+        run: python3 repairs/four-repair-20261018/test_native.py
+      - name: Prove original wrong-addon behavior and corrected opt-in-only path
+        run: python3 repairs/four-repair-20261018/test_item3_video_source_identity.py
