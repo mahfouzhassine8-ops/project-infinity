@@ -34,6 +34,13 @@ int main(int argc,char**argv) {
   const int id=8;
   IS::Admit(id,"plugin.video.thecrew:service.py");
   IS::Observed(id);
+  // A prior essential write by the same Python service prevents us from
+  // falsely classifying its later failed handle as optional-only.
+  if(which=="mixed-profile-writes") {
+    auto earlier=IS::BeginProtectedOperation(id,{essentialPath},"vfs.write");
+    assert(earlier);
+    IS::EndProtectedOperation(earlier);
+  }
   // Simulate the exact failed VFS write that was logged by the physical Fold.
   const std::string leased = which=="essential" ? essentialPath :
                              which=="settings" ? settingsPath : addonPath;

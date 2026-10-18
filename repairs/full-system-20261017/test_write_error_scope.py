@@ -26,6 +26,7 @@ CASES=(
  "optional", "unscoped", "forged", "wrong-operation", "essential",
  "settings", "pending-essential-txn", "unflushed-essential-buffer",
  "active-essential-operation", "alias-to-essential", "unrelated",
+ "mixed-profile-writes",
 )
 
 class WriteErrorScopeTests(unittest.TestCase):
@@ -43,6 +44,7 @@ class WriteErrorScopeTests(unittest.TestCase):
         self.assertIn('live.thread != std::this_thread::get_id()',writes)
         self.assertIn('!p.participants.count(blocker.writerId)',writes)
         self.assertIn('OptionalPathLocked(p, blocker.verifiedWriteTarget)',writes)
+        self.assertIn('allWriterPathsOptional && targetWasInventoried',writes)
         bridge=after["bridge"]
         self.assertIn('VerifiedVfsWriteFailureTarget',bridge)
         self.assertIn('PyArg_ParseTuple(args,"s|sz"',bridge)

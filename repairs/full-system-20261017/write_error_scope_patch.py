@@ -114,14 +114,22 @@ inline std::string VerifiedVfsWriteFailureTarget(int writer,
         OptionalPathLocked(p, blocker.verifiedWriteTarget) &&
         paths != p.writerPaths.end())
     {
+      bool allWriterPathsOptional = true;
+      bool targetWasInventoried = false;
       for (const auto& written : paths->second)
       {
-        if (ProtectedCanonical(written) == blocker.verifiedWriteTarget)
+        // A writer that ALSO touched an essential/unknown path must not
+        // assert the failed native VFS handle could affect optional data
+        // only. This protects against mutable Python handle attributes.
+        if (!OptionalPathLocked(p, written))
         {
-          privateOnly = true;
+          allWriterPathsOptional = false;
           break;
         }
+        if (ProtectedCanonical(written) == blocker.verifiedWriteTarget)
+          targetWasInventoried = true;
       }
+      privateOnly = allWriterPathsOptional && targetWasInventoried;
     }
     if (!privateOnly) proof.blockers.push_back("unverified_protected_writer:" + blocker.writer + ":" + reason);'''
     text=once(text,anchor,change)
