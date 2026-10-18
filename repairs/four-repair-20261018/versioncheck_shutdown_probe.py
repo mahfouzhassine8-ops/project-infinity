@@ -8,12 +8,80 @@ import json
 from pathlib import Path
 import subprocess
 import time
+import uuid
 
 ADDON = 'service.xbmc.versioncheck'
 DIAGNOSTIC = 'script.infinity.versioncheckdiagnostic'
 SERVICE = 'resources/lib/version_check/service.py'
 FAVOURITE = 'Infinity Version Check shutdown probe'
 DESTINATION = 'plugin://plugin.video.infinityuitest0/'
+DESCRIPTOR_DIAGNOSTIC = 'script.infinity.readonlydescriptor'
+DESCRIPTOR_PREFIX = 'infinity-readonly-descriptor-'
+
+# Reuse the ordinary read/flush/close exercised by readonly_maps_fixture.py.
+# Keep the descriptor open for a bounded host-side kernel metadata observation;
+# no fcntl, ioctl, buffer/raw access, syscall emulation or write exemption.
+DESCRIPTOR_SOURCE = r'''import json, os, stat, sys, time
+import xbmc, xbmcvfs
+prefix = xbmcvfs.translatePath('special://profile/infinity-readonly-descriptor-')
+result = {'schema': 1, 'scope': 'disposable API37 descriptor diagnostics; never durability authority',
+          'owner': sys.argv[1], 'nonce': sys.argv[2], 'pid': os.getpid(), 'uid': os.getuid(),
+          'android': xbmc.getCondVisibility('System.Platform.Android'), 'errors': [], 'stream_opened': False}
+def publish(suffix, data):
+    path = prefix + suffix + '.json'
+    with open(path + '.tmp', 'w', encoding='utf-8') as output:
+        json.dump(data, output, sort_keys=True)
+    os.replace(path + '.tmp', path)
+def sample(descriptor):
+    identity = os.fstat(descriptor)
+    with open('/proc/self/fdinfo/' + str(descriptor), encoding='utf-8') as info:
+        fdinfo = info.read(16384)
+    return {'dev': identity.st_dev, 'ino': identity.st_ino, 'mode': identity.st_mode,
+            'nlink': identity.st_nlink, 'regular_file': stat.S_ISREG(identity.st_mode),
+            'readlink': os.readlink('/proc/self/fd/' + str(descriptor)), 'fdinfo': fdinfo}
+maps = None
+try:
+    maps = open('/proc/self/maps', encoding='utf-8')
+    result['stream_opened'] = True
+    descriptor = maps.fileno()
+    result.update(descriptor=descriptor, mode=maps.mode, writable=maps.writable(),
+                  stream_type={'module': type(maps).__module__, 'name': type(maps).__name__},
+                  read_succeeded=bool(maps.readline()), before=sample(descriptor),
+                  hold_limit_seconds=30, release_received=False)
+    publish('pre', result)
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        try:
+            with open(prefix + 'release.json', encoding='utf-8') as control:
+                release = json.load(control)
+            if all(release.get(key) == result[key] for key in ('owner', 'nonce', 'pid', 'descriptor')):
+                result['release_received'] = True
+                break
+        except (OSError, ValueError):
+            pass
+        time.sleep(.05)
+    result['hold_timed_out'] = not result['release_received']
+    result['after_hold'] = sample(descriptor)
+    result['identity_stable_while_held'] = all(
+        result['before'][key] == result['after_hold'][key]
+        for key in ('dev', 'ino', 'mode', 'nlink', 'readlink'))
+    maps.flush()
+    result['flush_completed'] = True
+except Exception as error:
+    result['errors'].append({'stage': 'read_hold_flush', 'type': type(error).__name__, 'error': str(error)})
+finally:
+    if maps is not None:
+        try:
+            maps.close()
+            result['close_completed'] = True
+        except Exception as error:
+            result['errors'].append({'stage': 'close', 'type': type(error).__name__, 'error': str(error)})
+    result['closed'] = maps is None or maps.closed
+    result['held'] = not result['closed']
+    result['read_flush_close_completed'] = bool(result.get('read_succeeded') and
+                                               result.get('flush_completed') and result.get('close_completed'))
+    publish('post', result)
+'''
 
 DIAGNOSTIC_SOURCE = r'''import errno, hashlib, json, os, stat, sys
 import xbmc, xbmcaddon, xbmcvfs
@@ -112,6 +180,21 @@ def stage_diagnostic(staging):
     return folder
 
 
+def stage_descriptor_diagnostic(staging):
+    folder = Path(staging) / DESCRIPTOR_DIAGNOSTIC
+    folder.mkdir()
+    (folder / 'addon.xml').write_text(
+        '<addon id="' + DESCRIPTOR_DIAGNOSTIC + '" name="Readonly descriptor CI evidence" '
+        'version="1.0.0" provider-name="Infinity CI">'
+        '<requires><import addon="xbmc.python" version="3.0.0"/></requires>'
+        '<extension point="xbmc.python.script" library="default.py"/>'
+        '<extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable descriptor evidence</summary>'
+        '<description lang="en_GB">Bounded metadata observation; no durability authority</description>'
+        '<platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
+    (folder / 'default.py').write_text(DESCRIPTOR_SOURCE)
+    return folder
+
+
 def _save(out, name, value):
     (Path(out) / name).write_text(json.dumps(value, indent=2) + '\n')
 
@@ -135,6 +218,139 @@ def _same_live_owner(probe, owner):
     return (current.get('owner') == owner.get('owner') and current.get('pid') == owner['pid'] and
             any(row['pid'] == owner['pid'] and str(row['uid']) == str(probe.APP_UID) and
                 row['name'] == probe.PACKAGE + ':kodi' for row in probe.processes()))
+
+
+def descriptor_identity_matches(observation, owner, nonce, uid, descriptor=None):
+    """Correlate the held descriptor without assuming translated/kernel flags match."""
+    fd = observation.get('descriptor')
+    return (observation.get('owner') == owner.get('owner') and
+            observation.get('pid') == owner.get('pid') and
+            str(observation.get('uid')) == str(uid) and observation.get('nonce') == nonce and
+            observation.get('android') is True and type(fd) is int and fd >= 0 and
+            (descriptor is None or fd == descriptor))
+
+
+def descriptor_terminal_matches(observation, owner, nonce, uid, descriptor=None):
+    identity = (observation.get('owner') == owner.get('owner') and
+                observation.get('pid') == owner.get('pid') and observation.get('nonce') == nonce and
+                str(observation.get('uid')) == str(uid) and observation.get('android') is True)
+    return (identity and observation.get('closed') is True and observation.get('held') is False and
+            (observation.get('stream_opened') is False or
+             descriptor_identity_matches(observation, owner, nonce, uid, descriptor)))
+
+
+def capture_readonly_descriptor(probe, out, report):
+    """One pre-Close diagnostic only; preserve all failures and never grant Close."""
+    owner = report['native_owner']
+    require(probe.shell('getprop', 'ro.kernel.qemu').strip() == '1' and
+            report['android_platform']['sdk'] == '37', 'descriptor diagnostic requires disposable API37')
+    require(_same_live_owner(probe, owner), 'descriptor diagnostic owner changed before start')
+    nonce = uuid.uuid4().hex
+    evidence = {'scope': 'diagnostic only; no durability or termination authority',
+                'owner': owner, 'nonce': nonce, 'captured': False, 'kernel': {}}
+    report['readonly_descriptor_diagnostic'] = evidence
+    prefix = probe.PROFILE + '/' + DESCRIPTOR_PREFIX
+
+    def read(suffix):
+        command = _command('exec-out', 'cat', prefix + suffix + '.json', timeout=3)
+        if command.get('returncode') == 0:
+            try:
+                return json.loads(command['stdout']), command
+            except (ValueError, KeyError):
+                pass
+        return {}, command
+
+    def release(descriptor):
+        if not _same_live_owner(probe, owner):
+            evidence['release_skipped'] = 'original engine identity changed'
+            return
+        signal = {'owner': owner['owner'], 'nonce': nonce, 'pid': owner['pid'],
+                  'descriptor': descriptor}
+        path = Path(out) / 'readonly-descriptor-release.json'
+        path.write_text(json.dumps(signal))
+        evidence['release_command'] = _command('push', str(path), prefix + 'release.json', timeout=3)
+
+    descriptor = None
+    try:
+        details = probe.rpc('Addons.GetAddonDetails',
+                            {'addonid': DESCRIPTOR_DIAGNOSTIC, 'properties': ['enabled']})['addon']
+        if not details['enabled']:
+            require(probe.rpc('Addons.SetAddonEnabled',
+                             {'addonid': DESCRIPTOR_DIAGNOSTIC, 'enabled': True}) == 'OK',
+                    'cannot enable disposable descriptor helper')
+        require(probe.rpc('Addons.ExecuteAddon',
+                         {'addonid': DESCRIPTOR_DIAGNOSTIC, 'params': [owner['owner'], nonce],
+                          'wait': False}) == 'OK', 'cannot execute descriptor metadata helper')
+        deadline = time.monotonic() + 60
+        pre = {}
+        while time.monotonic() < deadline:
+            pre, evidence['last_pre_read'] = read('pre')
+            if descriptor_identity_matches(pre, owner, nonce, probe.APP_UID):
+                break
+            post, evidence['early_post_read'] = read('post')
+            if post.get('nonce') == nonce:
+                evidence['post'] = post
+                break
+            time.sleep(.25)
+        evidence['pre'] = pre
+        require(descriptor_identity_matches(pre, owner, nonce, probe.APP_UID),
+                'held descriptor identity unavailable or mismatched')
+        descriptor = pre['descriptor']
+        require(_same_live_owner(probe, owner), 'engine changed before kernel descriptor reads')
+        fd_path = '/proc/' + str(owner['pid']) + '/fd/' + str(descriptor)
+        commands = (
+            ('readlink_before', ('shell', 'readlink', fd_path)),
+            ('stat', ('shell', 'stat', '-L', '-c', '%d:%i:%f:%h', fd_path)),
+            ('fdinfo', ('shell', 'cat', '/proc/' + str(owner['pid']) + '/fdinfo/' + str(descriptor))),
+            ('readlink_after', ('shell', 'readlink', fd_path)),
+        )
+        try:
+            for label, command in commands:
+                require(_same_live_owner(probe, owner), 'engine changed during descriptor observation')
+                evidence['kernel'][label] = _command(*command, timeout=3)
+        finally:
+            release(descriptor)
+        deadline = time.monotonic() + 40
+        post = {}
+        while time.monotonic() < deadline:
+            post, evidence['last_post_read'] = read('post')
+            if descriptor_identity_matches(post, owner, nonce, probe.APP_UID, descriptor):
+                break
+            time.sleep(.25)
+        evidence['post'] = post
+        evidence['same_live_owner_after'] = _same_live_owner(probe, owner)
+        evidence['captured'] = bool(
+            descriptor_identity_matches(post, owner, nonce, probe.APP_UID, descriptor) and
+            evidence['same_live_owner_after'] and post.get('release_received') and
+            all(evidence['kernel'].get(key, {}).get('returncode') == 0 for key, _ in commands))
+        # A captured ordinary flush failure remains valid diagnostic evidence;
+        # the original Close gate below decides durability, never this helper.
+    except Exception as error:
+        evidence['error'] = str(error)
+    finally:
+        # Metadata errors must not race the still-held fixture into Close.
+        # The helper releases itself after30s even without an acknowledgement.
+        post = evidence.get('post', {})
+        try:
+            deadline = time.monotonic() + 40
+            while (_same_live_owner(probe, owner) and
+                   not descriptor_terminal_matches(post, owner, nonce, probe.APP_UID, descriptor) and
+                   time.monotonic() < deadline):
+                post, evidence['terminal_post_read'] = read('post')
+                if descriptor_terminal_matches(post, owner, nonce, probe.APP_UID, descriptor):
+                    break
+                time.sleep(.25)
+            evidence['post'] = post
+            evidence['terminal_confirmed'] = bool(
+                _same_live_owner(probe, owner) and
+                descriptor_terminal_matches(post, owner, nonce, probe.APP_UID, descriptor))
+            if not evidence['terminal_confirmed']:
+                evidence['collector_incomplete'] = 'same-engine terminal post with closed descriptor unavailable'
+        except Exception as error:
+            evidence['terminal_confirmed'] = False
+            evidence['collector_incomplete'] = str(error)
+        _save(out, 'READONLY-DESCRIPTOR-DIAGNOSTIC.json', evidence)
+    return evidence
 
 
 def _settings(probe):

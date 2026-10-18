@@ -86,9 +86,11 @@ jobs:
           PY
           echo 'cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699  ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip' | sha256sum -c
           echo '792154bc91f3a2839dec29b6c560c854105913df6d78a79d39cb253207f947d7  ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip' | sha256sum -c
+          python3 repairs/four-repair-20261018/test_versioncheck_android.py --apk signed/Infinity-2103386-UI-Restoration-TEST2.apk
+          python3 repairs/four-repair-20261018/versioncheck_android.py --apk signed/Infinity-2103386-UI-Restoration-TEST2.apk --out versioncheck-candidate
           mkdir -p full-input/additional-addons
           python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
-          python3 repairs/four-repair-20261018/prepare_ui_android.py --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip --first-party first-party-input/rc05-inputs/native-evidence/installed-addons --additional full-input/additional-addons --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip --out full-stack
+          python3 repairs/four-repair-20261018/prepare_ui_android.py --versioncheck versioncheck-candidate/service.xbmc.versioncheck-0.5.28+infinity.1-Android-TEST.zip --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip --first-party first-party-input/rc05-inputs/native-evidence/installed-addons --additional full-input/additional-addons --candidate ui-candidate/skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip --helper ui-candidate/script.infinity.uirepair-0.1.0-TEST.zip --out full-stack
       - name: Prepare isolated emulator and public test media
         run: |
           set -euo pipefail
@@ -129,6 +131,12 @@ jobs:
           assert r['skin_version']=='1.0.5.227' and not r['physical_fold_accepted'] and not r['crash_fixed']
           assert r['android_platform']['sdk']=='37' and r['android_platform']['release'].split('.')[0]=='17'
           assert not r['samsung_one_ui_emulated']
+          for stage in ('before_close', 'after_reopen'):
+              identity=r['versioncheck_runtime'][stage]
+              assert identity['verified'] and identity['addon']['enabled']
+              assert identity['addon']['version']=='0.5.28+infinity.1'
+              assert identity['input_archive_sha256']=='58d8869b16f2c6f409887de1e6c05b86908d3d314c439d780a294e8ccb88fb88'
+              assert identity['selected_source']['service_sha256']=='6eb8ed9dd5d4712aacb44d55c3e006b1da5198c6bee076315579927c437bcfc1'
           PY
       - uses: actions/upload-artifact@v7
         if: always()
@@ -140,5 +148,6 @@ jobs:
             emulator-setup/
             api37-support/
             ui-candidate/BUILD-1.0.5.227.json
+            versioncheck-candidate/
           if-no-files-found: warn
           retention-days: 90

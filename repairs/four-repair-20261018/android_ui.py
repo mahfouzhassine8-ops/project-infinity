@@ -43,6 +43,56 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def verify_versioncheck_candidate(runtime, out, expected, stage):
+    """Observe Kodi's selected source as its live UID; never enable the service."""
+    import versioncheck_android as package
+    import versioncheck_shutdown_probe as diagnostic
+    require(expected['addon'] == package.ADDON and expected['version'] == package.VERSION and
+            expected['archive_sha256'] == package.ARCHIVE_SHA and
+            expected['service_sha256'] == package.CANDIDATE_SERVICE_SHA and
+            expected['source_apk_sha256'] == package.APK_SHA,
+            'Full UI Version Check input is not the pinned Android correction')
+    details = runtime.rpc('Addons.GetAddonDetails',
+                          {'addonid': package.ADDON, 'properties': ['version', 'enabled']})['addon']
+    require(details['enabled'] is True and details['version'] == expected['version'],
+            'Running Version Check is disabled or not the exact staged candidate')
+    owner = runtime.read_json(runtime.PRIVATE + '/files/infinity-kodi-process.json')
+    require(diagnostic._same_live_owner(runtime, owner),
+            'Version Check identity observation needs the current live engine owner')
+    helper = runtime.rpc('Addons.GetAddonDetails',
+                         {'addonid': diagnostic.DIAGNOSTIC, 'properties': ['enabled']})['addon']
+    if not helper['enabled']:
+        require(runtime.rpc('Addons.SetAddonEnabled',
+                            {'addonid': diagnostic.DIAGNOSTIC, 'enabled': True}) == 'OK',
+                'Cannot enable disposable Version Check identity observer')
+    require(runtime.rpc('Addons.ExecuteAddon',
+                        {'addonid': diagnostic.DIAGNOSTIC, 'params': [owner['owner']],
+                         'wait': False}) == 'OK', 'Cannot observe selected Version Check source')
+    deadline = time.monotonic() + 60
+    observation = {}
+    while time.monotonic() < deadline:
+        observation = runtime.read_json(runtime.PROFILE + '/infinity-versioncheck-paths.json')
+        if observation.get('owner') == owner['owner'] and observation.get('pid') == owner['pid']:
+            break
+        time.sleep(.25)
+    evidence = {'input_archive_sha256': expected['archive_sha256'], 'addon': details,
+                'owner': owner, 'selected_source': observation}
+    (Path(out) / ('VERSIONCHECK-RUNTIME-' + stage + '.json')).write_text(
+        json.dumps(evidence, indent=2) + '\n')
+    require(observation.get('owner') == owner['owner'] and observation.get('pid') == owner['pid'] and
+            str(observation.get('uid')) == str(runtime.APP_UID) and
+            observation.get('android') is True and diagnostic._same_live_owner(runtime, owner),
+            'Selected Version Check source was not observed by the same live Android engine UID')
+    require(observation.get('addon_version') == expected['version'] and
+            observation.get('service_sha256') == expected['service_sha256'] and
+            bool(observation.get('addon_path')),
+            'Kodi-selected Version Check source differs from the pinned correction')
+    evidence['verified'] = True
+    (Path(out) / ('VERSIONCHECK-RUNTIME-' + stage + '.json')).write_text(
+        json.dumps(evidence, indent=2) + '\n')
+    return evidence
+
+
 def stage_confirmation(staging):
     """Only the disposable emulator gets this helper; do not modify the skin."""
     directory = staging / CONFIRM
@@ -104,6 +154,9 @@ def run(args):
         (out / "FULL-STACK-ANDROID.json").write_text(json.dumps(report, indent=2) + "\n")
         print("INFINITY FULL STACK:", stage, flush=True)
     try:
+        if getattr(args, 'versioncheck_descriptor_diagnostic', False):
+            require(getattr(args, 'versioncheck_shutdown_only', False) and args.expected_api == '37',
+                    'Readonly descriptor diagnostics require the dedicated targeted API37 run')
         require(Path(args.apk).is_file(), "Signed Infinity APK missing")
         report["apk_sha256"] = sha(args.apk)
         require(report["apk_sha256"] == args.expected_sha,
@@ -213,9 +266,13 @@ def run(args):
         extras.mkdir()
         confirmation = stage_confirmation(extras)
         versioncheck_diagnostic = None
-        if getattr(args, 'versioncheck_shutdown_only', False):
+        descriptor_diagnostic = None
+        if (getattr(args, 'versioncheck_shutdown_only', False) or
+                input_report.get('versioncheck_candidate')):
             import versioncheck_shutdown_probe as versioncheck_probe
             versioncheck_diagnostic = versioncheck_probe.stage_diagnostic(extras)
+        if getattr(args, 'versioncheck_descriptor_diagnostic', False):
+            descriptor_diagnostic = versioncheck_probe.stage_descriptor_diagnostic(extras)
         # No addon.xml modifications, substitutions, dependency deletion or
         # fabricated plugin sources. Every required addon comes from full-stack
         # input proof and is installed with its own unmodified ID.
@@ -229,6 +286,9 @@ def run(args):
         if versioncheck_diagnostic is not None:
             probe.adb("push", versioncheck_diagnostic,
                       probe.PROFILE + "/../addons/" + versioncheck_probe.DIAGNOSTIC)
+        if descriptor_diagnostic is not None:
+            probe.adb('push', descriptor_diagnostic,
+                      probe.PROFILE + '/../addons/' + versioncheck_probe.DESCRIPTOR_DIAGNOSTIC)
         backing = "/data/media/0/Android/data/" + PARENT
         probe.shell("chown", "-R", uid + ":" + uid, backing,
                     probe.PRIVATE + "/shared_prefs")
@@ -325,10 +385,18 @@ def run(args):
             publish("targeted-versioncheck-shutdown-evidence")
             import versioncheck_shutdown_probe as versioncheck_probe
             versioncheck_probe.before_close(probe, out, report, args)
+            if getattr(args, 'versioncheck_descriptor_diagnostic', False):
+                publish('diagnostic-only-readonly-descriptor-before-unchanged-Close')
+                versioncheck_probe.capture_readonly_descriptor(probe, out, report)
+                require(report['readonly_descriptor_diagnostic'].get('terminal_confirmed'),
+                        'Descriptor collector incomplete; refuse to race a held diagnostic stream into Close')
         else:
             publish("actual-ui-and-post-stop-input")
             from android_interactions import exercise
             exercise(probe, out, report)
+            if input_report.get('versioncheck_candidate'):
+                report['versioncheck_runtime'] = {'before_close': verify_versioncheck_candidate(
+                    probe, out, input_report['versioncheck_candidate'], 'before-close')}
         publish("request-native-Infinity-Power-Close-after-actual-skin-loading")
         real_close.loaded_close(probe, report["native_owner"], out, report)
         require(report.get("close_certified") is True and
@@ -336,6 +404,9 @@ def run(args):
                 "Native Infinity loaded Close and reopen proof incomplete")
         if getattr(args, 'versioncheck_shutdown_only', False):
             versioncheck_probe.after_close(probe, out, report, args)
+            if getattr(args, 'versioncheck_descriptor_diagnostic', False):
+                require(report['readonly_descriptor_diagnostic'].get('captured'),
+                        'Descriptor diagnostic incomplete; a Close result cannot substitute missing evidence')
         else:
             saved=probe.read_json(probe.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
             require(len(report['ui_expected_watchlist'])==2 and
@@ -346,6 +417,9 @@ def run(args):
                         for f in (favourites.get('favourites') or [])),
                     'Add-on favourite was lost on actual Close/reopen')
             report['ui_mutations_survived_actual_restart']=True
+            if input_report.get('versioncheck_candidate'):
+                report['versioncheck_runtime']['after_reopen'] = verify_versioncheck_candidate(
+                    probe, out, input_report['versioncheck_candidate'], 'after-reopen')
         report["passed"] = True
         publish("complete-Infinity-full-stack-loaded-Close-and-reopen")
         return report
@@ -393,5 +467,7 @@ if __name__ == "__main__":
                    help="Targeted equivalent Version Check Close comparison; does not certify UI matrix")
     p.add_argument("--versioncheck-expected-version")
     p.add_argument("--versioncheck-expected-service-sha")
+    p.add_argument('--versioncheck-descriptor-diagnostic', action='store_true',
+                   help='Dedicated disposable API37 descriptor evidence only; unchanged Close gate')
     p.add_argument("--out", type=Path, required=True)
     run(p.parse_args())
