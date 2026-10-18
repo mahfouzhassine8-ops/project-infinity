@@ -143,7 +143,20 @@ def run(args):
             'release': probe.shell('getprop', 'ro.build.version.release').strip(),
             'abis': probe.shell('getprop', 'ro.product.cpu.abilist').strip(),
             'native_bridge': probe.shell('getprop', 'ro.dalvik.vm.native.bridge').strip(),
+            'fingerprint': probe.shell('getprop', 'ro.build.fingerprint').strip(),
+            'manufacturer': probe.shell('getprop', 'ro.product.manufacturer').strip(),
+            'model': probe.shell('getprop', 'ro.product.model').strip(),
         }
+        report['target_firmware'] = {'manufacturer': 'Samsung', 'ui': 'One UI 9.0',
+                                     'android': '17', 'api': '37',
+                                     'physical_acceptance_required': True}
+        report['samsung_one_ui_emulated'] = False
+        if args.expected_api:
+            require(report['android_platform']['sdk'] == args.expected_api,
+                    'Booted emulator API does not match the requested test target')
+        if args.expected_release:
+            require(report['android_platform']['release'].split('.')[0] == args.expected_release,
+                    'Booted Android release does not match the requested test target')
         require("Success" in probe.adb("install", "--no-incremental", args.apk),
                 "Actual signed Infinity APK did not install")
         # Match the original approved fresh-Android probe's first-launch setup.
@@ -330,5 +343,7 @@ if __name__ == "__main__":
     p.add_argument("--addons", type=Path, required=True)
     p.add_argument("--input-proof", type=Path, required=True)
     p.add_argument("--test-variant", choices=("ui-restoration",), required=True)
+    p.add_argument("--expected-api", help="Require the actual booted API; no fallback")
+    p.add_argument("--expected-release", help="Require the actual Android major release")
     p.add_argument("--out", type=Path, required=True)
     run(p.parse_args())
