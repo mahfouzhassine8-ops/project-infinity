@@ -33,11 +33,14 @@ ADDON_BASE = "assets/addons/"
 # these are not new features. Existing parent bytes must never be overwritten.
 DEPENDENCIES = {
     "script.infinity.commandcenter": "0.3.5.20",
-    "service.infinity.compat": "0.8.2",
+    # Locked 2103384 already embeds 0.7.2. External .8.2 staging is NOT an
+    # authorized service upgrade, and reviewed skin .228 doesn't require it.
+    "service.infinity.compat": None,
     "script.skinshortcuts": None,
     "resource.images.studios.white": None,
     "resource.images.recordlabels.white": None,
 }
+PRESERVED_COMPAT_VERSION = "0.7.2"
 MANIFEST = "assets/system/addon-manifest.xml"
 ENGINE = "lib/arm64-v8a/libkodi.so"
 CRASH = "lib/arm64-v8a/libinfinitycrash.so"
@@ -156,6 +159,9 @@ def check_apks(previous: Path, candidate: Path):
         require(row.attrib.get("id") == aid and
                 (expected is None or row.attrib.get("version") == expected),
                 "Production dependency identity/version mismatch: " + aid)
+        if aid == "service.infinity.compat":
+            require(path in old and row.attrib.get("version") == PRESERVED_COMPAT_VERSION,
+                    "Original locked Compatibility 0.7.2 ID/version must be preserved")
         prefix = ADDON_BASE + aid + "/"
         require(all(old[name] == new[name] for name in old if name.startswith(prefix)),
                 "Existing production dependency was overwritten: " + aid)
