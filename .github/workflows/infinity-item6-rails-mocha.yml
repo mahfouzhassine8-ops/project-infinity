@@ -15,27 +15,29 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: {persist-credentials: false}
-      - name: Read exact original Rails 0.2.6 ZIP from authenticated pinned input
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39139344754
+          name: Infinity-2103388-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: rails-signed-reference
+      - name: Prove exact signed Rails-only source and original .026 package provenance
         run: |
-          set -euo pipefail
-          mkdir -p full-input
-          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/item6-release.json
-          python3 - <<'CHECK'
-          import json
-          r=json.load(open('/tmp/item6-release.json'))
-          assert r['draft'] is True and r['tag_name']=='infinity-ci-assets-20261017'
-          a=next(x for x in r['assets'] if x['id']==651868759)
-          assert a['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
-          CHECK
-          curl --fail --location --silent --show-error --retry 2 \
-            -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' \
-            https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 \
-            -o full-input/inputs.zip
-          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
-          unzip -q full-input/inputs.zip -d full-input
-          echo '5e4ff64592d6f8660d17db1077ed85a368c02f4eb14442760797b1d133c08179  full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip' | sha256sum -c
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,zipfile
+          root=Path('rails-signed-reference')
+          apk=root/'signed388/Infinity-2103388-All-In-One-TEST4.apk'
+          expected='500b9e6824f45d0d34e871aa1d480f2fc21642b67b9bb21b34c5422a5179009b'
+          with apk.open('rb') as f:
+              assert hashlib.file_digest(f,'sha256').hexdigest()==expected
+          proof=json.loads((root/'full-stack/FULL-STACK-INPUTS.json').read_text())
+          assert proof['rails_sha256']=='5e4ff64592d6f8660d17db1077ed85a368c02f4eb14442760797b1d133c08179'
+          with zipfile.ZipFile(apk) as z:
+              names=[n for n in z.namelist() if n.startswith('assets/addons/script.infinity.rails/')]
+              assert len(names)==14 and z.testzip() is None
+          print('PASS read-only Rails 0.2.6 source identity from signed archive; no rejected APK reused as base')
+          PY
       - uses: actions/download-artifact@v8
         with:
           run-id: 39114438060
@@ -52,8 +54,9 @@ jobs:
           echo '39f8f041376748fbe209868a33ef51e1cfd59082ee6ebb8ad095e6f85336bdef  item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip' | sha256sum -c
       - name: Build Rails Mocha path fix and preserve every original member
         run: |
-          python3 repairs/item6-rails-20261018/build.py \
-            --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip \
+          python3 repairs/item6-rails-20261018/reference_build.py \
+            --apk rails-signed-reference/signed388/Infinity-2103388-All-In-One-TEST4.apk \
+            --provenance rails-signed-reference/full-stack/FULL-STACK-INPUTS.json \
             --skin item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip \
             --out item6-output/script.infinity.rails-0.2.7-Mocha-Options-TEST.zip
       - name: Reproduce old XML error and test original Movie/TV Rails hold options
@@ -62,9 +65,13 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip') as z:
-              assert z.testzip() is None and len(z.namelist())==14
-              z.extractall('item6-fixture')
+          with zipfile.ZipFile('rails-signed-reference/signed388/Infinity-2103388-All-In-One-TEST4.apk') as z:
+              members=[n for n in z.namelist() if n.startswith('assets/addons/script.infinity.rails/')]
+              assert z.testzip() is None and len(members)==14
+              for n in members:
+                  path=Path('item6-fixture')/n[len('assets/addons/'):]
+                  path.parent.mkdir(parents=True,exist_ok=True)
+                  path.write_bytes(z.read(n))
           layout=Path('item6-approved-skin/unified/InfinityRailsOptions.xml')
           layout.parent.mkdir(parents=True)
           with zipfile.ZipFile('item6-input/skin.infinity.diggz-1.0.5.228-Rotate-Cyan-Isolated-TEST.zip') as z:
