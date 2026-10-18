@@ -181,17 +181,18 @@ jobs:
           avd-name: infinity-2103384-actual-apk
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: >-
-            bash -c '
-            apk=signed-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk;
-            expected=$(awk "$2==\"Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk\" {print $1}" signed-2103384/SHA256SUMS);
-            python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py
-            --case ${{ matrix.case }}
-            --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk
-            --apk "$apk"
-            --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons
-            --out emulator-2103384
-            --expected-sha256 "$expected"'
+          script: |
+            set -euo pipefail
+            apk=signed-2103384/Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk
+            expected=$(awk '$2=="Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk" {print $1}' signed-2103384/SHA256SUMS)
+            test -n "$expected"
+            python3 repairs/android-checkpoint-shutdown/runtime-tests/run_internal_observer_stage_case.py \
+              --case ${{ matrix.case }} \
+              --baseline-apk accepted-test3/Infinity-2103377-Essential-First-Signed-Fold-TEST3.apk \
+              --apk "$apk" \
+              --installed-addons test4-inputs/rc05-inputs/native-evidence/installed-addons \
+              --out emulator-2103384 \
+              --expected-sha256 "$expected"
       - name: Require real Android pass receipt, not a host-only or substituted result
         run: |
           set -euo pipefail
