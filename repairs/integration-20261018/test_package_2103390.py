@@ -31,6 +31,20 @@ class ExactNineAssemblerTests(unittest.TestCase):
         self.assertNotIn("service.xbmc.versioncheck", after)
         self.assertEqual(bundle.revised_manifest(updated), updated)
 
+    def test_locked_unregistered_compat_remains_unregistered_in_combined_manifest(self):
+        # Evidence: signed 2103384 system addon manifest excludes compat
+        # despite already including its preserved 0.7.2 files.
+        before = b"<addons>\n</addons>\n"
+        updated = bundle.revised_manifest(before)
+        before_names = bundle.gate.manifest_members(before)
+        after_names = bundle.gate.manifest_members(updated)
+        self.assertNotIn("service.infinity.compat", before_names)
+        self.assertNotIn("service.infinity.compat", after_names)
+        self.assertEqual(after_names-before_names,
+                         set(bundle.gate.VERSIONS) |
+                         (set(bundle.gate.DEPENDENCIES) -
+                          bundle.gate.PRESERVED_REGISTRATION_IDS))
+
     def sample(self, root, addon, version, member=None):
         archive = root / (addon + ".zip")
         with zipfile.ZipFile(archive, "w") as z:
