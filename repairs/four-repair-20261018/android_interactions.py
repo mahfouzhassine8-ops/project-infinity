@@ -1,8 +1,10 @@
 """Actual ADB taps/holds against the full signed candidate in a disposable emulator."""
 import json
 from pathlib import Path
+import re
 import struct
 import time
+import xml.etree.ElementTree as ET
 
 def exercise(probe, out, report):
     records = report['ui_interactions'] = []
@@ -120,6 +122,48 @@ def exercise(probe, out, report):
                 any(row.get('label') == 'Infinity UI public movie'
                     for row in state['controls'].get('50', {}).get('items', [])))
 
+    def acknowledge_system_tutorial():
+        # API35 evidence contains Android's first-use fullscreen coachmark,
+        # not an Infinity dialog. Acknowledge the observed system button before
+        # app gestures; do not prime/retry app taps or change navigation policy.
+        def visible_tutorial(windows):
+            return any('ImmersiveModeConfirmation}:' in block and
+                       'mOwnerUid=1000 ' in block and 'package=android ' in block and
+                       'isVisible=true' in block
+                       for block in re.split(r'(?m)^  Window #', windows))
+        windows = probe.shell('dumpsys', 'window')
+        if not visible_tutorial(windows):
+            return
+        (out / 'android-fullscreen-tutorial-before-windows.txt').write_text(windows)
+        (out / 'android-fullscreen-tutorial-before.png').write_bytes(
+            probe.adb('exec-out', 'screencap', '-p', binary=True))
+        path = '/data/local/tmp/infinity-system-tutorial.xml'
+        probe.shell('uiautomator', 'dump', path)
+        xml = probe.shell('cat', path)
+        (out / 'android-fullscreen-tutorial.xml').write_text(xml)
+        nodes = [n for n in ET.fromstring(xml).iter('node')
+                 if n.get('text') == 'Got it' and
+                 n.get('package') in ('android', 'com.android.systemui') and
+                 n.get('class') == 'android.widget.Button' and
+                 n.get('clickable') == 'true' and n.get('enabled') == 'true']
+        require(len(nodes) == 1, 'cannot identify Android fullscreen tutorial button')
+        bounds = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]', nodes[0].get('bounds', ''))
+        require(bounds is not None, 'Android tutorial button has no observed bounds')
+        x1, y1, x2, y2 = map(int, bounds.groups())
+        require(x2 > x1 and y2 > y1, 'Android tutorial button is not visible')
+        probe.shell('input', 'tap', (x1+x2)//2, (y1+y2)//2)
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            windows = probe.shell('dumpsys', 'window')
+            if not visible_tutorial(windows): break
+            time.sleep(.25)
+        require(not visible_tutorial(windows), 'Android fullscreen tutorial did not dismiss')
+        (out / 'android-fullscreen-tutorial-after-windows.txt').write_text(windows)
+        report['android_system_onboarding'] = dict(
+            window='ImmersiveModeConfirmation', button='Got it',
+            bounds=list(map(int, bounds.groups())), dismissed=True)
+        print('INFINITY UI: acknowledged observed Android fullscreen tutorial', flush=True)
+
     # This is an isolated emulator media fixture, never user playback content.
     movie = Path('infinity-ui-fixture.mp4')
     require(movie.is_file(), 'generated sample missing')
@@ -211,7 +255,8 @@ def exercise(probe, out, report):
     # below, after these actions, rather than delaying feedback on new paths.
     probe.shell('wm', 'size', '1800x1440'); probe.shell('wm', 'density', '320'); time.sleep(3)
     observe('theme', 'OLED')
-    state=browse(); capture('actions-grid-before-tap', state); grid=state['controls']['50']
+    state=browse(); acknowledge_system_tutorial()
+    state=observe(); capture('actions-grid-before-tap', state); grid=state['controls']['50']
     item_height=grid['height']*.21809829; item_width=item_height*.668085106
     columns=int(grid['width']//item_width)
     index=next(i for i,r in enumerate(grid['items']) if r.get('token','').startswith('plugin.video.infinityuitest'))
