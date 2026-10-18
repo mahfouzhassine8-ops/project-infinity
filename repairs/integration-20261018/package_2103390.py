@@ -216,7 +216,10 @@ def revised_manifest(original: bytes):
     names = [c.text for c in xml.findall("addon")]
     require(len(names) == len(set(names)), "Original duplicate add-on registration")
     require(original.endswith(b"</addons>\n"), "Unexpected original system manifest trailer")
-    missing = sorted((set(gate.VERSIONS) | set(gate.DEPENDENCIES)) - set(names))
+    # Locked 2103384 carried Compat 0.7.2 unregistered; registering it
+    # here would change shutdown behavior even with identical on-disk bytes.
+    missing = sorted((set(gate.VERSIONS) | set(gate.DEPENDENCIES)) -
+                     set(names) - gate.PRESERVED_REGISTRATION_IDS)
     appendix = b"".join(("  <addon>" + aid + "</addon>\n").encode() for aid in missing)
     updated = original[:-len(b"</addons>\n")] + appendix + b"</addons>\n"
     require(gate.manifest_members(updated) == set(names) | set(missing),
