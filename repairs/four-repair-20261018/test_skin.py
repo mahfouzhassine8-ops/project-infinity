@@ -32,6 +32,9 @@ def check(parent,candidate):
         for name in after.namelist():
             if name.endswith('/VideoOSD.xml'):
                 assert b'<label>Display Mode</label>' not in after.read(name)
+                parsed=ET.fromstring(after.read(name))
+                for direction in ('onup','ondown','onleft','onright'):
+                    assert all(n.text!='280' for n in parsed.iter(direction)), (name,direction)
         for name in ('unified/PlayerControls.xml','unified/Custom_1197_InfinityDisplayMode.xml',
                      'unified/DialogContextMenu.xml','unified/FileBrowser.xml'):
             assert before.read(prefix+name)==after.read(prefix+name),name

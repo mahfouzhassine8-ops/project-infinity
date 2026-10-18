@@ -21,13 +21,20 @@ patch = module(HERE / 'native_patch.py', 'ui_touch_patch')
 
 def save(path, obj): path.write_text(json.dumps(obj, indent=2, sort_keys=True) + '\n')
 def digests():
-    return {str(p.relative_to(ROOT / 'kodi')): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in (ROOT / 'kodi/xbmc').rglob('*') if p.is_file()}
+    root = ROOT / 'kodi'
+    # The locked manifest contains the WHOLE 9404-file source tree, including
+    # CMake, platform packaging and add-on headers outside xbmc/. Comparing a
+    # 4501-file xbmc-only inventory to it is a harness error, not source drift.
+    return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in root.rglob('*') if p.is_file() and '.git' not in p.relative_to(root).parts}
 
 def prepare(args):
     parent.prepare(args)
     before = digests()
     locked = json.loads((args.locked_384_proof / 'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json').read_text())
+    save(OUT / 'RECONSTRUCTED-2103384-SOURCE-MAP.json', before)
+    differences = [p for p in before.keys() | locked['after'].keys() if before.get(p) != locked['after'].get(p)]
+    save(OUT / 'LOCKED-SOURCE-COMPARISON.json', dict(reconstructed=len(before), locked=len(locked['after']), differences=sorted(differences)))
     assert len(before) == 9404 and before == locked['after'], 'Reconstructed sources differ from locked 2103384'
     save(OUT / 'LOCKED-2103384-SOURCE-MAP.json', before)
     delta = patch.apply(ROOT / 'kodi')

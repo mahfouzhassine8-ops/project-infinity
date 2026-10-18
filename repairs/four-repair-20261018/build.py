@@ -30,6 +30,25 @@ def remove_display(data):
             c.findtext('onclick') == 'ActivateWindow(1197)']
     if len(rows) > 1: raise ValueError('Unexpected duplicate Display Mode row')
     for row in rows:
+        removed_id = row.get('id')
+        parents = {child: parent for parent in e.root.iter() for child in parent}
+        siblings = list(parents[row]); index = siblings.index(row)
+        # Older inactive layouts draw a row icon/chevron as siblings. Remove
+        # that decoration too; a detached icon must not survive the menu row.
+        for sibling in siblings[index + 1:]:
+            if sibling.get('type') not in ('image', 'label'):
+                break
+            a, _, _, d = e.spans[sibling]
+            e.replace(a, d, '', 'remove Display Mode row decoration')
+        for control in e.root.iter('control'):
+            if control is row: continue
+            for direction in ('onup', 'ondown', 'onleft', 'onright'):
+                for nav in control.findall(direction):
+                    if nav.text == removed_id:
+                        destination = row.findtext('onup' if direction in ('onup','onleft') else 'ondown')
+                        if not destination or destination == removed_id:
+                            raise ValueError('Display Mode navigation cannot be safely bypassed')
+                        e.set(control, direction, destination, 'bypass removed Display Mode row')
         start, _, _, end = e.spans[row]
         e.replace(start, end, '', 'remove only standalone Display Mode from Playback')
     return e.done(), bool(rows)
@@ -62,6 +81,7 @@ def browse_patch(data):
       <visible>''' + condition + '''</visible>
     </control>''', 'reversible hide recovery')
     e.set(grid, 'ondown', '13', 'reachable recovery control')
+    e.set(grid, 'bottom', '80', 'reserve touch space for reversible hide recovery')
     return e.done()
 
 def continue_patch(data):
