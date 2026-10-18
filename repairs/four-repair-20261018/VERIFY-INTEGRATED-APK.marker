@@ -1,1 +1,2 @@
 Targeted API37 bundled addon selection verification for exact signed 2103388 with retained old 1.0.5.225 skin and a retained progress sentinel. Preserve locked2103384 and prohibit full Close approval from this smoke. One Android17 test only, no API11/15 reruns, no new APK build.
+Retry only corrected artifact nesting: the uploaded archive contains signed388/ prefix. Earlier run 39141207418 failed before emulator with signed APK missing due path nesting, not a package or runtime failure. Preserve all requirements and original locked 2103384.
