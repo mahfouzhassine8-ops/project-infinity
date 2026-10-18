@@ -1,0 +1,175 @@
+name: "Infinity 2103390 | combine exact #1-6 #9 #10 #12 (EXPERIMENTAL)"
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ["repairs/integration-20261018/BUILD.marker"]
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-exact-nine-experimental-packaging, cancel-in-progress: false}
+jobs:
+  exact-nine-source-and-signed-candidate:
+    name: Strict source/payload gates before any Android/Fold approval
+    runs-on: ubuntu-22.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Run exact nine-item source contracts before downloading anything
+        run: |
+          set -euo pipefail
+          python3 repairs/integration-20261018/scope_gate.py --out integration-evidence/SOURCE.json
+          python3 -m unittest discover -s repairs/integration-20261018 -p 'test_scope_gate.py' -v
+          python3 -m unittest discover -s repairs/integration-20261018 -p 'test_package_2103390.py' -v
+          python3 -m unittest discover -s repairs/four-repair-20261018 -p test_menu.py -v
+      - name: Require specific source-matched native producer; never reuse pre-#3 native engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,subprocess,time
+          repo=os.environ["GITHUB_REPOSITORY"]; runid="39169187099"
+          source="b6434fe29d1b78451a4911a2760afa6b36d307e8"
+          for attempt in range(1, 181):
+              payload=json.loads(subprocess.check_output(["gh","api",f"repos/{repo}/actions/runs/{runid}"]))
+              assert payload["head_sha"]==source, "Native source SHA changed"
+              assert payload["path"].endswith("infinity-four-repair-candidate.yml")
+              if payload["status"]=="completed":
+                  assert payload["conclusion"]=="success", "Native producer failed and cannot be used"
+                  break
+              time.sleep(15)
+          else:
+              raise RuntimeError("Exact native producer not completed; refuse packaging")
+          all_artifacts=json.loads(subprocess.check_output(["gh","api",f"repos/{repo}/actions/runs/{runid}/artifacts"]))["artifacts"]
+          required="Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return"
+          assert len([a for a in all_artifacts if a["name"]==required and not a["expired"]])==1, "Signed source artifact missing"
+          print("PASS exact original 2103384-derived #3 compiled and signed; final combined package not yet approved")
+          PY
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39169187099
+          name: Infinity-2103385-UI-Restoration-Signed-EXPERIMENTAL-and-Return
+          github-token: ${{ github.token }}
+          path: native385
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39091057069
+          name: Infinity-2103384-FAST-SIGNED-Experimental-APK-and-Return
+          github-token: ${{ github.token }}
+          path: locked384
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39114438060
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: skin227
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39168353557
+          name: Infinity-UI-Restoration-Current-Skins-and-Helper
+          github-token: ${{ github.token }}
+          path: helper012
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39159573926
+          name: Infinity-Item6-Rails-027-Source-Candidate-NOT-INSTALL-APPROVED
+          github-token: ${{ github.token }}
+          path: rails027
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39156538395
+          name: Infinity-Item5-Watched-Bridge-1.0.1-Host-Verified
+          github-token: ${{ github.token }}
+          path: watched101
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 38976250598
+          name: Infinity-2103377-INTERNAL-OBSERVER-STAGE-DIAGNOSTIC-Inputs
+          github-token: ${{ github.token }}
+          path: first-party-input
+      - name: Download only the originally verified full .225 source and exact .026 parent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p full-input
+          gh api repos/$GITHUB_REPOSITORY/releases/416125865 > /tmp/nine-ui-release.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/nine-ui-release.json'))
+          assert x['draft'] is True and x['tag_name']=='infinity-ci-assets-20261017'
+          asset=next(a for a in x['assets'] if a['id']==651868759)
+          assert asset['digest']=='sha256:852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834'
+          PY
+          curl --fail --location --silent --show-error --retry 2 -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/octet-stream' https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/651868759 -o full-input/inputs.zip
+          echo '852dce3899b1976556b3b46f696a805b668eca4a513df6194c642d108da58834  full-input/inputs.zip' | sha256sum -c
+          unzip -q full-input/inputs.zip -d full-input
+      - name: Reconstruct exact skin .228 from the proved .227 and select reviewed current helper / Rails / watched sources
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,shutil
+          from pathlib import Path
+          defs=[
+            ("native385","Infinity-2103385-UI-Restoration-TEST1.apk","inputs/native.apk",None),
+            ("native385","SIGNED-2103385.json","inputs/native-proof.json",None),
+            ("locked384","Infinity-2103384-Optional-VFS-Shutdown-TEST1.apk","inputs/locked.apk","b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af"),
+            ("skin227","skin.infinity.diggz-1.0.5.227-Coordinated-TEST.zip","inputs/skin227.zip","cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699"),
+            ("helper012","script.infinity.uirepair-0.1.2-TEST.zip","inputs/helper012.zip",None),
+            ("rails027","script.infinity.rails-0.2.7-Mocha-Options-TEST.zip","inputs/rails027.zip","e3b8614bc024d25159b64721ec5efe2b26b8c1bf0589dc03a0a33e7a9f02eddf"),
+            ("watched101","script.infinity.watchedbridge-1.0.1-TEST.zip","inputs/watched101.zip","dbc913459c148052ce46b30241d77c4a2c7d29bea45fddcad82496ebe9ad0029"),
+          ]
+          for directory,name,destination,expected in defs:
+              hits=list(Path(directory).rglob(name)); assert len(hits)==1, (directory,name,len(hits))
+              out=Path(destination);out.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copyfile(hits[0],out)
+              if expected: assert hashlib.sha256(out.read_bytes()).hexdigest()==expected,name
+          PY
+          python3 repairs/four-repair-20261018/item1_rotate_cyan_228.py --parent inputs/skin227.zip --out inputs/skin228.zip
+          echo '39f8f041376748fbe209868a33ef51e1cfd59082ee6ebb8ad095e6f85336bdef  inputs/skin228.zip' | sha256sum -c
+      - name: Retrieve original skin dependencies and first-party sources with NO edits
+        run: |
+          set -euo pipefail
+          mkdir -p full-input/additional-addons
+          python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py --additional full-input/additional-addons --out integration-evidence/OFFICIAL-SKIN-DEPENDENCIES.json
+          python3 repairs/full-system-20261017/infinity_full_stack_assets.py             --skin full-input/skin.infinity.diggz-1.0.5.225-PhaseD-TEST.zip             --rails full-input/script.infinity.rails-0.2.6-Stability-Evidence-RC1-TEST.zip             --first-party first-party-input/rc05-inputs/native-evidence/installed-addons             --additional full-input/additional-addons             --work original-dependency-proof
+      - name: Create EXACT single-APK candidate using permanent Infinity signer and fail-closed component diff
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/integration-20261018/package_2103390.py             --native-parent inputs/native.apk             --locked inputs/locked.apk             --signed-parent-proof inputs/native-proof.json             --native-source-commit b6434fe29d1b78451a4911a2760afa6b36d307e8             --skin inputs/skin228.zip             --helper inputs/helper012.zip             --rails inputs/rails027.zip             --watched inputs/watched101.zip             --static original-dependency-proof/addons             --static-proof original-dependency-proof/FULL-STACK-INPUTS.json             --out integrated-2103390 --sign
+          python3 repairs/integration-20261018/scope_gate.py             --previous inputs/native.apk             --candidate integrated-2103390/Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk             --out integrated-2103390/EXACT-NINE-PRESERVATION.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('integrated-2103390/INTEGRATION-2103390-RECEIPT.json').read_text())
+          assert r['signed_permanently'] and not r['physical_fold_accepted']
+          assert r['approved_items']==[1,2,3,4,5,6,9,10,12]
+          assert r['explicitly_excluded_new_work']==[7,8,11]
+          assert not r['crash_root_cause_resolved'] and not r['final_binding_audit_passed']
+          assert r['original_essential_first_shutdown_unchanged']
+          assert r['original_crash_recorder_unchanged'] and not r['cobra_changed']
+          print('EXPERIMENTAL candidate ready for separate Android17 and Fold qualification; NOT a user-approved final APK')
+          PY
+      - name: Preserve every failure and exact signed candidate; never promote
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          path: |
+            integrated-2103390/
+            integration-evidence/
+            original-dependency-proof/FULL-STACK-INPUTS.json
+          retention-days: 90
+          if-no-files-found: warn
+          compression-level: 0
