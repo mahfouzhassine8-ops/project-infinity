@@ -89,9 +89,22 @@ def open_addon(aid):
     xbmc.executebuiltin('RunScript(' + aid + ')' if kind == 'script' else
                        'ActivateWindow(Videos,' + target + ',return)')
 
+def ensure_selected_addon(aid):
+    """Refuse actions for a tile that changed while its popup was open.
+
+    This guard is only called by the Video Sources item menu, never Resume
+    Hub, Rails, the original Kodi add-on manager or any Cobra control.
+    """
+    if (not valid_id(aid) or xbmcgui.getCurrentWindowId() != 11193 or
+            xbmc.getInfoLabel('Container(50).ListItem.Property(Addon.ID)') != aid or
+            xbmc.getInfoLabel('Container(50).ListItem.Property(Infinity.UI.Token)') != aid):
+        raise RuntimeError('The selected Video Source changed. Open its menu again.')
+
+
 def manage(aid, row):
     if not manageable(aid):
         return
+    ensure_selected_addon(aid)
     result = choose('More / Manage Add-on — ' + row.get('name', aid), [('Disable Add-on', 'disable')])
     if result != 'disable':
         return
@@ -100,26 +113,34 @@ def manage(aid, row):
             'Its settings and data will be kept. Use Hide from This View to hide only this tile.',
             nolabel='Cancel', yeslabel='Disable Add-on'):
         return
+    # Explicit confirmation cannot disable a different tile when provider
+    # focus updates during a nested dialog.
+    ensure_selected_addon(aid)
     addon_info(aid) # Revalidate after user input. Kodi retains dependency enforcement.
     rpc('Addons.SetAddonEnabled', dict(addonid=aid, enabled=False))
     refresh_grid()
 
 def addon_menu(aid):
+    ensure_selected_addon(aid)
     row = addon_info(aid)
     action = choose('Add-on Options — ' + row.get('name', aid),
                     addon_rows(settings_available(aid), rails_supported(), manageable=manageable(aid)))
     if action is None:
         return
+    # The popup can outlive asynchronous grid/item updates. Never launch,
+    # hide, favourite, manage or act on an old tile after focus changes.
+    ensure_selected_addon(aid)
     addon_info(aid)
+    current = addon_rows(settings_available(aid), rails_supported(),
+                         manageable=manageable(aid))
+    if action not in {op for _, op in current}:
+        raise RuntimeError('This Video Source action is no longer available. Open the menu again.')
     if action == 'open':
         open_addon(aid)
     elif action == 'info':
-        if xbmc.getInfoLabel('Container(50).ListItem.Property(Addon.ID)') != aid:
-            raise RuntimeError('The selected tile changed. Open its menu again.')
         xbmc.executebuiltin('Action(Info,11193)')
     elif action == 'settings':
-        if settings_available(aid):
-            xbmcaddon.Addon(aid).openSettings()
+        xbmcaddon.Addon(aid).openSettings()
     elif action == 'favourite':
         kind, path = destination(aid)
         existing = rpc('Favourites.GetFavourites', dict(properties=['window', 'windowparameter', 'path']))
@@ -130,7 +151,7 @@ def addon_menu(aid):
             return
         target = dict(type='script', path=path) if kind == 'script' else dict(type='window', window='videos', windowparameter=path)
         rpc('Favourites.AddFavourite', dict(title=row.get('name', aid), thumbnail=row.get('thumbnail', ''), **target))
-    elif action == 'rails' and rails_supported():
+    elif action == 'rails':
         xbmc.executebuiltin('RunScript(script.infinity.rails,add,' + aid + ')')
     elif action == 'hide':
         set_hidden(aid, True)
