@@ -163,8 +163,8 @@ def package(parent,native,out):
                 changed=sorted(p for p in original.namelist()
                                if not SIGNATURE.fullmatch(p) and
                                original.read(p)!=final.read(p))
-                expected=["AndroidManifest.xml"] if previous else
-                       ["AndroidManifest.xml",ENGINE]
+                expected=(["AndroidManifest.xml"] if previous else
+                          ["AndroidManifest.xml",ENGINE])
                 require(changed==expected,"changed unrelated APK payload: "+str(changed))
                 artifacts.append(dict(filename=filename,sha256=sha(apk.read_bytes()),
                                       bytes=apk.stat().st_size,
