@@ -160,6 +160,10 @@ def run(args):
         if getattr(args, 'versioncheck_selection_only', False):
             require(args.expected_api == '37' and not getattr(args, 'versioncheck_shutdown_only', False),
                     'Bundled Version Check selection smoke requires dedicated API37 run')
+        if getattr(args, 'all_in_one_bundle_smoke', False):
+            require(args.expected_api == '37' and not getattr(args, 'versioncheck_shutdown_only', False)
+                    and not getattr(args, 'versioncheck_selection_only', False),
+                    'All-in-one selection needs a dedicated disposable API37 runtime')
         require(Path(args.apk).is_file(), "Signed Infinity APK missing")
         report["apk_sha256"] = sha(args.apk)
         require(report["apk_sha256"] == args.expected_sha,
@@ -171,6 +175,17 @@ def run(args):
                 "8ca8fc72ce24ae88d558d06485345ec37a2cd491ebea5805e169d84acf8ed235",
                 "Full production skin identity mismatch")
         source = Path(args.addons)
+        bundle_receipt = None
+        bundle_ids = set()
+        if getattr(args, 'all_in_one_bundle_smoke', False):
+            import package_2103388_all_in_one as integrated
+            bundle_receipt = json.loads(Path(args.bundle_proof).read_text())
+            require(set(bundle_receipt['component_inventory']) == set(integrated.IN_SCOPE),
+                    'Missing one of the approved APK-bundled components')
+            require(bundle_receipt['sha256'] == report['apk_sha256'] and
+                    bundle_receipt['version_code'] == 2103388 and bundle_receipt['signed_permanently'] is True,
+                    'All-in-one signed receipt does not match exact tested APK')
+            bundle_ids = set(integrated.IN_SCOPE)
         require(all((source / addon / "addon.xml").is_file() for addon in REQUIRED),
                 "Incomplete native Infinity component set; no fixture substitution")
 
@@ -257,6 +272,20 @@ def run(args):
                                + FULL_SKIN + '</setting>'
                                '<setting id="general.addonupdates">2</setting></settings>')
         probe.adb("push", guisettings, probe.PROFILE + "/guisettings.xml")
+        if getattr(args, 'retained_old_skin', None):
+            require(getattr(args, 'all_in_one_bundle_smoke', False),
+                    'Old-skin retention is allowed only in isolated bundle smoke')
+            retained = Path(args.retained_old_skin)
+            require(retained.is_dir() and
+                    ET.parse(retained / 'addon.xml').getroot().get('version') == '1.0.5.225',
+                    'Wrong original user-installed skin baseline')
+            probe.adb('push', retained, probe.PROFILE + '/../addons/skin.infinity.diggz')
+            sentinel = out / 'retained-progress-sentinel.txt'
+            sentinel.write_text('exact-original-user-profile-retention-proof-v1')
+            probe.shell('mkdir', '-p', probe.PROFILE + '/addon_data/script.infinity.commandcenter')
+            probe.adb('push', sentinel,
+                      probe.PROFILE + '/addon_data/script.infinity.commandcenter/retained-progress-sentinel.txt')
+            report['retained_old_skin_staged_for_upgrade'] = True
         if (getattr(args, 'versioncheck_shutdown_only', False) or
                 getattr(args, 'versioncheck_selection_only', False)):
             # Isolated Version Check checks need natural service startup
@@ -271,6 +300,10 @@ def run(args):
         confirmation = stage_confirmation(extras)
         versioncheck_diagnostic = None
         descriptor_diagnostic = None
+        bundle_diagnostic = None
+        if getattr(args, 'all_in_one_bundle_smoke', False):
+            import bundle_selection_probe as bundle_probe
+            bundle_diagnostic = bundle_probe.stage(extras)
         if (getattr(args, 'versioncheck_shutdown_only', False) or
                 getattr(args, 'versioncheck_selection_only', False) or
                 input_report.get('versioncheck_candidate')):
@@ -286,8 +319,13 @@ def run(args):
                 continue
             manifest = ET.parse(addon / "addon.xml").getroot()
             require(manifest.get("id") == addon.name, "Addon path ID mismatch")
+            if addon.name in bundle_ids:
+                continue  # Test the actual APK copy, not a staged replacement.
             probe.adb("push", addon, probe.PROFILE + "/../addons/" + addon.name)
         probe.adb("push", confirmation, probe.PROFILE + "/../addons/" + CONFIRM)
+        if bundle_diagnostic is not None:
+            probe.adb("push", bundle_diagnostic,
+                      probe.PROFILE + "/../addons/" + bundle_probe.PROBE_ID)
         if versioncheck_diagnostic is not None:
             probe.adb("push", versioncheck_diagnostic,
                       probe.PROFILE + "/../addons/" + versioncheck_probe.DIAGNOSTIC)
@@ -321,6 +359,8 @@ def run(args):
             expected = ET.parse(source / addon / "addon.xml").getroot().get("version")
             require(info["version"] == expected, "Addon version wrong in running Infinity: " + addon)
             if not info["enabled"]:
+                require(not (getattr(args, 'all_in_one_bundle_smoke', False) and addon in bundle_ids),
+                        'Bundled add-on is not automatically enabled: ' + addon)
                 require(probe.rpc("Addons.SetAddonEnabled",
                                   {"addonid": addon, "enabled": True}) == "OK",
                         "Infinity refused production addon " + addon)
@@ -386,6 +426,49 @@ def run(args):
         require(screenshot.startswith(b"\x89PNG\r\n\x1a\n"),
                 "Actual Infinity screenshot missing or not PNG")
         (out / "infinity-real-screen.png").write_bytes(screenshot)
+        if getattr(args, 'all_in_one_bundle_smoke', False):
+            publish('targeted-all-in-one-Kodi-addon-selection')
+            import bundle_selection_probe as bundle_probe
+            details = probe.rpc('Addons.GetAddonDetails',
+                        {'addonid': bundle_probe.PROBE_ID, 'properties': ['enabled']})['addon']
+            if not details['enabled']:
+                require(probe.rpc('Addons.SetAddonEnabled',
+                        {'addonid': bundle_probe.PROBE_ID, 'enabled': True}) == 'OK',
+                        'Disposable bundle probe not available')
+            require(probe.rpc('Addons.ExecuteAddon',
+                            {'addonid': bundle_probe.PROBE_ID,
+                             'params': [report['native_owner']['owner'], json.dumps(sorted(bundle_ids))],
+                             'wait': False}) == 'OK', 'Could not observe actual Kodi-selected bundle')
+            deadline = time.monotonic() + 70
+            observed = {}
+            while time.monotonic() < deadline:
+                observed = probe.read_json(probe.PROFILE + '/infinity-all-in-one-selected.json')
+                if observed.get('owner') == report['native_owner']['owner'] and
+                        observed.get('pid') == report['native_owner']['pid']:
+                    break
+                time.sleep(.25)
+            (out / 'ALL-IN-ONE-SELECTED.json').write_text(json.dumps(observed, indent=2) + '\n')
+            require(observed.get('owner') == report['native_owner']['owner'] and
+                    observed.get('pid') == report['native_owner']['pid'],
+                    'Bundle selection evidence missing/current engine changed')
+            for ident in sorted(bundle_ids):
+                selected = observed.get('addons', {}).get(ident, {})
+                target = bundle_receipt['component_inventory'][ident]
+                require(selected.get('version') == target['version'] and
+                        selected.get('addon_xml_sha256') == target['addon_xml_sha256'],
+                        'Kodi did not activate APK-bundled component ' + ident)
+            if getattr(args, 'retained_old_skin', None):
+                marker = probe.shell('cat', probe.PROFILE +
+                    '/addon_data/script.infinity.commandcenter/retained-progress-sentinel.txt', check=False)
+                require(marker.strip() == 'exact-original-user-profile-retention-proof-v1',
+                        'Retained user progress sentinel disappeared during one-APK update')
+                report['retained_progress_sentinel_preserved'] = True
+            report['all_in_one_bundle_selection_verified'] = True
+            report['real_close_executed'] = False
+            report['close_certified'] = False
+            report['passed'] = False  # Narrow bundle smoke is not a full Close certificate.
+            publish('targeted-all-in-one-selection-finished')
+            return report
         if getattr(args, 'versioncheck_selection_only', False):
             publish('targeted-bundled-versioncheck-selection')
             import versioncheck_shutdown_probe as versioncheck_probe
@@ -488,5 +571,10 @@ if __name__ == "__main__":
                    help='Dedicated disposable API37 descriptor evidence only; unchanged Close gate')
     p.add_argument('--versioncheck-selection-only', action='store_true',
                    help='Fresh API37 bundled service selection smoke; never certifies Close')
+    p.add_argument('--all-in-one-bundle-smoke', action='store_true',
+                   help='Only prove exact Kodi selected bundled components on fresh/retained API37')
+    p.add_argument('--bundle-proof', type=Path, help='Pinned signed 2103388 component receipt')
+    p.add_argument('--retained-old-skin', type=Path,
+                   help='Disposable pre-existing full .225 skin directory (no user device)')
     p.add_argument("--out", type=Path, required=True)
     run(p.parse_args())
