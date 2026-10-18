@@ -1,0 +1,58 @@
+name: "Infinity integration | only #1-6, #9, #10, #12 (HOST / NO APK)"
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths:
+      - "repairs/integration-20261018/**"
+      - "repairs/four-repair-20261018/addon/runtime.py"
+      - "repairs/four-repair-20261018/test_menu.py"
+      - ".github/workflows/infinity-integration-exact-nine-host.yml"
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: infinity-exact-nine-host, cancel-in-progress: false}
+jobs:
+  exact-nine-preservation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Pin exact nine-item scope and run APK-delta negative controls
+        run: |
+          set -euo pipefail
+          python3 repairs/integration-20261018/scope_gate.py --out exact-nine-host/SCOPE.json
+          python3 -m unittest discover -s repairs/integration-20261018 -p 'test_scope_gate.py' -v
+      - name: Preserve #4 menu, selected-tile safeguards, #6 exact Rails .026/.027 version contract
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/four-repair-20261018 -p test_menu.py -v
+          python3 repairs/four-repair-20261018/test_resume.py
+      - name: Verify existing approved #1 Rotate and #3 opt-in Video Sources native method
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/test_item1_rotate_cyan_228.py
+          python3 repairs/four-repair-20261018/test_native.py
+          python3 repairs/four-repair-20261018/test_item3_video_source_identity.py
+      - name: Reuse original #5 watched/Watchlist/Collection data owner
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_state.py -v
+          python3 -m unittest discover -s repairs/watched-bridge-20261017 -p test_contracts.py -v
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          path=Path('repairs/android-checkpoint-shutdown/installed/build.py')
+          spec=importlib.util.spec_from_file_location('cc_reuse',path)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          module.materialize(Path('exact-nine-host/commandcenter-original'))
+          PY
+          python3 repairs/watched-bridge-20261017/test_actions.py --runtime exact-nine-host/commandcenter-original/script.infinity.commandcenter
+      - name: Publish source-only evidence; no combined APK was created
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Exact-Nine-Integration-Scope-HOST-NO-APK
+          path: exact-nine-host/SCOPE.json
+          retention-days: 90
+          if-no-files-found: warn
