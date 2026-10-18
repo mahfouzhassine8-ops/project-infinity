@@ -7,3 +7,5 @@ Must preserve original 2103384 locked shutdown, all Cobra components, existing i
 Selected packages: exact reviewed skin 1.0.5.228, UI helper 0.1.2 with Rails 0.2.6/0.2.7 capability, Rails Mocha 0.2.7, Watched Bridge 1.0.1.
 No physical Fold acceptance, user-data changes, production deployment, baseline promotion or final lock are authorized by this marker.
 If any required checksum, dependency, signer, zip inventory, native lineage or conservation gate fails, STOP AND DO NOT ISSUE AN APK.
+
+TARGETED RETRY 2026-10-18: Prior combined run 39170118673 failed only at retrieving approved GitHub draft release asset 651868759 because the job token lacked contents:write (HTTP 403). Job-only permission corrected in workflow commit 142e76de35ecb32060694cdc561427b9db8bbc49, matching the already successful original skin job. Exact native source producer 39169187099 passed host, native compile, signature and fresh/loaded Android gates. Rerun combination without rebuilding previously passed native assets; all component hashes and skip exclusions stay unchanged. This RETRY remains EXPERIMENTAL and not Fold-qualified.
