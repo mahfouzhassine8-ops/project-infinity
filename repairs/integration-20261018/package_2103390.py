@@ -205,6 +205,39 @@ def revised_manifest(original: bytes):
     return updated
 
 
+def preserve_original_embedded_dependencies(original: zipfile.ZipFile, approved: dict):
+    """Existing signed 2103384-derived service/dependency bytes are authoritative.
+
+    A verified external source may help supply MISSING skin dependencies, but
+    must not overwrite or append members to an already embedded add-on.
+    Validate the original embedded add-on's exact ID and required version.
+    """
+    targets = dict(approved)
+    originals = set(original.namelist())
+    protected = {}
+    for aid, required in sorted(gate.DEPENDENCIES.items()):
+        prefix = "assets/addons/" + aid + "/"
+        present = sorted(name for name in originals if name.startswith(prefix))
+        if not present:
+            continue
+        manifest_name = prefix + "addon.xml"
+        require(manifest_name in present,
+                "Existing protected dependency has no addon.xml: " + aid)
+        descriptor = ET.fromstring(original.read(manifest_name))
+        require(descriptor.tag == "addon" and descriptor.get("id") == aid and
+                (required is None or descriptor.get("version") == required),
+                "Existing protected dependency ID/version differs: " + aid)
+        for name in tuple(targets):
+            if name.startswith(prefix):
+                del targets[name]
+        protected[aid] = {
+            "version": descriptor.get("version"),
+            "preserved_original_members": len(present),
+            "unchanged_original_addon": True,
+        }
+    return targets, protected
+
+
 def create_unsigned(parent: Path, approved: dict, destination: Path):
     manifest.PARENT_CODE = BASE_CODE
     manifest.CODE = CODE
@@ -215,16 +248,16 @@ def create_unsigned(parent: Path, approved: dict, destination: Path):
         new_manifest, edits = manifest.patch(original.read("AndroidManifest.xml"))
         require({x["field"] for x in edits} == {"versionCode", "versionName"},
                 "Unreviewed AndroidManifest changes")
-        targets = dict(approved)
+        # Use original embedded service/dependency bytes as the authority.
+        # External staged dependencies fill only genuinely absent add-on IDs.
+        targets, original_embedded = preserve_original_embedded_dependencies(original, approved)
         targets["AndroidManifest.xml"] = new_manifest
         targets[gate.MANIFEST] = revised_manifest(original.read(gate.MANIFEST))
         members = set(original.namelist())
-        for name in approved:
-            # Original static dependencies stay byte-for-byte identical.
-            if name in members and name.startswith(tuple(
-                    "assets/addons/" + aid + "/" for aid in gate.DEPENDENCIES)):
-                require(original.read(name) == approved[name],
-                        "Refusing to overwrite existing production dependency: " + name)
+        require(all(not n.startswith("assets/addons/" + aid + "/")
+                    for aid in original_embedded for n in targets
+                    if n not in ("AndroidManifest.xml", gate.MANIFEST)),
+                "Original embedded dependency accidentally selected for overwrite")
         with zipfile.ZipFile(destination, "w", allowZip64=True) as z:
             for info in original.infolist():
                 if SIGNATURE.fullmatch(info.filename):
