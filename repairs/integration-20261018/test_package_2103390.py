@@ -69,6 +69,35 @@ class ExactNineAssemblerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "archive does not contain"):
             bundle.helper_source_identity(altered)
 
+    def test_original_signed_native_name_remains_pinned_after_safe_staging_alias(self):
+        # Work's signed receipt names the original published APK, while this
+        # workflow stores the exact same bytes under inputs/native.apk.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            staged = root / "native.apk"
+            staged.write_bytes(b"pinned signed native byte fixture")
+            approved = {
+                "file": "Infinity-2103385-UI-Restoration-TEST1.apk",
+                "sha256": bundle.digest(staged),
+                "native_restored_2103384": False,
+                "changed_unsigned_payload": ["AndroidManifest.xml",
+                                             "lib/arm64-v8a/libkodi.so"],
+            }
+            self.assertEqual(
+                bundle.verify_signed_native_artifact({"artifacts": [approved]}, staged),
+                approved)
+            wrong_file = dict(approved, file="Infinity-2103384-Older-APK.apk")
+            with self.assertRaisesRegex(ValueError, "Signed native parent lineage"):
+                bundle.verify_signed_native_artifact({"artifacts": [wrong_file]}, staged)
+            wrong_digest = dict(approved, sha256="0"*64)
+            with self.assertRaisesRegex(ValueError, "Signed native parent lineage"):
+                bundle.verify_signed_native_artifact({"artifacts": [wrong_digest]}, staged)
+            wrong_delta = dict(approved, changed_unsigned_payload=["AndroidManifest.xml"])
+            with self.assertRaisesRegex(ValueError, "Signed native parent lineage"):
+                bundle.verify_signed_native_artifact({"artifacts": [wrong_delta]}, staged)
+            with self.assertRaisesRegex(ValueError, "Signed native parent lineage"):
+                bundle.verify_signed_native_artifact({"artifacts": [approved, approved]}, staged)
+
     def test_wrong_locked_parent_hash_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
