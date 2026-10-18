@@ -1,0 +1,33 @@
+name: Infinity | Cancel specifically requested API35 run | No build
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['.github/workflows/infinity-four-repair-cancel-api35.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: write}
+jobs:
+  cancel-requested-run:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Cancel only Android15 run39125992273 as requested by the user
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/39125992273 > /tmp/requested-run.json
+          python3 - <<'PY'
+          import json, os
+          r=json.load(open('/tmp/requested-run.json'))
+          assert os.environ['GITHUB_REPOSITORY']=='mahfouzhassine8-ops/project-infinity'
+          assert r['id']==39125992273
+          assert r['head_branch']=='work/infinity-post-2103384-feature-restoration'
+          assert r['head_sha']=='edd9461fa3e3d14bb372f63da32a859cdb1ba8b9'
+          assert r['path']=='.github/workflows/infinity-four-repair-ui-android.yml'
+          print('Verified requested API35 run:',r['status'],r['conclusion'])
+          with open('/tmp/requested-run-status','w') as f: f.write(r['status'])
+          PY
+          if [ "$(cat /tmp/requested-run-status)" != completed ]; then
+            gh api --method POST repos/$GITHUB_REPOSITORY/actions/runs/39125992273/cancel
+          fi
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/39125992273 --jq '{id,status,conclusion,html_url}'

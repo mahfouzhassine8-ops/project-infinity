@@ -1,8 +1,7 @@
-name: Infinity | Reuse signed 2103386 | API35 UI and both Stop paths
+name: Infinity | OPTIONAL MANUAL API35 compatibility | Reuse signed 2103386
 on:
-  push:
-    branches: [work/infinity-post-2103384-feature-restoration]
-    paths: ['repairs/four-repair-20261018/UI-ANDROID.marker']
+  # User directive 2026-10-18: API37/Fold is primary. Preserve this optional
+  # compatibility test, but never schedule it on pushes or marker changes.
   workflow_dispatch:
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-four-repair-ui-android, cancel-in-progress: true}

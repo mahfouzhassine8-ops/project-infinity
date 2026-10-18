@@ -202,7 +202,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [30, 35]
+        # API35 remains available only in the dedicated manual compatibility
+        # workflow. Do not automatically run it when signing a future candidate.
+        api: [30]
     runs-on: ubuntu-22.04
     timeout-minutes: 180
     permissions: {contents: write, actions: read}
@@ -285,8 +287,8 @@ jobs:
       - name: Real candidate taps, holds, themes, Stop choices, Stop Home, Essential-First Close and reopen
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
-          # Original API30 failure and modern API35; exact same input/actions
-          # and dismissal assertions, with window/input evidence retained.
+          # Original API30 failure regression; API35 is a separate manual test.
+          # Keep exact input/actions and dismissal assertions/evidence.
           api-level: ${{ matrix.api }}
           arch: x86_64
           target: google_apis
