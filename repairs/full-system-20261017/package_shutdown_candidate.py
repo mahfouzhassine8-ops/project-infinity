@@ -24,6 +24,13 @@ PARENT_SHA = "6e28bfea7cdb5e497ee21601a714e738db7a57edc3c5c0d29a9c19d461031854"
 PARENT_ENGINE_SHA = "9c2259ac06dde7a6b6788e9971dc1c9a6f67ad316ce16d379dc9d7b3861d7f3d"
 SIGNER_SHA = "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
 SOURCE_BASE = "093323fbc0ae87cbe2fa2a21abab0c357fdaf754"
+# Already successful full ARM64 native source and native artifact. A packaging
+# correction must reuse these identical bytes, NOT waste another native rebuild.
+PINNED_NATIVE_COMMIT = "3e5e5e4f8d65464153243de9179dd24fb090d05e"
+PINNED_NATIVE_SHA256 = "eeba929e4baa12d644bf6706af7813fa53a196d61c8abd948a92c9a226153eeb"
+PINNED_CORRECTED_HEADER_SHA256 = "580a884e002bd95cbdd10a5c439b9052b7bdebebaf9473613da588c11f50cc9e"
+TEST4_HEADER_SHA256 = "a0a50a78e24fc5da8c9af65bc894ee47af4e61139af9d89cf014207d177e92f1"
+
 PARENT_CODE = 2103382
 CODE = 2103383
 PARENT_NAME = "1.0.9-Watched-Touch-Bridge-TEST3"
@@ -82,15 +89,27 @@ def package(parent, native, destination):
     watched = read(native / "WATCHED-TOUCH-SOURCE-DELTA.json")
     prior = read(native / "FOLD-DEADLOCK-SOURCE-DELTA.json")
     source = read(native / "FINAL-SHUTDOWN-SOURCE-PRESERVATION.json")
+    locked = read(native / "LOCKED-TEST4-SOURCE-PRESERVATION.json")
     proof = read(native / "ENGINE-PROOF.json")
     require(delta["changed"] == ["xbmc/platform/android/activity/InfinityProtectedWrites.h"],
             "Native patch is not one strictly scoped file")
     name = delta["changed"][0]
-    require(delta["before"][name] == "a0a50a78e24fc5da8c9af65bc894ee47af4e61139af9d89cf014207d177e92f1" and
-            source["after"][name] == delta["after"][name],
+    require(delta["before"][name] == TEST4_HEADER_SHA256 and
+            source["after"][name] == delta["after"][name] ==
+            PINNED_CORRECTED_HEADER_SHA256,
             "Untested or mismatched protected write correction")
+    # The historical TEST4 lock lives in the *immutable locked map*. The
+    # actual preservation result lives in FINAL-SHUTDOWN-SOURCE-PRESERVATION.
+    # Earlier packaging incorrectly demanded the latter field in the one-file
+    # patch delta, where it was never recorded. Verify BOTH authentic maps.
     require(delta.get("strict_protected_file_durability_not_weakened") is True and
-            delta.get("original_locked_test4_unmodified") is True,
+            delta.get("test4_reference_header_sha256") == TEST4_HEADER_SHA256 and
+            locked["after"].get(name) == TEST4_HEADER_SHA256 and
+            source.get("original_locked_test4_unmodified") is True and
+            source.get("essential_first_coordinator_unchanged") is True and
+            source.get("safe_missing_installer_stage_durability_correction") is True and
+            locked["after"].get("xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp") ==
+            source["after"].get("xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp"),
             "Durability / original lock contract invalid")
     require(watched.get("all_other_native_sources_byte_identical") is True and
             watched.get("native_shutdown_and_write_admission_unchanged") is True and
@@ -103,13 +122,17 @@ def package(parent, native, destination):
             proof.get("independent_close_installer_durability_compiled") is True and
             proof.get("shutdown_policy") == "essential_first_process_exit_v1",
             "Native engine lacks preserved features or corrected durability header")
-    require(proof.get("native_sha256") == sha((native / "libkodi.so").read_bytes()),
+    require(proof.get("native_sha256") == PINNED_NATIVE_SHA256 ==
+            sha((native / "libkodi.so").read_bytes()),
             "Compiled native proof SHA mismatch")
     require(proof.get("physical_device_verified") is False and
             proof.get("locked") is False,
             "Experimental native proof falsely promoted")
     require(proof.get("source_commit") == delta.get("source_provenance") ==
-            os.environ.get("GITHUB_SHA"), "Native build is from a different commit")
+            PINNED_NATIVE_COMMIT, "Downloaded native evidence is NOT our passing source")
+    # The signing-only rerun legitimately has a newer workflow commit. Preserve
+    # the exact *native* commit provenance rather than rewriting the evidence.
+    require(os.environ.get("GITHUB_SHA"), "Signing workflow source unidentified")
     destination.mkdir(parents=True, exist_ok=True)
     bt = Path(os.environ["ANDROID_HOME"]) / "build-tools/34.0.0"
     ndk = Path(os.environ["ANDROID_HOME"]) / "ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin"
@@ -185,7 +208,8 @@ def package(parent, native, destination):
     receipt = {
         "scope": "Experimental in-place Infinity 2103383 from signed TEST3 2103382",
         "parent_signed_test3_sha256": PARENT_SHA, "parent_native_sha256": PARENT_ENGINE_SHA,
-        "native_commit": os.environ.get("GITHUB_SHA"),
+        "native_commit": PINNED_NATIVE_COMMIT,
+        "packaging_commit": os.environ.get("GITHUB_SHA"),
         "no_other_app_or_package_created": True, "user_data_untouched": True,
         "skin_rails_commandcenter_preserved": True,
         "all_test3_native_features_retained": True,
