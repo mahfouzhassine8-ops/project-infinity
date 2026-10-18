@@ -22,6 +22,8 @@ jobs:
           set -euo pipefail
           python3 repairs/integration-20261018/scope_gate.py --out exact-nine-host/SCOPE.json
           python3 -m unittest discover -s repairs/integration-20261018 -p 'test_scope_gate.py' -v
+          python3 -m py_compile repairs/integration-20261018/package_2103390.py
+          python3 -m unittest discover -s repairs/integration-20261018 -p 'test_package_2103390.py' -v
       - name: Preserve #4 menu, selected-tile safeguards, #6 exact Rails .026/.027 version contract
         run: |
           set -euo pipefail
