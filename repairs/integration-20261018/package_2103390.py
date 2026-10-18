@@ -91,6 +91,25 @@ def unzip_component(archive: Path, addon: str, known_sha=None):
     xml = ET.fromstring(result[key])
     require(xml.get("id") == addon and xml.get("version") == gate.VERSIONS[addon],
             "Wrong approved add-on identity/version for " + addon)
+    if addon == "skin.infinity.diggz":
+        # The full approved skin may raise this dependency in the future.
+        # Only retain original service 0.7.2 if the exact reviewed .228
+        # does not require a newer Compatibility version.
+        compat = [row.get("version", "0")
+                  for row in xml.findall("./requires/import")
+                  if row.get("addon") == "service.infinity.compat"]
+        require(len(compat) <= 1, "Duplicate skin Compatibility requirement")
+        if compat:
+            def dotted(value):
+                require(re.fullmatch(r"\d+(?:\.\d+)*", value) is not None,
+                        "Invalid skin Compatibility requirement")
+                return tuple(int(part) for part in value.split("."))
+            actual = dotted(gate.PRESERVED_COMPAT_VERSION)
+            minimum = dotted(compat[0])
+            width = max(len(actual), len(minimum))
+            require(actual + (0,) * (width-len(actual)) >=
+                    minimum + (0,) * (width-len(minimum)),
+                    "Reviewed skin requires newer Compatibility than locked 2103384")
     require(bool(result), "Empty ZIP: " + addon)
     return result, actual_hash
 
@@ -225,7 +244,9 @@ def preserve_original_embedded_dependencies(original: zipfile.ZipFile, approved:
                 "Existing protected dependency has no addon.xml: " + aid)
         descriptor = ET.fromstring(original.read(manifest_name))
         require(descriptor.tag == "addon" and descriptor.get("id") == aid and
-                (required is None or descriptor.get("version") == required),
+                (required is None or descriptor.get("version") == required) and
+                (aid != "service.infinity.compat" or
+                 descriptor.get("version") == gate.PRESERVED_COMPAT_VERSION),
                 "Existing protected dependency ID/version differs: " + aid)
         for name in tuple(targets):
             if name.startswith(prefix):
