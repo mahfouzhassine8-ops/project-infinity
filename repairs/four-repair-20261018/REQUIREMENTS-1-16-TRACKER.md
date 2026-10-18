@@ -1,6 +1,6 @@
 # Infinity — binding 1–16 completion tracker
 
-**Status:** IMPLEMENTATION TRACKER. **Current step:** #2 targeted repair complete; await instruction for #3. **Individual implementations complete:** 2/16. **Final all-in-one APK and Fold acceptance:** NOT DONE.
+**Status:** IMPLEMENTATION TRACKER. **Current step:** #3 targeted repair complete; await instruction for #4. **Individual implementations complete:** 3/16. **Final all-in-one APK and Fold acceptance:** NOT DONE.
 **Repository:** `mahfouzhassine8-ops/project-infinity`.
 **Development branch:** `work/infinity-post-2103384-feature-restoration`.
 **Protected user-approved APK:** 2103384, SHA-256 `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`.
@@ -22,7 +22,7 @@
 
 - [x] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **INDIVIDUAL IMPLEMENTATION COMPLETE:** Work Rotate handler reused, 13 alternate layout cyan corrections made in skin 1.0.5.228; all 14 layouts checked; exact approved binary delta proved; final Fold/integrated APK acceptance PENDING.
 - [x] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **INDIVIDUAL IMPLEMENTATION COMPLETE:** Work's original Home movie/episode actions preserved; helper 0.1.1 fixes a reproducible stale-action data integrity bug; targeted original-writer/host/source/package tests green; final integrated APK + Fold acceptance PENDING.
-- [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus — **DEFERRED when user returned to #1; previously gathered evidence retained; unchecked.**
+- [x] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus — **INDIVIDUAL IMPLEMENTATION COMPLETE:** existing approved two-tap/hold behavior retained; native opt-in Video Sources identity mismatch fail-closed correction and C++ host tests GREEN; final signed APK/physical Fold acceptance PENDING.
 - [ ] **4.** Exact approved context menu order and relevant actions; Hide is reversible and never Disable
 - [ ] **5.** Universal blue watched indicators, Resume Hub and Watchlist/Collection correctness; durable identity
 - [ ] **6.** Home Movie/TV rails long-press, touch parity and correct options with no black ghost popup
@@ -158,3 +158,21 @@
 **#1 preservation:** GitHub #2 code did not edit the pinned #1 corrected skin 1.0.5.228, native playback/OSD, or its source. #2 staged helper is for eventual approved integrated APK only; not a separate required user installation.
 
 **Final acceptance still pending:** A complete signed upgrade containing #1 and #2 plus all other fixes, preserving installed Diggz/user data, stable Cobra runtime, Android17/Fold long-press, current provider state, full Essential-First Close and restart. This is an **individual implementation** checkmark, not a release/physical Fold pass, and no final APK is claimed.
+
+## #3 ACTUAL TARGETED FIX — IMPLEMENTATION COMPLETE (2026-10-18)
+
+**Prior Work contract retained:** One tap selects, next tap on same tile opens the selected add-on, select+hold opens that tile's options, left/right columns and scroll-state preserved. The earlier [Android 17 UI trace 39126569633](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39126569633) contained 18/18 matched grid/scroll cases and 12/12 matching opened add-on identities across synthetic cover/inner sizes and Light/Dark/OLED. That overall run **FAILED at Essential-First Close**, not a final release pass.
+
+**New genuine defect reproduced:** The old native `OnInfinityUiTouch()` accepted a plugin-projected item with `Infinity.UI.Token` disagreeing with `Addon.ID`. In the compiled negative control, two taps on that mismatched Video Sources tile reached an ordinary `OnClick(ACTION_SELECT_ITEM)` and could launch the *different* add-on named by `Addon.ID`. Its long-press also improperly swallowed the event after arming the inconsistent token. This contradicted the exact selected-tile identity requirement.
+
+**Only scoped production correction:** [commit 6d7c315592793d09dee840680666b2e23e5ef769](https://github.com/mahfouzhassine8-ops/project-infinity/commit/6d7c315592793d09dee840680666b2e23e5ef769) inserts 13 lines into **`repairs/four-repair-20261018/native_patch.py`** inside the existing `browse` scope (`WINDOW_HOME + 1193`, control `50`, only explicit `Infinity.UI.Version=1` and `Infinity.UI.Kind=addon`). This fails closed on an unsafe or mismatched token, clears only that input's arm state, restores previous selection, and consumes that malformed touch so it cannot fall through to Kodi's direct launch. It does not change normal valid Video Sources behavior or any other input path. The entire previous native source is reproduced **byte-for-byte** when this one insertion is removed.
+
+**Compiling, regression and preservation proof:** New [host-only workflow 39154244497](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39154244497) **GREEN**:
+- Original `test_native.py` compiled/ran original left/right, second-tap, long-press, scrolled/Fold transforms, first popup tap selection, normal Resume path, unrelated window fallthrough. PASS.
+- `test_item3_video_source_identity.py` compiled the previous exact pinned production C++ method and reproduced unsafe second-tap wrong-ID action. It compiled the corrected method and confirmed that malformed first/second taps, malformed holds, and tokens changing *after* initial arming **do not activate**; valid exact IDs still select first/open second; independent Home Resume, popup, native fallthrough preserved. PASS.
+- Protected locked 2103384 shutdown source guard [39154244499](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39154244499) **GREEN**.
+- Exact change-scope comparison [583d08cb..94aba881](https://github.com/mahfouzhassine8-ops/project-infinity/compare/583d08cb683dcc866e824b1551f0cfb96cce878b...94aba881292bba91fc4dc975b966e0e701af9d8a) contains **one 13-line production native source addition**, one new target test, one new host-only CI workflow. **No Cobra source, assets, dependencies, skin, Item Options 0.1.1 (#2), skin 1.0.5.228 (#1), player code, or shutdown source modified.**
+- First run [39154158075](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39154158075) failed in a test-only overly broad whole-file assertion before compiling new negative controls; this test assertion was corrected (no production change) and the exact next run passed. That historical failure is retained.
+
+**No new APK:** The correction is checked in as a protected *native build input* for eventual one-APK integration, not yet in any signed APK. Physical Fold/Android17 firmware, full Cobra functional preservation, install-over, Essential-First Close/reopen and final user lock remain **not accepted**, and must be independently tested at #16. The individual #3 implementation checkmark does not waive them.
+
