@@ -109,7 +109,7 @@ def exercise(probe, out, report):
                 if not selected.startswith(('script.infinity.', 'service.infinity.', 'skin.infinity.')):
                     mandatory += ['Hide from This View','More / Manage Add-on']
                 require(labels == [x for x in required if x in labels] and all(x in labels for x in mandatory),
-                        'menu ordering/capabilities wrong')
+                        'menu ordering/capabilities wrong for '+selected+': '+repr(labels))
                 capture(viewport + '-' + theme.lower() + '-' + side + '-menu', menu)
                 tap(menu, rowpoint(menu, 'Open'))
                 require(popup(observe()), 'Open activated when merely selected')

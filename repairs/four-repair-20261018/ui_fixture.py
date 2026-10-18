@@ -78,11 +78,19 @@ try:
             row = dict(position=control.getPosition(), width=control.getWidth(), height=control.getHeight(),
                        visible=xbmc.getCondVisibility('Control.IsVisible(' + str(ident) + ')'))
             if hasattr(control, 'size'):
-                row.update(size=control.size(), selected=control.getSelectedPosition(),
-                    items=[dict(label=control.getListItem(i).getLabel(),
-                                kind=control.getListItem(i).getProperty('Infinity.UI.Kind'),
-                                token=control.getListItem(i).getProperty('Infinity.UI.Token'))
-                           for i in range(min(control.size(), 20))])
+                # Another Python interpreter's WindowXMLDialog list wrapper
+                # has an empty local vector even when the native GUI shows
+                # populated rows. Read native absolute list items, as the
+                # existing Rails observer does; never infer an empty menu.
+                count = int(xbmc.getInfoLabel('Container(%d).NumItems' % ident) or 0)
+                current = xbmc.getInfoLabel('Container(%d).CurrentItem' % ident)
+                row.update(size=count, python_wrapper_size=control.size(),
+                    selected=int(current)-1 if current.isdecimal() else -1,
+                    item_source='native-container-infolabels',
+                    items=[dict(label=xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).Label' % (ident,i)),
+                                kind=xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).Property(Infinity.UI.Kind)' % (ident,i)),
+                                token=xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).Property(Infinity.UI.Token)' % (ident,i)))
+                           for i in range(min(count, 30))])
             result['controls'][str(ident)] = row
         except Exception as exc:
             result['controls'][str(ident)] = dict(error=str(exc))
