@@ -86,6 +86,26 @@ class ContractTests(unittest.TestCase):
         finally:
             context.cleanup()
 
+    def test_rejects_new_registration_of_original_unregistered_compat_service(self):
+        context, old, candidate = self.setup_fixture()
+        try:
+            with zipfile.ZipFile(candidate) as z:
+                items = {name:z.read(name) for name in z.namelist()}
+            old_manifest = items[gate.MANIFEST]
+            self.assertNotIn("service.infinity.compat",
+                             gate.manifest_members(old_manifest))
+            xml = ET.fromstring(old_manifest)
+            ET.SubElement(xml, "addon").text = "service.infinity.compat"
+            items[gate.MANIFEST] = ET.tostring(xml)
+            with zipfile.ZipFile(candidate,"w") as z:
+                for name,body in items.items():
+                    z.writestr(name,body)
+            with self.assertRaisesRegex(ValueError,
+                                         "Original embedded Compatibility registration changed"):
+                gate.check_apks(old,candidate)
+        finally:
+            context.cleanup()
+
     def test_rejects_deletion_of_existing_compatibility_or_other_member(self):
         self.check_bad(drop="assets/addons/service.infinity.compat/runtime_service.py")
         self.check_bad(drop="assets/cobra/preserved.bin")
