@@ -191,9 +191,21 @@ def exercise(probe, out, report):
         # API35 evidence contains Android's first-use fullscreen coachmark,
         # not an Infinity dialog. Acknowledge the observed system button before
         # app gestures; do not prime/retry app taps or change navigation policy.
+        # API37 moved this window from android/UID1000 into SystemUI's own
+        # package UID (run39125992235:10201). Resolve that actual installed UID;
+        # never accept an arbitrary package, similarly named popup or ANR.
+        system_ui_packages = probe.shell('pm', 'list', 'packages', '-U', 'com.android.systemui')
+        system_ui_uids = re.findall(r'(?m)^package:com\.android\.systemui uid:(\d+)\s*$',
+                                    system_ui_packages)
+        require(len(system_ui_uids) == 1, 'Cannot verify installed Android SystemUI identity')
+        system_ui_uid = system_ui_uids[0]
+        (out / 'android-systemui-package.txt').write_text(system_ui_packages)
         def visible_tutorial(windows):
             return any('ImmersiveModeConfirmation}:' in block and
-                       'mOwnerUid=1000 ' in block and 'package=android ' in block and
+                       (('mOwnerUid=1000 ' in block and 'package=android ' in block) or
+                        ('mOwnerUid=' + system_ui_uid + ' ' in block and
+                         'package=com.android.systemui ' in block and
+                         'IMMERSIVE_CONFIRMATION_WINDOW' in block)) and
                        'isVisible=true' in block
                        for block in re.split(r'(?m)^  Window #', windows))
         windows = probe.shell('dumpsys', 'window')

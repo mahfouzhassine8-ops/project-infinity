@@ -18,6 +18,25 @@ HERE = Path(__file__).resolve().parent
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_fullscreen_onboarding_requires_verified_android_owner(self):
+        tree = ast.parse((HERE / 'android_interactions.py').read_text())
+        node = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)
+                    and n.name == 'visible_tutorial')
+        module = ast.fix_missing_locations(ast.Module(body=[node], type_ignores=[]))
+        namespace = dict(re=re, system_ui_uid='10201')
+        exec(compile(module, str(HERE / 'android_interactions.py'), 'exec'), namespace)
+        for package, uid, name, expected in (
+            ('android', '1000', 'ImmersiveModeConfirmation', True),
+            ('com.android.systemui', '10201', 'ImmersiveModeConfirmation', True),
+            ('com.android.systemui', '10099', 'ImmersiveModeConfirmation', False),
+            ('unrelated.app', '10201', 'ImmersiveModeConfirmation', False),
+            ('android', '1000', 'Application Not Responding: com.google.android.apps.nexuslauncher', False)):
+            with self.subTest(package=package, uid=uid, name=name):
+                windows = ('  Window #5 Window{abc u0 ' + name + '}:\n'
+                           '    mOwnerUid=' + uid + ' showForAllUsers=true package=' + package + ' appop=NONE\n'
+                           '    pfl=IMMERSIVE_CONFIRMATION_WINDOW TRUSTED_OVERLAY\n    isVisible=true\n')
+                self.assertEqual(namespace['visible_tutorial'](windows), expected)
+
     def test_foreign_android_dialog_cannot_receive_an_app_gesture(self):
         tree = ast.parse((HERE / 'android_interactions.py').read_text())
         node = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == 'tap')
