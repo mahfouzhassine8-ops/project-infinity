@@ -104,7 +104,7 @@ class ExactNineAssemblerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "original.apk"
             prefix = "assets/addons/service.infinity.compat/"
-            original_manifest = b'<addon id="service.infinity.compat" version="0.8.2"><extension point="xbmc.service"/></addon>'
+            original_manifest = b'<addon id="service.infinity.compat" version="0.7.2"><extension point="xbmc.service"/></addon>'
             with zipfile.ZipFile(path, "w") as z:
                 z.writestr(prefix + "addon.xml", original_manifest)
                 z.writestr(prefix + "runner.py", b"# original signed byte payload")
@@ -121,13 +121,33 @@ class ExactNineAssemblerTests(unittest.TestCase):
             self.assertNotIn(prefix + "runner.py", selected)
             self.assertNotIn(prefix + "unlisted.py", selected)
             self.assertIn("service.infinity.compat", preserved)
-            self.assertEqual(preserved["service.infinity.compat"]["version"], "0.8.2")
+            self.assertEqual(preserved["service.infinity.compat"]["version"], "0.7.2")
             self.assertEqual(set(selected),
                 {"assets/addons/script.skinshortcuts/addon.xml"})
             with zipfile.ZipFile(path) as z:
                 self.assertEqual(z.read(prefix + "addon.xml"), original_manifest)
                 self.assertEqual(z.read(prefix + "runner.py"),
                                  b"# original signed byte payload")
+
+    def test_reviewed_skin_rejects_compat_requirement_above_locked_version(self):
+        with tempfile.TemporaryDirectory() as temp:
+            archive = Path(temp) / "skin.zip"
+            prefix = "skin.infinity.diggz/"
+            with zipfile.ZipFile(archive, "w") as z:
+                z.writestr(prefix + "addon.xml",
+                    '<addon id="skin.infinity.diggz" version="1.0.5.228">'
+                    '<requires><import addon="service.infinity.compat" version="0.8.2"/>'
+                    '</requires></addon>')
+            with self.assertRaisesRegex(ValueError,
+                "Reviewed skin requires newer Compatibility"):
+                bundle.unzip_component(archive, "skin.infinity.diggz")
+            with zipfile.ZipFile(archive, "w") as z:
+                z.writestr(prefix + "addon.xml",
+                    '<addon id="skin.infinity.diggz" version="1.0.5.228">'
+                    '<requires><import addon="service.infinity.compat" version="0.7.2"/>'
+                    '</requires></addon>')
+            files, _ = bundle.unzip_component(archive, "skin.infinity.diggz")
+            self.assertIn("assets/addons/skin.infinity.diggz/addon.xml", files)
 
     def test_bogus_original_compat_service_version_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -138,6 +158,16 @@ class ExactNineAssemblerTests(unittest.TestCase):
             with zipfile.ZipFile(path) as z:
                 with self.assertRaisesRegex(ValueError,
                                              "Existing protected dependency ID/version"):
+                    bundle.preserve_original_embedded_dependencies(z, {})
+
+    def test_unapproved_original_compat_upgrade_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "bad-parent-upgrade.apk"
+            with zipfile.ZipFile(path, "w") as z:
+                z.writestr("assets/addons/service.infinity.compat/addon.xml",
+                           '<addon id="service.infinity.compat" version="0.8.2"/>')
+            with zipfile.ZipFile(path) as z:
+                with self.assertRaisesRegex(ValueError, "Existing protected dependency"):
                     bundle.preserve_original_embedded_dependencies(z, {})
 
     def test_wrong_locked_parent_hash_is_rejected(self):
