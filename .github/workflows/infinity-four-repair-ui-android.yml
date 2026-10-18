@@ -111,7 +111,10 @@ jobs:
       - name: Real candidate taps, holds, themes, Stop choices, Stop Home, Essential-First Close and reopen
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
-          api-level: 30
+          # API 30's nav_input_consumer swallows a post-playback first tap.
+          # Retain that failed compatibility observation; do not add a priming
+          # tap or waive assertions. API 35 exercises the modern bar policy.
+          api-level: 35
           arch: x86_64
           target: google_apis
           profile: pixel_2

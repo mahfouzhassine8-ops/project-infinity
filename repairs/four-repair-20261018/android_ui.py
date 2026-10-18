@@ -138,6 +138,12 @@ def run(args):
                 "Refuse to modify a pre-existing installation")
         require("arm64-v8a" in probe.shell("getprop", "ro.product.cpu.abilist"),
                 "Emulator cannot run actual ARM64 Infinity engine")
+        report['android_platform'] = {
+            'sdk': probe.shell('getprop', 'ro.build.version.sdk').strip(),
+            'release': probe.shell('getprop', 'ro.build.version.release').strip(),
+            'abis': probe.shell('getprop', 'ro.product.cpu.abilist').strip(),
+            'native_bridge': probe.shell('getprop', 'ro.dalvik.vm.native.bridge').strip(),
+        }
         require("Success" in probe.adb("install", "--no-incremental", args.apk),
                 "Actual signed Infinity APK did not install")
         # Match the original approved fresh-Android probe's first-launch setup.
@@ -300,6 +306,8 @@ def run(args):
             ("kodi.log", lambda: probe.shell("cat", probe.PROFILE + "/../temp/kodi.log", check=False)),
             ("logcat.txt", lambda: probe.adb("logcat", "-d")),
             ("activities.txt", lambda: probe.shell("dumpsys", "activity", "activities", check=False)),
+            ("windows.txt", lambda: probe.shell("dumpsys", "window", "windows", check=False)),
+            ("input.txt", lambda: probe.shell("dumpsys", "input", check=False)),
             ("processes.txt", lambda: probe.shell("ps", "-A", check=False)),
             ("exit-info.txt", lambda: probe.shell("dumpsys", "activity", "exit-info", PARENT, check=False)),
             ("native-crash-dropbox.txt", lambda: probe.shell("dumpsys", "dropbox", "--print", "data_app_native_crash", check=False)),
