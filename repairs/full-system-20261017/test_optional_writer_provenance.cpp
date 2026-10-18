@@ -54,13 +54,15 @@ int main(int argc, char** argv)
     }
     assert(IP::BeginWriteProtection(generation,{profile.string()},{}));
     if(scenario == "essential_participant") IP::RegisterParticipant(8);
+    if(scenario == "optional_corrupt_path")
+      IP::RecordProtectedResult(lease,essential); // one native lease, two destinations
     IP::Fail(8,reason,"untrusted Python detail cannot prove a file path");
     const auto& blocker=IP::Get().blockers.back();
     if(scenario == "native_ambiguous")
       assert(!blocker.nativeFailureTargetVerified);
     else {
       assert(blocker.nativeFailureTargetVerified);
-      assert(blocker.nativeFailureTargets.size()==1);
+      assert(blocker.nativeFailureTargets.size() == (scenario=="optional_corrupt_path" ? 2 : 1));
       assert(blocker.nativeFailureTargets[0]==optional);
     }
     if(extra) IP::EndProtectedOperation(extra);
