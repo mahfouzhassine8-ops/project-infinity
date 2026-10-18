@@ -65,7 +65,7 @@ def apply(source, build, manifest_path):
     replacement = corrected.read_bytes()
     require(b"SyncRemovedInstallerStage" in replacement and
             b"InstallerStageRoot" in replacement and
-            b"protected_durability_failed:" not in replacement,
+            b"protected_durability_failed:" in replacement,
             "unexpected installer-stage correction payload")
     corrected_sha = hashlib.sha256(replacement).hexdigest()
     require(corrected_sha != previous, "the correction was not applied")
