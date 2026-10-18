@@ -63,6 +63,24 @@ class MenuTests(unittest.TestCase):
         self.runtime.addon_menu('plugin.video.fixture')
         self.assertEqual(self.calls,[]);self.assertEqual(self.rpc_calls,[])
 
+    def test_first_favourite_accepts_kodi_null_collection_and_keeps_destination(self):
+        aid='plugin.video.fixture';path='plugin://'+aid+'/'
+        self.runtime.addon_info=mock.Mock(return_value={'name':'Fixture','thumbnail':'icon.png'})
+        self.runtime.settings_available=lambda aid:True
+        self.runtime.rails_supported=lambda:True
+        self.runtime.destination=lambda aid:('plugin',path)
+        self.runtime.choose.return_value='favourite'
+        for entries in (None, []):
+            with self.subTest(entries=entries):
+                self.runtime.rpc=mock.Mock(side_effect=[{'favourites':entries},'OK'])
+                self.runtime.addon_menu(aid)
+                self.assertEqual(self.runtime.rpc.call_args_list[-1],mock.call('Favourites.AddFavourite',
+                    {'title':'Fixture','thumbnail':'icon.png','type':'window','window':'videos','windowparameter':path}))
+        self.runtime.rpc=mock.Mock(return_value={'favourites':[{'windowparameter':path}]})
+        self.runtime.addon_menu(aid)
+        self.assertEqual(self.runtime.rpc.call_count,1)
+        self.dialog.notification.assert_called_once()
+
     def test_rejects_command_injection_and_unsafe_ids(self):
         for value in ('plugin.video.good),Quit(', '../plugin.video.x','',None):
             self.assertFalse(valid_id(value))

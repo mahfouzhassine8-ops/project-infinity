@@ -59,6 +59,9 @@ def exercise(probe, out, report):
     def rowpoint(state, label):
         card, listing = state['controls']['100'], state['controls']['50']
         surface = state['controls']['101']
+        vw,vh=state['viewport'];left,top=card['position']
+        require(left>=0 and top>=0 and left+card['width']<=vw and top+card['height']<=vh,
+                'popup card is clipped by the active window')
         require(surface['height']==card['height'] and surface['width']==card['width'],
                 'popup visible surface extends beyond compact card')
         require(listing['position'][1]+listing['height'] <= card['height'],
@@ -166,9 +169,9 @@ def exercise(probe, out, report):
     probe.rpc('Input.ContextMenu')
     menu = wait_for(popup, 'fixture context through native D-pad route')
     invoke(menu, 'Add to Favourites')
-    wait_for(lambda s:not popup(s), 'favourite action completed')
+    wait_for(lambda s:not popup(s) and s['dialog'] in (0,9999), 'favourite action completed without an error dialog')
     favourites = probe.rpc('Favourites.GetFavourites', dict(properties=['windowparameter']))
-    require(any(f.get('windowparameter') == 'plugin://'+selected+'/' for f in favourites['favourites']),
+    require(any(f.get('windowparameter') == 'plugin://'+selected+'/' for f in (favourites.get('favourites') or [])),
             'favourite destination not saved')
     report['ui_expected_favourite'] = 'plugin://'+selected+'/'
     probe.rpc('Input.ContextMenu'); menu=wait_for(popup,'hide menu')
@@ -209,7 +212,11 @@ def exercise(probe, out, report):
         tap(menu, rowpoint(menu, 'Mark Watched'))
         require(popup(observe()), 'Mark Watched ran on focus')
         back()
-        require(observe()['window'] == 10000, 'Resume dismissal left Home')
+        dismissed=observe()
+        require(dismissed['window']==10000 and token(dismissed,ident)==token(home,ident) and
+                dismissed['labels'].get('Container('+str(ident)+').CurrentPage')==
+                    home['labels'].get('Container('+str(ident)+').CurrentPage'),
+                'Resume dismissal changed Home, selected item or rail scroll')
         # Cross the real helper -> original controller writer boundary, then
         # verify the same movie/episode memberships after actual process restart.
         key=token(home,ident)

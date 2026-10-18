@@ -283,7 +283,7 @@ def run(args):
                 'Movie/episode Watchlist state was lost on actual Close/reopen')
         favourites=probe.rpc('Favourites.GetFavourites',{'properties':['windowparameter']})
         require(any(f.get('windowparameter')==report['ui_expected_favourite']
-                    for f in favourites.get('favourites',[])),
+                    for f in (favourites.get('favourites') or [])),
                 'Add-on favourite was lost on actual Close/reopen')
         report['ui_mutations_survived_actual_restart']=True
         report["passed"] = True

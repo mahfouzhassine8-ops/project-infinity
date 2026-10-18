@@ -123,7 +123,9 @@ def addon_menu(aid):
     elif action == 'favourite':
         kind, path = destination(aid)
         existing = rpc('Favourites.GetFavourites', dict(properties=['window', 'windowparameter', 'path']))
-        if any(f.get('windowparameter') == path or f.get('path') == path for f in existing.get('favourites', [])):
+        # Kodi serializes an empty favourites vector as null. Treat it as an
+        # empty collection so the first favourite can actually be added.
+        if any(f.get('windowparameter') == path or f.get('path') == path for f in (existing.get('favourites') or [])):
             xbmcgui.Dialog().notification('Infinity', 'This add-on is already in Favourites.')
             return
         target = dict(type='script', path=path) if kind == 'script' else dict(type='window', window='videos', windowparameter=path)
