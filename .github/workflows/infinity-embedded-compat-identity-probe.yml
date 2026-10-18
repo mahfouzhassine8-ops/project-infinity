@@ -20,7 +20,9 @@ jobs:
           path: native385
       - uses: actions/download-artifact@v8
         with:
-          run-id: 39168353557
+          # Hash-pinned original .227 source used by approved .228 delta,
+          # not the later rebuilt helper .012 artifact's non-deterministic ZIP.
+          run-id: 39114438060
           name: Infinity-UI-Restoration-Current-Skins-and-Helper
           github-token: ${{ github.token }}
           path: skin227
