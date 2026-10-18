@@ -107,9 +107,25 @@ def exercise(probe, out, report):
     # This is an isolated emulator media fixture, never user playback content.
     movie = Path('infinity-ui-fixture.mp4')
     require(movie.is_file(), 'generated sample missing')
+    require(probe.shell('getprop','ro.kernel.qemu').strip()=='1' and
+            str(probe.APP_UID).isdigit(), 'media staging requires the verified disposable emulator')
     probe.adb('push', movie, probe.PROFILE + '/' + movie.name)
-    probe.shell('chmod', '644', probe.PROFILE + '/' + movie.name)
-    observe('seed')
+    backing='/data/media/0/Android/data/'+probe.PACKAGE+'/files/.kodi/userdata/'+movie.name
+    media_proof=dict(before=probe.shell('ls','-lZ',backing))
+    # Match the original approved probe's fixture ownership/label restoration.
+    # Root adbd gives this late-copied clip storage_file, denied to the app.
+    # Restore only this disposable file; never change policy or enforcement.
+    probe.shell('chown',str(probe.APP_UID)+':'+str(probe.APP_UID),backing)
+    probe.shell('chmod','644',backing)
+    probe.shell('restorecon','-F',backing)
+    media_proof.update(after=probe.shell('ls','-lZ',backing),
+                       selinux=probe.shell('getenforce').strip())
+    require(media_proof['selinux']=='Enforcing','SELinux policy was weakened')
+    seeded=observe('seed');media_proof['app_vfs']=seeded.get('sample')
+    report['media_preflight']=media_proof
+    (out/'MEDIA-PREFLIGHT.json').write_text(json.dumps(media_proof,indent=2))
+    require(seeded.get('sample',{}).get('exists') is True,
+            'generated clip is not visible to the actual app after platform label restoration')
     def grid_matrix():
         for viewport, size in (('cover', '1080x2400'), ('inner', '1800x1440')):
             probe.shell('wm', 'size', size); probe.shell('wm', 'density', '320'); time.sleep(3)
