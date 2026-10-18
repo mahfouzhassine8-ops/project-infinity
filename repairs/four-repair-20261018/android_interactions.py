@@ -67,6 +67,13 @@ def exercise(probe, out, report):
         focused = observe()
         require(popup(focused), 'Focusing a popup row performed its action')
         tap(focused, xy)
+    def restore_button(state):
+        button, grid = state['controls']['13'], state['controls']['50']
+        require(button['visible'] and button['position'][1] >= 120 and
+                button['position'][1] + button['height'] < grid['position'][1],
+                'Restore control overlaps content or Android navigation')
+        tap(state, (button['position'][0] + button['width']/2,
+                    button['position'][1] + button['height']/2))
     def back():
         probe.rpc('Input.Back'); time.sleep(.6)
     def browse():
@@ -159,17 +166,17 @@ def exercise(probe, out, report):
     report['ui_expected_favourite'] = 'plugin://'+selected+'/'
     probe.rpc('Input.ContextMenu'); menu=wait_for(popup,'hide menu')
     invoke(menu,'Hide from This View')
-    wait_for(lambda s:not popup(s) and all(r.get('token') != selected for r in s['controls']['50'].get('items',[])),
+    hidden_state=wait_for(lambda s:not popup(s) and all(r.get('token') != selected for r in s['controls']['50'].get('items',[])),
              'hidden tile removed only from grid')
     require(probe.rpc('Addons.GetAddonDetails',dict(addonid=selected,properties=['enabled']))['addon']['enabled'],
             'Hide disabled the add-on')
-    observe('restore'); restore=wait_for(popup,'hidden tile recovery')
+    restore_button(hidden_state); restore=wait_for(popup,'hidden tile recovery through visible control')
     card=restore['controls']['100']
     tap(restore,(card['position'][0]+card['width']/2,card['position'][1]+card['height']+40))
     dismissed=wait_for(lambda s:not popup(s),'outside dismissal of compact restore menu')
     require(all(r.get('token') != selected for r in dismissed['controls']['50'].get('items',[])),
             'outside dismissal activated Restore')
-    observe('restore'); restore=wait_for(popup,'reopened hidden tile recovery')
+    restore_button(dismissed); restore=wait_for(popup,'reopened hidden tile recovery through visible control')
     label=restore['controls']['50']['items'][0]['label']
     invoke(restore,label)
     wait_for(lambda s:not popup(s) and any(r.get('token') == selected for r in s['controls']['50'].get('items',[])),

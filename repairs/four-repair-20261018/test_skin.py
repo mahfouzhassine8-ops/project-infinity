@@ -71,7 +71,11 @@ def check(parent,candidate):
             label='INFINITY BROWSE • PICK UP WHERE YOU LEFT OFF'
             footer=next(c for c in browse.findall('./controls/control') if c.findtext('label')==label)
             assert footer.findtext('visible')==navigation[0].get('condition')
-            assert browse.find('.//control[@id="13"]/visible').text==navigation[1].get('condition')
+            recovery=browse.find('.//control[@id="13"]')
+            assert recovery.findtext('visible')==navigation[1].get('condition')
+            assert recovery.find('bottom') is None, 'Recovery must not sit under Android navigation'
+            assert float(recovery.findtext('top')) >= 120
+            assert float(recovery.findtext('top'))+float(recovery.findtext('height')) < float(grid.findtext('top'))
         assert after.testzip() is None
     result=dict(passed=True,artifact=Path(candidate).name,sha256=hashlib.sha256(Path(candidate).read_bytes()).hexdigest(),
                 original_rotation_actions=True,white_cyan_states=True,other_playback_actions_preserved=True,

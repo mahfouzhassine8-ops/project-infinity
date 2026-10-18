@@ -76,7 +76,7 @@ def browse_patch(data):
     e.set(footer, 'visible', '![' + condition + ']', 'preserve original footer for other browse views')
     _, _, _, d = e.spans[footer]
     e.replace(d, d, '''<control type="button" id="13">
-      <left>10.1852%</left><bottom>8</bottom><width>87.4074%</width><height>56</height>
+      <left>10.1852%</left><top>128</top><width>87.4074%</width><height>52</height>
       <label>Restore Hidden Video Sources</label><font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacySecondary]</textcolor><focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
       <texturefocus border="12" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
@@ -89,8 +89,8 @@ def browse_patch(data):
     e.attr(down, 'condition', '![' + condition + ']', 'preserve original navigation outside Video Sources')
     _, _, _, end = e.spans[down]
     e.replace(end, end, '<ondown condition="' + condition + '">13</ondown>', 'reachable Video Sources recovery control')
-    # The original 70-unit bottom inset already clears the 56+8 recovery
-    # button. Keep the exact tile geometry for every other Browse destination.
+    # Keep recovery above the grid, clear of Android's bottom navigation bar.
+    # Preserve the exact original tile geometry and all other Browse views.
     return e.done()
 
 def browse_path_patch(data):

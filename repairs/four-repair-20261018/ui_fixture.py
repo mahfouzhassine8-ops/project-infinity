@@ -73,7 +73,7 @@ try:
         rotation=xbmc.getCondVisibility('Skin.HasSetting(Infinity.PlayerRotationUnlocked)'),
         controls={}, labels={}, popup=owner.getProperty('Infinity.UI.Popup'),
         title=owner.getProperty('Infinity.UI.Title'))
-    for ident in (2, 50, 100, 263, 280, 8830, 8831, 39799, 40001):
+    for ident in (2, 13, 50, 100, 263, 280, 8830, 8831, 39799, 40001):
         try:
             control = owner.getControl(ident)
             row = dict(position=control.getPosition(), width=control.getWidth(), height=control.getHeight(),
@@ -83,7 +83,9 @@ try:
                 # has an empty local vector even when the native GUI shows
                 # populated rows. Read native absolute list items, as the
                 # existing Rails observer does; never infer an empty menu.
-                count = int(xbmc.getInfoLabel('Container(%d).NumItems' % ident) or 0)
+                # Absolute indexing includes the parent-folder row; NumItems
+                # excludes it. NumAllItems matches the actual native vector.
+                count = int(xbmc.getInfoLabel('Container(%d).NumAllItems' % ident) or 0)
                 current = xbmc.getInfoLabel('Container(%d).CurrentItem' % ident)
                 row.update(size=count, python_wrapper_size=control.size(),
                     selected=int(current)-1 if current.isdecimal() else -1,
