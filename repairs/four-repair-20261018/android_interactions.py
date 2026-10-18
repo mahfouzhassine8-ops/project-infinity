@@ -52,6 +52,8 @@ def exercise(probe, out, report):
     def popup(state): return state.get('popup') == '1'
     def rowpoint(state, label):
         card, listing = state['controls']['100'], state['controls']['50']
+        require(listing['position'][1]+listing['height'] <= card['height'],
+                'popup native hit rectangle extends outside compact card')
         labels = [x['label'] for x in listing['items']]
         require(label in labels, 'Missing row ' + label + ': ' + repr(labels))
         index = labels.index(label)
@@ -151,6 +153,12 @@ def exercise(probe, out, report):
     require(probe.rpc('Addons.GetAddonDetails',dict(addonid=selected,properties=['enabled']))['addon']['enabled'],
             'Hide disabled the add-on')
     observe('restore'); restore=wait_for(popup,'hidden tile recovery')
+    card=restore['controls']['100']
+    tap(restore,(card['position'][0]+card['width']/2,card['position'][1]+card['height']+40))
+    dismissed=wait_for(lambda s:not popup(s),'outside dismissal of compact restore menu')
+    require(all(r.get('token') != selected for r in dismissed['controls']['50'].get('items',[])),
+            'outside dismissal activated Restore')
+    observe('restore'); restore=wait_for(popup,'reopened hidden tile recovery')
     label=restore['controls']['50']['items'][0]['label']
     invoke(restore,label)
     wait_for(lambda s:not popup(s) and any(r.get('token') == selected for r in s['controls']['50'].get('items',[])),

@@ -44,6 +44,10 @@ def choose(title, rows):
             card.setPosition(*position(backdrop.getWidth(), backdrop.getHeight(),
                                        card.getWidth(), card.getHeight(), anchor))
             control = self.getControl(50)
+            # Changing a group height at runtime does not recompute a child's
+            # XML bottom anchor. Keep the native hit rectangle inside the
+            # compact card, including one-row Manage/Restore dialogs.
+            control.setHeight(card.getHeight() - 116)
             control.reset()
             for index, (label, _) in enumerate(rows):
                 item = xbmcgui.ListItem(label=label)
