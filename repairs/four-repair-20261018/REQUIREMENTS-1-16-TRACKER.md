@@ -1,6 +1,6 @@
 # Infinity — binding 1–16 completion tracker
 
-**Status:** OPEN. **Current step:** #2 at the user's explicit direction. **#1:** verification deferred, still unchecked. **Fully completed:** 0/16.
+**Status:** OPEN. **Current step:** #3 at the user's explicit direction. **#1 and #2:** verification deferred, both unchecked. **Fully completed:** 0/16.
 **Repository:** `mahfouzhassine8-ops/project-infinity`.
 **Development branch:** `work/infinity-post-2103384-feature-restoration`.
 **Protected user-approved APK:** 2103384, SHA-256 `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`.
@@ -21,8 +21,8 @@
 ## Live checklist
 
 - [ ] **1.** Player Rotate button; white Follow Device / cyan Infinity-controlled; Playback Display Mode removed; all unrelated playback preserved — **DEFERRED BY USER to proceed to #2; source evidence saved, physical Fold acceptance outstanding, NOT COMPLETE.**
-- [ ] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **IN PROGRESS: review existing Work integration, exact Command Center original actions, untouched writers, restart persistence, Android 17 and physical Fold gaps.**
-- [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus
+- [ ] **2.** Home Continue Playing context menu; complete actions and persistence without normal-tap regression — **DEFERRED BY USER to proceed to #3; prior host/emulator evidence saved, physical acceptance and successful Close/reopen outstanding; NOT COMPLETE.**
+- [ ] **3.** Video Sources exact first-tap select / second-tap launch / selected-hold menu; both columns and focus — **IN PROGRESS: existing Work native gesture path, selected-add-on identity and exact Android 17 evidence; physical Fold pending.**
 - [ ] **4.** Exact approved context menu order and relevant actions; Hide is reversible and never Disable
 - [ ] **5.** Universal blue watched indicators, Resume Hub and Watchlist/Collection correctness; durable identity
 - [ ] **6.** Home Movie/TV rails long-press, touch parity and correct options with no black ghost popup
@@ -94,3 +94,11 @@
 - Require actual approved single-APK upgrade, normal Essential-First Close/reopen and untouched unrelated progress, watched history, Watchlist and Collection. No physical-device connection or permitted integrated qualified candidate is available yet.
 
 **#2 verdict:** source and controlled emulator functionality substantially verified; **unchecked** due to physical and full persistent-install acceptance still missing. No reproduction, guesswork, source edits or APK builds started for #2.
+
+## #3 investigation start — 2026-10-18 (NOT a checkmark)
+
+- At the user's explicit direction, work has advanced to **#3**, while #1 and #2 remain deferred/unverified, neither approved nor checked.
+- Scope is restricted to `All Add-ons → Video Sources` **first tap selects**, **second tap on same tile launches**, and **select then long-press opens contextual menu for that same tile**, across both columns, scrolling and active Fold geometry. Correct initial focus without launching/back-navigation workaround; dismiss restores current selection and scroll.
+- Audit existing native `OnInfinityUiTouch` and `OnInfinityUiContextMenu` and opt-in scope, existing custom `Custom_1193_InfinityBrowse.xml`, `script.infinity.uirepair` directory projection, and tested Android gestures. D-pad, unrelated Kodi input, Cobra, and all shared services are **untouchable** except where explicitly approved with proof of no impact.
+- #4's menu actions and Hide/Disable semantics remain a separate numbered workstream, not authorization to change #4 while verifying #3.
+- No source/native/skin/APK implementation changes or builds authorized by this tracker update. Missing physical Galaxy Fold testing cannot be reclassified as a passing result.
