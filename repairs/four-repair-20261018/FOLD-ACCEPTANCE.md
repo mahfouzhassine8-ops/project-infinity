@@ -7,6 +7,10 @@ Infinity installation. The five established workstreams remain in scope.
 
 ## Candidate choices and installation
 
+Before the APK update, finish playback and use the existing normal
+**Essential-First Close**. Wait for its successful completion before starting
+Android's installer. Do not use force-stop as a substitute for that Close.
+
 **Skin 1.0.5.226 — Rotate / Playback only.** This full ZIP can be tested with the
 locked APK 2103384. Install the ZIP through Kodi's existing add-on installer as
 an update to `skin.infinity.diggz`; retain the existing settings. Verify the
