@@ -7,12 +7,51 @@ infrastructure blocker, never a passed/skipped application qualification.
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import subprocess
 
 # Observed SDK catalog in run 39124478854 publishes decimal platform IDs.
 # This is the stable Android17 major release, not a fallback to another API.
 IMAGE = 'system-images;android-37.0;google_apis;x86_64'
+
+
+def pin_tools(sdk_root, out):
+    """Keep the emulator action from shadowing setup-android's current tools.
+
+    Its pinned sdk-installer.ts prepends cmdline-tools/latest/bin, which is
+    9.0 on ubuntu-22.04, even after setup-android installs 22.0 separately.
+    Old avdmanager misparses decimal platform IDs as android-0. Only change
+    the disposable CI runner SDK; retain the old directory for inspection.
+    """
+    if os.environ.get('GITHUB_ACTIONS') != 'true':
+        raise RuntimeError('SDK path preparation is restricted to the CI runner')
+    root = Path(sdk_root) / 'cmdline-tools'
+    current, latest = root / '22.0', root / 'latest'
+    props = (current / 'source.properties').read_text()
+    if 'Pkg.Revision=22.0' not in props.replace(' ', ''):
+        raise RuntimeError('setup-android did not provide the pinned 22.0 tools')
+    before = (latest / 'source.properties').read_text()
+    if latest.resolve() != current.resolve():
+        latest.rename(root / 'infinity-original-latest')
+        latest.symlink_to(current, target_is_directory=True)
+    report = dict(before=before, after=props, resolved_latest=str(latest.resolve()),
+                  scope='disposable CI SDK only', application_changed=False)
+    Path(out).mkdir(parents=True, exist_ok=True)
+    (Path(out) / 'SDK-TOOLS.json').write_text(json.dumps(report, indent=2) + '\n')
+
+
+def check_avd(avd_home, out):
+    """Require real platform metadata before launching the API37 emulator."""
+    ini = Path(avd_home) / 'infinity-four-repair-api37.ini'
+    config = ini.read_text()
+    Path(out).mkdir(parents=True, exist_ok=True)
+    (Path(out) / 'api37-avd.ini.txt').write_text(config)
+    values = dict(line.split('=', 1) for line in config.splitlines() if '=' in line)
+    if values.get('target') != 'android-37.0':
+        raise RuntimeError('API37 AVD target is not android-37.0; refusing a misidentified image')
+    avd_config = Path(values['path']) / 'config.ini'
+    (Path(out) / 'api37-avd-config.ini.txt').write_text(avd_config.read_text())
 
 
 def check(sdk_root, out):
@@ -49,5 +88,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdk-root', required=True)
     parser.add_argument('--out', required=True)
+    parser.add_argument('--pin-tools', action='store_true')
+    parser.add_argument('--check-avd', action='store_true')
     args = parser.parse_args()
-    print(json.dumps(check(args.sdk_root, args.out), sort_keys=True))
+    if args.check_avd:
+        check_avd(os.environ['ANDROID_AVD_HOME'], args.out)
+    else:
+        if args.pin_tools:
+            pin_tools(args.sdk_root, args.out)
+        print(json.dumps(check(args.sdk_root, args.out), sort_keys=True))

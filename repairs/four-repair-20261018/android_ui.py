@@ -158,6 +158,16 @@ def run(args):
             require(report['android_platform']['release'].split('.')[0] == args.expected_release,
                     'Booted Android release does not match the requested test target')
         if args.expected_api == '37':
+            # Run39125100898: SurfaceFlinger/mapper.ranchu aborted before APK
+            # install. Boot-completed alone must not certify a usable emulator.
+            samples = report['emulator_surfaceflinger_preinstall'] = []
+            for sample in range(16):
+                samples.append(probe.shell('pidof', 'surfaceflinger', check=False).strip())
+                (out / 'surfaceflinger-preinstall.json').write_text(json.dumps(samples))
+                require(samples[-1].isdigit() and samples[-1] == samples[0],
+                        'API37 emulator SurfaceFlinger exited/restarted before app installation')
+                if sample < 15:
+                    time.sleep(2)
             storage = probe.shell('df', '-k', '/data')
             (out / 'emulator-data-space-before-install.txt').write_text(storage)
             fields = storage.strip().splitlines()[-1].split()

@@ -106,6 +106,18 @@ def exercise(probe, out, report):
         return round(x * width / vw), round(y * height / vh)
     def tap(state, xy, hold=False):
         x, y = point(state, *xy)
+        # Run39124920134's Pixel Launcher ANR owned input. The first intended
+        # Favourites tap actually hit its Close app button, leaving only one
+        # app tap. Never dispatch through another app/system dialog or replay
+        # that gesture. Preserve evidence and fail at its actual boundary.
+        windows = diagnostic_dump('gesture-' + str(len(report.setdefault('gestures', []))), 'window')
+        focus = re.search(r'(?m)^\s*mCurrentFocus=(.+)$', windows)
+        current = focus.group(1) if focus else ''
+        report['gestures'].append(dict(point=[x, y], hold=hold, focus=current))
+        if ' ' + probe.PACKAGE + '/' not in current:
+            capture('foreign-input-owner', state)
+        require(' ' + probe.PACKAGE + '/' in current,
+                'Android input is owned by another window: ' + current)
         if hold: probe.shell('input', 'swipe', x, y, x, y, 1100)
         else: probe.shell('input', 'tap', x, y)
         time.sleep(.6)
@@ -136,7 +148,10 @@ def exercise(probe, out, report):
         xy = rowpoint(state, label)
         tap(state, xy)
         focused = observe()
+        capture('action-' + str(len(records)) + '-focused', focused)
         require(popup(focused), 'Focusing a popup row performed its action')
+        require(focused['labels'].get('Container(50).ListItem.Label') == label,
+                'First popup tap did not select the intended row: ' + label)
         tap(focused, xy)
     def restore_button(state):
         button, grid = state['controls']['13'], state['controls']['50']

@@ -31,10 +31,11 @@ jobs:
         run: python3 repairs/four-repair-20261018/test_android_evidence.py
       - uses: android-actions/setup-android@v4
         with:
+          cmdline-tools-version: '15859902'
           packages: 'platform-tools build-tools;34.0.0'
           log-accepted-android-sdk-licenses: false
       - name: Record actual API37 system-image availability; never substitute a lower API
-        run: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support
+        run: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
       - uses: actions/download-artifact@v8
         with:
           run-id: 39121637251
@@ -111,6 +112,7 @@ jobs:
           # session creation: Requested internal only, but not enough space.
           disk-size: 8G
           avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: >-
