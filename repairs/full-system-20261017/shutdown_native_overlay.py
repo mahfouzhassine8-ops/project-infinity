@@ -57,7 +57,7 @@ def save_json(path, data):
 def apply(source, build, manifest_path):
     source, build, manifest_path = Path(source), Path(build), Path(manifest_path)
     header = source / NATIVE
-    corrected = ROOT / "repairs/essential-first-2103377/runtime" / NATIVE
+    corrected = ROOT / "repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h"
     require(header.is_file() and corrected.is_file(), "missing original/corrected native header")
     previous = digest(header)
     require(previous == TEST4_TEST3_HEADER_SHA256,

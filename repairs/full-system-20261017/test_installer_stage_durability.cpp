@@ -1,5 +1,5 @@
 // Compile the real protected-write implementation; no mocked fsync receipts.
-#include "InfinityProtectedWrites.h"
+#include "InfinityProtectedWrites.stagefix.h"
 #include <cassert>
 #include <filesystem>
 #include <fstream>

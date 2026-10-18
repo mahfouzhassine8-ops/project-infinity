@@ -10,6 +10,7 @@ on:
       - 'repairs/full-system-20261017/package_shutdown_candidate.py'
       - 'repairs/full-system-20261017/test_installer_stage_durability.cpp'
       - 'repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityProtectedWrites.h'
+      - 'repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h'
   workflow_dispatch:
 
 permissions: {contents: read, actions: read}
