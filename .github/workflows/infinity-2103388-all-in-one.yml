@@ -91,7 +91,7 @@ jobs:
       - name: Stage complete protected first-party and exact .227 skin/Item Options
         run: |
           set -euo pipefail
-          mkdir -p full-input/additional-addons
+          mkdir -p full-input/additional-addons full-stack
           python3 repairs/full-system-20261017/infinity_official_skin_dependencies.py \
             --additional full-input/additional-addons --out full-stack/OMEGA-SKIN-DEPENDENCIES.json
           python3 repairs/four-repair-20261018/prepare_ui_android.py \
