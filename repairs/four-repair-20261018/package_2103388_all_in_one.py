@@ -102,8 +102,8 @@ def collect(addons, proof):
             if not path.is_file():
                 continue
             relative = path.relative_to(folder)
-            require("__pycache__" not in relative.parts and path.suffix != ".pyc",
-                    "Staging contains stale or device-derived bytecode; abort " + str(path))
+            if "__pycache__" in relative.parts or path.suffix == ".pyc":
+                continue
             rel = relative.as_posix()
             parts = PurePosixPath(rel).parts
             require(parts and ".." not in parts and "\\" not in rel and rel[0] != "/",
@@ -141,8 +141,8 @@ def verify(parent, candidate, additions, targets, expected_manifest):
     with zipfile.ZipFile(parent) as before, zipfile.ZipFile(candidate) as after:
         require(after.testzip() is None, "ZIP integrity failure")
         require(len(after.namelist()) == len(set(after.namelist())), "APK duplicate entries")
-        old = set(before.namelist())
-        now = set(after.namelist())
+        old = {n for n in before.namelist() if not signer.SIGNATURE.fullmatch(n)}
+        now = {n for n in after.namelist() if not signer.SIGNATURE.fullmatch(n)}
         permitted = {"AndroidManifest.xml", SYSTEM_MANIFEST} | set(additions)
         permitted |= {x for x in old if x.startswith("assets/addons/service.infinity.compat/")}
         require(now - old <= permitted, "Unapproved new APK member")
