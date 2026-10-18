@@ -30,7 +30,7 @@ jobs:
           run-id: 39139344754
           name: Infinity-2103388-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
           github-token: ${{ github.token }}
-          path: signed388
+          path: .
       - uses: actions/download-artifact@v8
         with:
           run-id: 38976250598
