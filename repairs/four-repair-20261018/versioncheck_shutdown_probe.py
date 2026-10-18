@@ -478,3 +478,19 @@ def capture_failure(probe, out, report):
         evidence['capture_error'] = str(error)
     report['failed_versioncheck_close_evidence'] = evidence
     _save(out, 'VERSIONCHECK-FAILED-ENGINE.json', evidence)
+    # Evidence-only correlation with the *actual* failed Close receipt. It may
+    # explain the x86_64 host's ARM64 translation mismatch, but MUST NOT turn
+    # CHECKPOINT_FAILED into COMPLETE or grant any durability/exit authority.
+    descriptor = report.get('readonly_descriptor_diagnostic')
+    if descriptor is not None:
+        from translated_descriptor_evidence import assess
+        try:
+            receipt = json.loads((Path(out) / 'CLOSE-RECEIPT.json').read_text())
+            assessment = assess(descriptor, receipt)
+        except (OSError, ValueError, TypeError):
+            assessment = {'classification': 'insufficient_evidence',
+                          'durable_close_verified': False,
+                          'can_override_native_protection': False,
+                          'fold_accepted': False}
+        report['translated_descriptor_assessment'] = assessment
+        _save(out, 'TRANSLATED-DESCRIPTOR-ASSESSMENT.json', assessment)
