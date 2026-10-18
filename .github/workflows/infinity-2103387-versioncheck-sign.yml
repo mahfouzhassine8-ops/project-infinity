@@ -1,0 +1,143 @@
+name: Infinity | Sign 2103387 Version Check correction | Experimental
+on:
+  push:
+    branches: [work/infinity-post-2103384-feature-restoration]
+    paths: ['repairs/four-repair-20261018/BUILD-2103387.marker']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103387-versioncheck-build, cancel-in-progress: false}
+
+jobs:
+  exact-host-proof:
+    name: Exact parent + Version Check regression + unsigned 2103387
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39121637251
+          name: Infinity-2103386-Android11-Input-Signed-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: signed386
+      - name: Verify signed 2103386 provenance and protected sources
+        run: |
+          set -euo pipefail
+          git diff --exit-code 5389b4572cd32037fedf0e7d88b7f79abb120952 HEAD -- \
+            repairs/locked-baselines/INFINITY-2103384-SHUTDOWN-LOCK.json \
+            repairs/full-system-20261017/write_error_scope_patch.py \
+            repairs/full-system-20261017/InfinityProtectedWrites.stagefix.h \
+            repairs/full-system-20261017/shutdown_native_ci.py \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityAndroidCheckpoint.h \
+            repairs/essential-first-2103377/runtime/xbmc/platform/android/activity/InfinityScriptPersistence.h
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path('signed386/Infinity-2103386-UI-Restoration-TEST2.apk')
+          r=json.loads(Path('signed386/SIGNED-2103386.json').read_text())
+          assert r['permanently_signed'] and r['native_engine_unchanged']
+          assert r['sha256']=='342587d9079f7e51b61ef525c04ae9b62adb6d128791164acbd99ec691fbac87'
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==r['sha256']
+          assert r['source_commit']=='91c25df66833add852b69e580ce0f0021eb27a94'
+          PY
+      - name: Execute bundled service import and child-protection regression tests
+        run: |
+          python3 repairs/four-repair-20261018/test_versioncheck_android.py \
+            --apk signed386/Infinity-2103386-UI-Restoration-TEST2.apk -q
+          python3 -m py_compile repairs/four-repair-20261018/package_2103387.py
+      - name: Build unsigned 2103387 and compare every APK payload entry
+        run: |
+          python3 repairs/four-repair-20261018/package_2103387.py \
+            --parent signed386/Infinity-2103386-UI-Restoration-TEST2.apk \
+            --out unsigned387
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('unsigned387/UNSIGNED-2103387.json').read_text())
+          expected=sorted([
+             'AndroidManifest.xml',
+             'assets/addons/service.xbmc.versioncheck/addon.xml',
+             'assets/addons/service.xbmc.versioncheck/resources/lib/version_check/service.py'
+          ])
+          assert r['changed_unsigned_payload']==expected
+          assert r['version_code']==2103387 and not r['permanently_signed']
+          assert r['native_engine_unchanged'] and r['classes_dex_unchanged']
+          assert r['native_close_policy_unchanged'] and r['crash_recorder_unchanged']
+          assert not r['shutdown_verified'] and not r['crash_fixed'] and not r['locked']
+          PY
+
+  permanent-sign:
+    name: Build and permanently sign experimental 2103387 (no lock)
+    needs: exact-host-proof
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v6
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: actions/download-artifact@v8
+        with:
+          run-id: 39121637251
+          name: Infinity-2103386-Android11-Input-Signed-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: signed386
+      - name: Reuse exact signed parent, patch three entries and sign
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/package_2103387.py \
+            --parent signed386/Infinity-2103386-UI-Restoration-TEST2.apk \
+            --out signed387 --sign
+      - name: Verify permanent signer, native identity and exact delta
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,sys,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'repairs/four-repair-20261018')
+          import package_2103387 as bundle
+          from package_2103387 import signer
+          p=Path('signed387')/bundle.FILENAME
+          receipt=json.loads(Path('signed387/SIGNED-2103387.json').read_text())
+          assert receipt['permanently_signed']
+          assert receipt['signer_sha256']==signer.CERT
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==receipt['sha256']
+          assert receipt['changed_unsigned_payload']==bundle.EXPECTED_DELTA
+          assert receipt['companion_addon_sha256']==bundle.service.ARCHIVE_SHA
+          assert (Path('signed387/versioncheck-companion')/bundle.service.ARCHIVE).is_file()
+          assert not receipt['crash_fixed'] and not receipt['shutdown_verified']
+          assert not receipt['physical_fold_verified'] and not receipt['locked']
+          assert not receipt['automatic_existing_addon_upgrade_proven']
+          with zipfile.ZipFile(p) as z, zipfile.ZipFile('signed386/Infinity-2103386-UI-Restoration-TEST2.apk') as parent:
+              assert hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()==bundle.ENGINE_SHA
+              assert z.read('assets/addons/service.xbmc.versioncheck/resources/lib/version_check/service.py')==bundle.service.patch_service(
+                  parent.read('assets/addons/service.xbmc.versioncheck/resources/lib/version_check/service.py'))
+          print('Signed experimental 2103387 verified; NOT Fold/release qualified.')
+          PY
+      - name: Save exact signed candidate and companion service ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-2103387-Permanent-Signed-EXPERIMENTAL-UNQUALIFIED
+          path: |
+            signed387/Infinity-2103387-UI-Restoration-TEST3.apk
+            signed387/SIGNED-2103387.json
+            signed387/Infinity-2103387-UI-Restoration-TEST3.signing.txt
+            signed387/Infinity-2103387-UI-Restoration-TEST3.sha256
+            signed387/versioncheck-companion/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
