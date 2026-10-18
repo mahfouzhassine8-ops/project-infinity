@@ -27,6 +27,8 @@ jobs:
         with: {distribution: temurin, java-version: '17'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
+      - name: Verify evidence collection rejects hidden restarts and never controls user playback
+        run: python3 repairs/four-repair-20261018/test_android_evidence.py
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools build-tools;34.0.0'

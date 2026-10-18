@@ -1,1 +1,2 @@
 2026-10-18: retain stdout/stderr and allow one bounded retry for read-only OS dumps after API35 run 39122376332 failed a diagnostic command; require complete dumps and all unchanged UI actions/assertions. Add explicit scrolled page snapshots/comparison. Reuse exact signed 2103386, no APK build.
+Run39123796362 recorded adbd write failure/offline and reconnect0.27s later. Wait up to10s before second diagnostic read; require unchanged boot ID and original live engine PID/owner/launch. Never replay app gestures. Exact386 unchanged.

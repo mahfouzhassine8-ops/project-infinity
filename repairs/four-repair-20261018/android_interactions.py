@@ -33,6 +33,24 @@ def exercise(probe, out, report):
         # (the original adb helper keeps only stderr) and retry this read once.
         # Never retry a gesture or waive a required application assertion.
         for attempt in (1, 2):
+            if attempt == 2:
+                # Run39123796362: adbd host-22 write failed/offline, then
+                # host-23 reconnected 0.27s later. The immediate second read
+                # raced that transport recovery. Wait only for ADB, then prove
+                # no Android reboot or Infinity engine restart was hidden.
+                waited = subprocess.run(['adb', 'wait-for-device'], capture_output=True,
+                                        text=True, timeout=10)
+                (out / (name + '-adb-recovery.json')).write_text(json.dumps(dict(
+                    returncode=waited.returncode, stdout=waited.stdout,
+                    stderr=waited.stderr), indent=2))
+                require(waited.returncode == 0, 'ADB did not recover for diagnostic read')
+                require(probe.shell('cat', '/proc/sys/kernel/random/boot_id').strip() == boot_id,
+                        'Android rebooted during diagnostic read')
+                owner = probe.read_json(probe.PRIVATE + '/files/infinity-kodi-process.json')
+                require(all(owner.get(k) == report['native_owner'].get(k)
+                            for k in ('pid', 'owner', 'launch')) and owner.get('live') is True and
+                        any(p['pid'] == owner['pid'] for p in probe.processes()),
+                        'Infinity engine changed or exited during diagnostic read')
             started = time.monotonic()
             try:
                 result = subprocess.run(['adb', 'shell', 'dumpsys', '-t', '30', service],
@@ -197,6 +215,9 @@ def exercise(probe, out, report):
         print('INFINITY UI: acknowledged observed Android fullscreen tutorial', flush=True)
 
     # This is an isolated emulator media fixture, never user playback content.
+    boot_id = probe.shell('cat', '/proc/sys/kernel/random/boot_id').strip()
+    require(bool(boot_id), 'Android boot identity unavailable')
+    report['android_boot_id'] = boot_id
     movie = Path('infinity-ui-fixture.mp4')
     require(movie.is_file(), 'generated sample missing')
     require(probe.shell('getprop','ro.kernel.qemu').strip()=='1' and

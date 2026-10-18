@@ -5,6 +5,12 @@ and the current **1.0.5.225** ZIP. Do not uninstall, clear application data, res
 the build, or replace an add-on database. These tests are updates to the existing
 Infinity installation. The five established workstreams remain in scope.
 
+**Acceptance device: Samsung Galaxy Fold, One UI 9.0, Android 17 / API 37.**
+Record the actual firmware/build fingerprint with every capture. API 30/35 jobs
+are supplementary compatibility checks. The API37 workflow uses a published
+generic Android17 image and verifies its runtime SDK/release; it does not emulate
+Samsung One UI, the Fold's hardware decoder, sensors or physical hinge.
+
 ## Candidate choices and installation
 
 Before the APK update, finish playback and use the existing normal
@@ -94,7 +100,7 @@ For a left tile and a right tile, including tiles after scrolling:
     Check the recovery control remains reachable and the popup fits on screen.
     If available, check TV/D-pad navigation still opens on explicit Select.
 
-## 4. Stop paths — crash remains unresolved
+## 4. Exit/lifecycle paths — crash remains unresolved
 
 Run each path separately, ideally first on the retained 2103384 + .226 skin and
 then on a qualified coordinated candidate. Use the same privately recorded
@@ -103,6 +109,15 @@ source and playback settings for comparison.
 * **A:** Video → Stop → movie choices. Remain there for at least 30 seconds.
 * **B:** Video → Stop → movie choices → Back/Home. Remain there for at least
   30 seconds. Then restart playback and test a background/foreground return.
+* **Background:** Repeat normal background/foreground return after **5, 20, 45
+  and 90 minutes**, both idle and playing. Record Home versus Recents return,
+  screen on/off, PiP/background-playback mode, and whether the original process
+  survived or Android reclaimed it. Stop is not a prerequisite for this path.
+* **Screensaver:** Let the configured screensaver appear normally, dismiss it,
+  then navigate provider choices/Home. Repeat after background return.
+* **Fold:** Test one fold/unfold or portrait/landscape transition per capture,
+  both playing and idle, then repeat while returning from the background.
+  Record the starting and ending physical state privately.
 
 When ADB is available, run the supplied capture script on the computer before
 reproducing, with a new private output directory each time:
@@ -110,6 +125,9 @@ reproducing, with a new private output directory each time:
 ```bash
 python3 capture_stop.py --path A --out ./Infinity-Stop-A --bugreport
 python3 capture_stop.py --path B --out ./Infinity-Stop-B --bugreport
+python3 capture_stop.py --path background --out ./Infinity-Background --bugreport
+python3 capture_stop.py --path screensaver --out ./Infinity-Screensaver --bugreport
+python3 capture_stop.py --path fold --out ./Infinity-Fold --bugreport
 ```
 
 Follow its timestamps/prompts. It collects logcat, exit-info and permitted
@@ -118,6 +136,12 @@ upload anything. Export Infinity Diagnostics immediately afterward through its
 existing UI. Keep all captures private. A missing/denied tombstone is a capture
 limitation, not evidence of a clean exit. Never publish titles, screenshots,
 playback history or diagnostic archives in the public repository.
+
+For a **still-live frozen engine**, optionally add `--native-snapshot` to request
+`debuggerd -b` after reproduction. This can briefly pause threads; Samsung may
+deny it. The script records failures and never elevates access or changes policy.
+It also records process/thread, power, display, device-state and exit snapshots.
+Those snapshots are evidence to correlate, not an automatic crash diagnosis.
 
 ## Final acceptance gate
 
