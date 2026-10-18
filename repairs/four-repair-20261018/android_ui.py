@@ -157,6 +157,9 @@ def run(args):
         if getattr(args, 'versioncheck_descriptor_diagnostic', False):
             require(getattr(args, 'versioncheck_shutdown_only', False) and args.expected_api == '37',
                     'Readonly descriptor diagnostics require the dedicated targeted API37 run')
+        if getattr(args, 'versioncheck_selection_only', False):
+            require(args.expected_api == '37' and not getattr(args, 'versioncheck_shutdown_only', False),
+                    'Bundled Version Check selection smoke requires dedicated API37 run')
         require(Path(args.apk).is_file(), "Signed Infinity APK missing")
         report["apk_sha256"] = sha(args.apk)
         require(report["apk_sha256"] == args.expected_sha,
@@ -254,8 +257,9 @@ def run(args):
                                + FULL_SKIN + '</setting>'
                                '<setting id="general.addonupdates">2</setting></settings>')
         probe.adb("push", guisettings, probe.PROFILE + "/guisettings.xml")
-        if getattr(args, 'versioncheck_shutdown_only', False):
-            # All three isolated comparison arms need natural service startup
+        if (getattr(args, 'versioncheck_shutdown_only', False) or
+                getattr(args, 'versioncheck_selection_only', False)):
+            # Isolated Version Check checks need natural service startup
             # evidence. Healthy Python retirement need not emit a warning.
             advanced = out / 'advancedsettings.xml'
             advanced.write_text('<advancedsettings><loglevel hide="true">1</loglevel></advancedsettings>')
@@ -268,6 +272,7 @@ def run(args):
         versioncheck_diagnostic = None
         descriptor_diagnostic = None
         if (getattr(args, 'versioncheck_shutdown_only', False) or
+                getattr(args, 'versioncheck_selection_only', False) or
                 input_report.get('versioncheck_candidate')):
             import versioncheck_shutdown_probe as versioncheck_probe
             versioncheck_diagnostic = versioncheck_probe.stage_diagnostic(extras)
@@ -381,6 +386,18 @@ def run(args):
         require(screenshot.startswith(b"\x89PNG\r\n\x1a\n"),
                 "Actual Infinity screenshot missing or not PNG")
         (out / "infinity-real-screen.png").write_bytes(screenshot)
+        if getattr(args, 'versioncheck_selection_only', False):
+            publish('targeted-bundled-versioncheck-selection')
+            import versioncheck_shutdown_probe as versioncheck_probe
+            versioncheck_probe.before_close(probe, out, report, args)
+            report['bundled_service_source_selected'] = True
+            report['versioncheck_selection_only'] = True
+            report['full_ui_matrix_executed'] = False
+            report['real_close_executed'] = False
+            report['close_certified'] = False
+            report['passed'] = False  # Only the narrow service smoke was exercised.
+            publish('targeted-bundled-versioncheck-selection-complete')
+            return report
         if getattr(args, 'versioncheck_shutdown_only', False):
             publish("targeted-versioncheck-shutdown-evidence")
             import versioncheck_shutdown_probe as versioncheck_probe
@@ -469,5 +486,7 @@ if __name__ == "__main__":
     p.add_argument("--versioncheck-expected-service-sha")
     p.add_argument('--versioncheck-descriptor-diagnostic', action='store_true',
                    help='Dedicated disposable API37 descriptor evidence only; unchanged Close gate')
+    p.add_argument('--versioncheck-selection-only', action='store_true',
+                   help='Fresh API37 bundled service selection smoke; never certifies Close')
     p.add_argument("--out", type=Path, required=True)
     run(p.parse_args())
