@@ -2,6 +2,7 @@
 import copy
 from pathlib import Path
 import json
+import hashlib
 import os
 import tempfile
 import unittest
@@ -19,8 +20,10 @@ class Control:
     def getSelectedPosition(self):return self.index
 
 class Home:
-    def __init__(self,focus=8101,index=2): self.focus=focus;self.control=Control(index)
+    def __init__(self,focus=8101,index=2): self.focus=focus;self.control=Control(index);self.properties={}
     def getFocusId(self):return self.focus
+    def getProperty(self,key):return self.properties.get(key,'')
+    def clearProperty(self,key):self.properties.pop(key,None)
     def getControl(self,i):return self.control
 
 class Kodi:
@@ -60,15 +63,32 @@ class UI:
     def Window(self,id):return self.home
 
 @unittest.skipUnless(APK.is_file(),'Exact original signed 2103390 required')
+def set_signed_native_hold(k, ui):
+    s=m.capture(k,ui)
+    assert s
+    label=k.getInfoLabel(f'Container({s.control}).ListItem.Label') or s.title
+    path=s.path
+    payload=f'{s.control}\n{s.index}\n{path}\n{label}'
+    proof=hashlib.sha256(payload.encode('utf8')).hexdigest()
+    ui.home.properties.update({
+        'Infinity.HomeOptionB.PendingControl':str(s.control),
+        'Infinity.HomeOptionB.PendingIndex':str(s.index),
+        'Infinity.HomeOptionB.PendingPath':path,
+        'Infinity.HomeOptionB.PendingLabel':label,
+        'Infinity.HomeOptionB.PendingProof':proof,
+    })
+    return [str(s.control),str(s.index),proof]
+
+
 class GroupThreeOptionB(unittest.TestCase):
-    def test_01_exact_signed_base_scope_two_new_files_only(self):
+    def test_01_signed_scope_two_additions_one_scoped_runtime_change(self):
         result=stage.audit(APK,ROOT)
         self.assertEqual(result['original_members'],7430)
-        self.assertEqual(result['original_members_unchanged'],7430)
-        self.assertEqual(result['modified_members'],0)
+        self.assertEqual(result['original_members_unchanged'],7429)
+        self.assertEqual(result['modified_members'],1)
         self.assertEqual(result['proposed_added_members'],2)
         self.assertFalse(result['ready_for_signed_apk'])
-        self.assertEqual(result['input_dispatch'],'UNRESOLVED_NOT_CONNECTED')
+        self.assertEqual(result['native_input_dispatch'],'SOURCE_PATCHED_NO_ANDROID_COMPILE')
         self.assertTrue(all(row['path'].startswith(stage.ADDON_PREFIX) for row in result['proposed_additions']))
 
     def test_02_design_xml_single_compact_glass_modal_exact_controls(self):
@@ -221,7 +241,7 @@ class GroupThreeOptionB(unittest.TestCase):
         sys.modules.update({'xbmc':k,'xbmcgui':ui,
                             'xbmcaddon':types.SimpleNamespace(Addon=lambda ident:types.SimpleNamespace(getAddonInfo=lambda name:'/fake/ui')),
                             'xbmcvfs':types.SimpleNamespace(translatePath=lambda path:path)})
-        try:self.assertFalse(m.show_for_focused_top_poster())
+        try:self.assertFalse(m.show_for_focused_top_poster(set_signed_native_hold(k,ui)))
         finally:
             for name,module in backup.items():
                 if module is None:sys.modules.pop(name,None)
@@ -251,7 +271,7 @@ class GroupThreeOptionB(unittest.TestCase):
         sys.modules.update({'xbmc':k,'xbmcgui':ui,
                             'xbmcaddon':types.SimpleNamespace(Addon=lambda ident:types.SimpleNamespace(getAddonInfo=lambda name:'/fake/ui')),
                             'xbmcvfs':types.SimpleNamespace(translatePath=lambda path:path)})
-        try:self.assertTrue(m.show_for_focused_top_poster())
+        try:self.assertTrue(m.show_for_focused_top_poster(set_signed_native_hold(k,ui)))
         finally:
             for name,module in backup.items():
                 if module is None:sys.modules.pop(name,None)
@@ -266,8 +286,72 @@ class GroupThreeOptionB(unittest.TestCase):
             before=stage.digest(APK.read_bytes())
             output=stage.stage(APK,ROOT,target)
             self.assertEqual(output['proposed_added_members'],2)
+            self.assertEqual(output['modified_members'],1)
+            self.assertTrue((target/stage.ADDON_PREFIX/'runtime.py').is_file())
             self.assertTrue((target/stage.ADDON_PREFIX/'home_option_b.py').is_file())
             self.assertEqual(before,stage.digest(APK.read_bytes()))
             self.assertEqual((target/stage.ADDON_PREFIX/'home_option_b.py').read_bytes(),(ROOT/'home_option_b.py').read_bytes())
+
+    def test_17_native_proof_acceptance_and_wrong_poster_rejection(self):
+        k=Kodi();ui=UI(k)
+        args=set_signed_native_hold(k,ui)
+        hold=m.read_native_hold(ui,args)
+        self.assertIsNotNone(hold)
+        self.assertEqual((hold.control,hold.index),(8101,2))
+        self.assertIsNone(m.read_native_hold(ui,['8102',args[1],args[2]]))
+        self.assertIsNone(m.read_native_hold(ui,['8101','3',args[2]]))
+        self.assertIsNone(m.read_native_hold(ui,['8101','2','0'*64]))
+        ui.home.properties['Infinity.HomeOptionB.PendingPath']='plugin://plugin.video.umbrella/?action=another'
+        self.assertIsNone(m.read_native_hold(ui,args))
+
+    def test_18_native_hold_clears_only_matching_properties(self):
+        k=Kodi();ui=UI(k)
+        args=set_signed_native_hold(k,ui)
+        h=m.read_native_hold(ui,args)
+        m.clear_native_hold(ui,h)
+        self.assertEqual(ui.home.properties,{})
+        args=set_signed_native_hold(k,ui)
+        h=m.read_native_hold(ui,args)
+        ui.home.properties['Infinity.HomeOptionB.PendingProof']='0'*64
+        m.clear_native_hold(ui,h)
+        self.assertEqual(ui.home.properties['Infinity.HomeOptionB.PendingProof'],'0'*64)
+
+    def test_19_guarded_first_party_runtime_route_only(self):
+        import runtime_option_b_patch
+        with ZipFile(APK) as z:
+            old=z.read('assets/addons/script.infinity.uirepair/runtime.py')
+        patched=runtime_option_b_patch.patch_runtime(old)
+        self.assertIn(b"elif action == 'option-b':",patched)
+        self.assertEqual(patched.replace(runtime_option_b_patch.REPLACEMENT.encode(),
+                                runtime_option_b_patch.ANCHOR.encode()),old)
+        with self.assertRaises(ValueError):
+            runtime_option_b_patch.patch_runtime(patched)
+
+    def test_20_native_dispatch_source_patch_exact_rail_fallback(self):
+        import native_option_b_patch as patch
+        msource=('''      // INFINITY_RAIL_HOLD_V2: existing rail handler
+            for (const int railID : {9200, 8820, 8720, 19601})
+            {
+              if (rail && rail->OnInfinityRailLongPress(newEvent.touch.x, newEvent.touch.y)) handled = true;
+            }
+            if (handled)
+              break;
+      if (newEvent.touch.action == ACTION_TOUCH_TAP)''').encode()
+        cpp=('''#include "GUIMessage.h"
+bool CGUIBaseContainer::OnInfinityRailLongPress(float x, float y)
+{ return false; }
+''').encode()
+        head='''  bool OnInfinityRailLongPress(float x, float y);
+'''.encode()
+        origins={'xbmc/input/InputManager.cpp':msource,
+                 'xbmc/guilib/GUIBaseContainer.cpp':cpp,
+                 'xbmc/guilib/GUIBaseContainer.h':head}
+        out=patch.patch_sources(origins)
+        self.assertEqual(set(out),set(origins))
+        self.assertIn(b"OnInfinityOptionBLongPress",out['xbmc/input/InputManager.cpp'])
+        self.assertIn(b"GetID() != 8101 && GetID() != 8102",out['xbmc/guilib/GUIBaseContainer.cpp'])
+        self.assertEqual(out['xbmc/input/InputManager.cpp'].count(b"for (const int railID : {9200, 8820, 8720, 19601})"),1)
+        self.assertIn(msource[:msource.index(b'            if (handled)')],out['xbmc/input/InputManager.cpp'])
+        with self.assertRaises(ValueError):patch.patch_sources(out)
 
 if __name__=='__main__':unittest.main(verbosity=2)
