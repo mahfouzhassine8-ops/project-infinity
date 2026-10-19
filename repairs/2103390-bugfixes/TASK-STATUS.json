@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "SEVEN_GROUPS_STRICT_PRESERVATION_FREEZE_GROUP1_HORIZONTAL_SCROLL_CONFIRMED_NO_FIX_IMPLEMENTED",
+  "status": "GROUP_01_USER_AUTHORIZED_SOURCE_AND_EVIDENCE_AUDIT_STARTED",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -29,7 +29,7 @@
   "complete_tasks_count": 0,
   "task_count": 19,
   "current_authorized_task": null,
-  "next_task_requires_user_choice": true,
+  "next_task_requires_user_choice": false,
   "player_glass_menu_visual_proposal": {
     "canonical_tasks": [
       "11",
@@ -487,9 +487,9 @@
     {
       "id": "17",
       "title": "TMDb Helper/SlyGuy quarantined startup investigation",
-      "approval_stage": "triage_only",
+      "approval_stage": "SKIPPED_BY_USER",
       "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
+      "status": "SKIPPED_BY_USER_NO_CODE_CHANGES",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [],
@@ -505,10 +505,10 @@
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "USER_EXCLUDED_AS_UNRELATED_ERROR",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "User excluded separate SlyGuy/TMDb Helper quarantine investigation as unrelated/error. Do not modify, disable or reinstall either addon. Read-only provider route evidence may be inspected solely within task 01, no generic service startup repair."
     },
     {
       "id": "18",
@@ -580,22 +580,21 @@
   },
   "primary_work_unit": "GROUP_01_TO_07",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
-  "current_authorized_group": null,
+  "current_authorized_group": "01",
   "group_count": 7,
   "group_done_count": 0,
   "group_status": {
     "01": {
-      "name": "Home, Continue Watching, category caching and clock",
+      "name": "Home, Continue Watching, category caching and clock (no SlyGuy/TMDb service work)",
       "original_subrequirements": [
         "01",
         "02",
         "03",
         "04",
-        "17",
         "19"
       ],
-      "status": "SCOPE_APPROVED_NOT_IMPLEMENTED",
-      "implementation_authorized": false,
+      "status": "USER_AUTHORIZED_IN_PROGRESS_AUDIT",
+      "implementation_authorized": true,
       "savepoint": null,
       "targeted_tests": "NOT_RUN",
       "fold": "NOT_VERIFIED",
@@ -724,5 +723,6 @@
     "block_unapproved_or_shared_cobra_affecting_changes": true,
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
-  }
+  },
+  "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion"
 }
