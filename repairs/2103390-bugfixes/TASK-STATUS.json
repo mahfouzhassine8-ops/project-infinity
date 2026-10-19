@@ -30,6 +30,18 @@
   "task_count": 18,
   "current_authorized_task": null,
   "next_task_requires_user_choice": true,
+  "player_glass_menu_visual_proposal": {
+    "canonical_tasks": ["11", "12", "13", "14"],
+    "user_requested": true,
+    "design_artifact": "repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md",
+    "appearance_state": "VISUAL_MOCK_PENDING_USER_APPROVAL",
+    "behavior_requested": "Playback, Video Settings and Audio & Subtitles menus must be translucent Infinity liquid glass, with moving video visible THROUGH the panel.",
+    "visual_approval_given": false,
+    "mocked_playback_actions_are_not_authoritative": true,
+    "preserve_real_playback_actions_except_redundant_video_settings_row": true,
+    "cobra_modification_allowed": false,
+    "implementation_or_build_started": false
+  },
   "save_after_each_task": {
     "update_required": [
       "task implementation and tests commit",
