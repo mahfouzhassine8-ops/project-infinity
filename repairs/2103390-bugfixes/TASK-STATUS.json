@@ -649,8 +649,8 @@
       "id": "19",
       "title": "Movies ↔ TV Shows keep all initially populated Home rails immediately available without tab-switch reload",
       "approval_stage": "user_reported_queued",
-      "implementation_authorized": true,
-      "status": "NO_RELOAD_NOT_FIXED_LIFECYCLE_OFFLINE_TRIAGE_ONLY_4_HOST_SYNTHETIC_TESTS_PASS",
+      "implementation_authorized": false,
+      "status": "USER_DEFERRED_PENDING_FOLD_REPRO_AND_CAUSAL_LOGS_NOT_FIXED",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [
@@ -678,10 +678,10 @@
           "19049.mp4 shows Movies/TV switching while latest releases/Continue Watching go blank; fix not verified."
         ]
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "DEFERRED_INVESTIGATION_ONLY_OTHER_GROUP1_SOURCE_WORK_ACCEPTED_AS_STAGED",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "No #19 fix implemented. Neither repeated CC directory jobs nor HomeLoad markers alone prove which user action, native invalidation or visibility/URL change causes the Umbrella and CW rails to blank. Do NOT install speculative global caches or alter third-party Umbrella/native DirectoryProvider.",
+      "blocking_or_caveat": "User has explicitly deferred #19 to a future replay and in-app diagnostics review. No #19 functional repair is implemented; do not mark FULL group 1 complete or include #19 in combined APK. Previously staged other Group1 source changes remain unchanged for future integration verification. Genuine Kodi Fold/device tests still pending.",
       "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md"
     }
   ],
@@ -713,7 +713,7 @@
         "04",
         "19"
       ],
-      "status": "PAUSED_UNFINISHED_SOURCE_STAGED_TASK19_UNFIXED_FOLD_UNVERIFIED",
+      "status": "CHECKED_FOR_SAVED_SOURCE_STAGE_ONLY_TASK19_DEFERRED_PENDING_USER_REPRO_AND_NEW_CORRELATED_DIAGNOSTICS_NO_COMBINED_RUNTIME_VERIFICATION",
       "implementation_authorized": false,
       "savepoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
       "targeted_tests": "LOCAL_NEW_17_17_CHOICE_INTEGRATION_DIAGNOSTIC_HOST_PASS_PREVIOUS_HOST_RUNS_SEPARATE_NO_FOLD",
@@ -730,7 +730,14 @@
         "implementation": "SOURCE_ONLY_DEFAULT_FOLD_CARD_GEOMETRY_AND_14_HOME_VARIANT_EXPERIMENTAL_VERTICAL_CHOOSER_STAGE_NO_APK",
         "tests": "PREVIOUS_6_6_NUMERIC_FOLD_DEFAULT_GEOMETRY_HOST_TEST_PLUS_NEW_12_12_CHOOSER_LOGIC_HOST_TEST_1_1_VIRTUAL_APK_GATE",
         "fold": "NOT_VERIFIED"
-      }
+      },
+      "source_stage_checkmark": true,
+      "source_stage_user_acknowledged": true,
+      "deferred_open_subrequirements": [
+        "19"
+      ],
+      "carry_forward_for_later_integration": "EXISTING_CHECKED_SOURCE_WORK_ONLY_DO_NOT_CLAIM_TASK19_FIXED_OR_GROUP_FULLY_COMPLETE",
+      "next_gate": "Wait for user to reproduce Movies-TV category switch blanking and supply a fresh in-app Infinity Diagnostic ZIP from the same run; correlate Home selection-vs-activation, Window HomeLoad, DirectoryProvider refresh/reset reasons, Umbrella Latest and Continue Watching URLs and revisions, then implement #19 root-cause correction within Group1 authorization."
     },
     "02": {
       "name": "Add-on Browser end-to-end including root task 06",
@@ -846,7 +853,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Back to Group #2, finish the approved 05–08 Add-on Browser repairs rather than advancing with unfinished work. Preserve Group #3 source work and all Cobra/unrelated Infinity functionality.",
+  "last_user_instruction": "Checkmark Group #1's existing saved source-work checkpoint and defer still-unfixed #19 Movies/TV reload until the user can reproduce and supply fresh in-app diagnostic evidence; do not falsely claim the full group is fixed. Continue Group #2 as active.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -1158,5 +1165,17 @@
     "cobra_tested_on_device": false,
     "Cobra_or_shutdown_source_modified": false,
     "original_signed_2103390_mutated": false
+  },
+  "group_1_user_stage_acceptance_20261019": {
+    "user_words": "So in other words, I have to replicate it and we have to do more research about it. So if anything, you've done everything you can do. So that means one gets a check, and we'll get back to it later for the other situation.",
+    "checkmark_meaning": "GROUP1_SOURCE_CHECKPOINT_ACCEPTED_AND_SAVED_NOT_FULLY_COMPLETE",
+    "other_source_work": "PRESERVED_FOR_LATER_COMBINED_REVIEW",
+    "task_19": "DEFERRED_UNFIXED_AWAITING_USER_REPRO_AND_CORRELATED_DIAGNOSTICS",
+    "source_checkmark": true,
+    "full_group_completed": false,
+    "fold_verified": false,
+    "signed_apk_created": false,
+    "current_active_group": "02",
+    "group_done_count_unchanged": 0
   }
 }
