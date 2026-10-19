@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "TRACKER_UPDATED_FOR_19_AND_GLASS_MENU_SCOPE_ONLY_NO_BUGFIX_IMPLEMENTATION",
+  "status": "SEVEN_GROUPS_APPROVED_GROUP6_SILENT_MODE_SCOPED_NO_BUGFIX_IMPLEMENTATION",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -38,10 +38,10 @@
       "14"
     ],
     "user_requested": true,
-    "design_artifact": "repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md",
-    "appearance_state": "VISUAL_MOCK_PENDING_USER_APPROVAL",
+    "design_artifact": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md",
+    "appearance_state": "USER_APPROVED_BITE_FOR_BITE_GLASS_MENU_MATERIAL",
     "behavior_requested": "Playback, Video Settings and Audio & Subtitles menus must be translucent Infinity liquid glass, with moving video visible THROUGH the panel.",
-    "visual_approval_given": false,
+    "visual_approval_given": true,
     "mocked_playback_actions_are_not_authoritative": true,
     "preserve_real_playback_actions_except_redundant_video_settings_row": true,
     "cobra_modification_allowed": false,
@@ -352,7 +352,7 @@
     {
       "id": "12",
       "title": "Remove only Video Settings row from Playback popup",
-      "approval_stage": "requested_behavior_approved_visual_mock_pending",
+      "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
       "implementation_authorized": false,
       "status": "OPEN_NOT_IMPLEMENTED",
       "prechange_commit": null,
@@ -378,7 +378,7 @@
     {
       "id": "13",
       "title": "Video Settings compact popup (slightly smaller than Playback)",
-      "approval_stage": "requested_behavior_approved_visual_mock_pending",
+      "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
       "implementation_authorized": false,
       "status": "OPEN_NOT_IMPLEMENTED",
       "prechange_commit": null,
@@ -404,7 +404,7 @@
     {
       "id": "14",
       "title": "Audio & Subtitles compact popup (slightly smaller than Playback)",
-      "approval_stage": "requested_behavior_approved_visual_mock_pending",
+      "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
       "implementation_authorized": false,
       "status": "OPEN_NOT_IMPLEMENTED",
       "prechange_commit": null,
@@ -456,9 +456,9 @@
     {
       "id": "16",
       "title": "CU LRC Lyrics Python exception investigation",
-      "approval_stage": "triage_only",
+      "approval_stage": "SKIPPED_BY_USER",
       "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
+      "status": "SKIPPED_BY_USER_NO_CODE_CHANGES",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [],
@@ -474,10 +474,10 @@
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "USER_SKIPPED_REPAIR",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Former Group 6 Lyrics repair explicitly removed from active work; user may self-uninstall/reinstall later but no such action authorized. Any old script-error diagnostic remains historical. New active Group #6 is separate System Hub Silent Mode."
     },
     {
       "id": "17",
@@ -568,8 +568,127 @@
     ],
     "clarified_object": "the Playback, Video Settings, and Audio & Subtitles menu/dialog BACKGROUNDS, not the toolbar icons",
     "user_direction": "translucent Infinity liquid glass with some real video visible beneath, same material across all three menus",
-    "exact_visual_design_status": "MOCK_SHOWN_PENDING_USER_APPROVAL",
+    "exact_visual_design_status": "USER_APPROVED_BITE_FOR_BITE_GLASS_MENU_MATERIAL",
     "implementation_status": "NOT_STARTED",
-    "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown"
+    "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown",
+    "approval_doc": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md"
+  },
+  "primary_work_unit": "GROUP_01_TO_07",
+  "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
+  "current_authorized_group": null,
+  "group_count": 7,
+  "group_done_count": 0,
+  "group_status": {
+    "01": {
+      "name": "Home, Continue Watching, category caching and clock",
+      "original_subrequirements": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "17",
+        "19"
+      ],
+      "status": "SCOPE_APPROVED_NOT_IMPLEMENTED",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    },
+    "02": {
+      "name": "Add-on Browser end-to-end including root task 06",
+      "original_subrequirements": [
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "status": "SCOPE_APPROVED_NOT_IMPLEMENTED",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    },
+    "03": {
+      "name": "Option B movie and TV top-rail long-press details",
+      "original_subrequirements": [
+        "09",
+        "10"
+      ],
+      "status": "DESIGN_APPROVED_NOT_IMPLEMENTED",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    },
+    "04": {
+      "name": "Player OSD and three translucent glass menus",
+      "original_subrequirements": [
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "status": "DESIGN_APPROVED_NOT_IMPLEMENTED",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    },
+    "05": {
+      "name": "Native status139 crash evidence/root cause",
+      "original_subrequirements": [
+        "15"
+      ],
+      "status": "INVESTIGATION_PENDING",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    },
+    "06": {
+      "name": "SYSTEM HUB SILENT MODE ON/OFF — suppress unwanted Kodi/in-app notification banners/toasts",
+      "original_subrequirements": [],
+      "new_scoped_feature": true,
+      "replaces_group": "former group 06 CU LRC Lyrics repair",
+      "status": "SCOPE_APPROVED_NOT_IMPLEMENTED",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    },
+    "07": {
+      "name": "Final combined APK, preservation audit and physical Fold/user LOCK",
+      "original_subrequirements": [
+        "18"
+      ],
+      "status": "GATE_NOT_STARTED",
+      "implementation_authorized": false,
+      "savepoint": null,
+      "targeted_tests": "NOT_RUN",
+      "fold": "NOT_VERIFIED"
+    }
+  },
+  "group6_silent_mode": {
+    "group": "06",
+    "placement": "EXISTING_INFINITY_SYSTEM_HUB",
+    "label": "Silent Mode",
+    "type": "TOGGLE",
+    "initial_value": "OFF",
+    "persistent": true,
+    "when_on": "suppress unsolicited noninteractive on-screen notification banners/toasts from Infinity, CU LRC Lyrics, Trakt and other addons; preserve diagnostic logs, running addon services and provider state",
+    "when_off": "restore usual banners/alert sounds immediately; no notification backlog",
+    "guard": "do not automatically dismiss dialogs requiring user consent, actions, playback choices, security/permission confirmation, core errors or shutdown safety; verify source of each banner; if shared Cobra path required STOP",
+    "prohibit": [
+      "Cobra modifications",
+      "third-party addon code edits or removals",
+      "global Android notification disabling",
+      "muting playback audio",
+      "shutdown/Essential-First changes",
+      "data wipe or reinstall"
+    ],
+    "status": "SPECIFICATION_ONLY_NOT_IMPLEMENTED",
+    "compatibility": "preserve existing Infinity System Hub layout, all theme and Fold variants",
+    "notification_source_audit": "REQUIRED_BEFORE_IMPLEMENTATION"
   }
 }
