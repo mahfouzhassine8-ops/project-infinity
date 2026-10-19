@@ -1,5 +1,21 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## OVERRIDING USER CLARIFICATION — DO THE NECESSARY APPROVED REPAIR, PRESERVE EVERYTHING ELSE
+
+**Latest user statement (October 19, 2026):** “Well, yes, we were strict about preserving Cobra and everything outside. However, if there is a fix that is needed to be, you can still preserve everything and do the fix that is needed.”
+
+**Meaning:** Protection is a required outcome, NOT an automatic veto of legitimate repair work. Earlier handoff language demanding *another* separate authorization merely to edit a shared/native source file was overrestrictive. For the **currently authorized Group #3** (approved Option B top Movie/TV release poster hold), investigate and implement a necessary, strictly gated native input fix if no first-party-only alternative exists and if negative tests and source diff show **Cobra and every unrelated path keep their original behavior**. The native change must fire only for Window Home, actual touch-hit Movie/TV top rail 8101/8102 and correct single long-press; default input for everything else, including add-on rails 9200/8820/8720/19601, remains original. Don't claim the hookup exists until code and tests actually prove it.
+
+**Group #2** is paused, not finished. When expressly reselected, finish the *already-approved* Add-on Browser original tasks 05–08 (submenu selection, view-only Hide, actual disable confirmation, Repository/ZIP/Search) rather than refusing all work merely because native Kodi supplies an action. Use an isolated first-party mechanism or narrowly scoped native condition with functional and protected-path tests. Existing UI Repair has a separate, first-party video-source hide/confirm implementation; this is evidence for reuse, not proof that Kodi's native Add-on Browser currently has Hide or Disable confirmation.
+
+**No permission** to change Cobra, unrelated Infinity functionality, provider data, shutdown, background playback, or another work group; no cleanup/features beyond the named repairs; no blind shared-native edits. If a candidate fails isolation or tests, reject it and keep the last accepted baseline. A host pass does not mean Fold pass, and final signing/group completion remains separately gated.
+
+**Contract update saved:** `repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md`, commit `00b43672523a48c72debb9e8f1f85fffd65fe8d5`. **Tracker update saved:** `TASK-STATUS.json`, commit `215d527fcc18bb5185ba262f4e55257b8d895d0a`. This continuation only updated scope/permission documentation, **not native runtime code, APK, skin, or device**. Group #3 source still unconnected to real long-press and Group #2 remains paused unfinished.
+
+---
+
+
+
 ## CURRENT GROUP #3 — OPTION B MODAL SOURCE CHECKPOINT (2026-10-19)
 
 **LAST USER COMMAND: “Move on to three.”** This authorizes work Group #3 only (original tasks 09, 10). Groups #1 and #2 remain PAUSED AND UNFINISHED: #1 category reload not fixed, #2 root/add-on browser only partially source-staged. All other Groups #4–7, Cobra and unrelated Infinity strictly OFF LIMITS. Original signed Infinity 2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb, 7,430 original members, and locked 2103384 shutdown fallback remain unchanged. Original actual top release rails Movie=8101 and TV=8102.
