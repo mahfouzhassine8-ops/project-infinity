@@ -18,7 +18,7 @@ from pathlib import Path
 import sys
 
 HERE=Path(__file__).resolve().parent
-ROOT=HERE.parents[3]
+ROOT=HERE.parents[2]
 GROUPS=HERE.parent
 for group in ("group2","group3","group6"):
     sys.path.insert(0,str(GROUPS/group))
