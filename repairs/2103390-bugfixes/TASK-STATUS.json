@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP1_VERTICAL_CHOOSER_EXPERIMENTAL_STAGED_17_HOST_GREEN_29MEMBER_SCOPE_NO_APK_NO_FOLD_RELOAD19_UNRESOLVED",
+  "status": "GROUP2_AUTHORIZED_START_GROUP1_PAUSED_UNFINISHED_NO_APK_OR_FOLD",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -630,9 +630,9 @@
     "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown",
     "approval_doc": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md"
   },
-  "primary_work_unit": "GROUP_01_TO_07",
+  "primary_work_unit": "GROUP_02_ADDON_BROWSER_05_06_07_08",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
-  "current_authorized_group": "01",
+  "current_authorized_group": "02",
   "group_count": 7,
   "group_done_count": 0,
   "group_status": {
@@ -645,8 +645,8 @@
         "04",
         "19"
       ],
-      "status": "IN_PROGRESS_SCOPED_VERTICAL_CHOOSER_HOST_GREEN_CATEGORY_RELOAD19_ROOT_CAUSE_OPEN_PHYSICAL_FOLD_REQUIRED",
-      "implementation_authorized": true,
+      "status": "PAUSED_UNFINISHED_SOURCE_STAGED_TASK19_UNFIXED_FOLD_UNVERIFIED",
+      "implementation_authorized": false,
       "savepoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
       "targeted_tests": "LOCAL_NEW_17_17_CHOICE_INTEGRATION_DIAGNOSTIC_HOST_PASS_PREVIOUS_HOST_RUNS_SEPARATE_NO_FOLD",
       "fold": "NOT_VERIFIED",
@@ -672,10 +672,10 @@
         "07",
         "08"
       ],
-      "status": "SCOPE_APPROVED_NOT_IMPLEMENTED",
-      "implementation_authorized": false,
-      "savepoint": null,
-      "targeted_tests": "NOT_RUN",
+      "status": "ACTIVE_AUTHORIZED_ORIGINAL_05_06_07_08_SOURCE_AUDIT_IN_PROGRESS",
+      "implementation_authorized": true,
+      "savepoint": "bea310aca5ba5ece2bc11209b064e0050c06e345",
+      "targeted_tests": "NOT_COMMITTED_AS_OF_ACTIVATION",
       "fold": "NOT_VERIFIED"
     },
     "03": {
@@ -776,7 +776,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion",
+  "last_user_instruction": "Move on to Group #2; leave Group #1 saved and still unfinished; only Group #2 corrections now.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -889,5 +889,22 @@
     "evidence": "Earlier real 20 jobs in 49.6 seconds; precise category-change provider invalidation trigger unproved",
     "root_cause_fixed": false,
     "additional_actions_authorized": false
+  },
+  "group_2_authorization": {
+    "source_parent": "2103390",
+    "signed_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "source_branch_head_before_group2": "bea310aca5ba5ece2bc11209b064e0050c06e345",
+    "original_subtasks": [
+      "05",
+      "06",
+      "07",
+      "08"
+    ],
+    "protected_group1": "PAUSED_UNFINISHED_DO_NOT_MARK_COMPLETE",
+    "cobra_modification_allowed": false,
+    "approved_scope": "Original Add-on Browser root/header/context/navigation and My Add-ons/Updates/Recently Updated/Repository/ZIP/Search subpages only",
+    "state": "ACTIVE_IMPLEMENTATION_UNDER_GROUP2",
+    "changed_runtime_apk": false,
+    "fold": "NOT_VERIFIED"
   }
 }
