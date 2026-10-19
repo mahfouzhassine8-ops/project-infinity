@@ -1,5 +1,31 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## OCT 19 ALL-IN-ONE READINESS GATE — SOURCE GREEN, ANDROID/FOLD/CRASH OPEN
+
+**User:** “All right, so if everything's complete, it's time to go to all-in-one phase.” The condition **IS NOT MET**. We have saved a source-stage audit, not compiled/signed a candidate or called a final lock. User's earlier directive requires full byte-preservation of Cobra and all unapproved Infinity behavior; do not mistake successful Python host fixtures for actual APK installation.
+
+**NEW GROUPS #4–#6 TESTED ON ORIGINAL SIGNED 2103390:**
+
+- **Group #4 — Player OSD and 3 glass menus:** 41 strictly scoped skin XML changes only. `group4/player_glass_patch.py` commit `55df2ad96f6704aba9746917d1b2718e483e09e5`. **CI run 39265841878, 10/10 PASS**. Existing OSD control #255 reuses real Video Settings; redundant Playback row #274 removed, rest preserved, 3 menu glass resources/conditions. **CAUTION:** original control #255 is actually `Action(AspectRatio)` in 2103390, so prove existing video/aspect capability remains available before shipping—its original one-tap behavior is not automatically preserved. No Fold player/device rendering test.
+- **Group #5 — native fatal SIGSEGV/139:** Original Oct 19 06:44 crash PID29396/TID29630, signal 11, exit139, Videos Navigation + Busy at last recorded state. Historical 2103229 native hash in crash recorder is provably stale compared to packaged 2103390 `libkodi.so`. Source-only `group5/final_native_identity_patch.py` commit `079b6b3249ca8c1849d00d0583fb4ae3e3a939fa` derives identity from final ELF, patches only fixed-sized companion recorder rodata at packaging; ELF NOBITS guard corrected at `cecb049cb66733deca395ddbd4a3713f01c92a17`. **CI run 39267576509, 10/10 PASS** (first 39266729693 failed and was corrected). **NO PROVEN FAULTING STACK/FUNCTION, NO CRASH CAUSE REPAIR, NO NATIVE REBUILD**. Do not imply the known crash is fixed. Crash receipt `repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md`.
+- **Group #6 — existing System Hub Silent Mode:** 13 original Hub layout XMLs get exactly one persistent `Silent Mode` radiobutton. All existing original button IDs/actions and geometry untouched. Only footer and surrounding glass envelope expanded to make room; unified scrolling preserved. Native one-function-only `CGUIDialogKaiToast::DoWork` presentation gate scoped by `skin.infinity.diggz` plus persistent Skin.HasSetting, discards passive toasts before sound/haptic; does not suppress interactive dialogs, player audio, logs, third-party add-ons or Cobra. Initial Group6 source `e9c83cf16783f307331b2f9ace1f10cc5a8ea10d`; layout safety correction `6b79ac88963e9e61fe6c7429ab3bd9f21b8747ff`; tests `d2a0888d770a3e19aa18993757f3edbf03226c05`. **CI run 39269926154, 10/10 PASS**. Native toast source NOT built or Fold-tested. Blocking CU LRC script-error dialogs aren't ordinary KaiToast and must not be claimed suppressed.
+
+**INTEGRATION COLLISION DISCOVERED/RESOLVED AT SOURCE LEVEL:** Earlier Group1 Continue Watching `home-choice` and Group3 Option B `option-b` each add a dispatcher case to **the same** first-party `script.infinity.uirepair/runtime.py`. Individual patches would fail if applied sequentially unchanged. Exact G3 `runtime_option_b_patch.py` was corrected at `fe0e5f7f2e99dda373bf9edadc14a56ffaa5364d` to recognize ONLY either signed original or Group1-approved source, with no other actions modified. Integration test commit `7628081245ff165828a52c1432b4547a317bc773`, **CI run 39270553998 26/26 PASS**, source only. Does not prove GUI input/Android.
+
+**Group1:** user accepted saved source checkpoint; task #19 Movies↔TV category reload deliberately deferred/unfixed for later actual Fold replay. **Group2:** 20/20 host source, native source modifications not compiled. **Group3:** 26/26 host source after Group1 overlap fix, native movie/TV hold not rebuilt. All stages preserved; never redo or discard existing accepted work.
+
+**ALL-IN-ONE CONDITION NOT MET:** 
+- Group #5 actual crash SIGSEGV/139 remains unresolved and lacks faulting native stack/module mapping; fingerprint alone does not fix it.
+- Groups #2, #3 and #6 native fixes have never been compiled together into source-matched **2103390** Android `libkodi.so` nor tested on a real Android process. Group #4 player OSD must be verified against real AspectRatio capability.
+- User's actual Fold 17, inner+cover, all theme player navigation, touch gestures, native package signing/install-over, Essential-First full Close, Cobra and provider regressions are still unknown.
+- Final Group #7 implementation remains unauthorized by the user's condition; **NO all-in-one APK, no signed candidate, no lock**. A future experimental diagnostic APK could be considered separately if the user explicitly accepts the known unresolved crash; do not quietly promote it to a corrected release.
+
+**All-stage verification receipt:** `repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md`, commit `d7ba7752ccc202348ac77769972a94f249e39258`. **Authoritative tracker update:** `TASK-STATUS.json`, commit `e4040a65a0ef1bb88f8dbb89dc217ed5eb8066b4`. This is a truthful readiness checkpoint; source changes/receipts/CI remain saved.
+
+---
+
+
+
 
 ## NEW FOLD NATIVE CRASH EVIDENCE — 2026-10-19 09:20 ZIP (READ ONLY)
 
