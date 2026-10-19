@@ -1,3 +1,11 @@
+# ARCHIVED MOCK REVIEW — GLASS MENU LOOK NOW USER APPROVED
+
+**STATUS UPDATE:** The user explicitly said “Prefect bite to bite,” approving the matching translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. **CONTROLLING APPROVED DESIGN:** `repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md`. **CONTROLLING SEVEN WORK GROUPS:** `repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md`, where all three glass panels and their original actions are Group #4.
+
+This older “pending approval” mock discussion is HISTORICAL ONLY. Preserve it for audit but do not treat its outdated status as current. The generated concept's film/title and options are NOT the real Infinity player and must not replace the Sacrifice player or its existing controls. Approved visual material does not constitute a completed implementation, Android/Fold test or APK. Cobra absolutely off-limits.
+
+---
+
 # INFINITY PLAYER — THREE MATCHING TRANSLUCENT GLASS POPUPS (DESIGN PROPOSAL)
 
 **State: VISUAL MOCK FOR USER REVIEW, NOT USER-APPROVED EXACT DESIGN, NOT CODE IMPLEMENTED.**
