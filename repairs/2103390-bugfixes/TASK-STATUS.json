@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUPS04_05_06_USER_AUTHORIZED_GROUP04_ACTIVE_PENDING_EXACT_SIGNED_SOURCE_BASE_AUDIT",
+  "status": "GROUP4_10HOST_GROUP5_FINGERPRINT_10HOST_GROUP6_SILENT_10HOST_GREEN_GROUP1_3_COMPOSITION_26HOST_GREEN_ALL_IN_ONE_BLOCKED_ANDROID_FOLD_AND_CRASH139_CAUSE_OPEN",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -442,120 +442,149 @@
       "title": "OSD video/monitor icon opens Video Settings",
       "approval_stage": "requested_behavior_approved",
       "implementation_authorized": true,
-      "status": "USER_AUTHORIZED_SCOPE_ACCEPTED_NOT_YET_VERIFIED",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
         "runs": []
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Original OSD button 255 had Action(AspectRatio); approved tap rebinding to OSDVideoSettings changes that existing shortcut. Must verify video/aspect capability preserved through real Video Settings on Fold; no user-facing APK yet.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
     },
     {
       "id": "12",
       "title": "Remove only Video Settings row from Playback popup",
       "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
       "implementation_authorized": true,
-      "status": "USER_AUTHORIZED_SCOPE_ACCEPTED_NOT_YET_VERIFIED",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
         "runs": []
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "User requested translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. User clarified NOT the toolbar icons. A visual mock was generated for approval, NOT locked; do not reuse invented mock movie/menu labels or alter original functions. Preserve original 2103390 until separate implementation authorization."
+      "blocking_or_caveat": "Original supported native controls remain source-preserved, but rendering/Focus/Fold theme/material and active playback remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
     },
     {
       "id": "13",
       "title": "Video Settings compact popup (slightly smaller than Playback)",
       "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
       "implementation_authorized": true,
-      "status": "USER_AUTHORIZED_SCOPE_ACCEPTED_NOT_YET_VERIFIED",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
         "runs": []
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "User requested translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. User clarified NOT the toolbar icons. A visual mock was generated for approval, NOT locked; do not reuse invented mock movie/menu labels or alter original functions. Preserve original 2103390 until separate implementation authorization."
+      "blocking_or_caveat": "Original supported native controls remain source-preserved, but rendering/Focus/Fold theme/material and active playback remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
     },
     {
       "id": "14",
       "title": "Audio & Subtitles compact popup (slightly smaller than Playback)",
       "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
       "implementation_authorized": true,
-      "status": "USER_AUTHORIZED_SCOPE_ACCEPTED_NOT_YET_VERIFIED",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
         "runs": []
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "User requested translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. User clarified NOT the toolbar icons. A visual mock was generated for approval, NOT locked; do not reuse invented mock movie/menu labels or alter original functions. Preserve original 2103390 until separate implementation authorization."
+      "blocking_or_caveat": "Original supported native controls remain source-preserved, but rendering/Focus/Fold theme/material and active playback remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
     },
     {
       "id": "15",
       "title": "Native exit status 139 root-cause investigation",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "USER_AUTHORIZED_SCOPE_ACCEPTED_NOT_YET_VERIFIED",
+      "status": "STALE_NATIVE_RECORDER_SHA_SOURCE_REPAIR_GREEN_SIGSEGV139_FUNCTION_UNPROVEN",
       "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "implementation_commit": "cecb049cb66733deca395ddbd4a3713f01c92a17",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group5/final_native_identity_patch.py",
+        "repairs/2103390-bugfixes/group5/test_final_native_identity_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "GITHUB_ACTIONS_39267576509_10_OF_10_HOST_GREEN_CRASH_CAUSE_OPEN",
+        "runs": [
+          "Corrects crash recorder's 2103229 SHA provenance to final compiled ELF at future packaging, source only; Oct19 SIGSEGV/139 no exact native function/tombstone."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
+        "result": "SOURCE_RODATA_IDENTITY_ONLY_ANDROID_COLLECTOR_UNCOMPILED",
         "runs": []
       },
       "physical_fold": {
@@ -565,9 +594,10 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Previous Work diagnostics exist, but underlying status-139 crash unresolved.",
+      "blocking_or_caveat": "Fatal native crash 139 still unresolved: exact faulting thread function missing ASLR map and native tombstone. Do not invent cause-based crash repair; original 2103390 unsafe baseline cannot be declared stable. Not compiled or installed.",
       "new_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
-      "new_evidence_only": "Matched October 19 06:44:03 status139 + SIGSEGV, last Videos Nav/Busy in landscape multi-window, stale 2103229 crash recorder fingerprint vs 2103390 packaged libkodi; no tombstone/maps/stack; no native fix made"
+      "new_evidence_only": "Matched October 19 06:44:03 status139 + SIGSEGV, last Videos Nav/Busy in landscape multi-window, stale 2103229 crash recorder fingerprint vs 2103390 packaged libkodi; no tombstone/maps/stack; no native fix made",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
     },
     {
       "id": "16",
@@ -702,7 +732,7 @@
   },
   "primary_work_unit": "GROUP_02_FINISH_ALL_ADDON_BROWSER_05_TO_08",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
-  "current_authorized_group": "04",
+  "current_authorized_group": "06",
   "group_count": 7,
   "group_done_count": 0,
   "group_status": {
@@ -777,10 +807,10 @@
         "13",
         "14"
       ],
-      "status": "USER_AUTHORIZED_ACTIVE_PREIMAGE_AUDIT",
+      "status": "PLAYER_GLASSES_AND_OSD_SOURCE_STAGED_10_OF_10_CI_HOST_PASS_ANDROID_RENDERING_ASPECT_ACTION_AND_FOLD_UNVERIFIED",
       "implementation_authorized": true,
-      "savepoint": "32420005937d5938bfcc82e66515c8ff2b42f170",
-      "targeted_tests": "NOT_RUN",
+      "savepoint": "6f7681384ec19c9704c8bfd055d2e56ea3bc9877",
+      "targeted_tests": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_SIGNED_2103390_41_SKIN_MEMBERS_NO_FOLD",
       "fold": "NOT_VERIFIED"
     },
     "05": {
@@ -788,10 +818,10 @@
       "original_subrequirements": [
         "15"
       ],
-      "status": "USER_AUTHORIZED_QUEUED_EVIDENCE_BASED_EXIT139_AND_NATIVE_FINGERPRINT",
+      "status": "CRASH_RECORDER_FINGERPRINT_SOURCE_PATCH_10_OF_10_CI_HOST_PASS_SIGSEGV139_ROOT_CAUSE_UNPROVEN_NO_NATIVE_REBUILD",
       "implementation_authorized": true,
-      "savepoint": "32420005937d5938bfcc82e66515c8ff2b42f170",
-      "targeted_tests": "NOT_RUN",
+      "savepoint": "cecb049cb66733deca395ddbd4a3713f01c92a17",
+      "targeted_tests": "GITHUB_ACTIONS_39267576509_10_OF_10_HOST_PASS_AFTER_ELF_BSS_CORRECTION_PRIOR_RUN_39266729693_RED_ROOT_CAUSE_NOT_IDENTIFIED",
       "fold": "NOT_VERIFIED",
       "new_read_only_evidence_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
       "new_read_only_evidence_status": "2026-10-19_SIGNED_APK_2103390_SIGSEGV139_VIDEO_NAV_BUSY_STALE_RECORDER_NATIVE_HASH_CRASH_FUNCTION_NOT_SYMBOLIZED_NO_FIX"
@@ -801,10 +831,10 @@
       "original_subrequirements": [],
       "new_scoped_feature": true,
       "replaces_group": "former group 06 CU LRC Lyrics repair",
-      "status": "USER_AUTHORIZED_QUEUED_SYSTEM_HUB_SILENT_MODE",
+      "status": "SYSTEM_HUB_ONE_PERSISTENT_SILENT_MODE_SWITCH_AND_KAITOAST_ONLY_NATIVE_SOURCE_STAGED_10_OF_10_HOST_PASS_NO_ANDROID_OR_FOLD",
       "implementation_authorized": true,
-      "savepoint": "32420005937d5938bfcc82e66515c8ff2b42f170",
-      "targeted_tests": "NOT_RUN",
+      "savepoint": "4c3384fe2e34aafab2ae665702d96685d27033c0",
+      "targeted_tests": "GITHUB_ACTIONS_39269926154_10_OF_10_HOST_PASS_PINNED_OMEGA_TOAST_SOURCE_AND_13_SIGNED_ORIGINAL_HUB_LAYOUTS",
       "fold": "NOT_VERIFIED"
     },
     "07": {
@@ -812,10 +842,10 @@
       "original_subrequirements": [
         "18"
       ],
-      "status": "GATE_NOT_STARTED",
+      "status": "CONDITIONAL_USER_REQUEST_RECEIVED_PREFLIGHT_BLOCKED_NO_SIGNED_INTEGRATION_OR_ANDROID_NATIVE_COMPILE",
       "implementation_authorized": false,
       "savepoint": null,
-      "targeted_tests": "NOT_RUN",
+      "targeted_tests": "READ_ONLY_PREFLIGHT_AND_SHARED_UIREPAIR_COMPOSABILITY_ONLY_39270553998_26_OF_26_HOST_GREEN",
       "fold": "NOT_VERIFIED"
     }
   },
@@ -857,7 +887,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Okay, go ahead and do four through six. Implement approved Group4 player glass, Group5 evidence-based native crash and fingerprint diagnostics, and Group6 existing System Hub Silent Mode in order; leave other groups intact and no Group7 package until final gate.",
+  "last_user_instruction": "If everything is complete proceed to all-in-one; run honest readiness gate, preserve all groups and do not claim completion or produce final APK with native crash unresolved or untested builds.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -1242,5 +1272,46 @@
     "separate_group7_apk_gate": true,
     "actual_build": "NONE",
     "fold": "NOT_VERIFIED"
-  }
+  },
+  "active_next_phase": "READ_ONLY_ALL_IN_ONE_PREFLIGHT_BLOCKED_PENDING_SOURCE_MATCHED_NATIVE_ANDROID_BUILD_AND_EXPLICIT_OPEN_CRASH_TREATMENT",
+  "groups_456_readiness": {
+    "verified_at": "2026-10-19",
+    "parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "group4": {
+      "run": 39265841878,
+      "host_tests": "10/10",
+      "skin_modified_original_apk_members": 41,
+      "native_engine_compiled": false,
+      "physical_fold": false
+    },
+    "group5": {
+      "run": 39267576509,
+      "host_tests": "10/10",
+      "collector_fingerprint_correction": "SOURCE_VERIFIED_PENDING_FINAL_ELF",
+      "fatal_139_crash_function_identified": false,
+      "cause_based_fix": false
+    },
+    "group6": {
+      "run": 39269926154,
+      "host_tests": "10/10",
+      "skin_modified_original_apk_members": 13,
+      "native_kaitoast_compiled": false,
+      "physical_fold": false
+    },
+    "group1_group3_shared_ui_runtime": {
+      "run": 39270553998,
+      "host_tests": "26/26",
+      "exact_shared_runtime_composition": "HOST_VERIFIED",
+      "source_fix_commit": "fe0e5f7f2e99dda373bf9edadc14a56ffaa5364d",
+      "tests_commit": "7628081245ff165828a52c1432b4547a317bc773",
+      "fold": false
+    },
+    "combined_apk_built": false,
+    "full_android_native_compiled": false,
+    "user_lock": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md",
+    "receipt_commit": "d7ba7752ccc202348ac77769972a94f249e39258",
+    "all_in_one_preflight": "NOT_READY_BLOCKED_WITH_KNOWN_NATIVE_CRASH_AND_ANDROID_COMPILE_FOLD_OPEN"
+  },
+  "group_7_signed_apk_status": "NONE — conditional readiness gate not satisfied; do not synthesize APK or state user lock."
 }
