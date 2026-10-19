@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "record_type": "Infinity_2103390_postbase_exact_new_18_tasks",
+  "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "TRACKER_CREATED_SCOPE_ONLY_NO_BUGFIX_IMPLEMENTATION",
+  "status": "TRACKER_UPDATED_FOR_19_AND_GLASS_MENU_SCOPE_ONLY_NO_BUGFIX_IMPLEMENTATION",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
-  "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md",
+  "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
   "continuation_handoff": "repairs/2103390-bugfixes/CONTINUE-HERE.md",
   "approved_option_b": "repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md",
   "protected_parent": {
@@ -27,11 +27,16 @@
   "user_data_clear_or_uninstall_allowed": false,
   "native_crash_139_fixed": false,
   "complete_tasks_count": 0,
-  "task_count": 18,
+  "task_count": 19,
   "current_authorized_task": null,
   "next_task_requires_user_choice": true,
   "player_glass_menu_visual_proposal": {
-    "canonical_tasks": ["11", "12", "13", "14"],
+    "canonical_tasks": [
+      "11",
+      "12",
+      "13",
+      "14"
+    ],
     "user_requested": true,
     "design_artifact": "repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md",
     "appearance_state": "VISUAL_MOCK_PENDING_USER_APPROVAL",
@@ -347,7 +352,7 @@
     {
       "id": "12",
       "title": "Remove only Video Settings row from Playback popup",
-      "approval_stage": "requested_behavior_approved",
+      "approval_stage": "requested_behavior_approved_visual_mock_pending",
       "implementation_authorized": false,
       "status": "OPEN_NOT_IMPLEMENTED",
       "prechange_commit": null,
@@ -368,12 +373,12 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "User requested translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. User clarified NOT the toolbar icons. A visual mock was generated for approval, NOT locked; do not reuse invented mock movie/menu labels or alter original functions. Preserve original 2103390 until separate implementation authorization."
     },
     {
       "id": "13",
       "title": "Video Settings compact popup (slightly smaller than Playback)",
-      "approval_stage": "requested_behavior_approved",
+      "approval_stage": "requested_behavior_approved_visual_mock_pending",
       "implementation_authorized": false,
       "status": "OPEN_NOT_IMPLEMENTED",
       "prechange_commit": null,
@@ -394,12 +399,12 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "User requested translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. User clarified NOT the toolbar icons. A visual mock was generated for approval, NOT locked; do not reuse invented mock movie/menu labels or alter original functions. Preserve original 2103390 until separate implementation authorization."
     },
     {
       "id": "14",
       "title": "Audio & Subtitles compact popup (slightly smaller than Playback)",
-      "approval_stage": "requested_behavior_approved",
+      "approval_stage": "requested_behavior_approved_visual_mock_pending",
       "implementation_authorized": false,
       "status": "OPEN_NOT_IMPLEMENTED",
       "prechange_commit": null,
@@ -420,7 +425,7 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "User requested translucent glass MENU surfaces for Playback, Video Settings and Audio & Subtitles. User clarified NOT the toolbar icons. A visual mock was generated for approval, NOT locked; do not reuse invented mock movie/menu labels or alter original functions. Preserve original 2103390 until separate implementation authorization."
     },
     {
       "id": "15",
@@ -525,6 +530,46 @@
       "apk_artifact": null,
       "sha256": null,
       "blocking_or_caveat": null
+    },
+    {
+      "id": "19",
+      "title": "Movies ↔ TV Shows keep all initially populated Home rails immediately available without tab-switch reload",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": [
+          "19049.mp4 — user-supplied ~77-second Fold recording shows category tiles loaded but top latest releases and Continue Watching blank temporarily before repopulating"
+        ]
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Root cause not proven. Requirement: after normal startup first population, switching Movies and TV Shows within live Infinity session must reuse already-populated category content without blank/refetch loading; normal full shutdown/relaunch reinitialization is allowed. Preserve memory budget, freshness, initial startup speed, user state, all protected scope and COBRA."
     }
-  ]
+  ],
+  "glass_player_menu_proposal": {
+    "affected_existing_tasks": [
+      "12",
+      "13",
+      "14"
+    ],
+    "clarified_object": "the Playback, Video Settings, and Audio & Subtitles menu/dialog BACKGROUNDS, not the toolbar icons",
+    "user_direction": "translucent Infinity liquid glass with some real video visible beneath, same material across all three menus",
+    "exact_visual_design_status": "MOCK_SHOWN_PENDING_USER_APPROVAL",
+    "implementation_status": "NOT_STARTED",
+    "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown"
+  }
 }
