@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP_01_USER_AUTHORIZED_SOURCE_AND_EVIDENCE_AUDIT_STARTED",
+  "status": "GROUP1_PROGRESS_SAVED_CLOCK_SOURCE_GREEN_BUT_OTHER_GROUP1_AND_FOLD_GATES_OPEN",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -151,26 +151,34 @@
       "title": "Home header moon/weather icon overlaps clock",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "SOURCE_STAGED_TARGETED_HOST_GREEN_FOLD_PENDING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "9d52bbc17364234e7733b99f4618b567940b1b57",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/clock_orb_patch.py",
+        "repairs/2103390-bugfixes/group1/test_clock_orb_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "2_HOST_UNIT_TESTS_PASS",
+        "runs": [
+          "local Python 3 unittest test_clock_orb_patch: 2/2 PASS; 10 targeted skin members changed; 3062 unchanged source assets"
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "SOURCE_DIFF_GUARD_PASS_FULL_ANDROID_REGRESSION_NOT_RUN",
+        "runs": [
+          "10/10 exact original HomeStatusCluster member preimage hashes matched signed 2103390 APK and 3062/3062 unchanged skin ZIP members preserved"
+        ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "PENDING_PHYSICAL_TEST",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Original health orb and clock use same timeleft anchor; patch stages only existing orb position change. Needs skin packaging, installed Fold test, exact full regression before complete.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md"
     },
     {
       "id": "05",
@@ -593,10 +601,10 @@
         "04",
         "19"
       ],
-      "status": "USER_AUTHORIZED_IN_PROGRESS_AUDIT",
+      "status": "IN_PROGRESS_TASK04_HOST_GREEN_OTHER_TASKS_OPEN",
       "implementation_authorized": true,
-      "savepoint": null,
-      "targeted_tests": "NOT_RUN",
+      "savepoint": "938ce39a1a5c2bb2c8da9bde3b710f39e7e5e7c1",
+      "targeted_tests": "PARTIAL_GREEN_T04_CLOCK_ONLY",
       "fold": "NOT_VERIFIED",
       "continue_watching_horizontal_scroll": {
         "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
@@ -724,5 +732,6 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion"
+  "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion",
+  "last_verified_group1_checkpoint": "938ce39a1a5c2bb2c8da9bde3b710f39e7e5e7c1"
 }
