@@ -1,3 +1,11 @@
+# ARCHIVED BF DRAFT — NOT THE CONTROLLING TASK NUMBERS
+
+**IMPORTANT NUMBERING CHANGE:** This BF-01–BF-16 document is preserved as a detailed historical acceptance/symptom reference ONLY. Its numbering and its status table are SUPERSEDED by the more complete canonical **01–18** tracker: repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md. Actual live progress and saved commits are ONLY in repairs/2103390-bugfixes/TASK-STATUS.json, with current-session directions in repairs/2103390-bugfixes/CONTINUE-HERE.md. Exact draft-to-canonical mapping: repairs/bugfix-program-2103390/DRAFT-BF-ALIAS-TO-CANONICAL-01-18.md.
+
+**Do not authorize a code fix using a bare BF number without translating to the controlling task ID. Do not update the stale table below after this notice. Nothing here authorizes Cobra edits.**
+
+---
+
 # INFINITY 2103390 — NEW BUG-FIX MASTER BINDING CONTRACT (BF-01 THROUGH BF-16)
 
 **Date:** October 19, 2026.
