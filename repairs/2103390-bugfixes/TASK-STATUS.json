@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP1_DEFAULT_FOLD_CONTINUE_TOUCH_SOURCE_STAGED_17_17_SIGNED_HOST_GREEN_CATEGORY_NAV_AUDITED_RELOAD_AND_VERTICAL_CHOOSER_OPEN_NO_APK_FOLD",
+  "status": "GROUP1_VERTICAL_CHOOSER_EXPERIMENTAL_STAGED_17_HOST_GREEN_29MEMBER_SCOPE_NO_APK_NO_FOLD_RELOAD19_UNRESOLVED",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -136,27 +136,32 @@
       "title": "Continue Watching rail touch and Resume/Play picker",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "DEFAULT_UNIFIED_NUMERIC_TOUCH_LAYOUT_SOURCE_PATCH_STAGED_6_6_HOST_GREEN_FOLD_AND_VERTICAL_CHOOSER_PENDING",
+      "status": "VERTICAL_HOME_CHOOSER_EXPERIMENTAL_SOURCE_STAGED_12_HOST_TESTS_GREEN_FOLD_AND_KODI_PROVIDER_BEHAVIOR_UNVERIFIED",
       "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
-      "implementation_commit": "d6ba53d7317e379044a23062434ff128f5b39cf2",
+      "implementation_commit": "bed9bd932edd5b9ed0643b6a3c3ec55a11641518",
       "changed_files": [
         "repairs/2103390-bugfixes/group1/continue_horizontal_touch_patch.py",
         "repairs/2103390-bugfixes/group1/test_continue_horizontal_touch_patch.py",
-        "repairs/2103390-bugfixes/group1/test_group1_scope_apk_15.py"
+        "repairs/2103390-bugfixes/group1/test_group1_scope_apk_15.py",
+        "repairs/2103390-bugfixes/group1/continue_choice_patch.py",
+        "repairs/2103390-bugfixes/group1/test_continue_choice_patch.py",
+        "repairs/2103390-bugfixes/group1/test_group1_scope_apk_29.py"
       ],
       "targeted_tests": {
-        "result": "6_OF_6_NEW_SIGNED_SOURCE_HOST_TESTS_GREEN_PHYSICAL_GESTURE_PENDING",
+        "result": "HOME_VERTICAL_POPUP_12_12_HOST_PASS_SIGNED_SOURCE_AND_MOCK_PLAYER_NO_FOLD",
         "runs": [
           "2026-10-19 python -m unittest -v test_home_rail_contract: PASS 14 actual 1.0.5.228 Home.xml variants with both Movies panel 8830 and TV panel 8831 horizontal/scrolltime150.",
           "Part of nine-test combined host run: python -m unittest -v test_clock_orb_patch test_movie_identity_patch test_home_rail_contract test_group1_scope_apk (9/9 PASS).",
-          "2026-10-19 original signed 2103390 default 'unified' 9:20 layout has invalid width=auto/percentage height for Continue panels 8830/8831; safe patch replaces exactly four item/focused layout tags with verified pre-existing 230.1x410 dimensions. 6/6 host tests PASS."
+          "2026-10-19 original signed 2103390 default 'unified' 9:20 layout has invalid width=auto/percentage height for Continue panels 8830/8831; safe patch replaces exactly four item/focused layout tags with verified pre-existing 230.1x410 dimensions. 6/6 host tests PASS.",
+          "2026-10-19: 12/12 source plus mocked Kodi/player tests for 14 Home control pairs (8830/8831), existing UI Repair vertical 78px popup, resume saved seconds vs zero, back cancel, stale source/progress refusal. NOT real device playback."
         ]
       },
       "regression_tests": {
-        "result": "NEW_15_OF_7430_VIRTUAL_APK_SCOPE_PASS_NO_REAL_APK_OR_FOLD",
+        "result": "FULL_SIGNED_BASE_29_OF_7430_VIRTUAL_SCOPE_LOCAL_PASS_NO_SIGNED_APK_OR_FOLD",
         "runs": [
           "Scope test asserts exact 11 proposed changed members among 7430 signed 2103390 APK assets and 7419 unchanged including Cobra, shutdown and other unrelated code. No actual combined APK built.",
-          "2026-10-19 17/17 combined host tests PASS; current virtual Group1 candidate changes only 15/7430 signed original members (10 orb, 1 TV, 1 movie, 2 pinned controller JSON, 1 default unified Home); other 7415 unchanged including Cobra, Essential-First, engine, UI Repair and Watched Bridge executable code."
+          "2026-10-19 17/17 combined host tests PASS; current virtual Group1 candidate changes only 15/7430 signed original members (10 orb, 1 TV, 1 movie, 2 pinned controller JSON, 1 default unified Home); other 7415 unchanged including Cobra, Essential-First, engine, UI Repair and Watched Bridge executable code.",
+          "2026-10-19: local independently executed full 7430-member virtual Group1 combination 1/1 PASS (29 changed, 7401 unchanged) including 14 Home XML, 10 clock includes, 2 Command Center sources, 2 first party pinned JSON, 1 UI Repair runtime.py. Original Cobra/native/shutdown/provider files untouched."
         ]
       },
       "physical_fold": {
@@ -166,13 +171,13 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Source geometry staged and strict hash/source-level tested ONLY. Need physical Fold real horizontal swipe, tap accurate poster, no swipe launches and preserved offset on return on both rail categories; vertical Resume/Play chooser touch/size still uncorrected. Global Kodi DialogSelect/android input off-limits absent proven safe scoped edit.",
+      "blocking_or_caveat": "Experimental scoped picker relies on first-party UI Repair WindowXMLDialog and xbmc.Player().play(target,original_listitem) with StartOffset/ResumeTime. This is NOT original native PlayMedia/VideoSelectActionProcessor; verify real Kodi addon resolver behavior, no secondary native popup, exact resume position, source continuity, horizontal swipe/offset and both Fold displays before acceptance. No APK built. If playback semantics wrong, reject candidate rather than silently ship.",
       "horizontal_scroll_explicit_group_1_gate": true,
       "horizontal_scroll_scope": [
         "Movies Continue Watching rail",
         "TV Shows Continue Watching rail"
       ],
-      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK03-DEFAULT-FOLD-HORIZONTAL-15MEMBER-20261019.md"
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md"
     },
     {
       "id": "04",
@@ -577,19 +582,22 @@
       "title": "Movies ↔ TV Shows keep all initially populated Home rails immediately available without tab-switch reload",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "HOST_NAVIGATION_AND_PROVIDER_AUDIT_5_5_GREEN_20_REPEAT_JOBS_SOURCE_CAUSE_STILL_OPEN_NO_FIX",
+      "status": "NO_RELOAD_NOT_FIXED_LIFECYCLE_OFFLINE_TRIAGE_ONLY_4_HOST_SYNTHETIC_TESTS_PASS",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [
         "repairs/2103390-bugfixes/group1/category_load_diagnostic.py",
         "repairs/2103390-bugfixes/group1/home_category_contract.py",
-        "repairs/2103390-bugfixes/group1/test_home_category_contract.py"
+        "repairs/2103390-bugfixes/group1/test_home_category_contract.py",
+        "repairs/2103390-bugfixes/group1/home_reload_correlation.py",
+        "repairs/2103390-bugfixes/group1/test_home_reload_correlation.py"
       ],
       "targeted_tests": {
-        "result": "READ_ONLY_20_JOBS_PLUS_SIGNED_HOME_SOURCE_NAVIGATION_5_OF_5_HOST_PASS_NO_RUNTIME_FIX",
+        "result": "READ_ONLY_20_REPEATED_JOBS_5_5_HOME_SOURCE_AUDIT_AND_4_4_SYNTHETIC_HOMELOAD_CORRELATION_NO_CAUSAL_FIX",
         "runs": [
           "User supplied Infinity-Diagnostics-20261019-000835.zip, 20 fresh Continue Watching requests over 49,584 ms under single revision 1792382779737, 20/20 cache_hit 0; 9 movie/11 TV; no causal native invalidation proof.",
-          "2026-10-19 signed original Home source 14/14 layouts: selecting category changes property/visible state whereas clicking category triggers ActivateWindow(Videos), Umbrella owns latest releases, first-party CC owns Continue Watching; 5/5 nav/ownership host tests PASS. No proof which path caused Fold blank/reload."
+          "2026-10-19 signed original Home source 14/14 layouts: selecting category changes property/visible state whereas clicking category triggers ActivateWindow(Videos), Umbrella owns latest releases, first-party CC owns Continue Watching; 5/5 nav/ownership host tests PASS. No proof which path caused Fold blank/reload.",
+          "2026-10-19: offline-only HomeLoad continuity JSON + Resume Hub trace aggregate 4/4 synthetic test cases; a changing HomeLoad identifies Home reinitialization, not cause. No user-specific recent diagnostic matched to precise native URL/invalidation trigger."
         ]
       },
       "regression_tests": {
@@ -605,7 +613,7 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Full #19 root cause still unproven: must correlate original Fold actual navigation with selected item vs Videos activation and directory Reset/URL/visibility, across both Umbrella and first-party widgets. No speculative native, provider, cache, or Home behavior change.",
+      "blocking_or_caveat": "No #19 fix implemented. Neither repeated CC directory jobs nor HomeLoad markers alone prove which user action, native invalidation or visibility/URL change causes the Umbrella and CW rails to blank. Do NOT install speculative global caches or alter third-party Umbrella/native DirectoryProvider.",
       "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md"
     }
   ],
@@ -637,10 +645,10 @@
         "04",
         "19"
       ],
-      "status": "IN_PROGRESS_FOUR_BEHAVIOR_SOURCE_PATCHES_AND_TWO_CONTROLLER_COMPAT_HASHES_HOST_GREEN_RELOAD_AND_VERTICAL_CHOOSER_OPEN",
+      "status": "IN_PROGRESS_SCOPED_VERTICAL_CHOOSER_HOST_GREEN_CATEGORY_RELOAD19_ROOT_CAUSE_OPEN_PHYSICAL_FOLD_REQUIRED",
       "implementation_authorized": true,
-      "savepoint": "7e341678e337405b4f646bf08ddcff5d778c34f6",
-      "targeted_tests": "SIGNED_2103390_17_17_COMBINED_HOST_CHECKS_PLUS_PREVIOUS_19_19_SEPARATE_RUN_NOT_FOLD",
+      "savepoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
+      "targeted_tests": "LOCAL_NEW_17_17_CHOICE_INTEGRATION_DIAGNOSTIC_HOST_PASS_PREVIOUS_HOST_RUNS_SEPARATE_NO_FOLD",
       "fold": "NOT_VERIFIED",
       "continue_watching_horizontal_scroll": {
         "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
@@ -651,8 +659,8 @@
         ],
         "behavior": "real left-right one-finger scroll; reliable correct card tap after swiping; no accidental playback during gesture; selected card and scroll offset retained on return; no change to existing Home layout or data; vertical two-choice Resume/Play dialog remains vertical",
         "pass_gate": "BOTH Movies and TV Shows must pass real Fold horizontal swipe, tap, Back and offset test before Group #1 passes",
-        "implementation": "DEFAULT_UNIFIED_FOLD_PANEL_8830_AND_8831_EXACT_FOUR_TAG_SOURCE_PATCH_STAGED_NO_APK",
-        "tests": "6_6_LAYOUT_HOST_PLUS_1_1_INTEGRATED_15_MEMBER_SCOPE_HOST_PASS_FOLD_PENDING",
+        "implementation": "SOURCE_ONLY_DEFAULT_FOLD_CARD_GEOMETRY_AND_14_HOME_VARIANT_EXPERIMENTAL_VERTICAL_CHOOSER_STAGE_NO_APK",
+        "tests": "PREVIOUS_6_6_NUMERIC_FOLD_DEFAULT_GEOMETRY_HOST_TEST_PLUS_NEW_12_12_CHOOSER_LOGIC_HOST_TEST_1_1_VIRTUAL_APK_GATE",
         "fold": "NOT_VERIFIED"
       }
     },
@@ -769,7 +777,7 @@
     "not_permission_to_build_or_edit_automatically": true
   },
   "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion",
-  "last_verified_group1_checkpoint": "7e341678e337405b4f646bf08ddcff5d778c34f6",
+  "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md",
@@ -778,9 +786,10 @@
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-REPEAT-LOAD-TRACE-20261019.md",
     "repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md",
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK03-DEFAULT-FOLD-HORIZONTAL-15MEMBER-20261019.md",
-    "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md"
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md"
   ],
-  "group_1_signed_apk_status": "NONE — source-only exact candidate patches, tests and receipts; original signed 2103390 unmodified, 15-of-7430 theoretical member scope",
+  "group_1_signed_apk_status": "NONE — exact source-only experimental popup patches/tests; original signed 2103390 unmodified; 29-of-7430 theoretical member delta",
   "group_1_physical_fold_status": "NOT_VERIFIED",
   "group_1_dual_consumer_integration": {
     "status": "SOURCE_ONLY_STAGE_5_OF_5_REAL_SIGNED_PARENT_HOST_TESTS_GREEN_DEVICE_UNVERIFIED",
@@ -810,24 +819,25 @@
   "group_1_current_virtual_source_scope": {
     "original_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
     "all_original_members": 7430,
-    "proposed_changed_members": 15,
-    "proposed_unchanged_members": 7415,
-    "changed_member_breakdown": "10 existing Home orb XML, 1 CC TV plugin.py, 1 CC movie resume_hub.py, 2 first-party controller pinned JSON, 1 default unified/Home.xml (four tags in 8830/8831 only)",
-    "latest_scope_test": "repairs/2103390-bugfixes/group1/test_group1_scope_apk_15.py",
+    "proposed_changed_members": 29,
+    "proposed_unchanged_members": 7401,
+    "changed_member_breakdown": "14 original skin Home.xml variants (two scoped Continue Watching onclick and default unified poster width), 10 clock-orb include XML variants, 2 Command Center sources, 2 first-party expected SHA JSON, 1 UI Repair runtime.py",
+    "latest_scope_test": "repairs/2103390-bugfixes/group1/test_group1_scope_apk_29.py",
     "current_signed_apk": "NONE_UNBUILT",
     "all_fourteen_fold_layout_variants_for_touch": "ONLY DEFAULT_UNIFIED_CHANGED_THIRTEEN_ALREADY_NUMERIC",
     "physical_fold": "NOT_TESTED",
     "signoff": "PENDING_USER",
-    "previous_14_member_virtual_check": "HISTORICAL_SUPERSEDED_BY_15"
+    "previous_14_member_virtual_check": "HISTORICAL_SUPERSEDED_BY_15",
+    "previous_15_member_virtual_check": "HISTORICAL_SUPERSEDED_BY_29"
   },
   "group_1_latest_host_run": {
     "date": "2026-10-19",
-    "test_cmd": "python -m unittest -v test_home_category_contract test_continue_horizontal_touch_patch test_group1_scope_apk_15 test_cc_preimage_contract_patch",
+    "tested_locally": "python -m unittest -q test_continue_choice_patch test_integrated_scope_29 test_home_reload_correlation",
     "passing_tests": 17,
     "total_tests": 17,
+    "result": "PASS_HOST_ONLY_NO_ANDROID_CI_NO_FOLD",
     "original_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
-    "result": "PASS_HOST_ONLY_FOLD_UNVERIFIED",
-    "previous_19_19": "SEPARATE_EARLIER_HOST_RUN_UNCHANGED_NOT_ADDED_AS_CURRENT_RUN"
+    "note": "The independent locally run virtual 29-member gate is equivalent to separately committed source test_group1_scope_apk_29.py; no full GitHub CI run claimed. Earlier 19/19 and 17/17 batches separate."
   },
   "group_1_touch_default_fold_details": {
     "source_commit": "d6ba53d7317e379044a23062434ff128f5b39cf2",
@@ -856,5 +866,28 @@
     },
     "root_cause": "NOT_YET_PROVEN",
     "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md"
+  },
+  "group_1_vertical_chooser_staged": {
+    "status": "SOURCE_ONLY_EXPERIMENTAL_HOST_GREEN_PHYSICAL_FOLD_OPEN",
+    "source": "repairs/2103390-bugfixes/group1/continue_choice_patch.py",
+    "commit": "bed9bd932edd5b9ed0643b6a3c3ec55a11641518",
+    "source_git_blob": "b5775c1597d603c3b53757be334cb8321f9ff458",
+    "tests": "repairs/2103390-bugfixes/group1/test_continue_choice_patch.py",
+    "test_commit": "7fc82b6e42052bdea7e3850b3fcd33656fbcaa62",
+    "host_test_result": "12_OF_12_PASS_MOCKED_PLAYER_NO_FOLD",
+    "modified_srcs": "14 Home variants panel 8830/8831 conditional click + first party UI Repair runtime.py only",
+    "risks": "xbmc.Player().play() may not match native PlayMedia(resume/noresume) for arbitrary provider; must prove Kodi starts correct item at chosen seconds without second native resume dialog",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md"
+  },
+  "group_1_task19_lifecycle_probe": {
+    "status": "READ_ONLY_OFFLINE_CORRELATION_UNPROVEN_NO_RUNTIME_FIX",
+    "source": "repairs/2103390-bugfixes/group1/home_reload_correlation.py",
+    "source_commit": "c1546bd9e49264d003c2c3cfae08bcfccfbad58f",
+    "tests": "repairs/2103390-bugfixes/group1/test_home_reload_correlation.py",
+    "test_commit": "a1ae517749f922aa52304ed2ad01566b03b654bd",
+    "host_tests": "4_OF_4_SYNTHETIC_PASS",
+    "evidence": "Earlier real 20 jobs in 49.6 seconds; precise category-change provider invalidation trigger unproved",
+    "root_cause_fixed": false,
+    "additional_actions_authorized": false
   }
 }
